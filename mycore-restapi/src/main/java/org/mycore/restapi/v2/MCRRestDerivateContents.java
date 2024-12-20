@@ -184,8 +184,8 @@ public class MCRRestDerivateContents {
                         try {
                             Files.copy(tempFile.toPath(), out);
                         } finally {
-                            LogManager.getLogger().debug("Deleting file {} of size {}.", tempFile.getAbsolutePath(),
-                                tempFile.length());
+                            LogManager.getLogger().debug("Deleting file {} of size {}.", tempFile::getAbsolutePath,
+                                tempFile::length);
                             tempFile.delete();
                         }
                     }

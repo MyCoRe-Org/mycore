@@ -36,10 +36,10 @@ import org.mycore.common.config.MCRConfigurationException;
  * Acts as a multiplexer to forward events that are created to all registered
  * event handlers, in the order that is configured in mycore properties. For
  * information how to configure, see MCREventHandler javadocs.
- * 
+ *
  * @see MCREventHandler
  * @see MCREventHandlerBase
- * 
+ *
  * @author Frank Lützenkirchen
  */
 public class MCREventManager {
@@ -83,7 +83,7 @@ public class MCREventManager {
             String type = eventHandlerProperty.getType();
             String mode = eventHandlerProperty.getMode();
 
-            logger.debug("EventManager instantiating handler {} for type {}", props.get(propertyKey), type);
+            logger.debug("EventManager instantiating handler {} for type {}", () -> props.get(propertyKey), () -> type);
 
             if (propKeyIsSet(propertyKey)) {
                 addEventHandler(type, getEventHandler(mode, propertyKey));
@@ -93,7 +93,7 @@ public class MCREventManager {
 
     /**
      * The singleton manager instance
-     * 
+     *
      * @return the single event manager
      */
     public static synchronized MCREventManager instance() {
@@ -158,8 +158,8 @@ public class MCREventManager {
         Exception handleEventExceptionCaught = null;
         for (int i = first; i != last + step; i += step) {
             MCREventHandler eh = list.get(i);
-            logger.debug("EventManager {} {} calling handler {}", objectType, eventType,
-                eh.getClass().getName());
+            logger.debug("EventManager {} {} calling handler {}", () -> objectType, () -> eventType,
+                () -> eh.getClass().getName());
             handleEventExceptionCaught = handleEventAndUndoOnException(eh, evt);
             if (handleEventExceptionCaught != null) {
                 pos = i;
@@ -190,8 +190,8 @@ public class MCREventManager {
             : evt.getObjectType().getClassName();
         final String eventType = evt.getEventType() == MCREvent.EventType.CUSTOM ? evt.getCustomEventType()
             : evt.getEventType().name();
-        logger.debug("EventManager {} {} calling undo of handler {}", objectType, eventType,
-            eh.getClass().getName());
+        logger.debug("EventManager {} {} calling undo of handler {}", () -> objectType, () -> eventType,
+            () -> eh.getClass().getName());
         try {
             eh.undoHandleEvent(evt);
         } catch (Exception ex) {

@@ -137,7 +137,7 @@ public final class MCRGoogleSitemapCommon {
             throw new NotDirectoryException(baseDir.getAbsolutePath());
         }
         this.webappBaseDir = baseDir;
-        LOGGER.info("Using webappbaseDir: {}", baseDir.getAbsolutePath());
+        LOGGER.info("Using webappbaseDir: {}", baseDir::getAbsolutePath);
         objidlist = new ArrayList<>();
         if ((numberOfURLs < 1) || (numberOfURLs > 50000)) {
             numberOfURLs = 50000;
@@ -252,7 +252,7 @@ public final class MCRGoogleSitemapCommon {
      * @return The sitemap.xml as JDOM document
      */
     protected Document buildPartSitemap(int number) {
-        LOGGER.debug("Build Google URL sitemap list number {}", Integer.toString(number));
+        LOGGER.debug("Build Google URL sitemap list number {}", number);
         // build document frame
         Element urlset = new Element("urlset", NS);
         urlset.addNamespaceDeclaration(XSI_NAMESPACE);
@@ -261,11 +261,8 @@ public final class MCRGoogleSitemapCommon {
 
         // build over all types
         int start = numberOfURLs * (number);
-        int stop = numberOfURLs * (number + 1);
-        if (stop > objidlist.size()) {
-            stop = objidlist.size();
-        }
-        LOGGER.debug("Build Google URL in range from {} to {}.", Integer.toString(start), Integer.toString(stop - 1));
+        int stop = Math.min(numberOfURLs * (number + 1), objidlist.size());
+        LOGGER.debug("Build Google URL in range from {} to {}.", () -> start, () -> stop - 1);
         for (int i = start; i < stop; i++) {
             MCRObjectIDDate objectIDDate = objidlist.get(i);
             urlset.addContent(buildURLElement(objectIDDate));
@@ -298,7 +295,7 @@ public final class MCRGoogleSitemapCommon {
      * @return The index sitemap_google.xml as JDOM document
      */
     protected Document buildSitemapIndex(int number) {
-        LOGGER.debug("Build Google sitemap number {}", Integer.toString(number));
+        LOGGER.debug("Build Google sitemap number {}", number);
         // build document frame
         Element index = new Element("sitemapindex", NS);
         index.addNamespaceDeclaration(XSI_NAMESPACE);
@@ -324,7 +321,7 @@ public final class MCRGoogleSitemapCommon {
         if (li != null) {
             for (File fi : li) {
                 if (fi.getName().startsWith("sitemap_google")) {
-                    LOGGER.debug("Remove file {}", fi.getName());
+                    LOGGER.debug("Remove file {}", fi::getName);
                     fi.delete();
                 }
             }

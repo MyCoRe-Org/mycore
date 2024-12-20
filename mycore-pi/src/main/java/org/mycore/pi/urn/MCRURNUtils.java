@@ -36,7 +36,7 @@ public class MCRURNUtils {
         try {
             return Optional.of(getDNBRegisterDate(dnburn.getIdentifier()));
         } catch (ParseException e) {
-            LogManager.getLogger().warn("Could not parse: " + dnburn.getIdentifier(), e);
+            LogManager.getLogger().warn(() -> "Could not parse: " + dnburn.getIdentifier(), e);
         }
 
         return Optional.empty();

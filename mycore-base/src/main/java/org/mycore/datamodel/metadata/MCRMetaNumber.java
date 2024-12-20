@@ -47,7 +47,7 @@ import org.mycore.common.config.MCRConfiguration2;
  * <p>
  * The String output format of the number is determined by the property
  * <em>MCR.Metadata.MetaNumber.FractionDigits</em>, default is DEFAULT_FRACTION_DIGITS = 3, and the ENGLISH Locale.
- * For more digits in fraction as defined in property <em>MCR.Metadata.MetaNumber.FractionDigits</em> 
+ * For more digits in fraction as defined in property <em>MCR.Metadata.MetaNumber.FractionDigits</em>
  * will be round the output!
  * </p>
  * <p>
@@ -60,7 +60,7 @@ import org.mycore.common.config.MCRConfiguration2;
  *   &lt;/subtag&gt;
  * &lt;/tag&gt;
  * </pre>
- * 
+ *
  * @author Jens Kupferschmidt
  */
 public final class MCRMetaNumber extends MCRMetaDefault {
@@ -172,7 +172,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
         } else {
             if (dimension.length() > dimensionLength) {
                 this.dimension = dimension.substring(dimensionLength);
-                LOGGER.warn("{}: dimension is too long: {}", getSubTag(), dimension.length());
+                LOGGER.warn("{}: dimension is too long: {}", this::getSubTag, dimension::length);
             } else {
                 this.dimension = dimension;
             }
@@ -192,7 +192,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
         } else {
             if (measurement.length() > measurementLength) {
                 this.measurement = measurement.substring(measurementLength);
-                LOGGER.warn("{}: measurement is too long: {}", getSubTag(), measurement.length());
+                LOGGER.warn("{}: measurement is too long: {}", this::getSubTag, measurement::length);
             } else {
                 this.measurement = measurement;
             }
@@ -316,9 +316,9 @@ public final class MCRMetaNumber extends MCRMetaDefault {
 
     /**
      * clone of this instance
-     * 
+     *
      * you will get a (deep) clone of this element
-     * 
+     *
      * @see java.lang.Object#clone()
      */
     @Override

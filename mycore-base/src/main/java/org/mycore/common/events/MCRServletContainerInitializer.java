@@ -80,7 +80,7 @@ public class MCRServletContainerInitializer implements ServletContainerInitializ
         if (loadOrderWebFragments == null) {
             logger.info("Loading Order by web-fragment.xml: NOT SPECIFIED");
         } else {
-            logger.info("Loading Order by web-fragment.xml: " + String.join(", ", loadOrderWebFragments));
+            logger.info(() -> "Loading Order by web-fragment.xml: " + String.join(", ", loadOrderWebFragments));
         }
     }
 

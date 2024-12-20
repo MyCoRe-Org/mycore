@@ -66,8 +66,8 @@ public abstract class MCRContentAbstractWriter implements MessageBodyWriter<MCRC
             MCRDetailLevel.normal.toString());
         LogManager.getLogger().debug("MediaType={}, format={}, detail={}", mediaType, format, detail);
         Optional<String> transformerId = getTransformerId(annotations, format, detail);
-        LogManager.getLogger().debug("Transformer for {} would be {}.", content.getSystemId(),
-            transformerId.orElse(null));
+        LogManager.getLogger().debug("Transformer for {} would be {}.", content::getSystemId,
+            () -> transformerId.orElse(null));
         Optional<MCRContentTransformer> transformer = transformerId
             .map(MCRContentTransformerFactory::getTransformer);
         if (transformer.isPresent()) {

@@ -94,12 +94,12 @@ public class MCRSecureTokenV2Filter implements Filter {
     private boolean validateSecureToken(HttpServletRequest httpServletRequest) throws ServletException {
         String queryString = httpServletRequest.getQueryString();
         if (queryString == null) {
-            LOGGER.warn("Request contains no parameters {}.", httpServletRequest.getRequestURL());
+            LOGGER.warn("Request contains no parameters {}.", httpServletRequest::getRequestURL);
         }
         String hashValue = httpServletRequest.getParameter(hashParameter);
         if (hashValue == null) {
-            LOGGER.warn("Could not find parameter '{}' in request {}.", hashParameter,
-                httpServletRequest.getRequestURL().append('?').append(queryString));
+            LOGGER.warn("Could not find parameter '{}' in request {}.",
+                () -> hashParameter, () -> httpServletRequest.getRequestURL().append('?').append(queryString));
             return false;
         }
         String[] origParams = Pattern.compile("&").split(queryString);
@@ -111,11 +111,13 @@ public class MCRSecureTokenV2Filter implements Filter {
         }
         MCRSecureTokenV2 token = new MCRSecureTokenV2(httpServletRequest.getPathInfo().substring(1),
             MCRFrontendUtil.getRemoteAddr(httpServletRequest), sharedSecret, stripParams);
-        try {
-            LOGGER.info(token.toURI(MCRFrontendUtil.getBaseURL() + "servlets/MCRFileNodeServlet/", hashParameter));
-        } catch (URISyntaxException e) {
-            throw new ServletException(e);
-        }
+        LOGGER.info(() -> {
+            try {
+                return token.toURI(MCRFrontendUtil.getBaseURL() + "servlets/MCRFileNodeServlet/", hashParameter);
+            } catch (URISyntaxException e) {
+                return e.getMessage();
+            }
+        });
         return hashValue.equals(token.getHash());
     }
 

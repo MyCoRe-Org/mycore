@@ -41,7 +41,7 @@ import org.mycore.util.concurrent.MCRReadWriteGuard;
  * not be. Use the {@link #releaseCurrentSession()}method to reset the session object for a Thread to its default
  * values. The basic idea for the implementation of this class is taken from an apache project, namely the class
  * org.apache.common.latka.LatkaProperties.java written by Morgan Delagrange.
- * 
+ *
  * @author Detlev Degenhardt
  * @author Thomas Scheffler (yagee)
  */
@@ -58,7 +58,7 @@ public class MCRSessionMgr {
     /**
      * This ThreadLocal is automatically instantiated per thread with a MyCoRe session object containing the default
      * session parameters which are set in the constructor of MCRSession.
-     * 
+     *
      * @see ThreadLocal
      */
     private static ThreadLocal<MCRSession> theThreadLocalSession = ThreadLocal.withInitial(MCRScopedSession::new);
@@ -70,7 +70,7 @@ public class MCRSessionMgr {
     /**
      * This method returns the unique MyCoRe session object for the current Thread. The session object is initialized
      * with the default MyCoRe session data.
-     * 
+     *
      * @return MyCoRe MCRSession object
      * @throws MCRException if the current Thread {@link #isLocked()}
      */
@@ -86,15 +86,15 @@ public class MCRSessionMgr {
      * This method sets a MyCoRe session object for the current Thread. This method fires a "activated" event, when
      * called the first time for this session and thread.
      * Calling this method also unlocks the current Thread for MCRSession handling.
-     * 
+     *
      * @see org.mycore.common.events.MCRSessionEvent.Type#activated
      */
     public static void setCurrentSession(MCRSession theSession) {
         if (hasCurrentSession()) {
             MCRSession currentSession = getCurrentSession();
             if (!currentSession.equals(theSession) && currentSession.getID() != null) {
-                LOGGER.error("Current session will be released: " + currentSession,
-                    new MCRException("Current thread already has a session attached!"));
+                MCRException debugHelp = new MCRException("Current thread already has a session attached!");
+                LOGGER.error(() -> "Current session will be released: " + currentSession, debugHelp);
                 releaseCurrentSession();
             }
 
@@ -110,7 +110,7 @@ public class MCRSessionMgr {
      * different MCRSession object than before for the current Thread. One use for this method is to reset the session
      * inside a Thread-pooling environment like Servlet engines. This method fires a "passivated" event, when called the
      * last time for this session and thread.
-     * 
+     *
      * @see org.mycore.common.events.MCRSessionEvent.Type#passivated
      */
     public static void releaseCurrentSession() {
@@ -118,7 +118,7 @@ public class MCRSessionMgr {
         if (theThreadLocalSession != null && hasCurrentSession()) {
             MCRSession session = theThreadLocalSession.get();
             session.passivate();
-            MCRSession.LOGGER.debug("MCRSession released {}", session.getID());
+            MCRSession.LOGGER.debug("MCRSession released {}", session::getID);
             theThreadLocalSession.remove();
             isSessionAttached.remove();
             lock();
@@ -127,7 +127,7 @@ public class MCRSessionMgr {
 
     /**
      * Returns a boolean indicating if a {@link MCRSession} is bound to the current thread.
-     * 
+     *
      * @return true if a session is bound to the current thread
      */
     public static boolean hasCurrentSession() {
@@ -137,7 +137,7 @@ public class MCRSessionMgr {
     /**
      * Returns the current session ID. This method does not spawn a new session as {@link #getCurrentSession()} would
      * do.
-     * 
+     *
      * @return current session ID or <code>null</code> if current thread has no session attached.
      */
     public static String getCurrentSessionID() {
@@ -182,7 +182,7 @@ public class MCRSessionMgr {
     /**
      * Add MCRSession to a static Map that manages all sessions. This method fires a "created" event and is invoked by
      * MCRSession constructor.
-     * 
+     *
      * @see MCRSession#MCRSession()
      * @see org.mycore.common.events.MCRSessionEvent.Type#created
      */
@@ -194,7 +194,7 @@ public class MCRSessionMgr {
     /**
      * Remove MCRSession from a static Map that manages all sessions. This method fires a "destroyed" event and is
      * invoked by MCRSession.close().
-     * 
+     *
      * @see MCRSession#close()
      * @see org.mycore.common.events.MCRSessionEvent.Type#destroyed
      */
@@ -205,7 +205,7 @@ public class MCRSessionMgr {
 
     /**
      * Add a MCRSessionListener, that gets infomed about MCRSessionEvents.
-     * 
+     *
      * @see #removeSessionListener(MCRSessionListener)
      */
     public static void addSessionListener(MCRSessionListener listener) {
@@ -214,7 +214,7 @@ public class MCRSessionMgr {
 
     /**
      * Removes a MCRSessionListener from the list.
-     * 
+     *
      * @see #addSessionListener(MCRSessionListener)
      */
     public static void removeSessionListener(MCRSessionListener listener) {

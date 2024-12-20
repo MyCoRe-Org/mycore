@@ -37,7 +37,7 @@ import org.mycore.oai.pmh.SimpleMetadata;
 
 /**
  * Provides an interface to the MyCoRe object engine.
- * 
+ *
  * @author Matthias Eichner
  */
 public class MCROAIObjectManager {
@@ -51,7 +51,7 @@ public class MCROAIObjectManager {
     /**
      * Initialize the object manager. Its important to call this method before you
      * can retrieve records or headers!
-     * 
+     *
      * @param identify oai repository identifier
      */
     public void init(MCROAIIdentify identify) {
@@ -62,7 +62,7 @@ public class MCROAIObjectManager {
 
     /**
      * Converts a oai identifier to a mycore id.
-     * 
+     *
      * @param oaiId the oai identifier
      * @return the mycore identifier
      */
@@ -72,7 +72,7 @@ public class MCROAIObjectManager {
 
     /**
      * Converts a mycore id to a oai id.
-     * 
+     *
      * @param mcrId mycore identifier
      */
     public String getOAIId(String mcrId) {
@@ -87,7 +87,7 @@ public class MCROAIObjectManager {
         try {
             recordElement = getJDOMRecord(getMyCoReId(header.getId()), format);
         } catch (Exception exc) {
-            LOGGER.error("unable to get record {} ({})", header.getId(), format.getPrefix(), exc);
+            LOGGER.error(() -> "unable to get record " + header.getId() + " (" + format.getPrefix() + ")", exc);
             return null;
         }
         Record record = new Record(header);
@@ -113,7 +113,7 @@ public class MCROAIObjectManager {
     /**
      * Returns a deleted record without metadata by given MyCoRe identifier or null, if the
      * record is not deleted.
-     * 
+     *
      * @param mcrId id of the deleted record
      * @return deleted record
      */
@@ -154,7 +154,7 @@ public class MCROAIObjectManager {
             objectType = mcrID.getTypeId();
         } else {
             //TODO remove this code path
-            LOGGER.warn("MCRFileSystemNodes are not supported anymore! id: " + id);
+            LOGGER.warn(() -> "MCRFileSystemNodes are not supported anymore! id: " + id);
             exists = false;
             objectType = "data_file";
         }
@@ -164,7 +164,7 @@ public class MCROAIObjectManager {
 
     /**
      * Checks if a mycore object with the given oai identifier exists.
-     * 
+     *
      * @param oaiId
      *            e.g. oai:www.mycore.de:Document_document_00000003
      * @return true if exists, otherwise false

@@ -220,7 +220,7 @@ public class MCRMODSCommands extends MCRAbstractCommands {
                             categId)));
             });
 
-        LOGGER.debug("Creating new derivate with ID {}", derivate.getId());
+        LOGGER.debug("Creating new derivate with ID {}", derivate::getId);
         MCRMetadataManager.create(derivate);
 
         setDefaultPermissions(derivate.getId());

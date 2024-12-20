@@ -43,7 +43,7 @@ import jakarta.persistence.criteria.Root;
 
 /**
  * JPA implementation for RuleStore, storing access rules
- * 
+ *
  * @author Arne Seifert
  * @author Thomas Scheffler (yagee)
  */
@@ -74,7 +74,7 @@ public class MCRJPARuleStore extends MCRRuleStore {
 
     /**
      * Method creates new rule in database by given rule-object
-     * 
+     *
      * @param rule
      *            as MCRAccessRule
      */
@@ -93,7 +93,7 @@ public class MCRJPARuleStore extends MCRRuleStore {
             hibrule.setDescription(rule.getDescription());
             em.persist(hibrule);
         } else {
-            LOGGER.error("rule with id '{}' can't be created, rule still exists.", rule.getId());
+            LOGGER.error("rule with id '{}' can't be created, rule still exists.", rule::getId);
         }
     }
 
@@ -146,7 +146,7 @@ public class MCRJPARuleStore extends MCRRuleStore {
 
     /**
      * Method returns MCRAccessRule by given id
-     * 
+     *
      * @param ruleid
      *            as string
      * @return MCRAccessRule
@@ -168,7 +168,7 @@ public class MCRJPARuleStore extends MCRRuleStore {
 
     /**
      * Method checks existance of rule in db
-     * 
+     *
      * @param ruleid
      *            id as string
      * @return boolean value

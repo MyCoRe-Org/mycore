@@ -48,7 +48,7 @@ public class MCRDropSessionFilter implements ContainerRequestFilter {
         if (produces == null || Stream.of(produces.value()).noneMatch(MediaType.SERVER_SENT_EVENTS::equals)) {
             return;
         }
-        LogManager.getLogger().info("Has Session? {}", MCRSessionMgr.hasCurrentSession());
+        LogManager.getLogger().info("Has Session? {}", MCRSessionMgr::hasCurrentSession);
         if (MCRSessionMgr.hasCurrentSession()) {
             MCRSession currentSession = MCRSessionMgr.getCurrentSession();
             if (MCRTransactionManager.hasActiveTransactions()) {

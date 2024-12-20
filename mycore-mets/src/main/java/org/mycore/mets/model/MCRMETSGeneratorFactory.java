@@ -100,7 +100,7 @@ public final class MCRMETSGeneratorFactory {
                 getOldMets(derivatePath).ifPresent(abstractGenerator::setOldMets);
             } catch (Exception exc) {
                 // we should not fail if the old mets.xml is broken
-                LogManager.getLogger().error("Unable to read mets.xml of {}", derivatePath.getOwner(), exc);
+                LogManager.getLogger().error(() -> "Unable to read mets.xml of " + derivatePath.getOwner(), exc);
             }
         }
         return generator;

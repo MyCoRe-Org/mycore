@@ -64,7 +64,7 @@ public class MCRClassificationWritePermission implements MCRResourceAccessChecke
                 String state = categoryEntry.getValue();
 
                 if (!hasPermission(category, state)) {
-                    LOGGER.info("Permission {} denied on classification {}", category.getRootID(), category);
+                    LOGGER.info("Permission {} denied on classification {}", state, category);
                     return false;
                 }
             }

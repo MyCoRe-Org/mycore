@@ -91,7 +91,7 @@ public class MCRLayoutTransformerFactory {
         }
         String[] stylesheets = getStylesheets(idStripped, stylesheet);
         MCRContentTransformer transformer = MCRXSLTransformer.getInstance(stylesheets);
-        LOGGER.debug("Using stylesheet '{}' for {}", Lists.newArrayList(stylesheets), idStripped);
+        LOGGER.debug("Using stylesheet '{}' for {}", () -> Lists.newArrayList(stylesheets), () -> idStripped);
         return transformer;
     }
 

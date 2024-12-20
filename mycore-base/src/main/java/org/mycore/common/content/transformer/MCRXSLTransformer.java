@@ -128,7 +128,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         TransformerFactory transformerFactory = Optional.ofNullable(factoryClass)
             .map(c -> TransformerFactory.newInstance(c, MCRClassTools.getClassLoader()))
             .orElseGet(TransformerFactory::newInstance);
-        LOGGER.debug("Transformerfactory: {}", transformerFactory.getClass().getName());
+        LOGGER.debug("Transformerfactory: {}", () -> transformerFactory.getClass().getName());
         transformerFactory.setURIResolver(URI_RESOLVER);
         transformerFactory.setErrorListener(MCRErrorListener.getInstance());
         if (transformerFactory.getFeature(SAXSource.FEATURE) && transformerFactory.getFeature(SAXResult.FEATURE)) {
@@ -267,7 +267,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         transformerHandler.setResult(serializer);
         // Parse the source XML, and send the parse events to the
         // TransformerHandler.
-        LOGGER.debug("Start transforming: {}", source.getSystemId() == null ? source.getName() : source.getSystemId());
+        LOGGER.debug("Start transforming: {}",
+            () -> source.getSystemId() == null ? source.getName() : source.getSystemId());
         MCRXMLHelper.asSecureXMLReader(reader).parse(source.getInputSource());
         return new MCRByteContent(baos.getBuffer(), 0, baos.size());
     }
@@ -360,10 +361,11 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             this.source = source;
             this.reader = reader;
             this.transformerHandler = transformerHandler;
+            long sourceLastModified = source.lastModified();
             LOGGER.debug("Transformer lastModified: {}", transformerLastModified);
-            LOGGER.debug("Source lastModified     : {}", source.lastModified());
-            this.lastModified = (transformerLastModified >= 0 && source.lastModified() >= 0)
-                ? Math.max(transformerLastModified, source.lastModified())
+            LOGGER.debug("Source lastModified     : {}", sourceLastModified);
+            this.lastModified = (transformerLastModified >= 0 && sourceLastModified >= 0)
+                ? Math.max(transformerLastModified, sourceLastModified)
                 : -1;
             this.eTag = generateETag(lastModified, parameter.hashCode());
             this.name = fileName;

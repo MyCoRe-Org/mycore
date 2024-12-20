@@ -45,8 +45,9 @@ public class MCRSwordServlet extends HttpServlet {
         }
         MCRSession session = MCRServlet.getSession(req);
         MCRSessionMgr.setCurrentSession(session);
-        LOGGER.info("{} ip={} mcr={} user={}", req.getPathInfo(), MCRFrontendUtil.getRemoteAddr(req), session.getID(),
-            session.getUserInformation().getUserID());
+        LOGGER.info("{} ip={} mcr={} user={}",
+            req::getPathInfo, () -> MCRFrontendUtil.getRemoteAddr(req),
+            session::getID, () -> session.getUserInformation().getUserID());
         MCRFrontendUtil.configureSession(session, req, resp);
         MCRSessionMgr.getCurrentSession();
         MCRTransactionManager.beginTransactions();

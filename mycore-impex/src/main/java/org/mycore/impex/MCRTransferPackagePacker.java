@@ -118,7 +118,7 @@ public class MCRTransferPackagePacker extends MCRPacker {
     public void pack() throws ExecutionException {
         String sourceId = getSourceId();
         try {
-            LOGGER.info("Creating transfer package for {} at {}", sourceId, SAVE_DIRECTORY_PATH.toAbsolutePath());
+            LOGGER.info("Creating transfer package for {} at {}", () -> sourceId, SAVE_DIRECTORY_PATH::toAbsolutePath);
             MCRTransferPackage transferPackage = build();
             checkAndCreateSaveDirectory();
             buildTar(getTarPath(transferPackage), transferPackage);
@@ -202,7 +202,7 @@ public class MCRTransferPackagePacker extends MCRPacker {
 
     private void checkAndCreateSaveDirectory() throws IOException {
         if (!Files.exists(SAVE_DIRECTORY_PATH)) {
-            LOGGER.info("Creating directory {}", SAVE_DIRECTORY_PATH.toAbsolutePath());
+            LOGGER.info("Creating directory {}", SAVE_DIRECTORY_PATH::toAbsolutePath);
             Files.createDirectories(SAVE_DIRECTORY_PATH);
         }
     }

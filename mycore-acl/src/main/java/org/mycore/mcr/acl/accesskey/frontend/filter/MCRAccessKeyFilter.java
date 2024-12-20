@@ -51,7 +51,7 @@ public class MCRAccessKeyFilter implements Filter {
     public void init(FilterConfig filterConfig) {
         if (MCRAccessKeyUtils.isAccessKeyForSessionAllowed()) {
             LOGGER.info("MCRAccessKeyFilter is enabled and the following permssions are allowed: {}",
-                String.join(",", MCRAccessKeyUtils.getAllowedSessionPermissionTypes()));
+                () -> String.join(",", MCRAccessKeyUtils.getAllowedSessionPermissionTypes()));
         }
     }
 

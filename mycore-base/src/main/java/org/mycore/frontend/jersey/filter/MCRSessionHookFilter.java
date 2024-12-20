@@ -57,8 +57,9 @@ public class MCRSessionHookFilter implements ContainerRequestFilter, ContainerRe
         MCRSession session = MCRServlet.getSession(httpRequest);
         request.setProperty(ATTR, session);
         MCRSessionMgr.setCurrentSession(session);
-        LOGGER.info("{} ip={} mcr={} user={}", request.getUriInfo().getPath(),
-            MCRFrontendUtil.getRemoteAddr(httpRequest), session.getID(), session.getUserInformation().getUserID());
+        LOGGER.info("{} ip={} mcr={} user={}",
+            () -> request.getUriInfo().getPath(), () -> MCRFrontendUtil.getRemoteAddr(httpRequest),
+            session::getID, () -> session.getUserInformation().getUserID());
         MCRFrontendUtil.configureSession(session, httpRequest, httpResponse);
     }
 

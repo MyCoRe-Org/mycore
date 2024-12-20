@@ -82,7 +82,7 @@ public class MCRIView2XSLFunctionsAdapter {
         }
 
         options.append('}');
-        LOGGER.debug(options.toString());
+        LOGGER.debug(options);
         return options.toString();
     }
 }

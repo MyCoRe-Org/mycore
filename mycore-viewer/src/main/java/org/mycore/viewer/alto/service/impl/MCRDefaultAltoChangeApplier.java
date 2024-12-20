@@ -80,7 +80,7 @@ public class MCRDefaultAltoChangeApplier implements MCRAltoChangeApplier {
                     .compile(xpath, Filters.element(), null, MCRConstants.ALTO_NAMESPACE).evaluate(altoDocument);
 
                 if (wordToChange.size() != 1) {
-                    LOGGER.warn("Found {} words to change.", wordToChange.size());
+                    LOGGER.warn("Found {} words to change.", wordToChange::size);
                 }
                 wordToChange.forEach(word -> {
                     word.setAttribute("CONTENT", wordChange.getTo());

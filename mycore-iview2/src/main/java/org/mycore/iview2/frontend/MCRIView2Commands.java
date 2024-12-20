@@ -256,7 +256,8 @@ public class MCRIView2Commands extends MCRAbstractCommands {
                 MCRIView2Tools.getZoomLevel(iviewFileRoot, props, imageReader, 0);
                 int maxX = (int) Math.ceil((double) props.getWidth() / MCRImage.getTileSize());
                 int maxY = (int) Math.ceil((double) props.getHeight() / MCRImage.getTileSize());
-                LOGGER.debug("Image size:{}x{}, tiles:{}x{}", props.getWidth(), props.getHeight(), maxX, maxY);
+                LOGGER.debug("Image size:{}x{}, tiles:{}x{}",
+                    props::getWidth, props::getHeight, () -> maxX, () -> maxY);
                 try {
                     MCRIView2Tools.readTile(iviewFileRoot, imageReader,
                         props.getZoomlevel(), maxX - 1, 0);

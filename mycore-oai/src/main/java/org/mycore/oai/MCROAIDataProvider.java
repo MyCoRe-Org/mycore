@@ -54,7 +54,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Implements an OAI-PMH 2.0 Data Provider as a servlet.
- * 
+ *
  * @author Matthias Eichner
  */
 public class MCROAIDataProvider extends MCRServlet {
@@ -117,7 +117,7 @@ public class MCROAIDataProvider extends MCRServlet {
 
     /**
      * Converts the servlet parameter map to deal with oaipmh api.
-     * 
+     *
      * @param pMap servlet parameter map
      * @return parameter map with generics and list
      */
@@ -134,14 +134,16 @@ public class MCROAIDataProvider extends MCRServlet {
     }
 
     protected void logRequest(HttpServletRequest req) {
-        StringBuilder log = new StringBuilder(this.getServletName());
-        for (Object o : req.getParameterMap().keySet()) {
-            String name = (String) o;
-            for (String value : req.getParameterValues(name)) {
-                log.append(' ').append(name).append('=').append(value);
+        LOGGER.info(() -> {
+            StringBuilder log = new StringBuilder(this.getServletName());
+            for (Object o : req.getParameterMap().keySet()) {
+                String name = (String) o;
+                for (String value : req.getParameterValues(name)) {
+                    log.append(' ').append(name).append('=').append(value);
+                }
             }
-        }
-        LOGGER.info(log.toString());
+            return log.toString();
+        });
     }
 
     /**

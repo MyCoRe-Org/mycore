@@ -86,10 +86,10 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
     public void onError(Session session, Throwable error) {
         if (error instanceof SocketTimeoutException) {
             this.close(session);
-            LOGGER.warn("Websocket error {}: websocket timeout", session.getId());
+            LOGGER.warn("Websocket error {}: websocket timeout", session::getId);
             return;
         }
-        LOGGER.error("Websocket error {}", session.getId(), error);
+        LOGGER.error(() -> "Websocket error " + session.getId(), error);
     }
 
     @OnClose
@@ -211,7 +211,8 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
                 try {
                     this.session.close(new CloseReason(CloseCodes.GOING_AWAY, "client disconnected"));
                 } catch (IOException ioExc) {
-                    LOGGER.error("Websocket error {}: Unable to close websocket connection", session.getId(), ioExc);
+                    LOGGER.error(() -> "Websocket error " + session.getId() + ": Unable to close websocket connection",
+                        ioExc);
                 }
                 return true;
             }
@@ -221,7 +222,7 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
         /**
          * Attaches the given collection to this {@link SessionListener} object by
          * adding all relevant listeners.
-         * 
+         *
          * @param collection the collection to attach to this object
          */
         public void attachCollection(MCRProcessableCollection collection) {
@@ -232,7 +233,7 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
         /**
          * Attaches the given processable to this {@link SessionListener} object by
          * adding all relevant listeners.
-         * 
+         *
          * @param processable the processable to attach to this object
          */
         private void attachProcessable(MCRProcessable processable) {
@@ -242,7 +243,7 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
 
         /**
          * Removes this session data object from all listeners of the given registry.
-         * 
+         *
          * @param registry the registry to detach from
          */
         public void detachListeners(MCRProcessableRegistry registry) {

@@ -33,7 +33,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 /**
  * This class provides a set of commands for the org.mycore.crypt management
  * which can be used by the command line interface.
- * 
+ *
  * @author Paul Borchert
  */
 
@@ -44,14 +44,14 @@ public class MCRCryptCommands extends MCRAbstractCommands {
 
     /**
      * list all cipher configuration
-     * 
+     *
      */
     @MCRCommand(syntax = "show cipher configuration",
         help = "The command list all chipher configured in mycore.properties",
         order = 10)
     public static void showChipherConfig() {
         Map<String, String> subProps = MCRConfiguration2.getSubPropertiesMap("MCR.Crypt.Cipher");
-        LOGGER.info("Cipher configuration: \n"
+        LOGGER.info(() -> "Cipher configuration: \n"
             + subProps.entrySet()
                 .stream()
                 .sorted(Map.Entry.<String, String>comparingByKey()) //.reversed())
@@ -61,8 +61,8 @@ public class MCRCryptCommands extends MCRAbstractCommands {
     }
 
     /**
-     * generate keyfile for cipher {0} 
-     * 
+     * generate keyfile for cipher {0}
+     *
      * @param cipherid
      *            String id of cipher configured in properties
      */
@@ -86,8 +86,8 @@ public class MCRCryptCommands extends MCRAbstractCommands {
     }
 
     /**
-     * generate and overwrite of keyfile of cipher {0} 
-     * 
+     * generate and overwrite of keyfile of cipher {0}
+     *
      * @param cipherid
      *            String id of cipher configured in properties
      */
@@ -109,11 +109,11 @@ public class MCRCryptCommands extends MCRAbstractCommands {
     }
 
     /**
-     * encrypt {0} with cipher {1} 
-     * 
+     * encrypt {0} with cipher {1}
+     *
      * @param value
      *            The value to be encrypted
-     * 
+     *
      * @param cipherid
      *            String id of cipher configured in properties
      */
@@ -124,15 +124,16 @@ public class MCRCryptCommands extends MCRAbstractCommands {
         throws MCRCryptKeyNoPermissionException, MCRCryptKeyFileNotFoundException,
         MCRCryptCipherConfigurationException {
         MCRCipher cipher = MCRCipherManager.getCipher(cipherid);
-        LOGGER.info("Encrypted Value: " + cipher.encrypt(value));
+        String encrypted = cipher.encrypt(value);
+        LOGGER.info("Encrypted Value: {}", encrypted);
     }
 
     /**
-     * decrypt {0} with cipher {1} 
-     * 
+     * decrypt {0} with cipher {1}
+     *
      * @param value
      *            The value to be decrypted
-     * 
+     *
      * @param cipherid
      *            String id of cipher configured in properties
      */
@@ -143,8 +144,8 @@ public class MCRCryptCommands extends MCRAbstractCommands {
         throws MCRCryptKeyNoPermissionException, MCRCryptKeyFileNotFoundException,
         MCRCryptCipherConfigurationException {
         MCRCipher cipher = MCRCipherManager.getCipher(cipherid);
-        LOGGER.info("Decrypted Value: " + cipher.decrypt(value));
-
+        String decrypted = cipher.decrypt(value);
+        LOGGER.info("Decrypted Value: {}", decrypted);
     }
 
 }

@@ -65,8 +65,8 @@ public class MCRCORSFilter implements Filter {
     public void init(FilterConfig filterConfig) {
         String filterName = filterConfig.getInitParameter(CORS_FILTER_NAME);
         if (filterName != null) {
-            LOGGER.info("initializing {}", MCRCORSFilter.class.getSimpleName());
-            LOGGER.info(String.format(Locale.ROOT, "%s is %s", CORS_FILTER_NAME, filterName));
+            LOGGER.info(() -> "initializing " + MCRCORSFilter.class.getSimpleName());
+            LOGGER.info(() -> String.format(Locale.ROOT, "%s is %s", CORS_FILTER_NAME, filterName));
             String propertyName = String.format(Locale.ROOT, "%s.%s", CONFIGURATION_PREFIX, filterName);
 
             this.allowOriginValue = MCRConfiguration2.getStringOrThrow(propertyName);
@@ -87,7 +87,7 @@ public class MCRCORSFilter implements Filter {
 
     @Override
     public void destroy() {
-        LOGGER.info("destroying {}", MCRCORSFilter.class.getSimpleName());
+        LOGGER.info(() -> "destroying " + MCRCORSFilter.class.getSimpleName());
     }
 
 }

@@ -80,13 +80,13 @@ public class MCRDerivateURNUtils {
                 MCRPath file = MCRPath.getPath(derivateID, piInfo.getAdditional());
 
                 if (!Files.exists(file)) {
-                    LOGGER.warn("File {} in object {} could NOT be found", file.getFileName().toString(), derivateID);
+                    LOGGER.warn("File {} in object {} could NOT be found", file::getFileName, () -> derivateID);
                     return null;
                 }
 
                 if (!isFileSupported(file)) {
                     LOGGER.info("File is not displayable within iView2. Use {} as url",
-                        MCRFileNodeServlet.class.getSimpleName());
+                        () -> MCRFileNodeServlet.class.getSimpleName());
                     String filePath = "/" + file.getOwner()
                         + MCRXMLFunctions.encodeURIPath(file.getOwnerRelativePath());
                     return new URI(MCRFrontendUtil.getBaseURL() + "servlets/" + MCRFileNodeServlet.class.getSimpleName()
@@ -96,7 +96,7 @@ public class MCRDerivateURNUtils {
                 return new URI(getViewerURL(file)).toURL();
             }
         } catch (MalformedURLException | MCRPersistenceException | URISyntaxException e) {
-            LOGGER.error("Malformed URL for URN {}", piInfo.getIdentifier(), e);
+            LOGGER.error(() -> "Malformed URL for URN " + piInfo.getIdentifier(), e);
         }
 
         return null;
@@ -131,7 +131,7 @@ public class MCRDerivateURNUtils {
                     + id;
             }
 
-            LOGGER.debug("Generated URL for urn {} is {}", urn.getIdentifier(), spec);
+            LOGGER.debug("Generated URL for urn {} is {}", urn::getIdentifier, () -> spec);
             url = new URI(spec).toURL();
         } catch (MalformedURLException | URISyntaxException e) {
             LOGGER.error("Could not create dfg viewer url", e);
@@ -148,10 +148,9 @@ public class MCRDerivateURNUtils {
         try {
             return SUPPORTED_CONTENT_TYPE.contains(MCRContentTypes.probeContentType(file));
         } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error(e::getMessage, e);
         }
 
         return false;
-        //        return true;
     }
 }

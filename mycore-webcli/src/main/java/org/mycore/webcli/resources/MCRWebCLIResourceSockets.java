@@ -51,7 +51,7 @@ import jakarta.websocket.server.ServerEndpoint;
 
 /**
  * @author Michel Buechner (mcrmibue)
- * 
+ *
  */
 @ServerEndpoint(value = "/ws/mycore-webcli/socket",
     configurator = MCRWebsocketDefaultConfigurator.class,
@@ -68,18 +68,18 @@ public class MCRWebCLIResourceSockets extends MCRAbstractEndpoint {
     @OnOpen
     public void open(Session session) {
         sessionized(session, () -> {
-            LOGGER.info("Socket Session ID: {}", session.getId());
-            LOGGER.info("MyCore Session ID: {}", MCRSessionMgr.getCurrentSessionID());
+            LOGGER.info("Socket Session ID: {}", session::getId);
+            LOGGER.info("MyCore Session ID: {}", MCRSessionMgr::getCurrentSessionID);
             cliCont = getCurrentSessionContainer(true, session);
-            LOGGER.info("Open ThreadID: {}", Thread.currentThread().getName());
+            LOGGER.info("Open ThreadID: {}", () -> Thread.currentThread().getName());
         });
     }
 
     @OnMessage
     public void message(Session session, JsonObject request) {
         sessionized(session, () -> {
-            LOGGER.info("Message ThreadID: {}", Thread.currentThread().getName());
-            LOGGER.info("MyCore Session ID (message): {}", MCRSessionMgr.getCurrentSessionID());
+            LOGGER.info("Message ThreadID: {}", () -> Thread.currentThread().getName());
+            LOGGER.info("MyCore Session ID (message): {}", MCRSessionMgr::getCurrentSessionID);
             if (!MCRAccessManager.checkPermission("use-webcli")) {
                 try {
                     session.getBasicRemote().sendText("noPermission");
@@ -124,7 +124,7 @@ public class MCRWebCLIResourceSockets extends MCRAbstractEndpoint {
 
     @OnClose
     public void close(Session session) {
-        LOGGER.info("Closing socket {}", session.getId());
+        LOGGER.info("Closing socket {}", session::getId);
         if (cliCont != null) {
             cliCont.webSocketClosed();
         }
@@ -149,13 +149,19 @@ public class MCRWebCLIResourceSockets extends MCRAbstractEndpoint {
             Session mySession = new DelegatedSession(session) {
                 @Override
                 public void close() throws IOException {
-                    LOGGER.debug("Close session.", new RuntimeException("debug"));
+                    if (LOGGER.isDebugEnabled()) {
+                        RuntimeException debug = new RuntimeException("debug");
+                        LOGGER.debug("Close session.", debug);
+                    }
                     super.close();
                 }
 
                 @Override
                 public void close(CloseReason closeReason) throws IOException {
-                    LOGGER.debug(() -> "Close session: " + closeReason, new RuntimeException("debug"));
+                    if (LOGGER.isDebugEnabled()) {
+                        RuntimeException debug = new RuntimeException("debug");
+                        LOGGER.debug(() -> "Close session: " + closeReason, debug);
+                    }
                     super.close(closeReason);
                 }
             };

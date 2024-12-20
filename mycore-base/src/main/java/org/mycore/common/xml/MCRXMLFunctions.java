@@ -181,8 +181,8 @@ public class MCRXMLFunctions {
             String formatted = mcrdate.format(simpleFormat, locale, timeZone);
             return formatted == null ? "?" + isoDate + "?" : formatted;
         } catch (RuntimeException iae) {
-            LOGGER.error("Unable to format date {} to {} with locale {} and timezone {}", mcrdate.getISOString(),
-                simpleFormat, locale, timeZone, iae);
+            LOGGER.error("Unable to format date {} to {} with locale {} and timezone {}",
+                mcrdate::getISOString, () -> simpleFormat, () -> locale, () -> timeZone, () -> iae);
             return "?";
         }
     }

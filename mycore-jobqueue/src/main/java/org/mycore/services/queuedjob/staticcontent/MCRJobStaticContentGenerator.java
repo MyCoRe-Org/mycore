@@ -55,7 +55,7 @@ public class MCRJobStaticContentGenerator extends MCRObjectStaticContentGenerato
             jobQueueManager.getJobQueue(MCRStaticContentGeneratorJobAction.class).add(job);
         } else {
             LOGGER.info("There is already a generator job for the object {} and the config {}. Skipping generation.",
-                object.getId(), configID);
+                object::getId, () -> configID);
         }
     }
 }

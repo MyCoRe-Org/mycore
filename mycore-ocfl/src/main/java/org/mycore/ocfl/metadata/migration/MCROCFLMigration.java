@@ -133,7 +133,8 @@ public class MCROCFLMigration {
                 }
             } catch (Exception e) {
                 // an error happened, so all steps are useless
-                LOGGER.warn("Error while receiving all information which are needed to migrate the object " + id, e);
+                LOGGER.warn(() -> "Error while receiving all information which are needed to migrate the object " + id,
+                    e);
                 steps.clear();
             }
         }
@@ -143,9 +144,9 @@ public class MCROCFLMigration {
             try {
                 int size = steps.size();
                 steps = pruner.prune(steps);
-                LOGGER.info("Pruned {} revisions to {} with {}", size, steps.size(), pruner);
+                LOGGER.info("Pruned {} revisions to {} with {}", () -> size, steps::size, () -> pruner);
             } catch (IOException | JDOMException e) {
-                LOGGER.warn("Error while pruning " + id, e);
+                LOGGER.warn(() -> "Error while pruning " + id, e);
                 failed.add(id);
                 return;
             }
@@ -161,7 +162,7 @@ public class MCROCFLMigration {
                 return;
             } catch (Exception e) {
                 // invalid state now
-                LOGGER.warn("Error while migrating " + id, e);
+                LOGGER.warn(() -> "Error while migrating " + id, e);
                 invalidState.add(id);
                 return;
             }
@@ -182,7 +183,7 @@ public class MCROCFLMigration {
                 lastModified = instance.getLastModified(objectID);
             } catch (IOException | JDOMException e) {
                 // can not even read the object
-                LOGGER.warn("Error while migrating " + id, e);
+                LOGGER.warn(() -> "Error while migrating " + id, e);
                 failed.add(id);
                 return;
             }
@@ -204,7 +205,7 @@ public class MCROCFLMigration {
         throws IOException {
         String user = rev.getUser();
         Date date = rev.getDate();
-        LOGGER.info("Migrate revision {} of {}", rev.getRevision(), objectID);
+        LOGGER.info("Migrate revision {} of {}", rev::getRevision, () -> objectID);
 
         MCRMetadataVersionType type = MCRMetadataVersionType.fromValue(rev.getType());
         ContentSupplier supplier = type == MCRMetadataVersionType.DELETED ? null : () -> retriveActualContent(rev);

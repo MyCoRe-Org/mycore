@@ -46,8 +46,8 @@ public class MCRSolrOptimizeIndexHandler extends MCRSolrAbstractIndexHandler {
         updateRequest.setAction(UpdateRequest.ACTION.OPTIMIZE, true, true, 1);
         for (SolrClient client : getClients()) {
             UpdateResponse response = updateRequest.process(client, null);
-            LOGGER.info("Optimize was {}({}ms)", (response.getStatus() == 0 ? "successful." : "UNSUCCESSFUL!"),
-                response.getElapsedTime());
+            LOGGER.info("Optimize was {}({}ms)", () -> (response.getStatus() == 0 ? "successful." : "UNSUCCESSFUL!"),
+                response::getElapsedTime);
         }
     }
 

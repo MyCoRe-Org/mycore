@@ -234,7 +234,7 @@ public class MCRSolrIndexer {
         UpdateResponse updateResponse = null;
         long start = System.currentTimeMillis();
         try {
-            LOGGER.debug("Deleting \"{}\" from solr", Arrays.asList(solrIDs));
+            LOGGER.debug("Deleting \"{}\" from solr", () -> Arrays.asList(solrIDs));
             UpdateRequest req = new UpdateRequest();
             SOLR_AUTHENTICATION_MANAGER.applyAuthentication(req,
                 MCRSolrAuthenticationLevel.INDEX);
@@ -480,7 +480,7 @@ public class MCRSolrIndexer {
         final MCRSolrIndexHandler indexHandler, final int priority) {
         return (handlerList, exc) -> {
             if (exc != null) {
-                LOGGER.error("Error while submitting index handler: " + indexHandler, exc);
+                LOGGER.error(() -> "Error while submitting index handler: " + indexHandler, exc);
                 return;
             }
             if (handlerList == null || handlerList.isEmpty()) {
@@ -591,24 +591,24 @@ public class MCRSolrIndexer {
         // get ids from store
         LOGGER.info("fetching mycore store...");
         List<String> storeList = localIDListSupplier.get();
-        LOGGER.info("there are {} mycore objects", storeList.size());
+        LOGGER.info("there are {} mycore objects", storeList::size);
         // get ids from solr
         LOGGER.info("fetching solr...");
         for (MCRSolrCore core : cores) {
             List<String> solrList = MCRSolrSearchUtils.listIDs(core.getClient(), query);
-            LOGGER.info("there are {} solr objects", solrList.size());
+            LOGGER.info("there are {} solr objects", solrList::size);
             // documents to remove
             List<String> toRemove = new ArrayList(solrList);
             toRemove.removeAll(storeList);
             if (!toRemove.isEmpty()) {
-                LOGGER.info("remove {} zombie objects from solr", toRemove.size());
+                LOGGER.info("remove {} zombie objects from solr", toRemove::size);
                 deleteById(core.getClient(), toRemove.toArray(String[]::new));
             }
             deleteOrphanedNestedDocuments(List.of(core));
             // documents to add
             storeList.removeAll(solrList);
             if (!storeList.isEmpty()) {
-                LOGGER.info("index {} mycore objects", storeList.size());
+                LOGGER.info("index {} mycore objects", storeList::size);
                 rebuildMetadataIndex(storeList, List.of(core));
             }
         }

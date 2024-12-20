@@ -73,7 +73,7 @@ public class MCRMetsCommands extends MCRAbstractCommands {
                         invalidMetsQueue.add(objectID);
                     }
                     for (ValidationException validationException : validationExceptionList) {
-                        LOGGER.error(validationException.getMessage());
+                        LOGGER.error(validationException::getMessage);
                     }
                 } catch (IOException e) {
                     LOGGER.error("Error while reading mets.xml of {}", objectID, e);

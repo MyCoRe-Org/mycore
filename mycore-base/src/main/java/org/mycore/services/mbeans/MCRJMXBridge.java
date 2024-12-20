@@ -113,13 +113,13 @@ public class MCRJMXBridge implements Closeable {
 
     @Override
     public void close() {
-        LOGGER.debug("Shutting down {}", MCRJMXBridge.class.getSimpleName());
+        LOGGER.debug("Shutting down {}", () -> MCRJMXBridge.class.getSimpleName());
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         Iterator<WeakReference<ObjectName>> wrIterator = ONAME_LIST.iterator();
         while (wrIterator.hasNext()) {
             try {
                 ObjectName objectName = wrIterator.next().get();
-                LOGGER.debug("Unregister {}", objectName.getCanonicalName());
+                LOGGER.debug("Unregister {}", objectName::getCanonicalName);
                 mbs.unregisterMBean(objectName);
                 wrIterator.remove();
             } catch (Exception e) {

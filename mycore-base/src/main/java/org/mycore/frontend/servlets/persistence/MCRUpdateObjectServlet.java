@@ -79,7 +79,7 @@ public class MCRUpdateObjectServlet extends MCRPersistenceServlet {
     private MCRObjectID updateObject(Document doc) throws JDOMException, IOException,
         MCRException, MCRAccessException {
         MCRObject mcrObject = MCRPersistenceHelper.getMCRObject(doc);
-        LogManager.getLogger().info("ID: {}", mcrObject.getId());
+        LogManager.getLogger().info("ID: {}", mcrObject::getId);
         try {
             MCRMetadataManager.update(mcrObject);
             return mcrObject.getId();

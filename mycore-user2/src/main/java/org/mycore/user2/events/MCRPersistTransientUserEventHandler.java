@@ -36,14 +36,14 @@ public class MCRPersistTransientUserEventHandler extends MCREventHandlerBase {
 
     /**
      * Persists {@link MCRTransientUser} if an {@link MCRObject} was created.
-     * 
+     *
      * @see org.mycore.common.events.MCREventHandlerBase#handleObjectCreated(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
      */
     @Override
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
         MCRUser currentUser = MCRUserManager.getCurrentUser();
         if (!MCRUserManager.isInvalidUser(currentUser) && MCRUserManager.getUser(currentUser.getUserID()) == null) {
-            LOGGER.info("create new user \"{}\"", currentUser.getUserID());
+            LOGGER.info("create new user \"{}\"", currentUser::getUserID);
             MCRUserManager.createUser((MCRTransientUser) currentUser);
         }
     }

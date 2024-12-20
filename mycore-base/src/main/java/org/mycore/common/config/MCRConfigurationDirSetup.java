@@ -25,11 +25,11 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -77,9 +77,9 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
         }
         File libDir = MCRConfigurationDir.getConfigFile("lib");
         URLClassLoader urlClassLoader = classLoaderOptional.get();
-        Set<URL> currentCPElements = Stream.of(urlClassLoader.getURLs()).collect(Collectors.toSet());
+        List<URL> currentCPElements = Stream.of(urlClassLoader.getURLs()).collect(Collectors.toList());
+        Class<? extends ClassLoader> classLoaderClass = urlClassLoader.getClass();
         try {
-            Class<? extends ClassLoader> classLoaderClass = urlClassLoader.getClass();
             BiConsumer<ClassLoader, URL> addUrlMethod = addToClassPath(classLoaderClass);
             getFileStream(resourceDir, libDir)
                 .filter(Objects::nonNull)
@@ -98,7 +98,7 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
                 .forEach(url -> addUrlMethod.accept(urlClassLoader, url));
         } catch (InaccessibleObjectException | ReflectiveOperationException | SecurityException e) {
             LogManager.getLogger(MCRConfigurationInputStream.class)
-                .warn("{} does not support adding additional JARs at runtime", urlClassLoader.getClass(), e);
+                .warn("{} does not support adding additional JARs at runtime", classLoaderClass, e);
         }
     }
 

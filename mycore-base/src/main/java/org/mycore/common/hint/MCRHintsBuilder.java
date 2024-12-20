@@ -56,8 +56,8 @@ public final class MCRHintsBuilder {
 
     public MCRHints build() {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Building hints ...");
-            entries.forEach(entry -> LOGGER.debug(" ... with entry {}: {}", entry.key, entry.formattedValue()));
+            LOGGER.debug("Building hints …");
+            entries.forEach(entry -> LOGGER.debug(" … with entry {}: {}", entry.key, entry.formattedValue()));
         }
         return new Hints(entries);
     }

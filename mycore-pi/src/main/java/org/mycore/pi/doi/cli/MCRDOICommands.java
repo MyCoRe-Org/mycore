@@ -94,7 +94,7 @@ public class MCRDOICommands {
 
         URI uri = dataciteClient.resolveDOI(doi);
         if (!uri.toString().startsWith(registrationService.getRegisterURL())) {
-            LOGGER.info("DOI/URL is not from this application: {}/{}", doi.asString(), uri);
+            LOGGER.info("DOI/URL is not from this application: {}/{}", doi::asString, () -> uri);
             return;
         }
 
@@ -142,11 +142,11 @@ public class MCRDOICommands {
                     URI uri = dataciteClient.resolveDOI(doi);
 
                     if (uri.toString().startsWith(registrationService.getRegisterURL())) {
-                        LOGGER.info("Checking DOI: {}", doi.asString());
+                        LOGGER.info("Checking DOI: {}", doi::asString);
                         MCRObjectID objectID = getObjectID(uri);
                         if (MCRMetadataManager.exists(objectID)) {
                             if (!registrationService.isRegistered(objectID, "")) {
-                                LOGGER.info("DOI is not registered in MyCoRe. Add to Database: {}", doi.asString());
+                                LOGGER.info("DOI is not registered in MyCoRe. Add to Database: {}", doi::asString);
                                 MCRPI databaseEntry = new MCRPI(doi.asString(), registrationService.getType(),
                                     objectID.toString(), "", serviceID, new MCRPIServiceDates(new Date(), null));
                                 MCREntityManagerProvider.getCurrentEntityManager().persist(databaseEntry);
@@ -160,10 +160,10 @@ public class MCRDOICommands {
                             LOGGER.info("Could not find Object : {}", objectID);
                         }
                     } else {
-                        LOGGER.info("DOI/URL is not from this application: {}/{}", doi.asString(), uri);
+                        LOGGER.info("DOI/URL is not from this application: {}/{}", doi::asString, () -> uri);
                     }
                 } catch (MCRPersistentIdentifierException e) {
-                    LOGGER.error("Error occurred for DOI: {}", doi, e);
+                    LOGGER.error(() -> "Error occurred for DOI: " + doi, e);
                 }
             });
         } catch (MCRPersistentIdentifierException e) {
@@ -219,7 +219,7 @@ public class MCRDOICommands {
 
             if (uri.toString().startsWith(registrationService.getRegisterURL())) {
                 String s = uri.toString();
-                LOGGER.info("Checking DOI: {} / {}", doi.asString(), s);
+                LOGGER.info("Checking DOI: {} / {}", doi::asString, () -> s);
                 String idString = s.substring(s.lastIndexOf("/") + 1);
 
                 MCRObjectID objectID = MCRObjectID.getInstance(idString);
@@ -258,10 +258,11 @@ public class MCRDOICommands {
                     LOGGER.info("Object {} does not exist in this application!", objectID);
                 }
             } else {
-                LOGGER.info("DOI is not from this application: ({}) {}", uri, registrationService.getRegisterURL());
+                LOGGER.info("DOI is not from this application: ({}) {}",
+                    () -> uri, registrationService::getRegisterURL);
             }
         } catch (MCRPersistentIdentifierException e) {
-            LOGGER.error("Error occurred for DOI: {}", doi, e);
+            LOGGER.error(() -> "Error occurred for DOI: " + doi, e);
         }
     }
 
@@ -284,7 +285,8 @@ public class MCRDOICommands {
             transform = contentTransformer.transform(new MCRBaseContent(mcrObject));
             document = transform.asXML();
         } catch (IOException | JDOMException e) {
-            LOGGER.error("Error while transforming document {} with transformer {}", e, mycoreIDString, transformer);
+            LOGGER.error(
+                () -> "Error while transforming document " + mycoreIDString + " with transformer " + transformer, e);
             return;
         }
 

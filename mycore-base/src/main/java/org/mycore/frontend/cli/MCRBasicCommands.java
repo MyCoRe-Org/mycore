@@ -210,14 +210,14 @@ public class MCRBasicCommands {
 
     private static boolean createDirectory(File directory) {
         if (directory.exists()) {
-            LOGGER.warn("Directory {} already exists.", directory.getAbsolutePath());
+            LOGGER.warn("Directory {} already exists.", directory::getAbsolutePath);
             return true;
         }
         if (directory.mkdirs()) {
-            LOGGER.info("Successfully created directory: {}", directory.getAbsolutePath());
+            LOGGER.info("Successfully created directory: {}", directory::getAbsolutePath);
             return true;
         } else {
-            LOGGER.warn("Due to unknown error the directory could not be created: {}", directory.getAbsolutePath());
+            LOGGER.warn("Due to unknown error the directory could not be created: {}", directory::getAbsolutePath);
             return false;
         }
     }
@@ -227,7 +227,7 @@ public class MCRBasicCommands {
         Path configurationDirectory = MCRConfigurationDir.getConfigurationDirectory().toPath();
         Path targetFile = configurationDirectory.resolve(path);
         if (Files.exists(targetFile)) {
-            LOGGER.warn("File {} already exists.", targetFile.toAbsolutePath());
+            LOGGER.warn("File {} already exists.", targetFile::toAbsolutePath);
             return;
         }
         if (!Files.exists(targetFile.getParent())) {
@@ -256,21 +256,21 @@ public class MCRBasicCommands {
             // attention: non-short-circuit OR operators to execute left and right side of OR expression
             boolean modified = updatePersistenceMappings(persistenceDoc) | updatePersistenceH2JdbcUrl(persistenceDoc);
             if (modified) {
-                LOGGER.warn("Updating " + persistenceXMLFile + " with new mappings.");
+                LOGGER.warn(() -> "Updating " + persistenceXMLFile + " with new mappings.");
                 XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
                 try (BufferedWriter bw = Files.newBufferedWriter(persistenceXMLFile.toPath())) {
                     out.output(persistenceDoc, bw);
                 }
             }
         } else {
-            LOGGER.warn("The config file '" + persistenceXMLFile + "' does not exist yet!");
+            LOGGER.warn(() -> "The config file '" + persistenceXMLFile + "' does not exist yet!");
         }
     }
 
     /**
      * changes an unconfigured H2 JDBC URL,
      * that the database files are created in the current MYCORE_HOME directory
-     * 
+     *
      * @param persistenceDoc the persistence.xml as JDOM2 document
      * @return true if the Jdbc URL was change
      */
@@ -292,10 +292,10 @@ public class MCRBasicCommands {
         return false;
     }
 
-    /** 
+    /**
      * adds or removes mapping entries in persistence.xml,
      * that they match the defined JPA-mappings in the currently available MyCoRe components
-     * 
+     *
      * @param persistenceDoc - the persistence.xml as JDOM2 document
      * @return true, if the mappings changed
      * @throws IOException
@@ -315,8 +315,7 @@ public class MCRBasicCommands {
                     (e.getTextNormalize().startsWith("/") ? "" : "/") + e.getTextNormalize()) == null);
 
         if (modified) {
-            LOGGER.warn((oldMappings.size() - mappingElements.size())
-                + " unknown mapping files removed.");
+            LOGGER.warn(() -> (oldMappings.size() - mappingElements.size()) + " unknown mapping files removed.");
         }
 
         List<String> newMappings = new ArrayList<>();
@@ -344,7 +343,7 @@ public class MCRBasicCommands {
                 ePersistenceUnit.addContent(++pos, eMappingFile);
             }
 
-            LOGGER.warn(newMappings.size() + " mapping files added.");
+            LOGGER.warn(() -> newMappings.size() + " mapping files added.");
             modified = true;
         }
         return modified;
@@ -372,7 +371,7 @@ public class MCRBasicCommands {
             return false;
         }
 
-        LOGGER.info("Reading file {} ...", file);
+        LOGGER.info("Reading file {} …", file);
         MCRContent content = new MCRFileContent(file);
 
         MCRXMLParserFactory.getParser().parseXML(content);

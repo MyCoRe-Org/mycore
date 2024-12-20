@@ -73,7 +73,7 @@ public class MCRSolrSchemaReloader {
 
     /**
      * Removes all fields, dynamicFields, copyFields and fieldTypes in the SOLR schema for the given core. The fields,
-     * dynamicFields, and types in the lists SOLR_DEFAULT_FIELDS, SOLR_DEFAULT_DYNAMIC_FIELDS, 
+     * dynamicFields, and types in the lists SOLR_DEFAULT_FIELDS, SOLR_DEFAULT_DYNAMIC_FIELDS,
      * SOLR_DEFAULT_DYNAMIC_FIELDS are excluded from remove.
      *
      * @param configType the name of the configuration directory containg the Solr core configuration
@@ -81,22 +81,22 @@ public class MCRSolrSchemaReloader {
      */
     public static void reset(String configType, String coreID) {
 
-        LOGGER.info("Resetting SOLR schema for core " + coreID + " using configuration " + configType);
+        LOGGER.info(() -> "Resetting SOLR schema for core " + coreID + " using configuration " + configType);
         try {
             SolrClient solrClient = MCRSolrCoreManager.get(coreID).map(MCRSolrCore::getClient)
                 .orElseThrow(() -> new MCRConfigurationException("The core " + coreID + " is not configured!"));
 
             deleteCopyFields(solrClient);
-            LOGGER.debug("CopyFields cleaned for core " + coreID + " for configuration " + configType);
+            LOGGER.debug(() -> "CopyFields cleaned for core " + coreID + " for configuration " + configType);
 
             deleteFields(solrClient);
-            LOGGER.debug("Fields cleaned for core " + coreID + " for configuration " + configType);
+            LOGGER.debug(() -> "Fields cleaned for core " + coreID + " for configuration " + configType);
 
             deleteDynamicFields(solrClient);
-            LOGGER.debug("DynamicFields cleaned for core " + coreID + " for configuration " + configType);
+            LOGGER.debug(() -> "DynamicFields cleaned for core " + coreID + " for configuration " + configType);
 
             deleteFieldTypes(solrClient);
-            LOGGER.debug("FieldTypes cleaned for core " + coreID + " for configuration " + configType);
+            LOGGER.debug(() -> "FieldTypes cleaned for core " + coreID + " for configuration " + configType);
 
         } catch (IOException | SolrServerException e) {
             LOGGER.error(e);
@@ -111,7 +111,7 @@ public class MCRSolrSchemaReloader {
         for (FieldTypeRepresentation fieldType : fieldTypesReq.process(solrClient).getFieldTypes()) {
             String fieldTypeName = fieldType.getAttributes().get("name").toString();
             if (!SOLR_DEFAULT_FIELDTYPES.contains(fieldTypeName)) {
-                LOGGER.debug("remove SOLR FieldType " + fieldTypeName);
+                LOGGER.debug(() -> "remove SOLR FieldType " + fieldTypeName);
                 SchemaRequest.DeleteFieldType delField = new SchemaRequest.DeleteFieldType(fieldTypeName);
                 SOLR_AUTHENTICATION_MANAGER.applyAuthentication(delField,
                     MCRSolrAuthenticationLevel.ADMIN);
@@ -127,7 +127,7 @@ public class MCRSolrSchemaReloader {
             MCRSolrAuthenticationLevel.ADMIN);
         for (Map<String, Object> field : dynFieldsReq.process(solrClient).getDynamicFields()) {
             String fieldName = field.get("name").toString();
-            LOGGER.debug("remove SOLR DynamicField " + fieldName);
+            LOGGER.debug(() -> "remove SOLR DynamicField " + fieldName);
             SchemaRequest.DeleteDynamicField delField = new SchemaRequest.DeleteDynamicField(fieldName);
             SOLR_AUTHENTICATION_MANAGER.applyAuthentication(delField,
                 MCRSolrAuthenticationLevel.ADMIN);
@@ -143,7 +143,7 @@ public class MCRSolrSchemaReloader {
         for (Map<String, Object> field : fieldsReq.process(solrClient).getFields()) {
             String fieldName = field.get("name").toString();
             if (!SOLR_DEFAULT_FIELDS.contains(fieldName)) {
-                LOGGER.debug("remove SOLR Field " + fieldName);
+                LOGGER.debug(() -> "remove SOLR Field " + fieldName);
                 SchemaRequest.DeleteField delField = new SchemaRequest.DeleteField(fieldName);
                 SOLR_AUTHENTICATION_MANAGER.applyAuthentication(delField,
                     MCRSolrAuthenticationLevel.ADMIN);
@@ -161,7 +161,7 @@ public class MCRSolrSchemaReloader {
             String fieldSrc = copyField.get("source").toString();
             List<String> fieldDest = new ArrayList<>();
             fieldDest.add(copyField.get("dest").toString());
-            LOGGER.debug("remove SOLR CopyField " + fieldSrc + " --> " + fieldDest.getFirst());
+            LOGGER.debug(() -> "remove SOLR CopyField " + fieldSrc + " --> " + fieldDest.getFirst());
             SchemaRequest.DeleteCopyField delCopyField = new SchemaRequest.DeleteCopyField(fieldSrc, fieldDest);
             SOLR_AUTHENTICATION_MANAGER.applyAuthentication(delCopyField,
                 MCRSolrAuthenticationLevel.ADMIN);
@@ -170,7 +170,7 @@ public class MCRSolrSchemaReloader {
     }
 
     /**
-     * This method modified the SOLR schema definition based on all solr/{coreType}/solr-schema.json 
+     * This method modified the SOLR schema definition based on all solr/{coreType}/solr-schema.json
      * in the MyCoRe-Maven modules resource path.
      *
      * @param configType the name of the configuration directory containg the Solr core configuration
@@ -180,7 +180,7 @@ public class MCRSolrSchemaReloader {
         MCRSolrCore solrCore = MCRSolrCoreManager.get(coreID)
             .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreID));
 
-        LOGGER.info("Load schema definitions for core " + coreID + " using configuration " + configType);
+        LOGGER.info(() -> "Load schema definitions for core " + coreID + " using configuration " + configType);
         try (HttpClient httpClient = MCRHttpUtils.getHttpClient()) {
             Collection<byte[]> schemaFileContents = MCRConfigurationInputStream.getConfigFileContents(
                 "solr/" + configType + "/" + SOLR_SCHEMA_UPDATE_FILE_NAME).values();
@@ -210,12 +210,12 @@ public class MCRSolrSchemaReloader {
                         HttpResponse.BodyHandlers.ofString());
 
                     if (response.statusCode() == 200) {
-                        LOGGER.debug("SOLR schema {} successful \n{}", commandprefix, response.body());
+                        LOGGER.debug("SOLR schema {} successful \n{}", () -> commandprefix, response::body);
                     } else {
 
                         LOGGER
-                            .error("SOLR schema {} error: {} {}\n{}", commandprefix, response.statusCode(),
-                                MCRHttpUtils.getReasonPhrase(response.statusCode()), response.body());
+                            .error("SOLR schema {} error: {} {}\n{}", () -> commandprefix, response::statusCode,
+                                () -> MCRHttpUtils.getReasonPhrase(response.statusCode()), response::body);
                     }
                 }
             }

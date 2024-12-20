@@ -35,13 +35,13 @@ import jakarta.inject.Singleton;
 
 /**
  * This class is a base implementation of the <code>MCRAccessInterface</code>.
- * 
+ *
  * It will simply allow everything and will do nothing on persistent operations.
  * Feel free to extend this class if your implementation can only support parts
  * of the Interface definition.
- * 
+ *
  * @author Jens Kupferschmidt
- * 
+ *
  */
 @Singleton
 public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
@@ -54,7 +54,7 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.access.MCRAccessInterface#addRule(java.lang.String,
      *      java.lang.String, org.jdom2.Element)
      */
@@ -64,7 +64,7 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.access.MCRAccessInterface#addRule(java.lang.String,
      *      org.jdom2.Element)
      */
@@ -74,7 +74,7 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.access.MCRAccessInterface#removeRule(java.lang.String,
      *      java.lang.String)
      */
@@ -84,7 +84,7 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.access.MCRAccessInterface#removeRule(java.lang.String)
      */
     public void removeRule(String permission) throws MCRException {
@@ -93,7 +93,7 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.access.MCRAccessInterface#removeAllRules(java.lang.String)
      */
     public void removeAllRules(String id) throws MCRException {
@@ -102,7 +102,7 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.access.MCRAccessInterface#updateRule(java.lang.String,
      *      java.lang.String, org.jdom2.Element)
      */
@@ -113,7 +113,7 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.access.MCRAccessInterface#updateRule(java.lang.String,
      *      org.jdom2.Element)
      */
@@ -123,7 +123,7 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.access.MCRAccessInterface#checkAccess(java.lang.String,
      *      java.lang.String)
      */
@@ -139,23 +139,24 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
                 return superUserID.equals(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
             }
             boolean validate = rule.validate();
-            LOGGER.debug(validate ? "Current user has permission." : "Current user does not have permission.");
+            LOGGER.debug(() -> validate ? "Current user has permission." : "Current user does not have permission.");
             return validate;
         } finally {
-            LOGGER.debug("Check {} on {} took:{}", permission, id, System.currentTimeMillis() - start);
+            LOGGER.debug("Check {} on {} took:{}", () -> permission, () -> id,
+                () -> System.currentTimeMillis() - start);
         }
     }
 
     @Override
     public boolean checkPermission(String id, String permission, MCRUserInformation userInfo) {
-        LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for ID " + id + " for permission " + permission
+        LOGGER.debug(() -> "Execute MCRAccessBaseImpl checkPermission for ID " + id + " for permission " + permission
             + " for user" + userInfo == null ? "null" : userInfo.getUserID());
         return true;
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.access.MCRAccessInterface#checkAccess(java.lang.String)
      */
     public boolean checkPermission(String permission) {
@@ -165,7 +166,7 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.access.MCRAccessInterface#checkAccess(java.lang.String, MCRUser)
      */
     @Deprecated
@@ -177,7 +178,7 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
 
     @Override
     public boolean checkPermissionForUser(String permission, MCRUserInformation userInfo) {
-        LOGGER.debug(
+        LOGGER.debug(() ->
             "Execute MCRAccessBaseImpl checkPermission for permission " + permission + " for user " + userInfo == null
                 ? "null"
                 : userInfo.getUserID());
@@ -186,7 +187,7 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.access.MCRAccessInterface#checkPermission(java.lang.String, java.lang.String, org.jdom2.Document)
      */
     public boolean checkPermission(Element rule) {
@@ -195,7 +196,7 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.access.MCRAccessInterface#getAccessRule(java.lang.String,
      *      java.lang.String)
      */
@@ -205,7 +206,7 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.access.MCRAccessInterface#getAccessRule(java.lang.String)
      */
     public Element getRule(String permission) {
@@ -214,7 +215,7 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.access.MCRAccessInterface#getRuleDescription(java.lang.String)
      */
     public String getRuleDescription(String permission) {
@@ -223,7 +224,7 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.access.MCRAccessInterface#getRuleDescription(java.lang.String, java.lang.String)
      */
     public String getRuleDescription(String id, String permission) {
@@ -232,7 +233,7 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.access.MCRAccessInterface#getPermissionsForID(java.lang.String)
      */
     public Collection<String> getPermissionsForID(String objid) {
@@ -241,7 +242,7 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.access.MCRAccessInterface#getPermissions()
      */
     public Collection<String> getPermissions() {
@@ -251,11 +252,11 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
     /**
      * checks wether a rule with the id and permission is defined. It's the same
      * as calling
-     * 
+     *
      * <pre>
      *    (getRule(id, permission)!=null);
      * </pre>
-     * 
+     *
      * @see #getRule(String, String)
      */
     public boolean hasRule(String id, String permission) {
@@ -264,11 +265,11 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
 
     /**
      * checks wether a rule with the id is defined. It's the same as calling
-     * 
+     *
      * <pre>
      *    (getPermissionsForID(id).size()&gt;0);
      * </pre>
-     * 
+     *
      * @see #getRule(String, String)
      */
     public boolean hasRule(String id) {
@@ -278,7 +279,7 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
     /**
      * just returns the String of Access Permissions configured in
      * property "MCR.AccessPermissions"
-     * 
+     *
      * @return the permissions as List
      */
     public Collection<String> getAccessPermissionsFromConfiguration() {
@@ -288,7 +289,7 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.access.MCRAccessInterface#getAllControlledIDs()
      */
     public Collection<String> getAllControlledIDs() {

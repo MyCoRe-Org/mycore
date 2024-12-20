@@ -30,9 +30,9 @@ import org.mycore.datamodel.classifications2.MCRClassificationUpdateType;
 
 /**
  * Eventhandler that stores classification and their modifications in a Solr collection
- * 
+ *
  * The implementation is based on MCRSolrCategoryDAO and MCREventedCategoryDAO.
- * 
+ *
  * @author Robert Stephan
  */
 public class MCRSolrClassificationEventHandler implements MCREventHandler {
@@ -43,13 +43,13 @@ public class MCRSolrClassificationEventHandler implements MCREventHandler {
     public void doHandleEvent(MCREvent evt) throws MCRException {
         if (evt.getObjectType() == MCREvent.ObjectType.CLASS) {
             MCRCategory categ = (MCRCategory) evt.get(MCREvent.CLASS_KEY);
-            LOGGER.debug("{} handling {} {}", getClass().getName(), categ.getId(), evt.getEventType());
+            LOGGER.debug("{} handling {} {}", () -> getClass().getName(), categ::getId, evt::getEventType);
             MCRCategory categParent = (MCRCategory) evt.get("parent");
             switch (evt.getEventType()) {
                 case CREATE -> MCRSolrClassificationUtil.reindex(categ, categParent);
                 case UPDATE -> processUpdate(evt, categ, categParent);
                 case DELETE -> MCRSolrClassificationUtil.solrDelete(categ.getId(), categ.getParent());
-                default -> LOGGER.error("No Method available for {}", evt.getEventType());
+                default -> LOGGER.error("No Method available for {}", evt::getEventType);
             }
         }
     }
@@ -70,11 +70,11 @@ public class MCRSolrClassificationEventHandler implements MCREventHandler {
     @Override
     public void undoHandleEvent(MCREvent evt) throws MCRException {
         if (evt.getObjectType() == MCREvent.ObjectType.CLASS) {
-            LOGGER.debug("{} handling undo of {} {}", getClass().getName(),
-                ((MCRCategory) evt.get(MCREvent.CLASS_KEY)).getId(),
-                evt.getEventType());
-            LOGGER.info("Doing nothing for undo of {} {}", ((MCRCategory) evt.get(MCREvent.CLASS_KEY)).getId(),
-                evt.getEventType());
+            LOGGER.debug("{} handling undo of {} {}", () -> getClass().getName(),
+                () -> ((MCRCategory) evt.get(MCREvent.CLASS_KEY)).getId(),
+                evt::getEventType);
+            LOGGER.info("Doing nothing for undo of {} {}", () -> ((MCRCategory) evt.get(MCREvent.CLASS_KEY)).getId(),
+                evt::getEventType);
         }
     }
 }

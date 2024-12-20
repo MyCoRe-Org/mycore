@@ -115,7 +115,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         if (this.derivate != null) {
             return;
         }
-        LOGGER.debug("upload starting, expecting {} files", getNumFiles());
+        LOGGER.debug("upload starting, expecting {} files", this::getNumFiles);
 
         MCRObjectID derivateID = getOrCreateDerivateID();
 

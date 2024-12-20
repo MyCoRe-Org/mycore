@@ -168,7 +168,7 @@ public class MCRRealmFactory {
             return MCRSourceContent.getInstance(realmsURI.toASCIIString()).asXML();
         }
         if (!realmsFile.exists() || realmsFile.length() == 0) {
-            LOGGER.info("Creating {}...", realmsFile.getAbsolutePath());
+            LOGGER.info("Creating {}...", realmsFile::getAbsolutePath);
             MCRSourceContent realmsContent = MCRSourceContent.getInstance(RESOURCE_REALMS_URI);
             realmsContent.sendTo(realmsFile);
         }
@@ -178,7 +178,7 @@ public class MCRRealmFactory {
 
     /**
      * Returns the realm with the given ID.
-     * 
+     *
      * @param id the ID of the realm
      * @return the realm with that ID, or null
      */
@@ -194,7 +194,7 @@ public class MCRRealmFactory {
 
     /**
      * Returns a list of all defined realms.
-     *  
+     *
      * @return a list of all realms.
      */
     public static List<MCRRealm> listRealms() {
@@ -203,7 +203,7 @@ public class MCRRealmFactory {
     }
 
     /**
-     * Returns the Realms JDOM document clone. 
+     * Returns the Realms JDOM document clone.
      */
     public static Document getRealmsDocument() {
         reInitIfNeeded();
@@ -220,7 +220,7 @@ public class MCRRealmFactory {
 
     /**
      * Returns the local default realm, as specified by the attribute 'local' in realms.xml
-     * 
+     *
      * @return the local default realm.
      */
     public static MCRRealm getLocalRealm() {

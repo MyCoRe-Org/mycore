@@ -250,13 +250,13 @@ public final class MCRTransferPackageUtil {
         Path derivateDirectory = targetDirectory.resolve(CONTENT_DIRECTORY).resolve(derivateId);
         Path derivatePath = derivateDirectory.resolve(derivateId + ".xml");
 
-        LOGGER.info("Importing {}", derivatePath.toAbsolutePath().toString());
+        LOGGER.info("Importing {}", derivatePath::toAbsolutePath);
         MCRDerivate der = new MCRDerivate(sax.build(derivatePath.toFile()));
         MCRMetadataManager.update(der);
 
         MCRPath derRoot = MCRPath.getPath(der.getId().toString(), "/");
         if (!Files.isDirectory(derRoot)) {
-            LOGGER.info("Creating missing root directory for {}", der.getId());
+            LOGGER.info("Creating missing root directory for {}", der::getId);
             derRoot.getFileSystem().createRoot(der.getId().toString());
         }
         try (Stream<Path> stream = Files.find(derivateDirectory, 5,

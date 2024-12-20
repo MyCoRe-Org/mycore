@@ -33,14 +33,14 @@ import org.mycore.common.content.MCRContent;
 /**
  * Stores XML metadata documents (or optionally any other BLOB data) in a
  * persistent filesystem structure
- * 
+ *
  * For each object type, a store must be defined as follows:
- * 
- * MCR.IFS2.Store.DocPortal_document.Class=org.mycore.datamodel.ifs2.MCRMetadataStore 
+ *
+ * MCR.IFS2.Store.DocPortal_document.Class=org.mycore.datamodel.ifs2.MCRMetadataStore
  * MCR.IFS2.Store.DocPortal_document.BaseDir=/foo/bar
- * MCR.IFS2.Store.DocPortal_document.SlotLayout=4-2-2 
+ * MCR.IFS2.Store.DocPortal_document.SlotLayout=4-2-2
  * MCR.IFS2.Store.DocPortal_document.ForceXML=true (which is default)
- * 
+ *
  * @author Frank Lützenkirchen
  */
 public class MCRMetadataStore extends MCRStore {
@@ -50,7 +50,7 @@ public class MCRMetadataStore extends MCRStore {
     /**
      * If true (which is default), store will enforce it gets
      * XML to store, otherwise any binary content can be stored here.
-     * 
+     *
      * Override with MCR.IFS2.Store.&lt;ObjectType&gt;.ForceXML=true|false
      */
     protected boolean forceXML = true;
@@ -59,7 +59,7 @@ public class MCRMetadataStore extends MCRStore {
 
     /**
      * Initializes a new metadata store instance.
-     * 
+     *
      * @param type
      *            the document type that is stored in this store
      */
@@ -77,7 +77,7 @@ public class MCRMetadataStore extends MCRStore {
 
     /**
      * Initializes a new metadata store instance.
-     * 
+     *
      * @param config
      *            the configuration for the store
      */
@@ -90,7 +90,7 @@ public class MCRMetadataStore extends MCRStore {
         if (forceXML) {
             forceDocType = MCRConfiguration2.getString("MCR.IFS2.Store." + config.getID() + ".ForceDocType")
                 .orElse(null);
-            LOGGER.debug("Set doctype for {} to {}", config.getID(), forceDocType);
+            LOGGER.debug("Set doctype for {} to {}", config::getID, () -> forceDocType);
         }
     }
 
@@ -100,7 +100,7 @@ public class MCRMetadataStore extends MCRStore {
 
     /**
      * Stores a newly created document, using the next free ID.
-     * 
+     *
      * @param xml
      *            the XML document to be stored
      * @return the stored metadata object
@@ -112,7 +112,7 @@ public class MCRMetadataStore extends MCRStore {
 
     /**
      * Stores a newly created document under the given ID.
-     * 
+     *
      * @param xml
      *            the XML document to be stored
      * @param id
@@ -138,7 +138,7 @@ public class MCRMetadataStore extends MCRStore {
 
     /**
      * Returns the metadata stored under the given ID, or null
-     * 
+     *
      * @param id
      *            the ID of the XML document
      * @return the metadata stored under that ID, or null when there is no such
@@ -155,7 +155,7 @@ public class MCRMetadataStore extends MCRStore {
 
     /**
      * Builds a new stored metadata object in this store
-     * 
+     *
      * @param fo
      *            the FileObject that stores the data
      * @param id

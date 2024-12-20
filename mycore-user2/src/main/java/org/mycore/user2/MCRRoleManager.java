@@ -40,7 +40,7 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 
 /**
  * Manages roles and role assignments using a database table.
- * 
+ *
  * @author Frank L\u00fctzenkirchen
  * @author Thomas Scheffler (yagee)
  */
@@ -85,7 +85,7 @@ public class MCRRoleManager {
 
     /**
      * Returns the role with the given role name, or null.
-     * 
+     *
      * @param name the unique role name
      * @return the role with the given role name, or null.
      */
@@ -118,7 +118,7 @@ public class MCRRoleManager {
     }
 
     /**
-     * Returns a role array for the given role names. 
+     * Returns a role array for the given role names.
      * @param names unique role names
      * @return array each element either MCRRole instance, or null
      */
@@ -149,7 +149,7 @@ public class MCRRoleManager {
 
     /**
      * Returns a list of all defined roles
-     * 
+     *
      * @return a list of all defined roles
      */
     public static List<MCRRole> listSystemRoles() {
@@ -158,7 +158,7 @@ public class MCRRoleManager {
 
     /**
      * Removes user from all roles
-     * 
+     *
      * @param user the user to remove from all roles
      */
     static void unassignRoles(MCRUser user) {
@@ -167,8 +167,8 @@ public class MCRRoleManager {
 
     /**
      * Stores role membership information of the user
-     * 
-     * @param user the user 
+     *
+     * @param user the user
      */
     static void storeRoleAssignments(MCRUser user) {
         MCRCategLinkReference ref = getLinkID(user);
@@ -181,7 +181,7 @@ public class MCRRoleManager {
             MCRCategoryID categID = MCRCategoryID.fromString(roleID);
             categories.add(categID);
         }
-        LOGGER.info("Assigning {} to these roles: {}", user.getUserID(), categories);
+        LOGGER.info("Assigning {} to these roles: {}", user::getUserID, () -> categories);
         CATEG_LINK_SERVICE.setLinks(ref, categories);
     }
 
@@ -203,7 +203,7 @@ public class MCRRoleManager {
     /**
      * Adds <code>role</code> to the classification system.
      * If the representing {@link MCRCategory} already exists this method does nothing.
-     * It will create any category if necessary. 
+     * It will create any category if necessary.
      */
     public static void addRole(MCRRole role) {
         MCRCategoryID categoryID = null;
