@@ -59,7 +59,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      */
     public static final int MAX_LENGTH = 64;
 
-    private static final NumberFormat NUMBER_FORMAT = initNumberFormat();
+    private static NumberFormat NUMBER_FORMAT = initNumberFormat();
 
     private static final Logger LOGGER = LogManager.getLogger(MCRObjectID.class);
 
