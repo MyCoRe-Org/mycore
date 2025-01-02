@@ -597,12 +597,12 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
          *            the language String
          */
         public void setText(String text, String lang) {
-            if (lang == null || lang.length() == 0) {
+            if (lang == null || lang.isEmpty()) {
                 this.lang = DEFAULT_LANGUAGE;
             } else {
                 this.lang = lang;
             }
-            if (text == null || text.length() == 0) {
+            if (text == null || text.isEmpty()) {
                 this.text = "";
             } else {
                 this.text = text;
@@ -617,7 +617,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
          */
         @Deprecated
         public void setText(String text) {
-            if (text == null || text.length() == 0) {
+            if (text == null || text.isEmpty()) {
                 this.text = "";
             } else {
                 this.text = text;
@@ -632,7 +632,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
          */
         @Deprecated
         public void setLang(String lang) {
-            if (lang == null || lang.length() == 0) {
+            if (lang == null || lang.isEmpty()) {
                 this.lang = DEFAULT_LANGUAGE;
             } else {
                 this.lang = lang;
@@ -645,7 +645,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
          * @return true if the content is valid.
          */
         public boolean isValid() {
-            return !(lang.length() == 0 || text.length() == 0);
+            return !(lang.isEmpty() || text.isEmpty());
         }
 
         /**
@@ -660,17 +660,15 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         }
 
         @Override
-        protected MCRMetaHistoryDateText clone() {
+        public MCRMetaHistoryDateText clone() {
             MCRMetaHistoryDateText clone = null;
             try {
                 clone = (MCRMetaHistoryDateText) super.clone();
+                clone.text = this.text;
+                clone.lang = this.lang;
             } catch (Exception e) {
                 // this can not happen!
             }
-
-            clone.text = this.text;
-            clone.lang = this.lang;
-
             return clone;
         }
     }
