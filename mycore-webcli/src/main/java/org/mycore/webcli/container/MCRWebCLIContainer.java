@@ -81,26 +81,27 @@ import jakarta.websocket.Session;
 
 /**
  * Is a wrapper class around command execution. Commands will be {@link #addCommand(String) queued} and executed in a
- * seperate thread.
+ * separate thread.
  *
  * @author Thomas Scheffler (yagee)
  * @author Michel Buechner (mcrmibue)
  * @since 2.0
  */
 public class MCRWebCLIContainer {
-    private final ReentrantLock lock;
 
-    MCRProcessableSupplier<Boolean> curFuture;
-
-    private static Map<String, List<MCRCommand>> knownCommands;
-
-    private final ProcessCallable processCallable;
-
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger(MCRWebCLIContainer.class);
 
     private static final MCRProcessableExecutor EXECUTOR;
 
     private static final MCRProcessableCollection PROCESSABLE_COLLECTION;
+
+    private final ReentrantLock lock;
+
+    private MCRProcessableSupplier<Boolean> curFuture;
+
+    private static volatile Map<String, List<MCRCommand>> knownCommands;
+
+    private final ProcessCallable processCallable;
 
     static {
         PROCESSABLE_COLLECTION = new MCRProcessableDefaultCollection("Web CLI");
@@ -178,8 +179,12 @@ public class MCRWebCLIContainer {
 
     protected static void initializeCommands() {
         if (knownCommands == null) {
-            knownCommands = new TreeMap<>();
-            knownCommands.putAll(new MCRWebCLICommandManager().getCommandsMap());
+            synchronized (MCRWebCLIContainer.class) {
+                if (knownCommands == null) {
+                    knownCommands = new TreeMap<>();
+                    knownCommands.putAll(new MCRWebCLICommandManager().getCommandsMap());
+                }
+            }
         }
     }
 

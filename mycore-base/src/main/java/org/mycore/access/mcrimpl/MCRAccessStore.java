@@ -48,7 +48,7 @@ public abstract class MCRAccessStore {
     protected static final String ACCESS_POOLS = MCRConfiguration2.getString("MCR.AccessPools")
         .orElse("read,write,delete");
 
-    private static MCRAccessStore implementation;
+    private static volatile MCRAccessStore implementation;
 
     public abstract String getRuleID(String objID, String acPool);
 
@@ -78,8 +78,12 @@ public abstract class MCRAccessStore {
 
     public static MCRAccessStore getInstance() {
         if (implementation == null) {
-            implementation = MCRConfiguration2.getSingleInstanceOfOrThrow(
-                MCRAccessStore.class, "MCR.Persistence.Access.Store.Class");
+            synchronized (MCRAccessStore.class) {
+                if(implementation == null) {
+                    implementation = MCRConfiguration2.getSingleInstanceOfOrThrow(
+                        MCRAccessStore.class, "MCR.Persistence.Access.Store.Class");
+                }
+            }
         }
         return implementation;
     }
