@@ -18,9 +18,9 @@
 
 package org.mycore.iiif.image.model;
 
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.mycore.iiif.model.MCRIIIFBase;
 
 public class MCRIIIFImageProfile extends MCRIIIFBase {
@@ -29,7 +29,7 @@ public class MCRIIIFImageProfile extends MCRIIIFBase {
 
     public static final String IIIF_IMAGE_PROFILE = "iiif:ImageProfile";
 
-    public Set<MCRIIIFFeatures> supports = new HashSet<>();
+    public Set<MCRIIIFFeatures> supports = EnumSet.noneOf(MCRIIIFFeatures.class);
 
     public Set<String> formats = new HashSet<>();
 
@@ -41,7 +41,6 @@ public class MCRIIIFImageProfile extends MCRIIIFBase {
         supports.add(MCRIIIFFeatures.canonicalLinkHeader);
         supports.add(MCRIIIFFeatures.cors);
         supports.add(MCRIIIFFeatures.jsonldMediaType);
-        supports.add(MCRIIIFFeatures.profileLinkHeader);
         supports.add(MCRIIIFFeatures.profileLinkHeader);
     }
 

@@ -18,9 +18,10 @@
 
 package org.mycore.datamodel.language;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Represents a language in the datamodel, independent of the type of code used to encode it.
@@ -32,12 +33,12 @@ public class MCRLanguage {
     /**
      * A map from codes used for this language, by code type
      */
-    private Map<MCRLanguageCodeType, String> codesByType = new HashMap<>();
+    private final Map<MCRLanguageCodeType, String> codesByType = new EnumMap<>(MCRLanguageCodeType.class);
 
     /**
      * A map of labels for this language, by language 
      */
-    private Map<MCRLanguage, String> labelsByLanguage = new HashMap<>();
+    private final Map<MCRLanguage, String> labelsByLanguage = new ConcurrentHashMap<>();
 
     private Locale locale;
 
