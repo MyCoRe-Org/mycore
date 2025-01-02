@@ -28,7 +28,6 @@ import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.parsers.bool.MCRAndCondition;
@@ -206,8 +205,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
                 // we are within phrase
                 if (value.endsWith("'")) {
                     // end of phrase
-                    value = phrase + " " + value;
-                    values.add(value);
+                    values.add(phrase + " " + value);
                     phrase = null;
                 } else {
                     // in middle of phrase

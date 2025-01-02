@@ -29,10 +29,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
@@ -190,11 +188,12 @@ public class MCRPURLManager {
             URL url = new URI(purlServerBaseURL + PURL_PATH + purl).toURL();
             LOGGER.debug(url.toString());
 
-            String data = "target=" + URLEncoder.encode(target, StandardCharsets.UTF_8);
-            data += "&maintainers=" + maintainers;
-            data += "&type=" + type;
+            StringBuilder data = new StringBuilder();
+            data.append("target=").append(URLEncoder.encode(target, StandardCharsets.UTF_8));
+            data.append("&maintainers=").append(maintainers);
+            data.append("&type=").append(type);
 
-            LOGGER.debug(data);
+            LOGGER.debug(data.toString());
 
             // Send data
 
@@ -205,7 +204,7 @@ public class MCRPURLManager {
             conn.setDoOutput(true);
 
             try (OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)) {
-                wr.write(data);
+                wr.write(data.toString());
                 wr.flush();
             }
             response = conn.getResponseCode();
