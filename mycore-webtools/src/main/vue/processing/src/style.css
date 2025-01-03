@@ -1,0 +1,117 @@
+
+body {
+  display: flex;
+}
+
+#app {
+  flex-grow: 1;
+}
+
+/* TABLE */
+.col {
+}
+.col-name {
+  flex: 5;
+}
+.col-user {
+  flex: 2;
+}
+.col-create {
+  flex: 2;
+}
+.col-progress {
+  flex: 3;
+}
+
+/* PROPERTIES */
+.property-row {
+  display: flex;
+  padding: 4px 0;
+}
+
+.propertyKey {
+  font-weight: bold;
+  flex: 1;
+}
+
+.propertyValue {
+  flex: 5;
+}
+
+.scrollContainer {
+  overflow-x: auto;
+  white-space: pre-wrap;
+  background: #f5f5f5;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+/* MODAL */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 800px;
+  width: 100%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-20px);
+  transition: all 0.3s ease-in-out;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.modal-header h4 {
+  font-size: 1.3rem;
+  margin: .5rem 0;
+}
+
+.modal h3 {
+  margin-top: 0;
+}
+
+.modal p {
+  margin: 8px 0;
+}
+
+.modal button {
+  padding: 8px 12px;
+  cursor: pointer;
+  border: none;
+  background: #ff6347;
+  color: white;
+  border-radius: 4px;
+}
+
+.modal button:hover {
+  background: #e5533d;
+}
+
+/* Modal Transition Animations */
+.modal-transition-enter-active,
+.modal-transition-leave-active {
+  transition: all 0.3s ease;
+}
+
+.modal-transition-enter-from,
+.modal-transition-leave-to {
+  opacity: 0;
+  transform: translateY(-20px);
+}
