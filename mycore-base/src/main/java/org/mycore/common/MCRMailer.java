@@ -303,7 +303,6 @@ public class MCRMailer extends MCRServlet {
      * is not responding), sending will be retried after five minutes. This is
      * done up to 10 times.
      *
-     *
      * @param from
      *            the sender of the email
      * @param replyTo
