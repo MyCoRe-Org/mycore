@@ -26,11 +26,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Detects the language of a given text string by 
+ * Detects the language of a given text string by
  * looking for typical words and word endings and used characters for each language.
  * German, english, french, arabic, chinese, japanese, greek and hebrew are currently supported.
  *

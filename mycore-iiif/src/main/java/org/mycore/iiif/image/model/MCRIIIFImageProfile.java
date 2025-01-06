@@ -21,6 +21,7 @@ package org.mycore.iiif.image.model;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.mycore.iiif.model.MCRIIIFBase;
 
 public class MCRIIIFImageProfile extends MCRIIIFBase {
