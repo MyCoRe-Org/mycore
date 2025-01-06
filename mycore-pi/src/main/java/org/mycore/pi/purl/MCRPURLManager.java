@@ -190,9 +190,10 @@ public class MCRPURLManager {
             URL url = new URI(purlServerBaseURL + PURL_PATH + purl).toURL();
             LOGGER.debug(url.toString());
 
-            String data = "target=" + URLEncoder.encode(target, StandardCharsets.UTF_8);
-            data += "&maintainers=" + maintainers;
-            data += "&type=" + type;
+            StringBuilder data = new StringBuilder();
+            data.append("target=").append(URLEncoder.encode(target, StandardCharsets.UTF_8));
+            data.append("&maintainers=").append(maintainers);
+            data.append("&type=").append(type);
 
             LOGGER.debug(data);
 
@@ -205,7 +206,7 @@ public class MCRPURLManager {
             conn.setDoOutput(true);
 
             try (OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)) {
-                wr.write(data);
+                wr.write(data.toString());
                 wr.flush();
             }
             response = conn.getResponseCode();
@@ -375,7 +376,7 @@ public class MCRPURLManager {
 
                 return db.parse(conn.getInputStream());
                 /* <purl status="1">
-                 *   <id>/test/rosdok/ppn750527188</id> 
+                 *   <id>/test/rosdok/ppn750527188</id>
                  *   <type>302</type>
                  *   <maintainers>
                  *     <uid>rosdok</uid>
@@ -383,7 +384,7 @@ public class MCRPURLManager {
                  *   </maintainers>
                  *   <target>
                  *     <url>http://localhost:8080/rosdok/resolve/id/rosdok_document_0000000259</url>
-                 *   </target> 
+                 *   </target>
                  * </purl>
                  */
             }

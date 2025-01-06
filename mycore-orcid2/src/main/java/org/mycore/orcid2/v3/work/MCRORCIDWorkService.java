@@ -311,16 +311,16 @@ public class MCRORCIDWorkService {
     }
 
     private static String buildORCIDIdentifierSearchQuery(Set<MCRIdentifier> identifiers) {
-        String query = "";
+        StringBuilder query = new StringBuilder();
         for (MCRIdentifier i : List.copyOf(identifiers)) {
             if (!query.isEmpty()) {
-                query += " OR ";
+                query.append(" OR ");
             }
             final String value = i.getValue();
-            query += String.format(Locale.ROOT, "%s-self:(%s OR %s OR %s)", i.getType(), value,
-                value.toUpperCase(Locale.ROOT), value.toLowerCase(Locale.ROOT));
+            query.append(String.format(Locale.ROOT, "%s-self:(%s OR %s OR %s)", i.getType(), value,
+                value.toUpperCase(Locale.ROOT), value.toLowerCase(Locale.ROOT)));
         }
-        return query;
+        return query.toString();
     }
 
     private static void checkScope(MCRORCIDCredential credential) {
