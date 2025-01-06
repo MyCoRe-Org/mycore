@@ -117,13 +117,6 @@ public class MCRClassificationEditorResource {
     @Context
     UriInfo uriInfo;
 
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    @Path("test")
-    public String test() {
-        return "Hallo";
-    }
-
     /**
      * @param rootidStr
      *            rootID.categID
