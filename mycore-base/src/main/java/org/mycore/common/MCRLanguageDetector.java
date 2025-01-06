@@ -20,7 +20,6 @@ package org.mycore.common;
 
 import java.lang.Character.UnicodeScript;
 import java.util.EnumMap;
-import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -108,7 +107,7 @@ public class MCRLanguageDetector {
         return score;
     }
 
-    public static Object detectLanguageByCharacter(String text) {
+    public static String detectLanguageByCharacter(String text) {
         if (text == null || text.isEmpty()) {
             LOGGER.warn("The text for language detection is null or empty");
             return null;
@@ -156,16 +155,14 @@ public class MCRLanguageDetector {
      * @param text the text string
      * @return the language code: de, en, fr, ar ,el, zh, he, jp or null
      */
-    public static Object detectLanguage(String text) {
+    public static String detectLanguage(String text) {
         LOGGER.debug("Detecting language of [{}]", text);
 
-        Object bestLanguage = detectLanguageByCharacter(text);
+        String bestLanguage = detectLanguageByCharacter(text);
 
         if (bestLanguage == null) {
             int bestScore = 0;
-            Enumeration<Object> languages = WORDS.keys();
-            while (languages.hasMoreElements()) {
-                String language = (String) languages.nextElement();
+            for (String language : WORDS.stringPropertyNames()) {
                 String wordList = WORDS.getProperty(language);
                 String endingList = ENDINGS.getProperty(language);
 
