@@ -19,8 +19,7 @@
 package org.mycore.common;
 
 import java.lang.Character.UnicodeScript;
-import java.util.Enumeration;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -31,42 +30,43 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Detects the language of a given text string by 
+ * Detects the language of a given text string by
  * looking for typical words and word endings and used characters for each language.
  * German, english, french, arabic, chinese, japanese, greek and hebrew are currently supported.
- * 
+ *
  * @author Frank Lützenkirchen
  */
 public class MCRLanguageDetector {
-    private static Logger LOGGER = LogManager.getLogger(MCRLanguageDetector.class);
 
-    private static Properties words = new Properties();
+    private static final Logger LOGGER = LogManager.getLogger(MCRLanguageDetector.class);
 
-    private static Properties endings = new Properties();
+    private static final Properties WORDS = new Properties();
 
-    private static Map<UnicodeScript, String> code2languageCodes = new HashMap<>();
+    private static final Properties ENDINGS = new Properties();
+
+    private static final Map<UnicodeScript, String> CODE_2_LANGUAGE_CODES = new EnumMap<>(UnicodeScript.class);
 
     static {
-        code2languageCodes.put(UnicodeScript.ARABIC, "ar");
-        code2languageCodes.put(UnicodeScript.GREEK, "el");
-        code2languageCodes.put(UnicodeScript.HAN, "zh");
-        code2languageCodes.put(UnicodeScript.HEBREW, "he");
-        code2languageCodes.put(UnicodeScript.HIRAGANA, "ja");
-        code2languageCodes.put(UnicodeScript.KATAKANA, "ja");
+        CODE_2_LANGUAGE_CODES.put(UnicodeScript.ARABIC, "ar");
+        CODE_2_LANGUAGE_CODES.put(UnicodeScript.GREEK, "el");
+        CODE_2_LANGUAGE_CODES.put(UnicodeScript.HAN, "zh");
+        CODE_2_LANGUAGE_CODES.put(UnicodeScript.HEBREW, "he");
+        CODE_2_LANGUAGE_CODES.put(UnicodeScript.HIRAGANA, "ja");
+        CODE_2_LANGUAGE_CODES.put(UnicodeScript.KATAKANA, "ja");
 
-        words.put("de", "als am auch auf aus bei bis das dem den der deren derer des dessen"
+        WORDS.put("de", "als am auch auf aus bei bis das dem den der deren derer des dessen"
             + " die dies diese dieser dieses ein eine einer eines einem für"
             + " hat im ist mit sich sie über und vom von vor wie zu zum zur");
-        words.put("en",
+        WORDS.put("en",
             "a and are as at do for from has have how its like new of on or the their through to with you your");
-        words.put("fr", "la le les un une des, à aux de pour par sur comme aussi jusqu'à"
+        WORDS.put("fr", "la le les un une des, à aux de pour par sur comme aussi jusqu'à"
             + " jusqu'aux quel quels quelles laquelle lequel lesquelles"
             + " lesquelles auxquels auxquelles avec sans ont sont duquel desquels desquelles quand");
 
-        endings.put("en", "ar ble cal ce ced ed ent ic ies ing ive ness our ous ons ral th ure y");
-        endings.put("de", "ag chen gen ger iche icht ig ige isch ische ischen kar ker"
+        ENDINGS.put("en", "ar ble cal ce ced ed ent ic ies ing ive ness our ous ons ral th ure y");
+        ENDINGS.put("de", "ag chen gen ger iche icht ig ige isch ische ischen kar ker"
             + " keit ler mus nen ner rie rer ter ten trie tz ung yse");
-        endings.put("fr", "é, és, ée, ées, euse, euses, ème, euil, asme, isme, aux");
+        ENDINGS.put("fr", "é, és, ée, ées, euse, euses, ème, euil, asme, isme, aux");
     }
 
     private static int buildScore(String text, String lang, String wordList, String endings) {
@@ -114,11 +114,11 @@ public class MCRLanguageDetector {
         }
         LOGGER.debug("Detecting language of [{}]", text);
 
-        Map<UnicodeScript, AtomicInteger> scores = new HashMap<>();
+        Map<UnicodeScript, AtomicInteger> scores = new EnumMap<>(UnicodeScript.class);
         buildScores(text, scores);
         UnicodeScript code = getCodeWithMaxScore(scores);
 
-        return code2languageCodes.getOrDefault(code, null);
+        return CODE_2_LANGUAGE_CODES.getOrDefault(code, null);
     }
 
     private static void buildScores(String text, Map<UnicodeScript, AtomicInteger> scores) {
@@ -151,7 +151,7 @@ public class MCRLanguageDetector {
 
     /**
      * Detects the language of a given text string.
-     * 
+     *
      * @param text the text string
      * @return the language code: de, en, fr, ar ,el, zh, he, jp or null
      */
@@ -162,11 +162,9 @@ public class MCRLanguageDetector {
 
         if (bestLanguage == null) {
             int bestScore = 0;
-            Enumeration<Object> languages = words.keys();
-            while (languages.hasMoreElements()) {
-                String language = (String) languages.nextElement();
-                String wordList = words.getProperty(language);
-                String endingList = endings.getProperty(language);
+            for (String language : WORDS.stringPropertyNames()) {
+                String wordList = WORDS.getProperty(language);
+                String endingList = ENDINGS.getProperty(language);
 
                 int score = buildScore(text, language, wordList, endingList);
                 if (score > bestScore) {
