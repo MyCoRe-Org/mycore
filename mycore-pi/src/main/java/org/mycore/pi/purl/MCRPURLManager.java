@@ -195,7 +195,7 @@ public class MCRPURLManager {
             data.append("&maintainers=").append(maintainers);
             data.append("&type=").append(type);
 
-            LOGGER.debug(data.toString());
+            LOGGER.debug(data);
 
             // Send data
 
