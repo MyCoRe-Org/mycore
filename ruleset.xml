@@ -38,10 +38,7 @@
   <rule ref="category/java/bestpractices.xml/JUnit4SuitesShouldUseSuiteAnnotation"/>
   <rule ref="category/java/bestpractices.xml/UnitTestShouldUseAfterAnnotation"/>
   <rule ref="category/java/bestpractices.xml/UnitTestShouldUseBeforeAnnotation"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/bestpractices.xml/UnitTestShouldUseTestAnnotation"/>
-  -->
   <rule ref="category/java/bestpractices.xml/JUnit5TestShouldBePackagePrivate"/>
   <rule ref="category/java/bestpractices.xml/UnitTestShouldIncludeAssert"/>
   <!-- TODO: Create PR to fix this rule -->
