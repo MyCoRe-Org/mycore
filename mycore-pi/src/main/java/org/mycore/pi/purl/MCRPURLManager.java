@@ -29,8 +29,10 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
@@ -374,7 +376,7 @@ public class MCRPURLManager {
 
                 return db.parse(conn.getInputStream());
                 /* <purl status="1">
-                 *   <id>/test/rosdok/ppn750527188</id> 
+                 *   <id>/test/rosdok/ppn750527188</id>
                  *   <type>302</type>
                  *   <maintainers>
                  *     <uid>rosdok</uid>
@@ -382,7 +384,7 @@ public class MCRPURLManager {
                  *   </maintainers>
                  *   <target>
                  *     <url>http://localhost:8080/rosdok/resolve/id/rosdok_document_0000000259</url>
-                 *   </target> 
+                 *   </target>
                  * </purl>
                  */
             }

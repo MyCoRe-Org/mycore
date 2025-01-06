@@ -28,6 +28,7 @@ import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.parsers.bool.MCRAndCondition;
