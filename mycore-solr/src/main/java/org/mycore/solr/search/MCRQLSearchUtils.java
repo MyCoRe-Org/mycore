@@ -19,12 +19,11 @@
 package org.mycore.solr.search;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.logging.log4j.LogManager;
@@ -48,8 +47,8 @@ public class MCRQLSearchUtils {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRQLSearchUtils.class);
 
-    private static HashSet<String> SEARCH_PARAMETER = new HashSet<>(Arrays.asList("search", "query", "maxResults",
-        "numPerPage", "page", "mask", "mode", "redirect", "qt"));
+    private static Set<String> SEARCH_PARAMETER = Set.of("search", "query", "maxResults",
+        "numPerPage", "page", "mask", "mode", "redirect", "qt");
 
     /**
      * Build MCRQuery from editor XML input
@@ -114,7 +113,7 @@ public class MCRQLSearchUtils {
             element.setAttribute("operator", operator);
 
             List<Element> values = element.getChildren("value");
-            if (values != null && values.size() > 0) {
+            if (values != null && !values.isEmpty()) {
                 element.removeAttribute("field");
                 element.setAttribute("operator", "or");
                 element.setName("boolean");
@@ -209,7 +208,7 @@ public class MCRQLSearchUtils {
             }
         }
 
-        if (sortFields.size() > 0) {
+        if (!sortFields.isEmpty()) {
             sortFields.sort((arg0, arg1) -> {
                 String s0 = arg0.substring(arg0.indexOf(".sortField"));
                 String s1 = arg1.substring(arg1.indexOf(".sortField"));
@@ -233,7 +232,7 @@ public class MCRQLSearchUtils {
 
     protected static String getReqParameter(HttpServletRequest req, String name, String defaultValue) {
         String value = req.getParameter(name);
-        if (value == null || value.trim().length() == 0) {
+        if (value == null || value.isBlank()) {
             return defaultValue;
         } else {
             return value.trim();

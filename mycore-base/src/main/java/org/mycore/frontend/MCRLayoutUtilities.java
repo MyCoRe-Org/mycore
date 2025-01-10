@@ -29,6 +29,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -106,7 +107,7 @@ public class MCRLayoutUtilities {
     private static final boolean ACCESS_CONTROLL_ON = MCRConfiguration2
         .getOrThrow("MCR.Website.ReadAccessVerification", Boolean::parseBoolean);
 
-    private static HashMap<String, Element> itemStore = new HashMap<>();
+    private static Map<String, Element> itemStore = new HashMap<>();
 
     private static final LoadingCache<String, DocumentHolder> NAV_DOCUMENT_CACHE = CacheBuilder.newBuilder()
         .refreshAfterWrite(STANDARD_CACHE_SECONDS, TimeUnit.SECONDS).build(new CacheLoader<>() {
@@ -468,7 +469,7 @@ public class MCRLayoutUtilities {
         }
 
         public boolean isValid(URL url) throws IOException {
-            return docURL.equals(url) && lastModified == getLastModified();
+            return docURL.toString().equals(url.toString()) && lastModified == getLastModified();
         }
 
         private void parseDocument() throws JDOMException, IOException {

@@ -104,7 +104,7 @@ public class MCRWCMSNavigationResource {
     }
 
     /**
-     * Returns a json object containing all available templates. 
+     * Returns a json object containing all available templates.
      */
     @GET
     @Path("templates")
@@ -113,7 +113,7 @@ public class MCRWCMSNavigationResource {
         // templates of navigation.xml
         Document xml = MCRWCMSNavigationUtils.getNavigationAsXML();
         List<Element> elementList = TEMPLATE_PATH.evaluate(xml);
-        HashSet<String> entries = elementList.stream()
+        Set<String> entries = elementList.stream()
             .map(e -> e.getAttributeValue("template"))
             .collect(Collectors.toCollection(HashSet::new));
 

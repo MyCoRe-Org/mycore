@@ -27,6 +27,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -92,7 +93,7 @@ public class MCRBasicCommands {
      */
     @MCRCommand(syntax = "help {0}", help = "Show the help text for the commands beginning with {0}.", order = 10)
     public static void listKnownCommandsBeginningWithPrefix(String pattern) {
-        TreeMap<String, List<org.mycore.frontend.cli.MCRCommand>> matchingCommands = MCRCommandManager
+        SortedMap<String, List<org.mycore.frontend.cli.MCRCommand>> matchingCommands = MCRCommandManager
             .getKnownCommands().entrySet().stream()
             .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
                 .filter(cmd -> cmd.getSyntax().contains(pattern) || cmd.getHelpText().contains(pattern))
@@ -186,7 +187,7 @@ public class MCRBasicCommands {
         order = 130)
     public static void createConfigurationDirectory() throws IOException {
         File configurationDirectory = MCRConfigurationDir.getConfigurationDirectory();
-        ArrayList<File> directories = new ArrayList<>(3);
+        List<File> directories = new ArrayList<>(3);
         directories.add(configurationDirectory);
         for (String dir : MCRConfiguration2.getString("MCR.ConfigurationDirectory.template.directories").orElse("")
             .split(",")) {

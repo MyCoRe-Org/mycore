@@ -95,7 +95,7 @@ public class MCRLoginServlet extends MCRServlet {
     }
 
     protected static void addFormFields(MCRLogin login, String loginToRealm) {
-        ArrayList<org.mycore.frontend.support.MCRLogin.InputField> fields = new ArrayList<>();
+        List<org.mycore.frontend.support.MCRLogin.InputField> fields = new ArrayList<>();
         if (loginToRealm != null) {
             //realmParameter
             MCRRealm realm = MCRRealmFactory.getRealm(loginToRealm);

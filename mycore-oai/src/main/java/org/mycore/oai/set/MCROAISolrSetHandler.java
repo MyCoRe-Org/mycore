@@ -32,7 +32,7 @@ public abstract class MCROAISolrSetHandler implements MCROAISetHandler<SolrQuery
 
     private String handlerPrefix;
 
-    private HashMap<String, MCRSet> setMap;
+    private Map<String, MCRSet> setMap;
 
     @Override
     public void init(String configPrefix, String handlerPrefix) {

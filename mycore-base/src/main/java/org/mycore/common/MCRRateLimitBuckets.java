@@ -81,7 +81,7 @@ public class MCRRateLimitBuckets {
         }
         final String dsConfigLimits = MCRConfiguration2.getStringOrThrow(CONFIG_PREFIX + CONFIG_ID + ".Limits");
 
-        final HashMap<String, Long> limitMap = Arrays.stream(dsConfigLimits.split(",")).collect(
+        final Map<String, Long> limitMap = Arrays.stream(dsConfigLimits.split(",")).collect(
             HashMap::new, (map, str) -> map.put(str.split("/")[1].trim(),
                 Long.parseLong(str.split("/")[0].trim())),
             HashMap::putAll);
@@ -96,7 +96,7 @@ public class MCRRateLimitBuckets {
      * @param limitMap a map of time units and the corresponding limit/amount of tokens.
      * @return the created bucket
      */
-    private static Bucket createNewBucket(HashMap<String, Long> limitMap) {
+    private static Bucket createNewBucket(Map<String, Long> limitMap) {
         final LocalBucketBuilder builder = Bucket.builder();
         for (Map.Entry<String, Long> entry : limitMap.entrySet()) {
             final String unit = entry.getKey();

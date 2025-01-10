@@ -36,6 +36,7 @@ import org.mycore.iview2.services.MCRTilingQueue;
  */
 public class MCRImageTileEventHandler extends MCREventHandlerBase {
 
+    @SuppressWarnings("PMD.LooseCoupling")
     MCRTilingQueue tq = MCRTilingQueue.getInstance();
 
     /**

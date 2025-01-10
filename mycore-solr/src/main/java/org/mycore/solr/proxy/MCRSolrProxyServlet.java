@@ -179,7 +179,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
         NamedList<Object> namedList = solrQueryParameter.toNamedList();
         //disabled for MCR-953 and https://issues.apache.org/jira/browse/SOLR-7508
         //Map<String, String[]> parameters = ModifiableSolrParams.toMultiMap(namedList);
-        HashMap<String, String[]> parameters = new HashMap<>();
+        Map<String, String[]> parameters = new HashMap<>();
         for (int i = 0; i < namedList.size(); i++) {
             String name = namedList.getName(i);
             Object val = namedList.getVal(i);
@@ -198,7 +198,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
      */
     private static void redirectToQueryHandler(Document input, HttpServletResponse resp)
         throws IOException {
-        LinkedHashMap<String, String[]> parameters = new LinkedHashMap<>();
+        Map<String, String[]> parameters = new LinkedHashMap<>();
         List<Element> children = input.getRootElement().getChildren();
         for (Element param : children) {
             String attribute = param.getAttributeValue("name");
@@ -342,7 +342,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
 
     private static ModifiableSolrParams toSolrParams(Map<String, String[]> parameters) {
         // to maintain order
-        LinkedHashMap<String, String[]> copy = new LinkedHashMap<>(parameters);
+        Map<String, String[]> copy = new LinkedHashMap<>(parameters);
         ModifiableSolrParams solrParams = new ModifiableSolrParams(copy);
         if (!parameters.containsKey("version") && !parameters.containsKey("wt")) {
             solrParams.set("version", SOLR_QUERY_XML_PROTOCOL_VERSION);

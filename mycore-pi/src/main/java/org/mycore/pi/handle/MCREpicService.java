@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -89,7 +90,7 @@ public class MCREpicService extends MCRPIJobService<MCRHandle> {
     @MCRProperty(name = "MetadataIndex", required = false)
     public String metadataIndex;
 
-    public ConcurrentHashMap<String, ReentrantLock> idLockMap = new ConcurrentHashMap<>();
+    public Map<String, ReentrantLock> idLockMap = new ConcurrentHashMap<>();
 
     public MCREpicService() {
         super("handle");
@@ -141,7 +142,7 @@ public class MCREpicService extends MCRPIJobService<MCRHandle> {
         final String urlForObject = getURLForObject(objId);
 
         try {
-            final ArrayList<MCRHandleInfo> handleInfos = new ArrayList<>();
+            final List<MCRHandleInfo> handleInfos = new ArrayList<>();
             processMedataData(objectID, handleInfos);
 
             ReentrantLock reentrantLock = idLockMap.computeIfAbsent(epic, (l) -> new ReentrantLock());
@@ -157,7 +158,7 @@ public class MCREpicService extends MCRPIJobService<MCRHandle> {
 
     }
 
-    private void processMedataData(MCRObjectID objectID, ArrayList<MCRHandleInfo> handleInfos) throws IOException {
+    private void processMedataData(MCRObjectID objectID, List<MCRHandleInfo> handleInfos) throws IOException {
         if (transformerID != null && metadataType != null && metadataIndex != null) {
             final int index = Integer.parseInt(metadataIndex, 10);
             final Document xml = MCRMetadataManager.retrieve(objectID).createXML();
@@ -186,9 +187,9 @@ public class MCREpicService extends MCRPIJobService<MCRHandle> {
     }
 
     @Override
-    protected HashMap<String, String> createJobContextParams(PiJobAction action, MCRBase obj, MCRHandle epic,
+    protected Map<String, String> createJobContextParams(PiJobAction action, MCRBase obj, MCRHandle epic,
         String additional) {
-        HashMap<String, String> contextParameters = new HashMap<>();
+        Map<String, String> contextParameters = new HashMap<>();
         contextParameters.put(EPIC_KEY, epic.asString());
         contextParameters.put(OBJECT_ID_KEY, obj.getId().toString());
         return contextParameters;

@@ -233,7 +233,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     private MCRJob createJob(Map<String, String> contextParameters, PiJobAction action) {
         MCRJob job = new MCRJob(MCRPIRegisterJobAction.class);
 
-        HashMap<String, String> params = new HashMap<>(contextParameters);
+        Map<String, String> params = new HashMap<>(contextParameters);
         params.put("action", action.toString());
         params.put("registrationServiceID", this.getServiceID());
         job.setParameters(params);
@@ -370,7 +370,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
 
     protected abstract boolean validateRegistrationDocument(MCRBase obj, T identifier, String additional);
 
-    protected abstract HashMap<String, String> createJobContextParams(PiJobAction action, MCRBase obj, T identifier,
+    protected abstract Map<String, String> createJobContextParams(PiJobAction action, MCRBase obj, T identifier,
         String additional);
 
     public enum PiJobAction {

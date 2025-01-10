@@ -44,13 +44,13 @@ public class MCROCFLMigration {
 
     private final MCROCFLXMLMetadataManager target;
 
-    private final ArrayList<String> invalidState;
+    private final List<String> invalidState;
 
-    private final ArrayList<String> withoutHistory;
+    private final List<String> withoutHistory;
 
-    private final ArrayList<String> success;
+    private final List<String> success;
 
-    private final ArrayList<String> failed;
+    private final List<String> failed;
 
     private final List<MCROCFLRevisionPruner> pruners;
 
@@ -76,19 +76,19 @@ public class MCROCFLMigration {
         this.pruners = pruners;
     }
 
-    public ArrayList<String> getInvalidState() {
+    public List<String> getInvalidState() {
         return invalidState;
     }
 
-    public ArrayList<String> getWithoutHistory() {
+    public List<String> getWithoutHistory() {
         return withoutHistory;
     }
 
-    public ArrayList<String> getSuccess() {
+    public List<String> getSuccess() {
         return success;
     }
 
-    public ArrayList<String> getFailed() {
+    public List<String> getFailed() {
         return failed;
     }
 

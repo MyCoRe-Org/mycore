@@ -20,6 +20,7 @@ package org.mycore.mods;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
@@ -34,7 +35,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * Eventhandler for linking MODS_OBJECTTYPE document to MyCoRe classifications.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  */
 public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
@@ -48,7 +49,7 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
             return;
         }
         MCRMODSWrapper modsWrapper = new MCRMODSWrapper(obj);
-        final HashSet<MCRCategoryID> categories = new HashSet<>(modsWrapper.getMcrCategoryIDs());
+        final Set<MCRCategoryID> categories = new HashSet<>(modsWrapper.getMcrCategoryIDs());
         if (!categories.isEmpty()) {
             final MCRCategLinkReference objectReference = new MCRCategLinkReference(obj.getId());
             MCRCategLinkServiceFactory.getInstance().setLinks(objectReference, categories);

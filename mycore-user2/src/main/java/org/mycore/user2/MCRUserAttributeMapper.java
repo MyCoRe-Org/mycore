@@ -83,7 +83,7 @@ public class MCRUserAttributeMapper {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRUserAttributeMapper.class);
 
-    private final HashMap<String, List<Attribute>> attributeMapping = new HashMap<>();
+    private final Map<String, List<Attribute>> attributeMapping = new HashMap<>();
 
     public static MCRUserAttributeMapper instance(Element attributeMapping) {
         try {

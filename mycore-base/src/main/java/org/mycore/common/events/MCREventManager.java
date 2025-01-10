@@ -57,7 +57,7 @@ public class MCREventManager {
     private static MCREventManager instance;
 
     /** Table of all configured event handlers * */
-    private ConcurrentHashMap<String, List<MCREventHandler>> handlers;
+    private Map<String, List<MCREventHandler>> handlers;
 
     private MCREventManager() {
         handlers = new ConcurrentHashMap<>();

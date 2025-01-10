@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -67,13 +68,13 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
-        HashSet<MCRCategLinkReference> before = new HashSet<>(CATEGLINK_SERVICE.getReferences(der.getId().toString()));
+        Set<MCRCategLinkReference> before = new HashSet<>(CATEGLINK_SERVICE.getReferences(der.getId().toString()));
 
         handleDerivateDeleted(evt, der);
         handleDerivateCreated(evt, der);
 
-        HashSet<MCRCategLinkReference> after = new HashSet<>(CATEGLINK_SERVICE.getReferences(der.getId().toString()));
-        HashSet<MCRCategLinkReference> combined = new HashSet<>(before);
+        Set<MCRCategLinkReference> after = new HashSet<>(CATEGLINK_SERVICE.getReferences(der.getId().toString()));
+        Set<MCRCategLinkReference> combined = new HashSet<>(before);
         combined.addAll(after);
         for (MCRCategLinkReference ref : combined) {
             MCRObjectID derId = der.getId();

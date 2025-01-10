@@ -35,7 +35,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -196,14 +195,15 @@ public final class MCRURIResolver implements URIResolver {
         context = ctx;
     }
 
-    public static Hashtable<String, String> getParameterMap(String key) {
+    public static Map<String, String> getParameterMap(String key) {
         String[] param;
         StringTokenizer tok = new StringTokenizer(key, "&");
-        Hashtable<String, String> params = new Hashtable<>();
+        Map<String, String> params = new HashMap<>();
 
         while (tok.hasMoreTokens()) {
             param = tok.nextToken().split("=");
-            params.put(param[0], param.length >= 2 ? param[1] : "");
+            params.put(URLDecoder.decode(param[0], StandardCharsets.UTF_8),
+                param.length >= 2 ? URLDecoder.decode(param[1], StandardCharsets.UTF_8) : "");
         }
         return params;
     }
@@ -219,11 +219,11 @@ public final class MCRURIResolver implements URIResolver {
         return context;
     }
 
-    private static HashMap<String, URIResolver> getResolverMapping() {
+    private static Map<String, URIResolver> getResolverMapping() {
         final Map<String, URIResolver> extResolverMapping = EXT_RESOLVER.getURIResolverMapping();
         extResolverMapping.putAll(new MCRModuleResolverProvider().getURIResolverMapping());
         // set Map to final size with loadfactor: full
-        HashMap<String, URIResolver> supportedSchemes = new HashMap<>(10 + extResolverMapping.size(), 1);
+        Map<String, URIResolver> supportedSchemes = new HashMap<>(10 + extResolverMapping.size(), 1);
         // don't let interal mapping be overwritten
         supportedSchemes.putAll(extResolverMapping);
         supportedSchemes.put("webapp", new MCRWebAppResolver());
@@ -749,7 +749,7 @@ public final class MCRURIResolver implements URIResolver {
 
             String[] param;
             StringTokenizer tok = new StringTokenizer(key, "&");
-            Hashtable<String, String> params = new Hashtable<>();
+            Map<String, String> params = new HashMap<>();
 
             while (tok.hasMoreTokens()) {
                 param = tok.nextToken().split("=");
@@ -915,13 +915,13 @@ public final class MCRURIResolver implements URIResolver {
             MCRCategory cl = null;
             LOGGER.debug("categoryCache entry invalid or not found: start MCRClassificationQuery");
             if (axis.equals("children")) {
-                if (categ.length() > 0) {
+                if (!categ.isEmpty()) {
                     cl = DAO.getCategory(new MCRCategoryID(classID, categ), levels);
                 } else {
                     cl = DAO.getCategory(MCRCategoryID.rootID(classID), levels);
                 }
             } else if (axis.equals("parents")) {
-                if (categ.length() == 0) {
+                if (categ.isEmpty()) {
                     LOGGER.error("Cannot resolve parent axis without a CategID. URI: {}", uri);
                     throw new IllegalArgumentException(
                         "Invalid format (categID is required in mode 'parents') "
@@ -1005,8 +1005,8 @@ public final class MCRURIResolver implements URIResolver {
         public Source resolve(String href, String base) {
             String target = href.substring(href.indexOf(':') + 1);
             // fixes exceptions if suburi is empty like "mcrobject:"
-            String subUri = target.substring(target.indexOf(':') + 1);
-            if (subUri.length() == 0) {
+            String subUri = target.substring(target.indexOf(":") + 1);
+            if (subUri.isEmpty()) {
                 return new JDOMSource(new Element("null"));
             }
             // end fix
@@ -1184,8 +1184,8 @@ public final class MCRURIResolver implements URIResolver {
             String transformerId = new StringTokenizer(help, ":").nextToken();
             String target = help.substring(help.indexOf(':') + 1);
 
-            String subUri = target.substring(target.indexOf(':') + 1);
-            if (subUri.length() == 0) {
+            String subUri = target.substring(target.indexOf(":") + 1);
+            if (subUri.isEmpty()) {
                 return new JDOMSource(new Element("null"));
             }
 
@@ -1329,19 +1329,6 @@ public final class MCRURIResolver implements URIResolver {
      */
     private static class MCRBuildXMLResolver implements URIResolver {
 
-        private static Hashtable<String, String> getParameterMap(String key) {
-            String[] param;
-            StringTokenizer tok = new StringTokenizer(key, "&");
-            Hashtable<String, String> params = new Hashtable<>();
-
-            while (tok.hasMoreTokens()) {
-                param = tok.nextToken().split("=");
-                params.put(URLDecoder.decode(param[0], StandardCharsets.UTF_8),
-                    URLDecoder.decode(param[1], StandardCharsets.UTF_8));
-            }
-            return params;
-        }
-
         private static void constructElement(Element current, String xpath, String value) {
             StringTokenizer st = new StringTokenizer(xpath, "/");
             Element currentToken = current;
@@ -1396,7 +1383,7 @@ public final class MCRURIResolver implements URIResolver {
             String key = href.substring(href.indexOf(':') + 1);
             LOGGER.debug("Building xml from {}", key);
 
-            Hashtable<String, String> params = getParameterMap(key);
+            Map<String, String> params = getParameterMap(key);
 
             Element defaultRoot = new Element("root");
             Element root = defaultRoot;
@@ -1737,7 +1724,7 @@ public final class MCRURIResolver implements URIResolver {
             final String[] translationKeys = target.split(",");
 
             // Combine translations to prevent duplicates
-            HashMap<String, String> translations = new HashMap<>();
+            Map<String, String> translations = new HashMap<>();
             for (String translationKey : translationKeys) {
                 if (translationKey.endsWith("*")) {
                     final String prefix = translationKey.substring(0, translationKey.length() - 1);

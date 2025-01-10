@@ -51,7 +51,7 @@ public class MCRContentTypes {
     }
 
     private static List<FileTypeDetector> getInstalledDetectors() {
-        ArrayList<FileTypeDetector> detectors = new ArrayList<>();
+        List<FileTypeDetector> detectors = new ArrayList<>();
         ServiceLoader<FileTypeDetector> serviceLoader = ServiceLoader.load(FileTypeDetector.class);
         for (FileTypeDetector fileTypeDetector : serviceLoader) {
             LOGGER.info("Adding content type detector: {}", fileTypeDetector::getClass);

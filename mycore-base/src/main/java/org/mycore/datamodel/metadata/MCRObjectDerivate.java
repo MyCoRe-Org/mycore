@@ -34,7 +34,7 @@ import org.mycore.datamodel.niofs.MCRPath;
 
 /**
  * This class implements all methode for handling one derivate data.
- * 
+ *
  * @author Jens Kupferschmidt
  */
 public class MCRObjectDerivate {
@@ -44,13 +44,13 @@ public class MCRObjectDerivate {
     // derivate data
     private MCRMetaLinkID linkmeta;
 
-    private final ArrayList<MCRMetaLink> externals;
+    private final List<MCRMetaLink> externals;
 
     private MCRMetaIFS internals;
 
-    private final ArrayList<MCRMetaLangText> titles;
+    private final List<MCRMetaLangText> titles;
 
-    private final ArrayList<MCRMetaClassification> classifications;
+    private final List<MCRMetaClassification> classifications;
 
     private String derivateURN;
 
@@ -80,7 +80,7 @@ public class MCRObjectDerivate {
     /**
      * This methode read the XML input stream part from a DOM part for the
      * structure data of the document.
-     * 
+     *
      * @param derivate
      *            a list of relevant DOM elements for the derivate
      */
@@ -182,7 +182,7 @@ public class MCRObjectDerivate {
 
     /**
      * returns link to the MCRObject.
-     * 
+     *
      * @return a metadata link as MCRMetaLinkID
      */
     public MCRMetaLinkID getMetaLink() {
@@ -191,7 +191,7 @@ public class MCRObjectDerivate {
 
     /**
      * This method set the metadata link
-     * 
+     *
      * @param link
      *            the MCRMetaLinkID object
      */
@@ -208,7 +208,7 @@ public class MCRObjectDerivate {
 
     /**
      * This method get a single link from the external list as a MCRMetaLink.
-     * 
+     *
      * @exception IndexOutOfBoundsException
      *                throw this exception, if the index is false
      * @return a external link as MCRMetaLink
@@ -230,7 +230,7 @@ public class MCRObjectDerivate {
 
     /**
      * This method get a single text from the titles list as a MCRMetaLangText.
-     * 
+     *
      * @exception IndexOutOfBoundsException
      *                throw this exception, if the index is false
      * @return a title text as MCRMetaLangText
@@ -245,7 +245,7 @@ public class MCRObjectDerivate {
 
     /**
      * This method get a single data from the internal list as a MCRMetaIFS.
-     * 
+     *
      * @return a internal data as MCRMetaIFS
      */
     public final MCRMetaIFS getInternals() {
@@ -255,7 +255,7 @@ public class MCRObjectDerivate {
     /**
      * @param file the file to add
      * @param urn the urn of the file, if already known, if not provide null
-     * 
+     *
      * @throws NullPointerException if first argument is null
      */
     public MCRFileMetadata getOrCreateFileMetadata(MCRPath file, String urn) {
@@ -340,7 +340,7 @@ public class MCRObjectDerivate {
 
     /**
      * This method set the metadata internals (the IFS data)
-     * 
+     *
      * @param ifs
      *            the MCRMetaIFS object
      */
@@ -354,7 +354,7 @@ public class MCRObjectDerivate {
 
     /**
      * This methode create a XML stream for all derivate data.
-     * 
+     *
      * @exception MCRException
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML data of the structure data part
@@ -371,7 +371,7 @@ public class MCRObjectDerivate {
         linkmetas.setAttribute("heritable", "false");
         linkmetas.addContent(linkmeta.createXML());
         elm.addContent(linkmetas);
-        if (externals.size() != 0) {
+        if (!externals.isEmpty()) {
             Element extEl = createExternalsElement();
             elm.addContent(extEl);
         }
@@ -379,11 +379,11 @@ public class MCRObjectDerivate {
             Element intEl = createInternalsElement();
             elm.addContent(intEl);
         }
-        if (titles.size() != 0) {
+        if (!titles.isEmpty()) {
             Element titEl = createTitleElement();
             elm.addContent(titEl);
         }
-        if (classifications.size() > 0) {
+        if (!classifications.isEmpty()) {
             Element clazzElement = createClassificationElement();
             elm.addContent(clazzElement);
         }
@@ -452,7 +452,7 @@ public class MCRObjectDerivate {
      * <li>the linkmeta exist and the XLink type of linkmeta is not "arc"</li>
      * <li>no information in the external AND internal tags</li>
      * </ul>
-     * 
+     *
      * @return a boolean value
      */
     public final boolean isValid() {
@@ -472,7 +472,7 @@ public class MCRObjectDerivate {
      *  <li>the linkmeta xlink:type is not 'locator'</li>
      *  <li>the internals and the externals are empty</li>
      *  </ul>
-     * 
+     *
      * @throws MCRException the MCRObjectDerivate is invalid
      */
     public void validate() throws MCRException {
@@ -482,7 +482,7 @@ public class MCRObjectDerivate {
         if (!linkmeta.getXLinkType().equals("locator")) {
             throw new MCRException("linkmeta type != locator");
         }
-        if ((internals == null) && (externals.size() == 0)) {
+        if ((internals == null) && (externals.isEmpty())) {
             throw new MCRException("(internals == null) && (externals.size() == 0)");
         }
     }
@@ -499,11 +499,11 @@ public class MCRObjectDerivate {
         this.derivateID = id;
     }
 
-    public ArrayList<MCRMetaClassification> getClassifications() {
+    public List<MCRMetaClassification> getClassifications() {
         return classifications;
     }
 
-    public ArrayList<MCRMetaLangText> getTitles() {
+    public List<MCRMetaLangText> getTitles() {
         return titles;
     }
 }

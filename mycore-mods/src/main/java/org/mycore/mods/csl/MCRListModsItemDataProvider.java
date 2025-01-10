@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.SequencedMap;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -44,7 +45,7 @@ public class MCRListModsItemDataProvider extends MCRItemDataProvider {
 
     protected static MCRCache<String, CSLItemData> cslCache = new MCRCache<>(2000, "CSL Mods Data");
 
-    private LinkedHashMap<String, CSLItemData> store = new LinkedHashMap<>();
+    private SequencedMap<String, CSLItemData> store = new LinkedHashMap<>();
 
     @Override
     public void addContent(MCRContent content) throws IOException, JDOMException, SAXException {

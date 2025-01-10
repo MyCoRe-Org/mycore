@@ -32,9 +32,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Vector;
+import java.util.Queue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
@@ -60,9 +62,9 @@ import org.mycore.common.xml.MCRURIResolver;
  * to be used on the server side. It implements an interactive command prompt
  * and understands a set of commands. Each command is an instance of the class
  * <code>MCRCommand</code>.
- * 
+ *
  * @see MCRCommand
- * 
+ *
  * @author Frank Lützenkirchen
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
@@ -77,9 +79,10 @@ public class MCRCommandLineInterface {
     private static String system;
 
     /** A queue of commands waiting to be executed */
-    protected static Vector<String> commandQueue = new Vector<>();
+    @SuppressWarnings("PMD.LooseCoupling")
+    protected static LinkedList<String> commandQueue = new LinkedList<>();
 
-    protected static Vector<String> failedCommands = new Vector<>();
+    protected static Queue<String> failedCommands = new LinkedList<>();
 
     private static boolean interactiveMode = true;
 
@@ -137,8 +140,7 @@ public class MCRCommandLineInterface {
                     exit();
                 }
             } else {
-                command = commandQueue.firstElement();
-                commandQueue.removeElementAt(0);
+                command = commandQueue.poll();
                 System.out.println(system + "> " + command);
             }
 
@@ -183,7 +185,7 @@ public class MCRCommandLineInterface {
     /**
      * Processes a command entered by searching a matching command in the list
      * of known commands and executing its method.
-     * 
+     *
      * @param command
      *            The command string to be processed
      */
@@ -244,12 +246,9 @@ public class MCRCommandLineInterface {
     }
 
     private static void addCommandsToQueue(List<String> commandsReturned) {
-        if (commandsReturned.size() > 0) {
+        if (!commandsReturned.isEmpty()) {
             output("Queueing " + commandsReturned.size() + " commands to process");
-
-            for (int i = 0; i < commandsReturned.size(); i++) {
-                commandQueue.insertElementAt(commandsReturned.get(i), i);
-            }
+            commandQueue.addAll(0, commandsReturned);
         }
     }
 
@@ -267,7 +266,7 @@ public class MCRCommandLineInterface {
         saveCommandQueueToFile(commandQueue, "unprocessed-commands.txt");
     }
 
-    private static void saveCommandQueueToFile(final Vector<String> queue, String fname) {
+    private static void saveCommandQueueToFile(final Collection<String> queue, String fname) {
         output("Writing unprocessed commands to file " + fname);
         try (PrintWriter pw = new PrintWriter(new File(fname), Charset.defaultCharset())) {
             for (String command : queue) {
@@ -290,7 +289,7 @@ public class MCRCommandLineInterface {
     }
 
     protected static void handleFailedCommands() {
-        if (failedCommands.size() > 0) {
+        if (!failedCommands.isEmpty()) {
             System.err.println(system + " Several command failed.");
             saveCommandQueueToFile(failedCommands, "failed-commands.txt");
         }
@@ -298,7 +297,7 @@ public class MCRCommandLineInterface {
 
     /**
      * Show contents of a local text file, including line numbers.
-     * 
+     *
      * @param fname
      *            the filename
      */
@@ -323,7 +322,7 @@ public class MCRCommandLineInterface {
      * Reads a file containing a list of commands to be executed and adds them
      * to the commands queue for processing. This method implements the
      * "process ..." command.
-     * 
+     *
      * @param file
      *            The file holding the commands to be processed
      * @throws IOException
@@ -369,7 +368,7 @@ public class MCRCommandLineInterface {
      * Executes simple shell commands from inside the command line interface and
      * shows their output. This method implements commands entered beginning
      * with exclamation mark, like "! ls -l /temp"
-     * 
+     *
      * @param command
      *            the shell command to be executed
      * @throws IOException

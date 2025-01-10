@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
@@ -92,8 +93,8 @@ public class MCRMigrationCommands {
         help = "Create missing servflags for createdby and modifiedby. (MCR-786)",
         order = 20)
     public static List<String> addServFlags() {
-        TreeSet<String> ids = new TreeSet<>(MCRXMLMetadataManager.instance().listIDs());
-        ArrayList<String> cmds = new ArrayList<>(ids.size());
+        SortedSet<String> ids = new TreeSet<>(MCRXMLMetadataManager.instance().listIDs());
+        List<String> cmds = new ArrayList<>(ids.size());
         for (String id : ids) {
             cmds.add("migrate author servflags for " + id);
         }
@@ -323,7 +324,7 @@ public class MCRMigrationCommands {
         objectTypes.remove("derivate");
         objectTypes.remove("class");
 
-        ArrayList<String> commands = new ArrayList<>();
+        List<String> commands = new ArrayList<>();
         for (String t : objectTypes) {
             for (String objID : MCRXMLMetadataManager.instance().listIDsOfType(t)) {
                 commands.add("migrate derivatelinks for object " + objID);

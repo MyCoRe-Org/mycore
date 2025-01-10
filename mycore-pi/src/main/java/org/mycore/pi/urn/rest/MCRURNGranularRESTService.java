@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.SequencedMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -144,7 +145,7 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
         GranularURNGenerator granularURNGen = new GranularURNGenerator(seed, derivURN, setID);
         Function<MCRPath, Supplier<String>> generateURN = p -> granularURNGen.getURNSupplier();
 
-        LinkedHashMap<Supplier<String>, MCRPath> urnPathMap = derivateFileStream.apply(deriv)
+        SequencedMap<Supplier<String>, MCRPath> urnPathMap = derivateFileStream.apply(deriv)
             .filter(notInIgnoreList().and(matchFile(filePath)))
             .sorted()
             .collect(Collectors.toMap(generateURN, p -> p, (m1, m2) -> m1,
@@ -275,7 +276,7 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
     public void updateFlag(MCRObjectID id, String additional, MCRPI mcrpi) {
         MCRBase obj = MCRMetadataManager.retrieve(id);
         MCRObjectService service = obj.getService();
-        ArrayList<String> flags = service.getFlags(PI_FLAG);
+        List<String> flags = service.getFlags(PI_FLAG);
         Gson gson = getGson();
 
         //just update flag for derivate, where additional is ""

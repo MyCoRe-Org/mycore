@@ -113,7 +113,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
     private void addFieldToQuery(StringBuilder query, String[] fieldValues, String fieldName, QueryType queryType)
         throws ServletException {
         for (String fieldValue : fieldValues) {
-            if (fieldValue.length() == 0) {
+            if (fieldValue.isEmpty()) {
                 continue;
             }
             switch (queryType) {
@@ -137,11 +137,11 @@ public class MCRSolrSearchServlet extends MCRServlet {
     protected Map<String, String[]> buildSelectParameterMap(Map<String, String[]> queryParameters,
         Map<String, String[]> typeParameters,
         Map<String, String[]> sortParameters, Set<String> phraseQuery) throws ServletException {
-        HashMap<String, String[]> queryParameterMap = new HashMap<>();
+        Map<String, String[]> queryParameterMap = new HashMap<>();
 
-        HashMap<String, String> fieldTypeMap = createFieldTypeMap(typeParameters);
+        Map<String, String> fieldTypeMap = createFieldTypeMap(typeParameters);
 
-        HashMap<String, StringBuilder> filterQueryMap = new HashMap<>();
+        Map<String, StringBuilder> filterQueryMap = new HashMap<>();
         StringBuilder query = new StringBuilder();
         for (Entry<String, String[]> queryParameter : queryParameters.entrySet()) {
             String fieldName = queryParameter.getKey();
@@ -194,7 +194,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
             }
         }
 
-        ArrayList<Integer> sortedPositions = new ArrayList<>(positionFieldMap.keySet());
+        List<Integer> sortedPositions = new ArrayList<>(positionFieldMap.keySet());
         Collections.sort(sortedPositions);
 
         StringBuilder sortBuilder = new StringBuilder();
@@ -210,7 +210,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
             }
             sortBuilder.append(order);
         }
-        if (sortBuilder.length() != 0) {
+        if (!sortBuilder.isEmpty()) {
             sortBuilder.deleteCharAt(0);
         }
 
@@ -222,8 +222,8 @@ public class MCRSolrSearchServlet extends MCRServlet {
      * the type of the field as value.
      *
      */
-    private HashMap<String, String> createFieldTypeMap(Map<String, String[]> typeParameters) {
-        HashMap<String, String> fieldTypeMap = new HashMap<>();
+    private Map<String, String> createFieldTypeMap(Map<String, String[]> typeParameters) {
+        Map<String, String> fieldTypeMap = new HashMap<>();
 
         for (Entry<String, String[]> currentType : typeParameters.entrySet()) {
             for (String typeMember : currentType.getValue()) {
@@ -289,7 +289,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
                 case QueryParameter -> {
                     String[] strings = currentEntry.getValue();
                     for (String v : strings) {
-                        if (v != null && v.length() > 0) {
+                        if (v != null && !v.isEmpty()) {
                             queryParameter.put(parameterName, currentEntry.getValue());
                         }
                     }
@@ -308,7 +308,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
      *            a map wich contains all {@link StringBuilder}
      * @return a {@link StringBuilder} for the specific fieldType
      */
-    private StringBuilder getFilterQueryBuilder(HashMap<String, StringBuilder> filterQueryMap, String fieldType) {
+    private StringBuilder getFilterQueryBuilder(Map<String, StringBuilder> filterQueryMap, String fieldType) {
         if (!filterQueryMap.containsKey(fieldType)) {
             filterQueryMap.put(fieldType, new StringBuilder(JOIN_PATTERN));
         }

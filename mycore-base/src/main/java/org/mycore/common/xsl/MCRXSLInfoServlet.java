@@ -303,7 +303,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
             IteratorIterable<Element> callTemplateElements = xsl
                 .getDescendants(Filters.element("call-template", MCRConstants.XSL_NAMESPACE));
             List<Element> templates = new ArrayList<>(list);
-            HashSet<String> callNames = new HashSet<>();
+            Set<String> callNames = new HashSet<>();
             for (Element callTemplate : callTemplateElements) {
                 String name = callTemplate.getAttributeValue("name");
                 if (callNames.add(name)) {

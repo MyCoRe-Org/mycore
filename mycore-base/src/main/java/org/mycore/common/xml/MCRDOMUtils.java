@@ -18,6 +18,7 @@
 
 package org.mycore.common.xml;
 
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -36,7 +37,7 @@ public class MCRDOMUtils implements Closeable {
 
     DocumentBuilderFactory docBuilderFactory;
 
-    ConcurrentLinkedQueue<DocumentBuilder> builderQueue;
+    Queue<DocumentBuilder> builderQueue;
 
     private MCRDOMUtils() {
         builderQueue = new ConcurrentLinkedQueue<>();

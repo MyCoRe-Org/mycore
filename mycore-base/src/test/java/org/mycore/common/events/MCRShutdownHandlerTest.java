@@ -143,7 +143,7 @@ public class MCRShutdownHandlerTest {
      * It only used by {@link #mark} and {@link #resetCloseables()}.
      */
     private record MCRShutdownHandlerState(boolean shuttingDown,
-        ConcurrentSkipListSet<MCRShutdownHandler.Closeable> requests) {
+        java.util.NavigableSet<MCRShutdownHandler.Closeable> requests) {
 
         /**
          * Constructs an instance of MCRShutdownHandlerState with the given parameters.

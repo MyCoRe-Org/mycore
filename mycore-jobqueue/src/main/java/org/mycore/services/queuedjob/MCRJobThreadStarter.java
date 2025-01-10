@@ -21,6 +21,7 @@ package org.mycore.services.queuedjob;
 import java.lang.reflect.Constructor;
 import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -69,7 +70,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
 
     private final MCRProcessableDefaultCollection processableCollection;
 
-    private final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
+    private final BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
 
     private final ReentrantLock runLock;
 
@@ -374,7 +375,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
         private final AtomicInteger activeThreads;
 
         ActiveCountingThreadPoolExecutor(int maxJobThreadCount,
-            LinkedBlockingQueue<Runnable> workQueue,
+            BlockingQueue<Runnable> workQueue,
             JobThreadFactory jobThreadFactory,
             AtomicInteger activeThreads) {
             super(maxJobThreadCount, maxJobThreadCount, 1, TimeUnit.DAYS, workQueue, jobThreadFactory);

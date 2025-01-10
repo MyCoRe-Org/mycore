@@ -216,7 +216,7 @@ public class MCRTranslation {
      */
     public static Map<String, String> translatePrefixToLocale(String prefix, Locale locale) {
         LOGGER.debug("Translation for locale: {}", locale::getLanguage);
-        HashMap<String, String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>();
         ResourceBundle message = getResourceBundle(MESSAGES_BUNDLE, locale);
         Enumeration<String> keys = message.getKeys();
         while (keys.hasMoreElements()) {
@@ -433,7 +433,7 @@ public class MCRTranslation {
         Set<String> languages = new HashSet<>();
         for (Locale locale : Locale.getAvailableLocales()) {
             try {
-                if (!locale.getLanguage().equals("")) {
+                if (!locale.getLanguage().isEmpty()) {
                     ResourceBundle bundle = getResourceBundle(MESSAGES_BUNDLE, locale);
                     languages.add(bundle.getLocale().toString());
                 }

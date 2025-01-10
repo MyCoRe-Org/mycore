@@ -75,15 +75,15 @@ import org.mycore.common.function.MCRTriConsumer;
  *
  * Using the <CODE>set</CODE> methods allows client code to set new configuration properties or
  * overwrite existing ones with new values.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  * @since 2018.05
  */
 public class MCRConfiguration2 {
 
-    private static ConcurrentHashMap<UUID, EventListener> LISTENERS = new ConcurrentHashMap<>();
+    private static Map<UUID, EventListener> LISTENERS = new ConcurrentHashMap<>();
 
-    static ConcurrentHashMap<SingletonKey, Object> instanceHolder = new MCRConcurrentHashMap<>();
+    static Map<SingletonKey, Object> instanceHolder = new MCRConcurrentHashMap<>();
 
     public static Map<String, String> getPropertiesMap() {
         return Collections.unmodifiableMap(MCRConfigurationBase.getResolvedProperties().getAsMap());
@@ -126,7 +126,7 @@ public class MCRConfiguration2 {
      * MCRConfiguration2.<MCRMyType>getInstanceOf(name)
      *     .ifPresent(myTypeObj -> myTypeObj.method());
      * }
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @return the value of the configuration property as a String, or null
@@ -272,7 +272,7 @@ public class MCRConfiguration2 {
 
     /**
      * Returns the configuration property with the specified name as String.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @throws MCRConfigurationException
@@ -284,7 +284,7 @@ public class MCRConfiguration2 {
 
     /**
      * Returns the configuration property with the specified name.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @param mapper
@@ -361,7 +361,7 @@ public class MCRConfiguration2 {
     /**
      * Returns the configuration property with the specified name as an <CODE>
      * int</CODE> value.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @return the value of the configuration property as an <CODE>int</CODE> value
@@ -375,7 +375,7 @@ public class MCRConfiguration2 {
     /**
      * Returns the configuration property with the specified name as a <CODE>
      * long</CODE> value.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @return the value of the configuration property as a <CODE>long</CODE> value
@@ -389,7 +389,7 @@ public class MCRConfiguration2 {
     /**
      * Returns the configuration property with the specified name as a <CODE>
      * float</CODE> value.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @return the value of the configuration property as a <CODE>float</CODE> value
@@ -403,7 +403,7 @@ public class MCRConfiguration2 {
     /**
      * Returns the configuration property with the specified name as a <CODE>
      * double</CODE> value.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @return the value of the configuration property as a <CODE>double
@@ -418,7 +418,7 @@ public class MCRConfiguration2 {
     /**
      * Returns the configuration property with the specified name as a <CODE>
      * boolean</CODE> value.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @return <CODE>true</CODE>, if and only if the specified property has the value <CODE>true</CODE>
@@ -431,7 +431,7 @@ public class MCRConfiguration2 {
      * Sets the configuration property with the specified name to a new <CODE>
      * String</CODE> value. If the parameter <CODE>value</CODE> is <CODE>
      * null</CODE>, the property will be deleted.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @param value
@@ -458,7 +458,7 @@ public class MCRConfiguration2 {
 
     /**
      * Adds a listener that is called after a new value is set.
-     * 
+     *
      * @param keyPredicate
      *            a filter upon the property name that if matches executes the listener
      * @param listener

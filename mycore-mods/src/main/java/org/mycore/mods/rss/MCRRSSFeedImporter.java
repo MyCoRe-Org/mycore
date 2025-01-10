@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -261,7 +262,7 @@ public class MCRRSSFeedImporter {
             xml.addContent(obj.createXML().detachRootElement());
         }
 
-        HashMap<String, String> parameters = new HashMap<>();
+        Map<String, String> parameters = new HashMap<>();
         parameters.put(PROPERTY_MAIL_ADDRESS, MCRConfiguration2.getStringOrThrow(PROPERTY_MAIL_ADDRESS));
         MCRMailer.sendMail(new Document(xml), xsl2BuildNotificationMail, parameters);
     }

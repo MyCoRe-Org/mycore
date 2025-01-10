@@ -39,13 +39,10 @@ public class MCRSolrLazyInputDocumentHandlerFactory extends MCRSolrIndexHandlerF
         return new MCRSolrMCRContentIndexHandler(id, content, MCRSolrCoreType.MAIN);
     }
 
-    /* (non-Javadoc)
-     * @see org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory#getIndexHandler(java.util.Map)
-     */
     @Override
     public MCRSolrIndexHandler getIndexHandler(Map<MCRObjectID, MCRContent> contentMap) {
         //contentMap is reused in different threads
-        HashMap<MCRObjectID, MCRContent> copyMap = new HashMap<>(contentMap);
+        Map<MCRObjectID, MCRContent> copyMap = new HashMap<>(contentMap);
         return new MCRSolrMCRContentMapIndexHandler(copyMap, MCRSolrCoreType.MAIN);
     }
 

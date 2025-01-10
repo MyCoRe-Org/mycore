@@ -63,7 +63,7 @@ public class MCRConditionTransformer {
      */
     protected static final String MIXED = "--mixed--";
 
-    private static volatile HashSet<String> joinFields;
+    private static volatile Set<String> joinFields;
 
     public static String toSolrQueryString(@SuppressWarnings("rawtypes") MCRCondition condition,
         Set<String> usedFields) {
@@ -183,7 +183,7 @@ public class MCRConditionTransformer {
         if (!explicitAndOrMapping()) {
             stripPlus(solrQueryString);
         }
-        if (solrQueryString == null || solrQueryString.length() == 0) {
+        if (solrQueryString == null || solrQueryString.isEmpty()) {
             return null;
         }
         sb.append(solrQueryString);
@@ -225,7 +225,7 @@ public class MCRConditionTransformer {
     }
 
     public static StringBuilder getTermQuery(String field, String value) {
-        if (value.length() == 0) {
+        if (value.isEmpty()) {
             return null;
         }
         StringBuilder sb = new StringBuilder();
@@ -259,7 +259,7 @@ public class MCRConditionTransformer {
     }
 
     private static StringBuilder stripPlus(StringBuilder sb) {
-        if (sb == null || sb.length() == 0) {
+        if (sb == null || sb.isEmpty()) {
             return sb;
         }
         if (sb.charAt(0) == '+') {
@@ -276,7 +276,7 @@ public class MCRConditionTransformer {
         q.setRows(maxResults == 0 ? Integer.MAX_VALUE : maxResults);
 
         if (returnFields != null) {
-            q.setFields(returnFields.size() > 0 ? returnFields.stream().collect(Collectors.joining(",")) : "*");
+            q.setFields(!returnFields.isEmpty() ? returnFields.stream().collect(Collectors.joining(",")) : "*");
         }
         String sort = q.getSortField();
         LOGGER.info("MyCoRe Query transformed to: {}{} {}", q::getQuery, () -> sort != null ? " " + sort : "",
@@ -310,7 +310,7 @@ public class MCRConditionTransformer {
      */
     @SuppressWarnings("rawtypes")
     public static SolrQuery buildMergedSolrQuery(List<MCRSortBy> sortBy, boolean not, boolean and,
-        HashMap<String, List<MCRCondition>> table, int maxHits, List<String> returnFields) {
+        Map<String, List<MCRCondition>> table, int maxHits, List<String> returnFields) {
         List<MCRCondition> queryConditions = table.get("metadata");
         MCRCondition combined = buildSubCondition(queryConditions, and, not);
         SolrQuery solrRequestQuery = getSolrQuery(combined, sortBy, maxHits, returnFields);
@@ -347,9 +347,8 @@ public class MCRConditionTransformer {
      * index
      */
     @SuppressWarnings("rawtypes")
-    public static HashMap<String, List<MCRCondition>> groupConditionsByIndex(MCRSetCondition cond) {
-        HashMap<String, List<MCRCondition>> table = new HashMap<>();
-        @SuppressWarnings("unchecked")
+    public static Map<String, List<MCRCondition>> groupConditionsByIndex(MCRSetCondition cond) {
+        Map<String, List<MCRCondition>> table = new HashMap<>();
         List<MCRCondition> children = cond.getChildren();
 
         for (MCRCondition child : children) {
@@ -386,7 +385,7 @@ public class MCRConditionTransformer {
         return getJoinFields().contains(fieldName) ? "content" : "metadata";
     }
 
-    private static HashSet<String> getJoinFields() {
+    private static Set<String> getJoinFields() {
         if (joinFields == null) {
             synchronized (MCRConditionTransformer.class) {
                 if (joinFields == null) {

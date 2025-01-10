@@ -104,6 +104,7 @@ public class MCRLDAPClient {
     /** Default group of user */
     private MCRRole defaultGroup;
 
+    @SuppressWarnings("PMD.LooseCoupling")
     private Hashtable<String, String> ldapEnv;
 
     private MCRLDAPClient() {

@@ -20,6 +20,7 @@ package org.mycore.user2;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.mycore.common.MCRSessionMgr;
@@ -34,7 +35,7 @@ import jakarta.xml.bind.annotation.XmlRootElement;
  * Represents a role of users.
  * Roles are {@link MCRCategory} instances and every category from {@link MCRUser2Constants#ROLE_CLASSID}
  * {@link MCRRole#isSystemRole()}.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  */
 @XmlRootElement(name = "role")
@@ -44,7 +45,7 @@ public class MCRRole {
     private String name;
 
     /** The labels of the role */
-    private HashMap<String, MCRLabel> labels;
+    private Map<String, MCRLabel> labels;
 
     private boolean isSystemRole;
 
@@ -53,8 +54,8 @@ public class MCRRole {
     }
 
     /**
-     * Creates a new role instance. 
-     * 
+     * Creates a new role instance.
+     *
      * @param name the unique role ID
      * @param labels a set of MCRLabel in different languages
      */
@@ -68,7 +69,7 @@ public class MCRRole {
 
     /**
      * Returns the roles's name
-     * 
+     *
      * @return the roles's name
      */
     @XmlAttribute
@@ -85,7 +86,7 @@ public class MCRRole {
     }
 
     /**
-     * Returns all labels available for this role. 
+     * Returns all labels available for this role.
      */
     public Collection<MCRLabel> getLabels() {
         return labels.values();
@@ -93,7 +94,7 @@ public class MCRRole {
 
     /**
      * Returns true if this role is a system role.
-     * A system role is every category in {@link MCRUser2Constants#ROLE_CLASSID}. 
+     * A system role is every category in {@link MCRUser2Constants#ROLE_CLASSID}.
      * @return false if category has not the same root ID as the system role classification.
      */
     public boolean isSystemRole() {

@@ -502,7 +502,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         order = 150)
     public static void checkClassification(String id) {
         LOGGER.info("Checking classifcation {}", id);
-        ArrayList<String> log = new ArrayList<>();
+        List<String> log = new ArrayList<>();
         LOGGER.info("{}: checking for missing parentID", id);
         checkMissingParent(id, log);
         LOGGER.info("{}: checking for empty labels", id);

@@ -23,6 +23,7 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
@@ -40,7 +41,7 @@ import org.mycore.common.config.MCRConfiguration2.SingletonKey;
  */
 @SuppressWarnings("unchecked")
 class MCRConcurrentHashMap<K extends SingletonKey, V> extends ConcurrentHashMap<K, V> {
-    private HashMap<K, RemappedKey> keyMap = new HashMap<>();
+    private Map<K, RemappedKey> keyMap = new HashMap<>();
 
     // Disable serialization
     @SuppressWarnings("unused")
@@ -61,7 +62,7 @@ class MCRConcurrentHashMap<K extends SingletonKey, V> extends ConcurrentHashMap<
      * In case of collision, the key is automatically remapped via {@link RemappedKey}.
      * It is a wrapper to modify the hashcode of the given SingletonKey to assign a different bucket
      * within the internal table, in an attempt to resolve the collision.
-     * 
+     *
      * <p>The mapping function must not modify the map during computation of any key other then a {@link SingletonKey}
      * @see java.util.concurrent.ConcurrentHashMap#computeIfAbsent(java.lang.Object, java.util.function.Function)
      */

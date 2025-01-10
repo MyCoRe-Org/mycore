@@ -497,7 +497,7 @@ public class MCRMetsSave {
         }
         try {
             Map<String, String> urnFileMap = derivate.getUrnMap();
-            if (urnFileMap.size() > 0) {
+            if (!urnFileMap.isEmpty()) {
                 updateMetsOnUrnGenerate(derivate.getId(), urnFileMap);
             } else {
                 LOGGER.debug("There are no URN to insert");
@@ -574,10 +574,10 @@ public class MCRMetsSave {
                     File fileToRemove = fileGrp.getFileByHref(href);
                     fileGrp.removeFile(fileToRemove);
 
-                    ArrayList<PhysicalSubDiv> physicalSubDivsToRemove = new ArrayList<>();
+                    List<PhysicalSubDiv> physicalSubDivsToRemove = new ArrayList<>();
                     // remove file from mets:mets/mets:structMap[@TYPE='PHYSICAL']
                     for (PhysicalSubDiv physicalSubDiv : divContainer.getChildren()) {
-                        ArrayList<Fptr> fptrsToRemove = new ArrayList<>();
+                        List<Fptr> fptrsToRemove = new ArrayList<>();
                         for (Fptr fptr : physicalSubDiv.getChildren()) {
                             if (fptr.getFileId().equals(fileToRemove.getId())) {
                                 if (fileGrp.getUse().equals(FileGrp.USE_MASTER)) {
@@ -621,12 +621,12 @@ public class MCRMetsSave {
                             }
 
                             // there are still files for this logical sub div, nothing to do
-                            if (modifiedMets.getStructLink().getSmLinkByFrom(logicalDiv.getId()).size() > 0) {
+                            if (!modifiedMets.getStructLink().getSmLinkByFrom(logicalDiv.getId()).isEmpty()) {
                                 continue;
                             }
 
                             // the logical div has other divs included, nothing to do
-                            if (logicalDiv.getChildren().size() > 0) {
+                            if (!logicalDiv.getChildren().isEmpty()) {
                                 continue;
                             }
 
@@ -655,7 +655,7 @@ public class MCRMetsSave {
         LogicalDiv parent = logDiv.getParent();
 
         // there are files for the parent of the log div, thus nothing to do
-        if (mets.getStructLink().getSmLinkByFrom(parent.getId()).size() > 0) {
+        if (!mets.getStructLink().getSmLinkByFrom(parent.getId()).isEmpty()) {
             return;
         }
 
@@ -742,9 +742,9 @@ public class MCRMetsSave {
             .map(path -> path.substring(1)).filter(href -> !Objects.equals(href, "mets.xml"))
             .collect(Collectors.toList());
 
-        ArrayList<String> removedFiles = new ArrayList<>(metsFiles);
+        List<String> removedFiles = new ArrayList<>(metsFiles);
         removedFiles.removeAll(derivateFiles);
-        ArrayList<String> addedFiles = new ArrayList<>(derivateFiles);
+        List<String> addedFiles = new ArrayList<>(derivateFiles);
         Collections.sort(addedFiles);
         addedFiles.removeAll(metsFiles);
 
