@@ -61,6 +61,7 @@ public class MCRTilingAction implements Runnable {
      *
      * Also this updates tileJob properties of {@link MCRTileJob} in the database.
      */
+    @Override
     public void run() {
         tileJob.setStart(new Date());
         MCRImage image;

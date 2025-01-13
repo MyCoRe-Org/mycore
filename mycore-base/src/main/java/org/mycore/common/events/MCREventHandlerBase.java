@@ -33,7 +33,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 /**
  * Abstract helper class that can be subclassed to implement event handlers more
  * easily.
- * 
+ *
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  */
@@ -43,10 +43,11 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     /**
      * This method handle all calls for EventHandler for the event types
      * MCRObject, MCRDerivate and MCRFile.
-     * 
+     *
      * @param evt
      *            The MCREvent object
      */
+    @Override
     public void doHandleEvent(MCREvent evt) {
         switch (evt.getObjectType()) {
             case OBJECT -> handleMCRObjectEvent(evt);
@@ -60,10 +61,11 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     /**
      * This method roll back all calls for EventHandler for the event types
      * MCRObject, MCRDerivate and MCRFile.
-     * 
+     *
      * @param evt
      *            The MCREvent object
      */
+    @Override
     public void undoHandleEvent(MCREvent evt) {
         switch (evt.getObjectType()) {
             case OBJECT -> undoHandleMCRObjectEvent(evt);
@@ -84,7 +86,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     /**
      * Handles classification created events. This implementation does nothing and
      * should be overwritted by subclasses.
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param obj
@@ -97,7 +99,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     /**
      * Handles classification updated events. This implementation does nothing and
      * should be overwritted by subclasses.
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param obj
@@ -110,7 +112,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     /**
      * Handles classification deleted events. This implementation does nothing and
      * should be overwritted by subclasses.
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param obj
@@ -123,7 +125,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     /**
      * Handles classification repair events. This implementation does nothing and should
      * be overwritted by subclasses.
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param obj
@@ -136,7 +138,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     /**
      * Handles object created events. This implementation does nothing and
      * should be overwritted by subclasses.
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param obj
@@ -149,7 +151,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     /**
      * Handles object updated events. This implementation does nothing and
      * should be overwritted by subclasses.
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param obj
@@ -162,7 +164,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     /**
      * Handles object deleted events. This implementation does nothing and
      * should be overwritted by subclasses.
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param obj
@@ -175,7 +177,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     /**
      * Handles object repair events. This implementation does nothing and should
      * be overwritted by subclasses.
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param obj
@@ -192,7 +194,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     /**
      * Handles derivate created events. This implementation does nothing and
      * should be overwritted by subclasses.
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param der
@@ -205,7 +207,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     /**
      * Handles derivate updated events. This implementation does nothing and
      * should be overwritted by subclasses.
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param der
@@ -218,7 +220,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     /**
      * Handles derivate deleted events. This implementation does nothing and
      * should be overwritted by subclasses.
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param der
@@ -231,7 +233,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     /**
      * Handles derivate repair events. This implementation does nothing and
      * should be overwritted by subclasses.
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param der
@@ -264,7 +266,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     /**
      * Handles undo of classification created events. This implementation does nothing
      * and should be overwritted by subclasses.
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param obj
@@ -277,7 +279,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     /**
      * Handles undo of classification updated events. This implementation does nothing
      * and should be overwritted by subclasses.
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param obj
@@ -290,7 +292,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     /**
      * Handles undo of classification deleted events. This implementation does nothing
      * and should be overwritted by subclasses.
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param obj
@@ -303,7 +305,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     /**
      * Handles undo of classification repaired events. This implementation does nothing
      * and should be overwritted by subclasses.
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param obj
@@ -316,7 +318,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     /**
      * Handles undo of object created events. This implementation does nothing
      * and should be overwritted by subclasses.
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param obj
@@ -329,7 +331,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     /**
      * Handles undo of object updated events. This implementation does nothing
      * and should be overwritted by subclasses.
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param obj
@@ -342,7 +344,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     /**
      * Handles undo of object deleted events. This implementation does nothing
      * and should be overwritted by subclasses.
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param obj
@@ -355,7 +357,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     /**
      * Handles undo of object repaired events. This implementation does nothing
      * and should be overwritted by subclasses.
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param obj
@@ -368,7 +370,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     /**
      * Handles undo of derivate created events. This implementation does nothing
      * and should be overwritted by subclasses.
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param der
@@ -381,7 +383,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     /**
      * Handles undo of derivate updated events. This implementation does nothing
      * and should be overwritted by subclasses.
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param der
@@ -394,7 +396,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     /**
      * Handles undo of derivate deleted events. This implementation does nothing
      * and should be overwritted by subclasses.
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param der
@@ -407,7 +409,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     /**
      * Handles undo of derivate repaired events. This implementation does
      * nothing and should be overwritted by subclasses.
-     * 
+     *
      * @param evt
      *            the event that occured
      * @param der

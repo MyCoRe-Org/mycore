@@ -28,6 +28,7 @@ import jakarta.servlet.ServletContext;
  */
 public abstract class MCRRepeaterControl implements MCREditorTarget {
 
+    @Override
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String buttonName)
         throws Exception {
         session.getSubmission().setSubmittedValues(job.getRequest().getParameterMap());

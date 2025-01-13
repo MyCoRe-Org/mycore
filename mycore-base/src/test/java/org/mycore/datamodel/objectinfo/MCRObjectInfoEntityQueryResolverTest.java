@@ -95,6 +95,7 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
         DAO.addCategory(null, licenses);
     }
 
+    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();

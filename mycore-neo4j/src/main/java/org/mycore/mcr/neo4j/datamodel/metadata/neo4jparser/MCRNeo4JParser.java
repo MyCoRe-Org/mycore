@@ -146,6 +146,7 @@ public class MCRNeo4JParser implements MCRNeo4JMetaParser {
         return sbNode.toString();
     }
 
+    @Override
     public String createNeo4JQuery(MCRObject mcrObject) {
 
         MCRObjectID id = mcrObject.getId();

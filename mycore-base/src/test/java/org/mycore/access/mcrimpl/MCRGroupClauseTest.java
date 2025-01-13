@@ -30,6 +30,7 @@ public class MCRGroupClauseTest extends MCRTestCase {
 
     private static final String INGROUP_NAME = "ingroup";
 
+    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();

@@ -39,6 +39,7 @@ public class MCRSubselectTarget implements MCREditorTarget {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRSubselectTarget.class);
 
+    @Override
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter)
         throws Exception {
         session.getSubmission().setSubmittedValues(job.getRequest().getParameterMap());

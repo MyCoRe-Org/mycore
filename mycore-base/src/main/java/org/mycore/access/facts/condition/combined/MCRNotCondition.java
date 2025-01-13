@@ -20,17 +20,18 @@ package org.mycore.access.facts.condition.combined;
 import org.mycore.access.facts.MCRFactsHolder;
 
 /**
- * This condition negates its child condition 
+ * This condition negates its child condition
  * (boolean NOT)
- * 
+ *
  * Only the first child condition will be evaluated.
  * Further child conditions will be ignored.
- * 
+ *
  * @author Robert Stephan
  *
  */
 public final class MCRNotCondition extends MCRAbstractCombinedCondition {
 
+    @Override
     public boolean matches(MCRFactsHolder facts) {
         return conditions.stream()
             .limit(1)

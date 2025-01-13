@@ -23,9 +23,9 @@ import org.mycore.access.facts.model.MCRCondition;
 
 /**
  * This is the base implementation for a condition.
- * 
+ *
  * It is the super class for MCRCombinedCondition and MCRFactCondition.
- * 
+ *
  * @author Robert Stephan
  *
  */
@@ -37,30 +37,36 @@ public abstract class MCRAbstractCondition implements MCRCondition {
 
     private boolean debug;
 
-    /** 
+    /**
      * implementors of this method should call super.parse(xml) to bind the XML element to the condition
      */
+    @Override
     public void parse(Element xml) {
         boundElement = xml;
         type = xml.getName();
     }
 
+    @Override
     public Element getBoundElement() {
         return boundElement;
     }
 
+    @Override
     public String getType() {
         return type;
     }
 
+    @Override
     public boolean isDebug() {
         return debug;
     }
 
+    @Override
     public void setDebug(boolean b) {
         this.debug = b;
 
     }
 
+    @Override
     public abstract boolean matches(MCRFactsHolder facts);
 }

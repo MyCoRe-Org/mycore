@@ -49,7 +49,7 @@ import jakarta.persistence.RollbackException;
 
 /**
  * Pulls {@link MCRJob}s from Database and starts {@link MCRJobRunnable}s.
- * 
+ *
  * @author René Adler
  * @author Sebastian Hofmann
  */
@@ -227,6 +227,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
     /**
      * stops transmitting {@link MCRJob} to {@link MCRJobRunnable} and prepares shutdown.
      */
+    @Override
     public void prepareClose() {
         LOGGER.info("Closing manager thread");
         //signal manager thread to stop now
@@ -281,7 +282,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
 
     /**
      * Returns the name of this job manager.
-     * 
+     *
      * @return the name
      */
     public String getName() {
@@ -290,7 +291,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
 
     /**
      * Returns the processable collection assigned to this job manager.
-     * 
+     *
      * @return the processable collection
      */
     public MCRProcessableCollection getProcessableCollection() {

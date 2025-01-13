@@ -348,6 +348,7 @@ public class MCRParameterCollector {
         return job == null ? new MCRParameterCollector() : new MCRParameterCollector(job.getRequest());
     }
 
+    @Override
     public int hashCode() {
         if (modified) {
             int result = LOGGER.hashCode();

@@ -38,6 +38,7 @@ public class MCRForbiddenExceptionMapper implements ExceptionMapper<ForbiddenExc
     @Context
     Application app;
 
+    @Override
     public Response toResponse(ForbiddenException ex) {
         String userID = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
         if (userID.equals(MCRSystemUserInformation.getGuestInstance().getUserID())) {

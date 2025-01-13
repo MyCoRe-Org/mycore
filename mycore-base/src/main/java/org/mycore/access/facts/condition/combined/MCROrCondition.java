@@ -22,12 +22,13 @@ import org.mycore.access.facts.MCRFactsHolder;
 /**
  * /**
  * This condition combines its child conditions with a boolean OR
- * 
+ *
  * @author Robert Stephan
  *
  */
 public final class MCROrCondition extends MCRAbstractCombinedCondition {
 
+    @Override
     public boolean matches(MCRFactsHolder facts) {
         return conditions.stream().anyMatch(c -> addDebugInfoIfRequested(c, facts));
     }

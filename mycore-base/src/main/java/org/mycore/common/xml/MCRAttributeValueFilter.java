@@ -40,6 +40,7 @@ public class MCRAttributeValueFilter extends ElementFilter {
         this.ns = ns;
     }
 
+    @Override
     public Element filter(Object arg0) {
         Element e = super.filter(arg0);
         if (e == null) {

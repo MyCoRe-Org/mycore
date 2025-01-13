@@ -31,7 +31,7 @@ import org.mycore.access.facts.model.MCRCondition;
 /**
  * This is the base implementation for a combined condition.
  * It can be used to create conditions for a boolean algebra (and, or, not)
- * 
+ *
  * @author Robert Stephan
  *
  */
@@ -40,10 +40,12 @@ sealed public abstract class MCRAbstractCombinedCondition extends MCRAbstractCon
 
     protected Set<MCRCondition> conditions = new LinkedHashSet<>();
 
+    @Override
     public void add(MCRCondition condition) {
         conditions.add(condition);
     }
 
+    @Override
     public void parse(Element xml) {
         super.parse(xml);
         for (Element child : xml.getChildren()) {
@@ -54,6 +56,7 @@ sealed public abstract class MCRAbstractCombinedCondition extends MCRAbstractCon
     /**
      * @return the conditions
      */
+    @Override
     public Set<MCRCondition> getChildConditions() {
         return conditions;
     }

@@ -39,6 +39,7 @@ public class MCRSessionTest extends MCRTestCase {
     /**
      * @throws java.lang.Exception
      */
+    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
@@ -48,6 +49,7 @@ public class MCRSessionTest extends MCRTestCase {
     /**
      * @throws java.lang.Exception
      */
+    @Override
     @After
     public void tearDown() throws Exception {
         this.session.close();

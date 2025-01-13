@@ -31,7 +31,7 @@ import org.mycore.common.processing.MCRProcessableRegistryListener;
 
 /**
  * Central base implementation for a processable registry.
- * 
+ *
  * @author Matthias Eichner
  */
 public class MCRCentralProcessableRegistry implements MCRProcessableRegistry {
@@ -49,9 +49,10 @@ public class MCRCentralProcessableRegistry implements MCRProcessableRegistry {
 
     /**
      * Registers a new collection to the registry.
-     * 
+     *
      * @param collection the collection to register
      */
+    @Override
     public void register(MCRProcessableCollection collection) {
         synchronized (this.collections) {
             if (this.collections.contains(collection)) {
@@ -65,9 +66,10 @@ public class MCRCentralProcessableRegistry implements MCRProcessableRegistry {
 
     /**
      * Removes a collection from the registry
-     * 
+     *
      * @param collection the collection to remove
      */
+    @Override
     public void unregister(MCRProcessableCollection collection) {
         this.collections.remove(collection);
         fireRemoved(collection);
@@ -75,9 +77,10 @@ public class MCRCentralProcessableRegistry implements MCRProcessableRegistry {
 
     /**
      * Streams all the collections of this registry.
-     * 
+     *
      * @return stream of the registry content.
      */
+    @Override
     public Stream<MCRProcessableCollection> stream() {
         List<MCRProcessableCollection> snapshot;
         synchronized (this.collections) {

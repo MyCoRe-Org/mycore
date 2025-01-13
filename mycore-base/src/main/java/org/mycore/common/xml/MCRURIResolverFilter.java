@@ -43,7 +43,7 @@ import jakarta.servlet.http.HttpServletResponseWrapper;
 
 /**
  * Servlet Filter for adding debug information to servlet output.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  */
 public class MCRURIResolverFilter implements Filter {
@@ -53,14 +53,15 @@ public class MCRURIResolverFilter implements Filter {
 
     /**
      * adds debug information from MCRURIResolver to Servlet output.
-     * 
+     *
      * The information includes all URIs resolved by MCRURIResolver by the
      * current request. The filter is triggered by the log4j statement of the
      * MCRURIResolver. To switch it on set the logger to DEBUG level.
-     * 
+     *
      * @see jakarta.servlet.Filter#doFilter(jakarta.servlet.ServletRequest,
      *      jakarta.servlet.ServletResponse, jakarta.servlet.FilterChain)
      */
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException,
         ServletException {
         /*
@@ -129,9 +130,10 @@ public class MCRURIResolverFilter implements Filter {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see jakarta.servlet.Filter#destroy()
      */
+    @Override
     public void destroy() {
         // nothing to be done so far
 
@@ -139,16 +141,17 @@ public class MCRURIResolverFilter implements Filter {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see jakarta.servlet.Filter#init(jakarta.servlet.FilterConfig)
      */
+    @Override
     public void init(FilterConfig arg0) {
         // no inititalization parameters required so far
     }
 
     /**
      * wrapper arround the servlet response to change the output afterwards.
-     * 
+     *
      * @author Thomas Scheffler (yagee)
      */
     private static class MyResponseWrapper extends HttpServletResponseWrapper {

@@ -27,7 +27,7 @@ import org.mycore.access.MCRAccessManager;
 
 /**
  * Use this class if you want to have a fallback to some default access rules.
- * 
+ *
  * These are the rules that will be checked against if available
  * <ol>
  *  <li><code>{id}</code>, e.g. "MyCoRe_mods_12345678"</li>
@@ -36,10 +36,10 @@ import org.mycore.access.MCRAccessManager;
  *  <li><code>default</code></li>
  * </ol>
  *
- * This is the same behaviour as {@link MCRObjectTypeStrategy} but step 2 is inserted here. 
+ * This is the same behaviour as {@link MCRObjectTypeStrategy} but step 2 is inserted here.
  * @author Thomas Scheffler (yagee)
  * @author Jens Kupferschmidt
- * 
+ *
  */
 public class MCRObjectBaseStrategy implements MCRCombineableAccessCheckStrategy {
     private static final Logger LOGGER = LogManager.getLogger(MCRObjectBaseStrategy.class);
@@ -50,10 +50,11 @@ public class MCRObjectBaseStrategy implements MCRCombineableAccessCheckStrategy 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.access.strategies.MCRAccessCheckStrategy#checkPermission(java.lang.String,
      *      java.lang.String)
      */
+    @Override
     public boolean checkPermission(String id, String permission) {
         LOGGER.debug("check permission {} for MCRBaseID {}", permission, id);
         if (id == null || id.length() == 0 || permission == null || permission.length() == 0) {

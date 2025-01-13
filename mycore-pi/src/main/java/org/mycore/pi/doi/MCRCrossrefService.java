@@ -132,6 +132,7 @@ public class MCRCrossrefService extends MCRDOIBaseService {
             new OperationNotSupportedException("Delete is not Supported!"));
     }
 
+    @Override
     protected void deleteJob(Map<String, String> parameters) {
         //TODO: should this method do something or can it be removed?
     }

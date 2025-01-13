@@ -41,7 +41,7 @@ import jakarta.persistence.PersistenceException;
 
 /**
  * This class execute the specified action for {@link MCRJob} and performs {@link MCRJobAction#rollback()}
- * if an error occurs. 
+ * if an error occurs.
  *
  * @author René Adler
  *
@@ -83,6 +83,7 @@ public class MCRJobRunnable extends MCRAbstractProcessable implements Runnable {
         job.getParameters().forEach((k, v) -> this.getProperties().put(k, v));
     }
 
+    @Override
     public void run() {
         //prepare environment
         MCRSessionMgr.unlock();

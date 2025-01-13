@@ -31,14 +31,14 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 
 /**
  * Use this class if you want to have a fallback to some default access rules.
- * 
+ *
  * First a check is done for the MCRObjectID. If no rule for the ID is specified
  * it will be tried to check the permission agains the rule ID
  * <code>default_&lt;ObjectType&gt;</code> if it exists. If not the last
  * fallback is done against <code>default</code>.
- * 
+ *
  * @author Thomas Scheffler (yagee)
- * 
+ *
  */
 public class MCRObjectTypeStrategy implements MCRCombineableAccessCheckStrategy {
     private static final Pattern TYPE_PATTERN = Pattern.compile("[^_]*_([^_]*)_[0-9]*");
@@ -51,10 +51,11 @@ public class MCRObjectTypeStrategy implements MCRCombineableAccessCheckStrategy 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.access.strategies.MCRAccessCheckStrategy#checkPermission(java.lang.String,
      *      java.lang.String)
      */
+    @Override
     public boolean checkPermission(String id, String permission) {
         if (idStrategy.hasRuleMapping(id, permission)) {
             LOGGER.debug("using access rule defined for object.");

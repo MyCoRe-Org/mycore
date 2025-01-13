@@ -62,8 +62,8 @@ import jakarta.xml.bind.JAXBException;
  * Provides functionality to select login method,
  * change login user and show a welcome page.
  * Login methods and realms are configured in realms.xml.
- * The login form for local users is login.xml. 
- * 
+ * The login form for local users is login.xml.
+ *
  * @author Frank L\u00fctzenkirchen
  * @author Thomas Scheffler (yagee)
  */
@@ -171,7 +171,7 @@ public class MCRLoginServlet extends MCRServlet {
      * MCRLoginServlet?url=foo&amp;realm=ID
      * stores foo as redirect url and redirects
      * to the login URL of the given realm.
-    
+
      * MCRLoginServlet?action=login
      * checks input from editor login form and
      * changes the current login user and redirects
@@ -181,6 +181,7 @@ public class MCRLoginServlet extends MCRServlet {
      * does not change login user, just
      * redirects to the target url
      */
+    @Override
     public void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();

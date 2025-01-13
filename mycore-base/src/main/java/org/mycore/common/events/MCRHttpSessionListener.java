@@ -47,6 +47,7 @@ public class MCRHttpSessionListener implements HttpSessionListener {
      *
      * @see jakarta.servlet.http.HttpSessionListener#sessionCreated(jakarta.servlet.http.HttpSessionEvent)
      */
+    @Override
     public void sessionCreated(HttpSessionEvent hse) {
         LOGGER.debug(() -> "HttpSession " + hse.getSession().getId() + " is being created by: " + hse.getSource());
     }
@@ -56,6 +57,7 @@ public class MCRHttpSessionListener implements HttpSessionListener {
      *
      * @see jakarta.servlet.http.HttpSessionListener#sessionDestroyed(jakarta.servlet.http.HttpSessionEvent)
      */
+    @Override
     public void sessionDestroyed(HttpSessionEvent hse) {
         // clear MCRSessions
         HttpSession httpSession = hse.getSession();

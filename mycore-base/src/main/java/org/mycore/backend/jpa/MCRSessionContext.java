@@ -34,9 +34,9 @@ import jakarta.persistence.EntityManagerFactory;
  * A helper class which scopes the notion of
  * current session by the current {@link MCRSession}. This implementation allows a thread of a
  * {@link MCRSession} to keep the {@link EntityManager} open for a long conversation.
- * 
+ *
  * @author Thomas Scheffler (yagee)
- * 
+ *
  * @since 2016.03
  */
 class MCRSessionContext implements MCRSessionListener {
@@ -53,6 +53,7 @@ class MCRSessionContext implements MCRSessionListener {
         MCRSessionMgr.addSessionListener(this);
     }
 
+    @Override
     public void sessionEvent(MCRSessionEvent event) {
         MCRSession mcrSession = event.getSession();
         EntityManager currentEntityManager;

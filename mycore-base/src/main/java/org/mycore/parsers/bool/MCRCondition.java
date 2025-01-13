@@ -26,14 +26,15 @@ import org.jdom2.Element;
 public interface MCRCondition<T> {
     /**
      * Returns this condition as a String.
-     * 
+     *
      * @return a condition string that can be parsed
      */
+    @Override
     String toString();
 
     /**
      * Returns this condition as an Element.
-     * 
+     *
      * @return this condition in XML format
      */
     Element toXML();

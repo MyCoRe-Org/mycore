@@ -21,6 +21,7 @@ package org.mycore.datamodel.ifs2;
 public class MCRIFS2MetadataTestCase extends MCRIFS2TestCase {
     private MCRMetadataStore metaDataStore;
 
+    @Override
     protected void createStore() throws Exception {
         setMetaDataStore(MCRStoreManager.createStore(STORE_ID, MCRMetadataStore.class));
     }

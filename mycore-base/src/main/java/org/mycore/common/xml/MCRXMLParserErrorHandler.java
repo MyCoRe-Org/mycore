@@ -26,7 +26,7 @@ import org.xml.sax.SAXParseException;
 
 /**
  * Handles errors during XML parsing.
- * 
+ *
  * @author Frank Lützenkirchen
  */
 public class MCRXMLParserErrorHandler implements ErrorHandler {
@@ -46,6 +46,7 @@ public class MCRXMLParserErrorHandler implements ErrorHandler {
     /**
      * Handles parser warnings
      */
+    @Override
     public void warning(SAXParseException ex) {
         if (!silent) {
             LOGGER.warn(getSAXErrorMessage(ex), ex);
@@ -55,6 +56,7 @@ public class MCRXMLParserErrorHandler implements ErrorHandler {
     /**
      * Handles parse errors
      */
+    @Override
     public void error(SAXParseException ex) {
         if (!silent) {
             LOGGER.error(getSAXErrorMessage(ex), ex);
@@ -65,6 +67,7 @@ public class MCRXMLParserErrorHandler implements ErrorHandler {
     /**
      * Handles fatal parse errors
      */
+    @Override
     public void fatalError(SAXParseException ex) {
         if (!silent) {
             LOGGER.fatal(getSAXErrorMessage(ex));
@@ -74,7 +77,7 @@ public class MCRXMLParserErrorHandler implements ErrorHandler {
 
     /**
      * Returns a text indicating at which line and column the error occured.
-     * 
+     *
      * @param ex the SAXParseException exception
      * @return the location string
      */

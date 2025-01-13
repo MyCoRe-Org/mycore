@@ -316,6 +316,7 @@ public class MCRWebCLIContainer {
             setCurrentCommand("");
         }
 
+        @Override
         public Boolean call() throws Exception {
             return processCommands();
         }

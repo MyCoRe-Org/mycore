@@ -22,21 +22,22 @@ import org.mycore.access.MCRAccessManager;
 
 /**
  * Use this class if you want to check against a MCRObjectID.
- * 
+ *
  * Be aware that you must provide a access rule - for each permission - for
  * every MCRObject.
- * 
+ *
  * @author Thomas Scheffler (yagee)
- * 
+ *
  */
 public class MCRObjectIDStrategy implements MCRCombineableAccessCheckStrategy {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.access.strategies.MCRAccessCheckStrategy#checkPermission(java.lang.String,
      *      java.lang.String)
      */
+    @Override
     public boolean checkPermission(String id, String permission) {
         return MCRAccessManager.getAccessImpl().checkPermission(id, permission);
     }

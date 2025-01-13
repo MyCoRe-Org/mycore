@@ -24,7 +24,7 @@ import org.mycore.parsers.bool.MCRCondition;
 /**
  * Represents a simple query condition, which consists of a search field,
  * a value and a comparison operator.
- * 
+ *
  * @author Frank Lützenkirchen
  */
 public class MCRQueryCondition extends MCRFieldBaseValue implements MCRCondition<Void> {
@@ -51,6 +51,7 @@ public class MCRQueryCondition extends MCRFieldBaseValue implements MCRCondition
         return getFieldName() + " " + getOperator() + " \"" + getValue() + "\"";
     }
 
+    @Override
     public Element toXML() {
         Element condition = new Element("condition");
         condition.setAttribute("field", getFieldName());
@@ -60,6 +61,7 @@ public class MCRQueryCondition extends MCRFieldBaseValue implements MCRCondition
         return condition;
     }
 
+    @Override
     public boolean evaluate(Void o) {
         //there is no 'void' instance
         throw new UnsupportedOperationException();

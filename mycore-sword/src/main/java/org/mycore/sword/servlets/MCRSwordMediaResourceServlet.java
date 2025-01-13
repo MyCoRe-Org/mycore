@@ -33,36 +33,42 @@ public class MCRSwordMediaResourceServlet extends MCRSwordServlet {
 
     private MediaResourceAPI api;
 
+    @Override
     public void init() {
         MCRSwordConfigurationDefault swordConfiguration = new MCRSwordConfigurationDefault();
         MCRSwordMediaManager mrm = new MCRSwordMediaManager();
         api = new MediaResourceAPI(mrm, swordConfiguration);
     }
 
+    @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         prepareRequest(req, resp);
         api.get(req, resp);
         afterRequest(req, resp);
     }
 
+    @Override
     public void doHead(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         prepareRequest(req, resp);
         api.head(req, resp);
         afterRequest(req, resp);
     }
 
+    @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         prepareRequest(req, resp);
         api.post(req, resp);
         afterRequest(req, resp);
     }
 
+    @Override
     public void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         prepareRequest(req, resp);
         api.put(req, resp);
         afterRequest(req, resp);
     }
 
+    @Override
     public void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         prepareRequest(req, resp);
         api.delete(req, resp);

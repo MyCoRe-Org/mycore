@@ -78,6 +78,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         labels = new TreeSet<>();
     }
 
+    @Override
     public List<MCRCategory> getChildren() {
         return childGuard.lazyLoad(this::childrenNotHere, this::initChildren, () -> children);
     }
@@ -94,18 +95,22 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         //Does nothing. Please override
     }
 
+    @Override
     public MCRCategoryID getId() {
         return id;
     }
 
+    @Override
     public void setId(MCRCategoryID id) {
         this.id = id;
     }
 
+    @Override
     public SortedSet<MCRLabel> getLabels() {
         return labels;
     }
 
+    @Override
     public MCRCategory getRoot() {
         if (getId().isRootID()) {
             return this;
@@ -116,28 +121,34 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         return root;
     }
 
+    @Override
     public URI getURI() {
         return uri;
     }
 
+    @Override
     public void setURI(URI uri) {
         this.uri = uri;
     }
 
+    @Override
     public boolean hasChildren() {
         return childGuard
             .read(() -> Optional.ofNullable(children).map(c -> !c.isEmpty()))
             .orElse(MCRCategoryDAOFactory.getInstance().hasChildren(id));
     }
 
+    @Override
     public final boolean isCategory() {
         return !isClassification();
     }
 
+    @Override
     public final boolean isClassification() {
         return getId().isRootID();
     }
 
+    @Override
     public MCRCategory getParent() {
         return parent;
     }
@@ -161,6 +172,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         }
     }
 
+    @Override
     public Optional<MCRLabel> getCurrentLabel() {
         if (labels.isEmpty()) {
             return Optional.empty();
@@ -174,6 +186,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
                             .orElseGet(() -> labels.getFirst())))));
     }
 
+    @Override
     public Optional<MCRLabel> getLabel(String lang) {
         String languageTag = Locale.forLanguageTag(lang).toLanguageTag();
         for (MCRLabel label : labels) {
@@ -184,6 +197,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         return Optional.empty();
     }
 
+    @Override
     public String toString() {
         return Optional.ofNullable(id).map(MCRCategoryID::toString).orElse(null);
     }

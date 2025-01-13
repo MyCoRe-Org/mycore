@@ -27,7 +27,7 @@ import org.mycore.parsers.bool.MCRCondition;
 
 /**
  * Implementation of a (group xy) clause
- * 
+ *
  * @author Matthias Kramm
  * @author Mathias Fricke
  */
@@ -42,6 +42,7 @@ class MCRGroupClause implements MCRCondition<Object> {
         this.not = not;
     }
 
+    @Override
     public boolean evaluate(Object o) {
         MCRUserInformation userInformation = Optional.ofNullable(o)
             .filter(obj -> obj instanceof MCRAccessData)
@@ -56,6 +57,7 @@ class MCRGroupClause implements MCRCondition<Object> {
         return "group" + (not ? " != " : " = ") + groupname + " ";
     }
 
+    @Override
     public Element toXML() {
         Element cond = new Element("condition");
         cond.setAttribute("field", "group");

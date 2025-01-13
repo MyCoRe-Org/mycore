@@ -99,6 +99,7 @@ public class MCRObjectInfoEntity implements MCRObjectInfo {
         // read only value
     }
 
+    @Override
     @Column(name = "objectnumber")
     public int getObjectNumber() {
         return this.id.getNumberAsInteger();

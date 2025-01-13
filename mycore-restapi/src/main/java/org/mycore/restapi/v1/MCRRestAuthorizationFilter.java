@@ -178,18 +178,21 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
      */
     public enum MCRRestAPIACLPermission {
         READ {
+            @Override
             public String toString() {
                 return MCRAccessManager.PERMISSION_READ;
             }
         },
 
         WRITE {
+            @Override
             public String toString() {
                 return MCRAccessManager.PERMISSION_WRITE;
             }
         },
 
         DELETE {
+            @Override
             public String toString() {
                 return MCRAccessManager.PERMISSION_DELETE;
             }
