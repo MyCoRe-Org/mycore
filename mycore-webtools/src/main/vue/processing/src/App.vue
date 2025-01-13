@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-import {Registry} from "./model/model.ts";
 import type {
   AddCollectionMessage,
   ErrorMessage,
@@ -8,27 +6,33 @@ import type {
   UpdateCollectionPropertyMessage,
   UpdateProcessableMessage
 } from "./model/messages.ts";
-import {ref} from "vue";
 import RegistryComponent from "./components/RegistryComponent.vue";
+import SettingsModal from "./components/SettingsModal.vue";
+import {Registry} from "./model/model.ts";
+import {Util} from "./common/util.ts";
+import {ref} from "vue";
 
-/*
-const loc = window.location;
-let protocol = 'ws://';
-if (location.protocol === 'https:') {
-  protocol = 'wss://';
-}
-this.socketURL = protocol + loc.host + Util.getBasePath(loc.pathname) + this.path;
- */
-const socketURL: string = "ws://localhost:8291/mir/ws/mycore-webtools/processing";
+const socketURL: string = getSocketURL();
 let retryCounter: number = 0;
 let socket: WebSocket | undefined = undefined;
 let errorCode: number | undefined = undefined;
+let errorMessage = ref<string | undefined>(undefined);
 let registry = ref(new Registry());
 
 connect();
 
+function getSocketURL() {
+  if (import.meta.env.DEV) {
+    // in dev mode connect to a local mir
+    return "ws://localhost:8291/mir/ws/mycore-webtools/processing";
+  } else {
+    const protocol = location.protocol === "https:" ? "wss://" : "ws://";
+    return protocol + location.host + Util.getBasePath() + "/ws/mycore-webtools/processing";
+  }
+}
+
 function send(message: string) {
-  if (message === '') {
+  if (message === "") {
     return;
   }
   retryCounter++;
@@ -54,64 +58,85 @@ function send(message: string) {
 
 function connect() {
   retryCounter = 0;
+
   socket = new WebSocket(socketURL);
 
   socket.onmessage = (message: MessageEvent) => {
     handleMessage(JSON.parse(message.data));
   }
   socket.onerror = (event: Event) => {
-    // TODO
+    errorMessage.value = "A websocket error occurred.";
     console.log(event);
   }
   socket.onclose = (closeEvent: CloseEvent) => {
-    // TODO
+    setTimeout(() => connect(), 5000);
     console.log(closeEvent);
   }
   socket.onopen = () => {
     send(JSON.stringify({
-      type: 'connect'
+      type: "connect"
     }));
   };
 }
 
 function handleMessage(data: RegistryMessage | AddCollectionMessage | UpdateProcessableMessage | UpdateCollectionPropertyMessage | ErrorMessage) {
   switch (data.type) {
-    case 'error':
-      const errorMessage = <ErrorMessage>data;
-      errorCode = parseInt(errorMessage.error);
+    case "error":
+      const serverMessage = <ErrorMessage>data;
+      errorCode = parseInt(serverMessage.error);
+      errorMessage.value = "A server error occurred: " + errorCode;
       break;
-    case 'registry':
+    case "registry":
       errorCode = undefined;
+      errorMessage.value = undefined;
       registry.value = new Registry();
       break;
-    case 'addCollection':
+    case "addCollection":
       registry.value.addCollection(<AddCollectionMessage>data);
       break;
-    case 'updateProcessable':
+    case "updateProcessable":
       registry.value.updateProcessable(<UpdateProcessableMessage>data);
-      // triggerDelayedUpdate();
       break;
-    case 'updateCollectionProperty':
+    case "updateCollectionProperty":
       let updatePropertyMessage = <UpdateCollectionPropertyMessage>data;
       const collection = registry.value.getCollection(updatePropertyMessage.id);
       if (collection == null) {
-        console.warn('Unable to find collection with id ' + updatePropertyMessage.id);
+        console.warn("Unable to find collection with id " + updatePropertyMessage.id);
         return;
       }
       collection.setProperty(updatePropertyMessage.propertyName, updatePropertyMessage.propertyValue);
-      // triggerDelayedUpdate();
       break;
     default:
-      console.warn('Unable to handle data type: ' + data.type);
+      console.warn("Unable to handle data type: " + data.type);
   }
 }
+
+function toggleSettingsModal() {
+  isSettingsModalVisible.value = !isSettingsModalVisible.value;
+}
+
+const isSettingsModalVisible = ref(false);
 
 </script>
 
 <template>
-  <h1>MyCoRe Processing</h1>
-  <RegistryComponent :registry="registry" />
+  <h1>
+    MyCoRe Processing
+    <a class="modal-button" href="#" @click.prevent="toggleSettingsModal">(Settings)</a>
+  </h1>
+  <div v-if="errorMessage !== undefined" class="error">
+    {{ errorMessage }}
+  </div>
+  <RegistryComponent :registry="registry"/>
+  <transition name="modal-transition">
+    <SettingsModal v-if="isSettingsModalVisible" @close="toggleSettingsModal"/>
+  </transition>
 </template>
 
 <style scoped>
+.error {
+  background-color: #ffc1ab;
+  padding: 1rem;
+  border-radius: 5px;
+}
 </style>

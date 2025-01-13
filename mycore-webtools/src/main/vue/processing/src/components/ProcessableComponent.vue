@@ -18,22 +18,16 @@
 
 <script setup lang="ts">
 import {Processable} from "../model/model.ts";
-import {ref} from "vue";
 import ProcessableModal from "./ProcessableModal.vue";
+import {Util} from "../common/util.ts";
+import {ref} from "vue";
 
-defineProps<{ model: Processable }>()
+defineProps<{
+  model: Processable;
+}>();
 
-function formatDate(timestamp: number | undefined): string {
-  if (!timestamp) {
-    return "";
-  }
-  const date = new Date(timestamp);
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  const seconds = String(date.getSeconds()).padStart(2, '0');
-  return `${month}.${day} - ${hours}:${minutes}:${seconds}`;
+function getProgress(model: Processable) {
+  return `${model.progress || 0}%`;
 }
 
 function toggleModal() {
@@ -50,8 +44,23 @@ const isModalVisible = ref(false);
       <a href="#" @click.prevent="toggleModal">(P)</a> {{ model.name }}
     </div>
     <div class="col col-user">{{ model.user }}</div>
-    <div class="col col-create">{{ formatDate(model.createTime) }}</div>
-    <div class="col col-progress">{{ model.progressText }}</div>
+    <div class="col col-create">{{ Util.formatDate(model.createTime) }}</div>
+    <div class="col col-progress">
+      <!-- If progress is undefined -->
+      <div v-if="model.progress === undefined">{{ model.status }}</div>
+      <!-- Default case -->
+      <div v-else class="progress">
+        <div
+            class="progress-bar"
+            role="progressbar"
+            :style="{width: getProgress(model)}"
+            aria-valuemin="0"
+            aria-valuemax="100"
+        >
+        </div>
+        <div class="progress-text">{{ model.progressText }}</div>
+      </div>
+    </div>
   </div>
   <!-- modal -->
   <transition name="modal-transition">
@@ -63,4 +72,32 @@ const isModalVisible = ref(false);
 .table-content {
   display: flex;
 }
+.progress {
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  height: 20px;
+  overflow: hidden;
+  margin: 1px;
+  background: #f5f5f5;
+  position: relative;
+}
+
+.progress-bar {
+  transition: width 0.3s ease;
+  height: 100%;
+  background-color: #ffc1ab;
+  position: absolute;
+  top: 0;
+  left:0;
+  z-index: 1;
+}
+
+.progress-text {
+  position: absolute;
+  top: 2px;
+  z-index: 2;
+  width: 100%;
+  text-align: center;
+}
+
 </style>

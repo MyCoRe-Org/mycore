@@ -7,26 +7,35 @@ body {
   flex-grow: 1;
 }
 
+.modal-button {
+  font-size: 75%;
+  font-variant: all-small-caps;
+}
+
 /* TABLE */
 .col {
 }
 .col-name {
   flex: 5;
+  padding: 0 1rem 0 0;
 }
 .col-user {
   flex: 2;
+  padding: 0 1rem;
 }
 .col-create {
   flex: 2;
+  padding: 0 1rem;
 }
 .col-progress {
   flex: 3;
+  padding: 0 0 0 1rem;
 }
 
 /* PROPERTIES */
 .property-row {
   display: flex;
-  padding: 4px 0;
+  padding: 2px 0;
 }
 
 .propertyKey {
@@ -60,7 +69,7 @@ body {
   z-index: 1000;
 }
 
-.modal {
+.processing-modal {
   background: #fff;
   padding: 20px;
   border-radius: 8px;
@@ -71,27 +80,31 @@ body {
   transition: all 0.3s ease-in-out;
 }
 
-.modal-header {
+.processing-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid #ddd;
 }
 
-.modal-header h4 {
+.processing-modal-header h4 {
   font-size: 1.3rem;
   margin: .5rem 0;
 }
 
-.modal h3 {
+.processing-modal h3 {
   margin-top: 0;
 }
 
-.modal p {
+.processing-modal .processing-modal-body {
+  margin: 1rem 0;
+}
+
+.processing-modal p {
   margin: 8px 0;
 }
 
-.modal button {
+.processing-modal button {
   padding: 8px 12px;
   cursor: pointer;
   border: none;
@@ -100,7 +113,7 @@ body {
   border-radius: 4px;
 }
 
-.modal button:hover {
+.processing-modal button:hover {
   background: #e5533d;
 }
 
@@ -114,4 +127,27 @@ body {
 .modal-transition-leave-to {
   opacity: 0;
   transform: translateY(-20px);
+}
+
+.card {
+  border: 1px solid rgba(0,0,0,0.125);
+  border-radius: .25rem;
+  display: flex;
+  flex-direction: column;
+  margin: 1rem 0 2rem;
+}
+
+.processing-modal .card:last-child {
+  margin: 1rem 0 1rem;
+}
+
+.card h5 {
+  margin: 0;
+  padding: 1rem;
+  background-color: rgba(0,0,0,0.03);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.card-content {
+  margin: 1rem;
 }

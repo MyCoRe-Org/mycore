@@ -33,10 +33,19 @@ export class Util {
     }
   }
 
-  public static getBasePath(path: String) {
+  public static getBasePath() {
     const pathArray = location.pathname.split('/');
-    pathArray.splice(-4);
+    pathArray.splice(-3);
     return pathArray.join('/');
+  }
+
+  public static formatDate(timestamp: number | undefined): string {
+    if (!timestamp) {
+      return "";
+    }
+    const date = new Date(timestamp);
+    return `${date.getMonth() + 1}.${String(date.getDate()).padStart(2, '0')}
+          ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`;
   }
 
   public static useJsonString(data: any): string {
