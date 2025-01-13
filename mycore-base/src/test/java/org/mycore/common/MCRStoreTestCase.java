@@ -36,6 +36,7 @@ public abstract class MCRStoreTestCase extends MCRJPATestCase {
     @Rule
     public TemporaryFolder svnBaseDir = new TemporaryFolder();
 
+    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();

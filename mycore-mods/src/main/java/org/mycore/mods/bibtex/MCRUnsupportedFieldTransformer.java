@@ -52,6 +52,7 @@ class MCRUnsupportedFieldTransformer extends MCRFieldTransformer {
         return !supportedFields.contains(field);
     }
 
+    @Override
     void transformField(BibtexEntry entry, Element parent) {
         for (String field : (entry.getFields().keySet())) {
             if (isUnsupported(field)) {
@@ -61,6 +62,7 @@ class MCRUnsupportedFieldTransformer extends MCRFieldTransformer {
         }
     }
 
+    @Override
     void buildField(BibtexAbstractValue value, Element parent) {
         MCRMessageLogger.logMessage("Field " + field + " is unsupported: " + value.toString().replaceAll("\\s+", " "));
         String xPath = "mods:extension/field[@name='" + field + "']" + AS_NEW_ELEMENT;

@@ -37,6 +37,7 @@ class MCRField2XPathTransformer extends MCRFieldTransformer {
         this.xPath = xPath;
     }
 
+    @Override
     void buildField(BibtexAbstractValue value, Element parent) {
         String content = ((BibtexString) value).getContent();
         content = normalizeValue(content);

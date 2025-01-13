@@ -38,6 +38,7 @@ public class MCRSwordContainerServlet extends MCRSwordServlet {
 
     private ContainerAPI api;
 
+    @Override
     public void init() {
         MCRSwordConfigurationDefault swordConfiguration = new MCRSwordConfigurationDefault();
         MCRSwordContainerManager containerManager = new MCRSwordContainerManager();
@@ -45,30 +46,35 @@ public class MCRSwordContainerServlet extends MCRSwordServlet {
         api = new ContainerAPI(containerManager, statementManager, swordConfiguration);
     }
 
+    @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         prepareRequest(req, resp);
         api.get(req, resp);
         afterRequest(req, resp);
     }
 
+    @Override
     public void doHead(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         prepareRequest(req, resp);
         api.head(req, resp);
         afterRequest(req, resp);
     }
 
+    @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         prepareRequest(req, resp);
         api.post(req, resp);
         afterRequest(req, resp);
     }
 
+    @Override
     public void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         prepareRequest(req, resp);
         api.put(req, resp);
         afterRequest(req, resp);
     }
 
+    @Override
     public void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         prepareRequest(req, resp);
         api.delete(req, resp);

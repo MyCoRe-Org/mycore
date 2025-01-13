@@ -24,9 +24,9 @@ import java.util.Map.Entry;
 
 /**
  * Collects statistics on number of invocations and total time needed for each command invoked.
- * 
+ *
  * @see org.mycore.frontend.cli.MCRBasicCommands for integration in MyCoRe CLI
- * 
+ *
  * @author Frank Lützenkirchen
  */
 public class MCRCommandStatistics {
@@ -67,6 +67,7 @@ class StatisticsEntry {
         return totalTimeNeeded / numInvocations;
     }
 
+    @Override
     public String toString() {
         return "  total=" + totalTimeNeeded + " ms, average=" + getAverage() + " ms, " + numInvocations
             + " invocations.";

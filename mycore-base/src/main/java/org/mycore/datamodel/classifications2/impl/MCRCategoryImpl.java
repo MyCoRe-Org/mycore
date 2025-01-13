@@ -60,9 +60,9 @@ import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
 
 /**
- * 
+ *
  * @author Thomas Scheffler (yagee)
- * 
+ *
  * @since 2.0
  */
 @Entity
@@ -167,6 +167,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
         return right;
     }
 
+    @Override
     @Column
     public int getLevel() {
         return level;
@@ -229,6 +230,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
         return super.getURI();
     }
 
+    @Override
     @ManyToOne(targetEntity = MCRCategoryImpl.class)
     @JoinColumn(name = "parentID")
     @Access(AccessType.FIELD)
@@ -323,7 +325,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.datamodel.classifications2.MCRCategory#setRoot(org.mycore.datamodel.classifications2.MCRClassificationObject)
      */
     public void setRoot(MCRCategory root) {
@@ -439,7 +441,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
     /**
      * calculates left and right value throug the subtree rooted at
      * <code>co</code>.
-     * 
+     *
      * @param leftStart
      *            this.left will be set to this value
      * @param levelStart

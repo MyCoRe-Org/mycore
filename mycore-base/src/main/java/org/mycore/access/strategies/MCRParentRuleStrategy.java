@@ -34,13 +34,13 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * Use this class if you want to have a fallback to ancestor access rules.
- * 
+ *
  * First a check is done for the MCRObjectID. If no rule for the ID is specified
  * it will be tried to check the permission agains the MCRObjectID of the parent
  * object and so on.
- * 
+ *
  * @author Thomas Scheffler (yagee)
- * 
+ *
  */
 public class MCRParentRuleStrategy implements MCRAccessCheckStrategy {
 
@@ -48,10 +48,11 @@ public class MCRParentRuleStrategy implements MCRAccessCheckStrategy {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.access.strategies.MCRAccessCheckStrategy#checkPermission(java.lang.String,
      *      java.lang.String)
      */
+    @Override
     public boolean checkPermission(String id, String permission) {
         String currentID;
         MCRRuleAccessInterface mcrRuleAccessInterface = MCRAccessManager.requireRulesInterface();

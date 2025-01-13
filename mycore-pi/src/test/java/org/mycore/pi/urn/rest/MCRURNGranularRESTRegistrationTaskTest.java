@@ -110,6 +110,7 @@ public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
         return testProperties;
     }
 
+    @Override
     @After
     public void tearDown() throws Exception {
         super.tearDown();

@@ -36,7 +36,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
- * 
+ *
  * @author René Adler (eagle)
  */
 public class MCRShibbolethLoginServlet extends MCRServlet {
@@ -45,6 +45,7 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
 
     private static Logger LOGGER = LogManager.getLogger(MCRShibbolethLoginServlet.class);
 
+    @Override
     public void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();

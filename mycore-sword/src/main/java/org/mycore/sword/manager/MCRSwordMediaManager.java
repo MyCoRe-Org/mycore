@@ -69,6 +69,7 @@ public class MCRSwordMediaManager implements MediaResourceManager {
         MCRSword.getCollection(collection).getAuthHandler().authentication(authCredentials);
     }
 
+    @Override
     public MediaResource getMediaResourceRepresentation(String editMediaIRI, Map<String, String> accept,
         AuthCredentials authCredentials, SwordConfiguration swordConfiguration)
         throws SwordError, SwordAuthException {
@@ -86,6 +87,7 @@ public class MCRSwordMediaManager implements MediaResourceManager {
         return getMediaProvider(collection).getMediaResourceRepresentation(requestDerivateID, requestFilePath, accept);
     }
 
+    @Override
     public DepositReceipt replaceMediaResource(String editMediaIRI, Deposit deposit, AuthCredentials authCredentials,
         SwordConfiguration swordConfiguration) throws SwordError, SwordAuthException {
         LOGGER.info("replaceMediaResource: {}", editMediaIRI);
@@ -105,6 +107,7 @@ public class MCRSwordMediaManager implements MediaResourceManager {
         return MCRSword.getCollection(collection).getMetadataProvider().provideMetadata(mcrObject);
     }
 
+    @Override
     public DepositReceipt addResource(String editMediaIRI, Deposit deposit, AuthCredentials authCredentials,
         SwordConfiguration swordConfiguration) throws SwordError, SwordServerException, SwordAuthException {
         LOGGER.info("addResource: {}", editMediaIRI);
@@ -127,6 +130,7 @@ public class MCRSwordMediaManager implements MediaResourceManager {
         return MCRSword.getCollection(collection).getMetadataProvider().provideMetadata(mcrObject);
     }
 
+    @Override
     public void deleteMediaResource(String editMediaIRI, AuthCredentials authCredentials,
         SwordConfiguration swordConfiguration) throws SwordError, SwordServerException, SwordAuthException {
         LOGGER.info("deleteMediaResource: {}", editMediaIRI);

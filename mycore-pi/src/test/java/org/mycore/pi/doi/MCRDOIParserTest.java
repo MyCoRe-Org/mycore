@@ -56,6 +56,7 @@ public class MCRDOIParserTest extends MCRTestCase {
             parsedDOI.getSuffix());
     }
 
+    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
@@ -73,6 +74,7 @@ public class MCRDOIParserTest extends MCRTestCase {
         testDOI(EXAMPLE_DOI2, EXAMPLE_DOI2_PREFIX, EXAMPLE_DOI2_SUFFIX);
     }
 
+    @Override
     @After
     public void tearDown() throws Exception {
         super.tearDown();

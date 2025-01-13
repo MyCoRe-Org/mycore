@@ -38,6 +38,7 @@ public abstract class MCRResourceLocatorBase implements MCRResourceLocator {
 
     private final Logger logger = LogManager.getLogger(getClass());
 
+    @Override
     public final Stream<URL> locate(MCRResourcePath path, MCRHints hints) {
         logger.debug("Locating resource URLs for path {}", path);
         Stream<URL> locatedResourceUrls = doLocate(path, hints);

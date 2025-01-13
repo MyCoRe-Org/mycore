@@ -146,6 +146,7 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
         super();
     }
 
+    @Override
     @MCRPostConstruction
     public void init(String property) {
         super.init(property);

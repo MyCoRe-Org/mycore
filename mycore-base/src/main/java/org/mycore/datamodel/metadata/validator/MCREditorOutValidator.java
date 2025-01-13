@@ -94,10 +94,10 @@ public class MCREditorOutValidator {
 
     /**
      * instantiate the validator with the editor input <code>jdom_in</code>.
-     * 
+     *
      * <code>id</code> will be set as the MCRObjectID for the resulting object
      * that can be fetched with <code>generateValidMyCoReObject()</code>
-     * 
+     *
      * @param jdomIn
      *            editor input
      */
@@ -490,6 +490,7 @@ public class MCREditorOutValidator {
     }
 
     static class MCRMetaHistoryDateCheck implements MCREditorMetadataValidator {
+        @Override
         public String checkDataSubTag(Element datasubtag) {
             Element[] children = datasubtag.getChildren("text").toArray(Element[]::new);
             int textCount = children.length;
@@ -513,6 +514,7 @@ public class MCREditorOutValidator {
     }
 
     static class MCRMetaClassificationCheck implements MCREditorMetadataValidator {
+        @Override
         public String checkDataSubTag(Element datasubtag) {
             String categid = datasubtag.getAttributeValue("categid");
             if (categid == null) {
@@ -523,6 +525,7 @@ public class MCREditorOutValidator {
     }
 
     static class MCRMetaAdressCheck implements MCREditorMetadataValidator {
+        @Override
         public String checkDataSubTag(Element datasubtag) {
             if (datasubtag.getChildren().size() == 0) {
                 return "adress is empty";
@@ -532,6 +535,7 @@ public class MCREditorOutValidator {
     }
 
     static class MCRMetaPersonNameCheck implements MCREditorMetadataValidator {
+        @Override
         public String checkDataSubTag(Element datasubtag) {
             if (datasubtag.getChildren().size() == 0) {
                 return "person name is empty";

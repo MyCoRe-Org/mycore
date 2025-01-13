@@ -27,12 +27,12 @@ import org.mycore.access.facts.model.MCRFactCondition;
 
 /**
  * This is the base implementation for a condition which evaluates or produces facts
- * 
+ *
  * Subclasses should call super.parse(xml) to bind the XML element to the condition.
- * 
+ *
  * If you specify the attribute 'fact' on the condition XML. It will be used as name for
  * the newly created fact. Otherwise the name of the condition will be used as name for the fact.
- * 
+ *
  * @author Robert Stephan
  *
  * @param <F> the class of the fact
@@ -46,9 +46,10 @@ public abstract class MCRAbstractFactCondition<F extends MCRFact<?>> extends MCR
 
     private String term;
 
-    /** 
+    /**
      * implementors of this method should call super.parse(xml) to bind the XML element to the condition
      */
+    @Override
     public void parse(Element xml) {
         super.parse(xml);
         term = xml.getTextTrim();
@@ -64,6 +65,7 @@ public abstract class MCRAbstractFactCondition<F extends MCRFact<?>> extends MCR
         return computed.isPresent();
     }
 
+    @Override
     public String getFactName() {
         return factName;
     }

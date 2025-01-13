@@ -41,7 +41,7 @@ import com.google.gson.JsonObject;
  * &lt;subtag xlink:type="locator" xlink:href=" <em>URL</em>" xlink:label="..." xlink:title="..."/&gt; <br>
  * &lt;subtag xlink:type="arc" xlink:from=" <em>URL</em>" xlink:to="URL"/&gt; <br>
  * &lt;/tag&gt; <br>
- * 
+ *
  * @author Jens Kupferschmidt
  */
 public class MCRMetaLink extends MCRMetaDefault {
@@ -80,7 +80,7 @@ public class MCRMetaLink extends MCRMetaDefault {
 
     /**
      * This method set a reference with xlink:href, xlink:label and xlink:title.
-     * 
+     *
      * @param href
      *            the reference
      * @param label
@@ -101,7 +101,7 @@ public class MCRMetaLink extends MCRMetaDefault {
 
     /**
      * This method set a bidirectional link with xlink:from, xlink:to and xlink:title.
-     * 
+     *
      * @param from
      *            the source
      * @param to
@@ -122,7 +122,7 @@ public class MCRMetaLink extends MCRMetaDefault {
 
     /**
      * This method get the xlink:type element.
-     * 
+     *
      * @return the xlink:type
      */
     public final String getXLinkType() {
@@ -131,7 +131,7 @@ public class MCRMetaLink extends MCRMetaDefault {
 
     /**
      * This method get the xlink:href element as string.
-     * 
+     *
      * @return the xlink:href element as string
      */
     public final String getXLinkHref() {
@@ -140,7 +140,7 @@ public class MCRMetaLink extends MCRMetaDefault {
 
     /**
      * This method get the xlink:label element.
-     * 
+     *
      * @return the xlink:label
      */
     public final String getXLinkLabel() {
@@ -149,7 +149,7 @@ public class MCRMetaLink extends MCRMetaDefault {
 
     /**
      * This method set the xlink:label
-     * 
+     *
      * @param label
      *            the xlink:label
      */
@@ -162,7 +162,7 @@ public class MCRMetaLink extends MCRMetaDefault {
 
     /**
      * This method get the xlink:title element.
-     * 
+     *
      * @return the xlink:title
      */
     public final String getXLinkTitle() {
@@ -171,7 +171,7 @@ public class MCRMetaLink extends MCRMetaDefault {
 
     /**
      * This method set the xlink:title
-     * 
+     *
      * @param title
      *            the xlink:title
      */
@@ -181,7 +181,7 @@ public class MCRMetaLink extends MCRMetaDefault {
 
     /**
      * This method get the xlink:from element as string.
-     * 
+     *
      * @return the xlink:from element as string
      */
     public final String getXLinkFrom() {
@@ -190,7 +190,7 @@ public class MCRMetaLink extends MCRMetaDefault {
 
     /**
      * This method get the xlink:to element as string.
-     * 
+     *
      * @return the xlink:to element as string
      */
     public final String getXLinkTo() {
@@ -199,7 +199,7 @@ public class MCRMetaLink extends MCRMetaDefault {
 
     /**
      * This method get the xlink:role element as string.
-     * 
+     *
      */
     public String getXLinkRole() {
         return role;
@@ -207,7 +207,7 @@ public class MCRMetaLink extends MCRMetaDefault {
 
     /**
      * This method sets the xlink:role.
-     * 
+     *
      */
     public void setXLinkRole(String role) {
         this.role = role;
@@ -221,7 +221,7 @@ public class MCRMetaLink extends MCRMetaDefault {
      * <li>for the type 'locator' the 'href' element is equal</li>
      * </ul>
      * <br>
-     * 
+     *
      * @param input
      *            the MCRMetaLink input
      * @return true if it is compare, else return false
@@ -265,7 +265,7 @@ public class MCRMetaLink extends MCRMetaDefault {
 
     /**
      * This method read the XML input stream part from a DOM part for the metadata of the document.
-     * 
+     *
      * @param element
      *            a relevant DOM element for the metadata
      * @exception MCRException
@@ -301,7 +301,7 @@ public class MCRMetaLink extends MCRMetaDefault {
     /**
      * This method create a XML stream for all data in this class,
      * defined by the MyCoRe XML MCRMetaLink definition for the given subtag.
-     * 
+     *
      * @exception MCRException
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML MCRMetaLink part
@@ -336,7 +336,7 @@ public class MCRMetaLink extends MCRMetaDefault {
     /**
      * Creates the JSON representation. Extends the {@link MCRMetaDefault#createJSON()} method
      * with the following data.
-     * 
+     *
      * For linktype equals 'locator':
      * <pre>
      *   {
@@ -346,7 +346,7 @@ public class MCRMetaLink extends MCRMetaDefault {
      *     href: "mycore_derivate_00000001/image.tif"
      *   }
      * </pre>
-     * 
+     *
      * For all other linktypes (arc):
      * <pre>
      *   {
@@ -386,9 +386,10 @@ public class MCRMetaLink extends MCRMetaDefault {
      * <li>the xlink:type not "locator" or "arc"</li>
      * <li>the from or to are not valid</li>
      * </ul>
-     * 
+     *
      * @throws MCRException the MCRMetaLink is invalid
      */
+    @Override
     public void validate() throws MCRException {
         super.validate();
         if (label != null && label.length() > 0 && !XMLChar.isValidNCName(label)) {
@@ -419,9 +420,9 @@ public class MCRMetaLink extends MCRMetaDefault {
 
     /**
      * clone of this instance
-     * 
+     *
      * you will get a (deep) clone of this element
-     * 
+     *
      * @see java.lang.Object#clone()
      */
     @Override

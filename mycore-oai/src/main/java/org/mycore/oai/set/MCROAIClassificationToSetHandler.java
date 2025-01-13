@@ -40,7 +40,7 @@ import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
 /**
  * Classification set handler.
- * 
+ *
  * @author Matthias Eichner
  */
 public class MCROAIClassificationToSetHandler extends MCROAISolrSetHandler {
@@ -55,6 +55,7 @@ public class MCROAIClassificationToSetHandler extends MCROAISolrSetHandler {
         classField = MCRConfiguration2.getString(getConfigPrefix() + "SetSolrField").orElse("category.top");
     }
 
+    @Override
     public void apply(MCRSet set, SolrQuery query) {
         String setSpec = set.getSpec();
         String classid = MCRClassificationAndSetMapper.mapSetToClassification(getConfigPrefix(), set.getSetId());

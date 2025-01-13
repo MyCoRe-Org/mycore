@@ -39,10 +39,12 @@ public class MCRNotCondition<T> implements MCRCondition<T> {
         return "not (" + child + ")";
     }
 
+    @Override
     public boolean evaluate(T o) {
         return !child.evaluate(o);
     }
 
+    @Override
     public Element toXML() {
         Element not = new Element("boolean");
         not.setAttribute("operator", "not");

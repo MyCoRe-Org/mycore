@@ -58,6 +58,7 @@ public class MCRStalledJobResetter implements Runnable {
     /**
      * Resets jobs to {@link MCRJobState#NEW} that where in status {@link MCRJobState#PROCESSING} for to long time.
      */
+    @Override
     public void run() {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         EntityTransaction executorTransaction = em.getTransaction();

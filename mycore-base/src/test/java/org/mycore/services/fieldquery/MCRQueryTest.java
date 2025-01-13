@@ -33,6 +33,7 @@ import org.mycore.common.xml.MCRXMLHelper;
 
 public class MCRQueryTest extends MCRTestCase {
 
+    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();

@@ -35,6 +35,7 @@ class MCRPagesTransformer extends MCRField2XPathTransformer {
         super("pages", "mods:relatedItem[@type='host']/mods:part");
     }
 
+    @Override
     void buildField(BibtexAbstractValue value, Element parent) {
         String pages = ((BibtexString) value).getContent();
         pages = normalizeValue(pages);

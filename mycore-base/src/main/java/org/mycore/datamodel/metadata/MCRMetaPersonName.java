@@ -31,7 +31,7 @@ import org.mycore.common.MCRUtils;
  * This class implements all methods for handling a name with the
  * MCRMetaPersonName datamodel. The MCRMetaPersonName class represents a natural
  * or legal person specified by a list of names parts.
- * 
+ *
  * @author J. Vogler
  * @author J. Kupferschmidt
  */
@@ -84,12 +84,12 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * The method set all common fields of all MCRMetaXXX datamodel types. It
      * set the language to the <b>application default language</b>. The type
      * attribute will be set to an empty String.
-     * 
+     *
      * @param subtag
      *            the name of the subtag
      * @param inherited
      *            a value &gt;= 0
-     * 
+     *
      * @exception MCRException
      *                if the parameter values are invalid
      */
@@ -110,7 +110,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
 
     /**
      * This method get the first name text element.
-     * 
+     *
      * @return the first name
      */
     public String getFirstName() {
@@ -129,7 +129,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
 
     /**
      * This method get the call name text element.
-     * 
+     *
      * @return the call name
      */
     public String getCallName() {
@@ -148,7 +148,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
 
     /**
      * This method get the surname text element.
-     * 
+     *
      * @return the surname
      */
     public String getSurName() {
@@ -164,7 +164,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
 
     /**
      * This method get the full name text element.
-     * 
+     *
      * @return the full name
      */
     public String getFullName() {
@@ -184,7 +184,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
 
     /**
      * This method get the academic text element.
-     * 
+     *
      * @return the academic
      */
     public String getAcademic() {
@@ -200,7 +200,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
 
     /**
      * This method get the peerage text element.
-     * 
+     *
      * @return the peerage
      */
     public String getPeerage() {
@@ -216,7 +216,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
 
     /**
      * This method get the numeration text element.
-     * 
+     *
      * @return the numeration
      */
     public String getNumeration() {
@@ -232,7 +232,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
 
     /**
      * This method get the title text element.
-     * 
+     *
      * @return the title
      */
     public String getTitle() {
@@ -248,7 +248,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
 
     /**
      * This method get the prefix text element.
-     * 
+     *
      * @return the prefix
      */
     public String getPrefix() {
@@ -264,7 +264,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
 
     /**
      * This method get the affix text element.
-     * 
+     *
      * @return the affix
      */
     public String getAffix() {
@@ -281,7 +281,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
     /**
      * This method reads the XML input stream part from a DOM part for the
      * metadata of the document.
-     * 
+     *
      * @param element
      *            a relevant JDOM element for the metadata
      */
@@ -303,7 +303,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
     /**
      * This method creates a XML stream for all data in this class, defined by
      * the MyCoRe XML MCRMetaPersonName definition for the given subtag.
-     * 
+     *
      * @exception MCRException
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML MCRMetaPersonName part
@@ -335,9 +335,10 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * <li>the inherited value is lower than zero</li>
      * <li>getFullName() returns an empty string</li>
      * </ul>
-     * 
+     *
      * @throws MCRException the MCRMetaPersonName is invalid
      */
+    @Override
     public void validate() throws MCRException {
         super.validate();
         if (getFullName().isEmpty()) {
@@ -347,7 +348,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
 
     /**
      * Clone of this instance. You will get a (deep) clone of this element.
-     * 
+     *
      * @see java.lang.Object#clone()
      */
     @Override

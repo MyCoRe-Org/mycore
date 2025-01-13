@@ -65,6 +65,7 @@ public class MCROCFLHashRepositoryProvider extends MCROCFLRepositoryProvider {
             .build();
     }
 
+    @Override
     public OcflExtensionConfig getExtensionConfig() {
         return new HashedNTupleIdEncapsulationLayoutConfig();
     }

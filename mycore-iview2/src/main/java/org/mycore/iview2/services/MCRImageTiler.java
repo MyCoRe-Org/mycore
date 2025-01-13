@@ -51,7 +51,7 @@ import jakarta.persistence.PersistenceException;
 
 /**
  * Master image tiler thread.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  */
 public class MCRImageTiler implements Runnable, Closeable {
@@ -109,6 +109,7 @@ public class MCRImageTiler implements Runnable, Closeable {
      * Starts local tiler threads ( {@link MCRTilingAction}) and gives {@link MCRTileJob} instances to them. Use
      * property <code>MCR.Module-iview2.TilingThreads</code> to specify how many concurrent threads should be running.
      */
+    @Override
     public void run() {
         waiter = Thread.currentThread();
         Thread.currentThread().setName("TileMaster");
@@ -144,6 +145,7 @@ public class MCRImageTiler implements Runnable, Closeable {
             @SuppressWarnings("PMD.AvoidThreadGroup") //no method is called on tg
             ThreadGroup tg = new ThreadGroup("MCR slave tiling thread group");
 
+            @Override
             public Thread newThread(Runnable r) {
                 return new Thread(tg, r, "TileSlave#" + tNum.incrementAndGet());
             }
@@ -254,6 +256,7 @@ public class MCRImageTiler implements Runnable, Closeable {
     /**
      * stops transmitting {@link MCRTileJob} to {@link MCRTilingAction} and prepares shutdown.
      */
+    @Override
     public void prepareClose() {
         LOGGER.info("Closing master image tiling thread");
         //signal master thread to stop now
@@ -284,6 +287,7 @@ public class MCRImageTiler implements Runnable, Closeable {
     /**
      * Shuts down this thread and every local tiling threads spawned by {@link #run()}.
      */
+    @Override
     public void close() {
         if (tilingServe != null && !tilingServe.getExecutor().isShutdown()) {
             LOGGER.info("We are in a hurry, closing tiling service right now");

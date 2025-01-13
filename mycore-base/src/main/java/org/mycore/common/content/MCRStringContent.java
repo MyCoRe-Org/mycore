@@ -28,7 +28,7 @@ import org.mycore.common.MCRException;
 
 /**
  * Reads MCRContent from a String's text.
- * 
+ *
  * @author Frank Lützenkichen
  */
 public class MCRStringContent extends MCRContent {
@@ -38,7 +38,7 @@ public class MCRStringContent extends MCRContent {
     private byte[] bytes;
 
     /**
-     * Reads content from the given string, 
+     * Reads content from the given string,
      */
     public MCRStringContent(String text) {
         this.text = text;
@@ -49,7 +49,7 @@ public class MCRStringContent extends MCRContent {
         }
     }
 
-    /** 
+    /**
      * Sets the character encoding to use when transforming the text to a byte stream.
      * By default, this is {@link MCRConstants#DEFAULT_ENCODING}.
      */
@@ -69,6 +69,7 @@ public class MCRStringContent extends MCRContent {
         return text.getBytes(encoding);
     }
 
+    @Override
     public String asString() {
         return text;
     }

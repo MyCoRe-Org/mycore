@@ -23,7 +23,7 @@ import org.mycore.parsers.bool.MCRCondition;
 
 /**
  * Implementation of a dummy clause (useful for debugging)
- * 
+ *
  * @author Matthias Kramm
  */
 class MCRDummyClause implements MCRCondition<Object> {
@@ -33,6 +33,7 @@ class MCRDummyClause implements MCRCondition<Object> {
         this.s = s;
     }
 
+    @Override
     public boolean evaluate(Object o) {
         return false;
     }
@@ -42,6 +43,7 @@ class MCRDummyClause implements MCRCondition<Object> {
         return "\"" + s + "\"";
     }
 
+    @Override
     public Element toXML() {
         return null; /* TODO */
     }

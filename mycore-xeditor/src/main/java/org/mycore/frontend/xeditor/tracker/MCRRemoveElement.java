@@ -29,6 +29,7 @@ public class MCRRemoveElement implements MCRChange {
         return data;
     }
 
+    @Override
     public void undo(MCRChangeData data) {
         data.getContext().addContent(data.getPosition(), data.getElement());
     }

@@ -261,6 +261,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         graphics.rotate(Math.toRadians(rotation.degrees()), xt, yt);
     }
 
+    @Override
     public MCRIIIFImageInformation getInformation(String identifier)
         throws MCRIIIFImageNotFoundException, MCRIIIFImageProvidingException, MCRAccessException {
         try {

@@ -182,6 +182,7 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
         return object;
     }
 
+    @Override
     @After
     public void tearDown() throws Exception {
         MCRMetadataManager.delete(derivate);

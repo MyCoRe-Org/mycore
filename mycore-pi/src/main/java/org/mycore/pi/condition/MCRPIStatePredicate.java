@@ -25,6 +25,7 @@ public class MCRPIStatePredicate extends MCRPIStatePredicateBase {
     @MCRProperty(name = "State")
     public String state;
 
+    @Override
     protected String getRequiredState() {
         return state;
     }

@@ -32,13 +32,14 @@ public class MCRORCIDAuthenticationFilter implements ClientRequestFilter {
 
     /**
      * Creates request filter for bearer authentication.
-     * 
+     *
      * @param token the token
      */
     public MCRORCIDAuthenticationFilter(String token) {
         this.token = token;
     }
 
+    @Override
     public void filter(ClientRequestContext requestContext) throws IOException {
         requestContext.getHeaders().add("Authorization", "Bearer " + this.token);
     }

@@ -89,6 +89,7 @@ public class MCRDefaultHTTPClient implements MCRHTTPClient {
         this.requestTimeout = Integer.parseInt(size);
     }
 
+    @Override
     public void close() {
         try {
             restClient.close();

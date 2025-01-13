@@ -28,6 +28,7 @@ public class MCRSetAttributeValue implements MCRChange {
         return data;
     }
 
+    @Override
     public void undo(MCRChangeData data) {
         Attribute attribute = data.getAttribute();
         data.getContext().removeAttribute(attribute.getName(), attribute.getNamespace());

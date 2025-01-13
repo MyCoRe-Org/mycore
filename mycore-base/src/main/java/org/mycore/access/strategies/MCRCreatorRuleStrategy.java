@@ -97,6 +97,7 @@ public class MCRCreatorRuleStrategy implements MCRCombineableAccessCheckStrategy
      * @see org.mycore.access.strategies.MCRAccessCheckStrategy#checkPermission(java.lang.String,
      *      java.lang.String)
      */
+    @Override
     public boolean checkPermission(String id, String permission) {
         LOGGER.debug("check permission {} for MCRBaseID {}", permission, id);
         if (id == null || id.length() == 0 || permission == null || permission.length() == 0) {

@@ -49,10 +49,7 @@
   <!--
   <rule ref="category/java/bestpractices.xml/MethodReturnsInternalArray"/>
   -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/bestpractices.xml/MissingOverride"/>
-  -->
   <rule ref="category/java/bestpractices.xml/OneDeclarationPerLine"/>
   <!-- TODO: Create PR to fix this rule -->
   <!--

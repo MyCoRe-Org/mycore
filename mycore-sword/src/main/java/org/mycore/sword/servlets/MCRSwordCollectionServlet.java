@@ -37,18 +37,21 @@ public class MCRSwordCollectionServlet extends MCRSwordServlet {
 
     private CollectionAPI api;
 
+    @Override
     public void init() {
         MCRSwordConfigurationDefault swordConfiguration = new MCRSwordConfigurationDefault();
         MCRSwordCollectionManager colMgr = new MCRSwordCollectionManager();
         api = new CollectionAPI(colMgr, colMgr, swordConfiguration);
     }
 
+    @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         prepareRequest(req, resp);
         api.get(req, resp);
         afterRequest(req, resp);
     }
 
+    @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         prepareRequest(req, resp);
         api.post(req, resp);

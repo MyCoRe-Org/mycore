@@ -59,6 +59,7 @@ public class MCRJerseyJPATest extends MCRStoreTestCase {
         jersey.tearDown();
     }
 
+    @Override
     protected Map<String, String> getTestProperties() {
         Map<String, String> testProperties = super.getTestProperties();
         testProperties.put("MCR.Access.Class", MCRAccessBaseImpl.class.getName());

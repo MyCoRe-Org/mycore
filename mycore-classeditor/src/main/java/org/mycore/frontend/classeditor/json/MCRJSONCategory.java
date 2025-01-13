@@ -29,7 +29,7 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 
 /**
  * GSON Category abstraction.
- * 
+ *
  * @author Chi
  */
 public class MCRJSONCategory implements MCRCategory {
@@ -61,6 +61,7 @@ public class MCRJSONCategory implements MCRCategory {
         return category.getLeft();
     }
 
+    @Override
     public int getLevel() {
         return category.getLevel();
     }
@@ -69,6 +70,7 @@ public class MCRJSONCategory implements MCRCategory {
         this.hasChildren = hasChildren;
     }
 
+    @Override
     public boolean hasChildren() {
         if (hasChildren == null) {
             hasChildren = category.hasChildren();
@@ -76,6 +78,7 @@ public class MCRJSONCategory implements MCRCategory {
         return hasChildren;
     }
 
+    @Override
     public List<MCRCategory> getChildren() {
         return category.getChildren();
     }
@@ -88,34 +91,42 @@ public class MCRJSONCategory implements MCRCategory {
         this.positionInParent = positionInParent;
     }
 
+    @Override
     public MCRCategoryID getId() {
         return category.getId();
     }
 
+    @Override
     public SortedSet<MCRLabel> getLabels() {
         return category.getLabels();
     }
 
+    @Override
     public MCRCategory getRoot() {
         return category.getRoot();
     }
 
+    @Override
     public java.net.URI getURI() {
         return category.getURI();
     }
 
+    @Override
     public void setId(MCRCategoryID id) {
         category.setId(id);
     }
 
+    @Override
     public void setURI(java.net.URI uri) {
         category.setURI(uri);
     }
 
+    @Override
     public MCRCategory getParent() {
         return category.getParent();
     }
 
+    @Override
     public Optional<MCRLabel> getCurrentLabel() {
         return category.getCurrentLabel();
     }
@@ -124,6 +135,7 @@ public class MCRJSONCategory implements MCRCategory {
         category.setLabels(labels);
     }
 
+    @Override
     public Optional<MCRLabel> getLabel(String lang) {
         return category.getLabel(lang);
     }
