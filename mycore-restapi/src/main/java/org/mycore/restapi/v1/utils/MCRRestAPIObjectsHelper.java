@@ -386,13 +386,11 @@ public class MCRRestAPIObjectsHelper {
 
         if (params.lastModifiedBefore != null || params.lastModifiedAfter != null) {
             return objIdDates.stream().filter(oid -> {
-                synchronized (SDF_UTC) {
-                    String lastModified = SDF_UTC.format(oid.getLastModified().toInstant());
-                    if (params.lastModifiedAfter != null && lastModified.compareTo(params.lastModifiedAfter) < 0) {
-                        return false;
-                    }
-                    return params.lastModifiedBefore == null || lastModified.compareTo(params.lastModifiedBefore) <= 0;
+                String lastModified = SDF_UTC.format(oid.getLastModified().toInstant());
+                if (params.lastModifiedAfter != null && lastModified.compareTo(params.lastModifiedAfter) < 0) {
+                    return false;
                 }
+                return params.lastModifiedBefore == null || lastModified.compareTo(params.lastModifiedBefore) <= 0;
             }).collect(Collectors.toList());
         }
 
@@ -513,9 +511,7 @@ public class MCRRestAPIObjectsHelper {
         };
 
         elem.setAttribute("ID", oid.getId());
-        synchronized (SDF_UTC) {
-            elem.setAttribute("lastModified", SDF_UTC.format(oid.getLastModified().toInstant()));
-        }
+        elem.setAttribute("lastModified", SDF_UTC.format(oid.getLastModified().toInstant()));
         elem.setAttribute("href", info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
 
         if (mode == Mode.MCRDERIVATE) {
@@ -558,9 +554,7 @@ public class MCRRestAPIObjectsHelper {
             for (MCRObjectIDDate oid : objIdDates) {
                 writer.beginObject();
                 writer.name("ID").value(oid.getId());
-                synchronized (SDF_UTC) {
-                    writer.name("lastModified").value(SDF_UTC.format(oid.getLastModified().toInstant()));
-                }
+                writer.name("lastModified").value(SDF_UTC.format(oid.getLastModified().toInstant()));
                 writer.name("href").value(info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
                 if (mode == Mode.MCRDERIVATE) {
                     MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(oid.getId()));
@@ -696,9 +690,7 @@ public class MCRRestAPIObjectsHelper {
             return false;
         }
         try {
-            synchronized (SDF_UTC) {
-                SDF_UTC.parse(test + base.substring(test.length()));
-            }
+            SDF_UTC.parse(test + base.substring(test.length()));
         } catch (DateTimeParseException e) {
             return false;
         }

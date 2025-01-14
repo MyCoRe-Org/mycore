@@ -283,10 +283,8 @@ public final class MCRGoogleSitemapCommon {
         // build entry
         Element url = new Element("url", NS);
         url.addContent(new Element("loc", NS).addContent(sb.toString()));
-        synchronized (DATE_FORMATTER) {
-            String datestr = DATE_FORMATTER.format(objectIDDate.getLastModified().toInstant());
-            url.addContent(new Element("lastmod", NS).addContent(datestr));
-        }
+        String datestr = DATE_FORMATTER.format(objectIDDate.getLastModified().toInstant());
+        url.addContent(new Element("lastmod", NS).addContent(datestr));
         url.addContent(new Element("changefreq", NS).addContent(FREQ));
         return url;
     }
@@ -310,11 +308,9 @@ public final class MCRGoogleSitemapCommon {
             Element sitemap = new Element("sitemap", NS);
             index.addContent(sitemap);
             sitemap.addContent(new Element("loc", NS).addContent((baseurl + getFileName(i + 2, false)).trim()));
-            synchronized (DATE_FORMATTER) {
-                Instant instant = (new GregorianCalendar(SITEMAP_TIMEZONE, SITEMAP_LOCALE)).getTime().toInstant();
-                String date = DATE_FORMATTER.format(instant);
-                sitemap.addContent(new Element("lastmod", NS).addContent(date.trim()));
-            }
+            Instant instant = (new GregorianCalendar(SITEMAP_TIMEZONE, SITEMAP_LOCALE)).getTime().toInstant();
+            String date = DATE_FORMATTER.format(instant);
+            sitemap.addContent(new Element("lastmod", NS).addContent(date.trim()));
         }
         return jdom;
     }
