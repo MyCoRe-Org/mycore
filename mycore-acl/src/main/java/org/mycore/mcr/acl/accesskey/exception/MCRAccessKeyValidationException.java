@@ -19,13 +19,23 @@
 package org.mycore.mcr.acl.accesskey.exception;
 
 /**
- * Exception that refers to an invalid secret.
+ * Exception thrown when an access key validation fails.
+ *
+ * The {@code AccessKeyValidationException} is a specialized {@link MCRAccessKeyException} that
+ * indicates an issue with the validation of an access key. This exception is typically used
+ * to signal that the provided data for an access key does not meet the required constraints or rules.
  */
-public class MCRAccessKeyInvalidSecretException extends MCRAccessKeyException {
+public class MCRAccessKeyValidationException extends MCRAccessKeyException {
 
     private static final long serialVersionUID = 1L;
 
-    public MCRAccessKeyInvalidSecretException(String errorMessage) {
-        super(errorMessage, "component.acl.accesskey.frontend.error.invalidSecret");
+    /**
+     * Constructs a new {@code AccessKeyValidationException} with the specified detail message.
+     *
+     * @param errorMessage the detail message explaining the reason for the exception
+     */
+    public MCRAccessKeyValidationException(String errorMessage) {
+        super(errorMessage);
     }
+
 }
