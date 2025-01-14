@@ -121,21 +121,21 @@ public abstract class MCRBase {
     }
 
     /**
-     * This methode return the MyCoRe version of the data structure.
-     *
-     * @return the version as a string
-     */
-    public final String getVersion() {
-        return mcrVersion;
-    }
-
-    /**
      * This methode return the object id. If this is not set, null was returned.
-     *
+     * 
      * @return the id as MCRObjectID
      */
     public final MCRObjectID getId() {
         return mcrId;
+    }
+
+    /**
+     * This methode return the MyCoRe version of the data structure.
+     * 
+     * @return the version as a string
+     */
+    public final String getVersion() {
+        return mcrVersion;
     }
 
     /**
