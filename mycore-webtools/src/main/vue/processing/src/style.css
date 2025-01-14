@@ -13,20 +13,21 @@ body {
 }
 
 /* TABLE */
-.col {
-}
 .col-name {
   flex: 5;
   padding: 0 1rem 0 0;
 }
+
 .col-user {
   flex: 2;
   padding: 0 1rem;
 }
+
 .col-create {
   flex: 2;
   padding: 0 1rem;
 }
+
 .col-progress {
   flex: 3;
   padding: 0 0 0 1rem;
