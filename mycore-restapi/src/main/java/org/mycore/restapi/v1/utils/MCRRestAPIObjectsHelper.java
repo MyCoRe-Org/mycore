@@ -18,6 +18,14 @@
 
 package org.mycore.restapi.v1.utils;
 
+import com.google.gson.stream.JsonWriter;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.CacheControl;
+import jakarta.ws.rs.core.Request;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
@@ -26,8 +34,8 @@ import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.EnumSet;
@@ -38,7 +46,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Comment;
@@ -72,20 +79,8 @@ import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
 import org.mycore.restapi.v1.utils.MCRRestAPISortObject.SortOrder;
 
-import com.google.gson.stream.JsonWriter;
-
-import jakarta.ws.rs.core.Application;
-import jakarta.ws.rs.core.CacheControl;
-import jakarta.ws.rs.core.Request;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.ResponseBuilder;
-import jakarta.ws.rs.core.Response.Status;
-import jakarta.ws.rs.core.UriInfo;
-
 /**
- * main utility class that handles REST requests
- * 
- * to filter the XML output of showMCRObject, set the properties:
+ * Main utility class that handles REST requests to filter the XML output of showMCRObject, set the properties:
  * MCR.RestAPI.v1.Filter.XML
  *   to your ContentTransformer-ID,
  * MCR.ContentTransformer.[your ContentTransformer-ID here].Class
@@ -95,20 +90,19 @@ import jakarta.ws.rs.core.UriInfo;
  * 
  * @author Robert Stephan
  * @author Christoph Neidahl
- * 
  */
 public class MCRRestAPIObjectsHelper {
     private enum Mode {
         MCROBJECT, MCRDERIVATE
     }
 
-    private static final String GENERAL_ERROR_MSG = "A problem occured while fetching the data.";
+    private static final String GENERAL_ERROR_MSG = "A problem occurred while fetching the data.";
 
-    private static Logger LOGGER = LogManager.getLogger(MCRRestAPIObjectsHelper.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIObjectsHelper.class);
 
-    private static final SimpleDateFormat SDF_UTC = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+    private static final DateTimeFormatter SDF_UTC = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
 
-    private static MCRIDMapper ID_MAPPER = MCRConfiguration2
+    private static final MCRIDMapper ID_MAPPER = MCRConfiguration2
         .getInstanceOf(MCRIDMapper.class, MCRIDMapper.MCR_PROPERTY_CLASS).get();
 
     public static Response showMCRObject(String pathParamId, String queryParamStyle, UriInfo info, Application app)
@@ -393,7 +387,7 @@ public class MCRRestAPIObjectsHelper {
         if (params.lastModifiedBefore != null || params.lastModifiedAfter != null) {
             return objIdDates.stream().filter(oid -> {
                 synchronized (SDF_UTC) {
-                    String lastModified = SDF_UTC.format(oid.getLastModified());
+                    String lastModified = SDF_UTC.format(oid.getLastModified().toInstant());
                     if (params.lastModifiedAfter != null && lastModified.compareTo(params.lastModifiedAfter) < 0) {
                         return false;
                     }
@@ -520,7 +514,7 @@ public class MCRRestAPIObjectsHelper {
 
         elem.setAttribute("ID", oid.getId());
         synchronized (SDF_UTC) {
-            elem.setAttribute("lastModified", SDF_UTC.format(oid.getLastModified()));
+            elem.setAttribute("lastModified", SDF_UTC.format(oid.getLastModified().toInstant()));
         }
         elem.setAttribute("href", info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
 
@@ -565,7 +559,7 @@ public class MCRRestAPIObjectsHelper {
                 writer.beginObject();
                 writer.name("ID").value(oid.getId());
                 synchronized (SDF_UTC) {
-                    writer.name("lastModified").value(SDF_UTC.format(oid.getLastModified()));
+                    writer.name("lastModified").value(SDF_UTC.format(oid.getLastModified().toInstant()));
                 }
                 writer.name("href").value(info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
                 if (mode == Mode.MCRDERIVATE) {
@@ -574,7 +568,7 @@ public class MCRRestAPIObjectsHelper {
                     if (!der.getDerivate().getClassifications().isEmpty()) {
                         List<String> classifications = der.getDerivate().getClassifications().stream()
                             .map(cl -> cl.getClassId() + ":" + cl.getCategId())
-                            .collect(Collectors.toList());
+                            .toList();
                         writer.name("classifications").beginArray();
                         for (String c : classifications) {
                             writer.value(c);
@@ -705,7 +699,7 @@ public class MCRRestAPIObjectsHelper {
             synchronized (SDF_UTC) {
                 SDF_UTC.parse(test + base.substring(test.length()));
             }
-        } catch (ParseException e) {
+        } catch (DateTimeParseException e) {
             return false;
         }
         return true;
