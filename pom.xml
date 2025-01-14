@@ -53,6 +53,8 @@ Applications based on MyCoRe use a common core, which provides the functionality
   </scm>
   <properties>
     <argLine />
+    <!-- same as ocfl aws sdk version -->
+    <aws-sdk.version>2.26.21</aws-sdk.version>
     <changelog.since>2024-12-18</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
     <changes.version>2025.02</changes.version>
@@ -87,8 +89,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <neo4j.version>5.26.0</neo4j.version>
     <oaipmh.version>3.0</oaipmh.version>
     <ocfl-java.version>2.2.1</ocfl-java.version>
-    <!-- same as ocfl aws sdk version -->
-    <aws-sdk.version>2.26.21</aws-sdk.version>
     <pmd.failOnViolation>true</pmd.failOnViolation>
     <pmd.version>7.11.0</pmd.version>
     <rdf4j.version>5.0.2</rdf4j.version>
@@ -1117,11 +1117,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <version>${ocfl-java.version}</version>
       </dependency>
       <dependency>
-        <groupId>software.amazon.awssdk</groupId>
-        <artifactId>netty-nio-client</artifactId>
-        <version>${aws-sdk.version}</version>
-      </dependency>
-      <dependency>
         <groupId>io.swagger.core.v3</groupId>
         <artifactId>swagger-annotations-jakarta</artifactId>
         <version>${swagger.version}</version>
@@ -1853,6 +1848,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <groupId>se.jiderhamn.classloader-leak-prevention</groupId>
         <artifactId>classloader-leak-prevention-core</artifactId>
         <version>2.7.0</version>
+      </dependency>
+      <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>netty-nio-client</artifactId>
+        <version>${aws-sdk.version}</version>
       </dependency>
       <dependency>
         <groupId>xalan</groupId>
