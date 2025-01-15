@@ -140,7 +140,7 @@ public abstract class MCRDynamicURIResolver implements URIResolver {
         String uriValue = uri.substring(uri.indexOf(':') + 1);
         String[] variablesArr = uriValue.split(":");
         for (int i = 0; i < variablesArr.length; i++) {
-            int equalsSignIndex = variablesArr[i].indexOf("=");
+            int equalsSignIndex = variablesArr[i].indexOf('=');
             if (equalsSignIndex == -1) {
                 String varName = String.valueOf(i + 1);
                 String varValue = variablesArr[i];

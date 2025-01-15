@@ -111,7 +111,7 @@ public final class MCRTransferPackageUtil {
      */
     public static Path getTargetDirectory(Path pathToTar) {
         String fileName = pathToTar.getFileName().toString();
-        return pathToTar.getParent().resolve(fileName.substring(0, fileName.lastIndexOf(".")));
+        return pathToTar.getParent().resolve(fileName.substring(0, fileName.lastIndexOf('.')));
     }
 
     /**

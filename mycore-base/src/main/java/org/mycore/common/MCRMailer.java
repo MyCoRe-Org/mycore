@@ -444,9 +444,9 @@ public class MCRMailer extends MCRServlet {
             messagePart.setDataHandler(new DataHandler(source));
             String fileName = url.getPath();
             if (fileName.contains("\\")) {
-                fileName = fileName.substring(fileName.lastIndexOf("\\") + 1);
+                fileName = fileName.substring(fileName.lastIndexOf('\\') + 1);
             } else if (fileName.contains("/")) {
-                fileName = fileName.substring(fileName.lastIndexOf("/") + 1);
+                fileName = fileName.substring(fileName.lastIndexOf('/') + 1);
             }
             messagePart.setFileName(fileName);
             multipart.addBodyPart(messagePart);
@@ -588,8 +588,8 @@ public class MCRMailer extends MCRServlet {
                 return new InternetAddress(s.trim());
             }
 
-            String name = s.substring(0, s.lastIndexOf("<")).trim();
-            String addr = s.substring(s.lastIndexOf("<") + 1, s.length() - 1).trim();
+            String name = s.substring(0, s.lastIndexOf('<')).trim();
+            String addr = s.substring(s.lastIndexOf('<') + 1, s.length() - 1).trim();
 
             if (name.startsWith("\"") && name.endsWith("\"")) {
                 name = name.substring(1, name.length() - 1);

@@ -47,7 +47,7 @@ public class MCRTransientUser extends MCRUser {
 
         String userName = userInfo.getUserID();
         if (userName.contains("@")) {
-            userName = userName.substring(0, userName.indexOf("@"));
+            userName = userName.substring(0, userName.indexOf('@'));
         }
         String realmId = getUserAttribute(MCRRealm.USER_INFORMATION_ATTR);
 

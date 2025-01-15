@@ -146,7 +146,7 @@ public class MCRDerivateLinkServlet extends MCRServlet {
         int index = browserAddressParameter.indexOf(subParameter);
         if (index != -1) {
             int startIndex = index + subParameter.length() + 1;
-            int endIndex = browserAddressParameter.indexOf("&", index + 1);
+            int endIndex = browserAddressParameter.indexOf('&', index + 1);
             if (endIndex == -1) {
                 endIndex = browserAddressParameter.length();
             }

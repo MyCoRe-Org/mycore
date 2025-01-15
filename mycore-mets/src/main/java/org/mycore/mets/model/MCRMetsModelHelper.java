@@ -53,7 +53,7 @@ public class MCRMetsModelHelper {
 
     public static Optional<String> getUseForHref(final String href) {
         final String hrefWithoutSlash = href.startsWith("/") ? href.substring(1) : href;
-        final int lastFolderPosition = hrefWithoutSlash.lastIndexOf("/");
+        final int lastFolderPosition = hrefWithoutSlash.lastIndexOf('/');
         final String path = (lastFolderPosition == -1) ? "" : hrefWithoutSlash.substring(0, lastFolderPosition);
 
         if (path.startsWith("tei/")) {

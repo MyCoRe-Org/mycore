@@ -31,7 +31,7 @@ public class MCRDNBURNParser implements MCRPIParser<MCRDNBURN> {
     public Optional<MCRDNBURN> parse(String identifier) {
         String prefix = PREFIX + URN_NID;
         if (identifier.startsWith(prefix)) {
-            int lastColon = identifier.lastIndexOf(":") + 1;
+            int lastColon = identifier.lastIndexOf(':') + 1;
             int checkSumStart = identifier.length() - 1;
 
             String namespace = identifier.substring(prefix.length(), lastColon);

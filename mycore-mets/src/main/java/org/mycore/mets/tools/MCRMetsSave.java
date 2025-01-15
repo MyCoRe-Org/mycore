@@ -452,7 +452,7 @@ public class MCRMetsSave {
             if (cleanPath.startsWith(TRANSLATION_FOLDER_PREFIX)) {
                 // e.g. tei/TRANSLATION_FOLDER_PREFIXDE/folder/file.tif -> folder/file.tif
                 cleanPath = cleanPath.substring(TRANSLATION_FOLDER_PREFIX.length());
-                cleanPath = cleanPath.substring(cleanPath.indexOf("/") + 1);
+                cleanPath = cleanPath.substring(cleanPath.indexOf('/') + 1);
             } else if (cleanPath.startsWith(TRANSCRIPTION_FOLDER_PREFIX)) {
                 cleanPath = cleanPath.substring(TRANSCRIPTION_FOLDER_PREFIX.length() + 1);
             }
@@ -461,7 +461,7 @@ public class MCRMetsSave {
     }
 
     private static String removeExtension(String fileName) {
-        int dotPosition = fileName.lastIndexOf(".");
+        int dotPosition = fileName.lastIndexOf('.');
         return fileName.substring(0, dotPosition);
     }
 
@@ -915,7 +915,7 @@ public class MCRMetsSave {
      */
     public static String getFileBase(String href) {
         String fileName = Paths.get(href).getFileName().toString();
-        int endIndex = fileName.lastIndexOf(".");
+        int endIndex = fileName.lastIndexOf('.');
         if (endIndex != -1) {
             fileName = fileName.substring(0, endIndex);
         }

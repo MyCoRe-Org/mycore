@@ -113,13 +113,13 @@ public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
             .getDestinationOf(mcrID, MCRLinkTableManager.ENTRY_TYPE_DERIVATE_LINK);
         for (String linkedImage : linkedImages) {
             MCRObjectID deriID = MCRObjectID.getInstance(
-                linkedImage.substring(0, linkedImage.indexOf("/")));
+                linkedImage.substring(0, linkedImage.indexOf('/')));
             MCRDerivate deri = MCRMetadataManager.retrieveMCRDerivate(deriID);
             if (deri.getDerivate().getClassifications().stream()
                 .map(classi -> classi.getClassId() + ":" + classi.getCategId())
                 .anyMatch(derivateTypes::contains)) {
                 Optional<MCRTileInfo> tileInfoForFile = createTileInfoForFile(deriID.toString(),
-                    linkedImage.substring(linkedImage.indexOf("/") + 1));
+                    linkedImage.substring(linkedImage.indexOf('/') + 1));
                 if (tileInfoForFile.isPresent()) {
                     return tileInfoForFile;
                 }

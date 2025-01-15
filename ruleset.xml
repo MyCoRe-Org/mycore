@@ -405,10 +405,7 @@
   <rule ref="category/java/performance.xml/UseArrayListInsteadOfVector"/>
   -->
   <rule ref="category/java/performance.xml/UseArraysAsList"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/performance.xml/UseIndexOfChar"/>
-  -->
   <rule ref="category/java/performance.xml/UseIOStreamsWithApacheCommonsFileItem"/>
   <rule ref="category/java/performance.xml/UselessStringValueOf"/>
   <rule ref="category/java/performance.xml/UseStringBufferForStringAppends"/>

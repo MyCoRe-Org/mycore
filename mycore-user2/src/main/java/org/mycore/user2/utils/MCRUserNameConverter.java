@@ -29,6 +29,6 @@ public class MCRUserNameConverter implements MCRUserAttributeConverter<String, S
 
     @Override
     public String convert(String value, String separator, Map<String, String> valueMapping) {
-        return (value != null && value.contains("@")) ? value.substring(0, value.indexOf("@")) : value;
+        return (value != null && value.contains("@")) ? value.substring(0, value.indexOf('@')) : value;
     }
 }

@@ -91,7 +91,7 @@ public class MCRCommand {
         StringTokenizer st = new StringTokenizer(methodSignature, " ");
 
         String token = st.nextToken();
-        int point = token.lastIndexOf(".");
+        int point = token.lastIndexOf('.');
 
         className = token.substring(0, point);
         methodName = token.substring(point + 1);
@@ -120,7 +120,7 @@ public class MCRCommand {
             messageFormat.setFormat(i, f);
         }
 
-        int pos = format.indexOf("{");
+        int pos = format.indexOf('{');
         suffix = pos == -1 ? format : format.substring(0, pos);
 
         help = Objects.requireNonNullElse(helpText, "No help text available for this command");
@@ -151,7 +151,7 @@ public class MCRCommand {
             }
         }
 
-        int pos = cmdAnnotation.syntax().indexOf("{");
+        int pos = cmdAnnotation.syntax().indexOf('{');
         suffix = pos == -1 ? cmdAnnotation.syntax() : cmdAnnotation.syntax().substring(0, pos);
     }
 

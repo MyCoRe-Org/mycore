@@ -844,7 +844,7 @@ public class MCRXMLFunctions {
     }
 
     public static String shortenPersonLabel(String text) {
-        int pos = text.indexOf("(");
+        int pos = text.indexOf('(');
         if (pos == -1) {
             return text;
         }

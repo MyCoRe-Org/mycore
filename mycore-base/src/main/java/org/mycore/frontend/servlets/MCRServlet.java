@@ -416,7 +416,7 @@ public class MCRServlet extends HttpServlet {
         MCRSession session = MCRSessionMgr.getCurrentSession();
 
         String longName = getClass().getName();
-        final String shortName = longName.substring(longName.lastIndexOf(".") + 1);
+        final String shortName = longName.substring(longName.lastIndexOf('.') + 1);
 
         LOGGER.info(() -> String
             .format(Locale.ROOT, "%s ip=%s mcr=%s path=%s", shortName, MCRFrontendUtil.getRemoteAddr(job.getRequest()),
@@ -531,7 +531,7 @@ public class MCRServlet extends HttpServlet {
     /** Reports an exception to the log */
     protected void reportException(Exception ex) {
         String cname = this.getClass().getName();
-        String servlet = cname.substring(cname.lastIndexOf(".") + 1);
+        String servlet = cname.substring(cname.lastIndexOf('.') + 1);
 
         LOGGER.warn("Exception caught in : {}", servlet, ex);
     }

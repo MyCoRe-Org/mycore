@@ -493,7 +493,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
             .listObjectIds()
             .filter(this::isMetadata)
             .map(this::removePrefix)
-            .map(s -> s.substring(0, s.lastIndexOf("_")))
+            .map(s -> s.substring(0, s.lastIndexOf('_')))
             .distinct()
             .collect(Collectors.toList());
     }

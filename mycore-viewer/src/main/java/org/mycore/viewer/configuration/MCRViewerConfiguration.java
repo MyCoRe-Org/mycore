@@ -245,7 +245,7 @@ public class MCRViewerConfiguration {
         StringBuilder scriptURL = new StringBuilder(baseURL);
         scriptURL.append("modules/iview2/js/");
         if (hasMinified && !debugMode) {
-            scriptURL.append(file, 0, file.lastIndexOf("."));
+            scriptURL.append(file, 0, file.lastIndexOf('.'));
             scriptURL.append(".min.js");
         } else {
             scriptURL.append(file);

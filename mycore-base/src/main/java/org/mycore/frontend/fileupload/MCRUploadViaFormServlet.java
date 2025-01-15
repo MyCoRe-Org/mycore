@@ -156,7 +156,7 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
     }
 
     private String convertAbsolutePathToRelativePath(String absolutePath) {
-        int pos = absolutePath.indexOf(":");
+        int pos = absolutePath.indexOf(':');
         String relativePath = (pos >= 0) ? absolutePath.substring(pos + 1) : absolutePath;
         while (relativePath.startsWith("\\") || relativePath.startsWith("/")) {
             relativePath = relativePath.substring(1);

@@ -350,7 +350,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
                 case ATT_EMAIL -> jwt.getClaim("email").asString();
                 case MCRRealm.USER_INFORMATION_ATTR -> {
                     if (getUserID().contains("@")) {
-                        yield getUserID().substring(getUserID().lastIndexOf("@") + 1);
+                        yield getUserID().substring(getUserID().lastIndexOf('@') + 1);
                     }
                     yield null;
                 }
