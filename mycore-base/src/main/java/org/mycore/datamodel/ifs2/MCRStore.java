@@ -131,7 +131,7 @@ public class MCRStore {
     /**
      * The last ID assigned by this store.
      */
-    protected int lastID = 0;
+    protected int lastID;
 
     public static final Logger LOGGER = LogManager.getLogger();
 

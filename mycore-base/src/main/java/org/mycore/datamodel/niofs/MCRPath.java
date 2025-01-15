@@ -403,7 +403,7 @@ public abstract class MCRPath implements Path {
     @Override
     public Iterator<Path> iterator() {
         return new Iterator<>() {
-            int i = 0;
+            int i;
 
             @Override
             public boolean hasNext() {

@@ -45,7 +45,7 @@ public class MCRCreateObjectServlet extends MCRPersistenceServlet {
 
     private static final long serialVersionUID = 4143057048219690238L;
 
-    private boolean appendDerivate = false;
+    private boolean appendDerivate;
 
     @Override
     public void init() throws ServletException {

@@ -52,7 +52,7 @@ class MCRDataSourceCall implements Callable<Boolean> {
 
     private List<Element> results = new ArrayList<>();
 
-    private boolean gotResults = false;
+    private boolean gotResults;
 
     MCRDataSourceCall(MCRDataSource ds, MCRIdentifierPool idPool) {
         this.ds = ds;

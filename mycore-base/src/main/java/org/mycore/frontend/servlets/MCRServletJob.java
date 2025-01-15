@@ -28,17 +28,16 @@ import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This class simply is a container for objects needed during a Servlet session
- * like the HttpServletRequest and HttpServeltResponse. The class provids only
+ * like the HttpServletRequest and HttpServletResponse. The class provides only
  * get-methods to return the objects set while constructing the job object.
  * 
  * @author Detlev Degenhardt
  */
 public class MCRServletJob {
-    /** The HttpServletRequest object */
-    private HttpServletRequest theRequest = null;
 
-    /** The HttpServletResponse object */
-    private HttpServletResponse theResponse = null;
+    private final HttpServletRequest theRequest;
+
+    private final HttpServletResponse theResponse;
 
     /**
      * The constructor takes the given objects and stores them in private
@@ -77,4 +76,5 @@ public class MCRServletJob {
             throw new MCRConfigurationException(msg, ex);
         }
     }
+
 }

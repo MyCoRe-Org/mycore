@@ -31,7 +31,7 @@ import org.mycore.access.facts.model.MCRCondition;
  */
 public abstract class MCRAbstractCondition implements MCRCondition {
 
-    private Element boundElement = null;
+    private Element boundElement;
 
     private String type;
 

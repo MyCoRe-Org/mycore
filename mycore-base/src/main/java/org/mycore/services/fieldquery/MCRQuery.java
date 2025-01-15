@@ -39,7 +39,7 @@ public class MCRQuery {
     private MCRCondition<Void> cond;
 
     /** The maximum number of results, default is 0 = unlimited */
-    private int maxResults = 0;
+    private int maxResults;
 
     /** The number of results per page, default is 10 */
     private int numPerPage = 10;
@@ -51,7 +51,7 @@ public class MCRQuery {
     private List<String> returnFields = new ArrayList<>();
 
     /** A cached xml representation of the query */
-    private Document doc = null;
+    private Document doc;
 
     /**
      * Builds a new MCRQuery object without sort criteria and unlimited results.

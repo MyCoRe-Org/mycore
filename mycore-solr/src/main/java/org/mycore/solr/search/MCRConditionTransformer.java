@@ -54,6 +54,7 @@ import org.mycore.solr.MCRSolrUtils;
  *
  */
 public class MCRConditionTransformer {
+
     private static final Logger LOGGER = LogManager.getLogger(MCRConditionTransformer.class);
 
     /**
@@ -62,7 +63,7 @@ public class MCRConditionTransformer {
      */
     protected static final String MIXED = "--mixed--";
 
-    private static volatile HashSet<String> joinFields = null;
+    private static volatile HashSet<String> joinFields;
 
     public static String toSolrQueryString(@SuppressWarnings("rawtypes") MCRCondition condition,
         Set<String> usedFields) {

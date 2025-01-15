@@ -130,7 +130,7 @@ public final class MCRGoogleSitemapCommon {
     private String baseurl = MCRConfiguration2.getString("MCR.baseurl").orElse("");
 
     /** local data */
-    private List<MCRObjectIDDate> objidlist = null;
+    private List<MCRObjectIDDate> objidlist;
 
     public MCRGoogleSitemapCommon(File baseDir) throws NotDirectoryException {
         if (!Objects.requireNonNull(baseDir, "baseDir may not be null.").isDirectory()) {

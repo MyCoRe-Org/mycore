@@ -50,7 +50,7 @@ public class MCRObjectServlet extends MCRContentServlet {
 
     private static final String I18N_ERROR_PREFIX = "component.base.error";
 
-    private MCRXMLMetadataManager metadataManager = null;
+    private MCRXMLMetadataManager metadataManager;
 
     @Override
     public void init() throws ServletException {

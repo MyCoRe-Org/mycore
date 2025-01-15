@@ -47,9 +47,9 @@ public final class MCRWebsiteWriteProtection {
 
     private static final File CONFIG_FILE = new File(CONFIG_FILE_PATH);
 
-    private static long cacheInitTime = 0;
+    private static long cacheInitTime;
 
-    private static Element configCache = null;
+    private static Element configCache;
 
     private MCRWebsiteWriteProtection() {
         //do not allow instantiation

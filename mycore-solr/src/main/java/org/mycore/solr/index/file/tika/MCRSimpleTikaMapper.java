@@ -40,7 +40,7 @@ import com.fasterxml.jackson.databind.node.ValueNode;
  */
 public class MCRSimpleTikaMapper implements MCRTikaMapper {
 
-    private boolean stripNamespace = false;
+    private boolean stripNamespace;
 
     private boolean multiValue = true;
 

@@ -70,7 +70,7 @@ public class MCRLinkTableManager {
     // logger
     static Logger LOGGER = LogManager.getLogger();
 
-    private MCRLinkTableInterface linkTableInstance = null;
+    private MCRLinkTableInterface linkTableInstance;
 
     /**
      * Returns the link table manager singleton.

@@ -34,9 +34,9 @@ import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.frontend.classeditor.json.MCRJSONCategory;
 
 public class CategoryDAOMock implements MCRCategoryDAO {
-    HashMap<MCRCategoryID, MCRCategory> categMap = null;
+    HashMap<MCRCategoryID, MCRCategory> categMap;
 
-    HashMap<MCRCategoryID, MCRCategory> rootCategMap = null;
+    HashMap<MCRCategoryID, MCRCategory> rootCategMap;
 
     private void buildTestCategs() {
         MCRJSONCategory root_01 = createCategory("rootID_01", "", null);

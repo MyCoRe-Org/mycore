@@ -43,13 +43,13 @@ public abstract class ViewerTestBase extends MCRSeleniumTestBase {
 
     private ImageViewerController viewerController;
 
-    private static ApplicationController appController = null;
+    private static ApplicationController appController;
 
     private ApplicationController applicationController;
 
     HttpServer httpServer;
 
-    private static ThreadLocal<AtomicLong> waitTime = ThreadLocal.withInitial(AtomicLong::new);
+    private static final ThreadLocal<AtomicLong> waitTime = ThreadLocal.withInitial(AtomicLong::new);
 
     @AfterClass
     public static void printWaitTime() {

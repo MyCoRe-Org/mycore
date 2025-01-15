@@ -36,9 +36,9 @@ public class MCRSword {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRSword.class);
 
-    private static volatile Hashtable<String, MCRSwordCollectionProvider> collections = null;
+    private static volatile Hashtable<String, MCRSwordCollectionProvider> collections;
 
-    private static volatile Hashtable<String, List<String>> workspaceCollectionTable = null;
+    private static volatile Hashtable<String, List<String>> workspaceCollectionTable;
 
     private static void initConfigThreadSafe() {
         if (collections == null) {

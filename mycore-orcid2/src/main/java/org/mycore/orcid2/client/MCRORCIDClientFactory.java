@@ -52,7 +52,7 @@ public class MCRORCIDClientFactory {
 
     private final ReadClientMode mode;
 
-    private MCRORCIDReadClient readClient = null;
+    private MCRORCIDReadClient readClient;
 
     private MCRORCIDClientFactory(String version) {
         final String prefix = CONFIG_PREFIX + version;

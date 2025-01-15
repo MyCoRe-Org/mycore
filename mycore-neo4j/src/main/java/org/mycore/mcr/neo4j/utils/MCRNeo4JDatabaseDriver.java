@@ -39,7 +39,7 @@ public class MCRNeo4JDatabaseDriver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static volatile MCRNeo4JDatabaseDriver instance = null;
+    private static volatile MCRNeo4JDatabaseDriver instance;
 
     private final String url;
 

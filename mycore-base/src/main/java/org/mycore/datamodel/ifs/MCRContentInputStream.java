@@ -43,11 +43,11 @@ public class MCRContentInputStream extends FilterInputStream {
     protected static final int HEADER_SIZE = 65536;
 
     /** The MD5 checksum of all bytes read through this stream */
-    protected byte[] md5 = null;
+    protected byte[] md5;
 
     /** The message digest to build the MD5 checksum */
     @SuppressWarnings("PMD.AvoidMessageDigestField") //InputStream is not thread safe either
-    protected MessageDigest digest = null;
+    protected MessageDigest digest;
 
     /** The total number of bytes read so far */
     protected long length;

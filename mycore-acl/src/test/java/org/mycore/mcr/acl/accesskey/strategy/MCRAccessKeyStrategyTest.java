@@ -46,9 +46,9 @@ public class MCRAccessKeyStrategyTest extends MCRAccessKeyTestCase {
 
     private MCRAccessKeyStrategy strategy;
 
-    private MCRObject object = null;
+    private MCRObject object;
 
-    private MCRDerivate derivate = null;
+    private MCRDerivate derivate;
 
     @Before
     @Override

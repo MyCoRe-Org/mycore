@@ -40,19 +40,22 @@ import org.mycore.pi.MCRPIRegistrationInfo;
  */
 @Deprecated
 public final class MCREpicurLite {
+
     private final MCRPIRegistrationInfo urn;
 
     private final URL url;
 
     private UsernamePasswordCredentials credentials;
 
-    private boolean isFrontpage = false;
+    private boolean isFrontpage;
 
-    private boolean isPrimary = true;
+    private boolean isPrimary;
 
     private MCREpicurLite(MCRPIRegistrationInfo urn, URL url) {
         this.urn = urn;
         this.url = url;
+        this.isFrontpage = false;
+        this.isPrimary = true;
     }
 
     public static MCREpicurLite instance(MCRPIRegistrationInfo urn, URL url) {

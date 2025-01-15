@@ -66,7 +66,7 @@ public class MCRBinding {
 
     protected MCRChangeTracker tracker;
 
-    private Map<String, Object> staticVariables = null;
+    private Map<String, Object> staticVariables;
 
     public MCRBinding(Document document) {
         this.boundNodes.add(document);

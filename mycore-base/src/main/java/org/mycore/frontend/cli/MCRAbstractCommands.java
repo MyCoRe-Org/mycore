@@ -28,7 +28,7 @@ import java.util.ArrayList;
  */
 public abstract class MCRAbstractCommands implements MCRExternalCommandInterface {
     /** The array holding all known commands */
-    protected ArrayList<MCRCommand> command = null;
+    protected ArrayList<MCRCommand> command;
 
     private String displayName;
 

@@ -81,7 +81,7 @@ public class MCRTileCombineServlet extends MCRServlet {
 
     private JPEGImageWriteParam imageWriteParam;
 
-    private MCRFooterInterface footerImpl = null;
+    private MCRFooterInterface footerImpl;
 
     /**
      * Initializes this instance.

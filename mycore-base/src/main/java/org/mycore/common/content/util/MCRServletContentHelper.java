@@ -461,7 +461,7 @@ public final class MCRServletContentHelper {
 
     public static class Config {
 
-        public int expiresMinutes = 0;
+        public int expiresMinutes;
 
         public boolean useAcceptRanges = true;
 

@@ -59,7 +59,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
     MCRAccessRule dummyRule;
 
-    boolean disabled = false;
+    boolean disabled;
 
     static Hashtable<String, String> ruleIDTable = new Hashtable<>();
 
