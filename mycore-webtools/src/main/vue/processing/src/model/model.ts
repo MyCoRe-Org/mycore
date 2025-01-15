@@ -16,42 +16,43 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Util } from '../util';
-import { Settings } from '../settings';
+import { Util } from '../common/util';
+import { Settings } from '../common/settings';
+import type {AddCollectionMessage, UpdateProcessableMessage} from "./messages.ts";
 
 export class Registry {
 
-  protected collections: Collection[] = [];
+  public collections: Collection[] = [];
 
-  public getCollection(id: number): Collection {
+  public getCollection(id: number): Collection | undefined {
     return this.collections.find((collection) => {
       return collection.id === id;
     });
   }
 
-  public addCollection(collectionData: any): void {
+  public addCollection(collectionData: AddCollectionMessage): void {
     const collection = new Collection();
     Util.mixin(collectionData, collection);
     collection.updatePropertyKeys();
     this.collections.push(collection);
   }
 
-  public updateProcessable(processableData: any): void {
-    const collection = this.getCollection(processableData.collectionId);
+  public updateProcessable(processableMessage: UpdateProcessableMessage): void {
+    const collection = this.getCollection(processableMessage.collectionId);
     if (collection == null) {
-      console.warn('Unable to find collection with id ' + processableData.collectionId);
+      console.warn('Unable to find collection with id ' + processableMessage.collectionId);
       return;
     }
-    collection.updateProcessable(processableData);
+    collection.updateProcessable(processableMessage);
   }
 
 }
 
 export class Collection {
 
-  public id: number;
+  public id: number | undefined;
 
-  public name: string;
+  public name: string | undefined;
 
   /**
    * Array for fast access.
@@ -83,30 +84,30 @@ export class Collection {
     return this.createdProcessables.slice(0, amount);
   }
 
-  public updateProcessable(processableData: any): void {
-    const oldProcessable = this.processables[processableData.id];
+  public updateProcessable(processableMessage: UpdateProcessableMessage): void {
+    const oldProcessable = this.processables[processableMessage.id];
     if (oldProcessable == null) {
       // new
-      this.addProcessable(processableData);
+      this.addProcessable(processableMessage);
     } else {
       // update
-      if (oldProcessable.status === 'processing' && processableData.status !== 'processing') {
+      if (oldProcessable.status === 'processing' && processableMessage.status !== 'processing') {
         Util.remove(this.processingProcessables, oldProcessable);
-        this.addProcessable(processableData);
-      } else if (oldProcessable.status === 'created' && processableData.status !== 'created') {
+        this.addProcessable(processableMessage);
+      } else if (oldProcessable.status === 'created' && processableMessage.status !== 'created') {
         Util.remove(this.createdProcessables, oldProcessable);
-        this.addProcessable(processableData);
+        this.addProcessable(processableMessage);
       } else {
-        Util.mixin(processableData, oldProcessable);
+        Util.mixin(processableMessage, oldProcessable);
         oldProcessable.updatePropertyKeys();
       }
     }
   }
 
-  public addProcessable(processableData: any) {
+  public addProcessable(processableMessage: UpdateProcessableMessage) {
     const processable = new Processable();
-    Util.mixin(processableData, processable);
-    this.processables[processable.id] = processable;
+    Util.mixin(processableMessage, processable);
+    this.processables[processableMessage.id] = processable;
     if (processable.status === 'processing') {
       this.processingProcessables.push(processable);
     } else if (processable.status === 'created') {
@@ -142,27 +143,29 @@ export class Collection {
 
 export class Processable {
 
-  public id: number;
+  public id: number | undefined;
 
-  public collectionId: number;
+  public collectionId: number | undefined;
 
-  public name: string;
+  public name: string | undefined;
 
-  public status: string;
+  public status: string | undefined;
 
-  public createTime: number;
+  public user: string | undefined;
 
-  public startTime: number;
+  public createTime: number | undefined;
 
-  public endTime: number;
+  public startTime: number | undefined;
 
-  public took: number;
+  public endTime: number | undefined;
 
-  public error: string;
+  public took: number | undefined;
 
-  public progress: number;
+  public error: string | undefined;
 
-  public progressText: string;
+  public progress: number | undefined;
+
+  public progressText: string | undefined;
 
   public properties: { [name: string]: any } = {};
 

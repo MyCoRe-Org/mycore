@@ -5,7 +5,6 @@
 
   <name>mycore_web_tools</name>
 
-
   <servlet>
     <servlet-name>MCRPropertyHelperContentServlet</servlet-name>
     <servlet-class>org.mycore.webtools.properties.MCRPropertyHelperContentServlet</servlet-class>
@@ -21,6 +20,14 @@
   <servlet-mapping>
     <servlet-name>TextEditor</servlet-name>
     <url-pattern>/modules/webtools/texteditor/*</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>Processing</servlet-name>
+    <servlet-class>org.mycore.webtools.vue.MCRVueRootServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Processing</servlet-name>
+    <url-pattern>/modules/webtools/processing/*</url-pattern>
   </servlet-mapping>
 
 </web-fragment>
