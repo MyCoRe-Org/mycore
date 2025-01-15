@@ -48,11 +48,11 @@ public class MCRRestAPIError {
 
     public static final String CODE_INVALID_DATA = "INVALID_DATA";
 
-    String code = "";
+    String code;
 
-    String title = "";
+    String title;
 
-    String detail = null;
+    String detail;
 
     public MCRRestAPIError(String code, String title, String detail) {
         this.code = code;

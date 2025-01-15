@@ -63,15 +63,15 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     // logger
     static Logger LOGGER = LogManager.getLogger();
 
-    private Class<? extends MCRMetaInterface> clazz = null;
+    private Class<? extends MCRMetaInterface> clazz;
 
-    private String tag = null;
+    private String tag;
 
     private boolean heritable;
 
     private boolean notinherit;
 
-    private ArrayList<MCRMetaInterface> list = null;
+    private ArrayList<MCRMetaInterface> list;
 
     /**
      * This is the constructor of the MCRMetaElement class. The default language

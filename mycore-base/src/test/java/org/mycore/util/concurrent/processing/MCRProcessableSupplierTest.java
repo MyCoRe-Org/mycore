@@ -38,9 +38,9 @@ public class MCRProcessableSupplierTest extends MCRTestCase {
 
     private static Logger LOGGER = LogManager.getLogger();
 
-    private static int PROGRESS_LISTENER_COUNTER = 0;
+    private static int PROGRESS_LISTENER_COUNTER;
 
-    private static int STATUS_LISTENER_COUNTER = 0;
+    private static int STATUS_LISTENER_COUNTER;
 
     @Test
     public void submit() throws Exception {

@@ -37,15 +37,15 @@ public class MCRIIIFManifest extends MCRIIIFPresentationBase {
 
     public List<MCRIIIFRange> structures = new ArrayList<>();
 
-    private String label = null;
+    private String label;
 
-    private String description = null;
+    private String description;
 
-    private MCRIIIFResource thumbnail = null;
+    private MCRIIIFResource thumbnail;
 
-    private MCRIIIFViewingDirection viewingDirection = null;
+    private MCRIIIFViewingDirection viewingDirection;
 
-    private String within = null;
+    private String within;
 
     private Date navDate;
 

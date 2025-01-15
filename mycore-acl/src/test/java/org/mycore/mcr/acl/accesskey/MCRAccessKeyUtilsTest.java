@@ -45,9 +45,9 @@ public class MCRAccessKeyUtilsTest extends MCRAccessKeyTestCase {
 
     private static final String WRITE_KEY = "blub";
 
-    private MCRObject object = null;
+    private MCRObject object;
 
-    private MCRDerivate derivate = null;
+    private MCRDerivate derivate;
 
     @Before
     @Override

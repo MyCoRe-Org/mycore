@@ -72,7 +72,7 @@ public class MCRSolrRemoteTikaAccumulator implements MCRSolrFileIndexAccumulator
 
     private final long maxFileSize;
 
-    private Iterator<MCRTikaHttpClient> tikaClientIterator = null;
+    private Iterator<MCRTikaHttpClient> tikaClientIterator;
 
     public MCRSolrRemoteTikaAccumulator() {
         Optional<String> serverList = MCRConfiguration2.getString(TIKA_SERVER_PROPERTY);

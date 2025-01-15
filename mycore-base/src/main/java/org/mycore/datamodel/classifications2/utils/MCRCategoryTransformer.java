@@ -196,9 +196,9 @@ public class MCRCategoryTransformer {
         private boolean emptyLeaves;
         private boolean completeId;
 
-        private Map<MCRCategoryID, Number> countMap = null;
+        private Map<MCRCategoryID, Number> countMap;
 
-        private Map<MCRCategoryID, Boolean> linkedMap = null;
+        private Map<MCRCategoryID, Boolean> linkedMap;
 
         private Element root;
 

@@ -61,7 +61,7 @@ public class MCRWebCLIResourceSockets extends MCRAbstractEndpoint {
 
     private static final String SESSION_KEY = "MCRWebCLI";
 
-    private MCRWebCLIContainer cliCont = null;
+    private MCRWebCLIContainer cliCont;
 
     private static final Logger LOGGER = LogManager.getLogger();
 

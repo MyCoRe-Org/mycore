@@ -60,7 +60,7 @@ public class MCRRealmFactory {
 
     private static final int REFRESH_DELAY = 5000;
 
-    private static long lastModified = 0;
+    private static long lastModified;
 
     /** Map of defined realms, key is the ID of the realm */
     private static HashMap<String, MCRRealm> realmsMap = new HashMap<>();

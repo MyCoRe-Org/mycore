@@ -51,11 +51,11 @@ public class MCRAccessKeyUserServiceImplTest extends MCRAccessKeyTestCase {
 
     private static final String UNKNOWN_KEY = "unknown";
 
-    private MCRObject object = null;
+    private MCRObject object;
 
-    private MCRDerivate derivate = null;
+    private MCRDerivate derivate;
 
-    private MCRObjectID unknownObjectId = null;
+    private MCRObjectID unknownObjectId;
 
     private MCRAccessKeyService accessKeyServiceMock;
 

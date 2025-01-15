@@ -32,11 +32,11 @@ public class MCRPublicationStatus {
 
     private String objectID;
 
-    private boolean isUsersPublication = false;
+    private boolean isUsersPublication;
 
-    private boolean isInORCIDProfile = false;
+    private boolean isInORCIDProfile;
 
-    private String putCode = null;
+    private String putCode;
 
     MCRPublicationStatus(MCRORCIDUser orcidUser, MCRObjectID oid)
         throws JDOMException, IOException, SAXException {

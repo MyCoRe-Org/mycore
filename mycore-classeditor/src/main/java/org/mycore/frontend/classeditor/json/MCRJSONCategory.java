@@ -33,21 +33,14 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
  * @author Chi
  */
 public class MCRJSONCategory implements MCRCategory {
-    private MCRCategoryImpl category;
 
-    private Boolean hasChildren = null;
+    private final MCRCategoryImpl category;
+
+    private Boolean hasChildren;
 
     private int positionInParent;
 
     private MCRCategoryID parentID;
-
-    public void setParent(MCRCategory parent) {
-        category.setParent(parent);
-    }
-
-    public void setChildren(List<MCRCategory> children) {
-        category.setChildren(children);
-    }
 
     public MCRJSONCategory() {
         category = new MCRCategoryImpl();
@@ -55,6 +48,14 @@ public class MCRJSONCategory implements MCRCategory {
 
     public MCRJSONCategory(MCRCategory category) {
         this.category = (MCRCategoryImpl) category;
+    }
+
+    public void setParent(MCRCategory parent) {
+        category.setParent(parent);
+    }
+
+    public void setChildren(List<MCRCategory> children) {
+        category.setChildren(children);
     }
 
     public int getLeft() {

@@ -91,9 +91,9 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
     private MCRUserInformation userInformation;
 
     /** The language for this session as upper case character */
-    private String language = null;
+    private String language;
 
-    private Locale locale = null;
+    private Locale locale;
 
     /** The unique ID of this session */
     private String sessionID;

@@ -784,7 +784,7 @@ public class MCRRestAPIObjectsHelper {
     static class FilterParams {
         List<String> projectIDs = new ArrayList<>();
         List<String> typeIDs = new ArrayList<>();
-        String lastModifiedBefore = null;
-        String lastModifiedAfter = null;
+        String lastModifiedBefore;
+        String lastModifiedAfter;
     }
 }

@@ -83,13 +83,13 @@ import org.jdom2.transform.JDOMSource;
 public class MCRXSLTransformation {
     private static Logger LOGGER = LogManager.getLogger(MCRXSLTransformation.class);
 
-    private static SAXTransformerFactory saxFactory = null;
+    private static SAXTransformerFactory saxFactory;
 
     private static TransformerFactory factory = TransformerFactory.newInstance();
 
     private static final Map EMPTY_PARAMETERS = Collections.unmodifiableMap(new HashMap(0, 1));
 
-    private static MCRXSLTransformation singleton = null;
+    private static MCRXSLTransformation singleton;
 
     static {
         factory.setURIResolver(MCRURIResolver.instance());

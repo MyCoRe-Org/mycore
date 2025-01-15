@@ -60,7 +60,7 @@ public class MCRShutdownHandler {
 
     final ReentrantReadWriteLock shutdownLock = new ReentrantReadWriteLock();
 
-    volatile boolean shuttingDown = false;
+    volatile boolean shuttingDown;
 
     boolean isWebAppRunning;
 

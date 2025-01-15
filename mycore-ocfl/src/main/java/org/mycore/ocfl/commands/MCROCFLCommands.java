@@ -76,7 +76,7 @@ public class MCROCFLCommands {
 
     public static final String PRUNERS_CONFIG_PREFIX = "MCR.OCFL.Metadata.Migration.Pruners.";
 
-    private static boolean confirmPurgeMarked = false;
+    private static boolean confirmPurgeMarked;
 
     protected static void migrateWithPrunersAndRepositoryKeyOrMetadataManager(String repository,
         String metadataManagerConfigKey,

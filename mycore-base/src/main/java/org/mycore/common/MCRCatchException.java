@@ -32,7 +32,7 @@ package org.mycore.common;
  */
 public class MCRCatchException extends Exception {
     /** Counter to prevent a recursion between getStackTrace() and toString() */
-    private int toStringInvocationCounter = 0;
+    private int toStringInvocationCounter;
     private static final long serialVersionUID = -2244850451757768863L;
 
     /**

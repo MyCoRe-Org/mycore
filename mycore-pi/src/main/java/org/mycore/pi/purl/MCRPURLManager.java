@@ -55,6 +55,7 @@ import org.w3c.dom.Element;
  * @author Robert Stephan
  */
 public class MCRPURLManager {
+
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String ADMIN_PATH = "/admin";
@@ -65,7 +66,7 @@ public class MCRPURLManager {
 
     private String purlServerBaseURL;
 
-    private String cookie = null;
+    private String cookie;
 
     /**
      * sets the session cookie, if the login was successful

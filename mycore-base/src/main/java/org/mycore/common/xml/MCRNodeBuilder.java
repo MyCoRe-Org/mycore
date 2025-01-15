@@ -51,7 +51,7 @@ public class MCRNodeBuilder {
 
     private Map<String, Object> variables;
 
-    private Object firstNodeBuilt = null;
+    private Object firstNodeBuilt;
 
     public MCRNodeBuilder() {
     }

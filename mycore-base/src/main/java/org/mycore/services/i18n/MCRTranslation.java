@@ -71,7 +71,7 @@ public class MCRTranslation {
 
     private static final Control CONTROL = new MCRCombinedResourceBundleControl();
 
-    private static boolean DEPRECATED_MESSAGES_PRESENT = false;
+    private static boolean DEPRECATED_MESSAGES_PRESENT;
 
     private static Properties DEPRECATED_MAPPING = loadProperties();
 

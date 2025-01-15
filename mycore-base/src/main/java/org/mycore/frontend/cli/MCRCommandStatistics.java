@@ -58,10 +58,10 @@ public class MCRCommandStatistics {
 
 class StatisticsEntry {
     /** Stores total number of invocations for each command */
-    int numInvocations = 0;
+    int numInvocations;
 
     /** Stores total time needed for all executions of the given command */
-    long totalTimeNeeded = 0;
+    long totalTimeNeeded;
 
     long getAverage() {
         return totalTimeNeeded / numInvocations;

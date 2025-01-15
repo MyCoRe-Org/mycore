@@ -27,19 +27,20 @@ import org.mycore.iiif.presentation.model.attributes.MCRIIIFService;
 import org.mycore.iiif.presentation.model.attributes.MCRIIIFViewingHint;
 
 public class MCRIIIFPresentationBase extends MCRIIIFBase {
-    public List<MCRIIIFLDURI> seeAlso = null;
 
-    private String attribution = null;
+    public List<MCRIIIFLDURI> seeAlso;
 
-    private MCRIIIFResource logo = null;
+    private String attribution;
 
-    private MCRIIIFLDURI licence = null;
+    private MCRIIIFResource logo;
 
-    private MCRIIIFViewingHint viewingHint = null;
+    private MCRIIIFLDURI licence;
 
-    private MCRIIIFResource related = null;
+    private MCRIIIFViewingHint viewingHint;
 
-    private MCRIIIFService service = null;
+    private MCRIIIFResource related;
+
+    private MCRIIIFService service;
 
     public MCRIIIFPresentationBase(String id, String type, String context) {
         super(id, type, context);

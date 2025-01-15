@@ -69,7 +69,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
     /** This configuration lists all eligible classifications for x-path-mapping */
     private String xPathMappingClassifications;
 
-    private MCRMetaElement oldMappings = null;
+    private MCRMetaElement oldMappings;
 
     public MCRClassificationMappingEventHandler() {
         this.xPathMappingClassifications = MCRConfiguration2.getString("MCR.Category.XPathMapping.ClassIDs")

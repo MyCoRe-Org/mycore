@@ -59,7 +59,7 @@ public final class MCRObject extends MCRBase {
 
     private final MCRObjectMetadata metadata;
 
-    protected String mcrLabel = null;
+    protected String mcrLabel;
 
     /**
      * This is the constructor of the MCRObject class. It creates an instance of

@@ -170,7 +170,7 @@ public final class MCRMETSGeneratorFactory {
      */
     public static class MCRMETSPropertyGeneratorSelector implements MCRMETSGeneratorSelector {
 
-        private static Class<? extends MCRMETSGenerator> METS_GENERATOR_CLASS = null;
+        private static Class<? extends MCRMETSGenerator> METS_GENERATOR_CLASS;
 
         @Override
         public MCRMETSGenerator get(MCRPath derivatePath) {

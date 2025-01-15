@@ -29,7 +29,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public class MCRObjectQuery {
 
-    private MCRObjectID afterId = null;
+    private MCRObjectID afterId;
 
     private int offset = -1;
 
@@ -39,11 +39,11 @@ public class MCRObjectQuery {
 
     private int numberLess = -1;
 
-    private String type = null;
+    private String type;
 
-    private String project = null;
+    private String project;
 
-    private String status = null;
+    private String status;
 
     private SortBy sortBy;
 

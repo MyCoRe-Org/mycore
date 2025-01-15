@@ -56,11 +56,11 @@ public class MCRORCIDWorkTransformerHelper {
     private static final MCRContentTransformer T_SUMMARY_MODS = MCRContentTransformerFactory
         .getTransformer("BaseORCIDv3WorkSummary2MODS");
 
-    private static JAXBContext context = null;
+    private static final JAXBContext JAXB_CONTEXT;
 
     static {
         try {
-            context = JAXBContext.newInstance(new Class[] { Work.class, WorkSummary.class });
+            JAXB_CONTEXT = JAXBContext.newInstance(Work.class, WorkSummary.class);
         } catch (JAXBException e) {
             throw new IllegalArgumentException("Could not init jaxb context");
         }
@@ -92,7 +92,7 @@ public class MCRORCIDWorkTransformerHelper {
      */
     public static MCRContent transformWork(Work work) {
         checkContext();
-        final MCRJAXBContent<Work> workContent = new MCRJAXBContent(context, work);
+        final MCRJAXBContent<Work> workContent = new MCRJAXBContent(JAXB_CONTEXT, work);
         Element mods = null;
         try {
             mods = T_WORK_MODS.transform(workContent).asXML().detachRootElement()
@@ -117,7 +117,7 @@ public class MCRORCIDWorkTransformerHelper {
      */
     public static MCRContent transformWorkSummary(WorkSummary work) {
         checkContext();
-        final MCRJAXBContent<WorkSummary> workContent = new MCRJAXBContent(context, work);
+        final MCRJAXBContent<WorkSummary> workContent = new MCRJAXBContent(JAXB_CONTEXT, work);
         Element mods = null;
         try {
             mods = T_SUMMARY_MODS.transform(workContent).asXML().detachRootElement()
@@ -131,7 +131,7 @@ public class MCRORCIDWorkTransformerHelper {
     private static Work unmarshalWork(MCRContent content) {
         checkContext();
         try {
-            final Unmarshaller unmarshaller = context.createUnmarshaller();
+            final Unmarshaller unmarshaller = JAXB_CONTEXT.createUnmarshaller();
             return (Work) unmarshaller.unmarshal(content.getInputSource());
         } catch (IOException | JAXBException e) {
             throw new MCRORCIDTransformationException(e);
@@ -139,7 +139,7 @@ public class MCRORCIDWorkTransformerHelper {
     }
 
     private static void checkContext() {
-        if (context == null) {
+        if (JAXB_CONTEXT == null) {
             throw new MCRORCIDTransformationException("Jaxb context is not initialized");
         }
     }

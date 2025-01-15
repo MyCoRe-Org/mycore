@@ -29,7 +29,7 @@ public class TestProperties extends Properties {
     public static final String TEST_PROPERTIES = "test.properties";
     private static final long serialVersionUID = -1135672087633884258L;
     private static final Logger LOGGER = LogManager.getLogger(TestProperties.class);
-    private static TestProperties singleton = null;
+    private static TestProperties singleton;
 
     private TestProperties() {
         LOGGER.info("Load TestProperties");
