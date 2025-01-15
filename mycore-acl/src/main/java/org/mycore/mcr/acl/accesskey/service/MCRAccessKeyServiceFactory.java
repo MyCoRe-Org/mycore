@@ -18,9 +18,6 @@
 
 package org.mycore.mcr.acl.accesskey.service;
 
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.mcr.acl.accesskey.config.MCRAccessKeyConfig;
 import org.mycore.mcr.acl.accesskey.persistence.MCRAccessKeyRepository;
@@ -36,18 +33,6 @@ import org.mycore.mcr.acl.accesskey.validation.MCRAccessKeyValidatorImpl;
  */
 public final class MCRAccessKeyServiceFactory {
 
-    private static volatile MCRAccessKeyService service;
-
-    private static volatile MCRAccessKeyUserService userService;
-
-    private static volatile MCRAccessKeySessionService sessionService;
-
-    private static final Lock SERVICE_LOCK = new ReentrantLock();
-
-    private static final Lock USER_SERVICE_LOCK = new ReentrantLock();
-
-    private static final Lock SESSION_SERVICE_LOCK = new ReentrantLock();
-
     private MCRAccessKeyServiceFactory() {
 
     }
@@ -59,17 +44,7 @@ public final class MCRAccessKeyServiceFactory {
      * @return the singleton instance of {@link MCRAccessKeyService}.
      */
     public static MCRAccessKeyService getAccessKeyService() {
-        if (service == null) {
-            try {
-                SERVICE_LOCK.lock();
-                if (service == null) {
-                    service = createAndConfigureService(createRepository(), createValidator(), getSecretProcessor());
-                }
-            } finally {
-                SERVICE_LOCK.unlock();
-            }
-        }
-        return service;
+        return ServiceHolder.INSTANCE;
     }
 
     /**
@@ -78,17 +53,7 @@ public final class MCRAccessKeyServiceFactory {
      * @return the instance
      */
     public static MCRAccessKeyUserService getAccessKeyUserService() {
-        if (userService == null) {
-            try {
-                USER_SERVICE_LOCK.lock();
-                if (userService == null) {
-                    userService = createUserService(getAccessKeyService());
-                }
-            } finally {
-                USER_SERVICE_LOCK.unlock();
-            }
-        }
-        return userService;
+        return UserServiceHolder.INSTANCE;
     }
 
     /**
@@ -97,17 +62,7 @@ public final class MCRAccessKeyServiceFactory {
      * @return the instance
      */
     public static MCRAccessKeySessionService getAccessKeySessionService() {
-        if (sessionService == null) {
-            try {
-                SESSION_SERVICE_LOCK.lock();
-                if (sessionService == null) {
-                    sessionService = createSessionService(getAccessKeyService());
-                }
-            } finally {
-                SESSION_SERVICE_LOCK.unlock();
-            }
-        }
-        return sessionService;
+        return SessionServiceHolder.INSTANCE;
     }
 
     private static MCRAccessKeyUserService createUserService(MCRAccessKeyService service) {
@@ -134,6 +89,19 @@ public final class MCRAccessKeyServiceFactory {
     private static MCRAccessKeySecretProcessor getSecretProcessor() {
         return MCRConfiguration2.getSingleInstanceOfOrThrow(
             MCRAccessKeySecretProcessor.class, MCRAccessKeyConfig.getSecretProcessorClassProperty());
+    }
+
+    private static class ServiceHolder {
+        private static final MCRAccessKeyService INSTANCE = createAndConfigureService(
+            createRepository(), createValidator(), getSecretProcessor());
+    }
+
+    private static class UserServiceHolder {
+        private static final MCRAccessKeyUserService INSTANCE = createUserService(getAccessKeyService());
+    }
+
+    private static class SessionServiceHolder {
+        private static final MCRAccessKeySessionService INSTANCE = createSessionService(getAccessKeyService());
     }
 
 }
