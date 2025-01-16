@@ -72,8 +72,8 @@ public class MCRFileSystemPromoter implements AutoExecutable {
                 .stream()
                 .map(FileSystemProvider::getScheme)
                 .collect(Collectors.toCollection(HashSet::new));
-            ServiceLoader<FileSystemProvider> sl = ServiceLoader.load(FileSystemProvider.class, getClass()
-                .getClassLoader());
+            ServiceLoader<FileSystemProvider> sl = ServiceLoader.load(FileSystemProvider.class, Thread.currentThread()
+                .getContextClassLoader());
             promoteFileSystemProvider(StreamSupport.stream(sl.spliterator(), false)
                 .filter(p -> !installedSchemes.contains(p.getScheme()))
                 .collect(Collectors.toCollection(ArrayList::new)));

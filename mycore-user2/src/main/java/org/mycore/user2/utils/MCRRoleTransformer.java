@@ -46,14 +46,15 @@ public final class MCRRoleTransformer {
 
     private static JAXBContext initContext() {
         try {
-            return JAXBContext.newInstance(MCRRole.class.getPackage().getName(), MCRRole.class.getClassLoader());
+            return JAXBContext.newInstance(MCRRole.class.getPackage().getName(), Thread.currentThread()
+                .getContextClassLoader());
         } catch (JAXBException e) {
             throw new MCRException("Could not instantiate JAXBContext.", e);
         }
     }
 
     /**
-     * Builds an xml element containing all information on the given role.
+     * Builds a xml element containing all information on the given role.
      */
     public static Document buildExportableXML(MCRRole role) {
         MCRJAXBContent<MCRRole> content = new MCRJAXBContent<>(JAXB_CONTEXT, role);
