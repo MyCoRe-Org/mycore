@@ -32,7 +32,7 @@
               <i class="fa fa-shuffle" />
             </button>
           </div>
-          <input id="inputValue" v-model="form.value" type="text" class="form-control" />
+          <input id="inputValue" v-model="form.secret" type="text" class="form-control" />
         </div>
       </div>
       <div class="form-row">
@@ -43,7 +43,7 @@
           <select
             v-if="availablePermissions"
             id="inputPermission"
-            v-model="form.permission"
+            v-model="form.type"
             class="form-control"
           >
             <option value="" disabled>
@@ -55,7 +55,7 @@
               </option>
             </template>
           </select>
-          <input v-else id="inputPermission" v-model="form.permission" class="form-control" />
+          <input v-else id="inputPermission" v-model="form.type" class="form-control" />
         </div>
         <div class="form-group col-md-6">
           <label for="expirationInput">
@@ -120,10 +120,10 @@ const rules = computed(() => ({
   reference: {
     required,
   },
-  permission: {
+  type: {
     required,
   },
-  value: {
+  secret: {
     required,
   },
 }));
@@ -139,12 +139,12 @@ const busy = ref<boolean>(false);
 const defaultForm = {
   reference: globalReference !== undefined ? globalReference : "",
   isActive: true,
-  value: "",
-  permission: "",
+  secret: "",
+  type: "",
   comment: undefined,
   expiration: undefined,
 };
-const form = ref<AccessKeyDto>({ ...defaultForm });
+const form = ref<CreateAccessKeyDto>({ ...defaultForm });
 const v = useVuelidate(rules, form);
 const handleError = (error: unknown) => {
   errorMessage.value =
@@ -173,9 +173,9 @@ const handleCreateAccessKey = async () => {
         try {
           const accessKeyDto = {
             reference: form.value.reference,
-            secret: form.value.value,
+            secret: form.value.secret,
             isActive: form.value.isActive,
-            permission: form.value.permission,
+            type: form.value.type,
           } as CreateAccessKeyDto;
           if (form.value.expiration) {
             accessKeyDto.expiration = Math.floor(new Date(form.value.expiration).getTime());
@@ -185,7 +185,7 @@ const handleCreateAccessKey = async () => {
           }
           const createdId = await createAccessKey(accessKeyDto);
           const createdAccessKey = await getAccessKey(createdId);
-          emit("access-key-created", form.value.value, createdAccessKey);
+          emit("access-key-created", form.value.secret, createdAccessKey);
           handleClose(true);
         } catch (error) {
           handleError(error);
@@ -199,7 +199,7 @@ const handleCreateAccessKey = async () => {
   }
 };
 const generateValue = (): void => {
-  form.value.value = generateRandomString(16);
+  form.value.secret = generateRandomString(16);
 };
 onErrorCaptured((err) => {
   handleError(err.message);

@@ -28,7 +28,7 @@
           <select
             v-if="availablePermissions"
             id="inputPermission"
-            v-model="form.permission"
+            v-model="form.type"
             class="form-control"
           >
             <template v-for="permissionValue in availablePermissions" :key="permissionValue">
@@ -37,7 +37,7 @@
               </option>
             </template>
           </select>
-          <input v-else id="inputPermission" v-model="form.permission" class="form-control" />
+          <input v-else id="inputPermission" v-model="form.type" class="form-control" />
         </div>
         <div class="form-group col-md-6">
           <label for="expirationInput">
@@ -105,7 +105,7 @@ const rules = computed(() => ({
   reference: {
     required,
   },
-  permission: {
+  type: {
     required,
   },
 }));
@@ -116,7 +116,7 @@ const busy = ref<boolean>(false);
 
 interface FormData {
   reference: string;
-  permission: string;
+  type: string;
   expiration: string | undefined;
   comment: string | undefined;
   isActive: boolean;
@@ -124,7 +124,7 @@ interface FormData {
 
 const form = ref<FormData>({
   reference: "",
-  permission: "",
+  type: "",
   isActive: false,
   comment: undefined,
   expiration: undefined,
@@ -136,7 +136,7 @@ watch(
   (newAccessKey: AccessKeyDto | undefined) => {
     if (newAccessKey) {
       form.value.reference = newAccessKey.reference;
-      form.value.permission = newAccessKey.permission;
+      form.value.type = newAccessKey.type;
       form.value.expiration = newAccessKey.expiration
         ? new Date(newAccessKey.expiration).toISOString().slice(0, 10)
         : undefined;
@@ -168,8 +168,8 @@ const handleUpdateAccessKey = async () => {
         if (form.value.comment !== props.accessKey.comment) {
           accessKeyDto.comment = form.value.comment;
         }
-        if (form.value.permission !== props.accessKey.permission) {
-          accessKeyDto.permission = form.value.permission;
+        if (form.value.type !== props.accessKey.type) {
+          accessKeyDto.type = form.value.type;
         }
         if (form.value.expiration !== props.accessKey.expiration) {
           accessKeyDto.expiration = form.value.expiration
@@ -181,7 +181,7 @@ const handleUpdateAccessKey = async () => {
         }
         await patchAccessKey(props.accessKey.id, accessKeyDto);
         const updatedAccessKey = await getAccessKey(props.accessKey.id);
-        emit("access-key-updated", props.accessKey.value, updatedAccessKey);
+        emit("access-key-updated", props.accessKey.secret, updatedAccessKey);
         handleClose(true);
       } catch (error) {
         handleError(error);

@@ -15,7 +15,7 @@
             })
           }}
           <template
-            v-if="accessKeyCreated && configStore.getAllowedSessionPermissionTypes.includes(accessKeyCreated.permission as string)"
+            v-if="accessKeyCreated && configStore.getAllowedSessionPermissionTypes.includes(accessKeyCreated.type as string)"
           >
             {{ t("component.acl.accesskey.frontend.success.add.url") }}
             <a :href="getActivationLink(accessKeyCreatedValue)" disabled>
@@ -170,7 +170,7 @@ const handleAccessKeyModalClose = () => {
 };
 const handleUpdateAccessKey = (value: string, accessKey: AccessKeyDto) => {
   resetInfos();
-  const index = accessKeys.value.findIndex((k: AccessKeyDto) => value === k.value);
+  const index = accessKeys.value.findIndex((k: AccessKeyDto) => value === k.secret);
   Object.assign(accessKeys.value[index], accessKey);
 };
 const handlePageChange = async (page: number): Promise<void> => {
@@ -184,12 +184,12 @@ const handleRemoveAccessKey = async (index: number): Promise<void> => {
   resetInfos();
   const accessKey: AccessKeyDto = accessKeys.value[index];
   if (accessKey.id) {
-    const fixedValue =
-      accessKey.id.length > 30 ? `${accessKey.id.slice(0, 27)}...` : accessKey.value;
+    const fixedSecret =
+      accessKey.id.length > 30 ? `${accessKey.id.slice(0, 27)}...` : accessKey.secret;
     const ok = await confirmModal.value.show({
       title: t("component.acl.accesskey.frontend.confirmRemove.title"),
       message: t("component.acl.accesskey.frontend.confirmRemove.text", {
-        value: fixedValue,
+        value: fixedSecret,
       }),
     });
     if (ok) {
@@ -198,10 +198,10 @@ const handleRemoveAccessKey = async (index: number): Promise<void> => {
     }
   }
 };
-const handleAddAccessKey = (value: string, accessKey: AccessKeyDto) => {
+const handleAddAccessKey = (secret: string, accessKey: AccessKeyDto) => {
   accessKeys.value.push(accessKey);
-  if (accessKey.value !== value) {
-    accessKeyCreatedValue.value = value;
+  if (accessKey.secret !== secret) {
+    accessKeyCreatedValue.value = secret;
     accessKeyCreated.value = accessKey;
   }
 };

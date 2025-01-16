@@ -2,7 +2,7 @@ export interface AccessKeyDto {
   id: string;
   reference: string;
   secret: string;
-  permission: string;
+  type: string;
   isActive: boolean;
   comment?: string;
   expiration?: number | null;
@@ -10,7 +10,7 @@ export interface AccessKeyDto {
 
 export interface PartialUpdateAccessKeyDto {
   reference?: string;
-  permission?: string;
+  type?: string;
   isActive?: boolean;
   comment?: string;
   expiration?: number | null;
@@ -19,7 +19,7 @@ export interface PartialUpdateAccessKeyDto {
 export interface CreateAccessKeyDto {
   reference: string;
   secret: string;
-  permission: string;
+  type: string;
   isActive: boolean;
   comment?: string;
   expiration?: number | null;

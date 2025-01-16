@@ -23,7 +23,7 @@
         <td>{{ accessKey.id }}</td>
         <td>{{ accessKey.reference }}</td>
         <td>
-          {{ $t(`component.acl.accesskey.frontend.label.permission.${accessKey.permission}`) }}
+          {{ $t(`component.acl.accesskey.frontend.label.permission.${accessKey.type}`) }}
         </td>
         <td>{{ accessKey.isActive }}</td>
         <td>
