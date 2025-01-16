@@ -175,7 +175,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
 
     @Transient
     int getPositionInParent() {
-        LOGGER.debug("getposition called for {}", getId());
+        LOGGER.debug("getposition called for {}", this::getId);
         if (parent == null) {
             LOGGER.debug("getposition called with no parent set.");
             return -1;
@@ -284,7 +284,8 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
      *            the children to set
      */
     public void setChildren(List<MCRCategory> children) {
-        LOGGER.debug("Set children called for {}list'{}': {}", getId(), children.getClass().getName(), children);
+        LOGGER.debug("Set children called for {} list '{}': {}",
+            () -> getId(), () -> children.getClass().getName(), () -> children);
         childGuard.write(() -> setChildrenUnlocked(children));
     }
 
@@ -360,7 +361,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
                 catImpl.level = parent.getLevel() + 1;
             } else if (category.isCategory()) {
                 LOGGER.warn("Something went wrong here, category has no parent and is no root category: {}",
-                    category.getId());
+                    category::getId);
             }
             // copy children to temporary list
             List<MCRCategory> children = new ArrayList<>(catImpl.getChildren().size());
@@ -371,7 +372,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
             catImpl.getChildren().addAll(children);
             return catImpl;
         }
-        LOGGER.debug("wrap Category: {}", category.getId());
+        LOGGER.debug("wrap Category: {}", category::getId);
         MCRCategoryImpl catImpl = new MCRCategoryImpl();
         catImpl.setId(category.getId());
         catImpl.labels = category.getLabels();
@@ -454,7 +455,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
         setLeft(leftStart);
         setLevel(levelStart);
         for (MCRCategory child : getChildren()) {
-            LOGGER.debug(child.getId());
+            LOGGER.debug(child::getId);
             curValue = ((MCRCategoryImpl) child).calculateLeftRightAndLevel(++curValue, nextLevel);
         }
         setRight(++curValue);

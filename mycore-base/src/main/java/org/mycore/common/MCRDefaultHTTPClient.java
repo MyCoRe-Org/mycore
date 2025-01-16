@@ -106,7 +106,7 @@ public class MCRDefaultHTTPClient implements MCRHTTPClient {
             @Override
             public MCRContent handleResponse(ClassicHttpResponse response) throws IOException {
                 logger.debug("http query: {}", hrefURI);
-                logger.debug("http resp status: {} {}", response.getCode(), response.getReasonPhrase());
+                logger.debug("http resp status: {} {}", response::getCode, response::getReasonPhrase);
                 logger.debug(() -> getCacheDebugMsg(hrefURI, context));
                 return super.handleResponse(response);
             }

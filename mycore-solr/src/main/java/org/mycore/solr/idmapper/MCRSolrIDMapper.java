@@ -41,9 +41,9 @@ import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
 /**
  * implementation of an MCRIDMapper
- * 
+ *
  * It uses Solr to retrieve the real id from the given input string
- *  
+ *
  * @author Robert Stephan
  */
 public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
@@ -113,10 +113,10 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
                     result = String.valueOf(solrResults.get(0).getFieldValue("id"));
                 }
                 if (solrResults.getNumFound() == 0) {
-                    LOGGER.info("ERROR: No MyCoRe ID found for query " + mcrid);
+                    LOGGER.info(() -> "ERROR: No MyCoRe ID found for query " + mcrid);
                 }
                 if (solrResults.getNumFound() > 1) {
-                    LOGGER.info("ERROR: Multiple IDs found for query " + mcrid);
+                    LOGGER.info(() -> "ERROR: Multiple IDs found for query " + mcrid);
                 }
             }
         }
@@ -159,10 +159,10 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
                     result = String.valueOf(solrResults.get(0).getFieldValue("id"));
                 }
                 if (solrResults.getNumFound() == 0) {
-                    LOGGER.info("ERROR: No MyCoRe Derivate ID found for query " + derid);
+                    LOGGER.info(() -> "ERROR: No MyCoRe Derivate ID found for query " + derid);
                 }
                 if (solrResults.getNumFound() > 1) {
-                    LOGGER.info("ERROR: Multiple IDs found for query " + derid);
+                    LOGGER.info(() -> "ERROR: Multiple IDs found for query " + derid);
                 }
             }
         }

@@ -52,7 +52,7 @@ public class MCRAccessKeyFilter implements Filter {
     public void init(FilterConfig filterConfig) {
         if (LOGGER.isInfoEnabled() && !MCRAccessKeyConfig.getAllowedSessionPermissionTypes().isEmpty()) {
             LOGGER.info("MCRAccessKeyObjectServletFilter is enabled and the following permssions are allowed: {}",
-                String.join(",", MCRAccessKeyConfig.getAllowedSessionPermissionTypes()));
+                () -> String.join(", ", MCRAccessKeyConfig.getAllowedSessionPermissionTypes()));
         }
     }
 

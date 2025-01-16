@@ -174,7 +174,7 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
             }
 
             if (!Files.exists(linkedFile)) {
-                LOGGER.warn("{}: File not found: {}", getSubTag(), super.href);
+                LOGGER.warn("{}: File not found: {}", this::getSubTag, () -> super.href);
             }
 
         } catch (Exception exc) {

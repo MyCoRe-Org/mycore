@@ -71,7 +71,7 @@ public class MCRMODSEmbargoReleaseCronjob extends MCRCronjob {
                 String today = LocalDate.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_DATE);
                 String query = "mods.embargo.date:[* TO " + today + "]";
 
-                LOGGER.info("Searching with query " + query);
+                LOGGER.info(() -> "Searching with query " + query);
 
                 ModifiableSolrParams params = new ModifiableSolrParams();
                 params.set("start", 0);
@@ -115,7 +115,7 @@ public class MCRMODSEmbargoReleaseCronjob extends MCRCronjob {
             }
 
         } catch (Exception e) {
-            LOGGER.error("Failed to release embargoed object " + id, e);
+            LOGGER.error(() -> "Failed to release embargoed object " + id, e);
         }
 
     }

@@ -288,7 +288,13 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             xout.output(classDoc, out);
             out.flush();
         }
-        LOGGER.info("Classifcation {} saved to {}.", id, xmlOutput.getCanonicalPath());
+        LOGGER.info("Classifcation {} saved to {}.", () -> id, () -> {
+            try {
+                return xmlOutput.getCanonicalPath();
+            } catch (IOException e) {
+                return xmlOutput.getAbsolutePath();
+            }
+        });
     }
 
     /**
@@ -331,9 +337,8 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     public static void listAllClassifications() {
         List<MCRCategoryID> allClassIds = DAO.getRootCategoryIDs();
         for (MCRCategoryID id : allClassIds) {
-            LOGGER.info(id.getRootID());
+            LOGGER.info(id::getRootID);
         }
-        LOGGER.info("");
     }
 
     /**
@@ -357,13 +362,13 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     }
 
     private static void listCategory(MCRCategory categ) {
-        int level = categ.getLevel();
-        String space = " ".repeat(level * 2);
         if (categ.isCategory()) {
-            LOGGER.info("{}  ID    : {}", space, categ.getId().getId());
+            LOGGER.info("{}  ID    : {}",
+                () -> " ".repeat(categ.getLevel() * 2), () -> categ.getId().getId());
         }
         for (MCRLabel label : categ.getLabels()) {
-            LOGGER.info("{}  Label : ({}) {}", space, label.getLang(), label.getText());
+            LOGGER.info("{}  Label : ({}) {}",
+                () -> " ".repeat(categ.getLevel() * 2), label::getLang, label::getText);
         }
         List<MCRCategory> children = categ.getChildren();
         for (MCRCategory child : children) {
@@ -417,7 +422,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             for (Object[] parentWithErrors : parentWithErrorsList) {
                 Number parentID = (Number) parentWithErrors[0];
                 Number firstErrorPositionInParent = (Number) parentWithErrors[1];
-                LOGGER.info("Category {} has the missing position {} ...", parentID, firstErrorPositionInParent);
+                LOGGER.info("Category {} has the missing position {} …", parentID, firstErrorPositionInParent);
                 repairCategoryWithGapInPos(parentID, firstErrorPositionInParent);
                 LOGGER.info("Fixed position {} for category {}.", firstErrorPositionInParent, parentID);
             }
@@ -440,7 +445,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             for (Object[] parentWithErrors : parentWithErrorsList) {
                 Number parentID = (Number) parentWithErrors[0];
                 Number wrongStartPositionInParent = (Number) parentWithErrors[1];
-                LOGGER.info("Category {} has the the starting position {} ...", parentID, wrongStartPositionInParent);
+                LOGGER.info("Category {} has the the starting position {} …", parentID, wrongStartPositionInParent);
                 repairCategoryWithWrongStartPos(parentID, wrongStartPositionInParent);
                 LOGGER.info("Fixed position {} for category {}.", wrongStartPositionInParent, parentID);
             }
@@ -484,7 +489,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         if (DAO instanceof MCRCategoryDAOImpl categoryDAO) {
             categoryDAO.repairLeftRightValue(classID);
         } else {
-            LOGGER.error("Command not compatible with {}", DAO.getClass().getName());
+            LOGGER.error("Command not compatible with {}", () -> DAO.getClass().getName());
         }
     }
 
@@ -551,7 +556,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
                 log.add("NULL child of parent " + category.getId() + " on position " + position);
                 continue;
             }
-            LOGGER.debug(child.getId());
+            LOGGER.debug(child::getId);
             curValue = checkLeftRightAndLevel((MCRCategoryImpl) child, ++curValue, nextLevel, log);
             position++;
         }

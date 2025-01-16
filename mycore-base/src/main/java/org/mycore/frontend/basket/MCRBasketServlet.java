@@ -89,7 +89,7 @@ public class MCRBasketServlet extends MCRServlet {
         String action = req.getParameter("action");
         String[] uris = req.getParameterValues("uri");
         String[] ids = req.getParameterValues("id");
-        LOGGER.info("{} {} {}", action, type, ids == null ? "" : ids);
+        LOGGER.info(() -> action + " " + req.getParameter("type") + " " + (ids == null ? "" : ids));
         MCRBasket basket = MCRBasketManager.getOrCreateBasketInSession(type);
         switch (action) {
             case "add":

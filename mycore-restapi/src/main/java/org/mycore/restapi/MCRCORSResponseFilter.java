@@ -94,7 +94,7 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
-        LOGGER.debug("Request-Header: {}", requestContext.getHeaders());
+        LOGGER.debug("Request-Header: {}", requestContext::getHeaders);
         String origin = requestContext.getHeaderString(ORIGIN);
         if (origin == null) {
             return; //No CORS Request

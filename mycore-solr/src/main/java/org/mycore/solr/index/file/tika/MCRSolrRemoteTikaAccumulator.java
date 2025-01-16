@@ -103,14 +103,14 @@ public class MCRSolrRemoteTikaAccumulator implements MCRSolrFileIndexAccumulator
                 .filter(p -> p.matcher(mcrPath.getOwnerRelativePath()).matches())
                 .findAny();
             if (matching.isPresent()) {
-                LOGGER.info("File {} is ignored by pattern {}", mcrPath.getOwnerRelativePath(), matching.get());
+                LOGGER.info("File {} is ignored by pattern {}", mcrPath::getOwnerRelativePath, matching::get);
                 return;
             }
         }
 
         if (attributes.size() > maxFileSize) {
-            LOGGER.info("File {} is ignored because it is too large {}", filePath,
-                MCRUtils.getSizeFormatted(attributes.size()));
+            LOGGER.info("File {} is ignored because it is too large {}", () -> filePath,
+                () -> MCRUtils.getSizeFormatted(attributes.size()));
             return;
         }
 
@@ -127,8 +127,8 @@ public class MCRSolrRemoteTikaAccumulator implements MCRSolrFileIndexAccumulator
             hasError = true;
             errorMessage = e.getMessage();
         } finally {
-            LOGGER.debug("Extracted text from {} using Tika in {}ms", filePath,
-                System.currentTimeMillis() - start);
+            LOGGER.debug("Extracted text from {} using Tika in {}ms", () -> filePath,
+                () -> System.currentTimeMillis() - start);
         }
 
         document.addField("tika_has_error", hasError);

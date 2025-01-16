@@ -147,16 +147,17 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
                 return superUserID.equals(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
             }
             boolean validate = rule.validate();
-            LOGGER.debug(validate ? "Current user has permission." : "Current user does not have permission.");
+            LOGGER.debug(() -> validate ? "Current user has permission." : "Current user does not have permission.");
             return validate;
         } finally {
-            LOGGER.debug("Check {} on {} took:{}", permission, id, System.currentTimeMillis() - start);
+            LOGGER.debug("Check {} on {} took:{}", () -> permission, () -> id,
+                () -> System.currentTimeMillis() - start);
         }
     }
 
     @Override
     public boolean checkPermission(String id, String permission, MCRUserInformation userInfo) {
-        LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for ID " + id + " for permission " + permission
+        LOGGER.debug(() -> "Execute MCRAccessBaseImpl checkPermission for ID " + id + " for permission " + permission
             + " for user" + userInfo == null ? "null" : userInfo.getUserID());
         return true;
     }
@@ -186,7 +187,7 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
 
     @Override
     public boolean checkPermissionForUser(String permission, MCRUserInformation userInfo) {
-        LOGGER.debug(
+        LOGGER.debug(() ->
             "Execute MCRAccessBaseImpl checkPermission for permission " + permission + " for user " + userInfo == null
                 ? "null"
                 : userInfo.getUserID());

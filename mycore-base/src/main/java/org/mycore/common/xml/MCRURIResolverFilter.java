@@ -100,7 +100,7 @@ public class MCRURIResolverFilter implements Filter {
                     out.write(origOutput.substring(pos).getBytes(characterEncoding));
                     // delete debuglist
                     uriList.remove();
-                    LOGGER.debug("end filter: {}", origOutput.substring(origOutput.length() - 10));
+                    LOGGER.debug("end filter: {}", () -> origOutput.substring(origOutput.length() - 10));
                 }
             } else {
                 LOGGER.debug("Sending original response");

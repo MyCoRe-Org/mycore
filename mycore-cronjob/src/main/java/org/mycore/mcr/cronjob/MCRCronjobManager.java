@@ -62,7 +62,7 @@ public class MCRCronjobManager implements MCRShutdownHandler.Closeable {
 
     @Override
     public void prepareClose() {
-        LOGGER.info("Shutdown {}", this.getClass().getSimpleName());
+        LOGGER.info("Shutdown {}", () -> this.getClass().getSimpleName());
         executor.shutdown();
         try {
             executor.awaitTermination(30, TimeUnit.SECONDS);
@@ -74,7 +74,7 @@ public class MCRCronjobManager implements MCRShutdownHandler.Closeable {
     @Override
     public void close() {
         if (!executor.isTerminated()) {
-            LOGGER.info("Force shutdown {}", this.getClass().getSimpleName());
+            LOGGER.info("Force shutdown {}", () -> this.getClass().getSimpleName());
             executor.shutdownNow();
             try {
                 executor.awaitTermination(30, TimeUnit.SECONDS);
@@ -103,7 +103,7 @@ public class MCRCronjobManager implements MCRShutdownHandler.Closeable {
                     schedule.add(Pair.of(job, false));
                 }
             });
-        LOGGER.info(schedule.logMessage("Cron schedule"));
+        LOGGER.info(() -> schedule.logMessage("Cron schedule"));
     }
 
     private MCRCronjob.Context getContext(ServletContext servletContext) {
@@ -116,13 +116,13 @@ public class MCRCronjobManager implements MCRShutdownHandler.Closeable {
             if (next > 0) {
                 executor.schedule(() -> {
                     try {
-                        LOGGER.info("Execute job " + job.getID() + " - " + job.getDescription());
+                        LOGGER.info(() -> "Execute job " + job.getID() + " - " + job.getDescription());
                         job.run();
                         this.processableCollection.remove(job.getProcessable());
-                        // schedule next run with a fresh instance of the same job 
+                        // schedule next run with a fresh instance of the same job
                         scheduleNextRun(toJob(job.getProperty()));
                     } catch (Exception ex) {
-                        LOGGER.error("Error while executing job " + job.getID() + " " + job.getDescription(), ex);
+                        LOGGER.error(() -> "Error while executing job " + job.getID() + " " + job.getDescription(), ex);
                         this.processableCollection.remove(job.getProcessable());
                     }
                 }, next, TimeUnit.MILLISECONDS);

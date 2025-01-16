@@ -286,8 +286,8 @@ public class MCRParameterCollector {
     }
 
     private void debugSessionParameters() {
-        LOGGER.debug("XSL.CurrentUser ={}", parameters.get("CurrentUser"));
-        LOGGER.debug("XSL.Referer ={}", parameters.get("Referer"));
+        LOGGER.debug("XSL.CurrentUser ={}", () -> parameters.get("CurrentUser"));
+        LOGGER.debug("XSL.Referer ={}", () -> parameters.get("Referer"));
     }
 
     /** Sets the request and referer URL */

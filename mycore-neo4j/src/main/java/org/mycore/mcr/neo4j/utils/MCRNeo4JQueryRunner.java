@@ -64,7 +64,8 @@ public class MCRNeo4JQueryRunner {
         try {
             driver.verifyConnectivity();
         } catch (Exception e) {
-            LOGGER.error("Neo4J connection failed.", e.getCause());
+            Throwable cause = e.getCause();
+            LOGGER.error("Neo4J connection failed.", cause);
             return;
         }
         try (Session session = driver.session()) {
@@ -133,10 +134,10 @@ public class MCRNeo4JQueryRunner {
                             keyMap.put("path_" + key, pathSB.toString());
                         } else if (StringUtils.equals(recordData.type().name(), "NULL")) {
                             LOGGER.warn("Got record of type {} for key {} which is not parsed and is ignored",
-                                recordData.type().name(), key);
+                                () -> recordData.type().name(), () -> key);
                         } else {
                             LOGGER.warn("Got record of type {} for key {} which is not parsed",
-                                recordData.type().name(), key);
+                                () -> recordData.type().name(), () -> key);
                             keyMap.put(key, gson.toJson(thisRecord.asMap()));
                         }
                     }

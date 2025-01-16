@@ -89,8 +89,8 @@ public class MCRWorkEventHandler extends MCREventHandlerBase {
             }
 
         } catch (Exception ex) {
-            LOGGER.warn("Could not publish {} in ORCID profile {} of user {}", oid,
-                user.getORCID(), user.getUser().getUserName(), ex);
+            LOGGER.warn(() -> "Could not publish " + oid + " in ORCID profile " + user.getORCID() + " of user "
+                + user.getUser().getUserName(), ex);
         }
     }
 

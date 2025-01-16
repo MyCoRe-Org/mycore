@@ -114,7 +114,7 @@ public class MCRNeo4JDatabaseDriver {
             LOGGER.info("Test query result is: {}", queryResult);
             return queryResult.equals("1");
         } catch (Exception e) {
-            LOGGER.info("Exception: {}", e.getMessage());
+            LOGGER.info("Exception: {}", e::getMessage);
         }
         return false;
     }

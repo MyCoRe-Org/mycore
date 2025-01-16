@@ -45,7 +45,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 /**
  * This class provides a set of commands for the org.mycore.access management
  * which can be used by the command line interface.
- * 
+ *
  * @author Heiko Helmbrecht
  * @author Jens Kupferschmidt
  */
@@ -57,7 +57,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
     /**
      * This method deletes the old permissions (if given any) and sets the new
      * permissions given in a certain file
-     * 
+     *
      * @param filename
      *            the filename of the file that contains the mcrpermissions
      * @see #createPermissionsFromFile(String)
@@ -104,7 +104,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      */
     public static void createPermissionsFrom(String permissionsUri) throws Exception {
         MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
-        LOGGER.info("Reading {} ...", permissionsUri);
+        LOGGER.info("Reading {} …", permissionsUri);
 
         Element permissions = getPermissionsFromUri(permissionsUri);
 
@@ -156,7 +156,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
 
     /**
      * delete the permission {0}
-     * 
+     *
      * @param permission
      *            the name of the permission
      */
@@ -187,8 +187,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
             LOGGER.info("       {}", permission);
             LOGGER.info("           {}", description);
             if (rule != null) {
-                XMLOutputter o = new XMLOutputter();
-                LOGGER.info("           {}", o.outputString(rule));
+                LOGGER.info("           {}", () -> new XMLOutputter().outputString(rule));
             }
         }
         if (noPermissionsDefined) {
@@ -199,7 +198,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
 
     /**
      * This method just export the permissions to a file
-     * 
+     *
      * @param filename
      *            the file written to
      */
@@ -231,7 +230,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
             LOGGER.warn("File {} yet exists, overwrite.", filename);
         }
         FileOutputStream fos = new FileOutputStream(file);
-        LOGGER.info("Writing to file {} ...", filename);
+        LOGGER.info("Writing to file {} …", filename);
         String mcrEncoding = MCRConfiguration2.getString("MCR.Metadata.DefaultEncoding").orElse(DEFAULT_ENCODING);
         XMLOutputter out = new XMLOutputter(Format.getPrettyFormat().setEncoding(mcrEncoding));
         out.output(doc, fos);
@@ -421,7 +420,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
 
     /**
      * delete a given permission for a given id
-     * 
+     *
      * @param permission
      *            String type of permission like read, writedb, etc.
      * @param id
@@ -437,7 +436,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
 
     /**
      * delete all permissions for a given id
-     * 
+     *
      * @param id
      *            String the id of the object the rule is assigned to
      */
@@ -451,7 +450,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
 
     /**
      * delete all permissions for all selected objects
-     * 
+     *
      * @param permission
      *            String type of permission like read, writedb, etc.
      * @see MCRObjectCommands#getSelectedObjectIDs()
@@ -468,7 +467,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
 
     /**
      * delete all permissions for all selected objects
-     * 
+     *
      * @see MCRObjectCommands#getSelectedObjectIDs()
      */
 

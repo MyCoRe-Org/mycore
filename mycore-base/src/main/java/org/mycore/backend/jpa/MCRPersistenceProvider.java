@@ -69,8 +69,8 @@ public class MCRPersistenceProvider implements PersistenceProvider {
 
     public MCRPersistenceProvider() {
         persistenceUnitInitializer = MCRConfiguration2.getInstances(JPA_PERSISTENCE_UNIT_PROPERTY_NAME);
-        LOGGER.info("Found {} persistence units [{}]", persistenceUnitInitializer.size(),
-            String.join(";", persistenceUnitInitializer.keySet()));
+        LOGGER.info("Found {} persistence units [{}]", persistenceUnitInitializer::size,
+            () -> String.join(";", persistenceUnitInitializer.keySet()));
     }
 
     /**
@@ -108,7 +108,7 @@ public class MCRPersistenceProvider implements PersistenceProvider {
         Optional.ofNullable(puDescriptor.getSharedCacheMode())
             .ifPresent((sharedCacheMode) -> table.add(new Property("SharedCacheMode", sharedCacheMode.name())));
 
-        LOGGER.info(table.logMessage("JPA Properties"));
+        LOGGER.info(() -> table.logMessage("JPA Properties"));
     }
 
     @Override

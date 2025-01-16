@@ -30,9 +30,9 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
- * 
+ *
  * Used to lock the mets editor for a specific Derivate
- * 
+ *
  * @author Sebastian Hofmann (mcrshofm)
  */
 public class MCRMetsLock {
@@ -51,8 +51,9 @@ public class MCRMetsLock {
         if (metsAccessSessionTable.containsKey(derivateId)) {
             String lastAccessID = metsAccessSessionTable.get(derivateId);
             MCRSession lastSession = MCRSessionMgr.getSession(lastAccessID);
-            LOGGER.debug("{} is locked : {}", derivateIdString, lastSession != null);
-            return lastSession != null;
+            boolean lastSessionNotClosed = lastSession != null;
+            LOGGER.debug("{} is locked : {}", derivateIdString, lastSessionNotClosed);
+            return lastSessionNotClosed;
         } else {
             LOGGER.debug("{} is not locked", derivateIdString);
             return false;

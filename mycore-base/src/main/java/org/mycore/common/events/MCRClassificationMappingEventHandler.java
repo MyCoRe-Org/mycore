@@ -50,7 +50,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 
 /**
  * This class implements an event handler, which reloads classification entries
- * stored in datafield mappings/mapping. These entries are retrieved from other 
+ * stored in datafield mappings/mapping. These entries are retrieved from other
  * classifications where they are stored in as labels with language "x-mapping" or "x-mapping-xpath".
  *
  * @author Robert Stephan
@@ -169,7 +169,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
             MCRCategory category = dao.getCategory(new MCRCategoryID(classElement.getAttributeValue("classid"),
                 classElement.getAttributeValue("categid")), 0);
             if (category == null) {
-                LOGGER.warn("Could not find a category for {}", new XMLOutputter().outputString(classElement));
+                LOGGER.warn(() -> "Could not find a category for " + new XMLOutputter().outputString(classElement));
             } else {
                 categories.add(category);
             }

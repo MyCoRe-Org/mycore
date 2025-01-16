@@ -44,7 +44,7 @@ import jakarta.servlet.ServletRegistration;
 /**
  * This StartupHandler deploys web resources and register filters/servlets to web container server,
  *  for with <code>MCR-Auto-Deploy = true</code> marked JARs.
- * 
+ *
  * @author René Adler (eagle)
  *
  */
@@ -124,7 +124,7 @@ public class MCRAutoDeploy implements MCRStartupHandler.AutoExecutable {
                                                         servletNames.stream()
                                                             .map(sn -> {
                                                                 LOGGER.info("...add servlet mapping: {}",
-                                                                    sn.getTextTrim());
+                                                                    sn::getTextTrim);
                                                                 return sn.getTextTrim();
                                                             })
                                                             .toArray(String[]::new));
@@ -138,7 +138,7 @@ public class MCRAutoDeploy implements MCRStartupHandler.AutoExecutable {
                                                         false, urlPattern.stream()
                                                             .map(url -> {
                                                                 LOGGER.info("...add url mapping: {}",
-                                                                    url.getTextTrim());
+                                                                    url::getTextTrim);
                                                                 return url.getTextTrim();
                                                             })
                                                             .toArray(String[]::new));
@@ -164,12 +164,12 @@ public class MCRAutoDeploy implements MCRStartupHandler.AutoExecutable {
 
                                         if (sr != null) {
                                             mapping.getChildren("url-pattern", ns).forEach(url -> {
-                                                LOGGER.info("...add url mapping: {}", url.getTextTrim());
+                                                LOGGER.info("...add url mapping: {}", url::getTextTrim);
                                                 sr.addMapping(url.getTextTrim());
                                             });
 
                                             servlet.getChildren("init-param", ns).forEach(param -> {
-                                                LOGGER.info("...add init-param: {}", param.getTextTrim());
+                                                LOGGER.info("...add init-param: {}", param::getTextTrim);
                                                 String paramName = param.getChildText("param-name", ns);
                                                 String paramValue = param.getChildText("param-value", ns);
                                                 sr.setInitParameter(paramName, paramValue);

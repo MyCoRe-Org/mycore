@@ -164,7 +164,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
         mcrmodsWrapper.getElements("mods:classification[contains(@generator, '" + GENERATOR_SUFFIX + "')]")
             .stream().forEach(Element::detach);
 
-        LOGGER.info("check mappings {}", obj.getId());
+        LOGGER.info("check mappings {}", obj::getId);
         final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
         // check x-mappings
         mcrmodsWrapper.getMcrCategoryIDs().stream()

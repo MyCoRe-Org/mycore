@@ -192,7 +192,7 @@ public class MCRUserServlet extends MCRServlet {
             return;
         }
 
-        LOGGER.info("show user {} {} {}", user.getUserID(), user.getUserName(), user.getRealmID());
+        LOGGER.info("show user {} {} {}", user::getUserID, user::getUserName, user::getRealmID);
         getLayoutService().doLayout(req, res, getContent(user));
     }
 
@@ -449,7 +449,7 @@ public class MCRUserServlet extends MCRServlet {
             return;
         }
 
-        LOGGER.info("change password of user {} {} {}", user.getUserID(), user.getUserName(), user.getRealmID());
+        LOGGER.info("change password of user {} {} {}", user::getUserID, user::getUserName, user::getRealmID);
 
         Document doc = (Document) (req.getAttribute("MCRXEditorSubmission"));
         String password = doc.getRootElement().getChildText("password");
@@ -474,7 +474,7 @@ public class MCRUserServlet extends MCRServlet {
             return;
         }
 
-        LOGGER.info("delete user {} {} {}", user.getUserID(), user.getUserName(), user.getRealmID());
+        LOGGER.info("delete user {} {} {}", user::getUserID, user::getUserName, user::getRealmID);
         MCRUserManager.deleteUser(user);
         getLayoutService().doLayout(req, res, getContent(user));
     }
@@ -533,7 +533,7 @@ public class MCRUserServlet extends MCRServlet {
             users.setAttribute("num", String.valueOf(num));
             users.setAttribute("max", String.valueOf(max));
         } else {
-            LOGGER.info("list owned users of {} {}", currentUser.getUserName(), currentUser.getRealmID());
+            LOGGER.info("list owned users of {} {}", currentUser::getUserName, currentUser::getRealmID);
             results = ownUsers;
         }
 

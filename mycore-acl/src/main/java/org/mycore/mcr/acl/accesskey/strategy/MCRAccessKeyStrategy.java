@@ -62,7 +62,7 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
      * @return true if permitted, otherwise false
      */
     public boolean checkObjectPermission(final MCRObjectID objectId, final String permission) {
-        LOGGER.debug("check object {} permission {}.", objectId.toString(), permission);
+        LOGGER.debug("check object {} permission {}.", objectId, permission);
         if ((PERMISSION_READ.equals(permission) || PERMISSION_WRITE.equals(permission)
             || PERMISSION_VIEW.equals(permission) || PERMISSION_PREVIEW.equals(permission))
             && MCRAccessKeyUtils.isAccessKeyForObjectTypeAllowed(objectId.getTypeId())) {
@@ -86,7 +86,7 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
      * @return true if permitted, otherwise false
      */
     public boolean checkDerivatePermission(final MCRObjectID objectId, final String permission) {
-        LOGGER.debug("check derivate {} permission {}.", objectId.toString(), permission);
+        LOGGER.debug("check derivate {} permission {}.", objectId, permission);
         if ((PERMISSION_READ.equals(permission) || PERMISSION_WRITE.equals(permission)
             || PERMISSION_VIEW.equals(permission) || PERMISSION_PREVIEW.equals(permission))
             && MCRAccessKeyUtils.isAccessKeyForObjectTypeAllowed(objectId.getTypeId())) {

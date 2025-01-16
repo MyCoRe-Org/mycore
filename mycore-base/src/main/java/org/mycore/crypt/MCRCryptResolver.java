@@ -28,18 +28,17 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
-import org.mycore.common.MCRException;
 
 /**
  * This class provides an URIResolver for encryption and decryption.
- * 
+ *
  * URI Pattern:
  * crypt:{encrypt/decrypt}:{cipherid}:{value}
- * 
- * where 
+ *
+ * where
  * <ul>
  *   <li>encrypt/decrypt - the action to act an value</li>
- *   <li>cipherid - ID of the cipher</li>  
+ *   <li>cipherid - ID of the cipher</li>
  *   <li>value - string to be encryptet or decypted</li>
  * </ul>
  * @author Paul Borchert
@@ -73,14 +72,13 @@ public class MCRCryptResolver implements URIResolver {
             MCRCipher cipher = MCRCipherManager.getCipher(cipherID);
             returnString = action.equals("encrypt") ? cipher.encrypt(value) : cipher.decrypt(value);
         } catch (MCRCryptKeyFileNotFoundException e) {
-            LOGGER.error(MCRException.getStackTraceAsString(e));
+            LOGGER.error(e::getMessage, e);
             returnString = action.equals("encrypt") ? "" : value;
         } catch (MCRCryptKeyNoPermissionException e) {
-            LOGGER.info("No permission to read cryptkey" + cipherID + ".");
+            LOGGER.info(() -> "No permission to read cryptkey" + cipherID + ".");
             returnString = action.equals("encrypt") ? "" : value;
         } catch (MCRCryptCipherConfigurationException e) {
-            LOGGER.error(e.getStackTraceAsString());
-            LOGGER.error("Invalid configuration or key.");
+            LOGGER.error("Invalid configuration or key.", e);
             returnString = action.equals("encrypt") ? "" : value;
         }
 

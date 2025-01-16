@@ -56,7 +56,7 @@ public class MCRMetaDefaultListJSONWriter implements MessageBodyWriter<List<? ex
     public void writeTo(List<? extends MCRMetaDefault> mcrMetaDefaults, Class<?> type, Type genericType,
         Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders,
         OutputStream entityStream) throws IOException, WebApplicationException {
-        LogManager.getLogger().info("Writing JSON array of size: " + mcrMetaDefaults.size());
+        LogManager.getLogger().info(() -> "Writing JSON array of size: " + mcrMetaDefaults.size());
         httpHeaders.putSingle(HttpHeaders.CONTENT_TYPE,
             MediaType.APPLICATION_JSON_TYPE.withCharset(StandardCharsets.UTF_8.toString()));
         JsonArray array = new JsonArray();

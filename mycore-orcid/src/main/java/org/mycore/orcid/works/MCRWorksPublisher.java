@@ -71,7 +71,7 @@ public class MCRWorksPublisher {
         Document workXML = buildWorkXMLFrom(objectID);
         Entity<InputStream> input = buildRequestEntity(workXML);
 
-        LOGGER.info("post (create) {} at {}", objectID, target.getUri());
+        LOGGER.info("post (create) {} at {}", () -> objectID, target::getUri);
         Response response = builder.post(input);
         expect(response, Response.Status.CREATED);
 
@@ -89,7 +89,7 @@ public class MCRWorksPublisher {
         workXML.getRootElement().setAttribute("put-code", work.getPutCode());
         Entity<InputStream> input = buildRequestEntity(workXML);
 
-        LOGGER.info("put (update) {} to {}", oid, target.getUri());
+        LOGGER.info("put (update) {} to {}", () -> oid, target::getUri);
         Response response = builder.put(input);
         expect(response, Response.Status.OK);
     }

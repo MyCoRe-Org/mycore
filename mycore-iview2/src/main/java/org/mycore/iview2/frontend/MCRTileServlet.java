@@ -58,7 +58,7 @@ public class MCRTileServlet extends HttpServlet {
 
     /**
      * Extracts tile or image properties from iview2 file and transmits it.
-     * 
+     *
      * Uses {@link HttpServletRequest#getPathInfo()} (see {@link #getTileInfo(String)}) to get tile attributes.
      * Also uses {@link #MAX_AGE} to tell the client how long it could cache the information.
      */
@@ -67,7 +67,7 @@ public class MCRTileServlet extends HttpServlet {
         final MCRTileInfo tileInfo = getTileInfo(getPathInfo(req));
         Path iviewFile = TFP.getTileFile(tileInfo).orElse(null);
         if (iviewFile == null) {
-            LOGGER.info("TileFile not found: " + tileInfo);
+            LOGGER.info(() -> "TileFile not found: " + tileInfo);
             return;
         }
         if (!Files.exists(iviewFile)) {

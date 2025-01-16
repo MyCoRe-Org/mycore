@@ -279,8 +279,8 @@ public class MCRConditionTransformer {
             q.setFields(returnFields.size() > 0 ? returnFields.stream().collect(Collectors.joining(",")) : "*");
         }
         String sort = q.getSortField();
-        LOGGER.info("MyCoRe Query transformed to: {}{} {}", q.getQuery(), sort != null ? " " + sort : "",
-            q.getFields());
+        LOGGER.info("MyCoRe Query transformed to: {}{} {}", q::getQuery, () -> sort != null ? " " + sort : "",
+            q::getFields);
         return q;
     }
 
@@ -300,11 +300,11 @@ public class MCRConditionTransformer {
 
     /**
      * Builds SOLR query.
-     * 
+     *
      * Automatically builds JOIN-Query if content search fields are used in query.
      * @param sortBy sort criteria
      * @param not true, if all conditions should be negated
-     * @param and AND or OR connective between conditions  
+     * @param and AND or OR connective between conditions
      * @param table conditions per "content" or "metadata"
      * @param maxHits maximum hits
      */

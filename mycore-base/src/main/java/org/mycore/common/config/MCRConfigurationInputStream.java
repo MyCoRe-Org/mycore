@@ -47,7 +47,7 @@ import org.mycore.common.content.MCRURLContent;
  * <li>application modules</li>
  * <li>installation specific files</li>
  * </ol>
- * 
+ *
  * @author Thomas Scheffler (yagee)
  * @author Robert Stephan
  * @since 2013.12
@@ -68,7 +68,7 @@ public class MCRConfigurationInputStream extends InputStream {
     /**
      * Combined Stream of all config files named <code>filename</code> available via
      * {@link MCRRuntimeComponentDetector#getAllComponents()}.
-     * 
+     *
      * @param filename
      *            , e.g. mycore.properties or messages_de.properties
      */
@@ -89,7 +89,7 @@ public class MCRConfigurationInputStream extends InputStream {
      * {@link InputStream} that includes all properties from {@link MCRRuntimeComponentDetector#getAllComponents()} and
      * <strong>mycore.properties</strong>. Use system property <code>MCR.Configuration.File</code> to configure
      * alternative property file.
-     * 
+     *
      * @since 2014.04
      */
     public static MCRConfigurationInputStream getMyCoRePropertiesInstance() throws IOException {
@@ -97,11 +97,11 @@ public class MCRConfigurationInputStream extends InputStream {
         InputStream initStream = null;
         if (configurationDirectory != null) {
             LogManager.getLogger().info("Current configuration directory: {}",
-                configurationDirectory.getAbsolutePath());
+                configurationDirectory::getAbsolutePath);
             // set MCR.basedir, is normally overwritten later
             if (!configurationDirectory.isDirectory()) {
                 LogManager.getLogger().warn("Current configuration directory does not exist: {}",
-                    configurationDirectory.getAbsolutePath());
+                    configurationDirectory::getAbsolutePath);
             }
             initStream = getBaseDirInputStream(configurationDirectory);
         }
@@ -143,7 +143,7 @@ public class MCRConfigurationInputStream extends InputStream {
         File localProperties = MCRConfigurationDir.getConfigFile(filename);
         if (localProperties != null && localProperties.canRead()) {
             empty = false;
-            LogManager.getLogger().info("Loading additional properties from {}", localProperties.getAbsolutePath());
+            LogManager.getLogger().info("Loading additional properties from {}", localProperties::getAbsolutePath);
             cList.add(new FileInputStream(localProperties));
             cList.add(new ByteArrayInputStream(LINE_BREAK));
         }
@@ -175,7 +175,7 @@ public class MCRConfigurationInputStream extends InputStream {
 
     /**
      * return an enumeration of input streams of configuration files
-     * found in MyCoRe components and modules, respecting the proper loading order 
+     * found in MyCoRe components and modules, respecting the proper loading order
      */
     public static LinkedHashMap<String, byte[]> getConfigFileContents(String filename) throws IOException {
         LinkedHashMap<String, byte[]> map = new LinkedHashMap<>();
@@ -189,7 +189,7 @@ public class MCRConfigurationInputStream extends InputStream {
         // load config file from classpath
         try (InputStream configStream = getConfigFileStream(filename)) {
             if (configStream != null) {
-                LogManager.getLogger().debug("Loaded config file from classpath: " + filename);
+                LogManager.getLogger().debug("Loaded config file from classpath: {}", filename);
                 map.put("classpath_" + filename, configStream.readAllBytes());
             }
         }
@@ -197,7 +197,7 @@ public class MCRConfigurationInputStream extends InputStream {
         //load config file from app config dir
         File localConfigFile = MCRConfigurationDir.getConfigFile(filename);
         if (localConfigFile != null && localConfigFile.canRead()) {
-            LogManager.getLogger().debug("Loaded config file from config dir: " + filename);
+            LogManager.getLogger().debug("Loaded config file from config dir: {}", filename);
             try (FileInputStream fis = new FileInputStream(localConfigFile)) {
                 map.put("configdir_" + filename, fis.readAllBytes());
             }

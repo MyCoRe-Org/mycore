@@ -121,7 +121,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
     @Override
     public void run() {
         boolean activated = config.activated(action).orElseGet(config::activated);
-        LOGGER.info("JobQueue {} is {}", action.getName(), activated ? "activated" : "deactivated");
+        LOGGER.info("JobQueue {} is {}", action::getName, () -> activated ? "activated" : "deactivated");
 
         if (!activated) {
             return;
@@ -137,7 +137,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
         processableExecutor = MCRProcessableFactory.newPool(jobExecutor, processableCollection);
         processableCollection.setProperty("running", running);
 
-        LOGGER.info("JobManager for {} with {} thread(s) is started", action.getName(), getMaxJobThreadCount());
+        LOGGER.info("JobManager for {} with {} thread(s) is started", action::getName, this::getMaxJobThreadCount);
         while (running) {
             try {
                 while (hasFreeJobThreads()) {
@@ -161,7 +161,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
         }
         processableCollection.setProperty("running", running);
 
-        LOGGER.info("{} thread finished", getName());
+        LOGGER.info("{} thread finished", this::getName);
         MCRSessionMgr.releaseCurrentSession();
     }
 
@@ -303,7 +303,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
             Constructor<? extends MCRJobAction> actionConstructor = job.getAction().getConstructor(MCRJob.class);
             return actionConstructor.newInstance(job);
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error(e::getMessage, e);
         }
 
         return null;

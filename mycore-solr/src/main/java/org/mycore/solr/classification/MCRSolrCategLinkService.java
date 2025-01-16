@@ -40,7 +40,7 @@ import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 /**
  * Solr extension of the category link service. Updates the solr index on set and delete
  * operations.
- * 
+ *
  * @see MCRSolrCategoryLink
  * @author Matthias Eichner
  */
@@ -67,7 +67,7 @@ public class MCRSolrCategLinkService extends MCRCategLinkServiceImpl {
             SolrClient solrClient = MCRSolrClassificationUtil.getCore().getClient();
             delete(solrClient, reference);
         } catch (Exception exc) {
-            LOGGER.error("Unable to delete links of object {}", reference.getObjectID(), exc);
+            LOGGER.error(() -> "Unable to delete links of object " + reference.getObjectID(), exc);
         }
     }
 
@@ -80,7 +80,7 @@ public class MCRSolrCategLinkService extends MCRCategLinkServiceImpl {
             try {
                 delete(solrClient, reference);
             } catch (Exception exc) {
-                LOGGER.error("Unable to delete links of object {}", reference.getObjectID(), exc);
+                LOGGER.error(() -> "Unable to delete links of object " + reference.getObjectID(), exc);
             }
         }
     }

@@ -116,7 +116,7 @@ public class MCRShutdownHandler {
             cfgSystemName = MCRConfiguration2.getStringOrThrow(PROPERTY_SYSTEM_NAME) + ":";
         } catch (MCRConfigurationException e) {
             //may occur early if there is an error starting mycore up or in JUnit tests
-            logger.warn("Error getting '" + PROPERTY_SYSTEM_NAME + "': {}", e.getMessage());
+            logger.warn(() -> "Error getting '" + PROPERTY_SYSTEM_NAME + "': " + e.getMessage());
         }
         final String system = cfgSystemName;
         System.out.println(system + " Shutting down system, please wait...\n");

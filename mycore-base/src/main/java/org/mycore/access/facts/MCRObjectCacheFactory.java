@@ -31,9 +31,9 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 /**
  * This implementation creates an object cache
  * for MyCoRe objects which are retrieved during the processing of the rules.
- * 
+ *
  * It is registered as event handler to listen for updated and deleted objects.
- *  
+ *
  * @author Robert Stephan
  *
  */
@@ -77,18 +77,18 @@ public class MCRObjectCacheFactory extends MCREventHandlerBase {
     @Override
     protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
         objectCache.remove(obj.getId());
-        LOGGER.debug("removing object {} from cache", obj.getId());
+        LOGGER.debug("removing object {} from cache", obj::getId);
     }
 
     @Override
     protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
         objectCache.remove(obj.getId());
-        LOGGER.debug("removing object {} from cache", obj.getId());
+        LOGGER.debug("removing object {} from cache", obj::getId);
     }
 
     @Override
     protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
         objectCache.remove(obj.getId());
-        LOGGER.debug("removing object {} from cache", obj.getId());
+        LOGGER.debug("removing object {} from cache", obj::getId);
     }
 }

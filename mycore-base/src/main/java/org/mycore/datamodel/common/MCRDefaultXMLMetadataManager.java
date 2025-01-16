@@ -337,7 +337,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
                 String relativeURI = new MessageFormat("{0}/{1}/", Locale.ROOT)
                     .format(new Object[] { project, objectType });
                 URI repURI = svnBase.resolve(relativeURI);
-                LOGGER.info("Resolved {} to {} for {}", relativeURI, repURI.toASCIIString(), property);
+                LOGGER.info("Resolved {} to {} for {}", () -> relativeURI, repURI::toASCIIString, () -> property);
                 MCRConfiguration2.set(property, repURI.toASCIIString());
                 checkAndCreateDirectory(svnPath.resolve(project), project, objectType, configPrefix, readOnly);
             }

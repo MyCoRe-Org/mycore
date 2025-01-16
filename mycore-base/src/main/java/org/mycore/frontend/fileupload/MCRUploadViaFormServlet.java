@@ -68,7 +68,7 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
         }
 
         MCRUploadHandler handler = uh.get();
-        LOGGER.info("UploadHandler form based file upload for ID {}", handler.getID());
+        LOGGER.info("UploadHandler form based file upload for ID {}", handler::getID);
 
         handleUploadedFiles(handler, job.getRequest().getParts());
 

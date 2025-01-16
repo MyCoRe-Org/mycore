@@ -150,7 +150,8 @@ public class MCRMetsSave {
         try (OutputStream metsOut = Files.newOutputStream(metsFile)) {
             XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
             xout.output(document, metsOut);
-            LOGGER.info("Storing file content from \"{}\" to derivate \"{}\"", getMetsFileName(), derivateId);
+            LOGGER.info("Storing file content from \"{}\" to derivate \"{}\"",
+                () -> getMetsFileName(), () -> derivateId);
         } catch (Exception e) {
             LOGGER.error(e);
             return false;
@@ -225,13 +226,13 @@ public class MCRMetsSave {
             XPathExpression<Element> xpath = XPathFactory.instance().compile(fileExistPathString, Filters.element(),
                 null, MCRConstants.METS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
 
-            if (xpath.evaluate(mets).size() > 0) {
+            if (!xpath.evaluate(mets).isEmpty()) {
                 String msgTemplate = "The File : '%s' already exists in mets.xml";
-                LOGGER.warn(String.format(Locale.ROOT, msgTemplate, relPath));
+                LOGGER.warn(() -> String.format(Locale.ROOT, msgTemplate, relPath));
                 return null;
             } else {
                 String msgTemplate = "The File : '%s' does not exists in mets.xml";
-                LOGGER.warn(String.format(Locale.ROOT, msgTemplate, relPath));
+                LOGGER.warn(() -> String.format(Locale.ROOT, msgTemplate, relPath));
             }
 
             // add to file section
@@ -518,7 +519,7 @@ public class MCRMetsSave {
             LOGGER.info("Derivate with id \"{}\" has no mets file. Nothing to do", derivateID);
             return;
         }
-        LOGGER.info("Update {} URNS in mets.xml", fileUrnMap.size());
+        LOGGER.info("Update {} URNS in mets.xml", fileUrnMap::size);
         Mets metsObject = new Mets(mets);
         updateURNsInMetsDocument(metsObject, fileUrnMap);
         saveMets(metsObject.asDocument(), derivateID);
@@ -587,7 +588,7 @@ public class MCRMetsSave {
                             }
                         }
                         for (Fptr fptrToRemove : fptrsToRemove) {
-                            LOGGER.warn(String.format(Locale.ROOT, "remove fptr \"%s\" from mets.xml of \"%s\"",
+                            LOGGER.warn(() -> String.format(Locale.ROOT, "remove fptr \"%s\" from mets.xml of \"%s\"",
                                 fptrToRemove.getFileId(), file.getOwner()));
                             physicalSubDiv.remove(fptrToRemove);
                         }
@@ -599,7 +600,7 @@ public class MCRMetsSave {
                             .getStructMap(LogicalStructMap.TYPE);
 
                         for (SmLink linkToRemove : list) {
-                            LOGGER.warn(String.format(Locale.ROOT, "remove smLink from \"%s\" to \"%s\"",
+                            LOGGER.warn(() -> String.format(Locale.ROOT, "remove smLink from \"%s\" to \"%s\"",
                                 linkToRemove.getFrom(), linkToRemove.getTo()));
                             modifiedMets.getStructLink().removeSmLink(linkToRemove);
                             // modify logical struct Map
@@ -613,7 +614,8 @@ public class MCRMetsSave {
                             LogicalDiv logicalDiv = logicalStructMap.getDivContainer().getLogicalSubDiv(
                                 logID);
                             if (logicalDiv == null) {
-                                LOGGER.error("Could not find {} with id {}", LogicalDiv.class.getSimpleName(), logID);
+                                LOGGER.error("Could not find {} with id {}",
+                                    () -> LogicalDiv.class.getSimpleName(), () -> logID);
                                 LOGGER.error("Mets document remains unchanged");
                                 return mets;
                             }
@@ -701,7 +703,7 @@ public class MCRMetsSave {
                             throw new IOException(e);
                         }
                         if (!fileGroup.contains(path)) {
-                            LOGGER.warn("{} does not appear in {}!", path, mcrPath.getOwner());
+                            LOGGER.warn("{} does not appear in {}!", () -> path, mcrPath::getOwner);
                             complete.set(false);
                             return FileVisitResult.TERMINATE;
                         }
@@ -845,7 +847,7 @@ public class MCRMetsSave {
             // add to struct link
             structLink.addSmLink(new SmLink(lastLogicalDiv.getId(), physicalSubDiv.getId()));
         } catch (Exception exc) {
-            LOGGER.error("Unable to add file {} to mets.xml of {}", href, derivatePath.getOwner(), exc);
+            LOGGER.error(() -> "Unable to add file " + href + " to mets.xml of " + derivatePath.getOwner(), exc);
         }
     }
 

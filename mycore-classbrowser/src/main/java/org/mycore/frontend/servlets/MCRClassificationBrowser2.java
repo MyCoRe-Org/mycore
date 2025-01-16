@@ -52,7 +52,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * categories of a classification. The XML output is transformed to HTML
  * using classificationBrowserData.xsl on the server side, then sent to
  * the client browser, where AJAX does the rest.
- * 
+ *
  * @author Frank Lützenkirchen
  */
 public class MCRClassificationBrowser2 extends MCRServlet {
@@ -73,7 +73,8 @@ public class MCRClassificationBrowser2 extends MCRServlet {
 
     @Override
     public void doGetPost(MCRServletJob job) throws Exception {
-        LOGGER.info("ClassificationBrowser finished in {} ms.", MCRUtils.measure(() -> processRequest(job)).toMillis());
+        long millis = MCRUtils.measure(() -> processRequest(job)).toMillis();
+        LOGGER.info("ClassificationBrowser finished in {} ms.", millis);
     }
 
     private void processRequest(MCRServletJob job) throws IOException, TransformerException, SAXException {
@@ -215,7 +216,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         }
     }
 
-    /** Sends output to client browser 
+    /** Sends output to client browser
      */
     private void renderToHTML(MCRServletJob job, Settings settings, Element xml)
         throws IOException, TransformerException, SAXException {

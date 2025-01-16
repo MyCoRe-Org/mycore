@@ -104,7 +104,7 @@ public class MCRJobRunnable extends MCRAbstractProcessable implements Runnable {
                 transaction.commit();
             } catch (PersistenceException e) {
                 executionException = e;
-                LOGGER.error("Could not start job {}", job.getId(), e);
+                LOGGER.error(() -> "Could not start job " + job.getId(), e);
                 transaction.rollback();
             }
             if (executionException == null) {
@@ -121,7 +121,7 @@ public class MCRJobRunnable extends MCRAbstractProcessable implements Runnable {
                         actionInstance.rollback();
                     } catch (RuntimeException e) {
                         executionException.addSuppressed(e);
-                        LOGGER.error("Could not rollback job {}", job.getId(), e);
+                        LOGGER.error(() -> "Could not rollback job " + job.getId(), e);
                     }
                 }
                 //handle result
@@ -136,7 +136,7 @@ public class MCRJobRunnable extends MCRAbstractProcessable implements Runnable {
                 try {
                     transaction.commit();
                 } catch (PersistenceException e) {
-                    LOGGER.error("Could not save result to job {}", job.getId(), e);
+                    LOGGER.error(() -> "Could not save result to job " + job.getId(), e);
                     transaction.rollback();
                     if (executionException == null) {
                         executionException = e;
@@ -176,7 +176,7 @@ public class MCRJobRunnable extends MCRAbstractProcessable implements Runnable {
             //TODO: check if changes to entities are reflected in database at next transaction or lost
             localJob.setException(exception);
         } catch (IOException e) {
-            LOGGER.error("Could not set exception for job {}", job.getId(), e);
+            LOGGER.error(() -> "Could not set exception for job " + job.getId(), e);
         }
 
         Integer tries = localJob.getTries();

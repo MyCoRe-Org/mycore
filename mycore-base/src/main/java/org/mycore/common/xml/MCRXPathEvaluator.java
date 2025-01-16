@@ -120,8 +120,8 @@ public class MCRXPathEvaluator {
             return xPath.evaluateFirst(context);
         } catch (Exception ex) {
             LOGGER.warn("unable to evaluate XPath: {}", xPathExpression);
-            LOGGER.warn("XPath factory used is {} {}", XPATH_FACTORY.getClass().getCanonicalName(),
-                MCRConfiguration2.getString("MCR.XPathFactory.Class").orElse(null));
+            LOGGER.warn("XPath factory used is {} {}", () -> XPATH_FACTORY.getClass().getCanonicalName(),
+                () -> MCRConfiguration2.getString("MCR.XPathFactory.Class").orElse(null));
             LOGGER.warn(ex);
             return null;
         }

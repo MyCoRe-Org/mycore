@@ -74,7 +74,7 @@ class MCRDataSourceCall implements Callable<Boolean> {
                         break loop;
                     }
 
-                    LOGGER.debug(ds + " with " + id + " starting call...");
+                    LOGGER.debug(() -> ds + " with " + id + " starting call...");
                     Element result = idResolver.resolve(id.getValue());
                     if (result != null) {
                         gotResults = true;
@@ -82,7 +82,7 @@ class MCRDataSourceCall implements Callable<Boolean> {
                         idPool.addIdentifiersFrom(result);
                     }
 
-                    LOGGER.info(ds + " with " + id + " returned " + (result != null ? "" : "no ") + "valid data");
+                    LOGGER.info(() -> ds + " with " + id + " returned " + (result != null ? "" : "no ") + "valid data");
                 }
             }
         }

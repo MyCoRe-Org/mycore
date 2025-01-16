@@ -67,7 +67,7 @@ public final class MCRWCMSUtil {
     public static OutputStream getOutputStream(String path) throws IOException {
         String cleanPath = path.startsWith("/") ? path.substring(1) : path;
         File wcmsDataDirTarget = new File(getWCMSDataDir(), cleanPath);
-        LOGGER.info(String.format(Locale.ROOT, "Writing content to %s.", wcmsDataDirTarget));
+        LOGGER.info(() -> "Writing content to " + wcmsDataDirTarget + ".");
         createDirectoryIfNeeded(wcmsDataDirTarget);
         return new FileOutputStream(wcmsDataDirTarget);
     }

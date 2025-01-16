@@ -338,8 +338,8 @@ public final class MCRResourceResolver {
         @Override
         public MCRResourceResolver get() {
 
-            LOGGER.info("Found providers: " + String.join(", ", providers.keySet()));
-            LOGGER.info("Resolving resources with provider: " + selectedProvider);
+            LOGGER.info(() -> "Found providers: " + String.join(", ", providers.keySet()));
+            LOGGER.info(() -> "Resolving resources with provider: " + selectedProvider);
 
             return new MCRResourceResolver(getHints(), getProvider(selectedProvider));
 
@@ -355,7 +355,7 @@ public final class MCRResourceResolver {
                 builder.add(hint);
             }
 
-            LOGGER.info(description.logMessage("Default hints:"));
+            LOGGER.info(() -> description.logMessage("Default hints:"));
 
             return builder.build();
 
@@ -370,7 +370,8 @@ public final class MCRResourceResolver {
             }
 
             MCRTreeMessage description = selectedProvider.compileDescription(LOGGER.getLevel());
-            LOGGER.info(description.logMessage("Configuration of selected provider " + selectedProviderName + ":"));
+            LOGGER
+                .info(() -> description.logMessage("Configuration of selected provider " + selectedProviderName + ":"));
 
             return selectedProvider;
 

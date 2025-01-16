@@ -235,7 +235,7 @@ public class MCRLanguageFactory {
 
         MCRCategory root = categoryDAO.getCategory(classification, -1);
         if (root == null) {
-            LOGGER.warn("Language classification {} not found", classification.getRootID());
+            LOGGER.warn("Language classification {} not found", classification::getRootID);
             return;
         }
 
