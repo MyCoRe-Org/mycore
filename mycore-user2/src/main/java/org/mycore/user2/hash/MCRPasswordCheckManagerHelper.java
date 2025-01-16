@@ -23,14 +23,12 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.Optional;
-
 import org.mycore.common.MCRException;
 import org.mycore.common.annotation.MCROutdated;
 import org.mycore.common.config.MCRConfigurationDir;
@@ -99,7 +97,7 @@ final class MCRPasswordCheckManagerHelper {
             if (!file.isFile() || !file.canRead()) {
                 throw new MCRException("Expected " + file.getAbsolutePath() + " to be a readable file");
             }
-            try (BufferedReader reader = new BufferedReader(new FileReader(file, UTF_8), 128)) {
+            try (BufferedReader reader = new BufferedReader(Files.newBufferedReader(file.toPath(), UTF_8), 128)) {
                 return Optional.of(readUnmodifiableConfiguration(reader));
             } catch (IOException e) {
                 throw new MCRException("Unable to read file " + file.getAbsolutePath());
@@ -163,7 +161,7 @@ final class MCRPasswordCheckManagerHelper {
                 }
             }
 
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, UTF_8), 128)) {
+            try (BufferedWriter writer = new BufferedWriter(Files.newBufferedWriter(file.toPath(), UTF_8), 128)) {
                 writer.write(configuration.className());
                 writer.newLine();
                 writer.write(configuration.hint());

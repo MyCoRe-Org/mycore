@@ -207,9 +207,8 @@ public class MCRWCMSFileBrowserResource {
     protected void saveFile(InputStream inputStream, String path) throws IOException {
         String newPath = testIfFileExists(path);
         OutputStream outputStream = MCRWCMSUtil.getOutputStream(newPath);
-        int read = 0;
+        int read;
         byte[] bytes = new byte[1024];
-
         while ((read = inputStream.read(bytes)) != -1) {
             outputStream.write(bytes, 0, read);
         }

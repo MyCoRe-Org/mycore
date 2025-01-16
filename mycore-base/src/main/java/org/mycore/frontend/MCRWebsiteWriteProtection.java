@@ -18,10 +18,12 @@
 
 package org.mycore.frontend;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-
+import java.io.OutputStream;
+import java.nio.file.Files;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -33,9 +35,6 @@ import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 public final class MCRWebsiteWriteProtection {
     private static final String FS = System.getProperty("file.separator");
@@ -122,12 +121,10 @@ public final class MCRWebsiteWriteProtection {
 
     private static void setConfiguration(Element configXML) {
         try {
-            // save
             XMLOutputter xmlOut = new XMLOutputter();
-            FileOutputStream fos = new FileOutputStream(CONFIG_FILE);
-            xmlOut.output(configXML, fos);
-            fos.flush();
-            fos.close();
+            try(OutputStream fileOutputStream = Files.newOutputStream(CONFIG_FILE.toPath())) {
+                xmlOut.output(configXML, fileOutputStream);
+            }
         } catch (IOException e) {
             LOGGER.debug(e);
         }

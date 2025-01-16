@@ -18,11 +18,13 @@
 
 package org.mycore.frontend.cli;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,7 +42,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
@@ -50,7 +51,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-
 import org.apache.commons.lang3.function.FailableBiConsumer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -101,9 +101,6 @@ import org.mycore.tools.MCRTopologicalSort;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
-
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
 
 /**
  * Provides static methods that implement commands for the MyCoRe command line interface. Robert: Ideas for clean-up -
@@ -804,14 +801,14 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the file instance to store
      * @param extension
      *            the file extension to use
-     * @param trans
+     * @param consumer
      *            the transformation
      * @param nid
      *            the MCRObjectID
      * @return true if the store was okay (see description), else return false
      */
     private static boolean exportObject(File dir, String extension,
-        FailableBiConsumer<MCRContent, OutputStream, Exception> trans,
+        FailableBiConsumer<MCRContent, OutputStream, Exception> consumer,
         String nid) throws IOException, MCRException {
         MCRContent content;
         try {
@@ -820,13 +817,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         } catch (MCRException ex) {
             return false;
         }
-
         File xmlOutput = new File(dir, nid + "." + extension);
-
-        if (trans != null) {
-            FileOutputStream out = new FileOutputStream(xmlOutput);
-            try {
-                trans.accept(content, out);
+        if (consumer != null) {
+            try(OutputStream fileOutputStream = Files.newOutputStream(xmlOutput.toPath())) {
+                consumer.accept(content, fileOutputStream);
             } catch (UncheckedIOException e) {
                 throw e.getCause();
             } catch (IOException | RuntimeException e) {

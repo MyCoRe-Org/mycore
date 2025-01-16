@@ -20,15 +20,14 @@ package org.mycore.impex;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
-
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.logging.log4j.LogManager;
@@ -154,8 +153,10 @@ public class MCRTransferPackagePacker extends MCRPacker {
      * @throws IOException something went wrong while packing
      */
     private void buildTar(Path pathToTar, MCRTransferPackage transferPackage) throws IOException {
-        FileOutputStream fos = new FileOutputStream(pathToTar.toFile());
-        try (TarArchiveOutputStream tarOutStream = new TarArchiveOutputStream(fos)) {
+        try (
+            OutputStream fileOutputStream = Files.newOutputStream(pathToTar);
+            TarArchiveOutputStream tarOutStream = new TarArchiveOutputStream(fileOutputStream)
+        ) {
             for (Entry<String, MCRContent> contentEntry : transferPackage.getContent().entrySet()) {
                 String filePath = contentEntry.getKey();
                 byte[] data = contentEntry.getValue().asByteArray();

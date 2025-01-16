@@ -19,8 +19,8 @@
 package org.mycore.frontend.cli;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -37,11 +37,9 @@ import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -486,10 +484,10 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             .collect(Collectors.toList());
     }
 
-    private static void exportDerivate(File dir, Transformer trans, String extension, String nid)
+    private static void exportDerivate(File dir, Transformer transformer, String extension, String nid)
         throws TransformerException, IOException {
         // store the XML file
-        Document xml = null;
+        Document xml;
         MCRDerivate obj;
 
         MCRObjectID derivateID = MCRObjectID.getInstance(nid);
@@ -517,17 +515,15 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             return;
         }
         File xmlOutput = new File(dir, derivateID + "." + extension);
-        FileOutputStream out = new FileOutputStream(xmlOutput);
         File directoryFile = new File(dir, derivateID.toString());
-
-        if (trans != null) {
-            trans.setParameter("dirname", directoryFile.getPath());
-            StreamResult sr = new StreamResult(out);
-            trans.transform(new JDOMSource(xml), sr);
-        } else {
-            new XMLOutputter().output(xml, out);
-            out.flush();
-            out.close();
+        try(OutputStream fileOutputStream = Files.newOutputStream(xmlOutput.toPath())) {
+            if (transformer != null) {
+                transformer.setParameter("dirname", directoryFile.getPath());
+                StreamResult sr = new StreamResult(fileOutputStream);
+                transformer.transform(new JDOMSource(xml), sr);
+            } else {
+                new XMLOutputter().output(xml, fileOutputStream);
+            }
         }
 
         LOGGER.info("Object {} stored under {}.", nid, xmlOutput);

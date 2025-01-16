@@ -18,16 +18,19 @@
 
 package org.mycore.wcms2;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -40,11 +43,6 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.util.MCRServletContentHelper;
 import org.mycore.common.function.MCRThrowFunction;
 import org.mycore.wcms2.datamodel.MCRNavigation;
-
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
 
 public final class MCRWCMSUtil {
 
@@ -69,7 +67,7 @@ public final class MCRWCMSUtil {
         File wcmsDataDirTarget = new File(getWCMSDataDir(), cleanPath);
         LOGGER.info(() -> "Writing content to " + wcmsDataDirTarget + ".");
         createDirectoryIfNeeded(wcmsDataDirTarget);
-        return new FileOutputStream(wcmsDataDirTarget);
+        return Files.newOutputStream(wcmsDataDirTarget.toPath());
     }
 
     private static void createDirectoryIfNeeded(File targetFile) throws IOException {

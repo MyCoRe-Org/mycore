@@ -18,11 +18,13 @@
 
 package org.mycore.frontend.cli;
 
+import jakarta.persistence.EntityManager;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,17 +34,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRConstants;
@@ -63,8 +61,6 @@ import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-
-import jakarta.persistence.EntityManager;
 
 /**
  * Commands for the classification system.
@@ -265,7 +261,6 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             + "with the stylesheet {2}-classification.xsl. For {2}, the default is xsl/save.",
         order = 60)
     public static void export(String id, String dirname, String style) throws Exception {
-
         File dir = new File(dirname);
         if (!dir.isDirectory()) {
             LOGGER.error("{} is not a directory.", dirname);
@@ -277,18 +272,12 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
 
         Transformer trans = getTransformer(style != null ? style + "-classification" : null);
         String extension = MCRXSLTransformerUtils.getFileExtension(trans, "xml");
-
         File xmlOutput = new File(dir, id + "." + extension);
-        FileOutputStream out = new FileOutputStream(xmlOutput);
-        if (trans != null) {
-            StreamResult sr = new StreamResult(out);
-            trans.transform(new JDOMSource(classDoc), sr);
-        } else {
-            XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-            xout.output(classDoc, out);
-            out.flush();
+        try(OutputStream fileOutputStream = Files.newOutputStream(xmlOutput.toPath())) {
+            StreamResult streamResult = new StreamResult(fileOutputStream);
+            trans.transform(new JDOMSource(classDoc), streamResult);
         }
-        LOGGER.info("Classifcation {} saved to {}.", () -> id, () -> {
+        LOGGER.info("Classification {} saved to {}.", () -> id, () -> {
             try {
                 return xmlOutput.getCanonicalPath();
             } catch (IOException e) {

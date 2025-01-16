@@ -19,10 +19,10 @@
 package org.mycore.services.i18n;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -39,9 +39,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import javax.xml.parsers.DocumentBuilder;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
@@ -459,7 +457,7 @@ public class MCRTranslation {
             rb.keySet().forEach(key -> props.put(key, rb.getString(key)));
             File resolvedMsgFile = MCRConfigurationDir.getConfigFile("messages_" + lang + ".resolved.properties");
             if (resolvedMsgFile != null) {
-                try (OutputStream os = new FileOutputStream(resolvedMsgFile)) {
+                try (OutputStream os = Files.newOutputStream(resolvedMsgFile.toPath())) {
                     props.store(os, "MyCoRe Messages for Locale " + lang);
                 } catch (IOException e) {
                     LOGGER.warn(() -> "Could not store resolved properties to " + resolvedMsgFile.getAbsolutePath(), e);
