@@ -94,7 +94,7 @@ public class MCRCommandLineInterface {
      * reads a file containing a list of commands to be processed
      */
     public static void main(String[] args) {
-        if (!(MCRCommandLineInterface.class.getClassLoader() instanceof URLClassLoader)) {
+        if (!(Thread.currentThread().getContextClassLoader() instanceof URLClassLoader)) {
             System.out.println("Current ClassLoader is not extendable at runtime. Using workaround.");
             Thread.currentThread().setContextClassLoader(new CLIURLClassLoader(new URL[0]));
         }

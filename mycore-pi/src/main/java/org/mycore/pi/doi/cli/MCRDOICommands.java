@@ -303,7 +303,7 @@ public class MCRDOICommands {
         final Schema schema;
         try {
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            URL localSchemaURL = MCRDOIService.class.getClassLoader().getResource(CROSSREF_SCHEMA_PATH);
+            URL localSchemaURL = Thread.currentThread().getContextClassLoader().getResource(CROSSREF_SCHEMA_PATH);
             if (localSchemaURL == null) {
                 LOGGER.error(CROSSREF_SCHEMA_PATH + " was not found!");
                 return;

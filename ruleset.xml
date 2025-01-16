@@ -341,10 +341,7 @@
   <rule ref="category/java/errorprone.xml/UseEqualsToCompareStrings"/>
   <rule ref="category/java/errorprone.xml/UselessOperationOnImmutable"/>
   <rule ref="category/java/errorprone.xml/UseLocaleWithCaseConversions"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/errorprone.xml/UseProperClassLoader"/>
-  -->
 
   <!-- Multithreading Rules -->
   <!-- TODO: Create PR to fix this rule -->

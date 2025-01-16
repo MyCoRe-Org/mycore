@@ -81,14 +81,14 @@ import jakarta.xml.bind.annotation.XmlValue;
  */
 public class MCRUserAttributeMapper {
 
-    private static Logger LOGGER = LogManager.getLogger(MCRUserAttributeMapper.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRUserAttributeMapper.class);
 
-    private HashMap<String, List<Attribute>> attributeMapping = new HashMap<>();
+    private final HashMap<String, List<Attribute>> attributeMapping = new HashMap<>();
 
     public static MCRUserAttributeMapper instance(Element attributeMapping) {
         try {
             JAXBContext jaxb = JAXBContext.newInstance(Mappings.class.getPackage().getName(),
-                Mappings.class.getClassLoader());
+                Thread.currentThread().getContextClassLoader());
 
             Unmarshaller unmarshaller = jaxb.createUnmarshaller();
             Mappings mappings = (Mappings) unmarshaller.unmarshal(new JDOMSource(attributeMapping));
@@ -108,7 +108,6 @@ public class MCRUserAttributeMapper {
      * @param attributes a collection of attributes to map
      * @return <code>true</code> if any attribute was changed
      */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     public boolean mapAttributes(final Object object, final Map<String, ?> attributes) throws Exception {
         boolean changed = false;
         for (Object annotated : getAnnotated(object)) {

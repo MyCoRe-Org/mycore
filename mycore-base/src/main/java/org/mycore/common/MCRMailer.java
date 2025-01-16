@@ -553,7 +553,8 @@ public class MCRMailer extends MCRServlet {
 
         private static JAXBContext initContext() {
             try {
-                return JAXBContext.newInstance(EMail.class.getPackage().getName(), EMail.class.getClassLoader());
+                return JAXBContext.newInstance(EMail.class.getPackage().getName(), Thread.currentThread()
+                    .getContextClassLoader());
             } catch (final JAXBException e) {
                 throw new MCRException("Could not instantiate JAXBContext.", e);
             }

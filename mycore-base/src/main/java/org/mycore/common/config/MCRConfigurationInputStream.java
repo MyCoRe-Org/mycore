@@ -165,7 +165,7 @@ public class MCRConfigurationInputStream extends InputStream {
         if (cfgFile.canRead()) {
             input = new MCRFileContent(cfgFile);
         } else {
-            URL url = MCRConfigurationInputStream.class.getClassLoader().getResource(filename);
+            URL url = Thread.currentThread().getContextClassLoader().getResource(filename);
             if (url != null) {
                 input = new MCRURLContent(url);
             }
