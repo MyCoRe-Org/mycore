@@ -107,7 +107,7 @@
 import { computed, inject, ref, onErrorCaptured } from "vue";
 import { createAccessKey, getAccessKey } from "@/api/service";
 import { generateRandomString } from "@/utils";
-import AccessKeyDto from "@/dtos/AccessKeyDto";
+import { AccessKeyDto, CreateAccessKeyDto } from "@/dtos/accesskey";
 import { referenceKey, availablePermissionsKey } from "@/keys";
 import useVuelidate from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
@@ -171,12 +171,12 @@ const handleCreateAccessKey = async () => {
       if (!v.value.$error) {
         busy.value = true;
         try {
-          const accessKeyDto: AccessKeyDto = {
+          const accessKeyDto = {
             reference: form.value.reference,
-            value: form.value.value,
+            secret: form.value.value,
             isActive: form.value.isActive,
             permission: form.value.permission,
-          };
+          } as CreateAccessKeyDto;
           if (form.value.expiration) {
             accessKeyDto.expiration = Math.floor(new Date(form.value.expiration).getTime());
           }

@@ -94,7 +94,7 @@ import {
 } from "@/api/service";
 import { referenceKey, availablePermissionsKey } from "@/keys";
 import LoadingOverlay from "@/components/LoadingOverlay.vue";
-import AccessKeyDto from "@/dtos/AccessKeyDto";
+import { AccessKeyDto } from "@/dtos/accesskey";
 import AccessKeyTable from "@/components/AccessKeyTable.vue";
 import CreateAccessKeyModal from "@/components/CreateAccessKeyModal.vue";
 import AccessKeyModal from "@/components/AccessKeyModal.vue";

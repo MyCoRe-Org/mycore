@@ -86,8 +86,7 @@
 </template>
 <script setup lang="ts">
 import { computed, ref, onErrorCaptured, inject, watch } from "vue";
-import AccessKeyDto from "@/dtos/AccessKeyDto";
-import PartialUpdateAccessKeyDto from "@/dtos/PartialUpdateAccessKeyDto";
+import { AccessKeyDto, PartialUpdateAccessKeyDto } from "@/dtos/accesskey";
 import BaseModal from "@/components/BaseModal.vue";
 import { availablePermissionsKey, referenceKey } from "@/keys";
 import { required } from "@vuelidate/validators";

@@ -1,6 +1,5 @@
 import { AxiosResponse } from "axios";
-import AccessKeyDto from "@/dtos/AccessKeyDto";
-import PartialUpdateAccessKeyDto from "@/dtos/PartialUpdateAccessKeyDto";
+import { AccessKeyDto, CreateAccessKeyDto, PartialUpdateAccessKeyDto } from "@/dtos/accesskey";
 import instance from "./axios";
 
 const extractResponse = (response: AxiosResponse) => {
@@ -43,7 +42,7 @@ export const getAccessKeys = async (offset: number, limit: number): Promise<Acce
 
 export const getAccessKey = async (id: string): Promise<AccessKeyDto> =>
   (await instance.get<AccessKeyDto>(`${API_URL}${id}`)).data;
-export const createAccessKey = async (accessKey: AccessKeyDto): Promise<string> =>
+export const createAccessKey = async (accessKey: CreateAccessKeyDto): Promise<string> =>
   (
     (await instance.post(API_URL, accessKey, {
       headers: {

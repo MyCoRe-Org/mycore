@@ -44,7 +44,7 @@
   </table>
 </template>
 <script setup lang="ts">
-import AccessKeyDto from "@/dtos/AccessKeyDto";
+import { AccessKeyDto } from "@/dtos/accesskey";
 
 defineProps<{
   accessKeys: AccessKeyDto[];
