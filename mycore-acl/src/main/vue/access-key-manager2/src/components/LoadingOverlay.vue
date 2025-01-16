@@ -1,5 +1,8 @@
 <template>
-  <div v-if="loading" class="overlay">
+  <div
+    v-if="loading"
+    class="overlay"
+  >
     <div class="d-flex justify-content-center">
       <div
         class="spinner-grow text-primary"

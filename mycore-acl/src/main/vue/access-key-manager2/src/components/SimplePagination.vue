@@ -7,7 +7,10 @@
         @click="jumpToPage(currentPage - 1)"
         @keyDown="jumpToPage(currentPage - 1)"
       >
-        <a class="page-link" href="#">
+        <a
+          class="page-link"
+          href="#"
+        >
           {{ $t("component.acl.accesskey.frontend.button.previous") }}
         </a>
       </li>
@@ -19,7 +22,10 @@
         @click="jumpToPage(page)"
         @keyDown="jumpToPage(page)"
       >
-        <a class="page-link" href="#">
+        <a
+          class="page-link"
+          href="#"
+        >
           {{ page }}
         </a>
       </li>
@@ -29,7 +35,10 @@
         @click="jumpToPage(currentPage + 1)"
         @keyDown="jumpToPage(currentPage + 1)"
       >
-        <a class="page-link" href="#">
+        <a
+          class="page-link"
+          href="#"
+        >
           {{ $t("component.acl.accesskey.frontend.button.next") }}
         </a>
       </li>

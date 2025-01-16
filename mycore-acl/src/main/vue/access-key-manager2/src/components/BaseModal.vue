@@ -1,14 +1,32 @@
 <template>
-  <div v-if="show" class="modal-backdrop" @click="close" @keyDown="close">
-    <div class="modal-dialog modal-dialog-centered" :class="style" role="document" @click.stop="">
+  <div
+    v-if="show"
+    class="modal-backdrop"
+    @click="close"
+    @keyDown="close"
+  >
+    <div
+      class="modal-dialog modal-dialog-centered"
+      :class="style"
+      role="document"
+      @click.stop=""
+    >
       <div class="modal-content">
         <div class="modal-header">
           <slot name="title">
             <h5 class="modal-title">
               {{ title }}
             </h5>
-            <button v-if="!hideHeaderClose" type="button" class="close" aria-label="Close">
-              <span aria-hidden="true" @click="close">&times;</span>
+            <button
+              v-if="!hideHeaderClose"
+              type="button"
+              class="close"
+              aria-label="Close"
+            >
+              <span
+                aria-hidden="true"
+                @click="close"
+              >&times;</span>
             </button>
           </slot>
         </div>
@@ -17,10 +35,19 @@
         </div>
         <div class="modal-footer">
           <slot name="footer">
-            <button v-if="!okOnly" type="button" class="btn btn-secondary" @click="cancel">
+            <button
+              v-if="!okOnly"
+              type="button"
+              class="btn btn-secondary"
+              @click="cancel"
+            >
               {{ cancelTitle }}
             </button>
-            <button type="button" class="btn btn-primary" @click="ok">
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="ok"
+            >
               {{ okTitle }}
             </button>
           </slot>

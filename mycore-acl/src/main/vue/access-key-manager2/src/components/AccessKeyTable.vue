@@ -1,12 +1,12 @@
 <template>
   <table class="table">
     <colgroup>
-      <col style="width: 30%" />
-      <col style="width: 35%" />
-      <col style="width: 10%" />
-      <col style="width: 10%" />
-      <col style="width: 10%" />
-      <col style="width: 5%" />
+      <col style="width: 30%">
+      <col style="width: 35%">
+      <col style="width: 10%">
+      <col style="width: 10%">
+      <col style="width: 10%">
+      <col style="width: 5%">
     </colgroup>
     <thead>
       <tr>
@@ -19,7 +19,10 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="(accessKey, index) in accessKeys" :key="index">
+      <tr
+        v-for="(accessKey, index) in accessKeys"
+        :key="index"
+      >
         <td>{{ accessKey.id }}</td>
         <td>{{ accessKey.reference }}</td>
         <td>
@@ -31,10 +34,16 @@
         </td>
         <td>
           <div class="btn-group">
-            <button class="btn shadow-none" @click="viewAccessKey(index)">
+            <button
+              class="btn shadow-none"
+              @click="viewAccessKey(index)"
+            >
               <i class="fa fa-eye" />
             </button>
-            <button class="btn shadow-none" @click="removeAccessKey(index)">
+            <button
+              class="btn shadow-none"
+              @click="removeAccessKey(index)"
+            >
               <i class="fa fa-trash" />
             </button>
           </div>

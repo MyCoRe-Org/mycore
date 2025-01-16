@@ -1,21 +1,25 @@
-import { createApp } from "vue";
+import { App, createApp } from "vue";
 import { createI18n } from "vue-i18n";
-import { useConfigStore } from "@/stores";
-import { createPinia } from "pinia";
 import {
   getReference,
   getWebApplicationBaseURL,
   fetchI18n,
   getAvailablePermissions,
+  fetchJWT,
+  fetchConfig,
 } from "@/utils";
-import { referenceKey, availablePermissionsKey } from "@/keys";
+import { referenceKey, availablePermissionsKey, configKey, webApplicationBaseUrlKey, accessKeyServiceKey } from "@/keys";
 import ContactManager from "@/App.vue";
+import router from './router';
+import { Config } from "./config";
+import { AccessKeyService } from "./api/service";
 
-const webApplicationBaseURL = getWebApplicationBaseURL() as string;
+const ALLOWED_SESSION_TYPES = "MCR.ACL.AccessKey.Strategy.AllowedSessionPermissionTypes";
+const webApplicationBaseUrl = getWebApplicationBaseURL() as string;
 
-(async () => {
-  const data = await fetchI18n(webApplicationBaseURL);
-  const i18n = createI18n({
+const initializeI18n = async () => {
+  const data = await fetchI18n(webApplicationBaseUrl);
+  return createI18n({
     legacy: false,
     locale: "_",
     messages: {
@@ -23,13 +27,17 @@ const webApplicationBaseURL = getWebApplicationBaseURL() as string;
     },
     warnHtmlInMessage: "off",
   });
-  const app = createApp(ContactManager);
-  app.use(createPinia());
-  const configStore = useConfigStore();
-  app.provide(referenceKey, getReference());
-  app.provide(availablePermissionsKey, getAvailablePermissions());
-  configStore.webApplicationBaseURL = webApplicationBaseURL;
-  app.use(i18n);
+}
+
+const initializeConfig = async (): Promise<Config> => {
+  const data = await fetchConfig(webApplicationBaseUrl);
+  return {
+    isSessionEnabled: data[ALLOWED_SESSION_TYPES] !== undefined && data[ALLOWED_SESSION_TYPES].length > 0,
+    allowedSessionPermissionTypes: data[ALLOWED_SESSION_TYPES].split(","),
+  } as Config;
+}
+
+const setErrorHandler = (app: App) => {
   app.config.errorHandler = (err, instance, info) => {
     // eslint-disable-next-line
     console.error('Global error:', err);
@@ -38,5 +46,28 @@ const webApplicationBaseURL = getWebApplicationBaseURL() as string;
     // eslint-disable-next-line
     console.log('Error info:', info);
   };
-  app.mount("#app");
-})();
+}
+
+const initializeApp = async () => {
+  try {
+    const i18n = await initializeI18n();
+    const config = initializeConfig();
+    const authorizationHeader = (process.env.NODE_ENV === "development")
+      ? `Basic ${process.env.VUE_APP_API_TOKEN}` : `Bearer ${await fetchJWT(webApplicationBaseUrl)}`
+    const accessKeyService = new AccessKeyService(webApplicationBaseUrl, authorizationHeader);
+    const app = createApp(ContactManager);
+    app.provide(referenceKey, getReference());
+    app.provide(availablePermissionsKey, getAvailablePermissions());
+    app.provide(webApplicationBaseUrlKey, webApplicationBaseUrl);
+    app.provide(configKey, config);
+    app.provide(accessKeyServiceKey, accessKeyService);
+    app.use(i18n);
+    app.use(router);
+    setErrorHandler(app);
+    app.mount("#app");
+  } catch(error) {
+    router.push('/error')
+  }
+};
+
+initializeApp();

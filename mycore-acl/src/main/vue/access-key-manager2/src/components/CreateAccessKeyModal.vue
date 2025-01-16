@@ -7,19 +7,31 @@
     :busy="busy"
     @close="handleClose()"
   >
-    <div v-if="errorMessage" class="alert alert-danger text-center" role="alert">
+    <div
+      v-if="errorMessage"
+      class="alert alert-danger text-center"
+      role="alert"
+    >
       {{ $t(errorMessage) }}
     </div>
     <div>
       <p>{{ $t("component.acl.accesskey.frontend.description.createAccesskey") }}</p>
     </div>
     <form>
-      <div v-if="globalReference === undefined" class="form-group required">
+      <div
+        v-if="globalReference === undefined"
+        class="form-group required"
+      >
         <label for="inputReference">
           {{ $t("component.acl.accesskey.frontend.label.reference") }}
         </label>
         <div class="input-group">
-          <input id="inputReference" v-model="form.reference" type="text" class="form-control" />
+          <input
+            id="inputReference"
+            v-model="form.reference"
+            type="text"
+            class="form-control"
+          >
         </div>
       </div>
       <div class="form-group required">
@@ -28,11 +40,20 @@
         </label>
         <div class="input-group">
           <div class="input-group-prepend">
-            <button class="btn btn-primary" type="button" @click="generateValue">
+            <button
+              class="btn btn-primary"
+              type="button"
+              @click="generateValue"
+            >
               <i class="fa fa-shuffle" />
             </button>
           </div>
-          <input id="inputValue" v-model="form.secret" type="text" class="form-control" />
+          <input
+            id="inputValue"
+            v-model="form.secret"
+            type="text"
+            class="form-control"
+          >
         </div>
       </div>
       <div class="form-row">
@@ -46,22 +67,38 @@
             v-model="form.type"
             class="form-control"
           >
-            <option value="" disabled>
+            <option
+              value=""
+              disabled
+            >
               {{ $t("component.acl.accesskey.frontend.select") }}
             </option>
-            <template v-for="permissionValue in availablePermissions" :key="permissionValue">
+            <template
+              v-for="permissionValue in availablePermissions"
+              :key="permissionValue"
+            >
               <option :value="permissionValue">
                 {{ $t(`component.acl.accesskey.frontend.label.permission.${permissionValue}`) }}
               </option>
             </template>
           </select>
-          <input v-else id="inputPermission" v-model="form.type" class="form-control" />
+          <input
+            v-else
+            id="inputPermission"
+            v-model="form.type"
+            class="form-control"
+          >
         </div>
         <div class="form-group col-md-6">
           <label for="expirationInput">
             {{ $t("component.acl.accesskey.frontend.label.expiration") }}
           </label>
-          <input id="expirationInput" v-model="form.expiration" type="date" class="form-control" />
+          <input
+            id="expirationInput"
+            v-model="form.expiration"
+            type="date"
+            class="form-control"
+          >
         </div>
       </div>
       <div class="form-group">
@@ -71,8 +108,11 @@
             v-model="form.isActive"
             class="form-check-input"
             type="checkbox"
-          />
-          <label class="form-check-label" for="inputActive">
+          >
+          <label
+            class="form-check-label"
+            for="inputActive"
+          >
             {{ $t("component.acl.accesskey.frontend.label.active") }}
           </label>
         </div>
@@ -81,7 +121,12 @@
         <label for="commentTextarea">
           {{ $t("component.acl.accesskey.frontend.label.comment") }}
         </label>
-        <textarea id="commentTextarea" v-model="form.comment" class="form-control" rows="3" />
+        <textarea
+          id="commentTextarea"
+          v-model="form.comment"
+          class="form-control"
+          rows="3"
+        />
       </div>
     </form>
     <template #footer>
@@ -105,13 +150,13 @@
 
 <script setup lang="ts">
 import { computed, inject, ref, onErrorCaptured } from "vue";
-import { createAccessKey, getAccessKey } from "@/api/service";
 import { generateRandomString } from "@/utils";
 import { AccessKeyDto, CreateAccessKeyDto } from "@/dtos/accesskey";
-import { referenceKey, availablePermissionsKey } from "@/keys";
+import { referenceKey, availablePermissionsKey, accessKeyServiceKey } from "@/keys";
 import useVuelidate from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import BaseModal from "@/components/BaseModal.vue";
+import { AccessKeyService } from "@/api/service";
 
 defineProps<{
   showModal: boolean;
@@ -134,6 +179,7 @@ const emit = defineEmits<{
 
 const globalReference: string | undefined = inject(referenceKey);
 const availablePermissions: string[] | undefined = inject(availablePermissionsKey);
+const accessKeyService: AccessKeyService | undefined = inject(accessKeyServiceKey);
 const errorMessage = ref<string | undefined>(undefined);
 const busy = ref<boolean>(false);
 const defaultForm = {
@@ -165,7 +211,7 @@ const handleClose = (force?: boolean) => {
   }
 };
 const handleCreateAccessKey = async () => {
-  if (!busy.value) {
+  if (accessKeyService && !busy.value) {
     v.value.$validate();
     if (!v.value.$invalid) {
       if (!v.value.$error) {
@@ -183,8 +229,8 @@ const handleCreateAccessKey = async () => {
           if (form.value.comment) {
             accessKeyDto.comment = form.value.comment;
           }
-          const createdId = await createAccessKey(accessKeyDto);
-          const createdAccessKey = await getAccessKey(createdId);
+          const createdId = await accessKeyService.createAccessKey(accessKeyDto);
+          const createdAccessKey = await accessKeyService.getAccessKey(createdId);
           emit("access-key-created", form.value.secret, createdAccessKey);
           handleClose(true);
         } catch (error) {
