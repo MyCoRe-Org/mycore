@@ -173,7 +173,7 @@ public class MCRDOICommands {
 
     private static MCRObjectID getObjectID(URI uri) {
         String s = uri.toString();
-        String idString = s.substring(s.lastIndexOf("/") + 1);
+        String idString = s.substring(s.lastIndexOf('/') + 1);
 
         return MCRObjectID.getInstance(idString);
     }
@@ -220,7 +220,7 @@ public class MCRDOICommands {
             if (uri.toString().startsWith(registrationService.getRegisterURL())) {
                 String s = uri.toString();
                 LOGGER.info("Checking DOI: {} / {}", doi::asString, () -> s);
-                String idString = s.substring(s.lastIndexOf("/") + 1);
+                String idString = s.substring(s.lastIndexOf('/') + 1);
 
                 MCRObjectID objectID = MCRObjectID.getInstance(idString);
                 if (MCRMetadataManager.exists(objectID)) {

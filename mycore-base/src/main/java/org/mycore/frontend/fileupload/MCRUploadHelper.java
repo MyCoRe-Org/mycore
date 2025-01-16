@@ -192,7 +192,7 @@ public final class MCRUploadHelper {
     }
 
     static String getFileName(String path) {
-        int pos = Math.max(path.lastIndexOf('\\'), path.lastIndexOf("/"));
+        int pos = Math.max(path.lastIndexOf('\\'), path.lastIndexOf('/'));
         return path.substring(pos + 1);
     }
 

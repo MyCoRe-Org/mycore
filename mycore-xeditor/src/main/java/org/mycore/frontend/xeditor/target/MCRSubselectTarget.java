@@ -44,7 +44,7 @@ public class MCRSubselectTarget implements MCREditorTarget {
         throws Exception {
         session.getSubmission().setSubmittedValues(job.getRequest().getParameterMap());
 
-        int pos = parameter.lastIndexOf(":");
+        int pos = parameter.lastIndexOf(':');
         String xPath = parameter.substring(0, pos);
         String href = decode(parameter.substring(pos + 1));
 

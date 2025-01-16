@@ -87,8 +87,8 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
     private String retrieveMCRObjectIDfromSOLR(String mcrid) {
         String result = mcrid;
         if (mcrid != null && mcrid.contains(":") && !objectSolrFields.isEmpty()) {
-            String key = mcrid.substring(0, mcrid.indexOf(":"));
-            String value = mcrid.substring(mcrid.indexOf(":") + 1);
+            String key = mcrid.substring(0, mcrid.indexOf(':'));
+            String value = mcrid.substring(mcrid.indexOf(':') + 1);
             if (objectSolrFields.contains(key)) {
                 ModifiableSolrParams params = new ModifiableSolrParams();
                 params.set("start", 0);
@@ -130,8 +130,8 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
         String result = derid;
         if (mcrObjId != null && derid != null
             && derid.contains(":") && !derivateSolrFields.isEmpty()) {
-            String key = derid.substring(0, derid.indexOf(":"));
-            String value = derid.substring(derid.indexOf(":") + 1);
+            String key = derid.substring(0, derid.indexOf(':'));
+            String value = derid.substring(derid.indexOf(':') + 1);
             if (derivateSolrFields.contains(key)) {
                 ModifiableSolrParams params = new ModifiableSolrParams();
                 params.set("start", 0);

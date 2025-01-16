@@ -86,7 +86,7 @@ public class MCRXPathEvaluator {
         if (expression.startsWith("i18n:")) {
             updatedI18nExpression = expression.substring(5);
             if (updatedI18nExpression.contains(",")) {
-                int pos = updatedI18nExpression.indexOf(",");
+                int pos = updatedI18nExpression.indexOf(',');
                 String key = updatedI18nExpression.substring(0, pos);
                 String xPath = updatedI18nExpression.substring(pos + 1);
                 updatedI18nExpression = "i18n:translate('" + key + "'," + xPath + ")";

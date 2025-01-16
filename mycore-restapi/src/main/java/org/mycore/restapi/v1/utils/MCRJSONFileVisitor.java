@@ -128,7 +128,7 @@ public class MCRJSONFileVisitor extends SimpleFileVisitor<Path> {
         if (fileName.endsWith(".")) {
             return "";
         }
-        int pos = fileName.lastIndexOf(".");
+        int pos = fileName.lastIndexOf('.');
         return pos == -1 ? "" : fileName.substring(pos + 1);
     }
 

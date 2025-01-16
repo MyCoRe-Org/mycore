@@ -106,7 +106,7 @@ public final class MCRUserInformationResolver {
 
     public Optional<MCRUserInformation> get(String specification) {
 
-        int delimiterPosition = specification.indexOf(":");
+        int delimiterPosition = specification.indexOf(':');
         if (delimiterPosition == -1) {
             throw new MCRUsageException("No schema delimiter found in " + specification);
         }

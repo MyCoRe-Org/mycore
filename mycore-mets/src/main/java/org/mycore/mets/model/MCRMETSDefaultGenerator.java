@@ -183,9 +183,9 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
             LOGGER.error("invalid href {}", path, uriSyntaxException);
             return;
         }
-        int beginIndex = href.lastIndexOf("/") == -1 ? 0 : href.lastIndexOf("/") + 1;
-        int endIndex = (href.lastIndexOf(".") == -1 || href.lastIndexOf(".") <= beginIndex) ? href.length()
-            : href.lastIndexOf(".");
+        int beginIndex = href.lastIndexOf('/') == -1 ? 0 : href.lastIndexOf('/') + 1;
+        int endIndex = (href.lastIndexOf('.') == -1 || href.lastIndexOf('.') <= beginIndex) ? href.length()
+            : href.lastIndexOf('.');
         String fileName = href.substring(beginIndex, endIndex);
         LOGGER.debug("Created fileName: {}", fileName);
 

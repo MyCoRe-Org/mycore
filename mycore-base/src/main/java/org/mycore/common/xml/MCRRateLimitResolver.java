@@ -59,9 +59,9 @@ public class MCRRateLimitResolver implements URIResolver {
      */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
-        final String subHref = href.substring(href.indexOf(":") + 1);
+        final String subHref = href.substring(href.indexOf(':') + 1);
         final String configID = subHref.substring(0, subHref.indexOf(':'));
-        final String resolvedHref = subHref.substring(subHref.indexOf(":") + 1);
+        final String resolvedHref = subHref.substring(subHref.indexOf(':') + 1);
         RateLimitBehavior behaviorConfig;
         try {
             behaviorConfig = RateLimitBehavior.fromValue(MCRConfiguration2.getStringOrThrow(

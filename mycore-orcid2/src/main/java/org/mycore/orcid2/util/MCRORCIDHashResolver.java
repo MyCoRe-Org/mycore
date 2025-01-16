@@ -65,7 +65,7 @@ public class MCRORCIDHashResolver implements URIResolver {
                 result = MCRUtils.hashString(input, algorithm, null, 1);
             } else {
                 final String optional = split[3];
-                final int separatorIndex = optional.indexOf(":");
+                final int separatorIndex = optional.indexOf(':');
                 if (separatorIndex >= 0) {
                     final String salt = URLDecoder.decode(optional.substring(0, separatorIndex),
                         StandardCharsets.UTF_8);

@@ -56,7 +56,7 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
         String userId = uid != null ? uid : req.getRemoteUser();
 
         if (userId != null) {
-            final String realmId = userId.contains("@") ? userId.substring(userId.indexOf("@") + 1) : null;
+            final String realmId = userId.contains("@") ? userId.substring(userId.indexOf('@') + 1) : null;
             if (realmId != null && MCRRealmFactory.getRealm(realmId) != null) {
                 userId = realmId != null ? userId.replace("@" + realmId, "") : userId;
 
