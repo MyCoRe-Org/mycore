@@ -5,14 +5,13 @@ import {
   getWebApplicationBaseURL,
   fetchI18n,
   getAvailablePermissions,
-  fetchJWT,
   fetchConfig,
 } from "@/utils";
-import { referenceKey, availablePermissionsKey, configKey, webApplicationBaseUrlKey, accessKeyServiceKey } from "@/keys";
+import { referenceKey, availablePermissionsKey, configKey, webApplicationBaseUrlKey } from "@/keys";
 import ContactManager from "@/App.vue";
 import router from './router';
 import { Config } from "./config";
-import { AccessKeyService } from "./api/service";
+import { createPinia } from 'pinia';
 
 const ALLOWED_SESSION_TYPES = "MCR.ACL.AccessKey.Strategy.AllowedSessionPermissionTypes";
 const webApplicationBaseUrl = getWebApplicationBaseURL() as string;
@@ -52,17 +51,15 @@ const initializeApp = async () => {
   try {
     const i18n = await initializeI18n();
     const config = initializeConfig();
-    const authorizationHeader = (process.env.NODE_ENV === "development")
-      ? `Basic ${process.env.VUE_APP_API_TOKEN}` : `Bearer ${await fetchJWT(webApplicationBaseUrl)}`
-    const accessKeyService = new AccessKeyService(webApplicationBaseUrl, authorizationHeader);
     const app = createApp(ContactManager);
     app.provide(referenceKey, getReference());
+    const pinia = createPinia();
     app.provide(availablePermissionsKey, getAvailablePermissions());
     app.provide(webApplicationBaseUrlKey, webApplicationBaseUrl);
     app.provide(configKey, config);
-    app.provide(accessKeyServiceKey, accessKeyService);
     app.use(i18n);
     app.use(router);
+    app.use(pinia);
     setErrorHandler(app);
     app.mount("#app");
   } catch(error) {

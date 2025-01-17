@@ -152,15 +152,19 @@
 import { computed, inject, ref, onErrorCaptured } from "vue";
 import { generateRandomString } from "@/utils";
 import { AccessKeyDto, CreateAccessKeyDto } from "@/dtos/accesskey";
-import { referenceKey, availablePermissionsKey, accessKeyServiceKey } from "@/keys";
+import { referenceKey, availablePermissionsKey } from "@/keys";
 import useVuelidate from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import BaseModal from "@/components/BaseModal.vue";
-import { AccessKeyService } from "@/api/service";
+import { useAccessKeyStore } from "@/store/access-keys";
+import { createAccessKey, getAccessKey } from "@/api/service";
 
 defineProps<{
   showModal: boolean;
 }>();
+
+const accessKeyStore = useAccessKeyStore();
+
 const rules = computed(() => ({
   reference: {
     required,
@@ -179,7 +183,6 @@ const emit = defineEmits<{
 
 const globalReference: string | undefined = inject(referenceKey);
 const availablePermissions: string[] | undefined = inject(availablePermissionsKey);
-const accessKeyService: AccessKeyService | undefined = inject(accessKeyServiceKey);
 const errorMessage = ref<string | undefined>(undefined);
 const busy = ref<boolean>(false);
 const defaultForm = {
@@ -211,26 +214,27 @@ const handleClose = (force?: boolean) => {
   }
 };
 const handleCreateAccessKey = async () => {
-  if (accessKeyService && !busy.value) {
+  if (!busy.value) {
     v.value.$validate();
     if (!v.value.$invalid) {
       if (!v.value.$error) {
         busy.value = true;
         try {
-          const accessKeyDto = {
+          const accessKey = {
             reference: form.value.reference,
             secret: form.value.secret,
             isActive: form.value.isActive,
             type: form.value.type,
           } as CreateAccessKeyDto;
           if (form.value.expiration) {
-            accessKeyDto.expiration = Math.floor(new Date(form.value.expiration).getTime());
+            accessKey.expiration = Math.floor(new Date(form.value.expiration).getTime());
           }
           if (form.value.comment) {
-            accessKeyDto.comment = form.value.comment;
+            accessKey.comment = form.value.comment;
           }
-          const createdId = await accessKeyService.createAccessKey(accessKeyDto);
-          const createdAccessKey = await accessKeyService.getAccessKey(createdId);
+          const accessKeyId = await createAccessKey(accessKey);
+          const createdAccessKey = await getAccessKey(accessKeyId);
+          accessKeyStore.addItem(createdAccessKey);
           emit("access-key-created", form.value.secret, createdAccessKey);
           handleClose(true);
         } catch (error) {

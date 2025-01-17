@@ -20,7 +20,7 @@
     </thead>
     <tbody>
       <tr
-        v-for="(accessKey, index) in accessKeys"
+        v-for="(accessKey, index) in accessKeyStore.paginatedAccessKeys"
         :key="index"
       >
         <td>{{ accessKey.id }}</td>
@@ -53,11 +53,10 @@
   </table>
 </template>
 <script setup lang="ts">
-import { AccessKeyDto } from "@/dtos/accesskey";
+import { useAccessKeyStore } from "@/store/access-keys";
 
-defineProps<{
-  accessKeys: AccessKeyDto[];
-}>();
+const accessKeyStore = useAccessKeyStore();
+
 const emit = defineEmits<{
   (event: "remove-access-key", index: number): void;
   (event: "view-access-key", index: number): void;

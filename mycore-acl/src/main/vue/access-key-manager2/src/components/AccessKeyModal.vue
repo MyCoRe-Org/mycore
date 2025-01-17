@@ -121,15 +121,19 @@
 import { computed, ref, onErrorCaptured, inject, watch } from "vue";
 import { AccessKeyDto, PartialUpdateAccessKeyDto } from "@/dtos/accesskey";
 import BaseModal from "@/components/BaseModal.vue";
-import { availablePermissionsKey, referenceKey, accessKeyServiceKey } from "@/keys";
+import { availablePermissionsKey, referenceKey } from "@/keys";
 import { required } from "@vuelidate/validators";
 import useVuelidate from "@vuelidate/core";
-import { AccessKeyService } from "@/api/service";
+import { useAccessKeyStore } from "@/store/access-keys";
+import { getAccessKey, patchAccessKey } from "@/api/service";
 
 const props = defineProps<{
   showModal: boolean;
   accessKey: AccessKeyDto | undefined;
 }>();
+
+const accessKeyStore = useAccessKeyStore();
+
 const emit = defineEmits<{
   (event: "access-key-updated", value: string, accessKey: AccessKeyDto): void;
   (event: "close"): void;
@@ -144,7 +148,6 @@ const rules = computed(() => ({
 }));
 const availablePermissions: string[] | undefined = inject(availablePermissionsKey);
 const globalReference: string | undefined = inject(referenceKey);
-const accessKeyService: AccessKeyService | undefined = inject(accessKeyServiceKey);
 const errorMessage = ref<string | undefined>(undefined);
 const busy = ref<boolean>(false);
 
@@ -190,32 +193,32 @@ const handleClose = (force: boolean) => {
   }
 };
 const handleUpdateAccessKey = async () => {
-  if (accessKeyService && !busy.value) {
+  if (!busy.value) {
     v.value.$validate();
     if (!v.value.$invalid && props.accessKey && props.accessKey.id) {
       busy.value = true;
       try {
-        const accessKeyDto: PartialUpdateAccessKeyDto = {};
+        const accessKey: PartialUpdateAccessKeyDto = {};
         if (form.value.reference !== props.accessKey.reference) {
-          accessKeyDto.reference = form.value.reference;
+          accessKey.reference = form.value.reference;
         }
         if (form.value.comment !== props.accessKey.comment) {
-          accessKeyDto.comment = form.value.comment;
+          accessKey.comment = form.value.comment;
         }
         if (form.value.type !== props.accessKey.type) {
-          accessKeyDto.type = form.value.type;
+          accessKey.type = form.value.type;
         }
         if (form.value.expiration !== props.accessKey.expiration) {
-          accessKeyDto.expiration = form.value.expiration
+          accessKey.expiration = form.value.expiration
             ? Math.floor(new Date(form.value.expiration).getTime())
             : null;
         }
         if (form.value.isActive !== props.accessKey.isActive) {
-          accessKeyDto.isActive = form.value.isActive;
+          accessKey.isActive = form.value.isActive;
         }
-        await accessKeyService.patchAccessKey(props.accessKey.id, accessKeyDto);
-        const updatedAccessKey = await accessKeyService.getAccessKey(props.accessKey.id);
-        emit("access-key-updated", props.accessKey.secret, updatedAccessKey);
+        await patchAccessKey(props.accessKey.id, accessKey);
+        const updatedAccessKey = await getAccessKey(props.accessKey.id);
+        accessKeyStore.updateItem(updatedAccessKey);
         handleClose(true);
       } catch (error) {
         handleError(error);
