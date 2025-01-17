@@ -21,6 +21,7 @@ package org.mycore.common.events;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.NavigableSet;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -142,8 +143,7 @@ public class MCRShutdownHandlerTest {
      * The MCRShutdownHandlerState class represents the state of a shutdown handler.
      * It only used by {@link #mark} and {@link #resetCloseables()}.
      */
-    private record MCRShutdownHandlerState(boolean shuttingDown,
-        java.util.NavigableSet<MCRShutdownHandler.Closeable> requests) {
+    private record MCRShutdownHandlerState(boolean shuttingDown, NavigableSet<MCRShutdownHandler.Closeable> requests) {
 
         /**
          * Constructs an instance of MCRShutdownHandlerState with the given parameters.

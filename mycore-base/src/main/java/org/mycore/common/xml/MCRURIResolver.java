@@ -1005,7 +1005,7 @@ public final class MCRURIResolver implements URIResolver {
         public Source resolve(String href, String base) {
             String target = href.substring(href.indexOf(':') + 1);
             // fixes exceptions if suburi is empty like "mcrobject:"
-            String subUri = target.substring(target.indexOf(":") + 1);
+            String subUri = target.substring(target.indexOf(':') + 1);
             if (subUri.isEmpty()) {
                 return new JDOMSource(new Element("null"));
             }
@@ -1184,7 +1184,7 @@ public final class MCRURIResolver implements URIResolver {
             String transformerId = new StringTokenizer(help, ":").nextToken();
             String target = help.substring(help.indexOf(':') + 1);
 
-            String subUri = target.substring(target.indexOf(":") + 1);
+            String subUri = target.substring(target.indexOf(':') + 1);
             if (subUri.isEmpty()) {
                 return new JDOMSource(new Element("null"));
             }
