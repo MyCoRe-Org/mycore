@@ -24,9 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -141,14 +139,12 @@ public class MCRPDFAFunctions {
             fileElement.setAttribute("name", fileName);
             derivateElement.appendChild(fileElement);
             fileElement.setAttribute("flavour", "Validation Error");
-            List<Element> exceptions = createExceptionElements(document, resultEntry.exception());
             Element exceptionElements = document.createElement("exceptions");
-            for (Element exception : exceptions) {
-                exceptionElements.appendChild(exception);
-            }
+            exceptionElements.appendChild(createExceptionElement(document, resultEntry.exception()));
             fileElement.appendChild(exceptionElements);
         }
     }
+
     /**
      * Creates a list of XML elements that represent the hierarchy of exceptions and their details.
      * Each exception is represented as an XML element containing information about its class,
@@ -164,21 +160,18 @@ public class MCRPDFAFunctions {
      *         exception chain. Each element includes the exception class, message, and stack trace.
      */
 
-    private static List<Element> createExceptionElements(Document document, Throwable throwable) {
-        Queue<Throwable> exceptionsQueue = new LinkedList<>();
-        return buildExceptionTree(document, throwable, exceptionsQueue);
+    private static Element createExceptionElement(Document document, Throwable throwable) {
+        return buildExceptionTree(document, throwable);
     }
 
     /**
      * Recursive helper method to build the exception tree.
      */
-    private static List<Element> buildExceptionTree(Document document, Throwable currentException,
-        Queue<Throwable> exceptionsQueue) {
-        List<Element> exceptionElementList = new ArrayList<>();
-        if (currentException == null || exceptionsQueue.contains(currentException)) {
-            return exceptionElementList;
+    private static Element buildExceptionTree(Document document, Throwable currentException) {
+        if (currentException == null) {
+            return null;
         }
-        exceptionsQueue.add(currentException);
+
         Element exceptionElement = document.createElement("exception");
         Element classElement = document.createElement("class");
         classElement.setAttribute("name", currentException.getClass().getName());
@@ -202,8 +195,8 @@ public class MCRPDFAFunctions {
         if (suppressedExceptions.length > 0) {
             Element suppressedElement = document.createElement("suppressed");
             for (Throwable suppressed : suppressedExceptions) {
-                List<Element> suppressedElements = buildExceptionTree(document, suppressed, exceptionsQueue);
-                for (Element suppressedChild : suppressedElements) {
+                Element suppressedChild = buildExceptionTree(document, suppressed);
+                if (suppressedChild != null) {
                     suppressedElement.appendChild(suppressedChild);
                 }
             }
@@ -212,17 +205,14 @@ public class MCRPDFAFunctions {
 
         Throwable cause = currentException.getCause();
         if (cause != null && !cause.equals(currentException)) {
-            Element causeElement = document.createElement("cause");
-            List<Element> causeElements = buildExceptionTree(document, cause, exceptionsQueue);
-            for (Element causeChild : causeElements) {
-                causeElement.appendChild(causeChild);
+            Element causeElement = buildExceptionTree(document, cause);
+            if (causeElement != null) {
+                Element causeWrapper = document.createElement("cause");
+                causeWrapper.appendChild(causeElement);
+                exceptionElement.appendChild(causeWrapper);
             }
-            exceptionElement.appendChild(causeElement);
         }
-
-        exceptionElementList.add(exceptionElement);
-
-        return exceptionElementList;
+        return exceptionElement;
     }
 
     /**
