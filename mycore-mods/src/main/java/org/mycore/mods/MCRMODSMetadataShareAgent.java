@@ -66,7 +66,7 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
         //if any metadata changed we need to update children
         boolean metadataChanged = !MCRXMLHelper.deepEqual(md.createXML(), mdold.createXML());
         if (!metadataChanged) {
-            LOGGER.info("Metadata did not change on update of {}", newVersion.getId());
+            LOGGER.info("Metadata did not change on update of {}", newVersion::getId);
         }
         return metadataChanged;
     }

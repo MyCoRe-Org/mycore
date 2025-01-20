@@ -39,7 +39,7 @@ public class MCRQuery {
     private MCRCondition<Void> cond;
 
     /** The maximum number of results, default is 0 = unlimited */
-    private int maxResults = 0;
+    private int maxResults;
 
     /** The number of results per page, default is 10 */
     private int numPerPage = 10;
@@ -51,11 +51,11 @@ public class MCRQuery {
     private List<String> returnFields = new ArrayList<>();
 
     /** A cached xml representation of the query */
-    private Document doc = null;
+    private Document doc;
 
     /**
      * Builds a new MCRQuery object without sort criteria and unlimited results.
-     * 
+     *
      * @param cond
      *            the query conditions
      */
@@ -66,7 +66,7 @@ public class MCRQuery {
     /**
      * Builds a new MCRQuery object with sort criteria and limited number of
      * results.
-     * 
+     *
      * @param cond
      *            the query conditions
      * @param sortBy
@@ -85,7 +85,7 @@ public class MCRQuery {
 
     /**
      * Returns the query condition
-     * 
+     *
      * @return the query condition
      */
     public MCRCondition<Void> getCondition() {
@@ -94,7 +94,7 @@ public class MCRQuery {
 
     /**
      * Returns the maximum number of results the query should return
-     * 
+     *
      * @return the maximum number of results, or 0
      */
     public int getMaxResults() {
@@ -104,7 +104,7 @@ public class MCRQuery {
     /**
      * Sets the maximum number of results the query should return. Default is 0
      * which means "return all results".
-     * 
+     *
      * @param maxResults
      *            the maximum number of results
      */
@@ -120,7 +120,7 @@ public class MCRQuery {
     /**
      * Sets the maximum number of results the query should return. Default is 0
      * which means "return all results".
-     * 
+     *
      * @param maxResultsString
      *            the maximum number of results as String
      */
@@ -133,14 +133,15 @@ public class MCRQuery {
         try {
             this.maxResults = Integer.parseInt(maxResultsString);
         } catch (NumberFormatException e) {
-            LOGGER.warn("The Results maxstring " + maxResultsString + " contains not an integer, 0 as default is set");
+            LOGGER.warn(
+                () -> "The Results maxstring " + maxResultsString + " contains not an integer, 0 as default is set");
             this.maxResults = 0;
         }
     }
 
     /**
      * Returns the number of results per page that the query should return
-     * 
+     *
      * @return the number of results per page
      */
     public int getNumPerPage() {
@@ -149,7 +150,7 @@ public class MCRQuery {
 
     /**
      * Sets the number of results per page that the query should return. Default is 10.
-     * 
+     *
      * @param numPerPage
      *            the number of results per page
      */
@@ -164,7 +165,7 @@ public class MCRQuery {
 
     /**
      * Sets the number of results per page that the query should return. Default is 10.
-     * 
+     *
      * @param numPerPageString
      *            the number of results per page as String
      */
@@ -177,14 +178,15 @@ public class MCRQuery {
         try {
             this.numPerPage = Integer.parseInt(numPerPageString);
         } catch (NumberFormatException e) {
-            LOGGER.warn("The numPerPage string " + numPerPageString + " contains not an integer, 10 as default is set");
+            LOGGER.warn(
+                () -> "The numPerPage string " + numPerPageString + " contains not an integer, 10 as default is set");
             this.numPerPage = 10;
         }
     }
 
     /**
      * Returns the list of MCRSortBy criteria for sorting query results
-     * 
+     *
      * @return a list of MCRSortBy objects, may be empty
      */
     public List<MCRSortBy> getSortBy() {
@@ -193,7 +195,7 @@ public class MCRQuery {
 
     /**
      * Sets the sort criteria for the query results
-     * 
+     *
      * @param sortBy
      *            a list of MCRSortBy objects, may be empty
      */
@@ -208,7 +210,7 @@ public class MCRQuery {
 
     /**
      * Sets the sort criteria for the query results
-     * 
+     *
      * @param sortBy
      *            a MCRSortBy object
      */
@@ -223,7 +225,7 @@ public class MCRQuery {
     /**
      * Returns the list of SOLR-fields they should return for a query
      * results
-     * 
+     *
      * @return a list of field names, may be empty
      */
     public List<String> getReturnFields() {
@@ -233,7 +235,7 @@ public class MCRQuery {
     /**
      * Returns the CSV-list of SOLR-fields they should return for a query
      * results
-     * 
+     *
      * @return a list of field names, may be empty
      */
     public String getReturnFieldsAsString() {
@@ -242,7 +244,7 @@ public class MCRQuery {
 
     /**
      * Sets the return fields list for the query results
-     * 
+     *
      * @param returnFields
      *            a list of SOLR return fields, may be empty
      */
@@ -252,7 +254,7 @@ public class MCRQuery {
 
     /**
      * Sets the return fields as String for the query results
-     * 
+     *
      * @param returnFields
      *            a CSV-list of SOLR return fields, may be empty
      */
@@ -266,7 +268,7 @@ public class MCRQuery {
 
     /**
      * Builds a XML representation of the query
-     * 
+     *
      * @return a XML document containing all query parameters
      */
     public synchronized Document buildXML() {
@@ -303,7 +305,7 @@ public class MCRQuery {
 
     /**
      * Parses a XML representation of a query.
-     * 
+     *
      * @param doc
      *            the XML document
      * @return the parsed MCRQuery

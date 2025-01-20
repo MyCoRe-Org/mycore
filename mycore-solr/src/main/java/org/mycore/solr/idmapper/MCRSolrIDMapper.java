@@ -41,9 +41,9 @@ import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
 /**
  * implementation of an MCRIDMapper
- * 
+ *
  * It uses Solr to retrieve the real id from the given input string
- *  
+ *
  * @author Robert Stephan
  */
 public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
@@ -87,8 +87,8 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
     private String retrieveMCRObjectIDfromSOLR(String mcrid) {
         String result = mcrid;
         if (mcrid != null && mcrid.contains(":") && !objectSolrFields.isEmpty()) {
-            String key = mcrid.substring(0, mcrid.indexOf(":"));
-            String value = mcrid.substring(mcrid.indexOf(":") + 1);
+            String key = mcrid.substring(0, mcrid.indexOf(':'));
+            String value = mcrid.substring(mcrid.indexOf(':') + 1);
             if (objectSolrFields.contains(key)) {
                 ModifiableSolrParams params = new ModifiableSolrParams();
                 params.set("start", 0);
@@ -113,10 +113,10 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
                     result = String.valueOf(solrResults.get(0).getFieldValue("id"));
                 }
                 if (solrResults.getNumFound() == 0) {
-                    LOGGER.info("ERROR: No MyCoRe ID found for query " + mcrid);
+                    LOGGER.info(() -> "ERROR: No MyCoRe ID found for query " + mcrid);
                 }
                 if (solrResults.getNumFound() > 1) {
-                    LOGGER.info("ERROR: Multiple IDs found for query " + mcrid);
+                    LOGGER.info(() -> "ERROR: Multiple IDs found for query " + mcrid);
                 }
             }
         }
@@ -130,8 +130,8 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
         String result = derid;
         if (mcrObjId != null && derid != null
             && derid.contains(":") && !derivateSolrFields.isEmpty()) {
-            String key = derid.substring(0, derid.indexOf(":"));
-            String value = derid.substring(derid.indexOf(":") + 1);
+            String key = derid.substring(0, derid.indexOf(':'));
+            String value = derid.substring(derid.indexOf(':') + 1);
             if (derivateSolrFields.contains(key)) {
                 ModifiableSolrParams params = new ModifiableSolrParams();
                 params.set("start", 0);
@@ -159,10 +159,10 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
                     result = String.valueOf(solrResults.get(0).getFieldValue("id"));
                 }
                 if (solrResults.getNumFound() == 0) {
-                    LOGGER.info("ERROR: No MyCoRe Derivate ID found for query " + derid);
+                    LOGGER.info(() -> "ERROR: No MyCoRe Derivate ID found for query " + derid);
                 }
                 if (solrResults.getNumFound() > 1) {
-                    LOGGER.info("ERROR: Multiple IDs found for query " + derid);
+                    LOGGER.info(() -> "ERROR: Multiple IDs found for query " + derid);
                 }
             }
         }

@@ -19,10 +19,11 @@
 package org.mycore.frontend.cli;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,8 +42,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRConstants;
@@ -265,7 +264,6 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             + "with the stylesheet {2}-classification.xsl. For {2}, the default is xsl/save.",
         order = 60)
     public static void export(String id, String dirname, String style) throws Exception {
-
         File dir = new File(dirname);
         if (!dir.isDirectory()) {
             LOGGER.error("{} is not a directory.", dirname);
@@ -277,18 +275,18 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
 
         Transformer trans = getTransformer(style != null ? style + "-classification" : null);
         String extension = MCRXSLTransformerUtils.getFileExtension(trans, "xml");
-
         File xmlOutput = new File(dir, id + "." + extension);
-        FileOutputStream out = new FileOutputStream(xmlOutput);
-        if (trans != null) {
-            StreamResult sr = new StreamResult(out);
-            trans.transform(new JDOMSource(classDoc), sr);
-        } else {
-            XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-            xout.output(classDoc, out);
-            out.flush();
+        try(OutputStream fileOutputStream = Files.newOutputStream(xmlOutput.toPath())) {
+            StreamResult streamResult = new StreamResult(fileOutputStream);
+            trans.transform(new JDOMSource(classDoc), streamResult);
         }
-        LOGGER.info("Classifcation {} saved to {}.", id, xmlOutput.getCanonicalPath());
+        LOGGER.info("Classification {} saved to {}.", () -> id, () -> {
+            try {
+                return xmlOutput.getCanonicalPath();
+            } catch (IOException e) {
+                return xmlOutput.getAbsolutePath();
+            }
+        });
     }
 
     /**
@@ -331,9 +329,8 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     public static void listAllClassifications() {
         List<MCRCategoryID> allClassIds = DAO.getRootCategoryIDs();
         for (MCRCategoryID id : allClassIds) {
-            LOGGER.info(id.getRootID());
+            LOGGER.info(id::getRootID);
         }
-        LOGGER.info("");
     }
 
     /**
@@ -357,13 +354,13 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     }
 
     private static void listCategory(MCRCategory categ) {
-        int level = categ.getLevel();
-        String space = " ".repeat(level * 2);
         if (categ.isCategory()) {
-            LOGGER.info("{}  ID    : {}", space, categ.getId().getId());
+            LOGGER.info("{}  ID    : {}",
+                () -> " ".repeat(categ.getLevel() * 2), () -> categ.getId().getId());
         }
         for (MCRLabel label : categ.getLabels()) {
-            LOGGER.info("{}  Label : ({}) {}", space, label.getLang(), label.getText());
+            LOGGER.info("{}  Label : ({}) {}",
+                () -> " ".repeat(categ.getLevel() * 2), label::getLang, label::getText);
         }
         List<MCRCategory> children = categ.getChildren();
         for (MCRCategory child : children) {
@@ -417,7 +414,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             for (Object[] parentWithErrors : parentWithErrorsList) {
                 Number parentID = (Number) parentWithErrors[0];
                 Number firstErrorPositionInParent = (Number) parentWithErrors[1];
-                LOGGER.info("Category {} has the missing position {} ...", parentID, firstErrorPositionInParent);
+                LOGGER.info("Category {} has the missing position {} …", parentID, firstErrorPositionInParent);
                 repairCategoryWithGapInPos(parentID, firstErrorPositionInParent);
                 LOGGER.info("Fixed position {} for category {}.", firstErrorPositionInParent, parentID);
             }
@@ -440,7 +437,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             for (Object[] parentWithErrors : parentWithErrorsList) {
                 Number parentID = (Number) parentWithErrors[0];
                 Number wrongStartPositionInParent = (Number) parentWithErrors[1];
-                LOGGER.info("Category {} has the the starting position {} ...", parentID, wrongStartPositionInParent);
+                LOGGER.info("Category {} has the the starting position {} …", parentID, wrongStartPositionInParent);
                 repairCategoryWithWrongStartPos(parentID, wrongStartPositionInParent);
                 LOGGER.info("Fixed position {} for category {}.", wrongStartPositionInParent, parentID);
             }
@@ -484,7 +481,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         if (DAO instanceof MCRCategoryDAOImpl categoryDAO) {
             categoryDAO.repairLeftRightValue(classID);
         } else {
-            LOGGER.error("Command not compatible with {}", DAO.getClass().getName());
+            LOGGER.error("Command not compatible with {}", () -> DAO.getClass().getName());
         }
     }
 
@@ -551,7 +548,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
                 log.add("NULL child of parent " + category.getId() + " on position " + position);
                 continue;
             }
-            LOGGER.debug(child.getId());
+            LOGGER.debug(child::getId);
             curValue = checkLeftRightAndLevel((MCRCategoryImpl) child, ++curValue, nextLevel, log);
             position++;
         }

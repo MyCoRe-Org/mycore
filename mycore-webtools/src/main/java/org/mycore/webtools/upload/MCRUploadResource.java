@@ -150,7 +150,7 @@ public class MCRUploadResource {
             try {
                 MCRFileUploadBucket.releaseBucket(bucket.getBucketID());
             } catch (MCRUploadServerException e) {
-                LOGGER.error("Error while releasing bucket " + bucket.getBucketID(), e);
+                LOGGER.error(() -> "Error while releasing bucket " + bucket.getBucketID(), e);
             }
         }
         if (location == null) {
@@ -230,7 +230,7 @@ public class MCRUploadResource {
                 .filter(processor -> processor.isProcessable(unicodeNormalizedPath))
                 .toList();
 
-            if (processors.size() == 0) {
+            if (processors.isEmpty()) {
                 Files.copy(contents, filePath, StandardCopyOption.REPLACE_EXISTING);
             } else {
                 java.nio.file.Path input = Files.createTempFile("processing", ".temp");

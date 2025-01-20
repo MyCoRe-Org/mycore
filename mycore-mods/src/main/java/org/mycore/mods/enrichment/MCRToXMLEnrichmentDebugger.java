@@ -25,38 +25,43 @@ import org.jdom2.Element;
 /**
  * Allows debugging enrichment resolving steps.
  * Writes debug output to an XML element.
- * Run enrich() on the resolver, 
+ * Run enrich() on the resolver,
  * afterwards call getDebugXML() on this debugger.
- * 
+ *
  * @see MCREnricher#setDebugger(MCREnrichmentDebugger)
  * @see MCRToXMLEnrichmentDebugger#getDebugXML()
- * 
+ *
  * @author Frank Lützenkirchen
  */
 public class MCRToXMLEnrichmentDebugger implements MCREnrichmentDebugger {
 
     Element debugElement = new Element("debugEnrichment");
 
+    @Override
     public void startIteration() {
         Element enrichmentIteration = new Element("enrichmentIteration");
         debugElement.addContent(enrichmentIteration);
         debugElement = enrichmentIteration;
     }
 
+    @Override
     public void endIteration() {
         debugElement = debugElement.getParentElement();
     }
 
+    @Override
     public void debugPublication(String label, Element publication) {
         debugElement.addContent(new Element(label).addContent(publication.clone()));
     }
 
+    @Override
     public void debugNewIdentifiers(Set<MCRIdentifier> ids) {
         Element e = new Element("newIdentifiersFound");
         ids.forEach(id -> id.mergeInto(e));
         debugElement.addContent(e);
     }
 
+    @Override
     public void debugResolved(String dataSourceID, Element result) {
         Element resolved = new Element("resolved").setAttribute("from", dataSourceID);
         debugElement.addContent(resolved);

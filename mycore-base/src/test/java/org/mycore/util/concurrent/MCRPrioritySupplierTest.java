@@ -61,7 +61,7 @@ public class MCRPrioritySupplierTest {
     }
 
     private static class TaskConsumer implements Consumer<Integer> {
-        static int COUNTER = 0;
+        static int COUNTER;
 
         static int[] ORDER = { 0, 0, 0, 0, 0, 0 };
 

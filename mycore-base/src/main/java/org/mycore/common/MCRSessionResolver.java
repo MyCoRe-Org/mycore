@@ -79,8 +79,8 @@ public final class MCRSessionResolver implements Serializable, HttpSessionBindin
             .map(MCRSessionResolver.class::cast);
         MCRSessionResolver oldResolver = this;
         if (newSessionResolver.isPresent() && !oldResolver.equals(newSessionResolver.get())) {
-            LOGGER.warn("Attribute {} is beeing unbound from session {} and replaced by {}!", hsbe.getName(),
-                oldResolver.getSessionID(), newSessionResolver.get());
+            LOGGER.warn("Attribute {} is beeing unbound from session {} and replaced by {}!", hsbe::getName,
+                oldResolver::getSessionID, newSessionResolver::get);
             oldResolver.resolveSession().ifPresent(MCRSession::close);
         }
 

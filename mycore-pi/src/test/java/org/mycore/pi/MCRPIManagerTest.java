@@ -55,6 +55,7 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
     @Rule
     public TemporaryFolder baseDir = new TemporaryFolder();
 
+    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
@@ -215,6 +216,7 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
         return mcrObject;
     }
 
+    @Override
     @After
     public void tearDown() throws Exception {
         super.tearDown();

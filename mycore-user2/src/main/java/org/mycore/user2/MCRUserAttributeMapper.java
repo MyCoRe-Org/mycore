@@ -64,7 +64,7 @@ import jakarta.xml.bind.annotation.XmlValue;
  *              &lt;attribute name="userName" mapping="eduPersonPrincipalName" /&gt;
  *              &lt;attribute name="realName" mapping="displayName" /&gt;
  *              &lt;attribute name="eMail" mapping="mail" /&gt;
- *              &lt;attribute name="roles" mapping="eduPersonAffiliation" separator="," 
+ *              &lt;attribute name="roles" mapping="eduPersonAffiliation" separator=","
  *                  converter="org.mycore.user2.utils.MCRRolesConverter"&gt;
  *                  &lt;valueMapping name="employee"&gt;editor&lt;/valueMapping&gt;
  *              &lt;/attribute&gt;
@@ -75,20 +75,20 @@ import jakarta.xml.bind.annotation.XmlValue;
  *  &lt;/realms&gt;
  * </code>
  * </pre>
- * 
+ *
  * @author René Adler (eagle)
  *
  */
 public class MCRUserAttributeMapper {
 
-    private static Logger LOGGER = LogManager.getLogger(MCRUserAttributeMapper.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRUserAttributeMapper.class);
 
-    private HashMap<String, List<Attribute>> attributeMapping = new HashMap<>();
+    private final HashMap<String, List<Attribute>> attributeMapping = new HashMap<>();
 
     public static MCRUserAttributeMapper instance(Element attributeMapping) {
         try {
             JAXBContext jaxb = JAXBContext.newInstance(Mappings.class.getPackage().getName(),
-                Mappings.class.getClassLoader());
+                Thread.currentThread().getContextClassLoader());
 
             Unmarshaller unmarshaller = jaxb.createUnmarshaller();
             Mappings mappings = (Mappings) unmarshaller.unmarshal(new JDOMSource(attributeMapping));
@@ -103,12 +103,11 @@ public class MCRUserAttributeMapper {
 
     /**
      * Maps configured attributes to {@link Object}.
-     * 
+     *
      * @param object the {@link Object}
      * @param attributes a collection of attributes to map
      * @return <code>true</code> if any attribute was changed
      */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     public boolean mapAttributes(final Object object, final Map<String, ?> attributes) throws Exception {
         boolean changed = false;
         for (Object annotated : getAnnotated(object)) {
@@ -168,7 +167,7 @@ public class MCRUserAttributeMapper {
         Class<? extends MCRUserAttributeConverter> convCls = getConverterClass(attribute, aConv);
         if (convCls != null) {
             MCRUserAttributeConverter converter = convCls.getDeclaredConstructor().newInstance();
-            LOGGER.debug("convert value \"{}\" with \"{}\"", value, converter.getClass().getName());
+            LOGGER.debug("convert value \"{}\" with \"{}\"", () -> value, () -> converter.getClass().getName());
             return converter.convert(value, attribute.separator != null ? attribute.separator : attrAnno.separator(),
                 attribute.getValueMap());
         }
@@ -197,13 +196,13 @@ public class MCRUserAttributeMapper {
         }
 
         if (annotated instanceof Field field) {
-            LOGGER.debug("map attribute \"{}\" with value \"{}\" to field \"{}\"", attribute.mapping, value,
-                field.getName());
+            LOGGER.debug("map attribute \"{}\" with value \"{}\" to field \"{}\"",
+                () -> attribute.mapping, () -> value, field::getName);
             field.setAccessible(true);
             field.set(object, value);
         } else if (annotated instanceof Method method) {
-            LOGGER.debug("map attribute \"{}\" with value \"{}\" to method \"{}\"", attribute.mapping, value,
-                method.getName());
+            LOGGER.debug("map attribute \"{}\" with value \"{}\" to method \"{}\"",
+                () -> attribute.mapping, () -> value, method::getName);
             method.setAccessible(true);
             method.invoke(object, value);
         }
@@ -212,7 +211,7 @@ public class MCRUserAttributeMapper {
 
     /**
      * Returns a collection of mapped attribute names.
-     * 
+     *
      * @return a collection of mapped attribute names
      */
     public Set<String> getAttributeNames() {

@@ -48,7 +48,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * Tests for MCR-910 (Link MODS documents to other MODS documents)
- * 
+ *
  * @author Thomas Scheffler (yagee)
  */
 public class MCRMODSLinkedMetadataTest extends MCRStoreTestCase {
@@ -56,6 +56,7 @@ public class MCRMODSLinkedMetadataTest extends MCRStoreTestCase {
     MCRObjectID seriesID;
     MCRObjectID bookID;
 
+    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
@@ -68,6 +69,7 @@ public class MCRMODSLinkedMetadataTest extends MCRStoreTestCase {
         MCRMetadataManager.create(book);
     }
 
+    @Override
     @After
     public void tearDown() throws Exception {
         MCRXMLMetadataManager mm = MCRXMLMetadataManager.instance();

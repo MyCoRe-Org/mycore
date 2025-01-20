@@ -47,11 +47,12 @@ class MCRPersonListTransformer extends MCRFieldTransformer {
         this.andOthers = new MCRAndOthersTransformer(field, role);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     void buildField(BibtexAbstractValue value, Element parent) {
         if (!(value instanceof BibtexPersonList personList)) {
-            LOGGER.error("Cannot not cast {} ({}) to {}", BibtexAbstractValue.class.getName(), value,
-                BibtexPersonList.class.getName());
+            LOGGER.error("Cannot not cast {} ({}) to {}", () -> BibtexAbstractValue.class.getName(), () -> value,
+                () -> BibtexPersonList.class.getName());
             return;
         }
         for (BibtexPerson person : (List<BibtexPerson>) (personList.getList())) {

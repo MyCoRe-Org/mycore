@@ -286,8 +286,8 @@ public class MCRParameterCollector {
     }
 
     private void debugSessionParameters() {
-        LOGGER.debug("XSL.CurrentUser ={}", parameters.get("CurrentUser"));
-        LOGGER.debug("XSL.Referer ={}", parameters.get("Referer"));
+        LOGGER.debug("XSL.CurrentUser ={}", () -> parameters.get("CurrentUser"));
+        LOGGER.debug("XSL.Referer ={}", () -> parameters.get("Referer"));
     }
 
     /** Sets the request and referer URL */
@@ -348,6 +348,7 @@ public class MCRParameterCollector {
         return job == null ? new MCRParameterCollector() : new MCRParameterCollector(job.getRequest());
     }
 
+    @Override
     public int hashCode() {
         if (modified) {
             int result = LOGGER.hashCode();

@@ -49,7 +49,7 @@ import jakarta.persistence.RollbackException;
 
 /**
  * Pulls {@link MCRJob}s from Database and starts {@link MCRJobRunnable}s.
- * 
+ *
  * @author René Adler
  * @author Sebastian Hofmann
  */
@@ -121,7 +121,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
     @Override
     public void run() {
         boolean activated = config.activated(action).orElseGet(config::activated);
-        LOGGER.info("JobQueue {} is {}", action.getName(), activated ? "activated" : "deactivated");
+        LOGGER.info("JobQueue {} is {}", action::getName, () -> activated ? "activated" : "deactivated");
 
         if (!activated) {
             return;
@@ -137,7 +137,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
         processableExecutor = MCRProcessableFactory.newPool(jobExecutor, processableCollection);
         processableCollection.setProperty("running", running);
 
-        LOGGER.info("JobManager for {} with {} thread(s) is started", action.getName(), getMaxJobThreadCount());
+        LOGGER.info("JobManager for {} with {} thread(s) is started", action::getName, this::getMaxJobThreadCount);
         while (running) {
             try {
                 while (hasFreeJobThreads()) {
@@ -161,7 +161,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
         }
         processableCollection.setProperty("running", running);
 
-        LOGGER.info("{} thread finished", getName());
+        LOGGER.info("{} thread finished", this::getName);
         MCRSessionMgr.releaseCurrentSession();
     }
 
@@ -227,6 +227,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
     /**
      * stops transmitting {@link MCRJob} to {@link MCRJobRunnable} and prepares shutdown.
      */
+    @Override
     public void prepareClose() {
         LOGGER.info("Closing manager thread");
         //signal manager thread to stop now
@@ -281,7 +282,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
 
     /**
      * Returns the name of this job manager.
-     * 
+     *
      * @return the name
      */
     public String getName() {
@@ -290,7 +291,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
 
     /**
      * Returns the processable collection assigned to this job manager.
-     * 
+     *
      * @return the processable collection
      */
     public MCRProcessableCollection getProcessableCollection() {
@@ -302,7 +303,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
             Constructor<? extends MCRJobAction> actionConstructor = job.getAction().getConstructor(MCRJob.class);
             return actionConstructor.newInstance(job);
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error(e::getMessage, e);
         }
 
         return null;

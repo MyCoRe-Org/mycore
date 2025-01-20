@@ -74,6 +74,7 @@ public class MCRMapObjectIDDOIGeneratorTest extends MCRTestCase {
         return testProperties;
     }
 
+    @Override
     @After
     public void tearDown() throws Exception {
         super.tearDown();

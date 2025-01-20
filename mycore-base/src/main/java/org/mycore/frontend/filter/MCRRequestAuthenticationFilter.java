@@ -46,7 +46,7 @@ public class MCRRequestAuthenticationFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) request;
         Optional<HttpSession> httpSession = Optional.ofNullable(req.getSession(false));
         if (httpSession.map(s -> s.getAttribute(SESSION_KEY)).isPresent() && req.getUserPrincipal() == null) {
-            LogManager.getLogger().info("request authentication required for: {}", req.getRemoteUser());
+            LogManager.getLogger().info("request authentication required for: {}", req::getRemoteUser);
             req.authenticate((HttpServletResponse) response);
         }
         chain.doFilter(request, response);

@@ -30,6 +30,7 @@ import org.swordapp.server.SwordAuthException;
  * @author Sebastian Hofmann (mcrshofm)
  */
 public class MCRSwordDefaultAuthHandler extends MCRSwordAuthHandler {
+    @Override
     public void authentication(AuthCredentials credentials) throws SwordAuthException {
         if (!exists(credentials.getUsername())) {
             throw new SwordAuthException("Wrong login data!");

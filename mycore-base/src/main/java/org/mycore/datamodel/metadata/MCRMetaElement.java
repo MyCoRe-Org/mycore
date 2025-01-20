@@ -43,7 +43,7 @@ import com.google.gson.JsonObject;
  * xlink:href attribute of the MCRMetaLink representing the link. The class name
  * of such a metadata element must be MCRMetaLink, and the metadata element is
  * considered to be a folder of links.
- * 
+ *
  * @author Jens Kupferschmidt
  * @author Mathias Hegner
  */
@@ -63,15 +63,15 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     // logger
     static Logger LOGGER = LogManager.getLogger();
 
-    private Class<? extends MCRMetaInterface> clazz = null;
+    private Class<? extends MCRMetaInterface> clazz;
 
-    private String tag = null;
+    private String tag;
 
     private boolean heritable;
 
     private boolean notinherit;
 
-    private ArrayList<MCRMetaInterface> list = null;
+    private ArrayList<MCRMetaInterface> list;
 
     /**
      * This is the constructor of the MCRMetaElement class. The default language
@@ -111,7 +111,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
 
     /**
      * This methode return the name of this metadata class as string.
-     * 
+     *
      * @return the name of this metadata class as string
      */
     public final String getClassName() {
@@ -121,7 +121,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     /**
      * This method returns the instance of an element from the list with index
      * i.
-     * 
+     *
      * @return the instance of an element, if index is out of range return null
      */
     public final MCRMetaInterface getElement(int index) {
@@ -132,9 +132,9 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     }
 
     /**
-     * This method returns the instance of an element from the list with the given 
+     * This method returns the instance of an element from the list with the given
      * name
-     * 
+     *
      * @return the instance of the element with the given name or null if there is no such element
      * */
     public final MCRMetaInterface getElementByName(String name) {
@@ -148,7 +148,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
 
     /**
      * This methode return the heritable flag of this metadata as boolean value.
-     * 
+     *
      * @return the heritable flag of this metadata class
      */
     public final boolean isHeritable() {
@@ -157,7 +157,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
 
     /**
      * This methode return the nonherit flag of this metadata as boolean value.
-     * 
+     *
      * @return the notherit flag of this metadata class
      */
     public final boolean inheritsNot() {
@@ -166,7 +166,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
 
     /**
      * This methode return the tag of this metadata class as string.
-     * 
+     *
      * @return the tag of this metadata class as string
      */
     public final String getTag() {
@@ -175,7 +175,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
 
     /**
      * This methode set the heritable flag for the metadata class.
-     * 
+     *
      * @param heritable
      *            the heritable flag as boolean value
      */
@@ -185,7 +185,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
 
     /**
      * This methode set the notinherit flag for the metadata class.
-     * 
+     *
      * @param notinherit
      *            the notinherit flag as boolean value
      */
@@ -195,7 +195,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
 
     /**
      * This methode set the tag for the metadata class.
-     * 
+     *
      * @param tag
      *            the tag for the metadata class
      */
@@ -206,7 +206,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
 
     /**
      * This methode set the element class for the metadata elements.
-     * 
+     *
      * @param clazz
      *            the class for the metadata elements
      */
@@ -220,7 +220,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
 
     /**
      * <em>size</em> returns the number of elements in this instance.
-     * 
+     *
      * @return int the size of "list"
      */
     public final int size() {
@@ -230,7 +230,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     /**
      * The method add a metadata object, that implements the MCRMetaInterface to
      * this element.
-     * 
+     *
      * @param obj
      *            a metadata object
      * @exception MCRException
@@ -244,7 +244,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     /**
      * This method remove the instance of an element from the list with index
      * i.
-     * 
+     *
      * @return true if the instance is removed, otherwise return else
      */
     public final boolean removeElement(int index) {
@@ -258,7 +258,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     /**
      * The method remove a metadata object, that implements the MCRMetaInterface to
      * this element.
-     * 
+     *
      * @param obj
      *            a metadata object
      * @exception MCRException
@@ -281,7 +281,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     /**
      * This methode read the XML input stream part from a DOM part for the
      * metadata of the document.
-     * 
+     *
      * @param element
      *            a relevant JDOM element for the metadata
      * @exception MCRException
@@ -331,7 +331,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     /**
      * This methode create a XML stream for all data in this class, defined by
      * the MyCoRe XML MCRLangText definition for the given subtag.
-     * 
+     *
      * @param flag
      *            true if all inherited data should be include, else false
      * @exception MCRException
@@ -359,7 +359,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
 
     /**
      * Creates the JSON representation of this metadata element.
-     * 
+     *
      * <pre>
      *   {
      *      class: 'MCRMetaLangText',
@@ -371,7 +371,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
      *      ]
      *   }
      * </pre>
-     * 
+     *
      * @return a json gson representation of this metadata element
      */
     public JsonObject createJSON(boolean flag) {
@@ -399,7 +399,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
      * <li>the lang value was supported
      * </ul>
      * otherwise the methode return <em>false</em>
-     * 
+     *
      * @return a boolean value
      */
     public final boolean isValid() {
@@ -407,7 +407,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
             validate();
             return true;
         } catch (MCRException exc) {
-            LOGGER.warn("The '{}' is invalid.", getTag(), exc);
+            LOGGER.warn(() -> "The '" + getTag() + "' is invalid.", exc);
         }
         return false;
     }
@@ -420,7 +420,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
      * <li>if the list is empty</li>
      * <li>the lang value was supported</li>
      * </ul>
-     * 
+     *
      * @throws MCRException the MCRMetaElement is invalid
      */
     public void validate() throws MCRException {

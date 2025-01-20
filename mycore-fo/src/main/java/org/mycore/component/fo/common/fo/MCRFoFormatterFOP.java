@@ -64,7 +64,7 @@ import org.mycore.resource.MCRResourceHelper;
 
 /**
  * This class implements the interface to use configured XSL-FO formatters for the layout service.
- * 
+ *
  * @author Jens Kupferschmidt
  * @author René Adler (eagle)
  */
@@ -75,11 +75,13 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
     private FopFactory fopFactory;
 
     final ResourceResolver resolver = new ResourceResolver() {
+        @Override
         public OutputStream getOutputStream(URI uri) throws IOException {
             URL url = MCRURIResolver.getServletContext().getResource(uri.toString());
             return url.openConnection().getOutputStream();
         }
 
+        @Override
         public Resource getResource(URI uri) throws IOException {
             MCRContent content;
             try {

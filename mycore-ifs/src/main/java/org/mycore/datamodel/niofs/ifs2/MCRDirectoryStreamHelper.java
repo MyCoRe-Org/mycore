@@ -18,9 +18,8 @@
 
 package org.mycore.datamodel.niofs.ifs2;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
+import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.ClosedDirectoryStreamException;
 import java.nio.file.DirectoryStream;
@@ -69,9 +68,9 @@ class MCRDirectoryStreamHelper {
     static DirectoryStream<Path> getInstance(MCRDirectory dir, MCRPath path) throws IOException {
         DirectoryStream.Filter<Path> filter = (dir instanceof MCRFileCollection) ? MCRFileCollectionFilter.FILTER
             : AcceptAllFilter.FILTER;
-        LOGGER.debug("Dir {}, class {}, filter {}", path, dir.getClass(), filter.getClass());
+        LOGGER.debug("Dir {}, class {}, filter {}", () -> path, dir::getClass, filter::getClass);
         DirectoryStream<Path> baseDirectoryStream = Files.newDirectoryStream(dir.getLocalPath(), filter);
-        LOGGER.debug("baseStream {}", baseDirectoryStream.getClass());
+        LOGGER.debug("baseStream {}", baseDirectoryStream::getClass);
         if (baseDirectoryStream instanceof SecureDirectoryStream secureDirectoryStream) {
             LOGGER.debug("Returning SecureDirectoryStream");
             return new MCRSecureDirectoryStream(dir, path, secureDirectoryStream);
@@ -201,12 +200,11 @@ class MCRDirectoryStreamHelper {
         }
 
         @Override
-        public void move(Path srcpath, SecureDirectoryStream<Path> targetdir, Path targetpath)
-            throws IOException {
+        public void move(Path srcpath, SecureDirectoryStream<Path> targetdir, Path targetpath) throws IOException {
             checkClosed();
             MCRPath src = checkFileSystem(srcpath);
             MCRFile srcFile = srcpath.isAbsolute() ? MCRFileSystemUtils.getMCRFile(src, false, false, true)
-                : (MCRFile) resolve(srcpath);
+                                                   : (MCRFile) resolve(srcpath);
             if (srcFile == null) {
                 throw new NoSuchFileException(this.dirPath.toString(), srcpath.toString(), null);
             }
@@ -233,13 +231,16 @@ class MCRDirectoryStreamHelper {
                     Files.move(srcFile.getLocalPath(), targetpath, StandardCopyOption.COPY_ATTRIBUTES);
                 } else {
                     LOGGER.debug("Move Case #2.2");
-                    try (FileInputStream fis = new FileInputStream(srcFile.getLocalPath().toFile());
-                        FileChannel inChannel = fis.getChannel();
+                    try (SeekableByteChannel sourceChannel = Files.newByteChannel(srcFile.getLocalPath());
                         SeekableByteChannel targetChannel = targetdir.newByteChannel(targetpath,
                             Set.of(StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE))) {
-                        long bytesTransferred = 0;
-                        while (bytesTransferred < inChannel.size()) {
-                            bytesTransferred += inChannel.transferTo(bytesTransferred, inChannel.size(), targetChannel);
+                        ByteBuffer buffer = ByteBuffer.allocateDirect(8192);
+                        while (sourceChannel.read(buffer) > 0) {
+                            buffer.flip();
+                            while (buffer.hasRemaining()) {
+                                targetChannel.write(buffer);
+                            }
+                            buffer.clear();
                         }
                     }
                 }

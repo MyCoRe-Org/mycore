@@ -19,8 +19,8 @@
 package org.mycore.frontend.cli;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -299,7 +299,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             return false;
         }
 
-        LOGGER.info("Reading file {} ...", file);
+        LOGGER.info("Reading file {} …", file);
 
         MCRDerivate derivate = new MCRDerivate(file.toURI());
         derivate.setImportMode(importMode);
@@ -333,10 +333,10 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         if (update) {
             MCRMetadataManager.update(derivate);
-            LOGGER.info("{} updated.", derivate.getId());
+            LOGGER.info("{} updated.", derivate::getId);
         } else {
             MCRMetadataManager.create(derivate);
-            LOGGER.info("{} loaded.", derivate.getId());
+            LOGGER.info("{} loaded.", derivate::getId);
         }
 
         return true;
@@ -408,7 +408,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         try {
             fid = MCRObjectID.getInstance(fromID);
         } catch (Exception ex) {
-            LOGGER.error("FromID : {}", ex.getMessage());
+            LOGGER.error("FromID : {}", ex::getMessage);
             return;
         }
 
@@ -417,7 +417,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         try {
             tid = MCRObjectID.getInstance(toID);
         } catch (Exception ex) {
-            LOGGER.error("ToID : {}", ex.getMessage());
+            LOGGER.error("ToID : {}", ex::getMessage);
             return;
         }
 
@@ -439,10 +439,11 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                 k++;
             }
         } catch (Exception ex) {
-            LOGGER.error("Exception while storing derivate to " + dir.getAbsolutePath(), ex);
+            LOGGER.error(() -> "Exception while storing derivate to " + dir.getAbsolutePath(), ex);
             return;
         }
-        LOGGER.info("{} Object's stored under {}.", k, dir.getAbsolutePath());
+        int numExported = k;
+        LOGGER.info("{} Object's stored under {}.", () -> numExported, dir::getAbsolutePath);
     }
 
     /**
@@ -485,10 +486,10 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             .collect(Collectors.toList());
     }
 
-    private static void exportDerivate(File dir, Transformer trans, String extension, String nid)
+    private static void exportDerivate(File dir, Transformer transformer, String extension, String nid)
         throws TransformerException, IOException {
         // store the XML file
-        Document xml = null;
+        Document xml;
         MCRDerivate obj;
 
         MCRObjectID derivateID = MCRObjectID.getInstance(nid);
@@ -516,17 +517,15 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             return;
         }
         File xmlOutput = new File(dir, derivateID + "." + extension);
-        FileOutputStream out = new FileOutputStream(xmlOutput);
         File directoryFile = new File(dir, derivateID.toString());
-
-        if (trans != null) {
-            trans.setParameter("dirname", directoryFile.getPath());
-            StreamResult sr = new StreamResult(out);
-            trans.transform(new JDOMSource(xml), sr);
-        } else {
-            new XMLOutputter().output(xml, out);
-            out.flush();
-            out.close();
+        try(OutputStream fileOutputStream = Files.newOutputStream(xmlOutput.toPath())) {
+            if (transformer != null) {
+                transformer.setParameter("dirname", directoryFile.getPath());
+                StreamResult sr = new StreamResult(fileOutputStream);
+                transformer.transform(new JDOMSource(xml), sr);
+            } else {
+                new XMLOutputter().output(xml, fileOutputStream);
+            }
         }
 
         LOGGER.info("Object {} stored under {}.", nid, xmlOutput);
@@ -568,7 +567,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
     /**
      * Repairing the content search index for all derivates in project {0}.
-     * 
+     *
      * @param project
      *            the project part of a MCRObjectID e.g. *DocPortal*_derivate
      */
@@ -698,7 +697,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         help = "check in all derivates of MCR base ID {0} for existing linked objects",
         order = 400)
     public static void checkObjectsInDerivates(String baseId) {
-        if (baseId == null || baseId.length() == 0) {
+        if (baseId == null || baseId.isEmpty()) {
             LOGGER.error("Base ID missed for check object entries in derivates for base {0}");
             return;
         }
@@ -722,7 +721,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                 LOGGER.error("   !!! Missing object {} in database for derivate ID {}", objid, mcrderid);
             }
         }
-        LOGGER.info("Check done for {} entries", Integer.toString(counter));
+        LOGGER.info("Check done for {} entries", counter);
     }
 
     @MCRCommand(syntax = "transform xml matching file name pattern {0} in derivate {1} with stylesheet {2}",
@@ -904,7 +903,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         MCRPath path = MCRPath.getPath(derivateID.toString(), "/");
         MCRUploadHelper.detectMainFile(path).ifPresent(file -> {
-            LOGGER.info("Setting main file of {} to {}", derID, file.toUri().toString());
+            LOGGER.info("Setting main file of {} to {}", () -> derID, file::toUri);
             derivate.getDerivate().getInternals().setMainDoc(file.getOwnerRelativePath());
             try {
                 MCRMetadataManager.update(derivate);

@@ -65,6 +65,7 @@ public class MCRAESCipher extends MCRCipher {
         decryptCipher = null;
     }
 
+    @Override
     public void init(String id) throws MCRCryptKeyFileNotFoundException, InvalidKeyException {
         cipherID = id;
 
@@ -95,16 +96,19 @@ public class MCRAESCipher extends MCRCipher {
         }
     }
 
+    @Override
     public boolean isInitialised() {
         return (secretKey != null && encryptCipher != null && decryptCipher != null);
     }
 
+    @Override
     public void reset() {
         secretKey = null;
         encryptCipher = null;
         decryptCipher = null;
     }
 
+    @Override
     public void generateKeyFile() throws FileAlreadyExistsException {
         try {
             LOGGER.info("generate Key File");
@@ -124,6 +128,7 @@ public class MCRAESCipher extends MCRCipher {
         }
     }
 
+    @Override
     public void overwriteKeyFile() {
         try {
             LOGGER.info("overwrite Key File");
@@ -144,12 +149,14 @@ public class MCRAESCipher extends MCRCipher {
         return java.util.Base64.getEncoder().encodeToString(tmpSecretKey.getEncoded());
     }
 
+    @Override
     protected String encryptImpl(String text) throws MCRCryptCipherConfigurationException {
         byte[] encryptedBytes = encryptImpl(text.getBytes(StandardCharsets.UTF_8));
         String encryptedString = java.util.Base64.getEncoder().encodeToString(encryptedBytes);
         return encryptedString;
     }
 
+    @Override
     protected String decryptImpl(String text) throws MCRCryptCipherConfigurationException {
         byte[] encryptedBytes = java.util.Base64.getDecoder().decode(text);
         byte[] decryptedBytes = decryptImpl(encryptedBytes);
@@ -157,6 +164,7 @@ public class MCRAESCipher extends MCRCipher {
         return decryptedText;
     }
 
+    @Override
     protected byte[] encryptImpl(byte[] bytes) throws MCRCryptCipherConfigurationException {
         try {
             byte[] encryptedBytes = encryptCipher.doFinal(bytes);
@@ -166,6 +174,7 @@ public class MCRAESCipher extends MCRCipher {
         }
     }
 
+    @Override
     protected byte[] decryptImpl(byte[] bytes) throws MCRCryptCipherConfigurationException {
         try {
             byte[] decryptedBytes = decryptCipher.doFinal(bytes);

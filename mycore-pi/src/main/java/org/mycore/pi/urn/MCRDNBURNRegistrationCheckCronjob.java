@@ -67,15 +67,15 @@ public class MCRDNBURNRegistrationCheckCronjob extends MCRCronjob {
 
     private void checkIfUrnIsRegistered(MCRPI mcrpi) {
         try {
-            LOGGER.info("Checking unregistered URN {}", mcrpi.getIdentifier());
+            LOGGER.info("Checking unregistered URN {}", mcrpi::getIdentifier);
             getDateRegistered(mcrpi).ifPresent(date -> updateServiceFlags(mcrpi, date));
         } catch (Exception e) {
-            LOGGER.error("Failed to check unregistered URN " + mcrpi.getIdentifier(), e);
+            LOGGER.error(() -> "Failed to check unregistered URN " + mcrpi.getIdentifier(), e);
         }
     }
 
     private Optional<Date> getDateRegistered(MCRPI mcrpi) throws MCRIdentifierUnresolvableException, ParseException {
-        LOGGER.info("Fetching registration date for URN {}", mcrpi.getIdentifier());
+        LOGGER.info("Fetching registration date for URN {}", mcrpi::getIdentifier);
         MCRDNBURN dnburn = new MCRDNBURNParser()
             .parse(mcrpi.getIdentifier())
             .orElseThrow(() -> new MCRException("Cannot parse Identifier from table: " + mcrpi.getIdentifier()));
@@ -83,7 +83,7 @@ public class MCRDNBURNRegistrationCheckCronjob extends MCRCronjob {
     }
 
     private void updateServiceFlags(MCRPI mcrpi, Date registerDate) {
-        LOGGER.info("Updating service flags for URN {}", mcrpi.getIdentifier());
+        LOGGER.info("Updating service flags for URN {}", mcrpi::getIdentifier);
         mcrpi.setRegistered(registerDate);
         MCRPIServiceManager.getInstance()
             .getRegistrationService(mcrpi.getService())

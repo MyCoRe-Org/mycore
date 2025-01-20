@@ -72,6 +72,7 @@ public abstract class MCRSetCondition<T> implements MCRCondition<T> {
         return sb.toString();
     }
 
+    @Override
     public Element toXML() {
         Element cond = new Element("boolean").setAttribute("operator", operator);
         for (MCRCondition<T> child : children) {
@@ -80,5 +81,6 @@ public abstract class MCRSetCondition<T> implements MCRCondition<T> {
         return cond;
     }
 
+    @Override
     public abstract boolean evaluate(T o);
 }

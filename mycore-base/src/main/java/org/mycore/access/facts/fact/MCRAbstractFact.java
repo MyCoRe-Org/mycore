@@ -37,7 +37,7 @@ import org.mycore.access.facts.model.MCRFact;
  */
 public abstract class MCRAbstractFact<T> implements MCRFact<T> {
 
-    private T value = null;
+    private T value;
 
     private String name;
 

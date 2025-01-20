@@ -43,14 +43,15 @@ import jakarta.xml.bind.Unmarshaller;
  *
  */
 public class MCRSolrInputDocumentGenerator {
-    private static Logger LOGGER = LogManager.getLogger(MCRSolrInputDocumentGenerator.class);
+
+    private static final Logger LOGGER = LogManager.getLogger(MCRSolrInputDocumentGenerator.class);
 
     public static final JAXBContext JAXB_CONTEXT = initContext();
 
     private static JAXBContext initContext() {
         try {
             return JAXBContext.newInstance(MCRSolrInputDocument.class.getPackage().getName(),
-                MCRSolrInputDocument.class.getClassLoader());
+                Thread.currentThread().getContextClassLoader());
         } catch (JAXBException e) {
             throw new MCRException("Could not instantiate JAXBContext.", e);
         }

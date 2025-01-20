@@ -28,18 +28,18 @@ import java.util.List;
  *
  * MCR.MODS.EnrichmentResolver.DataSource.PubMed.IdentifierTypes=doi pubmed
  *
- * For each supported identifier type, the data source has a resolver URI 
- * that returns MODS data for that identifier type. 
- * 
- * Depending on the global configuration property  
+ * For each supported identifier type, the data source has a resolver URI
+ * that returns MODS data for that identifier type.
+ *
+ * Depending on the global configuration property
  * MCR.MODS.EnrichmentResolver.DefaultStopOnFirstResult=true|false
- * a data source will stop retrieving data after any first identifier 
+ * a data source will stop retrieving data after any first identifier
  * returned valid data, or will continue to retrieve data for all identifiers
  * it is configured for.
- * 
+ *
  * This global configuration can be overwritten per data source, e.g.
  * MCR.MODS.EnrichmentResolver.DataSource.ZDB.StopOnFirstResult=false
- *   
+ *
  * @see MCRIdentifierResolver
  *
  * @author Frank Lützenkirchen
@@ -74,6 +74,7 @@ class MCRDataSource {
         return sourceID;
     }
 
+    @Override
     public String toString() {
         return "data source " + sourceID;
     }

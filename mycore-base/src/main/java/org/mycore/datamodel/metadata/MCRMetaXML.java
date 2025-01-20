@@ -37,7 +37,7 @@ import com.google.gson.JsonObject;
  * This class implements all method for handling with the MCRMetaLangText part
  * of a metadata object. The MCRMetaLangText class present a single item, which
  * has triples of a text and his corresponding language and optional a type.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  * @author Jens Kupferschmidt
  * @author Johannes B\u00fchler
@@ -62,7 +62,7 @@ public class MCRMetaXML extends MCRMetaDefault {
     /**
      * This method reads the XML input stream part from a DOM part for the
      * metadata of the document.
-     * 
+     *
      * @param element - a relevant JDOM2 element for the metadata
      */
     @Override
@@ -110,7 +110,7 @@ public class MCRMetaXML extends MCRMetaDefault {
     /**
      * This method creates a XML stream for all data in this class, defined by
      * the MyCoRe XML MCRMetaLangText definition for the given subtag.
-     * 
+     *
      * @exception MCRException
      *                if the content of this class is not valid
      * @return a JDOM2 Element with the XML MCRMetaLangText part
@@ -128,7 +128,7 @@ public class MCRMetaXML extends MCRMetaDefault {
     /**
      * Creates the JSON representation. Extends the {@link MCRMetaDefault#createJSON()} method
      * with the following data.
-     * 
+     *
      * <pre>
      *   {
      *     content: [
@@ -136,7 +136,7 @@ public class MCRMetaXML extends MCRMetaDefault {
      *     ]
      *   }
      * </pre>
-     * 
+     *
      * @see MCRXMLHelper#jsonSerialize(Element)
      */
     @Override
@@ -170,9 +170,10 @@ public class MCRMetaXML extends MCRMetaDefault {
      * <li>the inherited value is lower than zero</li>
      * <li>the content is null</li>
      * </ul>
-     * 
+     *
      * @throws MCRException the MCRMetaXML is invalid
      */
+    @Override
     public void validate() throws MCRException {
         super.validate();
         if (content == null) {

@@ -56,13 +56,13 @@ public class MCRFileChannel extends FileChannel {
 
     /**
      * MyCoRe implementation of a Java NIO FileChannel
-     * 
+     *
      * @param path - the MyCoRe path object
      * @param file - the MyCoRe file object
      * @param baseChannel - the base channel
      * @param write - true, if the FileChannel is writeable
-     * @param create - true, if the FileChannel can create new files 
-     * 
+     * @param create - true, if the FileChannel can create new files
+     *
      * @see FileChannel
      */
     public MCRFileChannel(MCRPath path, MCRFile file, FileChannel baseChannel, boolean write, boolean create) {
@@ -77,6 +77,7 @@ public class MCRFileChannel extends FileChannel {
         }
     }
 
+    @Override
     public void implCloseChannel() throws IOException {
         baseChannel.close(); //MCR-1003 close before updating metadata, as we read attributes from this file later
         updateMetadata();
@@ -120,63 +121,77 @@ public class MCRFileChannel extends FileChannel {
 
     //Delegate to baseChannel
 
+    @Override
     public int read(ByteBuffer dst) throws IOException {
         return baseChannel.read(dst);
     }
 
+    @Override
     public long read(ByteBuffer[] dsts, int offset, int length) throws IOException {
         return baseChannel.read(dsts, offset, length);
     }
 
+    @Override
     public int write(ByteBuffer src) throws IOException {
         modified = true;
         return baseChannel.write(src);
     }
 
+    @Override
     public long write(ByteBuffer[] srcs, int offset, int length) throws IOException {
         modified = true;
         return baseChannel.write(srcs, offset, length);
     }
 
+    @Override
     public long position() throws IOException {
         return baseChannel.position();
     }
 
+    @Override
     public FileChannel position(long newPosition) throws IOException {
         return baseChannel.position(newPosition);
     }
 
+    @Override
     public long size() throws IOException {
         return baseChannel.size();
     }
 
+    @Override
     public FileChannel truncate(long size) throws IOException {
         modified = true;
         return baseChannel.truncate(size);
     }
 
+    @Override
     public void force(boolean metaData) throws IOException {
         baseChannel.force(metaData);
     }
 
+    @Override
     public long transferTo(long position, long count, WritableByteChannel target) throws IOException {
         return baseChannel.transferTo(position, count, target);
     }
 
+    @Override
     public long transferFrom(ReadableByteChannel src, long position, long count) throws IOException {
         modified = true;
         return baseChannel.transferFrom(src, position, count);
     }
 
+    @Override
     public int read(ByteBuffer dst, long position) throws IOException {
         return baseChannel.read(dst, position);
     }
 
+    @Override
     public int write(ByteBuffer src, long position) throws IOException {
         modified = true;
         return baseChannel.write(src, position);
     }
 
+    @Override
     public MappedByteBuffer map(MapMode mode, long position, long size) throws IOException {
         if (write) {
             modified = true;
@@ -184,10 +199,12 @@ public class MCRFileChannel extends FileChannel {
         return baseChannel.map(mode, position, size);
     }
 
+    @Override
     public FileLock lock(long position, long size, boolean shared) throws IOException {
         return baseChannel.lock(position, size, shared);
     }
 
+    @Override
     public FileLock tryLock(long position, long size, boolean shared) throws IOException {
         return baseChannel.tryLock(position, size, shared);
     }

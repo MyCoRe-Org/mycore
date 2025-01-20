@@ -30,7 +30,7 @@ import com.google.gson.JsonObject;
  * This class implements all methods for handling with the
  * MCRMetaInstitutionName part of a metadata object. The MCRMetaInstitutionName
  * class represents a name of an institution or corporation.
- * 
+ *
  * @author J. Kupferschmidt
  */
 public final class MCRMetaInstitutionName extends MCRMetaDefault {
@@ -84,7 +84,7 @@ public final class MCRMetaInstitutionName extends MCRMetaDefault {
 
     /**
      * This methode set all name componets.
-     * 
+     *
      * @param fullname
      *            the full name
      * @param nickname
@@ -104,7 +104,7 @@ public final class MCRMetaInstitutionName extends MCRMetaDefault {
 
     /**
      * This method get the name text element.
-     * 
+     *
      * @return the fullname
      */
     public String getFullName() {
@@ -113,7 +113,7 @@ public final class MCRMetaInstitutionName extends MCRMetaDefault {
 
     /**
      * This method get the nickname text element.
-     * 
+     *
      * @return the nickname
      */
     public String getNickname() {
@@ -122,7 +122,7 @@ public final class MCRMetaInstitutionName extends MCRMetaDefault {
 
     /**
      * This method get the property text element.
-     * 
+     *
      * @return the property
      */
     public String getProperty() {
@@ -132,7 +132,7 @@ public final class MCRMetaInstitutionName extends MCRMetaDefault {
     /**
      * This method reads the XML input stream part from a DOM part for the
      * metadata of the document.
-     * 
+     *
      * @param element
      *            a relevant DOM element for the metadata
      */
@@ -161,7 +161,7 @@ public final class MCRMetaInstitutionName extends MCRMetaDefault {
     /**
      * This method creates a XML stream for all data in this class, defined by
      * the MyCoRe XML MCRMetaInstitutionName definition for the given subtag.
-     * 
+     *
      * @exception MCRException
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML MCRMetaInstitutionName part
@@ -187,7 +187,7 @@ public final class MCRMetaInstitutionName extends MCRMetaDefault {
     /**
      * Creates the JSON representation. Extends the {@link MCRMetaDefault#createJSON()} method
      * with the following data.
-     * 
+     *
      * <pre>
      *   {
      *     fullname: "library of congress",
@@ -217,9 +217,10 @@ public final class MCRMetaInstitutionName extends MCRMetaDefault {
      * <li>the inherited value is lower than zero</li>
      * <li>the trimmed fullname is null or empty</li>
      * </ul>
-     * 
+     *
      * @throws MCRException the MCRMetaInstitutionName is invalid
      */
+    @Override
     public void validate() throws MCRException {
         super.validate();
         fullname = MCRUtils.filterTrimmedNotEmpty(fullname)
@@ -228,9 +229,9 @@ public final class MCRMetaInstitutionName extends MCRMetaDefault {
 
     /**
      * clone of this instance
-     * 
+     *
      * you will get a (deep) clone of this element
-     * 
+     *
      * @see java.lang.Object#clone()
      */
     @Override

@@ -89,6 +89,7 @@ public class MCRDefaultHTTPClient implements MCRHTTPClient {
         this.requestTimeout = Integer.parseInt(size);
     }
 
+    @Override
     public void close() {
         try {
             restClient.close();
@@ -105,7 +106,7 @@ public class MCRDefaultHTTPClient implements MCRHTTPClient {
             @Override
             public MCRContent handleResponse(ClassicHttpResponse response) throws IOException {
                 logger.debug("http query: {}", hrefURI);
-                logger.debug("http resp status: {} {}", response.getCode(), response.getReasonPhrase());
+                logger.debug("http resp status: {} {}", response::getCode, response::getReasonPhrase);
                 logger.debug(() -> getCacheDebugMsg(hrefURI, context));
                 return super.handleResponse(response);
             }

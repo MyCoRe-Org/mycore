@@ -27,7 +27,8 @@ public class MCRTestCronJob extends MCRCronjob {
 
     public static final Logger LOGGER = LogManager.getLogger();
 
-    public static int count = 0;
+    public static int count;
+
     private Integer n;
 
     @Override

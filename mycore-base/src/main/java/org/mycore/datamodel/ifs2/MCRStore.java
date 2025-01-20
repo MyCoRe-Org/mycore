@@ -131,7 +131,7 @@ public class MCRStore {
     /**
      * The last ID assigned by this store.
      */
-    protected int lastID = 0;
+    protected int lastID;
 
     public static final Logger LOGGER = LogManager.getLogger();
 
@@ -166,7 +166,7 @@ public class MCRStore {
                 return slot2id(max);
             }
         } catch (final IOException e) {
-            LOGGER.error("Error while getting highest stored ID in " + baseDirectory, e);
+            LOGGER.error(() -> "Error while getting highest stored ID in " + baseDirectory, e);
         }
         return 0;
     }
@@ -196,7 +196,7 @@ public class MCRStore {
         try (Stream<Path> streamBaseDirectory = Files.list(baseDirectory)) {
             return streamBaseDirectory.findAny().isEmpty();
         } catch (final IOException e) {
-            LOGGER.error("Error while checking if base directory is empty: " + baseDirectory, e);
+            LOGGER.error(() -> "Error while checking if base directory is empty: " + baseDirectory, e);
             return false;
         }
     }
@@ -290,7 +290,7 @@ public class MCRStore {
                 try {
                     addChildren(baseDirectory);
                 } catch (final IOException e) {
-                    LOGGER.error("Error while iterating over children of " + baseDirectory, e);
+                    LOGGER.error(() -> "Error while iterating over children of " + baseDirectory, e);
                 }
                 nextID = findNextID();
                 return this;
@@ -510,7 +510,7 @@ public class MCRStore {
 
             validateAndInitializeBaseDirectory();
         } catch (final IOException e) {
-            LOGGER.error("Could not initialize store " + config.getID() + " correctly.", e);
+            LOGGER.error(() -> "Could not initialize store " + config.getID() + " correctly.", e);
         }
     }
 

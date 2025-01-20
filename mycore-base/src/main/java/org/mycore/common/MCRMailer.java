@@ -78,12 +78,12 @@ import jakarta.xml.bind.annotation.XmlValue;
 
 /**
  * This class provides methods to send emails from within a MyCoRe application.
- * 
+ *
  * @author Marc Schluepmann
  * @author Frank Lützenkirchen
  * @author Werner Greßhoff
  * @author René Adler (eagle)
- * 
+ *
  */
 public class MCRMailer extends MCRServlet {
 
@@ -146,7 +146,7 @@ public class MCRMailer extends MCRServlet {
 
     /**
      * This method sends a simple plaintext email with the given parameters.
-     * 
+     *
      * @param sender
      *            the sender of the email
      * @param recipient
@@ -167,7 +167,7 @@ public class MCRMailer extends MCRServlet {
     /**
      * This method sends a simple plaintext email to more than one recipient. If
      * flag BCC is true, the sender will also get the email as BCC recipient.
-     * 
+     *
      * @param sender
      *            the sender of the email
      * @param recipients
@@ -194,7 +194,7 @@ public class MCRMailer extends MCRServlet {
 
     /**
      * This method sends a multipart email with the given parameters.
-     * 
+     *
      * @param sender
      *            the sender of the email
      * @param recipient
@@ -217,7 +217,7 @@ public class MCRMailer extends MCRServlet {
     /**
      * This method sends a multipart email to more than one recipient. If flag
      * BCC is true, the sender will also get the email as BCC recipient.
-     * 
+     *
      * @param sender
      *            the sender of the email
      * @param recipients
@@ -264,7 +264,7 @@ public class MCRMailer extends MCRServlet {
         try {
             send(email, false);
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error(e::getMessage);
         }
     }
 
@@ -302,8 +302,7 @@ public class MCRMailer extends MCRServlet {
      * Sends email. When sending email fails (for example, outgoing mail server
      * is not responding), sending will be retried after five minutes. This is
      * done up to 10 times.
-     * 
-     * 
+     *
      * @param from
      *            the sender of the email
      * @param replyTo
@@ -343,7 +342,7 @@ public class MCRMailer extends MCRServlet {
      * Sends email. When sending email fails (for example, outgoing mail server
      * is not responding), sending will be retried after five minutes. This is
      * done up to 10 times.
-     * 
+     *
      * @param mail the email
      */
     public static void send(EMail mail) {
@@ -445,9 +444,9 @@ public class MCRMailer extends MCRServlet {
             messagePart.setDataHandler(new DataHandler(source));
             String fileName = url.getPath();
             if (fileName.contains("\\")) {
-                fileName = fileName.substring(fileName.lastIndexOf("\\") + 1);
+                fileName = fileName.substring(fileName.lastIndexOf('\\') + 1);
             } else if (fileName.contains("/")) {
-                fileName = fileName.substring(fileName.lastIndexOf("/") + 1);
+                fileName = fileName.substring(fileName.lastIndexOf('/') + 1);
             }
             messagePart.setFileName(fileName);
             multipart.addBodyPart(messagePart);
@@ -457,16 +456,16 @@ public class MCRMailer extends MCRServlet {
     /**
      * Generates e-mail from the given input document by transforming it with an xsl stylesheet,
      * and sends the e-mail afterwards.
-     * 
+     *
      * @param input the xml input document
-     * @param stylesheet the xsl stylesheet that will generate the e-mail, without the ending ".xsl" 
+     * @param stylesheet the xsl stylesheet that will generate the e-mail, without the ending ".xsl"
      * @param parameters the optionally empty table of xsl parameters
      * @return the generated e-mail
-     * 
+     *
      * @see org.mycore.common.MCRMailer
      */
     public static Element sendMail(Document input, String stylesheet, Map<String, String> parameters) throws Exception {
-        LOGGER.info("Generating e-mail from {} using {}.xsl", input.getRootElement().getName(), stylesheet);
+        LOGGER.info("Generating e-mail from {} using {}.xsl", () -> input.getRootElement().getName(), () -> stylesheet);
         if (LOGGER.isDebugEnabled()) {
             debug(input.getRootElement());
         }
@@ -479,7 +478,8 @@ public class MCRMailer extends MCRServlet {
         if (eMail.getChildren("to").isEmpty()) {
             LOGGER.warn("Will not send e-mail, no 'to' address specified");
         } else {
-            LOGGER.info("Sending e-mail to {}: {}", eMail.getChildText("to"), eMail.getChildText("subject"));
+            LOGGER.info("Sending e-mail to {}: {}", () -> eMail.getChildText("to"),
+                () -> eMail.getChildText("subject"));
             send(eMail);
         }
 
@@ -489,20 +489,20 @@ public class MCRMailer extends MCRServlet {
     /**
      * Generates e-mail from the given input document by transforming it with an xsl stylesheet,
      * and sends the e-mail afterwards.
-     * 
+     *
      * @param input the xml input document
-     * @param stylesheet the xsl stylesheet that will generate the e-mail, without the ending ".xsl" 
+     * @param stylesheet the xsl stylesheet that will generate the e-mail, without the ending ".xsl"
      * @return the generated e-mail
-     * 
+     *
      * @see org.mycore.common.MCRMailer
      */
     public static Element sendMail(Document input, String stylesheet) throws Exception {
         return sendMail(input, stylesheet, Collections.emptyMap());
     }
 
-    /** 
+    /**
      * Transforms the given input element using xsl stylesheet.
-     * 
+     *
      * @param input the input document to transform.
      * @param stylesheet the name of the xsl stylesheet to use, without the ".xsl" ending.
      * @param parameters the optionally empty table of xsl parameters
@@ -522,7 +522,7 @@ public class MCRMailer extends MCRServlet {
     /** Outputs xml to the LOGGER for debugging */
     private static void debug(Element xml) {
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-        LOGGER.debug(DELIMITER + "{}" + DELIMITER, xout.outputString(xml));
+        LOGGER.debug(() -> DELIMITER + xout.outputString(xml) + DELIMITER);
     }
 
     @XmlRootElement(name = "email")
@@ -553,7 +553,8 @@ public class MCRMailer extends MCRServlet {
 
         private static JAXBContext initContext() {
             try {
-                return JAXBContext.newInstance(EMail.class.getPackage().getName(), EMail.class.getClassLoader());
+                return JAXBContext.newInstance(EMail.class.getPackage().getName(), Thread.currentThread()
+                    .getContextClassLoader());
             } catch (final JAXBException e) {
                 throw new MCRException("Could not instantiate JAXBContext.", e);
             }
@@ -561,7 +562,7 @@ public class MCRMailer extends MCRServlet {
 
         /**
          * Parse a email from given {@link Element}.
-         * 
+         *
          * @param xml the email
          * @return the {@link EMail} object
          */
@@ -578,7 +579,7 @@ public class MCRMailer extends MCRServlet {
          * Builds email address from a string. The string may be a single email
          * address or a combination of a personal name and address, like "John Doe"
          * &lt;john@doe.com&gt;
-         * 
+         *
          * @param s the email address string
          * @return a {@link InternetAddress}
          * @throws Exception throws AddressException or UnsupportedEncodingException
@@ -588,8 +589,8 @@ public class MCRMailer extends MCRServlet {
                 return new InternetAddress(s.trim());
             }
 
-            String name = s.substring(0, s.lastIndexOf("<")).trim();
-            String addr = s.substring(s.lastIndexOf("<") + 1, s.length() - 1).trim();
+            String name = s.substring(0, s.lastIndexOf('<')).trim();
+            String addr = s.substring(s.lastIndexOf('<') + 1, s.length() - 1).trim();
 
             if (name.startsWith("\"") && name.endsWith("\"")) {
                 name = name.substring(1, name.length() - 1);
@@ -600,7 +601,7 @@ public class MCRMailer extends MCRServlet {
 
         /**
          * Builds a list of email addresses from a string list.
-         * 
+         *
          * @param addresses the list with email addresses
          * @return a list of {@link InternetAddress}s
          * @see MCRMailer.EMail#buildAddress(String)
@@ -617,7 +618,7 @@ public class MCRMailer extends MCRServlet {
 
         /**
          * Returns the text message part.
-         * 
+         *
          * @return the text message part
          */
         public Optional<MessagePart> getTextMessage() {
@@ -627,7 +628,7 @@ public class MCRMailer extends MCRServlet {
 
         /**
          * Returns the HTML message part.
-         * 
+         *
          * @return the HTML message part
          */
         public Optional<MessagePart> getHTMLMessage() {
@@ -637,7 +638,7 @@ public class MCRMailer extends MCRServlet {
 
         /**
          * Returns the {@link EMail} as XML.
-         * 
+         *
          * @return the XML
          */
         public Document toXML() {
@@ -770,6 +771,7 @@ public class MCRMailer extends MCRServlet {
 
     private static class SMTPAuthenticator extends Authenticator {
 
+        @Override
         public PasswordAuthentication getPasswordAuthentication() {
             return new PasswordAuthentication(MCRConfiguration2.getStringOrThrow("MCR.Mail.User"),
                 MCRConfiguration2.getStringOrThrow("MCR.Mail.Password"));

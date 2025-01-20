@@ -60,7 +60,7 @@ public class MCRPDFTools implements AutoCloseable {
      * This method returns a Buffered Image as thumbnail if an initial page was set,
      * it will be return - if not the first page
      *
-     * @param thumbnailSize - the size: size = max(width, height) 
+     * @param thumbnailSize - the size: size = max(width, height)
      *                        a size &lt; 0 will return the original size and centered parameter will be ignored
      * @param pdfFile       - the file from which the thumbnail will be taken
      * @param centered      - if true, a square (thumbnail with same width and
@@ -99,7 +99,7 @@ public class MCRPDFTools implements AutoCloseable {
         // if centered make thumbnailSize x thumbnailSize image
         final BufferedImage bicubicScaledPage = new BufferedImage(centered ? thumbnailSize : newWidth,
             centered ? thumbnailSize : newHeight, imageType);
-        LOGGER.info("target image dimensions: {}x{}", bicubicScaledPage.getWidth(), bicubicScaledPage.getHeight());
+        LOGGER.info("target image dimensions: {}x{}", bicubicScaledPage::getWidth, bicubicScaledPage::getHeight);
         final Graphics2D bg = bicubicScaledPage.createGraphics();
         try {
             bg.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);

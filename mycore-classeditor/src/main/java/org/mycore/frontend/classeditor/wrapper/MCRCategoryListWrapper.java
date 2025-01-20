@@ -28,7 +28,7 @@ public class MCRCategoryListWrapper {
 
     private List<MCRCategory> categList;
 
-    private Map<MCRCategoryID, Boolean> linkMap = null;
+    private Map<MCRCategoryID, Boolean> linkMap;
 
     public MCRCategoryListWrapper(List<MCRCategory> categList) {
         this.categList = categList;

@@ -36,7 +36,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
- * 
+ *
  * @author René Adler (eagle)
  */
 public class MCRShibbolethLoginServlet extends MCRServlet {
@@ -45,6 +45,7 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
 
     private static Logger LOGGER = LogManager.getLogger(MCRShibbolethLoginServlet.class);
 
+    @Override
     public void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
@@ -55,7 +56,7 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
         String userId = uid != null ? uid : req.getRemoteUser();
 
         if (userId != null) {
-            final String realmId = userId.contains("@") ? userId.substring(userId.indexOf("@") + 1) : null;
+            final String realmId = userId.contains("@") ? userId.substring(userId.indexOf('@') + 1) : null;
             if (realmId != null && MCRRealmFactory.getRealm(realmId) != null) {
                 userId = realmId != null ? userId.replace("@" + realmId, "") : userId;
 
@@ -74,7 +75,7 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
 
                 MCRUser user = MCRUserManager.getUser(userId, realmId);
                 if (user != null) {
-                    LOGGER.debug("login existing user \"{}\"", user.getUserID());
+                    LOGGER.debug("login existing user \"{}\"", user::getUserID);
 
                     attributeMapper.mapAttributes(user, attributes);
                     user.setLastLogin();

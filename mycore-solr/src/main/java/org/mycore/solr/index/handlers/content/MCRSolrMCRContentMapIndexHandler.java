@@ -109,11 +109,11 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
                     updateResponse = req.process(destinationCore.getClient());
                     if (updateResponse != null && updateResponse.getStatus() != 0) {
                         LOGGER.error("Error while indexing document collection. Split and retry: {}",
-                            updateResponse.getResponse());
+                            updateResponse::getResponse);
                         splitup(List.of(destinationCore));
                     } else {
-                        LOGGER.info("Sending {} documents was successful in {} ms.", totalCount,
-                            updateResponse.getElapsedTime());
+                        LOGGER.info("Sending {} documents was successful in {} ms.", () -> totalCount,
+                            updateResponse::getElapsedTime);
                     }
                 } catch (SolrServerException | IOException e) {
                     LOGGER.warn("Error while indexing document collection. Split and retry.", e);

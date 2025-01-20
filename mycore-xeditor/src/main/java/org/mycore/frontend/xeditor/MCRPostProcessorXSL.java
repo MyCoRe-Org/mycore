@@ -40,11 +40,11 @@ import org.mycore.common.xml.MCRXMLFunctions;
 /**
  * PostProcessor for MyCoRe editor framework
  * that allows execution of XSLT stylesheets after an editor is closed
- * 
- * &lt;xed:post-processor class="org.mycore.frontend.xeditor.MCRPostProcessorXSL" 
+ *
+ * &lt;xed:post-processor class="org.mycore.frontend.xeditor.MCRPostProcessorXSL"
  *      xsl="editor/ir_xeditor2mods.xsl" transformer="saxon" /&gt;
- * 
- * You can specify with param xsl the stylesheet, which should be processed and 
+ *
+ * You can specify with param xsl the stylesheet, which should be processed and
  * you can specify with parm transformer the XSLStylesheetProcessor ('xalan' or 'saxon').
  * If no transformer is specified the default transformer will be used
  * (property: MCR.LayoutService.TransformerFactoryClass).
@@ -55,6 +55,7 @@ public class MCRPostProcessorXSL implements MCRXEditorPostProcessor {
 
     private String stylesheet;
 
+    @Override
     public Document process(Document xml) throws IOException, JDOMException {
         if (stylesheet == null) {
             return xml.clone();
@@ -102,6 +103,7 @@ public class MCRPostProcessorXSL implements MCRXEditorPostProcessor {
 
 class MCRNormalizeUnicodeTransformer extends MCRContentTransformer {
 
+    @Override
     public MCRJDOMContent transform(MCRContent source) throws IOException {
         try {
             Element root = source.asXML().getRootElement().clone();

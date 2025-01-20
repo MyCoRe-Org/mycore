@@ -40,6 +40,7 @@ public class MCRSolrPropertyAuthenticationManager implements MCRSolrAuthenticati
         return instance;
     }
 
+    @Override
     public void applyAuthentication(SolrRequest<?> request, MCRSolrAuthenticationLevel level) {
         Optional<MCRSolrAuthentication> optImpl = loadImplementation(level);
         optImpl.ifPresent(instance -> {
@@ -47,6 +48,7 @@ public class MCRSolrPropertyAuthenticationManager implements MCRSolrAuthenticati
         });
     }
 
+    @Override
     public void applyAuthentication(HttpRequest.Builder request, MCRSolrAuthenticationLevel level) {
         Optional<MCRSolrAuthentication> optImpl = loadImplementation(level);
         optImpl.ifPresent(instance -> {

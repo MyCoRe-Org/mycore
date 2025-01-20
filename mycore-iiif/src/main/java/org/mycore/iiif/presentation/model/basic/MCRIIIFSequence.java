@@ -41,9 +41,9 @@ public class MCRIIIFSequence extends MCRIIIFPresentationBase {
 
     private String label;
 
-    private MCRIIIFAnnotationBase thumbnail = null;
+    private MCRIIIFAnnotationBase thumbnail;
 
-    private MCRIIIFViewingDirection viewingDirection = null;
+    private MCRIIIFViewingDirection viewingDirection;
 
     public MCRIIIFSequence(String id) {
         super(id, TYPE, API_PRESENTATION_2);

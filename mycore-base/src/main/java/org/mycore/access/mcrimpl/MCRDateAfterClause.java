@@ -28,7 +28,7 @@ import org.mycore.parsers.bool.MCRCondition;
 
 /**
  * Implementation of a (date &gt; xy) clause
- * 
+ *
  * @author Matthias Kramm
  */
 class MCRDateAfterClause implements MCRCondition<MCRAccessData> {
@@ -40,6 +40,7 @@ class MCRDateAfterClause implements MCRCondition<MCRAccessData> {
         this.date = date;
     }
 
+    @Override
     public boolean evaluate(MCRAccessData data) {
         return data.getDate().after(date);
     }
@@ -49,6 +50,7 @@ class MCRDateAfterClause implements MCRCondition<MCRAccessData> {
         return "date > " + dateformat.format(date) + " ";
     }
 
+    @Override
     public Element toXML() {
         Element cond = new Element("condition");
         cond.setAttribute("field", "date");

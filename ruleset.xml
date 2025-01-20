@@ -31,17 +31,11 @@
   <rule ref="category/java/bestpractices.xml/DoubleBraceInitialization"/>
   <rule ref="category/java/bestpractices.xml/ForLoopCanBeForeach"/>
   <rule ref="category/java/bestpractices.xml/ForLoopVariableCount"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/bestpractices.xml/GuardLogStatement"/>
-  -->
   <rule ref="category/java/bestpractices.xml/JUnit4SuitesShouldUseSuiteAnnotation"/>
   <rule ref="category/java/bestpractices.xml/UnitTestShouldUseAfterAnnotation"/>
   <rule ref="category/java/bestpractices.xml/UnitTestShouldUseBeforeAnnotation"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/bestpractices.xml/UnitTestShouldUseTestAnnotation"/>
-  -->
   <rule ref="category/java/bestpractices.xml/JUnit5TestShouldBePackagePrivate"/>
   <rule ref="category/java/bestpractices.xml/UnitTestShouldIncludeAssert"/>
   <!-- TODO: Create PR to fix this rule -->
@@ -52,10 +46,7 @@
   <!--
   <rule ref="category/java/bestpractices.xml/MethodReturnsInternalArray"/>
   -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/bestpractices.xml/MissingOverride"/>
-  -->
   <rule ref="category/java/bestpractices.xml/OneDeclarationPerLine"/>
   <!-- TODO: Create PR to fix this rule -->
   <!--
@@ -90,10 +81,7 @@
   <!--
   <rule ref="category/java/bestpractices.xml/UseCollectionIsEmpty"/>
   -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/bestpractices.xml/UseEnumCollections"/>
-  -->
   <rule ref="category/java/bestpractices.xml/UseStandardCharsets"/>
   <!-- TODO: Create PR to fix this rule -->
   <!--
@@ -171,10 +159,7 @@
   <rule ref="category/java/codestyle.xml/UseDiamondOperator"/>
   -->
   <rule ref="category/java/codestyle.xml/UselessQualifiedThis"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/codestyle.xml/UseShortArrayInitializer"/>
-  -->
   <!-- TODO: Create PR to fix this rule -->
   <!--
   <rule ref="category/java/codestyle.xml/UseUnderscoresInNumericLiterals"/>
@@ -230,10 +215,7 @@
   <rule ref="category/java/design.xml/NPathComplexity"/>
   <rule ref="category/java/design.xml/SimplifyConditional"/>
   <rule ref="category/java/design.xml/SingularField"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/design.xml/UselessOverridingMethod"/>
-  -->
   <!-- TODO: Create PR to fix this rule -->
   <!--
   <rule ref="category/java/design.xml/UseObjectForClearerAPI"/>
@@ -265,10 +247,7 @@
   <rule ref="category/java/errorprone.xml/BrokenNullCheck"/>
   <rule ref="category/java/errorprone.xml/CheckSkipResult"/>
   <rule ref="category/java/errorprone.xml/ClassCastExceptionWithToArray"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/errorprone.xml/CloneMethodMustBePublic"/>
-  -->
   <rule ref="category/java/errorprone.xml/CloneMethodMustImplementCloneable"/>
   <rule ref="category/java/errorprone.xml/CloneMethodReturnTypeMustMatchClassName"/>
   <!-- TODO: Create PR to fix this rule -->
@@ -313,10 +292,7 @@
   <!--
   <rule ref="category/java/errorprone.xml/NonSerializableClass"/>
   -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/errorprone.xml/NonStaticInitializer"/>
-  -->
   <!-- TODO: Create PR to fix this rule -->
   <!--
   <rule ref="category/java/errorprone.xml/OverrideBothEqualsAndHashcode"/>
@@ -365,10 +341,7 @@
   <rule ref="category/java/errorprone.xml/UseEqualsToCompareStrings"/>
   <rule ref="category/java/errorprone.xml/UselessOperationOnImmutable"/>
   <rule ref="category/java/errorprone.xml/UseLocaleWithCaseConversions"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/errorprone.xml/UseProperClassLoader"/>
-  -->
 
   <!-- Multithreading Rules -->
   <!-- TODO: Create PR to fix this rule -->
@@ -388,14 +361,8 @@
   <!--
   <rule ref="category/java/multithreading.xml/DoubleCheckedLocking"/>
   -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/multithreading.xml/NonThreadSafeSingleton"/>
-  -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/multithreading.xml/UnsynchronizedStaticFormatter"/>
-  -->
   <!-- TODO: Create PR to fix this rule -->
   <!--
   <rule ref="category/java/multithreading.xml/UseConcurrentHashMap"/>
@@ -410,10 +377,8 @@
   <rule ref="category/java/performance.xml/AppendCharacterWithChar"/>
   <rule ref="category/java/performance.xml/AvoidArrayLoops"/>
   <rule ref="category/java/performance.xml/AvoidCalendarDateCreation"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/performance.xml/AvoidFileStream"/>
-  -->
+
   <!-- TODO: Create PR to fix this rule -->
   <!--
   <rule ref="category/java/performance.xml/BigIntegerInstantiation"/>
@@ -424,10 +389,7 @@
   -->
   <rule ref="category/java/performance.xml/InefficientStringBuffering"/>
   <rule ref="category/java/performance.xml/OptimizableToArrayCall"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/performance.xml/RedundantFieldInitializer"/>
-  -->
   <rule ref="category/java/performance.xml/StringInstantiation"/>
   <rule ref="category/java/performance.xml/StringToString"/>
   <!-- TODO: Create PR to fix this rule -->
@@ -435,16 +397,10 @@
   <rule ref="category/java/performance.xml/UseArrayListInsteadOfVector"/>
   -->
   <rule ref="category/java/performance.xml/UseArraysAsList"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/performance.xml/UseIndexOfChar"/>
-  -->
   <rule ref="category/java/performance.xml/UseIOStreamsWithApacheCommonsFileItem"/>
   <rule ref="category/java/performance.xml/UselessStringValueOf"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/performance.xml/UseStringBufferForStringAppends"/>
-  -->
   <rule ref="category/java/performance.xml/UseStringBufferLength"/>
 
   <!-- Security Rules (Include entire ruleset) -->

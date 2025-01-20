@@ -133,7 +133,7 @@ public class MCRModsClassificationURIResolver implements URIResolver {
             .map(category -> String.format(Locale.ROOT, "classification:metadata:0:parents:%s:%s", category.getRootID(),
                 category.getId()));
         if (categoryURI.isPresent()) {
-            LOGGER.debug("{} -> {}", href, categoryURI.get());
+            LOGGER.debug("{} -> {}", () -> href, categoryURI::get);
             return MCRURIResolver.instance().resolve(categoryURI.get(), base);
         }
         LOGGER.debug("no category found for {}", href);

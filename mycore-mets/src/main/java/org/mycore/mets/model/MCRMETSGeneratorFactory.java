@@ -100,7 +100,7 @@ public final class MCRMETSGeneratorFactory {
                 getOldMets(derivatePath).ifPresent(abstractGenerator::setOldMets);
             } catch (Exception exc) {
                 // we should not fail if the old mets.xml is broken
-                LogManager.getLogger().error("Unable to read mets.xml of {}", derivatePath.getOwner(), exc);
+                LogManager.getLogger().error(() -> "Unable to read mets.xml of " + derivatePath.getOwner(), exc);
             }
         }
         return generator;
@@ -170,7 +170,7 @@ public final class MCRMETSGeneratorFactory {
      */
     public static class MCRMETSPropertyGeneratorSelector implements MCRMETSGeneratorSelector {
 
-        private static Class<? extends MCRMETSGenerator> METS_GENERATOR_CLASS = null;
+        private static Class<? extends MCRMETSGenerator> METS_GENERATOR_CLASS;
 
         @Override
         public MCRMETSGenerator get(MCRPath derivatePath) {

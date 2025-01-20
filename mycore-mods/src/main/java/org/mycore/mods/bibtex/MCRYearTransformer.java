@@ -39,6 +39,7 @@ class MCRYearTransformer extends MCRField2XPathTransformer {
         super("year", "mods:originInfo/mods:dateIssued[@encoding='w3cdtf']");
     }
 
+    @Override
     void buildField(BibtexAbstractValue value, Element parent) {
         String content = ((BibtexString) value).getContent();
         content = normalizeValue(content);

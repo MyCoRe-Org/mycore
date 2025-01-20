@@ -33,7 +33,7 @@ public class MCRChangeTracker implements Cloneable {
 
     public static final String PREFIX = "xed-tracker-";
 
-    private int counter = 0;
+    private int counter;
 
     public void track(MCRChangeData data) {
         ProcessingInstruction pi = data.getProcessingInstruction();

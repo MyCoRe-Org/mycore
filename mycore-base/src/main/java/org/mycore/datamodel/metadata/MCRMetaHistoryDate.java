@@ -35,7 +35,7 @@ import com.ibm.icu.util.GregorianCalendar;
 /**
  * This class implements all methods for handling the MCRMetaHistoryDate
  * part of a metadata object. It uses the GPL licensed ICU library of IBM.
- * 
+ *
  * @author Juergen Vogler
  * @author Jens Kupferschmidt
  * @author Thomas Junge
@@ -85,7 +85,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * is null or empty an exception was thrown. The type element was set to
      * the value of <em>type</em>, if it is null, an empty string was set
      * to the type element.<br>
-     * The text element is set to an empty string. The calendar is set to 'Gregorian Calendar'. The von value 
+     * The text element is set to an empty string. The calendar is set to 'Gregorian Calendar'. The von value
      * is set to MIN_JULIAN_DAY_NUMBER, the bis value is set to MAX_JULIAN_DAY_NUMBER;
      * @param subtag      the name of the subtag
      * @param type        the optional type string
@@ -104,7 +104,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     /**
      * This method set the text field for the default language. If data exists,
      * it overwrites the value of text.
-     * 
+     *
      * @param text
      *            the text string for a date or range
      */
@@ -116,7 +116,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     /**
      * This method set the text field for the given language. If data exists, it
      * overwrites the value of text.
-     * 
+     *
      * @param text
      *            the text string for a date or range
      * @param lang
@@ -143,7 +143,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     /**
      * This method add a MCRMetaHistoryDateTexts instance to the ArrayList of
      * texts.
-     * 
+     *
      * @param text
      *            the text- String
      * @param lang
@@ -171,7 +171,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     /**
      * This method return the MCRMetaHistoryDateTexts instance with the
      * corresponding language.
-     * 
+     *
      * @param lang
      *            the language String in ISO format
      * @return an instance of MCRMetaHistoryDateTexts or null
@@ -189,7 +189,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     /**
      * This method return the MCRMetaHistoryDateTexts instance of the indexed
      * element of the ArrayList.
-     * 
+     *
      * @param index
      *            the index of ArryList texts
      * @return an instance of MCRMetaHistoryDateTexts or null
@@ -203,7 +203,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
 
     /**
      * This method read the ArryList texts
-     * 
+     *
      * @return an ArrayList of MCRMetaHistoryDateTexts instances
      */
     public final ArrayList<MCRMetaHistoryDateText> getTexts() {
@@ -212,7 +212,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
 
     /**
      * This method read the size of texts
-     * 
+     *
      * @return the size of the ArrayList of language dependence texts
      */
     public final int textSize() {
@@ -221,7 +221,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
 
     /**
      * The method set the calendar String value.
-     * 
+     *
      * @param calstr
      *            the calendar as String, one of CALENDARS.
      */
@@ -237,7 +237,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
 
     /**
      * The method set the calendar String value.
-     * 
+     *
      * @param calendar
      *            the date of the calendar.
      */
@@ -265,7 +265,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
 
     /**
      * This method set the von to the given date of a supported calendar.
-     * 
+     *
      * @param calendar
      *            the date of a ICU supported calendar.
      */
@@ -281,7 +281,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
 
     /**
      * This method set the von to the given date.
-     * 
+     *
      * @param date
      *            a date string
      * @param calendar
@@ -292,7 +292,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
             von = MCRCalendar.getHistoryDateAsCalendar(date, false, calendar);
             ivon = von.get(Calendar.JULIAN_DAY);
         } catch (Exception e) {
-            LOGGER.debug(e.getMessage());
+            LOGGER.debug(e::getMessage);
             LOGGER.warn("The von date {} for calendar {} is false. Set to default!", date, calendar);
             setDefaultVon();
         }
@@ -300,7 +300,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
 
     /**
      * This method set the bis to the given date of a supported calendar.
-     * 
+     *
      * @param calendar
      *            the date of a ICU supported calendar
      */
@@ -316,7 +316,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
 
     /**
      * This method set the bis to the given date.
-     * 
+     *
      * @param date
      *            a date string
      * @param calendar
@@ -335,7 +335,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
 
     /**
      * This method get the 'calendar' text element.
-     * 
+     *
      * @return the calendar string
      */
     public final String getCalendar() {
@@ -344,7 +344,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
 
     /**
      * This method get the von element as ICU-Calendar.
-     * 
+     *
      * @return the date
      */
     public final Calendar getVon() {
@@ -353,7 +353,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
 
     /**
      * This method return the von as string.
-     * 
+     *
      * @return the date
      */
     public final String getVonToString() {
@@ -362,7 +362,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
 
     /**
      * This method get the ivon element as Julian Day integer.
-     * 
+     *
      * @return the date
      */
     public final int getIvon() {
@@ -371,7 +371,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
 
     /**
      * This method get the bis element as ICU-Calendar.
-     * 
+     *
      * @return the date
      */
     public final Calendar getBis() {
@@ -380,7 +380,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
 
     /**
      * This method return the bis as string.
-     * 
+     *
      * @return the date
      */
     public final String getBisToString() {
@@ -389,7 +389,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
 
     /**
      * This method get the ibis element as Julian Day integer.
-     * 
+     *
      * @return the date
      */
     public final int getIbis() {
@@ -399,7 +399,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     /**
      * This method reads the XML input stream part from a DOM part for the
      * metadata of the document.
-     * 
+     *
      * @param element
      *            a relevant JDOM element for the metadata
      */
@@ -420,8 +420,8 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         setCalendar(element.getChildTextTrim("calendar"));
         setVonDate(element.getChildTextTrim("von"), calendar);
         setBisDate(element.getChildTextTrim("bis"), calendar);
-        /** 
-         * If dates higher than 1582 and calendar is Julian the calendar must switch to 
+        /**
+         * If dates higher than 1582 and calendar is Julian the calendar must switch to
          * Gregorian cause the date transforming is implicit in the calendar methods. In
          * other cases before 1582 both calendar are equal.
          * */
@@ -433,7 +433,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     /**
      * This method creates a XML stream for all data in this class, defined by
      * the MyCoRe XML MCRMetaHistoryDate definition for the given subtag.
-     * 
+     *
      * @exception MCRException
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML MCRMetaHistoryDate part
@@ -466,7 +466,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * <li>the number of texts is 0 (empty texts are delete)</li>
      * <li>von is null or bis is null or calendar is null</li>
      * </ul>
-     * 
+     *
      * @throws MCRException the MCRMetaHistoryDate is invalid
      */
     @Override
@@ -488,9 +488,9 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
 
     /**
      * clone of this instance
-     * 
+     *
      * you will get a (deep) clone of this element
-     * 
+     *
      * @see java.lang.Object#clone()
      */
     @Override
@@ -553,7 +553,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     /**
      * This class describes the structure of pair of language an text. The
      * language notation is in the ISO format.
-     * 
+     *
      */
     public static class MCRMetaHistoryDateText implements Cloneable {
         private String text;
@@ -571,7 +571,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
 
         /**
          * This method get the text element as String.
-         * 
+         *
          * @return the text
          */
 
@@ -581,7 +581,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
 
         /**
          * This method get the language element as String of ISO code.
-         * 
+         *
          * @return the language
          */
         public String getLang() {
@@ -590,19 +590,19 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
 
         /**
          * This method set the text element with the corresponding language.
-         * 
+         *
          * @param text
          *            the text String
          * @param lang
          *            the language String
          */
         public void setText(String text, String lang) {
-            if (lang == null || lang.length() == 0) {
+            if (lang == null || lang.isEmpty()) {
                 this.lang = DEFAULT_LANGUAGE;
             } else {
                 this.lang = lang;
             }
-            if (text == null || text.length() == 0) {
+            if (text == null || text.isEmpty()) {
                 this.text = "";
             } else {
                 this.text = text;
@@ -611,13 +611,13 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
 
         /**
          * This method set the text element.
-         * 
+         *
          * @param text
          *            the text String of a date value
          */
         @Deprecated
         public void setText(String text) {
-            if (text == null || text.length() == 0) {
+            if (text == null || text.isEmpty()) {
                 this.text = "";
             } else {
                 this.text = text;
@@ -626,13 +626,13 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
 
         /**
          * This method set the lang element.
-         * 
+         *
          * @param lang
          *            the language String of a date value
          */
         @Deprecated
         public void setLang(String lang) {
-            if (lang == null || lang.length() == 0) {
+            if (lang == null || lang.isEmpty()) {
                 this.lang = DEFAULT_LANGUAGE;
             } else {
                 this.lang = lang;
@@ -641,17 +641,17 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
 
         /**
          * This method validate the content. If lang and text are not empty, it return true otherwise it return false.
-         * 
+         *
          * @return true if the content is valid.
          */
         public boolean isValid() {
-            return !(lang.length() == 0 || text.length() == 0);
+            return !(lang.isEmpty() || text.isEmpty());
         }
 
         /**
          * This method check the equivalence of lang and text between this object
          * and a given MCRMetaHistoryDateText object.
-         * 
+         *
          * @param obj a MCRMetaHistoryDateText instance
          * @return true if both parts are equal
          */
@@ -660,17 +660,15 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         }
 
         @Override
-        protected MCRMetaHistoryDateText clone() {
+        public MCRMetaHistoryDateText clone() {
             MCRMetaHistoryDateText clone = null;
             try {
                 clone = (MCRMetaHistoryDateText) super.clone();
-            } catch (Exception e) {
-                // this can not happen!
+                clone.text = this.text;
+                clone.lang = this.lang;
+            } catch (CloneNotSupportedException e) {
+                // this can not happen, as MCRMetaInterface implements Cloneable
             }
-
-            clone.text = this.text;
-            clone.lang = this.lang;
-
             return clone;
         }
     }

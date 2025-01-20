@@ -46,7 +46,8 @@ public final class MCRUserTransformer {
 
     private static JAXBContext initContext() {
         try {
-            return JAXBContext.newInstance(MCRUser.class.getPackage().getName(), MCRUser.class.getClassLoader());
+            return JAXBContext.newInstance(MCRUser.class.getPackage().getName(), Thread.currentThread()
+                .getContextClassLoader());
         } catch (JAXBException e) {
             throw new MCRException("Could not instantiate JAXBContext.", e);
         }

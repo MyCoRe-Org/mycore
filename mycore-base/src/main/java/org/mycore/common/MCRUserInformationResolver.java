@@ -78,7 +78,7 @@ public final class MCRUserInformationResolver {
         this.providers = Objects.requireNonNull(providers, "Providers must not be null");
         this.providers.values().forEach(provider -> Objects.requireNonNull(provider, "Provider must not be null"));
 
-        LOGGER.info("Working with providers: " + String.join(", ", providers.keySet()));
+        LOGGER.info(() -> "Working with providers: " + String.join(", ", providers.keySet()));
 
     }
 
@@ -106,7 +106,7 @@ public final class MCRUserInformationResolver {
 
     public Optional<MCRUserInformation> get(String specification) {
 
-        int delimiterPosition = specification.indexOf(":");
+        int delimiterPosition = specification.indexOf(':');
         if (delimiterPosition == -1) {
             throw new MCRUsageException("No schema delimiter found in " + specification);
         }

@@ -96,11 +96,11 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
             }
             if (updateResponse.getStatus() != 0) {
                 LOGGER.error("Error while indexing document collection. Split and retry: {}",
-                    updateResponse.getResponse());
+                    updateResponse::getResponse);
                 splitDocuments();
             } else {
-                LOGGER.info("Sending {} documents was successful in {} ms.", totalCount,
-                    updateResponse.getElapsedTime());
+                LOGGER.info("Sending {} documents was successful in {} ms.", () -> totalCount,
+                    updateResponse::getElapsedTime);
             }
         }
     }

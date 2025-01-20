@@ -57,7 +57,7 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
 
     @Override
     public boolean isReady() {
-        LOGGER.debug("TRANSACTION {} READY CHECK - {}", threadId, MANAGER != null);
+        LOGGER.debug("TRANSACTION {} READY CHECK - {}", () -> threadId, () -> MANAGER != null);
         return MANAGER != null;
     }
 

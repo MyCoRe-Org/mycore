@@ -60,7 +60,8 @@ public class MCRApiDraftFilter implements ContainerRequestFilter {
             final String apiDraftName = apiDraft.get().value();
             final String propertyName = "MCR.RestApi.Draft." + apiDraftName;
             if (!MCRConfiguration2.getBoolean(propertyName).orElse(false)) {
-                LogManager.getLogger().warn("Draft API not enabled. Set '" + propertyName + "=true' to enable access.");
+                LogManager.getLogger()
+                    .warn(() -> "Draft API not enabled. Set '" + propertyName + "=true' to enable access.");
                 requestContext.abortWith(Response.status(Response.Status.NOT_FOUND).build());
             }
         }

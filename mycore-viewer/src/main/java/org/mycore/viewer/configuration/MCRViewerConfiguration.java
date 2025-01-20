@@ -62,8 +62,8 @@ import jakarta.xml.bind.annotation.XmlValue;
 
 /**
  * Base class for the iview client configuration. You can add properties, javascript files and css files.
- * To retrieve the configuration in xml call {@link #toXML()}. To get it in json call {@link #toJSON()}. 
- * 
+ * To retrieve the configuration in xml call {@link #toXML()}. To get it in json call {@link #toJSON()}.
+ *
  * @author Matthias Eichner
  */
 public class MCRViewerConfiguration {
@@ -112,7 +112,7 @@ public class MCRViewerConfiguration {
 
     /**
      * Setup's the configuration with the request.
-     * 
+     *
      * @param request the request which should be parsed to build this configuration.
      * @return itself
      */
@@ -122,7 +122,7 @@ public class MCRViewerConfiguration {
 
     /**
      * Returns true if the debug/developer mode is active.
-     * 
+     *
      * <ul>
      *   <li>URL parameter iview2.debug = true</li>
      *   <li>MCR.Viewer.DeveloperMode property = true</li>
@@ -139,7 +139,7 @@ public class MCRViewerConfiguration {
     /**
      * Helper method to get the derivate id of the given request. Returns null
      * if no derivate identifier could be found in the request object.
-     * 
+     *
      * @param request http request
      * @return the derivate id embedded in the path of the request
      */
@@ -147,7 +147,7 @@ public class MCRViewerConfiguration {
         try {
             return getFromPath(request.getPathInfo(), 1);
         } catch (Exception exc) {
-            LOGGER.warn("Unable to get the derivate id of request {}", request.getRequestURI());
+            LOGGER.warn("Unable to get the derivate id of request {}", request::getRequestURI);
             return null;
         }
     }
@@ -155,7 +155,7 @@ public class MCRViewerConfiguration {
     /**
      * Helper method to get the path to the start file. The path is
      * URI decoded and starts with a slash.
-     * 
+     *
      * @param request http request
      * @return path to the file or null if the path couldn't be retrieved
      */
@@ -170,14 +170,14 @@ public class MCRViewerConfiguration {
             }
             return fromPath;
         } catch (Exception exc) {
-            LOGGER.warn("Unable to get the file path of request {}", request.getRequestURI());
+            LOGGER.warn("Unable to get the file path of request {}", request::getRequestURI);
             return null;
         }
     }
 
     /**
      * Gets the group from the {@link #REQUEST_PATH_PATTERN}.
-     * 
+     *
      * @param path uri decoded path
      * @param groupNumber the group number which should be returnd
      * @return the value of the regular expression group
@@ -245,7 +245,7 @@ public class MCRViewerConfiguration {
         StringBuilder scriptURL = new StringBuilder(baseURL);
         scriptURL.append("modules/iview2/js/");
         if (hasMinified && !debugMode) {
-            scriptURL.append(file, 0, file.lastIndexOf("."));
+            scriptURL.append(file, 0, file.lastIndexOf('.'));
             scriptURL.append(".min.js");
         } else {
             scriptURL.append(file);
@@ -264,7 +264,7 @@ public class MCRViewerConfiguration {
 
     /**
      * Adds a local (based in modules/iview2/css/) css file.
-     * 
+     *
      * @param file to include
      */
     public void addLocalCSS(final String file) {
@@ -274,7 +274,7 @@ public class MCRViewerConfiguration {
 
     /**
      * Sets a new property.
-     * 
+     *
      * @param name name of the property
      * @param value value of the property
      */
@@ -284,7 +284,7 @@ public class MCRViewerConfiguration {
 
     /**
      * Removes a property by name.
-     * 
+     *
      * @param name name of the property which should be removed
      * @return the removed value or null when nothing is done
      */
@@ -294,7 +294,7 @@ public class MCRViewerConfiguration {
 
     /**
      * Returns the configuration in json format.
-     * 
+     *
      * @return json the configuration as json string
      */
     public String toJSON() {

@@ -32,7 +32,7 @@ import org.mycore.frontend.cli.MCRCommandManager;
 
 public class MCRCommandCronJobTest extends MCRJPATestCase {
 
-    public static boolean commandRun = false;
+    public static boolean commandRun;
 
     public static String message;
 

@@ -41,7 +41,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * This class implements any methods for handling the basic data for all
  * metadata classes of the metadata objects. The methods createXML() and
  * createTypedContent() and createTextSearch() are abstract methods.
- * 
+ *
  * @author Jens Kupferschmidt
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -109,7 +109,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      * empty or false <b>en </b> was set. The datapart was set to default. All
      * other elemnts was set to an empty string. The inherited value is set to
      * 0!
-     * 
+     *
      * @param lang
      *            the default language
      */
@@ -174,10 +174,11 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     /**
      * This method set the inherited level. This can be 0 or an integer higher
      * 0.
-     * 
+     *
      * @param value
      *            the inherited level value, if it is &lt; 0, 0 is set
      */
+    @Override
     public final void setInherited(int value) {
         inherited = value;
     }
@@ -185,6 +186,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     /**
      * This method increments the inherited value with 1.
      */
+    @Override
     public final void incrementInherited() {
         inherited++;
     }
@@ -192,6 +194,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     /**
      * This method decrements the inherited value with 1.
      */
+    @Override
     public final void decrementInherited() {
         inherited--;
     }
@@ -199,10 +202,11 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     /**
      * This method set the language element. If the value of
      * <em>lang</em> is null, empty or false nothing was changed.
-     * 
+     *
      * @param lang
      *            the language
      */
+    @Override
     public final void setLang(String lang) {
         this.lang = lang;
     }
@@ -210,12 +214,13 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     /**
      * This method set the subtag element. If the value of <em>subtag</em>
      * is null or empty an exception was throwed.
-     * 
+     *
      * @param subtag
      *            the subtag
      * @exception MCRException
      *                if the subtag value is null or empty
      */
+    @Override
     public final void setSubTag(String subtag) throws MCRException {
         this.subtag = subtag;
     }
@@ -223,10 +228,11 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     /**
      * This method set the type element. If the value of <em>type</em> is
      * null or empty nothing was changed.
-     * 
+     *
      * @param type
      *            the optional type
      */
+    @Override
     public final void setType(String type) {
         this.type = type;
     }
@@ -234,7 +240,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     /**
      * This method set the sequence element. If the value of <em>sequence</em> is
      * null or empty nothing was changed.
-     * 
+     *
      * @param sequence
      *            the optional sequence attribute
      */
@@ -244,27 +250,30 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
 
     /**
      * This method get the inherited element.
-     * 
+     *
      * @return the inherited flag as int
      */
+    @Override
     public final int getInherited() {
         return inherited;
     }
 
     /**
      * This method get the language element.
-     * 
+     *
      * @return the language
      */
+    @Override
     public final String getLang() {
         return lang;
     }
 
     /**
      * This method get the subtag element.
-     * 
+     *
      * @return the subtag
      */
+    @Override
     @Schema(hidden = true)
     @JsonIgnore
     public final String getSubTag() {
@@ -273,16 +282,17 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
 
     /**
      * This method get the type element.
-     * 
+     *
      * @return the type
      */
+    @Override
     public final String getType() {
         return type;
     }
 
     /**
      * This method get the sequence element.
-     * 
+     *
      * @return the sequence element
      */
     public int getSequence() {
@@ -292,12 +302,13 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     /**
      * This method read the XML input stream part from a DOM part for the
      * metadata of the document.
-     * 
+     *
      * @param element
      *            a relevant DOM element for the metadata
      * @exception MCRException
      *                if the subtag value is null or empty
      */
+    @Override
     public void setFromDOM(Element element) throws MCRException {
         if (element == null) {
             return;
@@ -320,11 +331,12 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     /**
      * This abstract method create a XML stream for all data in this class,
      * defined by the MyCoRe XML MCRMeta... definition for the given subtag.
-     * 
+     *
      * @exception MCRException
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML MCRMeta... part
      */
+    @Override
     public Element createXML() throws MCRException {
         try {
             validate();
@@ -381,9 +393,10 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      * <li>the lang value was supported
      * </ul>
      * otherwise the method return <em>false</em>
-     * 
+     *
      * @return a boolean value
      */
+    @Override
     @JsonIgnore
     public boolean isValid() {
         try {
@@ -402,9 +415,10 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      * <li>the lang value was supported</li>
      * <li>the inherited value is lower than zero</li>
      * </ul>
-     * 
+     *
      * @throws MCRException the MCRMetaDefault is invalid
      */
+    @Override
     public void validate() throws MCRException {
         subtag = MCRUtils.filterTrimmedNotEmpty(subtag).orElse(null);
         if (subtag == null) {
@@ -440,6 +454,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     /**
      * This method put debug data to the logger (for the debug mode).
      */
+    @Override
     public void debug() {
         if (LOGGER.isDebugEnabled()) {
             debugDefault();

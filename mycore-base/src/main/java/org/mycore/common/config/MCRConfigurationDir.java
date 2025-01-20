@@ -79,9 +79,9 @@ public class MCRConfigurationDir {
 
     public static final String CONFIGURATION_DIRECTORY_PROPERTY = "MCR.ConfigDir";
 
-    private static ServletContext SERVLET_CONTEXT = null;
+    private static ServletContext SERVLET_CONTEXT;
 
-    private static String APP_NAME = null;
+    private static volatile String APP_NAME;
 
     private static File getMyCoReDirectory() {
         String mcrHome = System.getProperty("MCR.Home");
@@ -122,7 +122,11 @@ public class MCRConfigurationDir {
 
     private static String getAppName() {
         if (APP_NAME == null) {
-            APP_NAME = buildAppName();
+            synchronized (MCRConfigurationDir.class) {
+                if (APP_NAME == null) {
+                    APP_NAME = buildAppName();
+                }
+            }
         }
         return APP_NAME;
     }

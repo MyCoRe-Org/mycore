@@ -32,7 +32,7 @@ import com.google.gson.JsonObject;
  * This class implements all method for handling with the MCRMetaLangText part
  * of a metadata object. The MCRMetaLangText class present a single item, which
  * has triples of a text and his corresponding language and optional a type.
- * 
+ *
  * @author Jens Kupferschmidt
  */
 public class MCRMetaLangText extends MCRMetaDefault {
@@ -91,7 +91,7 @@ public class MCRMetaLangText extends MCRMetaDefault {
 
     /**
      * This method set the language, type and text.
-     * 
+     *
      * @param lang
      *            the new language string, if this is null or empty, nothing is
      *            to do
@@ -117,7 +117,7 @@ public class MCRMetaLangText extends MCRMetaDefault {
 
     /**
      * This method set the text.
-     * 
+     *
      * @param text
      *            the new text string
      */
@@ -129,7 +129,7 @@ public class MCRMetaLangText extends MCRMetaDefault {
 
     /**
      * This method set the form attribute.
-     * 
+     *
      * @param form
      *            the new form string
      */
@@ -141,7 +141,7 @@ public class MCRMetaLangText extends MCRMetaDefault {
 
     /**
      * This method get the text element.
-     * 
+     *
      * @return the text
      */
     public final String getText() {
@@ -150,7 +150,7 @@ public class MCRMetaLangText extends MCRMetaDefault {
 
     /**
      * This method get the form attribute.
-     * 
+     *
      * @return the form attribute
      */
     public final String getForm() {
@@ -160,7 +160,7 @@ public class MCRMetaLangText extends MCRMetaDefault {
     /**
      * This method read the XML input stream part from a DOM part for the
      * metadata of the document.
-     * 
+     *
      * @param element
      *            a relevant JDOM element for the metadata
      */
@@ -188,7 +188,7 @@ public class MCRMetaLangText extends MCRMetaDefault {
     /**
      * This method create a XML stream for all data in this class, defined by
      * the MyCoRe XML MCRMetaLangText definition for the given subtag.
-     * 
+     *
      * @exception MCRException
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML MCRMetaLangText part
@@ -206,14 +206,14 @@ public class MCRMetaLangText extends MCRMetaDefault {
     /**
      * Creates the JSON representation. Extends the {@link MCRMetaDefault#createJSON()} method
      * with the following data.
-     * 
+     *
      * <pre>
      *   {
      *     text: "Hallo Welt",
      *     form: "plain"
      *   }
      * </pre>
-     * 
+     *
      */
     @Override
     public JsonObject createJSON() {
@@ -233,9 +233,10 @@ public class MCRMetaLangText extends MCRMetaDefault {
      * <li>the inherited value is lower than zero</li>
      * <li>the trimmed text is null or empty</li>
      * </ul>
-     * 
+     *
      * @throws MCRException the MCRMetaLangText is invalid
      */
+    @Override
     public void validate() throws MCRException {
         super.validate();
         text = MCRUtils.filterTrimmedNotEmpty(text)
@@ -246,9 +247,9 @@ public class MCRMetaLangText extends MCRMetaDefault {
 
     /**
      * clone of this instance
-     * 
+     *
      * you will get a (deep) clone of this element
-     * 
+     *
      * @see java.lang.Object#clone()
      */
     @Override
@@ -276,7 +277,7 @@ public class MCRMetaLangText extends MCRMetaDefault {
 
     /**
      * Check the equivalence between this instance and the given object.
-     * 
+     *
      * @param obj the MCRMetaLangText object
      * @return true if its equal
      */

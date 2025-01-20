@@ -65,10 +65,10 @@ public class MCRUserAndObjectRightsURIResolver implements URIResolver {
 
     @Override
     public Source resolve(String href, String base) {
-        String query = href.substring(href.indexOf(":") + 1);
+        String query = href.substring(href.indexOf(':') + 1);
 
-        String key = query.substring(0, query.indexOf(":"));
-        String value = query.substring(query.indexOf(":") + 1);
+        String key = query.substring(0, query.indexOf(':'));
+        String value = query.substring(query.indexOf(':') + 1);
 
         try {
             Document doc = MCRDOMUtils.getDocumentBuilder().newDocument();

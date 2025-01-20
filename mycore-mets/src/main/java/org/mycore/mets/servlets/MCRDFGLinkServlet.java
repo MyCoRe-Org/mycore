@@ -56,13 +56,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
- * This servlet redirects to the DFG-viewer and 
+ * This servlet redirects to the DFG-viewer and
  * sets all parameters for specific images automatically if needed
- * 
+ *
  * parameters:
  * deriv = the MyCoReID of the derivate (needed)
  * file = the Filename of the image that had to be shown in the DFG-Viewer (optional)
- * 
+ *
  * @author Sebastian Röher (basti890)
  */
 public class MCRDFGLinkServlet extends MCRServlet {
@@ -151,7 +151,7 @@ public class MCRDFGLinkServlet extends MCRServlet {
 
         String encodedMetsURL = URLEncoder.encode(getServletBaseURL() + "MCRMETSServlet/" + derivateID
             + "?XSL.Style=dfg", StandardCharsets.UTF_8);
-        LOGGER.info(request.getPathInfo());
+        LOGGER.info(request::getPathInfo);
 
         MCRPath rootPath = MCRPath.getPath(derivateID, "/");
 

@@ -206,8 +206,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
 
         currentSession.setUserInformation(userInformation);
         requestContext.setSecurityContext(new MCRRestSecurityContext(userInformation, isSecure));
-        LOGGER.info("user detected: " + currentSession.getUserInformation().getUserID());
-
+        LOGGER.info(() -> "user detected: " + currentSession.getUserInformation().getUserID());
     }
 
     private MCRUserInformation extractUserFromBasicAuth(String authorization) {
@@ -275,7 +274,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
                 }
             }
         } catch (JWTVerificationException e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error(e::getMessage);
             LinkedHashMap<String, String> attrs = new LinkedHashMap<>();
             attrs.put("error", "invalid_token");
             attrs.put("error_description", e.getMessage());
@@ -351,7 +350,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
                 case ATT_EMAIL -> jwt.getClaim("email").asString();
                 case MCRRealm.USER_INFORMATION_ATTR -> {
                     if (getUserID().contains("@")) {
-                        yield getUserID().substring(getUserID().lastIndexOf("@") + 1);
+                        yield getUserID().substring(getUserID().lastIndexOf('@') + 1);
                     }
                     yield null;
                 }

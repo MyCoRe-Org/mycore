@@ -39,7 +39,7 @@ import org.xml.sax.ext.EntityResolver2;
 
 /**
  * Parses XML content using specified {@link XMLReaderJDOMFactory}.
- * 
+ *
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  */
@@ -70,10 +70,12 @@ public class MCRXMLParserImpl implements MCRXMLParser {
         builder.setEntityResolver(new AbsoluteToRelativeResolver(MCREntityResolver.instance()));
     }
 
+    @Override
     public boolean isValidating() {
         return validate;
     }
 
+    @Override
     public Document parseXML(MCRContent content) throws IOException, JDOMException {
         InputSource source = content.getInputSource();
         return builder.build(source);
@@ -101,7 +103,7 @@ public class MCRXMLParserImpl implements MCRXMLParser {
      * Xerces 2.11.0 does not provide a relative systemId if baseURI is a XML file to be validated by a schema specified
      * in systemId. This EntityResolver makes a relative systemId so that the fallback could conform to the defined
      * interface.
-     * 
+     *
      * @author Thomas Scheffler (yagee)
      */
     private static class AbsoluteToRelativeResolver implements EntityResolver2 {

@@ -164,7 +164,7 @@ public final class MCRObjectUtils {
             .getDestinationOf(mcrObjectID, MCRLinkTableManager.ENTRY_TYPE_DERIVATE).stream();
         Stream<String> derivateLinkStream = linkTableManager
             .getDestinationOf(mcrObjectID, MCRLinkTableManager.ENTRY_TYPE_DERIVATE_LINK).stream()
-            .map(link -> link.substring(0, link.indexOf("/")));
+            .map(link -> link.substring(0, link.indexOf('/')));
         return Stream.concat(derivateStream, derivateLinkStream).distinct().map(MCRObjectID::getInstance)
             .collect(Collectors.toList());
     }

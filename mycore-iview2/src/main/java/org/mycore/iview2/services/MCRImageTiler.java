@@ -51,13 +51,14 @@ import jakarta.persistence.PersistenceException;
 
 /**
  * Master image tiler thread.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  */
 public class MCRImageTiler implements Runnable, Closeable {
-    private static MCRImageTiler instance = null;
 
-    private static Logger LOGGER = LogManager.getLogger(MCRImageTiler.class);
+    private static volatile MCRImageTiler instance;
+
+    private static final Logger LOGGER = LogManager.getLogger(MCRImageTiler.class);
 
     private static final MCRTilingQueue TQ = MCRTilingQueue.getInstance();
 
@@ -96,7 +97,11 @@ public class MCRImageTiler implements Runnable, Closeable {
      */
     public static MCRImageTiler getInstance() {
         if (instance == null) {
-            instance = new MCRImageTiler();
+            synchronized (MCRImageTiler.class) {
+                if (instance == null) {
+                    instance = new MCRImageTiler();
+                }
+            }
         }
         return instance;
     }
@@ -105,6 +110,7 @@ public class MCRImageTiler implements Runnable, Closeable {
      * Starts local tiler threads ( {@link MCRTilingAction}) and gives {@link MCRTileJob} instances to them. Use
      * property <code>MCR.Module-iview2.TilingThreads</code> to specify how many concurrent threads should be running.
      */
+    @Override
     public void run() {
         waiter = Thread.currentThread();
         Thread.currentThread().setName("TileMaster");
@@ -115,9 +121,10 @@ public class MCRImageTiler implements Runnable, Closeable {
         boolean activated = MCRConfiguration2.getBoolean(MCRIView2Tools.CONFIG_PREFIX + "LocalTiler.activated")
             .orElse(true) && MCRConfiguration2.getBoolean("MCR.Persistence.Database.Enable").orElse(true)
             && MCREntityManagerProvider.getEntityManagerFactory() != null;
-        LOGGER.info("Local Tiling is {}", activated ? "activated" : "deactivated");
+        LOGGER.info("Local Tiling is {}", () -> activated ? "activated" : "deactivated");
         ImageIO.scanForPlugins();
-        LOGGER.info("Supported image file types for reading: {}", Arrays.toString(ImageIO.getReaderFormatNames()));
+        LOGGER.info("Supported image file types for reading: {}",
+            () -> Arrays.toString(ImageIO.getReaderFormatNames()));
 
         MCRProcessableDefaultCollection imageTilerCollection = new MCRProcessableDefaultCollection("Image Tiler");
         MCRProcessableRegistry registry = MCRProcessableRegistry.getSingleInstance();
@@ -140,6 +147,7 @@ public class MCRImageTiler implements Runnable, Closeable {
             @SuppressWarnings("PMD.AvoidThreadGroup") //no method is called on tg
             ThreadGroup tg = new ThreadGroup("MCR slave tiling thread group");
 
+            @Override
             public Thread newThread(Runnable r) {
                 return new Thread(tg, r, "TileSlave#" + tNum.incrementAndGet());
             }
@@ -198,7 +206,7 @@ public class MCRImageTiler implements Runnable, Closeable {
             }
         }
         if (job != null && !tilingServe.getExecutor().isShutdown()) {
-            LOGGER.info("Creating:{}", job.getPath());
+            LOGGER.info("Creating:{}", job::getPath);
             tilingServe.submit(getTilingAction(job));
         } else {
             try {
@@ -250,6 +258,7 @@ public class MCRImageTiler implements Runnable, Closeable {
     /**
      * stops transmitting {@link MCRTileJob} to {@link MCRTilingAction} and prepares shutdown.
      */
+    @Override
     public void prepareClose() {
         LOGGER.info("Closing master image tiling thread");
         //signal master thread to stop now
@@ -280,6 +289,7 @@ public class MCRImageTiler implements Runnable, Closeable {
     /**
      * Shuts down this thread and every local tiling threads spawned by {@link #run()}.
      */
+    @Override
     public void close() {
         if (tilingServe != null && !tilingServe.getExecutor().isShutdown()) {
             LOGGER.info("We are in a hurry, closing tiling service right now");
@@ -292,13 +302,13 @@ public class MCRImageTiler implements Runnable, Closeable {
         }
         if (waiter != null && waiter.isAlive()) {
             //thread still running
-            LOGGER.info("{} is still running.", waiter.getName());
+            LOGGER.info("{} is still running.", waiter::getName);
             Thread masterThread = waiter;
             waiter = null;
             masterThread.interrupt();
             try {
                 masterThread.join();
-                LOGGER.info("{} has died.", masterThread.getName());
+                LOGGER.info("{} has died.", masterThread::getName);
             } catch (InterruptedException e) {
                 e.printStackTrace(System.err);
             }

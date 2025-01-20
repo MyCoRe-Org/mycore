@@ -82,7 +82,7 @@ public class MCRRoleResolver implements URIResolver {
      */
     @Override
     public Source resolve(final String href, final String base) throws TransformerException {
-        final String target = href.substring(href.indexOf(":") + 1);
+        final String target = href.substring(href.indexOf(':') + 1);
         final String[] part = target.split(":");
         final String method = part[0];
         try {

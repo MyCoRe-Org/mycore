@@ -65,17 +65,17 @@ import org.xml.sax.SAXException;
  */
 public class MCRXEditorTransformer {
 
-    public int anchorID = 0;
+    private final MCREditorSession editorSession;
 
-    private MCREditorSession editorSession;
+    private final MCRParameterCollector transformationParameters;
 
     private MCRBinding currentBinding;
 
-    private MCRParameterCollector transformationParameters;
+    public int anchorID;
 
-    private boolean withinSelectElement = false;
+    private boolean withinSelectElement;
 
-    private boolean withinSelectMultiple = false;
+    private boolean withinSelectMultiple;
 
     public MCRXEditorTransformer(MCREditorSession editorSession, MCRParameterCollector transformationParameters) {
         this.editorSession = editorSession;

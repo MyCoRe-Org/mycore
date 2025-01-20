@@ -110,7 +110,7 @@ public class MCRJPATestCase extends MCRTestCase {
         return testProperties;
     }
 
-    @Before()
+    @Before
     @Override
     public void setUp() throws Exception {
         // Configure logging etc.
@@ -181,6 +181,7 @@ public class MCRJPATestCase extends MCRTestCase {
         doSchemaOperation(schema -> "drop schema " + schema);
     }
 
+    @Override
     @After
     public void tearDown() throws Exception {
         try {

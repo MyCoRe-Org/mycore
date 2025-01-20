@@ -57,7 +57,7 @@ public class MCRInstanceName {
      * @return the name
      */
     public static MCRInstanceName of(String name) {
-        int index = name.lastIndexOf(".");
+        int index = name.lastIndexOf('.');
         if (index == -1) {
             return of(name, "", name);
         } else {

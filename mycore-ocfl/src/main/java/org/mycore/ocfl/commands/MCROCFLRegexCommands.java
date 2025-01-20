@@ -48,7 +48,7 @@ public class MCROCFLRegexCommands {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static boolean confirmPurge = false;
+    private static boolean confirmPurge;
 
     private static String metadataRepositoryKey = MCRConfiguration2.getString("MCR.Metadata.Manager.Repository")
         .orElse(null);

@@ -23,8 +23,6 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
@@ -36,31 +34,37 @@ import org.mycore.sword.application.MCRSwordLifecycleConfiguration;
  */
 public class MCRSword {
 
-    private static Logger LOGGER = LogManager.getLogger(MCRSword.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSword.class);
 
-    private static Hashtable<String, MCRSwordCollectionProvider> collections = null;
+    private static volatile Hashtable<String, MCRSwordCollectionProvider> collections;
 
-    private static Hashtable<String, List<String>> workspaceCollectionTable = null;
+    private static volatile Hashtable<String, List<String>> workspaceCollectionTable;
+
+    private static void initConfigThreadSafe() {
+        if (collections == null) {
+            synchronized (MCRSword.class) {
+                if (collections == null) {
+                    initConfig();
+                }
+            }
+        }
+    }
 
     private static void initConfig() {
-        if (collections == null) {
-            collections = new Hashtable<>();
-            workspaceCollectionTable = new Hashtable<>();
-            LOGGER.info("--- INITIALIZE SWORD SERVER ---");
-            final int lenghtOfPropertyPrefix = MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX.length();
-            MCRConfiguration2.getPropertiesMap()
-                .keySet()
-                .stream()
-                .filter(prop -> prop.startsWith(MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX))
-                .map(prop -> prop.substring(lenghtOfPropertyPrefix)) // remove MCR_SWORD_COLLECTION_PREFIX
-                .map(prop -> prop.split(Pattern.quote("."), 2)) // split to workspace name and collection name
-                .filter(
-                    array -> array.length == 2) // remove all whith no workspace or collection name
-                .forEach(wsCol -> initWorkspaceCollection(wsCol[0], wsCol[1]));
-
-            addCollectionShutdownHook();
-        }
-
+        collections = new Hashtable<>();
+        workspaceCollectionTable = new Hashtable<>();
+        LOGGER.info("--- INITIALIZE SWORD SERVER ---");
+        final int lengthOfPropertyPrefix = MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX.length();
+        MCRConfiguration2.getPropertiesMap()
+            .keySet()
+            .stream()
+            .filter(prop -> prop.startsWith(MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX))
+            .map(prop -> prop.substring(lengthOfPropertyPrefix)) // remove MCR_SWORD_COLLECTION_PREFIX
+            .map(prop -> prop.split(Pattern.quote("."), 2)) // split to workspace name and collection name
+            .filter(
+                array -> array.length == 2) // remove all with no workspace or collection name
+            .forEach(wsCol -> initWorkspaceCollection(wsCol[0], wsCol[1]));
+        addCollectionShutdownHook();
     }
 
     private static void initWorkspaceCollection(String workspace, String collection) {
@@ -92,22 +96,22 @@ public class MCRSword {
     }
 
     public static MCRSwordCollectionProvider getCollection(String collectionName) {
-        initConfig();
+        initConfigThreadSafe();
         return collections.get(collectionName);
     }
 
     public static List<String> getCollectionNames() {
-        initConfig();
+        initConfigThreadSafe();
         return new ArrayList<>(collections.keySet());
     }
 
     public static List<String> getWorkspaces() {
-        initConfig();
-        return workspaceCollectionTable.keySet().stream().collect(Collectors.toUnmodifiableList());
+        initConfigThreadSafe();
+        return workspaceCollectionTable.keySet().stream().toList();
     }
 
     public static List<String> getCollectionsOfWorkspace(String workspace) {
-        initConfig();
+        initConfigThreadSafe();
         return Collections.unmodifiableList(workspaceCollectionTable.get(workspace));
     }
 

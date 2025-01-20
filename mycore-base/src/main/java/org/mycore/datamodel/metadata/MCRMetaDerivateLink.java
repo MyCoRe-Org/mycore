@@ -68,6 +68,7 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
         super.href = owner + path;
     }
 
+    @Override
     public void setFromDOM(Element element) throws MCRException {
         super.setFromDOM(element);
         List<Element> childrenList = element.getChildren(ANNOTATION);
@@ -82,6 +83,7 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
         }
     }
 
+    @Override
     public Element createXML() throws MCRException {
         Element elm = super.createXML();
 
@@ -161,6 +163,7 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
      *
      * @throws MCRException the MCRMetaDerivateLink is invalid
      */
+    @Override
     public void validate() throws MCRException {
         super.validate();
         try {
@@ -171,7 +174,7 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
             }
 
             if (!Files.exists(linkedFile)) {
-                LOGGER.warn("{}: File not found: {}", getSubTag(), super.href);
+                LOGGER.warn("{}: File not found: {}", this::getSubTag, () -> super.href);
             }
 
         } catch (Exception exc) {

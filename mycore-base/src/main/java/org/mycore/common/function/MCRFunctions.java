@@ -29,7 +29,7 @@ import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
  */
 public class MCRFunctions {
 
-    private static char END_OF_PATTERN = 0;
+    private static final char END_OF_PATTERN = 0;
 
     private static final String GLOB_RESERVED_CHARS = "?*\\{[";
 

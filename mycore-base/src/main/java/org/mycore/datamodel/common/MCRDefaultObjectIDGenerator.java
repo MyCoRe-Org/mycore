@@ -47,7 +47,7 @@ public class MCRDefaultObjectIDGenerator implements MCRObjectIDGenerator {
      * Returns a MCRObjectID from a given base ID string
      * The additional parameter acts as a
      * lower limit for integer part of the ID.
-     * 
+     *
      * Otherwise it is the next free number of an item in the database for the
      * given project ID and type ID, with the following additional restriction:
      * The ID returned can be divided by the configured numberDistance without remainder.
@@ -61,7 +61,7 @@ public class MCRDefaultObjectIDGenerator implements MCRObjectIDGenerator {
      *   last ID = 7, next ID = 10
      *   last ID = 8, next ID = 10
      *   last ID = 10, next ID = 20
-     * 
+     *
      *
      * @param baseId
      *            <em>project_id</em>_<em>type_id</em>
@@ -69,6 +69,7 @@ public class MCRDefaultObjectIDGenerator implements MCRObjectIDGenerator {
      *            returned integer part of id will be at least
      *            <code>maxInWorkflow + 1</code>
      */
+    @Override
     public synchronized MCRObjectID getNextFreeId(String baseId, int maxInWorkflow) {
         int last = Math.max(getLastIDNumber(baseId), maxInWorkflow);
         int next = last + numberDistance;
@@ -88,6 +89,7 @@ public class MCRDefaultObjectIDGenerator implements MCRObjectIDGenerator {
      * @return a valid MCRObjectID, or null when there is no ID for the given
      *         type
      */
+    @Override
     public synchronized MCRObjectID getLastID(String baseId) {
         int lastIDNumber = getLastIDNumber(baseId);
         if (lastIDNumber == 0) {

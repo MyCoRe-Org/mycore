@@ -59,27 +59,6 @@
             <phase>generate-resources</phase>
           </execution>
           <execution>
-            <id>yarn-install-processing</id>
-            <goals>
-              <goal>yarn</goal>
-            </goals>
-            <phase>generate-resources</phase>
-            <configuration>
-              <workingDirectory>${basedir}/src/main/ts/processing</workingDirectory>
-              <arguments>install</arguments>
-            </configuration>
-          </execution>
-          <execution>
-            <id>grunt-build-processing</id>
-            <goals>
-              <goal>grunt</goal>
-            </goals>
-            <phase>generate-resources</phase>
-            <configuration>
-              <workingDirectory>${basedir}/src/main/ts/processing</workingDirectory>
-            </configuration>
-          </execution>
-          <execution>
             <id>yarn-install-upload</id>
             <goals>
               <goal>yarn</goal>
@@ -120,6 +99,28 @@
             <phase>generate-resources</phase>
             <configuration>
               <workingDirectory>${basedir}/src/main/vue/texteditor</workingDirectory>
+              <arguments>build</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>yarn-install-processing</id>
+            <goals>
+              <goal>yarn</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <workingDirectory>${basedir}/src/main/vue/processing</workingDirectory>
+              <arguments>install</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>yarn-build-processing</id>
+            <goals>
+              <goal>yarn</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <workingDirectory>${basedir}/src/main/vue/processing</workingDirectory>
               <arguments>build</arguments>
             </configuration>
           </execution>

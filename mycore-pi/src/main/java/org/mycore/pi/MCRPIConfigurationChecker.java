@@ -72,7 +72,7 @@ public class MCRPIConfigurationChecker implements MCRStartupHandler.AutoExecutab
         // check service configuration
         final MCRPIServiceManager serviceManager = MCRPIServiceManager.getInstance();
         serviceManager.getServiceList().forEach(service -> {
-            LOGGER.info("Check service: " + service.getServiceID());
+            LOGGER.info(() -> "Check service: " + service.getServiceID());
             service.checkConfiguration();
         });
 

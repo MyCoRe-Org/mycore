@@ -76,7 +76,7 @@ public class MCROCFLCommands {
 
     public static final String PRUNERS_CONFIG_PREFIX = "MCR.OCFL.Metadata.Migration.Pruners.";
 
-    private static boolean confirmPurgeMarked = false;
+    private static boolean confirmPurgeMarked;
 
     protected static void migrateWithPrunersAndRepositoryKeyOrMetadataManager(String repository,
         String metadataManagerConfigKey,
@@ -110,25 +110,17 @@ public class MCROCFLCommands {
         ArrayList<String> invalidState = migration.getInvalidState();
         ArrayList<String> withoutHistory = migration.getWithoutHistory();
 
-        LOGGER.info("The migration resulted in \n" +
-            SUCCESS + ": {} \n" +
-            FAILED + ": {} \n" +
-            FAILED_AND_NOW_INVALID_STATE + ": {} \n" +
-            SUCCESS_BUT_WITHOUT_HISTORY + ": {} \n",
-            String.join(", ", success),
-            String.join(", ", failed),
-            String.join(", ", invalidState),
-            String.join(", ", withoutHistory));
+        LOGGER.info(() -> "The migration resulted in \n" +
+            SUCCESS + ": " + String.join(", ", success) + " \n" +
+            FAILED + ": " + String.join(", ", failed) + " \n" +
+            FAILED_AND_NOW_INVALID_STATE + ": " + String.join(", ", invalidState) + " \n" +
+            SUCCESS_BUT_WITHOUT_HISTORY + ": " + String.join(", ", withoutHistory) + " \n");
 
-        LOGGER.info("The migration resulted in \n" +
-            SUCCESS + ": {} \n" +
-            FAILED + ": {} \n" +
-            FAILED_AND_NOW_INVALID_STATE + ": {} \n" +
-            SUCCESS_BUT_WITHOUT_HISTORY + ": {} \n",
-            success.size(),
-            failed.size(),
-            invalidState.size(),
-            withoutHistory.size());
+        LOGGER.info(() -> "The migration resulted in \n" +
+            SUCCESS + ": " + success.size() + " \n" +
+            FAILED + ": " + failed.size() + " \n" +
+            FAILED_AND_NOW_INVALID_STATE + ": " + invalidState.size() + " \n" +
+            SUCCESS_BUT_WITHOUT_HISTORY + ": " + withoutHistory.size() + " \n");
     }
 
     @MCRCommand(syntax = "migrate metadata to metadatamanager {1} and pruners {2} ",

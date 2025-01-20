@@ -118,7 +118,7 @@ public class MCRExternalProcess {
             if (ex != null) {
                 LOGGER.warn("Error while sucking stdout or stderr streams.", ex);
             }
-            LOGGER.debug("Destroy process {}", p.pid());
+            LOGGER.debug("Destroy process {}", p::pid);
             p.destroy();
         }
 

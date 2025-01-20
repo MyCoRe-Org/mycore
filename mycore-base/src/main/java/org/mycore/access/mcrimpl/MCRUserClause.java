@@ -28,7 +28,7 @@ import org.mycore.parsers.bool.MCRCondition;
 
 /**
  * Implementation of a (user xy) clause
- * 
+ *
  * @author Matthias Kramm
  */
 class MCRUserClause implements MCRCondition<Object> {
@@ -62,6 +62,7 @@ class MCRUserClause implements MCRCondition<Object> {
         return Pattern.compile(regex.toString());
     }
 
+    @Override
     public boolean evaluate(Object o) {
         MCRUserInformation userInformation = Optional.ofNullable(o)
             .filter(obj -> obj instanceof MCRAccessData)
@@ -79,6 +80,7 @@ class MCRUserClause implements MCRCondition<Object> {
         return "user" + (not ? " != " : " = ") + user + " ";
     }
 
+    @Override
     public Element toXML() {
         Element cond = new Element("condition");
         cond.setAttribute("field", "user");

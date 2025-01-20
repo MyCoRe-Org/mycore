@@ -50,24 +50,25 @@ import com.google.common.collect.HashBiMap;
  * This class implements an algorithm for topological ordering.
  * It can be used to retrieve the order in which MyCoRe object can be imported to be
  * sure that parent objects are imported first.
- *
+ * <p>
  * It also checks for circular dependencies and will throw an exception if it occurs.
- *
+ * <p>
  * The doTopoSort() method can only be called once, since it processes the internal data.
  * Afterwards prepareData() must be called again or a new object has to be used.
- *
+ * <p>
  * For performance reasons each node label will be mapped to an integer (position in node list)
- *
+ * <p>
  * The algorithm is described in
- * http://en.wikipedia.org/wiki/Topological_sorting
+ * <a href="http://en.wikipedia.org/wiki/Topological_sorting">topological sorting</a>
  *
  * @author Robert Stephan
  *
  */
 public class MCRTopologicalSort<T> {
+
     private static final Logger LOGGER = LogManager.getLogger();
 
-    /** 
+    /**
      * store the edges as adjacent list
      *  for each target node a list of corresponding source node is stored
      */
@@ -78,27 +79,26 @@ public class MCRTopologicalSort<T> {
      */
     BiMap<Integer, T> nodes = HashBiMap.create();
 
-    boolean dirty = false;
+    boolean dirty;
 
     /**
      * parses MCRObject xml files for parent links
      * and creates the graph
-     *
+     * <p>
      * uses StAX cursor API (higher performance)
      *
      * @param ts - the topological sort data structure
      * @param files - a list of file names
-     * @param dir - the directory where the files can be found 
+     * @param dir - the directory where the files can be found
      */
     public static void prepareData(MCRTopologicalSort<String> ts, String[] files, Path dir) {
         ts.reset();
 
-        String file = null;
         Map<Integer, List<String>> parentNames = new HashMap<>();
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
         for (int i = 0; i < files.length; i++) {
-            file = files[i];
+            String file = files[i];
 
             try (BufferedReader br = Files.newBufferedReader(dir.resolve(file))) {
                 XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(br);
@@ -124,7 +124,7 @@ public class MCRTopologicalSort<T> {
                     xmlStreamReader.next();
                 }
             } catch (XMLStreamException | IOException e) {
-                LOGGER.warn("Error while reading: " + dir.resolve(file), e);
+                LOGGER.warn(() -> "Error while reading: " + dir.resolve(file), e);
             }
         }
 
@@ -292,7 +292,7 @@ public class MCRTopologicalSort<T> {
         }
         // if graph has edges then return error (graph has at least one cycle)
         if (!edgeSources.isEmpty()) {
-            LOGGER.error("The input contained circular dependencies: \n{}", toString());
+            LOGGER.error("The input contained circular dependencies: \n{}", this::toString);
             return null;
             // else return L (a topologically sorted order)
         } else {

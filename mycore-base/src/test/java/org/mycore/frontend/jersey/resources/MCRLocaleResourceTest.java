@@ -40,6 +40,7 @@ public class MCRLocaleResourceTest extends MCRTestCase {
 
     private MCRJerseyTestFeature jersey;
 
+    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
@@ -50,6 +51,7 @@ public class MCRLocaleResourceTest extends MCRTestCase {
         MCRTranslationTest.reInit();
     }
 
+    @Override
     @After
     public void tearDown() throws Exception {
         try {

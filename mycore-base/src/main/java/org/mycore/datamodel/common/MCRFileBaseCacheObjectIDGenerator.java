@@ -157,7 +157,7 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
                 channel.position(0);
                 int bytesRead = channel.read(buffer);
                 if (bytesRead <= 0) {
-                    LOGGER.info("No ID found in " + cacheFile.toAbsolutePath());
+                    LOGGER.info("No ID found in {}", cacheFile::toAbsolutePath);
                     // empty file -> new currentID is 1
                     nextID = MCRObjectID.getInstance(MCRObjectID.formatID(baseId, maxInWorkflow + 1));
                     writeNewID(nextID, buffer, channel, cacheFile);

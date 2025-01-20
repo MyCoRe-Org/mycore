@@ -107,7 +107,7 @@ public class MCRFile extends MCRStoredNode {
      */
     public String getExtension() {
         String name = getName();
-        int pos = name.lastIndexOf(".");
+        int pos = name.lastIndexOf('.');
         return pos == -1 ? "" : name.substring(pos + 1);
     }
 

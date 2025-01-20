@@ -56,9 +56,9 @@ public class MCRPropertiesResolver extends MCRTextResolver {
     }
 
     private String removeSelfReference(String name, String value) {
-        int pos1 = value.indexOf("%");
+        int pos1 = value.indexOf('%');
         if (pos1 != -1) {
-            int pos2 = value.indexOf("%", pos1 + 1);
+            int pos2 = value.indexOf('%', pos1 + 1);
             if (pos2 != -1) {
                 String ref = value.substring(pos1 + 1, pos2);
                 if (name.equals(ref)) {

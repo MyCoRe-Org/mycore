@@ -180,10 +180,10 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements EventListener 
         job.setStart(null);
 
         if (job.getId() == null) {
-            LOGGER.info("Adding job {} to queue {}.", job.toString(), action.getName());
+            LOGGER.info("Adding job {} to queue {}.", () -> job, action::getName);
             added = dao.addJob(job);
         } else {
-            LOGGER.info("Update job {} in queue {}.", job.toString(), action.getName());
+            LOGGER.info("Update job {} in queue {}.", () -> job, action::getName);
             added = dao.updateJob(job);
         }
 
@@ -205,7 +205,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements EventListener 
             return;
         }
 
-        LOGGER.info("Clearing queue {}.", action.getName());
+        LOGGER.info("Clearing queue {}.", action::getName);
         dao.removeJobs(action, Collections.emptyMap(), List.of(MCRJobStatus.NEW));
     }
 

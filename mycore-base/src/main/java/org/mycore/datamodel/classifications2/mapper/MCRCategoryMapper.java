@@ -34,6 +34,7 @@ public class MCRCategoryMapper extends MCRCategoryMapperBase {
 
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
+    @Override
     protected String getMappingRule(MCRCategoryID categoryID) {
         MCRCategory category = DAO.getCategory(categoryID, 0);
         //"x-mapper" was used in previous versions of mycore
@@ -42,6 +43,7 @@ public class MCRCategoryMapper extends MCRCategoryMapperBase {
         return label.getText();
     }
 
+    @Override
     protected void addParentsToList(MCRCategoryID childID, List<MCRCategoryID> list) {
         for (MCRCategory parent : DAO.getParents(childID)) {
             if (parent.isCategory()) {

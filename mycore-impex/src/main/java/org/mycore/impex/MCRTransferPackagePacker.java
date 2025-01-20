@@ -20,8 +20,8 @@ package org.mycore.impex;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -118,7 +118,7 @@ public class MCRTransferPackagePacker extends MCRPacker {
     public void pack() throws ExecutionException {
         String sourceId = getSourceId();
         try {
-            LOGGER.info("Creating transfer package for {} at {}", sourceId, SAVE_DIRECTORY_PATH.toAbsolutePath());
+            LOGGER.info("Creating transfer package for {} at {}", () -> sourceId, SAVE_DIRECTORY_PATH::toAbsolutePath);
             MCRTransferPackage transferPackage = build();
             checkAndCreateSaveDirectory();
             buildTar(getTarPath(transferPackage), transferPackage);
@@ -154,8 +154,10 @@ public class MCRTransferPackagePacker extends MCRPacker {
      * @throws IOException something went wrong while packing
      */
     private void buildTar(Path pathToTar, MCRTransferPackage transferPackage) throws IOException {
-        FileOutputStream fos = new FileOutputStream(pathToTar.toFile());
-        try (TarArchiveOutputStream tarOutStream = new TarArchiveOutputStream(fos)) {
+        try (
+            OutputStream fileOutputStream = Files.newOutputStream(pathToTar);
+            TarArchiveOutputStream tarOutStream = new TarArchiveOutputStream(fileOutputStream)
+        ) {
             for (Entry<String, MCRContent> contentEntry : transferPackage.getContent().entrySet()) {
                 String filePath = contentEntry.getKey();
                 byte[] data = contentEntry.getValue().asByteArray();
@@ -202,7 +204,7 @@ public class MCRTransferPackagePacker extends MCRPacker {
 
     private void checkAndCreateSaveDirectory() throws IOException {
         if (!Files.exists(SAVE_DIRECTORY_PATH)) {
-            LOGGER.info("Creating directory {}", SAVE_DIRECTORY_PATH.toAbsolutePath());
+            LOGGER.info("Creating directory {}", SAVE_DIRECTORY_PATH::toAbsolutePath);
             Files.createDirectories(SAVE_DIRECTORY_PATH);
         }
     }

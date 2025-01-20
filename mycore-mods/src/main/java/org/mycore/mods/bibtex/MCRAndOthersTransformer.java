@@ -33,6 +33,7 @@ class MCRAndOthersTransformer extends MCRPersonTransformer {
         super(field, role);
     }
 
+    @Override
     void buildField(BibtexPerson person, Element parent) {
         Element modsName = buildElement(xPath, null, parent);
         buildElement("mods:etAl", null, modsName);

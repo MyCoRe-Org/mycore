@@ -206,9 +206,10 @@ public class MCROAISolrSearcher extends MCROAISearcher {
 
     Header toHeader(SolrDocument doc, Collection<MCROAISetResolver<String, SolrDocument>> setResolver) {
         String docId = doc.getFieldValue("id").toString();
-        Date modified = (Date) doc.getFieldValue(getModifiedField());
+        String modifiedField = getModifiedField();
+        Date modified = (Date) doc.getFieldValue(modifiedField);
 
-        LOGGER.debug("'{}' is '{}' for {}", getModifiedField(), modified, docId);
+        LOGGER.debug("'{}' is '{}' for {}", modifiedField, modified, docId);
 
         MCROAIObjectManager objectManager = getObjectManager();
         String oaiId = objectManager.getOAIId(docId);

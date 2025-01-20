@@ -156,7 +156,8 @@ public class MCRDeveloperCommands {
         MCRScopedSession session = (MCRScopedSession) MCRSessionMgr.getCurrentSession();
         MCRScopedSession.ScopedValues values = new MCRScopedSession.ScopedValues(userInformation);
 
-        LOGGER.info(session.doAs(values, () -> MCRAccessManager.checkPermission(id, permission)));
+        boolean permissionResult = session.doAs(values, () -> MCRAccessManager.checkPermission(id, permission));
+        LOGGER.info(permissionResult);
 
     }
 
@@ -193,7 +194,7 @@ public class MCRDeveloperCommands {
                 LOGGER.info("URI {} not found", uri);
             }
         } catch (Exception e) {
-            LOGGER.info("Failed to resolve URI " + uri, e);
+            LOGGER.info(() -> "Failed to resolve URI " + uri, e);
         }
     }
 
@@ -230,7 +231,7 @@ public class MCRDeveloperCommands {
                 LOGGER.info("Resource {} not found", path);
             }
         } catch (Exception e) {
-            LOGGER.info("Failed to resolve resource " + path, e);
+            LOGGER.info(() -> "Failed to resolve resource " + path, e);
         }
     }
 
@@ -267,7 +268,7 @@ public class MCRDeveloperCommands {
                 urls.forEach(url -> LOGGER.info("Resolved resource {} as {} [{}]", path, url.url, url.origin));
             }
         } catch (Exception e) {
-            LOGGER.info("Failed to resolve resource " + path, e);
+            LOGGER.info(() -> "Failed to resolve resource " + path, e);
         }
     }
 
@@ -307,7 +308,7 @@ public class MCRDeveloperCommands {
                 LOGGER.info("Resource {} not found", path);
             }
         } catch (Exception e) {
-            LOGGER.info("Failed to resolve resource " + path, e);
+            LOGGER.info(() -> "Failed to resolve resource " + path, e);
         }
     }
 
@@ -365,7 +366,7 @@ public class MCRDeveloperCommands {
                 LOGGER.info("Resource {} not found", path);
             }
         } catch (Exception e) {
-            LOGGER.info("Failed to resolve resource " + path, e);
+            LOGGER.info(() -> "Failed to resolve resource " + path, e);
         }
     }
 
@@ -405,7 +406,7 @@ public class MCRDeveloperCommands {
             MCRMetadataManager.update(object);
             LOGGER.info("Touched object with id {}", id);
         } catch (Exception e) {
-            LOGGER.info("Failed to touch object with id " + id, e);
+            LOGGER.info(() -> "Failed to touch object with id " + id, e);
         }
     }
 
@@ -420,7 +421,7 @@ public class MCRDeveloperCommands {
             MCRMetadataManager.update(derivate);
             LOGGER.info("Touched derivate with id {}", id);
         } catch (Exception e) {
-            LOGGER.info("Failed to touch derivate with id " + id, e);
+            LOGGER.info(() -> "Failed to touch derivate with id " + id, e);
         }
     }
 

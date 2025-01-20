@@ -49,7 +49,7 @@ import org.mycore.datamodel.metadata.MCRObjectStructure;
 /**
  * This class manage all accesses to the link table database. This database
  * holds all informations about links between MCRObjects/MCRClassifications.
- * 
+ *
  * @author Jens Kupferschmidt
  */
 public class MCRLinkTableManager {
@@ -70,11 +70,11 @@ public class MCRLinkTableManager {
     // logger
     static Logger LOGGER = LogManager.getLogger();
 
-    private MCRLinkTableInterface linkTableInstance = null;
+    private MCRLinkTableInterface linkTableInstance;
 
     /**
      * Returns the link table manager singleton.
-     * 
+     *
      * @return Returns a MCRLinkTableManager instance.
      */
     public static synchronized MCRLinkTableManager instance() {
@@ -96,7 +96,7 @@ public class MCRLinkTableManager {
 
     /**
      * The method add a reference link pair.
-     * 
+     *
      * @param from
      *            the source of the reference as MCRObjectID
      * @param to
@@ -112,7 +112,7 @@ public class MCRLinkTableManager {
 
     /**
      * The method add a reference link pair.
-     * 
+     *
      * @param from
      *            the source of the reference as String
      * @param to
@@ -156,7 +156,7 @@ public class MCRLinkTableManager {
 
     /**
      * The method delete a reference link.
-     * 
+     *
      * @param from
      *            the source of the reference as MCRObjectID
      */
@@ -166,7 +166,7 @@ public class MCRLinkTableManager {
 
     /**
      * The method delete a reference link.
-     * 
+     *
      * @param from
      *            the source of the reference as String
      */
@@ -181,14 +181,14 @@ public class MCRLinkTableManager {
         try {
             linkTableInstance.delete(fromTrimmed, null, null);
         } catch (Exception e) {
-            LOGGER.warn("An error occured while deleting a dataset from the" + fromTrimmed
+            LOGGER.warn(() -> "An error occured while deleting a dataset from the" + fromTrimmed
                 + " reference link table, deleting could be not succesful.", e);
         }
     }
 
     /**
      * The method delete a reference link pair for the given type to the store.
-     * 
+     *
      * @param from
      *            the source of the reference as String
      * @param to
@@ -213,7 +213,7 @@ public class MCRLinkTableManager {
 
     /**
      * The method count the reference links for a given target MCRobjectID.
-     * 
+     *
      * @param to
      *            the object ID as MCRObjectID, they was referenced
      * @return the number of references
@@ -224,7 +224,7 @@ public class MCRLinkTableManager {
 
     /**
      * The method count the reference links for a given target object ID.
-     * 
+     *
      * @param to
      *            the object ID as String, they was referenced
      * @return the number of references
@@ -240,7 +240,7 @@ public class MCRLinkTableManager {
         try {
             return linkTableInstance.countTo(null, toTrimmed, null, null);
         } catch (Exception e) {
-            LOGGER.warn("An error occured while searching for references of " + toTrimmed + ".", e);
+            LOGGER.warn(() -> "An error occured while searching for references of " + toTrimmed + ".", e);
         }
 
         return 0;
@@ -248,7 +248,7 @@ public class MCRLinkTableManager {
 
     /**
      * counts the reference links for a given to object ID.
-     * 
+     *
      * @param types
      *            Array of document type slected by the mcrfrom content
      * @param restriction
@@ -269,7 +269,7 @@ public class MCRLinkTableManager {
             }
             return linkTableInstance.countTo(null, myTo.get(), null, restriction);
         } catch (Exception e) {
-            LOGGER.warn("An error occured while searching for references of " + to + ".", e);
+            LOGGER.warn(() -> "An error occured while searching for references of " + to + ".", e);
             return 0;
         }
     }
@@ -277,10 +277,10 @@ public class MCRLinkTableManager {
     /**
      * The method count the number of references to a category of a
      * classification without sub ID's and returns it as a Map
-     * 
+     *
      * @param classid
      *            the classification ID as MCRObjectID
-     * 
+     *
      * @return a Map with key=categID and value=counted number of references
      */
     public Map<String, Number> countReferenceCategory(String classid) {
@@ -290,7 +290,7 @@ public class MCRLinkTableManager {
     /**
      * The method count the number of references to a category of a
      * classification.
-     * 
+     *
      * @param classid
      *            the classification ID as String
      * @param categid
@@ -303,7 +303,7 @@ public class MCRLinkTableManager {
 
     /**
      * Returns a List of all link sources of <code>to</code>
-     * 
+     *
      * @param to
      *            The MCRObjectID to referenced.
      * @return List of Strings (Source-IDs)
@@ -314,7 +314,7 @@ public class MCRLinkTableManager {
 
     /**
      * Returns a List of all link sources of <code>to</code>
-     * 
+     *
      * @param to
      *            The ID to referenced.
      * @return List of Strings (Source-IDs)
@@ -328,7 +328,7 @@ public class MCRLinkTableManager {
         try {
             return linkTableInstance.getSourcesOf(to, null);
         } catch (Exception e) {
-            LOGGER.warn("An error occured while searching for references to " + to + ".", e);
+            LOGGER.warn(() -> "An error occured while searching for references to " + to + ".", e);
             return Collections.emptyList();
         }
     }
@@ -336,7 +336,7 @@ public class MCRLinkTableManager {
     /**
      * Returns a List of all link sources of <code>to</code> and a special
      * <code>type</code>
-     * 
+     *
      * @param to
      *            Destination-ID
      * @param type
@@ -350,7 +350,7 @@ public class MCRLinkTableManager {
     /**
      * Returns a List of all link sources of <code>to</code> and a special
      * <code>type</code>
-     * 
+     *
      * @param to
      *            Destination-ID
      * @param type
@@ -370,7 +370,7 @@ public class MCRLinkTableManager {
         try {
             return linkTableInstance.getSourcesOf(to, type);
         } catch (Exception e) {
-            LOGGER.warn("An error occured while searching for references to " + to + " with " + type + ".", e);
+            LOGGER.warn(() -> "An error occured while searching for references to " + to + " with " + type + ".", e);
             return Collections.emptyList();
         }
     }
@@ -378,7 +378,7 @@ public class MCRLinkTableManager {
     /**
      * The method return a list of all source ID's of the refernce target to
      * with the given type.
-     * 
+     *
      * @param to
      *            the refernce target to
      * @param type
@@ -397,7 +397,7 @@ public class MCRLinkTableManager {
             }
             return ll;
         } catch (Exception e) {
-            LOGGER.warn("An error occured while searching for references to " + Arrays.toString(to) + ".", e);
+            LOGGER.warn(() -> "An error occured while searching for references to " + Arrays.toString(to) + ".", e);
             return ll;
         }
     }
@@ -405,7 +405,7 @@ public class MCRLinkTableManager {
     /**
      * Returns a List of all link destinations of <code>from</code> and a
      * special <code>type</code>
-     * 
+     *
      * @param from
      *            Destination-ID
      * @param type
@@ -419,7 +419,7 @@ public class MCRLinkTableManager {
     /**
      * Returns a List of all link destination of <code>from</code> and a
      * special <code>type</code>
-     * 
+     *
      * @param from
      *            Source-ID
      * @param type
@@ -440,7 +440,7 @@ public class MCRLinkTableManager {
         try {
             return linkTableInstance.getDestinationsOf(from, type);
         } catch (Exception e) {
-            LOGGER.warn("An error occured while searching for references from " + from + ".", e);
+            LOGGER.warn(() -> "An error occured while searching for references from " + from + ".", e);
             return Collections.emptyList();
         }
     }

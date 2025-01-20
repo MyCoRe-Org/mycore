@@ -162,6 +162,7 @@ public class MCRJobQueueTest extends MCRTestCase {
         Assert.assertEquals("peek should return the same job", peek3, peek4);
     }
 
+    @Override
     protected Map<String, String> getTestProperties() {
         return super.getTestProperties();
     }

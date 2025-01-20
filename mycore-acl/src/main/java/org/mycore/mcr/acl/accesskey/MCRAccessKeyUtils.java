@@ -267,7 +267,7 @@ public class MCRAccessKeyUtils {
                 for (MCRUserAttribute attribute : attributes) {
                     final String attributeName = attribute.getName();
                     final MCRObjectID objectId = MCRObjectID.getInstance(attributeName.substring(
-                        attributeName.indexOf("_") + 1));
+                        attributeName.indexOf('_') + 1));
                     if (deadAttributes.contains(attribute)) {
                         removeAccessKeySecret(user, objectId);
                     } else {

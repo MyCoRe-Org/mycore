@@ -59,9 +59,9 @@ public class MCRRateLimitResolver implements URIResolver {
      */
     @Override
     public Source resolve(String href, String base) throws TransformerException {
-        final String subHref = href.substring(href.indexOf(":") + 1);
+        final String subHref = href.substring(href.indexOf(':') + 1);
         final String configID = subHref.substring(0, subHref.indexOf(':'));
-        final String resolvedHref = subHref.substring(subHref.indexOf(":") + 1);
+        final String resolvedHref = subHref.substring(subHref.indexOf(':') + 1);
         RateLimitBehavior behaviorConfig;
         try {
             behaviorConfig = RateLimitBehavior.fromValue(MCRConfiguration2.getStringOrThrow(
@@ -97,7 +97,7 @@ public class MCRRateLimitResolver implements URIResolver {
     private Source probeAccessLimit(String href, String base, BucketConfig config) throws TransformerException {
         ConsumptionProbe probe = config.bucket().tryConsumeAndReturnRemaining(1);
         if (probe.isConsumed()) {
-            LOGGER.debug("There are " + probe.getRemainingTokens() + " accesses remaining");
+            LOGGER.debug(() -> "There are " + probe.getRemainingTokens() + " accesses remaining");
             return MCRURIResolver.instance().resolve(href, base);
         } else {
             return handleError(probe, config);

@@ -70,7 +70,7 @@ class MCRIdentifierPool {
 
     boolean hasNewIdentifiers() {
         for (MCRIdentifier id : newIdentifiers) {
-            LOGGER.info("new identifier " + id);
+            LOGGER.info(() -> "new identifier " + id);
         }
 
         return !newIdentifiers.isEmpty();

@@ -67,7 +67,7 @@ public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
 
     private Collection<MCRCategoryLinkImpl> testLinks;
 
-    private static MCRCategLinkServiceImpl SERVICE = null;
+    private static MCRCategLinkServiceImpl SERVICE;
 
     private static final Logger LOGGER = LogManager.getLogger(MCRCategLinkServiceImplTest.class);
 

@@ -40,7 +40,7 @@ import com.fasterxml.jackson.databind.node.ValueNode;
  */
 public class MCRSimpleTikaMapper implements MCRTikaMapper {
 
-    private boolean stripNamespace = false;
+    private boolean stripNamespace;
 
     private boolean multiValue = true;
 
@@ -77,7 +77,7 @@ public class MCRSimpleTikaMapper implements MCRTikaMapper {
         Path filePath,
         BasicFileAttributes attributes) throws MCRTikaMappingException {
 
-        String keyWONamespace = isStripNamespace() && key.contains(":") ? key.substring(key.indexOf(":") + 1) : key;
+        String keyWONamespace = isStripNamespace() && key.contains(":") ? key.substring(key.indexOf(':') + 1) : key;
         String simplifiedKey = MCRTikaMapper.simplifyKeyName(keyWONamespace);
 
         if (element.isValueNode() && element instanceof ValueNode vn) {

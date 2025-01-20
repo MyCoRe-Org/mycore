@@ -61,7 +61,7 @@ import org.mycore.common.MCRTextResolver;
  *  &nbsp;&lt;panel/&gt;
  * &lt;/dynIncl&gt;
  * </pre>
- * 
+ *
  * @see MCRTextResolver
  * @author Matthias Eichner
  */
@@ -84,13 +84,14 @@ public abstract class MCRDynamicURIResolver implements URIResolver {
     /**
      * Sets the xml file. From this file the jdom content
      * will be created.
-     * 
+     *
      * @param xmlFile xml file object
      */
     public void setXmlFile(File xmlFile) {
         this.xmlFile = xmlFile;
         if (!xmlFile.exists()) {
-            LOGGER.error(new FileNotFoundException());
+            FileNotFoundException debugEx = new FileNotFoundException();
+            LOGGER.error(() -> "File does not exist: " + xmlFile, debugEx);
         }
     }
 
@@ -130,7 +131,7 @@ public abstract class MCRDynamicURIResolver implements URIResolver {
      * For the first option the name of the variables is 'x', where 'x' is a number
      * for the position in the uri. To get the first value use {1}, to get the second
      * one use {2} and so on.
-     * 
+     *
      * @param uri the whole uri
      * @return a hashtable with all variables from the uri
      */
@@ -139,7 +140,7 @@ public abstract class MCRDynamicURIResolver implements URIResolver {
         String uriValue = uri.substring(uri.indexOf(':') + 1);
         String[] variablesArr = uriValue.split(":");
         for (int i = 0; i < variablesArr.length; i++) {
-            int equalsSignIndex = variablesArr[i].indexOf("=");
+            int equalsSignIndex = variablesArr[i].indexOf('=');
             if (equalsSignIndex == -1) {
                 String varName = String.valueOf(i + 1);
                 String varValue = variablesArr[i];
@@ -156,7 +157,7 @@ public abstract class MCRDynamicURIResolver implements URIResolver {
     /**
      * This method runs through the whole content of the startElement and
      * tries to resolve all variables in texts and attributes.
-     * 
+     *
      * @param startElement where to start to resolve the variables
      * @param variablesMap a map of all variables
      */

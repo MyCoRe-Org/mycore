@@ -28,8 +28,8 @@ import java.io.InputStream;
  * it returned -1 on read(). But when using ZipInputStream, this is unwanted, because
  * a ZipInputStream may contain other entries that have to be read and invoked code
  * must be prevented from calling close(). With this class, a ZipInputStream or any other
- * stream can be wrapped to regain control of closing.      
- * 
+ * stream can be wrapped to regain control of closing.
+ *
  * @author Frank Lützenkirchen
  */
 public class MCRNotClosingInputStream extends FilterInputStream {
@@ -38,15 +38,16 @@ public class MCRNotClosingInputStream extends FilterInputStream {
         super(in);
     }
 
-    /** 
+    /**
      * Does nothing. When you want to really close the stream, call reallyClose().
      */
+    @Override
     public void close() {
         //Does nothing. When you want to really close the stream, call reallyClose().
     }
 
     /**
-     * Really closes the stream. 
+     * Really closes the stream.
      */
     public void reallyClose() throws IOException {
         super.close();

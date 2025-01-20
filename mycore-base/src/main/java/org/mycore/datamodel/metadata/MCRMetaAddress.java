@@ -31,7 +31,7 @@ import com.google.gson.JsonObject;
  * This class implements all methods for handling with the MCRMetaAddress part
  * of a metadata object. The MCRMetaAddress class represents a natural address
  * specified by a list of names.
- * 
+ *
  * @author J. Vogler
  */
 public final class MCRMetaAddress extends MCRMetaDefault {
@@ -97,9 +97,9 @@ public final class MCRMetaAddress extends MCRMetaDefault {
 
     /**
      * clone of this instance
-     * 
+     *
      * you will get a (deep) clone of this element
-     * 
+     *
      * @see java.lang.Object#clone()
      */
     @Override
@@ -119,7 +119,7 @@ public final class MCRMetaAddress extends MCRMetaDefault {
     /**
      * This method creates a XML stream for all data in this class, defined by
      * the MyCoRe XML MCRMetaAddress definition for the given subtag.
-     * 
+     *
      * @exception MCRException
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML MCRMetaAddress part
@@ -152,7 +152,7 @@ public final class MCRMetaAddress extends MCRMetaDefault {
     /**
      * Creates the JSON representation. Extends the {@link MCRMetaDefault#createJSON()} method
      * with the following data.
-     * 
+     *
      * <pre>
      *   {
      *     "country": "Deutschland",
@@ -163,7 +163,7 @@ public final class MCRMetaAddress extends MCRMetaDefault {
      *     "number": "2"
      *   }
      * </pre>
-     * 
+     *
      */
     @Override
     public JsonObject createJSON() {
@@ -208,7 +208,7 @@ public final class MCRMetaAddress extends MCRMetaDefault {
 
     /**
      * Check the equivalence between this instance and the given object.
-     * 
+     *
      * @param obj the MCRMetaAddress object
      * @return true if its equal
      */
@@ -273,9 +273,10 @@ public final class MCRMetaAddress extends MCRMetaDefault {
      * <li>the inherited value is lower than zero</li>
      * <li>all of country, state, zip, city, street and number is empty</li>
      * </ul>
-     * 
+     *
      * @throws MCRException the MCRMetaAddress is invalid
      */
+    @Override
     public void validate() throws MCRException {
         super.validate();
         if (getCountry() == null && getState() == null && getZipCode() == null && getCity() == null
@@ -301,7 +302,7 @@ public final class MCRMetaAddress extends MCRMetaDefault {
     /**
      * This method reads the XML input stream part from a DOM part for the
      * metadata of the document.
-     * 
+     *
      * @param element
      *            a relevant JDOM element for the metadata
      */

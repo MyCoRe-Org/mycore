@@ -40,14 +40,15 @@ public class MCRSwapElements implements MCRChange {
             return swap(parent, posB, b, posA, a);
         }
 
-        b.detach(); // x a x x x  
-        parent.addContent(posA, b); // x b a x x x 
+        b.detach(); // x a x x x
+        parent.addContent(posA, b); // x b a x x x
         a.detach(); // x b x x x
         parent.addContent(posB, a); // x b x x a x
 
         return new MCRChangeData("swapped-elements", posA + " " + posB, posB, parent);
     }
 
+    @Override
     public void undo(MCRChangeData data) {
         int posA = Integer.parseInt(data.getText().split(" ")[0]);
         int posB = Integer.parseInt(data.getText().split(" ")[1]);

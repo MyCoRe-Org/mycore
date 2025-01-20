@@ -168,10 +168,12 @@ public abstract class MCRResourcePath {
             this.path = path;
         }
 
+        @Override
         public String asAbsolutePath() {
             return path;
         }
 
+        @Override
         public Optional<String> asAbsoluteWebPath() {
             return Optional.empty();
         }
@@ -189,10 +191,12 @@ public abstract class MCRResourcePath {
             this.webResourcePath = Optional.of(path);
         }
 
+        @Override
         public String asAbsolutePath() {
             return path;
         }
 
+        @Override
         public Optional<String> asAbsoluteWebPath() {
             return webResourcePath;
         }

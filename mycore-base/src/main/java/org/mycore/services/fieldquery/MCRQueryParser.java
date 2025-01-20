@@ -206,8 +206,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
                 // we are within phrase
                 if (value.endsWith("'")) {
                     // end of phrase
-                    value = phrase + " " + value;
-                    values.add(value);
+                    values.add(phrase + " " + value);
                     phrase = null;
                 } else {
                     // in middle of phrase

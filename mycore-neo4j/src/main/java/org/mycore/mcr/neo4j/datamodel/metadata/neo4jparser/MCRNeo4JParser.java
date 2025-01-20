@@ -92,9 +92,9 @@ public class MCRNeo4JParser implements MCRNeo4JMetaParser {
                 LOGGER.debug("current Element: {}", parent);
                 Attribute classAttribute = parent.getAttribute("class");
                 if (classAttribute == null) {
-                    LOGGER.error("Parent of current Element: {}", parent.getParent());
+                    LOGGER.error("Parent of current Element: {}", parent::getParent);
                     LOGGER.error("NULL Class printing current Element {}", parent);
-                    LOGGER.error("Parser Attributes {}", parent.getAttributes());
+                    LOGGER.error("Parser Attributes {}", parent::getAttributes);
                     // TODO: return (no crash/error message) or no return and let it crash
                     return;
                 }
@@ -146,6 +146,7 @@ public class MCRNeo4JParser implements MCRNeo4JMetaParser {
         return sbNode.toString();
     }
 
+    @Override
     public String createNeo4JQuery(MCRObject mcrObject) {
 
         MCRObjectID id = mcrObject.getId();
@@ -183,12 +184,12 @@ public class MCRNeo4JParser implements MCRNeo4JMetaParser {
                 for (Element parent : elms) {
                     LOGGER.info("current Element: {}", parent);
                     Attribute classAttribute = parent.getAttribute("class");
-                    LOGGER.info("parse: {}", classAttribute.getValue());
+                    LOGGER.info("parse: {}", classAttribute::getValue);
 
                     MCRNeo4JAbstractDataModelParser clazz = parserMap.get(classAttribute.getValue());
                     if (null == clazz) {
                         LOGGER.error("Could not find Neo4J parser for metadata of type {}. Skipping",
-                            classAttribute.getValue());
+                            classAttribute::getValue);
                         continue;
                     }
 

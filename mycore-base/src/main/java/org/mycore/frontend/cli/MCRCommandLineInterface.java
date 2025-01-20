@@ -74,7 +74,7 @@ public class MCRCommandLineInterface {
     private static final Logger LOGGER = LogManager.getLogger();
 
     /** The name of the system */
-    private static String system = null;
+    private static String system;
 
     /** A queue of commands waiting to be executed */
     protected static Vector<String> commandQueue = new Vector<>();
@@ -83,7 +83,7 @@ public class MCRCommandLineInterface {
 
     private static boolean interactiveMode = true;
 
-    private static boolean SKIP_FAILED_COMMAND = false;
+    private static boolean SKIP_FAILED_COMMAND;
 
     private static MCRCommandManager knownCommands;
 
@@ -94,7 +94,7 @@ public class MCRCommandLineInterface {
      * reads a file containing a list of commands to be processed
      */
     public static void main(String[] args) {
-        if (!(MCRCommandLineInterface.class.getClassLoader() instanceof URLClassLoader)) {
+        if (!(Thread.currentThread().getContextClassLoader() instanceof URLClassLoader)) {
             System.out.println("Current ClassLoader is not extendable at runtime. Using workaround.");
             Thread.currentThread().setContextClassLoader(new CLIURLClassLoader(new URL[0]));
         }

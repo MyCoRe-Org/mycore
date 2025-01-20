@@ -29,6 +29,7 @@ import jakarta.ws.rs.ext.ExceptionMapper;
  * {@link Response.Status#UNAUTHORIZED} if current user is guest.
  */
 public class MCRNotAuthorizedExceptionMapper implements ExceptionMapper<NotAuthorizedException> {
+    @Override
     public Response toResponse(NotAuthorizedException ex) {
         if (ex.getMessage() == null || ex.getResponse().getEntity() != null) {
             return ex.getResponse();

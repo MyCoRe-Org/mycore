@@ -32,7 +32,7 @@ import org.mycore.common.processing.MCRProcessableRegistry;
  * @author Frank Lützenkirchen
  * @author Harald Richter
  * @author Jens Kupferschmidt
- * 
+ *
  */
 public class MCRUploadHandlerManager {
 
@@ -51,7 +51,7 @@ public class MCRUploadHandlerManager {
     }
 
     static void register(MCRUploadHandler handler) {
-        LOGGER.debug("Registering {} with upload ID {}", handler.getClass().getName(), handler.getID());
+        LOGGER.debug("Registering {} with upload ID {}", () -> handler.getClass().getName(), handler::getID);
         String sessionID = MCRSessionMgr.getCurrentSession().getID();
         HANDLERS.put(handler.getID(), new MCRUploadHandlerCacheEntry(sessionID, handler));
         COLLECTION.add(handler);

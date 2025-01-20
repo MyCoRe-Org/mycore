@@ -46,6 +46,7 @@ public abstract class MCRResourceProviderBase implements MCRResourceProvider {
         this.coverage = Objects.requireNonNull(coverage);
     }
 
+    @Override
     public final Optional<URL> provide(MCRResourcePath path, MCRHints hints) {
         logger.debug("Providing resource URLs for path {} [{}]", path, coverage);
         Optional<URL> resourceUrl = doProvide(path, hints);
@@ -61,6 +62,7 @@ public abstract class MCRResourceProviderBase implements MCRResourceProvider {
         return resourceUrl;
     }
 
+    @Override
     public final List<ProvidedUrl> provideAll(MCRResourcePath path, MCRHints hints) {
         logger.debug("Providing all resource URLs for path {} [{}]", path, coverage);
         List<ProvidedUrl> resourceUrls = doProvideAll(path, hints);

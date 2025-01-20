@@ -111,7 +111,7 @@ public class MyCoReWebPageProvider {
             + "\"http://www.mycore.org/mycorewebpage.dtd\">" + "<MyCoReWebPage>" + xmlAsString + "</MyCoReWebPage>";
         SAXBuilder saxBuilder = new SAXBuilder();
         saxBuilder.setEntityResolver((publicId, systemId) -> {
-            String resource = systemId.substring(systemId.lastIndexOf("/"));
+            String resource = systemId.substring(systemId.lastIndexOf('/'));
             InputStream is = getClass().getResourceAsStream(resource);
             if (is == null) {
                 throw new IOException(new FileNotFoundException("Unable to locate resource " + resource));
