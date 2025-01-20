@@ -19,8 +19,9 @@
 package org.mycore.frontend;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -58,7 +59,7 @@ public final class MCRWebsiteWriteProtection {
     /**
      * Checks if website protection is currently active.
      * If current user is super user this method always returns false.
-     * 
+     *
      * @return true if write access is currently active, false if not
      */
     public static boolean isActive() {
@@ -122,12 +123,10 @@ public final class MCRWebsiteWriteProtection {
 
     private static void setConfiguration(Element configXML) {
         try {
-            // save
             XMLOutputter xmlOut = new XMLOutputter();
-            FileOutputStream fos = new FileOutputStream(CONFIG_FILE);
-            xmlOut.output(configXML, fos);
-            fos.flush();
-            fos.close();
+            try(OutputStream fileOutputStream = Files.newOutputStream(CONFIG_FILE.toPath())) {
+                xmlOut.output(configXML, fileOutputStream);
+            }
         } catch (IOException e) {
             LOGGER.debug(e);
         }
@@ -184,7 +183,7 @@ public final class MCRWebsiteWriteProtection {
 
     /**
      * Verifies if the cache of configuration is valid.
-     * 
+     *
      * @return true if valid, false if note
      */
     private static boolean cacheValid() {

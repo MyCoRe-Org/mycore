@@ -20,9 +20,10 @@ package org.mycore.user2;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -184,9 +185,9 @@ public class MCRUserCommands extends MCRAbstractCommands {
     public static void exportRole(String roleID, String directory) throws IOException {
         MCRRole mcrRole = MCRRoleManager.getRole(roleID);
         File targetFile = new File(directory, roleID + ".xml");
-        try (FileOutputStream fout = new FileOutputStream(targetFile)) {
-            XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat().setEncoding(MCRConstants.DEFAULT_ENCODING));
-            xout.output(MCRRoleTransformer.buildExportableXML(mcrRole), fout);
+        try (OutputStream fileOutputStream = Files.newOutputStream(targetFile.toPath())) {
+            XMLOutputter out = new XMLOutputter(Format.getPrettyFormat().setEncoding(MCRConstants.DEFAULT_ENCODING));
+            out.output(MCRRoleTransformer.buildExportableXML(mcrRole), fileOutputStream);
         }
     }
 
@@ -272,8 +273,8 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
         MCRUserManager.setUserPassword(mcrUser, mcrUser.getPassword());
 
-        try (FileOutputStream outFile = new FileOutputStream(newFile)) {
-            saveToXMLFile(mcrUser, outFile);
+        try (OutputStream fileOutputStream = Files.newOutputStream(Path.of(newFile))) {
+            saveToXMLFile(mcrUser, fileOutputStream);
         }
     }
 
@@ -356,12 +357,16 @@ public class MCRUserCommands extends MCRAbstractCommands {
         order = 180)
     public static void exportUserToFile(String userID, String filename) throws IOException {
         MCRUser user = MCRUserManager.getUser(userID);
-        if (user.getSystemRoleIDs().isEmpty()) {
-            LOGGER.warn("User {} has not any system roles.", user::getUserID);
+        if (user == null) {
+            LOGGER.warn("User '{}' does not exist.", userID);
+            return;
         }
-        try (FileOutputStream outFile = new FileOutputStream(filename)) {
-            LOGGER.info("Writing to file {} …", filename);
-            saveToXMLFile(user, outFile);
+        if (user.getSystemRoleIDs().isEmpty()) {
+            LOGGER.warn("User '{}' has not any system roles.", user::getUserID);
+        }
+        try (OutputStream fileOutputStream = Files.newOutputStream(Path.of(filename))) {
+            LOGGER.info("Writing to file '{}' ...", filename);
+            saveToXMLFile(user, fileOutputStream);
         }
     }
 
@@ -670,14 +675,14 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *
      * @param mcrUser
      *            the JDOM XML document to be printed
-     * @param outFile
+     * @param outputStream
      *            a FileOutputStream object for the output
      * @throws IOException
      *             if output file can not be closed
      */
-    private static void saveToXMLFile(MCRUser mcrUser, FileOutputStream outFile) throws IOException {
+    private static void saveToXMLFile(MCRUser mcrUser, OutputStream outputStream) throws IOException {
         // Create the output
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat().setEncoding(MCRConstants.DEFAULT_ENCODING));
-        outputter.output(MCRUserTransformer.buildExportableXML(mcrUser), outFile);
+        outputter.output(MCRUserTransformer.buildExportableXML(mcrUser), outputStream);
     }
 }

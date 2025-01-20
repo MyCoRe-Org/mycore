@@ -23,7 +23,8 @@ import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -229,11 +230,12 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         if (file.exists()) {
             LOGGER.warn("File {} yet exists, overwrite.", filename);
         }
-        FileOutputStream fos = new FileOutputStream(file);
-        LOGGER.info("Writing to file {} …", filename);
+        LOGGER.info("Writing to file {} ...", filename);
         String mcrEncoding = MCRConfiguration2.getString("MCR.Metadata.DefaultEncoding").orElse(DEFAULT_ENCODING);
         XMLOutputter out = new XMLOutputter(Format.getPrettyFormat().setEncoding(mcrEncoding));
-        out.output(doc, fos);
+        try(OutputStream fileOutputStream = Files.newOutputStream(file.toPath())) {
+            out.output(doc, fileOutputStream);
+        }
     }
 
     private static String filenameToUri(String filename) {

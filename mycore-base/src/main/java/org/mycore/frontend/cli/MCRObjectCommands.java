@@ -19,10 +19,10 @@
 package org.mycore.frontend.cli;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -804,14 +804,14 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the file instance to store
      * @param extension
      *            the file extension to use
-     * @param trans
+     * @param consumer
      *            the transformation
      * @param nid
      *            the MCRObjectID
      * @return true if the store was okay (see description), else return false
      */
     private static boolean exportObject(File dir, String extension,
-        FailableBiConsumer<MCRContent, OutputStream, Exception> trans,
+        FailableBiConsumer<MCRContent, OutputStream, Exception> consumer,
         String nid) throws IOException, MCRException {
         MCRContent content;
         try {
@@ -820,13 +820,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         } catch (MCRException ex) {
             return false;
         }
-
         File xmlOutput = new File(dir, nid + "." + extension);
-
-        if (trans != null) {
-            FileOutputStream out = new FileOutputStream(xmlOutput);
-            try {
-                trans.accept(content, out);
+        if (consumer != null) {
+            try(OutputStream fileOutputStream = Files.newOutputStream(xmlOutput.toPath())) {
+                consumer.accept(content, fileOutputStream);
             } catch (UncheckedIOException e) {
                 throw e.getCause();
             } catch (IOException | RuntimeException e) {

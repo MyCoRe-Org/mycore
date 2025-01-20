@@ -21,9 +21,9 @@ package org.mycore.wcms2;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
@@ -69,7 +69,7 @@ public final class MCRWCMSUtil {
         File wcmsDataDirTarget = new File(getWCMSDataDir(), cleanPath);
         LOGGER.info(() -> "Writing content to " + wcmsDataDirTarget + ".");
         createDirectoryIfNeeded(wcmsDataDirTarget);
-        return new FileOutputStream(wcmsDataDirTarget);
+        return Files.newOutputStream(wcmsDataDirTarget.toPath());
     }
 
     private static void createDirectoryIfNeeded(File targetFile) throws IOException {

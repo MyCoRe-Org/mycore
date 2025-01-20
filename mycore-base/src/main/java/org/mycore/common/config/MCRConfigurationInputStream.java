@@ -21,11 +21,11 @@ package org.mycore.common.config;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -144,7 +144,7 @@ public class MCRConfigurationInputStream extends InputStream {
         if (localProperties != null && localProperties.canRead()) {
             empty = false;
             LogManager.getLogger().info("Loading additional properties from {}", localProperties::getAbsolutePath);
-            cList.add(new FileInputStream(localProperties));
+            cList.add(Files.newInputStream(localProperties.toPath()));
             cList.add(new ByteArrayInputStream(LINE_BREAK));
         }
         return Collections.enumeration(cList);
@@ -198,8 +198,8 @@ public class MCRConfigurationInputStream extends InputStream {
         File localConfigFile = MCRConfigurationDir.getConfigFile(filename);
         if (localConfigFile != null && localConfigFile.canRead()) {
             LogManager.getLogger().debug("Loaded config file from config dir: {}", filename);
-            try (FileInputStream fis = new FileInputStream(localConfigFile)) {
-                map.put("configdir_" + filename, fis.readAllBytes());
+            try (InputStream fileInputStream = Files.newInputStream(localConfigFile.toPath())) {
+                map.put("configdir_" + filename, fileInputStream.readAllBytes());
             }
         }
         return map;
