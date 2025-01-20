@@ -18,14 +18,6 @@
 
 package org.mycore.restapi.v1.utils;
 
-import com.google.gson.stream.JsonWriter;
-import jakarta.ws.rs.core.Application;
-import jakarta.ws.rs.core.CacheControl;
-import jakarta.ws.rs.core.Request;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.ResponseBuilder;
-import jakarta.ws.rs.core.Response.Status;
-import jakarta.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
@@ -46,6 +38,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Comment;
@@ -79,6 +72,16 @@ import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
 import org.mycore.restapi.v1.utils.MCRRestAPISortObject.SortOrder;
 
+import com.google.gson.stream.JsonWriter;
+
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.CacheControl;
+import jakarta.ws.rs.core.Request;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.UriInfo;
+
 /**
  * Main utility class that handles REST requests to filter the XML output of showMCRObject, set the properties:
  * MCR.RestAPI.v1.Filter.XML
@@ -87,7 +90,7 @@ import org.mycore.restapi.v1.utils.MCRRestAPISortObject.SortOrder;
  *   to your ContentTransformer's class and
  * MCR.ContentTransformer.[your ContentTransformer-ID here].Stylesheet
  *   to your filtering stylesheet.
- * 
+ *
  * @author Robert Stephan
  * @author Christoph Neidahl
  */
@@ -295,7 +298,7 @@ public class MCRRestAPIObjectsHelper {
      *
      * @return a Jersey response object
      * @see MCRRestAPIObjects#listObjects(UriInfo, String, String, String)
-     * 
+     *
      */
     public static Response listObjects(UriInfo info, String format, String filter, String sort)
         throws MCRRestAPIException {
