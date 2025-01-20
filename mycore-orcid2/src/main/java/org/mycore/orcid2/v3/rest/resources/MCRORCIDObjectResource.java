@@ -18,6 +18,8 @@
 
 package org.mycore.orcid2.v3.rest.resources;
 
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
@@ -37,6 +39,7 @@ import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
 import org.mycore.orcid2.user.MCRORCIDUser;
+import org.mycore.orcid2.user.MCRORCIDUserUtils;
 import org.mycore.orcid2.util.MCRIdentifier;
 import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
 import org.mycore.orcid2.v3.work.MCRORCIDWorkService;
@@ -44,6 +47,7 @@ import org.mycore.orcid2.v3.work.MCRORCIDWorkUtils;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.orcid.jaxb.model.v3.release.record.Work;
 
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -81,24 +85,18 @@ public class MCRORCIDObjectResource {
     public MCRORCIDPublicationStatus getObjectStatus(@PathParam("objectID") MCRObjectID objectID) {
         final MCRObject object = getObject(objectID);
         final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
-        final Set<String> orcids = getMatchingORCIDs(object, orcidUser);
-        if (orcids.isEmpty()) {
-            // assumption that a publication cannot be in the profile, it is if not users.
+        if (!MCRORCIDUserUtils.checkUserHasObjectRelation(orcidUser, object)) {
             return new MCRORCIDPublicationStatus(false, false);
         }
-        if (orcids.size() > 1) {
-            // should not happen
-            throw new WebApplicationException(Status.BAD_REQUEST);
-        }
-        final String orcid = orcids.iterator().next();
-        final MCRORCIDCredential credential = orcidUser.getCredentialByORCID(orcid);
-        if (credential == null) {
+        final Map.Entry<String, MCRORCIDCredential> entry = getCredential(orcidUser, object);
+        if (entry == null) {
             return new MCRORCIDPublicationStatus(true, false);
         }
         try {
             final Work work = MCRORCIDWorkTransformerHelper.transformContent(new MCRJDOMContent(object.createXML()));
             final Set<MCRIdentifier> identifiers = MCRORCIDWorkUtils.listTrustedIdentifiers(work);
-            final boolean result = new MCRORCIDWorkService(orcid, credential).checkOwnWorkExists(identifiers);
+            final boolean result
+                = new MCRORCIDWorkService(entry.getKey(), entry.getValue()).checkOwnWorkExists(identifiers);
             return new MCRORCIDPublicationStatus(true, result);
         } catch (Exception e) {
             LOGGER.error("Error while retrieving status: ", e);
@@ -121,8 +119,15 @@ public class MCRORCIDObjectResource {
     public Response createObject(@PathParam("objectID") MCRObjectID objectID) {
         final MCRObject object = getObject(objectID);
         final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
-        final String orcid = getMatchingORCID(object, orcidUser);
-        final MCRORCIDCredential credential = getCredential(orcidUser, orcid);
+        if (!MCRORCIDUserUtils.checkUserHasObjectRelation(orcidUser, object)) {
+            throw new BadRequestException("User has no relation to the object.");
+        }
+        final Map.Entry<String, MCRORCIDCredential> entry = getCredential(orcidUser, object);
+        if (entry == null) {
+            throw new WebApplicationException(Status.BAD_REQUEST);
+        }
+        final String orcid = entry.getKey();
+        final MCRORCIDCredential credential = entry.getValue();
 
         final MCRSession session = MCRSessionMgr.getCurrentSession();
         final MCRUserInformation savedUserInformation = session.getUserInformation();
@@ -140,12 +145,23 @@ public class MCRORCIDObjectResource {
         return Response.ok().build();
     }
 
-    private MCRORCIDCredential getCredential(MCRORCIDUser orcidUser, String orcid) {
-        final MCRORCIDCredential credential = orcidUser.getCredentialByORCID(orcid);
-        if (credential == null || credential.getAccessToken() == null) {
-            throw new WebApplicationException(Status.BAD_REQUEST);
+    private Map.Entry<String, MCRORCIDCredential> getCredential(MCRORCIDUser orcidUser, MCRObject object) {
+        final Map<String, MCRORCIDCredential> credentialMap = orcidUser.getCredentials();
+        if (credentialMap.isEmpty()) {
+            return null;
         }
-        return credential;
+        if (credentialMap.size() > 1) {
+            // try to find matching orcid/credential
+            final Set<String> orcids = credentialMap.keySet();
+            orcids.retainAll(MCRORCIDUtils.getORCIDs(object));
+            if (orcids.size() == 1) {
+                return credentialMap.entrySet().stream()
+                    .filter(entry -> Objects.equals(entry.getKey(), orcids.iterator().next())).findFirst()
+                    .orElseThrow(() -> new WebApplicationException(Status.BAD_REQUEST));
+            }
+
+        }
+        return credentialMap.entrySet().iterator().next();
     }
 
     private MCRObject getObject(MCRObjectID objectID) {
@@ -157,23 +173,6 @@ public class MCRORCIDObjectResource {
         } catch (MCRPersistenceException e) {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
-    }
-
-    private String getMatchingORCID(MCRObject object, MCRORCIDUser orcidUser) {
-        final Set<String> orcids = getMatchingORCIDs(object, orcidUser);
-        if (orcids.isEmpty()) {
-            return null;
-        }
-        if (orcids.size() == 1) {
-            return orcids.iterator().next();
-        }
-        throw new WebApplicationException(Status.BAD_REQUEST);
-    }
-
-    private Set<String> getMatchingORCIDs(MCRObject object, MCRORCIDUser orcidUser) {
-        final Set<String> orcids = MCRORCIDUtils.getORCIDs(object);
-        orcids.retainAll(orcidUser.getORCIDs());
-        return orcids;
     }
 
     static class MCRORCIDPublicationStatus {
