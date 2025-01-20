@@ -18,7 +18,6 @@
 
 package org.mycore.frontend.cli;
 
-import jakarta.persistence.EntityManager;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -34,9 +33,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -61,6 +62,8 @@ import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
+
+import jakarta.persistence.EntityManager;
 
 /**
  * Commands for the classification system.

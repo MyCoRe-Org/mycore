@@ -18,8 +18,6 @@
 
 package org.mycore.frontend.cli;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -42,6 +40,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
@@ -51,6 +50,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+
 import org.apache.commons.lang3.function.FailableBiConsumer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -101,6 +101,9 @@ import org.mycore.tools.MCRTopologicalSort;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 
 /**
  * Provides static methods that implement commands for the MyCoRe command line interface. Robert: Ideas for clean-up -

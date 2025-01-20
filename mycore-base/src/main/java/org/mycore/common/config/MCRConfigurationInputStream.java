@@ -33,6 +33,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
+
 import org.apache.logging.log4j.LogManager;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRFileContent;

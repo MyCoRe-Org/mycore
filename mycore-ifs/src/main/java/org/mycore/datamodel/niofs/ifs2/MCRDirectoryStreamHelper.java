@@ -40,6 +40,7 @@ import java.nio.file.attribute.FileAttributeView;
 import java.nio.file.attribute.FileTime;
 import java.util.Iterator;
 import java.util.Set;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.digest.MCRMD5Digest;

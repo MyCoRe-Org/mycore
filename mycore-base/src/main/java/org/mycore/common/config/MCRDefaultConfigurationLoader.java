@@ -26,6 +26,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.util.Map;
 import java.util.StringTokenizer;
+
 import org.apache.commons.io.input.TeeInputStream;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRFileContent;
@@ -95,7 +96,7 @@ public class MCRDefaultConfigurationLoader implements MCRConfigurationLoader {
      * a property called <CODE>MCR.Configuration.Include</CODE>, the files
      * specified in that property will also be read. Multiple include files have
      * to be separated by spaces or colons.
-     * 
+     *
      * @param filename
      *            the properties file to be loaded
      * @throws MCRConfigurationException
