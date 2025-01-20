@@ -1,8 +1,12 @@
+import { Config } from "./config";
+
 declare global {
   interface Window {
     webApplicationBaseURL: string;
   }
 }
+
+const ALLOWED_SESSION_TYPES = "MCR.ACL.AccessKey.Strategy.AllowedSessionPermissionTypes";
 
 export type JWT = {
   // eslint-disable-next-line camelcase
@@ -13,13 +17,27 @@ export type JWT = {
   token_type: string;
 };
 
-export const getWebApplicationBaseURL = (): string | undefined => window.webApplicationBaseURL;
+export const BASE_URL = window.webApplicationBaseURL as string;
 
-export const fetchI18n = async (webApplicationBaseURL: string) =>
-  (await fetch(`${webApplicationBaseURL}rsc/locale/translate/component.acl.accesskey.*`)).json();
+export const fetchTranslations = async (baseUrl: string) => {
+  const response = await fetch(`${baseUrl}rsc/locale/translate/component.acl.accesskey.*`);
+  if (!response.ok) {
+    throw new Error('Failed to load translations');
+  }
+  return await response.json();
+}
 
-export const fetchConfig = async (webApplicationBaseURL: string) =>
-  (await fetch(`${webApplicationBaseURL}config.json`)).json();
+export const fetchConfig = async (baseUrl: string) => {
+  const response = await fetch(`${baseUrl}config.json`);
+  if (!response.ok) {
+    throw new Error('Failed to load app configuration');
+  }
+  const config = await response.json();
+  return {
+    isSessionEnabled: config[ALLOWED_SESSION_TYPES] !== undefined && config[ALLOWED_SESSION_TYPES].length > 0,
+    allowedSessionPermissionTypes: config[ALLOWED_SESSION_TYPES].split(","),
+  } as Config;
+};
 
 const getQueryParameterByName = (
   parameterName: string,
@@ -45,20 +63,20 @@ export const getAvailablePermissions = (): string[] | undefined => {
 };
 
 export const fetchJWT = async (
-  webApplicationBaseURL: string,
-  objectId?: string,
+  baseUrl: string,
+  reference?: string,
   isSessionEnabled?: boolean
 ): Promise<JWT> => {
-  if (objectId) {
+  if (reference) {
     const params = new URLSearchParams();
-    params.append("ua", `acckey_${objectId}`);
+    params.append("ua", `acckey_${reference}`);
     if (isSessionEnabled) {
-      params.append("sa", `acckey_${objectId}`);
+      params.append("sa", `acckey_${reference}`);
     }
-    const result = await fetch(`${webApplicationBaseURL}rsc/jwt?${params}`);
+    const result = await fetch(`${baseUrl}rsc/jwt?${params}`);
     return result.json();
   }
-  const result = await fetch(`${webApplicationBaseURL}rsc/jwt`);
+  const result = await fetch(`${baseUrl}rsc/jwt`);
   return result.json();
 };
 

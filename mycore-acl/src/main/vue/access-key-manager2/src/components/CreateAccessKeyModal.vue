@@ -19,7 +19,7 @@
     </div>
     <form>
       <div
-        v-if="globalReference === undefined"
+        v-if="reference === undefined"
         class="form-group required"
       >
         <label for="inputReference">
@@ -149,17 +149,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref, onErrorCaptured } from "vue";
+import { computed, ref, onErrorCaptured } from "vue";
 import { generateRandomString } from "@/utils";
 import { AccessKeyDto, CreateAccessKeyDto } from "@/dtos/accesskey";
-import { referenceKey, availablePermissionsKey } from "@/keys";
 import useVuelidate from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import BaseModal from "@/components/BaseModal.vue";
 import { useAccessKeyStore } from "@/store/access-keys";
-import { createAccessKey, getAccessKey } from "@/api/service";
+import { createAccessKey, getAccessKey } from "@/api/access-key-service";
 
-defineProps<{
+const props = defineProps<{
+  reference: string | undefined;
+  availablePermissions: string[] | undefined;
   showModal: boolean;
 }>();
 
@@ -181,12 +182,10 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
-const globalReference: string | undefined = inject(referenceKey);
-const availablePermissions: string[] | undefined = inject(availablePermissionsKey);
 const errorMessage = ref<string | undefined>(undefined);
 const busy = ref<boolean>(false);
 const defaultForm = {
-  reference: globalReference !== undefined ? globalReference : "",
+  reference: props.reference !== undefined ? props.reference : "",
   isActive: true,
   secret: "",
   type: "",
@@ -234,7 +233,7 @@ const handleCreateAccessKey = async () => {
           }
           const accessKeyId = await createAccessKey(accessKey);
           const createdAccessKey = await getAccessKey(accessKeyId);
-          accessKeyStore.addItem(createdAccessKey);
+          accessKeyStore.addAccessKey(createdAccessKey);
           emit("access-key-created", form.value.secret, createdAccessKey);
           handleClose(true);
         } catch (error) {

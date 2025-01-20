@@ -1,23 +1,12 @@
 import { App, createApp } from "vue";
-import { createI18n } from "vue-i18n";
-import {
-  getReference,
-  getWebApplicationBaseURL,
-  fetchI18n,
-  getAvailablePermissions,
-  fetchConfig,
-} from "@/utils";
-import { referenceKey, availablePermissionsKey, configKey, webApplicationBaseUrlKey } from "@/keys";
+import { createI18n, I18n } from "vue-i18n";
+import { BASE_URL, fetchTranslations } from "@/utils";
 import ContactManager from "@/App.vue";
 import router from './router';
-import { Config } from "./config";
 import { createPinia } from 'pinia';
 
-const ALLOWED_SESSION_TYPES = "MCR.ACL.AccessKey.Strategy.AllowedSessionPermissionTypes";
-const webApplicationBaseUrl = getWebApplicationBaseURL() as string;
-
-const initializeI18n = async () => {
-  const data = await fetchI18n(webApplicationBaseUrl);
+const initI18n = async (baseUrl: string): Promise<I18n> => {
+  const data = await fetchTranslations(baseUrl);
   return createI18n({
     legacy: false,
     locale: "_",
@@ -26,14 +15,6 @@ const initializeI18n = async () => {
     },
     warnHtmlInMessage: "off",
   });
-}
-
-const initializeConfig = async (): Promise<Config> => {
-  const data = await fetchConfig(webApplicationBaseUrl);
-  return {
-    isSessionEnabled: data[ALLOWED_SESSION_TYPES] !== undefined && data[ALLOWED_SESSION_TYPES].length > 0,
-    allowedSessionPermissionTypes: data[ALLOWED_SESSION_TYPES].split(","),
-  } as Config;
 }
 
 const setErrorHandler = (app: App) => {
@@ -47,24 +28,24 @@ const setErrorHandler = (app: App) => {
   };
 }
 
-const initializeApp = async () => {
+const initApp = async (): Promise<void> => {
   try {
-    const i18n = await initializeI18n();
-    const config = initializeConfig();
+    const i18n = await initI18n(BASE_URL);
     const app = createApp(ContactManager);
-    app.provide(referenceKey, getReference());
     const pinia = createPinia();
-    app.provide(availablePermissionsKey, getAvailablePermissions());
-    app.provide(webApplicationBaseUrlKey, webApplicationBaseUrl);
-    app.provide(configKey, config);
     app.use(i18n);
     app.use(router);
     app.use(pinia);
     setErrorHandler(app);
     app.mount("#app");
   } catch(error) {
-    router.push('/error')
+    const container = document.getElementById("app");
+    if (container) {
+      container.innerHTML = '<p>Failed to initialize app.</p>';
+    }
+    // eslint-disable-next-line
+    console.error('App initialization failed:', error);
   }
 };
 
-initializeApp();
+initApp();

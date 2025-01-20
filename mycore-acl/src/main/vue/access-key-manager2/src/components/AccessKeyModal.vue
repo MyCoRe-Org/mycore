@@ -17,7 +17,7 @@
     </div>
     <form>
       <div
-        v-if="globalReference === undefined"
+        v-if="!fixedReference"
         class="form-group required"
       >
         <label for="inputReference">
@@ -118,17 +118,18 @@
   </BaseModal>
 </template>
 <script setup lang="ts">
-import { computed, ref, onErrorCaptured, inject, watch } from "vue";
+import { computed, ref, onErrorCaptured, watch } from "vue";
 import { AccessKeyDto, PartialUpdateAccessKeyDto } from "@/dtos/accesskey";
 import BaseModal from "@/components/BaseModal.vue";
-import { availablePermissionsKey, referenceKey } from "@/keys";
 import { required } from "@vuelidate/validators";
 import useVuelidate from "@vuelidate/core";
 import { useAccessKeyStore } from "@/store/access-keys";
-import { getAccessKey, patchAccessKey } from "@/api/service";
+import { getAccessKey, patchAccessKey } from "@/api/access-key-service";
 
 const props = defineProps<{
   showModal: boolean;
+  fixedReference: boolean;
+  availablePermissions: string[] | undefined;
   accessKey: AccessKeyDto | undefined;
 }>();
 
@@ -146,8 +147,6 @@ const rules = computed(() => ({
     required,
   },
 }));
-const availablePermissions: string[] | undefined = inject(availablePermissionsKey);
-const globalReference: string | undefined = inject(referenceKey);
 const errorMessage = ref<string | undefined>(undefined);
 const busy = ref<boolean>(false);
 
@@ -218,7 +217,7 @@ const handleUpdateAccessKey = async () => {
         }
         await patchAccessKey(props.accessKey.id, accessKey);
         const updatedAccessKey = await getAccessKey(props.accessKey.id);
-        accessKeyStore.updateItem(updatedAccessKey);
+        accessKeyStore.updateAccessKey(updatedAccessKey);
         handleClose(true);
       } catch (error) {
         handleError(error);

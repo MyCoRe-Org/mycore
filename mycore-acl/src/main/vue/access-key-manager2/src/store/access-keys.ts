@@ -2,15 +2,15 @@ import { AccessKeyDto } from "@/dtos/accesskey";
 import { defineStore } from "pinia";
 
 interface AccessKeyState {
-  data: AccessKeyDto[],
+  accessKeys: AccessKeyDto[],
   currentPage: number,
   totalCount: number,
   pageSize: number,
 }
 
-export const useAccessKeyStore = defineStore('accessKey', {
+export const useAccessKeyStore = defineStore('accessKeys', {
   state: (): AccessKeyState => ({
-    data: [],
+    accessKeys: [],
     totalCount: 0,
     currentPage: 1,
     pageSize: 8,
@@ -19,12 +19,12 @@ export const useAccessKeyStore = defineStore('accessKey', {
     paginatedAccessKeys: (state) => {
       const start = (state.currentPage - 1) * state.pageSize;
       const end = start + state.pageSize;
-      return state.data.slice(start, end);
+      return state.accessKeys.slice(start, end);
     },
   },
   actions: {
-    setData (accessKeys: AccessKeyDto[]) {
-      this.data = accessKeys;
+    setAccessKeys (accessKeys: AccessKeyDto[]) {
+      this.accessKeys = accessKeys;
     },
     setTotalCount (totalCount: number) {
       this.totalCount = totalCount;
@@ -36,18 +36,18 @@ export const useAccessKeyStore = defineStore('accessKey', {
       this.pageSize = size;
       this.currentPage = 1;
     },
-    addItem(accessKey: AccessKeyDto) {
-      this.data.push(accessKey);
+    addAccessKey(accessKey: AccessKeyDto) {
+      this.accessKeys.push(accessKey);
       this.totalCount = this.totalCount + 1;
     },
-    updateItem(accessKey: AccessKeyDto) {
-      const index = this.data.findIndex((accessKey: AccessKeyDto) => accessKey.id === accessKey.id);
+    updateAccessKey(accessKey: AccessKeyDto) {
+      const index = this.accessKeys.findIndex((accessKey: AccessKeyDto) => accessKey.id === accessKey.id);
       if (index !== -1) {
-        this.data[index] = accessKey;
+        this.accessKeys[index] = accessKey;
       }
     },
-    deleteItem(accessKeyId: string) {
-      this.data = this.data.filter((accessKey: AccessKeyDto) => accessKey.id !== accessKeyId);
+    removeAccessKey(accessKeyId: string) {
+      this.accessKeys = this.accessKeys.filter((accessKey: AccessKeyDto) => accessKey.id !== accessKeyId);
     },
   },
 });

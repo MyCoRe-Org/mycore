@@ -1,26 +1,37 @@
-import axios, { AxiosInstance, AxiosResponse } from "axios";
+import axios, { AxiosResponse } from "axios";
 import { AccessKeyDto, CreateAccessKeyDto, PartialUpdateAccessKeyDto } from "@/dtos/accesskey";
-import { getWebApplicationBaseURL, fetchJWT } from "@/utils";
-
-const extractResponse = (response: AxiosResponse) => {
-  return { items: response.data, totalResults: parseInt(response.headers["x-total-count"], 10) };
-};
+import { BASE_URL } from "@/utils";
+import { useAuthStore } from "@/store/auth";
 
 export interface AccessKeyInformation {
   items: Array<AccessKeyDto>;
   totalResults: number;
 }
 
-const webApplicationBaseUrl = getWebApplicationBaseURL() as string;
+const extractResponse = (response: AxiosResponse) => {
+  return { items: response.data, totalResults: parseInt(response.headers["x-total-count"], 10) };
+};
+
 const API_URL = "api/v2/access-keys/";
 
-const instance:AxiosInstance = axios.create({
-  baseURL: webApplicationBaseUrl,
+const instance = axios.create({
+  baseURL: BASE_URL,
   timeout: 5000,
 });
 
-instance.defaults.headers['Authorization'] = process.env.NODE_ENV === "development"
-  ? `Basic ${process.env.VUE_APP_API_TOKEN}`: `Bearer ${await fetchJWT(webApplicationBaseUrl)}`;
+instance.interceptors.request.use(
+  (config) => {
+    if (process.env.NODE_ENV === "development") {
+      config.headers['Authorization'] = `Basic ${process.env.VUE_APP_API_TOKEN}`;
+    } else {
+      config.headers['Authorization'] = `Bearer ${useAuthStore().token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 export const getAccessKeysByReferenceAndPermission = async (
   reference: string,
@@ -43,10 +54,7 @@ export const getAccessKeysByReferenceAndPermission = async (
 export const getAccessKeys = async (offset: number, limit: number): Promise<AccessKeyInformation> => {
   return extractResponse(
     await instance.get<AccessKeyDto[]>(API_URL, {
-      params: {
-        offset,
-        limit,
-      },
+      params: { offset, limit },
     })
   );
 }
@@ -58,18 +66,12 @@ export const getAccessKey = async (id: string): Promise<AccessKeyDto> => {
 export const createAccessKey = async (accessKey: CreateAccessKeyDto): Promise<string> => {
   return (
     (await instance.post(API_URL, accessKey, {
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json", },
     })) as AxiosResponse
-  ).headers.location
-    .split("/")
-    .pop() as string;
+  ).headers.location.split("/").pop() as string;
 }
 
-export const patchAccessKey = async(
-  id: string,
-  accessKey: PartialUpdateAccessKeyDto
+export const patchAccessKey = async(id: string, accessKey: PartialUpdateAccessKeyDto
 ): Promise<void> =>
   await instance.patch(`${API_URL}${id}`, accessKey);
 
