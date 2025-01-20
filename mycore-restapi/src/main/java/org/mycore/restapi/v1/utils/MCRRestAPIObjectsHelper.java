@@ -26,8 +26,8 @@ import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.EnumSet;
@@ -83,32 +83,29 @@ import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.UriInfo;
 
 /**
- * main utility class that handles REST requests
- * 
- * to filter the XML output of showMCRObject, set the properties:
+ * Main utility class that handles REST requests to filter the XML output of showMCRObject, set the properties:
  * MCR.RestAPI.v1.Filter.XML
  *   to your ContentTransformer-ID,
  * MCR.ContentTransformer.[your ContentTransformer-ID here].Class
  *   to your ContentTransformer's class and
  * MCR.ContentTransformer.[your ContentTransformer-ID here].Stylesheet
  *   to your filtering stylesheet.
- * 
+ *
  * @author Robert Stephan
  * @author Christoph Neidahl
- * 
  */
 public class MCRRestAPIObjectsHelper {
     private enum Mode {
         MCROBJECT, MCRDERIVATE
     }
 
-    private static final String GENERAL_ERROR_MSG = "A problem occured while fetching the data.";
+    private static final String GENERAL_ERROR_MSG = "A problem occurred while fetching the data.";
 
-    private static Logger LOGGER = LogManager.getLogger(MCRRestAPIObjectsHelper.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIObjectsHelper.class);
 
-    private static SimpleDateFormat SDF_UTC = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+    private static final DateTimeFormatter SDF_UTC = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
 
-    private static MCRIDMapper ID_MAPPER = MCRConfiguration2
+    private static final MCRIDMapper ID_MAPPER = MCRConfiguration2
         .getInstanceOf(MCRIDMapper.class, MCRIDMapper.MCR_PROPERTY_CLASS).get();
 
     public static Response showMCRObject(String pathParamId, String queryParamStyle, UriInfo info, Application app)
@@ -301,7 +298,7 @@ public class MCRRestAPIObjectsHelper {
      *
      * @return a Jersey response object
      * @see MCRRestAPIObjects#listObjects(UriInfo, String, String, String)
-     * 
+     *
      */
     public static Response listObjects(UriInfo info, String format, String filter, String sort)
         throws MCRRestAPIException {
@@ -392,7 +389,7 @@ public class MCRRestAPIObjectsHelper {
 
         if (params.lastModifiedBefore != null || params.lastModifiedAfter != null) {
             return objIdDates.stream().filter(oid -> {
-                String lastModified = SDF_UTC.format(oid.getLastModified());
+                String lastModified = SDF_UTC.format(oid.getLastModified().toInstant());
                 if (params.lastModifiedAfter != null && lastModified.compareTo(params.lastModifiedAfter) < 0) {
                     return false;
                 }
@@ -517,7 +514,7 @@ public class MCRRestAPIObjectsHelper {
         };
 
         elem.setAttribute("ID", oid.getId());
-        elem.setAttribute("lastModified", SDF_UTC.format(oid.getLastModified()));
+        elem.setAttribute("lastModified", SDF_UTC.format(oid.getLastModified().toInstant()));
         elem.setAttribute("href", info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
 
         if (mode == Mode.MCRDERIVATE) {
@@ -560,7 +557,7 @@ public class MCRRestAPIObjectsHelper {
             for (MCRObjectIDDate oid : objIdDates) {
                 writer.beginObject();
                 writer.name("ID").value(oid.getId());
-                writer.name("lastModified").value(SDF_UTC.format(oid.getLastModified()));
+                writer.name("lastModified").value(SDF_UTC.format(oid.getLastModified().toInstant()));
                 writer.name("href").value(info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
                 if (mode == Mode.MCRDERIVATE) {
                     MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(oid.getId()));
@@ -568,7 +565,7 @@ public class MCRRestAPIObjectsHelper {
                     if (!der.getDerivate().getClassifications().isEmpty()) {
                         List<String> classifications = der.getDerivate().getClassifications().stream()
                             .map(cl -> cl.getClassId() + ":" + cl.getCategId())
-                            .collect(Collectors.toList());
+                            .toList();
                         writer.name("classifications").beginArray();
                         for (String c : classifications) {
                             writer.value(c);
@@ -697,7 +694,7 @@ public class MCRRestAPIObjectsHelper {
         }
         try {
             SDF_UTC.parse(test + base.substring(test.length()));
-        } catch (ParseException e) {
+        } catch (DateTimeParseException e) {
             return false;
         }
         return true;

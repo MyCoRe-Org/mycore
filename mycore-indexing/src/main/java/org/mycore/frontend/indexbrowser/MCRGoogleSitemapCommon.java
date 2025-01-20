@@ -22,7 +22,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.NotDirectoryException;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -112,16 +113,16 @@ public final class MCRGoogleSitemapCommon {
         MCRSolrAuthenticationManager.getInstance();
 
     /** The logger */
-    private static Logger LOGGER = LogManager.getLogger(MCRGoogleSitemapCommon.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger(MCRGoogleSitemapCommon.class.getName());
 
     /** Number of URLs in one sitemap */
     private int numberOfURLs = MCRConfiguration2.getInt("MCR.GoogleSitemap.NumberOfURLs").orElse(10000);
 
     /** number format for parts */
-    private static NumberFormat number_format = getNumberFormat();
+    private static final NumberFormat NUMBER_FORMAT = getNumberFormat();
 
     /** date formatter */
-    private static SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", SITEMAP_LOCALE);
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd", SITEMAP_LOCALE);
 
     /** The webapps directory path from configuration */
     private final File webappBaseDir;
@@ -171,8 +172,8 @@ public final class MCRGoogleSitemapCommon {
      *         one for the index and all parts.
      *
      */
-    protected int checkSitemapFile() throws IOException {
-        int number = 0;
+    public int checkSitemapFile() throws IOException {
+        int number;
         QueryResponse response;
         SolrQuery query = new SolrQuery();
         query.setQuery(SOLR_QUERY);
@@ -206,20 +207,22 @@ public final class MCRGoogleSitemapCommon {
      *
      * @param number
      *            number of this file - '1' = sitemap_google.xml - '&gt; 1' sitemap_google_xxx.xml
-     * @param withpath
+     * @param withPath
      *            true for the full path, false for the file name
      * @return a path to sitemap_google.xml
      */
-    protected String getFileName(int number, boolean withpath) {
+    String getFileName(int number, boolean withPath) {
         String fn = "sitemap_google.xml";
         if (number > 1) {
-            fn = "sitemap_google_" + number_format.format(number - 1) + ".xml";
+            synchronized (NUMBER_FORMAT) {
+                fn = "sitemap_google_" + NUMBER_FORMAT.format(number - 1) + ".xml";
+            }
         }
         String localPath = fn;
-        if (CDIR.length() != 0) {
+        if (!CDIR.isEmpty()) {
             localPath = CDIR + File.separator + fn;
         }
-        if (withpath) {
+        if (withPath) {
             return webappBaseDir + File.separator + localPath;
         }
         return localPath;
@@ -230,7 +233,7 @@ public final class MCRGoogleSitemapCommon {
      *
      * @return The sitemap_google.xml as JDOM document
      */
-    protected Document buildSingleSitemap() {
+    public Document buildSingleSitemap() {
         LOGGER.debug("Build Google URL sitemap_google.xml for whole items.");
         // build document frame
         Element urlset = new Element("urlset", NS);
@@ -251,7 +254,7 @@ public final class MCRGoogleSitemapCommon {
      *            number of this file - '1' = sitemap_google.xml - '&gt; 1' sitemap_google_xxx.xml
      * @return The sitemap.xml as JDOM document
      */
-    protected Document buildPartSitemap(int number) {
+    public Document buildPartSitemap(int number) {
         LOGGER.debug("Build Google URL sitemap list number {}", number);
         // build document frame
         Element urlset = new Element("urlset", NS);
@@ -281,7 +284,7 @@ public final class MCRGoogleSitemapCommon {
         // build entry
         Element url = new Element("url", NS);
         url.addContent(new Element("loc", NS).addContent(sb.toString()));
-        String datestr = formatter.format(objectIDDate.getLastModified());
+        String datestr = DATE_FORMATTER.format(objectIDDate.getLastModified().toInstant());
         url.addContent(new Element("lastmod", NS).addContent(datestr));
         url.addContent(new Element("changefreq", NS).addContent(FREQ));
         return url;
@@ -294,7 +297,7 @@ public final class MCRGoogleSitemapCommon {
      *            number of indexed files (must greater than 1
      * @return The index sitemap_google.xml as JDOM document
      */
-    protected Document buildSitemapIndex(int number) {
+    public Document buildSitemapIndex(int number) {
         LOGGER.debug("Build Google sitemap number {}", number);
         // build document frame
         Element index = new Element("sitemapindex", NS);
@@ -306,8 +309,9 @@ public final class MCRGoogleSitemapCommon {
             Element sitemap = new Element("sitemap", NS);
             index.addContent(sitemap);
             sitemap.addContent(new Element("loc", NS).addContent((baseurl + getFileName(i + 2, false)).trim()));
-            String datestr = formatter.format((new GregorianCalendar(SITEMAP_TIMEZONE, SITEMAP_LOCALE)).getTime());
-            sitemap.addContent(new Element("lastmod", NS).addContent(datestr.trim()));
+            Instant instant = (new GregorianCalendar(SITEMAP_TIMEZONE, SITEMAP_LOCALE)).getTime().toInstant();
+            String date = DATE_FORMATTER.format(instant);
+            sitemap.addContent(new Element("lastmod", NS).addContent(date.trim()));
         }
         return jdom;
     }
@@ -315,7 +319,7 @@ public final class MCRGoogleSitemapCommon {
     /**
      * This method remove all sitemap files from the webapps directory.
      */
-    protected void removeSitemapFiles() {
+    public void removeSitemapFiles() {
         File dir = new File(webappBaseDir, CDIR);
         File[] li = dir.listFiles();
         if (li != null) {
