@@ -146,18 +146,17 @@ public class MCRPDFAFunctions {
     }
 
     /**
-     * Creates a list of XML elements that represent the hierarchy of exceptions and their details.
-     * Each exception is represented as an XML element containing information about its class,
-     * message, and stack trace. The method processes the main throwable and any nested causes
-     * or suppressed exceptions.
+     * Creates an XML element representing a throwable and its associated details,
+     * including its class, message, stack trace, and any nested causes or suppressed exceptions.
      *
      * @param document  The XML {@link Document} to which the exception elements will belong.
      *                  This document is used to create elements representing each exception.
      * @param throwable The root {@link Throwable} to be processed. This throwable and its
      *                  causal chain (including suppressed exceptions) are converted into
      *                  XML elements.
-     * @return A list of XML {@link Element} objects, each representing a throwable in the
-     *         exception chain. Each element includes the exception class, message, and stack trace.
+     * @return An XML {@link Element} representing the root throwable. The element contains
+     *         nested child elements for causes and suppressed exceptions, each including
+     *         details such as the exception class, message, and stack trace.
      */
 
     private static Element createExceptionElement(Document document, Throwable throwable) {
