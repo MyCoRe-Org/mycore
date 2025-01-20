@@ -47,7 +47,7 @@ public class MCRQLSearchUtils {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRQLSearchUtils.class);
 
-    private static Set<String> SEARCH_PARAMETER = Set.of("search", "query", "maxResults",
+    private static final Set<String> SEARCH_PARAMETER = Set.of("search", "query", "maxResults",
         "numPerPage", "page", "mask", "mode", "redirect", "qt");
 
     /**

@@ -21,9 +21,6 @@ package org.mycore.sword.application;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.sword.MCRSwordContainerHandler;
@@ -35,11 +32,9 @@ import org.mycore.sword.MCRSwordContainerHandler;
  */
 public abstract class MCRSwordCollectionProvider implements MCRSwordLifecycle {
 
-    protected static Logger LOGGER = LogManager.getLogger(MCRSwordCollectionProvider.class);
+    private final MCRSwordContainerHandler mcrSwordContainerHandler;
 
-    private MCRSwordContainerHandler mcrSwordContainerHandler;
-
-    private MCRSwordMediaHandler mcrSwordMediaHandler;
+    private final MCRSwordMediaHandler mcrSwordMediaHandler;
 
     protected MCRSwordCollectionProvider() {
         mcrSwordContainerHandler = new MCRSwordContainerHandler();

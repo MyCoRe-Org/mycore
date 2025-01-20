@@ -47,9 +47,10 @@ import org.mycore.datamodel.niofs.MCRPath;
  *
  */
 public class MCRFileMetaEventHandler extends MCREventHandlerBase {
-    private static MCRCategLinkService CATEGLINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
 
-    private static Logger LOGGER = LogManager.getLogger(MCRFileMetaEventHandler.class);
+    private static final MCRCategLinkService CATEGLINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
+
+    private static final Logger LOGGER = LogManager.getLogger(MCRFileMetaEventHandler.class);
 
     @Override
     protected void handleDerivateCreated(MCREvent evt, MCRDerivate der) {

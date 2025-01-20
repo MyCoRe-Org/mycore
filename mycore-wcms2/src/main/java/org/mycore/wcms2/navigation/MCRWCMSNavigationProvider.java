@@ -40,7 +40,7 @@ public interface MCRWCMSNavigationProvider extends MCRWCMSJSONProvider<MCRNaviga
     String JSON_WCMS_TYPE = "wcmsType";
 
     enum WCMSType {
-        root, item, insert, menu, group
+        ROOT, ITEM, INSERT, MENU, GROUP
     }
 
     /**

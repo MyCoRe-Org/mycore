@@ -52,7 +52,7 @@ public class MCRTransferPackagePacker extends MCRPacker {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRTransferPackagePacker.class);
 
-    private static Path SAVE_DIRECTORY_PATH;
+    private static final Path SAVE_DIRECTORY_PATH;
 
     static {
         String alternative = MCRConfiguration2.getStringOrThrow("MCR.datadir") + File.separator + "transferPackages";

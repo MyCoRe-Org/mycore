@@ -86,11 +86,11 @@ public class MCRCommandLineInterface {
 
     private static boolean interactiveMode = true;
 
-    private static boolean SKIP_FAILED_COMMAND;
+    private static boolean skipFailedCommand;
 
     private static MCRCommandManager knownCommands;
 
-    private static ThreadLocal<String> sessionId = new ThreadLocal<>();
+    private static final ThreadLocal<String> SESSION_ID = new ThreadLocal<>();
 
     /**
      * The main method that either shows up an interactive command prompt or
@@ -106,7 +106,7 @@ public class MCRCommandLineInterface {
 
         initSession();
 
-        MCRSession session = MCRSessionMgr.getSession(sessionId.get());
+        MCRSession session = MCRSessionMgr.getSession(SESSION_ID.get());
         MCRSessionMgr.setCurrentSession(session);
 
         try {
@@ -178,7 +178,7 @@ public class MCRCommandLineInterface {
         session.setCurrentIP("127.0.0.1");
         session.setUserInformation(MCRSystemUserInformation.getSuperUserInstance());
         MCRSessionMgr.setCurrentSession(session);
-        sessionId.set(session.getID());
+        SESSION_ID.set(session.getID());
         MCRSessionMgr.releaseCurrentSession();
     }
 
@@ -191,7 +191,7 @@ public class MCRCommandLineInterface {
      */
     protected static void processCommand(String command) {
 
-        MCRSession session = MCRSessionMgr.getSession(sessionId.get());
+        MCRSession session = MCRSessionMgr.getSession(SESSION_ID.get());
         MCRSessionMgr.setCurrentSession(session);
 
         try {
@@ -202,7 +202,7 @@ public class MCRCommandLineInterface {
         } catch (Exception ex) {
             MCRCLIExceptionHandler.handleException(ex);
             rollbackTransaction();
-            if (SKIP_FAILED_COMMAND) {
+            if (skipFailedCommand) {
                 saveFailedCommand(command);
             } else {
                 saveQueue(command);
@@ -394,11 +394,11 @@ public class MCRCommandLineInterface {
     }
 
     public static void cancelOnError() {
-        SKIP_FAILED_COMMAND = false;
+        skipFailedCommand = false;
     }
 
     public static void skipOnError() {
-        SKIP_FAILED_COMMAND = true;
+        skipFailedCommand = true;
     }
 
     /**

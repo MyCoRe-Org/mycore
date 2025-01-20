@@ -393,14 +393,14 @@ public class MCRObjectQuery {
     }
 
     public enum SortBy {
-        id,
-        modified,
-        created
+        ID,
+        MODIFIED,
+        CREATED
     }
 
     public enum SortOrder {
-        asc,
-        desc
+        ASC,
+        DESC
     }
 
     @Override

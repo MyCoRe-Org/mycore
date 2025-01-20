@@ -58,7 +58,7 @@ public class MCRRateLimitBuckets {
 
     private static final Map<String, Bucket> EXISTING_BUCKETS = new ConcurrentHashMap<>();
 
-    private static String CONFIG_ID;
+    private static String configId;
 
     /**
      * Clears the list of all buckets already created.
@@ -75,18 +75,18 @@ public class MCRRateLimitBuckets {
      * @return the bucket
      */
     public static Bucket getOrCreateBucket(String configID) {
-        CONFIG_ID = configID;
-        if (EXISTING_BUCKETS.containsKey(CONFIG_ID)) {
-            return EXISTING_BUCKETS.get(CONFIG_ID);
+        configId = configID;
+        if (EXISTING_BUCKETS.containsKey(configId)) {
+            return EXISTING_BUCKETS.get(configId);
         }
-        final String dsConfigLimits = MCRConfiguration2.getStringOrThrow(CONFIG_PREFIX + CONFIG_ID + ".Limits");
+        final String dsConfigLimits = MCRConfiguration2.getStringOrThrow(CONFIG_PREFIX + configId + ".Limits");
 
         final Map<String, Long> limitMap = Arrays.stream(dsConfigLimits.split(",")).collect(
             HashMap::new, (map, str) -> map.put(str.split("/")[1].trim(),
                 Long.parseLong(str.split("/")[0].trim())),
             HashMap::putAll);
         final Bucket bucket = createNewBucket(limitMap);
-        EXISTING_BUCKETS.put(CONFIG_ID, bucket);
+        EXISTING_BUCKETS.put(configId, bucket);
         return bucket;
     }
 
@@ -130,7 +130,7 @@ public class MCRRateLimitBuckets {
                 return Duration.ofSeconds(1);
             }
             default -> throw new MCRConfigurationException("The configuration \"" + amount + " tokens per " + unit +
-                "\" for the ID \"" + CONFIG_ID + "\" is malformed. No time unit could be identified.");
+                "\" for the ID \"" + configId + "\" is malformed. No time unit could be identified.");
         }
     }
 }

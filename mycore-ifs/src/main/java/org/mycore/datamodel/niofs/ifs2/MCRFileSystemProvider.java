@@ -78,7 +78,7 @@ public class MCRFileSystemProvider extends MCRAbstractFileSystemProvider {
      */
     public static final URI FS_URI = URI.create(SCHEME + ":///");
 
-    private static volatile MCRIFSFileSystem FILE_SYSTEM_INSTANCE;
+    private static volatile MCRIFSFileSystem fileSystemInstance;
 
     /* (non-Javadoc)
      * @see java.nio.file.spi.FileSystemProvider#getScheme()
@@ -103,14 +103,14 @@ public class MCRFileSystemProvider extends MCRAbstractFileSystemProvider {
      */
     @Override
     public MCRIFSFileSystem getFileSystem(URI uri) {
-        if (FILE_SYSTEM_INSTANCE == null) {
+        if (fileSystemInstance == null) {
             synchronized (FS_URI) {
-                if (FILE_SYSTEM_INSTANCE == null) {
-                    FILE_SYSTEM_INSTANCE = new MCRIFSFileSystem(this);
+                if (fileSystemInstance == null) {
+                    fileSystemInstance = new MCRIFSFileSystem(this);
                 }
             }
         }
-        return FILE_SYSTEM_INSTANCE;
+        return fileSystemInstance;
     }
 
     /* (non-Javadoc)
@@ -450,8 +450,8 @@ public class MCRFileSystemProvider extends MCRAbstractFileSystemProvider {
      * @return the MCRIFSFileSystem instance
      */
     public static MCRIFSFileSystem getMCRIFSFileSystem() {
-        return (MCRIFSFileSystem) (FILE_SYSTEM_INSTANCE == null ? MCRAbstractFileSystem.getInstance(SCHEME)
-            : FILE_SYSTEM_INSTANCE);
+        return (MCRIFSFileSystem) (fileSystemInstance == null ? MCRAbstractFileSystem.getInstance(SCHEME)
+                                                              : fileSystemInstance);
     }
 
     static abstract class BaseBasicFileAttributeView extends MCRBasicFileAttributeViewImpl {

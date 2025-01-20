@@ -72,11 +72,11 @@ public class MCRSolrSearchServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     private enum QueryType {
-        phrase, term
+        PHRASE, TERM
     }
 
     private enum SolrParameterGroup {
-        QueryParameter, SolrParameter, SortParameter, TypeParameter
+        QUERY_PARAMETER, SOLR_PARAMETER, SORT_PARAMETER, TYPE_PARAMETER
     }
 
     private static final Logger LOGGER = LogManager.getLogger(MCRSolrSearchServlet.class);
@@ -117,8 +117,8 @@ public class MCRSolrSearchServlet extends MCRServlet {
                 continue;
             }
             switch (queryType) {
-                case term -> query.append(MCRConditionTransformer.getTermQuery(fieldName, fieldValue));
-                case phrase -> query.append(MCRConditionTransformer.getPhraseQuery(fieldName, fieldValue));
+                case TERM -> query.append(MCRConditionTransformer.getTermQuery(fieldName, fieldValue));
+                case PHRASE -> query.append(MCRConditionTransformer.getPhraseQuery(fieldName, fieldValue));
                 default -> throw new ServletException("Query type is unsupported: " + queryType);
             }
             query.append(' ');
@@ -146,7 +146,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
         for (Entry<String, String[]> queryParameter : queryParameters.entrySet()) {
             String fieldName = queryParameter.getKey();
             String[] fieldValues = queryParameter.getValue();
-            QueryType queryType = phraseQuery.contains(fieldName) ? QueryType.phrase : QueryType.term;
+            QueryType queryType = phraseQuery.contains(fieldName) ? QueryType.PHRASE : QueryType.TERM;
             // Build the q parameter without solr.type.fields
             if (!fieldTypeMap.containsKey(fieldName)) {
                 addFieldToQuery(query, fieldValues, fieldName, queryType);
@@ -284,9 +284,9 @@ public class MCRSolrSearchServlet extends MCRServlet {
             SolrParameterGroup parameterGroup = getParameterType(parameterName);
 
             switch (parameterGroup) {
-                case SolrParameter -> solrParameter.put(parameterName, currentEntry.getValue());
-                case TypeParameter -> typeParameter.put(parameterName, currentEntry.getValue());
-                case QueryParameter -> {
+                case SOLR_PARAMETER -> solrParameter.put(parameterName, currentEntry.getValue());
+                case TYPE_PARAMETER -> typeParameter.put(parameterName, currentEntry.getValue());
+                case QUERY_PARAMETER -> {
                     String[] strings = currentEntry.getValue();
                     for (String v : strings) {
                         if (v != null && !v.isEmpty()) {
@@ -294,7 +294,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
                         }
                     }
                 }
-                case SortParameter -> sortParameter.put(parameterName, currentEntry.getValue());
+                case SORT_PARAMETER -> sortParameter.put(parameterName, currentEntry.getValue());
                 default -> {
                     LOGGER.warn("Unknown parameter group. That should not happen.");
                     continue;
@@ -324,17 +324,17 @@ public class MCRSolrSearchServlet extends MCRServlet {
      */
     private SolrParameterGroup getParameterType(String parameterName) {
         if (isTypeParameter(parameterName)) {
-            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.TypeParameter);
-            return SolrParameterGroup.TypeParameter;
+            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.TYPE_PARAMETER);
+            return SolrParameterGroup.TYPE_PARAMETER;
         } else if (isSolrParameter(parameterName)) {
-            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.SolrParameter);
-            return SolrParameterGroup.SolrParameter;
+            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.SOLR_PARAMETER);
+            return SolrParameterGroup.SOLR_PARAMETER;
         } else if (isSortParameter(parameterName)) {
-            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.SolrParameter);
-            return SolrParameterGroup.SortParameter;
+            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.SOLR_PARAMETER);
+            return SolrParameterGroup.SORT_PARAMETER;
         } else {
-            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.QueryParameter);
-            return SolrParameterGroup.QueryParameter;
+            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.QUERY_PARAMETER);
+            return SolrParameterGroup.QUERY_PARAMETER;
         }
     }
 

@@ -38,11 +38,11 @@ public class MCRIIIFImageProfile extends MCRIIIFBase {
 
     public MCRIIIFImageProfile() {
         super(IIIF_IMAGE_PROFILE, API_IMAGE_2);
-        supports.add(MCRIIIFFeatures.baseUriRedirect);
-        supports.add(MCRIIIFFeatures.canonicalLinkHeader);
-        supports.add(MCRIIIFFeatures.cors);
-        supports.add(MCRIIIFFeatures.jsonldMediaType);
-        supports.add(MCRIIIFFeatures.profileLinkHeader);
+        supports.add(MCRIIIFFeatures.BASE_URI_REDIRECT);
+        supports.add(MCRIIIFFeatures.CANONICAL_LINK_HEADER);
+        supports.add(MCRIIIFFeatures.CORS);
+        supports.add(MCRIIIFFeatures.JSONLD_MEDIA_TYPE);
+        supports.add(MCRIIIFFeatures.PROFILE_LINK_HEADER);
     }
 
 }

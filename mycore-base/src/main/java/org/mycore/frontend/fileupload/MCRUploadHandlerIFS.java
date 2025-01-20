@@ -106,7 +106,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     public void startUpload(int numFiles) {
         super.startUpload(numFiles);
         this.filesUploaded = 0;
-        this.setStatus(MCRProcessableStatus.processing);
+        this.setStatus(MCRProcessableStatus.PROCESSING);
         this.setProgress(0);
         this.setProgressText("start upload...");
     }
@@ -291,7 +291,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
                     "No files were uploaded, delete entry in database for " + derivate.getId() + "!");
             }
         }
-        this.setStatus(MCRProcessableStatus.successful);
+        this.setStatus(MCRProcessableStatus.SUCCESSFUL);
     }
 
     private void updateMainFile() throws IOException, MCRAccessException {

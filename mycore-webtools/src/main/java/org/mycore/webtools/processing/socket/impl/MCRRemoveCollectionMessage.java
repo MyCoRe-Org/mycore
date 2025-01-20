@@ -25,7 +25,7 @@ class MCRRemoveCollectionMessage extends MCRWebSocketMessage {
     public Integer id;
 
     MCRRemoveCollectionMessage(Integer id) {
-        super(MCRMessageType.removeCollection);
+        super(MCRMessageType.REMOVE_COLLECTION);
         this.id = id;
     }
 

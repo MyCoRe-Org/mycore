@@ -44,7 +44,7 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     /** The logger */
-    private static Logger LOGGER = LogManager.getLogger(MCRGoogleSitemapServlet.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger(MCRGoogleSitemapServlet.class.getName());
 
     /**
      * This method implement the doGetPost method of MCRServlet. It build a XML

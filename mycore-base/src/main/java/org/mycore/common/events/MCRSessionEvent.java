@@ -29,14 +29,14 @@ import org.mycore.common.MCRSession;
 public class MCRSessionEvent {
 
     public enum Type {
-        activated, created, destroyed, passivated
+        ACTIVATED, CREATED, DESTROYED, PASSIVATED
     }
 
-    private Type type;
+    private final Type type;
 
-    private MCRSession session;
+    private final MCRSession session;
 
-    private int concurrentAccessors;
+    private final int concurrentAccessors;
 
     public MCRSessionEvent(MCRSession session, Type type, int concurrentAccessors) {
         this.session = session;

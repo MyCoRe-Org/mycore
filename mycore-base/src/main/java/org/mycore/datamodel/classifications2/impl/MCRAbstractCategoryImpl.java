@@ -62,7 +62,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
 
     private String defaultLang;
 
-    private static Set<String> LANGUAGES;
+    private static final Set<String> LANGUAGES;
 
     static {
         LANGUAGES = new HashSet<>(MCRConfiguration2.getString("MCR.Metadata.Languages")

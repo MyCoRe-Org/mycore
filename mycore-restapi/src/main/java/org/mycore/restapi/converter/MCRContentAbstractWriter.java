@@ -63,7 +63,7 @@ public abstract class MCRContentAbstractWriter implements MessageBodyWriter<MCRC
         throws IOException, WebApplicationException {
         String format = getTransfomerFormat().getSubtype();
         String detail = mediaType.getParameters().getOrDefault(MCRDetailLevel.MEDIA_TYPE_PARAMETER,
-            MCRDetailLevel.normal.toString());
+            MCRDetailLevel.NORMAL.toString());
         LogManager.getLogger().debug("MediaType={}, format={}, detail={}", mediaType, format, detail);
         Optional<String> transformerId = getTransformerId(annotations, format, detail);
         LogManager.getLogger().debug("Transformer for {} would be {}.", content::getSystemId,
@@ -72,7 +72,7 @@ public abstract class MCRContentAbstractWriter implements MessageBodyWriter<MCRC
             .map(MCRContentTransformerFactory::getTransformer);
         if (transformer.isPresent()) {
             transformer.get().transform(content, entityStream);
-        } else if (MCRDetailLevel.normal.toString().equals(detail)) {
+        } else if (MCRDetailLevel.NORMAL.toString().equals(detail)) {
             handleFallback(content, entityStream);
         } else if (transformerId.isPresent()) {
             throw new InternalServerErrorException("MCRContentTransformer " + transformerId.get() + " is not defined.");

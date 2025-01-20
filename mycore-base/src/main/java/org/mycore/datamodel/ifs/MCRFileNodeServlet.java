@@ -60,7 +60,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class MCRFileNodeServlet extends MCRContentServlet {
     private static final long serialVersionUID = 1L;
 
-    private static Logger LOGGER = LogManager.getLogger(MCRFileNodeServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRFileNodeServlet.class);
 
     private static Pattern patternDerivateID = Pattern.compile(".+_derivate_[0-9]+");
 

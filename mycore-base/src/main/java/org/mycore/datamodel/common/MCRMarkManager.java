@@ -74,13 +74,13 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public class MCRMarkManager {
 
-    private static volatile MCRMarkManager INSTANCE;
+    private static volatile MCRMarkManager instance;
 
     public enum Operation {
         DELETE, IMPORT
     }
 
-    private Map<MCRObjectID, Operation> marks;
+    private final Map<MCRObjectID, Operation> marks;
 
     private MCRMarkManager() {
         this.marks = new ConcurrentHashMap<>();
@@ -92,15 +92,15 @@ public class MCRMarkManager {
      * @return instance of {@link MCRMarkManager}
      */
     public static MCRMarkManager instance() {
-        if (INSTANCE == null) {
+        if (instance == null) {
             // make it thread safe
             synchronized (MCRMarkManager.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = new MCRMarkManager();
+                if (instance == null) {
+                    instance = new MCRMarkManager();
                 }
             }
         }
-        return INSTANCE;
+        return instance;
     }
 
     /**

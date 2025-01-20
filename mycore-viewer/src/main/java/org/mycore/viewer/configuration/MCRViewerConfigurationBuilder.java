@@ -75,11 +75,11 @@ public class MCRViewerConfigurationBuilder {
         }
         Multimap<ResourceType, String> resources = conf2.getResources();
         for (Map.Entry<ResourceType, String> resource : resources.entries()) {
-            if (ResourceType.script.equals(resource.getKey())) {
+            if (ResourceType.SCRIPT.equals(resource.getKey())) {
                 conf1.addScript(resource.getValue(), false);
-            } else if (ResourceType.module.equals(resource.getKey())) {
+            } else if (ResourceType.MODULE.equals(resource.getKey())) {
                 conf1.addScript(resource.getValue(), true);
-            } else if (ResourceType.css.equals(resource.getKey())) {
+            } else if (ResourceType.CSS.equals(resource.getKey())) {
                 conf1.addCSS(resource.getValue());
             }
         }

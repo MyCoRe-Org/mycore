@@ -25,6 +25,7 @@ package org.mycore.mods;
  * @see MCRMODSLinksEventHandler
  * @since 2015.03
  */
+@SuppressWarnings("PMD.FieldNamingConventions")
 public enum MCRMODSRelationshipType {
     host, preceding, original, series, otherVersion, otherFormat, references, reviewOf,
 }

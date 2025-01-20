@@ -36,7 +36,7 @@ import org.mycore.common.processing.MCRProcessableRegistryListener;
  */
 public class MCRCentralProcessableRegistry implements MCRProcessableRegistry {
 
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final List<MCRProcessableCollection> collections;
 

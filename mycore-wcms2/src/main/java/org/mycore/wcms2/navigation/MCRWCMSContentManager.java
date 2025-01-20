@@ -60,7 +60,7 @@ public class MCRWCMSContentManager {
     private final MCRWCMSSectionProvider sectionProvider;
 
     public enum ErrorType {
-        notExist, invalidFile, notMyCoReWebPage, invalidDirectory, couldNotSave, couldNotMove
+        NOT_EXIST, INVALID_FILE, NOT_MYCORE_WEBPAGE, INVALID_DIRECTORY, COULD_NOT_SAVE, COULD_NOT_MOVE
     }
 
     public MCRWCMSContentManager() {
@@ -95,7 +95,7 @@ public class MCRWCMSContentManager {
         URL resourceURL = MCRResourceHelper.getWebResourceUrl(webpageId);
         // file is not in web application directory
         if (!isXML) {
-            throwError(ErrorType.invalidFile, webpageId);
+            throwError(ErrorType.INVALID_FILE, webpageId);
         }
         Document doc = null;
         if (resourceURL == null) {
@@ -107,7 +107,7 @@ public class MCRWCMSContentManager {
         }
         Element rootElement = doc.getRootElement();
         if (!"MyCoReWebPage".equals(rootElement.getName())) {
-            throwError(ErrorType.notMyCoReWebPage, webpageId);
+            throwError(ErrorType.NOT_MYCORE_WEBPAGE, webpageId);
         }
         // return content
         return getContent(rootElement);
@@ -149,7 +149,7 @@ public class MCRWCMSContentManager {
             validateContent(e).ifPresent(item -> {
                 String webpageId = getWebPageId(item).get();
                 if (!webpageId.endsWith(".xml")) {
-                    throwError(ErrorType.invalidFile, webpageId);
+                    throwError(ErrorType.INVALID_FILE, webpageId);
                 }
                 JsonArray content = item.get("content").getAsJsonArray();
                 Element mycoreWebpage = this.sectionProvider.fromJSON(content);
@@ -158,7 +158,7 @@ public class MCRWCMSContentManager {
                     out.output(new Document(mycoreWebpage), fout);
                 } catch (IOException | RuntimeException exc) {
                     LOGGER.error("Error while saving {}", webpageId, exc);
-                    throwError(ErrorType.couldNotSave, webpageId);
+                    throwError(ErrorType.COULD_NOT_SAVE, webpageId);
                 }
             });
         }
@@ -215,7 +215,7 @@ public class MCRWCMSContentManager {
             }
         } catch (Exception exc) {
             LOGGER.error("Error moving {} to {}", from, to, exc);
-            throwError(ErrorType.couldNotMove, to);
+            throwError(ErrorType.COULD_NOT_MOVE, to);
         }
     }
 

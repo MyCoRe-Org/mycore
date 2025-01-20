@@ -43,7 +43,7 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger LOGGER = LogManager.getLogger(MCRShibbolethLoginServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRShibbolethLoginServlet.class);
 
     @Override
     public void doGetPost(MCRServletJob job) throws Exception {

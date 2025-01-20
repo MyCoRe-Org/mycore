@@ -29,26 +29,26 @@ public enum MCRProcessableStatus {
     /**
      * The process is created and not started yet.
      */
-    created,
+    CREATED,
 
     /**
      * The process is currently running.
      */
-    processing,
+    PROCESSING,
 
     /**
      * Canceled by the user and not by an error.
      */
-    canceled,
+    CANCELED,
 
     /**
      * An exception/error occurred while processing.
      */
-    failed,
+    FAILED,
 
     /**
      * The process is successfully done.
      */
-    successful
+    SUCCESSFUL
 
 }

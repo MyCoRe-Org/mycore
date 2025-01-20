@@ -75,15 +75,16 @@ import jakarta.servlet.http.HttpServletResponse;
  *
  */
 public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRServlet {
+
     private static final long serialVersionUID = 1L;
 
-    protected static String KEY_OBJECT_ID = MCRCompressServlet.class.getCanonicalName() + ".object";
+    private static final String KEY_OBJECT_ID = MCRCompressServlet.class.getCanonicalName() + ".object";
 
-    protected static String KEY_PATH = MCRCompressServlet.class.getCanonicalName() + ".path";
+    private static final String KEY_PATH = MCRCompressServlet.class.getCanonicalName() + ".path";
 
-    private static Pattern PATH_INFO_PATTERN = Pattern.compile("\\A([\\w]+)/([\\w/]+)\\z");
+    private static final Pattern PATH_INFO_PATTERN = Pattern.compile("\\A([\\w]+)/([\\w/]+)\\z");
 
-    private static Logger LOGGER = LogManager.getLogger(MCRCompressServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRCompressServlet.class);
 
     @Override
     protected void think(MCRServletJob job) throws Exception {

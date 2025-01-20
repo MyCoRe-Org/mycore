@@ -19,7 +19,7 @@
 package org.mycore.restapi.converter;
 
 public enum MCRDetailLevel {
-    summary, normal, detailed;
+    SUMMARY, NORMAL, DETAILED;
 
     public static final String MEDIA_TYPE_PARAMETER = "detail";
 

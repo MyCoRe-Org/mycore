@@ -34,7 +34,7 @@ import org.mycore.common.config.MCRConfiguration2;
  *
  */
 public class MCRCipherManager {
-    private static Logger LOGGER = LogManager.getLogger(MCRCipherManager.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger(MCRCipherManager.class.getName());
 
     /**
      * Create a single instance of a MCRCipher and initialize it. If the cipher can't initialized an exception

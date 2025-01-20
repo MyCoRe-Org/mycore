@@ -93,7 +93,7 @@ import org.mycore.frontend.fileupload.MCRUploadHelper;
 public class MCRDerivateCommands extends MCRAbstractCommands {
 
     /** The logger */
-    private static Logger LOGGER = LogManager.getLogger(MCRDerivateCommands.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRDerivateCommands.class);
 
     /** The ACL interface */
     private static final MCRAccessInterface ACCESS_IMPL = MCRAccessManager.getAccessImpl();

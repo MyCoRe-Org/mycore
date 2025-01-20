@@ -42,7 +42,7 @@ public class MCRStalledJobResetter implements Runnable {
 
     private static int maxTimeDiff = Integer.parseInt(MCRIView2Tools.getIView2Property("TimeTillReset"));
 
-    private static Logger LOGGER = LogManager.getLogger(MCRStalledJobResetter.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRStalledJobResetter.class);
 
     private static int maxResetCount = Integer.parseInt(MCRIView2Tools.getIView2Property("MaxResetCount"));
 

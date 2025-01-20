@@ -79,9 +79,9 @@ public class MCRConfigurationDir {
 
     public static final String CONFIGURATION_DIRECTORY_PROPERTY = "MCR.ConfigDir";
 
-    private static ServletContext SERVLET_CONTEXT;
+    private static ServletContext servletContext;
 
-    private static volatile String APP_NAME;
+    private static volatile String appName;
 
     private static File getMyCoReDirectory() {
         String mcrHome = System.getProperty("MCR.Home");
@@ -121,14 +121,14 @@ public class MCRConfigurationDir {
     }
 
     private static String getAppName() {
-        if (APP_NAME == null) {
+        if (appName == null) {
             synchronized (MCRConfigurationDir.class) {
-                if (APP_NAME == null) {
-                    APP_NAME = buildAppName();
+                if (appName == null) {
+                    appName = buildAppName();
                 }
             }
         }
-        return APP_NAME;
+        return appName;
     }
 
     private static String buildAppName() {
@@ -146,9 +146,9 @@ public class MCRConfigurationDir {
     }
 
     private static String buildAppNameFromContext() {
-        String servletAppName = SERVLET_CONTEXT.getInitParameter("appName");
-        String contextPath = SERVLET_CONTEXT.getContextPath();
-        String servletContextName = SERVLET_CONTEXT.getServletContextName();
+        String servletAppName = servletContext.getInitParameter("appName");
+        String contextPath = servletContext.getContextPath();
+        String servletContextName = servletContext.getServletContextName();
         String updatedAppname;
         if (servletAppName != null && !servletAppName.isEmpty()) {
             updatedAppname = servletAppName;
@@ -183,8 +183,8 @@ public class MCRConfigurationDir {
     }
 
     static void setServletContext(ServletContext servletContext) {
-        SERVLET_CONTEXT = servletContext;
-        APP_NAME = null;
+        MCRConfigurationDir.servletContext = servletContext;
+        appName = null;
     }
 
     /**

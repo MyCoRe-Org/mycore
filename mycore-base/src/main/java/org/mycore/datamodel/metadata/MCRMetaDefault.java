@@ -76,7 +76,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     protected static final int DEFAULT_SEQUENCE = -1;
 
     // logger
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     // MetaLangText data
     protected String subtag;

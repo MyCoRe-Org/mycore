@@ -51,7 +51,7 @@ final class ContentUtils {
 
     static final String MIME_BOUNDARY = "MYCORE_MIME_BOUNDARY";
 
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     static long copyChannel(final ReadableByteChannel src, final WritableByteChannel dest, final int bufferSize)
         throws IOException {

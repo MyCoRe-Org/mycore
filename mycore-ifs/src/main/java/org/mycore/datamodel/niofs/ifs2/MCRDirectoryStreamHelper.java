@@ -63,7 +63,8 @@ import org.mycore.datamodel.niofs.MCRPath;
  * @author Thomas Scheffler (yagee)
  */
 class MCRDirectoryStreamHelper {
-    static Logger LOGGER = LogManager.getLogger();
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     static DirectoryStream<Path> getInstance(MCRDirectory dir, MCRPath path) throws IOException {
         DirectoryStream.Filter<Path> filter = (dir instanceof MCRFileCollection) ? MCRFileCollectionFilter.FILTER

@@ -66,7 +66,7 @@ public class MCRCASServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     /** The logger */
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** The URL of THIS servlet */
     private String clientURL;

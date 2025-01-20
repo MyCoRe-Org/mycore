@@ -62,13 +62,13 @@ public class MCRSolrSchemaReloader {
     private static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
         MCRSolrAuthenticationManager.getInstance();
 
-    private static Logger LOGGER = LogManager.getLogger(MCRSolrSchemaReloader.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSolrSchemaReloader.class);
 
-    private static String SOLR_SCHEMA_UPDATE_FILE_NAME = "solr-schema.json";
+    private static final String SOLR_SCHEMA_UPDATE_FILE_NAME = "solr-schema.json";
 
-    private static List<String> SOLR_DEFAULT_FIELDS = Arrays.asList("id", "_version_", "_root_", "_text_");
+    private static final List<String> SOLR_DEFAULT_FIELDS = Arrays.asList("id", "_version_", "_root_", "_text_");
 
-    private static List<String> SOLR_DEFAULT_FIELDTYPES = Arrays.asList(
+    private static final List<String> SOLR_DEFAULT_FIELDTYPES = Arrays.asList(
         "plong", "string", "text_general");
 
     /**

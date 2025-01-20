@@ -51,7 +51,7 @@ import jakarta.ws.rs.core.Response;
 @Path("/")
 public class MCRLodRoot {
 
-    private static Namespace NS_FOAF = Namespace.getNamespace("foaf", "http://xmlns.com/foaf/0.1/");
+    private static final Namespace NS_FOAF = Namespace.getNamespace("foaf", "http://xmlns.com/foaf/0.1/");
 
     @Context
     ContainerRequestContext request;

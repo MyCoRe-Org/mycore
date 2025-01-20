@@ -64,30 +64,30 @@ public class MCRMODSWrapper {
     private static final String DEF_MODS_CONTAINER = "def.modsContainer";
     private static final String MODS_DATAMODEL = "datamodel-mods.xsd";
 
-    private static List<String> topLevelElementOrder = new ArrayList<>();
+    private static final List<String> TOP_LEVEL_ELEMENT_ORDER = new ArrayList<>();
 
-    private static Set<String> SUPPORTED_TYPES = MCRConfiguration2
+    private static final Set<String> SUPPORTED_TYPES = MCRConfiguration2
         .getOrThrow("MCR.MODS.Types", MCRConfiguration2::splitValue)
         .collect(Collectors.toSet());
 
     static {
-        topLevelElementOrder.add("typeOfResource");
-        topLevelElementOrder.add("titleInfo");
-        topLevelElementOrder.add("name");
-        topLevelElementOrder.add("genre");
-        topLevelElementOrder.add("originInfo");
-        topLevelElementOrder.add("language");
-        topLevelElementOrder.add("abstract");
-        topLevelElementOrder.add("note");
-        topLevelElementOrder.add("subject");
-        topLevelElementOrder.add("classification");
-        topLevelElementOrder.add("relatedItem");
-        topLevelElementOrder.add("identifier");
-        topLevelElementOrder.add("location");
-        topLevelElementOrder.add("accessCondition");
+        TOP_LEVEL_ELEMENT_ORDER.add("typeOfResource");
+        TOP_LEVEL_ELEMENT_ORDER.add("titleInfo");
+        TOP_LEVEL_ELEMENT_ORDER.add("name");
+        TOP_LEVEL_ELEMENT_ORDER.add("genre");
+        TOP_LEVEL_ELEMENT_ORDER.add("originInfo");
+        TOP_LEVEL_ELEMENT_ORDER.add("language");
+        TOP_LEVEL_ELEMENT_ORDER.add("abstract");
+        TOP_LEVEL_ELEMENT_ORDER.add("note");
+        TOP_LEVEL_ELEMENT_ORDER.add("subject");
+        TOP_LEVEL_ELEMENT_ORDER.add("classification");
+        TOP_LEVEL_ELEMENT_ORDER.add("relatedItem");
+        TOP_LEVEL_ELEMENT_ORDER.add("identifier");
+        TOP_LEVEL_ELEMENT_ORDER.add("location");
+        TOP_LEVEL_ELEMENT_ORDER.add("accessCondition");
     }
 
-    private MCRObject object;
+    private final MCRObject object;
 
     public MCRMODSWrapper() {
         this(new MCRObject());
@@ -101,7 +101,7 @@ public class MCRMODSWrapper {
     }
 
     private static int getRankOf(Element topLevelElement) {
-        return topLevelElementOrder.indexOf(topLevelElement.getName());
+        return TOP_LEVEL_ELEMENT_ORDER.indexOf(topLevelElement.getName());
     }
 
     public static MCRObject wrapMODSDocument(Element modsDefinition, String projectID) {

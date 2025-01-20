@@ -46,14 +46,21 @@ class MCRDataSourceFactory {
 
     private static final String CONFIG_PREFIX = "MCR.MODS.EnrichmentResolver.";
 
-    private static MCRDataSourceFactory INSTANCE = new MCRDataSourceFactory();
+    private static volatile MCRDataSourceFactory instance;
 
-    private MCRCache<String, MCRDataSource> dataSources = new MCRCache<>(30, "data sources");
+    private final MCRCache<String, MCRDataSource> dataSources = new MCRCache<>(30, "data sources");
 
-    private Boolean defaultStopOnFirstResult;
+    private final Boolean defaultStopOnFirstResult;
 
     static MCRDataSourceFactory instance() {
-        return INSTANCE;
+        if (instance == null) {
+            synchronized (MCRDataSourceFactory.class) {
+                if (instance == null) {
+                    instance = new MCRDataSourceFactory();
+                }
+            }
+        }
+        return instance;
     }
 
     private MCRDataSourceFactory() {

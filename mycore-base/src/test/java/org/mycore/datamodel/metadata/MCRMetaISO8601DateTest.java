@@ -27,13 +27,11 @@ import java.io.StringWriter;
 import java.time.temporal.ChronoField;
 import java.util.Date;
 import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.config.MCRConfiguration2;
@@ -47,16 +45,8 @@ import org.mycore.datamodel.common.MCRISO8601Format;
  *
  */
 public class MCRMetaISO8601DateTest extends MCRTestCase {
-    private static Logger LOGGER;
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();//org.mycore.datamodel.metadata.MCRMetaISO8601Date
-        if (LOGGER == null) {
-            LOGGER = LogManager.getLogger(MCRMetaISO8601DateTest.class);
-        }
-    }
+    private static final Logger LOGGER = LogManager.getLogger(MCRMetaISO8601DateTest.class);
 
     /*
      * Test method for

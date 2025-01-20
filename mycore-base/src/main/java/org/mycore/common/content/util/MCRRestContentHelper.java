@@ -50,7 +50,7 @@ public final class MCRRestContentHelper {
     public static final RuntimeDelegate.HeaderDelegate<Date> DATE_HEADER_DELEGATE = RuntimeDelegate.getInstance()
         .createHeaderDelegate(Date.class);
 
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private MCRRestContentHelper() {
     }
@@ -201,12 +201,12 @@ public final class MCRRestContentHelper {
     }
 
     public enum ContentDispositionType {
-        inline, attachment
+        INLINE, ATTACHMENT
     }
 
     public static class Config {
 
-        public ContentDispositionType dispositionType = ContentDispositionType.attachment;
+        public ContentDispositionType dispositionType = ContentDispositionType.ATTACHMENT;
 
         public boolean useAcceptRanges = true;
 

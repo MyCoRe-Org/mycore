@@ -84,7 +84,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     // generated identifier is already present in database
     private static final int ERR_CODE_0_1 = 0x0001;
     @SuppressWarnings("unused")
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     static {
         ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("MCRPIRegister-#%d")

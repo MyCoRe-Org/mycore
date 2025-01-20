@@ -23,7 +23,7 @@ package org.mycore.common.digest;
  */
 public final class MCRMD5Digest extends MCRDigest {
 
-    public static MD5Algorithm ALGORITHM;
+    public static final MD5Algorithm ALGORITHM;
 
     static {
         ALGORITHM = new MD5Algorithm();

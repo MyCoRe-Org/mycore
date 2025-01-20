@@ -526,7 +526,7 @@ public class MCRWebCLIContainer {
 
         public String webCLIThread;
 
-        private static int MAX_BUFFER = 10_000;
+        private static final int MAX_BUFFER = 10_000;
 
         private List<Flow.Subscriber<? super LogEvent>> subscribers;
 

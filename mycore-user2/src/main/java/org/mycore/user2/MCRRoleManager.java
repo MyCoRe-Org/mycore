@@ -47,7 +47,7 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
  */
 public class MCRRoleManager {
 
-    private static Logger LOGGER = LogManager.getLogger(MCRRoleManager.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRRoleManager.class);
 
     /** Map of defined roles, key is the unique role name */
     private static Map<String, MCRRole> rolesByName = new HashMap<>();

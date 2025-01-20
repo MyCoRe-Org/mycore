@@ -193,10 +193,10 @@ public class MCRLanguageFactory {
      */
     private MCRLanguage buildLanguage(String xmlCode, String termCode, String biblCode) {
         MCRLanguage language = new MCRLanguage();
-        addCode(language, MCRLanguageCodeType.xmlCode, xmlCode);
+        addCode(language, MCRLanguageCodeType.XML_CODE, xmlCode);
         if (termCode != null) {
-            addCode(language, MCRLanguageCodeType.termCode, termCode);
-            addCode(language, MCRLanguageCodeType.biblCode, biblCode == null ? termCode : biblCode);
+            addCode(language, MCRLanguageCodeType.TERM_CODE, termCode);
+            addCode(language, MCRLanguageCodeType.BIBL_CODE, biblCode == null ? termCode : biblCode);
         }
         Locale locale = Arrays.stream(Locale.getAvailableLocales())
             .filter(l -> l.toString().equals(xmlCode))

@@ -67,7 +67,7 @@ public class MCROAISearchManager {
 
     protected static final String TOKEN_DELIMITER = "@";
 
-    protected static int MAX_AGE;
+    protected static int maxAge;
 
     protected Map<String, MCROAISearcher> resultMap;
 
@@ -83,7 +83,7 @@ public class MCROAISearchManager {
 
     static {
         String prefix = MCROAIAdapter.PREFIX + "ResumptionTokens.";
-        MAX_AGE = MCRConfiguration2.getInt(prefix + "MaxAge").orElse(30) * 60 * 1000;
+        maxAge = MCRConfiguration2.getInt(prefix + "MaxAge").orElse(30) * 60 * 1000;
     }
 
     public MCROAISearchManager() {
@@ -112,7 +112,7 @@ public class MCROAISearchManager {
             }
         };
         Timer cleanupTimer = new Timer("OAISearchManager-Timer " + identify.getConfigPrefix());
-        cleanupTimer.schedule(tt, new Date(System.currentTimeMillis() + MAX_AGE), MAX_AGE);
+        cleanupTimer.schedule(tt, new Date(System.currentTimeMillis() + maxAge), maxAge);
         MCRShutdownHandler.getInstance().addCloseable(() -> cleanupTimer.cancel());
     }
 
@@ -248,7 +248,7 @@ public class MCROAISearchManager {
         MCROAISearcher searcher = MCRConfiguration2.getInstanceOf(MCROAISearcher.class, className)
             .orElseGet(() -> MCRConfiguration2.getInstanceOfOrThrow(
                 MCROAISearcher.class, MCROAIAdapter.PREFIX + "DefaultSearcher"));
-        searcher.init(identify, format, MAX_AGE, partitionSize, setManager, objectManager);
+        searcher.init(identify, format, maxAge, partitionSize, setManager, objectManager);
         return searcher;
     }
 

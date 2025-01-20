@@ -109,7 +109,7 @@ public class MCRXMLParserImpl implements MCRXMLParser {
     private static class AbsoluteToRelativeResolver implements EntityResolver2 {
         private EntityResolver2 fallback;
 
-        private static Logger LOGGER = LogManager.getLogger(MCRXMLParserImpl.class);
+        private static final Logger LOGGER = LogManager.getLogger(MCRXMLParserImpl.class);
 
         private static URI baseDirURI = Paths.get("").toAbsolutePath().toUri();
 

@@ -42,7 +42,7 @@ public class MCRJMXBridge implements Closeable {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRJMXBridge.class);
 
-    private static java.util.List<WeakReference<ObjectName>> ONAME_LIST = Collections
+    private static final java.util.List<WeakReference<ObjectName>> ONAME_LIST = Collections
         .synchronizedList(new ArrayList<>());
 
     private static boolean shutdown;
