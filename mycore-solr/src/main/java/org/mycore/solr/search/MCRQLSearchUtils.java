@@ -144,7 +144,7 @@ public class MCRQLSearchUtils {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static MCRQuery buildDefaultQuery(String search, String defaultSearchField) {
         String[] fields = defaultSearchField.split(" *, *");
-        MCROrCondition queryCondition = new MCROrCondition();
+        MCROrCondition queryCondition = new MCROrCondition<>();
 
         for (String fDef : fields) {
             MCRCondition condition = new MCRQueryCondition(fDef, "=", search);
@@ -159,7 +159,7 @@ public class MCRQLSearchUtils {
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static MCRQuery buildNameValueQuery(HttpServletRequest req) {
-        MCRAndCondition condition = new MCRAndCondition();
+        MCRAndCondition condition = new MCRAndCondition<>();
 
         for (Enumeration<String> names = req.getParameterNames(); names.hasMoreElements();) {
             String name = names.nextElement();
@@ -177,7 +177,7 @@ public class MCRQLSearchUtils {
 
             if ((values.length > 1) || name.contains(",")) {
                 // Multiple fields with same name, combine with OR
-                parent = new MCROrCondition();
+                parent = new MCROrCondition<>();
                 condition.addChild(parent);
             }
 

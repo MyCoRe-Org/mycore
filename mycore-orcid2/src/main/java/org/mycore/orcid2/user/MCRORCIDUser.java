@@ -145,7 +145,7 @@ public class MCRORCIDUser {
      */
     public void removeAllCredentials() {
         final SortedSet<MCRUserAttribute> attributes = user.getAttributes();
-        final SortedSet<MCRUserAttribute> toKeep = new TreeSet<MCRUserAttribute>();
+        final SortedSet<MCRUserAttribute> toKeep = new TreeSet<>();
         for (MCRUserAttribute attribute : attributes) {
             if (!attribute.getName().startsWith(ATTR_ORCID_CREDENTIAL)) {
                 toKeep.add(attribute);
@@ -162,7 +162,7 @@ public class MCRORCIDUser {
      */
     public void removeCredentialByORCID(String orcid) {
         final SortedSet<MCRUserAttribute> attributes = user.getAttributes();
-        final SortedSet<MCRUserAttribute> toKeep = new TreeSet<MCRUserAttribute>();
+        final SortedSet<MCRUserAttribute> toKeep = new TreeSet<>();
         for (MCRUserAttribute attribute : attributes) {
             if (!attribute.getName().equals(getCredentialAttributeNameByORCID(orcid))) {
                 toKeep.add(attribute);

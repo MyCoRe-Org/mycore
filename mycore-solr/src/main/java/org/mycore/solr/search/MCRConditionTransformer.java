@@ -337,7 +337,7 @@ public class MCRConditionTransformer {
             subCond = new MCROrCondition().addAll(conditions);
         }
         if (not) {
-            subCond = new MCRNotCondition(subCond);
+            subCond = new MCRNotCondition<>(subCond);
         }
         return subCond;
     }

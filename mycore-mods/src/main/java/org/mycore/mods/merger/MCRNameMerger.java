@@ -46,7 +46,7 @@ public class MCRNameMerger extends MCRMerger {
 
     private Set<String> allNames = new HashSet<>();
 
-    private Map<String, Set<String>> nameIds = new HashMap<String, Set<String>>();
+    private Map<String, Set<String>> nameIds = new HashMap<>();
 
     @Override
     public void setElement(Element element) {
@@ -217,7 +217,7 @@ public class MCRNameMerger extends MCRMerger {
             if (nameIds.containsKey(type)) {
                 ids = nameIds.get(type);
             } else {
-                ids = new HashSet<String>();
+                ids = new HashSet<>();
             }
             ids.add(id);
             nameIds.put(type, ids);

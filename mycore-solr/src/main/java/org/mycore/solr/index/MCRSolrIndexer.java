@@ -599,7 +599,7 @@ public class MCRSolrIndexer {
             List<String> solrList = MCRSolrSearchUtils.listIDs(core.getClient(), query);
             LOGGER.info("there are {} solr objects", solrList::size);
             // documents to remove
-            List<String> toRemove = new ArrayList(solrList);
+            List<String> toRemove = new ArrayList<>(solrList);
             toRemove.removeAll(storeList);
             if (!toRemove.isEmpty()) {
                 LOGGER.info("remove {} zombie objects from solr", toRemove::size);

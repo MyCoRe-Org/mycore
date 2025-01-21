@@ -87,7 +87,7 @@ public class MCRXSLTransformation {
 
     private static TransformerFactory factory = TransformerFactory.newInstance();
 
-    private static final Map EMPTY_PARAMETERS = Collections.unmodifiableMap(new HashMap(0, 1));
+    private static final Map EMPTY_PARAMETERS = Collections.unmodifiableMap(new HashMap<>(0, 1));
 
     private static MCRXSLTransformation singleton;
 

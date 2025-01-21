@@ -315,7 +315,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         final Map<String, MCRORCIDUser> userOrcidPair = new HashMap<>();
         for (Element nameElement : MCRORCIDUtils.listNameElements(new MCRMODSWrapper(object))) {
             String orcid = null;
-            final Set<MCRUser> users = new HashSet<MCRUser>();
+            final Set<MCRUser> users = new HashSet<>();
             for (MCRIdentifier id : listTrustedNameIdentifiers(nameElement)) {
                 if (Objects.equals(id.getType(), "orcid")) {
                     orcid = id.getValue();
@@ -325,7 +325,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
             if (orcid != null && users.size() == 1) {
                 userOrcidPair.put(orcid, new MCRORCIDUser(users.iterator().next()));
             } else if (orcid != null && users.size() > 1) {
-                final List<MCRORCIDUser> orcidUsers = new ArrayList<MCRORCIDUser>();
+                final List<MCRORCIDUser> orcidUsers = new ArrayList<>();
                 for (MCRUser user : users) {
                     final MCRORCIDUser orcidUser = new MCRORCIDUser(user);
                     if (orcidUser.hasCredential(orcid)) {
@@ -376,7 +376,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         Set<String> excludeORCIDs) {
         final Set<String> matchingOrcids = findMatchingORCIDs(identifiers);
         matchingOrcids.removeAll(excludeORCIDs);
-        collectOtherPutCodes(identifiers, new ArrayList(matchingOrcids), flagContent);
+        collectOtherPutCodes(identifiers, new ArrayList<>(matchingOrcids), flagContent);
     }
 
     private void collectOtherPutCodes(Set<MCRIdentifier> identifiers, List<String> orcids,

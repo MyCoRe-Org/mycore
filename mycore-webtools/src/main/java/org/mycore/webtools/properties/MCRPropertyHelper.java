@@ -43,7 +43,7 @@ class MCRPropertyHelper {
     public SequencedMap<String, List<MCRProperty>> analyzeProperties() {
         Properties properties = new MCRProperties();
         Properties currentProperties = new MCRProperties();
-        final AtomicReference<Properties> oldProperties = new AtomicReference<Properties>(null);
+        final AtomicReference<Properties> oldProperties = new AtomicReference<>(null);
 
         SequencedMap<String, List<MCRProperty>> analyzedProperties = new LinkedHashMap<>();
 
