@@ -163,75 +163,75 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         parentPartOpt.ifPresent((modsPartElement) -> {
             final List<Element> detailElements = modsPartElement.getChildren("detail", MODS_NAMESPACE);
             for (Element detailElement : detailElements) {
-                final String type = detailElement.getAttributeValue("type");
-                final Element num = detailElement.getChild("number", MODS_NAMESPACE);
-                if (num != null) {
-
-                    Consumer<String> strFN = null;
-                    Consumer<Integer> intFn = null;
-                    switch (type) {
-                        case "issue" -> {
-                            strFN = idb::issue;
-                            intFn = idb::issue;
-                        }
-                        case "volume" -> {
-                            strFN = idb::volume;
-                            intFn = idb::volume;
-                        }
-                        case "article_number" -> {
-                            intFn = idb::number;
-                            strFN = idb::number;
-                        }
-                        default -> LOGGER.warn("Unknown type " + type + " in mods:detail in " + this.id);
-                    }
-
-                    try {
-                        if (intFn != null) {
-                            intFn.accept(Integer.parseInt(num.getTextNormalize()));
-                        }
-                    } catch (NumberFormatException nfe) {
-                        /* if(strFN!=null){ java compiler: always true :O */
-                        strFN.accept(num.getTextNormalize());
-                        //}
-                    }
-
-                }
+                processModsPartDetail(idb, detailElement);
             }
         });
 
         final Element modsExtentElement = wrapper
             .getElement("mods:relatedItem[@type='host']/mods:part/mods:extent[@unit='pages']");
         if (modsExtentElement != null) {
-            final String start = modsExtentElement.getChildTextNormalize("start", MODS_NAMESPACE);
-            final String end = modsExtentElement.getChildTextNormalize("end", MODS_NAMESPACE);
-            final String list = modsExtentElement.getChildTextNormalize("list", MODS_NAMESPACE);
-            final String total = modsExtentElement.getChildTextNormalize("total", MODS_NAMESPACE);
+            processModsPartExtent(idb, modsExtentElement);
+        }
+    }
 
-            if (list != null) {
-                idb.page(list);
-            } else if (start != null && end != null && start.matches("\\d+") && end.matches("\\d+")) {
-                idb.page(Integer.parseInt(start), Integer.parseInt(end));
-            } else if (start != null && end != null) {
-                idb.page(start + "-" + end);
-            } else if (start != null && total != null) {
-                idb.page(start);
-
-                try {
-                    final int startI = Integer.parseInt(start);
-                    final int totalI = Integer.parseInt(total);
-                    idb.page(startI, (totalI - startI));
-                } catch (NumberFormatException e) {
-                    idb.page(start);
+    private void processModsPartDetail(CSLItemDataBuilder idb, Element detailElement) {
+        final String type = detailElement.getAttributeValue("type");
+        final Element num = detailElement.getChild("number", MODS_NAMESPACE);
+        if (num != null) {
+            Consumer<String> strFN = null;
+            Consumer<Integer> intFn = null;
+            switch (type) {
+                case "issue" -> {
+                    strFN = idb::issue;
+                    intFn = idb::issue;
                 }
-
-                idb.numberOfPages(total);
-            } else if (start != null) {
-                idb.page(start);
-            } else if (end != null) {
-                idb.page(end);
+                case "volume" -> {
+                    strFN = idb::volume;
+                    intFn = idb::volume;
+                }
+                case "article_number" -> {
+                    intFn = idb::number;
+                    strFN = idb::number;
+                }
+                default -> LOGGER.warn("Unknown type " + type + " in mods:detail in " + this.id);
+            }
+            try {
+                if (intFn != null) {
+                    intFn.accept(Integer.parseInt(num.getTextNormalize()));
+                }
+            } catch (NumberFormatException nfe) {
+                strFN.accept(num.getTextNormalize());
             }
         }
+    }
 
+    private static void processModsPartExtent(CSLItemDataBuilder idb, Element modsExtentElement) {
+        final String start = modsExtentElement.getChildTextNormalize("start", MODS_NAMESPACE);
+        final String end = modsExtentElement.getChildTextNormalize("end", MODS_NAMESPACE);
+        final String list = modsExtentElement.getChildTextNormalize("list", MODS_NAMESPACE);
+        final String total = modsExtentElement.getChildTextNormalize("total", MODS_NAMESPACE);
+
+        if (list != null) {
+            idb.page(list);
+        } else if (start != null && end != null && start.matches("\\d+") && end.matches("\\d+")) {
+            idb.page(Integer.parseInt(start), Integer.parseInt(end));
+        } else if (start != null && end != null) {
+            idb.page(start + "-" + end);
+        } else if (start != null && total != null) {
+            idb.page(start);
+            try {
+                final int startI = Integer.parseInt(start);
+                final int totalI = Integer.parseInt(total);
+                idb.page(startI, (totalI - startI));
+            } catch (NumberFormatException e) {
+                idb.page(start);
+            }
+            idb.numberOfPages(total);
+        } else if (start != null) {
+            idb.page(start);
+        } else if (end != null) {
+            idb.page(end);
+        }
     }
 
     protected void processGenre(CSLItemDataBuilder idb) {
