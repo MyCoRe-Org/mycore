@@ -253,10 +253,7 @@
   <rule ref="category/java/errorprone.xml/DoNotExtendJavaLangThrowable"/>
   <rule ref="category/java/errorprone.xml/DoNotHardCodeSDCard"/>
   <rule ref="category/java/errorprone.xml/DoNotTerminateVM"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/errorprone.xml/DoNotThrowExceptionInFinally"/>
-  -->
   <rule ref="category/java/errorprone.xml/DontImportSun"/>
   <rule ref="category/java/errorprone.xml/DontUseFloatTypeForLoopIndices"/>
   <!-- TODO: Create PR to fix this rule -->
