@@ -3,7 +3,6 @@ import { createI18n, I18n } from "vue-i18n";
 import { BASE_URL, fetchTranslations } from "@/utils";
 import ContactManager from "@/App.vue";
 import router from './router';
-import { createPinia } from 'pinia';
 
 const initI18n = async (baseUrl: string): Promise<I18n> => {
   const data = await fetchTranslations(baseUrl);
@@ -17,7 +16,7 @@ const initI18n = async (baseUrl: string): Promise<I18n> => {
   });
 }
 
-const setErrorHandler = (app: App) => {
+const setErrorHandler = (app: App): void => {
   app.config.errorHandler = (err, instance, info) => {
     // eslint-disable-next-line
     console.error('Global error:', err);
@@ -32,10 +31,8 @@ const initApp = async (): Promise<void> => {
   try {
     const i18n = await initI18n(BASE_URL);
     const app = createApp(ContactManager);
-    const pinia = createPinia();
     app.use(i18n);
     app.use(router);
-    app.use(pinia);
     setErrorHandler(app);
     app.mount("#app");
   } catch(error) {

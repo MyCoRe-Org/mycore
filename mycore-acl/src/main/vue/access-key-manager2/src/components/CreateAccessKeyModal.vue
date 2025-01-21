@@ -155,16 +155,15 @@ import { AccessKeyDto, CreateAccessKeyDto } from "@/dtos/accesskey";
 import useVuelidate from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import BaseModal from "@/components/BaseModal.vue";
-import { useAccessKeyStore } from "@/store/access-keys";
-import { createAccessKey, getAccessKey } from "@/api/access-key-service";
+import { AccessKeyService } from "@/service/accesskey";
 
 const props = defineProps<{
+  accessKeyService: AccessKeyService | undefined,
   reference: string | undefined;
   availablePermissions: string[] | undefined;
   showModal: boolean;
 }>();
 
-const accessKeyStore = useAccessKeyStore();
 
 const rules = computed(() => ({
   reference: {
@@ -213,7 +212,7 @@ const handleClose = (force?: boolean) => {
   }
 };
 const handleCreateAccessKey = async () => {
-  if (!busy.value) {
+  if (props.accessKeyService && !busy.value) {
     v.value.$validate();
     if (!v.value.$invalid) {
       if (!v.value.$error) {
@@ -231,9 +230,8 @@ const handleCreateAccessKey = async () => {
           if (form.value.comment) {
             accessKey.comment = form.value.comment;
           }
-          const accessKeyId = await createAccessKey(accessKey);
-          const createdAccessKey = await getAccessKey(accessKeyId);
-          accessKeyStore.addAccessKey(createdAccessKey);
+          const accessKeyId = await props.accessKeyService.createAccessKey(accessKey);
+          const createdAccessKey = await props.accessKeyService.getAccessKey(accessKeyId);
           emit("access-key-created", form.value.secret, createdAccessKey);
           handleClose(true);
         } catch (error) {

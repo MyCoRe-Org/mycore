@@ -19,7 +19,7 @@ export type JWT = {
 
 export const BASE_URL = window.webApplicationBaseURL as string;
 
-export const fetchTranslations = async (baseUrl: string) => {
+export const fetchTranslations = async (baseUrl: string): Promise<Record<string, string>> => {
   const response = await fetch(`${baseUrl}rsc/locale/translate/component.acl.accesskey.*`);
   if (!response.ok) {
     throw new Error('Failed to load translations');
@@ -27,7 +27,7 @@ export const fetchTranslations = async (baseUrl: string) => {
   return await response.json();
 }
 
-export const fetchConfig = async (baseUrl: string) => {
+export const fetchConfig = async (baseUrl: string): Promise<Config> => {
   const response = await fetch(`${baseUrl}config.json`);
   if (!response.ok) {
     throw new Error('Failed to load app configuration');
@@ -104,11 +104,11 @@ export const generateRandomString = (length: number): string => {
   return temp;
 };
 
-const shortString = (input: string, len: number) =>
+const shortString = (input: string, len: number): string =>
   input.length > len ? `${input.slice(0, len - 3)}...` : input;
 
-export const shortReference = (reference: string) => shortString(reference, 20);
+export const shortReference = (reference: string): string => shortString(reference, 20);
 
-export const getI18nKey = (value: string) => `component.acl.accesskey.frontend.${value}`;
+export const getI18nKey = (value: string): string => `component.acl.accesskey.frontend.${value}`;
 
-export const urlEncode = (value: string) => encodeURIComponent(value);
+export const urlEncode = (value: string): string => encodeURIComponent(value);

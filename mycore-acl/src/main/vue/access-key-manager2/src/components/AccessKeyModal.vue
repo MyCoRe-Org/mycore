@@ -123,20 +123,19 @@ import { AccessKeyDto, PartialUpdateAccessKeyDto } from "@/dtos/accesskey";
 import BaseModal from "@/components/BaseModal.vue";
 import { required } from "@vuelidate/validators";
 import useVuelidate from "@vuelidate/core";
-import { useAccessKeyStore } from "@/store/access-keys";
-import { getAccessKey, patchAccessKey } from "@/api/access-key-service";
+import { AccessKeyService } from "@/service/accesskey";
 
 const props = defineProps<{
+  accessKeyService: AccessKeyService | undefined,
   showModal: boolean;
   fixedReference: boolean;
   availablePermissions: string[] | undefined;
   accessKey: AccessKeyDto | undefined;
 }>();
 
-const accessKeyStore = useAccessKeyStore();
 
 const emit = defineEmits<{
-  (event: "access-key-updated", value: string, accessKey: AccessKeyDto): void;
+  (event: "access-key-updated", accessKey: AccessKeyDto): void;
   (event: "close"): void;
 }>();
 const rules = computed(() => ({
@@ -192,7 +191,7 @@ const handleClose = (force: boolean) => {
   }
 };
 const handleUpdateAccessKey = async () => {
-  if (!busy.value) {
+  if (props.accessKeyService && !busy.value) {
     v.value.$validate();
     if (!v.value.$invalid && props.accessKey && props.accessKey.id) {
       busy.value = true;
@@ -215,9 +214,9 @@ const handleUpdateAccessKey = async () => {
         if (form.value.isActive !== props.accessKey.isActive) {
           accessKey.isActive = form.value.isActive;
         }
-        await patchAccessKey(props.accessKey.id, accessKey);
-        const updatedAccessKey = await getAccessKey(props.accessKey.id);
-        accessKeyStore.updateAccessKey(updatedAccessKey);
+        await props.accessKeyService.patchAccessKey(props.accessKey.id, accessKey);
+        const updatedAccessKey = await props.accessKeyService.getAccessKey(props.accessKey.id);
+        emit('access-key-updated', updatedAccessKey);
         handleClose(true);
       } catch (error) {
         handleError(error);

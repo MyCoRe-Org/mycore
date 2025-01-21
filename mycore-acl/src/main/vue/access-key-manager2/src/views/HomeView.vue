@@ -7,7 +7,7 @@
       </div>
     </div>
     <div
-      v-if="accessKeyCreatedValue"
+      v-if="accessKeyCreatedSecret"
       class="row"
     >
       <div class="col-12">
@@ -17,18 +17,18 @@
         >
           {{
             t("component.acl.accesskey.frontend.success.add", {
-              value: accessKeyCreatedValue,
+              secret: accessKeyCreatedSecret,
             })
           }}
           <template
-            v-if="accessKeyCreated && configStore.config.allowedSessionPermissionTypes.includes(accessKeyCreated.type as string)"
+            v-if="accessKeyCreated && config && config.allowedSessionPermissionTypes.includes(accessKeyCreated.type as string)"
           >
             {{ t("component.acl.accesskey.frontend.success.add.url") }}
             <a
-              :href="getActivationLink(accessKeyCreatedValue)"
+              :href="getActivationLink(accessKeyCreatedSecret)"
               disabled
             >
-              {{ getActivationLink(accessKeyCreatedValue) }}
+              {{ getActivationLink(accessKeyCreatedSecret) }}
             </a>
           </template>
         </div>
@@ -63,6 +63,7 @@
     <div class="row">
       <div class="col-12">
         <AccessKeyTable
+          :access-keys="paginatedAccessKeys"
           @remove-access-key="handleRemoveAccessKey"
           @view-access-key="showAccessKey"
         />
@@ -71,14 +72,15 @@
     <div class="row">
       <div class="col-12 d-flex justify-content-center">
         <Pagination
-          :current-page="accessKeyStore.currentPage"
-          :total-rows="accessKeyStore.totalCount"
-          :per-page="accessKeyStore.pageSize"
+          :current-page="currentPage"
+          :total-rows="totalCount"
+          :per-page="pageSize"
           @page-changed="handlePageChange"
         />
       </div>
     </div>
     <CreateAccessKeyModal
+      :access-key-service="accessKeyService"
       :reference="reference"
       :available-permissions="availablePermissions"
       :show-modal="showCreateAccessKeyModal"
@@ -86,18 +88,20 @@
       @access-key-created="handleAddAccessKey"
     />
     <AccessKeyModal
+      :access-key-service="accessKeyService"
       :fixed-reference="reference !== undefined"
       :available-permissions="availablePermissions"
       :show-modal="showAccessKeyModal"
       :access-key="currentAccessKey"
+      @access-key-updated="handleUpdateAccessKey"
       @close="handleAccessKeyModalClose"
     />
     <ConfirmModal ref="confirmModal" />
   </div>
 </template>
 <script setup lang="ts">
-import { useRoute } from 'vue-router';
-import { ref, onMounted, onErrorCaptured } from "vue";
+import { useRoute, useRouter } from 'vue-router';
+import { ref, onMounted, onErrorCaptured, Ref, computed } from "vue";
 import { useI18n } from "vue-i18n";
 import LoadingOverlay from "@/components/LoadingOverlay.vue";
 import { AccessKeyDto } from "@/dtos/accesskey";
@@ -106,27 +110,42 @@ import CreateAccessKeyModal from "@/components/CreateAccessKeyModal.vue";
 import AccessKeyModal from "@/components/AccessKeyModal.vue";
 import Pagination from "@/components/SimplePagination.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
-import { urlEncode, BASE_URL } from "@/utils";
-import { useAccessKeyStore } from "@/store/access-keys";
-import { deleteAccessKey, getAccessKeys, getAccessKeysByReferenceAndPermission } from "@/api/access-key-service";
-import { useAuthStore } from '@/store/auth';
-import { useConfigStore } from '@/store/config';
+import { urlEncode, BASE_URL, fetchJWT, fetchConfig } from "@/utils";
+import { AccessKeyService, AccessTokenAuthStrategy, AuthStrategy } from '@/service/accesskey';
+import { Config } from '@/config';
 
+class DevAuthStrategy implements AuthStrategy {
+  public getHeaders(): Record<string, string> {
+    return {
+      'Authorization': `Basic ${process.env.VUE_APP_API_TOKEN}`
+    };
+  }
+}
+
+const router = useRouter();
 const route = useRoute();
-
-const accessKeyStore = useAccessKeyStore();
-const authStore = useAuthStore();
-const configStore = useConfigStore();
-
 const { t } = useI18n();
+
+const accessKeyService = ref<AccessKeyService>();
+const config = ref<Config>();
 
 const reference = route.query.reference as string | undefined;
 const availablePermissionsQuery = route.query.availablePermissions as string | undefined;
 const availablePermissions = availablePermissionsQuery ? availablePermissionsQuery.split(',') : undefined;
 
+const totalCount = ref(0);
+const currentPage = ref(Number(route.query.page) || 1);
+const pageSize = ref(Number(route.query.pageSize) || 8);
+const accessKeys: Ref<AccessKeyDto[]> = ref([]);
+const paginatedAccessKeys = computed(() => {
+  if (accessKeys.value.length === 0) {
+    return [];
+  }
+  return accessKeys.value.slice(0, pageSize.value);
+});
 
 const errorMessage = ref<string>();
-const accessKeyCreatedValue = ref<string>();
+const accessKeyCreatedSecret = ref<string>();
 const accessKeyCreated = ref<AccessKeyDto>();
 const loading = ref<boolean>(true);
 const showCreateAccessKeyModal = ref<boolean>(false);
@@ -134,96 +153,111 @@ const showAccessKeyModal = ref<boolean>(false);
 const currentAccessKey = ref<AccessKeyDto>();
 const confirmModal = ref();
 
-
-const fetchAccessKeys = async () => {
-  let result;
-  const offset = (accessKeyStore.currentPage - 1) * accessKeyStore.pageSize;
-  const limit = accessKeyStore.pageSize;
-  if (availablePermissions && reference) {
-    result = await getAccessKeysByReferenceAndPermission(
-      reference,
-      availablePermissions,
-      offset,
-      limit
-    );
-  } else {
-    result = await getAccessKeys(offset, limit);
+const fetchAccessKeys = async (): Promise<void> => {
+  if (accessKeyService.value) {
+    let result;
+    const offset = (currentPage.value - 1) * pageSize.value;
+    const limit = pageSize.value;
+    if (availablePermissions && reference) {
+      result = await accessKeyService.value.getAccessKeysByReferenceAndPermission(
+        reference,
+        availablePermissions,
+        offset,
+        limit
+      );
+    } else {
+      result = await accessKeyService.value.getAccessKeys(offset, limit);
+    }
+    accessKeys.value = result.accessKeys;
+    totalCount.value = result.totalCount;
   }
-  accessKeyStore.setAccessKeys(result.items);
-  accessKeyStore.setTotalCount(result.totalResults);
-}
-
-const handleShowCreateAccessKeyModal = () => {
+};
+const handleShowCreateAccessKeyModal = (): void => {
   showCreateAccessKeyModal.value = true;
 };
-const handleCloseCreateAccessKeyModal = () => {
+const handleCloseCreateAccessKeyModal = (): void => {
   showCreateAccessKeyModal.value = false;
 };
-const showAccessKey = (index: number) => {
-  currentAccessKey.value = accessKeyStore.paginatedAccessKeys[index];
+const showAccessKey = (index: number): void => {
+  currentAccessKey.value = paginatedAccessKeys.value[index];
   showAccessKeyModal.value = true;
 };
-const handleError = (error: unknown) => {
+const handleError = (error: unknown): void => {
   errorMessage.value =
     error instanceof Error ? error.message : "component.acl.accesskey.frontend.error.fatal";
 };
-const resetInfos = () => {
+const resetInfos = (): void => {
   errorMessage.value = undefined;
-  accessKeyCreatedValue.value = undefined;
+  accessKeyCreatedSecret.value = undefined;
   accessKeyCreated.value = undefined;
 };
-// TODO
-const getActivationLink = (value: string) =>
+const getActivationLink = (secret: string): string =>
   t("component.acl.accesskey.frontend.success.add.url.format", {
-    webApplicationBaseUrl: BASE_URL,
-    objectId: reference,
-    value: urlEncode(value),
+    baseUrl: BASE_URL,
+    reference,
+    secret: urlEncode(secret),
   });
-const handleAccessKeyModalClose = () => {
+const handleAccessKeyModalClose = (): void => {
   showAccessKeyModal.value = false;
   currentAccessKey.value = undefined;
 };
 const handlePageChange = async (page: number): Promise<void> => {
   resetInfos();
   loading.value = true;
-  accessKeyStore.setPage(page);
+  currentPage.value = page;
   await fetchAccessKeys();
   loading.value = false;
+  router.push({
+    query: {
+      ...route.query,
+      page: page.toString(),
+    },
+  });
 };
 const handleRemoveAccessKey = async (index: number): Promise<void> => {
   resetInfos();
-  const accessKey: AccessKeyDto = accessKeyStore.paginatedAccessKeys[index];
+  const accessKey: AccessKeyDto = paginatedAccessKeys.value[index];
   if (accessKey.id) {
-    const fixedSecret =
-      accessKey.id.length > 30 ? `${accessKey.id.slice(0, 27)}...` : accessKey.secret;
     const ok = await confirmModal.value.show({
       title: t("component.acl.accesskey.frontend.confirmRemove.title"),
       message: t("component.acl.accesskey.frontend.confirmRemove.text", {
-        value: fixedSecret,
+        secret: accessKey.id.length > 30 ? `${accessKey.id.slice(0, 27)}...` : accessKey.secret,
       }),
     });
-    if (ok) {
+    if (accessKeyService.value && ok) {
       loading.value = true;
       try {
-        await deleteAccessKey(accessKey.id);
-        accessKeyStore.removeAccessKey(accessKey.id);
+        await accessKeyService.value.deleteAccessKey(accessKey.id);
+        accessKeys.value = accessKeys.value.filter((a: AccessKeyDto) => a.id !== accessKey.id);
+        totalCount.value -= 1;
       } finally {
         loading.value = false;
       }
     }
   }
 };
-const handleAddAccessKey = (secret: string, accessKey: AccessKeyDto) => {
-  if (accessKey.secret !== secret) {
-    accessKeyCreatedValue.value = secret;
-    accessKeyCreated.value = accessKey;
+const handleUpdateAccessKey = (accessKey: AccessKeyDto): void => {
+  const index = accessKeys.value.findIndex((accessKey: AccessKeyDto) => accessKey.id === accessKey.id);
+  if (index !== -1) {
+    accessKeys.value[index] = accessKey;
   }
 };
-onMounted(async () => {
+const handleAddAccessKey = (secret: string, accessKey: AccessKeyDto): void => {
+  if (accessKey.secret !== secret) {
+    accessKeyCreatedSecret.value = secret;
+    accessKeyCreated.value = accessKey;
+  }
+  totalCount.value += 1;
+  accessKeys.value.push(accessKey);
+};
+onMounted(async (): Promise<void> => {
   try {
-    await configStore.loadConfig();
-    if (process.env.NODE_ENV !== "development") {
-      await authStore.login();
+    config.value = await fetchConfig(BASE_URL);
+    if (process.env.NODE_ENV === "development") {
+      accessKeyService.value = new AccessKeyService(BASE_URL, new DevAuthStrategy());
+    } else {
+      const jwt = await fetchJWT(BASE_URL, reference, config.value.isSessionEnabled);
+      accessKeyService.value = new AccessKeyService(BASE_URL, new AccessTokenAuthStrategy(jwt.access_token));
     }
     await fetchAccessKeys();
   } catch (error) {
@@ -232,7 +266,7 @@ onMounted(async () => {
     loading.value = false;
   }
 });
-onErrorCaptured((error) => {
+onErrorCaptured((error): boolean => {
   handleError(error);
   return false;
 });
