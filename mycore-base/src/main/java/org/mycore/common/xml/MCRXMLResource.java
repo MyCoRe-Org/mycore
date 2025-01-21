@@ -128,7 +128,7 @@ public class MCRXMLResource {
      *             if resource cannot be loaded
      */
     public MCRContent getResource(String name, ClassLoader classLoader) throws IOException {
-        ResourceModifiedHandle modifiedHandle = getModifiedHandle(name, classLoader, 10000);
+        ResourceModifiedHandle modifiedHandle = getModifiedHandle(name, classLoader, 10_000);
         CacheEntry entry = RESOURCE_CACHE.getIfUpToDate(name, modifiedHandle);
         URL resolvedURL = modifiedHandle.getURL();
         if (entry != null && (resolvedURL == null || entry.resourceURL.equals(resolvedURL))) {

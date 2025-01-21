@@ -45,7 +45,7 @@ import org.mycore.common.content.MCRSeekableChannelContent;
 final class ContentUtils {
     static final int MIN_BUFFER_SIZE = 512;
 
-    static final int DEFAULT_BUFFER_SIZE = 65536;
+    static final int DEFAULT_BUFFER_SIZE = 65_536;
 
     static final List<Range> FULL = new ArrayList<>();
 

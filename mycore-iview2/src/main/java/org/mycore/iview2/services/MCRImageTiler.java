@@ -217,7 +217,7 @@ public class MCRImageTiler implements Runnable, Closeable {
                         LOGGER.debug("No Picture in TilingQueue going to sleep");
                         //fixes a race conditioned deadlock situation
                         //do not wait longer than 60 sec. for a new MCRTileJob
-                        TQ.wait(60000);
+                        TQ.wait(60_000);
                     }
                 }
             } catch (InterruptedException e) {

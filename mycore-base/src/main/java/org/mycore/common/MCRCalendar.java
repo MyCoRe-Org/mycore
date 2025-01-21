@@ -113,7 +113,7 @@ public class MCRCalendar {
     /**
      * Maximum Julian Day number is 3182057 = 28.01.4000
      */
-    public static final int MAX_JULIAN_DAY_NUMBER = 3182057;
+    public static final int MAX_JULIAN_DAY_NUMBER = 3_182_057;
 
     /**
      * a list of calendar tags they are supported in this class

@@ -95,7 +95,7 @@ public class MCRSolrIndexer {
 
     static final MCRProcessableDefaultCollection SOLR_COLLECTION;
 
-    private static final int BATCH_AUTO_COMMIT_WITHIN_MS = 60000;
+    private static final int BATCH_AUTO_COMMIT_WITHIN_MS = 60_000;
 
     public static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
         MCRSolrAuthenticationManager.getInstance();

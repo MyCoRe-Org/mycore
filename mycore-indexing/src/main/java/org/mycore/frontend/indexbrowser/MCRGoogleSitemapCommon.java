@@ -116,7 +116,7 @@ public final class MCRGoogleSitemapCommon {
     private static final Logger LOGGER = LogManager.getLogger(MCRGoogleSitemapCommon.class.getName());
 
     /** Number of URLs in one sitemap */
-    private int numberOfURLs = MCRConfiguration2.getInt("MCR.GoogleSitemap.NumberOfURLs").orElse(10000);
+    private int numberOfURLs = MCRConfiguration2.getInt("MCR.GoogleSitemap.NumberOfURLs").orElse(10_000);
 
     /** number format for parts */
     private static final NumberFormat NUMBER_FORMAT = getNumberFormat();
@@ -140,8 +140,8 @@ public final class MCRGoogleSitemapCommon {
         this.webappBaseDir = baseDir;
         LOGGER.info("Using webappbaseDir: {}", baseDir::getAbsolutePath);
         objidlist = new ArrayList<>();
-        if ((numberOfURLs < 1) || (numberOfURLs > 50000)) {
-            numberOfURLs = 50000;
+        if ((numberOfURLs < 1) || (numberOfURLs > 50_000)) {
+            numberOfURLs = 50_000;
         }
         if (CDIR.length() != 0) {
             File sitemapDirectory = new File(webappBaseDir, CDIR);

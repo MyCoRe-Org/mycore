@@ -499,7 +499,7 @@ public class MCRUtils {
         if (bytes >= 1024 * 1024) {
             // >= 1 MB
             sizeUnit = "MB";
-            sizeValue = (double) Math.round(bytes / 10485.76) / 100;
+            sizeValue = (double) Math.round(bytes / 10_485.76) / 100;
         } else if (bytes >= 5 * 1024) {
             // >= 5 KB
             sizeUnit = "KB";
