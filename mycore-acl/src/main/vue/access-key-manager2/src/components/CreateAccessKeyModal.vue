@@ -19,7 +19,6 @@
     </div>
     <form>
       <div
-        v-if="reference === undefined"
         class="form-group required"
       >
         <label for="inputReference">
@@ -29,6 +28,7 @@
           <input
             id="inputReference"
             v-model="form.reference"
+            :disabled="reference !== undefined"
             type="text"
             class="form-control"
           >
@@ -62,7 +62,7 @@
             {{ $t("component.acl.accesskey.frontend.label.permission") }}
           </label>
           <select
-            v-if="!allowCustomPermissions"
+            v-if="availablePermissions.length > 0"
             id="inputPermission"
             v-model="form.type"
             class="form-control"
@@ -159,8 +159,7 @@ import { AccessKeyService } from "@/service/accesskey";
 
 const props = defineProps<{
   accessKeyService: AccessKeyService | undefined,
-  reference: string | undefined;
-  allowCustomPermissions: boolean;
+  reference?: string;
   availablePermissions: string[];
   showModal: boolean;
 }>();

@@ -17,7 +17,6 @@
     </div>
     <form>
       <div
-        v-if="!fixedReference"
         class="form-group required"
       >
         <label for="inputReference">
@@ -27,6 +26,7 @@
           <input
             id="inputReference"
             v-model="form.reference"
+            :disabled="reference !== undefined"
             type="text"
             class="form-control"
           >
@@ -38,7 +38,7 @@
             {{ $t("component.acl.accesskey.frontend.label.permission") }}
           </label>
           <select
-            v-if="!allowCustomPermissions"
+            v-if="availablePermissions.length > 0"
             id="inputPermission"
             v-model="form.type"
             class="form-control"
@@ -126,11 +126,10 @@ import useVuelidate from "@vuelidate/core";
 import { AccessKeyService } from "@/service/accesskey";
 
 const props = defineProps<{
-  accessKeyService: AccessKeyService | undefined,
+  accessKeyService: AccessKeyService | undefined;
   showModal: boolean;
-  allowCustomPermissions: boolean;
+  reference: string | undefined;
   availablePermissions: string[];
-  fixedReference: boolean;
   accessKey: AccessKeyDto | undefined;
 }>();
 

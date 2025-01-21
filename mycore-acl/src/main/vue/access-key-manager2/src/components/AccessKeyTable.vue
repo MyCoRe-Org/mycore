@@ -56,7 +56,7 @@
 import { AccessKeyDto } from "@/dtos/accesskey";
 
 defineProps<{
-  accessKeys: AccessKeyDto[],
+  accessKeys: AccessKeyDto[];
 }>();
 
 

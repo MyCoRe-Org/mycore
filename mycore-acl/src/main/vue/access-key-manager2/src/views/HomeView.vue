@@ -83,16 +83,14 @@
       :access-key-service="accessKeyService"
       :reference="reference"
       :available-permissions="availablePermissions"
-      :allow-custom-permissions="allowCustomPermissions"
       :show-modal="showCreateAccessKeyModal"
       @close="handleCloseCreateAccessKeyModal"
       @access-key-created="handleAddAccessKey"
     />
     <AccessKeyModal
       :access-key-service="accessKeyService"
-      :fixed-reference="reference !== undefined"
       :available-permissions="availablePermissions"
-      :allow-custom-permissions="allowCustomPermissions"
+      :reference="reference"
       :show-modal="showAccessKeyModal"
       :access-key="currentAccessKey"
       @access-key-updated="handleUpdateAccessKey"
@@ -131,10 +129,9 @@ const { t } = useI18n();
 const accessKeyService = ref<AccessKeyService>();
 const config = ref<Config>();
 
-const reference = route.query.reference as string | null;
-const availablePermissionsQuery = route.query.availablePermissions as string | null;
+const reference = route.query.reference as string | undefined;
+const availablePermissionsQuery = route.query.availablePermissions as string | undefined;
 const availablePermissions = availablePermissionsQuery ? availablePermissionsQuery.split(',') : [];
-const allowCustomPermissions = availablePermissions.length === 0;
 
 const totalCount = ref(0);
 const currentPage = ref(Number(route.query.page) || 1);
@@ -153,19 +150,14 @@ const confirmModal = ref();
 
 const fetchAccessKeys = async (): Promise<void> => {
   if (accessKeyService.value) {
-    let result;
     const offset = (currentPage.value - 1) * pageSize.value;
     const limit = pageSize.value;
-    if (availablePermissions && reference) {
-      result = await accessKeyService.value.getAccessKeysByReferenceAndPermission(
-        reference,
-        availablePermissions,
-        offset,
-        limit
-      );
-    } else {
-      result = await accessKeyService.value.getAccessKeys(offset, limit);
-    }
+    const result = await accessKeyService.value.getAccessKeys(
+      availablePermissions,
+      reference,
+      offset,
+      limit
+    );
     accessKeys.value = result.accessKeys;
     totalCount.value = result.totalCount;
   }

@@ -60,9 +60,21 @@ export class AccessKeyService {
     };
   }
 
-  public async getAccessKeysByReferenceAndPermission (
+  public async getAccessKeys (permissions: string[], reference?: string, offset?: number, limit?: number): Promise<AccessKeyInformation> {
+    return extractResponse(
+      await this.axiosInstance.get<AccessKeyDto[]>(API_URL, {
+        params: {
+          reference,
+          permissions: permissions.length > 0 ? permissions.join(",") : undefined,
+          offset,
+          limit,
+        },
+      })
+    );
+  }
+
+  public async getAccessKeysByReference (
     reference: string,
-    permissions: string[],
     offset: number,
     limit: number
   ): Promise<AccessKeyInformation> {
@@ -70,18 +82,9 @@ export class AccessKeyService {
       await this.axiosInstance.get<AccessKeyDto[]>(API_URL, {
         params: {
           reference,
-          permissions: permissions.join(","),
           offset,
           limit,
         },
-      })
-    );
-  }
-  
-  public async getAccessKeys (offset: number, limit: number): Promise<AccessKeyInformation> {
-    return extractResponse(
-      await this.axiosInstance.get<AccessKeyDto[]>(API_URL, {
-        params: { offset, limit },
       })
     );
   }
