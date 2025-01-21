@@ -301,7 +301,7 @@ public class MCRCategoryTransformer {
             sort(items, MCREditorItemComparator.getCurrentLangComperator());
             for (Element item : items) {
                 List<Element> children = item.getChildren("item");
-                if (children.size() > 0) {
+                if (!children.isEmpty()) {
                     sortItems(children);
                 }
             }

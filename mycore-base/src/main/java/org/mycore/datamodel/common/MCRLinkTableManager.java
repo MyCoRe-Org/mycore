@@ -475,7 +475,7 @@ public class MCRLinkTableManager {
             categories.add(state);
         }
         categories.addAll(obj.getService().getClassifications());
-        if (categories.size() > 0) {
+        if (!categories.isEmpty()) {
             MCRCategLinkReference objectReference = new MCRCategLinkReference(mcrId);
             MCRCategLinkServiceFactory.getInstance().setLinks(objectReference, categories);
         }

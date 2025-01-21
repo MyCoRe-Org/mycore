@@ -231,11 +231,11 @@ public final class MCRObjectUtils {
                 List<MCRMetaLinkID> linksToRemove = metaElement.stream().map(MCRMetaLinkID.class::cast)
                     .filter(metaLinkID -> metaLinkID.getXLinkHrefID().equals(linkToRemove))
                     .collect(Collectors.toList());
-                if (linksToRemove.size() > 0) {
+                if (!linksToRemove.isEmpty()) {
                     updated.set(true);
                     linksToRemove.forEach(metaElement::removeMetaObject);
                 }
-                return metaElement.size() == 0 ? Stream.of(metaElement) : Stream.empty();
+                return metaElement.isEmpty() ? Stream.of(metaElement) : Stream.empty();
             }).collect(Collectors.toList());
         emptyElements.forEach(source.getMetadata()::removeMetadataElement);
         return updated.get();

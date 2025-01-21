@@ -167,7 +167,7 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
                             .filter(validationResult -> !validationResult.isValid())
                             .collect(Collectors.toList());
 
-                        if (invalidResults.size() > 0) {
+                        if (!invalidResults.isEmpty()) {
                             throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_BAD_REQUEST,
                                 invalidResults.stream()
                                     .map(MCRSwordUtil.MCRValidationResult::getMessage)
@@ -277,7 +277,7 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
                 METSValidator validator = new METSValidator(is);
                 List<ValidationException> validateResult = validator.validate();
 
-                if (validateResult.size() > 0) {
+                if (!validateResult.isEmpty()) {
                     String result = validateResult.stream().map(Throwable::getMessage)
                         .collect(Collectors.joining(System.lineSeparator()));
                     return new MCRSwordUtil.MCRValidationResult(false, result);

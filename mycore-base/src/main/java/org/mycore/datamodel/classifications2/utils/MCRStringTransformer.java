@@ -48,7 +48,7 @@ public class MCRStringTransformer {
             sb.append(label);
             sb.append(',');
         }
-        if (labels.size() > 0) {
+        if (!labels.isEmpty()) {
             sb.deleteCharAt(sb.length() - 1);
         }
     }

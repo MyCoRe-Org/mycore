@@ -88,7 +88,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
                     : owner.getId().toString());
 
             Map<String, String> urnFileMap = owner.getUrnMap();
-            if (urnFileMap.size() > 0) {
+            if (!urnFileMap.isEmpty()) {
                 try {
                     MCRMetsSave.updateURNsInMetsDocument(mets, urnFileMap);
                 } catch (Exception e) {

@@ -59,7 +59,7 @@ public class MCREditorItemComparator implements Comparator<Element> {
                 return label.getText();
             }
         }
-        if (labels.size() > 0) {
+        if (!labels.isEmpty()) {
             //fallback to first label if currentLang label is not found
             return labels.getFirst().getText();
         }

@@ -291,7 +291,7 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
      */
     @Override
     public boolean hasRule(String id) {
-        return getPermissionsForID(id).size() > 0;
+        return !getPermissionsForID(id).isEmpty();
     }
 
     /**

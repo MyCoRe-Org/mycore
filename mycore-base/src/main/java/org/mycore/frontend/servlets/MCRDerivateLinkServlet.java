@@ -120,7 +120,7 @@ public class MCRDerivateLinkServlet extends MCRServlet {
      */
     private Element getMyCoReObjectElement(MCRObjectID objectId) {
         Collection<String> derivates = MCRLinkTableManager.instance().getDestinationOf(objectId, "derivate");
-        if (derivates.size() <= 0) {
+        if (derivates.isEmpty()) {
             return null;
         }
         Element objElement = new Element("mycoreobject");
