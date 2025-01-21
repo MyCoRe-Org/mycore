@@ -57,9 +57,9 @@ public class MCRNeo4JMetaXMLParser extends MCRNeo4JAbstractDataModelParser {
 
     @Override
     public List<Neo4JNode> parse(Element rootTag) {
-        if (rootTag.getChildren().size() > 0) {
+        if (!rootTag.getChildren().isEmpty()) {
             Element child = rootTag.getChildren().getFirst();
-            if (child.getChildren().size() > 0) {
+            if (!child.getChildren().isEmpty()) {
                 Element grandChild = child.getChildren().getFirst();
                 String nameTag = grandChild.getName();
                 MCRNeo4JAbstractDataModelParser clazz = parserMap.get("MCRMetaXML." + nameTag);

@@ -69,7 +69,7 @@ public class MCRJobDAOJPAImpl implements MCRJobDAO {
                 return cb.equal(statusPath, status);
             }).toList();
 
-            if (statusPredicates.size() > 0) {
+            if (!statusPredicates.isEmpty()) {
                 return Optional.of(cb.or(statusPredicates.toArray(new Predicate[0])));
             }
         }

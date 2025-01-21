@@ -731,7 +731,7 @@ public class MCRRestAPIObjectsHelper {
             errors.add(new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_QUERY_PARAMETER, "The sort parameter is wrong.",
                 "The syntax should be [sortField]:[sortOrder]."));
         }
-        if (errors.size() > 0) {
+        if (!errors.isEmpty()) {
             throw new MCRRestAPIException(Status.BAD_REQUEST, errors);
         }
         return result;

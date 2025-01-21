@@ -76,7 +76,7 @@ public class MCRObjectInfoEntityQueryResolver implements MCRObjectQueryResolver 
             applySort(query, criteriaBuilder, criteriaQuery, oe);
         }
 
-        if (filters.size() > 0) {
+        if (!filters.isEmpty()) {
             criteriaQuery.where(criteriaBuilder.and(filters.toArray(new Predicate[0])));
         }
 
@@ -96,7 +96,7 @@ public class MCRObjectInfoEntityQueryResolver implements MCRObjectQueryResolver 
 
     private <T> void applyClassificationFilter(MCRObjectQuery query, CriteriaBuilder criteriaBuilder,
         CriteriaQuery<T> criteriaQuery, Root<MCRObjectInfoEntity> oe, List<Predicate> filters, EntityManager em) {
-        if (query.getIncludeCategories().size() > 0) {
+        if (!query.getIncludeCategories().isEmpty()) {
             List<MCRCategoryImpl> idImplMap = getCategories(query, em);
 
             if (idImplMap.size() != query.getIncludeCategories().size()) {
@@ -294,7 +294,7 @@ public class MCRObjectInfoEntityQueryResolver implements MCRObjectQueryResolver 
         List<Predicate> filters = getFilter(objectQuery, criteriaBuilder, source);
         applyClassificationFilter(objectQuery, criteriaBuilder, criteriaQuery, source, filters, em);
 
-        if (filters.size() > 0) {
+        if (!filters.isEmpty()) {
             criteriaQuery.where(criteriaBuilder.and(filters.toArray(new Predicate[0])));
         }
 

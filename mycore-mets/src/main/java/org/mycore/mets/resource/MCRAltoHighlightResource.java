@@ -168,7 +168,7 @@ public class MCRAltoHighlightResource {
         page.add("hits", hits);
         List<String> altoContentList = fields.get("alto_content");
         List<String> altoWords = fields.get("alto_words");
-        if (altoContentList.size() == 0 || altoWords.size() == 0) {
+        if (altoContentList.isEmpty() || altoWords.isEmpty()) {
             return Optional.empty();
         }
         int wordIndex = 0;

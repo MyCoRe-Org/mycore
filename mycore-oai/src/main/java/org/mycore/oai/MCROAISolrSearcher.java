@@ -271,7 +271,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
                 MCRSolrAuthenticationLevel.SEARCH);
             QueryResponse response = queryRequest.process(solrClient);
             SolrDocumentList list = response.getResults();
-            if (list.size() >= 1) {
+            if (!list.isEmpty()) {
                 Date date = (Date) list.getFirst().getFieldValue(fieldName);
                 return Optional.of(date.toInstant());
             }

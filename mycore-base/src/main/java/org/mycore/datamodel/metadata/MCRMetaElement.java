@@ -226,6 +226,15 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     public final int size() {
         return list.size();
     }
+    
+    /**
+     * returns true if there are no elements in this instance.
+     *
+     * @return true, if the "list" is empty
+     */
+    public final boolean isEmpty() {
+        return list.isEmpty();
+    }
 
     /**
      * The method add a metadata object, that implements the MCRMetaInterface to

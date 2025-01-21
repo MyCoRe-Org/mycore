@@ -85,7 +85,7 @@ public class MCRPIXPathMetadataService extends MCRPIMetadataService<MCRPersisten
                 "Got " + evaluate.size() + " matches for " + obj.getId() + " with xpath " + xpath + "");
         }
 
-        if (evaluate.size() == 0) {
+        if (evaluate.isEmpty()) {
             return Optional.empty();
         }
 

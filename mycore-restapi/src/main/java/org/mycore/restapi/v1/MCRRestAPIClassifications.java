@@ -123,7 +123,7 @@ public class MCRRestAPIClassifications {
      *
      */
     private static void writeChildrenAsJSON(Element eParent, JsonWriter writer, String lang) throws IOException {
-        if (eParent.getChildren("category").size() == 0) {
+        if (eParent.getChildren("category").isEmpty()) {
             return;
         }
         writer.name("categories");
@@ -139,7 +139,7 @@ public class MCRRestAPIClassifications {
             }
             writer.endArray();
 
-            if (e.getChildren("category").size() > 0) {
+            if (!e.getChildren("category").isEmpty()) {
                 writeChildrenAsJSON(e, writer, lang);
             }
             writer.endObject();
@@ -177,7 +177,7 @@ public class MCRRestAPIClassifications {
                 }
             }
             writer.name("checked").value(checked);
-            if (e.getChildren("category").size() > 0) {
+            if (!e.getChildren("category").isEmpty()) {
                 writer.name("children");
                 writeChildrenAsJSONCBTree(e, writer, lang, checked);
             }
@@ -222,7 +222,7 @@ public class MCRRestAPIClassifications {
                 }
                 writer.endObject();
             }
-            if (e.getChildren("category").size() > 0) {
+            if (!e.getChildren("category").isEmpty()) {
                 writer.name("children");
                 writeChildrenAsJSONJSTree(e, writer, lang, opened, disabled, selected);
             }

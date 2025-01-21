@@ -513,7 +513,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             LOGGER.info("{}: checking left, right and level values and for non-null children", id);
             checkLeftRightAndLevel(category, 0, 0, log);
         }
-        if (log.size() > 0) {
+        if (!log.isEmpty()) {
             LOGGER.error("Some errors occured on last test, report will follow");
             StringBuilder sb = new StringBuilder();
             for (String msg : log) {

@@ -40,7 +40,7 @@ public class MCRRequiredValidator extends MCRValidator {
 
     @Override
     public boolean validateBinding(MCRValidationResults results, MCRBinding binding) {
-        if (binding.getBoundNodes().size() == 0) {
+        if (binding.getBoundNodes().isEmpty()) {
             String msg = "Condition for " + this.xPath + " can not be validated, no such XML source node";
             throw new MCRException(msg);
         }

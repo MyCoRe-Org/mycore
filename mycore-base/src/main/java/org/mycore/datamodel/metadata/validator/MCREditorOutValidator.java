@@ -364,7 +364,7 @@ public class MCREditorOutValidator {
                 errorlog.add(msg);
             }
         }
-        return datatag.getChildren().size() != 0;
+        return !datatag.getChildren().isEmpty();
     }
 
     private void checkObjectService(Element root, Element service) throws JDOMException, IOException {
@@ -526,7 +526,7 @@ public class MCREditorOutValidator {
     static class MCRMetaAdressCheck implements MCREditorMetadataValidator {
         @Override
         public String checkDataSubTag(Element datasubtag) {
-            if (datasubtag.getChildren().size() == 0) {
+            if (datasubtag.getChildren().isEmpty()) {
                 return "adress is empty";
             }
             return checkMetaObjectWithLang(datasubtag, MCRMetaAddress.class);
@@ -536,7 +536,7 @@ public class MCREditorOutValidator {
     static class MCRMetaPersonNameCheck implements MCREditorMetadataValidator {
         @Override
         public String checkDataSubTag(Element datasubtag) {
-            if (datasubtag.getChildren().size() == 0) {
+            if (datasubtag.getChildren().isEmpty()) {
                 return "person name is empty";
             }
             return checkMetaObjectWithLang(datasubtag, MCRMetaAddress.class);
