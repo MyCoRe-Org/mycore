@@ -133,10 +133,7 @@
   <!--
   <rule ref="category/java/codestyle.xml/UnnecessaryAnnotationValueElement"/>
   -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/codestyle.xml/UnnecessaryBoxing"/>
-  -->
   <!-- TODO: Create PR to fix this rule -->
   <!--
   <rule ref="category/java/codestyle.xml/UnnecessaryCast"/>
