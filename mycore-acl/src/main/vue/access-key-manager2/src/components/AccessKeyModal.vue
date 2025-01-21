@@ -38,7 +38,7 @@
             {{ $t("component.acl.accesskey.frontend.label.permission") }}
           </label>
           <select
-            v-if="availablePermissions"
+            v-if="!allowCustomPermissions"
             id="inputPermission"
             v-model="form.type"
             class="form-control"
@@ -128,8 +128,9 @@ import { AccessKeyService } from "@/service/accesskey";
 const props = defineProps<{
   accessKeyService: AccessKeyService | undefined,
   showModal: boolean;
+  allowCustomPermissions: boolean;
+  availablePermissions: string[];
   fixedReference: boolean;
-  availablePermissions: string[] | undefined;
   accessKey: AccessKeyDto | undefined;
 }>();
 

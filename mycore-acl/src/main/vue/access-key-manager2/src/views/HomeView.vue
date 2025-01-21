@@ -83,6 +83,7 @@
       :access-key-service="accessKeyService"
       :reference="reference"
       :available-permissions="availablePermissions"
+      :allow-custom-permissions="allowCustomPermissions"
       :show-modal="showCreateAccessKeyModal"
       @close="handleCloseCreateAccessKeyModal"
       @access-key-created="handleAddAccessKey"
@@ -91,6 +92,7 @@
       :access-key-service="accessKeyService"
       :fixed-reference="reference !== undefined"
       :available-permissions="availablePermissions"
+      :allow-custom-permissions="allowCustomPermissions"
       :show-modal="showAccessKeyModal"
       :access-key="currentAccessKey"
       @access-key-updated="handleUpdateAccessKey"
@@ -129,20 +131,16 @@ const { t } = useI18n();
 const accessKeyService = ref<AccessKeyService>();
 const config = ref<Config>();
 
-const reference = route.query.reference as string | undefined;
-const availablePermissionsQuery = route.query.availablePermissions as string | undefined;
-const availablePermissions = availablePermissionsQuery ? availablePermissionsQuery.split(',') : undefined;
+const reference = route.query.reference as string | null;
+const availablePermissionsQuery = route.query.availablePermissions as string | null;
+const availablePermissions = availablePermissionsQuery ? availablePermissionsQuery.split(',') : [];
+const allowCustomPermissions = availablePermissions.length === 0;
 
 const totalCount = ref(0);
 const currentPage = ref(Number(route.query.page) || 1);
 const pageSize = ref(Number(route.query.pageSize) || 8);
 const accessKeys: Ref<AccessKeyDto[]> = ref([]);
-const paginatedAccessKeys = computed(() => {
-  if (accessKeys.value.length === 0) {
-    return [];
-  }
-  return accessKeys.value.slice(0, pageSize.value);
-});
+const paginatedAccessKeys = computed(() =>  accessKeys.value.slice(0, pageSize.value));
 
 const errorMessage = ref<string>();
 const accessKeyCreatedSecret = ref<string>();
@@ -256,7 +254,7 @@ onMounted(async (): Promise<void> => {
     if (process.env.NODE_ENV === "development") {
       accessKeyService.value = new AccessKeyService(BASE_URL, new DevAuthStrategy());
     } else {
-      const jwt = await fetchJWT(BASE_URL, reference, config.value.isSessionEnabled);
+      const jwt = await fetchJWT(BASE_URL, reference || undefined, config.value.isSessionEnabled);
       accessKeyService.value = new AccessKeyService(BASE_URL, new AccessTokenAuthStrategy(jwt.access_token));
     }
     await fetchAccessKeys();
