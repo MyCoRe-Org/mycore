@@ -3,21 +3,17 @@
                 xmlns:iview2="xalan://org.mycore.iview2.frontend.MCRIView2XSLFunctions"
                 exclude-result-prefixes="iview2">
   <xsl:param name="WebApplicationBaseURL" />
-  <xsl:param name="MCR.Viewer.bootstrapURL" /> <!-- just for legacy reasons -->
-  <xsl:param name="MCR.Viewer.FontaweSomeURL" />
-  <xsl:param name="MCR.Viewer.BootstrapURL" >
-    <xsl:if test="string-length($MCR.Viewer.bootstrapURL)&gt;0">
-      <xsl:choose>
-        <xsl:when
-                test="'/'=substring($MCR.Viewer.bootstrapURL, string-length($MCR.Viewer.bootstrapURL) - string-length('/') + 1)">
-          <xsl:value-of select="$MCR.Viewer.bootstrapURL"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="concat($MCR.Viewer.bootstrapURL, '/')"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:if>
-  </xsl:param>
+  <xsl:param name="MCR.Viewer.Bootstrap.Css.URL"/>
+  <xsl:param name="MCR.Viewer.Bootstrap.Css.Integrity"/>
+  <xsl:param name="MCR.Viewer.Bootstrap.Js.URL"/>
+  <xsl:param name="MCR.Viewer.Bootstrap.Js.Integrity"/>
+  <xsl:param name="MCR.Viewer.Popper.Js.URL"/>
+  <xsl:param name="MCR.Viewer.Popper.Js.Integrity"/>
+
+  <xsl:param name="MCR.Viewer.Fontawesome.Css.URL"/>
+  <xsl:param name="MCR.Viewer.Fontawesome.Css.Integrity"/>
+  <xsl:param name="MCR.Viewer.Fontawesome.Js.URL"/>
+  <xsl:param name="MCR.Viewer.Fontawesome.Js.Integrity"/>
 
   <xsl:output method="html" encoding="UTF-8" indent="yes" />
 
@@ -25,18 +21,68 @@
     <xsl:apply-templates />
   </xsl:template>
 
+  <xsl:template name="createViewerLinkElement">
+    <xsl:param name="href"/>
+    <xsl:param name="integrity"/>
+
+    <xsl:if test="$href and string-length($href) &gt; 0">
+      <xsl:element name="link">
+        <xsl:attribute name="rel">stylesheet</xsl:attribute>
+        <xsl:attribute name="href">
+          <xsl:value-of select="$href"/>
+        </xsl:attribute>
+        <xsl:if test="$integrity and string-length($integrity) &gt; 0">
+          <xsl:attribute name="integrity">
+            <xsl:value-of select="$integrity"/>
+          </xsl:attribute>
+        </xsl:if>
+        <xsl:attribute name="crossorigin">anonymous</xsl:attribute>
+      </xsl:element>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="createViewerScriptElement">
+    <xsl:param name="src"/>
+    <xsl:param name="integrity"/>
+
+    <xsl:if test="$src and string-length($src) &gt; 0">
+    <xsl:element name="script">
+      <xsl:attribute name="src">
+        <xsl:value-of select="$src"/>
+      </xsl:attribute>
+      <xsl:if test="$integrity and string-length($integrity) &gt; 0">
+        <xsl:attribute name="integrity">
+          <xsl:value-of select="$integrity"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:attribute name="crossorigin">anonymous</xsl:attribute>
+    </xsl:element>
+  </xsl:template>
+
   <xsl:template match="/IViewConfig">
     <xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html></xsl:text>
     <html>
       <head>
-        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/js/lib/jquery.min.js"></script>
-          <xsl:if test="string-length($MCR.Viewer.BootstrapURL)&gt;0">
-              <script type="text/javascript" src="{$MCR.Viewer.BootstrapURL}js/bootstrap.min.js"></script>
-              <link href="{$MCR.Viewer.BootstrapURL}css/bootstrap.css" type="text/css" rel="stylesheet"></link>
-          </xsl:if>
-          <xsl:if test="string-length($MCR.Viewer.FontaweSomeURL)&gt;0">
-              <link href="{$MCR.Viewer.FontaweSomeURL}" type="text/css" rel="stylesheet"></link>
-          </xsl:if>
+        <xsl:call-template name="createViewerLinkElement">
+          <xsl:with-param name="href" select="$MCR.Viewer.Bootstrap.Css.URL"/>
+          <xsl:with-param name="integrity" select="$MCR.Viewer.Bootstrap.Css.Integrity"/>
+        </xsl:call-template>
+        <xsl:call-template name="createViewerScriptElement">
+          <xsl:with-param name="src" select="$MCR.Viewer.Bootstrap.Js.URL"/>
+          <xsl:with-param name="integrity" select="$MCR.Viewer.Bootstrap.Js.Integrity"/>
+        </xsl:call-template>
+        <xsl:call-template name="createViewerScriptElement">
+          <xsl:with-param name="src" select="$MCR.Viewer.Popper.Js.URL"/>
+          <xsl:with-param name="integrity" select="$MCR.Viewer.Popper.Js.Integrity"/>
+        </xsl:call-template>
+        <xsl:call-template name="createViewerLinkElement">
+          <xsl:with-param name="href" select="$MCR.Viewer.Fontawesome.Css.URL"/>
+          <xsl:with-param name="integrity" select="$MCR.Viewer.Fontawesome.Css.Integrity"/>
+        </xsl:call-template>
+        <xsl:call-template name="createViewerScriptElement">
+          <xsl:with-param name="src" select="$MCR.Viewer.Fontawesome.Js.URL"/>
+          <xsl:with-param name="integrity" select="$MCR.Viewer.Fontawesome.Js.Integrity"/>
+        </xsl:call-template>
         <xsl:apply-templates select="xml/resources/resource" mode="iview.resource" />
         <script type="module">
           import { MyCoReViewer } from '<xsl:value-of select="$WebApplicationBaseURL" />modules/iview2/js/iview-client-base.es.js';
