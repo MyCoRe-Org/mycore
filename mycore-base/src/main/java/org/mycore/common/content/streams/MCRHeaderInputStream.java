@@ -33,7 +33,7 @@ import org.mycore.common.MCRException;
 public class MCRHeaderInputStream extends MCRBlockingInputStream {
 
     /** The number of bytes that will be read for content type detection */
-    public static final int MAX_HEADER_SIZE = 65536;
+    public static final int MAX_HEADER_SIZE = 65_536;
 
     /** The header of the stream read */
     protected byte[] header;

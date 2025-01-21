@@ -53,7 +53,7 @@ public class MCRMODSEmbargoUtils {
 
     private static final String EMPTY_VALUE = "";
 
-    private static final int CAPACITY = 10000;
+    private static final int CAPACITY = 10_000;
 
     private static MCRCache<MCRObjectID, String> embargoCache = new MCRCache<>(CAPACITY, "MODS embargo filter cache");
 

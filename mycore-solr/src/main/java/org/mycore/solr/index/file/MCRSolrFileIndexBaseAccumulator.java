@@ -55,8 +55,8 @@ public class MCRSolrFileIndexBaseAccumulator implements MCRSolrFileIndexAccumula
 
     private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.getInstance();
 
-    private static final MCRCache<String, String> DERIVATE_MODIFIED_CACHE = new MCRCache<>(10000,
-        "derivateID ISODateString cache");
+    private static final MCRCache<String, String> DERIVATE_MODIFIED_CACHE
+        = new MCRCache<>(10_000, "derivateID ISODateString cache");
 
     @Override
     public void accumulate(SolrInputDocument doc, Path input, BasicFileAttributes attr) throws IOException {

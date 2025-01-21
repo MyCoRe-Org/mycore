@@ -59,7 +59,7 @@ public class MCRUploadHandlerManager {
 
     public static MCRUploadHandler getHandler(String uploadID) {
 
-        long yesterday = System.currentTimeMillis() - 86400000;
+        long yesterday = System.currentTimeMillis() - 86_400_000;
         MCRUploadHandlerCacheEntry entry = HANDLERS.getIfUpToDate(uploadID, yesterday);
 
         if (entry == null) {

@@ -68,13 +68,13 @@ public class MCRStalledJobResetter implements Runnable {
 
         TypedQuery<MCRTileJob> query = em.createQuery("FROM MCRTileJob WHERE status='" + MCRJobState.PROCESSING.toChar()
             + "' ORDER BY id ASC", MCRTileJob.class);
-        long current = new Date(System.currentTimeMillis()).getTime() / 60000;
+        long current = new Date(System.currentTimeMillis()).getTime() / 60_000;
 
         boolean reset = query
             .getResultList()
             .stream()
             .map(job -> {
-                long start = job.getStart().getTime() / 60000;
+                long start = job.getStart().getTime() / 60_000;
                 boolean ret = false;
                 LOGGER.debug("checking {} {} …", job::getDerivate, job::getPath);
                 if (current - start >= maxTimeDiff) {
