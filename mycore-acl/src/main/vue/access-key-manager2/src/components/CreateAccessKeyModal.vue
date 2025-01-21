@@ -158,7 +158,7 @@ import BaseModal from "@/components/BaseModal.vue";
 import { AccessKeyService } from "@/service/accesskey";
 
 const props = defineProps<{
-  accessKeyService: AccessKeyService | undefined,
+  accessKeyService?: AccessKeyService;
   reference?: string;
   availablePermissions: string[];
   showModal: boolean;

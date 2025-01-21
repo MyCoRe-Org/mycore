@@ -117,6 +117,7 @@
     </template>
   </BaseModal>
 </template>
+<!-- TODO fix delete date issue -->
 <script setup lang="ts">
 import { computed, ref, onErrorCaptured, watch } from "vue";
 import { AccessKeyDto, PartialUpdateAccessKeyDto } from "@/dtos/accesskey";
@@ -126,11 +127,11 @@ import useVuelidate from "@vuelidate/core";
 import { AccessKeyService } from "@/service/accesskey";
 
 const props = defineProps<{
-  accessKeyService: AccessKeyService | undefined;
+  accessKeyService?: AccessKeyService;
   showModal: boolean;
-  reference: string | undefined;
   availablePermissions: string[];
-  accessKey: AccessKeyDto | undefined;
+  reference?: string;
+  accessKey?: AccessKeyDto;
 }>();
 
 
