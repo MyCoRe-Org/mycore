@@ -26,7 +26,7 @@
       <xsl:apply-templates select="mods:abstract" />
       <xsl:call-template name="workCitation" />
       <xsl:call-template name="workType" />
-      <xsl:apply-templates select="(descendant-or-self::mods:originInfo/mods:dateIssued[@encoding='w3cdtf'][@keyDate='yes'],mods:originInfo/mods:dateIssued[@encoding='w3cdtf'],descendant-or-self::mods:relatedItem/mods:originInfo/mods:dateIssued[@encoding='w3cdtf'])[1]" />
+      <xsl:apply-templates select="(mods:originInfo/mods:dateIssued[@encoding='w3cdtf'][@keyDate='yes'],mods:originInfo/mods:dateIssued[@encoding='w3cdtf'],descendant::mods:relatedItem/mods:originInfo/mods:dateIssued[@encoding='w3cdtf'])[1]" />
       <xsl:call-template name="externalIDs" />
       <xsl:apply-templates select="(mods:location/mods:url)[1]" />
       <xsl:call-template name="workContributors" />
