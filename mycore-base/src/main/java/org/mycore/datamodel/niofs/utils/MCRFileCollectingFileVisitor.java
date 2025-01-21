@@ -23,16 +23,17 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MCRFileCollectingFileVisitor<T> implements FileVisitor<T> {
 
-    private final ArrayList<T> paths;
+    private final List<T> paths;
 
     public MCRFileCollectingFileVisitor() {
         paths = new ArrayList<>();
     }
 
-    public ArrayList<T> getPaths() {
+    public List<T> getPaths() {
         return paths;
     }
 

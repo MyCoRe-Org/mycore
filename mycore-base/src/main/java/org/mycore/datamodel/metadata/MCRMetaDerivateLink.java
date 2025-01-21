@@ -23,6 +23,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,7 +41,7 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private HashMap<String, String> map;
+    private Map<String, String> map;
 
     /** Constructor initializes the HashMap */
     public MCRMetaDerivateLink() {

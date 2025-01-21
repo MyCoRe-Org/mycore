@@ -54,7 +54,7 @@ public class MCRMediaSourceProvider {
 
     private Optional<MCRSecureTokenV2> wowzaToken;
 
-    private ArrayList<MCRMediaSource> sources;
+    private List<MCRMediaSource> sources;
 
     public MCRMediaSourceProvider(String derivateId, String path, Optional<String> userAgent,
         Supplier<String[]> parameterSupplier) throws IOException, URISyntaxException {
@@ -76,7 +76,7 @@ public class MCRMediaSourceProvider {
             }
             throw e;
         }
-        ArrayList<MCRMediaSource> mediaSources = new ArrayList<>(4);
+        List<MCRMediaSource> mediaSources = new ArrayList<>(4);
         getDashStream()
             .map(s -> new MCRMediaSource(s, MCRMediaSourceType.dash_stream))
             .ifPresent(mediaSources::add);

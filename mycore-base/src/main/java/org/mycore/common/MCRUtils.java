@@ -47,6 +47,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HexFormat;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
@@ -175,8 +177,8 @@ public class MCRUtils {
      *            the File instance of the basic directory
      * @return an ArrayList with file names as pathes
      */
-    public static ArrayList<String> getAllFileNames(File basedir) {
-        ArrayList<String> out = new ArrayList<>();
+    public static List<String> getAllFileNames(File basedir) {
+        List<String> out = new ArrayList<>();
         File[] stage = basedir.listFiles();
 
         for (File element : stage) {
@@ -199,8 +201,8 @@ public class MCRUtils {
      * @param path    the part of directory path
      * @return an ArrayList with file names as pathes
      */
-    public static ArrayList<String> getAllFileNames(File basedir, String path) {
-        ArrayList<String> out = new ArrayList<>();
+    public static List<String> getAllFileNames(File basedir, String path) {
+        List<String> out = new ArrayList<>();
         File[] stage = basedir.listFiles();
 
         for (File element : stage) {
@@ -223,8 +225,8 @@ public class MCRUtils {
      *            the File instance of the basic directory
      * @return an ArrayList with directory names as pathes
      */
-    public static ArrayList<String> getAllDirectoryNames(File basedir) {
-        ArrayList<String> out = new ArrayList<>();
+    public static List<String> getAllDirectoryNames(File basedir) {
+        List<String> out = new ArrayList<>();
         File[] stage = basedir.listFiles();
 
         for (File element : stage) {
@@ -246,8 +248,8 @@ public class MCRUtils {
      *            the part of directory path
      * @return an ArrayList with directory names as pathes
      */
-    public static ArrayList<String> getAllDirectoryNames(File basedir, String path) {
-        ArrayList<String> out = new ArrayList<>();
+    public static List<String> getAllDirectoryNames(File basedir, String path) {
+        List<String> out = new ArrayList<>();
         File[] stage = basedir.listFiles();
 
         for (File element : stage) {
@@ -409,7 +411,7 @@ public class MCRUtils {
         try (TarArchiveInputStream tain = new TarArchiveInputStream(Files.newInputStream(source))) {
             TarArchiveEntry tarEntry;
             FileSystem targetFS = expandToDirectory.getFileSystem();
-            HashMap<Path, FileTime> directoryTimes = new HashMap<>();
+            Map<Path, FileTime> directoryTimes = new HashMap<>();
             while ((tarEntry = tain.getNextEntry()) != null) {
                 Path target = MCRPathUtils.getPath(targetFS, tarEntry.getName());
                 Path absoluteTarget = expandToDirectory.resolve(target).normalize().toAbsolutePath();

@@ -33,6 +33,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.SequencedMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.mycore.common.content.MCRContent;
@@ -57,7 +58,7 @@ public class MCRConfigurationInputStream extends InputStream {
     private static final String MYCORE_PROPERTIES = "mycore.properties";
 
     // latin1 for properties
-    private static final byte[] LINE_BREAK = System.getProperty("line.separator").getBytes(StandardCharsets.ISO_8859_1);
+    private static final byte[] LINE_BREAK = System.lineSeparator().getBytes(StandardCharsets.ISO_8859_1);
 
     InputStream in;
 
@@ -174,11 +175,17 @@ public class MCRConfigurationInputStream extends InputStream {
     }
 
     /**
-     * return an enumeration of input streams of configuration files
-     * found in MyCoRe components and modules, respecting the proper loading order
+     * Returns the contents of the given config file from all available sources.
+     *
+     * @param filename
+     *            the name of the config file
+     * @return a map with the component name as key and the file content as value
+     *  found in MyCoRe components and modules, respecting the proper loading order
+     * @throws IOException
+     *             if an I/O error occurs
      */
-    public static LinkedHashMap<String, byte[]> getConfigFileContents(String filename) throws IOException {
-        LinkedHashMap<String, byte[]> map = new LinkedHashMap<>();
+    public static SequencedMap<String, byte[]> getConfigFileContents(String filename) throws IOException {
+        SequencedMap<String, byte[]> map = new LinkedHashMap<>();
         for (MCRComponent component : MCRRuntimeComponentDetector.getAllComponents()) {
             try (InputStream is = component.getConfigFileStream(filename)) {
                 if (is != null) {

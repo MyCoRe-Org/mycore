@@ -43,7 +43,7 @@ import org.mycore.webtools.upload.exception.MCRUploadServerException;
  */
 public class MCRFileUploadBucket implements MCRSessionListener, MCRShutdownHandler.Closeable {
 
-    private static final ConcurrentHashMap<String, MCRFileUploadBucket> BUCKET_MAP = new ConcurrentHashMap<>();
+    private static final Map<String, MCRFileUploadBucket> BUCKET_MAP = new ConcurrentHashMap<>();
 
     private final String bucketID;
 

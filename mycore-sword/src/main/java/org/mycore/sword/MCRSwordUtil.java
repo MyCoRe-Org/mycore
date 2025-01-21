@@ -312,7 +312,7 @@ public class MCRSwordUtil {
         throws IOException, URISyntaxException {
         try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipFile.toUri()), new HashMap<>())) {
             final Path sourcePath = zipfs.getPath("/");
-            ArrayList<MCRValidationResult> validationResults = new ArrayList<>();
+            List<MCRValidationResult> validationResults = new ArrayList<>();
             Files.walkFileTree(sourcePath, new SimpleFileVisitor<>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
@@ -355,7 +355,7 @@ public class MCRSwordUtil {
 
     public static void addDatesToEntry(Entry entry, MCRObject mcrObject) {
         MCRObjectService serviceElement = mcrObject.getService();
-        ArrayList<String> flags = serviceElement.getFlags(MCRObjectService.FLAG_TYPE_CREATEDBY);
+        List<String> flags = serviceElement.getFlags(MCRObjectService.FLAG_TYPE_CREATEDBY);
         flags.addAll(serviceElement.getFlags(MCRObjectService.FLAG_TYPE_MODIFIEDBY));
         Set<String> clearedFlags = new LinkedHashSet<>(flags);
         clearedFlags.forEach(entry::addAuthor);
@@ -435,7 +435,7 @@ public class MCRSwordUtil {
                 Matcher matcher = COLLECTION_IRI_PATTERN.matcher(uriPathAsString);
                 if (matcher.matches() && matcher.groupCount() > 1) {
                     String numberGroup = matcher.group(2);
-                    if (numberGroup.length() > 0) {
+                    if (!numberGroup.isEmpty()) {
                         return Integer.parseInt(numberGroup);
                     }
                 }

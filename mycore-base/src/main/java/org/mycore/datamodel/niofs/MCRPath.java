@@ -40,6 +40,7 @@ import java.text.MessageFormat;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -99,7 +100,7 @@ public abstract class MCRPath implements Path {
 
     /**
      * Returns the root directory for a given derivate.
-     * 
+     *
      * @param owner the file owner (usually the id of a derivate)
      * @return the root path
      */
@@ -742,7 +743,7 @@ public abstract class MCRPath implements Path {
     }
 
     private void initNameComponents() {
-        final ArrayList<Integer> list = new ArrayList<>();
+        final List<Integer> list = new ArrayList<>();
         if (isEmpty()) {
             if (!isAbsolute()) {
                 // is empty path but not root component

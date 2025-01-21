@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.nio.CharBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -243,7 +242,7 @@ public final class MCRUploadHelper {
         Files.walkFileTree(rootPath, visitor);
 
         //sort files by name
-        ArrayList<Path> paths = visitor.getPaths();
+        List<Path> paths = visitor.getPaths();
         if (paths.isEmpty()) {
             return Optional.empty();
         }

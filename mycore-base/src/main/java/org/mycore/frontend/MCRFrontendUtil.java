@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.function.Supplier;
@@ -180,7 +181,7 @@ public class MCRFrontendUtil {
             .ifPresent(session::setCurrentLanguage);
 
         // Set the IP of the current session
-        if (session.getCurrentIP().length() == 0) {
+        if (session.getCurrentIP().isEmpty()) {
             session.setCurrentIP(getRemoteAddr(request));
         }
 
@@ -297,7 +298,7 @@ public class MCRFrontendUtil {
             if (name.startsWith("XSL.") && name.endsWith(".SESSION")) {
                 String key = name.substring(0, name.length() - 8);
                 // parameter is not empty -> store
-                if (!request.getParameter(name).trim().equals("")) {
+                if (!request.getParameter(name).trim().isEmpty()) {
                     mcrSession.put(key, request.getParameter(name));
                     LOGGER.debug("Found HTTP-Req.-Parameter {}={} that should be saved in session, safed {}={}",
                         () -> name, () -> request.getParameter(name), () -> key, () -> request.getParameter(name));
@@ -315,7 +316,7 @@ public class MCRFrontendUtil {
             if (name.startsWith("XSL.") && name.endsWith(".SESSION")) {
                 String key = name.substring(0, name.length() - 8);
                 // attribute is not empty -> store
-                if (!request.getAttribute(name).toString().trim().equals("")) {
+                if (!request.getAttribute(name).toString().isBlank()) {
                     mcrSession.put(key, request.getAttribute(name));
                     LOGGER.debug("Found HTTP-Req.-Attribute {}={} that should be saved in session, safed {}={}",
                         () -> name, () -> request.getParameter(name), () -> key, () -> request.getParameter(name));
@@ -335,7 +336,7 @@ public class MCRFrontendUtil {
      * automatically added to this list.
      *
      */
-    private static TreeSet<String> getTrustedProxies() {
+    private static SortedSet<String> getTrustedProxies() {
         // Always trust the local host
         return Stream
             .concat(Stream.of("localhost", URI.create(getBaseURL()).getHost()), MCRConfiguration2

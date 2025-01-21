@@ -71,7 +71,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
 
     private boolean notinherit;
 
-    private ArrayList<MCRMetaInterface> list;
+    private List<MCRMetaInterface> list;
 
     /**
      * This is the constructor of the MCRMetaElement class. The default language
@@ -435,7 +435,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
             throw new MCRException(
                 getTag() + ": package " + clazz.getPackage().getName() + " does not equal " + META_PACKAGE_NAME);
         }
-        if (list.size() == 0) {
+        if (list.isEmpty()) {
             throw new MCRException(getTag() + ": does not contain any sub elements");
         }
     }

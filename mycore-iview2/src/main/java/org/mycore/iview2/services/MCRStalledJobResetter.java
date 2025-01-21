@@ -20,6 +20,7 @@ package org.mycore.iview2.services;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,7 +46,7 @@ public class MCRStalledJobResetter implements Runnable {
 
     private static int maxResetCount = Integer.parseInt(MCRIView2Tools.getIView2Property("MaxResetCount"));
 
-    private HashMap<Long, Integer> jobCounter;
+    private Map<Long, Integer> jobCounter;
 
     private MCRStalledJobResetter() {
         jobCounter = new HashMap<>();

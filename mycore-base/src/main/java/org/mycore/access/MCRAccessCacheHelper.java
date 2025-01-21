@@ -40,7 +40,7 @@ public class MCRAccessCacheHelper {
     public static void clearPermissionCache(String id) {
         LOGGER.info("Invalidate all permissions for obj {} from local cache", id);
 
-        final ArrayList<String> idsToClear = new ArrayList<>();
+        List<String> idsToClear = new ArrayList<>();
         idsToClear.add(id);
         collectDescendants(idsToClear, id);
         MCRAccessManager.invalidPermissionCacheByID(idsToClear.toArray(new String[0]));
@@ -53,7 +53,7 @@ public class MCRAccessCacheHelper {
     public static void clearAllPermissionCaches(String id) {
         LOGGER.info("Invalidate all permissions for obj {} from all caches", id);
 
-        final ArrayList<String> idsToClear = new ArrayList<>();
+        List<String> idsToClear = new ArrayList<>();
         idsToClear.add(id);
         collectDescendants(idsToClear, id);
         MCRAccessManager.invalidAllPermissionCachesById(idsToClear.toArray(new String[0]));

@@ -23,6 +23,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.jdom2.Element;
 import org.jdom2.Namespace;
@@ -30,7 +31,7 @@ import org.mycore.common.MCRSessionMgr;
 
 public class MCREditorItemComparator implements Comparator<Element> {
 
-    private static final HashMap<String, MCREditorItemComparator> MY_COLLATORS = new HashMap<>();
+    private static final Map<String, MCREditorItemComparator> MY_COLLATORS = new HashMap<>();
 
     private Collator myCollator;
 

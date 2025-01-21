@@ -31,6 +31,7 @@ import java.text.MessageFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -73,7 +74,7 @@ public class MCRThumbnailServlet extends MCRServlet {
 
     private ImageWriteParam imageWriteParam;
 
-    private ConcurrentLinkedQueue<ImageWriter> imageWriters = new ConcurrentLinkedQueue<>();
+    private Queue<ImageWriter> imageWriters = new ConcurrentLinkedQueue<>();
 
     private static Logger LOGGER = LogManager.getLogger(MCRThumbnailServlet.class);
 

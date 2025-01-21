@@ -20,7 +20,6 @@ package org.mycore.frontend.classeditor.access;
 
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -54,7 +53,7 @@ public class MCRClassificationWritePermission implements MCRResourceAccessChecke
         String value = convertStreamToString(request.getEntityStream());
         try {
             //        Set<MCRCategoryID> categories = MCRCategUtils.getRootCategoryIDs(value);
-            HashMap<MCRCategoryID, String> categories = MCRCategUtils.getCategoryIDMap(value);
+            Map<MCRCategoryID, String> categories = MCRCategUtils.getCategoryIDMap(value);
             if (categories == null) {
                 LOGGER.error("Could not parse {}", value);
                 return false;

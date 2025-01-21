@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
@@ -327,7 +328,7 @@ public class MCRXMLHelper {
                 }
                 return false;
             }
-            HashSet<String> orig = new HashSet<>(aList1.size());
+            Set<String> orig = new HashSet<>(aList1.size());
             for (Attribute attr : aList1) {
                 orig.add(attr.toString());
             }

@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -72,7 +73,7 @@ public class MCRTopologicalSort<T> {
      * store the edges as adjacent list
      *  for each target node a list of corresponding source node is stored
      */
-    Map<Integer, TreeSet<Integer>> edgeSources = new TreeMap<>();
+    Map<Integer, SortedSet<Integer>> edgeSources = new TreeMap<>();
 
     /**
      * store the position of elements to sort in BiMap
@@ -233,7 +234,7 @@ public class MCRTopologicalSort<T> {
      *               ([to] = leaf node)
      */
     public boolean removeEdge(Integer from, Integer to) {
-        TreeSet<Integer> ts = edgeSources.get(to);
+        SortedSet<Integer> ts = edgeSources.get(to);
         if (ts != null) {
             ts.remove(from);
             if (ts.isEmpty()) {

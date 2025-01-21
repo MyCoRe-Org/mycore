@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -374,7 +375,7 @@ public class MCRSolrIndexer {
 
         MCRXMLMetadataManager metadataMgr = MCRXMLMetadataManager.instance();
         MCRSolrIndexStatistic statistic = null;
-        HashMap<MCRObjectID, MCRContent> contentMap = new HashMap<>((int) (BULK_SIZE * 1.4));
+        Map<MCRObjectID, MCRContent> contentMap = new HashMap<>((int) (BULK_SIZE * 1.4));
         int i = 0;
         for (String id : list) {
             i++;

@@ -159,7 +159,7 @@ public class MCRMailer extends MCRServlet {
     public static void send(String sender, String recipient, String subject, String body) {
         LOGGER.debug("Called plaintext send method with single recipient.");
 
-        ArrayList<String> recipients = new ArrayList<>();
+        List<String> recipients = new ArrayList<>();
         recipients.add(recipient);
         send(sender, null, recipients, null, subject, body, null);
     }
@@ -209,7 +209,7 @@ public class MCRMailer extends MCRServlet {
     public static void send(String sender, String recipient, String subject, String body, List<String> parts) {
         LOGGER.debug("Called multipart send method with single recipient.");
 
-        ArrayList<String> recipients = new ArrayList<>();
+        List<String> recipients = new ArrayList<>();
         recipients.add(recipient);
         send(sender, null, recipients, null, subject, body, parts);
     }

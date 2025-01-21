@@ -22,6 +22,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.mycore.common.MCRConstants;
@@ -29,10 +30,10 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 
 /**
- * Represents a realm of users. Each user belongs to a realm. Realms are configured 
+ * Represents a realm of users. Each user belongs to a realm. Realms are configured
  * in the file realms.xml. A realm determines the method that is used to login the user.
  * There is always a local default realm, which is defined by the attribute local in realms.xml.
- * 
+ *
  * @author Frank L\u00fctzenkirchen
  * @author Thomas Scheffler (yagee)
  */
@@ -41,7 +42,7 @@ public class MCRRealm {
     private String id;
 
     /** The labels of the realm */
-    private HashMap<String, String> labels = new HashMap<>();
+    private Map<String, String> labels = new HashMap<>();
 
     /** The URL where users from this realm can change their password */
     private String passwordChangeURL;
@@ -61,9 +62,9 @@ public class MCRRealm {
 
     public static final String USER_INFORMATION_ATTR = "realmId";
 
-    /** 
+    /**
      * Creates a new realm.
-     * 
+     *
      * @param id the unique ID of the realm
      */
     MCRRealm(String id) {
@@ -72,7 +73,7 @@ public class MCRRealm {
 
     /**
      * Returns the unique ID of the realm.
-     * 
+     *
      * @return the unique ID of the realm.
      */
     public String getID() {
@@ -102,29 +103,29 @@ public class MCRRealm {
         labels.put(lang, label);
     }
 
-    /** 
-     * Returns the URL where users from this realm can change their password 
+    /**
+     * Returns the URL where users from this realm can change their password
      */
     public String getPasswordChangeURL() {
         return passwordChangeURL;
     }
 
-    /** 
-     * Sets the URL where users from this realm can change their password 
+    /**
+     * Sets the URL where users from this realm can change their password
      */
     void setPasswordChangeURL(String url) {
         this.passwordChangeURL = url;
     }
 
-    /** 
-     * Returns the URL where users from this realm can login 
+    /**
+     * Returns the URL where users from this realm can login
      */
     public String getLoginURL() {
         return loginURL;
     }
 
-    /** 
-     * Sets the URL where users from this realm can login 
+    /**
+     * Sets the URL where users from this realm can login
      */
     void setLoginURL(String url) {
         this.loginURL = url;
@@ -170,7 +171,7 @@ public class MCRRealm {
      * @return the same as {@link #getLoginURL()} if <code>redirectParameter</code> is undefined for this realm
      */
     public String getLoginURL(String redirectURL) {
-        LinkedHashMap<String, String> parameter = new LinkedHashMap<>();
+        Map<String, String> parameter = new LinkedHashMap<>();
         String redirect = getRedirectParameter();
         if (redirect != null && redirectURL != null) {
             parameter.put(redirect, redirectURL);

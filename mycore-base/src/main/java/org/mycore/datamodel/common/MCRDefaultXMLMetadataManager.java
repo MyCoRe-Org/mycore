@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -108,7 +109,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
     /** The singleton */
     private static MCRDefaultXMLMetadataManager SINGLETON;
 
-    private HashSet<String> createdStores;
+    private Set<String> createdStores;
 
     /**
      * The default IFS2 Metadata store class to use, set by MCR.Metadata.Store.DefaultClass

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -59,7 +60,7 @@ public class MCRSolrInputDocumentGenerator {
 
     public static SolrInputDocument getSolrInputDocument(MCRSolrInputDocument jaxbDoc) {
         SolrInputDocument doc = new SolrInputDocument();
-        HashSet<MCRSolrInputField> duplicateFilter = new HashSet<>();
+        Set<MCRSolrInputField> duplicateFilter = new HashSet<>();
         for (Object o : jaxbDoc.getFieldOrDoc()) {
             if (o instanceof MCRSolrInputField field) {
                 if (field.getValue().isEmpty() || duplicateFilter.contains(field)) {
@@ -90,7 +91,7 @@ public class MCRSolrInputDocumentGenerator {
     }
 
     public static List<SolrInputDocument> getSolrInputDocuments(List<MCRSolrInputDocument> inputDocuments) {
-        ArrayList<SolrInputDocument> returnList = new ArrayList<>(inputDocuments.size());
+        List<SolrInputDocument> returnList = new ArrayList<>(inputDocuments.size());
         for (MCRSolrInputDocument doc : inputDocuments) {
             returnList.add(getSolrInputDocument(doc));
         }
@@ -99,7 +100,7 @@ public class MCRSolrInputDocumentGenerator {
 
     public static SolrInputDocument getSolrInputDocument(Element input) {
         SolrInputDocument doc = new SolrInputDocument();
-        HashSet<MCRSolrInputField> duplicateFilter = new HashSet<>();
+        Set<MCRSolrInputField> duplicateFilter = new HashSet<>();
         List<Element> fieldElements = input.getChildren("field");
         for (Element fieldElement : fieldElements) {
             MCRSolrInputField field = new MCRSolrInputField();

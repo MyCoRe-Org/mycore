@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.mycore.common.MCRClassTools;
@@ -108,7 +109,7 @@ public class MCRJobQueueResource {
         @QueryParam("offset") Integer offset,
         @QueryParam("limit") Integer limit) {
 
-        HashMap<String, String> parameterMap = new HashMap<>();
+        Map<String, String> parameterMap = new HashMap<>();
 
         parameters.forEach(p -> {
             String[] split = p.split(":");

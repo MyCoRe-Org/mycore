@@ -107,7 +107,7 @@ public class MCRAutoDeploy implements MCRStartupHandler.AutoExecutable {
                                             .<Runnable>map(fr -> () -> {
                                                 final List<Element> dispatchers = mapping
                                                     .getChildren("dispatcher", ns);
-
+                                                @SuppressWarnings("PMD.LooseCoupling")
                                                 final EnumSet<DispatcherType> eDT = dispatchers.isEmpty() ? null
                                                     : dispatchers.stream()
                                                         .map(d -> DispatcherType.valueOf(d.getTextTrim()))

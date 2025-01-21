@@ -108,6 +108,7 @@ public final class MCRProcessableFactory {
      *
      * @return a new priority blocking queue
      */
+    @SuppressWarnings("PMD.LooseCoupling")
     public static PriorityBlockingQueue<Runnable> newPriorityBlockingQueue() {
         int initialCapacity = 11; //taken from java.util.concurrent.PriorityBlockingQueue.DEFAULT_INITIAL_CAPACITY
         return new PriorityBlockingQueue<>(initialCapacity, Comparator.nullsLast(new MCRRunnableComperator()));

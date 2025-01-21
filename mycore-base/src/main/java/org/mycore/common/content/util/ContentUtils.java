@@ -33,6 +33,7 @@ import java.nio.channels.WritableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,7 +47,7 @@ final class ContentUtils {
 
     static final int DEFAULT_BUFFER_SIZE = 65536;
 
-    static final ArrayList<Range> FULL = new ArrayList<>();
+    static final List<Range> FULL = new ArrayList<>();
 
     static final String MIME_BOUNDARY = "MYCORE_MIME_BOUNDARY";
 

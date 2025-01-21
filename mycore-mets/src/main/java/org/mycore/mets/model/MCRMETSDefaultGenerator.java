@@ -74,7 +74,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
 
     private static final List<String> EXCLUDED_ROOT_FOLDERS = Arrays.asList("alto", "tei");
 
-    private HashMap<String, String> hrefIdMap = new HashMap<>();
+    private Map<String, String> hrefIdMap = new HashMap<>();
 
     @Override
     public Mets generate() throws MCRException {

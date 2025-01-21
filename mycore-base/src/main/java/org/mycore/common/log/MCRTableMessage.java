@@ -69,7 +69,7 @@ public final class MCRTableMessage<T> {
     }
 
     public List<String> tableLines() {
-        LinkedList<String> lines = new LinkedList<>();
+        List<String> lines = new LinkedList<>();
 
         int[] lengths = new int[columns.size()];
         String[] names = new String[columns.size()];

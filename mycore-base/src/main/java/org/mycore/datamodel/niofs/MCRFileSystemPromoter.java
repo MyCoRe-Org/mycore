@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -68,7 +69,7 @@ public class MCRFileSystemPromoter implements AutoExecutable {
     @Override
     public void startUp(ServletContext servletContext) {
         if (servletContext != null) {
-            HashSet<String> installedSchemes = FileSystemProvider.installedProviders()
+            Set<String> installedSchemes = FileSystemProvider.installedProviders()
                 .stream()
                 .map(FileSystemProvider::getScheme)
                 .collect(Collectors.toCollection(HashSet::new));

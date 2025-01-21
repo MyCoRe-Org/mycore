@@ -29,11 +29,11 @@ import org.mycore.frontend.basket.MCRBasketXMLBuilder;
 
 /**
  * Represents a collection of XML data to export.
- * XML can be added by URI or by JDOM Element, 
+ * XML can be added by URI or by JDOM Element,
  * or the contents of a complete MCRBasket can be added.
- * The collected XML data is wrapped by a root element 
+ * The collected XML data is wrapped by a root element
  * thats name and namespace can be set.
- * 
+ *
  * @author Frank Lützenkirchen
  */
 public class MCRExportCollection {
@@ -59,6 +59,7 @@ public class MCRExportCollection {
     /**
      * Adds the contents of the given basket.
      */
+    @SuppressWarnings("PMD.LooseCoupling")
     public void add(MCRBasket basketOfMODS) {
         for (MCRBasketEntry entry : basketOfMODS) {
             collection.addContent(basketBuilder.buildXML(entry));

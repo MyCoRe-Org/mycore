@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -69,7 +70,7 @@ import jakarta.ws.rs.core.Response.Status;
 @MCRRestrictedAccess(MCRWCMSPermission.class)
 public class MCRWCMSFileBrowserResource {
 
-    private final ArrayList<String> folderList = new ArrayList<>();
+    private final List<String> folderList = new ArrayList<>();
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -270,7 +271,7 @@ public class MCRWCMSFileBrowserResource {
                     }
                 }
             }
-            if (jsonArray.size() > 0) {
+            if (!jsonArray.isEmpty()) {
                 jsonObj.add("children", jsonArray);
             }
             return jsonObj;

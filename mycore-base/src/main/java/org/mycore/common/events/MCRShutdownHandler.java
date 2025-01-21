@@ -21,6 +21,7 @@ package org.mycore.common.events;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.TimeUnit;
@@ -56,7 +57,7 @@ public class MCRShutdownHandler {
 
     private static MCRShutdownHandler SINGLETON = new MCRShutdownHandler();
 
-    final ConcurrentSkipListSet<Closeable> requests = new ConcurrentSkipListSet<>();
+    final NavigableSet<Closeable> requests = new ConcurrentSkipListSet<>();
 
     final ReentrantReadWriteLock shutdownLock = new ReentrantReadWriteLock();
 

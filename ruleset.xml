@@ -38,10 +38,17 @@
   <rule ref="category/java/bestpractices.xml/UnitTestShouldUseTestAnnotation"/>
   <rule ref="category/java/bestpractices.xml/JUnit5TestShouldBePackagePrivate"/>
   <rule ref="category/java/bestpractices.xml/UnitTestShouldIncludeAssert"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
-  <rule ref="category/java/bestpractices.xml/LooseCoupling"/>
-  -->
+  <rule ref="category/java/bestpractices.xml/LooseCoupling">
+    <properties>
+      <property name="allowedTypes" value="java.util.Properties,
+      org.mycore.frontend.basket.MCRBasket,
+      org.mycore.services.queuedjob.MCRJobQueue,
+      org.mycore.oai.pmh.OAIDataList,
+      org.apache.solr.common.SolrInputDocument,
+      org.apache.solr.common.SolrDocumentList,
+      org.apache.solr.common.SolrDocument"/>
+    </properties>
+  </rule>>
   <!-- TODO: Create PR to fix this rule -->
   <!--
   <rule ref="category/java/bestpractices.xml/MethodReturnsInternalArray"/>

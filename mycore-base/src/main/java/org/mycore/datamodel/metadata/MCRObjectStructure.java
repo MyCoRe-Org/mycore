@@ -52,7 +52,7 @@ import com.google.gson.JsonObject;
  * (inner structure and combination of inner and outer structures of the
  * objects). This will possibly be done in a later extension of
  * <em>MCRMetaLink</em> and <em>MCRObjectStructure</em>.
- * 
+ *
  * @author Mathias Hegner
  * @author Jens Kupferschmidt
  */
@@ -60,9 +60,9 @@ public class MCRObjectStructure {
 
     private MCRMetaLinkID parent;
 
-    private final ArrayList<MCRMetaLinkID> children;
+    private final List<MCRMetaLinkID> children;
 
-    private final ArrayList<MCRMetaEnrichedLinkID> derivates;
+    private final List<MCRMetaEnrichedLinkID> derivates;
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -102,7 +102,7 @@ public class MCRObjectStructure {
 
     /**
      * The method returns the parent link.
-     * 
+     *
      * @return MCRMetaLinkID the corresponding link
      */
     public final MCRMetaLinkID getParent() {
@@ -111,7 +111,7 @@ public class MCRObjectStructure {
 
     /**
      * The method return the parent reference as a MCRObjectID.
-     * 
+     *
      * @return the parent MCRObjectID or null if there is no parent present
      */
     public final MCRObjectID getParentID() {
@@ -123,10 +123,10 @@ public class MCRObjectStructure {
 
     /**
      * This method set the parent value from a given MCRMetaLinkID.
-     * 
+     *
      * @param parent
      *            the MCRMetaLinkID to set
-     *  
+     *
      */
     public final void setParent(MCRMetaLinkID parent) {
         this.parent = parent;
@@ -153,7 +153,7 @@ public class MCRObjectStructure {
      * The method appends a child ID to the child link list if and only if it is
      * not already contained in the list, preventing from doubly-linked objects.
      * If the link could be added a "true" will be returned, otherwise "false".
-     * 
+     *
      * @param child
      *            the MCRMetaLinkID of the child
      * @return boolean true, if successfully done
@@ -173,7 +173,7 @@ public class MCRObjectStructure {
      * removes a child link to another object.
      *  If the link was found a "true" will be returned, otherwise
      * "false".
-     * 
+     *
      * @param href
      *            the MCRObjectID of the child
      * @return boolean true, if successfully completed
@@ -198,7 +198,7 @@ public class MCRObjectStructure {
      * removes a derivate link.
      * If the link was found a "true" will be returned, otherwise
      * "false".
-     * 
+     *
      * @param href
      *            the MCRObjectID of the child
      * @return boolean true, if successfully completed
@@ -231,7 +231,7 @@ public class MCRObjectStructure {
      * <em>addDerivate</em> methode append the given derivate link data to the
      * derivate vector. If the link could be added a "true" will be returned,
      * otherwise "false".
-     * 
+     *
      * @param derivate
      *            the link to be added as MCRMetaLinkID
      */
@@ -251,7 +251,7 @@ public class MCRObjectStructure {
     /**
      * Adds or updates the derivate link. Returns true if the derivate is added
      * or updated. Returns false when nothing is done.
-     * 
+     *
      * @param derivateLink the link to add or update
      * @return true when the structure is changed
      */
@@ -272,7 +272,7 @@ public class MCRObjectStructure {
 
     /**
      * Checks if the derivate is in the derivate vector.
-     * 
+     *
      * @param derivateId derivate to check
      */
     public final boolean containsDerivate(MCRObjectID derivateId) {
@@ -289,7 +289,7 @@ public class MCRObjectStructure {
             .orElse(null);
     }
 
-    /** 
+    /**
      * @return a list with all related derivate ids encapsulated within a {@link MCRMetaLinkID}
      * */
     public List<MCRMetaEnrichedLinkID> getDerivates() {
@@ -301,7 +301,7 @@ public class MCRObjectStructure {
      * only, the following three will affect the operations to or from datastore
      * too. Thereby <em>setFromDOM</em> will read the structure data from an
      * XML input stream (the "structure" entry).
-     * 
+     *
      * @param element
      *            the structure node list
      */
@@ -342,7 +342,7 @@ public class MCRObjectStructure {
     /**
      * <em>createXML</em> is the inverse of setFromDOM and converts the
      * structure's memory copy into XML.
-     * 
+     *
      * @exception MCRException
      *                if the content of this class is not valid
      * @return the structure XML
@@ -363,7 +363,7 @@ public class MCRObjectStructure {
             elm.addContent(elmm);
         }
 
-        if (children.size() > 0) {
+        if (!children.isEmpty()) {
             Element elmm = new Element("children");
             elmm.setAttribute("class", "MCRMetaLinkID");
             for (MCRMetaLinkID child : getChildren()) {
@@ -372,7 +372,7 @@ public class MCRObjectStructure {
             elm.addContent(elmm);
         }
 
-        if (derivates.size() > 0) {
+        if (!derivates.isEmpty()) {
             Element elmm = new Element("derobjects");
             elmm.setAttribute("class", "MCRMetaEnrichedLinkID");
             for (MCRMetaLinkID derivate : getDerivates()) {
@@ -386,7 +386,7 @@ public class MCRObjectStructure {
 
     /**
      * Creates the JSON representation of this structure.
-     * 
+     *
      * <pre>
      *   {
      *     parent: {@link MCRMetaLinkID#createJSON()},
@@ -400,7 +400,7 @@ public class MCRObjectStructure {
      *     ]
      *   }
      * </pre>
-     * 
+     *
      * @return a json gson representation of this structure
      */
     public JsonObject createJSON() {
@@ -438,7 +438,7 @@ public class MCRObjectStructure {
     /**
      * <em>isValid</em> checks whether all of the MCRMetaLink's in the link
      * vectors are valid or not.
-     * 
+     *
      * @return boolean true, if structure is valid
      */
     public final boolean isValid() {
@@ -458,7 +458,7 @@ public class MCRObjectStructure {
      *  <li>one of the children is invalid</li>
      *  <li>one of the derivates is invalid</li>
      *  </ul>
-     * 
+     *
      * @throws MCRException the MCRObjectStructure is invalid
      */
     public void validate() throws MCRException {

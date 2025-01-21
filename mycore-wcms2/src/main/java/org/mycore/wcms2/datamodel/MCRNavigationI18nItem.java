@@ -19,6 +19,7 @@
 package org.mycore.wcms2.datamodel;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
@@ -32,7 +33,7 @@ public abstract class MCRNavigationI18nItem implements MCRNavigationBaseItem {
     @XmlAttribute(name = "i18nKey")
     private String i18nKey;
 
-    private HashMap<String, String> labelMap;
+    private Map<String, String> labelMap;
 
     public MCRNavigationI18nItem() {
         this.labelMap = new HashMap<>();

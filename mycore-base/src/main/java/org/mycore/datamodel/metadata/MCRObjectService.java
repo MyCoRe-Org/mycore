@@ -97,15 +97,15 @@ public class MCRObjectService {
      */
     public static final String FLAG_TYPE_MODIFIEDBY = "modifiedby";
 
-    private final ArrayList<MCRMetaISO8601Date> dates = new ArrayList<>();
+    private final List<MCRMetaISO8601Date> dates = new ArrayList<>();
 
-    private final ArrayList<MCRMetaAccessRule> rules = new ArrayList<>();
+    private final List<MCRMetaAccessRule> rules = new ArrayList<>();
 
-    private final ArrayList<MCRMetaLangText> flags = new ArrayList<>();
+    private final List<MCRMetaLangText> flags = new ArrayList<>();
 
-    private final ArrayList<MCRMetaDateLangText> messages = new ArrayList<>();
+    private final List<MCRMetaDateLangText> messages = new ArrayList<>();
 
-    private final ArrayList<MCRMetaClassification> classifications = new ArrayList<>();
+    private final List<MCRMetaClassification> classifications = new ArrayList<>();
 
     private MCRCategoryID state;
 
@@ -209,7 +209,7 @@ public class MCRObjectService {
      *
      * @return list of dates
      */
-    protected ArrayList<MCRMetaISO8601Date> getDates() {
+    protected List<MCRMetaISO8601Date> getDates() {
         return dates;
     }
 
@@ -244,7 +244,7 @@ public class MCRObjectService {
     }
 
     private MCRMetaISO8601Date getISO8601Date(String type) {
-        if (type == null || type.length() == 0) {
+        if (type == null || type.isEmpty()) {
             return null;
         }
 
@@ -416,7 +416,7 @@ public class MCRObjectService {
      *              a type as string.
      * @return a list of flag values
      */
-    protected final ArrayList<MCRMetaLangText> getFlagsAsMCRMetaLangText(String type) {
+    protected final List<MCRMetaLangText> getFlagsAsMCRMetaLangText(String type) {
         return flags.stream()
             .filter(metaLangText -> StringUtils.equals(type, metaLangText.getType()))
             .collect(Collectors.toCollection(ArrayList::new));
@@ -429,7 +429,7 @@ public class MCRObjectService {
      *              a type as string.
      * @return a list of flag values
      */
-    public final ArrayList<String> getFlags(String type) {
+    public final List<String> getFlags(String type) {
         return getFlagsAsMCRMetaLangText(type).stream()
             .map(MCRMetaLangText::getText)
             .collect(Collectors.toCollection(ArrayList::new));
@@ -592,7 +592,7 @@ public class MCRObjectService {
      */
     public final int getRuleIndex(String permission) {
         int notFound = -1;
-        if (permission == null || permission.trim().length() == 0) {
+        if (permission == null || permission.isBlank()) {
             return notFound;
         }
         return IntStream.range(0, rules.size())
@@ -650,7 +650,7 @@ public class MCRObjectService {
      *
      * @return list of rules
      */
-    protected final ArrayList<MCRMetaAccessRule> getRules() {
+    protected final List<MCRMetaAccessRule> getRules() {
         return rules;
     }
 
@@ -880,7 +880,7 @@ public class MCRObjectService {
      *
      * @return messages as list
      */
-    protected final ArrayList<MCRMetaDateLangText> getMessagesAsList() {
+    protected final List<MCRMetaDateLangText> getMessagesAsList() {
         return messages;
     }
 
@@ -891,7 +891,7 @@ public class MCRObjectService {
      *              a type as string.
      * @return a list of message values
      */
-    protected final ArrayList<MCRMetaDateLangText> getMessagesAsMCRMetaDateLangText(String type) {
+    protected final List<MCRMetaDateLangText> getMessagesAsMCRMetaDateLangText(String type) {
         return messages.stream()
             .filter(metaLangText -> type.equals(metaLangText.getType()))
             .collect(Collectors.toCollection(ArrayList::new));
@@ -902,7 +902,7 @@ public class MCRObjectService {
      *
      * @return a list of message values
      */
-    public final ArrayList<String> getMessages() {
+    public final List<String> getMessages() {
         return messages.stream()
             .map(MCRMetaDateLangText::getText)
             .collect(Collectors.toCollection(ArrayList::new));
@@ -915,7 +915,7 @@ public class MCRObjectService {
      *              a type as string.
      * @return a list of message values
      */
-    public final ArrayList<String> getMessages(String type) {
+    public final List<String> getMessages(String type) {
         return getMessagesAsMCRMetaDateLangText(type).stream()
             .map(MCRMetaDateLangText::getText)
             .collect(Collectors.toCollection(ArrayList::new));
@@ -1083,7 +1083,7 @@ public class MCRObjectService {
      *
      * @return classifications as list
      */
-    protected final ArrayList<MCRMetaClassification> getClassificationsAsList() {
+    protected final List<MCRMetaClassification> getClassificationsAsList() {
         return classifications;
     }
 
@@ -1094,7 +1094,7 @@ public class MCRObjectService {
      *              a type as string.
      * @return a list of classification values
      */
-    protected final ArrayList<MCRMetaClassification> getClassificationsAsMCRMetaClassification(String type) {
+    protected final List<MCRMetaClassification> getClassificationsAsMCRMetaClassification(String type) {
         return classifications.stream()
             .filter(metaLangText -> type.equals(metaLangText.getType()))
             .collect(Collectors.toCollection(ArrayList::new));
@@ -1105,7 +1105,7 @@ public class MCRObjectService {
      *
      * @return a list of classification values
      */
-    public final ArrayList<MCRCategoryID> getClassifications() {
+    public final List<MCRCategoryID> getClassifications() {
         return classifications.stream()
             .map(c -> new MCRCategoryID(c.getClassId(), c.getCategId()))
             .collect(Collectors.toCollection(ArrayList::new));
@@ -1118,7 +1118,7 @@ public class MCRObjectService {
      *              a type as string.
      * @return a list of classification values
      */
-    public final ArrayList<MCRCategoryID> getClassifications(String type) {
+    public final List<MCRCategoryID> getClassifications(String type) {
         return getClassificationsAsMCRMetaClassification(type).stream()
             .map(c -> new MCRCategoryID(c.getClassId(), c.getCategId()))
             .collect(Collectors.toCollection(ArrayList::new));

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -67,7 +68,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
     private static final Pattern ID_PATTERN = Pattern
         .compile("^(?<projectId>[a-zA-Z][a-zA-Z0-9]*)_(?<objectType>[a-zA-Z0-9]+)_(?<numberPart>[0-9]+)$");
 
-    private static final HashSet<String> VALID_TYPE_LIST;
+    private static final Set<String> VALID_TYPE_LIST;
 
     private static final Comparator<MCRObjectID> COMPARATOR_FOR_MCR_OBJECT_ID = Comparator
         .comparing(MCRObjectID::getProjectId)

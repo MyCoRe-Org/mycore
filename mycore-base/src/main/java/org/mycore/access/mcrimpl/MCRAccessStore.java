@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
@@ -37,7 +38,7 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
  * must implement this interface. Which database actually will be used can then
  * be configured by reading the value <code>MCR.Persistence.Access.Store.Class</code>
  * from mycore.properties.access
- * 
+ *
  * @author Arne Seifert
  */
 public abstract class MCRAccessStore {
@@ -71,7 +72,7 @@ public abstract class MCRAccessStore {
     public abstract boolean isRuleInUse(String ruleid);
 
     /**
-     * 
+     *
      * @return a collection of all String IDs an access rule is assigned to
      */
     public abstract Collection<String> getDistinctStringIDs();
@@ -96,13 +97,13 @@ public abstract class MCRAccessStore {
     /**
      * alle Elemente eines Datentypes aufbereiten
      * @param type document type
-     * 
+     *
      * @return List of MCRAccessDefinition
      * @see MCRAccessDefinition
      */
     public Collection<MCRAccessDefinition> getDefinition(String type) {
         try {
-            HashMap<String, Collection<String>> sqlDefinition = new HashMap<>();
+            Map<String, Collection<String>> sqlDefinition = new HashMap<>();
             Collection<String> pools = getInstance().getDatabasePools();
             //merge pools
             pools.removeAll(getPools());

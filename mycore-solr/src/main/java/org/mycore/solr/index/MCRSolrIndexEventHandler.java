@@ -61,6 +61,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     private static long DELAY_IN_MS = MCRConfiguration2.getLong("MCR.Solr.DelayIndexing_inMS").orElse(2000L);
 
+    @SuppressWarnings("PMD.LooseCoupling")
     private static DelayQueue<MCRDelayedRunnable> SOLR_TASK_QUEUE = new DelayQueue<>();
 
     private static ScheduledExecutorService SOLR_TASK_EXECUTOR = Executors.newSingleThreadScheduledExecutor();

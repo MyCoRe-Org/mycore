@@ -248,7 +248,7 @@ public class MCRMetadataHistoryCommands {
         throws IOException {
         boolean exist = false;
         LogManager.getLogger().debug("Complete history rebuild of {} should be possible", derId);
-        ArrayList<MCRMetaHistoryItem> items = new ArrayList<>(100);
+        List<MCRMetaHistoryItem> items = new ArrayList<>(100);
         for (MCRAbstractMetadataVersion<?> version : versions) {
             String user = version.getUser();
             Instant revDate = version.getDate().toInstant();
@@ -291,7 +291,7 @@ public class MCRMetadataHistoryCommands {
         throws IOException {
         boolean exist = false;
         LogManager.getLogger().debug("Complete history rebuild of {} should be possible", objId);
-        ArrayList<MCRMetaHistoryItem> items = new ArrayList<>(100);
+        List<MCRMetaHistoryItem> items = new ArrayList<>(100);
         for (MCRAbstractMetadataVersion<?> version : versions) {
             String user = version.getUser();
             Instant revDate = version.getDate().toInstant();

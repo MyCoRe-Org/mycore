@@ -20,8 +20,9 @@ package org.mycore.tei;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
@@ -43,22 +44,22 @@ public class MCRTEIValidator implements ErrorHandler {
      */
     public static final String MCR_TRANSCRIPTION_SCHEMA = "xsd/mcrtranscr.xsd";
 
-    /** 
-     * Exception map key: fatalError 
+    /**
+     * Exception map key: fatalError
      */
     public static final String FATAL_ERROR = "fatalError";
 
-    /** 
-     * Exception map key: error 
+    /**
+     * Exception map key: error
      */
     public static final String ERROR = "error";
 
-    /** 
-     * Exception map key: warning 
+    /**
+     * Exception map key: warning
      */
     public static final String WARNING = "warning";
 
-    private Hashtable<String, List<SAXParseException>> exceptionMap;
+    private Map<String, List<SAXParseException>> exceptionMap;
 
     private Source teiSource;
 
@@ -69,7 +70,7 @@ public class MCRTEIValidator implements ErrorHandler {
     public MCRTEIValidator(Source teiSource) {
         this.teiSource = teiSource;
 
-        this.exceptionMap = new Hashtable<>();
+        this.exceptionMap = new HashMap<>();
         this.exceptionMap.put(WARNING, new ArrayList<>());
         this.exceptionMap.put(ERROR, new ArrayList<>());
         this.exceptionMap.put(FATAL_ERROR, new ArrayList<>());

@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -113,7 +114,7 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
     }
 
     private String[] getValues(Collection<Object> values) {
-        ArrayList<String> strValues = new ArrayList<>(values.size());
+        List<String> strValues = new ArrayList<>(values.size());
         for (Object o : values) {
             strValues.add(o.toString());
         }
