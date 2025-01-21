@@ -60,7 +60,7 @@ class MCRORCIDBaseClient {
      */
     protected MCRORCIDBaseClient(String restURL, String token) {
         final Client client = ClientBuilder.newClient();
-        client.register(new MCRORCIDXMLReader<Object>());
+        client.register(new MCRORCIDXMLReader<>());
         client.register(new MCRORCIDXMLWriter());
         Optional.ofNullable(token).ifPresent(t -> client.register(new MCRORCIDAuthenticationFilter(t)));
         this.baseTarget = client.target(restURL.endsWith("/") ? restURL : restURL + "/");
