@@ -399,10 +399,7 @@
   <rule ref="category/java/performance.xml/RedundantFieldInitializer"/>
   <rule ref="category/java/performance.xml/StringInstantiation"/>
   <rule ref="category/java/performance.xml/StringToString"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/performance.xml/UseArrayListInsteadOfVector"/>
-  -->
   <rule ref="category/java/performance.xml/UseArraysAsList"/>
   <rule ref="category/java/performance.xml/UseIndexOfChar"/>
   <rule ref="category/java/performance.xml/UseIOStreamsWithApacheCommonsFileItem"/>
