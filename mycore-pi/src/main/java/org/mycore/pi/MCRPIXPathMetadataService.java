@@ -82,7 +82,7 @@ public class MCRPIXPathMetadataService extends MCRPIMetadataService<MCRPersisten
         List<Element> evaluate = xp.evaluate(xml);
         if (evaluate.size() > 1) {
             throw new MCRPersistentIdentifierException(
-                "Got " + evaluate.size() + " matches for " + obj.getId() + " with xpath " + xpath + "");
+                "Got " + evaluate.size() + " matches for " + obj.getId() + " with xpath " + xpath);
         }
 
         if (evaluate.isEmpty()) {
