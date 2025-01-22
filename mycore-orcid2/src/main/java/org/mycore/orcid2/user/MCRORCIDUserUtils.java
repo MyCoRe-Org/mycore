@@ -18,10 +18,14 @@
 
 package org.mycore.orcid2.user;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.mods.MCRMODSWrapper;
+import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 import org.mycore.orcid2.exception.MCRORCIDException;
@@ -37,7 +41,7 @@ public class MCRORCIDUserUtils {
 
     /**
      * Returns MCRORCIDCredential by ORCID iD.
-     * 
+     *
      * @param orcid the ORCID iD
      * @return MCRORCIDCredential or null
      * @throws MCRORCIDException if the credential is corrupt or there is more than one user
@@ -48,7 +52,7 @@ public class MCRORCIDUserUtils {
 
     /**
      * Returns MCRORCIDUser by ORCID iD.
-     * 
+     *
      * @param orcid the ORCID iD
      * @return MCRORCIDUser or null
      * @throws MCRORCIDException if there is more than one matching user
@@ -66,7 +70,7 @@ public class MCRORCIDUserUtils {
 
     /**
      * Returns Set of MCRUser for given MCRIdentifier.
-     * 
+     *
      * @param id the MCRIdentifier
      * @return Set of MCRUser
      */
@@ -76,8 +80,25 @@ public class MCRORCIDUserUtils {
     }
 
     /**
+     * Checks whether the given {@link MCRORCIDUser} has a relation with the specified {@link MCRObject}.
+     * <p>
+     * This method determines the relationship by comparing the user's trusted identifiers
+     * with the name identifiers associated with the object. If there is at least one common identifier,
+     * the method returns {@code true}, indicating a relation exists.
+     * </p>
+     *
+     * @param orcidUser the ORCID user whose relation to the object is to be checked
+     * @param object the object to be checked for a relation with the user
+     * @return {@code true} if user has object relation; {@code false} otherwise
+     */
+    public static boolean checkUserHasObjectRelation(MCRORCIDUser orcidUser, MCRObject object) {
+        final MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
+        return !Collections.disjoint(MCRORCIDUtils.getNameIdentifiers(wrapper), orcidUser.getTrustedIdentifiers());
+    }
+
+    /**
      * Revokes orcid access token of MCRORCIDUser by ORCID iD.
-     * 
+     *
      * @param orcidUser the MCRORCIDUser
      * @param orcid the ORCID iD
      * @throws MCRORCIDException if credential does not exist or revoke request fails
