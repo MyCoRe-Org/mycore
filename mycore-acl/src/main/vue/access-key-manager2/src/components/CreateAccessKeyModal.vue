@@ -1,6 +1,6 @@
 <template>
   <BaseModal
-    :show="showModal"
+    :is-visible="isVisible"
     :title="$t('component.acl.accesskey.frontend.title.createAccessKey')"
     ok-only
     scrollable
@@ -161,7 +161,7 @@ const props = defineProps<{
   accessKeyService?: AccessKeyService;
   reference?: string;
   availablePermissions: string[];
-  showModal: boolean;
+  isVisible: boolean;
 }>();
 
 const rules = computed(() => ({
@@ -176,7 +176,7 @@ const rules = computed(() => ({
   },
 }));
 const emit = defineEmits<{
-  (event: "access-key-created", secret: string, accessKey: AccessKeyDto): void;
+  (event: "create-access-key", secret: string, accessKey: AccessKeyDto): void;
   (event: "close"): void;
 }>();
 
@@ -231,7 +231,7 @@ const handleCreateAccessKey = async () => {
           }
           const accessKeyId = await props.accessKeyService.createAccessKey(accessKey);
           const createdAccessKey = await props.accessKeyService.getAccessKey(accessKeyId);
-          emit("access-key-created", form.value.secret, createdAccessKey);
+          emit("create-access-key", form.value.secret, createdAccessKey);
           handleClose(true);
         } catch (error) {
           handleError(error);

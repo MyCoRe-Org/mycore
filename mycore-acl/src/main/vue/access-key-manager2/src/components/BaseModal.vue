@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="show"
+    v-if="isVisible"
     class="modal-backdrop"
     @click="close"
     @keyDown="close"
@@ -61,8 +61,8 @@ import { computed } from "vue";
 
 const props = withDefaults(
   defineProps<{
-    show: boolean;
-    title: string | null;
+    isVisible: boolean;
+    title?: string;
     okTitle?: string;
     cancelTitle?: string;
     okOnly?: boolean;
@@ -72,7 +72,7 @@ const props = withDefaults(
     hideHeaderClose?: boolean;
   }>(),
   {
-    show: false,
+    isVisible: false,
     title: "Title",
     okTitle: "OK",
     cancelTitle: "Cancel",

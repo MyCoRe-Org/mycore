@@ -1,5 +1,5 @@
 <template>
-  <LoadingOverlay :loading="loading" />
+  <LoadingOverlay :loading="state.loading" />
   <div class="container-fluid">
     <div class="row">
       <div class="col d-flex justify-content-center">
@@ -7,7 +7,7 @@
       </div>
     </div>
     <div
-      v-if="accessKeyCreatedSecret"
+      v-if="state.accessKeyCreatedSecret"
       class="row"
     >
       <div class="col-12">
@@ -17,25 +17,25 @@
         >
           {{
             t("component.acl.accesskey.frontend.success.add", {
-              secret: accessKeyCreatedSecret,
+              secret: state.accessKeyCreatedSecret,
             })
           }}
           <template
-            v-if="accessKeyCreated && config && config.allowedSessionPermissionTypes.includes(accessKeyCreated.type as string)"
+            v-if="state.accessKeyCreated && config && config.allowedSessionPermissionTypes.includes(state.accessKeyCreated.type as string)"
           >
             {{ t("component.acl.accesskey.frontend.success.add.url") }}
             <a
-              :href="getActivationLink(accessKeyCreatedSecret)"
+              :href="activationLink"
               disabled
             >
-              {{ getActivationLink(accessKeyCreatedSecret) }}
+              {{ activationLink }}
             </a>
           </template>
         </div>
       </div>
     </div>
     <div
-      v-if="errorMessage"
+      v-if="state.errorMessage"
       class="row"
     >
       <div class="col-12">
@@ -43,7 +43,7 @@
           class="alert alert-danger text-center"
           role="alert"
         >
-          {{ t(errorMessage) }}
+          {{ t(state.errorMessage) }}
         </div>
       </div>
     </div>
@@ -52,7 +52,7 @@
         <div class="text-right">
           <button
             class="btn btn-primary"
-            @click="handleShowCreateAccessKeyModal"
+            @click="openCreateAccessKeyModal"
           >
             <i class="fa fa-plus" />
             {{ t("component.acl.accesskey.frontend.button.showCreateAccessKeyModal") }}
@@ -65,18 +65,18 @@
       <div class="col-12">
         <AccessKeyTable
           :access-keys="paginatedAccessKeys"
-          @remove-access-key="handleRemoveAccessKey"
-          @view-access-key="showAccessKey"
+          @remove-access-key="deleteAccessKey"
+          @view-access-key="openAccessKeyInfoModal"
         />
       </div>
     </div>
     <div class="row">
       <div class="col-12 d-flex justify-content-center">
         <Pagination
-          :current-page="currentPage"
-          :total-rows="totalCount"
-          :per-page="pageSize"
-          @page-changed="handlePageChange"
+          :current-page="state.currentPage"
+          :total-rows="state.totalCount"
+          :per-page="state.pageSize"
+          @change-page="changePage"
         />
       </div>
     </div>
@@ -84,31 +84,31 @@
       :access-key-service="accessKeyService"
       :reference="reference"
       :available-permissions="availablePermissions"
-      :show-modal="showCreateAccessKeyModal"
-      @close="handleCloseCreateAccessKeyModal"
-      @access-key-created="handleAddAccessKey"
+      :is-visible="state.isCreateAccessKeyModalVisible"
+      @close="closeCreateAccessKeyModal"
+      @add-access-key="addAccessKey"
     />
-    <AccessKeyModal
+    <AccessKeyInfoModal
       :access-key-service="accessKeyService"
       :available-permissions="availablePermissions"
       :reference="reference"
-      :show-modal="showAccessKeyModal"
-      :access-key="currentAccessKey"
-      @access-key-updated="handleUpdateAccessKey"
-      @close="handleAccessKeyModalClose"
+      :is-visible="state.isAccessKeyInfoModalVisible"
+      :access-key="state.currentAccessKey"
+      @update-access-key="updateAccessKey"
+      @close="closeAccessKeyInfoModal"
     />
     <ConfirmModal ref="confirmModal" />
   </div>
 </template>
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router';
-import { ref, onMounted, onErrorCaptured, Ref, computed } from "vue";
+import { ref, onMounted, onErrorCaptured, computed, reactive } from "vue";
 import { useI18n } from "vue-i18n";
 import LoadingOverlay from "@/components/LoadingOverlay.vue";
 import { AccessKeyDto } from "@/dtos/accesskey";
 import AccessKeyTable from "@/components/AccessKeyTable.vue";
 import CreateAccessKeyModal from "@/components/CreateAccessKeyModal.vue";
-import AccessKeyModal from "@/components/AccessKeyModal.vue";
+import AccessKeyInfoModal from "@/components/AccessKeyInfoModal.vue";
 import Pagination from "@/components/SimplePagination.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import { urlEncode, BASE_URL, fetchJWT, fetchConfig } from "@/utils";
@@ -134,53 +134,57 @@ const reference = route.query.reference as string | undefined;
 const availablePermissionsQuery = route.query.availablePermissions as string | undefined;
 const availablePermissions = availablePermissionsQuery ? availablePermissionsQuery.split(',') : [];
 
-const totalCount = ref(0);
-const currentPage = ref(Number(route.query.page) || 1);
-const pageSize = ref(Number(route.query.pageSize) || 8);
-const accessKeys: Ref<AccessKeyDto[]> = ref([]);
-const paginatedAccessKeys = computed(() =>  accessKeys.value.slice(0, pageSize.value));
-
-const errorMessage = ref<string>();
-const accessKeyCreatedSecret = ref<string>();
-const accessKeyCreated = ref<AccessKeyDto>();
-const loading = ref<boolean>(true);
-const showCreateAccessKeyModal = ref<boolean>(false);
-const showAccessKeyModal = ref<boolean>(false);
-const currentAccessKey = ref<AccessKeyDto>();
+const state = reactive({
+  loading: false,
+  totalCount: 0,
+  currentPage: Number(route.query.page) || 1,
+  pageSize: Number(route.query.pageSize) || 8,
+  accessKeys: [] as AccessKeyDto[],
+  errorMessage: undefined as string | undefined,
+  accessKeyCreatedSecret: undefined as string | undefined,
+  accessKeyCreated: undefined as AccessKeyDto | undefined,
+  isCreateAccessKeyModalVisible: false,
+  isAccessKeyInfoModalVisible: false,
+  currentAccessKey: undefined as AccessKeyDto | undefined,
+})
 const confirmModal = ref();
 
+const paginatedAccessKeys = computed(() =>  state.accessKeys.slice(0, state.pageSize));
 const fetchAccessKeys = async (): Promise<void> => {
   if (accessKeyService.value) {
-    const offset = (currentPage.value - 1) * pageSize.value;
-    const limit = pageSize.value;
+    const offset = (state.currentPage - 1) * state.pageSize;
     const result = await accessKeyService.value.getAccessKeys(
       availablePermissions,
       reference,
       offset,
-      limit
+      state.pageSize
     );
-    accessKeys.value = result.accessKeys;
-    totalCount.value = result.totalCount;
+    state.accessKeys = result.accessKeys;
+    state.totalCount = result.totalCount;
   }
 };
-const handleShowCreateAccessKeyModal = (): void => {
-  showCreateAccessKeyModal.value = true;
+const openCreateAccessKeyModal = (): void => {
+  state.isCreateAccessKeyModalVisible = true;
 };
-const handleCloseCreateAccessKeyModal = (): void => {
-  showCreateAccessKeyModal.value = false;
+const closeCreateAccessKeyModal = (): void => {
+  state.isCreateAccessKeyModalVisible = false;
 };
-const showAccessKey = (index: number): void => {
-  currentAccessKey.value = paginatedAccessKeys.value[index];
-  showAccessKeyModal.value = true;
+const openAccessKeyInfoModal = (index: number): void => {
+  state.currentAccessKey = paginatedAccessKeys.value[index];
+  state.isAccessKeyInfoModalVisible = true;
+};
+const closeAccessKeyInfoModal = (): void => {
+  state.isAccessKeyInfoModalVisible = false;
+  state.currentAccessKey = undefined;
 };
 const handleError = (error: unknown): void => {
-  errorMessage.value =
+  state.errorMessage =
     error instanceof Error ? error.message : "component.acl.accesskey.frontend.error.fatal";
 };
 const resetInfos = (): void => {
-  errorMessage.value = undefined;
-  accessKeyCreatedSecret.value = undefined;
-  accessKeyCreated.value = undefined;
+  state.errorMessage = undefined;
+  state.accessKeyCreatedSecret = undefined;
+  state.accessKeyCreated = undefined;
 };
 const getActivationLink = (secret: string): string =>
   t("component.acl.accesskey.frontend.success.add.url.format", {
@@ -188,16 +192,18 @@ const getActivationLink = (secret: string): string =>
     reference,
     secret: urlEncode(secret),
   });
-const handleAccessKeyModalClose = (): void => {
-  showAccessKeyModal.value = false;
-  currentAccessKey.value = undefined;
-};
-const handlePageChange = async (page: number): Promise<void> => {
+const activationLink = computed((): string => {
+  if (state.accessKeyCreated && state.accessKeyCreatedSecret) {
+    return getActivationLink(state.accessKeyCreatedSecret);
+  }
+  return '';
+});
+const changePage = async (page: number): Promise<void> => {
   resetInfos();
-  loading.value = true;
-  currentPage.value = page;
+  state.loading = true;
+  state.currentPage = page;
   await fetchAccessKeys();
-  loading.value = false;
+  state.loading = false;
   router.push({
     query: {
       ...route.query,
@@ -205,44 +211,48 @@ const handlePageChange = async (page: number): Promise<void> => {
     },
   });
 };
-const handleRemoveAccessKey = async (index: number): Promise<void> => {
+const openDeleteConfirmationModal = async (accessKey: AccessKeyDto): Promise<boolean> => {
+  const secretPreview = accessKey.id.length > 30 ? `${accessKey.id.slice(0, 27)}...` : accessKey.secret;
+  return await confirmModal.value.show({
+    title: t("component.acl.accesskey.frontend.confirmRemove.title"),
+    message: t("component.acl.accesskey.frontend.confirmRemove.text", { secret: secretPreview }),
+  });
+};
+const deleteAccessKey = async (index: number): Promise<void> => {
   resetInfos();
   const accessKey: AccessKeyDto = paginatedAccessKeys.value[index];
-  if (accessKey.id) {
-    const ok = await confirmModal.value.show({
-      title: t("component.acl.accesskey.frontend.confirmRemove.title"),
-      message: t("component.acl.accesskey.frontend.confirmRemove.text", {
-        secret: accessKey.id.length > 30 ? `${accessKey.id.slice(0, 27)}...` : accessKey.secret,
-      }),
-    });
-    if (accessKeyService.value && ok) {
-      loading.value = true;
-      try {
-        await accessKeyService.value.deleteAccessKey(accessKey.id);
-        accessKeys.value = accessKeys.value.filter((a: AccessKeyDto) => a.id !== accessKey.id);
-        totalCount.value -= 1;
-      } finally {
-        loading.value = false;
-      }
+  if (!accessKey.id) {
+    return;
+  }
+  const confirmed = await openDeleteConfirmationModal(accessKey);
+  if (accessKeyService.value && confirmed) {
+    state.loading = true;
+    try {
+      await accessKeyService.value.deleteAccessKey(accessKey.id);
+      state.accessKeys = state.accessKeys.filter((a: AccessKeyDto) => a.id !== accessKey.id);
+      state.totalCount -= 1;
+    } finally {
+      state.loading = false;
     }
   }
 };
-const handleUpdateAccessKey = (accessKey: AccessKeyDto): void => {
-  const index = accessKeys.value.findIndex((accessKey: AccessKeyDto) => accessKey.id === accessKey.id);
+const updateAccessKey = (accessKey: AccessKeyDto): void => {
+  const index = state.accessKeys.findIndex((accessKey: AccessKeyDto) => accessKey.id === accessKey.id);
   if (index !== -1) {
-    accessKeys.value[index] = accessKey;
+    state.accessKeys[index] = accessKey;
   }
 };
-const handleAddAccessKey = (secret: string, accessKey: AccessKeyDto): void => {
+const addAccessKey = (secret: string, accessKey: AccessKeyDto): void => {
   if (accessKey.secret !== secret) {
-    accessKeyCreatedSecret.value = secret;
-    accessKeyCreated.value = accessKey;
+    state.accessKeyCreatedSecret = secret;
+    state.accessKeyCreated = accessKey;
   }
-  totalCount.value += 1;
-  accessKeys.value.push(accessKey);
+  state.totalCount += 1;
+  state.accessKeys.push(accessKey);
 };
 onMounted(async (): Promise<void> => {
   try {
+    state.loading = true;
     config.value = await fetchConfig(BASE_URL);
     if (process.env.NODE_ENV === "development") {
       accessKeyService.value = new AccessKeyService(BASE_URL, new DevAuthStrategy());
@@ -254,7 +264,7 @@ onMounted(async (): Promise<void> => {
   } catch (error) {
     handleError(error);
   } finally {
-    loading.value = false;
+    state.loading = false;
   }
 });
 onErrorCaptured((error): boolean => {

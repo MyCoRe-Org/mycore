@@ -1,7 +1,7 @@
 <template>
   <BaseModal
     v-if="accessKey"
-    :show="showModal"
+    :is-visible="isVisible"
     :title="$t('component.acl.accesskey.frontend.title.viewAccessKey')"
     ok-only
     scrollable
@@ -128,7 +128,7 @@ import { AccessKeyService } from "@/service/accesskey";
 
 const props = defineProps<{
   accessKeyService?: AccessKeyService;
-  showModal: boolean;
+  isVisible: boolean;
   availablePermissions: string[];
   reference?: string;
   accessKey?: AccessKeyDto;
@@ -136,7 +136,7 @@ const props = defineProps<{
 
 
 const emit = defineEmits<{
-  (event: "access-key-updated", accessKey: AccessKeyDto): void;
+  (event: "update-access-key", accessKey: AccessKeyDto): void;
   (event: "close"): void;
 }>();
 const rules = computed(() => ({
@@ -217,7 +217,7 @@ const handleUpdateAccessKey = async () => {
         }
         await props.accessKeyService.patchAccessKey(props.accessKey.id, accessKey);
         const updatedAccessKey = await props.accessKeyService.getAccessKey(props.accessKey.id);
-        emit('access-key-updated', updatedAccessKey);
+        emit('update-access-key', updatedAccessKey);
         handleClose(true);
       } catch (error) {
         handleError(error);

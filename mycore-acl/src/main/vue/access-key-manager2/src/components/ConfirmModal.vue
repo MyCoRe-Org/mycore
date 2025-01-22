@@ -1,6 +1,6 @@
 <template>
   <Modal
-    :show="visible"
+    :is-visible="isVisible"
     hide-header-close
     :ok-title="$t('component.acl.accesskey.frontend.button.yes')"
     :cancel-title="$t('component.acl.accesskey.frontend.button.no')"
@@ -15,9 +15,9 @@
 import { ref } from "vue";
 import Modal from "./BaseModal.vue";
 
-const visible = ref(false);
-const title = ref<string | null>(null);
-const message = ref<string | null>(null);
+const isVisible = ref(false);
+const title = ref<string>();
+const message = ref<string>();
 let resolvePromise: ((value: boolean) => void) | undefined;
 interface Ops {
   title: string;
@@ -26,21 +26,21 @@ interface Ops {
 const show = (ops: Ops): Promise<boolean> => {
   title.value = ops.title;
   message.value = ops.message;
-  visible.value = true;
+  isVisible.value = true;
   return new Promise<boolean>((resolve) => {
     resolvePromise = resolve;
   });
 };
 const ok = (): void => {
   if (resolvePromise) {
-    visible.value = false;
+    isVisible.value = false;
     resolvePromise(true);
     resolvePromise = undefined;
   }
 };
 const cancel = (): void => {
   if (resolvePromise) {
-    visible.value = false;
+    isVisible.value = false;
     resolvePromise(false);
     resolvePromise = undefined;
   }

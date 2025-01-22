@@ -55,7 +55,7 @@ const props = defineProps<{
   perPage: number;
 }>();
 const emit = defineEmits<{
-  (event: "page-changed", page: number): void;
+  (event: "change-page", page: number): void;
 }>();
 const totalPages = computed(() => Math.ceil(props.totalRows / props.perPage));
 const pages = computed(() => {
@@ -70,7 +70,7 @@ const pages = computed(() => {
 });
 const jumpToPage = (page: number) => {
   if (page > 0 && page <= totalPages.value && page !== props.currentPage) {
-    emit("page-changed", page);
+    emit("change-page", page);
   }
 };
 </script>

@@ -59,7 +59,6 @@ defineProps<{
   accessKeys: AccessKeyDto[];
 }>();
 
-
 const emit = defineEmits<{
   (event: "remove-access-key", index: number): void;
   (event: "view-access-key", index: number): void;
