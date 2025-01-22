@@ -159,7 +159,7 @@ public class MCRSolrCoreAdminCommands {
 
             if (core.getShardCount() > 1) {
                 solrConfiguration.put(SOLR_CORE_PREFIX + coreID + SOLR_CORE_SHARD_COUNT_SUFFIX,
-                    core.getShardCount() + "");
+                    Integer.toString(core.getShardCount()));
             }
 
             if (!core.getTypes().isEmpty()) {
