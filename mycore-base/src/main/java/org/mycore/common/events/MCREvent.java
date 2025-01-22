@@ -18,7 +18,7 @@
 
 package org.mycore.common.events;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -109,8 +109,8 @@ public class MCREvent {
 
     private String customEventType;
 
-    /** A hashtable to store event related, additional data */
-    private Map<String, Object> data = new Hashtable<>();
+    /** A map to store event related, additional data */
+    private Map<String, Object> data = new HashMap<>();
 
     /**
      * Creates a new event object of the given object type (object, file) and

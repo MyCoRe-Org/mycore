@@ -21,7 +21,6 @@ package org.mycore.mets.model.converter;
 import static java.util.stream.Collectors.toList;
 
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -81,7 +80,7 @@ public class MCRJSONSimpleModelConverter {
     }
 
     private static Map<String, MCRMetsFile> extractIdFileMap(List<MCRMetsPage> pages) {
-        final Map<String, MCRMetsFile> idFileMap = new Hashtable<>();
+        final Map<String, MCRMetsFile> idFileMap = new HashMap<>();
         pages.forEach(p -> p.getFileList().stream()
             .filter(file -> file.getUse().equals(MCRMetsModelHelper.ALTO_USE))
             .forEach(file -> idFileMap.put(file.getId(), file)));

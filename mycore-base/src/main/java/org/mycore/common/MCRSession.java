@@ -27,7 +27,7 @@ import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.ArrayDeque;
 import java.util.Collections;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -69,7 +69,7 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
     private static final URI DEFAULT_URI = URI.create("");
 
     /** A map storing arbitrary session data * */
-    private Map<Object, Object> map = new Hashtable<>();
+    private Map<Object, Object> map = new HashMap<>();
 
     @SuppressWarnings("unchecked")
     private Map.Entry<Object, Object>[] emptyEntryArray = new Map.Entry[0];
