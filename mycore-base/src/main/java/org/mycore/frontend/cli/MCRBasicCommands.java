@@ -63,7 +63,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 
 @MCRCommandGroup(name = "Basic Commands")
 public class MCRBasicCommands {
-    private static Logger LOGGER = LogManager.getLogger(MCRBasicCommands.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRBasicCommands.class);
 
     // default value as defined in src/main/resources/configdir.template/resources/META-INF/persistence.xml
     private static final String PERSISTENCE_DEFAULT_H2_URL =

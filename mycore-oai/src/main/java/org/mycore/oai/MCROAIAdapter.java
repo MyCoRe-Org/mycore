@@ -18,7 +18,6 @@
 package org.mycore.oai;
 
 import java.time.Instant;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,18 +46,16 @@ import org.mycore.oai.set.MCRSet;
 
 /**
  * Default MyCoRe {@link OAIAdapter} implementation.
- * 
+ *
  * @author Matthias Eichner
  */
 public class MCROAIAdapter implements OAIAdapter {
 
     protected static final Logger LOGGER = LogManager.getLogger(MCROAIAdapter.class);
 
-    protected static final ZoneId UTC_ZONE = ZoneId.of("UTC");
-
     public static final String PREFIX = "MCR.OAIDataProvider.";
 
-    public static int DEFAULT_PARTITION_SIZE;
+    public static final int DEFAULT_PARTITION_SIZE;
 
     protected String baseURL;
 
@@ -80,7 +77,7 @@ public class MCROAIAdapter implements OAIAdapter {
 
     /**
      * Initialize the adapter.
-     * 
+     *
      * @param baseURL
      *            baseURL of the adapter e.g. http://localhost:8291/oai2
      * @param oaiConfiguration

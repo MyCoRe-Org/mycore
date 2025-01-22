@@ -83,7 +83,7 @@ public class MCRLoginServlet extends MCRServlet {
         .map(s -> s.collect(Collectors.toList()))
         .orElse(Collections.emptyList());
 
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     protected static String getReturnURL(HttpServletRequest req) {
         String returnURL = req.getParameter(LOGIN_REDIRECT_URL_PARAMETER);

@@ -71,11 +71,11 @@ public class MCRTranslation {
 
     private static final Control CONTROL = new MCRCombinedResourceBundleControl();
 
-    private static boolean DEPRECATED_MESSAGES_PRESENT;
+    private static boolean deprecatedMessagesPresent;
 
-    private static Properties DEPRECATED_MAPPING = loadProperties();
+    private static final Properties DEPRECATED_MAPPING = loadProperties();
 
-    private static Set<String> AVAILABLE_LANGUAGES = loadAvailableLanguages();
+    private static final Set<String> AVAILABLE_LANGUAGES = loadAvailableLanguages();
 
     static {
         debug();
@@ -173,7 +173,7 @@ public class MCRTranslation {
             LOGGER.debug("Translation for {}={}", label, result);
         } catch (MissingResourceException mre) {
             // try to get new key if 'label' is deprecated
-            if (!DEPRECATED_MESSAGES_PRESENT) {
+            if (!deprecatedMessagesPresent) {
                 LOGGER.warn("Could not load resource '" + DEPRECATED_MESSAGES_PROPERTIES
                     + "' to check for depreacted I18N keys.");
             } else if (DEPRECATED_MAPPING.containsKey(label)) {
@@ -414,7 +414,7 @@ public class MCRTranslation {
                 return deprecatedMapping;
             }
             deprecatedMapping.load(propertiesStream);
-            DEPRECATED_MESSAGES_PRESENT = true;
+            deprecatedMessagesPresent = true;
         } catch (IOException e) {
             LOGGER.warn("Could not load resource '" + DEPRECATED_MESSAGES_PROPERTIES + "'.", e);
         }

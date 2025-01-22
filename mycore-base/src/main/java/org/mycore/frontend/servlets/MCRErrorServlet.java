@@ -55,9 +55,9 @@ public class MCRErrorServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger LOGGER = LogManager.getLogger(MCRErrorServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRErrorServlet.class);
 
-    private static MCRLayoutService LAYOUT_SERVICE = MCRLayoutService.instance();
+    private static final MCRLayoutService LAYOUT_SERVICE = MCRLayoutService.instance();
 
     /* (non-Javadoc)
      * @see jakarta.servlet.http.HttpServlet#service(jakarta.servlet.http.HttpServletRequest, jakarta.servlet.http.HttpServletResponse)

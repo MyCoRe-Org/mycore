@@ -57,7 +57,7 @@ import org.mycore.util.concurrent.MCRTransactionableRunnable;
  * expiration time. The time increases for each query call.
  *
  * <p>Due to token based querying it is not possible to set a current
- * position for the resumption token. Its always set to -1.</p>
+ * position for the resumption token. It's always set to -1.</p>
  *
  * @author Matthias Eichner
  */
@@ -67,7 +67,7 @@ public class MCROAISearchManager {
 
     protected static final String TOKEN_DELIMITER = "@";
 
-    protected static int MAX_AGE;
+    protected static final int MAX_AGE;
 
     protected Map<String, MCROAISearcher> resultMap;
 
@@ -79,7 +79,7 @@ public class MCROAISearchManager {
 
     protected int partitionSize;
 
-    private boolean runListRecordsParallel;
+    private final boolean runListRecordsParallel;
 
     static {
         String prefix = MCROAIAdapter.PREFIX + "ResumptionTokens.";

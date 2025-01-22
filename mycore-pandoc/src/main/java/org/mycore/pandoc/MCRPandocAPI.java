@@ -48,7 +48,7 @@ public class MCRPandocAPI {
         .orElse(Thread.currentThread().getContextClassLoader().getResource("lua").getPath() + "?.lua");
 
     private enum Action {
-        Reader, Writer
+        READER, WRITER
     }
 
     /**
@@ -79,8 +79,8 @@ public class MCRPandocAPI {
      * @throws MCRPandocException in case of unsuccessful call to Pandoc
      */
     public static String convert(String content, String importFormat, String outputFormat) {
-        String pandocArgs = "-f " + convertFormatToPath(Action.Reader, importFormat)
-            + " -t " + convertFormatToPath(Action.Writer, outputFormat);
+        String pandocArgs = "-f " + convertFormatToPath(Action.READER, importFormat)
+            + " -t " + convertFormatToPath(Action.WRITER, outputFormat);
         return call(pandocArgs, content);
     }
 

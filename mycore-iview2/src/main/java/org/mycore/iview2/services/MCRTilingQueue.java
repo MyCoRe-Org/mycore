@@ -45,7 +45,7 @@ import jakarta.persistence.TypedQuery;
 public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeable {
     @SuppressWarnings("PMD.LooseCoupling")
     private static MCRTilingQueue instance = new MCRTilingQueue();
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final Queue<MCRTileJob> preFetch;
 

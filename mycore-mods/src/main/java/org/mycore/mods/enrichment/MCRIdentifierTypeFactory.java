@@ -38,14 +38,21 @@ import org.mycore.common.config.MCRConfiguration2;
  */
 class MCRIdentifierTypeFactory {
 
-    private static String DEFAULT_XPATH = "mods:identifier[@type=\"%s\"]";
+    private static final String DEFAULT_XPATH = "mods:identifier[@type=\"%s\"]";
 
-    private static MCRIdentifierTypeFactory INSTANCE = new MCRIdentifierTypeFactory();
+    private static volatile MCRIdentifierTypeFactory instance;
 
-    private Map<String, MCRIdentifierType> id2type = new HashMap<>();
+    private final Map<String, MCRIdentifierType> id2type = new HashMap<>();
 
     static MCRIdentifierTypeFactory instance() {
-        return INSTANCE;
+        if(instance == null) {
+            synchronized (MCRIdentifierTypeFactory.class) {
+                if(instance == null) {
+                    instance = new MCRIdentifierTypeFactory();
+                }
+            }
+        }
+        return instance;
     }
 
     private MCRIdentifierTypeFactory() {

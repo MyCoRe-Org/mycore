@@ -44,21 +44,21 @@ import org.mycore.datamodel.niofs.MCRPath;
  */
 public final class MCRMETSGeneratorFactory {
 
-    private static MCRMETSGeneratorSelector GENERATOR_SELECTOR;
+    private static MCRMETSGeneratorSelector generatorSelector;
 
-    private static boolean IGNORE_METS_XML;
+    private static boolean ignoreMetsXml;
 
     static {
         // ignore mets.xml of the derivate by default
-        IGNORE_METS_XML = true;
+        ignoreMetsXml = true;
 
         // get selector
         Class<? extends MCRMETSGeneratorSelector> cn = MCRConfiguration2.<MCRMETSPropertyGeneratorSelector>getClass(
             "MCR.Component.MetsMods.Generator.Selector").orElse(MCRMETSPropertyGeneratorSelector.class);
         try {
-            GENERATOR_SELECTOR = cn.getDeclaredConstructor().newInstance();
+            generatorSelector = cn.getDeclaredConstructor().newInstance();
         } catch (Exception cause) {
-            GENERATOR_SELECTOR = new MCRMETSPropertyGeneratorSelector();
+            generatorSelector = new MCRMETSPropertyGeneratorSelector();
             throw new MCRException(
                 "Unable to instantiate " + cn + ". Please check the 'MCR.Component.MetsMods.Generator.Selector'."
                     + " Using default MCRMETSPropertyGeneratorSelector.",
@@ -89,10 +89,10 @@ public final class MCRMETSGeneratorFactory {
      * @throws MCRException the generator could not be instantiated
      */
     public static MCRMETSGenerator create(MCRPath derivatePath, Set<MCRPath> ignorePaths) throws MCRException {
-        MCRMETSGenerator generator = GENERATOR_SELECTOR.get(derivatePath);
+        MCRMETSGenerator generator = generatorSelector.get(derivatePath);
         if (generator instanceof MCRMETSAbstractGenerator abstractGenerator) {
             abstractGenerator.setDerivatePath(derivatePath);
-            if (IGNORE_METS_XML) {
+            if (ignoreMetsXml) {
                 ignorePaths.add(MCRPath.toMCRPath(derivatePath.resolve("mets.xml")));
             }
             abstractGenerator.setIgnorePaths(ignorePaths);
@@ -112,7 +112,7 @@ public final class MCRMETSGeneratorFactory {
      * @param ignore if the mets.xml should be added to the ignorePaths by default
      */
     public static void ignoreMetsXML(boolean ignore) {
-        IGNORE_METS_XML = ignore;
+        ignoreMetsXml = ignore;
     }
 
     /**
@@ -122,7 +122,7 @@ public final class MCRMETSGeneratorFactory {
      * @return true if the mets.xml is ignored.
      */
     public static boolean isMetsXMLIgnored() {
-        return IGNORE_METS_XML;
+        return ignoreMetsXml;
     }
 
     private static Optional<Mets> getOldMets(MCRPath derivatePath) throws IOException, JDOMException {
@@ -146,7 +146,7 @@ public final class MCRMETSGeneratorFactory {
      * @param selector the selector which determines which generator is chosen
      */
     public static synchronized void setSelector(MCRMETSGeneratorSelector selector) {
-        GENERATOR_SELECTOR = selector;
+        generatorSelector = selector;
     }
 
     /**
@@ -170,17 +170,17 @@ public final class MCRMETSGeneratorFactory {
      */
     public static class MCRMETSPropertyGeneratorSelector implements MCRMETSGeneratorSelector {
 
-        private static Class<? extends MCRMETSGenerator> METS_GENERATOR_CLASS;
+        private static Class<? extends MCRMETSGenerator> metsGeneratorClass;
 
         @Override
         public MCRMETSGenerator get(MCRPath derivatePath) {
             String cn = MCRConfiguration2.getString("MCR.Component.MetsMods.Generator")
                 .orElse(MCRMETSDefaultGenerator.class.getName());
             try {
-                if (METS_GENERATOR_CLASS == null || !cn.equals(METS_GENERATOR_CLASS.getName())) {
-                    METS_GENERATOR_CLASS = MCRClassTools.forName(cn);
+                if (metsGeneratorClass == null || !cn.equals(metsGeneratorClass.getName())) {
+                    metsGeneratorClass = MCRClassTools.forName(cn);
                 }
-                return METS_GENERATOR_CLASS.getDeclaredConstructor().newInstance();
+                return metsGeneratorClass.getDeclaredConstructor().newInstance();
             } catch (Exception cause) {
                 throw new MCRException("Unable to instantiate " + cn
                     + ". Please check the 'MCR.Component.MetsMods.Generator' property'.", cause);

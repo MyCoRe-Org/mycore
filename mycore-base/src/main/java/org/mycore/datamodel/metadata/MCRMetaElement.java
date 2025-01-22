@@ -61,7 +61,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     private static final String META_PACKAGE_NAME = "org.mycore.datamodel.metadata.";
 
     // logger
-    static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private Class<? extends MCRMetaInterface> clazz;
 
@@ -71,7 +71,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
 
     private boolean notinherit;
 
-    private List<MCRMetaInterface> list;
+    private final List<MCRMetaInterface> list;
 
     /**
      * This is the constructor of the MCRMetaElement class. The default language

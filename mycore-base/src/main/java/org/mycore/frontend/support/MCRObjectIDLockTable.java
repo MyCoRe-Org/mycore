@@ -33,7 +33,7 @@ public class MCRObjectIDLockTable implements MCRSessionListener {
 
     private static final MCRObjectIDLockTable SINGLETON = new MCRObjectIDLockTable();
 
-    private static Logger LOGGER = LogManager.getLogger(MCRObjectIDLockTable.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRObjectIDLockTable.class);
 
     private ConcurrentMap<MCRObjectID, MCRSession> lockMap;
 
@@ -72,7 +72,7 @@ public class MCRObjectIDLockTable implements MCRSessionListener {
     @Override
     public void sessionEvent(MCRSessionEvent event) {
         switch (event.getType()) {
-            case destroyed -> clearTable(event.getSession());
+            case DESTROYED -> clearTable(event.getSession());
             default -> LOGGER.debug("Skipping event: {}", event.getType());
         }
     }

@@ -91,18 +91,18 @@ public class MCRProcessableSupplier<R> extends MCRProcessableTask<Callable<R>> i
     @Override
     public R get() {
         try {
-            this.setStatus(MCRProcessableStatus.processing);
+            this.setStatus(MCRProcessableStatus.PROCESSING);
             this.startTime = Instant.now();
             R result = getTask().call();
-            this.setStatus(MCRProcessableStatus.successful);
+            this.setStatus(MCRProcessableStatus.SUCCESSFUL);
             return result;
         } catch (InterruptedException exc) {
             this.error = exc;
-            this.setStatus(MCRProcessableStatus.canceled);
+            this.setStatus(MCRProcessableStatus.CANCELED);
             throw new MCRException(this.error);
         } catch (Exception exc) {
             this.error = exc;
-            this.setStatus(MCRProcessableStatus.failed);
+            this.setStatus(MCRProcessableStatus.FAILED);
             throw new MCRException(this.error);
         }
     }

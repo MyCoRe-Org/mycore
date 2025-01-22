@@ -36,7 +36,7 @@ import org.mycore.common.processing.MCRProgressableListener;
 
 public class MCRProcessableSupplierTest extends MCRTestCase {
 
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static int PROGRESS_LISTENER_COUNTER;
 
@@ -71,7 +71,7 @@ public class MCRProcessableSupplierTest extends MCRTestCase {
         supplier.getFuture().get();
 
         // TESTS
-        assertEquals("the processable should be finished successful", MCRProcessableStatus.successful,
+        assertEquals("the processable should be finished successful", MCRProcessableStatus.SUCCESSFUL,
             supplier.getStatus());
         assertEquals("the progressable should be at 100", Integer.valueOf(100), supplier.getProgress());
         assertEquals("end", supplier.getProgressText());

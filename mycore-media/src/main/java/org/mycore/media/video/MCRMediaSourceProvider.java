@@ -78,16 +78,16 @@ public class MCRMediaSourceProvider {
         }
         List<MCRMediaSource> mediaSources = new ArrayList<>(4);
         getDashStream()
-            .map(s -> new MCRMediaSource(s, MCRMediaSourceType.dash_stream))
+            .map(s -> new MCRMediaSource(s, MCRMediaSourceType.DASH_STREAM))
             .ifPresent(mediaSources::add);
         userAgent.filter(MCRMediaSourceProvider::mayContainHLSStream).ifPresent(f -> getHLSStream()
-            .map(s -> new MCRMediaSource(s, MCRMediaSourceType.hls_stream))
+            .map(s -> new MCRMediaSource(s, MCRMediaSourceType.HLS_STREAM))
             .ifPresent(mediaSources::add));
         getRTMPStream()
-            .map(s -> new MCRMediaSource(s, MCRMediaSourceType.rtmp_stream))
+            .map(s -> new MCRMediaSource(s, MCRMediaSourceType.RTMP_STREAM))
             .ifPresent(mediaSources::add);
         mediaSources.add(
-            new MCRMediaSource(getPseudoStream(MCRObjectID.getInstance(derivateId), path), MCRMediaSourceType.mp4));
+            new MCRMediaSource(getPseudoStream(MCRObjectID.getInstance(derivateId), path), MCRMediaSourceType.MP4));
         this.sources = mediaSources;
     }
 

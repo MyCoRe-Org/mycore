@@ -18,8 +18,8 @@
 
 package org.mycore.common;
 
-import static org.mycore.common.events.MCRSessionEvent.Type.created;
-import static org.mycore.common.events.MCRSessionEvent.Type.destroyed;
+import static org.mycore.common.events.MCRSessionEvent.Type.CREATED;
+import static org.mycore.common.events.MCRSessionEvent.Type.DESTROYED;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -87,7 +87,7 @@ public class MCRSessionMgr {
      * called the first time for this session and thread.
      * Calling this method also unlocks the current Thread for MCRSession handling.
      *
-     * @see org.mycore.common.events.MCRSessionEvent.Type#activated
+     * @see org.mycore.common.events.MCRSessionEvent.Type#ACTIVATED
      */
     public static void setCurrentSession(MCRSession theSession) {
         if (hasCurrentSession()) {
@@ -111,14 +111,14 @@ public class MCRSessionMgr {
      * inside a Thread-pooling environment like Servlet engines. This method fires a "passivated" event, when called the
      * last time for this session and thread.
      *
-     * @see org.mycore.common.events.MCRSessionEvent.Type#passivated
+     * @see org.mycore.common.events.MCRSessionEvent.Type#PASSIVATED
      */
     public static void releaseCurrentSession() {
         //theThreadLocalSession maybe null if called after close()
         if (theThreadLocalSession != null && hasCurrentSession()) {
             MCRSession session = theThreadLocalSession.get();
             session.passivate();
-            MCRSession.LOGGER.debug("MCRSession released {}", session::getID);
+            LOGGER.debug("MCRSession released {}", session::getID);
             theThreadLocalSession.remove();
             isSessionAttached.remove();
             lock();
@@ -174,7 +174,7 @@ public class MCRSessionMgr {
     public static MCRSession getSession(String sessionID) {
         MCRSession s = sessions.get(sessionID);
         if (s == null) {
-            MCRSession.LOGGER.warn("MCRSession with ID {} not cached any more", sessionID);
+            LOGGER.warn("MCRSession with ID {} not cached any more", sessionID);
         }
         return s;
     }
@@ -184,11 +184,11 @@ public class MCRSessionMgr {
      * MCRSession constructor.
      *
      * @see MCRSession#MCRSession()
-     * @see org.mycore.common.events.MCRSessionEvent.Type#created
+     * @see org.mycore.common.events.MCRSessionEvent.Type#CREATED
      */
     static void addSession(MCRSession session) {
         sessions.put(session.getID(), session);
-        session.fireSessionEvent(created, session.concurrentAccess.get());
+        session.fireSessionEvent(CREATED, session.concurrentAccess.get());
     }
 
     /**
@@ -196,11 +196,11 @@ public class MCRSessionMgr {
      * invoked by MCRSession.close().
      *
      * @see MCRSession#close()
-     * @see org.mycore.common.events.MCRSessionEvent.Type#destroyed
+     * @see org.mycore.common.events.MCRSessionEvent.Type#DESTROYED
      */
     static void removeSession(MCRSession session) {
         sessions.remove(session.getID());
-        session.fireSessionEvent(destroyed, session.concurrentAccess.get());
+        session.fireSessionEvent(DESTROYED, session.concurrentAccess.get());
     }
 
     /**

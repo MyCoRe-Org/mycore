@@ -39,33 +39,34 @@ import org.xml.sax.XMLReader;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRXMLParserFactory {
-    private static boolean VALIDATE_BY_DEFAULT = MCRConfiguration2.getBoolean("MCR.XMLParser.ValidateSchema")
+
+    private static final boolean VALIDATE_BY_DEFAULT = MCRConfiguration2.getBoolean("MCR.XMLParser.ValidateSchema")
         .orElse(true);
 
-    private static XMLReaderJDOMFactory nonValidatingFactory = new MCRXMLReaderSAX2Factory(false);
+    private static final XMLReaderJDOMFactory NON_VALIDATING_FACTORY = new MCRXMLReaderSAX2Factory(false);
 
-    private static XMLReaderJDOMFactory validatingFactory = new MCRXMLReaderSAX2Factory(true);
+    private static final XMLReaderJDOMFactory VALIDATING_FACTORY = new MCRXMLReaderSAX2Factory(true);
 
-    private static ThreadLocal<MCRXMLParserImpl> nonValidating = ThreadLocal.withInitial(
-        () -> new MCRXMLParserImpl(nonValidatingFactory));
+    private static final ThreadLocal<MCRXMLParserImpl> NON_VALIDATING = ThreadLocal.withInitial(
+        () -> new MCRXMLParserImpl(NON_VALIDATING_FACTORY));
 
-    private static ThreadLocal<MCRXMLParserImpl> validating = ThreadLocal.withInitial(
-        () -> new MCRXMLParserImpl(validatingFactory));
+    private static final ThreadLocal<MCRXMLParserImpl> VALIDATING = ThreadLocal.withInitial(
+        () -> new MCRXMLParserImpl(VALIDATING_FACTORY));
 
-    private static ThreadLocal<MCRXMLParserImpl> nonValidatingSilent = ThreadLocal.withInitial(
-        () -> new MCRXMLParserImpl(nonValidatingFactory, true));
+    private static final ThreadLocal<MCRXMLParserImpl> NON_VALIDATING_SILENT = ThreadLocal.withInitial(
+        () -> new MCRXMLParserImpl(NON_VALIDATING_FACTORY, true));
 
-    private static ThreadLocal<MCRXMLParserImpl> validatingSilent = ThreadLocal.withInitial(
-        () -> new MCRXMLParserImpl(validatingFactory, true));
+    private static final ThreadLocal<MCRXMLParserImpl> VALIDATING_SILENT = ThreadLocal.withInitial(
+        () -> new MCRXMLParserImpl(VALIDATING_FACTORY, true));
 
     /** Returns a validating parser */
     public static MCRXMLParser getValidatingParser() {
-        return validating.get();
+        return VALIDATING.get();
     }
 
     /** Returns a non-validating parser */
     public static MCRXMLParser getNonValidatingParser() {
-        return nonValidating.get();
+        return NON_VALIDATING.get();
     }
 
     /**
@@ -74,7 +75,7 @@ public class MCRXMLParserFactory {
      * determine if the parser will validate or not. 
      */
     public static MCRXMLParser getParser() {
-        return VALIDATE_BY_DEFAULT ? validating.get() : nonValidating.get();
+        return VALIDATE_BY_DEFAULT ? VALIDATING.get() : NON_VALIDATING.get();
     }
 
     /** 
@@ -94,9 +95,9 @@ public class MCRXMLParserFactory {
      */
     public static MCRXMLParser getParser(boolean validate, boolean silent) {
         if (silent) {
-            return validate ? validatingSilent.get() : nonValidatingSilent.get();
+            return validate ? VALIDATING_SILENT.get() : NON_VALIDATING_SILENT.get();
         } else {
-            return validate ? validating.get() : nonValidating.get();
+            return validate ? VALIDATING.get() : NON_VALIDATING.get();
         }
     }
 

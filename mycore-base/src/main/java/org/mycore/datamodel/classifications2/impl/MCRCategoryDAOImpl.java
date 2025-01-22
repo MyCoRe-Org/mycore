@@ -63,13 +63,13 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     private static final int LEFT_START_VALUE = 0;
 
-    private static long LAST_MODIFIED = System.currentTimeMillis();
+    private static long lastModified = System.currentTimeMillis();
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String NAMED_QUERY_NAMESPACE = "MCRCategory.";
 
-    private static Map<String, Long> LAST_MODIFIED_MAP = new HashMap<>();
+    private static final Map<String, Long> LAST_MODIFIED_MAP = new HashMap<>();
 
     @Override
     public MCRCategory addCategory(MCRCategoryID parentID, MCRCategory category) {
@@ -563,11 +563,11 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     @Override
     public long getLastModified() {
-        return LAST_MODIFIED;
+        return lastModified;
     }
 
     private static void updateTimeStamp() {
-        LAST_MODIFIED = System.currentTimeMillis();
+        lastModified = System.currentTimeMillis();
     }
 
     private static MCRCategoryImpl buildCategoryFromPrefetchedList(List<MCRCategoryDTO> list, MCRCategoryID returnID) {

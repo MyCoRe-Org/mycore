@@ -105,11 +105,11 @@ public class MCRMetaHistoryItem implements Serializable {
     private static final long serialVersionUID = 1L;
 
     static MCRMetaHistoryItem createdNow(MCRObjectID id) {
-        return now(id, MCRMetadataHistoryEventType.Create);
+        return now(id, MCRMetadataHistoryEventType.CREATE);
     }
 
     static MCRMetaHistoryItem deletedNow(MCRObjectID id) {
-        return now(id, MCRMetadataHistoryEventType.Delete);
+        return now(id, MCRMetadataHistoryEventType.DELETE);
     }
 
     static MCRMetaHistoryItem now(MCRObjectID id, MCRMetadataHistoryEventType type) {

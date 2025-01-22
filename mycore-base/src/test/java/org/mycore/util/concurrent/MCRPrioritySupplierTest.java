@@ -35,7 +35,7 @@ import org.mycore.util.concurrent.processing.MCRProcessableFactory;
 
 public class MCRPrioritySupplierTest {
 
-    private static Logger LOGGER = LogManager.getLogger(MCRPrioritySupplierTest.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRPrioritySupplierTest.class);
 
     static int[] EXCPECTED = { 1, 10, 5, 4, 3, 2 };
 

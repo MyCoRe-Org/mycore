@@ -26,9 +26,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -48,7 +45,6 @@ import org.mycore.solr.index.file.MCRSolrFileIndexAccumulator;
  * @author shermann (Silvio Hermann)
  * */
 public class MCRMetsFileIndexAccumulator implements MCRSolrFileIndexAccumulator {
-    protected static Logger LOGGER = LogManager.getLogger(MCRMetsFileIndexAccumulator.class);
 
     @Override
     public void accumulate(SolrInputDocument solrInputDocument, Path path, BasicFileAttributes basicFileAttributes)

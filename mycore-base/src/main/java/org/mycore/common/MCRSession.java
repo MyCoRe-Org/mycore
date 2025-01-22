@@ -18,8 +18,8 @@
 
 package org.mycore.common;
 
-import static org.mycore.common.events.MCRSessionEvent.Type.activated;
-import static org.mycore.common.events.MCRSessionEvent.Type.passivated;
+import static org.mycore.common.events.MCRSessionEvent.Type.ACTIVATED;
+import static org.mycore.common.events.MCRSessionEvent.Type.PASSIVATED;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -85,7 +85,7 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
     ThreadLocal<AtomicInteger> currentThreadCount = ThreadLocal.withInitial(AtomicInteger::new);
 
     /** the logger */
-    static Logger LOGGER = LogManager.getLogger(MCRSession.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger(MCRSession.class.getName());
 
     /** The user ID of the session */
     private MCRUserInformation userInformation;
@@ -105,7 +105,7 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
     private long thisAccessTime;
     private long createTime;
 
-    private StackTraceElement[] constructingStackTrace;
+    private final StackTraceElement[] constructingStackTrace;
 
     private URI firstURI;
 
@@ -113,13 +113,13 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
 
     private URI lastURI;
 
-    private ThreadLocal<Throwable> lastActivatedStackTrace = new ThreadLocal<>();
+    private final ThreadLocal<Throwable> lastActivatedStackTrace = new ThreadLocal<>();
 
-    private ThreadLocal<Queue<Runnable>> onCommitTasks = ThreadLocal.withInitial(ArrayDeque::new);
+    private final ThreadLocal<Queue<Runnable>> onCommitTasks = ThreadLocal.withInitial(ArrayDeque::new);
 
-    private static ExecutorService COMMIT_SERVICE;
+    private static final ExecutorService COMMIT_SERVICE;
 
-    private static MCRUserInformation guestUserInformation = MCRSystemUserInformation.getGuestInstance();
+    private static final MCRUserInformation GUEST_USER_INFORMATION = MCRSystemUserInformation.getGuestInstance();
 
     static {
         ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("MCRSession-OnCommitService-#%d")
@@ -157,7 +157,7 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
      * 'MCR.Users.Guestuser.UserName'.
      */
     MCRSession() {
-        userInformation = guestUserInformation;
+        userInformation = GUEST_USER_INFORMATION;
         setCurrentLanguage(MCRConfiguration2.getString("MCR.Metadata.DefaultLang").orElse(MCRConstants.DEFAULT_LANG));
         accessCount = new AtomicInteger();
         concurrentAccess = new AtomicInteger();
@@ -346,7 +346,7 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
         accessCount.incrementAndGet();
         if (currentThreadCount.get().getAndIncrement() == 0) {
             lastActivatedStackTrace.set(new RuntimeException("This is for debugging purposes only"));
-            fireSessionEvent(activated, concurrentAccess.incrementAndGet());
+            fireSessionEvent(ACTIVATED, concurrentAccess.incrementAndGet());
         } else {
             MCRException e = new MCRException(
                 "Cannot activate a Session more than once per thread: " + currentThreadCount.get().get());
@@ -363,7 +363,7 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
     void passivate() {
         if (currentThreadCount.get().getAndDecrement() == 1) {
             lastActivatedStackTrace.set(null);
-            fireSessionEvent(passivated, concurrentAccess.decrementAndGet());
+            fireSessionEvent(PASSIVATED, concurrentAccess.decrementAndGet());
         } else {
             LOGGER.debug("deactivate currentThreadCount: {}", () -> currentThreadCount.get().get());
         }

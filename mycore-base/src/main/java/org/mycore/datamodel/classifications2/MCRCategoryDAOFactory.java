@@ -30,10 +30,10 @@ import org.mycore.common.config.MCRConfiguration2;
 public class MCRCategoryDAOFactory {
 
     /**
-     * Returns an instance of a MCRCategoryDAO implementator.
+     * Returns an instance of a MCRCategoryDAO implementation.
      */
     public static MCRCategoryDAO getInstance() {
-        return Objects.requireNonNull(MCRCategoryDAOHolder.INSTANCE,
+        return Objects.requireNonNull(MCRCategoryDAOHolder.instance,
             "MCRCategoryDAO cannot be NULL - There is a problem with the loading order of classes");
     }
 
@@ -44,13 +44,13 @@ public class MCRCategoryDAOFactory {
      * @param daoClass new dao class
      */
     public static synchronized void set(Class<? extends MCRCategoryDAO> daoClass) throws ReflectiveOperationException {
-        MCRCategoryDAOHolder.INSTANCE = daoClass.getDeclaredConstructor().newInstance();
+        MCRCategoryDAOHolder.instance = daoClass.getDeclaredConstructor().newInstance();
     }
 
-    // encapsulate the INSTANCE in an inner static class to avoid issues with class loading order
+    // encapsulate the instance in an inner static class to avoid issues with class loading order
     // this is known as "Bill Pugh singleton"
     private static class MCRCategoryDAOHolder {
-        private static MCRCategoryDAO INSTANCE = MCRConfiguration2.getInstanceOfOrThrow(
+        private static MCRCategoryDAO instance = MCRConfiguration2.getInstanceOfOrThrow(
             MCRCategoryDAO.class, "MCR.Category.DAO");
     }
 

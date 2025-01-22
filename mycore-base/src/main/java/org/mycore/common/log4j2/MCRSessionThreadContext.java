@@ -42,13 +42,13 @@ public class MCRSessionThreadContext implements MCRSessionListener {
     @Override
     public void sessionEvent(MCRSessionEvent event) {
         switch (event.getType()) {
-            case activated -> {
+            case ACTIVATED -> {
                 ThreadContext.put("ipAddress", event.getSession().getCurrentIP());
                 ThreadContext.put("loginId", event.getSession().getUserInformation().getUserID());
                 ThreadContext.put("mcrSession", event.getSession().getID());
                 ThreadContext.put("language", event.getSession().getCurrentLanguage());
             }
-            case passivated -> ThreadContext.clearMap();
+            case PASSIVATED -> ThreadContext.clearMap();
             default -> {
             }
         }

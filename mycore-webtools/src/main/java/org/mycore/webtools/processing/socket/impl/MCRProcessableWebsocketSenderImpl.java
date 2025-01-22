@@ -148,9 +148,9 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
      */
     private static class AsyncSenderHelper {
 
-        private static Logger LOGGER = LogManager.getLogger();
+        private static final Logger LOGGER = LogManager.getLogger();
 
-        private static ExecutorService SERVICE;
+        private static final ExecutorService SERVICE;
 
         static {
             SERVICE = Executors.newSingleThreadExecutor();

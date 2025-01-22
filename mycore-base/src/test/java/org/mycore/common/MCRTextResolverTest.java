@@ -91,9 +91,9 @@ public class MCRTextResolverTest extends MCRTestCase {
         resolver.addVariable("var1", "test1 & [{var2}]");
         resolver.addVariable("var2", "test2");
         assertEquals("test1 & test2", resolver.resolve("{var1}"));
-        resolver.setResolveDepth(ResolveDepth.NoVariables);
+        resolver.setResolveDepth(ResolveDepth.NO_VARIABLES);
         assertEquals("test1 & [{var2}]", resolver.resolve("{var1}"));
-        assertEquals(ResolveDepth.NoVariables, resolver.getResolveDepth());
+        assertEquals(ResolveDepth.NO_VARIABLES, resolver.getResolveDepth());
     }
 
     @Test

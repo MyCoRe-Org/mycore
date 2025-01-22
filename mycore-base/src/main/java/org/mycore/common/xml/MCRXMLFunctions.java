@@ -125,7 +125,7 @@ public class MCRXMLFunctions {
             Pattern.DOTALL);
 
     private static final Logger LOGGER = LogManager.getLogger(MCRXMLFunctions.class);
-    public static volatile MimetypesFileTypeMap MIMETYPE_MAP;
+    public static volatile MimetypesFileTypeMap mimetypeMap;
 
     public static Node document(String uri) throws JDOMException, IOException, TransformerException {
         MCRSourceContent sourceContent = MCRSourceContent.getInstance(uri);
@@ -532,15 +532,15 @@ public class MCRXMLFunctions {
             return "application/octet-stream";
         }
 
-        if (MIMETYPE_MAP == null) {
+        if (mimetypeMap == null) {
             synchronized (MCRXMLFunctions.class) {
-                if (MIMETYPE_MAP == null) {
-                    MIMETYPE_MAP = new MimetypesFileTypeMap();
+                if (mimetypeMap == null) {
+                    mimetypeMap = new MimetypesFileTypeMap();
                 }
             }
         }
 
-        return MIMETYPE_MAP.getContentType(f.toLowerCase(Locale.ROOT));
+        return mimetypeMap.getContentType(f.toLowerCase(Locale.ROOT));
     }
 
     /**

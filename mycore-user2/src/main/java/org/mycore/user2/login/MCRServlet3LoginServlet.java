@@ -49,7 +49,7 @@ import jakarta.xml.bind.JAXBException;
 public class MCRServlet3LoginServlet extends MCRContainerLoginServlet {
     private static final long serialVersionUID = 1L;
 
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public void init() throws ServletException {

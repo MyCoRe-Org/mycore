@@ -49,7 +49,7 @@ public class MCRXMLResource {
 
     private static MCRXMLResource instance = new MCRXMLResource();
 
-    private static Logger LOGGER = LogManager.getLogger(MCRXMLResource.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRXMLResource.class);
 
     private MCRXMLResource() {
     }

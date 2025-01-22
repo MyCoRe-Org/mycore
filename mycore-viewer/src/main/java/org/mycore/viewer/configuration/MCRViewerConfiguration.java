@@ -68,19 +68,19 @@ import jakarta.xml.bind.annotation.XmlValue;
  */
 public class MCRViewerConfiguration {
 
-    private static Logger LOGGER = LogManager.getLogger(MCRViewerConfiguration.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRViewerConfiguration.class);
 
     public enum ResourceType {
-        script, module, css
+        SCRIPT, MODULE, CSS
     }
 
-    private Multimap<ResourceType, String> resources;
+    private final Multimap<ResourceType, String> resources;
 
-    private Map<String, Object> properties;
+    private final Map<String, Object> properties;
 
-    private static boolean DEBUG_MODE;
+    private static final boolean DEBUG_MODE;
 
-    private static Pattern REQUEST_PATH_PATTERN;
+    private static final Pattern REQUEST_PATH_PATTERN;
 
     static {
         DEBUG_MODE = Boolean.parseBoolean(MCRConfiguration2.getString("MCR.Viewer.DeveloperMode").orElse("false"));
@@ -194,7 +194,7 @@ public class MCRViewerConfiguration {
      * Adds a new javascript file which should be included by the image viewer.
      */
     public void addScript(final String url, boolean isModule) {
-        this.resources.put(isModule ? ResourceType.module : ResourceType.script, url);
+        this.resources.put(isModule ? ResourceType.MODULE : ResourceType.SCRIPT, url);
     }
 
     /**
@@ -259,7 +259,7 @@ public class MCRViewerConfiguration {
      * @param url the url to add e.g. baseURL + "modules/iview2/css/my.css"
      */
     public void addCSS(final String url) {
-        this.resources.put(ResourceType.css, url);
+        this.resources.put(ResourceType.CSS, url);
     }
 
     /**

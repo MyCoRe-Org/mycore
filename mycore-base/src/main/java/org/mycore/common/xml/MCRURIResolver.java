@@ -134,9 +134,9 @@ public final class MCRURIResolver implements URIResolver {
 
     private static final Marker UNIQUE_MARKER = MarkerManager.getMarker("tryResolveXML");
 
-    private static Map<String, URIResolver> SUPPORTED_SCHEMES;
+    private static Map<String, URIResolver> supportedSchemes;
 
-    private static MCRResolverProvider EXT_RESOLVER;
+    private static MCRResolverProvider extResolver;
 
     private static MCRURIResolver singleton;
 
@@ -152,8 +152,8 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     public static void reInit() {
-        EXT_RESOLVER = getExternalResolverProvider();
-        SUPPORTED_SCHEMES = Collections.unmodifiableMap(getResolverMapping());
+        extResolver = getExternalResolverProvider();
+        supportedSchemes = Collections.unmodifiableMap(getResolverMapping());
     }
 
     private static MCRResolverProvider getExternalResolverProvider() {
@@ -220,7 +220,7 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     private static Map<String, URIResolver> getResolverMapping() {
-        final Map<String, URIResolver> extResolverMapping = EXT_RESOLVER.getURIResolverMapping();
+        final Map<String, URIResolver> extResolverMapping = extResolver.getURIResolverMapping();
         extResolverMapping.putAll(new MCRModuleResolverProvider().getURIResolverMapping());
         // set Map to final size with loadfactor: full
         Map<String, URIResolver> supportedSchemes = new HashMap<>(10 + extResolverMapping.size(), 1);
@@ -311,7 +311,7 @@ public final class MCRURIResolver implements URIResolver {
 
         String scheme = getScheme(href, base);
 
-        URIResolver uriResolver = SUPPORTED_SCHEMES.get(scheme);
+        URIResolver uriResolver = supportedSchemes.get(scheme);
         if (uriResolver != null) {
             Source resolved = uriResolver.resolve(href, base);
             if (resolved == null) {
@@ -359,14 +359,14 @@ public final class MCRURIResolver implements URIResolver {
 
         final String finalUri = saneBaseUri + saneHref;
         LOGGER.debug("Trying to resolve {} from uri {}", saneHref, finalUri);
-        Source newResolveMethodResult = SUPPORTED_SCHEMES.get("resource").resolve(finalUri, base);
+        Source newResolveMethodResult = supportedSchemes.get("resource").resolve(finalUri, base);
         if (newResolveMethodResult != null) {
             return newResolveMethodResult;
         }
 
         // new relative include did not work, now fall back to old behaviour and print a warning if it works
         final String xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
-        Source oldResolveMethodResult = SUPPORTED_SCHEMES.get("resource")
+        Source oldResolveMethodResult = supportedSchemes.get("resource")
             .resolve("resource:" + xslFolder + "/" + href, base);
         if (oldResolveMethodResult != null) {
             LOGGER.warn(UNIQUE_MARKER,
@@ -425,8 +425,8 @@ public final class MCRURIResolver implements URIResolver {
 
     @Deprecated
     URIResolver getResolver(String scheme) {
-        if (SUPPORTED_SCHEMES.containsKey(scheme)) {
-            return SUPPORTED_SCHEMES.get(scheme);
+        if (supportedSchemes.containsKey(scheme)) {
+            return supportedSchemes.get(scheme);
         }
         String msg = "Unsupported scheme type: " + scheme;
         throw new MCRUsageException(msg);
@@ -798,11 +798,11 @@ public final class MCRURIResolver implements URIResolver {
 
         private static MCRCache<String, Element> categoryCache;
 
-        private static MCRCategoryDAO DAO;
+        private static MCRCategoryDAO dao;
 
         static {
             try {
-                DAO = MCRCategoryDAOFactory.getInstance();
+                dao = MCRCategoryDAOFactory.getInstance();
                 categoryCache = new MCRCache<>(
                     MCRConfiguration2.getInt(CONFIG_PREFIX + "Classification.CacheSize").orElse(1000),
                     "URIResolver categories");
@@ -829,7 +829,7 @@ public final class MCRURIResolver implements URIResolver {
 
         private static long getSystemLastModified() {
             long xmlLastModified = MCRXMLMetadataManager.instance().getLastModified();
-            long classLastModified = DAO.getLastModified();
+            long classLastModified = dao.getLastModified();
             return Math.max(xmlLastModified, classLastModified);
         }
 
@@ -916,9 +916,9 @@ public final class MCRURIResolver implements URIResolver {
             LOGGER.debug("categoryCache entry invalid or not found: start MCRClassificationQuery");
             if (axis.equals("children")) {
                 if (!categ.isEmpty()) {
-                    cl = DAO.getCategory(new MCRCategoryID(classID, categ), levels);
+                    cl = dao.getCategory(new MCRCategoryID(classID, categ), levels);
                 } else {
-                    cl = DAO.getCategory(MCRCategoryID.rootID(classID), levels);
+                    cl = dao.getCategory(MCRCategoryID.rootID(classID), levels);
                 }
             } else if (axis.equals("parents")) {
                 if (categ.isEmpty()) {
@@ -928,7 +928,7 @@ public final class MCRURIResolver implements URIResolver {
                             + "of uri for retrieval of classification: "
                             + uri);
                 }
-                cl = DAO.getRootCategory(new MCRCategoryID(classID, categ), levels);
+                cl = dao.getRootCategory(new MCRCategoryID(classID, categ), levels);
             }
             if (cl == null) {
                 return null;

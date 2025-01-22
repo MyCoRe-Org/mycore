@@ -81,7 +81,7 @@ import jakarta.ws.rs.core.UriInfo;
 public class MCRRestAPIUploadHelper {
     private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIUploadHelper.class);
 
-    private static java.nio.file.Path UPLOAD_DIR = Paths
+    private static final java.nio.file.Path UPLOAD_DIR = Paths
         .get(MCRConfiguration2.getStringOrThrow("MCR.RestAPI.v1.Upload.Directory"));
 
     static {

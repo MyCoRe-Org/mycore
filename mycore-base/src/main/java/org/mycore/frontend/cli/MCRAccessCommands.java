@@ -53,7 +53,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 @MCRCommandGroup(name = "Access Commands")
 public class MCRAccessCommands extends MCRAbstractCommands {
     /** The logger */
-    private static Logger LOGGER = LogManager.getLogger(MCRAccessCommands.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger(MCRAccessCommands.class.getName());
 
     /**
      * This method deletes the old permissions (if given any) and sets the new

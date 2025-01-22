@@ -33,7 +33,7 @@ public class MCRTestCronJob extends MCRCronjob {
 
     @Override
     public void runJob() {
-        getProcessable().setStatus(MCRProcessableStatus.processing);
+        getProcessable().setStatus(MCRProcessableStatus.PROCESSING);
         getProcessable().setProgress(0);
 
         for (int i = 0; i < getN(); i++) {

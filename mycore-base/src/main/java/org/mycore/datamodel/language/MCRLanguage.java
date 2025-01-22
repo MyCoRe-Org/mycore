@@ -112,7 +112,7 @@ public class MCRLanguage {
 
     @Override
     public String toString() {
-        return getCode(MCRLanguageCodeType.xmlCode);
+        return getCode(MCRLanguageCodeType.XML_CODE);
     }
 
     public Locale getLocale() {

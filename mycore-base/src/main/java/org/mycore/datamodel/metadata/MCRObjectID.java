@@ -60,7 +60,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      */
     public static final int MAX_LENGTH = 64;
 
-    private static NumberFormat NUMBER_FORMAT = initNumberFormat();
+    private static NumberFormat numberFormat = initNumberFormat();
 
     private static final Logger LOGGER = LogManager.getLogger(MCRObjectID.class);
 
@@ -163,8 +163,8 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         if (number < 0) {
             throw new IllegalArgumentException("number must be non negative integer");
         }
-        synchronized (NUMBER_FORMAT) {
-            return projectID + '_' + type.toLowerCase(Locale.ROOT) + '_' + NUMBER_FORMAT.format(number);
+        synchronized (numberFormat) {
+            return projectID + '_' + type.toLowerCase(Locale.ROOT) + '_' + numberFormat.format(number);
         }
     }
 
@@ -271,8 +271,8 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      * @return the string of the number
      */
     public String getNumberAsString() {
-        synchronized (NUMBER_FORMAT) {
-            return NUMBER_FORMAT.format(numberPart);
+        synchronized (numberFormat) {
+            return numberFormat.format(numberPart);
         }
     }
 

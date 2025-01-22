@@ -58,7 +58,7 @@ public interface MCRProcessable extends MCRListenableProgressable {
      * @return true if this task is just created.
      */
     default boolean isCreated() {
-        return MCRProcessableStatus.created.equals(getStatus());
+        return MCRProcessableStatus.CREATED.equals(getStatus());
     }
 
     /**
@@ -67,7 +67,7 @@ public interface MCRProcessable extends MCRListenableProgressable {
      * @return true if this task is processing
      */
     default boolean isProcessing() {
-        return MCRProcessableStatus.processing.equals(getStatus());
+        return MCRProcessableStatus.PROCESSING.equals(getStatus());
     }
 
     /**
@@ -76,7 +76,7 @@ public interface MCRProcessable extends MCRListenableProgressable {
      * @return true if this task is cancelled
      */
     default boolean isCanceled() {
-        return MCRProcessableStatus.canceled.equals(getStatus());
+        return MCRProcessableStatus.CANCELED.equals(getStatus());
     }
 
     /**
@@ -86,7 +86,7 @@ public interface MCRProcessable extends MCRListenableProgressable {
      * @return true if the process failed
      */
     default boolean isFailed() {
-        return MCRProcessableStatus.failed.equals(getStatus());
+        return MCRProcessableStatus.FAILED.equals(getStatus());
     }
 
     /**
@@ -95,7 +95,7 @@ public interface MCRProcessable extends MCRListenableProgressable {
      * @return true if this task was successful
      */
     default boolean isSuccessful() {
-        return MCRProcessableStatus.successful.equals(getStatus());
+        return MCRProcessableStatus.SUCCESSFUL.equals(getStatus());
     }
 
     /**

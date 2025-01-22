@@ -58,20 +58,20 @@ class MCRSessionContext implements MCRSessionListener {
         MCRSession mcrSession = event.getSession();
         EntityManager currentEntityManager;
         switch (event.getType()) {
-            case activated:
+            case ACTIVATED:
                 if (event.getConcurrentAccessors() <= 1) {
                     LOGGER.debug(() -> "First Thread to access " + mcrSession);
                 }
                 break;
-            case passivated:
+            case PASSIVATED:
                 currentEntityManager = unbind();
                 autoCloseSession(currentEntityManager);
                 break;
-            case destroyed:
+            case DESTROYED:
                 currentEntityManager = unbind();
                 autoCloseSession(currentEntityManager);
                 break;
-            case created:
+            case CREATED:
                 break;
             default:
                 break;

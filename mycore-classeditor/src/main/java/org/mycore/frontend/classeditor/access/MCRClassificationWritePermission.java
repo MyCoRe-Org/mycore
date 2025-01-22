@@ -42,7 +42,7 @@ import jakarta.ws.rs.core.Response.Status;
 public class MCRClassificationWritePermission implements MCRResourceAccessChecker {
     public static final String PERMISSION_CREATE = "create-class";
 
-    private static Logger LOGGER = LogManager.getLogger(MCRClassificationWritePermission.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRClassificationWritePermission.class);
 
     /* (non-Javadoc)
      * @see org.mycore.frontend.jersey.filter.access.MCRResourceAccessChecker

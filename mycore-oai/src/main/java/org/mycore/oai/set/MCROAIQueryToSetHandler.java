@@ -32,7 +32,7 @@ import org.mycore.common.config.MCRConfigurationException;
 
 public class MCROAIQueryToSetHandler extends MCROAISolrSetHandler {
 
-    private static Pattern SIMPLE_PARAMETER_QUERY = Pattern.compile("^(?<field>[^:]+):\\{setSpec\\}$");
+    private static final Pattern SIMPLE_PARAMETER_QUERY = Pattern.compile("^(?<field>[^:]+):\\{setSpec\\}$");
 
     private static final String SET_SPEC_PARAMETER = "{setSpec}";
 

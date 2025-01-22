@@ -141,7 +141,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
 
     private static final long serialVersionUID = -7431317191711000317L;
 
-    private static Logger LOGGER = LogManager.getLogger(MCRCategoryImpl.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRCategoryImpl.class);
 
     private int left;
     private int right;

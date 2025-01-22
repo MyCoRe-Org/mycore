@@ -139,7 +139,7 @@ public class MCRCronjobManager implements MCRShutdownHandler.Closeable {
     }
 
     private static class MCRCronjobManagerInstanceHelper {
-        public static MCRCronjobManager INSTANCE = new MCRCronjobManager();
+        public static final MCRCronjobManager INSTANCE = new MCRCronjobManager();
     }
 
 }

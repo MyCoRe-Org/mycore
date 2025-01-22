@@ -43,7 +43,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 public final class MCRGoogleSitemapCommands extends MCRAbstractCommands {
 
     /** The logger */
-    private static Logger LOGGER = LogManager.getLogger(MCRGoogleSitemapCommands.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger(MCRGoogleSitemapCommands.class.getName());
 
     /**
      * The build and store method.
