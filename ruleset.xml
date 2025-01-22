@@ -65,10 +65,7 @@
   <!--
   <rule ref="category/java/bestpractices.xml/ReplaceHashtableWithMap"/>
   -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/bestpractices.xml/ReplaceVectorWithList"/>
-  -->
   <rule ref="category/java/bestpractices.xml/SimplifiableTestAssertion"/>
   <rule ref="category/java/bestpractices.xml/NonExhaustiveSwitch"/>
   <!-- TODO: Create PR to fix this rule -->
