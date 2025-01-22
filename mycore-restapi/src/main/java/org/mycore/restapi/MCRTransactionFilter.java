@@ -32,7 +32,7 @@ import jakarta.ws.rs.container.ContainerRequestFilter;
 @Priority(Priorities.USER)
 public class MCRTransactionFilter implements ContainerRequestFilter {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRTransactionFilter.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static final String PROP_REQUIRE_TRANSACTION = "mcr:jpaTrans";
 
@@ -45,12 +45,14 @@ public class MCRTransactionFilter implements ContainerRequestFilter {
         if (MCRTransactionManager.hasActiveTransactions()) {
             LOGGER.debug("Filter scoped JPA transaction is active.");
             if (MCRTransactionManager.hasRollbackOnlyTransactions()) {
+                InternalServerErrorException internalServerErrorException =
+                    new InternalServerErrorException("Transaction rollback was required.");
                 try {
                     MCRTransactionManager.rollbackTransactions();
                 } catch(Exception exc) {
-                    LOGGER.error("Error rolling back transactions.", exc);
+                    internalServerErrorException.addSuppressed(exc);
                 }
-                throw new InternalServerErrorException("Transaction rollback was required.");
+                throw internalServerErrorException;
             }
             MCRTransactionManager.commitTransactions();
         }
