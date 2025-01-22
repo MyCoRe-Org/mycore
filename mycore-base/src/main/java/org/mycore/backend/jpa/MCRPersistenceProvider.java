@@ -68,7 +68,8 @@ public class MCRPersistenceProvider implements PersistenceProvider {
     };
 
     public MCRPersistenceProvider() {
-        persistenceUnitInitializer = MCRConfiguration2.getInstances(JPA_PERSISTENCE_UNIT_PROPERTY_NAME);
+        persistenceUnitInitializer = MCRConfiguration2.getInstances(MCRPersistenceUnitDescriptor.class,
+            JPA_PERSISTENCE_UNIT_PROPERTY_NAME);
         LOGGER.info("Found {} persistence units [{}]", persistenceUnitInitializer::size,
             () -> String.join(";", persistenceUnitInitializer.keySet()));
     }

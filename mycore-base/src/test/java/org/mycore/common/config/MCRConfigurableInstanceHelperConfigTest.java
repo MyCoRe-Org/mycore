@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 
 import org.junit.Test;
@@ -140,7 +141,7 @@ public class MCRConfigurableInstanceHelperConfigTest extends MCRTestCase {
     @Test
     public void test() {
 
-        Map<String, ?> instances = MCRConfiguration2.getInstances(INSTANCE_NAME_PREFIX);
+        Map<String, Callable<Object>> instances = MCRConfiguration2.getInstances(Object.class, INSTANCE_NAME_PREFIX);
         assertEquals("Except two instances", 2, instances.size());
         assertTrue("Expected key " + INSTANCE_1_KEY + " to be present", instances.containsKey(INSTANCE_1_KEY));
         assertTrue("Expected key " + INSTANCE_2_KEY + " to be present", instances.containsKey(INSTANCE_2_KEY));

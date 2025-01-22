@@ -74,17 +74,13 @@ public class MCRSolrConfigSetHelper {
      * @return A list of config sets.
      */
     public static Map<String, MCRSolrConfigSetProvider> getLocalConfigSets() {
-        Map<String, Callable<Object>> instances = MCRConfiguration2.getInstances(CONFIG_SET_PROPERTY_PREFIX);
+        Map<String, Callable<MCRSolrConfigSetProvider>> instances = MCRConfiguration2.getInstances(
+            MCRSolrConfigSetProvider.class, CONFIG_SET_PROPERTY_PREFIX);
         Map<String, MCRSolrConfigSetProvider> configSets = new HashMap<>(instances.size());
 
         instances.forEach((name, supplier) -> {
             try {
-                Object cs = supplier.call();
-                if (cs instanceof MCRSolrConfigSetProvider configSet) {
-                    configSets.put(name, configSet);
-                } else {
-                    throw new MCRConfigurationException("Invalid config set instance " + name);
-                }
+                configSets.put(name, supplier.call());
             } catch (Exception e) {
                 throw new MCRConfigurationException("Error while initializing config set " + name, e);
             }
