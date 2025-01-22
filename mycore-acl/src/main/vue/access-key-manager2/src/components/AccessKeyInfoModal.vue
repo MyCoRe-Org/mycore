@@ -6,7 +6,7 @@
     ok-only
     scrollable
     :busy="busy"
-    @close="handleClose"
+    @close="close"
   >
     <div
       v-if="errorMessage"
@@ -104,7 +104,7 @@
         type="button"
         class="btn btn-primary"
         :disabled="busy || v.$invalid"
-        @click="handleUpdateAccessKey"
+        @click="updateAccessKey"
       >
         <span
           v-if="busy"
@@ -117,7 +117,7 @@
     </template>
   </BaseModal>
 </template>
-<!-- TODO fix delete date issue -->
+<!-- TODO fix delete date issue in endpoint -->
 <script setup lang="ts">
 import { computed, ref, onErrorCaptured, watch } from "vue";
 import { AccessKeyDto, PartialUpdateAccessKeyDto } from "@/dtos/accesskey";
@@ -134,18 +134,13 @@ const props = defineProps<{
   accessKey?: AccessKeyDto;
 }>();
 
-
 const emit = defineEmits<{
   (event: "update-access-key", accessKey: AccessKeyDto): void;
   (event: "close"): void;
 }>();
 const rules = computed(() => ({
-  reference: {
-    required,
-  },
-  type: {
-    required,
-  },
+  reference: { required },
+  type: { required },
 }));
 const errorMessage = ref<string | undefined>(undefined);
 const busy = ref<boolean>(false);
@@ -167,58 +162,59 @@ const form = ref<FormData>({
 });
 
 const v = useVuelidate(rules, form);
-watch(
-  () => props.accessKey,
-  (newAccessKey: AccessKeyDto | undefined) => {
-    if (newAccessKey) {
-      form.value.reference = newAccessKey.reference;
-      form.value.type = newAccessKey.type;
-      form.value.expiration = newAccessKey.expiration
+watch( () => props.accessKey, (newAccessKey: AccessKeyDto | undefined) => {
+  if (newAccessKey) {
+    form.value = {
+      reference: newAccessKey.reference,
+      type: newAccessKey.type,
+      expiration: newAccessKey.expiration
         ? new Date(newAccessKey.expiration).toISOString().slice(0, 10)
-        : undefined;
-      form.value.comment = newAccessKey.comment || undefined;
-      form.value.isActive = newAccessKey.isActive;
-    }
-  },
-  { deep: true }
-);
+        : undefined,
+      comment: newAccessKey.comment,
+      isActive: newAccessKey.isActive,
+    };
+  }
+}, { deep: true });
 const handleError = (error: unknown) => {
   errorMessage.value =
     error instanceof Error ? error.message : "component.acl.accesskey.frontend.error.fatal";
 };
-const handleClose = (force: boolean) => {
+const close = (force: boolean) => {
   if (force || !busy.value) {
     emit("close");
   }
 };
-const handleUpdateAccessKey = async () => {
+const buildAccessKeyPayload = (): PartialUpdateAccessKeyDto => {
+  const accessKey: PartialUpdateAccessKeyDto = {};
+  if (form.value.reference !== props.accessKey?.reference) {
+    accessKey.reference = form.value.reference;
+  } 
+  if (form.value.comment !== props.accessKey?.comment) {
+    accessKey.comment = form.value.comment;
+  }
+  if (form.value.type !== props.accessKey?.type) {
+    accessKey.type = form.value.type;
+  }
+  // TODO fix expiration compare
+  if (form.value.expiration !== props.accessKey?.expiration) {
+    accessKey.expiration = form.value.expiration ? Math.floor(new Date(form.value.expiration).getTime()) : null;
+  } 
+  if (form.value.isActive !== props.accessKey?.isActive) {
+    accessKey.isActive = form.value.isActive;
+  }
+  return accessKey;
+};
+const updateAccessKey = async () => {
   if (props.accessKeyService && !busy.value) {
     v.value.$validate();
     if (!v.value.$invalid && props.accessKey && props.accessKey.id) {
       busy.value = true;
+      const accessKey: PartialUpdateAccessKeyDto = buildAccessKeyPayload();
       try {
-        const accessKey: PartialUpdateAccessKeyDto = {};
-        if (form.value.reference !== props.accessKey.reference) {
-          accessKey.reference = form.value.reference;
-        }
-        if (form.value.comment !== props.accessKey.comment) {
-          accessKey.comment = form.value.comment;
-        }
-        if (form.value.type !== props.accessKey.type) {
-          accessKey.type = form.value.type;
-        }
-        if (form.value.expiration !== props.accessKey.expiration) {
-          accessKey.expiration = form.value.expiration
-            ? Math.floor(new Date(form.value.expiration).getTime())
-            : null;
-        }
-        if (form.value.isActive !== props.accessKey.isActive) {
-          accessKey.isActive = form.value.isActive;
-        }
         await props.accessKeyService.patchAccessKey(props.accessKey.id, accessKey);
         const updatedAccessKey = await props.accessKeyService.getAccessKey(props.accessKey.id);
         emit('update-access-key', updatedAccessKey);
-        handleClose(true);
+        close(true);
       } catch (error) {
         handleError(error);
       } finally {

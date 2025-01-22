@@ -97,7 +97,6 @@
       @update-access-key="updateAccessKey"
       @close="closeAccessKeyInfoModal"
     />
-    <ConfirmModal ref="confirmModal" />
   </div>
 </template>
 <script setup lang="ts">
@@ -110,7 +109,6 @@ import AccessKeyTable from "@/components/AccessKeyTable.vue";
 import CreateAccessKeyModal from "@/components/CreateAccessKeyModal.vue";
 import AccessKeyInfoModal from "@/components/AccessKeyInfoModal.vue";
 import Pagination from "@/components/SimplePagination.vue";
-import ConfirmModal from "@/components/ConfirmModal.vue";
 import { urlEncode, BASE_URL, fetchJWT, fetchConfig } from "@/utils";
 import { AccessKeyService, AccessTokenAuthStrategy, AuthStrategy } from '@/service/accesskey';
 import { Config } from '@/config';
@@ -147,7 +145,6 @@ const state = reactive({
   isAccessKeyInfoModalVisible: false,
   currentAccessKey: undefined as AccessKeyDto | undefined,
 })
-const confirmModal = ref();
 
 const paginatedAccessKeys = computed(() =>  state.accessKeys.slice(0, state.pageSize));
 const fetchAccessKeys = async (): Promise<void> => {
@@ -211,25 +208,14 @@ const changePage = async (page: number): Promise<void> => {
     },
   });
 };
-const openDeleteConfirmationModal = async (accessKey: AccessKeyDto): Promise<boolean> => {
-  const secretPreview = accessKey.id.length > 30 ? `${accessKey.id.slice(0, 27)}...` : accessKey.secret;
-  return await confirmModal.value.show({
-    title: t("component.acl.accesskey.frontend.confirmRemove.title"),
-    message: t("component.acl.accesskey.frontend.confirmRemove.text", { secret: secretPreview }),
-  });
-};
-const deleteAccessKey = async (index: number): Promise<void> => {
+
+const deleteAccessKey = async (accessKeyId: string): Promise<void> => {
   resetInfos();
-  const accessKey: AccessKeyDto = paginatedAccessKeys.value[index];
-  if (!accessKey.id) {
-    return;
-  }
-  const confirmed = await openDeleteConfirmationModal(accessKey);
-  if (accessKeyService.value && confirmed) {
+  if (accessKeyService.value) {
     state.loading = true;
     try {
-      await accessKeyService.value.deleteAccessKey(accessKey.id);
-      state.accessKeys = state.accessKeys.filter((a: AccessKeyDto) => a.id !== accessKey.id);
+      await accessKeyService.value.deleteAccessKey(accessKeyId);
+      state.accessKeys = state.accessKeys.filter((a: AccessKeyDto) => a.id !== accessKeyId);
       state.totalCount -= 1;
     } finally {
       state.loading = false;
@@ -237,7 +223,7 @@ const deleteAccessKey = async (index: number): Promise<void> => {
   }
 };
 const updateAccessKey = (accessKey: AccessKeyDto): void => {
-  const index = state.accessKeys.findIndex((accessKey: AccessKeyDto) => accessKey.id === accessKey.id);
+  const index = state.accessKeys.findIndex((a: AccessKeyDto) => a.id === accessKey.id);
   if (index !== -1) {
     state.accessKeys[index] = accessKey;
   }
