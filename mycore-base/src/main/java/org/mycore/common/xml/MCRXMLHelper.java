@@ -119,7 +119,7 @@ public class MCRXMLHelper {
      * @return the String with all illegal characters removed
      */
     public static String removeIllegalChars(String text) {
-        if (text == null || text.trim().isEmpty()) {
+        if (text == null || text.isBlank()) {
             return text;
         }
         if (Verifier.checkCharacterData(text) == null) {
@@ -439,7 +439,7 @@ public class MCRXMLHelper {
 
             // text
             String text = element.getText();
-            if (text != null && !text.trim().isEmpty()) {
+            if (text != null && !text.isBlank()) {
                 json.addProperty("$text", text);
             }
 

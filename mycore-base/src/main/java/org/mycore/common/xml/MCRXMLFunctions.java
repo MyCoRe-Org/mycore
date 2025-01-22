@@ -222,7 +222,7 @@ public class MCRXMLFunctions {
      * @return the date in format yyyy-MM-ddThh:mm:ssZ
      */
     public static String getISODateFromMCRHistoryDate(String date, String fieldName, String calendarName) {
-        if (fieldName == null || fieldName.trim().length() == 0) {
+        if (fieldName == null || fieldName.isBlank()) {
             return "";
         }
         boolean useLastValue = Objects.equals(fieldName, "bis");

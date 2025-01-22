@@ -278,7 +278,7 @@ public final class MCRGoogleSitemapCommon {
         String mcrID = objectIDDate.getId();
         StringBuilder sb = new StringBuilder(1024);
         sb.append(baseurl).append(OBJECT_PATH).append(mcrID);
-        if ((STYLE != null) && (STYLE.trim().length() > 0)) {
+        if (STYLE != null && !STYLE.isBlank()) {
             sb.append("?XSL.Style=").append(STYLE);
         }
         // build entry

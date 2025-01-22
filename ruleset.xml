@@ -375,10 +375,7 @@
   <!--
   <rule ref="category/java/performance.xml/BigIntegerInstantiation"/>
   -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/performance.xml/InefficientEmptyStringCheck"/>
-  -->
   <rule ref="category/java/performance.xml/InefficientStringBuffering"/>
   <rule ref="category/java/performance.xml/OptimizableToArrayCall"/>
   <rule ref="category/java/performance.xml/RedundantFieldInitializer"/>

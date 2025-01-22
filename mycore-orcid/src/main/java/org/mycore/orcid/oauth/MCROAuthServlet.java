@@ -71,9 +71,9 @@ public class MCROAuthServlet extends MCRServlet {
         String code = job.getRequest().getParameter("code");
         String error = job.getRequest().getParameter("error");
 
-        if ((error != null) && !error.trim().isEmpty()) {
+        if (error != null && !error.isBlank()) {
             job.getResponse().sendRedirect(userProfileURL + "&XSL.error=" + error);
-        } else if ((code == null) || code.trim().isEmpty()) {
+        } else if (code == null || code.isBlank()) {
             redirectToGetAuthorization(job);
         } else {
             String state = job.getRequest().getParameter("state");

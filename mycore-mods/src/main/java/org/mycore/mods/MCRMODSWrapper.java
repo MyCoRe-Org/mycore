@@ -319,7 +319,7 @@ public class MCRMODSWrapper {
         if (os.isFlagTypeSet(type)) {
             os.removeFlags(type);
         }
-        if ((value != null) && !value.trim().isEmpty()) {
+        if (value != null && !value.isBlank()) {
             os.addFlag(type, value.trim());
         }
     }
