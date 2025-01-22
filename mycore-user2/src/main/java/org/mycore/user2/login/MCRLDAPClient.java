@@ -129,7 +129,6 @@ public class MCRLDAPClient {
             defaultGroup = MCRRoleManager.getRole(group);
         }
 
-        @SuppressWarnings("PMD.ReplaceHashtableWithMap")
         ldapEnv = new Hashtable<>();
         ldapEnv.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         ldapEnv.put("com.sun.jndi.ldap.read.timeout", readTimeout);
