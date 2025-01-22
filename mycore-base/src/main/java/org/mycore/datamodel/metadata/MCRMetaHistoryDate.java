@@ -227,7 +227,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      *            the calendar as String, one of CALENDARS.
      */
     public final void setCalendar(String calstr) {
-        if (calstr == null || calstr.trim().isEmpty() || (!MCRCalendar.CALENDARS_LIST.contains(calstr))) {
+        if (calstr == null || calstr.isBlank() || (!MCRCalendar.CALENDARS_LIST.contains(calstr))) {
             calendar = MCRCalendar.TAG_GREGORIAN;
             LOGGER.warn("The calendar field of MCRMeataHistoryDate is set to default " + MCRCalendar.TAG_GREGORIAN
                 + ".");

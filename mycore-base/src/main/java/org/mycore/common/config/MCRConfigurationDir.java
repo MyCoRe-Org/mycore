@@ -154,8 +154,7 @@ public class MCRConfigurationDir {
             updatedAppname = servletAppName;
         } else if (!contextPath.isEmpty()) {
             updatedAppname = contextPath.substring(1);//remove leading '/'
-        } else if (servletContextName != null && !(servletContextName.trim().isEmpty()
-            || servletContextName.contains("/"))) {
+        } else if (servletContextName != null && !(servletContextName.isBlank() || servletContextName.contains("/"))) {
             updatedAppname = servletContextName.replaceAll("\\s", "");
         } else {
             updatedAppname = null;

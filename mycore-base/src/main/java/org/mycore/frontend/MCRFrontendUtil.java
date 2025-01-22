@@ -270,10 +270,10 @@ public class MCRFrontendUtil {
      */
     private static String getXForwardedFor(HttpServletRequest req) {
         String xff = req.getHeader(PROXY_HEADER_REMOTE_IP);
-        if ((xff == null) || xff.trim().isEmpty()) {
+        if ((xff == null) || xff.isBlank()) {
             xff = req.getHeader(PROXY_HEADER_REMOTE_IP);
         }
-        if ((xff == null) || xff.trim().isEmpty()) {
+        if ((xff == null) || xff.isBlank()) {
             return null;
         }
 
@@ -298,7 +298,7 @@ public class MCRFrontendUtil {
             if (name.startsWith("XSL.") && name.endsWith(".SESSION")) {
                 String key = name.substring(0, name.length() - 8);
                 // parameter is not empty -> store
-                if (!request.getParameter(name).trim().isEmpty()) {
+                if (!request.getParameter(name).isBlank()) {
                     mcrSession.put(key, request.getParameter(name));
                     LOGGER.debug("Found HTTP-Req.-Parameter {}={} that should be saved in session, safed {}={}",
                         () -> name, () -> request.getParameter(name), () -> key, () -> request.getParameter(name));

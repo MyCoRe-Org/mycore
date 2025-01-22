@@ -297,7 +297,7 @@ public class MCRLoginServlet extends MCRServlet {
      */
     private void storeURL(String url) {
         String storedUrl = url;
-        if ((url == null) || (url.trim().length() == 0)) {
+        if (url == null || url.isBlank()) {
             storedUrl = MCRFrontendUtil.getBaseURL();
         } else if (url.startsWith(MCRFrontendUtil.getBaseURL()) && !url.equals(MCRFrontendUtil.getBaseURL())) {
             String rest = url.substring(MCRFrontendUtil.getBaseURL().length());
