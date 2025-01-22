@@ -34,6 +34,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
@@ -85,9 +86,14 @@ public class MCROCFLCommands {
         List<MCROCFLRevisionPruner> prunerList = new ArrayList<>();
         if (!prunersStringList.isBlank()) {
             String[] prunerIds = prunersStringList.split(",");
-            Map<String, Callable<Object>> pruners = MCRConfiguration2.getInstances(PRUNERS_CONFIG_PREFIX);
+            Map<String, Callable<MCROCFLRevisionPruner>> pruners = MCRConfiguration2.getInstances(
+                MCROCFLRevisionPruner.class, PRUNERS_CONFIG_PREFIX);
             for (String prunerId : prunerIds) {
-                prunerList.add((MCROCFLRevisionPruner) pruners.get(prunerId).call());
+                try {
+                    prunerList.add(pruners.get(prunerId).call());
+                } catch (Exception e) {
+                    throw new MCRConfigurationException("Error while initializing pruner " + prunerId, e);
+                }
             }
         }
 
