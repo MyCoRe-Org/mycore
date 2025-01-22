@@ -18,7 +18,6 @@
 package org.mycore.oai;
 
 import java.time.Instant;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,18 +46,16 @@ import org.mycore.oai.set.MCRSet;
 
 /**
  * Default MyCoRe {@link OAIAdapter} implementation.
- * 
+ *
  * @author Matthias Eichner
  */
 public class MCROAIAdapter implements OAIAdapter {
 
     protected static final Logger LOGGER = LogManager.getLogger(MCROAIAdapter.class);
 
-    protected static final ZoneId UTC_ZONE = ZoneId.of("UTC");
-
     public static final String PREFIX = "MCR.OAIDataProvider.";
 
-    public static int defaultPartitionSize;
+    public static final int DEFAULT_PARTITION_SIZE;
 
     protected String baseURL;
 
@@ -74,13 +71,13 @@ public class MCROAIAdapter implements OAIAdapter {
 
     static {
         String prefix = PREFIX + "ResumptionTokens.";
-        defaultPartitionSize = MCRConfiguration2.getInt(prefix + "PartitionSize").orElse(50);
-        LOGGER.info(PREFIX + "ResumptionTokens.PartitionSize is set to {}", defaultPartitionSize);
+        DEFAULT_PARTITION_SIZE = MCRConfiguration2.getInt(prefix + "PartitionSize").orElse(50);
+        LOGGER.info(PREFIX + "ResumptionTokens.PartitionSize is set to {}", DEFAULT_PARTITION_SIZE);
     }
 
     /**
      * Initialize the adapter.
-     * 
+     *
      * @param baseURL
      *            baseURL of the adapter e.g. http://localhost:8291/oai2
      * @param oaiConfiguration
@@ -121,7 +118,7 @@ public class MCROAIAdapter implements OAIAdapter {
         if (this.searchManager == null) {
             this.searchManager = new MCROAISearchManager();
             int partitionSize = MCRConfiguration2.getInt(getConfigPrefix() + "ResumptionTokens.PartitionSize")
-                .orElse(defaultPartitionSize);
+                .orElse(DEFAULT_PARTITION_SIZE);
             this.searchManager.init(getIdentify(), getObjectManager(), getSetManager(), partitionSize);
         }
         return this.searchManager;
