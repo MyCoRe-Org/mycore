@@ -75,7 +75,7 @@ import org.mycore.common.function.MCRTriConsumer;
  *
  * Using the <CODE>set</CODE> methods allows client code to set new configuration properties or
  * overwrite existing ones with new values.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  * @since 2018.05
  */
@@ -117,73 +117,6 @@ public class MCRConfiguration2 {
             .stream()
             .filter(e -> e.getKey().startsWith(propertyPrefix))
             .collect(Collectors.toMap(e -> e.getKey().substring(propertyPrefix.length()), Map.Entry::getValue));
-    }
-
-    /**
-     * Returns a new instance of the class specified in the configuration property with the given name.
-     * If you call a method on the returned Optional directly you need to set the type like this:
-     * {@snippet :
-     * MCRConfiguration2.<MCRMyType>getInstanceOf(name)
-     *     .ifPresent(myTypeObj -> myTypeObj.method());
-     * }
-     * 
-     * @param name
-     *            the non-null and non-empty name of the configuration property
-     * @return the value of the configuration property as a String, or null
-     * @throws MCRConfigurationException
-     *             if the class can not be loaded or instantiated
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public static <T> Optional<T> getInstanceOf(String name) throws MCRConfigurationException {
-        return (Optional<T>) getInstanceOf(Object.class, name);
-    }
-
-    /**
-     * Returns a instance of the class specified in the configuration property with the given name. If the class was
-     * previously instantiated by this method this instance is returned.
-     * If you call a method on the returned Optional directly you need to set the type like this:
-     * {@snippet :
-     * MCRConfiguration2.<MCRMyType>getSingleInstanceOf(name)
-     *     .ifPresent(myTypeObj -> myTypeObj.method());
-     * }
-     *
-     * @param name
-     *            non-null and non-empty name of the configuration property
-     * @return the instance of the class named by the value of the configuration property
-     * @throws MCRConfigurationException
-     *             if the class can not be loaded or instantiated
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public static <T> Optional<T> getSingleInstanceOf(String name) {
-        return (Optional<T>) getSingleInstanceOf(Object.class, name);
-    }
-
-    /**
-     * Returns a instance of the class specified in the configuration property with the given name. If the class was
-     * previously instantiated by this method this instance is returned.
-     * If you call a method on the returned Optional directly you need to set the type like this:
-     * {@snippet :
-     * MCRConfiguration2.<MCRMyType>getSingleInstanceOf(name, alternative)
-     *     .ifPresent(myTypeObj -> myTypeObj.method());
-     * }
-     *
-     * @param name
-     *            non-null and non-empty name of the configuration property
-     * @param alternative
-     *            alternative class if property is undefined
-     * @return the instance of the class named by the value of the configuration property
-     * @throws MCRConfigurationException
-     *             if the class can not be loaded or instantiated
-     */
-    @Deprecated
-    public static <T> Optional<T> getSingleInstanceOf(String name, Class<? extends T> alternative) {
-        return MCRConfiguration2.<T>getSingleInstanceOf(name)
-            .or(() -> Optional.ofNullable(alternative)
-                .map(className -> new ConfigSingletonKey(name, className.getName()))
-                .map(key -> (T) instanceHolder.computeIfAbsent(key,
-                    (k) -> MCRConfigurableInstanceHelper.getInstance(MCRInstanceConfiguration.ofClass(alternative)))));
     }
 
     /**
@@ -272,7 +205,7 @@ public class MCRConfiguration2 {
 
     /**
      * Returns the configuration property with the specified name as String.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @throws MCRConfigurationException
@@ -284,7 +217,7 @@ public class MCRConfiguration2 {
 
     /**
      * Returns the configuration property with the specified name.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @param mapper
@@ -351,17 +284,29 @@ public class MCRConfiguration2 {
      * Gets a list of properties which represent a configurable class and turns them in to a map.
      * @return a map where the key is a String describing the configurable instance value
      */
+    @Deprecated
     public static <T> Map<String, Callable<T>> getInstances(String prefix) {
         return getInstantiatablePropertyKeys(prefix)
             .collect(Collectors.toMap(
                 k -> MCRInstanceName.of(k).canonical().substring(prefix.length()),
-                v -> () -> (T) getInstanceOf(v).orElse(null)));
+                v -> () -> (T) getInstanceOf(Object.class, v).orElse(null)));
+    }
+
+    /**
+     * Gets a list of properties which represent a configurable class and turns them in to a map.
+     * @return a map where the key is a String describing the configurable instance value
+     */
+    public static <S> Map<String, Callable<S>> getInstances(Class<S> superClass, String prefix) {
+        return getInstantiatablePropertyKeys(prefix)
+            .collect(Collectors.toMap(
+                k -> MCRInstanceName.of(k).canonical().substring(prefix.length()),
+                v -> () -> getInstanceOf(superClass, v).orElse(null)));
     }
 
     /**
      * Returns the configuration property with the specified name as an <CODE>
      * int</CODE> value.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @return the value of the configuration property as an <CODE>int</CODE> value
@@ -375,7 +320,7 @@ public class MCRConfiguration2 {
     /**
      * Returns the configuration property with the specified name as a <CODE>
      * long</CODE> value.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @return the value of the configuration property as a <CODE>long</CODE> value
@@ -389,7 +334,7 @@ public class MCRConfiguration2 {
     /**
      * Returns the configuration property with the specified name as a <CODE>
      * float</CODE> value.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @return the value of the configuration property as a <CODE>float</CODE> value
@@ -403,7 +348,7 @@ public class MCRConfiguration2 {
     /**
      * Returns the configuration property with the specified name as a <CODE>
      * double</CODE> value.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @return the value of the configuration property as a <CODE>double
@@ -418,7 +363,7 @@ public class MCRConfiguration2 {
     /**
      * Returns the configuration property with the specified name as a <CODE>
      * boolean</CODE> value.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @return <CODE>true</CODE>, if and only if the specified property has the value <CODE>true</CODE>
@@ -431,7 +376,7 @@ public class MCRConfiguration2 {
      * Sets the configuration property with the specified name to a new <CODE>
      * String</CODE> value. If the parameter <CODE>value</CODE> is <CODE>
      * null</CODE>, the property will be deleted.
-     * 
+     *
      * @param name
      *            the non-null and non-empty name of the configuration property
      * @param value
@@ -458,7 +403,7 @@ public class MCRConfiguration2 {
 
     /**
      * Adds a listener that is called after a new value is set.
-     * 
+     *
      * @param keyPredicate
      *            a filter upon the property name that if matches executes the listener
      * @param listener
