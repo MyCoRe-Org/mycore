@@ -57,7 +57,7 @@ public class MCRCronjobManager implements MCRShutdownHandler.Closeable {
     }
 
     public static MCRCronjobManager getInstance() {
-        return MCRCronjobManagerInstanceHelper.instance;
+        return MCRCronjobManagerInstanceHelper.INSTANCE;
     }
 
     @Override
@@ -139,7 +139,7 @@ public class MCRCronjobManager implements MCRShutdownHandler.Closeable {
     }
 
     private static class MCRCronjobManagerInstanceHelper {
-        public static MCRCronjobManager instance = new MCRCronjobManager();
+        public static final MCRCronjobManager INSTANCE = new MCRCronjobManager();
     }
 
 }

@@ -57,7 +57,7 @@ import org.mycore.util.concurrent.MCRTransactionableRunnable;
  * expiration time. The time increases for each query call.
  *
  * <p>Due to token based querying it is not possible to set a current
- * position for the resumption token. Its always set to -1.</p>
+ * position for the resumption token. It's always set to -1.</p>
  *
  * @author Matthias Eichner
  */
@@ -67,7 +67,7 @@ public class MCROAISearchManager {
 
     protected static final String TOKEN_DELIMITER = "@";
 
-    protected static int maxAge;
+    protected static final int MAX_AGE;
 
     protected Map<String, MCROAISearcher> resultMap;
 
@@ -79,11 +79,11 @@ public class MCROAISearchManager {
 
     protected int partitionSize;
 
-    private boolean runListRecordsParallel;
+    private final boolean runListRecordsParallel;
 
     static {
         String prefix = MCROAIAdapter.PREFIX + "ResumptionTokens.";
-        maxAge = MCRConfiguration2.getInt(prefix + "MaxAge").orElse(30) * 60 * 1000;
+        MAX_AGE = MCRConfiguration2.getInt(prefix + "MaxAge").orElse(30) * 60 * 1000;
     }
 
     public MCROAISearchManager() {
@@ -112,7 +112,7 @@ public class MCROAISearchManager {
             }
         };
         Timer cleanupTimer = new Timer("OAISearchManager-Timer " + identify.getConfigPrefix());
-        cleanupTimer.schedule(tt, new Date(System.currentTimeMillis() + maxAge), maxAge);
+        cleanupTimer.schedule(tt, new Date(System.currentTimeMillis() + MAX_AGE), MAX_AGE);
         MCRShutdownHandler.getInstance().addCloseable(() -> cleanupTimer.cancel());
     }
 
@@ -248,7 +248,7 @@ public class MCROAISearchManager {
         MCROAISearcher searcher = MCRConfiguration2.getInstanceOf(MCROAISearcher.class, className)
             .orElseGet(() -> MCRConfiguration2.getInstanceOfOrThrow(
                 MCROAISearcher.class, MCROAIAdapter.PREFIX + "DefaultSearcher"));
-        searcher.init(identify, format, maxAge, partitionSize, setManager, objectManager);
+        searcher.init(identify, format, MAX_AGE, partitionSize, setManager, objectManager);
         return searcher;
     }
 

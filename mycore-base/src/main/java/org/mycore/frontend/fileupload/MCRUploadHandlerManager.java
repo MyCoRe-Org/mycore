@@ -39,28 +39,28 @@ public class MCRUploadHandlerManager {
     private static final Logger LOGGER = LogManager.getLogger(MCRUploadHandlerManager.class);
 
     /** Cache of currently active upload handler sessions */
-    protected static MCRCache<String, MCRUploadHandlerCacheEntry> handlers;
+    protected static final MCRCache<String, MCRUploadHandlerCacheEntry> HANDLERS;
 
-    protected static MCRProcessableCollection collection;
+    protected static final MCRProcessableCollection COLLECTION;
 
     static {
-        handlers = new MCRCache<>(100, "UploadHandlerManager UploadHandlers");
-        collection = new MCRProcessableDefaultCollection("Upload Manager");
+        HANDLERS = new MCRCache<>(100, "UploadHandlerManager UploadHandlers");
+        COLLECTION = new MCRProcessableDefaultCollection("Upload Manager");
         MCRProcessableRegistry registry = MCRProcessableRegistry.getSingleInstance();
-        registry.register(collection);
+        registry.register(COLLECTION);
     }
 
     static void register(MCRUploadHandler handler) {
         LOGGER.debug("Registering {} with upload ID {}", () -> handler.getClass().getName(), handler::getID);
         String sessionID = MCRSessionMgr.getCurrentSession().getID();
-        handlers.put(handler.getID(), new MCRUploadHandlerCacheEntry(sessionID, handler));
-        collection.add(handler);
+        HANDLERS.put(handler.getID(), new MCRUploadHandlerCacheEntry(sessionID, handler));
+        COLLECTION.add(handler);
     }
 
     public static MCRUploadHandler getHandler(String uploadID) {
 
         long yesterday = System.currentTimeMillis() - 86_400_000;
-        MCRUploadHandlerCacheEntry entry = handlers.getIfUpToDate(uploadID, yesterday);
+        MCRUploadHandlerCacheEntry entry = HANDLERS.getIfUpToDate(uploadID, yesterday);
 
         if (entry == null) {
             throw new MCRUsageException("Upload session " + uploadID + " timed out");
@@ -79,9 +79,9 @@ public class MCRUploadHandlerManager {
     }
 
     public static void unregister(String uploadID) {
-        MCRUploadHandlerCacheEntry cacheEntry = handlers.get(uploadID);
-        handlers.remove(uploadID);
-        collection.remove(cacheEntry.handler);
+        MCRUploadHandlerCacheEntry cacheEntry = HANDLERS.get(uploadID);
+        HANDLERS.remove(uploadID);
+        COLLECTION.remove(cacheEntry.handler);
     }
 
     /** Represents a cache entry of currently active upload handler session */

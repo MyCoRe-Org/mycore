@@ -80,21 +80,21 @@ public class MCRFrontendUtil {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public static byte[] sessionNetmaskIPv4;
+    public static final byte[] SESSION_NETMASK_IPV4;
 
-    public static byte[] sessionNetmaskIPv6;
+    public static final byte[] SESSION_NETMASK_IPV6;
 
     private static final ThreadLocal<Map.Entry<String, MCRServletJob>> CURRENT_SERVLET_JOB = new ThreadLocal<>();
 
     static {
         try {
-            sessionNetmaskIPv4 = InetAddress.getByName(SESSION_NETMASK_IPV4_STRING).getAddress();
+            SESSION_NETMASK_IPV4 = InetAddress.getByName(SESSION_NETMASK_IPV4_STRING).getAddress();
         } catch (UnknownHostException e) {
             throw new MCRConfigurationException("MCR.Servlet.Session.NetMask.IPv4 is not a correct IPv4 network mask.",
                 e);
         }
         try {
-            sessionNetmaskIPv6 = InetAddress.getByName(SESSION_NETMASK_IPV6_STRING).getAddress();
+            SESSION_NETMASK_IPV6 = InetAddress.getByName(SESSION_NETMASK_IPV6_STRING).getAddress();
         } catch (UnknownHostException e) {
             throw new MCRConfigurationException("MCR.Servlet.Session.NetMask.IPv6 is not a correct IPv6 network mask.",
                 e);
@@ -421,9 +421,9 @@ public class MCRFrontendUtil {
 
     private static byte[] decideNetmask(InetAddress ip) throws MCRException {
         if (hasIPVersion(ip, 4)) {
-            return sessionNetmaskIPv4;
+            return SESSION_NETMASK_IPV4;
         } else if (hasIPVersion(ip, 6)) {
-            return sessionNetmaskIPv6;
+            return SESSION_NETMASK_IPV6;
         } else {
             throw new MCRException("Unknown or unidentifiable version of ip: " + ip);
         }

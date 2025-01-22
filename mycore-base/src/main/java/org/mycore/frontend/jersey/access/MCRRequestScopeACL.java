@@ -31,12 +31,12 @@ public interface MCRRequestScopeACL extends MCRAccessInterface {
     boolean isPrivate();
 
     static MCRRequestScopeACL getInstance(ContainerRequestContext requestContext) {
-        Object property = requestContext.getProperty(MCRRequestScopeACLFilter.aclInstantKey);
+        Object property = requestContext.getProperty(MCRRequestScopeACLFilter.ACL_INSTANT_KEY);
         Objects.requireNonNull(property, "Please register " + MCRRequestScopeACLFilter.class);
         if (property instanceof Supplier) {
             @SuppressWarnings("unchecked")
             MCRRequestScopeACL requestScopeACL = ((Supplier<MCRRequestScopeACL>) property).get();
-            requestContext.setProperty(MCRRequestScopeACLFilter.aclInstantKey, requestScopeACL);
+            requestContext.setProperty(MCRRequestScopeACLFilter.ACL_INSTANT_KEY, requestScopeACL);
             property = requestScopeACL;
         }
         return (MCRRequestScopeACL) property;

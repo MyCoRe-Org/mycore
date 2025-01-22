@@ -30,7 +30,7 @@ import org.mycore.common.config.MCRConfiguration2;
 public class MCRCategoryDAOFactory {
 
     /**
-     * Returns an instance of a MCRCategoryDAO implementator.
+     * Returns an instance of a MCRCategoryDAO implementation.
      */
     public static MCRCategoryDAO getInstance() {
         return Objects.requireNonNull(MCRCategoryDAOHolder.instance,
