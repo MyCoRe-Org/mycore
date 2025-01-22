@@ -159,6 +159,7 @@ public class MCRORCIDObjectResource {
                     .filter(entry -> Objects.equals(entry.getKey(), orcids.iterator().next())).findFirst()
                     .orElseThrow(() -> new WebApplicationException(Status.BAD_REQUEST));
             }
+            throw new WebApplicationException(Status.BAD_REQUEST);
 
         }
         return credentialMap.entrySet().iterator().next();
