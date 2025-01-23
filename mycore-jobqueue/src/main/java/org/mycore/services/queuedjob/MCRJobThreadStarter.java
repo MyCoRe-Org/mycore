@@ -175,36 +175,30 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
             if (!running) {
                 return false;
             }
-
-            EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-            EntityTransaction transaction = em.getTransaction();
-
             MCRJob job = null;
             MCRJobAction action = null;
-            try {
-                transaction.begin();
-
-                job = jobQueue.poll();
-                processableCollection.setProperty("queue size", jobQueue.size());
-
-                if (job != null) {
-                    action = toMCRJobAction(job);
-
-                    if (action != null && !action.isActivated()) {
-                        job.setStatus(MCRJobStatus.NEW);
-                        job.setStart(null);
+            try (EntityManager em = MCREntityManagerProvider.getCurrentEntityManager()) {
+                EntityTransaction transaction = em.getTransaction();
+                try {
+                    transaction.begin();
+                    job = jobQueue.poll();
+                    processableCollection.setProperty("queue size", jobQueue.size());
+                    if (job != null) {
+                        action = toMCRJobAction(job);
+                        if (action != null && !action.isActivated()) {
+                            job.setStatus(MCRJobStatus.NEW);
+                            job.setStart(null);
+                        }
+                    }
+                    transaction.commit();
+                } catch (RollbackException e) {
+                    LOGGER.error("Error while getting next job.", e);
+                    try {
+                        transaction.rollback();
+                    } catch (RuntimeException re) {
+                        LOGGER.warn("Could not rollback transaction.", re);
                     }
                 }
-                transaction.commit();
-            } catch (RollbackException e) {
-                LOGGER.error("Error while getting next job.", e);
-                try {
-                    transaction.rollback();
-                } catch (RuntimeException re) {
-                    LOGGER.warn("Could not rollback transaction.", re);
-                }
-            } finally {
-                em.close();
             }
             if (job != null && action != null && action.isActivated() && !jobExecutor.isShutdown()) {
                 LOGGER.info("Creating:{}", job);
