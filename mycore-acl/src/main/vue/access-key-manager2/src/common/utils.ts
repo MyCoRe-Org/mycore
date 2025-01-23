@@ -90,6 +90,9 @@ export const generateRandomString = (length: number): string => {
   return temp;
 };
 
+export const getUnixTimestamp = (date: string): number =>
+  Math.floor(new Date(date).getTime());
+
 const shortString = (input: string, len: number): string =>
   input.length > len ? `${input.slice(0, len - 3)}...` : input;
 

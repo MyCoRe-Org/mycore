@@ -128,7 +128,7 @@ import { required } from '@vuelidate/validators';
 import useVuelidate from '@vuelidate/core';
 import { AccessKeyDto, PartialUpdateAccessKeyDto } from '@/dtos/accesskey';
 import { AccessKeyService } from '@/service/accesskey';
-import { getI18nKey } from '@/common/utils';
+import { getI18nKey, getUnixTimestamp } from '@/common/utils';
 import BaseModal from '@/components/BaseModal.vue';
 
 interface FormData {
@@ -208,7 +208,7 @@ const buildAccessKeyPayload = (): PartialUpdateAccessKeyDto => {
     accessKey.type = form.value.type;
   }
   const expiration = form.value.expiration
-    ? Math.floor(new Date(form.value.expiration).getTime())
+    ? getUnixTimestamp(form.value.expiration)
     : null;
   if (expiration !== props.accessKey?.expiration) {
     accessKey.expiration = expiration;
