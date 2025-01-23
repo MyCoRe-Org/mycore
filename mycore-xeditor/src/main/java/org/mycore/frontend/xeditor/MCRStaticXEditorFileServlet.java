@@ -26,15 +26,16 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.jdom2.JDOMException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.servlets.MCRStaticXMLFileServlet;
 import org.xml.sax.SAXException;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Frank Lützenkirchen

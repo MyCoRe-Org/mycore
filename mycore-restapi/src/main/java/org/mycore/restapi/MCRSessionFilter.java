@@ -29,27 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.interfaces.Claim;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import jakarta.annotation.Priority;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.InternalServerErrorException;
-import jakarta.ws.rs.NotAuthorizedException;
-import jakarta.ws.rs.Priorities;
-import jakarta.ws.rs.container.ContainerRequestContext;
-import jakarta.ws.rs.container.ContainerRequestFilter;
-import jakarta.ws.rs.container.ContainerResponseContext;
-import jakarta.ws.rs.container.ContainerResponseFilter;
-import jakarta.ws.rs.core.Application;
-import jakarta.ws.rs.core.CacheControl;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.HttpHeaders;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.SecurityContext;
-import jakarta.ws.rs.ext.Provider;
-import jakarta.ws.rs.ext.RuntimeDelegate;
 import org.apache.commons.io.output.ProxyOutputStream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -67,6 +46,29 @@ import org.mycore.restapi.v1.utils.MCRRestAPIUtil;
 import org.mycore.user2.MCRRealm;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.Claim;
+import com.auth0.jwt.interfaces.DecodedJWT;
+
+import jakarta.annotation.Priority;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.NotAuthorizedException;
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.CacheControl;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.SecurityContext;
+import jakarta.ws.rs.ext.Provider;
+import jakarta.ws.rs.ext.RuntimeDelegate;
 
 @Provider
 @Priority(Priorities.AUTHENTICATION)
