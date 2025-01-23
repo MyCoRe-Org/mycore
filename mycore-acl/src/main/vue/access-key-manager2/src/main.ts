@@ -3,7 +3,6 @@ import { createI18n, I18n } from 'vue-i18n';
 import { BASE_URL, fetchTranslations } from '@/common/utils';
 import ContactManager from '@/App.vue';
 import router from './router';
-import './style.css';
 if (import.meta.env.MODE === 'development') {
   import('bootstrap/dist/css/bootstrap.min.css');
   import('font-awesome/css/font-awesome.min.css');

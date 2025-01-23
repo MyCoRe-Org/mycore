@@ -125,3 +125,9 @@ const cancel = () => {
   }
 };
 </script>
+
+<style lang="css" scoped>
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.3) !important;
+}
+</style>
