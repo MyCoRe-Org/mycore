@@ -104,9 +104,10 @@ public class MCRLDAPClient {
     /** Default group of user */
     private MCRRole defaultGroup;
 
-    @SuppressWarnings("PMD.LooseCoupling")
+    @SuppressWarnings({ "PMD.LooseCoupling", "PMD.ReplaceHashtableWithMap" })
     private Hashtable<String, String> ldapEnv;
 
+    @SuppressWarnings("PMD.ReplaceHashtableWithMap")
     private MCRLDAPClient() {
         String prefix = "MCR.user2.LDAP.";
         /* Timeout when connecting to LDAP server */

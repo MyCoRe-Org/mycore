@@ -61,10 +61,7 @@
   -->
   <rule ref="category/java/bestpractices.xml/PrimitiveWrapperInstantiation"/>
   <rule ref="category/java/bestpractices.xml/ReplaceEnumerationWithIterator"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/bestpractices.xml/ReplaceHashtableWithMap"/>
-  -->
   <rule ref="category/java/bestpractices.xml/ReplaceVectorWithList"/>
   <rule ref="category/java/bestpractices.xml/SimplifiableTestAssertion"/>
   <rule ref="category/java/bestpractices.xml/NonExhaustiveSwitch"/>

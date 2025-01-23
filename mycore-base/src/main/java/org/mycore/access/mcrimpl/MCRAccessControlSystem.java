@@ -22,8 +22,8 @@ import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -62,7 +62,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
     boolean disabled;
 
-    static Map<String, String> ruleIDTable = new Hashtable<>();
+    static Map<String, String> ruleIDTable = new ConcurrentHashMap<>();
 
     private static final Logger LOGGER = LogManager.getLogger(MCRAccessControlSystem.class);
 
