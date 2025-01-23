@@ -13,6 +13,10 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
     "verbatimModuleSyntax": false,
+    "noImplicitAny": true,
+    "allowUnreachableCode": false,
+    "strictFunctionTypes": true,
+    "noImplicitReturns": true,
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"]
 }

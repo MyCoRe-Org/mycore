@@ -39,29 +39,6 @@ export const fetchConfig = async (baseUrl: string): Promise<Config> => {
   } as Config;
 };
 
-const getQueryParameterByName = (
-  parameterName: string,
-  url = window.location.href.toLowerCase()
-): string | null => {
-  return new URL(url).searchParams.get(parameterName);
-};
-
-export const getReference = (): string | undefined => {
-  const objectId = getQueryParameterByName("reference");
-  if (objectId) {
-    return objectId;
-  }
-  return undefined;
-};
-
-export const getAvailablePermissions = (): string[] | undefined => {
-  const availablePermissionsString = getQueryParameterByName("availablepermissions");
-  if (availablePermissionsString) {
-    return availablePermissionsString.split(",");
-  }
-  return undefined;
-};
-
 export const fetchJWT = async (
   baseUrl: string,
   reference?: string,
