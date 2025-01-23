@@ -73,7 +73,7 @@ const columnLabels = computed(() => ({
   actions: t(getI18nKey('label.actions')),
 }));
 
-const getExpirationDisplay = (expiration: number | undefined): string => {
+const getExpirationDisplay = (expiration?: number | null): string => {
   return expiration ? new Date(expiration).toLocaleDateString() : '-';
 };
 const openDeleteConfirmationModal = async (

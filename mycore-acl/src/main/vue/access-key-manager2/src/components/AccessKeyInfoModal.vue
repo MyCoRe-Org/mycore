@@ -207,11 +207,11 @@ const buildAccessKeyPayload = (): PartialUpdateAccessKeyDto => {
   if (form.value.type !== props.accessKey?.type) {
     accessKey.type = form.value.type;
   }
-  // TODO fix expiration compare
-  if (form.value.expiration !== props.accessKey?.expiration) {
-    accessKey.expiration = form.value.expiration
-      ? Math.floor(new Date(form.value.expiration).getTime())
-      : null;
+  const expiration = form.value.expiration
+    ? Math.floor(new Date(form.value.expiration).getTime())
+    : null;
+  if (expiration !== props.accessKey?.expiration) {
+    accessKey.expiration = expiration;
   }
   if (form.value.isActive !== props.accessKey?.isActive) {
     accessKey.isActive = form.value.isActive;
