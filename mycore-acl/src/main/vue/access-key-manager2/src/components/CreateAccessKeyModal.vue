@@ -176,13 +176,12 @@
 
 <script setup lang="ts">
 import { ref, onErrorCaptured } from "vue";
-import { generateRandomString } from "@/utils";
+import { generateRandomString, getI18nKey } from "@/common/utils";
 import { AccessKeyDto, CreateAccessKeyDto } from "@/dtos/accesskey";
 import useVuelidate from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import BaseModal from "@/components/BaseModal.vue";
 import { AccessKeyService } from "@/service/accesskey";
-import { getI18nKey } from "@/utils";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();

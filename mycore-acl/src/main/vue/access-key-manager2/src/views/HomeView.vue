@@ -110,14 +110,14 @@ import AccessKeyTable from "@/components/AccessKeyTable.vue";
 import CreateAccessKeyModal from "@/components/CreateAccessKeyModal.vue";
 import AccessKeyInfoModal from "@/components/AccessKeyInfoModal.vue";
 import Pagination from "@/components/SimplePagination.vue";
-import { urlEncode, BASE_URL, fetchJWT, fetchConfig, getI18nKey } from "@/utils";
+import { urlEncode, BASE_URL, fetchJWT, fetchConfig, getI18nKey } from "@/common/utils";
 import { AccessKeyService, AccessTokenAuthStrategy, AuthStrategy } from '@/service/accesskey';
-import { Config } from '@/config';
+import { Config } from '@/common/config';
 
 class DevAuthStrategy implements AuthStrategy {
   public getHeaders(): Record<string, string> {
     return {
-      'Authorization': `Basic ${process.env.VUE_APP_API_TOKEN}`
+      'Authorization': `Basic ${import.meta.env.VITE_APP_API_TOKEN}`
     };
   }
 }
@@ -240,7 +240,7 @@ onMounted(async (): Promise<void> => {
   try {
     state.loading = true;
     config.value = await fetchConfig(BASE_URL);
-    if (process.env.NODE_ENV === "development") {
+    if (import.meta.env.MODE === 'development') {
       accessKeyService.value = new AccessKeyService(BASE_URL, new DevAuthStrategy());
     } else {
       const jwt = await fetchJWT(BASE_URL, reference || undefined, config.value.isSessionEnabled);

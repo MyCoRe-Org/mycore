@@ -52,7 +52,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
-import { getI18nKey } from "@/utils";
+import { getI18nKey } from "@/common/utils";
 
 const { t } = useI18n();
 const translate = (key: string) => t(getI18nKey(key));

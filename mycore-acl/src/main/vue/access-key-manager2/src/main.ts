@@ -1,8 +1,13 @@
 import { App, createApp } from "vue";
 import { createI18n, I18n } from "vue-i18n";
-import { BASE_URL, fetchTranslations } from "@/utils";
+import { BASE_URL, fetchTranslations } from "@/common/utils";
 import ContactManager from "@/App.vue";
 import router from './router';
+import './style.css';
+if (import.meta.env.MODE === 'development') {
+  import('bootstrap/dist/css/bootstrap.min.css');
+  import('font-awesome/css/font-awesome.min.css');
+}
 
 const initI18n = async (baseUrl: string): Promise<I18n> => {
   const data = await fetchTranslations(baseUrl);

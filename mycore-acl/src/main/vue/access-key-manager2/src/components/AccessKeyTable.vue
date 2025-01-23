@@ -59,7 +59,7 @@ import { computed, ref } from "vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import { useI18n } from "vue-i18n";
 import { AccessKeyDto } from "@/dtos/accesskey";
-import { getI18nKey } from "@/utils";
+import { getI18nKey } from "@/common/utils";
 
 const { t } = useI18n();
 const confirmModal = ref();

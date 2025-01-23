@@ -130,9 +130,3 @@ const cancel = () => {
   }
 };
 </script>
-
-<style>
-.modal-backdrop {
-  background-color: rgba(0, 0, 0, 0.3);
-}
-</style>

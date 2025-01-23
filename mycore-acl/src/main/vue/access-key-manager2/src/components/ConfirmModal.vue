@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import Modal from "./BaseModal.vue";
-import { getI18nKey } from "@/utils";
+import { getI18nKey } from "@/common/utils";
 import { useI18n } from "vue-i18n";
 
 interface Ops {

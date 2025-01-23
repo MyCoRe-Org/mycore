@@ -146,7 +146,7 @@ import BaseModal from "@/components/BaseModal.vue";
 import { required } from "@vuelidate/validators";
 import useVuelidate from "@vuelidate/core";
 import { AccessKeyService } from "@/service/accesskey";
-import { getI18nKey } from "@/utils";
+import { getI18nKey } from "@/common/utils";
 import { useI18n } from "vue-i18n";
 
 interface FormData {

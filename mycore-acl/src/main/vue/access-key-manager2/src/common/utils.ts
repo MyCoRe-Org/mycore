@@ -17,7 +17,7 @@ export type JWT = {
   token_type: string;
 };
 
-export const BASE_URL = window.webApplicationBaseURL as string;
+export const BASE_URL = import.meta.env.MODE === 'development' ? import.meta.env.VITE_APP_WEB_APPLICATION_BASE_URL : window.webApplicationBaseURL as string;
 
 export const fetchTranslations = async (baseUrl: string): Promise<Record<string, string>> => {
   const response = await fetch(`${baseUrl}rsc/locale/translate/component.acl.accesskey.*`);
