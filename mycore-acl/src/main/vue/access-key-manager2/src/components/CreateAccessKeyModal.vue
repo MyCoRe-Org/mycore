@@ -1,7 +1,7 @@
 <template>
   <BaseModal
     :is-visible="isVisible"
-    :title="$t('component.acl.accesskey.frontend.title.createAccessKey')"
+    :title="t(getI18nKey('title.createAccessKey'))"
     ok-only
     scrollable
     :busy="busy"
@@ -12,17 +12,17 @@
       class="alert alert-danger text-center"
       role="alert"
     >
-      {{ $t(errorMessage) }}
+      {{ t(errorMessage) }}
     </div>
     <div>
-      <p>{{ $t("component.acl.accesskey.frontend.description.createAccesskey") }}</p>
+      <p>{{ t(getI18nKey("description.createAccesskey")) }}</p>
     </div>
     <form>
       <div
         class="form-group required"
       >
         <label for="inputReference">
-          {{ $t("component.acl.accesskey.frontend.label.reference") }}
+          {{ t(getI18nKey("label.reference")) }}
         </label>
         <div class="input-group">
           <input
@@ -36,7 +36,7 @@
       </div>
       <div class="form-group required">
         <label for="inputValue">
-          {{ $t("component.acl.accesskey.frontend.label.value") }}
+          {{ t(getI18nKey("label.value")) }}
         </label>
         <div class="input-group">
           <div class="input-group-prepend">
@@ -59,7 +59,7 @@
       <div class="form-row">
         <div class="form-group col-md-6 required">
           <label for="inputPermission">
-            {{ $t("component.acl.accesskey.frontend.label.permission") }}
+            {{ t(getI18nKey("label.permission")) }}
           </label>
           <select
             v-if="availablePermissions.length > 0"
@@ -71,14 +71,14 @@
               value=""
               disabled
             >
-              {{ $t("component.acl.accesskey.frontend.select") }}
+              {{ t(getI18nKey("select")) }}
             </option>
             <template
               v-for="permissionValue in availablePermissions"
               :key="permissionValue"
             >
               <option :value="permissionValue">
-                {{ $t(`component.acl.accesskey.frontend.label.permission.${permissionValue}`) }}
+                {{ t(getI18nKey(`label.permission.${permissionValue}`)) }}
               </option>
             </template>
           </select>
@@ -91,7 +91,7 @@
         </div>
         <div class="form-group col-md-6">
           <label for="expirationInput">
-            {{ $t("component.acl.accesskey.frontend.label.expiration") }}
+            {{ t(getI18nKey("label.expiration")) }}
           </label>
           <input
             id="expirationInput"
@@ -113,13 +113,13 @@
             class="form-check-label"
             for="inputActive"
           >
-            {{ $t("component.acl.accesskey.frontend.label.active") }}
+            {{ t(getI18nKey("label.active")) }}
           </label>
         </div>
       </div>
       <div class="form-group">
         <label for="commentTextarea">
-          {{ $t("component.acl.accesskey.frontend.label.comment") }}
+          {{ t(getI18nKey("label.comment")) }}
         </label>
         <textarea
           id="commentTextarea"
@@ -142,7 +142,7 @@
           role="status"
           aria-hidden="true"
         />
-        {{ $t("component.acl.accesskey.frontend.button.createAccessKey") }}
+        {{ t(getI18nKey("button.createAccessKey")) }}
       </button>
     </template>
   </BaseModal>
@@ -156,6 +156,10 @@ import useVuelidate from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import BaseModal from "@/components/BaseModal.vue";
 import { AccessKeyService } from "@/service/accesskey";
+import { getI18nKey } from "@/utils";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   accessKeyService?: AccessKeyService;

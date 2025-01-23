@@ -26,7 +26,7 @@
         <td>{{ accessKey.id }}</td>
         <td>{{ accessKey.reference }}</td>
         <td>
-          {{ $t(getI18nKey(`label.permission.${accessKey.type}`)) }}
+          {{ t(getI18nKey(`label.permission.${accessKey.type}`)) }}
         </td>
         <td>{{ accessKey.isActive }}</td>
         <td>

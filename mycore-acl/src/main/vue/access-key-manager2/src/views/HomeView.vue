@@ -3,7 +3,7 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col d-flex justify-content-center">
-        <h3>{{ t("component.acl.accesskey.frontend.title.main") }}</h3>
+        <h3>{{ t(getI18nKey("title.main")) }}</h3>
       </div>
     </div>
     <div
@@ -16,14 +16,14 @@
           role="alert"
         >
           {{
-            t("component.acl.accesskey.frontend.success.add", {
+            t(getI18nKey("success.add"), {
               secret: state.accessKeyCreatedSecret,
             })
           }}
           <template
             v-if="state.accessKeyCreated && config && config.allowedSessionPermissionTypes.includes(state.accessKeyCreated.type as string)"
           >
-            {{ t("component.acl.accesskey.frontend.success.add.url") }}
+            {{ t(getI18nKey("success.add.url")) }}
             <a
               :href="activationLink"
               disabled
@@ -55,7 +55,7 @@
             @click="openCreateAccessKeyModal"
           >
             <i class="fa fa-plus" />
-            {{ t("component.acl.accesskey.frontend.button.showCreateAccessKeyModal") }}
+            {{ t(getI18nKey("button.showCreateAccessKeyModal")) }}
           </button>
         </div>
       </div>
@@ -109,7 +109,7 @@ import AccessKeyTable from "@/components/AccessKeyTable.vue";
 import CreateAccessKeyModal from "@/components/CreateAccessKeyModal.vue";
 import AccessKeyInfoModal from "@/components/AccessKeyInfoModal.vue";
 import Pagination from "@/components/SimplePagination.vue";
-import { urlEncode, BASE_URL, fetchJWT, fetchConfig } from "@/utils";
+import { urlEncode, BASE_URL, fetchJWT, fetchConfig, getI18nKey } from "@/utils";
 import { AccessKeyService, AccessTokenAuthStrategy, AuthStrategy } from '@/service/accesskey';
 import { Config } from '@/config';
 

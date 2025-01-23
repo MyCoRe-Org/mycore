@@ -11,7 +11,7 @@
           class="page-link"
           href="#"
         >
-          {{ $t("component.acl.accesskey.frontend.button.previous") }}
+          {{ t(getI18nKey("button.previous")) }}
         </a>
       </li>
       <li
@@ -39,7 +39,7 @@
           class="page-link"
           href="#"
         >
-          {{ $t("component.acl.accesskey.frontend.button.next") }}
+          {{ t(getI18nKey("button.next")) }}
         </a>
       </li>
     </ul>
@@ -48,6 +48,10 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
+import { getI18nKey } from "@/utils";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   totalRows: number;

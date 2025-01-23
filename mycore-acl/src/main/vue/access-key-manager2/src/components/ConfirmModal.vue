@@ -2,8 +2,8 @@
   <Modal
     :is-visible="isVisible"
     hide-header-close
-    :ok-title="$t('component.acl.accesskey.frontend.button.yes')"
-    :cancel-title="$t('component.acl.accesskey.frontend.button.no')"
+    :ok-title="t(getI18nKey('button.yes'))"
+    :cancel-title="t(getI18nKey('button.no'))"
     :title="title"
     @ok="ok"
     @cancel="cancel"
@@ -14,6 +14,10 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import Modal from "./BaseModal.vue";
+import { getI18nKey } from "@/utils";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const isVisible = ref(false);
 const title = ref<string>();

@@ -2,7 +2,7 @@
   <BaseModal
     v-if="accessKey"
     :is-visible="isVisible"
-    :title="$t('component.acl.accesskey.frontend.title.viewAccessKey')"
+    :title="t(getI18nKey('title.viewAccessKey'))"
     ok-only
     scrollable
     :busy="busy"
@@ -20,7 +20,7 @@
         class="form-group required"
       >
         <label for="inputReference">
-          {{ $t("component.acl.accesskey.frontend.label.reference") }}
+          {{ t(getI18nKey("label.reference")) }}
         </label>
         <div class="input-group">
           <input
@@ -35,7 +35,7 @@
       <div class="form-row">
         <div class="form-group col-md-6">
           <label for="inputPermission">
-            {{ $t("component.acl.accesskey.frontend.label.permission") }}
+            {{ t(getI18nKey("label.permission")) }}
           </label>
           <select
             v-if="availablePermissions.length > 0"
@@ -48,7 +48,7 @@
               :key="permissionValue"
             >
               <option :value="permissionValue">
-                {{ $t(`component.acl.accesskey.frontend.label.permission.${permissionValue}`) }}
+                {{ t(getI18nKey(`label.permission.${permissionValue}`)) }}
               </option>
             </template>
           </select>
@@ -61,7 +61,7 @@
         </div>
         <div class="form-group col-md-6">
           <label for="expirationInput">
-            {{ $t("component.acl.accesskey.frontend.label.expiration") }}
+            {{ t(getI18nKey("label.expiration")) }}
           </label>
           <input
             id="expirationInput"
@@ -83,13 +83,13 @@
             class="form-check-label"
             for="inputActive"
           >
-            {{ $t("component.acl.accesskey.frontend.label.active") }}
+            {{ t(getI18nKey("label.active")) }}
           </label>
         </div>
       </div>
       <div class="form-group">
         <label for="commentTextarea">
-          {{ $t("component.acl.accesskey.frontend.label.comment") }}
+          {{ $t(getI18nKey("label.comment")) }}
         </label>
         <textarea
           id="commentTextarea"
@@ -112,7 +112,7 @@
           role="status"
           aria-hidden="true"
         />
-        {{ $t("component.acl.accesskey.frontend.button.updateAccessKey") }}
+        {{ t(getI18nKey("button.updateAccessKey")) }}
       </button>
     </template>
   </BaseModal>
@@ -125,6 +125,10 @@ import BaseModal from "@/components/BaseModal.vue";
 import { required } from "@vuelidate/validators";
 import useVuelidate from "@vuelidate/core";
 import { AccessKeyService } from "@/service/accesskey";
+import { getI18nKey } from "@/utils";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   accessKeyService?: AccessKeyService;
