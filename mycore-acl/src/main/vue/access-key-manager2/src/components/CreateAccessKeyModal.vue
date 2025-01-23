@@ -175,7 +175,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onErrorCaptured } from "vue";
+import { ref, onErrorCaptured } from "vue";
 import { generateRandomString } from "@/utils";
 import { AccessKeyDto, CreateAccessKeyDto } from "@/dtos/accesskey";
 import useVuelidate from "@vuelidate/core";
@@ -199,7 +199,7 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
-const rules = computed(() => ({
+const rules = {
   reference: {
     required,
   },
@@ -209,7 +209,7 @@ const rules = computed(() => ({
   secret: {
     required,
   },
-}));
+};
 
 const errorMessage = ref<string>();
 const isBusy = ref<boolean>(false);

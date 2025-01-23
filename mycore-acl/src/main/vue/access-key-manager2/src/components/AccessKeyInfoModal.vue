@@ -140,7 +140,7 @@
 
 <!-- TODO fix delete date issue in endpoint -->
 <script setup lang="ts">
-import { computed, ref, onErrorCaptured, watch } from "vue";
+import { ref, onErrorCaptured, watch } from "vue";
 import { AccessKeyDto, PartialUpdateAccessKeyDto } from "@/dtos/accesskey";
 import BaseModal from "@/components/BaseModal.vue";
 import { required } from "@vuelidate/validators";
@@ -182,10 +182,10 @@ const form = ref<FormData>({
   expiration: undefined,
 });
 
-const rules = computed(() => ({
+const rules = {
   reference: { required },
   type: { required },
-}));
+};
 
 const v = useVuelidate(rules, form);
 watch(() => props.accessKey, (newAccessKey: AccessKeyDto | undefined) => {
