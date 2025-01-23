@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -61,7 +62,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
     boolean disabled;
 
-    static Map<String, String> ruleIDTable = new HashMap<>();
+    static Map<String, String> ruleIDTable = new ConcurrentHashMap<>();
 
     private static final Logger LOGGER = LogManager.getLogger(MCRAccessControlSystem.class);
 

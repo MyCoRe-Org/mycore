@@ -27,7 +27,6 @@ import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.ArrayDeque;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -39,6 +38,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -69,7 +69,7 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
     private static final URI DEFAULT_URI = URI.create("");
 
     /** A map storing arbitrary session data * */
-    private Map<Object, Object> map = new HashMap<>();
+    private Map<Object, Object> map = new ConcurrentHashMap<>();
 
     @SuppressWarnings("unchecked")
     private Map.Entry<Object, Object>[] emptyEntryArray = new Map.Entry[0];
