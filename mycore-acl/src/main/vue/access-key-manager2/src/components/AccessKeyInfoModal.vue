@@ -5,13 +5,14 @@
     :title="t(getI18nKey('title.viewAccessKey'))"
     ok-only
     scrollable
-    :busy="busy"
+    :busy="isBusy"
     @close="close"
   >
     <div
       v-if="errorMessage"
       class="alert alert-danger text-center"
       role="alert"
+      aria-live="assertive"
     >
       {{ $t(errorMessage) }}
     </div>
@@ -19,7 +20,10 @@
       <div
         class="form-group required"
       >
-        <label for="inputReference">
+        <label
+          id="labelReference"
+          for="inputReference"
+        >
           {{ t(getI18nKey("label.reference")) }}
         </label>
         <div class="input-group">
@@ -29,12 +33,16 @@
             :disabled="reference !== undefined"
             type="text"
             class="form-control"
+            aria-labelledby="labelReference"
           >
         </div>
       </div>
       <div class="form-row">
         <div class="form-group col-md-6">
-          <label for="inputPermission">
+          <label
+            id="lablePermission"
+            for="inputPermission"
+          >
             {{ t(getI18nKey("label.permission")) }}
           </label>
           <select
@@ -42,6 +50,7 @@
             id="inputPermission"
             v-model="form.type"
             class="form-control"
+            aria-labelledby="inputPermission"
           >
             <template
               v-for="permissionValue in availablePermissions"
@@ -57,10 +66,14 @@
             id="inputPermission"
             v-model="form.type"
             class="form-control"
+            aria-labelledby="inputPermission"
           >
         </div>
         <div class="form-group col-md-6">
-          <label for="expirationInput">
+          <label
+            id="labelExpiration"
+            for="expirationInput"
+          >
             {{ t(getI18nKey("label.expiration")) }}
           </label>
           <input
@@ -68,6 +81,7 @@
             v-model="form.expiration"
             type="date"
             class="form-control"
+            aria-labelledby="labelExpiration"
           >
         </div>
       </div>
@@ -78,8 +92,10 @@
             v-model="form.isActive"
             class="form-check-input"
             type="checkbox"
+            aria-labelledby="labelActive"
           >
           <label
+            id="labelActive"
             class="form-check-label"
             for="inputActive"
           >
@@ -88,7 +104,10 @@
         </div>
       </div>
       <div class="form-group">
-        <label for="commentTextarea">
+        <label
+          id="labelComment"
+          for="commentTextarea"
+        >
           {{ $t(getI18nKey("label.comment")) }}
         </label>
         <textarea
@@ -96,6 +115,7 @@
           v-model="form.comment"
           class="form-control"
           rows="3"
+          aria-labelledby="labelComment"
         />
       </div>
     </form>
@@ -103,11 +123,11 @@
       <button
         type="button"
         class="btn btn-primary"
-        :disabled="busy || v.$invalid"
+        :disabled="isBusy || v.$invalid"
         @click="updateAccessKey"
       >
         <span
-          v-if="busy"
+          v-if="isBusy"
           class="spinner-border spinner-border-sm"
           role="status"
           aria-hidden="true"
@@ -117,6 +137,7 @@
     </template>
   </BaseModal>
 </template>
+
 <!-- TODO fix delete date issue in endpoint -->
 <script setup lang="ts">
 import { computed, ref, onErrorCaptured, watch } from "vue";
@@ -127,6 +148,14 @@ import useVuelidate from "@vuelidate/core";
 import { AccessKeyService } from "@/service/accesskey";
 import { getI18nKey } from "@/utils";
 import { useI18n } from "vue-i18n";
+
+interface FormData {
+  reference: string;
+  type: string;
+  expiration: string | undefined;
+  comment: string | undefined;
+  isActive: boolean;
+}
 
 const { t } = useI18n();
 
@@ -142,21 +171,9 @@ const emit = defineEmits<{
   (event: "update-access-key", accessKey: AccessKeyDto): void;
   (event: "close"): void;
 }>();
-const rules = computed(() => ({
-  reference: { required },
-  type: { required },
-}));
+
 const errorMessage = ref<string | undefined>(undefined);
-const busy = ref<boolean>(false);
-
-interface FormData {
-  reference: string;
-  type: string;
-  expiration: string | undefined;
-  comment: string | undefined;
-  isActive: boolean;
-}
-
+const isBusy = ref<boolean>(false);
 const form = ref<FormData>({
   reference: "",
   type: "",
@@ -165,8 +182,13 @@ const form = ref<FormData>({
   expiration: undefined,
 });
 
+const rules = computed(() => ({
+  reference: { required },
+  type: { required },
+}));
+
 const v = useVuelidate(rules, form);
-watch( () => props.accessKey, (newAccessKey: AccessKeyDto | undefined) => {
+watch(() => props.accessKey, (newAccessKey: AccessKeyDto | undefined) => {
   if (newAccessKey) {
     form.value = {
       reference: newAccessKey.reference,
@@ -179,12 +201,12 @@ watch( () => props.accessKey, (newAccessKey: AccessKeyDto | undefined) => {
     };
   }
 }, { deep: true });
-const handleError = (error: unknown) => {
+const handleError = (error: unknown): void => {
   errorMessage.value =
     error instanceof Error ? error.message : "component.acl.accesskey.frontend.error.fatal";
 };
-const close = (force: boolean) => {
-  if (force || !busy.value) {
+const close = (force?: boolean): void => {
+  if (force || !isBusy.value) {
     emit("close");
   }
 };
@@ -208,11 +230,11 @@ const buildAccessKeyPayload = (): PartialUpdateAccessKeyDto => {
   }
   return accessKey;
 };
-const updateAccessKey = async () => {
-  if (props.accessKeyService && !busy.value) {
+const updateAccessKey = async (): Promise<void> => {
+  if (props.accessKeyService && !isBusy.value) {
+    isBusy.value = true;
     v.value.$validate();
     if (!v.value.$invalid && props.accessKey && props.accessKey.id) {
-      busy.value = true;
       const accessKey: PartialUpdateAccessKeyDto = buildAccessKeyPayload();
       try {
         await props.accessKeyService.patchAccessKey(props.accessKey.id, accessKey);
@@ -222,12 +244,14 @@ const updateAccessKey = async () => {
       } catch (error) {
         handleError(error);
       } finally {
-        busy.value = false;
+        isBusy.value = false;
       }
+    } else {
+      isBusy.value = false;
     }
   }
 };
-onErrorCaptured((err) => {
+onErrorCaptured((err): boolean => {
   handleError(err);
   return false;
 });

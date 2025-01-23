@@ -53,6 +53,7 @@
   </table>
   <ConfirmModal ref="confirmModal" />
 </template>
+
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
@@ -65,6 +66,11 @@ const confirmModal = ref();
 
 defineProps<{
   accessKeys: AccessKeyDto[];
+}>();
+
+const emit = defineEmits<{
+  (event: "remove-access-key", accessKey: string): void;
+  (event: "view-access-key", index: number): void;
 }>();
 
 const columnLabels = computed(() => ({
@@ -83,17 +89,13 @@ const openDeleteConfirmationModal = async (accessKey: AccessKeyDto): Promise<boo
     message: t("component.acl.accesskey.frontend.confirmRemove.text", { secret: secretPreview }),
   });
 };
-const emit = defineEmits<{
-  (event: "remove-access-key", accessKey: string): void;
-  (event: "view-access-key", index: number): void;
-}>();
-const removeAccessKey = async (accessKey: AccessKeyDto) => {
+const removeAccessKey = async (accessKey: AccessKeyDto): Promise<void> => {
   const confirmed = await openDeleteConfirmationModal(accessKey);
   if (confirmed) {
     emit("remove-access-key", accessKey.id);
   }
 };
-const viewAccessKey = (index: number) => {
+const viewAccessKey = (index: number): void => {
   emit("view-access-key", index);
 };
 </script>

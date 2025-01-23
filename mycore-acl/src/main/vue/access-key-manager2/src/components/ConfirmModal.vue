@@ -11,22 +11,26 @@
     {{ message }}
   </Modal>
 </template>
+
 <script setup lang="ts">
 import { ref } from "vue";
 import Modal from "./BaseModal.vue";
 import { getI18nKey } from "@/utils";
 import { useI18n } from "vue-i18n";
 
+interface Ops {
+  title: string;
+  message: string;
+}
+
 const { t } = useI18n();
 
 const isVisible = ref(false);
 const title = ref<string>();
 const message = ref<string>();
+
 let resolvePromise: ((value: boolean) => void) | undefined;
-interface Ops {
-  title: string;
-  message: string;
-}
+
 const show = (ops: Ops): Promise<boolean> => {
   title.value = ops.title;
   message.value = ops.message;

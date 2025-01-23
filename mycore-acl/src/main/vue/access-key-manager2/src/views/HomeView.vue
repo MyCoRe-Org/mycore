@@ -99,6 +99,7 @@
     />
   </div>
 </template>
+
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router';
 import { ref, onMounted, onErrorCaptured, computed, reactive } from "vue";
@@ -125,8 +126,12 @@ const router = useRouter();
 const route = useRoute();
 const { t } = useI18n();
 
-const accessKeyService = ref<AccessKeyService>();
-const config = ref<Config>();
+const getActivationLink = (secret: string): string =>
+  t("component.acl.accesskey.frontend.success.add.url.format", {
+    baseUrl: BASE_URL,
+    reference,
+    secret: urlEncode(secret),
+  });
 
 const reference = route.query.reference as string | undefined;
 const availablePermissionsQuery = route.query.availablePermissions as string | undefined;
@@ -145,8 +150,16 @@ const state = reactive({
   isAccessKeyInfoModalVisible: false,
   currentAccessKey: undefined as AccessKeyDto | undefined,
 })
+const accessKeyService = ref<AccessKeyService>();
+const config = ref<Config>();
 
 const paginatedAccessKeys = computed(() =>  state.accessKeys.slice(0, state.pageSize));
+const activationLink = computed((): string => {
+  if (state.accessKeyCreated && state.accessKeyCreatedSecret) {
+    return getActivationLink(state.accessKeyCreatedSecret);
+  }
+  return '';
+});
 const fetchAccessKeys = async (): Promise<void> => {
   if (accessKeyService.value) {
     const offset = (state.currentPage - 1) * state.pageSize;
@@ -183,18 +196,6 @@ const resetInfos = (): void => {
   state.accessKeyCreatedSecret = undefined;
   state.accessKeyCreated = undefined;
 };
-const getActivationLink = (secret: string): string =>
-  t("component.acl.accesskey.frontend.success.add.url.format", {
-    baseUrl: BASE_URL,
-    reference,
-    secret: urlEncode(secret),
-  });
-const activationLink = computed((): string => {
-  if (state.accessKeyCreated && state.accessKeyCreatedSecret) {
-    return getActivationLink(state.accessKeyCreatedSecret);
-  }
-  return '';
-});
 const changePage = async (page: number): Promise<void> => {
   resetInfos();
   state.loading = true;
@@ -208,7 +209,6 @@ const changePage = async (page: number): Promise<void> => {
     },
   });
 };
-
 const deleteAccessKey = async (accessKeyId: string): Promise<void> => {
   resetInfos();
   if (accessKeyService.value) {

@@ -4,13 +4,14 @@
     :title="t(getI18nKey('title.createAccessKey'))"
     ok-only
     scrollable
-    :busy="busy"
-    @close="handleClose()"
+    :busy="isBusy"
+    @close="handleClose"
   >
     <div
       v-if="errorMessage"
       class="alert alert-danger text-center"
       role="alert"
+      aria-live="polite"
     >
       {{ t(errorMessage) }}
     </div>
@@ -21,13 +22,17 @@
       <div
         class="form-group required"
       >
-        <label for="inputReference">
+        <label
+          id="labelReference"
+          for="inputReference"
+        >
           {{ t(getI18nKey("label.reference")) }}
         </label>
         <div class="input-group">
           <input
             id="inputReference"
             v-model="form.reference"
+            aria-labelledby="labelReference"
             :disabled="reference !== undefined"
             type="text"
             class="form-control"
@@ -35,7 +40,10 @@
         </div>
       </div>
       <div class="form-group required">
-        <label for="inputValue">
+        <label
+          id="labelSecret"
+          for="inputSecret"
+        >
           {{ t(getI18nKey("label.value")) }}
         </label>
         <div class="input-group">
@@ -43,14 +51,16 @@
             <button
               class="btn btn-primary"
               type="button"
-              @click="generateValue"
+              aria-label="generate secret"
+              @click="generateSecret"
             >
               <i class="fa fa-shuffle" />
             </button>
           </div>
           <input
-            id="inputValue"
+            id="inputSecret"
             v-model="form.secret"
+            aria-labelledby="labelSecret"
             type="text"
             class="form-control"
           >
@@ -58,13 +68,17 @@
       </div>
       <div class="form-row">
         <div class="form-group col-md-6 required">
-          <label for="inputPermission">
+          <label
+            id="labelPermission"
+            for="inputPermission"
+          >
             {{ t(getI18nKey("label.permission")) }}
           </label>
           <select
             v-if="availablePermissions.length > 0"
             id="inputPermission"
             v-model="form.type"
+            aria-labelledby="labelPermission"
             class="form-control"
           >
             <option
@@ -86,16 +100,21 @@
             v-else
             id="inputPermission"
             v-model="form.type"
+            aria-labelledby="labelPermission"
             class="form-control"
           >
         </div>
         <div class="form-group col-md-6">
-          <label for="expirationInput">
+          <label
+            id="labelExpiration"
+            for="expirationInput"
+          >
             {{ t(getI18nKey("label.expiration")) }}
           </label>
           <input
             id="expirationInput"
             v-model="form.expiration"
+            aria-labelledby="labelExpiration"
             type="date"
             class="form-control"
           >
@@ -106,10 +125,12 @@
           <input
             id="inputActive"
             v-model="form.isActive"
+            aria-labelledby="labelActive"
             class="form-check-input"
             type="checkbox"
           >
           <label
+            id="labelActive"
             class="form-check-label"
             for="inputActive"
           >
@@ -118,12 +139,16 @@
         </div>
       </div>
       <div class="form-group">
-        <label for="commentTextarea">
+        <label
+          id="labelComment"
+          for="commentTextarea"
+        >
           {{ t(getI18nKey("label.comment")) }}
         </label>
         <textarea
           id="commentTextarea"
           v-model="form.comment"
+          aria-labelledby="labelComment"
           class="form-control"
           rows="3"
         />
@@ -133,11 +158,12 @@
       <button
         type="button"
         class="btn btn-primary"
-        :disabled="busy || v.$invalid"
+        :disabled="isBusy || v.$invalid"
+        :aria-disabled="isBusy || v.$invalid"
         @click="handleCreateAccessKey"
       >
         <span
-          v-if="busy"
+          v-if="isBusy"
           class="spinner-border spinner-border-sm"
           role="status"
           aria-hidden="true"
@@ -168,6 +194,11 @@ const props = defineProps<{
   isVisible: boolean;
 }>();
 
+const emit = defineEmits<{
+  (event: "add-access-key", secret: string, accessKey: AccessKeyDto): void;
+  (event: "close"): void;
+}>();
+
 const rules = computed(() => ({
   reference: {
     required,
@@ -179,13 +210,9 @@ const rules = computed(() => ({
     required,
   },
 }));
-const emit = defineEmits<{
-  (event: "create-access-key", secret: string, accessKey: AccessKeyDto): void;
-  (event: "close"): void;
-}>();
 
-const errorMessage = ref<string | undefined>(undefined);
-const busy = ref<boolean>(false);
+const errorMessage = ref<string>();
+const isBusy = ref<boolean>(false);
 const defaultForm = {
   reference: props.reference !== undefined ? props.reference : "",
   isActive: true,
@@ -196,69 +223,76 @@ const defaultForm = {
 };
 const form = ref<CreateAccessKeyDto>({ ...defaultForm });
 const v = useVuelidate(rules, form);
-const handleError = (error: unknown) => {
+const handleError = (error: unknown): void => {
   errorMessage.value =
     error instanceof Error ? error.message : "component.acl.accesskey.frontend.error.fatal";
 };
-const resetForm = () => {
+const resetForm = (): void => {
   form.value = { ...defaultForm };
   v.value.$reset();
 };
-const resetModal = () => {
+const resetModal = (): void => {
   errorMessage.value = undefined;
   resetForm();
 };
-const handleClose = (force?: boolean) => {
-  if (force || !busy.value) {
+const handleClose = (force?: boolean): void => {
+  if (force || !isBusy.value) {
     resetModal();
     emit("close");
   }
 };
-const handleCreateAccessKey = async () => {
-  if (props.accessKeyService && !busy.value) {
-    v.value.$validate();
-    if (!v.value.$invalid) {
-      if (!v.value.$error) {
-        busy.value = true;
-        try {
-          const accessKey = {
-            reference: form.value.reference,
-            secret: form.value.secret,
-            isActive: form.value.isActive,
-            type: form.value.type,
-          } as CreateAccessKeyDto;
-          if (form.value.expiration) {
-            accessKey.expiration = Math.floor(new Date(form.value.expiration).getTime());
-          }
-          if (form.value.comment) {
-            accessKey.comment = form.value.comment;
-          }
-          const accessKeyId = await props.accessKeyService.createAccessKey(accessKey);
-          const createdAccessKey = await props.accessKeyService.getAccessKey(accessKeyId);
-          emit("create-access-key", form.value.secret, createdAccessKey);
-          handleClose(true);
-        } catch (error) {
-          handleError(error);
-        } finally {
-          busy.value = false;
-        }
-      } else {
-        busy.value = false;
-      }
+const validateForm = async (): Promise<boolean> => {
+  v.value.$validate();
+  if (v.value.$invalid) {
+    return false;
+  }
+  return true;
+};
+const getAccessKey = (): CreateAccessKeyDto => {
+  const accessKey = {
+    reference: form.value.reference,
+    secret: form.value.secret,
+    isActive: form.value.isActive,
+    type: form.value.type,
+  } as CreateAccessKeyDto;
+  if (form.value.expiration) {
+    accessKey.expiration = Math.floor(new Date(form.value.expiration).getTime());
+  }
+  if (form.value.comment) {
+    accessKey.comment = form.value.comment;
+  }
+  return accessKey;
+}
+const handleCreateAccessKey = async (): Promise<void> => {
+  if (props.accessKeyService && !isBusy.value && await validateForm()) {
+    isBusy.value = true;
+    try {
+      const accessKey = getAccessKey();
+      const accessKeyId = await props.accessKeyService.createAccessKey(accessKey);
+      const createdAccessKey = await props.accessKeyService.getAccessKey(accessKeyId);
+      emit("add-access-key", form.value.secret, createdAccessKey);
+      handleClose(true);
+    } catch (error) {
+      handleError(error);
+    } finally {
+      isBusy.value = false;
     }
   }
 };
-const generateValue = (): void => {
+const generateSecret = (): void => {
   form.value.secret = generateRandomString(16);
 };
-onErrorCaptured((err) => {
+onErrorCaptured((err): boolean => {
   handleError(err.message);
   return false;
 });
 </script>
+
 <style scoped>
 .form-group.required label:after {
   content: "*";
-  color: black;
+  color: red;
+  font-weight: bold;
+  margin-left: 5px;
 }
 </style>

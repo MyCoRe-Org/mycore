@@ -3,44 +3,47 @@
     <ul class="pagination">
       <li
         class="page-item"
-        :class="currentPage === 1 ? 'disabled' : ''"
-        @click="jumpToPage(currentPage - 1)"
-        @keyDown="jumpToPage(currentPage - 1)"
+        :class="previousButtonDisabled ? 'disabled' : ''"
       >
-        <a
+        <button
           class="page-link"
-          href="#"
+          :aria-label="translate('button.previous')"
+          :disabled="previousButtonDisabled"
+          :aria-disabled="previousButtonDisabled"
+          @click="jumpToPage(currentPage - 1)"
         >
-          {{ t(getI18nKey("button.previous")) }}
-        </a>
+          {{ translate("button.previous") }}
+        </button>
       </li>
       <li
         v-for="page in pages"
         :key="page"
         class="page-item"
         :class="page === currentPage ? 'active' : ''"
-        @click="jumpToPage(page)"
-        @keyDown="jumpToPage(page)"
       >
-        <a
+        <button
           class="page-link"
-          href="#"
+          :aria-label="String(page)"
+          :aria-current="page === currentPage"
+          :aria-disabled="page === currentPage"
+          @click="jumpToPage(page)"
         >
           {{ page }}
-        </a>
+        </button>
       </li>
       <li
         class="page-item"
-        :class="currentPage === totalPages || totalRows == 0 ? 'disabled' : ''"
-        @click="jumpToPage(currentPage + 1)"
-        @keyDown="jumpToPage(currentPage + 1)"
+        :class="nextButtonDisabled ? 'disabled' : ''"
       >
-        <a
+        <button
           class="page-link"
-          href="#"
+          :aria-label="translate('button.next')"
+          :disabled="nextButtonDisabled"
+          :aria-disabled="nextButtonDisabled"
+          @click="jumpToPage(currentPage + 1)"
         >
-          {{ t(getI18nKey("button.next")) }}
-        </a>
+          {{ translate("button.next") }}
+        </button>
       </li>
     </ul>
   </nav>
@@ -52,17 +55,22 @@ import { useI18n } from "vue-i18n";
 import { getI18nKey } from "@/utils";
 
 const { t } = useI18n();
+const translate = (key: string) => t(getI18nKey(key));
 
 const props = defineProps<{
   totalRows: number;
   currentPage: number;
   perPage: number;
 }>();
+
 const emit = defineEmits<{
   (event: "change-page", page: number): void;
 }>();
-const totalPages = computed(() => Math.ceil(props.totalRows / props.perPage));
-const pages = computed(() => {
+
+const totalPages = computed((): number => Math.ceil(props.totalRows / props.perPage));
+const nextButtonDisabled = computed((): boolean => props.currentPage === totalPages.value || props.totalRows === 0);
+const previousButtonDisabled = computed((): boolean => props.currentPage === 1);
+const pages = computed((): number[] => {
   if (props.totalRows === 0) {
     return [1];
   }
@@ -72,9 +80,11 @@ const pages = computed(() => {
   }
   return range;
 });
-const jumpToPage = (page: number) => {
-  if (page > 0 && page <= totalPages.value && page !== props.currentPage) {
-    emit("change-page", page);
+
+const jumpToPage = (page: number): void => {
+  if (page <= 0 || page > totalPages.value || page === props.currentPage) {
+    return;
   }
+  emit("change-page", page);
 };
 </script>
