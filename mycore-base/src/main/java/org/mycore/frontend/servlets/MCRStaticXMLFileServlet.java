@@ -69,7 +69,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
         .map(s -> URLEncoder.encode(s, StandardCharsets.UTF_8))
         .orElse("");
 
-    protected static final Logger LOGGER = LogManager.getLogger(MCRStaticXMLFileServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public void doGetPost(MCRServletJob job) throws IOException, MCRException, SAXException, JDOMException,

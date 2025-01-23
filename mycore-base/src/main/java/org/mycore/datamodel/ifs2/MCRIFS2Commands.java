@@ -53,7 +53,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 @MCRCommandGroup(name = "IFS2 Commands")
 public class MCRIFS2Commands extends MCRAbstractCommands {
 
-    public static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @MCRCommand(syntax = "list all current ifs2 stores",
         help = "Lists all currently configured IFS2 MCRStore instances")

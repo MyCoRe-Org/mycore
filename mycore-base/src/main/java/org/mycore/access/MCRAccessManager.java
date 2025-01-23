@@ -41,7 +41,7 @@ public class MCRAccessManager {
 
     private static final MCRAccessCacheManager ACCESS_CACHE = new MCRAccessCacheManager();
 
-    public static final Logger LOGGER = LogManager.getLogger(MCRAccessManager.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static final String PERMISSION_READ = "read";
 

@@ -57,7 +57,7 @@ public class MCRLayoutService {
 
     private static final int INITIAL_BUFFER_SIZE = 32 * 1024;
 
-    static final Logger LOGGER = LogManager.getLogger(MCRLayoutService.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCRLayoutService SINGLETON = new MCRLayoutService();
 

@@ -52,7 +52,7 @@ class MCRAuthorityWithURI extends MCRAuthorityInfo {
      */
     private static final String LABEL_LANG_URI = "x-uri";
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRMODSClassificationSupport.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * The authority URI

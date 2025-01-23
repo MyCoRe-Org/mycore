@@ -62,7 +62,7 @@ import org.mycore.solr.auth.MCRSolrAuthenticationManager;
  */
 public class MCROAISolrSearcher extends MCROAISearcher {
 
-    protected static final Logger LOGGER = LogManager.getLogger(MCROAISolrSearcher.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private MCRSet set;
 

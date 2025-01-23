@@ -68,7 +68,7 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
 
     private static final String RESOLVED_RULES_FILE_NAME = "rules.resolved.xml";
 
-    protected static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private MCRCondition rules;
 

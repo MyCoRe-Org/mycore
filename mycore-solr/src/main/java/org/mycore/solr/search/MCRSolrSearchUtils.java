@@ -57,7 +57,7 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 public final class MCRSolrSearchUtils {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRQLSearchUtils.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private MCRSolrSearchUtils() {
     }

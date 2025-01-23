@@ -18,8 +18,6 @@
 
 package org.mycore.access.mcrimpl;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
@@ -33,7 +31,6 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
  */
 @MCRCommandGroup(name = "Access Control Commands")
 public class MCRAccessCtrlCommands extends MCRAbstractCommands {
-    public static Logger logger = LogManager.getLogger(MCRAccessCtrlCommands.class.getName());
 
     /**
      * validates access for given object and given permission

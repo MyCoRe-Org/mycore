@@ -287,8 +287,6 @@
   <!--
   <rule ref="category/java/errorprone.xml/ProperCloneImplementation"/>
   -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/errorprone.xml/ProperLogger">
     <properties>
       <property name="staticLoggerName" value="LOGGER"/>
@@ -296,7 +294,6 @@
       <property name="loggerClass" value="org.apache.logging.log4j.Logger"/>
     </properties>
   </rule>
-  -->
   <!-- to be evaluated -->
   <!-- TODO: Create PR to fix this rule -->
   <!--

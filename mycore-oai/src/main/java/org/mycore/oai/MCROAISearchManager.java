@@ -63,7 +63,7 @@ import org.mycore.util.concurrent.MCRTransactionableRunnable;
  */
 public class MCROAISearchManager {
 
-    protected static final Logger LOGGER = LogManager.getLogger(MCROAISearchManager.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     protected static final String TOKEN_DELIMITER = "@";
 

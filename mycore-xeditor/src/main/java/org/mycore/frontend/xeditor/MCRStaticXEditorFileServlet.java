@@ -26,8 +26,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.jdom2.JDOMException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
@@ -35,18 +36,12 @@ import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.servlets.MCRStaticXMLFileServlet;
 import org.xml.sax.SAXException;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 /**
  * @author Frank Lützenkirchen
  */
 public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
 
     private static final long serialVersionUID = 1L;
-
-    protected static final Logger LOGGER = LogManager.getLogger(MCRStaticXEditorFileServlet.class);
 
     /** XML document types that may contain editor forms */
     protected Set<String> docTypesIncludingEditors = new HashSet<>();
@@ -101,4 +96,5 @@ public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
 
         return new MCRXEditorTransformer(session, pc).transform(content);
     }
+
 }

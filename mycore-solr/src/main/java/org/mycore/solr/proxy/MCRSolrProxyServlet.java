@@ -86,7 +86,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRSolrProxyServlet extends MCRServlet {
 
-    static final Logger LOGGER = LogManager.getLogger(MCRSolrProxyServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final long serialVersionUID = 1L;
 

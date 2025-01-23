@@ -27,13 +27,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jtojson.Neo4JMetaData;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jtojson.Neo4JNodeJsonRecord;
-import org.mycore.mcr.neo4j.index.MCRNeo4JIndexEventHandler;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
@@ -44,12 +45,9 @@ import org.neo4j.driver.types.Node;
 import org.neo4j.driver.types.Path;
 import org.neo4j.driver.types.Relationship;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 public class MCRNeo4JQueryRunner {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRNeo4JIndexEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String LANGUAGE = MCRConfiguration2.getString("MCR.Metadata.DefaultLang").orElse("de");
 

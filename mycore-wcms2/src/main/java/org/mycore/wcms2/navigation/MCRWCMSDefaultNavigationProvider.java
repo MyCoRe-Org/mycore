@@ -41,12 +41,13 @@ import com.google.gson.JsonObject;
  * @author Matthias Eichner
  */
 public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvider {
-    private static final Logger LOGGER = LogManager.getLogger(MCRWCMSDefaultSectionProvider.class);
 
-    private static Gson gson;
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    private static final Gson GSON;
 
     static {
-        gson = new Gson();
+        GSON = new Gson();
     }
 
     @Override
@@ -77,7 +78,7 @@ public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvid
 
     private JsonObject add(MCRNavigationBaseItem item, JsonArray hierarchy, JsonArray items) {
         int id = items.size();
-        JsonObject jsonItem = gson.toJsonTree(item).getAsJsonObject();
+        JsonObject jsonItem = GSON.toJsonTree(item).getAsJsonObject();
         jsonItem.addProperty(JSON_WCMS_ID, id);
         jsonItem.remove(JSON_CHILDREN);
         WCMSType type = null;
@@ -171,15 +172,15 @@ public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvid
                     && wcmsId.equals(item.get(JSON_WCMS_ID).getAsString())) {
                     WCMSType wcmsType = WCMSType.valueOf(item.get(JSON_WCMS_TYPE).getAsString());
                     if (wcmsType.equals(WCMSType.ROOT)) {
-                        return gson.fromJson(item, MCRNavigation.class);
+                        return GSON.fromJson(item, MCRNavigation.class);
                     } else if (wcmsType.equals(WCMSType.MENU)) {
-                        return gson.fromJson(item, MCRNavigationMenuItem.class);
+                        return GSON.fromJson(item, MCRNavigationMenuItem.class);
                     } else if (wcmsType.equals(WCMSType.ITEM)) {
-                        return gson.fromJson(item, MCRNavigationItem.class);
+                        return GSON.fromJson(item, MCRNavigationItem.class);
                     } else if (wcmsType.equals(WCMSType.INSERT)) {
-                        return gson.fromJson(item, MCRNavigationInsertItem.class);
+                        return GSON.fromJson(item, MCRNavigationInsertItem.class);
                     } else if (wcmsType.equals(WCMSType.GROUP)) {
-                        return gson.fromJson(item, MCRNavigationGroup.class);
+                        return GSON.fromJson(item, MCRNavigationGroup.class);
                     }
                 }
             }

@@ -124,9 +124,8 @@ import jakarta.servlet.ServletContext;
  * @author Thomas Scheffler (yagee)
  */
 public final class MCRURIResolver implements URIResolver {
-    static final Logger LOGGER = LogManager.getLogger(MCRURIResolver.class);
 
-    static final String SESSION_OBJECT_NAME = "URI_RESOLVER_DEBUG";
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String CONFIG_PREFIX = "MCR.URIResolver.";
 
@@ -1242,7 +1241,8 @@ public final class MCRURIResolver implements URIResolver {
      * @return A xsl file with the includes as href.
      */
     private static class MCRXslIncludeResolver implements URIResolver {
-        private static final Logger LOGGER = LogManager.getLogger(MCRXslIncludeResolver.class);
+
+        private static final Logger LOGGER = LogManager.getLogger();
 
         @Override
         public Source resolve(String href, String base) {
@@ -1632,7 +1632,8 @@ public final class MCRURIResolver implements URIResolver {
      * no variable substitution takes place Example: MCR.URIResolver.redirect.alias=webapp:path/to/alias.xml
      */
     private static class MCRRedirectResolver implements URIResolver {
-        private static final Logger LOGGER = LogManager.getLogger(MCRRedirectResolver.class);
+
+        private static final Logger LOGGER = LogManager.getLogger();
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {

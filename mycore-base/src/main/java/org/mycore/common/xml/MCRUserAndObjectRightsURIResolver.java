@@ -61,7 +61,7 @@ import org.w3c.dom.Element;
  */
 public class MCRUserAndObjectRightsURIResolver implements URIResolver {
 
-    static final Logger LOGGER = LogManager.getLogger(MCRURIResolver.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public Source resolve(String href, String base) {
