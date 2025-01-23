@@ -63,7 +63,7 @@ public class MCRMETSServlet extends MCRServlet {
 
     private boolean useExpire;
 
-    private static int CACHE_TIME;
+    private static int cacheTime;
 
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
@@ -98,7 +98,7 @@ public class MCRMETSServlet extends MCRServlet {
 
         long lastModified = Files.getLastModifiedTime(rootPath).toMillis();
 
-        MCRFrontendUtil.writeCacheHeaders(response, CACHE_TIME, lastModified, useExpire);
+        MCRFrontendUtil.writeCacheHeaders(response, cacheTime, lastModified, useExpire);
         long start = System.currentTimeMillis();
         MCRContent metsContent = getMetsSource(job, useExistingMets(request), derivate);
         MCRLayoutService.instance().doLayout(request, response, metsContent);
@@ -151,7 +151,7 @@ public class MCRMETSServlet extends MCRServlet {
         super.init();
         String cacheParam = getInitParameter("cacheTime");
         /* default is one day */
-        CACHE_TIME = cacheParam != null ? Integer.parseInt(cacheParam) : (60 * 60 * 24);
+        cacheTime = cacheParam != null ? Integer.parseInt(cacheParam) : (60 * 60 * 24);
         useExpire = MCRConfiguration2.getBoolean("MCR.Component.MetsMods.Servlet.UseExpire").orElse(true);
     }
 

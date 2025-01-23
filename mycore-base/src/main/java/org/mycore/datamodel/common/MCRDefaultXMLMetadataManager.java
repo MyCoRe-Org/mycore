@@ -107,9 +107,9 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
     private static final String DEFAULT_SVN_DIRECTORY_NAME = "versions-metadata";
 
     /** The singleton */
-    private static MCRDefaultXMLMetadataManager SINGLETON;
+    private static MCRDefaultXMLMetadataManager singleton;
 
-    private Set<String> createdStores;
+    private final Set<String> createdStores;
 
     /**
      * The default IFS2 Metadata store class to use, set by MCR.Metadata.Store.DefaultClass
@@ -146,10 +146,10 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
 
     /** Returns the singleton */
     public static synchronized MCRDefaultXMLMetadataManager instance() {
-        if (SINGLETON == null) {
-            SINGLETON = new MCRDefaultXMLMetadataManager();
+        if (singleton == null) {
+            singleton = new MCRDefaultXMLMetadataManager();
         }
-        return SINGLETON;
+        return singleton;
     }
 
     @Override

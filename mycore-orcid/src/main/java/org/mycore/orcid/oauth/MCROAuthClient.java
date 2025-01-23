@@ -50,18 +50,25 @@ import jakarta.ws.rs.client.ClientBuilder;
  */
 public class MCROAuthClient {
 
-    private static MCROAuthClient SINGLETON = new MCROAuthClient();
+    private static volatile MCROAuthClient singleton;
 
-    private String baseURL;
+    private final String baseURL;
 
-    private String clientID;
+    private final String clientID;
 
-    private String clientSecret;
+    private final String clientSecret;
 
-    private Client client;
+    private final Client client;
 
     public static MCROAuthClient instance() {
-        return SINGLETON;
+        if (singleton == null) {
+            synchronized (MCROAuthClient.class) {
+                if (singleton == null) {
+                    singleton = new MCROAuthClient();
+                }
+            }
+        }
+        return singleton;
     }
 
     private MCROAuthClient() {

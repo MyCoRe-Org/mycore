@@ -52,7 +52,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public class MCRCategoryCondition extends MCRAbstractFactCondition<MCRCategoryIDFact> {
 
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private String idFact = "objid";
 

@@ -37,7 +37,7 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.streams.MCRByteArrayOutputStream;
 
 public class MCRPNGTools implements AutoCloseable {
-    private static Logger LOGGER = LogManager.getLogger(MCRPNGTools.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRPNGTools.class);
 
     private static AtomicInteger maxPngSize = new AtomicInteger(64 * 1024);
 

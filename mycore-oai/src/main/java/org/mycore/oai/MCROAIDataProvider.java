@@ -66,7 +66,7 @@ public class MCROAIDataProvider extends MCRServlet {
     /**
      * Map of all MyCoRe oai adapter.
      */
-    private static Map<String, MCROAIAdapter> ADAPTER_MAP;
+    private static final Map<String, MCROAIAdapter> ADAPTER_MAP;
 
     private static final OAIXMLOutputProcessor OAI_XML_OUTPUT_PROCESSOR = new OAIXMLOutputProcessor();
 

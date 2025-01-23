@@ -131,7 +131,7 @@ public class MCRFileUploadBucket implements MCRSessionListener, MCRShutdownHandl
 
     @Override
     public void sessionEvent(MCRSessionEvent event) {
-        if (event.getType().equals(MCRSessionEvent.Type.destroyed)) {
+        if (event.getType().equals(MCRSessionEvent.Type.DESTROYED)) {
             final String sessionID = event.getSession().getID();
             if (sessionID.equals(this.sessionID)) {
                 close();

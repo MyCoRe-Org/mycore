@@ -85,7 +85,7 @@ import org.mycore.user2.utils.MCRUserTransformer;
  */
 public class MCRLDAPClient {
     /** The logger */
-    private static Logger LOGGER = LogManager.getLogger(MCRLDAPClient.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRLDAPClient.class);
 
     private static MCRLDAPClient instance = new MCRLDAPClient();
 

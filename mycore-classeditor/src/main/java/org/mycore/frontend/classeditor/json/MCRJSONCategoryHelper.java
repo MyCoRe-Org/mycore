@@ -19,31 +19,32 @@
 package org.mycore.frontend.classeditor.json;
 
 public final class MCRJSONCategoryHelper {
-    public static String PROP_ID = "id";
 
-    public static String PROP_PARENTID = "parentid";
+    public static final String PROP_ID = "id";
 
-    public static String PROP_POSITION = "position";
+    public static final String PROP_PARENTID = "parentid";
 
-    public static String PROP_ROOTID = "rootid";
+    public static final String PROP_POSITION = "position";
 
-    public static String PROP_CATEGID = "categid";
+    public static final String PROP_ROOTID = "rootid";
 
-    public static String PROP_LABELS = "labels";
+    public static final String PROP_CATEGID = "categid";
 
-    public static String PROP_URISTR = "uri";
+    public static final String PROP_LABELS = "labels";
 
-    public static String PROP_CHILDREN = "children";
+    public static final String PROP_URISTR = "uri";
 
-    public static String PROP_HAS_CHILDREN = "haschildren";
+    public static final String PROP_CHILDREN = "children";
 
-    public static String PROP_HAS_LINK = "haslink";
+    public static final String PROP_HAS_CHILDREN = "haschildren";
 
-    public static String PROP_LANG = "lang";
+    public static final String PROP_HAS_LINK = "haslink";
 
-    public static String PROP_TEXT = "text";
+    public static final String PROP_LANG = "lang";
 
-    public static String PROP_DESCRIPTION = "description";
+    public static final String PROP_TEXT = "text";
+
+    public static final String PROP_DESCRIPTION = "description";
 
     private MCRJSONCategoryHelper() {
     }

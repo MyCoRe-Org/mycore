@@ -24,7 +24,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -32,7 +31,6 @@ import org.jdom2.Element;
 import org.jdom2.Text;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.config.MCRConfiguration2;
@@ -46,16 +44,8 @@ import org.mycore.common.xml.MCRXMLHelper;
  *
  */
 public class MCRMetaNumberTest extends MCRTestCase {
-    private static Logger LOGGER;
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();//org.mycore.datamodel.metadata.MCRMetaXML
-        if (LOGGER == null) {
-            LOGGER = LogManager.getLogger(MCRMetaNumber.class);
-        }
-    }
+    private static final Logger LOGGER = LogManager.getLogger(MCRMetaNumberTest.class);;
 
     @Test
     public void numberTransformation() {

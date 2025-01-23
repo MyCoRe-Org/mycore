@@ -21,15 +21,15 @@ package org.mycore.iiif.image.model;
 import java.util.Locale;
 
 public enum MCRIIIFImageQuality {
-    color, gray, bitonal;
+    COLOR, GRAY, BITONAL;
 
     public static MCRIIIFImageQuality fromString(String str) {
         return switch (str.toLowerCase(Locale.ENGLISH)) {
             case "color", "default", "native" -> //for backwards compatibility with IIIF Image API 1.0
-                color;
+                COLOR;
             case "gray", "grey" -> //for backwards compatibility with IIIF Image API 1.0
-                gray;
-            case "bitonal" -> bitonal;
+                GRAY;
+            case "bitonal" -> BITONAL;
             default -> throw new IllegalArgumentException(str + " is no valid ImageQuality!");
         };
     }

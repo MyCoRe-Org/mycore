@@ -328,11 +328,11 @@ public class MCRMetadataHistoryCommands {
     }
 
     private static MCRMetaHistoryItem create(MCRObjectID mcrid, String author, Instant instant) {
-        return newHistoryItem(mcrid, author, instant, MCRMetadataHistoryEventType.Create);
+        return newHistoryItem(mcrid, author, instant, MCRMetadataHistoryEventType.CREATE);
     }
 
     private static MCRMetaHistoryItem delete(MCRObjectID mcrid, String author, Instant instant) {
-        return newHistoryItem(mcrid, author, instant, MCRMetadataHistoryEventType.Delete);
+        return newHistoryItem(mcrid, author, instant, MCRMetadataHistoryEventType.DELETE);
     }
 
     private static MCRMetaHistoryItem newHistoryItem(MCRObjectID mcrid, String author, Instant instant,

@@ -70,12 +70,13 @@ public class MCRIView2Tools {
 
     public static final String CONFIG_PREFIX = "MCR.Module-iview2.";
 
-    private static String SUPPORTED_CONTENT_TYPE = MCRConfiguration2.getString(CONFIG_PREFIX + "SupportedContentTypes")
-        .orElse("");
+    private static final String SUPPORTED_CONTENT_TYPE =
+        MCRConfiguration2.getString(CONFIG_PREFIX + "SupportedContentTypes")
+            .orElse("");
 
-    private static Path TILE_DIR = Paths.get(getIView2Property("DirectoryForTiles"));
+    private static final Path TILE_DIR = Paths.get(getIView2Property("DirectoryForTiles"));
 
-    private static Logger LOGGER = LogManager.getLogger(MCRIView2Tools.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRIView2Tools.class);
 
     /**
      * @return directory for tiles

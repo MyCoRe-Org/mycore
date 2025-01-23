@@ -32,7 +32,7 @@ public abstract class MCRTestJobActionBase extends MCRJobAction {
 
     public static final String ERROR_MESSAGE = "Error parameter was set to true";
 
-    private static Logger LOGGER = LogManager.getLogger(MCRTestJobActionBase.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRTestJobActionBase.class);
 
     /**
      * @param job

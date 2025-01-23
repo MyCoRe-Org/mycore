@@ -46,9 +46,9 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
  */
 public final class MCRObjectUtils {
 
-    private static XPathExpression<Attribute> META_LINK_HREF;
+    private static final XPathExpression<Attribute> META_LINK_HREF;
 
-    private static XPathExpression<Element> META_CLASS;
+    private static final XPathExpression<Element> META_CLASS;
 
     static {
         // META_LINK_HREF

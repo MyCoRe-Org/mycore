@@ -36,7 +36,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class MCRSwordServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    private static Logger LOGGER = LogManager.getLogger(MCRSwordServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSwordServlet.class);
 
     protected void prepareRequest(HttpServletRequest req, HttpServletResponse resp) {
         if (req.getAttribute(MCRFrontendUtil.BASE_URL_ATTRIBUTE) == null) {

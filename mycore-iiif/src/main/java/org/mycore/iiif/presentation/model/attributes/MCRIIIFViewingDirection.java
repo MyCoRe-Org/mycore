@@ -29,24 +29,24 @@ public enum MCRIIIFViewingDirection {
      * The object is read from left to right, and is the default if not specified.
      */
     @SerializedName("left-to-right")
-    left_to_right(),
+    LEFT_TO_RIGHT(),
 
     /**
      * The object is read from right to left.
      */
     @SerializedName("right-to-left")
-    right_to_left(),
+    RIGHT_TO_LEFT(),
 
     /**
      * The object is read from the top to the bottom.
      */
     @SerializedName("top-to-bottom")
-    top_to_bottom(),
+    TOP_TO_BOTTOM(),
 
     /**
      * The object is read from the bottom to the top.
      */
     @SerializedName("bottom-to-top")
-    bottom_to_top()
+    BOTTOM_TO_TOP()
 
 }

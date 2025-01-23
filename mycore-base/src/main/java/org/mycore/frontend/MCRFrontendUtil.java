@@ -74,15 +74,15 @@ public class MCRFrontendUtil {
     public static final String SESSION_NETMASK_IPV6_STRING = MCRConfiguration2
         .getString("MCR.Servlet.Session.NetMask.IPv6").orElse("FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF");
 
-    private static String BASE_URL;
+    private static String baseUrl;
 
-    private static String BASE_HOST_IP;
+    private static String baseHostIP;
 
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
-    public static byte[] SESSION_NETMASK_IPV4;
+    public static final byte[] SESSION_NETMASK_IPV4;
 
-    public static byte[] SESSION_NETMASK_IPV6;
+    public static final byte[] SESSION_NETMASK_IPV6;
 
     private static final ThreadLocal<Map.Entry<String, MCRServletJob>> CURRENT_SERVLET_JOB = new ThreadLocal<>();
 
@@ -116,11 +116,11 @@ public class MCRFrontendUtil {
                 return value.toString();
             }
         }
-        return BASE_URL;
+        return baseUrl;
     }
 
     public static String getHostIP() {
-        return BASE_HOST_IP;
+        return baseHostIP;
     }
 
     /**
@@ -157,18 +157,18 @@ public class MCRFrontendUtil {
     }
 
     public static synchronized void prepareBaseURLs(String baseURL) {
-        BASE_URL = MCRConfiguration2.getString("MCR.baseurl").orElse(baseURL);
-        if (!BASE_URL.endsWith("/")) {
-            BASE_URL = BASE_URL + "/";
+        baseUrl = MCRConfiguration2.getString("MCR.baseurl").orElse(baseURL);
+        if (!baseUrl.endsWith("/")) {
+            baseUrl = baseUrl + "/";
         }
         try {
-            URI baseUri = new URI(BASE_URL);
+            URI baseUri = new URI(baseUrl);
             InetAddress baseHost = InetAddress.getByName(baseUri.getHost());
-            BASE_HOST_IP = baseHost.getHostAddress();
+            baseHostIP = baseHost.getHostAddress();
         } catch (URISyntaxException e) {
-            LOGGER.error("Can't create URI from String {}", BASE_URL);
+            LOGGER.error("Can't create URI from String {}", baseUrl);
         } catch (UnknownHostException e) {
-            LOGGER.error("Can't find host IP for URL {}", BASE_URL);
+            LOGGER.error("Can't find host IP for URL {}", baseUrl);
         }
     }
 
@@ -441,7 +441,7 @@ public class MCRFrontendUtil {
     private static void addSessionListener() {
         MCRSessionMgr.addSessionListener(event -> {
             switch (event.getType()) {
-                case passivated, destroyed -> CURRENT_SERVLET_JOB.remove();
+                case PASSIVATED, DESTROYED -> CURRENT_SERVLET_JOB.remove();
                 default -> {
                 }
             }

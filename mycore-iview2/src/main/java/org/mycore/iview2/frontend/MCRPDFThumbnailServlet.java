@@ -44,7 +44,7 @@ public class MCRPDFThumbnailServlet extends MCRContentServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger LOGGER = LogManager.getLogger(MCRPDFThumbnailServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRPDFThumbnailServlet.class);
 
     private int thumbnailSize = 256;
 

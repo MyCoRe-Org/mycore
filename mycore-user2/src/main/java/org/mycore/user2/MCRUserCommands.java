@@ -66,7 +66,7 @@ import org.mycore.user2.utils.MCRUserTransformer;
     name = "User Commands")
 public class MCRUserCommands extends MCRAbstractCommands {
     /** The logger */
-    private static Logger LOGGER = LogManager.getLogger(MCRUserCommands.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger(MCRUserCommands.class.getName());
 
     private static final String SYSTEM = MCRConfiguration2.getStringOrThrow("MCR.CommandLineInterface.SystemName")
         + ":";

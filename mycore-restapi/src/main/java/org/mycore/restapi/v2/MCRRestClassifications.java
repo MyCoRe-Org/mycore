@@ -152,12 +152,12 @@ public class MCRRestClassifications {
                 .filter(e -> MCRDetailLevel.MEDIA_TYPE_PARAMETER.equals(e.getKey())))
             .map(Map.Entry::getValue)
             .findFirst()
-            .map(MCRDetailLevel::valueOf).orElse(MCRDetailLevel.normal);
+            .map(MCRDetailLevel::valueOf).orElse(MCRDetailLevel.NORMAL);
 
         MCRCategoryID categoryID = new MCRCategoryID(classId, categId);
         return switch (detailLevel) {
-            case detailed -> getClassification(classId, dao -> dao.getRootCategory(categoryID, -1));
-            case summary -> getClassification(classId, dao -> dao.getCategory(categoryID, 0));
+            case DETAILED -> getClassification(classId, dao -> dao.getRootCategory(categoryID, -1));
+            case SUMMARY -> getClassification(classId, dao -> dao.getCategory(categoryID, 0));
             //normal is also default case
             default -> getClassification(classId, dao -> dao.getRootCategory(categoryID, 0));
         };

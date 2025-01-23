@@ -72,7 +72,7 @@ import jakarta.persistence.EntityManager;
  */
 @MCRCommandGroup(name = "Classification Commands")
 public class MCRClassification2Commands extends MCRAbstractCommands {
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 

@@ -57,7 +57,7 @@ public class MCRRealm {
 
     private String realmParameter;
 
-    private static String DEFAULT_LANG = MCRConfiguration2.getString("MCR.Metadata.DefaultLang")
+    private static final String DEFAULT_LANG = MCRConfiguration2.getString("MCR.Metadata.DefaultLang")
         .orElse(MCRConstants.DEFAULT_LANG);
 
     public static final String USER_INFORMATION_ATTR = "realmId";

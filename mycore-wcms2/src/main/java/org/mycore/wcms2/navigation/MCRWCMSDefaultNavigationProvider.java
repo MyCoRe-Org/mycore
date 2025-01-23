@@ -84,22 +84,22 @@ public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvid
         String href = null;
         switch (item) {
             case MCRNavigation navigation -> {
-                type = WCMSType.root;
+                type = WCMSType.ROOT;
                 href = navigation.getHrefStartingPage();
             }
             case MCRNavigationMenuItem menuItem -> {
-                type = WCMSType.menu;
+                type = WCMSType.MENU;
                 href = menuItem.getDir();
             }
             case MCRNavigationItem navigationItem -> {
-                type = WCMSType.item;
+                type = WCMSType.ITEM;
                 href = navigationItem.getHref();
             }
             case MCRNavigationInsertItem mcrNavigationInsertItem -> {
-                type = WCMSType.insert;
+                type = WCMSType.INSERT;
             }
             case MCRNavigationGroup mcrNavigationGroup -> {
-                type = WCMSType.group;
+                type = WCMSType.GROUP;
             }
             case null, default -> LOGGER.warn("Unable to set type for item {}", id);
         }
@@ -170,15 +170,15 @@ public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvid
                 if (item.has(JSON_WCMS_ID) && item.has(JSON_WCMS_TYPE)
                     && wcmsId.equals(item.get(JSON_WCMS_ID).getAsString())) {
                     WCMSType wcmsType = WCMSType.valueOf(item.get(JSON_WCMS_TYPE).getAsString());
-                    if (wcmsType.equals(WCMSType.root)) {
+                    if (wcmsType.equals(WCMSType.ROOT)) {
                         return gson.fromJson(item, MCRNavigation.class);
-                    } else if (wcmsType.equals(WCMSType.menu)) {
+                    } else if (wcmsType.equals(WCMSType.MENU)) {
                         return gson.fromJson(item, MCRNavigationMenuItem.class);
-                    } else if (wcmsType.equals(WCMSType.item)) {
+                    } else if (wcmsType.equals(WCMSType.ITEM)) {
                         return gson.fromJson(item, MCRNavigationItem.class);
-                    } else if (wcmsType.equals(WCMSType.insert)) {
+                    } else if (wcmsType.equals(WCMSType.INSERT)) {
                         return gson.fromJson(item, MCRNavigationInsertItem.class);
-                    } else if (wcmsType.equals(WCMSType.group)) {
+                    } else if (wcmsType.equals(WCMSType.GROUP)) {
                         return gson.fromJson(item, MCRNavigationGroup.class);
                     }
                 }

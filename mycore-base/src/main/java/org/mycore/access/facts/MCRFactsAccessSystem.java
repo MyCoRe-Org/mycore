@@ -66,7 +66,7 @@ import jakarta.inject.Singleton;
 @Singleton
 public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckStrategy {
 
-    private static String RESOLVED_RULES_FILE_NAME = "rules.resolved.xml";
+    private static final String RESOLVED_RULES_FILE_NAME = "rules.resolved.xml";
 
     protected static final Logger LOGGER = LogManager.getLogger();
 

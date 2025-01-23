@@ -61,9 +61,9 @@ import jakarta.persistence.criteria.Root;
  */
 public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
-    private static Class<MCRCategoryLinkImpl> LINK_CLASS = MCRCategoryLinkImpl.class;
+    private static final Class<MCRCategoryLinkImpl> LINK_CLASS = MCRCategoryLinkImpl.class;
 
     private static final String NAMED_QUERY_NAMESPACE = "MCRCategoryLink.";
 
@@ -71,7 +71,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         MCRConfiguration2.getInt("MCR.Classifications.LinkServiceImpl.CategCache.Size").orElse(1000),
         "MCRCategLinkService category cache");
 
-    private static MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
     @Override
     public Map<MCRCategoryID, Number> countLinks(MCRCategory parent, boolean childrenOnly) {

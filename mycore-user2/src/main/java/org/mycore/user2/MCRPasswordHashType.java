@@ -24,10 +24,10 @@ import jakarta.xml.bind.annotation.XmlEnum;
  * This enum represents different hash type for user passwords.
  * Allows lazy migration of users from different sources.
  * <ul>
- * <li>{@link #crypt} is used in the old MyCoRe user system
- * <li>{@link #md5} is used in the old miless user system
- * <li>{@link #sha1} was the default hash type of mycore-user2
- * <li>{@link #sha256} is the default hash type of mycore-user2
+ * <li>{@link #CRYPT} is used in the old MyCoRe user system
+ * <li>{@link #MD5} is used in the old miless user system
+ * <li>{@link #SHA_1} was the default hash type of mycore-user2
+ * <li>{@link #SHA_256} is the default hash type of mycore-user2
  * </ul>
  * @author Thomas Scheffler (yagee)
  *
@@ -36,6 +36,6 @@ import jakarta.xml.bind.annotation.XmlEnum;
 @Deprecated
 public enum MCRPasswordHashType {
 
-    crypt, md5, sha1, sha256
+    CRYPT, MD5, SHA_1, SHA_256
 
 }

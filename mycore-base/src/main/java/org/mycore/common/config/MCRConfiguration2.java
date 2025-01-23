@@ -81,7 +81,7 @@ import org.mycore.common.function.MCRTriConsumer;
  */
 public class MCRConfiguration2 {
 
-    private static Map<UUID, EventListener> LISTENERS = new ConcurrentHashMap<>();
+    private static final Map<UUID, EventListener> LISTENERS = new ConcurrentHashMap<>();
 
     static Map<SingletonKey, Object> instanceHolder = new MCRConcurrentHashMap<>();
 

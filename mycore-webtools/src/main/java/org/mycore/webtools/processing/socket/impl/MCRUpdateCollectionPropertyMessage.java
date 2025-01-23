@@ -30,7 +30,7 @@ class MCRUpdateCollectionPropertyMessage extends MCRWebSocketMessage {
     public Object propertyValue;
 
     MCRUpdateCollectionPropertyMessage(Integer id, String propertyName, Object propertyValue) {
-        super(MCRMessageType.updateCollectionProperty);
+        super(MCRMessageType.UPDATE_COLLECTION_PROPERTY);
         this.id = id;
         this.propertyName = propertyName;
         this.propertyValue = propertyValue;

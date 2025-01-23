@@ -33,11 +33,13 @@ import jakarta.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.NONE)
 public class MCRNavigationItem extends MCRNavigationI18nItem implements MCRNavigationItemContainer {
 
+    @SuppressWarnings("PMD.FieldNamingConventions")
     @XmlType(name = "ItemType")
     public enum Type {
         intern, extern
     }
 
+    @SuppressWarnings("PMD.FieldNamingConventions")
     public enum Target {
         _self, _blank
     }

@@ -56,7 +56,7 @@ import jakarta.ws.rs.core.Response;
 public class MCRJerseyLodApp extends ResourceConfig {
 
     //RDFXML is the default/fallback format an does not have to be on this list
-    private static List<RDFFormat> RDF_OUTPUT_FORMATS = List.of(RDFFormat.TURTLE, RDFFormat.JSONLD);
+    private static final List<RDFFormat> RDF_OUTPUT_FORMATS = List.of(RDFFormat.TURTLE, RDFFormat.JSONLD);
 
     /**
      * Constructor

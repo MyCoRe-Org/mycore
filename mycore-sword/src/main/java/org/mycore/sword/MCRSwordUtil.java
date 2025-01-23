@@ -97,7 +97,7 @@ public class MCRSwordUtil {
 
     private static final int COPY_BUFFER_SIZE = 32 * 1024;
 
-    private static Logger LOGGER = LogManager.getLogger(MCRSwordUtil.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSwordUtil.class);
 
     public static MCRDerivate createDerivate(String documentID)
         throws MCRPersistenceException, IOException, MCRAccessException {
@@ -477,7 +477,7 @@ public class MCRSwordUtil {
 
         public static final String DEFAULT_URL_ENCODING = "UTF-8";
 
-        private static Logger LOGGER = LogManager.getLogger(BuildLinkUtil.class);
+        private static final Logger LOGGER = LogManager.getLogger(BuildLinkUtil.class);
 
         public static String getEditHref(String collection, String id) {
             return new MessageFormat("{0}{1}{2}/{3}", Locale.ROOT).format(

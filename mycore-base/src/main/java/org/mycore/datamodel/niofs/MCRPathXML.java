@@ -53,7 +53,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public class MCRPathXML {
 
-    static Logger LOGGER = LogManager.getLogger(MCRPathXML.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRPathXML.class);
 
     private MCRPathXML() {
     }

@@ -80,17 +80,17 @@ public class MCREditorOutValidator {
 
     private static final SAXBuilder SAX_BUILDER = new SAXBuilder();
 
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
-    private static Map<String, MCREditorMetadataValidator> VALIDATOR_MAP = getValidatorMap();
+    private static final Map<String, MCREditorMetadataValidator> VALIDATOR_MAP = getValidatorMap();
 
-    private static Map<String, Class<? extends MCRMetaInterface>> CLASS_MAP = new HashMap<>();
+    private static final Map<String, Class<? extends MCRMetaInterface>> CLASS_MAP = new HashMap<>();
 
     private Document input;
 
-    private MCRObjectID id;
+    private final MCRObjectID id;
 
-    private List<String> errorlog;
+    private final List<String> errorlog;
 
     /**
      * instantiate the validator with the editor input <code>jdom_in</code>.

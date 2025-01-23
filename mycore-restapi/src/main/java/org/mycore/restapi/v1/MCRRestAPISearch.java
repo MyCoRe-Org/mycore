@@ -54,7 +54,7 @@ public class MCRRestAPISearch {
     public static final String FORMAT_JSON = "json";
     public static final String FORMAT_XML = "xml";
     public static final String FORMAT_CSV = "csv";
-    private static Logger LOGGER = LogManager.getLogger(MCRRestAPISearch.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRRestAPISearch.class);
 
     /**
      * see http://wiki.apache.org/solr/CommonQueryParameters for syntax of parameters

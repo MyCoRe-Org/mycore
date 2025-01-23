@@ -50,7 +50,7 @@ import jakarta.ws.rs.ext.Provider;
 @Priority(Priorities.HEADER_DECORATOR - 10)
 public class MCRContentNegotiationViaExtensionFilter implements ContainerRequestFilter {
 
-    private static Pattern P_URI = Pattern.compile(MCRConfiguration2.getStringOrThrow(
+    private static final Pattern P_URI = Pattern.compile(MCRConfiguration2.getStringOrThrow(
         "MCR.RestAPI.V2.ContentNegotiationViaExtensionFilter.RegEx"));
 
     private static final Map<String, MediaType> MEDIA_TYPE_MAPPINGS = Map.ofEntries(

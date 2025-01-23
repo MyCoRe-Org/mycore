@@ -86,7 +86,7 @@ public class MCRRestAPIClassifications {
 
     private static final MCRCategoryDAO DAO = new MCRCategoryDAOImpl();
 
-    private static Logger LOGGER = LogManager.getLogger(MCRRestAPIClassifications.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIClassifications.class);
 
     @Context
     ContainerRequest request;

@@ -87,7 +87,7 @@ public class MCRUtils {
     private static final Logger LOGGER = LogManager.getLogger();
 
     // The file slash
-    private static String SLASH = FileSystems.getDefault().getSeparator();
+    private static final String SLASH = FileSystems.getDefault().getSeparator();
 
     /**
      * Reads exactly <code>len</code> bytes from the input stream into the byte array. This method reads repeatedly from
