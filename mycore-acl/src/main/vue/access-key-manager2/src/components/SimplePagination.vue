@@ -62,11 +62,10 @@ const emit = defineEmits<{
 }>();
 
 const totalPages = computed((): number =>
-  Math.ceil(props.totalRows / props.perPage),
+  Math.ceil(props.totalRows / props.perPage)
 );
 const nextButtonDisabled = computed(
-  (): boolean =>
-    props.currentPage === totalPages.value || props.totalRows === 0,
+  (): boolean => props.currentPage === totalPages.value || props.totalRows === 0
 );
 const previousButtonDisabled = computed((): boolean => props.currentPage === 1);
 const pages = computed((): number[] => {

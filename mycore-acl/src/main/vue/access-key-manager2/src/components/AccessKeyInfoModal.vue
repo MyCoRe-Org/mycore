@@ -185,7 +185,7 @@ watch(
       };
     }
   },
-  { deep: true },
+  { deep: true }
 );
 const handleError = (error: unknown): void => {
   errorMessage.value =
@@ -227,10 +227,10 @@ const updateAccessKey = async (): Promise<void> => {
       try {
         await props.accessKeyService.patchAccessKey(
           props.accessKey.id,
-          accessKey,
+          accessKey
         );
         const updatedAccessKey = await props.accessKeyService.getAccessKey(
-          props.accessKey.id,
+          props.accessKey.id
         );
         emit('update-access-key', updatedAccessKey);
         close(true);

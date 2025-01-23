@@ -27,7 +27,7 @@
         </td>
         <td>{{ accessKey.isActive }}</td>
         <td>
-          {{ getExpirationDisplay(accessKey) }}
+          {{ getExpirationDisplay(accessKey.expiration) }}
         </td>
         <td>
           <div class="btn-group">
@@ -77,7 +77,7 @@ const getExpirationDisplay = (expiration: number | undefined): string => {
   return expiration ? new Date(expiration).toLocaleDateString() : '-';
 };
 const openDeleteConfirmationModal = async (
-  accessKey: AccessKeyDto,
+  accessKey: AccessKeyDto
 ): Promise<boolean> => {
   const secretPreview =
     accessKey.id.length > 30

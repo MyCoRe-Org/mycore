@@ -54,7 +54,7 @@ export class AccessKeyService {
     permissions: string[],
     reference?: string,
     offset?: number,
-    limit?: number,
+    limit?: number
   ): Promise<AccessKeyInformation> {
     return extractResponse(
       await this.axiosInstance.get<AccessKeyDto[]>(API_URL, {
@@ -65,14 +65,14 @@ export class AccessKeyService {
           offset,
           limit,
         },
-      }),
+      })
     );
   }
 
   public async getAccessKeysByReference(
     reference: string,
     offset: number,
-    limit: number,
+    limit: number
   ): Promise<AccessKeyInformation> {
     return extractResponse(
       await this.axiosInstance.get<AccessKeyDto[]>(API_URL, {
@@ -81,7 +81,7 @@ export class AccessKeyService {
           offset,
           limit,
         },
-      }),
+      })
     );
   }
 
@@ -101,7 +101,7 @@ export class AccessKeyService {
 
   public async patchAccessKey(
     id: string,
-    accessKey: PartialUpdateAccessKeyDto,
+    accessKey: PartialUpdateAccessKeyDto
   ): Promise<void> {
     await this.axiosInstance.patch(`${API_URL}${id}`, accessKey);
   }

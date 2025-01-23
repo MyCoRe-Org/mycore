@@ -89,16 +89,16 @@ const props = withDefaults(
     size: 'md',
     scrollable: false,
     hideHeaderClose: false,
-  },
+  }
 );
 
 const emit = defineEmits(['close', 'ok', 'cancel']);
 
 const modalTitleId = computed(
-  () => `modal-title-${Math.random().toString(36).substring(2, 9)}`,
+  () => `modal-title-${Math.random().toString(36).substring(2, 9)}`
 );
 const modalDescriptionId = computed(
-  () => `modal-description-${Math.random().toString(36).substring(2, 9)}`,
+  () => `modal-description-${Math.random().toString(36).substring(2, 9)}`
 );
 const isBusy = computed(() => props.busy);
 const style = computed(() => {

@@ -19,7 +19,7 @@
               state.accessKeyCreated &&
               config &&
               config.allowedSessionPermissionTypes.includes(
-                state.accessKeyCreated.type as string,
+                state.accessKeyCreated.type as string
               )
             "
           >
@@ -156,7 +156,7 @@ const accessKeyService = ref<AccessKeyService>();
 const config = ref<Config>();
 
 const paginatedAccessKeys = computed(() =>
-  state.accessKeys.slice(0, state.pageSize),
+  state.accessKeys.slice(0, state.pageSize)
 );
 const activationLink = computed((): string => {
   if (state.accessKeyCreated && state.accessKeyCreatedSecret) {
@@ -171,7 +171,7 @@ const fetchAccessKeys = async (): Promise<void> => {
       availablePermissions,
       reference,
       offset,
-      state.pageSize,
+      state.pageSize
     );
     state.accessKeys = result.accessKeys;
     state.totalCount = result.totalCount;
@@ -220,7 +220,7 @@ const deleteAccessKey = async (accessKeyId: string): Promise<void> => {
     try {
       await accessKeyService.value.deleteAccessKey(accessKeyId);
       state.accessKeys = state.accessKeys.filter(
-        (a: AccessKeyDto) => a.id !== accessKeyId,
+        (a: AccessKeyDto) => a.id !== accessKeyId
       );
       state.totalCount -= 1;
     } finally {
@@ -230,7 +230,7 @@ const deleteAccessKey = async (accessKeyId: string): Promise<void> => {
 };
 const updateAccessKey = (accessKey: AccessKeyDto): void => {
   const index = state.accessKeys.findIndex(
-    (a: AccessKeyDto) => a.id === accessKey.id,
+    (a: AccessKeyDto) => a.id === accessKey.id
   );
   if (index !== -1) {
     state.accessKeys[index] = accessKey;
@@ -251,17 +251,17 @@ onMounted(async (): Promise<void> => {
     if (import.meta.env.MODE === 'development') {
       accessKeyService.value = new AccessKeyService(
         BASE_URL,
-        new DevAuthStrategy(),
+        new DevAuthStrategy()
       );
     } else {
       const jwt = await fetchJWT(
         BASE_URL,
         reference || undefined,
-        config.value.isSessionEnabled,
+        config.value.isSessionEnabled
       );
       accessKeyService.value = new AccessKeyService(
         BASE_URL,
-        new AccessTokenAuthStrategy(jwt.access_token),
+        new AccessTokenAuthStrategy(jwt.access_token)
       );
     }
     await fetchAccessKeys();

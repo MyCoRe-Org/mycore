@@ -5,7 +5,7 @@ export interface AccessKeyDto {
   type: string;
   isActive: boolean;
   comment?: string;
-  expiration?: number | null;
+  expiration?: number | undefined;
 }
 
 export interface PartialUpdateAccessKeyDto {

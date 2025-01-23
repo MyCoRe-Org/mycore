@@ -21,10 +21,10 @@ export const BASE_URL =
     : (window.webApplicationBaseURL as string);
 
 export const fetchTranslations = async (
-  baseUrl: string,
+  baseUrl: string
 ): Promise<Record<string, string>> => {
   const response = await fetch(
-    `${baseUrl}rsc/locale/translate/component.acl.accesskey.*`,
+    `${baseUrl}rsc/locale/translate/component.acl.accesskey.*`
   );
   if (!response.ok) {
     throw new Error('Failed to load translations');
@@ -49,7 +49,7 @@ export const fetchConfig = async (baseUrl: string): Promise<Config> => {
 export const fetchJWT = async (
   baseUrl: string,
   reference?: string,
-  isSessionEnabled?: boolean,
+  isSessionEnabled?: boolean
 ): Promise<JWT> => {
   if (reference) {
     const params = new URLSearchParams();
@@ -74,7 +74,7 @@ export const generateRandomString = (length: number): string => {
   const lenspec = length - len - len;
   for (let i = 0; i < len; i += 1) {
     temp += keylistalpha.charAt(
-      Math.floor(Math.random() * keylistalpha.length),
+      Math.floor(Math.random() * keylistalpha.length)
     );
   }
   for (let i = 0; i < lenspec; i += 1) {

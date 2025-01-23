@@ -233,7 +233,7 @@ const getAccessKey = (): CreateAccessKeyDto => {
   } as CreateAccessKeyDto;
   if (form.value.expiration) {
     accessKey.expiration = Math.floor(
-      new Date(form.value.expiration).getTime(),
+      new Date(form.value.expiration).getTime()
     );
   }
   if (form.value.comment) {
