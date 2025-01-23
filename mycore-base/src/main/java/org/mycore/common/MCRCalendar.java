@@ -848,7 +848,7 @@ public class MCRCalendar {
      *         the Julian Calendar to 05.10.1582. Then it use the Gregorian Calendar.
      */
     public static String getCalendarDateToFormattedString(Calendar calendar, String format) {
-        if (calendar == null || format == null || format.trim().isEmpty()) {
+        if (calendar == null || format == null || format.isBlank()) {
             return "";
         }
         SimpleDateFormat formatter;

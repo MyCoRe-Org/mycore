@@ -100,7 +100,7 @@ public class MCRCASServlet extends MCRServlet {
         HttpServletResponse res = job.getResponse();
 
         String ticket = req.getParameter("ticket");
-        if ((ticket == null) || (ticket.trim().length() == 0)) {
+        if ((ticket == null) || (ticket.isBlank())) {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }

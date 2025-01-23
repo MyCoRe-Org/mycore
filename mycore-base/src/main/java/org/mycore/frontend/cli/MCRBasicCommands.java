@@ -191,7 +191,7 @@ public class MCRBasicCommands {
         directories.add(configurationDirectory);
         for (String dir : MCRConfiguration2.getString("MCR.ConfigurationDirectory.template.directories").orElse("")
             .split(",")) {
-            if (!dir.trim().isEmpty()) {
+            if (!dir.isBlank()) {
                 directories.add(new File(configurationDirectory, dir.trim()));
             }
         }
@@ -203,7 +203,7 @@ public class MCRBasicCommands {
 
         for (String f : MCRConfiguration2.getString("MCR.ConfigurationDirectory.template.files").orElse("")
             .split(",")) {
-            if (!f.trim().isEmpty()) {
+            if (!f.isBlank()) {
                 createSampleConfigFile(f.trim());
             }
         }

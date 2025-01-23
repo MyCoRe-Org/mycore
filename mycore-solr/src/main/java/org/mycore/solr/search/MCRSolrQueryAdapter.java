@@ -126,11 +126,11 @@ public class MCRSolrQueryAdapter implements MCRQueryAdapter {
     @Override
     public void configure(HttpServletRequest request) {
         String objectType = request.getParameter("objecttype");
-        if ((objectType != null) && (objectType.trim().length() > 0)) {
+        if (objectType != null && !objectType.isBlank()) {
             setObjectType(objectType);
         }
         String restriction = request.getParameter("restriction");
-        if ((restriction != null) && (restriction.trim().length() > 0)) {
+        if (restriction != null && !restriction.isBlank()) {
             setRestriction(restriction);
         }
         boolean filter = "true".equals(MCRServlet.getProperty(request, "filterCategory"));

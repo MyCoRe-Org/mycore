@@ -133,7 +133,7 @@ public class MCRBooleanClauseParser<T> {
             .replaceAll("\n", " ")
             .replaceAll("\r", " ");
 
-        if (cleanedString.trim().length() == 0 || cleanedString.equals("()")) {
+        if (cleanedString.isBlank()|| cleanedString.equals("()")) {
             return defaultRule();
         }
         return parse(cleanedString, null);

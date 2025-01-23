@@ -206,7 +206,7 @@ public final class MCRConfigurationBase {
      *             if the properties are not initialized
      */
     public static Optional<String> getString(String name) {
-        if (Objects.requireNonNull(name, "MyCoRe property name must not be null.").trim().isEmpty()) {
+        if (Objects.requireNonNull(name, "MyCoRe property name must not be null.").isBlank()) {
             throw new MCRConfigurationException("MyCoRe property name must not be empty.");
         }
         if (!name.trim().equals(name)) {

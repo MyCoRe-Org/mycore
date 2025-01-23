@@ -62,10 +62,7 @@
   <rule ref="category/java/bestpractices.xml/PrimitiveWrapperInstantiation"/>
   <rule ref="category/java/bestpractices.xml/ReplaceEnumerationWithIterator"/>
   <rule ref="category/java/bestpractices.xml/ReplaceHashtableWithMap"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/bestpractices.xml/ReplaceVectorWithList"/>
-  -->
   <rule ref="category/java/bestpractices.xml/SimplifiableTestAssertion"/>
   <rule ref="category/java/bestpractices.xml/NonExhaustiveSwitch"/>
   <!-- TODO: Create PR to fix this rule -->
@@ -359,10 +356,7 @@
   <rule ref="category/java/multithreading.xml/UseNotifyAllInsteadOfNotify"/>
 
   <!-- Performance Rules -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/performance.xml/AddEmptyString"/>
-  -->
   <rule ref="category/java/performance.xml/AppendCharacterWithChar"/>
   <rule ref="category/java/performance.xml/AvoidArrayLoops"/>
   <rule ref="category/java/performance.xml/AvoidCalendarDateCreation"/>
@@ -372,10 +366,7 @@
   <!--
   <rule ref="category/java/performance.xml/BigIntegerInstantiation"/>
   -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/performance.xml/InefficientEmptyStringCheck"/>
-  -->
   <rule ref="category/java/performance.xml/InefficientStringBuffering"/>
   <rule ref="category/java/performance.xml/OptimizableToArrayCall"/>
   <rule ref="category/java/performance.xml/RedundantFieldInitializer"/>

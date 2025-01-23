@@ -175,7 +175,7 @@ public class MCRCommandUtils {
      */
     public static Transformer getTransformer(String style, String defaultStyle, Map<String, Transformer> cache) {
         String xslFilePath = defaultStyle;
-        if (style != null && style.trim().length() != 0) {
+        if (style != null && !style.isBlank()) {
             xslFilePath = style.trim() + ".xsl";
         }
         Transformer transformer = cache.get(style);

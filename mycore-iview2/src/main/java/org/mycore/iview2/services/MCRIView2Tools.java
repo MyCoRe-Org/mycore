@@ -70,8 +70,8 @@ public class MCRIView2Tools {
 
     public static final String CONFIG_PREFIX = "MCR.Module-iview2.";
 
-    private static final String SUPPORTED_CONTENT_TYPE =
-        MCRConfiguration2.getString(CONFIG_PREFIX + "SupportedContentTypes")
+    private static final String SUPPORTED_CONTENT_TYPE
+        = MCRConfiguration2.getString(CONFIG_PREFIX + "SupportedContentTypes")
             .orElse("");
 
     private static final Path TILE_DIR = Paths.get(getIView2Property("DirectoryForTiles"));
@@ -113,7 +113,7 @@ public class MCRIView2Tools {
      * @return true if {@link #getSupportedMainFile(String)} is not an empty String.
      */
     public static boolean isDerivateSupported(String derivateID) {
-        if (derivateID == null || derivateID.trim().length() == 0) {
+        if (derivateID == null || derivateID.isBlank()) {
             return false;
         }
 
