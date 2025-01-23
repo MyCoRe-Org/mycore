@@ -16,17 +16,12 @@
       {{ t(errorMessage) }}
     </div>
     <div>
-      <p>{{ t(getI18nKey("description.createAccesskey")) }}</p>
+      <p>{{ t(getI18nKey('description.createAccesskey')) }}</p>
     </div>
     <form>
-      <div
-        class="form-group required"
-      >
-        <label
-          id="labelReference"
-          for="inputReference"
-        >
-          {{ t(getI18nKey("label.reference")) }}
+      <div class="form-group required">
+        <label id="labelReference" for="inputReference">
+          {{ t(getI18nKey('label.reference')) }}
         </label>
         <div class="input-group">
           <input
@@ -36,15 +31,12 @@
             :disabled="reference !== undefined"
             type="text"
             class="form-control"
-          >
+          />
         </div>
       </div>
       <div class="form-group required">
-        <label
-          id="labelSecret"
-          for="inputSecret"
-        >
-          {{ t(getI18nKey("label.value")) }}
+        <label id="labelSecret" for="inputSecret">
+          {{ t(getI18nKey('label.value')) }}
         </label>
         <div class="input-group">
           <div class="input-group-prepend">
@@ -63,16 +55,13 @@
             aria-labelledby="labelSecret"
             type="text"
             class="form-control"
-          >
+          />
         </div>
       </div>
       <div class="form-row">
         <div class="form-group col-md-6 required">
-          <label
-            id="labelPermission"
-            for="inputPermission"
-          >
-            {{ t(getI18nKey("label.permission")) }}
+          <label id="labelPermission" for="inputPermission">
+            {{ t(getI18nKey('label.permission')) }}
           </label>
           <select
             v-if="availablePermissions.length > 0"
@@ -81,11 +70,8 @@
             aria-labelledby="labelPermission"
             class="form-control"
           >
-            <option
-              value=""
-              disabled
-            >
-              {{ t(getI18nKey("select")) }}
+            <option value="" disabled>
+              {{ t(getI18nKey('select')) }}
             </option>
             <template
               v-for="permissionValue in availablePermissions"
@@ -102,14 +88,11 @@
             v-model="form.type"
             aria-labelledby="labelPermission"
             class="form-control"
-          >
+          />
         </div>
         <div class="form-group col-md-6">
-          <label
-            id="labelExpiration"
-            for="expirationInput"
-          >
-            {{ t(getI18nKey("label.expiration")) }}
+          <label id="labelExpiration" for="expirationInput">
+            {{ t(getI18nKey('label.expiration')) }}
           </label>
           <input
             id="expirationInput"
@@ -117,7 +100,7 @@
             aria-labelledby="labelExpiration"
             type="date"
             class="form-control"
-          >
+          />
         </div>
       </div>
       <div class="form-group">
@@ -128,22 +111,15 @@
             aria-labelledby="labelActive"
             class="form-check-input"
             type="checkbox"
-          >
-          <label
-            id="labelActive"
-            class="form-check-label"
-            for="inputActive"
-          >
-            {{ t(getI18nKey("label.active")) }}
+          />
+          <label id="labelActive" class="form-check-label" for="inputActive">
+            {{ t(getI18nKey('label.active')) }}
           </label>
         </div>
       </div>
       <div class="form-group">
-        <label
-          id="labelComment"
-          for="commentTextarea"
-        >
-          {{ t(getI18nKey("label.comment")) }}
+        <label id="labelComment" for="commentTextarea">
+          {{ t(getI18nKey('label.comment')) }}
         </label>
         <textarea
           id="commentTextarea"
@@ -168,21 +144,22 @@
           role="status"
           aria-hidden="true"
         />
-        {{ t(getI18nKey("button.createAccessKey")) }}
+        {{ t(getI18nKey('button.createAccessKey')) }}
       </button>
     </template>
   </BaseModal>
 </template>
 
 <script setup lang="ts">
-import { ref, onErrorCaptured } from "vue";
-import { generateRandomString, getI18nKey } from "@/common/utils";
-import { AccessKeyDto, CreateAccessKeyDto } from "@/dtos/accesskey";
-import useVuelidate from "@vuelidate/core";
-import { required } from "@vuelidate/validators";
-import BaseModal from "@/components/BaseModal.vue";
-import { AccessKeyService } from "@/service/accesskey";
-import { useI18n } from "vue-i18n";
+import { ref, onErrorCaptured } from 'vue';
+import { useI18n } from 'vue-i18n';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
+import { generateRandomString, getI18nKey } from '@/common/utils';
+import { AccessKeyDto, CreateAccessKeyDto } from '@/dtos/accesskey';
+import { AccessKeyService } from '@/service/accesskey';
+
+import BaseModal from '@/components/BaseModal.vue';
 
 const { t } = useI18n();
 
@@ -194,8 +171,8 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (event: "add-access-key", secret: string, accessKey: AccessKeyDto): void;
-  (event: "close"): void;
+  (event: 'add-access-key', secret: string, accessKey: AccessKeyDto): void;
+  (event: 'close'): void;
 }>();
 
 const rules = {
@@ -213,10 +190,10 @@ const rules = {
 const errorMessage = ref<string>();
 const isBusy = ref<boolean>(false);
 const defaultForm = {
-  reference: props.reference !== undefined ? props.reference : "",
+  reference: props.reference !== undefined ? props.reference : '',
   isActive: true,
-  secret: "",
-  type: "",
+  secret: '',
+  type: '',
   comment: undefined,
   expiration: undefined,
 };
@@ -224,7 +201,7 @@ const form = ref<CreateAccessKeyDto>({ ...defaultForm });
 const v = useVuelidate(rules, form);
 const handleError = (error: unknown): void => {
   errorMessage.value =
-    error instanceof Error ? error.message : "component.acl.accesskey.frontend.error.fatal";
+    error instanceof Error ? error.message : t(getI18nKey('error.fatal'));
 };
 const resetForm = (): void => {
   form.value = { ...defaultForm };
@@ -237,7 +214,7 @@ const resetModal = (): void => {
 const handleClose = (force?: boolean): void => {
   if (force || !isBusy.value) {
     resetModal();
-    emit("close");
+    emit('close');
   }
 };
 const validateForm = async (): Promise<boolean> => {
@@ -255,21 +232,25 @@ const getAccessKey = (): CreateAccessKeyDto => {
     type: form.value.type,
   } as CreateAccessKeyDto;
   if (form.value.expiration) {
-    accessKey.expiration = Math.floor(new Date(form.value.expiration).getTime());
+    accessKey.expiration = Math.floor(
+      new Date(form.value.expiration).getTime(),
+    );
   }
   if (form.value.comment) {
     accessKey.comment = form.value.comment;
   }
   return accessKey;
-}
+};
 const handleCreateAccessKey = async (): Promise<void> => {
-  if (props.accessKeyService && !isBusy.value && await validateForm()) {
+  if (props.accessKeyService && !isBusy.value && (await validateForm())) {
     isBusy.value = true;
     try {
       const accessKey = getAccessKey();
-      const accessKeyId = await props.accessKeyService.createAccessKey(accessKey);
-      const createdAccessKey = await props.accessKeyService.getAccessKey(accessKeyId);
-      emit("add-access-key", form.value.secret, createdAccessKey);
+      const accessKeyId =
+        await props.accessKeyService.createAccessKey(accessKey);
+      const createdAccessKey =
+        await props.accessKeyService.getAccessKey(accessKeyId);
+      emit('add-access-key', form.value.secret, createdAccessKey);
       handleClose(true);
     } catch (error) {
       handleError(error);
@@ -289,7 +270,7 @@ onErrorCaptured((err): boolean => {
 
 <style scoped>
 .form-group.required label:after {
-  content: "*";
+  content: '*';
   color: red;
   font-weight: bold;
   margin-left: 5px;

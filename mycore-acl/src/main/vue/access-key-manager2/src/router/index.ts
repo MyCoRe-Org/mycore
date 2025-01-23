@@ -6,7 +6,7 @@ const routes: Array<RouteRecordRaw> = [
     path: '/',
     component: HomeView,
   },
-]
+];
 
 const router = createRouter({
   history: createWebHistory(),

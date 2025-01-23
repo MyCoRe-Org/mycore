@@ -1,12 +1,15 @@
-import { AccessKeyDto, CreateAccessKeyDto, PartialUpdateAccessKeyDto } from "@/dtos/accesskey";
-import axios, { AxiosInstance, AxiosResponse } from "axios";
+import {
+  AccessKeyDto,
+  CreateAccessKeyDto,
+  PartialUpdateAccessKeyDto,
+} from '@/dtos/accesskey';
+import axios, { AxiosInstance, AxiosResponse } from 'axios';
 
 export interface AuthStrategy {
   getHeaders(): Record<string, string>;
 }
 
 export class AccessTokenAuthStrategy implements AuthStrategy {
-
   private accessToken;
 
   constructor(accessToken: string) {
@@ -15,22 +18,7 @@ export class AccessTokenAuthStrategy implements AuthStrategy {
 
   public getHeaders(): Record<string, string> {
     return {
-      'Authorization': `Bearer ${this.accessToken}`
-    };
-  }
-}
-
-export class BasicAuthStrategy implements AuthStrategy {
-
-  private basic;
-
-  constructor(basic: string) {
-    this.basic = basic;
-  }
-
-  public getHeaders(): Record<string, string> {
-    return {
-      'Authorization': `Basic ${this.basic}`
+      Authorization: `Bearer ${this.accessToken}`,
     };
   }
 }
@@ -41,42 +29,50 @@ export interface AccessKeyInformation {
 }
 
 const extractResponse = (response: AxiosResponse): AccessKeyInformation => {
-  return { accessKeys : response.data, totalCount: parseInt(response.headers["x-total-count"], 10) };
+  return {
+    accessKeys: response.data,
+    totalCount: parseInt(response.headers['x-total-count'], 10),
+  };
 };
 
-const API_URL = "api/v2/access-keys/";
+const API_URL = 'api/v2/access-keys/';
 
 export class AccessKeyService {
-
   private axiosInstance: AxiosInstance;
 
   constructor(baseUrl: string, authStrategy: AuthStrategy) {
     this.axiosInstance = axios.create({
       baseURL: baseUrl,
       timeout: 5000,
-    })
+    });
     this.axiosInstance.defaults.headers.common = {
       ...authStrategy.getHeaders(),
     };
   }
 
-  public async getAccessKeys (permissions: string[], reference?: string, offset?: number, limit?: number): Promise<AccessKeyInformation> {
+  public async getAccessKeys(
+    permissions: string[],
+    reference?: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<AccessKeyInformation> {
     return extractResponse(
       await this.axiosInstance.get<AccessKeyDto[]>(API_URL, {
         params: {
           reference,
-          permissions: permissions.length > 0 ? permissions.join(",") : undefined,
+          permissions:
+            permissions.length > 0 ? permissions.join(',') : undefined,
           offset,
           limit,
         },
-      })
+      }),
     );
   }
 
-  public async getAccessKeysByReference (
+  public async getAccessKeysByReference(
     reference: string,
     offset: number,
-    limit: number
+    limit: number,
   ): Promise<AccessKeyInformation> {
     return extractResponse(
       await this.axiosInstance.get<AccessKeyDto[]>(API_URL, {
@@ -85,27 +81,32 @@ export class AccessKeyService {
           offset,
           limit,
         },
-      })
+      }),
     );
   }
-  
-  public async getAccessKey (id: string): Promise<AccessKeyDto> {
+
+  public async getAccessKey(id: string): Promise<AccessKeyDto> {
     return (await this.axiosInstance.get<AccessKeyDto>(`${API_URL}${id}`)).data;
   }
-  
-  public async createAccessKey (accessKey: CreateAccessKeyDto): Promise<string> {
+
+  public async createAccessKey(accessKey: CreateAccessKeyDto): Promise<string> {
     return (
       (await this.axiosInstance.post(API_URL, accessKey, {
-        headers: { "Content-Type": "application/json", },
+        headers: { 'Content-Type': 'application/json' },
       })) as AxiosResponse
-    ).headers.location.split("/").pop() as string;
+    ).headers.location
+      .split('/')
+      .pop() as string;
   }
-  
-  public async patchAccessKey (id: string, accessKey: PartialUpdateAccessKeyDto): Promise<void> {
+
+  public async patchAccessKey(
+    id: string,
+    accessKey: PartialUpdateAccessKeyDto,
+  ): Promise<void> {
     await this.axiosInstance.patch(`${API_URL}${id}`, accessKey);
   }
-  
-  public async deleteAccessKey (id: string): Promise<void> {
+
+  public async deleteAccessKey(id: string): Promise<void> {
     await this.axiosInstance.delete(`${API_URL}${id}`);
   }
 }

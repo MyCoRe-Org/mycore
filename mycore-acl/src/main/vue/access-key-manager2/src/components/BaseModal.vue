@@ -17,10 +17,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <slot name="title">
-            <h5
-              :id="modalTitleId" 
-              class="modal-title"
-            >
+            <h5 :id="modalTitleId" class="modal-title">
               {{ title }}
             </h5>
             <button
@@ -30,17 +27,11 @@
               :aria-disabled="isBusy"
               aria-label="Close"
             >
-              <span
-                aria-hidden="true"
-                @click="close"
-              >&times;</span>
+              <span aria-hidden="true" @click="close">&times;</span>
             </button>
           </slot>
         </div>
-        <div
-          :id="modalDescriptionId"
-          class="modal-body"
-        >
+        <div :id="modalDescriptionId" class="modal-body">
           <slot />
         </div>
         <div class="modal-footer">
@@ -74,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed } from 'vue';
 
 const props = withDefaults(
   defineProps<{
@@ -90,43 +81,47 @@ const props = withDefaults(
   }>(),
   {
     isVisible: false,
-    title: "Title",
-    okTitle: "OK",
-    cancelTitle: "Cancel",
+    title: 'Title',
+    okTitle: 'OK',
+    cancelTitle: 'Cancel',
     okOnly: false,
     busy: false,
-    size: "md",
+    size: 'md',
     scrollable: false,
     hideHeaderClose: false,
-  }
+  },
 );
 
-const emit = defineEmits(["close", "ok", "cancel"]);
+const emit = defineEmits(['close', 'ok', 'cancel']);
 
-const modalTitleId = computed(() => `modal-title-${Math.random().toString(36).substring(2, 9)}`);
-const modalDescriptionId = computed(() => `modal-description-${Math.random().toString(36).substring(2, 9)}`);
+const modalTitleId = computed(
+  () => `modal-title-${Math.random().toString(36).substring(2, 9)}`,
+);
+const modalDescriptionId = computed(
+  () => `modal-description-${Math.random().toString(36).substring(2, 9)}`,
+);
 const isBusy = computed(() => props.busy);
 const style = computed(() => {
   let result = `modal-${props.size}`;
   if (props.scrollable) {
-    result += " modal-dialog-scrollable";
+    result += ' modal-dialog-scrollable';
   }
   return result;
 });
 
 const close = () => {
   if (!isBusy.value) {
-    emit("close");
+    emit('close');
   }
 };
 const ok = () => {
   if (!isBusy.value) {
-    emit("ok");
+    emit('ok');
   }
 };
 const cancel = () => {
   if (!isBusy.value) {
-    emit("cancel");
+    emit('cancel');
   }
 };
 </script>

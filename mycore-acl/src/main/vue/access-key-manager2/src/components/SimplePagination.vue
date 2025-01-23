@@ -1,10 +1,7 @@
 <template>
   <nav>
     <ul class="pagination">
-      <li
-        class="page-item"
-        :class="previousButtonDisabled ? 'disabled' : ''"
-      >
+      <li class="page-item" :class="previousButtonDisabled ? 'disabled' : ''">
         <button
           class="page-link"
           :aria-label="translate('button.previous')"
@@ -12,7 +9,7 @@
           :aria-disabled="previousButtonDisabled"
           @click="jumpToPage(currentPage - 1)"
         >
-          {{ translate("button.previous") }}
+          {{ translate('button.previous') }}
         </button>
       </li>
       <li
@@ -31,10 +28,7 @@
           {{ page }}
         </button>
       </li>
-      <li
-        class="page-item"
-        :class="nextButtonDisabled ? 'disabled' : ''"
-      >
+      <li class="page-item" :class="nextButtonDisabled ? 'disabled' : ''">
         <button
           class="page-link"
           :aria-label="translate('button.next')"
@@ -42,7 +36,7 @@
           :aria-disabled="nextButtonDisabled"
           @click="jumpToPage(currentPage + 1)"
         >
-          {{ translate("button.next") }}
+          {{ translate('button.next') }}
         </button>
       </li>
     </ul>
@@ -50,9 +44,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import { useI18n } from "vue-i18n";
-import { getI18nKey } from "@/common/utils";
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { getI18nKey } from '@/common/utils';
 
 const { t } = useI18n();
 const translate = (key: string) => t(getI18nKey(key));
@@ -64,11 +58,16 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (event: "change-page", page: number): void;
+  (event: 'change-page', page: number): void;
 }>();
 
-const totalPages = computed((): number => Math.ceil(props.totalRows / props.perPage));
-const nextButtonDisabled = computed((): boolean => props.currentPage === totalPages.value || props.totalRows === 0);
+const totalPages = computed((): number =>
+  Math.ceil(props.totalRows / props.perPage),
+);
+const nextButtonDisabled = computed(
+  (): boolean =>
+    props.currentPage === totalPages.value || props.totalRows === 0,
+);
 const previousButtonDisabled = computed((): boolean => props.currentPage === 1);
 const pages = computed((): number[] => {
   if (props.totalRows === 0) {
@@ -85,6 +84,6 @@ const jumpToPage = (page: number): void => {
   if (page <= 0 || page > totalPages.value || page === props.currentPage) {
     return;
   }
-  emit("change-page", page);
+  emit('change-page', page);
 };
 </script>

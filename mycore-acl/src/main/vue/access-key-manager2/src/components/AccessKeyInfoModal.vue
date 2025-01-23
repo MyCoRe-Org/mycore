@@ -17,14 +17,9 @@
       {{ $t(errorMessage) }}
     </div>
     <form>
-      <div
-        class="form-group required"
-      >
-        <label
-          id="labelReference"
-          for="inputReference"
-        >
-          {{ t(getI18nKey("label.reference")) }}
+      <div class="form-group required">
+        <label id="labelReference" for="inputReference">
+          {{ t(getI18nKey('label.reference')) }}
         </label>
         <div class="input-group">
           <input
@@ -34,16 +29,13 @@
             type="text"
             class="form-control"
             aria-labelledby="labelReference"
-          >
+          />
         </div>
       </div>
       <div class="form-row">
         <div class="form-group col-md-6">
-          <label
-            id="lablePermission"
-            for="inputPermission"
-          >
-            {{ t(getI18nKey("label.permission")) }}
+          <label id="lablePermission" for="inputPermission">
+            {{ t(getI18nKey('label.permission')) }}
           </label>
           <select
             v-if="availablePermissions.length > 0"
@@ -67,14 +59,11 @@
             v-model="form.type"
             class="form-control"
             aria-labelledby="inputPermission"
-          >
+          />
         </div>
         <div class="form-group col-md-6">
-          <label
-            id="labelExpiration"
-            for="expirationInput"
-          >
-            {{ t(getI18nKey("label.expiration")) }}
+          <label id="labelExpiration" for="expirationInput">
+            {{ t(getI18nKey('label.expiration')) }}
           </label>
           <input
             id="expirationInput"
@@ -82,7 +71,7 @@
             type="date"
             class="form-control"
             aria-labelledby="labelExpiration"
-          >
+          />
         </div>
       </div>
       <div class="form-group">
@@ -93,22 +82,15 @@
             class="form-check-input"
             type="checkbox"
             aria-labelledby="labelActive"
-          >
-          <label
-            id="labelActive"
-            class="form-check-label"
-            for="inputActive"
-          >
-            {{ t(getI18nKey("label.active")) }}
+          />
+          <label id="labelActive" class="form-check-label" for="inputActive">
+            {{ t(getI18nKey('label.active')) }}
           </label>
         </div>
       </div>
       <div class="form-group">
-        <label
-          id="labelComment"
-          for="commentTextarea"
-        >
-          {{ $t(getI18nKey("label.comment")) }}
+        <label id="labelComment" for="commentTextarea">
+          {{ $t(getI18nKey('label.comment')) }}
         </label>
         <textarea
           id="commentTextarea"
@@ -132,7 +114,7 @@
           role="status"
           aria-hidden="true"
         />
-        {{ t(getI18nKey("button.updateAccessKey")) }}
+        {{ t(getI18nKey('button.updateAccessKey')) }}
       </button>
     </template>
   </BaseModal>
@@ -140,14 +122,14 @@
 
 <!-- TODO fix delete date issue in endpoint -->
 <script setup lang="ts">
-import { ref, onErrorCaptured, watch } from "vue";
-import { AccessKeyDto, PartialUpdateAccessKeyDto } from "@/dtos/accesskey";
-import BaseModal from "@/components/BaseModal.vue";
-import { required } from "@vuelidate/validators";
-import useVuelidate from "@vuelidate/core";
-import { AccessKeyService } from "@/service/accesskey";
-import { getI18nKey } from "@/common/utils";
-import { useI18n } from "vue-i18n";
+import { ref, onErrorCaptured, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { required } from '@vuelidate/validators';
+import useVuelidate from '@vuelidate/core';
+import { AccessKeyDto, PartialUpdateAccessKeyDto } from '@/dtos/accesskey';
+import { AccessKeyService } from '@/service/accesskey';
+import { getI18nKey } from '@/common/utils';
+import BaseModal from '@/components/BaseModal.vue';
 
 interface FormData {
   reference: string;
@@ -168,15 +150,15 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (event: "update-access-key", accessKey: AccessKeyDto): void;
-  (event: "close"): void;
+  (event: 'update-access-key', accessKey: AccessKeyDto): void;
+  (event: 'close'): void;
 }>();
 
 const errorMessage = ref<string | undefined>(undefined);
 const isBusy = ref<boolean>(false);
 const form = ref<FormData>({
-  reference: "",
-  type: "",
+  reference: '',
+  type: '',
   isActive: false,
   comment: undefined,
   expiration: undefined,
@@ -188,33 +170,37 @@ const rules = {
 };
 
 const v = useVuelidate(rules, form);
-watch(() => props.accessKey, (newAccessKey: AccessKeyDto | undefined) => {
-  if (newAccessKey) {
-    form.value = {
-      reference: newAccessKey.reference,
-      type: newAccessKey.type,
-      expiration: newAccessKey.expiration
-        ? new Date(newAccessKey.expiration).toISOString().slice(0, 10)
-        : undefined,
-      comment: newAccessKey.comment,
-      isActive: newAccessKey.isActive,
-    };
-  }
-}, { deep: true });
+watch(
+  () => props.accessKey,
+  (newAccessKey: AccessKeyDto | undefined) => {
+    if (newAccessKey) {
+      form.value = {
+        reference: newAccessKey.reference,
+        type: newAccessKey.type,
+        expiration: newAccessKey.expiration
+          ? new Date(newAccessKey.expiration).toISOString().slice(0, 10)
+          : undefined,
+        comment: newAccessKey.comment,
+        isActive: newAccessKey.isActive,
+      };
+    }
+  },
+  { deep: true },
+);
 const handleError = (error: unknown): void => {
   errorMessage.value =
-    error instanceof Error ? error.message : "component.acl.accesskey.frontend.error.fatal";
+    error instanceof Error ? error.message : t(getI18nKey('error.fatal'));
 };
 const close = (force?: boolean): void => {
   if (force || !isBusy.value) {
-    emit("close");
+    emit('close');
   }
 };
 const buildAccessKeyPayload = (): PartialUpdateAccessKeyDto => {
   const accessKey: PartialUpdateAccessKeyDto = {};
   if (form.value.reference !== props.accessKey?.reference) {
     accessKey.reference = form.value.reference;
-  } 
+  }
   if (form.value.comment !== props.accessKey?.comment) {
     accessKey.comment = form.value.comment;
   }
@@ -223,8 +209,10 @@ const buildAccessKeyPayload = (): PartialUpdateAccessKeyDto => {
   }
   // TODO fix expiration compare
   if (form.value.expiration !== props.accessKey?.expiration) {
-    accessKey.expiration = form.value.expiration ? Math.floor(new Date(form.value.expiration).getTime()) : null;
-  } 
+    accessKey.expiration = form.value.expiration
+      ? Math.floor(new Date(form.value.expiration).getTime())
+      : null;
+  }
   if (form.value.isActive !== props.accessKey?.isActive) {
     accessKey.isActive = form.value.isActive;
   }
@@ -237,8 +225,13 @@ const updateAccessKey = async (): Promise<void> => {
     if (!v.value.$invalid && props.accessKey && props.accessKey.id) {
       const accessKey: PartialUpdateAccessKeyDto = buildAccessKeyPayload();
       try {
-        await props.accessKeyService.patchAccessKey(props.accessKey.id, accessKey);
-        const updatedAccessKey = await props.accessKeyService.getAccessKey(props.accessKey.id);
+        await props.accessKeyService.patchAccessKey(
+          props.accessKey.id,
+          accessKey,
+        );
+        const updatedAccessKey = await props.accessKeyService.getAccessKey(
+          props.accessKey.id,
+        );
         emit('update-access-key', updatedAccessKey);
         close(true);
       } catch (error) {

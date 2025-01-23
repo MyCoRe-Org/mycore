@@ -13,10 +13,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import Modal from "./BaseModal.vue";
-import { getI18nKey } from "@/common/utils";
-import { useI18n } from "vue-i18n";
+import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { getI18nKey } from '@/common/utils';
+import Modal from './BaseModal.vue';
 
 interface Ops {
   title: string;
@@ -35,7 +35,7 @@ const show = (ops: Ops): Promise<boolean> => {
   title.value = ops.title;
   message.value = ops.message;
   isVisible.value = true;
-  return new Promise<boolean>((resolve) => {
+  return new Promise<boolean>(resolve => {
     resolvePromise = resolve;
   });
 };
