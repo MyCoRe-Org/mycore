@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import jakarta.inject.Singleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
@@ -52,8 +53,6 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-
-import jakarta.inject.Singleton;
 
 /**
  * base class for XML fact based access system
@@ -157,7 +156,8 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
         if (checkID == null) {
             cacheKey = action;
         } else {
-            String target = getTarget(checkID, facts);  // metadata|files|webpage
+            String target = getTarget(checkID);  // metadata|files|webpage
+            updateFactsForObject(checkID, facts);
             cacheKey = action + " " + checkID + " " + target;
             facts.add(new MCRStringFact("id", checkID));
             facts.add(new MCRStringFact("target", target));
@@ -186,34 +186,38 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
         return result;
     }
 
-    private String getTarget(String checkID, MCRFactsHolder facts) {
-        String target;
-        if (checkID.startsWith("webpage")) {
-            target = "webpage";
-        } else if (checkID.startsWith("solr")) {
-            target = "solr";
-        } else if (isCategory(checkID)) {
-            target = "category";
-        } else if (MCRObjectID.isValid(checkID)) {
-            MCRObjectID mcrId = MCRObjectID.getInstance(checkID);
-            target = "derivate".equals(mcrId.getTypeId()) ? "files" : "metadata";
-            if (MCRMetadataManager.exists(mcrId)) {
-                if ("derivate".equals(mcrId.getTypeId())) {
-                    facts.add(new MCRObjectIDFact("derid", checkID, mcrId));
-                    MCRObjectID mcrobjID = MCRMetadataManager.getObjectId(mcrId, 10, TimeUnit.MINUTES);
-                    if (mcrobjID != null) {
-                        facts.add(new MCRObjectIDFact("objid", checkID, mcrobjID));
-                    }
-                } else {
-                    facts.add(new MCRObjectIDFact("objid", checkID, mcrId));
-                }
-            } else {
-                LOGGER.debug(() -> "There is no object or derivate with id " + mcrId + " in metadata store");
+    private void updateFactsForObject(String checkID, MCRFactsHolder facts) {
+        if (!MCRObjectID.isValid(checkID)) {
+            return;
+        }
+        MCRObjectID mcrId = MCRObjectID.getInstance(checkID);
+        if (!MCRMetadataManager.exists(mcrId)) {
+            LOGGER.debug(() -> "There is no object or derivate with id " + mcrId + " in metadata store");
+            return;
+        }
+        if ("derivate".equals(mcrId.getTypeId())) {
+            facts.add(new MCRObjectIDFact("derid", checkID, mcrId));
+            MCRObjectID mcrobjID = MCRMetadataManager.getObjectId(mcrId, 10, TimeUnit.MINUTES);
+            if (mcrobjID != null) {
+                facts.add(new MCRObjectIDFact("objid", checkID, mcrobjID));
             }
         } else {
-            target = "unknown";
+            facts.add(new MCRObjectIDFact("objid", checkID, mcrId));
         }
-        return target;
+    }
+
+    private String getTarget(String checkID) {
+        if (checkID.startsWith("webpage")) {
+            return "webpage";
+        } else if (checkID.startsWith("solr")) {
+            return "solr";
+        } else if (isCategory(checkID)) {
+            return "category";
+        } else if (MCRObjectID.isValid(checkID)) {
+            MCRObjectID mcrId = MCRObjectID.getInstance(checkID);
+            return "derivate".equals(mcrId.getTypeId()) ? "files" : "metadata";
+        }
+        return "unknown";
     }
 
     private boolean isCategory(String checkID) {
