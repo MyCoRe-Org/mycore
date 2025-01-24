@@ -39,7 +39,7 @@ public class MCRStoreManager {
             LOGGER.info("Adding instance of {} as MCRStore '{}'.", storeClass::getSimpleName, store::getID);
             MCRStoreCenter.instance().addStore(store.getID(), store);
         } catch (Exception e) {
-            throw new MCRException("Could not create store with ID " + config.getID() + ", store allready exists");
+            throw new MCRException("Could not create store with ID " + config.getID() + ", store allready exists", e);
         }
 
         return store;

@@ -100,7 +100,9 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
                         LOGGER.error("Could not close Stream after error. ", e);
                     }
                 }
-                throw new SwordError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                SwordError swordError = new SwordError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                swordError.initCause(e);
+                throw swordError;
             }
         } else {
             // if there is no file path or file is just "/" or "" then send the zipped Derivate

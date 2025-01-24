@@ -987,7 +987,9 @@ public final class MCRURIResolver implements URIResolver {
                     ex.printStackTrace(pw);
                     stacktraceElement.setText(pw.toString());
                 } catch (IOException e) {
-                    throw new MCRException("Error while writing Exception to String!", e);
+                    MCRException mcrException = new MCRException("Error while writing Exception to String!", e);
+                    mcrException.addSuppressed(ex);
+                    throw mcrException;
                 }
 
                 return new JDOMSource(exception);

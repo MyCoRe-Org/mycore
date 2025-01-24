@@ -378,7 +378,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
             throw new MCRPersistenceException(String.format(Locale.ENGLISH,
                 "Couldn'e create directory ''%s'' to set up store for project ''%s'' and objectType ''%s'' "
                     + "and config prefix ''%s''",
-                path.toAbsolutePath(), project, objectType, configPrefix));
+                path.toAbsolutePath(), project, objectType, configPrefix), e);
         }
     }
 

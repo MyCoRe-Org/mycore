@@ -36,8 +36,17 @@ public class MCRAccessKeyException extends MCRException {
         super(errorMessage);
     }
 
+    public MCRAccessKeyException(String errorMessage, Throwable cause) {
+        super(errorMessage, cause);
+    }
+
     public MCRAccessKeyException(String errorMessage, String errorCode) {
         super(errorMessage);
+        this.errorCode = errorCode;
+    }
+
+    public MCRAccessKeyException(String errorMessage, String errorCode, Throwable cause) {
+        super(errorMessage, cause);
         this.errorCode = errorCode;
     }
 

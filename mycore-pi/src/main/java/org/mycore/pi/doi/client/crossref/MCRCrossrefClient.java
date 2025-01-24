@@ -111,7 +111,7 @@ public class MCRCrossrefClient {
             postRequest = new HttpPost(uri);
         } catch (URISyntaxException e) {
             throw new MCRPersistentIdentifierException(
-                String.format(Locale.ROOT, "Can not build a valid URL with  host: %s", this.host));
+                String.format(Locale.ROOT, "Can not build a valid URL with  host: %s", this.host), e);
         }
 
         final String metadataXmlAsString = METADATA_OUTPUTTER.outputString(metadata);

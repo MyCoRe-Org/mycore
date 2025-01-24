@@ -40,7 +40,9 @@ public class MCRORCIDClientErrorHandlerImpl implements MCRORCIDClientErrorHandle
             } catch (ProcessingException e) {
                 try {
                     final String error = response.readEntity(String.class);
-                    throw new MCRORCIDRequestException(error, response);
+                    MCRORCIDRequestException oe = new MCRORCIDRequestException(error, response);
+                    oe.initCause(e);
+                    throw oe;
                 } catch (ProcessingException f) {
                     // ignore
                 }

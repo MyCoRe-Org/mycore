@@ -28,4 +28,7 @@ public class MCRAccessKeyTransformationException extends MCRAccessKeyException {
     public MCRAccessKeyTransformationException(String errorMessage) {
         super(errorMessage, "component.acl.accesskey.frontend.error.transformation");
     }
+    public MCRAccessKeyTransformationException(String errorMessage, Throwable cause) {
+        super(errorMessage, "component.acl.accesskey.frontend.error.transformation", cause);
+    }
 }

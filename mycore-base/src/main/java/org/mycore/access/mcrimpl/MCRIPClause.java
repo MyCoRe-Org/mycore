@@ -42,7 +42,7 @@ public class MCRIPClause implements MCRIPCondition {
         try {
             this.ip = new MCRIPAddress(ip);
         } catch (java.net.UnknownHostException e) {
-            throw new MCRParseException("Couldn't parse/resolve host " + ip);
+            throw new MCRParseException("Couldn't parse/resolve host " + ip, e);
         }
     }
 

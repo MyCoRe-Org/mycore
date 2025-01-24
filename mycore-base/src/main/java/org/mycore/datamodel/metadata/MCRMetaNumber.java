@@ -216,7 +216,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
             String tmpNumber = number.replace(',', '.');
             this.number = new BigDecimal(tmpNumber);
         } catch (NumberFormatException e) {
-            throw new MCRException("The format of a number is invalid.");
+            throw new MCRException("The format of a number is invalid.", e);
         }
     }
 

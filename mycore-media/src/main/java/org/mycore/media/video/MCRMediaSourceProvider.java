@@ -66,15 +66,15 @@ public class MCRMediaSourceProvider {
                     MCRSessionMgr.getCurrentSession().getCurrentIP(),
                     MCRConfiguration2.getStringOrThrow("MCR.Media.Wowza.SharedSecred"),
                     parameterSupplier.get()));
-        } catch (RuntimeException e) {
-            Throwable cause = e.getCause();
+        } catch (RuntimeException ignoredBeCause) {
+            Throwable cause = ignoredBeCause.getCause();
             if (cause instanceof IOException ioe) {
                 throw ioe;
             }
             if (cause instanceof URISyntaxException use) {
                 throw use;
             }
-            throw e;
+            throw ignoredBeCause;
         }
         List<MCRMediaSource> mediaSources = new ArrayList<>(4);
         getDashStream()

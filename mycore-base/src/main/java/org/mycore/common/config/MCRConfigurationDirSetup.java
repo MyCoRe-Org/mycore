@@ -143,7 +143,8 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
                     return getDeclaredMethod((Class<? extends ClassLoader>) clazz.getSuperclass(), method, args);
                 }
             } catch (NoSuchMethodException e2) {
-                throw e;
+                e2.addSuppressed(e);
+                throw e2;
             }
             throw e;
         }

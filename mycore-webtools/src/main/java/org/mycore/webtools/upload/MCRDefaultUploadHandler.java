@@ -159,7 +159,9 @@ public class MCRDefaultUploadHandler implements MCRUploadHandler {
                 MCRObjectID newDerivateId = MCRObjectID.getInstance(formattedNewDerivateIDString);
                 MCRMetadataManager.checkCreatePrivilege(newDerivateId);
             } catch (MCRAccessException e) {
-                throw new MCRUploadForbiddenException();
+                MCRUploadForbiddenException uploadForbiddenException = new MCRUploadForbiddenException(e.getMessage());
+                uploadForbiddenException.initCause(e);
+                throw uploadForbiddenException;
             }
         }
 
@@ -173,7 +175,10 @@ public class MCRDefaultUploadHandler implements MCRUploadHandler {
         try {
             MCRUploadHelper.checkPathName(name);
         } catch (MCRException e) {
-            throw new MCRInvalidFileException(name, INVALID_FILE_NAME_TRANSLATION_KEY, true);
+            MCRInvalidFileException invalidFileException =
+                new MCRInvalidFileException(name, INVALID_FILE_NAME_TRANSLATION_KEY, true);
+            invalidFileException.initCause(e);
+            throw invalidFileException;
         }
 
         long maxSize = MCRConfiguration2.getOrThrow("MCR.FileUpload.MaxSize", Long::parseLong);

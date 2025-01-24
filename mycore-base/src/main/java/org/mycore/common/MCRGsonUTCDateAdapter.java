@@ -84,7 +84,9 @@ public class MCRGsonUTCDateAdapter implements JsonSerializer<Date>, JsonDeserial
                 try {
                     return ISO8601Utils.parse(json.getAsString(), new ParsePosition(0));
                 } catch (ParseException e1) {
-                    throw new JsonSyntaxException(json.getAsString(), e);
+                    JsonSyntaxException jsonSyntaxException = new JsonSyntaxException(json.getAsString(), e1);
+                    jsonSyntaxException.addSuppressed(e);
+                    throw jsonSyntaxException;
                 }
             }
         }

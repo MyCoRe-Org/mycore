@@ -139,8 +139,8 @@ public class MCRIView2Tools {
                 .or(() -> Optional.of("application/octet-stream"))
                 .map(SUPPORTED_CONTENT_TYPE::contains)
                 .orElse(Boolean.FALSE);
-        } catch (UncheckedIOException e) {
-            throw e.getCause();
+        } catch (UncheckedIOException ignoredUnchecked) {
+            throw ignoredUnchecked.getCause();
         }
     }
 
@@ -257,7 +257,10 @@ public class MCRIView2Tools {
                         Thread.sleep(10);
                     } catch (InterruptedException ie) {
                         // get out of here
-                        throw new IOException(ie);
+                        IOException ioe =
+                            new IOException("Exception while waiting for filesystem to close: " + uri, ie);
+                        ioe.addSuppressed(exc);
+                        throw ioe;
                     }
                 }
             } catch (FileSystemNotFoundException fsnfe) {

@@ -215,7 +215,9 @@ public class MCROAISearchManager {
         try {
             return token.split(TOKEN_DELIMITER)[0];
         } catch (Exception exc) {
-            throw new BadResumptionTokenException(token);
+            BadResumptionTokenException rte = new BadResumptionTokenException(token);
+            rte.initCause(exc);
+            throw rte;
         }
     }
 
@@ -224,7 +226,9 @@ public class MCROAISearchManager {
             String[] tokenParts = token.split(TOKEN_DELIMITER);
             return tokenParts[tokenParts.length - 1];
         } catch (Exception exc) {
-            throw new BadResumptionTokenException(token);
+            BadResumptionTokenException rte = new BadResumptionTokenException(token);
+            rte.initCause(exc);
+            throw rte;
         }
     }
 

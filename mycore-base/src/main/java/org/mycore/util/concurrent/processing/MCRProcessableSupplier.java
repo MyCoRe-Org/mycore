@@ -37,7 +37,7 @@ import org.mycore.util.concurrent.MCRPrioritySupplier;
  * A processable supplier combines a {@link Supplier} and a {@link MCRProcessable}.
  * The supplier will be executed with the help of an {@link CompletableFuture}.
  * To get the future call {@link #getFuture()}.
- * 
+ *
  * @author Matthias Eichner
  *
  * @param <R> the result of the task
@@ -48,7 +48,7 @@ public class MCRProcessableSupplier<R> extends MCRProcessableTask<Callable<R>> i
 
     /**
      * Creates a new {@link MCRProcessableSupplier} by the already committed task and its future.
-     * 
+     *
      * @param task the task which should be executed
      * @param future the future
      * @return a new processable supplier
@@ -62,7 +62,7 @@ public class MCRProcessableSupplier<R> extends MCRProcessableTask<Callable<R>> i
     /**
      * Creates a new {@link MCRProcessableSupplier} by submitting the task to the executorService with
      * the given priority.
-     * 
+     *
      * @param task the task to submit
      * @param executorService the executor service
      * @param priority the priority
@@ -76,8 +76,8 @@ public class MCRProcessableSupplier<R> extends MCRProcessableTask<Callable<R>> i
     }
 
     /**
-     * Private constructor, 
-     * 
+     * Private constructor,
+     *
      * @param task the task itself
      */
     private MCRProcessableSupplier(Callable<R> task) {
@@ -99,17 +99,17 @@ public class MCRProcessableSupplier<R> extends MCRProcessableTask<Callable<R>> i
         } catch (InterruptedException exc) {
             this.error = exc;
             this.setStatus(MCRProcessableStatus.CANCELED);
-            throw new MCRException(this.error);
+            throw new MCRException(exc);
         } catch (Exception exc) {
             this.error = exc;
             this.setStatus(MCRProcessableStatus.FAILED);
-            throw new MCRException(this.error);
+            throw new MCRException(exc);
         }
     }
 
     /**
      * The future the task is assigned to.
-     * 
+     *
      * @return the future
      */
     public CompletableFuture<R> getFuture() {
@@ -128,7 +128,7 @@ public class MCRProcessableSupplier<R> extends MCRProcessableTask<Callable<R>> i
 
     /**
      * Same as {@link Future#cancel(boolean)}.
-     * 
+     *
      * @param mayInterruptIfRunning true if the thread executing this task should be interrupted;
      *      otherwise, in-progress tasks are allowed to complete
      * @return false if the task could not be cancelled, typically because it has already
@@ -142,7 +142,7 @@ public class MCRProcessableSupplier<R> extends MCRProcessableTask<Callable<R>> i
      * Returns an integer between 0-100 indicating the progress
      * of the processable. Can return null if the task is not started
      * yet or the task is not an instance of {@link MCRProgressable}.
-     * 
+     *
      * @return the progress between 0-100 or null
      */
     @Override
@@ -155,7 +155,7 @@ public class MCRProcessableSupplier<R> extends MCRProcessableTask<Callable<R>> i
 
     /**
      * Returns a human-readable text indicating the state of the progress.
-     * 
+     *
      * @return progress text
      */
     @Override
@@ -169,7 +169,7 @@ public class MCRProcessableSupplier<R> extends MCRProcessableTask<Callable<R>> i
     /**
      * Returns the name of this process. If no name is set
      * this returns the simplified class name of the task.
-     * 
+     *
      * @return a human-readable name of this processable task
      */
     @Override

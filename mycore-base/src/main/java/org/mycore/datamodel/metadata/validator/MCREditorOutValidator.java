@@ -175,7 +175,7 @@ public class MCREditorOutValidator {
         try {
             test = metaClass.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
-            throw new MCRException("Could not instantiate " + metaClass.getCanonicalName());
+            throw new MCRException("Could not instantiate " + metaClass.getCanonicalName(), e);
         }
         test.setFromDOM(datasubtag);
         test.validate();

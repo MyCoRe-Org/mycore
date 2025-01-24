@@ -85,17 +85,15 @@ public class MCRXMLParserImpl implements MCRXMLParser {
     public XMLReader getXMLReader() throws SAXException, ParserConfigurationException {
         try {
             return builder.getXMLReaderFactory().createXMLReader();
-        } catch (JDOMException e) {
-            Throwable cause = e.getCause();
-            if (e != null) {
-                if (cause instanceof SAXException se) {
-                    throw se;
-                }
-                if (cause instanceof ParserConfigurationException pce) {
-                    throw pce;
-                }
+        } catch (JDOMException ignoredWithSAXCause) {
+            Throwable cause = ignoredWithSAXCause.getCause();
+            if (cause instanceof SAXException se) {
+                throw se;
             }
-            throw new MCRException(e);
+            if (cause instanceof ParserConfigurationException pce) {
+                throw pce;
+            }
+            throw new MCRException(ignoredWithSAXCause);
         }
     }
 

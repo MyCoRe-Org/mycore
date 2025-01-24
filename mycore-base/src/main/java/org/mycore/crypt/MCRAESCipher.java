@@ -81,9 +81,11 @@ public class MCRAESCipher extends MCRCipher {
             decryptCipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
             decryptCipher.init(Cipher.DECRYPT_MODE, secretKey);
         } catch (NoSuchFileException e) {
-            throw new MCRCryptKeyFileNotFoundException(
+            MCRCryptKeyFileNotFoundException fileNotFoundException = new MCRCryptKeyFileNotFoundException(
                 "Keyfile " + keyFile
                     + " not found. Generate new one with CLI command or copy file to path.");
+            fileNotFoundException.initCause(e);
+            throw fileNotFoundException;
         } catch (IllegalArgumentException e) {
             throw new InvalidKeyException("Error while decoding key from keyFile " + keyFile + "!", e);
         } catch (IOException e) {
@@ -120,9 +122,11 @@ public class MCRAESCipher extends MCRCipher {
             throw new MCRCryptCipherConfigurationException(
                 "Error while generating keyfile: The configured algorithm is not available.", e);
         } catch (FileAlreadyExistsException e) {
-            throw new FileAlreadyExistsException(keyFile, null,
+            FileAlreadyExistsException fileAlreadyExistsException = new FileAlreadyExistsException(keyFile, null,
                 "A crypt key shouldn't be generated if it allready exists. "
                     + " If you are aware of the consequences use overwriteKeyFile().");
+            fileAlreadyExistsException.initCause(e);
+            throw fileAlreadyExistsException;
         } catch (IOException e) {
             throw new MCRException("Error while write key to file.", e);
         }

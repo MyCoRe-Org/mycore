@@ -184,6 +184,7 @@ public class MCRRestClassifications {
                 return Response.ok(content.asString()).type("application/rdf+xml; charset=UTF-8").build();
             } catch (IOException e) {
                 throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
+                    .withCause(e)
                     .withErrorCode(MCRErrorCodeConstants.MCRCLASS_NOT_FOUND)
                     .withMessage("Could not find classification or category in " + classId + ".")
                     .toException();

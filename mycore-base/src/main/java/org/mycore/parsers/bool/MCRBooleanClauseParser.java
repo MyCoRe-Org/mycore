@@ -28,7 +28,7 @@ import org.jdom2.Element;
 
 /**
  * Class for parsing Boolean clauses
- * 
+ *
  * @author Matthias Kramm
  * @author Christoph Neidahl (OPNA2608)
  */
@@ -45,7 +45,7 @@ public class MCRBooleanClauseParser<T> {
     private static final Pattern BRACKET_MARKER = Pattern.compile("@<([0-9]*)>@");
 
     /**
-     * This both strings are for temporary bracket substitution in case of brackets 
+     * This both strings are for temporary bracket substitution in case of brackets
      * in a text string in a condition like 'title contains "foo (and bar)".
      */
     private static final String OPENING_BRACKET = "%%%%%%%%%%";
@@ -71,7 +71,7 @@ public class MCRBooleanClauseParser<T> {
 
     /**
      * Parse a complex or simple condition in XML format and put it in an condition object.
-     * 
+     *
      * @param condition a MyCoRe condition object in XML format
      * @return a MyCoRe condition object in the MCRCondition format
      */
@@ -291,7 +291,7 @@ public class MCRBooleanClauseParser<T> {
         try {
             name = element.getAttributeValue("operator").toLowerCase(Locale.ROOT);
         } catch (Exception e) {
-            throw new MCRParseException("Syntax error: attribute operator not found");
+            throw new MCRParseException("Syntax error: attribute operator not found", e);
         }
 
         if (name.equals("true")) {

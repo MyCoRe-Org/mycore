@@ -150,8 +150,8 @@ public class MCRFileCollection extends MCRDirectory {
                     throw new UncheckedIOException(e1);
                 }
             });
-        } catch (UncheckedIOException e) {
-            throw e.getCause();
+        } catch (UncheckedIOException ignoredUnchecked) {
+            throw ignoredUnchecked.getCause();
         }
     }
 

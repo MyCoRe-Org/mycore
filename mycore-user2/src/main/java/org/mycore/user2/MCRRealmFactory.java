@@ -117,7 +117,7 @@ public class MCRRealmFactory {
         try {
             root = getRealms().getRootElement();
         } catch (JDOMException | TransformerException | IOException e) {
-            throw new MCRException("Could not load realms from URI: " + realmsURI);
+            throw new MCRException("Could not load realms from URI: " + realmsURI, e);
         }
         String localRealmID = root.getAttributeValue("local");
         Map<String, MCRRealm> realmsMap = new HashMap<>();

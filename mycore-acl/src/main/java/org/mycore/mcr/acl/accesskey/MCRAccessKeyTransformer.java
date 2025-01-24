@@ -68,7 +68,7 @@ public class MCRAccessKeyTransformer {
         try {
             return objectMapper.readValue(json, MCRAccessKey.class);
         } catch (JsonProcessingException e) {
-            throw new MCRAccessKeyTransformationException("Cannot transform JSON.");
+            throw new MCRAccessKeyTransformationException("Cannot transform JSON.", e);
         }
     }
 
@@ -85,7 +85,7 @@ public class MCRAccessKeyTransformer {
         try {
             return Arrays.asList(objectMapper.readValue(json, MCRAccessKey[].class));
         } catch (JsonProcessingException e) {
-            throw new MCRAccessKeyTransformationException("Invalid JSON.");
+            throw new MCRAccessKeyTransformationException("Invalid JSON.", e);
         }
     }
 
@@ -102,7 +102,7 @@ public class MCRAccessKeyTransformer {
         try {
             return objectMapper.writeValueAsString(accessKey);
         } catch (JsonProcessingException e) {
-            throw new MCRAccessKeyTransformationException("Access key could not be converted to JSON.");
+            throw new MCRAccessKeyTransformationException("Access key could not be converted to JSON.", e);
         }
     }
 
@@ -119,7 +119,7 @@ public class MCRAccessKeyTransformer {
         try {
             return objectMapper.writeValueAsString(accessKeys);
         } catch (JsonProcessingException e) {
-            throw new MCRAccessKeyTransformationException("Access keys could not be converted to JSON.");
+            throw new MCRAccessKeyTransformationException("Access keys could not be converted to JSON.", e);
         }
     }
 

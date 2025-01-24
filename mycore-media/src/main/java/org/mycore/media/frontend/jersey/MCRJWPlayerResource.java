@@ -36,12 +36,11 @@ import com.google.gson.Gson;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.Response.Status;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -77,7 +76,7 @@ public class MCRJWPlayerResource {
             return toJson(formatter.getSources());
         } catch (NoSuchFileException e) {
             LogManager.getLogger().warn("Could not find video file.", e);
-            throw new WebApplicationException(Status.NOT_FOUND);
+            throw new NotFoundException("Could not find video file.", e);
         }
     }
 

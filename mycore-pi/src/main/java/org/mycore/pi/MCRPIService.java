@@ -356,11 +356,11 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
         try {
             return REGISTER_POOL.submit(createPICallable).get();
-        } catch (ExecutionException e) {
-            if (e.getCause() instanceof MCRPersistentIdentifierException pie) {
+        } catch (ExecutionException ignoredBeCause) {
+            if (ignoredBeCause.getCause() instanceof MCRPersistentIdentifierException pie) {
                 throw pie;
             }
-            throw e;
+            throw ignoredBeCause;
         }
     }
 

@@ -62,13 +62,13 @@ public class MCRORCIDWorkTransformerHelper {
         try {
             JAXB_CONTEXT = JAXBContext.newInstance(Work.class, WorkSummary.class);
         } catch (JAXBException e) {
-            throw new IllegalArgumentException("Could not init jaxb context");
+            throw new IllegalArgumentException("Could not init jaxb context", e);
         }
     }
 
     /**
      * Transforms MODS MCRContent to Work.
-     * 
+     *
      * @param content the MODS MCRContent
      * @return the Work
      * @throws MCRORCIDTransformationException if transformation failed
@@ -85,7 +85,7 @@ public class MCRORCIDWorkTransformerHelper {
     /**
      * Transforms Work to MODS MCRContent.
      * Merges BibLaTeX using transformer
-     * 
+     *
      * @param work the Work
      * @return the MODS MCRContent
      * @throws MCRORCIDTransformationException if transformation failed
@@ -110,7 +110,7 @@ public class MCRORCIDWorkTransformerHelper {
 
     /**
      * Transforms WorkSummary to mods MCRContent.
-     * 
+     *
      * @param work the WorkSummary
      * @return the MODS MCRContent
      * @throws MCRORCIDTransformationException if transformation failed

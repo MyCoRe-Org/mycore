@@ -39,7 +39,7 @@ public class MCRORCIDHashResolver implements URIResolver {
      * Hashes given input with given algoritm.
      *
      * Syntax: <code>hash:{input}:{algorithm}:{?salt}:{?iterations}</code>
-     * 
+     *
      * input and salt will be url decoded
      *
      * @param href
@@ -77,7 +77,7 @@ public class MCRORCIDHashResolver implements URIResolver {
                 }
             }
         } catch (NumberFormatException e) {
-            throw new MCRException("Invalid format of uri for retrieval of hash: " + href);
+            throw new MCRException("Invalid format of uri for retrieval of hash: " + href, e);
         }
         final Element root = new Element("string");
         root.setText(result);

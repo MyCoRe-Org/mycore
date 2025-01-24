@@ -824,8 +824,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         if (consumer != null) {
             try(OutputStream fileOutputStream = Files.newOutputStream(xmlOutput.toPath())) {
                 consumer.accept(content, fileOutputStream);
-            } catch (UncheckedIOException e) {
-                throw e.getCause();
+            } catch (UncheckedIOException ignoredUnchecked) {
+                throw ignoredUnchecked.getCause();
             } catch (IOException | RuntimeException e) {
                 throw e;
             } catch (Exception e) {
