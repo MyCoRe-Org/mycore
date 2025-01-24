@@ -17,89 +17,54 @@
       {{ $t(errorMessage) }}
     </div>
     <form>
-      <div class="form-group required">
-        <label id="labelReference" for="inputReference">
-          {{ t(getI18nKey('label.reference')) }}
-        </label>
-        <div class="input-group">
-          <input
-            id="inputReference"
-            v-model="form.reference"
-            :disabled="reference !== undefined"
-            type="text"
-            class="form-control"
-            aria-labelledby="labelReference"
-          />
-        </div>
-      </div>
+      <TextInputFormField
+        v-model="form.reference"
+        input-id="inputReference"
+        :disabled="reference !== undefined"
+        :label="t(getI18nKey('label.reference'))"
+      />
+
       <div class="form-row">
-        <div class="form-group col-md-6">
-          <label id="lablePermission" for="inputPermission">
-            {{ t(getI18nKey('label.permission')) }}
-          </label>
-          <select
-            v-if="availablePermissions.length > 0"
-            id="inputPermission"
-            v-model="form.type"
-            class="form-control"
-            aria-labelledby="inputPermission"
+        <SelectFormField
+          v-if="availablePermissions.length > 0"
+          v-model="form.type"
+          class="col-md-6"
+          input-id="inputPermission"
+          :label="t(getI18nKey('label.permission'))"
+        >
+          <option
+            v-for="permissionValue in availablePermissions"
+            :key="permissionValue"
+            :value="permissionValue"
           >
-            <template
-              v-for="permissionValue in availablePermissions"
-              :key="permissionValue"
-            >
-              <option :value="permissionValue">
-                {{ t(getI18nKey(`label.permission.${permissionValue}`)) }}
-              </option>
-            </template>
-          </select>
-          <input
-            v-else
-            id="inputPermission"
-            v-model="form.type"
-            class="form-control"
-            aria-labelledby="inputPermission"
-          />
-        </div>
-        <div class="form-group col-md-6">
-          <label id="labelExpiration" for="expirationInput">
-            {{ t(getI18nKey('label.expiration')) }}
-          </label>
-          <input
-            id="expirationInput"
-            v-model="form.expiration"
-            type="date"
-            class="form-control"
-            aria-labelledby="labelExpiration"
-          />
-        </div>
-      </div>
-      <div class="form-group">
-        <div class="form-check">
-          <input
-            id="inputActive"
-            v-model="form.isActive"
-            class="form-check-input"
-            type="checkbox"
-            aria-labelledby="labelActive"
-          />
-          <label id="labelActive" class="form-check-label" for="inputActive">
-            {{ t(getI18nKey('label.active')) }}
-          </label>
-        </div>
-      </div>
-      <div class="form-group">
-        <label id="labelComment" for="commentTextarea">
-          {{ $t(getI18nKey('label.comment')) }}
-        </label>
-        <textarea
-          id="commentTextarea"
-          v-model="form.comment"
-          class="form-control"
-          rows="3"
-          aria-labelledby="labelComment"
+            {{ t(getI18nKey(`label.permission.${permissionValue}`)) }}
+          </option>
+        </SelectFormField>
+        <TextInputFormField
+          v-else
+          v-model="form.type"
+          class="col-md-6"
+          input-id="inputPermission"
+          :label="t(getI18nKey('label.permission'))"
+        />
+        <DateInputFormField
+          v-model="form.expiration"
+          class="col-md-6"
+          input-id="expirationInput"
+          :label="t(getI18nKey('label.expiration'))"
         />
       </div>
+      <CheckboxInputFormField
+        v-model="form.isActive"
+        :label="t(getI18nKey('label.active'))"
+        input-id="inputActive"
+      />
+      <TextareaFormField
+        v-model="form.comment"
+        input-id="commentTextarea"
+        rows="3"
+        :label="t(getI18nKey('label.comment'))"
+      />
     </form>
     <template #footer>
       <button
@@ -128,13 +93,22 @@ import { required } from '@vuelidate/validators';
 import useVuelidate from '@vuelidate/core';
 import { AccessKeyDto, PartialUpdateAccessKeyDto } from '@/dtos/accesskey';
 import { AccessKeyService } from '@/service/accesskey';
-import { getI18nKey, getUnixTimestamp } from '@/common/utils';
+import {
+  convertUnixToISO,
+  getI18nKey,
+  getUnixTimestampString,
+} from '@/common/utils';
 import BaseModal from '@/components/BaseModal.vue';
+import TextInputFormField from './form/TextInputFormField.vue';
+import DateInputFormField from './form/DateInputFormField.vue';
+import CheckboxInputFormField from './form/CheckboxInputFormField.vue';
+import TextareaFormField from './form/TextareaFormField.vue';
+import SelectFormField from './form/SelectFormField.vue';
 
 interface FormData {
   reference: string;
   type: string;
-  expiration: string | undefined;
+  expiration: string | null;
   comment: string | undefined;
   isActive: boolean;
 }
@@ -161,7 +135,7 @@ const form = ref<FormData>({
   type: '',
   isActive: false,
   comment: undefined,
-  expiration: undefined,
+  expiration: null,
 });
 
 const rules = {
@@ -178,8 +152,8 @@ watch(
         reference: newAccessKey.reference,
         type: newAccessKey.type,
         expiration: newAccessKey.expiration
-          ? new Date(newAccessKey.expiration).toISOString().slice(0, 10)
-          : undefined,
+          ? convertUnixToISO(newAccessKey.expiration)
+          : null,
         comment: newAccessKey.comment,
         isActive: newAccessKey.isActive,
       };
@@ -208,8 +182,9 @@ const buildAccessKeyPayload = (): PartialUpdateAccessKeyDto => {
     accessKey.type = form.value.type;
   }
   const expiration = form.value.expiration
-    ? getUnixTimestamp(form.value.expiration)
+    ? getUnixTimestampString(form.value.expiration)
     : null;
+  console.log(props.accessKey?.expiration, expiration);
   if (expiration !== props.accessKey?.expiration) {
     accessKey.expiration = expiration;
   }

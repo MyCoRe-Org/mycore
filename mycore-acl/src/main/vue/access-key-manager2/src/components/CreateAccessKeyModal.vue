@@ -19,27 +19,22 @@
       <p>{{ t(getI18nKey('description.createAccesskey')) }}</p>
     </div>
     <form>
-      <div class="form-group required">
-        <label id="labelReference" for="inputReference">
-          {{ t(getI18nKey('label.reference')) }}
-        </label>
-        <div class="input-group">
-          <input
-            id="inputReference"
-            v-model="form.reference"
-            aria-labelledby="labelReference"
-            :disabled="reference !== undefined"
-            type="text"
-            class="form-control"
-          />
-        </div>
-      </div>
-      <div class="form-group required">
-        <label id="labelSecret" for="inputSecret">
-          {{ t(getI18nKey('label.value')) }}
-        </label>
-        <div class="input-group">
-          <div class="input-group-prepend">
+      <TextInputFormField
+        v-model="form.reference"
+        input-id="inputReference"
+        :disabled="reference !== undefined"
+        :label="t(getI18nKey('label.reference'))"
+        required
+      />
+
+      <TextInputFormField
+        v-model="form.secret"
+        input-id="inputSecret"
+        :label="t(getI18nKey('label.value'))"
+        required
+      >
+        <template #prepend>
+          <span class="input-group-prepend">
             <button
               class="btn btn-primary"
               type="button"
@@ -48,87 +43,52 @@
             >
               <i class="fa fa-shuffle" />
             </button>
-          </div>
-          <input
-            id="inputSecret"
-            v-model="form.secret"
-            aria-labelledby="labelSecret"
-            type="text"
-            class="form-control"
-          />
-        </div>
-      </div>
+          </span>
+        </template>
+      </TextInputFormField>
       <div class="form-row">
-        <div class="form-group col-md-6 required">
-          <label id="labelPermission" for="inputPermission">
-            {{ t(getI18nKey('label.permission')) }}
-          </label>
-          <select
-            v-if="availablePermissions.length > 0"
-            id="inputPermission"
-            v-model="form.type"
-            aria-labelledby="labelPermission"
-            class="form-control"
+        <SelectFormField
+          v-if="availablePermissions.length > 0"
+          v-model="form.type"
+          class="col-md-6"
+          input-id="inputPermission"
+          :label="t(getI18nKey('label.permission'))"
+          required
+        >
+          <option
+            v-for="permissionValue in availablePermissions"
+            :key="permissionValue"
+            :value="permissionValue"
           >
-            <option value="" disabled>
-              {{ t(getI18nKey('select')) }}
-            </option>
-            <template
-              v-for="permissionValue in availablePermissions"
-              :key="permissionValue"
-            >
-              <option :value="permissionValue">
-                {{ t(getI18nKey(`label.permission.${permissionValue}`)) }}
-              </option>
-            </template>
-          </select>
-          <input
-            v-else
-            id="inputPermission"
-            v-model="form.type"
-            aria-labelledby="labelPermission"
-            class="form-control"
-          />
-        </div>
-        <div class="form-group col-md-6">
-          <label id="labelExpiration" for="expirationInput">
-            {{ t(getI18nKey('label.expiration')) }}
-          </label>
-          <input
-            id="expirationInput"
-            v-model="form.expiration"
-            aria-labelledby="labelExpiration"
-            type="date"
-            class="form-control"
-          />
-        </div>
-      </div>
-      <div class="form-group">
-        <div class="form-check">
-          <input
-            id="inputActive"
-            v-model="form.isActive"
-            aria-labelledby="labelActive"
-            class="form-check-input"
-            type="checkbox"
-          />
-          <label id="labelActive" class="form-check-label" for="inputActive">
-            {{ t(getI18nKey('label.active')) }}
-          </label>
-        </div>
-      </div>
-      <div class="form-group">
-        <label id="labelComment" for="commentTextarea">
-          {{ t(getI18nKey('label.comment')) }}
-        </label>
-        <textarea
-          id="commentTextarea"
-          v-model="form.comment"
-          aria-labelledby="labelComment"
-          class="form-control"
-          rows="3"
+            {{ t(getI18nKey(`label.permission.${permissionValue}`)) }}
+          </option>
+        </SelectFormField>
+        <TextInputFormField
+          v-else
+          v-model="form.type"
+          class="col-md-6"
+          input-id="inputPermission"
+          :label="t(getI18nKey('label.permission'))"
+          required
+        />
+        <DateInputFormField
+          v-model="form.expiration"
+          class="col-md-6"
+          input-id="expirationInput"
+          :label="t(getI18nKey('label.expiration'))"
         />
       </div>
+      <CheckboxInputFormField
+        v-model="form.isActive"
+        :label="t(getI18nKey('label.active'))"
+        input-id="inputActive"
+      />
+      <TextareaFormField
+        v-model="form.comment"
+        input-id="commentTextarea"
+        rows="3"
+        :label="t(getI18nKey('label.comment'))"
+      />
     </form>
     <template #footer>
       <button
@@ -155,9 +115,18 @@ import { ref, onErrorCaptured } from 'vue';
 import { useI18n } from 'vue-i18n';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
-import { generateRandomString, getI18nKey } from '@/common/utils';
+import {
+  generateRandomString,
+  getI18nKey,
+  getUnixTimestampString,
+} from '@/common/utils';
 import { AccessKeyDto, CreateAccessKeyDto } from '@/dtos/accesskey';
 import { AccessKeyService } from '@/service/accesskey';
+import TextInputFormField from './form/TextInputFormField.vue';
+import SelectFormField from './form/SelectFormField.vue';
+import DateInputFormField from './form/DateInputFormField.vue';
+import CheckboxInputFormField from './form/CheckboxInputFormField.vue';
+import TextareaFormField from './form/TextareaFormField.vue';
 
 import BaseModal from '@/components/BaseModal.vue';
 
@@ -195,7 +164,7 @@ const defaultForm = {
   secret: '',
   type: '',
   comment: undefined,
-  expiration: undefined,
+  expiration: null,
 };
 const form = ref<CreateAccessKeyDto>({ ...defaultForm });
 const v = useVuelidate(rules, form);
@@ -232,9 +201,7 @@ const getAccessKey = (): CreateAccessKeyDto => {
     type: form.value.type,
   } as CreateAccessKeyDto;
   if (form.value.expiration) {
-    accessKey.expiration = Math.floor(
-      new Date(form.value.expiration).getTime()
-    );
+    accessKey.expiration = getUnixTimestampString(form.value.expiration);
   }
   if (form.value.comment) {
     accessKey.comment = form.value.comment;
@@ -267,12 +234,3 @@ onErrorCaptured((err): boolean => {
   return false;
 });
 </script>
-
-<style scoped>
-.form-group.required label:after {
-  content: '*';
-  color: red;
-  font-weight: bold;
-  margin-left: 5px;
-}
-</style>

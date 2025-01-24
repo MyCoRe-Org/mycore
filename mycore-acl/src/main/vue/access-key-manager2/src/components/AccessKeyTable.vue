@@ -49,7 +49,7 @@
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { AccessKeyDto } from '@/dtos/accesskey';
-import { getI18nKey } from '@/common/utils';
+import { getI18nKey, convertUnixToISO } from '@/common/utils';
 import ConfirmModal from '@/components/ConfirmModal.vue';
 
 const { t } = useI18n();
@@ -74,7 +74,7 @@ const columnLabels = computed(() => ({
 }));
 
 const getExpirationDisplay = (expiration?: number | null): string => {
-  return expiration ? new Date(expiration).toLocaleDateString() : '-';
+  return expiration ? convertUnixToISO(expiration) : '-';
 };
 const openDeleteConfirmationModal = async (
   accessKey: AccessKeyDto

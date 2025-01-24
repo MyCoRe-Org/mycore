@@ -90,8 +90,12 @@ export const generateRandomString = (length: number): string => {
   return temp;
 };
 
-export const getUnixTimestamp = (date: string): number =>
-  Math.floor(new Date(date).getTime());
+export const getUnixTimestampString = (date: string): string =>
+  String(Math.floor(new Date(date).getTime()));
+
+export const convertUnixToISO = (unixTimestamp: number): string => {
+  return new Date(unixTimestamp).toISOString().slice(0, 10);
+};
 
 const shortString = (input: string, len: number): string =>
   input.length > len ? `${input.slice(0, len - 3)}...` : input;

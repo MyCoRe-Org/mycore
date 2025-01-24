@@ -13,7 +13,7 @@ export interface PartialUpdateAccessKeyDto {
   type?: string;
   isActive?: boolean;
   comment?: string;
-  expiration?: number | null;
+  expiration?: string | null;
 }
 
 export interface CreateAccessKeyDto {
@@ -22,5 +22,5 @@ export interface CreateAccessKeyDto {
   type: string;
   isActive: boolean;
   comment?: string;
-  expiration?: number | null;
+  expiration?: string | null;
 }

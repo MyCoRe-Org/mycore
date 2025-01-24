@@ -41,7 +41,7 @@
     <div class="row pb-2">
       <div class="col-12">
         <div class="text-right">
-          <button class="btn btn-primary" @click="openCreateAccessKeyModal">
+          <button class="btn btn-primary" @click="open(CREATE_MODAL_ID)">
             <i class="fa fa-plus" />
             {{ t(getI18nKey('button.showCreateAccessKeyModal')) }}
           </button>
@@ -72,15 +72,15 @@
       :access-key-service="accessKeyService"
       :reference="reference"
       :available-permissions="availablePermissions"
-      :is-visible="state.isCreateAccessKeyModalVisible"
-      @close="closeCreateAccessKeyModal"
+      :is-visible="isVisible(CREATE_MODAL_ID)"
+      @close="close(CREATE_MODAL_ID)"
       @add-access-key="addAccessKey"
     />
     <AccessKeyInfoModal
       :access-key-service="accessKeyService"
       :available-permissions="availablePermissions"
       :reference="reference"
-      :is-visible="state.isAccessKeyInfoModalVisible"
+      :is-visible="isVisible(INFO_MODAL_ID)"
       :access-key="state.currentAccessKey"
       @update-access-key="updateAccessKey"
       @close="closeAccessKeyInfoModal"
@@ -106,6 +106,7 @@ import {
   AuthStrategy,
 } from '@/service/accesskey';
 import { Config } from '@/common/config';
+import { useModal } from '@/composables/modal';
 import LoadingOverlay from '@/components/LoadingOverlay.vue';
 import AccessKeyTable from '@/components/AccessKeyTable.vue';
 import CreateAccessKeyModal from '@/components/CreateAccessKeyModal.vue';
@@ -123,6 +124,7 @@ class DevAuthStrategy implements AuthStrategy {
 const router = useRouter();
 const route = useRoute();
 const { t } = useI18n();
+const { open, close, isVisible } = useModal();
 
 const getActivationLink = (secret: string): string =>
   t(getI18nKey('success.add.url.format'), {
@@ -139,6 +141,9 @@ const availablePermissions = availablePermissionsQuery
   ? availablePermissionsQuery.split(',')
   : [];
 
+const CREATE_MODAL_ID = 'createModal';
+const INFO_MODAL_ID = 'infoModal';
+
 const state = reactive({
   loading: false,
   totalCount: 0,
@@ -148,8 +153,6 @@ const state = reactive({
   errorMessage: undefined as string | undefined,
   accessKeyCreatedSecret: undefined as string | undefined,
   accessKeyCreated: undefined as AccessKeyDto | undefined,
-  isCreateAccessKeyModalVisible: false,
-  isAccessKeyInfoModalVisible: false,
   currentAccessKey: undefined as AccessKeyDto | undefined,
 });
 const accessKeyService = ref<AccessKeyService>();
@@ -177,18 +180,12 @@ const fetchAccessKeys = async (): Promise<void> => {
     state.totalCount = result.totalCount;
   }
 };
-const openCreateAccessKeyModal = (): void => {
-  state.isCreateAccessKeyModalVisible = true;
-};
-const closeCreateAccessKeyModal = (): void => {
-  state.isCreateAccessKeyModalVisible = false;
-};
 const openAccessKeyInfoModal = (index: number): void => {
   state.currentAccessKey = paginatedAccessKeys.value[index];
-  state.isAccessKeyInfoModalVisible = true;
+  open(INFO_MODAL_ID);
 };
 const closeAccessKeyInfoModal = (): void => {
-  state.isAccessKeyInfoModalVisible = false;
+  close(INFO_MODAL_ID);
   state.currentAccessKey = undefined;
 };
 const handleError = (error: unknown): void => {
