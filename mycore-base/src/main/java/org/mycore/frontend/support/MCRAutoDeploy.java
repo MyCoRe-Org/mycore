@@ -17,9 +17,6 @@
  */
 package org.mycore.frontend.support;
 
-import jakarta.servlet.DispatcherType;
-import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletRegistration;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -28,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -38,6 +36,10 @@ import org.jdom2.input.SAXBuilder;
 import org.mycore.common.config.MCRComponent;
 import org.mycore.common.config.MCRRuntimeComponentDetector;
 import org.mycore.common.events.MCRStartupHandler;
+
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletRegistration;
 
 /**
  * This StartupHandler deploys web resources and register filters/servlets to web container server,
