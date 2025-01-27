@@ -60,6 +60,9 @@ public class MCRAction {
     }
 
     public MCRDecision[] getDecisions() {
+        if (decisions == null) {
+            return new MCRDecision[0];
+        }
         return decisions.clone();
     }
 

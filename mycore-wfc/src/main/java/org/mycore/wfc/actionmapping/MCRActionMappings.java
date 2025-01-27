@@ -40,6 +40,9 @@ public class MCRActionMappings {
     }
 
     public MCRCollection[] getCollections() {
+        if (this.collections == null) {
+            return new MCRCollection[0];
+        }
         return collections.clone();
     }
 

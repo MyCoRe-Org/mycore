@@ -31,6 +31,7 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "collection")
 public class MCRCollection {
+
     @XmlElement(name = "action")
     MCRAction[] actions;
 
@@ -38,6 +39,9 @@ public class MCRCollection {
     String name;
 
     public MCRAction[] getActions() {
+        if (actions == null) {
+            return new MCRAction[0];
+        }
         return actions.clone();
     }
 
