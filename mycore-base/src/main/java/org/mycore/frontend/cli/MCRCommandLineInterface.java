@@ -70,7 +70,7 @@ import org.mycore.common.xml.MCRURIResolver;
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  */
-@SuppressWarnings("PMD.DoNotTerminateVM")
+@SuppressWarnings({"PMD.DoNotTerminateVM", "PMD.SystemPrintln"})
 public class MCRCommandLineInterface {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -98,7 +98,7 @@ public class MCRCommandLineInterface {
      */
     public static void main(String[] args) {
         if (!(Thread.currentThread().getContextClassLoader() instanceof URLClassLoader)) {
-            System.out.println("Current ClassLoader is not extendable at runtime. Using workaround.");
+            LOGGER.info("Current ClassLoader is not extendable at runtime. Using workaround.");
             Thread.currentThread().setContextClassLoader(new CLIURLClassLoader(new URL[0]));
         }
         MCRStartupHandler.startUp(null/*no servlet context here*/);
@@ -141,9 +141,8 @@ public class MCRCommandLineInterface {
                 }
             } else {
                 command = commandQueue.poll();
-                System.out.println(system + "> " + command);
+                LOGGER.info("{}> {}", system, command);
             }
-
             processCommand(command);
         }
     }
@@ -257,8 +256,7 @@ public class MCRCommandLineInterface {
         output("The following command failed:");
         output(lastCommand);
         if (!commandQueue.isEmpty()) {
-            System.out.printf(Locale.ROOT, "%s There are %s other commands still unprocessed.%n", system,
-                commandQueue.size());
+            LOGGER.info("{} There are {} other commands still unprocessed.", system, commandQueue.size());
         } else if (interactiveMode) {
             return;
         }
@@ -282,15 +280,14 @@ public class MCRCommandLineInterface {
         output("The following command failed:");
         output(lastCommand);
         if (!commandQueue.isEmpty()) {
-            System.out.printf(Locale.ROOT, "%s There are %s other commands still unprocessed.%n", system,
-                commandQueue.size());
+            LOGGER.info("{} There are {} other commands still unprocessed.", system, commandQueue.size());
         }
         failedCommands.add(lastCommand);
     }
 
     protected static void handleFailedCommands() {
         if (!failedCommands.isEmpty()) {
-            System.err.println(system + " Several command failed.");
+            LOGGER.error("{} Several commands failed.", system);
             saveCommandQueueToFile(failedCommands, "failed-commands.txt");
         }
     }
@@ -303,10 +300,8 @@ public class MCRCommandLineInterface {
      */
     public static void show(String fname) throws Exception {
         AtomicInteger ln = new AtomicInteger();
-        System.out.println();
         Files.readAllLines(Paths.get(fname), Charset.defaultCharset())
             .forEach(l -> System.out.printf(Locale.ROOT, "%04d: %s", ln.incrementAndGet(), l));
-        System.out.println();
     }
 
     /**
@@ -421,7 +416,7 @@ public class MCRCommandLineInterface {
     }
 
     static void output(String message) {
-        System.out.println(system + " " + message);
+        LOGGER.info("{} {}", system, message);
     }
 
     private static class CLIURLClassLoader extends URLClassLoader {

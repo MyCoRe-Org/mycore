@@ -85,9 +85,9 @@ public class MCRUserCommands extends MCRAbstractCommands {
         order = 10)
     public static void changeToUser(String user, String password) {
         MCRSession session = MCRSessionMgr.getCurrentSession();
-        System.out.println(SYSTEM + " The old user ID is " + session.getUserInformation().getUserID());
+        LOGGER.info("{} The old user ID is {}", SYSTEM, session.getUserInformation().getUserID());
         if (MCRUserManager.login(user, password) != null) {
-            System.out.println(SYSTEM + " The new user ID is " + session.getUserInformation().getUserID());
+            LOGGER.info("{} The new user ID is {}", SYSTEM, session.getUserInformation().getUserID());
         } else {
             LOGGER.warn("Wrong password, no changes of user ID in session context!");
         }

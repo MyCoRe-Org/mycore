@@ -32,7 +32,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
@@ -50,7 +49,7 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 
 /**
- * Called by {@link MCRStartupHandler} on start up to setup {@link MCRConfiguration2}.
+ * Called by {@link MCRStartupHandler} on start up to set up {@link MCRConfiguration2}.
  *
  * @author Thomas Scheffler (yagee)
  * @since 2013.12
@@ -71,13 +70,13 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
             .map(URLClassLoader.class::cast)
             .findFirst();
         if (classLoaderOptional.isEmpty()) {
-            System.err
-                .println(classLoaderOptional.getClass() + " is unsupported for adding extending CLASSPATH at runtime.");
+            LOGGER.error("{} is unsupported for adding extending CLASSPATH at runtime.",
+                classLoaderOptional.getClass());
             return;
         }
         File libDir = MCRConfigurationDir.getConfigFile("lib");
         URLClassLoader urlClassLoader = classLoaderOptional.get();
-        List<URL> currentCPElements = Stream.of(urlClassLoader.getURLs()).collect(Collectors.toList());
+        List<URL> currentCPElements = Stream.of(urlClassLoader.getURLs()).toList();
         Class<? extends ClassLoader> classLoaderClass = urlClassLoader.getClass();
         try {
             BiConsumer<ClassLoader, URL> addUrlMethod = addToClassPath(classLoaderClass);
@@ -94,11 +93,10 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
                 })
                 .filter(Objects::nonNull)
                 .filter(u -> !currentCPElements.contains(u))
-                .peek(u -> System.out.println("Adding to CLASSPATH: " + u))
+                .peek(u -> LOGGER.info("Adding to CLASSPATH: {}", u))
                 .forEach(url -> addUrlMethod.accept(urlClassLoader, url));
         } catch (InaccessibleObjectException | ReflectiveOperationException | SecurityException e) {
-            LogManager.getLogger(MCRConfigurationInputStream.class)
-                .warn("{} does not support adding additional JARs at runtime", classLoaderClass, e);
+            LOGGER.warn("{} does not support adding additional JARs at runtime", classLoaderClass, e);
         }
     }
 
@@ -113,12 +111,12 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
         //URLClassLoader does not allow to setAccessible(true) anymore in java >=16
         if (addURL.trySetAccessible()) {
             //works well in Tomcat
-            System.out.println("Using " + addURL + " to modify classpath.");
+            LOGGER.info("Using {} to modify classpath.", addURL);
             method = addURL;
             argumentMapper = u -> u;
         } else {
             final Method jettyFallback = getDeclaredMethod(classLoaderClass, "addClassPath", String.class);
-            System.out.println("Using " + jettyFallback + " to modify classpath.");
+            LOGGER.info("Using {} to modify classpath.", jettyFallback);
             argumentMapper = URL::toString;
             method = jettyFallback;
         }
@@ -194,7 +192,7 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
             try {
                 log4jInitializer.onStartup(null, servletContext);
             } catch (ServletException e) {
-                System.err.println("Could not start Log4J2 context");
+                LOGGER.error("Could not start Log4J2 context", e);
             }
         }
         String configFileKey = "log4j.configurationFile";
@@ -209,8 +207,9 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
             logCtx = (LoggerContext) LogManager.getContext(null, false, URI.create(log4j2ConfigURL.toString()));
         }
         logCtx.reconfigure();
-        System.out.printf(Locale.ROOT, "Using Log4J2 configuration at: %s%n",
+        LOGGER.info("Using Log4J2 configuration at: {}",
             logCtx.getConfiguration().getConfigurationSource().getLocation());
         MCRSessionMgr.addSessionListener(new MCRSessionThreadContext());
     }
+
 }
