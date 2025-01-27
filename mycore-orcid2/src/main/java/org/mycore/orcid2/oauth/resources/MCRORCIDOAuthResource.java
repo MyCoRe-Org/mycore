@@ -358,7 +358,7 @@ public class MCRORCIDOAuthResource {
         try {
             return new MCRJAXBContent<>(JAXBContext.newInstance(MCRORCIDOAuthErrorResponse.class), errorResponse);
         } catch (JAXBException e) {
-            throw new IllegalArgumentException("Invalid auth response");
+            throw new IllegalArgumentException("Invalid auth response", e);
         }
     }
 
@@ -366,7 +366,7 @@ public class MCRORCIDOAuthResource {
         try {
             return new MCRJAXBContent<>(JAXBContext.newInstance(MCRORCIDOAuthAccessTokenResponse.class), tokenResponse);
         } catch (JAXBException e) {
-            throw new IllegalArgumentException("Invalid token response");
+            throw new IllegalArgumentException("Invalid token response", e);
         }
     }
 

@@ -101,7 +101,7 @@ final class MCRPasswordCheckManagerHelper {
             try (BufferedReader reader = new BufferedReader(Files.newBufferedReader(file.toPath(), UTF_8), 128)) {
                 return Optional.of(readUnmodifiableConfiguration(reader));
             } catch (IOException e) {
-                throw new MCRException("Unable to read file " + file.getAbsolutePath());
+                throw new MCRException("Unable to read file " + file.getAbsolutePath(), e);
             }
         }
 
@@ -110,7 +110,7 @@ final class MCRPasswordCheckManagerHelper {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, UTF_8), 128)) {
                 return Optional.of(readUnmodifiableConfiguration(reader));
             } catch (IOException e) {
-                throw new MCRException("Unable to read resource " + path);
+                throw new MCRException("Unable to read resource " + path, e);
             }
         }
 
@@ -168,7 +168,7 @@ final class MCRPasswordCheckManagerHelper {
                 writer.write(configuration.hint());
                 writer.newLine();
             } catch (IOException e) {
-                throw new MCRException("Unable to write to value file " + file.getAbsolutePath());
+                throw new MCRException("Unable to write to value file " + file.getAbsolutePath(), e);
             }
 
         }

@@ -184,12 +184,12 @@ public class MCRXMLHelper {
         }
         try {
             return MCRURIResolver.instance().resolve(schemaURI, null);
-        } catch (TransformerException e) {
-            Throwable cause = e.getCause();
+        } catch (TransformerException ignoredIfSAXorIOException) {
+            Throwable cause = ignoredIfSAXorIOException.getCause();
             switch (cause) {
                 case IOException ioe -> throw ioe;
                 case SAXException se -> throw se;
-                default -> throw new IOException(e);
+                default -> throw new IOException(ignoredIfSAXorIOException);
             }
         }
     }

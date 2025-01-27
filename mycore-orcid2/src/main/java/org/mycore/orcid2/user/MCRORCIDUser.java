@@ -135,7 +135,7 @@ public class MCRORCIDUser {
         try {
             credentialString = MCRORCIDJSONMapper.credentialToJSON(credential);
         } catch (IllegalArgumentException e) {
-            throw new MCRORCIDException("Credential is invalid");
+            throw new MCRORCIDException("Credential is invalid", e);
         }
         user.setUserAttribute(getCredentialAttributeNameByORCID(orcid), credentialString);
     }
@@ -285,7 +285,7 @@ public class MCRORCIDUser {
         try {
             userPropertiesString = MCRORCIDJSONMapper.userPropertiesToString(userProperties);
         } catch (IllegalArgumentException e) {
-            throw new MCRORCIDException("User properties are invalid");
+            throw new MCRORCIDException("User properties are invalid", e);
         }
         user.setUserAttribute(getUserPropertiesAttributeNameByORCID(orcid), userPropertiesString);
     }

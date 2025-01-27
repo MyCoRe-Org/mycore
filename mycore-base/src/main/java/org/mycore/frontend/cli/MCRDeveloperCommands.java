@@ -375,7 +375,7 @@ public class MCRDeveloperCommands {
             return Encoder.valueOf(encoder);
         } catch (IllegalArgumentException e) {
             String encoders = Arrays.stream(Encoder.values()).map(Encoder::toString).collect(Collectors.joining(", "));
-            throw new MCRException("Encoder '" + encoder + "' unknown; must be one of: " + encoders);
+            throw new MCRException("Encoder '" + encoder + "' unknown; must be one of: " + encoders, e);
         }
     }
 

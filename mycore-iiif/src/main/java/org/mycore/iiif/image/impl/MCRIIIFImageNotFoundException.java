@@ -29,6 +29,11 @@ public class MCRIIIFImageNotFoundException extends Exception {
         this.identifier = identifier;
     }
 
+    public MCRIIIFImageNotFoundException(String identifier, Throwable cause) {
+        super("Invalid image-identifier " + identifier + "!", cause);
+        this.identifier = identifier;
+    }
+
     public String getIdentifier() {
         return identifier;
     }

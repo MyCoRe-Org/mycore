@@ -137,7 +137,9 @@ public class MCRRestDerivateContents {
             try {
                 doWithinTransaction(() -> Files.createDirectory(mcrPath));
             } catch (IOException e2) {
+                e2.addSuppressed(e);
                 throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
+                    .withCause(e2)
                     .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_CREATE_DIRECTORY)
                     .withMessage("Could not create directory " + mcrPath + ".")
                     .withDetail(e.getMessage())

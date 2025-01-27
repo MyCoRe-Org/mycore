@@ -200,7 +200,7 @@ public final class MCRSimpleJobSelector implements MCRJobSelector {
                 return MCRClassTools.forName(action);
             } catch (ClassNotFoundException e) {
                 throw new MCRConfigurationException("Missing class (" + action + ") configured in property: " +
-                    property + "." + ACTIONS_KEY);
+                    property + "." + ACTIONS_KEY, e);
             }
         }
 

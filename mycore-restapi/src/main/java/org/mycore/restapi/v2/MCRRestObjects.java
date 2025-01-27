@@ -403,6 +403,7 @@ public class MCRRestObjects {
             modified = MCRXMLMetadataManager.instance().getLastModified(id);
         } catch (IOException io) {
             throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+                .withCause(io)
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND)
                 .withMessage("MCRObject " + id + " not found")
                 .toException();
@@ -523,8 +524,8 @@ public class MCRRestObjects {
                     continue; //try another mainDoc if present
                 } catch (IOException e) {
                     throw new InternalServerErrorException(e);
-                } catch (UncheckedIOException e) {
-                    throw new InternalServerErrorException(e.getCause());
+                } catch (UncheckedIOException ignoredUnchecked) {
+                    throw new InternalServerErrorException(ignoredUnchecked.getCause());
                 }
             }
         }

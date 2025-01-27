@@ -247,7 +247,9 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             if (el != null && e.getCause() == null && el.getExceptionThrown() != null) {
                 //typically if a RuntimeException has no cause,
                 //we can get the "real cause" from MCRErrorListener, yeah!!!
-                throw new IOException(el.getExceptionThrown());
+                IOException ioException = new IOException(el.getExceptionThrown());
+                ioException.addSuppressed(e);
+                throw ioException;
             }
             throw e;
         }
@@ -411,8 +413,11 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
                     if (el != null && e.getCause() == null && el.getExceptionThrown() != null) {
                         //typically if a RuntimeException has no cause,
                         //we can get the "real cause" from MCRErrorListener, yeah!!!
-                        throw new MCRException(MCRErrorListener.getMyMessageAndLocation(el.getExceptionThrown()),
+                        MCRException mcrException = new MCRException(
+                            MCRErrorListener.getMyMessageAndLocation(el.getExceptionThrown()),
                             el.getExceptionThrown());
+                        mcrException.addSuppressed(e);
+                        throw mcrException;
                     }
                     throw e;
                 } finally {

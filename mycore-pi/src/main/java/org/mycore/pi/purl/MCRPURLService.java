@@ -90,7 +90,7 @@ public class MCRPURLService extends MCRPIJobService<MCRPURL> {
         try {
             return new MCRPURL(new URI(purlString).toURL());
         } catch (MalformedURLException | URISyntaxException e) {
-            throw new MCRPersistentIdentifierException("Cannot parse " + purlString);
+            throw new MCRPersistentIdentifierException("Cannot parse " + purlString, e);
         }
     }
 

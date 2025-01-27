@@ -162,8 +162,8 @@ public class MCRIFS2Commands extends MCRAbstractCommands {
                         throw new UncheckedIOException(e);
                     }
                 });
-        } catch (UncheckedIOException e) {
-            throw e.getCause();
+        } catch (UncheckedIOException ignoredUnchecked) {
+            throw ignoredUnchecked.getCause();
         }
     }
 
@@ -184,8 +184,8 @@ public class MCRIFS2Commands extends MCRAbstractCommands {
                     }
                     return Stream.of(new FileInfo(nodePath.resolve(fileName), n.getAttributeValue("md5")));
                 });
-        } catch (UncheckedIOException e) {
-            throw e.getCause();
+        } catch (UncheckedIOException ignoredUnchecked) {
+            throw ignoredUnchecked.getCause();
         }
     }
 

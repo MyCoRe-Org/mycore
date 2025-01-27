@@ -18,11 +18,17 @@
 
 package org.mycore.parsers.bool;
 
-public class MCRParseException extends org.mycore.common.MCRException {
+import org.mycore.common.MCRException;
+
+public class MCRParseException extends MCRException {
 
     private static final long serialVersionUID = 1L;
 
     public MCRParseException(String text) {
         super(text);
+    }
+
+    public MCRParseException(String text, Throwable cause) {
+        super(text, cause);
     }
 }

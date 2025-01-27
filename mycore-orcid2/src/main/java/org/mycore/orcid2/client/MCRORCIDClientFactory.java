@@ -64,13 +64,13 @@ public class MCRORCIDClientFactory {
         try {
             mode = ReadClientMode.valueOf(modeString.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
-            throw new MCRConfigurationException("Unknown APIMode: " + modeString);
+            throw new MCRConfigurationException("Unknown APIMode: " + modeString, e);
         }
     }
 
     /**
      * Returns an instance of a factory for a version.
-     * 
+     *
      * @param version the version
      * @return MCRORCIDClientFactory
      * @throws MCRConfigurationException if factory cannot be initialized
@@ -123,7 +123,7 @@ public class MCRORCIDClientFactory {
 
     /**
      * Checks if API is in member mode.
-     * 
+     *
      * @return true if member mode is enabled
      */
     public boolean checkMemberMode() {

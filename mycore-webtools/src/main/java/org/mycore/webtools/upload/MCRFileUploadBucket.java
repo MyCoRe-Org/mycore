@@ -91,11 +91,11 @@ public class MCRFileUploadBucket implements MCRSessionListener, MCRShutdownHandl
                     throw new MCRException(e);
                 }
             });
-        } catch (MCRException e) {
-            if (e.getCause() instanceof MCRUploadServerException use) {
+        } catch (MCRException ignoredBeCause) {
+            if (ignoredBeCause.getCause() instanceof MCRUploadServerException use) {
                 throw use;
             }
-            throw e;
+            throw ignoredBeCause;
         }
     }
 

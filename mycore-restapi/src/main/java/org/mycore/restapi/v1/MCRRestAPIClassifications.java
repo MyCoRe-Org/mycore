@@ -413,7 +413,7 @@ public class MCRRestAPIClassifications {
             try {
                 json = writeJSON(rootElement, lang, style);
             } catch (IOException e) {
-                throw new JsonIOException("failed to create json response");
+                throw new JsonIOException("failed to create json response", e);
             }
             if (!callback.isEmpty()) {
                 return Response.ok(callback + "(" + json + ")")
@@ -432,7 +432,7 @@ public class MCRRestAPIClassifications {
             try {
                 xml = writeXML(rootElement, lang);
             } catch (IOException e) {
-                throw new XMLParseException("failed to create xml response");
+                throw new XMLParseException(e, "failed to create xml response");
             }
             return Response.ok(xml)
                 .lastModified(lastModified)

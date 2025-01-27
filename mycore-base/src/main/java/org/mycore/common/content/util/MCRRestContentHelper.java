@@ -196,7 +196,7 @@ public final class MCRRestContentHelper {
         } catch (IllegalArgumentException e) {
             Response errResponse = Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE)
                 .header("Content-Range", "bytes */" + contentLength).build();
-            throw new WebApplicationException(errResponse);
+            throw new WebApplicationException(e, errResponse);
         }
     }
 

@@ -119,8 +119,8 @@ public final class MCRXSLInfoServlet extends MCRServlet {
                         throw new UncheckedIOException(e);
                     }
                 });
-        } catch (UncheckedIOException uioe) {
-            throw uioe.getCause();
+        } catch (UncheckedIOException ignoredUnchecked) {
+            throw ignoredUnchecked.getCause();
         }
     }
 

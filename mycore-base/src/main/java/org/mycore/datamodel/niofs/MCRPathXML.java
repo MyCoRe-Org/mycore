@@ -118,8 +118,8 @@ public class MCRPathXML {
                 MCRFileAttributes<?> childAttrs;
                 try {
                     childAttrs = attrResolver.apply(child);
-                } catch (UncheckedIOException e) {
-                    throw e.getCause();
+                } catch (UncheckedIOException ignoredUnchecked) {
+                    throw ignoredUnchecked.getCause();
                 }
                 if (childAttrs.isDirectory()) {
                     directories.put(MCRPath.toMCRPath(child), childAttrs);

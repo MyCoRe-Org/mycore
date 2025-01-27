@@ -83,8 +83,8 @@ public class MCRFileStore extends MCRAbstractFileStore {
     static MCRFileStore getInstance(String storeId) throws IOException {
         try {
             return instanceHolder.get(storeId);
-        } catch (ExecutionException e) {
-            Throwable cause = e.getCause();
+        } catch (ExecutionException ignoredIfCauseIOE) {
+            Throwable cause = ignoredIfCauseIOE.getCause();
             if (cause instanceof IOException ioe) {
                 throw ioe;
             }

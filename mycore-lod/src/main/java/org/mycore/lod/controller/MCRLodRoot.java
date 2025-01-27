@@ -43,9 +43,9 @@ import jakarta.ws.rs.core.Response;
 
 /**
  * Linked Open Data: Root End point
- * 
+ *
  * (Work in Progress - find some reasonable schema to for repository metadata)
- * 
+ *
  * @author Robert Stephan
  */
 @Path("/")
@@ -58,7 +58,7 @@ public class MCRLodRoot {
 
     /**
      * provide some basic information about the linked open data endpoint
-     * 
+     *
      * @return a short description using FOAF vocabulary
      */
     @GET
@@ -74,6 +74,7 @@ public class MCRLodRoot {
             return MCRJerseyLodApp.returnLinkedData(rdfxmlString, uri, mimeTypes);
         } catch (IOException e) {
             throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
+                .withCause(e)
                 .withErrorCode("INFO_ERROR")
                 .withMessage("Could not create Repository information")
                 .toException();

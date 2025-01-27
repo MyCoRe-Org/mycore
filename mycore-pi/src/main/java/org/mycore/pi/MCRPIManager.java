@@ -77,7 +77,7 @@ public class MCRPIManager {
                     registerParser(type, parserClass);
                 } catch (ClassNotFoundException e) {
                     throw new MCRConfigurationException(
-                        "Could not load class " + className + " defined in " + PARSER_CONFIGURATION + type);
+                        "Could not load class " + className + " defined in " + PARSER_CONFIGURATION + type, e);
                 }
             });
 
