@@ -18,8 +18,6 @@
 
 package org.mycore.wfc.actionmapping;
 
-import java.util.Arrays;
-
 import org.mycore.parsers.bool.MCRCondition;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
@@ -62,7 +60,7 @@ public class MCRAction {
     }
 
     public MCRDecision[] getDecisions() {
-        return Arrays.copyOf(decisions, decisions.length);
+        return decisions.clone();
     }
 
     @SuppressWarnings("PMD.ArrayIsStoredDirectly")//is only POJO

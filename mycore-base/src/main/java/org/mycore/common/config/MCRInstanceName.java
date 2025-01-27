@@ -115,8 +115,7 @@ public class MCRInstanceName {
 
         private static final Suffix[] REPRESENTED_VALUES = Arrays.stream(values())
             .filter(suffix -> suffix.representation != null)
-            .toList()
-            .toArray(new Suffix[0]);
+            .toArray(Suffix[]::new);
 
         private final String representation;
 
@@ -132,7 +131,7 @@ public class MCRInstanceName {
         }
 
         public static Suffix[] representedValues() {
-            return Arrays.copyOf(REPRESENTED_VALUES, REPRESENTED_VALUES.length);
+            return REPRESENTED_VALUES.clone();
         }
 
         public String appendTo(String string) {

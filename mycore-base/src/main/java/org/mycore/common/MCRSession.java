@@ -26,7 +26,6 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -448,7 +447,7 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
     }
 
     public StackTraceElement[] getConstructingStackTrace() {
-        return Arrays.copyOf(constructingStackTrace, constructingStackTrace.length);
+        return constructingStackTrace.clone();
     }
 
     public Optional<URI> getFirstURI() {

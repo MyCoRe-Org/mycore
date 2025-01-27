@@ -18,8 +18,6 @@
 
 package org.mycore.wfc.actionmapping;
 
-import java.util.Arrays;
-
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
@@ -42,7 +40,7 @@ public class MCRActionMappings {
     }
 
     public MCRCollection[] getCollections() {
-        return Arrays.copyOf(collections, collections.length);
+        return collections.clone();
     }
 
 }
