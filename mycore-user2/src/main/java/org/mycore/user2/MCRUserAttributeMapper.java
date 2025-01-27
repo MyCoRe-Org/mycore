@@ -112,33 +112,29 @@ public class MCRUserAttributeMapper {
         boolean changed = false;
         for (Object annotated : getAnnotated(object)) {
             MCRUserAttribute attrAnno = retrieveMCRUserAttribute(annotated);
-
-            if (attrAnno != null) {
-
-                final String name = attrAnno.name().isEmpty() ? getAttriutebName(annotated) : attrAnno.name();
-                final List<Attribute> attribs = attributeMapping.get(name);
-
-                if (attributes != null) {
-
-                    for (Attribute attribute : attribs) {
-                        if (attributes.containsKey(attribute.mapping)) {
-
-                            Object value = attributes.get(attribute.mapping);
-                            if (value == null) {
-                                LOGGER.warn("Could not apply mapping for {}", attribute.mapping);
-                            }
-
-                            value = convertValue(annotated, attrAnno, attribute, value);
-                            if (!isValueValid(attrAnno, attribute, value)) {
-                                throw new IllegalArgumentException(
-                                    "A not nullable attribute \"" + name + "\" was null.");
-                            }
-
-                            if (updateFieldOrMethod(object, annotated, attribute, value)) {
-                                changed = true;
-                            }
-                        }
-                    }
+            if (attrAnno == null) {
+                continue;
+            }
+            final String name = attrAnno.name().isEmpty() ? getAttriutebName(annotated) : attrAnno.name();
+            final List<Attribute> attribs = attributeMapping.get(name);
+            if (attributes == null) {
+                continue;
+            }
+            for (Attribute attribute : attribs) {
+                if (!attributes.containsKey(attribute.mapping)) {
+                    continue;
+                }
+                Object value = attributes.get(attribute.mapping);
+                if (value == null) {
+                    LOGGER.warn("Could not apply mapping for {}", attribute.mapping);
+                }
+                value = convertValue(annotated, attrAnno, attribute, value);
+                if (!isValueValid(attrAnno, attribute, value)) {
+                    throw new IllegalArgumentException(
+                        "A not nullable attribute \"" + name + "\" was null.");
+                }
+                if (updateFieldOrMethod(object, annotated, attribute, value)) {
+                    changed = true;
                 }
             }
         }

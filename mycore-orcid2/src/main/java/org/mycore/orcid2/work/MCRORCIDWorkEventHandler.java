@@ -322,35 +322,39 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
                 }
                 users.addAll(MCRORCIDUserUtils.getUserByID(id));
             }
-            if (orcid != null && users.size() == 1) {
-                userOrcidPair.put(orcid, new MCRORCIDUser(users.iterator().next()));
-            } else if (orcid != null && users.size() > 1) {
-                final List<MCRORCIDUser> orcidUsers = new ArrayList<>();
-                for (MCRUser user : users) {
-                    final MCRORCIDUser orcidUser = new MCRORCIDUser(user);
-                    if (orcidUser.hasCredential(orcid)) {
-                        orcidUsers.add(orcidUser);
-                    }
-                }
-                if (orcidUsers.size() == 1) {
-                    userOrcidPair.put(orcid, orcidUsers.getFirst());
-                } else if (orcidUsers.size() > 1) {
-                    LOGGER.warn("This case is not implemented");
-                }
-            } else if (orcid == null && users.size() == 1) {
-                final MCRORCIDUser orcidUser = new MCRORCIDUser(users.iterator().next());
-                final Map<String, MCRORCIDCredential> pairs = orcidUser.getCredentials();
-                if (pairs.size() == 1) {
-                    userOrcidPair.put(pairs.entrySet().iterator().next().getKey(), orcidUser);
-                } else if (pairs.size() > 1) {
-                    LOGGER.info("Try to find credentials for {}, but found more than one pair",
-                        () -> users.iterator().next().getUserID());
-                }
-            } else if (orcid == null && users.size() > 1) {
-                LOGGER.warn("This case is not implemented");
-            }
+            updateOrcidPair(orcid, users, userOrcidPair);
         }
         return userOrcidPair;
+    }
+
+    private void updateOrcidPair(String orcid, Set<MCRUser> users, Map<String, MCRORCIDUser> userOrcidPair) {
+        if (orcid != null && users.size() == 1) {
+            userOrcidPair.put(orcid, new MCRORCIDUser(users.iterator().next()));
+        } else if (orcid != null && users.size() > 1) {
+            final List<MCRORCIDUser> orcidUsers = new ArrayList<>();
+            for (MCRUser user : users) {
+                final MCRORCIDUser orcidUser = new MCRORCIDUser(user);
+                if (orcidUser.hasCredential(orcid)) {
+                    orcidUsers.add(orcidUser);
+                }
+            }
+            if (orcidUsers.size() == 1) {
+                userOrcidPair.put(orcid, orcidUsers.getFirst());
+            } else if (orcidUsers.size() > 1) {
+                LOGGER.warn("{}: Multiple users found. This case is not implemented.", orcid);
+            }
+        } else if (orcid == null && users.size() == 1) {
+            final MCRORCIDUser orcidUser = new MCRORCIDUser(users.iterator().next());
+            final Map<String, MCRORCIDCredential> pairs = orcidUser.getCredentials();
+            if (pairs.size() == 1) {
+                userOrcidPair.put(pairs.entrySet().iterator().next().getKey(), orcidUser);
+            } else if (pairs.size() > 1) {
+                LOGGER.info("Try to find credentials for {}, but found more than one pair",
+                    () -> users.iterator().next().getUserID());
+            }
+        } else if (orcid == null && users.size() > 1) {
+            LOGGER.warn("Unknown orcid and multiple users found. This case is not implemented.");
+        }
     }
 
     private void tryCollectAndSaveExternalPutCodes(MCRObject object) {

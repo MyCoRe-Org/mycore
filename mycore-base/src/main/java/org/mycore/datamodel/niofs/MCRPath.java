@@ -200,50 +200,48 @@ public abstract class MCRPath implements Path {
     @Override
     public boolean endsWith(final Path other) {
         Objects.requireNonNull(other, "other Path may not be null.");
-        final MCRPath that;
-        final int thatPathLength;
-        final int thisPathLength;
-        final boolean thatIsAbsolute;
-        final boolean thisIsAbsolute;
-        int thisOffsetStart;
-        int thisPos;
-        int thatPos;
-        if ((other instanceof MCRPath)) {
-            that = (MCRPath) other;
-            // Early return if both paths are equal
-            if (this.equals(that)) {
-                return true;
-            } else {
-                thatPathLength = that.path.length();
-                thisPathLength = path.length();
-                // thatPath cannot be longer than thisPath
-                if (thatPathLength < thisPathLength) {
-                    thatIsAbsolute = that.isAbsolute();
-                    thisIsAbsolute = isAbsolute();
-                    // When both paths are absolute, root and full path must match
-                    if (thatIsAbsolute && (!thisIsAbsolute || !root.equals(that.root))) {
-                        return false;
-                    } else if (thatIsAbsolute) {
-                        return Objects.deepEquals(offsets, that.offsets)
-                            && path.equals(that.path)
-                            && that.getFileSystem().equals(getFileSystem());
-                    }
-                    thisOffsetStart = createThisOffsetStart(that);
-                    if (thisOffsetStart != -1) {
-                        // Check if the remaining characters in the path match
-                        thisPos = offsets[thisOffsetStart];
-                        thatPos = that.offsets[0];
+        // Check if other path is MCRPath
+        if (!(other instanceof MCRPath that)) {
+            return false;
+        }
+        // Early return if both paths are equal
+        if (this.equals(that)) {
+            return true;
+        }
+        int thatPathLength = that.path.length();
+        int thisPathLength = path.length();
+        // thatPath cannot be longer than thisPath
+        if (thatPathLength < thisPathLength) {
+            if(that.isAbsolute()) {
+                return handleAbsoluteEndsWith(that);
+            }
+            return handleRelativeEndsWith(that, thisPathLength, thatPathLength);
+        }
+        return false;
+    }
 
-                        if (thisPathLength - thisPos == thatPathLength - thatPos) {
-                            while (thisPos < thisPathLength) {
-                                if (path.charAt(thisPos++) != that.path.charAt(thatPos++)) {
-                                    return false;
-                                }
-                            }
-                            return that.getFileSystem().equals(getFileSystem());
-                        }
+    private boolean handleAbsoluteEndsWith(MCRPath that) {
+        if((!isAbsolute() || !root.equals(that.root))) {
+            return false;
+        }
+        return Objects.deepEquals(offsets, that.offsets)
+            && path.equals(that.path)
+            && that.getFileSystem().equals(getFileSystem());
+    }
+
+    private boolean handleRelativeEndsWith(MCRPath that, int thisPathLength, int thatPathLength) {
+        int thisOffsetStart = createThisOffsetStart(that);
+        if (thisOffsetStart != -1) {
+            // Check if the remaining characters in the path match
+            int thisPos = offsets[thisOffsetStart];
+            int thatPos = that.offsets[0];
+            if (thisPathLength - thisPos == thatPathLength - thatPos) {
+                while (thisPos < thisPathLength) {
+                    if (path.charAt(thisPos++) != that.path.charAt(thatPos++)) {
+                        return false;
                     }
                 }
+                return that.getFileSystem().equals(getFileSystem());
             }
         }
         return false;
@@ -431,7 +429,7 @@ public abstract class MCRPath implements Path {
     /* (non-Javadoc)
      * @see java.nio.file.Path#normalize()
      */
-    @SuppressWarnings("PMD.NPathComplexity")
+    @SuppressWarnings({"PMD.NPathComplexity", "PMD.CognitiveComplexity"})
     @Override
     public MCRPath normalize() {
         final int count = getNameCount();

@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.config.MCRConfiguration2;
@@ -65,7 +64,7 @@ public class MCRThumbnailResource {
     @Produces({ "image/png", "image/jpeg" })
     public Response getThumbnailFromDocument(@PathParam("documentId") String documentId, @PathParam("size") int size,
         @PathParam("ext") String ext) {
-        return getThumbnail(documentId, size, ext);
+        return getThumbnailResponse(documentId, size, ext);
     }
 
     /**
@@ -79,61 +78,73 @@ public class MCRThumbnailResource {
     @Produces({ "image/png", "image/jpeg" })
     public Response getThumbnailFromDocument(@PathParam("documentId") String documentId, @PathParam("ext") String ext) {
         int defaultSize = MCRConfiguration2.getOrThrow("MCR.Media.Thumbnail.DefaultSize", Integer::parseInt);
-        return getThumbnail(documentId, defaultSize, ext);
+        return getThumbnailResponse(documentId, defaultSize, ext);
     }
 
-    private Response getThumbnail(String documentId, int size, String ext) {
+    private Response getThumbnailResponse(String documentId, int size, String ext) {
         List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(MCRJerseyUtil.getID(documentId),
             1, TimeUnit.MINUTES);
         for (MCRObjectID derivateId : derivateIds) {
-            if (MCRAccessManager.checkDerivateDisplayPermission(derivateId.toString())) {
-                String nameOfMainFile = MCRMetadataManager.retrieveMCRDerivate(derivateId).getDerivate().getInternals()
-                    .getMainDoc();
-                if (nameOfMainFile != null && !nameOfMainFile.equals("")) {
-                    MCRPath mainFile = MCRPath.getPath(derivateId.toString(), '/' + nameOfMainFile);
-                    try {
-                        FileTime lastModified = Files.getLastModifiedTime(mainFile);
-                        Date lastModifiedDate = new Date(lastModified.toMillis());
-                        Response.ResponseBuilder resp = request.evaluatePreconditions(lastModifiedDate);
-                        if (resp != null) {
-                            return resp.build();
-                        }
-                        String mimeType = Files.probeContentType(mainFile);
-                        List<MCRThumbnailGenerator> generators = MCRConfiguration2
-                            .getOrThrow("MCR.Media.Thumbnail.Generators", MCRConfiguration2::splitValue)
-                            .map(MCRConfiguration2::<MCRThumbnailGenerator>instantiateClass)
-                            .filter(thumbnailGenerator -> thumbnailGenerator.matchesFileType(mimeType, mainFile))
-                            .collect(Collectors.toList());
-                        final Optional<BufferedImage> thumbnail = generators.stream()
-                            .map(thumbnailGenerator -> {
-                                try {
-                                    return thumbnailGenerator.getThumbnail(mainFile, size);
-                                } catch (IOException e) {
-                                    throw new UncheckedIOException(e);
-                                }
-                            })
-                            .filter(Optional::isPresent)
-                            .map(Optional::get)
-                            .findFirst();
-                        if (thumbnail.isPresent()) {
-                            CacheControl cc = new CacheControl();
-                            cc.setMaxAge((int) TimeUnit.DAYS.toSeconds(1));
-                            String type = "image/png";
-                            if (Objects.equals(ext, "jpg") || Objects.equals(ext, "jpeg")) {
-                                type = "image/jpeg";
-                            }
-                            return Response.ok(thumbnail.get())
-                                .cacheControl(cc)
-                                .lastModified(lastModifiedDate)
-                                .type(type)
-                                .build();
-                        }
-                    } catch (IOException | RuntimeException e) {
-                        throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
-                    }
+            if (!MCRAccessManager.checkDerivateDisplayPermission(derivateId.toString())) {
+                continue;
+            }
+            String mainDoc = MCRMetadataManager.retrieveMCRDerivate(derivateId)
+                .getDerivate().getInternals().getMainDoc();
+            if (mainDoc == null || mainDoc.isEmpty()) {
+                continue;
+            }
+            MCRPath mainFile = MCRPath.getPath(derivateId.toString(), '/' + mainDoc);
+            try {
+                FileTime lastModified = Files.getLastModifiedTime(mainFile);
+                Date lastModifiedDate = new Date(lastModified.toMillis());
+                Response.ResponseBuilder responseBuilder = request.evaluatePreconditions(lastModifiedDate);
+                if (responseBuilder != null) {
+                    return responseBuilder.build();
                 }
+                final Optional<BufferedImage> thumbnail = getThumbnail(mainFile, size);
+                if (thumbnail.isEmpty()) {
+                    continue;
+                }
+                return getThumbnailResponse(ext, thumbnail.get(), lastModifiedDate);
+            } catch (IOException | RuntimeException e) {
+                throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
             }
         }
         return Response.status(Response.Status.NOT_FOUND).build();
     }
+
+    private static Response getThumbnailResponse(String ext, BufferedImage thumbnail, Date lastModifiedDate) {
+        CacheControl cc = new CacheControl();
+        cc.setMaxAge((int) TimeUnit.DAYS.toSeconds(1));
+        String type = "image/png";
+        if (Objects.equals(ext, "jpg") || Objects.equals(ext, "jpeg")) {
+            type = "image/jpeg";
+        }
+        return Response.ok(thumbnail)
+            .cacheControl(cc)
+            .lastModified(lastModifiedDate)
+            .type(type)
+            .build();
+    }
+
+    private static Optional<BufferedImage> getThumbnail(MCRPath mainFile, int size) throws IOException {
+        String mimeType = Files.probeContentType(mainFile);
+        List<MCRThumbnailGenerator> generators = MCRConfiguration2
+            .getOrThrow("MCR.Media.Thumbnail.Generators", MCRConfiguration2::splitValue)
+            .map(MCRConfiguration2::<MCRThumbnailGenerator>instantiateClass)
+            .filter(thumbnailGenerator -> thumbnailGenerator.matchesFileType(mimeType, mainFile))
+            .toList();
+        return generators.stream()
+            .map(thumbnailGenerator -> {
+                try {
+                    return thumbnailGenerator.getThumbnail(mainFile, size);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            })
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst();
+    }
+
 }

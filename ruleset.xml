@@ -165,14 +165,11 @@
   <!--
   <rule ref="category/java/design.xml/ClassWithOnlyPrivateConstructorsShouldBeFinal"/>
   -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/design.xml/CognitiveComplexity">
     <properties>
-      <property name="reportLevel" value="15"/>
+      <property name="reportLevel" value="30"/>
     </properties>
   </rule>
-  -->
   <!-- TODO: Create PR to fix this rule -->
   <!--
   <rule ref="category/java/design.xml/CyclomaticComplexity">
