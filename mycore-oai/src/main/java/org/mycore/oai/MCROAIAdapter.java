@@ -51,7 +51,7 @@ import org.mycore.oai.set.MCRSet;
  */
 public class MCROAIAdapter implements OAIAdapter {
 
-    protected static final Logger LOGGER = LogManager.getLogger(MCROAIAdapter.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static final String PREFIX = "MCR.OAIDataProvider.";
 

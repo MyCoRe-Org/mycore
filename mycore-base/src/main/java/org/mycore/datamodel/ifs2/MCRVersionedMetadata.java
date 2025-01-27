@@ -60,7 +60,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
     /**
      * The logger
      */
-    protected static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * The revision number of the metadata version that is currently in the

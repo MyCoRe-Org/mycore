@@ -45,7 +45,7 @@ import org.mycore.common.content.MCRContent;
  */
 public class MCRMetadataStore extends MCRStore {
 
-    public static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * If true (which is default), store will enforce it gets

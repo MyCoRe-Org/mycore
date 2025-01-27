@@ -96,7 +96,7 @@ import jakarta.xml.bind.annotation.XmlElementWrapper;
 @Path("/objects/{" + PARAM_MCRID + "}/derivates")
 public class MCRRestDerivates {
 
-    public static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Context
     Request request;

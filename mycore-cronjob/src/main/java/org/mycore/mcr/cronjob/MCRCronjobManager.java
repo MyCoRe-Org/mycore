@@ -42,7 +42,7 @@ public class MCRCronjobManager implements MCRShutdownHandler.Closeable {
 
     public static final String JOBS_CONFIG_PREFIX = "MCR.Cronjob.Jobs.";
 
-    public static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final MCRProcessableDefaultCollection processableCollection;
 

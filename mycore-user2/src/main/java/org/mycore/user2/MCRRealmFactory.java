@@ -57,7 +57,7 @@ public class MCRRealmFactory {
 
     static final String REALMS_URI_CFG_KEY = MCRUser2Constants.CONFIG_PREFIX + "Realms.URI";
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRRealm.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final int REFRESH_DELAY = 5000;
 

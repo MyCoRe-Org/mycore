@@ -22,8 +22,6 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.Random;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.oai.pmh.Header;
 import org.mycore.oai.pmh.MetadataFormat;
 import org.mycore.oai.set.MCRSet;
@@ -39,8 +37,6 @@ import org.mycore.oai.set.MCRSet;
  * @author Matthias Eichner
  */
 public abstract class MCROAISearcher {
-
-    protected static final Logger LOGGER = LogManager.getLogger(MCROAISearcher.class);
 
     protected MCROAIIdentify identify;
 

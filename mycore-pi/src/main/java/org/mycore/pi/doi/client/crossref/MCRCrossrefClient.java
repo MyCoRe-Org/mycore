@@ -47,7 +47,7 @@ import jakarta.validation.constraints.NotNull;
 
 public class MCRCrossrefClient {
 
-    public static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String HTTP_SCHEME_PREFIX = "http://";
 

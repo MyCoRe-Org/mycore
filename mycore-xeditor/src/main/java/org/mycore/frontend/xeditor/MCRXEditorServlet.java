@@ -37,7 +37,7 @@ public class MCRXEditorServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
 
-    protected static final Logger LOGGER = LogManager.getLogger(MCRXEditorServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String TARGET_PATTERN = "_xed_submit_";
 

@@ -28,7 +28,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.output.ProxyOutputStream;
 import org.apache.logging.log4j.LogManager;
@@ -75,14 +74,18 @@ import jakarta.ws.rs.ext.RuntimeDelegate;
 @Priority(Priorities.AUTHENTICATION)
 public class MCRSessionFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
-    public static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
+
     public static final String BASIC_AUTH_PREFIX = "Basic ";
+
     private static final String PROP_RENEW_JWT = "mcr:renewJWT";
+
     private static final String BEARER_AUTH_PREFIX = "Bearer ";
+
     private static final List<String> ALLOWED_JWT_SESSION_ATTRIBUTES = MCRConfiguration2
         .getString("MCR.RestAPI.JWT.AllowedSessionAttributePrefixes").stream()
         .flatMap(MCRConfiguration2::splitValue)
-        .collect(Collectors.toList());
+        .toList();
 
     @Context
     HttpServletRequest httpServletRequest;

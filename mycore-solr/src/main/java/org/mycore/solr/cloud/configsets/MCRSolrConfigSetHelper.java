@@ -45,7 +45,7 @@ import org.mycore.solr.auth.MCRSolrAuthenticationManager;
  */
 public class MCRSolrConfigSetHelper {
 
-    public static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * The prefix for the configuration set properties.

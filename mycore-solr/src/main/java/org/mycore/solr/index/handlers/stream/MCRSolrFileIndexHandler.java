@@ -45,7 +45,7 @@ import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
 
 public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
 
-    static final Logger LOGGER = LogManager.getLogger(MCRSolrFileIndexHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     protected Path file;
 

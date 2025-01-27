@@ -107,11 +107,12 @@ public class MCRXMLParserImpl implements MCRXMLParser {
      * @author Thomas Scheffler (yagee)
      */
     private static class AbsoluteToRelativeResolver implements EntityResolver2 {
-        private EntityResolver2 fallback;
 
-        private static final Logger LOGGER = LogManager.getLogger(MCRXMLParserImpl.class);
+        private final EntityResolver2 fallback;
 
-        private static URI baseDirURI = Paths.get("").toAbsolutePath().toUri();
+        private static final Logger LOGGER = LogManager.getLogger();
+
+        private static final URI BASE_DIR_URI = Paths.get("").toAbsolutePath().toUri();
 
         AbsoluteToRelativeResolver(EntityResolver2 fallback) {
             this.fallback = fallback;
@@ -133,9 +134,9 @@ public class MCRXMLParserImpl implements MCRXMLParser {
             if (baseURI == null) {
                 //check if baseDirURI is part of systemID and seperate
                 try {
-                    String relativeURI = baseDirURI.relativize(URI.create(systemId)).toString();
+                    String relativeURI = BASE_DIR_URI.relativize(URI.create(systemId)).toString();
                     if (!systemId.equals(relativeURI)) {
-                        return resolveEntity(name, publicId, baseDirURI.toString(), relativeURI);
+                        return resolveEntity(name, publicId, BASE_DIR_URI.toString(), relativeURI);
                     }
                 } catch (RuntimeException e) {
                     LOGGER.debug("Could not separate baseURI from {}", systemId, e);

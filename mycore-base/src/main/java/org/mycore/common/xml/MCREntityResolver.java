@@ -60,13 +60,13 @@ import org.xml.sax.ext.EntityResolver2;
  */
 public class MCREntityResolver implements EntityResolver2, LSResourceResolver {
 
-    public static final Logger LOGGER = LogManager.getLogger(MCREntityResolver.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String CONFIG_PREFIX = "MCR.URIResolver.";
 
     CatalogResolver catalogResolver;
 
-    private MCRCache<String, InputSourceProvider> bytesCache;
+    private final MCRCache<String, InputSourceProvider> bytesCache;
 
     private MCREntityResolver() {
         Enumeration<URL> systemResources;

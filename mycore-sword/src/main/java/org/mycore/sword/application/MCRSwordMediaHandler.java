@@ -60,7 +60,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCRFileValidator {
 
-    protected static final Logger LOGGER = LogManager.getLogger(MCRSwordMediaHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     protected static boolean isValidFilePath(String filePath) {
         return filePath != null && filePath.length() > 1;

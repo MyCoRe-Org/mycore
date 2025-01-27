@@ -477,7 +477,7 @@ public class MCRSwordUtil {
 
         public static final String DEFAULT_URL_ENCODING = "UTF-8";
 
-        private static final Logger LOGGER = LogManager.getLogger(BuildLinkUtil.class);
+        private static final Logger LOGGER = LogManager.getLogger();
 
         public static String getEditHref(String collection, String id) {
             return new MessageFormat("{0}{1}{2}/{3}", Locale.ROOT).format(

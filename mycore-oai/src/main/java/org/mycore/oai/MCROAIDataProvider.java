@@ -61,7 +61,7 @@ public class MCROAIDataProvider extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
 
-    protected static final Logger LOGGER = LogManager.getLogger(MCROAIDataProvider.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * Map of all MyCoRe oai adapter.
