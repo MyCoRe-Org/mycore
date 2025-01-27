@@ -41,8 +41,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import org.apache.commons.text.StringSubstitutor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRSession;
@@ -73,8 +71,6 @@ import org.mycore.common.xml.MCRURIResolver;
 @SuppressWarnings({"PMD.DoNotTerminateVM", "PMD.SystemPrintln"})
 public class MCRCommandLineInterface {
 
-    private static final Logger LOGGER = LogManager.getLogger();
-
     /** The name of the system */
     private static String system;
 
@@ -98,7 +94,7 @@ public class MCRCommandLineInterface {
      */
     public static void main(String[] args) {
         if (!(Thread.currentThread().getContextClassLoader() instanceof URLClassLoader)) {
-            LOGGER.info("Current ClassLoader is not extendable at runtime. Using workaround.");
+            System.out.println("Current ClassLoader is not extendable at runtime. Using workaround.");
             Thread.currentThread().setContextClassLoader(new CLIURLClassLoader(new URL[0]));
         }
         MCRStartupHandler.startUp(null/*no servlet context here*/);
@@ -141,8 +137,9 @@ public class MCRCommandLineInterface {
                 }
             } else {
                 command = commandQueue.poll();
-                LOGGER.info("{}> {}", system, command);
+                System.out.println(system + "> " + command);
             }
+
             processCommand(command);
         }
     }
@@ -227,7 +224,7 @@ public class MCRCommandLineInterface {
         StringSubstitutor strSubstitutor = new StringSubstitutor(MCRConfiguration2.getPropertiesMap());
         String expandedCommand = strSubstitutor.replace(command);
         if (!expandedCommand.equals(command)) {
-            LOGGER.info("{} --> {}", command, expandedCommand);
+            output(command + " --> " + expandedCommand);
         }
         return expandedCommand;
     }
@@ -256,7 +253,8 @@ public class MCRCommandLineInterface {
         output("The following command failed:");
         output(lastCommand);
         if (!commandQueue.isEmpty()) {
-            LOGGER.info("{} There are {} other commands still unprocessed.", system, commandQueue.size());
+            System.out.printf(Locale.ROOT, "%s There are %s other commands still unprocessed.%n", system,
+                commandQueue.size());
         } else if (interactiveMode) {
             return;
         }
@@ -280,14 +278,15 @@ public class MCRCommandLineInterface {
         output("The following command failed:");
         output(lastCommand);
         if (!commandQueue.isEmpty()) {
-            LOGGER.info("{} There are {} other commands still unprocessed.", system, commandQueue.size());
+            System.out.printf(Locale.ROOT, "%s There are %s other commands still unprocessed.%n", system,
+                commandQueue.size());
         }
         failedCommands.add(lastCommand);
     }
 
     protected static void handleFailedCommands() {
         if (!failedCommands.isEmpty()) {
-            LOGGER.error("{} Several commands failed.", system);
+            System.err.println(system + " Several command failed.");
             saveCommandQueueToFile(failedCommands, "failed-commands.txt");
         }
     }
@@ -300,8 +299,10 @@ public class MCRCommandLineInterface {
      */
     public static void show(String fname) throws Exception {
         AtomicInteger ln = new AtomicInteger();
+        System.out.println();
         Files.readAllLines(Paths.get(fname), Charset.defaultCharset())
             .forEach(l -> System.out.printf(Locale.ROOT, "%04d: %s", ln.incrementAndGet(), l));
+        System.out.println();
     }
 
     /**
@@ -416,7 +417,7 @@ public class MCRCommandLineInterface {
     }
 
     static void output(String message) {
-        LOGGER.info("{} {}", system, message);
+        System.out.println(system + " " + message);
     }
 
     private static class CLIURLClassLoader extends URLClassLoader {

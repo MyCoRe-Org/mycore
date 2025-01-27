@@ -115,7 +115,7 @@ public class MCRConfigurationDir {
         ProtectionDomain protectionDomain = clazz.getProtectionDomain();
         CodeSource codeSource = protectionDomain.getCodeSource();
         if (codeSource == null) {
-            LOGGER.error("Cannot get CodeSource for class {}", clazz.getSimpleName());
+            LOGGER.error(() -> "Cannot get CodeSource for class " + clazz.getSimpleName());
             return null;
         }
         URL location = codeSource.getLocation();

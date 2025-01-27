@@ -70,8 +70,8 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
             .map(URLClassLoader.class::cast)
             .findFirst();
         if (classLoaderOptional.isEmpty()) {
-            LOGGER.error("{} is unsupported for adding extending CLASSPATH at runtime.",
-                classLoaderOptional.getClass());
+            LOGGER.error(() -> classLoaderOptional.getClass() +
+                " is unsupported for adding extending CLASSPATH at runtime.");
             return;
         }
         File libDir = MCRConfigurationDir.getConfigFile("lib");
@@ -207,7 +207,7 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
             logCtx = (LoggerContext) LogManager.getContext(null, false, URI.create(log4j2ConfigURL.toString()));
         }
         logCtx.reconfigure();
-        LOGGER.info("Using Log4J2 configuration at: {}",
+        LOGGER.info(() -> "Using Log4J2 configuration at: " +
             logCtx.getConfiguration().getConfigurationSource().getLocation());
         MCRSessionMgr.addSessionListener(new MCRSessionThreadContext());
     }

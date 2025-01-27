@@ -104,7 +104,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         order = 80)
     public static void countChildren(String classID) {
         MCRCategory category = DAO.getCategory(MCRCategoryID.rootID(classID), 1);
-        LOGGER.info("{} has {} children", category.getId(), category.getChildren().size());
+        LOGGER.info(() -> category.getId() + " has " + category.getChildren().size() + " children");
     }
 
     /**
