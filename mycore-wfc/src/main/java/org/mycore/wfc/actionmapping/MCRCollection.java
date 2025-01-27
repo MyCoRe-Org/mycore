@@ -18,6 +18,8 @@
 
 package org.mycore.wfc.actionmapping;
 
+import java.util.Arrays;
+
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
@@ -38,7 +40,7 @@ public class MCRCollection {
     String name;
 
     public MCRAction[] getActions() {
-        return actions;
+        return Arrays.copyOf(actions, actions.length);
     }
 
     @SuppressWarnings("PMD.ArrayIsStoredDirectly")//only POJO

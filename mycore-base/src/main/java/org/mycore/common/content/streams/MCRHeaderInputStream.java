@@ -63,6 +63,6 @@ public class MCRHeaderInputStream extends MCRBlockingInputStream {
      * MAX_HEADER_SIZE bytes.
      */
     public byte[] getHeader() {
-        return header;
+        return header.clone();
     }
 }

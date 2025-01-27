@@ -125,7 +125,7 @@ public class MCRPandocAPI {
 
             private volatile byte[] output;
 
-            private InputStream istream;
+            private final InputStream istream;
 
             ThreadWrapper(InputStream is) {
                 istream = is;
@@ -142,7 +142,7 @@ public class MCRPandocAPI {
             }
 
             public byte[] getOutput() {
-                return output;
+                return output.clone();
             }
         }
 

@@ -27,7 +27,7 @@ import java.io.ByteArrayOutputStream;
 public class MCRByteArrayOutputStream extends ByteArrayOutputStream {
 
     /**
-     * Initital buffer size is 4k.
+     * Initial buffer size is 4k.
      */
     public MCRByteArrayOutputStream() {
         this(4 * 1024);
@@ -38,6 +38,7 @@ public class MCRByteArrayOutputStream extends ByteArrayOutputStream {
     }
 
     public byte[] getBuffer() {
-        return super.buf;
+        return buf.clone();
     }
+
 }

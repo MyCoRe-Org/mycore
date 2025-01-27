@@ -74,17 +74,17 @@ public class MCRByteContent extends MCRContent {
     @Override
     public byte[] asByteArray() {
         if (offset == 0 && length == 0) {
-            return bytes;
+            return bytes.clone();
         }
         synchronized (this) {
             if (offset == 0 && length == bytes.length) {
-                return bytes;
+                return bytes.clone();
             }
             bytes = Arrays.copyOfRange(bytes, offset, offset + length);
             offset = 0;
             length = bytes.length;
         }
-        return bytes;
+        return bytes.clone();
     }
 
     @Override
