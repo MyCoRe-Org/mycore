@@ -171,7 +171,7 @@ public class MCREditorOutValidator {
         if (!keepLang) {
             datasubtag.removeAttribute("lang", XML_NAMESPACE);
         }
-        MCRMetaInterface test = null;
+        MCRMetaInterface test;
         try {
             test = metaClass.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
@@ -343,7 +343,7 @@ public class MCREditorOutValidator {
         while (datatagIt.hasNext()) {
             Element datasubtag = datatagIt.next();
             MCREditorMetadataValidator validator = VALIDATOR_MAP.get(mcrclass);
-            String returns = null;
+            String returns;
             if (validator != null) {
                 returns = validator.checkDataSubTag(datasubtag);
             } else {

@@ -74,10 +74,8 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
         int totalCount = contentMap.size();
         LOGGER.info("Handling {} documents", totalCount);
         //multithread processing will result in too many http request
-        UpdateResponse updateResponse = null;
         try {
             Iterator<SolrInputDocument> documents = MCRSolrInputDocumentFactory.getInstance().getDocuments(contentMap);
-
             for (SolrClient client : getClients()) {
                 if (client instanceof ConcurrentUpdateHttp2SolrClient) {
                     //split up to speed up processing
@@ -106,7 +104,7 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
 
             for (MCRSolrCore destinationCore : getDestinationCores()) {
                 try {
-                    updateResponse = req.process(destinationCore.getClient());
+                	UpdateResponse updateResponse = req.process(destinationCore.getClient());
                     if (updateResponse != null && updateResponse.getStatus() != 0) {
                         LOGGER.error("Error while indexing document collection. Split and retry: {}",
                             updateResponse::getResponse);

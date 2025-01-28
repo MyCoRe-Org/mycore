@@ -82,7 +82,7 @@ public class MCRLockServlet extends MCRServlet {
                 "You must provide parameter: " + PARAM_OBJECTID);
             return;
         }
-        Action action = null;
+        Action action;
         try {
             action = actionValue != null ? Action.valueOf(actionValue) : Action.LOCK;
         } catch (IllegalArgumentException e) {

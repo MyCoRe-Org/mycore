@@ -40,7 +40,7 @@ public class MCRCommandPrompt {
     }
 
     public String readCommand() {
-        String line = "";
+        String line;
         do {
             line = readLine();
         } while (line.isEmpty());

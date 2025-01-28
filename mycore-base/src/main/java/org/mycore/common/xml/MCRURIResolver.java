@@ -634,11 +634,10 @@ public final class MCRURIResolver implements URIResolver {
         @Override
         public Source resolve(String href, String base) throws TransformerException {
             String classname = href.substring(href.indexOf(':') + 1, href.indexOf('?'));
-            Class<? extends URIResolver> cl = null;
             LogManager.getLogger(this.getClass()).debug("Loading Class: {}", classname);
             URIResolver resolver;
             try {
-                cl = MCRClassTools.forName(classname);
+            	Class<? extends URIResolver> cl = MCRClassTools.forName(classname);
                 resolver = cl.getDeclaredConstructor().newInstance();
             } catch (Exception e) {
                 throw new TransformerException(e);

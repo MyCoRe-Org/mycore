@@ -113,6 +113,7 @@ public class MCRConfigurationInputStream extends InputStream {
         return empty;
     }
 
+    @SuppressWarnings("PMD.UnusedAssignment")
     private Enumeration<? extends InputStream> getPropertyInputStreams(String filename, InputStream initStream)
         throws IOException {
         List<InputStream> cList = new ArrayList<>();

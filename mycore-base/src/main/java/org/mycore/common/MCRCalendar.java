@@ -880,7 +880,7 @@ public class MCRCalendar {
      * @return the date in format yyyy-MM-ddThh:mm:ssZ
      */
     public static String getISODateToFormattedString(String date, boolean useLastValue, String calendarName) {
-        String formattedDate = null;
+        String formattedDate;
         try {
             Calendar calendar = getHistoryDateAsCalendar(date, useLastValue, calendarName);
             GregorianCalendar gregorianCalendar = getGregorianCalendarOfACalendar(calendar);

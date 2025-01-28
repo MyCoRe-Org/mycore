@@ -36,7 +36,7 @@ public class MCRSortBy {
     private String fieldName;
 
     /** Sort order of this field */
-    private boolean order = ASCENDING;
+    private boolean order;
 
     /** 
      * Creates a new sort criteria

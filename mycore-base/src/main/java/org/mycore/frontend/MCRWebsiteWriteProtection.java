@@ -97,7 +97,7 @@ public final class MCRWebsiteWriteProtection {
         }
         // file exist?, return it's content
         if (CONFIG_FILE.exists()) {
-            Element config = null;
+            Element config;
             // try to get from cache
             if (cacheValid()) {
                 config = configCache;

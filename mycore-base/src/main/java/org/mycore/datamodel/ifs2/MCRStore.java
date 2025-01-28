@@ -356,7 +356,6 @@ public class MCRStore {
         if (!path.startsWith(baseDirectory)) {
             throw new IllegalArgumentException(path + " is not in the base directory " + baseDirectory);
         }
-        Path current = path;
         Path parent = path.getParent();
         Files.walkFileTree(path, MCRRecursiveDeleter.instance());
 
@@ -367,7 +366,7 @@ public class MCRStore {
                 if (streamParent.findAny().isPresent()) {
                     break;
                 }
-                current = parent;
+                Path current = parent;
                 parent = current.getParent();
                 Files.delete(current);
             }
