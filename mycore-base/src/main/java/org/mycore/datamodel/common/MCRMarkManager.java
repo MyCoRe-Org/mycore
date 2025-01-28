@@ -72,7 +72,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  *
  * @author Matthias Eichner
  */
-public class MCRMarkManager {
+public final class MCRMarkManager {
 
     private static volatile MCRMarkManager instance;
 
@@ -93,7 +93,6 @@ public class MCRMarkManager {
      */
     public static MCRMarkManager instance() {
         if (instance == null) {
-            // make it thread safe
             synchronized (MCRMarkManager.class) {
                 if (instance == null) {
                     instance = new MCRMarkManager();

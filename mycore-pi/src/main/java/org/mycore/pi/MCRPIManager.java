@@ -45,7 +45,8 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
-public class MCRPIManager {
+public final class MCRPIManager {
+
     private static final String TYPE = "type";
 
     private static final String MCRID = "mcrId";
@@ -60,11 +61,11 @@ public class MCRPIManager {
 
     private static MCRPIManager instance;
 
-    private List<MCRPIResolver<MCRPersistentIdentifier>> resolverList;
+    private final List<MCRPIResolver<MCRPersistentIdentifier>> resolverList;
 
-    private List<Class<? extends MCRPIParser<? extends MCRPersistentIdentifier>>> parserList;
+    private final List<Class<? extends MCRPIParser<? extends MCRPersistentIdentifier>>> parserList;
 
-    private Map<String, Class<? extends MCRPIParser>> typeParserMap;
+    private final Map<String, Class<? extends MCRPIParser>> typeParserMap;
 
     private MCRPIManager() {
         parserList = new ArrayList<>();

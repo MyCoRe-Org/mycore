@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 
 import org.mycore.common.MCRCatchException;
 
-public class MCRAccessException extends MCRCatchException {
+public final class MCRAccessException extends MCRCatchException {
 
     private static final long serialVersionUID = 6494399676882465653L;
 

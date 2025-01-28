@@ -29,16 +29,23 @@ import org.mycore.common.events.MCRSessionEvent;
 import org.mycore.common.events.MCRSessionListener;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
-public class MCRObjectIDLockTable implements MCRSessionListener {
+public final class MCRObjectIDLockTable implements MCRSessionListener {
 
-    private static final MCRObjectIDLockTable SINGLETON = new MCRObjectIDLockTable();
+    private static volatile MCRObjectIDLockTable instance;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRObjectIDLockTable.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
-    private ConcurrentMap<MCRObjectID, MCRSession> lockMap;
+    private final ConcurrentMap<MCRObjectID, MCRSession> lockMap;
 
     private static MCRObjectIDLockTable getInstance() {
-        return SINGLETON;
+        if(instance == null) {
+            synchronized (MCRObjectIDLockTable.class) {
+                if(instance == null) {
+                    instance = new MCRObjectIDLockTable();
+                }
+            }
+        }
+        return instance;
     }
 
     private MCRObjectIDLockTable() {

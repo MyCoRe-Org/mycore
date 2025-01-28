@@ -34,20 +34,20 @@ import org.mycore.common.content.MCRURLContent;
 import org.mycore.resource.MCRResourceHelper;
 
 /**
- * provides a cache for reading XML resources.
- *
+ * Provides a cache for reading XML resources.
+ * <p>
  * Cache size can be configured by property
- * <code>MCR.MCRXMLResouce.Cache.Size</code> which defaults to <code>100</code>.
+ * <code>MCR.MCRXMLResource.Cache.Size</code> which defaults to <code>100</code>.
  *
  * @author Thomas Scheffler (yagee)
  */
-public class MCRXMLResource {
+public final class MCRXMLResource {
 
     private static final MCRCache<String, CacheEntry> RESOURCE_CACHE = new MCRCache<>(
         MCRConfiguration2.getInt("MCR.MCRXMLResource.Cache.Size").orElse(100),
         "XML resources");
 
-    private static MCRXMLResource instance = new MCRXMLResource();
+    private static volatile MCRXMLResource instance;
 
     private static final Logger LOGGER = LogManager.getLogger(MCRXMLResource.class);
 
@@ -58,6 +58,13 @@ public class MCRXMLResource {
      * @return singleton instance
      */
     public static MCRXMLResource instance() {
+        if (instance == null) {
+            synchronized (MCRXMLResource.class) {
+                if (instance == null) {
+                    instance = new MCRXMLResource();
+                }
+            }
+        }
         return instance;
     }
 
@@ -194,7 +201,7 @@ public class MCRXMLResource {
         }
     }
 
-    private static class CacheEntry {
+    private static final class CacheEntry {
         URL resourceURL;
 
         MCRContent content;

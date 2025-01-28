@@ -44,8 +44,10 @@ import org.mycore.common.config.MCRConfiguration2;
  * @author Matthias Kramm
  * @author Heiko Helmbrecht
  */
-public class MCRAccessControlSystem extends MCRAccessBaseImpl {
+public final class MCRAccessControlSystem extends MCRAccessBaseImpl {
+
     private static MCRAccessControlSystem singleton;
+
     private static final Map<String, Integer> NEXT_FREE_RULE_ID = new HashMap<>();
 
     public static final String SYSTEM_RULE_PREFIX = "SYSTEMRULE";

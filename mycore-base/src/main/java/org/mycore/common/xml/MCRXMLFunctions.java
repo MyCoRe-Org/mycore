@@ -85,7 +85,6 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRLinkTableManager;
-import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -945,16 +944,11 @@ public class MCRXMLFunctions {
         return new SetNodeList(distinctNodeSet);
     }
 
-    //use holder to not initialize MCRXMLMetadataManager to early (simplifies junit testing)
-    private static class MCRXMLMetaDataManagerHolder {
-        public static final MCRXMLMetadataManager INSTANCE = MCRXMLMetadataManager.instance();
-    }
-
-    private static class MCRCategLinkServiceHolder {
+    private static final class MCRCategLinkServiceHolder {
         public static final MCRCategLinkService INSTANCE = MCRCategLinkServiceFactory.getInstance();
     }
 
-    private static class SetNodeList implements NodeList {
+    private static final class SetNodeList implements NodeList {
 
         private final Object[] objects;
 

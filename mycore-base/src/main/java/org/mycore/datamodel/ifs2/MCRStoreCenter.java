@@ -23,16 +23,24 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-public class MCRStoreCenter {
-    private Map<String, MCRStore> storeHeap;
+public final class MCRStoreCenter {
 
-    private static MCRStoreCenter instance = new MCRStoreCenter();
+    private final Map<String, MCRStore> storeHeap;
+
+    private static volatile MCRStoreCenter instance;
 
     private MCRStoreCenter() {
         this.storeHeap = new HashMap<>();
     }
 
     public static MCRStoreCenter instance() {
+        if (instance == null) {
+            synchronized (MCRStoreCenter.class) {
+                if (instance == null) {
+                    instance = new MCRStoreCenter();
+                }
+            }
+        }
         return instance;
     }
 

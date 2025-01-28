@@ -158,10 +158,7 @@
   <rule ref="category/java/design.xml/AvoidThrowingNewInstanceOfSameException"/>
   <rule ref="category/java/design.xml/AvoidThrowingNullPointerException"/>
   <rule ref="category/java/design.xml/AvoidThrowingRawExceptionTypes"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/design.xml/ClassWithOnlyPrivateConstructorsShouldBeFinal"/>
-  -->
   <rule ref="category/java/design.xml/CognitiveComplexity">
     <properties>
       <property name="reportLevel" value="30"/>

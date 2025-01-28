@@ -485,7 +485,7 @@ public class MCRLayoutUtilities {
         }
     }
 
-    private static class AccessCleaningDOMOutputProcessor extends AbstractDOMOutputProcessor {
+    private static final class AccessCleaningDOMOutputProcessor extends AbstractDOMOutputProcessor {
 
         @Override
         protected org.w3c.dom.Element printElement(FormatStack fstack, NamespaceStack nstack,
