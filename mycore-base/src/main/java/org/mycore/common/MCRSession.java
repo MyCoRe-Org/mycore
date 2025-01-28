@@ -447,7 +447,7 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
     }
 
     public StackTraceElement[] getConstructingStackTrace() {
-        return constructingStackTrace;
+        return constructingStackTrace.clone();
     }
 
     public Optional<URI> getFirstURI() {

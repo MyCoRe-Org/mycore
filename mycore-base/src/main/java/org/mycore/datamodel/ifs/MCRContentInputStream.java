@@ -143,7 +143,7 @@ public class MCRContentInputStream extends FilterInputStream {
      * @return the first 64 k of the input stream
      */
     public byte[] getHeader() {
-        return header;
+        return header.clone();
     }
 
     /**
@@ -165,7 +165,7 @@ public class MCRContentInputStream extends FilterInputStream {
         if (md5 == null) {
             md5 = digest.digest();
         }
-        return md5;
+        return md5.clone();
     }
 
     /**

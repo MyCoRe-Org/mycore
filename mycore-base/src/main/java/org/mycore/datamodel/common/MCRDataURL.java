@@ -460,7 +460,7 @@ public class MCRDataURL implements Serializable {
      * @return the data
      */
     public byte[] getData() {
-        return data;
+        return data.clone();
     }
 
     /**

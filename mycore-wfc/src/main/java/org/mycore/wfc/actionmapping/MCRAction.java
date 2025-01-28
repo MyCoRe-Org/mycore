@@ -60,11 +60,15 @@ public class MCRAction {
     }
 
     public MCRDecision[] getDecisions() {
-        return decisions;
+        if (decisions == null) {
+            return new MCRDecision[0];
+        }
+        return decisions.clone();
     }
 
     @SuppressWarnings("PMD.ArrayIsStoredDirectly")//is only POJO
     public void setDecisions(MCRDecision... decisions) {
         this.decisions = decisions;
     }
+
 }

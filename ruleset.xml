@@ -48,11 +48,8 @@
       org.apache.solr.common.SolrDocumentList,
       org.apache.solr.common.SolrDocument"/>
     </properties>
-  </rule>>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
+  </rule>
   <rule ref="category/java/bestpractices.xml/MethodReturnsInternalArray"/>
-  -->
   <rule ref="category/java/bestpractices.xml/MissingOverride"/>
   <rule ref="category/java/bestpractices.xml/OneDeclarationPerLine"/>
   <rule ref="category/java/bestpractices.xml/PreserveStackTrace"/>
