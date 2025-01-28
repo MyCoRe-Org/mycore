@@ -22,9 +22,6 @@ import java.io.ByteArrayOutputStream;
 
 /**
  * An extension of {@link ByteArrayOutputStream} that allows access to internal buffer.
- * <p>
- * TODO: check if this class is still required. It seems like a normal ByteArrayOutputStream with an additional method
- * getBuffer() which is not required because ByteArrayOutputStream already has a method toByteArray().
  *
  * @author Thomas Scheffler (yagee)
  */
@@ -43,7 +40,7 @@ public class MCRByteArrayOutputStream extends ByteArrayOutputStream {
 
     @SuppressWarnings("PMD.MethodReturnsInternalArray")
     public byte[] getBuffer() {
-        return buf;
+        return super.buf;
     }
 
 }
