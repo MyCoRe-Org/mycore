@@ -18,6 +18,7 @@
 package org.mycore.oai;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,6 +60,7 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 public class MCROAIDataProvider extends MCRServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -76,7 +78,7 @@ public class MCROAIDataProvider extends MCRServlet {
 
     private String myBaseURL;
 
-    private ServiceLoader<OAIProvider> oaiAdapterServiceLoader;
+    private transient ServiceLoader<OAIProvider> oaiAdapterServiceLoader;
 
     @Override
     public void init() throws ServletException {

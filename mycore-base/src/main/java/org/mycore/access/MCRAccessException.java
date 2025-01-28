@@ -18,6 +18,7 @@
 
 package org.mycore.access;
 
+import java.io.Serial;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -26,30 +27,31 @@ import org.mycore.common.MCRCatchException;
 
 public class MCRAccessException extends MCRCatchException {
 
+    @Serial
     private static final long serialVersionUID = 6494399676882465653L;
 
-    private Optional<String> action;
+    private final String action;
 
-    private Optional<String> id;
+    private final String id;
 
-    private Optional<String> permission;
+    private final String permission;
 
     public static MCRAccessException missingPrivilege(String action, String... privilege) {
-        return new MCRAccessException(Optional.ofNullable(action), null, null, privilege);
+        return new MCRAccessException(action, null, null, privilege);
     }
 
     public static MCRAccessException missingPermission(String action, String id, String permission) {
-        return new MCRAccessException(Optional.ofNullable(action), id, permission);
+        return new MCRAccessException(action, id, permission);
     }
 
-    private MCRAccessException(Optional<String> action, String id, String permission, String... privilege) {
+    private MCRAccessException(String action, String id, String permission, String... privilege) {
         super(getMessage(action, id, permission, privilege));
         this.action = action;
-        this.id = Optional.ofNullable(id);
-        this.permission = Optional.ofNullable(permission);
+        this.id = id;
+        this.permission = permission;
     }
 
-    private static String getMessage(Optional<String> action, String oid, String permission, String... privilege) {
+    private static String getMessage(String action, String oid, String permission, String... privilege) {
         StringBuilder sb = new StringBuilder();
         switch (privilege.length) {
             case 0 ->
@@ -61,21 +63,20 @@ public class MCRAccessException extends MCRCatchException {
                 Stream.of(privilege).collect(
                     Collectors.joining("', '", "You do not have any of the required privileges ('", "')")));
         }
-        sb.append(
-            action.map(s -> " to perform: " + s).orElse("."));
+        sb.append(action != null ? (" to perform: " + action) : ".");
         return sb.toString();
     }
 
     public Optional<String> getAction() {
-        return action;
+        return Optional.ofNullable(action);
     }
 
     public Optional<String> getId() {
-        return id;
+        return Optional.ofNullable(id);
     }
 
     public Optional<String> getPermission() {
-        return permission;
+        return Optional.ofNullable(permission);
     }
 
 }

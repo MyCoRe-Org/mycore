@@ -20,6 +20,7 @@ package org.mycore.frontend.servlets;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Serial;
 import java.nio.file.NoSuchFileException;
 import java.util.Locale;
 import java.util.Objects;
@@ -40,9 +41,10 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public abstract class MCRContentServlet extends MCRServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRContentServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private MCRServletContentHelper.Config config;
 

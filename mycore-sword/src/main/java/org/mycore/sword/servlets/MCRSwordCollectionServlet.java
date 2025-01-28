@@ -19,6 +19,7 @@
 package org.mycore.sword.servlets;
 
 import java.io.IOException;
+import java.io.Serial;
 
 import org.mycore.sword.MCRSwordConfigurationDefault;
 import org.mycore.sword.manager.MCRSwordCollectionManager;
@@ -33,9 +34,10 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRSwordCollectionServlet extends MCRSwordServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    private CollectionAPI api;
+    private transient CollectionAPI api;
 
     @Override
     public void init() {
