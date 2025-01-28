@@ -180,7 +180,9 @@ public class MCRAccessKeyServiceImpl implements MCRAccessKeyService {
         }
         accessKeyDto.getActive().getOptional().ifPresent(accessKey::setIsActive);
         accessKeyDto.getComment().getOptional().ifPresent(accessKey::setComment);
-        accessKeyDto.getExpiration().getOptional().ifPresent(accessKey::setExpiration);
+        if (accessKeyDto.getExpiration().isPresent()) {
+            accessKey.setExpiration(accessKeyDto.getExpiration().get());
+        }
         accessKey.setLastModified(new Date());
         accessKey.setLastModifiedBy(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
         final MCRAccessKey savedAccessKey = accessKeyRepository.save(accessKey);
