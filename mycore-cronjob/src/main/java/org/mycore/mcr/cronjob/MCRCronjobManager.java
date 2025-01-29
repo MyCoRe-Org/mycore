@@ -38,7 +38,7 @@ import jakarta.servlet.ServletContext;
  * Schedules all Cronjobs defined with the property prefix {@link #JOBS_CONFIG_PREFIX}. Couples the execution with the
  * {@link MCRProcessableRegistry}.
  */
-public class MCRCronjobManager implements MCRShutdownHandler.Closeable {
+public final class MCRCronjobManager implements MCRShutdownHandler.Closeable {
 
     public static final String JOBS_CONFIG_PREFIX = "MCR.Cronjob.Jobs.";
 
@@ -138,7 +138,7 @@ public class MCRCronjobManager implements MCRShutdownHandler.Closeable {
         return MCRConfiguration2.getInstanceOfOrThrow(MCRCronjob.class, property);
     }
 
-    private static class MCRCronjobManagerInstanceHelper {
+    private static final class MCRCronjobManagerInstanceHelper {
         public static final MCRCronjobManager INSTANCE = new MCRCronjobManager();
     }
 

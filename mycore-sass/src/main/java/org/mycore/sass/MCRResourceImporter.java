@@ -118,10 +118,10 @@ public class MCRResourceImporter extends CustomImporter {
 
     /**
      * Helper class for working with URLs.
-     *
+     * <p>
      * Exposes {@link CustomUrlImporter#isFile(URL)} as a utility method for internal use.
      */
-    private static class UrlHelper extends CustomUrlImporter {
+    private static final class UrlHelper extends CustomUrlImporter {
 
         @Override
         public URL canonicalizeUrl(String url) throws Exception {

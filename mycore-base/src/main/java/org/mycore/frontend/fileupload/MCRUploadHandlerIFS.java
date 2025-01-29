@@ -322,7 +322,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         return documentID;
     }
 
-    private static class MainFileFinder extends SimpleFileVisitor<Path> {
+    private static final class MainFileFinder extends SimpleFileVisitor<Path> {
 
         private Path mainFile;
 

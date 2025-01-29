@@ -52,7 +52,7 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlRootElement(name = "error")
 @XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.PUBLIC_ONLY)
-public class MCRErrorResponse {
+public final class MCRErrorResponse {
 
     UUID uuid;
 

@@ -769,7 +769,7 @@ public class MCRMailer extends MCRServlet {
         }
     }
 
-    private static class SMTPAuthenticator extends Authenticator {
+    private static final class SMTPAuthenticator extends Authenticator {
 
         @Override
         public PasswordAuthentication getPasswordAuthentication() {

@@ -31,14 +31,21 @@ import jakarta.ws.rs.client.WebTarget;
  *
  * @author Frank Lützenkirchen
  */
-public class MCRORCIDClient {
+public final class MCRORCIDClient {
 
-    private static final MCRORCIDClient SINGLETON = new MCRORCIDClient();
+    private static volatile MCRORCIDClient instance;
 
-    private WebTarget baseTarget;
+    private final WebTarget baseTarget;
 
     public static MCRORCIDClient instance() {
-        return SINGLETON;
+        if(instance == null) {
+            synchronized (MCRORCIDClient.class) {
+                if(instance == null) {
+                    instance = new MCRORCIDClient();
+                }
+            }
+        }
+        return instance;
     }
 
     private MCRORCIDClient() {

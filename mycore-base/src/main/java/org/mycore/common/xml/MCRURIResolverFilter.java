@@ -190,7 +190,7 @@ public class MCRURIResolverFilter implements Filter {
             return encoding;
         }
 
-        private class MyServletOutputStream extends ServletOutputStream {
+        private final class MyServletOutputStream extends ServletOutputStream {
 
             @Override
             public void print(String arg0) throws IOException {

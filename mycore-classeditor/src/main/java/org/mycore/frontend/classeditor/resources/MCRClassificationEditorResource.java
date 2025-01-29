@@ -407,7 +407,7 @@ public class MCRClassificationEditorResource {
         }
     }
 
-    private static class IndexComperator implements Comparator<JsonElement> {
+    private static final class IndexComperator implements Comparator<JsonElement> {
         @Override
         public int compare(JsonElement jsonElement1, JsonElement jsonElement2) {
             if (!jsonElement1.isJsonObject()) {

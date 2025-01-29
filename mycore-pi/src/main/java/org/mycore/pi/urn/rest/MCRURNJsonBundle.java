@@ -32,7 +32,7 @@ import com.google.gson.JsonObject;
  *
  * @author shermann
  * */
-public class MCRURNJsonBundle {
+public final class MCRURNJsonBundle {
 
     protected enum Format {
         REGISTER, UPDATE

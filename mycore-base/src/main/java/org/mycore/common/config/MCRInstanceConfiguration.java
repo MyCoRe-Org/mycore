@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  * Each configuration (top level or nested) keeps an unmodified  reference to the properties used to create
  * the top level configuration.
  */
-public class MCRInstanceConfiguration {
+public final class MCRInstanceConfiguration {
 
     private final MCRInstanceName name;
 

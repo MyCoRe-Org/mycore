@@ -42,7 +42,7 @@ import org.mycore.common.config.MCRConfigurationException;
  *
  * @author Frank Lützenkirchen
  */
-public class MCREventManager {
+public final class MCREventManager {
 
     public static final String CONFIG_PREFIX = "MCR.EventHandler.";
 

@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
 /**
  * @author Thomas Scheffler (yagee)
  */
-public class MCRClassMapper {
+public final class MCRClassMapper {
 
     private static final String TYPE_OF_RESOURCE = "typeOfResource";
 
@@ -248,7 +248,7 @@ public class MCRClassMapper {
 
     }
 
-    private static class MCRNullAuthInfo extends MCRAuthorityInfo {
+    private static final class MCRNullAuthInfo extends MCRAuthorityInfo {
 
         @Override
         protected MCRCategoryID lookupCategoryID() {

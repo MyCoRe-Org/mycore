@@ -36,7 +36,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 
-public class MCRJMXBridge implements Closeable {
+public final class MCRJMXBridge implements Closeable {
 
     static final WeakReference<MCRJMXBridge> SINGLETON = new WeakReference<>(new MCRJMXBridge());
 

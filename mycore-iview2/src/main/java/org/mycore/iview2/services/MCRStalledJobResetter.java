@@ -37,22 +37,30 @@ import jakarta.persistence.TypedQuery;
  * Set property <code>MCR.Module-iview2.MaxResetCount</code> to alter maximum tries per job.
  * @author Thomas Scheffler (yagee)
  */
-public class MCRStalledJobResetter implements Runnable {
-    private static MCRStalledJobResetter instance = new MCRStalledJobResetter();
+public final class MCRStalledJobResetter implements Runnable {
 
-    private static int maxTimeDiff = Integer.parseInt(MCRIView2Tools.getIView2Property("TimeTillReset"));
+    private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRStalledJobResetter.class);
+    private static volatile MCRStalledJobResetter instance;
 
-    private static int maxResetCount = Integer.parseInt(MCRIView2Tools.getIView2Property("MaxResetCount"));
+    private static final int MAX_TIME_DIFF = Integer.parseInt(MCRIView2Tools.getIView2Property("TimeTillReset"));
 
-    private Map<Long, Integer> jobCounter;
+    private static final int MAX_RESET_COUNT = Integer.parseInt(MCRIView2Tools.getIView2Property("MaxResetCount"));
+
+    private final Map<Long, Integer> jobCounter;
 
     private MCRStalledJobResetter() {
         jobCounter = new HashMap<>();
     }
 
     public static MCRStalledJobResetter getInstance() {
+        if(instance == null) {
+            synchronized (MCRStalledJobResetter.class) {
+                if(instance == null) {
+                    instance = new MCRStalledJobResetter();
+                }
+            }
+        }
         return instance;
     }
 
@@ -77,7 +85,7 @@ public class MCRStalledJobResetter implements Runnable {
                 long start = job.getStart().getTime() / 60_000;
                 boolean ret = false;
                 LOGGER.debug("checking {} {} …", job::getDerivate, job::getPath);
-                if (current - start >= maxTimeDiff) {
+                if (current - start >= MAX_TIME_DIFF) {
                     if (hasPermanentError(job)) {
                         LOGGER.warn("Job has permanent errors: {}", job);
                         job.setStatus(MCRJobState.ERROR);
@@ -120,7 +128,7 @@ public class MCRStalledJobResetter implements Runnable {
         if (jobCounter.containsKey(job.getId())) {
             runs = jobCounter.get(job.getId());
         }
-        if (++runs >= maxResetCount) {
+        if (++runs >= MAX_RESET_COUNT) {
             return true;
         }
         jobCounter.put(job.getId(), runs);

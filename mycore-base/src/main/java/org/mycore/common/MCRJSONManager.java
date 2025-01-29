@@ -21,7 +21,7 @@ package org.mycore.common;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public class MCRJSONManager {
+public final class MCRJSONManager {
 
     private final GsonBuilder gsonBuilder;
 

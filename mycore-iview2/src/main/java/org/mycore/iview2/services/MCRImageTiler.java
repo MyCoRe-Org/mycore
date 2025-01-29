@@ -55,7 +55,7 @@ import jakarta.persistence.PersistenceException;
  *
  * @author Thomas Scheffler (yagee)
  */
-public class MCRImageTiler implements Runnable, Closeable {
+public final class MCRImageTiler implements Runnable, Closeable {
 
     private static volatile MCRImageTiler instance;
 
@@ -68,9 +68,9 @@ public class MCRImageTiler implements Runnable, Closeable {
 
     private volatile boolean running = true;
 
-    private ReentrantLock runLock;
+    private final ReentrantLock runLock;
 
-    private Constructor<? extends MCRTilingAction> tilingActionConstructor;
+    private final Constructor<? extends MCRTilingAction> tilingActionConstructor;
 
     private volatile Thread waiter;
 

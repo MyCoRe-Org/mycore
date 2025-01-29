@@ -159,7 +159,7 @@ public final class MCRISO8601FormatChooser {
         return isoString;
     }
 
-    private static class ISODateTimeFormat {
+    private static final class ISODateTimeFormat {
 
         public static DateTimeFormatter year() {
             return DateTimeFormatter.ofPattern("uuuu", Locale.ROOT);

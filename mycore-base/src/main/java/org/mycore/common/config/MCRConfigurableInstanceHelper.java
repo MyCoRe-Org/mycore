@@ -252,7 +252,7 @@ class MCRConfigurableInstanceHelper {
      * It is intended that instances of this class are cached, such that the information about the target class
      * only needs to be gathered once.
      */
-    private static class ClassInfo<T> {
+    private static final class ClassInfo<T> {
 
         private final Class<T> targetClass;
 
@@ -538,7 +538,7 @@ class MCRConfigurableInstanceHelper {
 
     }
 
-    private static class NoParameterMethodTarget<T> extends MethodTarget<T> {
+    private static final class NoParameterMethodTarget<T> extends MethodTarget<T> {
 
         private final Method method;
 
@@ -564,7 +564,7 @@ class MCRConfigurableInstanceHelper {
 
     }
 
-    private static class SingleParameterMethodTarget<T> extends MethodTarget<T> {
+    private static final class SingleParameterMethodTarget<T> extends MethodTarget<T> {
 
         private final Method method;
 
@@ -707,16 +707,16 @@ class MCRConfigurableInstanceHelper {
 
     }
 
-    private static class PropertySource extends Source<MCRProperty, String> {
+    private static final class PropertySource extends Source<MCRProperty, String> {
 
-        protected final MCRProperty annotation;
+        private final MCRProperty annotation;
 
         private PropertySource(MCRProperty annotation) {
             this.annotation = annotation;
         }
 
         @Override
-        public final SourceType type() {
+        public SourceType type() {
             return SourceType.PROPERTY;
         }
 
@@ -731,7 +731,7 @@ class MCRConfigurableInstanceHelper {
         }
 
         @Override
-        public final int order() {
+        public int order() {
             return annotation.order();
         }
 
@@ -776,16 +776,16 @@ class MCRConfigurableInstanceHelper {
 
     }
 
-    private static class AllPropertiesSource extends Source<MCRProperty, Map<String, String>> {
+    private static final class AllPropertiesSource extends Source<MCRProperty, Map<String, String>> {
 
-        protected final MCRProperty annotation;
+        private final MCRProperty annotation;
 
         private AllPropertiesSource(MCRProperty annotation) {
             this.annotation = annotation;
         }
 
         @Override
-        public final SourceType type() {
+        public SourceType type() {
             return SourceType.PROPERTY;
         }
 
@@ -800,7 +800,7 @@ class MCRConfigurableInstanceHelper {
         }
 
         @Override
-        public final int order() {
+        public int order() {
             return annotation.order();
         }
 
@@ -825,16 +825,16 @@ class MCRConfigurableInstanceHelper {
 
     }
 
-    private static class InstanceSource extends Source<MCRInstance, Object> {
+    private static final class InstanceSource extends Source<MCRInstance, Object> {
 
-        protected final MCRInstance annotation;
+        private final MCRInstance annotation;
 
         private InstanceSource(MCRInstance annotation) {
             this.annotation = annotation;
         }
 
         @Override
-        public final SourceType type() {
+        public SourceType type() {
             return SourceType.INSTANCE;
         }
 
@@ -849,7 +849,7 @@ class MCRConfigurableInstanceHelper {
         }
 
         @Override
-        public final int order() {
+        public int order() {
             return annotation.order();
         }
 
@@ -905,16 +905,16 @@ class MCRConfigurableInstanceHelper {
 
     }
 
-    private static class InstanceMapSource extends Source<MCRInstanceMap, Map<String, Object>> {
+    private static final class InstanceMapSource extends Source<MCRInstanceMap, Map<String, Object>> {
 
-        protected final MCRInstanceMap annotation;
+        private final MCRInstanceMap annotation;
 
         private InstanceMapSource(MCRInstanceMap annotation) {
             this.annotation = annotation;
         }
 
         @Override
-        public final SourceType type() {
+        public SourceType type() {
             return SourceType.INSTANCE_MAP;
         }
 
@@ -929,7 +929,7 @@ class MCRConfigurableInstanceHelper {
         }
 
         @Override
-        public final int order() {
+        public int order() {
             return annotation.order();
         }
 
@@ -1003,16 +1003,16 @@ class MCRConfigurableInstanceHelper {
 
     }
 
-    private static class InstanceListSource extends Source<MCRInstanceList, List<Object>> {
+    private static final class InstanceListSource extends Source<MCRInstanceList, List<Object>> {
 
-        protected final MCRInstanceList annotation;
+        private final MCRInstanceList annotation;
 
         private InstanceListSource(MCRInstanceList annotation) {
             this.annotation = annotation;
         }
 
         @Override
-        public final SourceType type() {
+        public SourceType type() {
             return SourceType.INSTANCE_LIST;
         }
 
@@ -1027,7 +1027,7 @@ class MCRConfigurableInstanceHelper {
         }
 
         @Override
-        public final int order() {
+        public int order() {
             return annotation.order();
         }
 
@@ -1100,16 +1100,16 @@ class MCRConfigurableInstanceHelper {
 
     }
 
-    private static class PostConstructionSource extends Source<MCRPostConstruction, String> {
+    private static final class PostConstructionSource extends Source<MCRPostConstruction, String> {
 
-        protected final MCRPostConstruction annotation;
+        private final MCRPostConstruction annotation;
 
         private PostConstructionSource(MCRPostConstruction annotation) {
             this.annotation = annotation;
         }
 
         @Override
-        public final SourceType type() {
+        public SourceType type() {
             return SourceType.POST_CONSTRUCTION;
         }
 
@@ -1124,7 +1124,7 @@ class MCRConfigurableInstanceHelper {
         }
 
         @Override
-        public final int order() {
+        public int order() {
             return annotation.order();
         }
 

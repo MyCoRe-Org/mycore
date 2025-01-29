@@ -278,7 +278,7 @@ public class MCRInfo {
     }
 
     @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.PUBLIC_ONLY)
-    public static class GitId {
+    public static final class GitId {
         String abbrev;
 
         String describeShort;

@@ -61,7 +61,7 @@ public class MCRPIServiceManager {
             MCRPIService.class, REGISTRATION_SERVICE_CONFIG_PREFIX + id);
     }
 
-    private static class InstanceHolder {
+    private static final class InstanceHolder {
         private static final MCRPIServiceManager INSTANCE = new MCRPIServiceManager();
     }
 

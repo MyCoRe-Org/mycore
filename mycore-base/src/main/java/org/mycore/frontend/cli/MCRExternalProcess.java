@@ -94,7 +94,7 @@ public class MCRExternalProcess {
         return output.join();
     }
 
-    private static class MCRStreamSucker {
+    private static final class MCRStreamSucker {
 
         private static final Logger LOGGER = LogManager.getLogger();
 

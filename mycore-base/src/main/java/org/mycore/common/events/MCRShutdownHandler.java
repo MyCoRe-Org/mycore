@@ -38,7 +38,7 @@ import org.mycore.common.config.MCRConfigurationException;
 import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventor;
 
 /**
- * is a wrapper for shutdown hooks. When used inside a web application this shutdown hook is bound to the
+ * Is a wrapper for shutdown hooks. When used inside a web application this shutdown hook is bound to the
  * ServletContext. If not this hook is bound to the Java Runtime. Every <code>Closeable</code> that is added via
  * <code>addCloseable()</code> will be closed at shutdown time. Do not forget to remove any closeable via
  * <code>removeCloseable()</code> to remove any instances. For registering this hook for a web application see
@@ -49,7 +49,7 @@ import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventor;
  * @see org.mycore.common.events.MCRServletContextListener
  * @since 1.3
  */
-public class MCRShutdownHandler {
+public final class MCRShutdownHandler {
 
     private static final int ADD_CLOSEABLE_TIMEOUT = 10;
 

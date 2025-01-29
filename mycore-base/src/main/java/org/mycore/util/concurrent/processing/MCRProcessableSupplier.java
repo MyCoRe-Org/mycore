@@ -42,9 +42,9 @@ import org.mycore.util.concurrent.MCRPrioritySupplier;
  *
  * @param <R> the result of the task
  */
-public class MCRProcessableSupplier<R> extends MCRProcessableTask<Callable<R>> implements Supplier<R> {
+public final class MCRProcessableSupplier<R> extends MCRProcessableTask<Callable<R>> implements Supplier<R> {
 
-    protected CompletableFuture<R> future;
+    private CompletableFuture<R> future;
 
     /**
      * Creates a new {@link MCRProcessableSupplier} by the already committed task and its future.

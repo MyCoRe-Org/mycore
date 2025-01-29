@@ -49,7 +49,7 @@ public class MCRCategoryDAOFactory {
 
     // encapsulate the instance in an inner static class to avoid issues with class loading order
     // this is known as "Bill Pugh singleton"
-    private static class MCRCategoryDAOHolder {
+    private static final class MCRCategoryDAOHolder {
         private static MCRCategoryDAO instance = MCRConfiguration2.getInstanceOfOrThrow(
             MCRCategoryDAO.class, "MCR.Category.DAO");
     }

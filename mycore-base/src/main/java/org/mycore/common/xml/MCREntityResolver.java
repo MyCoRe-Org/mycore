@@ -58,7 +58,7 @@ import org.xml.sax.ext.EntityResolver2;
  * @author Thomas Scheffler (yagee)
  * @since 2013.10
  */
-public class MCREntityResolver implements EntityResolver2, LSResourceResolver {
+public final class MCREntityResolver implements EntityResolver2, LSResourceResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -255,7 +255,7 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver {
         return is.newInputSource();
     }
 
-    private static class MCREntityResolverHolder {
+    private static final class MCREntityResolverHolder {
         public static MCREntityResolver instance = new MCREntityResolver();
     }
 
@@ -277,14 +277,7 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver {
         }
     }
 
-    private static class CatalogEntityIdentifier {
-        private String publicId;
-
-        private String systemId;
-
-        private CatalogEntityIdentifier(String publicId, String systemId) {
-            this.publicId = publicId;
-            this.systemId = systemId;
-        }
+    private record CatalogEntityIdentifier(String publicId, String systemId) {
     }
+
 }

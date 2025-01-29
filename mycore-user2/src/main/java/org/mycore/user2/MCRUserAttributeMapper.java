@@ -287,7 +287,7 @@ public class MCRUserAttributeMapper {
 
     @XmlRootElement(name = "realm")
     @XmlAccessorType(XmlAccessType.FIELD)
-    private static class Mappings {
+    private static final class Mappings {
         @XmlElementWrapper(name = "attributeMapping")
         @XmlElement(name = "attribute")
         List<Attribute> attributes;
@@ -299,7 +299,7 @@ public class MCRUserAttributeMapper {
 
     @XmlRootElement(name = "attribute")
     @XmlAccessorType(XmlAccessType.FIELD)
-    private static class Attribute {
+    private static final class Attribute {
         @XmlAttribute(required = true)
         String name;
 
@@ -333,7 +333,7 @@ public class MCRUserAttributeMapper {
 
     @XmlRootElement(name = "valueMapping")
     @XmlAccessorType(XmlAccessType.FIELD)
-    private static class ValueMapping {
+    private static final class ValueMapping {
         @XmlAttribute(required = true)
         String name;
 

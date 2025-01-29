@@ -18,8 +18,8 @@
 
 package org.mycore.orcid.works;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.mycore.orcid.oauth.MCROAuthClient;
 
@@ -29,14 +29,14 @@ import org.mycore.orcid.oauth.MCROAuthClient;
  *
  * @author Frank Lützenkirchen *
  */
-public class MCRWorkSource {
+public final class MCRWorkSource {
 
-    private static Map<String, MCRWorkSource> sources = new HashMap<>();
+    private static final Map<String, MCRWorkSource> SOURCES = new ConcurrentHashMap<>();
 
-    private String sourceID;
+    private final String sourceID;
 
     static MCRWorkSource getInstance(String sourceID) {
-        return sources.computeIfAbsent(sourceID, MCRWorkSource::new);
+        return SOURCES.computeIfAbsent(sourceID, MCRWorkSource::new);
     }
 
     private MCRWorkSource(String sourceID) {

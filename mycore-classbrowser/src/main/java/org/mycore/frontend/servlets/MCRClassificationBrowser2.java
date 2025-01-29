@@ -248,7 +248,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         void configure(HttpServletRequest request);
     }
 
-    private static class Settings {
+    private static final class Settings {
         private String classifID;
 
         private String categID;

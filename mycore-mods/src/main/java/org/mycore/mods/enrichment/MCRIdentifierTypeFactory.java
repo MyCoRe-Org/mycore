@@ -27,16 +27,16 @@ import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * Builds identifiers types as configured in mycore.properties.
- *
+ * <p>
  * If the corresponding XPath representation is
  * mods:identifier[@type='TYPE'], no explicit configuration is needed.
- *
+ * <p>
  * Otherwise, the XPath must be configured, e.g.
  * MCR.MODS.EnrichmentResolver.IdentifierType.shelfmark=mods:location/mods:shelfLocator
  *
  * @author Frank Lützenkirchen
  */
-class MCRIdentifierTypeFactory {
+final class MCRIdentifierTypeFactory {
 
     private static final String DEFAULT_XPATH = "mods:identifier[@type=\"%s\"]";
 

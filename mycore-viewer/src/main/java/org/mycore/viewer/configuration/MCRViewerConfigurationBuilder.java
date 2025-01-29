@@ -28,17 +28,18 @@ import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Use this class to build your {@link MCRViewerConfiguration}.
+ * <p>
  * You can use {@link #mets(HttpServletRequest)} or {@link #pdf(HttpServletRequest)}
  * as entry point and use {@link #mixin(MCRViewerConfiguration)} to append
  * additional configuration.
  * 
  * @author Matthias Eichner
  */
-public class MCRViewerConfigurationBuilder {
+public final class MCRViewerConfigurationBuilder {
 
-    private MCRViewerConfiguration internalConfig;
+    private final MCRViewerConfiguration internalConfig;
 
-    private HttpServletRequest request;
+    private final HttpServletRequest request;
 
     private MCRViewerConfigurationBuilder(HttpServletRequest request) {
         this.request = request;

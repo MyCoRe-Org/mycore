@@ -44,7 +44,7 @@ import org.apache.logging.log4j.message.ParameterizedMessage;
  * By default, the result of a match is <code>DENY</code> and on a mismatch is <code>NEUTRAL</code>.  
  */
 @Plugin(name = "MCRUniqueFilter", category = Node.CATEGORY, elementType = Filter.ELEMENT_TYPE)
-public class MCRUniqueFilter extends AbstractFilter {
+public final class MCRUniqueFilter extends AbstractFilter {
 
     private final int cacheSizePerFormat;
 

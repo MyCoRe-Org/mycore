@@ -29,13 +29,13 @@ import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.mycore.common.MCRSessionMgr;
 
-public class MCREditorItemComparator implements Comparator<Element> {
+public final class MCREditorItemComparator implements Comparator<Element> {
 
     private static final Map<String, MCREditorItemComparator> MY_COLLATORS = new HashMap<>();
 
-    private Collator myCollator;
+    private final Collator myCollator;
 
-    private String language;
+    private final String language;
 
     private MCREditorItemComparator(Collator myCollator, String language) {
         super();

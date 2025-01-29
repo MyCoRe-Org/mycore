@@ -23,12 +23,12 @@ import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * Builds and caches all data sources as configured in mycore.properties.
- *
+ * <p>
  * For each data source, the types of identifiers must be configured:
  * MCR.MODS.EnrichmentResolver.DataSource.[ID].IdentifierTypes=[TYPE] [TYPE] [TYPE]
  * e.g.
  * MCR.MODS.EnrichmentResolver.DataSource.PubMed.IdentifierTypes=doi pubmed
- *
+ * <p>
  * Per data source, for each identifier type, there must be a pattern configured
  * that defines the URI to get the data for this type of identifier
  *
@@ -42,7 +42,7 @@ import org.mycore.common.config.MCRConfiguration2;
  *
  * @author Frank Lützenkirchen
  */
-class MCRDataSourceFactory {
+final class MCRDataSourceFactory {
 
     private static final String CONFIG_PREFIX = "MCR.MODS.EnrichmentResolver.";
 

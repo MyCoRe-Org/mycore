@@ -821,7 +821,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         return copy;
     }
 
-    private static class Password implements Serializable {
+    private static final class Password implements Serializable {
 
         private static final long serialVersionUID = 8068063832119405080L;
 
@@ -841,7 +841,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     }
 
-    private static class UserIdentifier implements Serializable {
+    private static final class UserIdentifier implements Serializable {
 
         private static final long serialVersionUID = 4654103884660408929L;
 

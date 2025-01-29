@@ -41,7 +41,7 @@ import org.mycore.mcr.neo4j.datamodel.metadata.neo4jparser.MCRNeo4JAbstractDataM
  * @author Andreas Kluge
  * @author Jens Kupferschmidt
  */
-public class MCRNeo4JUtil {
+public final class MCRNeo4JUtil {
 
     /**
      * Retrieves the label of a classification based on the provided class ID and category ID.
