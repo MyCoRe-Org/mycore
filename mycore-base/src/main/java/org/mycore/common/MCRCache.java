@@ -41,6 +41,7 @@ import com.google.common.cache.CacheBuilder;
  * @author Frank Lützenkirchen
  */
 public class MCRCache<K, V> implements Closeable {
+
     /** Tch type string for the MCRCacheJMXBridge */
     protected String type;
 
@@ -62,25 +63,6 @@ public class MCRCache<K, V> implements Closeable {
         this.type = type;
         Object mbean = new MCRCacheManager(this);
         MCRJMXBridge.register(mbean, "MCRCache", type);
-    }
-
-    /**
-     * A small sample program for testing this class.
-     */
-    public static void main(String[] args) {
-        MCRCache<String, String> cache = new MCRCache<>(4, "Small Sample Program");
-        System.out.println(cache);
-        cache.put("a", "Anton");
-        cache.put("b", "Bohnen");
-        cache.put("c", "Cache");
-        System.out.println(cache);
-        cache.get("d");
-        cache.get("c");
-        cache.put("d", "Dieter");
-        cache.put("e", "Egon");
-        cache.put("f", "Frank");
-        cache.get("c");
-        System.out.println(cache);
     }
 
     /**

@@ -47,6 +47,7 @@ public class MCRCommandStatistics {
      * Shows statistics on number of invocations and time needed for each
      * command successfully executed.
      */
+    @SuppressWarnings("PMD.SystemPrintln")
     public static void showCommandStatistics() {
         System.out.println();
         for (Entry<MCRCommand, StatisticsEntry> entry : entries.entrySet()) {

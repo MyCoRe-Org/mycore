@@ -33,17 +33,18 @@ import org.mycore.common.config.MCRConfigurationDir;
  *
  */
 public class MCRCoreVersion {
-    private static Properties prop = loadVersionProperties();
 
-    public static final String VERSION = prop.getProperty("git.build.version");
+    private static final Properties PROPERTIES = loadVersionProperties();
 
-    public static final String BRANCH = prop.getProperty("git.branch");
+    public static final String VERSION = PROPERTIES.getProperty("git.build.version");
 
-    public static final String REVISION = prop.getProperty("git.commit.id.full");
+    public static final String BRANCH = PROPERTIES.getProperty("git.branch");
 
-    public static final String DESCRIBE = prop.getProperty("git.commit.id.describe");
+    public static final String REVISION = PROPERTIES.getProperty("git.commit.id.full");
 
-    public static final String ABBREV = prop.getProperty("git.commit.id.abbrev");
+    public static final String DESCRIBE = PROPERTIES.getProperty("git.commit.id.describe");
+
+    public static final String ABBREV = PROPERTIES.getProperty("git.commit.id.abbrev");
 
     public static final String COMPLETE = VERSION + " " + BRANCH + ":" + DESCRIBE;
 
@@ -95,14 +96,16 @@ public class MCRCoreVersion {
     }
 
     public static Map<String, String> getVersionProperties() {
-        return prop.entrySet()
+        return PROPERTIES.entrySet()
             .stream()
             .collect(Collectors.toMap(e -> e.getKey().toString(), e -> e.getValue().toString()));
     }
 
+    @SuppressWarnings("PMD.SystemPrintln")
     public static void main(String[] arg) throws IOException {
         System.out.printf(Locale.ROOT, "MyCoRe\tver: %s\tbranch: %s\tcommit: %s%n", VERSION, BRANCH, DESCRIBE);
         System.out.printf(Locale.ROOT, "Config directory: %s%n", MCRConfigurationDir.getConfigurationDirectory());
-        prop.store(System.out, "Values of '/org/mycore/version.properties' resource");
+        PROPERTIES.store(System.out, "Values of '/org/mycore/version.properties' resource");
     }
+
 }

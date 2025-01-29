@@ -38,6 +38,9 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRPropertiesResolver;
 
 public final class MCRConfigurationBase {
+
+    private static final Logger LOGGER = LogManager.getLogger();
+
     static final Pattern PROPERTY_SPLITTER = Pattern.compile(",");
 
     /**
@@ -107,8 +110,8 @@ public final class MCRConfigurationBase {
                 .filter(File::isDirectory).isPresent()) {
                 lastModifiedFile = dataDir.map(p -> new File(p, ".systemTime")).get();
             } else {
-                dataDir
-                    .ifPresent(d -> System.err.println("WARNING: MCR.dataDir does not exist: " + d.getAbsolutePath()));
+                dataDir.ifPresent(directory ->
+                    LOGGER.error("WARNING: MCR.dataDir does not exist: {}", directory.getAbsolutePath()));
             }
         }
         if (lastModifiedFile == null) {

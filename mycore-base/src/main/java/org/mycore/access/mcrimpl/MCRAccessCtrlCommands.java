@@ -18,6 +18,8 @@
 
 package org.mycore.access.mcrimpl;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
@@ -32,6 +34,8 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 @MCRCommandGroup(name = "Access Control Commands")
 public class MCRAccessCtrlCommands extends MCRAbstractCommands {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
     /**
      * validates access for given object and given permission
      *
@@ -44,6 +48,8 @@ public class MCRAccessCtrlCommands extends MCRAbstractCommands {
         help = "Validates access for given object and given permission",
         order = 10)
     public static void validate(String objid, String permission) {
-        System.out.println("current user has access: " + MCRAccessManager.checkPermission(objid, permission));
+        boolean hasAccess = MCRAccessManager.checkPermission(objid, permission);
+        LOGGER.info("current user has access: {}", hasAccess);
     }
+
 }
