@@ -284,10 +284,9 @@ public class MCRDataciteClient {
                 HttpEntity entity = response.getEntity();
                 return switch (response.getCode()) {
                     case HttpStatus.SC_OK -> {
-                        String uriString = null;
                         try (InputStream content = entity.getContent();
                             Scanner scanner = new Scanner(content, StandardCharsets.UTF_8)) {
-                            uriString = scanner.nextLine();
+                            String uriString = scanner.nextLine();
                             yield MCRResultOrException.ofResult(new URI(uriString));
                         } catch (URISyntaxException e) {
                             yield MCRResultOrException

@@ -128,7 +128,7 @@ public class MCRIFSFileSystem extends MCRAbstractFileSystem {
     @Override
     public void removeRoot(String owner) throws FileSystemException {
         MCRPath rootPath = getPath(owner, "", this);
-        MCRDirectory rootDirectory = null;
+        MCRDirectory rootDirectory;
         try {
             rootDirectory = MCRFileSystemUtils.getFileCollection(owner);
             if (rootDirectory.hasChildren()) {

@@ -97,7 +97,7 @@ public class MCRWCMSContentManager {
         if (!isXML) {
             throwError(ErrorType.INVALID_FILE, webpageId);
         }
-        Document doc = null;
+        Document doc;
         if (resourceURL == null) {
             MyCoReWebPageProvider wpp = new MyCoReWebPageProvider();
             wpp.addSection("neuer Eintrag", new Element("p").setText("TODO"), "de");

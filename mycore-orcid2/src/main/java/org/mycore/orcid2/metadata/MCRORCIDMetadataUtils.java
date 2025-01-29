@@ -150,13 +150,12 @@ public class MCRORCIDMetadataUtils {
             flagContent.getUserInfos().stream().map(MCRORCIDUserInfo::getWorkInfo).filter(Objects::nonNull)
                 .forEach(w -> w.setOtherPutCodes(null));
         }
-        String flagContentString = null;
         try {
-            flagContentString = transformFlagContent(flagContent);
+            String flagContentString = transformFlagContent(flagContent);
+            addORCIDFlag(object, flagContentString);
         } catch (MCRORCIDTransformationException e) {
             throw new MCRORCIDException("Could not update list of object " + object.getId(), e);
         }
-        addORCIDFlag(object, flagContentString);
     }
 
     /**

@@ -123,7 +123,7 @@ public class MCRJobQueueResource {
         MCRJobDAO dao = MCRJobQueueManager.getInstance()
             .getJobDAO();
 
-        Class<? extends MCRJobAction> action = null;
+        Class<? extends MCRJobAction> action;
         try {
             action = MCRClassTools.forName(name);
         } catch (ClassNotFoundException e) {

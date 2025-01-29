@@ -76,7 +76,7 @@ public class MCRORCIDClientFactory {
      * @throws MCRConfigurationException if factory cannot be initialized
      */
     public static MCRORCIDClientFactory getInstance(String version) {
-        MCRORCIDClientFactory factory = null;
+        MCRORCIDClientFactory factory;
         if (factories.containsKey(version)) {
             factory = factories.get(version);
         } else {
@@ -131,7 +131,7 @@ public class MCRORCIDClientFactory {
     }
 
     private MCRORCIDReadClient initReadClient() {
-        MCRORCIDReadClientImpl client = null;
+        MCRORCIDReadClientImpl client;
         if (checkMemberMode()) {
             if (READ_PUBLIC_TOKEN == null) {
                 throw new MCRORCIDException("MCR.ORCID2.Client.ReadPublicToken is not set");

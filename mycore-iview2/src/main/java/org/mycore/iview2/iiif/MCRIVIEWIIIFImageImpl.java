@@ -318,21 +318,18 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
     }
 
     private MCRTiledPictureProps getTiledPictureProps(Path tiledFile) throws MCRIIIFImageProvidingException {
-        MCRTiledPictureProps tiledPictureProps = null;
         try (FileSystem fileSystem = MCRIView2Tools.getFileSystem(tiledFile)) {
-            tiledPictureProps = MCRTiledPictureProps.getInstanceFromDirectory(fileSystem.getPath("/"));
+            return MCRTiledPictureProps.getInstanceFromDirectory(fileSystem.getPath("/"));
         } catch (IOException e) {
             throw new MCRIIIFImageProvidingException("Could not provide image information!", e);
         }
-        return tiledPictureProps;
     }
 
     protected MCRTileInfo createTileInfo(String identifier) throws MCRIIIFImageNotFoundException {
-        MCRTileInfo tileInfo = null;
         String id = identifier.contains(":/") ? identifier.replaceFirst(":/", "/") : identifier;
         String separator = getProperties().getOrDefault(IDENTIFIER_SEPARATOR_PROPERTY, "/");
         String[] splittedIdentifier = id.split(separator, 2);
-        tileInfo = switch (splittedIdentifier.length) {
+        MCRTileInfo tileInfo = switch (splittedIdentifier.length) {
             case 1 -> new MCRTileInfo(null, identifier, null);
             case 2 -> new MCRTileInfo(splittedIdentifier[0], splittedIdentifier[1], null);
             default -> throw new MCRIIIFImageNotFoundException(identifier);

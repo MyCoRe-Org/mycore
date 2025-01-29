@@ -79,8 +79,8 @@ public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
         HttpServletResponse response, String sessionID, String pageURL)
         throws IOException {
         MCRParameterCollector pc = new MCRParameterCollector(request, false);
-        MCREditorSession session = null;
 
+        MCREditorSession session;
         if (sessionID != null) {
             session = MCREditorSessionStoreUtils.getSessionStore().getSession(sessionID);
             if (session == null) {

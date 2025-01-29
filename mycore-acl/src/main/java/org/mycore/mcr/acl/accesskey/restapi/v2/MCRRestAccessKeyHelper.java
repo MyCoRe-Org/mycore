@@ -74,7 +74,7 @@ public class MCRRestAccessKeyHelper {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException(objectId);
         }
-        MCRAccessKey accessKey = null;
+        MCRAccessKey accessKey;
         if (secretEncoding != null) {
             accessKey = MCRAccessKeyManager.getAccessKeyWithSecret(objectId, decode(secret, secretEncoding));
         } else {

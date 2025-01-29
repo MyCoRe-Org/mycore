@@ -35,8 +35,8 @@ public class MCRRestAPIException extends Exception {
 
     private List<MCRRestAPIError> errors = new ArrayList<>();
 
-    //default is 501 - internal server error, override if necessary
-    private Status status = Status.INTERNAL_SERVER_ERROR;
+    //default is 501 - (Status.INTERNAL_SERVER_ERROR) use other if necessary
+    private Status status;
 
     public MCRRestAPIException(Status status, MCRRestAPIError error) {
         this.status = status;

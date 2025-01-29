@@ -93,7 +93,7 @@ public class MCRORCIDWorkTransformerHelper {
     public static MCRContent transformWork(Work work) {
         checkContext();
         final MCRJAXBContent<Work> workContent = new MCRJAXBContent<>(JAXB_CONTEXT, work);
-        Element mods = null;
+        Element mods;
         try {
             mods = T_WORK_MODS.transform(workContent).asXML().detachRootElement()
                 .getChild("mods", MCRConstants.MODS_NAMESPACE).detach();
@@ -118,14 +118,13 @@ public class MCRORCIDWorkTransformerHelper {
     public static MCRContent transformWorkSummary(WorkSummary work) {
         checkContext();
         final MCRJAXBContent<WorkSummary> workContent = new MCRJAXBContent<>(JAXB_CONTEXT, work);
-        Element mods = null;
         try {
-            mods = T_SUMMARY_MODS.transform(workContent).asXML().detachRootElement()
+            Element mods = T_SUMMARY_MODS.transform(workContent).asXML().detachRootElement()
                 .getChild("mods", MCRConstants.MODS_NAMESPACE).detach();
+            return new MCRJDOMContent(mods);
         } catch (IOException | JDOMException e) {
             throw new MCRORCIDTransformationException(e);
         }
-        return new MCRJDOMContent(mods);
     }
 
     private static Work unmarshalWork(MCRContent content) {

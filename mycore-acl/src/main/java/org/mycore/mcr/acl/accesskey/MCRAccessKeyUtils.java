@@ -18,7 +18,6 @@
 
 package org.mycore.mcr.acl.accesskey;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -255,7 +254,7 @@ public class MCRAccessKeyUtils {
         final Set<MCRUserAttribute> deadAttributes = new HashSet<>();
         int offset = 0;
         final int limit = 1024;
-        List<MCRUser> users = new ArrayList<>();
+        List<MCRUser> users;
         do {
             users = listUsersWithAccessKey(offset, limit);
             for (final MCRUser user : users) {

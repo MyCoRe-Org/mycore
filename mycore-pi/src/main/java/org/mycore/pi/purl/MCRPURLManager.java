@@ -267,8 +267,8 @@ public class MCRPURLManager {
             if (response != 200 && conn.getErrorStream() != null && LOGGER.isErrorEnabled()) {
                 try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(),
                     StandardCharsets.UTF_8))) {
-                    String line = null;
                     LOGGER.error(conn.getRequestMethod() + " " + conn.getURL() + " -> " + conn.getResponseCode());
+                    String line;
                     while ((line = rd.readLine()) != null) {
                         LOGGER.error(line);
                     }
@@ -302,10 +302,10 @@ public class MCRPURLManager {
             response = conn.getResponseCode();
 
             if (response != 200 || conn.getErrorStream() != null && LOGGER.isErrorEnabled()) {
-                try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(),
-                    StandardCharsets.UTF_8))) {
-                    String line = null;
+                try (BufferedReader rd = new BufferedReader(
+                    new InputStreamReader(conn.getErrorStream(), StandardCharsets.UTF_8))) {
                     LOGGER.error(conn.getRequestMethod() + " " + conn.getURL() + " -> " + conn.getResponseCode());
+                    String line;
                     while ((line = rd.readLine()) != null) {
                         LOGGER.error(line);
                     }

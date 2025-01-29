@@ -91,7 +91,7 @@ public class MCROCFLCommands {
             }
         }
 
-        MCROCFLMigration migration = null;
+        MCROCFLMigration migration;
         if (metadataManagerConfigKey != null && !metadataManagerConfigKey.isEmpty()) {
             MCROCFLXMLMetadataManager metadataManager =
                 MCRConfiguration2.getInstanceOf(MCROCFLXMLMetadataManager.class, metadataManagerConfigKey)
@@ -308,6 +308,7 @@ public class MCROCFLCommands {
 
     @MCRCommand(syntax = "purge all marked from ocfl",
         help = "Permanently delete all hidden/archived ocfl entries")
+    @SuppressWarnings("PMD.UnusedAssignment")
     public static void purgeMarked() throws IOException {
         if (!confirmPurgeMarked) {
             LOGGER.info("\n"
