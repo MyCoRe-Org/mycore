@@ -17,7 +17,7 @@
  */
 
 import { Viewport } from "./viewport/Viewport";
-import { MyCoReMap, Position2D, Rect, Size2D, ViewerProperty } from "../../Utils";
+import {getElementHeight, getElementWidth, MyCoReMap, Position2D, Rect, Size2D, ViewerProperty} from "../../Utils";
 import { PageArea, PageAreaInformation } from "./model/PageArea";
 import { HtmlRenderer } from "./HtmlRenderer";
 import { PageView } from "./PageView";
@@ -55,8 +55,8 @@ export class PageController {
 
   public _updateSizeIfChanged() {
     this._views.forEach(view => {
-      const retinaWidth = Math.round(view.container.width() * (window.devicePixelRatio || 1));
-      const retinaHeight = Math.round(view.container.height() * (window.devicePixelRatio || 1));
+      const retinaWidth = Math.round(getElementWidth(view.container) * (window.devicePixelRatio || 1));
+      const retinaHeight = Math.round(getElementHeight(view.container) * (window.devicePixelRatio || 1));
       if (view.drawCanvas.width != retinaWidth || view.drawCanvas.height != retinaHeight || view.markCanvas.width != retinaWidth || view.markCanvas.height != retinaHeight) {
         this._updateSize(view);
       }
@@ -65,10 +65,10 @@ export class PageController {
   }
 
   private _updateSize(view: PageView) {
-    view.drawCanvas.width = view.container.width() * (window.devicePixelRatio || 1);
-    view.drawCanvas.height = view.container.height() * (window.devicePixelRatio || 1);
-    view.markCanvas.width = view.container.width() * (window.devicePixelRatio || 1);
-    view.markCanvas.height = view.container.height() * (window.devicePixelRatio || 1);
+    view.drawCanvas.width = getElementWidth(view.container) * (window.devicePixelRatio || 1);
+    view.drawCanvas.height = getElementHeight(view.container) * (window.devicePixelRatio || 1);
+    view.markCanvas.width = getElementWidth(view.container) * (window.devicePixelRatio || 1);
+    view.markCanvas.height = getElementHeight(view.container) * (window.devicePixelRatio || 1);
     this._lastSize = new Size2D(view.drawCanvas.width, view.drawCanvas.height);
     this._viewport.size = new Size2D(view.drawCanvas.width, view.drawCanvas.height);
   }

@@ -37,7 +37,7 @@ export interface ChapterTreeSettings {
   /**
    * Should hold the DOM-Node were the Chapter Tree should be inserted
    */
-  container: JQuery;
+  container: HTMLElement;
 
   /**
    * Should hold a ChapterTreeViewFactory wich creates the View for the ChapterTree
@@ -61,7 +61,7 @@ export interface ChapterTreeViewFactory {
  */
 export class DefaultChapterTreeSettings implements ChapterTreeSettings, ChapterTreeViewFactory {
 
-  constructor(private _container: JQuery,
+  constructor(private _container: HTMLElement,
     private _chapterLabelMap: MyCoReMap<string, string>,
     private _chapter: ChapterTreeChapter = null,
     private mobile: boolean = false,

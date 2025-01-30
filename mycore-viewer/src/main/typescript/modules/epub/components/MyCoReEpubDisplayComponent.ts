@@ -27,7 +27,7 @@ import { ProvideToolbarModelEvent } from "../../base/components/events/ProvideTo
 import { ViewerEvent } from "../../base/widgets/events/ViewerEvent";
 import { WaitForEvent } from "../../base/components/events/WaitForEvent";
 import { ShowContentEvent } from "../../base/components/events/ShowContentEvent";
-import { Debounce, MyCoReMap } from "../../base/Utils";
+import {addViewerComponent, Debounce, MyCoReMap} from "../../base/Utils";
 import { StructureChapter } from "../../base/components/model/StructureChapter";
 import { EpubStructureChapter } from "../widgets/EpubStructureChapter";
 import { EpubStructureBuilder } from "../widgets/EpubStructureBuilder";
@@ -43,7 +43,7 @@ export class MyCoReEpubDisplayComponent extends ViewerComponent {
   private zoomInPercent: number = 100;
   private currentHref: string;
 
-  constructor(private epubSettings: MyCoReViewerSettings, private appContainer: JQuery) {
+  constructor(private epubSettings: MyCoReViewerSettings, private appContainer: HTMLElement) {
     super();
   }
 
@@ -112,7 +112,7 @@ export class MyCoReEpubDisplayComponent extends ViewerComponent {
     content.style.background = 'white';
     content.style.paddingLeft = '5%';
 
-    this.trigger(new ShowContentEvent(this, jQuery(content), ShowContentEvent.DIRECTION_CENTER));
+    this.trigger(new ShowContentEvent(this, content, ShowContentEvent.DIRECTION_CENTER));
 
     const book = ePub((<any>this.epubSettings).epubPath, {
       openAs: 'directory',
@@ -131,7 +131,7 @@ export class MyCoReEpubDisplayComponent extends ViewerComponent {
     const resizeBounce = new Debounce<boolean>(100, (b) => {
       this.rendition.resize();
     });
-    jQuery(content).bind('iviewResize', () => {
+    content.addEventListener('iviewResize', () => {
       resizeBounce.call(false);
     });
 

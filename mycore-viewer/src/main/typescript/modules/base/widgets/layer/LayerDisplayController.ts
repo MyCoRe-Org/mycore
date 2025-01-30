@@ -22,23 +22,23 @@ import { Layer } from "../../components/model/Layer";
 import { LayerDisplayModel } from "./LayerDisplayModel";
 
 export class LayerDisplayController {
-  constructor(private _container: JQuery, private languageResolver: (id: string) => string) {
+  constructor(private _container: HTMLElement, private languageResolver: (id: string) => string) {
     this.initializeView();
     this.initializeModel();
   }
 
   private initializeView() {
-    this._view = jQuery("<div></div>");
-    this._view.addClass("layer-view");
-    this._view.appendTo(this._container);
+    this._view = document.createElement("div");
+    this._view.classList.add("layer-view");
+    this._container.append(this._view)
   }
 
-  private _view: JQuery;
-  private _layerIdViewMap = new MyCoReMap<string, JQuery>();
+  private _view: HTMLElement;
+  private _layerIdViewMap = new MyCoReMap<string, HTMLElement>();
   private static REMOVE_EXCLUDE_CLASS = "rm-exclude";
 
   // used to check if callback is 2 old!
-  private _layerIdCallbackMap = new MyCoReMap<string, (success: boolean, content: JQuery) => void>();
+  private _layerIdCallbackMap = new MyCoReMap<string, (success: boolean, content: HTMLElement) => void>();
 
   private addLayerView(layer: Layer): void {
     const id = layer.getId();
@@ -57,9 +57,15 @@ export class LayerDisplayController {
     const id = layer.getId();
     const label = this.languageResolver(layer.getLabel());
 
-    const layerView = jQuery(`<div data-id='layer-${id}' class='layer'></div>`);
-    const layerHeading = jQuery(`<div class="layer-heading ${LayerDisplayController.REMOVE_EXCLUDE_CLASS}">${label}</div>`);
-    layerHeading.appendTo(layerView);
+    const layerView = document.createElement("div");
+    layerView.setAttribute("data-id", `layer-${id}`);
+    layerView.classList.add("layer");
+
+    const layerHeading = document.createElement("div");
+    layerHeading.classList.add("layer-heading");
+    layerHeading.classList.add(LayerDisplayController.REMOVE_EXCLUDE_CLASS);
+    layerHeading.textContent = label;
+    layerView.append(layerHeading);
 
     this._layerIdViewMap.set(id, layerView);
 
@@ -67,10 +73,10 @@ export class LayerDisplayController {
   }
 
   private removeLayerView(layer: Layer): void {
-    this.getLayerView(layer.getId()).detach();
+    this.getLayerView(layer.getId()).remove();
   }
 
-  private getLayerView(id: string): JQuery {
+  private getLayerView(id: string): HTMLElement {
     return this._layerIdViewMap.get(id);
   }
 
@@ -79,7 +85,12 @@ export class LayerDisplayController {
    * @param id
    */
   private cleanLayerView(id: string) {
-    this._layerIdViewMap.get(id).children().not("." + LayerDisplayController.REMOVE_EXCLUDE_CLASS).detach();
+    let children = this._layerIdViewMap.get(id).children;
+    for (let i = 0; i < children.length; i++) {
+        if(!children[i].classList.contains(LayerDisplayController.REMOVE_EXCLUDE_CLASS)) {
+          children[i].remove();
+        }
+    }
   }
 
   private initializeModel() {
@@ -131,11 +142,12 @@ export class LayerDisplayController {
       const layerId = currentDisplayedLayer.getId();
       this.cleanLayerView(currentDisplayedLayer.getId()); // don not show old content while loading!
 
-      const onResolve = (success: boolean, content?: JQuery) => {
+      const onResolve = (success: boolean, content?: HTMLElement) => {
         if (success && /* check if the last registered callback matches the current*/
           this._layerIdCallbackMap.has(layerId) &&
           this._layerIdCallbackMap.get(layerId) == onResolve) {
 
+          /* TODO: FIX POPUP HACK
           content.find(".popupTrigger").each(function(i, popupTrigger) {
             const popup = (jQuery as any)(popupTrigger);
             popup.attr("data-placement", "bottom");
@@ -146,6 +158,8 @@ export class LayerDisplayController {
               }
             });
           });
+          */
+
           this.getLayerView(currentDisplayedLayer.getId()).append(content);
           this._layerIdCallbackMap.remove(layerId); // remove this callback
         }

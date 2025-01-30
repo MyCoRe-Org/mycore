@@ -17,30 +17,28 @@
  */
 
 
-
-
-import { ViewerComponent } from "./ViewerComponent";
-import { ChapterTreeInputHandler } from "../widgets/chapter/ChapterTreeInputHandler";
-import { MyCoReMap, Utils } from "../Utils";
-import { MyCoReViewerSettings } from "../MyCoReViewerSettings";
-import { IviewChapterTree } from "../widgets/chapter/IviewChapterTree";
-import { ChapterTreeSettings, DefaultChapterTreeSettings } from "../widgets/chapter/ChapterTreeSettings";
-import { StructureModel } from "./model/StructureModel";
-import { StructureImage } from "./model/StructureImage";
-import { WaitForEvent } from "./events/WaitForEvent";
-import { StructureModelLoadedEvent } from "./events/StructureModelLoadedEvent";
-import { LanguageModelLoadedEvent } from "./events/LanguageModelLoadedEvent";
-import { ShowContentEvent } from "./events/ShowContentEvent";
-import { ProvideToolbarModelEvent } from "./events/ProvideToolbarModelEvent";
-import { ImageChangedEvent } from "./events/ImageChangedEvent";
-import { DropdownButtonPressedEvent } from "../widgets/toolbar/events/DropdownButtonPressedEvent";
-import { RequestStateEvent } from "./events/RequestStateEvent";
-import { RestoreStateEvent } from "./events/RestoreStateEvent";
-import { ViewerEvent } from "../widgets/events/ViewerEvent";
-import { ComponentInitializedEvent } from "./events/ComponentInitializedEvent";
-import { StructureChapter } from "./model/StructureChapter";
-import { ImageSelectedEvent } from "./events/ImageSelectedEvent";
-import { ChapterChangedEvent } from "./events/ChapterChangedEvent";
+import {ViewerComponent} from "./ViewerComponent";
+import {ChapterTreeInputHandler} from "../widgets/chapter/ChapterTreeInputHandler";
+import {getElementHeight, getElementOuterHeight, getElementWidth, MyCoReMap, Utils} from "../Utils";
+import {MyCoReViewerSettings} from "../MyCoReViewerSettings";
+import {IviewChapterTree} from "../widgets/chapter/IviewChapterTree";
+import {ChapterTreeSettings, DefaultChapterTreeSettings} from "../widgets/chapter/ChapterTreeSettings";
+import {StructureModel} from "./model/StructureModel";
+import {StructureImage} from "./model/StructureImage";
+import {WaitForEvent} from "./events/WaitForEvent";
+import {StructureModelLoadedEvent} from "./events/StructureModelLoadedEvent";
+import {LanguageModelLoadedEvent} from "./events/LanguageModelLoadedEvent";
+import {ShowContentEvent} from "./events/ShowContentEvent";
+import {ProvideToolbarModelEvent} from "./events/ProvideToolbarModelEvent";
+import {ImageChangedEvent} from "./events/ImageChangedEvent";
+import {DropdownButtonPressedEvent} from "../widgets/toolbar/events/DropdownButtonPressedEvent";
+import {RequestStateEvent} from "./events/RequestStateEvent";
+import {RestoreStateEvent} from "./events/RestoreStateEvent";
+import {ViewerEvent} from "../widgets/events/ViewerEvent";
+import {ComponentInitializedEvent} from "./events/ComponentInitializedEvent";
+import {StructureChapter} from "./model/StructureChapter";
+import {ImageSelectedEvent} from "./events/ImageSelectedEvent";
+import {ChapterChangedEvent} from "./events/ChapterChangedEvent";
 
 /**
      * Settings
@@ -58,21 +56,28 @@ export class MyCoReChapterComponent extends ViewerComponent implements ChapterTr
   private _enabled: boolean;
   private _chapterWidgetSettings: ChapterTreeSettings;
   private _chapterWidget: IviewChapterTree;
-  private _spinner: JQuery = null;
+  private _spinner: HTMLElement = null;
   private _currentChapter: StructureChapter = null;
 
   private _structureModel: StructureModel;
   private _initialized: boolean = false;
-  private _sidebarLabel = jQuery("<span>strukturübersicht</span>");
+  private _sidebarLabel = this.createSidebarLabel();
+
   private _chapterToActivate: string = null;
   private _autoPagination = true;
   private _idImageMap: MyCoReMap<string, StructureImage> = new MyCoReMap<string, StructureImage>();
 
+  private createSidebarLabel() {
+    const el = document.createElement("span");
+    el.innerText = "strukturübersicht";
+    return el;
+  }
+
   public init() {
     if (this._enabled) {
-      this._container = jQuery("<div></div>");
-      this._container.css({ overflowY: "scroll" });
-      this._container.bind("iviewResize", () => {
+      this._container = document.createElement("div");
+      this._container.style.overflowY = "scroll";
+      this.container.addEventListener("iviewResize", () => {
         this.updateContainerSize();
       });
       this.trigger(new WaitForEvent(this, StructureModelLoadedEvent.TYPE));
@@ -84,8 +89,7 @@ export class MyCoReChapterComponent extends ViewerComponent implements ChapterTr
         "leftShowOnStart", oldProperty ? "chapterOverview" : "none") == "chapterOverview";
 
       if (this._settings.mobile == false && showChapterOnStart) {
-        this._spinner = jQuery(`<div class='spinner'><img src='${this._settings.webApplicationBaseURL}` +
-          `/modules/iview2/img/spinner.gif'></div>`);
+        this._spinner = this.createSpinnerElement();
         this._container.append(this._spinner);
         let direction = (this._settings.mobile) ? ShowContentEvent.DIRECTION_CENTER :
           ShowContentEvent.DIRECTION_WEST;
@@ -96,10 +100,17 @@ export class MyCoReChapterComponent extends ViewerComponent implements ChapterTr
     }
   }
 
+  private createSpinnerElement(): HTMLElement {
+    const spinner = document.createElement("div");
+    spinner.classList.add("spinner");
+    const img = document.createElement("img");
+    img.src = `${this._settings.webApplicationBaseURL}/modules/iview2/img/spinner.gif`;
+    spinner.appendChild(img);
+    return spinner;
+  }
+
   private updateContainerSize() {
-    this._container.css({
-      "height": (this._container.parent().height() - this._sidebarLabel.parent().outerHeight()) + "px"
-    });
+    this._container.style.height = getElementHeight(this._container.parentElement) - getElementOuterHeight(this._sidebarLabel.parentElement) + "px";
   }
 
   public get handlesEvents(): string[] {
@@ -159,7 +170,7 @@ export class MyCoReChapterComponent extends ViewerComponent implements ChapterTr
       this._initialized = true;
       this.trigger(new ComponentInitializedEvent(this));
       if (this._spinner != null) {
-        this._spinner.detach();
+        this._spinner.parentElement.removeChild(this._spinner);
       }
       if (this._chapterToActivate != null) {
         this.setChapter(this._chapterToActivate);
@@ -186,7 +197,7 @@ export class MyCoReChapterComponent extends ViewerComponent implements ChapterTr
 
     if (e.type === LanguageModelLoadedEvent.TYPE) {
       const lmle = e as LanguageModelLoadedEvent;
-      this._sidebarLabel.text(lmle.languageModel.getTranslation("sidebar.chapterOverview"));
+      this._sidebarLabel.innerText = lmle.languageModel.getTranslation("sidebar.chapterOverview");
     }
 
     if (e.type === RequestStateEvent.TYPE) {
@@ -235,13 +246,14 @@ export class MyCoReChapterComponent extends ViewerComponent implements ChapterTr
   register(): void {
   }
 
-  registerNode(node: JQuery, id: string): void {
-    node.click(() => {
+  registerNode(node: HTMLElement, id: string): void {
+    node.addEventListener("click", () => {
       this.setChapter(id, true, node);
     });
+
   }
 
-  private setChapter(id: string, jumpToFirstImageOfChapter: boolean = true, node?: JQuery, trigger = true) {
+  private setChapter(id: string, jumpToFirstImageOfChapter: boolean = true, node?: HTMLElement, trigger = true) {
     if (this._currentChapter != null && this._currentChapter.id == id) {
       return;
     }
@@ -270,26 +282,26 @@ export class MyCoReChapterComponent extends ViewerComponent implements ChapterTr
     } else {
       let oldVal: null | string = null;
       if (typeof node != "undefined") {
-        oldVal = node.css("cursor");
-        node.css("cursor", "wait");
+        oldVal = node.style.cursor;
+        node.style.cursor = "wait";
       }
       newSelectedChapter.resolveDestination((targetId) => {
         if (typeof node != "undefined" && oldVal != null) {
-          node.css("cursor", oldVal);
+          node.style.cursor = oldVal;
         }
         changeChapter(targetId !== null ? this._idImageMap.get(targetId) : null);
       });
     }
   }
 
-  registerExpander(expander: JQuery, id: string): void {
-    expander.click(() => {
+  registerExpander(expander: HTMLElement, id: string): void {
+    expander.addEventListener("click", () => {
       const chapterToChange = this._chapterWidget.getChapterById(id);
       this._chapterWidget.setChapterExpanded(chapterToChange, !this._chapterWidget.getChapterExpanded(chapterToChange));
     });
   }
 
-  private _container: JQuery;
+  private _container: HTMLElement;
 
   public get container() {
     return this._container;

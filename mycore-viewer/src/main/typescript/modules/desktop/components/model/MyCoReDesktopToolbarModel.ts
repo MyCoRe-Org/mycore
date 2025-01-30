@@ -33,7 +33,6 @@ export class MyCoReDesktopToolbarModel extends MyCoReBasicToolbarModel {
   }
 
   public _languageModel: LanguageModel;
-  public _viewSelectGroup: ToolbarGroup;
   public viewSelectChilds: Array<ToolbarDropdownButtonChild>;
   public viewSelect: ToolbarDropdownButton;
 
@@ -41,12 +40,12 @@ export class MyCoReDesktopToolbarModel extends MyCoReBasicToolbarModel {
   public selectionSwitchButton: ToolbarButton;
 
   public addComponents(): void {
-    this._viewSelectGroup = new ToolbarGroup("viewSelectGroup", 40);
+    ;
 
     this.addGroup(this._sidebarControllGroup);
     this.addGroup(this._zoomControllGroup);
     this.addGroup(this._layoutControllGroup);
-    this.addGroup(this._viewSelectGroup);
+    this.addGroup(new ToolbarGroup("viewSelectGroup", 40));
     this.addGroup(this._imageChangeControllGroup);
     this.addGroup(this._actionControllGroup);
     this.addGroup(this._searchGroup);
@@ -73,8 +72,9 @@ export class MyCoReDesktopToolbarModel extends MyCoReBasicToolbarModel {
     });
 
     this.viewSelect = new ToolbarDropdownButton('viewSelect', 'viewSelect', this.viewSelectChilds, 'eye');
-    if (this._viewSelectGroup != null && typeof this._viewSelectGroup != "undefined") {
-      this._viewSelectGroup.addComponent(this.viewSelect);
+    const vsg = this.getGroup("viewSelectGroup");
+    if (vsg) {
+      vsg.addComponent(this.viewSelect);
     }
   }
 

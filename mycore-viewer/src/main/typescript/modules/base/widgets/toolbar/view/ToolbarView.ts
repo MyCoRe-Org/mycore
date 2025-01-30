@@ -18,10 +18,10 @@
 
 
 export interface ToolbarView {
-  addChild(child: JQuery): void;
+  addChild(child: HTMLElement): void;
 
-  removeChild(child: JQuery): void;
+  removeChild(child: HTMLElement): void;
 
-  getElement(): JQuery;
+  getElement(): HTMLElement;
 }
 

@@ -138,15 +138,23 @@ export class MyCoReAltoModelProvider extends ViewerComponent {
   }
 
   public loadAltoXML(altoPath: string, successCallback: any, errorCallback: any): void {
-    const requestObj: any = {
-      url: altoPath,
-      type: "GET",
-      dataType: "xml",
-      async: true,
-      success: successCallback,
-      error: errorCallback
-    };
-    jQuery.ajax(requestObj);
+    const promise = fetch(altoPath, {
+      method: "GET",
+        headers: {
+            "Content-Type": "application/xml"
+        }
+    });
+
+    promise.catch((e) => {
+      errorCallback(e);
+    });
+
+    promise
+        .then((response) => response.text())
+        .then((response) => {
+          const domParser = new window.DOMParser();
+          successCallback(domParser.parseFromString(response, "text/xml"));
+    });
   }
 
   public loadedAltoModel(parentId: string,

@@ -51,7 +51,7 @@ export class MyCoReHighlightAltoComponent extends ViewerComponent {
   private selectedChapter: string = null;
   private highlightedChapter: string = null;
 
-  constructor(private _settings: MetsSettings, private container: JQuery) {
+  constructor(private _settings: MetsSettings, private container: HTMLElement) {
     super();
   }
 

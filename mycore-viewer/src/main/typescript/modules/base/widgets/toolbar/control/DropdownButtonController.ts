@@ -50,26 +50,26 @@ export class DropdownButtonController extends ButtonController {
     const dropdownView = this._dropdownButtonViewMap.get(button.id);
     const that = this;
     if (button.largeContent || this.__mobile) {
-      dropdownView.getElement().bind("change", function(modelElement: ToolbarDropdownButton) {
-        return function(e) {
-          const jqTarget = jQuery(e.target);
-          const select = jqTarget.find(":selected");
-          if (that.__mobile) {
-            jqTarget.val([]);
-          }
-          that.eventManager.trigger(new DropdownButtonPressedEvent(button, select.attr("data-id")));
-        };
-      }(button));
+      let dropDownElement = dropdownView.getElement()[0];
+
+        if("selectedIndex" in dropDownElement) {
+          (dropDownElement as HTMLSelectElement).addEventListener("change", (e) => {
+            const selected = (dropDownElement as HTMLSelectElement).options[(dropDownElement as HTMLSelectElement).selectedIndex];
+            if (selected) {
+              that.eventManager.trigger(new DropdownButtonPressedEvent(button, selected.getAttribute("data-id")));
+            }
+          });
+        }
+
     } else {
       const childArray: Array<ToolbarDropdownButtonChild> = childs;
       childArray.forEach((child) => {
         const view = dropdownView.getChildElement(child.id);
-        view.bind("click", () => {
+        view.forEach(el => el.addEventListener("click", () => {
           that.eventManager.trigger(new DropdownButtonPressedEvent(button, child.id))
-        });
+        }));
       });
     }
-
   }
 
   public childRemoved(parent: any, component: any): void {

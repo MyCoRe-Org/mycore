@@ -17,15 +17,15 @@
  */
 
 
-import { ContainerObserver, MyCoReMap, ViewerProperty, ViewerPropertyObserver } from "../../../Utils";
-import { ToolbarGroup } from "../model/ToolbarGroup";
-import { ToolbarComponent } from "../model/ToolbarComponent";
-import { GroupView } from "../view/group/GroupView";
-import { ButtonView } from "../view/button/ButtonView";
-import { ToolbarButton } from "../model/ToolbarButton";
-import { ButtonPressedEvent } from "../events/ButtonPressedEvent";
-import { ToolbarViewFactory } from "../view/ToolbarViewFactory";
-import { ViewerEventManager } from "../../events/ViewerEventManager";
+import {ContainerObserver, MyCoReMap, ViewerProperty, ViewerPropertyObserver} from "../../../Utils";
+import {ToolbarGroup} from "../model/ToolbarGroup";
+import {ToolbarComponent} from "../model/ToolbarComponent";
+import {GroupView} from "../view/group/GroupView";
+import {ButtonView} from "../view/button/ButtonView";
+import {ToolbarButton} from "../model/ToolbarButton";
+import {ButtonPressedEvent} from "../events/ButtonPressedEvent";
+import {ToolbarViewFactory} from "../view/ToolbarViewFactory";
+import {ViewerEventManager} from "../../events/ViewerEventManager";
 
 
 export class ButtonController implements ContainerObserver<ToolbarGroup, ToolbarComponent>, ViewerPropertyObserver<any> {
@@ -68,9 +68,9 @@ export class ButtonController implements ContainerObserver<ToolbarGroup, Toolbar
     buttonView.updateButtonActive(activeProperty.value);
     buttonView.updateButtonDisabled(disabledProperty.value);
 
-    buttonView.getElement().bind("click", (e) => {
-      this._eventManager.trigger(new ButtonPressedEvent(button));
-    });
+    buttonView.getElement()[0].addEventListener("click", (e) => {
+          this._eventManager.trigger(new ButtonPressedEvent(button));
+        });
 
     const iconValue = iconProperty.value;
     if (iconValue != null) {
@@ -78,14 +78,16 @@ export class ButtonController implements ContainerObserver<ToolbarGroup, Toolbar
     }
 
 
-    groupView.addChild(buttonView.getElement());
+    buttonView.getElement().forEach((el) => {
+      groupView.addChild(el);
+    });
     this._buttonViewMap.set(componentId, buttonView);
 
   }
 
   public childRemoved(parent: any, component: any): void {
     const componentId = component.getProperty("id").value;
-    this._buttonViewMap.get(componentId).getElement().remove();
+    this._buttonViewMap.get(componentId).getElement().forEach(el => el.remove());
 
     component.getProperty("label").removeObserver(this);
     component.getProperty("icon").removeObserver(this);

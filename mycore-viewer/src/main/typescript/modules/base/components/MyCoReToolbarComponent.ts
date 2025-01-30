@@ -35,7 +35,7 @@ import { ViewerEvent } from "../widgets/events/ViewerEvent";
 
 export class MyCoReToolbarComponent extends ViewerComponent {
 
-  constructor(private _settings: MyCoReViewerSettings, private _container: JQuery) {
+  constructor(private _settings: MyCoReViewerSettings, private _container: HTMLElement) {
     super();
     this._toolbarModel = null;
   }
@@ -116,16 +116,20 @@ export class MyCoReToolbarComponent extends ViewerComponent {
         const icEvent: ImageChangedEvent = e as ImageChangedEvent;
         if (icEvent.image != null) {
           if (!this._settings.mobile) {
-            const select = this._toolbarController.getView("PageSelect").getElement();
-            //select.find("option[selected]").removeAttr("selected");
-            select.val(icEvent.image.id);
+            const select = this._toolbarController.getView("PageSelect").getElement() as HTMLSelectElement;
+            select.value = icEvent.image.id;
           }
         }
         return;
       }
 
       if (e.type == CanvasTapedEvent.TYPE) {
-        this._toolbarController.getView(null).getElement().slideToggle();
+        let elementStyle = this._toolbarController.getView(null).getElement().style;
+        if(elementStyle.display == "block" || elementStyle.display == "") {
+            elementStyle.display = "none";
+        } else {
+          elementStyle.display = "block";
+        }
         return;
       }
     }

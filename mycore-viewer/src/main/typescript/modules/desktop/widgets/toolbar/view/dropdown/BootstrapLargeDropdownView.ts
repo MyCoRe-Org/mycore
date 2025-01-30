@@ -23,12 +23,12 @@ import { MyCoReMap } from "../../../../../base/Utils";
 export class BootstrapLargeDropdownView implements DropdownView {
 
   constructor(private _id: string) {
-    this._buttonElement = jQuery("<select></select>");
-    this._buttonElement.addClass("btn btn-secondary navbar-btn dropdown");
-    this._childMap = new MyCoReMap<string, JQuery>();
+    this._buttonElement = document.createElement("select");
+    this._buttonElement.classList.add("btn", "btn-secondary", "navbar-btn", "dropdown");
+    this._childMap = new MyCoReMap<string, HTMLElement>();
   }
 
-  private _buttonElement: JQuery;
+  private _buttonElement: HTMLElement;
 
   public updateButtonLabel(label: string): void {
   }
@@ -48,7 +48,7 @@ export class BootstrapLargeDropdownView implements DropdownView {
   public updateButtonDisabled(disabled: boolean): void {
   }
 
-  private _childMap: MyCoReMap<string, JQuery>;
+  private _childMap: MyCoReMap<string, HTMLElement>;
 
   public updateChilds(childs: Array<{
     id: string; label: string
@@ -62,18 +62,23 @@ export class BootstrapLargeDropdownView implements DropdownView {
       const current: {
         id: string; label: string
       } = childs[childIndex];
-      const newChild = jQuery("<option value='" + current.id + "' data-id=\"" + current.id + "\">" + current.label + "</option>");
+      const newChild = document.createElement("option");
+        newChild.value = current.id;
+        newChild.setAttribute("data-id", current.id);
+        newChild.innerText = current.label;
+
       this._childMap.set(current.id, newChild);
-      newChild.appendTo(this._buttonElement);
+      this._buttonElement.append(newChild);
     }
   }
 
-  public getChildElement(id: string): JQuery {
-    return this._childMap.get(id) || null;
+  public getChildElement(id: string): HTMLElement[] {
+    const child = this._childMap.get(id);
+    return child == null ? [] : [child];
   }
 
-  public getElement(): JQuery {
-    return jQuery().add(this._buttonElement).add(this._buttonElement);
+  public getElement(): HTMLElement[] {
+    return [this._buttonElement];
   }
 
 }
