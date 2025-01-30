@@ -518,7 +518,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         }
         File xmlOutput = new File(dir, derivateID + "." + extension);
         File directoryFile = new File(dir, derivateID.toString());
-        try(OutputStream fileOutputStream = Files.newOutputStream(xmlOutput.toPath())) {
+        try (OutputStream fileOutputStream = Files.newOutputStream(xmlOutput.toPath())) {
             if (transformer != null) {
                 transformer.setParameter("dirname", directoryFile.getPath());
                 StreamResult sr = new StreamResult(fileOutputStream);
@@ -666,8 +666,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         /* set link to derivate in the new parent */
         MCRObject oldOwner = MCRMetadataManager.retrieveMCRObject(oldOwnerId);
-        //MCR-3323 - RS: Was happens here with oldObjectToDerivateLink;
-        /*
+
         List<MCRMetaEnrichedLinkID> derivates = oldOwner.getStructure().getDerivates();
         MCRMetaLinkID oldObjectToDerivateLink = null;
         for (MCRMetaLinkID derivate : derivates) {
@@ -678,9 +677,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         if (oldObjectToDerivateLink == null) {
             oldObjectToDerivateLink = new MCRMetaLinkID();
         }
-        */
-        // MCR-3323 - ENDE
-        
+
         LOGGER.info("Linking derivate {} to {}", derID, objID);
         MCRMetaEnrichedLinkID derivateLink = MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(derObj);
         MCRMetadataManager.addOrUpdateDerivateToObject(objID, derivateLink, derObj.isImportMode());

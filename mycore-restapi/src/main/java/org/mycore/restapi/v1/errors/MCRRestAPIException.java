@@ -26,6 +26,7 @@ import jakarta.ws.rs.core.Response.Status;
 /**
  * exception that can be thrown during rest api requests
  * 
+ * 
  * @author Robert Stephan
  * 
  */
@@ -35,14 +36,25 @@ public class MCRRestAPIException extends Exception {
 
     private List<MCRRestAPIError> errors = new ArrayList<>();
 
-    //default is 501 - (Status.INTERNAL_SERVER_ERROR) use other if necessary
     private Status status;
 
+    /**
+     * create a new MCRRestAPIException
+     * @param status the Http status code
+     *        if no specific status code is available, use  501 = Status.INTERNAL_SERVER_ERROR
+     * @param error - a single RestAPI-Error
+     */
     public MCRRestAPIException(Status status, MCRRestAPIError error) {
         this.status = status;
         errors.add(error);
     }
 
+    /**
+     * create a new MCRRestAPIException
+     * @param status the Http status code
+     *        if no specific status code is available, use  501 = Status.INTERNAL_SERVER_ERROR
+     * @param errors - a list of RestAPI error
+     */
     public MCRRestAPIException(Status status, List<MCRRestAPIError> errors) {
         this.status = status;
         this.errors.addAll(errors);

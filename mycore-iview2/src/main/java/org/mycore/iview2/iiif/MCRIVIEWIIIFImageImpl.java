@@ -329,12 +329,11 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         String id = identifier.contains(":/") ? identifier.replaceFirst(":/", "/") : identifier;
         String separator = getProperties().getOrDefault(IDENTIFIER_SEPARATOR_PROPERTY, "/");
         String[] splittedIdentifier = id.split(separator, 2);
-        MCRTileInfo tileInfo = switch (splittedIdentifier.length) {
+        return switch (splittedIdentifier.length) {
             case 1 -> new MCRTileInfo(null, identifier, null);
             case 2 -> new MCRTileInfo(splittedIdentifier[0], splittedIdentifier[1], null);
             default -> throw new MCRIIIFImageNotFoundException(identifier);
         };
-        return tileInfo;
     }
 
     private void checkTileFile(String identifier, MCRTileInfo tileInfo, Path tileFilePath)
