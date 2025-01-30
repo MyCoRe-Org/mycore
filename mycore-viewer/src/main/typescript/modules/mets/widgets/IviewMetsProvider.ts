@@ -28,17 +28,23 @@ export class IviewMetsProvider {
     model: StructureModel
   }, any> {
     let promise = new ViewerPromise<{ model: StructureModel; document: Document }, any>();
-    let settings = {
-      url: metsDocumentLocation,
-      success: function(response) {
-        let builder = new MetsStructureBuilder(response, tilePathBuilder);
-        promise.resolve({ model: builder.processMets(), document: response });
-      },
-      error: function(request, status, exception) {
-        promise.reject(exception);
-      }
-    };
-    jQuery.ajax(settings);
+    fetch(metsDocumentLocation)
+        .then(response => {
+          if (!response.ok) {
+            promise.reject(response.statusText);
+            return null;
+          }
+          return response.text();
+        })
+        .then(text => {
+        let parser = new DOMParser();
+        let xmlDoc = parser.parseFromString(text, "text/xml");
+        let builder = new MetsStructureBuilder(xmlDoc, tilePathBuilder);
+        promise.resolve({ model: builder.processMets(), document: xmlDoc });
+
+    }).catch(error => {
+      promise.reject(error);
+    });
     return promise;
   }
 

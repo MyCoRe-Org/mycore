@@ -15,8 +15,6 @@
 
   <xsl:param name="MCR.Viewer.Fontawesome.Css.URL"/>
   <xsl:param name="MCR.Viewer.Fontawesome.Css.Integrity"/>
-  <xsl:param name="MCR.Viewer.Fontawesome.Js.URL"/>
-  <xsl:param name="MCR.Viewer.Fontawesome.Js.Integrity"/>
 
   <xsl:output method="html" encoding="UTF-8" indent="yes" />
 
@@ -80,10 +78,6 @@
         <xsl:call-template name="createViewerLinkElement">
             <xsl:with-param name="href" select="$MCR.Viewer.Fontawesome.Css.URL"/>
             <xsl:with-param name="integrity" select="$MCR.Viewer.Fontawesome.Css.Integrity"/>
-        </xsl:call-template>
-        <xsl:call-template name="createViewerScriptElement">
-            <xsl:with-param name="src" select="$MCR.Viewer.Fontawesome.Js.URL"/>
-            <xsl:with-param name="integrity" select="$MCR.Viewer.Fontawesome.Js.Integrity"/>
         </xsl:call-template>
 
         <xsl:apply-templates select="xml/resources/resource" mode="iview.resource" />

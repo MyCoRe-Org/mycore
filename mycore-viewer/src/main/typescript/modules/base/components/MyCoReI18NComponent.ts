@@ -37,32 +37,25 @@ export class MyCoReI18NProvider implements I18NProvider {
   private static METS_PREFIX = "component.mets.";
 
   public getLanguage(href: string, callback: (model: LanguageModel) => void, errorCallback: (err) => void = MyCoReI18NProvider.DEFAULT_ERROR_CALLBACK) {
-    const settings = {
-      url: href,
-      dataType: 'json',
-      success: function(response) {
-        const newResponse = [];
-        for (let keyIndex in response) {
-          let prefixEnd = 0;
-          if (keyIndex.indexOf(MyCoReI18NProvider.VIEWER_PREFIX) == 0) {
-            prefixEnd = MyCoReI18NProvider.VIEWER_PREFIX.length;
-          } else if (keyIndex.indexOf(MyCoReI18NProvider.METS_PREFIX) == 0) {
-            prefixEnd = MyCoReI18NProvider.METS_PREFIX.length;
+    fetch(href).then(r=>r.json())
+        .then((response => {
+          const newResponse = [];
+          for (let keyIndex in response) {
+            let prefixEnd = 0;
+            if (keyIndex.indexOf(MyCoReI18NProvider.VIEWER_PREFIX) == 0) {
+              prefixEnd = MyCoReI18NProvider.VIEWER_PREFIX.length;
+            } else if (keyIndex.indexOf(MyCoReI18NProvider.METS_PREFIX) == 0) {
+              prefixEnd = MyCoReI18NProvider.METS_PREFIX.length;
+            }
+
+            let newKeyIndex = keyIndex.substr(prefixEnd);
+            newResponse[newKeyIndex] = response[keyIndex];
           }
-
-          let newKeyIndex = keyIndex.substr(prefixEnd);
-          newResponse[newKeyIndex] = response[keyIndex];
-        }
-
-        callback(new LanguageModel(new MyCoReMap<string, string>(newResponse)));
-      },
-      error: function(request, status, exception) {
-        errorCallback(exception);
-        callback(new LanguageModel(new MyCoReMap<string, string>()));
-      }
-    };
-
-    jQuery.ajax(settings);
+          callback(new LanguageModel(new MyCoReMap<string, string>(newResponse)));
+        })).catch(error => {
+      errorCallback(error);
+      callback(new LanguageModel(new MyCoReMap<string, string>()));
+    });
   }
 
 }
