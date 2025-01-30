@@ -18,23 +18,23 @@
 
 import { PageView } from "./PageView";
 import { Viewport } from "./viewport/Viewport";
-import { Position2D, Rect, Size2D } from "../../Utils";
+import {offset, Position2D, Rect, Size2D} from "../../Utils";
 
 export class Overview extends PageView {
 
   constructor(private vp: Viewport, private _maxOverviewSize: Size2D = new Size2D(250, 250)) {
     super(true, false);
-    this.container.addClass("overview");
-    this.container.attr("style", "");
-    this.container.css("z-index", "6");
-    jQuery(this.markCanvas).detach();
+    this.container.classList.add("overview");
+    this.container.setAttribute("style", "");
+    this.container.style.zIndex = "6";
+    this.markCanvas.remove()
     //this.updateOverviewSize(_maxOverviewSize);
   }
 
   private updateOverviewSize(size: Size2D) {
     size = size.roundUp();
-    this.container[0].style.width = size.width + "px";
-    this.container[0].style.height = size.height + "px";
+    this.container.style.width = size.width + "px";
+    this.container.style.height = size.height + "px";
     if (this.drawCanvas.width != size.width || this.drawCanvas.height != size.height
       || this.markCanvas.width != size.width
       || this.markCanvas.height != size.height) {
@@ -98,10 +98,14 @@ export class Overview extends PageView {
   }
 
   public initEventHandler() {
-    const handler = (e: JQuery.MouseEventBase) => {
+    const handler = (e: MouseEvent) => {
       e.preventDefault();
-      const x = (e.clientX + window.pageXOffset) - jQuery(e.target).offset().left;
-      const y = (e.clientY + window.pageYOffset) - jQuery(e.target).offset().top;
+      if(!("classList" in e.target)) {
+        return;
+      }
+      const target = e.target as HTMLElement;
+      const x = (e.clientX + window.pageXOffset) - offset(target).left;
+      const y = (e.clientY + window.pageYOffset) - offset(target).top;
       const pos = new Position2D(x, y);
       const scaledPos = pos.scale(1 / this.overviewViewport.scale);
       const upperLeftVpPos = this.overviewViewport.asRectInArea().getPoints().upperLeft;
@@ -111,14 +115,14 @@ export class Overview extends PageView {
       e.stopImmediatePropagation();
     };
 
-    jQuery(this.drawCanvas).mousedown((e) => {
-      jQuery(this.drawCanvas).bind("mousemove", handler);
+    this.drawCanvas.addEventListener('mousedown', (e) => {
+      this.drawCanvas.addEventListener("mousemove", handler);
     });
-    jQuery(this.drawCanvas).mouseup((e) => {
-      jQuery(this.drawCanvas).unbind("mousemove", handler);
+    this.drawCanvas.addEventListener('mouseup', (e) => {
+      this.drawCanvas.removeEventListener("mousemove", handler);
     });
-    jQuery(this.drawCanvas).mouseout((e) => {
-      jQuery(this.drawCanvas).unbind("mousemove", handler);
+    this.drawCanvas.addEventListener('mouseout' ,(e) => {
+      this.drawCanvas.removeEventListener("mousemove", handler);
     });
 
   }

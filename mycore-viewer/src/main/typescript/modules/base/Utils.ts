@@ -553,7 +553,7 @@ export class Utils {
     return hash;
   }
 
-  public static stopPropagation = function(e: JQuery.MouseEventBase) {
+  public static stopPropagation = function(e: MouseEvent) {
     e.stopImmediatePropagation(); // this prevents the global mouse event handler (wich stops selection)
   };
 
@@ -877,8 +877,8 @@ export function viewerCrossBrowserWheel(element: HTMLElement, handler: (e: {
 }) => void) {
   let internHandler = (e: any) => {
     e.preventDefault();
-    let x = (e.clientX - jQuery(element).offset().left);
-    let y = (e.clientY - jQuery(element).offset().top);
+    let x = (e.clientX - offset(element).left);
+    let y = (e.clientY - offset(element).top);
 
 
     let pos = new Position2D(x, y).scale(window.devicePixelRatio);
@@ -1118,4 +1118,94 @@ export class Debounce<T> {
       this.handler(param);
     }, this.time);
   }
+}
+
+/**
+ * Replacement for jquery's $.width() function.
+ * @param element HTMLElement to get the width from
+ * @returns number width of the element
+ */
+export function getElementWidth(element:HTMLElement) {
+  if (!element) {
+    return 0;
+  }
+  const style = window.getComputedStyle(element, null);
+  return parseFloat(style.width.replace('px', ''));
+}
+
+/**
+ * Replacement for jquery's $.height() function.
+ * @param element HTMLElement to get the height from
+ * @returns number height of the element
+ */
+export function getElementHeight(element:HTMLElement) {
+    if (!element) {
+        return 0;
+    }
+    const style = window.getComputedStyle(element, null);
+    return parseFloat(style.height.replace('px', ''));
+}
+
+/**
+ * Replacement for jquery's $.outerWidth() function.
+ * @param element HTMLElement to get the outer width from
+ * @param includeMargin boolean to include the margin in the calculation
+ * @returns number outer width of the element
+ */
+export function getElementOuterWidth(element:HTMLElement, includeMargin?:boolean) {
+    if (!element) {
+        return 0;
+    }
+    if (includeMargin !== undefined) {
+        let width = element.offsetWidth;
+        const style = getComputedStyle(element);
+
+        width +=
+            parseInt(style.marginLeft, 10) +
+            parseInt(style.marginRight, 10);
+        return width;
+    }
+    return element.offsetWidth;
+}
+
+/**
+ * Replacement for jquery's $.outerHeight() function.
+ * @param element HTMLElement to get the outer height from
+ * @param includeMargin boolean to include the margin in the calculation
+ * @returns number outer height of the element
+ */
+export function getElementOuterHeight(element:HTMLElement, includeMargin?:boolean) {
+  if (!element) {
+    return 0;
+  }
+  if (includeMargin !== undefined) {
+    let height = element.offsetHeight;
+    const style = getComputedStyle(element);
+
+    height +=
+        parseInt(style.marginTop, 10) +
+        parseInt(style.marginBottom, 10);
+    return height;
+  }
+  return element.offsetHeight;
+}
+
+export function offset(element:HTMLElement) {
+  if (!element) {
+    return {
+      left: 0,
+      top: 0,
+    };
+  }
+  const box = element.getBoundingClientRect();
+  return {
+    top:
+        box.top +
+        window.pageYOffset -
+        document.documentElement.clientTop,
+    left:
+        box.left +
+        window.pageXOffset -
+        document.documentElement.clientLeft,
+  };
 }

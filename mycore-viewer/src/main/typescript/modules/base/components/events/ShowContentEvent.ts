@@ -22,7 +22,7 @@ import { ViewerComponent } from "../ViewerComponent";
 
 export class ShowContentEvent extends MyCoReImageViewerEvent {
 
-  constructor(component: ViewerComponent, public content: JQuery, public containerDirection: number, public size = 300, public text: JQuery = null) {
+  constructor(component: ViewerComponent, public content: HTMLElement|HTMLElement[]|null, public containerDirection: number, public size = 300, public text: HTMLElement = null) {
     super(component, ShowContentEvent.TYPE);
   }
 

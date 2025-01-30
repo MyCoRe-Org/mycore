@@ -23,7 +23,7 @@ export interface TextInputView {
 
   getValue(): string;
 
-  getElement(): JQuery;
+  getElement(): HTMLElement;
 
   onChange: () => void;
 }

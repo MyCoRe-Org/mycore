@@ -22,17 +22,17 @@ import { TextView } from "../../../../../base/widgets/toolbar/view/text/TextView
 export class BootstrapTextView implements TextView {
 
   constructor(private _id: string) {
-    this.element = jQuery("<p></p>");
-    this.element.addClass("navbar-text");
+    this.element = document.createElement("p");
+    this.element.classList.add("navbar-text");
   }
 
-  private element: JQuery;
+  private element: HTMLElement;
 
   updateText(text: string): void {
-    this.element.text(text);
+    this.element.innerText = text;
   }
 
-  getElement(): JQuery {
+  getElement(): HTMLElement {
     return this.element;
   }
 }

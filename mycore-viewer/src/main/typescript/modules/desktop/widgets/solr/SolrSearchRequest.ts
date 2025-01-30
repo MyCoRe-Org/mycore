@@ -29,7 +29,7 @@ export class SolrSearchRequest {
 
   public static BASE_TEMPLATE = "{solrHandlerURL}/{derivateID}?q={query}";
 
-  private request: JQueryXHR = null;
+  private request: Promise<any> = null;
 
   private _solrRequestResult: Array<HighlightPage> = null;
   private _isComplete: boolean = false;
@@ -58,7 +58,22 @@ export class SolrSearchRequest {
         this.requestCallback(false);
       }
     };
-    this.request = jQuery.ajax(<JQueryAjaxSettings>ajaxSettings);
+    this.request = fetch(requestURL).then(response => response.json());
+    let req = this.request;
+
+    this.request.catch((error) => {
+      if(this.request == req) {
+        console.error(error);
+        this.requestCallback(false);
+      }
+    });
+
+    this.request.then(response => {
+      if(this.request == req) {
+        this.processResponse(response);
+        this.requestCallback(true);
+      }
+    })
   }
 
   public abortRequest() {
@@ -74,7 +89,8 @@ export class SolrSearchRequest {
 
     this.requestCallback = () => {
     };
-    this.request.abort("request abort");
+
+    this.request = null;
   }
 
   private processResponse(response: Array<HighlightPage>) {
