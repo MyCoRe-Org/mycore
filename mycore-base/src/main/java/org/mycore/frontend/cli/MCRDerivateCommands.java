@@ -638,6 +638,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     @MCRCommand(syntax = "link derivate {0} to {1}",
         help = "links the given derivate {0} to the given mycore object {1}",
         order = 180)
+    @SuppressWarnings("PMD.UnusedAssignment")
     public static void linkDerivateToObject(String derivateId, String objectId) throws Exception {
         if (derivateId == null || objectId == null) {
             LOGGER.error("Either derivate id or object id is null. Derivate={}, object={}", derivateId, objectId);
