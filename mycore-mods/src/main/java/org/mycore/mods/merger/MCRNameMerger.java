@@ -192,10 +192,10 @@ public class MCRNameMerger extends MCRMerger {
     }
 
     private boolean haveContradictingNameIds(Map<String, Set<String>> a, Map<String, Set<String>> b) {
-        Set<String> intersection = null;
-        boolean foundContradictingNameIds = false;
+        boolean foundContradictingNameIds;
+        foundContradictingNameIds = false;
         for (String type : a.keySet()) {
-            intersection = new HashSet<>(a.get(type));
+            Set<String> intersection = new HashSet<>(a.get(type));
             if (b.get(type) != null) {
                 intersection.retainAll(b.get(type));
                 if (!intersection.isEmpty()) {
@@ -213,12 +213,7 @@ public class MCRNameMerger extends MCRMerger {
             String type = nameId.getAttributeValue("type");
             String id = nameId.getText();
 
-            Set<String> ids = null;
-            if (nameIds.containsKey(type)) {
-                ids = nameIds.get(type);
-            } else {
-                ids = new HashSet<>();
-            }
+            Set<String> ids = nameIds.containsKey(type) ? nameIds.get(type) : new HashSet<>();
             ids.add(id);
             nameIds.put(type, ids);
         }

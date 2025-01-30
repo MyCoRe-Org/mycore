@@ -58,8 +58,7 @@ public class MCRORCIDCommands {
         final List<MCRUser> users = MCRUserManager.listUsers(null, null, null, null, ORCID_TOKEN_ATTRIBUTE_NAME,
             null, 0, Integer.MAX_VALUE);
         for (MCRUser user : users) {
-            String orcid = null;
-            orcid = user.getUserAttribute(MCRORCIDUser.ATTR_ORCID_ID);
+            String orcid = user.getUserAttribute(MCRORCIDUser.ATTR_ORCID_ID);
             final String token = user.getUserAttribute(ORCID_TOKEN_ATTRIBUTE_NAME);
             if (orcid == null) {
                 LOGGER.info("Ignored {}, ORCiD attribute is missing.", user::getUserName);

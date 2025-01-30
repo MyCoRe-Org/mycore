@@ -131,8 +131,12 @@ public class MCRPathXML {
         //store current directory statistics
         addString(here, "directories", Integer.toString(directories.size()), false);
         addString(here, "files", Integer.toString(files.size()), false);
-        directories = mapItemsToElementAndType(nodes, "directory");
-        files = mapItemsToElementAndType(nodes, "file");
+        
+        //maybe remove with MCR-3323
+        //directories = mapItemsToElementAndType(nodes, "directory");
+        //files = mapItemsToElementAndType(nodes, "file");
+        mapItemsToElementAndType(nodes, "directory");
+        mapItemsToElementAndType(nodes, "file");
 
         LOGGER.debug("MCRDirectoryXML: end listing of directory {}", path);
 
@@ -140,6 +144,7 @@ public class MCRPathXML {
 
     }
 
+    //MCR-3323 - this method does nothing and can be removed?
     private static SortedMap<MCRPath, MCRFileAttributes<?>> mapItemsToElementAndType(Element nodes, String type)
         throws IOException {
         SortedMap<MCRPath, MCRFileAttributes<?>> itemMap = new TreeMap<>();

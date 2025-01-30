@@ -50,7 +50,7 @@ public class MCRUserResolver implements URIResolver {
     public Source resolve(String href, String base) throws TransformerException {
         String[] hrefParts = href.split(":");
         String userID = hrefParts[1];
-        MCRUser user = null;
+        MCRUser user;
         try {
             if (Objects.equals(userID, "current")) {
                 user = MCRUserManager.getCurrentUser();

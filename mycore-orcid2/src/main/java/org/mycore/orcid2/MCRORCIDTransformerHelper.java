@@ -44,15 +44,15 @@ public class MCRORCIDTransformerHelper {
      * @throws MCRORCIDTransformationException if transformation fails
      */
     public static Element transformBibTeXToMODS(String bibTeX) {
-        Element modsCollection = null;
         try {
-            modsCollection = T_BIBTEX2MODS.transform(new MCRStringContent(bibTeX)).asXML().getRootElement();
+            Element modsCollection = T_BIBTEX2MODS.transform(new MCRStringContent(bibTeX)).asXML().getRootElement();
+            Element mods = modsCollection.getChild("mods", MCRConstants.MODS_NAMESPACE);
+            // Remove mods:extension containing the original BibTeX:
+            mods.removeChildren("extension", MCRConstants.MODS_NAMESPACE);
+            return mods;
+
         } catch (IOException | JDOMException e) {
             throw new MCRORCIDTransformationException("BibTeX to mods transformation failed", e);
         }
-        final Element mods = modsCollection.getChild("mods", MCRConstants.MODS_NAMESPACE);
-        // Remove mods:extension containing the original BibTeX:
-        mods.removeChildren("extension", MCRConstants.MODS_NAMESPACE);
-        return mods;
     }
 }

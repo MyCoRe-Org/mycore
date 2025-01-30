@@ -84,13 +84,11 @@ public class MCRImageThumbnailGenerator implements MCRThumbnailGenerator {
     }
 
     private MCRTiledPictureProps getIviewFileProps(Path tiledFile) throws IOException {
-        MCRTiledPictureProps tiledPictureProps = null;
         try (FileSystem fileSystem = MCRIView2Tools.getFileSystem(tiledFile)) {
-            tiledPictureProps = MCRTiledPictureProps.getInstanceFromDirectory(fileSystem.getPath("/"));
+            return MCRTiledPictureProps.getInstanceFromDirectory(fileSystem.getPath("/"));
         } catch (IOException e) {
             throw new IOException("Could not provide image information!", e);
         }
-        return tiledPictureProps;
     }
 
     private BufferedImage getTargetImage(int width, int height, BufferedImage firstTile) {

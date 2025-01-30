@@ -345,7 +345,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
             MCROCFLRepositoryProvider.class, "MCR.OCFL.Repository." + repositoryKey);
 
         OcflExtensionConfig config = oclfRepoProvider.getExtensionConfig();
-        Path basePath = null;
+        Path basePath;
 
         // optimization for known layouts
         if (Objects.equals(config.getExtensionName(), MCRStorageLayoutExtension.EXTENSION_NAME)) {

@@ -207,12 +207,9 @@ public class MCRRoleManager {
      * It will create any category if necessary.
      */
     public static void addRole(MCRRole role) {
-        MCRCategoryID categoryID = null;
-        if (role.isSystemRole()) {
-            categoryID = new MCRCategoryID(MCRUser2Constants.ROLE_CLASSID.getRootID(), role.getName());
-        } else {
-            categoryID = MCRCategoryID.fromString(role.getName());
-        }
+        MCRCategoryID categoryID = role.isSystemRole()
+        		? new MCRCategoryID(MCRUser2Constants.ROLE_CLASSID.getRootID(), role.getName())
+        		: MCRCategoryID.fromString(role.getName());
         if (DAO.exist(categoryID)) {
             return;
         }
@@ -243,12 +240,9 @@ public class MCRRoleManager {
             //unknown role
             return;
         }
-        MCRCategoryID categoryID = null;
-        if (role.isSystemRole()) {
-            categoryID = new MCRCategoryID(MCRUser2Constants.ROLE_CLASSID.getRootID(), role.getName());
-        } else {
-            categoryID = MCRCategoryID.fromString(role.getName());
-        }
+        MCRCategoryID categoryID = role.isSystemRole()
+        		? new MCRCategoryID(MCRUser2Constants.ROLE_CLASSID.getRootID(), role.getName())
+        		: MCRCategoryID.fromString(role.getName());
         DAO.deleteCategory(categoryID);
     }
 

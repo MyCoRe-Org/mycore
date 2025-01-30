@@ -63,20 +63,17 @@ public class MCRIView2XSLFunctions {
      *         null if there are no derivates related to the given mcrid
      */
     public static String getSupportedMainFileByOwner(String mcrID) {
-        MCRObjectID objectID = null;
-
         try {
-            objectID = MCRObjectID.getInstance(mcrID);
+            MCRObjectID objectID = MCRObjectID.getInstance(mcrID);
+            MCRObject obj = MCRMetadataManager.retrieveMCRObject(objectID);
+            List<MCRMetaEnrichedLinkID> derivates = obj.getStructure().getDerivates();
+            if (!derivates.isEmpty()) {
+                return derivates.getFirst() + "/" + ADAPTER.getSupportedMainFile(derivates.getFirst().toString());
+            }
+            return null;
         } catch (Exception e) {
             return null;
         }
-
-        MCRObject obj = MCRMetadataManager.retrieveMCRObject(objectID);
-        List<MCRMetaEnrichedLinkID> derivates = obj.getStructure().getDerivates();
-        if (!derivates.isEmpty()) {
-            return derivates.getFirst() + "/" + ADAPTER.getSupportedMainFile(derivates.getFirst().toString());
-        }
-        return null;
     }
 
     public static String getThumbnailURL(String derivate, String imagePath) {

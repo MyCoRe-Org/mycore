@@ -324,14 +324,13 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      *            the calendar as String, one of CALENDARS.
      */
     public final void setBisDate(String date, String calendar) {
-        Calendar c = bis;
         try {
-            c = MCRCalendar.getHistoryDateAsCalendar(date, true, calendar);
+            Calendar c = MCRCalendar.getHistoryDateAsCalendar(date, true, calendar);
+            setBisDate(c);
         } catch (Exception e) {
             LOGGER.warn("The bis date {} for calendar {} is false.", date, calendar);
-            c = null;
+            setBisDate(null);
         }
-        setBisDate(c);
     }
 
     /**
