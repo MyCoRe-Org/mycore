@@ -106,7 +106,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
     public static void login(String user) {
         char[] password;
         do {
-        	password = System.console().readPassword("{0} Enter password for user {1} :> ", SYSTEM, user);
+            password = System.console().readPassword("{0} Enter password for user {1} :> ", SYSTEM, user);
         } while (password.length == 0);
 
         changeToUser(user, String.valueOf(password));

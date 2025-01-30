@@ -637,7 +637,7 @@ public final class MCRURIResolver implements URIResolver {
             LogManager.getLogger(this.getClass()).debug("Loading Class: {}", classname);
             URIResolver resolver;
             try {
-            	Class<? extends URIResolver> cl = MCRClassTools.forName(classname);
+                Class<? extends URIResolver> cl = MCRClassTools.forName(classname);
                 resolver = cl.getDeclaredConstructor().newInstance();
             } catch (Exception e) {
                 throw new TransformerException(e);

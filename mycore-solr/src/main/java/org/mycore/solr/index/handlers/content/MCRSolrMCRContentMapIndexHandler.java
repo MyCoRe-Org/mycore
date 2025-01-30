@@ -104,7 +104,7 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
 
             for (MCRSolrCore destinationCore : getDestinationCores()) {
                 try {
-                	UpdateResponse updateResponse = req.process(destinationCore.getClient());
+                    UpdateResponse updateResponse = req.process(destinationCore.getClient());
                     if (updateResponse != null && updateResponse.getStatus() != 0) {
                         LOGGER.error("Error while indexing document collection. Split and retry: {}",
                             updateResponse::getResponse);
