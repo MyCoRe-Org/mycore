@@ -77,11 +77,7 @@ export class AccessKeyService {
   ): Promise<AccessKeyInformation> {
     return extractResponse(
       await this.axiosInstance.get<AccessKeyDto[]>(API_URL, {
-        params: {
-          reference,
-          offset,
-          limit,
-        },
+        params: { reference, offset, limit },
       })
     );
   }

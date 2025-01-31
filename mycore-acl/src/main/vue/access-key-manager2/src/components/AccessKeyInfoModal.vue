@@ -93,7 +93,6 @@
   </div>
 </template>
 
-<!-- TODO fix delete date issue in endpoint -->
 <script setup lang="ts">
 import { ref, onErrorCaptured, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
