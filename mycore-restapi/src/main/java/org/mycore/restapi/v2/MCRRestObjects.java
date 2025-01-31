@@ -34,6 +34,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -274,9 +275,13 @@ public class MCRRestObjects {
         @QueryParam(PARAM_CREATED_BY) String createdBy,
         @QueryParam(PARAM_MODIFIED_BY) String modifiedBy,
         @QueryParam(PARAM_DELETED_BY) String deletedBy,
-        @QueryParam(PARAM_SORT_BY) @DefaultValue("id") MCRObjectQuery.SortBy sortBy,
-        @QueryParam(PARAM_SORT_ORDER) @DefaultValue("asc") MCRObjectQuery.SortOrder sortOrder,
+        @QueryParam(PARAM_SORT_BY) @DefaultValue("ID") String sortByString,
+        @QueryParam(PARAM_SORT_ORDER) @DefaultValue("ASC") String sortOrderString,
         @QueryParam(PARAM_CATEGORIES) List<String> categories) {
+
+        final MCRObjectQuery.SortBy sortBy = MCRObjectQuery.SortBy.valueOf(sortByString.toUpperCase(Locale.ROOT));
+        final MCRObjectQuery.SortOrder sortOrder
+            = MCRObjectQuery.SortOrder.valueOf(sortOrderString.toUpperCase(Locale.ROOT));
 
         MCRObjectQuery query = new MCRObjectQuery();
         int limitInt = Optional.ofNullable(limit)
