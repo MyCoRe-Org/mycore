@@ -153,7 +153,7 @@ public class ToolBarController extends WebDriverController {
         By selector = By.cssSelector(SELECTBOX_SELECTOR);
         WebElement element = this.getDriver().findElement(selector);
         Select select = new Select(element);
-        return select != null && select.getFirstSelectedOption() != null
+        return select.getFirstSelectedOption() != null
             && select.getFirstSelectedOption().getText().equalsIgnoreCase(oderLabel);
     }
 

@@ -116,8 +116,14 @@ export class MyCoReToolbarComponent extends ViewerComponent {
         const icEvent: ImageChangedEvent = e as ImageChangedEvent;
         if (icEvent.image != null) {
           if (!this._settings.mobile) {
-            const select = this._toolbarController.getView("PageSelect").getElement() as HTMLSelectElement;
-            select.value = icEvent.image.id;
+            const select = (this._toolbarController.getView("PageSelect").getElement() as any)[0] as HTMLSelectElement;
+            if(select != null) {
+              let newIndex = Array.from(select.options)
+                  .findIndex((option) => option.value == icEvent.image.id);
+              if(newIndex != -1) {
+                select.selectedIndex = newIndex;
+              }
+            }
           }
         }
         return;
