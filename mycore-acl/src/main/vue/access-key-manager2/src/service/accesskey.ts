@@ -37,6 +37,7 @@ const extractResponse = (response: AxiosResponse): AccessKeyInformation => {
 
 const API_URL = 'api/v2/access-keys/';
 
+// TODO switch to fetch
 export class AccessKeyService {
   private axiosInstance: AxiosInstance;
 
