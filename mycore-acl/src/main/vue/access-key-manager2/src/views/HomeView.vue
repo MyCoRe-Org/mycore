@@ -41,7 +41,7 @@
     <div class="row pb-2">
       <div class="col-12">
         <div class="text-right">
-          <button class="btn btn-primary" @click="open(CREATE_MODAL_ID)">
+          <button class="btn btn-primary" @click="createModalRef?.open">
             <i class="fa fa-plus" />
             {{ t(getI18nKey('button.showCreateAccessKeyModal')) }}
           </button>
@@ -69,23 +69,22 @@
       </div>
     </div>
     <CreateAccessKeyModal
+      ref="createModalRef"
       :access-key-service="accessKeyService"
       :reference="reference"
       :available-permissions="availablePermissions"
-      :is-visible="isVisible(CREATE_MODAL_ID)"
-      @close="close(CREATE_MODAL_ID)"
       @add-access-key="addAccessKey"
     />
     <AccessKeyInfoModal
+      ref="infoModalRef"
       :access-key-service="accessKeyService"
       :available-permissions="availablePermissions"
       :reference="reference"
-      :is-visible="isVisible(INFO_MODAL_ID)"
       :access-key="state.currentAccessKey"
       @update-access-key="updateAccessKey"
-      @close="closeAccessKeyInfoModal"
     />
   </div>
+  <ConfirmModal ref="confirmModal" />
 </template>
 
 <script setup lang="ts">
@@ -106,12 +105,12 @@ import {
   AuthStrategy,
 } from '@/service/accesskey';
 import { Config } from '@/common/config';
-import { useModal } from '@/composables/modal';
 import LoadingOverlay from '@/components/LoadingOverlay.vue';
 import AccessKeyTable from '@/components/AccessKeyTable.vue';
 import CreateAccessKeyModal from '@/components/CreateAccessKeyModal.vue';
 import AccessKeyInfoModal from '@/components/AccessKeyInfoModal.vue';
 import Pagination from '@/components/SimplePagination.vue';
+import ConfirmModal from '@/components/form/ConfirmModal.vue';
 
 class DevAuthStrategy implements AuthStrategy {
   public getHeaders(): Record<string, string> {
@@ -121,10 +120,15 @@ class DevAuthStrategy implements AuthStrategy {
   }
 }
 
+const infoModalRef = ref<{ open: () => void } | null>(null);
+const createModalRef = ref<{ open: () => void } | null>(null);
+const confirmModal = ref<{
+  open: (title: string, message: string, callback?: () => void) => void;
+} | null>(null);
+
 const router = useRouter();
 const route = useRoute();
 const { t } = useI18n();
-const { open, close, isVisible } = useModal();
 
 const getActivationLink = (secret: string): string =>
   t(getI18nKey('success.add.url.format'), {
@@ -140,9 +144,6 @@ const availablePermissionsQuery = route.query.availablePermissions as
 const availablePermissions = availablePermissionsQuery
   ? availablePermissionsQuery.split(',')
   : [];
-
-const CREATE_MODAL_ID = 'createModal';
-const INFO_MODAL_ID = 'infoModal';
 
 const state = reactive({
   loading: false,
@@ -182,11 +183,7 @@ const fetchAccessKeys = async (): Promise<void> => {
 };
 const openAccessKeyInfoModal = (index: number): void => {
   state.currentAccessKey = paginatedAccessKeys.value[index];
-  open(INFO_MODAL_ID);
-};
-const closeAccessKeyInfoModal = (): void => {
-  close(INFO_MODAL_ID);
-  state.currentAccessKey = undefined;
+  infoModalRef.value?.open();
 };
 const handleError = (error: unknown): void => {
   state.errorMessage =
@@ -210,20 +207,27 @@ const changePage = async (page: number): Promise<void> => {
     },
   });
 };
-const deleteAccessKey = async (accessKeyId: string): Promise<void> => {
+const deleteAccessKey = async (accessKey: AccessKeyDto): Promise<void> => {
   resetInfos();
-  if (accessKeyService.value) {
+  const title = t('component.acl.accesskey.frontend.confirmRemove.title');
+  const message = t('component.acl.accesskey.frontend.confirmRemove.text', {
+    secret:
+      accessKey.id.length > 30
+        ? `${accessKey.id.slice(0, 27)}...`
+        : accessKey.secret,
+  });
+  confirmModal.value?.open(title, message, async () => {
     state.loading = true;
     try {
-      await accessKeyService.value.deleteAccessKey(accessKeyId);
+      await accessKeyService.value?.deleteAccessKey(accessKey.id);
       state.accessKeys = state.accessKeys.filter(
-        (a: AccessKeyDto) => a.id !== accessKeyId
+        (a: AccessKeyDto) => a.id !== accessKey.id
       );
       state.totalCount -= 1;
     } finally {
       state.loading = false;
     }
-  }
+  });
 };
 const updateAccessKey = (accessKey: AccessKeyDto): void => {
   const index = state.accessKeys.findIndex(

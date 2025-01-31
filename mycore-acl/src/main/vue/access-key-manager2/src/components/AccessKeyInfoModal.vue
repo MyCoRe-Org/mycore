@@ -1,96 +1,105 @@
 <template>
-  <BaseModal
-    v-if="accessKey"
-    :is-visible="isVisible"
-    :title="t(getI18nKey('title.viewAccessKey'))"
-    ok-only
-    scrollable
-    :busy="isBusy"
-    @close="close"
-  >
-    <div
-      v-if="errorMessage"
-      class="alert alert-danger text-center"
-      role="alert"
-      aria-live="assertive"
-    >
-      {{ $t(errorMessage) }}
-    </div>
-    <form>
-      <TextInputFormField
-        v-model="form.reference"
-        input-id="inputReference"
-        :disabled="reference !== undefined"
-        :label="t(getI18nKey('label.reference'))"
-      />
-
-      <div class="form-row">
-        <SelectFormField
-          v-if="availablePermissions.length > 0"
-          v-model="form.type"
-          class="col-md-6"
-          input-id="inputPermission"
-          :label="t(getI18nKey('label.permission'))"
-        >
-          <option
-            v-for="permissionValue in availablePermissions"
-            :key="permissionValue"
-            :value="permissionValue"
+  <div ref="infoModalElement" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            {{ t(getI18nKey('title.viewAccessKey')) }}
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div
+            v-if="errorMessage"
+            class="alert alert-danger text-center"
+            role="alert"
+            aria-live="assertive"
           >
-            {{ t(getI18nKey(`label.permission.${permissionValue}`)) }}
-          </option>
-        </SelectFormField>
-        <TextInputFormField
-          v-else
-          v-model="form.type"
-          class="col-md-6"
-          input-id="inputPermission"
-          :label="t(getI18nKey('label.permission'))"
-        />
-        <DateInputFormField
-          v-model="form.expiration"
-          class="col-md-6"
-          input-id="expirationInput"
-          :label="t(getI18nKey('label.expiration'))"
-        />
+            {{ $t(errorMessage) }}
+          </div>
+          <form>
+            <TextInputFormField
+              v-model="form.reference"
+              input-id="inputReference"
+              :disabled="reference !== undefined"
+              :label="t(getI18nKey('label.reference'))"
+            />
+
+            <div class="form-row">
+              <SelectFormField
+                v-if="availablePermissions.length > 0"
+                v-model="form.type"
+                class="col-md-6"
+                input-id="inputPermission"
+                :label="t(getI18nKey('label.permission'))"
+              >
+                <option
+                  v-for="permissionValue in availablePermissions"
+                  :key="permissionValue"
+                  :value="permissionValue"
+                >
+                  {{ t(getI18nKey(`label.permission.${permissionValue}`)) }}
+                </option>
+              </SelectFormField>
+              <TextInputFormField
+                v-else
+                v-model="form.type"
+                class="col-md-6"
+                input-id="inputPermission"
+                :label="t(getI18nKey('label.permission'))"
+              />
+              <DateInputFormField
+                v-model="form.expiration"
+                class="col-md-6"
+                input-id="expirationInput"
+                :label="t(getI18nKey('label.expiration'))"
+              />
+            </div>
+            <CheckboxInputFormField
+              v-model="form.isActive"
+              :label="t(getI18nKey('label.active'))"
+              input-id="inputActive"
+            />
+            <TextareaFormField
+              v-model="form.comment"
+              input-id="commentTextarea"
+              rows="3"
+              :label="t(getI18nKey('label.comment'))"
+            />
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-primary"
+            :disabled="isBusy || v.$invalid"
+            @click="updateAccessKey"
+          >
+            <span
+              v-if="isBusy"
+              class="spinner-border spinner-border-sm"
+              role="status"
+              aria-hidden="true"
+            />
+            {{ t(getI18nKey('button.updateAccessKey')) }}
+          </button>
+        </div>
       </div>
-      <CheckboxInputFormField
-        v-model="form.isActive"
-        :label="t(getI18nKey('label.active'))"
-        input-id="inputActive"
-      />
-      <TextareaFormField
-        v-model="form.comment"
-        input-id="commentTextarea"
-        rows="3"
-        :label="t(getI18nKey('label.comment'))"
-      />
-    </form>
-    <template #footer>
-      <button
-        type="button"
-        class="btn btn-primary"
-        :disabled="isBusy || v.$invalid"
-        @click="updateAccessKey"
-      >
-        <span
-          v-if="isBusy"
-          class="spinner-border spinner-border-sm"
-          role="status"
-          aria-hidden="true"
-        />
-        {{ t(getI18nKey('button.updateAccessKey')) }}
-      </button>
-    </template>
-  </BaseModal>
+    </div>
+  </div>
 </template>
 
 <!-- TODO fix delete date issue in endpoint -->
 <script setup lang="ts">
-import { ref, onErrorCaptured, watch } from 'vue';
+import { ref, onErrorCaptured, watch, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { required } from '@vuelidate/validators';
 import useVuelidate from '@vuelidate/core';
+import { Modal } from 'bootstrap';
 import { AccessKeyDto, PartialUpdateAccessKeyDto } from '@/dtos/accesskey';
 import { AccessKeyService } from '@/service/accesskey';
 import {
@@ -98,7 +107,6 @@ import {
   getI18nKey,
   getUnixTimestampString,
 } from '@/common/utils';
-import BaseModal from '@/components/BaseModal.vue';
 import TextInputFormField from './form/TextInputFormField.vue';
 import DateInputFormField from './form/DateInputFormField.vue';
 import CheckboxInputFormField from './form/CheckboxInputFormField.vue';
@@ -117,7 +125,6 @@ const { t } = useI18n();
 
 const props = defineProps<{
   accessKeyService?: AccessKeyService;
-  isVisible: boolean;
   availablePermissions: string[];
   reference?: string;
   accessKey?: AccessKeyDto;
@@ -127,6 +134,9 @@ const emit = defineEmits<{
   (event: 'update-access-key', accessKey: AccessKeyDto): void;
   (event: 'close'): void;
 }>();
+
+const infoModalElement = ref<HTMLDivElement | null>(null);
+let modalInstance: Modal | null = null;
 
 const errorMessage = ref<string | undefined>(undefined);
 const isBusy = ref<boolean>(false);
@@ -164,11 +174,6 @@ watch(
 const handleError = (error: unknown): void => {
   errorMessage.value =
     error instanceof Error ? error.message : t(getI18nKey('error.fatal'));
-};
-const close = (force?: boolean): void => {
-  if (force || !isBusy.value) {
-    emit('close');
-  }
 };
 const buildAccessKeyPayload = (): PartialUpdateAccessKeyDto => {
   const accessKey: PartialUpdateAccessKeyDto = {};
@@ -219,8 +224,22 @@ const updateAccessKey = async (): Promise<void> => {
     }
   }
 };
+onMounted(() => {
+  if (infoModalElement.value) {
+    modalInstance = new Modal(infoModalElement.value, { backdrop: true });
+  }
+});
 onErrorCaptured((err): boolean => {
   handleError(err);
   return false;
 });
+const open = () => {
+  modalInstance?.show();
+};
+const close = (force: boolean) => {
+  if (force || !isBusy.value) {
+    modalInstance?.hide();
+  }
+};
+defineExpose({ open, close });
 </script>

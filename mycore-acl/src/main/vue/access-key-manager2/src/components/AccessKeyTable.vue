@@ -42,25 +42,22 @@
       </tr>
     </tbody>
   </table>
-  <ConfirmModal ref="confirmModal" />
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { AccessKeyDto } from '@/dtos/accesskey';
 import { getI18nKey, convertUnixToISO } from '@/common/utils';
-import ConfirmModal from '@/components/ConfirmModal.vue';
 
 const { t } = useI18n();
-const confirmModal = ref();
 
 defineProps<{
   accessKeys: AccessKeyDto[];
 }>();
 
 const emit = defineEmits<{
-  (event: 'remove-access-key', accessKey: string): void;
+  (event: 'remove-access-key', accessKey: AccessKeyDto): void;
   (event: 'view-access-key', index: number): void;
 }>();
 
@@ -76,25 +73,9 @@ const columnLabels = computed(() => ({
 const getExpirationDisplay = (expiration?: number | null): string => {
   return expiration ? convertUnixToISO(expiration) : '-';
 };
-const openDeleteConfirmationModal = async (
-  accessKey: AccessKeyDto
-): Promise<boolean> => {
-  const secretPreview =
-    accessKey.id.length > 30
-      ? `${accessKey.id.slice(0, 27)}...`
-      : accessKey.secret;
-  return await confirmModal.value.show({
-    title: t('component.acl.accesskey.frontend.confirmRemove.title'),
-    message: t('component.acl.accesskey.frontend.confirmRemove.text', {
-      secret: secretPreview,
-    }),
-  });
-};
+
 const removeAccessKey = async (accessKey: AccessKeyDto): Promise<void> => {
-  const confirmed = await openDeleteConfirmationModal(accessKey);
-  if (confirmed) {
-    emit('remove-access-key', accessKey.id);
-  }
+  emit('remove-access-key', accessKey);
 };
 const viewAccessKey = (index: number): void => {
   emit('view-access-key', index);
