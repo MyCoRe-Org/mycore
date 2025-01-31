@@ -1,7 +1,7 @@
 {
   "name": "access-key-manager2",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,14 +11,13 @@
   "dependencies": {
     "@vuelidate/core": "^2.0.3",
     "@vuelidate/validators": "^2.0.4",
-    "add": "^2.0.6",
     "axios": "^1.7.9",
     "vue": "^3.5.13",
     "vue-i18n": "^11.0.1",
-    "vue-router": "^4.5.0",
-    "yarn": "^1.22.22"
+    "vue-router": "^4.5.0"
   },
   "devDependencies": {
+    "@popperjs/core": "^2.11.8",
     "@types/bootstrap": "^5.2.10",
     "@types/node": "^22.10.9",
     "@vitejs/plugin-vue": "^5.2.1",
@@ -29,8 +28,6 @@
     "eslint-plugin-prettier": "^5.2.3",
     "eslint-plugin-vue": "^9.32.0",
     "font-awesome": "^4.7.0",
-    "jquery": "1.9.1",
-    "popper.js": "^1.16.1",
     "prettier": "^3.4.2",
     "pug": "^3.0.3",
     "typescript": "^5.7.3",

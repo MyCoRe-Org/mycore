@@ -95,7 +95,7 @@
 
 <!-- TODO fix delete date issue in endpoint -->
 <script setup lang="ts">
-import { ref, onErrorCaptured, watch, onMounted } from 'vue';
+import { ref, onErrorCaptured, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { required } from '@vuelidate/validators';
 import useVuelidate from '@vuelidate/core';
@@ -127,7 +127,6 @@ const props = defineProps<{
   accessKeyService?: AccessKeyService;
   availablePermissions: string[];
   reference?: string;
-  accessKey?: AccessKeyDto;
 }>();
 
 const emit = defineEmits<{
@@ -137,6 +136,7 @@ const emit = defineEmits<{
 
 const infoModalElement = ref<HTMLDivElement | null>(null);
 let modalInstance: Modal | null = null;
+const accessKey = ref<AccessKeyDto>();
 
 const errorMessage = ref<string | undefined>(undefined);
 const isBusy = ref<boolean>(false);
@@ -154,63 +154,46 @@ const rules = {
 };
 
 const v = useVuelidate(rules, form);
-watch(
-  () => props.accessKey,
-  (newAccessKey: AccessKeyDto | undefined) => {
-    if (newAccessKey) {
-      form.value = {
-        reference: newAccessKey.reference,
-        type: newAccessKey.type,
-        expiration: newAccessKey.expiration
-          ? convertUnixToISO(newAccessKey.expiration)
-          : null,
-        comment: newAccessKey.comment,
-        isActive: newAccessKey.isActive,
-      };
-    }
-  },
-  { deep: true }
-);
 const handleError = (error: unknown): void => {
   errorMessage.value =
     error instanceof Error ? error.message : t(getI18nKey('error.fatal'));
 };
 const buildAccessKeyPayload = (): PartialUpdateAccessKeyDto => {
-  const accessKey: PartialUpdateAccessKeyDto = {};
-  if (form.value.reference !== props.accessKey?.reference) {
-    accessKey.reference = form.value.reference;
+  const updatedAccessKey: PartialUpdateAccessKeyDto = {};
+  if (form.value.reference !== accessKey.value?.reference) {
+    updatedAccessKey.reference = form.value.reference;
   }
-  if (form.value.comment !== props.accessKey?.comment) {
-    accessKey.comment = form.value.comment;
+  if (form.value.comment !== accessKey.value?.comment) {
+    updatedAccessKey.comment = form.value.comment;
   }
-  if (form.value.type !== props.accessKey?.type) {
-    accessKey.type = form.value.type;
+  if (form.value.type !== accessKey.value?.type) {
+    updatedAccessKey.type = form.value.type;
   }
   const expiration = form.value.expiration
     ? getUnixTimestampString(form.value.expiration)
     : null;
-  console.log(props.accessKey?.expiration, expiration);
-  if (expiration !== props.accessKey?.expiration) {
-    accessKey.expiration = expiration;
+  if (expiration !== accessKey.value?.expiration) {
+    updatedAccessKey.expiration = expiration;
   }
-  if (form.value.isActive !== props.accessKey?.isActive) {
-    accessKey.isActive = form.value.isActive;
+  if (form.value.isActive !== accessKey.value?.isActive) {
+    updatedAccessKey.isActive = form.value.isActive;
   }
-  return accessKey;
+  return updatedAccessKey;
 };
 const updateAccessKey = async (): Promise<void> => {
-  if (props.accessKeyService && !isBusy.value) {
+  if (props.accessKeyService && !isBusy.value && accessKey.value) {
     isBusy.value = true;
     v.value.$validate();
-    if (!v.value.$invalid && props.accessKey && props.accessKey.id) {
-      const accessKey: PartialUpdateAccessKeyDto = buildAccessKeyPayload();
+    if (!v.value.$invalid && accessKey.value && accessKey.value.id) {
+      const partialUpdatedAccessKey: PartialUpdateAccessKeyDto =
+        buildAccessKeyPayload();
       try {
         await props.accessKeyService.patchAccessKey(
-          props.accessKey.id,
-          accessKey
+          accessKey.value.id,
+          partialUpdatedAccessKey
         );
         const updatedAccessKey = await props.accessKeyService.getAccessKey(
-          props.accessKey.id
+          accessKey.value.id
         );
         emit('update-access-key', updatedAccessKey);
         close(true);
@@ -233,7 +216,15 @@ onErrorCaptured((err): boolean => {
   handleError(err);
   return false;
 });
-const open = () => {
+const open = (a: AccessKeyDto) => {
+  accessKey.value = a;
+  form.value = {
+    reference: a.reference,
+    type: a.type,
+    expiration: a.expiration ? convertUnixToISO(a.expiration) : null,
+    comment: a.comment,
+    isActive: a.isActive,
+  };
   modalInstance?.show();
 };
 const close = (force: boolean) => {

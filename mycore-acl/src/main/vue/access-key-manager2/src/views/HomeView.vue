@@ -80,7 +80,6 @@
       :access-key-service="accessKeyService"
       :available-permissions="availablePermissions"
       :reference="reference"
-      :access-key="state.currentAccessKey"
       @update-access-key="updateAccessKey"
     />
   </div>
@@ -110,7 +109,7 @@ import AccessKeyTable from '@/components/AccessKeyTable.vue';
 import CreateAccessKeyModal from '@/components/CreateAccessKeyModal.vue';
 import AccessKeyInfoModal from '@/components/AccessKeyInfoModal.vue';
 import Pagination from '@/components/SimplePagination.vue';
-import ConfirmModal from '@/components/form/ConfirmModal.vue';
+import ConfirmModal from '@/components/ConfirmModal.vue';
 
 class DevAuthStrategy implements AuthStrategy {
   public getHeaders(): Record<string, string> {
@@ -120,7 +119,9 @@ class DevAuthStrategy implements AuthStrategy {
   }
 }
 
-const infoModalRef = ref<{ open: () => void } | null>(null);
+const infoModalRef = ref<{ open: (accessKey: AccessKeyDto) => void } | null>(
+  null
+);
 const createModalRef = ref<{ open: () => void } | null>(null);
 const confirmModal = ref<{
   open: (title: string, message: string, callback?: () => void) => void;
@@ -154,7 +155,6 @@ const state = reactive({
   errorMessage: undefined as string | undefined,
   accessKeyCreatedSecret: undefined as string | undefined,
   accessKeyCreated: undefined as AccessKeyDto | undefined,
-  currentAccessKey: undefined as AccessKeyDto | undefined,
 });
 const accessKeyService = ref<AccessKeyService>();
 const config = ref<Config>();
@@ -182,8 +182,7 @@ const fetchAccessKeys = async (): Promise<void> => {
   }
 };
 const openAccessKeyInfoModal = (index: number): void => {
-  state.currentAccessKey = paginatedAccessKeys.value[index];
-  infoModalRef.value?.open();
+  infoModalRef.value?.open(paginatedAccessKeys.value[index]);
 };
 const handleError = (error: unknown): void => {
   state.errorMessage =

@@ -10,8 +10,12 @@
           <p>{{ message }}</p>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-secondary" @click="close">Abbrechen</button>
-          <button class="btn btn-primary" @click="confirm">Bestätigen</button>
+          <button class="btn btn-secondary" @click="close">
+            {{ t(getI18nKey('button.cancel')) }}
+          </button>
+          <button class="btn btn-primary" @click="confirm">
+            {{ t(getI18nKey('button.ok')) }}
+          </button>
         </div>
       </div>
     </div>
@@ -20,7 +24,11 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { Modal } from 'bootstrap';
+import { getI18nKey } from '@/common/utils';
+
+const { t } = useI18n();
 
 const title = ref<string>('');
 const message = ref<string>('');
