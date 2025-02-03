@@ -19,8 +19,31 @@
 package org.mycore.restapi.converter;
 
 public enum MCRDetailLevel {
-    SUMMARY, NORMAL, DETAILED;
+    SUMMARY("summary"), NORMAL("normal"), DETAILED("detailed");
 
     public static final String MEDIA_TYPE_PARAMETER = "detail";
 
+    private final String value;
+
+    MCRDetailLevel(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return value;
+    }
+
+    public static MCRDetailLevel fromString(String value) {
+        for (MCRDetailLevel level : values()) {
+            if (level.getValue().equals(value)) {
+                return level;
+            }
+        }
+        throw new IllegalArgumentException("No constant with value " + value + " found");
+    }
 }

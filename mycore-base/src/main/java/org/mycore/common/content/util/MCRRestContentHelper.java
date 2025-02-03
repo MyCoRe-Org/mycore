@@ -102,7 +102,7 @@ public final class MCRRestContentHelper {
         String filename = Optional.of(content.getName())
             .orElseGet(() -> Iterables.getLast(uriInfo.getPathSegments()).getPath());
         response.header(HttpHeaders.CONTENT_DISPOSITION,
-            config.dispositionType.name() + ";filename=\"" + filename + "\"");
+            config.dispositionType.getValue() + ";filename=\"" + filename + "\"");
 
         boolean noRangeRequest = ranges == null || ranges.equals(ContentUtils.FULL);
         if (noRangeRequest) {
@@ -201,7 +201,17 @@ public final class MCRRestContentHelper {
     }
 
     public enum ContentDispositionType {
-        INLINE, ATTACHMENT
+        INLINE("inline"), ATTACHMENT("attachment");
+
+        private final String value;
+
+        ContentDispositionType(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
     }
 
     public static class Config {

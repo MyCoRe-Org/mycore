@@ -19,13 +19,32 @@ package org.mycore.mods;
 
 /**
  * Represents all supported relatedItem type supported for metadata sharing and linking.
- * 
+ *
  * @author Thomas Scheffler
  * @see MCRMODSMetadataShareAgent
  * @see MCRMODSLinksEventHandler
  * @since 2015.03
  */
-@SuppressWarnings("PMD.FieldNamingConventions")
 public enum MCRMODSRelationshipType {
-    host, preceding, original, series, otherVersion, otherFormat, references, reviewOf,
+    HOST("host"), PRECEDING("preceding"), ORIGINAL("original"), SERIES("series"), OTHER_VERSION("otherVersion"),
+    OTHER_FORMAT("otherFormat"), REFERENCES("references"), REVIEW_OF("reviewOf");
+
+    private final String value;
+
+    MCRMODSRelationshipType(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public static MCRMODSRelationshipType fromValue(String value) {
+        for (MCRMODSRelationshipType type : values()) {
+            if (type.getValue().equals(value)) {
+                return type;
+            }
+        }
+        return null;
+    }
 }
