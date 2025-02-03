@@ -55,20 +55,7 @@
             :access-keys="paginatedAccessKeys"
             @remove-access-key="deleteAccessKey"
             @view-access-key="openAccessKeyInfoModal"
-          >
-            <template #footer>
-              <tr>
-                <td colspan="6">
-                  <Pagination
-                    :current-page="state.currentPage"
-                    :total-rows="state.totalCount"
-                    :per-page="state.pageSize"
-                    @change-page="changePage"
-                  />
-                </td>
-              </tr>
-            </template>
-          </AccessKeyTable>
+          />
           <div
             id="loading-overlay"
             class="loading-overlay"
@@ -77,6 +64,16 @@
             <div class="spinner-border text-primary" role="status"></div>
           </div>
         </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12 d-flex justify-content-center">
+        <Pagination
+          :current-page="state.currentPage"
+          :total-rows="state.totalCount"
+          :per-page="state.pageSize"
+          @change-page="changePage"
+        />
       </div>
     </div>
     <CreateAccessKeyModal
@@ -299,5 +296,9 @@ onErrorCaptured((error): boolean => {
   justify-content: center;
   align-items: center;
   visibility: hidden;
+}
+.table-container {
+  position: relative;
+  display: inline-block;
 }
 </style>
