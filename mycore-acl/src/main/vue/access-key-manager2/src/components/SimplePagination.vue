@@ -1,6 +1,6 @@
 <template>
   <nav>
-    <ul class="pagination">
+    <ul class="pagination justify-content-center">
       <li class="page-item" :class="previousButtonDisabled ? 'disabled' : ''">
         <button
           class="page-link"

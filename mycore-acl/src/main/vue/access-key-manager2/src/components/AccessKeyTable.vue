@@ -24,7 +24,7 @@
         <td class="text-end">
           <div class="btn-group">
             <button class="btn" type="button" @click="viewAccessKey(index)">
-              <i class="fa fa-eye" />
+              <i class="fa fa-edit" />
             </button>
             <button
               class="btn"
@@ -37,6 +37,9 @@
         </td>
       </tr>
     </tbody>
+    <tfoot>
+      <slot name="footer"></slot>
+    </tfoot>
   </table>
 </template>
 
@@ -77,11 +80,3 @@ const viewAccessKey = (index: number): void => {
   emit('view-access-key', index);
 };
 </script>
-
-<style lang="css">
-.icon-btn:focus-visible,
-.icon-btn:active {
-  box-shadow: none !important;
-  outline: none !important;
-}
-</style>
