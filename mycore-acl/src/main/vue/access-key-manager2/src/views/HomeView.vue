@@ -110,20 +110,20 @@ import {
   fetchConfig,
   getI18nKey,
 } from '@/common/utils';
-import {
-  AccessKeyService,
-  AccessTokenAuthStrategy,
-  AuthStrategy,
-} from '@/service/accesskey';
+import { AccessKeyService } from '@/service/accesskey';
 import { Config } from '@/common/config';
 import AccessKeyTable from '@/components/AccessKeyTable.vue';
 import CreateAccessKeyModal from '@/components/CreateAccessKeyModal.vue';
 import AccessKeyInfoModal from '@/components/AccessKeyInfoModal.vue';
 import Pagination from '@/components/SimplePagination.vue';
 import ConfirmModal from '@/components/ConfirmModal.vue';
-import { MCRRestHttpClient } from '@/service/accesskey';
+import {
+  MCRRestHttpClient,
+  MCRClientAuthStrategy,
+  MCRAccessTokenClientAuthStrategy,
+} from '@/common/client';
 
-class DevAuthStrategy implements AuthStrategy {
+class DevAuthStrategy implements MCRClientAuthStrategy {
   public getHeaders(): Record<string, string> {
     return {
       Authorization: `Basic ${import.meta.env.VITE_APP_API_TOKEN}`,
@@ -273,7 +273,7 @@ onMounted(async (): Promise<void> => {
       accessKeyService.value = new AccessKeyService(
         new MCRRestHttpClient(
           BASE_URL,
-          new AccessTokenAuthStrategy(jwt.access_token)
+          new MCRAccessTokenClientAuthStrategy(jwt.access_token)
         )
       );
     }
