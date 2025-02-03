@@ -1,5 +1,5 @@
 <template>
-  <table class="table">
+  <table class="table table-striped table-hover">
     <thead>
       <tr>
         <th scope="col" class="col-3">{{ columnLabels.id }}</th>
@@ -11,7 +11,11 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="(accessKey, index) in accessKeys" :key="accessKey.id">
+      <tr
+        v-for="(accessKey, index) in accessKeys"
+        :key="accessKey.id"
+        class="align-middle"
+      >
         <td>{{ accessKey.id }}</td>
         <td>{{ accessKey.reference }}</td>
         <td>

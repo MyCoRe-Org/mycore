@@ -23,6 +23,7 @@
           :aria-label="String(page)"
           :aria-current="page === currentPage"
           :aria-disabled="page === currentPage"
+          :disabled="page === currentPage"
           @click="jumpToPage(page)"
         >
           {{ page }}
