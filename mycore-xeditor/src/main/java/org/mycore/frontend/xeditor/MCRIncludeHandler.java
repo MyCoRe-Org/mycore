@@ -18,19 +18,17 @@
 
 package org.mycore.frontend.xeditor;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.StreamSupport;
+import java.util.stream.IntStream;
 
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.dom.DOMResult;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,12 +37,12 @@ import org.apache.xpath.NodeSet;
 import org.apache.xpath.XPathContext;
 import org.apache.xpath.objects.XNodeSet;
 import org.apache.xpath.objects.XNodeSetForDOM;
-import org.jdom2.Element;
-import org.jdom2.filter.ElementFilter;
-import org.jdom2.transform.JDOMSource;
-import org.jdom2.util.IteratorIterable;
+import org.jdom2.JDOMException;
+import org.jdom2.output.DOMOutputter;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.xml.MCRURIResolver;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -102,31 +100,38 @@ public class MCRIncludeHandler {
         }
 
         Map<String, Element> cache = chooseCacheLevel(uri, sStatic);
-        handlePreloadedComponents(xml, cache);
+        try {
+            handlePreloadedComponents(xml, cache);
+        } catch (TransformerException | JDOMException e) {
+            throw new TransformerFactoryConfigurationError(e);
+        }
     }
 
     /**
      * Cache all descendant components that have an @id, handle xed:modify|xed:extend afterwards
      */
-    private void handlePreloadedComponents(Element xml, Map<String, Element> cache) {
-        for (Element component : xml.getChildren()) {
+    private void handlePreloadedComponents(Element xml, Map<String, Element> cache)
+        throws TransformerException, JDOMException {
+        for (Element component : getChildren(xml)) {
             cacheComponent(cache, component);
             handlePreloadedComponents(component, cache);
             handleModify(cache, component);
         }
     }
 
-    private void cacheComponent(Map<String, Element> cache, Element element) {
-        String id = element.getAttributeValue(ATTR_ID);
+    private void cacheComponent(Map<String, Element> cache, Element element)
+        throws TransformerException {
+        String id = getAttributeIfPresent(element, ATTR_ID);
         if ((id != null) && !id.isEmpty()) {
             LOGGER.debug(() -> "preloaded component " + id);
             cache.put(id, element);
         }
     }
 
-    private void handleModify(Map<String, Element> cache, Element element) {
-        if ("modify".equals(element.getName())) {
-            String refID = element.getAttributeValue(ATTR_REF);
+    private void handleModify(Map<String, Element> cache, Element element)
+        throws JDOMException, TransformerException {
+        if ("modify".equals(element.getLocalName())) {
+            String refID = getAttributeIfPresent(element, ATTR_REF);
             if (refID == null) {
                 throw new MCRUsageException("<xed:modify /> must have a @ref attribute!");
             }
@@ -137,9 +142,7 @@ public class MCRIncludeHandler {
                 return;
             }
 
-            container = container.clone();
-
-            String newID = element.getAttributeValue(ATTR_ID);
+            String newID = getAttributeIfPresent(element, ATTR_ID);
             if (newID != null) {
                 container.setAttribute(ATTR_ID, newID); // extend rather that modify
                 LOGGER.debug(() -> "extending " + refID + " to " + newID);
@@ -147,8 +150,8 @@ public class MCRIncludeHandler {
                 LOGGER.debug(() -> "modifying " + refID);
             }
 
-            for (Element command : element.getChildren()) {
-                String commandType = command.getName();
+            for (Element command : getChildren(element)) {
+                String commandType = command.getLocalName();
                 if (Objects.equals(commandType, "remove")) {
                     handleRemove(container, command);
                 } else if (Objects.equals(commandType, "include")) {
@@ -160,33 +163,47 @@ public class MCRIncludeHandler {
     }
 
     private void handleRemove(Element container, Element removeRule) {
-        String id = removeRule.getAttributeValue(ATTR_REF);
+        String id = getAttributeIfPresent(removeRule, ATTR_REF);
         LOGGER.debug(() -> "removing " + id);
-        findDescendant(container, id).ifPresent(Element::detach);
+        findDescendant(container, id).ifPresent(e -> e.getParentNode().removeChild(e));
     }
 
     private Optional<Element> findDescendant(Element container, String id) {
-        IteratorIterable<Element> descendants = container.getDescendants(new ElementFilter());
-        return StreamSupport.stream(descendants.spliterator(), false)
-            .filter(e -> hasOrIncludesID(e, id)).findFirst();
+        NodeList children = container.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node node = children.item(i);
+            if (node instanceof Element element) {
+                if (hasOrIncludesID(element, id)) {
+                    return Optional.of(element);
+                }
+                // Rekursive Suche in den Unterelementen
+                Optional<Element> descendant = findDescendant(element, id);
+                if (descendant.isPresent()) {
+                    return descendant;
+                }
+            }
+        }
+        return Optional.empty();
     }
 
     private boolean hasOrIncludesID(Element e, String id) {
-        return id.equals(e.getAttributeValue(ATTR_ID))
-            || "include".equals(e.getName()) && id.equals(e.getAttributeValue(ATTR_REF));
+        return id.equals(getAttributeIfPresent(e, ATTR_ID))
+            || "include".equals(e.getLocalName()) && id.equals(getAttributeIfPresent(e, ATTR_REF));
     }
 
-    private void handleInclude(Element container, Element includeRule) {
+    private void handleInclude(Element container, Element includeRule) throws JDOMException {
         boolean modified = handleBeforeAfter(container, includeRule, ATTR_BEFORE, 0, 0);
         if (!modified) {
-            includeRule.setAttribute(ATTR_AFTER, includeRule.getAttributeValue(ATTR_AFTER, "*"));
-            handleBeforeAfter(container, includeRule, ATTR_AFTER, 1, container.getChildren().size());
+            if (!includeRule.hasAttribute(ATTR_AFTER)) {
+                includeRule.setAttribute(ATTR_AFTER, "*");
+            }
+            handleBeforeAfter(container, includeRule, ATTR_AFTER, 1, getChildren(container).size());
         }
     }
 
     private boolean handleBeforeAfter(Element container, Element includeRule, String attributeName, int offset,
-        int defaultPos) {
-        String refID = includeRule.getAttributeValue(attributeName);
+        int defaultPos) throws JDOMException {
+        String refID = getAttributeIfPresent(includeRule, attributeName);
         if (refID != null) {
             includeRule.removeAttribute(attributeName);
 
@@ -194,27 +211,59 @@ public class MCRIncludeHandler {
             int pos;
 
             Optional<Element> neighbor = findDescendant(container, refID);
+            List<Element> childElements;
             if (neighbor.isPresent()) {
                 Element n = neighbor.get();
-                parent = n.getParentElement();
-                List<Element> children = parent.getChildren();
-                pos = children.indexOf(n) + offset;
+                parent = (Element) n.getParentNode();
+                childElements = getChildren(parent);
+                pos = childElements.indexOf(n) + offset;
             } else {
                 pos = defaultPos;
+                childElements = getChildren(parent);
             }
 
             LOGGER.debug(
-                () -> "including  " + Arrays.toString(includeRule.getAttributes().toArray()) + " at pos {}" + pos);
-            parent.getChildren().add(pos, includeRule.clone());
+                () -> {
+                    NamedNodeMap attributes = includeRule.getAttributes();
+                    return "including " + IntStream.range(0, attributes.getLength())
+                        .mapToObj(attributes::item)
+                        .map(attr -> attr.getNodeName() + "=\"" + attr.getNodeValue() + "\"")
+                        .reduce((a, b) -> a + ", " + b)
+                        .orElse("") + " at pos " + pos;
+                });
+            Node newChild = parent.getOwnerDocument().adoptNode(includeRule.cloneNode(true));
+            if (pos >= childElements.size()) {
+                parent.appendChild(newChild);
+            } else {
+                parent.insertBefore(newChild, childElements.get(pos));
+            }
         }
         return refID != null;
+    }
+
+    private List<Element> getChildren(Element parent) {
+        NodeList childNodes = parent.getChildNodes();
+        List<Element> childElements = new ArrayList<>(childNodes.getLength());
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            if (childNodes.item(i) instanceof Element) {
+                childElements.add((Element) childNodes.item(i));
+            }
+        }
+        return childElements;
+    }
+
+    private String getAttributeIfPresent(Element element, String attributeName) {
+        if (element.hasAttribute(attributeName)) {
+            return element.getAttribute(attributeName);
+        }
+        return null;
     }
 
     public XNodeSet resolve(ExpressionContext context, String ref) throws TransformerException {
         LOGGER.debug(() -> "including component " + ref);
         Map<String, Element> cache = chooseCacheLevel(ref, Boolean.FALSE.toString());
         Element resolved = cache.get(ref);
-        return (resolved == null ? null : asNodeSet(context, jdom2dom(resolved)));
+        return (resolved == null ? null : asNodeSet(context, resolved));
     }
 
     public XNodeSet resolve(ExpressionContext context, String uri, String sStatic)
@@ -222,10 +271,9 @@ public class MCRIncludeHandler {
         LOGGER.debug(() -> "including xml " + uri);
 
         Element xml = resolve(uri, sStatic);
-        Node node = jdom2dom(xml);
 
         try {
-            return asNodeSet(context, node);
+            return asNodeSet(context, xml);
         } catch (Exception ex) {
             LOGGER.error(ex);
             throw ex;
@@ -233,16 +281,17 @@ public class MCRIncludeHandler {
     }
 
     private Element resolve(String uri, String sStatic)
-        throws TransformerFactoryConfigurationError {
+        throws TransformerFactoryConfigurationError, TransformerException {
         Map<String, Element> cache = chooseCacheLevel(uri, sStatic);
 
         if (cache.containsKey(uri)) {
             LOGGER.debug(() -> "uri was cached: " + uri);
             return cache.get(uri);
         } else {
-            Element xml = MCRURIResolver.obtainInstance().resolve(uri);
-            cache.put(uri, xml);
-            return xml;
+            org.jdom2.Element xml = MCRURIResolver.obtainInstance().resolve(uri);
+            Element domElement = jdom2dom(xml);
+            cache.put(uri, domElement);
+            return domElement;
         }
     }
 
@@ -254,11 +303,13 @@ public class MCRIncludeHandler {
         }
     }
 
-    private Node jdom2dom(Element element) throws TransformerException {
-        DOMResult result = new DOMResult();
-        JDOMSource source = new JDOMSource(element);
-        TransformerFactory.newInstance().newTransformer().transform(source, result);
-        return result.getNode();
+    private Element jdom2dom(org.jdom2.Element element) throws TransformerException {
+        DOMOutputter outputter = new DOMOutputter();
+        try {
+            return outputter.output(element);
+        } catch (JDOMException e) {
+            throw new TransformerException(e);
+        }
     }
 
     private XNodeSet asNodeSet(ExpressionContext context, Node node) throws TransformerException {
