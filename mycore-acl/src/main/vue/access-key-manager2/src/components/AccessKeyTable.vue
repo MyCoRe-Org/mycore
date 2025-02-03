@@ -1,21 +1,13 @@
 <template>
   <table class="table">
-    <colgroup>
-      <col style="width: 30%" />
-      <col style="width: 35%" />
-      <col style="width: 10%" />
-      <col style="width: 10%" />
-      <col style="width: 10%" />
-      <col style="width: 5%" />
-    </colgroup>
     <thead>
       <tr>
-        <th>{{ columnLabels.id }}</th>
-        <th>{{ columnLabels.reference }}</th>
-        <th>{{ columnLabels.permission }}</th>
-        <th>{{ columnLabels.active }}</th>
-        <th>{{ columnLabels.expiration }}</th>
-        <th>{{ columnLabels.actions }}</th>
+        <th scope="col" class="col-3">{{ columnLabels.id }}</th>
+        <th scope="col" class="col-5">{{ columnLabels.reference }}</th>
+        <th scope="col" class="col-1">{{ columnLabels.permission }}</th>
+        <th scope="col" class="col-1">{{ columnLabels.active }}</th>
+        <th scope="col" class="col-1">{{ columnLabels.expiration }}</th>
+        <th scope="col" class="col-1 text-end">{{ columnLabels.actions }}</th>
       </tr>
     </thead>
     <tbody>
@@ -29,7 +21,7 @@
         <td>
           {{ getExpirationDisplay(accessKey.expiration) }}
         </td>
-        <td>
+        <td class="text-end">
           <div class="btn-group">
             <button class="btn shadow-none" @click="viewAccessKey(index)">
               <i class="fa fa-eye" />

@@ -11,10 +11,10 @@
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary" @click="close">
-            {{ t(getI18nKey('button.cancel')) }}
+            {{ t(getI18nKey('button.no')) }}
           </button>
           <button class="btn btn-primary" @click="confirm">
-            {{ t(getI18nKey('button.ok')) }}
+            {{ t(getI18nKey('button.yes')) }}
           </button>
         </div>
       </div>

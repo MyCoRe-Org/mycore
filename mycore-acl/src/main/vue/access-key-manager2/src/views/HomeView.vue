@@ -40,7 +40,7 @@
     </div>
     <div class="row pb-2">
       <div class="col-12">
-        <div class="text-right">
+        <div class="text-end">
           <button class="btn btn-primary" @click="createModalRef?.open">
             <i class="fa fa-plus" />
             {{ t(getI18nKey('button.showCreateAccessKeyModal')) }}

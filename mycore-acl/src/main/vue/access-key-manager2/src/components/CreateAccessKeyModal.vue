@@ -50,7 +50,7 @@
                     aria-label="generate secret"
                     @click="generateSecret"
                   >
-                    <i class="fa fa-shuffle" />
+                    <i class="fa fa-random" />
                   </button>
                 </span>
                 <input
