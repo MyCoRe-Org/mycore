@@ -12,89 +12,120 @@
             data-bs-dismiss="modal"
           ></button>
         </div>
-        <div
-          v-if="errorMessage"
-          class="alert alert-danger text-center"
-          role="alert"
-          aria-live="polite"
-        >
-          {{ t(errorMessage) }}
-        </div>
-        <div>
-          <p>{{ t(getI18nKey('description.createAccesskey')) }}</p>
-        </div>
-        <form>
-          <TextInputFormField
-            v-model="form.reference"
-            input-id="inputReference"
-            :disabled="reference !== undefined"
-            :label="t(getI18nKey('label.reference'))"
-            required
-          />
-
-          <TextInputFormField
-            v-model="form.secret"
-            input-id="inputSecret"
-            :label="t(getI18nKey('label.value'))"
-            required
+        <div class="modal-body">
+          <div
+            v-if="errorMessage"
+            class="alert alert-danger text-center"
+            role="alert"
+            aria-live="polite"
           >
-            <template #prepend>
-              <span class="input-group-prepend">
-                <button
-                  class="btn btn-primary"
-                  type="button"
-                  aria-label="generate secret"
-                  @click="generateSecret"
-                >
-                  <i class="fa fa-shuffle" />
-                </button>
-              </span>
-            </template>
-          </TextInputFormField>
-          <div class="form-row">
-            <SelectFormField
-              v-if="availablePermissions.length > 0"
-              v-model="form.type"
-              class="col-md-6"
-              input-id="inputPermission"
-              :label="t(getI18nKey('label.permission'))"
-              required
-            >
-              <option
-                v-for="permissionValue in availablePermissions"
-                :key="permissionValue"
-                :value="permissionValue"
-              >
-                {{ t(getI18nKey(`label.permission.${permissionValue}`)) }}
-              </option>
-            </SelectFormField>
-            <TextInputFormField
-              v-else
-              v-model="form.type"
-              class="col-md-6"
-              input-id="inputPermission"
-              :label="t(getI18nKey('label.permission'))"
-              required
-            />
-            <DateInputFormField
-              v-model="form.expiration"
-              class="col-md-6"
-              input-id="expirationInput"
-              :label="t(getI18nKey('label.expiration'))"
-            />
+            {{ t(errorMessage) }}
           </div>
-          <CheckboxInputFormField
-            v-model="form.isActive"
-            :label="t(getI18nKey('label.active'))"
-            input-id="inputActive"
-          />
-          <TextareaFormField
-            v-model="form.comment"
-            input-id="commentTextarea"
-            rows="3"
-            :label="t(getI18nKey('label.comment'))"
-          />
-        </form>
+          <div>
+            <p>{{ t(getI18nKey('description.createAccesskey')) }}</p>
+          </div>
+          <form class="row g-3">
+            <div class="col-12">
+              <label for="inputReference" class="form-label">
+                {{ t(getI18nKey('label.reference')) }}
+              </label>
+              <input
+                id="inputReference"
+                v-model="form.reference"
+                type="text"
+                :disabled="reference !== undefined"
+                class="form-control"
+              />
+            </div>
+
+            <div class="col-12">
+              <label for="inputSecret" class="form-label">
+                {{ t(getI18nKey('label.secret')) }}
+              </label>
+              <div class="input-group mb-3">
+                <span class="input-group-prepend">
+                  <button
+                    class="btn btn-primary"
+                    type="button"
+                    aria-label="generate secret"
+                    @click="generateSecret"
+                  >
+                    <i class="fa fa-shuffle" />
+                  </button>
+                </span>
+                <input
+                  id="inputSecret"
+                  v-model="form.secret"
+                  type="text"
+                  class="form-control"
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label for="inputPermission" class="form-label">
+                {{ t(getI18nKey('label.permission')) }}
+              </label>
+              <select
+                v-if="availablePermissions.length > 0"
+                id="inputPermission"
+                v-model="form.type"
+                class="form-select"
+              >
+                <option
+                  v-for="permissionValue in availablePermissions"
+                  :key="permissionValue"
+                  :value="permissionValue"
+                >
+                  {{ t(getI18nKey(`label.permission.${permissionValue}`)) }}
+                </option>
+              </select>
+              <input
+                v-else
+                id="inputPermission"
+                v-model="form.type"
+                type="text"
+                class="form-control"
+              />
+            </div>
+            <div class="col-md-6">
+              <label for="expirationInput" class="form-label">
+                {{ t(getI18nKey('label.expiration')) }}
+              </label>
+              <div class="input-group">
+                <input
+                  id="expirationInput"
+                  v-model="form.expiration"
+                  type="date"
+                  class="form-control"
+                />
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="form-check">
+                <input
+                  id="inputActive"
+                  v-model="form.isActive"
+                  class="form-check-input"
+                  type="checkbox"
+                />
+                <label class="form-check-label" for="inputActive">
+                  {{ t(getI18nKey('label.active')) }}
+                </label>
+              </div>
+            </div>
+            <div class="col-12">
+              <label for="commentTextarea" class="form-label">
+                {{ t(getI18nKey('label.comment')) }}
+              </label>
+              <textarea
+                id="commentTextarea"
+                v-model="form.comment"
+                class="form-control"
+                rows="3"
+              />
+            </div>
+          </form>
+        </div>
         <div class="modal-footer">
           <button
             type="button"
@@ -128,11 +159,6 @@ import {
 } from '@/common/utils';
 import { AccessKeyDto, CreateAccessKeyDto } from '@/dtos/accesskey';
 import { AccessKeyService } from '@/service/accesskey';
-import TextInputFormField from './form/TextInputFormField.vue';
-import SelectFormField from './form/SelectFormField.vue';
-import DateInputFormField from './form/DateInputFormField.vue';
-import CheckboxInputFormField from './form/CheckboxInputFormField.vue';
-import TextareaFormField from './form/TextareaFormField.vue';
 import { Modal } from 'bootstrap';
 
 const { t } = useI18n();

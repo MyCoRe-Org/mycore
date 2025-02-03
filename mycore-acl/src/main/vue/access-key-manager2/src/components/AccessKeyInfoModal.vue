@@ -21,21 +21,28 @@
           >
             {{ $t(errorMessage) }}
           </div>
-          <form>
-            <TextInputFormField
-              v-model="form.reference"
-              input-id="inputReference"
-              :disabled="reference !== undefined"
-              :label="t(getI18nKey('label.reference'))"
-            />
-
-            <div class="form-row">
-              <SelectFormField
+          <form class="row g-3">
+            <div class="col-12">
+              <label for="inputReference" class="form-label">
+                {{ t(getI18nKey('label.reference')) }}
+              </label>
+              <input
+                id="inputReference"
+                v-model="form.reference"
+                type="text"
+                :disabled="reference !== undefined"
+                class="form-control"
+              />
+            </div>
+            <div class="col-md-6">
+              <label for="inputPermission" class="form-label">
+                {{ t(getI18nKey('label.permission')) }}
+              </label>
+              <select
                 v-if="availablePermissions.length > 0"
+                id="inputPermission"
                 v-model="form.type"
-                class="col-md-6"
-                input-id="inputPermission"
-                :label="t(getI18nKey('label.permission'))"
+                class="form-select"
               >
                 <option
                   v-for="permissionValue in availablePermissions"
@@ -44,32 +51,52 @@
                 >
                   {{ t(getI18nKey(`label.permission.${permissionValue}`)) }}
                 </option>
-              </SelectFormField>
-              <TextInputFormField
+              </select>
+              <input
                 v-else
+                id="inputPermission"
                 v-model="form.type"
-                class="col-md-6"
-                input-id="inputPermission"
-                :label="t(getI18nKey('label.permission'))"
-              />
-              <DateInputFormField
-                v-model="form.expiration"
-                class="col-md-6"
-                input-id="expirationInput"
-                :label="t(getI18nKey('label.expiration'))"
+                type="text"
+                class="form-control"
               />
             </div>
-            <CheckboxInputFormField
-              v-model="form.isActive"
-              :label="t(getI18nKey('label.active'))"
-              input-id="inputActive"
-            />
-            <TextareaFormField
-              v-model="form.comment"
-              input-id="commentTextarea"
-              rows="3"
-              :label="t(getI18nKey('label.comment'))"
-            />
+            <div class="col-md-6">
+              <label for="expirationInput" class="form-label">
+                {{ t(getI18nKey('label.expiration')) }}
+              </label>
+              <div class="input-group">
+                <input
+                  id="expirationInput"
+                  v-model="form.expiration"
+                  type="date"
+                  class="form-control"
+                />
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="form-check">
+                <input
+                  id="inputActive"
+                  v-model="form.isActive"
+                  class="form-check-input"
+                  type="checkbox"
+                />
+                <label class="form-check-label" for="inputActive">
+                  {{ t(getI18nKey('label.active')) }}
+                </label>
+              </div>
+            </div>
+            <div class="col-12">
+              <label for="commentTextarea" class="form-label">
+                {{ t(getI18nKey('label.comment')) }}
+              </label>
+              <textarea
+                id="commentTextarea"
+                v-model="form.comment"
+                class="form-control"
+                rows="3"
+              />
+            </div>
           </form>
         </div>
         <div class="modal-footer">
@@ -106,11 +133,6 @@ import {
   getI18nKey,
   getUnixTimestampString,
 } from '@/common/utils';
-import TextInputFormField from './form/TextInputFormField.vue';
-import DateInputFormField from './form/DateInputFormField.vue';
-import CheckboxInputFormField from './form/CheckboxInputFormField.vue';
-import TextareaFormField from './form/TextareaFormField.vue';
-import SelectFormField from './form/SelectFormField.vue';
 
 interface FormData {
   reference: string;
