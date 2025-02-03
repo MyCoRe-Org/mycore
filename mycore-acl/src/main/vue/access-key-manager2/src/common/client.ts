@@ -69,15 +69,25 @@ export class MCRHttpClient {
 }
 
 export class MCRRestHttpClient extends MCRHttpClient {
-  private defaultHeaders: HeadersInit = {};
+  private authStrategy: MCRClientAuthStrategy | null = null;
 
-  constructor(baseUrl: string, authStrategy?: MCRClientAuthStrategy) {
+  constructor(
+    baseUrl: string,
+    authStrategy: MCRClientAuthStrategy | null = null
+  ) {
     super(baseUrl);
-    if (authStrategy) {
-      this.defaultHeaders = {
-        ...authStrategy.getHeaders(),
-      };
-    }
+    this.authStrategy = authStrategy;
+  }
+
+  private getHeaders(customHeaders: HeadersInit = {}): Headers {
+    return new Headers({
+      ...(this.authStrategy?.getHeaders() ?? {}),
+      ...customHeaders,
+    });
+  }
+
+  public setAuthStrategy(strategy: MCRClientAuthStrategy | null) {
+    this.authStrategy = strategy;
   }
 
   public async get(
@@ -86,11 +96,9 @@ export class MCRRestHttpClient extends MCRHttpClient {
     responseType: 'json',
     headers: HeadersInit = {}
   ): Promise<Response> {
-    const requestHeaders = new Headers(
-      Object.assign({}, this.defaultHeaders, headers)
-    );
+    const requestHeaders = this.getHeaders(headers);
     if (responseType === 'json') {
-      requestHeaders.set('Content-Accept', 'application/json');
+      requestHeaders.set('Accept', 'application/json');
     }
     return await super.request(url, 'GET', params, requestHeaders);
   }
@@ -100,9 +108,7 @@ export class MCRRestHttpClient extends MCRHttpClient {
     params: Record<string, string | number | boolean> = {},
     headers: HeadersInit = {}
   ): Promise<void> {
-    const requestHeaders = new Headers(
-      Object.assign({}, this.defaultHeaders, headers)
-    );
+    const requestHeaders = this.getHeaders(headers);
     await super.request(url, 'DELETE', params, requestHeaders);
   }
 
@@ -144,9 +150,7 @@ export class MCRRestHttpClient extends MCRHttpClient {
     bodyType: string,
     headers: HeadersInit = {}
   ): Promise<Response> {
-    const requestHeaders = new Headers(
-      Object.assign({}, this.defaultHeaders, headers)
-    );
+    const requestHeaders = this.getHeaders(headers);
     if (bodyType === 'json') {
       requestHeaders.set('Content-Type', 'application/json');
     } else {
