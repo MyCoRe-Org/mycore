@@ -121,6 +121,7 @@ import CreateAccessKeyModal from '@/components/CreateAccessKeyModal.vue';
 import AccessKeyInfoModal from '@/components/AccessKeyInfoModal.vue';
 import Pagination from '@/components/SimplePagination.vue';
 import ConfirmModal from '@/components/ConfirmModal.vue';
+import { MCRRestHttpClient } from '@/service/accesskey';
 
 class DevAuthStrategy implements AuthStrategy {
   public getHeaders(): Record<string, string> {
@@ -261,8 +262,7 @@ onMounted(async (): Promise<void> => {
     config.value = await fetchConfig(BASE_URL);
     if (import.meta.env.MODE === 'development') {
       accessKeyService.value = new AccessKeyService(
-        BASE_URL,
-        new DevAuthStrategy()
+        new MCRRestHttpClient(BASE_URL, new DevAuthStrategy())
       );
     } else {
       const jwt = await fetchJWT(
@@ -271,8 +271,10 @@ onMounted(async (): Promise<void> => {
         config.value.isSessionEnabled
       );
       accessKeyService.value = new AccessKeyService(
-        BASE_URL,
-        new AccessTokenAuthStrategy(jwt.access_token)
+        new MCRRestHttpClient(
+          BASE_URL,
+          new AccessTokenAuthStrategy(jwt.access_token)
+        )
       );
     }
     await fetchAccessKeys();

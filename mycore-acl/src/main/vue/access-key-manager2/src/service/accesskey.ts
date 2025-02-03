@@ -182,8 +182,8 @@ export class MCRRestHttpClient extends MCRHttpClient {
 export class AccessKeyService {
   private client: MCRRestHttpClient;
 
-  constructor(baseUrl: string, authStrategy: AuthStrategy) {
-    this.client = new MCRRestHttpClient(baseUrl, authStrategy);
+  constructor(client: MCRRestHttpClient) {
+    this.client = client;
   }
 
   public async getAccessKeys(
