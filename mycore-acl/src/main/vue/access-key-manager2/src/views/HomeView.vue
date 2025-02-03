@@ -40,7 +40,11 @@
     <div class="row pb-2">
       <div class="col-12">
         <div class="text-end">
-          <button class="btn btn-primary" @click="createModalRef?.open">
+          <button
+            class="btn btn-primary"
+            :disabled="state.loading"
+            @click="createModalRef?.open"
+          >
             <i class="fa fa-plus" />
             {{ t(getI18nKey('button.showCreateAccessKeyModal')) }}
           </button>
