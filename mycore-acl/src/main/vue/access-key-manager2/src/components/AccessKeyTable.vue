@@ -23,10 +23,14 @@
         </td>
         <td class="text-end">
           <div class="btn-group">
-            <button class="btn shadow-none" @click="viewAccessKey(index)">
+            <button class="btn" type="button" @click="viewAccessKey(index)">
               <i class="fa fa-eye" />
             </button>
-            <button class="btn shadow-none" @click="removeAccessKey(accessKey)">
+            <button
+              class="btn"
+              type="button"
+              @click="removeAccessKey(accessKey)"
+            >
               <i class="fa fa-trash" />
             </button>
           </div>
@@ -73,3 +77,11 @@ const viewAccessKey = (index: number): void => {
   emit('view-access-key', index);
 };
 </script>
+
+<style lang="css">
+.icon-btn:focus-visible,
+.icon-btn:active {
+  box-shadow: none !important;
+  outline: none !important;
+}
+</style>

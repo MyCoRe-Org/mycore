@@ -1,5 +1,4 @@
 <template>
-  <LoadingOverlay :loading="state.loading" />
   <div class="container-fluid">
     <div class="row">
       <div class="col d-flex justify-content-center">
@@ -51,11 +50,20 @@
     <!-- TODO bind message -->
     <div class="row">
       <div class="col-12">
-        <AccessKeyTable
-          :access-keys="paginatedAccessKeys"
-          @remove-access-key="deleteAccessKey"
-          @view-access-key="openAccessKeyInfoModal"
-        />
+        <div class="position-relative">
+          <AccessKeyTable
+            :access-keys="paginatedAccessKeys"
+            @remove-access-key="deleteAccessKey"
+            @view-access-key="openAccessKeyInfoModal"
+          />
+          <div
+            id="loading-overlay"
+            class="loading-overlay"
+            :style="{ visibility: state.loading ? 'visible' : 'hidden' }"
+          >
+            <div class="spinner-border text-primary" role="status"></div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="row">
@@ -104,7 +112,6 @@ import {
   AuthStrategy,
 } from '@/service/accesskey';
 import { Config } from '@/common/config';
-import LoadingOverlay from '@/components/LoadingOverlay.vue';
 import AccessKeyTable from '@/components/AccessKeyTable.vue';
 import CreateAccessKeyModal from '@/components/CreateAccessKeyModal.vue';
 import AccessKeyInfoModal from '@/components/AccessKeyInfoModal.vue';
@@ -276,3 +283,18 @@ onErrorCaptured((error): boolean => {
   return false;
 });
 </script>
+
+<style scoped>
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  visibility: hidden;
+}
+</style>
