@@ -21,10 +21,10 @@ package org.mycore.user2.hash;
 import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
 
 /**
- * A {@link MCRHashPasswordCheckStrategy} is a base implementation of {@link MCRPasswordCheckStrategy} that
+ * A {@link MCRHashPasswordCheckStrategyBase} is a base implementation of {@link MCRPasswordCheckStrategy} that
  * facilitates verification by comparing a generated hash string.
  */
-public abstract class MCRHashPasswordCheckStrategy extends MCRPasswordCheckStrategyBase {
+public abstract class MCRHashPasswordCheckStrategyBase extends MCRPasswordCheckStrategyBase {
 
     @Override
     protected final PasswordCheckResult<Boolean> doVerify(PasswordCheckData data, String password) throws Exception {
