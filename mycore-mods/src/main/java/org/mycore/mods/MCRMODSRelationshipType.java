@@ -17,6 +17,11 @@
  */
 package org.mycore.mods;
 
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 /**
  * Represents all supported relatedItem type supported for metadata sharing and linking.
  *
@@ -31,6 +36,11 @@ public enum MCRMODSRelationshipType {
 
     private final String value;
 
+    private static final Map<String, MCRMODSRelationshipType> RELATIONSHIP_TYPES = EnumSet
+        .allOf(MCRMODSRelationshipType.class)
+        .stream()
+        .collect(Collectors.toMap(MCRMODSRelationshipType::getValue, Function.identity()));
+
     MCRMODSRelationshipType(String value) {
         this.value = value;
     }
@@ -39,12 +49,16 @@ public enum MCRMODSRelationshipType {
         return value;
     }
 
+    @Override
+    public String toString() {
+        return value;
+    }
+
     public static MCRMODSRelationshipType fromValue(String value) {
-        for (MCRMODSRelationshipType type : values()) {
-            if (type.getValue().equals(value)) {
-                return type;
-            }
+        MCRMODSRelationshipType type = RELATIONSHIP_TYPES.get(value);
+        if (type != null) {
+            return type;
         }
-        return null;
+        throw new IllegalArgumentException("Unknown relatedItem type: " + value);
     }
 }
