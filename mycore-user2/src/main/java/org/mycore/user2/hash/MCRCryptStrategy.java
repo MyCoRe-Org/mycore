@@ -41,7 +41,7 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
  */
 @MCROutdated
 @MCRConfigurationProxy(proxyClass = MCRCryptStrategy.Factory.class)
-public class MCRCryptStrategy extends MCRHashPasswordCheckStrategy {
+public class MCRCryptStrategy extends MCRHashPasswordCheckStrategyBase {
 
     @Override
     public String unmodifiableConfigurationHint() {

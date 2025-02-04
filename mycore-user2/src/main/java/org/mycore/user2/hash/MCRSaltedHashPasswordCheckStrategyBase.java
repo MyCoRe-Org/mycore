@@ -22,17 +22,17 @@ import java.security.SecureRandom;
 import java.util.Base64;
 
 /**
- * A {@link MCRSaltedHashPasswordCheckStrategy} is a base implementation of {@link MCRPasswordCheckStrategy} that
+ * A {@link MCRSaltedHashPasswordCheckStrategyBase} is a base implementation of {@link MCRPasswordCheckStrategy} that
  * facilitates verification by comparing a generated hash string and employs a randomly generated salt.
  * <p>
  * The salt is stored as a Base64 encoded String. The verification result will be marked as outdated if the size of
  * the salt doesn't equal the expected size.
  */
-public abstract class MCRSaltedHashPasswordCheckStrategy extends MCRHashPasswordCheckStrategy {
+public abstract class MCRSaltedHashPasswordCheckStrategyBase extends MCRHashPasswordCheckStrategyBase {
 
     private final int saltSizeBytes;
 
-    public MCRSaltedHashPasswordCheckStrategy(int saltSizeBytes) {
+    public MCRSaltedHashPasswordCheckStrategyBase(int saltSizeBytes) {
         this.saltSizeBytes = saltSizeBytes;
         if (saltSizeBytes < 0) {
             throw new IllegalArgumentException("Salt size [bytes] must be non-negative, got " + saltSizeBytes);
