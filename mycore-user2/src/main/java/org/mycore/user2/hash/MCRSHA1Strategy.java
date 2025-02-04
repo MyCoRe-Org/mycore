@@ -51,7 +51,7 @@ import org.mycore.common.config.annotation.MCRProperty;
  */
 @MCROutdated
 @MCRConfigurationProxy(proxyClass = MCRSHA1Strategy.Factory.class)
-public class MCRSHA1Strategy extends MCRSaltedHashPasswordCheckStrategy {
+public class MCRSHA1Strategy extends MCRSaltedHashPasswordCheckStrategyBase {
 
     public static final String SALT_SIZE_BYTES_KEY = "SaltSizeBytes";
 

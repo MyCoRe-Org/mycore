@@ -36,7 +36,7 @@ import org.mycore.common.config.annotation.MCRProperty;
  * <ul>
  * <li> The configuration suffix {@link MCRMD5Strategy#SALT_SIZE_BYTES_KEY} can be used to specify the size of
  * generated salt values in bytes.
- * <li> The configuration suffix {@link MCRMD5Strategy#ITERATIONS_KEY} can be used to specify the number of 
+ * <li> The configuration suffix {@link MCRMD5Strategy#ITERATIONS_KEY} can be used to specify the number of
  * iterations to be performed.
  * </ul>
  * Example:
@@ -46,12 +46,12 @@ import org.mycore.common.config.annotation.MCRProperty;
  * [...].Iterations=1
  * </pre>
  * Changes to the number of iterations will result in deviating hashes and therefore prevent the successful
- * verification of existing hashes, even if the correct password is supplied. Changes to the salt size will not prevent 
+ * verification of existing hashes, even if the correct password is supplied. Changes to the salt size will not prevent
  * verification, but successful verification results will be marked as outdated.
  */
 @MCROutdated
 @MCRConfigurationProxy(proxyClass = MCRMD5Strategy.Factory.class)
-public class MCRMD5Strategy extends MCRSaltedHashPasswordCheckStrategy {
+public class MCRMD5Strategy extends MCRSaltedHashPasswordCheckStrategyBase {
 
     public static final String SALT_SIZE_BYTES_KEY = "SaltSizeBytes";
 
