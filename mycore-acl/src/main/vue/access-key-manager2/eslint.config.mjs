@@ -1,23 +1,25 @@
 import eslint from '@eslint/js';
+import tseslint from 'typescript-eslint';
 import globals from 'globals';
 import eslintPluginVue from 'eslint-plugin-vue';
-import typescriptEslint from 'typescript-eslint';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 
-export default typescriptEslint.config({
-  languageOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    globals: globals.browser,
-    parserOptions: {
-      parser: typescriptEslint.parser,
+export default tseslint.config(
+  eslint.configs.recommended,
+  tseslint.configs.recommended,
+  eslintPluginVue.configs['flat/recommended'],
+  eslintPluginPrettierRecommended,
+  {
+    languageOptions: {
+      ecmaVersion: 2025,
+      sourceType: 'module',
+      globals: globals.browser,
+      parserOptions: {
+        parser: tseslint.parser,
+      },
     },
   },
-  extends: [
-    eslint.configs.recommended,
-    ...typescriptEslint.configs.recommended,
-    ...eslintPluginVue.configs['flat/recommended'],
-    eslintPluginPrettierRecommended,
-  ],
-  files: ['**/*.{ts,vue}'],
-});
+  {
+    files: ['**/*.{ts,vue}'],
+  }
+);
