@@ -20,14 +20,15 @@
     <div class="user-list-users">
       <xsl:if test="@num">
         <div class="section">
-          <form class="form-inline" action="{$ServletsBaseURL}MCRUserServlet" onsubmit="document.getElementById('indicator').style.display='inline';">
-            <div class="form-group">
-              <label for="search">
+          <form action="{$ServletsBaseURL}MCRUserServlet">
+            <div class="row">
+              <label class="col-12 col-md-6 col-lg-4" for="search">
                 <xsl:value-of select="i18n:translate('component.user2.admin.search')" />
                 <xsl:text>&#160;</xsl:text>
               </label>
-              <input class="form-control" type="text" name="search" value="{@search}" />
-              <img id="indicator" style="display:none" src="{$WebApplicationBaseURL}{$MCR.Ajax.LoadingImage}" />
+              <div class="col-12 col-md-6 col-lg-8">
+                <input class="form-control" type="text" name="search" value="{@search}" />
+              </div>
             </div>
           </form>
           <xsl:apply-templates select="." mode="headAdditional" />
@@ -40,7 +41,7 @@
               <xsl:value-of select="i18n:translate('component.user2.admin.search.found', count(user))" />
             </strong>
             <div class="table-responsive">
-              <table class="user table table-striped">
+              <table class="user table table-striped table-bordered">
                 <thead>
                   <tr>
                     <th scope="col">
