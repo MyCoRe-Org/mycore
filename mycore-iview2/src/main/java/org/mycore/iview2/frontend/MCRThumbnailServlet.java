@@ -23,6 +23,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.Serial;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -67,12 +68,14 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 @Deprecated
 public class MCRThumbnailServlet extends MCRServlet {
+
+    @Serial
     private static final long serialVersionUID = 1506443527774956290L;
 
     //stores max png size for byte array buffer of output
-    private AtomicInteger maxPngSize = new AtomicInteger(64 * 1024);
+    private transient AtomicInteger maxPngSize = new AtomicInteger(64 * 1024);
 
-    private ImageWriteParam imageWriteParam;
+    private transient ImageWriteParam imageWriteParam;
 
     private Queue<ImageWriter> imageWriters = new ConcurrentLinkedQueue<>();
 

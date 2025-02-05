@@ -22,6 +22,7 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_HISTORY_READ;
 import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 
 import java.io.IOException;
+import java.io.Serial;
 
 import javax.xml.transform.TransformerException;
 
@@ -46,11 +47,13 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRObjectServlet extends MCRContentServlet {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final String I18N_ERROR_PREFIX = "component.base.error";
 
-    private MCRXMLMetadataManager metadataManager;
+    private transient MCRXMLMetadataManager metadataManager;
 
     @Override
     public void init() throws ServletException {

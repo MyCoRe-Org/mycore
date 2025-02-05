@@ -18,6 +18,8 @@
 
 package org.mycore.datamodel.metadata;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -54,7 +56,11 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @JsonClassDescription("MyCoRe ObjectID in form {project}_{type}_{int32}, "
     + "where project is a namespace and type defines the datamodel")
 @JsonFormat(shape = JsonFormat.Shape.STRING)
-public final class MCRObjectID implements Comparable<MCRObjectID> {
+public final class MCRObjectID implements Comparable<MCRObjectID>, Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     /**
      * public constant value for the MCRObjectID length
      */
@@ -62,7 +68,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
 
     private static NumberFormat numberFormat = initNumberFormat();
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRObjectID.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** ID pattern with named capturing groups */
     private static final Pattern ID_PATTERN = Pattern

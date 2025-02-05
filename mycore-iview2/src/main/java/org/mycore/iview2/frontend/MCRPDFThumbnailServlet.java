@@ -19,6 +19,7 @@
 package org.mycore.iview2.frontend;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
@@ -42,6 +43,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @Deprecated
 public class MCRPDFThumbnailServlet extends MCRContentServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger(MCRPDFThumbnailServlet.class);
@@ -50,7 +52,7 @@ public class MCRPDFThumbnailServlet extends MCRContentServlet {
 
     static final int MAX_AGE = 60 * 60 * 24 * 365; // one year
 
-    private MCRPDFTools pdfTools;
+    private transient MCRPDFTools pdfTools;
 
     /* (non-Javadoc)
      * @see org.mycore.frontend.servlets.MCRContentServlet#getContent(jakarta.servlet.http.HttpServletRequest,
