@@ -69,7 +69,7 @@
 
   <xsl:template match="user">
     <div class="user-details">
-      <div class="text-right mb-3">
+      <div class="text-end mb-3">
         <div id="buttons" class="btn-group">
           <xsl:apply-templates select="." mode="actions" />
         </div>
@@ -134,70 +134,70 @@
       </xsl:if>
       <div class="section" id="sectionlast">
         <div class="table-responsive">
-          <table class="user table">
-            <tr class="d-flex">
-              <th class="col-md-3">
+          <table class="user table table-hover">
+            <tr>
+              <th>
                 <xsl:value-of select="i18n:translate('component.user2.admin.userAccount')" />
               </th>
-              <td class="col-md-9">
+              <td>
                 <xsl:apply-templates select="." mode="name" />
               </td>
             </tr>
-            <tr class="d-flex">
-              <th class="col-md-3">
+            <tr>
+              <th>
                 <xsl:value-of select="i18n:translate('component.user2.admin.passwordHint')" />
               </th>
-              <td class="col-md-9">
+              <td>
                 <xsl:value-of select="password/@hint" />
               </td>
             </tr>
-            <tr class="d-flex">
-              <th class="col-md-3">
+            <tr>
+              <th>
                 <xsl:value-of select="i18n:translate('component.user2.admin.user.lastLogin')" />
               </th>
-              <td class="col-md-9">
+              <td>
                 <xsl:call-template name="formatISODate">
                   <xsl:with-param name="date" select="lastLogin" />
                   <xsl:with-param name="format" select="i18n:translate('component.user2.metaData.dateTime')" />
                 </xsl:call-template>
               </td>
             </tr>
-            <tr class="d-flex">
-              <th class="col-md-3">
+            <tr>
+              <th>
                 <xsl:value-of select="i18n:translate('component.user2.admin.user.validUntil')" />
               </th>
-              <td class="col-md-9">
+              <td>
                 <xsl:call-template name="formatISODate">
                   <xsl:with-param name="date" select="validUntil" />
                   <xsl:with-param name="format" select="i18n:translate('component.user2.metaData.dateTime')" />
                 </xsl:call-template>
               </td>
             </tr>
-            <tr class="d-flex">
-              <th class="col-md-3">
+            <tr>
+              <th>
                 <xsl:value-of select="i18n:translate('component.user2.admin.user.name')" />
               </th>
-              <td class="col-md-9">
+              <td>
                 <xsl:value-of select="realName" />
               </td>
             </tr>
             <xsl:if test="eMail">
-              <tr class="d-flex">
-                <th class="col-md-3">
+              <tr>
+                <th>
                   <xsl:value-of select="i18n:translate('component.user2.admin.user.email')" />
                 </th>
-                <td class="col-md-9">
+                <td>
                   <a href="mailto:{eMail}">
                     <xsl:value-of select="eMail" />
                   </a>
                 </td>
               </tr>
             </xsl:if>
-            <tr class="d-flex">
-              <th class="col-md-3">
+            <tr>
+              <th>
                 <xsl:value-of select="i18n:translate('component.user2.admin.user.locked')" />
               </th>
-              <td class="col-md-9">
+              <td>
                 <xsl:choose>
                   <xsl:when test="@locked='true'">
                     <xsl:value-of select="i18n:translate('component.user2.admin.user.locked.true')" />
@@ -208,11 +208,11 @@
                 </xsl:choose>
               </td>
             </tr>
-            <tr class="d-flex">
-              <th class="col-md-3">
+            <tr>
+              <th>
                 <xsl:value-of select="concat(i18n:translate('component.user2.admin.user.disabled'), ':')" />
               </th>
-              <td class="col-md-9">
+              <td>
                 <xsl:choose>
                   <xsl:when test="@disabled='true'">
                     <xsl:value-of select="i18n:translate('component.user2.admin.user.disabled.true')" />
@@ -224,11 +224,11 @@
               </td>
             </tr>
             <xsl:if test="attributes">
-              <tr class="d-flex">
-                <th class="col-md-3">
+              <tr>
+                <th>
                   <xsl:value-of select="i18n:translate('component.user2.admin.user.attributes')" />
                 </th>
-                <td class="col-md-9">
+                <td>
                   <dl>
                     <xsl:for-each select="attributes/attribute">
                       <dt>
@@ -242,22 +242,22 @@
                 </td>
               </tr>
             </xsl:if>
-            <tr class="col-md-9">
-              <th class="col-md-3">
+            <tr>
+              <th>
                 <xsl:value-of select="i18n:translate('component.user2.admin.owner')" />
               </th>
-              <td class="col-md-9">
+              <td>
                 <xsl:apply-templates select="owner" mode="link" />
                 <xsl:if test="count(owner)=0">
                   <xsl:value-of select="i18n:translate('component.user2.admin.userIndependent')" />
                 </xsl:if>
               </td>
             </tr>
-            <tr class="col-md-9">
-              <th class="col-md-3">
+            <tr>
+              <th>
                 <xsl:value-of select="i18n:translate('component.user2.admin.roles')" />
               </th>
-              <td class="col-md-9">
+              <td>
                 <xsl:for-each select="roles/role">
                   <xsl:value-of select="@name" />
                   <xsl:variable name="lang">
@@ -272,11 +272,11 @@
                 </xsl:for-each>
               </td>
             </tr>
-            <tr class="col-md-9">
-              <th class="col-md-3">
+            <tr>
+              <th>
                 <xsl:value-of select="i18n:translate('component.user2.admin.userOwns')" />
               </th>
-              <td class="col-md-9">
+              <td>
                 <xsl:for-each select="$owns/user">
                   <xsl:apply-templates select="." mode="link" />
                   <xsl:if test="position() != last()">
