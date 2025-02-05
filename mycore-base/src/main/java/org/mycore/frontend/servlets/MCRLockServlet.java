@@ -46,7 +46,26 @@ public class MCRLockServlet extends MCRServlet {
     private static final String ACTION_KEY = MCRLockServlet.class.getCanonicalName() + ".Action";
 
     enum Action {
-        LOCK, UNLOCK
+        LOCK("lock"), UNLOCK("unlock");
+
+        private final String value;
+
+        Action(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public static Action fromString(String value) {
+            for (Action action : values()) {
+                if (action.getValue().equals(value)) {
+                    return action;
+                }
+            }
+            throw new IllegalArgumentException("No constant with value " + value + " found");
+        }
     }
 
     private static final Logger LOGGER = LogManager.getLogger(MCRLockServlet.class);
@@ -84,7 +103,7 @@ public class MCRLockServlet extends MCRServlet {
         }
         Action action = null;
         try {
-            action = actionValue != null ? Action.valueOf(actionValue) : Action.LOCK;
+            action = actionValue != null ? Action.fromString(actionValue) : Action.LOCK;
         } catch (IllegalArgumentException e) {
             job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST,
                 "Unsupported value for parameter " + PARAM_ACTION + ": " + actionValue);

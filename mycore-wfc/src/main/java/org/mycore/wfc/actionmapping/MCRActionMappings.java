@@ -18,6 +18,8 @@
 
 package org.mycore.wfc.actionmapping;
 
+import java.util.List;
+
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
@@ -32,18 +34,14 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 public class MCRActionMappings {
 
     @XmlElement(name = "collection")
-    MCRCollection[] collections;
+    List<MCRCollection> collections;
 
-    @SuppressWarnings("PMD.ArrayIsStoredDirectly")//only POJO
     public void setCollections(MCRCollection... collections) {
-        this.collections = collections;
+        this.collections = List.of(collections);
     }
 
-    public MCRCollection[] getCollections() {
-        if (this.collections == null) {
-            return new MCRCollection[0];
-        }
-        return collections.clone();
+    public List<MCRCollection> getCollections() {
+        return collections;
     }
 
 }

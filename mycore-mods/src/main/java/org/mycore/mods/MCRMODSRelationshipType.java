@@ -17,15 +17,48 @@
  */
 package org.mycore.mods;
 
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 /**
  * Represents all supported relatedItem type supported for metadata sharing and linking.
- * 
+ *
  * @author Thomas Scheffler
  * @see MCRMODSMetadataShareAgent
  * @see MCRMODSLinksEventHandler
  * @since 2015.03
  */
-@SuppressWarnings("PMD.FieldNamingConventions")
 public enum MCRMODSRelationshipType {
-    host, preceding, original, series, otherVersion, otherFormat, references, reviewOf,
+    HOST("host"), PRECEDING("preceding"), ORIGINAL("original"), SERIES("series"), OTHER_VERSION("otherVersion"),
+    OTHER_FORMAT("otherFormat"), REFERENCES("references"), REVIEW_OF("reviewOf");
+
+    private final String value;
+
+    private static final Map<String, MCRMODSRelationshipType> RELATIONSHIP_TYPES = EnumSet
+        .allOf(MCRMODSRelationshipType.class)
+        .stream()
+        .collect(Collectors.toMap(MCRMODSRelationshipType::getValue, Function.identity()));
+
+    MCRMODSRelationshipType(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return value;
+    }
+
+    public static MCRMODSRelationshipType fromValue(String value) {
+        MCRMODSRelationshipType type = RELATIONSHIP_TYPES.get(value);
+        if (type != null) {
+            return type;
+        }
+        throw new IllegalArgumentException("Unknown relatedItem type: " + value);
+    }
 }
