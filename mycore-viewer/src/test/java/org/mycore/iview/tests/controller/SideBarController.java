@@ -29,7 +29,7 @@ import org.openqa.selenium.WebElement;
 
 public class SideBarController extends WebDriverController {
 
-    public static final String SIDEBAR_CLOSE_SELECTOR = "//button[@class=\"btn-close\"]";
+    public static final String SIDEBAR_CLOSE_SELECTOR = "//button[contains(@class,\"btn-close\")]";
 
     private static final Logger LOGGER = LogManager.getLogger();
 
