@@ -133,7 +133,7 @@ public class MCRMODSWrapper {
 
     private static String xPathRelationshipTypeTest() {
         return Stream.of(MCRMODSRelationshipType.values())
-            .map(s -> String.format(Locale.ROOT, "@type='%s'", s))
+            .map(s -> String.format(Locale.ROOT, "@type='%s'", s.getValue()))
             .collect(Collectors.joining(" or "));
     }
 

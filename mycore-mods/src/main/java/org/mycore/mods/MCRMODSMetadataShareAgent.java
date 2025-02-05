@@ -182,7 +182,7 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
             String holderId = relatedItem.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
             LOGGER.info("receive metadata from {} document {}", type, holderId);
             if ((holderId == null || parentID != null && parentID.toString().equals(holderId))
-                && MCRMODSRelationshipType.host.name().equals(type)) {
+                && MCRMODSRelationshipType.HOST.getValue().equals(type)) {
                 //already received metadata from parent;
                 continue;
             }

@@ -48,7 +48,18 @@ public class MCRPandocAPI {
         .orElse(Thread.currentThread().getContextClassLoader().getResource("lua").getPath() + "?.lua");
 
     private enum Action {
-        READER, WRITER
+        READER("Reader"), WRITER("Writer");
+
+        private final String value;
+
+        Action(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return value;
+        }
     }
 
     /**
