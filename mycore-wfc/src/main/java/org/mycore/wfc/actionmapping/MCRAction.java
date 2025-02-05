@@ -18,6 +18,8 @@
 
 package org.mycore.wfc.actionmapping;
 
+import java.util.List;
+
 import org.mycore.parsers.bool.MCRCondition;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
@@ -38,7 +40,7 @@ public class MCRAction {
     private String action;
 
     @XmlElement(name = "when")
-    private MCRDecision[] decisions;
+    private List<MCRDecision> decisions;
 
     public String getURL(MCRWorkflowData workflowData) {
         for (MCRDecision decision : decisions) {
@@ -59,16 +61,11 @@ public class MCRAction {
         this.action = action;
     }
 
-    public MCRDecision[] getDecisions() {
-        if (decisions == null) {
-            return new MCRDecision[0];
-        }
-        return decisions.clone();
+    public List<MCRDecision> getDecisions() {
+        return decisions;
     }
 
-    @SuppressWarnings("PMD.ArrayIsStoredDirectly")//is only POJO
     public void setDecisions(MCRDecision... decisions) {
-        this.decisions = decisions;
+        this.decisions = List.of(decisions);
     }
-
 }
