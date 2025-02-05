@@ -21,25 +21,34 @@ export class XMLImageInformationProvider {
     return;
   }) {
 
-    const settings = {
-      url: basePath + href + "/imageinfo.xml",
-      async: true,
-      success: function(response) {
-        const imageInformation = XMLImageInformationProvider.proccessXML(response, href);
-        callback(imageInformation);
-      },
-      error: function(request, status, exception) {
-        errorCallback(exception);
-      }
-    };
+    fetch(basePath + href + "/imageinfo.xml")
+        .then(response => {
+          if (!response.ok) {
+            errorCallback(response.statusText);
+            return null;
+          }
+          return response.text();
+        }).then(text => {
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(text, "text/xml");
+      const imageInformation = XMLImageInformationProvider.proccessXML(xmlDoc, href);
+      callback(imageInformation);
+    }).catch(error => {
+      errorCallback(error);
+    });
 
-    jQuery.ajax(settings);
 
   }
 
-  private static proccessXML(imageInfo, path: string): XMLImageInformation {
-    const node = jQuery(imageInfo.childNodes[0]);
-    return new XMLImageInformation(node.attr("derivate"), path, parseInt(node.attr("tiles")), parseInt(node.attr("width")), parseInt(node.attr("height")), parseInt(node.attr("zoomLevel")));
+  private static proccessXML(imageInfo: Document, path: string): XMLImageInformation {
+    const node = imageInfo.documentElement;
+    return new XMLImageInformation(node.getAttribute("derivate"),
+        path,
+        parseInt(node.getAttribute("tiles")),
+        parseInt(node.getAttribute("width")),
+        parseInt(node.getAttribute("height")),
+        parseInt(node.getAttribute("zoomLevel"))
+    );
   }
 
 }

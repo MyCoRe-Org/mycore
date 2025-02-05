@@ -23,10 +23,19 @@ export class ViewerConfirmModal extends ViewerModalWindow {
 
   constructor(_mobile: boolean, confirmTitle: string, confirmText: string, callback: Function, parent: HTMLElement = document.body) {
     super(_mobile, confirmTitle, parent);
-    this.modalHeader.children("h4").addClass("text-info");
-    this.modalBody.append("<p><span data-i18n='" + confirmText + "'>" + confirmText + "</span></p>");
+    this.modalHeader.querySelectorAll(">h4").forEach(el => {
+        el.classList.add("text-info");
+    });
+    /*this.modalBody.append("<p><span data-i18n='" + confirmText + "'>" + confirmText + "</span></p>");*/
+    const p = document.createElement("p");
+    p.innerText = confirmText;
+    p.setAttribute("data-i18n", confirmText);
+    this.modalBody.appendChild(p);
 
-    this.modalFooter.empty();
+
+    for (let i = 0; i < this.modalFooter.children.length; i++) {
+        this.modalFooter.children[i].remove();
+    }
 
     this.createButton(true, callback);
     this.createButton(false, callback);
@@ -34,12 +43,14 @@ export class ViewerConfirmModal extends ViewerModalWindow {
 
   private createButton(confirm: boolean, callback: Function): void {
     let key = confirm ? "yes" : "no";
-    let button = jQuery("<a data-i18n='modal." + key + "'></a>");
-    button.attr("type", "button");
-    button.addClass("btn btn-secondary");
-    button.appendTo(this.modalFooter);
+    const button = document.createElement("a");
+    button.setAttribute("type", "button");
+    button.classList.add("btn", "btn-secondary");
+    button.innerText = key;
+    button.setAttribute("data-i18n", "modal." + key);
+    this.modalFooter.appendChild(button);
 
-    button.click(() => {
+    button.addEventListener("click", () => {
       if (callback) {
         callback(confirm);
       }

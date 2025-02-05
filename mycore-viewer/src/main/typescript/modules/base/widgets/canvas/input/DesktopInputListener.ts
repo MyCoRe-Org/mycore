@@ -20,24 +20,24 @@
 import { Position2D } from "../../../Utils";
 
 export interface DesktopInputListener {
-  keydown(e: JQuery.KeyboardEventBase): void;
+  keydown(e: KeyboardEvent): void;
 
-  keypress(e: JQuery.KeyboardEventBase): void;
+  keypress(e: KeyboardEvent): void;
 
-  keyup(e: JQuery.KeyboardEventBase): void;
+  keyup(e: KeyboardEvent): void;
 
-  mouseClick(position: Position2D, e: JQuery.MouseEventBase): void;
+  mouseClick(position: Position2D, e: MouseEvent): void;
 
-  mouseDoubleClick(position: Position2D, e: JQuery.MouseEventBase): void;
+  mouseDoubleClick(position: Position2D, e: MouseEvent): void;
 
-  mouseDown(position: Position2D, e: JQuery.MouseEventBase): void;
+  mouseDown(position: Position2D, e: MouseEvent): void;
 
   mouseDrag(currentPosition: Position2D, startPosition: Position2D, startViewport: Position2D,
-    e: JQuery.MouseEventBase): void;
+    e: MouseEvent): void;
 
-  mouseMove(position: Position2D, e: JQuery.MouseEventBase): void;
+  mouseMove(position: Position2D, e: MouseEvent): void;
 
-  mouseUp(position: Position2D, e: JQuery.MouseEventBase): void;
+  mouseUp(position: Position2D, e: MouseEvent): void;
 
   scroll(e: {
     deltaX: number;
@@ -50,23 +50,23 @@ export interface DesktopInputListener {
 
 export abstract class DesktopInputAdapter implements DesktopInputListener {
 
-  mouseDown(position: Position2D, e: JQuery.MouseEventBase): void {
+  mouseDown(position: Position2D, e: MouseEvent): void {
   }
 
-  mouseUp(position: Position2D, e: JQuery.MouseEventBase): void {
+  mouseUp(position: Position2D, e:MouseEvent): void {
   }
 
-  mouseClick(position: Position2D, e: JQuery.MouseEventBase): void {
+  mouseClick(position: Position2D, e: MouseEvent): void {
   }
 
-  mouseDoubleClick(position: Position2D, e: JQuery.MouseEventBase): void {
+  mouseDoubleClick(position: Position2D, e: MouseEvent): void {
   }
 
-  mouseMove(position: Position2D, e: JQuery.MouseEventBase): void {
+  mouseMove(position: Position2D, e: MouseEvent): void {
   }
 
   mouseDrag(currentPosition: Position2D, startPosition: Position2D, startViewport: Position2D,
-    e: JQuery.MouseEventBase): void {
+    e: MouseEvent): void {
   }
 
   scroll(e: {
@@ -78,13 +78,13 @@ export abstract class DesktopInputAdapter implements DesktopInputListener {
   }) {
   }
 
-  keydown(e: JQuery.KeyboardEventBase): void {
+  keydown(e: KeyboardEvent): void {
   }
 
-  keypress(e: JQuery.KeyboardEventBase): void {
+  keypress(e: KeyboardEvent): void {
   }
 
-  keyup(e: JQuery.KeyboardEventBase): void {
+  keyup(e: KeyboardEvent): void {
   }
 }
 

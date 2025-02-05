@@ -19,6 +19,6 @@
 export interface TextView {
   updateText(text: string): void;
 
-  getElement(): JQuery;
+  getElement(): HTMLElement;
 }
 

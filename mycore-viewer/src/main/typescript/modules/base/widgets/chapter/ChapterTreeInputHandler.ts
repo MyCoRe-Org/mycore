@@ -29,7 +29,7 @@ export interface ChapterTreeInputHandler {
   * node is the label of the node.
   * id is the id of the node.
   */
-  registerNode(node: JQuery, id: string): void;
+  registerNode(node: HTMLElement, id: string): void;
 
   /**
    * Called if a chapter was inserted and the chapter can hold children.
@@ -38,7 +38,7 @@ export interface ChapterTreeInputHandler {
    * expander is the "arrow" to expand the tree.
    * id is the id of the node with has the expander.
    */
-  registerExpander(expander: JQuery, id: string): void;
+  registerExpander(expander: HTMLElement, id: string): void;
 }
 
 export class DefaultChapterTreeInputHandler implements ChapterTreeInputHandler {
@@ -54,17 +54,17 @@ export class DefaultChapterTreeInputHandler implements ChapterTreeInputHandler {
     this._ctrl = ctrl;
   }
 
-  registerNode(node: JQuery, id: string): void {
-    node.click(() => {
+  registerNode(node: HTMLElement, id: string): void {
+    node.addEventListener("click", () => {
       const newSelectedChapter = this._ctrl.getChapterById(id);
-      this._ctrl.setChapterSelected(newSelectedChapter);
+        this._ctrl.setChapterSelected(newSelectedChapter);
     });
   }
 
-  registerExpander(expander: JQuery, id: string): void {
-    expander.click(() => {
-      const chapterToChange = this._ctrl.getChapterById(id);
-      this._ctrl.setChapterExpanded(chapterToChange, !this._ctrl.getChapterExpanded(chapterToChange));
+  registerExpander(expander: HTMLElement, id: string): void {
+    expander.addEventListener("click", () => {
+        const chapterToChange = this._ctrl.getChapterById(id);
+        this._ctrl.setChapterExpanded(chapterToChange, !this._ctrl.getChapterExpanded(chapterToChange));
     });
   }
 }
