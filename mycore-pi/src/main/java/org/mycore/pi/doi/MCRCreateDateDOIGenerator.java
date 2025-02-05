@@ -36,10 +36,10 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.MCRPIRegistrationInfo;
-import org.mycore.pi.MCRPersistentIdentifier;
 
 public class MCRCreateDateDOIGenerator extends MCRPIGenerator<MCRDigitalObjectIdentifier> {
 
@@ -53,7 +53,7 @@ public class MCRCreateDateDOIGenerator extends MCRPIGenerator<MCRDigitalObjectId
 
     private final MCRDOIParser mcrdoiParser;
 
-    private String prefix = MCRConfiguration2.getStringOrThrow("MCR.DOI.Prefix");
+    private final String prefix = MCRConfiguration2.getStringOrThrow("MCR.DOI.Prefix");
 
     public MCRCreateDateDOIGenerator() {
         super();
@@ -62,16 +62,14 @@ public class MCRCreateDateDOIGenerator extends MCRPIGenerator<MCRDigitalObjectId
 
     @Override
     public MCRDigitalObjectIdentifier generate(MCRBase mcrObj, String additional) {
-        Date createdate = mcrObj.getService().getDate("createdate");
-
+        Date createdate = mcrObj.getService().getDate(MCRObjectService.DATE_TYPE_CREATEDATE);
         if (createdate != null) {
             MCRISO8601Date mcrdate = new MCRISO8601Date();
             mcrdate.setDate(createdate);
             String createDate = mcrdate.format(DATE_PATTERN, Locale.ENGLISH);
             final int count = getCountForCreateDate(createDate);
             Optional<MCRDigitalObjectIdentifier> parse = mcrdoiParser.parse(prefix + "/" + createDate + "-" + count);
-            MCRPersistentIdentifier doi = parse.orElseThrow(() -> new MCRException("Error while parsing default doi!"));
-            return (MCRDigitalObjectIdentifier) doi;
+            return parse.orElseThrow(() -> new MCRException("Error while parsing default doi!"));
         } else {
             throw new MCRPersistenceException("The object " + mcrObj.getId() + " doesn't have a createdate!");
         }

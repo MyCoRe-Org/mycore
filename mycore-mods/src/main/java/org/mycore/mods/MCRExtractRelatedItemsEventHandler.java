@@ -25,6 +25,7 @@ import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRXlink;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -77,7 +78,7 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
         Element mods = new MCRMODSWrapper(object).getMODS();
         MCRObjectID oid = object.getId();
         for (Element relatedItem : mods.getChildren("relatedItem", MCRConstants.MODS_NAMESPACE)) {
-            String href = relatedItem.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
+            String href = relatedItem.getAttributeValue(MCRXlink.HREF, MCRConstants.XLINK_NAMESPACE);
             LOGGER.info("Found related item in {}, href={}", oid, href);
             //MCR-957: only create releated object if mycoreId
             MCRObjectID mcrIdCheck;
@@ -100,7 +101,7 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
 
                     href = relatedID.toString();
                     LOGGER.info("Setting href of related item to {}", href);
-                    relatedItem.setAttribute("href", href, MCRConstants.XLINK_NAMESPACE);
+                    relatedItem.setAttribute(MCRXlink.HREF, href, MCRConstants.XLINK_NAMESPACE);
 
                     if (isHost(relatedItem)) {
                         LOGGER.info("Setting {} as parent of {}", href, oid);
@@ -158,8 +159,8 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
         Element mods = relatedItem.clone();
         mods.setName("mods");
         mods.removeAttribute("type");
-        mods.removeAttribute("href", MCRConstants.XLINK_NAMESPACE);
-        mods.removeAttribute("type", MCRConstants.XLINK_NAMESPACE);
+        mods.removeAttribute(MCRXlink.HREF, MCRConstants.XLINK_NAMESPACE);
+        mods.removeAttribute(MCRXlink.TYPE, MCRConstants.XLINK_NAMESPACE);
         mods.removeChildren("part", MCRConstants.MODS_NAMESPACE);
         return mods;
     }
@@ -170,7 +171,7 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
      * @return true if @type='host' and MCRObjectID in @href contains is valid and this MCRObject exists
      */
     private boolean isParentExists(Element relatedItem) {
-        String href = relatedItem.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
+        String href = relatedItem.getAttributeValue(MCRXlink.HREF, MCRConstants.XLINK_NAMESPACE);
         if (isHost(relatedItem) && href != null && !href.isEmpty()) {
             MCRObjectID relatedID = MCRObjectID.getInstance(href);
             return relatedID != null;

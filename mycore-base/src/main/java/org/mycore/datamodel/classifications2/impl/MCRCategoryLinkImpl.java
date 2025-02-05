@@ -42,6 +42,7 @@ import jakarta.persistence.UniqueConstraint;
  *
  * @since 2.0
  */
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 @Entity
 @Table(name = "MCRCategoryLink",
     uniqueConstraints = { @UniqueConstraint(columnNames = { "category", "objectID", "objectType" }) },

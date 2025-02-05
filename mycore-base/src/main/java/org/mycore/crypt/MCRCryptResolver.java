@@ -31,10 +31,10 @@ import org.jdom2.transform.JDOMSource;
 
 /**
  * This class provides an URIResolver for encryption and decryption.
- *
+ * <p>
  * URI Pattern:
  * crypt:{encrypt/decrypt}:{cipherid}:{value}
- *
+ * <p>
  * where
  * <ul>
  *   <li>encrypt/decrypt - the action to act an value</li>
@@ -50,14 +50,18 @@ public class MCRCryptResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRCryptResolver.class);
 
-    private static final Set<String> ACTIONS = Set.of("encrypt", "decrypt");
+    private static final String ENCRYPT_ACTION = "encrypt";
+
+    private static final String DECRYPT_ACTION = "decrypt";
+
+    private static final Set<String> ACTIONS = Set.of(ENCRYPT_ACTION, DECRYPT_ACTION);
 
     @Override
     public Source resolve(String s, String s1) throws TransformerException {
         String[] parts = s.split(":", 4);
         if (parts.length != 4) {
             throw new TransformerException(
-                "Malformed CrypResolver uri. Must be crypt:{encrypt/decrypt}:{cipherid}:{value}");
+                "Malformed CryptResolver uri. Must be crypt:{encrypt/decrypt}:{cipherid}:{value}");
         }
         if (!ACTIONS.contains(parts[1])) {
             throw new TransformerException("The crypt action must be one of encrypt or decrypt.");
@@ -67,19 +71,19 @@ public class MCRCryptResolver implements URIResolver {
         String cipherID = parts[2];
         String value = parts[3];
 
-        String returnString = "";
+        String returnString;
         try {
             MCRCipher cipher = MCRCipherManager.getCipher(cipherID);
-            returnString = action.equals("encrypt") ? cipher.encrypt(value) : cipher.decrypt(value);
+            returnString = action.equals(ENCRYPT_ACTION) ? cipher.encrypt(value) : cipher.decrypt(value);
         } catch (MCRCryptKeyFileNotFoundException e) {
             LOGGER.error(e::getMessage, e);
-            returnString = action.equals("encrypt") ? "" : value;
+            returnString = action.equals(ENCRYPT_ACTION) ? "" : value;
         } catch (MCRCryptKeyNoPermissionException e) {
             LOGGER.info(() -> "No permission to read cryptkey" + cipherID + ".");
-            returnString = action.equals("encrypt") ? "" : value;
+            returnString = action.equals(ENCRYPT_ACTION) ? "" : value;
         } catch (MCRCryptCipherConfigurationException e) {
             LOGGER.error("Invalid configuration or key.", e);
-            returnString = action.equals("encrypt") ? "" : value;
+            returnString = action.equals(ENCRYPT_ACTION) ? "" : value;
         }
 
         final Element root = new Element("value");

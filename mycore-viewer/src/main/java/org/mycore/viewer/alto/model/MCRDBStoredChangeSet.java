@@ -35,6 +35,7 @@ import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
 
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 @Entity(name = MCRDBStoredChangeSet.ENTITY_NAME)
 @Table(name = MCRDBStoredChangeSet.ENTITY_NAME)
 @NamedQueries({

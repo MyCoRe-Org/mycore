@@ -32,6 +32,7 @@ import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLangText;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 
@@ -113,12 +114,12 @@ public class MCRBasketPersistence {
         derivate.setSchema(schema.replaceAll(".xml", ".xsd"));
 
         MCRMetaIFS ifs = new MCRMetaIFS();
-        ifs.setSubTag("internal");
+        ifs.setSubTag(MCRObjectDerivate.ELEMENT_INTERNAL);
         ifs.setSourcePath(null);
         derivate.getDerivate().setInternals(ifs);
 
         MCRMetaLinkID linkId = new MCRMetaLinkID();
-        linkId.setSubTag("linkmeta");
+        linkId.setSubTag(MCRObjectDerivate.ELEMENT_LINKMETA);
         linkId.setReference(ownerID, null, null);
         derivate.getDerivate().setLinkMeta(linkId);
 

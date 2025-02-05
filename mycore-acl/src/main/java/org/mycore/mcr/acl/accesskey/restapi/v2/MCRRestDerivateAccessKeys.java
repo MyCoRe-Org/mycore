@@ -22,6 +22,11 @@ import static org.mycore.mcr.acl.accesskey.restapi.v2.MCRRestAccessKeyHelper.PAR
 import static org.mycore.mcr.acl.accesskey.restapi.v2.MCRRestAccessKeyHelper.QUERY_PARAM_SECRET_ENCODING;
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_DERID;
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
+import static org.mycore.restapi.v2.MCRRestStatusCode.BAD_REQUEST;
+import static org.mycore.restapi.v2.MCRRestStatusCode.NOT_FOUND;
+import static org.mycore.restapi.v2.MCRRestStatusCode.NO_CONTENT;
+import static org.mycore.restapi.v2.MCRRestStatusCode.OK;
+import static org.mycore.restapi.v2.MCRRestStatusCode.UNAUTHORIZED;
 import static org.mycore.restapi.v2.MCRRestUtils.TAG_MYCORE_DERIVATE;
 
 import org.mycore.access.MCRAccessManager;
@@ -31,6 +36,8 @@ import org.mycore.restapi.annotations.MCRApiDraft;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRObjectIDParamConverterProvider;
 import org.mycore.restapi.v2.MCRRestDerivates;
+import org.mycore.restapi.v2.MCRRestDescription;
+import org.mycore.restapi.v2.MCRRestSchemaType;
 import org.mycore.restapi.v2.annotation.MCRRestRequiredPermission;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,6 +49,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -74,18 +82,18 @@ public class MCRRestDerivateAccessKeys {
     @Operation(
         summary = "Lists all access keys for a derivate",
         responses = {
-            @ApiResponse(responseCode = "200",
+            @ApiResponse(responseCode = OK,
                 description = "List of access keys attached to this derivate",
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON,
                     array = @ArraySchema(schema = @Schema(implementation = MCRAccessKey.class))) }),
-            @ApiResponse(responseCode = "" + MCRObjectIDParamConverterProvider.CODE_INVALID, // 400
+            @ApiResponse(responseCode = BAD_REQUEST,
                 description = MCRObjectIDParamConverterProvider.MSG_INVALID,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
-            @ApiResponse(responseCode = "401",
-                description = "You do not have create permission and need to authenticate first",
+            @ApiResponse(responseCode = UNAUTHORIZED,
+                description = MCRRestDescription.UNAUTHORIZED,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
-            @ApiResponse(responseCode = "404",
-                description = "Derivate or access key does not exist",
+            @ApiResponse(responseCode = NOT_FOUND,
+                description = MCRRestDescription.DERIVATE_NOT_FOUND,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
         })
     @Produces(MediaType.APPLICATION_JSON)
@@ -102,18 +110,18 @@ public class MCRRestDerivateAccessKeys {
     @Operation(
         summary = "Gets access key for a derivate",
         responses = {
-            @ApiResponse(responseCode = "200",
+            @ApiResponse(responseCode = OK,
                 description = "Information about a specific access key",
                 content = @Content(mediaType = MediaType.APPLICATION_JSON,
                     schema = @Schema(implementation = MCRAccessKey.class))),
-            @ApiResponse(responseCode = "" + MCRObjectIDParamConverterProvider.CODE_INVALID, // 400
+            @ApiResponse(responseCode = BAD_REQUEST,
                 description = MCRObjectIDParamConverterProvider.MSG_INVALID,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
-            @ApiResponse(responseCode = "401",
-                description = "You do not have create permission and need to authenticate first",
+            @ApiResponse(responseCode = UNAUTHORIZED,
+                description = MCRRestDescription.UNAUTHORIZED,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
-            @ApiResponse(responseCode = "404",
-                description = "Derivate or access key does not exist",
+            @ApiResponse(responseCode = NOT_FOUND,
+                description = MCRRestDescription.DERIVATE_NOT_FOUND,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
         })
     @Produces(MediaType.APPLICATION_JSON)
@@ -129,18 +137,18 @@ public class MCRRestDerivateAccessKeys {
     @Operation(
         summary = "Creates an access key for a derivate",
         responses = {
-            @ApiResponse(responseCode = "201",
+            @ApiResponse(responseCode = OK,
                 description = "Access key was successfully created",
                 headers = @Header(name = HttpHeaders.LOCATION,
-                    schema = @Schema(type = "string", format = "uri"),
+                    schema = @Schema(type = MCRRestSchemaType.STRING, format = "uri"),
                     description = "Location of the new access keyD")),
-            @ApiResponse(responseCode = "400",
-                description = "Invalid ID or invalid access key",
+            @ApiResponse(responseCode = BAD_REQUEST,
+                description = MCRRestDescription.BAD_REQUEST,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
-            @ApiResponse(responseCode = "401",
-                description = "You do not have create permission and need to authenticate first",
+            @ApiResponse(responseCode = UNAUTHORIZED,
+                description = MCRRestDescription.UNAUTHORIZED,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
-            @ApiResponse(responseCode = "404",
+            @ApiResponse(responseCode = NOT_FOUND,
                 description = "Derivate does not exist",
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
         })
@@ -162,15 +170,15 @@ public class MCRRestDerivateAccessKeys {
     @Operation(
         summary = "Updates an access key for a derivate",
         responses = {
-            @ApiResponse(responseCode = "204", description = "Access key was successfully updated"),
-            @ApiResponse(responseCode = "400",
-                description = "Invalid ID or invalid access key",
+            @ApiResponse(responseCode = NO_CONTENT, description = "Access key was successfully updated"),
+            @ApiResponse(responseCode = BAD_REQUEST,
+                description = MCRRestDescription.BAD_REQUEST,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
-            @ApiResponse(responseCode = "401",
-                description = "You do not have create permission and need to authenticate first",
+            @ApiResponse(responseCode = UNAUTHORIZED,
+                description = MCRRestDescription.UNAUTHORIZED,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
-            @ApiResponse(responseCode = "404",
-                description = "Derivate or access key does not exist",
+            @ApiResponse(responseCode = NOT_FOUND,
+                description = MCRRestDescription.DERIVATE_NOT_FOUND,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
         })
     @RequestBody(required = true,
@@ -192,15 +200,15 @@ public class MCRRestDerivateAccessKeys {
     @Operation(
         summary = "Deletes an access key from a derivate",
         responses = {
-            @ApiResponse(responseCode = "204", description = "Access key was successfully deleted"),
-            @ApiResponse(responseCode = "" + MCRObjectIDParamConverterProvider.CODE_INVALID, // 400
+            @ApiResponse(responseCode = NO_CONTENT, description = "Access key was successfully deleted"),
+            @ApiResponse(responseCode = BAD_REQUEST,
                 description = MCRObjectIDParamConverterProvider.MSG_INVALID,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
-            @ApiResponse(responseCode = "401",
-                description = "You do not have create permission and need to authenticate first",
+            @ApiResponse(responseCode = UNAUTHORIZED,
+                description = MCRRestDescription.UNAUTHORIZED,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
-            @ApiResponse(responseCode = "404",
-                description = "Derivate or access key does not exist",
+            @ApiResponse(responseCode = NOT_FOUND,
+                description = MCRRestDescription.DERIVATE_NOT_FOUND,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
         })
     @Produces(MediaType.APPLICATION_JSON)
@@ -212,4 +220,5 @@ public class MCRRestDerivateAccessKeys {
         MCRRestDerivates.validateDerivateRelation(mcrId, derivateId);
         return MCRRestAccessKeyHelper.doRemoveAccessKey(derivateId, secret, secretEncoding);
     }
+
 }

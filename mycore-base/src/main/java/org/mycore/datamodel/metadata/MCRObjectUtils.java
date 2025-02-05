@@ -272,7 +272,7 @@ public final class MCRObjectUtils {
     public static <T extends MCRBase> T restore(MCRObjectID mcrId, String revision) throws IOException,
         MCRPersistenceException {
         @SuppressWarnings("unchecked")
-        T mcrBase = (T) (mcrId.getTypeId().equals("derivate") ? new MCRDerivate() : new MCRObject());
+        T mcrBase = (T) (mcrId.getTypeId().equals(MCRDerivate.OBJECT_TYPE) ? new MCRDerivate() : new MCRObject());
 
         // get content
         MCRXMLMetadataManager xmlMetadataManager = MCRXMLMetadataManager.instance();

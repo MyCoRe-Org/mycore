@@ -505,11 +505,11 @@ public class MCRLinkTableManager {
     /**
      * Updates all references of this object. Old ones will be removed and new links will be created.
      *
-     * @param id the mycore object identifer
+     * @param id the mycore object identifier
      */
     public void update(MCRObjectID id) {
         delete(id);
-        if ("derivate".equals(id.getTypeId())) {
+        if (MCRDerivate.OBJECT_TYPE.equals(id.getTypeId())) {
             create(MCRMetadataManager.retrieveMCRDerivate(id));
         } else {
             create(MCRMetadataManager.retrieveMCRObject(id));

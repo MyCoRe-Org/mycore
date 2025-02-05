@@ -99,6 +99,7 @@ import org.mycore.datamodel.metadata.MCRFileMetadata;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRXMLConstants;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.MCRPathXML;
 import org.mycore.frontend.MCRLayoutUtilities;
@@ -123,6 +124,7 @@ import jakarta.servlet.ServletContext;
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  */
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public final class MCRURIResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -132,6 +134,12 @@ public final class MCRURIResolver implements URIResolver {
     private static final String HTTP_CLIENT_CLASS = "MCR.HTTPClient.Class";
 
     private static final Marker UNIQUE_MARKER = MarkerManager.getMarker("tryResolveXML");
+
+    private static final String PROPERTY_XSL_FOLDER = "MCR.Layout.Transformer.Factory.XSLFolder";
+
+    private static final String RESOURCE_PREFIX = "resource:";
+
+    private static final String ELEMENT_NULL = "null";
 
     private static Map<String, URIResolver> supportedSchemes;
 
@@ -271,14 +279,14 @@ public final class MCRURIResolver implements URIResolver {
     static String getParentDirectoryResourceURI(String base) {
         if (base == null) {
             // the file was not included from another file, so we need to use the default resource directory
-            final String xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
-            return "resource:" + xslFolder + "/";
+            final String xslFolder = MCRConfiguration2.getStringOrThrow(PROPERTY_XSL_FOLDER);
+            return RESOURCE_PREFIX + xslFolder + "/";
         } else {
             String resolvingBase = null;
             MCRResourcePath resourcePath = MCRResourceHelper.getResourcePath(base);
             if (resourcePath != null) {
                 String path = resourcePath.asRelativePath();
-                resolvingBase = "resource:" + path.substring(0, path.lastIndexOf('/') + 1);
+                resolvingBase = RESOURCE_PREFIX + path.substring(0, path.lastIndexOf('/') + 1);
             }
 
             return resolvingBase;
@@ -364,9 +372,9 @@ public final class MCRURIResolver implements URIResolver {
         }
 
         // new relative include did not work, now fall back to old behaviour and print a warning if it works
-        final String xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
+        final String xslFolder = MCRConfiguration2.getStringOrThrow(PROPERTY_XSL_FOLDER);
         Source oldResolveMethodResult = supportedSchemes.get("resource")
-            .resolve("resource:" + xslFolder + "/" + href, base);
+            .resolve(RESOURCE_PREFIX + xslFolder + "/" + href, base);
         if (oldResolveMethodResult != null) {
             LOGGER.warn(UNIQUE_MARKER,
                 () -> "The Stylesheet " + base + " has include " + href + " which only works with an old " +
@@ -1008,7 +1016,7 @@ public final class MCRURIResolver implements URIResolver {
             // fixes exceptions if suburi is empty like "mcrobject:"
             String subUri = target.substring(target.indexOf(':') + 1);
             if (subUri.isEmpty()) {
-                return new JDOMSource(new Element("null"));
+                return new JDOMSource(new Element(ELEMENT_NULL));
             }
             // end fix
             LOGGER.debug("Ensuring xml is not null: {}", target);
@@ -1023,13 +1031,13 @@ public final class MCRURIResolver implements URIResolver {
                     return new JDOMSource(document.getRootElement().detach());
                 } else {
                     LOGGER.debug("MCRNotNullResolver returning empty xml");
-                    return new JDOMSource(new Element("null"));
+                    return new JDOMSource(new Element(ELEMENT_NULL));
                 }
             } catch (Exception ex) {
                 LOGGER.info("MCRNotNullResolver caught exception: {}", ex::getLocalizedMessage);
                 LOGGER.debug(ex::getLocalizedMessage, ex);
                 LOGGER.debug("MCRNotNullResolver returning empty xml");
-                return new JDOMSource(new Element("null"));
+                return new JDOMSource(new Element(ELEMENT_NULL));
             }
         }
     }
@@ -1053,7 +1061,7 @@ public final class MCRURIResolver implements URIResolver {
                 .<TransformerFactory>getClass("MCR.LayoutService.TransformerFactoryClass")
                 .orElseGet(TransformerFactory.newInstance()::getClass);
             String defaultXslFolder = MCRConfiguration2
-                .getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
+                .getStringOrThrow(PROPERTY_XSL_FOLDER);
 
             defaultFlavor = new Flavor(defaultFactoryClass, defaultXslFolder);
             LOGGER.info("Working with default flavor {}", defaultFlavor);
@@ -1187,7 +1195,7 @@ public final class MCRURIResolver implements URIResolver {
 
             String subUri = target.substring(target.indexOf(':') + 1);
             if (subUri.isEmpty()) {
-                return new JDOMSource(new Element("null"));
+                return new JDOMSource(new Element(ELEMENT_NULL));
             }
 
             Map<String, String> params;
@@ -1218,7 +1226,7 @@ public final class MCRURIResolver implements URIResolver {
                     return result.getSource();
                 } else {
                     LOGGER.debug("MCRLayoutStyleResolver returning empty xml");
-                    return new JDOMSource(new Element("null"));
+                    return new JDOMSource(new Element(ELEMENT_NULL));
                 }
             } catch (Exception e) {
                 findAndThrowTransformerException(e);
@@ -1252,7 +1260,7 @@ public final class MCRURIResolver implements URIResolver {
             Namespace xslNamespace = Namespace.getNamespace("xsl", "http://www.w3.org/1999/XSL/Transform");
 
             Element root = new Element("stylesheet", xslNamespace);
-            root.setAttribute("version", "1.0");
+            root.setAttribute(MCRXMLConstants.VERSION, "1.0");
 
             // get the parameters from mycore.properties
             String propertyName = "MCR.URIResolver.xslIncludes." + includePart;
@@ -1268,12 +1276,12 @@ public final class MCRURIResolver implements URIResolver {
                     .orElseGet(Collections::emptyList);
             }
 
-            final String xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
+            final String xslFolder = MCRConfiguration2.getStringOrThrow(PROPERTY_XSL_FOLDER);
             for (String include : propValue) {
                 // create a new include element
                 Element includeElement = new Element("include", xslNamespace);
                 includeElement.setAttribute("href",
-                    include.contains(":") ? include : "resource:" + xslFolder + "/" + include);
+                    include.contains(":") ? include : RESOURCE_PREFIX + xslFolder + "/" + include);
                 root.addContent(includeElement);
                 LOGGER.debug("Resolved XSL include: {}", include);
             }
@@ -1306,7 +1314,7 @@ public final class MCRURIResolver implements URIResolver {
             } else if (StringUtils.startsWith(baseURI, "resource:xslt/")) {
                 xslFolder = "xslt";
             } else {
-                xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
+                xslFolder = MCRConfiguration2.getStringOrThrow(PROPERTY_XSL_FOLDER);
             }
 
             String importXSL = MCRXMLFunctions.nextImportStep(href.substring(href.indexOf(':') + 1));
@@ -1314,12 +1322,12 @@ public final class MCRURIResolver implements URIResolver {
                 LOGGER.debug("End of import queue: {}", href);
                 Namespace xslNamespace = Namespace.getNamespace("xsl", "http://www.w3.org/1999/XSL/Transform");
                 Element root = new Element("stylesheet", xslNamespace);
-                root.setAttribute("version", "1.0");
+                root.setAttribute(MCRXMLConstants.VERSION, "1.0");
                 return new JDOMSource(root);
             }
             LOGGER.debug("xslImport importing {}", importXSL);
 
-            return fallback.resolve("resource:" + xslFolder + "/" + importXSL, base);
+            return fallback.resolve(RESOURCE_PREFIX + xslFolder + "/" + importXSL, base);
         }
     }
 
@@ -1615,9 +1623,9 @@ public final class MCRURIResolver implements URIResolver {
             MCRObjectDerivate objectDerivate = derivate.getDerivate();
             if (pathParts.length == 1) {
                 //only derivate is given;
-                Element fileset = new Element("fileset");
+                Element fileset = new Element(MCRObjectDerivate.ELEMENT_FILESET);
                 if (objectDerivate.getURN() != null) {
-                    fileset.setAttribute("urn", objectDerivate.getURN());
+                    fileset.setAttribute(MCRObjectDerivate.ATTRIBUTE_FILESET_URN, objectDerivate.getURN());
                     for (MCRFileMetadata fileMeta : objectDerivate.getFileMetadata()) {
                         fileset.addContent(fileMeta.createXML());
                     }

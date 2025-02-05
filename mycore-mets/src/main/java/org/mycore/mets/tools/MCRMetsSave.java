@@ -59,6 +59,7 @@ import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRStreamUtils;
+import org.mycore.common.MCRXlink;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.xml.MCRXMLFunctions;
@@ -431,7 +432,7 @@ public class MCRMetsSave {
         String cleanPath = getCleanPath(path);
 
         for (Element fileLoc : fileLocList) {
-            Attribute hrefAttribute = fileLoc.getAttribute("href", MCRConstants.XLINK_NAMESPACE);
+            Attribute hrefAttribute = fileLoc.getAttribute(MCRXlink.HREF, MCRConstants.XLINK_NAMESPACE);
             String hrefAttributeValue = hrefAttribute.getValue();
             String hrefPath = getCleanPath(removeExtension(hrefAttributeValue));
 

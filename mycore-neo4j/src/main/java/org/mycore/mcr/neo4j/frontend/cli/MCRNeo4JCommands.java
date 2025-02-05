@@ -36,7 +36,7 @@ import org.mycore.mcr.neo4j.utils.MCRNeo4JManager;
 import org.mycore.mcr.neo4j.utils.MCRNeo4JQueryRunner;
 
 @MCRCommandGroup(name = "Commands to handle Neo4J")
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "PMD.AvoidDuplicateLiterals"})
 public class MCRNeo4JCommands extends MCRAbstractCommands {
 
     private static final String NEO4J_MANAGER_CLASS_PROPERTY = "MCR.Neo4J.Manager.Class";

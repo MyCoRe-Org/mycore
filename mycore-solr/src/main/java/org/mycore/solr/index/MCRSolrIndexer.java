@@ -52,6 +52,7 @@ import org.mycore.common.events.MCRShutdownHandler.Closeable;
 import org.mycore.common.processing.MCRProcessableDefaultCollection;
 import org.mycore.common.processing.MCRProcessableRegistry;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.MCRSolrUtils;
@@ -406,7 +407,7 @@ public class MCRSolrIndexer {
      * Rebuilds solr's content index.
      */
     public static void rebuildContentIndex(List<MCRSolrCore> cores) {
-        rebuildContentIndex(MCRXMLMetadataManager.instance().listIDsOfType("derivate"), cores);
+        rebuildContentIndex(MCRXMLMetadataManager.instance().listIDsOfType(MCRDerivate.OBJECT_TYPE), cores);
     }
 
     /**

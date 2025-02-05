@@ -23,6 +23,7 @@ import java.util.Set;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRXlink;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -58,6 +59,12 @@ public class MCRClassMapper {
     private static final MCRCache<MCRAuthKey, MCRAuthorityInfo> AUTHORITY_INFO_CACHE = new MCRCache<>(1000,
         "MCRAuthorityInfo cache");
 
+    private static final String ATTRIBUTE_AUTHORITY_URI = "authorityURI";
+
+    private static final String ATTRIBUTE_AUTHORITY = "authority";
+
+    private static final String ATTRIBUTE_VALUE_URI = "valueURI";
+
     private MCRClassMapper() {
     }
 
@@ -72,17 +79,17 @@ public class MCRClassMapper {
     public static MCRCategoryID getCategoryID(org.jdom2.Element modsElement) {
         if (supportsClassification(modsElement)) {
             MCRAuthorityInfo authInfo;
-            if (modsElement.getAttributeValue("authorityURI") != null) {
+            if (modsElement.getAttributeValue(ATTRIBUTE_AUTHORITY_URI) != null) {
                 //authorityURI
-                String authorityURI = modsElement.getAttributeValue("authorityURI");
-                String valueURI = modsElement.getAttributeValue("valueURI");
+                String authorityURI = modsElement.getAttributeValue(ATTRIBUTE_AUTHORITY_URI);
+                String valueURI = modsElement.getAttributeValue(ATTRIBUTE_VALUE_URI);
                 authInfo = new MCRAuthorityWithURI(authorityURI, valueURI);
-            } else if (modsElement.getAttributeValue("authority") != null) {
+            } else if (modsElement.getAttributeValue(ATTRIBUTE_AUTHORITY) != null) {
                 //authority
                 authInfo = MCRAuthorityAndCode.getAuthorityInfo(modsElement);
             } else if (modsElement.getName().equals(ACCESS_CONDITION)) {
                 //accessDefinition
-                String href = modsElement.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE, "");
+                String href = modsElement.getAttributeValue(MCRXlink.HREF, MCRConstants.XLINK_NAMESPACE, "");
                 authInfo = new MCRAccessCondition(href);
             } else if (modsElement.getName().equals(TYPE_OF_RESOURCE)) {
                 //typeOfResource
@@ -102,17 +109,17 @@ public class MCRClassMapper {
     public static MCRCategoryID getCategoryID(Element modsElement) {
         if (supportsClassification(modsElement)) {
             MCRAuthorityInfo authInfo;
-            if (!modsElement.getAttribute("authorityURI").isEmpty()) {
+            if (!modsElement.getAttribute(ATTRIBUTE_AUTHORITY_URI).isEmpty()) {
                 //authorityURI
-                String authorityURI = modsElement.getAttribute("authorityURI");
-                String valueURI = modsElement.getAttribute("valueURI");
+                String authorityURI = modsElement.getAttribute(ATTRIBUTE_AUTHORITY_URI);
+                String valueURI = modsElement.getAttribute(ATTRIBUTE_VALUE_URI);
                 authInfo = new MCRAuthorityWithURI(authorityURI, valueURI);
-            } else if (!modsElement.getAttribute("authority").isEmpty()) {
+            } else if (!modsElement.getAttribute(ATTRIBUTE_AUTHORITY).isEmpty()) {
                 //authority
                 authInfo = MCRAuthorityAndCode.getAuthorityInfo(modsElement);
             } else if (modsElement.getLocalName().equals(ACCESS_CONDITION)) {
                 //accessDefinition
-                String href = modsElement.getAttributeNS(MCRConstants.XLINK_NAMESPACE.getURI(), "href");
+                String href = modsElement.getAttributeNS(MCRConstants.XLINK_NAMESPACE.getURI(), MCRXlink.HREF);
                 authInfo = new MCRAccessCondition(href);
             } else if (modsElement.getLocalName().equals(TYPE_OF_RESOURCE)) {
                 //typeOfResource

@@ -50,10 +50,11 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
  * @author Heiko Helmbrecht
  * @author Jens Kupferschmidt
  */
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 @MCRCommandGroup(name = "Access Commands")
 public class MCRAccessCommands extends MCRAbstractCommands {
-    /** The logger */
-    private static final Logger LOGGER = LogManager.getLogger(MCRAccessCommands.class.getName());
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * This method deletes the old permissions (if given any) and sets the new
@@ -282,7 +283,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      *            String the path to the xml file, that contains the rule
      */
     @MCRCommand(syntax = "update permission {0} for id {1} with rulefile {2}",
-        help = "The command updates access rule for a given id of a given permission with a given special rule",
+        help = "The command updates access rule for a given id of a given permission with a given rule file",
         order = 71)
     public static void permissionFileUpdateForID(String permission, String id, String strFileRule) {
         permissionUpdateForID(permission, id, filenameToUri(strFileRule));
@@ -303,7 +304,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      *            rule is multiple used
      */
     @MCRCommand(syntax = "update permission {0} for id {1} with rule {2} described by {3}",
-        help = "The command updates access rule for a given id of a given permission with a given special rule",
+        help = "The command updates access rule for a given id of a given permission with a given uri and description",
         order = 60)
     public static void permissionUpdateForID(String permission, String id, String ruleUri, String description) {
         MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
@@ -329,7 +330,8 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      *            rule is multiple used
      */
     @MCRCommand(syntax = "update permission {0} for id {1} with rulefile {2} described by {3}",
-        help = "The command updates access rule for a given id of a given permission with a given special rule",
+        help = "The command updates access rule for a given id of a given permission with a given rule file and"
+            + "description",
         order = 61)
     public static void permissionFileUpdateForID(String permission, String id, String strFileRule, String description) {
         permissionUpdateForID(permission, id, filenameToUri(strFileRule), description);

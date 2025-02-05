@@ -50,8 +50,10 @@ import io.ocfl.api.model.VersionInfo;
 
 /**
  * XML Manager to handle MCRUsers in a MyCoRe OCFL Repository
+ *
  * @author Tobias Lenhardt [Hammer1279]
  */
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class MCROCFLXMLUserManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -116,7 +118,7 @@ public class MCROCFLXMLUserManager {
         MCRJDOMContent content = new MCRJDOMContent(MCRUserTransformer.buildExportableXML(user));
         try (InputStream userAsStream = content.getInputStream()) {
             repository.updateObject(ObjectVersionId.head(ocflUserID), info,
-                updater -> updater.writeFile(userAsStream, user.getUserID() + ".xml", OcflOption.OVERWRITE));
+                updater -> updater.writeFile(userAsStream, getFilePath(user.getUserID()), OcflOption.OVERWRITE));
         } catch (IOException | OverwriteException e) {
             throw new MCRPersistenceException("Failed to update user '" + ocflUserID + "'", e);
         }
@@ -143,7 +145,7 @@ public class MCROCFLXMLUserManager {
         MCRJDOMContent content = new MCRJDOMContent(MCRUserTransformer.buildExportableXML(user));
         try (InputStream userAsStream = content.getInputStream()) {
             repository.updateObject(ObjectVersionId.head(ocflUserID), info,
-                updater -> updater.writeFile(userAsStream, user.getUserID() + ".xml"));
+                updater -> updater.writeFile(userAsStream,  getFilePath(user.getUserID())));
         } catch (IOException | OverwriteException e) {
             throw new MCRPersistenceException("Failed to update user '" + ocflUserID + "'", e);
         }
@@ -176,7 +178,7 @@ public class MCROCFLXMLUserManager {
             .setCreated(OffsetDateTime.now(ZoneOffset.UTC))
             .setUser(currentUser.getUserName(), buildEmail(currentUser));
         repository.updateObject(ObjectVersionId.head(ocflUserID), info,
-            updater -> updater.removeFile(userId + ".xml"));
+            updater -> updater.removeFile(getFilePath(userId)));
     }
 
     public void purgeUser(String userId) {
@@ -199,7 +201,7 @@ public class MCROCFLXMLUserManager {
      * @param userId the userId of the requested user
      * @param revision the version in ocfl store or <code>null</code> for latest
      * @return the requested MCRUser
-     * @throws IOException if a error occurs during retrieval
+     * @throws IOException if an error occurs during retrieval
      */
     public MCRUser retrieveContent(String userId, String revision) throws IOException {
         String ocflUserID = MCROCFLObjectIDPrefixHelper.USER + userId;
@@ -216,12 +218,16 @@ public class MCROCFLXMLUserManager {
                 + "' has been deleted!");
         }
 
-        try (InputStream storedContentStream = repository.getObject(version).getFile(userId + ".xml").getStream()) {
+        try (InputStream storedContentStream = repository.getObject(version).getFile(getFilePath(userId)).getStream()) {
             Document xml = new MCRStreamContent(storedContentStream).asXML();
             return MCRUserTransformer.buildMCRUser(xml.getRootElement());
         } catch (JDOMException e) {
             throw new IOException("Can not parse XML from OCFL-Store", e);
         }
+    }
+
+    private String getFilePath(String userId) {
+        return userId + ".xml";
     }
 
     private boolean isDeleted(ObjectVersionId version) {

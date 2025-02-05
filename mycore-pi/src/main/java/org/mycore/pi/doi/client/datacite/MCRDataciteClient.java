@@ -80,6 +80,7 @@ import org.mycore.services.http.MCRHttpUtils;
  * <li>use {@link #setMediaList(MCRDigitalObjectIdentifier, List)} to add a list of mime-type URI pairs to a DOI</li>
  * </ol>
  */
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class MCRDataciteClient {
 
     public static final String DOI_REGISTER_REQUEST_TEMPLATE = "doi=%s\nurl=%s";
@@ -90,11 +91,11 @@ public class MCRDataciteClient {
 
     private static final AuthScope ANY_AUTHSCOPE = new AuthScope(null, -1);
 
-    private String host;
+    private final String host;
 
-    private String userName;
+    private final String userName;
 
-    private String password;
+    private final String password;
 
     /**
      * @param host       the host (in most cases mds.datacite.org)
@@ -438,6 +439,7 @@ public class MCRDataciteClient {
             throw new MCRDatacenterException("Error while storing metadata!", e);
         }
     }
+
 
     public void deleteMetadata(final MCRDigitalObjectIdentifier doi) throws MCRPersistentIdentifierException {
         URI requestURI = getRequestURI("/metadata/" + doi.asString());

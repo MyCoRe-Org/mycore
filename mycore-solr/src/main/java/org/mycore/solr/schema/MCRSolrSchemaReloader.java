@@ -52,8 +52,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
 /**
- * This class provides methods to reload a SOLR schema using the SOLR schema API
- * see https://lucene.apache.org/solr/guide/7_3/schema-api.html
+ * This class provides methods to reload a SOLR schema using the
+ * <a href="https://lucene.apache.org/solr/guide/7_3/schema-api.html">SOLR schema API</a>
  *
  * @author Robert Stephan
  * @author Jens Kupferschmidt
@@ -68,19 +68,18 @@ public class MCRSolrSchemaReloader {
 
     private static final List<String> SOLR_DEFAULT_FIELDS = Arrays.asList("id", "_version_", "_root_", "_text_");
 
-    private static final List<String> SOLR_DEFAULT_FIELDTYPES = Arrays.asList(
-        "plong", "string", "text_general");
+    private static final List<String> SOLR_DEFAULT_FIELD_TYPES = Arrays.asList("plong", "string", "text_general");
 
     /**
      * Removes all fields, dynamicFields, copyFields and fieldTypes in the SOLR schema for the given core. The fields,
      * dynamicFields, and types in the lists SOLR_DEFAULT_FIELDS, SOLR_DEFAULT_DYNAMIC_FIELDS,
      * SOLR_DEFAULT_DYNAMIC_FIELDS are excluded from remove.
      *
-     * @param configType the name of the configuration directory containg the Solr core configuration
+     * @param configType the name of the configuration directory containing the Solr core configuration
      * @param coreID the ID of the core, which the configuration should be applied to
      */
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     public static void reset(String configType, String coreID) {
-
         LOGGER.info(() -> "Resetting SOLR schema for core " + coreID + " using configuration " + configType);
         try {
             SolrClient solrClient = MCRSolrCoreManager.get(coreID).map(MCRSolrCore::getClient)
@@ -110,7 +109,7 @@ public class MCRSolrSchemaReloader {
             MCRSolrAuthenticationLevel.ADMIN);
         for (FieldTypeRepresentation fieldType : fieldTypesReq.process(solrClient).getFieldTypes()) {
             String fieldTypeName = fieldType.getAttributes().get("name").toString();
-            if (!SOLR_DEFAULT_FIELDTYPES.contains(fieldTypeName)) {
+            if (!SOLR_DEFAULT_FIELD_TYPES.contains(fieldTypeName)) {
                 LOGGER.debug(() -> "remove SOLR FieldType " + fieldTypeName);
                 SchemaRequest.DeleteFieldType delField = new SchemaRequest.DeleteFieldType(fieldTypeName);
                 SOLR_AUTHENTICATION_MANAGER.applyAuthentication(delField,
@@ -203,18 +202,18 @@ public class MCRSolrSchemaReloader {
                         .POST(HttpRequest.BodyPublishers.ofString(command));
                     SOLR_AUTHENTICATION_MANAGER.applyAuthentication(solrRequestBuilder,
                         MCRSolrAuthenticationLevel.ADMIN);
-                    String commandprefix = command.indexOf('-') != -1 ? command.substring(2, command.indexOf('-'))
+                    String commandPrefix = command.indexOf('-') != -1 ? command.substring(2, command.indexOf('-'))
                         : "unknown command";
 
                     HttpResponse<String> response = httpClient.send(solrRequestBuilder.build(),
                         HttpResponse.BodyHandlers.ofString());
 
                     if (response.statusCode() == 200) {
-                        LOGGER.debug("SOLR schema {} successful \n{}", () -> commandprefix, response::body);
+                        LOGGER.debug("SOLR schema {} successful \n{}", () -> commandPrefix, response::body);
                     } else {
 
                         LOGGER
-                            .error("SOLR schema {} error: {} {}\n{}", () -> commandprefix, response::statusCode,
+                            .error("SOLR schema {} error: {} {}\n{}", () -> commandPrefix, response::statusCode,
                                 () -> MCRHttpUtils.getReasonPhrase(response.statusCode()), response::body);
                     }
                 }
@@ -223,4 +222,5 @@ public class MCRSolrSchemaReloader {
             LOGGER.error(e);
         }
     }
+
 }

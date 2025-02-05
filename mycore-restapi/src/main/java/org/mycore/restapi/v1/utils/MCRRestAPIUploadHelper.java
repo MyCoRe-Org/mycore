@@ -18,6 +18,7 @@
 package org.mycore.restapi.v1.utils;
 
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+import static org.mycore.frontend.jersey.MCRJerseyUtil.APPLICATION_XML_UTF_8;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
@@ -65,6 +66,7 @@ import org.mycore.datamodel.metadata.MCRMetaLangText;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
@@ -76,13 +78,21 @@ import org.mycore.restapi.v1.errors.MCRRestAPIException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.UriInfo;
 
 public class MCRRestAPIUploadHelper {
-    private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIUploadHelper.class);
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final java.nio.file.Path UPLOAD_DIR = Paths
         .get(MCRConfiguration2.getStringOrThrow("MCR.RestAPI.v1.Upload.Directory"));
+
+    private static final String PATH_OBJECTS = "objects";
+
+    private static final String PATH_DERIVATES = "derivates";
+
+    private static final String PATH_CONTENTS = "contents";
 
     static {
         if (!Files.exists(UPLOAD_DIR)) {
@@ -124,8 +134,8 @@ public class MCRRestAPIUploadHelper {
 
             MCRObject object = MCRObjectCommands.updateFromFile(fXML.toString(), false);// handles "create" as well
             mcrID = Objects.requireNonNull(object, "An error occurred while the object was created").getId();
-            return Response.created(info.getBaseUriBuilder().path("objects/" + mcrID).build())
-                .type("application/xml; charset=UTF-8")
+            return Response.created(info.getBaseUriBuilder().path(PATH_OBJECTS + "/" + mcrID).build())
+                .type(APPLICATION_XML_UTF_8)
                 .build();
         } catch (Exception e) {
             LOGGER.error("Unable to Upload file: {}", fXML, e);
@@ -205,11 +215,11 @@ public class MCRRestAPIUploadHelper {
         MCRCategoryDAO dao) throws MCRRestAPIException {
         final List<MCRCategoryID> categories = Stream.of(classifications.split(" "))
             .map(MCRCategoryID::fromString)
-            .collect(Collectors.toList());
+            .toList();
 
         final List<MCRCategoryID> notExisting = categories.stream()
             .filter(Predicate.not(dao::exist))
-            .collect(Collectors.toList());
+            .toList();
 
         if (!notExisting.isEmpty()) {
             throw new MCRRestAPIException(Status.NOT_FOUND,
@@ -232,8 +242,9 @@ public class MCRRestAPIUploadHelper {
         throws MCRPersistenceException, MCRAccessException {
         MCRDerivate mcrDerivate = new MCRDerivate();
 
+        MCRObjectDerivate derivate = mcrDerivate.getDerivate();
         if (label != null && !label.isEmpty()) {
-            mcrDerivate.getDerivate().getTitles()
+            derivate.getTitles()
                 .add(new MCRMetaLangText("title", null, null, 0, null, label));
         }
 
@@ -241,8 +252,8 @@ public class MCRRestAPIUploadHelper {
             MCRObjectID.getInstance(MCRObjectID.formatID(mcrObjIDObj.getProjectId() + "_derivate", 0));
         mcrDerivate.setId(zeroDerId);
         mcrDerivate.setSchema("datamodel-derivate.xsd");
-        mcrDerivate.getDerivate().setLinkMeta(new MCRMetaLinkID("linkmeta", mcrObjIDObj, null, null));
-        mcrDerivate.getDerivate().setInternals(new MCRMetaIFS("internal", null));
+        derivate.setLinkMeta(new MCRMetaLinkID(MCRObjectDerivate.ELEMENT_LINKMETA, mcrObjIDObj, null, null));
+        derivate.setInternals(new MCRMetaIFS(MCRObjectDerivate.ELEMENT_INTERNAL, null));
         if (classifications != null && !classifications.isEmpty()) {
             addClassificationsToDerivate(mcrDerivate, classifications);
         }
@@ -301,7 +312,7 @@ public class MCRRestAPIUploadHelper {
             throw restAPIException;
         }
 
-        return buildResponse(info, objID, derID + "/contents");
+        return buildResponse(info, objID, derID + "/" + PATH_CONTENTS);
     }
 
     private static SortedMap<String, String> createParameterMap(String pathParamMcrObjID, String pathParamMcrDerID,
@@ -408,9 +419,10 @@ public class MCRRestAPIUploadHelper {
     }
 
     private static Response buildResponse(UriInfo info, MCRObjectID objID, String derID) {
+        UriBuilder uriBuilder = info.getBaseUriBuilder();
         return Response
-            .created(info.getBaseUriBuilder().path("objects/" + objID + "/derivates/" + derID).build())
-            .type("application/xml; charset=UTF-8").build();
+            .created(uriBuilder.path(PATH_OBJECTS + "/" + objID + "/" + PATH_DERIVATES + "/" + derID).build())
+            .type(APPLICATION_XML_UTF_8).build();
     }
 
     /**
@@ -443,9 +455,9 @@ public class MCRRestAPIUploadHelper {
 
         return Response
             .created(info.getBaseUriBuilder()
-                .path("objects/" + objID + "/derivates/" + derID + "/contents")
+                .path(PATH_OBJECTS + "/" + objID + "/" + PATH_DERIVATES + "/" + derID + "/" + PATH_CONTENTS)
                 .build())
-            .type("application/xml; charset=UTF-8")
+            .type(APPLICATION_XML_UTF_8)
             .build();
     }
 
@@ -466,8 +478,8 @@ public class MCRRestAPIUploadHelper {
         try {
             MCRMetadataManager.deleteMCRDerivate(derID);
             return Response
-                .created(info.getBaseUriBuilder().path("objects/" + objID + "/derivates").build())
-                .type("application/xml; charset=UTF-8")
+                .created(info.getBaseUriBuilder().path(PATH_OBJECTS + "/" + objID + "/" + PATH_DERIVATES).build())
+                .type(APPLICATION_XML_UTF_8)
                 .build();
         } catch (MCRAccessException e) {
             MCRRestAPIException restAPIException = new MCRRestAPIException(Status.FORBIDDEN,

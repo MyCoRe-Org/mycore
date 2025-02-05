@@ -18,6 +18,7 @@
 package org.mycore.datamodel.common;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URLDecoder;
@@ -58,11 +59,16 @@ import org.w3c.dom.NodeList;
  */
 public class MCRDataURL implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final String SCHEME = "data:";
 
-    private static final String DEFAULT_MIMETYPE = "text/plain";
+    private static final String MIME_TYPE_TEXT_XML = "text/xml";
+
+    private static final String MIME_TYPE_TEXT_PLAIN = "text/plain";
+
+    private static final String DEFAULT_MIMETYPE = MIME_TYPE_TEXT_PLAIN;
 
     private static final Pattern PATTERN_MIMETYPE = Pattern.compile("^([a-z0-9\\-\\+]+)\\/([a-z0-9\\-\\+]+)$");
 
@@ -295,7 +301,7 @@ public class MCRDataURL implements Serializable {
      */
     public static String build(final Document document, final String mimeType)
         throws TransformerException, MalformedURLException {
-        return build(document, null, mimeType, "UTF-8");
+        return build(document, null, mimeType, StandardCharsets.UTF_8.name());
     }
 
     /**
@@ -307,7 +313,7 @@ public class MCRDataURL implements Serializable {
      */
     public static String build(final NodeList nodeList, final String mimeType)
         throws TransformerException, MalformedURLException {
-        return build(nodeList, null, mimeType, "UTF-8");
+        return build(nodeList, null, mimeType, StandardCharsets.UTF_8.name());
     }
 
     /**
@@ -319,7 +325,7 @@ public class MCRDataURL implements Serializable {
      */
     public static String build(final String str, final String mimeType)
         throws MalformedURLException {
-        return build(str, null, mimeType, "UTF-8");
+        return build(str, null, mimeType, StandardCharsets.UTF_8.name());
     }
 
     /**
@@ -330,7 +336,7 @@ public class MCRDataURL implements Serializable {
      * @return a string with "data" URL
      */
     public static String build(final Document document) throws TransformerException, MalformedURLException {
-        return build(document, null, "text/xml", "UTF-8");
+        return build(document, null, MIME_TYPE_TEXT_XML, StandardCharsets.UTF_8.name());
     }
 
     /**
@@ -341,7 +347,7 @@ public class MCRDataURL implements Serializable {
      * @return a string with "data" URL
      */
     public static String build(final NodeList nodeList) throws TransformerException, MalformedURLException {
-        return build(nodeList, null, "text/xml", "UTF-8");
+        return build(nodeList, null, MIME_TYPE_TEXT_XML, StandardCharsets.UTF_8.name());
     }
 
     /**
@@ -352,7 +358,7 @@ public class MCRDataURL implements Serializable {
      * @return a string with "data" URL
      */
     public static String build(final String str) throws MalformedURLException {
-        return build(str, null, "text/palin", "UTF-8");
+        return build(str, null, MIME_TYPE_TEXT_PLAIN, StandardCharsets.UTF_8.name());
     }
 
     /**
@@ -367,10 +373,11 @@ public class MCRDataURL implements Serializable {
             String[] parts = url.substring(SCHEME.length()).split(DATA_SEPARATOR, 2);
             if (parts.length == 2) {
                 String[] tokens = parts[0].split(TOKEN_SEPARATOR);
-                List<String> token = Arrays.stream(tokens).filter(s -> !s.contains(PARAM_SEPARATOR))
-                    .collect(Collectors.toList());
+                List<String> token = Arrays.stream(tokens)
+                    .filter(s -> !s.contains(PARAM_SEPARATOR))
+                    .toList();
                 Map<String, String> params = parseTokenizedParameters(parts);
-                final String mimeType = !token.isEmpty() ? token.get(0) : null;
+                final String mimeType = !token.isEmpty() ? token.getFirst() : null;
 
                 if (mimeType != null && !mimeType.isEmpty() && !PATTERN_MIMETYPE.matcher(mimeType).matches()) {
                     throw new MalformedURLException("Unknown mime type.");
@@ -409,7 +416,7 @@ public class MCRDataURL implements Serializable {
 
     private static Map<String, String> parseTokenizedParameters(String[] parts) {
         String[] tokens = parts[0].split(TOKEN_SEPARATOR);
-        Map<String, String> params = Arrays.stream(tokens).filter(s -> s.contains(PARAM_SEPARATOR))
+        return Arrays.stream(tokens).filter(s -> s.contains(PARAM_SEPARATOR))
             .map(s -> s.split(PARAM_SEPARATOR, 2)).collect(Collectors.toMap(sl -> sl[0], sl -> {
                 try {
                     return decode(sl[1], StandardCharsets.UTF_8);
@@ -417,7 +424,6 @@ public class MCRDataURL implements Serializable {
                     throw new MCRException("Error decoding the parameter value \"" + sl[1] + "\".", e);
                 }
             }));
-        return params;
     }
 
     private static String encode(final String str, final Charset charset) {

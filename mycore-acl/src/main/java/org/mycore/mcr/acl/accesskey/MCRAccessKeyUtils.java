@@ -33,6 +33,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyException;
@@ -123,7 +124,7 @@ public class MCRAccessKeyUtils {
         if (!isAccessKeyForSessionAllowed()) {
             throw new MCRAccessKeyException("Access keys is not allowed.");
         }
-        if ("derivate".equals(objectId.getTypeId())) {
+        if (MCRDerivate.OBJECT_TYPE.equals(objectId.getTypeId())) {
             addAccessKeySecretForObject(session, objectId, value);
         } else {
             boolean success = false;
@@ -185,7 +186,7 @@ public class MCRAccessKeyUtils {
      */
     public static synchronized void addAccessKeySecret(final MCRUser user, final MCRObjectID objectId,
         final String value) throws MCRException {
-        if ("derivate".equals(objectId.getTypeId())) {
+        if (MCRDerivate.OBJECT_TYPE.equals(objectId.getTypeId())) {
             addAccessKeySecretForObject(user, objectId, value);
         } else {
             boolean success = false;

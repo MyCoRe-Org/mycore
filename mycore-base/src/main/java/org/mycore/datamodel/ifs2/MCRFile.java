@@ -52,6 +52,8 @@ public class MCRFile extends MCRStoredNode {
      */
     public static final String MD5_OF_EMPTY_FILE = "d41d8cd98f00b204e9800998ecf8427e";
 
+    private static final String MD_5 = "md5";
+
     /**
      * Returns a MCRFile object representing an existing file already stored in
      * the store.
@@ -76,7 +78,7 @@ public class MCRFile extends MCRStoredNode {
     protected MCRFile(MCRDirectory parent, String name) throws IOException {
         super(parent, name, "file");
         Files.createFile(path);
-        writeData(e -> e.setAttribute("md5", MD5_OF_EMPTY_FILE));
+        writeData(e -> e.setAttribute(MD_5, MD5_OF_EMPTY_FILE));
         getRoot().saveAdditionalData();
     }
 
@@ -122,7 +124,7 @@ public class MCRFile extends MCRStoredNode {
         try (MCRContentInputStream cis = source.getContentInputStream()) {
             source.sendTo(path, StandardCopyOption.REPLACE_EXISTING);
             String md5 = cis.getMD5String();
-            writeData(e -> e.setAttribute("md5", md5));
+            writeData(e -> e.setAttribute(MD_5, md5));
             getRoot().saveAdditionalData();
             return md5;
         }
@@ -134,7 +136,7 @@ public class MCRFile extends MCRStoredNode {
      * Use only if you modified the content outside of {@link #setContent(MCRContent)}.
      */
     public void setMD5(String md5) throws IOException {
-        writeData(e -> e.setAttribute("md5", md5));
+        writeData(e -> e.setAttribute(MD_5, md5));
         getRoot().saveAdditionalData();
     }
 
@@ -153,9 +155,9 @@ public class MCRFile extends MCRStoredNode {
             e.removeChildren("file");
             e.removeChildren("directory");
             String md5 = cis.getMD5String();
-            if (!md5.equals(e.getAttributeValue("md5"))) {
+            if (!md5.equals(e.getAttributeValue(MD_5))) {
                 LOGGER.warn("Fixed MD5 of {} to {}", path, md5);
-                e.setAttribute("md5", md5);
+                e.setAttribute(MD_5, md5);
             }
         });
     }

@@ -32,6 +32,6 @@ public class MCRRestAPIExceptionMapper implements ExceptionMapper<MCRRestAPIExce
     @Override
     public Response toResponse(MCRRestAPIException ex) {
         return Response.status(ex.getStatus()).entity(MCRRestAPIError.convertErrorListToJSONString(ex.getErrors()))
-            .type(MCRJerseyUtil.APPLICATION_JSON_UTF8).build();
+            .type(MCRJerseyUtil.APPLICATION_JSON_UTF_8).build();
     }
 }

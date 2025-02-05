@@ -66,7 +66,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRUploadHandlerIFS.class);
 
-    private static final String ID_TYPE = "derivate";
+    private static final String ID_TYPE = MCRDerivate.OBJECT_TYPE;
 
     private static final String FILE_PROCESSOR_PROPERTY = "MCR.MCRUploadHandlerIFS.FileProcessors";
 
@@ -152,12 +152,12 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         derivate.setSchema(schema);
 
         MCRMetaLinkID linkId = new MCRMetaLinkID();
-        linkId.setSubTag("linkmeta");
+        linkId.setSubTag(MCRObjectDerivate.ELEMENT_LINKMETA);
         linkId.setReference(documentID, null, null);
         derivate.getDerivate().setLinkMeta(linkId);
 
         MCRMetaIFS ifs = new MCRMetaIFS();
-        ifs.setSubTag("internal");
+        ifs.setSubTag(MCRObjectDerivate.ELEMENT_INTERNAL);
         ifs.setSourcePath(null);
         derivate.getDerivate().setInternals(ifs);
 

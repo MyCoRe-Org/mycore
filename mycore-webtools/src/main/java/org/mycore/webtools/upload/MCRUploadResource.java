@@ -71,6 +71,7 @@ public class MCRUploadResource {
     @Context
     ContainerRequestContext request;
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static List<MCRPostUploadFileProcessor> initProcessorList() {
         List<String> fileProcessorList = MCRConfiguration2.getString(FILE_PROCESSOR_PROPERTY)
             .map(MCRConfiguration2::splitValue)

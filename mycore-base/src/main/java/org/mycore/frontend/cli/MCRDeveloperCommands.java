@@ -61,7 +61,7 @@ import com.google.common.base.Splitter;
  *
  * @author Torsten Krause
  */
-
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 @MCRCommandGroup(name = "Developer Commands")
 public class MCRDeveloperCommands {
 

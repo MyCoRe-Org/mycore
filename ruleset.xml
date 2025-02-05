@@ -206,11 +206,12 @@
   <rule ref="category/java/errorprone.xml/AvoidCatchingNPE"/>
   <rule ref="category/java/errorprone.xml/AvoidCatchingThrowable"/>
   <rule ref="category/java/errorprone.xml/AvoidDecimalLiteralsInBigDecimalConstructor"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
-  <rule ref="category/java/errorprone.xml/AvoidDuplicateLiterals"/>
-  -->
-  <rule ref="category/java/errorprone.xml/AvoidEnumAsIdentifier"/>
+  <rule ref="category/java/errorprone.xml/AvoidDuplicateLiterals">
+    <properties>
+      <property name="exceptionList" value="unchecked" />
+    </properties>
+  </rule>
+  <rule ref="category/java/errorprone.xml/AvoidEnumAsIdentifier" />
   <rule ref="category/java/errorprone.xml/AvoidInstanceofChecksInCatchClause"/>
   <rule ref="category/java/errorprone.xml/AvoidLosingExceptionInformation"/>
   <rule ref="category/java/errorprone.xml/AvoidMultipleUnaryOperators"/>

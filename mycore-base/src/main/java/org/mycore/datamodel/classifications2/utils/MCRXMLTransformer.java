@@ -31,6 +31,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRXlink;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
@@ -102,7 +103,7 @@ public class MCRXMLTransformer {
 
     private static void setURL(Element e, MCRCategory category) throws URISyntaxException {
         if (e.getChild("url") != null) {
-            final String uri = e.getChild("url").getAttributeValue("href", XLINK_NAMESPACE);
+            final String uri = e.getChild("url").getAttributeValue(MCRXlink.HREF, XLINK_NAMESPACE);
             if (uri != null) {
                 category.setURI(new URI(uri));
             }

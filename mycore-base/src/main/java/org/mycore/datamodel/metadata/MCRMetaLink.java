@@ -30,6 +30,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 
 import com.google.gson.JsonObject;
+import org.mycore.common.MCRXlink;
 
 /**
  * This class implements all method for generic handling with the MCRMetaLink part of a metadata object.
@@ -45,7 +46,11 @@ import com.google.gson.JsonObject;
  * @author Jens Kupferschmidt
  */
 public class MCRMetaLink extends MCRMetaDefault {
+
     private static final Logger LOGGER = LogManager.getLogger();
+
+    public static final String CLASS_NAME = "MCRMetaLink";
+
     // MetaLink data
     protected String href;
     protected String label;
@@ -69,13 +74,13 @@ public class MCRMetaLink extends MCRMetaDefault {
      * If the value of <em>subtag</em> is null or empty an exception was throwed.
      * @param subtag
      *            the name of the subtag
-     * @param inherted
+     * @param inherited
      *            a value &gt;= 0
      * @exception MCRException
      *                if the set_datapart or subtag value is null or empty
      */
-    public MCRMetaLink(String subtag, int inherted) throws MCRException {
-        super(subtag, null, null, inherted);
+    public MCRMetaLink(String subtag, int inherited) throws MCRException {
+        super(subtag, null, null, inherited);
     }
 
     /**
@@ -91,7 +96,7 @@ public class MCRMetaLink extends MCRMetaDefault {
      *                if the href value is null or empty
      */
     public void setReference(String href, String label, String title) throws MCRException {
-        linktype = "locator";
+        linktype = MCRXlink.TYPE_LOCATOR;
 
         this.href = MCRUtils.filterTrimmedNotEmpty(href)
             .orElseThrow(() -> new MCRException("The href value is null or empty."));
@@ -116,7 +121,7 @@ public class MCRMetaLink extends MCRMetaDefault {
             .orElseThrow(() -> new MCRException("The from value is null or empty."));
         this.to = MCRUtils.filterTrimmedNotEmpty(to)
             .orElseThrow(() -> new MCRException("The to value is null or empty."));
-        linktype = "arc";
+        linktype = MCRXlink.TYPE_ARC;
         this.title = title;
     }
 
@@ -227,10 +232,10 @@ public class MCRMetaLink extends MCRMetaDefault {
      * @return true if it is compare, else return false
      */
     public final boolean compare(MCRMetaLink input) {
-        if (linktype.equals("locator") && linktype.equals(input.getXLinkType()) && href.equals(input.getXLinkHref())) {
+        if (linktype.equals(MCRXlink.TYPE_LOCATOR) && linktype.equals(input.getXLinkType()) && href.equals(input.getXLinkHref())) {
             return true;
         }
-        if (linktype.equals("arc")) {
+        if (linktype.equals(MCRXlink.TYPE_ARC)) {
             return linktype.equals(input.getXLinkType())
                 && from.equals(input.getXLinkFrom())
                 && to.equals(input.getXLinkTo());
@@ -277,21 +282,21 @@ public class MCRMetaLink extends MCRMetaDefault {
 
         String temp = element.getAttributeValue("type", XLINK_NAMESPACE);
 
-        if (temp != null && (temp.equals("locator") || temp.equals("arc"))) {
+        if (temp != null && (temp.equals(MCRXlink.TYPE_LOCATOR) || temp.equals(MCRXlink.TYPE_ARC))) {
             linktype = temp;
         } else {
             throw new MCRException("The xlink:type is not locator or arc.");
         }
 
-        if (linktype.equals("locator")) {
-            String temp1 = element.getAttributeValue("href", XLINK_NAMESPACE);
-            String temp2 = element.getAttributeValue("label", XLINK_NAMESPACE);
-            String temp3 = element.getAttributeValue("title", XLINK_NAMESPACE);
+        if (linktype.equals(MCRXlink.TYPE_LOCATOR)) {
+            String temp1 = element.getAttributeValue(MCRXlink.HREF, XLINK_NAMESPACE);
+            String temp2 = element.getAttributeValue(MCRXlink.LABEL, XLINK_NAMESPACE);
+            String temp3 = element.getAttributeValue(MCRXlink.TITLE, XLINK_NAMESPACE);
             setReference(temp1, temp2, temp3);
         } else {
-            String temp1 = element.getAttributeValue("from", XLINK_NAMESPACE);
-            String temp2 = element.getAttributeValue("to", XLINK_NAMESPACE);
-            String temp3 = element.getAttributeValue("title", XLINK_NAMESPACE);
+            String temp1 = element.getAttributeValue(MCRXlink.FROM, XLINK_NAMESPACE);
+            String temp2 = element.getAttributeValue(MCRXlink.TO, XLINK_NAMESPACE);
+            String temp3 = element.getAttributeValue(MCRXlink.TITLE, XLINK_NAMESPACE);
             setBiLink(temp1, temp2, temp3);
         }
 
@@ -309,25 +314,25 @@ public class MCRMetaLink extends MCRMetaDefault {
     @Override
     public Element createXML() throws MCRException {
         Element elm = super.createXML();
-        elm.setAttribute("type", linktype, XLINK_NAMESPACE);
+        elm.setAttribute(MCRXlink.TYPE, linktype, XLINK_NAMESPACE);
 
         if (title != null) {
-            elm.setAttribute("title", title, XLINK_NAMESPACE);
+            elm.setAttribute(MCRXlink.TITLE, title, XLINK_NAMESPACE);
         }
 
         if (label != null) {
-            elm.setAttribute("label", label, XLINK_NAMESPACE);
+            elm.setAttribute(MCRXlink.LABEL, label, XLINK_NAMESPACE);
         }
 
         if (role != null) {
-            elm.setAttribute("role", role, XLINK_NAMESPACE);
+            elm.setAttribute(MCRXlink.ROLE, role, XLINK_NAMESPACE);
         }
 
-        if (linktype.equals("locator")) {
-            elm.setAttribute("href", href, XLINK_NAMESPACE);
+        if (linktype.equals(MCRXlink.TYPE_LOCATOR)) {
+            elm.setAttribute(MCRXlink.HREF, href, XLINK_NAMESPACE);
         } else {
-            elm.setAttribute("from", from, XLINK_NAMESPACE);
-            elm.setAttribute("to", to, XLINK_NAMESPACE);
+            elm.setAttribute(MCRXlink.FROM, from, XLINK_NAMESPACE);
+            elm.setAttribute(MCRXlink.TO, to, XLINK_NAMESPACE);
         }
 
         return elm;
@@ -362,19 +367,19 @@ public class MCRMetaLink extends MCRMetaDefault {
     public JsonObject createJSON() {
         JsonObject obj = super.createJSON();
         if (title != null) {
-            obj.addProperty("title", title);
+            obj.addProperty(MCRXlink.TITLE, title);
         }
         if (label != null) {
-            obj.addProperty("label", label);
+            obj.addProperty(MCRXlink.LABEL, label);
         }
         if (role != null) {
-            obj.addProperty("role", role);
+            obj.addProperty(MCRXlink.ROLE, role);
         }
-        if (linktype.equals("locator")) {
-            obj.addProperty("href", href);
+        if (linktype.equals(MCRXlink.TYPE_LOCATOR)) {
+            obj.addProperty(MCRXlink.HREF, href);
         } else {
-            obj.addProperty("from", from);
-            obj.addProperty("to", to);
+            obj.addProperty(MCRXlink.FROM, from);
+            obj.addProperty(MCRXlink.TO, to);
         }
         return obj;
     }
@@ -392,26 +397,26 @@ public class MCRMetaLink extends MCRMetaDefault {
     @Override
     public void validate() throws MCRException {
         super.validate();
-        if (label != null && label.length() > 0 && !XMLChar.isValidNCName(label)) {
+        if (label != null && !label.isEmpty() && !XMLChar.isValidNCName(label)) {
             throw new MCRException(getSubTag() + ": label is no valid NCName:" + label);
         }
         if (linktype == null) {
             throw new MCRException(getSubTag() + ": linktype is null");
         }
-        if (!linktype.equals("locator") && !linktype.equals("arc")) {
+        if (!linktype.equals(MCRXlink.TYPE_LOCATOR) && !linktype.equals(MCRXlink.TYPE_ARC)) {
             throw new MCRException(getSubTag() + ": linktype is unsupported: " + linktype);
         }
-        if (linktype.equals("arc")) {
+        if (linktype.equals(MCRXlink.TYPE_ARC)) {
             throwMCRExceptionIfNullOrInvalid(from);
             throwMCRExceptionIfNullOrInvalid(to);
         }
-        if (linktype.equals("locator") && (href == null || href.length() == 0)) {
+        if (linktype.equals(MCRXlink.TYPE_LOCATOR) && (href == null || href.isEmpty())) {
             throw new MCRException(getSubTag() + ": href is null or empty");
         }
     }
 
     private void throwMCRExceptionIfNullOrInvalid(String string) {
-        if (string == null || string.length() == 0) {
+        if (string == null || string.isEmpty()) {
             throw new MCRException(getSubTag() + ": is null or empty");
         } else if (!XMLChar.isValidNCName(string)) {
             throw new MCRException(getSubTag() + ": is no valid NCName:" + string);

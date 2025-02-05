@@ -47,6 +47,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * given base id. The cache file is located in the data directory of MyCoRe and is named "id_cache" and contains one
  * file for each base id. The file contains the last generated id as a string.
  */
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
 
     private static final Logger LOGGER = LogManager.getLogger();

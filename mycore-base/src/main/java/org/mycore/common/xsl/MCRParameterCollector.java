@@ -48,10 +48,14 @@ import jakarta.servlet.http.HttpSession;
  */
 public class MCRParameterCollector {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRParameterCollector.class);
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    private static final String HEADER_USER_AGENT = "User-Agent";
+
+    private static final String HEADER_REFERER = "Referer";
 
     /** The collected parameters */
-    private Map<String, Object> parameters = new HashMap<>();
+    private final Map<String, Object> parameters = new HashMap<>();
 
     /** If true (which is default), only those parameters starting with "XSL." are copied from session and request */
     private boolean onlySetXSLParameters = true;
@@ -278,23 +282,24 @@ public class MCRParameterCollector {
         String defaultLang = MCRConfiguration2.getString("MCR.Metadata.DefaultLang").orElse(MCRConstants.DEFAULT_LANG);
         parameters.put("DefaultLang", defaultLang);
 
-        String userAgent = request != null ? request.getHeader("User-Agent") : null;
+        String userAgent = request != null ? request.getHeader(HEADER_USER_AGENT) : null;
         if (userAgent != null) {
-            parameters.put("User-Agent", userAgent);
+            parameters.put("UserAgent", userAgent);
         }
-
     }
 
     private void debugSessionParameters() {
         LOGGER.debug("XSL.CurrentUser ={}", () -> parameters.get("CurrentUser"));
-        LOGGER.debug("XSL.Referer ={}", () -> parameters.get("Referer"));
+        LOGGER.debug("XSL.Referer ={}", () -> parameters.get(HEADER_REFERER));
     }
 
     /** Sets the request and referer URL */
     private void setFromRequestHeader(HttpServletRequest request) {
         parameters.put("RequestURL", getCompleteURL(request));
-        parameters.put("Referer", request.getHeader("Referer") != null ? request.getHeader("Referer") : "");
-        parameters.put("UserAgent", request.getHeader("User-Agent") != null ? request.getHeader("User-Agent") : "");
+        String referer = request.getHeader(HEADER_REFERER);
+        String userAgent = request.getHeader(HEADER_USER_AGENT);
+        parameters.put("Referer", referer != null ? referer : "");
+        parameters.put("UserAgent", userAgent != null ? userAgent : "");
     }
 
     /**
@@ -308,7 +313,7 @@ public class MCRParameterCollector {
         buffer.append(errorURI != null ? errorURI : request.getRequestURI());
 
         String queryString = request.getQueryString();
-        if (queryString != null && queryString.length() > 0) {
+        if (queryString != null && !queryString.isEmpty()) {
             buffer.append('?').append(queryString);
         }
 

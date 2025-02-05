@@ -20,7 +20,6 @@ package org.mycore.frontend.jersey;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.jdom2.Document;
@@ -53,9 +52,19 @@ import jakarta.ws.rs.core.UriInfo;
  */
 public final class MCRJerseyUtil {
 
-    public static final String APPLICATION_JSON_UTF8 = MediaType.APPLICATION_JSON + ";charset=utf-8";
+    public static final String CHARSET_UTF_8 = "charset=UTF-8";
 
-    public static final String APPLICATION_XML_UTF8 = MediaType.APPLICATION_XML + ";charset=utf-8";
+    public static final String CHARSET_ISO_8859_1 = "charset=ISO-8859-1";
+
+    public static final String APPLICATION_JSON_UTF_8 = MediaType.APPLICATION_JSON + ";" + CHARSET_UTF_8;
+
+    public static final String APPLICATION_XML_UTF_8 = MediaType.APPLICATION_XML + ";" + CHARSET_UTF_8;
+
+    public static final String TEXT_XML_UTF_8 = MediaType.TEXT_XML + ";" + CHARSET_UTF_8;
+
+    public static final String TEXT_PLAIN_UTF_8 = MediaType.TEXT_PLAIN + ";" + CHARSET_UTF_8;
+
+    public static final String TEXT_PLAIN_ISO_8859_1 = MediaType.TEXT_PLAIN + ";" + CHARSET_ISO_8859_1;
 
     private MCRJerseyUtil() {
     }
@@ -168,11 +177,11 @@ public final class MCRJerseyUtil {
     }
 
     /**
-     * Returns a human readable message of a http status code.
+     * Returns a human-readable message of a http status code.
      *
      * @param statusCode
      *            http status code
-     * @return human readable string
+     * @return human-readable string
      */
     public static String fromStatusCode(int statusCode) {
         Status status = Response.Status.fromStatusCode(statusCode);
@@ -190,7 +199,7 @@ public final class MCRJerseyUtil {
         String baseURL = info.getBaseUri().toString();
         List<String> applicationPaths = MCRConfiguration2
             .getOrThrow("MCR.Jersey.Resource.ApplicationPaths", MCRConfiguration2::splitValue)
-            .collect(Collectors.toList());
+            .toList();
         for (String path : applicationPaths) {
             baseURL = removeAppPath(baseURL, path);
         }

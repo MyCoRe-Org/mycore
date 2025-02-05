@@ -18,6 +18,10 @@
 
 package org.mycore.restapi.v1;
 
+import static org.mycore.frontend.jersey.MCRJerseyUtil.APPLICATION_JSON_UTF_8;
+import static org.mycore.frontend.jersey.MCRJerseyUtil.APPLICATION_XML_UTF_8;
+import static org.mycore.frontend.jersey.MCRJerseyUtil.TEXT_XML_UTF_8;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Date;
@@ -48,7 +52,6 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.frontend.jersey.MCRCacheControl;
-import org.mycore.frontend.jersey.MCRJerseyUtil;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
 import org.mycore.solr.MCRSolrCoreManager;
@@ -66,7 +69,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.UriInfo;
@@ -75,8 +77,8 @@ import jakarta.ws.rs.core.UriInfo;
  * REST API for classification objects.
  *
  * @author Robert Stephan
- *
  */
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 @Path("/classifications")
 public class MCRRestAPIClassifications {
 
@@ -86,12 +88,14 @@ public class MCRRestAPIClassifications {
 
     private static final MCRCategoryDAO DAO = new MCRCategoryDAOImpl();
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIClassifications.class);
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    private static final String ELEMENT_CATEGORY = "category";
 
     @Context
     ContainerRequest request;
 
-    private Date lastModified = new Date(DAO.getLastModified());
+    private final Date lastModified = new Date(DAO.getLastModified());
 
     /**
      * Output xml
@@ -117,18 +121,18 @@ public class MCRRestAPIClassifications {
 
     /**
      * output categories in JSON format
+     *
      * @param eParent - the parent xml element
      * @param writer - the JSON writer
      * @param lang - the language to be filtered or null if all languages should be displayed
-     *
      */
     private static void writeChildrenAsJSON(Element eParent, JsonWriter writer, String lang) throws IOException {
-        if (eParent.getChildren("category").isEmpty()) {
+        if (eParent.getChildren(ELEMENT_CATEGORY).isEmpty()) {
             return;
         }
         writer.name("categories");
         writer.beginArray();
-        for (Element e : eParent.getChildren("category")) {
+        for (Element e : eParent.getChildren(ELEMENT_CATEGORY)) {
             writer.beginObject();
             writer.name("ID").value(e.getAttributeValue("ID"));
             writer.name("labels").beginArray();
@@ -139,7 +143,7 @@ public class MCRRestAPIClassifications {
             }
             writer.endArray();
 
-            if (!e.getChildren("category").isEmpty()) {
+            if (!e.getChildren(ELEMENT_CATEGORY).isEmpty()) {
                 writeChildrenAsJSON(e, writer, lang);
             }
             writer.endObject();
@@ -168,7 +172,7 @@ public class MCRRestAPIClassifications {
     private static void writeChildrenAsJSONCBTree(Element eParent, JsonWriter writer, String lang, boolean checked)
         throws IOException {
         writer.beginArray();
-        for (Element e : eParent.getChildren("category")) {
+        for (Element e : eParent.getChildren(ELEMENT_CATEGORY)) {
             writer.beginObject();
             writer.name("ID").value(e.getAttributeValue("ID"));
             for (Element eLabel : e.getChildren("label")) {
@@ -177,7 +181,7 @@ public class MCRRestAPIClassifications {
                 }
             }
             writer.name("checked").value(checked);
-            if (!e.getChildren("category").isEmpty()) {
+            if (!e.getChildren(ELEMENT_CATEGORY).isEmpty()) {
                 writer.name("children");
                 writeChildrenAsJSONCBTree(e, writer, lang, checked);
             }
@@ -200,7 +204,7 @@ public class MCRRestAPIClassifications {
     private static void writeChildrenAsJSONJSTree(Element eParent, JsonWriter writer, String lang, boolean opened,
         boolean disabled, boolean selected) throws IOException {
         writer.beginArray();
-        for (Element e : eParent.getChildren("category")) {
+        for (Element e : eParent.getChildren(ELEMENT_CATEGORY)) {
             writer.beginObject();
             writer.name("id").value(e.getAttributeValue("ID"));
             for (Element eLabel : e.getChildren("label")) {
@@ -222,7 +226,7 @@ public class MCRRestAPIClassifications {
                 }
                 writer.endObject();
             }
-            if (!e.getChildren("category").isEmpty()) {
+            if (!e.getChildren(ELEMENT_CATEGORY).isEmpty()) {
                 writer.name("children");
                 writeChildrenAsJSONJSTree(e, writer, lang, opened, disabled, selected);
             }
@@ -239,7 +243,7 @@ public class MCRRestAPIClassifications {
      * @return a Jersey Response Object
      */
     @GET
-    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @Produces({ TEXT_XML_UTF_8, APPLICATION_JSON_UTF_8 })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS))
     public Response listClassifications(@Context UriInfo info,
@@ -266,7 +270,7 @@ public class MCRRestAPIClassifications {
                 xout.output(docOut, sw);
                 return Response.ok(sw.toString())
                     .lastModified(lastModified)
-                    .type("application/xml; charset=UTF-8")
+                    .type(APPLICATION_XML_UTF_8)
                     .build();
             } catch (IOException e) {
                 LOGGER.error("Error while writing JSON object to XML", e);
@@ -294,7 +298,7 @@ public class MCRRestAPIClassifications {
                 writer.close();
 
                 return Response.ok(sw.toString())
-                    .type(MCRJerseyUtil.APPLICATION_JSON_UTF8)
+                    .type(APPLICATION_JSON_UTF_8)
                     .lastModified(lastModified)
                     .build();
             } catch (IOException e) {
@@ -329,7 +333,7 @@ public class MCRRestAPIClassifications {
     @GET
     //@Path("/id/{value}{format:(\\.[^/]+?)?}")  -> working, but returns empty string instead of default value
     @Path("/{classID}")
-    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @Produces({ TEXT_XML_UTF_8, APPLICATION_JSON_UTF_8 })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS))
     public Response showObject(@PathParam("classID") String classID,
@@ -349,7 +353,7 @@ public class MCRRestAPIClassifications {
                 filterNonEmpty(doc.getRootElement().getAttributeValue("ID"), rootElement);
             }
             if (filter.contains("nochildren")) {
-                rootElement.removeChildren("category");
+                rootElement.removeChildren(ELEMENT_CATEGORY);
             }
 
             return createResponse(format, rootElement, style, callback, filter);
@@ -418,11 +422,11 @@ public class MCRRestAPIClassifications {
             if (!callback.isEmpty()) {
                 return Response.ok(callback + "(" + json + ")")
                     .lastModified(lastModified)
-                    .type(MCRJerseyUtil.APPLICATION_JSON_UTF8)
+                    .type(APPLICATION_JSON_UTF_8)
                     .build();
             } else {
                 return Response.ok(json)
-                    .type("application/json; charset=UTF-8")
+                    .type(APPLICATION_JSON_UTF_8)
                     .build();
             }
         }
@@ -436,7 +440,7 @@ public class MCRRestAPIClassifications {
             }
             return Response.ok(xml)
                 .lastModified(lastModified)
-                .type(MCRJerseyUtil.APPLICATION_XML_UTF8)
+                .type(APPLICATION_XML_UTF_8)
                 .build();
         }
 
@@ -498,7 +502,7 @@ public class MCRRestAPIClassifications {
 
     private void filterNonEmpty(String classId, Element e) {
         SolrClient solrClient = MCRSolrCoreManager.getMainSolrClient();
-        Element[] categories = e.getChildren("category").toArray(Element[]::new);
+        Element[] categories = e.getChildren(ELEMENT_CATEGORY).toArray(Element[]::new);
         for (Element cat : categories) {
             SolrQuery solrQquery = new SolrQuery();
             solrQquery.setQuery(

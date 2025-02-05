@@ -18,6 +18,12 @@
 
 package org.mycore.restapi.v1;
 
+import static org.mycore.frontend.jersey.MCRJerseyUtil.APPLICATION_JSON_UTF_8;
+import static org.mycore.frontend.jersey.MCRJerseyUtil.APPLICATION_XML_UTF_8;
+import static org.mycore.frontend.jersey.MCRJerseyUtil.TEXT_PLAIN_ISO_8859_1;
+import static org.mycore.frontend.jersey.MCRJerseyUtil.TEXT_PLAIN_UTF_8;
+import static org.mycore.frontend.jersey.MCRJerseyUtil.TEXT_XML_UTF_8;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -42,7 +48,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.UriInfo;
@@ -53,7 +58,6 @@ import jakarta.ws.rs.core.UriInfo;
  * 
  *  
  * @author Robert Stephan
- * 
  */
 @Path("/messages")
 public class MCRRestAPIMessages {
@@ -82,8 +86,7 @@ public class MCRRestAPIMessages {
      * 
      */
     @GET
-    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8",
-        MediaType.TEXT_PLAIN + ";charset=ISO-8859-1" })
+    @Produces({ TEXT_XML_UTF_8, APPLICATION_JSON_UTF_8, TEXT_PLAIN_ISO_8859_1})
     public Response listMessages(@Context UriInfo info, @Context HttpServletRequest request,
         @QueryParam("lang") @DefaultValue("de") String lang,
         @QueryParam("format") @DefaultValue("property") String format,
@@ -99,12 +102,12 @@ public class MCRRestAPIMessages {
             if (FORMAT_PROPERTY.equals(format)) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 data.store(baos, "MyCoRe Messages (charset='ISO-8859-1')");
-                return Response.ok(baos.toByteArray()).type("text/plain; charset=ISO-8859-1").build();
+                return Response.ok(baos.toByteArray()).type(TEXT_PLAIN_ISO_8859_1).build();
             }
             if (FORMAT_XML.equals(format)) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 data.storeToXML(baos, "MyCoRe Messages");
-                return Response.ok(baos.toString(StandardCharsets.UTF_8)).type("application/xml; charset=UTF-8")
+                return Response.ok(baos.toString(StandardCharsets.UTF_8)).type(APPLICATION_XML_UTF_8)
                     .build();
             }
             if (FORMAT_JSON.equals(format)) {
@@ -123,7 +126,7 @@ public class MCRRestAPIMessages {
                 writer.endObject();
                 writer.close();
 
-                return Response.ok(sw.toString()).type("application/json; charset=UTF-8")
+                return Response.ok(sw.toString()).type(APPLICATION_JSON_UTF_8)
                     .build();
             }
         } catch (IOException e) {
@@ -145,8 +148,7 @@ public class MCRRestAPIMessages {
      */
     @GET
     @Path("/{value}")
-    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8",
-        MediaType.TEXT_PLAIN + ";charset=UTF-8" })
+    @Produces({ TEXT_XML_UTF_8, APPLICATION_JSON_UTF_8, TEXT_PLAIN_UTF_8 })
     public Response getMessage(@Context UriInfo info, @Context HttpServletRequest request,
         @PathParam("value") String key, @QueryParam("lang") @DefaultValue("de") String lang,
         @QueryParam("format") @DefaultValue("text") String format) {
@@ -154,8 +156,7 @@ public class MCRRestAPIMessages {
         String result = MCRTranslation.translate(key, locale);
         try {
             if (FORMAT_PROPERTY.equals(format)) {
-                return Response.ok(key + "=" + result).type("text/plain; charset=ISO-8859-1")
-                    .build();
+                return Response.ok(key + "=" + result).type(TEXT_PLAIN_ISO_8859_1).build();
             }
             if (FORMAT_XML.equals(format)) {
                 Document doc = new Document();
@@ -166,8 +167,7 @@ public class MCRRestAPIMessages {
                 StringWriter sw = new StringWriter();
                 XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
                 outputter.output(doc, sw);
-                return Response.ok(sw.toString()).type("application/xml; charset=UTF-8")
-                    .build();
+                return Response.ok(sw.toString()).type(APPLICATION_XML_UTF_8).build();
             }
             if (FORMAT_JSON.equals(format)) {
                 StringWriter sw = new StringWriter();
@@ -178,15 +178,14 @@ public class MCRRestAPIMessages {
                 writer.value(result);
                 writer.endObject();
                 writer.close();
-                return Response.ok(sw.toString()).type("application/json; charset=UTF-8")
-                    .build();
+                return Response.ok(sw.toString()).type(APPLICATION_JSON_UTF_8).build();
             }
             //text only
-            return Response.ok(result).type("text/plain; charset=UTF-8")
-                .build();
+            return Response.ok(result).type(TEXT_PLAIN_UTF_8).build();
         } catch (IOException e) {
             //toDo
         }
         return Response.status(Status.BAD_REQUEST).build();
     }
+
 }

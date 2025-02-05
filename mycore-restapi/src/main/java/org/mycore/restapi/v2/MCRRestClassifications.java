@@ -18,7 +18,11 @@
 
 package org.mycore.restapi.v2;
 
+import static org.mycore.frontend.jersey.MCRJerseyUtil.APPLICATION_JSON_UTF_8;
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_CLASSID;
+import static org.mycore.restapi.v2.MCRRestStatusCode.BAD_REQUEST;
+import static org.mycore.restapi.v2.MCRRestStatusCode.CREATED;
+import static org.mycore.restapi.v2.MCRRestStatusCode.NO_CONTENT;
 
 import java.io.IOException;
 import java.util.Date;
@@ -51,6 +55,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
@@ -75,7 +80,7 @@ public class MCRRestClassifications {
     ContainerRequestContext request;
 
     @GET
-    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @Produces({ MediaType.APPLICATION_XML, APPLICATION_JSON_UTF_8 })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS))
     @Operation(
@@ -106,7 +111,7 @@ public class MCRRestClassifications {
     private static MCRClass convertToClass(MCRCategory cat) {
         MCRClass mcrClass = new MCRClass();
         mcrClass.setID(cat.getId().getRootID());
-        mcrClass.getLabel().addAll(cat.getLabels().stream().map(MCRLabel::clone).collect(Collectors.toList()));
+        mcrClass.getLabel().addAll(cat.getLabels().stream().map(MCRLabel::clone).toList());
         Optional.ofNullable(cat.getURI())
             .map(MCRClassURL::getInstance)
             .ifPresent(mcrClass::setUrl);
@@ -114,7 +119,7 @@ public class MCRRestClassifications {
     }
 
     @GET
-    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8", "application/rdf+xml" })
+    @Produces({ MediaType.APPLICATION_XML, APPLICATION_JSON_UTF_8, "application/rdf+xml" })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     @Path("/{" + PARAM_CLASSID + "}")
@@ -129,7 +134,7 @@ public class MCRRestClassifications {
     }
 
     @GET
-    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8", "application/rdf+xml" })
+    @Produces({ MediaType.APPLICATION_XML, APPLICATION_JSON_UTF_8, "application/rdf+xml" })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     @Path("/{" + PARAM_CLASSID + "}/{" + PARAM_CATEGID + "}")
@@ -204,17 +209,17 @@ public class MCRRestClassifications {
     }
 
     @PUT
-    @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @Consumes({ MediaType.APPLICATION_XML, APPLICATION_JSON_UTF_8 })
     @Path("/{" + PARAM_CLASSID + "}")
     @Produces(MediaType.APPLICATION_XML)
     @Operation(
         summary = "Creates Classification with the given " + PARAM_CLASSID + ".",
         responses = {
-            @ApiResponse(responseCode = "400",
+            @ApiResponse(responseCode = BAD_REQUEST,
                 content = { @Content(mediaType = MediaType.TEXT_PLAIN) },
                 description = "'MCRCategoryID mismatch'"),
-            @ApiResponse(responseCode = "201", description = "Classification successfully created"),
-            @ApiResponse(responseCode = "204", description = "Classification successfully updated"),
+            @ApiResponse(responseCode = CREATED, description = "Classification successfully created"),
+            @ApiResponse(responseCode = NO_CONTENT, description = "Classification successfully updated"),
         },
         tags = MCRRestUtils.TAG_MYCORE_CLASSIFICATION)
     @MCRRequireTransaction

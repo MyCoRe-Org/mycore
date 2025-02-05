@@ -18,6 +18,13 @@
 
 package org.mycore.mcr.acl.accesskey.restapi.v2;
 
+import static org.mycore.restapi.v2.MCRRestStatusCode.BAD_REQUEST;
+import static org.mycore.restapi.v2.MCRRestStatusCode.CREATED;
+import static org.mycore.restapi.v2.MCRRestStatusCode.NOT_FOUND;
+import static org.mycore.restapi.v2.MCRRestStatusCode.NO_CONTENT;
+import static org.mycore.restapi.v2.MCRRestStatusCode.OK;
+import static org.mycore.restapi.v2.MCRRestStatusCode.UNAUTHORIZED;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -26,6 +33,8 @@ import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyPartialUpdateDto;
 import org.mycore.mcr.acl.accesskey.restapi.v2.access.MCRAccessKeyRestAccessCheckStrategy;
 import org.mycore.restapi.annotations.MCRApiDraft;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
+import org.mycore.restapi.v2.MCRRestDescription;
+import org.mycore.restapi.v2.MCRRestSchemaType;
 import org.mycore.restapi.v2.annotation.MCRRestAccessCheck;
 import org.mycore.restapi.v2.annotation.MCRRestRequiredPermission;
 
@@ -39,6 +48,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -88,15 +98,16 @@ public class MCRAccessKeyRestResource {
      */
     @Operation(summary = "Get all access keys", description = "Retrieve a list of all access keys.")
     @ApiResponses({
-        @ApiResponse(responseCode = "200",
+        @ApiResponse(responseCode = OK,
             content = {
                 @Content(mediaType = MediaType.APPLICATION_JSON,
                     array = @ArraySchema(schema = @Schema(implementation = MCRAccessKeyDto.class))),
             },
             headers = {
-                @Header(name = MCRAccessKeyRestConstants.HEADER_TOTAL_COUNT, schema = @Schema(type = "integer"))
+                @Header(name = MCRAccessKeyRestConstants.HEADER_TOTAL_COUNT,
+                    schema = @Schema(type = MCRRestSchemaType.INTEGER))
             }),
-        @ApiResponse(responseCode = "401", description = DESCRIPTION_UNAUTHORIZED,
+        @ApiResponse(responseCode = UNAUTHORIZED, description = DESCRIPTION_UNAUTHORIZED,
             content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
     })
     @GET
@@ -128,14 +139,14 @@ public class MCRAccessKeyRestResource {
      */
     @Operation(summary = "Get an access key by id", description = "Retrieves a specific access key by id.")
     @ApiResponses({
-        @ApiResponse(responseCode = "200",
+        @ApiResponse(responseCode = OK,
             content = {
                 @Content(mediaType = MediaType.APPLICATION_JSON,
                     schema = @Schema(implementation = MCRAccessKeyDto.class))
             }),
-        @ApiResponse(responseCode = "401", description = DESCRIPTION_UNAUTHORIZED,
+        @ApiResponse(responseCode = UNAUTHORIZED, description = DESCRIPTION_UNAUTHORIZED,
             content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
-        @ApiResponse(responseCode = "404", description = DESCRIPTION_ACCESS_KEY_NOT_FOUND,
+        @ApiResponse(responseCode = NOT_FOUND, description = DESCRIPTION_ACCESS_KEY_NOT_FOUND,
             content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
     })
     @GET
@@ -144,8 +155,8 @@ public class MCRAccessKeyRestResource {
     @MCRRestRequiredPermission(MCRAccessKeyRestConstants.PERMISSION_MANAGE_ACCESS_KEY)
     @MCRRestAccessCheck(strategy = MCRAccessKeyRestAccessCheckStrategy.class)
     public MCRAccessKeyDto findAccessKey(
-        @Parameter(in = ParameterIn.PATH, description = "The access key id", required = true,
-            schema = @Schema(type = "string", implementation = UUID.class))
+        @Parameter(in = ParameterIn.PATH, description = MCRRestDescription.ACCESS_KEY_ID, required = true,
+            schema = @Schema(type = MCRRestSchemaType.STRING, implementation = UUID.class))
         @PathParam(MCRAccessKeyRestConstants.PATH_PARAM_ACCESS_KEY_ID) UUID id) {
         return MCRAccessKeyRestHelper.findAccessKey(id);
     }
@@ -158,12 +169,13 @@ public class MCRAccessKeyRestResource {
      */
     @Operation(summary = "Create access key", description = "Creates a new access key.")
     @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "Access key successfully created",
-            headers = @Header(name = HttpHeaders.LOCATION, schema = @Schema(type = "string", format = "uri"),
+        @ApiResponse(responseCode = CREATED, description = "Access key successfully created",
+            headers = @Header(name = HttpHeaders.LOCATION,
+                schema = @Schema(type = MCRRestSchemaType.STRING, format = "uri"),
                 description = "Location of the new access key")),
-        @ApiResponse(responseCode = "400", description = DESCRIPTION_INVALID_INPUT,
+        @ApiResponse(responseCode = BAD_REQUEST, description = DESCRIPTION_INVALID_INPUT,
             content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
-        @ApiResponse(responseCode = "401", description = DESCRIPTION_UNAUTHORIZED,
+        @ApiResponse(responseCode = UNAUTHORIZED, description = DESCRIPTION_UNAUTHORIZED,
             content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
     })
     @POST
@@ -186,12 +198,12 @@ public class MCRAccessKeyRestResource {
      */
     @Operation(summary = "Update an access key by id", description = "Updates an existing access key by id.")
     @ApiResponses({
-        @ApiResponse(responseCode = "204", description = "Access key update sucessfully"),
-        @ApiResponse(responseCode = "400", description = DESCRIPTION_INVALID_INPUT,
+        @ApiResponse(responseCode = NO_CONTENT, description = "Access key update successfully"),
+        @ApiResponse(responseCode = BAD_REQUEST, description = DESCRIPTION_INVALID_INPUT,
             content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
-        @ApiResponse(responseCode = "401", description = DESCRIPTION_UNAUTHORIZED,
+        @ApiResponse(responseCode = UNAUTHORIZED, description = DESCRIPTION_UNAUTHORIZED,
             content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
-        @ApiResponse(responseCode = "404", description = DESCRIPTION_ACCESS_KEY_NOT_FOUND,
+        @ApiResponse(responseCode = NOT_FOUND, description = DESCRIPTION_ACCESS_KEY_NOT_FOUND,
             content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
     })
     @PUT
@@ -201,8 +213,8 @@ public class MCRAccessKeyRestResource {
     @MCRRestAccessCheck(strategy = MCRAccessKeyRestAccessCheckStrategy.class)
     @MCRRequireTransaction
     public Response updateAccessKey(
-        @Parameter(in = ParameterIn.PATH, description = "The access key id", required = true,
-            schema = @Schema(type = "string", implementation = UUID.class))
+        @Parameter(in = ParameterIn.PATH, description = MCRRestDescription.ACCESS_KEY_ID, required = true,
+            schema = @Schema(type = MCRRestSchemaType.STRING, implementation = UUID.class))
         @PathParam(MCRAccessKeyRestConstants.PATH_PARAM_ACCESS_KEY_ID) UUID id,
         @RequestBody(content = @Content(mediaType = MediaType.APPLICATION_JSON,
             schema = @Schema(implementation = MCRAccessKeyDto.class))) MCRAccessKeyDto accessKeyDto) {
@@ -219,12 +231,12 @@ public class MCRAccessKeyRestResource {
     @Operation(summary = "Partial update an access key by id",
         description = "Partially updates an existing access key by id.")
     @ApiResponses({
-        @ApiResponse(responseCode = "204", description = "Access key update sucessfully"),
-        @ApiResponse(responseCode = "400", description = DESCRIPTION_INVALID_INPUT,
+        @ApiResponse(responseCode = NO_CONTENT, description = "Access key update sucessfully"),
+        @ApiResponse(responseCode = BAD_REQUEST, description = DESCRIPTION_INVALID_INPUT,
             content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
-        @ApiResponse(responseCode = "401", description = DESCRIPTION_UNAUTHORIZED,
+        @ApiResponse(responseCode = UNAUTHORIZED, description = DESCRIPTION_UNAUTHORIZED,
             content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
-        @ApiResponse(responseCode = "404", description = DESCRIPTION_ACCESS_KEY_NOT_FOUND,
+        @ApiResponse(responseCode = NOT_FOUND, description = DESCRIPTION_ACCESS_KEY_NOT_FOUND,
             content = { @Content(mediaType = MediaType.APPLICATION_JSON) })
     })
     @PATCH
@@ -234,8 +246,8 @@ public class MCRAccessKeyRestResource {
     @MCRRestAccessCheck(strategy = MCRAccessKeyRestAccessCheckStrategy.class)
     @MCRRequireTransaction
     public Response partialUpdateAccessKey(
-        @Parameter(in = ParameterIn.PATH, description = "The access key id", required = true,
-            schema = @Schema(type = "string", implementation = UUID.class))
+        @Parameter(in = ParameterIn.PATH, description = MCRRestDescription.ACCESS_KEY_ID, required = true,
+            schema = @Schema(type = MCRRestSchemaType.STRING, implementation = UUID.class))
         @PathParam(MCRAccessKeyRestConstants.PATH_PARAM_ACCESS_KEY_ID) UUID id,
         @RequestBody(content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(
             implementation = MCRAccessKeyPartialUpdateDto.class))) MCRAccessKeyPartialUpdateDto accessKeyDto) {
@@ -250,10 +262,10 @@ public class MCRAccessKeyRestResource {
      */
     @Operation(summary = "Delete an access key by id")
     @ApiResponses({
-        @ApiResponse(responseCode = "204", description = "Access key deleted sucessfully"),
-        @ApiResponse(responseCode = "401", description = DESCRIPTION_UNAUTHORIZED,
+        @ApiResponse(responseCode = NO_CONTENT, description = "Access key deleted successfully"),
+        @ApiResponse(responseCode = UNAUTHORIZED, description = DESCRIPTION_UNAUTHORIZED,
             content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
-        @ApiResponse(responseCode = "404", description = DESCRIPTION_ACCESS_KEY_NOT_FOUND,
+        @ApiResponse(responseCode = NOT_FOUND, description = DESCRIPTION_ACCESS_KEY_NOT_FOUND,
             content = { @Content(mediaType = MediaType.APPLICATION_JSON) })
     })
     @DELETE
@@ -262,8 +274,8 @@ public class MCRAccessKeyRestResource {
     @MCRRestAccessCheck(strategy = MCRAccessKeyRestAccessCheckStrategy.class)
     @MCRRequireTransaction
     public Response removeAccessKey(
-        @Parameter(in = ParameterIn.PATH, description = "The access key id", required = true,
-            schema = @Schema(type = "string", implementation = UUID.class))
+        @Parameter(in = ParameterIn.PATH, description = MCRRestDescription.ACCESS_KEY_ID, required = true,
+            schema = @Schema(type = MCRRestSchemaType.STRING, implementation = UUID.class))
         @PathParam(MCRAccessKeyRestConstants.PATH_PARAM_ACCESS_KEY_ID) UUID id) {
         return MCRAccessKeyRestHelper.removeAccessKey(id);
     }

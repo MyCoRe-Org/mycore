@@ -66,15 +66,16 @@ public class MCRNeo4JUtilsConfigurationHelper {
         Map<String, String> attributes = new HashMap<>();
         attributes.put("id", "/mycoreobject/@ID");
         attributes.put("type", type);
-        String desc = properties.get("descriptor");
+        String descriptor = "descriptor";
+        String desc = properties.get(descriptor);
         if (desc != null && desc.length() > 1) {
-            attributes.put("descriptor", desc);
+            attributes.put(descriptor, desc);
         } else {
-            attributes.put("descriptor", "/mycoreobject/@label");
+            attributes.put(descriptor, "/mycoreobject/@label");
         }
 
         properties.forEach((k, v) -> {
-            if (!k.startsWith("descriptor")) {
+            if (!k.startsWith(descriptor)) {
                 attributes.put(k, v);
             }
         });

@@ -50,6 +50,8 @@ public final class MCRDerivate extends MCRBase {
 
     public static final String ROOT_NAME = "mycorederivate";
 
+    public static final String OBJECT_TYPE = "derivate";
+
     public static final int MAX_LABEL_LENGTH = 256;
 
     // the object content
@@ -57,7 +59,7 @@ public final class MCRDerivate extends MCRBase {
 
     private int order;
 
-    protected String mcrLabel;
+    private String mcrLabel;
 
     /**
      * This is the constructor of the MCRDerivate class. It make an instance of
@@ -111,7 +113,7 @@ public final class MCRDerivate extends MCRBase {
         setLabel(jdomDocument.getRootElement().getAttributeValue("label"));
 
         // get the derivate data of the object
-        Element derivateElement = jdomDocument.getRootElement().getChild("derivate");
+        Element derivateElement = jdomDocument.getRootElement().getChild(MCRObjectDerivate.XML_NAME);
         mcrDerivate = new MCRObjectDerivate(mcrId, derivateElement);
     }
 
@@ -156,7 +158,7 @@ public final class MCRDerivate extends MCRBase {
         if (result == null) {
             return fileUrnMap;
         }
-        String urn = result.getAttributeValue("urn");
+        String urn = result.getAttributeValue(MCRObjectDerivate.ATTRIBUTE_FILESET_URN);
 
         if (urn != null) {
             XPathExpression<Element> filePath = XPathFactory

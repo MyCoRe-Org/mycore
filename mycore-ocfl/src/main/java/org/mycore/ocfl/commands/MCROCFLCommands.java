@@ -110,17 +110,18 @@ public class MCROCFLCommands {
         List<String> invalidState = migration.getInvalidState();
         List<String> withoutHistory = migration.getWithoutHistory();
 
-        LOGGER.info(() -> "The migration resulted in \n" +
-            SUCCESS + ": " + String.join(", ", success) + " \n" +
-            FAILED + ": " + String.join(", ", failed) + " \n" +
-            FAILED_AND_NOW_INVALID_STATE + ": " + String.join(", ", invalidState) + " \n" +
-            SUCCESS_BUT_WITHOUT_HISTORY + ": " + String.join(", ", withoutHistory) + " \n");
+        String ls = System.lineSeparator();
+        LOGGER.info(() -> "The migration resulted in " + ls +
+            SUCCESS + ": " + String.join(", ", success) + ls +
+            FAILED + ": " + String.join(", ", failed) + ls +
+            FAILED_AND_NOW_INVALID_STATE + ": " + String.join(", ", invalidState) + ls +
+            SUCCESS_BUT_WITHOUT_HISTORY + ": " + String.join(", ", withoutHistory) + ls);
 
-        LOGGER.info(() -> "The migration resulted in \n" +
-            SUCCESS + ": " + success.size() + " \n" +
-            FAILED + ": " + failed.size() + " \n" +
-            FAILED_AND_NOW_INVALID_STATE + ": " + invalidState.size() + " \n" +
-            SUCCESS_BUT_WITHOUT_HISTORY + ": " + withoutHistory.size() + " \n");
+        LOGGER.info(() -> "The migration resulted in" + ls +
+            SUCCESS + ": " + success.size() + ls +
+            FAILED + ": " + failed.size() + ls +
+            FAILED_AND_NOW_INVALID_STATE + ": " + invalidState.size() + ls +
+            SUCCESS_BUT_WITHOUT_HISTORY + ": " + withoutHistory.size() + ls);
     }
 
     @MCRCommand(syntax = "migrate metadata to metadatamanager {1} and pruners {2} ",
@@ -179,7 +180,7 @@ public class MCROCFLCommands {
         List<String> outOfSync = getStaleOCFLClassificationIDs();
         commands.addAll(
             outOfSync.stream()
-                .map(id -> "delete ocfl classification " + id).collect(Collectors.toList()));
+                .map(id -> "delete ocfl classification " + id).toList());
         return commands;
     }
 
@@ -196,10 +197,11 @@ public class MCROCFLCommands {
     @MCRCommand(syntax = "update ocfl user {0}",
         help = "Update user {0} in the OCFL Store from database")
     public static void updateOCFLUser(String userId) {
-        if (MCRUserManager.getUser(userId) == null) {
+        MCRUser user = MCRUserManager.getUser(userId);
+        if (user == null) {
             throw new MCRUsageException("The User '" + userId + "' does not exist!");
         }
-        new MCROCFLXMLUserManager().updateUser(MCRUserManager.getUser(userId));
+        new MCROCFLXMLUserManager().updateUser(user);
     }
 
     @MCRCommand(syntax = "delete ocfl user {0}",
@@ -216,7 +218,7 @@ public class MCROCFLCommands {
         List<String> outOfSync = getStaleOCFLUserIDs();
         commands.addAll(
             outOfSync.stream()
-                .map(id -> "delete ocfl user " + id).collect(Collectors.toList()));
+                .map(id -> "delete ocfl user " + id).toList());
         return commands;
     }
 
@@ -310,10 +312,7 @@ public class MCROCFLCommands {
         help = "Permanently delete all hidden/archived ocfl entries")
     public static void purgeMarked() throws IOException {
         if (!confirmPurgeMarked) {
-            LOGGER.info("\n"
-                + "\u001B[93m" + "Enter the command again to confirm \u001B[4mPERMANENTLY\u001B[24m deleting ALL"
-                + " hidden/archived OCFL entries." + "\u001B[0m" + "\n"
-                + "\u001B[41m" + "THIS ACTION CANNOT BE UNDONE!" + "\u001B[0m");
+            logConfirm("entries");
             confirmPurgeMarked = true;
             return;
         }
@@ -329,10 +328,7 @@ public class MCROCFLCommands {
         help = "Permanently delete all hidden/archived ocfl objects")
     public static void purgeMarkedObjects() throws IOException {
         if (!confirmPurgeMarked) {
-            LOGGER.info("\n"
-                + "\u001B[93m" + "Enter the command again to confirm \u001B[4mPERMANENTLY\u001B[24m deleting ALL"
-                + " hidden/archived OCFL objects." + "\u001B[0m" + "\n"
-                + "\u001B[41m" + "THIS ACTION CANNOT BE UNDONE!" + "\u001B[0m");
+            logConfirm("objects");
             confirmPurgeMarked = true;
             return;
         }
@@ -356,10 +352,7 @@ public class MCROCFLCommands {
         help = "Permanently delete all hidden/archived ocfl classes")
     public static void purgeMarkedClasses() throws IOException {
         if (!confirmPurgeMarked) {
-            LOGGER.info("\n"
-                + "\u001B[93m" + "Enter the command again to confirm \u001B[4mPERMANENTLY\u001B[24m deleting ALL"
-                + " hidden/archived OCFL classes." + "\u001B[0m" + "\n"
-                + "\u001B[41m" + "THIS ACTION CANNOT BE UNDONE!" + "\u001B[0m");
+            logConfirm("classes");
             confirmPurgeMarked = true;
             return;
         }
@@ -381,10 +374,7 @@ public class MCROCFLCommands {
         help = "Permanently delete all hidden/archived ocfl users")
     public static void purgeMarkedUsers() throws IOException {
         if (!confirmPurgeMarked) {
-            LOGGER.info("\n"
-                + "\u001B[93m" + "Enter the command again to confirm \u001B[4mPERMANENTLY\u001B[24m deleting ALL"
-                + " hidden/archived OCFL users." + "\u001B[0m" + "\n"
-                + "\u001B[41m" + "THIS ACTION CANNOT BE UNDONE!" + "\u001B[0m");
+            logConfirm("users");
             confirmPurgeMarked = true;
             return;
         }
@@ -400,11 +390,19 @@ public class MCROCFLCommands {
         confirmPurgeMarked = false;
     }
 
+    private static void logConfirm(String type) {
+        LOGGER.info(() -> """
+            
+            \u001B[93mEnter the command again to confirm \u001B[4mPERMANENTLY\u001B[24m deleting ALL\
+             hidden/archived OCFL %s.\u001B[0m
+            \u001B[41mTHIS ACTION CANNOT BE UNDONE!\u001B[0m""".formatted(type));
+    }
+
     private static List<String> getStaleOCFLClassificationIDs() {
         String repositoryKey = MCRConfiguration2.getStringOrThrow("MCR.Classification.Manager.Repository");
         List<String> classDAOList = new MCRCategoryDAOImpl().getRootCategoryIDs().stream()
             .map(MCRCategoryID::toString)
-            .collect(Collectors.toList());
+            .toList();
         OcflRepository repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
         return repository.listObjectIds()
             .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.CLASSIFICATION))
@@ -420,7 +418,7 @@ public class MCROCFLCommands {
         String repositoryKey = MCRConfiguration2.getStringOrThrow("MCR.Users.Manager.Repository");
         List<String> userEMList = MCRUserManager.listUsers("*", null, null, null).stream()
             .map(MCRUser::getUserID)
-            .collect(Collectors.toList());
+            .toList();
         OcflRepository repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
         return repository.listObjectIds()
             .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.USER))

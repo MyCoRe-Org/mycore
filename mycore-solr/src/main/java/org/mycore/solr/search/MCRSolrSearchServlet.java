@@ -19,7 +19,11 @@
 package org.mycore.solr.search;
 
 import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
+import static org.mycore.solr.search.MCRSolrParameter.FILTER_QUERY;
+import static org.mycore.solr.search.MCRSolrParameter.QUERY;
+import static org.mycore.solr.search.MCRSolrParameter.SORT;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -69,6 +73,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class MCRSolrSearchServlet extends MCRServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private enum QueryType {
@@ -159,16 +164,16 @@ public class MCRSolrSearchServlet extends MCRServlet {
         }
 
         // put query and all filterquery´s to the map
-        queryParameterMap.put("q", new String[] { query.toString().trim() });
+        queryParameterMap.put(QUERY.getValue(), new String[] { query.toString().trim() });
 
         for (StringBuilder filterQueryBuilder : filterQueryMap.values()) {
             // skip the whole query if no field has been added
             if (filterQueryBuilder.length() > JOIN_PATTERN.length()) {
-                queryParameterMap.put("fq", new String[] { filterQueryBuilder.toString() });
+                queryParameterMap.put(FILTER_QUERY.getValue(), new String[] { filterQueryBuilder.toString() });
             }
         }
 
-        queryParameterMap.put("sort", new String[] { buildSolrSortParameter(sortParameters) });
+        queryParameterMap.put(SORT.getValue(), new String[] { buildSolrSortParameter(sortParameters) });
 
         return queryParameterMap;
     }
@@ -218,9 +223,8 @@ public class MCRSolrSearchServlet extends MCRServlet {
     }
 
     /**
-     * This method is used to create a map wich contains all fields as key and
+     * This method is used to create a map which contains all fields as key and
      * the type of the field as value.
-     *
      */
     private Map<String, String> createFieldTypeMap(Map<String, String[]> typeParameters) {
         Map<String, String> fieldTypeMap = new HashMap<>();
@@ -266,7 +270,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
      * @param requestParameter
      *            the map of parameters to split.
      * @param queryParameter
-     *            all querys will be stored here.
+     *            all query's will be stored here.
      * @param solrParameter
      *            all solr-parameters will be stored here.
      * @param typeParameter
@@ -297,7 +301,6 @@ public class MCRSolrSearchServlet extends MCRServlet {
                 case SORT_PARAMETER -> sortParameter.put(parameterName, currentEntry.getValue());
                 default -> {
                     LOGGER.warn("Unknown parameter group. That should not happen.");
-                    continue;
                 }
             }
         }
@@ -305,7 +308,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
 
     /**
      * @param filterQueryMap
-     *            a map wich contains all {@link StringBuilder}
+     *            a map which contains all {@link StringBuilder}
      * @return a {@link StringBuilder} for the specific fieldType
      */
     private StringBuilder getFilterQueryBuilder(Map<String, StringBuilder> filterQueryMap, String fieldType) {
@@ -323,17 +326,18 @@ public class MCRSolrSearchServlet extends MCRServlet {
      * @return the parameter group enum
      */
     private SolrParameterGroup getParameterType(String parameterName) {
+        String debugMessage = "Parameter {} is a {}";
         if (isTypeParameter(parameterName)) {
-            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.TYPE_PARAMETER);
+            LOGGER.debug(debugMessage, parameterName, SolrParameterGroup.TYPE_PARAMETER);
             return SolrParameterGroup.TYPE_PARAMETER;
         } else if (isSolrParameter(parameterName)) {
-            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.SOLR_PARAMETER);
+            LOGGER.debug(debugMessage, parameterName, SolrParameterGroup.SOLR_PARAMETER);
             return SolrParameterGroup.SOLR_PARAMETER;
         } else if (isSortParameter(parameterName)) {
-            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.SOLR_PARAMETER);
+            LOGGER.debug(debugMessage, parameterName, SolrParameterGroup.SOLR_PARAMETER);
             return SolrParameterGroup.SORT_PARAMETER;
         } else {
-            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.QUERY_PARAMETER);
+            LOGGER.debug(debugMessage, parameterName, SolrParameterGroup.QUERY_PARAMETER);
             return SolrParameterGroup.QUERY_PARAMETER;
         }
     }
@@ -350,9 +354,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
         try {
             reservedCustomKey = MCRConfiguration2
                 .getOrThrow(SOLR_CONFIG_PREFIX + "ReservedParameterKeys", MCRConfiguration2::splitValue)
-                .filter(parameterName::equals)
-                .findAny()
-                .isPresent();
+                .anyMatch(parameterName::equals);
         } catch (MCRConfigurationException e) {
             reservedCustomKey = false;
         }
@@ -380,4 +382,5 @@ public class MCRSolrSearchServlet extends MCRServlet {
     private boolean isTypeParameter(String parameterName) {
         return parameterName.startsWith("solr.type.");
     }
+
 }

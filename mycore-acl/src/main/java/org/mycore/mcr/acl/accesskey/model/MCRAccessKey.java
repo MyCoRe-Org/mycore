@@ -39,6 +39,7 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 @NamedQueries({
     @NamedQuery(name = "MCRAccessKey.getWithObjectId",
         query = "SELECT k"

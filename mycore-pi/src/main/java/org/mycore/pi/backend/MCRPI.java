@@ -34,6 +34,7 @@ import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 @Entity
 @NamedQueries({
     @NamedQuery(name = "Count.PI.Created",

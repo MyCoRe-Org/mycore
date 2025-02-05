@@ -25,6 +25,7 @@ import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRLinkTableManager;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.wfc.MCRConstants;
 
@@ -47,7 +48,7 @@ public class MCRClassificationUtils {
 
     public static String getCollection(String mcrId) {
         MCRObjectID mcrObjectID = MCRObjectID.getInstance(mcrId);
-        if (mcrObjectID.getTypeId().equals("derivate")) {
+        if (mcrObjectID.getTypeId().equals(MCRDerivate.OBJECT_TYPE)) {
             return getCollectionFromDerivate(mcrObjectID);
         }
         return getCollectionFromObject(mcrObjectID);

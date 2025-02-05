@@ -46,6 +46,10 @@ public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvid
 
     private static final Gson GSON;
 
+    private static final String PERMISSION_READ = "read";
+
+    private static final String PERMISSION_WRITE = "write";
+
     static {
         GSON = new Gson();
     }
@@ -190,18 +194,19 @@ public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvid
 
     private JsonObject getAccess(String href) {
         JsonObject accessObject = new JsonObject();
-        if (MCRLayoutUtilities.hasRule("read", href)) {
+        if (MCRLayoutUtilities.hasRule(PERMISSION_READ, href)) {
             JsonObject readObject = new JsonObject();
             accessObject.add("read", readObject);
-            readObject.addProperty("ruleID", MCRLayoutUtilities.getRuleID("read", href));
-            readObject.addProperty("ruleDes", MCRLayoutUtilities.getRuleDescr("read", href));
+            readObject.addProperty("ruleID", MCRLayoutUtilities.getRuleID(PERMISSION_READ, href));
+            readObject.addProperty("ruleDes", MCRLayoutUtilities.getRuleDescr(PERMISSION_READ, href));
         }
-        if (MCRLayoutUtilities.hasRule("write", href)) {
+        if (MCRLayoutUtilities.hasRule(PERMISSION_WRITE, href)) {
             JsonObject writeObject = new JsonObject();
             accessObject.add("write", writeObject);
-            writeObject.addProperty("ruleID", MCRLayoutUtilities.getRuleID("write", href));
-            writeObject.addProperty("ruleDes", MCRLayoutUtilities.getRuleDescr("write", href));
+            writeObject.addProperty("ruleID", MCRLayoutUtilities.getRuleID(PERMISSION_WRITE, href));
+            writeObject.addProperty("ruleDes", MCRLayoutUtilities.getRuleDescr(PERMISSION_WRITE, href));
         }
         return accessObject;
     }
+
 }

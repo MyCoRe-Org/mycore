@@ -37,6 +37,7 @@ import org.mycore.datamodel.metadata.MCRObject;
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  */
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public abstract class MCREventHandlerBase implements MCREventHandler {
 
     private static final Logger LOGGER = LogManager.getLogger(MCREventHandlerBase.class);
@@ -80,8 +81,8 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
 
     /** This method does nothing. It is very useful for debugging events. */
     public void doNothing(MCREvent evt, Object obj) {
-        LOGGER.debug("{} does nothing on {} {} {}", () -> getClass().getName(), () -> evt.getEventType(),
-            () -> evt.getObjectType(), () -> obj.getClass().getName());
+        LOGGER.debug("{} does nothing on {} {} {}", () -> getClass().getName(), evt::getEventType,
+            evt::getObjectType, () -> obj.getClass().getName());
     }
 
     /**
@@ -451,7 +452,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     private void handleMCRObjectEvent(MCREvent evt) {
         MCRObject obj = (MCRObject) evt.get("object");
         if (obj != null) {
-            LOGGER.debug("{} handling {} {}", () -> getClass().getName(), () -> obj.getId(), () -> evt.getEventType());
+            LOGGER.debug("{} handling {} {}", () -> getClass().getName(), obj::getId, evt::getEventType);
             switch (evt.getEventType()) {
                 case CREATE -> handleObjectCreated(evt, obj);
                 case UPDATE -> handleObjectUpdated(evt, obj);
@@ -474,7 +475,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     private void handleMCRDerivateEvent(MCREvent evt) {
         MCRDerivate der = (MCRDerivate) evt.get("derivate");
         if (der != null) {
-            LOGGER.debug("{} handling {} {}", () -> getClass().getName(), () -> der.getId(), () -> evt.getEventType());
+            LOGGER.debug("{} handling {} {}", () -> getClass().getName(), der::getId, evt::getEventType);
             switch (evt.getEventType()) {
                 case CREATE -> handleDerivateCreated(evt, der);
                 case UPDATE -> handleDerivateUpdated(evt, der);
@@ -500,7 +501,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
             if (!path.isAbsolute()) {
                 LOGGER.warn("Cannot handle path events on non absolute paths: {}", path);
             }
-            LOGGER.debug("{} handling {} {}", () -> getClass().getName(), () -> path, () -> evt.getEventType());
+            LOGGER.debug("{} handling {} {}", () -> getClass().getName(), () -> path, evt::getEventType);
             BasicFileAttributes attrs = (BasicFileAttributes) evt.get(MCREvent.FILEATTR_KEY);
             if (attrs == null && evt.getEventType() != MCREvent.EventType.DELETE) {
                 LOGGER.warn("BasicFileAttributes for {} was not given. Resolving now.", path);
@@ -532,7 +533,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     private void handleMCRCategoryEvent(MCREvent evt) {
         MCRCategory cl = (MCRCategory) evt.get(MCREvent.CLASS_KEY);
         if (cl != null) {
-            LOGGER.debug("{} handling {} {}", () -> getClass().getName(), () -> cl.getId(), () -> evt.getEventType());
+            LOGGER.debug("{} handling {} {}", () -> getClass().getName(), cl::getId, evt::getEventType);
             switch (evt.getEventType()) {
                 case CREATE -> handleClassificationCreated(evt, cl);
                 case UPDATE -> handleClassificationUpdated(evt, cl);
@@ -646,4 +647,5 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
         }
         LOGGER.warn(() -> "Can't find method for " + evt.getObjectType() + " for event type " + evt.getEventType());
     }
+
 }

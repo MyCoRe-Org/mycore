@@ -112,7 +112,7 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
      */
     @Test
     public void createXML() {
-        MCRMetaISO8601Date ts = new MCRMetaISO8601Date("servdate", "createdate", 0);
+        MCRMetaISO8601Date ts = new MCRMetaISO8601Date("servdate", MCRObjectService.DATE_TYPE_CREATEDATE, 0);
         String timeString = "1997-07-16T19:20:30.452300+01:00";
         ts.setDate(timeString);
         assertNotNull("Date is null", ts.getDate());
