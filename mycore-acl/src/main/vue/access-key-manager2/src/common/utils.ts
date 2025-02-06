@@ -1,68 +1,20 @@
-import { Config } from './config';
-
-declare global {
-  interface Window {
-    webApplicationBaseURL: string;
-  }
-}
-
-const ALLOWED_SESSION_TYPES =
-  'MCR.ACL.AccessKey.Strategy.AllowedSessionPermissionTypes';
-
-export type JWT = {
-  login_success: boolean;
-  access_token: string;
-  token_type: string;
-};
-
-export const BASE_URL =
-  import.meta.env.MODE === 'development'
-    ? import.meta.env.VITE_APP_WEB_APPLICATION_BASE_URL
-    : (window.webApplicationBaseURL as string);
-
-export const fetchTranslations = async (
-  baseUrl: string
-): Promise<Record<string, string>> => {
-  const response = await fetch(
-    `${baseUrl}rsc/locale/translate/component.acl.accesskey.*`
-  );
-  if (!response.ok) {
-    throw new Error('Failed to load translations');
-  }
-  return await response.json();
-};
-
-export const fetchConfig = async (baseUrl: string): Promise<Config> => {
-  const response = await fetch(`${baseUrl}config.json`);
-  if (!response.ok) {
-    throw new Error('Failed to load app configuration');
-  }
-  const config = await response.json();
-  return {
-    isSessionEnabled:
-      config[ALLOWED_SESSION_TYPES] !== undefined &&
-      config[ALLOWED_SESSION_TYPES].length > 0,
-    allowedSessionPermissionTypes: config[ALLOWED_SESSION_TYPES].split(','),
-  } as Config;
-};
-
-export const fetchJWT = async (
-  baseUrl: string,
-  reference?: string,
-  isSessionEnabled?: boolean
-): Promise<JWT> => {
-  if (reference) {
-    const params = new URLSearchParams();
-    params.append('ua', `acckey_${reference}`);
-    if (isSessionEnabled) {
-      params.append('sa', `acckey_${reference}`);
-    }
-    const result = await fetch(`${baseUrl}rsc/jwt?${params}`);
-    return result.json();
-  }
-  const result = await fetch(`${baseUrl}rsc/jwt`);
-  return result.json();
-};
+/*!
+ * This file is part of ***  M y C o R e  ***
+ * See https://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 export const generateRandomString = (length: number): string => {
   const keylistalpha = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -93,7 +45,7 @@ export const generateRandomString = (length: number): string => {
 export const getUnixTimestampString = (date: string): string =>
   String(Math.floor(new Date(date).getTime()));
 
-export const convertUnixToISO = (unixTimestamp: number): string => {
+export const convertUnixToIso = (unixTimestamp: number): string => {
   return new Date(unixTimestamp).toISOString().slice(0, 10);
 };
 
@@ -103,7 +55,7 @@ const shortString = (input: string, len: number): string =>
 export const shortReference = (reference: string): string =>
   shortString(reference, 20);
 
+export const urlEncode = (value: string): string => encodeURIComponent(value);
+
 export const getI18nKey = (value: string): string =>
   `component.acl.accesskey.frontend.${value}`;
-
-export const urlEncode = (value: string): string => encodeURIComponent(value);

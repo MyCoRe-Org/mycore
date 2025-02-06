@@ -17,8 +17,8 @@
             v-if="
               state.accessKeyCreated &&
               config &&
-              config.allowedSessionPermissionTypes.includes(
-                state.accessKeyCreated.type as string
+              config.allowedAccessKeySessionPermissions.includes(
+                state.accessKeyCreated.type
               )
             "
           >
@@ -99,29 +99,34 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onErrorCaptured, computed, reactive } from 'vue';
+import {
+  ref,
+  onMounted,
+  onErrorCaptured,
+  computed,
+  reactive,
+  inject,
+} from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import { AccessKeyDto } from '@/dtos/accesskey';
+import { urlEncode } from '@/common/utils';
 import {
-  urlEncode,
-  BASE_URL,
-  fetchJWT,
-  fetchConfig,
-  getI18nKey,
-} from '@/common/utils';
-import { AccessKeyService } from '@/service/accesskey';
-import { Config } from '@/common/config';
+  MCRAccessKey,
+  MCRAccessKeyConfig,
+  MCRAccessKeyService,
+} from '@golsch/test/acl/accesskey';
 import AccessKeyTable from '@/components/AccessKeyTable.vue';
 import CreateAccessKeyModal from '@/components/CreateAccessKeyModal.vue';
 import AccessKeyInfoModal from '@/components/AccessKeyInfoModal.vue';
 import Pagination from '@/components/SimplePagination.vue';
 import ConfirmModal from '@/components/ConfirmModal.vue';
+import { fetchJWT } from '@/common/auth';
 import {
-  MCRRestHttpClient,
+  MCRHTTPClient,
   MCRClientAuthStrategy,
   MCRAccessTokenClientAuthStrategy,
-} from '@/common/client';
+} from '@golsch/test/common/client';
+import { getI18nKey } from '@/common/utils';
 
 class DevAuthStrategy implements MCRClientAuthStrategy {
   public getHeaders(): Record<string, string> {
@@ -131,7 +136,10 @@ class DevAuthStrategy implements MCRClientAuthStrategy {
   }
 }
 
-const infoModalRef = ref<{ open: (accessKey: AccessKeyDto) => void } | null>(
+const baseUrl = inject('baseUrl') as string;
+const config = inject('accessKeyConfig') as MCRAccessKeyConfig;
+
+const infoModalRef = ref<{ open: (accessKey: MCRAccessKey) => void } | null>(
   null
 );
 const createModalRef = ref<{ open: () => void } | null>(null);
@@ -141,12 +149,13 @@ const confirmModal = ref<{
 
 const router = useRouter();
 const route = useRoute();
+
 const { t } = useI18n();
 
 const getActivationLink = (secret: string): string =>
   t(getI18nKey('success.add.url.format'), {
-    baseUrl: BASE_URL,
-    reference,
+    baseUrl,
+    reference: reference ?? '',
     secret: urlEncode(secret),
   });
 
@@ -163,13 +172,12 @@ const state = reactive({
   totalCount: 0,
   currentPage: Number(route.query.page) || 1,
   pageSize: Number(route.query.pageSize) || 8,
-  accessKeys: [] as AccessKeyDto[],
+  accessKeys: [] as MCRAccessKey[],
   errorMessage: undefined as string | undefined,
   accessKeyCreatedSecret: undefined as string | undefined,
-  accessKeyCreated: undefined as AccessKeyDto | undefined,
+  accessKeyCreated: undefined as MCRAccessKey | undefined,
 });
-const accessKeyService = ref<AccessKeyService>();
-const config = ref<Config>();
+const accessKeyService = ref<MCRAccessKeyService>();
 
 const paginatedAccessKeys = computed(() =>
   state.accessKeys.slice(0, state.pageSize)
@@ -183,12 +191,12 @@ const activationLink = computed((): string => {
 const fetchAccessKeys = async (): Promise<void> => {
   if (accessKeyService.value) {
     const offset = (state.currentPage - 1) * state.pageSize;
-    const result = await accessKeyService.value.getAccessKeys(
-      availablePermissions,
+    const result = await accessKeyService.value.getAccessKeys({
+      permissions: availablePermissions,
       reference,
       offset,
-      state.pageSize
-    );
+      limit: state.pageSize,
+    });
     state.accessKeys = result.accessKeys;
     state.totalCount = result.totalCount;
   }
@@ -218,7 +226,7 @@ const changePage = async (page: number): Promise<void> => {
     },
   });
 };
-const deleteAccessKey = async (accessKey: AccessKeyDto): Promise<void> => {
+const deleteAccessKey = async (accessKey: MCRAccessKey): Promise<void> => {
   resetInfos();
   const title = t('component.acl.accesskey.frontend.confirmRemove.title');
   const message = t('component.acl.accesskey.frontend.confirmRemove.text', {
@@ -232,7 +240,7 @@ const deleteAccessKey = async (accessKey: AccessKeyDto): Promise<void> => {
     try {
       await accessKeyService.value?.deleteAccessKey(accessKey.id);
       state.accessKeys = state.accessKeys.filter(
-        (a: AccessKeyDto) => a.id !== accessKey.id
+        (a: MCRAccessKey) => a.id !== accessKey.id
       );
       state.totalCount -= 1;
     } finally {
@@ -240,15 +248,15 @@ const deleteAccessKey = async (accessKey: AccessKeyDto): Promise<void> => {
     }
   });
 };
-const updateAccessKey = (accessKey: AccessKeyDto): void => {
+const updateAccessKey = (accessKey: MCRAccessKey): void => {
   const index = state.accessKeys.findIndex(
-    (a: AccessKeyDto) => a.id === accessKey.id
+    (a: MCRAccessKey) => a.id === accessKey.id
   );
   if (index !== -1) {
     state.accessKeys[index] = accessKey;
   }
 };
-const addAccessKey = (secret: string, accessKey: AccessKeyDto): void => {
+const addAccessKey = (secret: string, accessKey: MCRAccessKey): void => {
   if (accessKey.secret !== secret) {
     state.accessKeyCreatedSecret = secret;
     state.accessKeyCreated = accessKey;
@@ -256,27 +264,32 @@ const addAccessKey = (secret: string, accessKey: AccessKeyDto): void => {
   state.totalCount += 1;
   state.accessKeys.push(accessKey);
 };
+const initAccessKeyService = async () => {
+  if (import.meta.env.PROD) {
+    const jwt = await fetchJWT(
+      baseUrl,
+      reference || undefined,
+      config.isAccessKeySessionEnabled
+    );
+    accessKeyService.value = new MCRAccessKeyService(
+      new MCRHTTPClient(baseUrl, {
+        authStrategy: new MCRAccessTokenClientAuthStrategy(jwt),
+        timeout: 5000,
+      })
+    );
+  } else {
+    accessKeyService.value = new MCRAccessKeyService(
+      new MCRHTTPClient(baseUrl, {
+        authStrategy: new DevAuthStrategy(),
+        timeout: 5000,
+      })
+    );
+  }
+};
 onMounted(async (): Promise<void> => {
   try {
     state.loading = true;
-    config.value = await fetchConfig(BASE_URL);
-    if (import.meta.env.MODE === 'development') {
-      accessKeyService.value = new AccessKeyService(
-        new MCRRestHttpClient(BASE_URL, new DevAuthStrategy())
-      );
-    } else {
-      const jwt = await fetchJWT(
-        BASE_URL,
-        reference || undefined,
-        config.value.isSessionEnabled
-      );
-      accessKeyService.value = new AccessKeyService(
-        new MCRRestHttpClient(
-          BASE_URL,
-          new MCRAccessTokenClientAuthStrategy(jwt.access_token)
-        )
-      );
-    }
+    await initAccessKeyService();
     await fetchAccessKeys();
   } catch (error) {
     handleError(error);

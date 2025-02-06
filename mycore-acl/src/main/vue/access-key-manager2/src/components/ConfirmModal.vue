@@ -36,31 +36,33 @@ const modalElement = ref<HTMLDivElement | null>(null);
 let modalInstance: Modal | null = null;
 let confirmCallback: (() => void) | null = null;
 
-onMounted(() => {
-  if (modalElement.value) {
-    modalInstance = new Modal(modalElement.value, { backdrop: 'static' });
-  }
-});
-
 const open = (
   modalTitle: string,
   modalMessage: string,
   callback?: () => void
-) => {
+): void => {
   title.value = modalTitle;
   message.value = modalMessage;
   confirmCallback = callback || null;
   modalInstance?.show();
 };
 
-const close = () => {
+const close = (): void => {
   modalInstance?.hide();
 };
 
-const confirm = () => {
+const confirm = (): void => {
   modalInstance?.hide();
-  if (confirmCallback) confirmCallback();
+  if (confirmCallback) {
+    confirmCallback();
+  }
 };
+
+onMounted((): void => {
+  if (modalElement.value) {
+    modalInstance = new Modal(modalElement.value, { backdrop: 'static' });
+  }
+});
 
 defineExpose({ open });
 </script>
