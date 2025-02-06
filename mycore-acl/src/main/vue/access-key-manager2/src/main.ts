@@ -1,26 +1,34 @@
+/*!
+ * This file is part of ***  M y C o R e  ***
+ * See https://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import { App, createApp } from 'vue';
-import { createI18n, I18n } from 'vue-i18n';
-import { BASE_URL, fetchTranslations } from '@/common/utils';
 import ContactManager from '@/App.vue';
 import router from './router';
-if (import.meta.env.MODE === 'development') {
+import { createI18n } from 'vue-i18n';
+import { BASE_URL, CURRENT_LANG, fetchAccessKeyConfig } from '@/common/config';
+import { getTranslations } from '@golsch/test/i18n';
+if (import.meta.env.DEV) {
   import('bootstrap/dist/css/bootstrap.min.css');
   import('font-awesome/css/font-awesome.min.css');
 }
 
+const I18N_PREFIX = 'component.acl.accesskey.*';
 const APP_ID = 'app';
-
-const initI18n = async (baseUrl: string): Promise<I18n> => {
-  const data = await fetchTranslations(baseUrl);
-  return createI18n({
-    legacy: false,
-    locale: '_',
-    messages: {
-      _: data,
-    },
-    warnHtmlInMessage: 'off',
-  });
-};
 
 const setErrorHandler = (app: App): void => {
   app.config.errorHandler = (err, instance, info) => {
@@ -30,12 +38,23 @@ const setErrorHandler = (app: App): void => {
   };
 };
 
-const initApp = async (): Promise<void> => {
+const initApp = async () => {
   try {
-    const i18n = await initI18n(BASE_URL);
+    const [config, translations] = await Promise.all([
+      fetchAccessKeyConfig(BASE_URL),
+      getTranslations(BASE_URL, I18N_PREFIX, CURRENT_LANG),
+    ]);
+    const i18n = createI18n({
+      legacy: false,
+      locale: CURRENT_LANG,
+      messages: { [CURRENT_LANG]: translations },
+    });
     const app = createApp(ContactManager);
     app.use(i18n);
+    // TODO fix 401 and 403
     app.use(router);
+    app.provide('accessKeyConfig', config);
+    app.provide('baseUrl', BASE_URL);
     setErrorHandler(app);
     app.mount(`#${APP_ID}`);
   } catch (error) {

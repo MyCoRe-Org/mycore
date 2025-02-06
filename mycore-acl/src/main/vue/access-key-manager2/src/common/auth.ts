@@ -16,29 +16,16 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import HomeView from '@/views/HomeView.vue';
-import { BASE_URL } from '@/common/config';
+import { fetchJWT as mcrFetchJWT } from '@golsch/test/auth';
 
-const routes: Array<RouteRecordRaw> = [
-  {
-    path: '/',
-    component: HomeView,
-  },
-];
-
-const getContext = (): string => {
-  if (import.meta.env.DEV) {
-    return import.meta.env.BASE_URL;
-  }
-  const el = document.createElement('a');
-  el.href = BASE_URL;
-  return `${el.pathname}'access-key-manager'`;
+export const fetchJWT = async (
+  baseUrl: string,
+  reference?: string,
+  isSessionEnabled?: boolean
+): Promise<string> => {
+  const attributeName = `acckey_${reference}`;
+  return await mcrFetchJWT(baseUrl, {
+    userAttributes: [attributeName],
+    sessionAttributes: isSessionEnabled ? [attributeName] : undefined,
+  });
 };
-
-const router = createRouter({
-  history: createWebHistory(getContext()),
-  routes,
-});
-
-export default router;
