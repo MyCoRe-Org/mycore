@@ -18,6 +18,7 @@
 
 package org.mycore.pi.backend;
 
+import java.io.Serial;
 import java.util.Date;
 
 import org.mycore.common.MCRCoreVersion;
@@ -34,7 +35,6 @@ import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 @Entity
 @NamedQueries({
     @NamedQuery(name = "Count.PI.Created",
@@ -86,8 +86,10 @@ import jakarta.persistence.UniqueConstraint;
         @Index(name = "Identifier", columnList = "identifier"),
         @Index(name = "MCRIdentifierService", columnList = "mycoreID, service")
     })
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class MCRPI implements org.mycore.pi.MCRPIRegistrationInfo {
 
+    @Serial
     private static final long serialVersionUID = 234168232792525611L;
 
     // unique constraint für identifier type

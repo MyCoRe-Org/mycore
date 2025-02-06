@@ -208,7 +208,7 @@
   <rule ref="category/java/errorprone.xml/AvoidDecimalLiteralsInBigDecimalConstructor"/>
   <rule ref="category/java/errorprone.xml/AvoidDuplicateLiterals">
     <properties>
-      <property name="exceptionList" value="unchecked" />
+      <property name="exceptionList" value="unchecked,rawtypes" />
     </properties>
   </rule>
   <rule ref="category/java/errorprone.xml/AvoidEnumAsIdentifier" />

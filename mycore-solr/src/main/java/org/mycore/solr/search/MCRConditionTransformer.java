@@ -52,7 +52,6 @@ import org.mycore.solr.MCRSolrUtils;
  * @author Thomas Scheffler (yagee)
  * @author Jens Kupferschmidt
  */
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class MCRConditionTransformer {
 
     private static final Logger LOGGER = LogManager.getLogger();

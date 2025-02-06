@@ -124,7 +124,6 @@ import jakarta.servlet.ServletContext;
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  */
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public final class MCRURIResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -226,6 +225,7 @@ public final class MCRURIResolver implements URIResolver {
         return context;
     }
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static Map<String, URIResolver> getResolverMapping() {
         final Map<String, URIResolver> extResolverMapping = extResolver.getURIResolverMapping();
         extResolverMapping.putAll(new MCRModuleResolverProvider().getURIResolverMapping());
@@ -1480,6 +1480,7 @@ public final class MCRURIResolver implements URIResolver {
      */
     private static class MCRVersionResolver implements URIResolver {
 
+        @SuppressWarnings("PMD.AvoidDuplicateLiterals")
         @Override
         public Source resolve(String href, String base) throws TransformerException {
             String versionType = href.substring(href.indexOf(':') + 1);
@@ -1560,6 +1561,7 @@ public final class MCRURIResolver implements URIResolver {
             }
         }
 
+        @SuppressWarnings("PMD.AvoidDuplicateLiterals")
         private Source getSource(Instant lastModified) {
             Element e = new Element("versions");
             Element v = new Element("version");
@@ -1568,6 +1570,7 @@ public final class MCRURIResolver implements URIResolver {
             return new JDOMSource(e);
         }
 
+        @SuppressWarnings("PMD.AvoidDuplicateLiterals")
         private Source getSource(List<? extends MCRAbstractMetadataVersion<?>> versions) {
             Element e = new Element("versions");
             for (MCRAbstractMetadataVersion<?> version : versions) {

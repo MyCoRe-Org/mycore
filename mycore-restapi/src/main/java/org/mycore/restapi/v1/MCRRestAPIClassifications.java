@@ -21,6 +21,7 @@ package org.mycore.restapi.v1;
 import static org.mycore.frontend.jersey.MCRJerseyUtil.APPLICATION_JSON_UTF_8;
 import static org.mycore.frontend.jersey.MCRJerseyUtil.APPLICATION_XML_UTF_8;
 import static org.mycore.frontend.jersey.MCRJerseyUtil.TEXT_XML_UTF_8;
+import static org.mycore.solr.MCRSolrUtils.escapeSearchValue;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -55,7 +56,6 @@ import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
 import org.mycore.solr.MCRSolrCoreManager;
-import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
@@ -78,7 +78,6 @@ import jakarta.ws.rs.core.UriInfo;
  *
  * @author Robert Stephan
  */
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 @Path("/classifications")
 public class MCRRestAPIClassifications {
 
@@ -91,6 +90,20 @@ public class MCRRestAPIClassifications {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String ELEMENT_CATEGORY = "category";
+
+    private static final String ELEMENT_LABEL = "label";
+
+    private static final String ATTRIBUTE_LANG = "lang";
+
+    private static final String ATTRIBUTE_TEXT = "text";
+
+    private static final String ATTRIBUTE_ID = "ID";
+
+    private static final String ATTRIBUTE_HREF = "href";
+
+    private static final String JSON_PROPERTY_TEXT = "text";
+
+    private static final String JSON_PROPERTY_LANG = "lang";
 
     @Context
     ContainerRequest request;
@@ -134,10 +147,10 @@ public class MCRRestAPIClassifications {
         writer.beginArray();
         for (Element e : eParent.getChildren(ELEMENT_CATEGORY)) {
             writer.beginObject();
-            writer.name("ID").value(e.getAttributeValue("ID"));
+            writer.name("ID").value(e.getAttributeValue(ATTRIBUTE_ID));
             writer.name("labels").beginArray();
-            for (Element eLabel : e.getChildren("label")) {
-                if (lang == null || lang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
+            for (Element eLabel : e.getChildren(ELEMENT_LABEL)) {
+                if (lang == null || lang.equals(eLabel.getAttributeValue(ATTRIBUTE_LANG, Namespace.XML_NAMESPACE))) {
                     writeLabelAttributesToJson(writer, eLabel);
                 }
             }
@@ -153,8 +166,8 @@ public class MCRRestAPIClassifications {
 
     private static void writeLabelAttributesToJson(JsonWriter writer, Element element) throws IOException {
         writer.beginObject();
-        writer.name("lang").value(element.getAttributeValue("lang", Namespace.XML_NAMESPACE));
-        writer.name("text").value(element.getAttributeValue("text"));
+        writer.name(JSON_PROPERTY_LANG).value(element.getAttributeValue(ATTRIBUTE_LANG, Namespace.XML_NAMESPACE));
+        writer.name(JSON_PROPERTY_TEXT).value(element.getAttributeValue(ATTRIBUTE_TEXT));
         if (element.getAttributeValue("description") != null) {
             writer.name("description").value(element.getAttributeValue("description"));
         }
@@ -174,10 +187,10 @@ public class MCRRestAPIClassifications {
         writer.beginArray();
         for (Element e : eParent.getChildren(ELEMENT_CATEGORY)) {
             writer.beginObject();
-            writer.name("ID").value(e.getAttributeValue("ID"));
-            for (Element eLabel : e.getChildren("label")) {
-                if (lang == null || lang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
-                    writer.name("text").value(eLabel.getAttributeValue("text"));
+            writer.name("ID").value(e.getAttributeValue(ATTRIBUTE_ID));
+            for (Element eLabel : e.getChildren(ELEMENT_LABEL)) {
+                if (lang == null || lang.equals(eLabel.getAttributeValue(ATTRIBUTE_LANG, Namespace.XML_NAMESPACE))) {
+                    writer.name(JSON_PROPERTY_TEXT).value(eLabel.getAttributeValue(ATTRIBUTE_TEXT));
                 }
             }
             writer.name("checked").value(checked);
@@ -206,10 +219,10 @@ public class MCRRestAPIClassifications {
         writer.beginArray();
         for (Element e : eParent.getChildren(ELEMENT_CATEGORY)) {
             writer.beginObject();
-            writer.name("id").value(e.getAttributeValue("ID"));
-            for (Element eLabel : e.getChildren("label")) {
-                if (lang == null || lang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
-                    writer.name("text").value(eLabel.getAttributeValue("text"));
+            writer.name("id").value(e.getAttributeValue(ATTRIBUTE_ID));
+            for (Element eLabel : e.getChildren(ELEMENT_LABEL)) {
+                if (lang == null || lang.equals(eLabel.getAttributeValue(ATTRIBUTE_LANG, Namespace.XML_NAMESPACE))) {
+                    writer.name(JSON_PROPERTY_TEXT).value(eLabel.getAttributeValue(ATTRIBUTE_TEXT));
                 }
             }
             if (opened || disabled || selected) {
@@ -263,8 +276,11 @@ public class MCRRestAPIClassifications {
             docOut.setRootElement(eRoot);
 
             for (MCRCategory cat : DAO.getRootCategories()) {
-                eRoot.addContent(new Element("mycoreclass").setAttribute("ID", cat.getId().getRootID()).setAttribute(
-                    "href", info.getAbsolutePathBuilder().path(cat.getId().getRootID()).build().toString()));
+                String href = info.getAbsolutePathBuilder().path(cat.getId().getRootID()).build().toString();
+                Element mycoreclass = new Element("mycoreclass")
+                    .setAttribute(ATTRIBUTE_ID, cat.getId().getRootID())
+                    .setAttribute(ATTRIBUTE_HREF, href);
+                eRoot.addContent(mycoreclass);
             }
             try {
                 xout.output(docOut, sw);
@@ -350,7 +366,7 @@ public class MCRRestAPIClassifications {
             Document doc = MCRCategoryTransformer.getMetaDataDocument(category, false);
             Element rootElement = getRootElement(doc, filter);
             if (filter.contains("nonempty")) {
-                filterNonEmpty(doc.getRootElement().getAttributeValue("ID"), rootElement);
+                filterNonEmpty(doc.getRootElement().getAttributeValue(ATTRIBUTE_ID), rootElement);
             }
             if (filter.contains("nochildren")) {
                 rootElement.removeChildren(ELEMENT_CATEGORY);
@@ -464,10 +480,10 @@ public class MCRRestAPIClassifications {
         if (style.contains("checkboxtree")) {
             String finalLang = (lang != null) ? lang : "de";
             writer.beginObject();
-            writer.name("identifier").value(eRoot.getAttributeValue("ID"));
-            for (Element eLabel : eRoot.getChildren("label")) {
-                if (finalLang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
-                    writer.name("label").value(eLabel.getAttributeValue("text"));
+            writer.name("identifier").value(eRoot.getAttributeValue(ATTRIBUTE_ID));
+            for (Element eLabel : eRoot.getChildren(ELEMENT_LABEL)) {
+                if (finalLang.equals(eLabel.getAttributeValue(ATTRIBUTE_LANG, Namespace.XML_NAMESPACE))) {
+                    writer.name("label").value(eLabel.getAttributeValue(ATTRIBUTE_TEXT));
                 }
             }
             writer.name("items");
@@ -479,11 +495,11 @@ public class MCRRestAPIClassifications {
                 style.contains("disabled"), style.contains("selected"));
         } else {
             writer.beginObject(); // {
-            writer.name("ID").value(eRoot.getAttributeValue("ID"));
+            writer.name("ID").value(eRoot.getAttributeValue(ATTRIBUTE_ID));
             writer.name("label");
             writer.beginArray();
-            for (Element eLabel : eRoot.getChildren("label")) {
-                if (lang == null || lang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
+            for (Element eLabel : eRoot.getChildren(ELEMENT_LABEL)) {
+                if (lang == null || lang.equals(eLabel.getAttributeValue(ATTRIBUTE_LANG, Namespace.XML_NAMESPACE))) {
                     writeLabelAttributesToJson(writer, eRoot);
                 }
             }
@@ -504,12 +520,12 @@ public class MCRRestAPIClassifications {
         SolrClient solrClient = MCRSolrCoreManager.getMainSolrClient();
         Element[] categories = e.getChildren(ELEMENT_CATEGORY).toArray(Element[]::new);
         for (Element cat : categories) {
-            SolrQuery solrQquery = new SolrQuery();
-            solrQquery.setQuery(
-                "category:\"" + MCRSolrUtils.escapeSearchValue(classId + ":" + cat.getAttributeValue("ID")) + "\"");
-            solrQquery.setRows(0);
+            SolrQuery solrQuery = new SolrQuery();
+            String q = "category:\"" + escapeSearchValue(classId + ":" + cat.getAttributeValue(ATTRIBUTE_ID)) + "\"";
+            solrQuery.setQuery(q);
+            solrQuery.setRows(0);
             try {
-                QueryRequest queryRequest = new QueryRequest(solrQquery);
+                QueryRequest queryRequest = new QueryRequest(solrQuery);
                 MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
                     MCRSolrAuthenticationLevel.SEARCH);
                 QueryResponse response = queryRequest.process(solrClient);
@@ -522,7 +538,6 @@ public class MCRRestAPIClassifications {
             } catch (SolrServerException | IOException exc) {
                 LOGGER.error(exc);
             }
-
         }
     }
 

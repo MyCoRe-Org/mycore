@@ -47,13 +47,13 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * given base id. The cache file is located in the data directory of MyCoRe and is named "id_cache" and contains one
  * file for each base id. The file contains the last generated id as a string.
  */
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     static Map<String, ReentrantReadWriteLock> locks = new ConcurrentHashMap<>();
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static Path getCacheFilePath(String baseId) {
         Path idCachePath = getCacheDirPath();
 
@@ -75,6 +75,7 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
         return cacheFile;
     }
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static Path getCacheDirPath() {
         Path dataDir = getDataDirPath();
 
@@ -121,6 +122,7 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
      * @param baseId the base id
      * @param next the next free id to be returned by getNextFreeId
      */
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     public void setNextFreeId(String baseId, int next) {
         Path cacheFile = getCacheFilePath(baseId);
 
@@ -138,6 +140,7 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
         }
     }
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     @Override
     public MCRObjectID getNextFreeId(String baseId, int maxInWorkflow) {
         Path cacheFile = getCacheFilePath(baseId);

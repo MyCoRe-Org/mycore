@@ -138,7 +138,6 @@ import jakarta.xml.bind.annotation.XmlElementWrapper;
         description = "Operations on derivates belonging to metadata objects"),
     @Tag(name = MCRRestUtils.TAG_MYCORE_FILE, description = "Operations on files in derivates"),
 })
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class MCRRestObjects {
 
     public static final String PARAM_AFTER_ID = "after_id";
@@ -591,6 +590,7 @@ public class MCRRestObjects {
         summary = "Returns MCRObject with the given " + PARAM_MCRID + " and revision.",
         tags = MCRRestUtils.TAG_MYCORE_OBJECT)
     @MCRRestRequiredPermission(MCRAccessManager.PERMISSION_HISTORY_READ)
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     public Response getObjectVersion(@Parameter(example = "mir_mods_00004714") @PathParam(PARAM_MCRID) MCRObjectID id,
         @PathParam("revision") String revision)
         throws IOException {
@@ -636,23 +636,16 @@ public class MCRRestObjects {
             @ApiResponse(responseCode = NO_CONTENT, description = "MCRObject successfully updated"),
         })
     @MCRRequireTransaction
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     public Response updateObject(@PathParam(PARAM_MCRID) MCRObjectID id,
         @Parameter(required = true,
             description = "MCRObject XML",
             examples = @ExampleObject("<mycoreobject ID=\"{mcrid}\" ..>\n...\n</mycorobject>")) InputStream xmlSource)
         throws IOException {
         //check preconditions
-        try {
-            long lastModified = MCRXMLMetadataManager.instance().getLastModified(id);
-            if (lastModified >= 0) {
-                Date lmDate = new Date(lastModified);
-                Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lmDate);
-                if (cachedResponse.isPresent()) {
-                    return cachedResponse.get();
-                }
-            }
-        } catch (Exception e) {
-            //ignore errors as PUT is idempotent
+        Response cachedResponse = MCRRestUtils.getCachedResponseIgnoreExceptions(request, id);
+        if (cachedResponse != null) {
+            return cachedResponse;
         }
         MCRStreamContent inputContent = new MCRStreamContent(xmlSource, null, MCRObject.ROOT_NAME);
         MCRObject updatedObject;
@@ -703,23 +696,16 @@ public class MCRRestObjects {
             @ApiResponse(responseCode = NO_CONTENT, description = "MCRObject metadata successfully updated"),
         })
     @MCRRequireTransaction
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     public Response updateObjectMetadata(@PathParam(PARAM_MCRID) MCRObjectID id,
         @Parameter(required = true,
             description = "MCRObject XML",
             examples = @ExampleObject("<metadata>\n...\n</metadata>")) InputStream xmlSource)
         throws IOException {
         //check preconditions
-        try {
-            long lastModified = MCRXMLMetadataManager.instance().getLastModified(id);
-            if (lastModified >= 0) {
-                Date lmDate = new Date(lastModified);
-                Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lmDate);
-                if (cachedResponse.isPresent()) {
-                    return cachedResponse.get();
-                }
-            }
-        } catch (Exception e) {
-            //ignore errors as PUT is idempotent
+        Response cachedResponse = MCRRestUtils.getCachedResponseIgnoreExceptions(request, id);
+        if (cachedResponse != null) {
+            return cachedResponse;
         }
         MCRStreamContent inputContent = new MCRStreamContent(xmlSource, null);
         MCRObject updatedObject;

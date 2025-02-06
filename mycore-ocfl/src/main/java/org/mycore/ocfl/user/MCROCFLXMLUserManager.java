@@ -53,7 +53,6 @@ import io.ocfl.api.model.VersionInfo;
  *
  * @author Tobias Lenhardt [Hammer1279]
  */
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class MCROCFLXMLUserManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -159,6 +158,7 @@ public class MCROCFLXMLUserManager {
         deleteUser(user.getUserID());
     }
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     public void deleteUser(String userId) {
         MCRUser currentUser = MCRUserManager.getCurrentUser();
         String ocflUserID = MCROCFLObjectIDPrefixHelper.USER + userId;
@@ -169,8 +169,7 @@ public class MCROCFLXMLUserManager {
         }
 
         if (!exists(ocflUserID)) {
-            throw new MCRUsageException(
-                "The User '" + userId + "' does not exist or has already been deleted!");
+            throw new MCRUsageException("The User '" + userId + "' does not exist or has already been deleted!");
         }
 
         VersionInfo info = new VersionInfo()
@@ -181,12 +180,12 @@ public class MCROCFLXMLUserManager {
             updater -> updater.removeFile(getFilePath(userId)));
     }
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     public void purgeUser(String userId) {
         String ocflUserID = MCROCFLObjectIDPrefixHelper.USER + userId;
 
         if (!repository.containsObject(ocflUserID)) {
-            throw new MCRUsageException(
-                "The User '" + userId + "' does not exist!");
+            throw new MCRUsageException("The User '" + userId + "' does not exist!");
         }
 
         repository.purgeObject(ocflUserID);
@@ -203,6 +202,7 @@ public class MCROCFLXMLUserManager {
      * @return the requested MCRUser
      * @throws IOException if an error occurs during retrieval
      */
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     public MCRUser retrieveContent(String userId, String revision) throws IOException {
         String ocflUserID = MCROCFLObjectIDPrefixHelper.USER + userId;
 
@@ -243,4 +243,5 @@ public class MCROCFLXMLUserManager {
         return repository.containsObject(ocflUserID)
             && !isDeleted(ObjectVersionId.version(ocflUserID, revision));
     }
+
 }

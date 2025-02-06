@@ -102,7 +102,6 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 @Path("/objects/{" + PARAM_MCRID + "}/derivates")
 public class MCRRestDerivates {
 
@@ -118,6 +117,7 @@ public class MCRRestDerivates {
     @PathParam(PARAM_MCRID)
     MCRObjectID mcrId;
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     public static void validateDerivateRelation(MCRObjectID mcrId, MCRObjectID derId) {
         MCRObjectID objectId = MCRMetadataManager.getObjectId(derId, 1, TimeUnit.DAYS);
         if (objectId != null && !mcrId.equals(objectId)) {
@@ -215,24 +215,17 @@ public class MCRRestDerivates {
         })
     @MCRRequireTransaction
     @Path("/{" + PARAM_DERID + "}")
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     public Response updateDerivate(
-        @Parameter(example = "mir_derivate_00004711") @PathParam(PARAM_DERID) MCRObjectID derid,
+        @Parameter(example = "mir_derivate_00004712") @PathParam(PARAM_DERID) MCRObjectID derid,
         @Parameter(required = true,
             description = "MCRObject XML",
             examples = @ExampleObject("<mycoreobject ID=\"{mcrid}\" ..>\n...\n</mycorobject>")) InputStream xmlSource)
         throws IOException {
         //check preconditions
-        try {
-            long lastModified = MCRXMLMetadataManager.instance().getLastModified(derid);
-            if (lastModified >= 0) {
-                Date lmDate = new Date(lastModified);
-                Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lmDate);
-                if (cachedResponse.isPresent()) {
-                    return cachedResponse.get();
-                }
-            }
-        } catch (Exception e) {
-            //ignore errors as PUT is idempotent
+        Response cachedResponse = MCRRestUtils.getCachedResponseIgnoreExceptions(request, derid);
+        if (cachedResponse != null) {
+            return cachedResponse;
         }
         boolean create = true;
         if (MCRMetadataManager.exists(derid)) {
@@ -288,8 +281,9 @@ public class MCRRestDerivates {
         })
     @MCRRequireTransaction
     @Path("/{" + PARAM_DERID + "}")
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     public Response deleteDerivate(
-        @Parameter(example = "mir_derivate_00004711") @PathParam(PARAM_DERID) MCRObjectID derid) {
+        @Parameter(example = "mir_derivate_00004713") @PathParam(PARAM_DERID) MCRObjectID derid) {
         if (!MCRMetadataManager.exists(derid)) {
             throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NOT_FOUND)
@@ -422,7 +416,7 @@ public class MCRRestDerivates {
     @Path("/{" + PARAM_DERID + "}")
     @MCRApiDraft("MCRPatchDerivate")
     public Response patchDerivate(@BeanParam DerivateMetadata der,
-        @Parameter(example = "mir_derivate_00004711") @PathParam(PARAM_DERID) MCRObjectID derid) {
+        @Parameter(example = "mir_derivate_00004714") @PathParam(PARAM_DERID) MCRObjectID derid) {
 
         LOGGER.debug(der);
         MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derid);

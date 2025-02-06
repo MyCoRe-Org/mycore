@@ -50,7 +50,6 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
  * @author Heiko Helmbrecht
  * @author Jens Kupferschmidt
  */
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 @MCRCommandGroup(name = "Access Commands")
 public class MCRAccessCommands extends MCRAbstractCommands {
 
@@ -346,6 +345,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * @param ruleUri
      *            String the URI of the rule XML resource, that contains the rule
      */
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     @MCRCommand(
         syntax = "update permission {0} for selected with rule {1}",
         help = "The command updates access rule for a given permission and all ids "
@@ -364,6 +364,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * @param strFileRule
      *            String the path to the xml file, that contains the rule
      */
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     @MCRCommand(
         syntax = "update permission {0} for selected with rulefile {1}",
         help = "The command updates access rule for a given permission and all ids "
@@ -385,6 +386,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      *            String give a special description, if the semantics of your
      *            rule is multiple used
      */
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     @MCRCommand(
         syntax = "update permission {0} for selected with rule {1} described by {2}",
         help = "The command updates access rule for a given permission and all ids "
@@ -413,6 +415,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      *            String give a special description, if the semantics of your
      *            rule is multiple used
      */
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     @MCRCommand(
         syntax = "update permission {0} for selected with rulefile {1} described by {2}",
         help = "The command updates access rule for a given permission and all ids "

@@ -39,7 +39,13 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
+/**
+ * Access keys for a reference.
+ * <p>
+ * Access keys contains a secret and a type.
+ * <p>
+ * Value is the key secret of the key and type the permission.
+ */
 @NamedQueries({
     @NamedQuery(name = "MCRAccessKey.getWithObjectId",
         query = "SELECT k"
@@ -81,15 +87,10 @@ import jakarta.persistence.Transient;
     @NamedQuery(name = MCRAccessKeyNamedQueries.NAME_FIND_ALL,
         query = "SELECT k FROM MCRAccessKey k"),
 })
-
-/**
- * Access keys for a reference.
- * An access keys contains a secret and a type.
- * Value is the key secret of the key and type the permission.
- */
 @Entity
 @Table(name = "MCRAccessKey")
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class MCRAccessKey {
 
     /** The unique and internal information id */

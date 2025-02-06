@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -306,11 +307,11 @@ public class MCROCFLRegexCommands {
     }
 
     private static void logConfirm(String type) {
-        LOGGER.info(() -> """
+        LOGGER.info(() -> String.format(Locale.ROOT, """
 
-            \u001B[93mEnter the command again to confirm \u001B[4mPERMANENTLY\u001B[24m deleting ALL\
-             matching OCFL %s.\u001B[0m
-            \u001B[41mTHIS ACTION CANNOT BE UNDONE!\u001B[0m""".formatted(type));
+        \u001B[93mEnter the command again to confirm \u001B[4mPERMANENTLY\u001B[24m deleting ALL\
+         matching OCFL %s.\u001B[0m
+        \u001B[41mTHIS ACTION CANNOT BE UNDONE!\u001B[0m""", type));
     }
 
 }

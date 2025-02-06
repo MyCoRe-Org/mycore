@@ -36,12 +36,14 @@ import org.mycore.mcr.neo4j.utils.MCRNeo4JManager;
 import org.mycore.mcr.neo4j.utils.MCRNeo4JQueryRunner;
 
 @MCRCommandGroup(name = "Commands to handle Neo4J")
-@SuppressWarnings({"unused", "PMD.AvoidDuplicateLiterals"})
+@SuppressWarnings({"unused"})
 public class MCRNeo4JCommands extends MCRAbstractCommands {
 
     private static final String NEO4J_MANAGER_CLASS_PROPERTY = "MCR.Neo4J.Manager.Class";
-    private static final Logger LOGGER = LogManager.getLogger(MCRNeo4JCommands.class.getName());
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     @MCRCommand(syntax = "clean neo4j for id {0}", help = "clean the Neo4J database for an ID {0}", order = 10)
     public static void cleanForMCRID(final String id) {
         LOGGER.info("Start clean data from Neo4J instance for an MCRID");
@@ -50,6 +52,7 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
         MCRNeo4JQueryRunner.commitWriteOnlyQuery(queryString);
     }
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     @MCRCommand(syntax = "clean neo4j for base {0}", help = "clean the Neo4J database for a MCRBase {0}", order = 20)
     public static void cleanForBase(final String baseId) {
         LOGGER.info("Start clean data from Neo4J instance for MCRBase {}", baseId);
@@ -62,6 +65,7 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
         }
     }
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     @MCRCommand(syntax = "clean neo4j for type {0}", help = "clean the Neo4J database for a MCRType {0}", order = 30)
     public static void cleanForType(final String type) {
         LOGGER.info("Start clean data from Neo4J instance for MCRType {}", type);
@@ -70,6 +74,7 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
         MCRNeo4JQueryRunner.commitWriteOnlyQuery(queryString);
     }
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     @MCRCommand(syntax = "clean neo4j metadata", help = "clean the complete Neo4J database", order = 40)
     public static void cleanAll() {
         LOGGER.info("Start clean all data from Neo4J");

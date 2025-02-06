@@ -42,7 +42,6 @@ import jakarta.persistence.UniqueConstraint;
  *
  * @since 2.0
  */
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 @Entity
 @Table(name = "MCRCategoryLink",
     uniqueConstraints = { @UniqueConstraint(columnNames = { "category", "objectID", "objectType" }) },
@@ -114,6 +113,7 @@ import jakarta.persistence.UniqueConstraint;
     @NamedQuery(name = "MCRCategoryLink.links",
         query = "FROM MCRCategoryLinkImpl WHERE objectReference.type=:type")
 })
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class MCRCategoryLinkImpl implements MCRCategoryLink {
 
     @Id
