@@ -92,7 +92,7 @@ public class MCROCFLCommands {
             }
         }
 
-        MCROCFLMigration migration = null;
+        MCROCFLMigration migration;
         if (metadataManagerConfigKey != null && !metadataManagerConfigKey.isEmpty()) {
             MCROCFLXMLMetadataManager metadataManager =
                 MCRConfiguration2.getInstanceOf(MCROCFLXMLMetadataManager.class, metadataManagerConfigKey)
@@ -284,7 +284,7 @@ public class MCROCFLCommands {
 
     @MCRCommand(syntax = "purge object {0} from ocfl",
         help = "Permanently delete object {0} and its history from ocfl")
-    public static void purgeObject(String mcridString) throws IOException {
+    public static void purgeObject(String mcridString) {
         MCRObjectID mcrid = MCRObjectID.getInstance(mcridString);
         MCROCFLXMLMetadataManager manager = new MCROCFLXMLMetadataManager();
         manager.setRepositoryKey(MCRConfiguration2.getStringOrThrow("MCR.Metadata.Manager.Repository"));
@@ -293,7 +293,7 @@ public class MCROCFLCommands {
 
     @MCRCommand(syntax = "purge classification {0} from ocfl",
         help = "Permanently delete classification {0} and its history from ocfl")
-    public static void purgeClass(String mcrCgIdString) throws IOException {
+    public static void purgeClass(String mcrCgIdString) {
         MCRCategoryID mcrCgId = MCRCategoryID.fromString(mcrCgIdString);
         if (!mcrCgId.isRootID()) {
             throw new MCRUsageException("You can only purge root classifications!");
@@ -305,13 +305,13 @@ public class MCROCFLCommands {
 
     @MCRCommand(syntax = "purge user {0} from ocfl",
         help = "Permanently delete user {0} and its history from ocfl")
-    public static void purgeUser(String userId) throws IOException {
+    public static void purgeUser(String userId) {
         new MCROCFLXMLUserManager().purgeUser(userId);
     }
 
     @MCRCommand(syntax = "purge all marked from ocfl",
         help = "Permanently delete all hidden/archived ocfl entries")
-    public static void purgeMarked() throws IOException {
+    public static void purgeMarked() {
         if (!confirmPurgeMarked) {
             logConfirm("entries");
             confirmPurgeMarked = true;
@@ -327,7 +327,7 @@ public class MCROCFLCommands {
 
     @MCRCommand(syntax = "purge marked metadata from ocfl",
         help = "Permanently delete all hidden/archived ocfl objects")
-    public static void purgeMarkedObjects() throws IOException {
+    public static void purgeMarkedObjects() {
         if (!confirmPurgeMarked) {
             logConfirm("objects");
             confirmPurgeMarked = true;
@@ -351,7 +351,7 @@ public class MCROCFLCommands {
 
     @MCRCommand(syntax = "purge marked classifications from ocfl",
         help = "Permanently delete all hidden/archived ocfl classes")
-    public static void purgeMarkedClasses() throws IOException {
+    public static void purgeMarkedClasses() {
         if (!confirmPurgeMarked) {
             logConfirm("classes");
             confirmPurgeMarked = true;
@@ -373,7 +373,7 @@ public class MCROCFLCommands {
 
     @MCRCommand(syntax = "purge marked users from ocfl",
         help = "Permanently delete all hidden/archived ocfl users")
-    public static void purgeMarkedUsers() throws IOException {
+    public static void purgeMarkedUsers() {
         if (!confirmPurgeMarked) {
             logConfirm("users");
             confirmPurgeMarked = true;
@@ -396,7 +396,7 @@ public class MCROCFLCommands {
             
             \u001B[93mEnter the command again to confirm \u001B[4mPERMANENTLY\u001B[24m deleting ALL\
              hidden/archived OCFL %s.\u001B[0m
-            \u001B[41mTHIS ACTION CANNOT BE UNDONE!\u001B[0m""".formatted(type)));
+            \u001B[41mTHIS ACTION CANNOT BE UNDONE!\u001B[0m""", type));
     }
 
     private static List<String> getStaleOCFLClassificationIDs() {
@@ -430,4 +430,5 @@ public class MCROCFLCommands {
             .filter(Predicate.not(userEMList::contains))
             .collect(Collectors.toList());
     }
+
 }
