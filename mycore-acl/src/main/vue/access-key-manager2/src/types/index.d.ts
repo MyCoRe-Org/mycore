@@ -16,29 +16,11 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import HomeView from '@/views/HomeView.vue';
-import { BASE_URL } from '@/common/config';
-
-const routes: Array<RouteRecordRaw> = [
-  {
-    path: '/',
-    component: HomeView,
-  },
-];
-
-const getContext = (): string => {
-  if (import.meta.env.DEV) {
-    return import.meta.env.BASE_URL;
+declare global {
+  interface Window {
+    webApplicationBaseURL: string;
+    currentLang: string;
   }
-  const el = document.createElement('a');
-  el.href = BASE_URL;
-  return `${el.pathname}'access-key-manager'`;
-};
+}
 
-const router = createRouter({
-  history: createWebHistory(getContext()),
-  routes,
-});
-
-export default router;
+export {};

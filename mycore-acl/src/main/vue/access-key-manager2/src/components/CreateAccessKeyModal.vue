@@ -76,7 +76,7 @@
                   :key="permissionValue"
                   :value="permissionValue"
                 >
-                  {{ t(getI18nKey(`label.permission.${permissionValue}`)) }}
+                  {{ permissionValue }}
                 </option>
               </select>
               <input
@@ -153,24 +153,27 @@ import { useI18n } from 'vue-i18n';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import {
-  generateRandomString,
   getI18nKey,
+  generateRandomString,
   getUnixTimestampString,
 } from '@/common/utils';
-import { AccessKeyDto, CreateAccessKeyDto } from '@/dtos/accesskey';
-import { AccessKeyService } from '@/service/accesskey';
+import {
+  MCRAccessKey,
+  MCRCreateAccessKeyDTO,
+  MCRAccessKeyService,
+} from '@golsch/test/acl/accesskey';
 import { Modal } from 'bootstrap';
 
 const { t } = useI18n();
 
 const props = defineProps<{
-  accessKeyService?: AccessKeyService;
+  accessKeyService?: MCRAccessKeyService;
   reference?: string;
   availablePermissions: string[];
 }>();
 
 const emit = defineEmits<{
-  (event: 'add-access-key', secret: string, accessKey: AccessKeyDto): void;
+  (event: 'add-access-key', secret: string, accessKey: MCRAccessKey): void;
 }>();
 
 const createModalElement = ref<HTMLDivElement | null>(null);
@@ -198,7 +201,7 @@ const defaultForm = {
   comment: undefined,
   expiration: null,
 };
-const form = ref<CreateAccessKeyDto>({ ...defaultForm });
+const form = ref<MCRCreateAccessKeyDTO>({ ...defaultForm });
 const v = useVuelidate(rules, form);
 const handleError = (error: unknown): void => {
   errorMessage.value =
@@ -219,13 +222,13 @@ const validateForm = async (): Promise<boolean> => {
   }
   return true;
 };
-const getAccessKey = (): CreateAccessKeyDto => {
-  const accessKey = {
+const getAccessKey = (): MCRCreateAccessKeyDTO => {
+  const accessKey: MCRCreateAccessKeyDTO = {
     reference: form.value.reference,
     secret: form.value.secret,
     isActive: form.value.isActive,
     type: form.value.type,
-  } as CreateAccessKeyDto;
+  };
   if (form.value.expiration) {
     accessKey.expiration = getUnixTimestampString(form.value.expiration);
   }
@@ -233,6 +236,15 @@ const getAccessKey = (): CreateAccessKeyDto => {
     accessKey.comment = form.value.comment;
   }
   return accessKey;
+};
+const open = (): void => {
+  modalInstance?.show();
+};
+const close = (force: boolean): void => {
+  if (force || !isBusy.value) {
+    resetModal();
+    modalInstance?.hide();
+  }
 };
 const handleCreateAccessKey = async (): Promise<void> => {
   if (props.accessKeyService && !isBusy.value && (await validateForm())) {
@@ -255,7 +267,7 @@ const handleCreateAccessKey = async (): Promise<void> => {
 const generateSecret = (): void => {
   form.value.secret = generateRandomString(16);
 };
-onMounted(() => {
+onMounted((): void => {
   if (createModalElement.value) {
     modalInstance = new Modal(createModalElement.value, { backdrop: true });
   }
@@ -264,14 +276,6 @@ onErrorCaptured((err): boolean => {
   handleError(err.message);
   return false;
 });
-const open = () => {
-  modalInstance?.show();
-};
-const close = (force: boolean) => {
-  if (force || !isBusy.value) {
-    resetModal();
-    modalInstance?.hide();
-  }
-};
+
 defineExpose({ open, close });
 </script>

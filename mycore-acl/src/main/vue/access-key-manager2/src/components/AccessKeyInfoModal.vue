@@ -126,11 +126,14 @@ import { useI18n } from 'vue-i18n';
 import { required } from '@vuelidate/validators';
 import useVuelidate from '@vuelidate/core';
 import { Modal } from 'bootstrap';
-import { AccessKeyDto, PartialUpdateAccessKeyDto } from '@/dtos/accesskey';
-import { AccessKeyService } from '@/service/accesskey';
 import {
-  convertUnixToISO,
+  MCRAccessKey,
+  MCRPartialUpdateAccessKeyDTO,
+  MCRAccessKeyService,
+} from '@golsch/test/acl/accesskey';
+import {
   getI18nKey,
+  convertUnixToIso,
   getUnixTimestampString,
 } from '@/common/utils';
 
@@ -145,19 +148,19 @@ interface FormData {
 const { t } = useI18n();
 
 const props = defineProps<{
-  accessKeyService?: AccessKeyService;
+  accessKeyService?: MCRAccessKeyService;
   availablePermissions: string[];
   reference?: string;
 }>();
 
 const emit = defineEmits<{
-  (event: 'update-access-key', accessKey: AccessKeyDto): void;
+  (event: 'update-access-key', accessKey: MCRAccessKey): void;
   (event: 'close'): void;
 }>();
 
 const infoModalElement = ref<HTMLDivElement | null>(null);
 let modalInstance: Modal | null = null;
-const accessKey = ref<AccessKeyDto>();
+const accessKey = ref<MCRAccessKey>();
 
 const errorMessage = ref<string | undefined>(undefined);
 const isBusy = ref<boolean>(false);
@@ -179,8 +182,8 @@ const handleError = (error: unknown): void => {
   errorMessage.value =
     error instanceof Error ? error.message : t(getI18nKey('error.fatal'));
 };
-const buildAccessKeyPayload = (): PartialUpdateAccessKeyDto => {
-  const updatedAccessKey: PartialUpdateAccessKeyDto = {};
+const buildAccessKeyPayload = (): MCRPartialUpdateAccessKeyDTO => {
+  const updatedAccessKey: MCRPartialUpdateAccessKeyDTO = {};
   if (form.value.reference !== accessKey.value?.reference) {
     updatedAccessKey.reference = form.value.reference;
   }
@@ -206,8 +209,7 @@ const updateAccessKey = async (): Promise<void> => {
     isBusy.value = true;
     v.value.$validate();
     if (!v.value.$invalid && accessKey.value && accessKey.value.id) {
-      const partialUpdatedAccessKey: PartialUpdateAccessKeyDto =
-        buildAccessKeyPayload();
+      const partialUpdatedAccessKey = buildAccessKeyPayload();
       try {
         await props.accessKeyService.patchAccessKey(
           accessKey.value.id,
@@ -228,7 +230,23 @@ const updateAccessKey = async (): Promise<void> => {
     }
   }
 };
-onMounted(() => {
+const open = (a: MCRAccessKey): void => {
+  accessKey.value = a;
+  form.value = {
+    reference: a.reference,
+    type: a.type,
+    expiration: a.expiration ? convertUnixToIso(a.expiration) : null,
+    comment: a.comment,
+    isActive: a.isActive,
+  };
+  modalInstance?.show();
+};
+const close = (force: boolean): void => {
+  if (force || !isBusy.value) {
+    modalInstance?.hide();
+  }
+};
+onMounted((): void => {
   if (infoModalElement.value) {
     modalInstance = new Modal(infoModalElement.value, { backdrop: true });
   }
@@ -237,21 +255,5 @@ onErrorCaptured((err): boolean => {
   handleError(err);
   return false;
 });
-const open = (a: AccessKeyDto) => {
-  accessKey.value = a;
-  form.value = {
-    reference: a.reference,
-    type: a.type,
-    expiration: a.expiration ? convertUnixToISO(a.expiration) : null,
-    comment: a.comment,
-    isActive: a.isActive,
-  };
-  modalInstance?.show();
-};
-const close = (force: boolean) => {
-  if (force || !isBusy.value) {
-    modalInstance?.hide();
-  }
-};
 defineExpose({ open, close });
 </script>
