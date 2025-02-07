@@ -20,122 +20,99 @@
 import {Collection} from "../model/model.ts";
 import ProcessableComponent from "./ProcessableComponent.vue";
 import CollectionModal from "./CollectionModal.vue";
-import {ref} from "vue";
+import {computed, ref, useTemplateRef} from "vue";
 
-defineProps<{ collection: Collection }>();
+const props = defineProps<{ collection: Collection }>();
 
 const selectedTab = ref<'processing' | 'waiting' | 'finished'>('processing');
 
-function toggleModal() {
-  isModalVisible.value = !isModalVisible.value;
+const collectionModal = useTemplateRef("collectionModal");
+
+function showModal() {
+  if (collectionModal.value) {
+    collectionModal.value.show();
+  }
 }
-const isModalVisible = ref(false);
+
+const currentTabCollection = computed(() => {
+  switch (selectedTab.value) {
+    case 'processing':
+      return props.collection.processingProcessables;
+    case 'waiting':
+      return props.collection.createdProcessables;
+    case 'finished':
+      return props.collection.finishedProcessables;
+  }
+});
 
 </script>
 
 <template>
-  <h2>
-    {{ collection.name }}
-    <a class="modal-button" href="#" @click.prevent="toggleModal">(Properties)</a>
-  </h2>
-  <!-- TAB -->
-  <div style="white-space: nowrap; overflow-x: auto;">
-    <button
-        @click="selectedTab = 'processing'"
-        :class="{ active: selectedTab === 'processing' }">
-      Processing <span class="badge">{{ collection.processingProcessables.length }}</span>
-    </button>
-    <button
-        @click="selectedTab = 'waiting'"
-        :class="{ active: selectedTab === 'waiting' }">
-      Waiting <span class="badge">{{ collection.createdProcessables.length }}</span>
-    </button>
-    <button
-        @click="selectedTab = 'finished'"
-        :class="{ active: selectedTab === 'finished' }">
-      Finished <span class="badge">{{ collection.finishedProcessables.length }}</span>
-    </button>
-  </div>
-  <!-- HEADER -->
-  <div class="table-header">
-    <div class="col col-name">Name</div>
-    <div class="col col-user">User</div>
-    <div class="col col-create">Create Date</div>
-    <div class="col col-progress">Progress</div>
-  </div>
-  <!-- CONTENT -->
-  <div class="table-content">
-    <div v-if="selectedTab === 'processing'">
-      <ProcessableComponent v-for="processable in collection.processingProcessables"
-                            :model="processable"
-                            :key="processable.id"/>
-      <div v-if="collection.processingProcessables.length === 0">
-        no active process
-      </div>
+  <div class="card mb-4">
+    <div class="card-header">
+
+      <h2 class="d-inline h5">{{ collection.name }}</h2>
+      <a class="ms-1 text-secondary" href="#" @click.prevent="showModal">
+        <i class="fa-solid fa-gear"></i>
+        <span class="visually-hidden">Properties</span>
+      </a>
     </div>
-    <div v-if="selectedTab === 'waiting'">
-      <ProcessableComponent v-for="processable in collection.createdProcessables"
-                            :model="processable"
-                            :key="processable.id"/>
-      <div v-if="collection.createdProcessables.length === 0">
-        no waiting process
-      </div>
-    </div>
-    <div v-if="selectedTab === 'finished'">
-      <ProcessableComponent v-for="processable in collection.finishedProcessables"
-                            :model="processable"
-                            :key="processable.id"/>
-      <div v-if="collection.finishedProcessables.length === 0">
-        no finished process
-      </div>
+    <div class="card-body">
+      <!-- TAB -->
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a
+              href="#processing"
+              @click="selectedTab = 'processing'"
+              :class="{ 'nav-link': true, active: selectedTab === 'processing' }">
+            Processing <span class="badge rounded-pill bg-info">{{ collection.processingProcessables.length }}</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+              href="#waiting"
+              @click="selectedTab = 'waiting'"
+              :class="{ 'nav-link': true, active: selectedTab === 'waiting' }">
+            Waiting <span class="badge rounded-pill bg-info">{{ collection.createdProcessables.length }}</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+              href="#finished"
+              @click="selectedTab = 'finished'"
+              :class="{ 'nav-link': true, active: selectedTab === 'finished' }">
+            Finished <span class="badge rounded-pill bg-info">{{ collection.finishedProcessables.length }}</span>
+          </a>
+        </li>
+      </ul>
+      <!-- HEADER -->
+      <table class="table">
+        <thead>
+        <tr>
+          <th>Name</th>
+          <th>User</th>
+          <th>Create Date</th>
+          <th>Progress</th>
+        </tr>
+        </thead>
+        <tbody>
+        <ProcessableComponent v-for="processable in currentTabCollection"
+                              :model="processable"
+                              :key="processable.id"/>
+        <tr v-if="currentTabCollection.length === 0">
+          <td colspan="4">
+            no {{ selectedTab }} process
+          </td>
+        </tr>
+        </tbody>
+      </table>
+      <!-- modal -->
+      <CollectionModal ref="collectionModal" :model="collection"/>
     </div>
   </div>
-  <!-- modal -->
-  <transition name="modal-transition">
-    <CollectionModal v-if="isModalVisible" :model="collection" @close="toggleModal"/>
-  </transition>
+
 </template>
 
 <style scoped>
-h2 {
-  margin: 3rem 0 1rem;
-}
-button {
-  margin-right: 8px;
-  padding: 8px 16px;
-  cursor: pointer;
-  border: 1px solid #ccc;
-  background: #f5f5f5;
-  border-radius: 4px;
-  outline: none;
-}
 
-button:hover {
-  background: #e0e0e0;
-}
-
-button.active {
-  background: #ffc1ab;
-  border-color: #ff6347;
-}
-
-.badge {
-  background-color: #ff6347;
-  color: white;
-  border-radius: 12px;
-  padding: 2px 8px;
-  font-size: 12px;
-  margin-left: 8px;
-}
-
-.table-header {
-  display: flex;
-  font-weight: bold;
-  border-bottom: 1px solid #ccc;
-  margin: 10px 0 4px;
-}
-
-.table-content {
-  min-height: 5rem;
-}
 </style>

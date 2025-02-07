@@ -1,16 +1,10 @@
 <script setup lang="ts">
-import type {
-  AddCollectionMessage,
-  ErrorMessage,
-  RegistryMessage,
-  UpdateCollectionPropertyMessage,
-  UpdateProcessableMessage
-} from "./model/messages.ts";
+import type {IncomingMessage} from "./model/messages.ts";
 import RegistryComponent from "./components/RegistryComponent.vue";
 import SettingsModal from "./components/SettingsModal.vue";
 import {Registry} from "./model/model.ts";
 import {Util} from "./common/util.ts";
-import {ref} from "vue";
+import {ref, useTemplateRef} from "vue";
 
 const socketURL: string = getSocketURL();
 let retryCounter: number = 0;
@@ -18,6 +12,7 @@ let socket: WebSocket | undefined = undefined;
 let errorCode: number | undefined = undefined;
 let errorMessage = ref<string | undefined>(undefined);
 let registry = ref(new Registry());
+const settingsModal = useTemplateRef("settingsModal");
 
 connect();
 
@@ -79,11 +74,10 @@ function connect() {
   };
 }
 
-function handleMessage(data: RegistryMessage | AddCollectionMessage | UpdateProcessableMessage | UpdateCollectionPropertyMessage | ErrorMessage) {
+function handleMessage(data: IncomingMessage) {
   switch (data.type) {
     case "error":
-      const serverMessage = <ErrorMessage>data;
-      errorCode = parseInt(serverMessage.error);
+      errorCode = parseInt(data.error);
       errorMessage.value = "A server error occurred: " + errorCode;
       break;
     case "registry":
@@ -92,51 +86,45 @@ function handleMessage(data: RegistryMessage | AddCollectionMessage | UpdateProc
       registry.value = new Registry();
       break;
     case "addCollection":
-      registry.value.addCollection(<AddCollectionMessage>data);
+      registry.value.addCollection(data);
       break;
     case "updateProcessable":
-      registry.value.updateProcessable(<UpdateProcessableMessage>data);
+      registry.value.updateProcessable(data);
       break;
     case "updateCollectionProperty":
-      let updatePropertyMessage = <UpdateCollectionPropertyMessage>data;
-      const collection = registry.value.getCollection(updatePropertyMessage.id);
+      const collection = registry.value.getCollection(data.id);
       if (collection == null) {
-        console.warn("Unable to find collection with id " + updatePropertyMessage.id);
+        console.warn("Unable to find collection with id " + data.id);
         return;
       }
-      collection.setProperty(updatePropertyMessage.propertyName, updatePropertyMessage.propertyValue);
+      collection.setProperty(data.propertyName, data.propertyValue);
       break;
-    default:
-      console.warn("Unable to handle data type: " + data.type);
   }
 }
 
-function toggleSettingsModal() {
-  isSettingsModalVisible.value = !isSettingsModalVisible.value;
+function showSettingsModal() {
+  if(settingsModal.value) {
+    settingsModal.value.show();
+  }
 }
-
-const isSettingsModalVisible = ref(false);
 
 </script>
 
 <template>
   <h1>
     MyCoRe Processing
-    <a class="modal-button" href="#" @click.prevent="toggleSettingsModal">(Settings)</a>
+    <a class="ms-1 text-secondary" href="#" @click.prevent="showSettingsModal">
+      <i class="fa-solid fa-gear"></i>
+      <span class="visually-hidden">Settings</span>
+    </a>
   </h1>
-  <div v-if="errorMessage !== undefined" class="error">
+  <div v-if="errorMessage !== undefined" class="error alert alert-danger">
     {{ errorMessage }}
   </div>
   <RegistryComponent :registry="registry"/>
-  <transition name="modal-transition">
-    <SettingsModal v-if="isSettingsModalVisible" @close="toggleSettingsModal"/>
-  </transition>
+  <SettingsModal ref="settingsModal" />
 </template>
 
 <style scoped>
-.error {
-  background-color: #ffc1ab;
-  padding: 1rem;
-  border-radius: 5px;
-}
+
 </style>
