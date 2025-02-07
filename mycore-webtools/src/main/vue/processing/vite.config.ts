@@ -15,6 +15,9 @@ export default defineConfig({
   },
   build: {
     outDir: "../../../../target/classes/META-INF/resources/modules/webtools/processing",
+    rollupOptions: {
+      external: ['bootstrap']
+    }
   },
   base: "./"
 })

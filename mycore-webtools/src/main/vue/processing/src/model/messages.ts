@@ -26,9 +26,14 @@ export interface ConnectMessage extends ProcessingMessage {
 }
 
 export interface RegistryMessage extends ProcessingMessage {
+
+    type: "registry";
+
 }
 
 export interface AddCollectionMessage extends ProcessingMessage {
+
+    type: "addCollection";
 
     id: number;
 
@@ -39,6 +44,8 @@ export interface AddCollectionMessage extends ProcessingMessage {
 }
 
 export interface UpdateProcessableMessage extends ProcessingMessage {
+
+    type: "updateProcessable";
 
     id: number;
 
@@ -62,6 +69,8 @@ export interface UpdateProcessableMessage extends ProcessingMessage {
 
 export interface UpdateCollectionPropertyMessage extends ProcessingMessage {
 
+    type: "updateCollectionProperty";
+
     id: number;
 
     propertyName: string;
@@ -72,6 +81,10 @@ export interface UpdateCollectionPropertyMessage extends ProcessingMessage {
 
 export interface ErrorMessage extends ProcessingMessage {
 
+    type: "error";
+
     error: string;
 
 }
+
+export type IncomingMessage = RegistryMessage | AddCollectionMessage | UpdateProcessableMessage | UpdateCollectionPropertyMessage | ErrorMessage;
