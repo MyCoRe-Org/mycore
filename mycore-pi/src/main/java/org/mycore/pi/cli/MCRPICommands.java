@@ -152,7 +152,7 @@ public class MCRPICommands {
         order = 50)
     public static void controlObjectWithService(String objectIDString, String serviceID)
         throws MCRAccessException {
-        controlObjectWithServiceAndAdditional(objectIDString, serviceID, "");
+        controlObjectWithServiceAndAdditional(objectIDString, serviceID, null);
     }
 
     @MCRCommand(syntax = "try to control {0} with pi service {1} with additional {2}",
