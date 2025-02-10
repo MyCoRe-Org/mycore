@@ -108,7 +108,7 @@ public class MCRRestClassifications {
         mcrClass.setID(cat.getId().getRootID());
         mcrClass.getLabel().addAll(cat.getLabels().stream().map(MCRLabel::clone).collect(Collectors.toList()));
         Optional.ofNullable(cat.getURI())
-            .map(MCRClassURL::getInstance)
+            .map(MCRClassURL::createInstanceOf)
             .ifPresent(mcrClass::setUrl);
         return mcrClass;
     }
@@ -193,7 +193,7 @@ public class MCRRestClassifications {
 
         return Response.ok()
             .entity(classification.isClassification() ? MCRClass.getClassification(classification)
-                : MCRClassCategory.getInstance(classification))
+                : MCRClassCategory.createInstanceOf(classification))
             .lastModified(lastModified)
             .build();
     }

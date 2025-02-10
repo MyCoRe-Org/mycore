@@ -52,8 +52,17 @@ public class MCRClassURL {
         this.href = value;
     }
 
-    @JsonCreator
+    /**
+     * @deprecated Use {@link #createInstanceOf(URI)} instead.
+     */
+    @Deprecated
+    @SuppressWarnings("PMD.SingletonClassReturningNewInstance")
     public static MCRClassURL getInstance(URI uri) {
+        return createInstanceOf(uri);
+    }
+
+    @JsonCreator
+    public static MCRClassURL createInstanceOf(URI uri) {
         if (uri == null) {
             return null;
         }

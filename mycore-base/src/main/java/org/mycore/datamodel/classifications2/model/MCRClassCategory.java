@@ -20,7 +20,6 @@ package org.mycore.datamodel.classifications2.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -97,27 +96,44 @@ public class MCRClassCategory {
         this.id = value;
     }
 
+    /**
+     * @deprecated Use {@link #createInstanceOf(MCRCategory)} instead.
+     */
+    @Deprecated
+    @SuppressWarnings("PMD.SingletonClassReturningNewInstance")
     public static MCRClassCategory getInstance(MCRCategory from) {
-        MCRClassCategory categ = new MCRClassCategory();
+        return createInstanceOf(from);
+    }
+
+    public static MCRClassCategory createInstanceOf(MCRCategory from) {
+        MCRClassCategory category = new MCRClassCategory();
         MCRCategoryID categoryID = from.getId();
-        categ.setID(categoryID.isRootID() ? categoryID.getRootID() : categoryID.getId());
-        categ.setUrl(MCRClassURL.getInstance(from.getURI()));
-        categ.getCategory()
-            .addAll(getInstance(from.getChildren()));
-        categ.getLabel()
+        category.setID(categoryID.isRootID() ? categoryID.getRootID() : categoryID.getId());
+        category.setUrl(MCRClassURL.createInstanceOf(from.getURI()));
+        category.getCategory().addAll(createInstancesOf(from.getChildren()));
+        category.getLabel()
             .addAll(
                 from.getLabels()
                     .stream()
                     .map(MCRLabel::clone)
-                    .collect(Collectors.toList()));
-        return categ;
+                    .toList());
+        return category;
     }
 
+    /**
+     * @deprecated Use {@link #createInstancesOf(List)} instead.
+     */
+    @Deprecated
+    @SuppressWarnings("PMD.SingletonClassReturningNewInstance")
     public static List<MCRClassCategory> getInstance(List<MCRCategory> children) {
+        return createInstancesOf(children);
+    }
+
+    public static List<MCRClassCategory> createInstancesOf(List<MCRCategory> children) {
         return children
             .stream()
-            .map(MCRClassCategory::getInstance)
-            .collect(Collectors.toList());
+            .map(MCRClassCategory::createInstanceOf)
+            .toList();
     }
 
 }

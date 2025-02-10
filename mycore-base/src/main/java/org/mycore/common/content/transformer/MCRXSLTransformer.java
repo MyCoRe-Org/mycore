@@ -130,7 +130,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             .orElseGet(TransformerFactory::newInstance);
         LOGGER.debug("Transformerfactory: {}", () -> transformerFactory.getClass().getName());
         transformerFactory.setURIResolver(URI_RESOLVER);
-        transformerFactory.setErrorListener(MCRErrorListener.getInstance());
+        transformerFactory.setErrorListener(MCRErrorListener.createInstance());
         if (transformerFactory.getFeature(SAXSource.FEATURE) && transformerFactory.getFeature(SAXResult.FEATURE)) {
             this.tFactory = (SAXTransformerFactory) transformerFactory;
         } else {
@@ -139,11 +139,23 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         }
     }
 
+    @Deprecated
+    @SuppressWarnings("PMD.SingletonClassReturningNewInstance")
     public static MCRXSLTransformer getInstance(String... stylesheets) {
-        return getInstance(DEFAULT_FACTORY_CLASS, stylesheets);
+        return getInstanceOf(stylesheets);
     }
 
+    public static MCRXSLTransformer getInstanceOf(String... stylesheets) {
+        return getInstanceOf(DEFAULT_FACTORY_CLASS, stylesheets);
+    }
+
+    @Deprecated
+    @SuppressWarnings("PMD.SingletonClassReturningNewInstance")
     public static MCRXSLTransformer getInstance(Class<? extends TransformerFactory> tfClass, String... stylesheets) {
+        return getInstanceOf(tfClass, stylesheets);
+    }
+
+    public static MCRXSLTransformer getInstanceOf(Class<? extends TransformerFactory> tfClass, String... stylesheets) {
         String key = tfClass.getName() + "_"
             + (stylesheets.length == 1 ? stylesheets[0] : Arrays.toString(stylesheets));
         MCRXSLTransformer instance = INSTANCE_CACHE.get(key);
@@ -302,7 +314,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         checkTemplateUptodate();
         Deque<TransformerHandler> xslSteps = new ArrayDeque<>();
         //every transformhandler shares the same ErrorListener instance
-        MCRErrorListener errorListener = MCRErrorListener.getInstance();
+        MCRErrorListener errorListener = MCRErrorListener.createInstance();
         for (Templates template : templates) {
             TransformerHandler handler = tFactory.newTransformerHandler(template);
             parameterCollector.setParametersTo(handler.getTransformer());

@@ -64,7 +64,13 @@ public class MCRXSL2XMLTransformer extends MCRXSLTransformer {
         super(stylesheets);
     }
 
+    @Deprecated
+    @SuppressWarnings("PMD.SingletonClassReturningNewInstance")
     public static MCRXSL2XMLTransformer getInstance(String... stylesheets) {
+        return getInstanceOf(stylesheets);
+    }
+
+    public static MCRXSL2XMLTransformer getInstanceOf(String... stylesheets) {
         String key = stylesheets.length == 1 ? stylesheets[0] : Arrays.toString(stylesheets);
         MCRXSL2XMLTransformer instance = INSTANCE_CACHE.get(key);
         if (instance == null) {

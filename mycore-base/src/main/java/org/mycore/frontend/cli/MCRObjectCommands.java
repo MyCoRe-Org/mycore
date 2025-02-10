@@ -1047,7 +1047,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         Document document = MCRXMLMetadataManager.instance().retrieveXML(mcrId);
         // do XSL transform
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        transformerFactory.setErrorListener(MCRErrorListener.getInstance());
+        transformerFactory.setErrorListener(MCRErrorListener.createInstance());
         transformerFactory.setURIResolver(MCRURIResolver.instance());
         XMLReader xmlReader = MCRXMLParserFactory.getNonValidatingParser().getXMLReader();
         xmlReader.setEntityResolver(MCREntityResolver.instance());

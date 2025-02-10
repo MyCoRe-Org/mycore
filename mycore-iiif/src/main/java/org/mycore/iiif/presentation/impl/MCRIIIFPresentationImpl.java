@@ -40,7 +40,16 @@ public abstract class MCRIIIFPresentationImpl {
         this.implName = implName;
     }
 
+    /**
+     * @deprecated Use {@link #getInstanceOf(String)} instead.
+     */
+    @Deprecated
+    @SuppressWarnings("PMD.SingletonClassReturningNewInstance")
     public static synchronized MCRIIIFPresentationImpl getInstance(String implNameParameter) {
+        return getInstanceOf(implNameParameter);
+    }
+
+    public static synchronized MCRIIIFPresentationImpl getInstanceOf(String implNameParameter) {
         String implName = (implNameParameter == null || implNameParameter.isBlank())
             ? MCRConfiguration2.getStringOrThrow("MCR.IIIFPresentation.Default")
             : implNameParameter;

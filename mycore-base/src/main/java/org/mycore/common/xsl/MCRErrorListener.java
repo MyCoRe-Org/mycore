@@ -28,16 +28,25 @@ import org.apache.xml.utils.WrappedRuntimeException;
 
 /**
  * @author Thomas Scheffler (yagee)
- *
  */
 public class MCRErrorListener implements ErrorListener {
-    private static final Logger LOGGER = LogManager.getLogger(MCRErrorListener.class);
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private TransformerException exceptionThrown;
 
     private String lastMessage;
 
+    /**
+     * @deprecated Use {@link #createInstance()} instead.
+     */
+    @Deprecated
+    @SuppressWarnings("PMD.SingletonClassReturningNewInstance")
     public static MCRErrorListener getInstance() {
+        return createInstance();
+    }
+
+    public static MCRErrorListener createInstance() {
         return new MCRErrorListener();
     }
 
@@ -145,4 +154,5 @@ public class MCRErrorListener implements ErrorListener {
         msg.append(exception.getMessage());
         return msg.toString();
     }
+
 }

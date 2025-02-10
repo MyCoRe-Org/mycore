@@ -108,6 +108,7 @@ import jakarta.ws.rs.core.UriBuilder;
  * @author René Adler (eagle)
  */
 public class MCRXMLFunctions {
+
     private static final String TAG_START = "\\<\\w+((\\s+\\w+(\\s*\\=\\s*(?:\".*?\"|'.*?'|[^'\"\\>\\s]+))?)+"
         + "\\s*|\\s*)\\>";
 
@@ -124,11 +125,12 @@ public class MCRXMLFunctions {
         .compile("(" + TAG_START + "((.*?[^\\<]))" + TAG_END + ")|(" + TAG_SELF_CLOSING + ")|(" + HTML_ENTITY + ")",
             Pattern.DOTALL);
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRXMLFunctions.class);
+    private static final Logger LOGGER = LogManager.getLogger();
+
     public static volatile MimetypesFileTypeMap mimetypeMap;
 
     public static Node document(String uri) throws JDOMException, IOException, TransformerException {
-        MCRSourceContent sourceContent = MCRSourceContent.getInstance(uri);
+        MCRSourceContent sourceContent = MCRSourceContent.createInstanceOf(uri);
         if (sourceContent == null) {
             throw new TransformerException("Could not load document: " + uri);
         }

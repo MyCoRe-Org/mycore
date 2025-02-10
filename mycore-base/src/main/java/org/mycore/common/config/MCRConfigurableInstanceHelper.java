@@ -146,9 +146,9 @@ class MCRConfigurableInstanceHelper {
         MCRConfigurationProxy productAnnotation = targetClass.getDeclaredAnnotation(MCRConfigurationProxy.class);
         if (productAnnotation != null) {
             Class<Supplier<T>> proxyClass = (Class<Supplier<T>>) productAnnotation.proxyClass();
-            return getInfo(proxyClass).getInstance(configuration).get();
+            return getInfo(proxyClass).getInstanceOf(configuration).get();
         } else {
-            return getInfo(targetClass).getInstance(configuration);
+            return getInfo(targetClass).getInstanceOf(configuration);
         }
     }
 
@@ -378,7 +378,7 @@ class MCRConfigurableInstanceHelper {
 
         }
 
-        public T getInstance(MCRInstanceConfiguration configuration) {
+        public T getInstanceOf(MCRInstanceConfiguration configuration) {
             T instance = factory.get();
             for (Injector<T, ?> injector : injectors) {
                 injector.inject(instance, configuration);

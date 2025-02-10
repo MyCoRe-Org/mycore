@@ -111,14 +111,14 @@ public class MCRClass {
         }
         MCRClass mcrClass = new MCRClass();
         mcrClass.setID(rootCategory.getId().getRootID());
-        mcrClass.setUrl(MCRClassURL.getInstance(rootCategory.getURI()));
+        mcrClass.setUrl(MCRClassURL.createInstanceOf(rootCategory.getURI()));
         mcrClass.getLabel()
             .addAll(
                 rootCategory.getLabels()
                     .stream()
                     .map(MCRLabel::clone)
                     .collect(Collectors.toList()));
-        mcrClass.setCategories(MCRClassCategory.getInstance(rootCategory.getChildren()));
+        mcrClass.setCategories(MCRClassCategory.createInstancesOf(rootCategory.getChildren()));
         return mcrClass;
     }
 
