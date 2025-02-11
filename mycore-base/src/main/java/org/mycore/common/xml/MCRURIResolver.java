@@ -1025,7 +1025,7 @@ public final class MCRURIResolver implements URIResolver {
                 }
             } catch (Exception ex) {
                 LOGGER.info("MCRNotNullResolver caught exception: {}", ex.getLocalizedMessage());
-                LOGGER.debug(ex);
+                LOGGER.debug(ex.getStackTrace());
                 LOGGER.debug("MCRNotNullResolver returning empty xml");
                 return new JDOMSource(new Element("null"));
             }
