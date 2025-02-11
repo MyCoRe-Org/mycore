@@ -11,10 +11,10 @@
         </h3>
         <ul class="nav nav-tabs" id="tab-nav">
           <li class="nav-item">
-            <a id="acle2-ruleAllocation-tab" class="tab-active tab nav-link active" href="#acle2-ruleAllocation" data-toggle=""><text i18n="ACLE.labels.tab.access"/></a>
+            <a id="acle2-ruleAllocation-tab" class="tab-active tab nav-link active" href="#acle2-ruleAllocation" data-bs-target="#acle2-ruleAllocation" data-bs-toggle="tab"><text i18n="ACLE.labels.tab.access"/></a>
           </li>
           <li class="nav-item">
-            <a id="acle2-rules-tab" class="tab nav-link" href="#acle2-rules" data-toggle=""><text i18n="ACLE.labels.tab.rule"/></a>
+            <a id="acle2-rules-tab" class="tab nav-link" href="#acle2-rules" data-bas-target="#acle2-rules" data-bs-toggle="tab"><text i18n="ACLE.labels.tab.rule"/></a>
           </li>
         </ul>
         <div id="acle2-alert-area" class="alert fade">...</div>
