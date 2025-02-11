@@ -101,7 +101,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
     public MCRMetaNumber() {
         super();
         loadProperties();
-        number = BigDecimal.ONE;
+        number = BigDecimal.ZERO;
         dimension = "";
         measurement = "";
     }
