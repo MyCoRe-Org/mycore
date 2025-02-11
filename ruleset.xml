@@ -337,11 +337,7 @@
   <rule ref="category/java/performance.xml/AvoidArrayLoops"/>
   <rule ref="category/java/performance.xml/AvoidCalendarDateCreation"/>
   <rule ref="category/java/performance.xml/AvoidFileStream"/>
-
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/performance.xml/BigIntegerInstantiation"/>
-  -->
   <rule ref="category/java/performance.xml/InefficientEmptyStringCheck"/>
   <rule ref="category/java/performance.xml/InefficientStringBuffering"/>
   <rule ref="category/java/performance.xml/OptimizableToArrayCall"/>
