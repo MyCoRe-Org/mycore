@@ -29,6 +29,7 @@ import jakarta.servlet.ServletContext;
  */
 public class MCRRemoveTarget extends MCRRepeaterControl {
 
+    @Override
     protected void handleRepeaterControl(ServletContext context, MCRServletJob job, MCREditorSession session,
         String xPath) throws Exception {
         MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());

@@ -41,13 +41,16 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author Thomas Scheffler (yagee)
  * @author Matthias Eichner
  */
-public abstract class MCRServletContentHelper {
+public final class MCRServletContentHelper {
 
     public static final int DEFAULT_BUFFER_SIZE = ContentUtils.DEFAULT_BUFFER_SIZE;
 
     public static final String ATT_SERVE_CONTENT = MCRServletContentHelper.class.getName() + ".serveContent";
 
     private static Logger LOGGER = LogManager.getLogger(MCRServletContentHelper.class);
+
+    private MCRServletContentHelper() {
+    }
 
     public static Config buildConfig(ServletConfig servletConfig) {
         Config config = new Config();
@@ -458,7 +461,7 @@ public abstract class MCRServletContentHelper {
 
     public static class Config {
 
-        public int expiresMinutes = 0;
+        public int expiresMinutes;
 
         public boolean useAcceptRanges = true;
 

@@ -21,9 +21,9 @@ package org.mycore.wcms2;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
@@ -46,9 +46,12 @@ import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 
-public abstract class MCRWCMSUtil {
+public final class MCRWCMSUtil {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    private MCRWCMSUtil() {
+    }
 
     public static File getWCMSDataDir() {
         return new File(MCRConfiguration2.getStringOrThrow("MCR.WCMS2.DataDir"));
@@ -64,9 +67,9 @@ public abstract class MCRWCMSUtil {
     public static OutputStream getOutputStream(String path) throws IOException {
         String cleanPath = path.startsWith("/") ? path.substring(1) : path;
         File wcmsDataDirTarget = new File(getWCMSDataDir(), cleanPath);
-        LOGGER.info(String.format(Locale.ROOT, "Writing content to %s.", wcmsDataDirTarget));
+        LOGGER.info(() -> "Writing content to " + wcmsDataDirTarget + ".");
         createDirectoryIfNeeded(wcmsDataDirTarget);
-        return new FileOutputStream(wcmsDataDirTarget);
+        return Files.newOutputStream(wcmsDataDirTarget.toPath());
     }
 
     private static void createDirectoryIfNeeded(File targetFile) throws IOException {

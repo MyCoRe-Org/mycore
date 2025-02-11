@@ -71,7 +71,7 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
         String path)
         throws MCRRestAPIException {
         MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
-        LogManager.getLogger().warn(path + ": Checking API access: " + permission);
+        LogManager.getLogger().warn(() -> path + ": Checking API access: " + permission);
         String thePath = path.startsWith("/") ? path : "/" + path;
 
         MCRAccessInterface acl = MCRAccessManager.getAccessImpl();
@@ -178,18 +178,21 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
      */
     public enum MCRRestAPIACLPermission {
         READ {
+            @Override
             public String toString() {
                 return MCRAccessManager.PERMISSION_READ;
             }
         },
 
         WRITE {
+            @Override
             public String toString() {
                 return MCRAccessManager.PERMISSION_WRITE;
             }
         },
 
         DELETE {
+            @Override
             public String toString() {
                 return MCRAccessManager.PERMISSION_DELETE;
             }

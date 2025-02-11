@@ -42,7 +42,7 @@ import org.mycore.datamodel.niofs.MCRPath;
  *
  * @author Matthias Eichner
  */
-public abstract class MCRMETSGeneratorFactory {
+public final class MCRMETSGeneratorFactory {
 
     private static MCRMETSGeneratorSelector GENERATOR_SELECTOR;
 
@@ -64,6 +64,9 @@ public abstract class MCRMETSGeneratorFactory {
                     + " Using default MCRMETSPropertyGeneratorSelector.",
                 cause);
         }
+    }
+
+    private MCRMETSGeneratorFactory() {
     }
 
     /**
@@ -97,7 +100,7 @@ public abstract class MCRMETSGeneratorFactory {
                 getOldMets(derivatePath).ifPresent(abstractGenerator::setOldMets);
             } catch (Exception exc) {
                 // we should not fail if the old mets.xml is broken
-                LogManager.getLogger().error("Unable to read mets.xml of {}", derivatePath.getOwner(), exc);
+                LogManager.getLogger().error(() -> "Unable to read mets.xml of " + derivatePath.getOwner(), exc);
             }
         }
         return generator;
@@ -167,7 +170,7 @@ public abstract class MCRMETSGeneratorFactory {
      */
     public static class MCRMETSPropertyGeneratorSelector implements MCRMETSGeneratorSelector {
 
-        private static Class<? extends MCRMETSGenerator> METS_GENERATOR_CLASS = null;
+        private static Class<? extends MCRMETSGenerator> METS_GENERATOR_CLASS;
 
         @Override
         public MCRMETSGenerator get(MCRPath derivatePath) {

@@ -35,7 +35,7 @@ import org.mycore.common.content.streams.MCRBlockingInputStream;
  * provides the header of the file that is read (the first 64k) for content type
  * detection purposes, counts the number of bytes read and builds an MD5
  * checksum String while content goes through this input stream.
- * 
+ *
  * @author Frank Lützenkirchen
  */
 public class MCRContentInputStream extends FilterInputStream {
@@ -43,10 +43,11 @@ public class MCRContentInputStream extends FilterInputStream {
     protected static final int HEADER_SIZE = 65536;
 
     /** The MD5 checksum of all bytes read through this stream */
-    protected byte[] md5 = null;
+    protected byte[] md5;
 
     /** The message digest to build the MD5 checksum */
-    protected MessageDigest digest = null;
+    @SuppressWarnings("PMD.AvoidMessageDigestField") //InputStream is not thread safe either
+    protected MessageDigest digest;
 
     /** The total number of bytes read so far */
     protected long length;
@@ -56,7 +57,7 @@ public class MCRContentInputStream extends FilterInputStream {
 
     /**
      * Constructs a new MCRContentInputStream
-     * 
+     *
      * @param in
      *            the InputStream to read from
      * @throws MCRConfigurationException
@@ -138,7 +139,7 @@ public class MCRContentInputStream extends FilterInputStream {
     /**
      * Returns the first 64 k of the underlying input stream. This is used for
      * content type detection during file import into MyCoRe.
-     * 
+     *
      * @return the first 64 k of the input stream
      */
     public byte[] getHeader() {
@@ -147,7 +148,7 @@ public class MCRContentInputStream extends FilterInputStream {
 
     /**
      * Returns the number of bytes read so far
-     * 
+     *
      * @return the number of bytes read
      */
     public long getLength() {
@@ -157,7 +158,7 @@ public class MCRContentInputStream extends FilterInputStream {
     /**
      * Returns the MD5 message digest that has been built during reading of the
      * underlying input stream.
-     * 
+     *
      * @return the MD5 message digest checksum of all bytes that have been read
      */
     public byte[] getMD5() {
@@ -169,7 +170,7 @@ public class MCRContentInputStream extends FilterInputStream {
 
     /**
      * Returns the MD5 checksum as a String
-     * 
+     *
      * @return the MD5 checksum as a String of hex digits
      */
     public String getMD5String() {
@@ -178,7 +179,7 @@ public class MCRContentInputStream extends FilterInputStream {
 
     /**
      * Given an MD5 message digest, returns the MD5 checksum as a String
-     * 
+     *
      * @return the MD5 checksum as a String of hex digits
      */
     public static String getMD5String(byte[] digest) {
@@ -191,7 +192,7 @@ public class MCRContentInputStream extends FilterInputStream {
 
     /**
      * Builds a MessageDigest instance for MD5 checksum computation.
-     * 
+     *
      * @throws MCRConfigurationException
      *             if no java classes that support MD5 algorithm could be found
      */

@@ -65,7 +65,7 @@ public class MCRURL {
             return p;
         }
         for (String pair : queryString.split("&")) {
-            int eq = pair.indexOf("=");
+            int eq = pair.indexOf('=');
             String key = eq >= 0 ? pair.substring(0, eq) : pair;
             String value = eq >= 0 ? pair.substring(eq + 1) : "";
             if (p.containsKey(key)) {

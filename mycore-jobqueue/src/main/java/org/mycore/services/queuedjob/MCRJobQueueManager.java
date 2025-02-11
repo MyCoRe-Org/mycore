@@ -71,7 +71,7 @@ public class MCRJobQueueManager {
             long count = MCRJobResetter.resetJobsWithAction(action, config, getJobDAO(), queue1,
                 MCRJobStatus.PROCESSING);
             if (count > 0) {
-                LOGGER.info("Resetted {} processing jobs for action {} on startup!", count, action.getName());
+                LOGGER.info("Resetted {} processing jobs for action {} on startup!", () -> count, action::getName);
             }
             return queue1;
         });

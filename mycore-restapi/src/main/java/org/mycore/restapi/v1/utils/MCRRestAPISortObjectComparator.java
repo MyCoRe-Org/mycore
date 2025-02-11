@@ -33,7 +33,8 @@ import org.mycore.restapi.v1.utils.MCRRestAPISortObject.SortOrder;
  * 
  */
 public class MCRRestAPISortObjectComparator implements Comparator<MCRObjectIDDate> {
-    private MCRRestAPISortObject sortObj = null;
+
+    private final MCRRestAPISortObject sortObj;
 
     public MCRRestAPISortObjectComparator(MCRRestAPISortObject sortObj) {
         this.sortObj = sortObj;

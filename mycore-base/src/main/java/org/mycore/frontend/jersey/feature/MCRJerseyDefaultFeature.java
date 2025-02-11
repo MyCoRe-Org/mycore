@@ -35,7 +35,7 @@ import jakarta.ws.rs.ext.Provider;
 /**
  * Default feature for mycore. Does register a cache, transaction, session and
  * access filter.
- * 
+ *
  * @author Matthias Eichner
  */
 @Provider
@@ -74,12 +74,12 @@ public class MCRJerseyDefaultFeature extends MCRJerseyBaseFeature {
         MCRRestrictedAccess restrictedAccessMETHOD = resourceMethod.getAnnotation(MCRRestrictedAccess.class);
         MCRRestrictedAccess restrictedAccessTYPE = resourceClass.getAnnotation(MCRRestrictedAccess.class);
         if (restrictedAccessMETHOD != null) {
-            LOGGER.info("Access to {} is restricted by {}", resourceMethod,
-                restrictedAccessMETHOD.value().getCanonicalName());
+            LOGGER.info("Access to {} is restricted by {}",
+                () -> resourceMethod, () -> restrictedAccessMETHOD.value().getCanonicalName());
             addFilter(context, restrictedAccessMETHOD);
         } else if (restrictedAccessTYPE != null) {
-            LOGGER.info("Access to {} is restricted by {}", resourceClass.getName(),
-                restrictedAccessTYPE.value().getCanonicalName());
+            LOGGER.info("Access to {} is restricted by {}",
+                resourceClass::getName, () -> restrictedAccessTYPE.value().getCanonicalName());
             addFilter(context, restrictedAccessTYPE);
         }
     }

@@ -81,26 +81,27 @@ import jakarta.websocket.Session;
 
 /**
  * Is a wrapper class around command execution. Commands will be {@link #addCommand(String) queued} and executed in a
- * seperate thread.
+ * separate thread.
  *
  * @author Thomas Scheffler (yagee)
  * @author Michel Buechner (mcrmibue)
  * @since 2.0
  */
 public class MCRWebCLIContainer {
-    private final ReentrantLock lock;
 
-    MCRProcessableSupplier<Boolean> curFuture;
-
-    private static Map<String, List<MCRCommand>> knownCommands;
-
-    private final ProcessCallable processCallable;
-
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger(MCRWebCLIContainer.class);
 
     private static final MCRProcessableExecutor EXECUTOR;
 
     private static final MCRProcessableCollection PROCESSABLE_COLLECTION;
+
+    private final ReentrantLock lock;
+
+    private MCRProcessableSupplier<Boolean> curFuture;
+
+    private static volatile Map<String, List<MCRCommand>> knownCommands;
+
+    private final ProcessCallable processCallable;
 
     static {
         PROCESSABLE_COLLECTION = new MCRProcessableDefaultCollection("Web CLI");
@@ -178,8 +179,12 @@ public class MCRWebCLIContainer {
 
     protected static void initializeCommands() {
         if (knownCommands == null) {
-            knownCommands = new TreeMap<>();
-            knownCommands.putAll(new MCRWebCLICommandManager().getCommandsMap());
+            synchronized (MCRWebCLIContainer.class) {
+                if (knownCommands == null) {
+                    knownCommands = new TreeMap<>();
+                    knownCommands.putAll(new MCRWebCLICommandManager().getCommandsMap());
+                }
+            }
         }
     }
 
@@ -311,6 +316,7 @@ public class MCRWebCLIContainer {
             setCurrentCommand("");
         }
 
+        @Override
         public Boolean call() throws Exception {
             return processCommands();
         }
@@ -325,7 +331,7 @@ public class MCRWebCLIContainer {
                 // ignore comment
                 return true;
             }
-            LOGGER.info("Processing command:'{}' ({} left)", command, commands.size());
+            LOGGER.info("Processing command:'{}' ({} left)", () -> command, commands::size);
             setCurrentCommand(command);
             long start = System.currentTimeMillis();
             MCRTransactionManager.beginTransactions();
@@ -341,7 +347,7 @@ public class MCRWebCLIContainer {
                 updateKnownCommandsIfNeeded();
                 MCRTransactionManager.commitTransactions();
                 if (commandsReturned != null) {
-                    LOGGER.info("Command processed ({} ms)", System.currentTimeMillis() - start);
+                    LOGGER.info("Command processed ({} ms)", () -> System.currentTimeMillis() - start);
                 } else {
                     throw new MCRUsageException("Command not understood: " + command);
                 }
@@ -371,8 +377,8 @@ public class MCRWebCLIContainer {
                 commandsReturned = currentCommand.invoke(command, MCRClassTools.getClassLoader());
                 if (commandsReturned != null) { // Command was executed
                     // Add commands to queue
-                    if (commandsReturned.size() > 0) {
-                        LOGGER.info("Queueing {} commands to process", commandsReturned.size());
+                    if (!commandsReturned.isEmpty()) {
+                        LOGGER.info("Queueing {} commands to process", commandsReturned::size);
                         commands.addAll(0, commandsReturned);
                         cmdListPublisher.submit(commands);
                     }
@@ -395,7 +401,7 @@ public class MCRWebCLIContainer {
             }
             String unprocessedCommandsFile = MCRConfiguration2.getStringOrThrow("MCR.WebCLI.UnprocessedCommandsFile");
             File file = new File(unprocessedCommandsFile);
-            LOGGER.info("Writing unprocessed commands to file {}", file.getAbsolutePath());
+            LOGGER.info("Writing unprocessed commands to file {}", file::getAbsolutePath);
 
             try {
                 PrintWriter pw = new PrintWriter(file, Charset.defaultCharset());
@@ -412,7 +418,7 @@ public class MCRWebCLIContainer {
                 }
                 pw.close();
             } catch (IOException ex) {
-                LOGGER.error("Cannot write to {}", file.getAbsolutePath(), ex);
+                LOGGER.error(() -> "Cannot write to " + file.getAbsolutePath(), ex);
             }
             clearCommandList();
         }

@@ -35,6 +35,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 
 public abstract class MCRIFSTest extends MCRStoreTestCase {
 
+    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();

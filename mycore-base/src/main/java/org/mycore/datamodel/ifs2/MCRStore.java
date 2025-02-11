@@ -49,12 +49,12 @@ import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 /**
  * Stores metadata files or file collections containing files and directories in
  * a persistent store implemented using a local filesystem.
- * 
+ *
  * For better filesystem performance, the store can build slot subdirectories
  * (containing other subdirectories and so on) so that not all objects are
  * stored in the same filesystem directory. Directories containing a very large
  * number of files typically show bad performance.
- * 
+ *
  * The slot layout of the store defines the usage of subdirectories within the
  * base directory. A layout of "8" would mean no subdirectories will be used,
  * the maximum ID size is 8 digits, and therefore up to 99999999 objects can be
@@ -66,19 +66,19 @@ import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
  * the data of ID 10485 would be stored in the file object "/00/01/00010485",
  * for example. Using layout "4-2-2", data would be stored in
  * "/0001/04/00010485", and so on.
- * 
+ *
  * The slot file name itself may optionally have a prefix and suffix. With
  * prefix "derivate-", the slot name would be "derivate-00010485". With prefix
  * "DocPortal_document_" and suffix ".xml", the slot name would be
  * "DocPortal_document_00010485.xml" for example.
- * 
+ *
  * MCR.IFS2.Store.ID.Class=org.mycore.datamodel.ifs2.MCRFileStore
  * MCR.IFS2.Store.ID.BaseDir=/foo/bar
  * MCR.IFS2.Store.ID.SlotLayout=4-2-2
- * 
+ *
  * @author Frank Lützenkirchen
  */
-public abstract class MCRStore {
+public class MCRStore {
 
     /**
      * Indicates ascending order when listing IDs
@@ -119,7 +119,7 @@ public abstract class MCRStore {
      * Offset to add to the maximum ID found in the store to build the new ID.
      * This is normally 1, but initially higher to avoid reassigning the same ID
      * after system restarts. Consider the following example:
-     * 
+     *
      * 1) User creates new document, ID assigned is 10. 2) User deletes document
      * 10. 3) Web application is restarted. 4) User creates new document, ID
      * assigned is 20. If offset would always be 1, ID assigned would have been
@@ -131,13 +131,16 @@ public abstract class MCRStore {
     /**
      * The last ID assigned by this store.
      */
-    protected int lastID = 0;
+    protected int lastID;
 
     public static final Logger LOGGER = LogManager.getLogger();
 
+    protected MCRStore() {
+    }
+
     /**
      * Deletes the data stored under the given ID from the store
-     * 
+     *
      * @param id
      *            the ID of the document to be deleted
      */
@@ -147,7 +150,7 @@ public abstract class MCRStore {
 
     /**
      * Returns true if data for the given ID is existing in the store.
-     * 
+     *
      * @param id
      *            the ID of the data
      * @return true, if data for the given ID is existing in the store.
@@ -163,7 +166,7 @@ public abstract class MCRStore {
                 return slot2id(max);
             }
         } catch (final IOException e) {
-            LOGGER.error("Error while getting highest stored ID in " + baseDirectory, e);
+            LOGGER.error(() -> "Error while getting highest stored ID in " + baseDirectory, e);
         }
         return 0;
     }
@@ -179,7 +182,7 @@ public abstract class MCRStore {
      * Returns the next free ID that can be used to store data. Call as late as
      * possible to avoid that another process, for example from batch import, in
      * the meantime already used that ID.
-     * 
+     *
      * @return the next free ID that can be used to store data
      */
     public synchronized int getNextFreeID() {
@@ -193,7 +196,7 @@ public abstract class MCRStore {
         try (Stream<Path> streamBaseDirectory = Files.list(baseDirectory)) {
             return streamBaseDirectory.findAny().isEmpty();
         } catch (final IOException e) {
-            LOGGER.error("Error while checking if base directory is empty: " + baseDirectory, e);
+            LOGGER.error(() -> "Error while checking if base directory is empty: " + baseDirectory, e);
             return false;
         }
     }
@@ -214,10 +217,10 @@ public abstract class MCRStore {
     /**
      * Lists all IDs currently used in the store, in ascending or descending
      * order
-     * 
+     *
      * @see #ASCENDING
      * @see #DESCENDING
-     * 
+     *
      * @param order
      *            the order in which IDs should be returned.
      * @return all IDs currently used in the store
@@ -278,7 +281,7 @@ public abstract class MCRStore {
             /**
              * Initializes the enumeration and searches for the first ID to
              * return
-             * 
+             *
              * @param order
              *            the return order, ascending or descending
              */
@@ -287,7 +290,7 @@ public abstract class MCRStore {
                 try {
                     addChildren(baseDirectory);
                 } catch (final IOException e) {
-                    LOGGER.error("Error while iterating over children of " + baseDirectory, e);
+                    LOGGER.error(() -> "Error while iterating over children of " + baseDirectory, e);
                 }
                 nextID = findNextID();
                 return this;
@@ -297,7 +300,7 @@ public abstract class MCRStore {
              * Adds children of the given directory to the list of files to
              * handle next. Depending on the return sort order, ascending or
              * descending file name order is used.
-             * 
+             *
              * @param dir
              *            the directory thats children should be added
              */
@@ -316,7 +319,7 @@ public abstract class MCRStore {
 
             /**
              * Finds the next ID used in the store.
-             * 
+             *
              * @return the next ID, or 0 if there is no other ID any more
              */
             private int findNextID() {
@@ -380,7 +383,7 @@ public abstract class MCRStore {
 
     /**
      * Returns the absolute path of the local base directory
-     * 
+     *
      * @return the base directory storing the data
      */
     String getBaseDirURI() {
@@ -395,7 +398,7 @@ public abstract class MCRStore {
     /**
      * Returns the relative path used to store data for the given id within the
      * store base directory
-     * 
+     *
      * @param id
      *            the id of the data
      * @return the relative path storing that data
@@ -408,7 +411,7 @@ public abstract class MCRStore {
     /**
      * Returns the paths of all subdirectories and the slot itself used to store
      * data for the given id relative to the store base directory
-     * 
+     *
      * @param id
      *            the id of the data
      * @return the directory and file names of the relative path storing that
@@ -433,7 +436,7 @@ public abstract class MCRStore {
 
     /**
      * Extracts the numerical ID contained in the slot filename.
-     * 
+     *
      * @param slot
      *            the file name of the slot containing the data
      * @return the ID of that data
@@ -446,7 +449,7 @@ public abstract class MCRStore {
      * Returns the slot file object used to store data for the given id. This
      * may be a file or directory, depending on the subclass of MCRStore that is
      * used.
-     * 
+     *
      * @param id
      *            the id of the data
      * @return the file object storing that data
@@ -507,7 +510,7 @@ public abstract class MCRStore {
 
             validateAndInitializeBaseDirectory();
         } catch (final IOException e) {
-            LOGGER.error("Could not initialize store " + config.getID() + " correctly.", e);
+            LOGGER.error(() -> "Could not initialize store " + config.getID() + " correctly.", e);
         }
     }
 
@@ -550,7 +553,7 @@ public abstract class MCRStore {
     /**
      * Recursively searches for the highest ID, which is the greatest slot file
      * name currently used in the store.
-     * 
+     *
      * @param dir
      *            the directory to search
      * @param depth

@@ -149,8 +149,8 @@ public class MCRRuntimeComponentDetector {
         if (artifactId != null && artifactId.startsWith("mycore-")
             || mainAttributes.containsKey(ATT_MCR_APPLICATION_MODULE)) {
             if (usePomProperties) {
-                LOGGER.warn("No Attribute \"{}\" in Manifest of {}.", ATT_MCR_ARTIFACT_ID,
-                    mainAttributes.getValue(ATT_MCR_APPLICATION_MODULE));
+                LOGGER.warn("No Attribute \"{}\" in Manifest of {}.", () -> ATT_MCR_ARTIFACT_ID,
+                    () -> mainAttributes.getValue(ATT_MCR_APPLICATION_MODULE));
                 LOGGER.warn("Change this in the future, pom.properties path definition is deprecated.");
                 LOGGER.info("Using artifactId in {}.", pomPropertiesPath);
             }

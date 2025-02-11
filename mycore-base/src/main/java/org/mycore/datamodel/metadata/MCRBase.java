@@ -50,14 +50,14 @@ public abstract class MCRBase {
     protected static final String MCR_ENCODING;
 
     // the DOM document
-    protected Document jdomDocument = null;
+    protected Document jdomDocument;
 
     // the object content
-    protected MCRObjectID mcrId = null;
+    protected MCRObjectID mcrId;
 
-    protected String mcrVersion = null;
+    protected String mcrVersion;
 
-    protected String mcrSchema = null;
+    protected String mcrSchema;
 
     protected final MCRObjectService mcrService;
 
@@ -66,7 +66,7 @@ public abstract class MCRBase {
 
     protected static final String SLASH;
 
-    protected boolean importMode = false;
+    protected boolean importMode;
 
     // logger
     private static final Logger LOGGER = LogManager.getLogger();

@@ -24,29 +24,34 @@ import org.jdom2.Element;
 
 /**
  * Default debugger for enrichment process. Does nothing.
- * 
+ *
  * @see MCREnricher#setDebugger(MCREnrichmentDebugger)
- * 
+ *
  * @author Frank Lützenkirchen
  */
 public class MCRNoOpEnrichmentDebugger implements MCREnrichmentDebugger {
 
+    @Override
     public void startIteration() {
         // Do nothing here
     }
 
+    @Override
     public void endIteration() {
         // Do nothing here
     }
 
+    @Override
     public void debugPublication(String label, Element publication) {
         // Do nothing here
     }
 
+    @Override
     public void debugNewIdentifiers(Set<MCRIdentifier> ids) {
         // Do nothing here
     }
 
+    @Override
     public void debugResolved(String token, Element result) {
         // Do nothing here
     }

@@ -125,7 +125,7 @@ public class MCRXMLFunctions {
             Pattern.DOTALL);
 
     private static final Logger LOGGER = LogManager.getLogger(MCRXMLFunctions.class);
-    public static volatile MimetypesFileTypeMap MIMETYPE_MAP = null;
+    public static volatile MimetypesFileTypeMap MIMETYPE_MAP;
 
     public static Node document(String uri) throws JDOMException, IOException, TransformerException {
         MCRSourceContent sourceContent = MCRSourceContent.getInstance(uri);
@@ -181,8 +181,8 @@ public class MCRXMLFunctions {
             String formatted = mcrdate.format(simpleFormat, locale, timeZone);
             return formatted == null ? "?" + isoDate + "?" : formatted;
         } catch (RuntimeException iae) {
-            LOGGER.error("Unable to format date {} to {} with locale {} and timezone {}", mcrdate.getISOString(),
-                simpleFormat, locale, timeZone, iae);
+            LOGGER.error("Unable to format date {} to {} with locale {} and timezone {}",
+                mcrdate::getISOString, () -> simpleFormat, () -> locale, () -> timeZone, () -> iae);
             return "?";
         }
     }
@@ -844,7 +844,7 @@ public class MCRXMLFunctions {
     }
 
     public static String shortenPersonLabel(String text) {
-        int pos = text.indexOf("(");
+        int pos = text.indexOf('(');
         if (pos == -1) {
             return text;
         }

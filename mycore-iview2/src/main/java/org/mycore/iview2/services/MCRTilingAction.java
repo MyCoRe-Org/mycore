@@ -50,7 +50,7 @@ import jakarta.persistence.EntityTransaction;
 public class MCRTilingAction implements Runnable {
     private static final Logger LOGGER = LogManager.getLogger(MCRTilingAction.class);
 
-    protected MCRTileJob tileJob = null;
+    protected MCRTileJob tileJob;
 
     public MCRTilingAction(MCRTileJob image) {
         this.tileJob = image;
@@ -61,6 +61,7 @@ public class MCRTilingAction implements Runnable {
      *
      * Also this updates tileJob properties of {@link MCRTileJob} in the database.
      */
+    @Override
     public void run() {
         tileJob.setStart(new Date());
         MCRImage image;

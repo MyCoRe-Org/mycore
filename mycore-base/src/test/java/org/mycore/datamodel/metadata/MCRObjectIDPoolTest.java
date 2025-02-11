@@ -44,6 +44,7 @@ public class MCRObjectIDPoolTest extends MCRTestCase {
     /**
      * @throws java.lang.Exception
      */
+    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();

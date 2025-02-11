@@ -42,10 +42,12 @@ public interface MCRRequestScopeACL extends MCRAccessInterface {
         return (MCRRequestScopeACL) property;
     }
 
+    @Override
     default boolean checkPermissionForUser(String permission, MCRUserInformation userInfo) {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     default boolean checkPermission(String id, String permission, MCRUserInformation userInfo) {
         throw new UnsupportedOperationException();
     }

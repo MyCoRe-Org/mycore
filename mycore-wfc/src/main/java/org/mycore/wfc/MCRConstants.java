@@ -33,7 +33,7 @@ import jakarta.xml.bind.JAXBException;
  * @author Thomas Scheffler (yagee)
  *
  */
-public abstract class MCRConstants {
+public final class MCRConstants {
 
     public static final String CONFIG_PREFIX = "MCR.Module-wfc.";
 

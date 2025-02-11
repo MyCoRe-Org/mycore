@@ -26,6 +26,7 @@ public class MCRAddedAttribute implements MCRChange {
         return new MCRChangeData("added-attribute", attribute);
     }
 
+    @Override
     public void undo(MCRChangeData data) {
         Attribute attribute = data.getAttribute();
         data.getContext().removeAttribute(attribute.getName(), attribute.getNamespace());

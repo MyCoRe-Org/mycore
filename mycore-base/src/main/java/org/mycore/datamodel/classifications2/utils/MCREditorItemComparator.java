@@ -42,6 +42,7 @@ public class MCREditorItemComparator implements Comparator<Element> {
         this.language = language;
     }
 
+    @Override
     public int compare(Element o1, Element o2) {
         if (!(o1.getName().equals("item") && o2.getName().equals("item"))) {
             //NO Editor Items

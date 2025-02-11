@@ -126,7 +126,7 @@ public class MCREditorSession {
 
     public void setPageURL(String pageURL) {
         if (url == null) {
-            this.url = pageURL.contains("?") ? pageURL.substring(0, pageURL.indexOf("?")) : pageURL;
+            this.url = pageURL.contains("?") ? pageURL.substring(0, pageURL.indexOf('?')) : pageURL;
             LOGGER.debug("Editor page URL set to {}", this.url);
         }
     }

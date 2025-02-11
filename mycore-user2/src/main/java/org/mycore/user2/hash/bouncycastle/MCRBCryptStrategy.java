@@ -80,7 +80,7 @@ public class MCRBCryptStrategy extends MCRPasswordCheckStrategyBase {
 
     static {
 
-        char[] base64Alphabet = new char[] {
+        char[] base64Alphabet = {
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
             'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
@@ -90,7 +90,7 @@ public class MCRBCryptStrategy extends MCRPasswordCheckStrategyBase {
             '=',
         };
 
-        char[] radix64Alphabet = new char[] {
+        char[] radix64Alphabet = {
             '.', '/',
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
             'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
@@ -101,12 +101,12 @@ public class MCRBCryptStrategy extends MCRPasswordCheckStrategyBase {
         };
 
         BASE_64_TO_RADIX_64_MAP = new char[max(base64Alphabet) + 1];
-        for (int i = 0, n = base64Alphabet.length; i < n; i++) {
+        for (int i = 0; i < base64Alphabet.length; i++) {
             BASE_64_TO_RADIX_64_MAP[base64Alphabet[i]] = radix64Alphabet[i];
         }
 
         RADIX_64_TO_BASE_64_MAP = new char[max(radix64Alphabet) + 1];
-        for (int i = 0, n = radix64Alphabet.length; i < n; i++) {
+        for (int i = 0; i < radix64Alphabet.length; i++) {
             RADIX_64_TO_BASE_64_MAP[radix64Alphabet[i]] = base64Alphabet[i];
         }
 

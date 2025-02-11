@@ -326,7 +326,7 @@ public final class MCRURIResolver implements URIResolver {
             try {
                 InputSource entity = MCREntityResolver.instance().resolveEntity(null, href);
                 if (entity != null) {
-                    LOGGER.debug("Resolved via EntityResolver: {}", entity.getSystemId());
+                    LOGGER.debug("Resolved via EntityResolver: {}", entity::getSystemId);
                     return new MCRLazyStreamSource(entity::getByteStream, entity.getSystemId());
                 }
             } catch (IOException e) {
@@ -369,8 +369,9 @@ public final class MCRURIResolver implements URIResolver {
         Source oldResolveMethodResult = SUPPORTED_SCHEMES.get("resource")
             .resolve("resource:" + xslFolder + "/" + href, base);
         if (oldResolveMethodResult != null) {
-            LOGGER.warn(UNIQUE_MARKER, "The Stylesheet {} has include {} which only works with an old " +
-                "absolute include mechanism. Please change the include to relative!", base, href);
+            LOGGER.warn(UNIQUE_MARKER,
+                () -> "The Stylesheet " + base + " has include " + href + " which only works with an old " +
+                    "absolute include mechanism. Please change the include to relative!");
         }
         return oldResolveMethodResult;
     }
@@ -542,7 +543,7 @@ public final class MCRURIResolver implements URIResolver {
          */
         @Override
         public Source resolve(String href, String base) throws TransformerException {
-            String id = href.substring(href.indexOf(":") + 1);
+            String id = href.substring(href.indexOf(':') + 1);
             LOGGER.debug("Reading MCRObject with ID {}", id);
             Map<String, String> params;
             StringTokenizer tok = new StringTokenizer(id, "?");
@@ -579,7 +580,7 @@ public final class MCRURIResolver implements URIResolver {
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {
-            String path = href.substring(href.indexOf(":") + 1);
+            String path = href.substring(href.indexOf(':') + 1);
             try {
                 URL resource = MCRResourceHelper.getWebResourceUrl(path);
                 if (resource != null) {
@@ -600,7 +601,7 @@ public final class MCRURIResolver implements URIResolver {
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {
-            String path = href.substring(href.indexOf(":") + 1);
+            String path = href.substring(href.indexOf(':') + 1);
             URL resource = MCRResourceHelper.getResourceUrl(path);
             if (resource != null) {
                 //have to use SAX here to resolve entities
@@ -614,7 +615,7 @@ public final class MCRURIResolver implements URIResolver {
                     reader.setEntityResolver(MCREntityResolver.instance());
                     InputSource input = new InputSource(resource.toString());
                     SAXSource saxSource = new SAXSource(reader, input);
-                    LOGGER.debug("include stylesheet: {}", saxSource.getSystemId());
+                    LOGGER.debug("include stylesheet: {}", saxSource::getSystemId);
                     return saxSource;
                 } else {
                     return instance().resolve(resource.toString(), base);
@@ -633,7 +634,7 @@ public final class MCRURIResolver implements URIResolver {
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {
-            String classname = href.substring(href.indexOf(":") + 1, href.indexOf("?"));
+            String classname = href.substring(href.indexOf(':') + 1, href.indexOf('?'));
             Class<? extends URIResolver> cl = null;
             LogManager.getLogger(this.getClass()).debug("Loading Class: {}", classname);
             URIResolver resolver;
@@ -661,7 +662,7 @@ public final class MCRURIResolver implements URIResolver {
          */
         @Override
         public Source resolve(String href, String base) {
-            String key = href.substring(href.indexOf(":") + 1);
+            String key = href.substring(href.indexOf(':') + 1);
             LOGGER.debug("Reading xml from session using key {}", key);
             Element value = (Element) MCRSessionMgr.getCurrentSession().get(key);
             return new JDOMSource(value.clone());
@@ -682,7 +683,7 @@ public final class MCRURIResolver implements URIResolver {
         public Source resolve(String href, String base) throws TransformerException {
             LOGGER.debug("Reading xml from url {}", href);
 
-            String path = href.substring(href.indexOf(":") + 1);
+            String path = href.substring(href.indexOf(':') + 1);
 
             int i = path.indexOf("?host");
             if (i > 0) {
@@ -710,12 +711,12 @@ public final class MCRURIResolver implements URIResolver {
         public Source resolve(String href, String base) throws TransformerException {
             LOGGER.debug("Reading xml from MCRFile {}", href);
             MCRPath file = null;
-            String id = href.substring(href.indexOf(":") + 1);
+            String id = href.substring(href.indexOf(':') + 1);
             if (id.contains("/")) {
                 // assume thats a derivate with path
                 try {
-                    MCRObjectID derivateID = MCRObjectID.getInstance(id.substring(0, id.indexOf("/")));
-                    String path = id.substring(id.indexOf("/"));
+                    MCRObjectID derivateID = MCRObjectID.getInstance(id.substring(0, id.indexOf('/')));
+                    String path = id.substring(id.indexOf('/'));
                     file = MCRPath.getPath(derivateID.toString(), path);
                 } catch (MCRException exc) {
                     // just check if the id is valid, don't care about the exception
@@ -743,7 +744,7 @@ public final class MCRURIResolver implements URIResolver {
          */
         @Override
         public Source resolve(String href, String base) {
-            String key = href.substring(href.indexOf(":") + 1);
+            String key = href.substring(href.indexOf(':') + 1);
             LOGGER.debug("Reading xml from query result using key :{}", key);
 
             String[] param;
@@ -965,12 +966,12 @@ public final class MCRURIResolver implements URIResolver {
 
         @Override
         public Source resolve(String href, String base) {
-            String target = href.substring(href.indexOf(":") + 1);
+            String target = href.substring(href.indexOf(':') + 1);
 
             try {
                 return instance().resolve(target, base);
             } catch (Exception ex) {
-                LOGGER.debug("Caught {}. Put it into XML to process in XSL!", ex.getClass().getName());
+                LOGGER.debug("Caught {}. Put it into XML to process in XSL!", () -> ex.getClass().getName());
                 Element exception = new Element("exception");
                 Element message = new Element("message");
                 Element stacktraceElement = new Element("stacktrace");
@@ -1002,9 +1003,9 @@ public final class MCRURIResolver implements URIResolver {
 
         @Override
         public Source resolve(String href, String base) {
-            String target = href.substring(href.indexOf(":") + 1);
+            String target = href.substring(href.indexOf(':') + 1);
             // fixes exceptions if suburi is empty like "mcrobject:"
-            String subUri = target.substring(target.indexOf(":") + 1);
+            String subUri = target.substring(target.indexOf(':') + 1);
             if (subUri.length() == 0) {
                 return new JDOMSource(new Element("null"));
             }
@@ -1024,8 +1025,8 @@ public final class MCRURIResolver implements URIResolver {
                     return new JDOMSource(new Element("null"));
                 }
             } catch (Exception ex) {
-                LOGGER.info("MCRNotNullResolver caught exception: {}", ex.getLocalizedMessage());
-                LOGGER.debug(ex.getStackTrace());
+                LOGGER.info("MCRNotNullResolver caught exception: {}", ex::getLocalizedMessage);
+                LOGGER.debug(ex::getLocalizedMessage, ex);
                 LOGGER.debug("MCRNotNullResolver returning empty xml");
                 return new JDOMSource(new Element("null"));
             }
@@ -1087,7 +1088,7 @@ public final class MCRURIResolver implements URIResolver {
         @Override
         public Source resolve(String href, String base) throws TransformerException {
 
-            String help = href.substring(href.indexOf(":") + 1);
+            String help = href.substring(href.indexOf(':') + 1);
 
             // check if target URI is present
             int configurationEnd = help.indexOf(':');
@@ -1179,11 +1180,11 @@ public final class MCRURIResolver implements URIResolver {
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {
-            String help = href.substring(href.indexOf(":") + 1);
+            String help = href.substring(href.indexOf(':') + 1);
             String transformerId = new StringTokenizer(help, ":").nextToken();
-            String target = help.substring(help.indexOf(":") + 1);
+            String target = help.substring(help.indexOf(':') + 1);
 
-            String subUri = target.substring(target.indexOf(":") + 1);
+            String subUri = target.substring(target.indexOf(':') + 1);
             if (subUri.length() == 0) {
                 return new JDOMSource(new Element("null"));
             }
@@ -1245,7 +1246,7 @@ public final class MCRURIResolver implements URIResolver {
 
         @Override
         public Source resolve(String href, String base) {
-            String includePart = href.substring(href.indexOf(":") + 1);
+            String includePart = href.substring(href.indexOf(':') + 1);
             Namespace xslNamespace = Namespace.getNamespace("xsl", "http://www.w3.org/1999/XSL/Transform");
 
             Element root = new Element("stylesheet", xslNamespace);
@@ -1392,7 +1393,7 @@ public final class MCRURIResolver implements URIResolver {
          */
         @Override
         public Source resolve(String href, String base) {
-            String key = href.substring(href.indexOf(":") + 1);
+            String key = href.substring(href.indexOf(':') + 1);
             LOGGER.debug("Building xml from {}", key);
 
             Hashtable<String, String> params = getParameterMap(key);
@@ -1446,7 +1447,7 @@ public final class MCRURIResolver implements URIResolver {
                 MCRURLQueryParameter.parse(req).forEach(nv -> {
                     if (nv.name().equals("attribute")) {
                         if (suppliedAttributes.contains(nv.value())) {
-                            LOGGER.warn("Duplicate attribute {} in user info request", nv.value());
+                            LOGGER.warn("Duplicate attribute {} in user info request", nv::value);
                             return;
                         }
                         suppliedAttributes.add(nv.value());
@@ -1456,7 +1457,7 @@ public final class MCRURIResolver implements URIResolver {
                         root.addContent(attribute);
                     } else if (nv.name().equals("role")) {
                         if (suppliedRoles.contains(nv.value())) {
-                            LOGGER.warn("Duplicate role {} in user info request", nv.value());
+                            LOGGER.warn("Duplicate role {} in user info request", nv::value);
                             return;
                         }
                         suppliedRoles.add(nv.value());
@@ -1484,7 +1485,7 @@ public final class MCRURIResolver implements URIResolver {
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {
-            String versionType = href.substring(href.indexOf(":") + 1);
+            String versionType = href.substring(href.indexOf(':') + 1);
             final Element versionElement = new Element("version");
             versionElement.setText(
                 switch (versionType) {
@@ -1545,7 +1546,7 @@ public final class MCRURIResolver implements URIResolver {
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {
-            String id = href.substring(href.indexOf(":") + 1);
+            String id = href.substring(href.indexOf(':') + 1);
             LOGGER.debug("Reading version info of MCRObject with ID {}", id);
             MCRObjectID mcrId = MCRObjectID.getInstance(id);
             MCRXMLMetadataManager metadataManager = MCRXMLMetadataManager.instance();
@@ -1648,7 +1649,7 @@ public final class MCRURIResolver implements URIResolver {
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {
-            String configsuffix = href.substring(href.indexOf(":") + 1);
+            String configsuffix = href.substring(href.indexOf(':') + 1);
 
             // get the parameters from mycore.properties
             String propertyName = "MCR.URIResolver.redirect." + configsuffix;
@@ -1717,13 +1718,13 @@ public final class MCRURIResolver implements URIResolver {
          */
         @Override
         public Source resolve(String href, String base) {
-            String target = href.substring(href.indexOf(":") + 1);
+            String target = href.substring(href.indexOf(':') + 1);
 
             final Element i18nElement = new Element("i18n");
             if (!target.contains("*") && !target.contains(",")) {
                 String translation;
                 if (target.contains(":")) {
-                    final int i = target.indexOf(":");
+                    final int i = target.indexOf(':');
                     translation = MCRTranslation.translate(target.substring(0, i),
                         (Object[]) target.substring(i + 1).split(":"));
                 } else {
@@ -1858,18 +1859,18 @@ public final class MCRURIResolver implements URIResolver {
          */
         @Override
         public Source resolve(String href, String base) {
-            String hrefToCache = href.substring(href.indexOf(":") + 1);
-            LOGGER.debug("resolving: " + hrefToCache);
+            String hrefToCache = href.substring(href.indexOf(':') + 1);
+            LOGGER.debug(() -> "resolving: " + hrefToCache);
 
             long maxDateCached = System.currentTimeMillis() - maxAge;
             Element resolvedXML = cache.getIfUpToDate(hrefToCache, maxDateCached);
 
             if (resolvedXML == null) {
-                LOGGER.debug(hrefToCache + " not in cache, must resolve");
+                LOGGER.debug(() -> hrefToCache + " not in cache, must resolve");
                 resolvedXML = instance().resolve(hrefToCache);
                 cache.put(hrefToCache, resolvedXML);
             } else {
-                LOGGER.debug(hrefToCache + " already in cache");
+                LOGGER.debug(() -> hrefToCache + " already in cache");
             }
 
             return new JDOMSource(resolvedXML);

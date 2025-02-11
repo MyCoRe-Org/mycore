@@ -61,7 +61,7 @@ public class MCRLoggingCommands extends MCRAbstractCommands {
             LOGGER.error("Could not get logger for \"{}\"", name);
             return;
         }
-        LOGGER.info("Change log level from {} to {}", log.getLevel(), newLevel);
+        LOGGER.info("Change log level from {} to {}", log::getLevel, () -> newLevel);
         Configurator.setLevel(log.getName(), newLevel);
     }
 }

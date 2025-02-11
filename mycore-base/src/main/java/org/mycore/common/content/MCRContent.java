@@ -84,7 +84,7 @@ public abstract class MCRContent {
     protected String encoding;
     protected String name;
 
-    protected boolean usingSession = false;
+    protected boolean usingSession;
 
     /**
      * Sets the systemID of the current content

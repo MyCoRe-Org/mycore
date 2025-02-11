@@ -34,13 +34,13 @@ import com.google.gson.JsonObject;
 /**
  * provides support for a restricted range of formats, all of which are valid
  * ISO 8601 dates and times.
- * 
+ *
  * The range of supported formats is exactly the same range that is suggested by
  * the W3C <a href="http://www.w3.org/TR/NOTE-datetime">datetime profile</a> in
  * its version from 1997-09-15.
- * 
+ *
  * @author Thomas Scheffler (yagee)
- * 
+ *
  * @since 1.3
  */
 public final class MCRMetaISO8601Date extends MCRMetaDefault {
@@ -57,7 +57,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
 
     /**
      * constructs a empty instance.
-     * 
+     *
      * @see MCRMetaDefault#MCRMetaDefault()
      */
     public MCRMetaISO8601Date() {
@@ -67,7 +67,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
 
     /**
      * same as superImplentation but sets lang attribute to "null"
-     * 
+     *
      * @see MCRMetaDefault#MCRMetaDefault(String, String, String, int)
      */
     public MCRMetaISO8601Date(String subtag, String type, int inherted) {
@@ -77,7 +77,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.datamodel.metadata.MCRMetaDefault#createXML()
      */
     @Override
@@ -98,7 +98,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
     /**
      * Creates the JSON representation. Extends the {@link MCRMetaDefault#createJSON()} method
      * with the following data.
-     * 
+     *
      * <pre>
      *   {
      *     date: "2016-02-08",
@@ -126,7 +126,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
 
     /**
      * returns the namespace of this element
-     * 
+     *
      * @return Returns the ns.
      */
     protected static Namespace getNs() {
@@ -135,7 +135,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
 
     /**
      * sets the date for this meta data object
-     * 
+     *
      * @param isoString
      *            Date in any form that is a valid W3C dateTime
      */
@@ -145,7 +145,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
 
     /**
      * returns the Date representing this element.
-     * 
+     *
      * @return a new Date instance of the time set in this element
      */
     public Date getDate() {
@@ -154,7 +154,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
 
     /**
      * sets the date for this meta data object
-     * 
+     *
      * @param dt
      *            Date object representing date String in Element
      */
@@ -164,7 +164,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
 
     /**
      * returns a ISO 8601 conform String using the current set format.
-     * 
+     *
      * @return date in ISO 8601 format, or null if date is unset.
      */
     public String getISOString() {
@@ -173,15 +173,15 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
 
     /**
      * sets the input and output format.
-     * 
+     *
      * please use only the formats defined on the <a
      * href="http://www.w3.org/TR/NOTE-datetime">W3C Page</a>, which are also
      * exported as static fields by this class.
-     * 
+     *
      * @param format
      *            a format string that is valid conforming to xsd:duration
      *            schema type.
-     * 
+     *
      */
     public void setFormat(String format) {
         isoDate.setFormat(format);
@@ -193,7 +193,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
 
     /**
      * Returns the internal date.
-     * 
+     *
      * @return the base date
      */
     public MCRISO8601Date getMCRISO8601Date() {
@@ -217,9 +217,9 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
 
     /**
      * clone of this instance
-     * 
+     *
      * you will get a (deep) clone of this element
-     * 
+     *
      * @see java.lang.Object#clone()
      */
     @Override
@@ -241,9 +241,10 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
      * <li>the inherited value is lower than zero</li>
      * <li>the isoDate or the temporal accessor is null</li>
      * </ul>
-     * 
+     *
      * @throws MCRException the MCRMetaISO8601Date is invalid
      */
+    @Override
     public void validate() throws MCRException {
         super.validate();
         if (isoDate == null || isoDate.getDt() == null) {

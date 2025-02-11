@@ -34,7 +34,7 @@ public class MCRMockResolver implements URIResolver {
 
     private static final List<MCRMockResolverCall> CALLS = new ArrayList<>();
 
-    private static Source resultSource = null;
+    private static Source resultSource;
 
     public static List<MCRMockResolverCall> getCalls() {
         return Collections.unmodifiableList(CALLS);

@@ -75,19 +75,19 @@ public class MCREpicService extends MCRPIJobService<MCRHandle> {
      * String.
      */
     @MCRProperty(name = "Transformer", required = false)
-    public String transformerID = null;
+    public String transformerID;
 
     /**
      * The Type which should be used in the Handle Object.
      */
     @MCRProperty(name = "MetadataType", required = false)
-    public String metadataType = null;
+    public String metadataType;
 
     /**
      * The Index which should be used in the handle object.
      */
     @MCRProperty(name = "MetadataIndex", required = false)
-    public String metadataIndex = null;
+    public String metadataIndex;
 
     public ConcurrentHashMap<String, ReentrantLock> idLockMap = new ConcurrentHashMap<>();
 

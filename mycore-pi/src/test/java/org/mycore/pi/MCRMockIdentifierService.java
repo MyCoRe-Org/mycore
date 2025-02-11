@@ -19,17 +19,17 @@
 package org.mycore.pi;
 
 import java.util.Date;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.metadata.MCRBase;
 
 public class MCRMockIdentifierService extends MCRPIService<MCRMockIdentifier> {
-    public static final Logger LOGGER = LogManager.getLogger();
+
     protected static final String TYPE = "mock";
-    private boolean registerCalled = false;
-    private boolean deleteCalled = false;
-    private boolean updatedCalled = false;
+
+    private boolean registerCalled;
+
+    private boolean deleteCalled;
+
+    private boolean updatedCalled;
 
     public MCRMockIdentifierService() {
         super(TYPE);

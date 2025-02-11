@@ -32,6 +32,7 @@ import jakarta.servlet.ServletContext;
  */
 public abstract class MCRSwapInsertTarget extends MCRRepeaterControl {
 
+    @Override
     protected void handleRepeaterControl(ServletContext context, MCRServletJob job, MCREditorSession session,
         String param)
         throws Exception {

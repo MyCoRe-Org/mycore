@@ -156,7 +156,7 @@ public class MCRLayoutUtilities {
             long startTime = System.currentTimeMillis();
             boolean access = getAccess(webpageID, PERMISSION_READ, ALL2BLOCKER_TRUE, blockerWebpageID);
             LOGGER.debug("checked read access for webpageID= {} (with blockerWebpageID ={}) => {}: took {} msec.",
-                webpageID, blockerWebpageID, access, getDuration(startTime));
+                () -> webpageID, () -> blockerWebpageID, () -> access, () -> getDuration(startTime));
             return access;
         } else {
             return true;
@@ -176,8 +176,8 @@ public class MCRLayoutUtilities {
         if (ACCESS_CONTROLL_ON) {
             long startTime = System.currentTimeMillis();
             boolean access = getAccess(webpageID, PERMISSION_READ, ALLTRUE);
-            LOGGER.debug("checked read access for webpageID= {} => {}: took {} msec.", webpageID, access,
-                getDuration(startTime));
+            LOGGER.debug("checked read access for webpageID= {} => {}: took {} msec.",
+                () -> webpageID, () -> access, () -> getDuration(startTime));
             return access;
         } else {
             return true;

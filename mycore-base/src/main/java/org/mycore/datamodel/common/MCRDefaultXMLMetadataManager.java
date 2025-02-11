@@ -151,6 +151,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         return SINGLETON;
     }
 
+    @Override
     public synchronized void reload() {
         String pattern = MCRConfiguration2.getStringOrThrow("MCR.Metadata.ObjectID.NumberPattern");
         defaultLayout = pattern.length() - 4 + "-2-2";
@@ -309,6 +310,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         return store;
     }
 
+    @Override
     public void verifyStore(String base) {
         MCRMetadataStore store = getStore(base);
         if (store instanceof MCRVersioningMetadataStore versioningMetadataStore) {
@@ -335,7 +337,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
                 String relativeURI = new MessageFormat("{0}/{1}/", Locale.ROOT)
                     .format(new Object[] { project, objectType });
                 URI repURI = svnBase.resolve(relativeURI);
-                LOGGER.info("Resolved {} to {} for {}", relativeURI, repURI.toASCIIString(), property);
+                LOGGER.info("Resolved {} to {} for {}", () -> relativeURI, repURI::toASCIIString, () -> property);
                 MCRConfiguration2.set(property, repURI.toASCIIString());
                 checkAndCreateDirectory(svnPath.resolve(project), project, objectType, configPrefix, readOnly);
             }
@@ -383,6 +385,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         return project + "_" + objectType;
     }
 
+    @Override
     public void create(MCRObjectID mcrid, MCRContent xml, Date lastModified)
         throws MCRPersistenceException {
         try {
@@ -394,6 +397,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         }
     }
 
+    @Override
     public void delete(MCRObjectID mcrid) throws MCRPersistenceException {
         try {
             getStore(mcrid, true).delete(mcrid.getNumberAsInteger());
@@ -403,6 +407,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         }
     }
 
+    @Override
     public void update(MCRObjectID mcrid, MCRContent xml, Date lastModified)
         throws MCRPersistenceException {
         if (!exists(mcrid)) {
@@ -418,6 +423,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         }
     }
 
+    @Override
     public MCRContent retrieveContent(MCRObjectID mcrid) throws IOException {
         MCRContent metadata;
         MCRStoredMetadata storedMetadata = retrieveStoredMetadata(mcrid);
@@ -428,6 +434,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         return metadata;
     }
 
+    @Override
     public MCRContent retrieveContent(MCRObjectID mcrid, String revision) throws IOException {
         LOGGER.info("Getting object {} in revision {}", mcrid, revision);
         MCRMetadataVersion version = getMetadataVersion(mcrid, Long.parseLong(revision));
@@ -465,6 +472,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         return versionedMetaData.getRevision(rev);
     }
 
+    @Override
     public List<MCRMetadataVersion> listRevisions(MCRObjectID id) throws IOException {
         MCRVersionedMetadata vm = getVersionedMetaData(id);
         if (vm == null) {
@@ -493,6 +501,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         return getStore(mcrid, true).retrieve(mcrid.getNumberAsInteger());
     }
 
+    @Override
     public int getHighestStoredID(String project, String type) {
         MCRMetadataStore store;
         try {
@@ -508,6 +517,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
             .orElse(0));
     }
 
+    @Override
     public boolean exists(MCRObjectID mcrid) throws MCRPersistenceException {
         try {
             if (mcrid == null) {
@@ -526,6 +536,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         }
     }
 
+    @Override
     public List<String> listIDsForBase(String base) {
         MCRMetadataStore store;
         try {
@@ -544,6 +555,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         return list;
     }
 
+    @Override
     public List<String> listIDsOfType(String type) {
         try (Stream<Path> streamBasePath = list(basePath)) {
             return streamBasePath.flatMap(projectPath -> {
@@ -559,6 +571,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         }
     }
 
+    @Override
     public List<String> listIDs() {
         try (Stream<Path> streamBasePath = list(basePath)) {
             return streamBasePath.flatMap(projectPath -> {
@@ -572,6 +585,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         }
     }
 
+    @Override
     public Collection<String> getObjectTypes() {
         try (Stream<Path> streamBasePath = list(basePath)) {
             return streamBasePath.flatMap(this::list)
@@ -583,6 +597,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         }
     }
 
+    @Override
     public Collection<String> getObjectBaseIds() {
         try (Stream<Path> streamBasePath = list(basePath)) {
             return streamBasePath.flatMap(this::list)
@@ -606,6 +621,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         }
     }
 
+    @Override
     public List<MCRObjectIDDate> retrieveObjectDates(List<String> ids) throws IOException {
         List<MCRObjectIDDate> objidlist = new ArrayList<>(ids.size());
         for (String id : ids) {
@@ -615,6 +631,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         return objidlist;
     }
 
+    @Override
     public long getLastModified(MCRObjectID id) throws IOException {
         MCRMetadataStore store = getStore(id, true);
         MCRStoredMetadata metadata = store.retrieve(id.getNumberAsInteger());
@@ -624,6 +641,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         return -1;
     }
 
+    @Override
     public MCRCache.ModifiedHandle getLastModifiedHandle(final MCRObjectID id, final long expire, TimeUnit unit) {
         return new StoreModifiedHandle(this, id, expire, unit);
     }

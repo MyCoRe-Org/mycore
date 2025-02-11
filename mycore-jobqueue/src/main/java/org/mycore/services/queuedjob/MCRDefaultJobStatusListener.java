@@ -32,12 +32,12 @@ public class MCRDefaultJobStatusListener implements MCRJobStatusListener {
 
     @Override
     public void onProcessing(MCRJob job) {
-        LOGGER.debug("Processing {}", job.getAction().getName());
+        LOGGER.debug(() -> "Processing {}" + job.getAction().getName());
     }
 
     @Override
     public void onSuccess(MCRJob job) {
-        LOGGER.debug("Finished {}", job.getAction().getName());
+        LOGGER.debug(() -> "Finished " + job.getAction().getName());
     }
 
     @Override

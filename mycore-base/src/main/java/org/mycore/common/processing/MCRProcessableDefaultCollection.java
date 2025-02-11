@@ -30,7 +30,7 @@ import org.apache.logging.log4j.Logger;
 
 /**
  * Base implementation of a processable collection.
- * 
+ *
  * @author Matthias Eichner
  */
 public class MCRProcessableDefaultCollection implements MCRProcessableCollection {
@@ -47,7 +47,7 @@ public class MCRProcessableDefaultCollection implements MCRProcessableCollection
 
     /**
      * Creates a new collection with the given a human readable name.
-     * 
+     *
      * @param name name of this collection
      */
     public MCRProcessableDefaultCollection(String name) {
@@ -60,6 +60,7 @@ public class MCRProcessableDefaultCollection implements MCRProcessableCollection
     /**
      * Returns the human readable name of this collection.
      */
+    @Override
     public String getName() {
         return name;
     }

@@ -33,6 +33,7 @@ import org.mycore.common.MCRTestProperty;
 })
 public class MCRURIResolverXalanTest extends MCRTestCase {
 
+    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
@@ -57,6 +58,7 @@ public class MCRURIResolverXalanTest extends MCRTestCase {
 
     }
 
+    @Override
     @After
     public void tearDown() throws Exception {
         super.tearDown();

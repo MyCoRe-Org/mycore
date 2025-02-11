@@ -76,6 +76,7 @@ public class MCRNavigationMenuItem extends MCRNavigationI18nItem
         this.children.add(insertItem);
     }
 
+    @Override
     public List<MCRNavigationBaseItem> getChildren() {
         return this.children;
     }

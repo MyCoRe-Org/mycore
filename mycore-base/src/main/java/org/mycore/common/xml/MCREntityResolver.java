@@ -54,7 +54,7 @@ import org.xml.sax.ext.EntityResolver2;
 /**
  * MCREntityResolver uses {@link CatalogResolver} for resolving entities or - for compatibility reasons - looks in
  * classpath to resolve XSD and DTD files.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  * @since 2013.10
  */
@@ -106,7 +106,7 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver {
                 return resolvedEntity(entity);
             }
         } catch (CatalogException e) {
-            LOGGER.debug(e.getMessage());
+            LOGGER.debug(() -> e.getMessage());
         }
         return alternative.apply(new CatalogEntityIdentifier(publicId, systemId));
     }
@@ -264,6 +264,7 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver {
 
         URL url;
 
+        @SuppressWarnings("PMD.ArrayIsStoredDirectly") //internal use only
         InputSourceProvider(byte[] bytes, URL url) {
             this.bytes = bytes;
             this.url = url;

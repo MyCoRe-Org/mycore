@@ -96,8 +96,8 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
             final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
             String label = labelOptional.get().getText();
             return Stream.of(label.split("\\s"))
-                .map(categIdString -> categIdString.split(":"))
-                .map(categIdArr -> new MCRCategoryID(categIdArr[0], categIdArr[1]))
+                .map(MCRCategoryID::fromString)
+                .filter(id -> !id.isRootID())
                 .filter(dao::exist)
                 .map(mappingTarget -> new AbstractMap.SimpleEntry<>(category.getId(), mappingTarget))
                 .collect(Collectors.toList());
@@ -164,7 +164,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
         mcrmodsWrapper.getElements("mods:classification[contains(@generator, '" + GENERATOR_SUFFIX + "')]")
             .stream().forEach(Element::detach);
 
-        LOGGER.info("check mappings {}", obj.getId());
+        LOGGER.info("check mappings {}", obj::getId);
         final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
         // check x-mappings
         mcrmodsWrapper.getMcrCategoryIDs().stream()

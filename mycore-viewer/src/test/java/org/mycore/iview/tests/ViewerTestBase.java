@@ -43,22 +43,22 @@ public abstract class ViewerTestBase extends MCRSeleniumTestBase {
 
     private ImageViewerController viewerController;
 
-    private static ApplicationController appController = null;
+    private static ApplicationController appController;
 
     private ApplicationController applicationController;
 
     HttpServer httpServer;
 
-    private static ThreadLocal<AtomicLong> waitTime = ThreadLocal.withInitial(AtomicLong::new);
+    private static final ThreadLocal<AtomicLong> WAIT_TIME = ThreadLocal.withInitial(AtomicLong::new);
 
     @AfterClass
     public static void printWaitTime() {
-        LogManager.getLogger().info("Total wait time: {}", Duration.ofMillis(waitTime.get().get()));
-        waitTime.remove();
+        LogManager.getLogger().info("Total wait time: {}", Duration.ofMillis(WAIT_TIME.get().get()));
+        WAIT_TIME.remove();
     }
 
     public static void sleep(long millis) throws InterruptedException {
-        waitTime.get().addAndGet(millis);
+        WAIT_TIME.get().addAndGet(millis);
         Thread.sleep(millis);
     }
 

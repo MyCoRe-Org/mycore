@@ -24,11 +24,12 @@ import jakarta.ws.rs.ext.ExceptionMapper;
 
 /**
  * maps a REST API exception to a proper response with message as JSON output
- * 
+ *
  * @author Robert Stephan
  *
  */
 public class MCRRestAPIExceptionMapper implements ExceptionMapper<MCRRestAPIException> {
+    @Override
     public Response toResponse(MCRRestAPIException ex) {
         return Response.status(ex.getStatus()).entity(MCRRestAPIError.convertErrorListToJSONString(ex.getErrors()))
             .type(MCRJerseyUtil.APPLICATION_JSON_UTF8).build();

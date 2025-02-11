@@ -38,6 +38,7 @@ public class MCRTitleInfoMerger extends MCRMerger {
 
     private String normalizedText;
 
+    @Override
     public void setElement(Element element) {
         super.setElement(element);
         originalText = Stream.of(textOf("nonSort"), textOf("title"), textOf("subTitle"))
@@ -66,6 +67,7 @@ public class MCRTitleInfoMerger extends MCRMerger {
             || otherTitle.normalizedText.startsWith(normalizedText);
     }
 
+    @Override
     public void mergeFrom(MCRMerger other) {
         mergeAttributes(other);
 

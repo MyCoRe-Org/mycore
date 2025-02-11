@@ -81,11 +81,11 @@ public class MCRTileCombineServlet extends MCRServlet {
 
     private JPEGImageWriteParam imageWriteParam;
 
-    private MCRFooterInterface footerImpl = null;
+    private MCRFooterInterface footerImpl;
 
     /**
      * Initializes this instance.
-     * 
+     *
      * Use parameter <code>org.mycore.iview2.frontend.MCRFooterInterface</code> to specify implementation of
      * {@link MCRFooterInterface} (can be omitted).
      */
@@ -124,7 +124,7 @@ public class MCRTileCombineServlet extends MCRServlet {
      * <tr><td>'MAX'</td><td>3</td></tr>
      * <tr><td>default and all others</td><td>0</td></tr>
      * </table>
-     * 
+     *
      * See {@link #init()} how to attach a footer to every generated image.
      */
     @Override
@@ -181,7 +181,7 @@ public class MCRTileCombineServlet extends MCRServlet {
             }
 
         } finally {
-            LOGGER.info("Finished sending {}", request.getPathInfo());
+            LOGGER.info("Finished sending {}", request::getPathInfo);
         }
     }
 
@@ -234,7 +234,8 @@ public class MCRTileCombineServlet extends MCRServlet {
         job.getResponse().setContentType("image/jpeg");
         job.getResponse().setDateHeader("Last-Modified", iviewFile.lastModified());
         final Instant expires = Instant.now().plus(MCRTileServlet.MAX_AGE, TimeUnit.SECONDS.toChronoUnit());
-        LOGGER.info("Last-Modified: {}, expire on: {}", Instant.ofEpochMilli(iviewFile.lastModified()), expires);
+        LOGGER.info("Last-Modified: {}, expire on: {}", () -> Instant.ofEpochMilli(iviewFile.lastModified()),
+            () -> expires);
         job.getResponse().setDateHeader("Expires", expires.toEpochMilli());
 
         final ImageWriter curImgWriter = imageWriter.get();

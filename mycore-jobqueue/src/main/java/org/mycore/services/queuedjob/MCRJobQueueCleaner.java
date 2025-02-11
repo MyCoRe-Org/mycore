@@ -91,7 +91,7 @@ public final class MCRJobQueueCleaner {
         this.selectors.values().forEach(selector -> Objects.requireNonNull(selector, "Selector must not be null"));
         this.enabled = enabled;
 
-        LOGGER.info("Working with selectors: " + String.join(", ", selectors.keySet()));
+        LOGGER.info(() -> "Working with selectors: " + String.join(", ", selectors.keySet()));
 
     }
 
@@ -171,12 +171,12 @@ public final class MCRJobQueueCleaner {
         Predicate[] predicates = selector.getPredicates(builder, jobs).toArray(Predicate[]::new);
 
         if (predicates.length == 0) {
-            LOGGER.info("Skipping selector " + name + ", because selector provided no predicates");
+            LOGGER.info(() -> "Skipping selector " + name + ", because selector provided no predicates");
             return 0;
         }
 
         int numberOfJobs = manager.createQuery(query.where(predicates)).executeUpdate();
-        LOGGER.info("Performed selector " + name + ", deleted " + numberOfJobs + " jobs");
+        LOGGER.info(() -> "Performed selector " + name + ", deleted " + numberOfJobs + " jobs");
 
         return numberOfJobs;
 

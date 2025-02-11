@@ -21,11 +21,11 @@ package org.mycore.common.config;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -47,7 +47,7 @@ import org.mycore.common.content.MCRURLContent;
  * <li>application modules</li>
  * <li>installation specific files</li>
  * </ol>
- * 
+ *
  * @author Thomas Scheffler (yagee)
  * @author Robert Stephan
  * @since 2013.12
@@ -68,7 +68,7 @@ public class MCRConfigurationInputStream extends InputStream {
     /**
      * Combined Stream of all config files named <code>filename</code> available via
      * {@link MCRRuntimeComponentDetector#getAllComponents()}.
-     * 
+     *
      * @param filename
      *            , e.g. mycore.properties or messages_de.properties
      */
@@ -89,7 +89,7 @@ public class MCRConfigurationInputStream extends InputStream {
      * {@link InputStream} that includes all properties from {@link MCRRuntimeComponentDetector#getAllComponents()} and
      * <strong>mycore.properties</strong>. Use system property <code>MCR.Configuration.File</code> to configure
      * alternative property file.
-     * 
+     *
      * @since 2014.04
      */
     public static MCRConfigurationInputStream getMyCoRePropertiesInstance() throws IOException {
@@ -97,11 +97,13 @@ public class MCRConfigurationInputStream extends InputStream {
         InputStream initStream = null;
         if (configurationDirectory != null) {
             LogManager.getLogger().info("Current configuration directory: {}",
-                configurationDirectory.getAbsolutePath());
+                configurationDirectory::getAbsolutePath);
             // set MCR.basedir, is normally overwritten later
-            if (configurationDirectory.isDirectory()) {
-                initStream = getBaseDirInputStream(configurationDirectory);
+            if (!configurationDirectory.isDirectory()) {
+                LogManager.getLogger().warn("Current configuration directory does not exist: {}",
+                    configurationDirectory::getAbsolutePath);
             }
+            initStream = getBaseDirInputStream(configurationDirectory);
         }
         return new MCRConfigurationInputStream(MYCORE_PROPERTIES, initStream);
     }
@@ -141,8 +143,8 @@ public class MCRConfigurationInputStream extends InputStream {
         File localProperties = MCRConfigurationDir.getConfigFile(filename);
         if (localProperties != null && localProperties.canRead()) {
             empty = false;
-            LogManager.getLogger().info("Loading additional properties from {}", localProperties.getAbsolutePath());
-            cList.add(new FileInputStream(localProperties));
+            LogManager.getLogger().info("Loading additional properties from {}", localProperties::getAbsolutePath);
+            cList.add(Files.newInputStream(localProperties.toPath()));
             cList.add(new ByteArrayInputStream(LINE_BREAK));
         }
         return Collections.enumeration(cList);
@@ -163,7 +165,7 @@ public class MCRConfigurationInputStream extends InputStream {
         if (cfgFile.canRead()) {
             input = new MCRFileContent(cfgFile);
         } else {
-            URL url = MCRConfigurationInputStream.class.getClassLoader().getResource(filename);
+            URL url = Thread.currentThread().getContextClassLoader().getResource(filename);
             if (url != null) {
                 input = new MCRURLContent(url);
             }
@@ -173,7 +175,7 @@ public class MCRConfigurationInputStream extends InputStream {
 
     /**
      * return an enumeration of input streams of configuration files
-     * found in MyCoRe components and modules, respecting the proper loading order 
+     * found in MyCoRe components and modules, respecting the proper loading order
      */
     public static LinkedHashMap<String, byte[]> getConfigFileContents(String filename) throws IOException {
         LinkedHashMap<String, byte[]> map = new LinkedHashMap<>();
@@ -187,7 +189,7 @@ public class MCRConfigurationInputStream extends InputStream {
         // load config file from classpath
         try (InputStream configStream = getConfigFileStream(filename)) {
             if (configStream != null) {
-                LogManager.getLogger().debug("Loaded config file from classpath: " + filename);
+                LogManager.getLogger().debug("Loaded config file from classpath: {}", filename);
                 map.put("classpath_" + filename, configStream.readAllBytes());
             }
         }
@@ -195,9 +197,9 @@ public class MCRConfigurationInputStream extends InputStream {
         //load config file from app config dir
         File localConfigFile = MCRConfigurationDir.getConfigFile(filename);
         if (localConfigFile != null && localConfigFile.canRead()) {
-            LogManager.getLogger().debug("Loaded config file from config dir: " + filename);
-            try (FileInputStream fis = new FileInputStream(localConfigFile)) {
-                map.put("configdir_" + filename, fis.readAllBytes());
+            LogManager.getLogger().debug("Loaded config file from config dir: {}", filename);
+            try (InputStream fileInputStream = Files.newInputStream(localConfigFile.toPath())) {
+                map.put("configdir_" + filename, fileInputStream.readAllBytes());
             }
         }
         return map;

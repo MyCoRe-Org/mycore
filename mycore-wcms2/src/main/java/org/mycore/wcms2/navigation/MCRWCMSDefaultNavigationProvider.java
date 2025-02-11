@@ -37,7 +37,7 @@ import com.google.gson.JsonObject;
 
 /**
  * Default implementation of <code>NavigationProvider</code>.
- * 
+ *
  * @author Matthias Eichner
  */
 public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvider {
@@ -136,7 +136,8 @@ public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvid
         }
         MCRNavigationBaseItem item = getNavigationItem(hierarchyObject.get(JSON_WCMS_ID).getAsString(), items);
         if (item == null) {
-            LOGGER.warn("While saving navigation.xml. Item with id {} is null!", hierarchyObject.get(JSON_WCMS_ID));
+            LOGGER.warn("While saving navigation.xml. Item with id {} is null!",
+                () -> hierarchyObject.get(JSON_WCMS_ID));
             return null;
         }
 
@@ -157,10 +158,10 @@ public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvid
     /**
      * Internal method to get an <code>NavigationItem</code> from
      * the json array.
-     * 
+     *
      * @param wcmsId id of the item
      * @param items list of items
-     * @return instance of <code>NavigationItem</code> or null 
+     * @return instance of <code>NavigationItem</code> or null
      */
     private MCRNavigationBaseItem getNavigationItem(String wcmsId, JsonArray items) {
         for (JsonElement e : items) {

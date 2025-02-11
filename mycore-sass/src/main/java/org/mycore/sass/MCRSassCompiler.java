@@ -298,6 +298,7 @@ class MCRSassCompiler implements Closeable {
         return sw.toString();
     }
 
+    @Override
     public void close() throws IOException {
         this.connection.close();
     }

@@ -40,7 +40,7 @@ import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
 /**
  * Classification set handler.
- * 
+ *
  * @author Matthias Eichner
  */
 public class MCROAIClassificationToSetHandler extends MCROAISolrSetHandler {
@@ -55,11 +55,12 @@ public class MCROAIClassificationToSetHandler extends MCROAISolrSetHandler {
         classField = MCRConfiguration2.getString(getConfigPrefix() + "SetSolrField").orElse("category.top");
     }
 
+    @Override
     public void apply(MCRSet set, SolrQuery query) {
         String setSpec = set.getSpec();
         String classid = MCRClassificationAndSetMapper.mapSetToClassification(getConfigPrefix(), set.getSetId());
         //Check: Is it possible for setSpec to NOT contain ":" here?
-        String value = setSpec.contains(":") ? setSpec.substring(setSpec.indexOf(":")) : ":*";
+        String value = setSpec.contains(":") ? setSpec.substring(setSpec.indexOf(':')) : ":*";
         String setFilter = classField + ":" + MCRSolrUtils.escapeSearchValue(classid + value);
         query.add(CommonParams.FQ, setFilter);
     }

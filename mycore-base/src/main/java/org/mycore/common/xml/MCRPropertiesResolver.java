@@ -52,7 +52,7 @@ public class MCRPropertiesResolver implements URIResolver {
 
     @Override
     public Source resolve(String href, String base) {
-        String target = href.substring(href.indexOf(":") + 1);
+        String target = href.substring(href.indexOf(':') + 1);
 
         if (target.endsWith("*")) {
             return resolveKeyPrefix(target.substring(0, target.length() - 1));

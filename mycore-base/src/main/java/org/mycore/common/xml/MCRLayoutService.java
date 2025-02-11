@@ -49,7 +49,7 @@ import jakarta.servlet.http.HttpServletResponse;
 /**
  * Does the layout for other MyCoRe servlets by transforming XML input to
  * various output formats, using XSL stylesheets.
- * 
+ *
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  */
@@ -84,7 +84,7 @@ public class MCRLayoutService {
     public void doLayout(HttpServletRequest req, HttpServletResponse res, MCRContent source) throws IOException,
         TransformerException, SAXException {
         if (res.isCommitted()) {
-            LOGGER.warn("Response already committed: {}:{}", res.getStatus(), res.getContentType());
+            LOGGER.warn("Response already committed: {}:{}", res::getStatus, res::getContentType);
             return;
         }
         String docType = source.getDocType();
@@ -190,7 +190,7 @@ public class MCRLayoutService {
             } else {
                 response.setContentType(ct);
             }
-            LOGGER.debug("MCRLayoutService starts to output {}", response.getContentType());
+            LOGGER.debug("MCRLayoutService starts to output {}", response::getContentType);
             ServletOutputStream servletOutputStream = response.getOutputStream();
             long start = System.currentTimeMillis();
             try {
@@ -204,7 +204,7 @@ public class MCRLayoutService {
                 response.setContentLength(bout.size());
                 bout.writeTo(servletOutputStream);
             } finally {
-                LOGGER.debug("MCRContent transformation took {} ms.", System.currentTimeMillis() - start);
+                LOGGER.debug("MCRContent transformation took {} ms.", () -> System.currentTimeMillis() - start);
             }
         } catch (TransformerException | IOException | SAXException e) {
             throw e;
@@ -226,7 +226,13 @@ public class MCRLayoutService {
 
     private MCRContent transform(MCRContentTransformer transformer, MCRContent source, MCRParameterCollector parameter)
         throws IOException, TransformerException, SAXException {
-        LOGGER.debug("MCRLayoutService starts to output {}", getMimeType(transformer));
+        LOGGER.debug("MCRLayoutService starts to output {}", () -> {
+            try {
+                return getMimeType(transformer);
+            } catch (IOException | TransformerException | SAXException e) {
+                return e.getMessage();
+            }
+        });
         long start = System.currentTimeMillis();
         try {
             if (transformer instanceof MCRParameterizedTransformer paramTransformer) {
@@ -235,7 +241,7 @@ public class MCRLayoutService {
                 return transformer.transform(source);
             }
         } finally {
-            LOGGER.debug("MCRContent transformation took {} ms.", System.currentTimeMillis() - start);
+            LOGGER.debug("MCRContent transformation took {} ms.", () -> System.currentTimeMillis() - start);
         }
     }
 

@@ -57,10 +57,10 @@ import org.mycore.frontend.servlets.MCRServletJob;
 import org.xml.sax.SAXException;
 
 /**
- * Lists all *.xsl stylesheets in the web application located in any 
+ * Lists all *.xsl stylesheets in the web application located in any
  * WEB-INF/lib/*.jar or WEB-INF/classes/[MCR.Layout.Transformer.Factory.XSLFolder]/ or in {@link MCRConfigurationDir},
  * outputs the dependencies (import/include) and contained templates.
- * 
+ *
  * @author Frank Lützenkirchen
  */
 public final class MCRXSLInfoServlet extends MCRServlet {
@@ -73,6 +73,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
     private final String xslFolder =
         MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder") + "/";
 
+    @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
         if ("true".equals(job.getRequest().getParameter("reload"))) {
             stylesheets.clear();

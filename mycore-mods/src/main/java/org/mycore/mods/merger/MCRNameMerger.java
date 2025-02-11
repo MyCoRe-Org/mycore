@@ -48,6 +48,7 @@ public class MCRNameMerger extends MCRMerger {
 
     private Map<String, Set<String>> nameIds = new HashMap<String, Set<String>>();
 
+    @Override
     public void setElement(Element element) {
         super.setElement(element);
 
@@ -223,6 +224,7 @@ public class MCRNameMerger extends MCRMerger {
         }
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(familyName);
 

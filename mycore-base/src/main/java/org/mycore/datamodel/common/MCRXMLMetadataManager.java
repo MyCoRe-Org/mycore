@@ -158,8 +158,8 @@ public class MCRXMLMetadataManager {
 
     public int getHighestStoredID(String base) {
         return IMPLEMENTATION.getHighestStoredID(
-            base.substring(0, base.indexOf("_")),
-            base.substring(base.indexOf("_") + 1));
+            base.substring(0, base.indexOf('_')),
+            base.substring(base.indexOf('_') + 1));
     }
 
     /**

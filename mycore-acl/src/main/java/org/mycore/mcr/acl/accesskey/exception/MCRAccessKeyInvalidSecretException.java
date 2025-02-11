@@ -19,7 +19,7 @@
 package org.mycore.mcr.acl.accesskey.exception;
 
 /**
- * Exception that refers to an invalid value.
+ * Exception that refers to an invalid secret.
  */
 public class MCRAccessKeyInvalidSecretException extends MCRAccessKeyException {
 

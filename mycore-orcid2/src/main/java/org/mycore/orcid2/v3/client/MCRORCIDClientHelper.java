@@ -41,15 +41,15 @@ public class MCRORCIDClientHelper {
 
     /**
      * Fetches API with best credential.
-     * If credential exist for an ORCID iD, the Member API is requested with the token. 
-     * If a problem occurs during the request or no credential exist, 
+     * If credential exist for an ORCID iD, the Member API is requested with the token.
+     * If a problem occurs during the request or no credential exist,
      * the general Member/Public API is requested as a fallback.
-     * 
+     *
      * @param orcid the ORCID iD
      * @param section the section
      * @param <T> the result class
      * @param valueType type of the response
-     * @param putCodes optional put codes 
+     * @param putCodes optional put codes
      * @return the result as specified type
      * @throws MCRORCIDRequestException if the request fails
      */
@@ -71,7 +71,7 @@ public class MCRORCIDClientHelper {
                         LOGGER.info(
                             "Request with credential for orcid {} has failed with status code {} and error: {}\n"
                                 + "Token has probably expired. Trying to use read client as fallback...",
-                            orcid, response.getStatus(), e.getMessage());
+                            () -> orcid, response::getStatus, e::getMessage);
                     } else {
                         throw e;
                     }
@@ -83,7 +83,7 @@ public class MCRORCIDClientHelper {
 
     /**
      * Returns debug string for OrcidError.
-     * 
+     *
      * @param error the OrcidError
      * @return the debug message
      */

@@ -149,7 +149,8 @@ public class MCRCalendar {
      * @see #getHistoryDateAsCalendar(String, boolean, String)
      */
     public static Calendar getHistoryDateAsCalendar(String input, boolean last, CalendarType calendarType) {
-        LOGGER.debug("Input of getHistoryDateAsCalendar: {}  {}  {}", input, calendarType, Boolean.toString(last));
+        LOGGER.debug("Input of getHistoryDateAsCalendar: {}  {}  {}", () -> input, () -> calendarType,
+            () -> Boolean.toString(last));
 
         final String dateString = StringUtils.trim(input);
         // check dateString
@@ -186,7 +187,7 @@ public class MCRCalendar {
             default -> throw new MCRException("Calendar type " + calendarType + " not supported!");
         };
 
-        LOGGER.debug("Output of getHistoryDateAsCalendar: {}", getCalendarDateToFormattedString(out));
+        LOGGER.debug("Output of getHistoryDateAsCalendar: {}", () -> getCalendarDateToFormattedString(out));
         return out;
     }
 

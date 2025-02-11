@@ -23,11 +23,10 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.Optional;
 
@@ -53,7 +52,7 @@ import org.mycore.resource.MCRResourceHelper;
  * configuration directory. The content of this file is compared to the corresponding values, when a strategy is
  * encountered again. For build-in strategies, corresponding files are provided as a ressource.
  */
-abstract class MCRPasswordCheckManagerHelper {
+final class MCRPasswordCheckManagerHelper {
 
     private static final String DATA_DIRECTORY_NAME = "passwordCheckStrategies";
 
@@ -99,7 +98,7 @@ abstract class MCRPasswordCheckManagerHelper {
             if (!file.isFile() || !file.canRead()) {
                 throw new MCRException("Expected " + file.getAbsolutePath() + " to be a readable file");
             }
-            try (BufferedReader reader = new BufferedReader(new FileReader(file, UTF_8), 128)) {
+            try (BufferedReader reader = new BufferedReader(Files.newBufferedReader(file.toPath(), UTF_8), 128)) {
                 return Optional.of(readUnmodifiableConfiguration(reader));
             } catch (IOException e) {
                 throw new MCRException("Unable to read file " + file.getAbsolutePath());
@@ -163,7 +162,7 @@ abstract class MCRPasswordCheckManagerHelper {
                 }
             }
 
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, UTF_8), 128)) {
+            try (BufferedWriter writer = new BufferedWriter(Files.newBufferedWriter(file.toPath(), UTF_8), 128)) {
                 writer.write(configuration.className());
                 writer.newLine();
                 writer.write(configuration.hint());

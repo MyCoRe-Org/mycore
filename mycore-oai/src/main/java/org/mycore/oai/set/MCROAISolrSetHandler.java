@@ -53,6 +53,7 @@ public abstract class MCROAISolrSetHandler implements MCROAISetHandler<SolrQuery
         return Collections.emptySet();
     }
 
+    @Override
     public MCROAISetResolver<String, SolrDocument> getSetResolver(Collection<SolrDocument> result) {
         MCROAISetResolver<String, SolrDocument> resolver = new MCROAISetResolver<>();
         resolver.init(configPrefix, handlerPrefix, getSetMap(), result, MCROAISolrSetHandler::getIdentifier);

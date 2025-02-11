@@ -34,7 +34,7 @@ import com.google.gson.JsonObject;
  * &lt;tag class="MCRMetaIFS" &gt; <br>
  * &lt;subtag sourcepath="..." maindoc="..." ifsid="..." /&gt; <br>
  * &lt;/tag&gt; <br>
- * 
+ *
  * @author Jens Kupferschmidt
  */
 public final class MCRMetaIFS extends MCRMetaDefault {
@@ -74,7 +74,7 @@ public final class MCRMetaIFS extends MCRMetaDefault {
 
     /**
      * The method return the derivate source path.
-     * 
+     *
      * @return the sourcepath
      */
     public String getSourcePath() {
@@ -83,7 +83,7 @@ public final class MCRMetaIFS extends MCRMetaDefault {
 
     /**
      * The method return the derivate main document name.
-     * 
+     *
      * @return the main document name.
      */
     public String getMainDoc() {
@@ -92,7 +92,7 @@ public final class MCRMetaIFS extends MCRMetaDefault {
 
     /**
      * The method return the derivate IFS ID.
-     * 
+     *
      * @return the IFS ID.
      * @deprecated will always return empty String
      */
@@ -103,7 +103,7 @@ public final class MCRMetaIFS extends MCRMetaDefault {
 
     /**
      * This method set the value of derivate source path.
-     * 
+     *
      * @param sourcePath
      *            the derivate source path
      */
@@ -113,7 +113,7 @@ public final class MCRMetaIFS extends MCRMetaDefault {
 
     /**
      * This method set the value of derivate main document.
-     * 
+     *
      * @param mainDoc
      *            the derivate main document name
      */
@@ -128,7 +128,7 @@ public final class MCRMetaIFS extends MCRMetaDefault {
     /**
      * This method read the XML input stream part from a DOM part for the
      * metadata of the document.
-     * 
+     *
      * @param element
      *            a relevant JDOM element for the metadata
      * @exception MCRException
@@ -144,7 +144,7 @@ public final class MCRMetaIFS extends MCRMetaDefault {
     /**
      * This method create a XML stream for all data in this class, defined by
      * the MyCoRe XML MCRMetaIFS definition for the given subtag.
-     * 
+     *
      * @exception MCRException
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML MCRClassification part
@@ -163,7 +163,7 @@ public final class MCRMetaIFS extends MCRMetaDefault {
     /**
      * Creates the JSON representation. Extends the {@link MCRMetaDefault#createJSON()} method
      * with the following data.
-     * 
+     *
      * <pre>
      *   {
      *     sourcepath: "...",
@@ -171,7 +171,7 @@ public final class MCRMetaIFS extends MCRMetaDefault {
      *     ifsid: "ve3s8a3j00xsfk8z"
      *   }
      * </pre>
-     * 
+     *
      */
     @Override
     public JsonObject createJSON() {
@@ -191,9 +191,10 @@ public final class MCRMetaIFS extends MCRMetaDefault {
      * <li>the inherited value is lower than zero</li>
      * <li>the trimmed sourcepath is null empty</li>
      * </ul>
-     * 
+     *
      * @throws MCRException the MCRMetaIFS is invalid
      */
+    @Override
     public void validate() throws MCRException {
         super.validate();
         if (sourcePath == null) {

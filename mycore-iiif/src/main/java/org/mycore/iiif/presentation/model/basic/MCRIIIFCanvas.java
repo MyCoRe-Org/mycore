@@ -36,9 +36,9 @@ public class MCRIIIFCanvas extends MCRIIIFPresentationBase {
 
     private String label;
 
-    private String description = null;
+    private String description;
 
-    private MCRIIIFResource thumbnail = null;
+    private MCRIIIFResource thumbnail;
 
     private int height;
 
@@ -70,4 +70,25 @@ public class MCRIIIFCanvas extends MCRIIIFPresentationBase {
     public MCRIIIFResource getThumbnail() {
         return thumbnail;
     }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public void setThumbnail(MCRIIIFResource thumbnail) {
+        this.thumbnail = thumbnail;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
 }

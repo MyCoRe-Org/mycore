@@ -67,7 +67,7 @@ public final class MCRSolrCoreManager {
             .filter(p -> p.startsWith(MCRSolrConstants.SOLR_CORE_PREFIX))
             .map(cp -> cp.substring(MCRSolrConstants.SOLR_CORE_PREFIX.length()))
             .map(cp -> {
-                int indexOfDot = cp.indexOf(".");
+                int indexOfDot = cp.indexOf('.');
                 return indexOfDot != -1 ? cp.substring(0, indexOfDot) : cp;
             })
             .distinct()

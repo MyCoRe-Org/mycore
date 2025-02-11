@@ -38,7 +38,7 @@ import org.mycore.common.xml.MCRURIResolver;
 /**
  * Compiles XSL sources, reports compile errors and returns transformer
  * instances for compiled templates.
- * 
+ *
  * @author Frank Lützenkirchen
  */
 public class MCRTemplatesCompiler {
@@ -52,7 +52,7 @@ public class MCRTemplatesCompiler {
         System.setProperty("javax.xml.transform.TransformerFactory",
             "org.apache.xalan.processor.TransformerFactoryImpl");
         TransformerFactory tf = TransformerFactory.newInstance();
-        LOGGER.info("Transformerfactory: {}", tf.getClass().getName());
+        LOGGER.info("Transformerfactory: {}", () -> tf.getClass().getName());
 
         if (!tf.getFeature(SAXTransformerFactory.FEATURE)) {
             throw new MCRConfigurationException("Could not load a SAXTransformerFactory for use with XSLT");
@@ -61,16 +61,19 @@ public class MCRTemplatesCompiler {
         factory = (SAXTransformerFactory) tf;
         factory.setURIResolver(MCRURIResolver.instance());
         factory.setErrorListener(new ErrorListener() {
+            @Override
             public void error(TransformerException ex) {
                 throw new WrappedRuntimeException(MCRExceptionCauseFinder.getCause(ex));
             }
 
+            @Override
             public void fatalError(TransformerException ex) {
                 throw new WrappedRuntimeException(MCRExceptionCauseFinder.getCause(ex));
             }
 
+            @Override
             public void warning(TransformerException ex) {
-                LOGGER.warn(ex.getMessageAndLocation());
+                LOGGER.warn(ex::getMessageAndLocation);
             }
         });
     }
@@ -88,7 +91,7 @@ public class MCRTemplatesCompiler {
         }
     }
 
-    /** Returns a new transformer for the compiled XSL templates 
+    /** Returns a new transformer for the compiled XSL templates
      */
     public static Transformer getTransformer(Templates templates) throws TransformerConfigurationException {
         return factory.newTransformerHandler(templates).getTransformer();

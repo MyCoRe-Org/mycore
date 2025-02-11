@@ -36,7 +36,7 @@ import com.google.common.cache.CacheBuilder;
  * objects by updating its internal structure whenever an object is get from the cache or put into the cache. The cache
  * also provides methods for getting the current cache hit rate and fill rate. Like in a hashtable, an MCRCache uses a
  * unique key for each object.
- * 
+ *
  * @see java.util.Hashtable
  * @author Frank Lützenkirchen
  */
@@ -298,6 +298,7 @@ public class MCRCache<K, V> implements Closeable {
             + "Cache fill rate: " + getFillRate() + "\n" + "Cache hit rate:  " + getHitRate();
     }
 
+    @Override
     public void close() {
         MCRJMXBridge.unregister("MCRCache", type);
         clear();

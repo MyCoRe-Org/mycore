@@ -71,7 +71,7 @@ public class MCRJPABootstrapper implements AutoExecutable {
         Metamodel metamodel = MCREntityManagerProvider.getEntityManagerFactory().getMetamodel();
         checkHibernateMappingConfig(metamodel);
         LogManager.getLogger()
-            .info("Mapping these entities: {}", metamodel.getEntities()
+            .info("Mapping these entities: {}", () -> metamodel.getEntities()
                 .stream()
                 .map(EntityType::getJavaType)
                 .map(Class::getName)
@@ -118,7 +118,7 @@ public class MCRJPABootstrapper implements AutoExecutable {
                 .error(() -> "JPA Mapping is incomplete. Could not find a mapping for these classes: "
                     + unMappedEntities);
             LogManager.getLogger()
-                .error(() -> "Could not initialize JPA. Database access is disabled in this session.");
+                .error("Could not initialize JPA. Database access is disabled in this session.");
             MCRConfiguration2.set("MCR.Persistence.Database.Enable", String.valueOf(false));
         }
     }

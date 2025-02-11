@@ -39,11 +39,12 @@ public class MCRSubselectTarget implements MCREditorTarget {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRSubselectTarget.class);
 
+    @Override
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter)
         throws Exception {
         session.getSubmission().setSubmittedValues(job.getRequest().getParameterMap());
 
-        int pos = parameter.lastIndexOf(":");
+        int pos = parameter.lastIndexOf(':');
         String xPath = parameter.substring(0, pos);
         String href = decode(parameter.substring(pos + 1));
 

@@ -28,7 +28,7 @@ import org.mycore.common.config.MCRConfigurationException;
 /**
  * Utility class providing functions commonly used by implementations of {@link MCRPasswordCheckStrategy}.
  */
-public abstract class MCRPasswordCheckUtils {
+public final class MCRPasswordCheckUtils {
 
     private MCRPasswordCheckUtils() {
     }

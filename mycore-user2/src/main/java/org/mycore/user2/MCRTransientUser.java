@@ -47,7 +47,7 @@ public class MCRTransientUser extends MCRUser {
 
         String userName = userInfo.getUserID();
         if (userName.contains("@")) {
-            userName = userName.substring(0, userName.indexOf("@"));
+            userName = userName.substring(0, userName.indexOf('@'));
         }
         String realmId = getUserAttribute(MCRRealm.USER_INFORMATION_ATTR);
 
@@ -72,7 +72,7 @@ public class MCRTransientUser extends MCRUser {
         } else {
             super.setRealName(getUserAttribute(ATT_REAL_NAME));
             for (MCRRole role : MCRRoleManager.listSystemRoles()) {
-                LOGGER.debug("Test is in role: {}", role.getName());
+                LOGGER.debug("Test is in role: {}", role::getName);
                 if (userInfo.isUserInRole(role.getName())) {
                     assignRole(role.getName());
                 }

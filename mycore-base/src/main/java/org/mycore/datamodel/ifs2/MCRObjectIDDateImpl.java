@@ -38,10 +38,12 @@ public class MCRObjectIDDateImpl implements MCRObjectIDDate {
         this.id = id;
     }
 
+    @Override
     public Date getLastModified() {
         return lastModified;
     }
 
+    @Override
     public String getId() {
         return id;
     }

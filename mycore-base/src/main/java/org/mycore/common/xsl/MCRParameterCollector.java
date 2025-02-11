@@ -42,8 +42,8 @@ import jakarta.servlet.http.HttpSession;
 
 /**
  * Collects parameters used in XSL transformations, by copying them from
- * MCRConfiguration, from the HTTP and MyCoRe session, from request attributes etc. 
- * 
+ * MCRConfiguration, from the HTTP and MyCoRe session, from request attributes etc.
+ *
  * @author Frank Lützenkirchen
  */
 public class MCRParameterCollector {
@@ -63,14 +63,14 @@ public class MCRParameterCollector {
     /**
      * Collects parameters The collecting of parameters is done in steps,
      * each step may overwrite parameters that already have been set.
-     * 
+     *
      * First, all configuration properties from MCRConfiguration are copied.
      * Second, those variables stored in the HTTP session, that start with "XSL." are copied.
      * Next, variables stored in the MCRSession are copied.
      * Next, HTTP request parameters are copied.
-     * 
+     *
      * Only those parameters starting with "XSL." are copied from session and request,
-     * 
+     *
      * @param request the HttpRequest causing the XSL transformation, must NOT be null
      */
     public MCRParameterCollector(HttpServletRequest request) {
@@ -80,13 +80,13 @@ public class MCRParameterCollector {
     /**
      * Collects parameters The collecting of parameters is done in steps,
      * each step may overwrite parameters that already have been set.
-     * 
+     *
      * First, all configuration properties from MCRConfiguration are copied.
      * Second, those variables stored in the HTTP session, that start with "XSL." are copied.
      * Next, variables stored in the MCRSession are copied.
      * Next, HTTP request parameters are copied.
      * Next, HTTP request attributes are copied.
-     * 
+     *
      * @param request the HttpRequest causing the XSL transformation, must NOT be null
      * @param onlySetXSLParameters if true, only those parameters starting with "XSL."
      *                            are copied from session and request
@@ -116,7 +116,7 @@ public class MCRParameterCollector {
     /**
      * Collects parameters The collecting of parameters is done in steps,
      * each step may overwrite parameters that already have been set.
-     * 
+     *
      * First, all configuration properties from MCRConfiguration are copied.
      * Next, those variables stored in the MCRSession that start with "XSL." are copied.
      */
@@ -127,10 +127,10 @@ public class MCRParameterCollector {
     /**
      * Collects parameters The collecting of parameters is done in steps,
      * each step may overwrite parameters that already have been set.
-     * 
+     *
      * First, all configuration properties from MCRConfiguration are copied.
      * Next, those variables stored in the MCRSession are copied.
-     * 
+     *
      * @param onlySetXSLParameters if true, only those parameters starting with "XSL." are copied from session
      */
     public MCRParameterCollector(boolean onlySetXSLParameters) {
@@ -181,7 +181,7 @@ public class MCRParameterCollector {
     }
 
     /**
-     * Returns the parameter map.  
+     * Returns the parameter map.
      */
     public Map<String, Object> getParameterMap() {
         return Collections.unmodifiableMap(parameters);
@@ -200,10 +200,10 @@ public class MCRParameterCollector {
 
     private String xmlSafe(String key) {
         StringBuilder builder = new StringBuilder();
-        if (key.length() != 0) {
+        if (!key.isEmpty()) {
             char first = key.charAt(0);
             builder.append(first == ':' || !Verifier.isXMLNameStartCharacter(first) ? "_" : first);
-            for (int i = 1, n = key.length(); i < n; i++) {
+            for (int i = 1; i < key.length(); i++) {
                 char following = key.charAt(i);
                 builder.append(following == ':' || !Verifier.isXMLNameCharacter(following) ? "_" : following);
             }
@@ -286,8 +286,8 @@ public class MCRParameterCollector {
     }
 
     private void debugSessionParameters() {
-        LOGGER.debug("XSL.CurrentUser ={}", parameters.get("CurrentUser"));
-        LOGGER.debug("XSL.Referer ={}", parameters.get("Referer"));
+        LOGGER.debug("XSL.CurrentUser ={}", () -> parameters.get("CurrentUser"));
+        LOGGER.debug("XSL.Referer ={}", () -> parameters.get("Referer"));
     }
 
     /** Sets the request and referer URL */
@@ -297,8 +297,8 @@ public class MCRParameterCollector {
         parameters.put("UserAgent", request.getHeader("User-Agent") != null ? request.getHeader("User-Agent") : "");
     }
 
-    /** 
-     * Calculates the complete request URL, so that mod_proxy is supported 
+    /**
+     * Calculates the complete request URL, so that mod_proxy is supported
      */
     private String getCompleteURL(HttpServletRequest request) {
         StringBuilder buffer = getBaseURLUpToHostName();
@@ -332,7 +332,7 @@ public class MCRParameterCollector {
     /**
      * Sets XSL parameters for the given transformer by taking them from the
      * properties object provided.
-     * 
+     *
      * @param transformer
      *            the Transformer object thats parameters should be set
      */
@@ -348,6 +348,7 @@ public class MCRParameterCollector {
         return job == null ? new MCRParameterCollector() : new MCRParameterCollector(job.getRequest());
     }
 
+    @Override
     public int hashCode() {
         if (modified) {
             int result = LOGGER.hashCode();

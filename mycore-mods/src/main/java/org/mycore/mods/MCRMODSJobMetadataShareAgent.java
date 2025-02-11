@@ -45,7 +45,7 @@ public class MCRMODSJobMetadataShareAgent extends MCRMODSMetadataShareAgent {
             List.of(MCRJobStatus.NEW, MCRJobStatus.ERROR));
 
         if (count > 0) {
-            LOGGER.info("Job for " + holder.getId() + " already exists. Skipping.");
+            LOGGER.info(() -> "Job for " + holder.getId() + " already exists. Skipping.");
             return;
         }
 

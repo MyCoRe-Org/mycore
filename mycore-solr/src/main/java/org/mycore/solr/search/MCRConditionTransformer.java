@@ -54,6 +54,7 @@ import org.mycore.solr.MCRSolrUtils;
  *
  */
 public class MCRConditionTransformer {
+
     private static final Logger LOGGER = LogManager.getLogger(MCRConditionTransformer.class);
 
     /**
@@ -62,7 +63,7 @@ public class MCRConditionTransformer {
      */
     protected static final String MIXED = "--mixed--";
 
-    private static HashSet<String> joinFields = null;
+    private static volatile HashSet<String> joinFields;
 
     public static String toSolrQueryString(@SuppressWarnings("rawtypes") MCRCondition condition,
         Set<String> usedFields) {
@@ -278,8 +279,8 @@ public class MCRConditionTransformer {
             q.setFields(returnFields.size() > 0 ? returnFields.stream().collect(Collectors.joining(",")) : "*");
         }
         String sort = q.getSortField();
-        LOGGER.info("MyCoRe Query transformed to: {}{} {}", q.getQuery(), sort != null ? " " + sort : "",
-            q.getFields());
+        LOGGER.info("MyCoRe Query transformed to: {}{} {}", q::getQuery, () -> sort != null ? " " + sort : "",
+            q::getFields);
         return q;
     }
 
@@ -299,11 +300,11 @@ public class MCRConditionTransformer {
 
     /**
      * Builds SOLR query.
-     * 
+     *
      * Automatically builds JOIN-Query if content search fields are used in query.
      * @param sortBy sort criteria
      * @param not true, if all conditions should be negated
-     * @param and AND or OR connective between conditions  
+     * @param and AND or OR connective between conditions
      * @param table conditions per "content" or "metadata"
      * @param maxHits maximum hits
      */
@@ -387,10 +388,14 @@ public class MCRConditionTransformer {
 
     private static HashSet<String> getJoinFields() {
         if (joinFields == null) {
-            joinFields = MCRConfiguration2.getString(SOLR_CONFIG_PREFIX + "JoinQueryFields")
-                .stream()
-                .flatMap(MCRConfiguration2::splitValue)
-                .collect(Collectors.toCollection(HashSet::new));
+            synchronized (MCRConditionTransformer.class) {
+                if (joinFields == null) {
+                    joinFields = MCRConfiguration2.getString(SOLR_CONFIG_PREFIX + "JoinQueryFields")
+                        .stream()
+                        .flatMap(MCRConfiguration2::splitValue)
+                        .collect(Collectors.toCollection(HashSet::new));
+                }
+            }
         }
         return joinFields;
     }

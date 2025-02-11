@@ -97,8 +97,10 @@ public class MCRComponent implements Comparable<MCRComponent> {
         this.artifactId = artifactId;
         this.manifest = manifest;
         this.priority = calculatePriority(artifactId, manifest, this.type);
-        this.sortCriteria = PRIORITY_FORMAT.format(this.priority) + getName();
-        LOGGER.debug("{} is of type {} and named {}: {}", artifactId, type, getName(), jarFile);
+        synchronized (PRIORITY_FORMAT) {
+            this.sortCriteria = PRIORITY_FORMAT.format(this.priority) + this.name;
+        }
+        LOGGER.debug("{} is of type {} and named {}: {}", artifactId, this.type, this.name, jarFile);
     }
 
     private static int calculatePriority(String artifactId, Manifest manifest, Type type) {
@@ -117,7 +119,6 @@ public class MCRComponent implements Comparable<MCRComponent> {
             case base -> 100;
             case component -> 200;
             case module -> 300;
-            default -> throw new MCRException("Do not support MCRComponenty of type: " + type);
         };
         return priority;
     }
@@ -154,10 +155,10 @@ public class MCRComponent implements Comparable<MCRComponent> {
     public String getResourceBase() {
         return switch (type) {
             case base -> "config/";
-            case component -> "components/" + getName() + "/config/";
-            case module -> "config/" + getName() + "/";
+            case component -> "components/" + name + "/config/";
+            case module -> "config/" + name + "/";
             default -> {
-                LOGGER.debug("{}: there is no resource base for type {}", getName(), type);
+                LOGGER.debug("{}: there is no resource base for type {}", name, type);
                 yield null;
             }
         };
@@ -178,7 +179,7 @@ public class MCRComponent implements Comparable<MCRComponent> {
     }
 
     /**
-     * Returns true, if this component is an application module 
+     * Returns true, if this component is an application module
      */
     public boolean isAppModule() {
         return type == Type.module;
@@ -219,7 +220,7 @@ public class MCRComponent implements Comparable<MCRComponent> {
 
     /**
      * Returns the mainfest main attribute value for given attribute name.
-     * 
+     *
      * @param name the attribute name
      * @return the attribute value
      */

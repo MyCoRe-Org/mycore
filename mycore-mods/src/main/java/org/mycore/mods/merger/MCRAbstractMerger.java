@@ -45,6 +45,7 @@ public class MCRAbstractMerger extends MCRMerger {
 
     private String text;
 
+    @Override
     public void setElement(Element element) {
         super.setElement(element);
         text = MCRTextNormalizer.normalizeText(element.getText());

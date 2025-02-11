@@ -207,9 +207,8 @@ public class MCRWCMSFileBrowserResource {
     protected void saveFile(InputStream inputStream, String path) throws IOException {
         String newPath = testIfFileExists(path);
         OutputStream outputStream = MCRWCMSUtil.getOutputStream(newPath);
-        int read = 0;
+        int read;
         byte[] bytes = new byte[1024];
-
         while ((read = inputStream.read(bytes)) != -1) {
             outputStream.write(bytes, 0, read);
         }
@@ -224,10 +223,10 @@ public class MCRWCMSFileBrowserResource {
             .toFile();
         int i = 1;
         while (file.exists()) {
-            String type = newPath.substring(newPath.lastIndexOf("."));
-            String name = newPath.substring(0, newPath.lastIndexOf("."));
+            String type = newPath.substring(newPath.lastIndexOf('.'));
+            String name = newPath.substring(0, newPath.lastIndexOf('.'));
             if (i > 1) {
-                name = name.substring(0, name.lastIndexOf("("));
+                name = name.substring(0, name.lastIndexOf('('));
             }
             newPath = name + "(" + i++ + ")" + type;
             file = MCRUtils.safeResolve(basePath, newPath).toFile();

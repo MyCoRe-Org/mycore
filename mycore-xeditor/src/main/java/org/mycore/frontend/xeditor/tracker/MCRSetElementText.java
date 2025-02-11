@@ -38,6 +38,7 @@ public class MCRSetElementText implements MCRChange {
         return data;
     }
 
+    @Override
     public void undo(MCRChangeData data) {
         data.getContext().setContent(data.getElement().cloneContent());
     }

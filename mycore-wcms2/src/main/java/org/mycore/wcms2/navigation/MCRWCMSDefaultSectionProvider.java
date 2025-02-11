@@ -64,6 +64,7 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
         "strike", "strong", "style", "sub", "summary", "sup", "svg", "table", "tbody", "td", "template", "textarea",
         "tfoot", "th", "thead", "time", "title", "tr", "track", "tt", "u", "ul", "var", "video", "wbr");
 
+    @Override
     public JsonArray toJSON(Element rootElement) {
         JsonArray sectionArray = new JsonArray();
         for (Element section : rootElement.getChildren(MyCoReWebPageProvider.XML_SECTION)) {

@@ -58,6 +58,7 @@ public class MCRStalledJobResetter implements Runnable {
     /**
      * Resets jobs to {@link MCRJobState#NEW} that where in status {@link MCRJobState#PROCESSING} for to long time.
      */
+    @Override
     public void run() {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         EntityTransaction executorTransaction = em.getTransaction();
@@ -74,7 +75,7 @@ public class MCRStalledJobResetter implements Runnable {
             .map(job -> {
                 long start = job.getStart().getTime() / 60000;
                 boolean ret = false;
-                LOGGER.debug("checking {} {} ...", job.getDerivate(), job.getPath());
+                LOGGER.debug("checking {} {} …", job::getDerivate, job::getPath);
                 if (current - start >= maxTimeDiff) {
                     if (hasPermanentError(job)) {
                         LOGGER.warn("Job has permanent errors: {}", job);

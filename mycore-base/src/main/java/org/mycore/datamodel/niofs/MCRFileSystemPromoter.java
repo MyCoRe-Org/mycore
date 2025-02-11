@@ -35,7 +35,7 @@ import jakarta.servlet.ServletContext;
 
 /**
  * This {@link AutoExecutable} checks if the {@link FileSystem} implementations are available.
- * 
+ *
  * There is a documented "feature" in OpenJDK 8 that only {@link FileSystemProvider}
  * available to the system {@link ClassLoader} are available.
  * We try to fix (a.k.a. hack) it right.
@@ -72,8 +72,8 @@ public class MCRFileSystemPromoter implements AutoExecutable {
                 .stream()
                 .map(FileSystemProvider::getScheme)
                 .collect(Collectors.toCollection(HashSet::new));
-            ServiceLoader<FileSystemProvider> sl = ServiceLoader.load(FileSystemProvider.class, getClass()
-                .getClassLoader());
+            ServiceLoader<FileSystemProvider> sl = ServiceLoader.load(FileSystemProvider.class, Thread.currentThread()
+                .getContextClassLoader());
             promoteFileSystemProvider(StreamSupport.stream(sl.spliterator(), false)
                 .filter(p -> !installedSchemes.contains(p.getScheme()))
                 .collect(Collectors.toCollection(ArrayList::new)));
@@ -87,7 +87,8 @@ public class MCRFileSystemPromoter implements AutoExecutable {
             return;
         }
         for (FileSystemProvider provider : detectedProviders) {
-            LOGGER.info("Promoting filesystem {}: {}", provider.getScheme(), provider.getClass().getCanonicalName());
+            LOGGER.info("Promoting filesystem {}: {}",
+                provider::getScheme, () -> provider.getClass().getCanonicalName());
             MCRPaths.addFileSystemProvider(provider);
         }
     }

@@ -22,11 +22,12 @@ import org.jdom2.Element;
 
 /**
  * Implementation of the boolean "false" primitive
- * 
+ *
  * @author Matthias Kramm
  */
 public class MCRFalseCondition<T> implements MCRCondition<T> {
 
+    @Override
     public boolean evaluate(T o) {
         return false;
     }
@@ -36,6 +37,7 @@ public class MCRFalseCondition<T> implements MCRCondition<T> {
         return "false";
     }
 
+    @Override
     public Element toXML() {
         Element cond = new Element("boolean");
         cond.setAttribute("operator", "false");

@@ -36,7 +36,7 @@ import com.google.gson.JsonObject;
  * &lt;tag class="MCRMetaClassification" heritable="..."&gt; <br>
  * &lt;subtag classid="..." categid="..." /&gt; <br>
  * &lt;/tag&gt; <br>
- * 
+ *
  * @author Jens Kupferschmidt
  */
 public class MCRMetaClassification extends MCRMetaDefault {
@@ -103,7 +103,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
 
     /**
      * The method return the classification ID.
-     * 
+     *
      * @return the classId
      */
     public final String getClassId() {
@@ -112,7 +112,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
 
     /**
      * The method return the category ID.
-     * 
+     *
      * @return the categId
      */
     public final String getCategId() {
@@ -121,7 +121,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
 
     /**
      * This method set values of classid and categid.
-     * 
+     *
      * @param classid
      *            the classification ID
      * @param categid
@@ -137,7 +137,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
     /**
      * This method read the XML input stream part from a DOM part for the
      * metadata of the document.
-     * 
+     *
      * @param element
      *            a relevant JDOM element for the metadata
      * @exception MCRException
@@ -156,7 +156,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
     /**
      * This method create a XML stream for all data in this class, defined by
      * the MyCoRe XML MCRMetaClassification definition for the given subtag.
-     * 
+     *
      * @exception MCRException
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML MCRClassification part
@@ -173,14 +173,14 @@ public class MCRMetaClassification extends MCRMetaDefault {
     /**
      * Creates the JSON representation. Extends the {@link MCRMetaDefault#createJSON()} method
      * with the following data.
-     * 
+     *
      * <pre>
      *   {
      *     classid: "mycore_class_00000001",
      *     categid: "category1"
      *   }
      * </pre>
-     * 
+     *
      */
     @Override
     public JsonObject createJSON() {
@@ -198,9 +198,10 @@ public class MCRMetaClassification extends MCRMetaDefault {
      * <li>the inherited value is lower than zero</li>
      * <li>the category is null</li>
      * </ul>
-     * 
+     *
      * @throws MCRException the MCRMetaClassification is invalid
      */
+    @Override
     public void validate() throws MCRException {
         super.validate();
         if (category == null) {
@@ -210,9 +211,9 @@ public class MCRMetaClassification extends MCRMetaDefault {
 
     /**
      * clone of this instance
-     * 
+     *
      * you will get a (deep) clone of this element
-     * 
+     *
      * @see java.lang.Object#clone()
      */
     @Override

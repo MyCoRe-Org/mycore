@@ -111,6 +111,7 @@ public class MCRNavigation implements MCRNavigationItemContainer {
         this.children.add(insertItem);
     }
 
+    @Override
     public List<MCRNavigationBaseItem> getChildren() {
         return this.children;
     }

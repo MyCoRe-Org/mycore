@@ -43,7 +43,7 @@ import org.mycore.util.concurrent.MCRReadWriteGuard;
  * Represents a set of files and directories belonging together, that are stored
  * in a persistent MCRFileStore. A FileCollection has a unique ID within the
  * store, it is the root folder of all files and directories in the collection.
- * 
+ *
  * @author Frank Lützenkirchen
  */
 public class MCRFileCollection extends MCRDirectory {
@@ -164,6 +164,7 @@ public class MCRFileCollection extends MCRDirectory {
     /**
      * Deletes this file collection with all its data and children
      */
+    @Override
     public void delete() throws IOException {
         writeData(Element::removeContent);
         Files.walkFileTree(path, MCRRecursiveDeleter.instance());
@@ -181,7 +182,7 @@ public class MCRFileCollection extends MCRDirectory {
 
     /**
      * Returns the store this file collection is stored in.
-     * 
+     *
      * @return the store this file collection is stored in.
      */
     public MCRStore getStore() {
@@ -190,7 +191,7 @@ public class MCRFileCollection extends MCRDirectory {
 
     /**
      * Returns the ID of this file collection
-     * 
+     *
      * @return the ID of this file collection
      */
     public int getID() {
@@ -200,7 +201,7 @@ public class MCRFileCollection extends MCRDirectory {
     /**
      * Returns this object, because the FileCollection instance is the root of
      * all files and directories contained in the collection.
-     * 
+     *
      * @return this
      */
     @Override

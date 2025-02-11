@@ -34,6 +34,7 @@ public class MCRTestAnnotationWatcher<A extends Annotation> extends TestWatcher 
         this.annotationType = annotationType;
     }
 
+    @Override
     protected void starting(Description d) {
         this.annotation = d.getAnnotation(annotationType);
     }

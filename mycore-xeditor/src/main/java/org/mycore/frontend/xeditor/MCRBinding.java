@@ -66,7 +66,7 @@ public class MCRBinding {
 
     protected MCRChangeTracker tracker;
 
-    private Map<String, Object> staticVariables = null;
+    private Map<String, Object> staticVariables;
 
     public MCRBinding(Document document) {
         this.boundNodes.add(document);
@@ -112,12 +112,12 @@ public class MCRBinding {
             }
         }
 
-        LOGGER.debug("Bind to {} selected {} node(s)", xPath, boundNodes.size());
+        LOGGER.debug("Bind to {} selected {} node(s)", () -> xPath, boundNodes::size);
 
         if (boundNodes.isEmpty() && buildIfNotExists) {
             MCRNodeBuilder builder = new MCRNodeBuilder(variables);
             Object built = builder.buildNode(xPath, initialValue, (Parent) (parent.getBoundNode()));
-            LOGGER.debug("Bind to {} generated node {}", xPath, MCRXPathBuilder.buildXPath(built));
+            LOGGER.debug("Bind to {} generated node {}", () -> xPath, () -> MCRXPathBuilder.buildXPath(built));
             boundNodes.add(built);
             trackNodeCreated(builder.getFirstNodeBuilt());
         }

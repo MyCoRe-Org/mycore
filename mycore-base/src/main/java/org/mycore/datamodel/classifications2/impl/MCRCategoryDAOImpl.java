@@ -52,9 +52,9 @@ import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 
 /**
- * 
+ *
  * @author Thomas Scheffler (yagee)
- * 
+ *
  * @since 2.0
  */
 public class MCRCategoryDAOImpl implements MCRCategoryDAO {
@@ -124,7 +124,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                 parent.calculateLeftRightAndLevel(parentLeft, parent.getLevel());
             }
             entityManager.persist(category);
-            LOGGER.info("Category {} saved.", category.getId());
+            LOGGER.info("Category {} saved.", category::getId);
             updateTimeStamp();
 
             updateLastModified(category.getRoot().getId().toString());
@@ -146,13 +146,13 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         if (category == null) {
             throw new MCRPersistenceException("Category " + id + " was not found. Delete aborted.");
         }
-        LOGGER.debug("Will delete: {}", category.getId());
+        LOGGER.debug("Will delete: {}", category::getId);
         MCRCategory parent = category.parent;
         category.detachFromParent();
         entityManager.remove(category);
         if (parent != null) {
             entityManager.flush();
-            LOGGER.debug("Left: {} Right: {}", category.getLeft(), category.getRight());
+            LOGGER.debug("Left: {} Right: {}", category::getLeft, category::getRight);
             // always add +1 for the currentNode
             int nodes = 1 + (category.getRight() - category.getLeft()) / 2;
             final int increment = nodes * -2;
@@ -165,7 +165,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.datamodel.classifications2.MCRCategoryDAO#exist(org.mycore.datamodel.classifications2.MCRCategoryID)
      */
     @Override
@@ -243,7 +243,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.datamodel.classifications2.MCRClassificationService#getChildren(org.mycore.datamodel.classifications2.MCRCategoryID)
      */
     @Override
@@ -355,7 +355,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mycore.datamodel.classifications2.MCRClassificationService#hasChildren(org.mycore.datamodel.classifications2.MCRCategoryID)
      */
     @Override
@@ -593,7 +593,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         try {
             childAmount = level != 0 ? category.getChildren().size() : 0;
         } catch (RuntimeException e) {
-            LOGGER.error("Cannot get children size for category: {}", category.getId(), e);
+            LOGGER.error(() -> "Cannot get children size for category: " + category.getId(), e);
             throw e;
         }
         newCateg.setChildren(new ArrayList<>(childAmount));
@@ -618,7 +618,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     /**
      * returns database backed MCRCategoryImpl
-     * 
+     *
      * every change to the returned MCRCategory is reflected in the database.
      */
     public static MCRCategoryImpl getByNaturalID(EntityManager entityManager, MCRCategoryID id) {
@@ -684,7 +684,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     /**
      * Method updates the last modified timestamp, for the given root id.
-     * 
+     *
      */
     protected synchronized void updateLastModified(String root) {
         LAST_MODIFIED_MAP.put(root, System.currentTimeMillis());
@@ -692,7 +692,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     /**
      * Gets the timestamp for the given root id. If there is not timestamp at the moment -1 is returned.
-     * 
+     *
      * @return the last modified timestamp (if any) or -1
      */
     @Override

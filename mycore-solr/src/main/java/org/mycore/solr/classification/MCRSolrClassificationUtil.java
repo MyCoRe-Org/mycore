@@ -56,11 +56,14 @@ import com.google.common.collect.Lists;
  *
  * @author Matthias Eichner
  */
-public abstract class MCRSolrClassificationUtil {
+public final class MCRSolrClassificationUtil {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRSolrClassificationUtil.class);
 
     private static final String CLASSIFICATION_CORE_TYPE = "classification";
+
+    private MCRSolrClassificationUtil() {
+    }
 
     /**
      * Reindex the whole classification system with the default classification solr core.
@@ -221,7 +224,7 @@ public abstract class MCRSolrClassificationUtil {
                     MCRSolrAuthenticationLevel.INDEX);
                 req.process(solrClient);
             } catch (Exception exc) {
-                LOGGER.error("Unable to reindex {}", category.getId(), exc);
+                LOGGER.error(() -> "Unable to reindex " + category.getId(), exc);
             }
         }
         try {

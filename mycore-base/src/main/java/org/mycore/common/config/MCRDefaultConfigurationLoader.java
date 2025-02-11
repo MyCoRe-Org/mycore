@@ -19,10 +19,11 @@
 package org.mycore.common.config;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -61,8 +62,8 @@ public class MCRDefaultConfigurationLoader implements MCRConfigurationLoader {
             .getMyCoRePropertiesInstance();
         File configFile = MCRConfigurationDir.getConfigFile("mycore.active.properties");
         if (configFile != null) {
-            FileOutputStream fout = new FileOutputStream(configFile);
-            return new TeeInputStream(configurationInputStream, fout, true);
+            OutputStream outputStream = Files.newOutputStream(configFile.toPath());
+            return new TeeInputStream(configurationInputStream, outputStream, true);
         }
         return configurationInputStream;
     }
@@ -71,8 +72,8 @@ public class MCRDefaultConfigurationLoader implements MCRConfigurationLoader {
         MCRConfigurationInputStream deprecatedInputStream = new MCRConfigurationInputStream("deprecated.properties");
         File configFile = MCRConfigurationDir.getConfigFile("deprecated.active.properties");
         if (configFile != null) {
-            FileOutputStream fout = new FileOutputStream(configFile);
-            return new TeeInputStream(deprecatedInputStream, fout, true);
+            OutputStream outputStream = Files.newOutputStream(configFile.toPath());
+            return new TeeInputStream(deprecatedInputStream, outputStream, true);
         }
         return deprecatedInputStream;
     }
@@ -95,7 +96,7 @@ public class MCRDefaultConfigurationLoader implements MCRConfigurationLoader {
      * a property called <CODE>MCR.Configuration.Include</CODE>, the files
      * specified in that property will also be read. Multiple include files have
      * to be separated by spaces or colons.
-     * 
+     *
      * @param filename
      *            the properties file to be loaded
      * @throws MCRConfigurationException

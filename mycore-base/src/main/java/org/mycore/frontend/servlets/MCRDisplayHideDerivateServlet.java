@@ -86,7 +86,7 @@ public class MCRDisplayHideDerivateServlet extends MCRServlet {
             String oldVal = displayAttr.getValue();
             String newVal = oldVal.equals(String.valueOf(true)) ? String.valueOf(false) : String.valueOf(true);
             displayAttr.setValue(newVal);
-            LOGGER.info("Setting display attribute of derivate with id {} to {}", derObj.getId(), newVal);
+            LOGGER.info("Setting display attribute of derivate with id {} to {}", derObj::getId, () -> newVal);
         }
         MCRDerivate updated = new MCRDerivate(xml);
         MCRMetadataManager.update(updated);

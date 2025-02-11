@@ -59,7 +59,7 @@ public class MCRSubselectReturnTarget implements MCREditorTarget {
         Document doc = session.getEditedXML();
         MCRChangeData change = session.getChangeTracker().findLastChange(doc);
         String text = change.getText();
-        String xPath = text.substring(text.lastIndexOf(" ") + 1).trim();
+        String xPath = text.substring(text.lastIndexOf(' ') + 1).trim();
         return bindsFirstOrMoreThanOneElement(xPath, session) ? xPath + "[1]" : xPath;
     }
 

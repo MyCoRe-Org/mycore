@@ -144,6 +144,7 @@ public class MCRPI implements org.mycore.pi.MCRPIRegistrationInfo {
         this.created = new Date();
     }
 
+    @Override
     public Date getRegistrationStarted() {
         return registrationStarted;
     }

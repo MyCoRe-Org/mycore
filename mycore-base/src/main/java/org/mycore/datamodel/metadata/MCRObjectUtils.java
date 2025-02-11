@@ -41,10 +41,10 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
 
 /**
  * This class contains several helper methods for {@link MCRObject}.
- * 
+ *
  * @author Matthias Eichner
  */
-public abstract class MCRObjectUtils {
+public final class MCRObjectUtils {
 
     private static XPathExpression<Attribute> META_LINK_HREF;
 
@@ -62,11 +62,14 @@ public abstract class MCRObjectUtils {
             MCRConstants.getStandardNamespaces());
     }
 
+    private MCRObjectUtils() {
+    }
+
     /**
      * Retrieves a list of all ancestors of the given object. The first entry
      * is the parent object, the last entry is the root node. Returns an empty
      * list if no ancestor is found.
-     * 
+     *
      * @return list of ancestors
      */
     public static List<MCRObject> getAncestors(MCRObject mcrObject) {
@@ -85,7 +88,7 @@ public abstract class MCRObjectUtils {
      * Returns a list of all ancestors and the object itself. The first entry
      * is the object itself, the last entry is the root node. Returns a list
      * with one entry if no ancestor is found.
-     * 
+     *
      * @return list of ancestors
      */
     public static List<MCRObject> getAncestorsAndSelf(MCRObject mcrObject) {
@@ -98,7 +101,7 @@ public abstract class MCRObjectUtils {
     /**
      * Returns the root ancestor of the given object. If the object has
      * no parent null is returned.
-     * 
+     *
      * @param mcrObject object to get the root node
      * @return root <code>MCRObject</code>
      */
@@ -110,7 +113,7 @@ public abstract class MCRObjectUtils {
     /**
      * Returns all children of the given object. If the object has no
      * children, an empty list is returned.
-     * 
+     *
      * @param mcrObject the mycore object
      * @return list of all children
      */
@@ -126,7 +129,7 @@ public abstract class MCRObjectUtils {
     /**
      * Returns a list of all descendants and the object itself. For more information
      * see {@link MCRObjectUtils#getDescendants}.
-     * 
+     *
      * @return list of all descendants and the object itself
      */
     public static List<MCRObject> getDescendantsAndSelf(MCRObject mcrObject) {
@@ -139,8 +142,8 @@ public abstract class MCRObjectUtils {
      * Returns a list of all descendants of the given object. Be aware that
      * there is no specific order. The list is empty if the object has no
      * children.
-     * 
-     * @return list of all descendants 
+     *
+     * @return list of all descendants
      */
     public static List<MCRObject> getDescendants(MCRObject mcrObject) {
         List<MCRObject> objectList = new ArrayList<>();
@@ -161,7 +164,7 @@ public abstract class MCRObjectUtils {
             .getDestinationOf(mcrObjectID, MCRLinkTableManager.ENTRY_TYPE_DERIVATE).stream();
         Stream<String> derivateLinkStream = linkTableManager
             .getDestinationOf(mcrObjectID, MCRLinkTableManager.ENTRY_TYPE_DERIVATE_LINK).stream()
-            .map(link -> link.substring(0, link.indexOf("/")));
+            .map(link -> link.substring(0, link.indexOf('/')));
         return Stream.concat(derivateStream, derivateLinkStream).distinct().map(MCRObjectID::getInstance)
             .collect(Collectors.toList());
     }
@@ -170,7 +173,7 @@ public abstract class MCRObjectUtils {
      * Returns a list of {@link MCRObject}s which are linked in the given object
      * by an {@link MCRMetaLinkID}. This does not return any {@link MCRObjectStructure}
      * links or any {@link MCRMetaDerivateLink}s.
-     * 
+     *
      * @param object the object where to get the entitylinks from
      * @return a list of linked objects
      * @throws MCRPersistenceException one of the linked objects does not exists
@@ -240,7 +243,7 @@ public abstract class MCRObjectUtils {
 
     /**
      * Returns a list of {@link MCRCategoryID}s which are used in the given object.
-     * 
+     *
      * @param object the object where to get the categories from
      * @return a list of linked categories
      */
@@ -256,11 +259,11 @@ public abstract class MCRObjectUtils {
     /**
      * Restores a MyCoRe Object to the selected revision. Please note that children and derivates
      * are not deleted or reverted!
-     * 
+     *
      * @param mcrId the mycore object identifier
      * @param revision The revision to restore to. If this is lower than zero, the last revision is used.
      * @return the new {@link MCRObject}
-     * 
+     *
      * @throws IOException An error occurred while retrieving the revision information. This is most
      *          likely due an svn error.
      * @throws MCRPersistenceException There is no such object with the given id and revision.

@@ -77,20 +77,20 @@ class MCRIdentifierResolver {
      * @return the publication data in MODS format, or null if the data source did not return data for this identifier
      */
     Element resolve(String identifier) {
-        Object[] params = new Object[] { identifier, URLEncoder.encode(identifier, StandardCharsets.UTF_8) };
+        Object[] params = { identifier, URLEncoder.encode(identifier, StandardCharsets.UTF_8) };
         String uri = new MessageFormat(uriPattern, Locale.ROOT).format(params);
 
         Element resolved = null;
         try {
             resolved = MCRURIResolver.instance().resolve(uri);
         } catch (Exception ex) {
-            LOGGER.warn("Exception resolving " + uri, ex);
+            LOGGER.warn(() -> "Exception resolving " + uri, ex);
             return null;
         }
 
         // Normalize various error/not found cases
         if (resolved == null || !"mods".equals(resolved.getName()) || resolved.getChildren().isEmpty()) {
-            LOGGER.warn(ds + " returned none or empty MODS for " + idType + " " + identifier);
+            LOGGER.warn(() -> ds + " returned none or empty MODS for " + idType + " " + identifier);
             return null;
         }
 
@@ -98,7 +98,7 @@ class MCRIdentifierResolver {
             ensureIsValidMODS(resolved);
             return resolved;
         } catch (Exception ex) {
-            LOGGER.warn(ds + " returned invalid MODS for " + identifier + ": " + ex.getMessage(), ex);
+            LOGGER.warn(() -> ds + " returned invalid MODS for " + identifier + ": " + ex.getMessage(), ex);
             return null;
         }
     }

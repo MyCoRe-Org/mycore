@@ -85,7 +85,7 @@ public class MCRErrorServlet extends HttpServlet {
                 resp.sendError(statusCode, message);
             }
         } else {
-            LOGGER.info("Client does not accept HTML pages: {}", req.getHeader("Accept"));
+            LOGGER.info("Client does not accept HTML pages: {}", () -> req.getHeader("Accept"));
             resp.sendError(statusCode, message);
         }
     }
@@ -147,14 +147,14 @@ public class MCRErrorServlet extends HttpServlet {
 
     /**
      * Builds a jdom document containing the error parameter.
-     * 
+     *
      * @param msg the message of the error
      * @param statusCode the http status code
      * @param requestURI the uri of the request
      * @param exceptionType type of the exception
-     * @param source source of the error 
+     * @param source source of the error
      * @param ex exception which is occured
-     * 
+     *
      * @return jdom document containing all error parameter
      */
     public static Document buildErrorPage(String msg, Integer statusCode, String requestURI,
@@ -242,7 +242,7 @@ public class MCRErrorServlet extends HttpServlet {
         } else {
             if (request.getAttribute(requestAttr) != null) {
                 LOGGER.warn("Could not send error page. Generating error page failed. The original message:\n{}",
-                    request.getAttribute(requestAttr));
+                    () -> request.getAttribute(requestAttr));
             } else {
                 LOGGER.warn(
                     "Could not send error page. Response allready commited. The following message was given:\n{}", msg);

@@ -217,7 +217,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
                 userInfo.getWorkInfo().setOwnPutCode(-1);
                 flagContent.updateUserInfoByORCID(orcid, userInfo);
             } catch (Exception e) {
-                LOGGER.warn("Error while deleting {}", userInfo.getWorkInfo().getOwnPutCode(), e);
+                LOGGER.warn(() -> "Error while deleting " + userInfo.getWorkInfo().getOwnPutCode(), e);
             }
         }
     }
@@ -344,7 +344,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
                     userOrcidPair.put(pairs.entrySet().iterator().next().getKey(), orcidUser);
                 } else if (pairs.size() > 1) {
                     LOGGER.info("Try to find credentials for {}, but found more than one pair",
-                        users.iterator().next().getUserID());
+                        () -> users.iterator().next().getUserID());
                 }
             } else if (orcid == null && users.size() > 1) {
                 LOGGER.warn("This case is not implemented");
@@ -358,7 +358,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
             try {
                 collectAndSaveExternalPutCodes(object);
             } catch (Exception e) {
-                LOGGER.warn("Error while collecting external put codes for {}.", object.getId(), e);
+                LOGGER.warn(() -> "Error while collecting external put codes for {}." + object.getId(), e);
             }
         }
     }

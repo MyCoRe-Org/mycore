@@ -136,7 +136,7 @@ public class MCRMetadataHistoryCommands {
         executorService.shutdown();
         boolean waitToFinish = true;
         while (!executorService.isTerminated() && waitToFinish) {
-            LogManager.getLogger().info("Waiting for history of {} objects/derivates.", completed.get());
+            LogManager.getLogger().info("Waiting for history of {} objects/derivates.", completed::get);
             try {
                 executorService.awaitTermination(10, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
@@ -279,7 +279,7 @@ public class MCRMetadataHistoryCommands {
                     }
                 } catch (JDOMException e) {
                     LogManager.getLogger()
-                        .error("Error while reading revision {} of {}", version.getRevision(), derId, e);
+                        .error(() -> "Error while reading revision " + version.getRevision() + " of " + derId, e);
                 }
             }
         }
@@ -320,7 +320,7 @@ public class MCRMetadataHistoryCommands {
                     }
                 } catch (JDOMException e) {
                     LogManager.getLogger()
-                        .error("Error while reading revision {} of {}", version.getRevision(), objId, e);
+                        .error(() -> "Error while reading revision " + version.getRevision() + " of " + objId, e);
                 }
             }
         }

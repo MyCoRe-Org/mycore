@@ -91,7 +91,7 @@ public class MCRURNGranularOAIService extends MCRPIService<MCRDNBURN> {
 
     private MCRDNBURN registerSingleURN(MCRBase obj, String additional, MCRObjectDerivate derivate)
         throws MCRPersistentIdentifierException {
-        LOGGER.info("Add single urn to {} / {}", obj.getId(), additional);
+        LOGGER.info("Add single urn to {} / {}", obj::getId, () -> additional);
 
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         MCRPath filePath = MCRPath.getPath(obj.getId().toString(), additional);
@@ -114,7 +114,7 @@ public class MCRURNGranularOAIService extends MCRPIService<MCRDNBURN> {
 
     private MCRDNBURN registerURNsDerivate(MCRBase obj, String additional, MCRObjectDerivate derivate)
         throws MCRPersistentIdentifierException {
-        LOGGER.info("Add URNs to all files of {}", obj.getId());
+        LOGGER.info("Add URNs to all files of {}", obj::getId);
 
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
 

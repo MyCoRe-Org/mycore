@@ -41,13 +41,13 @@ import org.mycore.common.content.MCRURLContent;
  */
 public class MCRXMLParserTest extends MCRTestCase {
 
-    private URL xmlResource = null;
+    private URL xmlResource;
 
-    private Path xmlFile = null;
+    private Path xmlFile;
 
-    private URL xmlResourceInvalid = null;
+    private URL xmlResourceInvalid;
 
-    private Path xmlFileInvalid = null;
+    private Path xmlFileInvalid;
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();

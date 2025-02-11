@@ -41,11 +41,11 @@ import jakarta.servlet.http.HttpServletResponse;
  * Provides the web front end to manage baskets and their contents.
  * Required parameter is the type of basket and the action to perform.
  * For a basket of objects, possible requests would be:
- * 
+ *
  * BasketServlet?type=objects&amp;action=show
  *   to output the contents of the objects basket using basket-{type}.xsl
  * BasketServlet?type=objects&amp;action=clear
- *   to remove all entries in the objects basket.  
+ *   to remove all entries in the objects basket.
  * BasketServlet?type=objects&amp;action=add&amp;id=DocPortal_document_00774301&amp;uri=mcrobject:DocPortal_document_00774301
  *   to add a new entry with ID DocPortal_document_00774301 to the basket,
  *   reading its contents from URI mcrobject:DocPortal_document_00774301
@@ -53,11 +53,11 @@ import jakarta.servlet.http.HttpServletResponse;
  *   to add a new entry with ID DocPortal_document_00774301 to the basket,
  *   immediately resolving content from the given URI.
  * BasketServlet?type=objects&amp;action=remove&amp;id=DocPortal_document_00774301
- *   to remove the entry with ID DocPortal_document_00774301 from the basket  
+ *   to remove the entry with ID DocPortal_document_00774301 from the basket
  * BasketServlet?type=objects&amp;action=up&amp;id=DocPortal_document_00774301
- *   to move the entry with ID DocPortal_document_00774301 one position up in the basket  
+ *   to move the entry with ID DocPortal_document_00774301 one position up in the basket
  * BasketServlet?type=objects&amp;action=down&amp;id=DocPortal_document_00774301
- *   to move the entry with ID DocPortal_document_00774301 one position down in the basket  
+ *   to move the entry with ID DocPortal_document_00774301 one position down in the basket
  * BasketServlet?type=objects&amp;action=comment&amp;id=DocPortal_document_00774301
  *   to change the comment stored in the basket. This is called
  *   using EditorServlet submission, see basket-edit.xml for an example.
@@ -68,7 +68,7 @@ import jakarta.servlet.http.HttpServletResponse;
  *   to update a persistent basket in its derivate - that is the derivate the basket was loaded from.
  * BasketServlet?action=retrieve&amp;derivateID=DocPortal_derivate_12345678
  *   to retrieve a basket's data from a file "basket.xml" in the given derivate into the current user's session.
- * 
+ *
  * @author Frank L\u00fctzenkirchen
  **/
 public class MCRBasketServlet extends MCRServlet {
@@ -82,13 +82,14 @@ public class MCRBasketServlet extends MCRServlet {
         .getOrThrow(ALLOW_LIST_PROPERTY_NAME, MCRConfiguration2::splitValue)
         .collect(Collectors.toList());
 
+    @Override
     public void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest req = job.getRequest();
         String type = req.getParameter("type");
         String action = req.getParameter("action");
         String[] uris = req.getParameterValues("uri");
         String[] ids = req.getParameterValues("id");
-        LOGGER.info("{} {} {}", action, type, ids == null ? "" : ids);
+        LOGGER.info(() -> action + " " + req.getParameter("type") + " " + (ids == null ? "" : ids));
         MCRBasket basket = MCRBasketManager.getOrCreateBasketInSession(type);
         switch (action) {
             case "add":

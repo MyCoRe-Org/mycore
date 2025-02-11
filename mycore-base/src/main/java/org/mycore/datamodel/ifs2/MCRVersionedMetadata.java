@@ -88,7 +88,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
                 return Optional.ofNullable(Optional.ofNullable(getStore().getRepository().info(getFilePath(), -1))
                     .map(SVNDirEntry::getRevision).orElseGet(this::getLastRevision));
             } catch (SVNException e) {
-                LOGGER.error("Could not get last revision of {}_{}", getStore().getID(), id, e);
+                LOGGER.error(() -> "Could not get last revision of " + getStore().getID() + "_" + id, e);
                 return Optional.empty();
             }
         };
@@ -188,7 +188,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
             throw new IOException(e);
         }
         revision = () -> Optional.of(info.getNewRevision());
-        LOGGER.info("SVN commit of {} finished, new revision {}", mode, getRevision());
+        LOGGER.info("SVN commit of {} finished, new revision {}", () -> mode, this::getRevision);
 
         if (MCRVersioningMetadataStore.shouldSyncLastModifiedOnSVNCommit()) {
             setLastModified(info.getDate());
@@ -281,7 +281,8 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
             if (revision < 0) {
                 lastPresentRevision = getLastPresentRevision();
                 if (lastPresentRevision < 0) {
-                    LOGGER.warn("Metadata object {} in store {} has no last revision!", getID(), getStore().getID());
+                    LOGGER.warn("Metadata object {} in store {} has no last revision!",
+                        this::getID, () -> getStore().getID());
                     return null;
                 }
             } else {
@@ -301,8 +302,8 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
                         logEntry.getDate(), type);
                 }
             }
-            LOGGER.warn("Metadata object {} in store {} has no revision ''{}''!", getID(), getStore().getID(),
-                getRevision());
+            LOGGER.warn("Metadata object {} in store {} has no revision ''{}''!",
+                () -> getID(), () -> getStore().getID(), () -> getRevision());
             return null;
         } catch (SVNException svnExc) {
             throw new IOException(svnExc);
@@ -336,7 +337,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
             long lastRevision = getLastRevision(true);
             return lastRevision < 0 ? null : lastRevision;
         } catch (SVNException e) {
-            LOGGER.warn("Could not get last revision of: {}_{}", getStore(), id, e);
+            LOGGER.warn(() -> "Could not get last revision of: " + getStore() + "_" + id, e);
             return null;
         }
     }

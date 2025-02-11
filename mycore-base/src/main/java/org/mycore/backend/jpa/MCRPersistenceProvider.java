@@ -51,14 +51,17 @@ public class MCRPersistenceProvider implements PersistenceProvider {
     private final Map<String, Callable<MCRPersistenceUnitDescriptor>> persistenceUnitInitializer;
     private final PersistenceUtilHelper.MetadataCache cache = new PersistenceUtilHelper.MetadataCache();
     private final ProviderUtil providerUtil = new ProviderUtil() {
+        @Override
         public LoadState isLoadedWithoutReference(Object proxy, String property) {
             return PersistenceUtilHelper.isLoadedWithoutReference(proxy, property, MCRPersistenceProvider.this.cache);
         }
 
+        @Override
         public LoadState isLoadedWithReference(Object proxy, String property) {
             return PersistenceUtilHelper.isLoadedWithReference(proxy, property, MCRPersistenceProvider.this.cache);
         }
 
+        @Override
         public LoadState isLoaded(Object o) {
             return PersistenceUtilHelper.getLoadState(o);
         }
@@ -66,8 +69,8 @@ public class MCRPersistenceProvider implements PersistenceProvider {
 
     public MCRPersistenceProvider() {
         persistenceUnitInitializer = MCRConfiguration2.getInstances(JPA_PERSISTENCE_UNIT_PROPERTY_NAME);
-        LOGGER.info("Found {} persistence units [{}]", persistenceUnitInitializer.size(),
-            String.join(";", persistenceUnitInitializer.keySet()));
+        LOGGER.info("Found {} persistence units [{}]", persistenceUnitInitializer::size,
+            () -> String.join(";", persistenceUnitInitializer.keySet()));
     }
 
     /**
@@ -105,7 +108,7 @@ public class MCRPersistenceProvider implements PersistenceProvider {
         Optional.ofNullable(puDescriptor.getSharedCacheMode())
             .ifPresent((sharedCacheMode) -> table.add(new Property("SharedCacheMode", sharedCacheMode.name())));
 
-        LOGGER.info(table.logMessage("JPA Properties"));
+        LOGGER.info(() -> table.logMessage("JPA Properties"));
     }
 
     @Override

@@ -86,7 +86,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         final EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         MCRCategory parentRoot = getEffectiveParentRoot(parent, childrenOnly, entityManager);
 
-        LOGGER.info("parentID:{}", parentRoot.getId());
+        LOGGER.info("parentID:{}", parentRoot::getId);
         String classID = parentRoot.getId().getRootID();
         TypedQuery<Object[]> query = entityManager.createNamedQuery(NAMED_QUERY_NAMESPACE + queryName, Object[].class);
         // query can take long time, please cache result

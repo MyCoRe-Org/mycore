@@ -23,12 +23,12 @@ import java.util.ArrayList;
 /**
  * This class is an abstract for the implementation of command classes for the
  * MyCoRe commandline system.
- * 
+ *
  * @author Jens Kupferschmidt
  */
 public abstract class MCRAbstractCommands implements MCRExternalCommandInterface {
     /** The array holding all known commands */
-    protected ArrayList<MCRCommand> command = null;
+    protected ArrayList<MCRCommand> command;
 
     private String displayName;
 
@@ -56,9 +56,10 @@ public abstract class MCRAbstractCommands implements MCRExternalCommandInterface
      * The method return the list of possible commands of this class. Each
      * command has TWO Strings, a String of the user command syntax and a String
      * of the called method.
-     * 
+     *
      * @return a ascending sorted command pair ArrayList
      */
+    @Override
     public ArrayList<MCRCommand> getPossibleCommands() {
         return this.command;
     }

@@ -39,7 +39,10 @@ import org.mycore.util.concurrent.MCRRunnableComperator;
  *
  * @author Matthias Eichner
  */
-public abstract class MCRProcessableFactory {
+public final class MCRProcessableFactory {
+
+    private MCRProcessableFactory() {
+    }
 
     /**
      * Returns a {@link Callable} object that, when
@@ -147,7 +150,8 @@ public abstract class MCRProcessableFactory {
                 supplier.getFuture().whenComplete((result, throwable) -> {
                     this.collection.remove(supplier);
                     if (throwable != null) {
-                        LogManager.getLogger().error("Error while processing '{}'", supplier.getName(), throwable);
+                        LogManager.getLogger().error(() -> "Error while processing '" + supplier.getName() + "'",
+                            throwable);
                     }
                 });
             }

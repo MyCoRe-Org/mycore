@@ -57,7 +57,7 @@ public final class MCRDerivate extends MCRBase {
 
     private int order;
 
-    protected String mcrLabel = null;
+    protected String mcrLabel;
 
     /**
      * This is the constructor of the MCRDerivate class. It make an instance of

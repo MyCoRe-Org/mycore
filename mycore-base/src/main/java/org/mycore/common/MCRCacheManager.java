@@ -19,9 +19,9 @@
 package org.mycore.common;
 
 /**
- * 
+ *
  * @author Thomas Scheffler (yagee)
- * 
+ *
  * Need to insert some things here
  * jmx.mbean
  */
@@ -34,30 +34,37 @@ public class MCRCacheManager implements MCRCacheManagerMBean {
         this.cache = cache;
     }
 
+    @Override
     public long getCapacity() {
         return cache.getCapacity();
     }
 
+    @Override
     public double getFillRate() {
         return cache.getFillRate();
     }
 
+    @Override
     public double getHitRate() {
         return cache.getHitRate();
     }
 
+    @Override
     public long getHits() {
         return cache.backingCache.stats().hitCount();
     }
 
+    @Override
     public long getRequests() {
         return cache.backingCache.stats().requestCount();
     }
 
+    @Override
     public long getEvictions() {
         return cache.backingCache.stats().evictionCount();
     }
 
+    @Override
     public long getSize() {
         return cache.getCurrentSize();
     }
@@ -65,10 +72,12 @@ public class MCRCacheManager implements MCRCacheManagerMBean {
     /**
      * jmx.managed-operation
      */
+    @Override
     public void setCapacity(long capacity) {
         cache.setCapacity(capacity);
     }
 
+    @Override
     public void clear() {
         cache.clear();
     }

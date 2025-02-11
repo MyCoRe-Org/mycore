@@ -54,11 +54,11 @@ import org.xml.sax.SAXParseException;
 
 /**
  * Contains utility methods for handling transfer packages.
- * 
+ *
  * @author Silvio Hermann
  * @author Matthias Eichner
  */
-public abstract class MCRTransferPackageUtil {
+public final class MCRTransferPackageUtil {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -68,9 +68,12 @@ public abstract class MCRTransferPackageUtil {
      */
     public static final String CONTENT_DIRECTORY = "content";
 
+    private MCRTransferPackageUtil() {
+    }
+
     /**
      * Imports a *.tar transport package from the given path.
-     * 
+     *
      * @param pathToTar
      *                path to the *.tar archive
      * @throws IOException
@@ -102,18 +105,18 @@ public abstract class MCRTransferPackageUtil {
 
     /**
      * Returns the path where the *.tar will be unzipped.
-     * 
+     *
      * @param pathToTar the path to the tar.
      * @return path to the directory
      */
     public static Path getTargetDirectory(Path pathToTar) {
         String fileName = pathToTar.getFileName().toString();
-        return pathToTar.getParent().resolve(fileName.substring(0, fileName.lastIndexOf(".")));
+        return pathToTar.getParent().resolve(fileName.substring(0, fileName.lastIndexOf('.')));
     }
 
     /**
      * Imports from an unpacked *.tar archive directory.
-     * 
+     *
      * @param targetDirectory
      *                the directory where the *.tar was unpacked
      * @throws JDOMException
@@ -141,7 +144,7 @@ public abstract class MCRTransferPackageUtil {
 
     /**
      * Returns a list containing all paths to the classifications which should be imported.
-     * 
+     *
      * @param targetDirectory
      *                the directory where the *.tar was unpacked
      * @return list of paths
@@ -162,7 +165,7 @@ public abstract class MCRTransferPackageUtil {
 
     /**
      * Imports a object from the targetDirectory path.
-     * 
+     *
      * @param targetDirectory
      *                the directory where the *.tar was unpacked
      * @param objectId
@@ -189,7 +192,7 @@ public abstract class MCRTransferPackageUtil {
     /**
      * Same as {@link #importObject(Path, String, String)} but returns a list of derivates which
      * should be imported afterwards.
-     * 
+     *
      * @param targetDirectory
      *                the directory where the *.tar was unpacked
      * @param objectId
@@ -233,7 +236,7 @@ public abstract class MCRTransferPackageUtil {
 
     /**
      * Imports a derivate from the given target directory path.
-     * 
+     *
      * @param targetDirectory path to the extracted *.tar archive
      * @param derivateId the derivate to import
      * @throws JDOMException derivate xml couldn't be read
@@ -247,13 +250,13 @@ public abstract class MCRTransferPackageUtil {
         Path derivateDirectory = targetDirectory.resolve(CONTENT_DIRECTORY).resolve(derivateId);
         Path derivatePath = derivateDirectory.resolve(derivateId + ".xml");
 
-        LOGGER.info("Importing {}", derivatePath.toAbsolutePath().toString());
+        LOGGER.info("Importing {}", derivatePath::toAbsolutePath);
         MCRDerivate der = new MCRDerivate(sax.build(derivatePath.toFile()));
         MCRMetadataManager.update(der);
 
         MCRPath derRoot = MCRPath.getPath(der.getId().toString(), "/");
         if (!Files.isDirectory(derRoot)) {
-            LOGGER.info("Creating missing root directory for {}", der.getId());
+            LOGGER.info("Creating missing root directory for {}", der::getId);
             derRoot.getFileSystem().createRoot(der.getId().toString());
         }
         try (Stream<Path> stream = Files.find(derivateDirectory, 5,
@@ -273,7 +276,7 @@ public abstract class MCRTransferPackageUtil {
 
     /**
      * Gets the list of mycore object identifiers from the given directory.
-     * 
+     *
      * @param targetDirectory directory where the *.tar was unpacked
      * @return list of object which lies within the directory
      */

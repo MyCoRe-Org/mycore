@@ -24,10 +24,10 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore-parent</artifactId>
-    <version>56-SNAPSHOT</version>
+    <version>57-SNAPSHOT</version>
   </parent>
   <artifactId>mycore</artifactId>
-  <version>2024.11-SNAPSHOT</version>
+  <version>2025.02-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>MyCoRe</name>
   <description xml:space="preserve">
@@ -53,9 +53,9 @@ Applications based on MyCoRe use a common core, which provides the functionality
   </scm>
   <properties>
     <argLine />
-    <changelog.since>2024-06-14</changelog.since>
+    <changelog.since>2024-12-18</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
-    <changes.version>2024.06.0</changes.version>
+    <changes.version>2025.02</changes.version>
     <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <checkstyle.suppressions.location>${user.dir}/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <frontend.maven.plugin.version>1.12.0</frontend.maven.plugin.version>
@@ -1739,7 +1739,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.mycore.iview2</groupId>
         <artifactId>image-tiler</artifactId>
-        <version>4.1-SNAPSHOT</version>
+        <version>4.1</version>
       </dependency>
       <dependency>
         <groupId>org.mycore.mets</groupId>
@@ -2076,6 +2076,12 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <scope>test</scope>
       </dependency>
       <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>5.12.0</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-base</artifactId>
         <version>${project.version}</version>
@@ -2085,7 +2091,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>selenium-utils</artifactId>
-        <version>0.10-SNAPSHOT</version>
+        <version>0.10</version>
         <scope>test</scope>
         <exclusions>
           <exclusion>

@@ -128,7 +128,7 @@ public class MCRXSL2JAXBTransformer<T> extends MCRXSLTransformer {
         String property = "MCR.ContentTransformer." + id + ".Context";
         String contextPath = MCRConfiguration2.getStringOrThrow(property);
         try {
-            JAXBContext context = JAXBContext.newInstance(contextPath, getClass().getClassLoader());
+            JAXBContext context = JAXBContext.newInstance(contextPath, Thread.currentThread().getContextClassLoader());
             setContext(context);
         } catch (JAXBException e) {
             throw new MCRConfigurationException("Error while creating JAXBContext.", e);

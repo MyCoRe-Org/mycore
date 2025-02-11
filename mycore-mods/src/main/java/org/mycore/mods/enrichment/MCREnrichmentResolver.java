@@ -48,10 +48,10 @@ public class MCREnrichmentResolver implements URIResolver {
     @Override
     public Source resolve(String href, String base) {
 
-        String hrefSub = href.substring(href.indexOf(":") + 1);
+        String hrefSub = href.substring(href.indexOf(':') + 1);
         String configID = hrefSub.substring(0, hrefSub.indexOf(':'));
 
-        hrefSub = hrefSub.substring(hrefSub.indexOf(":") + 1);
+        hrefSub = hrefSub.substring(hrefSub.indexOf(':') + 1);
         Element mods = MCRURIResolver.instance().resolve(hrefSub);
 
         enrichPublication(mods, configID);

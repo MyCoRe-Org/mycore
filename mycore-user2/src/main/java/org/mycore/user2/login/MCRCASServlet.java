@@ -39,11 +39,11 @@ import jakarta.servlet.http.HttpServletResponse;
  * Login user with JA-SIG Central Authentication Service (CAS).
  * The servlet validates the ticket returned from CAS and
  * builds a User object to login to the current session.
- * 
+ *
  * For /servlets/MCRCASServlet, a authentication filter must be defined
- * in web.xml. The following properties must be configured in 
+ * in web.xml. The following properties must be configured in
  * mycore.properties:
- * 
+ *
  *  The URL of the CAS Client Servlet:
  * MCR.user2.CAS.ClientURL=http://localhost:8291/servlets/MCRCASServlet
  *
@@ -56,7 +56,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * Configure store of trusted SSL (https) server certificates
  * MCR.user2.CAS.SSL.TrustStore=/path/to/java/lib/security/cacerts
  * MCR.user2.CAS.SSL.TrustStore.Password=changeit
- * 
+ *
  * After successful login, MCRCASServlet queries an LDAP server for
  * the user's properties.
  *
@@ -85,7 +85,7 @@ public class MCRCASServlet extends MCRServlet {
         serverURL = MCRConfiguration2.getStringOrThrow(MCRUser2Constants.CONFIG_PREFIX + "CAS.ServerURL");
         realmID = MCRConfiguration2.getStringOrThrow(MCRUser2Constants.CONFIG_PREFIX + "CAS.RealmID");
 
-        // Set properties to enable SSL connection to CAS and accept certificates  
+        // Set properties to enable SSL connection to CAS and accept certificates
         String trustStore = MCRConfiguration2.getStringOrThrow(MCRUser2Constants.CONFIG_PREFIX + "CAS.SSL.TrustStore");
         String trustStorePassword = MCRConfiguration2
             .getStringOrThrow(MCRUser2Constants.CONFIG_PREFIX + "CAS.SSL.TrustStore.Password");
@@ -94,6 +94,7 @@ public class MCRCASServlet extends MCRServlet {
         System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
     }
 
+    @Override
     public void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();

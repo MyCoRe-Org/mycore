@@ -63,9 +63,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
- * Provides functionality to search for users, list users, 
- * retrieve, delete or update user data. 
- * 
+ * Provides functionality to search for users, list users,
+ * retrieve, delete or update user data.
+ *
  * @author Frank L\u00fctzenkirchen
  * @author Thomas Scheffler (yagee)
  */
@@ -82,6 +82,7 @@ public class MCRUserServlet extends MCRServlet {
      * values are show, save, delete, password (with id as second parameter).
      * The default is to search and list users.
      */
+    @Override
     public void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
@@ -191,7 +192,7 @@ public class MCRUserServlet extends MCRServlet {
             return;
         }
 
-        LOGGER.info("show user {} {} {}", user.getUserID(), user.getUserName(), user.getRealmID());
+        LOGGER.info("show user {} {} {}", user::getUserID, user::getUserName, user::getRealmID);
         getLayoutService().doLayout(req, res, getContent(user));
     }
 
@@ -236,7 +237,7 @@ public class MCRUserServlet extends MCRServlet {
      * Handles MCRUserServlet?action=save&id={userID}.
      * This is called by user-editor.xml editor form to save the
      * changed user data from editor submission. Redirects to
-     * show user data afterwards. 
+     * show user data afterwards.
      */
     private void saveUser(HttpServletRequest req, HttpServletResponse res) throws Exception {
         MCRUser currentUser = MCRUserManager.getCurrentUser();
@@ -431,7 +432,7 @@ public class MCRUserServlet extends MCRServlet {
      * Handles MCRUserServlet?action=save&id={userID}.
      * This is called by user-editor.xml editor form to save the
      * changed user data from editor submission. Redirects to
-     * show user data afterwards. 
+     * show user data afterwards.
      */
     private void changePassword(HttpServletRequest req, HttpServletResponse res, MCRUser user, String uid)
         throws Exception {
@@ -448,7 +449,7 @@ public class MCRUserServlet extends MCRServlet {
             return;
         }
 
-        LOGGER.info("change password of user {} {} {}", user.getUserID(), user.getUserName(), user.getRealmID());
+        LOGGER.info("change password of user {} {} {}", user::getUserID, user::getUserName, user::getRealmID);
 
         Document doc = (Document) (req.getAttribute("MCRXEditorSubmission"));
         String password = doc.getRootElement().getChildText("password");
@@ -460,7 +461,7 @@ public class MCRUserServlet extends MCRServlet {
 
     /**
      * Handles MCRUserServlet?action=delete&id={userID}.
-     * Deletes the user. 
+     * Deletes the user.
      * Outputs user data of the deleted user using user.xsl afterwards.
      */
     private void deleteUser(HttpServletRequest req, HttpServletResponse res, MCRUser user) throws Exception {
@@ -473,7 +474,7 @@ public class MCRUserServlet extends MCRServlet {
             return;
         }
 
-        LOGGER.info("delete user {} {} {}", user.getUserID(), user.getUserName(), user.getRealmID());
+        LOGGER.info("delete user {} {} {}", user::getUserID, user::getUserName, user::getRealmID);
         MCRUserManager.deleteUser(user);
         getLayoutService().doLayout(req, res, getContent(user));
     }
@@ -489,8 +490,8 @@ public class MCRUserServlet extends MCRServlet {
      * wildcard characters. The property MCR.user2.Users.MaxResults (default 100) specifies
      * the maximum number of users to return. When there are more hits, just the
      * number of results is returned.
-     * 
-     * When current user is not admin, the search pattern will be ignored and only all 
+     *
+     * When current user is not admin, the search pattern will be ignored and only all
      * the users the current user is owner of will be listed.
      */
     private void listUsers(HttpServletRequest req, HttpServletResponse res) throws Exception {
@@ -532,7 +533,7 @@ public class MCRUserServlet extends MCRServlet {
             users.setAttribute("num", String.valueOf(num));
             users.setAttribute("max", String.valueOf(max));
         } else {
-            LOGGER.info("list owned users of {} {}", currentUser.getUserName(), currentUser.getRealmID());
+            LOGGER.info("list owned users of {} {}", currentUser::getUserName, currentUser::getRealmID);
             results = ownUsers;
         }
 

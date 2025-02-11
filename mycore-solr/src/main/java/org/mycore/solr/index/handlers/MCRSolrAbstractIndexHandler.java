@@ -49,6 +49,7 @@ public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler
         this.solrAuthenticationFactory = MCRSolrAuthenticationManager.getInstance();
     }
 
+    @Override
     public abstract void index() throws IOException, SolrServerException;
 
     @Override
@@ -60,10 +61,12 @@ public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler
      * Time in milliseconds solr should index the stream. -1 by default,
      * says that solr decide when to commit.
      */
+    @Override
     public void setCommitWithin(int commitWithin) {
         this.commitWithin = commitWithin;
     }
 
+    @Override
     public int getCommitWithin() {
         return commitWithin;
     }

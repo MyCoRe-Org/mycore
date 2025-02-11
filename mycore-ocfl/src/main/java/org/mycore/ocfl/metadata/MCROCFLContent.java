@@ -34,7 +34,7 @@ public class MCROCFLContent extends MCRContent {
 
     private String fileName;
 
-    private String version = null;
+    private String version;
 
     public MCROCFLContent(OcflRepository repository, String objectid, String fileName, String version) {
         this.repository = repository;

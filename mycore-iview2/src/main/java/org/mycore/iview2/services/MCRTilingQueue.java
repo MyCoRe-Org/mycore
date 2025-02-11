@@ -79,6 +79,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
     /**
      * @return next available tile job instance
      */
+    @Override
     public MCRTileJob poll() {
         if (!running) {
             return null;
@@ -117,8 +118,9 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
     }
 
     /**
-     * get next job without modifying it state to {@link MCRJobState#PROCESSING} 
+     * get next job without modifying it state to {@link MCRJobState#PROCESSING}
      */
+    @Override
     public MCRTileJob peek() {
         if (!running) {
             return null;
@@ -147,6 +149,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
      * adds <code>job</code> to queue.
      * alters date added to current time and status of job to {@link MCRJobState#NEW}
      */
+    @Override
     public boolean offer(MCRTileJob job) {
         MCRTileJob newJob = job;
         if (!running) {
@@ -183,7 +186,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
 
     /**
      * iterates of jobs of status {@link MCRJobState#NEW}
-     * 
+     *
      * does not change the status.
      */
     @Override
@@ -363,6 +366,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
     /**
      * Shuts down {@link MCRStalledJobResetter} and does not alter any job anymore.
      */
+    @Override
     public void prepareClose() {
         stalledJobScheduler.shutdownNow();
         running = false;
@@ -377,6 +381,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
     /**
      * does nothing
      */
+    @Override
     public void close() {
         //nothing to be done in this phase
     }

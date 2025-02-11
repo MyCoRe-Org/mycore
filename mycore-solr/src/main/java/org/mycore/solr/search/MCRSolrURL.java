@@ -129,8 +129,8 @@ public class MCRSolrURL {
     }
 
     /**
-     * Invoke this method to get a {@link URL} referring to the luke interface of a solr server. 
-     * Under this URL one can find useful information about the solr schema. 
+     * Invoke this method to get a {@link URL} referring to the luke interface of a solr server.
+     * Under this URL one can find useful information about the solr schema.
      *
      * @return a {@link URL} refering to the luke interface or null
      */
@@ -148,7 +148,7 @@ public class MCRSolrURL {
      */
     public InputStream openStream() throws IOException {
         URL url = this.getUrl();
-        LOGGER.info(url.toString());
+        LOGGER.info(url);
         return url.openStream();
     }
 

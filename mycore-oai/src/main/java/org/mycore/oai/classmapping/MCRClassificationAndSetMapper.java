@@ -71,7 +71,7 @@ public class MCRClassificationAndSetMapper {
                     PROP_CLASS_SUFFIX))
             .findFirst()
             .map(Map.Entry::getKey)
-            .map(key -> key.substring(key.lastIndexOf(".") + 1))
+            .map(key -> key.substring(key.lastIndexOf('.') + 1))
             .orElse(classid);
     }
 

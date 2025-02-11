@@ -36,6 +36,7 @@ import org.mycore.tools.MCRLanguageOrientationHelper;
  */
 public class MCRLanguageResolver implements URIResolver {
 
+    @Override
     public Source resolve(String href, String base) throws TransformerException, IllegalArgumentException {
         String[] hrefContent = href.split(":");
         if (hrefContent.length < 2) {

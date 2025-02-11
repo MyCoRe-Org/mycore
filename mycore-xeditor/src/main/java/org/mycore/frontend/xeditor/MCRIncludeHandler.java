@@ -91,13 +91,13 @@ public class MCRIncludeHandler {
             return;
         }
 
-        LOGGER.debug("preloading " + uri);
+        LOGGER.debug(() -> "preloading " + uri);
 
         Element xml;
         try {
             xml = resolve(uri.trim(), sStatic);
         } catch (Exception ex) {
-            LOGGER.warn("Exception preloading " + uri, ex);
+            LOGGER.warn(() -> "Exception preloading " + uri, ex);
             return;
         }
 
@@ -119,7 +119,7 @@ public class MCRIncludeHandler {
     private void cacheComponent(Map<String, Element> cache, Element element) {
         String id = element.getAttributeValue(ATTR_ID);
         if ((id != null) && !id.isEmpty()) {
-            LOGGER.debug("preloaded component " + id);
+            LOGGER.debug(() -> "preloaded component " + id);
             cache.put(id, element);
         }
     }
@@ -133,7 +133,7 @@ public class MCRIncludeHandler {
 
             Element container = cache.get(refID);
             if (container == null) {
-                LOGGER.warn("Ignoring xed:modify of " + refID + ", no component with that @id found");
+                LOGGER.warn(() -> "Ignoring xed:modify of " + refID + ", no component with that @id found");
                 return;
             }
 
@@ -142,9 +142,9 @@ public class MCRIncludeHandler {
             String newID = element.getAttributeValue(ATTR_ID);
             if (newID != null) {
                 container.setAttribute(ATTR_ID, newID); // extend rather that modify
-                LOGGER.debug("extending " + refID + " to " + newID);
+                LOGGER.debug(() -> "extending " + refID + " to " + newID);
             } else {
-                LOGGER.debug("modifying " + refID);
+                LOGGER.debug(() -> "modifying " + refID);
             }
 
             for (Element command : element.getChildren()) {
@@ -161,7 +161,7 @@ public class MCRIncludeHandler {
 
     private void handleRemove(Element container, Element removeRule) {
         String id = removeRule.getAttributeValue(ATTR_REF);
-        LOGGER.debug("removing " + id);
+        LOGGER.debug(() -> "removing " + id);
         findDescendant(container, id).ifPresent(Element::detach);
     }
 
@@ -191,7 +191,7 @@ public class MCRIncludeHandler {
             includeRule.removeAttribute(attributeName);
 
             Element parent = container;
-            int pos = defaultPos;
+            int pos;
 
             Optional<Element> neighbor = findDescendant(container, refID);
             if (neighbor.isPresent()) {
@@ -199,16 +199,19 @@ public class MCRIncludeHandler {
                 parent = n.getParentElement();
                 List<Element> children = parent.getChildren();
                 pos = children.indexOf(n) + offset;
+            } else {
+                pos = defaultPos;
             }
 
-            LOGGER.debug("including  " + Arrays.toString(includeRule.getAttributes().toArray()) + " at pos " + pos);
+            LOGGER.debug(
+                () -> "including  " + Arrays.toString(includeRule.getAttributes().toArray()) + " at pos {}" + pos);
             parent.getChildren().add(pos, includeRule.clone());
         }
         return refID != null;
     }
 
     public XNodeSet resolve(ExpressionContext context, String ref) throws TransformerException {
-        LOGGER.debug("including component " + ref);
+        LOGGER.debug(() -> "including component " + ref);
         Map<String, Element> cache = chooseCacheLevel(ref, Boolean.FALSE.toString());
         Element resolved = cache.get(ref);
         return (resolved == null ? null : asNodeSet(context, jdom2dom(resolved)));
@@ -216,7 +219,7 @@ public class MCRIncludeHandler {
 
     public XNodeSet resolve(ExpressionContext context, String uri, String sStatic)
         throws TransformerException {
-        LOGGER.debug("including xml " + uri);
+        LOGGER.debug(() -> "including xml " + uri);
 
         Element xml = resolve(uri, sStatic);
         Node node = jdom2dom(xml);
@@ -234,7 +237,7 @@ public class MCRIncludeHandler {
         Map<String, Element> cache = chooseCacheLevel(uri, sStatic);
 
         if (cache.containsKey(uri)) {
-            LOGGER.debug("uri was cached: " + uri);
+            LOGGER.debug(() -> "uri was cached: " + uri);
             return cache.get(uri);
         } else {
             Element xml = MCRURIResolver.instance().resolve(uri);

@@ -57,6 +57,7 @@ public class MCRMODSCSLTest extends MCRStoreTestCase {
             .collect(Collectors.toList());
     }
 
+    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();

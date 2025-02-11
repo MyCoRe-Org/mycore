@@ -50,7 +50,7 @@ public abstract class MCRWrappedContent extends MCRContent {
     }
 
     protected void setBaseContent(MCRContent baseContent) {
-        LOGGER.debug("Wrapped {}: {}", baseContent.getClass().getCanonicalName(), baseContent.getSystemId());
+        LOGGER.debug("Wrapped {}: {}", () -> baseContent.getClass().getCanonicalName(), baseContent::getSystemId);
         this.baseContent = baseContent;
     }
 

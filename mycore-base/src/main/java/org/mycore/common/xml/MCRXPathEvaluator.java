@@ -86,7 +86,7 @@ public class MCRXPathEvaluator {
         if (expression.startsWith("i18n:")) {
             updatedI18nExpression = expression.substring(5);
             if (updatedI18nExpression.contains(",")) {
-                int pos = updatedI18nExpression.indexOf(",");
+                int pos = updatedI18nExpression.indexOf(',');
                 String key = updatedI18nExpression.substring(0, pos);
                 String xPath = updatedI18nExpression.substring(pos + 1);
                 updatedI18nExpression = "i18n:translate('" + key + "'," + xPath + ")";
@@ -120,8 +120,8 @@ public class MCRXPathEvaluator {
             return xPath.evaluateFirst(context);
         } catch (Exception ex) {
             LOGGER.warn("unable to evaluate XPath: {}", xPathExpression);
-            LOGGER.warn("XPath factory used is {} {}", XPATH_FACTORY.getClass().getCanonicalName(),
-                MCRConfiguration2.getString("MCR.XPathFactory.Class").orElse(null));
+            LOGGER.warn("XPath factory used is {} {}", () -> XPATH_FACTORY.getClass().getCanonicalName(),
+                () -> MCRConfiguration2.getString("MCR.XPathFactory.Class").orElse(null));
             LOGGER.warn(ex);
             return null;
         }

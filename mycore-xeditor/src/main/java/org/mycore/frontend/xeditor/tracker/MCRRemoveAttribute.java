@@ -28,6 +28,7 @@ public class MCRRemoveAttribute implements MCRChange {
         return data;
     }
 
+    @Override
     public void undo(MCRChangeData data) {
         data.getContext().setAttribute(data.getAttribute());
     }

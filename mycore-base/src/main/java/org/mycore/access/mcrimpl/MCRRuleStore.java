@@ -35,7 +35,7 @@ public abstract class MCRRuleStore {
 
     protected static final String SQL_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-    private static MCRRuleStore implementation;
+    private static volatile MCRRuleStore implementation;
 
     public abstract void createRule(MCRAccessRule rule);
 
@@ -55,9 +55,14 @@ public abstract class MCRRuleStore {
 
     public static MCRRuleStore getInstance() {
         if (implementation == null) {
-            implementation = MCRConfiguration2.getSingleInstanceOfOrThrow(
-                MCRRuleStore.class, "MCR.Persistence.Rule.Store_Class");
+            synchronized (MCRRuleStore.class) {
+                if (implementation == null) {
+                    implementation = MCRConfiguration2.getSingleInstanceOfOrThrow(
+                        MCRRuleStore.class, "MCR.Persistence.Rule.Store_Class");
+                }
+            }
         }
         return implementation;
     }
+
 }

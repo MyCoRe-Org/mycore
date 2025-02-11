@@ -56,6 +56,7 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
         this.setCoreType(MCRSolrCoreType.MAIN);
     }
 
+    @Override
     public MCRSolrPathContentStream getStream() {
         return new MCRSolrPathContentStream(file, attrs);
     }

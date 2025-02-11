@@ -73,7 +73,7 @@ public abstract class MCRCategoryMapperBase {
     }
 
     private MCRCategoryID buildMappedID(String mapping) {
-        int pos = mapping.indexOf(":");
+        int pos = mapping.indexOf(':');
         String mappedClassificationID = mapping.substring(0, pos);
         String mappedCategoryID = mapping.substring(pos + 1);
         return new MCRCategoryID(mappedClassificationID, mappedCategoryID);
