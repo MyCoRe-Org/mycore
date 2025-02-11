@@ -56,11 +56,10 @@ import org.mycore.datamodel.niofs.MCRPath;
 
 /**
  * @author Thomas Scheffler
- *
  */
 final class MCRFileSystemUtils {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRFileSystemUtils.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String DEFAULT_CONFIG_PREFIX = "MCR.IFS.ContentStore.IFS2."; //todo: rename
 

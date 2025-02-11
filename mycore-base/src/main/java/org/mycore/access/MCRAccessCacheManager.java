@@ -19,7 +19,6 @@
 package org.mycore.access;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -33,38 +32,23 @@ import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * @author Thomas Scheffler (yagee)
- *
  */
 class MCRAccessCacheManager {
+
     private static final int CAPACITY = MCRConfiguration2.getOrThrow("MCR.Access.Cache.Size", Integer::valueOf);
 
-    private static String key = MCRAccessCacheManager.class.getCanonicalName();
+    private static final String SESSION_PERMISSION_KEY = MCRAccessCacheManager.class.getCanonicalName();
 
+    @SuppressWarnings("unchecked")
     private MCRCache<MCRPermissionHandle, Boolean> getSessionPermissionCache() {
         MCRSession session = MCRSessionMgr.getCurrentSession();
-        @SuppressWarnings("unchecked")
-        MCRCache<MCRPermissionHandle, Boolean> cache = (MCRCache<MCRPermissionHandle, Boolean>) session.get(key);
-        if (cache == null) {
-            synchronized (getCacheCreationLock(session)) {
-                cache = (MCRCache<MCRPermissionHandle, Boolean>) session.get(key);
-                if (cache == null) {
-                    cache = createCache(session);
-                    session.put(key, cache);
-                }
-            }
-        }
-        return cache;
+        return (MCRCache<MCRPermissionHandle, Boolean>) session.computeIfAbsent(
+            SESSION_PERMISSION_KEY, k -> createCache(session));
     }
 
-    private static Object getCacheCreationLock(MCRSession session) {
-        //in a short living scoped session, we should not lock the whole session, but a unique object
-        return Optional.of(session)
-            .map(s -> s.get(MCRScopedSession.SCOPED_HINT))
-            .orElse(session);
-    }
-
+    @SuppressWarnings("unchecked")
     private MCRCache<MCRPermissionHandle, Boolean> getCacheFromSession(MCRSession session) {
-        return (MCRCache<MCRPermissionHandle, Boolean>) session.get(key);
+        return (MCRCache<MCRPermissionHandle, Boolean>) session.get(SESSION_PERMISSION_KEY);
     }
 
     private MCRCache<MCRPermissionHandle, Boolean> createCache(MCRSession session) {
@@ -101,7 +85,7 @@ class MCRAccessCacheManager {
             .stream()
             .filter(hdl -> hdl.id() != null)
             .filter(hdl -> ids.contains(hdl.id()))
-            .collect(Collectors.toList());
+            .toList();
         handlesToRemove.forEach(permissionCache::remove);
     }
 
@@ -119,6 +103,6 @@ class MCRAccessCacheManager {
         private MCRPermissionHandle {
             permission = permission.intern();
         }
-
     }
+
 }

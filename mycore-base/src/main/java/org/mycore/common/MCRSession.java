@@ -45,6 +45,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -246,6 +247,28 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
     public Object put(Object key, Object value) {
         mapChanged = true;
         return map.put(key, value);
+    }
+
+    /**
+     * Retrieves the value associated with the given key within the session, or computes and stores a new value if
+     * absent.
+     * <p>
+     * This method ensures thread-safe lazy initialization by leveraging
+     * {@link ConcurrentHashMap#computeIfAbsent(Object, Function)}.
+     * <p>
+     * If the key is not already present in the session, the provided mapping function is used to compute the value,
+     * which is then stored in the session.
+     *
+     * @param key             the key whose associated value is to be retrieved or computed
+     * @param mappingFunction the function to compute a value if the key is absent
+     * @return the existing or newly computed value associated with the key
+     * @throws NullPointerException if the key or mapping function is null
+     */
+    public Object computeIfAbsent(Object key, Function<Object, Object> mappingFunction) {
+        if(!map.containsKey(key)) {
+            mapChanged = true;
+        }
+        return map.computeIfAbsent(key, mappingFunction);
     }
 
     /** Returns the object that was stored in the session under the given key * */
