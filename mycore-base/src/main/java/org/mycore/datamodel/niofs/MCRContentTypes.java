@@ -33,9 +33,9 @@ import org.apache.logging.log4j.Logger;
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRContentTypes {
+public final class MCRContentTypes {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRContentTypes.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static List<FileTypeDetector> fileTypeDetectors;
 

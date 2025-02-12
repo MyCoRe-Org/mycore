@@ -271,7 +271,7 @@ public class MCRXMLHelper {
         return xml.getRootElement();
     }
 
-    private static class JDOMEquivalent {
+    private static final class JDOMEquivalent {
 
         public static boolean equivalent(Element e1, Element e2) {
             return equivalentName(e1, e2) && equivalentAttributes(e1, e2)
@@ -413,7 +413,7 @@ public class MCRXMLHelper {
      *
      * @author Matthias Eichner
      */
-    private static class JDOMtoGSONSerializer {
+    private static final class JDOMtoGSONSerializer {
 
         /**
          * This method is capable of serializing Elements and Text nodes.

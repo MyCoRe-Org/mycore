@@ -42,7 +42,7 @@ import org.mycore.common.config.MCRConfiguration2;
  * @author Andreas Kluge
  * @author Jens Kupferschmidt
  */
-public class MCRNeo4JUtilsConfigurationHelper {
+public final class MCRNeo4JUtilsConfigurationHelper {
 
     /**
     * A map of MyCoRe properties starts with {@code MCR.Neo4J... Map<MCRObjectType, Map<property, path_to_element>>}

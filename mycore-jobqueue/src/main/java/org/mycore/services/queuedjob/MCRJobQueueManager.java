@@ -136,7 +136,7 @@ public class MCRJobQueueManager {
         return config;
     }
 
-    private static class InstanceHolder {
+    private static final class InstanceHolder {
         private static final MCRJobQueueManager INSTANCE = new MCRJobQueueManager(new MCRJobDAOJPAImpl(),
             new MCRConfiguration2JobConfig());
     }

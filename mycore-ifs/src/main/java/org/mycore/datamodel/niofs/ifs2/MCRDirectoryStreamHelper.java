@@ -79,7 +79,7 @@ class MCRDirectoryStreamHelper {
         return new SimpleDirectoryStream<>(path, baseDirectoryStream);
     }
 
-    private static class AcceptAllFilter
+    private static final class AcceptAllFilter
         implements DirectoryStream.Filter<Path> {
         static final MCRDirectoryStreamHelper.AcceptAllFilter FILTER = new AcceptAllFilter();
 
@@ -89,7 +89,7 @@ class MCRDirectoryStreamHelper {
         }
     }
 
-    private static class MCRFileCollectionFilter
+    private static final class MCRFileCollectionFilter
         implements DirectoryStream.Filter<Path> {
         static final MCRDirectoryStreamHelper.MCRFileCollectionFilter FILTER = new MCRFileCollectionFilter();
 

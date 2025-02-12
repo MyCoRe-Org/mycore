@@ -198,7 +198,7 @@ public abstract class MCRCronjob implements Runnable {
         CLI
     }
 
-    private static class CronJobProcessable extends MCRAbstractProcessable {
+    private static final class CronJobProcessable extends MCRAbstractProcessable {
     }
 
 }

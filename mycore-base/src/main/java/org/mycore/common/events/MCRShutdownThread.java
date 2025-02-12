@@ -22,18 +22,18 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * is a shutdown hook for the current <code>Runtime</code>.
- * 
+ * Is a shutdown hook for the current <code>Runtime</code>.
+ * <p>
  * This class registers itself as a shutdown hook to the JVM. 
- * 
- * There is no way to instanciate this class somehow. This will be done by MCRShutdownHandler.
+ * <p>
+ * There is no way to instantiate this class somehow. This will be done by MCRShutdownHandler.
  * 
  * @author Thomas Scheffler (yagee)
  * @see java.lang.Runtime#addShutdownHook(java.lang.Thread)
  * @see org.mycore.common.events.MCRShutdownHandler
  * @since 1.3
  */
-public class MCRShutdownThread extends Thread {
+public final class MCRShutdownThread extends Thread {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRShutdownThread.class);
 

@@ -82,7 +82,7 @@ public class MCRUserResolver implements URIResolver {
 
     @XmlRootElement(name = "owns")
     @XmlAccessorType(XmlAccessType.FIELD)
-    private static class MCROwns {
+    private static final class MCROwns {
         @XmlElement(name = "user")
         MCRUser[] users;
     }

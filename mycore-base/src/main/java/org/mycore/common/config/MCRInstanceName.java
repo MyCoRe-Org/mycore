@@ -27,7 +27,7 @@ import java.util.Optional;
 /**
  * Represents a property name that can be used to convey the class name of a class that should be instantiated.
  */
-public class MCRInstanceName {
+public final class MCRInstanceName {
 
     private final String actual;
 

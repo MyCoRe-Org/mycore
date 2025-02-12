@@ -41,7 +41,7 @@ import org.mycore.webtools.upload.exception.MCRUploadServerException;
  * the parameters and the upload handler used for the upload.
  *
  */
-public class MCRFileUploadBucket implements MCRSessionListener, MCRShutdownHandler.Closeable {
+public final class MCRFileUploadBucket implements MCRSessionListener, MCRShutdownHandler.Closeable {
 
     private static final Map<String, MCRFileUploadBucket> BUCKET_MAP = new ConcurrentHashMap<>();
 

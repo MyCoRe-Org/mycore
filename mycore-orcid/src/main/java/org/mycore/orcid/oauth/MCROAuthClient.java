@@ -41,14 +41,15 @@ import jakarta.ws.rs.client.ClientBuilder;
 /**
  * Utility class working as a client for the OAuth2 API of orcid.org.
  * Used to get access tokens. Minimum configuration requires to set
- *
- * MCR.ORCID.OAuth.BaseURL
- * MCR.ORCID.OAuth.ClientID
- * MCR.ORCID.OAuth.ClientSecret
+ * <ul>
+ * <li>MCR.ORCID.OAuth.BaseURL</li>
+ * <li>MCR.ORCID.OAuth.ClientID</li>
+ * <li>MCR.ORCID.OAuth.ClientSecret</li>
+ * </ul>
  *
  * @author Frank Lützenkirchen
  */
-public class MCROAuthClient {
+public final class MCROAuthClient {
 
     private static volatile MCROAuthClient singleton;
 
