@@ -518,7 +518,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         }
         File xmlOutput = new File(dir, derivateID + "." + extension);
         File directoryFile = new File(dir, derivateID.toString());
-        try(OutputStream fileOutputStream = Files.newOutputStream(xmlOutput.toPath())) {
+        try (OutputStream fileOutputStream = Files.newOutputStream(xmlOutput.toPath())) {
             if (transformer != null) {
                 transformer.setParameter("dirname", directoryFile.getPath());
                 StreamResult sr = new StreamResult(fileOutputStream);
@@ -638,6 +638,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     @MCRCommand(syntax = "link derivate {0} to {1}",
         help = "links the given derivate {0} to the given mycore object {1}",
         order = 180)
+    @SuppressWarnings("PMD.UnusedAssignment")
     public static void linkDerivateToObject(String derivateId, String objectId) throws Exception {
         if (derivateId == null || objectId == null) {
             LOGGER.error("Either derivate id or object id is null. Derivate={}, object={}", derivateId, objectId);
@@ -666,6 +667,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         /* set link to derivate in the new parent */
         MCRObject oldOwner = MCRMetadataManager.retrieveMCRObject(oldOwnerId);
+
         List<MCRMetaEnrichedLinkID> derivates = oldOwner.getStructure().getDerivates();
         MCRMetaLinkID oldObjectToDerivateLink = null;
         for (MCRMetaLinkID derivate : derivates) {
@@ -676,6 +678,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         if (oldObjectToDerivateLink == null) {
             oldObjectToDerivateLink = new MCRMetaLinkID();
         }
+
         LOGGER.info("Linking derivate {} to {}", derID, objID);
         MCRMetaEnrichedLinkID derivateLink = MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(derObj);
         MCRMetadataManager.addOrUpdateDerivateToObject(objID, derivateLink, derObj.isImportMode());

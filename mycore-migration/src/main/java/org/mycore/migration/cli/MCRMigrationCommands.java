@@ -112,8 +112,8 @@ public class MCRMigrationCommands {
         if (!service.isFlagTypeSet(MCRObjectService.FLAG_TYPE_CREATEDBY)) { //the egg
             List<? extends MCRAbstractMetadataVersion<?>> versions = MCRXMLMetadataManager.instance()
                 .listRevisions(objectID);
-            String createUser = null;
-            String modifyUser = null;
+            String createUser;
+            String modifyUser;
             if (versions == null) {
                 LOGGER.warn(
                     "Cannot restore author servflags as there are no versions available. Setting to current user.");

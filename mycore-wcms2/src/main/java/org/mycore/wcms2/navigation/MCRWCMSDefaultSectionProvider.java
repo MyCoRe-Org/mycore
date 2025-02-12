@@ -71,7 +71,7 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
             // get infos of element
             String title = section.getAttributeValue(MyCoReWebPageProvider.XML_TITLE);
             String lang = section.getAttributeValue(MyCoReWebPageProvider.XML_LANG, Namespace.XML_NAMESPACE);
-            String sectionAsString = null;
+            String sectionAsString;
             try {
                 sectionAsString = getContentAsString(section);
             } catch (IOException ioExc) {

@@ -244,7 +244,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
             String path = getFilePath();
             String dir = getDirectory();
 
-            Collection<SVNLogEntry> entries = null;
+            Collection<SVNLogEntry> entries;
             try {
                 entries = repository.log(new String[] { dir }, null, 0, repository.getLatestRevision(), true, true);
             } catch (Exception ioex) {

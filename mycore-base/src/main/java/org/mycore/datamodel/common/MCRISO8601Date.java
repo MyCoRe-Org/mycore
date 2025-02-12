@@ -196,7 +196,7 @@ public class MCRISO8601Date {
      *            Date in any form that is a valid W3C dateTime
      */
     public final void setDate(final String isoString) {
-        TemporalAccessor dt = null;
+        TemporalAccessor dt;
         try {
             dt = getDateTime(MCRISO8601FormatChooser.cropSecondFractions(isoString));
         } catch (final RuntimeException e) {
@@ -252,11 +252,9 @@ public class MCRISO8601Date {
             final DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT, locale);
             df.setTimeZone(TimeZone.getTimeZone("UTC"));
             df.setLenient(true);
-            TemporalAccessor result = null;
             try {
                 final Date pDate = df.parse(date);
-                result = pDate.toInstant();
-                return result;
+                return pDate.toInstant();
             } catch (final ParseException e) {
                 LOGGER.warn("Date guess failed for locale: {}", locale);
                 //we need no big exception in the logs, if we can't guess what it is, a warning should be enough

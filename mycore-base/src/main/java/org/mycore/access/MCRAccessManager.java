@@ -337,7 +337,7 @@ public class MCRAccessManager {
     @Deprecated
     public static boolean checkPermissionForReadingDerivate(String derID) {
         // derID must be a derivate ID
-        boolean accessAllowed = false;
+        boolean accessAllowed;
         MCRObjectID objectId = MCRMetadataManager.getObjectId(MCRObjectID.getInstance(derID), 10, TimeUnit.MINUTES);
         if (objectId != null) {
             accessAllowed = checkPermission(objectId, PERMISSION_READ) && checkPermission(derID, PERMISSION_READ);

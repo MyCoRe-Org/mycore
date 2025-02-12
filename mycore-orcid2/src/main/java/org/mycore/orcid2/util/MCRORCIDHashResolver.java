@@ -59,7 +59,7 @@ public class MCRORCIDHashResolver implements URIResolver {
         }
         final String input = URLDecoder.decode(split[1], StandardCharsets.UTF_8);
         final String algorithm = split[2];
-        String result = null;
+        String result;
         try {
             if (split.length == 3) {
                 result = MCRUtils.hashString(input, algorithm, null, 1);

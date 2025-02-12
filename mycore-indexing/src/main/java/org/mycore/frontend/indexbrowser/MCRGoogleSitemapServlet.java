@@ -62,7 +62,7 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
             baseDir);
         int number = common.checkSitemapFile();
         LOGGER.debug("Build Google number of URL files {}.", number);
-        Document jdom = null;
+        Document jdom;
         // check if sitemap_google.xml exist
         String fnsm = common.getFileName(1, true);
         LOGGER.debug("Build Google check file {}", fnsm);

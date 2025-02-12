@@ -48,7 +48,7 @@ class MCRDataSource {
 
     private String sourceID;
 
-    private boolean stopOnFirstResult = true;
+    private boolean stopOnFirstResult;
 
     private List<MCRIdentifierResolver> resolvers = new ArrayList<>();
 

@@ -66,7 +66,6 @@ public class MCRRoleServlet extends MCRServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        roleClassificationsDefined = false;
         roleCategories = new ArrayList<>();
         roleCategories.add(MCRUser2Constants.ROLE_CLASSID);
         String roleCategoriesValue = MCRConfiguration2.getString(MCRUser2Constants.CONFIG_PREFIX + "RoleCategories")

@@ -178,14 +178,13 @@ public abstract class MCRBase {
      *                general Exception of MyCoRe
      */
     protected final void setFromXML(byte[] xml, boolean valid) throws JDOMException {
-        Document jdom = null;
         try {
-            jdom = MCRXMLParserFactory.getParser(valid).parseXML(new MCRByteContent(xml));
+            Document jdom = MCRXMLParserFactory.getParser(valid).parseXML(new MCRByteContent(xml));
+            setFromJDOM(jdom);    
         } catch (IOException e) {
             //Why oh why?
             throw new JDOMException("Unexpected IOException while building JDOM document.", e);
         }
-        setFromJDOM(jdom);
     }
 
     /**

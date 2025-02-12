@@ -196,6 +196,7 @@ public class MCRServlet extends HttpServlet {
     }
 
     public static MCRSession getSession(HttpServletRequest req) {
+        MCRSession session;
         boolean reusedSession = req.isRequestedSessionIdValid();
         HttpSession theSession = req.getSession(true);
         if (reusedSession) {
@@ -204,7 +205,6 @@ public class MCRServlet extends HttpServlet {
         } else {
             LOGGER.info(() -> "Created new HTTP session: " + theSession.getId());
         }
-        MCRSession session = null;
 
         MCRSession fromHttpSession = Optional
             .ofNullable((MCRSessionResolver) theSession.getAttribute(ATTR_MYCORE_SESSION))
@@ -557,8 +557,7 @@ public class MCRServlet extends HttpServlet {
             }
 
             String name = (String) e.nextElement();
-            String value = null;
-            value = URLEncoder.encode(parameters.getProperty(name), StandardCharsets.UTF_8);
+            String value = URLEncoder.encode(parameters.getProperty(name), StandardCharsets.UTF_8);
 
             redirectURL.append(name).append('=').append(value);
         }
