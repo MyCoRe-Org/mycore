@@ -101,7 +101,7 @@ export class TextIndex<T> {
     return textline;
   }
 
-  public getContext(pos: number, words: Array<string>) {
+  public getContext(pos: number, words: Array<string>):HTMLElement {
     let html = this._fullText.substr(Math.max(0, pos - TextIndex.DEFAULT_CONTEXT_SIZE / 2), TextIndex.DEFAULT_CONTEXT_SIZE);
     words = words.sort((w1, w2) => w1.length - w2.length);
     words.forEach((w) => {
@@ -109,7 +109,9 @@ export class TextIndex<T> {
         html = html.replace(new RegExp(w, "gim"), "<span class='" + TextIndex.TEXT_HIGHLIGHT_CLASSNAME + "'>$&</span>")
       }
     });
-    return jQuery("<span>" + html + "</span>");
+    let htmlSpanElement = document.createElement("span");
+    htmlSpanElement.innerHTML = html;
+    return htmlSpanElement;
   }
 
 }
@@ -120,7 +122,7 @@ export class SearchResult<T> {
 }
 
 export class IndexResultObject<T> {
-  constructor(public arr: Array<T>, public matchWords: Array<string>, public context: JQuery) {
+  constructor(public arr: Array<T>, public matchWords: Array<string>, public context: HTMLElement) {
   }
 }
 

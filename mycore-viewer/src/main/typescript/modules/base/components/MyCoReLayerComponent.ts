@@ -19,7 +19,15 @@
 
 import { ViewerComponent } from "./ViewerComponent";
 import { MyCoReViewerSettings } from "../MyCoReViewerSettings";
-import { MyCoReMap, Utils, ViewerError, ViewerUserSettingStore } from "../Utils";
+import {
+  getElementHeight,
+  getElementOuterHeight,
+  getElementWidth,
+  MyCoReMap,
+  Utils,
+  ViewerError,
+  ViewerUserSettingStore
+} from "../Utils";
 import { StructureModel } from "./model/StructureModel";
 import { LanguageModel } from "./model/LanguageModel";
 import { MyCoReBasicToolbarModel } from "./model/MyCoReBasicToolbarModel";
@@ -64,18 +72,24 @@ export class MyCoReLayerComponent extends ViewerComponent {
 
 
   private currentHref: string;
-  private container: JQuery;
+  private container: HTMLElement;
 
   private static LAYER_DROPDOWN_ID = "toolbar.LayerButton";
-  private sidebarLabel: JQuery = jQuery("<span>Ebenen</span>");
+  private sidebarLabel: HTMLElement = this.createSidebarLabel();
+
+  private createSidebarLabel() {
+    const sidebar = document.createElement("span");
+    sidebar.innerText = "Ebenen";
+    return sidebar;
+  }
 
   public init() {
     if (this.enabled) {
-      this.container = jQuery("<div></div>");
-      this.container.css({ overflowY: "scroll", display: "block" });
-      this.container.addClass("tei");
-      this.container.addClass("layer-component");
-      this.container.bind("iviewResize", () => {
+      this.container =document.createElement("div");
+      this.container.style.overflowY = "scroll";
+      this.container.style.display = "block";
+      this.container.classList.add("tei", "layer-component");
+      this.container.addEventListener("iviewResize", () => {
         this.updateContainerSize();
       });
 
@@ -92,8 +106,8 @@ export class MyCoReLayerComponent extends ViewerComponent {
 
 
   private updateContainerSize() {
-    this.container.css({ "height": this.container.parent().height() - this.sidebarLabel.parent().outerHeight() + "px" });
-    const containerSize = this.container.width();
+    this.container.style.height = getElementHeight(this.container.parentElement) - getElementOuterHeight(this.sidebarLabel.parentElement) + "px";
+    const containerSize = getElementWidth(this.container);
     const settingStore = ViewerUserSettingStore.getInstance();
     if (containerSize > 50) {
       settingStore.setValue(MyCoReLayerComponent.SIDEBAR_LAYER_SIZE, containerSize.toString());
@@ -177,7 +191,7 @@ export class MyCoReLayerComponent extends ViewerComponent {
 
     if (e.type == ImageChangedEvent.TYPE) {
       const imageChangedEvent = e as ImageChangedEvent;
-      if (typeof this.structureModel !== "undefined" && typeof imageChangedEvent.image != "undefined" && imageChangedEvent != null) {
+      if (typeof this.structureModel !== "undefined" && typeof imageChangedEvent.image != "undefined") {
         this.currentHref = imageChangedEvent.image.href;
         this.layerDisplay.pageChanged(this.currentHref);
       }

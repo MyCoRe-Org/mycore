@@ -16,15 +16,16 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { ViewerComponent } from "./ViewerComponent";
-import { MyCoReViewerSettings } from "../MyCoReViewerSettings";
-import { ComponentInitializedEvent } from "./events/ComponentInitializedEvent";
-import { WaitForEvent } from "./events/WaitForEvent";
-import { StructureModelLoadedEvent } from "./events/StructureModelLoadedEvent";
-import { ShowContentEvent } from "./events/ShowContentEvent";
-import { ProvideToolbarModelEvent } from "./events/ProvideToolbarModelEvent";
-import { ViewportInitializedEvent } from "./events/ViewportInitializedEvent";
+import {ViewerComponent} from "./ViewerComponent";
+import {MyCoReViewerSettings} from "../MyCoReViewerSettings";
+import {ComponentInitializedEvent} from "./events/ComponentInitializedEvent";
+import {WaitForEvent} from "./events/WaitForEvent";
+import {StructureModelLoadedEvent} from "./events/StructureModelLoadedEvent";
+import {ShowContentEvent} from "./events/ShowContentEvent";
+import {ProvideToolbarModelEvent} from "./events/ProvideToolbarModelEvent";
+import {ViewportInitializedEvent} from "./events/ViewportInitializedEvent";
 import {
+  getElementWidth,
   MoveVector,
   MyCoReMap,
   Position2D,
@@ -34,46 +35,45 @@ import {
   ViewerParameterMap,
   ViewerProperty
 } from "../Utils";
-import { Scrollbar } from "../widgets/canvas/Scrollbar";
-import { Overview } from "../widgets/canvas/Overview";
-import { TextRenderer } from "../widgets/canvas/TextRenderer";
-import { RequestTextContentEvent } from "./events/RequestTextContentEvent";
-import { AbstractPage } from "./model/AbstractPage";
-import { TextContentModel } from "./model/TextContent";
-import { PageView } from "../widgets/canvas/PageView";
-import { PageController } from "../widgets/canvas/PageController";
+import {Scrollbar} from "../widgets/canvas/Scrollbar";
+import {Overview} from "../widgets/canvas/Overview";
+import {TextRenderer} from "../widgets/canvas/TextRenderer";
+import {RequestTextContentEvent} from "./events/RequestTextContentEvent";
+import {AbstractPage} from "./model/AbstractPage";
+import {TextContentModel} from "./model/TextContent";
+import {PageView} from "../widgets/canvas/PageView";
+import {PageController} from "../widgets/canvas/PageController";
 
-import { StructureImage } from "./model/StructureImage";
-import { LanguageModel } from "./model/LanguageModel";
-import { ToolbarButton } from "../widgets/toolbar/model/ToolbarButton";
-import { ToolbarDropdownButton } from "../widgets/toolbar/model/ToolbarDropdownButton";
+import {StructureImage} from "./model/StructureImage";
+import {LanguageModel} from "./model/LanguageModel";
+import {ToolbarButton} from "../widgets/toolbar/model/ToolbarButton";
+import {ToolbarDropdownButton} from "../widgets/toolbar/model/ToolbarDropdownButton";
 
-import { MyCoReBasicToolbarModel } from "./model/MyCoReBasicToolbarModel";
-import { ImageChangedEvent } from "./events/ImageChangedEvent";
-import { ImageSelectedEvent } from "./events/ImageSelectedEvent";
-import { DropdownButtonPressedEvent } from "../widgets/toolbar/events/DropdownButtonPressedEvent";
-import { ButtonPressedEvent } from "../widgets/toolbar/events/ButtonPressedEvent";
-import { PageLayout } from "../widgets/canvas/PageLayout";
-import { DesktopInputDelegator } from "../widgets/canvas/input/DesktopInputDelegator";
-import { TouchInputDelegator } from "../widgets/canvas/input/TouchInputDelegator";
-import { RequestStateEvent } from "./events/RequestStateEvent";
-import { LanguageModelLoadedEvent } from "./events/LanguageModelLoadedEvent";
-import { ProvidePageLayoutEvent } from "./events/ProvidePageLayoutEvent";
-import { RequestDesktopInputEvent } from "./events/RequestDesktopInputEvent";
-import { RequestTouchInputEvent } from "./events/RequestTouchInputEvent";
-import { AddCanvasPageLayerEvent } from "./events/AddCanvasPageLayerEvent";
-import { RedrawEvent } from "./events/RedrawEvent";
-import { TextEditEvent } from "./events/TextEditEvent";
-import { PageLayoutChangedEvent } from "./events/PageLayoutChangedEvent";
-import { RequestPageEvent } from "./events/RequestPageEvent";
-import { ViewerEvent } from "../widgets/events/ViewerEvent";
-import { ZoomAnimation } from "../widgets/canvas/viewport/ZoomAnimation";
-import { RestoreStateEvent } from "./events/RestoreStateEvent";
-import { TouchInputAdapter, TouchInputListener } from "../widgets/canvas/input/TouchInputListener";
-import { DesktopInputAdapter, DesktopInputListener } from "../widgets/canvas/input/DesktopInputListener";
-import { TouchSession } from "../widgets/canvas/input/TouchSession";
-import { VelocityScrollAnimation } from "../widgets/canvas/viewport/VelocityScrollAnimation";
-
+import {MyCoReBasicToolbarModel} from "./model/MyCoReBasicToolbarModel";
+import {ImageChangedEvent} from "./events/ImageChangedEvent";
+import {ImageSelectedEvent} from "./events/ImageSelectedEvent";
+import {DropdownButtonPressedEvent} from "../widgets/toolbar/events/DropdownButtonPressedEvent";
+import {ButtonPressedEvent} from "../widgets/toolbar/events/ButtonPressedEvent";
+import {PageLayout} from "../widgets/canvas/PageLayout";
+import {DesktopInputDelegator} from "../widgets/canvas/input/DesktopInputDelegator";
+import {TouchInputDelegator} from "../widgets/canvas/input/TouchInputDelegator";
+import {RequestStateEvent} from "./events/RequestStateEvent";
+import {LanguageModelLoadedEvent} from "./events/LanguageModelLoadedEvent";
+import {ProvidePageLayoutEvent} from "./events/ProvidePageLayoutEvent";
+import {RequestDesktopInputEvent} from "./events/RequestDesktopInputEvent";
+import {RequestTouchInputEvent} from "./events/RequestTouchInputEvent";
+import {AddCanvasPageLayerEvent} from "./events/AddCanvasPageLayerEvent";
+import {RedrawEvent} from "./events/RedrawEvent";
+import {TextEditEvent} from "./events/TextEditEvent";
+import {PageLayoutChangedEvent} from "./events/PageLayoutChangedEvent";
+import {RequestPageEvent} from "./events/RequestPageEvent";
+import {ViewerEvent} from "../widgets/events/ViewerEvent";
+import {ZoomAnimation} from "../widgets/canvas/viewport/ZoomAnimation";
+import {RestoreStateEvent} from "./events/RestoreStateEvent";
+import {TouchInputAdapter, TouchInputListener} from "../widgets/canvas/input/TouchInputListener";
+import {DesktopInputAdapter, DesktopInputListener} from "../widgets/canvas/input/DesktopInputListener";
+import {TouchSession} from "../widgets/canvas/input/TouchSession";
+import {VelocityScrollAnimation} from "../widgets/canvas/viewport/VelocityScrollAnimation";
 
 
 /**
@@ -83,7 +83,7 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
 
   private _settings: MyCoReViewerSettings;
 
-  constructor(_settings: MyCoReViewerSettings, private _container: JQuery) {
+  constructor(_settings: MyCoReViewerSettings, private _container: HTMLElement) {
     super();
     this._settings = _settings;
   }
@@ -99,30 +99,29 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
     this.trigger(new WaitForEvent(this, ShowContentEvent.TYPE));
     this.trigger(new WaitForEvent(this, ProvideToolbarModelEvent.TYPE));
     this.trigger(new ViewportInitializedEvent(this, this._pageController.viewport));
-    const componentContent = this._componentContent;
-    componentContent.css({
-      position: "absolute",
-      top: "0px",
-      left: "0px",
-      right: this._settings.mobile ? "0px" : "15px",
-      bottom: "15px"
-    });
+    const viewParentElement = this._viewParentElement;
+    viewParentElement.style.position = "absolute";
+    viewParentElement.style.top = "0px";
+    viewParentElement.style.left = "0px";
+    viewParentElement.style.right = this._settings.mobile ? "0px" : "15px";
+    viewParentElement.style.bottom = "15px";
+
     this.initMainView();
 
     const overviewEnabled = Utils.getVar(this._settings, "canvas.overview.enabled", true);
     if (!this._settings.mobile) {
       if (overviewEnabled) {
-        componentContent.append(this._pageController._overview.container);
+        this._viewParentElement.append(this._pageController._overview.container);
       }
       this._pageController._overview.initEventHandler();
-      componentContent.add(this._horizontalScrollbar.scrollbarElement);
-      componentContent.add(this._verticalScrollbar.scrollbarElement);
-      componentContent.add(this._toggleButton);
+      this._componentContent.push(this._horizontalScrollbar.scrollbarElement);
+      this._componentContent.push(this._verticalScrollbar.scrollbarElement);
+      this._componentContent.push(this._toggleButton);
       this.initOverview(overviewEnabled);
     }
 
-
-    jQuery(componentContent).bind("iviewResize", () => {
+    /* new code */
+    viewParentElement.addEventListener("iviewResize", () => {
       this._horizontalScrollbar.resized();
       this._verticalScrollbar.resized();
       this._pageController.update();
@@ -141,7 +140,7 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
     });
 
 
-    this.trigger(new ShowContentEvent(this, componentContent, ShowContentEvent.DIRECTION_CENTER));
+    this.trigger(new ShowContentEvent(this, this._componentContent, ShowContentEvent.DIRECTION_CENTER));
   }
 
   private isImageDoctype() {
@@ -155,27 +154,34 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
         return !isNaN((<any>value) * 1) && parseInt(value, 10) > 1;
       }), 10);
 
-      const iconChild = this._toggleButton.children('.fas');
-      if (this._container.width() < minVisibleSize) {
-        jQuery(overviewContainer).hide();
-        iconChild.addClass(MyCoReImageScrollComponent.OVERVIEW_VISIBLE_ICON);
+      const iconChildren = this._toggleButton.querySelectorAll('.fas');
+
+      if (getElementWidth(this._container) < minVisibleSize) {
+        overviewContainer.style.display = "none"
+        iconChildren.forEach((iconChild) => {
+          iconChild.classList.add(MyCoReImageScrollComponent.OVERVIEW_VISIBLE_ICON);
+        });
       } else {
-        iconChild.addClass(MyCoReImageScrollComponent.OVERVIEW_INVISIBLE_ICON);
+        iconChildren.forEach((iconChild) => {
+          iconChild.classList.add(MyCoReImageScrollComponent.OVERVIEW_INVISIBLE_ICON);
+        });
       }
 
-      this._toggleButton.click(() => {
-        if (jQuery(overviewContainer).is(":visible")) {
-          jQuery(overviewContainer).hide();
-          iconChild.addClass(MyCoReImageScrollComponent.OVERVIEW_VISIBLE_ICON);
-          iconChild.removeClass(MyCoReImageScrollComponent.OVERVIEW_INVISIBLE_ICON);
+      this._toggleButton.addEventListener('click', () => {
+        if (overviewContainer.style.display != "none") {
+          overviewContainer.style.display = "none";
+          iconChildren.forEach((iconChild) => {
+            iconChild.classList.replace(MyCoReImageScrollComponent.OVERVIEW_INVISIBLE_ICON, MyCoReImageScrollComponent.OVERVIEW_VISIBLE_ICON);
+          })
         } else {
-          jQuery(overviewContainer).show();
-          iconChild.addClass(MyCoReImageScrollComponent.OVERVIEW_INVISIBLE_ICON);
-          iconChild.removeClass(MyCoReImageScrollComponent.OVERVIEW_VISIBLE_ICON);
+          overviewContainer.style.display = "block";
+          iconChildren.forEach((iconChild) => {
+            iconChild.classList.replace(MyCoReImageScrollComponent.OVERVIEW_VISIBLE_ICON, MyCoReImageScrollComponent.OVERVIEW_INVISIBLE_ICON);
+          })
         }
       });
     } else {
-      this._toggleButton.addClass("disabled");
+      this._toggleButton.classList.add("disabled");
     }
   }
 
@@ -187,7 +193,9 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
 
       this._horizontalScrollbar = new Scrollbar(true);
       this._verticalScrollbar = new Scrollbar(false);
-      this._toggleButton = jQuery(`<div class='overViewToggle'><div class="fas"></div></div>`);
+      this._toggleButton = document.createElement(`div`);
+      this._toggleButton.classList.add("overViewToggle");
+      this._toggleButton.innerHTML = `<i class="fas"></i>`;
 
       this._pageController.viewport.sizeProperty.addObserver({
         propertyChanged: (_old, _new) => {
@@ -203,17 +211,17 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
       this._pageController._overview = new Overview(this._pageController.viewport);
     }
 
-    this._componentContent.append(this._imageView.container);
-    this._imageView.container.addClass("mainView");
-    this._imageView.container.css({ left: "0px", right: "0px" });
-    this._componentContent.addClass("grabbable");
+    this._viewParentElement.append(this._imageView.container);
+    this._imageView.container.classList.add("mainView");
+    this._imageView.container.style.left = "0px";
+    this._imageView.container.style.right = "0px";
+    this._viewParentElement.classList.add("grabbable");
 
     //this._componentContent.append(this._altoView.container);
-    this._altoView.container.addClass("secondView");
-    this._altoView.container.css({ left: "50%", right: "0px" });
-    this._altoView.container.css({
-      "border-left": "1px solid black"
-    });
+    this._altoView.container.classList.add("secondView");
+    this._altoView.container.style.left = "50%";
+    this._altoView.container.style.right = "0px";
+    this._altoView.container.style.borderLeft = "1px solid black";
 
     this._pageController.views.push(this._imageView);
     //this._pageController.views.push(this._altoView);
@@ -238,7 +246,7 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
       if (index != -1) {
         this._pageController.views.splice(index, 1);
       }
-      view.container.detach();
+      view.container.remove();
     };
 
 
@@ -246,25 +254,29 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
       if (this._pageController.views.indexOf(view) == -1) {
         this._pageController.views.push(view);
       }
-      if (view.container.parent() != this._componentContent) {
-        this._componentContent.append(view.container);
+      if (view.container.parentElement != this._viewParentElement) {
+        this._viewParentElement.append(view.container);
       }
     };
 
     this._viewMode = mode;
     if (mode == 'imageView') {
-      this._imageView.container.css({ "left": "0px", "right": "0px" });
+      this._imageView.container.style.left = "0px";
+      this._imageView.container.style.right = "0px";
       remove(this._altoView);
       add(this._imageView);
       this.setSelectableButtonEnabled(false);
     } else if (mode == 'mixedView') {
-      this._imageView.container.css({ "left": "0px", "right": "50%" });
-      this._altoView.container.css({ "left": "50%", "right": "0px" });
+      this._imageView.container.style.left = "0px";
+      this._imageView.container.style.right = "50%";
+      this._altoView.container.style.left = "50%";
+      this._altoView.container.style.right = "0px";
       add(this._altoView);
       add(this._imageView);
       this.setSelectableButtonEnabled(true);
     } else if (mode == 'textView') {
-      this._altoView.container.css({ "left": "0px", "right": "0px" });
+      this._altoView.container.style.left = "0px";
+      this._altoView.container.style.right = "0px";
       remove(this._imageView);
       add(this._altoView);
       this.setSelectableButtonEnabled(true);
@@ -300,10 +312,12 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
   private _touchDelegators: Array<TouchInputDelegator> = new Array<TouchInputDelegator>();
 
   private _permalinkState: MyCoReMap<string, string> = null;
-  private _toggleButton: JQuery;
+  private _toggleButton: HTMLElement;
   public _imageView: PageView = new PageView(true, false);
   private _altoView: PageView = new PageView(true, true);
-  public _componentContent: JQuery = jQuery("<div></div>");
+
+  public _viewParentElement: HTMLElement = document.createElement("div");
+  public _componentContent: HTMLElement[] = [ this._viewParentElement ];
   private _enableAltoSpecificButtons;
   private _selectionSwitchButton: ToolbarButton;
   private _viewSelectButton: ToolbarDropdownButton;
@@ -344,7 +358,7 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
     }
 
     if (this._settings.mobile) {
-      this.trigger(new ShowContentEvent(this, jQuery(this._componentContent), ShowContentEvent.DIRECTION_CENTER));
+      this.trigger(new ShowContentEvent(this, this._componentContent, ShowContentEvent.DIRECTION_CENTER));
     }
   }
 
@@ -683,10 +697,10 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
   private setAltoOnTop(onTop: boolean) {
     this.setAltoSelectable(false);
     if (onTop) {
-      this._altoView.container.addClass("altoTop");
+      this._altoView.container.classList.add("altoTop");
       this._selectionSwitchButton.disabled = true;
     } else {
-      this._altoView.container.removeClass("altoTop");
+      this._altoView.container.classList.remove("altoTop");
       this._selectionSwitchButton.disabled = false;
     }
   }
@@ -697,13 +711,16 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
 
   private setAltoSelectable(selectable: boolean) {
     this._selectionSwitchButton.active = selectable;
-    jQuery("[data-id='selectionSwitchButton']").blur();
-    this._altoView.container.removeClass("altoTop");
+    const switchButton = document.querySelector("[data-id='selectionSwitchButton']") as HTMLElement;
+    if (switchButton) {
+      switchButton.blur();
+    }
+    this._altoView.container.classList.remove("altoTop");
 
     if (selectable) {
-      this._altoView.container.addClass("altoSelectable");
+      this._altoView.container.classList.add("altoSelectable");
     } else {
-      this._altoView.container.removeClass("altoSelectable");
+      this._altoView.container.classList.remove("altoSelectable");
     }
 
     viewerClearTextSelection();
@@ -873,13 +890,13 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
   }
 
   private registerDesktopInputHandler(listener: DesktopInputListener) {
-    this._desktopDelegators.push(new DesktopInputDelegator(jQuery(this._imageView.container), this._pageController.viewport, listener));
-    this._desktopDelegators.push(new DesktopInputDelegator(jQuery(this._altoView.container), this._pageController.viewport, listener));
+    this._desktopDelegators.push(new DesktopInputDelegator(this._imageView.container, this._pageController.viewport, listener));
+    this._desktopDelegators.push(new DesktopInputDelegator(this._altoView.container, this._pageController.viewport, listener));
   }
 
   private registerTouchInputHandler(listener: TouchInputListener) {
-    this._touchDelegators.push(new TouchInputDelegator(jQuery(this._imageView.container), this._pageController.viewport, listener));
-    this._touchDelegators.push(new TouchInputDelegator(jQuery(this._altoView.container), this._pageController.viewport, listener));
+    this._touchDelegators.push(new TouchInputDelegator(this._imageView.container, this._pageController.viewport, listener));
+    this._touchDelegators.push(new TouchInputDelegator(this._altoView.container, this._pageController.viewport, listener));
   }
 
 
@@ -968,16 +985,15 @@ class DesktopInputHandler extends DesktopInputAdapter {
   }
 
   public mouseDown(mousePosition, e): void {
-
-    let container = this.component._componentContent;
-    container.addClass("grab");
-    container.removeClass("grabbable");
+    let container = this.component._viewParentElement;
+    container.classList.remove("grabbable");
+    container.classList.add("grab");
   }
 
   public mouseUp(mousePosition, e): void {
-    let container = this.component._componentContent;
-    container.addClass("grabbable");
-    container.removeClass("grab");
+    let container = this.component._viewParentElement;
+    container.classList.add("grabbable");
+    container.classList.remove("grab");
   }
 
   public mouseDoubleClick(mousePosition: Position2D): void {
@@ -987,7 +1003,7 @@ class DesktopInputHandler extends DesktopInputAdapter {
   }
 
   public mouseDrag(currentPosition: Position2D, startPosition: Position2D, startViewport: Position2D,
-    event: JQuery.MouseEventBase): void {
+    event: MouseEvent): void {
     const isAltoSelectable = this.component.isAltoSelectable();
     const isImageCanvas = event.target === this.component._imageView.drawCanvas ||
       event.target === this.component._imageView.markCanvas;
@@ -1034,7 +1050,7 @@ class DesktopInputHandler extends DesktopInputAdapter {
 
   }
 
-  public keydown(e: JQuery.KeyboardEventBase): void {
+  public keydown(e: KeyboardEvent): void {
     switch (e.keyCode) {
       case 33:
         this.component.previousImage();
