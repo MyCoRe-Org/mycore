@@ -26,8 +26,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.jar.Manifest;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.status.StatusLogger;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 
@@ -43,7 +43,7 @@ import org.mycore.common.MCRException;
  */
 public class MCRComponent implements Comparable<MCRComponent> {
 
-    private static final Logger LOGGER = StatusLogger.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String ATT_PRIORITY = "Priority";
 
