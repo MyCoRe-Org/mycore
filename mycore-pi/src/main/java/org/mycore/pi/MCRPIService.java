@@ -132,16 +132,13 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      */
     public static MCRPI removeFlagFromObject(MCRBase obj, MCRPI databaseEntry) {
         MCRObjectService service = obj.getService();
-        List<String> flags = service.getFlags(PI_FLAG);
-        int flagCount = flags.size();
-        for (int flagIndex = 0; flagIndex < flagCount; flagIndex++) {
-            String flag = flags.get(flagIndex);
+        for (String flag : service.getFlags(PI_FLAG)) {
             MCRPI pi = getGson().fromJson(flag, MCRPI.class);
             if (pi.getIdentifier().equals(databaseEntry.getIdentifier()) &&
                 pi.getAdditional().equals(databaseEntry.getAdditional()) &&
                 pi.getService().equals(databaseEntry.getService()) &&
                 pi.getType().equals(databaseEntry.getType())) {
-                service.removeFlag(flagIndex);
+                service.removeFlag(service.getFlagIndex(flag));
                 return databaseEntry;
             }
         }
