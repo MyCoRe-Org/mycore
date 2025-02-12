@@ -53,8 +53,10 @@ public class MCRRedundantModsClassificationEventHandler extends MCRAbstractRedun
                 There are inconsistencies found between the classifications {} and {}.
                 They have the same authority "{}" but {} has the displayLabel "{}" and {} has the displayLabel "{}".""";
 
-            LOGGER.warn(logMessage, classificationName1, classificationName2, getAuthority(el1),
-                classificationName1, displayLabel1, classificationName2, displayLabel2);
+            if (LOGGER.isWarnEnabled()) {
+                LOGGER.warn(logMessage, classificationName1, classificationName2, getAuthority(el1),
+                    classificationName1, displayLabel1, classificationName2, displayLabel2);
+            }
             return false;
         }
         return true;

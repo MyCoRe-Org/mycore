@@ -58,7 +58,9 @@ public abstract class MCRAbstractRedundantModsEventHandler extends MCREventHandl
         if (mcrmodsWrapper.getMODS() == null) {
             return;
         }
-        logger.info("merge redundant " + getClassificationElementName() + " categories for {}", obj.getId());
+        if (logger.isInfoEnabled()) {
+            logger.info("merge redundant " + getClassificationElementName() + " categories for {}", obj.getId());
+        }
 
         Element mods = mcrmodsWrapper.getMODS();
         List<Element> supportedElements = getAllDescendants(mods).stream()

@@ -53,9 +53,10 @@ public class MCRRedundantModsGenreEventHandler extends MCRAbstractRedundantModsE
             String logMessage = """
                 There are inconsistencies found between the classifications {} and {}.
                 They have the same authority "{}" but {} has the displayLabel "{}" and {} has the displayLabel "{}".""";
-
-            LOGGER.warn(logMessage, classificationName1, classificationName2, getAuthority(el1),
-                classificationName1, displayLabel1, classificationName2, displayLabel2);
+            if (LOGGER.isWarnEnabled()) {
+                LOGGER.warn(logMessage, classificationName1, classificationName2, getAuthority(el1),
+                    classificationName1, displayLabel1, classificationName2, displayLabel2);
+            }
             return false;
         }
         return true;
@@ -78,10 +79,10 @@ public class MCRRedundantModsGenreEventHandler extends MCRAbstractRedundantModsE
             String logMessage = """
                 There are inconsistencies found between the classifications {} and {}.
                 They have the same authority "{}" but {} has the type "{}" and {} has the type "{}".""";
-
-            LOGGER.warn(logMessage, classificationName1, classificationName2, getAuthority(el1),
-                classificationName1, type1, classificationName2, type2);
-
+            if (LOGGER.isWarnEnabled()) {
+                LOGGER.warn(logMessage, classificationName1, classificationName2, getAuthority(el1),
+                    classificationName1, type1, classificationName2, type2);
+            }
             return false;
         }
         return true;
