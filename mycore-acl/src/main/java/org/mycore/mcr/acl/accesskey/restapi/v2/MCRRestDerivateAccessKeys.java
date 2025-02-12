@@ -71,6 +71,8 @@ import jakarta.ws.rs.core.UriInfo;
 @Tag(name = TAG_MYCORE_DERIVATE)
 public class MCRRestDerivateAccessKeys {
 
+    private static final String DERIVATE_NOT_FOUND = "Derivate or access key does not exist";
+
     @Context
     UriInfo uriInfo;
 
@@ -93,7 +95,7 @@ public class MCRRestDerivateAccessKeys {
                 description = MCRRestDescription.UNAUTHORIZED,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
             @ApiResponse(responseCode = NOT_FOUND,
-                description = MCRRestDescription.DERIVATE_NOT_FOUND,
+                description = DERIVATE_NOT_FOUND,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
         })
     @Produces(MediaType.APPLICATION_JSON)
@@ -121,7 +123,7 @@ public class MCRRestDerivateAccessKeys {
                 description = MCRRestDescription.UNAUTHORIZED,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
             @ApiResponse(responseCode = NOT_FOUND,
-                description = MCRRestDescription.DERIVATE_NOT_FOUND,
+                description = DERIVATE_NOT_FOUND,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
         })
     @Produces(MediaType.APPLICATION_JSON)
@@ -178,7 +180,7 @@ public class MCRRestDerivateAccessKeys {
                 description = MCRRestDescription.UNAUTHORIZED,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
             @ApiResponse(responseCode = NOT_FOUND,
-                description = MCRRestDescription.DERIVATE_NOT_FOUND,
+                description = DERIVATE_NOT_FOUND,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
         })
     @RequestBody(required = true,
@@ -208,7 +210,7 @@ public class MCRRestDerivateAccessKeys {
                 description = MCRRestDescription.UNAUTHORIZED,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
             @ApiResponse(responseCode = NOT_FOUND,
-                description = MCRRestDescription.DERIVATE_NOT_FOUND,
+                description = DERIVATE_NOT_FOUND,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
         })
     @Produces(MediaType.APPLICATION_JSON)

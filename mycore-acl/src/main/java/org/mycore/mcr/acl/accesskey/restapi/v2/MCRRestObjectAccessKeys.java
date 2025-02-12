@@ -69,6 +69,8 @@ import jakarta.ws.rs.core.UriInfo;
 @Tag(name = TAG_MYCORE_OBJECT)
 public class MCRRestObjectAccessKeys {
 
+    private static final String OBJECT_NOT_FOUND = "Object or access key does not exist";
+
     @Context
     UriInfo uriInfo;
 
@@ -87,7 +89,7 @@ public class MCRRestObjectAccessKeys {
                 description = MCRRestDescription.UNAUTHORIZED,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
             @ApiResponse(responseCode = NOT_FOUND,
-                description = MCRRestDescription.OBJECT_NOT_FOUND,
+                description = OBJECT_NOT_FOUND,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
         })
     @Produces(MediaType.APPLICATION_JSON)
@@ -114,7 +116,7 @@ public class MCRRestObjectAccessKeys {
                 description = MCRRestDescription.UNAUTHORIZED,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
             @ApiResponse(responseCode = NOT_FOUND,
-                description = MCRRestDescription.OBJECT_NOT_FOUND,
+                description = OBJECT_NOT_FOUND,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
         })
     @Produces(MediaType.APPLICATION_JSON)
@@ -141,7 +143,7 @@ public class MCRRestObjectAccessKeys {
                 description = MCRRestDescription.UNAUTHORIZED,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
             @ApiResponse(responseCode = NOT_FOUND,
-                description = MCRRestDescription.OBJECT_NOT_FOUND,
+                description = OBJECT_NOT_FOUND,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
         })
     @RequestBody(required = true,
@@ -170,7 +172,7 @@ public class MCRRestObjectAccessKeys {
                 description = MCRRestDescription.UNAUTHORIZED,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
             @ApiResponse(responseCode = NOT_FOUND,
-                description = MCRRestDescription.OBJECT_NOT_FOUND,
+                description = OBJECT_NOT_FOUND,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
         })
     @RequestBody(required = true,

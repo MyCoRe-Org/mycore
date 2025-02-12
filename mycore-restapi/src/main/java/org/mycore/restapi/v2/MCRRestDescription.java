@@ -20,13 +20,7 @@ package org.mycore.restapi.v2;
 
 public final class MCRRestDescription {
 
-    public static final String ACCESS_KEY_ID = "The access key id";
-
     public static final String UNAUTHORIZED = "You do not have create permission and need to authenticate first";
-
-    public static final String OBJECT_NOT_FOUND = "Object or access key does not exist";
-
-    public static final String DERIVATE_NOT_FOUND = "Derivate or access key does not exist";
 
     public static final String BAD_REQUEST = "Invalid ID or invalid access key";
 

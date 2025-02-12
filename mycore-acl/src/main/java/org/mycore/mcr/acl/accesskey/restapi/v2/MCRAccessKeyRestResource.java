@@ -33,7 +33,6 @@ import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyPartialUpdateDto;
 import org.mycore.mcr.acl.accesskey.restapi.v2.access.MCRAccessKeyRestAccessCheckStrategy;
 import org.mycore.restapi.annotations.MCRApiDraft;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
-import org.mycore.restapi.v2.MCRRestDescription;
 import org.mycore.restapi.v2.MCRRestSchemaType;
 import org.mycore.restapi.v2.annotation.MCRRestAccessCheck;
 import org.mycore.restapi.v2.annotation.MCRRestRequiredPermission;
@@ -75,11 +74,13 @@ import jakarta.ws.rs.core.UriInfo;
 @Path("access-keys")
 public class MCRAccessKeyRestResource {
 
-    private static final String DESCRIPTION_UNAUTHORIZED = "Unautorized";
+    private static final String DESCRIPTION_UNAUTHORIZED = "Unauthorized";
 
     private static final String DESCRIPTION_ACCESS_KEY_NOT_FOUND = "Access key not found";
 
     private static final String DESCRIPTION_INVALID_INPUT = "Invalid input data";
+
+    private static final String DESCRIPTION_ACCESS_KEY_ID = "The access key id";
 
     @Context
     private UriInfo uriInfo;
@@ -155,7 +156,7 @@ public class MCRAccessKeyRestResource {
     @MCRRestRequiredPermission(MCRAccessKeyRestConstants.PERMISSION_MANAGE_ACCESS_KEY)
     @MCRRestAccessCheck(strategy = MCRAccessKeyRestAccessCheckStrategy.class)
     public MCRAccessKeyDto findAccessKey(
-        @Parameter(in = ParameterIn.PATH, description = MCRRestDescription.ACCESS_KEY_ID, required = true,
+        @Parameter(in = ParameterIn.PATH, description = DESCRIPTION_ACCESS_KEY_ID, required = true,
             schema = @Schema(type = MCRRestSchemaType.STRING, implementation = UUID.class))
         @PathParam(MCRAccessKeyRestConstants.PATH_PARAM_ACCESS_KEY_ID) UUID id) {
         return MCRAccessKeyRestHelper.findAccessKey(id);
@@ -213,7 +214,7 @@ public class MCRAccessKeyRestResource {
     @MCRRestAccessCheck(strategy = MCRAccessKeyRestAccessCheckStrategy.class)
     @MCRRequireTransaction
     public Response updateAccessKey(
-        @Parameter(in = ParameterIn.PATH, description = MCRRestDescription.ACCESS_KEY_ID, required = true,
+        @Parameter(in = ParameterIn.PATH, description = DESCRIPTION_ACCESS_KEY_ID, required = true,
             schema = @Schema(type = MCRRestSchemaType.STRING, implementation = UUID.class))
         @PathParam(MCRAccessKeyRestConstants.PATH_PARAM_ACCESS_KEY_ID) UUID id,
         @RequestBody(content = @Content(mediaType = MediaType.APPLICATION_JSON,
@@ -246,7 +247,7 @@ public class MCRAccessKeyRestResource {
     @MCRRestAccessCheck(strategy = MCRAccessKeyRestAccessCheckStrategy.class)
     @MCRRequireTransaction
     public Response partialUpdateAccessKey(
-        @Parameter(in = ParameterIn.PATH, description = MCRRestDescription.ACCESS_KEY_ID, required = true,
+        @Parameter(in = ParameterIn.PATH, description = DESCRIPTION_ACCESS_KEY_ID, required = true,
             schema = @Schema(type = MCRRestSchemaType.STRING, implementation = UUID.class))
         @PathParam(MCRAccessKeyRestConstants.PATH_PARAM_ACCESS_KEY_ID) UUID id,
         @RequestBody(content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(
@@ -274,7 +275,7 @@ public class MCRAccessKeyRestResource {
     @MCRRestAccessCheck(strategy = MCRAccessKeyRestAccessCheckStrategy.class)
     @MCRRequireTransaction
     public Response removeAccessKey(
-        @Parameter(in = ParameterIn.PATH, description = MCRRestDescription.ACCESS_KEY_ID, required = true,
+        @Parameter(in = ParameterIn.PATH, description = DESCRIPTION_ACCESS_KEY_ID, required = true,
             schema = @Schema(type = MCRRestSchemaType.STRING, implementation = UUID.class))
         @PathParam(MCRAccessKeyRestConstants.PATH_PARAM_ACCESS_KEY_ID) UUID id) {
         return MCRAccessKeyRestHelper.removeAccessKey(id);

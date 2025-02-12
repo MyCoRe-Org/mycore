@@ -35,7 +35,7 @@ import org.mycore.datamodel.niofs.MCRPath;
 
 public class MCRMetaDerivateLink extends MCRMetaLink {
 
-    private static final String ANNOTATION_ELEMENT = "annotation";
+    private static final String ELEMENT_ANNOTATION = "annotation";
 
     private static final String ATTRIBUTE_LANG = MCRXMLConstants.LANG;
 
@@ -72,7 +72,7 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
     @Override
     public void setFromDOM(Element element) throws MCRException {
         super.setFromDOM(element);
-        List<Element> childrenList = element.getChildren(ANNOTATION_ELEMENT);
+        List<Element> childrenList = element.getChildren(ELEMENT_ANNOTATION);
         if (childrenList == null) {
             return;
         }
@@ -89,7 +89,7 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
         Element elm = super.createXML();
 
         for (String key : map.keySet()) {
-            Element annotationElem = new Element(ANNOTATION_ELEMENT);
+            Element annotationElem = new Element(ELEMENT_ANNOTATION);
             annotationElem.setAttribute(ATTRIBUTE_LANG, key, Namespace.XML_NAMESPACE);
             String content = map.get(key);
             if (content == null || content.isEmpty()) {
