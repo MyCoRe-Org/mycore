@@ -166,11 +166,11 @@ public class MCRRealmFactory {
 
     private static Document getRealms() throws JDOMException, TransformerException, IOException {
         if (realmsFile == null) {
-            return MCRSourceContent.getInstance(realmsURI.toASCIIString()).asXML();
+            return MCRSourceContent.createInstanceOf(realmsURI.toASCIIString()).asXML();
         }
         if (!realmsFile.exists() || realmsFile.length() == 0) {
             LOGGER.info("Creating {}...", realmsFile::getAbsolutePath);
-            MCRSourceContent realmsContent = MCRSourceContent.getInstance(RESOURCE_REALMS_URI);
+            MCRSourceContent realmsContent = MCRSourceContent.createInstanceOf(RESOURCE_REALMS_URI);
             realmsContent.sendTo(realmsFile);
         }
         updateLastModified();

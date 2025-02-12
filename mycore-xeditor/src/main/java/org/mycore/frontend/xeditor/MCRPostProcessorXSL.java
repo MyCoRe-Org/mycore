@@ -82,7 +82,7 @@ public class MCRPostProcessorXSL implements MCRXEditorPostProcessor {
 
         final String xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
         MCRContent source = new MCRJDOMContent(xml);
-        MCRContent transformed = MCRXSL2XMLTransformer.getInstance(factoryClass, xslFolder + "/" + stylesheet)
+        MCRContent transformed = MCRXSL2XMLTransformer.getInstanceOf(factoryClass, xslFolder + "/" + stylesheet)
             .transform(source);
         MCRContent normalized = new MCRNormalizeUnicodeTransformer().transform(transformed);
         return normalized.asXML();

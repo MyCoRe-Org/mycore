@@ -148,7 +148,7 @@ public class MCRFileSystemProvider extends MCRAbstractFileSystemProvider {
         MCRPath mcrPath = MCRFileSystemUtils.checkPathAbsolute(dir);
         MCRStoredNode node = MCRFileSystemUtils.resolvePath(mcrPath);
         if (node instanceof MCRDirectory mcrDirectory) {
-            return MCRDirectoryStreamHelper.getInstance(mcrDirectory, mcrPath);
+            return MCRDirectoryStreamHelper.createInstanceOf(mcrDirectory, mcrPath);
         }
         throw new NotDirectoryException(dir.toString());
     }

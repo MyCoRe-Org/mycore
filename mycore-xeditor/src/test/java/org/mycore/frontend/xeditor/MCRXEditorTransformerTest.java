@@ -74,10 +74,10 @@ public class MCRXEditorTransformerTest extends MCRTestCase {
             pc.setParameter("input", editedXMLFile);
         }
 
-        MCRContent input = MCRSourceContent.getInstance("resource:" + inputFile);
+        MCRContent input = MCRSourceContent.createInstanceOf("resource:" + inputFile);
         MCRContent transformed = new MCRXEditorTransformer(session, pc).transform(input);
 
-        Document expected = MCRSourceContent.getInstance("resource:" + expectedOutputFile).asXML();
+        Document expected = MCRSourceContent.createInstanceOf("resource:" + expectedOutputFile).asXML();
 
         MCRBinding binding = new MCRBinding("//input[@type='hidden'][@name='_xed_session']/@value", true,
             new MCRBinding(expected));

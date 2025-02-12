@@ -298,7 +298,7 @@ public class MCRMigrationCommands {
             return;
         }
 
-        final MCRXSLTransformer transformer = MCRXSLTransformer.getInstance("xsl/mets-translation-migration.xsl");
+        final MCRXSLTransformer transformer = MCRXSLTransformer.getInstanceOf("xsl/mets-translation-migration.xsl");
 
         final Document xml;
 

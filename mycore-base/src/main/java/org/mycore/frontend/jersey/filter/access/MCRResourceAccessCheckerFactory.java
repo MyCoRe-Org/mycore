@@ -26,21 +26,32 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  */
 public class MCRResourceAccessCheckerFactory {
-    private static Map<Class<? extends MCRResourceAccessChecker>, MCRResourceAccessChecker> implMap;
+
+    private static final Map<Class<? extends MCRResourceAccessChecker>, MCRResourceAccessChecker> IMPL_MAP;
+
     static {
-        //static block as code style requires 120 character line width
-        implMap = new ConcurrentHashMap<>();
+        IMPL_MAP = new ConcurrentHashMap<>();
     }
 
+    /**
+     * @deprecated Use {@link #getInstanceOf(Class)} instead.
+     */
+    @Deprecated
+    @SuppressWarnings("PMD.SingletonClassReturningNewInstance")
     public static <T extends MCRResourceAccessChecker> T getInstance(Class<T> clazz)
         throws ReflectiveOperationException {
+        return getInstanceOf(clazz);
+    }
+
+    public static <T extends MCRResourceAccessChecker> T getInstanceOf(Class<T> clazz)
+        throws ReflectiveOperationException {
         @SuppressWarnings("unchecked")
-        T accessChecker = (T) implMap.get(clazz);
+        T accessChecker = (T) IMPL_MAP.get(clazz);
         if (accessChecker != null) {
             return accessChecker;
         }
         accessChecker = clazz.getDeclaredConstructor().newInstance();
-        implMap.put(clazz, accessChecker);
+        IMPL_MAP.put(clazz, accessChecker);
         return accessChecker;
     }
 

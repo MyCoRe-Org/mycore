@@ -66,13 +66,13 @@ class MCRDirectoryStreamHelper {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    static DirectoryStream<Path> getInstance(MCRDirectory dir, MCRPath path) throws IOException {
+    static DirectoryStream<Path> createInstanceOf(MCRDirectory dir, MCRPath path) throws IOException {
         DirectoryStream.Filter<Path> filter = (dir instanceof MCRFileCollection) ? MCRFileCollectionFilter.FILTER
             : AcceptAllFilter.FILTER;
         LOGGER.debug("Dir {}, class {}, filter {}", () -> path, dir::getClass, filter::getClass);
         DirectoryStream<Path> baseDirectoryStream = Files.newDirectoryStream(dir.getLocalPath(), filter);
         LOGGER.debug("baseStream {}", baseDirectoryStream::getClass);
-        if (baseDirectoryStream instanceof SecureDirectoryStream secureDirectoryStream) {
+        if (baseDirectoryStream instanceof SecureDirectoryStream<Path> secureDirectoryStream) {
             LOGGER.debug("Returning SecureDirectoryStream");
             return new MCRSecureDirectoryStream(dir, path, secureDirectoryStream);
         }
@@ -149,7 +149,7 @@ class MCRDirectoryStreamHelper {
                 throw new NotDirectoryException(nodeByPath.getPath());
             }
             MCRDirectory newDir = (MCRDirectory) nodeByPath;
-            return (SecureDirectoryStream<Path>) getInstance(newDir, getCurrentSecurePath(newDir));
+            return (SecureDirectoryStream<Path>) createInstanceOf(newDir, getCurrentSecurePath(newDir));
         }
 
         private MCRStoredNode resolve(Path path) {

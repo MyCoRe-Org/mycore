@@ -47,7 +47,16 @@ public abstract class MCRIIIFImageImpl {
         this.implName = implName;
     }
 
+    /**
+     * @deprecated Use {@link #getInstanceOf(String)} instead.
+     */
+    @Deprecated
+    @SuppressWarnings("PMD.SingletonClassReturningNewInstance")
     public static synchronized MCRIIIFImageImpl getInstance(String implNameParameter) {
+        return getInstanceOf(implNameParameter);
+    }
+
+    public static synchronized MCRIIIFImageImpl getInstanceOf(String implNameParameter) {
         String implName = (implNameParameter == null || implNameParameter.isBlank())
             ? MCRConfiguration2.getStringOrThrow("MCR.IIIFImage.Default")
             : implNameParameter;

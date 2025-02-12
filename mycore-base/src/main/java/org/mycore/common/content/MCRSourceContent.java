@@ -47,9 +47,10 @@ import jakarta.xml.bind.util.JAXBSource;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRSourceContent extends MCRWrappedContent {
+
     private static final MCRURIResolver URI_RESOLVER = MCRURIResolver.instance();
 
-    private Source source;
+    private final Source source;
 
     public MCRSourceContent(Source source) {
         Objects.requireNonNull(source, "Source cannot be null");
@@ -121,12 +122,24 @@ public class MCRSourceContent extends MCRWrappedContent {
     }
 
     /**
-     * Build instance of MCRSourceContent by resolving via {@link MCRURIResolver}
-     * 
+     * @deprecated Use {@link #createInstanceOf(String)} instead.
+     *
      * @throws TransformerException
      *             thrown by {@link MCRURIResolver#resolve(String, String)}
      */
+    @Deprecated
+    @SuppressWarnings("PMD.SingletonClassReturningNewInstance")
     public static MCRSourceContent getInstance(String uri) throws TransformerException {
+        return createInstanceOf(uri);
+    }
+
+    /**
+     * Build instance of MCRSourceContent by resolving via {@link MCRURIResolver}
+     *
+     * @throws TransformerException
+     *             thrown by {@link MCRURIResolver#resolve(String, String)}
+     */
+    public static MCRSourceContent createInstanceOf(String uri) throws TransformerException {
         Source source = URI_RESOLVER.resolve(uri, null);
         if (source == null) {
             return null;

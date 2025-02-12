@@ -85,7 +85,7 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
         public Resource getResource(URI uri) throws IOException {
             MCRContent content;
             try {
-                content = MCRSourceContent.getInstance(uri.toString());
+                content = MCRSourceContent.createInstanceOf(uri.toString());
                 return new Resource(uri.getScheme(), content.getInputStream());
             } catch (TransformerException e) {
                 LOGGER.error("Error while resolving uri: {}", uri);
@@ -149,7 +149,7 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
             .map(impl -> TransformerFactory.newInstance(impl, MCRClassTools.getClassLoader()))
             .orElseGet(TransformerFactory::newInstance);
         transformerFactory.setURIResolver(MCRURIResolver.instance());
-        transformerFactory.setErrorListener(MCRErrorListener.getInstance());
+        transformerFactory.setErrorListener(MCRErrorListener.createInstance());
         return transformerFactory;
     }
 

@@ -392,7 +392,7 @@ public final class MCRURIResolver implements URIResolver {
         }
         MCRSourceContent content;
         try {
-            content = MCRSourceContent.getInstance(uri);
+            content = MCRSourceContent.createInstanceOf(uri);
             return content == null ? null : content.asXML().getRootElement().detach();
         } catch (Exception e) {
             throw new MCRException("Error while resolving " + uri, e);
@@ -1143,7 +1143,7 @@ public final class MCRURIResolver implements URIResolver {
 
                 // prepare transformer
                 String[] stylesheets = augmentStylesheetsPaths(stylesheetPaths.split(","), flavor.xslFolder);
-                MCRXSLTransformer transformer = MCRXSLTransformer.getInstance(flavor.transformerFactory, stylesheets);
+                MCRXSLTransformer transformer = MCRXSLTransformer.getInstanceOf(flavor.transformerFactory, stylesheets);
 
                 //prepare parameter collector
                 MCRParameterCollector parameterCollector = MCRParameterCollector.getInstanceFromUserSession();

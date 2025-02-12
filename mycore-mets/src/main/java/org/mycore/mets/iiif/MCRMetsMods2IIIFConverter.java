@@ -148,7 +148,7 @@ public class MCRMetsMods2IIIFConverter {
         MCRIIIFSequence sequence = new MCRIIIFSequence(id);
 
         List<PhysicalSubDiv> children = physicalDivContainer.getChildren();
-        MCRIIIFImageImpl imageImpl = MCRIIIFImageImpl.getInstance(getImageImplName());
+        MCRIIIFImageImpl imageImpl = MCRIIIFImageImpl.getInstanceOf(getImageImplName());
         MCRIIIFImageProfile profile = imageImpl.getProfile();
         profile.setId(MCRIIIFImageUtil.getProfileLink(imageImpl));
         sequence.canvases = children.stream().map(physicalSubDiv -> {

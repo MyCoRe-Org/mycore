@@ -42,7 +42,7 @@ public class MCRORCIDClientFactory {
     private static final String READ_PUBLIC_TOKEN = MCRConfiguration2.getString(CONFIG_PREFIX + "ReadPublicToken")
         .orElse(null);
 
-    private static Map<String, MCRORCIDClientFactory> factories = new HashMap<>();
+    private static final Map<String, MCRORCIDClientFactory> FACTORIES = new HashMap<>();
 
     private final String publicAPI;
 
@@ -69,19 +69,28 @@ public class MCRORCIDClientFactory {
     }
 
     /**
+     * @deprecated Use {@link #getInstanceOf(String)} instead.
+     */
+    @Deprecated
+    @SuppressWarnings("PMD.SingletonClassReturningNewInstance")
+    public static MCRORCIDClientFactory getInstance(String version) {
+        return getInstanceOf(version);
+    }
+
+    /**
      * Returns an instance of a factory for a version.
      *
      * @param version the version
      * @return MCRORCIDClientFactory
      * @throws MCRConfigurationException if factory cannot be initialized
      */
-    public static MCRORCIDClientFactory getInstance(String version) {
+    public static MCRORCIDClientFactory getInstanceOf(String version) {
         MCRORCIDClientFactory factory = null;
-        if (factories.containsKey(version)) {
-            factory = factories.get(version);
+        if (FACTORIES.containsKey(version)) {
+            factory = FACTORIES.get(version);
         } else {
             factory = new MCRORCIDClientFactory(version);
-            factories.put(version, factory);
+            FACTORIES.put(version, factory);
         }
         return factory;
     }
