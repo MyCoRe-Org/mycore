@@ -23,6 +23,7 @@ import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.util.Properties;
 
 import org.jdom2.Document;
@@ -47,7 +48,8 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRUpdateDerivateServlet extends MCRPersistenceServlet {
 
-    private static final long serialVersionUID = -8005685456830013040L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Override
     void handlePersistenceOperation(HttpServletRequest request, HttpServletResponse response) throws MCRAccessException,

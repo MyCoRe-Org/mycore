@@ -19,6 +19,7 @@
 package org.mycore.pi.urn.rest;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
@@ -344,6 +345,7 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
 
     public static class MCRPICreationException extends RuntimeException {
 
+        @Serial
         private static final long serialVersionUID = 1L;
 
         public MCRPICreationException(String message, Throwable cause) {

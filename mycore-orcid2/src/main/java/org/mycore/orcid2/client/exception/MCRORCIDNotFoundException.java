@@ -20,11 +20,14 @@ package org.mycore.orcid2.client.exception;
 
 import jakarta.ws.rs.core.Response;
 
+import java.io.Serial;
+
 /**
  * This class is used if a resource was not found
  */
 public class MCRORCIDNotFoundException extends MCRORCIDRequestException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

@@ -20,6 +20,8 @@ package org.mycore.common.config;
 
 import org.mycore.common.MCRException;
 
+import java.io.Serial;
+
 /**
  * Instances of this class represent an exception thrown because of an error in the MyCoRe configuration. Normally this
  * will be the case when a configuration property that is required is not set or has an illegal value.
@@ -29,6 +31,7 @@ import org.mycore.common.MCRException;
  */
 public class MCRConfigurationException extends MCRException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

@@ -18,10 +18,12 @@
 
 package org.mycore.pi.exceptions;
 
+import java.io.Serial;
 import java.util.Locale;
 
 public class MCRInvalidIdentifierExeption extends MCRPersistentIdentifierException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public MCRInvalidIdentifierExeption(String idString, String type) {

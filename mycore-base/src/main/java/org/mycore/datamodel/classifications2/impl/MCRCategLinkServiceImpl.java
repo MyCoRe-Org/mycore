@@ -27,6 +27,7 @@ import static org.mycore.datamodel.classifications2.impl.MCRCategoryQueryParamet
 import static org.mycore.datamodel.classifications2.impl.MCRCategoryQueryParameter.ROOT_ID;
 import static org.mycore.datamodel.classifications2.impl.MCRCategoryQueryParameter.TYPE;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -293,6 +294,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     private Map<MCRCategoryID, Boolean> hasLinksForClassifications() {
         Map<MCRCategoryID, Boolean> boolMap = new HashMap<>() {
+            @Serial
             private static final long serialVersionUID = 1L;
 
             @Override

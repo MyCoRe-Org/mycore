@@ -18,11 +18,14 @@
 
 package org.mycore.orcid2.exception;
 
+import java.io.Serial;
+
 /**
  * This exception concerns errors when transforming.
  */
 public class MCRORCIDTransformationException extends MCRORCIDException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

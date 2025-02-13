@@ -35,6 +35,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.io.Serial;
+
 /**
  * Login user with JA-SIG Central Authentication Service (CAS).
  * The servlet validates the ticket returned from CAS and
@@ -63,6 +65,8 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author Frank L\u00fctzenkirchen
  */
 public class MCRCASServlet extends MCRServlet {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /** The logger */

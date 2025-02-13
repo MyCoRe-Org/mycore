@@ -19,6 +19,8 @@ package org.mycore.validation.pdfa;
 
 import org.mycore.common.MCRCatchException;
 
+import java.io.Serial;
+
 /**
  *
  *
@@ -26,6 +28,7 @@ import org.mycore.common.MCRCatchException;
  */
 public class MCRPDFAValidationException extends MCRCatchException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public MCRPDFAValidationException(String message, Throwable cause) {

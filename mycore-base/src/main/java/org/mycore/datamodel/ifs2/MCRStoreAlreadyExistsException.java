@@ -18,8 +18,11 @@
 
 package org.mycore.datamodel.ifs2;
 
+import java.io.Serial;
+
 public class MCRStoreAlreadyExistsException extends Exception {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public MCRStoreAlreadyExistsException(String msg) {

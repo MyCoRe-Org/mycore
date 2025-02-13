@@ -18,6 +18,7 @@
 
 package org.mycore.frontend.servlets;
 
+import java.io.Serial;
 import java.net.URI;
 import java.util.Map;
 import java.util.Set;
@@ -39,6 +40,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRLockServlet extends MCRServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final String OBJECT_ID_KEY = MCRLockServlet.class.getCanonicalName() + ".MCRObjectID";

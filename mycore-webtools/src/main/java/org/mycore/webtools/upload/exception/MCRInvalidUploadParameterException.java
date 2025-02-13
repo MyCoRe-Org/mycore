@@ -20,11 +20,14 @@ package org.mycore.webtools.upload.exception;
 
 import org.mycore.services.i18n.MCRTranslation;
 
+import java.io.Serial;
+
 /**
  * Should be thrown if a parameter required by an upload handler is not valid. E.g. a classification does not exist.
  */
 public class MCRInvalidUploadParameterException extends MCRUploadException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String parameterName;

@@ -19,6 +19,7 @@
 package org.mycore.frontend.servlets.persistence;
 
 import java.io.IOException;
+import java.io.Serial;
 
 import org.mycore.access.MCRAccessException;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -34,7 +35,8 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRDeleteDerivateServlet extends MCRPersistenceServlet {
 
-    private static final long serialVersionUID = 1581063299429224344L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Override
     void handlePersistenceOperation(HttpServletRequest request, HttpServletResponse response)

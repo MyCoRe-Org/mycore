@@ -18,6 +18,7 @@
 
 package org.mycore.frontend.servlets;
 
+import java.io.Serial;
 import java.util.Arrays;
 
 import org.mycore.common.MCRSession;
@@ -34,6 +35,7 @@ import org.mycore.services.i18n.MCRTranslation;
  */
 public class MCRContainerLoginFormServlet extends MCRServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final String LOGIN_ATTR = MCRContainerLoginFormServlet.class.getCanonicalName();

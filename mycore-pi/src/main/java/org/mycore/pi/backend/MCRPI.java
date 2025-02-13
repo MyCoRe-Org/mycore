@@ -90,7 +90,7 @@ import jakarta.persistence.UniqueConstraint;
 public class MCRPI implements org.mycore.pi.MCRPIRegistrationInfo {
 
     @Serial
-    private static final long serialVersionUID = 234168232792525611L;
+    private static final long serialVersionUID = 1L;
 
     // unique constraint für identifier type
     @Id

@@ -20,11 +20,14 @@ package org.mycore.webtools.upload.exception;
 
 import org.mycore.services.i18n.MCRTranslation;
 
+import java.io.Serial;
+
 /**
  * Should be thrown if the file is not valid. E.g. the size is too big or the file name contains invalid characters.
  */
 public class MCRInvalidFileException extends MCRUploadException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String fileName;

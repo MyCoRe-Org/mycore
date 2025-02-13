@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.Serial;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -86,9 +87,10 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRSolrProxyServlet extends MCRServlet {
 
-    private static final Logger LOGGER = LogManager.getLogger();
-
+    @Serial
     private static final long serialVersionUID = 1L;
+    
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * Attribute key to store Query parameters as <code>Map&lt;String, String[]&gt;</code> for SOLR. This takes

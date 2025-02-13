@@ -34,10 +34,14 @@ import org.mycore.frontend.MCRFrontendUtil;
 
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.io.Serial;
+
 /**
  * @author shermann
  */
 public class MCRDisplayHideDerivateServlet extends MCRServlet {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger(MCRDisplayHideDerivateServlet.class);

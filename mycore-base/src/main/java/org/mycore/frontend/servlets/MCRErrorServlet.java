@@ -19,6 +19,7 @@
 package org.mycore.frontend.servlets;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Objects;
@@ -53,6 +54,7 @@ import jakarta.servlet.http.HttpSession;
  */
 public class MCRErrorServlet extends HttpServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger(MCRErrorServlet.class);

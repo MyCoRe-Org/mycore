@@ -19,6 +19,7 @@
 package org.mycore.common;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -87,6 +88,9 @@ import jakarta.xml.bind.annotation.XmlValue;
  */
 public class MCRMailer extends MCRServlet {
 
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     private static final Logger LOGGER = LogManager.getLogger(MCRMailer.class);
 
     private static final String DELIMITER = "\n--------------------------------------\n";
@@ -97,8 +101,6 @@ public class MCRMailer extends MCRServlet {
 
     /** How often should MCRMailer try to send mail? */
     protected static int numTries;
-
-    private static final long serialVersionUID = 1L;
 
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {

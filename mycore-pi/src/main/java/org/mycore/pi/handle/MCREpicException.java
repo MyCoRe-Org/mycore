@@ -20,8 +20,11 @@ package org.mycore.pi.handle;
 
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
+import java.io.Serial;
+
 public class MCREpicException extends MCRPersistentIdentifierException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public MCREpicException(String message) {

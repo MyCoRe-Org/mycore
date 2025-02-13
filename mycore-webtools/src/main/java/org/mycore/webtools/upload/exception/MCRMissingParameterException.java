@@ -18,11 +18,14 @@
 
 package org.mycore.webtools.upload.exception;
 
+import java.io.Serial;
+
 /**
  * Should be thrown if a parameter required by an upload handler is missing.
  */
 public class MCRMissingParameterException extends MCRUploadException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String parameterName;

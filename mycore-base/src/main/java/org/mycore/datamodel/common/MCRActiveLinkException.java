@@ -18,6 +18,7 @@
 
 package org.mycore.datamodel.common;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,6 +37,7 @@ import org.mycore.common.MCRCatchException;
  */
 public class MCRActiveLinkException extends MCRCatchException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     Map<String, Collection<String>> linkTable = new ConcurrentHashMap<>();

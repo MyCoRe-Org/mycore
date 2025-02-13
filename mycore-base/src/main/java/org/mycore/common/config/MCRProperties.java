@@ -20,6 +20,7 @@ package org.mycore.common.config;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Serial;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.Collections;
@@ -53,7 +54,8 @@ import org.apache.logging.log4j.LogManager;
  */
 public class MCRProperties extends Properties {
 
-    private static final long serialVersionUID = 8801587133852810123L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Override
     public synchronized Object put(Object key, Object value) {

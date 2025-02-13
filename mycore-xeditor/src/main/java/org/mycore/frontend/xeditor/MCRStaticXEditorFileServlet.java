@@ -19,6 +19,7 @@
 package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashSet;
@@ -42,6 +43,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /** XML document types that may contain editor forms */
