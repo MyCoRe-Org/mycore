@@ -18,6 +18,7 @@
 
 package org.mycore.frontend.servlets;
 
+import java.io.Serial;
 import java.security.Principal;
 import java.util.Optional;
 
@@ -37,6 +38,7 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 public class MCRContainerLoginServlet extends MCRServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger(MCRContainerLoginServlet.class);

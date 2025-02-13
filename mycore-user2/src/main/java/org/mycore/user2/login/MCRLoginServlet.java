@@ -19,6 +19,7 @@
 package org.mycore.user2.login;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -68,13 +69,16 @@ import jakarta.xml.bind.JAXBException;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRLoginServlet extends MCRServlet {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     protected static final String REALM_URL_PARAMETER = "realm";
 
     static final String HTTPS_ONLY_PROPERTY = MCRUser2Constants.CONFIG_PREFIX + "LoginHttpsOnly";
     protected static final boolean LOCAL_LOGIN_SECURE_ONLY = MCRConfiguration2
         .getOrThrow(HTTPS_ONLY_PROPERTY, Boolean::parseBoolean);
     static final String ALLOWED_ROLES_PROPERTY = MCRUser2Constants.CONFIG_PREFIX + "LoginAllowedRoles";
-    private static final long serialVersionUID = 1L;
     private static final String LOGIN_REDIRECT_URL_PARAMETER = "url";
     private static final String LOGIN_REDIRECT_URL_KEY = "loginRedirectURL";
     private static final List<String> ALLOWED_ROLES = MCRConfiguration2

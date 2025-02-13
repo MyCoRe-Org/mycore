@@ -20,6 +20,7 @@ package org.mycore.datamodel.ifs2;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serial;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -370,6 +371,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
     }
 
     private static final class LastRevisionFoundException extends RuntimeException {
+        @Serial
         private static final long serialVersionUID = 1L;
     }
 

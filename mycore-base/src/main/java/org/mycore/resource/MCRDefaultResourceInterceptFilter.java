@@ -19,6 +19,7 @@
 package org.mycore.resource;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.util.Enumeration;
 
 import org.apache.logging.log4j.LogManager;
@@ -55,6 +56,9 @@ import jakarta.servlet.http.HttpServletResponse;
  * found by a deviating resource lookup strategy, specifically {@link MCRResourceResolver#resolveWebResource(String)}.
  */
 public final class MCRDefaultResourceInterceptFilter extends HttpFilter {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger();
 

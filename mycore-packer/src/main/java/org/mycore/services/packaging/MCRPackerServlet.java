@@ -19,6 +19,7 @@
 package org.mycore.services.packaging;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -41,6 +42,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRPackerServlet extends MCRServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger();

@@ -20,10 +20,15 @@ package org.mycore.common.digest;
 
 import org.mycore.common.MCRException;
 
+import java.io.Serial;
+
 /**
  * Exception thrown when an error occurs in digest validation.
  */
 public class MCRDigestValidationException extends MCRException {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * Constructs a new digest validation exception with the specified detail message.

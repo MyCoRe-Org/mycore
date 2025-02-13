@@ -19,6 +19,7 @@
 package org.mycore.frontend.servlets;
 
 import java.io.IOException;
+import java.io.Serial;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,6 +37,7 @@ import jakarta.servlet.http.HttpSession;
  */
 public class MCRLogoutServlet extends HttpServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final String LOGOUT_REDIRECT_URL_PARAMETER = "url";

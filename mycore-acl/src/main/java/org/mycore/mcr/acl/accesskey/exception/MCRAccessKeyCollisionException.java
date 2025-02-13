@@ -18,12 +18,15 @@
 
 package org.mycore.mcr.acl.accesskey.exception;
 
+import java.io.Serial;
+
 /**
  * Exception that refers to a collision of access keys.
  * This refers to secret duplicates.
  */
 public class MCRAccessKeyCollisionException extends MCRAccessKeyException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public MCRAccessKeyCollisionException(String errorMessage) {

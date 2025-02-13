@@ -70,7 +70,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class MCRThumbnailServlet extends MCRServlet {
 
     @Serial
-    private static final long serialVersionUID = 1506443527774956290L;
+    private static final long serialVersionUID = 1L;
 
     //stores max png size for byte array buffer of output
     private transient AtomicInteger maxPngSize = new AtomicInteger(64 * 1024);

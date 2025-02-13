@@ -20,6 +20,8 @@ package org.mycore.pandoc;
 
 import org.mycore.common.MCRException;
 
+import java.io.Serial;
+
 /**
  * Pandoc exception
  *
@@ -27,6 +29,7 @@ import org.mycore.common.MCRException;
  */
 public class MCRPandocException extends MCRException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

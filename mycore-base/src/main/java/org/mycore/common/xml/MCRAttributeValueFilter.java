@@ -21,10 +21,14 @@ import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.filter.ElementFilter;
 
+import java.io.Serial;
+
 /**
  * A jdom-filter which compares attribute values.
  */
 public class MCRAttributeValueFilter extends ElementFilter {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     protected String attrKey;

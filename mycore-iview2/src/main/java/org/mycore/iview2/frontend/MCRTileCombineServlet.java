@@ -72,7 +72,7 @@ public class MCRTileCombineServlet extends MCRServlet {
     protected static final String THUMBNAIL_KEY = MCRTileCombineServlet.class.getName() + ".thumb";
 
     @Serial
-    private static final long serialVersionUID = 7924934677622546958L;
+    private static final long serialVersionUID = 1L;
 
     private static final float QUALITY = 0.75f;
 

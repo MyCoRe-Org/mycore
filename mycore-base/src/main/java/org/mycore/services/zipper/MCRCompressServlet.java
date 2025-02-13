@@ -24,6 +24,7 @@ import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Serial;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -80,6 +81,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final String KEY_OBJECT_ID = MCRCompressServlet.class.getCanonicalName() + ".object";

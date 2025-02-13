@@ -21,6 +21,7 @@ package org.mycore.frontend.servlets;
 import static org.mycore.frontend.MCRFrontendUtil.BASE_URL_ATTRIBUTE;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -78,6 +79,7 @@ public class MCRServlet extends HttpServlet {
 
     public static final String INITIAL_SERVLET_NAME_KEY = "currentServletName";
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger();

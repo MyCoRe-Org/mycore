@@ -19,6 +19,7 @@
 package org.mycore.mcr.acl.accesskey.dto.util;
 
 import java.io.IOException;
+import java.io.Serial;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -40,6 +41,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
  */
 public class MCRNullableDeserializer<T> extends StdDeserializer<MCRNullable<T>> implements ContextualDeserializer {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

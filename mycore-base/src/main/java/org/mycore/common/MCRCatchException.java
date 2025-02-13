@@ -18,6 +18,8 @@
 
 package org.mycore.common;
 
+import java.io.Serial;
+
 /**
  * Instances of this class represent a general exception thrown by any part of
  * the MyCoRe implementation classes.
@@ -31,9 +33,12 @@ package org.mycore.common;
  * @see java.lang.Exception
  */
 public class MCRCatchException extends Exception {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     /** Counter to prevent a recursion between getStackTrace() and toString() */
     private int toStringInvocationCounter;
-    private static final long serialVersionUID = -2244850451757768863L;
 
     /**
      * Creates a new MCRCatchException with an error message

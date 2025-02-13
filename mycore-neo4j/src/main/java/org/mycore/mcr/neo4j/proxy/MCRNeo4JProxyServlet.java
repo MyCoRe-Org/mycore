@@ -23,6 +23,7 @@ import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JConstant
 import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_CONFIG_PREFIX;
 import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JUtil.getClassificationLabel;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -56,6 +57,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class MCRNeo4JProxyServlet extends MCRServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger();

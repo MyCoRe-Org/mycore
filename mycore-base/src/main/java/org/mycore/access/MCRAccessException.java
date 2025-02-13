@@ -28,7 +28,7 @@ import org.mycore.common.MCRCatchException;
 public final class MCRAccessException extends MCRCatchException {
 
     @Serial
-    private static final long serialVersionUID = 6494399676882465653L;
+    private static final long serialVersionUID = 1L;
 
     private final String action;
 

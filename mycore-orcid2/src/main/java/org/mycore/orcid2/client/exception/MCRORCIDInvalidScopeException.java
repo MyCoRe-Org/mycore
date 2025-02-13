@@ -20,11 +20,14 @@ package org.mycore.orcid2.client.exception;
 
 import org.mycore.orcid2.exception.MCRORCIDException;
 
+import java.io.Serial;
+
 /**
  * This class is used if a scope is invalid.
  */
 public class MCRORCIDInvalidScopeException extends MCRORCIDException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

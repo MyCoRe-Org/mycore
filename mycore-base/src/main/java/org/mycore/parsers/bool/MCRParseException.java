@@ -20,8 +20,11 @@ package org.mycore.parsers.bool;
 
 import org.mycore.common.MCRException;
 
+import java.io.Serial;
+
 public class MCRParseException extends MCRException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public MCRParseException(String text) {

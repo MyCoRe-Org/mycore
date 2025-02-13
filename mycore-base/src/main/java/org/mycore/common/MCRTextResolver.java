@@ -18,6 +18,7 @@
 
 package org.mycore.common;
 
+import java.io.Serial;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -707,7 +708,8 @@ public class MCRTextResolver {
 
     protected static class CircularDependencyExecption extends RuntimeException {
 
-        private static final long serialVersionUID = -2448797538275144448L;
+        @Serial
+        private static final long serialVersionUID = 1L;
 
         private List<String> dependencyList;
 
