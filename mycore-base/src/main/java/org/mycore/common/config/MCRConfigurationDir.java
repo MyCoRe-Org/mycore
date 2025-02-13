@@ -24,6 +24,8 @@ import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.util.Locale;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRUtils;
 
 import jakarta.servlet.ServletContext;
@@ -75,6 +77,8 @@ import jakarta.servlet.ServletContext;
  */
 public class MCRConfigurationDir {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
     public static final String DISABLE_CONFIG_DIR_PROPERTY = "MCR.DisableConfigDir";
 
     public static final String CONFIGURATION_DIRECTORY_PROPERTY = "MCR.ConfigDir";
@@ -111,7 +115,7 @@ public class MCRConfigurationDir {
         ProtectionDomain protectionDomain = clazz.getProtectionDomain();
         CodeSource codeSource = protectionDomain.getCodeSource();
         if (codeSource == null) {
-            System.err.println("Cannot get CodeSource.");
+            LOGGER.error(() -> "Cannot get CodeSource for class " + clazz.getSimpleName());
             return null;
         }
         URL location = codeSource.getLocation();

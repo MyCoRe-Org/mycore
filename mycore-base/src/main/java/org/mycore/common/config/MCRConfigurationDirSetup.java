@@ -32,12 +32,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.status.StatusLogger;
 import org.apache.logging.log4j.web.Log4jServletContainerInitializer;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRSessionMgr;
@@ -50,14 +48,13 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 
 /**
- * Called by {@link MCRStartupHandler} on start up to setup {@link MCRConfiguration2}.
+ * Called by {@link MCRStartupHandler} on start up to set up {@link MCRConfiguration2}.
  *
  * @author Thomas Scheffler (yagee)
  * @since 2013.12
  */
+@SuppressWarnings("PMD.SystemPrintln")
 public class MCRConfigurationDirSetup implements AutoExecutable {
-
-    private static final StatusLogger LOGGER = StatusLogger.getLogger();
 
     public static void loadExternalLibs() {
         File resourceDir = MCRConfigurationDir.getConfigFile("resources");
@@ -71,13 +68,12 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
             .map(URLClassLoader.class::cast)
             .findFirst();
         if (classLoaderOptional.isEmpty()) {
-            System.err
-                .println(classLoaderOptional.getClass() + " is unsupported for adding extending CLASSPATH at runtime.");
+            System.err.println("No suitable URLClassLoader found for extending CLASSPATH at runtime.");
             return;
         }
         File libDir = MCRConfigurationDir.getConfigFile("lib");
         URLClassLoader urlClassLoader = classLoaderOptional.get();
-        List<URL> currentCPElements = Stream.of(urlClassLoader.getURLs()).collect(Collectors.toList());
+        List<URL> currentCPElements = Stream.of(urlClassLoader.getURLs()).toList();
         Class<? extends ClassLoader> classLoaderClass = urlClassLoader.getClass();
         try {
             BiConsumer<ClassLoader, URL> addUrlMethod = addToClassPath(classLoaderClass);
@@ -97,8 +93,8 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
                 .peek(u -> System.out.println("Adding to CLASSPATH: " + u))
                 .forEach(url -> addUrlMethod.accept(urlClassLoader, url));
         } catch (InaccessibleObjectException | ReflectiveOperationException | SecurityException e) {
-            LogManager.getLogger(MCRConfigurationInputStream.class)
-                .warn("{} does not support adding additional JARs at runtime", classLoaderClass, e);
+            System.err.println(classLoaderClass + " does not support adding additional JARs at runtime");
+            e.printStackTrace(System.err);
         }
     }
 
@@ -128,7 +124,8 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
             try {
                 finalMethod.invoke(cl, finalArgumentMapper.apply(url));
             } catch (IllegalAccessException | InvocationTargetException e) {
-                LOGGER.error("Could not add {} to current classloader.", url, e);
+                System.err.println("Could not add " + url + " to current classloader.");
+                e.printStackTrace(System.err);
             }
         };
     }
@@ -213,4 +210,5 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
             logCtx.getConfiguration().getConfigurationSource().getLocation());
         MCRSessionMgr.addSessionListener(new MCRSessionThreadContext());
     }
+
 }

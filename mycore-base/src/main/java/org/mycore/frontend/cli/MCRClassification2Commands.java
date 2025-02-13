@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -101,16 +100,16 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @param classID classification ID
      */
     @MCRCommand(syntax = "count classification children of {0}",
-        help = "The command count the categoies of the classification with MCRObjectID {0} in the system.",
+        help = "The command count the categories of the classification with MCRObjectID {0} in the system.",
         order = 80)
     public static void countChildren(String classID) {
         MCRCategory category = DAO.getCategory(MCRCategoryID.rootID(classID), 1);
-        System.out.printf(Locale.ROOT, "%s has %d children", category.getId(), category.getChildren().size());
+        LOGGER.info(() -> category.getId() + " has " + category.getChildren().size() + " children");
     }
 
     /**
      * Adds a classification.
-     *
+     * <p>
      * Classification is built from a file.
      *
      * @param filename

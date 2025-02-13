@@ -41,8 +41,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import org.apache.commons.text.StringSubstitutor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRSession;
@@ -70,10 +68,8 @@ import org.mycore.common.xml.MCRURIResolver;
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  */
-@SuppressWarnings("PMD.DoNotTerminateVM")
+@SuppressWarnings({"PMD.DoNotTerminateVM", "PMD.SystemPrintln"})
 public class MCRCommandLineInterface {
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     /** The name of the system */
     private static String system;
@@ -228,7 +224,7 @@ public class MCRCommandLineInterface {
         StringSubstitutor strSubstitutor = new StringSubstitutor(MCRConfiguration2.getPropertiesMap());
         String expandedCommand = strSubstitutor.replace(command);
         if (!expandedCommand.equals(command)) {
-            LOGGER.info("{} --> {}", command, expandedCommand);
+            output(command + " --> " + expandedCommand);
         }
         return expandedCommand;
     }

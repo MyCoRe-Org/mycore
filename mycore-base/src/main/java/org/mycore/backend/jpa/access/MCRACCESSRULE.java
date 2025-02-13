@@ -100,7 +100,6 @@ public class MCRACCESSRULE {
 
     @Override
     public boolean equals(Object obj) {
-        System.out.println("EQUALS");
         if (this == obj) {
             return true;
         }
