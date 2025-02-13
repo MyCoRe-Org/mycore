@@ -242,7 +242,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
                 }
             });
             this.filesUploaded++;
-            int progress = (int) (((float) this.filesUploaded / (float) getNumFiles()) * 100f);
+            int progress = (int) (((float) this.filesUploaded / getNumFiles()) * 100f);
             this.setProgress(progress);
         }
     }

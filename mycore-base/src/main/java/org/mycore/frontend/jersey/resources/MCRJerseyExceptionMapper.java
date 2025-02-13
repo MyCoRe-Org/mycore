@@ -106,6 +106,7 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
         return response;
     }
 
+    @SuppressWarnings("PMD.UnnecessaryCast")
     private Response getResponse(Exception exc) {
         if (exc instanceof WebApplicationException wae) {
             Response response = wae.getResponse();
