@@ -112,11 +112,8 @@
   <rule ref="category/java/codestyle.xml/MethodNamingConventions"/>
   <rule ref="category/java/codestyle.xml/NoPackage"/>
   <rule ref="category/java/codestyle.xml/PackageCase"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/codestyle.xml/UnnecessaryAnnotationValueElement"/>
-  -->
-  <rule ref="category/java/codestyle.xml/UnnecessaryBoxing"/>
+   <rule ref="category/java/codestyle.xml/UnnecessaryBoxing"/>
   <!-- TODO: Create PR to fix this rule -->
   <!--
   <rule ref="category/java/codestyle.xml/UnnecessaryCast"/>
