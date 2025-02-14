@@ -38,6 +38,7 @@ import org.mycore.mcr.acl.accesskey.config.MCRAccessKeyConfig;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 import org.mycore.user2.MCRUser;
 
+@Deprecated
 public class MCRAccessKeyStrategyTest extends MCRAccessKeyTestCase {
 
     private static final String READ_VALUE = "bla";
