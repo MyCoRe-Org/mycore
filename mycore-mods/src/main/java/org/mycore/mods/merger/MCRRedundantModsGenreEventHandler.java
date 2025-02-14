@@ -31,8 +31,7 @@ public class MCRRedundantModsGenreEventHandler extends MCRAbstractRedundantModsE
      */
     @Override
     protected boolean isConsistent(Element el1, Element el2) {
-        return !hasSameAuthority(el1, el2) ||
-            (checkDisplayLabelConsistence(el1, el2) && checkTypeConsistence(el1, el2));
+        return checkDisplayLabelConsistence(el1, el2) && checkTypeConsistence(el1, el2);
     }
 
     /**
@@ -45,10 +44,9 @@ public class MCRRedundantModsGenreEventHandler extends MCRAbstractRedundantModsE
         final String displayLabel1 = el1.getAttributeValue("displayLabel");
         final String displayLabel2 = el2.getAttributeValue("displayLabel");
 
-        final String classificationName1 = getClassificationName(el1);
-        final String classificationName2 = getClassificationName(el2);
-
         if (!Objects.equals(displayLabel1, displayLabel2)) {
+            final String classificationName1 = getClassificationName(el1);
+            final String classificationName2 = getClassificationName(el2);
 
             String logMessage = """
                 There are inconsistencies found between the classifications {} and {}.
@@ -72,10 +70,10 @@ public class MCRRedundantModsGenreEventHandler extends MCRAbstractRedundantModsE
         final String type1 = el1.getAttributeValue("type");
         final String type2 = el2.getAttributeValue("type");
 
-        final String classificationName1 = getClassificationName(el1);
-        final String classificationName2 = getClassificationName(el2);
-
         if (!Objects.equals(type1, type2)) {
+            final String classificationName1 = getClassificationName(el1);
+            final String classificationName2 = getClassificationName(el2);
+
             String logMessage = """
                 There are inconsistencies found between the classifications {} and {}.
                 They have the same authority "{}" but {} has the type "{}" and {} has the type "{}".""";

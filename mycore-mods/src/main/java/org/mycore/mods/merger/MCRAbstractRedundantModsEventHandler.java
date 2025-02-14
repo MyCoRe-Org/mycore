@@ -59,36 +59,46 @@ public abstract class MCRAbstractRedundantModsEventHandler extends MCREventHandl
             return;
         }
         if (logger.isInfoEnabled()) {
-            logger.info("merge redundant " + getClassificationElementName() + " categories for {}", obj.getId());
+            logger.info("merge redundant {} categories for {}", getClassificationElementName(), obj.getId());
         }
 
         Element mods = mcrmodsWrapper.getMODS();
-        List<Element> supportedElements = getAllDescendants(mods).stream()
-            .filter(element -> element.getName().equals(getClassificationElementName()))
-            .filter(element -> MCRClassMapper.getCategoryID(element) != null).toList();
+        mergeCategories(mods);
+    }
+
+    /**
+     * Takes a mods-element and searches for and drops redundant classifications.
+     * Has a recursion and calls itself to check related items of the original element for redundancies.
+     * @param modsOrRelatedItem the mods-element or related item that is searched for redundant classifications
+     */
+    private void mergeCategories(Element modsOrRelatedItem) {
+        List<Element> supportedElements = getAllSupportedDescendants(modsOrRelatedItem);
         dropRedundantCategories(supportedElements);
 
-        List<Element> relatedItems = getAllRelatedItems(mods);
+        List<Element> relatedItems = getAllRelatedItems(modsOrRelatedItem);
         for (Element relatedItem : relatedItems) {
             if (relatedItem.getAttribute("href", MCRConstants.XLINK_NAMESPACE) == null) {
-                dropRedundantCategories(getAllDescendants(relatedItem));
+                mergeCategories(relatedItem);
             }
         }
     }
 
     /**
-     * Recursively writes all child-elements of a given element into a list and returns the list once completed.
-     * @param element the parent element for which all children should be listed
-     * @return a list with all child-elements
+     * Recursively writes all child-classifications of a given element into a list and returns the list once completed.
+     * Excluded are relatedItems, as classifications from each related item should be processed individually.
+     * @param modsOrRelatedItem the parent element for which all classification-children should be listed
+     * @return a list with all child-classifications
      */
-    protected static List<Element> getAllDescendants(Element element) {
+    protected List<Element> getAllSupportedDescendants(Element modsOrRelatedItem) {
         List<Element> descendants = new ArrayList<>();
-
-        for (Element child : element.getChildren()) {
-            if (!child.getName().equals("relatedItem")) {
-                descendants.add(child);
-                descendants.addAll(getAllDescendants(child));
+        for (Element child : modsOrRelatedItem.getChildren()) {
+            if (child.getName().equals("relatedItem")) {
+                continue;
             }
+            if (child.getName().equals(getClassificationElementName()) && MCRClassMapper.getCategoryID(child) != null) {
+                descendants.add(child);
+            }
+            descendants.addAll(getAllSupportedDescendants(child));
         }
         return descendants;
     }
@@ -116,8 +126,11 @@ public abstract class MCRAbstractRedundantModsEventHandler extends MCREventHandl
                 Element element1 = elements.get(i);
                 Element element2 = elements.get(j);
                 Element parentElement = MCRCategoryMerger.getElementWithParentCategory(element1, element2);
-                if (parentElement != null && isConsistent(element1, element2)) {
-                    parentElement.detach();
+                if (parentElement != null) {
+                    assert Objects.equals(getAuthority(element1), getAuthority(element2));
+                    if (isConsistent(element1, element2)) {
+                        parentElement.detach();
+                    }
                 }
             }
         }
@@ -131,18 +144,6 @@ public abstract class MCRAbstractRedundantModsEventHandler extends MCREventHandl
     protected String getAuthority(Element element) {
         return element.getAttributeValue("authorityURI") != null ?
                element.getAttributeValue("authorityURI") : element.getAttributeValue("authority");
-    }
-
-    /**
-     * Compares two classification elements for the same authority
-     * @param el1 first element to be compared
-     * @param el2 second element to be compared
-     * @return true if both have the same authority, or if none of them has an authority
-     */
-    protected boolean hasSameAuthority(Element el1, Element el2) {
-        return Objects.equals(el1.getAttributeValue("authorityURI"),
-            el2.getAttributeValue("authorityURI")) &&
-            Objects.equals(el1.getAttributeValue("authority"), el2.getAttributeValue("authority"));
     }
 
     /**

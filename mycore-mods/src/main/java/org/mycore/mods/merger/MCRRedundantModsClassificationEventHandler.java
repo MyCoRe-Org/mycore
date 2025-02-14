@@ -31,7 +31,7 @@ public class MCRRedundantModsClassificationEventHandler extends MCRAbstractRedun
      */
     @Override
     protected boolean isConsistent(Element el1, Element el2) {
-        return !hasSameAuthority(el1, el2) || checkDisplayLabelConsistence(el1, el2);
+        return checkDisplayLabelConsistence(el1, el2);
     }
 
     /**
@@ -44,10 +44,9 @@ public class MCRRedundantModsClassificationEventHandler extends MCRAbstractRedun
         final String displayLabel1 = el1.getAttributeValue("displayLabel");
         final String displayLabel2 = el2.getAttributeValue("displayLabel");
 
-        final String classificationName1 = getClassificationName(el1);
-        final String classificationName2 = getClassificationName(el2);
-
         if (!Objects.equals(displayLabel1, displayLabel2)) {
+            final String classificationName1 = getClassificationName(el1);
+            final String classificationName2 = getClassificationName(el2);
 
             String logMessage = """
                 There are inconsistencies found between the classifications {} and {}.
