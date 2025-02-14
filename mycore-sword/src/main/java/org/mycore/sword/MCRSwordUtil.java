@@ -554,11 +554,10 @@ public class MCRSwordUtil {
          * {@link MCRSwordCollectionProvider} of the collection (needed to count how much objects)
          * @throws SwordServerException when the {@link MCRSwordObjectIDSupplier} throws a exception.
          */
-        @SuppressWarnings("PMD.UnnecessaryCast")
         public static void addPaginationLinks(IRI collectionIRI, String collection, Feed feed,
             MCRSwordCollectionProvider collectionProvider) throws SwordServerException {
-            final int lastPage = (int) Math.ceil((double) collectionProvider.getIDSupplier().getCount()
-                / MCRSwordConstants.MAX_ENTRYS_PER_PAGE);
+            final int lastPage = (int) Math.ceil(collectionProvider.getIDSupplier().getCount()
+                / (double) MCRSwordConstants.MAX_ENTRYS_PER_PAGE);
             int currentPage = ParseLinkUtil.CollectionIRI.getPaginationFromCollectionIRI(collectionIRI);
 
             feed.addLink(buildCollectionPaginationLinkHref(collection, 1), "first");
