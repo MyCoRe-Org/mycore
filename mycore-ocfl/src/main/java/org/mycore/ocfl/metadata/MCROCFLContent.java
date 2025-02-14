@@ -30,29 +30,30 @@ public class MCROCFLContent extends MCRContent {
 
     private OcflRepository repository;
 
-    private String objectid;
+    private String ocflObjectID;
 
     private String fileName;
 
     private String version;
 
-    public MCROCFLContent(OcflRepository repository, String objectid, String fileName, String version) {
+    public MCROCFLContent(OcflRepository repository, String ocflObjectID, String fileName, String version) {
         this.repository = repository;
-        this.objectid = objectid;
+        this.ocflObjectID = ocflObjectID;
         this.fileName = fileName;
         this.version = version;
     }
 
-    public MCROCFLContent(OcflRepository repository, String objectid, String fileName) {
+    public MCROCFLContent(OcflRepository repository, String ocflObjectID, String fileName) {
         this.repository = repository;
-        this.objectid = objectid;
+        this.ocflObjectID = ocflObjectID;
         this.fileName = fileName;
     }
 
     @Override
     public InputStream getInputStream() throws IOException {
         return repository
-            .getObject(version == null ? ObjectVersionId.head(objectid) : ObjectVersionId.version(objectid, version))
+            .getObject(version == null ? ObjectVersionId.head(ocflObjectID) :
+                    ObjectVersionId.version(ocflObjectID, version))
             .getFile(fileName).getStream();
     }
 }

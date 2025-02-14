@@ -224,23 +224,18 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
     public MCRContent retrieveContent(MCRObjectID mcrid) throws IOException {
         String ocflObjectID = getOCFLObjectID(mcrid);
         OcflObjectVersion storeObject;
+        OcflRepository repository = getRepository();
         try {
-            storeObject = getRepository().getObject(ObjectVersionId.head(ocflObjectID));
+            storeObject = repository.getObject(ObjectVersionId.head(ocflObjectID));
         } catch (NotFoundException e) {
             throw new IOException("Object '" + ocflObjectID + "' could not be found", e);
         }
 
         if (convertMessageToType(
-            storeObject.getVersionInfo().getMessage()) == MCROCFLMetadataVersion.DELETED) {
+                storeObject.getVersionInfo().getMessage()) == MCROCFLMetadataVersion.DELETED) {
             throw new IOException("Cannot read already deleted object '" + ocflObjectID + "'");
         }
-
-        // "metadata/" +
-        try (InputStream storedContentStream = getStoredContentStream(mcrid, storeObject)) {
-            return new MCRJDOMContent(new MCRStreamContent(storedContentStream).asXML());
-        } catch (JDOMException e) {
-            throw new IOException("Can not parse XML from OCFL-Store", e);
-        }
+        return new MCROCFLContent(repository, ocflObjectID, buildFilePath(mcrid));
     }
 
     protected InputStream getStoredContentStream(MCRObjectID mcrid, OcflObjectVersion storeObject) throws IOException {
