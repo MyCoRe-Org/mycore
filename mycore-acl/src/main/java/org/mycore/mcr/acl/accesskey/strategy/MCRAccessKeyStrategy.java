@@ -37,6 +37,7 @@ import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 /**
  * Strategy for {@link MCRAccessKey}.
  */
+@Deprecated
 public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
 
     private static final Logger LOGGER = LogManager.getLogger();
