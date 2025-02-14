@@ -45,6 +45,7 @@ import org.mycore.user2.MCRUserManager;
 /**
  * Methods for setting and removing {@link MCRAccessKey} for users.
  */
+@Deprecated
 public class MCRAccessKeyUtils {
     /**
      * Prefix for user attribute name for value
@@ -270,13 +271,11 @@ public class MCRAccessKeyUtils {
                         attributeName.indexOf('_') + 1));
                     if (deadAttributes.contains(attribute)) {
                         removeAccessKeySecret(user, objectId);
+                    } else if (MCRAccessKeyManager.getAccessKeyWithSecret(objectId, attribute.getValue()) != null) {
+                        validAttributes.add(attribute);
                     } else {
-                        if (MCRAccessKeyManager.getAccessKeyWithSecret(objectId, attribute.getValue()) != null) {
-                            validAttributes.add(attribute);
-                        } else {
-                            removeAccessKeySecret(user, objectId);
-                            deadAttributes.add(attribute);
-                        }
+                        removeAccessKeySecret(user, objectId);
+                        deadAttributes.add(attribute);
                     }
                 }
             }
