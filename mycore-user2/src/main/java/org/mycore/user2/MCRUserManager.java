@@ -344,10 +344,10 @@ public class MCRUserManager {
     private static Predicate[] buildCondition(CriteriaBuilder cb, Root<MCRUser> root, String userPattern, String realm,
         String namePattern, String mailPattern, String attributeNamePattern, String attributeValuePattern) {
 
-        ArrayList<Predicate> predicates = new ArrayList<>(2);
+        List<Predicate> predicates = new ArrayList<>(2);
         addEqualsPredicate(cb, root, MCRUser_.realmID, realm, predicates);
 
-        ArrayList<Predicate> searchPredicates = new ArrayList<>(3);
+        List<Predicate> searchPredicates = new ArrayList<>(3);
         addSearchPredicate(cb, root, MCRUser_.userName, userPattern, searchPredicates);
         addSearchPredicate(cb, root, MCRUser_.realName, namePattern, searchPredicates);
         addSearchPredicate(cb, root, MCRUser_.EMail, mailPattern, searchPredicates);
@@ -376,14 +376,14 @@ public class MCRUserManager {
     }
 
     private static void addEqualsPredicate(CriteriaBuilder cb, Root<MCRUser> root,
-        SingularAttribute<MCRUser, String> attribute, String string, ArrayList<Predicate> predicates) {
+        SingularAttribute<MCRUser, String> attribute, String string, List<Predicate> predicates) {
         if (isValidSearchPattern(string)) {
             predicates.add(cb.equal(root.get(attribute), string));
         }
     }
 
     private static void addSearchPredicate(CriteriaBuilder cb, Root<MCRUser> root,
-        SingularAttribute<MCRUser, String> attribute, String searchPattern, ArrayList<Predicate> predicates) {
+        SingularAttribute<MCRUser, String> attribute, String searchPattern, List<Predicate> predicates) {
         if (isValidSearchPattern(searchPattern)) {
             predicates.add(buildSearchPredicate(cb, root, attribute, searchPattern));
         }

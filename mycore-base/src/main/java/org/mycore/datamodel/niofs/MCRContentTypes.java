@@ -33,9 +33,9 @@ import org.apache.logging.log4j.Logger;
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRContentTypes {
+public final class MCRContentTypes {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRContentTypes.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static List<FileTypeDetector> fileTypeDetectors;
 
@@ -51,7 +51,7 @@ public class MCRContentTypes {
     }
 
     private static List<FileTypeDetector> getInstalledDetectors() {
-        ArrayList<FileTypeDetector> detectors = new ArrayList<>();
+        List<FileTypeDetector> detectors = new ArrayList<>();
         ServiceLoader<FileTypeDetector> serviceLoader = ServiceLoader.load(FileTypeDetector.class);
         for (FileTypeDetector fileTypeDetector : serviceLoader) {
             LOGGER.info("Adding content type detector: {}", fileTypeDetector::getClass);

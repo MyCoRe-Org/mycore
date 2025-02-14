@@ -187,7 +187,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
             return;
         }
         String objType = objectType;
-        if (objType != null && objType.trim().length() == 0) {
+        if (objType != null && objType.isBlank()) {
             objType = null;
         }
 
@@ -248,7 +248,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         void configure(HttpServletRequest request);
     }
 
-    private static class Settings {
+    private static final class Settings {
         private String classifID;
 
         private String categID;

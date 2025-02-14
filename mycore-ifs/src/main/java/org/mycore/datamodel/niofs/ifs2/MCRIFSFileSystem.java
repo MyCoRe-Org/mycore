@@ -110,12 +110,17 @@ public class MCRIFSFileSystem extends MCRAbstractFileSystem {
                 fileStore.create(derId.getNumberAsInteger());
             } catch (RuntimeException e) {
                 LogManager.getLogger(getClass()).warn("Catched RuntimeException while creating new root directory.", e);
-                throw new FileSystemException(rootPath.toString(), null, e.getMessage());
+                FileSystemException fileSystemException = new FileSystemException(rootPath.toString(), null,
+                    e.getMessage());
+                fileSystemException.initCause(e);
+                throw fileSystemException;
             }
         } catch (FileSystemException e) {
             throw e;
         } catch (IOException e) {
-            throw new FileSystemException(rootPath.toString(), null, e.getMessage());
+            FileSystemException fse = new FileSystemException(rootPath.toString(), null, e.getMessage());
+            fse.initCause(e);
+            throw fse;
         }
         LogManager.getLogger(getClass()).info("Created root directory: {}", rootPath);
     }
@@ -133,10 +138,14 @@ public class MCRIFSFileSystem extends MCRAbstractFileSystem {
         } catch (FileSystemException e) {
             throw e;
         } catch (IOException e) {
-            throw new FileSystemException(rootPath.toString(), null, e.getMessage());
+            FileSystemException fse = new FileSystemException(rootPath.toString(), null, e.getMessage());
+            fse.initCause(e);
+            throw fse;
         } catch (RuntimeException e) {
             LogManager.getLogger(getClass()).warn("Catched RuntimeException while removing root directory.", e);
-            throw new FileSystemException(rootPath.toString(), null, e.getMessage());
+            FileSystemException fse = new FileSystemException(rootPath.toString(), null, e.getMessage());
+            fse.initCause(e);
+            throw fse;
         }
         LogManager.getLogger(getClass()).info("Removed root directory: {}", rootPath);
     }

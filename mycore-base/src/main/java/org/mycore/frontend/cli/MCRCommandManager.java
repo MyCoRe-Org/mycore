@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -47,7 +48,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 public class MCRCommandManager {
     private static final Logger LOGGER = LogManager.getLogger(MCRCommandManager.class);
 
-    protected static TreeMap<String, List<MCRCommand>> knownCommands = new TreeMap<>();
+    protected static SortedMap<String, List<MCRCommand>> knownCommands = new TreeMap<>();
 
     public MCRCommandManager() {
         try {
@@ -65,7 +66,7 @@ public class MCRCommandManager {
 
     }
 
-    public static TreeMap<String, List<MCRCommand>> getKnownCommands() {
+    public static SortedMap<String, List<MCRCommand>> getKnownCommands() {
         return knownCommands;
     }
 
@@ -114,7 +115,7 @@ public class MCRCommandManager {
             .orElse(cliClass.getSimpleName());
         final Class<org.mycore.frontend.cli.annotation.MCRCommand> mcrCommandAnnotation;
         mcrCommandAnnotation = org.mycore.frontend.cli.annotation.MCRCommand.class;
-        ArrayList<MCRCommand> commands = Arrays.stream(cliClass.getMethods())
+        List<MCRCommand> commands = Arrays.stream(cliClass.getMethods())
             .filter(method -> method.getDeclaringClass().equals(cliClass))
             .filter(method -> Modifier.isStatic(method.getModifiers()) && Modifier.isPublic(method.getModifiers()))
             .filter(method -> method.isAnnotationPresent(mcrCommandAnnotation))
@@ -125,14 +126,14 @@ public class MCRCommandManager {
     }
 
     //fixes MCR-1594 deep in the code
-    private List<MCRCommand> addCommandGroup(String groupName, ArrayList<MCRCommand> commands) {
+    private List<MCRCommand> addCommandGroup(String groupName, List<MCRCommand> commands) {
         return knownCommands.put(groupName, Collections.unmodifiableList(commands));
     }
 
     protected void addDefaultCLIClass(String className) {
         Object obj = buildInstanceOfClass(className);
         MCRExternalCommandInterface commandInterface = (MCRExternalCommandInterface) obj;
-        ArrayList<MCRCommand> commandsToAdd = commandInterface.getPossibleCommands();
+        List<MCRCommand> commandsToAdd = commandInterface.getPossibleCommands();
         addCommandGroup(commandInterface.getDisplayName(), commandsToAdd);
     }
 

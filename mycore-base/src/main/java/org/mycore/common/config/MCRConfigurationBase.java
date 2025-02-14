@@ -38,6 +38,9 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRPropertiesResolver;
 
 public final class MCRConfigurationBase {
+
+    private static final Logger LOGGER = LogManager.getLogger();
+
     static final Pattern PROPERTY_SPLITTER = Pattern.compile(",");
 
     /**
@@ -107,8 +110,8 @@ public final class MCRConfigurationBase {
                 .filter(File::isDirectory).isPresent()) {
                 lastModifiedFile = dataDir.map(p -> new File(p, ".systemTime")).get();
             } else {
-                dataDir
-                    .ifPresent(d -> System.err.println("WARNING: MCR.dataDir does not exist: " + d.getAbsolutePath()));
+                dataDir.ifPresent(directory ->
+                    LOGGER.error("WARNING: MCR.dataDir does not exist: {}", directory.getAbsolutePath()));
             }
         }
         if (lastModifiedFile == null) {
@@ -116,7 +119,7 @@ public final class MCRConfigurationBase {
                 lastModifiedFile = File.createTempFile("MyCoRe", ".systemTime");
                 lastModifiedFile.deleteOnExit();
             } catch (IOException e) {
-                throw new MCRException("Could not create temporary file, please set property MCR.datadir");
+                throw new MCRException("Could not create temporary file, please set property MCR.datadir", e);
             }
         }
         if (!lastModifiedFile.exists()) {
@@ -206,7 +209,7 @@ public final class MCRConfigurationBase {
      *             if the properties are not initialized
      */
     public static Optional<String> getString(String name) {
-        if (Objects.requireNonNull(name, "MyCoRe property name must not be null.").trim().isEmpty()) {
+        if (Objects.requireNonNull(name, "MyCoRe property name must not be null.").isBlank()) {
             throw new MCRConfigurationException("MyCoRe property name must not be empty.");
         }
         if (!name.trim().equals(name)) {

@@ -37,6 +37,7 @@ public class MCRJobQueueManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    @SuppressWarnings("PMD.LooseCoupling")
     final Map<String, MCRJobQueue> queueInstances = new ConcurrentHashMap<>();
 
     final Map<String, MCRJobThreadStarter> jobThreadStartInstances = new ConcurrentHashMap<>();
@@ -135,7 +136,7 @@ public class MCRJobQueueManager {
         return config;
     }
 
-    private static class InstanceHolder {
+    private static final class InstanceHolder {
         private static final MCRJobQueueManager INSTANCE = new MCRJobQueueManager(new MCRJobDAOJPAImpl(),
             new MCRConfiguration2JobConfig());
     }

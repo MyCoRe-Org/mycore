@@ -50,7 +50,7 @@ import jakarta.persistence.metamodel.SingularAttribute;
 
 public class MCRObjectInfoEntityQueryResolver implements MCRObjectQueryResolver {
 
-    private static final MCRObjectQuery.SortBy SORT_BY_DEFAULT = MCRObjectQuery.SortBy.created;
+    private static final MCRObjectQuery.SortBy SORT_BY_DEFAULT = MCRObjectQuery.SortBy.CREATED;
 
     protected TypedQuery<MCRObjectInfoEntity> convertQuery(MCRObjectQuery query) {
         Objects.requireNonNull(query, "The Query cant be null");
@@ -76,7 +76,7 @@ public class MCRObjectInfoEntityQueryResolver implements MCRObjectQueryResolver 
             applySort(query, criteriaBuilder, criteriaQuery, oe);
         }
 
-        if (filters.size() > 0) {
+        if (!filters.isEmpty()) {
             criteriaQuery.where(criteriaBuilder.and(filters.toArray(new Predicate[0])));
         }
 
@@ -96,7 +96,7 @@ public class MCRObjectInfoEntityQueryResolver implements MCRObjectQueryResolver 
 
     private <T> void applyClassificationFilter(MCRObjectQuery query, CriteriaBuilder criteriaBuilder,
         CriteriaQuery<T> criteriaQuery, Root<MCRObjectInfoEntity> oe, List<Predicate> filters, EntityManager em) {
-        if (query.getIncludeCategories().size() > 0) {
+        if (!query.getIncludeCategories().isEmpty()) {
             List<MCRCategoryImpl> idImplMap = getCategories(query, em);
 
             if (idImplMap.size() != query.getIncludeCategories().size()) {
@@ -152,12 +152,12 @@ public class MCRObjectInfoEntityQueryResolver implements MCRObjectQueryResolver 
         MCRObjectQuery.SortBy sf = query.sortBy() == null ? SORT_BY_DEFAULT : query.sortBy();
 
         SingularAttribute<MCRObjectInfoEntity, ?> attribute = switch (sf) {
-            case id -> MCRObjectInfoEntity_.id;
-            case created -> MCRObjectInfoEntity_.createDate;
-            case modified -> MCRObjectInfoEntity_.modifyDate;
+            case ID -> MCRObjectInfoEntity_.id;
+            case CREATED -> MCRObjectInfoEntity_.createDate;
+            case MODIFIED -> MCRObjectInfoEntity_.modifyDate;
         };
 
-        if (query.sortAsc() == null || query.sortAsc() == MCRObjectQuery.SortOrder.asc) {
+        if (query.sortAsc() == null || query.sortAsc() == MCRObjectQuery.SortOrder.ASC) {
             criteriaQuery.orderBy(criteriaBuilder.asc(source.get(attribute)));
         } else {
             criteriaQuery.orderBy(criteriaBuilder.desc(source.get(attribute)));
@@ -166,10 +166,10 @@ public class MCRObjectInfoEntityQueryResolver implements MCRObjectQueryResolver 
 
     protected void applyLastId(MCRObjectQuery query, CriteriaBuilder criteriaBuilder,
         CriteriaQuery<MCRObjectInfoEntity> criteriaQuery, Root<MCRObjectInfoEntity> source, List<Predicate> filters) {
-        if (query.sortBy() != MCRObjectQuery.SortBy.id && query.sortBy() != null) {
+        if (query.sortBy() != MCRObjectQuery.SortBy.ID && query.sortBy() != null) {
             throw new UnsupportedOperationException("last id can not be used with " + query.sortBy());
         }
-        if (query.sortAsc() == null || query.sortAsc() == MCRObjectQuery.SortOrder.asc) {
+        if (query.sortAsc() == null || query.sortAsc() == MCRObjectQuery.SortOrder.ASC) {
             filters.add(criteriaBuilder.greaterThan(source.get(MCRObjectInfoEntity_.id), query.afterId()));
             criteriaQuery.orderBy(criteriaBuilder.asc(source.get(MCRObjectInfoEntity_.id)));
         } else {
@@ -294,7 +294,7 @@ public class MCRObjectInfoEntityQueryResolver implements MCRObjectQueryResolver 
         List<Predicate> filters = getFilter(objectQuery, criteriaBuilder, source);
         applyClassificationFilter(objectQuery, criteriaBuilder, criteriaQuery, source, filters, em);
 
-        if (filters.size() > 0) {
+        if (!filters.isEmpty()) {
             criteriaQuery.where(criteriaBuilder.and(filters.toArray(new Predicate[0])));
         }
 

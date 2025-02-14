@@ -62,7 +62,7 @@ import org.mycore.solr.auth.MCRSolrAuthenticationManager;
  */
 public class MCROAISolrSearcher extends MCROAISearcher {
 
-    protected static final Logger LOGGER = LogManager.getLogger(MCROAISolrSearcher.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private MCRSet set;
 
@@ -271,7 +271,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
                 MCRSolrAuthenticationLevel.SEARCH);
             QueryResponse response = queryRequest.process(solrClient);
             SolrDocumentList list = response.getResults();
-            if (list.size() >= 1) {
+            if (!list.isEmpty()) {
                 Date date = (Date) list.getFirst().getFieldValue(fieldName);
                 return Optional.of(date.toInstant());
             }

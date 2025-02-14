@@ -133,7 +133,7 @@ public class MCRDataciteClient {
 
     public List<Map.Entry<String, URI>> getMediaList(final MCRDigitalObjectIdentifier doi)
         throws MCRPersistentIdentifierException {
-        ArrayList<Map.Entry<String, URI>> entries = new ArrayList<>();
+        List<Map.Entry<String, URI>> entries = new ArrayList<>();
 
         URI requestURI = getRequestURI("/media/" + doi.asString());
         HttpGet httpGet = new HttpGet(requestURI);

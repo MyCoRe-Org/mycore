@@ -106,7 +106,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     public void startUpload(int numFiles) {
         super.startUpload(numFiles);
         this.filesUploaded = 0;
-        this.setStatus(MCRProcessableStatus.processing);
+        this.setStatus(MCRProcessableStatus.PROCESSING);
         this.setProgress(0);
         this.setProgressText("start upload...");
     }
@@ -291,15 +291,15 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
                     "No files were uploaded, delete entry in database for " + derivate.getId() + "!");
             }
         }
-        this.setStatus(MCRProcessableStatus.successful);
+        this.setStatus(MCRProcessableStatus.SUCCESSFUL);
     }
 
     private void updateMainFile() throws IOException, MCRAccessException {
         String mainFile = derivate.getDerivate().getInternals().getMainDoc();
         MCRObjectDerivate der = MCRMetadataManager.retrieveMCRDerivate(getOrCreateDerivateID()).getDerivate();
-        boolean hasNoMainFile = ((der.getInternals().getMainDoc() == null) || (der.getInternals().getMainDoc().trim()
-            .isEmpty()));
-        if ((mainFile == null) || mainFile.trim().isEmpty() && hasNoMainFile) {
+        boolean hasNoMainFile
+            = ((der.getInternals().getMainDoc() == null) || (der.getInternals().getMainDoc().isBlank()));
+        if ((mainFile == null) || mainFile.isBlank() && hasNoMainFile) {
             mainFile = getPathOfMainFile();
             LOGGER.debug("Setting main file to {}", mainFile);
             derivate.getDerivate().getInternals().setMainDoc(mainFile);
@@ -322,7 +322,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         return documentID;
     }
 
-    private static class MainFileFinder extends SimpleFileVisitor<Path> {
+    private static final class MainFileFinder extends SimpleFileVisitor<Path> {
 
         private Path mainFile;
 

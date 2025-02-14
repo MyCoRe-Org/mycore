@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -94,7 +95,7 @@ public class MCRSolrIndexer {
 
     static final MCRProcessableDefaultCollection SOLR_COLLECTION;
 
-    private static final int BATCH_AUTO_COMMIT_WITHIN_MS = 60000;
+    private static final int BATCH_AUTO_COMMIT_WITHIN_MS = 60_000;
 
     public static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
         MCRSolrAuthenticationManager.getInstance();
@@ -374,7 +375,7 @@ public class MCRSolrIndexer {
 
         MCRXMLMetadataManager metadataMgr = MCRXMLMetadataManager.instance();
         MCRSolrIndexStatistic statistic = null;
-        HashMap<MCRObjectID, MCRContent> contentMap = new HashMap<>((int) (BULK_SIZE * 1.4));
+        Map<MCRObjectID, MCRContent> contentMap = new HashMap<>((int) (BULK_SIZE * 1.4));
         int i = 0;
         for (String id : list) {
             i++;
@@ -598,7 +599,7 @@ public class MCRSolrIndexer {
             List<String> solrList = MCRSolrSearchUtils.listIDs(core.getClient(), query);
             LOGGER.info("there are {} solr objects", solrList::size);
             // documents to remove
-            List<String> toRemove = new ArrayList(solrList);
+            List<String> toRemove = new ArrayList<>(solrList);
             toRemove.removeAll(storeList);
             if (!toRemove.isEmpty()) {
                 LOGGER.info("remove {} zombie objects from solr", toRemove::size);

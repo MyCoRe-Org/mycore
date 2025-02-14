@@ -168,7 +168,7 @@ public class MCRMetsMods2IIIFConverter {
                 MCRIIIFAnnotation annotation = new MCRIIIFAnnotation(identifier, canvas);
                 canvas.images.add(annotation);
 
-                MCRIIIFResource resource = new MCRIIIFResource(information.getId(), MCRDCMIType.Image);
+                MCRIIIFResource resource = new MCRIIIFResource(information.getId(), MCRDCMIType.IMAGE);
                 resource.setWidth(information.width);
                 resource.setHeight(information.height);
 
@@ -203,7 +203,7 @@ public class MCRMetsMods2IIIFConverter {
     protected void processDivContainer(List<MCRIIIFRange> complete, LogicalDiv divContainer) {
         MCRIIIFRange range = new MCRIIIFRange(divContainer.getId());
         if (divContainer.getParent() == null) {
-            range.setViewingHint(MCRIIIFViewingHint.top);
+            range.setViewingHint(MCRIIIFViewingHint.TOP);
         }
         complete.add(range);
         range.setLabel((divContainer.getLabel() != null) ? divContainer.getLabel() : divContainer.getType());

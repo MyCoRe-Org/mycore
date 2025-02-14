@@ -61,7 +61,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     private static final String META_PACKAGE_NAME = "org.mycore.datamodel.metadata.";
 
     // logger
-    static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private Class<? extends MCRMetaInterface> clazz;
 
@@ -71,7 +71,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
 
     private boolean notinherit;
 
-    private ArrayList<MCRMetaInterface> list;
+    private final List<MCRMetaInterface> list;
 
     /**
      * This is the constructor of the MCRMetaElement class. The default language
@@ -225,6 +225,15 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
      */
     public final int size() {
         return list.size();
+    }
+    
+    /**
+     * returns true if there are no elements in this instance.
+     *
+     * @return true, if the "list" is empty
+     */
+    public final boolean isEmpty() {
+        return list.isEmpty();
     }
 
     /**
@@ -435,7 +444,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
             throw new MCRException(
                 getTag() + ": package " + clazz.getPackage().getName() + " does not equal " + META_PACKAGE_NAME);
         }
-        if (list.size() == 0) {
+        if (list.isEmpty()) {
             throw new MCRException(getTag() + ": does not contain any sub elements");
         }
     }

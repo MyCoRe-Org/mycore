@@ -24,6 +24,8 @@ import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.util.Locale;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRUtils;
 
 import jakarta.servlet.ServletContext;
@@ -75,13 +77,15 @@ import jakarta.servlet.ServletContext;
  */
 public class MCRConfigurationDir {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
     public static final String DISABLE_CONFIG_DIR_PROPERTY = "MCR.DisableConfigDir";
 
     public static final String CONFIGURATION_DIRECTORY_PROPERTY = "MCR.ConfigDir";
 
-    private static ServletContext SERVLET_CONTEXT;
+    private static ServletContext servletContext;
 
-    private static volatile String APP_NAME;
+    private static volatile String appName;
 
     private static File getMyCoReDirectory() {
         String mcrHome = System.getProperty("MCR.Home");
@@ -111,7 +115,7 @@ public class MCRConfigurationDir {
         ProtectionDomain protectionDomain = clazz.getProtectionDomain();
         CodeSource codeSource = protectionDomain.getCodeSource();
         if (codeSource == null) {
-            System.err.println("Cannot get CodeSource.");
+            LOGGER.error(() -> "Cannot get CodeSource for class " + clazz.getSimpleName());
             return null;
         }
         URL location = codeSource.getLocation();
@@ -121,14 +125,14 @@ public class MCRConfigurationDir {
     }
 
     private static String getAppName() {
-        if (APP_NAME == null) {
+        if (appName == null) {
             synchronized (MCRConfigurationDir.class) {
-                if (APP_NAME == null) {
-                    APP_NAME = buildAppName();
+                if (appName == null) {
+                    appName = buildAppName();
                 }
             }
         }
-        return APP_NAME;
+        return appName;
     }
 
     private static String buildAppName() {
@@ -146,16 +150,15 @@ public class MCRConfigurationDir {
     }
 
     private static String buildAppNameFromContext() {
-        String servletAppName = SERVLET_CONTEXT.getInitParameter("appName");
-        String contextPath = SERVLET_CONTEXT.getContextPath();
-        String servletContextName = SERVLET_CONTEXT.getServletContextName();
+        String servletAppName = servletContext.getInitParameter("appName");
+        String contextPath = servletContext.getContextPath();
+        String servletContextName = servletContext.getServletContextName();
         String updatedAppname;
         if (servletAppName != null && !servletAppName.isEmpty()) {
             updatedAppname = servletAppName;
         } else if (!contextPath.isEmpty()) {
             updatedAppname = contextPath.substring(1);//remove leading '/'
-        } else if (servletContextName != null && !(servletContextName.trim().isEmpty()
-            || servletContextName.contains("/"))) {
+        } else if (servletContextName != null && !(servletContextName.isBlank() || servletContextName.contains("/"))) {
             updatedAppname = servletContextName.replaceAll("\\s", "");
         } else {
             updatedAppname = null;
@@ -183,8 +186,8 @@ public class MCRConfigurationDir {
     }
 
     static void setServletContext(ServletContext servletContext) {
-        SERVLET_CONTEXT = servletContext;
-        APP_NAME = null;
+        MCRConfigurationDir.servletContext = servletContext;
+        appName = null;
     }
 
     /**

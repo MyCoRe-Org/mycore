@@ -56,6 +56,7 @@ public class MCRNeo4JIndexEventHandler extends MCREventHandlerBase {
     private static final boolean ENABLED = MCRConfiguration2
         .getString(MCRNeo4JConstants.DEFAULT_NEO4J_SERVER_URL).isPresent();
 
+    @SuppressWarnings("PMD.LooseCoupling")
     private static final DelayQueue<MCRDelayedRunnable> NEO4J_TASK_QUEUE = new DelayQueue<>();
 
     private static final ScheduledExecutorService NEO4J_TASK_EXECUTOR = Executors.newSingleThreadScheduledExecutor();

@@ -70,11 +70,11 @@ import org.mycore.services.i18n.MCRTranslation;
  */
 public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRMETSGenerator.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final List<String> EXCLUDED_ROOT_FOLDERS = Arrays.asList("alto", "tei");
 
-    private HashMap<String, String> hrefIdMap = new HashMap<>();
+    private final Map<String, String> hrefIdMap = new HashMap<>();
 
     @Override
     public Mets generate() throws MCRException {
@@ -88,7 +88,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
                     : owner.getId().toString());
 
             Map<String, String> urnFileMap = owner.getUrnMap();
-            if (urnFileMap.size() > 0) {
+            if (!urnFileMap.isEmpty()) {
                 try {
                     MCRMetsSave.updateURNsInMetsDocument(mets, urnFileMap);
                 } catch (Exception e) {

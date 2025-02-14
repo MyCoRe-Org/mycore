@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -72,7 +71,7 @@ import jakarta.persistence.EntityManager;
  */
 @MCRCommandGroup(name = "Classification Commands")
 public class MCRClassification2Commands extends MCRAbstractCommands {
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
@@ -101,16 +100,16 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @param classID classification ID
      */
     @MCRCommand(syntax = "count classification children of {0}",
-        help = "The command count the categoies of the classification with MCRObjectID {0} in the system.",
+        help = "The command count the categories of the classification with MCRObjectID {0} in the system.",
         order = 80)
     public static void countChildren(String classID) {
         MCRCategory category = DAO.getCategory(MCRCategoryID.rootID(classID), 1);
-        System.out.printf(Locale.ROOT, "%s has %d children", category.getId(), category.getChildren().size());
+        LOGGER.info(() -> category.getId() + " has " + category.getChildren().size() + " children");
     }
 
     /**
      * Adds a classification.
-     *
+     * <p>
      * Classification is built from a file.
      *
      * @param filename
@@ -502,7 +501,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         order = 150)
     public static void checkClassification(String id) {
         LOGGER.info("Checking classifcation {}", id);
-        ArrayList<String> log = new ArrayList<>();
+        List<String> log = new ArrayList<>();
         LOGGER.info("{}: checking for missing parentID", id);
         checkMissingParent(id, log);
         LOGGER.info("{}: checking for empty labels", id);
@@ -513,7 +512,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             LOGGER.info("{}: checking left, right and level values and for non-null children", id);
             checkLeftRightAndLevel(category, 0, 0, log);
         }
-        if (log.size() > 0) {
+        if (!log.isEmpty()) {
             LOGGER.error("Some errors occured on last test, report will follow");
             StringBuilder sb = new StringBuilder();
             for (String msg : log) {

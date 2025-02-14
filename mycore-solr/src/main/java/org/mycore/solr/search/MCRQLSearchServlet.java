@@ -144,7 +144,7 @@ public class MCRQLSearchServlet extends MCRServlet {//extends MCRSearchServlet {
 
     protected String getReqParameter(HttpServletRequest req, String name, String defaultValue) {
         String value = req.getParameter(name);
-        if (value == null || value.trim().length() == 0) {
+        if (value == null || value.isBlank()) {
             return defaultValue;
         } else {
             return value.trim();

@@ -248,7 +248,7 @@ public class MCRMetadataHistoryCommands {
         throws IOException {
         boolean exist = false;
         LogManager.getLogger().debug("Complete history rebuild of {} should be possible", derId);
-        ArrayList<MCRMetaHistoryItem> items = new ArrayList<>(100);
+        List<MCRMetaHistoryItem> items = new ArrayList<>(100);
         for (MCRAbstractMetadataVersion<?> version : versions) {
             String user = version.getUser();
             Instant revDate = version.getDate().toInstant();
@@ -291,7 +291,7 @@ public class MCRMetadataHistoryCommands {
         throws IOException {
         boolean exist = false;
         LogManager.getLogger().debug("Complete history rebuild of {} should be possible", objId);
-        ArrayList<MCRMetaHistoryItem> items = new ArrayList<>(100);
+        List<MCRMetaHistoryItem> items = new ArrayList<>(100);
         for (MCRAbstractMetadataVersion<?> version : versions) {
             String user = version.getUser();
             Instant revDate = version.getDate().toInstant();
@@ -328,11 +328,11 @@ public class MCRMetadataHistoryCommands {
     }
 
     private static MCRMetaHistoryItem create(MCRObjectID mcrid, String author, Instant instant) {
-        return newHistoryItem(mcrid, author, instant, MCRMetadataHistoryEventType.Create);
+        return newHistoryItem(mcrid, author, instant, MCRMetadataHistoryEventType.CREATE);
     }
 
     private static MCRMetaHistoryItem delete(MCRObjectID mcrid, String author, Instant instant) {
-        return newHistoryItem(mcrid, author, instant, MCRMetadataHistoryEventType.Delete);
+        return newHistoryItem(mcrid, author, instant, MCRMetadataHistoryEventType.DELETE);
     }
 
     private static MCRMetaHistoryItem newHistoryItem(MCRObjectID mcrid, String author, Instant instant,

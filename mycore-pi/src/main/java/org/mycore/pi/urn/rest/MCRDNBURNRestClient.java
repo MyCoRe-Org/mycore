@@ -201,7 +201,7 @@ public class MCRDNBURNRestClient {
      */
     private Optional<Date> registerNew(MCRPIRegistrationInfo urn) {
         MCRURNJsonBundle bundle = jsonProvider.apply(urn);
-        String json = bundle.toJSON(MCRURNJsonBundle.Format.register);
+        String json = bundle.toJSON(MCRURNJsonBundle.Format.REGISTER);
         String baseServiceURL = getBaseServiceURL();
         return MCRHttpsClient.post(baseServiceURL, ContentType.APPLICATION_JSON.toString(), json, credentials,
             response -> {
@@ -240,7 +240,7 @@ public class MCRDNBURNRestClient {
 
     private Optional<Date> update(MCRPIRegistrationInfo urn) {
         MCRURNJsonBundle bundle = jsonProvider.apply(urn);
-        String json = bundle.toJSON(MCRURNJsonBundle.Format.update);
+        String json = bundle.toJSON(MCRURNJsonBundle.Format.UPDATE);
         String updateURL = getUpdateURL(urn);
         return MCRHttpsClient.patch(updateURL, ContentType.APPLICATION_JSON.toString(), json, credentials, response -> {
             int patchStatus = response.getCode();

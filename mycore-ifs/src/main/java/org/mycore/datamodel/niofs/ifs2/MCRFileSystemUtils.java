@@ -334,8 +334,8 @@ final class MCRFileSystemUtils {
                 .sorted(Comparator.comparing(Path::getFileName))
                 .map(p -> p.getParent().getFileName().toString() + "_" + p.getFileName().toString())
                 .collect(Collectors.toList());
-        } catch (UncheckedIOException e) {
-            throw e.getCause();
+        } catch (UncheckedIOException ignoredUnchecked) {
+            throw ignoredUnchecked.getCause();
         }
     }
 

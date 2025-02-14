@@ -90,7 +90,7 @@ public class MCRPURLService extends MCRPIJobService<MCRPURL> {
         try {
             return new MCRPURL(new URI(purlString).toURL());
         } catch (MalformedURLException | URISyntaxException e) {
-            throw new MCRPersistentIdentifierException("Cannot parse " + purlString);
+            throw new MCRPersistentIdentifierException("Cannot parse " + purlString, e);
         }
     }
 
@@ -134,9 +134,9 @@ public class MCRPURLService extends MCRPIJobService<MCRPURL> {
     }
 
     @Override
-    protected HashMap<String, String> createJobContextParams(PiJobAction action, MCRBase obj, MCRPURL purl,
+    protected Map<String, String> createJobContextParams(PiJobAction action, MCRBase obj, MCRPURL purl,
         String additional) {
-        HashMap<String, String> params = new HashMap<>();
+        Map<String, String> params = new HashMap<>();
         params.put(CONTEXT_PURL, purl.asString());
         params.put(CONTEXT_OBJECT, obj.getId().toString());
         return params;

@@ -28,17 +28,18 @@ import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Use this class to build your {@link MCRViewerConfiguration}.
+ * <p>
  * You can use {@link #mets(HttpServletRequest)} or {@link #pdf(HttpServletRequest)}
  * as entry point and use {@link #mixin(MCRViewerConfiguration)} to append
  * additional configuration.
  * 
  * @author Matthias Eichner
  */
-public class MCRViewerConfigurationBuilder {
+public final class MCRViewerConfigurationBuilder {
 
-    private MCRViewerConfiguration internalConfig;
+    private final MCRViewerConfiguration internalConfig;
 
-    private HttpServletRequest request;
+    private final HttpServletRequest request;
 
     private MCRViewerConfigurationBuilder(HttpServletRequest request) {
         this.request = request;
@@ -75,11 +76,11 @@ public class MCRViewerConfigurationBuilder {
         }
         Multimap<ResourceType, String> resources = conf2.getResources();
         for (Map.Entry<ResourceType, String> resource : resources.entries()) {
-            if (ResourceType.script.equals(resource.getKey())) {
+            if (ResourceType.SCRIPT.equals(resource.getKey())) {
                 conf1.addScript(resource.getValue(), false);
-            } else if (ResourceType.module.equals(resource.getKey())) {
+            } else if (ResourceType.MODULE.equals(resource.getKey())) {
                 conf1.addScript(resource.getValue(), true);
-            } else if (ResourceType.css.equals(resource.getKey())) {
+            } else if (ResourceType.CSS.equals(resource.getKey())) {
                 conf1.addCSS(resource.getValue());
             }
         }

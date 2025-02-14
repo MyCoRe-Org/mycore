@@ -61,9 +61,9 @@ import jakarta.persistence.criteria.Root;
  */
 public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
-    private static Class<MCRCategoryLinkImpl> LINK_CLASS = MCRCategoryLinkImpl.class;
+    private static final Class<MCRCategoryLinkImpl> LINK_CLASS = MCRCategoryLinkImpl.class;
 
     private static final String NAMED_QUERY_NAMESPACE = "MCRCategoryLink.";
 
@@ -71,7 +71,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         MCRConfiguration2.getInt("MCR.Classifications.LinkServiceImpl.CategCache.Size").orElse(1000),
         "MCRCategLinkService category cache");
 
-    private static MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
     @Override
     public Map<MCRCategoryID, Number> countLinks(MCRCategory parent, boolean childrenOnly) {
@@ -167,7 +167,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         if (ids.isEmpty()) {
             return;
         }
-        HashMap<String, Collection<String>> typeMap = new HashMap<>();
+        Map<String, Collection<String>> typeMap = new HashMap<>();
         //prepare
         Collection<String> objectIds = new ArrayList<>();
         String currentType = ids.iterator().next().getType();
@@ -276,14 +276,14 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             //Category does not exist, so it has no links
             return getNoLinksMap(category);
         }
-        HashMap<MCRCategoryID, Boolean> boolMap = new HashMap<>();
+        Map<MCRCategoryID, Boolean> boolMap = new HashMap<>();
         final BitSet linkedInternalIds = getLinkedInternalIds();
         storeHasLinkValues(boolMap, linkedInternalIds, rootImpl);
         return boolMap;
     }
 
     private Map<MCRCategoryID, Boolean> hasLinksForClassifications() {
-        HashMap<MCRCategoryID, Boolean> boolMap = new HashMap<>() {
+        Map<MCRCategoryID, Boolean> boolMap = new HashMap<>() {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -302,14 +302,14 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     }
 
     private Map<MCRCategoryID, Boolean> getNoLinksMap(MCRCategory category) {
-        HashMap<MCRCategoryID, Boolean> boolMap = new HashMap<>();
+        Map<MCRCategoryID, Boolean> boolMap = new HashMap<>();
         for (MCRCategoryID categID : getAllCategIDs(category)) {
             boolMap.put(categID, false);
         }
         return boolMap;
     }
 
-    private void storeHasLinkValues(HashMap<MCRCategoryID, Boolean> boolMap, BitSet internalIds,
+    private void storeHasLinkValues(Map<MCRCategoryID, Boolean> boolMap, BitSet internalIds,
         MCRCategoryImpl parent) {
         final int internalID = parent.getInternalID();
         if (internalID < internalIds.size() && internalIds.get(internalID)) {
@@ -322,7 +322,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         }
     }
 
-    private void addParentHasValues(HashMap<MCRCategoryID, Boolean> boolMap, MCRCategory parent) {
+    private void addParentHasValues(Map<MCRCategoryID, Boolean> boolMap, MCRCategory parent) {
         boolMap.put(parent.getId(), true);
         if (parent.isCategory() && !Optional.ofNullable(boolMap.get(parent.getParent().getId())).orElse(false)) {
             addParentHasValues(boolMap, parent.getParent());
@@ -341,7 +341,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
                     .orderBy(cb.desc(internalId)))
             .getResultList();
 
-        int maxSize = result.size() == 0 ? 1 : result.getFirst().intValue() + 1;
+        int maxSize = result.isEmpty() ? 1 : result.getFirst().intValue() + 1;
         BitSet linkSet = new BitSet(maxSize);
         for (Number internalID : result) {
             linkSet.set(internalID.intValue(), true);

@@ -24,7 +24,7 @@ package org.mycore.webtools.processing.socket.impl;
 class MCRUpdateCollectionMessage extends MCRWebSocketMessage {
 
     MCRUpdateCollectionMessage() {
-        super(MCRMessageType.updateCollectionProperty);
+        super(MCRMessageType.UPDATE_COLLECTION_PROPERTY);
     }
 
 }

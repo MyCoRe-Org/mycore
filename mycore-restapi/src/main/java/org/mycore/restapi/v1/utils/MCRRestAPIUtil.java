@@ -27,13 +27,13 @@ import jakarta.ws.rs.core.Application;
 
 /**
  * This class contains some generic utility functions for the REST API
- * 
+ *
  * @author Thomas Scheffler (yagee)
  */
 public class MCRRestAPIUtil {
     public static String getWWWAuthenticateHeader(String s,
         Map<String, String> attributes, Application app) {
-        LinkedHashMap<String, String> attrMap = new LinkedHashMap<>();
+        Map<String, String> attrMap = new LinkedHashMap<>();
         String realm = app.getProperties()
             .getOrDefault(ServerProperties.APPLICATION_NAME, "REST API")
             .toString();
@@ -47,7 +47,7 @@ public class MCRRestAPIUtil {
     }
 
     private static void appendField(StringBuilder b, String field) {
-        if (b.length() > 0) {
+        if (!b.isEmpty()) {
             b.append(", ");
         }
         b.append(field);

@@ -381,7 +381,9 @@ public class MCRDataURL implements Serializable {
                     encoding = !token.isEmpty() && token.size() > 1 ? MCRDataURLEncoding.fromValue(token.get(1))
                         : MCRDataURLEncoding.URL;
                 } catch (IllegalArgumentException e) {
-                    throw new MalformedURLException("Unknown encoding.");
+                    MalformedURLException malformedURLException = new MalformedURLException("Unknown encoding.");
+                    malformedURLException.initCause(e);
+                    throw malformedURLException;
                 }
 
                 Charset charset = params.containsKey(CHARSET_PARAM) ? Charset.forName(params.get(CHARSET_PARAM))
@@ -391,7 +393,9 @@ public class MCRDataURL implements Serializable {
                     data = encoding == MCRDataURLEncoding.BASE64 ? Base64.getDecoder().decode(parts[1])
                         : decode(parts[1], charset).getBytes(StandardCharsets.UTF_8);
                 } catch (IllegalArgumentException e) {
-                    throw new MalformedURLException("Error decoding the data. " + e.getMessage());
+                    MalformedURLException mue = new MalformedURLException("Error decoding the data.");
+                    mue.initCause(e);
+                    throw mue;
                 }
                 return new MCRDataURL(data, encoding, mimeType, params);
             } else {
@@ -410,8 +414,7 @@ public class MCRDataURL implements Serializable {
                 try {
                     return decode(sl[1], StandardCharsets.UTF_8);
                 } catch (UnsupportedCharsetException e) {
-                    throw new MCRException("Error encoding the parameter value \"" + sl[1]
-                        + "\". Error: " + e.getMessage());
+                    throw new MCRException("Error decoding the parameter value \"" + sl[1] + "\".", e);
                 }
             }));
         return params;
@@ -457,7 +460,7 @@ public class MCRDataURL implements Serializable {
      * @return the data
      */
     public byte[] getData() {
-        return data;
+        return data.clone();
     }
 
     /**

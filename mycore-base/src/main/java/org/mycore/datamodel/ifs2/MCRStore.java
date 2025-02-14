@@ -133,7 +133,7 @@ public class MCRStore {
      */
     protected int lastID;
 
-    public static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     protected MCRStore() {
     }

@@ -97,7 +97,7 @@ public class MCRSwordUtil {
 
     private static final int COPY_BUFFER_SIZE = 32 * 1024;
 
-    private static Logger LOGGER = LogManager.getLogger(MCRSwordUtil.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSwordUtil.class);
 
     public static MCRDerivate createDerivate(String documentID)
         throws MCRPersistenceException, IOException, MCRAccessException {
@@ -312,7 +312,7 @@ public class MCRSwordUtil {
         throws IOException, URISyntaxException {
         try (FileSystem zipfs = FileSystems.newFileSystem(new URI("jar:" + zipFile.toUri()), new HashMap<>())) {
             final Path sourcePath = zipfs.getPath("/");
-            ArrayList<MCRValidationResult> validationResults = new ArrayList<>();
+            List<MCRValidationResult> validationResults = new ArrayList<>();
             Files.walkFileTree(sourcePath, new SimpleFileVisitor<>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
@@ -355,7 +355,7 @@ public class MCRSwordUtil {
 
     public static void addDatesToEntry(Entry entry, MCRObject mcrObject) {
         MCRObjectService serviceElement = mcrObject.getService();
-        ArrayList<String> flags = serviceElement.getFlags(MCRObjectService.FLAG_TYPE_CREATEDBY);
+        List<String> flags = serviceElement.getFlags(MCRObjectService.FLAG_TYPE_CREATEDBY);
         flags.addAll(serviceElement.getFlags(MCRObjectService.FLAG_TYPE_MODIFIEDBY));
         Set<String> clearedFlags = new LinkedHashSet<>(flags);
         clearedFlags.forEach(entry::addAuthor);
@@ -435,7 +435,7 @@ public class MCRSwordUtil {
                 Matcher matcher = COLLECTION_IRI_PATTERN.matcher(uriPathAsString);
                 if (matcher.matches() && matcher.groupCount() > 1) {
                     String numberGroup = matcher.group(2);
-                    if (numberGroup.length() > 0) {
+                    if (!numberGroup.isEmpty()) {
                         return Integer.parseInt(numberGroup);
                     }
                 }
@@ -477,7 +477,7 @@ public class MCRSwordUtil {
 
         public static final String DEFAULT_URL_ENCODING = "UTF-8";
 
-        private static Logger LOGGER = LogManager.getLogger(BuildLinkUtil.class);
+        private static final Logger LOGGER = LogManager.getLogger();
 
         public static String getEditHref(String collection, String id) {
             return new MessageFormat("{0}{1}{2}/{3}", Locale.ROOT).format(

@@ -43,7 +43,6 @@ import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileAttributeView;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -79,7 +78,7 @@ public class MCRFileSystemProvider extends MCRAbstractFileSystemProvider {
      */
     public static final URI FS_URI = URI.create(SCHEME + ":///");
 
-    private static volatile MCRIFSFileSystem FILE_SYSTEM_INSTANCE;
+    private static volatile MCRIFSFileSystem fileSystemInstance;
 
     /* (non-Javadoc)
      * @see java.nio.file.spi.FileSystemProvider#getScheme()
@@ -104,14 +103,14 @@ public class MCRFileSystemProvider extends MCRAbstractFileSystemProvider {
      */
     @Override
     public MCRIFSFileSystem getFileSystem(URI uri) {
-        if (FILE_SYSTEM_INSTANCE == null) {
+        if (fileSystemInstance == null) {
             synchronized (FS_URI) {
-                if (FILE_SYSTEM_INSTANCE == null) {
-                    FILE_SYSTEM_INSTANCE = new MCRIFSFileSystem(this);
+                if (fileSystemInstance == null) {
+                    fileSystemInstance = new MCRIFSFileSystem(this);
                 }
             }
         }
-        return FILE_SYSTEM_INSTANCE;
+        return fileSystemInstance;
     }
 
     /* (non-Javadoc)
@@ -230,7 +229,7 @@ public class MCRFileSystemProvider extends MCRAbstractFileSystemProvider {
             return; //that was easy
         }
         checkCopyOptions(options);
-        HashSet<CopyOption> copyOptions = Sets.newHashSet(options);
+        Set<CopyOption> copyOptions = Sets.newHashSet(options);
         boolean createNew = !copyOptions.contains(StandardCopyOption.REPLACE_EXISTING);
         MCRPath src = MCRFileSystemUtils.checkPathAbsolute(source);
         MCRPath tgt = MCRFileSystemUtils.checkPathAbsolute(target);
@@ -259,7 +258,7 @@ public class MCRFileSystemProvider extends MCRAbstractFileSystemProvider {
         }
     }
 
-    private static void copyFile(MCRFile srcFile, MCRPath target, HashSet<CopyOption> copyOptions, boolean createNew)
+    private static void copyFile(MCRFile srcFile, MCRPath target, Set<CopyOption> copyOptions, boolean createNew)
         throws IOException {
         boolean fireCreateEvent = createNew || Files.notExists(target);
         MCRFile targetFile = MCRFileSystemUtils.getMCRFile(target, true, createNew, !fireCreateEvent);
@@ -274,7 +273,7 @@ public class MCRFileSystemProvider extends MCRAbstractFileSystemProvider {
         }
     }
 
-    private static void copyDirectory(MCRDirectory srcNode, MCRPath target, HashSet<CopyOption> copyOptions)
+    private static void copyDirectory(MCRDirectory srcNode, MCRPath target, Set<CopyOption> copyOptions)
         throws IOException {
         MCRDirectory tgtParentDir = MCRFileSystemUtils.resolvePath(target.getParent());
         MCRStoredNode child = (MCRStoredNode) tgtParentDir.getChild(target.getFileName().toString());
@@ -328,7 +327,7 @@ public class MCRFileSystemProvider extends MCRAbstractFileSystemProvider {
      */
     @Override
     public void move(Path source, Path target, CopyOption... options) throws IOException {
-        HashSet<CopyOption> copyOptions = Sets.newHashSet(options);
+        Set<CopyOption> copyOptions = Sets.newHashSet(options);
         if (copyOptions.contains(StandardCopyOption.ATOMIC_MOVE)) {
             throw new AtomicMoveNotSupportedException(source.toString(), target.toString(),
                 "ATOMIC_MOVE not supported yet");
@@ -451,8 +450,8 @@ public class MCRFileSystemProvider extends MCRAbstractFileSystemProvider {
      * @return the MCRIFSFileSystem instance
      */
     public static MCRIFSFileSystem getMCRIFSFileSystem() {
-        return (MCRIFSFileSystem) (FILE_SYSTEM_INSTANCE == null ? MCRAbstractFileSystem.getInstance(SCHEME)
-            : FILE_SYSTEM_INSTANCE);
+        return (MCRIFSFileSystem) (fileSystemInstance == null ? MCRAbstractFileSystem.getInstance(SCHEME)
+                                                              : fileSystemInstance);
     }
 
     static abstract class BaseBasicFileAttributeView extends MCRBasicFileAttributeViewImpl {

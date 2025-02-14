@@ -42,9 +42,10 @@ import jakarta.persistence.NoResultException;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 
-public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeable {
+public final class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeable {
+    @SuppressWarnings("PMD.LooseCoupling")
     private static MCRTilingQueue instance = new MCRTilingQueue();
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final Queue<MCRTileJob> preFetch;
 
@@ -69,6 +70,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
     /**
      * @return singleton instance of this class
      */
+    @SuppressWarnings("PMD.LooseCoupling")
     public static MCRTilingQueue getInstance() {
         if (!instance.running) {
             return null;

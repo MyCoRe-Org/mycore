@@ -255,7 +255,7 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
                     case null, default -> content.toString();
                 };
             });
-            System.out.println(resultingPI);
+            LOGGER.info(resultingPI);
         }
 
         final MCRPIParser<MCRPersistentIdentifier> parser = MCRPIManager.getInstance()

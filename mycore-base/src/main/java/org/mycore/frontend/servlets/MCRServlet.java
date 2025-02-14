@@ -80,26 +80,26 @@ public class MCRServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
-    private static String SERVLET_URL;
+    private static String servletUrl;
 
     private static final boolean ENABLE_BROWSER_CACHE = MCRConfiguration2.getBoolean("MCR.Servlet.BrowserCache.enable")
         .orElse(false);
 
-    private static MCRLayoutService LAYOUT_SERVICE;
+    private static MCRLayoutService layoutService;
 
-    private static String ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
+    private static final String ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
 
     public static MCRLayoutService getLayoutService() {
-        return LAYOUT_SERVICE;
+        return layoutService;
     }
 
     @Override
     public void init() throws ServletException {
         super.init();
-        if (LAYOUT_SERVICE == null) {
-            LAYOUT_SERVICE = MCRLayoutService.instance();
+        if (layoutService == null) {
+            layoutService = MCRLayoutService.instance();
         }
     }
 
@@ -125,7 +125,7 @@ public class MCRServlet extends HttpServlet {
             LOGGER.debug("Returning BaseURL {}servlets/ from user session.", value);
             return value + "servlets/";
         }
-        return SERVLET_URL != null ? SERVLET_URL : MCRFrontendUtil.getBaseURL() + "servlets/";
+        return servletUrl != null ? servletUrl : MCRFrontendUtil.getBaseURL() + "servlets/";
     }
 
     /**
@@ -143,7 +143,7 @@ public class MCRServlet extends HttpServlet {
 
     private static void prepareBaseURLs(String baseURLofRequest) {
         MCRFrontendUtil.prepareBaseURLs(baseURLofRequest);
-        SERVLET_URL = MCRFrontendUtil.getBaseURL() + "servlets/";
+        servletUrl = MCRFrontendUtil.getBaseURL() + "servlets/";
     }
 
     // The methods doGet() and doPost() simply call the private method
@@ -306,7 +306,7 @@ public class MCRServlet extends HttpServlet {
         SAXException, TransformerException {
         initializeMCRSession(req, getServletName());
 
-        if (SERVLET_URL == null) {
+        if (servletUrl == null) {
             prepareBaseURLs(req);
         }
 

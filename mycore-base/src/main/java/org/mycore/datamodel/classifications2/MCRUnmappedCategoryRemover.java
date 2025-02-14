@@ -21,6 +21,7 @@ package org.mycore.datamodel.classifications2;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -37,9 +38,9 @@ public class MCRUnmappedCategoryRemover {
     private final String classificationID;
 
     // contains mappings like mir_genres:article -> marcgt:article
-    private HashMap<MCRCategoryID, MCRCategoryID> toFromMapping;
+    private Map<MCRCategoryID, MCRCategoryID> toFromMapping;
 
-    private ArrayList<MCRCategoryID> filtered;
+    private List<MCRCategoryID> filtered;
 
     /**
      * @param classificationID of the classification to filter

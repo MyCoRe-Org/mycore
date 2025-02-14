@@ -137,7 +137,7 @@ public class MCRORCIDResource {
         } catch (Exception ex) {
             LOGGER.warn(() -> "Exception publishing " + oid + " to ORCID", ex);
             String msg = ex.getClass().getName() + " " + ex.getMessage();
-            throw new InternalServerErrorException(msg);
+            throw new InternalServerErrorException(msg, ex);
         }
     }
 

@@ -22,26 +22,26 @@ import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * A {@link MCRUserInformation} implementation with no roles attached.
- * @author Thomas Scheffler (yagee)
  *
+ * @author Thomas Scheffler (yagee)
  */
-public class MCRSystemUserInformation implements MCRUserInformation {
+public final class MCRSystemUserInformation implements MCRUserInformation {
 
-    private static MCRSystemUserInformation janitorInstance = new MCRSystemUserInformation(
+    private static final MCRSystemUserInformation JANITOR_INSTANCE = new MCRSystemUserInformation(
         new UserIdResolver("MCRJANITOR", null), true);
 
-    private static MCRSystemUserInformation systemInstance = new MCRSystemUserInformation(new UserIdResolver("SYSTEM",
-        null), false);
+    private static final MCRSystemUserInformation SYSTEM_INSTANCE = new MCRSystemUserInformation(
+        new UserIdResolver("SYSTEM", null), false);
 
-    private static MCRSystemUserInformation guestInstance = new MCRSystemUserInformation(new UserIdResolver("guest",
-        "MCR.Users.Guestuser.UserName"), false);
+    private static final MCRSystemUserInformation GUEST_INSTANCE = new MCRSystemUserInformation(
+        new UserIdResolver("guest", "MCR.Users.Guestuser.UserName"), false);
 
-    private static MCRSystemUserInformation superUserInstance = new MCRSystemUserInformation(new UserIdResolver(
-        "administrator", "MCR.Users.Superuser.UserName"), true);
+    private static final MCRSystemUserInformation SUPER_USER_INSTANCE = new MCRSystemUserInformation(
+        new UserIdResolver("administrator", "MCR.Users.Superuser.UserName"), true);
 
-    private boolean roleReturn;
+    private final boolean roleReturn;
 
-    private UserIdResolver userID;
+    private final UserIdResolver userID;
 
     private MCRSystemUserInformation(UserIdResolver userID, boolean roleReturn) {
         this.userID = userID;
@@ -53,7 +53,7 @@ public class MCRSystemUserInformation implements MCRUserInformation {
      */
     @Override
     public String getUserID() {
-        return userID.getUserId();
+        return userID.userId();
     }
 
     /**
@@ -68,7 +68,7 @@ public class MCRSystemUserInformation implements MCRUserInformation {
      * @return the systemInstance
      */
     public static MCRSystemUserInformation getSystemUserInstance() {
-        return systemInstance;
+        return SYSTEM_INSTANCE;
     }
 
     @Override
@@ -80,34 +80,27 @@ public class MCRSystemUserInformation implements MCRUserInformation {
      * @return the guestInstance
      */
     public static MCRSystemUserInformation getGuestInstance() {
-        return guestInstance;
+        return GUEST_INSTANCE;
     }
 
     /**
      * @return the superUserInstance
      */
     public static MCRSystemUserInformation getSuperUserInstance() {
-        return superUserInstance;
+        return SUPER_USER_INSTANCE;
     }
 
     /**
      * @return the janitor Instance
      */
     public static MCRSystemUserInformation getJanitorInstance() {
-        return janitorInstance;
+        return JANITOR_INSTANCE;
     }
 
-    private static class UserIdResolver {
-        private String userId;
+    private record UserIdResolver(String userId, String property) {
 
-        private String property;
-
-        UserIdResolver(String userId, String property) {
-            this.userId = userId;
-            this.property = property;
-        }
-
-        public String getUserId() {
+        @Override
+        public String userId() {
             if (property == null) {
                 return userId;
             }

@@ -235,7 +235,7 @@ public class MCRDOICommands {
                         oldMediaList = new ArrayList<>();
                     }
 
-                    HashMap<String, URI> newHashMap = new HashMap<>();
+                    Map<String, URI> newHashMap = new HashMap<>();
 
                     newMediaList.forEach(e -> newHashMap.put(e.getKey(), e.getValue()));
                     oldMediaList.forEach(e -> {

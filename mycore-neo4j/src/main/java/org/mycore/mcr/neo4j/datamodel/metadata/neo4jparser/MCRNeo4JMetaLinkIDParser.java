@@ -45,7 +45,7 @@ public class MCRNeo4JMetaLinkIDParser extends MCRNeo4JAbstractDataModelParser {
         for (Element element : classElement.getChildren()) {
             String linkType = element.getAttributeValue("type");
             String linkHref = element.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
-            if (linkHref != null && linkHref.trim().length() > 0) {
+            if (linkHref != null && !linkHref.isBlank()) {
                 try {
                     MCRObjectID.getInstance(linkHref);
                     LOGGER.debug("Got MCRObjectID from {}", linkHref);
@@ -60,7 +60,7 @@ public class MCRNeo4JMetaLinkIDParser extends MCRNeo4JAbstractDataModelParser {
                 continue;
             }
 
-            if (linkType == null || linkType.trim().length() == 0) {
+            if (linkType == null || linkType.isBlank()) {
                 LOGGER.warn("Set default link type reference for {}", sourceID);
                 linkType = "reference";
             }

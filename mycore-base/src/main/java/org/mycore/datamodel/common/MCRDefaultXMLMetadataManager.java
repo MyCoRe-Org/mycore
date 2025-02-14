@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -106,9 +107,9 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
     private static final String DEFAULT_SVN_DIRECTORY_NAME = "versions-metadata";
 
     /** The singleton */
-    private static MCRDefaultXMLMetadataManager SINGLETON;
+    private static MCRDefaultXMLMetadataManager singleton;
 
-    private HashSet<String> createdStores;
+    private final Set<String> createdStores;
 
     /**
      * The default IFS2 Metadata store class to use, set by MCR.Metadata.Store.DefaultClass
@@ -145,10 +146,10 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
 
     /** Returns the singleton */
     public static synchronized MCRDefaultXMLMetadataManager instance() {
-        if (SINGLETON == null) {
-            SINGLETON = new MCRDefaultXMLMetadataManager();
+        if (singleton == null) {
+            singleton = new MCRDefaultXMLMetadataManager();
         }
-        return SINGLETON;
+        return singleton;
     }
 
     @Override
@@ -377,7 +378,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
             throw new MCRPersistenceException(String.format(Locale.ENGLISH,
                 "Couldn'e create directory ''%s'' to set up store for project ''%s'' and objectType ''%s'' "
                     + "and config prefix ''%s''",
-                path.toAbsolutePath(), project, objectType, configPrefix));
+                path.toAbsolutePath(), project, objectType, configPrefix), e);
         }
     }
 

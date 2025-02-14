@@ -111,7 +111,7 @@ public class MCRRoleServlet extends MCRServlet {
     }
 
     private Collection<Element> getRoleElements() {
-        ArrayList<Element> list = new ArrayList<>(roleCategories.size());
+        List<Element> list = new ArrayList<>(roleCategories.size());
         for (MCRCategoryID categID : roleCategories) {
             Element role = new Element("role");
             role.setAttribute("categID", categID.toString());

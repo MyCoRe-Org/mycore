@@ -40,7 +40,7 @@ public class MCRCommandListProcessor extends SubmissionPublisher<JsonObject>
     @Override
     public void onNext(List<String> item) {
         try {
-            ArrayList<String> copy;
+            List<String> copy;
             synchronized (item) {
                 copy = new ArrayList<>(item);
             }

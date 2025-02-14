@@ -58,7 +58,7 @@ import jakarta.ws.rs.core.Response;
 
 /**
  * Linked Open Data: Classification End point
- * 
+ *
  * @author Robert Stephan
  */
 @Path("/classification")
@@ -83,11 +83,11 @@ public class MCRLodClassification {
     ContainerRequestContext request;
 
     /**
-     * return the list of available classifications as Linked Open Data 
-     * 
+     * return the list of available classifications as Linked Open Data
+     *
      * TODO Is there a reasonable response on the base path of an LOD URI,
      * or remove this endpoint completely?
-     * 
+     *
      * @return a jersey response with the list of classifications
      */
     @GET
@@ -110,6 +110,7 @@ public class MCRLodClassification {
             return MCRJerseyLodApp.returnLinkedData(rdfxmlString, uri, mimeTypes);
         } catch (IOException e) {
             throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
+                .withCause(e)
                 .withErrorCode(ERROR_MCRCLASS_TRANSFORMATION)
                 .withMessage("Could create classification list.")
                 .toException();
@@ -119,7 +120,7 @@ public class MCRLodClassification {
     /**
      * return a classification (with its categories on the first hierarchy level as linked open data)
      * @param classId - the classification ID
-     * @return the Response with the classification as linked open data 
+     * @return the Response with the classification as linked open data
      */
     @GET
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
@@ -134,7 +135,7 @@ public class MCRLodClassification {
 
     /**
      * return a category and its children on the first hierarchy level as linked open data
-     * 
+     *
      * @param classId - the class ID
      * @param categId - the category ID
      * @return the Response with the category as linked open data
@@ -185,6 +186,7 @@ public class MCRLodClassification {
             return MCRJerseyLodApp.returnLinkedData(rdfxmlString, uri, mimeTypes);
         } catch (IOException e) {
             throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
+                .withCause(e)
                 .withErrorCode(ERROR_MCRCLASS_TRANSFORMATION)
                 .withMessage("Could not find classification or category in " + classId + ".")
                 .toException();

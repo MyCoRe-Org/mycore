@@ -67,7 +67,8 @@ public abstract class MCRIIIFImageImpl {
             return imageImpl;
         } catch (NoSuchMethodException e) {
             throw new MCRConfigurationException(
-                "Configurated class (" + classObject.getName() + ") needs a string constructor: " + classPropertyName);
+                "Configurated class (" + classObject.getName() + ") needs a string constructor: " + classPropertyName,
+                e);
         } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             throw new MCRException(e);
         }

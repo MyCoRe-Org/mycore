@@ -46,7 +46,7 @@ public class MCRMetsIIIFModsMetadataExtractor implements MCRMetsIIIFMetadataExtr
             XPathExpression<Text> pathExpression = XPathFactory.instance().compile(entry.getValue(), Filters.text(),
                 null, MCRConstants.MODS_NAMESPACE);
             List<Text> texts = pathExpression.evaluate(xmlData);
-            if (texts.size() == 0) {
+            if (texts.isEmpty()) {
                 return null;
             }
             return new MCRIIIFMetadata(entry.getKey(),

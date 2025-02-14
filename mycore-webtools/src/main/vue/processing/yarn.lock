@@ -561,10 +561,10 @@ undici-types@~6.19.2:
   resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-6.19.8.tgz#35111c9d1437ab83a7cdc0abae2f26d88eda0a02"
   integrity sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==
 
-vite@^6.0.6:
-  version "6.0.6"
-  resolved "https://registry.yarnpkg.com/vite/-/vite-6.0.6.tgz#a851674fcff55b0c1962f72082354b8802e48505"
-  integrity sha512-NSjmUuckPmDU18bHz7QZ+bTYhRR0iA72cs2QAxCqDpafJ0S6qetco0LB3WW2OxlMHS0JmAv+yZ/R3uPmMyGTjQ==
+vite@^6.0.9:
+  version "6.0.9"
+  resolved "https://registry.yarnpkg.com/vite/-/vite-6.0.9.tgz#0a830b767ef7aa762360b56bdef955c1395dc1ee"
+  integrity sha512-MSgUxHcaXLtnBPktkbUSoQUANApKYuxZ6DrbVENlIorbhL2dZydTLaZ01tjUoE3szeFzlFk9ANOKk0xurh4MKA==
   dependencies:
     esbuild "^0.24.2"
     postcss "^8.4.49"

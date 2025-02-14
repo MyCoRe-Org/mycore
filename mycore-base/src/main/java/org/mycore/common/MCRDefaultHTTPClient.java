@@ -43,15 +43,19 @@ import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.services.http.MCRHttpUtils;
 
 public class MCRDefaultHTTPClient implements MCRHTTPClient {
-    private static Logger logger = LogManager.getLogger();
+
+    private static final Logger LOGGER = LogManager.getLogger();
+
     @SuppressWarnings("PMD.SingularField")
     private long maxObjectSize;
+
     @SuppressWarnings("PMD.SingularField")
     private int maxCacheEntries;
+
     @SuppressWarnings("PMD.SingularField")
     private int requestTimeout;
 
-    private CloseableHttpClient restClient;
+    private final CloseableHttpClient restClient;
 
     public MCRDefaultHTTPClient() {
         CacheConfig cacheConfig = CacheConfig.custom()
@@ -94,7 +98,7 @@ public class MCRDefaultHTTPClient implements MCRHTTPClient {
         try {
             restClient.close();
         } catch (IOException e) {
-            logger.warn("Exception while closing http client.", e);
+            LOGGER.warn("Exception while closing http client.", e);
         }
     }
 
@@ -102,12 +106,12 @@ public class MCRDefaultHTTPClient implements MCRHTTPClient {
     public MCRContent get(URI hrefURI) throws IOException {
         HttpCacheContext context = HttpCacheContext.create();
         HttpGet get = new HttpGet(hrefURI);
-        MCRContent retContent = restClient.execute(get, context, new AbstractHttpClientResponseHandler<MCRContent>() {
+        MCRContent retContent = restClient.execute(get, context, new AbstractHttpClientResponseHandler<>() {
             @Override
             public MCRContent handleResponse(ClassicHttpResponse response) throws IOException {
-                logger.debug("http query: {}", hrefURI);
-                logger.debug("http resp status: {} {}", response::getCode, response::getReasonPhrase);
-                logger.debug(() -> getCacheDebugMsg(hrefURI, context));
+                LOGGER.debug("http query: {}", hrefURI);
+                LOGGER.debug("http resp status: {} {}", response::getCode, response::getReasonPhrase);
+                LOGGER.debug(() -> getCacheDebugMsg(hrefURI, context));
                 return super.handleResponse(response);
             }
 

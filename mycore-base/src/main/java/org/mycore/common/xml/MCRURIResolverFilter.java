@@ -47,7 +47,8 @@ import jakarta.servlet.http.HttpServletResponseWrapper;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRURIResolverFilter implements Filter {
-    private static final Logger LOGGER = LogManager.getLogger(MCRURIResolver.class);
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     static ThreadLocal<List<String>> uriList = ThreadLocal.withInitial(ArrayList::new);
 
@@ -189,7 +190,7 @@ public class MCRURIResolverFilter implements Filter {
             return encoding;
         }
 
-        private class MyServletOutputStream extends ServletOutputStream {
+        private final class MyServletOutputStream extends ServletOutputStream {
 
             @Override
             public void print(String arg0) throws IOException {

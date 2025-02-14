@@ -19,10 +19,10 @@
 package org.mycore.webtools.processing.socket.impl;
 
 enum MCRMessageType {
-    error,
-    registry,
-    addCollection,
-    removeCollection,
-    updateProcessable,
-    updateCollectionProperty
+    ERROR,
+    REGISTRY,
+    ADD_COLLECTION,
+    REMOVE_COLLECTION,
+    UPDATE_PROCESSABLE,
+    UPDATE_COLLECTION_PROPERTY
 }

@@ -54,7 +54,7 @@ public class MCRMediaSourceProvider {
 
     private Optional<MCRSecureTokenV2> wowzaToken;
 
-    private ArrayList<MCRMediaSource> sources;
+    private List<MCRMediaSource> sources;
 
     public MCRMediaSourceProvider(String derivateId, String path, Optional<String> userAgent,
         Supplier<String[]> parameterSupplier) throws IOException, URISyntaxException {
@@ -66,28 +66,28 @@ public class MCRMediaSourceProvider {
                     MCRSessionMgr.getCurrentSession().getCurrentIP(),
                     MCRConfiguration2.getStringOrThrow("MCR.Media.Wowza.SharedSecred"),
                     parameterSupplier.get()));
-        } catch (RuntimeException e) {
-            Throwable cause = e.getCause();
+        } catch (RuntimeException ignoredBeCause) {
+            Throwable cause = ignoredBeCause.getCause();
             if (cause instanceof IOException ioe) {
                 throw ioe;
             }
             if (cause instanceof URISyntaxException use) {
                 throw use;
             }
-            throw e;
+            throw ignoredBeCause;
         }
-        ArrayList<MCRMediaSource> mediaSources = new ArrayList<>(4);
+        List<MCRMediaSource> mediaSources = new ArrayList<>(4);
         getDashStream()
-            .map(s -> new MCRMediaSource(s, MCRMediaSourceType.dash_stream))
+            .map(s -> new MCRMediaSource(s, MCRMediaSourceType.DASH_STREAM))
             .ifPresent(mediaSources::add);
         userAgent.filter(MCRMediaSourceProvider::mayContainHLSStream).ifPresent(f -> getHLSStream()
-            .map(s -> new MCRMediaSource(s, MCRMediaSourceType.hls_stream))
+            .map(s -> new MCRMediaSource(s, MCRMediaSourceType.HLS_STREAM))
             .ifPresent(mediaSources::add));
         getRTMPStream()
-            .map(s -> new MCRMediaSource(s, MCRMediaSourceType.rtmp_stream))
+            .map(s -> new MCRMediaSource(s, MCRMediaSourceType.RTMP_STREAM))
             .ifPresent(mediaSources::add);
         mediaSources.add(
-            new MCRMediaSource(getPseudoStream(MCRObjectID.getInstance(derivateId), path), MCRMediaSourceType.mp4));
+            new MCRMediaSource(getPseudoStream(MCRObjectID.getInstance(derivateId), path), MCRMediaSourceType.MP4));
         this.sources = mediaSources;
     }
 

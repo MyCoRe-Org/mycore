@@ -304,7 +304,7 @@ public class MCRDOIService extends MCRDOIBaseService {
             LOGGER.warn("Object {} with registered doi {} got deleted. Try to set DOI inactive.", obj::getId,
                 doi::asString);
             if (this.isRegistered(obj.getId(), additional)) {
-                HashMap<String, String> contextParameters = new HashMap<>();
+                Map<String, String> contextParameters = new HashMap<>();
                 contextParameters.put(CONTEXT_DOI, doi.asString());
                 contextParameters.put(CONTEXT_OBJ, obj.getId().toString());
                 this.addJob(PiJobAction.DELETE, contextParameters);

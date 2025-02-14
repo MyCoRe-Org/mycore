@@ -20,6 +20,7 @@ package org.mycore.tools;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -36,13 +37,13 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.streams.MCRByteArrayOutputStream;
 
 public class MCRPNGTools implements AutoCloseable {
-    private static Logger LOGGER = LogManager.getLogger(MCRPNGTools.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRPNGTools.class);
 
     private static AtomicInteger maxPngSize = new AtomicInteger(64 * 1024);
 
     private ImageWriteParam imageWriteParam;
 
-    private ConcurrentLinkedQueue<ImageWriter> imageWriters = new ConcurrentLinkedQueue<>();
+    private Queue<ImageWriter> imageWriters = new ConcurrentLinkedQueue<>();
 
     public MCRPNGTools() {
         imageWriteParam = ImageIO.getImageWritersBySuffix("png").next().getDefaultWriteParam();

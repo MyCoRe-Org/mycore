@@ -29,6 +29,7 @@ public class MCRDataciteRestResponseEntryDataBase64Value extends MCRDataciteRest
     }
 
     public byte[] getDecodedValue() {
-        return decodedValue;
+        return decodedValue.clone();
     }
+
 }

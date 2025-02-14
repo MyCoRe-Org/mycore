@@ -56,9 +56,9 @@ import jakarta.ws.rs.core.UriInfo;
 
 /**
  * REST API methods to retrieve objects and derivates.
- * 
+ *
  * @author Robert Stephan
- * 
+ *
  */
 @Path("/objects")
 public class MCRRestAPIObjects {
@@ -75,7 +75,7 @@ public class MCRRestAPIObjects {
     @Context
     Application app;
 
-    /** returns a list of mcrObjects 
+    /** returns a list of mcrObjects
      *
      * @param info - the injected Jersey URIInfo object
      * @param format - parameter for return format, values are
@@ -104,15 +104,15 @@ public class MCRRestAPIObjects {
         return MCRRestAPIObjectsHelper.listObjects(info, format, filter, sort);
     }
 
-    /** 
-     * returns a list of derivates for a given MyCoRe Object 
+    /**
+     * returns a list of derivates for a given MyCoRe Object
      *
      * @param info - the injected Jersey URIInfo object
      * @param mcrid - an object identifier of syntax [id] or [prefix]:[id]
      *
      * Allowed Prefixes are "mcr" or application specific search keys
      * "mcr" is the default prefix for MyCoRe IDs.
-    
+
      * @param format - parameter for return format, values are
      *     * xml (default value)
      *     * json
@@ -135,13 +135,13 @@ public class MCRRestAPIObjects {
 
     /**
      * returns a single derivate object in XML Format
-     * 
+     *
      * @param info - the injected Jersey URIInfo object
      * @param id an object identifier of syntax [id] or [prefix]:[id]
      *
      * Allowed Prefixes are "mcr" or application specific search keys
      * "mcr" is the default prefix for MyCoRe IDs.
-    
+
      *
      * @param style allowed values are "derivatedetails"
      * derivate details will be integrated into the output.
@@ -159,7 +159,7 @@ public class MCRRestAPIObjects {
 
     /**
      * returns a single object in XML Format
-     * 
+     *
      * @param info - the injected Jersey URIInfo object
      * @param mcrid - a object identifier of syntax [id] or [prefix]:[id]
      * @param derid - a derivate identifier of syntax [id] or [prefix]:[id]
@@ -184,7 +184,7 @@ public class MCRRestAPIObjects {
             Objects.equals(style, "derivatedetails"));
     }
 
-    /** returns a list of derivates for a given MyCoRe Object 
+    /** returns a list of derivates for a given MyCoRe Object
      *
      * @param info - the injected Jersey URIInfo object
      * @param request - the injected JAX-WS request object
@@ -218,7 +218,7 @@ public class MCRRestAPIObjects {
 
     /**
      *  redirects to the maindoc of the given derivate
-     *  
+     *
      * @param info - the injected Jersey URIInfo object
      * @param mcrObjID - a object identifier of syntax [id] or [prefix]:[id]
      * @param mcrDerID - a derivate identifier of syntax [id] or [prefix]:[id]
@@ -227,7 +227,7 @@ public class MCRRestAPIObjects {
      * "mcr" is the default prefix for MyCoRe IDs.
      *
      * @return a Jersey Response object
-     * 
+     *
      */
     @GET
     @Path("/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}/open")
@@ -241,9 +241,11 @@ public class MCRRestAPIObjects {
                 return Response.seeOther(new URI(url)).build();
             }
         } catch (URISyntaxException e) {
-            throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
+            MCRRestAPIException restAPIException = new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
                 new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR,
                     "A problem occurred while opening maindoc from derivate " + mcrDerID, e.getMessage()));
+            restAPIException.initCause(e);
+            throw restAPIException;
         }
         throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
             new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR,
@@ -255,15 +257,15 @@ public class MCRRestAPIObjects {
     //*****************************
     /**
      * create / update a MyCoRe object
-     *  
+     *
      * @param info - the injected Jersey URIInfo object
      * @param request - the injected HTTPServletRequest object
      *
      * @param uploadedInputStream - the MyCoRe Object (XML) as inputstream from HTTP Post
      * @param fileDetails - file metadata from HTTP Post
-     * 
+     *
      * @return a Jersey Response object
-     * 
+     *
      */
     @POST
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8" })
@@ -278,17 +280,17 @@ public class MCRRestAPIObjects {
 
     /**
      * create a new (empty) MyCoRe derivate or returns one that already exists (by label)
-     *  
+     *
      * @param info - the injected Jersey URIInfo object
      * @param request - the injected HTTPServletRequest object
-     * 
+     *
      * @param mcrObjID - a MyCoRe Object ID
-     * 
+     *
      * @param label - the label of the new derivate
      * @param overwrite - if true, return an existing derivate (with same label)
-     * 
+     *
      * @return a Jersey Response object
-     * 
+     *
      */
 
     @POST
@@ -338,15 +340,15 @@ public class MCRRestAPIObjects {
 
     /**
      * delete all file from a given derivate
-     *  
+     *
      * @param info - the injected Jersey URIInfo object
      * @param request - the injected HTTPServletRequest object
-     * 
+     *
      * @param mcrObjID - a MyCoRe Object ID
      * @param mcrDerID - a MyCoRe Derivate ID
-     * 
+     *
      * @return a Jersey Response object
-     * 
+     *
      */
     @DELETE
     @Path("/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}/contents")
@@ -359,15 +361,15 @@ public class MCRRestAPIObjects {
 
     /**
      * delete a whole derivate
-     *  
+     *
      * @param info - the injected Jersey URIInfo object
      * @param request - the injected HTTPServletRequest object
-     * 
+     *
      * @param mcrObjID - a MyCoRe Object ID
      * @param mcrDerID - a MyCoRe Derivate ID
-     * 
+     *
      * @return a Jersey Response object
-     * 
+     *
      */
     @DELETE
     @Path("/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}")

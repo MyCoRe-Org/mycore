@@ -58,7 +58,7 @@ public class MCRNeo4JProxyServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
 
-    static final Logger LOGGER = LogManager.getLogger(MCRNeo4JProxyServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final List<String> KEY_LIST = List.of("q", "id", "limit");
 

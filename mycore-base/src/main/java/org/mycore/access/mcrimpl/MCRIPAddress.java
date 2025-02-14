@@ -80,7 +80,7 @@ public class MCRIPAddress {
     }
 
     public byte[] getAddress() {
-        return address;
+        return address.clone();
     }
 
     @Override

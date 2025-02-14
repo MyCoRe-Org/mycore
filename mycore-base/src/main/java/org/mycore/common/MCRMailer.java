@@ -159,7 +159,7 @@ public class MCRMailer extends MCRServlet {
     public static void send(String sender, String recipient, String subject, String body) {
         LOGGER.debug("Called plaintext send method with single recipient.");
 
-        ArrayList<String> recipients = new ArrayList<>();
+        List<String> recipients = new ArrayList<>();
         recipients.add(recipient);
         send(sender, null, recipients, null, subject, body, null);
     }
@@ -209,7 +209,7 @@ public class MCRMailer extends MCRServlet {
     public static void send(String sender, String recipient, String subject, String body, List<String> parts) {
         LOGGER.debug("Called multipart send method with single recipient.");
 
-        ArrayList<String> recipients = new ArrayList<>();
+        List<String> recipients = new ArrayList<>();
         recipients.add(recipient);
         send(sender, null, recipients, null, subject, body, parts);
     }
@@ -364,7 +364,7 @@ public class MCRMailer extends MCRServlet {
                 for (int i = numTries - 1; i > 0; i--) {
                     LOGGER.info("Retrying in 5 minutes...");
                     try {
-                        Thread.sleep(300000); // wait 5 minutes
+                        Thread.sleep(300_000); // wait 5 minutes
                     } catch (InterruptedException ignored) {
                     }
 
@@ -769,7 +769,7 @@ public class MCRMailer extends MCRServlet {
         }
     }
 
-    private static class SMTPAuthenticator extends Authenticator {
+    private static final class SMTPAuthenticator extends Authenticator {
 
         @Override
         public PasswordAuthentication getPasswordAuthentication() {

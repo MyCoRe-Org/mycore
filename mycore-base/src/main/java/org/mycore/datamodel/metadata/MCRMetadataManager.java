@@ -71,10 +71,10 @@ public final class MCRMetadataManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRCache<MCRObjectID, MCRObjectID> DERIVATE_OBJECT_MAP = new MCRCache<>(10000,
+    private static final MCRCache<MCRObjectID, MCRObjectID> DERIVATE_OBJECT_MAP = new MCRCache<>(10_000,
         "derivate objectid cache");
 
-    private static final MCRCache<MCRObjectID, List<MCRObjectID>> OBJECT_DERIVATE_MAP = new MCRCache<>(10000,
+    private static final MCRCache<MCRObjectID, List<MCRObjectID>> OBJECT_DERIVATE_MAP = new MCRCache<>(10_000,
         "derivate objectid cache");
 
     private static final MCRXMLMetadataManager XML_MANAGER = MCRXMLMetadataManager.instance();

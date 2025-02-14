@@ -57,7 +57,7 @@ import org.mycore.pi.urn.MCRUUIDURNGenerator;
  * @author Huu Chi Vu
  */
 public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private int numOfDerivFiles = 15;
 

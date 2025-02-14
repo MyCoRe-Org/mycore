@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.SequencedMap;
 
 import org.mycore.common.config.MCRConfiguration2;
 
@@ -42,7 +43,7 @@ public class MCRValidationResults {
 
     private Map<String, String> xPath2Marker = new HashMap<>();
 
-    private LinkedHashMap<String, MCRValidator> xPath2FailedRule = new LinkedHashMap<>();
+    private SequencedMap<String, MCRValidator> xPath2FailedRule = new LinkedHashMap<>();
 
     private boolean isValid = true;
 

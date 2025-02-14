@@ -111,10 +111,10 @@ public class MCROCFLCommands {
 
         migration.start();
 
-        ArrayList<String> success = migration.getSuccess();
-        ArrayList<String> failed = migration.getFailed();
-        ArrayList<String> invalidState = migration.getInvalidState();
-        ArrayList<String> withoutHistory = migration.getWithoutHistory();
+        List<String> success = migration.getSuccess();
+        List<String> failed = migration.getFailed();
+        List<String> invalidState = migration.getInvalidState();
+        List<String> withoutHistory = migration.getWithoutHistory();
 
         LOGGER.info(() -> "The migration resulted in \n" +
             SUCCESS + ": " + String.join(", ", success) + " \n" +

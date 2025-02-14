@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.SequencedMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.mycore.common.config.MCRConfigurationInputStream;
@@ -33,18 +34,18 @@ import org.mycore.common.config.MCRProperties;
 
 class MCRPropertyHelper {
 
-    private final LinkedHashMap<String, byte[]> configFileContents;
+    private final SequencedMap<String, byte[]> configFileContents;
 
     MCRPropertyHelper() throws IOException {
         configFileContents = MCRConfigurationInputStream.getConfigFileContents("mycore.properties");
     }
 
-    public Map<String, List<MCRProperty>> analyzeProperties() {
+    public SequencedMap<String, List<MCRProperty>> analyzeProperties() {
         Properties properties = new MCRProperties();
         Properties currentProperties = new MCRProperties();
-        final AtomicReference<Properties> oldProperties = new AtomicReference<Properties>(null);
+        final AtomicReference<Properties> oldProperties = new AtomicReference<>(null);
 
-        LinkedHashMap<String, List<MCRProperty>> analyzedProperties = new LinkedHashMap<>();
+        SequencedMap<String, List<MCRProperty>> analyzedProperties = new LinkedHashMap<>();
 
         for (Map.Entry<String, byte[]> componentContentEntry : configFileContents.entrySet()) {
             String component = componentContentEntry.getKey();

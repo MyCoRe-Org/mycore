@@ -60,7 +60,7 @@ public final class MCRTreeMessage {
     }
 
     public List<String> treeLines() {
-        LinkedList<String> lines = new LinkedList<>();
+        List<String> lines = new LinkedList<>();
         treeLines(new LinkedList<>(), lines);
         return lines;
     }
@@ -113,7 +113,7 @@ public final class MCRTreeMessage {
 
     }
 
-    private static class LineEntry extends Entry {
+    private static final class LineEntry extends Entry {
 
         private final String key;
 
@@ -131,7 +131,7 @@ public final class MCRTreeMessage {
 
     }
 
-    private static class NestedEntry extends Entry {
+    private static final class NestedEntry extends Entry {
 
         private final String key;
 

@@ -123,12 +123,12 @@ public class MCRTextResolver {
     /**
      * Defines how deep the text is resolved.
      * <dl>
-     * <dt>Deep</dt><dd>everything is resolved</dd>
-     * <dt>NoVariables</dt><dd>the value of variables is not being resolved</dd>
+     * <dt>DEEP</dt><dd>everything is resolved</dd>
+     * <dt>NO_VARIABLES</dt><dd>the value of variables is not being resolved</dd>
      * </dl>
      */
     public enum ResolveDepth {
-        Deep, NoVariables
+        DEEP, NO_VARIABLES
     }
 
     /**
@@ -136,7 +136,7 @@ public class MCRTextResolver {
      */
     public MCRTextResolver() {
         this.variablesMap = new HashMap<>();
-        this.setResolveDepth(ResolveDepth.Deep);
+        this.setResolveDepth(ResolveDepth.DEEP);
         this.setRetainText(true);
         this.tracker = new CircularDependencyTracker(this);
         try {
@@ -469,7 +469,7 @@ public class MCRTextResolver {
                 }
                 // resolve the content of the variable recursive
                 // to resolve all other internal variables, condition etc.
-                if (getTextResolver().getResolveDepth() != ResolveDepth.NoVariables) {
+                if (getTextResolver().getResolveDepth() != ResolveDepth.NO_VARIABLES) {
                     Text recursiveResolvedText = resolveText(value);
                     resolved = recursiveResolvedText.resolved;
                     value = recursiveResolvedText.getValue();

@@ -277,7 +277,7 @@ public class MCRQuery {
             query.setAttribute("maxResults", String.valueOf(maxResults));
             query.setAttribute("numPerPage", String.valueOf(numPerPage));
 
-            if (sortBy != null && sortBy.size() > 0) {
+            if (sortBy != null && !sortBy.isEmpty()) {
                 Element sortByElem = new Element("sortBy");
                 query.addContent(sortByElem);
                 for (MCRSortBy sb : sortBy) {
@@ -288,7 +288,7 @@ public class MCRQuery {
                 }
             }
 
-            if (returnFields != null && returnFields.size() > 0) {
+            if (returnFields != null && !returnFields.isEmpty()) {
                 Element returns = new Element("returnFields");
                 returns.setText(returnFields.stream().collect(Collectors.joining(",")));
                 query.addContent(returns);

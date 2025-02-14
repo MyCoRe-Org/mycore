@@ -68,9 +68,9 @@ public class MCRLinkTableManager {
     protected static MCRLinkTableManager singleton;
 
     // logger
-    static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
-    private MCRLinkTableInterface linkTableInstance;
+    private final MCRLinkTableInterface linkTableInstance;
 
     /**
      * Returns the link table manager singleton.
@@ -475,7 +475,7 @@ public class MCRLinkTableManager {
             categories.add(state);
         }
         categories.addAll(obj.getService().getClassifications());
-        if (categories.size() > 0) {
+        if (!categories.isEmpty()) {
             MCRCategLinkReference objectReference = new MCRCategLinkReference(mcrId);
             MCRCategLinkServiceFactory.getInstance().setLinks(objectReference, categories);
         }

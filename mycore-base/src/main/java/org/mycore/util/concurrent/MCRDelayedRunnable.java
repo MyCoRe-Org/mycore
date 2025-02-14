@@ -38,13 +38,13 @@ import com.google.common.primitives.Ints;
  */
 public class MCRDelayedRunnable implements Delayed, Runnable, MCRDecorator<Runnable> {
 
-    private static AtomicLong ATOMIC_SYSTEM_TIME = new AtomicLong(System.currentTimeMillis());
+    private static final AtomicLong ATOMIC_SYSTEM_TIME = new AtomicLong(System.currentTimeMillis());
 
     protected Runnable runnable;
 
     private long startTimeInMs = -1;
 
-    private String id;
+    private final String id;
 
     /**
      * Creates a new {@link MCRDelayedRunnable} encapsulating a Runnable for delayed execution.

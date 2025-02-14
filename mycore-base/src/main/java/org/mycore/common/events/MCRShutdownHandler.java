@@ -21,6 +21,7 @@ package org.mycore.common.events;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.TimeUnit;
@@ -37,7 +38,7 @@ import org.mycore.common.config.MCRConfigurationException;
 import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventor;
 
 /**
- * is a wrapper for shutdown hooks. When used inside a web application this shutdown hook is bound to the
+ * Is a wrapper for shutdown hooks. When used inside a web application this shutdown hook is bound to the
  * ServletContext. If not this hook is bound to the Java Runtime. Every <code>Closeable</code> that is added via
  * <code>addCloseable()</code> will be closed at shutdown time. Do not forget to remove any closeable via
  * <code>removeCloseable()</code> to remove any instances. For registering this hook for a web application see
@@ -48,15 +49,17 @@ import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventor;
  * @see org.mycore.common.events.MCRServletContextListener
  * @since 1.3
  */
-public class MCRShutdownHandler {
+public final class MCRShutdownHandler {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final int ADD_CLOSEABLE_TIMEOUT = 10;
 
     private static final String PROPERTY_SYSTEM_NAME = "MCR.CommandLineInterface.SystemName";
 
-    private static MCRShutdownHandler SINGLETON = new MCRShutdownHandler();
+    private static MCRShutdownHandler singleton = new MCRShutdownHandler();
 
-    final ConcurrentSkipListSet<Closeable> requests = new ConcurrentSkipListSet<>();
+    final NavigableSet<Closeable> requests = new ConcurrentSkipListSet<>();
 
     final ReentrantReadWriteLock shutdownLock = new ReentrantReadWriteLock();
 
@@ -77,7 +80,7 @@ public class MCRShutdownHandler {
     }
 
     public static MCRShutdownHandler getInstance() {
-        return SINGLETON;
+        return singleton;
     }
 
     public void addCloseable(MCRShutdownHandler.Closeable c) {
@@ -110,22 +113,21 @@ public class MCRShutdownHandler {
     }
 
     void shutDown() {
-        Logger logger = LogManager.getLogger();
         String cfgSystemName = "MyCoRe:";
         try {
             cfgSystemName = MCRConfiguration2.getStringOrThrow(PROPERTY_SYSTEM_NAME) + ":";
         } catch (MCRConfigurationException e) {
             //may occur early if there is an error starting mycore up or in JUnit tests
-            logger.warn(() -> "Error getting '" + PROPERTY_SYSTEM_NAME + "': " + e.getMessage());
+            LOGGER.warn(() -> "Error getting '" + PROPERTY_SYSTEM_NAME + "': " + e.getMessage());
         }
         final String system = cfgSystemName;
-        System.out.println(system + " Shutting down system, please wait...\n");
+        LOGGER.info("{} Shutting down system, please wait...", system);
         runClosables();
-        System.out.println(system + " closing any remaining MCRSession instances, please wait...\n");
+        LOGGER.info("{} closing any remaining MCRSession instances, please wait...", system);
         MCRSessionMgr.close();
-        System.out.println(system + " Goodbye, and remember: \"Alles wird gut.\"\n");
+        LOGGER.info("{} Goodbye, and remember: \"Alles wird gut.\"", system);
         LogManager.shutdown();
-        SINGLETON = null;
+        singleton = null;
         // may be needed in webapp to release file handles correctly.
         if (leakPreventor != null) {
             ClassLoaderLeakPreventor myLeakPreventor = leakPreventor;
@@ -137,7 +139,7 @@ public class MCRShutdownHandler {
     void runClosables() {
         Logger logger = LogManager.getLogger();
         logger.debug(() -> "requests: " + requests);
-        Closeable[] closeables = requests.stream().toArray(Closeable[]::new);
+        Closeable[] closeables = requests.toArray(Closeable[]::new);
         Stream.of(closeables)
             .peek(c -> logger.debug("Prepare Closing (1): {}", c))
             .forEach(Closeable::prepareClose); //may add more Closeables MCR-1726

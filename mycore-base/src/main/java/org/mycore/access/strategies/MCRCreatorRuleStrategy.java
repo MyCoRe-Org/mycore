@@ -83,7 +83,7 @@ public class MCRCreatorRuleStrategy implements MCRCombineableAccessCheckStrategy
         .getOrThrow("MCR.Access.Strategy.CreatorReviewPermissions", MCRConfiguration2::splitValue)
         .collect(Collectors.toList());
 
-    private static List<String> CREATOR_ANY_STATE_PERMISSIONS =
+    private static final List<String> CREATOR_ANY_STATE_PERMISSIONS =
         MCRConfiguration2.getString("MCR.Access.Strategy.CreatorAnyStatePermissions").stream()
             .flatMap(MCRConfiguration2::splitValue).toList();
 

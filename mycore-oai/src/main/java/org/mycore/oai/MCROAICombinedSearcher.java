@@ -120,7 +120,7 @@ public class MCROAICombinedSearcher extends MCROAISearcher {
             MCROAIResult deletedResult = delSearcher.query(deletedCursor);
             result.list().addAll(deletedResult.list());
             deletedResult.nextCursor().ifPresent(result::setNextCursor);
-        } else if (delSearcher.getDeletedRecords().size() > 0) {
+        } else if (!delSearcher.getDeletedRecords().isEmpty()) {
             result.setNextCursor(delSearcher.buildCursor(0, this.getPartitionSize()));
         }
         return result;

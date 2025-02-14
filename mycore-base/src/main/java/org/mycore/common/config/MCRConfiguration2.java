@@ -81,9 +81,9 @@ import org.mycore.common.function.MCRTriConsumer;
  */
 public class MCRConfiguration2 {
 
-    private static ConcurrentHashMap<UUID, EventListener> LISTENERS = new ConcurrentHashMap<>();
+    private static final Map<UUID, EventListener> LISTENERS = new ConcurrentHashMap<>();
 
-    static ConcurrentHashMap<SingletonKey, Object> instanceHolder = new MCRConcurrentHashMap<>();
+    static Map<SingletonKey, Object> instanceHolder = new MCRConcurrentHashMap<>();
 
     public static Map<String, String> getPropertiesMap() {
         return Collections.unmodifiableMap(MCRConfigurationBase.getResolvedProperties().getAsMap());

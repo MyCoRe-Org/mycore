@@ -380,7 +380,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
             .orElse(0));
     }
 
-    /** 
+    /**
      * This method recursively parses a directory structure in MCRStorageLayout,
      * like this:
      * <pre>
@@ -400,15 +400,15 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
      *                         ...
      *                     +-- mir_mods_0000014567
      *                         ...
-     *                     +-- mir_mods_0000017654 
+     *                     +-- mir_mods_0000017654
      *  </pre>
-     *  
+     *
      * and searches on each level for the directory with the highest number at the end of it's name
      * finally it returns the highest available number part of a MyCoRe object id.
-     * 
+     *
      * @param path - the root path
      * @param depth - the level of subdirectories to look into
-     * @return the highest number, or 0 if such cannot be found 
+     * @return the highest number, or 0 if such cannot be found
      */
     private int traverseMCRStorageDirectory(Path path, int depth) {
         int max = -1;
@@ -513,8 +513,8 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
                     }
                 })
                 .collect(Collectors.toList());
-        } catch (UncheckedIOException e) {
-            throw e.getCause();
+        } catch (UncheckedIOException ignoredUnchecked) {
+            throw ignoredUnchecked.getCause();
         }
     }
 

@@ -63,13 +63,13 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     private static final int LEFT_START_VALUE = 0;
 
-    private static long LAST_MODIFIED = System.currentTimeMillis();
+    private static long lastModified = System.currentTimeMillis();
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String NAMED_QUERY_NAMESPACE = "MCRCategory.";
 
-    private static HashMap<String, Long> LAST_MODIFIED_MAP = new HashMap<>();
+    private static final Map<String, Long> LAST_MODIFIED_MAP = new HashMap<>();
 
     @Override
     public MCRCategory addCategory(MCRCategoryID parentID, MCRCategory category) {
@@ -311,7 +311,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         return resultList.parallelStream()
             .map(c -> c.merge(null))
             .collect(Collector.of(ArrayList::new,
-                (ArrayList<MCRCategory> l, MCRCategoryImpl c) -> {
+                (List<MCRCategory> l, MCRCategoryImpl c) -> {
                     if (l.isEmpty()) {
                         l.add(c);
                     } else {
@@ -511,8 +511,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         if (category.hasChildren()) {
             int parentPos = category.getPositionInParent();
             MCRCategoryImpl parent = (MCRCategoryImpl) category.getParent();
-            @SuppressWarnings("unchecked")
-            ArrayList<MCRCategoryImpl> copy = new ArrayList(category.children);
+            List<MCRCategoryImpl> copy = new ArrayList(category.children);
             copy.forEach(MCRCategoryImpl::detachFromParent);
             parent.children.addAll(parentPos, copy);
             copy.forEach(c -> c.parent = parent); //fixes MCR-1963
@@ -564,11 +563,11 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     @Override
     public long getLastModified() {
-        return LAST_MODIFIED;
+        return lastModified;
     }
 
     private static void updateTimeStamp() {
-        LAST_MODIFIED = System.currentTimeMillis();
+        lastModified = System.currentTimeMillis();
     }
 
     private static MCRCategoryImpl buildCategoryFromPrefetchedList(List<MCRCategoryDTO> list, MCRCategoryID returnID) {

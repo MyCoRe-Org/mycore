@@ -26,6 +26,8 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.history.MCRMetadataHistoryManager;
@@ -41,6 +43,8 @@ import org.mycore.oai.set.MCRSet;
  * @author Matthias Eichner
  */
 public class MCROAIDeletedSearcher extends MCROAISearcher {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static final String CURSOR_PREFIX = "deleted";
 

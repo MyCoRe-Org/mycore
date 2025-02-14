@@ -46,7 +46,7 @@ import org.mycore.common.xml.MCRXMLHelper;
 public class MCRMerger {
 
     /** Holds the MODS namespace */
-    private static List<Namespace> NS = Collections.singletonList(MCRConstants.MODS_NAMESPACE);
+    private static final List<Namespace> NS = Collections.singletonList(MCRConstants.MODS_NAMESPACE);
 
     /** The MODS element wrapped and compared by this merger */
     protected Element element;

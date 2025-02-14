@@ -18,6 +18,7 @@
 package org.mycore.oai;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,14 +60,15 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 public class MCROAIDataProvider extends MCRServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    protected static final Logger LOGGER = LogManager.getLogger(MCROAIDataProvider.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * Map of all MyCoRe oai adapter.
      */
-    private static Map<String, MCROAIAdapter> ADAPTER_MAP;
+    private static final Map<String, MCROAIAdapter> ADAPTER_MAP;
 
     private static final OAIXMLOutputProcessor OAI_XML_OUTPUT_PROCESSOR = new OAIXMLOutputProcessor();
 
@@ -76,7 +78,7 @@ public class MCROAIDataProvider extends MCRServlet {
 
     private String myBaseURL;
 
-    private ServiceLoader<OAIProvider> oaiAdapterServiceLoader;
+    private transient ServiceLoader<OAIProvider> oaiAdapterServiceLoader;
 
     @Override
     public void init() throws ServletException {

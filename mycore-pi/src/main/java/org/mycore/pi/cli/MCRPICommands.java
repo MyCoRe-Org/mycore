@@ -102,7 +102,7 @@ public class MCRPICommands {
     public static void removeFlagsFromObject(String mycoreIDString) {
         MCRObjectID objectID = MCRObjectID.getInstance(mycoreIDString);
         MCRBase base = MCRMetadataManager.retrieve(objectID);
-        if (base.getService().getFlags(MCRPIService.PI_FLAG).size() > 0) {
+        if (!base.getService().getFlags(MCRPIService.PI_FLAG).isEmpty()) {
             base.getService().removeFlags(MCRPIService.PI_FLAG);
             try {
                 MCRMetadataManager.update(base);

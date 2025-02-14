@@ -256,13 +256,13 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
     public static class SettingsBuilder {
 
         @MCRProperty(name = "OmitRootElement", required = false)
-        public String omitRootElement = String.valueOf(Boolean.valueOf(DEFAULT_OMIT_ROOT_ELEMENT));
+        public String omitRootElement = String.valueOf(DEFAULT_OMIT_ROOT_ELEMENT);
 
         @MCRProperty(name = "NamespaceDeclaration", required = false)
         public String namespaceDeclaration = DEFAULT_NAMESPACE_HANDLING.name();
 
         @MCRProperty(name = "NormalizeText", required = false)
-        public String normalizeText = String.valueOf(Boolean.valueOf(DEFAULT_NORMALIZE_TEXT));
+        public String normalizeText = String.valueOf(DEFAULT_NORMALIZE_TEXT);
 
         @MCRProperty(name = "ElementPrefixHandling", required = false)
         public String elementPrefixHandling = DEFAULT_ELEMENT_PREFIX_HANDLING.name();

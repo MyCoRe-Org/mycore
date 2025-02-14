@@ -83,7 +83,7 @@ public class MCRUserAttributeMapper {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRUserAttributeMapper.class);
 
-    private final HashMap<String, List<Attribute>> attributeMapping = new HashMap<>();
+    private final Map<String, List<Attribute>> attributeMapping = new HashMap<>();
 
     public static MCRUserAttributeMapper instance(Element attributeMapping) {
         try {
@@ -112,33 +112,29 @@ public class MCRUserAttributeMapper {
         boolean changed = false;
         for (Object annotated : getAnnotated(object)) {
             MCRUserAttribute attrAnno = retrieveMCRUserAttribute(annotated);
-
-            if (attrAnno != null) {
-
-                final String name = attrAnno.name().isEmpty() ? getAttriutebName(annotated) : attrAnno.name();
-                final List<Attribute> attribs = attributeMapping.get(name);
-
-                if (attributes != null) {
-
-                    for (Attribute attribute : attribs) {
-                        if (attributes.containsKey(attribute.mapping)) {
-
-                            Object value = attributes.get(attribute.mapping);
-                            if (value == null) {
-                                LOGGER.warn("Could not apply mapping for {}", attribute.mapping);
-                            }
-
-                            value = convertValue(annotated, attrAnno, attribute, value);
-                            if (!isValueValid(attrAnno, attribute, value)) {
-                                throw new IllegalArgumentException(
-                                    "A not nullable attribute \"" + name + "\" was null.");
-                            }
-
-                            if (updateFieldOrMethod(object, annotated, attribute, value)) {
-                                changed = true;
-                            }
-                        }
-                    }
+            if (attrAnno == null) {
+                continue;
+            }
+            final String name = attrAnno.name().isEmpty() ? getAttriutebName(annotated) : attrAnno.name();
+            final List<Attribute> attribs = attributeMapping.get(name);
+            if (attributes == null) {
+                continue;
+            }
+            for (Attribute attribute : attribs) {
+                if (!attributes.containsKey(attribute.mapping)) {
+                    continue;
+                }
+                Object value = attributes.get(attribute.mapping);
+                if (value == null) {
+                    LOGGER.warn("Could not apply mapping for {}", attribute.mapping);
+                }
+                value = convertValue(annotated, attrAnno, attribute, value);
+                if (!isValueValid(attrAnno, attribute, value)) {
+                    throw new IllegalArgumentException(
+                        "A not nullable attribute \"" + name + "\" was null.");
+                }
+                if (updateFieldOrMethod(object, annotated, attribute, value)) {
+                    changed = true;
                 }
             }
         }
@@ -291,7 +287,7 @@ public class MCRUserAttributeMapper {
 
     @XmlRootElement(name = "realm")
     @XmlAccessorType(XmlAccessType.FIELD)
-    private static class Mappings {
+    private static final class Mappings {
         @XmlElementWrapper(name = "attributeMapping")
         @XmlElement(name = "attribute")
         List<Attribute> attributes;
@@ -303,7 +299,7 @@ public class MCRUserAttributeMapper {
 
     @XmlRootElement(name = "attribute")
     @XmlAccessorType(XmlAccessType.FIELD)
-    private static class Attribute {
+    private static final class Attribute {
         @XmlAttribute(required = true)
         String name;
 
@@ -337,7 +333,7 @@ public class MCRUserAttributeMapper {
 
     @XmlRootElement(name = "valueMapping")
     @XmlAccessorType(XmlAccessType.FIELD)
-    private static class ValueMapping {
+    private static final class ValueMapping {
         @XmlAttribute(required = true)
         String name;
 

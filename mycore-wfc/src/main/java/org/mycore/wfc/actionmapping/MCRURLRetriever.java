@@ -18,7 +18,6 @@
 
 package org.mycore.wfc.actionmapping;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -44,7 +43,7 @@ public final class MCRURLRetriever {
 
     private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.getInstance();
 
-    private static Map<String, MCRCollection> COLLECTION_MAP = initActionsMappings();
+    private static final Map<String, MCRCollection> COLLECTION_MAP = initActionsMappings();
 
     private MCRURLRetriever() {
     }
@@ -52,8 +51,7 @@ public final class MCRURLRetriever {
     private static Map<String, MCRCollection> initActionsMappings() {
         try {
             MCRActionMappings actionMappings = MCRActionMappingsManager.getActionMappings();
-            return Arrays
-                .stream(actionMappings.getCollections())
+            return actionMappings.getCollections().stream()
                 .collect(Collectors.toMap(MCRCollection::getName, c -> c));
         } catch (Exception e) {
             throw new MCRException(e);
@@ -104,8 +102,7 @@ public final class MCRURLRetriever {
         MCRCollection defaultCollection) {
         MCRCollection mcrCollection = COLLECTION_MAP.get(collection);
         if (mcrCollection != null) {
-            Optional<MCRAction> firstAction = Arrays
-                .stream(mcrCollection.getActions())
+            Optional<MCRAction> firstAction = mcrCollection.actions.stream()
                 .filter(a -> a.getAction().equals(action))
                 .findFirst();
             if (firstAction.isPresent()) {
@@ -132,9 +129,12 @@ public final class MCRURLRetriever {
         }
         for (MCRAction act : collectionWithAction.getActions()) {
             if (act.getAction().equals(action)) {
-                int oldLength = mcrCollection.getActions().length;
-                mcrCollection.setActions(Arrays.copyOf(mcrCollection.getActions(), oldLength + 1));
-                mcrCollection.getActions()[oldLength] = act;
+                int oldLength = mcrCollection.getActions().size();
+                MCRAction[] actions = new MCRAction[oldLength + 1];
+                //copy old actions
+                mcrCollection.getActions().toArray(actions);
+                actions[oldLength] = act;
+                mcrCollection.setActions(actions);
             }
         }
         //store in cache

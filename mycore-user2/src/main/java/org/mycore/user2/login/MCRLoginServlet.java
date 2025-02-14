@@ -83,7 +83,7 @@ public class MCRLoginServlet extends MCRServlet {
         .map(s -> s.collect(Collectors.toList()))
         .orElse(Collections.emptyList());
 
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     protected static String getReturnURL(HttpServletRequest req) {
         String returnURL = req.getParameter(LOGIN_REDIRECT_URL_PARAMETER);
@@ -95,7 +95,7 @@ public class MCRLoginServlet extends MCRServlet {
     }
 
     protected static void addFormFields(MCRLogin login, String loginToRealm) {
-        ArrayList<org.mycore.frontend.support.MCRLogin.InputField> fields = new ArrayList<>();
+        List<org.mycore.frontend.support.MCRLogin.InputField> fields = new ArrayList<>();
         if (loginToRealm != null) {
             //realmParameter
             MCRRealm realm = MCRRealmFactory.getRealm(loginToRealm);
@@ -297,7 +297,7 @@ public class MCRLoginServlet extends MCRServlet {
      */
     private void storeURL(String url) {
         String storedUrl = url;
-        if ((url == null) || (url.trim().length() == 0)) {
+        if (url == null || url.isBlank()) {
             storedUrl = MCRFrontendUtil.getBaseURL();
         } else if (url.startsWith(MCRFrontendUtil.getBaseURL()) && !url.equals(MCRFrontendUtil.getBaseURL())) {
             String rest = url.substring(MCRFrontendUtil.getBaseURL().length());

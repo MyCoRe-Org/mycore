@@ -53,7 +53,7 @@ public class MCRMODSDateHelperTest extends MCRTestCase {
 
         int fullYear = Year.now().get(ChronoField.YEAR);
 
-        MCRMODSDateHelper.setDate(element, new Date(), MCRMODSDateFormat.iso8601_4);
+        MCRMODSDateHelper.setDate(element, new Date(), MCRMODSDateFormat.ISO_8601_4);
 
         int year = Integer.parseInt(element.getText());
         assertEquals(fullYear, year);
@@ -76,7 +76,7 @@ public class MCRMODSDateHelperTest extends MCRTestCase {
         assertEquals(9 - 1, parsed.get(Calendar.MONTH));
         assertEquals(29, parsed.get(Calendar.DAY_OF_MONTH));
 
-        MCRMODSDateHelper.setDate(element, parsed, MCRMODSDateFormat.iso8601_8);
+        MCRMODSDateHelper.setDate(element, parsed, MCRMODSDateFormat.ISO_8601_8);
         assertEquals("iso8601", element.getAttributeValue("encoding"));
         assertEquals(date, element.getText());
     }
@@ -91,7 +91,7 @@ public class MCRMODSDateHelperTest extends MCRTestCase {
         assertEquals(9 - 1, parsed.get(Calendar.MONTH));
         assertEquals(29, parsed.get(Calendar.DAY_OF_MONTH));
 
-        MCRMODSDateHelper.setDate(element, parsed, MCRMODSDateFormat.w3cdtf_10);
+        MCRMODSDateHelper.setDate(element, parsed, MCRMODSDateFormat.W3C_DTF_10);
         assertEquals("w3cdtf", element.getAttributeValue("encoding"));
         assertEquals(date, element.getText());
     }
@@ -105,7 +105,7 @@ public class MCRMODSDateHelperTest extends MCRTestCase {
 
         GregorianCalendar gIn = new GregorianCalendar(year, month - 1, day);
         Element element = new Element("date");
-        MCRMODSDateHelper.setDate(element, gIn, MCRMODSDateFormat.w3cdtf_10);
+        MCRMODSDateHelper.setDate(element, gIn, MCRMODSDateFormat.W3C_DTF_10);
 
         // Not christmas :-( ?
         assertEquals(year + "-" + month + "-" + day, element.getText());
@@ -128,7 +128,7 @@ public class MCRMODSDateHelperTest extends MCRTestCase {
         assertEquals(14, parsed.get(Calendar.MINUTE));
         assertEquals(15, parsed.get(Calendar.SECOND));
 
-        MCRMODSDateHelper.setDate(element, parsed, MCRMODSDateFormat.w3cdtf_19);
+        MCRMODSDateHelper.setDate(element, parsed, MCRMODSDateFormat.W3C_DTF_19);
         assertEquals("w3cdtf", element.getAttributeValue("encoding"));
         assertEquals(date, element.getText());
     }

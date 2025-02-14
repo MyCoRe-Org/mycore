@@ -36,12 +36,12 @@ import org.mycore.common.processing.MCRProcessableRegistry;
  */
 public class MCRUploadHandlerManager {
 
-    private static Logger LOGGER = LogManager.getLogger(MCRUploadHandlerManager.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRUploadHandlerManager.class);
 
     /** Cache of currently active upload handler sessions */
-    protected static MCRCache<String, MCRUploadHandlerCacheEntry> HANDLERS;
+    protected static final MCRCache<String, MCRUploadHandlerCacheEntry> HANDLERS;
 
-    protected static MCRProcessableCollection COLLECTION;
+    protected static final MCRProcessableCollection COLLECTION;
 
     static {
         HANDLERS = new MCRCache<>(100, "UploadHandlerManager UploadHandlers");
@@ -59,7 +59,7 @@ public class MCRUploadHandlerManager {
 
     public static MCRUploadHandler getHandler(String uploadID) {
 
-        long yesterday = System.currentTimeMillis() - 86400000;
+        long yesterday = System.currentTimeMillis() - 86_400_000;
         MCRUploadHandlerCacheEntry entry = HANDLERS.getIfUpToDate(uploadID, yesterday);
 
         if (entry == null) {
@@ -85,13 +85,13 @@ public class MCRUploadHandlerManager {
     }
 
     /** Represents a cache entry of currently active upload handler session */
-    private static class MCRUploadHandlerCacheEntry {
+    protected static class MCRUploadHandlerCacheEntry {
 
         /** The ID of the MCRSession this upload is associated with */
-        private String sessionID;
+        private final String sessionID;
 
         /** The MCRUploadHander instance to be used */
-        private MCRUploadHandler handler;
+        private final MCRUploadHandler handler;
 
         MCRUploadHandlerCacheEntry(String sessionID, MCRUploadHandler handler) {
             this.sessionID = sessionID;

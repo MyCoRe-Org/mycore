@@ -85,100 +85,11 @@ public class MCRAutoDeploy implements MCRStartupHandler.AutoExecutable {
                 Collections.list(jar.entries()).stream()
                     .filter(file -> file.getName().equals(WEB_FRAGMENT))
                     .findFirst().ifPresent(file -> {
-                        final SAXBuilder builder = new SAXBuilder();
                         try {
                             final InputStream is = jar.getInputStream(file);
+                            final SAXBuilder builder = new SAXBuilder();
                             final Document doc = builder.build(is);
-
-                            final Element root = doc.getRootElement();
-                            final Namespace ns = root.getNamespace();
-
-                            final List<Element> filters = root.getChildren("filter", ns);
-                            final List<Element> fmaps = root.getChildren("filter-mapping", ns);
-
-                            filters.forEach(filter -> {
-                                final String name = filter.getChildText("filter-name", ns);
-                                final String className = filter.getChildText("filter-class", ns);
-
-                                fmaps.stream().filter(mapping -> mapping.getChildText("filter-name", ns).equals(name))
-                                    .findFirst().ifPresent(mapping -> {
-                                        LOGGER.info("Register Filter {} ({})...", name, className);
-                                        Optional.ofNullable(servletContext.addFilter(name, className))
-                                            .<Runnable>map(fr -> () -> {
-                                                final List<Element> dispatchers = mapping
-                                                    .getChildren("dispatcher", ns);
-
-                                                final EnumSet<DispatcherType> eDT = dispatchers.isEmpty() ? null
-                                                    : dispatchers.stream()
-                                                        .map(d -> DispatcherType.valueOf(d.getTextTrim()))
-                                                        .collect(Collectors
-                                                            .toCollection(() -> EnumSet.noneOf(DispatcherType.class)));
-
-                                                final List<Element> servletNames = mapping
-                                                    .getChildren("servlet-name", ns);
-
-                                                if (!servletNames.isEmpty()) {
-                                                    fr.addMappingForServletNames(
-                                                        eDT,
-                                                        false,
-                                                        servletNames.stream()
-                                                            .map(sn -> {
-                                                                LOGGER.info("...add servlet mapping: {}",
-                                                                    sn::getTextTrim);
-                                                                return sn.getTextTrim();
-                                                            })
-                                                            .toArray(String[]::new));
-                                                }
-
-                                                final List<Element> urlPattern = mapping
-                                                    .getChildren("url-pattern", ns);
-
-                                                if (!urlPattern.isEmpty()) {
-                                                    fr.addMappingForUrlPatterns(eDT,
-                                                        false, urlPattern.stream()
-                                                            .map(url -> {
-                                                                LOGGER.info("...add url mapping: {}",
-                                                                    url::getTextTrim);
-                                                                return url.getTextTrim();
-                                                            })
-                                                            .toArray(String[]::new));
-                                                }
-                                            }).orElse(() -> LOGGER.warn("Filter {} already registered!", name))
-                                            .run();
-                                    });
-                            });
-
-                            final List<Element> servlets = root.getChildren("servlet", ns);
-                            final List<Element> smaps = root.getChildren("servlet-mapping", ns);
-
-                            servlets.forEach(servlet -> {
-                                final String name = servlet.getChildText("servlet-name", ns);
-                                final String className = servlet.getChildText("servlet-class", ns);
-
-                                smaps.stream()
-                                    .filter(mapping -> mapping.getChildText("servlet-name", ns).equals(name))
-                                    .findFirst()
-                                    .ifPresent(mapping -> {
-                                        LOGGER.info("Register Servlet {} ({})...", name, className);
-                                        ServletRegistration.Dynamic sr = servletContext.addServlet(name, className);
-
-                                        if (sr != null) {
-                                            mapping.getChildren("url-pattern", ns).forEach(url -> {
-                                                LOGGER.info("...add url mapping: {}", url::getTextTrim);
-                                                sr.addMapping(url.getTextTrim());
-                                            });
-
-                                            servlet.getChildren("init-param", ns).forEach(param -> {
-                                                LOGGER.info("...add init-param: {}", param::getTextTrim);
-                                                String paramName = param.getChildText("param-name", ns);
-                                                String paramValue = param.getChildText("param-value", ns);
-                                                sr.setInitParameter(paramName, paramValue);
-                                            });
-                                        } else {
-                                            LOGGER.warn("Servlet {} already registered!", name);
-                                        }
-                                    });
-                            });
+                            registerWebFragment(servletContext, doc);
                         } catch (IOException | JDOMException e) {
                             LOGGER.error("Couldn't parse " + WEB_FRAGMENT, e);
                         }
@@ -189,6 +100,119 @@ public class MCRAutoDeploy implements MCRStartupHandler.AutoExecutable {
                 LOGGER.error("Couldn't parse JAR!", e);
             }
         }
+    }
+
+    private static void registerWebFragment(final ServletContext servletContext, final Document doc) {
+        final Element root = doc.getRootElement();
+        final Namespace ns = root.getNamespace();
+
+        // filters
+        final List<Element> filters = root.getChildren("filter", ns);
+        final List<Element> fmaps = root.getChildren("filter-mapping", ns);
+        for (Element filter : filters) {
+            handleFilter(servletContext, filter, ns, fmaps);
+        }
+
+        // servlets
+        final List<Element> servlets = root.getChildren("servlet", ns);
+        final List<Element> smaps = root.getChildren("servlet-mapping", ns);
+        for (Element servlet : servlets) {
+            handleServlet(servletContext, servlet, ns, smaps);
+        }
+    }
+
+    private static void handleServlet(ServletContext servletContext, Element servlet, Namespace ns,
+        List<Element> smaps) {
+        final String name = servlet.getChildText("servlet-name", ns);
+        final String className = servlet.getChildText("servlet-class", ns);
+
+        smaps.stream()
+            .filter(mapping -> mapping.getChildText("servlet-name", ns).equals(name))
+            .findFirst()
+            .ifPresent(mapping -> {
+                handleServletMapping(servletContext, servlet, ns, mapping, name, className);
+            });
+    }
+
+    private static void handleServletMapping(ServletContext servletContext, Element servlet, Namespace ns,
+        Element mapping, String name, String className) {
+        LOGGER.info("Register Servlet {} ({})...", name, className);
+        ServletRegistration.Dynamic sr = servletContext.addServlet(name, className);
+        if (sr != null) {
+            for (Element url : mapping.getChildren("url-pattern", ns)) {
+                LOGGER.info("...add url mapping: {}", url::getTextTrim);
+                sr.addMapping(url.getTextTrim());
+            }
+            for (Element param : servlet.getChildren("init-param", ns)) {
+                LOGGER.info("...add init-param: {}", param::getTextTrim);
+                String paramName = param.getChildText("param-name", ns);
+                String paramValue = param.getChildText("param-value", ns);
+                sr.setInitParameter(paramName, paramValue);
+            }
+        } else {
+            LOGGER.warn("Servlet {} already registered!", name);
+        }
+    }
+
+    private static void handleFilter(ServletContext servletContext, Element filter, Namespace ns, List<Element> fmaps) {
+        final String name = filter.getChildText("filter-name", ns);
+        final String className = filter.getChildText("filter-class", ns);
+
+        fmaps.stream()
+            .filter(mapping -> mapping.getChildText("filter-name", ns).equals(name))
+            .findFirst()
+            .ifPresent(mapping -> {
+                handleFilterMapping(servletContext, ns, mapping, name, className);
+            });
+    }
+
+    private static void handleFilterMapping(ServletContext servletContext, Namespace ns, Element mapping, String name,
+        String className) {
+        LOGGER.info("Register Filter {} ({})...", name, className);
+        Optional.ofNullable(servletContext.addFilter(name, className))
+            .<Runnable>map(fr -> () -> {
+                final List<Element> dispatchers = mapping.getChildren("dispatcher", ns);
+                @SuppressWarnings("PMD.LooseCoupling")
+                final EnumSet<DispatcherType> eDT = dispatchers.isEmpty() ? null : getDispatcherTypes(dispatchers);
+                // servlet names
+                final List<Element> servletNames = mapping.getChildren("servlet-name", ns);
+                if (!servletNames.isEmpty()) {
+                    fr.addMappingForServletNames(eDT, false, getServletNames(servletNames));
+                }
+                // url patter
+                final List<Element> urlPattern = mapping.getChildren("url-pattern", ns);
+                if (!urlPattern.isEmpty()) {
+                    fr.addMappingForUrlPatterns(eDT, false, getUrlMapping(urlPattern));
+                }
+            })
+            .orElse(() -> LOGGER.warn("Filter {} already registered!", name))
+            .run();
+    }
+
+    private static String[] getUrlMapping(List<Element> urlPattern) {
+        return urlPattern.stream()
+            .map(url -> {
+                LOGGER.info("...add url mapping: {}", url::getTextTrim);
+                return url.getTextTrim();
+            })
+            .toArray(String[]::new);
+    }
+
+    private static String[] getServletNames(List<Element> servletNames) {
+        return servletNames.stream()
+            .map(sn -> {
+                LOGGER.info("...add servlet mapping: {}",
+                    sn::getTextTrim);
+                return sn.getTextTrim();
+            })
+            .toArray(String[]::new);
+    }
+
+    @SuppressWarnings("PMD.LooseCoupling")
+    private static EnumSet<DispatcherType> getDispatcherTypes(List<Element> dispatchers) {
+        return dispatchers.stream()
+            .map(d -> DispatcherType.valueOf(d.getTextTrim()))
+            .collect(Collectors.toCollection(() -> EnumSet.noneOf(DispatcherType.class)));
     }
 
     @SuppressWarnings("unchecked")

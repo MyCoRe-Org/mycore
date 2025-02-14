@@ -81,7 +81,7 @@ import jakarta.ws.rs.core.UriInfo;
 public class MCRRestAPIUploadHelper {
     private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIUploadHelper.class);
 
-    private static java.nio.file.Path UPLOAD_DIR = Paths
+    private static final java.nio.file.Path UPLOAD_DIR = Paths
         .get(MCRConfiguration2.getStringOrThrow("MCR.RestAPI.v1.Upload.Directory"));
 
     static {
@@ -129,8 +129,11 @@ public class MCRRestAPIUploadHelper {
                 .build();
         } catch (Exception e) {
             LOGGER.error("Unable to Upload file: {}", fXML, e);
-            throw new MCRRestAPIException(Status.BAD_REQUEST, new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER,
-                "Unable to Upload file: " + fXML, e.getMessage()));
+            MCRRestAPIException restAPIException = new MCRRestAPIException(Status.BAD_REQUEST,
+                new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER,
+                    "Unable to Upload file: " + fXML, e.getMessage()));
+            restAPIException.initCause(e);
+            throw restAPIException;
         } finally {
             if (fXML != null) {
                 try {
@@ -292,8 +295,10 @@ public class MCRRestAPIUploadHelper {
             handleFileUpload(uploadedInputStream, formParamPath, formParamMaindoc, formParamUnzip, derID, der);
         } catch (IOException | MCRPersistenceException | MCRAccessException e) {
             LOGGER.error(e);
-            throw new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR,
+            MCRRestAPIException restAPIException = new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR,
                 new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, "Internal error", e.getMessage()));
+            restAPIException.initCause(e);
+            throw restAPIException;
         }
 
         return buildResponse(info, objID, derID + "/contents");
@@ -465,8 +470,10 @@ public class MCRRestAPIUploadHelper {
                 .type("application/xml; charset=UTF-8")
                 .build();
         } catch (MCRAccessException e) {
-            throw new MCRRestAPIException(Status.FORBIDDEN,
+            MCRRestAPIException restAPIException = new MCRRestAPIException(Status.FORBIDDEN,
                 new MCRRestAPIError(MCRRestAPIError.CODE_ACCESS_DENIED, "Could not delete derivate", e.getMessage()));
+            restAPIException.initCause(e);
+            throw restAPIException;
         }
     }
 

@@ -384,7 +384,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         if (derivateIds == null) {
             LOGGER.error("Object does not exist: {}", mcrobjid);
         }
-        ArrayList<String> cmds = new ArrayList<>(derivateIds.size());
+        List<String> cmds = new ArrayList<>(derivateIds.size());
         for (MCRObjectID derId : derivateIds) {
             cmds.add(new MessageFormat(batchCommandSyntax, Locale.ROOT).format(new String[] { derId.toString() }));
         }
@@ -438,7 +438,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
     }
 
     private static List<MCRPath> getSupportedFiles(MCRPath rootNode) throws IOException {
-        final ArrayList<MCRPath> files = new ArrayList<>();
+        final List<MCRPath> files = new ArrayList<>();
         SimpleFileVisitor<Path> test = new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {

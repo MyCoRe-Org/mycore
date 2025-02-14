@@ -26,8 +26,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.status.StatusLogger;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceMap;
@@ -85,7 +85,7 @@ import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
 @MCRConfigurationProxy(proxyClass = MCRResourceResolver.Factory.class)
 public final class MCRResourceResolver {
 
-    private static final Logger LOGGER = StatusLogger.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCRResourceResolver INSTANCE = instantiate();
 
@@ -324,6 +324,7 @@ public final class MCRResourceResolver {
         return hints;
     }
 
+    @SuppressWarnings("PMD.SystemPrintln")
     public static class Factory implements Supplier<MCRResourceResolver> {
 
         @MCRInstanceMap(name = HINTS_KEY, valueClass = MCRHint.class)
@@ -337,16 +338,12 @@ public final class MCRResourceResolver {
 
         @Override
         public MCRResourceResolver get() {
-
-            LOGGER.info(() -> "Found providers: " + String.join(", ", providers.keySet()));
-            LOGGER.info(() -> "Resolving resources with provider: " + selectedProvider);
-
+            System.out.println("Found providers: " + String.join(", ", providers.keySet()));
+            System.out.println("Resolving resources with provider: " + selectedProvider);
             return new MCRResourceResolver(getHints(), getProvider(selectedProvider));
-
         }
 
         private MCRHints getHints() {
-
             MCRListMessage description = new MCRListMessage();
             MCRHintsBuilder builder = new MCRHintsBuilder();
             for (Map.Entry<String, MCRHint<?>> entry : hints.entrySet()) {
@@ -354,27 +351,20 @@ public final class MCRResourceResolver {
                 description.add(entry.getKey(), hint.getClass().getName());
                 builder.add(hint);
             }
-
-            LOGGER.info(() -> description.logMessage("Default hints:"));
-
+            System.out.println(description.logMessage("Default hints:"));
             return builder.build();
-
         }
 
         private MCRResourceProvider getProvider(String selectedProviderName) {
-
             MCRResourceProvider selectedProvider = providers.get(selectedProviderName);
             if (selectedProvider == null) {
                 throw new IllegalArgumentException("Selected provider " + selectedProviderName + " unavailable, got: "
                     + String.join(", ", providers.keySet()));
             }
-
             MCRTreeMessage description = selectedProvider.compileDescription(LOGGER.getLevel());
-            LOGGER
-                .info(() -> description.logMessage("Configuration of selected provider " + selectedProviderName + ":"));
-
+            String introduction = "Configuration of selected provider " + selectedProviderName + ":";
+            System.out.println(description.logMessage(introduction));
             return selectedProvider;
-
         }
 
     }

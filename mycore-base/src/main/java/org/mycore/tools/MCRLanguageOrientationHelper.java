@@ -25,7 +25,7 @@ import org.mycore.common.config.MCRConfiguration2;
 
 public class MCRLanguageOrientationHelper {
 
-    static Set<String> RTL_LANGUAGES = getRTLLanguages();
+    private static final Set<String> RTL_LANGUAGES = getRTLLanguages();
 
     private static Set<String> getRTLLanguages() {
         return MCRConfiguration2.getString("MCR.I18N.RtlLanguageList")

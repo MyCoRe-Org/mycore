@@ -87,7 +87,7 @@ public class MCRLabel implements Cloneable, Serializable, Comparable<MCRLabel> {
      */
     public void setLang(String lang) {
         Objects.requireNonNull(lang, "'lang' of label may not be null.");
-        if (lang.trim().isEmpty()) {
+        if (lang.isBlank()) {
             throw new IllegalArgumentException("'lang' of label may not be empty.");
         }
         Locale locale = Locale.forLanguageTag(lang);
@@ -110,7 +110,7 @@ public class MCRLabel implements Cloneable, Serializable, Comparable<MCRLabel> {
      */
     public void setText(String text) {
         Objects.requireNonNull(text, "'text' of label('" + lang + "') may not be null.");
-        if (text.trim().isEmpty()) {
+        if (text.isBlank()) {
             throw new IllegalArgumentException("'text' of label('" + lang + "') may not be empty.");
         }
         this.text = text;

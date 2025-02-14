@@ -32,10 +32,10 @@ import com.google.gson.JsonObject;
  *
  * @author shermann
  * */
-public class MCRURNJsonBundle {
+public final class MCRURNJsonBundle {
 
     protected enum Format {
-        register, update
+        REGISTER, UPDATE
     }
 
     private final MCRPIRegistrationInfo urn;
@@ -67,7 +67,7 @@ public class MCRURNJsonBundle {
      * @return JSON
      * */
     public String toJSON(Format format) {
-        return format.equals(Format.register) ? getRegisterJson() : getUpdateJson();
+        return format.equals(Format.REGISTER) ? getRegisterJson() : getUpdateJson();
     }
 
     /**

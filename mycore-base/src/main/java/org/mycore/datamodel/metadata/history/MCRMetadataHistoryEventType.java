@@ -20,7 +20,7 @@ package org.mycore.datamodel.metadata.history;
 
 public enum MCRMetadataHistoryEventType {
 
-    Create('c'), Delete('d');
+    CREATE('c'), DELETE('d');
 
     private final char abbr;
 
@@ -30,8 +30,8 @@ public enum MCRMetadataHistoryEventType {
 
     public static MCRMetadataHistoryEventType fromAbbr(char abbr) {
         return switch (abbr) {
-            case 'c' -> Create;
-            case 'd' -> Delete;
+            case 'c' -> CREATE;
+            case 'd' -> DELETE;
             default -> throw new IllegalArgumentException(
                 "No such " + MCRMetadataHistoryEventType.class.getSimpleName() + ": " + abbr);
         };

@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.SequencedSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -74,7 +75,7 @@ public class MCRTransferPackage {
      * Set of objects including the source, its descendants and all resolved links.
      * Its linked because the import order matters.
      */
-    protected LinkedHashSet<MCRObject> objects;
+    protected SequencedSet<MCRObject> objects;
 
     /**
      * List of transfer package file containers.
@@ -96,7 +97,7 @@ public class MCRTransferPackage {
      * @throws MCRUsageException is thrown if some of the referenced objects or derivates couldn't be retrieved
      */
     public void build() throws MCRUsageException {
-        LinkedHashMap<MCRObjectID, MCRObject> objectMap = new LinkedHashMap<>();
+        Map<MCRObjectID, MCRObject> objectMap = new LinkedHashMap<>();
         Set<MCRCategoryID> categories = new HashSet<>();
         resolveChildrenAndLinks(source, objectMap, categories);
 
@@ -112,7 +113,7 @@ public class MCRTransferPackage {
      * @param object the source object
      * @param objectMap the map which will be created
      */
-    protected void resolveChildrenAndLinks(MCRObject object, LinkedHashMap<MCRObjectID, MCRObject> objectMap,
+    protected void resolveChildrenAndLinks(MCRObject object, Map<MCRObjectID, MCRObject> objectMap,
         Set<MCRCategoryID> categories) {
         // add links
         for (MCRObject entityLink : MCRObjectUtils.getLinkedObjects(object)) {

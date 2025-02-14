@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
@@ -118,7 +119,7 @@ public class MCRXMLHelper {
      * @return the String with all illegal characters removed
      */
     public static String removeIllegalChars(String text) {
-        if (text == null || text.trim().isEmpty()) {
+        if (text == null || text.isBlank()) {
             return text;
         }
         if (Verifier.checkCharacterData(text) == null) {
@@ -183,12 +184,12 @@ public class MCRXMLHelper {
         }
         try {
             return MCRURIResolver.instance().resolve(schemaURI, null);
-        } catch (TransformerException e) {
-            Throwable cause = e.getCause();
+        } catch (TransformerException ignoredIfSAXorIOException) {
+            Throwable cause = ignoredIfSAXorIOException.getCause();
             switch (cause) {
                 case IOException ioe -> throw ioe;
                 case SAXException se -> throw se;
-                default -> throw new IOException(e);
+                default -> throw new IOException(ignoredIfSAXorIOException);
             }
         }
     }
@@ -270,7 +271,7 @@ public class MCRXMLHelper {
         return xml.getRootElement();
     }
 
-    private static class JDOMEquivalent {
+    private static final class JDOMEquivalent {
 
         public static boolean equivalent(Element e1, Element e2) {
             return equivalentName(e1, e2) && equivalentAttributes(e1, e2)
@@ -327,7 +328,7 @@ public class MCRXMLHelper {
                 }
                 return false;
             }
-            HashSet<String> orig = new HashSet<>(aList1.size());
+            Set<String> orig = new HashSet<>(aList1.size());
             for (Attribute attr : aList1) {
                 orig.add(attr.toString());
             }
@@ -412,7 +413,7 @@ public class MCRXMLHelper {
      *
      * @author Matthias Eichner
      */
-    private static class JDOMtoGSONSerializer {
+    private static final class JDOMtoGSONSerializer {
 
         /**
          * This method is capable of serializing Elements and Text nodes.
@@ -438,7 +439,7 @@ public class MCRXMLHelper {
 
             // text
             String text = element.getText();
-            if (text != null && !text.trim().isEmpty()) {
+            if (text != null && !text.isBlank()) {
                 json.addProperty("$text", text);
             }
 

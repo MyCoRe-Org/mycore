@@ -32,13 +32,13 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.jersey.access.MCRRequireLogin;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
-import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.metadata.MCRORCIDPutCodeInfo;
 import org.mycore.orcid2.rest.resources.MCRORCIDRestConstants;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
 import org.mycore.orcid2.user.MCRORCIDUser;
+import org.mycore.orcid2.user.MCRORCIDUserUtils;
 import org.mycore.orcid2.util.MCRIdentifier;
 import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
 import org.mycore.orcid2.v3.work.MCRORCIDWorkService;
@@ -159,7 +159,7 @@ public class MCRORCIDObjectResource {
         final MCRORCIDCredential credential = Optional.ofNullable(orcidUser.getCredentialByORCID(orcid))
             .filter(c -> c.getAccessToken() != null).orElseThrow(() -> new ForbiddenException());
         final MCRObject object = getObjectOrThrow(objectId);
-        if (!checkHasMatchingOrcid(object, orcid)) {
+        if (!MCRORCIDUserUtils.checkUserHasObjectRelation(orcidUser, object)) {
             throw new BadRequestException("User has no relation to the object.");
         }
         final MCRSession session = MCRSessionMgr.getCurrentSession();
@@ -186,10 +186,6 @@ public class MCRORCIDObjectResource {
         } catch (MCRPersistenceException e) {
             throw new InternalServerErrorException("Failed to retrieve object from persistence.", e);
         }
-    }
-
-    private boolean checkHasMatchingOrcid(MCRObject object, String orcid) {
-        return MCRORCIDUtils.getORCIDs(object).contains(orcid);
     }
 
     private MCRORCIDPutCodeInfo getWorkInfo(String orcid, MCRORCIDCredential credential, MCRObject object) {

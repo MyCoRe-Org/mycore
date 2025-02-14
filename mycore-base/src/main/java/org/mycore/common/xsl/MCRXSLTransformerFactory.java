@@ -43,7 +43,7 @@ public class MCRXSLTransformerFactory {
 
     static {
         int cacheSize = MCRConfiguration2.getInt("MCR.LayoutService.XSLCacheSize").orElse(200);
-        checkPeriod = MCRConfiguration2.getLong("MCR.LayoutService.LastModifiedCheckPeriod").orElse(10000L);
+        checkPeriod = MCRConfiguration2.getLong("MCR.LayoutService.LastModifiedCheckPeriod").orElse(10_000L);
         cache = new MCRCache<>(cacheSize, MCRXSLTransformerFactory.class.getName());
     }
 

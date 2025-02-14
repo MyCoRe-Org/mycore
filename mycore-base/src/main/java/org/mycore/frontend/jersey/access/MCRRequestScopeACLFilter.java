@@ -27,7 +27,8 @@ import jakarta.ws.rs.container.ContainerRequestFilter;
 
 @Priority(Priorities.AUTHENTICATION - 1)
 public class MCRRequestScopeACLFilter implements ContainerRequestFilter {
-    public static String ACL_INSTANT_KEY = "requestScopeACL";
+
+    public static final String ACL_INSTANT_KEY = "requestScopeACL";
 
     private static final MCRRequestScopeACLFactory ACL_FACTORY = new MCRRequestScopeACLFactory();
 
@@ -35,4 +36,5 @@ public class MCRRequestScopeACLFilter implements ContainerRequestFilter {
     public void filter(ContainerRequestContext requestContext) {
         requestContext.setProperty(ACL_INSTANT_KEY, (Supplier<MCRRequestScopeACL>) ACL_FACTORY::provide);
     }
+
 }

@@ -32,7 +32,7 @@ public class MCRLanguageXML {
      * Sets the lang attribute to the ISO 639-2 bibliographic code of the given language 
      */
     public static void setLangAttribute(MCRLanguage lang, Element element) {
-        String code = lang.getCode(MCRLanguageCodeType.biblCode);
+        String code = lang.getCode(MCRLanguageCodeType.BIBL_CODE);
         if (code != null) {
             element.setAttribute("lang", code);
         }
@@ -42,7 +42,7 @@ public class MCRLanguageXML {
      * Sets the xml:lang attribute to the ISO 639-1 code of the given language 
      */
     public static void setXMLLangAttribute(MCRLanguage lang, Element element) {
-        element.setAttribute("lang", lang.getCode(MCRLanguageCodeType.xmlCode), Namespace.XML_NAMESPACE);
+        element.setAttribute("lang", lang.getCode(MCRLanguageCodeType.XML_CODE), Namespace.XML_NAMESPACE);
     }
 
     /**

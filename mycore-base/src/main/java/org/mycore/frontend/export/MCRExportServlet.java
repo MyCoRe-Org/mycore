@@ -86,6 +86,7 @@ public class MCRExportServlet extends MCRServlet {
     private void fillCollection(HttpServletRequest req, MCRExportCollection collection) {
         String basketID = req.getParameter("basket");
         if (basketID != null) {
+            @SuppressWarnings("PMD.LooseCoupling")
             MCRBasket basket = MCRBasketManager.getOrCreateBasketInSession(basketID);
             collection.add(basket);
             LOGGER.info("exporting basket {} via {}", () -> basketID, () -> req.getParameter("transformer"));

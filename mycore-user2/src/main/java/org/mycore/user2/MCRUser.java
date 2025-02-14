@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -678,7 +679,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         if (getSystemRoleIDs().isEmpty() && getExternalRoleIDs().isEmpty()) {
             return null;
         }
-        ArrayList<String> roleIds = new ArrayList<>(getSystemRoleIDs().size() + getExternalRoleIDs().size());
+        List<String> roleIds = new ArrayList<>(getSystemRoleIDs().size() + getExternalRoleIDs().size());
         Collection<MCRRole> roles = new ArrayList<>(roleIds.size());
         roleIds.addAll(getSystemRoleIDs());
         roleIds.addAll(getExternalRoleIDs());
@@ -812,7 +813,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         return copy;
     }
 
-    private static class Password implements Serializable {
+    private static final class Password implements Serializable {
 
         private static final long serialVersionUID = 8068063832119405080L;
 
@@ -832,7 +833,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     }
 
-    private static class UserIdentifier implements Serializable {
+    private static final class UserIdentifier implements Serializable {
 
         private static final long serialVersionUID = 4654103884660408929L;
 

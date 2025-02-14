@@ -28,13 +28,13 @@ import org.mycore.common.xml.MCRXPathBuilder;
 import org.mycore.frontend.xeditor.MCRBinding;
 
 /**
- * Validates edited xml using an external method. 
- * The method must be "public static boolean ..." 
+ * Validates edited xml using an external method.
+ * The method must be "public static boolean ..."
  * and should accept a String, Element, Attribute or Object as argument.
- *   
+ *
  * Example: &lt;xed:validate class="foo.bar.MyValidator" method="validateISBN" ... /&gt;
  *
- * @author Frank Lützenkirchen 
+ * @author Frank Lützenkirchen
  */
 public class MCRExternalValidator extends MCRValidator {
 
@@ -99,7 +99,7 @@ public class MCRExternalValidator extends MCRValidator {
             Class<?>[] argTypes = { argType };
             return MethodUtils.getMatchingAccessibleMethod(clazz, methodName, argTypes);
         } catch (ClassNotFoundException ex) {
-            throw new MCRConfigurationException("class configured for external validation not found: " + className);
+            throw new MCRConfigurationException("class configured for external validation not found: " + className, ex);
         }
     }
 

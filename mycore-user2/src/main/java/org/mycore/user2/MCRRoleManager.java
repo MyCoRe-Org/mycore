@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -46,10 +47,10 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
  */
 public class MCRRoleManager {
 
-    private static Logger LOGGER = LogManager.getLogger(MCRRoleManager.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRRoleManager.class);
 
     /** Map of defined roles, key is the unique role name */
-    private static HashMap<String, MCRRole> rolesByName = new HashMap<>();
+    private static Map<String, MCRRole> rolesByName = new HashMap<>();
 
     /** List of all defined roles */
     private static List<MCRRole> rolesList = new ArrayList<>();

@@ -23,6 +23,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serial;
 import java.net.URISyntaxException;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
@@ -58,8 +59,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Combines tiles of an image in specific resolutions.
- * @author Thomas Scheffler (yagee)
  *
+ * @author Thomas Scheffler (yagee)
  */
 @Deprecated
 public class MCRTileCombineServlet extends MCRServlet {
@@ -70,16 +71,17 @@ public class MCRTileCombineServlet extends MCRServlet {
     /** key of request attribute for iview2-{@link File}. */
     protected static final String THUMBNAIL_KEY = MCRTileCombineServlet.class.getName() + ".thumb";
 
+    @Serial
     private static final long serialVersionUID = 7924934677622546958L;
 
     private static final float QUALITY = 0.75f;
 
     private static final Logger LOGGER = LogManager.getLogger(MCRTileCombineServlet.class);
 
-    private ThreadLocal<ImageWriter> imageWriter = ThreadLocal.withInitial(
+    private transient ThreadLocal<ImageWriter> imageWriter = ThreadLocal.withInitial(
         () -> ImageIO.getImageWritersBySuffix("jpeg").next());
 
-    private JPEGImageWriteParam imageWriteParam;
+    private transient JPEGImageWriteParam imageWriteParam;
 
     private MCRFooterInterface footerImpl;
 

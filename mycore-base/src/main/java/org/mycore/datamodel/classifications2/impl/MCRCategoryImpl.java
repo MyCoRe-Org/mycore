@@ -141,7 +141,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
 
     private static final long serialVersionUID = -7431317191711000317L;
 
-    private static Logger LOGGER = LogManager.getLogger(MCRCategoryImpl.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRCategoryImpl.class);
 
     private int left;
     private int right;
@@ -243,7 +243,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
     @Override
     public boolean hasChildren() {
         //if children is initialized and has objects use it and don't depend on db values
-        if (children != null && children.size() > 0) {
+        if (children != null && !children.isEmpty()) {
             return true;
         }
         if (right != left) {
@@ -291,7 +291,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
 
     @Override
     protected void setChildrenUnlocked(List<MCRCategory> children) {
-        MCRCategoryChildList newChildren = new MCRCategoryChildList(root, this);
+        List<MCRCategory> newChildren = new MCRCategoryChildList(root, this);
         newChildren.addAll(children);
         this.children = newChildren;
     }

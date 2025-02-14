@@ -20,9 +20,11 @@ package org.mycore.sword;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
@@ -36,9 +38,9 @@ public class MCRSword {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRSword.class);
 
-    private static volatile Hashtable<String, MCRSwordCollectionProvider> collections;
+    private static volatile Map<String, MCRSwordCollectionProvider> collections;
 
-    private static volatile Hashtable<String, List<String>> workspaceCollectionTable;
+    private static volatile Map<String, List<String>> workspaceCollectionTable;
 
     private static void initConfigThreadSafe() {
         if (collections == null) {
@@ -51,8 +53,8 @@ public class MCRSword {
     }
 
     private static void initConfig() {
-        collections = new Hashtable<>();
-        workspaceCollectionTable = new Hashtable<>();
+        collections = new ConcurrentHashMap<>();
+        workspaceCollectionTable = new ConcurrentHashMap<>();
         LOGGER.info("--- INITIALIZE SWORD SERVER ---");
         final int lengthOfPropertyPrefix = MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX.length();
         MCRConfiguration2.getPropertiesMap()

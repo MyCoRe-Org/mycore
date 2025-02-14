@@ -57,7 +57,7 @@ public class MCRJWTUtil implements MCRStartupHandler.AutoExecutable {
 
     private static final String ROLES_PROPERTY = "MCR.Rest.JWT.Roles";
 
-    private static Algorithm SHARED_SECRET;
+    private static Algorithm sharedSecret;
 
     public static JWTCreator.Builder getJWTBuilder(MCRSession mcrSession) {
         return getJWTBuilder(mcrSession, null, null);
@@ -97,7 +97,7 @@ public class MCRJWTUtil implements MCRStartupHandler.AutoExecutable {
     }
 
     public static Algorithm getJWTAlgorithm() {
-        return SHARED_SECRET;
+        return sharedSecret;
     }
 
     public static Response getJWTLoginSuccessResponse(String jwt) throws IOException {
@@ -168,7 +168,7 @@ public class MCRJWTUtil implements MCRStartupHandler.AutoExecutable {
                         "Could not create shared secret in file: " + sharedSecretFile.getAbsolutePath(), e);
                 }
             }
-            SHARED_SECRET = Algorithm.HMAC512(secret);
+            sharedSecret = Algorithm.HMAC512(secret);
         }
     }
 

@@ -19,20 +19,21 @@
 package org.mycore.common.content.transformer;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * Creates and returns MCRContentTransformer instances by their ID.
- * 
+ *
  * @author Frank Lützenkirchen
  */
 public class MCRContentTransformerFactory {
 
     /** Map of transformer instances by ID */
-    private static HashMap<String, MCRContentTransformer> transformers = new HashMap<>();
+    private static Map<String, MCRContentTransformer> transformers = new HashMap<>();
 
-    /** 
+    /**
      * Returns the transformer with the given ID. If the transformer is not instantiated yet,
      * it is created and initialized.
      */

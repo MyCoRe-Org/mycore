@@ -72,11 +72,11 @@ public class MCRSolrSearchServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     private enum QueryType {
-        phrase, term
+        PHRASE, TERM
     }
 
     private enum SolrParameterGroup {
-        QueryParameter, SolrParameter, SortParameter, TypeParameter
+        QUERY_PARAMETER, SOLR_PARAMETER, SORT_PARAMETER, TYPE_PARAMETER
     }
 
     private static final Logger LOGGER = LogManager.getLogger(MCRSolrSearchServlet.class);
@@ -113,12 +113,12 @@ public class MCRSolrSearchServlet extends MCRServlet {
     private void addFieldToQuery(StringBuilder query, String[] fieldValues, String fieldName, QueryType queryType)
         throws ServletException {
         for (String fieldValue : fieldValues) {
-            if (fieldValue.length() == 0) {
+            if (fieldValue.isEmpty()) {
                 continue;
             }
             switch (queryType) {
-                case term -> query.append(MCRConditionTransformer.getTermQuery(fieldName, fieldValue));
-                case phrase -> query.append(MCRConditionTransformer.getPhraseQuery(fieldName, fieldValue));
+                case TERM -> query.append(MCRConditionTransformer.getTermQuery(fieldName, fieldValue));
+                case PHRASE -> query.append(MCRConditionTransformer.getPhraseQuery(fieldName, fieldValue));
                 default -> throw new ServletException("Query type is unsupported: " + queryType);
             }
             query.append(' ');
@@ -137,16 +137,16 @@ public class MCRSolrSearchServlet extends MCRServlet {
     protected Map<String, String[]> buildSelectParameterMap(Map<String, String[]> queryParameters,
         Map<String, String[]> typeParameters,
         Map<String, String[]> sortParameters, Set<String> phraseQuery) throws ServletException {
-        HashMap<String, String[]> queryParameterMap = new HashMap<>();
+        Map<String, String[]> queryParameterMap = new HashMap<>();
 
-        HashMap<String, String> fieldTypeMap = createFieldTypeMap(typeParameters);
+        Map<String, String> fieldTypeMap = createFieldTypeMap(typeParameters);
 
-        HashMap<String, StringBuilder> filterQueryMap = new HashMap<>();
+        Map<String, StringBuilder> filterQueryMap = new HashMap<>();
         StringBuilder query = new StringBuilder();
         for (Entry<String, String[]> queryParameter : queryParameters.entrySet()) {
             String fieldName = queryParameter.getKey();
             String[] fieldValues = queryParameter.getValue();
-            QueryType queryType = phraseQuery.contains(fieldName) ? QueryType.phrase : QueryType.term;
+            QueryType queryType = phraseQuery.contains(fieldName) ? QueryType.PHRASE : QueryType.TERM;
             // Build the q parameter without solr.type.fields
             if (!fieldTypeMap.containsKey(fieldName)) {
                 addFieldToQuery(query, fieldValues, fieldName, queryType);
@@ -194,7 +194,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
             }
         }
 
-        ArrayList<Integer> sortedPositions = new ArrayList<>(positionFieldMap.keySet());
+        List<Integer> sortedPositions = new ArrayList<>(positionFieldMap.keySet());
         Collections.sort(sortedPositions);
 
         StringBuilder sortBuilder = new StringBuilder();
@@ -210,7 +210,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
             }
             sortBuilder.append(order);
         }
-        if (sortBuilder.length() != 0) {
+        if (!sortBuilder.isEmpty()) {
             sortBuilder.deleteCharAt(0);
         }
 
@@ -222,8 +222,8 @@ public class MCRSolrSearchServlet extends MCRServlet {
      * the type of the field as value.
      *
      */
-    private HashMap<String, String> createFieldTypeMap(Map<String, String[]> typeParameters) {
-        HashMap<String, String> fieldTypeMap = new HashMap<>();
+    private Map<String, String> createFieldTypeMap(Map<String, String[]> typeParameters) {
+        Map<String, String> fieldTypeMap = new HashMap<>();
 
         for (Entry<String, String[]> currentType : typeParameters.entrySet()) {
             for (String typeMember : currentType.getValue()) {
@@ -284,17 +284,17 @@ public class MCRSolrSearchServlet extends MCRServlet {
             SolrParameterGroup parameterGroup = getParameterType(parameterName);
 
             switch (parameterGroup) {
-                case SolrParameter -> solrParameter.put(parameterName, currentEntry.getValue());
-                case TypeParameter -> typeParameter.put(parameterName, currentEntry.getValue());
-                case QueryParameter -> {
+                case SOLR_PARAMETER -> solrParameter.put(parameterName, currentEntry.getValue());
+                case TYPE_PARAMETER -> typeParameter.put(parameterName, currentEntry.getValue());
+                case QUERY_PARAMETER -> {
                     String[] strings = currentEntry.getValue();
                     for (String v : strings) {
-                        if (v != null && v.length() > 0) {
+                        if (v != null && !v.isEmpty()) {
                             queryParameter.put(parameterName, currentEntry.getValue());
                         }
                     }
                 }
-                case SortParameter -> sortParameter.put(parameterName, currentEntry.getValue());
+                case SORT_PARAMETER -> sortParameter.put(parameterName, currentEntry.getValue());
                 default -> {
                     LOGGER.warn("Unknown parameter group. That should not happen.");
                     continue;
@@ -308,7 +308,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
      *            a map wich contains all {@link StringBuilder}
      * @return a {@link StringBuilder} for the specific fieldType
      */
-    private StringBuilder getFilterQueryBuilder(HashMap<String, StringBuilder> filterQueryMap, String fieldType) {
+    private StringBuilder getFilterQueryBuilder(Map<String, StringBuilder> filterQueryMap, String fieldType) {
         if (!filterQueryMap.containsKey(fieldType)) {
             filterQueryMap.put(fieldType, new StringBuilder(JOIN_PATTERN));
         }
@@ -324,17 +324,17 @@ public class MCRSolrSearchServlet extends MCRServlet {
      */
     private SolrParameterGroup getParameterType(String parameterName) {
         if (isTypeParameter(parameterName)) {
-            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.TypeParameter);
-            return SolrParameterGroup.TypeParameter;
+            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.TYPE_PARAMETER);
+            return SolrParameterGroup.TYPE_PARAMETER;
         } else if (isSolrParameter(parameterName)) {
-            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.SolrParameter);
-            return SolrParameterGroup.SolrParameter;
+            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.SOLR_PARAMETER);
+            return SolrParameterGroup.SOLR_PARAMETER;
         } else if (isSortParameter(parameterName)) {
-            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.SolrParameter);
-            return SolrParameterGroup.SortParameter;
+            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.SOLR_PARAMETER);
+            return SolrParameterGroup.SORT_PARAMETER;
         } else {
-            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.QueryParameter);
-            return SolrParameterGroup.QueryParameter;
+            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.QUERY_PARAMETER);
+            return SolrParameterGroup.QUERY_PARAMETER;
         }
     }
 

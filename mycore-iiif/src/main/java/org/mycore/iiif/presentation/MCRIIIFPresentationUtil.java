@@ -81,7 +81,7 @@ public class MCRIIIFPresentationUtil {
                 }
             }
             default -> {
-                if (base.getType().equals(MCRDCMIType.Image.toString())) {
+                if (base.getType().equals(MCRDCMIType.IMAGE.toString())) {
                     return;
                 }
                 base.setId(getImplBaseURL(impl, identifier) + "res/" + base.getId());

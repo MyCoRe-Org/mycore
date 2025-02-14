@@ -30,9 +30,9 @@ import java.nio.charset.Charset;
  */
 public class MCRCommandPrompt {
 
-    private BufferedReader console;
+    private final BufferedReader console;
 
-    private String systemName;
+    private final String systemName;
 
     public MCRCommandPrompt(String systemName) {
         this.systemName = systemName;
@@ -40,16 +40,16 @@ public class MCRCommandPrompt {
     }
 
     public String readCommand() {
-        String line = "";
+        String line;
         do {
             line = readLine();
         } while (line.isEmpty());
         return line;
     }
 
+    @SuppressWarnings("PMD.SystemPrintln")
     private String readLine() {
         System.out.print(systemName + "> ");
-
         try {
             String input = console.readLine();
             if (input != null) {

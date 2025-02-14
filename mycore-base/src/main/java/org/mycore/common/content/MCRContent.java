@@ -172,15 +172,15 @@ public abstract class MCRContent {
      * @param out
      *            the OutputStream to write the content to
      * @param close
-     *            if true, close OutputStream afterwards
+     *            if true, close OutputStream afterward
      */
     public void sendTo(OutputStream out, boolean close) throws IOException {
-        try {
-            sendTo(out);
-        } finally {
-            if (close) {
-                out.close();
+        if (close) {
+            try (out) {
+                sendTo(out);
             }
+        } else {
+            sendTo(out);
         }
     }
 

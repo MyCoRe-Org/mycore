@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
@@ -54,7 +55,7 @@ public class MCRMetsCommands extends MCRAbstractCommands {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRMetsCommands.class);
 
-    public static ConcurrentLinkedQueue<String> invalidMetsQueue = new ConcurrentLinkedQueue<>();
+    public static Queue<String> invalidMetsQueue = new ConcurrentLinkedQueue<>();
 
     @MCRCommand(syntax = "validate selected mets", help = "validates all mets.xml of selected derivates", order = 10)
     public static void validateSelectedMets() {
@@ -69,7 +70,7 @@ public class MCRMetsCommands extends MCRAbstractCommands {
                     InputStream metsIS = content.getInputStream();
                     METSValidator mv = new METSValidator(metsIS);
                     List<ValidationException> validationExceptionList = mv.validate();
-                    if (validationExceptionList.size() > 0) {
+                    if (!validationExceptionList.isEmpty()) {
                         invalidMetsQueue.add(objectID);
                     }
                     for (ValidationException validationException : validationExceptionList) {

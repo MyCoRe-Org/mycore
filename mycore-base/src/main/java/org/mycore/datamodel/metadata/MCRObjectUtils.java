@@ -46,9 +46,9 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
  */
 public final class MCRObjectUtils {
 
-    private static XPathExpression<Attribute> META_LINK_HREF;
+    private static final XPathExpression<Attribute> META_LINK_HREF;
 
-    private static XPathExpression<Element> META_CLASS;
+    private static final XPathExpression<Element> META_CLASS;
 
     static {
         // META_LINK_HREF
@@ -231,11 +231,11 @@ public final class MCRObjectUtils {
                 List<MCRMetaLinkID> linksToRemove = metaElement.stream().map(MCRMetaLinkID.class::cast)
                     .filter(metaLinkID -> metaLinkID.getXLinkHrefID().equals(linkToRemove))
                     .collect(Collectors.toList());
-                if (linksToRemove.size() > 0) {
+                if (!linksToRemove.isEmpty()) {
                     updated.set(true);
                     linksToRemove.forEach(metaElement::removeMetaObject);
                 }
-                return metaElement.size() == 0 ? Stream.of(metaElement) : Stream.empty();
+                return metaElement.isEmpty() ? Stream.of(metaElement) : Stream.empty();
             }).collect(Collectors.toList());
         emptyElements.forEach(source.getMetadata()::removeMetadataElement);
         return updated.get();

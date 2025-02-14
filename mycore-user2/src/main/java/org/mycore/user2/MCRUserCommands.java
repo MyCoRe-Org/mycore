@@ -66,7 +66,7 @@ import org.mycore.user2.utils.MCRUserTransformer;
     name = "User Commands")
 public class MCRUserCommands extends MCRAbstractCommands {
     /** The logger */
-    private static Logger LOGGER = LogManager.getLogger(MCRUserCommands.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger(MCRUserCommands.class.getName());
 
     private static final String SYSTEM = MCRConfiguration2.getStringOrThrow("MCR.CommandLineInterface.SystemName")
         + ":";
@@ -85,9 +85,9 @@ public class MCRUserCommands extends MCRAbstractCommands {
         order = 10)
     public static void changeToUser(String user, String password) {
         MCRSession session = MCRSessionMgr.getCurrentSession();
-        System.out.println(SYSTEM + " The old user ID is " + session.getUserInformation().getUserID());
+        LOGGER.info(() -> SYSTEM + " The old user ID is " + session.getUserInformation().getUserID());
         if (MCRUserManager.login(user, password) != null) {
-            System.out.println(SYSTEM + " The new user ID is " + session.getUserInformation().getUserID());
+            LOGGER.info(() -> SYSTEM + " The new user ID is " + session.getUserInformation().getUserID());
         } else {
             LOGGER.warn("Wrong password, no changes of user ID in session context!");
         }
@@ -379,7 +379,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
             throw new MCRException("Directory does not exist: " + dir.getAbsolutePath());
         }
         List<MCRUser> users = MCRUserManager.listUsers(null, null, null, null);
-        ArrayList<String> commands = new ArrayList<>(users.size());
+        List<String> commands = new ArrayList<>(users.size());
         for (MCRUser user : users) {
             File userFile = new File(dir, user.getUserID() + ".xml");
             commands.add("export user " + user.getUserID() + " to file " + userFile.getAbsolutePath());
@@ -413,7 +413,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
             return null;
         }
         Arrays.sort(listFiles);
-        ArrayList<String> cmds = new ArrayList<>(listFiles.length);
+        List<String> cmds = new ArrayList<>(listFiles.length);
         for (File file : listFiles) {
             cmds.add(new MessageFormat("{0} {1}", Locale.ROOT).format(new Object[] { cmd, file.getAbsolutePath() }));
         }

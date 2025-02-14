@@ -41,13 +41,14 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
  *
  */
 public class MCRObjectTypeStrategy implements MCRCombineableAccessCheckStrategy {
+
     private static final Pattern TYPE_PATTERN = Pattern.compile("[^_]*_([^_]*)_[0-9]*");
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRObjectIDStrategy.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
-    private static MCRObjectIDStrategy idStrategy = new MCRObjectIDStrategy();
+    private static final MCRObjectIDStrategy ID_STRATEGY = new MCRObjectIDStrategy();
 
     /*
      * (non-Javadoc)
@@ -57,9 +58,9 @@ public class MCRObjectTypeStrategy implements MCRCombineableAccessCheckStrategy 
      */
     @Override
     public boolean checkPermission(String id, String permission) {
-        if (idStrategy.hasRuleMapping(id, permission)) {
+        if (ID_STRATEGY.hasRuleMapping(id, permission)) {
             LOGGER.debug("using access rule defined for object.");
-            return idStrategy.checkPermission(id, permission);
+            return ID_STRATEGY.checkPermission(id, permission);
         }
         return checkObjectTypePermission(id, permission);
     }
@@ -100,7 +101,7 @@ public class MCRObjectTypeStrategy implements MCRCombineableAccessCheckStrategy 
 
     @Override
     public boolean hasRuleMapping(String id, String permission) {
-        return idStrategy.hasRuleMapping(id, permission) || hasTypePermission(getObjectType(id), permission)
+        return ID_STRATEGY.hasRuleMapping(id, permission) || hasTypePermission(getObjectType(id), permission)
             || MCRAccessManager.hasRule("default", permission);
     }
 

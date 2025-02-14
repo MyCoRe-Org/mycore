@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -61,7 +62,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
 
     private String defaultLang;
 
-    private static HashSet<String> LANGUAGES;
+    private static final Set<String> LANGUAGES;
 
     static {
         LANGUAGES = new HashSet<>(MCRConfiguration2.getString("MCR.Metadata.Languages")

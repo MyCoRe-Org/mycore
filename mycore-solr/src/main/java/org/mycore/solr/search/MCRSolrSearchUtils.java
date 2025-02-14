@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -56,7 +57,7 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 public final class MCRSolrSearchUtils {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRQLSearchUtils.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private MCRSolrSearchUtils() {
     }
@@ -85,7 +86,7 @@ public final class MCRSolrSearchUtils {
         int rows = query.getNumPerPage();
         List<String> returnFields = query.getReturnFields();
         MCRCondition condition = query.getCondition();
-        HashMap<String, List<MCRCondition>> table;
+        Map<String, List<MCRCondition>> table;
 
         if (condition instanceof MCRSetCondition setCondition) {
             table = MCRConditionTransformer.groupConditionsByIndex(setCondition);
@@ -94,7 +95,7 @@ public final class MCRSolrSearchUtils {
             LOGGER.warn("Condition is not SetCondition.");
             table = new HashMap<>();
 
-            ArrayList<MCRCondition> conditionList = new ArrayList<>();
+            List<MCRCondition> conditionList = new ArrayList<>();
             conditionList.add(condition);
 
             table.put("metadata", conditionList);

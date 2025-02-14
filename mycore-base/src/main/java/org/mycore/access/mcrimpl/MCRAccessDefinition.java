@@ -19,17 +19,18 @@
 package org.mycore.access.mcrimpl;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Maps object ids to rules
- * 
+ *
  * @author Arne Seifert
  */
 public class MCRAccessDefinition {
 
     private String objid;
 
-    private HashMap<String, String> pools = new HashMap<>();
+    private Map<String, String> pools = new HashMap<>();
 
     public MCRAccessDefinition() {
         pools.clear();
@@ -43,11 +44,11 @@ public class MCRAccessDefinition {
         objid = value;
     }
 
-    public HashMap<String, String> getPool() {
+    public Map<String, String> getPool() {
         return pools;
     }
 
-    public void setPool(HashMap<String, String> pool) {
+    public void setPool(Map<String, String> pool) {
         pools = pool;
     }
 

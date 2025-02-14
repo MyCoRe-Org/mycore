@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.function.Supplier;
@@ -73,15 +74,15 @@ public class MCRFrontendUtil {
     public static final String SESSION_NETMASK_IPV6_STRING = MCRConfiguration2
         .getString("MCR.Servlet.Session.NetMask.IPv6").orElse("FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF");
 
-    private static String BASE_URL;
+    private static String baseUrl;
 
-    private static String BASE_HOST_IP;
+    private static String baseHostIP;
 
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
-    public static byte[] SESSION_NETMASK_IPV4;
+    public static final byte[] SESSION_NETMASK_IPV4;
 
-    public static byte[] SESSION_NETMASK_IPV6;
+    public static final byte[] SESSION_NETMASK_IPV6;
 
     private static final ThreadLocal<Map.Entry<String, MCRServletJob>> CURRENT_SERVLET_JOB = new ThreadLocal<>();
 
@@ -115,11 +116,11 @@ public class MCRFrontendUtil {
                 return value.toString();
             }
         }
-        return BASE_URL;
+        return baseUrl;
     }
 
     public static String getHostIP() {
-        return BASE_HOST_IP;
+        return baseHostIP;
     }
 
     /**
@@ -156,18 +157,18 @@ public class MCRFrontendUtil {
     }
 
     public static synchronized void prepareBaseURLs(String baseURL) {
-        BASE_URL = MCRConfiguration2.getString("MCR.baseurl").orElse(baseURL);
-        if (!BASE_URL.endsWith("/")) {
-            BASE_URL = BASE_URL + "/";
+        baseUrl = MCRConfiguration2.getString("MCR.baseurl").orElse(baseURL);
+        if (!baseUrl.endsWith("/")) {
+            baseUrl = baseUrl + "/";
         }
         try {
-            URI baseUri = new URI(BASE_URL);
+            URI baseUri = new URI(baseUrl);
             InetAddress baseHost = InetAddress.getByName(baseUri.getHost());
-            BASE_HOST_IP = baseHost.getHostAddress();
+            baseHostIP = baseHost.getHostAddress();
         } catch (URISyntaxException e) {
-            LOGGER.error("Can't create URI from String {}", BASE_URL);
+            LOGGER.error("Can't create URI from String {}", baseUrl);
         } catch (UnknownHostException e) {
-            LOGGER.error("Can't find host IP for URL {}", BASE_URL);
+            LOGGER.error("Can't find host IP for URL {}", baseUrl);
         }
     }
 
@@ -180,7 +181,7 @@ public class MCRFrontendUtil {
             .ifPresent(session::setCurrentLanguage);
 
         // Set the IP of the current session
-        if (session.getCurrentIP().length() == 0) {
+        if (session.getCurrentIP().isEmpty()) {
             session.setCurrentIP(getRemoteAddr(request));
         }
 
@@ -269,10 +270,10 @@ public class MCRFrontendUtil {
      */
     private static String getXForwardedFor(HttpServletRequest req) {
         String xff = req.getHeader(PROXY_HEADER_REMOTE_IP);
-        if ((xff == null) || xff.trim().isEmpty()) {
+        if ((xff == null) || xff.isBlank()) {
             xff = req.getHeader(PROXY_HEADER_REMOTE_IP);
         }
-        if ((xff == null) || xff.trim().isEmpty()) {
+        if ((xff == null) || xff.isBlank()) {
             return null;
         }
 
@@ -297,7 +298,7 @@ public class MCRFrontendUtil {
             if (name.startsWith("XSL.") && name.endsWith(".SESSION")) {
                 String key = name.substring(0, name.length() - 8);
                 // parameter is not empty -> store
-                if (!request.getParameter(name).trim().equals("")) {
+                if (!request.getParameter(name).isBlank()) {
                     mcrSession.put(key, request.getParameter(name));
                     LOGGER.debug("Found HTTP-Req.-Parameter {}={} that should be saved in session, safed {}={}",
                         () -> name, () -> request.getParameter(name), () -> key, () -> request.getParameter(name));
@@ -315,7 +316,7 @@ public class MCRFrontendUtil {
             if (name.startsWith("XSL.") && name.endsWith(".SESSION")) {
                 String key = name.substring(0, name.length() - 8);
                 // attribute is not empty -> store
-                if (!request.getAttribute(name).toString().trim().equals("")) {
+                if (!request.getAttribute(name).toString().isBlank()) {
                     mcrSession.put(key, request.getAttribute(name));
                     LOGGER.debug("Found HTTP-Req.-Attribute {}={} that should be saved in session, safed {}={}",
                         () -> name, () -> request.getParameter(name), () -> key, () -> request.getParameter(name));
@@ -335,7 +336,7 @@ public class MCRFrontendUtil {
      * automatically added to this list.
      *
      */
-    private static TreeSet<String> getTrustedProxies() {
+    private static SortedSet<String> getTrustedProxies() {
         // Always trust the local host
         return Stream
             .concat(Stream.of("localhost", URI.create(getBaseURL()).getHost()), MCRConfiguration2
@@ -440,7 +441,7 @@ public class MCRFrontendUtil {
     private static void addSessionListener() {
         MCRSessionMgr.addSessionListener(event -> {
             switch (event.getType()) {
-                case passivated, destroyed -> CURRENT_SERVLET_JOB.remove();
+                case PASSIVATED, DESTROYED -> CURRENT_SERVLET_JOB.remove();
                 default -> {
                 }
             }

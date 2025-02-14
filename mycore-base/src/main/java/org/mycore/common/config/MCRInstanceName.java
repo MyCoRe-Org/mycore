@@ -23,12 +23,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Represents a property name that can be used to convey the class name of a class that should be instantiated.
  */
-public class MCRInstanceName {
+public final class MCRInstanceName {
 
     private final String actual;
 
@@ -116,8 +115,7 @@ public class MCRInstanceName {
 
         private static final Suffix[] REPRESENTED_VALUES = Arrays.stream(values())
             .filter(suffix -> suffix.representation != null)
-            .collect(Collectors.toList())
-            .toArray(new Suffix[0]);
+            .toArray(Suffix[]::new);
 
         private final String representation;
 
@@ -133,7 +131,7 @@ public class MCRInstanceName {
         }
 
         public static Suffix[] representedValues() {
-            return REPRESENTED_VALUES;
+            return REPRESENTED_VALUES.clone();
         }
 
         public String appendTo(String string) {

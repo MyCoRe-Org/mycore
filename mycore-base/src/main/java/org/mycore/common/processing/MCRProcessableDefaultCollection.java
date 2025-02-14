@@ -35,7 +35,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class MCRProcessableDefaultCollection implements MCRProcessableCollection {
 
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private String name;
 

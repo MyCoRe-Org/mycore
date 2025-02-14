@@ -163,11 +163,18 @@ public class MCRRestAPIObjectsHelper {
                 outputter.output(doc, sw);
             }
         } catch (JDOMException e) {
-            throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR, new MCRRestAPIError(
-                MCRRestAPIError.CODE_INTERNAL_ERROR, "Unable to transform MCRContent to XML document", e.getMessage()));
+            MCRRestAPIException restAPIException = new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR,
+                new MCRRestAPIError(
+                    MCRRestAPIError.CODE_INTERNAL_ERROR, "Unable to transform MCRContent to XML document",
+                    e.getMessage()));
+            restAPIException.initCause(e);
+            throw restAPIException;
         } catch (IOException e) {
-            throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR, new MCRRestAPIError(
-                MCRRestAPIError.CODE_INTERNAL_ERROR, "Unable to retrieve/transform MyCoRe object", e.getMessage()));
+            MCRRestAPIException restAPIException = new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR,
+                new MCRRestAPIError(
+                    MCRRestAPIError.CODE_INTERNAL_ERROR, "Unable to retrieve/transform MyCoRe object", e.getMessage()));
+            restAPIException.initCause(e);
+            throw restAPIException;
         }
 
         return Response.ok(sw.toString())
@@ -198,8 +205,10 @@ public class MCRRestAPIObjectsHelper {
                 .type("application/xml")
                 .build();
         } catch (IOException e) {
-            throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
+            MCRRestAPIException restAPIException = new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR,
                 new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, GENERAL_ERROR_MSG, e.getMessage()));
+            restAPIException.initCause(e);
+            throw restAPIException;
         }
 
     }
@@ -383,8 +392,10 @@ public class MCRRestAPIObjectsHelper {
         try {
             objIdDates = MCRXMLMetadataManager.instance().retrieveObjectDates(new ArrayList<>(mcrIDs));
         } catch (IOException e) {
-            throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
+            MCRRestAPIException restAPIException = new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR,
                 new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, GENERAL_ERROR_MSG, e.getMessage()));
+            restAPIException.initCause(e);
+            throw restAPIException;
         }
 
         if (params.lastModifiedBefore != null || params.lastModifiedAfter != null) {
@@ -538,8 +549,10 @@ public class MCRRestAPIObjectsHelper {
                 .type("application/xml; charset=UTF-8")
                 .build();
         } catch (IOException e) {
-            throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
+            MCRRestAPIException restAPIException = new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR,
                 new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, GENERAL_ERROR_MSG, e.getMessage()));
+            restAPIException.initCause(e);
+            throw restAPIException;
         }
     }
 
@@ -582,8 +595,10 @@ public class MCRRestAPIObjectsHelper {
                 .type("application/json; charset=UTF-8")
                 .build();
         } catch (IOException e) {
-            throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
+            MCRRestAPIException restAPIException = new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR,
                 new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, GENERAL_ERROR_MSG, e.getMessage()));
+            restAPIException.initCause(e);
+            throw restAPIException;
         }
     }
 
@@ -626,9 +641,11 @@ public class MCRRestAPIObjectsHelper {
                         xout.output(docOut, sw);
                         return response(sw.toString(), "application/xml", lastModified);
                     } catch (IOException e) {
-                        throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
+                        MCRRestAPIException restAPIException = new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR,
                             new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, GENERAL_ERROR_MSG,
                                 e.getMessage()));
+                        restAPIException.initCause(e);
+                        throw restAPIException;
                     }
                 case MCRRestAPIObjects.FORMAT_JSON:
                     String result = listDerivateContentAsJson(derObj, path, depth, info, app);
@@ -641,8 +658,11 @@ public class MCRRestAPIObjectsHelper {
 
             }
         } catch (IOException e) {
-            throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR, new MCRRestAPIError(
-                MCRRestAPIError.CODE_INTERNAL_ERROR, "Unexepected program flow termination.", e.getMessage()));
+            MCRRestAPIException restAPIException = new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR,
+                new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, "Unexepected program flow termination.",
+                    e.getMessage()));
+            restAPIException.initCause(e);
+            throw restAPIException;
         }
     }
 
@@ -731,7 +751,7 @@ public class MCRRestAPIObjectsHelper {
             errors.add(new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_QUERY_PARAMETER, "The sort parameter is wrong.",
                 "The syntax should be [sortField]:[sortOrder]."));
         }
-        if (errors.size() > 0) {
+        if (!errors.isEmpty()) {
             throw new MCRRestAPIException(Status.BAD_REQUEST, errors);
         }
         return result;

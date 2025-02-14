@@ -41,12 +41,13 @@ import com.google.gson.JsonObject;
  * @author Matthias Eichner
  */
 public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvider {
-    private static final Logger LOGGER = LogManager.getLogger(MCRWCMSDefaultSectionProvider.class);
 
-    private static Gson gson;
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    private static final Gson GSON;
 
     static {
-        gson = new Gson();
+        GSON = new Gson();
     }
 
     @Override
@@ -77,29 +78,29 @@ public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvid
 
     private JsonObject add(MCRNavigationBaseItem item, JsonArray hierarchy, JsonArray items) {
         int id = items.size();
-        JsonObject jsonItem = gson.toJsonTree(item).getAsJsonObject();
+        JsonObject jsonItem = GSON.toJsonTree(item).getAsJsonObject();
         jsonItem.addProperty(JSON_WCMS_ID, id);
         jsonItem.remove(JSON_CHILDREN);
         WCMSType type = null;
         String href = null;
         switch (item) {
             case MCRNavigation navigation -> {
-                type = WCMSType.root;
+                type = WCMSType.ROOT;
                 href = navigation.getHrefStartingPage();
             }
             case MCRNavigationMenuItem menuItem -> {
-                type = WCMSType.menu;
+                type = WCMSType.MENU;
                 href = menuItem.getDir();
             }
             case MCRNavigationItem navigationItem -> {
-                type = WCMSType.item;
+                type = WCMSType.ITEM;
                 href = navigationItem.getHref();
             }
             case MCRNavigationInsertItem mcrNavigationInsertItem -> {
-                type = WCMSType.insert;
+                type = WCMSType.INSERT;
             }
             case MCRNavigationGroup mcrNavigationGroup -> {
-                type = WCMSType.group;
+                type = WCMSType.GROUP;
             }
             case null, default -> LOGGER.warn("Unable to set type for item {}", id);
         }
@@ -170,16 +171,16 @@ public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvid
                 if (item.has(JSON_WCMS_ID) && item.has(JSON_WCMS_TYPE)
                     && wcmsId.equals(item.get(JSON_WCMS_ID).getAsString())) {
                     WCMSType wcmsType = WCMSType.valueOf(item.get(JSON_WCMS_TYPE).getAsString());
-                    if (wcmsType.equals(WCMSType.root)) {
-                        return gson.fromJson(item, MCRNavigation.class);
-                    } else if (wcmsType.equals(WCMSType.menu)) {
-                        return gson.fromJson(item, MCRNavigationMenuItem.class);
-                    } else if (wcmsType.equals(WCMSType.item)) {
-                        return gson.fromJson(item, MCRNavigationItem.class);
-                    } else if (wcmsType.equals(WCMSType.insert)) {
-                        return gson.fromJson(item, MCRNavigationInsertItem.class);
-                    } else if (wcmsType.equals(WCMSType.group)) {
-                        return gson.fromJson(item, MCRNavigationGroup.class);
+                    if (wcmsType.equals(WCMSType.ROOT)) {
+                        return GSON.fromJson(item, MCRNavigation.class);
+                    } else if (wcmsType.equals(WCMSType.MENU)) {
+                        return GSON.fromJson(item, MCRNavigationMenuItem.class);
+                    } else if (wcmsType.equals(WCMSType.ITEM)) {
+                        return GSON.fromJson(item, MCRNavigationItem.class);
+                    } else if (wcmsType.equals(WCMSType.INSERT)) {
+                        return GSON.fromJson(item, MCRNavigationInsertItem.class);
+                    } else if (wcmsType.equals(WCMSType.GROUP)) {
+                        return GSON.fromJson(item, MCRNavigationGroup.class);
                     }
                 }
             }

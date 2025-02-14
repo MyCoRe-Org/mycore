@@ -46,7 +46,7 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
 
     List<MCRSolrIndexHandler> subHandlerList;
 
-    private static Logger LOGGER = LogManager.getLogger(MCRSolrInputDocumentsHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSolrInputDocumentsHandler.class);
 
     public MCRSolrInputDocumentsHandler(Collection<SolrInputDocument> documents, MCRSolrCoreType coreType) {
         this.documents = documents;
