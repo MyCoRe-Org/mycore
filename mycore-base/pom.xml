@@ -49,6 +49,8 @@
                 <useDependency>com.h2database:h2</useDependency>
                 <!-- used by hibernate -->
                 <useDependency>org.javassist:javassist</useDependency>
+                <!-- needed to compile xalan -->
+                <useDependency>xalan:serializer</useDependency>
               </usedDependencies>
             </configuration>
           </execution>
@@ -384,6 +386,10 @@
     </dependency>
     <dependency>
       <groupId>xalan</groupId>
+      <artifactId>serializer</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>xalan</groupId>
       <artifactId>xalan</artifactId>
     </dependency>
     <dependency>
@@ -394,11 +400,6 @@
     <dependency>
       <groupId>org.glassfish.jersey.inject</groupId>
       <artifactId>jersey-hk2</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>xalan</groupId>
-      <artifactId>serializer</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>
