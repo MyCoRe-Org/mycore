@@ -337,6 +337,20 @@ public class MCRParameterCollector {
      *            the Transformer object thats parameters should be set
      */
     public void setParametersTo(Transformer transformer) {
+        /*String name = transformer.getClass().getName();
+        // xalan special case
+        if (name.equals("org.apache.xalan.transformer.TransformerImpl")) {
+            try {
+                Method sp = transformer.getClass().getMethod("setParameter", String.class, String.class, Object.class);
+                for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+                    sp.invoke(transformer, entry.getKey(), null, entry.getValue());
+                }
+            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                throw new MCRException("Failed to set parameters to: " + transformer.getClass().getName(), e);
+            }
+            return;
+        }*/
+        // saxon and all other
         for (Map.Entry<String, Object> entry : parameters.entrySet()) {
             transformer.setParameter(entry.getKey(), entry.getValue());
         }
