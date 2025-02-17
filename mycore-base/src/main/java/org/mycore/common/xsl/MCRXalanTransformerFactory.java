@@ -63,9 +63,9 @@ public class MCRXalanTransformerFactory extends TransformerFactoryImpl {
         return new MyStylesheetHandler(this);
     }
 
-    private static class MyStylesheetHandler extends StylesheetHandler {
+    private static final class MyStylesheetHandler extends StylesheetHandler {
 
-        public MyStylesheetHandler(TransformerFactoryImpl processor) throws TransformerConfigurationException {
+        private MyStylesheetHandler(TransformerFactoryImpl processor) throws TransformerConfigurationException {
             super(processor);
         }
 
@@ -76,11 +76,11 @@ public class MCRXalanTransformerFactory extends TransformerFactoryImpl {
 
     }
 
-    private static class MyTemplates implements Templates {
+    private static final class MyTemplates implements Templates {
 
         StylesheetRoot delegate;
 
-        public MyTemplates(StylesheetRoot delegate) {
+        private MyTemplates(StylesheetRoot delegate) {
             this.delegate = delegate;
         }
 
@@ -96,9 +96,9 @@ public class MCRXalanTransformerFactory extends TransformerFactoryImpl {
 
     }
 
-    private static class MyTransformerImpl extends TransformerImpl {
+    private static final class MyTransformerImpl extends TransformerImpl {
 
-        public MyTransformerImpl(StylesheetRoot stylesheet) {
+        private MyTransformerImpl(StylesheetRoot stylesheet) {
             super(stylesheet);
         }
 

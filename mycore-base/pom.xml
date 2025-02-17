@@ -394,6 +394,10 @@
     </dependency>
     <dependency>
       <groupId>xalan</groupId>
+      <artifactId>serializer</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>xalan</groupId>
       <artifactId>xalan</artifactId>
     </dependency>
     <dependency>
@@ -405,10 +409,6 @@
       <groupId>org.glassfish.jersey.inject</groupId>
       <artifactId>jersey-hk2</artifactId>
       <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>xalan</groupId>
-      <artifactId>serializer</artifactId>
     </dependency>
     <dependency>
       <groupId>com.zaxxer</groupId>
