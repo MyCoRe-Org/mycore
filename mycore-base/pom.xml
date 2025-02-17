@@ -49,8 +49,6 @@
                 <useDependency>com.h2database:h2</useDependency>
                 <!-- used by hibernate -->
                 <useDependency>org.javassist:javassist</useDependency>
-                <!-- needed to compile xalan -->
-                <useDependency>xalan:serializer</useDependency>
               </usedDependencies>
             </configuration>
           </execution>
