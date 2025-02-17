@@ -20,89 +20,73 @@ package org.mycore.common.xsl;
 
 import java.util.Properties;
 
-import javax.xml.transform.ErrorListener;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.URIResolver;
+import javax.xml.transform.sax.TemplatesHandler;
 
+import org.apache.xalan.processor.StylesheetHandler;
 import org.apache.xalan.processor.TransformerFactoryImpl;
 import org.apache.xalan.templates.StylesheetRoot;
 import org.apache.xalan.transformer.TransformerImpl;
-import org.xml.sax.ContentHandler;
 
+/**
+ * A custom {@code TransformerFactory} implementation for Xalan that improves
+ * performance when handling parameters by disabling namespace support and avoiding
+ * the use of the inefficient {@code m_userParams} vector.
+ * <p>
+ * In the standard Xalan implementation, parameters are stored in a vector, and each
+ * parameter set operation performs a linear search through this vector. This can lead
+ * to significant performance degradation when many parameters (such as "mycore" properties)
+ * are set (e.g., over 1200 times). To address this, this custom factory disables support
+ * for namespace-based parameters and bypasses the internal {@code m_userParams} vector.
+ * <p>
+ * <b>Key modifications:</b>
+ * <ul>
+ *   <li>Namespace-based parameters are not supported. Any parameter name beginning with
+ *       the character '{' is rejected and will result in an {@link IllegalArgumentException}.</li>
+ *   <li>The internal vector-based parameter storage ({@code m_userParams}) is not used;
+ *       instead, parameters are set via a call to the superclass method with a {@code null}
+ *       namespace.</li>
+ * </ul>
+ * <p>
+ * This implementation provides custom subclasses for the stylesheet handler, templates,
+ * and transformer.
+ *
+ * @see javax.xml.transform.Templates
+ * @see javax.xml.transform.Transformer
+ */
 public class MCRXalanTransformerFactory extends TransformerFactoryImpl {
 
     @Override
-    public Templates newTemplates(Source source) throws TransformerConfigurationException {
-        return new TemplatesFacade(super.newTemplates(source));
+    public TemplatesHandler newTemplatesHandler() throws TransformerConfigurationException {
+        return new MyStylesheetHandler(this);
     }
 
-    private static class TemplatesFacade implements Templates {
+    private static class MyStylesheetHandler extends StylesheetHandler {
 
-        private final Templates delegate;
+        public MyStylesheetHandler(TransformerFactoryImpl processor) throws TransformerConfigurationException {
+            super(processor);
+        }
 
-        public TemplatesFacade(Templates delegate) {
+        @Override
+        public Templates getTemplates() {
+            return new MyTemplates((StylesheetRoot) super.getTemplates());
+        }
+
+    }
+
+    private static class MyTemplates implements Templates {
+
+        StylesheetRoot delegate;
+
+        public MyTemplates(StylesheetRoot delegate) {
             this.delegate = delegate;
         }
 
         @Override
-        public Transformer newTransformer() throws TransformerConfigurationException {
-            TransformerImpl transformerImpl = (TransformerImpl) delegate.newTransformer();
-            return new TransformerFacade(transformerImpl, transformerImpl.getStylesheet());
-        }
-
-        @Override
-        public Properties getOutputProperties() {
-            return this.delegate.getOutputProperties();
-        }
-    }
-
-    private static class TransformerFacade extends TransformerImpl {
-
-        private final TransformerImpl delegate;
-
-        private TransformerFacade(TransformerImpl delegate, StylesheetRoot stylesheetRoot) {
-            super(stylesheetRoot);
-            this.delegate = delegate;
-        }
-
-        @Override
-        public void setParameter(String name, Object object) {
-            delegate.setParameter(name, null, object);
-        }
-
-        @Override
-        public void transform(Source source, Result result) throws TransformerException {
-            delegate.transform(source, result);
-        }
-
-        @Override
-        public Object getParameter(String s) {
-            return delegate.getParameter(s);
-        }
-
-        @Override
-        public void clearParameters() {
-            delegate.clearParameters();
-        }
-
-        @Override
-        public void setURIResolver(URIResolver uriResolver) {
-            delegate.setURIResolver(uriResolver);
-        }
-
-        @Override
-        public URIResolver getURIResolver() {
-            return delegate.getURIResolver();
-        }
-
-        @Override
-        public void setOutputProperties(Properties properties) {
-            delegate.setOutputProperties(properties);
+        public Transformer newTransformer() {
+            return new MyTransformerImpl(delegate);
         }
 
         @Override
@@ -110,34 +94,20 @@ public class MCRXalanTransformerFactory extends TransformerFactoryImpl {
             return delegate.getOutputProperties();
         }
 
-        @Override
-        public void setOutputProperty(String s, String s1) throws IllegalArgumentException {
-            delegate.setOutputProperty(s, s1);
+    }
+
+    private static class MyTransformerImpl extends TransformerImpl {
+
+        public MyTransformerImpl(StylesheetRoot stylesheet) {
+            super(stylesheet);
         }
 
         @Override
-        public String getOutputProperty(String s) throws IllegalArgumentException {
-            return delegate.getOutputProperty(s);
-        }
-
-        @Override
-        public void setErrorListener(ErrorListener errorListener) throws IllegalArgumentException {
-            delegate.setErrorListener(errorListener);
-        }
-
-        @Override
-        public ErrorListener getErrorListener() {
-            return delegate.getErrorListener();
-        }
-
-        @Override
-        public ContentHandler getInputContentHandler(boolean doDocFrag) {
-            return delegate.getInputContentHandler(doDocFrag);
-        }
-
-        @Override
-        public ContentHandler getInputContentHandler() {
-            return delegate.getInputContentHandler();
+        public void setParameter(String name, Object value) {
+            if (name.charAt(0) == '{') {
+                throw new IllegalArgumentException("Namespaces for parameters are not supported: " + name);
+            }
+            super.setParameter(name, null, value);
         }
 
     }
