@@ -29,6 +29,7 @@ import org.apache.xalan.processor.StylesheetHandler;
 import org.apache.xalan.processor.TransformerFactoryImpl;
 import org.apache.xalan.templates.StylesheetRoot;
 import org.apache.xalan.transformer.TransformerImpl;
+import org.apache.xml.serializer.SerializerTrace;
 
 /**
  * A custom {@code TransformerFactory} implementation for Xalan that improves
@@ -96,7 +97,7 @@ public class MCRXalanTransformerFactory extends TransformerFactoryImpl {
 
     }
 
-    private static final class MyTransformerImpl extends TransformerImpl {
+    private static final class MyTransformerImpl extends TransformerImpl implements SerializerTrace {
 
         private MyTransformerImpl(StylesheetRoot stylesheet) {
             super(stylesheet);
