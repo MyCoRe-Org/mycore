@@ -18,31 +18,93 @@
 
 package org.mycore.datamodel.ifs2;
 
+import java.util.function.Supplier;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.ifs2.MCRStore.MCRStoreConfig;
 
+/**
+ * Manages the lifecycle of {@link MCRStore} instances, including creation, retrieval, and removal.
+ * <p>
+ * This class provides methods to create new stores, retrieve existing ones, and remove them from
+ * the {@link MCRStoreCenter}. It ensures proper initialization and thread-safe store access.
+ */
 public class MCRStoreManager {
-    private static final Logger LOGGER = LogManager.getLogger(MCRStoreManager.class);
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    /**
+     * Builds a new store instance using the default configuration  and adds it to the {@link MCRStoreCenter}.
+     *
+     * @param id         the unique identifier for the store
+     * @param storeClass the class of the store to create
+     * @return the created store instance
+     * @throws ReflectiveOperationException if the store cannot be instantiated
+     */
     public static <T extends MCRStore> T createStore(String id, Class<T> storeClass)
         throws ReflectiveOperationException {
         return createStore(new MCRStoreDefaultConfig(id), storeClass);
     }
 
+    /**
+     * Builds a new store instance with the specified configuration and adds it to the {@link MCRStoreCenter}.
+     *
+     * @param config     the store configuration
+     * @param storeClass the class of the store to create
+     * @return the created store instance
+     * @throws ReflectiveOperationException if the store cannot be instantiated
+     */
     public static <T extends MCRStore> T createStore(MCRStoreConfig config, Class<T> storeClass)
         throws ReflectiveOperationException {
-        T store = storeClass.getDeclaredConstructor().newInstance();
-        store.init(config);
+        T store = buildStore(config, storeClass);
         try {
             LOGGER.info("Adding instance of {} as MCRStore '{}'.", storeClass::getSimpleName, store::getID);
             MCRStoreCenter.instance().addStore(store.getID(), store);
         } catch (Exception e) {
-            throw new MCRException("Could not create store with ID " + config.getID() + ", store allready exists", e);
+            throw new MCRException("Could not create store with ID " + config.getID() + ", store already exists", e);
         }
-
         return store;
+    }
+
+    /**
+     * Builds a new store instance using the default configuration.
+     *
+     * @param id         the unique identifier for the store
+     * @param storeClass the class of the store to create
+     * @return the built store instance
+     * @throws ReflectiveOperationException if the store cannot be instantiated
+     */
+    public static <T extends MCRStore> T buildStore(String id, Class<T> storeClass)
+        throws ReflectiveOperationException {
+        return buildStore(new MCRStoreDefaultConfig(id), storeClass);
+    }
+
+    /**
+     * Builds a new store instance with the specified configuration.
+     *
+     * @param config     the store configuration
+     * @param storeClass the class of the store to create
+     * @return the built store instance
+     * @throws ReflectiveOperationException if the store cannot be instantiated
+     */
+    public static <T extends MCRStore> T buildStore(MCRStoreConfig config, Class<T> storeClass)
+        throws ReflectiveOperationException {
+        T store = storeClass.getDeclaredConstructor().newInstance();
+        store.init(config);
+        return store;
+    }
+
+    /**
+     * Retrieves an existing store by its ID, or creates and registers a new one if absent.
+     *
+     * @param id            the store ID
+     * @param storeSupplier the supplier function to create a store if it does not exist
+     * @return the existing or newly created store instance
+     */
+    public static <T extends MCRStore> T computeStoreIfAbsent(String id, Supplier<T> storeSupplier) {
+        return MCRStoreCenter.instance().computeStoreIfAbsent(id, storeSupplier);
     }
 
     /**
@@ -67,4 +129,5 @@ public class MCRStoreManager {
         LOGGER.info("Remove MCRStore '{}'.", id);
         MCRStoreCenter.instance().removeStore(id);
     }
+
 }
