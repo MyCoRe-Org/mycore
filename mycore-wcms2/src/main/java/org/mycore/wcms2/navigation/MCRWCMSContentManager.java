@@ -124,7 +124,7 @@ public class MCRWCMSContentManager {
     public JsonObject getContent(Element e) {
         JsonArray sectionArray = this.sectionProvider.toJSON(e);
         JsonObject content = new JsonObject();
-        content.addProperty(JSON_PROPERTY_TYPE, JSON_PROPERTY_CONTENT);
+        content.addProperty(JSON_PROPERTY_TYPE, "content");
         content.add(JSON_PROPERTY_CONTENT, sectionArray);
         return content;
     }

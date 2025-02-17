@@ -83,6 +83,8 @@ public class MCRUserServlet extends MCRServlet {
 
     private static final String ATTRIBUTE_REALM = "realm";
 
+    private static final String ATTRIBUTE_VALUE = "value";
+
     /**
      * Handles requests. The parameter 'action' selects what to do, possible
      * values are show, save, delete, password (with id as second parameter).
@@ -427,7 +429,9 @@ public class MCRUserServlet extends MCRServlet {
             .map(attributes -> attributes.getChildren("attribute"))
             .orElse(Collections.emptyList());
         Set<MCRUserAttribute> newAttrs = attributeList.stream()
-            .map(a -> new MCRUserAttribute(a.getAttributeValue(ATTRIBUTE_NAME), a.getAttributeValue("value")))
+            .map(a -> new MCRUserAttribute(
+                a.getAttributeValue(ATTRIBUTE_NAME),
+                a.getAttributeValue(ATTRIBUTE_VALUE)))
             .collect(Collectors.toSet());
         user.getAttributes().retainAll(newAttrs);
         newAttrs.removeAll(user.getAttributes());

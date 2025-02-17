@@ -329,7 +329,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      *            rule is multiple used
      */
     @MCRCommand(syntax = "update permission {0} for id {1} with rulefile {2} described by {3}",
-        help = "The command updates access rule for a given id of a given permission with a given rule file and"
+        help = "The command updates access rule for a given id of a given permission with a given rule file and "
             + "description",
         order = 61)
     public static void permissionFileUpdateForID(String permission, String id, String strFileRule, String description) {
