@@ -122,8 +122,8 @@ public class MCROCFLCommands {
 
         MCROCFLMigration migration;
         if (metadataManagerConfigKey != null && !metadataManagerConfigKey.isEmpty()) {
-            MCROCFLXMLMetadataManager metadataManager =
-                MCRConfiguration2.getInstanceOf(MCROCFLXMLMetadataManager.class, metadataManagerConfigKey)
+            MCROCFLXMLMetadataManager metadataManager
+                = MCRConfiguration2.getInstanceOf(MCROCFLXMLMetadataManager.class, metadataManagerConfigKey)
                     .orElseThrow(() -> MCRConfiguration2.createConfigurationException(metadataManagerConfigKey));
             migration = new MCROCFLMigration(null, prunerList, metadataManager);
         } else if (repository != null && !repository.isEmpty()) {
@@ -490,7 +490,8 @@ public class MCROCFLCommands {
                 .map(entry -> entry.getKey() + ": " + entry.getValue())
                 .toList();
             Files.write(errorFilePath, errorLines, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-            LOGGER.info("Validation error in '{}'. See '{}' for details.", derivateId, errorFilePath.getFileName());
+            LOGGER.info(() -> "Validation error in '" + derivateId + "'. See '" + errorFilePath.getFileName()
+                + "' for details.");
         }
     }
 
