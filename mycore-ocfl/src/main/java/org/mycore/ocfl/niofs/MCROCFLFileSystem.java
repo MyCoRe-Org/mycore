@@ -42,7 +42,7 @@ import io.ocfl.api.OcflRepository;
 public class MCROCFLFileSystem extends MCRVersionedFileSystem {
 
     // TODO we need a bridge for a localfilestore and a remotefilestore
-    private static volatile MCROCFLLocalFileStore FILE_STORE;
+    private static volatile MCROCFLLocalFileStore fileStore;
 
     private final Object fileStoreLock = new Object();
 
@@ -81,7 +81,10 @@ public class MCROCFLFileSystem extends MCRVersionedFileSystem {
         try {
             virtualObject.create();
         } catch (IOException ioException) {
-            throw new FileSystemException("Cannot create root of '" + owner + "'.", null, ioException.getMessage());
+            FileSystemException fileSystemException
+                = new FileSystemException(null, null, "Cannot create root of '" + owner + "'.");
+            fileSystemException.initCause(ioException);
+            throw fileSystemException;
         }
     }
 
@@ -101,7 +104,10 @@ public class MCROCFLFileSystem extends MCRVersionedFileSystem {
         try {
             virtualObject.purge();
         } catch (IOException ioException) {
-            throw new FileSystemException("Cannot remove root of '" + owner + "'.", null, ioException.getMessage());
+            FileSystemException fileSystemException
+                = new FileSystemException(null, null, "Cannot remove root of '" + owner + "'.");
+            fileSystemException.initCause(ioException);
+            throw fileSystemException;
         }
     }
 
@@ -155,14 +161,14 @@ public class MCROCFLFileSystem extends MCRVersionedFileSystem {
      * @return the {@link MCROCFLLocalFileStore}.
      */
     public MCROCFLLocalFileStore getFileStore() {
-        if (FILE_STORE == null) {
+        if (fileStore == null) {
             synchronized (fileStoreLock) {
-                if (FILE_STORE == null) {
-                    FILE_STORE = new MCROCFLLocalFileStore(provider());
+                if (fileStore == null) {
+                    fileStore = new MCROCFLLocalFileStore(provider());
                 }
             }
         }
-        return FILE_STORE;
+        return fileStore;
     }
 
 }
