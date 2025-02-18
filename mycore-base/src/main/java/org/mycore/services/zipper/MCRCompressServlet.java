@@ -42,6 +42,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRXlink;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
@@ -50,7 +51,10 @@ import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectStructure;
+import org.mycore.datamodel.metadata.MCRXMLConstants;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -118,7 +122,7 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
             job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, "ID is not valid: " + objId);
             return;
         }
-        boolean readPermission = id.getTypeId().equals("derivate") ? MCRAccessManager
+        boolean readPermission = id.getTypeId().equals(MCRDerivate.OBJECT_TYPE) ? MCRAccessManager
             .checkDerivateContentPermission(id, PERMISSION_READ)
             : MCRAccessManager.checkPermission(id, PERMISSION_READ);
         if (!readPermission) {
@@ -152,7 +156,7 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
                 job.getResponse().setContentType(getMimeType());
                 String filename = getFileName(id, path);
                 job.getResponse().addHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
-                if (id.getTypeId().equals("derivate")) {
+                if (id.getTypeId().equals(MCRDerivate.OBJECT_TYPE)) {
                     sendDerivate(id, path, container);
                 } else {
                     sendObject(id, job, container);
@@ -173,12 +177,13 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
         sendMetadataCompressed("metadata.xml", metaDataContent, lastModified, container);
 
         // zip all derivates
-        List<Element> li = content.asXML().getRootElement().getChild("structure").getChild("derobjects")
+        List<Element> li = content.asXML().getRootElement().getChild(MCRObjectStructure.XML_NAME)
+            .getChild(MCRObjectStructure.ELEMENT_DERIVATE_OBJECTS)
             .getChildren("derobject");
 
         for (Element el : li) {
-            if (el.getAttributeValue("inherited").equals("0")) {
-                String ownerID = el.getAttributeValue("href", XLINK_NAMESPACE);
+            if (el.getAttributeValue(MCRXMLConstants.INHERITED).equals("0")) {
+                String ownerID = el.getAttributeValue(MCRXlink.HREF, XLINK_NAMESPACE);
                 MCRObjectID derId = MCRObjectID.getInstance(ownerID);
                 // here the access check is tested only against the derivate
                 if (MCRAccessManager.checkDerivateContentPermission(derId, PERMISSION_READ)

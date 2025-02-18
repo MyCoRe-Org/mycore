@@ -31,12 +31,19 @@ import org.mycore.common.MCRException;
  * @author Jens Kupferschmidt
  */
 public class MCRMetaAccessRule extends MCRMetaDefault {
+
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    public static final String CLASS_NAME = "MCRMetaAccessRule";
+
+    private static final String ELEMENT_CONDITION = "condition";
+
+    private static final String ATTRIBUTE_PERMISSION = "permission";
+
     // MCRMetaAccessRule data
     protected Element condition;
 
     protected String permission;
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * This is the constructor. <br>
@@ -61,15 +68,15 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      * <em>condition</em>, if it is null, an exception will be throwed.
      * @param subtag       the name of the subtag
      * @param type         the optional type string
-     * @param inherted     a value &gt;= 0
+     * @param inherited    a value &gt;= 0
      * @param permission   permission
      * @param condition    the JDOM Element included the condition tree
      * @exception MCRException if the subtag value or condition is null or empty
      */
-    public MCRMetaAccessRule(String subtag, String type, int inherted, String permission, Element condition)
+    public MCRMetaAccessRule(String subtag, String type, int inherited, String permission, Element condition)
         throws MCRException {
-        super(subtag, null, type, inherted);
-        if (condition == null || !condition.getName().equals("condition")) {
+        super(subtag, null, type, inherited);
+        if (condition == null || !condition.getName().equals(ELEMENT_CONDITION)) {
             throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
         }
         set(permission, condition);
@@ -98,7 +105,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      *                if the condition is null or empty
      */
     public final void setCondition(Element condition) throws MCRException {
-        if (condition == null || !condition.getName().equals("condition")) {
+        if (condition == null || !condition.getName().equals(ELEMENT_CONDITION)) {
             throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
         }
         this.condition = condition.clone();
@@ -143,8 +150,8 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
     public void setFromDOM(Element element) {
         super.setFromDOM(element);
 
-        setCondition(element.getChild("condition"));
-        setPermission(element.getAttributeValue("permission"));
+        setCondition(element.getChild(ELEMENT_CONDITION));
+        setPermission(element.getAttributeValue(ATTRIBUTE_PERMISSION));
     }
 
     /**
@@ -158,7 +165,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
     @Override
     public Element createXML() throws MCRException {
         Element elm = super.createXML();
-        elm.setAttribute("permission", permission);
+        elm.setAttribute(ATTRIBUTE_PERMISSION, permission);
         elm.addContent(condition.clone());
         return elm;
     }
@@ -181,7 +188,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
         if (condition == null) {
             throw new MCRException(getSubTag() + ": condition is null");
         }
-        if (permission == null || permission.length() == 0) {
+        if (permission == null || permission.isEmpty()) {
             throw new MCRException(getSubTag() + ": permission is null or empty");
         }
     }
@@ -207,8 +214,9 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
         if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
             LOGGER.debug("Permission         = {}", permission);
-            LOGGER.debug("Rule               = " + "condition");
+            LOGGER.debug("Rule               = " + ELEMENT_CONDITION);
             LOGGER.debug(" ");
         }
     }
+
 }

@@ -55,7 +55,15 @@ import jakarta.ws.rs.core.Response.Status;
  */
 public class MCRWCMSContentManager {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRWCMSContentManager.class);
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    private static final String JSON_PROPERTY_TYPE = "type";
+
+    private static final String JSON_PROPERTY_CONTENT = "content";
+
+    private static final String JSON_PROPERTY_WEBPAGE_ID = "webpageId";
+
+    private static final String JSON_PROPERTY_DIRTY = "dirty";
 
     private final MCRWCMSSectionProvider sectionProvider;
 
@@ -116,21 +124,21 @@ public class MCRWCMSContentManager {
     public JsonObject getContent(Element e) {
         JsonArray sectionArray = this.sectionProvider.toJSON(e);
         JsonObject content = new JsonObject();
-        content.addProperty("type", "content");
-        content.add("content", sectionArray);
+        content.addProperty(JSON_PROPERTY_TYPE, "content");
+        content.add(JSON_PROPERTY_CONTENT, sectionArray);
         return content;
     }
 
     /**
      * Saves the content of the given items.
-     * 
+     * <p>
      * Returns a json object, if everything is ok:
      * <p>
      * { type: "saveDone" }
      * </p>
      * 
      * <p>
-     * If one or more files could'nt be saved because of an error the returning
+     * If one or more files couldn't be saved because of an error the returning
      * json looks like:<br>
      * {
      *   type: "error",
@@ -144,18 +152,18 @@ public class MCRWCMSContentManager {
      * 
      */
     public void save(JsonArray items) {
-        XMLOutputter out = new XMLOutputter(Format.getRawFormat().setEncoding("UTF-8"));
+        XMLOutputter xmlOutputter = new XMLOutputter(Format.getRawFormat().setEncoding("UTF-8"));
         for (JsonElement e : items) {
             validateContent(e).ifPresent(item -> {
                 String webpageId = getWebPageId(item).get();
                 if (!webpageId.endsWith(".xml")) {
                     throwError(ErrorType.INVALID_FILE, webpageId);
                 }
-                JsonArray content = item.get("content").getAsJsonArray();
+                JsonArray content = item.get(JSON_PROPERTY_CONTENT).getAsJsonArray();
                 Element mycoreWebpage = this.sectionProvider.fromJSON(content);
                 // save
-                try (OutputStream fout = MCRWCMSUtil.getOutputStream(webpageId)) {
-                    out.output(new Document(mycoreWebpage), fout);
+                try (OutputStream out = MCRWCMSUtil.getOutputStream(webpageId)) {
+                    xmlOutputter.output(new Document(mycoreWebpage), out);
                 } catch (IOException | RuntimeException exc) {
                     LOGGER.error("Error while saving {}", webpageId, exc);
                     throwError(ErrorType.COULD_NOT_SAVE, webpageId);
@@ -179,12 +187,13 @@ public class MCRWCMSContentManager {
             return Optional.empty();
         }
         JsonObject item = e.getAsJsonObject();
-        if (!item.has("dirty") || !item.get("dirty").getAsBoolean()) {
+        if (!item.has(JSON_PROPERTY_DIRTY) || !item.get(JSON_PROPERTY_DIRTY).getAsBoolean()) {
             return Optional.empty();
         }
         //TODO wenn man nur den href ändert und nicht den content muss die datei
         // trotzdem umgeschrieben werden -> check auf file exists
-        if (!getWebPageId(item).isPresent() || !item.has("content") || !item.get("content").isJsonArray()) {
+        if (getWebPageId(item).isEmpty() || !item.has(JSON_PROPERTY_CONTENT)
+            || !item.get(JSON_PROPERTY_CONTENT).isJsonArray()) {
             return Optional.empty();
         }
         return Optional.of(item);
@@ -228,8 +237,8 @@ public class MCRWCMSContentManager {
      */
     private void throwError(ErrorType errorType, String webpageId) {
         JsonObject error = new JsonObject();
-        error.addProperty("type", errorType.name());
-        error.addProperty("webpageId", webpageId);
+        error.addProperty(JSON_PROPERTY_TYPE, errorType.name());
+        error.addProperty(JSON_PROPERTY_WEBPAGE_ID, webpageId);
         Response response = Response.status(Status.INTERNAL_SERVER_ERROR).entity(error.toString())
             .type(MediaType.APPLICATION_JSON).build();
         throw new WebApplicationException(response);

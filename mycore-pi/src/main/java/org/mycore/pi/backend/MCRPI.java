@@ -18,6 +18,7 @@
 
 package org.mycore.pi.backend;
 
+import java.io.Serial;
 import java.util.Date;
 
 import org.mycore.common.MCRCoreVersion;
@@ -85,8 +86,10 @@ import jakarta.persistence.UniqueConstraint;
         @Index(name = "Identifier", columnList = "identifier"),
         @Index(name = "MCRIdentifierService", columnList = "mycoreID, service")
     })
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class MCRPI implements org.mycore.pi.MCRPIRegistrationInfo {
 
+    @Serial
     private static final long serialVersionUID = 234168232792525611L;
 
     // unique constraint für identifier type

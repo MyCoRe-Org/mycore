@@ -28,6 +28,7 @@ import org.jdom2.Element;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.MCRFrontendUtil;
 
@@ -73,7 +74,7 @@ public class MCRDisplayHideDerivateServlet extends MCRServlet {
      */
     private void toggleDisplay(MCRDerivate derObj) throws Exception {
         Document xml = derObj.createXML();
-        Element derivateNode = xml.getRootElement().getChild("derivate");
+        Element derivateNode = xml.getRootElement().getChild(MCRObjectDerivate.XML_NAME);
 
         Attribute displayAttr = derivateNode.getAttribute("display");
 

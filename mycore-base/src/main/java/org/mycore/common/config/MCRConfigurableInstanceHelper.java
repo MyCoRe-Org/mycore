@@ -175,6 +175,13 @@ class MCRConfigurableInstanceHelper {
         return source.annotationClass().getName();
     }
 
+    private static void throwIncompatibleAnnotation(Class<?> annotationValueClass, Target<?> target, Object instance) {
+        throw new MCRConfigurationException("Configured instance of class " + instance.getClass().getName()
+            + " is incompatible with annotation value class " + annotationValueClass.getName()
+            + " for target " + targetTypeName(target) + " '" + target.name()
+            + "' in configured class " + target.declaringClass().getName());
+    }
+
     /**
      * A {@link ClassInfo} is a helper class that gathers and holds some information about a target class.
      * <p>
@@ -342,6 +349,7 @@ class MCRConfigurableInstanceHelper {
             return injectors;
         }
 
+        @SuppressWarnings("PMD.AvoidDuplicateLiterals")
         private Optional<Injector<T, ?>> findInjector(Injectable injectable) {
 
             List<Source<?, ?>> sources = new LinkedList<>();
@@ -893,10 +901,7 @@ class MCRConfigurableInstanceHelper {
             Object instance = getInstance(nestedConfiguration);
 
             if (!annotation.valueClass().isAssignableFrom(instance.getClass())) {
-                throw new MCRConfigurationException("Configured instance of class " + instance.getClass().getName()
-                    + " is incompatible with annotation value class " + annotation.valueClass().getName()
-                    + " for target " + targetTypeName(target) + " '" + target.name()
-                    + "' in configured class " + target.declaringClass().getName());
+                throwIncompatibleAnnotation(annotation.valueClass(), target, instance);
             }
 
             return instance;
@@ -974,10 +979,7 @@ class MCRConfigurableInstanceHelper {
 
             instanceMap.values().forEach(instance -> {
                 if (!annotation.valueClass().isAssignableFrom(instance.getClass())) {
-                    throw new MCRConfigurationException("Configured instance of class " + instance.getClass().getName()
-                        + " is incompatible with annotation value class " + annotation.valueClass().getName()
-                        + " for target " + targetTypeName(target) + " '" + target.name()
-                        + "' in configured class " + target.declaringClass().getName());
+                    throwIncompatibleAnnotation(annotation.valueClass(), target, instance);
                 }
             });
 
@@ -1071,10 +1073,7 @@ class MCRConfigurableInstanceHelper {
 
             instanceList.forEach(instance -> {
                 if (!annotation.valueClass().isAssignableFrom(instance.getClass())) {
-                    throw new MCRConfigurationException("Configured instance of class " + instance.getClass().getName()
-                        + " is incompatible with annotation value class " + annotation.valueClass().getName()
-                        + " for target " + targetTypeName(target) + " '" + target.name()
-                        + "' in configured class " + target.declaringClass().getName());
+                    throwIncompatibleAnnotation(annotation.valueClass(), target, instance);
                 }
             });
 

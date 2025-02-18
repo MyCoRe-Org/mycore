@@ -49,7 +49,7 @@ public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
     @Override
     protected MCRTileInfo createTileInfo(String id) throws MCRIIIFImageNotFoundException {
         MCRObjectID mcrID = calculateMCRObjectID(id).orElseThrow(() -> new MCRIIIFImageNotFoundException(id));
-        if (mcrID.getTypeId().equals("derivate")) {
+        if (mcrID.getTypeId().equals(MCRDerivate.OBJECT_TYPE)) {
             MCRDerivate mcrDer = MCRMetadataManager.retrieveMCRDerivate(mcrID);
             return new MCRTileInfo(mcrID.toString(), mcrDer.getDerivate().getInternals().getMainDoc(), null);
         } else {

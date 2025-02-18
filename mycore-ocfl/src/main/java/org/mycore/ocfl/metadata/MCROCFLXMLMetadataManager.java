@@ -54,6 +54,7 @@ import org.mycore.common.content.MCRStreamContent;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.common.MCRXMLMetadataManagerAdapter;
 import org.mycore.datamodel.ifs2.MCRObjectIDDateImpl;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.history.MCRMetadataHistoryManager;
 import org.mycore.ocfl.layout.MCRStorageLayoutConfig;
@@ -154,8 +155,9 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
     }
 
     public void delete(MCRObjectID mcrid, Date date, String user) throws MCRPersistenceException {
-        String prefix = Objects.equals(mcrid.getTypeId(), "derivate") ? MCROCFLObjectIDPrefixHelper.MCRDERIVATE
-            : MCROCFLObjectIDPrefixHelper.MCROBJECT;
+        boolean equals = Objects.equals(mcrid.getTypeId(), MCRDerivate.OBJECT_TYPE);
+        String prefix = equals ? MCROCFLObjectIDPrefixHelper.MCRDERIVATE
+                               : MCROCFLObjectIDPrefixHelper.MCROBJECT;
 
         if (MCROCFLDeleteUtils.checkPurgeObject(mcrid, prefix)) {
             purge(mcrid, date, user);
@@ -212,7 +214,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
 
     private String getOCFLObjectID(String mcrid) {
         String objectType = MCRObjectID.getInstance(mcrid).getTypeId();
-        return Objects.equals(objectType, "derivate") ? MCROCFLObjectIDPrefixHelper.MCRDERIVATE + mcrid
+        return Objects.equals(objectType, MCRDerivate.OBJECT_TYPE) ? MCROCFLObjectIDPrefixHelper.MCRDERIVATE + mcrid
             : MCROCFLObjectIDPrefixHelper.MCROBJECT + mcrid;
     }
 

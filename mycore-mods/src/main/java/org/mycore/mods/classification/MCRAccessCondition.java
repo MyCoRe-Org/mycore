@@ -26,6 +26,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRXlink;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -91,7 +92,7 @@ public class MCRAccessCondition extends MCRAuthorityInfo {
      */
     @Override
     public void setInElement(Element modsElement) {
-        modsElement.setAttribute("href", href, MCRConstants.XLINK_NAMESPACE);
+        modsElement.setAttribute(MCRXlink.HREF, href, MCRConstants.XLINK_NAMESPACE);
     }
 
     /* (non-Javadoc)
@@ -99,7 +100,7 @@ public class MCRAccessCondition extends MCRAuthorityInfo {
      */
     @Override
     public void setInElement(org.w3c.dom.Element modsElement) {
-        modsElement.setAttributeNS(MCRConstants.XLINK_NAMESPACE.getURI(), "href", href);
+        modsElement.setAttributeNS(MCRConstants.XLINK_NAMESPACE.getURI(), MCRXlink.HREF, href);
     }
 
     @Override

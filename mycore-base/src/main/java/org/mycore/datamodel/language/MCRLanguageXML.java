@@ -28,13 +28,15 @@ import org.jdom2.Namespace;
  */
 public class MCRLanguageXML {
 
+    private static final String ATTRIBUTE_LANG = "lang";
+
     /**
      * Sets the lang attribute to the ISO 639-2 bibliographic code of the given language 
      */
     public static void setLangAttribute(MCRLanguage lang, Element element) {
         String code = lang.getCode(MCRLanguageCodeType.BIBL_CODE);
         if (code != null) {
-            element.setAttribute("lang", code);
+            element.setAttribute(ATTRIBUTE_LANG, code);
         }
     }
 
@@ -42,7 +44,7 @@ public class MCRLanguageXML {
      * Sets the xml:lang attribute to the ISO 639-1 code of the given language 
      */
     public static void setXMLLangAttribute(MCRLanguage lang, Element element) {
-        element.setAttribute("lang", lang.getCode(MCRLanguageCodeType.XML_CODE), Namespace.XML_NAMESPACE);
+        element.setAttribute(ATTRIBUTE_LANG, lang.getCode(MCRLanguageCodeType.XML_CODE), Namespace.XML_NAMESPACE);
     }
 
     /**
@@ -50,9 +52,9 @@ public class MCRLanguageXML {
      * If neither exists, the default language is returned. 
      */
     public static MCRLanguage getLanguage(Element element) {
-        String code = element.getAttributeValue("lang", Namespace.XML_NAMESPACE);
+        String code = element.getAttributeValue(ATTRIBUTE_LANG, Namespace.XML_NAMESPACE);
         if ((code == null) || code.isEmpty()) {
-            code = element.getAttributeValue("lang");
+            code = element.getAttributeValue(ATTRIBUTE_LANG);
         }
 
         if ((code == null) || code.isEmpty()) {

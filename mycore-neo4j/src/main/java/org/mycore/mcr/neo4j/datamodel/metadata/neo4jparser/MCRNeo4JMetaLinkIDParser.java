@@ -26,6 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRXlink;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JNode;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JRelation;
@@ -44,7 +45,7 @@ public class MCRNeo4JMetaLinkIDParser extends MCRNeo4JAbstractDataModelParser {
 
         for (Element element : classElement.getChildren()) {
             String linkType = element.getAttributeValue("type");
-            String linkHref = element.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
+            String linkHref = element.getAttributeValue(MCRXlink.HREF, MCRConstants.XLINK_NAMESPACE);
             if (linkHref != null && !linkHref.isBlank()) {
                 try {
                     MCRObjectID.getInstance(linkHref);

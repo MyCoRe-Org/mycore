@@ -77,6 +77,8 @@ public class MCRObjectService {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRObjectService.class);
 
+    public static final String XML_NAME = "service";
+
     /**
      * constant for create date
      */
@@ -96,6 +98,30 @@ public class MCRObjectService {
      * constant for modify user
      */
     public static final String FLAG_TYPE_MODIFIEDBY = "modifiedby";
+
+    public static final String ELEMENT_SERVDATE = "servdate";
+
+    public static final String ELEMENT_SERVDATES = "servdates";
+
+    public static final String ELEMENT_SERVACLS = "servacls";
+
+    public static final String ELEMENT_SERVFLAGS = "servflags";
+
+    public static final String ELEMENT_SERVCLASSES = "servclasses";
+
+    public static final String ELEMENT_SERVMESSAGES = "servmessages";
+
+    public static final String ELEMENT_SERVSTATES = "servstates";
+
+    public static final String ELEMENT_SERVACL = "servacl";
+
+    public static final String ELEMENT_SERVFLAG = "servflag";
+
+    public static final String ELEMENT_SERVCLASS = "servclass";
+
+    public static final String ELEMENT_SERVMESSAGE = "servmessage";
+
+    public static final String ELEMENT_SERVSTATE = "servstate";
 
     private final List<MCRMetaISO8601Date> dates = new ArrayList<>();
 
@@ -117,11 +143,11 @@ public class MCRObjectService {
 
         Date now = new Date();
 
-        MCRMetaISO8601Date createDate = new MCRMetaISO8601Date("servdate", DATE_TYPE_CREATEDATE, 0);
+        MCRMetaISO8601Date createDate = new MCRMetaISO8601Date(ELEMENT_SERVDATE, DATE_TYPE_CREATEDATE, 0);
         createDate.setDate(now);
         dates.add(createDate);
 
-        MCRMetaISO8601Date modifyDate = new MCRMetaISO8601Date("servdate", DATE_TYPE_MODIFYDATE, 0);
+        MCRMetaISO8601Date modifyDate = new MCRMetaISO8601Date(ELEMENT_SERVDATE, DATE_TYPE_MODIFYDATE, 0);
         modifyDate.setDate(now);
         dates.add(modifyDate);
 
@@ -136,17 +162,17 @@ public class MCRObjectService {
      */
     public final void setFromDOM(Element service) {
 
-        Element datesElement = service.getChild("servdates");
-        Element rulesElement = service.getChild("servacls");
-        Element flagsElement = service.getChild("servflags");
-        Element classificationsElement = service.getChild("servclasses");
-        Element messagesElement = service.getChild("servmessages");
-        Element statesElement = service.getChild("servstates");
+        Element datesElement = service.getChild(ELEMENT_SERVDATES);
+        Element rulesElement = service.getChild(ELEMENT_SERVACLS);
+        Element flagsElement = service.getChild(ELEMENT_SERVFLAGS);
+        Element classificationsElement = service.getChild(ELEMENT_SERVCLASSES);
+        Element messagesElement = service.getChild(ELEMENT_SERVMESSAGES);
+        Element statesElement = service.getChild(ELEMENT_SERVSTATES);
 
-        addContent(rulesElement, "servacl", MCRMetaAccessRule.class, rules);
-        addContent(flagsElement, "servflag", MCRMetaLangText.class, flags);
-        addContent(classificationsElement, "servclass", MCRMetaClassification.class, classifications);
-        addContent(messagesElement, "servmessage", MCRMetaDateLangText.class, messages);
+        addContent(rulesElement, ELEMENT_SERVACL, MCRMetaAccessRule.class, rules);
+        addContent(flagsElement, ELEMENT_SERVFLAG, MCRMetaLangText.class, flags);
+        addContent(classificationsElement, ELEMENT_SERVCLASS, MCRMetaClassification.class, classifications);
+        addContent(messagesElement, ELEMENT_SERVMESSAGE, MCRMetaDateLangText.class, messages);
 
         // date part
         dates.clear();
@@ -154,7 +180,7 @@ public class MCRObjectService {
             List<Element> dateElements = datesElement.getChildren();
             for (Element dateElement : dateElements) {
                 String dateElementName = dateElement.getName();
-                if (!Objects.equals(dateElementName, "servdate")) {
+                if (!Objects.equals(dateElementName, ELEMENT_SERVDATE)) {
                     continue;
                 }
                 MCRMetaISO8601Date date = new MCRMetaISO8601Date();
@@ -166,7 +192,7 @@ public class MCRObjectService {
         if (statesElement != null) {
             List<Element> stateElements = statesElement.getChildren();
             for (Element stateElement : stateElements) {
-                if (!stateElement.getName().equals("servstate")) {
+                if (!stateElement.getName().equals(ELEMENT_SERVSTATE)) {
                     continue;
                 }
                 MCRMetaClassification stateClass = new MCRMetaClassification();
@@ -279,7 +305,7 @@ public class MCRObjectService {
     public final void setDate(String type, Date date) {
         MCRMetaISO8601Date d = getISO8601Date(type); //search date in ArrayList
         if (d == null) {
-            d = new MCRMetaISO8601Date("servdate", type, 0);
+            d = new MCRMetaISO8601Date(ELEMENT_SERVDATE, type, 0);
             d.setDate(date);
             dates.add(d);
         } else {
@@ -381,7 +407,7 @@ public class MCRObjectService {
     public final void addFlag(String type, String value) {
         String lType = StringUtils.trim(type);
         MCRUtils.filterTrimmedNotEmpty(value)
-            .map(flagValue -> new MCRMetaLangText("servflag", null, lType, 0, null, flagValue))
+            .map(flagValue -> new MCRMetaLangText(ELEMENT_SERVFLAG, null, lType, 0, null, flagValue))
             .ifPresent(flags::add);
     }
 
@@ -572,7 +598,7 @@ public class MCRObjectService {
         }
         MCRUtils.filterTrimmedNotEmpty(permission)
             .filter(p -> getRuleIndex(p) == -1)
-            .map(p -> new MCRMetaAccessRule("servacl", null, 0, p, condition))
+            .map(p -> new MCRMetaAccessRule(ELEMENT_SERVACL, null, 0, p, condition))
             .ifPresent(rules::add);
     }
 
@@ -668,22 +694,22 @@ public class MCRObjectService {
             throw new MCRException("The content is not valid.", exc);
         }
 
-        Element elm = new Element("service");
+        Element elm = new Element(XML_NAME);
 
         // Create XML elements for each list
-        addContentIfNotEmpty(elm, dates, "servdates", "MCRMetaISO8601Date");
-        addContentIfNotEmpty(elm, rules, "servacls", "MCRMetaAccessRule");
-        addContentIfNotEmpty(elm, flags, "servflags", "MCRMetaLangText");
-        addContentIfNotEmpty(elm, messages, "servmessages", "MCRMetaDateLangText");
-        addContentIfNotEmpty(elm, classifications, "servclasses", "MCRMetaClassification");
+        addContentIfNotEmpty(elm, dates, ELEMENT_SERVDATES, MCRMetaISO8601Date.CLASS_NAME);
+        addContentIfNotEmpty(elm, rules, ELEMENT_SERVACLS, MCRMetaAccessRule.CLASS_NAME);
+        addContentIfNotEmpty(elm, flags, ELEMENT_SERVFLAGS, MCRMetaLangText.CLASS_NAME);
+        addContentIfNotEmpty(elm, messages, ELEMENT_SERVMESSAGES, MCRMetaDateLangText.CLASS_NAME);
+        addContentIfNotEmpty(elm, classifications, ELEMENT_SERVCLASSES, MCRMetaClassification.CLASS_NAME);
 
         // Handle the state separately
         if (state != null) {
-            Element elmm = new Element("servstates");
-            elmm.setAttribute("class", "MCRMetaClassification");
-            MCRMetaClassification stateClass = new MCRMetaClassification("servstate", 0, null, state);
-            elmm.addContent(stateClass.createXML());
-            elm.addContent(elmm);
+            Element servStates = new Element(ELEMENT_SERVSTATES);
+            servStates.setAttribute(MCRXMLConstants.CLASS, MCRMetaClassification.CLASS_NAME);
+            MCRMetaClassification stateClass = new MCRMetaClassification(ELEMENT_SERVSTATE, 0, null, state);
+            servStates.addContent(stateClass.createXML());
+            elm.addContent(servStates);
         }
 
         return elm;
@@ -696,7 +722,7 @@ public class MCRObjectService {
         }
 
         Element elmm = new Element(elementName);
-        elmm.setAttribute("class", className);
+        elmm.setAttribute(MCRXMLConstants.CLASS, className);
 
         for (T item : items) {
             elmm.addContent(item.createXML());
@@ -999,7 +1025,7 @@ public class MCRObjectService {
         String lType = StringUtils.trim(type);
         MCRUtils.filterTrimmedNotEmpty(value)
             .map(messageValue -> {
-                MCRMetaDateLangText message = new MCRMetaDateLangText("servmessage", null, lType, 0, form,
+                MCRMetaDateLangText message = new MCRMetaDateLangText(ELEMENT_SERVMESSAGE, null, lType, 0, form,
                     messageValue);
                 message.setDate(MCRISO8601Date.now());
                 return message;
@@ -1188,7 +1214,7 @@ public class MCRObjectService {
      */
     public final void addClassification(String type, MCRCategoryID value) {
         String lType = StringUtils.trim(type);
-        classifications.add(new MCRMetaClassification("servclass", 0, lType, value));
+        classifications.add(new MCRMetaClassification(ELEMENT_SERVCLASS, 0, lType, value));
     }
 
     /**

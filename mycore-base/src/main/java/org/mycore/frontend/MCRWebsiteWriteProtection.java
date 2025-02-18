@@ -21,6 +21,7 @@ package org.mycore.frontend;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 
 import org.apache.logging.log4j.LogManager;
@@ -34,12 +35,14 @@ import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.datamodel.metadata.MCRXMLConstants;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 public final class MCRWebsiteWriteProtection {
-    private static final String FS = System.getProperty("file.separator");
+
+    private static final String FS = FileSystems.getDefault().getSeparator();
 
     private static final String CONFIG_FOLDER_PATH = MCRConfiguration2.getStringOrThrow("MCR.datadir") + FS
         + "config";
@@ -47,6 +50,10 @@ public final class MCRWebsiteWriteProtection {
     private static final String CONFIG_FILE_PATH = CONFIG_FOLDER_PATH + FS + "config-writeProtectionWebsite.xml";
 
     private static final File CONFIG_FILE = new File(CONFIG_FILE_PATH);
+
+    private static final String ELEMENT_PROTECTION_ENABLED = "protectionEnabled";
+
+    private static final String ELEMENT_MESSAGE = "message";
 
     private static long cacheInitTime;
 
@@ -74,7 +81,7 @@ public final class MCRWebsiteWriteProtection {
             return false;
         }
         // return value contained in config
-        String protection = config.getChildTextTrim("protectionEnabled");
+        String protection = config.getChildTextTrim(ELEMENT_PROTECTION_ENABLED);
         return Boolean.parseBoolean(protection);
     }
 
@@ -83,7 +90,7 @@ public final class MCRWebsiteWriteProtection {
         if (config == null) {
             return new DOMOutputter().output(new Document());
         } else {
-            Element messageElem = config.getChild("message");
+            Element messageElem = config.getChild(ELEMENT_MESSAGE);
             Document message = new Document(messageElem.clone());
             return new DOMOutputter().output(message);
         }
@@ -140,8 +147,8 @@ public final class MCRWebsiteWriteProtection {
 
     private static Element configToJDOM(boolean protection, String message) {
         Element xml = new Element("config-writeProtectionWebsite");
-        xml.addContent(new Element("protectionEnabled").setText(Boolean.toString(protection)));
-        xml.addContent(new Element("message").setText(message));
+        xml.addContent(new Element(ELEMENT_PROTECTION_ENABLED).setText(Boolean.toString(protection)));
+        xml.addContent(new Element(ELEMENT_MESSAGE).setText(message));
         return xml;
     }
 
@@ -149,7 +156,7 @@ public final class MCRWebsiteWriteProtection {
     public static void activate() {
         // create file, set param in file to true, add message to file
         Element config = getConfiguration();
-        config.getChild("protectionEnabled").setText("true");
+        config.getChild(ELEMENT_PROTECTION_ENABLED).setText(MCRXMLConstants.TRUE);
         setConfiguration(config);
     }
 
@@ -157,8 +164,8 @@ public final class MCRWebsiteWriteProtection {
     public static void activate(String message) {
         // create file, set param in file to true, add message to file
         Element config = getConfiguration();
-        config.getChild("protectionEnabled").setText("true");
-        config.getChild("message").setText(message);
+        config.getChild(ELEMENT_PROTECTION_ENABLED).setText(MCRXMLConstants.TRUE);
+        config.getChild(ELEMENT_MESSAGE).setText(message);
         setConfiguration(config);
     }
 
@@ -166,7 +173,7 @@ public final class MCRWebsiteWriteProtection {
     public static void deactivate() {
         // set param in file to false
         Element config = getConfiguration();
-        config.getChild("protectionEnabled").setText("false");
+        config.getChild(ELEMENT_PROTECTION_ENABLED).setText(MCRXMLConstants.FALSE);
         setConfiguration(config);
     }
 

@@ -29,22 +29,23 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.access.MCRRuleAccessInterface;
+import org.mycore.common.MCRXlink;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectStructure;
 
 /**
  * Use this class if you want to have a fallback to ancestor access rules.
- *
+ * <p>
  * First a check is done for the MCRObjectID. If no rule for the ID is specified
- * it will be tried to check the permission agains the MCRObjectID of the parent
+ * it will be tried to check the permission against the MCRObjectID of the parent
  * object and so on.
  *
  * @author Thomas Scheffler (yagee)
- *
  */
 public class MCRParentRuleStrategy implements MCRAccessCheckStrategy {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRParentRuleStrategy.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /*
      * (non-Javadoc)
@@ -72,9 +73,11 @@ public class MCRParentRuleStrategy implements MCRAccessCheckStrategy {
             LOGGER.error("Could not read object: {}", objectID, e);
             return null;
         }
-        final Element parentElement = parentDoc.getRootElement().getChild("structure").getChild("parents");
+        final Element parentElement = parentDoc.getRootElement()
+            .getChild(MCRObjectStructure.XML_NAME)
+            .getChild("parents");
         if (parentElement != null) {
-            return parentElement.getChild("parent").getAttributeValue("href", XLINK_NAMESPACE);
+            return parentElement.getChild("parent").getAttributeValue(MCRXlink.HREF, XLINK_NAMESPACE);
         }
         return null;
     }

@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -73,7 +74,7 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
             LOGGER.warn("Unable to index '{}' cause it doesn't exists anymore!", mcrID);
             return;
         }
-        if (mcrID.getTypeId().equals("derivate")) {
+        if (mcrID.getTypeId().equals(MCRDerivate.OBJECT_TYPE)) {
             indexDerivate(mcrID);
         } else {
             indexObject(mcrID);

@@ -40,6 +40,8 @@ import jakarta.ws.rs.core.MediaType;
 @Path("locale")
 public class MCRLocaleResource {
 
+    private static final String PARAM_KEY = "key";
+
     @Context
     private HttpServletResponse resp;
 
@@ -74,7 +76,7 @@ public class MCRLocaleResource {
      * @return json array of all languages available
      */
     @GET
-    @Produces(MCRJerseyUtil.APPLICATION_JSON_UTF8)
+    @Produces(MCRJerseyUtil.APPLICATION_JSON_UTF_8)
     @Path("languages")
     @MCRStaticContent
     public String languages() {
@@ -90,10 +92,10 @@ public class MCRLocaleResource {
      * @return json object containing all keys and their corresponding translation
      */
     @GET
-    @Produces(MCRJerseyUtil.APPLICATION_JSON_UTF8)
+    @Produces(MCRJerseyUtil.APPLICATION_JSON_UTF_8)
     @Path("translate/{lang}/{key: .*\\*}")
     @MCRStaticContent
-    public String translateJSON(@PathParam("lang") String lang, @PathParam("key") String key) {
+    public String translateJSON(@PathParam("lang") String lang, @PathParam(PARAM_KEY) String key) {
         MCRFrontendUtil.writeCacheHeaders(resp, cacheTime, startUpTime, true);
         return MCRJSONUtils.getTranslations(key, lang);
     }
@@ -105,9 +107,9 @@ public class MCRLocaleResource {
      * @return json object containing all keys and their corresponding translation in current language
      */
     @GET
-    @Produces(MCRJerseyUtil.APPLICATION_JSON_UTF8)
+    @Produces(MCRJerseyUtil.APPLICATION_JSON_UTF_8)
     @Path("translate/{key: .*\\*}")
-    public String translateJSONDefault(@PathParam("key") String key) {
+    public String translateJSONDefault(@PathParam(PARAM_KEY) String key) {
         MCRFrontendUtil.writeCacheHeaders(resp, cacheTime, startUpTime, true);
         return MCRJSONUtils.getTranslations(key.substring(0, key.length() - 1),
             MCRSessionMgr.getCurrentSession().getCurrentLanguage());
@@ -124,7 +126,7 @@ public class MCRLocaleResource {
     @Produces(MediaType.TEXT_PLAIN)
     @Path("translate/{lang}/{key: [^\\*]+}")
     @MCRStaticContent
-    public String translateText(@PathParam("lang") String lang, @PathParam("key") String key) {
+    public String translateText(@PathParam("lang") String lang, @PathParam(PARAM_KEY) String key) {
         MCRFrontendUtil.writeCacheHeaders(resp, cacheTime, startUpTime, true);
         return MCRTranslation.translateToLocale(key, MCRTranslation.getLocale(lang));
     }
@@ -138,7 +140,7 @@ public class MCRLocaleResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     @Path("translate/{key: [^\\*]+}")
-    public String translateTextDefault(@PathParam("key") String key) {
+    public String translateTextDefault(@PathParam(PARAM_KEY) String key) {
         MCRFrontendUtil.writeCacheHeaders(resp, cacheTime, startUpTime, true);
         return MCRTranslation.translate(key, MCRTranslation.getCurrentLocale());
     }

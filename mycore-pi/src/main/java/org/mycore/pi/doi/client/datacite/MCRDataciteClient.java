@@ -90,11 +90,13 @@ public class MCRDataciteClient {
 
     private static final AuthScope ANY_AUTHSCOPE = new AuthScope(null, -1);
 
-    private String host;
+    private static final String MESSAGE_SEPARATOR = " - ";
 
-    private String userName;
+    private final String host;
 
-    private String password;
+    private final String userName;
+
+    private final String password;
 
     /**
      * @param host       the host (in most cases mds.datacite.org)
@@ -118,8 +120,9 @@ public class MCRDataciteClient {
     private static String getStatusString(final ClassicHttpResponse resp) throws IOException {
         StringBuilder statusStringBuilder = new StringBuilder();
 
-        statusStringBuilder.append(resp.getCode()).append(" - ").append(resp.getReasonPhrase())
-            .append(" - ");
+        statusStringBuilder
+            .append(resp.getCode()).append(MESSAGE_SEPARATOR)
+            .append(resp.getReasonPhrase()).append(MESSAGE_SEPARATOR);
 
         try (InputStream content = resp.getEntity().getContent();
             Scanner scanner = new Scanner(content, StandardCharsets.UTF_8)) {
@@ -139,8 +142,8 @@ public class MCRDataciteClient {
         HttpGet httpGet = new HttpGet(requestURI);
 
         try (CloseableHttpClient httpClient = getHttpClient()) {
-            MCRResultOrException<List<Map.Entry<String, URI>>, MCRPersistentIdentifierException> result =
-                httpClient.execute(httpGet, response -> {
+            MCRResultOrException<List<Map.Entry<String, URI>>, MCRPersistentIdentifierException> result
+                = httpClient.execute(httpGet, response -> {
                     return switch (response.getCode()) {
                         case HttpStatus.SC_OK -> {
                             try (InputStream content = response.getEntity().getContent();
@@ -245,8 +248,8 @@ public class MCRDataciteClient {
 
         HttpGet get = new HttpGet(requestURI);
         try (CloseableHttpClient httpClient = getHttpClient()) {
-            MCRResultOrException<List<MCRDigitalObjectIdentifier>, MCRPersistentIdentifierException> result =
-                httpClient.execute(get, response -> {
+            MCRResultOrException<List<MCRDigitalObjectIdentifier>, MCRPersistentIdentifierException> result
+                = httpClient.execute(get, response -> {
                     HttpEntity entity = response.getEntity();
                     return switch (response.getCode()) {
                         case HttpStatus.SC_OK -> {
@@ -275,6 +278,7 @@ public class MCRDataciteClient {
         }
     }
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     public URI resolveDOI(final MCRDigitalObjectIdentifier doiParam) throws MCRPersistentIdentifierException {
 
         URI requestURI = getRequestURI("/doi/" + doiParam.asString());
@@ -284,7 +288,7 @@ public class MCRDataciteClient {
                 HttpEntity entity = response.getEntity();
                 return switch (response.getCode()) {
                     case HttpStatus.SC_OK -> {
-                        String uriString = null;
+                        String uriString;
                         try (InputStream content = entity.getContent();
                             Scanner scanner = new Scanner(content, StandardCharsets.UTF_8)) {
                             uriString = scanner.nextLine();
@@ -341,8 +345,8 @@ public class MCRDataciteClient {
      * @throws JDOMException if the metadata is empty or not a valid xml document
      * @throws MCRDatacenterException if there is something wrong with the communication with the datacenter
      */
-    public Document resolveMetadata(final MCRDigitalObjectIdentifier doi) throws MCRDatacenterAuthenticationException,
-        MCRIdentifierUnresolvableException, JDOMException, MCRDatacenterException {
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
+    public Document resolveMetadata(final MCRDigitalObjectIdentifier doi) throws JDOMException, MCRDatacenterException {
         URI requestURI = getRequestURI("/metadata/" + doi.asString());
         HttpGet get = new HttpGet(requestURI);
         try (CloseableHttpClient httpClient = getHttpClient()) {
@@ -424,12 +428,12 @@ public class MCRDataciteClient {
                     case HttpStatus.SC_BAD_REQUEST -> // invalid xml or wrong PREFIX
                         MCRResultOrException
                             .ofException(new MCRDatacenterException("Invalid xml or wrong PREFIX: " + response.getCode()
-                                + " - " + response.getReasonPhrase() + " - " + responseString));
+                                + MESSAGE_SEPARATOR + response.getReasonPhrase() + MESSAGE_SEPARATOR + responseString));
                     case HttpStatus.SC_UNAUTHORIZED -> // no login
                         MCRResultOrException.ofException(new MCRDatacenterAuthenticationException());
                     default -> MCRResultOrException.ofException(new MCRDatacenterException(
-                        "Unknown return status: " + response.getCode() + " - "
-                            + response.getReasonPhrase() + " - " + responseString));
+                        "Unknown return status: " + response.getCode() + MESSAGE_SEPARATOR
+                            + response.getReasonPhrase() + MESSAGE_SEPARATOR + responseString));
                 };
             });
             return resultOrException.getResultOrThrow();
@@ -452,9 +456,8 @@ public class MCRDataciteClient {
                     case HttpStatus.SC_UNAUTHORIZED -> new MCRDatacenterAuthenticationException();
                     case HttpStatus.SC_NOT_FOUND -> new MCRIdentifierUnresolvableException(doi.asString(),
                         doi.asString() + " was not found!");
-                    default -> new MCRDatacenterException(
-                        "Unknown return status: " + response.getCode() + " - " + response.getReasonPhrase());
-
+                    default -> new MCRDatacenterException("Unknown return status: "
+                        + response.getCode() + MESSAGE_SEPARATOR + response.getReasonPhrase());
                 };
             });
             if (datacenterException != null) {

@@ -41,8 +41,7 @@ import org.w3c.dom.Element;
 /**
  * PURL Manager to register Persistent URLs on a PURL server
  * <p>
- * for further documentation see PURLZ Wiki:
- * https://code.google.com/archive/p/persistenturls/wikis
+ * For further documentation see <a href="https://code.google.com/archive/p/persistenturls/wikis">PURLZ Wiki</a>
  * <p>
  * Hint:
  * -----
@@ -109,9 +108,9 @@ public class MCRPURLManager {
                     wr.flush();
                     int responseCode = conn.getResponseCode();
                     if (responseCode == 200) {
-                        LOGGER.info(() -> conn.getRequestMethod() + " " + conn.getURL() + " -> " + responseCode);
+                        LOGGER.info(() -> buildLogMessage(conn, responseCode));
                     } else {
-                        LOGGER.error(() -> conn.getRequestMethod() + " " + conn.getURL() + " -> " + responseCode);
+                        LOGGER.error(() -> buildLogMessage(conn, responseCode));
                     }
 
                     // Get the response
@@ -159,7 +158,7 @@ public class MCRPURLManager {
                 }
                 responseCode = conn.getResponseCode();
                 int finalResponseCode = responseCode;
-                LOGGER.debug(() -> conn.getRequestMethod() + " " + conn.getURL() + " -> " + finalResponseCode);
+                LOGGER.debug(() -> buildLogMessage(conn, finalResponseCode));
             } finally {
                 conn.disconnect();
             }
@@ -216,14 +215,7 @@ public class MCRPURLManager {
             response = conn.getResponseCode();
 
             if (response != 200 && conn.getErrorStream() != null && LOGGER.isErrorEnabled()) {
-                try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(),
-                    StandardCharsets.UTF_8))) {
-                    String line;
-                    LOGGER.error(conn.getRequestMethod() + " " + conn.getURL() + " -> " + conn.getResponseCode());
-                    while ((line = rd.readLine()) != null) {
-                        LOGGER.error(line);
-                    }
-                }
+                logError(conn);
             }
         } catch (Exception e) {
             LOGGER.error(e);
@@ -265,14 +257,7 @@ public class MCRPURLManager {
             response = conn.getResponseCode();
 
             if (response != 200 && conn.getErrorStream() != null && LOGGER.isErrorEnabled()) {
-                try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(),
-                    StandardCharsets.UTF_8))) {
-                    String line = null;
-                    LOGGER.error(conn.getRequestMethod() + " " + conn.getURL() + " -> " + conn.getResponseCode());
-                    while ((line = rd.readLine()) != null) {
-                        LOGGER.error(line);
-                    }
-                }
+                logError(conn);
             }
         } catch (Exception e) {
             LOGGER.error(e);
@@ -302,14 +287,7 @@ public class MCRPURLManager {
             response = conn.getResponseCode();
 
             if (response != 200 || conn.getErrorStream() != null && LOGGER.isErrorEnabled()) {
-                try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(),
-                    StandardCharsets.UTF_8))) {
-                    String line = null;
-                    LOGGER.error(conn.getRequestMethod() + " " + conn.getURL() + " -> " + conn.getResponseCode());
-                    while ((line = rd.readLine()) != null) {
-                        LOGGER.error(line);
-                    }
-                }
+                logError(conn);
             }
         } catch (Exception e) {
             LOGGER.error(e);
@@ -424,4 +402,23 @@ public class MCRPURLManager {
         }
         return false;
     }
+
+    private static String buildLogMessage(HttpURLConnection conn, int finalResponseCode) {
+        return conn.getRequestMethod() + " " + conn.getURL() + " -> " + finalResponseCode;
+    }
+
+    private void logError(HttpURLConnection connection) throws IOException {
+        try (BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getErrorStream(),
+            StandardCharsets.UTF_8))) {
+            String method = connection.getRequestMethod();
+            URL url = connection.getURL();
+            int code = connection.getResponseCode();
+            LOGGER.error(() -> method + " " + url + " -> " + code);
+            String line;
+            while ((line = rd.readLine()) != null) {
+                LOGGER.error(line);
+            }
+        }
+    }
+
 }

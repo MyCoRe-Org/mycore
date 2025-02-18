@@ -34,6 +34,7 @@ import org.jdom2.transform.JDOMSource;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.datamodel.common.MCRLinkTableManager;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.mets.model.MCRMETSGeneratorFactory;
@@ -53,7 +54,7 @@ public class MCRMetsResolver implements URIResolver {
         String id = href.substring(href.indexOf(':') + 1);
         LOGGER.debug("Reading METS for ID {}", id);
         MCRObjectID objId = MCRObjectID.getInstance(id);
-        if (!objId.getTypeId().equals("derivate")) {
+        if (!objId.getTypeId().equals(MCRDerivate.OBJECT_TYPE)) {
             String derivateID = getDerivateFromObject(id);
             if (derivateID == null) {
                 return new JDOMSource(new Element("mets", Namespace.getNamespace("mets", "http://www.loc.gov/METS/")));

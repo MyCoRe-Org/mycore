@@ -23,7 +23,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -45,6 +44,7 @@ import jakarta.xml.bind.annotation.XmlType;
 import jakarta.xml.bind.annotation.adapters.NormalizedStringAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 @XmlRootElement(name = "mycoreclass")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "MCRClass",
@@ -117,7 +117,7 @@ public class MCRClass {
                 rootCategory.getLabels()
                     .stream()
                     .map(MCRLabel::clone)
-                    .collect(Collectors.toList()));
+                    .toList());
         mcrClass.setCategories(MCRClassCategory.getInstance(rootCategory.getChildren()));
         return mcrClass;
     }
@@ -134,7 +134,7 @@ public class MCRClass {
         category.getLabels()
             .addAll(getLabel().stream()
                 .map(MCRLabel::clone)
-                .collect(Collectors.toList()));
+                .toList());
         return category;
     }
 
@@ -148,7 +148,7 @@ public class MCRClass {
         category.getLabels()
             .addAll(e.getLabel().stream()
                 .map(MCRLabel::clone)
-                .collect(Collectors.toList()));
+                .toList());
         category.setLevel(parent.getLevel() + 1);
         URI uri = Optional.ofNullable(e.getUrl())
             .map(MCRClassURL::getHref)

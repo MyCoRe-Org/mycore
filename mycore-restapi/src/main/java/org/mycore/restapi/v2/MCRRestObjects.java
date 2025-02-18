@@ -19,7 +19,17 @@
 package org.mycore.restapi.v2;
 
 import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
+import static org.mycore.frontend.jersey.MCRJerseyUtil.APPLICATION_JSON_UTF_8;
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
+import static org.mycore.restapi.v2.MCRRestStatusCode.ACCEPTED;
+import static org.mycore.restapi.v2.MCRRestStatusCode.BAD_REQUEST;
+import static org.mycore.restapi.v2.MCRRestStatusCode.CONFLICT;
+import static org.mycore.restapi.v2.MCRRestStatusCode.CREATED;
+import static org.mycore.restapi.v2.MCRRestStatusCode.FORBIDDEN;
+import static org.mycore.restapi.v2.MCRRestStatusCode.NOT_FOUND;
+import static org.mycore.restapi.v2.MCRRestStatusCode.NO_CONTENT;
+import static org.mycore.restapi.v2.MCRRestStatusCode.TEMPORARY_REDIRECT;
+import static org.mycore.restapi.v2.MCRRestStatusCode.UNAUTHORIZED;
 
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
@@ -95,6 +105,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.servlet.ServletContext;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
@@ -195,7 +206,7 @@ public class MCRRestObjects {
     UriInfo uriInfo;
 
     @GET
-    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @Produces({ MediaType.APPLICATION_XML, APPLICATION_JSON_UTF_8 })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS))
     @Operation(
@@ -345,7 +356,7 @@ public class MCRRestObjects {
     @POST
     @Operation(
         summary = "Create a new MyCoRe Object",
-        responses = @ApiResponse(responseCode = "201",
+        responses = @ApiResponse(responseCode = CREATED,
             description = "Metadata object successfully created",
             headers = @Header(name = HttpHeaders.LOCATION,
                 schema = @Schema(type = "string", format = "uri"),
@@ -389,7 +400,7 @@ public class MCRRestObjects {
     }
 
     @GET
-    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @Produces({ MediaType.APPLICATION_XML, APPLICATION_JSON_UTF_8 })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     @Path("/{" + PARAM_MCRID + "}")
@@ -405,7 +416,7 @@ public class MCRRestObjects {
             throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
                 .withCause(io)
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND)
-                .withMessage("MCRObject " + id + " not found")
+                .withMessage(buildNotFoundMessage(id))
                 .toException();
         }
         Date lastModified = new Date(modified);
@@ -430,11 +441,11 @@ public class MCRRestObjects {
     @Operation(
         summary = "Returns metadata section MCRObject with the given " + PARAM_MCRID + ".",
         tags = MCRRestUtils.TAG_MYCORE_OBJECT)
-    public Response getObjectMetadata(@Parameter(example = "mir_mods_00004711") @PathParam(PARAM_MCRID) MCRObjectID id)
+    public Response getObjectMetadata(@Parameter(example = "mir_mods_00004712") @PathParam(PARAM_MCRID) MCRObjectID id)
         throws IOException {
         long modified = MCRXMLMetadataManager.instance().getLastModified(id);
         if (modified < 0) {
-            throw new NotFoundException("MCRObject " + id + " not found");
+            throw new NotFoundException(buildNotFoundMessage(id));
         }
         Date lastModified = new Date(modified);
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lastModified);
@@ -487,7 +498,7 @@ public class MCRRestObjects {
                 return nameOfMainFile.isEmpty() ? null : MCRPath.getPath(d.toString(), '/' + nameOfMainFile);
             })
             .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+            .toList();
 
         if (mainDocs.isEmpty()) {
             throw new NotFoundException();
@@ -534,7 +545,7 @@ public class MCRRestObjects {
     }
 
     @GET
-    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @Produces({ MediaType.APPLICATION_XML, APPLICATION_JSON_UTF_8 })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     @Path("/{" + PARAM_MCRID + "}/versions")
@@ -549,13 +560,13 @@ public class MCRRestObjects {
     @JacksonFeatures(serializationDisable = { SerializationFeature.WRITE_DATES_AS_TIMESTAMPS })
     @XmlElementWrapper(name = "versions")
     @MCRRestRequiredPermission(MCRAccessManager.PERMISSION_HISTORY_VIEW)
-    public Response getObjectVersions(@Parameter(example = "mir_mods_00004711") @PathParam(PARAM_MCRID) MCRObjectID id)
+    public Response getObjectVersions(@Parameter(example = "mir_mods_00004713") @PathParam(PARAM_MCRID) MCRObjectID id)
         throws IOException {
         long modified = MCRXMLMetadataManager.instance().getLastModified(id);
         if (modified < 0) {
             throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND)
-                .withMessage("MCRObject " + id + " not found")
+                .withMessage(buildNotFoundMessage(id))
                 .toException();
         }
         Date lastModified = new Date(modified);
@@ -571,7 +582,7 @@ public class MCRRestObjects {
     }
 
     @GET
-    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @Produces({ MediaType.APPLICATION_XML, APPLICATION_JSON_UTF_8 })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1000, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1000, unit = TimeUnit.DAYS)) //will never expire actually
     @Path("/{" + PARAM_MCRID + "}/versions/{revision}")
@@ -579,7 +590,8 @@ public class MCRRestObjects {
         summary = "Returns MCRObject with the given " + PARAM_MCRID + " and revision.",
         tags = MCRRestUtils.TAG_MYCORE_OBJECT)
     @MCRRestRequiredPermission(MCRAccessManager.PERMISSION_HISTORY_READ)
-    public Response getObjectVersion(@Parameter(example = "mir_mods_00004711") @PathParam(PARAM_MCRID) MCRObjectID id,
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
+    public Response getObjectVersion(@Parameter(example = "mir_mods_00004714") @PathParam(PARAM_MCRID) MCRObjectID id,
         @PathParam("revision") String revision)
         throws IOException {
         MCRContent mcrContent = MCRXMLMetadataManager.instance().retrieveContent(id, revision);
@@ -617,30 +629,23 @@ public class MCRRestObjects {
     @Operation(summary = "Creates or updates MCRObject with the body of this request",
         tags = MCRRestUtils.TAG_MYCORE_OBJECT,
         responses = {
-            @ApiResponse(responseCode = "400",
+            @ApiResponse(responseCode = BAD_REQUEST,
                 content = { @Content(mediaType = MediaType.TEXT_PLAIN) },
                 description = "'Invalid body content' or 'MCRObjectID mismatch'"),
-            @ApiResponse(responseCode = "201", description = "MCRObject successfully created"),
-            @ApiResponse(responseCode = "204", description = "MCRObject successfully updated"),
+            @ApiResponse(responseCode = CREATED, description = "MCRObject successfully created"),
+            @ApiResponse(responseCode = NO_CONTENT, description = "MCRObject successfully updated"),
         })
     @MCRRequireTransaction
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     public Response updateObject(@PathParam(PARAM_MCRID) MCRObjectID id,
         @Parameter(required = true,
             description = "MCRObject XML",
             examples = @ExampleObject("<mycoreobject ID=\"{mcrid}\" ..>\n...\n</mycorobject>")) InputStream xmlSource)
         throws IOException {
         //check preconditions
-        try {
-            long lastModified = MCRXMLMetadataManager.instance().getLastModified(id);
-            if (lastModified >= 0) {
-                Date lmDate = new Date(lastModified);
-                Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lmDate);
-                if (cachedResponse.isPresent()) {
-                    return cachedResponse.get();
-                }
-            }
-        } catch (Exception e) {
-            //ignore errors as PUT is idempotent
+        Response cachedResponse = MCRRestUtils.getCachedResponseIgnoreExceptions(request, id);
+        if (cachedResponse != null) {
+            return cachedResponse;
         }
         MCRStreamContent inputContent = new MCRStreamContent(xmlSource, null, MCRObject.ROOT_NAME);
         MCRObject updatedObject;
@@ -685,29 +690,22 @@ public class MCRRestObjects {
     @Operation(summary = "Updates the metadata section of a MCRObject with the body of this request",
         tags = MCRRestUtils.TAG_MYCORE_OBJECT,
         responses = {
-            @ApiResponse(responseCode = "400",
+            @ApiResponse(responseCode = BAD_REQUEST,
                 content = { @Content(mediaType = MediaType.TEXT_PLAIN) },
                 description = "'Invalid body content' or 'MCRObjectID mismatch'"),
-            @ApiResponse(responseCode = "204", description = "MCRObject metadata successfully updated"),
+            @ApiResponse(responseCode = NO_CONTENT, description = "MCRObject metadata successfully updated"),
         })
     @MCRRequireTransaction
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     public Response updateObjectMetadata(@PathParam(PARAM_MCRID) MCRObjectID id,
         @Parameter(required = true,
             description = "MCRObject XML",
             examples = @ExampleObject("<metadata>\n...\n</metadata>")) InputStream xmlSource)
         throws IOException {
         //check preconditions
-        try {
-            long lastModified = MCRXMLMetadataManager.instance().getLastModified(id);
-            if (lastModified >= 0) {
-                Date lmDate = new Date(lastModified);
-                Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lmDate);
-                if (cachedResponse.isPresent()) {
-                    return cachedResponse.get();
-                }
-            }
-        } catch (Exception e) {
-            //ignore errors as PUT is idempotent
+        Response cachedResponse = MCRRestUtils.getCachedResponseIgnoreExceptions(request, id);
+        if (cachedResponse != null) {
+            return cachedResponse;
         }
         MCRStreamContent inputContent = new MCRStreamContent(xmlSource, null);
         MCRObject updatedObject;
@@ -741,8 +739,8 @@ public class MCRRestObjects {
     @Operation(summary = "Deletes MCRObject {" + PARAM_MCRID + "}",
         tags = MCRRestUtils.TAG_MYCORE_OBJECT,
         responses = {
-            @ApiResponse(responseCode = "204", description = "MCRObject successfully deleted"),
-            @ApiResponse(responseCode = "409",
+            @ApiResponse(responseCode = NO_CONTENT, description = "MCRObject successfully deleted"),
+            @ApiResponse(responseCode = CONFLICT,
                 description = "MCRObject could not be deleted as it is referenced.",
                 content = @Content(schema = @Schema(
                     description = "Map<String, <Collection<String>> of source (key) to targets (value)",
@@ -754,7 +752,7 @@ public class MCRRestObjects {
         if (!MCRMetadataManager.exists(id)) {
             throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND)
-                .withMessage("MCRObject " + id + " not found")
+                .withMessage(buildNotFoundMessage(id))
                 .toException();
         }
         try {
@@ -784,10 +782,10 @@ public class MCRRestObjects {
     @Operation(summary = "pre-flight target to test write operation on {" + PARAM_MCRID + "}",
         tags = MCRRestUtils.TAG_MYCORE_OBJECT,
         responses = {
-            @ApiResponse(responseCode = "202", description = "You have write permission"),
-            @ApiResponse(responseCode = "401",
+            @ApiResponse(responseCode = ACCEPTED, description = "You have write permission"),
+            @ApiResponse(responseCode = UNAUTHORIZED,
                 description = "You do not have write permission and need to authenticate first"),
-            @ApiResponse(responseCode = "403", description = "You do not have write permission"),
+            @ApiResponse(responseCode = FORBIDDEN, description = "You do not have write permission"),
         })
     public Response testUpdateObject(@PathParam(PARAM_MCRID) MCRObjectID id) {
         return Response.status(Response.Status.ACCEPTED).build();
@@ -798,10 +796,10 @@ public class MCRRestObjects {
     @Operation(summary = "pre-flight target to test delete operation on {" + PARAM_MCRID + "}",
         tags = MCRRestUtils.TAG_MYCORE_OBJECT,
         responses = {
-            @ApiResponse(responseCode = "202", description = "You have delete permission"),
-            @ApiResponse(responseCode = "401",
+            @ApiResponse(responseCode = ACCEPTED, description = "You have delete permission"),
+            @ApiResponse(responseCode = UNAUTHORIZED,
                 description = "You do not have delete permission and need to authenticate first"),
-            @ApiResponse(responseCode = "403", description = "You do not have delete permission"),
+            @ApiResponse(responseCode = FORBIDDEN, description = "You do not have delete permission"),
         })
     public Response testDeleteObject(@PathParam(PARAM_MCRID) MCRObjectID id) {
         return Response.status(Response.Status.ACCEPTED).build();
@@ -814,9 +812,9 @@ public class MCRRestObjects {
     @Operation(summary = "change state of object {" + PARAM_MCRID + "}",
         tags = MCRRestUtils.TAG_MYCORE_OBJECT,
         responses = {
-            @ApiResponse(responseCode = "204", description = "operation was successful"),
-            @ApiResponse(responseCode = "400", description = "Invalid state"),
-            @ApiResponse(responseCode = "404", description = "object is not found"),
+            @ApiResponse(responseCode = NO_CONTENT, description = "operation was successful"),
+            @ApiResponse(responseCode = BAD_REQUEST, description = "Invalid state"),
+            @ApiResponse(responseCode = NOT_FOUND, description = "object is not found"),
         })
     @MCRRequireTransaction
     @MCRApiDraft("MCRObjectState")
@@ -825,7 +823,7 @@ public class MCRRestObjects {
         if (!MCRMetadataManager.exists(id)) {
             throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND)
-                .withMessage("MCRObject " + id + " not found")
+                .withMessage(buildNotFoundMessage(id))
                 .toException();
         }
         if (!state.isEmpty()) {
@@ -863,9 +861,9 @@ public class MCRRestObjects {
     @Operation(summary = "get state of object {" + PARAM_MCRID + "}",
         tags = MCRRestUtils.TAG_MYCORE_OBJECT,
         responses = {
-            @ApiResponse(responseCode = "307", description = "redirect to state category"),
-            @ApiResponse(responseCode = "204", description = "no state is set"),
-            @ApiResponse(responseCode = "404", description = "object is not found"),
+            @ApiResponse(responseCode = TEMPORARY_REDIRECT, description = "redirect to state category"),
+            @ApiResponse(responseCode = NO_CONTENT, description = "no state is set"),
+            @ApiResponse(responseCode = NOT_FOUND, description = "object is not found"),
         })
     @MCRApiDraft("MCRObjectState")
     public Response getState(@PathParam(PARAM_MCRID) MCRObjectID id) {
@@ -873,7 +871,7 @@ public class MCRRestObjects {
         if (!MCRMetadataManager.exists(id)) {
             throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND)
-                .withMessage("MCRObject " + id + " not found")
+                .withMessage(buildNotFoundMessage(id))
                 .toException();
         }
         final MCRCategoryID state = MCRMetadataManager.retrieveMCRObject(id).getService().getState();
@@ -883,6 +881,10 @@ public class MCRRestObjects {
         return Response.temporaryRedirect(
             uriInfo.resolve(URI.create("classifications/" + state.getRootID() + "/" + state.getId())))
             .build();
+    }
+
+    private static String buildNotFoundMessage(MCRObjectID id) {
+        return "MCRObject " + id + " not found";
     }
 
 }

@@ -18,8 +18,15 @@
 
 package org.mycore.restapi.v2;
 
+import static org.mycore.frontend.jersey.MCRJerseyUtil.APPLICATION_JSON_UTF_8;
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_DERID;
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
+import static org.mycore.restapi.v2.MCRRestStatusCode.ACCEPTED;
+import static org.mycore.restapi.v2.MCRRestStatusCode.BAD_REQUEST;
+import static org.mycore.restapi.v2.MCRRestStatusCode.CREATED;
+import static org.mycore.restapi.v2.MCRRestStatusCode.FORBIDDEN;
+import static org.mycore.restapi.v2.MCRRestStatusCode.NO_CONTENT;
+import static org.mycore.restapi.v2.MCRRestStatusCode.UNAUTHORIZED;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +37,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,7 +56,9 @@ import org.mycore.datamodel.metadata.MCRMetaLangText;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.restapi.annotations.MCRAccessControlExposeHeaders;
@@ -72,6 +80,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -108,6 +117,7 @@ public class MCRRestDerivates {
     @PathParam(PARAM_MCRID)
     MCRObjectID mcrId;
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     public static void validateDerivateRelation(MCRObjectID mcrId, MCRObjectID derId) {
         MCRObjectID objectId = MCRMetadataManager.getObjectId(derId, 1, TimeUnit.DAYS);
         if (objectId != null && !mcrId.equals(objectId)) {
@@ -138,12 +148,11 @@ public class MCRRestDerivates {
             @ApiResponse(
                 description = "List of derivates (file collections) attached to the given metadata object",
                 content = @Content(array = @ArraySchema(schema = @Schema(implementation = MCRMetaLinkID.class)))),
-            @ApiResponse(responseCode = "" + MCRObjectIDParamConverterProvider.CODE_INVALID,
-                description = MCRObjectIDParamConverterProvider.MSG_INVALID),
+            @ApiResponse(responseCode = BAD_REQUEST, description = MCRObjectIDParamConverterProvider.MSG_INVALID),
 
         },
         tags = MCRRestUtils.TAG_MYCORE_DERIVATE)
-    @XmlElementWrapper(name = "derobjects")
+    @XmlElementWrapper(name = MCRObjectStructure.ELEMENT_DERIVATE_OBJECTS)
     public Response listDerivates()
         throws IOException {
         long modified = MCRXMLMetadataManager.instance().getLastModified(mcrId);
@@ -168,7 +177,7 @@ public class MCRRestDerivates {
     }
 
     @GET
-    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @Produces({ MediaType.APPLICATION_XML, APPLICATION_JSON_UTF_8 })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     @Operation(
@@ -194,36 +203,29 @@ public class MCRRestDerivates {
     }
 
     @PUT
-    @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @Consumes({ MediaType.APPLICATION_XML, APPLICATION_JSON_UTF_8 })
     @Operation(summary = "Creates or updates MCRDerivate with the body of this request",
         tags = MCRRestUtils.TAG_MYCORE_DERIVATE,
         responses = {
-            @ApiResponse(responseCode = "400",
+            @ApiResponse(responseCode = BAD_REQUEST,
                 content = { @Content(mediaType = MediaType.TEXT_PLAIN) },
                 description = "'Invalid body content' or 'MCRObjectID mismatch'"),
-            @ApiResponse(responseCode = "201", description = "MCRDerivate successfully created"),
-            @ApiResponse(responseCode = "204", description = "MCRDerivate successfully updated"),
+            @ApiResponse(responseCode = CREATED, description = "MCRDerivate successfully created"),
+            @ApiResponse(responseCode = NO_CONTENT, description = "MCRDerivate successfully updated"),
         })
     @MCRRequireTransaction
     @Path("/{" + PARAM_DERID + "}")
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     public Response updateDerivate(
-        @Parameter(example = "mir_derivate_00004711") @PathParam(PARAM_DERID) MCRObjectID derid,
+        @Parameter(example = "mir_derivate_00004712") @PathParam(PARAM_DERID) MCRObjectID derid,
         @Parameter(required = true,
             description = "MCRObject XML",
             examples = @ExampleObject("<mycoreobject ID=\"{mcrid}\" ..>\n...\n</mycorobject>")) InputStream xmlSource)
         throws IOException {
         //check preconditions
-        try {
-            long lastModified = MCRXMLMetadataManager.instance().getLastModified(derid);
-            if (lastModified >= 0) {
-                Date lmDate = new Date(lastModified);
-                Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lmDate);
-                if (cachedResponse.isPresent()) {
-                    return cachedResponse.get();
-                }
-            }
-        } catch (Exception e) {
-            //ignore errors as PUT is idempotent
+        Response cachedResponse = MCRRestUtils.getCachedResponseIgnoreExceptions(request, derid);
+        if (cachedResponse != null) {
+            return cachedResponse;
         }
         boolean create = true;
         if (MCRMetadataManager.exists(derid)) {
@@ -275,12 +277,13 @@ public class MCRRestDerivates {
     @Operation(summary = "Deletes MCRDerivate {" + PARAM_DERID + "}",
         tags = MCRRestUtils.TAG_MYCORE_DERIVATE,
         responses = {
-            @ApiResponse(responseCode = "204", description = "MCRDerivate successfully deleted"),
+            @ApiResponse(responseCode = NO_CONTENT, description = "MCRDerivate successfully deleted"),
         })
     @MCRRequireTransaction
     @Path("/{" + PARAM_DERID + "}")
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     public Response deleteDerivate(
-        @Parameter(example = "mir_derivate_00004711") @PathParam(PARAM_DERID) MCRObjectID derid) {
+        @Parameter(example = "mir_derivate_00004713") @PathParam(PARAM_DERID) MCRObjectID derid) {
         if (!MCRMetadataManager.exists(derid)) {
             throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NOT_FOUND)
@@ -303,7 +306,7 @@ public class MCRRestDerivates {
     @POST
     @Operation(
         summary = "Adds a new derivate (with defaults for 'display-enabled', 'main-doc', 'label') in the given object",
-        responses = @ApiResponse(responseCode = "201",
+        responses = @ApiResponse(responseCode = CREATED,
             headers = @Header(name = HttpHeaders.LOCATION,
                 schema = @Schema(
                     type = "string",
@@ -319,7 +322,7 @@ public class MCRRestDerivates {
     @POST
     @Operation(
         summary = "Adds a new derivate in the given object",
-        responses = @ApiResponse(responseCode = "201",
+        responses = @ApiResponse(responseCode = CREATED,
             description = "Derivate successfully created",
             headers = @Header(name = HttpHeaders.LOCATION,
                 schema = @Schema(type = "string", format = "uri"),
@@ -347,12 +350,12 @@ public class MCRRestDerivates {
         derivate.getDerivate().getClassifications()
             .addAll(der.getClassifications().stream()
                 .map(categId -> new MCRMetaClassification("classification", 0, null, categId))
-                .collect(Collectors.toList()));
+                .toList());
 
         derivate.getDerivate().getTitles()
             .addAll(der.getTitles().stream()
                 .map(DerivateTitle::toMetaLangText)
-                .collect(Collectors.toList()));
+                .toList());
 
         String schema = MCRConfiguration2.getString("MCR.Metadata.Config.derivate")
             .orElse("datamodel-derivate.xml")
@@ -360,12 +363,12 @@ public class MCRRestDerivates {
         derivate.setSchema(schema);
 
         MCRMetaLinkID linkId = new MCRMetaLinkID();
-        linkId.setSubTag("linkmeta");
+        linkId.setSubTag(MCRObjectDerivate.ELEMENT_LINKMETA);
         linkId.setReference(mcrId, null, null);
         derivate.getDerivate().setLinkMeta(linkId);
 
         MCRMetaIFS ifs = new MCRMetaIFS();
-        ifs.setSubTag("internal");
+        ifs.setSubTag(MCRObjectDerivate.ELEMENT_INTERNAL);
         ifs.setSourcePath(null);
         ifs.setMainDoc(der.getMainDoc());
         derivate.getDerivate().setInternals(ifs);
@@ -402,7 +405,7 @@ public class MCRRestDerivates {
     @PATCH
     @Operation(
         summary = "Updates the metadata (or partial metadata) of the given derivate",
-        responses = @ApiResponse(responseCode = "204"),
+        responses = @ApiResponse(responseCode = NO_CONTENT),
         tags = MCRRestUtils.TAG_MYCORE_DERIVATE)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @RequestBody(required = true,
@@ -413,7 +416,7 @@ public class MCRRestDerivates {
     @Path("/{" + PARAM_DERID + "}")
     @MCRApiDraft("MCRPatchDerivate")
     public Response patchDerivate(@BeanParam DerivateMetadata der,
-        @Parameter(example = "mir_derivate_00004711") @PathParam(PARAM_DERID) MCRObjectID derid) {
+        @Parameter(example = "mir_derivate_00004714") @PathParam(PARAM_DERID) MCRObjectID derid) {
 
         LOGGER.debug(der);
         MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derid);
@@ -452,7 +455,7 @@ public class MCRRestDerivates {
         // Check if the 'classifications' field has been updated
         List<MCRCategoryID> oldClassifications = derivate.getDerivate().getClassifications().stream()
             .map(x -> MCRCategoryID.fromString(x.getClassId() + ":" + x.getCategId()))
-            .collect(Collectors.toList());
+            .toList();
         if (!der.getClassifications().isEmpty()
             && (oldClassifications.size() != der.getClassifications().size()
                 || !oldClassifications.containsAll(der.getClassifications()))) {
@@ -461,13 +464,13 @@ public class MCRRestDerivates {
             derivate.getDerivate().getClassifications()
                 .addAll(der.getClassifications().stream()
                     .map(categId -> new MCRMetaClassification("classification", 0, null, categId))
-                    .collect(Collectors.toList()));
+                    .toList());
         }
 
         // Check if the 'titles' field has been updated
         List<MCRMetaLangText> newTitles = der.getTitles().stream()
             .map(DerivateTitle::toMetaLangText)
-            .collect(Collectors.toList());
+            .toList();
         if (!newTitles.isEmpty()
             && (derivate.getDerivate().getTitleSize() != newTitles.size()
                 || !derivate.getDerivate().getTitles().containsAll(newTitles))) {
@@ -483,10 +486,10 @@ public class MCRRestDerivates {
     @Operation(summary = "pre-flight target to test write operation on {" + PARAM_DERID + "}",
         tags = MCRRestUtils.TAG_MYCORE_DERIVATE,
         responses = {
-            @ApiResponse(responseCode = "202", description = "You have write permission"),
-            @ApiResponse(responseCode = "401",
+            @ApiResponse(responseCode = ACCEPTED, description = "You have write permission"),
+            @ApiResponse(responseCode = UNAUTHORIZED,
                 description = "You do not have write permission and need to authenticate first"),
-            @ApiResponse(responseCode = "403", description = "You do not have write permission"),
+            @ApiResponse(responseCode = FORBIDDEN, description = "You do not have write permission"),
         })
     public Response testUpdateDerivate(@PathParam(PARAM_DERID) MCRObjectID id) {
         return Response.status(Response.Status.ACCEPTED).build();
@@ -497,10 +500,10 @@ public class MCRRestDerivates {
     @Operation(summary = "pre-flight target to test delete operation on {" + PARAM_DERID + "}",
         tags = MCRRestUtils.TAG_MYCORE_DERIVATE,
         responses = {
-            @ApiResponse(responseCode = "202", description = "You have delete permission"),
-            @ApiResponse(responseCode = "401",
+            @ApiResponse(responseCode = ACCEPTED, description = "You have delete permission"),
+            @ApiResponse(responseCode = UNAUTHORIZED,
                 description = "You do not have delete permission and need to authenticate first"),
-            @ApiResponse(responseCode = "403", description = "You do not have delete permission"),
+            @ApiResponse(responseCode = FORBIDDEN, description = "You do not have delete permission"),
         })
     public Response testDeleteDerivate(@PathParam(PARAM_DERID) MCRObjectID id) {
         return Response.status(Response.Status.ACCEPTED).build();

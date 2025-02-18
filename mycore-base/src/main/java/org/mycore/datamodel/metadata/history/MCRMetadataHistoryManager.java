@@ -44,11 +44,27 @@ import jakarta.persistence.TypedQuery;
  */
 public class MCRMetadataHistoryManager extends MCREventHandlerBase {
 
+    private static final String QUERY_PARAM_KIND = "kind";
+
+    private static final String QUERY_PARAM_AFTER_ID = "afterID";
+
+    private static final String QUERY_PARAM_TYPE = "type";
+
+    private static final String QUERY_PARAM_ID = "id";
+
+    private static final String QUERY_PARAM_FROM = "from";
+
+    private static final String QUERY_PARAM_UNTIL = "until";
+
+    private static final String QUERY_PARAM_EVENT_TYPE = "eventType";
+
+    private static final String QUERY_PARAM_LOOKS_LIKE = "looksLike";
+
     public static Optional<MCRObjectID> getHighestStoredID(String project, String type) {
         String looksLike = Objects.requireNonNull(project) + "\\_" + Objects.requireNonNull(type) + "%";
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         TypedQuery<MCRObjectID> query = em.createNamedQuery("MCRMetaHistory.getHighestID", MCRObjectID.class);
-        query.setParameter("looksLike", looksLike);
+        query.setParameter(QUERY_PARAM_LOOKS_LIKE, looksLike);
         return Optional.ofNullable(query.getSingleResult());
     }
 
@@ -62,9 +78,9 @@ public class MCRMetadataHistoryManager extends MCREventHandlerBase {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         TypedQuery<MCRMetaHistoryItem> query = em.createNamedQuery("MCRMetaHistory.getLastEventByID",
             MCRMetaHistoryItem.class);
-        query.setParameter("from", from);
-        query.setParameter("until", until.orElseGet(Instant::now));
-        query.setParameter("eventType", MCRMetadataHistoryEventType.DELETE.getAbbr());
+        query.setParameter(QUERY_PARAM_FROM, from);
+        query.setParameter(QUERY_PARAM_UNTIL, until.orElseGet(Instant::now));
+        query.setParameter(QUERY_PARAM_EVENT_TYPE, MCRMetadataHistoryEventType.DELETE.getAbbr());
         return query.getResultList()
             .stream()
             .collect(Collectors.toMap(MCRMetaHistoryItem::getId, MCRMetaHistoryItem::getTime));
@@ -73,8 +89,8 @@ public class MCRMetadataHistoryManager extends MCREventHandlerBase {
     public static Optional<Instant> getLastDeletedDate(MCRObjectID identifier) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         TypedQuery<Instant> query = em.createNamedQuery("MCRMetaHistory.getLastOfType", Instant.class);
-        query.setParameter("id", identifier);
-        query.setParameter("type", MCRMetadataHistoryEventType.DELETE.getAbbr());
+        query.setParameter(QUERY_PARAM_ID, identifier);
+        query.setParameter(QUERY_PARAM_TYPE, MCRMetadataHistoryEventType.DELETE.getAbbr());
         return Optional.ofNullable(query.getSingleResult());
     }
 
@@ -82,8 +98,8 @@ public class MCRMetadataHistoryManager extends MCREventHandlerBase {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         TypedQuery<MCRMetaHistoryItem> query = em.createNamedQuery("MCRMetaHistory.getNextActiveIDs",
             MCRMetaHistoryItem.class);
-        query.setParameter("afterID", afterID);
-        query.setParameter("kind", "object");
+        query.setParameter(QUERY_PARAM_AFTER_ID, afterID);
+        query.setParameter(QUERY_PARAM_KIND, "object");
         query.setMaxResults(maxResults);
         return query.getResultList();
     }
@@ -92,8 +108,8 @@ public class MCRMetadataHistoryManager extends MCREventHandlerBase {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         TypedQuery<MCRMetaHistoryItem> query = em.createNamedQuery("MCRMetaHistory.getNextActiveIDs",
             MCRMetaHistoryItem.class);
-        query.setParameter("afterID", afterID);
-        query.setParameter("kind", "derivate");
+        query.setParameter(QUERY_PARAM_AFTER_ID, afterID);
+        query.setParameter(QUERY_PARAM_KIND, "derivate");
         query.setMaxResults(maxResults);
         return query.getResultList();
     }
@@ -102,7 +118,7 @@ public class MCRMetadataHistoryManager extends MCREventHandlerBase {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         TypedQuery<Long> query = em.createNamedQuery("MCRMetaHistory.countActiveIDs",
             Long.class);
-        query.setParameter("kind", "object");
+        query.setParameter(QUERY_PARAM_KIND, "object");
         return query.getSingleResult();
     }
 
@@ -110,7 +126,7 @@ public class MCRMetadataHistoryManager extends MCREventHandlerBase {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         TypedQuery<Long> query = em.createNamedQuery("MCRMetaHistory.countActiveIDs",
             Long.class);
-        query.setParameter("kind", "derivate");
+        query.setParameter(QUERY_PARAM_KIND, "derivate");
         return query.getSingleResult();
     }
 

@@ -101,7 +101,7 @@ public class MCRAltoHighlightResource {
 
     @GET
     @Path("{derivateId}")
-    @Produces(MCRJerseyUtil.APPLICATION_JSON_UTF8)
+    @Produces(MCRJerseyUtil.APPLICATION_JSON_UTF_8)
     public Response query(@PathParam("derivateId") String derivateId, @QueryParam("q") String query) {
         ModifiableSolrParams p = new ModifiableSolrParams();
         p.set("q", buildQuery(query));

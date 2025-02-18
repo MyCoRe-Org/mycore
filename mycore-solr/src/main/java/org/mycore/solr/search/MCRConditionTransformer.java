@@ -51,11 +51,10 @@ import org.mycore.solr.MCRSolrUtils;
 /**
  * @author Thomas Scheffler (yagee)
  * @author Jens Kupferschmidt
- *
  */
 public class MCRConditionTransformer {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRConditionTransformer.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * If a condition references fields from multiple indexes, this constant is

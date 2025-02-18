@@ -80,8 +80,8 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
 
     /** This method does nothing. It is very useful for debugging events. */
     public void doNothing(MCREvent evt, Object obj) {
-        LOGGER.debug("{} does nothing on {} {} {}", () -> getClass().getName(), () -> evt.getEventType(),
-            () -> evt.getObjectType(), () -> obj.getClass().getName());
+        LOGGER.debug("{} does nothing on {} {} {}", () -> getClass().getName(), evt::getEventType,
+            evt::getObjectType, () -> obj.getClass().getName());
     }
 
     /**
@@ -448,10 +448,11 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *
      * @param evt The MCREvent object
      */
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private void handleMCRObjectEvent(MCREvent evt) {
         MCRObject obj = (MCRObject) evt.get("object");
         if (obj != null) {
-            LOGGER.debug("{} handling {} {}", () -> getClass().getName(), () -> obj.getId(), () -> evt.getEventType());
+            LOGGER.debug("{} handling {} {}", () -> getClass().getName(), obj::getId, evt::getEventType);
             switch (evt.getEventType()) {
                 case CREATE -> handleObjectCreated(evt, obj);
                 case UPDATE -> handleObjectUpdated(evt, obj);
@@ -471,10 +472,11 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *
      * @param evt The MCREvent object
      */
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private void handleMCRDerivateEvent(MCREvent evt) {
         MCRDerivate der = (MCRDerivate) evt.get("derivate");
         if (der != null) {
-            LOGGER.debug("{} handling {} {}", () -> getClass().getName(), () -> der.getId(), () -> evt.getEventType());
+            LOGGER.debug("{} handling {} {}", () -> getClass().getName(), der::getId, evt::getEventType);
             switch (evt.getEventType()) {
                 case CREATE -> handleDerivateCreated(evt, der);
                 case UPDATE -> handleDerivateUpdated(evt, der);
@@ -497,19 +499,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     private void handlePathEvent(MCREvent evt) {
         Path path = (Path) evt.get(MCREvent.PATH_KEY);
         if (path != null) {
-            if (!path.isAbsolute()) {
-                LOGGER.warn("Cannot handle path events on non absolute paths: {}", path);
-            }
-            LOGGER.debug("{} handling {} {}", () -> getClass().getName(), () -> path, () -> evt.getEventType());
-            BasicFileAttributes attrs = (BasicFileAttributes) evt.get(MCREvent.FILEATTR_KEY);
-            if (attrs == null && evt.getEventType() != MCREvent.EventType.DELETE) {
-                LOGGER.warn("BasicFileAttributes for {} was not given. Resolving now.", path);
-                try {
-                    attrs = Files.getFileAttributeView(path, BasicFileAttributeView.class).readAttributes();
-                } catch (IOException e) {
-                    LOGGER.error("Could not get BasicFileAttributes from path: {}", path, e);
-                }
-            }
+            BasicFileAttributes attrs = getBasicFileAttributes(evt, path);
             switch (evt.getEventType()) {
                 case CREATE -> handlePathCreated(evt, path, attrs);
                 case UPDATE -> handlePathUpdated(evt, path, attrs);
@@ -529,10 +519,11 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *
      * @param evt The MCREvent object
      */
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private void handleMCRCategoryEvent(MCREvent evt) {
         MCRCategory cl = (MCRCategory) evt.get(MCREvent.CLASS_KEY);
         if (cl != null) {
-            LOGGER.debug("{} handling {} {}", () -> getClass().getName(), () -> cl.getId(), () -> evt.getEventType());
+            LOGGER.debug("{} handling {} {}", () -> getClass().getName(), cl::getId, evt::getEventType);
             switch (evt.getEventType()) {
                 case CREATE -> handleClassificationCreated(evt, cl);
                 case UPDATE -> handleClassificationUpdated(evt, cl);
@@ -551,6 +542,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *
      * @param evt The MCREvent object
      */
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private void undoHandleMCRObjectEvent(MCREvent evt) {
         MCRObject obj = (MCRObject) evt.get("object");
         if (obj != null) {
@@ -599,19 +591,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     private void undoHandlePathEvent(MCREvent evt) {
         Path path = (Path) evt.get(MCREvent.PATH_KEY);
         if (path != null) {
-            if (!path.isAbsolute()) {
-                LOGGER.warn("Cannot handle path events on non absolute paths: {}", path);
-            }
-            LOGGER.debug("{} handling {} {}", () -> getClass().getName(), () -> path, evt::getEventType);
-            BasicFileAttributes attrs = (BasicFileAttributes) evt.get(MCREvent.FILEATTR_KEY);
-            if (attrs == null && evt.getEventType() != MCREvent.EventType.DELETE) {
-                LOGGER.warn("BasicFileAttributes for {} was not given. Resolving now.", path);
-                try {
-                    attrs = Files.getFileAttributeView(path, BasicFileAttributeView.class).readAttributes();
-                } catch (IOException e) {
-                    LOGGER.error("Could not get BasicFileAttributes from path: {}", path, e);
-                }
-            }
+            BasicFileAttributes attrs = getBasicFileAttributes(evt, path);
             switch (evt.getEventType()) {
                 case CREATE -> undoPathCreated(evt, path, attrs);
                 case UPDATE -> undoPathUpdated(evt, path, attrs);
@@ -630,6 +610,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *
      * @param evt The MCREvent object
      */
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private void undoHandleMCRCategoryEvent(MCREvent evt) {
         MCRCategory obj = (MCRCategory) evt.get(MCREvent.CLASS_KEY);
         if (obj != null) {
@@ -646,4 +627,23 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
         }
         LOGGER.warn(() -> "Can't find method for " + evt.getObjectType() + " for event type " + evt.getEventType());
     }
+
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
+    private BasicFileAttributes getBasicFileAttributes(MCREvent evt, Path path) {
+        if (!path.isAbsolute()) {
+            LOGGER.warn("Cannot handle path events on non absolute paths: {}", path);
+        }
+        LOGGER.debug("{} handling {} {}", () -> getClass().getName(), () -> path, evt::getEventType);
+        BasicFileAttributes attrs = (BasicFileAttributes) evt.get(MCREvent.FILEATTR_KEY);
+        if (attrs == null && evt.getEventType() != MCREvent.EventType.DELETE) {
+            LOGGER.warn("BasicFileAttributes for {} was not given. Resolving now.", path);
+            try {
+                attrs = Files.getFileAttributeView(path, BasicFileAttributeView.class).readAttributes();
+            } catch (IOException e) {
+                LOGGER.error("Could not get BasicFileAttributes from path: {}", path, e);
+            }
+        }
+        return attrs;
+    }
+
 }

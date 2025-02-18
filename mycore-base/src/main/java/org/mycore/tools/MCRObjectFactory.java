@@ -23,8 +23,14 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
 import org.mycore.datamodel.common.MCRISO8601Date;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectMetadata;
+import org.mycore.datamodel.metadata.MCRObjectService;
+import org.mycore.datamodel.metadata.MCRObjectStructure;
+import org.mycore.datamodel.metadata.MCRXMLConstants;
 
 /**
  * @author shermann
@@ -48,16 +54,16 @@ public class MCRObjectFactory {
     }
 
     private static Element createServiceElement() {
-        Element service = new Element("service");
-        Element servDates = new Element("servdates");
+        Element service = new Element(MCRObjectService.XML_NAME);
+        Element servDates = new Element(MCRObjectService.ELEMENT_SERVDATES);
         service.addContent(servDates);
-        Element createDate = new Element("servdate");
-        createDate.setAttribute("type", "createdate");
-        createDate.setAttribute("inherited", "0");
+        Element createDate = new Element(MCRObjectService.ELEMENT_SERVDATE);
+        createDate.setAttribute(MCRXMLConstants.TYPE, MCRObjectService.DATE_TYPE_CREATEDATE);
+        createDate.setAttribute(MCRXMLConstants.INHERITED, "0");
 
-        Element modifyDate = new Element("servdate");
-        modifyDate.setAttribute("type", "modifydate");
-        modifyDate.setAttribute("inherited", "0");
+        Element modifyDate = new Element(MCRObjectService.ELEMENT_SERVDATE);
+        modifyDate.setAttribute(MCRXMLConstants.TYPE, MCRObjectService.DATE_TYPE_MODIFYDATE);
+        modifyDate.setAttribute(MCRXMLConstants.INHERITED, "0");
 
         servDates.addContent(createDate);
         servDates.addContent(modifyDate);
@@ -76,14 +82,16 @@ public class MCRObjectFactory {
     }
 
     private static Element createMetadataElement(MCRObjectID id) {
-        return id.getTypeId().equals("derivate") ? new Element("derivate") : new Element("metadata");
+        return id.getTypeId().equals(MCRDerivate.OBJECT_TYPE) ?
+               new Element(MCRObjectDerivate.XML_NAME) :
+               new Element(MCRObjectMetadata.XML_NAME);
     }
 
     private static Element createRootElement(MCRObjectID id) {
-        String rootTag = id.getTypeId().equals("derivate") ? "mycorederivate" : "mycoreobject";
+        String rootTag = id.getTypeId().equals(MCRDerivate.OBJECT_TYPE) ? MCRDerivate.ROOT_NAME : MCRObject.ROOT_NAME;
         Element root = new Element(rootTag);
-        root.setAttribute("ID", id.toString());
-        root.setAttribute("label", id.toString());
+        root.setAttribute(MCRXMLConstants.ID, id.toString());
+        root.setAttribute(MCRXMLConstants.LABEL, id.toString());
         root.setAttribute("noNamespaceSchemaLocation", getXSD(id), MCRConstants.XSI_NAMESPACE);
         root.setAttribute("version", "2.0");
         return root;
@@ -93,7 +101,7 @@ public class MCRObjectFactory {
      * Creates the structure element.
      */
     private static Element createStructureElement() {
-        return new Element("structure");
+        return new Element(MCRObjectStructure.XML_NAME);
     }
 
     /**

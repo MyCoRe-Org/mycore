@@ -33,6 +33,7 @@ import org.jdom2.Element;
 import org.junit.Test;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRTestCase;
+import org.mycore.common.MCRXlink;
 
 /**
  * @author Frank Lützenkirchen
@@ -268,7 +269,8 @@ public class MCRNodeBuilderTest extends MCRTestCase {
         assertEquals("role", role.getName());
         assertEquals(MCRConstants.MODS_NAMESPACE, role.getNamespace());
         assertEquals("creator", role.getAttributeValue("type"));
-        assertEquals("id", role.getParentElement().getAttribute("href", MCRConstants.XLINK_NAMESPACE).getValue());
+        assertEquals("id",
+            role.getParentElement().getAttribute(MCRXlink.HREF, MCRConstants.XLINK_NAMESPACE).getValue());
     }
 
     @Test

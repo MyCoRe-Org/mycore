@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
+import org.mycore.common.MCRXlink;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -119,7 +120,7 @@ public class MCRIView2XSLFunctions {
         NodeList smLinks = structLink.getChildNodes();
         for (int i = 0; i < smLinks.getLength(); i++) {
             Node smLink = smLinks.item(i);
-            Node xlinkFrom = smLink.getAttributes().getNamedItemNS(XLINK_NAMESPACE.getURI(), "from");
+            Node xlinkFrom = smLink.getAttributes().getNamedItemNS(XLINK_NAMESPACE.getURI(), MCRXlink.FROM);
             if (xlinkFrom == null || !xlinkFrom.getNodeValue().equals(logId)) {
                 continue;
             }
@@ -130,7 +131,7 @@ public class MCRIView2XSLFunctions {
     }
 
     private static int getSmLinkOrder(Document document, Node smLink) {
-        Node xlinkTo = smLink.getAttributes().getNamedItemNS(XLINK_NAMESPACE.getURI(), "to");
+        Node xlinkTo = smLink.getAttributes().getNamedItemNS(XLINK_NAMESPACE.getURI(), MCRXlink.TO);
         Node physDiv = getElementById(document.getDocumentElement(), xlinkTo.getNodeValue());
         String orderValue = physDiv.getAttributes().getNamedItem("ORDER").getNodeValue();
         return Integer.parseInt(orderValue);

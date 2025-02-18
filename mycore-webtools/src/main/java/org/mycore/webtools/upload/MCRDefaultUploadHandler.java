@@ -103,7 +103,7 @@ public class MCRDefaultUploadHandler implements MCRUploadHandler {
         final MCRObjectID objOrDerivateID = getObjectID(parameters);
         final List<MCRMetaClassification> classifications = getClassifications(parameters);
         final Path root = bucket.getRoot();
-        final boolean isDerivate = "derivate".equals(objOrDerivateID.getTypeId());
+        final boolean isDerivate = MCRDerivate.OBJECT_TYPE.equals(objOrDerivateID.getTypeId());
 
         final MCRPath targetDerivateRoot;
 
@@ -153,11 +153,11 @@ public class MCRDefaultUploadHandler implements MCRUploadHandler {
                 OBJECT_DOES_NOT_EXIST_TRANSLATION_KEY, true);
         }
 
-        if (!oid.getTypeId().equals("derivate")) {
+        if (!oid.getTypeId().equals(MCRDerivate.OBJECT_TYPE)) {
             try {
-                String formattedNewDerivateIDString = MCRObjectID.formatID(oid.getProjectId(), "derivate", 0);
-                MCRObjectID newDerivateId = MCRObjectID.getInstance(formattedNewDerivateIDString);
-                MCRMetadataManager.checkCreatePrivilege(newDerivateId);
+                String derivateId = MCRObjectID.formatID(oid.getProjectId(), MCRDerivate.OBJECT_TYPE, 0);
+                MCRObjectID mcrDerivateId = MCRObjectID.getInstance(derivateId);
+                MCRMetadataManager.checkCreatePrivilege(mcrDerivateId);
             } catch (MCRAccessException e) {
                 MCRUploadForbiddenException uploadForbiddenException = new MCRUploadForbiddenException(e.getMessage());
                 uploadForbiddenException.initCause(e);

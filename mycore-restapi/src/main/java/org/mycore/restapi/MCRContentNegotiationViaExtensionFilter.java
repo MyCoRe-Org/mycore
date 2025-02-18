@@ -18,6 +18,8 @@
 
 package org.mycore.restapi;
 
+import static org.mycore.frontend.jersey.MCRJerseyUtil.APPLICATION_RDF_XML;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -36,15 +38,13 @@ import jakarta.ws.rs.ext.Provider;
 /**
  * This filter uses Jersey's default implementation of UriConnectFilter to set
  * the content headers by file extension.
- * 
- * It is preconfigured for the extensions (*.json, *.xml) and ignores ressources
+ * <p>
+ * It is preconfigured for the extensions (*.json, *.xml) and ignores resources
  * behind REST-API path /contents/ since there is the possibility that a valid
  * file extension (*.xml) will be removed through this filter by mistake
  * 
  * @author Robert Stephan
- * 
  */
-
 @Provider
 @PreMatching
 @Priority(Priorities.HEADER_DECORATOR - 10)
@@ -56,9 +56,9 @@ public class MCRContentNegotiationViaExtensionFilter implements ContainerRequest
     private static final Map<String, MediaType> MEDIA_TYPE_MAPPINGS = Map.ofEntries(
         Map.entry("json", MediaType.APPLICATION_JSON_TYPE),
         Map.entry("xml", MediaType.APPLICATION_XML_TYPE),
-        Map.entry("rdf", MediaType.valueOf("application/rdf+xml")));
+        Map.entry("rdf", MediaType.valueOf(APPLICATION_RDF_XML)));
 
-    private UriConnegFilter uriConnegFilter = new UriConnegFilter(MEDIA_TYPE_MAPPINGS, Map.of());
+    private final UriConnegFilter uriConnegFilter = new UriConnegFilter(MEDIA_TYPE_MAPPINGS, Map.of());
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
@@ -66,4 +66,5 @@ public class MCRContentNegotiationViaExtensionFilter implements ContainerRequest
             uriConnegFilter.filter(requestContext);
         }
     }
+
 }

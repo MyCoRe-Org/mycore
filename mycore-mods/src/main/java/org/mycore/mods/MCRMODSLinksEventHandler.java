@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRXlink;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
@@ -58,7 +59,7 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
         if (!linkingNodes.isEmpty()) {
             MCRLinkTableManager linkTableManager = MCRLinkTableManager.instance();
             for (Element linkingNode : linkingNodes) {
-                String targetID = linkingNode.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
+                String targetID = linkingNode.getAttributeValue(MCRXlink.HREF, MCRConstants.XLINK_NAMESPACE);
                 if (targetID == null) {
                     continue;
                 }

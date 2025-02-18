@@ -50,6 +50,7 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
@@ -196,7 +197,7 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
             LOGGER.debug(() -> "There is no object or derivate with id " + mcrId + " in metadata store");
             return;
         }
-        if ("derivate".equals(mcrId.getTypeId())) {
+        if (MCRDerivate.OBJECT_TYPE.equals(mcrId.getTypeId())) {
             facts.add(new MCRObjectIDFact("derid", checkID, mcrId));
             MCRObjectID mcrobjID = MCRMetadataManager.getObjectId(mcrId, 10, TimeUnit.MINUTES);
             if (mcrobjID != null) {
@@ -216,7 +217,7 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
             return "category";
         } else if (MCRObjectID.isValid(checkID)) {
             MCRObjectID mcrId = MCRObjectID.getInstance(checkID);
-            return "derivate".equals(mcrId.getTypeId()) ? "files" : "metadata";
+            return MCRDerivate.OBJECT_TYPE.equals(mcrId.getTypeId()) ? "files" : "metadata";
         }
         return "unknown";
     }

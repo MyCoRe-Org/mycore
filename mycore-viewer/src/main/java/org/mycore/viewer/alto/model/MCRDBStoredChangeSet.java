@@ -55,6 +55,7 @@ import jakarta.persistence.Table;
             + " u where u.derivateID = :derivateID and u.applied IS NULL"),
     @NamedQuery(name = "Delete.ALTOCS.byPID",
         query = "delete from " + MCRDBStoredChangeSet.ENTITY_NAME + " u where u.pid = :pid") })
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class MCRDBStoredChangeSet extends MCRStoredChangeSet {
 
     protected static final String ENTITY_NAME = "MCRAltoChangeStore";

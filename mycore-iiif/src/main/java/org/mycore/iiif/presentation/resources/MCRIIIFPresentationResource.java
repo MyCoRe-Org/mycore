@@ -60,6 +60,10 @@ public class MCRIIIFPresentationResource {
 
     private static final String IDENTIFIER_PARAM = "identifier";
 
+    public static final String CACHE_CONTROL_HEADER = "Cache-Control";
+
+    public static final String NO_CACHE_HEADER = "no-cache";
+
     @GET
     @Produces(MCRIIIFMediaTypeHelper.APPLICATION_LD_JSON)
     @Path("collection/{" + NAME_PARAM + "}")
@@ -75,10 +79,10 @@ public class MCRIIIFPresentationResource {
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     public Response getManifest(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
-        @HeaderParam("Cache-Control") String cacheControl) {
+        @HeaderParam(CACHE_CONTROL_HEADER) String cacheControl) {
         String normalizedID = MCRIIIFPresentationImpl.getInstance(impl).normalizeIdentifier(identifier);
         MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, normalizedID,
-            cacheHeaderAsList(cacheControl).contains("no-cache"));
+            cacheHeaderAsList(cacheControl).contains(NO_CACHE_HEADER));
         String manifestAsJSON = getGson().toJson(quickAccess.getManifest());
         return addHeaders(Response.ok()).entity(manifestAsJSON).build();
     }
@@ -127,10 +131,10 @@ public class MCRIIIFPresentationResource {
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     public Response getSequence(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
-        @PathParam(NAME_PARAM) String name, @HeaderParam("Cache-Control") String cacheControl) {
+        @PathParam(NAME_PARAM) String name, @HeaderParam(CACHE_CONTROL_HEADER) String cacheControl) {
         String normalizedID = MCRIIIFPresentationImpl.getInstance(impl).normalizeIdentifier(identifier);
         MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, normalizedID,
-            cacheHeaderAsList(cacheControl).contains("no-cache"));
+            cacheHeaderAsList(cacheControl).contains(NO_CACHE_HEADER));
         String sequenceAsJSON = getGson().toJson(quickAccess.getSequence(name));
         return addHeaders(Response.ok()).entity(sequenceAsJSON).build();
     }
@@ -141,10 +145,10 @@ public class MCRIIIFPresentationResource {
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS))
     public Response getCanvas(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
-        @PathParam(NAME_PARAM) String name, @HeaderParam("Cache-Control") String cacheControl) {
+        @PathParam(NAME_PARAM) String name, @HeaderParam(CACHE_CONTROL_HEADER) String cacheControl) {
         String normalizedID = MCRIIIFPresentationImpl.getInstance(impl).normalizeIdentifier(identifier);
         MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, normalizedID,
-            cacheHeaderAsList(cacheControl).contains("no-cache"));
+            cacheHeaderAsList(cacheControl).contains(NO_CACHE_HEADER));
         String canvasAsJSON = getGson().toJson(quickAccess.getCanvas(name));
         return addHeaders(Response.ok()).entity(canvasAsJSON).build();
     }
@@ -155,10 +159,10 @@ public class MCRIIIFPresentationResource {
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     public Response getAnnotation(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
-        @PathParam(NAME_PARAM) String name, @HeaderParam("Cache-Control") String cacheControl) {
+        @PathParam(NAME_PARAM) String name, @HeaderParam(CACHE_CONTROL_HEADER) String cacheControl) {
         String normalizedID = MCRIIIFPresentationImpl.getInstance(impl).normalizeIdentifier(identifier);
         MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, normalizedID,
-            cacheHeaderAsList(cacheControl).contains("no-cache"));
+            cacheHeaderAsList(cacheControl).contains(NO_CACHE_HEADER));
         String annotationAsJSON = getGson().toJson(quickAccess.getAnnotationBase(name));
         return addHeaders(Response.ok()).entity(annotationAsJSON).build();
     }
@@ -170,7 +174,7 @@ public class MCRIIIFPresentationResource {
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     public Response getAnnotationList(@PathParam(IMPL_PARAM) String impl,
         @PathParam(IDENTIFIER_PARAM) String identifier, @PathParam(NAME_PARAM) String name,
-        @HeaderParam("Cache-Control") String cacheControl) {
+        @HeaderParam(CACHE_CONTROL_HEADER) String cacheControl) {
         String normalizedID = MCRIIIFPresentationImpl.getInstance(impl).normalizeIdentifier(identifier);
         return getAnnotation(impl, normalizedID, name, cacheControl);
     }
@@ -181,10 +185,10 @@ public class MCRIIIFPresentationResource {
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     public Response getRange(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
-        @PathParam(NAME_PARAM) String name, @HeaderParam("Cache-Control") String cacheControl) {
+        @PathParam(NAME_PARAM) String name, @HeaderParam(CACHE_CONTROL_HEADER) String cacheControl) {
         String normalizedID = MCRIIIFPresentationImpl.getInstance(impl).normalizeIdentifier(identifier);
         MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, normalizedID,
-            cacheHeaderAsList(cacheControl).contains("no-cache"));
+            cacheHeaderAsList(cacheControl).contains(NO_CACHE_HEADER));
         String rangeAsJSON = getGson().toJson(quickAccess.getRange(name));
         return addHeaders(Response.ok()).entity(rangeAsJSON).build();
     }

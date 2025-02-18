@@ -45,10 +45,13 @@ import com.google.gson.JsonObject;
  * @author Mathias Hegner
  */
 public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
+
     private static final Logger LOGGER = LogManager.getLogger();
 
+    public static final String XML_NAME = "metadata";
+
     // common data
-    private boolean heritedXML;
+    private final boolean heritedXML;
 
     // metadata list
     private final List<MCRMetaElement> metadataElements;
@@ -387,7 +390,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
         } catch (MCRException exc) {
             throw new MCRException("MCRObjectMetadata : The content is not valid.", exc);
         }
-        Element elm = new Element("metadata");
+        Element elm = new Element(XML_NAME);
         for (MCRMetaElement e : this) {
             elm.addContent(e.createXML(heritedXML));
         }
