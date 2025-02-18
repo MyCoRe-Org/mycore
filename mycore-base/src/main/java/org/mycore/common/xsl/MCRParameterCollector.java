@@ -381,14 +381,22 @@ public class MCRParameterCollector {
     }
 
     private static final class SavePropertiesCacheHolder {
-        private static AtomicInteger computedHashCode;
-        private static Map<String, String> SAFE_PROPERTIES_CACHE = initializeSafeProperties();
+        private final static AtomicInteger COMPUTED_HASH_CODE = new AtomicInteger(0);;
+        private static volatile Map<String, String> SAFE_PROPERTIES_CACHE;
 
-        static void clear(){
-            SAFE_PROPERTIES_CACHE = initializeSafeProperties();
+        static synchronized void clear() {
+            SAFE_PROPERTIES_CACHE = null;
+            COMPUTED_HASH_CODE.set(0);
         }
 
         static Map<String, String> getSafePropertiesCache() {
+            if (SAFE_PROPERTIES_CACHE == null) {
+                synchronized (SavePropertiesCacheHolder.class) {
+                    if (SAFE_PROPERTIES_CACHE == null) {
+                        SAFE_PROPERTIES_CACHE = initializeSafeProperties();
+                    }
+                }
+            }
             return SAFE_PROPERTIES_CACHE;
         }
 
@@ -398,10 +406,10 @@ public class MCRParameterCollector {
             MCRConfiguration2.addPropertyChangeEventLister((k) -> true, (k, old, _new) -> {
                 if (_new.isEmpty() && old.isPresent()) {
                     safeProperties.remove(xmlSafe(k));
-                    computedHashCode.set(computeHashCode(safeProperties));
+                    COMPUTED_HASH_CODE.set(computeHashCode(safeProperties));
                 } else if (_new.isPresent()) {
                     safeProperties.put(xmlSafe(k), _new.get());
-                    computedHashCode.set(computeHashCode(safeProperties));
+                    COMPUTED_HASH_CODE.set(computeHashCode(safeProperties));
                 }
             });
 
@@ -409,7 +417,7 @@ public class MCRParameterCollector {
                 safeProperties.put(xmlSafe(key), value);
             });
 
-            computedHashCode = new AtomicInteger(computeHashCode(safeProperties));
+            COMPUTED_HASH_CODE.set(computeHashCode(safeProperties));
 
             return safeProperties;
         }
@@ -433,7 +441,7 @@ public class MCRParameterCollector {
 
         @Override
         public int hashCode() {
-            return computedHashCode.get();
+            return COMPUTED_HASH_CODE.get();
         }
     }
 }
