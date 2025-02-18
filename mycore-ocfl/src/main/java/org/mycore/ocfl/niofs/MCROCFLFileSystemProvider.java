@@ -72,7 +72,7 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
 
     public static final URI FS_URI = URI.create(SCHEME + ":///");
 
-    private static volatile MCROCFLFileSystem FILE_SYSTEM;
+    private static volatile MCROCFLFileSystem fileSystem;
 
     private MCROCFLTransactionalTempFileStorage localStorage;
 
@@ -154,14 +154,14 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
      */
     @Override
     public MCROCFLFileSystem getFileSystem(URI uri) {
-        if (FILE_SYSTEM == null) {
+        if (fileSystem == null) {
             synchronized (FS_URI) {
-                if (FILE_SYSTEM == null) {
-                    FILE_SYSTEM = new MCROCFLFileSystem(this);
+                if (fileSystem == null) {
+                    fileSystem = new MCROCFLFileSystem(this);
                 }
             }
         }
-        return FILE_SYSTEM;
+        return fileSystem;
     }
 
     /**
@@ -352,7 +352,9 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
                 checkFileAccessModes(path);
             }
         } catch (NotFoundException notFoundException) {
-            throw new NoSuchFileException(path.toString());
+            NoSuchFileException noSuchFileException = new NoSuchFileException(path.toString());
+            noSuchFileException.initCause(notFoundException);
+            throw noSuchFileException;
         }
     }
 
@@ -490,7 +492,7 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
      * @throws FileSystemNotFoundException if the OCFL file system is not available.
      */
     public static MCROCFLFileSystem getMCROCFLFileSystem() throws FileSystemNotFoundException {
-        return FILE_SYSTEM != null ? FILE_SYSTEM : (MCROCFLFileSystem) MCRAbstractFileSystem.getInstance(SCHEME);
+        return fileSystem != null ? fileSystem : (MCROCFLFileSystem) MCRAbstractFileSystem.getInstance(SCHEME);
     }
 
     /**
