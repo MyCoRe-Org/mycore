@@ -172,6 +172,9 @@ public class MCRParameterCollectorTest extends MCRTestCase {
 
         tFactory = getTransformerFactory(XALAN_FACTORY_CLASS);
         testSetParametersTo(tFactory);
+
+        tFactory = getTransformerFactory(MCR_XALAN_FACTORY_CLASS);
+        testSetParametersTo(tFactory);
     }
 
     private void testSetParametersTo(SAXTransformerFactory tFactory) throws TransformerException {
