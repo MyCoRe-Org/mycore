@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 
 import org.junit.rules.TemporaryFolder;
 import org.mycore.common.config.MCRComponent;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationLoader;
 import org.mycore.common.config.MCRConfigurationLoaderFactory;
@@ -67,7 +66,6 @@ public class MCRTestCaseHelper {
         HashMap<String, String> baseProperties = new HashMap<>(configurationLoader.load());
         baseProperties.putAll(testProperties);
         MCRConfigurationBase.initialize(configurationLoader.loadDeprecated(), baseProperties, true);
-        baseProperties.forEach(MCRConfiguration2::set);
         MCRSessionMgr.unlock();
     }
 
