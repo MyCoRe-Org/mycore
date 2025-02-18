@@ -82,8 +82,10 @@ public class MCROCFLBasicFileAttributeView implements BasicFileAttributeView {
             if (!virtualObject.exists(path)) {
                 throw new NoSuchFileException(path.toString());
             }
-        } catch (NotFoundException ignore) {
-            throw new NoSuchFileException(path.toString());
+        } catch (NotFoundException notFoundException) {
+            NoSuchFileException noSuchFileException = new NoSuchFileException(path.toString());
+            noSuchFileException.initCause(notFoundException);
+            throw noSuchFileException;
         }
         this.fileAttributes = new MCROCFLFileAttributes(virtualObject, path);
         return this.fileAttributes;
