@@ -360,6 +360,14 @@ public class MCRParameterCollector {
         return job == null ? new MCRParameterCollector() : new MCRParameterCollector(job.getRequest());
     }
 
+    /**
+     * This method is used to clear the cache of the properties that are used in the XSL transformations.
+     * This should only be used in tests.
+     */
+    public static void clearCache(){
+        SavePropertiesCacheHolder.clear();
+    }
+
     public int hashCode() {
         if (modified) {
             int result = LOGGER.hashCode();
@@ -374,7 +382,11 @@ public class MCRParameterCollector {
 
     private static final class SavePropertiesCacheHolder {
         private static AtomicInteger computedHashCode;
-        private static final Map<String, String> SAFE_PROPERTIES_CACHE = initializeSafeProperties();
+        private static Map<String, String> SAFE_PROPERTIES_CACHE = initializeSafeProperties();
+
+        static void clear(){
+            SAFE_PROPERTIES_CACHE = initializeSafeProperties();
+        }
 
         static Map<String, String> getSafePropertiesCache() {
             return SAFE_PROPERTIES_CACHE;

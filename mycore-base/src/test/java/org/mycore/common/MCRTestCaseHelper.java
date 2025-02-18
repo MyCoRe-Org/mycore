@@ -24,7 +24,6 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.junit.rules.TemporaryFolder;
@@ -34,6 +33,7 @@ import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationLoader;
 import org.mycore.common.config.MCRConfigurationLoaderFactory;
 import org.mycore.common.config.MCRRuntimeComponentDetector;
+import org.mycore.common.xsl.MCRParameterCollector;
 
 public class MCRTestCaseHelper {
 
@@ -72,10 +72,7 @@ public class MCRTestCaseHelper {
     }
 
     public static void after() {
-        Set<String> properties = MCRConfiguration2.getPropertiesMap().keySet();
-        properties.forEach((p) -> {
-          MCRConfiguration2.set(p, (String) null);
-        });
+        MCRParameterCollector.clearCache();
         MCRConfigurationBase.initialize(Collections.emptyMap(), Collections.emptyMap(), true);
         MCRSessionMgr.releaseCurrentSession();
     }
