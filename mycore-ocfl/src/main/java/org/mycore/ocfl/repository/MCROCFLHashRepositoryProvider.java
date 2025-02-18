@@ -29,6 +29,7 @@ import jakarta.inject.Singleton;
 @Singleton
 public class MCROCFLHashRepositoryProvider extends MCROCFLLocalRepositoryProvider {
 
+    @Override
     public OcflExtensionConfig getExtensionConfig() {
         return new HashedNTupleIdEncapsulationLayoutConfig();
     }
