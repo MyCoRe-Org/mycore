@@ -54,7 +54,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
   <properties>
     <argLine />
     <!-- same as ocfl aws sdk version -->
-    <aws-sdk.version>2.26.21</aws-sdk.version>
+    <aws-sdk.version>2.29.52</aws-sdk.version>
     <changelog.since>2024-12-18</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
     <changes.version>2025.02</changes.version>
@@ -88,7 +88,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <!-- <log4j.version>2.19.0</log4j.version> -->
     <neo4j.version>5.26.0</neo4j.version>
     <oaipmh.version>3.0</oaipmh.version>
-    <ocfl-java.version>2.2.1</ocfl-java.version>
+    <ocfl-java.version>2.2.2</ocfl-java.version>
     <pmd.failOnViolation>true</pmd.failOnViolation>
     <pmd.version>7.7.0</pmd.version>
     <rdf4j.version>5.0.2</rdf4j.version>
