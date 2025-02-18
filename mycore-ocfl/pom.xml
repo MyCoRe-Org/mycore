@@ -74,8 +74,6 @@
     <dependency>
       <groupId>software.amazon.awssdk</groupId>
       <artifactId>netty-nio-client</artifactId>
-      <!-- use same version as ocfl-java -->
-      <version>2.26.21</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
