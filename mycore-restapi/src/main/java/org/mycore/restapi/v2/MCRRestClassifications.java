@@ -19,6 +19,8 @@
 package org.mycore.restapi.v2;
 
 import static org.mycore.frontend.jersey.MCRJerseyUtil.APPLICATION_JSON_UTF_8;
+import static org.mycore.frontend.jersey.MCRJerseyUtil.APPLICATION_RDF_XML;
+import static org.mycore.frontend.jersey.MCRJerseyUtil.APPLICATION_RDF_XML_UTF_8;
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_CLASSID;
 import static org.mycore.restapi.v2.MCRRestStatusCode.BAD_REQUEST;
 import static org.mycore.restapi.v2.MCRRestStatusCode.CREATED;
@@ -119,7 +121,7 @@ public class MCRRestClassifications {
     }
 
     @GET
-    @Produces({ MediaType.APPLICATION_XML, APPLICATION_JSON_UTF_8, "application/rdf+xml" })
+    @Produces({ MediaType.APPLICATION_XML, APPLICATION_JSON_UTF_8, APPLICATION_RDF_XML })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     @Path("/{" + PARAM_CLASSID + "}")
@@ -134,7 +136,7 @@ public class MCRRestClassifications {
     }
 
     @GET
-    @Produces({ MediaType.APPLICATION_XML, APPLICATION_JSON_UTF_8, "application/rdf+xml" })
+    @Produces({ MediaType.APPLICATION_XML, APPLICATION_JSON_UTF_8, APPLICATION_RDF_XML })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     @Path("/{" + PARAM_CLASSID + "}/{" + PARAM_CATEGID + "}")
@@ -182,11 +184,11 @@ public class MCRRestClassifications {
                 .withMessage("Could not find classification or category in " + classId + ".")
                 .toException();
         }
-        if (request.getAcceptableMediaTypes().contains(MediaType.valueOf("application/rdf+xml"))) {
+        if (request.getAcceptableMediaTypes().contains(MediaType.valueOf(APPLICATION_RDF_XML))) {
             Document docSKOS = MCRSkosTransformer.getSkosInRDFXML(classification, MCRCategoryID.fromString(classId));
             MCRJDOMContent content = new MCRJDOMContent(docSKOS);
             try {
-                return Response.ok(content.asString()).type("application/rdf+xml; charset=UTF-8").build();
+                return Response.ok(content.asString()).type(APPLICATION_RDF_XML_UTF_8).build();
             } catch (IOException e) {
                 throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
                     .withCause(e)

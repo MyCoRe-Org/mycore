@@ -22,6 +22,7 @@ import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JConstant
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.mycore.common.config.MCRConfiguration2;
 
@@ -44,10 +45,12 @@ import org.mycore.common.config.MCRConfiguration2;
  */
 public class MCRNeo4JUtilsConfigurationHelper {
 
+    private static final String DESCRIPTOR = "descriptor";
+
     /**
     * A map of MyCoRe properties starts with {@code MCR.Neo4J... Map<MCRObjectType, Map<property, path_to_element>>}
     */
-    static Map<String, Map<String, String>> attributePaths = new HashMap<>();
+    private static final Map<String, Map<String, String>> ATTRIBUTE_PATHS = new ConcurrentHashMap<>();
 
     /**
     * Retrieves the configuration for the specified MCR object type. Configured in the Style of
@@ -57,8 +60,8 @@ public class MCRNeo4JUtilsConfigurationHelper {
     * @return a map of attribute paths for the specified object type
     */
     public static Map<String, String> getConfiguration(String type) {
-        if (attributePaths.containsKey(type)) {
-            return attributePaths.get(type);
+        if (ATTRIBUTE_PATHS.containsKey(type)) {
+            return ATTRIBUTE_PATHS.get(type);
         }
 
         Map<String, String> properties = MCRConfiguration2.getSubPropertiesMap(NEO4J_CONFIG_PREFIX
@@ -66,20 +69,19 @@ public class MCRNeo4JUtilsConfigurationHelper {
         Map<String, String> attributes = new HashMap<>();
         attributes.put("id", "/mycoreobject/@ID");
         attributes.put("type", type);
-        String descriptor = "descriptor";
-        String desc = properties.get(descriptor);
+        String desc = properties.get(DESCRIPTOR);
         if (desc != null && desc.length() > 1) {
-            attributes.put(descriptor, desc);
+            attributes.put(DESCRIPTOR, desc);
         } else {
-            attributes.put(descriptor, "/mycoreobject/@label");
+            attributes.put(DESCRIPTOR, "/mycoreobject/@label");
         }
 
         properties.forEach((k, v) -> {
-            if (!k.startsWith(descriptor)) {
+            if (!k.startsWith(DESCRIPTOR)) {
                 attributes.put(k, v);
             }
         });
-        attributePaths.put(type, attributes);
+        ATTRIBUTE_PATHS.put(type, attributes);
         return attributes;
     }
 

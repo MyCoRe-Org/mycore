@@ -60,6 +60,10 @@ public final class MCRJerseyUtil {
 
     public static final String APPLICATION_XML_UTF_8 = MediaType.APPLICATION_XML + ";" + CHARSET_UTF_8;
 
+    public static final String APPLICATION_RDF_XML = "application/rdf+xml";
+
+    public static final String APPLICATION_RDF_XML_UTF_8 = "application/rdf+xml;" + CHARSET_UTF_8;
+
     public static final String TEXT_XML_UTF_8 = MediaType.TEXT_XML + ";" + CHARSET_UTF_8;
 
     public static final String TEXT_PLAIN_UTF_8 = MediaType.TEXT_PLAIN + ";" + CHARSET_UTF_8;

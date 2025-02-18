@@ -164,16 +164,16 @@ public class MCRSolrSearchServlet extends MCRServlet {
         }
 
         // put query and all filterquery´s to the map
-        queryParameterMap.put(QUERY.getValue(), new String[] { query.toString().trim() });
+        queryParameterMap.put(QUERY, new String[] { query.toString().trim() });
 
         for (StringBuilder filterQueryBuilder : filterQueryMap.values()) {
             // skip the whole query if no field has been added
             if (filterQueryBuilder.length() > JOIN_PATTERN.length()) {
-                queryParameterMap.put(FILTER_QUERY.getValue(), new String[] { filterQueryBuilder.toString() });
+                queryParameterMap.put(FILTER_QUERY, new String[] { filterQueryBuilder.toString() });
             }
         }
 
-        queryParameterMap.put(SORT.getValue(), new String[] { buildSolrSortParameter(sortParameters) });
+        queryParameterMap.put(SORT, new String[] { buildSolrSortParameter(sortParameters) });
 
         return queryParameterMap;
     }

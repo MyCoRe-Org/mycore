@@ -18,31 +18,26 @@
 
 package org.mycore.solr.search;
 
-public enum MCRSolrParameter {
+/**
+ * A utility class that defines constant keys for constructing Solr query parameters.
+ * <p>
+ * These constants represent common parameter names used in Solr requests, such as query,
+ * filter query, pagination, sorting, and specifying the fields to return.
+ */
+public final class MCRSolrParameter {
 
-    QUERY("q"), FILTER_QUERY("fq"),
-    START("start"), ROWS("rows"),
-    SORT("sort"),
-    FIELD_LIST("fl"),
-    REQUEST_HANDLER("qt");
+    public static final String QUERY = "q";
 
-    private final String value;
+    public static final String FILTER_QUERY = "fq";
 
-    MCRSolrParameter(String value) {
-        this.value = value;
-    }
+    public static final String START = "start";
 
-    public String getValue() {
-        return value;
-    }
+    public static final String ROWS = "rows";
 
-    public static MCRSolrParameter fromString(String value) {
-        for (MCRSolrParameter parameter : values()) {
-            if (parameter.value.equals(value)) {
-                return parameter;
-            }
-        }
-        throw new IllegalArgumentException("No constant with value " + value + " found");
-    }
+    public static final String SORT = "sort";
+
+    public static final String FIELD_LIST = "fl";
+
+    public static final String REQUEST_HANDLER = "qt";
 
 }
