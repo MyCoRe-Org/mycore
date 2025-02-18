@@ -188,6 +188,7 @@ public class MCROCFLLocalVirtualObject extends MCROCFLVirtualObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Path toPhysicalPath(MCRVersionedPath path) throws IOException {
         MCRVersionedPath lockedPath = lockVersion(path);
         checkExists(lockedPath);
