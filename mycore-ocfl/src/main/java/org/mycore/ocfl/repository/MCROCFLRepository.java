@@ -250,7 +250,7 @@ public class MCROCFLRepository implements OcflRepository {
             return null;
         }
         String relativePath = file.substring(directory.length());
-        int nextPathSegmentIndex = file.indexOf("/");
+        int nextPathSegmentIndex = file.indexOf('/');
         return nextPathSegmentIndex != -1 ? relativePath.substring(0, nextPathSegmentIndex) : relativePath;
     }
 

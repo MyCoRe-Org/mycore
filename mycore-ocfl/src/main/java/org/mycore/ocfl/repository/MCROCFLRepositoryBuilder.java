@@ -76,6 +76,7 @@ public class MCROCFLRepositoryBuilder extends OcflRepositoryBuilder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MCROCFLRepositoryBuilder storage(OcflStorage storage) {
         return (MCROCFLRepositoryBuilder) super.storage(storage);
     }
@@ -83,6 +84,7 @@ public class MCROCFLRepositoryBuilder extends OcflRepositoryBuilder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MCROCFLRepositoryBuilder storage(Consumer<OcflStorageBuilder> configureStorage) {
         return (MCROCFLRepositoryBuilder) super.storage(configureStorage);
     }
@@ -90,6 +92,7 @@ public class MCROCFLRepositoryBuilder extends OcflRepositoryBuilder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MCROCFLRepositoryBuilder workDir(Path workDir) {
         return (MCROCFLRepositoryBuilder) super.workDir(workDir);
     }
@@ -97,6 +100,7 @@ public class MCROCFLRepositoryBuilder extends OcflRepositoryBuilder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MCROCFLRepositoryBuilder objectLock(ObjectLock objectLock) {
         return (MCROCFLRepositoryBuilder) super.objectLock(objectLock);
     }
@@ -104,6 +108,7 @@ public class MCROCFLRepositoryBuilder extends OcflRepositoryBuilder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MCROCFLRepositoryBuilder objectLock(Consumer<ObjectLockBuilder> configureLock) {
         return (MCROCFLRepositoryBuilder) super.objectLock(configureLock);
     }
@@ -111,6 +116,7 @@ public class MCROCFLRepositoryBuilder extends OcflRepositoryBuilder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MCROCFLRepositoryBuilder inventoryCache(Cache<String, Inventory> inventoryCache) {
         return (MCROCFLRepositoryBuilder) super.inventoryCache(inventoryCache);
     }
@@ -118,6 +124,7 @@ public class MCROCFLRepositoryBuilder extends OcflRepositoryBuilder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MCROCFLRepositoryBuilder objectDetailsDb(ObjectDetailsDatabase objectDetailsDb) {
         return (MCROCFLRepositoryBuilder) super.objectDetailsDb(objectDetailsDb);
     }
@@ -125,6 +132,7 @@ public class MCROCFLRepositoryBuilder extends OcflRepositoryBuilder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MCROCFLRepositoryBuilder objectDetailsDb(Consumer<ObjectDetailsDatabaseBuilder> configureDb) {
         return (MCROCFLRepositoryBuilder) super.objectDetailsDb(configureDb);
     }
@@ -132,6 +140,7 @@ public class MCROCFLRepositoryBuilder extends OcflRepositoryBuilder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MCROCFLRepositoryBuilder prettyPrintJson() {
         return (MCROCFLRepositoryBuilder) super.prettyPrintJson();
     }
@@ -139,6 +148,7 @@ public class MCROCFLRepositoryBuilder extends OcflRepositoryBuilder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MCROCFLRepositoryBuilder inventoryMapper(InventoryMapper inventoryMapper) {
         return (MCROCFLRepositoryBuilder) super.inventoryMapper(inventoryMapper);
     }
@@ -146,6 +156,7 @@ public class MCROCFLRepositoryBuilder extends OcflRepositoryBuilder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MCROCFLRepositoryBuilder logicalPathMapper(LogicalPathMapper logicalPathMapper) {
         return (MCROCFLRepositoryBuilder) super.logicalPathMapper(logicalPathMapper);
     }
@@ -153,6 +164,7 @@ public class MCROCFLRepositoryBuilder extends OcflRepositoryBuilder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MCROCFLRepositoryBuilder contentPathConstraints(ContentPathConstraintProcessor contentPathConstraints) {
         return (MCROCFLRepositoryBuilder) super.contentPathConstraints(contentPathConstraints);
     }
@@ -160,6 +172,7 @@ public class MCROCFLRepositoryBuilder extends OcflRepositoryBuilder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MCROCFLRepositoryBuilder ocflConfig(OcflConfig config) {
         return (MCROCFLRepositoryBuilder) super.ocflConfig(config);
     }
@@ -167,6 +180,7 @@ public class MCROCFLRepositoryBuilder extends OcflRepositoryBuilder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MCROCFLRepositoryBuilder ocflConfig(Consumer<OcflConfig> configureConfig) {
         return (MCROCFLRepositoryBuilder) super.ocflConfig(configureConfig);
     }
@@ -174,6 +188,7 @@ public class MCROCFLRepositoryBuilder extends OcflRepositoryBuilder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MCROCFLRepositoryBuilder defaultLayoutConfig(OcflExtensionConfig defaultLayoutConfig) {
         return (MCROCFLRepositoryBuilder) super.defaultLayoutConfig(defaultLayoutConfig);
     }
@@ -181,6 +196,7 @@ public class MCROCFLRepositoryBuilder extends OcflRepositoryBuilder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MCROCFLRepositoryBuilder unsupportedExtensionBehavior(UnsupportedExtensionBehavior unsupportedBehavior) {
         return (MCROCFLRepositoryBuilder) super.unsupportedExtensionBehavior(unsupportedBehavior);
     }
@@ -188,6 +204,7 @@ public class MCROCFLRepositoryBuilder extends OcflRepositoryBuilder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MCROCFLRepositoryBuilder ignoreUnsupportedExtensions(Set<String> ignoreUnsupportedExtensions) {
         return (MCROCFLRepositoryBuilder) super.ignoreUnsupportedExtensions(ignoreUnsupportedExtensions);
     }
@@ -195,6 +212,7 @@ public class MCROCFLRepositoryBuilder extends OcflRepositoryBuilder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MCROCFLRepositoryBuilder verifyStaging(boolean verifyStaging) {
         return (MCROCFLRepositoryBuilder) super.verifyStaging(verifyStaging);
     }
@@ -202,6 +220,7 @@ public class MCROCFLRepositoryBuilder extends OcflRepositoryBuilder {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MCROCFLRepositoryBuilder fileLockTimeoutDuration(Duration fileLockTimeoutDuration) {
         return (MCROCFLRepositoryBuilder) super.fileLockTimeoutDuration(fileLockTimeoutDuration);
     }

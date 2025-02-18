@@ -491,7 +491,8 @@ public class MCROCFLCommands {
                 .map(entry -> entry.getKey() + ": " + entry.getValue())
                 .toList();
             Files.write(errorFilePath, errorLines, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-            LOGGER.info("Validation error in '{}'. See '{}' for details.", derivateId, errorFilePath.getFileName());
+            LOGGER.info(() -> "Validation error in '" + derivateId + "'. See '" + errorFilePath.getFileName()
+                + "' for details.");
         }
     }
 
