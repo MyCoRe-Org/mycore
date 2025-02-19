@@ -77,10 +77,7 @@
   <!-- Code Style Rules -->
   <rule ref="category/java/codestyle.xml/AvoidDollarSigns"/>
   <rule ref="category/java/codestyle.xml/AvoidProtectedFieldInFinalClass"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/codestyle.xml/AvoidProtectedMethodInFinalClassNotExtending"/>
-  -->
   <rule ref="category/java/codestyle.xml/ControlStatementBraces"/>
   <rule ref="category/java/codestyle.xml/EmptyControlStatement">
     <properties>

@@ -160,7 +160,7 @@ public final class MCRConfigurationBase {
     /**
      * Substitute all %properties%.
      */
-    protected static synchronized void resolveProperties() {
+    private static synchronized void resolveProperties() {
         MCRProperties tmpProperties = MCRProperties.copy(getBaseProperties());
         MCRPropertiesResolver resolver = new MCRPropertiesResolver(tmpProperties);
         resolvedProperties = MCRProperties.copy(resolver.resolveAll(tmpProperties));
@@ -187,15 +187,15 @@ public final class MCRConfigurationBase {
         }
     }
 
-    protected static MCRProperties getResolvedProperties() {
+    static MCRProperties getResolvedProperties() {
         return resolvedProperties;
     }
 
-    protected static MCRProperties getBaseProperties() {
+    private static MCRProperties getBaseProperties() {
         return baseProperties;
     }
 
-    protected static MCRProperties getDeprecatedProperties() {
+    private static MCRProperties getDeprecatedProperties() {
         return deprecatedProperties;
     }
 
