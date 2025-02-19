@@ -76,10 +76,7 @@
 
   <!-- Code Style Rules -->
   <rule ref="category/java/codestyle.xml/AvoidDollarSigns"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/codestyle.xml/AvoidProtectedFieldInFinalClass"/>
-  -->
   <!-- TODO: Create PR to fix this rule -->
   <!--
   <rule ref="category/java/codestyle.xml/AvoidProtectedMethodInFinalClassNotExtending"/>
