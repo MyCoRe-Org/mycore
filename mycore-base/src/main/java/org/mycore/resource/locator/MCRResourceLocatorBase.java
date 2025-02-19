@@ -31,8 +31,8 @@ import org.mycore.resource.MCRResourcePath;
 
 /**
  * {@link MCRResourceLocatorBase} is a base implementation of {@link MCRResourceLocator} that
- * facilitates consistent logging. Implementors must provide a class-specific {@link Logger} and the
- * actual locating strategy ({@link MCRResourceLocatorBase#doLocate(MCRResourcePath, MCRHints)}).
+ * facilitates consistent logging. Implementors must provide the actual locating strategy
+ * ({@link MCRResourceLocatorBase#doLocate(MCRResourcePath, MCRHints)}).
  */
 public abstract class MCRResourceLocatorBase implements MCRResourceLocator {
 
@@ -43,10 +43,13 @@ public abstract class MCRResourceLocatorBase implements MCRResourceLocator {
         logger.debug("Locating resource URLs for path {}", path);
         Stream<URL> locatedResourceUrls = doLocate(path, hints);
         if (logger.isDebugEnabled()) {
-            return logResourceUrls(locatedResourceUrls.toList()).stream();
-        } else {
-            return locatedResourceUrls;
+            locatedResourceUrls = logResourceUrls(locatedResourceUrls);
         }
+        return locatedResourceUrls;
+    }
+
+    private Stream<URL> logResourceUrls(Stream<URL> resourceUrls) {
+        return logResourceUrls(resourceUrls.toList()).stream();
     }
 
     private List<URL> logResourceUrls(List<URL> resourceUrls) {

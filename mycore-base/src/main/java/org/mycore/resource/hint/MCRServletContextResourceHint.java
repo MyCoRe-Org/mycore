@@ -26,7 +26,9 @@ import org.mycore.common.hint.MCRHintKey;
 
 import jakarta.servlet.ServletContext;
 
-public class MCRServletContextResourceHint implements MCRHint<ServletContext> {
+public final class MCRServletContextResourceHint implements MCRHint<ServletContext> {
+
+    private static final MCRServletContextResourceHint INSTANCE = new MCRServletContextResourceHint();
 
     @Override
     public MCRHintKey<ServletContext> key() {
@@ -37,4 +39,12 @@ public class MCRServletContextResourceHint implements MCRHint<ServletContext> {
     public Optional<ServletContext> value() {
         return MCRServletContextHolder.instance().get();
     }
+
+    private MCRServletContextResourceHint(){
+    }
+
+    public static MCRServletContextResourceHint getInstance() {
+        return INSTANCE;
+    }
+
 }

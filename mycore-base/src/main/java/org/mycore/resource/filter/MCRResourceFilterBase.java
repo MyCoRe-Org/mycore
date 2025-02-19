@@ -30,22 +30,25 @@ import org.mycore.common.log.MCRTreeMessage;
 
 /**
  * {@link MCRResourceFilterBase} is a base implementation of {@link MCRResourceFilter} that
- * facilitates consistent logging. Implementors must provide a class-specific {@link Logger} and the
- * actual filtering strategy ({@link MCRResourceFilterBase#doFilter(Stream, MCRHints)}).
+ * facilitates consistent logging. Implementors must provide the actual filtering strategy
+ * ({@link MCRResourceFilterBase#doFilter(Stream, MCRHints)}).
  */
 public abstract class MCRResourceFilterBase implements MCRResourceFilter {
 
-    private final Logger logger = LogManager.getLogger();
+    private final Logger logger = LogManager.getLogger(getClass());
 
     @Override
     public Stream<URL> filter(Stream<URL> resourceUrls, MCRHints hints) {
         logger.debug("Filtering resource URLs");
         Stream<URL> filteredResourceUrls = doFilter(resourceUrls, hints);
         if (logger.isDebugEnabled()) {
-            return logResourceUrls(filteredResourceUrls.toList()).stream();
-        } else {
-            return filteredResourceUrls;
+            filteredResourceUrls = logResourceUrls(filteredResourceUrls);
         }
+        return filteredResourceUrls;
+    }
+
+    private Stream<URL> logResourceUrls(Stream<URL> resourceUrls) {
+        return logResourceUrls(resourceUrls.toList()).stream();
     }
 
     private List<URL> logResourceUrls(List<URL> resourceUrls) {

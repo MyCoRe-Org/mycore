@@ -45,7 +45,7 @@ import org.apache.logging.log4j.Logger;
  * <code>/META-INF/resources/WEB-INF/</code>, because such resource paths would be web resource paths that point to
  * resources that are not served by popular web containers.
  */
-public abstract class MCRResourcePath {
+public sealed abstract class MCRResourcePath {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
