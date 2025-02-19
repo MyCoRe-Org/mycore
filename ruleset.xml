@@ -59,7 +59,7 @@
   <rule ref="category/java/bestpractices.xml/ReplaceVectorWithList"/>
   <rule ref="category/java/bestpractices.xml/SimplifiableTestAssertion"/>
   <rule ref="category/java/bestpractices.xml/NonExhaustiveSwitch"/>
-  <rule ref="category/java/bestpractices.xml/SystemPrintln" />
+  <rule ref="category/java/bestpractices.xml/SystemPrintln"/>
   <rule ref="category/java/bestpractices.xml/UnnecessaryVarargsArrayCreation"/>
   <!-- TODO: Create PR to fix this rule -->
   <!--
@@ -106,10 +106,7 @@
   <rule ref="category/java/codestyle.xml/MethodNamingConventions"/>
   <rule ref="category/java/codestyle.xml/NoPackage"/>
   <rule ref="category/java/codestyle.xml/PackageCase"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/codestyle.xml/UnnecessaryAnnotationValueElement"/>
-  -->
   <rule ref="category/java/codestyle.xml/UnnecessaryBoxing"/>
   <!-- TODO: Create PR to fix this rule -->
   <!--

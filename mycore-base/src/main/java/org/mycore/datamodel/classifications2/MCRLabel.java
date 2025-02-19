@@ -42,7 +42,7 @@ import jakarta.xml.bind.annotation.XmlRootElement;
     name = "label")
 @XmlAccessorType(XmlAccessType.FIELD)
 @Embeddable
-@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MCRLabel implements Cloneable, Serializable, Comparable<MCRLabel> {
 
     @Serial

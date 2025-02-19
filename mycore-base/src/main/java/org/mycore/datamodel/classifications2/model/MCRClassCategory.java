@@ -49,7 +49,7 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
     })
 @XmlSeeAlso({ MCRLabel.class, MCRClassURL.class })
 @XmlRootElement(name = "category")
-@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonPropertyOrder({ "ID", "url", "labels", "categories" })
 public class MCRClassCategory {
 
