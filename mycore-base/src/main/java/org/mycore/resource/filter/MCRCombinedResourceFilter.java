@@ -50,6 +50,7 @@ import org.mycore.common.log.MCRTreeMessage;
 public final class MCRCombinedResourceFilter extends MCRResourceFilterBase {
 
     public static final String FILTERS_KEY = "Filters";
+
     private final List<MCRResourceFilter> filters;
 
     public MCRCombinedResourceFilter(MCRResourceFilter... filters) {
@@ -57,8 +58,8 @@ public final class MCRCombinedResourceFilter extends MCRResourceFilterBase {
     }
 
     public MCRCombinedResourceFilter(List<MCRResourceFilter> filters) {
-        this.filters = new ArrayList<>(Objects.requireNonNull(filters));
-        this.filters.forEach(Objects::requireNonNull);
+        this.filters = new ArrayList<>(Objects.requireNonNull(filters, "Filters must not be null"));
+        this.filters.forEach(filter -> Objects.requireNonNull(filter, "Filter must not be null"));
     }
 
     @Override

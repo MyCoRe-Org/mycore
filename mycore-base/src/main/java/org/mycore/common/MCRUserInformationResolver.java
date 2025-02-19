@@ -76,7 +76,8 @@ public final class MCRUserInformationResolver {
     public MCRUserInformationResolver(Map<String, MCRUserInformationProvider> providers) {
 
         this.providers = Objects.requireNonNull(providers, "Providers must not be null");
-        this.providers.values().forEach(provider -> Objects.requireNonNull(provider, "Provider must not be null"));
+        this.providers.forEach((name, provider) ->
+            Objects.requireNonNull(provider, "Provider " + name + " must not be null"));
 
         LOGGER.info(() -> "Working with providers: " + String.join(", ", providers.keySet()));
 

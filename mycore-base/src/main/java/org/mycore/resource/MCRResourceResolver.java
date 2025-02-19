@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -154,7 +155,7 @@ public final class MCRResourceResolver {
     }
 
     /**
-     * Resolves a {@link MCRResourcePath}using the given hints, returning all alternatives (i.e. because one module
+     * Resolves a {@link MCRResourcePath} using the given hints, returning all alternatives (i.e. because one module
      * overrides a resource that is also provided by another module). Intended for introspective purposes only.
      */
     public List<ProvidedUrl> resolveAll(MCRResourcePath path, MCRHints hints) {
@@ -292,23 +293,30 @@ public final class MCRResourceResolver {
     }
 
     /**
-     * Tries to revers {@link MCRResourceResolver#resolve(MCRResourcePath)}, using the given hints. Optionally
-     * performs a consistency check by resolving the calculated {@link MCRResourcePath} and comparing the
-     * result of this resolution against the given resource URL.
+     * Tries to revers {@link MCRResourceResolver#resolve(MCRResourcePath)}, using the given hints, i.e. tries to
+     * calculate a {@link MCRResourcePath}, that resolves to the given resource URL.
+     * <p>
+     * This resource path is calculated by removing different prefixes from the given resource URL and checking if
+     * resolving the remaining part of the resource URL as a resource path results in the given resource URL.
+     * <p>
+     * For this to happen, the used {@link MCRResourceResolver} provides a stream of {@link PrefixStripper}, each of
+     * which can remove multiple prefixes from the given resource URL. The prefix strippers and the remaining parts
+     * returned by each prefix stripper are checked in order. returns the first such remaining part, that resolves to
+     * the given resource URL, if any.
      */
     public Optional<MCRResourcePath> reverse(URL resourceUrl, MCRHints hints) {
         LOGGER.debug("Reversing resource URL {}", resourceUrl);
-        List<PrefixStripper> prefixStrippers = provider.prefixStrippers(hints).toList();
-        for (PrefixStripper stripper : prefixStrippers) {
-            List<MCRResourcePath> potentialPaths = stripper.strip(resourceUrl).get();
-            for (MCRResourcePath potentialPath : potentialPaths) {
-                if (isConsistent(resourceUrl, potentialPath, hints)) {
-                    return Optional.of(potentialPath);
+        return provider.prefixStrippers(hints).sequential().flatMap(
+            prefixStripper -> {
+                List<MCRResourcePath> potentialPaths = prefixStripper.strip(resourceUrl).get();
+                for (MCRResourcePath potentialPath : potentialPaths) {
+                    if (isConsistent(resourceUrl, potentialPath, hints)) {
+                        return Stream.of(potentialPath);
+                    }
                 }
+                return Stream.empty();
             }
-        }
-        LOGGER.debug("Unable to reverse path for resource URL {}", resourceUrl);
-        return Optional.empty();
+        ).findFirst();
     }
 
     private boolean isConsistent(URL resourceUrl, MCRResourcePath potentialPath, MCRHints hints) {

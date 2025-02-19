@@ -102,9 +102,9 @@ public class MCRLFSResourceProvider extends MCRResourceProviderBase {
     public MCRLFSResourceProvider(String coverage, MCRResourceLocator locator, MCRResourceFilter filter,
         MCRResourceSelector selector) {
         super(coverage);
-        this.locator = Objects.requireNonNull(locator);
-        this.filter = Objects.requireNonNull(filter);
-        this.selector = Objects.requireNonNull(selector);
+        this.locator = Objects.requireNonNull(locator, "Locator must not be null");
+        this.filter = Objects.requireNonNull(filter, "Filter must not be null");
+        this.selector = Objects.requireNonNull(selector, "Selector must not be null");
     }
 
     @Override

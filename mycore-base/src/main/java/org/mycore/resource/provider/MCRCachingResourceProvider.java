@@ -73,8 +73,11 @@ public class MCRCachingResourceProvider extends MCRResourceProviderBase {
 
     public MCRCachingResourceProvider(String coverage, int capacity, MCRResourceProvider provider) {
         super(coverage);
+        if (capacity < 1) {
+            throw new IllegalArgumentException("Capacity must be positive, got " + capacity);
+        }
         this.capacity = capacity;
-        this.provider = Objects.requireNonNull(provider);
+        this.provider = Objects.requireNonNull(provider, "Provider must not be null");
         this.cache = new MCRCache<>(capacity, coverage);
     }
 
