@@ -29,8 +29,8 @@ import org.mycore.common.log.MCRTreeMessage;
 
 /**
  * {@link MCRResourceSelectorBase} is a base implementation of {@link MCRResourceSelector} that
- * facilitates consistent logging. Implementors must provide a class-specific {@link Logger} and the
- * actual selection strategy ({@link MCRResourceSelectorBase#doSelect(List, MCRHints)}).
+ * facilitates consistent logging. Implementors must provide the actual selection strategy
+ * ({@link MCRResourceSelectorBase#doSelect(List, MCRHints)}).
  */
 public abstract class MCRResourceSelectorBase implements MCRResourceSelector {
 
@@ -44,17 +44,15 @@ public abstract class MCRResourceSelectorBase implements MCRResourceSelector {
             selectedResourceUrls = resourceUrls;
         }
         if (logger.isDebugEnabled()) {
-            return logResourceUrls(selectedResourceUrls);
-        } else {
-            return selectedResourceUrls;
-        }
+            logResourceUrls(selectedResourceUrls);
+        } 
+        return selectedResourceUrls;
     }
 
-    private List<URL> logResourceUrls(List<URL> resourceUrls) {
+    private void logResourceUrls(List<URL> resourceUrls) {
         for (URL resourceUrl : resourceUrls) {
             logger.debug("Selected resource URL {}", resourceUrl);
         }
-        return resourceUrls;
     }
 
     /**
