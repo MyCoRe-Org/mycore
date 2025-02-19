@@ -66,10 +66,8 @@ public final class MCRDefaultResourceInterceptFilter extends HttpFilter {
 
     @Override
     public void init(FilterConfig config) throws ServletException {
-
         servlet = new MCRResourceServlet();
         servlet.init(getServletConfig(config));
-
     }
 
     private static ServletConfig getServletConfig(FilterConfig config) {
