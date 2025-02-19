@@ -23,6 +23,10 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.xml.transform.Transformer;
 
@@ -59,6 +63,8 @@ public class MCRParameterCollector {
     private boolean modified = true;
 
     private int hashCode;
+
+    private boolean setPropertiesFromConfiguration;
 
     /**
      * Collects parameters The collecting of parameters is done in steps,
@@ -188,31 +194,20 @@ public class MCRParameterCollector {
      * Returns the parameter map.  
      */
     public Map<String, Object> getParameterMap() {
-        return Collections.unmodifiableMap(parameters);
+        Map<String, Object> mergedMap = new HashMap<>(SavePropertiesCacheHolder.getSafePropertiesCache());
+        mergedMap.putAll(parameters);
+        return Collections.unmodifiableMap(mergedMap);
     }
 
     /**
-     * Copies all MCRConfiguration properties as XSL parameters. Characters that are valid in property names
-     * but invalid in XML names are replaced with an underscore. Colons are replaced with underscores as well,
-     * because this character is used as a namespace separater in namespace-aware XML.
+     * Sets a marker so that all MCRConfiguration properties will be copied to XSL parameters, when
+     * {@link #setParametersTo(Transformer)} is called.
+     * Characters that are valid in property names but invalid in XML names are replaced with an underscore.
+     * Colons are replaced with underscores as well, because this character is used as a namespace separater in
+     * namespace-aware XML.
      */
     private void setFromConfiguration() {
-        for (Map.Entry<String, String> property : MCRConfiguration2.getPropertiesMap().entrySet()) {
-            parameters.put(xmlSafe(property.getKey()), property.getValue());
-        }
-    }
-
-    private String xmlSafe(String key) {
-        StringBuilder builder = new StringBuilder();
-        if (key.length() != 0) {
-            char first = key.charAt(0);
-            builder.append(first == ':' || !Verifier.isXMLNameStartCharacter(first) ? "_" : first);
-            for (int i = 1, n = key.length(); i < n; i++) {
-                char following = key.charAt(i);
-                builder.append(following == ':' || !Verifier.isXMLNameCharacter(following) ? "_" : following);
-            }
-        }
-        return builder.toString();
+        setPropertiesFromConfiguration = true;
     }
 
     /**
@@ -352,9 +347,12 @@ public class MCRParameterCollector {
      * properties object provided.
      * 
      * @param transformer
-     *            the Transformer object thats parameters should be set
+     *            the Transformer object that parameters should be set
      */
     public void setParametersTo(Transformer transformer) {
+        if (setPropertiesFromConfiguration) {
+            SavePropertiesCacheHolder.getSafePropertiesCache().forEach(transformer::setParameter);
+        }
         for (Map.Entry<String, Object> entry : parameters.entrySet()) {
             transformer.setParameter(entry.getKey(), entry.getValue());
         }
@@ -366,14 +364,95 @@ public class MCRParameterCollector {
         return job == null ? new MCRParameterCollector() : new MCRParameterCollector(job.getRequest());
     }
 
+    /**
+     * This method is used to clear the cache of the properties that are used in the XSL transformations.
+     * This should only be used in tests.
+     */
+    public static void clearCache(){
+        SavePropertiesCacheHolder.clear();
+    }
+
     public int hashCode() {
         if (modified) {
             int result = LOGGER.hashCode();
             //order of map should not harm result
+            result += SavePropertiesCacheHolder.getSafePropertiesCache().hashCode();
             result += parameters.entrySet().stream().mapToInt(Map.Entry::hashCode).sum();
             hashCode = result;
             modified = false;
         }
         return hashCode;
+    }
+
+    private static final class SavePropertiesCacheHolder {
+        private final static AtomicInteger COMPUTED_HASH_CODE = new AtomicInteger(0);
+        private final static AtomicReference<UUID> PROPERTIES_CHANGE_LISTENER_ID = new AtomicReference<>();
+        private static volatile Map<String, String> safePropertiesCache;
+
+        static synchronized void clear() {
+            safePropertiesCache = null;
+            COMPUTED_HASH_CODE.set(0);
+            UUID listenerID = PROPERTIES_CHANGE_LISTENER_ID.get();
+            if (listenerID != null) {
+                MCRConfiguration2.removePropertyChangeEventListener(listenerID);
+            }
+        }
+
+        static Map<String, String> getSafePropertiesCache() {
+            if (safePropertiesCache == null) {
+                synchronized (SavePropertiesCacheHolder.class) {
+                    if (safePropertiesCache == null) {
+                        safePropertiesCache = initializeSafeProperties();
+                    }
+                }
+            }
+            return safePropertiesCache;
+        }
+
+        static Map<String, String> initializeSafeProperties() {
+            Map<String, String> safeProperties = new ConcurrentHashMap<>();
+
+            UUID uuid = MCRConfiguration2.addPropertyChangeEventLister((k) -> true, (k, old, _new) -> {
+                if (_new.isEmpty() && old.isPresent()) {
+                    safeProperties.remove(xmlSafe(k));
+                    COMPUTED_HASH_CODE.set(computeHashCode(safeProperties));
+                } else if (_new.isPresent()) {
+                    safeProperties.put(xmlSafe(k), _new.get());
+                    COMPUTED_HASH_CODE.set(computeHashCode(safeProperties));
+                }
+            });
+
+            PROPERTIES_CHANGE_LISTENER_ID.set(uuid);
+
+            MCRConfiguration2.getPropertiesMap().forEach((key, value) -> {
+                safeProperties.put(xmlSafe(key), value);
+            });
+
+            COMPUTED_HASH_CODE.set(computeHashCode(safeProperties));
+
+            return safeProperties;
+        }
+
+        private static int computeHashCode(Map<String, String> map) {
+            return map.entrySet().stream().mapToInt(Map.Entry::hashCode).sum();
+        }
+
+        private static String xmlSafe(String key) {
+            StringBuilder builder = new StringBuilder();
+            if (!key.isEmpty()) {
+                char first = key.charAt(0);
+                builder.append(first == ':' || !Verifier.isXMLNameStartCharacter(first) ? "_" : first);
+                for (int i = 1; i < key.length(); i++) {
+                    char following = key.charAt(i);
+                    builder.append(following == ':' || !Verifier.isXMLNameCharacter(following) ? "_" : following);
+                }
+            }
+            return builder.toString();
+        }
+
+        @Override
+        public int hashCode() {
+            return COMPUTED_HASH_CODE.get();
+        }
     }
 }
