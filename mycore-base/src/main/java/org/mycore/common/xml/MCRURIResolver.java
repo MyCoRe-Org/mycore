@@ -19,7 +19,6 @@
 package org.mycore.common.xml;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
@@ -80,7 +79,6 @@ import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.content.MCRSourceContent;
-import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
@@ -437,22 +435,6 @@ public final class MCRURIResolver implements URIResolver {
         }
         String msg = "Unsupported scheme type: " + scheme;
         throw new MCRUsageException(msg);
-    }
-
-    /**
-     * Reads xml from an InputStream and returns the parsed root element.
-     *
-     * @param in
-     *            the InputStream that contains the XML document
-     * @return the root element of the parsed input stream
-     */
-    @Deprecated
-    protected Element parseStream(InputStream in) throws JDOMException, IOException {
-        final MCRStreamContent streamContent = new MCRStreamContent(in);
-        return MCRXMLParserFactory
-            .getNonValidatingParser()
-            .parseXML(streamContent)
-            .getRootElement();
     }
 
     /**
