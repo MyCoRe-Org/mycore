@@ -720,8 +720,9 @@ public abstract class MCROCFLVirtualObject {
     /**
      * Converts the specified versioned path to a local file system path. The path can either point at the local
      * temporary storage (if it exists) or at the original OCFL file or directory.
-     * <p>Use the returned path ONLY for read operations. Its not allowed to write/move or remove the returned path.
-     * Because this would create inconsistencies in the OCFL repository or the local storage.</p>
+     * <p>
+ *     Use the returned path ONLY for read operations. It's not allowed to write/move or remove the returned path.
+     * Because this would create inconsistencies in the OCFL repository or the local storage.
      *
      * @param path the virtual path.
      * @return the physical path.

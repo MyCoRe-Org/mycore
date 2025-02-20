@@ -161,6 +161,8 @@ public interface MCROCFLTempFileStorage {
 
     /**
      * Converts the specified owner and version to a physical path.
+     * <p>
+     * If called externally, use the returned path only for READ operations!
      *
      * @param owner the owner.
      * @param version the version.
@@ -170,6 +172,8 @@ public interface MCROCFLTempFileStorage {
 
     /**
      * Converts the specified versioned path to a physical path.
+     * <p>
+     * If called externally, use the returned path only for READ operations!
      *
      * @param path the versioned path.
      * @return the physical path.
