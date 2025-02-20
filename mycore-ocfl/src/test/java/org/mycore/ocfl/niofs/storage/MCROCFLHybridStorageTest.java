@@ -42,18 +42,22 @@ public class MCROCFLHybridStorageTest extends MCROCFLStorageTestCase {
     }
 
     @Test
-    public void toPhysicalPath() {
+    public void toPhysicalPath() throws IOException {
         String rollingDirectory = "/" + MCROCFLHybridStorage.ROLLING_DIRECTORY + "/";
         String transactionDirectory = "/" + MCROCFLHybridStorage.TRANSACTION_DIRECTORY + "/";
         assertTrue("should access rolling store", storage.toPhysicalPath(path1).toString().contains(rollingDirectory));
         MCRTransactionManager.beginTransactions();
-        assertTrue("should access transactional store",
+        assertTrue("should access rolling store because the transaction store is empty",
+            storage.toPhysicalPath(path1).toString().contains(rollingDirectory));
+        write(path1);
+        assertTrue("should access transactional store because a file was written there",
             storage.toPhysicalPath(path1).toString().contains(transactionDirectory));
         MCRTransactionManager.commitTransactions();
-        assertTrue("should access rolling store", storage.toPhysicalPath(path1).toString().contains(rollingDirectory));
+        assertTrue("should access rolling store because there is no active transaction",
+            storage.toPhysicalPath(path1).toString().contains(rollingDirectory));
         MCRTransactionManager.beginTransactions();
-        assertTrue("should access transactional store",
-            storage.toPhysicalPath(path1).toString().contains(transactionDirectory));
+        assertTrue("should access rolling store because the transaction store is empty",
+            storage.toPhysicalPath(path1).toString().contains(rollingDirectory));
         MCRTransactionManager.commitTransactions();
     }
 
