@@ -335,4 +335,7 @@
   <!-- Security Rules (Include entire ruleset) -->
   <rule ref="category/java/security.xml"/>
 
+  <!-- Custom MyCoRe rules  -->
+  <rule ref="rules.xml"/>
+
 </ruleset>
