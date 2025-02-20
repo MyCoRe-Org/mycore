@@ -44,7 +44,6 @@ import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRComponent;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
@@ -54,6 +53,7 @@ import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
+import org.mycore.resource.MCRResourceHelper;
 
 /**
  * This class contains the basic commands for MyCoRe Command Line and WebCLI.
@@ -224,7 +224,6 @@ public class MCRBasicCommands {
     }
 
     private static void createSampleConfigFile(String path) throws IOException {
-        ClassLoader classLoader = MCRClassTools.getClassLoader();
         Path configurationDirectory = MCRConfigurationDir.getConfigurationDirectory().toPath();
         Path targetFile = configurationDirectory.resolve(path);
         if (Files.exists(targetFile)) {
@@ -237,7 +236,7 @@ public class MCRBasicCommands {
                 throw new IOException("Could not create directory for file: " + targetFile);
             }
         }
-        try (InputStream templateResource = classLoader.getResourceAsStream("configdir.template/" + path)) {
+        try (InputStream templateResource = MCRResourceHelper.getResourceAsStream("configdir.template/" + path)) {
             if (templateResource == null) {
                 throw new IOException("Could not find template for " + path);
             }
@@ -301,6 +300,7 @@ public class MCRBasicCommands {
      * @return true, if the mappings changed
      * @throws IOException
      */
+    @SuppressWarnings("PMD.MCR.ResourceResolver")
     private static boolean updatePersistenceMappings(Document persistenceDoc) throws IOException {
         Namespace nsPersistence = persistenceDoc.getRootElement().getNamespace();
         Element ePersistenceUnit = persistenceDoc.getRootElement().getChild("persistence-unit", nsPersistence);

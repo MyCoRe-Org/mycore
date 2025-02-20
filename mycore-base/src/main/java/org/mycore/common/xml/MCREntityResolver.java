@@ -58,6 +58,7 @@ import org.xml.sax.ext.EntityResolver2;
  * @author Thomas Scheffler (yagee)
  * @since 2013.10
  */
+@SuppressWarnings("PMD.MCR.ResourceResolver")
 public final class MCREntityResolver implements EntityResolver2, LSResourceResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();

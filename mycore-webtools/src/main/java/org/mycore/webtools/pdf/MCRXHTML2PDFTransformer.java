@@ -23,12 +23,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.Normalizer;
 
-import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
+import org.mycore.resource.MCRResourceHelper;
 
 import com.itextpdf.html2pdf.ConverterProperties;
 import com.itextpdf.html2pdf.HtmlConverter;
@@ -67,12 +67,11 @@ public class MCRXHTML2PDFTransformer extends MCRContentTransformer {
     protected synchronized FontProvider lazyInitFontProvider() {
         if (fontProvider == null) {
             fontProvider = new FontProvider();
-            final ClassLoader cl = MCRClassTools.getClassLoader();
             MCRConfiguration2.getString("MCR.ContentTransformer." + id + ".FontResources")
                 .stream()
                 .flatMap(MCRConfiguration2::splitValue)
                 .forEach((path) -> {
-                    try (InputStream is = cl.getResource(path).openStream()) {
+                    try (InputStream is = MCRResourceHelper.getResourceAsStream(path)) {
                         fontProvider.addFont(is.readAllBytes());
                     } catch (IOException e) {
                         throw new MCRConfigurationException("Error while loading configured fonts!", e);

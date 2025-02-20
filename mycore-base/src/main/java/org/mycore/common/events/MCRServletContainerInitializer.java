@@ -39,6 +39,7 @@ import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventorFactory;
 /**
  * @author Thomas Scheffler (yagee)
  */
+@SuppressWarnings("PMD.MCR.ResourceResolver")
 public class MCRServletContainerInitializer implements ServletContainerInitializer {
 
     /* (non-Javadoc)

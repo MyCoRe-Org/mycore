@@ -30,6 +30,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.mycore.resource.MCRResourceHelper;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -80,7 +81,7 @@ public class MCRTEIValidator implements ErrorHandler {
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         schemaFactory.setFeature("http://apache.org/xml/features/validation/schema-full-checking", false);
         schemaFactory.setErrorHandler(this);
-        return schemaFactory.newSchema(Thread.currentThread().getContextClassLoader().getResource(path));
+        return schemaFactory.newSchema(MCRResourceHelper.getResourceUrl(path));
     }
 
     /**
