@@ -42,7 +42,6 @@ import java.util.stream.Stream;
 
 import org.apache.commons.text.StringSubstitutor;
 import org.jdom2.Element;
-import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
@@ -51,6 +50,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.events.MCRStartupHandler;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.resource.MCRResourceHelper;
 
 /**
  * The main class implementing the MyCoRe command line interface. With the
@@ -334,7 +334,7 @@ public class MCRCommandLineInterface {
     }
 
     public static List<String> readCommandsRessource(String resource) throws IOException {
-        final URL resourceURL = MCRClassTools.getClassLoader().getResource(resource);
+        final URL resourceURL = MCRResourceHelper.getResourceUrl(resource);
         if (resourceURL == null) {
             throw new IOException("Resource URL is null!");
         }

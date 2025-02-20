@@ -47,6 +47,7 @@ import org.mycore.resource.hint.MCRResourceHintKeys;
  * [...].Coverage=Lorem ipsum dolor sit amet
  * </pre>
  */
+@SuppressWarnings("PMD.MCR.ResourceResolver")
 @MCRConfigurationProxy(proxyClass = MCRClassLoaderResourceProvider.Factory.class)
 public class MCRClassLoaderResourceProvider extends MCRResourceProviderBase {
 

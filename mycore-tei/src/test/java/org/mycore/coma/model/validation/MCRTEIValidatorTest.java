@@ -25,10 +25,11 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.mycore.common.MCRTestCase;
 import org.mycore.tei.MCRTEIValidator;
 import org.xml.sax.SAXException;
 
-public class MCRTEIValidatorTest {
+public class MCRTEIValidatorTest extends MCRTestCase {
 
     @Test
     public void validate() throws IOException, SAXException {

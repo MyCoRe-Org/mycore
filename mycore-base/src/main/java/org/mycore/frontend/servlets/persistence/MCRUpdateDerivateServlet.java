@@ -136,7 +136,7 @@ public class MCRUpdateDerivateServlet extends MCRPersistenceServlet {
             Properties params = new Properties();
             params.put("sourceUri", "xslStyle:mycorederivate-editor:mcrobject:" + derivateID);
             params.put("cancelUrl", MCRPersistenceHelper.getCancelUrl(request));
-            String page = MCRPersistenceHelper.getWebPage(getServletContext(), "editor_form_derivate.xed",
+            String page = MCRPersistenceHelper.getWebPage("editor_form_derivate.xed",
                 "editor_form_derivate.xml");
             String redirectURL = MCRFrontendUtil.getBaseURL() + page;
             response

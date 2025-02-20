@@ -405,6 +405,7 @@ public class MCRTranslation {
         return false;
     }
 
+    @SuppressWarnings("PMD.MCR.ResourceResolver")
     static Properties loadProperties() {
         Properties deprecatedMapping = new Properties();
         try {

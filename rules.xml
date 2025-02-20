@@ -12,6 +12,12 @@
         message="The serialVersionUID should be annotated with @java.io.Serial"
         class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
     <priority>4</priority>
+    <description>
+      Field should look like this:
+
+      @Serial
+      private static final long serialVersionUID = 1L;
+    </description>
     <properties>
       <property name="xpath">
         <value>
@@ -42,6 +48,12 @@
         message="The serialVersionUID should have literal value '1L'"
         class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
     <priority>4</priority>
+    <description>
+      Field should look like this:
+
+      @Serial
+      private static final long serialVersionUID = 1L;
+    </description>
     <properties>
       <property name="xpath">
         <value>
@@ -61,6 +73,51 @@
               [
                 not(VariableDeclarator/NumericLiteral[@Image='1L'])
               ]
+          ]]>
+        </value>
+      </property>
+    </properties>
+  </rule>
+
+  <rule name="MCR.ResourceResolver"
+        language="java"
+        message="Resources should be accessed using MCRResourceResolver or MCRResourceHelper"
+        class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+    <description>
+      Accessing resources directly via Class, ClassLoader or ServletContext should only be done
+      - in classes that are part of the setup of the MyCoRe application (e.g. MCRConfigurationInputStream, MCRComponent),
+      - in classes that are used by MCRResourceResolver (e.g. MCRResourceProvider, MCRResourceLocator) or
+      - in rare cases where module specific files need to be accessed (e.g. MCRCoreVersion accessing git.properties).
+      Otherwise, MCRResourceResolver or MCRResourceHelper should be used.
+    </description>
+    <priority>1</priority>
+    <properties>
+      <property name="xpath">
+        <value>
+          <![CDATA[
+            //(MethodCall|MethodReference)
+              [*[position() = 1 and pmd-java:typeIs('java.lang.Class')]]
+              [@MethodName=(
+                'getResource',
+                'getResourceAsStream'
+              )]
+              |
+            //(MethodCall|MethodReference)
+              [*[position() = 1 and pmd-java:typeIs('java.lang.ClassLoader')]]
+              [@MethodName=(
+                'resources',
+                'getResource',
+                'getResources',
+                'getResourceAsStream'
+              )]
+              |
+            //(MethodCall|MethodReference)
+              [*[position() = 1 and pmd-java:typeIs('jakarta.servlet.ServletContext')]]
+              [@MethodName=(
+                'getResource',
+                'getResourcePaths',
+                'getResourceAsStream'
+              )]
           ]]>
         </value>
       </property>

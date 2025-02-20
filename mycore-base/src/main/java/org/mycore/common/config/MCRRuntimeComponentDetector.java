@@ -49,6 +49,7 @@ import com.google.common.collect.Sets;
  * @author Thomas Scheffler (yagee)
  * @since 2013.12
  */
+@SuppressWarnings("PMD.MCR.ResourceResolver")
 public class MCRRuntimeComponentDetector {
 
     private static final Logger LOGGER = LogManager.getLogger();

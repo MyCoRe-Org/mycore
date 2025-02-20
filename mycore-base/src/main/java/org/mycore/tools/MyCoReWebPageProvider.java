@@ -37,6 +37,7 @@ import org.jdom2.Namespace;
 import org.jdom2.Text;
 import org.jdom2.input.SAXBuilder;
 import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.resource.MCRResourceHelper;
 import org.xml.sax.InputSource;
 
 /**
@@ -56,6 +57,7 @@ import org.xml.sax.InputSource;
  * @author shermann
  * @author Matthias Eichner
  */
+@SuppressWarnings("PMD.MCR.ResourceResolver")
 public class MyCoReWebPageProvider {
 
     /** German language key */
@@ -112,7 +114,7 @@ public class MyCoReWebPageProvider {
         SAXBuilder saxBuilder = new SAXBuilder();
         saxBuilder.setEntityResolver((publicId, systemId) -> {
             String resource = systemId.substring(systemId.lastIndexOf('/'));
-            InputStream is = getClass().getResourceAsStream(resource);
+            InputStream is = MCRResourceHelper.getResourceAsStream(resource);
             if (is == null) {
                 throw new IOException(new FileNotFoundException("Unable to locate resource " + resource));
             }

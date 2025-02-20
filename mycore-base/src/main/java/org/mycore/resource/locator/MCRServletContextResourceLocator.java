@@ -48,6 +48,7 @@ import jakarta.servlet.ServletContext;
  * [...].Class=org.mycore.resource.locator.MCRServletContextResourceLocator
  * </pre>
  */
+@SuppressWarnings("PMD.MCR.ResourceResolver")
 @MCRConfigurationProxy(proxyClass = MCRServletContextResourceLocator.Factory.class)
 public class MCRServletContextResourceLocator extends MCRResourceLocatorBase {
 
