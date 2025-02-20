@@ -30,7 +30,6 @@ import java.nio.file.attribute.FileAttribute;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
-import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
@@ -108,10 +107,7 @@ public class MCROCFLHybridStorage implements MCROCFLTransactionalTempFileStorage
      */
     @Override
     public boolean exists(MCRVersionedPath path) {
-        if (MCRTransactionManager.isActive(MCROCFLFileSystemTransaction.class)) {
-            return this.transactionalStorage.exists(path) || this.rollingStorage.exists(path);
-        }
-        return this.rollingStorage.exists(path);
+        return getStore(path).exists(path);
     }
 
     /**
@@ -242,9 +238,31 @@ public class MCROCFLHybridStorage implements MCROCFLTransactionalTempFileStorage
      * {@inheritDoc}
      */
     @Override
+    public Path toPhysicalPath(MCRVersionedPath path) {
+        return getStore(path).toPhysicalPath(path);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Path toPhysicalPath(String owner, String version) {
-        return MCROCFLFileSystemTransaction.isActive() ? this.transactionalStorage.toPhysicalPath(owner, version)
-            : this.rollingStorage.toPhysicalPath(owner, version);
+        if (MCROCFLFileSystemTransaction.isActive()) {
+            return this.transactionalStorage.toPhysicalPath(owner, version);
+        }
+        return this.rollingStorage.toPhysicalPath(owner, version);
+    }
+
+    private MCROCFLTempFileStorage getStore(MCRVersionedPath path) {
+        boolean activeTransaction = MCROCFLFileSystemTransaction.isActive();
+        if (!activeTransaction) {
+            return this.rollingStorage;
+        }
+        boolean doesExistInTransaction = this.transactionalStorage.exists(path);
+        if (doesExistInTransaction) {
+            return this.transactionalStorage;
+        }
+        return this.rollingStorage;
     }
 
 }
