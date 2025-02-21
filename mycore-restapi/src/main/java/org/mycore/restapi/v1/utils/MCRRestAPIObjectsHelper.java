@@ -18,6 +18,9 @@
 
 package org.mycore.restapi.v1.utils;
 
+import static org.mycore.frontend.jersey.MCRJerseyUtil.APPLICATION_JSON_UTF_8;
+import static org.mycore.frontend.jersey.MCRJerseyUtil.APPLICATION_XML_UTF_8;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
@@ -52,6 +55,7 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRXlink;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
@@ -62,7 +66,9 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.MCRPathXML;
 import org.mycore.frontend.idmapper.MCRIDMapper;
@@ -76,6 +82,7 @@ import com.google.gson.stream.JsonWriter;
 
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.CacheControl;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Request;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.ResponseBuilder;
@@ -95,13 +102,14 @@ import jakarta.ws.rs.core.UriInfo;
  * @author Christoph Neidahl
  */
 public class MCRRestAPIObjectsHelper {
+
     private enum Mode {
         MCROBJECT, MCRDERIVATE
     }
 
     private static final String GENERAL_ERROR_MSG = "A problem occurred while fetching the data.";
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIObjectsHelper.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final DateTimeFormatter SDF_UTC = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
 
@@ -113,7 +121,7 @@ public class MCRRestAPIObjectsHelper {
         MCRObjectID mcrObjId = retrieveMCRObjectID(pathParamId);
         MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(mcrObjId);
         Document doc = mcrObj.createXML();
-        Element eStructure = doc.getRootElement().getChild("structure");
+        Element eStructure = doc.getRootElement().getChild(MCRObjectStructure.XML_NAME);
 
         if (queryParamStyle != null && !MCRRestAPIObjects.STYLE_DERIVATEDETAILS.equals(queryParamStyle)) {
             throw new MCRRestAPIException(Response.Status.BAD_REQUEST,
@@ -123,10 +131,10 @@ public class MCRRestAPIObjectsHelper {
         }
 
         if (MCRRestAPIObjects.STYLE_DERIVATEDETAILS.equals(queryParamStyle) && eStructure != null) {
-            Element eDerObjects = eStructure.getChild("derobjects");
+            Element eDerObjects = eStructure.getChild(MCRObjectStructure.ELEMENT_DERIVATE_OBJECTS);
             if (eDerObjects != null) {
                 for (Element eDer : eDerObjects.getChildren("derobject")) {
-                    String derID = eDer.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
+                    String derID = eDer.getAttributeValue(MCRXlink.HREF, MCRConstants.XLINK_NAMESPACE);
                     Element currentDerElement = eDer;
                     try {
                         MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derID));
@@ -135,7 +143,7 @@ public class MCRRestAPIObjectsHelper {
                         //<mycorederivate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:noNamespaceSchemaLocation="datamodel-derivate.xsd" ID="cpr_derivate_00003760" label="display_image" version="1.3">
                         //  <derivate display="true">
 
-                        currentDerElement = eDer.getChild("mycorederivate").getChild("derivate");
+                        currentDerElement = eDer.getChild(MCRDerivate.ROOT_NAME).getChild(MCRObjectDerivate.XML_NAME);
                         Document docContents = listDerivateContentAsXML(
                             MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derID)), "/", -1, info, app);
                         if (docContents.hasRootElement()) {
@@ -178,7 +186,7 @@ public class MCRRestAPIObjectsHelper {
         }
 
         return Response.ok(sw.toString())
-            .type("application/xml")
+            .type(MediaType.APPLICATION_XML)
             .build();
     }
 
@@ -202,7 +210,7 @@ public class MCRRestAPIObjectsHelper {
             outputter.output(doc, sw);
 
             return Response.ok(sw.toString())
-                .type("application/xml")
+                .type(MediaType.APPLICATION_XML)
                 .build();
         } catch (IOException e) {
             MCRRestAPIException restAPIException = new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR,
@@ -473,7 +481,7 @@ public class MCRRestAPIObjectsHelper {
             .getStructure().getDerivates().stream()
             .map(MCRMetaLinkID::getXLinkHrefID)
             .filter(MCRMetadataManager::exists)
-            .map(id -> createMCRObjectIDDate(id))
+            .map(MCRRestAPIObjectsHelper::createMCRObjectIDDate)
             .sorted(new MCRRestAPISortObjectComparator(sortObj))
             .collect(Collectors.toList());
     }
@@ -546,7 +554,7 @@ public class MCRRestAPIObjectsHelper {
         try (StringWriter sw = new StringWriter()) {
             new XMLOutputter(Format.getPrettyFormat()).output(docOut, sw);
             return Response.ok(sw.toString())
-                .type("application/xml; charset=UTF-8")
+                .type(APPLICATION_XML_UTF_8)
                 .build();
         } catch (IOException e) {
             MCRRestAPIException restAPIException = new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR,
@@ -592,7 +600,7 @@ public class MCRRestAPIObjectsHelper {
             writer.endArray();
             writer.endObject();
             return Response.ok(sw.toString())
-                .type("application/json; charset=UTF-8")
+                .type(APPLICATION_JSON_UTF_8)
                 .build();
         } catch (IOException e) {
             MCRRestAPIException restAPIException = new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR,
@@ -639,7 +647,7 @@ public class MCRRestAPIObjectsHelper {
                     try (StringWriter sw = new StringWriter()) {
                         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
                         xout.output(docOut, sw);
-                        return response(sw.toString(), "application/xml", lastModified);
+                        return response(sw.toString(), MediaType.APPLICATION_XML, lastModified);
                     } catch (IOException e) {
                         MCRRestAPIException restAPIException = new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR,
                             new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, GENERAL_ERROR_MSG,
@@ -649,17 +657,17 @@ public class MCRRestAPIObjectsHelper {
                     }
                 case MCRRestAPIObjects.FORMAT_JSON:
                     String result = listDerivateContentAsJson(derObj, path, depth, info, app);
-                    return response(result, "application/json", lastModified);
+                    return response(result, MediaType.APPLICATION_JSON, lastModified);
                 default:
                     throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
                         new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR,
-                            "Unexepected program flow termination.",
+                            "Unexpected program flow termination.",
                             "Please contact a developer!"));
 
             }
         } catch (IOException e) {
             MCRRestAPIException restAPIException = new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR,
-                new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, "Unexepected program flow termination.",
+                new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, "Unexpected program flow termination.",
                     e.getMessage()));
             restAPIException.initCause(e);
             throw restAPIException;

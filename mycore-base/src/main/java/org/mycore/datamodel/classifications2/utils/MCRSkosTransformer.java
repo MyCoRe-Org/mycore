@@ -33,9 +33,10 @@ import org.mycore.frontend.MCRFrontendUtil;
  * Transforms MyCoRe classification and category objects into SKOS resources
  * 
  * @author Robert Stephan
- *
  */
 public class MCRSkosTransformer {
+
+    public static final String ATTRIBUTE_RESOURCE = "resource";
 
     /**
      * return a classification tree as SKOS XML
@@ -72,7 +73,7 @@ public class MCRSkosTransformer {
 
             for (MCRCategory child : categ.getChildren()) {
                 eConcept.addContent(new Element("hasTopConcept", MCRConstants.SKOS_NAMESPACE)
-                    .setAttribute("resource", retrieveURI(child), MCRConstants.RDF_NAMESPACE));
+                    .setAttribute(ATTRIBUTE_RESOURCE, retrieveURI(child), MCRConstants.RDF_NAMESPACE));
                 createSkosConcept(child, current, eRDF);
             }
         }
@@ -95,19 +96,19 @@ public class MCRSkosTransformer {
                 if (categ.getParent().isClassification()) {
                     // skos:topConceptOf is a sub-property of skos:inScheme.
                     eConcept.addContent(new Element("isTopConceptOf", MCRConstants.SKOS_NAMESPACE)
-                        .setAttribute("resource", retrieveURI(categ.getParent()), MCRConstants.RDF_NAMESPACE));
+                        .setAttribute(ATTRIBUTE_RESOURCE, retrieveURI(categ.getParent()), MCRConstants.RDF_NAMESPACE));
                 }
                 if (categ.getParent().isCategory()) {
                     eConcept.addContent(new Element("broader", MCRConstants.SKOS_NAMESPACE)
-                        .setAttribute("resource", retrieveURI(categ.getParent()), MCRConstants.RDF_NAMESPACE));
+                        .setAttribute(ATTRIBUTE_RESOURCE, retrieveURI(categ.getParent()), MCRConstants.RDF_NAMESPACE));
                     eConcept.addContent(new Element("inScheme", MCRConstants.SKOS_NAMESPACE)
-                        .setAttribute("resource", retrieveURI(categ.getRoot()), MCRConstants.RDF_NAMESPACE));
+                        .setAttribute(ATTRIBUTE_RESOURCE, retrieveURI(categ.getRoot()), MCRConstants.RDF_NAMESPACE));
                 }
             }
 
             for (MCRCategory child : categ.getChildren()) {
                 eConcept.addContent(new Element("narrower", MCRConstants.SKOS_NAMESPACE)
-                    .setAttribute("resource", retrieveURI(child), MCRConstants.RDF_NAMESPACE));
+                    .setAttribute(ATTRIBUTE_RESOURCE, retrieveURI(child), MCRConstants.RDF_NAMESPACE));
                 createSkosConcept(child, current, eRDF);
             }
 
@@ -117,7 +118,7 @@ public class MCRSkosTransformer {
                 MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
                 for (MCRCategory c : categoryDAO.getChildren(current)) {
                     eConcept.addContent(new Element("narrower", MCRConstants.SKOS_NAMESPACE)
-                        .setAttribute("resource", retrieveURI(c), MCRConstants.RDF_NAMESPACE));
+                        .setAttribute(ATTRIBUTE_RESOURCE, retrieveURI(c), MCRConstants.RDF_NAMESPACE));
                 }
             }
         }
@@ -144,7 +145,7 @@ public class MCRSkosTransformer {
         categ.getLabel("x-skos-exact").ifPresent(x -> {
             for (String uri : x.getText().split("\\s")) {
                 eConcept.addContent(new Element("exactMatch", MCRConstants.SKOS_NAMESPACE)
-                    .setAttribute("resource", uri, MCRConstants.RDF_NAMESPACE));
+                    .setAttribute(ATTRIBUTE_RESOURCE, uri, MCRConstants.RDF_NAMESPACE));
             }
         });
     }

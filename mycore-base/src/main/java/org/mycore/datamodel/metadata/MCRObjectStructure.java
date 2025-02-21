@@ -31,6 +31,7 @@ import org.mycore.common.MCRException;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import org.mycore.common.MCRXlink;
 
 /**
  * This class implements code for the inheritance of metadata of linked objects
@@ -58,13 +59,17 @@ import com.google.gson.JsonObject;
  */
 public class MCRObjectStructure {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    public static final String XML_NAME = "structure";
+
+    public static final String ELEMENT_DERIVATE_OBJECTS = "derobjects";
+
     private MCRMetaLinkID parent;
 
     private final List<MCRMetaLinkID> children;
 
     private final List<MCRMetaEnrichedLinkID> derivates;
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * The constructor initializes NL (non-static, in order to enable different
@@ -328,7 +333,7 @@ public class MCRObjectStructure {
         }
 
         // Structure derivate part
-        subElement = element.getChild("derobjects");
+        subElement = element.getChild(ELEMENT_DERIVATE_OBJECTS);
 
         if (subElement != null) {
             List<Element> derobjectList = subElement.getChildren();
@@ -354,7 +359,7 @@ public class MCRObjectStructure {
             throw new MCRException("The content is not valid.", exc);
         }
 
-        Element elm = new Element("structure");
+        Element elm = new Element(XML_NAME);
 
         if (parent != null) {
             Element elmm = new Element("parents");
@@ -373,7 +378,7 @@ public class MCRObjectStructure {
         }
 
         if (!derivates.isEmpty()) {
-            Element elmm = new Element("derobjects");
+            Element elmm = new Element(ELEMENT_DERIVATE_OBJECTS);
             elmm.setAttribute("class", "MCRMetaEnrichedLinkID");
             for (MCRMetaLinkID derivate : getDerivates()) {
                 elmm.addContent(derivate.createXML());
@@ -484,13 +489,13 @@ public class MCRObjectStructure {
             } catch (Exception exc) {
                 throw new MCRException("The link to the derivate '" + derivate.getXLinkHref() + "' is invalid.", exc);
             }
-            if (!derivate.getXLinkType().equals("locator")) {
+            if (!derivate.getXLinkType().equals(MCRXlink.TYPE_LOCATOR)) {
                 throw new MCRException("The xlink:type of the derivate link '" + derivate.getXLinkHref()
                     + "' has to be 'locator' and not '" + derivate.getXLinkType() + "'.");
             }
 
             String typeId = derivate.getXLinkHrefID().getTypeId();
-            if (!typeId.equals("derivate")) {
+            if (!typeId.equals(MCRDerivate.OBJECT_TYPE)) {
                 throw new MCRException("The derivate link '" + derivate.getXLinkHref()
                     + "' is invalid. The _type_ has to be 'derivate' and not '" + typeId + "'.");
             }

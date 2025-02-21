@@ -18,8 +18,11 @@
 
 package org.mycore.iiif.image.impl;
 
+import java.io.Serial;
+
 public class MCRIIIFUnsupportedFormatException extends Exception {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public MCRIIIFUnsupportedFormatException(String unsupportedFormat) {

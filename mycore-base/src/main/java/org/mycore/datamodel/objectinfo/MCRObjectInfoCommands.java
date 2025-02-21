@@ -30,6 +30,7 @@ import org.jdom2.JDOMException;
 import org.mycore.backend.jpa.objectinfo.MCRObjectInfoEntityManager;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -53,7 +54,7 @@ public class MCRObjectInfoCommands {
     public static List<String> createAllObjectInfo() {
         MCRXMLMetadataManager mm = MCRXMLMetadataManager.instance();
         return mm.getObjectBaseIds()
-            .stream().filter(b -> !b.endsWith("derivate"))
+            .stream().filter(b -> !b.endsWith(MCRDerivate.OBJECT_TYPE))
             .map(b -> "create objectinfo for base " + b)
             .collect(Collectors.toList());
     }
@@ -63,7 +64,7 @@ public class MCRObjectInfoCommands {
     public static List<String> createObjectInfoForBase(String baseId) {
         String[] idParts = baseId.split("_");
         MCRXMLMetadataManager mm = MCRXMLMetadataManager.instance();
-        if (idParts[1].equals("derivate")) {
+        if (idParts[1].equals(MCRDerivate.OBJECT_TYPE)) {
             return List.of();
         }
 
@@ -79,7 +80,7 @@ public class MCRObjectInfoCommands {
     public static void createObjectInfoForObject(String idStr) {
         MCRObjectID id = MCRObjectID.getInstance(idStr);
         LogManager.getLogger().info(() -> "create objectinfo for object " + idStr);
-        if (id.getTypeId().equals("derivate")) {
+        if (id.getTypeId().equals(MCRDerivate.OBJECT_TYPE)) {
             return;
         }
         try {

@@ -19,6 +19,7 @@
 package org.mycore.frontend.fileupload;
 
 import java.io.InputStream;
+import java.io.Serial;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Objects;
@@ -53,6 +54,7 @@ import jakarta.servlet.http.Part;
 
 public final class MCRUploadViaFormServlet extends MCRServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger(MCRUploadViaFormServlet.class);

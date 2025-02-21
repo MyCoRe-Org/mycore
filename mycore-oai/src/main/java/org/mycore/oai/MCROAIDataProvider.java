@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -73,7 +74,7 @@ public class MCROAIDataProvider extends MCRServlet {
     private static final OAIXMLOutputProcessor OAI_XML_OUTPUT_PROCESSOR = new OAIXMLOutputProcessor();
 
     static {
-        ADAPTER_MAP = new HashMap<>();
+        ADAPTER_MAP = new ConcurrentHashMap<>();
     }
 
     private String myBaseURL;
@@ -105,16 +106,16 @@ public class MCROAIDataProvider extends MCRServlet {
         // handle request
         OAIResponse oaiResponse = oaiProvider.handleRequest(oaiRequest);
         // build response
-        Element xmlRespone = oaiResponse.toXML();
+        Element xmlResponse = oaiResponse.toXML();
 
         if (!(adapter instanceof MCROAIAdapter mcrAdapter) || mcrAdapter.moveNamespaceDeclarationsToRoot()) {
-            moveNamespacesUp(xmlRespone);
+            moveNamespacesUp(xmlResponse);
         }
 
         // fire
         job.getResponse().setContentType("text/xml; charset=UTF-8");
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat(), OAI_XML_OUTPUT_PROCESSOR);
-        xout.output(addXSLStyle(new Document(xmlRespone)), job.getResponse().getOutputStream());
+        xout.output(addXSLStyle(new Document(xmlResponse)), job.getResponse().getOutputStream());
     }
 
     /**
@@ -165,28 +166,23 @@ public class MCROAIDataProvider extends MCRServlet {
 
     private OAIAdapter getOAIAdapter() {
         String oaiAdapterKey = getServletName();
-        MCROAIAdapter oaiAdapter = ADAPTER_MAP.get(oaiAdapterKey);
-        if (oaiAdapter == null) {
-            synchronized (this) {
-                // double check because of synchronize block
-                oaiAdapter = ADAPTER_MAP.get(oaiAdapterKey);
-                if (oaiAdapter == null) {
-                    String adapter = MCROAIAdapter.PREFIX + oaiAdapterKey + ".Adapter";
-                    oaiAdapter = MCRConfiguration2.getInstanceOf(MCROAIAdapter.class, adapter)
-                        .orElseGet(() -> MCRConfiguration2.getInstanceOfOrThrow(
-                            MCROAIAdapter.class, MCROAIAdapter.PREFIX + "DefaultAdapter"));
-                    oaiAdapter.init(this.myBaseURL, oaiAdapterKey);
-                    ADAPTER_MAP.put(oaiAdapterKey, oaiAdapter);
-                }
-            }
-        }
+        return ADAPTER_MAP.computeIfAbsent(oaiAdapterKey, k -> createOAIAdapter(oaiAdapterKey));
+    }
+
+    private MCROAIAdapter createOAIAdapter(String oaiAdapterKey) {
+        MCROAIAdapter oaiAdapter;
+        String adapter = MCROAIAdapter.PREFIX + oaiAdapterKey + ".Adapter";
+        oaiAdapter = MCRConfiguration2.getInstanceOf(MCROAIAdapter.class, adapter)
+            .orElseGet(() -> MCRConfiguration2.getInstanceOfOrThrow(
+                MCROAIAdapter.class, MCROAIAdapter.PREFIX + "DefaultAdapter"));
+        oaiAdapter.init(this.myBaseURL, oaiAdapterKey);
         return oaiAdapter;
     }
 
     /**
      * Moves all namespace declarations in the children of target to the target.
      *
-     * @param target the namespace are bundled here
+     * @param target the namespace is bundled here
      */
     private void moveNamespacesUp(Element target) {
         Map<String, Namespace> existingNamespaces = getNamespaceMap(target);

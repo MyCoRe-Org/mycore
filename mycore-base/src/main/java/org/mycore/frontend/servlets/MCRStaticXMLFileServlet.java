@@ -19,6 +19,7 @@
 package org.mycore.frontend.servlets;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -49,9 +50,10 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRStaticXMLFileServlet extends MCRServlet {
 
-    private static final String READ_WEBPAGE_PERMISSION = MCRLayoutUtilities.getPermission2ReadWebpage();
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-    private static final long serialVersionUID = -9213353868244605750L;
+    private static final String READ_WEBPAGE_PERMISSION = MCRLayoutUtilities.getPermission2ReadWebpage();
 
     private static final String REDIRECT_GUESTS_PROPERTY = "MCR.StaticXMLFileServlet.NoAccess.RedirectGuestsToLogin";
 

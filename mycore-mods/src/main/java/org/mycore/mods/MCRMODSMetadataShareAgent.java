@@ -38,6 +38,7 @@ import org.jdom2.filter.Filters;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRXlink;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -51,7 +52,8 @@ import org.mycore.datamodel.metadata.share.MCRMetadataShareAgent;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
-    private static final Logger LOGGER = LogManager.getLogger(MCRMODSMetadataShareAgent.class);
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String HOST_SECTION_XPATH = "mods:relatedItem[@type='host']";
 
@@ -133,7 +135,7 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
             MCRObject recipient = MCRMetadataManager.retrieveMCRObject(recipientId);
             MCRMODSWrapper recipientWrapper = new MCRMODSWrapper(recipient);
             for (Element relatedItem : recipientWrapper.getLinkedRelatedItems()) {
-                String holderId = relatedItem.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
+                String holderId = relatedItem.getAttributeValue(MCRXlink.HREF, MCRConstants.XLINK_NAMESPACE);
                 if (holderWrapper.getMCRObject().getId().toString().equals(holderId)) {
                     @SuppressWarnings("unchecked")
                     Filter<Content> sharedMetadata = (Filter<Content>) Filters.element("part",
@@ -159,7 +161,7 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
      * @return true if the content should be removed
      */
     protected boolean isClearableRelatedItem(Element relatedItem) {
-        return relatedItem.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE) != null;
+        return relatedItem.getAttributeValue(MCRXlink.HREF, MCRConstants.XLINK_NAMESPACE) != null;
     }
 
     /* (non-Javadoc)
@@ -179,7 +181,7 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
         }
         for (Element relatedItem : childWrapper.getLinkedRelatedItems()) {
             String type = relatedItem.getAttributeValue("type");
-            String holderId = relatedItem.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
+            String holderId = relatedItem.getAttributeValue(MCRXlink.HREF, MCRConstants.XLINK_NAMESPACE);
             LOGGER.info("receive metadata from {} document {}", type, holderId);
             if ((holderId == null || parentID != null && parentID.toString().equals(holderId))
                 && MCRMODSRelationshipType.HOST.getValue().equals(type)) {
@@ -217,8 +219,9 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
         Element hostContainer = childWrapper.getElement(HOST_SECTION_XPATH);
         if (hostContainer == null) {
             LOGGER.info("Adding new relatedItem[@type='host'])");
+            String objectId = parentWrapper.getMCRObject().getId().toString();
             hostContainer = new Element("relatedItem", MCRConstants.MODS_NAMESPACE)
-                .setAttribute("href", parentWrapper.getMCRObject().getId().toString(), MCRConstants.XLINK_NAMESPACE)
+                .setAttribute(MCRXlink.HREF, objectId, MCRConstants.XLINK_NAMESPACE)
                 .setAttribute("type", "host");
             childWrapper.addElement(hostContainer);
         }
@@ -244,7 +247,7 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
      * @throws MCRPersistenceException if {@link MCRObjectID} of <code>relatedItem</code> is in <code>idCollected</code>
      */
     private void checkHierarchy(Element relatedItem, Set<MCRObjectID> idCollected) throws MCRPersistenceException {
-        final Attribute href = relatedItem.getAttribute("href", MCRConstants.XLINK_NAMESPACE);
+        final Attribute href = relatedItem.getAttribute(MCRXlink.HREF, MCRConstants.XLINK_NAMESPACE);
         if (href != null) {
             final String testId = href.getValue();
             LOGGER.debug("Checking relatedItem {}.", testId);

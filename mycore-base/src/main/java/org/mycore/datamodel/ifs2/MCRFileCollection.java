@@ -55,22 +55,24 @@ public class MCRFileCollection extends MCRDirectory {
 
     public static final String DATA_FILE = "mcrdata.xml";
 
+    private static final String ELEMENT_COLLECTION = "collection";
+
     /**
      * The store this file collection is stored in.
      */
-    private MCRStore store;
+    private final MCRStore store;
 
     /**
      * The ID of this file collection
      */
-    private int id;
+    private final int id;
 
     /**
      * Guard for additional data
-     *
+     * <p>
      * MCR-1869
      */
-    private MCRReadWriteGuard dataGuard;
+    private final MCRReadWriteGuard dataGuard;
 
     /**
      * Creates a new file collection in the given store, or retrieves an
@@ -84,7 +86,7 @@ public class MCRFileCollection extends MCRDirectory {
      *            the ID of this file collection
      */
     protected MCRFileCollection(MCRStore store, int id) throws IOException {
-        super(null, store.getSlot(id), new Element("collection"));
+        super(null, store.getSlot(id), new Element(ELEMENT_COLLECTION));
         this.store = store;
         this.id = id;
         this.dataGuard = new MCRReadWriteGuard();
@@ -107,7 +109,7 @@ public class MCRFileCollection extends MCRDirectory {
             LOGGER.warn("Metadata file is missing, repairing metadata...");
             writeData(e -> {
                 e.detach();
-                e.setName("collection");
+                e.setName(ELEMENT_COLLECTION);
                 e.removeContent();
                 new Document(e);
             });
@@ -117,7 +119,7 @@ public class MCRFileCollection extends MCRDirectory {
             Element parsed = new MCRPathContent(src).asXML().getRootElement();
             writeData(e -> {
                 e.detach();
-                e.setName("collection");
+                e.setName(ELEMENT_COLLECTION);
                 e.removeContent();
                 List<Content> parsedContent = new ArrayList<>(parsed.getContent());
                 parsedContent.forEach(Content::detach);
@@ -220,19 +222,19 @@ public class MCRFileCollection extends MCRDirectory {
 
     @Override
     public boolean hasChildren() throws IOException {
-        try (Stream<Path> stream = getUsableChildSream()) {
+        try (Stream<Path> stream = getUsableChildStream()) {
             return stream.findAny().isPresent();
         }
     }
 
     @Override
     public int getNumChildren() throws IOException {
-        try (Stream<Path> stream = getUsableChildSream()) {
+        try (Stream<Path> stream = getUsableChildStream()) {
             return Math.toIntExact(stream.count());
         }
     }
 
-    private Stream<Path> getUsableChildSream() throws IOException {
+    private Stream<Path> getUsableChildStream() throws IOException {
         return Files.list(path)
             .filter(p -> !DATA_FILE.equals(p.getFileName().toString()));
     }
@@ -250,7 +252,7 @@ public class MCRFileCollection extends MCRDirectory {
     public void repairMetadata() throws IOException {
         super.repairMetadata();
         writeData(e -> {
-            e.setName("collection");
+            e.setName(ELEMENT_COLLECTION);
             e.removeAttribute("name");
         });
         saveAdditionalData();

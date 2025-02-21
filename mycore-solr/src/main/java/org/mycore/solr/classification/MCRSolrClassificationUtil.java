@@ -278,7 +278,7 @@ public final class MCRSolrClassificationUtil {
         return classId.toString().replaceAll(":", "\\\\:");
     }
 
-    protected static void solrDelete(MCRCategoryID id, MCRCategory parent) {
+    static void solrDelete(MCRCategoryID id, MCRCategory parent) {
         try {
             // remove all descendants and itself
             HttpSolrClientBase solrClient = getCore().getClient();
@@ -299,7 +299,7 @@ public final class MCRSolrClassificationUtil {
         }
     }
 
-    protected static void solrMove(MCRCategoryID id, MCRCategoryID newParentID) {
+    static void solrMove(MCRCategoryID id, MCRCategoryID newParentID) {
         try {
             SolrClient solrClient = getCore().getClient();
             List<String> reindexList = MCRSolrSearchUtils.listIDs(solrClient,

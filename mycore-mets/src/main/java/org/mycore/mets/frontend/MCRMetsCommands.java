@@ -35,6 +35,7 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRPathContent;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.cli.MCRAbstractCommands;
@@ -142,7 +143,7 @@ public class MCRMetsCommands extends MCRAbstractCommands {
 
     @MCRCommand(syntax = "add mets files for project id {0}", order = 30)
     public static List<String> addMetsFileForProjectID(String projectID) {
-        return MCRCommandUtils.getIdsForProjectAndType(projectID, "derivate")
+        return MCRCommandUtils.getIdsForProjectAndType(projectID, MCRDerivate.OBJECT_TYPE)
             .map(id -> "add mets files for derivate " + id)
             .collect(Collectors.toList());
     }

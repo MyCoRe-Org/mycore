@@ -18,11 +18,14 @@
 
 package org.mycore.mcr.acl.accesskey.exception;
 
+import java.io.Serial;
+
 /**
  * Exception that refers to a disabled access key.
  */
 public class MCRAccessKeyDisabledException extends MCRAccessKeyException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public MCRAccessKeyDisabledException(String errorMessage) {

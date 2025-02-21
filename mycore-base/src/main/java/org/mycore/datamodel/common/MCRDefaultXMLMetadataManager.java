@@ -62,6 +62,7 @@ import org.mycore.datamodel.ifs2.MCRStoreManager;
 import org.mycore.datamodel.ifs2.MCRStoredMetadata;
 import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.history.MCRMetadataHistoryManager;
@@ -213,6 +214,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
      * @param path the path to check
      * @param type metadata store type
      */
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private void checkPath(Path path, String type) {
         if (!Files.exists(path)) {
             try {
@@ -353,7 +355,8 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         }
         MCRConfiguration2.set(configPrefix + "BaseDir", typePath.toAbsolutePath().toString());
         MCRConfiguration2.set(configPrefix + "ForceXML", String.valueOf(true));
-        String value = Objects.equals(objectType, "derivate") ? "mycorederivate" : "mycoreobject";
+        String value = Objects.equals(objectType, MCRDerivate.OBJECT_TYPE) ?
+                       MCRDerivate.ROOT_NAME : MCRObject.ROOT_NAME;
         MCRConfiguration2.set(configPrefix + "ForceDocType", value);
         createdStores.add(baseID);
         MCRStoreManager.createStore(baseID, clazz);

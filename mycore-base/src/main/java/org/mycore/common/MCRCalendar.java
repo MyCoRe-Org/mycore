@@ -132,6 +132,8 @@ public class MCRCalendar {
      */
     public static final int FIRST_EGYPTIAN_DAY;
 
+    private static final String INADMISSIBLE_DAY = "The day of the date is inadmissible.";
+
     static {
         final Calendar firstArmenian = GregorianCalendar.getInstance();
         firstArmenian.set(552, GregorianCalendar.JULY, 13);
@@ -236,14 +238,14 @@ public class MCRCalendar {
 
         // Test of the daily
         if (day > 31) {
-            throw new MCRException("The day of the date is inadmissible.");
+            throw new MCRException(INADMISSIBLE_DAY);
         } else if ((day > 30) && (mon == GregorianCalendar.APRIL || mon == GregorianCalendar.JUNE ||
             mon == GregorianCalendar.SEPTEMBER || mon == GregorianCalendar.NOVEMBER)) {
-            throw new MCRException("The day of the date is inadmissible.");
+            throw new MCRException(INADMISSIBLE_DAY);
         } else if ((day > 29) && (mon == GregorianCalendar.FEBRUARY)) {
-            throw new MCRException("The day of the date is inadmissible.");
+            throw new MCRException(INADMISSIBLE_DAY);
         } else if ((day > 28) && (mon == GregorianCalendar.FEBRUARY) && !isLeapYear(year, calendarType)) {
-            throw new MCRException("The day of the date is inadmissible.");
+            throw new MCRException(INADMISSIBLE_DAY);
         }
 
         return new int[] { year, mon, day, era };
@@ -373,7 +375,7 @@ public class MCRCalendar {
         }
         // Test of the daily
         if (day > 30 || mon % 2 == 1 && mon < 11 && day > 29 || day < 1) {
-            throw new MCRException("The day of the date is inadmissible.");
+            throw new MCRException(INADMISSIBLE_DAY);
         }
 
         IslamicCalendar calendar = new IslamicCalendar();
@@ -447,7 +449,7 @@ public class MCRCalendar {
         }
         // Test of the daily
         if (day > 30 || day < 1 || day > 6 && mon == 12) {
-            throw new MCRException("The day of the date is inadmissible.");
+            throw new MCRException(INADMISSIBLE_DAY);
         }
 
         return new int[] { year, mon, day, era };

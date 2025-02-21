@@ -45,6 +45,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -93,7 +94,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         order = 40)
     public static List<String> tileAll() {
         MessageFormat syntaxMF = new MessageFormat(TILE_DERIVATE_TILES_COMMAND_SYNTAX, Locale.ROOT);
-        return MCRCommandUtils.getIdsForType("derivate")
+        return MCRCommandUtils.getIdsForType(MCRDerivate.OBJECT_TYPE)
             .map(id -> syntaxMF.format(new Object[] { id }))
             .collect(Collectors.toList());
     }
@@ -107,7 +108,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         order = 10)
     public static List<String> checkAll() {
         MessageFormat syntaxMF = new MessageFormat(CHECK_TILES_OF_DERIVATE_COMMAND_SYNTAX, Locale.ROOT);
-        return MCRCommandUtils.getIdsForType("derivate")
+        return MCRCommandUtils.getIdsForType(MCRDerivate.OBJECT_TYPE)
             .map(id -> syntaxMF.format(new Object[] { id }))
             .collect(Collectors.toList());
     }
@@ -121,7 +122,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         order = 41)
     public static List<String> tileAllOfProject(String project) {
         MessageFormat syntaxMF = new MessageFormat(TILE_DERIVATE_TILES_COMMAND_SYNTAX, Locale.ROOT);
-        return MCRCommandUtils.getIdsForProjectAndType(project, "derivate")
+        return MCRCommandUtils.getIdsForProjectAndType(project, MCRDerivate.OBJECT_TYPE)
             .map(id -> syntaxMF.format(new Object[] { id }))
             .collect(Collectors.toList());
     }
@@ -135,7 +136,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         order = 11)
     public static List<String> checkAllOfProject(String project) {
         MessageFormat syntaxMF = new MessageFormat(CHECK_TILES_OF_DERIVATE_COMMAND_SYNTAX, Locale.ROOT);
-        return MCRCommandUtils.getIdsForProjectAndType(project, "derivate")
+        return MCRCommandUtils.getIdsForProjectAndType(project, MCRDerivate.OBJECT_TYPE)
             .map(id -> syntaxMF.format(new Object[] { id }))
             .collect(Collectors.toList());
     }

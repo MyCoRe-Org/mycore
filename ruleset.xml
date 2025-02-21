@@ -59,7 +59,7 @@
   <rule ref="category/java/bestpractices.xml/ReplaceVectorWithList"/>
   <rule ref="category/java/bestpractices.xml/SimplifiableTestAssertion"/>
   <rule ref="category/java/bestpractices.xml/NonExhaustiveSwitch"/>
-  <rule ref="category/java/bestpractices.xml/SystemPrintln" />
+  <rule ref="category/java/bestpractices.xml/SystemPrintln"/>
   <rule ref="category/java/bestpractices.xml/UnnecessaryVarargsArrayCreation"/>
   <!-- TODO: Create PR to fix this rule -->
   <!--
@@ -76,14 +76,8 @@
 
   <!-- Code Style Rules -->
   <rule ref="category/java/codestyle.xml/AvoidDollarSigns"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/codestyle.xml/AvoidProtectedFieldInFinalClass"/>
-  -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/codestyle.xml/AvoidProtectedMethodInFinalClassNotExtending"/>
-  -->
   <rule ref="category/java/codestyle.xml/ControlStatementBraces"/>
   <rule ref="category/java/codestyle.xml/EmptyControlStatement">
     <properties>
@@ -112,10 +106,7 @@
   <rule ref="category/java/codestyle.xml/MethodNamingConventions"/>
   <rule ref="category/java/codestyle.xml/NoPackage"/>
   <rule ref="category/java/codestyle.xml/PackageCase"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/codestyle.xml/UnnecessaryAnnotationValueElement"/>
-  -->
   <rule ref="category/java/codestyle.xml/UnnecessaryBoxing"/>
   <!-- TODO: Create PR to fix this rule -->
   <!--
@@ -200,11 +191,12 @@
   <rule ref="category/java/errorprone.xml/AvoidCatchingNPE"/>
   <rule ref="category/java/errorprone.xml/AvoidCatchingThrowable"/>
   <rule ref="category/java/errorprone.xml/AvoidDecimalLiteralsInBigDecimalConstructor"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
-  <rule ref="category/java/errorprone.xml/AvoidDuplicateLiterals"/>
-  -->
-  <rule ref="category/java/errorprone.xml/AvoidEnumAsIdentifier"/>
+  <rule ref="category/java/errorprone.xml/AvoidDuplicateLiterals">
+    <properties>
+      <property name="exceptionList" value="unchecked,rawtypes" />
+    </properties>
+  </rule>
+  <rule ref="category/java/errorprone.xml/AvoidEnumAsIdentifier" />
   <rule ref="category/java/errorprone.xml/AvoidInstanceofChecksInCatchClause"/>
   <rule ref="category/java/errorprone.xml/AvoidLosingExceptionInformation"/>
   <rule ref="category/java/errorprone.xml/AvoidMultipleUnaryOperators"/>
@@ -243,10 +235,7 @@
   <rule ref="category/java/errorprone.xml/JUnitStaticSuite"/>
   <rule ref="category/java/errorprone.xml/MethodWithSameNameAsEnclosingClass"/>
   <rule ref="category/java/errorprone.xml/MisplacedNullCheck"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/errorprone.xml/MissingSerialVersionUID"/>
-  -->
   <rule ref="category/java/errorprone.xml/MissingStaticMethodInNonInstantiatableClass"/>
   <rule ref="category/java/errorprone.xml/MoreThanOneLogger"/>
   <rule ref="category/java/errorprone.xml/NonCaseLabelInSwitch"/>
@@ -313,10 +302,7 @@
   <rule ref="category/java/multithreading.xml/DoNotUseThreads"/>
   -->
   <rule ref="category/java/multithreading.xml/DontCallThreadRun"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/multithreading.xml/DoubleCheckedLocking"/>
-  -->
   <rule ref="category/java/multithreading.xml/NonThreadSafeSingleton"/>
   <rule ref="category/java/multithreading.xml/UnsynchronizedStaticFormatter"/>
   <!-- TODO: Create PR to fix this rule -->

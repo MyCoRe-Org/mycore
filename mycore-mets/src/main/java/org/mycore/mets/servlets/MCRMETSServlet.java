@@ -19,6 +19,7 @@
 package org.mycore.mets.servlets;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Locale;
@@ -54,6 +55,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRMETSServlet extends MCRServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger(MCRMETSServlet.class);

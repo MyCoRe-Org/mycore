@@ -20,6 +20,7 @@ package org.mycore.services.zipper;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.Serial;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.zip.Deflater;
@@ -36,6 +37,8 @@ import jakarta.servlet.ServletOutputStream;
  * @author Thomas Scheffler
  */
 public class MCRZipServlet extends MCRCompressServlet<ZipArchiveOutputStream> {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override

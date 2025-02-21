@@ -20,6 +20,7 @@ package org.mycore.restapi.v1.utils;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Serial;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
@@ -66,6 +67,7 @@ public class MCRPropertiesToJSONTransformer implements MessageBodyWriter<Propert
         httpHeaders.putSingle(HttpHeaders.CONTENT_TYPE,
             MediaType.APPLICATION_JSON_TYPE.withCharset(StandardCharsets.UTF_8.name()));
         final Type mapType = new TypeToken<Map<String, String>>() {
+            @Serial
             private static final long serialVersionUID = 1L;
         }.getType();
         Map<String, String> writeMap = t.entrySet()

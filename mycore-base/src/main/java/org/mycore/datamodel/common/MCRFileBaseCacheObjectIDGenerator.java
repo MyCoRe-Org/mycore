@@ -53,6 +53,7 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
 
     static Map<String, ReentrantReadWriteLock> locks = new ConcurrentHashMap<>();
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static Path getCacheFilePath(String baseId) {
         Path idCachePath = getCacheDirPath();
 
@@ -74,6 +75,7 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
         return cacheFile;
     }
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static Path getCacheDirPath() {
         Path dataDir = getDataDirPath();
 
@@ -120,6 +122,7 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
      * @param baseId the base id
      * @param next the next free id to be returned by getNextFreeId
      */
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     public void setNextFreeId(String baseId, int next) {
         Path cacheFile = getCacheFilePath(baseId);
 
@@ -137,6 +140,7 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
         }
     }
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     @Override
     public MCRObjectID getNextFreeId(String baseId, int maxInWorkflow) {
         Path cacheFile = getCacheFilePath(baseId);

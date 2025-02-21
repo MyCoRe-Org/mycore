@@ -19,6 +19,7 @@
 package org.mycore.common;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -87,6 +88,9 @@ import jakarta.xml.bind.annotation.XmlValue;
  */
 public class MCRMailer extends MCRServlet {
 
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     private static final Logger LOGGER = LogManager.getLogger(MCRMailer.class);
 
     private static final String DELIMITER = "\n--------------------------------------\n";
@@ -97,8 +101,6 @@ public class MCRMailer extends MCRServlet {
 
     /** How often should MCRMailer try to send mail? */
     protected static int numTries;
-
-    private static final long serialVersionUID = 1L;
 
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
@@ -123,14 +125,14 @@ public class MCRMailer extends MCRServlet {
             if (MCRConfiguration2.getString("MCR.Mail.User").isPresent()
                 && MCRConfiguration2.getString("MCR.Mail.Password").isPresent()) {
                 auth = new SMTPAuthenticator();
-                mailProperties.setProperty("mail.smtp.auth", "true");
+                mailProperties.setProperty("mail.smtp.auth", Boolean.toString(true));
             }
             String starttsl = MCRConfiguration2.getString("MCR.Mail.STARTTLS").orElse("disabled");
             if (Objects.equals(starttsl, "enabled")) {
-                mailProperties.setProperty("mail.smtp.starttls.enabled", "true");
+                mailProperties.setProperty("mail.smtp.starttls.enabled", Boolean.toString(true));
             } else if (Objects.equals(starttsl, "required")) {
-                mailProperties.setProperty("mail.smtp.starttls.enabled", "true");
-                mailProperties.setProperty("mail.smtp.starttls.required", "true");
+                mailProperties.setProperty("mail.smtp.starttls.enabled", Boolean.toString(true));
+                mailProperties.setProperty("mail.smtp.starttls.required", Boolean.toString(true));
             }
             mailProperties.setProperty("mail.smtp.host", MCRConfiguration2.getStringOrThrow("MCR.Mail.Server"));
             mailProperties.setProperty("mail.transport.protocol",

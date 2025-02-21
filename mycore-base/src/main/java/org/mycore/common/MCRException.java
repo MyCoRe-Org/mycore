@@ -20,6 +20,7 @@ package org.mycore.common;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serial;
 import java.io.StringWriter;
 
 import org.apache.logging.log4j.LogManager;
@@ -34,7 +35,9 @@ import org.apache.logging.log4j.LogManager;
  * @see RuntimeException
  */
 public class MCRException extends RuntimeException {
-    private static final long serialVersionUID = -3396055962010289244L;
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * Creates a new MCRException with an error message

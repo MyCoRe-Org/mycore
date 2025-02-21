@@ -18,6 +18,7 @@
 
 package org.mycore.datamodel.classifications2.impl;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
@@ -139,7 +140,8 @@ import jakarta.persistence.UniqueConstraint;
 @Access(AccessType.PROPERTY)
 public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializable {
 
-    private static final long serialVersionUID = -7431317191711000317L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger(MCRCategoryImpl.class);
 

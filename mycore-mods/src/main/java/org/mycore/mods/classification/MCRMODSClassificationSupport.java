@@ -98,48 +98,40 @@ public final class MCRMODSClassificationSupport {
     }
 
     public static String getClassCategLink(final NodeList sources) {
-        if (sources.getLength() == 0) {
-            LOGGER.warn("Cannot get first element of node list 'sources'.");
+        MCRCategoryID category = getCategoryID(sources);
+        if(category == null) {
             return "";
         }
-        final Element source = (Element) sources.item(0);
-        MCRCategoryID category = MCRClassMapper.getCategoryID(source);
-        if (category == null) {
-            return "";
-        }
-
-        String id;
-        try {
-            id = MCRXMLFunctions.encodeURIPath(category.getId());
-        } catch (URISyntaxException e) {
-            /* This should be impossible! */
-            throw new MCRException(e);
-        }
-
+        String id = getId(category);
         return new MessageFormat("classification:metadata:0:children:{0}:{1}", Locale.ROOT).format(
             new Object[] { category.getRootID(), id });
     }
 
     public static String getClassCategParentLink(final NodeList sources) {
+        MCRCategoryID category = getCategoryID(sources);
+        if(category == null) {
+            return "";
+        }
+        String id = getId(category);
+        return String.format(Locale.ROOT, "classification:metadata:0:parents:%s:%s", category.getRootID(), id);
+    }
+
+    private static MCRCategoryID getCategoryID(final NodeList sources) {
         if (sources.getLength() == 0) {
             LOGGER.warn("Cannot get first element of node list 'sources'.");
-            return "";
+            return null;
         }
         final Element source = (Element) sources.item(0);
-        MCRCategoryID category = MCRClassMapper.getCategoryID(source);
-        if (category == null) {
-            return "";
-        }
+        return MCRClassMapper.getCategoryID(source);
+    }
 
-        String id;
+    private static String getId(MCRCategoryID category) {
         try {
-            id = MCRXMLFunctions.encodeURIPath(category.getId());
+            return MCRXMLFunctions.encodeURIPath(category.getId());
         } catch (URISyntaxException e) {
             /* This should be impossible! */
             throw new MCRException(e);
         }
-
-        return String.format(Locale.ROOT, "classification:metadata:0:parents:%s:%s", category.getRootID(), id);
     }
 
     static String getText(final Element element) {

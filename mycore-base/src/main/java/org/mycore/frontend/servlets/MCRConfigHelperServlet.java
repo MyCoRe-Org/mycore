@@ -19,6 +19,7 @@
 package org.mycore.frontend.servlets;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.StringWriter;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -44,6 +45,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRConfigHelperServlet extends HttpServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public static final String PROPERTIES_INIT_PARAM = "Properties";

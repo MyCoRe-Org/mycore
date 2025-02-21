@@ -20,11 +20,14 @@ package org.mycore.orcid2.exception;
 
 import org.mycore.common.MCRException;
 
+import java.io.Serial;
+
 /**
  * General mycore-orcid2 exception.
  */
 public class MCRORCIDException extends MCRException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

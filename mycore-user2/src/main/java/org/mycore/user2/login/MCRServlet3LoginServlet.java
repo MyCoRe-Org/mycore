@@ -22,6 +22,7 @@ import static org.mycore.user2.login.MCRLoginServlet.HTTPS_ONLY_PROPERTY;
 import static org.mycore.user2.login.MCRLoginServlet.LOCAL_LOGIN_SECURE_ONLY;
 
 import java.io.IOException;
+import java.io.Serial;
 
 import javax.xml.transform.TransformerException;
 
@@ -47,6 +48,8 @@ import jakarta.xml.bind.JAXBException;
  *
  */
 public class MCRServlet3LoginServlet extends MCRContainerLoginServlet {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger();

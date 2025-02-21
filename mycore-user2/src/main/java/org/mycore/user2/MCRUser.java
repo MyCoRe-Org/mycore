@@ -18,6 +18,7 @@
 
 package org.mycore.user2;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -86,7 +87,9 @@ import jakarta.xml.bind.annotation.XmlType;
 @XmlType(propOrder = { "ownerId", "realName", "eMail", "lastLogin", "validUntil", "roles", "attributes",
     "password" })
 public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
-    private static final long serialVersionUID = 3378645055646901800L;
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /** The unique user ID */
     int internalID;
@@ -815,7 +818,8 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     private static final class Password implements Serializable {
 
-        private static final long serialVersionUID = 8068063832119405080L;
+        @Serial
+        private static final long serialVersionUID = 1L;
 
         @XmlAttribute
         private String hash;
@@ -835,7 +839,8 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     private static final class UserIdentifier implements Serializable {
 
-        private static final long serialVersionUID = 4654103884660408929L;
+        @Serial
+        private static final long serialVersionUID = 1L;
 
         @XmlAttribute
         public String name;

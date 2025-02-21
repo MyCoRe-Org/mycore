@@ -160,12 +160,13 @@ public class MCRTranslation {
     public static String translateToLocale(String label, Locale locale, String baseName) {
         LOGGER.debug("Translation for current locale: {}", locale::getLanguage);
         ResourceBundle message;
+        String unresolvedQuestionMarks = "???";
         try {
             message = getResourceBundle(baseName, locale);
         } catch (MissingResourceException mre) {
             //no messages.properties at all
             LOGGER.debug(mre::getMessage);
-            return "???" + label + "???";
+            return unresolvedQuestionMarks + label + unresolvedQuestionMarks;
         }
         String result = null;
         try {
@@ -175,7 +176,7 @@ public class MCRTranslation {
             // try to get new key if 'label' is deprecated
             if (!deprecatedMessagesPresent) {
                 LOGGER.warn("Could not load resource '" + DEPRECATED_MESSAGES_PROPERTIES
-                    + "' to check for depreacted I18N keys.");
+                    + "' to check for deprecated I18N keys.");
             } else if (DEPRECATED_MAPPING.containsKey(label)) {
                 String newLabel = DEPRECATED_MAPPING.getProperty(label);
                 try {
@@ -183,11 +184,11 @@ public class MCRTranslation {
                 } catch (MissingResourceException e) {
                 }
                 if (result != null) {
-                    LOGGER.warn("Usage of deprected I18N key '{}'. Please use '{}' instead.", label, newLabel);
+                    LOGGER.warn("Usage of deprecated I18N key '{}'. Please use '{}' instead.", label, newLabel);
                     return result;
                 }
             }
-            result = "???" + label + "???";
+            result = unresolvedQuestionMarks + label + unresolvedQuestionMarks;
             LOGGER.debug(mre::getMessage);
         }
         return result;

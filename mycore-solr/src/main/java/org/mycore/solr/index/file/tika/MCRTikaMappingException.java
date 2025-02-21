@@ -18,12 +18,17 @@
 
 package org.mycore.solr.index.file.tika;
 
+import java.io.Serial;
+
 /**
  * An exception that is thrown when an error occurs during the mapping of a Tika response to a Solr document.
  *
  * @author Sebastian Hofmann
  */
 public class MCRTikaMappingException extends Exception {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     public MCRTikaMappingException() {
     }

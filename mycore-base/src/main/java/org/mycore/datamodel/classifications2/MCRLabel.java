@@ -18,6 +18,7 @@
 
 package org.mycore.datamodel.classifications2;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Locale;
 import java.util.Objects;
@@ -41,10 +42,11 @@ import jakarta.xml.bind.annotation.XmlRootElement;
     name = "label")
 @XmlAccessorType(XmlAccessType.FIELD)
 @Embeddable
-@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MCRLabel implements Cloneable, Serializable, Comparable<MCRLabel> {
 
-    private static final long serialVersionUID = -843799854929361194L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @XmlAttribute(
         namespace = "http://www.w3.org/XML/1998/namespace")

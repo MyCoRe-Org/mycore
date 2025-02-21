@@ -67,6 +67,7 @@ public class MCRJPAConfigurationCheck implements AutoExecutable {
 
     }
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private void performConfigurationChecks() {
 
         Optional<String> selectedUnit = MCRConfiguration2.getString("MCR.JPA.PersistenceUnitName");

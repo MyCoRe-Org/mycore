@@ -150,36 +150,44 @@ class ExtentPagesBuilder {
 
     private static final String FF = "(" + SPACES + "ff?\\.?)" + OPTIONAL;
 
-    private List<PagesPattern> patterns = new ArrayList<>();
+    private static final String MAPPING_START = "start";
+
+    private static final String MAPPING_END = "end";
+
+    private static final String MAPPING_TOTAL = "total";
+
+    private static final String MAPPING_LIST = "list";
+
+    private final List<PagesPattern> patterns = new ArrayList<>();
 
     ExtentPagesBuilder() {
         PagesPattern startEnd = new PagesPattern(PAGE + PAGENR + HYPHEN + PAGENR + DOT + OPTIONAL);
-        startEnd.addMapping("start", 2);
-        startEnd.addMapping("end", 3);
+        startEnd.addMapping(MAPPING_START, 2);
+        startEnd.addMapping(MAPPING_END, 3);
         patterns.add(startEnd);
 
         PagesPattern startEndVariant = new PagesPattern(
             PAGE + PAGENR_W_HYPHEN + HYPHEN_SEPARATED + PAGENR_W_HYPHEN + DOT + OPTIONAL);
-        startEndVariant.addMapping("start", 2);
-        startEndVariant.addMapping("end", 3);
+        startEndVariant.addMapping(MAPPING_START, 2);
+        startEndVariant.addMapping(MAPPING_END, 3);
         patterns.add(startEndVariant);
 
         PagesPattern startTotal = new PagesPattern(
             PAGE + PAGENR + SPACES + "\\(" + NUMBER + SPACES_OPTIONAL + PAGES + "\\)");
-        startTotal.addMapping("start", 2);
-        startTotal.addMapping("total", 3);
+        startTotal.addMapping(MAPPING_START, 2);
+        startTotal.addMapping(MAPPING_TOTAL, 3);
         patterns.add(startTotal);
 
         PagesPattern startOnly = new PagesPattern(PAGE + PAGENR + FF);
-        startOnly.addMapping("start", 2);
+        startOnly.addMapping(MAPPING_START, 2);
         patterns.add(startOnly);
 
         PagesPattern totalOnly = new PagesPattern("\\(?" + PAGENR + SPACES + PAGES + OPTIONAL + "\\)?");
-        totalOnly.addMapping("total", 1);
+        totalOnly.addMapping(MAPPING_TOTAL, 1);
         patterns.add(totalOnly);
 
         PagesPattern list = new PagesPattern("(.+)");
-        list.addMapping("list", 1);
+        list.addMapping(MAPPING_LIST, 1);
         patterns.add(list);
     }
 
@@ -221,10 +229,10 @@ class ExtentPagesBuilder {
  **/
 class PagesPattern {
 
-    private Pattern pattern;
+    private final Pattern pattern;
 
     /** Mapping from MODS Element name to group number in the pattern */
-    private Map<String, Integer> mods2group = new LinkedHashMap<>();
+    private final Map<String, Integer> mods2group = new LinkedHashMap<>();
 
     PagesPattern(String regularExpression) {
         pattern = Pattern.compile(regularExpression);

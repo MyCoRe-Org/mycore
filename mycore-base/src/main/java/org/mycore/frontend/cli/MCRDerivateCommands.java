@@ -93,7 +93,7 @@ import org.mycore.frontend.fileupload.MCRUploadHelper;
 public class MCRDerivateCommands extends MCRAbstractCommands {
 
     /** The logger */
-    private static final Logger LOGGER = LogManager.getLogger(MCRDerivateCommands.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** The ACL interface */
     private static final MCRAccessInterface ACCESS_IMPL = MCRAccessManager.getAccessImpl();
@@ -109,7 +109,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      */
     @MCRCommand(syntax = "delete all derivates", help = "Removes all derivates from the repository", order = 10)
     public static List<String> deleteAllDerivates() {
-        return MCRCommandUtils.getIdsForType("derivate")
+        return MCRCommandUtils.getIdsForType(MCRDerivate.OBJECT_TYPE)
             .map(id -> "delete derivate " + id)
             .collect(Collectors.toList());
     }
@@ -461,7 +461,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             + " For {1}, the default is xsl/save.",
         order = 100)
     public static List<String> exportAllDerivatesWithStylesheet(String dirname, String style) {
-        return MCRCommandUtils.getIdsForType("derivate")
+        return MCRCommandUtils.getIdsForType(MCRDerivate.OBJECT_TYPE)
             .map(id -> "export derivate " + id + " to directory " + dirname + " with stylesheet " + style)
             .collect(Collectors.toList());
     }
@@ -481,7 +481,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             + " For {2}, the default is xsl/save.",
         order = 110)
     public static List<String> exportAllDerivatesOfProjectWithStylesheet(String project, String dirname, String style) {
-        return MCRCommandUtils.getIdsForProjectAndType(project, "derivate")
+        return MCRCommandUtils.getIdsForProjectAndType(project, MCRDerivate.OBJECT_TYPE)
             .map(id -> "export derivate " + id + " to directory " + dirname + " with stylesheet " + style)
             .collect(Collectors.toList());
     }
@@ -560,7 +560,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         order = 140)
     public static List<String> repairDerivateSearch() {
         LOGGER.info("Start the repair for type derivate.");
-        return MCRCommandUtils.getIdsForType("derivate")
+        return MCRCommandUtils.getIdsForType(MCRDerivate.OBJECT_TYPE)
             .map(id -> "repair derivate search of ID " + id)
             .collect(Collectors.toList());
     }
@@ -576,7 +576,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         order = 141)
     public static List<String> repairDerivateSearchForBase(String project) {
         LOGGER.info("Start the repair for project {}.", project);
-        return MCRCommandUtils.getIdsForProjectAndType(project, "derivate")
+        return MCRCommandUtils.getIdsForProjectAndType(project, MCRDerivate.OBJECT_TYPE)
             .map(id -> "repair derivate search of ID " + id)
             .collect(Collectors.toList());
     }
@@ -627,7 +627,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         order = 160)
     public static List<String> synchronizeAllDerivates() {
         LOGGER.info("Start the synchronization for derivates.");
-        return MCRCommandUtils.getIdsForType("derivate")
+        return MCRCommandUtils.getIdsForType(MCRDerivate.OBJECT_TYPE)
             .map(id -> "synchronize derivate with ID " + id)
             .collect(Collectors.toList());
     }
@@ -707,7 +707,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             return;
         }
         MCRXMLMetadataManager mgr = MCRXMLMetadataManager.instance();
-        List<String> idList = mgr.listIDsForBase(baseId.substring(0, projectPartPosition + 1) + "derivate");
+        String project = baseId.substring(0, projectPartPosition + 1);
+        List<String> idList = mgr.listIDsForBase(project + MCRDerivate.OBJECT_TYPE);
         int counter = 0;
         int maxresults = idList.size();
         for (String derid : idList) {

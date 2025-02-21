@@ -18,6 +18,16 @@
 
 package org.mycore.datamodel.classifications2.impl;
 
+import static org.mycore.datamodel.classifications2.impl.MCRCategoryQueryParameter.CATEGORY_ID;
+import static org.mycore.datamodel.classifications2.impl.MCRCategoryQueryParameter.CLASS_ID;
+import static org.mycore.datamodel.classifications2.impl.MCRCategoryQueryParameter.ID;
+import static org.mycore.datamodel.classifications2.impl.MCRCategoryQueryParameter.IDS;
+import static org.mycore.datamodel.classifications2.impl.MCRCategoryQueryParameter.OBJECT_ID;
+import static org.mycore.datamodel.classifications2.impl.MCRCategoryQueryParameter.PARENT_ID;
+import static org.mycore.datamodel.classifications2.impl.MCRCategoryQueryParameter.ROOT_ID;
+import static org.mycore.datamodel.classifications2.impl.MCRCategoryQueryParameter.TYPE;
+
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -67,7 +77,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     private static final String NAMED_QUERY_NAMESPACE = "MCRCategoryLink.";
 
-    private static MCRCache<MCRCategoryID, MCRCategory> categCache = new MCRCache<>(
+    private static final MCRCache<MCRCategoryID, MCRCategory> CATEGORY_CACHE = new MCRCache<>(
         MCRConfiguration2.getInt("MCR.Classifications.LinkServiceImpl.CategCache.Size").orElse(1000),
         "MCRCategLinkService category cache");
 
@@ -100,12 +110,12 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     private void setQueryParametersForLinkCount(String classID, TypedQuery<Object[]> query, MCRCategory parent,
         boolean childrenOnly, boolean restrictedByType, String type) {
-        query.setParameter("classID", classID);
+        query.setParameter(CLASS_ID, classID);
         if (childrenOnly) {
-            query.setParameter("parentID", ((MCRCategoryImpl) parent).getInternalID());
+            query.setParameter(PARENT_ID, ((MCRCategoryImpl) parent).getInternalID());
         }
         if (restrictedByType) {
-            query.setParameter("type", type);
+            query.setParameter(TYPE, type);
         }
         // get object count for every category (not accumulated)
     }
@@ -156,8 +166,8 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     public void deleteLink(MCRCategLinkReference reference) {
         final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         Query q = em.createNamedQuery(NAMED_QUERY_NAMESPACE + "deleteByObjectID");
-        q.setParameter("id", reference.getObjectID());
-        q.setParameter("type", reference.getType());
+        q.setParameter(ID, reference.getObjectID());
+        q.setParameter(TYPE, reference.getType());
         int deleted = q.executeUpdate();
         LOGGER.debug("Number of Links deleted: {}", deleted);
     }
@@ -184,8 +194,8 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         Query q = em.createNamedQuery(NAMED_QUERY_NAMESPACE + "deleteByObjectCollection");
         int deleted = 0;
         for (Map.Entry<String, Collection<String>> entry : typeMap.entrySet()) {
-            q.setParameter("ids", entry.getValue());
-            q.setParameter("type", entry.getKey());
+            q.setParameter(IDS, entry.getValue());
+            q.setParameter(TYPE, entry.getKey());
             deleted += q.executeUpdate();
         }
         LOGGER.debug("Number of Links deleted: {}", deleted);
@@ -196,7 +206,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         TypedQuery<String> q = em.createNamedQuery(NAMED_QUERY_NAMESPACE + "ObjectIDByCategory", String.class);
         setCacheable(q);
-        q.setParameter("id", id);
+        q.setParameter(ID, id);
         setReadOnly(q);
         return q.getResultList();
     }
@@ -206,8 +216,8 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         TypedQuery<String> q = em.createNamedQuery(NAMED_QUERY_NAMESPACE + "ObjectIDByCategoryAndType", String.class);
         setCacheable(q);
-        q.setParameter("id", id);
-        q.setParameter("type", type);
+        q.setParameter(ID, id);
+        q.setParameter(TYPE, type);
         setReadOnly(q);
         return q.getResultList();
     }
@@ -218,8 +228,8 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         TypedQuery<MCRCategoryID> q = em.createNamedQuery(NAMED_QUERY_NAMESPACE + "categoriesByObjectID",
             MCRCategoryID.class);
         setCacheable(q);
-        q.setParameter("id", reference.getObjectID());
-        q.setParameter("type", reference.getType());
+        q.setParameter(ID, reference.getObjectID());
+        q.setParameter(TYPE, reference.getType());
         setReadOnly(q);
         return q.getResultList();
     }
@@ -252,7 +262,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     }
 
     private static MCRCategory getMCRCategory(EntityManager entityManager, MCRCategoryID categID) {
-        MCRCategory categ = categCache.getIfUpToDate(categID, DAO.getLastModified());
+        MCRCategory categ = CATEGORY_CACHE.getIfUpToDate(categID, DAO.getLastModified());
         if (categ != null) {
             return categ;
         }
@@ -260,7 +270,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         if (categ == null) {
             return null;
         }
-        categCache.put(categID, categ);
+        CATEGORY_CACHE.put(categID, categ);
         return categ;
     }
 
@@ -284,6 +294,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     private Map<MCRCategoryID, Boolean> hasLinksForClassifications() {
         Map<MCRCategoryID, Boolean> boolMap = new HashMap<>() {
+            @Serial
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -373,10 +384,10 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         Query q = em.createNamedQuery(NAMED_QUERY_NAMESPACE + "CategoryAndObjectID");
         setCacheable(q);
         setReadOnly(q);
-        q.setParameter("rootID", id.getRootID());
-        q.setParameter("categID", id.getId());
-        q.setParameter("objectID", reference.getObjectID());
-        q.setParameter("type", reference.getType());
+        q.setParameter(ROOT_ID, id.getRootID());
+        q.setParameter(CATEGORY_ID, id.getId());
+        q.setParameter(OBJECT_ID, reference.getObjectID());
+        q.setParameter(TYPE, reference.getType());
         return !q.getResultList().isEmpty();
     }
 
@@ -406,7 +417,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     public Collection<MCRCategoryLink> getLinks(String type) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         TypedQuery<MCRCategoryLink> q = em.createNamedQuery(NAMED_QUERY_NAMESPACE + "links", MCRCategoryLink.class);
-        q.setParameter("type", type);
+        q.setParameter(TYPE, type);
         return q.getResultList();
     }
 

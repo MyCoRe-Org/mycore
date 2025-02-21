@@ -19,6 +19,7 @@
 package org.mycore.frontend.servlets.persistence;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -48,7 +49,8 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 abstract class MCRPersistenceServlet extends MCRServlet {
 
-    private static final long serialVersionUID = -6776941436009193613L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     protected static final String OBJECT_ID_KEY = MCRPersistenceServlet.class.getCanonicalName() + ".MCRObjectID";
 

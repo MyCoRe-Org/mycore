@@ -21,6 +21,9 @@ package org.mycore.restapi.v2;
 import java.util.Date;
 import java.util.Optional;
 
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.metadata.MCRObjectID;
+
 import jakarta.ws.rs.core.EntityTag;
 import jakarta.ws.rs.core.Request;
 import jakarta.ws.rs.core.Response;
@@ -42,6 +45,22 @@ public final class MCRRestUtils {
     public static final String TAG_MYCORE_EVENTS = "mcr_events";
 
     private MCRRestUtils() {
+    }
+
+    public static Response getCachedResponseIgnoreExceptions(Request request, MCRObjectID id) {
+        try {
+            long lastModified = MCRXMLMetadataManager.instance().getLastModified(id);
+            if (lastModified >= 0) {
+                Date lmDate = new Date(lastModified);
+                Optional<Response> cachedResponse = getCachedResponse(request, lmDate);
+                if (cachedResponse.isPresent()) {
+                    return cachedResponse.get();
+                }
+            }
+        } catch (Exception e) {
+            //ignore errors as PUT is idempotent
+        }
+        return null;
     }
 
     public static Optional<Response> getCachedResponse(Request request, Date lastModified) {

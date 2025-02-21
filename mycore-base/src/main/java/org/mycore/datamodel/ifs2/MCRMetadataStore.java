@@ -47,10 +47,12 @@ public class MCRMetadataStore extends MCRStore {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private static final String PROPERTY_IFS_STORE = "MCR.IFS2.Store.";
+
     /**
      * If true (which is default), store will enforce it gets
      * XML to store, otherwise any binary content can be stored here.
-     *
+     * <p>
      * Override with MCR.IFS2.Store.&lt;ObjectType&gt;.ForceXML=true|false
      */
     protected boolean forceXML = true;
@@ -66,11 +68,11 @@ public class MCRMetadataStore extends MCRStore {
     @Override
     protected void init(String type) {
         super.init(type);
-        prefix = MCRConfiguration2.getString("MCR.IFS2.Store." + type + ".Prefix").orElse(type + "_");
+        prefix = MCRConfiguration2.getString(PROPERTY_IFS_STORE + type + ".Prefix").orElse(type + "_");
         suffix = ".xml";
-        forceXML = MCRConfiguration2.getBoolean("MCR.IFS2.Store." + type + ".ForceXML").orElse(true);
+        forceXML = MCRConfiguration2.getBoolean(PROPERTY_IFS_STORE + type + ".ForceXML").orElse(true);
         if (forceXML) {
-            forceDocType = MCRConfiguration2.getString("MCR.IFS2.Store." + type + ".ForceDocType").orElse(null);
+            forceDocType = MCRConfiguration2.getString(PROPERTY_IFS_STORE + type + ".ForceDocType").orElse(null);
             LOGGER.debug("Set doctype for {} to {}", type, forceDocType);
         }
     }
@@ -86,9 +88,10 @@ public class MCRMetadataStore extends MCRStore {
         super.init(config);
         prefix = Optional.ofNullable(config.getPrefix()).orElseGet(() -> config.getID() + "_");
         suffix = ".xml";
-        forceXML = MCRConfiguration2.getBoolean("MCR.IFS2.Store." + config.getID() + ".ForceXML").orElse(true);
+        forceXML = MCRConfiguration2.getBoolean(PROPERTY_IFS_STORE + config.getID() + ".ForceXML").orElse(true);
         if (forceXML) {
-            forceDocType = MCRConfiguration2.getString("MCR.IFS2.Store." + config.getID() + ".ForceDocType")
+            forceDocType = MCRConfiguration2
+                .getString(PROPERTY_IFS_STORE + config.getID() + ".ForceDocType")
                 .orElse(null);
             LOGGER.debug("Set doctype for {} to {}", config::getID, () -> forceDocType);
         }
@@ -164,4 +167,5 @@ public class MCRMetadataStore extends MCRStore {
     protected MCRStoredMetadata buildMetadataObject(Path fo, int id) {
         return new MCRStoredMetadata(this, fo, id, forceDocType);
     }
+
 }

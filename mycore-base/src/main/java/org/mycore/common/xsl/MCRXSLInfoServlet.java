@@ -21,6 +21,7 @@ package org.mycore.common.xsl;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serial;
 import java.io.UncheckedIOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -64,6 +65,9 @@ import org.xml.sax.SAXException;
  * @author Frank Lützenkirchen
  */
 public final class MCRXSLInfoServlet extends MCRServlet {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger(MCRXSLInfoServlet.class);
 

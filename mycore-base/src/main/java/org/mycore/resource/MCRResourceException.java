@@ -20,11 +20,16 @@ package org.mycore.resource;
 
 import org.mycore.common.MCRException;
 
+import java.io.Serial;
+
 /**
  * Instances of {@link MCRResourceException} are thrown when the MyCoRe API is used in an
  * illegal way. For example, this could happen when you provide illegal arguments to a method.
  */
 public class MCRResourceException extends MCRException {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * Creates a new {@link MCRResourceException} with an error message

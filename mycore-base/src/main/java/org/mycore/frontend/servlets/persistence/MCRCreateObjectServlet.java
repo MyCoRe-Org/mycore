@@ -19,6 +19,7 @@
 package org.mycore.frontend.servlets.persistence;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.util.Enumeration;
 import java.util.Properties;
 
@@ -43,7 +44,8 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRCreateObjectServlet extends MCRPersistenceServlet {
 
-    private static final long serialVersionUID = 4143057048219690238L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private boolean appendDerivate;
 

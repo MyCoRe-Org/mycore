@@ -18,6 +18,8 @@
 
 package org.mycore.common;
 
+import java.io.Serial;
+
 /**
  * Instances of this class represent a general exception thrown by the
  * persistency layer of the MyCoRe implementation. This will be the case when
@@ -27,6 +29,10 @@ package org.mycore.common;
  * @author Frank Lützenkirchen
  */
 public class MCRPersistenceException extends MCRException {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     /**
      * Creates a new MCRPersistenceException with an error message
      * 

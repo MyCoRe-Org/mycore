@@ -18,6 +18,7 @@
 
 package org.mycore.datamodel.classifications2;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.Locale;
@@ -48,7 +49,8 @@ import jakarta.persistence.Transient;
 @JsonFormat(shape = JsonFormat.Shape.STRING)
 public class MCRCategoryID implements Serializable {
 
-    private static final long serialVersionUID = -5672923571406252855L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     public static final Pattern VALID_ID = Pattern.compile("[^:$\\{\\}]+");
 

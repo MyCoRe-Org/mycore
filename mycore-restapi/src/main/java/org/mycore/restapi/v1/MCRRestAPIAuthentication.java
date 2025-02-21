@@ -85,7 +85,7 @@ public class MCRRestAPIAuthentication {
      * @return response message as JSON
      */
     @GET
-    @Produces({ MCRJerseyUtil.APPLICATION_JSON_UTF8 })
+    @Produces({ MCRJerseyUtil.APPLICATION_JSON_UTF_8 })
     @Path("/login")
     @MCRCacheControl(noTransform = true,
         noStore = true,

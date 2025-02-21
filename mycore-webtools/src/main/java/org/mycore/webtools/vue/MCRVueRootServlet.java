@@ -20,6 +20,7 @@ package org.mycore.webtools.vue;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.Serial;
 import java.io.StringReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -123,6 +124,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRVueRootServlet extends MCRContentServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override

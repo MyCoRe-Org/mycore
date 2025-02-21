@@ -20,11 +20,14 @@ package org.mycore.mcr.acl.accesskey.exception;
 
 import org.mycore.common.MCRException;
 
+import java.io.Serial;
+
 /**
  * Instances of this class represent a general exception related to access keys.
  */
 public class MCRAccessKeyException extends MCRException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

@@ -19,6 +19,7 @@
 package org.mycore.mets.servlets;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -67,6 +68,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRDFGLinkServlet extends MCRServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger(MCRDFGLinkServlet.class);

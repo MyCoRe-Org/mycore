@@ -18,6 +18,7 @@
 
 package org.mycore.frontend.xeditor;
 
+import java.io.Serial;
 import java.util.Enumeration;
 import java.util.Locale;
 
@@ -35,6 +36,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRXEditorServlet extends MCRServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger();

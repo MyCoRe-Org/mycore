@@ -37,6 +37,7 @@ import org.jdom2.xpath.XPathFactory;
 import org.junit.Test;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRTestCase;
+import org.mycore.common.MCRXlink;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
@@ -135,7 +136,7 @@ public class MCRMODSWrapperTest extends MCRTestCase {
         MCRMODSWrapper wrapper = new MCRMODSWrapper();
 
         Element relatedItem = new Element("relatedItem", MCRConstants.MODS_NAMESPACE);
-        relatedItem.setAttribute("href", "mir_test_00000001", MCRConstants.XLINK_NAMESPACE);
+        relatedItem.setAttribute(MCRXlink.HREF, "mir_test_00000001", MCRConstants.XLINK_NAMESPACE);
         mods.addContent(relatedItem);
         wrapper.setID("JUnit", 4711);
         wrapper.setMODS(mods);
@@ -147,7 +148,7 @@ public class MCRMODSWrapperTest extends MCRTestCase {
         relatedItem.setAttribute("type", "series");
         assertEquals("There should be one related item!", 1, wrapper.getLinkedRelatedItems().size());
 
-        relatedItem.removeAttribute("href", MCRConstants.XLINK_NAMESPACE);
+        relatedItem.removeAttribute(MCRXlink.HREF, MCRConstants.XLINK_NAMESPACE);
         assertEquals("There should be no related item!", 0, wrapper.getLinkedRelatedItems().size());
     }
 

@@ -18,12 +18,14 @@
 
 package org.mycore.pi.exceptions;
 
+import java.io.Serial;
 import java.util.Optional;
 
 import org.mycore.common.MCRCatchException;
 
 public class MCRPersistentIdentifierException extends MCRCatchException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String translatedAdditionalInformation;

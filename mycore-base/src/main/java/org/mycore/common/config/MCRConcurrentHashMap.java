@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -41,6 +42,10 @@ import org.mycore.common.config.MCRConfiguration2.SingletonKey;
  */
 @SuppressWarnings("unchecked")
 class MCRConcurrentHashMap<K extends SingletonKey, V> extends ConcurrentHashMap<K, V> {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     private Map<K, RemappedKey> keyMap = new HashMap<>();
 
     // Disable serialization
