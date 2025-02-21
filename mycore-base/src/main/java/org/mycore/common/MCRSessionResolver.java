@@ -38,7 +38,7 @@ import jakarta.servlet.http.HttpSessionBindingListener;
 public final class MCRSessionResolver implements Serializable, HttpSessionBindingListener {
 
     @Serial
-    private static final long serialVersionUID = 1;
+    private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger();
 

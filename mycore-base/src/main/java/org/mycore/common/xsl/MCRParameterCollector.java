@@ -23,6 +23,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -186,8 +187,10 @@ public class MCRParameterCollector {
      * Returns the parameter with the given name
      */
     public String getParameter(String name, String defaultValue) {
-        Object val = parameters.get(name);
-        return (val == null) ? defaultValue : val.toString();
+        return Optional.ofNullable(parameters.get(name))
+            .map(Object::toString)
+            .or(() -> Optional.ofNullable(SavePropertiesCacheHolder.getSafePropertiesCache().get(name)))
+            .orElse(defaultValue);
     }
 
     /**
