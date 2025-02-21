@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -246,8 +247,11 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
 
     private void sortFileToGrp(FileSec fileSec, Map.Entry<MCRPath, BasicFileAttributes> file, String fileID,
         final String href, String fileUse) throws IOException {
+        //MCR-3317: fix NPE when mime type cannot be determined
+        String mimeType = Optional.ofNullable(MCRContentTypes.probeContentType(file.getKey()))
+            .orElse("application/octet-stream");
         // file
-        File metsFile = new File(fileID, MCRContentTypes.probeContentType(file.getKey()));
+        File metsFile = new File(fileID, mimeType);
         FLocat fLocat = new FLocat(LOCTYPE.URL, href);
         metsFile.setFLocat(fLocat);
 
