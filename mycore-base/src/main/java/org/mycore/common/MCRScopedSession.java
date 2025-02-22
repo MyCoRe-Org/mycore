@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.mycore.common.config.MCRConfiguration2;
@@ -184,6 +185,16 @@ public final class MCRScopedSession extends MCRSession {
             super.deleteObject(key);
         } else {
             values.map.remove(key);
+        }
+    }
+
+    @Override
+    public Object computeIfAbsent(Object key, Function<Object, Object> mappingFunction) {
+        ScopedValues values = scopedValues.get();
+        if (values == null) {
+            return super.computeIfAbsent(key, mappingFunction);
+        } else {
+            return values.map.computeIfAbsent(key, mappingFunction);
         }
     }
 
