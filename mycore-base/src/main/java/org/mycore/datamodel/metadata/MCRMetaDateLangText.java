@@ -35,8 +35,6 @@ import com.google.gson.JsonObject;
  */
 public class MCRMetaDateLangText extends MCRMetaLangText {
 
-    public static final String CLASS_NAME = "MCRMetaDateLangText";
-
     protected MCRISO8601Date isoDate;
 
     /**

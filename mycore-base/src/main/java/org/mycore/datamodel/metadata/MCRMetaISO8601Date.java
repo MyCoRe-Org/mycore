@@ -49,8 +49,6 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public static final String CLASS_NAME = "MCRMetaISO8601Date";
-
     private Element export;
 
     private boolean changed = true;

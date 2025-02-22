@@ -697,16 +697,16 @@ public class MCRObjectService {
         Element elm = new Element(XML_NAME);
 
         // Create XML elements for each list
-        addContentIfNotEmpty(elm, dates, ELEMENT_SERVDATES, MCRMetaISO8601Date.CLASS_NAME);
-        addContentIfNotEmpty(elm, rules, ELEMENT_SERVACLS, MCRMetaAccessRule.CLASS_NAME);
-        addContentIfNotEmpty(elm, flags, ELEMENT_SERVFLAGS, MCRMetaLangText.CLASS_NAME);
-        addContentIfNotEmpty(elm, messages, ELEMENT_SERVMESSAGES, MCRMetaDateLangText.CLASS_NAME);
-        addContentIfNotEmpty(elm, classifications, ELEMENT_SERVCLASSES, MCRMetaClassification.CLASS_NAME);
+        addContentIfNotEmpty(elm, dates, ELEMENT_SERVDATES, MCRMetaISO8601Date.class.getSimpleName());
+        addContentIfNotEmpty(elm, rules, ELEMENT_SERVACLS, MCRMetaAccessRule.class.getSimpleName());
+        addContentIfNotEmpty(elm, flags, ELEMENT_SERVFLAGS, MCRMetaLangText.class.getSimpleName());
+        addContentIfNotEmpty(elm, messages, ELEMENT_SERVMESSAGES, MCRMetaDateLangText.class.getSimpleName());
+        addContentIfNotEmpty(elm, classifications, ELEMENT_SERVCLASSES, MCRMetaClassification.class.getSimpleName());
 
         // Handle the state separately
         if (state != null) {
             Element servStates = new Element(ELEMENT_SERVSTATES);
-            servStates.setAttribute(MCRXMLConstants.CLASS, MCRMetaClassification.CLASS_NAME);
+            servStates.setAttribute(MCRXMLConstants.CLASS, MCRMetaClassification.class.getSimpleName());
             MCRMetaClassification stateClass = new MCRMetaClassification(ELEMENT_SERVSTATE, 0, null, state);
             servStates.addContent(stateClass.createXML());
             elm.addContent(servStates);

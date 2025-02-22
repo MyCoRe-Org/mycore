@@ -45,6 +45,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @JsonClassDescription("Links to other objects or derivates")
 public class MCRMetaLinkID extends MCRMetaLink {
+
     /**
      * initializes with empty values.
      */

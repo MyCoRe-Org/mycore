@@ -391,7 +391,7 @@ public class MCRObjectDerivate {
         }
         Element elm = new Element(XML_NAME);
         Element linkmetas = new Element(ELEMENT_LINKMETAS);
-        linkmetas.setAttribute(CLASS, MCRMetaLinkID.CLASS_NAME);
+        linkmetas.setAttribute(CLASS, MCRMetaLinkID.class.getSimpleName());
         linkmetas.setAttribute(HERITABLE, MCRXMLConstants.FALSE);
         linkmetas.addContent(linkmeta.createXML());
         elm.addContent(linkmetas);
@@ -420,7 +420,7 @@ public class MCRObjectDerivate {
 
     private Element createExternalsElement() {
         Element extEl = new Element(ELEMENT_EXTERNALS);
-        extEl.setAttribute(CLASS, MCRMetaLink.CLASS_NAME);
+        extEl.setAttribute(CLASS, MCRMetaLink.class.getSimpleName());
         extEl.setAttribute(HERITABLE, MCRXMLConstants.FALSE);
         for (MCRMetaLink external : externals) {
             extEl.addContent(external.createXML());
@@ -430,7 +430,7 @@ public class MCRObjectDerivate {
 
     private Element createInternalsElement() {
         Element intEl = new Element(ELEMENT_INTERNALS);
-        intEl.setAttribute(CLASS, MCRMetaIFS.CLASS_NAME);
+        intEl.setAttribute(CLASS, MCRMetaIFS.class.getSimpleName());
         intEl.setAttribute(HERITABLE, MCRXMLConstants.FALSE);
         intEl.addContent(internals.createXML());
         return intEl;
@@ -438,7 +438,7 @@ public class MCRObjectDerivate {
 
     private Element createTitleElement() {
         Element titEl = new Element(ELEMENT_TITLES);
-        titEl.setAttribute(CLASS, MCRMetaLangText.CLASS_NAME);
+        titEl.setAttribute(CLASS, MCRMetaLangText.class.getSimpleName());
         titEl.setAttribute(HERITABLE, MCRXMLConstants.FALSE);
         titles.stream()
             .map(MCRMetaLangText::createXML)
@@ -448,7 +448,7 @@ public class MCRObjectDerivate {
 
     private Element createClassificationElement() {
         Element clazzElement = new Element(ELEMENT_CLASSIFICATIONS);
-        clazzElement.setAttribute(CLASS, MCRMetaClassification.CLASS_NAME);
+        clazzElement.setAttribute(CLASS, MCRMetaClassification.class.getSimpleName());
         clazzElement.setAttribute(HERITABLE, MCRXMLConstants.FALSE);
 
         classifications.stream()
