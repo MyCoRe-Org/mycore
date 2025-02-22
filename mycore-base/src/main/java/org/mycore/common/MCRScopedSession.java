@@ -100,49 +100,33 @@ public final class MCRScopedSession extends MCRSession {
 
     @Override
     public Locale getLocale() {
-        ScopedValues values = scopedValues.get();
-        if (values == null) {
-            return super.getLocale();
-        }
-        return values.locale();
+        return withScopedValues(ScopedValues::locale, super::getLocale);
     }
 
     @Override
     public void setUserInformation(MCRUserInformation userSystemAdapter) {
-        ScopedValues values = scopedValues.get();
-        if (values == null) {
-            super.setUserInformation(userSystemAdapter);
-        } else {
+        withScopedValues(values -> {
             throw new IllegalArgumentException(
                 "User information should not be set when running in restricted scope: " + values);
-        }
+        }, () -> {
+            super.setUserInformation(userSystemAdapter);
+            return null;
+        });
     }
 
     @Override
     public Object get(Object key) {
-        ScopedValues values = scopedValues.get();
-        if (values == null) {
-            return super.get(key);
-        }
-        return values.map.get(key);
+        return withScopedValues(v -> v.map.get(key), () -> super.get(key));
     }
 
     @Override
     public Object put(Object key, Object value) {
-        ScopedValues values = scopedValues.get();
-        if (values == null) {
-            return super.put(key, value);
-        }
-        return values.map.put(key, value);
+        return withScopedValues(v -> v.map.put(key, value), () -> super.put(key, value));
     }
 
     @Override
     public String getCurrentIP() {
-        ScopedValues values = scopedValues.get();
-        if (values == null) {
-            return super.getCurrentIP();
-        }
-        return values.ip();
+        return withScopedValues(ScopedValues::ip, super::getCurrentIP);
     }
 
     @Override
@@ -153,49 +137,50 @@ public final class MCRScopedSession extends MCRSession {
 
     @Override
     public MCRUserInformation getUserInformation() {
-        ScopedValues values = scopedValues.get();
-        if (values == null) {
-            return super.getUserInformation();
-        }
-        return values.userInformation();
+        return withScopedValues(ScopedValues::userInformation, super::getUserInformation);
     }
 
     @Override
     public Iterator<Object> getObjectsKeyList() {
-        ScopedValues values = scopedValues.get();
-        if (values == null) {
-            return super.getObjectsKeyList();
-        }
-        return values.map.keySet().iterator();
+        return withScopedValues(v -> v.map.keySet().iterator(), super::getObjectsKeyList);
     }
 
     @Override
     public List<Map.Entry<Object, Object>> getMapEntries() {
-        ScopedValues values = scopedValues.get();
-        if (values == null) {
-            return super.getMapEntries();
-        }
-        return values.map.entrySet().stream().toList();
+        return withScopedValues(v -> v.map.entrySet().stream().toList(), super::getMapEntries);
     }
 
     @Override
     public void deleteObject(Object key) {
-        ScopedValues values = scopedValues.get();
-        if (values == null) {
+        withScopedValues(v -> {
+            v.map.remove(key);
+            return null;
+        }, () -> {
             super.deleteObject(key);
-        } else {
-            values.map.remove(key);
-        }
+            return null;
+        });
     }
 
     @Override
     public Object computeIfAbsent(Object key, Function<Object, Object> mappingFunction) {
+        return withScopedValues(v -> v.map.computeIfAbsent(key, mappingFunction),
+            () -> super.computeIfAbsent(key, mappingFunction));
+    }
+
+    /**
+     * Executes an operation either within a scoped context or with default behavior.
+     * <p>
+     * This method serves as a template for the commonly used logic to check scoped values.
+     * If scoped values are present, the {@code scopedAction} is executed, otherwise the {@code defaultAction}.
+     *
+     * @param <T> The return type of the operation
+     * @param scopedAction The operation to execute with scoped values
+     * @param defaultAction The default operation to execute when no scoped values are present
+     * @return The result of the executed operation
+     */
+    private <T> T withScopedValues(Function<ScopedValues, T> scopedAction, Supplier<T> defaultAction) {
         ScopedValues values = scopedValues.get();
-        if (values == null) {
-            return super.computeIfAbsent(key, mappingFunction);
-        } else {
-            return values.map.computeIfAbsent(key, mappingFunction);
-        }
+        return values == null ? defaultAction.get() : scopedAction.apply(values);
     }
 
     public record ScopedValues(
