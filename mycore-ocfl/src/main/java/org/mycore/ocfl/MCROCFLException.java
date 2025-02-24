@@ -18,6 +18,8 @@
 
 package org.mycore.ocfl;
 
+import java.io.Serial;
+
 import org.mycore.common.MCRException;
 
 /**
@@ -30,6 +32,9 @@ import org.mycore.common.MCRException;
  * @see MCRException
  */
 public class MCROCFLException extends MCRException {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * Constructs a new {@code MCROCFLException} with the specified detail message.
