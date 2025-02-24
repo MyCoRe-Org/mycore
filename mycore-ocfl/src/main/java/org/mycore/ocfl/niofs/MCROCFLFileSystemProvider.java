@@ -167,6 +167,7 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     @Override
     public SeekableByteChannel newByteChannel(MCRVersionedPath path, Set<? extends OpenOption> options,
         FileAttribute<?>... fileAttributes) throws IOException {
@@ -202,6 +203,7 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     @Override
     public void createDirectory(MCRVersionedPath path, FileAttribute<?>... fileAttributes) throws IOException {
         if (!path.isHeadVersion()) {
@@ -217,6 +219,7 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     @Override
     public void delete(MCRVersionedPath path) throws IOException {
         if (!path.isHeadVersion()) {
@@ -231,6 +234,7 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     @Override
     public void copy(MCRVersionedPath source, MCRVersionedPath target, CopyOption... options) throws IOException {
         if (isSameFile(source, target)) {
@@ -256,6 +260,7 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     @Override
     public void move(MCRVersionedPath source, MCRVersionedPath target, CopyOption... options) throws IOException {
         if (isSameFile(source, target)) {

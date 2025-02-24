@@ -18,6 +18,8 @@
 
 package org.mycore.ocfl.niofs;
 
+import java.io.Serial;
+
 import org.mycore.ocfl.MCROCFLException;
 
 /**
@@ -25,6 +27,9 @@ import org.mycore.ocfl.MCROCFLException;
  * available.
  */
 public class MCROCFLInactiveTransactionException extends MCROCFLException {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * Constructs a new {@code MCROCFLInactiveTransactionException} with the specified detail message.
