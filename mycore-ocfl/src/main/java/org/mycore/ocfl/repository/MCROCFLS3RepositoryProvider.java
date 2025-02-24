@@ -48,7 +48,6 @@ import software.amazon.awssdk.transfer.s3.S3TransferManager;
  * This class sets up and initializes an OCFL repository backed by S3 storage. It handles the configuration of
  * AWS clients, transfer managers, and storage layers, leveraging MyCoRe's dependency injection framework to populate
  * necessary properties.
- * </p>
  *
  * <h2>Key Features</h2>
  * <ul>
@@ -115,7 +114,6 @@ public class MCROCFLS3RepositoryProvider implements MCROCFLRepositoryProvider {
      *   <li>Builds the OCFL repository with S3 as the storage backend.</li>
      *   <li>Registers a shutdown handler to clean up resources on application close.</li>
      * </ul>
-     * </p>
      *
      * @param prop the property key used to identify this repository configuration.
      * @throws IOException if an error occurs during initialization.
