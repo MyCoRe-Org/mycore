@@ -115,11 +115,13 @@ import {
   MCRAccessKeyConfig,
   MCRAccessKeyService,
 } from '@golsch/test/acl/accesskey';
-import AccessKeyTable from '@/components/AccessKeyTable.vue';
-import CreateAccessKeyModal from '@/components/CreateAccessKeyModal.vue';
-import AccessKeyInfoModal from '@/components/AccessKeyInfoModal.vue';
+import {
+  AccessKeyTable,
+  CreateAccessKeyModal,
+  AccessKeyInfoModal,
+  ConfirmModal,
+} from '@mycore-test/vue-access-key-manager';
 import Pagination from '@/components/SimplePagination.vue';
-import ConfirmModal from '@/components/ConfirmModal.vue';
 import { fetchJWT } from '@/common/auth';
 import {
   MCRHTTPClient,
