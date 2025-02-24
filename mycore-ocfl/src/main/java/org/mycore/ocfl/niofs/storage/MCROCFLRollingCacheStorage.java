@@ -28,15 +28,19 @@ import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.niofs.channels.MCROCFLClosableCallbackChannel;
 
@@ -45,6 +49,8 @@ import org.mycore.ocfl.niofs.channels.MCROCFLClosableCallbackChannel;
  * This class maintains a cache of files and employs an eviction strategy to manage the cache size.
  */
 public class MCROCFLRollingCacheStorage implements MCROCFLTempFileStorage {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final Path root;
 
@@ -65,9 +71,46 @@ public class MCROCFLRollingCacheStorage implements MCROCFLTempFileStorage {
     public MCROCFLRollingCacheStorage(Path root, MCROCFLEvictionStrategy evictionStrategy) {
         this.root = root;
         this.evictionStrategy = evictionStrategy;
-        this.cache = Collections.synchronizedMap(new HashMap<>());
+        this.cache = new ConcurrentHashMap<>();
         this.queue = new ConcurrentLinkedDeque<>();
         this.totalAllocation = new AtomicLong(0);
+        try {
+            init();
+        } catch (IOException initException) {
+            try {
+                clear();
+                LOGGER.error(() -> "Unable to initialize the rolling cache storage. Cleared it.", initException);
+            } catch (IOException clearException) {
+                clearException.initCause(initException);
+                LOGGER.error(
+                    () -> "Unable to initialize the rolling cache storage. Tried to clear but this also didn't work.",
+                    clearException);
+            }
+        }
+    }
+
+    private void init() throws IOException {
+        final List<Path> toRemoveList = new ArrayList<>();
+        // update cache
+        try (Stream<Path> pathStream = Files.walk(root)) {
+            pathStream.filter(Files::isRegularFile)
+                .forEach(path -> {
+                    try {
+                        cacheUpdate(path, true);
+                    } catch (IOException e) {
+                        LOGGER.error(() -> "Unable to cache file " + path + ". Path will be removed from cache.", e);
+                        toRemoveList.add(path);
+                    }
+                });
+        }
+        // remove
+        for (Path toRemove : toRemoveList) {
+            try {
+                Files.delete(toRemove);
+            } catch (IOException removeException) {
+                LOGGER.error(() -> "Unable to remove path " + toRemove + "from rolling cache.", removeException);
+            }
+        }
     }
 
     /**
@@ -196,15 +239,20 @@ public class MCROCFLRollingCacheStorage implements MCROCFLTempFileStorage {
      * @throws IOException If an I/O error occurs.
      */
     private void cacheUpdate(Path physicalPath, boolean updateSize) throws IOException {
-        this.queue.remove(physicalPath);
-        this.queue.offer(physicalPath);
-        boolean recalculate = !this.cache.containsKey(physicalPath) || updateSize;
-        if (recalculate) {
-            Long oldSize = this.cache.get(physicalPath);
-            long newSize = Files.size(physicalPath);
-            long deltaSize = newSize - (oldSize != null ? oldSize : 0);
-            this.cache.put(physicalPath, newSize);
-            this.totalAllocation.addAndGet(deltaSize);
+        try {
+            this.queue.remove(physicalPath);
+            this.queue.offer(physicalPath);
+            boolean recalculate = !this.cache.containsKey(physicalPath) || updateSize;
+            if (recalculate) {
+                Long oldSize = this.cache.get(physicalPath);
+                long newSize = Files.size(physicalPath);
+                long deltaSize = newSize - (oldSize != null ? oldSize : 0);
+                this.cache.put(physicalPath, newSize);
+                this.totalAllocation.addAndGet(deltaSize);
+            }
+        } catch (IOException ioException) {
+            this.queue.remove(physicalPath);
+            throw ioException;
         }
     }
 
