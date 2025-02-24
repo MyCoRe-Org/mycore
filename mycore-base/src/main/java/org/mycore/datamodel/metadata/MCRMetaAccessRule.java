@@ -27,14 +27,12 @@ import org.mycore.common.MCRException;
  * This class implements all method for handling with the MCRMetaAccessRule part
  * of a metadata object. The MCRMetaAccessRule class present a single item,
  * which hold an ACL condition for a defined permission.
- * 
+ *
  * @author Jens Kupferschmidt
  */
 public class MCRMetaAccessRule extends MCRMetaDefault {
 
     private static final Logger LOGGER = LogManager.getLogger();
-
-    public static final String CLASS_NAME = "MCRMetaAccessRule";
 
     private static final String ELEMENT_CONDITION = "condition";
 
@@ -84,7 +82,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
 
     /**
      * This method set the permission and the condition.
-     * 
+     *
      * @param permission the format string, if it is empty 'READ' will be set.
      * @param condition
      *            the JDOM Element included the condition tree
@@ -98,7 +96,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
 
     /**
      * This method set the condition.
-     * 
+     *
      * @param condition
      *            the JDOM Element included the condition tree
      * @exception MCRException
@@ -113,7 +111,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
 
     /**
      * This method set the permission attribute.
-     * 
+     *
      * @param permission
      *            the new permission string.
      */
@@ -123,7 +121,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
 
     /**
      * This method get the condition.
-     * 
+     *
      * @return the condition as JDOM Element
      */
     public final Element getCondition() {
@@ -132,7 +130,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
 
     /**
      * This method get the permission attribute.
-     * 
+     *
      * @return the permission attribute
      */
     public final String getPermission() {
@@ -142,7 +140,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
     /**
      * This method read the XML input stream part from a DOM part for the
      * metadata of the document.
-     * 
+     *
      * @param element
      *            a relevant JDOM element for the metadata
      */
@@ -157,7 +155,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
     /**
      * This method create a XML stream for all data in this class, defined by
      * the MyCoRe XML MCRMetaAccessRule definition for the given subtag.
-     * 
+     *
      * @exception MCRException
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML MCRMetaAccessRule part
@@ -179,7 +177,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      * <li>the condition is null</li>
      * <li>the permission is null or empty</li>
      * </ul>
-     * 
+     *
      * @throws MCRException the MCRMetaAccessRule is invalid
      */
     @Override

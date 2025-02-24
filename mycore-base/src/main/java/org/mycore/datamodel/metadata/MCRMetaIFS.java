@@ -39,8 +39,6 @@ import com.google.gson.JsonObject;
  */
 public final class MCRMetaIFS extends MCRMetaDefault {
 
-    public static final String CLASS_NAME = "MCRMetaIFS";
-
     // MCRMetaIFS data
     private String sourcePath;
 

@@ -41,8 +41,6 @@ public class MCRMetaLangText extends MCRMetaDefault {
 
     private static final String FORM_PLAIN = "plain";
 
-    public static final String CLASS_NAME = "MCRMetaLangText";
-
     protected String text;
 
     protected String form;

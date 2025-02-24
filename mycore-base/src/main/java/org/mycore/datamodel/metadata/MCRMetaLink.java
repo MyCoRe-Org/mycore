@@ -49,8 +49,6 @@ public class MCRMetaLink extends MCRMetaDefault {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public static final String CLASS_NAME = "MCRMetaLink";
-
     // MetaLink data
     protected String href;
     protected String label;

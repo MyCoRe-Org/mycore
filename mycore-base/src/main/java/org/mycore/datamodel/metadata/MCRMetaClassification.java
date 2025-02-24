@@ -43,8 +43,6 @@ public class MCRMetaClassification extends MCRMetaDefault {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public static final String CLASS_NAME = "MCRMetaClassification";
-
     // MCRMetaClassification data
     protected MCRCategoryID category;
 
