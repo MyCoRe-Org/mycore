@@ -18,6 +18,8 @@
 
 package org.mycore.ocfl.niofs;
 
+import java.io.Serial;
+
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.MCROCFLException;
@@ -34,6 +36,9 @@ import org.mycore.ocfl.MCROCFLException;
  * @see MCRException
  */
 public class MCROCFLVersionMismatchException extends MCROCFLException {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * Constructs a new exception with the specified detail message.
