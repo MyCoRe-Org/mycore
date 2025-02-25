@@ -120,7 +120,7 @@ public class MCRPBKDF2Strategy extends MCRPasswordCheckStrategyBase {
         byte[] checkHash = HEX_FORMAT.parseHex(data.hash());
         byte[] hash = getHash(checkSalt, checkHash.length, password);
 
-        boolean verified = fixedEffortEquals(HEX_FORMAT.parseHex(data.hash()), hash);
+        boolean verified = fixedEffortEquals(checkHash, hash);
         boolean deprecated = checkSalt.length != saltSizeBytes || checkHash.length != hashSizeBytes;
 
         return new PasswordCheckResult<>(verified, deprecated);

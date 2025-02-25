@@ -141,7 +141,7 @@ public class MCRArgon2Strategy extends MCRPasswordCheckStrategyBase {
         byte[] checkHash = HEX_FORMAT.parseHex(data.hash());
         byte[] hash = getHash(checkSalt, checkHash.length, password);
 
-        boolean verified = fixedEffortEquals(HEX_FORMAT.parseHex(data.hash()), hash);
+        boolean verified = fixedEffortEquals(checkHash, hash);
         boolean deprecated = checkSalt.length != saltSizeBytes || checkHash.length != hashSizeBytes;
 
         return new PasswordCheckResult<>(verified, deprecated);
@@ -150,9 +150,9 @@ public class MCRArgon2Strategy extends MCRPasswordCheckStrategyBase {
 
     private byte[] getHash(byte[] salt, int hashSizeBytes, String password) {
 
-        Argon2BytesGenerator generate = getGenerator(salt);
         byte[] hash = new byte[hashSizeBytes];
-        generate.generateBytes(password.getBytes(StandardCharsets.UTF_8), hash);
+        Argon2BytesGenerator generator = getGenerator(salt);
+        generator.generateBytes(password.getBytes(StandardCharsets.UTF_8), hash);
 
         return hash;
 
