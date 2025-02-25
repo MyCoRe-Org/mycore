@@ -23,9 +23,11 @@ import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.util.Set;
 
@@ -137,6 +139,32 @@ public interface MCROCFLTempFileStorage {
      */
     default void createDirectories(MCRVersionedPath directoryPath, FileAttribute<?>... attrs) throws IOException {
         Files.createDirectories(toPhysicalPath(directoryPath), attrs);
+    }
+
+    /**
+     * Returns the size of a file (in bytes).
+     * 
+     * @param path the path to the file
+     * @return the size of a file in bytes
+     * @throws IOException if an I/O error occurs.
+     */
+    default long size(MCRVersionedPath path) throws IOException {
+        // TODO implement
+        return Files.size(toPhysicalPath(path));
+    }
+
+    /**
+     * Reads a file's attributes as a bulk operation.
+     *
+     * @param path the path to the file
+     * @param type the Class of the file attributes required to read
+     * @param options options indicating how symbolic links are handled
+     * @return the file attributes
+     * @throws IOException if an I/O error occurs.
+     */
+    default <A extends BasicFileAttributes> A readAttributes(MCRVersionedPath path, Class<A> type,
+        LinkOption... options) throws IOException {
+        return Files.readAttributes(toPhysicalPath(path), type, options);
     }
 
     /**
