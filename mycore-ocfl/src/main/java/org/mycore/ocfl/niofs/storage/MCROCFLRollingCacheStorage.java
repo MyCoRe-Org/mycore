@@ -91,6 +91,9 @@ public class MCROCFLRollingCacheStorage implements MCROCFLTempFileStorage {
 
     private void init() throws IOException {
         final List<Path> toRemoveList = new ArrayList<>();
+        if (!Files.exists(root)) {
+            return;
+        }
         // update cache
         try (Stream<Path> pathStream = Files.walk(root)) {
             pathStream.filter(Files::isRegularFile)
@@ -108,7 +111,7 @@ public class MCROCFLRollingCacheStorage implements MCROCFLTempFileStorage {
             try {
                 Files.delete(toRemove);
             } catch (IOException removeException) {
-                LOGGER.error(() -> "Unable to remove path " + toRemove + "from rolling cache.", removeException);
+                LOGGER.error(() -> "Unable to remove path " + toRemove + " from rolling cache.", removeException);
             }
         }
     }
