@@ -61,8 +61,7 @@ public class MCROCFLFileTypeDetector extends FileTypeDetector {
         if (virtualObject == null) {
             throw new NoSuchFileException(path.toString());
         }
-        Path physicalPath = virtualObject.toPhysicalPath(versionedPath);
-        return Files.probeContentType(physicalPath);
+        return virtualObject.probeContentType(versionedPath);
     }
 
 }

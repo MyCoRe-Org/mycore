@@ -14,6 +14,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashSet;
 import java.util.Set;
@@ -25,9 +26,9 @@ import org.mycore.datamodel.niofs.MCRVersionedPath;
 import io.ocfl.api.model.ObjectVersionId;
 import io.ocfl.api.model.OcflObjectVersion;
 
-public class MCRVirtualObjectTest extends MCROCFLNioTestCase {
+public class MCROCFLVirtualObjectTest extends MCROCFLNioTestCase {
 
-    public MCRVirtualObjectTest(boolean remote) {
+    public MCROCFLVirtualObjectTest(boolean remote) {
         super(remote);
     }
 
@@ -268,6 +269,32 @@ public class MCRVirtualObjectTest extends MCROCFLNioTestCase {
         assertNotNull("fileKey of original black.png should not be null", v1BlackPngFileKey);
         assertThrows("fileKey of notFound.png should not exist yet", NoSuchFileException.class,
             () -> getFileKey(notFoundPng));
+    }
+
+    @Test
+    public void externalCopy() throws IOException {
+        MCRVersionedPath whitePng = MCRVersionedPath.head(DERIVATE_1, "white.png");
+        MCRVersionedPath blackPng = MCRVersionedPath.head(DERIVATE_1, "black.png");
+        MCRVersionedPath target = MCRVersionedPath.head(DERIVATE_2, "white.png");
+        long whiteSize = Files.size(whitePng);
+        long blackSize = Files.size(blackPng);
+
+        // copy from one derivate to another
+        assertFalse("white.png should not exist in " + DERIVATE_2, Files.exists(target));
+        MCRTransactionManager.beginTransactions();
+        Files.copy(whitePng, target);
+        assertTrue("white.png should exist in " + DERIVATE_2, Files.exists(target));
+        assertEquals("white.png should have the same size", whiteSize, Files.size(target));
+        MCRTransactionManager.commitTransactions();
+        assertEquals("white.png should have the same size", whiteSize, Files.size(target));
+        assertTrue("white.png should exist in " + DERIVATE_2, Files.exists(target));
+
+        // overwrite from one derivate to another
+        MCRTransactionManager.beginTransactions();
+        Files.copy(blackPng, target, StandardCopyOption.REPLACE_EXISTING);
+        assertEquals("white.png should have the same size", blackSize, Files.size(target));
+        MCRTransactionManager.commitTransactions();
+        assertEquals("white.png should have the same size", blackSize, Files.size(target));
     }
 
     private static Object getFileKey(MCRVersionedPath path) throws IOException {

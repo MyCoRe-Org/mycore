@@ -157,8 +157,7 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
         MCRVersionedPath lockedPath = lockVersion(path);
         checkExists(lockedPath);
         if (this.localStorage.exists(lockedPath)) {
-            Path physicalPath = this.localStorage.toPhysicalPath(lockedPath);
-            return Files.readAttributes(physicalPath, BasicFileAttributes.class).lastModifiedTime();
+            return this.localStorage.readAttributes(lockedPath, BasicFileAttributes.class).lastModifiedTime();
         }
         FileChangeHistory changeHistory = getChangeHistory(lockedPath);
         return FileTime.from(changeHistory.getMostRecent().getTimestamp().toInstant());
@@ -172,8 +171,7 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
         MCRVersionedPath lockedPath = lockVersion(path);
         checkExists(lockedPath);
         if (this.localStorage.exists(lockedPath)) {
-            Path physicalPath = this.localStorage.toPhysicalPath(lockedPath);
-            return Files.readAttributes(physicalPath, BasicFileAttributes.class).lastAccessTime();
+            return this.localStorage.readAttributes(lockedPath, BasicFileAttributes.class).lastAccessTime();
         }
         FileChangeHistory changeHistory = getChangeHistory(lockedPath);
         return FileTime.from(changeHistory.getMostRecent().getTimestamp().toInstant());
@@ -211,15 +209,24 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
 
     /**
      * {@inheritDoc}
-     * This implementation always creates a copy before returning the physical path, guaranteeing
-     * that the file exists in the local temporary storage.
      */
     @Override
-    public Path toPhysicalPath(MCRVersionedPath path) throws IOException {
+    protected Path toPhysicalPath(MCRVersionedPath path) throws IOException {
         MCRVersionedPath lockedPath = lockVersion(path);
         checkExists(lockedPath);
         localCopy(lockedPath);
         return this.localStorage.toPhysicalPath(lockedPath);
+    }
+
+    /**
+     * {@inheritDoc}
+     * This implementation always creates a copy before returning the physical path, guaranteeing
+     * that the file exists in the local temporary storage.
+     */
+    @Override
+    public Object getFileKey(MCRVersionedPath path) throws IOException {
+        Path physicalPath = toPhysicalPath(path);
+        return Files.readAttributes(physicalPath, BasicFileAttributes.class).fileKey();
     }
 
     /**

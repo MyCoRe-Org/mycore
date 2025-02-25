@@ -2,11 +2,16 @@ package org.mycore.ocfl.niofs.storage;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.StandardOpenOption;
+import java.util.Set;
 
 import org.junit.Test;
+import org.mycore.datamodel.niofs.MCRVersionedPath;
 
 public class MCROCFLRollingCacheStorageTest extends MCROCFLStorageTestCase {
 
@@ -76,6 +81,16 @@ public class MCROCFLRollingCacheStorageTest extends MCROCFLStorageTestCase {
         assertFalse("'path1' should be rolled over", storage.exists(path1));
         assertTrue("'path2' should exist", storage.exists(path2));
         assertTrue("'path3' should exist", storage.exists(path3));
+    }
+
+    @Test
+    public void newByteChannelFailureTest() {
+        MCRVersionedPath nonExistingPath = MCRVersionedPath.head("owner1", "file4");
+        try (SeekableByteChannel ignored = storage.newByteChannel(nonExistingPath, Set.of(StandardOpenOption.READ))) {
+            fail("Expected an IOException to be thrown due to non-existent file.");
+        } catch (IOException e) {
+            assertFalse("Cache should not contain the file after failed open", storage.exists(nonExistingPath));
+        }
     }
 
 }
