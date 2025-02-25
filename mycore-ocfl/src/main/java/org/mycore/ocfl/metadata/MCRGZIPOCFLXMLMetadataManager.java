@@ -18,18 +18,17 @@
 
 package org.mycore.ocfl.metadata;
 
+import io.ocfl.api.model.OcflObjectVersion;
+import io.ocfl.api.model.VersionNum;
+import org.mycore.common.content.MCRContent;
+import org.mycore.datamodel.metadata.MCRObjectID;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-
-import org.mycore.common.content.MCRContent;
-import org.mycore.datamodel.metadata.MCRObjectID;
-
-import io.ocfl.api.model.OcflObjectVersion;
-import io.ocfl.api.model.VersionNum;
 
 public class MCRGZIPOCFLXMLMetadataManager extends MCROCFLXMLMetadataManager {
 

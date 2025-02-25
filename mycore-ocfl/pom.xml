@@ -32,8 +32,24 @@
   <name>MyCoRe OCFL</name>
   <dependencies>
     <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+    <dependency>
       <groupId>io.ocfl</groupId>
       <artifactId>ocfl-java-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.ocfl</groupId>
+      <artifactId>ocfl-java-aws</artifactId>
     </dependency>
     <dependency>
       <groupId>io.ocfl</groupId>
@@ -66,6 +82,10 @@
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-user2</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>netty-nio-client</artifactId>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
