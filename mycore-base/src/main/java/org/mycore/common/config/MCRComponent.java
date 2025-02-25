@@ -26,8 +26,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.jar.Manifest;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.status.StatusLogger;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 
@@ -43,7 +43,7 @@ import org.mycore.common.MCRException;
  */
 public class MCRComponent implements Comparable<MCRComponent> {
 
-    private static final Logger LOGGER = StatusLogger.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String ATT_PRIORITY = "Priority";
 
@@ -66,7 +66,7 @@ public class MCRComponent implements Comparable<MCRComponent> {
     private final Manifest manifest;
 
     private enum Type {
-        base, component, module
+        BASE, COMPONENT, MODULE
     }
 
     private static NumberFormat getPriorityFormat() {
@@ -83,14 +83,14 @@ public class MCRComponent implements Comparable<MCRComponent> {
     public MCRComponent(String artifactId, Manifest manifest, File jarFile) {
         if (artifactId.startsWith("mycore-")) {
             if (artifactId.endsWith("base")) {
-                this.type = Type.base;
+                this.type = Type.BASE;
                 this.name = "base";
             } else {
-                this.type = Type.component;
+                this.type = Type.COMPONENT;
                 this.name = artifactId.substring("mycore-".length());
             }
         } else {
-            this.type = Type.module;
+            this.type = Type.MODULE;
             this.name = artifactId.replaceAll("[_-]?module", "");
         }
         this.jarFile = jarFile;
@@ -116,9 +116,9 @@ public class MCRComponent implements Comparable<MCRComponent> {
             throw new MCRException(artifactId + " has unsupported priority: " + priority);
         }
         priority += switch (type) {
-            case base -> 100;
-            case component -> 200;
-            case module -> 300;
+            case BASE -> 100;
+            case COMPONENT -> 200;
+            case MODULE -> 300;
         };
         return priority;
     }
@@ -154,9 +154,9 @@ public class MCRComponent implements Comparable<MCRComponent> {
      */
     public String getResourceBase() {
         return switch (type) {
-            case base -> "config/";
-            case component -> "components/" + name + "/config/";
-            case module -> "config/" + name + "/";
+            case BASE -> "config/";
+            case COMPONENT -> "components/" + name + "/config/";
+            case MODULE -> "config/" + name + "/";
             default -> {
                 LOGGER.debug("{}: there is no resource base for type {}", name, type);
                 yield null;
@@ -168,21 +168,21 @@ public class MCRComponent implements Comparable<MCRComponent> {
      * Returns true, if this component is a MyCore base component
      */
     public boolean isMyCoReBaseComponent() {
-        return type == Type.base;
+        return type == Type.BASE;
     }
 
     /**
      * Returns true, if this component is a MyCoRe component
      */
     public boolean isMyCoReComponent() {
-        return type == Type.base || type == Type.component;
+        return type == Type.BASE || type == Type.COMPONENT;
     }
 
     /**
      * Returns true, if this component is an application module
      */
     public boolean isAppModule() {
-        return type == Type.module;
+        return type == Type.MODULE;
     }
 
     /**
@@ -278,8 +278,8 @@ public class MCRComponent implements Comparable<MCRComponent> {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         switch (type) {
-            case base, component -> sb.append("mcr:");
-            case module -> sb.append("app:");
+            case BASE, COMPONENT -> sb.append("mcr:");
+            case MODULE -> sb.append("app:");
             default -> {
             }
         }

@@ -19,6 +19,7 @@
 package org.mycore.frontend.basket;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
@@ -72,6 +73,8 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author Frank L\u00fctzenkirchen
  **/
 public class MCRBasketServlet extends MCRServlet {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger(MCRBasketServlet.class);

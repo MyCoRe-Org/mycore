@@ -76,7 +76,7 @@ public abstract class MCRCronjob implements Runnable {
     public void checkConfiguration(String property) {
         setID(property.substring(MCRCronjobManager.JOBS_CONFIG_PREFIX.length()));
         this.processable = new CronJobProcessable();
-        this.processable.setStatus(MCRProcessableStatus.created);
+        this.processable.setStatus(MCRProcessableStatus.CREATED);
         this.processable.setName(getClass().getSimpleName() + " - " + getDescription());
         this.processable.setProgressText("Wait for " + getCronDescription() + "..");
         this.processable.getProperties().put("Cron", this.cron.asString());
@@ -171,13 +171,13 @@ public abstract class MCRCronjob implements Runnable {
 
     @Override
     public final void run() {
-        getProcessable().setStatus(MCRProcessableStatus.processing);
+        getProcessable().setStatus(MCRProcessableStatus.PROCESSING);
         getProcessable().setProgressText("running..");
         try {
             runJob();
-            getProcessable().setStatus(MCRProcessableStatus.successful);
+            getProcessable().setStatus(MCRProcessableStatus.SUCCESSFUL);
         } catch (Exception e) {
-            getProcessable().setStatus(MCRProcessableStatus.failed);
+            getProcessable().setStatus(MCRProcessableStatus.FAILED);
             throw new MCRException("Error while running Cronjob " + getID() + " - " + getDescription(), e);
         }
     }
@@ -198,7 +198,7 @@ public abstract class MCRCronjob implements Runnable {
         CLI
     }
 
-    private static class CronJobProcessable extends MCRAbstractProcessable {
+    private static final class CronJobProcessable extends MCRAbstractProcessable {
     }
 
 }

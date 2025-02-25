@@ -20,6 +20,8 @@ package org.mycore.common.content.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serial;
+import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Locale;
@@ -47,7 +49,7 @@ public final class MCRServletContentHelper {
 
     public static final String ATT_SERVE_CONTENT = MCRServletContentHelper.class.getName() + ".serveContent";
 
-    private static Logger LOGGER = LogManager.getLogger(MCRServletContentHelper.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRServletContentHelper.class);
 
     private MCRServletContentHelper() {
     }
@@ -459,7 +461,10 @@ public final class MCRServletContentHelper {
         response.setHeader("Content-Length", String.valueOf(length));
     }
 
-    public static class Config {
+    public static class Config implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
 
         public int expiresMinutes;
 

@@ -143,14 +143,14 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
     /**
      * Tomcat does not support async sending of messages. We have to implement
      * our own sender.
-     *
+     * <p>
      * <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=56026">tomcat bug</a>
      */
-    private static class AsyncSenderHelper {
+    private static final class AsyncSenderHelper {
 
-        private static Logger LOGGER = LogManager.getLogger();
+        private static final Logger LOGGER = LogManager.getLogger();
 
-        private static ExecutorService SERVICE;
+        private static final ExecutorService SERVICE;
 
         static {
             SERVICE = Executors.newSingleThreadExecutor();

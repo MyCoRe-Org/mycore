@@ -66,7 +66,7 @@ public abstract class MCRAbstractProcessable extends MCRAbstractProgressable imp
             // do not create a new session! (getCurrentSession() is wrong named!)
             this.userId = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
         }
-        this.status = MCRProcessableStatus.created;
+        this.status = MCRProcessableStatus.CREATED;
         this.createTime = Instant.now();
         this.properties = new HashMap<>();
         this.statusListener = Collections.synchronizedList(new ArrayList<>());
@@ -115,7 +115,7 @@ public abstract class MCRAbstractProcessable extends MCRAbstractProgressable imp
      */
     public void setError(Throwable error) {
         this.error = error;
-        setStatus(MCRProcessableStatus.failed);
+        setStatus(MCRProcessableStatus.FAILED);
     }
 
     /**
@@ -127,11 +127,11 @@ public abstract class MCRAbstractProcessable extends MCRAbstractProgressable imp
     public void setStatus(MCRProcessableStatus status) {
         MCRProcessableStatus oldStatus = this.status;
         this.status = status;
-        if (status.equals(MCRProcessableStatus.processing)) {
+        if (status.equals(MCRProcessableStatus.PROCESSING)) {
             this.startTime = Instant.now();
         }
-        if (status.equals(MCRProcessableStatus.successful) || status.equals(MCRProcessableStatus.failed) ||
-            status.equals(MCRProcessableStatus.canceled)) {
+        if (status.equals(MCRProcessableStatus.SUCCESSFUL) || status.equals(MCRProcessableStatus.FAILED) ||
+            status.equals(MCRProcessableStatus.CANCELED)) {
             this.endTime = Instant.now();
         }
         fireStatusChanged(oldStatus);

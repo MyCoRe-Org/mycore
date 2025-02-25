@@ -135,7 +135,7 @@ public class MCRORCIDUser {
         try {
             credentialString = MCRORCIDJSONMapper.credentialToJSON(credential);
         } catch (IllegalArgumentException e) {
-            throw new MCRORCIDException("Credential is invalid");
+            throw new MCRORCIDException("Credential is invalid", e);
         }
         user.setUserAttribute(getCredentialAttributeNameByORCID(orcid), credentialString);
     }
@@ -145,7 +145,7 @@ public class MCRORCIDUser {
      */
     public void removeAllCredentials() {
         final SortedSet<MCRUserAttribute> attributes = user.getAttributes();
-        final SortedSet<MCRUserAttribute> toKeep = new TreeSet<MCRUserAttribute>();
+        final SortedSet<MCRUserAttribute> toKeep = new TreeSet<>();
         for (MCRUserAttribute attribute : attributes) {
             if (!attribute.getName().startsWith(ATTR_ORCID_CREDENTIAL)) {
                 toKeep.add(attribute);
@@ -162,7 +162,7 @@ public class MCRORCIDUser {
      */
     public void removeCredentialByORCID(String orcid) {
         final SortedSet<MCRUserAttribute> attributes = user.getAttributes();
-        final SortedSet<MCRUserAttribute> toKeep = new TreeSet<MCRUserAttribute>();
+        final SortedSet<MCRUserAttribute> toKeep = new TreeSet<>();
         for (MCRUserAttribute attribute : attributes) {
             if (!attribute.getName().equals(getCredentialAttributeNameByORCID(orcid))) {
                 toKeep.add(attribute);
@@ -285,7 +285,7 @@ public class MCRORCIDUser {
         try {
             userPropertiesString = MCRORCIDJSONMapper.userPropertiesToString(userProperties);
         } catch (IllegalArgumentException e) {
-            throw new MCRORCIDException("User properties are invalid");
+            throw new MCRORCIDException("User properties are invalid", e);
         }
         user.setUserAttribute(getUserPropertiesAttributeNameByORCID(orcid), userPropertiesString);
     }

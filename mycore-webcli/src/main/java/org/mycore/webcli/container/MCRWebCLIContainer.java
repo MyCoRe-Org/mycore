@@ -423,6 +423,7 @@ public class MCRWebCLIContainer {
             clearCommandList();
         }
 
+        @SuppressWarnings("PMD.UseTryWithResources")
         protected boolean processCommands() throws IOException {
             final LoggerContext logCtx = (LoggerContext) LogManager.getContext(false);
             final AbstractConfiguration logConf = (AbstractConfiguration) logCtx.getConfiguration();
@@ -461,7 +462,7 @@ public class MCRWebCLIContainer {
                 logConf.removeAppender(logGrabber.getName());
                 try {
                     if (webSocketSession.isOpen()) {
-                        LogManager.getLogger().info("Close session {}", webSocketSession::getId);
+                        LOGGER.info("Close session {}", webSocketSession::getId);
                         webSocketSession.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Done"));
                     }
                 } finally {
@@ -526,7 +527,7 @@ public class MCRWebCLIContainer {
 
         public String webCLIThread;
 
-        private static int MAX_BUFFER = 10000;
+        private static final int MAX_BUFFER = 10_000;
 
         private List<Flow.Subscriber<? super LogEvent>> subscribers;
 

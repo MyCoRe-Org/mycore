@@ -18,7 +18,7 @@
 
 package org.mycore.mets.model.converter;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -64,11 +64,11 @@ public class MCRSimpleModelXMLConverter {
     public static Document toXML(MCRMetsSimpleModel msm) {
         Mets mets = new Mets();
 
-        Hashtable<MCRMetsPage, String> pageIdMap = new Hashtable<>();
-        Map<String, String> idToNewIDMap = new Hashtable<>();
+        Map<MCRMetsPage, String> pageIdMap = new HashMap<>();
+        Map<String, String> idToNewIDMap = new HashMap<>();
         buildPhysicalPages(msm, mets, pageIdMap, idToNewIDMap);
 
-        Hashtable<MCRMetsSection, String> sectionIdMap = new Hashtable<>();
+        Map<MCRMetsSection, String> sectionIdMap = new HashMap<>();
         buildLogicalPages(msm, mets, sectionIdMap, idToNewIDMap);
 
         StructLink structLink = mets.getStructLink();
@@ -147,7 +147,7 @@ public class MCRSimpleModelXMLConverter {
         String id = metsSection.getId();
         LogicalDiv logicalSubDiv = new LogicalDiv(id, metsSection.getType(), metsSection.getLabel());
 
-        if (metsSection.getAltoLinks().size() > 0) {
+        if (!metsSection.getAltoLinks().isEmpty()) {
             Fptr fptr = new Fptr();
             List<Seq> seqList = fptr.getSeqList();
 

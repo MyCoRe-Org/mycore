@@ -33,6 +33,7 @@ import java.nio.channels.WritableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,13 +45,13 @@ import org.mycore.common.content.MCRSeekableChannelContent;
 final class ContentUtils {
     static final int MIN_BUFFER_SIZE = 512;
 
-    static final int DEFAULT_BUFFER_SIZE = 65536;
+    static final int DEFAULT_BUFFER_SIZE = 65_536;
 
-    static final ArrayList<Range> FULL = new ArrayList<>();
+    static final List<Range> FULL = new ArrayList<>();
 
     static final String MIME_BOUNDARY = "MYCORE_MIME_BOUNDARY";
 
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     static long copyChannel(final ReadableByteChannel src, final WritableByteChannel dest, final int bufferSize)
         throws IOException {

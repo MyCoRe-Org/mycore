@@ -21,6 +21,7 @@ package org.mycore.frontend.servlets;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.Serial;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,6 +47,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRQRCodeServlet extends MCRContentServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final long CACHE_TIME = TimeUnit.SECONDS.convert(1000L, TimeUnit.DAYS);
@@ -54,7 +56,7 @@ public class MCRQRCodeServlet extends MCRContentServlet {
 
     private static final Pattern REQUEST_PATTERN = Pattern.compile("/(\\d*)/(.*)");
 
-    private MCRPNGTools pngTools;
+    private transient MCRPNGTools pngTools;
 
     @Override
     public void init() throws ServletException {

@@ -44,7 +44,7 @@ import org.mycore.common.config.annotation.MCRProperty;
  */
 public class MCRIPCondition extends MCRAbstractFactCondition<MCRIpAddressFact> {
 
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private String defaultIP;
 

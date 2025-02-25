@@ -52,7 +52,7 @@ class Range {
 
         String rangeValue = rangeHeader.substring(RANGE_UNIT.length() + 1);
 
-        final ArrayList<Range> result = new ArrayList<>();
+        final List<Range> result = new ArrayList<>();
         final StringTokenizer commaTokenizer = new StringTokenizer(rangeValue, ",");
 
         // Parsing the range list

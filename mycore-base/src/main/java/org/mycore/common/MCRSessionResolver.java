@@ -18,6 +18,7 @@
 
 package org.mycore.common;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Optional;
@@ -35,6 +36,9 @@ import jakarta.servlet.http.HttpSessionBindingListener;
  * because values need to be {@link java.io.Serializable}.
  */
 public final class MCRSessionResolver implements Serializable, HttpSessionBindingListener {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger();
 

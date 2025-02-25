@@ -19,6 +19,7 @@
 package org.mycore.webtools.properties;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +38,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 public class MCRPropertyHelperContentServlet extends MCRContentServlet {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Override
     public MCRContent getContent(HttpServletRequest req, HttpServletResponse resp)

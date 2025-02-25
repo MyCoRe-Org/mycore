@@ -18,6 +18,7 @@
 
 package org.mycore.backend.jpa.access;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import jakarta.persistence.Column;
@@ -26,7 +27,8 @@ import jakarta.persistence.Embeddable;
 @Embeddable
 public class MCRACCESSPK implements Serializable {
 
-    private static final long serialVersionUID = 1177905976922683366L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Column(name = "ACPOOL")
     private String acpool;

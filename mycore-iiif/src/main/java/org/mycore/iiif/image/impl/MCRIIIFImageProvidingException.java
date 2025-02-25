@@ -18,8 +18,11 @@
 
 package org.mycore.iiif.image.impl;
 
+import java.io.Serial;
+
 public class MCRIIIFImageProvidingException extends Exception {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public MCRIIIFImageProvidingException(String message, Throwable cause, boolean enableSuppression,

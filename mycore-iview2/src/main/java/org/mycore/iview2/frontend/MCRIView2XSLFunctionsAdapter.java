@@ -39,7 +39,7 @@ import org.mycore.iview2.services.MCRIView2Tools;
  *
  */
 public class MCRIView2XSLFunctionsAdapter {
-    private static Logger LOGGER = LogManager.getLogger(MCRIView2XSLFunctionsAdapter.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRIView2XSLFunctionsAdapter.class);
 
     private static final MCRLinkTableManager LINK_TABLE_MANAGER = MCRLinkTableManager.instance();
 
@@ -56,6 +56,7 @@ public class MCRIView2XSLFunctionsAdapter {
         return MCRIView2Tools.getSupportedMainFile(derivateID);
     }
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     public String getOptions(String derivateID, String extensions) {
         final Collection<String> sources = LINK_TABLE_MANAGER.getSourceOf(derivateID, "derivate");
         String objectID = (sources != null && !sources.isEmpty()) ? sources.iterator().next() : "";
@@ -76,7 +77,7 @@ public class MCRIView2XSLFunctionsAdapter {
                 .append(MCRConfiguration2.getString("MCR.Module-iview2.PDFCreatorStyle").orElse("")).append('\"');
         }
 
-        if (extensions != null && !extensions.equals("")) {
+        if (extensions != null && !extensions.isEmpty()) {
             options.append(',');
             options.append(extensions);
         }

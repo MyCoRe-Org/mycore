@@ -117,7 +117,7 @@ public class MCRXEditorTransformer {
     public void initializePostprocessor(Node postProcessorNode) {
         NamedNodeMap attributes = postProcessorNode.getAttributes();
         int attributesLength = attributes.getLength();
-        HashMap<String, String> attributeMap = new HashMap<>();
+        Map<String, String> attributeMap = new HashMap<>();
         for (int i = 0; i < attributesLength; i++) {
             Attr item = (Attr) attributes.item(i); // this should be save because we called getAttributes earlier
             String attrName = item.getName();

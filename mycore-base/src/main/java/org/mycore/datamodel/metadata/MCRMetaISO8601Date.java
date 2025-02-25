@@ -45,15 +45,15 @@ import com.google.gson.JsonObject;
  */
 public final class MCRMetaISO8601Date extends MCRMetaDefault {
 
+    private static final Namespace DEFAULT_NAMESPACE = Namespace.NO_NAMESPACE;
+
+    private static final Logger LOGGER = LogManager.getLogger();
+
     private Element export;
 
     private boolean changed = true;
 
-    private static final Namespace DEFAULT_NAMESPACE = Namespace.NO_NAMESPACE;
-
     private MCRISO8601Date isoDate;
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * constructs a empty instance.

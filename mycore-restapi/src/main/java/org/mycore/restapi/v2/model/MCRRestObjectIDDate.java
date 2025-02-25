@@ -54,7 +54,7 @@ public class MCRRestObjectIDDate {
     }
 
     @XmlAttribute(required = true)
-    @XmlJavaTypeAdapter(value = MCRInstantXMLAdapter.class)
+    @XmlJavaTypeAdapter(MCRInstantXMLAdapter.class)
     public Instant getLastModified() {
         return lastModified;
     }

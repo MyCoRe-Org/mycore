@@ -21,6 +21,7 @@ package org.mycore.user2;
 import static org.mycore.user2.utils.MCRUserTransformer.JAXB_CONTEXT;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
@@ -70,12 +71,19 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRUserServlet extends MCRServlet {
-    private static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone("UTC");
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    /** The logger */
-    private static final Logger LOGGER = LogManager.getLogger(MCRUserServlet.class);
+    private static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone("UTC");
+
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    private static final String ATTRIBUTE_NAME = "name";
+
+    private static final String ATTRIBUTE_REALM = "realm";
+
+    private static final String ATTRIBUTE_VALUE = "value";
 
     /**
      * Handles requests. The parameter 'action' selects what to do, possible
@@ -255,11 +263,11 @@ public class MCRUserServlet extends MCRServlet {
 
         Document doc = (Document) req.getAttribute("MCRXEditorSubmission");
         Element u = doc.getRootElement();
-        String userName = u.getAttributeValue("name");
+        String userName = u.getAttributeValue(ATTRIBUTE_NAME);
 
         String realmID = MCRRealmFactory.getLocalRealm().getID();
         if (hasAdminPermission) {
-            realmID = u.getAttributeValue("realm");
+            realmID = u.getAttributeValue(ATTRIBUTE_REALM);
         }
 
         MCRUser user = getUserIfAllowed(userName, realmID,
@@ -330,8 +338,8 @@ public class MCRUserServlet extends MCRServlet {
 
         Element o = u.getChild("owner");
         if (o != null && !o.getAttributes().isEmpty()) {
-            String ownerName = o.getAttributeValue("name");
-            String ownerRealm = o.getAttributeValue("realm");
+            String ownerName = o.getAttributeValue(ATTRIBUTE_NAME);
+            String ownerRealm = o.getAttributeValue(ATTRIBUTE_REALM);
             MCRUser owner = MCRUserManager.getUser(ownerName, ownerRealm);
             if (!checkUserIsNotNull(res, owner, ownerName + "@" + ownerRealm)) {
                 return false;
@@ -377,7 +385,7 @@ public class MCRUserServlet extends MCRServlet {
             return null;
         }
         return gs.getChildren("role").stream()
-            .map(group -> group.getAttributeValue("name"))
+            .map(group -> group.getAttributeValue(ATTRIBUTE_NAME))
             .filter(Objects::nonNull)
             .toList();
     }
@@ -421,7 +429,9 @@ public class MCRUserServlet extends MCRServlet {
             .map(attributes -> attributes.getChildren("attribute"))
             .orElse(Collections.emptyList());
         Set<MCRUserAttribute> newAttrs = attributeList.stream()
-            .map(a -> new MCRUserAttribute(a.getAttributeValue("name"), a.getAttributeValue("value")))
+            .map(a -> new MCRUserAttribute(
+                a.getAttributeValue(ATTRIBUTE_NAME),
+                a.getAttributeValue(ATTRIBUTE_VALUE)))
             .collect(Collectors.toSet());
         user.getAttributes().retainAll(newAttrs);
         newAttrs.removeAll(user.getAttributes());

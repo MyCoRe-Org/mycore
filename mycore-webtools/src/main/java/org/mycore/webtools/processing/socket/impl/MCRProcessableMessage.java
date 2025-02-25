@@ -59,7 +59,7 @@ class MCRProcessableMessage extends MCRWebSocketMessage {
 
     MCRProcessableMessage(MCRProcessable processable, Integer processableId,
         Integer collectionId) {
-        super(MCRMessageType.updateProcessable);
+        super(MCRMessageType.UPDATE_PROCESSABLE);
 
         this.id = processableId;
         this.collectionId = collectionId;

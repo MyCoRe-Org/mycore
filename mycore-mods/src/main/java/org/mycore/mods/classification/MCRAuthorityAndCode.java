@@ -35,26 +35,29 @@ import org.w3c.dom.Element;
  * @author Frank Lützenkirchen
  */
 class MCRAuthorityAndCode extends MCRAuthorityInfo {
+
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRAuthorityAndCode.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * xml:lang value of category or classification <label> for MODS @authority.
      */
     public static final String LABEL_LANG_AUTHORITY = "x-auth";
 
+    private static final String ELEMENT_AUTHORITY = "authority";
+
     /** The authority code */
-    private String authority;
+    private final String authority;
 
     /** The value code */
-    private String code;
+    private final String code;
 
     /**
      * Inspects the attributes in the given MODS XML element and returns the AuthorityInfo given there.
      */
     public static MCRAuthorityAndCode getAuthorityInfo(org.jdom2.Element modsElement) {
-        String authority = modsElement.getAttributeValue("authority");
+        String authority = modsElement.getAttributeValue(ELEMENT_AUTHORITY);
         String type = modsElement.getAttributeValue("type");
         String code = modsElement.getTextTrim();
         return getAuthorityInfo(authority, type, code);
@@ -64,7 +67,7 @@ class MCRAuthorityAndCode extends MCRAuthorityInfo {
      * Inspects the attributes in the given MODS XML element and returns the AuthorityInfo given there.
      */
     public static MCRAuthorityAndCode getAuthorityInfo(Element modsElement) {
-        String authority = modsElement.getAttribute("authority");
+        String authority = modsElement.getAttribute(ELEMENT_AUTHORITY);
         String type = modsElement.getAttribute("type");
         String code = MCRMODSClassificationSupport.getText(modsElement).trim();
         return getAuthorityInfo(authority, type, code);
@@ -116,13 +119,13 @@ class MCRAuthorityAndCode extends MCRAuthorityInfo {
 
     @Override
     public void setInElement(org.jdom2.Element element) {
-        element.setAttribute("authority", authority);
+        element.setAttribute(ELEMENT_AUTHORITY, authority);
         element.setText(code);
     }
 
     @Override
     public void setInElement(Element element) {
-        element.setAttribute("authority", authority);
+        element.setAttribute(ELEMENT_AUTHORITY, authority);
         element.setTextContent(code);
     }
 }

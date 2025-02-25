@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<ruleset name="Custom MyCoRe rules" xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+  <description>
+    This ruleset contains custom MyCoRe rules
+  </description>
+
+  <rule name="MCR.SerialVersionUidAnnotation"
+        language="java"
+        message="The serialVersionUID should be annotated with @java.io.Serial"
+        class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+    <priority>4</priority>
+    <properties>
+      <property name="xpath">
+        <value>
+          <![CDATA[
+            //ClassBody/FieldDeclaration
+              [
+                pmd-java:modifiers()='private'
+                  and
+                pmd-java:modifiers()='static'
+                  and
+                pmd-java:modifiers()='final'
+                  and
+                PrimitiveType[@Kind='long']
+                  and
+                VariableDeclarator/VariableId[@Name='serialVersionUID']
+              ]
+              [
+                not(ModifierList/Annotation/ClassType[pmd-java:typeIs('java.io.Serial')])
+              ]
+          ]]>
+        </value>
+      </property>
+    </properties>
+  </rule>
+
+  <rule name="MCR.SerialVersionUidValue"
+        language="java"
+        message="The serialVersionUID should have literal value '1L'"
+        class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+    <priority>4</priority>
+    <properties>
+      <property name="xpath">
+        <value>
+          <![CDATA[
+            //ClassBody/FieldDeclaration
+              [
+                pmd-java:modifiers()='private'
+                  and
+                pmd-java:modifiers()='static'
+                  and
+                pmd-java:modifiers()='final'
+                  and
+                PrimitiveType[@Kind='long']
+                  and
+                VariableDeclarator/VariableId[@Name='serialVersionUID']
+              ]
+              [
+                not(VariableDeclarator/NumericLiteral[@Image='1L'])
+              ]
+          ]]>
+        </value>
+      </property>
+    </properties>
+  </rule>
+
+</ruleset>

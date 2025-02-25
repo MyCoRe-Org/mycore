@@ -18,6 +18,7 @@
 
 package org.mycore.common.xml;
 
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -29,14 +30,15 @@ import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 
 /**
- * Helper class to get {@link DocumentBuilder} instances from a common pool
+ * Helper class to get {@link DocumentBuilder} instances from a common pool.
+ *
  * @author Thomas Scheffler (yagee)
  */
-public class MCRDOMUtils implements Closeable {
+public final class MCRDOMUtils implements Closeable {
 
     DocumentBuilderFactory docBuilderFactory;
 
-    ConcurrentLinkedQueue<DocumentBuilder> builderQueue;
+    Queue<DocumentBuilder> builderQueue;
 
     private MCRDOMUtils() {
         builderQueue = new ConcurrentLinkedQueue<>();
@@ -87,7 +89,7 @@ public class MCRDOMUtils implements Closeable {
         return 0;
     }
 
-    private static class LazyHolder {
+    private static final class LazyHolder {
         private static final MCRDOMUtils INSTANCE = new MCRDOMUtils();
     }
 

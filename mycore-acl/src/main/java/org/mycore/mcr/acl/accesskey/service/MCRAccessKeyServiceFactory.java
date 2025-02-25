@@ -91,16 +91,16 @@ public final class MCRAccessKeyServiceFactory {
             MCRAccessKeySecretProcessor.class, MCRAccessKeyConfig.getSecretProcessorClassProperty());
     }
 
-    private static class ServiceHolder {
+    private static final class ServiceHolder {
         private static final MCRAccessKeyService INSTANCE = createAndConfigureService(
             createRepository(), createValidator(), getSecretProcessor());
     }
 
-    private static class UserServiceHolder {
+    private static final class UserServiceHolder {
         private static final MCRAccessKeyUserService INSTANCE = createUserService(getAccessKeyService());
     }
 
-    private static class SessionServiceHolder {
+    private static final class SessionServiceHolder {
         private static final MCRAccessKeySessionService INSTANCE = createSessionService(getAccessKeyService());
     }
 

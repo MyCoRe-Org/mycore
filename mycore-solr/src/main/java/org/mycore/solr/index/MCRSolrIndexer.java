@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -51,6 +52,7 @@ import org.mycore.common.events.MCRShutdownHandler.Closeable;
 import org.mycore.common.processing.MCRProcessableDefaultCollection;
 import org.mycore.common.processing.MCRProcessableRegistry;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.MCRSolrUtils;
@@ -94,7 +96,7 @@ public class MCRSolrIndexer {
 
     static final MCRProcessableDefaultCollection SOLR_COLLECTION;
 
-    private static final int BATCH_AUTO_COMMIT_WITHIN_MS = 60000;
+    private static final int BATCH_AUTO_COMMIT_WITHIN_MS = 60_000;
 
     public static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
         MCRSolrAuthenticationManager.getInstance();
@@ -374,7 +376,7 @@ public class MCRSolrIndexer {
 
         MCRXMLMetadataManager metadataMgr = MCRXMLMetadataManager.instance();
         MCRSolrIndexStatistic statistic = null;
-        HashMap<MCRObjectID, MCRContent> contentMap = new HashMap<>((int) (BULK_SIZE * 1.4));
+        Map<MCRObjectID, MCRContent> contentMap = new HashMap<>((int) (BULK_SIZE * 1.4));
         int i = 0;
         for (String id : list) {
             i++;
@@ -405,7 +407,7 @@ public class MCRSolrIndexer {
      * Rebuilds solr's content index.
      */
     public static void rebuildContentIndex(List<MCRSolrCore> cores) {
-        rebuildContentIndex(MCRXMLMetadataManager.instance().listIDsOfType("derivate"), cores);
+        rebuildContentIndex(MCRXMLMetadataManager.instance().listIDsOfType(MCRDerivate.OBJECT_TYPE), cores);
     }
 
     /**
@@ -598,7 +600,7 @@ public class MCRSolrIndexer {
             List<String> solrList = MCRSolrSearchUtils.listIDs(core.getClient(), query);
             LOGGER.info("there are {} solr objects", solrList::size);
             // documents to remove
-            List<String> toRemove = new ArrayList(solrList);
+            List<String> toRemove = new ArrayList<>(solrList);
             toRemove.removeAll(storeList);
             if (!toRemove.isEmpty()) {
                 LOGGER.info("remove {} zombie objects from solr", toRemove::size);

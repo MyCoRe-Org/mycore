@@ -18,6 +18,7 @@
 
 package org.mycore.frontend.jersey.filter.access;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -25,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  */
 public class MCRResourceAccessCheckerFactory {
-    private static ConcurrentHashMap<Class<? extends MCRResourceAccessChecker>, MCRResourceAccessChecker> implMap;
+    private static Map<Class<? extends MCRResourceAccessChecker>, MCRResourceAccessChecker> implMap;
     static {
         //static block as code style requires 120 character line width
         implMap = new ConcurrentHashMap<>();

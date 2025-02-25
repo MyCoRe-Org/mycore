@@ -42,7 +42,7 @@ import org.mycore.common.config.MCRConfigurationException;
  *
  * @author Frank Lützenkirchen
  */
-public class MCREventManager {
+public final class MCREventManager {
 
     public static final String CONFIG_PREFIX = "MCR.EventHandler.";
 
@@ -52,12 +52,12 @@ public class MCREventManager {
     /** Call event handlers in backward direction (delete) */
     public static final boolean BACKWARD = false;
 
-    private static Logger logger = LogManager.getLogger(MCREventManager.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCREventManager.class);
 
     private static MCREventManager instance;
 
     /** Table of all configured event handlers * */
-    private ConcurrentHashMap<String, List<MCREventHandler>> handlers;
+    private Map<String, List<MCREventHandler>> handlers;
 
     private MCREventManager() {
         handlers = new ConcurrentHashMap<>();
@@ -83,7 +83,7 @@ public class MCREventManager {
             String type = eventHandlerProperty.getType();
             String mode = eventHandlerProperty.getMode();
 
-            logger.debug("EventManager instantiating handler {} for type {}", () -> props.get(propertyKey), () -> type);
+            LOGGER.debug("EventManager instantiating handler {} for type {}", () -> props.get(propertyKey), () -> type);
 
             if (propKeyIsSet(propertyKey)) {
                 addEventHandler(type, getEventHandler(mode, propertyKey));
@@ -158,7 +158,7 @@ public class MCREventManager {
         Exception handleEventExceptionCaught = null;
         for (int i = first; i != last + step; i += step) {
             MCREventHandler eh = list.get(i);
-            logger.debug("EventManager {} {} calling handler {}", () -> objectType, () -> eventType,
+            LOGGER.debug("EventManager {} {} calling handler {}", () -> objectType, () -> eventType,
                 () -> eh.getClass().getName());
             handleEventExceptionCaught = handleEventAndUndoOnException(eh, evt);
             if (handleEventExceptionCaught != null) {
@@ -178,8 +178,8 @@ public class MCREventManager {
             eh.doHandleEvent(evt);
         } catch (Exception ex) {
             handleEventExceptionCaught = ex;
-            logger.error("Exception caught while calling event handler", ex);
-            logger.error("Trying rollback by calling undo method of event handlers");
+            LOGGER.error("Exception caught while calling event handler", ex);
+            LOGGER.error("Trying rollback by calling undo method of event handlers");
         }
         return handleEventExceptionCaught;
 
@@ -190,12 +190,12 @@ public class MCREventManager {
             : evt.getObjectType().getClassName();
         final String eventType = evt.getEventType() == MCREvent.EventType.CUSTOM ? evt.getCustomEventType()
             : evt.getEventType().name();
-        logger.debug("EventManager {} {} calling undo of handler {}", () -> objectType, () -> eventType,
+        LOGGER.debug("EventManager {} {} calling undo of handler {}", () -> objectType, () -> eventType,
             () -> eh.getClass().getName());
         try {
             eh.undoHandleEvent(evt);
         } catch (Exception ex) {
-            logger.error("Exception caught while calling undo of event handler", ex);
+            LOGGER.error("Exception caught while calling undo of event handler", ex);
         }
 
     }

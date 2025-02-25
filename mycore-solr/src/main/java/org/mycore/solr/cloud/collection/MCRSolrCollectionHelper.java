@@ -35,7 +35,7 @@ import org.mycore.solr.auth.MCRSolrAuthenticationManager;
  */
 public class MCRSolrCollectionHelper {
 
-    public static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static void createCollection(MCRSolrCore core) throws SolrServerException, IOException {
         CollectionAdminRequest.Create collectionCreateRequest = CollectionAdminRequest

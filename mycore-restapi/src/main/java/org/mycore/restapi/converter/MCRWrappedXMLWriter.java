@@ -29,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -53,7 +54,7 @@ import jakarta.xml.bind.annotation.XmlType;
 @Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
 public class MCRWrappedXMLWriter implements MessageBodyWriter<Object> {
 
-    private static final ConcurrentHashMap<Class, JAXBContext> CTX_MAP = new ConcurrentHashMap<>();
+    private static final Map<Class, JAXBContext> CTX_MAP = new ConcurrentHashMap<>();
 
     private static final Predicate<Class> JAXB_CHECKER = type -> type.isAnnotationPresent(XmlRootElement.class)
         || type.isAnnotationPresent(XmlType.class);

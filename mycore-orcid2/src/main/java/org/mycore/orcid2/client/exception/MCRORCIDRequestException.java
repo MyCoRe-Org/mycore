@@ -22,11 +22,14 @@ import org.mycore.orcid2.exception.MCRORCIDException;
 
 import jakarta.ws.rs.core.Response;
 
+import java.io.Serial;
+
 /**
  * This class is used if a request fails.
  */
 public class MCRORCIDRequestException extends MCRORCIDException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

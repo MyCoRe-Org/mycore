@@ -97,7 +97,7 @@ public class MCRJobRunnable extends MCRAbstractProcessable implements Runnable {
             //prepare job
             transaction.begin();
             MCRJob localJob;
-            setStatus(MCRProcessableStatus.processing);
+            setStatus(MCRProcessableStatus.PROCESSING);
             job.setStart(new Date());
             localJob = em.merge(job);
             try {
@@ -163,7 +163,7 @@ public class MCRJobRunnable extends MCRAbstractProcessable implements Runnable {
 
     private void handleSuccess(MCRJob localJob) {
         localJob.setStatus(MCRJobStatus.FINISHED);
-        setStatus(MCRProcessableStatus.successful);
+        setStatus(MCRProcessableStatus.SUCCESSFUL);
     }
 
     private void handleException(MCRJob localJob, Exception executionException) {

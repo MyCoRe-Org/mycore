@@ -35,7 +35,7 @@ import org.mycore.common.MCRTestCase;
 
 public class MCRTransactionableCallableTest extends MCRTestCase {
 
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Test
     public void run() {

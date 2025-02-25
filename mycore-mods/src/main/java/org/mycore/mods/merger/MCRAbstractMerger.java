@@ -21,6 +21,7 @@ package org.mycore.mods.merger;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRXlink;
 import org.mycore.common.config.MCRConfiguration2;
 
 /**
@@ -49,7 +50,7 @@ public class MCRAbstractMerger extends MCRMerger {
     public void setElement(Element element) {
         super.setElement(element);
         text = MCRTextNormalizer.normalizeText(element.getText());
-        text += element.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE, "");
+        text += element.getAttributeValue(MCRXlink.HREF, MCRConstants.XLINK_NAMESPACE, "");
         text = text.substring(0, Math.min(text.length(), MAX_COMPARE_LENGTH));
     }
 

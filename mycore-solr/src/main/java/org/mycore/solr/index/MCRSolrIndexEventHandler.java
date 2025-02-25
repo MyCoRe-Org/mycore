@@ -59,11 +59,12 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRSolrIndexEventHandler.class);
 
-    private static long DELAY_IN_MS = MCRConfiguration2.getLong("MCR.Solr.DelayIndexing_inMS").orElse(2000L);
+    private static final long DELAY_IN_MS = MCRConfiguration2.getLong("MCR.Solr.DelayIndexing_inMS").orElse(2000L);
 
-    private static DelayQueue<MCRDelayedRunnable> SOLR_TASK_QUEUE = new DelayQueue<>();
+    @SuppressWarnings("PMD.LooseCoupling")
+    private static final DelayQueue<MCRDelayedRunnable> SOLR_TASK_QUEUE = new DelayQueue<>();
 
-    private static ScheduledExecutorService SOLR_TASK_EXECUTOR = Executors.newSingleThreadScheduledExecutor();
+    private static final ScheduledExecutorService SOLR_TASK_EXECUTOR = Executors.newSingleThreadScheduledExecutor();
 
     private static synchronized void putIntoTaskQueue(MCRDelayedRunnable task) {
         SOLR_TASK_QUEUE.remove(task);

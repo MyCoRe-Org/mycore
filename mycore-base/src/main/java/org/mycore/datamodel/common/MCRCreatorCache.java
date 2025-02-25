@@ -43,7 +43,7 @@ public class MCRCreatorCache {
 
     private static final long CACHE_SIZE = 5000;
 
-    private static LoadingCache<MCRObjectID, String> CACHE = CacheBuilder.newBuilder()
+    private static final LoadingCache<MCRObjectID, String> CACHE = CacheBuilder.newBuilder()
         .maximumSize(CACHE_SIZE).build(new CacheLoader<>() {
             @Override
             public String load(final MCRObjectID objectId) {

@@ -21,6 +21,7 @@ package org.mycore.services.queuedjob;
 import java.lang.reflect.Constructor;
 import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -69,7 +70,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
 
     private final MCRProcessableDefaultCollection processableCollection;
 
-    private final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
+    private final BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
 
     private final ReentrantLock runLock;
 
@@ -174,36 +175,30 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
             if (!running) {
                 return false;
             }
-
-            EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-            EntityTransaction transaction = em.getTransaction();
-
             MCRJob job = null;
             MCRJobAction action = null;
-            try {
-                transaction.begin();
-
-                job = jobQueue.poll();
-                processableCollection.setProperty("queue size", jobQueue.size());
-
-                if (job != null) {
-                    action = toMCRJobAction(job);
-
-                    if (action != null && !action.isActivated()) {
-                        job.setStatus(MCRJobStatus.NEW);
-                        job.setStart(null);
+            try (EntityManager em = MCREntityManagerProvider.getCurrentEntityManager()) {
+                EntityTransaction transaction = em.getTransaction();
+                try {
+                    transaction.begin();
+                    job = jobQueue.poll();
+                    processableCollection.setProperty("queue size", jobQueue.size());
+                    if (job != null) {
+                        action = toMCRJobAction(job);
+                        if (action != null && !action.isActivated()) {
+                            job.setStatus(MCRJobStatus.NEW);
+                            job.setStart(null);
+                        }
+                    }
+                    transaction.commit();
+                } catch (RollbackException e) {
+                    LOGGER.error("Error while getting next job.", e);
+                    try {
+                        transaction.rollback();
+                    } catch (RuntimeException re) {
+                        LOGGER.warn("Could not rollback transaction.", re);
                     }
                 }
-                transaction.commit();
-            } catch (RollbackException e) {
-                LOGGER.error("Error while getting next job.", e);
-                try {
-                    transaction.rollback();
-                } catch (RuntimeException re) {
-                    LOGGER.warn("Could not rollback transaction.", re);
-                }
-            } finally {
-                em.close();
             }
             if (job != null && action != null && action.isActivated() && !jobExecutor.isShutdown()) {
                 LOGGER.info("Creating:{}", job);
@@ -374,7 +369,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
         private final AtomicInteger activeThreads;
 
         ActiveCountingThreadPoolExecutor(int maxJobThreadCount,
-            LinkedBlockingQueue<Runnable> workQueue,
+            BlockingQueue<Runnable> workQueue,
             JobThreadFactory jobThreadFactory,
             AtomicInteger activeThreads) {
             super(maxJobThreadCount, maxJobThreadCount, 1, TimeUnit.DAYS, workQueue, jobThreadFactory);

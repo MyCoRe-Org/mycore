@@ -101,7 +101,7 @@ public class MCRAltoHighlightResource {
 
     @GET
     @Path("{derivateId}")
-    @Produces(MCRJerseyUtil.APPLICATION_JSON_UTF8)
+    @Produces(MCRJerseyUtil.APPLICATION_JSON_UTF_8)
     public Response query(@PathParam("derivateId") String derivateId, @QueryParam("q") String query) {
         ModifiableSolrParams p = new ModifiableSolrParams();
         p.set("q", buildQuery(query));
@@ -168,7 +168,7 @@ public class MCRAltoHighlightResource {
         page.add("hits", hits);
         List<String> altoContentList = fields.get("alto_content");
         List<String> altoWords = fields.get("alto_words");
-        if (altoContentList.size() == 0 || altoWords.size() == 0) {
+        if (altoContentList.isEmpty() || altoWords.isEmpty()) {
             return Optional.empty();
         }
         int wordIndex = 0;

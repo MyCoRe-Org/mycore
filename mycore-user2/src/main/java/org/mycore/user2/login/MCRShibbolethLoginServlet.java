@@ -18,6 +18,7 @@
 
 package org.mycore.user2.login;
 
+import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,9 +42,10 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRShibbolethLoginServlet extends MCRServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    private static Logger LOGGER = LogManager.getLogger(MCRShibbolethLoginServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRShibbolethLoginServlet.class);
 
     @Override
     public void doGetPost(MCRServletJob job) throws Exception {

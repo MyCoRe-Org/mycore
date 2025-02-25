@@ -53,7 +53,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 @MCRCommandGroup(name = "IFS2 Commands")
 public class MCRIFS2Commands extends MCRAbstractCommands {
 
-    public static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @MCRCommand(syntax = "list all current ifs2 stores",
         help = "Lists all currently configured IFS2 MCRStore instances")
@@ -162,8 +162,8 @@ public class MCRIFS2Commands extends MCRAbstractCommands {
                         throw new UncheckedIOException(e);
                     }
                 });
-        } catch (UncheckedIOException e) {
-            throw e.getCause();
+        } catch (UncheckedIOException ignoredUnchecked) {
+            throw ignoredUnchecked.getCause();
         }
     }
 
@@ -184,8 +184,8 @@ public class MCRIFS2Commands extends MCRAbstractCommands {
                     }
                     return Stream.of(new FileInfo(nodePath.resolve(fileName), n.getAttributeValue("md5")));
                 });
-        } catch (UncheckedIOException e) {
-            throw e.getCause();
+        } catch (UncheckedIOException ignoredUnchecked) {
+            throw ignoredUnchecked.getCause();
         }
     }
 

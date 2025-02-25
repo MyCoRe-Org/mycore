@@ -66,10 +66,12 @@ import org.mycore.user2.utils.MCRUserTransformer;
     name = "User Commands")
 public class MCRUserCommands extends MCRAbstractCommands {
     /** The logger */
-    private static Logger LOGGER = LogManager.getLogger(MCRUserCommands.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String SYSTEM = MCRConfiguration2.getStringOrThrow("MCR.CommandLineInterface.SystemName")
         + ":";
+
+    private static final String FILENAME_EXTENSION_XML = ".xml";
 
     /**
      * This command changes the user of the session context to a new user.
@@ -85,9 +87,9 @@ public class MCRUserCommands extends MCRAbstractCommands {
         order = 10)
     public static void changeToUser(String user, String password) {
         MCRSession session = MCRSessionMgr.getCurrentSession();
-        System.out.println(SYSTEM + " The old user ID is " + session.getUserInformation().getUserID());
+        LOGGER.info(() -> SYSTEM + " The old user ID is " + session.getUserInformation().getUserID());
         if (MCRUserManager.login(user, password) != null) {
-            System.out.println(SYSTEM + " The new user ID is " + session.getUserInformation().getUserID());
+            LOGGER.info(() -> SYSTEM + " The new user ID is " + session.getUserInformation().getUserID());
         } else {
             LOGGER.warn("Wrong password, no changes of user ID in session context!");
         }
@@ -184,7 +186,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         help = "Export the role {0} to the directory {1}. The filename will be {0}.xml")
     public static void exportRole(String roleID, String directory) throws IOException {
         MCRRole mcrRole = MCRRoleManager.getRole(roleID);
-        File targetFile = new File(directory, roleID + ".xml");
+        File targetFile = new File(directory, roleID + FILENAME_EXTENSION_XML);
         try (OutputStream fileOutputStream = Files.newOutputStream(targetFile.toPath())) {
             XMLOutputter out = new XMLOutputter(Format.getPrettyFormat().setEncoding(MCRConstants.DEFAULT_ENCODING));
             out.output(MCRRoleTransformer.buildExportableXML(mcrRole), fileOutputStream);
@@ -379,9 +381,9 @@ public class MCRUserCommands extends MCRAbstractCommands {
             throw new MCRException("Directory does not exist: " + dir.getAbsolutePath());
         }
         List<MCRUser> users = MCRUserManager.listUsers(null, null, null, null);
-        ArrayList<String> commands = new ArrayList<>(users.size());
+        List<String> commands = new ArrayList<>(users.size());
         for (MCRUser user : users) {
-            File userFile = new File(dir, user.getUserID() + ".xml");
+            File userFile = new File(dir, user.getUserID() + FILENAME_EXTENSION_XML);
             commands.add("export user " + user.getUserID() + " to file " + userFile.getAbsolutePath());
         }
         return commands;
@@ -407,13 +409,13 @@ public class MCRUserCommands extends MCRAbstractCommands {
             throw new FileNotFoundException(dir.getAbsolutePath() + " is not a directory.");
         }
         File[] listFiles = dir
-            .listFiles(pathname -> pathname.isFile() && pathname.getName().endsWith(".xml"));
+            .listFiles(pathname -> pathname.isFile() && pathname.getName().endsWith(FILENAME_EXTENSION_XML));
         if (listFiles.length == 0) {
             LOGGER.warn("Did not find any user files in {}", dir::getAbsolutePath);
             return null;
         }
         Arrays.sort(listFiles);
-        ArrayList<String> cmds = new ArrayList<>(listFiles.length);
+        List<String> cmds = new ArrayList<>(listFiles.length);
         for (File file : listFiles) {
             cmds.add(new MessageFormat("{0} {1}", Locale.ROOT).format(new Object[] { cmd, file.getAbsolutePath() }));
         }
@@ -524,7 +526,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * @return true if the file name is okay
      */
     private static File getCheckedFile(String filename) {
-        if (!filename.endsWith(".xml")) {
+        if (!filename.endsWith(FILENAME_EXTENSION_XML)) {
             LOGGER.warn("{} ignored, does not end with *.xml", filename);
 
             return null;

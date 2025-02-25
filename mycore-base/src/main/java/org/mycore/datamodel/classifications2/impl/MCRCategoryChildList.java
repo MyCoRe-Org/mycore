@@ -18,6 +18,7 @@
 
 package org.mycore.datamodel.classifications2.impl;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -25,7 +26,9 @@ import java.util.Objects;
 import org.mycore.datamodel.classifications2.MCRCategory;
 
 class MCRCategoryChildList extends ArrayList<MCRCategory> {
-    private static final long serialVersionUID = 5844882597476033744L;
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private MCRCategory root;
 

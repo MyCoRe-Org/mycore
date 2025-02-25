@@ -61,10 +61,12 @@ public class MetsResource {
 
     public static final String METS_XML_PATH = "/mets.xml";
 
+    private static final String DERIVATE_ID = "derivateId";
+
     @GET
     @Path("/editor/start/{derivateId}")
     @Produces(MediaType.TEXT_HTML)
-    public String startEditor(@PathParam("derivateId") String derivateId) {
+    public String startEditor(@PathParam(DERIVATE_ID) String derivateId) {
         MCRObjectID derivateIdObject = MCRObjectID.getInstance(derivateId);
 
         checkDerivateExists(derivateIdObject);
@@ -89,7 +91,7 @@ public class MetsResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/editor/islocked/{derivateId}")
-    public String isLocked(@PathParam("derivateId") String derivateId) {
+    public String isLocked(@PathParam(DERIVATE_ID) String derivateId) {
         checkDerivateAccess(MCRObjectID.getInstance(derivateId), MCRAccessManager.PERMISSION_READ);
         boolean isLocked = MCRMetsLock.isLocked(derivateId);
         return "{\"lock\": " + isLocked + " }";
@@ -98,7 +100,7 @@ public class MetsResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/editor/lock/{derivateId}")
-    public String lock(@PathParam("derivateId") String derivateId) {
+    public String lock(@PathParam(DERIVATE_ID) String derivateId) {
         checkDerivateAccess(MCRObjectID.getInstance(derivateId), MCRAccessManager.PERMISSION_WRITE);
         boolean isLockSuccessfully = MCRMetsLock.doLock(derivateId);
         return "{\"success\": " + isLockSuccessfully + " }";
@@ -107,7 +109,7 @@ public class MetsResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/editor/unlock/{derivateId}")
-    public String unlock(@PathParam("derivateId") String derivateId) {
+    public String unlock(@PathParam(DERIVATE_ID) String derivateId) {
         checkDerivateAccess(MCRObjectID.getInstance(derivateId), MCRAccessManager.PERMISSION_WRITE);
         try {
             MCRMetsLock.doUnlock(derivateId);
@@ -120,7 +122,7 @@ public class MetsResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/crud/{derivateId}")
-    public String get(@PathParam("derivateId") String derivateId) {
+    public String get(@PathParam(DERIVATE_ID) String derivateId) {
         MCRObjectID derivateIdObject = MCRObjectID.getInstance(derivateId);
 
         checkDerivateExists(derivateIdObject);
@@ -143,7 +145,7 @@ public class MetsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/crud/{derivateId}")
-    public String save(@PathParam("derivateId") String derivateId, String data) {
+    public String save(@PathParam(DERIVATE_ID) String derivateId, String data) {
         MCRObjectID derivateIdObject = MCRObjectID.getInstance(derivateId);
 
         checkDerivateExists(derivateIdObject);
@@ -165,7 +167,7 @@ public class MetsResource {
 
     @DELETE
     @Path("/crud/{derivateId}")
-    public String delete(@PathParam("derivateId") String derivateId) {
+    public String delete(@PathParam(DERIVATE_ID) String derivateId) {
         MCRObjectID derivateIdObject = MCRObjectID.getInstance(derivateId);
 
         checkDerivateExists(derivateIdObject);

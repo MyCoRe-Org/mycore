@@ -113,6 +113,7 @@ import jakarta.persistence.UniqueConstraint;
     @NamedQuery(name = "MCRCategoryLink.links",
         query = "FROM MCRCategoryLinkImpl WHERE objectReference.type=:type")
 })
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class MCRCategoryLinkImpl implements MCRCategoryLink {
 
     @Id

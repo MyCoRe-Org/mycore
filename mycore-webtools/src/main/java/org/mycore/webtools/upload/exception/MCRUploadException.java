@@ -20,8 +20,11 @@ package org.mycore.webtools.upload.exception;
 
 import org.mycore.services.i18n.MCRTranslation;
 
+import java.io.Serial;
+
 public class MCRUploadException extends Exception {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public MCRUploadException(String messageKey) {

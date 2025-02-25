@@ -20,6 +20,7 @@ package org.mycore.restapi;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -119,7 +120,7 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
 
     private void addExposedHeadersToResponseHeaders(ContainerRequestContext requestContext, MultivaluedMap<String,
         Object> responseHeaders, boolean authenticatedRequest) {
-        ArrayList<String> exposedHeaders = new ArrayList<>();
+        List<String> exposedHeaders = new ArrayList<>();
         //MCR-3041 expose all header starting with X-
         responseHeaders.keySet().stream()
             .filter(name -> name.startsWith("x-") || name.startsWith("X-"))

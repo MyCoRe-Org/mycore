@@ -31,6 +31,7 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
+import org.mycore.datamodel.metadata.MCRObjectMetadata;
 
 public abstract class AbstractNeo4JParserTest extends MCRStoreTestCase {
     protected final Document doc;
@@ -43,7 +44,7 @@ public abstract class AbstractNeo4JParserTest extends MCRStoreTestCase {
         } catch (JDOMException | IOException e) {
             throw new MCRException("Error while loading Resource:", e);
         }
-        metadata = doc.getRootElement().getChild("metadata");
+        metadata = doc.getRootElement().getChild(MCRObjectMetadata.XML_NAME);
     }
 
     @Override

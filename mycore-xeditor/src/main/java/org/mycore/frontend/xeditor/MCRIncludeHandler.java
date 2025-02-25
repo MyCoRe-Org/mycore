@@ -87,7 +87,7 @@ public class MCRIncludeHandler {
 
     private void preloadFromURI(String uri, String sStatic)
         throws TransformerFactoryConfigurationError {
-        if (uri.trim().isEmpty()) {
+        if (uri.isBlank()) {
             return;
         }
 

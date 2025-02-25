@@ -21,6 +21,7 @@ package org.mycore.frontend.servlets.persistence;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 import java.io.IOException;
+import java.io.Serial;
 
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
@@ -36,7 +37,8 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRCreateDerivateServlet extends MCRPersistenceServlet {
 
-    private static final long serialVersionUID = 4735574336094275787L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Override
     void handlePersistenceOperation(HttpServletRequest request, HttpServletResponse response)

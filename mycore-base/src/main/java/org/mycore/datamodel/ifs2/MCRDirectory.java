@@ -30,14 +30,14 @@ import org.jdom2.Element;
 /**
  * Represents a directory stored in a file collection, which may contain other
  * files and directories.
- * 
+ *
  * @author Frank Lützenkirchen
  */
 public class MCRDirectory extends MCRStoredNode {
 
     /**
      * Create MCRDirectory representing an existing, already stored directory.
-     * 
+     *
      * @param parent
      *            the parent directory of this directory
      * @param fo
@@ -49,7 +49,7 @@ public class MCRDirectory extends MCRStoredNode {
 
     /**
      * Create a new MCRDirectory that does not exist yet
-     * 
+     *
      * @param parent
      *            the parent directory of this directory
      * @param name
@@ -63,7 +63,7 @@ public class MCRDirectory extends MCRStoredNode {
 
     /**
      * Creates a new subdirectory within this directory
-     * 
+     *
      * @param name
      *            the name of the new directory
      */
@@ -73,7 +73,7 @@ public class MCRDirectory extends MCRStoredNode {
 
     /**
      * Creates a new file within this directory
-     * 
+     *
      * @param name
      *            the name of the new file
      */
@@ -99,7 +99,7 @@ public class MCRDirectory extends MCRStoredNode {
      * Returns the MCRFile or MCRDirectory that is represented by the given
      * FileObject, which is a direct child of the directory FileObject this
      * MCRDirectory is stored in.
-     * 
+     *
      * @return an MCRFile or MCRDirectory child
      */
     @Override
@@ -152,8 +152,8 @@ public class MCRDirectory extends MCRStoredNode {
                         throw new UncheckedIOException(e);
                     }
                 });
-        } catch (UncheckedIOException e) {
-            throw e.getCause();
+        } catch (UncheckedIOException ignoredUnchecked) {
+            throw ignoredUnchecked.getCause();
         }
 
         writeData(e -> e.removeChildren("node"));

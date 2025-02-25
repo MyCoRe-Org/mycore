@@ -60,7 +60,7 @@ import org.tmatesoft.svn.core.wc.admin.SVNAdminEvent;
  */
 public class MCRVersioningMetadataStore extends MCRMetadataStore {
 
-    protected static final Logger LOGGER = LogManager.getLogger(MCRVersioningMetadataStore.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     protected SVNURL repURL;
 

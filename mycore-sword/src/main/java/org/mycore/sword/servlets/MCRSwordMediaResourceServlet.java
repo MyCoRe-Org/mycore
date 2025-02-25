@@ -19,6 +19,7 @@
 package org.mycore.sword.servlets;
 
 import java.io.IOException;
+import java.io.Serial;
 
 import org.mycore.sword.MCRSwordConfigurationDefault;
 import org.mycore.sword.manager.MCRSwordMediaManager;
@@ -29,9 +30,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 public class MCRSwordMediaResourceServlet extends MCRSwordServlet {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    private MediaResourceAPI api;
+    private transient MediaResourceAPI api;
 
     @Override
     public void init() {

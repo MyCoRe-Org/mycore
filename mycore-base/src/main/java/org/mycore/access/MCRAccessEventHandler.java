@@ -41,9 +41,9 @@ import org.mycore.datamodel.metadata.MCRObject;
 public class MCRAccessEventHandler extends MCREventHandlerBase {
 
     // the logger
-    private static Logger LOGGER = LogManager.getLogger(MCRAccessEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRAccessEventHandler.class);
 
-    private static MCRRuleAccessInterface AI = MCRAccessManager.getAccessImpl();
+    private static final MCRRuleAccessInterface AI = MCRAccessManager.getAccessImpl();
 
     private static String storedrules = MCRConfiguration2.getString("MCR.Access.StorePermissions")
         .orElse("read,write,delete");

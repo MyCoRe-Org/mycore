@@ -41,6 +41,7 @@ import com.google.common.cache.CacheBuilder;
  * @author Frank Lützenkirchen
  */
 public class MCRCache<K, V> implements Closeable {
+
     /** Tch type string for the MCRCacheJMXBridge */
     protected String type;
 
@@ -65,25 +66,6 @@ public class MCRCache<K, V> implements Closeable {
     }
 
     /**
-     * A small sample program for testing this class.
-     */
-    public static void main(String[] args) {
-        MCRCache<String, String> cache = new MCRCache<>(4, "Small Sample Program");
-        System.out.println(cache);
-        cache.put("a", "Anton");
-        cache.put("b", "Bohnen");
-        cache.put("c", "Cache");
-        System.out.println(cache);
-        cache.get("d");
-        cache.get("c");
-        cache.put("d", "Dieter");
-        cache.put("e", "Egon");
-        cache.put("f", "Frank");
-        cache.get("c");
-        System.out.println(cache);
-    }
-
-    /**
      * Puts an object into the cache, storing it under the given key. If the cache is already full, the least recently
      * used object will be removed from the cache first. If the cache already contains an entry under the key provided,
      * this entry is replaced.
@@ -95,7 +77,7 @@ public class MCRCache<K, V> implements Closeable {
      */
     public void put(K key, V value) {
         Objects.requireNonNull(key, "The key of a cache entry may not be null.");
-        Objects.requireNonNull(value, "The key of a cache entry may not be null.");
+        Objects.requireNonNull(value, "The value of a cache entry may not be null.");
 
         MCRCacheEntry<V> entry = new MCRCacheEntry<>(value);
         backingCache.put(key, entry);
@@ -115,7 +97,7 @@ public class MCRCache<K, V> implements Closeable {
      */
     public void put(K key, V value, long insertTime) {
         Objects.requireNonNull(key, "The key of a cache entry may not be null.");
-        Objects.requireNonNull(value, "The key of a cache entry may not be null.");
+        Objects.requireNonNull(value, "The value of a cache entry may not be null.");
         MCRCacheEntry<V> entry = new MCRCacheEntry<>(value);
         entry.insertTime = insertTime;
         backingCache.put(key, entry);

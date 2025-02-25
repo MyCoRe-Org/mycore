@@ -21,6 +21,9 @@ package org.mycore.restapi.v2;
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_DERID;
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_DER_PATH;
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
+import static org.mycore.restapi.v2.MCRRestStatusCode.BAD_REQUEST;
+import static org.mycore.restapi.v2.MCRRestStatusCode.CREATED;
+import static org.mycore.restapi.v2.MCRRestStatusCode.NO_CONTENT;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -137,7 +140,9 @@ public class MCRRestDerivateContents {
             try {
                 doWithinTransaction(() -> Files.createDirectory(mcrPath));
             } catch (IOException e2) {
+                e2.addSuppressed(e);
                 throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
+                    .withCause(e2)
                     .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_CREATE_DIRECTORY)
                     .withMessage("Could not create directory " + mcrPath + ".")
                     .withDetail(e.getMessage())
@@ -361,9 +366,9 @@ public class MCRRestDerivateContents {
                 description = "set to 'true' if a new directory should be created",
                 schema = @Schema(type = "boolean")) },
         responses = {
-            @ApiResponse(responseCode = "204", description = "if directory already exists or while was updated"),
-            @ApiResponse(responseCode = "201", description = "if directory or file was created"),
-            @ApiResponse(responseCode = "400",
+            @ApiResponse(responseCode = NO_CONTENT, description = "if directory already exists or while was updated"),
+            @ApiResponse(responseCode = CREATED, description = "if directory or file was created"),
+            @ApiResponse(responseCode = BAD_REQUEST,
                 description = "if directory overwrites file or vice versa; content length is too big"),
         },
         tags = MCRRestUtils.TAG_MYCORE_FILE)
@@ -409,7 +414,7 @@ public class MCRRestDerivateContents {
 
     @DELETE
     @Operation(summary = "Deletes file or directory.",
-        responses = { @ApiResponse(responseCode = "204", description = "if deletion was successful")
+        responses = { @ApiResponse(responseCode = NO_CONTENT, description = "if deletion was successful")
         },
         tags = MCRRestUtils.TAG_MYCORE_FILE)
     @MCRRequireTransaction

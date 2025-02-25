@@ -81,13 +81,13 @@ import org.jdom2.transform.JDOMSource;
  */
 @Deprecated
 public class MCRXSLTransformation {
-    private static Logger LOGGER = LogManager.getLogger(MCRXSLTransformation.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRXSLTransformation.class);
 
     private static SAXTransformerFactory saxFactory;
 
     private static TransformerFactory factory = TransformerFactory.newInstance();
 
-    private static final Map EMPTY_PARAMETERS = Collections.unmodifiableMap(new HashMap(0, 1));
+    private static final Map EMPTY_PARAMETERS = Collections.unmodifiableMap(new HashMap<>(0, 1));
 
     private static MCRXSLTransformation singleton;
 

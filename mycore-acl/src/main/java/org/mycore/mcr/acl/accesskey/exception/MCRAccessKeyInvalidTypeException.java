@@ -18,11 +18,14 @@
 
 package org.mycore.mcr.acl.accesskey.exception;
 
+import java.io.Serial;
+
 /**
  * Exception that refers to an invalid permission type.
  */
 public class MCRAccessKeyInvalidTypeException extends MCRAccessKeyException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public MCRAccessKeyInvalidTypeException(String errorMessage) {

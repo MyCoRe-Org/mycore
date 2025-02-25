@@ -38,17 +38,17 @@ import org.verapdf.pdfa.results.ValidationResult;
  */
 public class MCRPDFAValidator {
 
-    private static volatile Boolean INITIALIZED = false;
+    private static volatile Boolean initialized = false;
 
     private static final Object MUTEX = new Object();
 
     private static void initialise() {
-        if (!INITIALIZED) {
+        if (!initialized) {
             synchronized (MUTEX) {
-                if (INITIALIZED) {
+                if (initialized) {
                     return;
                 }
-                INITIALIZED = true;
+                initialized = true;
                 VeraGreenfieldFoundryProvider.initialise();
             }
         }

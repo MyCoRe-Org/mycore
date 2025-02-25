@@ -18,11 +18,11 @@
 
 package org.mycore.frontend.cli;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This interface is designed to incude external application commands.
- * 
+ *
  * @author Jens Kupferschmidt
  */
 public interface MCRExternalCommandInterface {
@@ -30,15 +30,15 @@ public interface MCRExternalCommandInterface {
      * The method return the list of possible commands of this class. Each
      * command has TWO Strings, a String of the user command syntax and a String
      * of the called method.
-     * 
+     *
      * @return a command pair ArrayList
      */
-    ArrayList<MCRCommand> getPossibleCommands();
+    List<MCRCommand> getPossibleCommands();
 
     /**
      * Returns the display name of the external commands. If the display name
      * has not been set the simple class name is returned
-     * 
+     *
      * @return the display name of the external commands
      */
     String getDisplayName();

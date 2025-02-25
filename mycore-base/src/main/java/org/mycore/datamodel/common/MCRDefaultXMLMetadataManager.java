@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -61,6 +62,7 @@ import org.mycore.datamodel.ifs2.MCRStoreManager;
 import org.mycore.datamodel.ifs2.MCRStoredMetadata;
 import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.history.MCRMetadataHistoryManager;
@@ -106,9 +108,9 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
     private static final String DEFAULT_SVN_DIRECTORY_NAME = "versions-metadata";
 
     /** The singleton */
-    private static MCRDefaultXMLMetadataManager SINGLETON;
+    private static MCRDefaultXMLMetadataManager singleton;
 
-    private HashSet<String> createdStores;
+    private final Set<String> createdStores;
 
     /**
      * The default IFS2 Metadata store class to use, set by MCR.Metadata.Store.DefaultClass
@@ -145,10 +147,10 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
 
     /** Returns the singleton */
     public static synchronized MCRDefaultXMLMetadataManager instance() {
-        if (SINGLETON == null) {
-            SINGLETON = new MCRDefaultXMLMetadataManager();
+        if (singleton == null) {
+            singleton = new MCRDefaultXMLMetadataManager();
         }
-        return SINGLETON;
+        return singleton;
     }
 
     @Override
@@ -212,6 +214,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
      * @param path the path to check
      * @param type metadata store type
      */
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private void checkPath(Path path, String type) {
         if (!Files.exists(path)) {
             try {
@@ -352,7 +355,8 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         }
         MCRConfiguration2.set(configPrefix + "BaseDir", typePath.toAbsolutePath().toString());
         MCRConfiguration2.set(configPrefix + "ForceXML", String.valueOf(true));
-        String value = Objects.equals(objectType, "derivate") ? "mycorederivate" : "mycoreobject";
+        String value = Objects.equals(objectType, MCRDerivate.OBJECT_TYPE) ?
+                       MCRDerivate.ROOT_NAME : MCRObject.ROOT_NAME;
         MCRConfiguration2.set(configPrefix + "ForceDocType", value);
         createdStores.add(baseID);
         MCRStoreManager.createStore(baseID, clazz);
@@ -377,7 +381,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
             throw new MCRPersistenceException(String.format(Locale.ENGLISH,
                 "Couldn'e create directory ''%s'' to set up store for project ''%s'' and objectType ''%s'' "
                     + "and config prefix ''%s''",
-                path.toAbsolutePath(), project, objectType, configPrefix));
+                path.toAbsolutePath(), project, objectType, configPrefix), e);
         }
     }
 

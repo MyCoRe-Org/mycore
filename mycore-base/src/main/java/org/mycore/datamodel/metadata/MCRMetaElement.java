@@ -61,7 +61,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     private static final String META_PACKAGE_NAME = "org.mycore.datamodel.metadata.";
 
     // logger
-    static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private Class<? extends MCRMetaInterface> clazz;
 
@@ -71,7 +71,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
 
     private boolean notinherit;
 
-    private ArrayList<MCRMetaInterface> list;
+    private final List<MCRMetaInterface> list;
 
     /**
      * This is the constructor of the MCRMetaElement class. The default language
@@ -226,6 +226,15 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     public final int size() {
         return list.size();
     }
+    
+    /**
+     * returns true if there are no elements in this instance.
+     *
+     * @return true, if the "list" is empty
+     */
+    public final boolean isEmpty() {
+        return list.isEmpty();
+    }
 
     /**
      * The method add a metadata object, that implements the MCRMetaInterface to
@@ -287,29 +296,27 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
      * @exception MCRException
      *                if the class can't loaded
      */
-    @SuppressWarnings("unchecked")
     public final void setFromDOM(Element element) throws MCRException {
-
-        String fullname;
+        String fullName;
         Class<? extends MCRMetaInterface> forName;
         try {
-            String classname = element.getAttributeValue("class");
+            String classname = element.getAttributeValue(MCRXMLConstants.CLASS);
             if (classname == null) {
                 throw new MCRException("Missing required class attribute in element " + element.getName());
             }
-            fullname = META_PACKAGE_NAME + classname;
-            forName = MCRClassTools.forName(fullname);
+            fullName = META_PACKAGE_NAME + classname;
+            forName = MCRClassTools.forName(fullName);
             setClass(forName);
         } catch (ClassNotFoundException e) {
             throw new MCRException(e);
         }
         tag = element.getName();
-        String heritable = element.getAttributeValue("heritable");
+        String heritable = element.getAttributeValue(MCRXMLConstants.HERITABLE);
         if (heritable != null) {
             setHeritable(Boolean.parseBoolean(heritable));
         }
 
-        String notInherit = element.getAttributeValue("notinherit");
+        String notInherit = element.getAttributeValue(MCRXMLConstants.NOT_INHERIT);
         if (notInherit != null) {
             setNotInherit(Boolean.parseBoolean(notInherit));
         }
@@ -321,7 +328,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
                 obj = forName.getDeclaredConstructor().newInstance();
                 obj.setFromDOM(subtag);
             } catch (ReflectiveOperationException e) {
-                throw new MCRException(fullname + " ReflectiveOperationException", e);
+                throw new MCRException(fullName + " ReflectiveOperationException", e);
             }
 
             list.add(obj);
@@ -346,9 +353,9 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
             throw new MCRException("MCRMetaElement : The content is not valid: Tag=" + this.tag, exc);
         }
         Element elm = new Element(tag);
-        elm.setAttribute("class", getClassName());
-        elm.setAttribute("heritable", String.valueOf(heritable));
-        elm.setAttribute("notinherit", String.valueOf(notinherit));
+        elm.setAttribute(MCRXMLConstants.CLASS, getClassName());
+        elm.setAttribute(MCRXMLConstants.HERITABLE, String.valueOf(heritable));
+        elm.setAttribute(MCRXMLConstants.NOT_INHERIT, String.valueOf(notinherit));
         list
             .stream()
             .filter(metaInterface -> (flag || metaInterface.getInherited() == 0))
@@ -435,7 +442,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
             throw new MCRException(
                 getTag() + ": package " + clazz.getPackage().getName() + " does not equal " + META_PACKAGE_NAME);
         }
-        if (list.size() == 0) {
+        if (list.isEmpty()) {
             throw new MCRException(getTag() + ": does not contain any sub elements");
         }
     }

@@ -46,12 +46,14 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 public class MCRPIManagerTest extends MCRStoreTestCase {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
     private static final String MOCK_SERVICE = "MockService";
 
     private static final String MOCK_METADATA_SERVICE = "MockInscriber";
 
     private static final String MOCK_PID_GENERATOR = "MockIDGenerator";
-    final private static Logger LOGGER = LogManager.getLogger();
+
     @Rule
     public TemporaryFolder baseDir = new TemporaryFolder();
 

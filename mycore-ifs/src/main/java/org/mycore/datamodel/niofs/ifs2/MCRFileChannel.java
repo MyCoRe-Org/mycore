@@ -44,15 +44,15 @@ public class MCRFileChannel extends FileChannel {
 
     private final MCRPath path;
 
-    private FileChannel baseChannel;
+    private final FileChannel baseChannel;
 
-    private MCRFile file;
+    private final MCRFile file;
 
-    private boolean write;
+    private final boolean write;
+
+    private final boolean create;
 
     private boolean modified;
-
-    private boolean create;
 
     /**
      * MyCoRe implementation of a Java NIO FileChannel
@@ -91,8 +91,8 @@ public class MCRFileChannel extends FileChannel {
             return;
         }
         MessageDigest md5Digest = MCRUtils.buildMessageDigest(MCRMD5Digest.ALGORITHM);
-        FileChannel md5Channel = (FileChannel) Files.newByteChannel(file.getLocalPath(), StandardOpenOption.READ);
-        try {
+        try (
+            FileChannel md5Channel = (FileChannel) Files.newByteChannel(file.getLocalPath(), StandardOpenOption.READ)) {
             long position = 0;
             long size = md5Channel.size();
             while (position < size) {
@@ -103,10 +103,6 @@ public class MCRFileChannel extends FileChannel {
                     md5Digest.update(byteBuffer);
                 }
                 position += byteBuffer.limit();
-            }
-        } finally {
-            if (!md5Channel.equals(baseChannel)) {
-                md5Channel.close();
             }
         }
         String md5 = MCRContentInputStream.getMD5String(md5Digest.digest());

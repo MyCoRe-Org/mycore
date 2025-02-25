@@ -19,11 +19,15 @@
 package org.mycore.datamodel.niofs;
 
 import java.io.IOException;
+import java.io.Serial;
 
 /**
  * Thrown to indicate that an operation attempted to modify a read-only file or directory.
  */
 public class MCRReadOnlyIOException extends IOException {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * Constructs a new read-only exception with the specified detail message.

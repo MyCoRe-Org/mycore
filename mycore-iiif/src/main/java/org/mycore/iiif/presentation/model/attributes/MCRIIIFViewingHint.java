@@ -33,7 +33,7 @@ public enum MCRIIIFViewingHint {
      * photographs in a collection.&quot;
      */
     @SerializedName("individuals")
-    individuals,
+    INDIVIDUALS,
 
     /**
      * &quot;The canvases represent pages in a bound volume, and should be presented in a page-turning interface if one
@@ -41,7 +41,7 @@ public enum MCRIIIFViewingHint {
      * of the object in the first canvas.&quot;
      */
     @SerializedName("paged")
-    paged,
+    PAGED,
 
     /**
      * &quot;
@@ -50,14 +50,14 @@ public enum MCRIIIFViewingHint {
      * include multi-volume books or a set of journal issues or other serials. &quot;
      */
     @SerializedName("multi-part")
-    multi_part,
+    MULTI_PART,
     /**
      * &quot;Each canvas is the complete view of one side of a long scroll or roll and an appropriate rendering might
      * only
      * display part of the canvas at any given time rather than the entire object. &quot;
      */
     @SerializedName("continuous")
-    continuous,
+    CONTINUOUS,
 
     /**
      * &quot;Canvases with this hint must not be presented in a page turning interface, and must be skipped over when
@@ -65,7 +65,7 @@ public enum MCRIIIFViewingHint {
      * have the ‘paged’ viewing hint.&quot;
      */
     @SerializedName("non-paged")
-    non_paged,
+    NON_PAGED,
 
     /**
      * &quot;Only valid on a range. A range which has this viewingHint is the top-most node in a hierarchy of ranges
@@ -77,12 +77,12 @@ public enum MCRIIIFViewingHint {
      * structures to navigate through.&quot;
      */
     @SerializedName("top")
-    top,
+    TOP,
     /**
      * &quot;Canvases with this hint, in a sequence or manifest with the “paged” viewing hint, must be displayed by
      * themselves, as they depict both parts of the opening. If all of the canvases are like this, then page turning is
      * not possible, so simply use “individuals” instead.&quot;
      */
     @SerializedName("facing-pages")
-    facing_pages
+    FACING_PAGES
 }

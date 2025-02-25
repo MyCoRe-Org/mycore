@@ -18,6 +18,7 @@
 
 package org.mycore.frontend.servlets;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.Map;
 
@@ -38,6 +39,7 @@ import org.mycore.frontend.MCRFrontendUtil;
  */
 public class MCRDerivateLinkServlet extends MCRServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     protected static String derivateLinkErrorPage = "error_derivatelink.xml";
@@ -120,7 +122,7 @@ public class MCRDerivateLinkServlet extends MCRServlet {
      */
     private Element getMyCoReObjectElement(MCRObjectID objectId) {
         Collection<String> derivates = MCRLinkTableManager.instance().getDestinationOf(objectId, "derivate");
-        if (derivates.size() <= 0) {
+        if (derivates.isEmpty()) {
             return null;
         }
         Element objElement = new Element("mycoreobject");

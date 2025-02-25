@@ -53,7 +53,7 @@ public class MCRObjectServiceTest extends MCRTestCase {
         super.setUp();
         Document testObjectDocument = loadResourceDocument(TEST_OBJECT_RESOURCE_NAME);
         testService = new MCRObjectService();
-        testService.setFromDOM(testObjectDocument.getRootElement().getChild("service"));
+        testService.setFromDOM(testObjectDocument.getRootElement().getChild(MCRObjectService.XML_NAME));
     }
 
     /**

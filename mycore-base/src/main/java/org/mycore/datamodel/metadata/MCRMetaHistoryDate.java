@@ -19,6 +19,7 @@
 package org.mycore.datamodel.metadata;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -50,7 +51,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     public static final int MCRHISTORYDATE_MAX_TEXT = 512;
 
     // Data of this class
-    private ArrayList<MCRMetaHistoryDateText> texts;
+    private List<MCRMetaHistoryDateText> texts;
 
     private Calendar von;
 
@@ -123,7 +124,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      *            the language of the text in the ISO format
      */
     public final void setText(String text, String lang) {
-        if (text == null || text.length() == 0) {
+        if (text == null || text.isEmpty()) {
             LOGGER.warn("The text field of MCRMeataHistoryDate is empty.");
             return;
         }
@@ -133,7 +134,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         } else {
             textTrimmed = text.substring(0, MCRHISTORYDATE_MAX_TEXT);
         }
-        if (lang == null || lang.length() == 0) {
+        if (lang == null || lang.isEmpty()) {
             addText(textTrimmed, this.lang);
         } else {
             addText(textTrimmed, lang);
@@ -151,11 +152,11 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
 
     public final void addText(String text, String lang) {
-        if (text == null || text.length() == 0) {
+        if (text == null || text.isEmpty()) {
             LOGGER.warn("The text field of MCRMeataHistoryDate is empty.");
             return;
         }
-        if (lang == null || lang.length() == 0) {
+        if (lang == null || lang.isEmpty()) {
             LOGGER.warn("The lang field of MCRMeataHistoryDate is empty.");
             return;
         }
@@ -206,7 +207,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      *
      * @return an ArrayList of MCRMetaHistoryDateTexts instances
      */
-    public final ArrayList<MCRMetaHistoryDateText> getTexts() {
+    public final List<MCRMetaHistoryDateText> getTexts() {
         return texts;
     }
 
@@ -226,7 +227,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      *            the calendar as String, one of CALENDARS.
      */
     public final void setCalendar(String calstr) {
-        if (calstr == null || calstr.trim().length() == 0 || (!MCRCalendar.CALENDARS_LIST.contains(calstr))) {
+        if (calstr == null || calstr.isBlank() || (!MCRCalendar.CALENDARS_LIST.contains(calstr))) {
             calendar = MCRCalendar.TAG_GREGORIAN;
             LOGGER.warn("The calendar field of MCRMeataHistoryDate is set to default " + MCRCalendar.TAG_GREGORIAN
                 + ".");
@@ -473,7 +474,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     public void validate() throws MCRException {
         super.validate();
         texts.removeIf(textItem -> !textItem.isValid());
-        if (texts.size() == 0) {
+        if (texts.isEmpty()) {
             throw new MCRException(getSubTag() + ": no texts defined");
         }
         if (von == null || bis == null || calendar == null) {
@@ -541,7 +542,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         return fieldTest && textTest;
     }
 
-    private boolean equalText(ArrayList<MCRMetaHistoryDateText> objtexts) {
+    private boolean equalText(List<MCRMetaHistoryDateText> objtexts) {
         boolean testflag = true;
         int size = texts.size() < objtexts.size() ? texts.size() : objtexts.size();
         for (int i = 0; i < size; i++) {

@@ -18,14 +18,22 @@
 
 package org.mycore.iiif.image.impl;
 
+import java.io.Serial;
+
 public class MCRIIIFImageNotFoundException extends Exception {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private String identifier;
 
     public MCRIIIFImageNotFoundException(String identifier) {
         super("Invalid image-identifier " + identifier + "!");
+        this.identifier = identifier;
+    }
+
+    public MCRIIIFImageNotFoundException(String identifier, Throwable cause) {
+        super("Invalid image-identifier " + identifier + "!", cause);
         this.identifier = identifier;
     }
 

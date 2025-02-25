@@ -20,11 +20,13 @@ package org.mycore.iview.tests.image.api;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.io.Serial;
 
 import javax.swing.JFrame;
 
 public class DebugBufferedImageWindow extends JFrame {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private BufferedImage imageToShow;

@@ -28,19 +28,19 @@ import org.mycore.common.digest.MCRDigest;
 public interface MCRFileAttributes<T> extends BasicFileAttributes {
 
     enum FileType {
-        file, directory, link, other;
+        FILE, DIRECTORY, LINK, OTHER;
 
         public static FileType fromAttribute(BasicFileAttributes attrs) {
             if (attrs.isRegularFile()) {
-                return file;
+                return FILE;
             }
             if (attrs.isDirectory()) {
-                return directory;
+                return DIRECTORY;
             }
             if (attrs.isSymbolicLink()) {
-                return link;
+                return LINK;
             }
-            return other;
+            return OTHER;
         }
     }
 

@@ -48,7 +48,18 @@ public class MCRPandocAPI {
         .orElse(Thread.currentThread().getContextClassLoader().getResource("lua").getPath() + "?.lua");
 
     private enum Action {
-        Reader, Writer
+        READER("Reader"), WRITER("Writer");
+
+        private final String value;
+
+        Action(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return value;
+        }
     }
 
     /**
@@ -79,8 +90,8 @@ public class MCRPandocAPI {
      * @throws MCRPandocException in case of unsuccessful call to Pandoc
      */
     public static String convert(String content, String importFormat, String outputFormat) {
-        String pandocArgs = "-f " + convertFormatToPath(Action.Reader, importFormat)
-            + " -t " + convertFormatToPath(Action.Writer, outputFormat);
+        String pandocArgs = "-f " + convertFormatToPath(Action.READER, importFormat)
+            + " -t " + convertFormatToPath(Action.WRITER, outputFormat);
         return call(pandocArgs, content);
     }
 
@@ -125,7 +136,7 @@ public class MCRPandocAPI {
 
             private volatile byte[] output;
 
-            private InputStream istream;
+            private final InputStream istream;
 
             ThreadWrapper(InputStream is) {
                 istream = is;
@@ -142,7 +153,7 @@ public class MCRPandocAPI {
             }
 
             public byte[] getOutput() {
-                return output;
+                return output.clone();
             }
         }
 

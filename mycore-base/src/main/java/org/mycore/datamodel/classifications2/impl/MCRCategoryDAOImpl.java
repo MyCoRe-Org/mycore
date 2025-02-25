@@ -18,6 +18,16 @@
 
 package org.mycore.datamodel.classifications2.impl;
 
+import static org.mycore.datamodel.classifications2.impl.MCRCategoryQueryParameter.CATEGORY_ID;
+import static org.mycore.datamodel.classifications2.impl.MCRCategoryQueryParameter.CLASS_ID;
+import static org.mycore.datamodel.classifications2.impl.MCRCategoryQueryParameter.END_LEVEL;
+import static org.mycore.datamodel.classifications2.impl.MCRCategoryQueryParameter.INCREMENT;
+import static org.mycore.datamodel.classifications2.impl.MCRCategoryQueryParameter.LANG;
+import static org.mycore.datamodel.classifications2.impl.MCRCategoryQueryParameter.LEFT;
+import static org.mycore.datamodel.classifications2.impl.MCRCategoryQueryParameter.RIGHT;
+import static org.mycore.datamodel.classifications2.impl.MCRCategoryQueryParameter.ROOT_ID;
+import static org.mycore.datamodel.classifications2.impl.MCRCategoryQueryParameter.TEXT;
+
 import java.net.URI;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -63,13 +73,13 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     private static final int LEFT_START_VALUE = 0;
 
-    private static long LAST_MODIFIED = System.currentTimeMillis();
+    private static long lastModified = System.currentTimeMillis();
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String NAMED_QUERY_NAMESPACE = "MCRCategory.";
 
-    private static HashMap<String, Long> LAST_MODIFIED_MAP = new HashMap<>();
+    private static final Map<String, Long> LAST_MODIFIED_MAP = new HashMap<>();
 
     @Override
     public MCRCategory addCategory(MCRCategoryID parentID, MCRCategory category) {
@@ -177,8 +187,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     public List<MCRCategory> getCategoriesByLabel(final String lang, final String text) {
         EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         return cast(entityManager.createNamedQuery(NAMED_QUERY_NAMESPACE + "byLabel", MCRCategoryImpl.class)
-            .setParameter("lang", lang)
-            .setParameter("text", text)
+            .setParameter(LANG, lang)
+            .setParameter(TEXT, text)
             .getResultList());
     }
 
@@ -186,8 +196,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     public List<MCRCategory> getCategoriesByClassAndLang(final String classId, final String lang) {
         EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         return cast(entityManager.createNamedQuery(NAMED_QUERY_NAMESPACE + "byClassAndLang", MCRCategoryImpl.class)
-            .setParameter("classID", classId)
-            .setParameter("lang", lang)
+            .setParameter(CLASS_ID, classId)
+            .setParameter(LANG, lang)
             .getResultList());
     }
 
@@ -197,11 +207,11 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         MCRCategoryDTO leftRight = getLeftRightLevelValues(entityManager, baseID);
         return cast(entityManager
             .createNamedQuery(NAMED_QUERY_NAMESPACE + "byLabelInClass", MCRCategoryImpl.class)
-            .setParameter("rootID", baseID.getRootID())
-            .setParameter("left", leftRight.leftValue)
-            .setParameter("right", leftRight.rightValue)
-            .setParameter("lang", lang)
-            .setParameter("text", text)
+            .setParameter(ROOT_ID, baseID.getRootID())
+            .setParameter(LEFT, leftRight.leftValue)
+            .setParameter(RIGHT, leftRight.rightValue)
+            .setParameter(LANG, lang)
+            .setParameter(TEXT, text)
             .getResultList());
     }
 
@@ -215,9 +225,9 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             q = entityManager.createNamedQuery(NAMED_QUERY_NAMESPACE
                 + (fetchAllChildren ? "prefetchClassQuery" : "prefetchClassLevelQuery"));
             if (!fetchAllChildren) {
-                q.setParameter("endlevel", childLevel);
+                q.setParameter(END_LEVEL, childLevel);
             }
-            q.setParameter("classID", id.getRootID());
+            q.setParameter(CLASS_ID, id.getRootID());
         } else {
             //normal category
             MCRCategoryDTO leftRightLevel = getLeftRightLevelValues(entityManager, id);
@@ -227,11 +237,11 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             q = entityManager.createNamedQuery(NAMED_QUERY_NAMESPACE
                 + (fetchAllChildren ? "prefetchCategQuery" : "prefetchCategLevelQuery"));
             if (!fetchAllChildren) {
-                q.setParameter("endlevel", leftRightLevel.level + childLevel);
+                q.setParameter(END_LEVEL, leftRightLevel.level + childLevel);
             }
-            q.setParameter("classID", id.getRootID());
-            q.setParameter("left", leftRightLevel.leftValue);
-            q.setParameter("right", leftRightLevel.rightValue);
+            q.setParameter(CLASS_ID, id.getRootID());
+            q.setParameter(LEFT, leftRightLevel.leftValue);
+            q.setParameter(RIGHT, leftRightLevel.rightValue);
         }
         List<MCRCategoryDTO> result = q.getResultList();
         if (result.isEmpty()) {
@@ -254,7 +264,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             .map(MCRCategory::getChildren)
             .map(l -> l
                 .parallelStream()
-                .collect(Collectors.toList()) //temporary copy for detachFromParent
+                .toList() //temporary copy for detachFromParent
                 .parallelStream()
                 .map(MCRCategoryImpl.class::cast)
                 .peek(MCRCategoryImpl::detachFromParent)
@@ -272,10 +282,10 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         }
         Query parentQuery = entityManager
             .createNamedQuery(NAMED_QUERY_NAMESPACE + "parentQuery")
-            .setParameter("classID", id.getRootID())
-            .setParameter("categID", id.getId())
-            .setParameter("left", leftRight.leftValue)
-            .setParameter("right", leftRight.rightValue);
+            .setParameter(CLASS_ID, id.getRootID())
+            .setParameter(CATEGORY_ID, id.getId())
+            .setParameter(LEFT, leftRight.leftValue)
+            .setParameter(RIGHT, leftRight.rightValue);
         @SuppressWarnings("unchecked")
         List<MCRCategoryDTO> resultList = parentQuery.getResultList();
         MCRCategory category = buildCategoryFromPrefetchedList(resultList, id);
@@ -311,7 +321,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         return resultList.parallelStream()
             .map(c -> c.merge(null))
             .collect(Collector.of(ArrayList::new,
-                (ArrayList<MCRCategory> l, MCRCategoryImpl c) -> {
+                (List<MCRCategory> l, MCRCategoryImpl c) -> {
                     if (l.isEmpty()) {
                         l.add(c);
                     } else {
@@ -342,7 +352,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                 MCRCategory parent = parents.getFirst();
                 c.getChildren()
                     .stream()
-                    .collect(Collectors.toList())
+                    .toList()
                     .stream()
                     .map(MCRCategoryImpl.class::cast)
                     .peek(MCRCategoryImpl::detachFromParent)
@@ -386,9 +396,9 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         int right = Math.max(node1.getRight(), node2.getRight());
         Query q = entityManager.createNamedQuery(NAMED_QUERY_NAMESPACE + "commonAncestor")
             .setMaxResults(1)
-            .setParameter("left", left)
-            .setParameter("right", right)
-            .setParameter("rootID", node1.getRootID());
+            .setParameter(LEFT, left)
+            .setParameter(RIGHT, right)
+            .setParameter(ROOT_ID, node1.getRootID());
         return getSingleResult(q);
     }
 
@@ -511,8 +521,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         if (category.hasChildren()) {
             int parentPos = category.getPositionInParent();
             MCRCategoryImpl parent = (MCRCategoryImpl) category.getParent();
-            @SuppressWarnings("unchecked")
-            ArrayList<MCRCategoryImpl> copy = new ArrayList(category.children);
+            List<MCRCategoryImpl> copy = new ArrayList(category.children);
             copy.forEach(MCRCategoryImpl::detachFromParent);
             parent.children.addAll(parentPos, copy);
             copy.forEach(c -> c.parent = parent); //fixes MCR-1963
@@ -564,11 +573,11 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     @Override
     public long getLastModified() {
-        return LAST_MODIFIED;
+        return lastModified;
     }
 
     private static void updateTimeStamp() {
-        LAST_MODIFIED = System.currentTimeMillis();
+        lastModified = System.currentTimeMillis();
     }
 
     private static MCRCategoryImpl buildCategoryFromPrefetchedList(List<MCRCategoryDTO> list, MCRCategoryID returnID) {
@@ -617,22 +626,22 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     /**
-     * returns database backed MCRCategoryImpl
-     *
+     * Returns database backed MCRCategoryImpl
+     * <p>
      * every change to the returned MCRCategory is reflected in the database.
      */
     public static MCRCategoryImpl getByNaturalID(EntityManager entityManager, MCRCategoryID id) {
         TypedQuery<MCRCategoryImpl> naturalIDQuery = entityManager
             .createNamedQuery(NAMED_QUERY_NAMESPACE + "byNaturalId", MCRCategoryImpl.class)
-            .setParameter("classID", id.getRootID())
-            .setParameter("categID", id.getId());
+            .setParameter(CLASS_ID, id.getRootID())
+            .setParameter(CATEGORY_ID, id.getId());
         return getSingleResult(naturalIDQuery);
     }
 
     private static void syncLabels(MCRCategoryImpl source, MCRCategoryImpl target) {
         for (MCRLabel newLabel : source.getLabels()) {
             Optional<MCRLabel> label = target.getLabel(newLabel.getLang());
-            if (!label.isPresent()) {
+            if (label.isEmpty()) {
                 // copy new label
                 target.getLabels().add(newLabel);
             }
@@ -652,14 +661,14 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     private static MCRCategoryDTO getLeftRightLevelValues(EntityManager entityManager, MCRCategoryID id) {
         return getSingleResult(entityManager
             .createNamedQuery(NAMED_QUERY_NAMESPACE + "leftRightLevelQuery")
-            .setParameter("categID", id));
+            .setParameter(CATEGORY_ID, id));
     }
 
     private static int getNumberOfChildren(EntityManager entityManager, MCRCategoryID id) {
         return getSingleResult(entityManager
             .createNamedQuery(NAMED_QUERY_NAMESPACE + "childCount")
-            .setParameter("classID", id.getRootID())
-            .setParameter("categID", id.getId()));
+            .setParameter(CLASS_ID, id.getRootID())
+            .setParameter(CATEGORY_ID, id.getId()));
     }
 
     private static void updateLeftRightValue(EntityManager entityManager, String classID, int left,
@@ -668,15 +677,15 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             LOGGER.debug("LEFT AND RIGHT values need updates. Left={}, increment by: {}", left, increment);
             Query leftQuery = e
                 .createNamedQuery(NAMED_QUERY_NAMESPACE + "updateLeft")
-                .setParameter("left", left)
-                .setParameter("increment", increment)
-                .setParameter("classID", classID);
+                .setParameter(LEFT, left)
+                .setParameter(INCREMENT, increment)
+                .setParameter(CLASS_ID, classID);
             int leftChanges = leftQuery.executeUpdate();
             Query rightQuery = e
                 .createNamedQuery(NAMED_QUERY_NAMESPACE + "updateRight")
-                .setParameter("left", left)
-                .setParameter("increment", increment)
-                .setParameter("classID", classID);
+                .setParameter(LEFT, left)
+                .setParameter(INCREMENT, increment)
+                .setParameter(CLASS_ID, classID);
             int rightChanges = rightQuery.executeUpdate();
             LOGGER.debug("Updated {} left and {} right values.", leftChanges, rightChanges);
         });

@@ -36,7 +36,7 @@ public class MCRIIIFRotationParser {
         try {
             rotationNumber = Double.parseDouble(rotationNumberString);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(rotationNumberString + " cannot parsed to a rotation value!");
+            throw new IllegalArgumentException(rotationNumberString + " cannot parsed to a rotation value!", e);
         }
 
         if (rotationNumber < 0 || rotationNumber > 360) {

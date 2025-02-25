@@ -18,6 +18,7 @@
 
 package org.mycore.datamodel.classifications2;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -35,7 +36,8 @@ import jakarta.persistence.Embeddable;
 @Embeddable
 public class MCRCategLinkReference implements Serializable {
 
-    private static final long serialVersionUID = -6457722746147666860L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Basic
     private String objectID;

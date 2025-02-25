@@ -29,6 +29,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
@@ -50,8 +51,9 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    static ConcurrentHashMap<String, ReentrantReadWriteLock> locks = new ConcurrentHashMap<>();
+    static Map<String, ReentrantReadWriteLock> locks = new ConcurrentHashMap<>();
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static Path getCacheFilePath(String baseId) {
         Path idCachePath = getCacheDirPath();
 
@@ -73,6 +75,7 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
         return cacheFile;
     }
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static Path getCacheDirPath() {
         Path dataDir = getDataDirPath();
 
@@ -119,6 +122,7 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
      * @param baseId the base id
      * @param next the next free id to be returned by getNextFreeId
      */
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     public void setNextFreeId(String baseId, int next) {
         Path cacheFile = getCacheFilePath(baseId);
 
@@ -136,6 +140,7 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
         }
     }
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     @Override
     public MCRObjectID getNextFreeId(String baseId, int maxInWorkflow) {
         Path cacheFile = getCacheFilePath(baseId);

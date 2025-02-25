@@ -30,13 +30,17 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.io.Serial;
+
 /**
  * @author Sebastian Hofmann (mcrshofm)
  */
 public class MCRSwordServlet extends HttpServlet {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    private static Logger LOGGER = LogManager.getLogger(MCRSwordServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSwordServlet.class);
 
     protected void prepareRequest(HttpServletRequest req, HttpServletResponse resp) {
         if (req.getAttribute(MCRFrontendUtil.BASE_URL_ATTRIBUTE) == null) {

@@ -18,6 +18,7 @@
 
 package org.mycore.backend.jpa.dnbtransfer;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -31,7 +32,8 @@ import jakarta.persistence.Id;
 @Entity
 public class MCRDNBTRANSFERRESULTS implements Serializable {
 
-    private static final long serialVersionUID = -5543608475323581768L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private int id;
 

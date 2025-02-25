@@ -19,6 +19,7 @@
 package org.mycore.frontend.servlets;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -56,6 +57,8 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author Frank Lützenkirchen
  */
 public class MCRClassificationBrowser2 extends MCRServlet {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger(MCRClassificationBrowser2.class);
@@ -187,7 +190,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
             return;
         }
         String objType = objectType;
-        if (objType != null && objType.trim().length() == 0) {
+        if (objType != null && objType.isBlank()) {
             objType = null;
         }
 
@@ -248,7 +251,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         void configure(HttpServletRequest request);
     }
 
-    private static class Settings {
+    private static final class Settings {
         private String classifID;
 
         private String categID;

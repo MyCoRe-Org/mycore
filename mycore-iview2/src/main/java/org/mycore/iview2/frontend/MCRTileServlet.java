@@ -19,6 +19,7 @@
 package org.mycore.iview2.frontend;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -49,11 +50,12 @@ public class MCRTileServlet extends HttpServlet {
      */
     static final int MAX_AGE = 60 * 60 * 24 * 365; // one year
 
-    private static final long serialVersionUID = 3805114872438336791L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger(MCRTileServlet.class);
 
-    private static MCRTileFileProvider TFP = MCRConfiguration2.getInstanceOfOrThrow(
+    private static final MCRTileFileProvider TFP = MCRConfiguration2.getInstanceOfOrThrow(
         MCRDefaultTileFileProvider.class, "MCR.IIIFImage.Iview.TileFileProvider");
 
     /**

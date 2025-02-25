@@ -173,8 +173,8 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
 
     private int getImageType(MCRIIIFImageQuality imageQuality, String format) {
         final int imageType = switch (imageQuality) {
-            case bitonal -> BufferedImage.TYPE_BYTE_BINARY;
-            case gray -> BufferedImage.TYPE_BYTE_GRAY;
+            case BITONAL -> BufferedImage.TYPE_BYTE_BINARY;
+            case GRAY -> BufferedImage.TYPE_BYTE_GRAY;
             //color is also default case
             default -> transparentFormats.contains(format) ? BufferedImage.TYPE_4BYTE_ABGR
                 : BufferedImage.TYPE_3BYTE_BGR;
@@ -203,7 +203,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
     private void checkMaximumFileSize(MCRIIIFImageTargetSize targetSize, MCRIIIFImageQuality imageQuality)
         throws MCRIIIFImageProvidingException {
         long resultingSize = (long) targetSize.height() * targetSize.width()
-            * (imageQuality.equals(MCRIIIFImageQuality.color) ? 3 : 1);
+            * (imageQuality.equals(MCRIIIFImageQuality.COLOR) ? 3 : 1);
 
         long maxImageSize = Optional.ofNullable(getProperties().get(MAX_BYTES_PROPERTY)).map(Long::parseLong)
             .orElseThrow(() -> MCRConfiguration2.createConfigurationException(getConfigPrefix() + MAX_BYTES_PROPERTY));
@@ -286,7 +286,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
             return imageInformation;
         } catch (FileSystemNotFoundException | IOException e) {
             LOGGER.error("Could not find Iview ZIP for {}", identifier, e);
-            throw new MCRIIIFImageNotFoundException(identifier);
+            throw new MCRIIIFImageNotFoundException(identifier, e);
         }
     }
 
@@ -301,18 +301,18 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         mcriiifImageProfile.qualities.add("bitonal");
         mcriiifImageProfile.qualities.add("gray");
 
-        mcriiifImageProfile.supports.add(MCRIIIFFeatures.mirroring);
-        mcriiifImageProfile.supports.add(MCRIIIFFeatures.regionByPct);
-        mcriiifImageProfile.supports.add(MCRIIIFFeatures.regionByPx);
-        mcriiifImageProfile.supports.add(MCRIIIFFeatures.rotationArbitrary);
-        mcriiifImageProfile.supports.add(MCRIIIFFeatures.rotationBy90s);
-        mcriiifImageProfile.supports.add(MCRIIIFFeatures.sizeAboveFull);
-        mcriiifImageProfile.supports.add(MCRIIIFFeatures.sizeByWhListed);
-        mcriiifImageProfile.supports.add(MCRIIIFFeatures.sizeByForcedWh);
-        mcriiifImageProfile.supports.add(MCRIIIFFeatures.sizeByH);
-        mcriiifImageProfile.supports.add(MCRIIIFFeatures.sizeByPct);
-        mcriiifImageProfile.supports.add(MCRIIIFFeatures.sizeByW);
-        mcriiifImageProfile.supports.add(MCRIIIFFeatures.sizeByWh);
+        mcriiifImageProfile.supports.add(MCRIIIFFeatures.MIRRORING);
+        mcriiifImageProfile.supports.add(MCRIIIFFeatures.REGION_BY_PCT);
+        mcriiifImageProfile.supports.add(MCRIIIFFeatures.REGION_BY_PX);
+        mcriiifImageProfile.supports.add(MCRIIIFFeatures.ROTATION_ARBITRARY);
+        mcriiifImageProfile.supports.add(MCRIIIFFeatures.ROTATION_BY_90_S);
+        mcriiifImageProfile.supports.add(MCRIIIFFeatures.SIZE_ABOVE_FULL);
+        mcriiifImageProfile.supports.add(MCRIIIFFeatures.SIZE_BY_WH_LISTED);
+        mcriiifImageProfile.supports.add(MCRIIIFFeatures.SIZE_BY_FORCED_WH);
+        mcriiifImageProfile.supports.add(MCRIIIFFeatures.SIZE_BY_H);
+        mcriiifImageProfile.supports.add(MCRIIIFFeatures.SIZE_BY_PCT);
+        mcriiifImageProfile.supports.add(MCRIIIFFeatures.SIZE_BY_W);
+        mcriiifImageProfile.supports.add(MCRIIIFFeatures.SIZE_BY_WH);
 
         return mcriiifImageProfile;
     }

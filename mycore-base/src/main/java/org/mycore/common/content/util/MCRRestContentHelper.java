@@ -50,7 +50,7 @@ public final class MCRRestContentHelper {
     public static final RuntimeDelegate.HeaderDelegate<Date> DATE_HEADER_DELEGATE = RuntimeDelegate.getInstance()
         .createHeaderDelegate(Date.class);
 
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private MCRRestContentHelper() {
     }
@@ -102,7 +102,7 @@ public final class MCRRestContentHelper {
         String filename = Optional.of(content.getName())
             .orElseGet(() -> Iterables.getLast(uriInfo.getPathSegments()).getPath());
         response.header(HttpHeaders.CONTENT_DISPOSITION,
-            config.dispositionType.name() + ";filename=\"" + filename + "\"");
+            config.dispositionType.getValue() + ";filename=\"" + filename + "\"");
 
         boolean noRangeRequest = ranges == null || ranges.equals(ContentUtils.FULL);
         if (noRangeRequest) {
@@ -153,7 +153,7 @@ public final class MCRRestContentHelper {
         MediaType contentType = MediaType.valueOf(mimeType);
         String enc = content.getEncoding();
         if (enc != null) {
-            HashMap<String, String> param = new HashMap<>(contentType.getParameters());
+            Map<String, String> param = new HashMap<>(contentType.getParameters());
             param.put(MediaType.CHARSET_PARAMETER, enc);
             contentType = new MediaType(contentType.getType(), contentType.getSubtype(), param);
         }
@@ -196,17 +196,27 @@ public final class MCRRestContentHelper {
         } catch (IllegalArgumentException e) {
             Response errResponse = Response.status(Response.Status.REQUESTED_RANGE_NOT_SATISFIABLE)
                 .header("Content-Range", "bytes */" + contentLength).build();
-            throw new WebApplicationException(errResponse);
+            throw new WebApplicationException(e, errResponse);
         }
     }
 
     public enum ContentDispositionType {
-        inline, attachment
+        INLINE("inline"), ATTACHMENT("attachment");
+
+        private final String value;
+
+        ContentDispositionType(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
     }
 
     public static class Config {
 
-        public ContentDispositionType dispositionType = ContentDispositionType.attachment;
+        public ContentDispositionType dispositionType = ContentDispositionType.ATTACHMENT;
 
         public boolean useAcceptRanges = true;
 

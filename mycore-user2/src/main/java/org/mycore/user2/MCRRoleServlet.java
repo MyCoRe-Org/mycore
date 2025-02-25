@@ -18,6 +18,7 @@
 
 package org.mycore.user2;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -50,6 +51,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRRoleServlet extends MCRServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final String LAYOUT_ELEMENT_KEY = MCRRoleServlet.class.getName() + ".layoutElement";
@@ -111,7 +113,7 @@ public class MCRRoleServlet extends MCRServlet {
     }
 
     private Collection<Element> getRoleElements() {
-        ArrayList<Element> list = new ArrayList<>(roleCategories.size());
+        List<Element> list = new ArrayList<>(roleCategories.size());
         for (MCRCategoryID categID : roleCategories) {
             Element role = new Element("role");
             role.setAttribute("categID", categID.toString());

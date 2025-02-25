@@ -18,12 +18,14 @@
 
 package org.mycore.datamodel.ifs2;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.Comparator;
 
 class MCRPathComparator implements Comparator<Path>, Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Override

@@ -101,7 +101,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
     public MCRMetaNumber() {
         super();
         loadProperties();
-        number = new BigDecimal("0");
+        number = BigDecimal.ZERO;
         dimension = "";
         measurement = "";
     }
@@ -216,7 +216,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
             String tmpNumber = number.replace(',', '.');
             this.number = new BigDecimal(tmpNumber);
         } catch (NumberFormatException e) {
-            throw new MCRException("The format of a number is invalid.");
+            throw new MCRException("The format of a number is invalid.", e);
         }
     }
 

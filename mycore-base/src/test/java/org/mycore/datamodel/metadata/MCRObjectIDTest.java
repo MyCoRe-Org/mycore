@@ -50,7 +50,7 @@ public class MCRObjectIDTest extends MCRStoreTestCase {
      */
     public static void resetObjectIDFormat() {
         try {
-            Field fNumberformat = MCRObjectID.class.getDeclaredField("NUMBER_FORMAT");
+            Field fNumberformat = MCRObjectID.class.getDeclaredField("numberFormat");
             fNumberformat.setAccessible(true);
             Method mInitNumberformat = MCRObjectID.class.getDeclaredMethod("initNumberFormat");
             mInitNumberformat.setAccessible(true); //if security settings allow this

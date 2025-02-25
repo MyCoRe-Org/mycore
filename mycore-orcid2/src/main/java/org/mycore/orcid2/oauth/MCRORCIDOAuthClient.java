@@ -34,12 +34,12 @@ import jakarta.ws.rs.core.Response;
  * Client for the OAuth2 API of orcid.org.
  * Used to exchange or revoke access tokens.
  * Minimum configuration requires to set:
- *
+ * <p>
  * MCR.ORCID2.BaseURL
  * MCR.ORCID2.OAuth.ClientID
  * MCR.ORCID2.OAuth.ClientSecret
  */
-public class MCRORCIDOAuthClient {
+public final class MCRORCIDOAuthClient {
 
     private static final String CONFIG_PREFIX = MCRORCIDConstants.CONFIG_PREFIX + "OAuth.";
 
@@ -109,7 +109,7 @@ public class MCRORCIDOAuthClient {
         throw new MCRORCIDRequestException(response);
     }
 
-    private static class LazyInstanceHelper {
+    private static final class LazyInstanceHelper {
         static final MCRORCIDOAuthClient INSTANCE = new MCRORCIDOAuthClient();
     }
 }

@@ -38,6 +38,7 @@ import com.google.gson.JsonObject;
  * @author Jens Kupferschmidt
  */
 public final class MCRMetaIFS extends MCRMetaDefault {
+
     // MCRMetaIFS data
     private String sourcePath;
 

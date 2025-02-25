@@ -58,8 +58,6 @@ public class MCRRateLimitBuckets {
 
     private static final Map<String, Bucket> EXISTING_BUCKETS = new ConcurrentHashMap<>();
 
-    private static String CONFIG_ID;
-
     /**
      * Clears the list of all buckets already created.
      */
@@ -75,44 +73,47 @@ public class MCRRateLimitBuckets {
      * @return the bucket
      */
     public static Bucket getOrCreateBucket(String configID) {
-        CONFIG_ID = configID;
-        if (EXISTING_BUCKETS.containsKey(CONFIG_ID)) {
-            return EXISTING_BUCKETS.get(CONFIG_ID);
+        if (EXISTING_BUCKETS.containsKey(configID)) {
+            return EXISTING_BUCKETS.get(configID);
         }
-        final String dsConfigLimits = MCRConfiguration2.getStringOrThrow(CONFIG_PREFIX + CONFIG_ID + ".Limits");
+        final String dsConfigLimits = MCRConfiguration2.getStringOrThrow(CONFIG_PREFIX + configID + ".Limits");
 
-        final HashMap<String, Long> limitMap = Arrays.stream(dsConfigLimits.split(",")).collect(
+        final Map<String, Long> limitMap = Arrays.stream(dsConfigLimits.split(",")).collect(
             HashMap::new, (map, str) -> map.put(str.split("/")[1].trim(),
                 Long.parseLong(str.split("/")[0].trim())),
             HashMap::putAll);
-        final Bucket bucket = createNewBucket(limitMap);
-        EXISTING_BUCKETS.put(CONFIG_ID, bucket);
+        final Bucket bucket = createNewBucket(configID, limitMap);
+        EXISTING_BUCKETS.put(configID, bucket);
         return bucket;
     }
 
     /**
      * Creates a bucket using a map of limits and the configured ID. The used bucket refill-strategy is "intervally".
      * This means the whole amount of tokens is refilled after the whole time period has elapsed.
+     * @param configID the configuration-ID for a bucket
      * @param limitMap a map of time units and the corresponding limit/amount of tokens.
      * @return the created bucket
      */
-    private static Bucket createNewBucket(HashMap<String, Long> limitMap) {
+    private static Bucket createNewBucket(String configID, Map<String, Long> limitMap) {
         final LocalBucketBuilder builder = Bucket.builder();
         for (Map.Entry<String, Long> entry : limitMap.entrySet()) {
             final String unit = entry.getKey();
             final Long amount = entry.getValue();
-            builder.addLimit(limit -> limit.capacity(amount).refillIntervally(amount, getDuration(unit, amount)));
+            builder.addLimit(limit -> limit
+                .capacity(amount)
+                .refillIntervally(amount, getDuration(configID, unit, amount)));
         }
         return builder.build();
     }
 
     /**
      * Helper method to determine the duration until a bucket refill for a given time unit.
+     * @param configID the configuration-ID for a bucket
      * @param unit the time unit in String-format
      * @param amount amount of tokens for a bucket
      * @return the duration until a bucket refill should happen
      */
-    private static Duration getDuration(String unit, long amount) {
+    private static Duration getDuration(String configID, String unit, long amount) {
         switch (unit.toLowerCase(Locale.ROOT)) {
             case "m" -> {
                 return Duration.ofDays(30);
@@ -130,7 +131,7 @@ public class MCRRateLimitBuckets {
                 return Duration.ofSeconds(1);
             }
             default -> throw new MCRConfigurationException("The configuration \"" + amount + " tokens per " + unit +
-                "\" for the ID \"" + CONFIG_ID + "\" is malformed. No time unit could be identified.");
+                "\" for the ID \"" + configID + "\" is malformed. No time unit could be identified.");
         }
     }
 }

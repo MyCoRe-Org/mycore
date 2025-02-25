@@ -19,6 +19,7 @@
 package org.mycore.iview.tests;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.util.Properties;
 
 import org.apache.logging.log4j.LogManager;
@@ -27,8 +28,12 @@ import org.apache.logging.log4j.Logger;
 public class TestProperties extends Properties {
 
     public static final String TEST_PROPERTIES = "test.properties";
-    private static final long serialVersionUID = -1135672087633884258L;
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     private static final Logger LOGGER = LogManager.getLogger(TestProperties.class);
+
     private static TestProperties singleton;
 
     private TestProperties() {

@@ -41,7 +41,7 @@ import org.apache.solr.common.util.ContentStreamBase;
  * */
 public abstract class MCRSolrAbstractContentStream<T> extends ContentStreamBase implements AutoCloseable {
 
-    static final Logger LOGGER = LogManager.getLogger(MCRSolrAbstractContentStream.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     protected boolean setup;
 

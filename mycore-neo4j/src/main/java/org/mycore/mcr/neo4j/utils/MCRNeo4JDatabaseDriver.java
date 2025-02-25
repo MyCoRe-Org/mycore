@@ -35,7 +35,7 @@ import org.neo4j.driver.Session;
  *
  * @author Andreas Kluge
  */
-public class MCRNeo4JDatabaseDriver {
+public final class MCRNeo4JDatabaseDriver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 

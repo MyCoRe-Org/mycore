@@ -53,7 +53,7 @@ public class MCRLayoutTransformerFactory {
     /** Map of transformer instances by ID */
     private static Map<String, MCRContentTransformer> transformers = new ConcurrentHashMap<>();
 
-    private static Logger LOGGER = LogManager.getLogger(MCRLayoutTransformerFactory.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRLayoutTransformerFactory.class);
 
     protected static final MCRIdentityTransformer NOOP_TRANSFORMER = new MCRIdentityTransformer("text/xml", "xml");
 

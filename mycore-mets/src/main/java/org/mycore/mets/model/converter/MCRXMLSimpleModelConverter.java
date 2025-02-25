@@ -21,7 +21,6 @@ package org.mycore.mets.model.converter;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -58,12 +57,12 @@ public class MCRXMLSimpleModelConverter {
 
         MCRMetsSimpleModel msm = new MCRMetsSimpleModel();
 
-        Map<String, MCRMetsPage> idPageMap = new Hashtable<>();
+        Map<String, MCRMetsPage> idPageMap = new HashMap<>();
         Map<String, MCRMetsFile> idFileMap = buildidFileMap(mets);
         List<MCRMetsPage> metsPageList = buildPageList(mets, idPageMap, idFileMap);
         msm.getMetsPageList().addAll(metsPageList);
 
-        Map<String, MCRMetsSection> idSectionMap = new Hashtable<>();
+        Map<String, MCRMetsSection> idSectionMap = new HashMap<>();
         MCRMetsSection rootMetsSection = buidRootSection(mets, idSectionMap, idFileMap);
         msm.setRootSection(rootMetsSection);
 

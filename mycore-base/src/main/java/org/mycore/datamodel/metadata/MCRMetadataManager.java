@@ -20,6 +20,7 @@ package org.mycore.datamodel.metadata;
 
 import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+import static org.mycore.datamodel.metadata.MCRObjectService.DATE_TYPE_CREATEDATE;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -71,10 +72,10 @@ public final class MCRMetadataManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRCache<MCRObjectID, MCRObjectID> DERIVATE_OBJECT_MAP = new MCRCache<>(10000,
+    private static final MCRCache<MCRObjectID, MCRObjectID> DERIVATE_OBJECT_MAP = new MCRCache<>(10_000,
         "derivate objectid cache");
 
-    private static final MCRCache<MCRObjectID, List<MCRObjectID>> OBJECT_DERIVATE_MAP = new MCRCache<>(10000,
+    private static final MCRCache<MCRObjectID, List<MCRObjectID>> OBJECT_DERIVATE_MAP = new MCRCache<>(10_000,
         "derivate objectid cache");
 
     private static final MCRXMLMetadataManager XML_MANAGER = MCRXMLMetadataManager.instance();
@@ -178,7 +179,7 @@ public final class MCRMetadataManager {
     public static void create(final MCRDerivate mcrDerivate) throws MCRPersistenceException, MCRAccessException {
         MCRObjectID derivateId = mcrDerivate.getId();
         checkCreatePrivilege(derivateId);
-        throwPersistenceExceptionIfExists(derivateId, "derivate");
+        throwPersistenceExceptionIfExists(derivateId, MCRDerivate.OBJECT_TYPE);
 
         derivateId = assignNewIdIfNecessary(mcrDerivate);
 
@@ -243,11 +244,12 @@ public final class MCRMetadataManager {
     }
 
     private static void setDerivateMetadata(MCRDerivate mcrDerivate) {
-        if (mcrDerivate.getService().getDate("createdate") == null || !mcrDerivate.isImportMode()) {
-            mcrDerivate.getService().setDate("createdate");
+        boolean importMode = mcrDerivate.isImportMode();
+        if (mcrDerivate.getService().getDate(DATE_TYPE_CREATEDATE) == null || !importMode) {
+            mcrDerivate.getService().setDate(DATE_TYPE_CREATEDATE);
         }
-        if (mcrDerivate.getService().getDate("modifydate") == null || !mcrDerivate.isImportMode()) {
-            mcrDerivate.getService().setDate("modifydate");
+        if (mcrDerivate.getService().getDate(MCRObjectService.DATE_TYPE_MODIFYDATE) == null || !importMode) {
+            mcrDerivate.getService().setDate(MCRObjectService.DATE_TYPE_MODIFYDATE);
         }
     }
 
@@ -377,11 +379,11 @@ public final class MCRMetadataManager {
         }
 
         // create this object in datastore
-        if (mcrObject.getService().getDate("createdate") == null) {
-            mcrObject.getService().setDate("createdate");
+        if (mcrObject.getService().getDate(DATE_TYPE_CREATEDATE) == null) {
+            mcrObject.getService().setDate(DATE_TYPE_CREATEDATE);
         }
-        if (mcrObject.getService().getDate("modifydate") == null) {
-            mcrObject.getService().setDate("modifydate");
+        if (mcrObject.getService().getDate(MCRObjectService.DATE_TYPE_MODIFYDATE) == null) {
+            mcrObject.getService().setDate(MCRObjectService.DATE_TYPE_MODIFYDATE);
         }
 
         // prepare this object with parent metadata
@@ -725,8 +727,9 @@ public final class MCRMetadataManager {
      *            mycore object which is updated
      */
     public static void fireUpdateEvent(final MCRObject mcrObject) throws MCRPersistenceException {
-        if (!mcrObject.isImportMode() || mcrObject.getService().getDate("modifydate") == null) {
-            mcrObject.getService().setDate("modifydate");
+        if (!mcrObject.isImportMode() ||
+            mcrObject.getService().getDate(MCRObjectService.DATE_TYPE_MODIFYDATE) == null) {
+            mcrObject.getService().setDate(MCRObjectService.DATE_TYPE_MODIFYDATE);
         }
         // remove ACL if it is set from data source
         mcrObject.getService().getRules().clear();
@@ -783,7 +786,7 @@ public final class MCRMetadataManager {
      *                if a persistence problem is occurred
      */
     public static MCRBase retrieve(final MCRObjectID id) throws MCRPersistenceException {
-        if (id.getTypeId().equals("derivate")) {
+        if (id.getTypeId().equals(MCRDerivate.OBJECT_TYPE)) {
             return retrieveMCRDerivate(id);
         }
         return retrieveMCRObject(id);
@@ -875,14 +878,13 @@ public final class MCRMetadataManager {
     }
 
     private static void updateDerivate(MCRDerivate mcrDerivate, MCRDerivate old) throws MCRPersistenceException {
-        mcrDerivate.getService().setDate("createdate", old.getService().getDate("createdate"));
-
+        Date oldDate = old.getService().getDate(DATE_TYPE_CREATEDATE);
+        mcrDerivate.getService().setDate(DATE_TYPE_CREATEDATE, oldDate);
         if (!mcrDerivate.getService().isFlagTypeSet(MCRObjectService.FLAG_TYPE_CREATEDBY)) {
             for (String flagCreatedBy : old.getService().getFlags(MCRObjectService.FLAG_TYPE_CREATEDBY)) {
                 mcrDerivate.getService().addFlag(MCRObjectService.FLAG_TYPE_CREATEDBY, flagCreatedBy);
             }
         }
-
         updateMCRDerivateXML(mcrDerivate);
     }
 
@@ -1011,10 +1013,11 @@ public final class MCRMetadataManager {
     }
 
     private static void retainCreatedDateAndFlags(MCRObject mcrObject, MCRObject old) throws MCRPersistenceException {
-        if (!mcrObject.isImportMode() || mcrObject.getService().getDate("createdate") == null) {
-            mcrObject.getService().setDate("createdate", old.getService().getDate("createdate"));
+        boolean importMode = mcrObject.isImportMode();
+        if (!importMode || mcrObject.getService().getDate(DATE_TYPE_CREATEDATE) == null) {
+            mcrObject.getService().setDate(DATE_TYPE_CREATEDATE, old.getService().getDate(DATE_TYPE_CREATEDATE));
         }
-        if (!mcrObject.isImportMode() && !mcrObject.getService().isFlagTypeSet(MCRObjectService.FLAG_TYPE_CREATEDBY)) {
+        if (!importMode && !mcrObject.getService().isFlagTypeSet(MCRObjectService.FLAG_TYPE_CREATEDBY)) {
             for (String flagCreatedBy : old.getService().getFlags(MCRObjectService.FLAG_TYPE_CREATEDBY)) {
                 mcrObject.getService().addFlag(MCRObjectService.FLAG_TYPE_CREATEDBY, flagCreatedBy);
             }
@@ -1073,8 +1076,9 @@ public final class MCRMetadataManager {
      *                if a persistence problem is occurred
      */
     private static void updateMCRDerivateXML(final MCRDerivate mcrDerivate) throws MCRPersistenceException {
-        if (!mcrDerivate.isImportMode() || mcrDerivate.getService().getDate("modifydate") == null) {
-            mcrDerivate.getService().setDate("modifydate");
+        boolean importMode = mcrDerivate.isImportMode();
+        if (!importMode || mcrDerivate.getService().getDate(MCRObjectService.DATE_TYPE_MODIFYDATE) == null) {
+            mcrDerivate.getService().setDate(MCRObjectService.DATE_TYPE_MODIFYDATE);
         }
         fireEvent(mcrDerivate, retrieveMCRDerivate(mcrDerivate.getId()), MCREvent.EventType.UPDATE);
     }
@@ -1117,7 +1121,7 @@ public final class MCRMetadataManager {
             return false;
         }
         if (!isImportMode && !object.isImportMode()) {
-            object.getService().setDate("modifydate");
+            object.getService().setDate(MCRObjectService.DATE_TYPE_MODIFYDATE);
         }
         fireUpdateEvent(object);
         return true;
@@ -1127,7 +1131,7 @@ public final class MCRMetadataManager {
         throws MCRPersistenceException {
         final MCRObject object = retrieveMCRObject(objectID);
         if (object.getStructure().removeDerivate(derivateID)) {
-            object.getService().setDate("modifydate");
+            object.getService().setDate(MCRObjectService.DATE_TYPE_MODIFYDATE);
             fireUpdateEvent(object);
             return true;
         }

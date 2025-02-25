@@ -19,16 +19,16 @@
 package org.mycore.datamodel.language;
 
 /**
- * Represents a type of langauge code, currently the ISO 639-1 and ISO 639-2b and 2t code types.
+ * Represents a type of language code, currently the ISO 639-1 and ISO 639-2b and 2t code types.
  * 
  * @author Frank Lützenkirchen
  */
 public enum MCRLanguageCodeType {
 
     /** ISO 639-2 terminology code is identical with ISO 639-3 and used in Dublin Core and OAI output */
-    termCode,
+    TERM_CODE,
     /** ISO 639-2 bibliographic code is used in some bibliographic metadata standards */
-    biblCode,
+    BIBL_CODE,
     /** ISO 639-1 is used in xml:lang and HTML lang attribute in XML and XHTML output */
-    xmlCode
+    XML_CODE
 }

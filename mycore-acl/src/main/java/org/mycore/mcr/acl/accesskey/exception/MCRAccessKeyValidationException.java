@@ -18,6 +18,8 @@
 
 package org.mycore.mcr.acl.accesskey.exception;
 
+import java.io.Serial;
+
 /**
  * Exception thrown when an access key validation fails.
  *
@@ -27,6 +29,7 @@ package org.mycore.mcr.acl.accesskey.exception;
  */
 public class MCRAccessKeyValidationException extends MCRAccessKeyException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

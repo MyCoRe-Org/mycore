@@ -18,6 +18,7 @@
 
 package org.mycore.frontend.servlets;
 
+import java.io.Serial;
 import java.net.URI;
 import java.util.Map;
 import java.util.Set;
@@ -39,6 +40,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRLockServlet extends MCRServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final String OBJECT_ID_KEY = MCRLockServlet.class.getCanonicalName() + ".MCRObjectID";
@@ -46,7 +48,26 @@ public class MCRLockServlet extends MCRServlet {
     private static final String ACTION_KEY = MCRLockServlet.class.getCanonicalName() + ".Action";
 
     enum Action {
-        lock, unlock
+        LOCK("lock"), UNLOCK("unlock");
+
+        private final String value;
+
+        Action(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public static Action fromString(String value) {
+            for (Action action : values()) {
+                if (action.getValue().equals(value)) {
+                    return action;
+                }
+            }
+            throw new IllegalArgumentException("No constant with value " + value + " found");
+        }
     }
 
     private static final Logger LOGGER = LogManager.getLogger(MCRLockServlet.class);
@@ -84,7 +105,7 @@ public class MCRLockServlet extends MCRServlet {
         }
         Action action = null;
         try {
-            action = actionValue != null ? Action.valueOf(actionValue) : Action.lock;
+            action = actionValue != null ? Action.fromString(actionValue) : Action.LOCK;
         } catch (IllegalArgumentException e) {
             job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST,
                 "Unsupported value for parameter " + PARAM_ACTION + ": " + actionValue);
@@ -92,8 +113,8 @@ public class MCRLockServlet extends MCRServlet {
         }
         MCRObjectID objectID = MCRObjectID.getInstance(idValue);
         switch (action) {
-            case lock -> MCRObjectIDLockTable.lock(objectID);
-            case unlock -> MCRObjectIDLockTable.unlock(objectID);
+            case LOCK -> MCRObjectIDLockTable.lock(objectID);
+            case UNLOCK -> MCRObjectIDLockTable.unlock(objectID);
         }
         job.getRequest().setAttribute(OBJECT_ID_KEY, objectID);
         job.getRequest().setAttribute(ACTION_KEY, action);
@@ -112,7 +133,7 @@ public class MCRLockServlet extends MCRServlet {
         MCRObjectID objectId = (MCRObjectID) job.getRequest().getAttribute(OBJECT_ID_KEY);
         Action action = (Action) job.getRequest().getAttribute(ACTION_KEY);
         MCRSession lockingSession = MCRObjectIDLockTable.getLocker(objectId);
-        if (MCRObjectIDLockTable.isLockedByCurrentSession(objectId) || action == Action.unlock) {
+        if (MCRObjectIDLockTable.isLockedByCurrentSession(objectId) || action == Action.UNLOCK) {
             String url = getProperty(job.getRequest(), PARAM_REDIRECT);
             if (url.startsWith("/")) {
                 url = req.getContextPath() + url;

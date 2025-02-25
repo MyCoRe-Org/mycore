@@ -20,7 +20,6 @@ package org.mycore.frontend.classeditor.access;
 
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -43,7 +42,7 @@ import jakarta.ws.rs.core.Response.Status;
 public class MCRClassificationWritePermission implements MCRResourceAccessChecker {
     public static final String PERMISSION_CREATE = "create-class";
 
-    private static Logger LOGGER = LogManager.getLogger(MCRClassificationWritePermission.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRClassificationWritePermission.class);
 
     /* (non-Javadoc)
      * @see org.mycore.frontend.jersey.filter.access.MCRResourceAccessChecker
@@ -54,7 +53,7 @@ public class MCRClassificationWritePermission implements MCRResourceAccessChecke
         String value = convertStreamToString(request.getEntityStream());
         try {
             //        Set<MCRCategoryID> categories = MCRCategUtils.getRootCategoryIDs(value);
-            HashMap<MCRCategoryID, String> categories = MCRCategUtils.getCategoryIDMap(value);
+            Map<MCRCategoryID, String> categories = MCRCategUtils.getCategoryIDMap(value);
             if (categories == null) {
                 LOGGER.error("Could not parse {}", value);
                 return false;

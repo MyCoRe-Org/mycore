@@ -49,63 +49,73 @@ import org.mycore.user2.utils.MCRUserTransformer;
 /**
  * Queries an LDAP server for the user's properties.
  *
- *  # Timeout when connecting to LDAP server
- *  MCR.user2.LDAP.ReadTimeout=5000
+ * <p>Configuration properties for connecting to the LDAP server:</p>
  *
- *  # LDAP server
- *  MCR.user2.LDAP.ProviderURL=ldap://idp.uni-duisburg-essen.de
+ * <ul>
+ *   <li><b>Timeout when connecting to LDAP server:</b>
+ *     <pre>MCR.user2.LDAP.ReadTimeout=5000</pre>
+ *   </li>
+ *   <li><b>LDAP server:</b>
+ *     <pre>MCR.user2.LDAP.ProviderURL=ldap://idp.uni-duisburg-essen.de</pre>
+ *   </li>
+ *   <li><b>Security principal for logging into the LDAP server:</b>
+ *     <pre>MCR.user2.LDAP.SecurityPrincipal=cn=duepublico,dc=idp</pre>
+ *   </li>
+ *   <li><b>Security credentials for logging into the LDAP server:</b>
+ *     <pre>MCR.user2.LDAP.SecurityCredentials=XXXXXX</pre>
+ *   </li>
+ *   <li><b>Base DN:</b>
+ *     <pre>MCR.user2.LDAP.BaseDN=ou=people,dc=idp</pre>
+ *   </li>
+ *   <li><b>Filter for user ID:</b>
+ *     <pre>MCR.user2.LDAP.UIDFilter=(uid=%s)</pre>
+ *   </li>
+ * </ul>
  *
- *  # Security principal for logging in at LDAP server
- *  MCR.user2.LDAP.SecurityPrincipal=cn=duepublico,dc=idp
+ * <p>LDAP attribute mappings:</p>
  *
- *  # Security credentials for logging in at LDAP server
- *  MCR.user2.LDAP.SecurityCredentials=XXXXXX
+ * <ul>
+ *   <li><b>Mapping from LDAP attribute to real name of user:</b>
+ *     <pre>MCR.user2.LDAP.Mapping.Name=cn</pre>
+ *   </li>
+ *   <li><b>Mapping from LDAP attribute to email address of user:</b>
+ *     <pre>MCR.user2.LDAP.Mapping.E-Mail=mail</pre>
+ *   </li>
+ *   <li><b>Mapping of any attribute.value combination to group membership of user:</b>
+ *     <pre>MCR.user2.LDAP.Mapping.Group.eduPersonScopedAffiliation.staff@uni-duisburg-essen.de=creators</pre>
+ *   </li>
+ *   <li><b>Default group membership (optional):</b>
+ *     <pre>MCR.user2.LDAP.Mapping.Group.DefaultGroup=submitters</pre>
+ *   </li>
+ * </ul>
  *
- *  # Base DN
- *  MCR.user2.LDAP.BaseDN=ou=people,dc=idp
- *
- *  # Filter for user ID
- *  MCR.user2.LDAP.UIDFilter=(uid=%s)
- *
- *  # LDAP attribute mappings
- *
- *  # Mapping from LDAP attribute to real name of user
- *  MCR.user2.LDAP.Mapping.Name=cn
- *
- *  # Mapping from LDAP attribute to E-Mail address of user
- *  MCR.user2.LDAP.Mapping.E-Mail=mail
- *
- *  # Mapping of any attribute.value combination to group membership of user
- *  MCR.user2.LDAP.Mapping.Group.eduPersonScopedAffiliation.staff@uni-duisburg-essen.de=creators
- *
- *  # Default group membership (optional)
- *  MCR.user2.LDAP.Mapping.Group.DefaultGroup=submitters
- *
- * @author Frank L\u00fctzenkirchen
+ * @author Frank Lützenkirchen
  */
-public class MCRLDAPClient {
-    /** The logger */
-    private static Logger LOGGER = LogManager.getLogger(MCRLDAPClient.class);
+public final class MCRLDAPClient {
 
-    private static MCRLDAPClient instance = new MCRLDAPClient();
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    private static volatile MCRLDAPClient instance;
 
     /** Base DN */
-    private String baseDN;
+    private final String baseDN;
 
     /** Filter for user ID */
-    private String uidFilter;
+    private final String uidFilter;
 
     /** Mapping from LDAP attribute to real name of user */
-    private String mapName;
+    private final String mapName;
 
     /** Mapping from LDAP attribute to E-Mail address of user */
-    private String mapEMail;
+    private final String mapEMail;
 
     /** Default group of user */
     private MCRRole defaultGroup;
 
-    private Hashtable<String, String> ldapEnv;
+    @SuppressWarnings({ "PMD.LooseCoupling", "PMD.ReplaceHashtableWithMap" })
+    private final Hashtable<String, String> ldapEnv;
 
+    @SuppressWarnings("PMD.ReplaceHashtableWithMap")
     private MCRLDAPClient() {
         String prefix = "MCR.user2.LDAP.";
         /* Timeout when connecting to LDAP server */
@@ -138,6 +148,13 @@ public class MCRLDAPClient {
     }
 
     public static MCRLDAPClient instance() {
+        if(instance == null) {
+            synchronized (MCRLDAPClient.class) {
+                if(instance == null) {
+                    instance = new MCRLDAPClient();
+                }
+            }
+        }
         return instance;
     }
 

@@ -44,7 +44,7 @@ public abstract class MCROCFLCombineComparePruner implements MCROCFLRevisionPrun
 
     @Override
     public List<MCROCFLRevision> prune(List<MCROCFLRevision> revisions) throws IOException, JDOMException {
-        ArrayList<MCROCFLRevision> newRevisions = new ArrayList<>();
+        List<MCROCFLRevision> newRevisions = new ArrayList<>();
         Iterator<MCROCFLRevision> iterator = revisions.listIterator();
 
         if (!iterator.hasNext()) {

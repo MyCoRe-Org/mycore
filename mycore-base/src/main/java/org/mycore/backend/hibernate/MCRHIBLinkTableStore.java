@@ -42,7 +42,7 @@ import jakarta.persistence.TypedQuery;
  */
 public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
     // logger
-    static Logger LOGGER = LogManager.getLogger(MCRHIBLinkTableStore.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRHIBLinkTableStore.class);
 
     private String classname = MCRLINKHREF.class.getCanonicalName();
 
@@ -196,7 +196,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
      */
     @Override
     public Collection<String> getSourcesOf(String to, String type) {
-        boolean withType = type != null && type.trim().length() != 0;
+        boolean withType = type != null && !type.isBlank();
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         TypedQuery<String> toQuery = em.createNamedQuery(
             withType ? "MCRLINKHREF.getSourcesWithType" : "MCRLINKHREF.getSources", String.class);
@@ -219,7 +219,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
      */
     @Override
     public Collection<String> getDestinationsOf(String source, String type) {
-        boolean withType = type != null && type.trim().length() != 0;
+        boolean withType = type != null && !type.isBlank();
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         TypedQuery<String> toQuery = em.createNamedQuery(
             withType ? "MCRLINKHREF.getDestinationsWithType" : "MCRLINKHREF.getDestinations", String.class);

@@ -23,7 +23,7 @@ package org.mycore.common.digest;
  */
 public final class MCRSHA512Digest extends MCRDigest {
 
-    public static SHA512Algorithm ALGORITHM;
+    public static final SHA512Algorithm ALGORITHM;
 
     static {
         ALGORITHM = new MCRSHA512Digest.SHA512Algorithm();

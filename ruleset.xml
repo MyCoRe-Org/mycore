@@ -38,36 +38,28 @@
   <rule ref="category/java/bestpractices.xml/UnitTestShouldUseTestAnnotation"/>
   <rule ref="category/java/bestpractices.xml/JUnit5TestShouldBePackagePrivate"/>
   <rule ref="category/java/bestpractices.xml/UnitTestShouldIncludeAssert"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
-  <rule ref="category/java/bestpractices.xml/LooseCoupling"/>
-  -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
+  <rule ref="category/java/bestpractices.xml/LooseCoupling">
+    <properties>
+      <property name="allowedTypes" value="java.util.Properties,
+      org.mycore.frontend.basket.MCRBasket,
+      org.mycore.services.queuedjob.MCRJobQueue,
+      org.mycore.oai.pmh.OAIDataList,
+      org.apache.solr.common.SolrInputDocument,
+      org.apache.solr.common.SolrDocumentList,
+      org.apache.solr.common.SolrDocument"/>
+    </properties>
+  </rule>
   <rule ref="category/java/bestpractices.xml/MethodReturnsInternalArray"/>
-  -->
   <rule ref="category/java/bestpractices.xml/MissingOverride"/>
   <rule ref="category/java/bestpractices.xml/OneDeclarationPerLine"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/bestpractices.xml/PreserveStackTrace"/>
-  -->
   <rule ref="category/java/bestpractices.xml/PrimitiveWrapperInstantiation"/>
   <rule ref="category/java/bestpractices.xml/ReplaceEnumerationWithIterator"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/bestpractices.xml/ReplaceHashtableWithMap"/>
-  -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/bestpractices.xml/ReplaceVectorWithList"/>
-  -->
   <rule ref="category/java/bestpractices.xml/SimplifiableTestAssertion"/>
   <rule ref="category/java/bestpractices.xml/NonExhaustiveSwitch"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
-  <rule ref="category/java/bestpractices.xml/SystemPrintln" />
-  -->
+  <rule ref="category/java/bestpractices.xml/SystemPrintln"/>
   <rule ref="category/java/bestpractices.xml/UnnecessaryVarargsArrayCreation"/>
   <!-- TODO: Create PR to fix this rule -->
   <!--
@@ -77,27 +69,15 @@
   <rule ref="category/java/bestpractices.xml/UnusedLocalVariable"/>
   <rule ref="category/java/bestpractices.xml/UnusedPrivateField"/>
   <rule ref="category/java/bestpractices.xml/UnusedPrivateMethod"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/bestpractices.xml/UseCollectionIsEmpty"/>
-  -->
   <rule ref="category/java/bestpractices.xml/UseEnumCollections"/>
   <rule ref="category/java/bestpractices.xml/UseStandardCharsets"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/bestpractices.xml/UseTryWithResources"/>
-  -->
 
   <!-- Code Style Rules -->
   <rule ref="category/java/codestyle.xml/AvoidDollarSigns"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/codestyle.xml/AvoidProtectedFieldInFinalClass"/>
-  -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/codestyle.xml/AvoidProtectedMethodInFinalClassNotExtending"/>
-  -->
   <rule ref="category/java/codestyle.xml/ControlStatementBraces"/>
   <rule ref="category/java/codestyle.xml/EmptyControlStatement">
     <properties>
@@ -106,10 +86,7 @@
   </rule>
   <rule ref="category/java/codestyle.xml/ExtendsObject"/>
   <rule ref="category/java/codestyle.xml/FieldDeclarationsShouldBeAtStartOfClass"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/codestyle.xml/FieldNamingConventions"/>
-  -->
   <rule ref="category/java/codestyle.xml/FinalParameterInAbstractMethod"/>
   <rule ref="category/java/codestyle.xml/ForLoopShouldBeWhileLoop"/>
   <!-- TODO: Create PR to fix this rule -->
@@ -129,14 +106,8 @@
   <rule ref="category/java/codestyle.xml/MethodNamingConventions"/>
   <rule ref="category/java/codestyle.xml/NoPackage"/>
   <rule ref="category/java/codestyle.xml/PackageCase"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/codestyle.xml/UnnecessaryAnnotationValueElement"/>
-  -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/codestyle.xml/UnnecessaryBoxing"/>
-  -->
   <!-- TODO: Create PR to fix this rule -->
   <!--
   <rule ref="category/java/codestyle.xml/UnnecessaryCast"/>
@@ -148,22 +119,13 @@
   <!--
   <rule ref="category/java/codestyle.xml/UnnecessaryLocalBeforeReturn"/>
   -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/codestyle.xml/UnnecessaryModifier"/>
-  -->
   <rule ref="category/java/codestyle.xml/UnnecessaryReturn"/>
   <rule ref="category/java/codestyle.xml/UnnecessarySemicolon"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/codestyle.xml/UseDiamondOperator"/>
-  -->
   <rule ref="category/java/codestyle.xml/UselessQualifiedThis"/>
   <rule ref="category/java/codestyle.xml/UseShortArrayInitializer"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/codestyle.xml/UseUnderscoresInNumericLiterals"/>
-  -->
 
   <!-- Design Rules -->
   <rule ref="category/java/design.xml/AbstractClassWithoutAnyMethod"/>
@@ -178,18 +140,12 @@
   <rule ref="category/java/design.xml/AvoidThrowingNewInstanceOfSameException"/>
   <rule ref="category/java/design.xml/AvoidThrowingNullPointerException"/>
   <rule ref="category/java/design.xml/AvoidThrowingRawExceptionTypes"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/design.xml/ClassWithOnlyPrivateConstructorsShouldBeFinal"/>
-  -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/design.xml/CognitiveComplexity">
     <properties>
-      <property name="reportLevel" value="15"/>
+      <property name="reportLevel" value="30"/>
     </properties>
   </rule>
-  -->
   <!-- TODO: Create PR to fix this rule -->
   <!--
   <rule ref="category/java/design.xml/CyclomaticComplexity">
@@ -235,11 +191,12 @@
   <rule ref="category/java/errorprone.xml/AvoidCatchingNPE"/>
   <rule ref="category/java/errorprone.xml/AvoidCatchingThrowable"/>
   <rule ref="category/java/errorprone.xml/AvoidDecimalLiteralsInBigDecimalConstructor"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
-  <rule ref="category/java/errorprone.xml/AvoidDuplicateLiterals"/>
-  -->
-  <rule ref="category/java/errorprone.xml/AvoidEnumAsIdentifier"/>
+  <rule ref="category/java/errorprone.xml/AvoidDuplicateLiterals">
+    <properties>
+      <property name="exceptionList" value="unchecked,rawtypes" />
+    </properties>
+  </rule>
+  <rule ref="category/java/errorprone.xml/AvoidEnumAsIdentifier" />
   <rule ref="category/java/errorprone.xml/AvoidInstanceofChecksInCatchClause"/>
   <rule ref="category/java/errorprone.xml/AvoidLosingExceptionInformation"/>
   <rule ref="category/java/errorprone.xml/AvoidMultipleUnaryOperators"/>
@@ -261,10 +218,7 @@
   <rule ref="category/java/errorprone.xml/DoNotExtendJavaLangThrowable"/>
   <rule ref="category/java/errorprone.xml/DoNotHardCodeSDCard"/>
   <rule ref="category/java/errorprone.xml/DoNotTerminateVM"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/errorprone.xml/DoNotThrowExceptionInFinally"/>
-  -->
   <rule ref="category/java/errorprone.xml/DontImportSun"/>
   <rule ref="category/java/errorprone.xml/DontUseFloatTypeForLoopIndices"/>
   <!-- TODO: Create PR to fix this rule -->
@@ -281,17 +235,11 @@
   <rule ref="category/java/errorprone.xml/JUnitStaticSuite"/>
   <rule ref="category/java/errorprone.xml/MethodWithSameNameAsEnclosingClass"/>
   <rule ref="category/java/errorprone.xml/MisplacedNullCheck"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/errorprone.xml/MissingSerialVersionUID"/>
-  -->
   <rule ref="category/java/errorprone.xml/MissingStaticMethodInNonInstantiatableClass"/>
   <rule ref="category/java/errorprone.xml/MoreThanOneLogger"/>
   <rule ref="category/java/errorprone.xml/NonCaseLabelInSwitch"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/errorprone.xml/NonSerializableClass"/>
-  -->
   <rule ref="category/java/errorprone.xml/NonStaticInitializer"/>
   <!-- TODO: Create PR to fix this rule -->
   <!--
@@ -301,8 +249,6 @@
   <!--
   <rule ref="category/java/errorprone.xml/ProperCloneImplementation"/>
   -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/errorprone.xml/ProperLogger">
     <properties>
       <property name="staticLoggerName" value="LOGGER"/>
@@ -310,7 +256,6 @@
       <property name="loggerClass" value="org.apache.logging.log4j.Logger"/>
     </properties>
   </rule>
-  -->
   <!-- to be evaluated -->
   <!-- TODO: Create PR to fix this rule -->
   <!--
@@ -357,10 +302,7 @@
   <rule ref="category/java/multithreading.xml/DoNotUseThreads"/>
   -->
   <rule ref="category/java/multithreading.xml/DontCallThreadRun"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/multithreading.xml/DoubleCheckedLocking"/>
-  -->
   <rule ref="category/java/multithreading.xml/NonThreadSafeSingleton"/>
   <rule ref="category/java/multithreading.xml/UnsynchronizedStaticFormatter"/>
   <!-- TODO: Create PR to fix this rule -->
@@ -370,32 +312,19 @@
   <rule ref="category/java/multithreading.xml/UseNotifyAllInsteadOfNotify"/>
 
   <!-- Performance Rules -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/performance.xml/AddEmptyString"/>
-  -->
   <rule ref="category/java/performance.xml/AppendCharacterWithChar"/>
   <rule ref="category/java/performance.xml/AvoidArrayLoops"/>
   <rule ref="category/java/performance.xml/AvoidCalendarDateCreation"/>
   <rule ref="category/java/performance.xml/AvoidFileStream"/>
-
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/performance.xml/BigIntegerInstantiation"/>
-  -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/performance.xml/InefficientEmptyStringCheck"/>
-  -->
   <rule ref="category/java/performance.xml/InefficientStringBuffering"/>
   <rule ref="category/java/performance.xml/OptimizableToArrayCall"/>
   <rule ref="category/java/performance.xml/RedundantFieldInitializer"/>
   <rule ref="category/java/performance.xml/StringInstantiation"/>
   <rule ref="category/java/performance.xml/StringToString"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/performance.xml/UseArrayListInsteadOfVector"/>
-  -->
   <rule ref="category/java/performance.xml/UseArraysAsList"/>
   <rule ref="category/java/performance.xml/UseIndexOfChar"/>
   <rule ref="category/java/performance.xml/UseIOStreamsWithApacheCommonsFileItem"/>
@@ -405,5 +334,8 @@
 
   <!-- Security Rules (Include entire ruleset) -->
   <rule ref="category/java/security.xml"/>
+
+  <!-- Custom MyCoRe rules  -->
+  <rule ref="rules.xml"/>
 
 </ruleset>

@@ -393,14 +393,44 @@ public class MCRObjectQuery {
     }
 
     public enum SortBy {
-        id,
-        modified,
-        created
+        ID("id"),
+        MODIFIED("modified"),
+        CREATED("created");
+
+        private final String value;
+
+        SortBy(String value) {
+            this.value = value;
+        }
+
+        public static SortBy fromString(String value) {
+            for (SortBy sortBy : values()) {
+                if (sortBy.value.equals(value)) {
+                    return sortBy;
+                }
+            }
+            throw new IllegalArgumentException("No constant with value " + value + " found");
+        }
     }
 
     public enum SortOrder {
-        asc,
-        desc
+        ASC("asc"),
+        DESC("desc");
+
+        private final String value;
+
+        SortOrder(String value) {
+            this.value = value;
+        }
+
+        public static SortOrder fromString(String value) {
+            for (SortOrder sortOrder : values()) {
+                if (sortOrder.value.equals(value)) {
+                    return sortOrder;
+                }
+            }
+            throw new IllegalArgumentException("No constant with value " + value + " found");
+        }
     }
 
     @Override

@@ -18,6 +18,7 @@
 
 package org.mycore.datamodel.metadata.history;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 
@@ -84,6 +85,9 @@ import jakarta.persistence.Table;
 })
 public class MCRMetaHistoryItem implements Serializable {
 
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long internalid;
@@ -102,14 +106,12 @@ public class MCRMetaHistoryItem implements Serializable {
 
     private String userIP;
 
-    private static final long serialVersionUID = 1L;
-
     static MCRMetaHistoryItem createdNow(MCRObjectID id) {
-        return now(id, MCRMetadataHistoryEventType.Create);
+        return now(id, MCRMetadataHistoryEventType.CREATE);
     }
 
     static MCRMetaHistoryItem deletedNow(MCRObjectID id) {
-        return now(id, MCRMetadataHistoryEventType.Delete);
+        return now(id, MCRMetadataHistoryEventType.DELETE);
     }
 
     static MCRMetaHistoryItem now(MCRObjectID id, MCRMetadataHistoryEventType type) {

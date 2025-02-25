@@ -18,8 +18,11 @@
 
 package org.mycore.pi.exceptions;
 
+import java.io.Serial;
+
 public class MCRIdentifierUnresolvableException extends MCRDatacenterException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("unused")

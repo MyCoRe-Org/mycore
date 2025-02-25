@@ -18,7 +18,7 @@
 
 package org.mycore.common.events;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -30,7 +30,7 @@ import java.util.Set;
  * object or file. They can be handled by MCREventHandler implementations.
  * Events are automatically created by some MyCoRe components and are forwarded
  * to the handlers by MCREventManager.
- * 
+ *
  * @author Frank Lützenkirchen
  */
 public class MCREvent {
@@ -109,8 +109,8 @@ public class MCREvent {
 
     private String customEventType;
 
-    /** A hashtable to store event related, additional data */
-    private Hashtable<String, Object> data = new Hashtable<>();
+    /** A map to store event related, additional data */
+    private Map<String, Object> data = new HashMap<>();
 
     /**
      * Creates a new event object of the given object type (object, file) and
@@ -171,7 +171,7 @@ public class MCREvent {
 
     /**
      * Returns the object type of this event
-     * 
+     *
      * @return the object type of this event
      */
     public ObjectType getObjectType() {
@@ -189,7 +189,7 @@ public class MCREvent {
 
     /**
      * Returns the event type of this event
-     * 
+     *
      * @return the event type of this event
      */
     public EventType getEventType() {
@@ -207,7 +207,7 @@ public class MCREvent {
 
     /**
      * returns an object from event data
-     * 
+     *
      * @param key - the object key
      * @return an object from event data
      */
@@ -226,7 +226,7 @@ public class MCREvent {
 
     /**
      * return the entries of the event data
-     * (1x called in wfc.mail.MCRMailEventhandler) 
+     * (1x called in wfc.mail.MCRMailEventhandler)
      * @return the entrySet of the the data of the event
      */
     public Set<Map.Entry<String, Object>> entrySet() {

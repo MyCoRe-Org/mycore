@@ -18,6 +18,7 @@
 
 package org.mycore.restapi.v1.errors;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +32,7 @@ import jakarta.ws.rs.core.Response.Status;
  */
 public class MCRRestAPIException extends Exception {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private List<MCRRestAPIError> errors = new ArrayList<>();

@@ -32,6 +32,7 @@ import org.jdom2.filter.Filters;
 import org.junit.Test;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRTestCase;
+import org.mycore.common.MCRXlink;
 import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.frontend.xeditor.MCRBinding;
@@ -224,7 +225,7 @@ public class MCRChangeTrackerTest extends MCRTestCase {
         Document doc = new Document(root);
         MCRChangeTracker tracker = new MCRChangeTracker();
 
-        Attribute href = new Attribute("href", "foo", MCRConstants.XLINK_NAMESPACE);
+        Attribute href = new Attribute(MCRXlink.HREF, "foo", MCRConstants.XLINK_NAMESPACE);
         root.setAttribute(href);
         tracker.track(MCRAddedAttribute.added(href));
 
@@ -233,10 +234,10 @@ public class MCRChangeTrackerTest extends MCRTestCase {
         tracker.track(MCRRemoveAttribute.remove(href));
         tracker.undoLastChange(doc);
 
-        assertEquals("bar", root.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE));
+        assertEquals("bar", root.getAttributeValue(MCRXlink.HREF, MCRConstants.XLINK_NAMESPACE));
         tracker.undoChanges(doc);
 
-        assertNull(root.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE));
+        assertNull(root.getAttributeValue(MCRXlink.HREF, MCRConstants.XLINK_NAMESPACE));
 
         Element title = new Element("title", MCRConstants.MODS_NAMESPACE).setText("foo");
         root.addContent(title);
@@ -265,7 +266,7 @@ public class MCRChangeTrackerTest extends MCRTestCase {
 
         tracker.track(MCRBreakpoint.setBreakpoint(root, "Test"));
 
-        Attribute href = new Attribute("href", "foo", MCRConstants.XLINK_NAMESPACE);
+        Attribute href = new Attribute(MCRXlink.HREF, "foo", MCRConstants.XLINK_NAMESPACE);
         root.setAttribute(href);
         tracker.track(MCRAddedAttribute.added(href));
 

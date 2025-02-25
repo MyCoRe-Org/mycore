@@ -20,7 +20,7 @@ package org.mycore.mets.model.converter;
 
 import static java.util.stream.Collectors.toList;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,12 +52,12 @@ public class MCRJSONSimpleModelConverter {
 
         MCRMetsSimpleModel metsSimpleModel = gsonBuilder.create().fromJson(model, MCRMetsSimpleModel.class);
 
-        Hashtable<String, MCRMetsPage> idPageMap = new Hashtable<>();
+        Map<String, MCRMetsPage> idPageMap = new HashMap<>();
         metsSimpleModel.getMetsPageList().stream().forEach(page -> idPageMap.put(page.getId(), page));
 
         final Map<String, MCRMetsFile> idMCRMetsFileMap = extractIdFileMap(metsSimpleModel.getMetsPageList());
 
-        Hashtable<String, MCRMetsSection> idSectionMap = new Hashtable<>();
+        Map<String, MCRMetsSection> idSectionMap = new HashMap<>();
         processSections(metsSimpleModel.getRootSection(), idSectionMap, idMCRMetsFileMap);
 
         List<MCRMetsLink> sectionPageLinkList = metsSimpleModel.getSectionPageLinkList();
@@ -80,7 +80,7 @@ public class MCRJSONSimpleModelConverter {
     }
 
     private static Map<String, MCRMetsFile> extractIdFileMap(List<MCRMetsPage> pages) {
-        final Map<String, MCRMetsFile> idFileMap = new Hashtable<>();
+        final Map<String, MCRMetsFile> idFileMap = new HashMap<>();
         pages.forEach(p -> p.getFileList().stream()
             .filter(file -> file.getUse().equals(MCRMetsModelHelper.ALTO_USE))
             .forEach(file -> idFileMap.put(file.getId(), file)));
@@ -88,7 +88,7 @@ public class MCRJSONSimpleModelConverter {
         return idFileMap;
     }
 
-    private static void processSections(MCRMetsSection current, Hashtable<String, MCRMetsSection> idSectionTable,
+    private static void processSections(MCRMetsSection current, Map<String, MCRMetsSection> idSectionTable,
         Map<String, MCRMetsFile> idFileMap) {
         idSectionTable.put(current.getId(), current);
 

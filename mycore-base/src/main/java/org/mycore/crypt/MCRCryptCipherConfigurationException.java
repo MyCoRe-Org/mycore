@@ -20,8 +20,11 @@ package org.mycore.crypt;
 
 import org.mycore.common.config.MCRConfigurationException;
 
+import java.io.Serial;
+
 public class MCRCryptCipherConfigurationException extends MCRConfigurationException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private String errorCode;

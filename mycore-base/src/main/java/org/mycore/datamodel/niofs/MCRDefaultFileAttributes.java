@@ -58,7 +58,7 @@ public class MCRDefaultFileAttributes<T> implements MCRFileAttributes<T> {
 
     public static <T> MCRDefaultFileAttributes<T> directory(final T filekey, final long size,
         final FileTime lastModified) {
-        return new MCRDefaultFileAttributes<>(FileType.directory, size, filekey, null, null, lastModified, null);
+        return new MCRDefaultFileAttributes<>(FileType.DIRECTORY, size, filekey, null, null, lastModified, null);
     }
 
     public static <T> MCRDefaultFileAttributes<T> file(final T filekey, final long size, final MCRDigest digest,
@@ -68,7 +68,7 @@ public class MCRDefaultFileAttributes<T> implements MCRFileAttributes<T> {
 
     public static <T> MCRDefaultFileAttributes<T> file(final T filekey, final long size, final MCRDigest digest,
         final FileTime creationTime, final FileTime lastModified, final FileTime lastAccessTime) {
-        return new MCRDefaultFileAttributes<>(FileType.file, size, filekey, digest, creationTime, lastModified,
+        return new MCRDefaultFileAttributes<>(FileType.FILE, size, filekey, digest, creationTime, lastModified,
             lastAccessTime);
     }
 
@@ -98,7 +98,7 @@ public class MCRDefaultFileAttributes<T> implements MCRFileAttributes<T> {
      */
     @Override
     public boolean isDirectory() {
-        return type == FileType.directory;
+        return type == FileType.DIRECTORY;
     }
 
     /**
@@ -106,7 +106,7 @@ public class MCRDefaultFileAttributes<T> implements MCRFileAttributes<T> {
      */
     @Override
     public boolean isOther() {
-        return type == FileType.other;
+        return type == FileType.OTHER;
     }
 
     /**
@@ -114,7 +114,7 @@ public class MCRDefaultFileAttributes<T> implements MCRFileAttributes<T> {
      */
     @Override
     public boolean isRegularFile() {
-        return type == FileType.file;
+        return type == FileType.FILE;
     }
 
     /**
@@ -122,7 +122,7 @@ public class MCRDefaultFileAttributes<T> implements MCRFileAttributes<T> {
      */
     @Override
     public boolean isSymbolicLink() {
-        return type == FileType.link;
+        return type == FileType.LINK;
     }
 
     /**
@@ -155,7 +155,7 @@ public class MCRDefaultFileAttributes<T> implements MCRFileAttributes<T> {
     }
 
     private void setDigest(final FileType type, final MCRDigest digest) {
-        if (type != FileType.file && digest == null) {
+        if (type != FileType.FILE && digest == null) {
             return;
         }
         Objects.requireNonNull(digest, "'digest' is required for files");

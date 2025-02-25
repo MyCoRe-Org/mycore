@@ -36,13 +36,13 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 
-public class MCRJMXBridge implements Closeable {
+public final class MCRJMXBridge implements Closeable {
 
     static final WeakReference<MCRJMXBridge> SINGLETON = new WeakReference<>(new MCRJMXBridge());
 
     private static final Logger LOGGER = LogManager.getLogger(MCRJMXBridge.class);
 
-    private static java.util.List<WeakReference<ObjectName>> ONAME_LIST = Collections
+    private static final java.util.List<WeakReference<ObjectName>> ONAME_LIST = Collections
         .synchronizedList(new ArrayList<>());
 
     private static boolean shutdown;

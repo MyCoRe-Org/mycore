@@ -59,7 +59,7 @@ public final class MCRObject extends MCRBase {
 
     private final MCRObjectMetadata metadata;
 
-    protected String mcrLabel;
+    private String mcrLabel;
 
     /**
      * This is the constructor of the MCRObject class. It creates an instance of
@@ -153,16 +153,16 @@ public final class MCRObject extends MCRBase {
     protected void setUp() throws MCRException {
         super.setUp();
 
-        setLabel(jdomDocument.getRootElement().getAttributeValue("label"));
+        setLabel(jdomDocument.getRootElement().getAttributeValue(MCRXMLConstants.LABEL));
 
         // get the structure data of the object
-        Element structureElement = jdomDocument.getRootElement().getChild("structure");
+        Element structureElement = jdomDocument.getRootElement().getChild(MCRObjectStructure.XML_NAME);
         if (structureElement != null) {
             structure.setFromDOM(structureElement);
         }
 
         // get the metadata of the object
-        Element metadataElement = jdomDocument.getRootElement().getChild("metadata");
+        Element metadataElement = jdomDocument.getRootElement().getChild(MCRObjectMetadata.XML_NAME);
 
         if (metadataElement != null) {
             metadata.setFromDOM(metadataElement);
@@ -182,7 +182,7 @@ public final class MCRObject extends MCRBase {
             Document doc = super.createXML();
             Element elm = doc.getRootElement();
             if (mcrLabel != null) {
-                elm.setAttribute("label", mcrLabel);
+                elm.setAttribute(MCRXMLConstants.LABEL, mcrLabel);
             }
             elm.addContent(structure.createXML());
             elm.addContent(metadata.createXML());
@@ -217,9 +217,9 @@ public final class MCRObject extends MCRBase {
         if (mcrLabel != null) {
             object.addProperty("label", mcrLabel);
         }
-        object.add("structure", structure.createJSON());
-        object.add("metadata", metadata.createJSON());
-        object.add("service", mcrService.createJSON());
+        object.add(MCRObjectStructure.XML_NAME, structure.createJSON());
+        object.add(MCRObjectMetadata.XML_NAME, metadata.createJSON());
+        object.add(MCRObjectService.XML_NAME, mcrService.createJSON());
         return object;
     }
 

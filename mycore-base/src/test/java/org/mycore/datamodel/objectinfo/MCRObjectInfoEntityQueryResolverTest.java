@@ -153,7 +153,7 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
     @Test
     public void sortByIdTest() {
         MCRObjectQuery query = new MCRObjectQuery();
-        query.sort(MCRObjectQuery.SortBy.id, MCRObjectQuery.SortOrder.asc);
+        query.sort(MCRObjectQuery.SortBy.ID, MCRObjectQuery.SortOrder.ASC);
         List<MCRObjectInfo> result = instance.getInfos(query);
 
         Assert.assertEquals("The first result should be " + TEST_ID_1, MCRObjectID.getInstance(TEST_ID_1),
@@ -314,7 +314,7 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
         count = instance.count(category2);
         Assert.assertEquals("Only one object should match", 1, count);
 
-        MCRObjectQuery category3 = new MCRObjectQuery().sort(MCRObjectQuery.SortBy.id, MCRObjectQuery.SortOrder.asc);
+        MCRObjectQuery category3 = new MCRObjectQuery().sort(MCRObjectQuery.SortBy.ID, MCRObjectQuery.SortOrder.ASC);
         category3.getIncludeCategories().add(TEST_CATEGORY_3);
         result = instance.getInfos(category3);
 
@@ -326,8 +326,8 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
         count = instance.count(category3);
         Assert.assertEquals("both object should match", 2, count);
 
-        MCRObjectQuery category1and3 = new MCRObjectQuery().sort(MCRObjectQuery.SortBy.id,
-            MCRObjectQuery.SortOrder.asc);
+        MCRObjectQuery category1and3 = new MCRObjectQuery().sort(MCRObjectQuery.SortBy.ID,
+            MCRObjectQuery.SortOrder.ASC);
         category1and3.getIncludeCategories().add(TEST_CATEGORY_1);
         category1and3.getIncludeCategories().add(TEST_CATEGORY_3);
         result = instance.getInfos(category1and3);
