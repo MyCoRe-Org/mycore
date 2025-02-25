@@ -636,8 +636,7 @@ public abstract class MCROCFLVirtualObject {
         boolean added = this.isAdded(lockedPath);
         boolean inLocalStorage = this.isLocal(lockedPath);
         if (added && inLocalStorage) {
-            Path physicalPath = this.localStorage.toPhysicalPath(lockedPath);
-            return Files.readAttributes(physicalPath, BasicFileAttributes.class).creationTime();
+            return this.localStorage.readAttributes(lockedPath, BasicFileAttributes.class).creationTime();
         }
         FileChangeHistory changeHistory = getChangeHistory(lockedPath);
         return FileTime.from(changeHistory.getOldest().getTimestamp().toInstant());
@@ -676,8 +675,7 @@ public abstract class MCROCFLVirtualObject {
             return 0;
         }
         if (this.localStorage.exists(lockedPath)) {
-            Path physicalPath = this.localStorage.toPhysicalPath(lockedPath);
-            return Files.size(physicalPath);
+            return this.localStorage.size(lockedPath);
         }
         OcflObjectVersionFile ocflObjectVersionFile = fromOcfl(lockedPath);
         String sizeAsString = ocflObjectVersionFile.getFixity().get(new SizeDigestAlgorithm());
@@ -687,48 +685,56 @@ public abstract class MCROCFLVirtualObject {
     /**
      * Returns the `filekey` of the given path.
      * <p>
-     *     Because OCFL is a version file system and the mycore implementation uses transactions this `filekey`
-     *     implementation differs from a Unix like system.
-     * </p>
+     * Because OCFL is a version file system and the mycore implementation uses transactions this `filekey`
+     * implementation differs from a Unix like system.
      * <p>
-     *     The Unix `filekey` is typically derived from the inode and device ID, ensuring uniqueness within the
-     *     filesystem. When a file is modified (written, moved...), the Unix `filekey` remains unchanged as long as the
-     *     inode remains the same.
-     * </p>
+     * The Unix `filekey` is typically derived from the inode and device ID, ensuring uniqueness within the
+     * filesystem. When a file is modified (written, moved...), the Unix `filekey` remains unchanged as long as the
+     * inode remains the same.
      * <p>
-     *     In contrast this implementation returns a new `filekey` as soon as a file is written or moved. The `filekey`
-     *     then remains constant as long as the transaction is open. After the transaction is committed the `filekey`
-     *     may change again.
-     * </p>
+     * In contrast, this implementation returns a new `filekey` as soon as a file is written or moved. The `filekey`
+     * then remains constant as long as the transaction is open. After the transaction is committed the `filekey`
+     * may change again.
      * <p>
-     *     Implementation detail: Be aware that this method calls {@link #toPhysicalPath(MCRVersionedPath)}. For remote
-     *     virtual objects this means that the whole file is copied to the local storage. Because the fileKey is not
-     *     accessed frequently this should be acceptable. If this assumption proves to be wrong a special implementation
-     *     for remote virtual objects is required!
-     * </p>
+     * Implementation detail: Be aware that for remote virtual objects the whole file is copied to the local
+     * storage. Because the fileKey is not accessed frequently this should be acceptable. If this assumption proves
+     * to be wrong a special implementation for remote virtual objects is required!
      *
      * @param path versioned path
      * @return fileKey
      * @throws IOException if an I/O error occurs.
      */
-    public Object getFileKey(MCRVersionedPath path) throws IOException {
+    public abstract Object getFileKey(MCRVersionedPath path) throws IOException;
+
+    /**
+     * Identifies the MIME type of a give path.
+     * <p>
+     * Implementation detail: Be aware that for remote virtual objects the whole file is copied to the local
+     * storage. Because the MIME type is not accessed frequently this should be acceptable. If this assumption proves
+     * to be wrong a special implementation for remote virtual objects is required! 
+     *
+     * @param path versioned path
+     * @return the mime type
+     * @throws IOException  if an I/O error occurs.
+     */
+    public String probeContentType(MCRVersionedPath path) throws IOException {
         MCRVersionedPath lockedPath = lockVersion(path);
-        Path physicalPath = toPhysicalPath(lockedPath);
-        return Files.readAttributes(physicalPath, BasicFileAttributes.class).fileKey();
+        checkExists(lockedPath);
+        return Files.probeContentType(toPhysicalPath(lockedPath));
     }
 
     /**
      * Converts the specified versioned path to a local file system path. The path can either point at the local
      * temporary storage (if it exists) or at the original OCFL file or directory.
      * <p>
- *     Use the returned path ONLY for read operations. It's not allowed to write/move or remove the returned path.
+    *     Use the returned path ONLY for read operations. It's not allowed to write/move or remove the returned path.
      * Because this would create inconsistencies in the OCFL repository or the local storage.
      *
      * @param path the virtual path.
      * @return the physical path.
      * @throws IOException if an I/O error occurs.
      */
-    public abstract Path toPhysicalPath(MCRVersionedPath path) throws IOException;
+    protected abstract Path toPhysicalPath(MCRVersionedPath path) throws IOException;
 
     /**
      * Returns the change history of a path.
@@ -1001,7 +1007,7 @@ public abstract class MCROCFLVirtualObject {
     }
 
     /**
-     * Releases the version on a given {@link MCRVersionedPath}, returning the path 
+     * Releases the version on a given {@link MCRVersionedPath}, returning the path
      * that points to the latest (head) version of the virtual object.
      * <p>
      * This is necessary for the mycore event system. Due to the fact that the metadata is not yet
@@ -1012,7 +1018,7 @@ public abstract class MCROCFLVirtualObject {
      * TODO: This should be removed when the metadata is also included in the transaction system!
      *
      * @param versionedPath the {@link MCRVersionedPath} to release, retaining the same owner.
-     * @return a {@link MCRVersionedPath} that points to the head (latest) version of 
+     * @return a {@link MCRVersionedPath} that points to the head (latest) version of
      *         the path for the specified owner.
      */
     protected MCRVersionedPath releaseVersion(MCRVersionedPath versionedPath) {
@@ -1162,5 +1168,4 @@ public abstract class MCROCFLVirtualObject {
             throw new UncheckedIOException("Unable to calculate digest for path '" + path + "'.", ioException);
         }
     }
-
 }
