@@ -21,7 +21,7 @@ import ContactManager from '@/App.vue';
 import router from './router';
 import { createI18n } from 'vue-i18n';
 import { BASE_URL, CURRENT_LANG, fetchAccessKeyConfig } from '@/common/config';
-import { MCRLangService } from '@golsch/test/i18n';
+import { LangService } from '@mycore-test/js-common/i18n';
 if (import.meta.env.DEV) {
   import('bootstrap/dist/css/bootstrap.min.css');
   import('font-awesome/css/font-awesome.min.css');
@@ -38,7 +38,7 @@ const setErrorHandler = (app: App): void => {
   };
 };
 
-const langService = new MCRLangService(BASE_URL);
+const langService = new LangService(BASE_URL);
 
 const initApp = async () => {
   try {

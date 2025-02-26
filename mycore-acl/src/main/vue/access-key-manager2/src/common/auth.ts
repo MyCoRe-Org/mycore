@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { fetchJWT as mcrFetchJWT } from '@golsch/test/auth';
+import { fetchJwt as mcrFetchJwt } from '@mycore-test/js-common/auth';
 
 export const fetchJWT = async (
   baseUrl: string,
@@ -24,7 +24,7 @@ export const fetchJWT = async (
   isSessionEnabled?: boolean
 ): Promise<string> => {
   const attributeName = `acckey_${reference}`;
-  return await mcrFetchJWT(baseUrl, {
+  return await mcrFetchJwt(baseUrl, {
     userAttributes: [attributeName],
     sessionAttributes: isSessionEnabled ? [attributeName] : undefined,
   });

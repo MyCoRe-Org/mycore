@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { MCRAccessKeyConfig } from '@golsch/test/acl/accesskey';
+import { AccessKeyConfig } from '@mycore-test/js-common/acl/accesskey';
 
 export const BASE_URL =
   import.meta.env.VITE_APP_WEB_APPLICATION_BASE_URL ??
@@ -30,7 +30,7 @@ const ALLOWED_SESSION_TYPES =
 
 export const fetchAccessKeyConfig = async (
   baseUrl: string
-): Promise<MCRAccessKeyConfig> => {
+): Promise<AccessKeyConfig> => {
   const response = await fetch(`${baseUrl}config.json`);
   if (!response.ok) {
     throw new Error('Failed to load app configuration');
