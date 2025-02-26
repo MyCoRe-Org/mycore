@@ -198,8 +198,8 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
             .stream(xPathMappingClassifications.trim().split(",")).collect(Collectors.toMap(
                 relevantClass -> relevantClass,
                 relevantClass -> Stream.concat(
-                    dao.getCategoriesByClassAndLang(relevantClass, LABEL_LANG_XPATH_MAPPING).stream(),
-                    dao.getCategoriesByClassAndLang(relevantClass, LABEL_LANG_XPATH_MAPPING_FALLBACK).stream())
+                        dao.getCategoriesByClassAndLang(relevantClass, LABEL_LANG_XPATH_MAPPING).stream(),
+                        dao.getCategoriesByClassAndLang(relevantClass, LABEL_LANG_XPATH_MAPPING_FALLBACK).stream())
                     .collect(Collectors.toSet())));
 
         // check x-mapping-xpath-mappings
@@ -289,6 +289,16 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
      * <b>Property:</b> MCR.Category.XPathMapping.Pattern.genre=mods:genre[substring-after(@valueURI,'#')='{0}']<p>
      * <b>Substituted XPath:</b> mods:genre[substring-after(@valueURI,'#')='article']
      * and not(mods:relatedItem[@type='host'])
+     * <br><br>
+     * Additionally, it is possible to use OR-operators in the patterns. This creates multiple XPath-expressions
+     * after pattern-replacement that are connected via 'or'. To consider all possible combinations of replacement
+     * values and logical precedence, parenthesis are put around sub-expressions connected through 'or'.<p>
+     * Ex.:<p>
+     * <b>Input XPath:</b> {pattern:genre(article|blog_entry)} and not(mods:relatedItem[@type='host'])<p>
+     * <b>Property:</b> MCR.Category.XPathMapping.Pattern.genre=mods:genre[substring-after(@valueURI,'#')='{0}']<p>
+     * <b>Substituted XPath:</b> (mods:genre[substring-after(@valueURI,'#')='article'] or
+     * mods:genre[substring-after(@valueURI,'#')='blog_entry']) and not(mods:relatedItem[@type='host'])
+     *
      * @param xPath the XPath containing a pattern to substitute
      * @return the resolved xPath
      */
@@ -298,19 +308,31 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
         Matcher matcher = pattern.matcher(updatedXPath);
         while (matcher.find()) {
             String patternName = matcher.group(1);
-            String placeholderText = MCRConfiguration2.getSubPropertiesMap("MCR.Category.XPathMapping.Pattern.")
-                .get(patternName);
+            String placeholderText = MCRConfiguration2
+                .getSubPropertiesMap("MCR.Category.XPathMapping.Pattern.").get(patternName);
             if (placeholderText != null) {
                 if (!matcher.group(2).isEmpty()) { // if there are values to substitute
                     String[] placeholderValues = matcher.group(2).split(",");
-                    Map<String, String> placeholderValuesMap = new HashMap<>();
+
+                    String[][] splitValues = new String[placeholderValues.length][];
                     for (int i = 0; i < placeholderValues.length; i++) {
-                        placeholderValuesMap.put(String.valueOf(i), placeholderValues[i]);
+                        splitValues[i] = placeholderValues[i].split("\\|");
                     }
-                    StringSubstitutor sub = new StringSubstitutor(placeholderValuesMap, "{", "}");
-                    String substitute = sub.replace(placeholderText);
-                    updatedXPath = updatedXPath.substring(0, matcher.start()) + substitute +
+
+                    List<Map<String, String>> substitutionMapList = new ArrayList<>();
+                    generateCombination(splitValues, 0, new HashMap<>(), substitutionMapList);
+
+                    List<String> substitutes = new ArrayList<>();
+                    for (Map<String, String> map : substitutionMapList) {
+                        StringSubstitutor sub = new StringSubstitutor(map, "{", "}");
+                        String substitute = sub.replace(placeholderText);
+                        substitutes.add("(" + substitute + ")");
+                    }
+
+                    String updatedSubXPath = "(" + String.join(" or ", substitutes) + ")";
+                    updatedXPath = updatedXPath.substring(0, matcher.start()) + updatedSubXPath +
                         updatedXPath.substring(matcher.end());
+
                 } else {
                     updatedXPath = updatedXPath.substring(0, matcher.start()) + placeholderText +
                         updatedXPath.substring(matcher.end());
@@ -321,6 +343,33 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
             matcher = pattern.matcher(updatedXPath);
         }
         return updatedXPath;
+    }
+
+    /**
+     * Generates all possible combinations of values from the given 2-dimensional array of strings.
+     * Each combination is stored in a map where the key is the index of the original array
+     * and the value is one of the strings obtained from splitting the original values.
+     * <br><br>
+     * This method uses recursion to build combinations. It explores each value at the current
+     * index and recursively processes the next index, backtracking after exploring each value.
+     *
+     * @param splitValues A 2-dimensional array of strings where each sub-array contains the values to be combined
+     * @param index The current index in the splitValues array being processed, needs to start at 0
+     * @param currentMap A map that accumulates the current combination of values being built
+     * @param results A list that stores all generated combinations represented as maps
+     */
+    private static void generateCombination(String[][] splitValues, int index, Map<String, String> currentMap,
+        List<Map<String, String>> results) {
+        if (index >= splitValues.length) {
+            results.add(new HashMap<>(currentMap));
+            return;
+        }
+
+        for (String value : splitValues[index]) {
+            currentMap.put(String.valueOf(index), value);
+            generateCombination(splitValues, index + 1, currentMap, results);
+            currentMap.remove(String.valueOf(index));
+        }
     }
 
     /**

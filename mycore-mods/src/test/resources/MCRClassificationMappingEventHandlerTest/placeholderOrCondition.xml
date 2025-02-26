@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<mycoreclass ID="placeholderOrCondition" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="MCRClassification.xsd">
+    <label xml:lang="de" text="Dummy Or Condition Classification"/>
+    <label xml:lang="en" text="dummy Or Condition classification"/>
+    <categories>
+        <category ID="dummy-placeholder-or-condition">
+            <label xml:lang="de" text="Text"/>
+            <label xml:lang="en" text="text"
+                   description="Dummy category for a test."/>
+            <label xml:lang="x-mapping-xpath" text="{pattern:genre-with-host-genre(article|chapter,magazine|journal|other)}" />
+        </category>
+        <category ID="dummy-placeholder-or-condition-fb">
+            <label xml:lang="de" text="Text"/>
+            <label xml:lang="en" text="text"
+                   description="Dummy category for a test."/>
+            <label xml:lang="x-mapping-xpathfb" text="{pattern:title-contains(Test|SomethingElse)}" />
+        </category>
+    </categories>
+</mycoreclass>
