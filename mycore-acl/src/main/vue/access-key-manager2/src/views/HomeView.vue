@@ -111,26 +111,26 @@ import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { urlEncode } from '@/common/utils';
 import {
-  MCRAccessKey,
-  MCRAccessKeyConfig,
-  MCRAccessKeyService,
-} from '@golsch/test/acl/accesskey';
+  AccessKey,
+  AccessKeyConfig,
+  AccessKeyService,
+} from '@mycore-test/js-common/acl/accesskey';
 import {
   AccessKeyTable,
   CreateAccessKeyModal,
   AccessKeyInfoModal,
   ConfirmModal,
-} from '@mycore-test/vue-access-key-manager';
+} from 'vue-access-key-manager';
 import Pagination from '@/components/SimplePagination.vue';
 import { fetchJWT } from '@/common/auth';
 import {
-  MCRHTTPClient,
-  MCRClientAuthStrategy,
-  MCRAccessTokenClientAuthStrategy,
-} from '@golsch/test/common/client';
+  HttpClient,
+  ClientAuthStrategy,
+  AccessTokenClientAuthStrategy,
+} from '@mycore-test/js-common/common/client';
 import { getI18nKey } from '@/common/utils';
 
-class DevAuthStrategy implements MCRClientAuthStrategy {
+class DevAuthStrategy implements ClientAuthStrategy {
   public getHeaders(): Record<string, string> {
     return {
       Authorization: `Basic ${import.meta.env.VITE_APP_API_TOKEN}`,
@@ -139,11 +139,9 @@ class DevAuthStrategy implements MCRClientAuthStrategy {
 }
 
 const baseUrl = inject('baseUrl') as string;
-const config = inject('accessKeyConfig') as MCRAccessKeyConfig;
+const config = inject('accessKeyConfig') as AccessKeyConfig;
 
-const infoModalRef = ref<{ open: (accessKey: MCRAccessKey) => void } | null>(
-  null
-);
+const infoModalRef = ref<{ open: (accessKey: AccessKey) => void } | null>(null);
 const createModalRef = ref<{ open: () => void } | null>(null);
 const confirmModal = ref<{
   open: (title: string, message: string, callback?: () => void) => void;
@@ -174,12 +172,12 @@ const state = reactive({
   totalCount: 0,
   currentPage: Number(route.query.page) || 1,
   pageSize: Number(route.query.pageSize) || 8,
-  accessKeys: [] as MCRAccessKey[],
+  accessKeys: [] as AccessKey[],
   errorMessage: undefined as string | undefined,
   accessKeyCreatedSecret: undefined as string | undefined,
-  accessKeyCreated: undefined as MCRAccessKey | undefined,
+  accessKeyCreated: undefined as AccessKey | undefined,
 });
-const accessKeyService = ref<MCRAccessKeyService>();
+const accessKeyService = ref<AccessKeyService>();
 
 const paginatedAccessKeys = computed(() =>
   state.accessKeys.slice(0, state.pageSize)
@@ -228,7 +226,7 @@ const changePage = async (page: number): Promise<void> => {
     },
   });
 };
-const deleteAccessKey = async (accessKey: MCRAccessKey): Promise<void> => {
+const deleteAccessKey = async (accessKey: AccessKey): Promise<void> => {
   resetInfos();
   const title = t('component.acl.accesskey.frontend.confirmRemove.title');
   const message = t('component.acl.accesskey.frontend.confirmRemove.text', {
@@ -242,7 +240,7 @@ const deleteAccessKey = async (accessKey: MCRAccessKey): Promise<void> => {
     try {
       await accessKeyService.value?.deleteAccessKey(accessKey.id);
       state.accessKeys = state.accessKeys.filter(
-        (a: MCRAccessKey) => a.id !== accessKey.id
+        (a: AccessKey) => a.id !== accessKey.id
       );
       state.totalCount -= 1;
     } finally {
@@ -250,15 +248,15 @@ const deleteAccessKey = async (accessKey: MCRAccessKey): Promise<void> => {
     }
   });
 };
-const updateAccessKey = (accessKey: MCRAccessKey): void => {
+const updateAccessKey = (accessKey: AccessKey): void => {
   const index = state.accessKeys.findIndex(
-    (a: MCRAccessKey) => a.id === accessKey.id
+    (a: AccessKey) => a.id === accessKey.id
   );
   if (index !== -1) {
     state.accessKeys[index] = accessKey;
   }
 };
-const addAccessKey = (secret: string, accessKey: MCRAccessKey): void => {
+const addAccessKey = (secret: string, accessKey: AccessKey): void => {
   if (accessKey.secret !== secret) {
     state.accessKeyCreatedSecret = secret;
     state.accessKeyCreated = accessKey;
@@ -273,15 +271,15 @@ const initAccessKeyService = async () => {
       reference || undefined,
       config.isAccessKeySessionEnabled
     );
-    accessKeyService.value = new MCRAccessKeyService(
-      new MCRHTTPClient(baseUrl, {
-        authStrategy: new MCRAccessTokenClientAuthStrategy(jwt),
+    accessKeyService.value = new AccessKeyService(
+      new HttpClient(baseUrl, {
+        authStrategy: new AccessTokenClientAuthStrategy(jwt),
         timeout: 5000,
       })
     );
   } else {
-    accessKeyService.value = new MCRAccessKeyService(
-      new MCRHTTPClient(baseUrl, {
+    accessKeyService.value = new AccessKeyService(
+      new HttpClient(baseUrl, {
         authStrategy: new DevAuthStrategy(),
         timeout: 5000,
       })
