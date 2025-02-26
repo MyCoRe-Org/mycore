@@ -33,7 +33,7 @@ const getContext = (): string => {
   }
   const el = document.createElement('a');
   el.href = BASE_URL;
-  return `${el.pathname}'access-key-manager'`;
+  return `${el.pathname}access-key-manager`;
 };
 
 const router = createRouter({
