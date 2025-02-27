@@ -73,7 +73,7 @@ public class MCRSolrIndexStatistic {
                 if (docs == 0) {
                     return time == 0 ? 0 : Double.MAX_VALUE;
                 }
-                return ((double) time / (double) docs);
+                return (double) time / docs;
             }
         }
     }
