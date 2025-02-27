@@ -25,7 +25,9 @@ import org.mycore.common.events.MCRServletContextHolder;
 import org.mycore.common.hint.MCRHint;
 import org.mycore.common.hint.MCRHintKey;
 
-public class MCRWebappDirResourceHint implements MCRHint<File> {
+public final class MCRWebappDirResourceHint implements MCRHint<File> {
+
+    private static final MCRWebappDirResourceHint INSTANCE = new MCRWebappDirResourceHint();
 
     @Override
     public MCRHintKey<File> key() {
@@ -36,4 +38,12 @@ public class MCRWebappDirResourceHint implements MCRHint<File> {
     public Optional<File> value() {
         return MCRServletContextHolder.instance().get().map(context -> context.getRealPath("/")).map(File::new);
     }
+
+    private MCRWebappDirResourceHint(){
+    }
+
+    public static MCRWebappDirResourceHint getInstance(){
+        return INSTANCE;
+    }
+
 }

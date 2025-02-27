@@ -36,6 +36,15 @@ import org.mycore.common.MCRUserInformationProvider;
  */
 public final class MCRUserProvider implements MCRUserInformationProvider {
 
+    private static final MCRUserProvider INSTANCE = new MCRUserProvider();
+
+    private MCRUserProvider(){
+    }
+
+    public static MCRUserProvider getInstance(){
+        return INSTANCE;
+    }
+
     @Override
     public Optional<MCRUserInformation> get(String userId) {
         return Optional.ofNullable(MCRUserManager.getUser(userId));

@@ -26,6 +26,8 @@ import org.mycore.common.hint.MCRHintKey;
 
 public final class MCRClassLoaderResourceHint implements MCRHint<ClassLoader> {
 
+    private static final MCRClassLoaderResourceHint INSTANCE = new MCRClassLoaderResourceHint();
+
     @Override
     public MCRHintKey<ClassLoader> key() {
         return MCRResourceHintKeys.CLASS_LOADER;
@@ -34,6 +36,13 @@ public final class MCRClassLoaderResourceHint implements MCRHint<ClassLoader> {
     @Override
     public Optional<ClassLoader> value() {
         return Optional.ofNullable(MCRClassTools.getClassLoader());
+    }
+
+    private MCRClassLoaderResourceHint(){
+    }
+
+    public static MCRClassLoaderResourceHint getInstance(){
+        return INSTANCE;
     }
 
 }

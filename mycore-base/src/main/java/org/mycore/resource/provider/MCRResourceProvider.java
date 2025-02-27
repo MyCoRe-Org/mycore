@@ -60,6 +60,11 @@ public interface MCRResourceProvider {
      */
     List<ProvidedUrl> provideAll(MCRResourcePath path, MCRHints hints);
 
+    /**
+     * Returns a stream of {@link PrefixStripper} using the given hints, each of which can remove multiple prefixes
+     * from a given resource URL in order to facilitate the reversal of resource path resolution.
+     * ({@link org.mycore.resource.MCRResourceResolver#reverse(URL, MCRHints)}).
+     */
     Stream<PrefixStripper> prefixStrippers(MCRHints hints);
 
     /**

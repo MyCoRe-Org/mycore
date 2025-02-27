@@ -40,6 +40,8 @@ import java.util.Optional;
  */
 public final class MCRSystemUserInformationProvider implements MCRUserInformationProvider {
 
+    private static final MCRSystemUserInformationProvider INSTANCE = new MCRSystemUserInformationProvider();
+
     public static final String GUEST = "GUEST";
 
     public static final String JANITOR = "JANITOR";
@@ -47,6 +49,13 @@ public final class MCRSystemUserInformationProvider implements MCRUserInformatio
     public static final String SYSTEM_USER = "SYSTEM_USER";
 
     public static final String SUPER_USER = "SUPER_USER";
+
+    private MCRSystemUserInformationProvider(){
+    }
+
+    public static MCRSystemUserInformationProvider getInstance() {
+        return INSTANCE;
+    }
 
     @Override
     public Optional<MCRUserInformation> get(String userId) {

@@ -27,6 +27,8 @@ import org.mycore.common.hint.MCRHintKey;
 
 public final class MCRConfigDirResourceHint implements MCRHint<File> {
 
+    private static final MCRConfigDirResourceHint INSTANCE = new MCRConfigDirResourceHint();
+
     @Override
     public MCRHintKey<File> key() {
         return MCRResourceHintKeys.CONFIG_DIR;
@@ -35,6 +37,13 @@ public final class MCRConfigDirResourceHint implements MCRHint<File> {
     @Override
     public Optional<File> value() {
         return Optional.ofNullable(MCRConfigurationDir.getConfigurationDirectory());
+    }
+
+    private MCRConfigDirResourceHint(){
+    }
+
+    public static MCRConfigDirResourceHint getInstance(){
+        return INSTANCE;
     }
 
 }
