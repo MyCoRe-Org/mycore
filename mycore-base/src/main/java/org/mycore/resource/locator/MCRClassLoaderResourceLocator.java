@@ -48,6 +48,7 @@ import org.mycore.resource.provider.MCRResourceProvider.PrefixStripper;
  * [...].Class=org.mycore.resource.locator.MCRClassLoaderResourceLocator
  * </pre>
  */
+@SuppressWarnings("PMD.MCR.ResourceResolver")
 @MCRConfigurationProxy(proxyClass = MCRClassLoaderResourceLocator.Factory.class)
 public class MCRClassLoaderResourceLocator extends MCRResourceLocatorBase {
 

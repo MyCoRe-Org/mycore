@@ -46,6 +46,7 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRContentServlet;
+import org.mycore.resource.MCRResourceHelper;
 import org.mycore.tools.MyCoReWebPageProvider;
 import org.xml.sax.SAXException;
 
@@ -132,26 +133,30 @@ public class MCRVueRootServlet extends MCRContentServlet {
         String pathInfo = req.getPathInfo();
         String indexHtmlPage = getIndexPage();
         String indexHtmlPath = req.getServletPath() + "/" + indexHtmlPage;
-        URL resource = getServletContext().getResource(req.getServletPath() + pathInfo);
 
-        if (resource != null && !pathInfo.endsWith("/") && !pathInfo.endsWith(indexHtmlPage)) {
-            return new MCRURLContent(resource);
-        } else {
-            URL indexResource = getServletContext().getResource(indexHtmlPath);
-            org.jdom2.Document mycoreWebpage = getIndexDocument(indexResource, getAbsoluteServletPath(req));
-            if (pathInfo != null && pathInfo.endsWith("/404")) {
-                /* if there is a requested route which does not exist, the app should
-                 * redirect to this /404 route the get the actual 404 Code.
-                 * see also https://www.youtube.com/watch?v=vjj8B4sq0UI&t=1815s
-                 * */
-                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            }
-            try {
-                return getLayoutService().getTransformedContent(req, resp, new MCRJDOMContent(mycoreWebpage));
-            } catch (TransformerException | SAXException e) {
-                throw new IOException(e);
+        if (pathInfo != null && !pathInfo.endsWith("/") && !pathInfo.endsWith(indexHtmlPage)) {
+            URL resource = MCRResourceHelper.getWebResourceUrl(req.getServletPath() + pathInfo);
+            if (resource != null) {
+                return new MCRURLContent(resource);
             }
         }
+
+        URL indexResource = MCRResourceHelper.getWebResourceUrl(indexHtmlPath);
+        org.jdom2.Document mycoreWebpage = getIndexDocument(indexResource, getAbsoluteServletPath(req));
+        if (pathInfo != null && pathInfo.endsWith("/404")) {
+            /* if there is a requested route which does not exist, the app should
+             * redirect to this /404 route the get the actual 404 Code.
+             * see also https://www.youtube.com/watch?v=vjj8B4sq0UI&t=1815s
+             * */
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
+
+        try {
+            return getLayoutService().getTransformedContent(req, resp, new MCRJDOMContent(mycoreWebpage));
+        } catch (TransformerException | SAXException e) {
+            throw new IOException(e);
+        }
+
     }
 
     protected String getIndexPage() {

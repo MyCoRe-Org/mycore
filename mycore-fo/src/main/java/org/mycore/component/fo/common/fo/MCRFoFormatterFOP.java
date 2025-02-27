@@ -77,7 +77,7 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
     final ResourceResolver resolver = new ResourceResolver() {
         @Override
         public OutputStream getOutputStream(URI uri) throws IOException {
-            URL url = MCRURIResolver.getServletContext().getResource(uri.toString());
+            URL url = MCRResourceHelper.getResourceUrl(uri.toString());
             return url.openConnection().getOutputStream();
         }
 
