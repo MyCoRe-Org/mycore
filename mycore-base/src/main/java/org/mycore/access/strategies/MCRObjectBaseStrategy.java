@@ -42,7 +42,7 @@ import org.mycore.access.MCRAccessManager;
  *
  */
 public class MCRObjectBaseStrategy implements MCRCombineableAccessCheckStrategy {
-    private static final Logger LOGGER = LogManager.getLogger(MCRObjectBaseStrategy.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final Pattern BASE_PATTERN = Pattern.compile("([^_]*_[^_]*)_*");
 

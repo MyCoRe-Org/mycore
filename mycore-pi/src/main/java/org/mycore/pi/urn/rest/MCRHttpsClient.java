@@ -54,7 +54,7 @@ import org.mycore.pi.util.MCRHttpUtils;
  */
 public class MCRHttpsClient {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRHttpsClient.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static RequestConfig noRedirect() {
         return RequestConfig

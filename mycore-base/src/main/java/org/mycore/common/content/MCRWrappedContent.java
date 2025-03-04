@@ -41,7 +41,7 @@ import org.xml.sax.InputSource;
  */
 public abstract class MCRWrappedContent extends MCRContent {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRWrappedContent.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private MCRContent baseContent;
 

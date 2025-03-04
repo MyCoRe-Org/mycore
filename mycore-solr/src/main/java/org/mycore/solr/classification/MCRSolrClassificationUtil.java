@@ -58,7 +58,7 @@ import com.google.common.collect.Lists;
  */
 public final class MCRSolrClassificationUtil {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRSolrClassificationUtil.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String CLASSIFICATION_CORE_TYPE = "classification";
 

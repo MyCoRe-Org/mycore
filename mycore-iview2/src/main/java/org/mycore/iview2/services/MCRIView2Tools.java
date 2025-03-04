@@ -76,7 +76,7 @@ public class MCRIView2Tools {
 
     private static final Path TILE_DIR = Paths.get(getIView2Property("DirectoryForTiles"));
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRIView2Tools.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * @return directory for tiles

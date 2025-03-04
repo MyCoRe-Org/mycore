@@ -52,7 +52,7 @@ public class MCRQRCodeServlet extends MCRContentServlet {
 
     private static final long CACHE_TIME = TimeUnit.SECONDS.convert(1000L, TimeUnit.DAYS);
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRQRCodeServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final Pattern REQUEST_PATTERN = Pattern.compile("/(\\d*)/(.*)");
 

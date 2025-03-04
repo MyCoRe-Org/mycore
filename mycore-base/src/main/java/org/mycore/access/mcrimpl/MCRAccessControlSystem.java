@@ -66,7 +66,7 @@ public final class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
     static Map<String, String> ruleIDTable = new ConcurrentHashMap<>();
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRAccessControlSystem.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private MCRAccessControlSystem() {
         String pools = MCRConfiguration2.getString("MCR.Access.AccessPermissions").orElse("read,write,delete");

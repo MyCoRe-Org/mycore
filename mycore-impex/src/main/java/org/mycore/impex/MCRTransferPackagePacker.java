@@ -50,7 +50,7 @@ import org.mycore.services.packaging.MCRPacker;
  */
 public class MCRTransferPackagePacker extends MCRPacker {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRTransferPackagePacker.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final Path SAVE_DIRECTORY_PATH;
 

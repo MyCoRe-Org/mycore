@@ -54,7 +54,7 @@ import org.mycore.mets.validator.validators.ValidationException;
 @MCRCommandGroup(name = "Mets Commands")
 public class MCRMetsCommands extends MCRAbstractCommands {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRMetsCommands.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static Queue<String> invalidMetsQueue = new ConcurrentLinkedQueue<>();
 

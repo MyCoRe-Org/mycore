@@ -45,7 +45,7 @@ public class MCRFile extends MCRStoredNode {
 
     private static final MCRDevNull DEV_NULL = new MCRDevNull();
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRFile.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * The md5 checksum of the empty file

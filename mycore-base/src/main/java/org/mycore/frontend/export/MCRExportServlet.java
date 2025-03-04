@@ -62,7 +62,7 @@ public class MCRExportServlet extends MCRServlet {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRExportServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** URIs beginning with these prefixes are forbidden for security reasons */
     private static final String[] FORBIDDEN_URIS = { "file", "webapp", "resource" };

@@ -61,7 +61,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class MCRTextResolver {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRTextResolver.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     protected TermContainer termContainer;
 

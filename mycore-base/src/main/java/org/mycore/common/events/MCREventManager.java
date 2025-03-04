@@ -52,7 +52,7 @@ public final class MCREventManager {
     /** Call event handlers in backward direction (delete) */
     public static final boolean BACKWARD = false;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCREventManager.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static MCREventManager instance;
 

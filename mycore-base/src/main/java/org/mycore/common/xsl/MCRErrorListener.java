@@ -31,7 +31,7 @@ import org.apache.xml.utils.WrappedRuntimeException;
  *
  */
 public final class MCRErrorListener implements ErrorListener {
-    private static final Logger LOGGER = LogManager.getLogger(MCRErrorListener.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private TransformerException exceptionThrown;
 

@@ -57,7 +57,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  *
  */
 public class MCRCreatorRuleStrategy implements MCRCombineableAccessCheckStrategy {
-    private static final Logger LOGGER = LogManager.getLogger(MCRCreatorRuleStrategy.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final List<String> SUBMITTED_CATEGORY_IDS = MCRConfiguration2
         .getString("MCR.Access.Strategy.SubmittedCategories")

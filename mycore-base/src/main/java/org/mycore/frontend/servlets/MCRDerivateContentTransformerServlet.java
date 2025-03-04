@@ -49,7 +49,7 @@ public class MCRDerivateContentTransformerServlet extends MCRContentServlet {
 
     private static final int CACHE_TIME = 24 * 60 * 60;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRDerivateContentTransformerServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public MCRContent getContent(HttpServletRequest req, HttpServletResponse resp) throws IOException {

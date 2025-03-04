@@ -61,7 +61,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRClassificationBrowser2.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     protected MCRQueryAdapter getQueryAdapter(final String fieldName) {
         MCRQueryAdapter adapter = MCRConfiguration2

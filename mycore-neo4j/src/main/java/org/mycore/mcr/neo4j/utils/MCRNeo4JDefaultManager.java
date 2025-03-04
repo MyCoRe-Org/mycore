@@ -42,7 +42,7 @@ import org.mycore.mcr.neo4j.datamodel.metadata.neo4jparser.MCRNeo4JParser;
  */
 public class MCRNeo4JDefaultManager implements MCRNeo4JManager {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRNeo4JDefaultManager.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final MCRNeo4JMetaParser parser;
 

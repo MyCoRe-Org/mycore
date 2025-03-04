@@ -52,7 +52,7 @@ import org.xml.sax.SAXException;
  */
 class MCRIdentifierResolver {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRIdentifierResolver.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private MCRDataSource ds;
 

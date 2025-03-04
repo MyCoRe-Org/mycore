@@ -48,7 +48,7 @@ import org.mycore.common.config.MCRConfigurationException;
  */
 public class MCRCommand {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRCommand.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** The input format used for invoking this command */
     protected MessageFormat messageFormat;

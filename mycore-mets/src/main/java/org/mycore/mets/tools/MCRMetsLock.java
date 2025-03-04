@@ -40,7 +40,7 @@ public class MCRMetsLock {
 
     private static Map<MCRObjectID, String> metsAccessSessionTable = new HashMap<>();
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRMetsLock.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * Checks if a Derivate is locked

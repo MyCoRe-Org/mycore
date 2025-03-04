@@ -64,7 +64,7 @@ import com.google.common.base.Splitter;
 @MCRCommandGroup(name = "Developer Commands")
 public class MCRDeveloperCommands {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRDeveloperCommands.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @MCRCommand(
         syntax = "show message {0} for {1}",

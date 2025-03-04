@@ -45,7 +45,7 @@ public class MCRSolrPathDocumentFactory {
 
     private static final String ACCUMULATOR_LIST_PROPERTY_NAME = SOLR_CONFIG_PREFIX + "Indexer.File.AccumulatorList";
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRSolrPathDocumentFactory.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static MCRSolrPathDocumentFactory instance = MCRConfiguration2
         .getOrThrow(SOLR_CONFIG_PREFIX + "SolrInputDocument.Path.Factory", MCRConfiguration2::instantiateClass);

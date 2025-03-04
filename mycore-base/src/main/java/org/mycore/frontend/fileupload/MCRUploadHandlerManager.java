@@ -36,7 +36,7 @@ import org.mycore.common.processing.MCRProcessableRegistry;
  */
 public class MCRUploadHandlerManager {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRUploadHandlerManager.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** Cache of currently active upload handler sessions */
     protected static final MCRCache<String, MCRUploadHandlerCacheEntry> HANDLERS;

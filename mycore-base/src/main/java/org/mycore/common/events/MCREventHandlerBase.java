@@ -39,7 +39,7 @@ import org.mycore.datamodel.metadata.MCRObject;
  */
 public abstract class MCREventHandlerBase implements MCREventHandler {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCREventHandlerBase.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * This method handle all calls for EventHandler for the event types

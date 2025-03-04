@@ -53,7 +53,7 @@ public class MCRTileServlet extends HttpServlet {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRTileServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCRTileFileProvider TFP = MCRConfiguration2.getInstanceOfOrThrow(
         MCRDefaultTileFileProvider.class, "MCR.IIIFImage.Iview.TileFileProvider");

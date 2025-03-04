@@ -123,7 +123,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         "export object {0} to directory {1} with stylesheet {2}";
 
     /** The logger */
-    private static final Logger LOGGER = LogManager.getLogger(MCRObjectCommands.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** Default transformer script */
     public static final String DEFAULT_STYLE = "save-object.xsl";

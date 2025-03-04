@@ -70,7 +70,7 @@ public class MCRLockServlet extends MCRServlet {
         }
     }
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRLockServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String PARAM_ACTION = "action";
 

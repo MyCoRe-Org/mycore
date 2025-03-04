@@ -82,7 +82,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     private static final MCREntityResolver ENTITY_RESOLVER = MCREntityResolver.instance();
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRXSLTransformer.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCRCache<String, MCRXSLTransformer> INSTANCE_CACHE = new MCRCache<>(100,
         "MCRXSLTransformer instance cache");

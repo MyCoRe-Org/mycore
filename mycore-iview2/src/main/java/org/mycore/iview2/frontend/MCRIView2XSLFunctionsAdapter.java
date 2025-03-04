@@ -39,7 +39,7 @@ import org.mycore.iview2.services.MCRIView2Tools;
  *
  */
 public class MCRIView2XSLFunctionsAdapter {
-    private static final Logger LOGGER = LogManager.getLogger(MCRIView2XSLFunctionsAdapter.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCRLinkTableManager LINK_TABLE_MANAGER = MCRLinkTableManager.instance();
 

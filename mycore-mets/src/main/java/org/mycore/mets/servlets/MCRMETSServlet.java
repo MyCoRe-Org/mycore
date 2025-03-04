@@ -58,7 +58,7 @@ public class MCRMETSServlet extends MCRServlet {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRMETSServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static final boolean STORE_METS_ON_GENERATE = MCRConfiguration2
         .getOrThrow("MCR.Mets.storeMetsOnGenerate", Boolean::parseBoolean);

@@ -46,7 +46,7 @@ public class MCRQLSearchServlet extends MCRServlet {//extends MCRSearchServlet {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRQLSearchServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** Default search field */
     private String defaultSearchField;

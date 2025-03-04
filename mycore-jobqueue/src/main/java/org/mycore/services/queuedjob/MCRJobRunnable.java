@@ -48,7 +48,7 @@ import jakarta.persistence.PersistenceException;
  */
 public class MCRJobRunnable extends MCRAbstractProcessable implements Runnable {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRJobRunnable.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * The job to execute.

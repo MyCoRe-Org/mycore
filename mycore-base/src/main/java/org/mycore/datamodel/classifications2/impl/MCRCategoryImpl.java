@@ -143,7 +143,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRCategoryImpl.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private int left;
     private int right;

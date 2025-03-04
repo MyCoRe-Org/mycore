@@ -44,7 +44,7 @@ import org.apache.solr.client.solrj.impl.HttpSolrClientBase;
  * @author shermann
  */
 public class MCRSolrURL {
-    private static final Logger LOGGER = LogManager.getLogger(MCRSolrURL.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static final String FIXED_URL_PART = new MessageFormat("?version={0}", Locale.ROOT)
         .format(new Object[] { SOLR_QUERY_XML_PROTOCOL_VERSION });

@@ -50,7 +50,7 @@ public class MCRThumbnailForPdfEventHandler extends MCREventHandlerBase {
 
     public static final MCRDefaultTileFileProvider TILE_FILE_PROVIDER = new MCRDefaultTileFileProvider();
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRThumbnailForPdfEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCRJobQueue PDF_THUMBNAIL_JOB_QUEUE = initializeJobQueue();
 

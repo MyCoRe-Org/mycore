@@ -44,7 +44,7 @@ import org.mycore.solr.index.strategy.MCRSolrIndexStrategyManager;
  */
 public abstract class MCRSolrIndexHandlerFactory {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRSolrIndexHandlerFactory.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static MCRSolrIndexHandlerFactory instance = new MCRSolrLazyInputDocumentHandlerFactory();
 

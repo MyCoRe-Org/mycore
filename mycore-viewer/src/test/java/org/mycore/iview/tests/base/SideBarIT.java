@@ -37,7 +37,7 @@ import org.openqa.selenium.UnsupportedCommandException;
 @Category(org.mycore.iview.tests.groups.ImageViewerTests.class)
 public class SideBarIT extends ViewerTestBase {
 
-    private static final Logger LOGGER = LogManager.getLogger(SideBarIT.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Test
     public void testSideBarPresent() {

@@ -72,7 +72,7 @@ import jakarta.persistence.TypedQuery;
 
 @MCRCommandGroup(name = "IView2 Tile Commands")
 public class MCRIView2Commands extends MCRAbstractCommands {
-    private static final Logger LOGGER = LogManager.getLogger(MCRIView2Commands.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String TILE_DERIVATE_TILES_COMMAND_SYNTAX = "tile images of derivate {0}";
 
