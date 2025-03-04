@@ -16,6 +16,10 @@
   <servlet>
     <servlet-name>TextEditor</servlet-name>
     <servlet-class>org.mycore.webtools.vue.MCRVueRootServlet</servlet-class>
+    <init-param>
+      <param-name>heading</param-name>
+      <param-value>component.texteditor.title</param-value>
+    </init-param>
   </servlet>
   <servlet-mapping>
     <servlet-name>TextEditor</servlet-name>

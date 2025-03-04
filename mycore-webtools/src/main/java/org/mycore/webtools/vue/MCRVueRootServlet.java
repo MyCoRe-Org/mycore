@@ -24,15 +24,23 @@ import java.io.Serial;
 import java.io.StringReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.xml.transform.TransformerException;
 
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
 import org.jdom2.Content;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -41,11 +49,14 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Entities;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRContentServlet;
+import org.mycore.services.i18n.MCRTranslation;
 import org.mycore.tools.MyCoReWebPageProvider;
 import org.xml.sax.SAXException;
 
@@ -60,6 +71,14 @@ import jakarta.servlet.http.HttpServletResponse;
  * &lt;servlet&gt;
  *   &lt;servlet-name&gt;MCRVueRootServlet&lt;/servlet-name&gt;
  *   &lt;servlet-class&gt;org.mycore.webtools.vue.MCRVueRootServlet&lt;/servlet-class&gt;
+ *   &lt;init-param&gt;
+ *   &lt;param-name&gt;heading&lt;/param-name&gt;
+ *   &lt;param-value&gt;webtools.texteditor.heading&lt;/param-value&gt;
+ *   &lt;/init-param&gt;
+ *   &lt;init-param&gt;
+ *   &lt;param-name&gt;properties&lt;/param-name&gt;
+ *   &lt;param-value&gt;MCR.Webtools.Special.Property&lt;/param-value&gt;
+ *   &lt;/init-param&gt;
  * &lt;/servlet&gt;
  * &lt;servlet-mapping&gt;
  *   &lt;servlet-name&gt;MCRVueRootServlet&lt;/servlet-name&gt;
@@ -127,6 +146,43 @@ public class MCRVueRootServlet extends MCRContentServlet {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    protected static final String VUE_PASSTHROUGH_PROPERTY_NAME = "MCR.Vue.Properties";
+
+    protected static final String HEADING_INIT_PARAM = "heading";
+    protected static final String PROPERTIES_INIT_PARAM = "properties";
+
+    protected String headingI18nKey;
+    protected Set<String> servletInitPropertiesKeys;
+    private Map<String, String> servletInitProperties;
+
+    private static final Set<Integer> PASSTHROUGH_HTTP_STATUS_CODE_LIST = Set.of(
+        HttpServletResponse.SC_NOT_FOUND,
+        HttpServletResponse.SC_UNAUTHORIZED,
+        HttpServletResponse.SC_FORBIDDEN
+    );
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        headingI18nKey = config.getInitParameter(HEADING_INIT_PARAM);
+
+        String propertiesInitParam = config.getInitParameter(PROPERTIES_INIT_PARAM);
+        servletInitPropertiesKeys = propertiesInitParam != null
+            ? new HashSet<>(List.of(propertiesInitParam.split(",")))
+            : new HashSet<>();
+
+        updateInitProperties();
+
+        MCRConfiguration2.addPropertyChangeEventLister(servletInitPropertiesKeys::contains, this::changeProperty);
+    }
+
+    protected void updateInitProperties() {
+        servletInitProperties = new HashMap<>();
+        servletInitPropertiesKeys.forEach(key -> {
+            MCRConfiguration2.getString(key).ifPresent(value -> servletInitProperties.put(key, value));
+        });
+    }
+
     @Override
     public MCRContent getContent(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String pathInfo = req.getPathInfo();
@@ -139,12 +195,17 @@ public class MCRVueRootServlet extends MCRContentServlet {
         } else {
             URL indexResource = getServletContext().getResource(indexHtmlPath);
             org.jdom2.Document mycoreWebpage = getIndexDocument(indexResource, getAbsoluteServletPath(req));
-            if (pathInfo != null && pathInfo.endsWith("/404")) {
+
+            if (pathInfo != null){
+                Optional<Integer> matchingPathCode = PASSTHROUGH_HTTP_STATUS_CODE_LIST.stream()
+                        .filter(httpCode -> pathInfo.endsWith("/".concat(httpCode.toString())))
+                        .findFirst();
+
                 /* if there is a requested route which does not exist, the app should
                  * redirect to this /404 route the get the actual 404 Code.
                  * see also https://www.youtube.com/watch?v=vjj8B4sq0UI&t=1815s
                  * */
-                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                matchingPathCode.ifPresent(resp::setStatus);
             }
             try {
                 return getLayoutService().getTransformedContent(req, resp, new MCRJDOMContent(mycoreWebpage));
@@ -184,7 +245,17 @@ public class MCRVueRootServlet extends MCRContentServlet {
      */
     protected Properties getProperties() {
         Properties properties = new Properties();
+
+        MCRConfiguration2.getOrThrow(VUE_PASSTHROUGH_PROPERTY_NAME, MCRConfiguration2::splitValue)
+                .map(k -> new AbstractMap.SimpleImmutableEntry<>(k, MCRConfiguration2.getString(k)) {})
+                .filter(e -> e.getValue().isPresent())
+                .forEach(e -> properties.setProperty(e.getKey(), e.getValue().get()));
+
+        properties.putAll(servletInitProperties);
+
         properties.setProperty("webApplicationBaseURL", MCRFrontendUtil.getBaseURL());
+        properties.setProperty("CurrentLang", MCRSessionMgr.getCurrentSession().getCurrentLanguage());
+
         return properties;
     }
 
@@ -201,7 +272,11 @@ public class MCRVueRootServlet extends MCRContentServlet {
             .toList();
 
         MyCoReWebPageProvider mycoreWebPage = new MyCoReWebPageProvider();
-        mycoreWebPage.addSection("", content, "de");
+        String translatedHeading = MCRTranslation.exists(this.headingI18nKey) ?
+                MCRTranslation.translate(this.headingI18nKey) : "";
+
+        String currentLanguage = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
+        mycoreWebPage.addSection(translatedHeading, content, currentLanguage);
         return mycoreWebPage.getXML();
     }
 
@@ -237,8 +312,8 @@ public class MCRVueRootServlet extends MCRContentServlet {
         propertiesScript.setAttribute("type", "text/javascript");
         StringBuilder propertiesJson = new StringBuilder("var mycore = mycore || {};");
         propertiesJson.append(System.lineSeparator());
-        getProperties().forEach((key, value) -> propertiesJson.append("mycore.").append(key).append("=\"").append(value)
-            .append("\";").append(System.lineSeparator()));
+        getProperties().forEach((key, value) -> propertiesJson.append("mycore[\"").append(key)
+                .append("\"]").append("=\"").append(value).append("\";").append(System.lineSeparator()));
         propertiesScript.setText(propertiesJson.toString());
         return propertiesScript;
     }
@@ -266,4 +341,11 @@ public class MCRVueRootServlet extends MCRContentServlet {
             }).toList();
     }
 
+    protected void changeProperty(String property, Optional<String> before, Optional<String> after) {
+        if (before.isPresent() && after.isEmpty()) {
+            servletInitProperties.remove(property);
+        } else if (after.isPresent()) {
+            servletInitProperties.put(property, after.get());
+        }
+    }
 }
