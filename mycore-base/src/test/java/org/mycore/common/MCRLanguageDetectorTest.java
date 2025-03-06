@@ -18,11 +18,11 @@
 
 package org.mycore.common;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class MCRLanguageDetectorTest extends MCRTestCase {
+public class MCRLanguageDetectorTest {
 
     @Test
     public void testLanguageDetection() {
@@ -30,11 +30,12 @@ public class MCRLanguageDetectorTest extends MCRTestCase {
             MCRLanguageDetector.detectLanguage("Das Leben ist eher kurz als lang, und wir stehen alle mittenmang"));
         assertEquals("en",
             MCRLanguageDetector.detectLanguage("MyCoRe is the best repository software currently available"));
-        assertEquals("fr",
-            MCRLanguageDetector.detectLanguage("Tout vient à point à qui sait attendre"));
+        assertEquals("fr", MCRLanguageDetector.detectLanguage("Tout vient à point à qui sait attendre"));
         assertEquals("de",
             MCRLanguageDetector.detectLanguage("Ein simples β macht noch keinen Griechen aus Dir."));
-        assertEquals("el",
-            MCRLanguageDetector.detectLanguage("Φοβοῦ τοὺς Δαναοὺς καὶ δῶρα φέροντας"));
+        assertEquals("el", MCRLanguageDetector.detectLanguage("Φοβοῦ τοὺς Δαναοὺς καὶ δῶρα φέροντας"));
+        assertEquals("ja", MCRLanguageDetector.detectLanguage("こんにちは世界"));
+        assertEquals("he", MCRLanguageDetector.detectLanguage("שלום עול"));
     }
+
 }

@@ -322,13 +322,14 @@ public class MCRBasicCommands {
         List<String> newMappings = new ArrayList<>();
         for (MCRComponent cmp : MCRRuntimeComponentDetector.getAllComponents()) {
             try (ZipInputStream zip = new ZipInputStream(Files.newInputStream(cmp.getJarFile().toPath()))) {
-                ZipEntry ze;
-                while ((ze = zip.getNextEntry()) != null) {
+                ZipEntry ze = zip.getNextEntry();
+                while (ze != null) {
                     String zeName = ze.getName();
                     if (zeName.startsWith("META-INF/") && zeName.endsWith("-mappings.xml")
                         && !oldMappings.contains(zeName)) {
                         newMappings.add(zeName);
                     }
+                    ze = zip.getNextEntry();
                 }
             }
         }

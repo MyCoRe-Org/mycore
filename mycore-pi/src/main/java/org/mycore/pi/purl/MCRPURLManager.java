@@ -116,13 +116,13 @@ public class MCRPURLManager {
                     // Get the response
                     try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream(),
                         StandardCharsets.UTF_8))) {
-
-                        String line;
-                        while ((line = rd.readLine()) != null) {
+                        String line = rd.readLine();
+                        while (line != null) {
                             if ("PURL User Login Failure".equals(line.trim())) {
                                 cookie = null;
                                 break;
                             }
+                            line = rd.readLine();
                         }
                     }
                 }
@@ -414,9 +414,10 @@ public class MCRPURLManager {
             URL url = connection.getURL();
             int code = connection.getResponseCode();
             LOGGER.error(() -> method + " " + url + " -> " + code);
-            String line;
-            while ((line = rd.readLine()) != null) {
+            String line = rd.readLine();
+            while (line != null) {
                 LOGGER.error(line);
+                line = rd.readLine();
             }
         }
     }

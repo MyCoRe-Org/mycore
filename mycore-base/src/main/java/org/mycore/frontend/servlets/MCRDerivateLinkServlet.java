@@ -93,12 +93,13 @@ public class MCRDerivateLinkServlet extends MCRServlet {
      * @param objId the source object id
      */
     private void addParentsToElement(Element toElement, MCRObjectID objId) {
-        MCRObjectID pId = objId;
-        while ((pId = getParentId(pId)) != null) {
+        MCRObjectID pId = getParentId(objId);
+        while (pId != null) {
             Element parentElement = getMyCoReObjectElement(pId);
             if (parentElement != null) {
                 toElement.addContent(parentElement);
             }
+            pId = getParentId(pId);
         }
     }
 
