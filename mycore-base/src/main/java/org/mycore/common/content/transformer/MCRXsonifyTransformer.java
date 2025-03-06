@@ -1,40 +1,10 @@
 package org.mycore.common.content.transformer;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import jakarta.inject.Singleton;
-import org.mycore.common.MCRException;
-import org.mycore.common.config.annotation.MCRInstance;
-import org.mycore.common.config.annotation.MCRPostConstruction;
-import org.mycore.common.config.annotation.MCRProperty;
-import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRStringContent;
-import org.mycore.common.xml.MCREntityResolver;
-import org.mycore.xsonify.serialize.Json2XmlSerializer;
-import org.mycore.xsonify.serialize.SerializationException;
-import org.mycore.xsonify.serialize.SerializerSettings;
-import org.mycore.xsonify.serialize.SerializerStyle;
-import org.mycore.xsonify.serialize.Xml2JsonSerializer;
-import org.mycore.xsonify.xml.XmlDocument;
-import org.mycore.xsonify.xml.XmlDocumentLoader;
-import org.mycore.xsonify.xml.XmlEntityResolverDocumentLoader;
-import org.mycore.xsonify.xml.XmlName;
-import org.mycore.xsonify.xml.XmlParseException;
-import org.mycore.xsonify.xml.XmlSaxParser;
-import org.mycore.xsonify.xsd.Xsd;
-import org.mycore.xsonify.xsd.XsdParseException;
-import org.mycore.xsonify.xsd.XsdParser;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.util.Locale;
-
 import static org.mycore.xsonify.serialize.SerializerSettings.AdditionalNamespaceDeclarationStrategy;
 import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_ADDITIONAL_NAMESPACE_DECLARATION_STRATEGY;
 import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_ATTRIBUTE_PREFIX_HANDLING;
 import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_ELEMENT_PREFIX_HANDLING;
+import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_FIXED_ATTRIBUTE_HANDLING;
 import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_JSON_STRUCTURE;
 import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_MIXED_CONTENT_HANDLING;
 import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_NAMESPACE_HANDLING;
@@ -48,6 +18,41 @@ import static org.mycore.xsonify.serialize.SerializerSettings.NamespaceDeclarati
 import static org.mycore.xsonify.serialize.SerializerSettings.PlainTextHandling;
 import static org.mycore.xsonify.serialize.SerializerSettings.PrefixHandling;
 import static org.mycore.xsonify.serialize.SerializerSettings.XsAnyNamespaceStrategy;
+
+import java.io.IOException;
+import java.util.Locale;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.mycore.common.MCRException;
+import org.mycore.common.config.annotation.MCRInstance;
+import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRStringContent;
+import org.mycore.common.xml.MCREntityResolver;
+import org.mycore.xsonify.serialize.Json2XmlSerializer;
+import org.mycore.xsonify.serialize.SerializationException;
+import org.mycore.xsonify.serialize.SerializerSettings;
+import org.mycore.xsonify.serialize.SerializerSettings.FixedAttributeHandling;
+import org.mycore.xsonify.serialize.SerializerStyle;
+import org.mycore.xsonify.serialize.Xml2JsonSerializer;
+import org.mycore.xsonify.xml.XmlDocument;
+import org.mycore.xsonify.xml.XmlDocumentLoader;
+import org.mycore.xsonify.xml.XmlEntityResolverDocumentLoader;
+import org.mycore.xsonify.xml.XmlName;
+import org.mycore.xsonify.xml.XmlParseException;
+import org.mycore.xsonify.xml.XmlSaxParser;
+import org.mycore.xsonify.xsd.Xsd;
+import org.mycore.xsonify.xsd.XsdParseException;
+import org.mycore.xsonify.xsd.XsdParser;
+import org.xml.sax.SAXException;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import jakarta.inject.Singleton;
 
 /**
  * <p>Content Transformer to convert XML to JSON and vice versa.
@@ -264,6 +269,9 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
         @MCRProperty(name = "XsAnyNamespaceStrategy", required = false)
         public String xsAnyNamespaceStrategy = DEFAULT_XS_ANY_NAMESPACE_STRATEGY.name();
 
+        @MCRProperty(name = "FixedAttributeHandling", required = false)
+        public String fixedAttributeHandling = DEFAULT_FIXED_ATTRIBUTE_HANDLING.name();
+
         public SerializerSettings get() {
             return new SerializerSettings(
                 Boolean.parseBoolean(omitRootElement),
@@ -275,7 +283,8 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
                 PlainTextHandling.valueOf(plainTextHandling),
                 MixedContentHandling.valueOf(mixedContentHandling),
                 AdditionalNamespaceDeclarationStrategy.valueOf(additionalNamespaceDeclarationStrategy),
-                XsAnyNamespaceStrategy.valueOf(xsAnyNamespaceStrategy)
+                XsAnyNamespaceStrategy.valueOf(xsAnyNamespaceStrategy),
+                FixedAttributeHandling.valueOf(fixedAttributeHandling)
             );
         }
 
