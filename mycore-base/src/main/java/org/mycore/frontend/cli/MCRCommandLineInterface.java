@@ -68,7 +68,7 @@ import org.mycore.resource.MCRResourceHelper;
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  */
-@SuppressWarnings({"PMD.DoNotTerminateVM", "PMD.SystemPrintln"})
+@SuppressWarnings({ "PMD.DoNotTerminateVM", "PMD.SystemPrintln" })
 public class MCRCommandLineInterface {
 
     /** The name of the system */
@@ -347,15 +347,14 @@ public class MCRCommandLineInterface {
     }
 
     private static List<String> readCommandsFromBufferedReader(BufferedReader reader) throws IOException {
-        String line;
         List<String> list = new ArrayList<>();
-        while ((line = reader.readLine()) != null) {
+        String line = reader.readLine();
+        while (line != null) {
             line = line.trim();
-
-            if (line.startsWith("#") || line.isEmpty()) {
-                continue;
+            if (!line.startsWith("#") && !line.isEmpty()) {
+                list.add(line);
             }
-            list.add(line);
+            line = reader.readLine();
         }
         return list;
     }
