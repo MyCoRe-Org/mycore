@@ -248,8 +248,7 @@ public class MCRVueRootServlet extends MCRContentServlet {
 
         MCRConfiguration2.getOrThrow(VUE_PASSTHROUGH_PROPERTY_NAME, MCRConfiguration2::splitValue)
                 .map(k -> new AbstractMap.SimpleImmutableEntry<>(k, MCRConfiguration2.getString(k)))
-                .filter(e -> e.getValue().isPresent())
-                .forEach(e -> properties.setProperty(e.getKey(), e.getValue().get()));
+                .forEach(e -> properties.setProperty(e.getKey(), e.getValue().orElse(null)));
 
         properties.putAll(servletInitProperties);
 
@@ -312,8 +311,15 @@ public class MCRVueRootServlet extends MCRContentServlet {
         propertiesScript.setAttribute("type", "text/javascript");
         StringBuilder propertiesJson = new StringBuilder("var mycore = mycore || {};");
         propertiesJson.append(System.lineSeparator());
-        getProperties().forEach((key, value) -> propertiesJson.append("mycore[\"").append(key)
-                .append("\"]").append("=\"").append(value).append("\";").append(System.lineSeparator()));
+        getProperties().forEach((key, value) -> {
+            propertiesJson.append("mycore[\"").append(key)
+                    .append("\"]").append("=");
+            if(value == null) {
+                propertiesJson.append("null;");
+            } else {
+                propertiesJson.append("\"").append(value).append("\";").append(System.lineSeparator());
+            }
+        });
         propertiesScript.setText(propertiesJson.toString());
         return propertiesScript;
     }
