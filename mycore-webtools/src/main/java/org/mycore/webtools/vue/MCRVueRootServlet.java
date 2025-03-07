@@ -39,8 +39,6 @@ import java.util.stream.Stream;
 
 import javax.xml.transform.TransformerException;
 
-import jakarta.servlet.ServletConfig;
-import jakarta.servlet.ServletException;
 import org.jdom2.Content;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -60,6 +58,8 @@ import org.mycore.services.i18n.MCRTranslation;
 import org.mycore.tools.MyCoReWebPageProvider;
 import org.xml.sax.SAXException;
 
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -254,7 +254,7 @@ public class MCRVueRootServlet extends MCRContentServlet {
         properties.putAll(servletInitProperties);
 
         properties.setProperty("webApplicationBaseURL", MCRFrontendUtil.getBaseURL());
-        properties.setProperty("CurrentLang", MCRSessionMgr.getCurrentSession().getCurrentLanguage());
+        properties.setProperty("currentLang", MCRSessionMgr.getCurrentSession().getCurrentLanguage());
 
         return properties;
     }
