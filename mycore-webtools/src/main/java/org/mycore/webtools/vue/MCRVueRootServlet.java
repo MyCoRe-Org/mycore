@@ -313,11 +313,11 @@ public class MCRVueRootServlet extends MCRContentServlet {
         propertiesJson.append(System.lineSeparator());
         getProperties().forEach((key, value) -> {
             propertiesJson.append("mycore[\"").append(key)
-                    .append("\"]").append("=");
+                    .append("\"]").append('=');
             if(value == null) {
                 propertiesJson.append("null;");
             } else {
-                propertiesJson.append("\"").append(value).append("\";").append(System.lineSeparator());
+                propertiesJson.append('"').append(value).append("\";").append(System.lineSeparator());
             }
         });
         propertiesScript.setText(propertiesJson.toString());
