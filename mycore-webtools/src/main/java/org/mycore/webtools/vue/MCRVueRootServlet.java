@@ -247,7 +247,7 @@ public class MCRVueRootServlet extends MCRContentServlet {
         Properties properties = new Properties();
 
         MCRConfiguration2.getOrThrow(VUE_PASSTHROUGH_PROPERTY_NAME, MCRConfiguration2::splitValue)
-                .map(k -> new AbstractMap.SimpleImmutableEntry<>(k, MCRConfiguration2.getString(k)) {})
+                .map(k -> new AbstractMap.SimpleImmutableEntry<>(k, MCRConfiguration2.getString(k)))
                 .filter(e -> e.getValue().isPresent())
                 .forEach(e -> properties.setProperty(e.getKey(), e.getValue().get()));
 
