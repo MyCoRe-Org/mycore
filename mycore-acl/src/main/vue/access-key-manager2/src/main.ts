@@ -20,8 +20,8 @@ import { App, createApp } from 'vue';
 import ContactManager from '@/App.vue';
 import router from './router';
 import { createI18n } from 'vue-i18n';
-import { BASE_URL, CURRENT_LANG, fetchAccessKeyConfig } from '@/common/config';
 import { LangService } from '@mycore-test/js-common/i18n';
+import { appConfig, accessKeyConfig } from './common/config';
 if (import.meta.env.DEV) {
   import('bootstrap/dist/css/bootstrap.min.css');
   import('font-awesome/css/font-awesome.min.css');
@@ -38,25 +38,25 @@ const setErrorHandler = (app: App): void => {
   };
 };
 
-const langService = new LangService(BASE_URL);
+// TODO validate config
+
+const langService = new LangService(appConfig.baseUrl);
 
 const initApp = async () => {
   try {
-    const [config, translations] = await Promise.all([
-      fetchAccessKeyConfig(BASE_URL),
-      langService.getTranslations(I18N_PREFIX, CURRENT_LANG),
+    const [translations] = await Promise.all([
+      langService.getTranslations(I18N_PREFIX, appConfig.currentLang),
     ]);
     const i18n = createI18n({
       legacy: false,
-      locale: CURRENT_LANG,
-      messages: { [CURRENT_LANG]: translations },
+      locale: appConfig.currentLang,
+      messages: { [appConfig.currentLang]: translations },
     });
     const app = createApp(ContactManager);
     app.use(i18n);
-    // TODO fix 401 and 403
     app.use(router);
-    app.provide('accessKeyConfig', config);
-    app.provide('baseUrl', BASE_URL);
+    app.provide('appConfig', appConfig);
+    app.provide('accessKeyConfig', accessKeyConfig);
     setErrorHandler(app);
     app.mount(`#${APP_ID}`);
   } catch (error) {

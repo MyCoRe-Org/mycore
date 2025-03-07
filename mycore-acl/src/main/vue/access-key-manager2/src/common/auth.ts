@@ -17,8 +17,9 @@
  */
 
 import { fetchJwt as mcrFetchJwt } from '@mycore-test/js-common/auth';
+import { AuthStrategy } from '@mycore-test/js-common/auth';
 
-export const fetchJWT = async (
+export const fetchJwt = async (
   baseUrl: string,
   reference?: string,
   isSessionEnabled?: boolean
@@ -29,3 +30,11 @@ export const fetchJWT = async (
     sessionAttributes: isSessionEnabled ? [attributeName] : undefined,
   });
 };
+
+export class DevAuthStrategy implements AuthStrategy {
+  public getHeaders(): Record<string, string> {
+    return {
+      Authorization: `Basic ${import.meta.env.VITE_APP_API_TOKEN}`,
+    };
+  }
+}
