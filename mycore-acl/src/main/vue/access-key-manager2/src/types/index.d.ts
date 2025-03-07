@@ -18,8 +18,7 @@
 
 declare global {
   interface Window {
-    webApplicationBaseURL: string;
-    currentLang: string;
+    mycore: object;
   }
 }
 

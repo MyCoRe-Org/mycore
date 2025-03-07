@@ -1,100 +1,93 @@
 <template>
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col d-flex justify-content-center">
-        <h3>{{ t(getI18nKey('title.main')) }}</h3>
+  <div v-if="state.accessKeyCreatedSecret" class="row">
+    <div class="col-12">
+      <div class="alert alert-success text-center" role="alert">
+        {{
+          t(getI18nKey('success.add'), {
+            secret: state.accessKeyCreatedSecret,
+          })
+        }}
+        <template
+          v-if="
+            state.accessKeyCreated &&
+            config &&
+            config.allowedAccessKeySessionPermissions.includes(
+              state.accessKeyCreated.type
+            )
+          "
+        >
+          {{ t(getI18nKey('success.add.url')) }}
+          <a :href="activationLink" disabled>
+            {{ activationLink }}
+          </a>
+        </template>
       </div>
     </div>
-    <div v-if="state.accessKeyCreatedSecret" class="row">
-      <div class="col-12">
-        <div class="alert alert-success text-center" role="alert">
-          {{
-            t(getI18nKey('success.add'), {
-              secret: state.accessKeyCreatedSecret,
-            })
-          }}
-          <template
-            v-if="
-              state.accessKeyCreated &&
-              config &&
-              config.allowedAccessKeySessionPermissions.includes(
-                state.accessKeyCreated.type
-              )
-            "
-          >
-            {{ t(getI18nKey('success.add.url')) }}
-            <a :href="activationLink" disabled>
-              {{ activationLink }}
-            </a>
-          </template>
-        </div>
-      </div>
-    </div>
-    <div v-if="state.errorMessage" class="row">
-      <div class="col-12">
-        <div class="alert alert-danger text-center" role="alert">
-          {{ t(state.errorMessage) }}
-        </div>
-      </div>
-    </div>
-    <div class="row pb-2">
-      <div class="col-12">
-        <div class="text-end">
-          <button
-            class="btn btn-primary"
-            :disabled="state.loading"
-            @click="createModalRef?.open"
-          >
-            <i class="fa fa-plus" />
-            {{ t(getI18nKey('button.showCreateAccessKeyModal')) }}
-          </button>
-        </div>
-      </div>
-    </div>
-    <!-- TODO bind message -->
-    <div class="row">
-      <div class="col-12">
-        <div class="position-relative">
-          <AccessKeyTable
-            :access-keys="paginatedAccessKeys"
-            @remove-access-key="deleteAccessKey"
-            @view-access-key="openAccessKeyInfoModal"
-          />
-          <div
-            id="loading-overlay"
-            class="loading-overlay"
-            :style="{ visibility: state.loading ? 'visible' : 'hidden' }"
-          >
-            <div class="spinner-border text-primary" role="status"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-12 d-flex justify-content-center">
-        <Pagination
-          :current-page="state.currentPage"
-          :total-rows="state.totalCount"
-          :per-page="state.pageSize"
-          @change-page="changePage"
-        />
-      </div>
-    </div>
-    <CreateAccessKeyModal
-      ref="createModalRef"
-      :access-key-service="accessKeyService"
-      :reference="reference"
-      :available-permissions="availablePermissions"
-      @add-access-key="addAccessKey"
-    />
-    <AccessKeyInfoModal
-      ref="infoModalRef"
-      :access-key-service="accessKeyService"
-      :available-permissions="availablePermissions"
-      :reference="reference"
-      @update-access-key="updateAccessKey"
-    />
   </div>
+  <div v-if="state.errorMessage" class="row">
+    <div class="col-12">
+      <div class="alert alert-danger text-center" role="alert">
+        {{ t(state.errorMessage) }}
+      </div>
+    </div>
+  </div>
+  <div class="row pb-2">
+    <div class="col-12">
+      <div class="text-end">
+        <button
+          class="btn btn-primary"
+          :disabled="state.loading"
+          @click="createModalRef?.open"
+        >
+          <i class="fa fa-plus" />
+          {{ t(getI18nKey('button.showCreateAccessKeyModal')) }}
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- TODO bind message -->
+  <div class="row">
+    <div class="col-12">
+      <div class="position-relative">
+        <AccessKeyTable
+          :access-keys="paginatedAccessKeys"
+          @remove-access-key="deleteAccessKey"
+          @view-access-key="openAccessKeyInfoModal"
+        />
+        <div
+          id="loading-overlay"
+          class="loading-overlay"
+          :style="{ visibility: state.loading ? 'visible' : 'hidden' }"
+        >
+          <div class="spinner-border text-primary" role="status"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 d-flex justify-content-center">
+      <Pagination
+        :current-page="state.currentPage"
+        :total-rows="state.totalCount"
+        :per-page="state.pageSize"
+        @change-page="changePage"
+      />
+    </div>
+  </div>
+  <CreateAccessKeyModal
+    ref="createModalRef"
+    :access-key-service="accessKeyService"
+    :reference="reference"
+    :available-permissions="availablePermissions"
+    @add-access-key="addAccessKey"
+  />
+  <AccessKeyInfoModal
+    ref="infoModalRef"
+    :access-key-service="accessKeyService"
+    :available-permissions="availablePermissions"
+    :reference="reference"
+    @update-access-key="updateAccessKey"
+  />
   <ConfirmModal ref="confirmModal" />
 </template>
 
@@ -111,10 +104,9 @@ import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { urlEncode } from '@/common/utils';
 import {
-  AccessKey,
-  AccessKeyConfig,
+  AccessKeyDto,
   AccessKeyService,
-} from '@mycore-test/js-common/acl/accesskey';
+} from '@mycore-test/js-common/access-key';
 import {
   AccessKeyTable,
   CreateAccessKeyModal,
@@ -122,26 +114,25 @@ import {
   ConfirmModal,
 } from 'vue-access-key-manager';
 import Pagination from '@/components/SimplePagination.vue';
-import { fetchJWT } from '@/common/auth';
-import {
-  HttpClient,
-  ClientAuthStrategy,
-  AccessTokenClientAuthStrategy,
-} from '@mycore-test/js-common/common/client';
+import { fetchJwt, DevAuthStrategy } from '@/common/auth';
+import { AccessTokenAuthStrategy } from '@mycore-test/js-common/auth';
+import { AccessKeyConfig, AppConfig } from '@/common/config';
 import { getI18nKey } from '@/common/utils';
+import { SimpleHttpClient } from '@mycore-test/js-common/utils/http';
+import {
+  PermissionError,
+  UnauthorizedActionError,
+} from '@mycore-test/js-common/utils/errors';
 
-class DevAuthStrategy implements ClientAuthStrategy {
-  public getHeaders(): Record<string, string> {
-    return {
-      Authorization: `Basic ${import.meta.env.VITE_APP_API_TOKEN}`,
-    };
-  }
-}
+const props = defineProps<{
+  config: AccessKeyConfig;
+}>();
 
-const baseUrl = inject('baseUrl') as string;
-const config = inject('accessKeyConfig') as AccessKeyConfig;
+const appConfig = inject('appConfig') as AppConfig;
 
-const infoModalRef = ref<{ open: (accessKey: AccessKey) => void } | null>(null);
+const infoModalRef = ref<{ open: (accessKey: AccessKeyDto) => void } | null>(
+  null
+);
 const createModalRef = ref<{ open: () => void } | null>(null);
 const confirmModal = ref<{
   open: (title: string, message: string, callback?: () => void) => void;
@@ -154,7 +145,7 @@ const { t } = useI18n();
 
 const getActivationLink = (secret: string): string =>
   t(getI18nKey('success.add.url.format'), {
-    baseUrl,
+    baseUrl: appConfig.baseUrl,
     reference: reference ?? '',
     secret: urlEncode(secret),
   });
@@ -172,10 +163,10 @@ const state = reactive({
   totalCount: 0,
   currentPage: Number(route.query.page) || 1,
   pageSize: Number(route.query.pageSize) || 8,
-  accessKeys: [] as AccessKey[],
+  accessKeys: [] as AccessKeyDto[],
   errorMessage: undefined as string | undefined,
   accessKeyCreatedSecret: undefined as string | undefined,
-  accessKeyCreated: undefined as AccessKey | undefined,
+  accessKeyCreated: undefined as AccessKeyDto | undefined,
 });
 const accessKeyService = ref<AccessKeyService>();
 
@@ -191,14 +182,23 @@ const activationLink = computed((): string => {
 const fetchAccessKeys = async (): Promise<void> => {
   if (accessKeyService.value) {
     const offset = (state.currentPage - 1) * state.pageSize;
-    const result = await accessKeyService.value.getAccessKeys({
-      permissions: availablePermissions,
-      reference,
-      offset,
-      limit: state.pageSize,
-    });
-    state.accessKeys = result.accessKeys;
-    state.totalCount = result.totalCount;
+    try {
+      const result = await accessKeyService.value.getAccessKeys({
+        permissions: availablePermissions,
+        reference,
+        offset,
+        limit: state.pageSize,
+      });
+      state.accessKeys = result.accessKeys;
+      state.totalCount = result.totalCount;
+    } catch (error) {
+      if (error instanceof UnauthorizedActionError) {
+        router.push({ name: '401' });
+      }
+      if (error instanceof PermissionError) {
+        router.push({ name: '403' });
+      }
+    }
   }
 };
 const openAccessKeyInfoModal = (index: number): void => {
@@ -226,7 +226,7 @@ const changePage = async (page: number): Promise<void> => {
     },
   });
 };
-const deleteAccessKey = async (accessKey: AccessKey): Promise<void> => {
+const deleteAccessKey = async (accessKey: AccessKeyDto): Promise<void> => {
   resetInfos();
   const title = t('component.acl.accesskey.frontend.confirmRemove.title');
   const message = t('component.acl.accesskey.frontend.confirmRemove.text', {
@@ -240,7 +240,7 @@ const deleteAccessKey = async (accessKey: AccessKey): Promise<void> => {
     try {
       await accessKeyService.value?.deleteAccessKey(accessKey.id);
       state.accessKeys = state.accessKeys.filter(
-        (a: AccessKey) => a.id !== accessKey.id
+        (a: AccessKeyDto) => a.id !== accessKey.id
       );
       state.totalCount -= 1;
     } finally {
@@ -248,15 +248,15 @@ const deleteAccessKey = async (accessKey: AccessKey): Promise<void> => {
     }
   });
 };
-const updateAccessKey = (accessKey: AccessKey): void => {
+const updateAccessKey = (accessKey: AccessKeyDto): void => {
   const index = state.accessKeys.findIndex(
-    (a: AccessKey) => a.id === accessKey.id
+    (a: AccessKeyDto) => a.id === accessKey.id
   );
   if (index !== -1) {
     state.accessKeys[index] = accessKey;
   }
 };
-const addAccessKey = (secret: string, accessKey: AccessKey): void => {
+const addAccessKey = (secret: string, accessKey: AccessKeyDto): void => {
   if (accessKey.secret !== secret) {
     state.accessKeyCreatedSecret = secret;
     state.accessKeyCreated = accessKey;
@@ -266,20 +266,20 @@ const addAccessKey = (secret: string, accessKey: AccessKey): void => {
 };
 const initAccessKeyService = async () => {
   if (import.meta.env.PROD) {
-    const jwt = await fetchJWT(
-      baseUrl,
+    const jwt = await fetchJwt(
+      appConfig.baseUrl,
       reference || undefined,
-      config.isAccessKeySessionEnabled
+      props.config.allowedAccessKeySessionPermissions.length > 0
     );
     accessKeyService.value = new AccessKeyService(
-      new HttpClient(baseUrl, {
-        authStrategy: new AccessTokenClientAuthStrategy(jwt),
+      new SimpleHttpClient(appConfig.baseUrl, {
+        authStrategy: new AccessTokenAuthStrategy(jwt),
         timeout: 5000,
       })
     );
   } else {
     accessKeyService.value = new AccessKeyService(
-      new HttpClient(baseUrl, {
+      new SimpleHttpClient(appConfig.baseUrl, {
         authStrategy: new DevAuthStrategy(),
         timeout: 5000,
       })

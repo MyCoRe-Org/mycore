@@ -17,22 +17,34 @@
  */
 
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import HomeView from '@/views/HomeView.vue';
-import { BASE_URL } from '@/common/config';
+import AppView from '@/views/AppView.vue';
+import Error401View from '@/views/Error403View.vue';
+import Error403View from '@/views/Error403View.vue';
+import { appConfig } from '@/common/config';
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    component: HomeView,
+    component: AppView,
+  },
+  {
+    path: '/401',
+    name: '401',
+    component: Error401View,
+  },
+  {
+    path: '/403',
+    name: '403',
+    component: Error403View,
   },
 ];
 
 const getContext = (): string => {
   if (import.meta.env.DEV) {
-    return import.meta.env.BASE_URL;
+    return appConfig.baseUrl;
   }
   const el = document.createElement('a');
-  el.href = BASE_URL;
+  el.href = appConfig.baseUrl;
   return `${el.pathname}access-key-manager`;
 };
 

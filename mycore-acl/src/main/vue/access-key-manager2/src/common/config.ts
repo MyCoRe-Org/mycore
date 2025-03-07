@@ -16,31 +16,39 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { AccessKeyConfig } from '@mycore-test/js-common/acl/accesskey';
+export interface AppConfig {
+  baseUrl: string;
+  currentLang: string;
+}
 
-export const BASE_URL =
-  import.meta.env.VITE_APP_WEB_APPLICATION_BASE_URL ??
-  (window.webApplicationBaseURL as string);
+export interface AccessKeyConfig {
+  allowedAccessKeySessionPermissions: string[];
+}
 
-export const CURRENT_LANG =
-  import.meta.env.VITE_APP_CURRENT_LANG ?? (window.currentLang as string);
+interface RawConfig {
+  webApplicationBaseURL: string;
+  CurrentLang: string;
+  'MCR.ACL.AccessKey.Strategy.AllowedSessionPermissionTypes': string;
+}
 
-const ALLOWED_SESSION_TYPES =
-  'MCR.ACL.AccessKey.Strategy.AllowedSessionPermissionTypes';
+const rawConfig = (
+  import.meta.env.DEV === true
+    ? Object.fromEntries(
+        Object.entries(import.meta.env)
+          .filter(([key]) => key.startsWith('VITE_APP_CONFIG_'))
+          .map(([key, value]) => [key.replace('VITE_APP_CONFIG_', ''), value])
+      )
+    : window.mycore
+) as RawConfig;
 
-export const fetchAccessKeyConfig = async (
-  baseUrl: string
-): Promise<AccessKeyConfig> => {
-  const response = await fetch(`${baseUrl}config.json`);
-  if (!response.ok) {
-    throw new Error('Failed to load app configuration');
-  }
-  const config = await response.json();
-  return {
-    isAccessKeySessionEnabled:
-      config[ALLOWED_SESSION_TYPES] !== undefined &&
-      config[ALLOWED_SESSION_TYPES].length > 0,
-    allowedAccessKeySessionPermissions:
-      config[ALLOWED_SESSION_TYPES].split(','),
-  };
+export const appConfig: AppConfig = {
+  baseUrl: rawConfig.webApplicationBaseURL,
+  currentLang: rawConfig.CurrentLang,
+};
+
+export const accessKeyConfig: AccessKeyConfig = {
+  allowedAccessKeySessionPermissions:
+    rawConfig['MCR.ACL.AccessKey.Strategy.AllowedSessionPermissionTypes'].split(
+      ','
+    ),
 };
