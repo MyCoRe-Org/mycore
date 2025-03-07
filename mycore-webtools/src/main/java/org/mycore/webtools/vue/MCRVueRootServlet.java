@@ -271,7 +271,7 @@ public class MCRVueRootServlet extends MCRContentServlet {
             .toList();
 
         MyCoReWebPageProvider mycoreWebPage = new MyCoReWebPageProvider();
-        String translatedHeading = MCRTranslation.exists(this.headingI18nKey) ?
+        String translatedHeading = this.headingI18nKey != null && MCRTranslation.exists(this.headingI18nKey) ?
                 MCRTranslation.translate(this.headingI18nKey) : "";
 
         String currentLanguage = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
