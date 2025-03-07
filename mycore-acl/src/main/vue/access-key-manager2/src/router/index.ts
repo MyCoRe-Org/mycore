@@ -18,8 +18,7 @@
 
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import AppView from '@/views/AppView.vue';
-import Error401View from '@/views/Error403View.vue';
-import Error403View from '@/views/Error403View.vue';
+import { Error401View, Error403View } from 'mcr-vue-components';
 import { appConfig } from '@/common/config';
 
 const routes: Array<RouteRecordRaw> = [
@@ -41,7 +40,7 @@ const routes: Array<RouteRecordRaw> = [
 
 const getContext = (): string => {
   if (import.meta.env.DEV) {
-    return appConfig.baseUrl;
+    return '';
   }
   const el = document.createElement('a');
   el.href = appConfig.baseUrl;
