@@ -92,13 +92,13 @@ public class MCRURIResolverTest extends MCRTestCase {
     public void testImportFromSameDirectory() throws Exception {
 
         String xslResourceUrl = MCRResourceHelper.getResourceUrl("/xsl/functions/xsl-2.xsl").toString();
-        Source xslSource = MCRURIResolver.instance()
+        Source xslSource = MCRURIResolver.obtainInstance()
             .resolve("xslImport:xsl-import:functions/xsl-2.xsl", xslResourceUrl);
         Assert.assertNotNull(xslSource);
         Assert.assertTrue(StringUtils.endsWith(xslSource.getSystemId(), "/xsl/functions/xsl-1.xsl"));
 
         String xsltResourceUrl = MCRResourceHelper.getResourceUrl("/xslt/functions/xsl-2.xsl").toString();
-        Source xsltSource = MCRURIResolver.instance()
+        Source xsltSource = MCRURIResolver.obtainInstance()
             .resolve("xslImport:xsl-import:functions/xsl-2.xsl", xsltResourceUrl);
         Assert.assertNotNull(xsltSource);
         Assert.assertTrue(StringUtils.endsWith(xsltSource.getSystemId(), "/xslt/functions/xsl-1.xsl"));

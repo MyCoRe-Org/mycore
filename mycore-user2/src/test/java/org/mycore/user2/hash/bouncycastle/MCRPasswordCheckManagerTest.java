@@ -45,7 +45,7 @@ public class MCRPasswordCheckManagerTest extends MCRTestCase {
     })
     public final void testBCrypt() {
 
-        MCRPasswordCheckManager manager = MCRPasswordCheckManager.instantiate();
+        MCRPasswordCheckManager manager = MCRPasswordCheckManager.createInstance();
         MCRPasswordCheckData data = manager.create(PASSWORD);
 
         assertEquals("bcrypt", data.type());
@@ -65,7 +65,7 @@ public class MCRPasswordCheckManagerTest extends MCRTestCase {
     })
     public final void testSCrypt() {
 
-        MCRPasswordCheckManager manager = MCRPasswordCheckManager.instantiate();
+        MCRPasswordCheckManager manager = MCRPasswordCheckManager.createInstance();
         MCRPasswordCheckData data = manager.create(PASSWORD);
 
         assertEquals("scrypt", data.type());
@@ -85,7 +85,7 @@ public class MCRPasswordCheckManagerTest extends MCRTestCase {
     })
     public final void testArgon2() {
 
-        MCRPasswordCheckManager manager = MCRPasswordCheckManager.instantiate();
+        MCRPasswordCheckManager manager = MCRPasswordCheckManager.createInstance();
         MCRPasswordCheckData data = manager.create(PASSWORD);
 
         assertEquals("argon2", data.type());

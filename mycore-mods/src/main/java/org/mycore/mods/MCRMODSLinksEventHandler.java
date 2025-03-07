@@ -57,7 +57,7 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
         }
         List<Element> linkingNodes = modsWrapper.getLinkedRelatedItems();
         if (!linkingNodes.isEmpty()) {
-            MCRLinkTableManager linkTableManager = MCRLinkTableManager.instance();
+            MCRLinkTableManager linkTableManager = MCRLinkTableManager.getInstance();
             for (Element linkingNode : linkingNodes) {
                 String targetID = linkingNode.getAttributeValue(MCRXlink.HREF, MCRConstants.XLINK_NAMESPACE);
                 if (targetID == null) {

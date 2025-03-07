@@ -61,7 +61,7 @@ public class MCRReadPublicTokenFactory {
     private static void requestToken() {
         LOGGER.info("requesting read-public access token...");
 
-        MCRTokenRequest request = MCROAuthClient.instance().getTokenRequest();
+        MCRTokenRequest request = MCROAuthClient.getInstance().getTokenRequest();
         request.set("grant_type", "client_credentials");
         request.set("scope", "/read-public");
 

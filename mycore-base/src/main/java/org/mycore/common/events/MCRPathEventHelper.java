@@ -38,7 +38,7 @@ public class MCRPathEventHelper {
         if (attrs != null) {
             fileEvent.put(MCREvent.FILEATTR_KEY, attrs);
         }
-        MCREventManager.instance().handleEvent(fileEvent);
+        MCREventManager.getInstance().handleEvent(fileEvent);
     }
 
     public static void fireFileCreateEvent(Path file) throws IOException {

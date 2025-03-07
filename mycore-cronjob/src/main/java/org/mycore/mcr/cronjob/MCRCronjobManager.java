@@ -29,6 +29,7 @@ import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.log.MCRTableMessage;
 import org.mycore.common.log.MCRTableMessage.Column;
 import org.mycore.common.processing.MCRProcessableDefaultCollection;
+import org.mycore.common.processing.MCRProcessableManager;
 import org.mycore.common.processing.MCRProcessableRegistry;
 import org.mycore.mcr.cronjob.MCRCronjob.Context;
 
@@ -51,13 +52,13 @@ public final class MCRCronjobManager implements MCRShutdownHandler.Closeable {
 
     private MCRCronjobManager() {
         processableCollection = new MCRProcessableDefaultCollection(getClass().getSimpleName());
-        MCRProcessableRegistry.getSingleInstance().register(processableCollection);
+        MCRProcessableManager.getInstance().getRegistry().register(processableCollection);
         executor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
         executor.setContinueExistingPeriodicTasksAfterShutdownPolicy(false);
     }
 
     public static MCRCronjobManager getInstance() {
-        return MCRCronjobManagerInstanceHelper.INSTANCE;
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     @Override
@@ -138,8 +139,8 @@ public final class MCRCronjobManager implements MCRShutdownHandler.Closeable {
         return MCRConfiguration2.getInstanceOfOrThrow(MCRCronjob.class, property);
     }
 
-    private static final class MCRCronjobManagerInstanceHelper {
-        public static final MCRCronjobManager INSTANCE = new MCRCronjobManager();
+    private static final class LazyInstanceHolder {
+        public static final MCRCronjobManager SINGLETON_INSTANCE = new MCRCronjobManager();
     }
 
 }

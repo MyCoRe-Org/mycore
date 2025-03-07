@@ -63,7 +63,7 @@ public class MCRCommandUtils {
         if (type == null || type.length() == 0) {
             throw new MCRUsageException("Type required to enumerate IDs!");
         }
-        List<String> idList = MCRXMLMetadataManager.instance().listIDsOfType(type);
+        List<String> idList = MCRXMLMetadataManager.getInstance().listIDsOfType(type);
         if (idList.isEmpty()) {
             LOGGER.warn("No IDs found for type {}.", type);
         }
@@ -107,7 +107,7 @@ public class MCRCommandUtils {
         if (MCRObjectID.getIDParts(base).length != 2) {
             throw new MCRUsageException("Base ID ({project}_{type}) required to enumerate IDs!");
         }
-        List<String> idList = MCRXMLMetadataManager.instance().listIDsForBase(base);
+        List<String> idList = MCRXMLMetadataManager.getInstance().listIDsForBase(base);
         if (idList.isEmpty()) {
             LOGGER.warn("No IDs found for base {}.", base);
         }
@@ -183,18 +183,18 @@ public class MCRCommandUtils {
             return transformer;
         }
 
-        Element element = MCRURIResolver.instance().resolve("resource:" + xslFilePath);
+        Element element = MCRURIResolver.obtainInstance().resolve("resource:" + xslFilePath);
         if (element == null) {
             LOGGER.warn("Couldn't find resource {} for style {}, using default.", xslFilePath, style);
             final String xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
             xslFilePath = xslFolder + "/" + defaultStyle;
-            element = MCRURIResolver.instance().resolve("resource:" + xslFilePath);
+            element = MCRURIResolver.obtainInstance().resolve("resource:" + xslFilePath);
         }
 
         try {
             if (element != null) {
                 TransformerFactory transformerFactory = TransformerFactory.newInstance();
-                transformerFactory.setURIResolver(MCRURIResolver.instance());
+                transformerFactory.setURIResolver(MCRURIResolver.obtainInstance());
                 transformer = transformerFactory.newTransformer(new JDOMSource(element));
                 cache.put(style, transformer);
                 LOGGER.info("Loaded transformer from resource {} for style {}.", xslFilePath, style);

@@ -215,7 +215,7 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         MCRConfiguration2.getString("MCR.MODS.Import.Derivate.Categories")
             .map(MCRConfiguration2::splitValue)
             .ifPresent(s -> {
-                s.map(MCRCategoryID::fromString)
+                s.map(MCRCategoryID::ofString)
                     .forEach(categId -> derivate.getDerivate().getClassifications()
                         .add(new MCRMetaClassification("classification", 0, null,
                             categId)));

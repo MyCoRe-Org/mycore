@@ -90,7 +90,7 @@ public class MCRLayoutTransformerFactory {
             return NOOP_TRANSFORMER;
         }
         String[] stylesheets = getStylesheets(idStripped, stylesheet);
-        MCRContentTransformer transformer = MCRXSLTransformer.getInstance(stylesheets);
+        MCRContentTransformer transformer = MCRXSLTransformer.obtainInstance(stylesheets);
         LOGGER.debug("Using stylesheet '{}' for {}", () -> Lists.newArrayList(stylesheets), () -> idStripped);
         return transformer;
     }
@@ -103,7 +103,7 @@ public class MCRLayoutTransformerFactory {
             .orElseGet(Collections::emptyList);
         List<String> defaults = Collections.emptyList();
         if (!ignore.contains(id)) {
-            MCRXSLTransformer transformerTest = MCRXSLTransformer.getInstance(stylesheet);
+            MCRXSLTransformer transformerTest = MCRXSLTransformer.obtainInstance(stylesheet);
             String outputMethod = transformerTest.getOutputProperties().getProperty(OutputKeys.METHOD, "xml");
             if (isXMLOutput(outputMethod, transformerTest)) {
                 defaults = MCRConfiguration2.getString("MCR.LayoutTransformerFactory.Default.Stylesheets")
@@ -130,7 +130,7 @@ public class MCRLayoutTransformerFactory {
 
         String styleName = buildStylesheetName(id);
         try {
-            if (MCRXMLResource.instance().exists(styleName, MCRClassTools.getClassLoader())) {
+            if (MCRXMLResource.getInstance().exists(styleName, MCRClassTools.getClassLoader())) {
                 return styleName;
             }
         } catch (Exception e) {

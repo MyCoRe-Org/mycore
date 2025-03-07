@@ -78,9 +78,9 @@ public class MCRCategoryMergerTest extends MCRJPATestCase {
 
     @Test
     public void testIsDescendantCheck() {
-        MCRCategoryID cen = MCRCategoryID.fromString("institutes:CEN");
-        MCRCategoryID cinch = MCRCategoryID.fromString("institutes:CINCH");
-        MCRCategoryID ican = MCRCategoryID.fromString("institutes:ICAN");
+        MCRCategoryID cen = MCRCategoryID.ofString("institutes:CEN");
+        MCRCategoryID cinch = MCRCategoryID.ofString("institutes:CINCH");
+        MCRCategoryID ican = MCRCategoryID.ofString("institutes:ICAN");
 
         assertFalse(MCRCategoryMerger.oneIsDescendantOfTheOther(cinch, ican));
         assertFalse(MCRCategoryMerger.oneIsDescendantOfTheOther(ican, cinch));

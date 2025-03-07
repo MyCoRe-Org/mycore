@@ -230,7 +230,8 @@ public class MCRMetaLink extends MCRMetaDefault {
      * @return true if it is compare, else return false
      */
     public final boolean compare(MCRMetaLink input) {
-        if (linktype.equals(MCRXlink.TYPE_LOCATOR) && linktype.equals(input.getXLinkType()) && href.equals(input.getXLinkHref())) {
+        if (linktype.equals(MCRXlink.TYPE_LOCATOR) && linktype.equals(input.getXLinkType()) 
+            && href.equals(input.getXLinkHref())) {
             return true;
         }
         if (linktype.equals(MCRXlink.TYPE_ARC)) {

@@ -73,7 +73,7 @@ public class MCRLodRoot {
                 .toList();
             return MCRJerseyLodApp.returnLinkedData(rdfxmlString, uri, mimeTypes);
         } catch (IOException e) {
-            throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
                 .withCause(e)
                 .withErrorCode("INFO_ERROR")
                 .withMessage("Could not create Repository information")

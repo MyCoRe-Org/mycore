@@ -47,7 +47,7 @@ public class MCRSolrAltoExtractor implements MCRSolrFileIndexAccumulator {
     @Override
     public void accumulate(SolrInputDocument document, Path filePath, BasicFileAttributes attributes)
         throws IOException {
-        String parentPath = MCRPath.toMCRPath(filePath).getParent().getOwnerRelativePath();
+        String parentPath = MCRPath.ofPath(filePath).getParent().getOwnerRelativePath();
         if (!parentPath.startsWith("/alto")) {
             return;
         }

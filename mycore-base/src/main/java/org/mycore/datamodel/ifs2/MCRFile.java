@@ -165,7 +165,7 @@ public class MCRFile extends MCRStoredNode {
     @Override
     public MCRFileAttributes<String> getBasicFileAttributes() throws IOException {
         BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
-        return MCRDefaultFileAttributes.fromAttributes(attrs, new MCRMD5Digest(getMD5()));
+        return MCRDefaultFileAttributes.ofAttributes(attrs, new MCRMD5Digest(getMD5()));
     }
 
 }

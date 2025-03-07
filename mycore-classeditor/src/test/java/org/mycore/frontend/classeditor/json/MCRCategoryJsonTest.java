@@ -43,7 +43,7 @@ public class MCRCategoryJsonTest {
         Document doc = saxBuilder.build(getClass().getResourceAsStream("/classi/categoryJsonErr.xml"));
         String json = doc.getRootElement().getText();
 
-        Gson gson = MCRJSONManager.instance().createGson();
+        Gson gson = MCRJSONManager.obtainInstance().createGson();
         try {
             gson.fromJson(json, MCRCategoryImpl.class);
             System.out.println("FOO");

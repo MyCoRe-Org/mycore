@@ -52,7 +52,7 @@ public class MCRRestAccessKeyHelper {
     protected static final String QUERY_PARAM_SECRET_ENCODING = "secret_encoding";
 
     private static WebApplicationException getUnknownObjectException(final MCRObjectID objectId) {
-        return MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+        return MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
             .withMessage(objectId + " does not exist!")
             .withErrorCode("objectNotFound")
             .toException();

@@ -307,7 +307,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             String.class);
         setReadOnly(linkedClassifications);
         linkedClassifications.getResultList()
-            .stream().map(MCRCategoryID::rootID)
+            .stream().map(MCRCategoryID::new)
             .forEach(id -> boolMap.put(id, true));
         return boolMap;
     }

@@ -58,7 +58,7 @@ public class MCRObjectServlet extends MCRContentServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        metadataManager = MCRXMLMetadataManager.instance();
+        metadataManager = MCRXMLMetadataManager.getInstance();
     }
 
     @Override
@@ -110,7 +110,7 @@ public class MCRObjectServlet extends MCRContentServlet {
                     currentSession.getUserInformation().getUserID(), currentSession.getCurrentIP()));
             return null;
         }
-        MCRXMLMetadataManager xmlMetadataManager = MCRXMLMetadataManager.instance();
+        MCRXMLMetadataManager xmlMetadataManager = MCRXMLMetadataManager.getInstance();
         if (xmlMetadataManager.listRevisions(mcrid) != null) {
             MCRContent content = xmlMetadataManager.retrieveContent(mcrid, rev);
             if (content != null) {

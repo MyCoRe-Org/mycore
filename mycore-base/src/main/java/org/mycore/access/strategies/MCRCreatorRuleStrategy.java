@@ -121,7 +121,7 @@ public class MCRCreatorRuleStrategy implements MCRCombineableAccessCheckStrategy
             return false;
         }
         for (String categoryId : categoryIds) {
-            MCRCategoryID category = MCRCategoryID.fromString(categoryId);
+            MCRCategoryID category = MCRCategoryID.ofString(categoryId);
             if (LINK_SERVICE.isInCategory(reference, category)) {
                 return true;
             }

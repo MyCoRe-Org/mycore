@@ -45,21 +45,24 @@ import jakarta.servlet.ServletContext;
  *
  * @author Sebastian Hofmann (mcrshofm)
  */
-public class MCRSassCompilerManager {
+public final class MCRSassCompilerManager {
 
     private static final String DEVELOPER_MODE_CONFIG_KEY = "MCR.SASS.DeveloperMode";
 
-    private Map<String, String> fileCompiledContentMap = new ConcurrentHashMap<>();
+    private final Map<String, String> fileCompiledContentMap = new ConcurrentHashMap<>();
 
-    private Map<String, Date> fileLastCompileDateMap = new ConcurrentHashMap<>();
+    private final Map<String, Date> fileLastCompileDateMap = new ConcurrentHashMap<>();
 
-    private Map<String, String> fileMD5Map = new ConcurrentHashMap<>();
+    private final Map<String, String> fileMD5Map = new ConcurrentHashMap<>();
+
+    private MCRSassCompilerManager(){
+    }
 
     /**
      * @return the singleton instance of this class
      */
     public static MCRSassCompilerManager getInstance() {
-        return MCRSASSCompilerManagerHolder.INSTANCE;
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     /**
@@ -157,8 +160,8 @@ public class MCRSassCompilerManager {
         return MCRConfiguration2.getBoolean(DEVELOPER_MODE_CONFIG_KEY).orElse(false);
     }
 
-    private static final class MCRSASSCompilerManagerHolder {
-        public static final MCRSassCompilerManager INSTANCE = new MCRSassCompilerManager();
+    private static final class LazyInstanceHolder {
+        public static final MCRSassCompilerManager SINGLETON_INSTANCE = new MCRSassCompilerManager();
     }
 
 }

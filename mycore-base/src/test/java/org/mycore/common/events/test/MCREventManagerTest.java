@@ -52,7 +52,7 @@ public class MCREventManagerTest extends MCRTestCase {
     @Test
     public void instance() {
         try {
-            MCREventManager.instance();
+            MCREventManager.getInstance();
         } catch (MCRConfigurationException e) {
             assertEquals("Configuration property MCR.EventHandler.Mode.Foo is not set.", e.getMessage());
         }

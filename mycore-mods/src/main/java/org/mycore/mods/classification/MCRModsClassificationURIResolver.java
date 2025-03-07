@@ -134,7 +134,7 @@ public class MCRModsClassificationURIResolver implements URIResolver {
                 category.getId()));
         if (categoryURI.isPresent()) {
             LOGGER.debug("{} -> {}", () -> href, categoryURI::get);
-            return MCRURIResolver.instance().resolve(categoryURI.get(), base);
+            return MCRURIResolver.obtainInstance().resolve(categoryURI.get(), base);
         }
         LOGGER.debug("no category found for {}", href);
         return new JDOMSource(new Element("empty"));

@@ -66,7 +66,7 @@ public class MCRORCIDResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String getUserStatus() {
         MCRORCIDUser user = MCRORCIDSession.getCurrentUser();
-        Gson gson = MCRJSONManager.instance().createGson();
+        Gson gson = MCRJSONManager.obtainInstance().createGson();
         return gson.toJson(user.getStatus());
     }
 
@@ -155,7 +155,7 @@ public class MCRORCIDResource {
     private String publicationStatus(MCRObjectID oid, MCRORCIDUser user)
         throws JDOMException, IOException, SAXException {
         MCRPublicationStatus status = user.getPublicationStatus(oid);
-        Gson gson = MCRJSONManager.instance().createGson();
+        Gson gson = MCRJSONManager.obtainInstance().createGson();
         return gson.toJson(status);
     }
 }

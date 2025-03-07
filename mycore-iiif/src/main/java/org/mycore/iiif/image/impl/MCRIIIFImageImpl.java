@@ -47,7 +47,15 @@ public abstract class MCRIIIFImageImpl {
         this.implName = implName;
     }
 
+    /**
+     * @deprecated Use {@link #obtainInstance(String)} instead
+     */
+    @Deprecated
     public static synchronized MCRIIIFImageImpl getInstance(String implNameParameter) {
+        return obtainInstance(implNameParameter);
+    }
+
+    public static synchronized MCRIIIFImageImpl obtainInstance(String implNameParameter) {
         String implName = (implNameParameter == null || implNameParameter.isBlank())
             ? MCRConfiguration2.getStringOrThrow("MCR.IIIFImage.Default")
             : implNameParameter;

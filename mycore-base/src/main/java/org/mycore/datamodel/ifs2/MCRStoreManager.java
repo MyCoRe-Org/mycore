@@ -61,7 +61,7 @@ public class MCRStoreManager {
         T store = buildStore(config, storeClass);
         try {
             LOGGER.info("Adding instance of {} as MCRStore '{}'.", storeClass::getSimpleName, store::getID);
-            MCRStoreCenter.instance().addStore(store.getID(), store);
+            MCRStoreCenter.getInstance().addStore(store.getID(), store);
         } catch (Exception e) {
             throw new MCRException("Could not create store with ID " + config.getID() + ", store already exists", e);
         }
@@ -104,7 +104,7 @@ public class MCRStoreManager {
      * @return the existing or newly created store instance
      */
     public static <T extends MCRStore> T computeStoreIfAbsent(String id, Supplier<T> storeSupplier) {
-        return MCRStoreCenter.instance().computeStoreIfAbsent(id, storeSupplier);
+        return MCRStoreCenter.getInstance().computeStoreIfAbsent(id, storeSupplier);
     }
 
     /**
@@ -114,7 +114,7 @@ public class MCRStoreManager {
      *            the ID of the store
      */
     public static <T extends MCRStore> T getStore(String id) {
-        return MCRStoreCenter.instance().getStore(id);
+        return MCRStoreCenter.getInstance().getStore(id);
     }
 
     /**
@@ -122,12 +122,12 @@ public class MCRStoreManager {
      */
     @Deprecated
     public static <T extends MCRStore> T getStore(String id, Class<T> storeClass) {
-        return MCRStoreCenter.instance().getStore(id, storeClass);
+        return MCRStoreCenter.getInstance().getStore(id, storeClass);
     }
 
     public static void removeStore(String id) {
         LOGGER.info("Remove MCRStore '{}'.", id);
-        MCRStoreCenter.instance().removeStore(id);
+        MCRStoreCenter.getInstance().removeStore(id);
     }
 
 }

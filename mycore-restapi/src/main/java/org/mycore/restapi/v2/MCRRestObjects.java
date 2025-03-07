@@ -325,7 +325,7 @@ public class MCRRestObjects {
 
         query.sort(sortBy, sortOrder);
 
-        MCRObjectQueryResolver queryResolver = MCRObjectQueryResolver.getInstance();
+        MCRObjectQueryResolver queryResolver = MCRObjectQueryResolver.obtainInstance();
 
         List<MCRObjectIDDate> idDates = limitInt == 0 ? Collections.emptyList() : queryResolver.getIdDates(query);
 
@@ -411,9 +411,9 @@ public class MCRRestObjects {
         throws IOException {
         long modified;
         try {
-            modified = MCRXMLMetadataManager.instance().getLastModified(id);
+            modified = MCRXMLMetadataManager.getInstance().getLastModified(id);
         } catch (IOException io) {
-            throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
                 .withCause(io)
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND)
                 .withMessage(buildNotFoundMessage(id))
@@ -424,7 +424,7 @@ public class MCRRestObjects {
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
-        MCRContent mcrContent = MCRXMLMetadataManager.instance().retrieveContent(id);
+        MCRContent mcrContent = MCRXMLMetadataManager.getInstance().retrieveContent(id);
         return Response.ok()
             .entity(mcrContent,
                 new Annotation[] { MCRParams.Factory
@@ -443,7 +443,7 @@ public class MCRRestObjects {
         tags = MCRRestUtils.TAG_MYCORE_OBJECT)
     public Response getObjectMetadata(@Parameter(example = "mir_mods_00004712") @PathParam(PARAM_MCRID) MCRObjectID id)
         throws IOException {
-        long modified = MCRXMLMetadataManager.instance().getLastModified(id);
+        long modified = MCRXMLMetadataManager.getInstance().getLastModified(id);
         if (modified < 0) {
             throw new NotFoundException(buildNotFoundMessage(id));
         }
@@ -562,9 +562,9 @@ public class MCRRestObjects {
     @MCRRestRequiredPermission(MCRAccessManager.PERMISSION_HISTORY_VIEW)
     public Response getObjectVersions(@Parameter(example = "mir_mods_00004713") @PathParam(PARAM_MCRID) MCRObjectID id)
         throws IOException {
-        long modified = MCRXMLMetadataManager.instance().getLastModified(id);
+        long modified = MCRXMLMetadataManager.getInstance().getLastModified(id);
         if (modified < 0) {
-            throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND)
                 .withMessage(buildNotFoundMessage(id))
                 .toException();
@@ -574,7 +574,7 @@ public class MCRRestObjects {
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
-        List<? extends MCRAbstractMetadataVersion<?>> versions = MCRXMLMetadataManager.instance().listRevisions(id);
+        List<? extends MCRAbstractMetadataVersion<?>> versions = MCRXMLMetadataManager.getInstance().listRevisions(id);
         return Response.ok()
             .entity(new GenericEntity<>(versions, TypeUtils.parameterize(List.class, MCRAbstractMetadataVersion.class)))
             .lastModified(lastModified)
@@ -594,9 +594,9 @@ public class MCRRestObjects {
     public Response getObjectVersion(@Parameter(example = "mir_mods_00004714") @PathParam(PARAM_MCRID) MCRObjectID id,
         @PathParam("revision") String revision)
         throws IOException {
-        MCRContent mcrContent = MCRXMLMetadataManager.instance().retrieveContent(id, revision);
+        MCRContent mcrContent = MCRXMLMetadataManager.getInstance().retrieveContent(id, revision);
         if (mcrContent == null) {
-            throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_REVISION_NOT_FOUND)
                 .withMessage("MCRObject " + id + " has no revision " + revision + ".")
                 .toException();
@@ -653,7 +653,7 @@ public class MCRRestObjects {
             updatedObject = new MCRObject(inputContent.asXML());
             updatedObject.validate();
         } catch (JDOMException | MCRException e) {
-            throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.BAD_REQUEST.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_INVALID)
                 .withMessage("MCRObject " + id + " is not valid")
                 .withDetail(e.getMessage())
@@ -661,7 +661,7 @@ public class MCRRestObjects {
                 .toException();
         }
         if (!id.equals(updatedObject.getId())) {
-            throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.BAD_REQUEST.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_ID_MISMATCH)
                 .withMessage("MCRObject " + id + " cannot be overwritten by " + updatedObject.getId() + ".")
                 .toException();
@@ -675,7 +675,7 @@ public class MCRRestObjects {
                 return Response.status(Response.Status.CREATED).build();
             }
         } catch (MCRAccessException e) {
-            throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.FORBIDDEN.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NO_PERMISSION)
                 .withMessage("You may not modify or create MCRObject " + id + ".")
                 .withDetail(e.getMessage())
@@ -714,7 +714,7 @@ public class MCRRestObjects {
             updatedObject.getMetadata().setFromDOM(inputContent.asXML().getRootElement().detach());
             updatedObject.validate();
         } catch (JDOMException | MCRException e) {
-            throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.BAD_REQUEST.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_INVALID)
                 .withMessage("MCRObject " + id + " is not valid")
                 .withDetail(e.getMessage())
@@ -725,7 +725,7 @@ public class MCRRestObjects {
             MCRMetadataManager.update(updatedObject);
             return Response.status(Response.Status.NO_CONTENT).build();
         } catch (MCRAccessException e) {
-            throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.FORBIDDEN.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NO_PERMISSION)
                 .withMessage("You may not modify or create metadata of MCRObject " + id + ".")
                 .withDetail(e.getMessage())
@@ -750,7 +750,7 @@ public class MCRRestObjects {
     public Response deleteObject(@PathParam(PARAM_MCRID) MCRObjectID id) {
         //check preconditions
         if (!MCRMetadataManager.exists(id)) {
-            throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND)
                 .withMessage(buildNotFoundMessage(id))
                 .toException();
@@ -759,7 +759,7 @@ public class MCRRestObjects {
             MCRMetadataManager.deleteMCRObject(id);
         } catch (MCRActiveLinkException e) {
             Map<String, Collection<String>> activeLinks = e.getActiveLinks();
-            throw MCRErrorResponse.fromStatus(Response.Status.CONFLICT.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.CONFLICT.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_STILL_LINKED)
                 .withMessage("MCRObject " + id + " is still linked by other objects.")
                 .withDetail(activeLinks.toString())
@@ -767,7 +767,7 @@ public class MCRRestObjects {
                 .toException();
         } catch (MCRAccessException e) {
             //usually handled before
-            throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.FORBIDDEN.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NO_PERMISSION)
                 .withMessage("You may not delete MCRObject " + id + ".")
                 .withDetail(e.getMessage())
@@ -821,7 +821,7 @@ public class MCRRestObjects {
     public Response setState(@PathParam(PARAM_MCRID) MCRObjectID id, String state) {
         //check preconditions
         if (!MCRMetadataManager.exists(id)) {
-            throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND)
                 .withMessage(buildNotFoundMessage(id))
                 .toException();
@@ -830,7 +830,7 @@ public class MCRRestObjects {
             MCRCategoryID categState = new MCRCategoryID(
                 MCRConfiguration2.getString("MCR.Metadata.Service.State.Classification.ID").orElse("state"), state);
             if (!MCRCategoryDAOFactory.getInstance().exist(categState)) {
-                throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
+                throw MCRErrorResponse.ofStatusCode(Response.Status.BAD_REQUEST.getStatusCode())
                     .withErrorCode(MCRErrorCodeConstants.MCROBJECT_INVALID_STATE)
                     .withMessage("Category " + categState + " not found")
                     .toException();
@@ -846,7 +846,7 @@ public class MCRRestObjects {
             MCRMetadataManager.update(mcrObject);
             return Response.status(Response.Status.NO_CONTENT).build();
         } catch (MCRAccessException e) {
-            throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.FORBIDDEN.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NO_PERMISSION)
                 .withMessage("You may not modify or create metadata of MCRObject " + id + ".")
                 .withDetail(e.getMessage())
@@ -869,7 +869,7 @@ public class MCRRestObjects {
     public Response getState(@PathParam(PARAM_MCRID) MCRObjectID id) {
         //check preconditions
         if (!MCRMetadataManager.exists(id)) {
-            throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND)
                 .withMessage(buildNotFoundMessage(id))
                 .toException();

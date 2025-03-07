@@ -59,8 +59,6 @@ public final class MCRPIManager {
 
     private static final String RESOLVER_CONFIGURATION = "MCR.PI.Resolvers";
 
-    private static MCRPIManager instance;
-
     private final List<MCRPIResolver<MCRPersistentIdentifier>> resolverList;
 
     private final List<Class<? extends MCRPIParser<? extends MCRPersistentIdentifier>>> parserList;
@@ -88,12 +86,8 @@ public final class MCRPIManager {
 
     }
 
-    public static synchronized MCRPIManager getInstance() {
-        if (instance == null) {
-            instance = new MCRPIManager();
-        }
-
-        return instance;
+    public static MCRPIManager getInstance() {
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     @SuppressWarnings("unchecked")
@@ -380,4 +374,9 @@ public final class MCRPIManager {
             .map(Optional::get)
             .map(MCRPersistentIdentifier.class::cast);
     }
+
+    private static final class LazyInstanceHolder {
+        public static final MCRPIManager SINGLETON_INSTANCE = new MCRPIManager();
+    }
+
 }

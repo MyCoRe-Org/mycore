@@ -95,8 +95,6 @@ public final class MCRLDAPClient {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static volatile MCRLDAPClient instance;
-
     /** Base DN */
     private final String baseDN;
 
@@ -147,15 +145,17 @@ public final class MCRLDAPClient {
         ldapEnv.put(Context.SECURITY_CREDENTIALS, securityCredentials);
     }
 
+
+    /**
+     * @deprecated Use {@link #getInstance()} instead
+     */
+    @Deprecated
     public static MCRLDAPClient instance() {
-        if(instance == null) {
-            synchronized (MCRLDAPClient.class) {
-                if(instance == null) {
-                    instance = new MCRLDAPClient();
-                }
-            }
-        }
-        return instance;
+        return getInstance();
+    }
+
+    public static MCRLDAPClient getInstance() {
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     public static void main(String[] args) throws Exception {
@@ -167,7 +167,7 @@ public final class MCRLDAPClient {
         LOGGER.info("\n{}",
             () -> new XMLOutputter(Format.getPrettyFormat())
                 .outputString(MCRUserTransformer.buildExportableSafeXML(user)));
-        instance().updateUserProperties(user);
+        getInstance().updateUserProperties(user);
         LOGGER.info("\n{}",
             () -> new XMLOutputter(Format.getPrettyFormat())
                 .outputString(MCRUserTransformer.buildExportableSafeXML(user)));
@@ -256,6 +256,10 @@ public final class MCRLDAPClient {
             return trimmedName;
         }
         return trimmedName.substring(pos + 1) + ", " + trimmedName.substring(0, pos);
+    }
+
+    private static final class LazyInstanceHolder {
+        public static final MCRLDAPClient SINGLETON_INSTANCE = new MCRLDAPClient();
     }
 
 }

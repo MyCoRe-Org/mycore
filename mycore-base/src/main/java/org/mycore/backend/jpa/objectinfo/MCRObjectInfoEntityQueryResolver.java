@@ -138,7 +138,7 @@ public class MCRObjectInfoEntityQueryResolver implements MCRObjectQueryResolver 
         Root<MCRCategoryImpl> classRoot = categQuery.from(MCRCategoryImpl.class);
         categQuery.select(classRoot);
         List<MCRCategoryID> categoryIDList = query.getIncludeCategories().stream()
-            .map(MCRCategoryID::fromString)
+            .map(MCRCategoryID::ofString)
             .collect(Collectors.toList());
 
         categQuery.where(classRoot.get("id").in(categoryIDList));

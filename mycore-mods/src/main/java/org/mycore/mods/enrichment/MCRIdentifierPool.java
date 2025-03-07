@@ -53,7 +53,7 @@ class MCRIdentifierPool {
 
     /** Add all new identifiers that can be found in the given MODS object */
     synchronized void addIdentifiersFrom(Element object) {
-        for (MCRIdentifierType type : MCRIdentifierTypeFactory.instance().getTypes()) {
+        for (MCRIdentifierType type : MCRIdentifierTypeFactory.getInstance().getTypes()) {
             newIdentifiers.addAll(type.getIdentifiers(object));
         }
         newIdentifiers.removeAll(currentIdentifiers);

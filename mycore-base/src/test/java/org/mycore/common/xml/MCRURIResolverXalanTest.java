@@ -37,13 +37,13 @@ public class MCRURIResolverXalanTest extends MCRTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        MCRURIResolver.reInit();
+        MCRURIResolver.obtainInstance().reinitialize();
     }
 
     @Test
     public void testXalanAvailability() {
 
-        Element resolved = MCRURIResolver.instance().resolve("xslStyle:reflection:buildxml:_rootName_=test");
+        Element resolved = MCRURIResolver.obtainInstance().resolve("xslStyle:reflection:buildxml:_rootName_=test");
         assert resolved != null;
 
         String id = resolved.getAttributeValue("id");
@@ -62,7 +62,7 @@ public class MCRURIResolverXalanTest extends MCRTestCase {
     @After
     public void tearDown() throws Exception {
         super.tearDown();
-        MCRURIResolver.reInit();
+        MCRURIResolver.obtainInstance().reinitialize();
     }
 
 }

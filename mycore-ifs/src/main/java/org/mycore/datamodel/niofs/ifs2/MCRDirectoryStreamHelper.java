@@ -66,7 +66,13 @@ class MCRDirectoryStreamHelper {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    @Deprecated
+    @SuppressWarnings("PMD.SingletonClassReturningNewInstance")
     static DirectoryStream<Path> getInstance(MCRDirectory dir, MCRPath path) throws IOException {
+        return createInstance(dir, path);
+    }
+
+    static DirectoryStream<Path> createInstance(MCRDirectory dir, MCRPath path) throws IOException {
         DirectoryStream.Filter<Path> filter = (dir instanceof MCRFileCollection) ? MCRFileCollectionFilter.FILTER
             : AcceptAllFilter.FILTER;
         LOGGER.debug("Dir {}, class {}, filter {}", () -> path, dir::getClass, filter::getClass);
@@ -149,7 +155,7 @@ class MCRDirectoryStreamHelper {
                 throw new NotDirectoryException(nodeByPath.getPath());
             }
             MCRDirectory newDir = (MCRDirectory) nodeByPath;
-            return (SecureDirectoryStream<Path>) getInstance(newDir, getCurrentSecurePath(newDir));
+            return (SecureDirectoryStream<Path>) createInstance(newDir, getCurrentSecurePath(newDir));
         }
 
         private MCRStoredNode resolve(Path path) {
@@ -314,7 +320,7 @@ class MCRDirectoryStreamHelper {
             if (!(path.getFileSystem() instanceof MCRIFSFileSystem)) {
                 throw new IllegalArgumentException(path + " is not from " + MCRIFSFileSystem.class.getSimpleName());
             }
-            return MCRPath.toMCRPath(path);
+            return MCRPath.ofPath(path);
         }
     }
 
@@ -363,10 +369,10 @@ class MCRDirectoryStreamHelper {
         public MCRFileAttributes readAllAttributes() throws IOException {
             MCRStoredNode node = nodeSupplier.apply(null);
             if (node instanceof MCRFile file) {
-                return MCRDefaultFileAttributes.fromAttributes(baseAttrView.readAttributes(),
+                return MCRDefaultFileAttributes.ofAttributes(baseAttrView.readAttributes(),
                     new MCRMD5Digest(file.getMD5()));
             }
-            return MCRDefaultFileAttributes.fromAttributes(baseAttrView.readAttributes(), null);
+            return MCRDefaultFileAttributes.ofAttributes(baseAttrView.readAttributes(), null);
         }
     }
 }

@@ -71,7 +71,7 @@ public class MCRJSONFileVisitor extends SimpleFileVisitor<Path> {
     }
 
     private String writePathInfo(Path path, BasicFileAttributes attrs) throws IOException {
-        MCRPath mcrPath = MCRPath.toMCRPath(path);
+        MCRPath mcrPath = MCRPath.ofPath(path);
         MCRPath relativePath = mcrPath.getRoot().relativize(mcrPath);
         boolean isRoot = mcrPath.getNameCount() == 0;
         jw.name("type").value(attrs.isDirectory() ? "directory" : "file");

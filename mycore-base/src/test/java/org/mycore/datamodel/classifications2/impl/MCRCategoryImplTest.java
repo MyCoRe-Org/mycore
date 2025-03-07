@@ -51,7 +51,7 @@ public class MCRCategoryImplTest extends MCRTestCase {
      */
     @Test
     public void calculateLeftRightAndLevel() {
-        MCRCategoryImpl rootNode = buildNode(MCRCategoryID.rootID("co1"));
+        MCRCategoryImpl rootNode = buildNode(new MCRCategoryID("co1"));
         final int leftStart = 1;
         final int levelStart = 0;
         assertEquals(2, rootNode.calculateLeftRightAndLevel(leftStart, levelStart));

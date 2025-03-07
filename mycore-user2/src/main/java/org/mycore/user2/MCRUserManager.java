@@ -208,7 +208,7 @@ public class MCRUserManager {
         MCRRoleManager.storeRoleAssignments(user);
         MCREvent evt = new MCREvent(MCREvent.ObjectType.USER, MCREvent.EventType.CREATE);
         evt.put(MCREvent.USER_KEY, user);
-        MCREventManager.instance().handleEvent(evt);
+        MCREventManager.getInstance().handleEvent(evt);
     }
 
     /**
@@ -260,7 +260,7 @@ public class MCRUserManager {
             MCRRoleManager.storeRoleAssignments(user);
             MCREvent evt = new MCREvent(MCREvent.ObjectType.USER, MCREvent.EventType.UPDATE);
             evt.put(MCREvent.USER_KEY, user);
-            MCREventManager.instance().handleEvent(evt);
+            MCREventManager.getInstance().handleEvent(evt);
         });
     }
 
@@ -298,7 +298,7 @@ public class MCRUserManager {
         MCRUser user = getUser(userName, realmId);
         MCREvent evt = new MCREvent(MCREvent.ObjectType.USER, MCREvent.EventType.DELETE);
         evt.put(MCREvent.USER_KEY, user);
-        MCREventManager.instance().handleEvent(evt);
+        MCREventManager.getInstance().handleEvent(evt);
         MCRRoleManager.unassignRoles(user);
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         em.remove(user);
@@ -653,7 +653,7 @@ public class MCRUserManager {
         }
 
         MCRPasswordCheckData hash = new MCRPasswordCheckData(user.getHashType(), user.getSalt(), user.getPassword());
-        MCRPasswordCheckResult result = MCRPasswordCheckManager.instance().verify(hash, password);
+        MCRPasswordCheckResult result = MCRPasswordCheckManager.obtainInstance().verify(hash, password);
 
         if (!result.valid()) {
             waitLoginPenalty();
@@ -696,11 +696,11 @@ public class MCRUserManager {
 
     @Deprecated
     static void updatePasswordHashToSHA256(MCRUser user, String password) {
-        setUserPassword(MCRPasswordCheckManager.instance(), user, password);
+        setUserPassword(MCRPasswordCheckManager.obtainInstance(), user, password);
     }
 
     public static void setUserPassword(MCRUser user, String password) {
-        setUserPassword(MCRPasswordCheckManager.instance(), user, password);
+        setUserPassword(MCRPasswordCheckManager.obtainInstance(), user, password);
     }
 
     private static void setUserPassword(MCRPasswordCheckManager passwordCheckManager, MCRUser user, String password) {

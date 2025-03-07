@@ -43,7 +43,7 @@ public class MCRIView2XSLFunctions {
 
     private static final String METS_NAMESPACE_URI = "http://www.loc.gov/METS/";
 
-    private static final MCRIView2XSLFunctionsAdapter ADAPTER = MCRIView2XSLFunctionsAdapter.getInstance();
+    private static final MCRIView2XSLFunctionsAdapter ADAPTER = MCRIView2XSLFunctionsAdapter.obtainInstance();
 
     public static boolean hasMETSFile(String derivateID) {
         return ADAPTER.hasMETSFile(derivateID);

@@ -68,9 +68,18 @@ public final class MCRErrorResponse {
 
     int status;
 
+
+    /**
+     * @deprecated Use {@link #ofStatusCode(int)} instead
+     */
+    @Deprecated
     public static MCRErrorResponse fromStatus(int status) {
+        return ofStatusCode(status);
+    }
+
+    public static MCRErrorResponse ofStatusCode(int statusCode) {
         final MCRErrorResponse response = new MCRErrorResponse();
-        response.setStatus(status);
+        response.setStatus(statusCode);
         return response;
     }
 

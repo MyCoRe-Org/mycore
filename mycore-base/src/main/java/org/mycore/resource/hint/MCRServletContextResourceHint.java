@@ -35,6 +35,6 @@ public class MCRServletContextResourceHint implements MCRHint<ServletContext> {
 
     @Override
     public Optional<ServletContext> value() {
-        return MCRServletContextHolder.instance().get();
+        return MCRServletContextHolder.getInstance().get();
     }
 }

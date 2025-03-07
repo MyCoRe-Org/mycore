@@ -234,7 +234,7 @@ public class MCRISO8601Date {
      *            a format string that is valid conforming to xsd:duration schema type.
      */
     public void setFormat(String format) {
-        setFormat(MCRISO8601Format.getFormat(format));
+        setFormat(MCRISO8601Format.fromString(format));
     }
 
     private TemporalAccessor getDateTime(final String timeString) {

@@ -64,7 +64,15 @@ public class MCRXSL2XMLTransformer extends MCRXSLTransformer {
         super(stylesheets);
     }
 
+    /**
+     * @deprecated Use {@link #obtainInstance(String...)} instead
+     */
+    @Deprecated
     public static MCRXSL2XMLTransformer getInstance(String... stylesheets) {
+        return obtainInstance(stylesheets);
+    }
+
+    public static MCRXSL2XMLTransformer obtainInstance(String... stylesheets) {
         String key = stylesheets.length == 1 ? stylesheets[0] : Arrays.toString(stylesheets);
         MCRXSL2XMLTransformer instance = INSTANCE_CACHE.get(key);
         if (instance == null) {

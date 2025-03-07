@@ -98,7 +98,7 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
 
         try {
             return Files.walk(derivRoot)
-                .map(MCRPath::toMCRPath)
+                .map(MCRPath::ofPath)
                 .filter(p -> !Files.isDirectory(p))
                 .filter(p -> !p.equals(derivRoot));
         } catch (IOException e) {

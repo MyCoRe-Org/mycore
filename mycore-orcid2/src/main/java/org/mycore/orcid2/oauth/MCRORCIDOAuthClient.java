@@ -62,7 +62,7 @@ public final class MCRORCIDOAuthClient {
      * @return client instance
      */
     public static MCRORCIDOAuthClient getInstance() {
-        return LazyInstanceHelper.INSTANCE;
+        return LazyInstanceHelper.SINGLETON_INSTANCE;
     }
 
     /**
@@ -110,6 +110,6 @@ public final class MCRORCIDOAuthClient {
     }
 
     private static final class LazyInstanceHelper {
-        static final MCRORCIDOAuthClient INSTANCE = new MCRORCIDOAuthClient();
+        static final MCRORCIDOAuthClient SINGLETON_INSTANCE = new MCRORCIDOAuthClient();
     }
 }

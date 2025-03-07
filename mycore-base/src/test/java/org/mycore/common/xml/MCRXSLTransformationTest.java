@@ -46,7 +46,7 @@ public class MCRXSLTransformationTest extends MCRTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        tr = MCRXSLTransformation.getInstance();
+        tr = MCRXSLTransformation.obtainInstance();
         stylesheet = File.createTempFile("test", ".xsl");
         initStylesheet();
     }

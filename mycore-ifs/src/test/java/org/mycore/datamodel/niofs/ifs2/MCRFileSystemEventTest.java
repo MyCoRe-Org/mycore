@@ -70,13 +70,13 @@ public class MCRFileSystemEventTest extends MCRTestCase {
     public void setUp() throws Exception {
         super.setUp();
         register = new EventRegister();
-        MCREventManager.instance().addEventHandler(MCREvent.ObjectType.PATH, register);
+        MCREventManager.getInstance().addEventHandler(MCREvent.ObjectType.PATH, register);
         derivateRoot = Paths.get(URI.create("ifs2:/junit_derivate_00000001:/"));
     }
 
     @Override
     public void tearDown() throws Exception {
-        MCREventManager.instance().removeEventHandler(MCREvent.ObjectType.PATH, register);
+        MCREventManager.getInstance().removeEventHandler(MCREvent.ObjectType.PATH, register);
         register.clear();
         MCRStoreManager.removeStore("IFS2_junit_derivate");
         super.tearDown();
@@ -153,7 +153,7 @@ public class MCRFileSystemEventTest extends MCRTestCase {
         Path dir2 = derivateRoot.resolve("dir2");
         Path file = dir1.resolve("File.txt");
         final MCRAbstractFileSystem fileSystem = (MCRAbstractFileSystem) derivateRoot.getFileSystem();
-        fileSystem.createRoot(MCRPath.toMCRPath(derivateRoot).getOwner());
+        fileSystem.createRoot(MCRPath.ofPath(derivateRoot).getOwner());
         Files.createDirectory(dir1);
         Files.createDirectory(dir2);
         Assert.assertTrue(register.getEntries().isEmpty());

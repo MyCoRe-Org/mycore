@@ -72,7 +72,15 @@ public class MCRDefaultFileAttributes<T> implements MCRFileAttributes<T> {
             lastAccessTime);
     }
 
+    /**
+     * @deprecated Use {@link #ofAttributes(BasicFileAttributes, MCRDigest)} instead
+     */
+    @Deprecated
     public static MCRFileAttributes fromAttributes(BasicFileAttributes attrs, MCRDigest digest) {
+        return ofAttributes(attrs, digest);
+    }
+
+    public static MCRFileAttributes ofAttributes(BasicFileAttributes attrs, MCRDigest digest) {
         return new MCRDefaultFileAttributes<>(FileType.fromAttribute(attrs), attrs.size(), attrs.fileKey(), digest,
             attrs.creationTime(), attrs.lastModifiedTime(), attrs.lastAccessTime());
     }

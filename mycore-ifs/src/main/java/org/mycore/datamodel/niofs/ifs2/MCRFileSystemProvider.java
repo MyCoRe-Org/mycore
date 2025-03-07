@@ -148,7 +148,7 @@ public class MCRFileSystemProvider extends MCRAbstractFileSystemProvider {
         MCRPath mcrPath = MCRFileSystemUtils.checkPathAbsolute(dir);
         MCRStoredNode node = MCRFileSystemUtils.resolvePath(mcrPath);
         if (node instanceof MCRDirectory mcrDirectory) {
-            return MCRDirectoryStreamHelper.getInstance(mcrDirectory, mcrPath);
+            return MCRDirectoryStreamHelper.createInstance(mcrDirectory, mcrPath);
         }
         throw new NotDirectoryException(dir.toString());
     }
@@ -367,7 +367,7 @@ public class MCRFileSystemProvider extends MCRAbstractFileSystemProvider {
     public FileStore getFileStore(Path path) throws IOException {
         MCRPath mcrPath = MCRFileSystemUtils.checkPathAbsolute(path);
         MCRStoredNode node = MCRFileSystemUtils.resolvePath(mcrPath);
-        return MCRFileStore.getInstance(node);
+        return MCRFileStore.obtainInstance(node);
     }
 
     /* (non-Javadoc)
@@ -450,7 +450,7 @@ public class MCRFileSystemProvider extends MCRAbstractFileSystemProvider {
      * @return the MCRIFSFileSystem instance
      */
     public static MCRIFSFileSystem getMCRIFSFileSystem() {
-        return (MCRIFSFileSystem) (fileSystemInstance == null ? MCRAbstractFileSystem.getInstance(SCHEME)
+        return (MCRIFSFileSystem) (fileSystemInstance == null ? MCRAbstractFileSystem.obtainInstance(SCHEME)
                                                               : fileSystemInstance);
     }
 
@@ -459,7 +459,7 @@ public class MCRFileSystemProvider extends MCRAbstractFileSystemProvider {
         protected MCRPath path;
 
         BaseBasicFileAttributeView(Path path) {
-            this.path = MCRPath.toMCRPath(path);
+            this.path = MCRPath.ofPath(path);
             if (!path.isAbsolute()) {
                 throw new InvalidPathException(path.toString(), "'path' must be absolute.");
             }

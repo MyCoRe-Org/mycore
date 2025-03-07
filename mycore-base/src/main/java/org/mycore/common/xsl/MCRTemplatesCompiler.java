@@ -59,7 +59,7 @@ public class MCRTemplatesCompiler {
         }
 
         factory = (SAXTransformerFactory) tf;
-        factory.setURIResolver(MCRURIResolver.instance());
+        factory.setURIResolver(MCRURIResolver.obtainInstance());
         factory.setErrorListener(new ErrorListener() {
             @Override
             public void error(TransformerException ex) {

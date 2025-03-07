@@ -84,7 +84,7 @@ public class MCRURNGranularRESTRegistrationCronjob extends MCRCronjob {
     }
 
     private Function<MCRPIRegistrationInfo, MCRURNJsonBundle> getBundleProvider() {
-        return urn -> MCRURNJsonBundle.instance(urn, MCRDerivateURNUtils.getURL(urn));
+        return urn -> new MCRURNJsonBundle(urn, MCRDerivateURNUtils.getURL(urn));
     }
 
     private Optional<UsernamePasswordCredentials> getUsernamePasswordCredentials() {

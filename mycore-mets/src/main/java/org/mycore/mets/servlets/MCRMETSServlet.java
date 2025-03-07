@@ -82,7 +82,7 @@ public class MCRMETSServlet extends MCRServlet {
             return;
         }
         request.setAttribute("XSL.derivateID", derivate);
-        Collection<String> linkList = MCRLinkTableManager.instance().getSourceOf(derivate);
+        Collection<String> linkList = MCRLinkTableManager.getInstance().getSourceOf(derivate);
         if (linkList.isEmpty()) {
             MCRDerivate derivate2 = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivate));
             MCRObjectID ownerID = derivate2.getOwnerID();
@@ -103,7 +103,7 @@ public class MCRMETSServlet extends MCRServlet {
         MCRFrontendUtil.writeCacheHeaders(response, cacheTime, lastModified, useExpire);
         long start = System.currentTimeMillis();
         MCRContent metsContent = getMetsSource(job, useExistingMets(request), derivate);
-        MCRLayoutService.instance().doLayout(request, response, metsContent);
+        MCRLayoutService.obtainInstance().doLayout(request, response, metsContent);
         LOGGER.info("Generation of code by {} took {} ms",
             () -> this.getClass().getSimpleName(), () -> System.currentTimeMillis() - start);
     }
@@ -116,7 +116,7 @@ public class MCRMETSServlet extends MCRServlet {
 
         try {
             job.getRequest().setAttribute("XSL.derivateID", derivate);
-            String objectid = MCRLinkTableManager.instance().getSourceOf(derivate).iterator().next();
+            String objectid = MCRLinkTableManager.getInstance().getSourceOf(derivate).iterator().next();
 
             if (objectid == null || objectid.length() == 0) {
                 MCRDerivate derObj = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivate));

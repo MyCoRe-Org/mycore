@@ -50,7 +50,7 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 import org.mycore.common.processing.MCRProcessableDefaultCollection;
-import org.mycore.common.processing.MCRProcessableRegistry;
+import org.mycore.common.processing.MCRProcessableManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -99,11 +99,9 @@ public class MCRSolrIndexer {
     private static final int BATCH_AUTO_COMMIT_WITHIN_MS = 60_000;
 
     public static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
-        MCRSolrAuthenticationManager.getInstance();
+        MCRSolrAuthenticationManager.obtainInstance();
 
     static {
-        MCRProcessableRegistry registry = MCRProcessableRegistry.getSingleInstance();
-
         int poolSize = MCRConfiguration2.getInt(SOLR_CONFIG_PREFIX + "Indexer.ThreadCount").orElse(4);
         final ExecutorService threadPool = new ThreadPoolExecutor(poolSize, poolSize, 0L, TimeUnit.MILLISECONDS,
             MCRProcessableFactory.newPriorityBlockingQueue(),
@@ -112,8 +110,7 @@ public class MCRSolrIndexer {
         SOLR_COLLECTION.setProperty("pool size (threads)", poolSize);
         SOLR_COLLECTION.setProperty("bulk size", BULK_SIZE);
         SOLR_COLLECTION.setProperty("commit within (ms)", BATCH_AUTO_COMMIT_WITHIN_MS);
-
-        registry.register(SOLR_COLLECTION);
+        MCRProcessableManager.getInstance().getRegistry().register(SOLR_COLLECTION);
         SOLR_EXECUTOR = MCRProcessableFactory.newPool(threadPool, SOLR_COLLECTION);
 
         int poolSize2 = Math.max(1, poolSize / 2);
@@ -329,7 +326,7 @@ public class MCRSolrIndexer {
      * Rebuilds solr's metadata index.
      */
     public static void rebuildMetadataIndex(List<MCRSolrCore> solrCores) {
-        rebuildMetadataIndex(MCRXMLMetadataManager.instance().listIDs(), solrCores);
+        rebuildMetadataIndex(MCRXMLMetadataManager.getInstance().listIDs(), solrCores);
     }
 
     /**
@@ -339,7 +336,7 @@ public class MCRSolrIndexer {
      *            of the objects to index
      */
     public static void rebuildMetadataIndex(String type, List<MCRSolrCore> solrCores) {
-        List<String> identfiersOfType = MCRXMLMetadataManager.instance().listIDsOfType(type);
+        List<String> identfiersOfType = MCRXMLMetadataManager.getInstance().listIDsOfType(type);
         rebuildMetadataIndex(identfiersOfType, solrCores);
     }
 
@@ -350,7 +347,7 @@ public class MCRSolrIndexer {
      *            of the objects to index
      */
     public static void rebuildMetadataIndexForObjectBase(String base, List<MCRSolrCore> solrCores) {
-        List<String> identfiersOfBase = MCRXMLMetadataManager.instance().listIDsForBase(base);
+        List<String> identfiersOfBase = MCRXMLMetadataManager.getInstance().listIDsForBase(base);
         rebuildMetadataIndex(identfiersOfBase, solrCores);
     }
 
@@ -374,7 +371,7 @@ public class MCRSolrIndexer {
         int totalCount = list.size();
         LOGGER.info("Sending {} objects to solr for reindexing", totalCount);
 
-        MCRXMLMetadataManager metadataMgr = MCRXMLMetadataManager.instance();
+        MCRXMLMetadataManager metadataMgr = MCRXMLMetadataManager.getInstance();
         MCRSolrIndexStatistic statistic = null;
         Map<MCRObjectID, MCRContent> contentMap = new HashMap<>((int) (BULK_SIZE * 1.4));
         int i = 0;
@@ -386,7 +383,7 @@ public class MCRSolrIndexer {
                 MCRContent content = metadataMgr.retrieveContent(objId);
                 contentMap.put(objId, content);
                 if (i % BULK_SIZE == 0 || totalCount == i) {
-                    MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.getInstance()
+                    MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.obtainInstance()
                         .getIndexHandler(contentMap);
                     indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
                     statistic = indexHandler.getStatistic();
@@ -407,7 +404,7 @@ public class MCRSolrIndexer {
      * Rebuilds solr's content index.
      */
     public static void rebuildContentIndex(List<MCRSolrCore> cores) {
-        rebuildContentIndex(MCRXMLMetadataManager.instance().listIDsOfType(MCRDerivate.OBJECT_TYPE), cores);
+        rebuildContentIndex(MCRXMLMetadataManager.getInstance().listIDsOfType(MCRDerivate.OBJECT_TYPE), cores);
     }
 
     /**
@@ -562,7 +559,7 @@ public class MCRSolrIndexer {
      * database. All solr zombie documents will be removed, and all not indexed mycore objects will be indexed.
      */
     public static void synchronizeMetadataIndex(List<MCRSolrCore> client) throws IOException, SolrServerException {
-        Collection<String> objectTypes = MCRXMLMetadataManager.instance().getObjectTypes();
+        Collection<String> objectTypes = MCRXMLMetadataManager.getInstance().getObjectTypes();
         for (String objectType : objectTypes) {
             synchronizeMetadataIndex(client, objectType);
         }
@@ -575,15 +572,15 @@ public class MCRSolrIndexer {
      */
     public static void synchronizeMetadataIndex(List<MCRSolrCore> cores, String objectType)
         throws IOException, SolrServerException {
-        synchronizeMetadataIndex(cores, objectType, () -> MCRXMLMetadataManager.instance().listIDsOfType(objectType),
+        synchronizeMetadataIndex(cores, objectType, () -> MCRXMLMetadataManager.getInstance().listIDsOfType(objectType),
             "objectType:" + objectType);
     }
 
     public static void synchronizeMetadataIndexForObjectBase(List<MCRSolrCore> cores, String objectBase)
         throws IOException, SolrServerException {
         final String solrQuery = "objectType:" + objectBase.split("_")[1] + " _root_:" + objectBase + "_*";
-        synchronizeMetadataIndex(cores, objectBase, () -> MCRXMLMetadataManager.instance().listIDsForBase(objectBase),
-            solrQuery);
+        synchronizeMetadataIndex(cores, objectBase, () -> MCRXMLMetadataManager.getInstance()
+                .listIDsForBase(objectBase), solrQuery);
     }
 
     private static void synchronizeMetadataIndex(List<MCRSolrCore> cores, String synchBase,

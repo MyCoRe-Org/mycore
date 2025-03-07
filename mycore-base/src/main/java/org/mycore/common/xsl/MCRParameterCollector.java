@@ -348,9 +348,20 @@ public class MCRParameterCollector {
         }
     }
 
+    /**
+     * @deprecated Use {@link #ofCurrentSession()} instead
+     */
+    @Deprecated
     public static MCRParameterCollector getInstanceFromUserSession() {
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        MCRServletJob job = (MCRServletJob) mcrSession.get("MCRServletJob");
+        return ofCurrentSession();
+    }
+
+    public static MCRParameterCollector ofCurrentSession() {
+        return ofSession(MCRSessionMgr.getCurrentSession());
+    }
+
+    public static MCRParameterCollector ofSession(MCRSession session) {
+        MCRServletJob job = (MCRServletJob) session.get("MCRServletJob");
         return job == null ? new MCRParameterCollector() : new MCRParameterCollector(job.getRequest());
     }
 

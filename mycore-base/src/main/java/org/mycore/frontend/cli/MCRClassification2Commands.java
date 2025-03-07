@@ -91,7 +91,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         help = "The command remove the classification with MCRObjectID {0} from the system.",
         order = 30)
     public static void delete(String classID) {
-        DAO.deleteCategory(MCRCategoryID.rootID(classID));
+        DAO.deleteCategory(new MCRCategoryID(classID));
     }
 
     /**
@@ -103,7 +103,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         help = "The command count the categories of the classification with MCRObjectID {0} in the system.",
         order = 80)
     public static void countChildren(String classID) {
-        MCRCategory category = DAO.getCategory(MCRCategoryID.rootID(classID), 1);
+        MCRCategory category = DAO.getCategory(new MCRCategoryID(classID), 1);
         LOGGER.info(() -> category.getId() + " has " + category.getChildren().size() + " children");
     }
 
@@ -139,7 +139,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         order = 17)
     public static void loadFromURI(String fileURI)
         throws URISyntaxException, TransformerException, IOException, JDOMException {
-        Document xml = MCRXMLParserFactory.getParser().parseXML(MCRSourceContent.getInstance(fileURI));
+        Document xml = MCRXMLParserFactory.getParser().parseXML(MCRSourceContent.createInstance(fileURI));
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
         DAO.addCategory(null, category);
     }
@@ -181,7 +181,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         order = 27)
     public static void updateFromURI(String fileURI)
         throws URISyntaxException, TransformerException, IOException, JDOMException {
-        Document xml = MCRXMLParserFactory.getParser().parseXML(MCRSourceContent.getInstance(fileURI));
+        Document xml = MCRXMLParserFactory.getParser().parseXML(MCRSourceContent.createInstance(fileURI));
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
         if (DAO.exist(category.getId())) {
             DAO.replaceCategory(category);
@@ -269,7 +269,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             return;
         }
 
-        MCRCategory cl = DAO.getCategory(MCRCategoryID.rootID(id), -1);
+        MCRCategory cl = DAO.getCategory(new MCRCategoryID(id), -1);
         Document classDoc = MCRCategoryTransformer.getMetaDataDocument(cl, false);
 
         Transformer trans = getTransformer(style != null ? style + "-classification" : null);
@@ -342,7 +342,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         help = "The command list the classification with MCRObjectID {0}.",
         order = 90)
     public static void listClassification(String classid) {
-        MCRCategoryID clid = MCRCategoryID.rootID(classid);
+        MCRCategoryID clid = new MCRCategoryID(classid);
         MCRCategory cl = DAO.getCategory(clid, -1);
         LOGGER.info(classid);
         if (cl != null) {
@@ -508,7 +508,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         checkEmptyLabels(id, log);
         if (log.isEmpty()) {
             MCRCategoryImpl category = (MCRCategoryImpl) MCRCategoryDAOFactory.getInstance().getCategory(
-                MCRCategoryID.rootID(id), -1);
+                new MCRCategoryID(id), -1);
             LOGGER.info("{}: checking left, right and level values and for non-null children", id);
             checkLeftRightAndLevel(category, 0, 0, log);
         }

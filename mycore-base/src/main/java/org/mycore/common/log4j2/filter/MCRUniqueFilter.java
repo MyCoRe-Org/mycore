@@ -85,7 +85,7 @@ public final class MCRUniqueFilter extends AbstractFilter {
     }
 
     @PluginFactory
-    public static MCRUniqueFilter createFilter(
+    public static MCRUniqueFilter createInstance(
         @PluginAttribute(value = "cacheSizePerFormat", defaultInt = 1000) int cacheSizePerFormat,
         @PluginAttribute("onMatch") Result match, @PluginAttribute("onMismatch") Result mismatch) {
         Result onMatch = match == null ? Result.DENY : match;

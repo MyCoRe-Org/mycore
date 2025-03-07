@@ -40,7 +40,7 @@ public class MCRNeo4JParserTest extends AbstractNeo4JParserTest {
 
     @Test
     public void testParseMCRObject() throws Exception {
-        MCRLanguageFactory.instance().getLanguage("xx");
+        MCRLanguageFactory.obtainInstance().getLanguage("xx");
         MCRConfiguration2.set("MCR.Metadata.Type.work", "true");
         MCRConfiguration2.set("MCR.Metadata.Type.manuscript", "true");
 

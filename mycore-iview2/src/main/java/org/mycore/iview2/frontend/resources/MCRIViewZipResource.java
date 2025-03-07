@@ -103,7 +103,7 @@ public class MCRIViewZipResource {
                         throws IOException {
                         Objects.requireNonNull(file);
                         Objects.requireNonNull(attrs);
-                        MCRPath mcrPath = MCRPath.toMCRPath(file);
+                        MCRPath mcrPath = MCRPath.ofPath(file);
                         if (MCRIView2Tools.isFileSupported(file)) {
                             java.nio.file.Path iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(),
                                 mcrPath.getOwner(), mcrPath.getOwnerRelativePath());

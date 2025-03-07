@@ -23,27 +23,22 @@ import com.google.gson.GsonBuilder;
 
 public final class MCRJSONManager {
 
-    private final GsonBuilder gsonBuilder;
-
-    private static volatile MCRJSONManager instance;
-
-    private MCRJSONManager() {
-        gsonBuilder = new GsonBuilder();
-    }
+    private final GsonBuilder gsonBuilder = new GsonBuilder();
 
     public void registerAdapter(MCRJSONTypeAdapter<?> typeAdapter) {
         gsonBuilder.registerTypeAdapter(typeAdapter.bindTo(), typeAdapter);
     }
 
+    /**
+     * @deprecated Use {@link #obtainInstance()} instead
+     */
+    @Deprecated
     public static MCRJSONManager instance() {
-        if (instance == null) {
-            synchronized (MCRJSONManager.class) {
-                if (instance == null) {
-                    instance = new MCRJSONManager();
-                }
-            }
-        }
-        return instance;
+        return obtainInstance();
+    }
+
+    public static MCRJSONManager obtainInstance() {
+        return LazyInstanceHolder.SHARED_INSTANCE;
     }
 
     public GsonBuilder getGsonBuilder() {
@@ -52,6 +47,10 @@ public final class MCRJSONManager {
 
     public Gson createGson() {
         return gsonBuilder.create();
+    }
+
+    private static final class LazyInstanceHolder {
+        public static final MCRJSONManager SHARED_INSTANCE = new MCRJSONManager();
     }
 
 }

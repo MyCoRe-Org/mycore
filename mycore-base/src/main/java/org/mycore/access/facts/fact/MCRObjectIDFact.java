@@ -49,7 +49,7 @@ public class MCRObjectIDFact extends MCRAbstractFact<MCRObjectID> {
         if (objectID == null) {
             return Optional.empty();
         }
-        return Optional.ofNullable(MCRObjectCacheFactory.instance().getObject(objectID));
+        return Optional.ofNullable(MCRObjectCacheFactory.getInstance().getObject(objectID));
     }
 
 }

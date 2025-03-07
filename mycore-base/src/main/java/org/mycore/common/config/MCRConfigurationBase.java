@@ -161,9 +161,9 @@ public final class MCRConfigurationBase {
      * Substitute all %properties%.
      */
     private static synchronized void resolveProperties() {
-        MCRProperties tmpProperties = MCRProperties.copy(getBaseProperties());
+        MCRProperties tmpProperties = MCRProperties.ofProperties(getBaseProperties());
         MCRPropertiesResolver resolver = new MCRPropertiesResolver(tmpProperties);
-        resolvedProperties = MCRProperties.copy(resolver.resolveAll(tmpProperties));
+        resolvedProperties = MCRProperties.ofProperties(resolver.resolveAll(tmpProperties));
     }
 
     private static void checkForDeprecatedProperties(Map<String, String> props) {

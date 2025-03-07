@@ -41,8 +41,6 @@ public final class MCRStalledJobResetter implements Runnable {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static volatile MCRStalledJobResetter instance;
-
     private static final int MAX_TIME_DIFF = Integer.parseInt(MCRIView2Tools.getIView2Property("TimeTillReset"));
 
     private static final int MAX_RESET_COUNT = Integer.parseInt(MCRIView2Tools.getIView2Property("MaxResetCount"));
@@ -54,14 +52,7 @@ public final class MCRStalledJobResetter implements Runnable {
     }
 
     public static MCRStalledJobResetter getInstance() {
-        if(instance == null) {
-            synchronized (MCRStalledJobResetter.class) {
-                if(instance == null) {
-                    instance = new MCRStalledJobResetter();
-                }
-            }
-        }
-        return instance;
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     /**
@@ -134,4 +125,9 @@ public final class MCRStalledJobResetter implements Runnable {
         jobCounter.put(job.getId(), runs);
         return false;
     }
+
+    private static final class LazyInstanceHolder {
+        public static final MCRStalledJobResetter SINGLETON_INSTANCE = new MCRStalledJobResetter();
+    }
+
 }

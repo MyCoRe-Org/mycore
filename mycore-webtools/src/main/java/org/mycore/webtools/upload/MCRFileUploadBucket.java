@@ -104,7 +104,7 @@ public final class MCRFileUploadBucket implements MCRSessionListener, MCRShutdow
             final MCRFileUploadBucket bucket = BUCKET_MAP.get(bucketID);
             if (Files.exists(bucket.root)) {
                 try {
-                    Files.walkFileTree(bucket.root, MCRRecursiveDeleter.instance());
+                    Files.walkFileTree(bucket.root, new MCRRecursiveDeleter());
                 } catch (IOException e) {
                     throw new MCRUploadServerException("component.webtools.upload.temp.delete.failed", e);
                 }

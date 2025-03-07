@@ -226,7 +226,7 @@ public class MCRRestAPIObjectsHelper {
         throws IOException {
         StringWriter sw = new StringWriter();
         MCRPath root = MCRPath.getPath(derObj.getId().toString(), "/");
-        root = MCRPath.toMCRPath(root.resolve(path));
+        root = MCRPath.ofPath(root.resolve(path));
         int finalDepth = (depth != -1) ? depth : Integer.MAX_VALUE;
 
         if (root != null) {
@@ -244,7 +244,7 @@ public class MCRRestAPIObjectsHelper {
         Document doc = new Document();
 
         MCRPath root = MCRPath.getPath(derObj.getId().toString(), "/");
-        root = MCRPath.toMCRPath(root.resolve(path));
+        root = MCRPath.ofPath(root.resolve(path));
         int finalDepth = (depth != -1) ? depth : Integer.MAX_VALUE;
 
         if (root != null) {
@@ -377,17 +377,17 @@ public class MCRRestAPIObjectsHelper {
         Set<String> mcrIDs = new HashSet<>();
         if (params.projectIDs.isEmpty()) {
             if (params.typeIDs.isEmpty()) {
-                mcrIDs = MCRXMLMetadataManager.instance().listIDs().stream().filter(id -> !id.contains("_derivate_"))
+                mcrIDs = MCRXMLMetadataManager.getInstance().listIDs().stream().filter(id -> !id.contains("_derivate_"))
                     .collect(Collectors.toSet());
             } else {
                 for (String type : params.typeIDs) {
-                    mcrIDs.addAll(MCRXMLMetadataManager.instance().listIDsOfType(type));
+                    mcrIDs.addAll(MCRXMLMetadataManager.getInstance().listIDsOfType(type));
                 }
             }
         } else {
             for (String project : params.projectIDs) {
                 for (String type : params.typeIDs) {
-                    mcrIDs.addAll(MCRXMLMetadataManager.instance().listIDsForBase(project + "_" + type));
+                    mcrIDs.addAll(MCRXMLMetadataManager.getInstance().listIDsForBase(project + "_" + type));
                 }
             }
         }
@@ -398,7 +398,7 @@ public class MCRRestAPIObjectsHelper {
         throws MCRRestAPIException {
         List<MCRObjectIDDate> objIdDates;
         try {
-            objIdDates = MCRXMLMetadataManager.instance().retrieveObjectDates(new ArrayList<>(mcrIDs));
+            objIdDates = MCRXMLMetadataManager.getInstance().retrieveObjectDates(new ArrayList<>(mcrIDs));
         } catch (IOException e) {
             MCRRestAPIException restAPIException = new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR,
                 new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, GENERAL_ERROR_MSG, e.getMessage()));
@@ -492,7 +492,7 @@ public class MCRRestAPIObjectsHelper {
 
             {
                 try {
-                    lastModified = MCRXMLMetadataManager.instance().getLastModified(id);
+                    lastModified = MCRXMLMetadataManager.getInstance().getLastModified(id);
                 } catch (IOException e) {
                     lastModified = 0;
                     LOGGER.error("Exception while getting last modified of {}", id, e);

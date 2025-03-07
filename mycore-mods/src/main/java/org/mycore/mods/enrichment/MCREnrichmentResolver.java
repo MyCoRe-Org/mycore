@@ -52,7 +52,7 @@ public class MCREnrichmentResolver implements URIResolver {
         String configID = hrefSub.substring(0, hrefSub.indexOf(':'));
 
         hrefSub = hrefSub.substring(hrefSub.indexOf(':') + 1);
-        Element mods = MCRURIResolver.instance().resolve(hrefSub);
+        Element mods = MCRURIResolver.obtainInstance().resolve(hrefSub);
 
         enrichPublication(mods, configID);
         return new JDOMSource(mods);

@@ -40,7 +40,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
      */
     @Override
     protected final void handleObjectCreated(MCREvent evt, MCRObject obj) {
-        MCRLinkTableManager.instance().create(obj);
+        MCRLinkTableManager.getInstance().create(obj);
     }
 
     /**
@@ -66,7 +66,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
      */
     @Override
     protected final void handleObjectDeleted(MCREvent evt, MCRObject obj) {
-        MCRLinkTableManager.instance().delete(obj.getId());
+        MCRLinkTableManager.getInstance().delete(obj.getId());
     }
 
     /**
@@ -79,17 +79,17 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
      */
     @Override
     protected final void handleObjectRepaired(MCREvent evt, MCRObject obj) {
-        MCRLinkTableManager.instance().update(obj);
+        MCRLinkTableManager.getInstance().update(obj);
     }
 
     @Override
     protected void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
-        MCRLinkTableManager.instance().create(der);
+        MCRLinkTableManager.getInstance().create(der);
     }
 
     @Override
     protected void handleDerivateRepaired(MCREvent evt, MCRDerivate der) {
-        MCRLinkTableManager.instance().update(der);
+        MCRLinkTableManager.getInstance().update(der);
     }
 
     @Override
@@ -99,6 +99,6 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleDerivateDeleted(MCREvent evt, MCRDerivate der) {
-        MCRLinkTableManager.instance().delete(der.getId());
+        MCRLinkTableManager.getInstance().delete(der.getId());
     }
 }

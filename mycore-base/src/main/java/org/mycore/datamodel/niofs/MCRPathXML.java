@@ -122,9 +122,9 @@ public final class MCRPathXML {
                     throw ignoredUnchecked.getCause();
                 }
                 if (childAttrs.isDirectory()) {
-                    directories.put(MCRPath.toMCRPath(child), childAttrs);
+                    directories.put(MCRPath.ofPath(child), childAttrs);
                 } else {
-                    files.put(MCRPath.toMCRPath(child), childAttrs);
+                    files.put(MCRPath.ofPath(child), childAttrs);
                 }
             }
         }

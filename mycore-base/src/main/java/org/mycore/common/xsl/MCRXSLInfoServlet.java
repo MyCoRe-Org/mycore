@@ -283,7 +283,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
 
         private void resolveXSL(String uri) {
             try {
-                xsl = MCRURIResolver.instance().resolve(uri);
+                xsl = MCRURIResolver.obtainInstance().resolve(uri);
             } catch (Exception ex) {
                 String msg = "Exception resolving stylesheet " + name;
                 LOGGER.warn(msg, ex);

@@ -194,7 +194,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         LOGGER.debug("incoming acceptFile request: {} {} {} bytes", path, checksum, length);
         boolean shouldAcceptFile = true;
         if (rootDir != null) {
-            MCRPath child = MCRPath.toMCRPath(rootDir.resolve(path));
+            MCRPath child = MCRPath.ofPath(rootDir.resolve(path));
             if (Files.isRegularFile(child)) {
                 @SuppressWarnings("rawtypes")
                 MCRFileAttributes attrs = Files.readAttributes(child, MCRFileAttributes.class);
@@ -270,7 +270,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     }
 
     private MCRPath getFile(String path) throws IOException {
-        MCRPath pathToFile = MCRPath.toMCRPath(rootDir.resolve(path));
+        MCRPath pathToFile = MCRPath.ofPath(rootDir.resolve(path));
         MCRPath parentDirectory = pathToFile.getParent();
         if (!Files.isDirectory(parentDirectory)) {
             Files.createDirectories(parentDirectory);

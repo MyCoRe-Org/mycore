@@ -69,7 +69,7 @@ public class MCRClassificationUtils {
      * @return the classification as jdom document
      */
     public static Document asDocument(String classId) {
-        MCRCategoryID categoryId = MCRCategoryID.rootID(classId);
+        MCRCategoryID categoryId = new MCRCategoryID(classId);
         MCRCategory classification = MCRCategoryDAOFactory.getInstance().getRootCategory(categoryId, -1);
         if (classification == null) {
             return null;

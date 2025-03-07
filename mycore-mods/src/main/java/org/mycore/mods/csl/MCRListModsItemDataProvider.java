@@ -58,7 +58,7 @@ public class MCRListModsItemDataProvider extends MCRItemDataProvider {
             Element copy = object.clone().detach();
             String objectID = copy.getAttributeValue(MCRXMLConstants.ID);
             MCRObjectID mcrObjectID = MCRObjectID.getInstance(objectID);
-            CSLItemData itemData = cslCache.getIfUpToDate(objectID, MCRXMLMetadataManager.instance()
+            CSLItemData itemData = cslCache.getIfUpToDate(objectID, MCRXMLMetadataManager.getInstance()
                 .getLastModified(mcrObjectID));
             if (itemData == null) {
                 MCRModsItemDataProvider midp = new MCRModsItemDataProvider();

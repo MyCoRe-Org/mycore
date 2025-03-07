@@ -76,7 +76,7 @@ public class MCRMetsResolver implements URIResolver {
     }
 
     private String getDerivateFromObject(String id) {
-        Collection<String> derivates = MCRLinkTableManager.instance().getDestinationOf(id, "derivate");
+        Collection<String> derivates = MCRLinkTableManager.getInstance().getDestinationOf(id, "derivate");
         for (String derID : derivates) {
             if (MCRAccessManager.checkDerivateDisplayPermission(derID)) {
                 return derID;

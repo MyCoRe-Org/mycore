@@ -206,7 +206,7 @@ public class MCROAISetManager {
                 Map<String, MCRSet> setMap = handler.getSetMap();
                 synchronized (setMap) {
                     setMap.clear();
-                    Element resolved = MCRURIResolver.instance().resolve(conf.getURI());
+                    Element resolved = MCRURIResolver.obtainInstance().resolve(conf.getURI());
                     if (resolved == null) {
                         throw new MCRException(
                             "Could not resolve set URI " + conf.getURI() + " for set " + conf.getId() + ".");

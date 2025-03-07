@@ -43,7 +43,7 @@ import com.google.common.collect.Lists;
 public class MCRCombinedResourceBundleControl extends Control {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private Locale defaultLocale = MCRLanguageFactory.instance().getDefaultLanguage().getLocale();
+    private Locale defaultLocale = MCRLanguageFactory.obtainInstance().getDefaultLanguage().getLocale();
 
     private static final ResourceBundle.Control CONTROL_HELPER = new ResourceBundle.Control() {
     };

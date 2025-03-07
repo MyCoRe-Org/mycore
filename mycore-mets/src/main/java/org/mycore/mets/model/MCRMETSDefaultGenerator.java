@@ -215,7 +215,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
         SortedMap<MCRPath, BasicFileAttributes> directories, Path dir) throws IOException {
         try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(dir)) {
             for (Path child : dirStream) {
-                MCRPath path = MCRPath.toMCRPath(child);
+                MCRPath path = MCRPath.ofPath(child);
                 if (ignoreNodes.contains(path)) {
                     continue;
                 }

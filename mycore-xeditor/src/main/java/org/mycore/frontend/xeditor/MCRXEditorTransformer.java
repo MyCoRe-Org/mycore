@@ -292,7 +292,7 @@ public class MCRXEditorTransformer {
     }
 
     public void loadResource(String uri, String name) {
-        Element resource = MCRURIResolver.instance().resolve(uri);
+        Element resource = MCRURIResolver.obtainInstance().resolve(uri);
         editorSession.getVariables().put(name, resource);
     }
 

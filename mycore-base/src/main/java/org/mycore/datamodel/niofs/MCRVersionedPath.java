@@ -50,7 +50,7 @@ public abstract class MCRVersionedPath extends MCRPath {
 
     public static MCRVersionedPath getPath(String owner, String version, String path) {
         Path resolved = MCRPaths.getVersionedPath(owner, version, path);
-        return toVersionedPath(resolved);
+        return ofPath(resolved);
     }
 
     public static MCRVersionedPath head(String owner, String path) {
@@ -79,27 +79,27 @@ public abstract class MCRVersionedPath extends MCRPath {
     @Override
     public MCRVersionedPath getParent() {
         MCRPath parent = super.getParent();
-        return parent != null ? toVersionedPath(parent) : null;
+        return parent != null ? ofPath(parent) : null;
     }
 
     @Override
     public MCRVersionedPath subpath(int beginIndex, int endIndex) {
-        return toVersionedPath(super.subpath(beginIndex, endIndex));
+        return ofPath(super.subpath(beginIndex, endIndex));
     }
 
     @Override
     public MCRVersionedPath subpathComplete() {
-        return toVersionedPath(super.subpathComplete());
+        return ofPath(super.subpathComplete());
     }
 
     @Override
     public MCRVersionedPath getName(int index) {
-        return toVersionedPath(super.getName(index));
+        return ofPath(super.getName(index));
     }
 
     @Override
     protected MCRVersionedPath getPath(String owner, String path, MCRAbstractFileSystem fs) {
-        return toVersionedPath(super.getPath(owner, path, fs));
+        return ofPath(super.getPath(owner, path, fs));
     }
 
     public String toRelativePath() {
@@ -180,13 +180,21 @@ public abstract class MCRVersionedPath extends MCRPath {
     }
 
     /**
+     * @deprecated Use {@link #ofPath(Path)} instead
+     */
+    @Deprecated
+    public static MCRVersionedPath toVersionedPath(final Path other) {
+        return ofPath(other);
+    }
+
+    /**
      * Cast the other path to a {@link MCRVersionedPath}, ensuring that the path is not null.
      *
      * @param other The path to convert.
      * @return The converted versioned path.
      * @throws ProviderMismatchException If the path is not an instance of {@link MCRVersionedPath}.
      */
-    public static MCRVersionedPath toVersionedPath(final Path other) {
+    public static MCRVersionedPath ofPath(final Path other) {
         Objects.requireNonNull(other);
         if (!(other instanceof MCRVersionedPath)) {
             throw new ProviderMismatchException("other is not an instance of MCRVersionedPath: " + other.getClass());
