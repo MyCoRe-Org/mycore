@@ -16,14 +16,8 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export interface AppConfig {
-  baseUrl: string;
-  currentLang: string;
-}
-
-export interface AccessKeyConfig {
-  allowedAccessKeySessionPermissions: string[];
-}
+import { AppConfig } from 'mcr-vue-components';
+import { AccessKeyConfig } from 'vue-access-key-manager';
 
 interface RawConfig {
   webApplicationBaseURL: string;

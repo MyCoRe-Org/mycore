@@ -19,5 +19,5 @@
     "noImplicitReturns": true,
     "typeRoots": ["node_modules/@types", "src/types"]
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "../../../../../../vue-components/src/views/Error401View.vue", "../../../../../../vue-components/src/views/Error403View.vue"]
 }
