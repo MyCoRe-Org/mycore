@@ -38,7 +38,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class MCRLanguageDetector {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRLanguageDetector.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final Properties WORDS = new Properties();
 

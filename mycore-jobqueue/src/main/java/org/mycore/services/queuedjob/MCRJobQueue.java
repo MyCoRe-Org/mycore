@@ -40,7 +40,7 @@ import org.mycore.common.MCRException;
  * @author Sebastian Hofmann
  */
 public class MCRJobQueue extends AbstractQueue<MCRJob> implements EventListener {
-    private static final Logger LOGGER = LogManager.getLogger(MCRJobQueue.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final Class<? extends MCRJobAction> action;
 

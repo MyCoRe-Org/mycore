@@ -90,7 +90,7 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
 
     private static final Pattern PATH_INFO_PATTERN = Pattern.compile("\\A([\\w]+)/([\\w/]+)\\z");
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRCompressServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     protected void think(MCRServletJob job) throws Exception {

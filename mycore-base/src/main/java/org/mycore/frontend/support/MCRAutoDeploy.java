@@ -50,7 +50,7 @@ import jakarta.servlet.ServletRegistration;
  */
 public class MCRAutoDeploy implements MCRStartupHandler.AutoExecutable {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRAutoDeploy.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String HANDLER_NAME = MCRAutoDeploy.class.getName();
 

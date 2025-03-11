@@ -49,7 +49,7 @@ import org.mycore.frontend.xeditor.validation.MCRXEditorValidator;
  */
 public class MCREditorSession {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCREditorSession.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final Pattern PATTERN_URI = Pattern.compile("\\{\\$([^\\}]+)\\}");
 

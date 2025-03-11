@@ -42,7 +42,7 @@ import com.google.gson.JsonSerializationContext;
 
 public class MCRLabelSetTypeAdapter extends MCRJSONTypeAdapter<MCRLabelSetWrapper> {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRLabelSetTypeAdapter.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public JsonElement serialize(MCRLabelSetWrapper labelSetWrapper, Type typeOfSrc, JsonSerializationContext context) {

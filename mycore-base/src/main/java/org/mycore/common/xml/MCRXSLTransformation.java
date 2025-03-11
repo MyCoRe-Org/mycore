@@ -81,7 +81,7 @@ import org.jdom2.transform.JDOMSource;
  */
 @Deprecated
 public class MCRXSLTransformation {
-    private static final Logger LOGGER = LogManager.getLogger(MCRXSLTransformation.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static SAXTransformerFactory saxFactory;
 

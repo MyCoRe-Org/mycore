@@ -40,8 +40,7 @@ import org.mycore.datamodel.metadata.MCRObject;
  */
 public class MCRAccessEventHandler extends MCREventHandlerBase {
 
-    // the logger
-    private static final Logger LOGGER = LogManager.getLogger(MCRAccessEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCRRuleAccessInterface AI = MCRAccessManager.getAccessImpl();
 

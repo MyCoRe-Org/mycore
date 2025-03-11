@@ -51,7 +51,7 @@ import jakarta.ws.rs.WebApplicationException;
  */
 public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRWCMSDefaultSectionProvider.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final List<String> HTML_TAG_LIST = Arrays.asList("a", "abbr", "acronym", "address", "applet", "area",
         "article", "aside", "audio", "b", "base", "basefont", "bdi", "bdo", "big", "blockquote", "body", "br", "button",

@@ -31,7 +31,7 @@ import jakarta.servlet.ServletContext;
  *
  */
 public class MCRIView2TilingThreadStarter implements MCRStartupHandler.AutoExecutable {
-    private static final Logger LOGGER = LogManager.getLogger(MCRIView2TilingThreadStarter.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public String getName() {

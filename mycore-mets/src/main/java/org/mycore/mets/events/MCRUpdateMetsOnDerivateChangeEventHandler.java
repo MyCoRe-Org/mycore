@@ -40,7 +40,7 @@ import org.mycore.mets.tools.MCRMetsSave;
  * @author shermann
  */
 public class MCRUpdateMetsOnDerivateChangeEventHandler extends MCREventHandlerBase {
-    private static final Logger LOGGER = LogManager.getLogger(MCRUpdateMetsOnDerivateChangeEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private String mets = MCRMetsSave.getMetsFileName();
 

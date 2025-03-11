@@ -46,7 +46,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author Sebastian Hofmann (mcrshofm)
  */
 public class MCRSwordCollectionManager implements CollectionListManager, CollectionDepositManager {
-    private static final Logger LOGGER = LogManager.getLogger(MCRSwordCollectionManager.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public Feed listCollectionContents(IRI collectionIRI, AuthCredentials authCredentials, SwordConfiguration config)

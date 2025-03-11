@@ -32,7 +32,7 @@ import jakarta.ws.rs.container.ContainerRequestContext;
  */
 public class MCRNewClassificationPermission implements MCRResourceAccessChecker {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRNewClassificationPermission.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /* (non-Javadoc)
      * @see org.mycore.frontend.jersey.filter.access.MCRResourceAccessChecker

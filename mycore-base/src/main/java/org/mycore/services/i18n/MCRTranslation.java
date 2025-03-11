@@ -65,7 +65,7 @@ public class MCRTranslation {
 
     private static final String DEPRECATED_MESSAGES_PROPERTIES = "/deprecated-messages.properties";
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRTranslation.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final Pattern ARRAY_DETECTOR = Pattern.compile(";");
 

@@ -57,7 +57,7 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRUploadViaFormServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public void doGetPost(MCRServletJob job) throws Exception {

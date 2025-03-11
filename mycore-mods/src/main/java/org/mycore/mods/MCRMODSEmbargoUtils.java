@@ -49,7 +49,7 @@ public class MCRMODSEmbargoUtils {
 
     public static final String POOLPRIVILEGE_EMBARGO = "embargo";
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRMODSEmbargoUtils.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String EMPTY_VALUE = "";
 

@@ -68,7 +68,7 @@ import jakarta.persistence.EntityTransaction;
  */
 public final class MCRUploadHelper {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRUploadHelper.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final Pattern PATH_SEPERATOR = Pattern.compile(Pattern.quote(File.separator.replace('\\', '/')));
 

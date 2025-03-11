@@ -46,7 +46,7 @@ import org.mycore.datamodel.common.MCRISO8601Format;
  */
 public class MCRMetaISO8601DateTest extends MCRTestCase {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRMetaISO8601DateTest.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /*
      * Test method for

@@ -69,7 +69,7 @@ public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
 
     private static MCRCategLinkServiceImpl SERVICE;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRCategLinkServiceImplTest.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     @Before

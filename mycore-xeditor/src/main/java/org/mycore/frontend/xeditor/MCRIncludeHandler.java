@@ -63,7 +63,7 @@ public class MCRIncludeHandler {
 
     private static final String ATTR_REF = "ref";
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRIncludeHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** Caches preloaded components at application level: resolved only once, used many times (static) */
     private static final Map<String, Element> CACHE_AT_APPLICATION_LEVEL = new ConcurrentHashMap<>();

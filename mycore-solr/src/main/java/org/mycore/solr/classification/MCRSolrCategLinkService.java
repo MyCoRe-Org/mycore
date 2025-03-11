@@ -46,7 +46,7 @@ import org.mycore.solr.auth.MCRSolrAuthenticationManager;
  */
 public class MCRSolrCategLinkService extends MCRCategLinkServiceImpl {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRSolrCategLinkService.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public void setLinks(MCRCategLinkReference objectReference, Collection<MCRCategoryID> categories) {

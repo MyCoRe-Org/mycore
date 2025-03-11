@@ -32,7 +32,7 @@ public class TestProperties extends Properties {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = LogManager.getLogger(TestProperties.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static TestProperties singleton;
 

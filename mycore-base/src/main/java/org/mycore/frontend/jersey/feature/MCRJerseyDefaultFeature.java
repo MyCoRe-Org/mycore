@@ -41,7 +41,7 @@ import jakarta.ws.rs.ext.Provider;
 @Provider
 public class MCRJerseyDefaultFeature extends MCRJerseyBaseFeature {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRJerseyDefaultFeature.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public void configure(ResourceInfo resourceInfo, FeatureContext context) {

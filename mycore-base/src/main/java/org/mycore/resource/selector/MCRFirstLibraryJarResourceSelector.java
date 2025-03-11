@@ -42,11 +42,11 @@ public class MCRFirstLibraryJarResourceSelector extends MCRResourceSelectorBase 
     @Override
     protected List<URL> doSelect(List<URL> resourceUrls, MCRHints hints) {
         for (String library : librariesByServletContextOrder(hints)) {
-            getLogger().debug("Comparing library {} ...", library);
+            logger.debug("Comparing library {} ...", library);
             for (URL resourceUrl : resourceUrls) {
-                getLogger().debug(" ... with resource URL {}", resourceUrl);
+                logger.debug(" ... with resource URL {}", resourceUrl);
                 if (resourceUrl.toString().contains(library)) {
-                    getLogger().debug("Found match, using library {}", library);
+                    logger.debug("Found match, using library {}", library);
                     return Collections.singletonList(resourceUrl);
                 }
             }

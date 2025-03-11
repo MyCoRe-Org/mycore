@@ -43,7 +43,7 @@ import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
  */
 public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRSolrInputDocumentHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
     private final String id;
 
     Supplier<SolrInputDocument> documentSupplier;

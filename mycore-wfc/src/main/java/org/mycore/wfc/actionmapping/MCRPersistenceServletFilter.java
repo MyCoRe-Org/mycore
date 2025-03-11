@@ -41,7 +41,7 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 public class MCRPersistenceServletFilter implements Filter {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRPersistenceServletFilter.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)

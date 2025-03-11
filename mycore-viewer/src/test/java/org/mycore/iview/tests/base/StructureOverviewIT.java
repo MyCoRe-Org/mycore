@@ -56,7 +56,7 @@ public class StructureOverviewIT extends ViewerTestBase {
 
     private static final int TOLERANCE = 20;
 
-    private static final Logger LOGGER = LogManager.getLogger(StructureOverviewIT.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Test
     /**

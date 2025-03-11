@@ -51,7 +51,7 @@ public class MCRFileCollection extends MCRDirectory {
     /**
      * The logger
      */
-    private static final Logger LOGGER = LogManager.getLogger(MCRFileCollection.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static final String DATA_FILE = "mcrdata.xml";
 

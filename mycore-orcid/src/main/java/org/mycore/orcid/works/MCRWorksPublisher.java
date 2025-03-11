@@ -51,7 +51,7 @@ import jakarta.ws.rs.core.Response.StatusType;
  */
 public class MCRWorksPublisher {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRWorksPublisher.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** Transformer used to transform a MyCoRe object with MODS to ORCID's work XML schema */
     private static final MCRContentTransformer T_MCR2WORK = MCRContentTransformerFactory.getTransformer("MyCoRe2Work");

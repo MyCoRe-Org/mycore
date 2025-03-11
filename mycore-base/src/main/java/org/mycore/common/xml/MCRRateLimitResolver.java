@@ -44,7 +44,7 @@ public class MCRRateLimitResolver implements URIResolver {
 
     private static final String CONFIG_PREFIX = "MCR.RateLimitResolver.";
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRRateLimitResolver.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * Expects a configuration of the rate limit of a specific configID. Checks if

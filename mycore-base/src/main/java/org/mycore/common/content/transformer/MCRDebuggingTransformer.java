@@ -32,7 +32,7 @@ import org.mycore.common.content.MCRContent;
  */
 public class MCRDebuggingTransformer extends MCRContentTransformer {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRDebuggingTransformer.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public MCRContent transform(MCRContent source) throws IOException {

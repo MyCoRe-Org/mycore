@@ -41,8 +41,8 @@ import jakarta.persistence.TypedQuery;
  * @author Jens Kupferschmidt
  */
 public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
-    // logger
-    private static final Logger LOGGER = LogManager.getLogger(MCRHIBLinkTableStore.class);
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private String classname = MCRLINKHREF.class.getCanonicalName();
 

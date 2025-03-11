@@ -47,7 +47,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRSwordMediaManager implements MediaResourceManager {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRSwordMediaManager.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static MCRSwordMediaHandler getMediaProvider(String collection) {
         return MCRSword.getCollection(collection).getMediaHandler();

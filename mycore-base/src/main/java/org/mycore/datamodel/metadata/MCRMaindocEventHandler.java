@@ -39,7 +39,7 @@ import org.mycore.datamodel.niofs.MCRPath;
  *
  */
 public class MCRMaindocEventHandler extends MCREventHandlerBase {
-    private static final Logger LOGGER = LogManager.getLogger(MCRMaindocEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     protected void handlePathDeleted(MCREvent evt, Path path, BasicFileAttributes attrs) {

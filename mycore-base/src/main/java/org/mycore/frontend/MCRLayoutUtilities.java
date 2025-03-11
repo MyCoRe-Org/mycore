@@ -102,7 +102,7 @@ public class MCRLayoutUtilities {
 
     private static final XPathFactory XPATH_FACTORY = XPathFactory.instance();
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRLayoutUtilities.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final boolean ACCESS_CONTROLL_ON = MCRConfiguration2
         .getOrThrow("MCR.Website.ReadAccessVerification", Boolean::parseBoolean);

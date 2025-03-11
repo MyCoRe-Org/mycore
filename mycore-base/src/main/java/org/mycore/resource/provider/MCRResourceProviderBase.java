@@ -38,7 +38,7 @@ import org.mycore.resource.MCRResourcePath;
  */
 public abstract class MCRResourceProviderBase implements MCRResourceProvider {
 
-    private final Logger logger = LogManager.getLogger(getClass());
+    protected final Logger logger = LogManager.getLogger(getClass());
 
     private final String coverage;
 
@@ -76,10 +76,6 @@ public abstract class MCRResourceProviderBase implements MCRResourceProvider {
     private List<ProvidedUrl> logResourceUrls(List<ProvidedUrl> resourceUrl) {
         resourceUrl.forEach(url -> logger.debug("Providing resource URL {} [{}]", url.url, coverage));
         return resourceUrl;
-    }
-
-    protected final Logger getLogger() {
-        return logger;
     }
 
     protected abstract Optional<URL> doProvide(MCRResourcePath path, MCRHints hints);

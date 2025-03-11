@@ -47,7 +47,7 @@ import org.mycore.common.MCRConstants;
  */
 public class MCRNodeBuilder {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRNodeBuilder.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private Map<String, Object> variables;
 

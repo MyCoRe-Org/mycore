@@ -47,7 +47,7 @@ import org.mycore.mets.model.MCRMETSGeneratorFactory;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRMetsResolver implements URIResolver {
-    private static final Logger LOGGER = LogManager.getLogger(MCRMetsResolver.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public Source resolve(String href, String base) throws TransformerException {

@@ -58,7 +58,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
 
     private static final long ONE_MINUTE_IN_MS = TimeUnit.MINUTES.toMillis(1);
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRJobThreadStarter.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final MCRJobQueue jobQueue;
 

@@ -36,7 +36,7 @@ import org.mycore.resource.MCRResourcePath;
  */
 public abstract class MCRResourceLocatorBase implements MCRResourceLocator {
 
-    private final Logger logger = LogManager.getLogger(getClass());
+    protected final Logger logger = LogManager.getLogger(getClass());
 
     @Override
     public final Stream<URL> locate(MCRResourcePath path, MCRHints hints) {
@@ -54,10 +54,6 @@ public abstract class MCRResourceLocatorBase implements MCRResourceLocator {
             logger.debug("Located resource URL {}", resourceUrl);
         }
         return resourceUrls;
-    }
-
-    protected final Logger getLogger() {
-        return logger;
     }
 
     protected abstract Stream<URL> doLocate(MCRResourcePath path, MCRHints hints);

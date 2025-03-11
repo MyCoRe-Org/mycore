@@ -43,7 +43,7 @@ public class MCRTarServlet extends MCRCompressServlet<TarArchiveOutputStream> {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRTarServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     protected void sendCompressedDirectory(MCRPath file, BasicFileAttributes attrs,

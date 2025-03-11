@@ -59,7 +59,7 @@ public final class MCRImageTiler implements Runnable, Closeable {
 
     private static volatile MCRImageTiler instance;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRImageTiler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @SuppressWarnings("PMD.LooseCoupling")
     private static final MCRTilingQueue TQ = MCRTilingQueue.getInstance();

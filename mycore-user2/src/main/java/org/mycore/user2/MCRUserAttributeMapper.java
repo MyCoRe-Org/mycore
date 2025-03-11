@@ -81,7 +81,7 @@ import jakarta.xml.bind.annotation.XmlValue;
  */
 public class MCRUserAttributeMapper {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRUserAttributeMapper.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final Map<String, List<Attribute>> attributeMapping = new HashMap<>();
 

@@ -50,7 +50,7 @@ import org.mycore.solr.auth.MCRSolrAuthenticationManager;
  */
 public class MCRSolrCore {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRSolrCore.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static final int DEFAULT_SHARD_COUNT = 1;
 

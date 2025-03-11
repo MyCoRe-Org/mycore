@@ -52,7 +52,7 @@ import org.mycore.frontend.xeditor.tracker.MCRSetElementText;
  */
 public class MCRBinding {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRBinding.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     protected String name;
 

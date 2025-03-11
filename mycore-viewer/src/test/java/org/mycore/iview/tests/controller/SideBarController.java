@@ -31,7 +31,7 @@ public class SideBarController extends WebDriverController {
 
     public static final String SIDEBAR_CLOSE_SELECTOR = "//button[@class=\"close\"]";
 
-    private static final Logger LOGGER = LogManager.getLogger(SideBarController.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public SideBarController(WebDriver webdriver) {
         super(webdriver);

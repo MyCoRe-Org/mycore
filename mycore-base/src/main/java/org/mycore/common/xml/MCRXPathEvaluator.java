@@ -40,7 +40,7 @@ import org.mycore.common.config.MCRConfiguration2;
  */
 public class MCRXPathEvaluator {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRXPathEvaluator.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final Pattern PATTERN_XPATH = Pattern.compile("\\{([^\\}]+)\\}");
 

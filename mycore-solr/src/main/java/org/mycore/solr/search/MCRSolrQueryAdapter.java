@@ -38,7 +38,7 @@ import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import jakarta.servlet.http.HttpServletRequest;
 
 public class MCRSolrQueryAdapter implements MCRQueryAdapter {
-    private static final Logger LOGGER = LogManager.getLogger(MCRSolrQueryAdapter.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private String fieldName;
 

@@ -46,7 +46,7 @@ import org.mycore.common.MCRClassTools;
  * @author shermann (Silvio Hermann)
  * */
 public class MCRFunctionResolver implements URIResolver {
-    private static final Logger LOGGER = LogManager.getLogger(MCRFunctionResolver.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public Source resolve(String href, String base) throws TransformerException {

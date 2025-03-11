@@ -64,7 +64,7 @@ public class MCRWebappClassesDirResourceFilter extends MCRUrlPrefixResourceFilte
 
     private String getPrefix(File webappDir) {
         String prefix = webappDir.toURI() + "WEB-INF/classes/";
-        getLogger().debug("Working with webapp resource prefix: {}", prefix);
+        logger.debug("Working with webapp resource prefix: {}", prefix);
         return prefix;
     }
 

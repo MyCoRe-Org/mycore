@@ -52,7 +52,7 @@ public class MCRISO8601Date {
 
     public static final String PROPERTY_STRICT_PARSING = "MCR.Metadata.SimpleDateFormat.StrictParsing";
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRISO8601Date.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private DateTimeFormatter dateTimeFormatter = MCRISO8601FormatChooser.getFormatter(null, null);
 

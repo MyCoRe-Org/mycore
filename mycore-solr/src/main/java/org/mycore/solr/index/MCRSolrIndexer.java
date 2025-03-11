@@ -78,7 +78,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
  * @author Matthias Eichner
  */
 public class MCRSolrIndexer {
-    private static final Logger LOGGER = LogManager.getLogger(MCRSolrIndexer.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static final int LOW_PRIORITY = 0;
 

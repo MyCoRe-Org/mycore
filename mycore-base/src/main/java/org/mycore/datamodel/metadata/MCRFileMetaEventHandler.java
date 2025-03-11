@@ -50,7 +50,7 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
 
     private static final MCRCategLinkService CATEGLINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRFileMetaEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     protected void handleDerivateCreated(MCREvent evt, MCRDerivate der) {

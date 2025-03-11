@@ -32,7 +32,7 @@ import org.mycore.user2.MCRUserManager;
  */
 public class MCRPersistTransientUserEventHandler extends MCREventHandlerBase {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRPersistTransientUserEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * Persists {@link MCRTransientUser} if an {@link MCRObject} was created.
