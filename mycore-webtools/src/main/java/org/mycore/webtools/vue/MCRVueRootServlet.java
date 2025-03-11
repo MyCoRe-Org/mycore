@@ -176,10 +176,21 @@ public class MCRVueRootServlet extends MCRContentServlet {
         MCRConfiguration2.addPropertyChangeEventLister(servletInitPropertiesKeys::contains, this::changeProperty);
     }
 
+    /**
+     * Resolves the property value from the configuration. If the property is not found, an exception is thrown.
+     * If the property is found, but the value is empty, then the value is still returned.
+     * {@link MCRConfiguration2#getString(String)} would return an empty optional in this case.
+     * @param key the property key
+     * @return the property value, even if it is an empty string
+     */
+    private static String resolveProperty(String key) {
+        return MCRConfiguration2.getOrThrow(key, o -> o);
+    }
+
     protected void updateInitProperties() {
         servletInitProperties = new HashMap<>();
         servletInitPropertiesKeys.forEach(key -> {
-            MCRConfiguration2.getString(key).ifPresent(value -> servletInitProperties.put(key, value));
+            servletInitProperties.put(key, resolveProperty(key));
         });
     }
 
@@ -247,8 +258,8 @@ public class MCRVueRootServlet extends MCRContentServlet {
         Properties properties = new Properties();
 
         MCRConfiguration2.getOrThrow(VUE_PASSTHROUGH_PROPERTY_NAME, MCRConfiguration2::splitValue)
-                .map(k -> new AbstractMap.SimpleImmutableEntry<>(k, MCRConfiguration2.getString(k)))
-                .forEach(e -> properties.setProperty(e.getKey(), e.getValue().orElse(null)));
+            .map(k -> new AbstractMap.SimpleImmutableEntry<>(k, resolveProperty(k)))
+            .forEach(e -> properties.setProperty(e.getKey(), e.getValue()));
 
         properties.putAll(servletInitProperties);
 
@@ -314,11 +325,7 @@ public class MCRVueRootServlet extends MCRContentServlet {
         getProperties().forEach((key, value) -> {
             propertiesJson.append("mycore[\"").append(key)
                     .append("\"]").append('=');
-            if(value == null) {
-                propertiesJson.append("null;");
-            } else {
-                propertiesJson.append('"').append(value).append("\";").append(System.lineSeparator());
-            }
+            propertiesJson.append('"').append(value).append("\";").append(System.lineSeparator());
         });
         propertiesScript.setText(propertiesJson.toString());
         return propertiesScript;
