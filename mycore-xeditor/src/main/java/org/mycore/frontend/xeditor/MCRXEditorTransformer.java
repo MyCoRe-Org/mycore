@@ -178,11 +178,11 @@ public class MCRXEditorTransformer {
     }
 
     public void setValues(String value) {
-        currentBinding.setValues(value);
+        currentBinding.setValues(replaceXPaths(value));
     }
 
     public void setDefault(String value) {
-        currentBinding.setDefault(value);
+        currentBinding.setDefault(replaceXPaths(value));
         editorSession.getSubmission().markDefaultValue(currentBinding.getAbsoluteXPath(), value);
     }
 

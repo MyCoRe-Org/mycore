@@ -153,13 +153,11 @@
   </xsl:template>
 
   <xsl:template match="xed:bind/@set" mode="xeditor">
-    <xsl:variable name="value" select="transformer:replaceXPaths($transformer,.)" />
-    <xsl:value-of select="transformer:setValues($transformer,$value)" />
+    <xsl:value-of select="transformer:setValues($transformer,.)" />
   </xsl:template>
 
   <xsl:template match="xed:bind/@default" mode="xeditor">
-    <xsl:variable name="value" select="transformer:replaceXPaths($transformer,.)" />
-    <xsl:value-of select="transformer:setDefault($transformer,$value)" />
+    <xsl:value-of select="transformer:setDefault($transformer,.)" />
   </xsl:template>
 
   <!-- ========== Default templates ========== -->
