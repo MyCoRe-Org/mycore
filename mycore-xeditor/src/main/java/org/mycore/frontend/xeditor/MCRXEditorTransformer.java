@@ -359,7 +359,7 @@ public class MCRXEditorTransformer {
     }
 
     public void loadResource(String uri, String name) {
-        Element resource = MCRURIResolver.instance().resolve(uri);
+        Element resource = MCRURIResolver.instance().resolve(replaceXPaths(uri));
         editorSession.getVariables().put(name, resource);
     }
 
