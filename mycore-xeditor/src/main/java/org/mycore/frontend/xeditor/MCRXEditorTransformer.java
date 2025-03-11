@@ -52,6 +52,7 @@ import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXPathEvaluator;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.xeditor.target.MCRInsertTarget;
+import org.mycore.frontend.xeditor.target.MCRRemoveTarget;
 import org.mycore.frontend.xeditor.target.MCRSubselectTarget;
 import org.mycore.frontend.xeditor.target.MCRSwapTarget;
 import org.mycore.frontend.xeditor.validation.MCRValidator;
@@ -275,15 +276,15 @@ public class MCRXEditorTransformer {
         return (MCRRepeatBinding) binding;
     }
 
-    public int getNumRepeats() {
+    private int getNumRepeats() {
         return getCurrentRepeat().getBoundNodes().size();
     }
 
-    public int getMaxRepeats() {
+    private int getMaxRepeats() {
         return getCurrentRepeat().getMaxRepeats();
     }
 
-    public int getRepeatPosition() {
+    private int getRepeatPosition() {
         return getCurrentRepeat().getRepeatPosition();
     }
 
@@ -292,25 +293,68 @@ public class MCRXEditorTransformer {
         editorSession.getValidator().setValidationMarker(currentBinding);
         return nextAnchorID();
     }
+    public NodeSet buildControls(String controlTokens) throws JaxenException, ParserConfigurationException {
+        if (StringUtils.isEmpty(controlTokens)) {
+            controlTokens = "insert remove up down";
+        }
 
-    public String getSwapParameter(String action) throws JaxenException {
-        boolean direction = Objects.equals(action, "down") ? MCRSwapTarget.MOVE_DOWN : MCRSwapTarget.MOVE_UP;
-        return MCRSwapTarget.getSwapParameter(getCurrentRepeat(), direction);
+        org.w3c.dom.Document dom = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        NodeSet nodeSet = new NodeSet();
+
+        for (String controlToken : controlTokens.split("\\s")) {
+            String name = buildControlNameAttribute(controlToken);
+            if (name != null) {
+                org.w3c.dom.Element element = dom.createElement("control");
+                element.setAttribute("name", name);
+                element.setTextContent(controlToken);
+                nodeSet.addElement(element);
+            }
+        }
+
+        return nodeSet;
     }
 
-    public String getInsertParameter() throws JaxenException {
-        return MCRInsertTarget.getInsertParameter(getCurrentRepeat());
-    }
+    private String buildControlNameAttribute(String controlToken) throws JaxenException {
+        int pos = getRepeatPosition();
+        int num = getNumRepeats();
+        int max = getMaxRepeats();
+        
+        if ((MCRSwapTarget.TOKEN_UP.equals(controlToken) && (pos == 1)) ||
+            (MCRSwapTarget.TOKEN_DOWN.equals(controlToken) && (pos == num)) ||
+            (MCRInsertTarget.isAppendToken(controlToken) && ((pos < num) || (num == max))) ||
+            (MCRInsertTarget.isInsertToken(controlToken) && (max == num))) {
+            return null;
+        }
+        
+        StringBuilder sb = new StringBuilder("_xed_submit_").append(controlToken).append(':');
 
-    public int nextAnchorID() {
+        if (MCRInsertTarget.isAppendToken(controlToken) || MCRInsertTarget.isInsertToken(controlToken)) {
+            sb.append(MCRInsertTarget.getInsertParameter(getCurrentRepeat()));
+        } else if (MCRRemoveTarget.isRemoveToken(controlToken)) {
+            sb.append(getAbsoluteXPath());
+        } else if (MCRSwapTarget.TOKEN_UP.equals(controlToken)) {
+            sb.append(MCRSwapTarget.getSwapParameter(getCurrentRepeat(), MCRSwapTarget.TOKEN_UP));
+        } else if (MCRSwapTarget.TOKEN_DOWN.equals(controlToken)) {
+            sb.append(MCRSwapTarget.getSwapParameter(getCurrentRepeat(), MCRSwapTarget.TOKEN_DOWN));
+        }
+
+        sb.append("|rep-");
+
+        if (MCRRemoveTarget.isRemoveToken(controlToken) && (getRepeatPosition() > 1)) {
+            /* redirect to anchor of preceding, since this one will be removed */
+            sb.append(previousAnchorID());
+        } else {
+            sb.append(anchorID);
+        }
+
+        return sb.toString();
+    }
+    
+    private int nextAnchorID() {
         return ++anchorID;
     }
 
-    public int getAnchorID() {
-        return anchorID;
-    }
-
-    public int previousAnchorID() {
+    private int previousAnchorID() {
         return (anchorID == 0 ? 1 : anchorID - 1);
     }
 

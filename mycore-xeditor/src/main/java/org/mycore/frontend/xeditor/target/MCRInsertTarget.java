@@ -25,10 +25,23 @@ import org.mycore.frontend.xeditor.MCRRepeatBinding;
  * @author Frank Lützenkirchen
  */
 public class MCRInsertTarget extends MCRSwapInsertTarget {
+    
+    private static final String INSERT_TOKEN = "insert";
+    
+    private static final String APPEND_TOKEN = "append";
+    
     @Override
     protected void handle(int pos, MCRRepeatBinding repeatBinding) throws JaxenException {
         repeatBinding.insert(pos);
     }
+    
+    public static boolean isInsertToken(String controlToken) {
+      return INSERT_TOKEN.equals(controlToken);    
+    }
+
+    public static boolean isAppendToken(String controlToken) {
+        return APPEND_TOKEN.equals(controlToken);    
+      }
 
     public static String getInsertParameter(MCRRepeatBinding repeatBinding) throws JaxenException {
         return buildParameter(repeatBinding, repeatBinding.getRepeatPosition());

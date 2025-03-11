@@ -297,56 +297,10 @@
   <!-- ========== <xed:controls /> ========== -->
 
   <xsl:template match="xed:controls" mode="xeditor">
-    <xsl:variable name="pos" select="transformer:getRepeatPosition($transformer)" />
-    <xsl:variable name="num" select="transformer:getNumRepeats($transformer)" />
-    <xsl:variable name="max" select="transformer:getMaxRepeats($transformer)" />
-
-    <xsl:variable name="controls">
-      <xsl:if test="string-length(.) = 0">
-        insert remove up down
-      </xsl:if>
-      <xsl:value-of select="." />
-    </xsl:variable>
-
-    <xsl:for-each select="xalan:tokenize($controls)">
-      <xsl:choose>
-        <xsl:when test="(. = 'append') and ($pos &lt; $num)" />
-        <xsl:when test="(. = 'up') and ($pos = 1)" />
-        <xsl:when test="(. = 'down') and ($pos = $num)" />
-        <xsl:when test="(. = 'insert') and ($max = $num)" />
-        <xsl:when test="(. = 'append') and ($max = $num)" />
-        <xsl:otherwise>
-          <xsl:apply-templates select="." mode="xed.control">
-            <xsl:with-param name="name">
-              <xsl:value-of select="concat('_xed_submit_',.,':')" />
-              <xsl:choose>
-                <xsl:when test="(. = 'append') or (. = 'insert')">
-                  <xsl:value-of select="transformer:getInsertParameter($transformer)" />
-                </xsl:when>
-                <xsl:when test="(. = 'remove')">
-                  <xsl:value-of select="transformer:getAbsoluteXPath($transformer)" />
-                </xsl:when>
-                <xsl:when test="(. = 'up')">
-                  <xsl:value-of select="transformer:getSwapParameter($transformer,'up')" />
-                </xsl:when>
-                <xsl:when test="(. = 'down')">
-                  <xsl:value-of select="transformer:getSwapParameter($transformer,'down')" />
-                </xsl:when>
-              </xsl:choose>
-              <xsl:text>|rep-</xsl:text>
-              <xsl:choose>
-                <xsl:when
-                  test="(. = 'remove') and ($pos &gt; 1)"> <!-- redirect to anchor of preceding, since this one will be removed -->
-                  <xsl:value-of select="transformer:previousAnchorID($transformer)" />
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="transformer:getAnchorID($transformer)" />
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:with-param>
-          </xsl:apply-templates>
-        </xsl:otherwise>
-      </xsl:choose>
+    <xsl:for-each select="transformer:buildControls($transformer,.)">
+      <xsl:apply-templates select="text()" mode="xed.control">
+        <xsl:with-param name="name" select="@name" />
+      </xsl:apply-templates>
     </xsl:for-each>
   </xsl:template>
 

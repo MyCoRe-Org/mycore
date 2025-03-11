@@ -29,6 +29,12 @@ import jakarta.servlet.ServletContext;
  */
 public class MCRRemoveTarget extends MCRRepeaterControl {
 
+    private final static String REMOVE_TOKEN = "remove";
+
+    public static boolean isRemoveToken(String controlToken) {
+        return REMOVE_TOKEN.equals(controlToken);
+    }
+
     @Override
     protected void handleRepeaterControl(ServletContext context, MCRServletJob job, MCREditorSession session,
         String xPath) throws Exception {
