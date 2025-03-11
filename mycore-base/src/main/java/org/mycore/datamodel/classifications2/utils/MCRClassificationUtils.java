@@ -32,6 +32,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.access.MCRMissingPermissionException;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
@@ -114,14 +115,14 @@ public class MCRClassificationUtils {
         MCRCategory classification = MCRXMLTransformer.getCategory(jdom);
         if (categoryDAO.exist(classification.getId())) {
             if (!MCRAccessManager.checkPermission(classification.getId().getRootID(), PERMISSION_WRITE)) {
-                throw MCRAccessException.missingPermission(
+                throw new MCRMissingPermissionException(
                     "update classification " + classification.getId().getRootID(), classification.getId().getRootID(),
                     PERMISSION_WRITE);
             }
             categoryDAO.replaceCategory(classification);
         } else {
             if (!MCRAccessManager.checkPermission(CREATE_CLASS_PERMISSION)) {
-                throw MCRAccessException.missingPermission(
+                throw new MCRMissingPermissionException(
                     "create classification " + classification.getId().getRootID(), classification.getId().getRootID(),
                     CREATE_CLASS_PERMISSION);
             }

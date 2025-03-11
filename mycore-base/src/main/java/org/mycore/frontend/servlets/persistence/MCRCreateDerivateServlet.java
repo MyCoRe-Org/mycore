@@ -25,6 +25,7 @@ import java.io.Serial;
 
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.access.MCRMissingPermissionException;
 import org.mycore.datamodel.metadata.MCRDerivate;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,7 +46,7 @@ public class MCRCreateDerivateServlet extends MCRPersistenceServlet {
         throws MCRAccessException {
         String objectID = getObjectId(request);
         if (!MCRAccessManager.checkPermission(objectID, PERMISSION_WRITE)) {
-            throw MCRAccessException.missingPermission("Add derivate.", objectID, PERMISSION_WRITE);
+            throw new MCRMissingPermissionException("Add derivate.", objectID, PERMISSION_WRITE);
         }
     }
 
