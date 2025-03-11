@@ -145,6 +145,20 @@ public class MCRXEditorTransformer {
         return getXPathEvaluator().replaceXPaths(uri, false);
     }
 
+    public void bind(org.w3c.dom.Node bindNode) throws JaxenException {
+        org.w3c.dom.Element bindElement = (org.w3c.dom.Element)bindNode;
+        String xPath = bindElement.getAttribute("xpath");
+        String initialValue = bindElement.getAttribute("initially");
+        String name = bindElement.getAttribute("name");
+        bind(xPath, initialValue, name);
+        
+        Attr setAttr = bindElement.getAttributeNode("set");
+        if( setAttr != null ) { setValues(setAttr.getValue());}
+
+        Attr setDefault = bindElement.getAttributeNode("default");
+        if( setDefault != null ) { setDefault(setDefault.getValue());}
+    }
+    
     public void bind(String xPath, String initialValue, String name) throws JaxenException {
         if (editorSession.getEditedXML() == null) {
             createEmptyDocumentFromXPath(xPath);
@@ -177,11 +191,11 @@ public class MCRXEditorTransformer {
         return new Element(nameStep.getLocalName(), ns);
     }
 
-    public void setValues(String value) {
+    private void setValues(String value) {
         currentBinding.setValues(replaceXPaths(value));
     }
 
-    public void setDefault(String value) {
+    private void setDefault(String value) {
         currentBinding.setDefault(replaceXPaths(value));
         editorSession.getSubmission().markDefaultValue(currentBinding.getAbsoluteXPath(), value);
     }
