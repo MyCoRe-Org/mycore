@@ -62,7 +62,7 @@ public class MCRDNBURNRegistrationCheckCronjob extends MCRCronjob {
                 .peek(mcrpi -> LOGGER.info("Found unregistered URN " + mcrpi.getIdentifier()))
                 .forEach(this::checkIfUrnIsRegistered);
 
-        }, MCRSystemUserInformation.getJanitorInstance()).run();
+        }, MCRSystemUserInformation.JANITOR).run();
     }
 
     private void checkIfUrnIsRegistered(MCRPI mcrpi) {

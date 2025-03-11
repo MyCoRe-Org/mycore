@@ -470,7 +470,7 @@ public class MCRSolrIndexer {
      */
     public static void submitIndexHandler(MCRSolrIndexHandler indexHandler, int priority) {
         MCRFixedUserCallable<List<MCRSolrIndexHandler>> indexTask = new MCRFixedUserCallable<>(
-            new MCRSolrIndexTask(indexHandler), MCRSystemUserInformation.getSystemUserInstance());
+            new MCRSolrIndexTask(indexHandler), MCRSystemUserInformation.SYSTEM_USER);
         MCRProcessableSupplier<List<MCRSolrIndexHandler>> supplier = SOLR_EXECUTOR.submit(indexTask, priority);
         supplier.getFuture().whenCompleteAsync(afterIndex(indexHandler, priority), SOLR_SUB_EXECUTOR);
     }

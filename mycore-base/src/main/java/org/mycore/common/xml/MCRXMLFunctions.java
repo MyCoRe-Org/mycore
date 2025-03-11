@@ -389,7 +389,7 @@ public class MCRXMLFunctions {
         MCRObjectID mcrObjectID = MCRObjectID.getInstance(objId);
         try {
             return MCRAccessManager.checkPermission(
-                MCRSystemUserInformation.getGuestInstance(),
+                MCRSystemUserInformation.GUEST,
                 () -> MCRAccessManager.checkPermission(mcrObjectID, MCRAccessManager.PERMISSION_READ)
                     && checkReadPermissionOfDerivates(mcrObjectID));
         } catch (RuntimeException e) {
@@ -424,7 +424,7 @@ public class MCRXMLFunctions {
         MCRObjectID mcrObjectID = MCRObjectID.getInstance(objId);
         try {
             return MCRAccessManager.checkPermission(
-                MCRSystemUserInformation.getGuestInstance(),
+                MCRSystemUserInformation.GUEST,
                 () -> MCRAccessManager.checkPermission(mcrObjectID, MCRAccessManager.PERMISSION_READ));
         } catch (RuntimeException e) {
             LOGGER.error("Error while retriving ACL information for Object {}", objId, e);
@@ -611,12 +611,12 @@ public class MCRXMLFunctions {
 
     public static boolean isCurrentUserSuperUser() {
         return MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
-            .equals(MCRSystemUserInformation.getSuperUserInstance().getUserID());
+            .equals(MCRSystemUserInformation.SUPER_USER.getUserID());
     }
 
     public static boolean isCurrentUserGuestUser() {
         return MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
-            .equals(MCRSystemUserInformation.getGuestInstance().getUserID());
+            .equals(MCRSystemUserInformation.GUEST.getUserID());
     }
 
     public static String getCurrentUserAttribute(String attribute) {

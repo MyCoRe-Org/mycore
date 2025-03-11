@@ -77,7 +77,7 @@ public class MCRURNGranularRESTRegistrationCronjob extends MCRCronjob {
             new MCRFixedUserCallable<>(() -> {
                 mcrpi.setRegistered(registerDate);
                 return MCREntityManagerProvider.getCurrentEntityManager().merge(mcrpi);
-            }, MCRSystemUserInformation.getJanitorInstance()).call();
+            }, MCRSystemUserInformation.JANITOR).call();
         } catch (Exception e) {
             LOGGER.error("Error while set registered date!", e);
         }

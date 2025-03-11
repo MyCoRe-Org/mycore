@@ -172,7 +172,7 @@ public class MCRCommandLineInterface {
         MCRSessionMgr.unlock();
         MCRSession session = MCRSessionMgr.getCurrentSession();
         session.setCurrentIP("127.0.0.1");
-        session.setUserInformation(MCRSystemUserInformation.getSuperUserInstance());
+        session.setUserInformation(MCRSystemUserInformation.SUPER_USER);
         MCRSessionMgr.setCurrentSession(session);
         SESSION_ID.set(session.getID());
         MCRSessionMgr.releaseCurrentSession();

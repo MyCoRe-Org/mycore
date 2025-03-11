@@ -179,7 +179,7 @@ public class MCRAccessKeyUserServiceImplTest extends MCRAccessKeyTestCase {
             MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + object.getId().toString(), UNKNOWN_KEY);
         final MCRUser user = new MCRUser("junit1");
         MCRUserManager.createUser(user);
-        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getGuestInstance());
+        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.GUEST);
         MCRSessionMgr.getCurrentSession().setUserInformation(user);
         MCRUserManager.getCurrentUser().setUserAttribute(
             MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + object.getId().toString(), UNKNOWN_KEY);
@@ -190,7 +190,7 @@ public class MCRAccessKeyUserServiceImplTest extends MCRAccessKeyTestCase {
             .getUserAttribute(MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + object.getId().toString()));
         assertNotNull(MCRUserManager.getCurrentUser()
             .getUserAttribute(MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + derivate.getId().toString()));
-        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getGuestInstance());
+        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.GUEST);
         MCRSessionMgr.getCurrentSession().setUserInformation(MCRUserManager.getUser("junit"));
         assertNull(MCRUserManager.getCurrentUser()
             .getUserAttribute(MCRAccessKeyUserService.ACCESS_KEY_USER_ATTRIBUTE_PREFIX + object.getId().toString()));

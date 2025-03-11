@@ -41,7 +41,7 @@ public class MCRForbiddenExceptionMapper implements ExceptionMapper<ForbiddenExc
     @Override
     public Response toResponse(ForbiddenException ex) {
         String userID = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
-        if (userID.equals(MCRSystemUserInformation.getGuestInstance().getUserID())) {
+        if (userID.equals(MCRSystemUserInformation.GUEST.getUserID())) {
             LogManager.getLogger().warn("Guest detected");
             return Response.fromResponse(ex.getResponse())
                 .status(Response.Status.UNAUTHORIZED)

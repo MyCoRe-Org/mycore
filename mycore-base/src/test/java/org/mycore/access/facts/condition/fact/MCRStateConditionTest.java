@@ -70,7 +70,7 @@ public class MCRStateConditionTest extends MCRJPATestCase {
 
     @Test
     public void testConditionMatch() throws NoSuchFieldException, IllegalAccessException {
-        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getSuperUserInstance());
+        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.SUPER_USER);
 
         MCRObject object = new MCRObject();
         object.getService().setState("published");
@@ -87,7 +87,7 @@ public class MCRStateConditionTest extends MCRJPATestCase {
 
     @Test
     public void testConditionNotMatch() throws NoSuchFieldException, IllegalAccessException {
-        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getSuperUserInstance());
+        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.SUPER_USER);
 
         MCRObject object = new MCRObject();
         object.getService().setState("published");
