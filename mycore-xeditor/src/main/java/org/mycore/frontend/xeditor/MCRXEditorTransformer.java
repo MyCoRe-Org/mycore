@@ -153,10 +153,14 @@ public class MCRXEditorTransformer {
         bind(xPath, initialValue, name);
         
         Attr setAttr = bindElement.getAttributeNode("set");
-        if( setAttr != null ) { setValues(setAttr.getValue());}
+        if (setAttr != null) {
+            setValues(setAttr.getValue());
+        }
 
         Attr setDefault = bindElement.getAttributeNode("default");
-        if( setDefault != null ) { setDefault(setDefault.getValue());}
+        if (setDefault != null) {
+            setDefault(setDefault.getValue());
+        }
     }
     
     public void bind(String xPath, String initialValue, String name) throws JaxenException {
