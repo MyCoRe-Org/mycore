@@ -34,7 +34,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.ocfl.classification.MCROCFLXMLClassificationManager;
-import org.mycore.ocfl.metadata.MCROCFLXMLMetadataManager;
+import org.mycore.ocfl.metadata.MCROCFLXMLMetadataManagerAdapter;
 import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
 import org.mycore.ocfl.user.MCROCFLXMLUserManager;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
@@ -103,7 +103,7 @@ public class MCROCFLRegexCommands {
     @MCRCommand(syntax = "purge ocfl objects matching {0}",
         help = "Purge ocfl objects that are matching the RegEx {0}")
     public static List<String> purgeMatchObj(String regex) {
-        MCROCFLXMLMetadataManager manager = new MCROCFLXMLMetadataManager();
+        MCROCFLXMLMetadataManagerAdapter manager = new MCROCFLXMLMetadataManagerAdapter();
         manager.setRepositoryKey(METADATA_REPOSITORY_KEY);
         if (!confirmPurge) {
             logConfirm("objects");
@@ -191,7 +191,7 @@ public class MCROCFLRegexCommands {
     @MCRCommand(syntax = "purge marked ocfl objects matching {0}",
         help = "Purge marked ocfl objects that are matching the RegEx {0}")
     public static List<String> purgeMarkedMatchObj(String regex) {
-        MCROCFLXMLMetadataManager manager = new MCROCFLXMLMetadataManager();
+        MCROCFLXMLMetadataManagerAdapter manager = new MCROCFLXMLMetadataManagerAdapter();
         manager.setRepositoryKey(METADATA_REPOSITORY_KEY);
         return streamDeleted(regex, manager)
             .map(id -> buildPurgeCommand("object", id))
@@ -249,7 +249,7 @@ public class MCROCFLRegexCommands {
     @MCRCommand(syntax = "restore ocfl objects matching {0}",
         help = "Restore ocfl objects that are matching the RegEx {0}")
     public static List<String> restoreMatchObj(String regex) {
-        MCROCFLXMLMetadataManager manager = new MCROCFLXMLMetadataManager();
+        MCROCFLXMLMetadataManagerAdapter manager = new MCROCFLXMLMetadataManagerAdapter();
         manager.setRepositoryKey(METADATA_REPOSITORY_KEY);
         return streamDeleted(regex, manager)
             .map(id -> buildRestoreCommand("object", id,
@@ -287,7 +287,7 @@ public class MCROCFLRegexCommands {
             .collect(Collectors.toList());
     }
 
-    private static Stream<String> streamDeleted(String regex, MCROCFLXMLMetadataManager manager) {
+    private static Stream<String> streamDeleted(String regex, MCROCFLXMLMetadataManagerAdapter manager) {
         return manager.getRepository().listObjectIds()
             .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.MCROBJECT)
                 || obj.startsWith(MCROCFLObjectIDPrefixHelper.MCRDERIVATE))
