@@ -41,6 +41,8 @@ import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.access.MCRMissingPermissionException;
+import org.mycore.access.MCRMissingPrivilegeException;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRCache.ModifiedHandle;
 import org.mycore.common.MCRException;
@@ -224,9 +226,8 @@ public final class MCRMetadataManager {
 
     private static void checkWritePermission(MCRObjectID objectId, MCRObjectID derivateId) throws MCRAccessException {
         if (!MCRAccessManager.checkPermission(objectId, PERMISSION_WRITE)) {
-            throw MCRAccessException.missingPermission("Add derivate " + derivateId + " to object.",
-                objectId.toString(),
-                PERMISSION_WRITE);
+            throw new MCRMissingPermissionException("Add derivate " + derivateId + " to object.",
+                objectId.toString(), PERMISSION_WRITE);
         }
     }
 
@@ -414,7 +415,7 @@ public final class MCRMetadataManager {
         String createTypePrivilege = "create-" + objectId.getTypeId();
         if (!MCRAccessManager.checkPermission(createBasePrivilege)
             && !MCRAccessManager.checkPermission(createTypePrivilege)) {
-            throw MCRAccessException.missingPrivilege("Create base with id " + objectId, createBasePrivilege,
+            throw new MCRMissingPrivilegeException("Create base with id " + objectId, createBasePrivilege,
                 createTypePrivilege);
         }
     }
@@ -432,7 +433,7 @@ public final class MCRMetadataManager {
     public static void delete(final MCRDerivate mcrDerivate) throws MCRPersistenceException, MCRAccessException {
         MCRObjectID id = mcrDerivate.getId();
         if (!MCRAccessManager.checkDerivateContentPermission(id, PERMISSION_DELETE)) {
-            throw MCRAccessException.missingPermission("Delete derivate", id.toString(), PERMISSION_DELETE);
+            throw new MCRMissingPermissionException("Delete derivate", id.toString(), PERMISSION_DELETE);
         }
         // mark for deletion
         MCRMarkManager.getInstance().mark(id, Operation.DELETE);
@@ -524,7 +525,7 @@ public final class MCRMetadataManager {
 
     private static void checkDeletePermission(MCRObjectID id) throws MCRAccessException {
         if (!MCRAccessManager.checkPermission(id, PERMISSION_DELETE)) {
-            throw MCRAccessException.missingPermission("Delete object", id.toString(), PERMISSION_DELETE);
+            throw new MCRMissingPermissionException("Delete object", id.toString(), PERMISSION_DELETE);
         }
     }
 
@@ -958,7 +959,7 @@ public final class MCRMetadataManager {
 
     private static void checkUpdatePermission(MCRObjectID id) throws MCRAccessException {
         if (!MCRAccessManager.checkPermission(id, PERMISSION_WRITE)) {
-            throw MCRAccessException.missingPermission("Update object.", id.toString(), PERMISSION_WRITE);
+            throw new MCRMissingPermissionException("Update object.", id.toString(), PERMISSION_WRITE);
         }
     }
 

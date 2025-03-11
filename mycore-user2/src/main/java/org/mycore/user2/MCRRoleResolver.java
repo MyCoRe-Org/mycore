@@ -32,6 +32,7 @@ import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.access.MCRMissingPrivilegeException;
 import org.mycore.datamodel.classifications2.MCRLabel;
 
 /**
@@ -57,7 +58,7 @@ public class MCRRoleResolver implements URIResolver {
                 groupIDs.add(MCRRoleManager.getRole(id));
             }
         } else {
-            throw MCRAccessException.missingPrivilege("List asignable groups for new user.",
+            throw new MCRMissingPrivilegeException("List asignable groups for new user.",
                 MCRUser2Constants.USER_ADMIN_PERMISSION, MCRUser2Constants.USER_CREATE_PERMISSION);
         }
 
