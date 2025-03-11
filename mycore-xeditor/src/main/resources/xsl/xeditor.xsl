@@ -360,9 +360,10 @@
   <!-- ========== <xed:choose> <xed:when test=""/> <xed:otherwise /> </xed:choose> ========== -->
 
   <xsl:template match="xed:choose" mode="xeditor">
+    <xsl:variable name="matchingWhens" select="xed:when[transformer:test($transformer,@test)]" />
     <xsl:choose>
-      <xsl:when test="xed:when[transformer:test($transformer,@test)]">
-        <xsl:apply-templates select="xed:when[transformer:test($transformer,@test)][1]/node()" mode="xeditor" />
+      <xsl:when test="count($matchingWhens) &gt; 0">
+        <xsl:apply-templates select="$matchingWhens[1]/node()" mode="xeditor" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:apply-templates select="xed:otherwise/node()" mode="xeditor" />
