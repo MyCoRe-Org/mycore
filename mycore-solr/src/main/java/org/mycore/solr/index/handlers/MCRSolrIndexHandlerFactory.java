@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -38,6 +39,7 @@ import org.mycore.solr.index.handlers.document.MCRSolrInputDocumentHandler;
 import org.mycore.solr.index.handlers.stream.MCRSolrFileIndexHandler;
 import org.mycore.solr.index.strategy.MCRSolrIndexStrategyManager;
 
+import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -47,7 +49,8 @@ public abstract class MCRSolrIndexHandlerFactory {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRSolrIndexHandlerFactory SHARED_INSTANCE = new MCRSolrLazyInputDocumentHandlerFactory();
+    private static final MCRSolrIndexHandlerFactory SHARED_INSTANCE = MCRConfiguration2
+        .getInstanceOfOrThrow(MCRSolrIndexHandlerFactory.class, SOLR_CONFIG_PREFIX + "IndexHandler.Factory");
 
     /**
      * @deprecated Use {@link #obtainInstance()} instead
