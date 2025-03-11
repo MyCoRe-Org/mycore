@@ -36,13 +36,13 @@ import org.mycore.datamodel.common.MCRObjectIDGenerator;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.ocfl.metadata.MCROCFLXMLMetadataManager;
+import org.mycore.ocfl.metadata.MCROCFLXMLMetadataManagerAdapter;
 
 public class MCROCFLMigration {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final MCROCFLXMLMetadataManager target;
+    private final MCROCFLXMLMetadataManagerAdapter target;
 
     private final List<String> invalidState;
 
@@ -59,11 +59,11 @@ public class MCROCFLMigration {
     }
 
     public MCROCFLMigration(String newRepoKey, List<MCROCFLRevisionPruner> pruners) {
-        this(newRepoKey, pruners, new MCROCFLXMLMetadataManager());
+        this(newRepoKey, pruners, new MCROCFLXMLMetadataManagerAdapter());
     }
 
     public MCROCFLMigration(String newRepoKey, List<MCROCFLRevisionPruner> pruners,
-        MCROCFLXMLMetadataManager target) {
+        MCROCFLXMLMetadataManagerAdapter target) {
         this.target = target;
 
         if (newRepoKey != null) {
