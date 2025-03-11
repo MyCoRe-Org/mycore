@@ -38,6 +38,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.access.MCRMissingPermissionException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.MCRException;
@@ -253,9 +254,8 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
             .filter(permission -> !MCRAccessManager.checkPermission(obj.getId(), permission))
             .findFirst();
         if (missingPermission.isPresent()) {
-            throw MCRAccessException
-                .missingPermission("Register a " + type + " & Update object.", obj.getId().toString(),
-                    missingPermission.get());
+            throw new MCRMissingPermissionException("Register a " + type + " & Update object.",
+                obj.getId().toString(), missingPermission.get());
         }
     }
 
