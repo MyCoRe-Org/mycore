@@ -145,7 +145,7 @@ public class MCRXEditorTransformer {
         return getXPathEvaluator().replaceXPaths(uri, false);
     }
 
-    public void bind(org.w3c.dom.Node bindNode) throws JaxenException {
+    public void bind(Node bindNode) throws JaxenException {
         org.w3c.dom.Element bindElement = (org.w3c.dom.Element)bindNode;
         String xPath = bindElement.getAttribute("xpath");
         String initialValue = bindElement.getAttribute("initially");
