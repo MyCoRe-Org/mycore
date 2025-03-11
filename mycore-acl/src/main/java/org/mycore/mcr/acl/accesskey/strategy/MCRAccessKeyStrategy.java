@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.strategies.MCRAccessCheckStrategy;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.MCRAccessKeyUtils;
@@ -46,7 +47,7 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
             || PERMISSION_VIEW.equals(permission) || PERMISSION_PREVIEW.equals(permission))
             && MCRObjectID.isValid(objectIdString)) {
             final MCRObjectID objectId = MCRObjectID.getInstance(objectIdString);
-            if ("derivate".equals(objectId.getTypeId())) {
+            if (MCRDerivate.OBJECT_TYPE.equals(objectId.getTypeId())) {
                 return checkDerivatePermission(objectId, permission);
             }
             return checkObjectPermission(objectId, permission);

@@ -70,12 +70,13 @@ public class MCRIView2Tools {
 
     public static final String CONFIG_PREFIX = "MCR.Module-iview2.";
 
-    private static String SUPPORTED_CONTENT_TYPE = MCRConfiguration2.getString(CONFIG_PREFIX + "SupportedContentTypes")
-        .orElse("");
+    private static final String SUPPORTED_CONTENT_TYPE
+        = MCRConfiguration2.getString(CONFIG_PREFIX + "SupportedContentTypes")
+            .orElse("");
 
-    private static Path TILE_DIR = Paths.get(getIView2Property("DirectoryForTiles"));
+    private static final Path TILE_DIR = Paths.get(getIView2Property("DirectoryForTiles"));
 
-    private static Logger LOGGER = LogManager.getLogger(MCRIView2Tools.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRIView2Tools.class);
 
     /**
      * @return directory for tiles
@@ -112,7 +113,7 @@ public class MCRIView2Tools {
      * @return true if {@link #getSupportedMainFile(String)} is not an empty String.
      */
     public static boolean isDerivateSupported(String derivateID) {
-        if (derivateID == null || derivateID.trim().length() == 0) {
+        if (derivateID == null || derivateID.isBlank()) {
             return false;
         }
 
@@ -138,8 +139,8 @@ public class MCRIView2Tools {
                 .or(() -> Optional.of("application/octet-stream"))
                 .map(SUPPORTED_CONTENT_TYPE::contains)
                 .orElse(Boolean.FALSE);
-        } catch (UncheckedIOException e) {
-            throw e.getCause();
+        } catch (UncheckedIOException ignoredUnchecked) {
+            throw ignoredUnchecked.getCause();
         }
     }
 
@@ -256,7 +257,10 @@ public class MCRIView2Tools {
                         Thread.sleep(10);
                     } catch (InterruptedException ie) {
                         // get out of here
-                        throw new IOException(ie);
+                        IOException ioe =
+                            new IOException("Exception while waiting for filesystem to close: " + uri, ie);
+                        ioe.addSuppressed(exc);
+                        throw ioe;
                     }
                 }
             } catch (FileSystemNotFoundException fsnfe) {

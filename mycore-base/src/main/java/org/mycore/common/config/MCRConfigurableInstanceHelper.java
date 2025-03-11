@@ -175,6 +175,13 @@ class MCRConfigurableInstanceHelper {
         return source.annotationClass().getName();
     }
 
+    private static void throwIncompatibleAnnotation(Class<?> annotationValueClass, Target<?> target, Object instance) {
+        throw new MCRConfigurationException("Configured instance of class " + instance.getClass().getName()
+            + " is incompatible with annotation value class " + annotationValueClass.getName()
+            + " for target " + targetTypeName(target) + " '" + target.name()
+            + "' in configured class " + target.declaringClass().getName());
+    }
+
     /**
      * A {@link ClassInfo} is a helper class that gathers and holds some information about a target class.
      * <p>
@@ -252,7 +259,7 @@ class MCRConfigurableInstanceHelper {
      * It is intended that instances of this class are cached, such that the information about the target class
      * only needs to be gathered once.
      */
-    private static class ClassInfo<T> {
+    private static final class ClassInfo<T> {
 
         private final Class<T> targetClass;
 
@@ -342,6 +349,7 @@ class MCRConfigurableInstanceHelper {
             return injectors;
         }
 
+        @SuppressWarnings("PMD.AvoidDuplicateLiterals")
         private Optional<Injector<T, ?>> findInjector(Injectable injectable) {
 
             List<Source<?, ?>> sources = new LinkedList<>();
@@ -538,7 +546,7 @@ class MCRConfigurableInstanceHelper {
 
     }
 
-    private static class NoParameterMethodTarget<T> extends MethodTarget<T> {
+    private static final class NoParameterMethodTarget<T> extends MethodTarget<T> {
 
         private final Method method;
 
@@ -564,7 +572,7 @@ class MCRConfigurableInstanceHelper {
 
     }
 
-    private static class SingleParameterMethodTarget<T> extends MethodTarget<T> {
+    private static final class SingleParameterMethodTarget<T> extends MethodTarget<T> {
 
         private final Method method;
 
@@ -707,16 +715,16 @@ class MCRConfigurableInstanceHelper {
 
     }
 
-    private static class PropertySource extends Source<MCRProperty, String> {
+    private static final class PropertySource extends Source<MCRProperty, String> {
 
-        protected final MCRProperty annotation;
+        private final MCRProperty annotation;
 
         private PropertySource(MCRProperty annotation) {
             this.annotation = annotation;
         }
 
         @Override
-        public final SourceType type() {
+        public SourceType type() {
             return SourceType.PROPERTY;
         }
 
@@ -731,7 +739,7 @@ class MCRConfigurableInstanceHelper {
         }
 
         @Override
-        public final int order() {
+        public int order() {
             return annotation.order();
         }
 
@@ -776,16 +784,16 @@ class MCRConfigurableInstanceHelper {
 
     }
 
-    private static class AllPropertiesSource extends Source<MCRProperty, Map<String, String>> {
+    private static final class AllPropertiesSource extends Source<MCRProperty, Map<String, String>> {
 
-        protected final MCRProperty annotation;
+        private final MCRProperty annotation;
 
         private AllPropertiesSource(MCRProperty annotation) {
             this.annotation = annotation;
         }
 
         @Override
-        public final SourceType type() {
+        public SourceType type() {
             return SourceType.PROPERTY;
         }
 
@@ -800,7 +808,7 @@ class MCRConfigurableInstanceHelper {
         }
 
         @Override
-        public final int order() {
+        public int order() {
             return annotation.order();
         }
 
@@ -825,16 +833,16 @@ class MCRConfigurableInstanceHelper {
 
     }
 
-    private static class InstanceSource extends Source<MCRInstance, Object> {
+    private static final class InstanceSource extends Source<MCRInstance, Object> {
 
-        protected final MCRInstance annotation;
+        private final MCRInstance annotation;
 
         private InstanceSource(MCRInstance annotation) {
             this.annotation = annotation;
         }
 
         @Override
-        public final SourceType type() {
+        public SourceType type() {
             return SourceType.INSTANCE;
         }
 
@@ -849,7 +857,7 @@ class MCRConfigurableInstanceHelper {
         }
 
         @Override
-        public final int order() {
+        public int order() {
             return annotation.order();
         }
 
@@ -893,10 +901,7 @@ class MCRConfigurableInstanceHelper {
             Object instance = getInstance(nestedConfiguration);
 
             if (!annotation.valueClass().isAssignableFrom(instance.getClass())) {
-                throw new MCRConfigurationException("Configured instance of class " + instance.getClass().getName()
-                    + " is incompatible with annotation value class " + annotation.valueClass().getName()
-                    + " for target " + targetTypeName(target) + " '" + target.name()
-                    + "' in configured class " + target.declaringClass().getName());
+                throwIncompatibleAnnotation(annotation.valueClass(), target, instance);
             }
 
             return instance;
@@ -905,16 +910,16 @@ class MCRConfigurableInstanceHelper {
 
     }
 
-    private static class InstanceMapSource extends Source<MCRInstanceMap, Map<String, Object>> {
+    private static final class InstanceMapSource extends Source<MCRInstanceMap, Map<String, Object>> {
 
-        protected final MCRInstanceMap annotation;
+        private final MCRInstanceMap annotation;
 
         private InstanceMapSource(MCRInstanceMap annotation) {
             this.annotation = annotation;
         }
 
         @Override
-        public final SourceType type() {
+        public SourceType type() {
             return SourceType.INSTANCE_MAP;
         }
 
@@ -929,7 +934,7 @@ class MCRConfigurableInstanceHelper {
         }
 
         @Override
-        public final int order() {
+        public int order() {
             return annotation.order();
         }
 
@@ -974,10 +979,7 @@ class MCRConfigurableInstanceHelper {
 
             instanceMap.values().forEach(instance -> {
                 if (!annotation.valueClass().isAssignableFrom(instance.getClass())) {
-                    throw new MCRConfigurationException("Configured instance of class " + instance.getClass().getName()
-                        + " is incompatible with annotation value class " + annotation.valueClass().getName()
-                        + " for target " + targetTypeName(target) + " '" + target.name()
-                        + "' in configured class " + target.declaringClass().getName());
+                    throwIncompatibleAnnotation(annotation.valueClass(), target, instance);
                 }
             });
 
@@ -1003,16 +1005,16 @@ class MCRConfigurableInstanceHelper {
 
     }
 
-    private static class InstanceListSource extends Source<MCRInstanceList, List<Object>> {
+    private static final class InstanceListSource extends Source<MCRInstanceList, List<Object>> {
 
-        protected final MCRInstanceList annotation;
+        private final MCRInstanceList annotation;
 
         private InstanceListSource(MCRInstanceList annotation) {
             this.annotation = annotation;
         }
 
         @Override
-        public final SourceType type() {
+        public SourceType type() {
             return SourceType.INSTANCE_LIST;
         }
 
@@ -1027,7 +1029,7 @@ class MCRConfigurableInstanceHelper {
         }
 
         @Override
-        public final int order() {
+        public int order() {
             return annotation.order();
         }
 
@@ -1071,10 +1073,7 @@ class MCRConfigurableInstanceHelper {
 
             instanceList.forEach(instance -> {
                 if (!annotation.valueClass().isAssignableFrom(instance.getClass())) {
-                    throw new MCRConfigurationException("Configured instance of class " + instance.getClass().getName()
-                        + " is incompatible with annotation value class " + annotation.valueClass().getName()
-                        + " for target " + targetTypeName(target) + " '" + target.name()
-                        + "' in configured class " + target.declaringClass().getName());
+                    throwIncompatibleAnnotation(annotation.valueClass(), target, instance);
                 }
             });
 
@@ -1100,16 +1099,16 @@ class MCRConfigurableInstanceHelper {
 
     }
 
-    private static class PostConstructionSource extends Source<MCRPostConstruction, String> {
+    private static final class PostConstructionSource extends Source<MCRPostConstruction, String> {
 
-        protected final MCRPostConstruction annotation;
+        private final MCRPostConstruction annotation;
 
         private PostConstructionSource(MCRPostConstruction annotation) {
             this.annotation = annotation;
         }
 
         @Override
-        public final SourceType type() {
+        public SourceType type() {
             return SourceType.POST_CONSTRUCTION;
         }
 
@@ -1124,7 +1123,7 @@ class MCRConfigurableInstanceHelper {
         }
 
         @Override
-        public final int order() {
+        public int order() {
             return annotation.order();
         }
 

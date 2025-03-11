@@ -152,7 +152,7 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
 
     }
 
-    private static class ExceptionTypeAdapter extends XmlAdapter<RException, Exception> {
+    private static final class ExceptionTypeAdapter extends XmlAdapter<RException, Exception> {
         @Override
         public Exception unmarshal(RException v) {
             throw new UnsupportedOperationException();
@@ -173,7 +173,7 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
         }
     }
 
-    private static class RException {
+    private static final class RException {
         @XmlElement
         private String message;
 
@@ -185,7 +185,7 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
 
     }
 
-    private static class RStackTraceElement {
+    private static final class RStackTraceElement {
         @XmlAttribute
         private String className;
 

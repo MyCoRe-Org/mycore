@@ -18,10 +18,17 @@
 
 package org.mycore.solr.search;
 
+import static org.mycore.solr.search.MCRSolrParameter.FIELD_LIST;
+import static org.mycore.solr.search.MCRSolrParameter.REQUEST_HANDLER;
+import static org.mycore.solr.search.MCRSolrParameter.QUERY;
+import static org.mycore.solr.search.MCRSolrParameter.ROWS;
+import static org.mycore.solr.search.MCRSolrParameter.START;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -56,7 +63,7 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 public final class MCRSolrSearchUtils {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRQLSearchUtils.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private MCRSolrSearchUtils() {
     }
@@ -71,8 +78,8 @@ public final class MCRSolrSearchUtils {
      */
     public static SolrDocument first(SolrClient solrClient, String query) throws SolrServerException, IOException {
         ModifiableSolrParams p = new ModifiableSolrParams();
-        p.set("q", query);
-        p.set("rows", 1);
+        p.set(QUERY, query);
+        p.set(ROWS, 1);
         QueryRequest queryRequest = new QueryRequest(p);
         MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
             MCRSolrAuthenticationLevel.SEARCH);
@@ -85,7 +92,7 @@ public final class MCRSolrSearchUtils {
         int rows = query.getNumPerPage();
         List<String> returnFields = query.getReturnFields();
         MCRCondition condition = query.getCondition();
-        HashMap<String, List<MCRCondition>> table;
+        Map<String, List<MCRCondition>> table;
 
         if (condition instanceof MCRSetCondition setCondition) {
             table = MCRConditionTransformer.groupConditionsByIndex(setCondition);
@@ -94,7 +101,7 @@ public final class MCRSolrSearchUtils {
             LOGGER.warn("Condition is not SetCondition.");
             table = new HashMap<>();
 
-            ArrayList<MCRCondition> conditionList = new ArrayList<>();
+            List<MCRCondition> conditionList = new ArrayList<>();
             conditionList.add(condition);
 
             table.put("metadata", conditionList);
@@ -106,7 +113,7 @@ public final class MCRSolrSearchUtils {
             table, rows, returnFields);
         String qt = input.getRootElement().getAttributeValue("qt");
         if (qt != null) {
-            mergedSolrQuery.setParam("qt", qt);
+            mergedSolrQuery.setParam(REQUEST_HANDLER, qt);
         }
 
         String mask = input.getRootElement().getAttributeValue("mask");
@@ -127,8 +134,8 @@ public final class MCRSolrSearchUtils {
      */
     public static List<String> listIDs(SolrClient solrClient, String query) {
         ModifiableSolrParams p = new ModifiableSolrParams();
-        p.set("q", query);
-        p.set("fl", "id");
+        p.set(QUERY, query);
+        p.set(FIELD_LIST, "id");
         return stream(solrClient, p).map(doc -> doc.getFieldValue("id").toString()).collect(Collectors.toList());
     }
 
@@ -188,8 +195,8 @@ public final class MCRSolrSearchUtils {
         public long estimateSize() {
             if (this.size == null) {
                 ModifiableSolrParams sizeParams = new ModifiableSolrParams(this.params);
-                sizeParams.set("start", 0);
-                sizeParams.set("rows", 0);
+                sizeParams.set(START, 0);
+                sizeParams.set(ROWS, 0);
                 try {
                     QueryRequest queryRequest = new QueryRequest(sizeParams);
                     MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
@@ -209,12 +216,12 @@ public final class MCRSolrSearchUtils {
                 throw new IllegalArgumentException("Action cannot be null");
             }
             ModifiableSolrParams p = new ModifiableSolrParams(params);
-            p.set("rows", (int) rows);
+            p.set(ROWS, (int) rows);
             long start = this.start;
             long size = estimateSize();
             long fetched = 0;
             while (fetched < size) {
-                p.set("start", (int) (start + fetched));
+                p.set(START, (int) (start + fetched));
                 response = query(p);
                 SolrDocumentList results = response.getResults();
                 for (SolrDocument doc : results) {
@@ -245,8 +252,8 @@ public final class MCRSolrSearchUtils {
             if (size > 0) {
                 if (response == null) {
                     ModifiableSolrParams p = new ModifiableSolrParams(params);
-                    p.set("start", (int) i);
-                    p.set("rows", (int) rows);
+                    p.set(START, (int) i);
+                    p.set(ROWS, (int) rows);
                     response = query(p);
                 }
                 action.accept(response.getResults().get(response.getResults().size() - (int) size));

@@ -61,7 +61,6 @@ import com.google.common.base.Splitter;
  *
  * @author Torsten Krause
  */
-
 @MCRCommandGroup(name = "Developer Commands")
 public class MCRDeveloperCommands {
 
@@ -73,7 +72,7 @@ public class MCRDeveloperCommands {
         order = 10)
     public static void showMessage(String key, String lang) {
         String value = MCRTranslation.translate(key, MCRTranslation.getLocale(lang));
-        if (value == null || (value.startsWith("???") && value.endsWith("???"))) {
+        if (value.startsWith("???") && value.endsWith("???")) {
             LOGGER.info("Found no message for key {}", key);
         } else {
             LOGGER.info("Found message for key {}: {}", key, value);
@@ -214,6 +213,7 @@ public class MCRDeveloperCommands {
         showResourceUri(MCRResourcePath.ofWebPath(path));
     }
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static void showResourceUri(Optional<MCRResourcePath> path) {
         if (path.isEmpty()) {
             LOGGER.info("Invalid resource path");
@@ -222,6 +222,7 @@ public class MCRDeveloperCommands {
         }
     }
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static void doShowResourceUri(MCRResourcePath path) {
         try {
             URL url = MCRResourceResolver.instance().resolve(path).orElse(null);
@@ -251,6 +252,7 @@ public class MCRDeveloperCommands {
         showAllResourceUrls(MCRResourcePath.ofWebPath(path));
     }
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static void showAllResourceUrls(Optional<MCRResourcePath> path) {
         if (path.isEmpty()) {
             LOGGER.info("Invalid resource path");
@@ -259,6 +261,7 @@ public class MCRDeveloperCommands {
         }
     }
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static void doShowAllResourceUrls(MCRResourcePath path) {
         try {
             List<ProvidedUrl> urls = MCRResourceResolver.instance().resolveAll(path);
@@ -288,6 +291,7 @@ public class MCRDeveloperCommands {
         resolveTextualResource(MCRResourcePath.ofWebPath(path), charset);
     }
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static void resolveTextualResource(Optional<MCRResourcePath> path, String charset) {
         if (path.isEmpty()) {
             LOGGER.info("Invalid resource path");
@@ -296,6 +300,7 @@ public class MCRDeveloperCommands {
         }
     }
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static void doResolveTextualResource(MCRResourcePath path, String charset) {
         try {
             URL url = MCRResourceResolver.instance().resolve(path).orElse(null);
@@ -344,6 +349,7 @@ public class MCRDeveloperCommands {
         resolveBinaryResource(MCRResourcePath.ofWebPath(path), encoder);
     }
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static void resolveBinaryResource(Optional<MCRResourcePath> path, String encoder) {
         if (path.isEmpty()) {
             LOGGER.info("Invalid resource path");
@@ -352,6 +358,7 @@ public class MCRDeveloperCommands {
         }
     }
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static void doResolveBinaryResource(MCRResourcePath path, String encoder) {
         try {
             URL url = MCRResourceResolver.instance().resolve(path).orElse(null);
@@ -375,7 +382,7 @@ public class MCRDeveloperCommands {
             return Encoder.valueOf(encoder);
         } catch (IllegalArgumentException e) {
             String encoders = Arrays.stream(Encoder.values()).map(Encoder::toString).collect(Collectors.joining(", "));
-            throw new MCRException("Encoder '" + encoder + "' unknown; must be one of: " + encoders);
+            throw new MCRException("Encoder '" + encoder + "' unknown; must be one of: " + encoders, e);
         }
     }
 

@@ -45,7 +45,8 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
-public class MCRPIManager {
+public final class MCRPIManager {
+
     private static final String TYPE = "type";
 
     private static final String MCRID = "mcrId";
@@ -60,11 +61,11 @@ public class MCRPIManager {
 
     private static MCRPIManager instance;
 
-    private List<MCRPIResolver<MCRPersistentIdentifier>> resolverList;
+    private final List<MCRPIResolver<MCRPersistentIdentifier>> resolverList;
 
-    private List<Class<? extends MCRPIParser<? extends MCRPersistentIdentifier>>> parserList;
+    private final List<Class<? extends MCRPIParser<? extends MCRPersistentIdentifier>>> parserList;
 
-    private Map<String, Class<? extends MCRPIParser>> typeParserMap;
+    private final Map<String, Class<? extends MCRPIParser>> typeParserMap;
 
     private MCRPIManager() {
         parserList = new ArrayList<>();
@@ -77,7 +78,7 @@ public class MCRPIManager {
                     registerParser(type, parserClass);
                 } catch (ClassNotFoundException e) {
                     throw new MCRConfigurationException(
-                        "Could not load class " + className + " defined in " + PARSER_CONFIGURATION + type);
+                        "Could not load class " + className + " defined in " + PARSER_CONFIGURATION + type, e);
                 }
             });
 
@@ -334,7 +335,7 @@ public class MCRPIManager {
                 .select(pi)
                 .where(cb.equal(pi.get(MCRPI_.identifier), identifier), cb.equal(pi.get(MCRPI_.type), type)))
             .getResultList();
-        return resultList.size() == 0 ? Optional.empty() : Optional.of(resultList.getFirst());
+        return resultList.isEmpty() ? Optional.empty() : Optional.of(resultList.getFirst());
     }
 
     /**

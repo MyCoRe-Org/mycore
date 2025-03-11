@@ -18,6 +18,7 @@
 
 package org.mycore.backend.jpa.links;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -34,7 +35,8 @@ import jakarta.persistence.Embeddable;
 @Embeddable
 public class MCRLINKHREFPK implements Serializable {
 
-    private static final long serialVersionUID = -5838803852559721772L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private String mcrfrom;
 

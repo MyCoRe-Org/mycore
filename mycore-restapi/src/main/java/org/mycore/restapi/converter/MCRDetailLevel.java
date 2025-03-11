@@ -18,9 +18,41 @@
 
 package org.mycore.restapi.converter;
 
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 public enum MCRDetailLevel {
-    summary, normal, detailed;
+    SUMMARY("summary"), NORMAL("normal"), DETAILED("detailed");
 
     public static final String MEDIA_TYPE_PARAMETER = "detail";
 
+    private final String value;
+
+    private static final Map<String, MCRDetailLevel> DETAIL_LEVELS = EnumSet
+        .allOf(MCRDetailLevel.class)
+        .stream()
+        .collect(Collectors.toMap(MCRDetailLevel::getValue, Function.identity()));
+
+    MCRDetailLevel(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return value;
+    }
+
+    public static MCRDetailLevel fromString(String value) {
+        MCRDetailLevel level = DETAIL_LEVELS.get(value);
+        if (level != null) {
+            return level;
+        }
+        throw new IllegalArgumentException("No constant with value " + value + " found");
+    }
 }

@@ -18,6 +18,7 @@
 
 package org.mycore.wfc.actionmapping;
 
+import java.io.Serial;
 import java.net.URI;
 import java.util.List;
 
@@ -36,9 +37,11 @@ import jakarta.servlet.http.HttpServletResponse;
  *
  */
 public class MCRActionMappingServlet extends MCRServlet {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    private static Splitter PATH_SPLITTER = Splitter.on('/').trimResults().omitEmptyStrings().limit(2);
+    private static final Splitter PATH_SPLITTER = Splitter.on('/').trimResults().omitEmptyStrings().limit(2);
 
     @Override
     protected void doGet(MCRServletJob job) throws Exception {

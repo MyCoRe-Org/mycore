@@ -40,7 +40,7 @@ public class MCRORCIDMetadataUtils {
     /**
      * Controls the saving of other put codes.
      */
-    public static boolean SAVE_OTHER_PUT_CODES = MCRConfiguration2.getOrThrow(MCRORCIDConstants.CONFIG_PREFIX
+    public static final boolean SAVE_OTHER_PUT_CODES = MCRConfiguration2.getOrThrow(MCRORCIDConstants.CONFIG_PREFIX
         + "Metadata.WorkInfo.SaveOtherPutCodes", Boolean::parseBoolean);
 
     /**

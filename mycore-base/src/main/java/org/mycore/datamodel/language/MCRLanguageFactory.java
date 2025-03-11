@@ -44,7 +44,8 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  *
  * @author Frank Lützenkirchen
  */
-public class MCRLanguageFactory {
+public final class MCRLanguageFactory {
+
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCRLanguageFactory SINGLETON = new MCRLanguageFactory();
@@ -56,14 +57,14 @@ public class MCRLanguageFactory {
     /**
      * Map of languages by ISO 639-1 or -2 code
      */
-    private Map<String, MCRLanguage> languageByCode = new HashMap<>();
+    private final Map<String, MCRLanguage> languageByCode = new HashMap<>();
 
     /**
      * The ID of the classification containing the language codes and labels
      */
-    private MCRCategoryID classification;
+    private final MCRCategoryID classification;
 
-    private MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
+    private final MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
 
     /**
      * Language classification may change at runtime, so we remember the time we last read the languages in.
@@ -73,7 +74,7 @@ public class MCRLanguageFactory {
     /**
      * The default language is configured via "MCR.Metadata.DefaultLang"
      */
-    private String codeOfDefaultLanguage;
+    private final String codeOfDefaultLanguage;
 
     private MCRLanguageFactory() {
         codeOfDefaultLanguage = MCRConfiguration2.getString("MCR.Metadata.DefaultLang")
@@ -138,12 +139,12 @@ public class MCRLanguageFactory {
      * @return true if the language code is supported. It return true too if the code starts
      *            with x- or i-, otherwise return false;
      */
-    public final boolean isSupportedLanguage(String code) {
+    public boolean isSupportedLanguage(String code) {
         if (code == null) {
             return false;
         }
         String codeTrimmed = code.trim();
-        if (codeTrimmed.length() == 0) {
+        if (codeTrimmed.isEmpty()) {
             return false;
         }
         if (codeTrimmed.startsWith("x-") || codeTrimmed.startsWith("i-")) {
@@ -193,10 +194,10 @@ public class MCRLanguageFactory {
      */
     private MCRLanguage buildLanguage(String xmlCode, String termCode, String biblCode) {
         MCRLanguage language = new MCRLanguage();
-        addCode(language, MCRLanguageCodeType.xmlCode, xmlCode);
+        addCode(language, MCRLanguageCodeType.XML_CODE, xmlCode);
         if (termCode != null) {
-            addCode(language, MCRLanguageCodeType.termCode, termCode);
-            addCode(language, MCRLanguageCodeType.biblCode, biblCode == null ? termCode : biblCode);
+            addCode(language, MCRLanguageCodeType.TERM_CODE, termCode);
+            addCode(language, MCRLanguageCodeType.BIBL_CODE, biblCode == null ? termCode : biblCode);
         }
         Locale locale = Arrays.stream(Locale.getAvailableLocales())
             .filter(l -> l.toString().equals(xmlCode))

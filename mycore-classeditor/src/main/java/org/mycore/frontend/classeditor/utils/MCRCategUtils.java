@@ -19,6 +19,7 @@
 package org.mycore.frontend.classeditor.utils;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.SortedSet;
 
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -47,8 +48,8 @@ public class MCRCategUtils {
         return rootID + "." + (id == null ? "" : id);
     }
 
-    public static HashMap<MCRCategoryID, String> getCategoryIDMap(String json) {
-        HashMap<MCRCategoryID, String> categories = new HashMap<>();
+    public static Map<MCRCategoryID, String> getCategoryIDMap(String json) {
+        Map<MCRCategoryID, String> categories = new HashMap<>();
         JsonStreamParser jsonStreamParser = new JsonStreamParser(json);
         if (jsonStreamParser.hasNext()) {
             JsonArray saveObjArray = jsonStreamParser.next().getAsJsonArray();

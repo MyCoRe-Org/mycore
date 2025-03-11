@@ -18,6 +18,7 @@
 
 package org.mycore.datamodel.classifications2;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Locale;
 import java.util.Objects;
@@ -41,10 +42,11 @@ import jakarta.xml.bind.annotation.XmlRootElement;
     name = "label")
 @XmlAccessorType(XmlAccessType.FIELD)
 @Embeddable
-@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MCRLabel implements Cloneable, Serializable, Comparable<MCRLabel> {
 
-    private static final long serialVersionUID = -843799854929361194L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @XmlAttribute(
         namespace = "http://www.w3.org/XML/1998/namespace")
@@ -87,7 +89,7 @@ public class MCRLabel implements Cloneable, Serializable, Comparable<MCRLabel> {
      */
     public void setLang(String lang) {
         Objects.requireNonNull(lang, "'lang' of label may not be null.");
-        if (lang.trim().isEmpty()) {
+        if (lang.isBlank()) {
             throw new IllegalArgumentException("'lang' of label may not be empty.");
         }
         Locale locale = Locale.forLanguageTag(lang);
@@ -110,7 +112,7 @@ public class MCRLabel implements Cloneable, Serializable, Comparable<MCRLabel> {
      */
     public void setText(String text) {
         Objects.requireNonNull(text, "'text' of label('" + lang + "') may not be null.");
-        if (text.trim().isEmpty()) {
+        if (text.isBlank()) {
             throw new IllegalArgumentException("'text' of label('" + lang + "') may not be empty.");
         }
         this.text = text;

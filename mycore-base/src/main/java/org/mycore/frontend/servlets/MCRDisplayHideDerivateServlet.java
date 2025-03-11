@@ -28,15 +28,20 @@ import org.jdom2.Element;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.MCRFrontendUtil;
 
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.io.Serial;
+
 /**
  * @author shermann
  */
 public class MCRDisplayHideDerivateServlet extends MCRServlet {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger(MCRDisplayHideDerivateServlet.class);
@@ -73,7 +78,7 @@ public class MCRDisplayHideDerivateServlet extends MCRServlet {
      */
     private void toggleDisplay(MCRDerivate derObj) throws Exception {
         Document xml = derObj.createXML();
-        Element derivateNode = xml.getRootElement().getChild("derivate");
+        Element derivateNode = xml.getRootElement().getChild(MCRObjectDerivate.XML_NAME);
 
         Attribute displayAttr = derivateNode.getAttribute("display");
 

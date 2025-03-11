@@ -19,6 +19,7 @@
 package org.mycore.frontend.indexbrowser;
 
 import java.io.File;
+import java.io.Serial;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,10 +42,11 @@ import org.mycore.frontend.servlets.MCRServletJob;
  */
 public final class MCRGoogleSitemapServlet extends MCRServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /** The logger */
-    private static Logger LOGGER = LogManager.getLogger(MCRGoogleSitemapServlet.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger(MCRGoogleSitemapServlet.class.getName());
 
     /**
      * This method implement the doGetPost method of MCRServlet. It build a XML

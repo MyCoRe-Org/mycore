@@ -23,6 +23,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.jdom2.Element;
@@ -150,7 +151,7 @@ public class MCRAccessRule implements org.mycore.access.MCRAccessRule {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ROOT);
         el.addContent(new Element("creationdate").setText(df.format(creationTime)));
         el.addContent(new Element("rule").setText(rule));
-        el.addContent(new Element("description").setText("" + description));
+        el.addContent(new Element("description").setText(Objects.requireNonNullElse(description, "null")));
         return el;
     }
 

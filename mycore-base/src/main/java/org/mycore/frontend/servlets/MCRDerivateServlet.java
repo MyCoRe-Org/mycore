@@ -22,6 +22,7 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.nio.file.Files;
 import java.util.Locale;
 import java.util.Objects;
@@ -46,6 +47,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRDerivateServlet extends MCRServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public static final String TODO_SMOVFILE = "smovfile";

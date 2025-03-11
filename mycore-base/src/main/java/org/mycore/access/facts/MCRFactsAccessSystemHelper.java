@@ -17,6 +17,8 @@
  */
 package org.mycore.access.facts;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.access.facts.model.MCRCombinedCondition;
 import org.mycore.access.facts.model.MCRCondition;
@@ -31,6 +33,8 @@ import org.mycore.common.config.MCRConfiguration2;
  */
 public class MCRFactsAccessSystemHelper {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
     public static final String CONDITION_PREFIX = "MCR.Access.Facts.Condition.";
 
     public static MCRCondition parse(Element xml) {
@@ -42,9 +46,10 @@ public class MCRFactsAccessSystemHelper {
 
     static MCRCondition build(String type) {
         MCRCondition condition = MCRConfiguration2.getInstanceOfOrThrow(MCRCondition.class, CONDITION_PREFIX + type);
-        if (MCRFactsAccessSystem.LOGGER.isDebugEnabled() && condition instanceof MCRCombinedCondition combCond) {
+        if (LOGGER.isDebugEnabled() && condition instanceof MCRCombinedCondition combCond) {
             combCond.setDebug(true);
         }
         return condition;
     }
+
 }

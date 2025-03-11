@@ -18,6 +18,7 @@
 
 package org.mycore.backend.jpa;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -61,6 +62,8 @@ import jakarta.persistence.Convert;
  */
 @Access(AccessType.FIELD)
 public class MCRObjectIDPK implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Convert(converter = MCRObjectIDConverter.class)

@@ -18,8 +18,11 @@
 
 package org.mycore.pi.handle;
 
+import java.io.Serial;
+
 public class MCREpicUnauthorizedException extends MCREpicException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public MCREpicUnauthorizedException(String message) {

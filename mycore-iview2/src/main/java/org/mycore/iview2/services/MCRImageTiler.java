@@ -20,6 +20,7 @@ package org.mycore.iview2.services;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -54,21 +55,22 @@ import jakarta.persistence.PersistenceException;
  *
  * @author Thomas Scheffler (yagee)
  */
-public class MCRImageTiler implements Runnable, Closeable {
+public final class MCRImageTiler implements Runnable, Closeable {
 
     private static volatile MCRImageTiler instance;
 
     private static final Logger LOGGER = LogManager.getLogger(MCRImageTiler.class);
 
+    @SuppressWarnings("PMD.LooseCoupling")
     private static final MCRTilingQueue TQ = MCRTilingQueue.getInstance();
 
     private MCRProcessableExecutor tilingServe;
 
     private volatile boolean running = true;
 
-    private ReentrantLock runLock;
+    private final ReentrantLock runLock;
 
-    private Constructor<? extends MCRTilingAction> tilingActionConstructor;
+    private final Constructor<? extends MCRTilingAction> tilingActionConstructor;
 
     private volatile Thread waiter;
 
@@ -215,7 +217,7 @@ public class MCRImageTiler implements Runnable, Closeable {
                         LOGGER.debug("No Picture in TilingQueue going to sleep");
                         //fixes a race conditioned deadlock situation
                         //do not wait longer than 60 sec. for a new MCRTileJob
-                        TQ.wait(60000);
+                        TQ.wait(60_000);
                     }
                 }
             } catch (InterruptedException e) {
@@ -227,7 +229,7 @@ public class MCRImageTiler implements Runnable, Closeable {
     private static MCRProcessableExecutor getProcessableExecutor(
         MCRProcessableDefaultCollection imageTilerCollection, int tilingThreadCount, ThreadFactory slaveFactory,
         AtomicInteger activeThreads) {
-        final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
+        final BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
         ThreadPoolExecutor baseExecutor = new ThreadPoolExecutor(tilingThreadCount, tilingThreadCount, 1,
             TimeUnit.DAYS, workQueue, slaveFactory) {
 

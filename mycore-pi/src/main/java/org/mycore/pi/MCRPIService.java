@@ -84,7 +84,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     // generated identifier is already present in database
     private static final int ERR_CODE_0_1 = 0x0001;
     @SuppressWarnings("unused")
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     static {
         ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("MCRPIRegister-#%d")
@@ -132,16 +132,13 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      */
     public static MCRPI removeFlagFromObject(MCRBase obj, MCRPI databaseEntry) {
         MCRObjectService service = obj.getService();
-        ArrayList<String> flags = service.getFlags(PI_FLAG);
-        int flagCount = flags.size();
-        for (int flagIndex = 0; flagIndex < flagCount; flagIndex++) {
-            String flag = flags.get(flagIndex);
+        for (String flag : service.getFlags(PI_FLAG)) {
             MCRPI pi = getGson().fromJson(flag, MCRPI.class);
             if (pi.getIdentifier().equals(databaseEntry.getIdentifier()) &&
-                pi.getAdditional().equals(databaseEntry.getAdditional()) &&
+                Objects.equals(pi.getAdditional(), databaseEntry.getAdditional()) &&
                 pi.getService().equals(databaseEntry.getService()) &&
                 pi.getType().equals(databaseEntry.getType())) {
-                service.removeFlag(flagIndex);
+                service.removeFlag(service.getFlagIndex(flag));
                 return databaseEntry;
             }
         }
@@ -155,7 +152,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
     public static boolean hasFlag(MCRBase obj, String additional, MCRPIRegistrationInfo mcrpi) {
         MCRObjectService service = obj.getService();
-        ArrayList<String> flags = service.getFlags(PI_FLAG);
+        List<String> flags = service.getFlags(PI_FLAG);
         Gson gson = getGson();
         return flags.stream().anyMatch(_stringFlag -> {
             MCRPI flag = gson.fromJson(_stringFlag, MCRPI.class);
@@ -165,7 +162,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
     public static boolean hasFlag(MCRBase obj, String additional, MCRPIService<?> piService) {
         MCRObjectService service = obj.getService();
-        ArrayList<String> flags = service.getFlags(PI_FLAG);
+        List<String> flags = service.getFlags(PI_FLAG);
         Gson gson = getGson();
         return flags.stream().anyMatch(_stringFlag -> {
             MCRPI flag = gson.fromJson(_stringFlag, MCRPI.class);
@@ -356,11 +353,11 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
         try {
             return REGISTER_POOL.submit(createPICallable).get();
-        } catch (ExecutionException e) {
-            if (e.getCause() instanceof MCRPersistentIdentifierException pie) {
+        } catch (ExecutionException ignoredBeCause) {
+            if (ignoredBeCause.getCause() instanceof MCRPersistentIdentifierException pie) {
                 throw pie;
             }
-            throw e;
+            throw ignoredBeCause;
         }
     }
 
@@ -461,7 +458,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     public void updateFlag(MCRObjectID id, String additional, MCRPI mcrpi) {
         MCRBase obj = MCRMetadataManager.retrieve(id);
         MCRObjectService service = obj.getService();
-        ArrayList<String> flags = service.getFlags(PI_FLAG);
+        List<String> flags = service.getFlags(PI_FLAG);
         Gson gson = getGson();
         String stringFlag = flags.stream().filter(_stringFlag -> {
             MCRPI flag = gson.fromJson(_stringFlag, MCRPI.class);

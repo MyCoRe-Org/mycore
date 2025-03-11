@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.mycore.access.MCRAccessCacheHelper;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
@@ -117,7 +118,7 @@ public abstract class MCRAccessKeyContextService<T> {
             throw new MCRAccessKeyException("No access key could be activated");
         }
         final T context = getCurrentContext();
-        if ("derivate".equals(objectId.getTypeId())) {
+        if (MCRDerivate.OBJECT_TYPE.equals(objectId.getTypeId())) {
             addAccessKeyForObjectToContext(context, objectId, secret);
         } else {
             boolean success = false;

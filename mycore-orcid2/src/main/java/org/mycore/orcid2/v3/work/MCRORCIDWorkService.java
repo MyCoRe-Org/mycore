@@ -277,7 +277,9 @@ public class MCRORCIDWorkService {
                 .fetch(MCRORCIDSectionImpl.WORK, Work.class, putCode);
         } catch (MCRORCIDRequestException e) {
             if (Objects.equals(e.getResponse().getStatus(), Response.Status.NOT_FOUND.getStatusCode())) {
-                throw new MCRORCIDNotFoundException(e.getResponse());
+                MCRORCIDNotFoundException notFoundException = new MCRORCIDNotFoundException(e.getResponse());
+                notFoundException.initCause(e);
+                throw notFoundException;
             }
             throw e;
         }
@@ -292,7 +294,9 @@ public class MCRORCIDWorkService {
             memberClient.update(MCRORCIDSectionImpl.WORK, putCode, work);
         } catch (MCRORCIDRequestException e) {
             if (Objects.equals(e.getResponse().getStatus(), Response.Status.NOT_FOUND.getStatusCode())) {
-                throw new MCRORCIDNotFoundException(e.getResponse());
+                MCRORCIDNotFoundException notFoundException = new MCRORCIDNotFoundException(e.getResponse());
+                notFoundException.initCause(e);
+                throw notFoundException;
             }
             throw e;
         }

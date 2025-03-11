@@ -824,8 +824,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         if (consumer != null) {
             try(OutputStream fileOutputStream = Files.newOutputStream(xmlOutput.toPath())) {
                 consumer.accept(content, fileOutputStream);
-            } catch (UncheckedIOException e) {
-                throw e.getCause();
+            } catch (UncheckedIOException ignoredUnchecked) {
+                throw ignoredUnchecked.getCause();
             } catch (IOException | RuntimeException e) {
                 throw e;
             } catch (Exception e) {
@@ -1293,8 +1293,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         try {
             doc = mgr.retrieveXML(objID);
         } catch (IOException | JDOMException e) {
-            throw new MCRException(
-                "Object " + objID.toString() + " could not be retrieved, unable to validate against schema!", e);
+            throw new MCRException(objID.toString() + " could not be retrieved, unable to validate against schema!", e);
         }
         if (doc == null) {
             throw new MCRException("Could not get object " + objID.toString() + " from XML store");
@@ -1304,14 +1303,11 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             object.validate();
         } catch (MCRException e) {
             throw new MCRException(
-                "Object " + objID.toString()
-                    + " does not pass basic self-validation, unable to validate against schema!",
-                e);
+                objID.toString() + " does not pass basic self-validation, unable to validate against schema!", e);
         }
         String schema = object.getSchema();
         if (schema == null) {
-            throw new MCRException(
-                "Object " + objID.toString() + " has no assigned schema, unable to validate against it!");
+            throw new MCRException(objID.toString() + " has no assigned schema, unable to validate against it!");
         }
         if (trans != null) {
             JDOMResult res = new JDOMResult();
@@ -1319,16 +1315,15 @@ public class MCRObjectCommands extends MCRAbstractCommands {
                 trans.transform(new JDOMSource(doc), res);
                 doc = Objects.requireNonNull(res.getDocument(), "Could not get transformation result");
             } catch (TransformerException | MCRException | NullPointerException e) {
-                throw new MCRException("Object " + objID.toString()
-                    + " could not be transformed, unable to validate against schema!",
-                    e);
+                throw new MCRException(
+                    objID.toString() + " could not be transformed, unable to validate against schema!", e);
             }
             LOGGER.info("Object {} successfully transformed.", objID);
         }
         try {
             MCRXMLParserFactory.getValidatingParser().parseXML(new MCRJDOMContent(doc));
         } catch (MCRException | JDOMException | IOException e) {
-            throw new MCRException("Object " + objID.toString() + " failed to parse against its schema!", e);
+            throw new MCRException(objID.toString() + " failed to parse against its schema!", e);
         }
     }
 

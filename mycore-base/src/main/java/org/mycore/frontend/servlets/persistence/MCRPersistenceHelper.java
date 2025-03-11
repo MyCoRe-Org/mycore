@@ -115,7 +115,7 @@ class MCRPersistenceHelper {
         MCRObjectID objectID = MCRObjectID.getInstance(id);
         MCREditorOutValidator ev = new MCREditorOutValidator(doc, objectID);
         Document validMyCoReObject = ev.generateValidMyCoReObject();
-        if (ev.getErrorLog().size() > 0 && LOGGER.isDebugEnabled()) {
+        if (!ev.getErrorLog().isEmpty() && LOGGER.isDebugEnabled()) {
             XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
             StringWriter swOrig = new StringWriter();
             xout.output(doc, swOrig);

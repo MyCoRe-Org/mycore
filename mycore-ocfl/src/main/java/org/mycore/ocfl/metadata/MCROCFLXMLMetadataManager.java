@@ -54,6 +54,7 @@ import org.mycore.common.content.MCRStreamContent;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.common.MCRXMLMetadataManagerAdapter;
 import org.mycore.datamodel.ifs2.MCRObjectIDDateImpl;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.history.MCRMetadataHistoryManager;
 import org.mycore.ocfl.layout.MCRStorageLayoutConfig;
@@ -154,8 +155,9 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
     }
 
     public void delete(MCRObjectID mcrid, Date date, String user) throws MCRPersistenceException {
-        String prefix = Objects.equals(mcrid.getTypeId(), "derivate") ? MCROCFLObjectIDPrefixHelper.MCRDERIVATE
-            : MCROCFLObjectIDPrefixHelper.MCROBJECT;
+        boolean equals = Objects.equals(mcrid.getTypeId(), MCRDerivate.OBJECT_TYPE);
+        String prefix = equals ? MCROCFLObjectIDPrefixHelper.MCRDERIVATE
+                               : MCROCFLObjectIDPrefixHelper.MCROBJECT;
 
         if (MCROCFLDeleteUtils.checkPurgeObject(mcrid, prefix)) {
             purge(mcrid, date, user);
@@ -212,7 +214,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
 
     private String getOCFLObjectID(String mcrid) {
         String objectType = MCRObjectID.getInstance(mcrid).getTypeId();
-        return Objects.equals(objectType, "derivate") ? MCROCFLObjectIDPrefixHelper.MCRDERIVATE + mcrid
+        return Objects.equals(objectType, MCRDerivate.OBJECT_TYPE) ? MCROCFLObjectIDPrefixHelper.MCRDERIVATE + mcrid
             : MCROCFLObjectIDPrefixHelper.MCROBJECT + mcrid;
     }
 
@@ -224,23 +226,18 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
     public MCRContent retrieveContent(MCRObjectID mcrid) throws IOException {
         String ocflObjectID = getOCFLObjectID(mcrid);
         OcflObjectVersion storeObject;
+        OcflRepository repository = getRepository();
         try {
-            storeObject = getRepository().getObject(ObjectVersionId.head(ocflObjectID));
+            storeObject = repository.getObject(ObjectVersionId.head(ocflObjectID));
         } catch (NotFoundException e) {
             throw new IOException("Object '" + ocflObjectID + "' could not be found", e);
         }
 
         if (convertMessageToType(
-            storeObject.getVersionInfo().getMessage()) == MCROCFLMetadataVersion.DELETED) {
+                storeObject.getVersionInfo().getMessage()) == MCROCFLMetadataVersion.DELETED) {
             throw new IOException("Cannot read already deleted object '" + ocflObjectID + "'");
         }
-
-        // "metadata/" +
-        try (InputStream storedContentStream = getStoredContentStream(mcrid, storeObject)) {
-            return new MCRJDOMContent(new MCRStreamContent(storedContentStream).asXML());
-        } catch (JDOMException e) {
-            throw new IOException("Can not parse XML from OCFL-Store", e);
-        }
+        return new MCROCFLContent(repository, ocflObjectID, buildFilePath(mcrid));
     }
 
     protected InputStream getStoredContentStream(MCRObjectID mcrid, OcflObjectVersion storeObject) throws IOException {
@@ -380,7 +377,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
             .orElse(0));
     }
 
-    /** 
+    /**
      * This method recursively parses a directory structure in MCRStorageLayout,
      * like this:
      * <pre>
@@ -400,15 +397,15 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
      *                         ...
      *                     +-- mir_mods_0000014567
      *                         ...
-     *                     +-- mir_mods_0000017654 
+     *                     +-- mir_mods_0000017654
      *  </pre>
-     *  
+     *
      * and searches on each level for the directory with the highest number at the end of it's name
      * finally it returns the highest available number part of a MyCoRe object id.
-     * 
+     *
      * @param path - the root path
      * @param depth - the level of subdirectories to look into
-     * @return the highest number, or 0 if such cannot be found 
+     * @return the highest number, or 0 if such cannot be found
      */
     private int traverseMCRStorageDirectory(Path path, int depth) {
         int max = -1;
@@ -513,8 +510,8 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
                     }
                 })
                 .collect(Collectors.toList());
-        } catch (UncheckedIOException e) {
-            throw e.getCause();
+        } catch (UncheckedIOException ignoredUnchecked) {
+            throw ignoredUnchecked.getCause();
         }
     }
 

@@ -19,6 +19,7 @@
 package org.mycore.solr.search;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -42,6 +43,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class MCRQLSearchServlet extends MCRServlet {//extends MCRSearchServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger(MCRQLSearchServlet.class);
@@ -144,7 +146,7 @@ public class MCRQLSearchServlet extends MCRServlet {//extends MCRSearchServlet {
 
     protected String getReqParameter(HttpServletRequest req, String name, String defaultValue) {
         String value = req.getParameter(name);
-        if (value == null || value.trim().length() == 0) {
+        if (value == null || value.isBlank()) {
             return defaultValue;
         } else {
             return value.trim();

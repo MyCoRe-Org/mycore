@@ -28,33 +28,34 @@ import org.jdom2.Element;
 
 /**
  * Class for parsing Boolean clauses
- * 
+ *
  * @author Matthias Kramm
  * @author Christoph Neidahl (OPNA2608)
  */
 public class MCRBooleanClauseParser<T> {
-    private static Pattern bracket = Pattern.compile("\\([^)(]*\\)");
 
-    private static Pattern apostrophe = Pattern.compile("\"[^\"]*?\"");
+    private static final Pattern BRACKET = Pattern.compile("\\([^)(]*\\)");
 
-    private static Pattern and = Pattern.compile("[)\\s]+[aA][nN][dD][\\s(]+");
+    private static final Pattern APOSTROPHE = Pattern.compile("\"[^\"]*?\"");
 
-    private static Pattern or = Pattern.compile("[)\\s]+[oO][rR][\\s(]+");
+    private static final Pattern AND = Pattern.compile("[)\\s]+[aA][nN][dD][\\s(]+");
 
-    private static Pattern bracket_marker = Pattern.compile("@<([0-9]*)>@");
+    private static final Pattern OR = Pattern.compile("[)\\s]+[oO][rR][\\s(]+");
+
+    private static final Pattern BRACKET_MARKER = Pattern.compile("@<([0-9]*)>@");
 
     /**
-     * This both strings are for temporary bracket substitution in case of brackets 
+     * This both strings are for temporary bracket substitution in case of brackets
      * in a text string in a condition like 'title contains "foo (and bar)".
      */
-    private static String opening_bracket = "%%%%%%%%%%";
+    private static final String OPENING_BRACKET = "%%%%%%%%%%";
 
-    private static String closing_bracket = "##########";
+    private static final String CLOSING_BRACKET = "##########";
 
     private static String extendClauses(final String s, final List<String> l) {
         String sintern = s;
         while (true) {
-            Matcher m = bracket_marker.matcher(sintern);
+            Matcher m = BRACKET_MARKER.matcher(sintern);
 
             if (m.find()) {
                 String c = m.group();
@@ -70,7 +71,7 @@ public class MCRBooleanClauseParser<T> {
 
     /**
      * Parse a complex or simple condition in XML format and put it in an condition object.
-     * 
+     *
      * @param condition a MyCoRe condition object in XML format
      * @return a MyCoRe condition object in the MCRCondition format
      */
@@ -132,7 +133,7 @@ public class MCRBooleanClauseParser<T> {
             .replaceAll("\n", " ")
             .replaceAll("\r", " ");
 
-        if (cleanedString.trim().length() == 0 || cleanedString.equals("()")) {
+        if (cleanedString.isBlank()|| cleanedString.equals("()")) {
             return defaultRule();
         }
         return parse(cleanedString, null);
@@ -161,7 +162,7 @@ public class MCRBooleanClauseParser<T> {
             stringTrimmed = findBracketPairs(stringTrimmed);
 
             // find bracket pairs and replace text inside brackets with  @<number>@
-            Matcher m = bracket.matcher(stringTrimmed);
+            Matcher m = BRACKET.matcher(stringTrimmed);
             if (m.find()) {
                 String clause = m.group();
                 stringTrimmed = stringTrimmed.substring(0, m.start())
@@ -182,14 +183,14 @@ public class MCRBooleanClauseParser<T> {
 
         /* handle OR */
         MCROrCondition<T> orClause = new MCROrCondition<>();
-        orClause = (MCROrCondition<T>) handleAndORClause(stringTrimmed, list, orClause, or);
+        orClause = (MCROrCondition<T>) handleAndORClause(stringTrimmed, list, orClause, OR);
         if (orClause != null) {
             return orClause;
         }
 
         /* handle AND */
         MCRAndCondition<T> andClause = new MCRAndCondition<>();
-        andClause = (MCRAndCondition<T>) handleAndORClause(stringTrimmed, list, andClause, and);
+        andClause = (MCRAndCondition<T>) handleAndORClause(stringTrimmed, list, andClause, AND);
         if (andClause != null) {
             return andClause;
         }
@@ -207,12 +208,12 @@ public class MCRBooleanClauseParser<T> {
     }
 
     private String findBracketPairs(String string) {
-        Matcher a = apostrophe.matcher(string); // find bracket pairs
+        Matcher a = APOSTROPHE.matcher(string); // find bracket pairs
         String stringTrimmed = string;
         if (a.find()) {
             String clause = a.group();
-            clause = clause.replaceAll("\\(", opening_bracket);
-            clause = clause.replaceAll("\\)", closing_bracket);
+            clause = clause.replaceAll("\\(", OPENING_BRACKET);
+            clause = clause.replaceAll("\\)", CLOSING_BRACKET);
             stringTrimmed = string.substring(0, a.start()) + clause + string.substring(a.end());
         }
         return stringTrimmed;
@@ -225,8 +226,8 @@ public class MCRBooleanClauseParser<T> {
             mcrCondition = parse(string, list);
         } else {
             // replace back brackets in apostrophe
-            String s = string.replaceAll(opening_bracket, "(");
-            s = s.replaceAll(closing_bracket, ")");
+            String s = string.replaceAll(OPENING_BRACKET, "(");
+            s = s.replaceAll(CLOSING_BRACKET, ")");
             mcrCondition = parseSimpleCondition(s);
         }
         return mcrCondition;
@@ -290,7 +291,7 @@ public class MCRBooleanClauseParser<T> {
         try {
             name = element.getAttributeValue("operator").toLowerCase(Locale.ROOT);
         } catch (Exception e) {
-            throw new MCRParseException("Syntax error: attribute operator not found");
+            throw new MCRParseException("Syntax error: attribute operator not found", e);
         }
 
         if (name.equals("true")) {

@@ -61,7 +61,7 @@ public abstract class MCRSolrIndexHandlerFactory {
             MCRContent content = MCRXMLMetadataManager.instance().retrieveContent(ids[0]);
             return getIndexHandler(content, ids[0]);
         }
-        HashMap<MCRObjectID, MCRContent> contentMap = new HashMap<>();
+        Map<MCRObjectID, MCRContent> contentMap = new HashMap<>();
         for (MCRObjectID id : ids) {
             MCRContent content = MCRXMLMetadataManager.instance().retrieveContent(id);
             contentMap.put(id, content);
@@ -74,7 +74,7 @@ public abstract class MCRSolrIndexHandlerFactory {
             MCRBaseContent content = new MCRBaseContent(derOrObjs[0]);
             return getIndexHandler(content, derOrObjs[0].getId());
         }
-        HashMap<MCRObjectID, MCRContent> contentMap = new HashMap<>();
+        Map<MCRObjectID, MCRContent> contentMap = new HashMap<>();
         for (MCRBase derOrObj : derOrObjs) {
             MCRBaseContent content = new MCRBaseContent(derOrObj);
             contentMap.put(derOrObj.getId(), content);

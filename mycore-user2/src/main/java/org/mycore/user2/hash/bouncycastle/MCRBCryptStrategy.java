@@ -155,8 +155,8 @@ public class MCRBCryptStrategy extends MCRPasswordCheckStrategyBase {
     protected PasswordCheckResult<Boolean> doVerify(PasswordCheckData data, String password) {
 
         Details details = parseBCryptMCFString(data.hash());
-
         byte[] hash = getHash(details.cost(), details.salt(), password);
+
         boolean verified = fixedEffortEquals(details.hash(), hash);
         boolean deprecated = details.cost() != this.cost;
 

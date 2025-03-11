@@ -60,7 +60,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCRFileValidator {
 
-    protected static final Logger LOGGER = LogManager.getLogger(MCRSwordMediaHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     protected static boolean isValidFilePath(String filePath) {
         return filePath != null && filePath.length() > 1;
@@ -100,7 +100,9 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
                         LOGGER.error("Could not close Stream after error. ", e);
                     }
                 }
-                throw new SwordError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                SwordError swordError = new SwordError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                swordError.initCause(e);
+                throw swordError;
             }
         } else {
             // if there is no file path or file is just "/" or "" then send the zipped Derivate
@@ -167,7 +169,7 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
                             .filter(validationResult -> !validationResult.isValid())
                             .collect(Collectors.toList());
 
-                        if (invalidResults.size() > 0) {
+                        if (!invalidResults.isEmpty()) {
                             throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_BAD_REQUEST,
                                 invalidResults.stream()
                                     .map(MCRSwordUtil.MCRValidationResult::getMessage)
@@ -277,7 +279,7 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
                 METSValidator validator = new METSValidator(is);
                 List<ValidationException> validateResult = validator.validate();
 
-                if (validateResult.size() > 0) {
+                if (!validateResult.isEmpty()) {
                     String result = validateResult.stream().map(Throwable::getMessage)
                         .collect(Collectors.joining(System.lineSeparator()));
                     return new MCRSwordUtil.MCRValidationResult(false, result);

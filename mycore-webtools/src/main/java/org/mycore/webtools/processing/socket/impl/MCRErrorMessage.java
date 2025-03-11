@@ -25,7 +25,7 @@ class MCRErrorMessage extends MCRWebSocketMessage {
     public final int error;
 
     MCRErrorMessage(int errorCode) {
-        super(MCRMessageType.error);
+        super(MCRMessageType.ERROR);
         this.error = errorCode;
     }
 

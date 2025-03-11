@@ -44,7 +44,7 @@
 
         <xsl:variable name="langXML" select="fn:document(concat('language:', $language))" />
         <xsl:choose>
-            <xsl:when test="$langXML/language/@rtl">rtl</xsl:when>
+            <xsl:when test="$langXML/language/@rtl = 'true'">rtl</xsl:when>
             <xsl:otherwise>ltr</xsl:otherwise>
         </xsl:choose>
     </xsl:function>

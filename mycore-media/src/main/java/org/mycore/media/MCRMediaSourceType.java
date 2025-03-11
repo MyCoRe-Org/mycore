@@ -21,7 +21,7 @@ package org.mycore.media;
 import org.mycore.common.MCRException;
 
 public enum MCRMediaSourceType {
-    mp4, rtmp_stream, hls_stream, dash_stream;
+    MP4, RTMP_STREAM, HLS_STREAM, DASH_STREAM;
 
     public String getSimpleType() {
         String str = toString();
@@ -31,10 +31,10 @@ public enum MCRMediaSourceType {
 
     public String getMimeType() {
         return switch (this) {
-            case mp4 -> "video/mp4";
-            case hls_stream -> "application/x-mpegURL";
-            case rtmp_stream -> "rtmp/mp4";
-            case dash_stream -> "application/dash+xml";
+            case MP4 -> "video/mp4";
+            case HLS_STREAM -> "application/x-mpegURL";
+            case RTMP_STREAM -> "rtmp/mp4";
+            case DASH_STREAM -> "application/dash+xml";
             default -> throw new MCRException(this + " has no MIME type defined.");
         };
     }

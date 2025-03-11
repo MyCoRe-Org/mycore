@@ -18,6 +18,8 @@
 
 package org.mycore.common;
 
+import java.io.Serial;
+
 /**
  * Instances of this class represent a general exception thrown by any part of
  * the MyCoRe implementation classes.
@@ -31,9 +33,12 @@ package org.mycore.common;
  * @see java.lang.Exception
  */
 public class MCRCatchException extends Exception {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     /** Counter to prevent a recursion between getStackTrace() and toString() */
     private int toStringInvocationCounter;
-    private static final long serialVersionUID = -2244850451757768863L;
 
     /**
      * Creates a new MCRCatchException with an error message
@@ -90,25 +95,29 @@ public class MCRCatchException extends Exception {
         StringBuilder sb = new StringBuilder();
 
         sb.append("MyCoRe Exception: ").append(getClass().getName());
-        sb.append("\n\n");
-        sb.append("Message:\n");
-        sb.append(getMessage()).append("\n\n");
-        sb.append("Stack trace:\n");
+        String ls = System.lineSeparator();
+        sb.append(ls).append(ls);
+        sb.append("Message:").append(ls);
+        sb.append(getMessage());
+        sb.append(ls).append(ls);
+        sb.append("Stack trace:").append(ls);
         sb.append(getStackTraceAsString());
 
         if (getCause() != null) {
-            sb.append('\n');
-            sb.append("This exception was thrown because of the following underlying exception:\n\n");
+            sb.append(ls);
+            sb.append("This exception was thrown because of the following underlying exception:");
+            sb.append(ls).append(ls);
             sb.append(getCause().getClass().getName());
-            sb.append("\n\n");
+            sb.append(ls).append(ls);
 
             String msg = getCause().getLocalizedMessage();
 
             if (msg != null) {
-                sb.append("Message:\n").append(msg).append("\n\n");
+                sb.append("Message:").append(ls).append(msg);
+                sb.append(ls).append(ls);
             }
 
-            sb.append("Stack trace:\n");
+            sb.append("Stack trace:").append(ls);
             sb.append(MCRException.getStackTraceAsString(getCause()));
         }
 

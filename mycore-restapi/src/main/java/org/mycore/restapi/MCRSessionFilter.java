@@ -28,7 +28,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.output.ProxyOutputStream;
 import org.apache.logging.log4j.LogManager;
@@ -75,14 +74,18 @@ import jakarta.ws.rs.ext.RuntimeDelegate;
 @Priority(Priorities.AUTHENTICATION)
 public class MCRSessionFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
-    public static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
+
     public static final String BASIC_AUTH_PREFIX = "Basic ";
+
     private static final String PROP_RENEW_JWT = "mcr:renewJWT";
+
     private static final String BEARER_AUTH_PREFIX = "Bearer ";
+
     private static final List<String> ALLOWED_JWT_SESSION_ATTRIBUTES = MCRConfiguration2
         .getString("MCR.RestAPI.JWT.AllowedSessionAttributePrefixes").stream()
         .flatMap(MCRConfiguration2::splitValue)
-        .collect(Collectors.toList());
+        .toList();
 
     @Context
     HttpServletRequest httpServletRequest;
@@ -221,7 +224,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
             return Optional.ofNullable(MCRUserManager.checkPassword(username, password))
                 .map(MCRUserInformation.class::cast)
                 .orElseThrow(() -> {
-                    LinkedHashMap<String, String> attrs = new LinkedHashMap<>();
+                    Map<String, String> attrs = new LinkedHashMap<>();
                     attrs.put("error", "invalid_login");
                     attrs.put("error_description", "Wrong login or password.");
                     return new NotAuthorizedException(Response.status(Response.Status.UNAUTHORIZED)
@@ -275,7 +278,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
             }
         } catch (JWTVerificationException e) {
             LOGGER.error(e::getMessage);
-            LinkedHashMap<String, String> attrs = new LinkedHashMap<>();
+            Map<String, String> attrs = new LinkedHashMap<>();
             attrs.put("error", "invalid_token");
             attrs.put("error_description", e.getMessage());
             throw new NotAuthorizedException(e.getMessage(), e,

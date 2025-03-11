@@ -21,6 +21,7 @@ package org.mycore.services.queuedjob.staticcontent;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,7 +41,7 @@ public class MCRJobStaticContentGenerator extends MCRObjectStaticContentGenerato
 
     @Override
     public void generate(MCRObject object) throws IOException {
-        HashMap<String, String> parameters = new HashMap<>();
+        Map<String, String> parameters = new HashMap<>();
         parameters.put(MCRStaticContentGeneratorJobAction.CONFIG_ID_PARAMETER, configID);
         parameters.put(MCRStaticContentGeneratorJobAction.OBJECT_ID_PARAMETER, object.getId().toString());
 

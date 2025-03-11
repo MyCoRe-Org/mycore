@@ -49,7 +49,7 @@ import org.mycore.common.config.annotation.MCRProperty;
  * verification, but successful verification results will be marked as outdated.
  */
 @MCRConfigurationProxy(proxyClass = MCRSHA256Strategy.Factory.class)
-public class MCRSHA256Strategy extends MCRSaltedHashPasswordCheckStrategy {
+public class MCRSHA256Strategy extends MCRSaltedHashPasswordCheckStrategyBase {
 
     public static final String SALT_SIZE_BYTES_KEY = "SaltSizeBytes";
 

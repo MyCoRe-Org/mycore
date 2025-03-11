@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,7 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRPathContent;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.cli.MCRAbstractCommands;
@@ -54,7 +56,7 @@ public class MCRMetsCommands extends MCRAbstractCommands {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRMetsCommands.class);
 
-    public static ConcurrentLinkedQueue<String> invalidMetsQueue = new ConcurrentLinkedQueue<>();
+    public static Queue<String> invalidMetsQueue = new ConcurrentLinkedQueue<>();
 
     @MCRCommand(syntax = "validate selected mets", help = "validates all mets.xml of selected derivates", order = 10)
     public static void validateSelectedMets() {
@@ -69,7 +71,7 @@ public class MCRMetsCommands extends MCRAbstractCommands {
                     InputStream metsIS = content.getInputStream();
                     METSValidator mv = new METSValidator(metsIS);
                     List<ValidationException> validationExceptionList = mv.validate();
-                    if (validationExceptionList.size() > 0) {
+                    if (!validationExceptionList.isEmpty()) {
                         invalidMetsQueue.add(objectID);
                     }
                     for (ValidationException validationException : validationExceptionList) {
@@ -141,7 +143,7 @@ public class MCRMetsCommands extends MCRAbstractCommands {
 
     @MCRCommand(syntax = "add mets files for project id {0}", order = 30)
     public static List<String> addMetsFileForProjectID(String projectID) {
-        return MCRCommandUtils.getIdsForProjectAndType(projectID, "derivate")
+        return MCRCommandUtils.getIdsForProjectAndType(projectID, MCRDerivate.OBJECT_TYPE)
             .map(id -> "add mets files for derivate " + id)
             .collect(Collectors.toList());
     }

@@ -18,6 +18,8 @@
 
 package org.mycore.common;
 
+import java.io.Serial;
+
 /**
  * Instances of MCRUsageException are thrown when the MyCoRe API is used in an
  * illegal way. For example, this could happen when you provide illegal
@@ -26,6 +28,10 @@ package org.mycore.common;
  * @author Frank Lützenkirchen
  */
 public class MCRUsageException extends MCRException {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     /**
      * Creates a new MCRUsageException with an error message
      * 

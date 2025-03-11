@@ -29,7 +29,7 @@ public class MCRIdentifierValidator {
     private static final int ISBN13_WITH_DELIM_LENGTH = 17;
 
     public static boolean validate(final String type, String value) {
-        if (value.trim().length() == 0) {
+        if (value.isBlank()) {
             //do not check 'required' here
             return true;
         }

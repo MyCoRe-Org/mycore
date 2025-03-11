@@ -20,6 +20,7 @@ package org.mycore.pi.frontend.resources;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.mycore.pi.MCRPIManager;
@@ -40,7 +41,7 @@ public class MCRPersistentIdentifierResolvingResource {
     @Path("{identifier:.+}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response resolve(@PathParam("identifier") String identifier) {
-        HashMap<String, List<String>> resolveMap = new HashMap<>();
+        Map<String, List<String>> resolveMap = new HashMap<>();
         MCRPIManager.getInstance().getResolvers().forEach(resolver -> MCRPIManager
             .getInstance().get(identifier)
             .forEach(mcrPersistentIdentifier -> resolveMap.put(resolver.getName(),

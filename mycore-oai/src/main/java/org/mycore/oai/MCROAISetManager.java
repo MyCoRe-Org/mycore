@@ -74,12 +74,12 @@ import org.mycore.util.concurrent.MCRFixedUserRunnable;
  * may be useful for some implementations, but it is slower and should be avoided for large set hierarchies.
  *
  * @see MCRURIResolver
- * @author Frank L\u00fctzenkirchen
+ * @author Frank Lützenkirchen
  * @author Matthias Eichner
  */
 public class MCROAISetManager {
 
-    protected static final Logger LOGGER = LogManager.getLogger(MCROAISetManager.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     protected String configPrefix;
 

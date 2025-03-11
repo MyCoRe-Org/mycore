@@ -21,13 +21,14 @@ package org.mycore.common.content.streams;
 import java.io.ByteArrayOutputStream;
 
 /**
- * A extension of {@link ByteArrayOutputStream} that allows access to internal buffer.
+ * An extension of {@link ByteArrayOutputStream} that allows access to internal buffer.
+ *
  * @author Thomas Scheffler (yagee)
  */
 public class MCRByteArrayOutputStream extends ByteArrayOutputStream {
 
     /**
-     * Initital buffer size is 4k.
+     * Initial buffer size is 4k.
      */
     public MCRByteArrayOutputStream() {
         this(4 * 1024);
@@ -37,7 +38,9 @@ public class MCRByteArrayOutputStream extends ByteArrayOutputStream {
         super(i);
     }
 
+    @SuppressWarnings("PMD.MethodReturnsInternalArray")
     public byte[] getBuffer() {
         return super.buf;
     }
+
 }

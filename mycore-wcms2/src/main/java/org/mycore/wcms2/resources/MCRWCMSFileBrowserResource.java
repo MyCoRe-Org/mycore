@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -51,8 +52,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import jakarta.servlet.ServletContext;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -69,15 +68,19 @@ import jakarta.ws.rs.core.Response.Status;
 @MCRRestrictedAccess(MCRWCMSPermission.class)
 public class MCRWCMSFileBrowserResource {
 
-    private final ArrayList<String> folderList = new ArrayList<>();
+    private final List<String> folderList = new ArrayList<>();
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @Context
-    HttpServletRequest request;
+    private static final String QUERY_PARAM_PATH = "path";
 
-    @Context
-    HttpServletResponse response;
+    private static final String QUERY_PARAM_TYPE = "type";
+
+    public static final String JSON_PROPERTY_PATH = "path";
+
+    public static final String JSON_PROPERTY_NAME = "name";
+
+    public static final String JSON_PROPERTY_TYPE = "type";
 
     @Context
     ServletContext context;
@@ -131,7 +134,7 @@ public class MCRWCMSFileBrowserResource {
 
     @POST
     @Path("/folder")
-    public Response addFolder(@QueryParam("path") String path) throws IOException {
+    public Response addFolder(@QueryParam(QUERY_PARAM_PATH) String path) throws IOException {
         File wcmsDir = resolveDirWCMS(path);
         if (wcmsDir.mkdir()) {
             return Response.ok().build();
@@ -141,7 +144,7 @@ public class MCRWCMSFileBrowserResource {
 
     @DELETE
     @Path("/folder")
-    public Response deleteFolder(@QueryParam("path") String path) {
+    public Response deleteFolder(@QueryParam(QUERY_PARAM_PATH) String path) {
         File wcmsDir = resolveDirWCMS(path);
         if (FileUtils.deleteQuietly(wcmsDir)) {
             return Response.ok().build();
@@ -155,7 +158,8 @@ public class MCRWCMSFileBrowserResource {
 
     @GET
     @Path("/files")
-    public String getFiles(@QueryParam("path") String path, @QueryParam("type") String type) throws IOException {
+    public String getFiles(@QueryParam(QUERY_PARAM_PATH) String path, @QueryParam(QUERY_PARAM_TYPE) String type)
+        throws IOException {
         File dir = MCRUtils.safeResolve(MCRWCMSUtil.getWCMSDataDirPath(), removeLeadingSlash(path)).toFile();
         JsonObject jsonObj = new JsonObject();
         JsonArray jsonArray = new JsonArray();
@@ -165,14 +169,7 @@ public class MCRWCMSFileBrowserResource {
                 String mimetype = Files.probeContentType(file.toPath());
                 if (mimetype != null && (type.equals("images") ? mimetype.split("/")[0].equals("image")
                     : !mimetype.split("/")[1].contains("xml"))) {
-                    JsonObject fileJsonObj = new JsonObject();
-                    fileJsonObj.addProperty("name", file.getName());
-                    fileJsonObj.addProperty("path", context.getContextPath() + path + "/" + file.getName());
-                    if (file.isDirectory()) {
-                        fileJsonObj.addProperty("type", "folder");
-                    } else {
-                        fileJsonObj.addProperty("type", mimetype.split("/")[0]);
-                    }
+                    JsonObject fileJsonObj = getJsonFileObject(path, file, mimetype);
                     jsonArray.add(fileJsonObj);
                 }
             }
@@ -180,6 +177,18 @@ public class MCRWCMSFileBrowserResource {
             return jsonObj.toString();
         }
         return "";
+    }
+
+    private JsonObject getJsonFileObject(String path, File file, String mimetype) {
+        JsonObject fileJsonObj = new JsonObject();
+        fileJsonObj.addProperty(JSON_PROPERTY_NAME, file.getName());
+        fileJsonObj.addProperty(JSON_PROPERTY_PATH, context.getContextPath() + path + "/" + file.getName());
+        if (file.isDirectory()) {
+            fileJsonObj.addProperty(JSON_PROPERTY_TYPE, "folder");
+        } else {
+            fileJsonObj.addProperty(JSON_PROPERTY_TYPE, mimetype.split("/")[0]);
+        }
+        return fileJsonObj;
     }
 
     @POST
@@ -196,7 +205,7 @@ public class MCRWCMSFileBrowserResource {
     }
 
     @DELETE
-    public Response deleteFile(@QueryParam("path") String path) {
+    public Response deleteFile(@QueryParam(QUERY_PARAM_PATH) String path) {
         File wcmsDir = MCRUtils.safeResolve(MCRWCMSUtil.getWCMSDataDirPath(), removeLeadingSlash(path)).toFile();
         if (delete(wcmsDir)) {
             return Response.ok().build();
@@ -252,25 +261,25 @@ public class MCRWCMSFileBrowserResource {
         }
     }
 
-    protected JsonObject getFolder(File node, boolean folderallowed) {
+    protected JsonObject getFolder(File node, boolean folderAllowed) {
         JsonObject jsonObj = new JsonObject();
-        jsonObj.addProperty("name", node.getName());
-        jsonObj.addProperty("path", node.getAbsolutePath());
-        jsonObj.addProperty("allowed", folderallowed);
+        jsonObj.addProperty(JSON_PROPERTY_NAME, node.getName());
+        jsonObj.addProperty(JSON_PROPERTY_PATH, node.getAbsolutePath());
+        jsonObj.addProperty("allowed", folderAllowed);
         if (node.isDirectory()) {
-            jsonObj.addProperty("type", "folder");
+            jsonObj.addProperty(JSON_PROPERTY_TYPE, "folder");
             JsonArray jsonArray = new JsonArray();
             File[] childNodes = node.listFiles();
             for (File child : childNodes) {
                 if (child.isDirectory()) {
-                    if (folderallowed || folderList.contains(child.getPath())) {
+                    if (folderAllowed || folderList.contains(child.getPath())) {
                         jsonArray.add(getFolder(child, true));
                     } else {
                         jsonArray.add(getFolder(child, false));
                     }
                 }
             }
-            if (jsonArray.size() > 0) {
+            if (!jsonArray.isEmpty()) {
                 jsonObj.add("children", jsonArray);
             }
             return jsonObj;
@@ -286,4 +295,5 @@ public class MCRWCMSFileBrowserResource {
         }
         return !file.exists() || file.delete();
     }
+
 }

@@ -118,6 +118,7 @@ public class MCRRuntimeComponentDetector {
     }
 
     private static MCRComponent buildComponent(Manifest manifest, URL manifestURL) throws IOException {
+        @SuppressWarnings("PMD.LooseCoupling")
         Attributes mainAttributes = manifest.getMainAttributes();
         String artifactId = mainAttributes.getValue(ATT_MCR_ARTIFACT_ID);
         String pomPropertiesPath = mainAttributes.getValue(ATT_POM);

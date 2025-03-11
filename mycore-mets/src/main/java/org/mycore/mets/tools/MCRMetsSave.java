@@ -43,6 +43,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -58,6 +59,7 @@ import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRStreamUtils;
+import org.mycore.common.MCRXlink;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.xml.MCRXMLFunctions;
@@ -430,7 +432,7 @@ public class MCRMetsSave {
         String cleanPath = getCleanPath(path);
 
         for (Element fileLoc : fileLocList) {
-            Attribute hrefAttribute = fileLoc.getAttribute("href", MCRConstants.XLINK_NAMESPACE);
+            Attribute hrefAttribute = fileLoc.getAttribute(MCRXlink.HREF, MCRConstants.XLINK_NAMESPACE);
             String hrefAttributeValue = hrefAttribute.getValue();
             String hrefPath = getCleanPath(removeExtension(hrefAttributeValue));
 
@@ -480,9 +482,13 @@ public class MCRMetsSave {
             LOGGER.info("Derivate with id \"{}\" has no mets file. Nothing to do", derivateID);
             return;
         }
-        mets = updateOnFileDelete(mets, file);
-        if (mets != null) {
+        try {
+            Mets modifiedMets = new Mets(mets);
+            UpdateMETSOnFileDeleteAction action = new UpdateMETSOnFileDeleteAction(modifiedMets, file);
+            action.apply();
             saveMets(mets, derivateID);
+        } catch (Exception e) {
+            LOGGER.error("Error occurred while removing file {} from the existing mets file", file, e);
         }
     }
 
@@ -497,7 +503,7 @@ public class MCRMetsSave {
         }
         try {
             Map<String, String> urnFileMap = derivate.getUrnMap();
-            if (urnFileMap.size() > 0) {
+            if (!urnFileMap.isEmpty()) {
                 updateMetsOnUrnGenerate(derivate.getId(), urnFileMap);
             } else {
                 LOGGER.debug("There are no URN to insert");
@@ -554,118 +560,6 @@ public class MCRMetsSave {
             if (fileUrnMap.containsKey(file)) {
                 divChild.setContentIds(fileUrnMap.get(file));
             }
-        }
-    }
-
-    private static Document updateOnFileDelete(Document mets, MCRPath file) {
-        Mets modifiedMets;
-        try {
-            modifiedMets = new Mets(mets);
-            String href = file.getOwnerRelativePath().substring(1);
-
-            PhysicalStructMap physStructMap = (PhysicalStructMap) modifiedMets.getStructMap(PhysicalStructMap.TYPE);
-            PhysicalDiv divContainer = physStructMap.getDivContainer();
-
-            // search the right group and remove the file from the group
-            List<FileGrp> fileGroups = modifiedMets.getFileSec().getFileGroups();
-
-            for (FileGrp fileGrp : fileGroups) {
-                if (fileGrp.contains(href)) {
-                    File fileToRemove = fileGrp.getFileByHref(href);
-                    fileGrp.removeFile(fileToRemove);
-
-                    ArrayList<PhysicalSubDiv> physicalSubDivsToRemove = new ArrayList<>();
-                    // remove file from mets:mets/mets:structMap[@TYPE='PHYSICAL']
-                    for (PhysicalSubDiv physicalSubDiv : divContainer.getChildren()) {
-                        ArrayList<Fptr> fptrsToRemove = new ArrayList<>();
-                        for (Fptr fptr : physicalSubDiv.getChildren()) {
-                            if (fptr.getFileId().equals(fileToRemove.getId())) {
-                                if (fileGrp.getUse().equals(FileGrp.USE_MASTER)) {
-                                    physicalSubDivsToRemove.add(physicalSubDiv);
-                                } else {
-                                    fptrsToRemove.add(fptr);
-                                }
-                            }
-                        }
-                        for (Fptr fptrToRemove : fptrsToRemove) {
-                            LOGGER.warn(() -> String.format(Locale.ROOT, "remove fptr \"%s\" from mets.xml of \"%s\"",
-                                fptrToRemove.getFileId(), file.getOwner()));
-                            physicalSubDiv.remove(fptrToRemove);
-                        }
-                    }
-                    for (PhysicalSubDiv physicalSubDivToRemove : physicalSubDivsToRemove) {
-                        //remove links in mets:structLink section
-                        List<SmLink> list = modifiedMets.getStructLink().getSmLinkByTo(physicalSubDivToRemove.getId());
-                        LogicalStructMap logicalStructMap = (LogicalStructMap) modifiedMets
-                            .getStructMap(LogicalStructMap.TYPE);
-
-                        for (SmLink linkToRemove : list) {
-                            LOGGER.warn(() -> String.format(Locale.ROOT, "remove smLink from \"%s\" to \"%s\"",
-                                linkToRemove.getFrom(), linkToRemove.getTo()));
-                            modifiedMets.getStructLink().removeSmLink(linkToRemove);
-                            // modify logical struct Map
-                            String logID = linkToRemove.getFrom();
-
-                            // the deleted file was not directly assigned to a structure
-                            if (logicalStructMap.getDivContainer().getId().equals(logID)) {
-                                continue;
-                            }
-
-                            LogicalDiv logicalDiv = logicalStructMap.getDivContainer().getLogicalSubDiv(
-                                logID);
-                            if (logicalDiv == null) {
-                                LOGGER.error("Could not find {} with id {}",
-                                    () -> LogicalDiv.class.getSimpleName(), () -> logID);
-                                LOGGER.error("Mets document remains unchanged");
-                                return mets;
-                            }
-
-                            // there are still files for this logical sub div, nothing to do
-                            if (modifiedMets.getStructLink().getSmLinkByFrom(logicalDiv.getId()).size() > 0) {
-                                continue;
-                            }
-
-                            // the logical div has other divs included, nothing to do
-                            if (logicalDiv.getChildren().size() > 0) {
-                                continue;
-                            }
-
-                            /*
-                             * the log div might be in a hierarchy of divs, which may now be empty
-                             * (only containing empty directories), if so the parent of the log div
-                             * must be deleted
-                             * */
-                            handleParents(logicalDiv, modifiedMets);
-
-                            logicalStructMap.getDivContainer().remove(logicalDiv);
-                        }
-                        divContainer.remove(physicalSubDivToRemove);
-                    }
-                }
-            }
-        } catch (Exception ex) {
-            LOGGER.error("Error occured while removing file {} from the existing mets file", file, ex);
-            return null;
-        }
-
-        return modifiedMets.asDocument();
-    }
-
-    private static void handleParents(LogicalDiv logDiv, Mets mets) {
-        LogicalDiv parent = logDiv.getParent();
-
-        // there are files for the parent of the log div, thus nothing to do
-        if (mets.getStructLink().getSmLinkByFrom(parent.getId()).size() > 0) {
-            return;
-        }
-
-        //no files associated to the parent of the log div
-        LogicalDiv logicalDiv = ((LogicalStructMap) mets.getStructMap(LogicalStructMap.TYPE)).getDivContainer();
-        if (parent.getParent().equals(logicalDiv)) {
-            //the parent the log div container itself, thus we quit here and remove the log div
-            logicalDiv.remove(parent);
-        } else {
-            handleParents(parent, mets);
         }
     }
 
@@ -735,73 +629,8 @@ public class MCRMetsSave {
      * @throws IOException derivate couldn't be read
      */
     public static void updateFiles(Mets mets, final MCRPath derivatePath) throws IOException {
-        List<String> metsFiles = mets.getFileSec().getFileGroups().stream().flatMap(g -> g.getFileList().stream())
-            .map(File::getFLocat).map(FLocat::getHref).collect(Collectors.toList());
-        List<String> derivateFiles = Files.walk(derivatePath).filter(MCRStreamUtils.not(Files::isDirectory))
-            .map(MCRPath::toMCRPath).map(MCRPath::getOwnerRelativePath)
-            .map(path -> path.substring(1)).filter(href -> !Objects.equals(href, "mets.xml"))
-            .collect(Collectors.toList());
-
-        ArrayList<String> removedFiles = new ArrayList<>(metsFiles);
-        removedFiles.removeAll(derivateFiles);
-        ArrayList<String> addedFiles = new ArrayList<>(derivateFiles);
-        Collections.sort(addedFiles);
-        addedFiles.removeAll(metsFiles);
-
-        StructLink structLink = mets.getStructLink();
-        PhysicalStructMap physicalStructMap = mets.getPhysicalStructMap();
-        List<String> unlinkedLogicalIds = new ArrayList<>();
-
-        // remove files
-        PhysicalDiv physicalDiv = physicalStructMap.getDivContainer();
-        removedFiles.forEach(href -> {
-            File file = null;
-            // remove from fileSec
-            for (FileGrp grp : mets.getFileSec().getFileGroups()) {
-                file = grp.getFileByHref(href);
-                if (file != null) {
-                    grp.removeFile(file);
-                    break;
-                }
-            }
-            if (file == null) {
-                return;
-            }
-            // remove from physical
-            PhysicalSubDiv physicalSubDiv = physicalDiv.byFileId(file.getId());
-            physicalSubDiv.remove(physicalSubDiv.getFptr(file.getId()));
-            if (physicalSubDiv.getChildren().isEmpty()) {
-                physicalDiv.remove(physicalSubDiv);
-            }
-            // remove from struct link
-            structLink.getSmLinkByTo(physicalSubDiv.getId()).forEach(smLink -> {
-                structLink.removeSmLink(smLink);
-                if (structLink.getSmLinkByFrom(smLink.getFrom()).isEmpty()) {
-                    unlinkedLogicalIds.add(smLink.getFrom());
-                }
-            });
-        });
-
-        // fix unlinked logical divs
-        if (!unlinkedLogicalIds.isEmpty()) {
-            // get first physical div
-            List<PhysicalSubDiv> physicalChildren = physicalStructMap.getDivContainer().getChildren();
-            String firstPhysicalID = physicalChildren.isEmpty() ? physicalStructMap.getDivContainer().getId()
-                : physicalChildren.getFirst().getId();
-
-            // a logical div is not linked anymore -> link with first physical div
-            unlinkedLogicalIds.forEach(from -> structLink.addSmLink(new SmLink(from, firstPhysicalID)));
-        }
-
-        // get last logical div
-        LogicalDiv divContainer = mets.getLogicalStructMap().getDivContainer();
-        List<LogicalDiv> descendants = divContainer.getDescendants();
-        LogicalDiv lastLogicalDiv = descendants.isEmpty() ? divContainer : descendants.getLast();
-
-        // add files
-        addedFiles.forEach(href -> {
-            addFileToMets(mets, derivatePath, href, physicalDiv, structLink, lastLogicalDiv);
-        });
+        UpdateMETSOnFileChangeAction action = new UpdateMETSOnFileChangeAction(mets, derivatePath);
+        action.apply();
     }
 
     private static void addFileToMets(Mets mets, MCRPath derivatePath, String href,
@@ -860,12 +689,12 @@ public class MCRMetsSave {
      * @throws IOException if an I/O error is thrown when accessing the starting file.
      */
     public static List<MCRPath> listFiles(MCRPath path, Collection<MCRPath> ignore) throws IOException {
-        return Files.walk(path)
-            .filter(Files::isRegularFile)
-            .map(MCRPath::toMCRPath)
-            .filter(MCRStreamUtils.not(ignore::contains))
-            .sorted()
-            .collect(Collectors.toList());
+        try (Stream<Path> pathStream = Files.walk(path).filter(Files::isRegularFile)) {
+            return pathStream.map(MCRPath::toMCRPath)
+                .filter(MCRStreamUtils.not(ignore::contains))
+                .sorted()
+                .collect(Collectors.toList());
+        }
     }
 
     /**
@@ -947,6 +776,213 @@ public class MCRMetsSave {
         String prefix = MCRMetsModelHelper.getUseForHref(path.getOwnerRelativePath()).orElse(UNKNOWN_FILEGROUP);
         String base = getFileBase(path);
         return prefix + "_" + base;
+    }
+
+    private record UpdateMETSOnFileChangeAction(Mets mets, MCRPath derivatePath) {
+
+        public void apply() throws IOException {
+            List<String> metsFiles = getMetsFiles();
+            try(Stream<Path> pathStream = Files.walk(derivatePath).filter(MCRStreamUtils.not(Files::isDirectory))) {
+                List<String> derivateFiles = getDerivateFiles(pathStream);
+
+                List<String> removedFiles = new ArrayList<>(metsFiles);
+                removedFiles.removeAll(derivateFiles);
+                List<String> addedFiles = new ArrayList<>(derivateFiles);
+                Collections.sort(addedFiles);
+                addedFiles.removeAll(metsFiles);
+
+                StructLink structLink = mets.getStructLink();
+                PhysicalStructMap physicalStructMap = mets.getPhysicalStructMap();
+                PhysicalDiv physicalDiv = physicalStructMap.getDivContainer();
+
+                // remove old files
+                List<String> unlinkedLogicalIds = removeFiles(removedFiles, physicalDiv, structLink);
+                // fix unlinked logical divs
+                if (!unlinkedLogicalIds.isEmpty()) {
+                    fixUnlinkedLogicalDivs(physicalStructMap, unlinkedLogicalIds, structLink);
+                }
+                // get last logical div
+                addFiles(addedFiles, physicalDiv, structLink);
+            }
+        }
+
+        private static void fixUnlinkedLogicalDivs(PhysicalStructMap physicalStructMap, List<String> unlinkedLogicalIds,
+            StructLink structLink) {
+            List<PhysicalSubDiv> physicalChildren = physicalStructMap.getDivContainer().getChildren();
+            String firstPhysicalID = physicalChildren.isEmpty() ? physicalStructMap.getDivContainer().getId()
+                                                                : physicalChildren.getFirst().getId();
+            // a logical div is not linked anymore -> link with first physical div
+            unlinkedLogicalIds.forEach(from -> structLink.addSmLink(new SmLink(from, firstPhysicalID)));
+        }
+
+        private List<String> removeFiles(List<String> removedFiles, PhysicalDiv physicalDiv, StructLink structLink) {
+            List<String> unlinkedLogicalIds = new ArrayList<>();
+            // remove files
+            for (String href : removedFiles) {
+                File file = null;
+                // remove from fileSec
+                for (FileGrp grp : mets.getFileSec().getFileGroups()) {
+                    file = grp.getFileByHref(href);
+                    if (file != null) {
+                        grp.removeFile(file);
+                        break;
+                    }
+                }
+                if (file == null) {
+                    continue;
+                }
+                // remove from physical
+                PhysicalSubDiv physicalSubDiv = physicalDiv.byFileId(file.getId());
+                physicalSubDiv.remove(physicalSubDiv.getFptr(file.getId()));
+                if (physicalSubDiv.getChildren().isEmpty()) {
+                    physicalDiv.remove(physicalSubDiv);
+                }
+                // remove from struct link
+                for (SmLink smLink : structLink.getSmLinkByTo(physicalSubDiv.getId())) {
+                    structLink.removeSmLink(smLink);
+                    if (structLink.getSmLinkByFrom(smLink.getFrom()).isEmpty()) {
+                        unlinkedLogicalIds.add(smLink.getFrom());
+                    }
+                }
+            }
+            return unlinkedLogicalIds;
+        }
+
+        private void addFiles(List<String> addedFiles, PhysicalDiv physicalDiv, StructLink structLink) {
+            LogicalDiv divContainer = mets.getLogicalStructMap().getDivContainer();
+            List<LogicalDiv> descendants = divContainer.getDescendants();
+            LogicalDiv lastLogicalDiv = descendants.isEmpty() ? divContainer : descendants.getLast();
+            // add files
+            addedFiles.forEach(href -> {
+                addFileToMets(mets, derivatePath, href, physicalDiv, structLink, lastLogicalDiv);
+            });
+        }
+
+        private static List<String> getDerivateFiles(Stream<Path> pathStream) {
+            return pathStream
+                .map(MCRPath::toMCRPath)
+                .map(MCRPath::getOwnerRelativePath)
+                .map(path -> path.substring(1))
+                .filter(href -> !Objects.equals(href, "mets.xml"))
+                .toList();
+        }
+
+        private List<String> getMetsFiles() {
+            return mets.getFileSec().getFileGroups().stream()
+                .flatMap(fileGrp -> fileGrp.getFileList().stream())
+                .map(File::getFLocat)
+                .map(FLocat::getHref)
+                .toList();
+        }
+
+    }
+
+    private record UpdateMETSOnFileDeleteAction(Mets mets, MCRPath file) {
+
+        public void apply() {
+            String href = file.getOwnerRelativePath().substring(1);
+
+            PhysicalStructMap physStructMap = (PhysicalStructMap) mets.getStructMap(PhysicalStructMap.TYPE);
+            PhysicalDiv divContainer = physStructMap.getDivContainer();
+
+            // search the right group and remove the file from the group
+            for (FileGrp fileGrp : mets.getFileSec().getFileGroups()) {
+                if (!fileGrp.contains(href)) {
+                    continue;
+                }
+                File fileToRemove = fileGrp.getFileByHref(href);
+                fileGrp.removeFile(fileToRemove);
+                List<PhysicalSubDiv> physicalSubDivsToRemove = removeFptrs(fileGrp, divContainer, fileToRemove);
+                removePhysicalSubDivs(physicalSubDivsToRemove, divContainer);
+            }
+        }
+
+        private List<PhysicalSubDiv> removeFptrs(FileGrp fileGrp, PhysicalDiv divContainer, File fileToRemove) {
+            List<PhysicalSubDiv> physicalSubDivsToRemove = new ArrayList<>();
+            // remove file from mets:mets/mets:structMap[@TYPE='PHYSICAL']
+            for (PhysicalSubDiv physicalSubDiv : divContainer.getChildren()) {
+                List<Fptr> fptrsToRemove = new ArrayList<>();
+                for (Fptr fptr : physicalSubDiv.getChildren()) {
+                    if (fptr.getFileId().equals(fileToRemove.getId())) {
+                        if (fileGrp.getUse().equals(FileGrp.USE_MASTER)) {
+                            physicalSubDivsToRemove.add(physicalSubDiv);
+                        } else {
+                            fptrsToRemove.add(fptr);
+                        }
+                    }
+                }
+                for (Fptr fptrToRemove : fptrsToRemove) {
+                    LOGGER.info(() -> String.format(Locale.ROOT, "remove fptr \"%s\" from mets.xml of \"%s\"",
+                        fptrToRemove.getFileId(), file.getOwner()));
+                    physicalSubDiv.remove(fptrToRemove);
+                }
+            }
+            return physicalSubDivsToRemove;
+        }
+
+        private void removePhysicalSubDivs(List<PhysicalSubDiv> physicalSubDivsToRemove, PhysicalDiv divContainer) {
+            for (PhysicalSubDiv physicalSubDivToRemove : physicalSubDivsToRemove) {
+                //remove links in mets:structLink section
+                List<SmLink> list = mets.getStructLink().getSmLinkByTo(physicalSubDivToRemove.getId());
+                LogicalStructMap logicalStructMap = (LogicalStructMap) mets
+                    .getStructMap(LogicalStructMap.TYPE);
+
+                for (SmLink linkToRemove : list) {
+                    rmSmLink(linkToRemove, logicalStructMap);
+                }
+                divContainer.remove(physicalSubDivToRemove);
+            }
+        }
+
+        private void rmSmLink(SmLink linkToRemove, LogicalStructMap logicalStructMap) {
+            LOGGER.info(() -> String.format(Locale.ROOT, "remove smLink from \"%s\" to \"%s\"",
+                linkToRemove.getFrom(), linkToRemove.getTo()));
+            mets.getStructLink().removeSmLink(linkToRemove);
+            // modify logical struct Map
+            String logID = linkToRemove.getFrom();
+            // the deleted file was not directly assigned to a structure
+            if (logicalStructMap.getDivContainer().getId().equals(logID)) {
+                return;
+            }
+            LogicalDiv logicalDiv = logicalStructMap.getDivContainer().getLogicalSubDiv(logID);
+            if (logicalDiv == null) {
+                LOGGER.error("Could not find 'LogicalDiv' with id '{}'.", () -> logID);
+                return;
+            }
+            // there are still files for this logical sub div, nothing to do
+            if (!mets.getStructLink().getSmLinkByFrom(logicalDiv.getId()).isEmpty()) {
+                return;
+            }
+            // the logical div has other divs included, nothing to do
+            if (!logicalDiv.getChildren().isEmpty()) {
+                return;
+            }
+            /*
+             * the log div might be in a hierarchy of divs, which may now be empty
+             * (only containing empty directories), if so the parent of the log div
+             * must be deleted
+             * */
+            handleParents(logicalDiv);
+
+            logicalStructMap.getDivContainer().remove(logicalDiv);
+        }
+
+        private void handleParents(LogicalDiv logDiv) {
+            LogicalDiv parent = logDiv.getParent();
+            // there are files for the parent of the log div, thus nothing to do
+            if (!mets.getStructLink().getSmLinkByFrom(parent.getId()).isEmpty()) {
+                return;
+            }
+            //no files associated to the parent of the log div
+            LogicalDiv logicalDiv = ((LogicalStructMap) mets.getStructMap(LogicalStructMap.TYPE)).getDivContainer();
+            if (parent.getParent().equals(logicalDiv)) {
+                //the parent the log div container itself, thus we quit here and remove the log div
+                logicalDiv.remove(parent);
+            } else {
+                handleParents(parent);
+            }
+        }
+
     }
 
 }

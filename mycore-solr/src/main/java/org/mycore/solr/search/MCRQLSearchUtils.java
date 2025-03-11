@@ -19,12 +19,10 @@
 package org.mycore.solr.search;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.logging.log4j.LogManager;
@@ -32,6 +30,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.filter.ElementFilter;
+import org.jdom2.util.IteratorIterable;
 import org.mycore.common.MCRUsageException;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRCondition;
@@ -48,14 +47,36 @@ public class MCRQLSearchUtils {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRQLSearchUtils.class);
 
-    private static HashSet<String> SEARCH_PARAMETER = new HashSet<>(Arrays.asList("search", "query", "maxResults",
-        "numPerPage", "page", "mask", "mode", "redirect", "qt"));
+    private static final Set<String> SEARCH_PARAMETER = Set.of("search", "query", "maxResults",
+        "numPerPage", "page", "mask", "mode", "redirect", "qt");
+
+    private static final String ELEMENT_CONDITIONS = "conditions";
+
+    private static final String ELEMENT_CONDITION = "condition";
+
+    private static final String ELEMENT_FIELD = "field";
+
+    private static final String ELEMENT_SORT_BY = "sortBy";
+
+    private static final String ELEMENT_RETURN_FIELDS = "returnFields";
+
+    private static final String ELEMENT_VALUE = "value";
+
+    private static final String ATTRIBUTE_FIELD = "field";
+
+    private static final String ATTRIBUTE_OPERATOR = "operator";
+
+    private static final String ATTRIBUTE_VALUE = "value";
+
+    private static final String REQUEST_PARAM_PART_OPERATOR = ".operator";
+
+    private static final String REQUEST_PARAM_PART_SORT_FIELD = ".sortField";
 
     /**
      * Build MCRQuery from editor XML input
      */
     public static MCRQuery buildFormQuery(Element root) {
-        Element conditions = root.getChild("conditions");
+        Element conditions = root.getChild(ELEMENT_CONDITIONS);
 
         if (conditions.getAttributeValue("format", "xml").equals("xml")) {
             Element condition = conditions.getChildren().getFirst();
@@ -63,17 +84,18 @@ public class MCRQLSearchUtils {
 
             // Remove conditions without values
             List<Element> empty = new ArrayList<>();
-            for (Iterator<Element> it = conditions.getDescendants(new ElementFilter("condition")); it.hasNext();) {
-                Element cond = it.next();
-                if (cond.getAttribute("value") == null) {
+            IteratorIterable<Element> descendants = conditions.getDescendants(new ElementFilter(ELEMENT_CONDITION));
+            while (descendants.hasNext()) {
+                Element cond = descendants.next();
+                if (cond.getAttribute(ATTRIBUTE_VALUE) == null) {
                     empty.add(cond);
                 }
             }
 
             // Remove empty sort conditions
-            Element sortBy = root.getChild("sortBy");
+            Element sortBy = root.getChild(ELEMENT_SORT_BY);
             if (sortBy != null) {
-                for (Element field : sortBy.getChildren("field")) {
+                for (Element field : sortBy.getChildren(ELEMENT_FIELD)) {
                     if (field.getAttributeValue("name", "").isEmpty()) {
                         empty.add(field);
                     }
@@ -89,7 +111,7 @@ public class MCRQLSearchUtils {
             }
 
             // Remove empty returnFields
-            Element returnFields = root.getChild("returnFields");
+            Element returnFields = root.getChild(ELEMENT_RETURN_FIELDS);
             if (returnFields != null && returnFields.getText().isEmpty()) {
                 returnFields.detach();
             }
@@ -102,27 +124,27 @@ public class MCRQLSearchUtils {
      * Rename elements conditionN to condition. Transform condition with multiple child values to OR-condition.
      */
     protected static void renameElements(Element element) {
-        if (element.getName().startsWith("condition")) {
-            element.setName("condition");
+        if (element.getName().startsWith(ELEMENT_CONDITION)) {
+            element.setName(ELEMENT_CONDITION);
 
-            String field = new StringTokenizer(element.getAttributeValue("field"), " -,").nextToken();
-            String operator = element.getAttributeValue("operator");
+            String field = new StringTokenizer(element.getAttributeValue(ATTRIBUTE_FIELD), " -,").nextToken();
+            String operator = element.getAttributeValue(ATTRIBUTE_OPERATOR);
             if (operator == null) {
                 LOGGER.warn("No operator defined for field: {}", field);
                 operator = "=";
             }
-            element.setAttribute("operator", operator);
+            element.setAttribute(ATTRIBUTE_OPERATOR, operator);
 
-            List<Element> values = element.getChildren("value");
-            if (values != null && values.size() > 0) {
-                element.removeAttribute("field");
-                element.setAttribute("operator", "or");
+            List<Element> values = element.getChildren(ELEMENT_VALUE);
+            if (values != null && !values.isEmpty()) {
+                element.removeAttribute(ATTRIBUTE_FIELD);
+                element.setAttribute(ATTRIBUTE_OPERATOR, "or");
                 element.setName("boolean");
                 for (Element value : values) {
-                    value.setName("condition");
-                    value.setAttribute("field", field);
-                    value.setAttribute("operator", operator);
-                    value.setAttribute("value", value.getText());
+                    value.setName(ELEMENT_CONDITION);
+                    value.setAttribute(ATTRIBUTE_FIELD, field);
+                    value.setAttribute(ATTRIBUTE_OPERATOR, operator);
+                    value.setAttribute(ATTRIBUTE_VALUE, value.getText());
                     value.removeContent();
                 }
             }
@@ -145,7 +167,7 @@ public class MCRQLSearchUtils {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static MCRQuery buildDefaultQuery(String search, String defaultSearchField) {
         String[] fields = defaultSearchField.split(" *, *");
-        MCROrCondition queryCondition = new MCROrCondition();
+        MCROrCondition queryCondition = new MCROrCondition<>();
 
         for (String fDef : fields) {
             MCRCondition condition = new MCRQueryCondition(fDef, "=", search);
@@ -160,14 +182,14 @@ public class MCRQLSearchUtils {
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static MCRQuery buildNameValueQuery(HttpServletRequest req) {
-        MCRAndCondition condition = new MCRAndCondition();
+        MCRAndCondition condition = new MCRAndCondition<>();
 
         for (Enumeration<String> names = req.getParameterNames(); names.hasMoreElements();) {
             String name = names.nextElement();
 
             // Skip irrelevant parameters
-            if (name.endsWith(".operator")
-                || name.contains(".sortField")
+            if (name.endsWith(REQUEST_PARAM_PART_OPERATOR)
+                || name.contains(REQUEST_PARAM_PART_SORT_FIELD)
                 || SEARCH_PARAMETER.contains(name)
                 || name.startsWith("XSL.")) {
                 continue;
@@ -178,12 +200,12 @@ public class MCRQLSearchUtils {
 
             if ((values.length > 1) || name.contains(",")) {
                 // Multiple fields with same name, combine with OR
-                parent = new MCROrCondition();
+                parent = new MCROrCondition<>();
                 condition.addChild(parent);
             }
 
             for (String fieldName : name.split(",")) {
-                String operator = getReqParameter(req, fieldName + ".operator", "=");
+                String operator = getReqParameter(req, fieldName + REQUEST_PARAM_PART_OPERATOR, "=");
                 for (String value : values) {
                     parent.addChild(new MCRQueryCondition(fieldName, operator, value));
                 }
@@ -204,22 +226,22 @@ public class MCRQLSearchUtils {
         List<String> sortFields = new ArrayList<>();
         for (Enumeration<String> names = req.getParameterNames(); names.hasMoreElements();) {
             String name = names.nextElement();
-            if (name.contains(".sortField")) {
+            if (name.contains(REQUEST_PARAM_PART_SORT_FIELD)) {
                 sortFields.add(name);
             }
         }
 
-        if (sortFields.size() > 0) {
+        if (!sortFields.isEmpty()) {
             sortFields.sort((arg0, arg1) -> {
-                String s0 = arg0.substring(arg0.indexOf(".sortField"));
-                String s1 = arg1.substring(arg1.indexOf(".sortField"));
+                String s0 = arg0.substring(arg0.indexOf(REQUEST_PARAM_PART_SORT_FIELD));
+                String s1 = arg1.substring(arg1.indexOf(REQUEST_PARAM_PART_SORT_FIELD));
                 return s0.compareTo(s1);
             });
             List<MCRSortBy> sortBy = new ArrayList<>();
             for (String name : sortFields) {
                 String sOrder = getReqParameter(req, name, "ascending");
                 boolean order = Objects.equals(sOrder, "ascending") ? MCRSortBy.ASCENDING : MCRSortBy.DESCENDING;
-                String fieldName = name.substring(0, name.indexOf(".sortField"));
+                String fieldName = name.substring(0, name.indexOf(REQUEST_PARAM_PART_SORT_FIELD));
                 sortBy.add(new MCRSortBy(fieldName, order));
             }
             query.setSortBy(sortBy);
@@ -233,7 +255,7 @@ public class MCRQLSearchUtils {
 
     protected static String getReqParameter(HttpServletRequest req, String name, String defaultValue) {
         String value = req.getParameter(name);
-        if (value == null || value.trim().length() == 0) {
+        if (value == null || value.isBlank()) {
             return defaultValue;
         } else {
             return value.trim();

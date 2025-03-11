@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
@@ -50,6 +51,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRXlink;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
@@ -92,8 +94,8 @@ public class MCRMigrationCommands {
         help = "Create missing servflags for createdby and modifiedby. (MCR-786)",
         order = 20)
     public static List<String> addServFlags() {
-        TreeSet<String> ids = new TreeSet<>(MCRXMLMetadataManager.instance().listIDs());
-        ArrayList<String> cmds = new ArrayList<>(ids.size());
+        SortedSet<String> ids = new TreeSet<>(MCRXMLMetadataManager.instance().listIDs());
+        List<String> cmds = new ArrayList<>(ids.size());
         for (String id : ids) {
             cmds.add("migrate author servflags for " + id);
         }
@@ -172,7 +174,7 @@ public class MCRMigrationCommands {
         // check them
         boolean changedObject = false;
         for (Element derivateLinkElement : derivateLinkElements) {
-            String href = derivateLinkElement.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
+            String href = derivateLinkElement.getAttributeValue(MCRXlink.HREF, MCRConstants.XLINK_NAMESPACE);
             MCRMetaDerivateLink link = new MCRMetaDerivateLink();
             link.setReference(href, null, null);
             String owner = link.getOwner();
@@ -226,7 +228,7 @@ public class MCRMigrationCommands {
             // path exists -> do URI encoding for href
             try {
                 String encodedHref = MCRXMLFunctions.encodeURIPath(rawPath);
-                derivateLinkElement.setAttribute("href", owner + encodedHref, MCRConstants.XLINK_NAMESPACE);
+                derivateLinkElement.setAttribute(MCRXlink.HREF, owner + encodedHref, MCRConstants.XLINK_NAMESPACE);
                 return true;
             } catch (URISyntaxException uriEncodeException) {
                 LOGGER.error("Unable to encode {} for object {}", rawPath, objectID, uriEncodeException);
@@ -320,10 +322,10 @@ public class MCRMigrationCommands {
         help = "Migrates the order and label of all derivates (MCR-2003, MCR-2099)")
     public static List<String> migrateAllDerivates() {
         List<String> objectTypes = MCRObjectID.listTypes();
-        objectTypes.remove("derivate");
+        objectTypes.remove(MCRDerivate.OBJECT_TYPE);
         objectTypes.remove("class");
 
-        ArrayList<String> commands = new ArrayList<>();
+        List<String> commands = new ArrayList<>();
         for (String t : objectTypes) {
             for (String objID : MCRXMLMetadataManager.instance().listIDsOfType(t)) {
                 commands.add("migrate derivatelinks for object " + objID);
@@ -366,10 +368,11 @@ public class MCRMigrationCommands {
 
         //migrate title:
         //in professorenkatalog we used a service flag to store the title -> should be moved to titles/tile
-        if (!derivate.getService().getFlags("title").isEmpty()) {
-            String title = derivate.getService().getFlags("title").getFirst();
+        String titleFlag = "title";
+        if (!derivate.getService().getFlags(titleFlag).isEmpty()) {
+            String title = derivate.getService().getFlags(titleFlag).getFirst();
             derivate.getDerivate().getTitles().add(new MCRMetaLangText("title", "de", null, 0, "main", title));
-            derivate.getService().removeFlags("title");
+            derivate.getService().removeFlags(titleFlag);
         }
 
         //update derivate

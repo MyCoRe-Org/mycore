@@ -68,7 +68,7 @@ public class MCRSolrResourceConfigSetProvider extends MCRSolrConfigSetProvider {
     @Override
     public Supplier<InputStream> getStreamSupplier() {
         return () -> {
-            HashSet<String> createdDirs = new HashSet<>();
+            Set<String> createdDirs = new HashSet<>();
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
                 try (ZipOutputStream outputStream = new ZipOutputStream(baos)) {
                     List<String> files = MCRConfiguration2.splitValue(this.getFilesString()).toList();

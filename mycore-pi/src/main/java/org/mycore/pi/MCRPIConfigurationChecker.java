@@ -63,7 +63,7 @@ public class MCRPIConfigurationChecker implements MCRStartupHandler.AutoExecutab
                 .map(Map.Entry::getKey))
             .collect(Collectors.toList());
 
-        if (deprecatedPropertyList.size() > 0) {
+        if (!deprecatedPropertyList.isEmpty()) {
             throw new MCRConfigurationException("Deprecated properties found: " + deprecatedPropertyList
                 .stream()
                 .collect(Collectors.joining(System.lineSeparator())));

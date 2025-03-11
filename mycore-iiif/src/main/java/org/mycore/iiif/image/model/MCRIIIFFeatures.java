@@ -19,28 +19,28 @@
 package org.mycore.iiif.image.model;
 
 public enum MCRIIIFFeatures {
-    baseUriRedirect("baseUriRedirect"),
-    canonicalLinkHeader("canonicalLinkHeader"),
-    cors("cors"),
-    jsonldMediaType(
+    BASE_URI_REDIRECT("baseUriRedirect"),
+    CANONICAL_LINK_HEADER("canonicalLinkHeader"),
+    CORS("cors"),
+    JSONLD_MEDIA_TYPE(
         "jsonldMediaType"),
-    mirroring("mirroring"),
-    profileLinkHeader("profileLinkHeader"),
-    regionByPct(
+    MIRRORING("mirroring"),
+    PROFILE_LINK_HEADER("profileLinkHeader"),
+    REGION_BY_PCT(
         "regionByPct"),
-    regionByPx("regionByPx"),
-    rotationArbitrary("rotationArbitrary"),
-    rotationBy90s(
+    REGION_BY_PX("regionByPx"),
+    ROTATION_ARBITRARY("rotationArbitrary"),
+    ROTATION_BY_90_S(
         "rotationBy90s"),
-    sizeAboveFull("sizeAboveFull"),
-    sizeByWhListed("sizeByWhListed"),
-    sizeByForcedWh(
+    SIZE_ABOVE_FULL("sizeAboveFull"),
+    SIZE_BY_WH_LISTED("sizeByWhListed"),
+    SIZE_BY_FORCED_WH(
         "sizeByForcedWh"),
-    sizeByH(
+    SIZE_BY_H(
         "sizeByH"),
-    sizeByPct("sizeByPct"),
-    sizeByW("sizeByW"),
-    sizeByWh("sizeByWh");
+    SIZE_BY_PCT("sizeByPct"),
+    SIZE_BY_W("sizeByW"),
+    SIZE_BY_WH("sizeByWh");
 
     private final String featureName;
 

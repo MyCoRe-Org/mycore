@@ -20,8 +20,9 @@ package org.mycore.common.xml;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.xml.transform.URIResolver;
@@ -98,7 +99,7 @@ public abstract class MCRDynamicURIResolver implements URIResolver {
     public Element resolveElement(String uri) {
         Objects.requireNonNull(xmlFile, "No xml file set in '" + this.getClass().getName() + "'!");
         Element rootElement = getRootElement();
-        Hashtable<String, String> variablesMap = createVariablesMap(uri);
+        Map<String, String> variablesMap = createVariablesMap(uri);
         resolveVariablesFromElement(rootElement, variablesMap);
         return rootElement;
     }
@@ -135,8 +136,8 @@ public abstract class MCRDynamicURIResolver implements URIResolver {
      * @param uri the whole uri
      * @return a hashtable with all variables from the uri
      */
-    protected Hashtable<String, String> createVariablesMap(String uri) {
-        Hashtable<String, String> variablesMap = new Hashtable<>();
+    protected Map<String, String> createVariablesMap(String uri) {
+        Map<String, String> variablesMap = new HashMap<>();
         String uriValue = uri.substring(uri.indexOf(':') + 1);
         String[] variablesArr = uriValue.split(":");
         for (int i = 0; i < variablesArr.length; i++) {
@@ -161,14 +162,14 @@ public abstract class MCRDynamicURIResolver implements URIResolver {
      * @param startElement where to start to resolve the variables
      * @param variablesMap a map of all variables
      */
-    protected void resolveVariablesFromElement(Element startElement, Hashtable<String, String> variablesMap) {
+    protected void resolveVariablesFromElement(Element startElement, Map<String, String> variablesMap) {
         Iterator<Element> it = startElement.getDescendants(Filters.element());
         MCRTextResolver varResolver = new MCRTextResolver(variablesMap);
         while (it.hasNext()) {
             Element element = it.next();
             // text
             String text = element.getText();
-            if (text != null && !text.equals("") && text.contains("{")) {
+            if (text != null && !text.isEmpty() && text.contains("{")) {
                 element.setText(varResolver.resolve(text));
             }
 

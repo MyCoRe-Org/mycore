@@ -42,17 +42,16 @@ import com.google.common.cache.LoadingCache;
 /**
  * IFS2 MyCoRe FileStore implementation
  */
-public class MCRFileStore extends MCRAbstractFileStore {
+public final class MCRFileStore extends MCRAbstractFileStore {
 
-    private MCRStore contentStore;
+    private final MCRStore contentStore;
 
-    private String baseId;
+    private final String baseId;
 
-    private FileStore baseFileStore;
+    private final FileStore baseFileStore;
 
-    private static LoadingCache<String, MCRFileStore> instanceHolder = CacheBuilder.newBuilder().weakKeys()
+    private static final LoadingCache<String, MCRFileStore> INSTANCE_HOLDER = CacheBuilder.newBuilder().weakKeys()
         .build(new CacheLoader<>() {
-
             @Override
             public MCRFileStore load(String contentStoreID) throws Exception {
                 MCRStore store = MCRStoreManager.getStore(contentStoreID);
@@ -82,9 +81,9 @@ public class MCRFileStore extends MCRAbstractFileStore {
 
     static MCRFileStore getInstance(String storeId) throws IOException {
         try {
-            return instanceHolder.get(storeId);
-        } catch (ExecutionException e) {
-            Throwable cause = e.getCause();
+            return INSTANCE_HOLDER.get(storeId);
+        } catch (ExecutionException ignoredIfCauseIOE) {
+            Throwable cause = ignoredIfCauseIOE.getCause();
             if (cause instanceof IOException ioe) {
                 throw ioe;
             }

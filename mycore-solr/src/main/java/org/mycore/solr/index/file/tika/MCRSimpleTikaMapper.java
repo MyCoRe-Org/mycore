@@ -81,35 +81,39 @@ public class MCRSimpleTikaMapper implements MCRTikaMapper {
         String simplifiedKey = MCRTikaMapper.simplifyKeyName(keyWONamespace);
 
         if (element.isValueNode() && element instanceof ValueNode vn) {
-            String value = getValueNodeAsString(vn);
-            if (value == null || value.isEmpty()) {
-                return;
-            }
-            document.addField(simplifiedKey, value);
+            mapValueNode(document, vn, simplifiedKey);
         } else if (element.isArray() && element instanceof ArrayNode an) {
-            if (isMultiValueField()) {
-                an.forEach(e -> {
-                    if (e.isValueNode() && e instanceof ValueNode vn) {
-                        String value = getValueNodeAsString(vn);
-                        if (value == null || value.isEmpty()) {
-                            return;
-                        }
-                        document.addField(simplifiedKey, value);
-                    }
-                });
-            } else {
-                StringBuilder sb = new StringBuilder();
-                an.forEach(e -> {
-                    if (e.isValueNode() && e instanceof ValueNode vn) {
-                        if (!sb.isEmpty()) {
-                            sb.append('\n');
-                        }
-                        sb.append(getValueNodeAsString(vn));
-                    }
-                });
-                document.addField(simplifiedKey, sb.toString());
-            }
+            mapArrayNode(document, an, simplifiedKey);
         }
+    }
+
+    private void mapArrayNode(SolrInputDocument document, ArrayNode an, String simplifiedKey) {
+        if (isMultiValueField()) {
+            an.forEach(e -> {
+                if (e.isValueNode() && e instanceof ValueNode vn) {
+                    mapValueNode(document, vn, simplifiedKey);
+                }
+            });
+        } else {
+            StringBuilder sb = new StringBuilder();
+            an.forEach(e -> {
+                if (e.isValueNode() && e instanceof ValueNode vn) {
+                    if (!sb.isEmpty()) {
+                        sb.append('\n');
+                    }
+                    sb.append(getValueNodeAsString(vn));
+                }
+            });
+            document.addField(simplifiedKey, sb.toString());
+        }
+    }
+
+    private void mapValueNode(SolrInputDocument document, ValueNode vn, String simplifiedKey) {
+        String value = getValueNodeAsString(vn);
+        if (value == null || value.isEmpty()) {
+            return;
+        }
+        document.addField(simplifiedKey, value);
     }
 
     protected String getValueNodeAsString(ValueNode vn) {

@@ -18,21 +18,30 @@
 
 package org.mycore.datamodel.ifs2;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public class MCRStoreCenter {
-    private Map<String, MCRStore> storeHeap;
+public final class MCRStoreCenter {
 
-    private static MCRStoreCenter instance = new MCRStoreCenter();
+    private final Map<String, MCRStore> storeHeap;
+
+    private static volatile MCRStoreCenter instance;
 
     private MCRStoreCenter() {
-        this.storeHeap = new HashMap<>();
+        this.storeHeap = new ConcurrentHashMap<>();
     }
 
     public static MCRStoreCenter instance() {
+        if (instance == null) {
+            synchronized (MCRStoreCenter.class) {
+                if (instance == null) {
+                    instance = new MCRStoreCenter();
+                }
+            }
+        }
         return instance;
     }
 
@@ -44,8 +53,21 @@ public class MCRStoreCenter {
      */
     public void addStore(String id, MCRStore store) throws MCRStoreAlreadyExistsException {
         if (storeHeap.putIfAbsent(id, store) != null) {
-            throw new MCRStoreAlreadyExistsException("Could not add store with ID " + id + ", store allready exists");
+            throw new MCRStoreAlreadyExistsException("Could not add store with ID " + id + ", store already exists");
         }
+    }
+
+    /**
+     * Computes a store if it does not exist yet.
+     *
+     * @param id store id
+     * @param storeSupplier the mapping function to create a store
+     * @return the original store or the newly computed one
+     * @param <T> the store
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends MCRStore> T computeStoreIfAbsent(String id, Supplier<T> storeSupplier) {
+        return (T) storeHeap.computeIfAbsent(id, k -> storeSupplier.get());
     }
 
     /**
@@ -99,4 +121,5 @@ public class MCRStoreCenter {
     public void clear() {
         storeHeap.clear();
     }
+
 }

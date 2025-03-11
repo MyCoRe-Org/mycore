@@ -61,22 +61,22 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     protected static final String DEFAULT_LANGUAGE = MCRConfiguration2.getString("MCR.Metadata.DefaultLang")
         .orElse(MCRConstants.DEFAULT_LANG);
 
-    protected static final String DEFAULT_ELEMENT_DATAPART = "metadata";
+    protected static final String DEFAULT_ELEMENT_DATAPART = MCRObjectMetadata.XML_NAME;
 
-    protected static final String DEFAULT_ATTRIBUTE_INHERITED = "inherited";
+    protected static final String DEFAULT_ATTRIBUTE_INHERITED = MCRXMLConstants.INHERITED;
 
-    protected static final String DEFAULT_ATTRIBUTE_LANG = "lang";
+    protected static final String DEFAULT_ATTRIBUTE_LANG = MCRXMLConstants.LANG;
 
-    protected static final String DEFAULT_ATTRIBUTE_SEQUENCE = "sequence";
+    protected static final String DEFAULT_ATTRIBUTE_SEQUENCE = MCRXMLConstants.SEQUENCE;
 
-    protected static final String DEFAULT_ATTRIBUTE_TYPE = "type";
+    protected static final String DEFAULT_ATTRIBUTE_TYPE = MCRXMLConstants.TYPE;
 
     protected static final int DEFAULT_INHERITED = 0;
 
     protected static final int DEFAULT_SEQUENCE = -1;
 
     // logger
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     // MetaLangText data
     protected String subtag;

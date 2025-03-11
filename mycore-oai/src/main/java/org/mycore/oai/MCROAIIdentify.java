@@ -23,8 +23,6 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRURIResolver;
@@ -42,11 +40,9 @@ import org.mycore.oai.pmh.SimpleIdentify;
  * Also adds custom description elements from URIs configured by MCR.OAIDataProvider.OAI.DescriptionURI
  *
  * @author Matthias Eichner
- * @author Frank L\u00fctzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCROAIIdentify extends SimpleIdentify {
-
-    protected static final Logger LOGGER = LogManager.getLogger(MCROAIIdentify.class);
 
     protected String configPrefix;
 

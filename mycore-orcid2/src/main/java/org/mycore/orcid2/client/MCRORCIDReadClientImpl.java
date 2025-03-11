@@ -71,7 +71,7 @@ public class MCRORCIDReadClientImpl extends MCRORCIDBaseClient implements MCRORC
         if (offset < 0 || limit < 0) {
             throw new IllegalArgumentException("Offset or limit must be positive.");
         }
-        final Map<String, Object> queryMap = new HashMap<String, Object>();
+        final Map<String, Object> queryMap = new HashMap<>();
         queryMap.put("q", query);
         queryMap.put("start", offset);
         queryMap.put("rows", limit);

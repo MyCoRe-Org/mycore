@@ -795,7 +795,7 @@ public class MCRCalendarTest extends MCRTestCase {
         /* check julian calendar implementation */
         // all entries are empty
         try {
-            cal = MCRCalendar.getHistoryDateAsCalendar(null, false, MCRCalendar.CalendarType.Islamic);
+            cal = MCRCalendar.getHistoryDateAsCalendar(null, false, MCRCalendar.CalendarType.ISLAMIC);
         } catch (MCRException e) {
             cal = new GregorianCalendar();
         }
@@ -942,61 +942,61 @@ public class MCRCalendarTest extends MCRTestCase {
 
     @Test
     public void testBeforeZero() {
-        assertFalse(MCRCalendar.beforeZero("23.03.2022", MCRCalendar.CalendarType.Gregorian));
-        assertFalse(MCRCalendar.beforeZero("23/03/2022", MCRCalendar.CalendarType.Gregorian));
-        assertFalse(MCRCalendar.beforeZero("23-03-2022", MCRCalendar.CalendarType.Gregorian));
-        assertTrue(MCRCalendar.beforeZero("-23.03.2022", MCRCalendar.CalendarType.Gregorian));
-        assertTrue(MCRCalendar.beforeZero("-23/03/2022", MCRCalendar.CalendarType.Gregorian));
-        assertTrue(MCRCalendar.beforeZero("-23-03-2022", MCRCalendar.CalendarType.Gregorian));
+        assertFalse(MCRCalendar.beforeZero("23.03.2022", MCRCalendar.CalendarType.GREGORIAN));
+        assertFalse(MCRCalendar.beforeZero("23/03/2022", MCRCalendar.CalendarType.GREGORIAN));
+        assertFalse(MCRCalendar.beforeZero("23-03-2022", MCRCalendar.CalendarType.GREGORIAN));
+        assertTrue(MCRCalendar.beforeZero("-23.03.2022", MCRCalendar.CalendarType.GREGORIAN));
+        assertTrue(MCRCalendar.beforeZero("-23/03/2022", MCRCalendar.CalendarType.GREGORIAN));
+        assertTrue(MCRCalendar.beforeZero("-23-03-2022", MCRCalendar.CalendarType.GREGORIAN));
 
-        assertFalse(MCRCalendar.beforeZero("23-03-2022 AD", MCRCalendar.CalendarType.Gregorian));
-        assertFalse(MCRCalendar.beforeZero("AD 23-03-2022", MCRCalendar.CalendarType.Gregorian));
-        assertTrue(MCRCalendar.beforeZero("23-03-2022 BC", MCRCalendar.CalendarType.Gregorian));
-        assertTrue(MCRCalendar.beforeZero("BC 23-03-2022", MCRCalendar.CalendarType.Gregorian));
+        assertFalse(MCRCalendar.beforeZero("23-03-2022 AD", MCRCalendar.CalendarType.GREGORIAN));
+        assertFalse(MCRCalendar.beforeZero("AD 23-03-2022", MCRCalendar.CalendarType.GREGORIAN));
+        assertTrue(MCRCalendar.beforeZero("23-03-2022 BC", MCRCalendar.CalendarType.GREGORIAN));
+        assertTrue(MCRCalendar.beforeZero("BC 23-03-2022", MCRCalendar.CalendarType.GREGORIAN));
     }
 
     @Test
     public void testGetLastDayOfMonth() {
-        assertEquals(MCRCalendar.getLastDayOfMonth(GregorianCalendar.JANUARY, 2000, MCRCalendar.CalendarType.Gregorian),
+        assertEquals(MCRCalendar.getLastDayOfMonth(GregorianCalendar.JANUARY, 2000, MCRCalendar.CalendarType.GREGORIAN),
             31);
         assertEquals(
-            MCRCalendar.getLastDayOfMonth(GregorianCalendar.FEBRUARY, 2000, MCRCalendar.CalendarType.Gregorian),
+            MCRCalendar.getLastDayOfMonth(GregorianCalendar.FEBRUARY, 2000, MCRCalendar.CalendarType.GREGORIAN),
             29);
         assertEquals(
-            MCRCalendar.getLastDayOfMonth(GregorianCalendar.FEBRUARY, 2001, MCRCalendar.CalendarType.Gregorian),
+            MCRCalendar.getLastDayOfMonth(GregorianCalendar.FEBRUARY, 2001, MCRCalendar.CalendarType.GREGORIAN),
             28);
-        assertEquals(MCRCalendar.getLastDayOfMonth(GregorianCalendar.MARCH, 2000, MCRCalendar.CalendarType.Gregorian),
+        assertEquals(MCRCalendar.getLastDayOfMonth(GregorianCalendar.MARCH, 2000, MCRCalendar.CalendarType.GREGORIAN),
             31);
-        assertEquals(MCRCalendar.getLastDayOfMonth(GregorianCalendar.APRIL, 2000, MCRCalendar.CalendarType.Gregorian),
+        assertEquals(MCRCalendar.getLastDayOfMonth(GregorianCalendar.APRIL, 2000, MCRCalendar.CalendarType.GREGORIAN),
             30);
 
         assertEquals(
-            MCRCalendar.getLastDayOfMonth(GregorianCalendar.FEBRUARY, 1700, MCRCalendar.CalendarType.Gregorian),
+            MCRCalendar.getLastDayOfMonth(GregorianCalendar.FEBRUARY, 1700, MCRCalendar.CalendarType.GREGORIAN),
             28);
-        assertEquals(MCRCalendar.getLastDayOfMonth(GregorianCalendar.FEBRUARY, 1700, MCRCalendar.CalendarType.Julian),
+        assertEquals(MCRCalendar.getLastDayOfMonth(GregorianCalendar.FEBRUARY, 1700, MCRCalendar.CalendarType.JULIAN),
             29);
 
-        assertEquals(MCRCalendar.getLastDayOfMonth(CopticCalendar.NASIE, 2000, MCRCalendar.CalendarType.Coptic),
+        assertEquals(MCRCalendar.getLastDayOfMonth(CopticCalendar.NASIE, 2000, MCRCalendar.CalendarType.COPTIC),
             5);
 
-        assertEquals(MCRCalendar.getLastDayOfMonth(11, 2000, MCRCalendar.CalendarType.Egyptian),
+        assertEquals(MCRCalendar.getLastDayOfMonth(11, 2000, MCRCalendar.CalendarType.EGYPTIAN),
             30);
-        assertEquals(MCRCalendar.getLastDayOfMonth(12, 2000, MCRCalendar.CalendarType.Egyptian),
+        assertEquals(MCRCalendar.getLastDayOfMonth(12, 2000, MCRCalendar.CalendarType.EGYPTIAN),
             5);
 
-        assertEquals(MCRCalendar.getLastDayOfMonth(11, 2000, MCRCalendar.CalendarType.Armenian),
+        assertEquals(MCRCalendar.getLastDayOfMonth(11, 2000, MCRCalendar.CalendarType.ARMENIAN),
             30);
-        assertEquals(MCRCalendar.getLastDayOfMonth(12, 2000, MCRCalendar.CalendarType.Armenian),
+        assertEquals(MCRCalendar.getLastDayOfMonth(12, 2000, MCRCalendar.CalendarType.ARMENIAN),
             5);
     }
 
     @Test
     public void testIsLeapYear() {
-        assertTrue(MCRCalendar.isLeapYear(2000, MCRCalendar.CalendarType.Gregorian));
-        assertFalse(MCRCalendar.isLeapYear(1999, MCRCalendar.CalendarType.Gregorian));
-        assertFalse(MCRCalendar.isLeapYear(1582, MCRCalendar.CalendarType.Gregorian));
-        assertFalse(MCRCalendar.isLeapYear(1900, MCRCalendar.CalendarType.Gregorian));
-        assertTrue(MCRCalendar.isLeapYear(1900, MCRCalendar.CalendarType.Julian));
+        assertTrue(MCRCalendar.isLeapYear(2000, MCRCalendar.CalendarType.GREGORIAN));
+        assertFalse(MCRCalendar.isLeapYear(1999, MCRCalendar.CalendarType.GREGORIAN));
+        assertFalse(MCRCalendar.isLeapYear(1582, MCRCalendar.CalendarType.GREGORIAN));
+        assertFalse(MCRCalendar.isLeapYear(1900, MCRCalendar.CalendarType.GREGORIAN));
+        assertTrue(MCRCalendar.isLeapYear(1900, MCRCalendar.CalendarType.JULIAN));
     }
 
     @Test

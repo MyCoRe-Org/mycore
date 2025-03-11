@@ -45,6 +45,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @JsonClassDescription("Links to other objects or derivates")
 public class MCRMetaLinkID extends MCRMetaLink {
+
     /**
      * initializes with empty values.
      */
@@ -143,7 +144,7 @@ public class MCRMetaLinkID extends MCRMetaLink {
             super.setBiLink(fromid.toString(), toid.toString(), title);
         } catch (Exception e) {
             linktype = null;
-            throw new MCRException("The from/to value is not a MCRObjectID.");
+            throw new MCRException("The from/to value is not a MCRObjectID.", e);
         }
     }
 
@@ -217,21 +218,21 @@ public class MCRMetaLinkID extends MCRMetaLink {
                 MCRObjectID hrefid = MCRObjectID.getInstance(href);
                 href = hrefid.toString();
             } catch (Exception e) {
-                throw new MCRException("The xlink:href is not a MCRObjectID.");
+                throw new MCRException("The xlink:href is not a MCRObjectID.", e);
             }
         } else {
             try {
                 MCRObjectID fromid = MCRObjectID.getInstance(from);
                 from = fromid.toString();
             } catch (Exception e) {
-                throw new MCRException("The xlink:from is not a MCRObjectID.");
+                throw new MCRException("The xlink:from is not a MCRObjectID.", e);
             }
 
             try {
                 MCRObjectID toid = MCRObjectID.getInstance(to);
                 to = toid.toString();
             } catch (Exception e) {
-                throw new MCRException("The xlink:to is not a MCRObjectID.");
+                throw new MCRException("The xlink:to is not a MCRObjectID.", e);
             }
         }
     }

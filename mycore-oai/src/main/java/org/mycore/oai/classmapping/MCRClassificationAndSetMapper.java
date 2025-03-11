@@ -39,7 +39,7 @@ public class MCRClassificationAndSetMapper {
 
     private static final String PROP_SETS_PREFIX = "Sets.";
 
-    private static String PROP_SUFFIX = "MapSetToClassification.";
+    private static final String PROP_SUFFIX = "MapSetToClassification.";
 
     /**
      * maps a classification name to an OAI set name

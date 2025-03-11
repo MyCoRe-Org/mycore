@@ -20,7 +20,13 @@ package org.mycore.crypt;
 
 import org.mycore.common.MCRCatchException;
 
+import java.io.Serial;
+
 public class MCRCryptKeyNoPermissionException extends MCRCatchException {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     private String errorCode;
 
     public MCRCryptKeyNoPermissionException(String errorMessage) {

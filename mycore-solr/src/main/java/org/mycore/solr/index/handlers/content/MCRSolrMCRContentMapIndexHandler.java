@@ -87,7 +87,7 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
             }
 
             if (LOGGER.isDebugEnabled()) {
-                ArrayList<SolrInputDocument> debugList = new ArrayList<>();
+                List<SolrInputDocument> debugList = new ArrayList<>();
                 while (documents.hasNext()) {
                     debugList.add(documents.next());
                 }
@@ -98,7 +98,7 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
             UpdateRequest req = new UpdateRequest();
             getSolrAuthenticationFactory().applyAuthentication(req, MCRSolrAuthenticationLevel.INDEX);
 
-            ArrayList<SolrInputDocument> docs = new ArrayList<>(totalCount);
+            List<SolrInputDocument> docs = new ArrayList<>(totalCount);
             while (documents.hasNext()) {
                 docs.add(documents.next());
             }

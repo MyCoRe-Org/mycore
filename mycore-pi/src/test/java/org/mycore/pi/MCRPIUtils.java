@@ -42,7 +42,8 @@ import org.mycore.pi.urn.rest.MCRURNJsonBundle;
  * @author Huu Chi Vu
  */
 public class MCRPIUtils {
-    final private static Logger LOGGER = LogManager.getLogger();
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static MCRPI generateMCRPI(String fileName, String serviceID) throws MCRPersistentIdentifierException {
         MCRObjectID mycoreID = getNextFreeID();

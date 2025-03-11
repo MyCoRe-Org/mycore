@@ -37,11 +37,13 @@ import com.google.gson.JsonObject;
  */
 public class MCRMetaLangText extends MCRMetaDefault {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    private static final String FORM_PLAIN = "plain";
+
     protected String text;
 
     protected String form;
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * This is the constructor. <br>
@@ -51,7 +53,7 @@ public class MCRMetaLangText extends MCRMetaDefault {
     public MCRMetaLangText() {
         super();
         text = "";
-        form = "plain";
+        form = FORM_PLAIN;
     }
 
     /**
@@ -65,24 +67,24 @@ public class MCRMetaLangText extends MCRMetaDefault {
      * <em>text</em>, if it is null, an empty string was set
      * to the text element.
      * @param subtag       the name of the subtag
-     * @param lang     the default language
+     * @param lang         the default language
      * @param type         the optional type string
-     * @param inherted     a value &gt;= 0
+     * @param inherited    a value &gt;= 0
      * @param form         the format string, if it is empty 'plain' is set.
      * @param text         the text string
      *
      * @exception MCRException if the subtag value is null or empty
      */
-    public MCRMetaLangText(String subtag, String lang, String type, int inherted, String form, String text)
+    public MCRMetaLangText(String subtag, String lang, String type, int inherited, String form, String text)
         throws MCRException {
-        super(subtag, lang, type, inherted);
+        super(subtag, lang, type, inherited);
         this.text = "";
 
         if (text != null) {
             this.text = text.trim();
         }
 
-        this.form = "plain";
+        this.form = FORM_PLAIN;
 
         if (form != null) {
             this.form = form.trim();
@@ -108,7 +110,7 @@ public class MCRMetaLangText extends MCRMetaDefault {
             this.text = text.trim();
         }
 
-        this.form = "plain";
+        this.form = FORM_PLAIN;
 
         if (form != null) {
             this.form = form.trim();
@@ -179,7 +181,7 @@ public class MCRMetaLangText extends MCRMetaDefault {
         String tempForm = element.getAttributeValue("form");
 
         if (tempForm == null) {
-            tempForm = "plain";
+            tempForm = FORM_PLAIN;
         }
 
         form = tempForm.trim();
@@ -242,7 +244,7 @@ public class MCRMetaLangText extends MCRMetaDefault {
         text = MCRUtils.filterTrimmedNotEmpty(text)
             .orElseThrow(() -> new MCRException(getSubTag() + ": text is null or empty"));
         form = MCRUtils.filterTrimmedNotEmpty(form)
-            .orElse("plain");
+            .orElse(FORM_PLAIN);
     }
 
     /**

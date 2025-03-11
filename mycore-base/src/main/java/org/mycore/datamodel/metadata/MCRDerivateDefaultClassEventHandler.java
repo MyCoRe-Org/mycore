@@ -18,7 +18,6 @@
 
 package org.mycore.datamodel.metadata;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -49,7 +48,7 @@ public class MCRDerivateDefaultClassEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
-        final ArrayList<MCRMetaClassification> classifications = der.getDerivate().getClassifications();
+        final List<MCRMetaClassification> classifications = der.getDerivate().getClassifications();
         if (!classifications.isEmpty()) {
             //already defined at creation
             return;

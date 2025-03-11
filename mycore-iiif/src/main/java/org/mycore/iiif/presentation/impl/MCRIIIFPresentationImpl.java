@@ -61,7 +61,8 @@ public abstract class MCRIIIFPresentationImpl {
             return presentationImpl;
         } catch (NoSuchMethodException e) {
             throw new MCRConfigurationException(
-                "Configurated class (" + classObject.getName() + ") needs a string constructor: " + classPropertyName);
+                "Configurated class (" + classObject.getName() + ") needs a string constructor: " + classPropertyName,
+                e);
         } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             throw new MCRException(e);
         }
@@ -82,9 +83,9 @@ public abstract class MCRIIIFPresentationImpl {
     /**
      * For consistency and security reasons it may become necessary to
      * to cleanup the identifier, which is an otherwise unchecked URL path parameter.
-     * 
+     *
      * Subclasses may override.
-     * 
+     *
      * @param identifier - the IIIF manifest identifier, which should be normalized
      * @return the normalized identifier
      */

@@ -65,33 +65,46 @@ public class MCRObjectMerger {
         for (MCRMetaElement metaElementSource : source.getMetadata()) {
             MCRMetaElement metaElementTarget = targetMetadata.getMetadataElement(metaElementSource.getTag());
             if (metaElementTarget == null) {
-                targetMetadata.setMetadataElement(metaElementSource.clone());
-                if (validate && !validate(this.target)) {
-                    targetMetadata.removeMetadataElement(metaElementSource.getTag());
-                } else {
+                if(mergeMetaElement(metaElementSource, targetMetadata, validate)) {
                     merged = true;
                 }
             } else {
                 for (MCRMetaInterface metaInterfaceSource : metaElementSource) {
-                    boolean equal = false;
-                    for (MCRMetaInterface metaInterfaceTarget : metaElementTarget) {
-                        if (metaInterfaceSource.equals(metaInterfaceTarget)) {
-                            equal = true;
-                            break;
-                        }
-                    }
-                    if (!equal) {
-                        metaElementTarget.addMetaObject(metaInterfaceSource.clone());
-                        if (validate && !validate(this.target)) {
-                            metaElementTarget.removeMetaObject(metaInterfaceSource);
-                        } else {
-                            merged = true;
-                        }
+                    if(mergeMetaInterface(metaInterfaceSource, metaElementTarget, validate)) {
+                        merged = true;
                     }
                 }
             }
         }
         return merged;
+    }
+
+    private boolean mergeMetaElement(MCRMetaElement metaElement, MCRObjectMetadata objectMetadata, boolean validate) {
+        objectMetadata.setMetadataElement(metaElement.clone());
+        if (validate && !validate(this.target)) {
+            objectMetadata.removeMetadataElement(metaElement.getTag());
+            return false;
+        }
+        return true;
+    }
+
+    private boolean mergeMetaInterface(MCRMetaInterface metaInterface, MCRMetaElement metaElement, boolean validate) {
+        boolean equal = false;
+        for (MCRMetaInterface metaInterfaceTarget : metaElement) {
+            if (metaInterface.equals(metaInterfaceTarget)) {
+                equal = true;
+                break;
+            }
+        }
+        if (!equal) {
+            metaElement.addMetaObject(metaInterface.clone());
+            if (validate && !validate(this.target)) {
+                metaElement.removeMetaObject(metaInterface);
+            } else {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

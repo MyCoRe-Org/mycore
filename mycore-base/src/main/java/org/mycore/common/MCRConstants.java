@@ -20,7 +20,8 @@ package org.mycore.common;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.jdom2.Namespace;
@@ -30,7 +31,7 @@ import org.mycore.common.config.MCRConfiguration2;
 /**
  * This class replaces the deprecated MCRDefaults interface and provides some
  * final static fields of common use.
- * 
+ *
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  * @author Stefan Freitag (sasf)
@@ -119,10 +120,10 @@ public final class MCRConstants {
 
     public static final Namespace MCR_NAMESPACE = Namespace.getNamespace("mcr", MCR_URL);
 
-    private static final HashMap<String, Namespace> NAMESPACES_BY_PREFIX;
+    private static final Map<String, Namespace> NAMESPACES_BY_PREFIX;
 
     static {
-        NAMESPACES_BY_PREFIX = new HashMap<>();
+        NAMESPACES_BY_PREFIX = new ConcurrentHashMap<>();
 
         Field[] fields = MCRConstants.class.getFields();
         for (Field f : fields) {

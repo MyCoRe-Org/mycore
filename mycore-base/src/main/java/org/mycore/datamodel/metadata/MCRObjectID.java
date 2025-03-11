@@ -18,6 +18,8 @@
 
 package org.mycore.datamodel.metadata;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -26,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -53,21 +56,25 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @JsonClassDescription("MyCoRe ObjectID in form {project}_{type}_{int32}, "
     + "where project is a namespace and type defines the datamodel")
 @JsonFormat(shape = JsonFormat.Shape.STRING)
-public final class MCRObjectID implements Comparable<MCRObjectID> {
+public final class MCRObjectID implements Comparable<MCRObjectID>, Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     /**
      * public constant value for the MCRObjectID length
      */
     public static final int MAX_LENGTH = 64;
 
-    private static NumberFormat NUMBER_FORMAT = initNumberFormat();
+    private static NumberFormat numberFormat = initNumberFormat();
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRObjectID.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** ID pattern with named capturing groups */
     private static final Pattern ID_PATTERN = Pattern
         .compile("^(?<projectId>[a-zA-Z][a-zA-Z0-9]*)_(?<objectType>[a-zA-Z0-9]+)_(?<numberPart>[0-9]+)$");
 
-    private static final HashSet<String> VALID_TYPE_LIST;
+    private static final Set<String> VALID_TYPE_LIST;
 
     private static final Comparator<MCRObjectID> COMPARATOR_FOR_MCR_OBJECT_ID = Comparator
         .comparing(MCRObjectID::getProjectId)
@@ -162,8 +169,8 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         if (number < 0) {
             throw new IllegalArgumentException("number must be non negative integer");
         }
-        synchronized (NUMBER_FORMAT) {
-            return projectID + '_' + type.toLowerCase(Locale.ROOT) + '_' + NUMBER_FORMAT.format(number);
+        synchronized (numberFormat) {
+            return projectID + '_' + type.toLowerCase(Locale.ROOT) + '_' + numberFormat.format(number);
         }
     }
 
@@ -270,8 +277,8 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      * @return the string of the number
      */
     public String getNumberAsString() {
-        synchronized (NUMBER_FORMAT) {
-            return NUMBER_FORMAT.format(numberPart);
+        synchronized (numberFormat) {
+            return numberFormat.format(numberPart);
         }
     }
 

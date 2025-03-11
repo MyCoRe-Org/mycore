@@ -57,17 +57,17 @@ import org.mycore.util.concurrent.MCRTransactionableRunnable;
  * expiration time. The time increases for each query call.
  *
  * <p>Due to token based querying it is not possible to set a current
- * position for the resumption token. Its always set to -1.</p>
+ * position for the resumption token. It's always set to -1.</p>
  *
  * @author Matthias Eichner
  */
 public class MCROAISearchManager {
 
-    protected static final Logger LOGGER = LogManager.getLogger(MCROAISearchManager.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     protected static final String TOKEN_DELIMITER = "@";
 
-    protected static int MAX_AGE;
+    protected static final int MAX_AGE;
 
     protected Map<String, MCROAISearcher> resultMap;
 
@@ -79,7 +79,7 @@ public class MCROAISearchManager {
 
     protected int partitionSize;
 
-    private boolean runListRecordsParallel;
+    private final boolean runListRecordsParallel;
 
     static {
         String prefix = MCROAIAdapter.PREFIX + "ResumptionTokens.";
@@ -215,7 +215,9 @@ public class MCROAISearchManager {
         try {
             return token.split(TOKEN_DELIMITER)[0];
         } catch (Exception exc) {
-            throw new BadResumptionTokenException(token);
+            BadResumptionTokenException rte = new BadResumptionTokenException(token);
+            rte.initCause(exc);
+            throw rte;
         }
     }
 
@@ -224,7 +226,9 @@ public class MCROAISearchManager {
             String[] tokenParts = token.split(TOKEN_DELIMITER);
             return tokenParts[tokenParts.length - 1];
         } catch (Exception exc) {
-            throw new BadResumptionTokenException(token);
+            BadResumptionTokenException rte = new BadResumptionTokenException(token);
+            rte.initCause(exc);
+            throw rte;
         }
     }
 

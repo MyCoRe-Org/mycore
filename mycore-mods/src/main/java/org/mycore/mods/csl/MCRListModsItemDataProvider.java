@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.SequencedMap;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -32,7 +33,9 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.csl.MCRItemDataProvider;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRXMLConstants;
 import org.xml.sax.SAXException;
 
 import de.undercouch.citeproc.csl.CSLItemData;
@@ -44,16 +47,16 @@ public class MCRListModsItemDataProvider extends MCRItemDataProvider {
 
     protected static MCRCache<String, CSLItemData> cslCache = new MCRCache<>(2000, "CSL Mods Data");
 
-    private LinkedHashMap<String, CSLItemData> store = new LinkedHashMap<>();
+    private final SequencedMap<String, CSLItemData> store = new LinkedHashMap<>();
 
     @Override
     public void addContent(MCRContent content) throws IOException, JDOMException, SAXException {
         Document document = content.asXML();
-        List<Element> objects = document.getRootElement().getChildren("mycoreobject");
+        List<Element> objects = document.getRootElement().getChildren(MCRObject.ROOT_NAME);
 
         for (Element object : objects) {
             Element copy = object.clone().detach();
-            String objectID = copy.getAttributeValue("ID");
+            String objectID = copy.getAttributeValue(MCRXMLConstants.ID);
             MCRObjectID mcrObjectID = MCRObjectID.getInstance(objectID);
             CSLItemData itemData = cslCache.getIfUpToDate(objectID, MCRXMLMetadataManager.instance()
                 .getLastModified(mcrObjectID));

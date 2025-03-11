@@ -48,6 +48,7 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStringContent;
 import org.mycore.common.xml.MCREntityResolver;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.xsonify.serialize.Json2XmlSerializer;
 import org.mycore.xsonify.serialize.SerializationException;
 import org.mycore.xsonify.serialize.SerializerSettings;
@@ -116,7 +117,7 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
      * json2xml serialisation process and if {@link SerializerSettings#omitRootElement()} is set to <b>true</b>.
      */
     @MCRProperty(name = "RootName", required = false)
-    public String rootName = "mycoreobject";
+    public String rootName = MCRObject.ROOT_NAME;
 
     /**
      * Map of namespaces. This setting is required for the json2xml serialisation process if the
@@ -256,13 +257,13 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
     public static class SettingsBuilder {
 
         @MCRProperty(name = "OmitRootElement", required = false)
-        public String omitRootElement = String.valueOf(Boolean.valueOf(DEFAULT_OMIT_ROOT_ELEMENT));
+        public String omitRootElement = String.valueOf(DEFAULT_OMIT_ROOT_ELEMENT);
 
         @MCRProperty(name = "NamespaceDeclaration", required = false)
         public String namespaceDeclaration = DEFAULT_NAMESPACE_HANDLING.name();
 
         @MCRProperty(name = "NormalizeText", required = false)
-        public String normalizeText = String.valueOf(Boolean.valueOf(DEFAULT_NORMALIZE_TEXT));
+        public String normalizeText = String.valueOf(DEFAULT_NORMALIZE_TEXT);
 
         @MCRProperty(name = "ElementPrefixHandling", required = false)
         public String elementPrefixHandling = DEFAULT_ELEMENT_PREFIX_HANDLING.name();

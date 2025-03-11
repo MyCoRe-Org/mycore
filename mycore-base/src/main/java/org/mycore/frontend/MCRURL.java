@@ -32,12 +32,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * 
+ *
  * @author Matthias Eichner
  */
 public class MCRURL {
 
-    static Logger LOGGER = LogManager.getLogger(MCRURL.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRURL.class);
 
     private URL url;
 
@@ -47,7 +47,9 @@ public class MCRURL {
         try {
             this.url = new URI(url).toURL();
         } catch (URISyntaxException e) {
-            throw new MalformedURLException(e.getMessage());
+            MalformedURLException malformedURLException = new MalformedURLException(e.getMessage());
+            malformedURLException.initCause(e);
+            throw malformedURLException;
         }
     }
 

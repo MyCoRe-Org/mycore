@@ -85,7 +85,6 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRLinkTableManager;
-import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -125,7 +124,7 @@ public class MCRXMLFunctions {
             Pattern.DOTALL);
 
     private static final Logger LOGGER = LogManager.getLogger(MCRXMLFunctions.class);
-    public static volatile MimetypesFileTypeMap MIMETYPE_MAP;
+    public static volatile MimetypesFileTypeMap mimetypeMap;
 
     public static Node document(String uri) throws JDOMException, IOException, TransformerException {
         MCRSourceContent sourceContent = MCRSourceContent.getInstance(uri);
@@ -222,7 +221,7 @@ public class MCRXMLFunctions {
      * @return the date in format yyyy-MM-ddThh:mm:ssZ
      */
     public static String getISODateFromMCRHistoryDate(String date, String fieldName, String calendarName) {
-        if (fieldName == null || fieldName.trim().length() == 0) {
+        if (fieldName == null || fieldName.isBlank()) {
             return "";
         }
         boolean useLastValue = Objects.equals(fieldName, "bis");
@@ -532,15 +531,15 @@ public class MCRXMLFunctions {
             return "application/octet-stream";
         }
 
-        if (MIMETYPE_MAP == null) {
+        if (mimetypeMap == null) {
             synchronized (MCRXMLFunctions.class) {
-                if (MIMETYPE_MAP == null) {
-                    MIMETYPE_MAP = new MimetypesFileTypeMap();
+                if (mimetypeMap == null) {
+                    mimetypeMap = new MimetypesFileTypeMap();
                 }
             }
         }
 
-        return MIMETYPE_MAP.getContentType(f.toLowerCase(Locale.ROOT));
+        return mimetypeMap.getContentType(f.toLowerCase(Locale.ROOT));
     }
 
     /**
@@ -945,16 +944,11 @@ public class MCRXMLFunctions {
         return new SetNodeList(distinctNodeSet);
     }
 
-    //use holder to not initialize MCRXMLMetadataManager to early (simplifies junit testing)
-    private static class MCRXMLMetaDataManagerHolder {
-        public static final MCRXMLMetadataManager INSTANCE = MCRXMLMetadataManager.instance();
-    }
-
-    private static class MCRCategLinkServiceHolder {
+    private static final class MCRCategLinkServiceHolder {
         public static final MCRCategLinkService INSTANCE = MCRCategLinkServiceFactory.getInstance();
     }
 
-    private static class SetNodeList implements NodeList {
+    private static final class SetNodeList implements NodeList {
 
         private final Object[] objects;
 

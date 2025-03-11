@@ -18,6 +18,8 @@
 
 package org.mycore.restapi.v1;
 
+import static org.mycore.frontend.jersey.MCRJerseyUtil.APPLICATION_JSON_UTF_8;
+import static org.mycore.frontend.jersey.MCRJerseyUtil.TEXT_XML_UTF_8;
 import static org.mycore.restapi.v1.MCRRestAuthorizationFilter.PARAM_DERID;
 import static org.mycore.restapi.v1.MCRRestAuthorizationFilter.PARAM_MCRID;
 
@@ -28,7 +30,6 @@ import java.util.Objects;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
-import org.mycore.frontend.jersey.MCRJerseyUtil;
 import org.mycore.restapi.annotations.MCRAccessControlExposeHeaders;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
@@ -56,13 +57,16 @@ import jakarta.ws.rs.core.UriInfo;
 
 /**
  * REST API methods to retrieve objects and derivates.
- * 
+ *
  * @author Robert Stephan
- * 
+ *
  */
 @Path("/objects")
 public class MCRRestAPIObjects {
+
     public static final String STYLE_DERIVATEDETAILS = "derivatedetails";
+
+    private static final String PATH_DERIVATES = "derivates";
 
     public static final String FORMAT_JSON = "json";
 
@@ -72,10 +76,20 @@ public class MCRRestAPIObjects {
 
     public static final String SORT_DESC = "desc";
 
+    public static final String QUERY_PARAM_FORMAT = "format";
+
+    public static final String QUERY_PARAM_SORT = "sort";
+
+    public static final String QUERY_PARAM_FILTER = "filter";
+
+    public static final String QUERY_PARAM_STYLE = "style";
+
+    public static final String QUERY_PARAM_DEPTH = "depth";
+
     @Context
     Application app;
 
-    /** returns a list of mcrObjects 
+    /** returns a list of mcrObjects
      *
      * @param info - the injected Jersey URIInfo object
      * @param format - parameter for return format, values are
@@ -95,21 +109,21 @@ public class MCRRestAPIObjects {
      *
      * @return a Jersey response object
      */
-
     @GET
-    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @Produces({ TEXT_XML_UTF_8, APPLICATION_JSON_UTF_8 })
     public Response listObjects(@Context UriInfo info,
-        @QueryParam("format") @DefaultValue("xml") String format, @QueryParam("filter") String filter,
-        @QueryParam("sort") @DefaultValue("ID:asc") String sort) throws MCRRestAPIException {
+        @QueryParam(QUERY_PARAM_FORMAT) @DefaultValue(FORMAT_XML) String format,
+        @QueryParam(QUERY_PARAM_FILTER) String filter,
+        @QueryParam(QUERY_PARAM_SORT) @DefaultValue("ID:" + SORT_ASC) String sort) throws MCRRestAPIException {
         return MCRRestAPIObjectsHelper.listObjects(info, format, filter, sort);
     }
 
-    /** 
-     * returns a list of derivates for a given MyCoRe Object 
+    /**
+     * Returns a list of derivates for a given MyCoRe Object.
      *
      * @param info - the injected Jersey URIInfo object
      * @param mcrid - an object identifier of syntax [id] or [prefix]:[id]
-     *
+     * <p>
      * Allowed Prefixes are "mcr" or application specific search keys
      * "mcr" is the default prefix for MyCoRe IDs.
     
@@ -122,23 +136,22 @@ public class MCRRestAPIObjects {
      *
      * @return a Jersey Response object
      */
-
     @GET
-    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
-    @Path("/{" + PARAM_MCRID + "}/derivates")
+    @Produces({ TEXT_XML_UTF_8, APPLICATION_JSON_UTF_8 })
+    @Path("/{" + PARAM_MCRID + "}/" + PATH_DERIVATES)
     public Response listDerivates(@Context UriInfo info,
         @PathParam(PARAM_MCRID) String mcrid,
-        @QueryParam("format") @DefaultValue("xml") String format,
-        @QueryParam("sort") @DefaultValue("ID:asc") String sort) throws MCRRestAPIException {
+        @QueryParam(QUERY_PARAM_FORMAT) @DefaultValue(FORMAT_XML) String format,
+        @QueryParam(QUERY_PARAM_SORT) @DefaultValue("ID:" + SORT_ASC) String sort) throws MCRRestAPIException {
         return MCRRestAPIObjectsHelper.listDerivates(info, mcrid, format, sort);
     }
 
     /**
-     * returns a single derivate object in XML Format
-     * 
+     * Returns a single derivate object in XML Format.
+     *
      * @param info - the injected Jersey URIInfo object
      * @param id an object identifier of syntax [id] or [prefix]:[id]
-     *
+     * <p>
      * Allowed Prefixes are "mcr" or application specific search keys
      * "mcr" is the default prefix for MyCoRe IDs.
     
@@ -152,18 +165,18 @@ public class MCRRestAPIObjects {
     @Produces(MediaType.TEXT_XML)
     @Path("/{" + PARAM_MCRID + "}")
     public Response returnMCRObject(@Context UriInfo info,
-        @PathParam(PARAM_MCRID) String id, @QueryParam("style") String style)
+        @PathParam(PARAM_MCRID) String id, @QueryParam(QUERY_PARAM_STYLE) String style)
         throws MCRRestAPIException {
         return MCRRestAPIObjectsHelper.showMCRObject(id, style, info, app);
     }
 
     /**
-     * returns a single object in XML Format
-     * 
+     * Returns a single object in XML Format.
+     *
      * @param info - the injected Jersey URIInfo object
      * @param mcrid - a object identifier of syntax [id] or [prefix]:[id]
      * @param derid - a derivate identifier of syntax [id] or [prefix]:[id]
-     *
+     * <p>
      * Allowed Prefixes are "mcr" or application specific search keys
      * "mcr" is the default prefix for MyCoRe IDs.
      *
@@ -174,24 +187,25 @@ public class MCRRestAPIObjects {
      */
     @GET
     @Produces(MediaType.TEXT_XML)
-    @Path("/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}")
+    @Path("/{" + PARAM_MCRID + "}/" + PATH_DERIVATES + "/{" + PARAM_DERID + "}")
     public Response returnDerivate(@Context UriInfo info,
         @PathParam(PARAM_MCRID) String mcrid,
         @PathParam(PARAM_DERID) String derid,
-        @QueryParam("style") String style)
+        @QueryParam(QUERY_PARAM_STYLE) String style)
         throws MCRRestAPIException {
         return MCRRestAPIObjectsHelper.showMCRDerivate(mcrid, derid, info, app,
             Objects.equals(style, "derivatedetails"));
     }
 
-    /** returns a list of derivates for a given MyCoRe Object 
+    /** 
+     * Returns a list of derivates for a given MyCoRe Object.
      *
      * @param info - the injected Jersey URIInfo object
      * @param request - the injected JAX-WS request object
      *
      * @param mcrid - a object identifier of syntax [id] or [prefix]:[id]
      * @param derid - a derivate identifier of syntax [id] or [prefix]:[id]
-     *
+     * <p>
      * Allowed Prefixes are "mcr" or application specific search keys
      * "mcr" is the default prefix for MyCoRe IDs.
      *
@@ -204,33 +218,33 @@ public class MCRRestAPIObjects {
      *
      * @return a Jersey Response object
      */
-
     @GET
-    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MCRJerseyUtil.APPLICATION_JSON_UTF8 })
-    @Path("/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}/contents{path:(/.*)*}")
+    @Produces({ TEXT_XML_UTF_8, APPLICATION_JSON_UTF_8 })
+    @Path("/{" + PARAM_MCRID + "}/" + PATH_DERIVATES + "/{" + PARAM_DERID + "}/contents{path:(/.*)*}")
     public Response listContents(@Context UriInfo info,
         @Context Request request, @PathParam(PARAM_MCRID) String mcrid,
         @PathParam(PARAM_DERID) String derid,
-        @PathParam("path") @DefaultValue("/") String path, @QueryParam("format") @DefaultValue("xml") String format,
-        @QueryParam("depth") @DefaultValue("-1") int depth) throws MCRRestAPIException {
+        @PathParam("path") @DefaultValue("/") String path,
+        @QueryParam(QUERY_PARAM_FORMAT) @DefaultValue(FORMAT_XML) String format,
+        @QueryParam(QUERY_PARAM_DEPTH) @DefaultValue("-1") int depth) throws MCRRestAPIException {
         return MCRRestAPIObjectsHelper.listContents(info, app, request, mcrid, derid, format, path, depth);
     }
 
     /**
-     *  redirects to the maindoc of the given derivate
-     *  
+     * Redirects to the maindoc of the given derivate.
+     *
      * @param info - the injected Jersey URIInfo object
      * @param mcrObjID - a object identifier of syntax [id] or [prefix]:[id]
      * @param mcrDerID - a derivate identifier of syntax [id] or [prefix]:[id]
-     *
+     * <p>
      * Allowed Prefixes are "mcr" or application specific search keys
      * "mcr" is the default prefix for MyCoRe IDs.
      *
      * @return a Jersey Response object
-     * 
+     *
      */
     @GET
-    @Path("/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}/open")
+    @Path("/{" + PARAM_MCRID + "}/" + PATH_DERIVATES + "/{" + PARAM_DERID + "}/open")
     public Response listContents(@Context UriInfo info,
         @PathParam(PARAM_MCRID) String mcrObjID,
         @PathParam(PARAM_DERID) String mcrDerID)
@@ -241,9 +255,11 @@ public class MCRRestAPIObjects {
                 return Response.seeOther(new URI(url)).build();
             }
         } catch (URISyntaxException e) {
-            throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
+            MCRRestAPIException restAPIException = new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
                 new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR,
                     "A problem occurred while opening maindoc from derivate " + mcrDerID, e.getMessage()));
+            restAPIException.initCause(e);
+            throw restAPIException;
         }
         throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
             new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR,
@@ -255,18 +271,18 @@ public class MCRRestAPIObjects {
     //*****************************
     /**
      * create / update a MyCoRe object
-     *  
+     *
      * @param info - the injected Jersey URIInfo object
      * @param request - the injected HTTPServletRequest object
      *
      * @param uploadedInputStream - the MyCoRe Object (XML) as inputstream from HTTP Post
      * @param fileDetails - file metadata from HTTP Post
-     * 
+     *
      * @return a Jersey Response object
-     * 
+     *
      */
     @POST
-    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8" })
+    @Produces({ TEXT_XML_UTF_8 })
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @MCRRequireTransaction
     @MCRAccessControlExposeHeaders(HttpHeaders.LOCATION)
@@ -278,22 +294,22 @@ public class MCRRestAPIObjects {
 
     /**
      * create a new (empty) MyCoRe derivate or returns one that already exists (by label)
-     *  
+     *
      * @param info - the injected Jersey URIInfo object
      * @param request - the injected HTTPServletRequest object
-     * 
+     *
      * @param mcrObjID - a MyCoRe Object ID
-     * 
+     *
      * @param label - the label of the new derivate
      * @param overwrite - if true, return an existing derivate (with same label)
-     * 
+     *
      * @return a Jersey Response object
-     * 
+     *
      */
 
     @POST
-    @Path("/{" + PARAM_MCRID + "}/derivates")
-    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8" })
+    @Path("/{" + PARAM_MCRID + "}/" + PATH_DERIVATES)
+    @Produces({ TEXT_XML_UTF_8 })
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @MCRRequireTransaction
     @MCRAccessControlExposeHeaders(HttpHeaders.LOCATION)
@@ -319,8 +335,8 @@ public class MCRRestAPIObjects {
      * @return a Jersey Response object
      */
     @POST
-    @Path("/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}/contents{path:(/.*)*}")
-    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8" })
+    @Path("/{" + PARAM_MCRID + "}/" + PATH_DERIVATES + "/{" + PARAM_DERID + "}/contents{path:(/.*)*}")
+    @Produces({ TEXT_XML_UTF_8 })
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @MCRRequireTransaction
     @MCRAccessControlExposeHeaders(HttpHeaders.LOCATION)
@@ -338,18 +354,18 @@ public class MCRRestAPIObjects {
 
     /**
      * delete all file from a given derivate
-     *  
+     *
      * @param info - the injected Jersey URIInfo object
      * @param request - the injected HTTPServletRequest object
-     * 
+     *
      * @param mcrObjID - a MyCoRe Object ID
      * @param mcrDerID - a MyCoRe Derivate ID
-     * 
+     *
      * @return a Jersey Response object
-     * 
+     *
      */
     @DELETE
-    @Path("/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}/contents")
+    @Path("/{" + PARAM_MCRID + "}/" + PATH_DERIVATES + "/{" + PARAM_DERID + "}/contents")
     @MCRRequireTransaction
     public Response deleteFiles(@Context UriInfo info, @Context HttpServletRequest request,
         @PathParam(PARAM_MCRID) String mcrObjID,
@@ -359,22 +375,23 @@ public class MCRRestAPIObjects {
 
     /**
      * delete a whole derivate
-     *  
+     *
      * @param info - the injected Jersey URIInfo object
      * @param request - the injected HTTPServletRequest object
-     * 
+     *
      * @param mcrObjID - a MyCoRe Object ID
      * @param mcrDerID - a MyCoRe Derivate ID
-     * 
+     *
      * @return a Jersey Response object
-     * 
+     *
      */
     @DELETE
-    @Path("/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}")
+    @Path("/{" + PARAM_MCRID + "}/" + PATH_DERIVATES + "/{" + PARAM_DERID + "}")
     @MCRRequireTransaction
     public Response deleteDerivate(@Context UriInfo info, @Context HttpServletRequest request,
         @PathParam(PARAM_MCRID) String mcrObjID,
         @PathParam(PARAM_DERID) String mcrDerID) throws MCRRestAPIException {
         return MCRRestAPIUploadHelper.deleteDerivate(info, request, mcrObjID, mcrDerID);
     }
+
 }

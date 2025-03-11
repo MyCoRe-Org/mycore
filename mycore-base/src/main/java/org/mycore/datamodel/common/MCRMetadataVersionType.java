@@ -37,7 +37,7 @@ public enum MCRMetadataVersionType {
             .orElseThrow(IllegalArgumentException::new);
     }
 
-    final char getCharValue() {
+    char getCharValue() {
         return charValue;
     }
 }

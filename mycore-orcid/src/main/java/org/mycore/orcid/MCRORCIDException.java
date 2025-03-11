@@ -19,6 +19,7 @@
 package org.mycore.orcid;
 
 import java.io.IOException;
+import java.io.Serial;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,7 +34,8 @@ import jakarta.ws.rs.core.Response.StatusType;
  */
 public class MCRORCIDException extends IOException {
 
-    private static final long serialVersionUID = 1846541932326084816L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private String message;
 

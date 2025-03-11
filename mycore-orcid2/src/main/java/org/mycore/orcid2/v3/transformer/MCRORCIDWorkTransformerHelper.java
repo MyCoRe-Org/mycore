@@ -62,13 +62,13 @@ public class MCRORCIDWorkTransformerHelper {
         try {
             JAXB_CONTEXT = JAXBContext.newInstance(Work.class, WorkSummary.class);
         } catch (JAXBException e) {
-            throw new IllegalArgumentException("Could not init jaxb context");
+            throw new IllegalArgumentException("Could not init jaxb context", e);
         }
     }
 
     /**
      * Transforms MODS MCRContent to Work.
-     * 
+     *
      * @param content the MODS MCRContent
      * @return the Work
      * @throws MCRORCIDTransformationException if transformation failed
@@ -85,14 +85,14 @@ public class MCRORCIDWorkTransformerHelper {
     /**
      * Transforms Work to MODS MCRContent.
      * Merges BibLaTeX using transformer
-     * 
+     *
      * @param work the Work
      * @return the MODS MCRContent
      * @throws MCRORCIDTransformationException if transformation failed
      */
     public static MCRContent transformWork(Work work) {
         checkContext();
-        final MCRJAXBContent<Work> workContent = new MCRJAXBContent(JAXB_CONTEXT, work);
+        final MCRJAXBContent<Work> workContent = new MCRJAXBContent<>(JAXB_CONTEXT, work);
         Element mods = null;
         try {
             mods = T_WORK_MODS.transform(workContent).asXML().detachRootElement()
@@ -110,14 +110,14 @@ public class MCRORCIDWorkTransformerHelper {
 
     /**
      * Transforms WorkSummary to mods MCRContent.
-     * 
+     *
      * @param work the WorkSummary
      * @return the MODS MCRContent
      * @throws MCRORCIDTransformationException if transformation failed
      */
     public static MCRContent transformWorkSummary(WorkSummary work) {
         checkContext();
-        final MCRJAXBContent<WorkSummary> workContent = new MCRJAXBContent(JAXB_CONTEXT, work);
+        final MCRJAXBContent<WorkSummary> workContent = new MCRJAXBContent<>(JAXB_CONTEXT, work);
         Element mods = null;
         try {
             mods = T_SUMMARY_MODS.transform(workContent).asXML().detachRootElement()

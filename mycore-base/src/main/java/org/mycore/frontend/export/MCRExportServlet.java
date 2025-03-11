@@ -29,6 +29,8 @@ import org.mycore.frontend.servlets.MCRServletJob;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.io.Serial;
+
 /**
  * Provides functionality to export content.
  * The content to export can be selected by specifying one or more
@@ -56,6 +58,8 @@ import jakarta.servlet.http.HttpServletRequest;
  * @author Frank Lützenkirchen
  */
 public class MCRExportServlet extends MCRServlet {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger(MCRExportServlet.class);
@@ -86,6 +90,7 @@ public class MCRExportServlet extends MCRServlet {
     private void fillCollection(HttpServletRequest req, MCRExportCollection collection) {
         String basketID = req.getParameter("basket");
         if (basketID != null) {
+            @SuppressWarnings("PMD.LooseCoupling")
             MCRBasket basket = MCRBasketManager.getOrCreateBasketInSession(basketID);
             collection.add(basket);
             LOGGER.info("exporting basket {} via {}", () -> basketID, () -> req.getParameter("transformer"));

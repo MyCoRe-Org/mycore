@@ -18,12 +18,14 @@
 
 package org.mycore.user2;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -85,7 +87,9 @@ import jakarta.xml.bind.annotation.XmlType;
 @XmlType(propOrder = { "ownerId", "realName", "eMail", "lastLogin", "validUntil", "roles", "attributes",
     "password" })
 public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
-    private static final long serialVersionUID = 3378645055646901800L;
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /** The unique user ID */
     int internalID;
@@ -678,7 +682,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         if (getSystemRoleIDs().isEmpty() && getExternalRoleIDs().isEmpty()) {
             return null;
         }
-        ArrayList<String> roleIds = new ArrayList<>(getSystemRoleIDs().size() + getExternalRoleIDs().size());
+        List<String> roleIds = new ArrayList<>(getSystemRoleIDs().size() + getExternalRoleIDs().size());
         Collection<MCRRole> roles = new ArrayList<>(roleIds.size());
         roleIds.addAll(getSystemRoleIDs());
         roleIds.addAll(getExternalRoleIDs());
@@ -812,9 +816,10 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         return copy;
     }
 
-    private static class Password implements Serializable {
+    private static final class Password implements Serializable {
 
-        private static final long serialVersionUID = 8068063832119405080L;
+        @Serial
+        private static final long serialVersionUID = 1L;
 
         @XmlAttribute
         private String hash;
@@ -832,9 +837,10 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     }
 
-    private static class UserIdentifier implements Serializable {
+    private static final class UserIdentifier implements Serializable {
 
-        private static final long serialVersionUID = 4654103884660408929L;
+        @Serial
+        private static final long serialVersionUID = 1L;
 
         @XmlAttribute
         public String name;

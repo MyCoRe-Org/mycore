@@ -23,6 +23,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,13 +35,13 @@ import org.mycore.datamodel.niofs.MCRPath;
 
 public class MCRMetaDerivateLink extends MCRMetaLink {
 
-    private static final String ANNOTATION = "annotation";
+    private static final String ELEMENT_ANNOTATION = "annotation";
 
-    private static final String ATTRIBUTE = "lang";
+    private static final String ATTRIBUTE_LANG = MCRXMLConstants.LANG;
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private HashMap<String, String> map;
+    private Map<String, String> map;
 
     /** Constructor initializes the HashMap */
     public MCRMetaDerivateLink() {
@@ -71,13 +72,13 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
     @Override
     public void setFromDOM(Element element) throws MCRException {
         super.setFromDOM(element);
-        List<Element> childrenList = element.getChildren(ANNOTATION);
+        List<Element> childrenList = element.getChildren(ELEMENT_ANNOTATION);
         if (childrenList == null) {
             return;
         }
 
         for (Element anAnnotation : childrenList) {
-            String key = anAnnotation.getAttributeValue(ATTRIBUTE, Namespace.XML_NAMESPACE);
+            String key = anAnnotation.getAttributeValue(ATTRIBUTE_LANG, Namespace.XML_NAMESPACE);
             String annotationText = anAnnotation.getText();
             this.map.put(key, annotationText);
         }
@@ -88,10 +89,10 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
         Element elm = super.createXML();
 
         for (String key : map.keySet()) {
-            Element annotationElem = new Element(ANNOTATION);
-            annotationElem.setAttribute(ATTRIBUTE, key, Namespace.XML_NAMESPACE);
+            Element annotationElem = new Element(ELEMENT_ANNOTATION);
+            annotationElem.setAttribute(ATTRIBUTE_LANG, key, Namespace.XML_NAMESPACE);
             String content = map.get(key);
-            if (content == null || content.length() == 0) {
+            if (content == null || content.isEmpty()) {
                 continue;
             }
             annotationElem.addContent(content);

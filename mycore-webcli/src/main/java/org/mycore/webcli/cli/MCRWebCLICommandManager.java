@@ -19,7 +19,7 @@
 package org.mycore.webcli.cli;
 
 import java.util.List;
-import java.util.TreeMap;
+import java.util.SortedMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.mycore.frontend.cli.MCRCommand;
@@ -27,7 +27,7 @@ import org.mycore.frontend.cli.MCRCommandManager;
 
 /**
  * @author Thomas Scheffler (yagee)
- * 
+ *
  */
 public class MCRWebCLICommandManager extends MCRCommandManager {
 
@@ -45,7 +45,7 @@ public class MCRWebCLICommandManager extends MCRCommandManager {
         addAnnotatedCLIClass(MCRBasicWebCLICommands.class);
     }
 
-    public TreeMap<String, List<MCRCommand>> getCommandsMap() {
+    public SortedMap<String, List<MCRCommand>> getCommandsMap() {
         return knownCommands;
     }
 

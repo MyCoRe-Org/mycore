@@ -18,6 +18,9 @@
 
 package org.mycore.datamodel.metadata;
 
+import static org.mycore.datamodel.metadata.MCRXMLConstants.CLASS;
+import static org.mycore.datamodel.metadata.MCRXMLConstants.HERITABLE;
+
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,27 +33,48 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRXlink;
 import org.mycore.datamodel.niofs.MCRPath;
 
 /**
  * This class implements all methode for handling one derivate data.
- * 
+ *
  * @author Jens Kupferschmidt
  */
 public class MCRObjectDerivate {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    public static final String XML_NAME = "derivate";
+
+    public static final String ELEMENT_EXTERNALS = "externals";
+
+    public static final String ELEMENT_INTERNALS = "internals";
+
+    public static final String ELEMENT_INTERNAL = "internal";
+
+    public static final String ELEMENT_TITLES = "titles";
+
+    public static final String ELEMENT_CLASSIFICATIONS = "classifications";
+
+    public static final String ELEMENT_FILESET = "fileset";
+
+    public static final String ELEMENT_LINKMETAS = "linkmetas";
+
+    public static final String ELEMENT_LINKMETA = "linkmeta";
+
+    public static final String ATTRIBUTE_FILESET_URN = "urn";
+
     // derivate data
     private MCRMetaLinkID linkmeta;
 
-    private final ArrayList<MCRMetaLink> externals;
+    private final List<MCRMetaLink> externals;
 
     private MCRMetaIFS internals;
 
-    private final ArrayList<MCRMetaLangText> titles;
+    private final List<MCRMetaLangText> titles;
 
-    private final ArrayList<MCRMetaClassification> classifications;
+    private final List<MCRMetaClassification> classifications;
 
     private String derivateURN;
 
@@ -80,7 +104,7 @@ public class MCRObjectDerivate {
     /**
      * This methode read the XML input stream part from a DOM part for the
      * structure data of the document.
-     * 
+     *
      * @param derivate
      *            a list of relevant DOM elements for the derivate
      */
@@ -105,9 +129,9 @@ public class MCRObjectDerivate {
     }
 
     private void setFilesetFromDOM(Element derivate) {
-        Element filesetElements = derivate.getChild("fileset");
+        Element filesetElements = derivate.getChild(ELEMENT_FILESET);
         if (filesetElements != null) {
-            String mainURN = filesetElements.getAttributeValue("urn");
+            String mainURN = filesetElements.getAttributeValue(ATTRIBUTE_FILESET_URN);
             if (mainURN != null) {
                 this.derivateURN = mainURN;
             }
@@ -122,7 +146,7 @@ public class MCRObjectDerivate {
     }
 
     private void setClassificationsFromDOM(Element derivate) {
-        Element classificationElement = derivate.getChild("classifications");
+        Element classificationElement = derivate.getChild(ELEMENT_CLASSIFICATIONS);
         classifications.clear();
         if (classificationElement != null) {
             final List<Element> classificationList = classificationElement.getChildren();
@@ -135,7 +159,7 @@ public class MCRObjectDerivate {
     }
 
     private void setTitleFromDOM(Element derivate) {
-        Element titlesElement = derivate.getChild("titles");
+        Element titlesElement = derivate.getChild(ELEMENT_TITLES);
         titles.clear();
         if (titlesElement != null) {
             List<Element> titleList = titlesElement.getChildren();
@@ -150,9 +174,9 @@ public class MCRObjectDerivate {
     }
 
     private void setInternalFromDOM(Element derivate) {
-        Element internalsElement = derivate.getChild("internals");
+        Element internalsElement = derivate.getChild(ELEMENT_INTERNALS);
         if (internalsElement != null) {
-            Element internalElement = internalsElement.getChild("internal");
+            Element internalElement = internalsElement.getChild(ELEMENT_INTERNAL);
             if (internalElement != null) {
                 internals = new MCRMetaIFS();
                 internals.setFromDOM(internalElement);
@@ -161,7 +185,7 @@ public class MCRObjectDerivate {
     }
 
     private void setExternalFromDOM(Element derivate) {
-        Element externalsElement = derivate.getChild("externals");
+        Element externalsElement = derivate.getChild(ELEMENT_EXTERNALS);
         externals.clear();
         if (externalsElement != null) {
             List<Element> externalList = externalsElement.getChildren();
@@ -174,7 +198,7 @@ public class MCRObjectDerivate {
     }
 
     private void setMetadataFromDOM(Element derivate) {
-        Element linkmetaElement = derivate.getChild("linkmetas").getChild("linkmeta");
+        Element linkmetaElement = derivate.getChild(ELEMENT_LINKMETAS).getChild(ELEMENT_LINKMETA);
         MCRMetaLinkID link = new MCRMetaLinkID();
         link.setFromDOM(linkmetaElement);
         linkmeta = link;
@@ -182,7 +206,7 @@ public class MCRObjectDerivate {
 
     /**
      * returns link to the MCRObject.
-     * 
+     *
      * @return a metadata link as MCRMetaLinkID
      */
     public MCRMetaLinkID getMetaLink() {
@@ -191,7 +215,7 @@ public class MCRObjectDerivate {
 
     /**
      * This method set the metadata link
-     * 
+     *
      * @param link
      *            the MCRMetaLinkID object
      */
@@ -208,7 +232,7 @@ public class MCRObjectDerivate {
 
     /**
      * This method get a single link from the external list as a MCRMetaLink.
-     * 
+     *
      * @exception IndexOutOfBoundsException
      *                throw this exception, if the index is false
      * @return a external link as MCRMetaLink
@@ -230,7 +254,7 @@ public class MCRObjectDerivate {
 
     /**
      * This method get a single text from the titles list as a MCRMetaLangText.
-     * 
+     *
      * @exception IndexOutOfBoundsException
      *                throw this exception, if the index is false
      * @return a title text as MCRMetaLangText
@@ -245,7 +269,7 @@ public class MCRObjectDerivate {
 
     /**
      * This method get a single data from the internal list as a MCRMetaIFS.
-     * 
+     *
      * @return a internal data as MCRMetaIFS
      */
     public final MCRMetaIFS getInternals() {
@@ -255,7 +279,7 @@ public class MCRObjectDerivate {
     /**
      * @param file the file to add
      * @param urn the urn of the file, if already known, if not provide null
-     * 
+     *
      * @throws NullPointerException if first argument is null
      */
     public MCRFileMetadata getOrCreateFileMetadata(MCRPath file, String urn) {
@@ -340,7 +364,7 @@ public class MCRObjectDerivate {
 
     /**
      * This method set the metadata internals (the IFS data)
-     * 
+     *
      * @param ifs
      *            the MCRMetaIFS object
      */
@@ -354,7 +378,7 @@ public class MCRObjectDerivate {
 
     /**
      * This methode create a XML stream for all derivate data.
-     * 
+     *
      * @exception MCRException
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML data of the structure data part
@@ -365,13 +389,13 @@ public class MCRObjectDerivate {
         } catch (MCRException exc) {
             throw new MCRException("The content is not valid.", exc);
         }
-        Element elm = new Element("derivate");
-        Element linkmetas = new Element("linkmetas");
-        linkmetas.setAttribute("class", "MCRMetaLinkID");
-        linkmetas.setAttribute("heritable", "false");
+        Element elm = new Element(XML_NAME);
+        Element linkmetas = new Element(ELEMENT_LINKMETAS);
+        linkmetas.setAttribute(CLASS, MCRMetaLinkID.class.getSimpleName());
+        linkmetas.setAttribute(HERITABLE, MCRXMLConstants.FALSE);
         linkmetas.addContent(linkmeta.createXML());
         elm.addContent(linkmetas);
-        if (externals.size() != 0) {
+        if (!externals.isEmpty()) {
             Element extEl = createExternalsElement();
             elm.addContent(extEl);
         }
@@ -379,11 +403,11 @@ public class MCRObjectDerivate {
             Element intEl = createInternalsElement();
             elm.addContent(intEl);
         }
-        if (titles.size() != 0) {
+        if (!titles.isEmpty()) {
             Element titEl = createTitleElement();
             elm.addContent(titEl);
         }
-        if (classifications.size() > 0) {
+        if (!classifications.isEmpty()) {
             Element clazzElement = createClassificationElement();
             elm.addContent(clazzElement);
         }
@@ -395,9 +419,9 @@ public class MCRObjectDerivate {
     }
 
     private Element createExternalsElement() {
-        Element extEl = new Element("externals");
-        extEl.setAttribute("class", "MCRMetaLink");
-        extEl.setAttribute("heritable", "false");
+        Element extEl = new Element(ELEMENT_EXTERNALS);
+        extEl.setAttribute(CLASS, MCRMetaLink.class.getSimpleName());
+        extEl.setAttribute(HERITABLE, MCRXMLConstants.FALSE);
         for (MCRMetaLink external : externals) {
             extEl.addContent(external.createXML());
         }
@@ -405,17 +429,17 @@ public class MCRObjectDerivate {
     }
 
     private Element createInternalsElement() {
-        Element intEl = new Element("internals");
-        intEl.setAttribute("class", "MCRMetaIFS");
-        intEl.setAttribute("heritable", "false");
+        Element intEl = new Element(ELEMENT_INTERNALS);
+        intEl.setAttribute(CLASS, MCRMetaIFS.class.getSimpleName());
+        intEl.setAttribute(HERITABLE, MCRXMLConstants.FALSE);
         intEl.addContent(internals.createXML());
         return intEl;
     }
 
     private Element createTitleElement() {
-        Element titEl = new Element("titles");
-        titEl.setAttribute("class", "MCRMetaLangText");
-        titEl.setAttribute("heritable", "false");
+        Element titEl = new Element(ELEMENT_TITLES);
+        titEl.setAttribute(CLASS, MCRMetaLangText.class.getSimpleName());
+        titEl.setAttribute(HERITABLE, MCRXMLConstants.FALSE);
         titles.stream()
             .map(MCRMetaLangText::createXML)
             .forEach(titEl::addContent);
@@ -423,9 +447,9 @@ public class MCRObjectDerivate {
     }
 
     private Element createClassificationElement() {
-        Element clazzElement = new Element("classifications");
-        clazzElement.setAttribute("class", "MCRMetaClassification");
-        clazzElement.setAttribute("heritable", "false");
+        Element clazzElement = new Element(ELEMENT_CLASSIFICATIONS);
+        clazzElement.setAttribute(CLASS, MCRMetaClassification.class.getSimpleName());
+        clazzElement.setAttribute(HERITABLE, MCRXMLConstants.FALSE);
 
         classifications.stream()
             .map(MCRMetaClassification::createXML)
@@ -434,9 +458,9 @@ public class MCRObjectDerivate {
     }
 
     private Element createFilesetElement() {
-        Element fileset = new Element("fileset");
+        Element fileset = new Element(ELEMENT_FILESET);
         if (this.derivateURN != null) {
-            fileset.setAttribute("urn", this.derivateURN);
+            fileset.setAttribute(ATTRIBUTE_FILESET_URN, this.derivateURN);
         }
         Collections.sort(files);
         for (MCRFileMetadata file : files) {
@@ -452,7 +476,7 @@ public class MCRObjectDerivate {
      * <li>the linkmeta exist and the XLink type of linkmeta is not "arc"</li>
      * <li>no information in the external AND internal tags</li>
      * </ul>
-     * 
+     *
      * @return a boolean value
      */
     public final boolean isValid() {
@@ -472,17 +496,17 @@ public class MCRObjectDerivate {
      *  <li>the linkmeta xlink:type is not 'locator'</li>
      *  <li>the internals and the externals are empty</li>
      *  </ul>
-     * 
+     *
      * @throws MCRException the MCRObjectDerivate is invalid
      */
     public void validate() throws MCRException {
         if (linkmeta == null) {
             throw new MCRException("linkmeta == null");
         }
-        if (!linkmeta.getXLinkType().equals("locator")) {
+        if (!linkmeta.getXLinkType().equals(MCRXlink.TYPE_LOCATOR)) {
             throw new MCRException("linkmeta type != locator");
         }
-        if ((internals == null) && (externals.size() == 0)) {
+        if ((internals == null) && (externals.isEmpty())) {
             throw new MCRException("(internals == null) && (externals.size() == 0)");
         }
     }
@@ -499,11 +523,11 @@ public class MCRObjectDerivate {
         this.derivateID = id;
     }
 
-    public ArrayList<MCRMetaClassification> getClassifications() {
+    public List<MCRMetaClassification> getClassifications() {
         return classifications;
     }
 
-    public ArrayList<MCRMetaLangText> getTitles() {
+    public List<MCRMetaLangText> getTitles() {
         return titles;
     }
 }

@@ -27,16 +27,21 @@ import org.mycore.common.MCRException;
  * This class implements all method for handling with the MCRMetaAccessRule part
  * of a metadata object. The MCRMetaAccessRule class present a single item,
  * which hold an ACL condition for a defined permission.
- * 
+ *
  * @author Jens Kupferschmidt
  */
 public class MCRMetaAccessRule extends MCRMetaDefault {
+
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    private static final String ELEMENT_CONDITION = "condition";
+
+    private static final String ATTRIBUTE_PERMISSION = "permission";
+
     // MCRMetaAccessRule data
     protected Element condition;
 
     protected String permission;
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * This is the constructor. <br>
@@ -61,15 +66,15 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      * <em>condition</em>, if it is null, an exception will be throwed.
      * @param subtag       the name of the subtag
      * @param type         the optional type string
-     * @param inherted     a value &gt;= 0
+     * @param inherited    a value &gt;= 0
      * @param permission   permission
      * @param condition    the JDOM Element included the condition tree
      * @exception MCRException if the subtag value or condition is null or empty
      */
-    public MCRMetaAccessRule(String subtag, String type, int inherted, String permission, Element condition)
+    public MCRMetaAccessRule(String subtag, String type, int inherited, String permission, Element condition)
         throws MCRException {
-        super(subtag, null, type, inherted);
-        if (condition == null || !condition.getName().equals("condition")) {
+        super(subtag, null, type, inherited);
+        if (condition == null || !condition.getName().equals(ELEMENT_CONDITION)) {
             throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
         }
         set(permission, condition);
@@ -77,7 +82,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
 
     /**
      * This method set the permission and the condition.
-     * 
+     *
      * @param permission the format string, if it is empty 'READ' will be set.
      * @param condition
      *            the JDOM Element included the condition tree
@@ -91,14 +96,14 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
 
     /**
      * This method set the condition.
-     * 
+     *
      * @param condition
      *            the JDOM Element included the condition tree
      * @exception MCRException
      *                if the condition is null or empty
      */
     public final void setCondition(Element condition) throws MCRException {
-        if (condition == null || !condition.getName().equals("condition")) {
+        if (condition == null || !condition.getName().equals(ELEMENT_CONDITION)) {
             throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
         }
         this.condition = condition.clone();
@@ -106,7 +111,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
 
     /**
      * This method set the permission attribute.
-     * 
+     *
      * @param permission
      *            the new permission string.
      */
@@ -116,7 +121,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
 
     /**
      * This method get the condition.
-     * 
+     *
      * @return the condition as JDOM Element
      */
     public final Element getCondition() {
@@ -125,7 +130,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
 
     /**
      * This method get the permission attribute.
-     * 
+     *
      * @return the permission attribute
      */
     public final String getPermission() {
@@ -135,7 +140,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
     /**
      * This method read the XML input stream part from a DOM part for the
      * metadata of the document.
-     * 
+     *
      * @param element
      *            a relevant JDOM element for the metadata
      */
@@ -143,14 +148,14 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
     public void setFromDOM(Element element) {
         super.setFromDOM(element);
 
-        setCondition(element.getChild("condition"));
-        setPermission(element.getAttributeValue("permission"));
+        setCondition(element.getChild(ELEMENT_CONDITION));
+        setPermission(element.getAttributeValue(ATTRIBUTE_PERMISSION));
     }
 
     /**
      * This method create a XML stream for all data in this class, defined by
      * the MyCoRe XML MCRMetaAccessRule definition for the given subtag.
-     * 
+     *
      * @exception MCRException
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML MCRMetaAccessRule part
@@ -158,7 +163,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
     @Override
     public Element createXML() throws MCRException {
         Element elm = super.createXML();
-        elm.setAttribute("permission", permission);
+        elm.setAttribute(ATTRIBUTE_PERMISSION, permission);
         elm.addContent(condition.clone());
         return elm;
     }
@@ -172,7 +177,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      * <li>the condition is null</li>
      * <li>the permission is null or empty</li>
      * </ul>
-     * 
+     *
      * @throws MCRException the MCRMetaAccessRule is invalid
      */
     @Override
@@ -181,7 +186,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
         if (condition == null) {
             throw new MCRException(getSubTag() + ": condition is null");
         }
-        if (permission == null || permission.length() == 0) {
+        if (permission == null || permission.isEmpty()) {
             throw new MCRException(getSubTag() + ": permission is null or empty");
         }
     }
@@ -207,8 +212,9 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
         if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
             LOGGER.debug("Permission         = {}", permission);
-            LOGGER.debug("Rule               = " + "condition");
+            LOGGER.debug("Rule               = " + ELEMENT_CONDITION);
             LOGGER.debug(" ");
         }
     }
+
 }

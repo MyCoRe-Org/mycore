@@ -32,7 +32,7 @@ class MCRAddCollectionMessage extends MCRWebSocketMessage {
     public Map<String, Object> properties;
 
     MCRAddCollectionMessage(Integer id, String name, Map<String, Object> properties) {
-        super(MCRMessageType.addCollection);
+        super(MCRMessageType.ADD_COLLECTION);
         this.id = id;
         this.name = name;
         this.properties = properties;

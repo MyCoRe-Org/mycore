@@ -41,9 +41,9 @@ import org.mycore.webtools.upload.exception.MCRUploadServerException;
  * the parameters and the upload handler used for the upload.
  *
  */
-public class MCRFileUploadBucket implements MCRSessionListener, MCRShutdownHandler.Closeable {
+public final class MCRFileUploadBucket implements MCRSessionListener, MCRShutdownHandler.Closeable {
 
-    private static final ConcurrentHashMap<String, MCRFileUploadBucket> BUCKET_MAP = new ConcurrentHashMap<>();
+    private static final Map<String, MCRFileUploadBucket> BUCKET_MAP = new ConcurrentHashMap<>();
 
     private final String bucketID;
 
@@ -91,11 +91,11 @@ public class MCRFileUploadBucket implements MCRSessionListener, MCRShutdownHandl
                     throw new MCRException(e);
                 }
             });
-        } catch (MCRException e) {
-            if (e.getCause() instanceof MCRUploadServerException use) {
+        } catch (MCRException ignoredBeCause) {
+            if (ignoredBeCause.getCause() instanceof MCRUploadServerException use) {
                 throw use;
             }
-            throw e;
+            throw ignoredBeCause;
         }
     }
 
@@ -131,7 +131,7 @@ public class MCRFileUploadBucket implements MCRSessionListener, MCRShutdownHandl
 
     @Override
     public void sessionEvent(MCRSessionEvent event) {
-        if (event.getType().equals(MCRSessionEvent.Type.destroyed)) {
+        if (event.getType().equals(MCRSessionEvent.Type.DESTROYED)) {
             final String sessionID = event.getSession().getID();
             if (sessionID.equals(this.sessionID)) {
                 close();

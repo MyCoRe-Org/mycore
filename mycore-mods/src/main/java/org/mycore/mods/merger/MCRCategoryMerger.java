@@ -19,8 +19,11 @@
 package org.mycore.mods.merger;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
+import org.jdom2.Element;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
@@ -88,10 +91,37 @@ public class MCRCategoryMerger extends MCRMerger {
     }
 
     private static List<MCRCategory> getAncestorsAndSelf(MCRCategoryID categoryID) {
-        List<MCRCategory> ancestorsAndSelf = new ArrayList<>(DAO.getParents(categoryID));
+        List<MCRCategory> ancestorsAndSelf = new ArrayList<>(Optional.ofNullable(DAO.getParents(categoryID)).orElse(
+            Collections.emptyList()));
         ancestorsAndSelf.remove(DAO.getRootCategory(categoryID, 0));
         ancestorsAndSelf.add(DAO.getCategory(categoryID, 0));
         return ancestorsAndSelf;
+    }
+
+    /**
+     * Compares two {@link Element Elements} that are assumed to be categories.
+     * If it is determined that one Element is a parent category of the other, return the parent, else return null.
+     * @param element1 first Element to compare
+     * @param element2 second Element to compare
+     * @return the parent Element or null
+     */
+    public static Element getElementWithParentCategory(Element element1, Element element2) {
+        MCRCategoryID idThis = MCRClassMapper.getCategoryID(element1);
+        MCRCategoryID idOther = MCRClassMapper.getCategoryID(element2);
+        if (idThis == null || idOther == null) {
+            return null;
+        }
+
+        final String p = CONFIG_PREFIX + idThis.getRootID();
+        if (idThis.getRootID().equals(idOther.getRootID()) && !MCRConfiguration2.getBoolean(p).orElse(true)) {
+            return null;
+        }
+
+        if (idThis.equals(idOther) || !oneIsDescendantOfTheOther(idThis, idOther)) {
+            return null;
+        }
+
+        return getAncestorsAndSelf(idThis).containsAll(getAncestorsAndSelf(idOther)) ? element2 : element1;
     }
 
     @Override

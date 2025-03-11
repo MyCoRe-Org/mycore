@@ -66,8 +66,10 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
 
     public static final String LABEL_LANG_X_MAPPING = "x-mapping";
 
+    public static final String ELEMENT_MAPPINGS = "mappings";
+
     /** This configuration lists all eligible classifications for x-path-mapping */
-    private String xPathMappingClassifications;
+    private final String xPathMappingClassifications;
 
     private MCRMetaElement oldMappings;
 
@@ -111,10 +113,10 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
      * @param obj the {@link MCRObject} to add mappings to
      */
     private void createMapping(MCRObject obj) {
-        MCRMetaElement mappings = obj.getMetadata().getMetadataElement("mappings");
+        MCRMetaElement mappings = obj.getMetadata().getMetadataElement(ELEMENT_MAPPINGS);
         if (mappings != null) {
             oldMappings = mappings.clone();
-            obj.getMetadata().removeMetadataElement("mappings");
+            obj.getMetadata().removeMetadataElement(ELEMENT_MAPPINGS);
         }
 
         MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
@@ -134,8 +136,8 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
         } catch (Exception je) {
             LOGGER.error("Error while finding classification elements", je);
         } finally {
-            if (mappings == null || mappings.size() == 0) {
-                obj.getMetadata().removeMetadataElement("mappings");
+            if (mappings == null || mappings.isEmpty()) {
+                obj.getMetadata().removeMetadataElement(ELEMENT_MAPPINGS);
             }
         }
     }
@@ -146,7 +148,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
      */
     private MCRMetaElement createMappingsElement() {
         MCRMetaElement mappings = new MCRMetaElement();
-        mappings.setTag("mappings");
+        mappings.setTag(ELEMENT_MAPPINGS);
         mappings.setClass(MCRMetaClassification.class);
         mappings.setHeritable(false);
         mappings.setNotInherit(true);
@@ -376,9 +378,9 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
      */
     private void undo(MCRObject obj) {
         if (oldMappings == null) {
-            obj.getMetadata().removeMetadataElement("mappings");
+            obj.getMetadata().removeMetadataElement(ELEMENT_MAPPINGS);
         } else {
-            MCRMetaElement mmap = obj.getMetadata().getMetadataElement("mappings");
+            MCRMetaElement mmap = obj.getMetadata().getMetadataElement(ELEMENT_MAPPINGS);
             if (mmap == null) {
                 obj.getMetadata().setMetadataElement(createMappingsElement());
             }

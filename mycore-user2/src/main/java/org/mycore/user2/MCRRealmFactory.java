@@ -25,6 +25,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
@@ -56,16 +57,16 @@ public class MCRRealmFactory {
 
     static final String REALMS_URI_CFG_KEY = MCRUser2Constants.CONFIG_PREFIX + "Realms.URI";
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRRealm.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final int REFRESH_DELAY = 5000;
 
     private static long lastModified;
 
     /** Map of defined realms, key is the ID of the realm */
-    private static HashMap<String, MCRRealm> realmsMap = new HashMap<>();
+    private static Map<String, MCRRealm> realmsMap = new HashMap<>();
 
-    private static HashMap<String, MCRUserAttributeMapper> attributeMapper = new HashMap<>();
+    private static Map<String, MCRUserAttributeMapper> attributeMapper = new HashMap<>();
 
     /** List of defined realms */
     private static List<MCRRealm> realmsList = new ArrayList<>();
@@ -116,12 +117,12 @@ public class MCRRealmFactory {
         try {
             root = getRealms().getRootElement();
         } catch (JDOMException | TransformerException | IOException e) {
-            throw new MCRException("Could not load realms from URI: " + realmsURI);
+            throw new MCRException("Could not load realms from URI: " + realmsURI, e);
         }
         String localRealmID = root.getAttributeValue("local");
-        HashMap<String, MCRRealm> realmsMap = new HashMap<>();
+        Map<String, MCRRealm> realmsMap = new HashMap<>();
 
-        HashMap<String, MCRUserAttributeMapper> attributeMapper = new HashMap<>();
+        Map<String, MCRUserAttributeMapper> attributeMapper = new HashMap<>();
 
         List<MCRRealm> realmsList = new ArrayList<>();
 

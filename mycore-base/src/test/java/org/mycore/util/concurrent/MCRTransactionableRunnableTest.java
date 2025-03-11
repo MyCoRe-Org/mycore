@@ -32,7 +32,7 @@ import org.mycore.common.MCRTestCase;
 
 public class MCRTransactionableRunnableTest extends MCRTestCase {
 
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Test
     public void run() {

@@ -23,18 +23,19 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.mycore.common.MCRSessionMgr;
 
-public class MCREditorItemComparator implements Comparator<Element> {
+public final class MCREditorItemComparator implements Comparator<Element> {
 
-    private static final HashMap<String, MCREditorItemComparator> MY_COLLATORS = new HashMap<>();
+    private static final Map<String, MCREditorItemComparator> MY_COLLATORS = new HashMap<>();
 
-    private Collator myCollator;
+    private final Collator myCollator;
 
-    private String language;
+    private final String language;
 
     private MCREditorItemComparator(Collator myCollator, String language) {
         super();
@@ -58,7 +59,7 @@ public class MCREditorItemComparator implements Comparator<Element> {
                 return label.getText();
             }
         }
-        if (labels.size() > 0) {
+        if (!labels.isEmpty()) {
             //fallback to first label if currentLang label is not found
             return labels.getFirst().getText();
         }

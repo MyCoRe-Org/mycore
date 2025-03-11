@@ -18,6 +18,7 @@
 
 package org.mycore.user2;
 
+import java.io.Serial;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +35,7 @@ import org.mycore.common.MCRUserInformation;
  */
 public class MCRTransientUser extends MCRUser {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger(MCRTransientUser.class);

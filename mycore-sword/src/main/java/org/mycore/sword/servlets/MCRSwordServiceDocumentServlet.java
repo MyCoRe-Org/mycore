@@ -19,6 +19,7 @@
 package org.mycore.sword.servlets;
 
 import java.io.IOException;
+import java.io.Serial;
 
 import org.mycore.sword.MCRSwordConfigurationDefault;
 import org.mycore.sword.manager.MCRSwordServiceDocumentManager;
@@ -32,9 +33,11 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author Sebastian Hofmann (mcrshofm)
  */
 public class MCRSwordServiceDocumentServlet extends MCRSwordServlet {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    private ServiceDocumentAPI api;
+    private transient ServiceDocumentAPI api;
 
     @Override
     public void init() {

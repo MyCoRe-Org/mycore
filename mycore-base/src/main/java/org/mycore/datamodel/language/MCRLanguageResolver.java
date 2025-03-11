@@ -67,7 +67,7 @@ public class MCRLanguageResolver implements URIResolver {
         }
 
         xml.setAttribute("rtl",
-            MCRLanguageOrientationHelper.isRTL(language.getCode(MCRLanguageCodeType.xmlCode)) ? "true" : "false");
+            MCRLanguageOrientationHelper.isRTL(language.getCode(MCRLanguageCodeType.XML_CODE)) ? "true" : "false");
 
         return xml;
     }

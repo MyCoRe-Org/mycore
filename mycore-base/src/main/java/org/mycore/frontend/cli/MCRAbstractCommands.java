@@ -19,6 +19,7 @@
 package org.mycore.frontend.cli;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is an abstract for the implementation of command classes for the
@@ -28,7 +29,7 @@ import java.util.ArrayList;
  */
 public abstract class MCRAbstractCommands implements MCRExternalCommandInterface {
     /** The array holding all known commands */
-    protected ArrayList<MCRCommand> command;
+    protected List<MCRCommand> command;
 
     private String displayName;
 
@@ -60,7 +61,7 @@ public abstract class MCRAbstractCommands implements MCRExternalCommandInterface
      * @return a ascending sorted command pair ArrayList
      */
     @Override
-    public ArrayList<MCRCommand> getPossibleCommands() {
+    public List<MCRCommand> getPossibleCommands() {
         return this.command;
     }
 
@@ -82,7 +83,7 @@ public abstract class MCRAbstractCommands implements MCRExternalCommandInterface
         this.command.add(cmd);
     }
 
-    private void setCommand(ArrayList<MCRCommand> command) {
+    private void setCommand(List<MCRCommand> command) {
         this.command = command;
     }
 }

@@ -102,7 +102,7 @@ public class MCRPICommands {
     public static void removeFlagsFromObject(String mycoreIDString) {
         MCRObjectID objectID = MCRObjectID.getInstance(mycoreIDString);
         MCRBase base = MCRMetadataManager.retrieve(objectID);
-        if (base.getService().getFlags(MCRPIService.PI_FLAG).size() > 0) {
+        if (!base.getService().getFlags(MCRPIService.PI_FLAG).isEmpty()) {
             base.getService().removeFlags(MCRPIService.PI_FLAG);
             try {
                 MCRMetadataManager.update(base);
@@ -119,7 +119,7 @@ public class MCRPICommands {
         order = 30)
     public static void migrateURNGranularToServiceID(String serviceID) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        MCRXMLMetadataManager.instance().listIDsOfType("derivate").forEach(derivateID -> {
+        MCRXMLMetadataManager.instance().listIDsOfType(MCRDerivate.OBJECT_TYPE).forEach(derivateID -> {
             MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateID));
 
             String urn = derivate.getDerivate().getURN();
@@ -152,7 +152,7 @@ public class MCRPICommands {
         order = 50)
     public static void controlObjectWithService(String objectIDString, String serviceID)
         throws MCRAccessException {
-        controlObjectWithServiceAndAdditional(objectIDString, serviceID, "");
+        controlObjectWithServiceAndAdditional(objectIDString, serviceID, null);
     }
 
     @MCRCommand(syntax = "try to control {0} with pi service {1} with additional {2}",

@@ -53,7 +53,7 @@ public class MCRObjectMetadataTest extends MCRTestCase {
         super.setUp();
         Document testObjectDocument = loadResourceDocument(TEST_OBJECT_RESOURCE_NAME);
         testMetadata = new MCRObjectMetadata();
-        testMetadata.setFromDOM(testObjectDocument.getRootElement().getChild("metadata"));
+        testMetadata.setFromDOM(testObjectDocument.getRootElement().getChild(MCRObjectMetadata.XML_NAME));
     }
 
     /**

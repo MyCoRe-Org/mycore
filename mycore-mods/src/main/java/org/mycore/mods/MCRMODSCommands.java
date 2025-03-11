@@ -50,6 +50,7 @@ import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
@@ -187,14 +188,14 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         throws MCRPersistenceException, IOException, MCRAccessException {
         MCRDerivate derivate = new MCRDerivate();
         derivate.setId(MCRMetadataManager.getMCRObjectIDGenerator()
-            .getNextFreeId(documentID.getProjectId(), "derivate"));
+            .getNextFreeId(documentID.getProjectId(), MCRDerivate.OBJECT_TYPE));
         String schema = MCRConfiguration2.getString("MCR.Metadata.Config.derivate")
             .orElse("datamodel-derivate.xml")
             .replaceAll(".xml", ".xsd");
         derivate.setSchema(schema);
 
         MCRMetaLinkID linkId = new MCRMetaLinkID();
-        linkId.setSubTag("linkmeta");
+        linkId.setSubTag(MCRObjectDerivate.ELEMENT_LINKMETA);
         linkId.setReference(documentID, null, null);
         derivate.getDerivate().setLinkMeta(linkId);
 
@@ -206,7 +207,7 @@ public class MCRMODSCommands extends MCRAbstractCommands {
                 .findFirst();
 
             MCRMetaIFS ifs = new MCRMetaIFS();
-            ifs.setSubTag("internal");
+            ifs.setSubTag(MCRObjectDerivate.ELEMENT_INTERNAL);
             ifs.setSourcePath(fileDir.getAbsolutePath());
             firstRegularFile.ifPresent(ifs::setMainDoc);
             derivate.getDerivate().setInternals(ifs);

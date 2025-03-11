@@ -18,6 +18,7 @@
 
 package org.mycore.frontend.xeditor;
 
+import java.io.Serial;
 import java.util.Enumeration;
 import java.util.Locale;
 
@@ -35,9 +36,10 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRXEditorServlet extends MCRServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    protected static final Logger LOGGER = LogManager.getLogger(MCRXEditorServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String TARGET_PATTERN = "_xed_submit_";
 

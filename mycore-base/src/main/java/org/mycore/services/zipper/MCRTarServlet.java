@@ -19,6 +19,7 @@
 package org.mycore.services.zipper;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 
@@ -38,6 +39,8 @@ import jakarta.servlet.ServletOutputStream;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRTarServlet extends MCRCompressServlet<TarArchiveOutputStream> {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger(MCRTarServlet.class);

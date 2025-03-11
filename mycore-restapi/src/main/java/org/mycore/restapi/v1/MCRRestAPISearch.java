@@ -18,6 +18,12 @@
 
 package org.mycore.restapi.v1;
 
+import static org.mycore.frontend.jersey.MCRJerseyUtil.APPLICATION_JSON_UTF_8;
+import static org.mycore.frontend.jersey.MCRJerseyUtil.APPLICATION_XML_UTF_8;
+import static org.mycore.frontend.jersey.MCRJerseyUtil.TEXT_PLAIN_ISO_8859_1;
+import static org.mycore.frontend.jersey.MCRJerseyUtil.TEXT_PLAIN_UTF_8;
+import static org.mycore.frontend.jersey.MCRJerseyUtil.TEXT_XML_UTF_8;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -40,24 +46,27 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 /**
  * Rest API methods that cover SOLR searches.
  *
  * @author Robert Stephan
- *
  */
 @Path("/search")
 public class MCRRestAPISearch {
+
+    private static final Logger LOGGER = LogManager.getLogger();
+
     public static final String FORMAT_JSON = "json";
+
     public static final String FORMAT_XML = "xml";
+
     public static final String FORMAT_CSV = "csv";
-    private static Logger LOGGER = LogManager.getLogger(MCRRestAPISearch.class);
 
     /**
-     * see http://wiki.apache.org/solr/CommonQueryParameters for syntax of parameters
+     * See <a href="ttp://wiki.apache.org/solr/CommonQueryParameters">CommonQueryParameters</a> for syntax of
+     * parameters.
      *
      * @param query       the Query in SOLR Query syntax
      * @param sort        the sort parameter - syntax as defined by SOLR
@@ -73,8 +82,7 @@ public class MCRRestAPISearch {
      */
     @SuppressWarnings("PMD.ExcessiveParameterList")
     @GET
-    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8",
-        MediaType.TEXT_PLAIN + ";charset=ISO-8859-1", MediaType.TEXT_PLAIN + ";charset=UTF-8" })
+    @Produces({ TEXT_XML_UTF_8, APPLICATION_JSON_UTF_8, TEXT_PLAIN_ISO_8859_1, TEXT_PLAIN_UTF_8 })
     public Response search(@QueryParam("q") String query,
         @QueryParam("sort") String sort, @QueryParam("wt") @DefaultValue("xml") String wt,
         @QueryParam("start") String start, @QueryParam("rows") String rows,
@@ -144,8 +152,8 @@ public class MCRRestAPISearch {
     // Helper method to determine content type based on 'wt'
     private String getContentType(String wt) {
         return switch (wt) {
-            case FORMAT_XML -> "application/xml; charset=UTF-8";
-            case FORMAT_JSON -> "application/json; charset=UTF-8";
+            case FORMAT_XML -> APPLICATION_XML_UTF_8;
+            case FORMAT_JSON -> APPLICATION_JSON_UTF_8;
             case FORMAT_CSV -> "text/comma-separated-values; charset=UTF-8";
             default -> "text";
         };

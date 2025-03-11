@@ -24,6 +24,6 @@ package org.mycore.webtools.processing.socket.impl;
 class MCRRegistryMessage extends MCRWebSocketMessage {
 
     MCRRegistryMessage() {
-        super(MCRMessageType.registry);
+        super(MCRMessageType.REGISTRY);
     }
 }

@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.nio.CharBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -54,6 +53,7 @@ import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRFileCollectingFileVisitor;
@@ -243,7 +243,7 @@ public final class MCRUploadHelper {
         Files.walkFileTree(rootPath, visitor);
 
         //sort files by name
-        ArrayList<Path> paths = visitor.getPaths();
+        List<Path> paths = visitor.getPaths();
         if (paths.isEmpty()) {
             return Optional.empty();
         }
@@ -274,12 +274,12 @@ public final class MCRUploadHelper {
         derivate.setSchema(schema);
 
         MCRMetaLinkID linkId = new MCRMetaLinkID();
-        linkId.setSubTag("linkmeta");
+        linkId.setSubTag(MCRObjectDerivate.ELEMENT_LINKMETA);
         linkId.setReference(objectID, null, null);
         derivate.getDerivate().setLinkMeta(linkId);
 
         MCRMetaIFS ifs = new MCRMetaIFS();
-        ifs.setSubTag("internal");
+        ifs.setSubTag(MCRObjectDerivate.ELEMENT_INTERNAL);
         ifs.setSourcePath(null);
         derivate.getDerivate().setInternals(ifs);
 

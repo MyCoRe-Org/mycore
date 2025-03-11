@@ -18,8 +18,9 @@
 
 package org.mycore.csl;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Map;
-import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -43,7 +44,7 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
 
     private static final String CONFIG_PREFIX = "MCR.ContentTransformer.";
 
-    private final Map<String, Stack<MCRCSLTransformerInstance>> transformerInstances = new ConcurrentHashMap<>();
+    private final Map<String, Deque<MCRCSLTransformerInstance>> transformerInstances = new ConcurrentHashMap<>();
 
     private String configuredFormat;
 
@@ -76,7 +77,7 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
 
     private MCRCSLTransformerInstance getTransformerInstance(String style, String format) {
         synchronized (transformerInstances) {
-            if (getStyleFormatTransformerStack(style, format).size() > 0) {
+            if (!getStyleFormatTransformerStack(style, format).isEmpty()) {
                 return transformerInstances.get(mapKey(style, format)).pop();
             }
         }
@@ -88,8 +89,8 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
         return newInstance;
     }
 
-    private Stack<MCRCSLTransformerInstance> getStyleFormatTransformerStack(String style, String format) {
-        return transformerInstances.computeIfAbsent(mapKey(style, format), (a) -> new Stack<>());
+    private Deque<MCRCSLTransformerInstance> getStyleFormatTransformerStack(String style, String format) {
+        return transformerInstances.computeIfAbsent(mapKey(style, format), (a) -> new ArrayDeque<>());
     }
 
     private String mapKey(String style, String format) {
@@ -105,7 +106,7 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
             return;
         }
         synchronized (transformerInstances) {
-            final Stack<MCRCSLTransformerInstance> styleFormatTransformerStack = getStyleFormatTransformerStack(style,
+            final Deque<MCRCSLTransformerInstance> styleFormatTransformerStack = getStyleFormatTransformerStack(style,
                 format);
             if (!styleFormatTransformerStack.contains(instance)) {
                 styleFormatTransformerStack.push(instance);

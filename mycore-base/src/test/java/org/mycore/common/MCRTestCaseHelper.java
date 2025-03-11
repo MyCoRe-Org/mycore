@@ -31,6 +31,7 @@ import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationLoader;
 import org.mycore.common.config.MCRConfigurationLoaderFactory;
 import org.mycore.common.config.MCRRuntimeComponentDetector;
+import org.mycore.common.xsl.MCRParameterCollector;
 
 public class MCRTestCaseHelper {
 
@@ -74,6 +75,7 @@ public class MCRTestCaseHelper {
             currentSession.close();
         }
         MCRConfigurationLoader configurationLoader = MCRConfigurationLoaderFactory.getConfigurationLoader();
+        MCRParameterCollector.clearCache();
         MCRConfigurationBase.initialize(configurationLoader.loadDeprecated(), configurationLoader.load(), true);
     }
 

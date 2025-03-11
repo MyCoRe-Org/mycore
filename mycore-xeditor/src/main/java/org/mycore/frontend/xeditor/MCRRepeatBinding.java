@@ -35,14 +35,19 @@ import org.mycore.frontend.xeditor.tracker.MCRSwapElements;
 
 public class MCRRepeatBinding extends MCRBinding {
 
+    private static final String METHOD_BUILD = "build";
+
+    private static final String METHOD_CLONE = "clone";
+
     private int repeatPosition;
 
     private int maxRepeats;
 
-    private static final String DEFAULT_METHOD = MCRConfiguration2.getString("MCR.XEditor.InsertTarget.DefaultMethod")
-        .orElse("build");
+    private static final String DEFAULT_METHOD = MCRConfiguration2
+        .getString("MCR.XEditor.InsertTarget.DefaultMethod")
+        .orElse(METHOD_BUILD);
 
-    private String method = DEFAULT_METHOD; // build|clone
+    private final String method; // build|clone
 
     public MCRRepeatBinding(String xPath, MCRBinding parent, int minRepeats, int maxRepeats, String method)
         throws JaxenException {
@@ -58,8 +63,8 @@ public class MCRRepeatBinding extends MCRBinding {
 
     public MCRRepeatBinding(String xPath, MCRBinding parent, String method) throws JaxenException {
         super(xPath, true, parent);
-        this.method = Objects.equals(method, "clone") ? "clone"
-            : Objects.equals(method, "build") ? "build" : DEFAULT_METHOD;
+        this.method = Objects.equals(method, METHOD_CLONE) ? METHOD_CLONE
+            : Objects.equals(method, METHOD_BUILD) ? METHOD_BUILD : DEFAULT_METHOD;
         this.maxRepeats = Integer.MAX_VALUE;
     }
 
@@ -102,7 +107,7 @@ public class MCRRepeatBinding extends MCRBinding {
     }
 
     public void insert(int pos) throws JaxenException {
-        if (Objects.equals(method, "build")) {
+        if (Objects.equals(method, METHOD_BUILD)) {
             Element parentElement = getParentElement();
             Element precedingElement = (Element) (getBoundNodes().get(pos - 1));
             int posOfPrecedingInParent = parentElement.indexOf(precedingElement);
@@ -116,4 +121,5 @@ public class MCRRepeatBinding extends MCRBinding {
             cloneBoundElement(pos - 1);
         }
     }
+
 }

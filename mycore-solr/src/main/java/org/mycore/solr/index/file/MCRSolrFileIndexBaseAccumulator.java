@@ -25,6 +25,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
@@ -48,14 +49,14 @@ import com.google.common.io.Files;
 
 public class MCRSolrFileIndexBaseAccumulator implements MCRSolrFileIndexAccumulator {
 
-    private static Logger LOGGER = LogManager.getLogger(MCRSolrFileIndexBaseAccumulator.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRSolrFileIndexBaseAccumulator.class);
 
-    private static MCRXMLMetadataManager XML_MANAGER = MCRXMLMetadataManager.instance();
+    private static final MCRXMLMetadataManager XML_MANAGER = MCRXMLMetadataManager.instance();
 
     private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.getInstance();
 
-    private static final MCRCache<String, String> DERIVATE_MODIFIED_CACHE = new MCRCache<>(10000,
-        "derivateID ISODateString cache");
+    private static final MCRCache<String, String> DERIVATE_MODIFIED_CACHE
+        = new MCRCache<>(10_000, "derivateID ISODateString cache");
 
     @Override
     public void accumulate(SolrInputDocument doc, Path input, BasicFileAttributes attr) throws IOException {
@@ -77,7 +78,7 @@ public class MCRSolrFileIndexBaseAccumulator implements MCRSolrFileIndexAccumula
             doc.setField("derivateModified", getDerivateModified(ownerID));
             Collection<MCRCategoryID> linksFromReference = MCRCategLinkServiceFactory.getInstance()
                 .getLinksFromReference(new MCRCategLinkReference(mcrPath));
-            HashSet<MCRCategoryID> linkedCategories = new HashSet<>(linksFromReference);
+            Set<MCRCategoryID> linkedCategories = new HashSet<>(linksFromReference);
             for (MCRCategoryID category : linksFromReference) {
                 for (MCRCategory parent : CATEGORY_DAO.getParents(category)) {
                     linkedCategories.add(parent.getId());

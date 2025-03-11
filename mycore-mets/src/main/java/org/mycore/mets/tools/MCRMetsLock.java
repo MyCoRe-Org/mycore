@@ -18,8 +18,9 @@
 
 package org.mycore.mets.tools;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
@@ -37,7 +38,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public class MCRMetsLock {
 
-    private static Hashtable<MCRObjectID, String> metsAccessSessionTable = new Hashtable<>();
+    private static Map<MCRObjectID, String> metsAccessSessionTable = new HashMap<>();
 
     private static final Logger LOGGER = LogManager.getLogger(MCRMetsLock.class);
 

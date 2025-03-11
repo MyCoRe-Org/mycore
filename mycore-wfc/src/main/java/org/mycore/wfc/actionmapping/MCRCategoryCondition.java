@@ -32,13 +32,13 @@ import org.mycore.parsers.bool.MCRCondition;
  */
 public class MCRCategoryCondition implements MCRCondition<MCRWorkflowData> {
 
-    private MCRCategoryID mcrCategoryID;
+    private final MCRCategoryID mcrCategoryID;
 
-    private boolean not;
+    private final boolean not;
 
-    private String fieldName;
+    private final String fieldName;
 
-    private static MCRCategLinkService LINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
+    private static final MCRCategLinkService LINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
 
     public MCRCategoryCondition(String fieldName, MCRCategoryID mcrCategoryID, boolean not) {
         this.fieldName = fieldName;

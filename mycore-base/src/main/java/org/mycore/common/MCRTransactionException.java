@@ -18,6 +18,8 @@
 
 package org.mycore.common;
 
+import java.io.Serial;
+
 /**
  * Exception thrown to indicate an error during transaction handling in the
  * {@link MCRTransactionManager} or any other transaction management component.
@@ -27,6 +29,9 @@ package org.mycore.common;
  * or an illegal transaction state.</p>
  */
 public class MCRTransactionException extends MCRException {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * Constructs a new {@code MCRTransactionException} with the specified detail message.

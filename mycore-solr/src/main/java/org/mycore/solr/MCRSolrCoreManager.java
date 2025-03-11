@@ -41,11 +41,11 @@ public final class MCRSolrCoreManager {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRSolrCoreManager.class);
 
-    private static Map<String, MCRSolrCore> CORE_MAP;
+    private static Map<String, MCRSolrCore> coreMap;
 
     static {
         try {
-            CORE_MAP = Collections.synchronizedMap(loadCoresFromProperties());
+            coreMap = Collections.synchronizedMap(loadCoresFromProperties());
         } catch (Exception e) {
             LOGGER.error("Exception creating solr client object", e);
         }
@@ -104,7 +104,7 @@ public final class MCRSolrCoreManager {
     }
 
     public static MCRSolrCore addCore(String coreID, MCRSolrCore core) {
-        CORE_MAP.put(coreID, core);
+        coreMap.put(coreID, core);
         return core;
     }
 
@@ -114,7 +114,7 @@ public final class MCRSolrCoreManager {
      * @param core the MCRSolrCore instance 
      */
     public static void add(String coreID, MCRSolrCore core) {
-        CORE_MAP.put(coreID, core);
+        coreMap.put(coreID, core);
     }
 
     /**
@@ -123,7 +123,7 @@ public final class MCRSolrCoreManager {
      * @param coreID the name of the MCRSolrCore instance
      */
     public static Optional<MCRSolrCore> remove(String coreID) {
-        return Optional.ofNullable(CORE_MAP.remove(coreID));
+        return Optional.ofNullable(coreMap.remove(coreID));
     }
 
     /**
@@ -131,7 +131,7 @@ public final class MCRSolrCoreManager {
      * @return a core with a specific id
      */
     public static Optional<MCRSolrCore> get(String coreID) {
-        return Optional.ofNullable(CORE_MAP.get(coreID));
+        return Optional.ofNullable(coreMap.get(coreID));
     }
 
     public static MCRSolrCore getMainSolrCore() {
@@ -145,7 +145,7 @@ public final class MCRSolrCoreManager {
      * @return a list of cores
      */
     public static List<MCRSolrCore> getCoresForType(MCRSolrCoreType type) {
-        return CORE_MAP.values().stream().filter(c -> c.getTypes().contains(type)).collect(Collectors.toList());
+        return coreMap.values().stream().filter(c -> c.getTypes().contains(type)).collect(Collectors.toList());
     }
 
     /**
@@ -166,7 +166,7 @@ public final class MCRSolrCoreManager {
      * @return the read only core map wich contains the coreId and the core
      */
     public static Map<String, MCRSolrCore> getCoreMap() {
-        return Collections.unmodifiableMap(CORE_MAP);
+        return Collections.unmodifiableMap(coreMap);
     }
 
 }

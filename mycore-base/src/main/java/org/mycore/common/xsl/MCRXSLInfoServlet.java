@@ -21,6 +21,7 @@ package org.mycore.common.xsl;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serial;
 import java.io.UncheckedIOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -64,6 +65,9 @@ import org.xml.sax.SAXException;
  * @author Frank Lützenkirchen
  */
 public final class MCRXSLInfoServlet extends MCRServlet {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger(MCRXSLInfoServlet.class);
 
@@ -119,8 +123,8 @@ public final class MCRXSLInfoServlet extends MCRServlet {
                         throw new UncheckedIOException(e);
                     }
                 });
-        } catch (UncheckedIOException uioe) {
-            throw uioe.getCause();
+        } catch (UncheckedIOException ignoredUnchecked) {
+            throw ignoredUnchecked.getCause();
         }
     }
 
@@ -303,7 +307,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
             IteratorIterable<Element> callTemplateElements = xsl
                 .getDescendants(Filters.element("call-template", MCRConstants.XSL_NAMESPACE));
             List<Element> templates = new ArrayList<>(list);
-            HashSet<String> callNames = new HashSet<>();
+            Set<String> callNames = new HashSet<>();
             for (Element callTemplate : callTemplateElements) {
                 String name = callTemplate.getAttributeValue("name");
                 if (callNames.add(name)) {

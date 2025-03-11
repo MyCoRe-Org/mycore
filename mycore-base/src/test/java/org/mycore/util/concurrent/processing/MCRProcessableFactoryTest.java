@@ -39,7 +39,7 @@ import org.mycore.common.processing.impl.MCRCentralProcessableRegistry;
 
 public class MCRProcessableFactoryTest extends MCRTestCase {
 
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Test
     public void newPool() throws Exception {
@@ -65,18 +65,18 @@ public class MCRProcessableFactoryTest extends MCRTestCase {
         MCRProcessableStatus s2 = sup2.getStatus();
         MCRProcessableStatus s3 = sup3.getStatus();
         String msgPrefix = "Job should be created or in processing: ";
-        assertTrue(msgPrefix + s1, MCRProcessableStatus.processing == s1 || MCRProcessableStatus.created == s1);
-        assertTrue(msgPrefix + s2, MCRProcessableStatus.processing == s2 || MCRProcessableStatus.created == s2);
-        assertTrue(msgPrefix + s3, MCRProcessableStatus.processing == s3 || MCRProcessableStatus.created == s3);
+        assertTrue(msgPrefix + s1, MCRProcessableStatus.PROCESSING == s1 || MCRProcessableStatus.CREATED == s1);
+        assertTrue(msgPrefix + s2, MCRProcessableStatus.PROCESSING == s2 || MCRProcessableStatus.CREATED == s2);
+        assertTrue(msgPrefix + s3, MCRProcessableStatus.PROCESSING == s3 || MCRProcessableStatus.CREATED == s3);
 
         assertEquals(3, collection.stream().count());
         semaphore.release(nThreads); //go
 
         CompletableFuture.allOf(sup1.getFuture(), sup2.getFuture(), sup3.getFuture()).get();
 
-        assertEquals(MCRProcessableStatus.successful, sup1.getStatus());
-        assertEquals(MCRProcessableStatus.successful, sup2.getStatus());
-        assertEquals(MCRProcessableStatus.successful, sup3.getStatus());
+        assertEquals(MCRProcessableStatus.SUCCESSFUL, sup1.getStatus());
+        assertEquals(MCRProcessableStatus.SUCCESSFUL, sup2.getStatus());
+        assertEquals(MCRProcessableStatus.SUCCESSFUL, sup3.getStatus());
 
         es.shutdown();
         es.awaitTermination(10, TimeUnit.SECONDS);

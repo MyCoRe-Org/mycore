@@ -51,9 +51,9 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 /**
  * @author Thomas Scheffler (yagee)
  */
-public class MCRPathXML {
+public final class MCRPathXML {
 
-    static Logger LOGGER = LogManager.getLogger(MCRPathXML.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private MCRPathXML() {
     }
@@ -118,8 +118,8 @@ public class MCRPathXML {
                 MCRFileAttributes<?> childAttrs;
                 try {
                     childAttrs = attrResolver.apply(child);
-                } catch (UncheckedIOException e) {
-                    throw e.getCause();
+                } catch (UncheckedIOException ignoredUnchecked) {
+                    throw ignoredUnchecked.getCause();
                 }
                 if (childAttrs.isDirectory()) {
                     directories.put(MCRPath.toMCRPath(child), childAttrs);

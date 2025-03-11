@@ -19,6 +19,7 @@ package org.mycore.datamodel.common;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -33,7 +34,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 public class MCRDefaultObjectIDGenerator implements MCRObjectIDGenerator {
 
     // counter for the next IDs per project base ID
-    private HashMap<String, Integer> lastNumber = new HashMap<>();
+    private Map<String, Integer> lastNumber = new HashMap<>();
 
     /**
      * First invocation may return MCR.Metadata.ObjectID.InitialNumberDistance if set,

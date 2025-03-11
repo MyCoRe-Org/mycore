@@ -31,13 +31,12 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 /**
  * This implementation creates an object cache
  * for MyCoRe objects which are retrieved during the processing of the rules.
- *
+ * <p>
  * It is registered as event handler to listen for updated and deleted objects.
  *
  * @author Robert Stephan
- *
  */
-public class MCRObjectCacheFactory extends MCREventHandlerBase {
+public final class MCRObjectCacheFactory extends MCREventHandlerBase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 

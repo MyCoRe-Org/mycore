@@ -40,7 +40,7 @@ public class MCRACCESSRULE {
     @Column(name = "CREATIONDATE", length = 64, nullable = false)
     private Timestamp creationdate;
 
-    @Column(name = "RULE", length = 2048000, nullable = false)
+    @Column(name = "RULE", length = 2_048_000, nullable = false)
     private String rule;
 
     @Column(name = "DESCRIPTION", nullable = false)
@@ -100,7 +100,6 @@ public class MCRACCESSRULE {
 
     @Override
     public boolean equals(Object obj) {
-        System.out.println("EQUALS");
         if (this == obj) {
             return true;
         }

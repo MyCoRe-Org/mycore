@@ -40,9 +40,9 @@ import org.mycore.datamodel.niofs.MCRPathXML;
 
 /**
  * Uses "e-mail-events.xsl" to transform derivate, object and files to emails.
- * 
+ *
  * See {@link MCRMailer} for email xml format.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  *
  */
@@ -52,7 +52,7 @@ public class MCRMailEventHandler extends MCREventHandlerBase {
 
     private void sendNotificationMail(MCREvent evt, MCRContent doc, String description) throws Exception {
         LOGGER.info("Preparing mail for: {}", description);
-        HashMap<String, String> parameters = new HashMap<>();
+        Map<String, String> parameters = new HashMap<>();
         for (Map.Entry<String, Object> entry : evt.entrySet()) {
             parameters.put(entry.getKey(), entry.getValue().toString());
         }

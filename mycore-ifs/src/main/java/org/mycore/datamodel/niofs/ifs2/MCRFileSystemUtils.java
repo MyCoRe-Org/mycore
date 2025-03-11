@@ -56,11 +56,10 @@ import org.mycore.datamodel.niofs.MCRPath;
 
 /**
  * @author Thomas Scheffler
- *
  */
 final class MCRFileSystemUtils {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRFileSystemUtils.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String DEFAULT_CONFIG_PREFIX = "MCR.IFS.ContentStore.IFS2."; //todo: rename
 
@@ -96,27 +95,16 @@ final class MCRFileSystemUtils {
     }
 
     static MCRFileStore getStore(String base) {
-        String storeBaseDir = getBaseDir();
-
+        String baseDir = getBaseDir();
         String sid = STORE_ID_PREFIX + base;
-        storeBaseDir += File.separatorChar + base.replace("_", File.separator);
-
-        MCRFileStore store = MCRStoreManager.getStore(sid);
-        if (store == null) {
-            synchronized (MCRStoreManager.class) {
-                store = MCRStoreManager.getStore(sid);
-                if (store == null) {
-                    store = createStore(sid, storeBaseDir, base);
-                }
-            }
-        }
-        return store;
+        String storeBaseDir = baseDir + File.separatorChar + base.replace("_", File.separator);
+        return MCRStoreManager.computeStoreIfAbsent(sid, () -> buildStore(sid, storeBaseDir, base));
     }
 
-    private static MCRFileStore createStore(String sid, String storeBaseDir, String base) {
+    private static MCRFileStore buildStore(String sid, String storeBaseDir, String base) {
         try {
             configureStore(sid, storeBaseDir, base);
-            return MCRStoreManager.createStore(sid, MCRFileStore.class);
+            return MCRStoreManager.buildStore(sid, MCRFileStore.class);
         } catch (Exception ex) {
             String msg = "Could not create IFS2 file store with ID " + sid;
             throw new MCRConfigurationException(msg, ex);
@@ -334,8 +322,8 @@ final class MCRFileSystemUtils {
                 .sorted(Comparator.comparing(Path::getFileName))
                 .map(p -> p.getParent().getFileName().toString() + "_" + p.getFileName().toString())
                 .collect(Collectors.toList());
-        } catch (UncheckedIOException e) {
-            throw e.getCause();
+        } catch (UncheckedIOException ignoredUnchecked) {
+            throw ignoredUnchecked.getCause();
         }
     }
 

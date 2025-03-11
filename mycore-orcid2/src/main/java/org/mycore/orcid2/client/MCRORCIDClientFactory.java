@@ -18,10 +18,10 @@
 
 package org.mycore.orcid2.client;
 
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,7 +33,7 @@ import org.mycore.orcid2.exception.MCRORCIDException;
 /**
  * Factory for various ORCID clients.
  */
-public class MCRORCIDClientFactory {
+public final class MCRORCIDClientFactory {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -42,7 +42,7 @@ public class MCRORCIDClientFactory {
     private static final String READ_PUBLIC_TOKEN = MCRConfiguration2.getString(CONFIG_PREFIX + "ReadPublicToken")
         .orElse(null);
 
-    private static Map<String, MCRORCIDClientFactory> factories = new HashMap<>();
+    private static final Map<String, MCRORCIDClientFactory> FACTORIES = new ConcurrentHashMap<>();
 
     private final String publicAPI;
 
@@ -64,24 +64,24 @@ public class MCRORCIDClientFactory {
         try {
             mode = ReadClientMode.valueOf(modeString.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
-            throw new MCRConfigurationException("Unknown APIMode: " + modeString);
+            throw new MCRConfigurationException("Unknown APIMode: " + modeString, e);
         }
     }
 
     /**
      * Returns an instance of a factory for a version.
-     * 
+     *
      * @param version the version
      * @return MCRORCIDClientFactory
      * @throws MCRConfigurationException if factory cannot be initialized
      */
     public static MCRORCIDClientFactory getInstance(String version) {
-        MCRORCIDClientFactory factory = null;
-        if (factories.containsKey(version)) {
-            factory = factories.get(version);
+        MCRORCIDClientFactory factory;
+        if (FACTORIES.containsKey(version)) {
+            factory = FACTORIES.get(version);
         } else {
             factory = new MCRORCIDClientFactory(version);
-            factories.put(version, factory);
+            FACTORIES.put(version, factory);
         }
         return factory;
     }
@@ -123,7 +123,7 @@ public class MCRORCIDClientFactory {
 
     /**
      * Checks if API is in member mode.
-     * 
+     *
      * @return true if member mode is enabled
      */
     public boolean checkMemberMode() {

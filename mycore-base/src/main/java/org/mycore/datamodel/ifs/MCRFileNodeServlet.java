@@ -19,6 +19,7 @@
 package org.mycore.datamodel.ifs;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -58,9 +59,11 @@ import jakarta.servlet.http.HttpServletResponse;
  *
  */
 public class MCRFileNodeServlet extends MCRContentServlet {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    private static Logger LOGGER = LogManager.getLogger(MCRFileNodeServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRFileNodeServlet.class);
 
     private static Pattern patternDerivateID = Pattern.compile(".+_derivate_[0-9]+");
 

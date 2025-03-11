@@ -40,6 +40,7 @@ import com.google.gson.JsonObject;
  * @author Jens Kupferschmidt
  */
 public class MCRMetaClassification extends MCRMetaDefault {
+
     private static final Logger LOGGER = LogManager.getLogger();
 
     // MCRMetaClassification data

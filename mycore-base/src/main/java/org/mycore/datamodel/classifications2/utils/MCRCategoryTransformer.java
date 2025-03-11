@@ -33,6 +33,7 @@ import java.util.regex.Pattern;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.mycore.common.MCRXlink;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -171,14 +172,14 @@ public class MCRCategoryTransformer {
 
         static Element getElement(URI link) {
             Element le = new Element("url");
-            le.setAttribute("href", link.toString(), XLINK_NAMESPACE);
+            le.setAttribute(MCRXlink.HREF, link.toString(), XLINK_NAMESPACE);
             // TODO: Have to check url here: any samples?
-            le.setAttribute("type", "locator", XLINK_NAMESPACE);
+            le.setAttribute(MCRXlink.TYPE, MCRXlink.TYPE_LOCATOR, XLINK_NAMESPACE);
             return le;
         }
 
         static boolean stringNotEmpty(String test) {
-            return test != null && test.length() > 0;
+            return test != null && !test.isEmpty();
         }
     }
 
@@ -301,7 +302,7 @@ public class MCRCategoryTransformer {
             sort(items, MCREditorItemComparator.getCurrentLangComperator());
             for (Element item : items) {
                 List<Element> children = item.getChildren("item");
-                if (children.size() > 0) {
+                if (!children.isEmpty()) {
                     sortItems(children);
                 }
             }

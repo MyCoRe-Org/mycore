@@ -68,7 +68,7 @@ public class MCRDerivateURNUtils {
 
         try {
             // the base urn, links to frontpage (metadata + viewer)
-            if (piInfo.getAdditional() == null || piInfo.getAdditional().trim().isEmpty()) {
+            if (piInfo.getAdditional() == null || piInfo.getAdditional().isBlank()) {
                 MCRObjectID derID = MCRObjectID.getInstance(derivateID);
                 final MCRObjectID objectId = MCRMetadataManager.getObjectId(derID, 0, TimeUnit.SECONDS);
                 if (objectId == null) {

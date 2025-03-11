@@ -47,6 +47,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HexFormat;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
@@ -85,7 +87,7 @@ public class MCRUtils {
     private static final Logger LOGGER = LogManager.getLogger();
 
     // The file slash
-    private static String SLASH = FileSystems.getDefault().getSeparator();
+    private static final String SLASH = FileSystems.getDefault().getSeparator();
 
     /**
      * Reads exactly <code>len</code> bytes from the input stream into the byte array. This method reads repeatedly from
@@ -175,8 +177,8 @@ public class MCRUtils {
      *            the File instance of the basic directory
      * @return an ArrayList with file names as pathes
      */
-    public static ArrayList<String> getAllFileNames(File basedir) {
-        ArrayList<String> out = new ArrayList<>();
+    public static List<String> getAllFileNames(File basedir) {
+        List<String> out = new ArrayList<>();
         File[] stage = basedir.listFiles();
 
         for (File element : stage) {
@@ -199,8 +201,8 @@ public class MCRUtils {
      * @param path    the part of directory path
      * @return an ArrayList with file names as pathes
      */
-    public static ArrayList<String> getAllFileNames(File basedir, String path) {
-        ArrayList<String> out = new ArrayList<>();
+    public static List<String> getAllFileNames(File basedir, String path) {
+        List<String> out = new ArrayList<>();
         File[] stage = basedir.listFiles();
 
         for (File element : stage) {
@@ -223,8 +225,8 @@ public class MCRUtils {
      *            the File instance of the basic directory
      * @return an ArrayList with directory names as pathes
      */
-    public static ArrayList<String> getAllDirectoryNames(File basedir) {
-        ArrayList<String> out = new ArrayList<>();
+    public static List<String> getAllDirectoryNames(File basedir) {
+        List<String> out = new ArrayList<>();
         File[] stage = basedir.listFiles();
 
         for (File element : stage) {
@@ -246,8 +248,8 @@ public class MCRUtils {
      *            the part of directory path
      * @return an ArrayList with directory names as pathes
      */
-    public static ArrayList<String> getAllDirectoryNames(File basedir, String path) {
-        ArrayList<String> out = new ArrayList<>();
+    public static List<String> getAllDirectoryNames(File basedir, String path) {
+        List<String> out = new ArrayList<>();
         File[] stage = basedir.listFiles();
 
         for (File element : stage) {
@@ -409,7 +411,7 @@ public class MCRUtils {
         try (TarArchiveInputStream tain = new TarArchiveInputStream(Files.newInputStream(source))) {
             TarArchiveEntry tarEntry;
             FileSystem targetFS = expandToDirectory.getFileSystem();
-            HashMap<Path, FileTime> directoryTimes = new HashMap<>();
+            Map<Path, FileTime> directoryTimes = new HashMap<>();
             while ((tarEntry = tain.getNextEntry()) != null) {
                 Path target = MCRPathUtils.getPath(targetFS, tarEntry.getName());
                 Path absoluteTarget = expandToDirectory.resolve(target).normalize().toAbsolutePath();
@@ -497,7 +499,7 @@ public class MCRUtils {
         if (bytes >= 1024 * 1024) {
             // >= 1 MB
             sizeUnit = "MB";
-            sizeValue = (double) Math.round(bytes / 10485.76) / 100;
+            sizeValue = (double) Math.round(bytes / 10_485.76) / 100;
         } else if (bytes >= 5 * 1024) {
             // >= 5 KB
             sizeUnit = "KB";

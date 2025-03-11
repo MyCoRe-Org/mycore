@@ -19,6 +19,7 @@
 package org.mycore.frontend.servlets;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.nio.file.Files;
 import java.nio.file.attribute.FileTime;
 
@@ -43,6 +44,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRDerivateContentTransformerServlet extends MCRContentServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final int CACHE_TIME = 24 * 60 * 60;

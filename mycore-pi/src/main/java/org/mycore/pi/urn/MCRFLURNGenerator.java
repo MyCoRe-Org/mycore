@@ -44,7 +44,7 @@ public class MCRFLURNGenerator extends MCRDNBURNGenerator {
         int hh = now.get(Calendar.HOUR_OF_DAY);
         int mm = now.get(Calendar.MINUTE);
         int ss = now.get(Calendar.SECOND);
-        int sss = 99999 - (hh * 3600 + mm * 60 + ss);
+        int sss = 99_999 - (hh * 3600 + mm * 60 + ss);
 
         String ddddd = String.valueOf(yyy * 366 + ddd);
 
