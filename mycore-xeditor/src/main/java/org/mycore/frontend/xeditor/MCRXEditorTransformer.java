@@ -154,7 +154,7 @@ public class MCRXEditorTransformer {
             currentBinding = editorSession.getRootBinding();
         }
 
-        setCurrentBinding(new MCRBinding(xPath, initialValue, name, currentBinding));
+        setCurrentBinding(new MCRBinding(xPath, replaceXPaths(initialValue), name, currentBinding));
     }
 
     private void setCurrentBinding(MCRBinding binding) {

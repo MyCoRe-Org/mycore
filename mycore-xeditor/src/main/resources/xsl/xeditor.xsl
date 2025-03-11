@@ -145,8 +145,7 @@
   <xsl:template match="xed:bind" mode="xeditor">
     <xsl:call-template name="registerAdditionalNamespaces" />
     
-    <xsl:variable name="initialValue" select="transformer:replaceXPaths($transformer,@initially)" />
-    <xsl:value-of select="transformer:bind($transformer,@xpath,$initialValue,@name)" />
+    <xsl:value-of select="transformer:bind($transformer,@xpath,@initially,@name)" />
     <xsl:apply-templates select="@set|@default" mode="xeditor" />
     <xsl:apply-templates select="*" mode="xeditor" />
     <xsl:value-of select="transformer:unbind($transformer)" />
