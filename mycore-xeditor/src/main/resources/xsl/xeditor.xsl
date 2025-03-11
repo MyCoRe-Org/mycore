@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xed="http://www.mycore.de/xeditor"
-                xmlns:xalan="http://xml.apache.org/xalan" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
+                xmlns:xalan="http://xml.apache.org/xalan"
                 xmlns:transformer="xalan://org.mycore.frontend.xeditor.MCRXEditorTransformer"
                 xmlns:includer="xalan://org.mycore.frontend.xeditor.MCRIncludeHandler"
-                exclude-result-prefixes="xsl xed xalan transformer includer i18n">
+                exclude-result-prefixes="xsl xed xalan transformer includer">
 
   <xsl:strip-space elements="xed:*" />
 
@@ -286,8 +286,8 @@
     <xsl:variable name="xed_repeat" select="." />
 
     <xsl:for-each select="xalan:tokenize(transformer:repeat($transformer,@xpath,@min,@max,@method))">
-      <a id="rep-{transformer:nextAnchorID($transformer)}" />
-      <xsl:value-of select="transformer:bindRepeatPosition($transformer)" />
+      <xsl:variable name="anchorID" select="transformer:bindRepeatPosition($transformer)" />
+      <a id="rep-{$anchorID}" />
       <xsl:apply-templates select="$xed_repeat/node()" mode="xeditor" />
       <xsl:value-of select="transformer:unbind($transformer)" />
     </xsl:for-each>
@@ -418,22 +418,12 @@
 
   <!-- ========== <xed:output i18n="" value="" /> ========== -->
 
-  <xsl:template match="xed:output[not(@value) and not(@i18n)]" mode="xeditor">
-    <xsl:value-of select="transformer:getValue($transformer)" />
-  </xsl:template>
-
-  <xsl:template match="xed:output[@value and not(@i18n)]" mode="xeditor">
-    <xsl:value-of select="transformer:replaceXPathOrI18n($transformer,@value)" />
-  </xsl:template>
-
   <xsl:template match="xed:output[@i18n and not(@value)]" mode="xeditor">
-    <xsl:variable name="i18n" select="transformer:replaceParameters($transformer,@i18n)" />
-    <xsl:value-of select="i18n:translate($i18n)" disable-output-escaping="yes" />
+    <xsl:value-of select="transformer:output($transformer,@value,@i18n)" disable-output-escaping="yes" />
   </xsl:template>
 
-  <xsl:template match="xed:output[@i18n and @value]" mode="xeditor">
-    <xsl:variable name="i18n" select="transformer:replaceParameters($transformer,@i18n)" />
-    <xsl:value-of select="i18n:translate($i18n,transformer:evaluateXPath($transformer,@value))" />
+  <xsl:template match="xed:output" mode="xeditor">
+    <xsl:value-of select="transformer:output($transformer,@value,@i18n)" />
   </xsl:template>
 
   <!-- ========== <xed:multi-lang> <xed:lang xml:lang="" /> </xed:multi-lang> ========== -->

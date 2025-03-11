@@ -55,6 +55,7 @@ import org.mycore.frontend.xeditor.target.MCRInsertTarget;
 import org.mycore.frontend.xeditor.target.MCRSubselectTarget;
 import org.mycore.frontend.xeditor.target.MCRSwapTarget;
 import org.mycore.frontend.xeditor.validation.MCRValidator;
+import org.mycore.services.i18n.MCRTranslation;
 import org.w3c.dom.Attr;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -226,6 +227,27 @@ public class MCRXEditorTransformer {
         return getXPathEvaluator().evaluateXPath(xPathExpression);
     }
 
+    /**
+     * Handles the xed:output element
+     */
+    public String output(String attrValue, String attrI18N) {
+        if (!StringUtils.isEmpty(attrI18N)) {
+            String key = replaceParameters(attrI18N);
+
+            if (StringUtils.isEmpty(attrValue)) {
+                return MCRTranslation.translate(key);
+            } else {
+                String value = evaluateXPath(attrValue);
+                return MCRTranslation.translate(key, value);
+            }
+
+        } else if (!StringUtils.isEmpty(attrValue)) {
+            return replaceXPathOrI18n(attrValue);
+        } else {
+            return getValue();
+        }
+    }
+
     public boolean test(String xPathExpression) {
         return getXPathEvaluator().test(xPathExpression);
     }
@@ -265,9 +287,10 @@ public class MCRXEditorTransformer {
         return getCurrentRepeat().getRepeatPosition();
     }
 
-    public void bindRepeatPosition() {
+    public int bindRepeatPosition() {
         setCurrentBinding(getCurrentRepeat().bindRepeatPosition());
         editorSession.getValidator().setValidationMarker(currentBinding);
+        return nextAnchorID();
     }
 
     public String getSwapParameter(String action) throws JaxenException {
