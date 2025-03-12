@@ -42,7 +42,7 @@ import org.openqa.selenium.WebDriver;
 public class ControllerUtil {
 
     public static final String RESULT_FOLDER = "test.result.folder";
-    private static final Logger LOGGER = LogManager.getLogger(ControllerUtil.class);
+    private static final Logger LOGGER = LogManager.getLogger();
     private static final Properties TEST_PROPERTIES = TestProperties.getInstance();
     public static final String SCREENSHOT_FOLDER = TEST_PROPERTIES.getProperty(RESULT_FOLDER) + "/screenshots/";
 

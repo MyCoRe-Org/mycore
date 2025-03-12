@@ -50,7 +50,7 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
         .orElse("read,write,delete");
 
     /** the logger */
-    private static final Logger LOGGER = LogManager.getLogger(MCRAccessBaseImpl.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /*
      * (non-Javadoc)

@@ -36,7 +36,7 @@ import org.mycore.util.concurrent.MCRTransactionableRunnable;
  * @author René Adler
  */
 public class MCRJobResetter extends MCRCronjob {
-    private static final Logger LOGGER = LogManager.getLogger(MCRJobResetter.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final MCRJobDAO dao;
 

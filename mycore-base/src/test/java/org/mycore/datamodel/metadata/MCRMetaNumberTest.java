@@ -45,7 +45,7 @@ import org.mycore.common.xml.MCRXMLHelper;
  */
 public class MCRMetaNumberTest extends MCRTestCase {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRMetaNumberTest.class);;
+    private static final Logger LOGGER = LogManager.getLogger();;
 
     @Test
     public void numberTransformation() {

@@ -123,7 +123,7 @@ public class MCRXMLFunctions {
         .compile("(" + TAG_START + "((.*?[^\\<]))" + TAG_END + ")|(" + TAG_SELF_CLOSING + ")|(" + HTML_ENTITY + ")",
             Pattern.DOTALL);
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRXMLFunctions.class);
+    private static final Logger LOGGER = LogManager.getLogger();
     public static volatile MimetypesFileTypeMap mimetypeMap;
 
     public static Node document(String uri) throws JDOMException, IOException, TransformerException {

@@ -113,7 +113,7 @@ public final class MCRGoogleSitemapCommon {
         MCRSolrAuthenticationManager.getInstance();
 
     /** The logger */
-    private static final Logger LOGGER = LogManager.getLogger(MCRGoogleSitemapCommon.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** Number of URLs in one sitemap */
     private int numberOfURLs = MCRConfiguration2.getInt("MCR.GoogleSitemap.NumberOfURLs").orElse(10_000);

@@ -58,7 +58,7 @@ import org.mycore.datamodel.metadata.MCRObject;
  */
 public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRClassificationMappingEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static final String LABEL_LANG_XPATH_MAPPING = "x-mapping-xpath";
 

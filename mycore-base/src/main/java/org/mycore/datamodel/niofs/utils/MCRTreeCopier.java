@@ -42,7 +42,7 @@ import org.mycore.common.MCRTransactionManager;
  *
  */
 public class MCRTreeCopier implements FileVisitor<Path> {
-    private static final Logger LOGGER = LogManager.getLogger(MCRTreeCopier.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final Path source;
 

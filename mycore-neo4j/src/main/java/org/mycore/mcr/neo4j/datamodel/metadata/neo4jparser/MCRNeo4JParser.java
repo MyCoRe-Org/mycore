@@ -50,7 +50,7 @@ import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JRelation;
  */
 public class MCRNeo4JParser implements MCRNeo4JMetaParser {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRNeo4JParser.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String LANG_UNSET = "__unset__";
 

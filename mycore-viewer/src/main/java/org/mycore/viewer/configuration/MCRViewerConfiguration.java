@@ -68,10 +68,15 @@ import jakarta.xml.bind.annotation.XmlValue;
  */
 public class MCRViewerConfiguration {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRViewerConfiguration.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public enum ResourceType {
-        SCRIPT, MODULE, CSS
+        SCRIPT, MODULE, CSS;
+
+        @Override
+        public String toString() {
+            return super.toString().toLowerCase(Locale.ROOT);
+        }
     }
 
     private final Multimap<ResourceType, String> resources;
@@ -353,7 +358,7 @@ public class MCRViewerConfiguration {
     @XmlRootElement(name = "resource")
     private static class MCRIViewClientResource {
 
-        @XmlAttribute(name = "type", required = true)
+        @XmlTransient
         public ResourceType type;
 
         @XmlValue
@@ -366,6 +371,11 @@ public class MCRViewerConfiguration {
         MCRIViewClientResource(ResourceType type, String url) {
             this.type = type;
             this.url = url;
+        }
+
+        @XmlAttribute(name = "type", required = true)
+        public String getType() {
+            return type.name().toLowerCase(Locale.ROOT);
         }
 
         @Override
@@ -412,7 +422,6 @@ public class MCRViewerConfiguration {
 
     private static final class MultimapSerializer implements JsonSerializer<Multimap<ResourceType, String>> {
 
-        @SuppressWarnings("serial")
         private static final Type T = new TypeToken<Map<ResourceType, Collection<String>>>() {
         }.getType();
 

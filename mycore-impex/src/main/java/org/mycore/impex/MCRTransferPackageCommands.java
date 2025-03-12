@@ -51,7 +51,7 @@ import org.mycore.solr.search.MCRSolrSearchUtils;
 @SuppressWarnings("PMD.ClassNamingConventions")
 public class MCRTransferPackageCommands {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRTransferPackageCommands.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @MCRCommand(help = "Creates multiple transfer packages which matches the solr query in {0}.",
         syntax = "create transfer package for objects matching {0}")

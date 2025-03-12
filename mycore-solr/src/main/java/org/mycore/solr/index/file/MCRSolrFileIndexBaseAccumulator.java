@@ -49,7 +49,7 @@ import com.google.common.io.Files;
 
 public class MCRSolrFileIndexBaseAccumulator implements MCRSolrFileIndexAccumulator {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRSolrFileIndexBaseAccumulator.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCRXMLMetadataManager XML_MANAGER = MCRXMLMetadataManager.instance();
 

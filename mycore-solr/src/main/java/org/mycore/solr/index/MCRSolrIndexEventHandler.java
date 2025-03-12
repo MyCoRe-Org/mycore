@@ -57,7 +57,7 @@ import org.mycore.util.concurrent.MCRTransactionableRunnable;
  */
 public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRSolrIndexEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final long DELAY_IN_MS = MCRConfiguration2.getLong("MCR.Solr.DelayIndexing_inMS").orElse(2000L);
 

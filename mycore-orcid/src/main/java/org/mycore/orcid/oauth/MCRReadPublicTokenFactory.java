@@ -37,7 +37,7 @@ import org.mycore.common.config.MCRConfigurationException;
  */
 public class MCRReadPublicTokenFactory {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRReadPublicTokenFactory.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String CONFIG_PROPERTY = "MCR.ORCID.OAuth.ReadPublicToken";
 

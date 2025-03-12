@@ -45,7 +45,7 @@ import jakarta.xml.bind.Unmarshaller;
  */
 public class MCRSolrInputDocumentGenerator {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRSolrInputDocumentGenerator.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static final JAXBContext JAXB_CONTEXT = initContext();
 

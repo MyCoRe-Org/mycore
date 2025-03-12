@@ -55,7 +55,7 @@ public class MCROAuthServlet extends MCRServlet {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCROAuthServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private String scopes = MCRConfiguration2.getStringOrThrow("MCR.ORCID.OAuth.Scopes");
 

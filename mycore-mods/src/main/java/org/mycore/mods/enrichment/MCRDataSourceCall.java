@@ -44,7 +44,7 @@ import org.jdom2.Element;
  */
 class MCRDataSourceCall implements Callable<Boolean> {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRDataSourceCall.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private MCRDataSource ds;
 

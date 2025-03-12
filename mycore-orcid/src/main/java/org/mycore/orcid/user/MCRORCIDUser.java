@@ -47,7 +47,7 @@ import org.xml.sax.SAXException;
  */
 public class MCRORCIDUser {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRORCIDUser.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static final String ATTR_ID_PREFIX = "id_";
 

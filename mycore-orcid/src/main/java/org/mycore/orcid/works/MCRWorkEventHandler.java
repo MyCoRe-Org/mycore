@@ -47,7 +47,7 @@ import org.mycore.user2.MCRUserManager;
  */
 public class MCRWorkEventHandler extends MCREventHandlerBase {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRWorkEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     protected void handleObjectCreated(MCREvent evt, MCRObject object) {

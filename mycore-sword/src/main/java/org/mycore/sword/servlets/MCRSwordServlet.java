@@ -40,7 +40,7 @@ public class MCRSwordServlet extends HttpServlet {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRSwordServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     protected void prepareRequest(HttpServletRequest req, HttpServletResponse resp) {
         if (req.getAttribute(MCRFrontendUtil.BASE_URL_ATTRIBUTE) == null) {

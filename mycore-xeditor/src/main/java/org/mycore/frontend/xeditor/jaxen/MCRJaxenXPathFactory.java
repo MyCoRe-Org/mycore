@@ -39,7 +39,7 @@ import org.mycore.common.MCRConstants;
  */
 public class MCRJaxenXPathFactory extends JaxenXPathFactory {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRJaxenXPathFactory.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private List<ExtensionFunction> functions = new ArrayList<>();
 

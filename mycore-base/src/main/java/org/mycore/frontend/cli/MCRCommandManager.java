@@ -46,7 +46,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
  */
 @SuppressWarnings("PMD.DoNotTerminateVM")
 public class MCRCommandManager {
-    private static final Logger LOGGER = LogManager.getLogger(MCRCommandManager.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     protected static SortedMap<String, List<MCRCommand>> knownCommands = new TreeMap<>();
 

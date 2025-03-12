@@ -63,7 +63,7 @@ public class MCRFileNodeServlet extends MCRContentServlet {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRFileNodeServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static Pattern patternDerivateID = Pattern.compile(".+_derivate_[0-9]+");
 

@@ -48,7 +48,7 @@ import java.util.Optional;
  */
 public abstract class MCRAbstractRedundantModsEventHandler extends MCREventHandlerBase {
 
-    private final Logger logger = LogManager.getLogger(getClass());
+    private final static Logger LOGGER = LogManager.getLogger();
 
     @Override
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
@@ -76,8 +76,8 @@ public abstract class MCRAbstractRedundantModsEventHandler extends MCREventHandl
         if (mcrmodsWrapper.getMODS() == null) {
             return;
         }
-        if (logger.isInfoEnabled()) {
-            logger.info("merge redundant {} categories for {}", getClassificationElementName(), obj.getId());
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("merge redundant {} categories for {}", getClassificationElementName(), obj.getId());
         }
 
         Element mods = mcrmodsWrapper.getMODS();

@@ -105,7 +105,7 @@ public class MCRMetsSave {
 
     public static final String UNKNOWN_FILEGROUP = "UNKNOWN";
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRMetsSave.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * Saves the content of the given document to file and then adds the file to

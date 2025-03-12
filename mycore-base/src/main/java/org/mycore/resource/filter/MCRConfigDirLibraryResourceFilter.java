@@ -60,7 +60,7 @@ public class MCRConfigDirLibraryResourceFilter extends MCRUrlPrefixResourceFilte
 
     private String getPrefix(File configDir) {
         String prefix = "jar:" + configDir.toURI() + "lib/";
-        getLogger().debug("Working with config dir library prefix: {}", prefix);
+        logger.debug("Working with config dir library prefix: {}", prefix);
         return prefix;
     }
 

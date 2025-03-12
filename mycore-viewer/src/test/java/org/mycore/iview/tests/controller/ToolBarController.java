@@ -57,7 +57,7 @@ public class ToolBarController extends WebDriverController {
 
     private static final String SELECTBOX_SELECTOR = "[data-id=ImageChangeControllGroup] select.dropdown";
 
-    private static final Logger LOGGER = LogManager.getLogger(ToolBarController.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public ToolBarController(WebDriver webdriver) {
         super(webdriver);

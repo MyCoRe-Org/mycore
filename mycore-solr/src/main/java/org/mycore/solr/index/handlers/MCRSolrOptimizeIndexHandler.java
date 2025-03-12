@@ -35,7 +35,7 @@ import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
  *
  */
 public class MCRSolrOptimizeIndexHandler extends MCRSolrAbstractIndexHandler {
-    private static final Logger LOGGER = LogManager.getLogger(MCRSolrOptimizeIndexHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public void index() throws IOException, SolrServerException {

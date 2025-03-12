@@ -39,7 +39,7 @@ import org.mycore.wfc.MCRConstants;
  * @author Thomas Scheffler (yagee)
  */
 public final class MCRURLRetriever {
-    private static final Logger LOGGER = LogManager.getLogger(MCRURLRetriever.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.getInstance();
 

@@ -60,7 +60,7 @@ public class MCRWebappLibraryResourceFilter extends MCRUrlPrefixResourceFilterBa
 
     private String getPrefix(File webappDir) {
         String prefix = "jar:" + webappDir.toURI() + "WEB-INF/lib/";
-        getLogger().debug("Working with webapp library prefix: {}", prefix);
+        logger.debug("Working with webapp library prefix: {}", prefix);
         return prefix;
     }
 

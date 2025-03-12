@@ -41,7 +41,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRExtractRelatedItemsEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /* (non-Javadoc)
      * @see org.mycore.common.events.MCREventHandlerBase

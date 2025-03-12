@@ -68,7 +68,7 @@ import org.mycore.common.MCRTextResolver;
  */
 public abstract class MCRDynamicURIResolver implements URIResolver {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRDynamicURIResolver.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     protected Element cachedElement;
 

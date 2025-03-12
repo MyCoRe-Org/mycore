@@ -40,7 +40,7 @@ public final class MCRJMXBridge implements Closeable {
 
     static final WeakReference<MCRJMXBridge> SINGLETON = new WeakReference<>(new MCRJMXBridge());
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRJMXBridge.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final java.util.List<WeakReference<ObjectName>> ONAME_LIST = Collections
         .synchronizedList(new ArrayList<>());

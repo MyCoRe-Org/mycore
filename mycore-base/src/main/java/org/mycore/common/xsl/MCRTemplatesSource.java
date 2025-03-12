@@ -43,7 +43,7 @@ import org.xml.sax.SAXException;
  */
 public class MCRTemplatesSource {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRTemplatesSource.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** The path to the XSL resource */
     private String resource;

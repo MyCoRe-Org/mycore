@@ -122,21 +122,21 @@ public abstract class MCRFileSystemResourceProviderBase extends MCRResourceProvi
 
     private boolean isUsableBaseDir(File baseDir) {
         String dirPath = baseDir.getAbsolutePath();
-        getLogger().debug("Looking for directory {}", dirPath);
+        logger.debug("Looking for directory {}", dirPath);
         if (!baseDir.exists()) {
-            getLogger().debug("{} doesn't exist", dirPath);
+            logger.debug("{} doesn't exist", dirPath);
             return false;
         }
         if (!baseDir.isDirectory()) {
-            getLogger().debug("{} isn't a directory", dirPath);
+            logger.debug("{} isn't a directory", dirPath);
             return false;
         }
         if (!baseDir.canRead()) {
-            getLogger().debug("{} can't be read", dirPath);
+            logger.debug("{} can't be read", dirPath);
             return false;
         }
         if (!baseDir.canExecute()) {
-            getLogger().debug("{} can't be opened", dirPath);
+            logger.debug("{} can't be opened", dirPath);
             return false;
         }
         return true;
@@ -159,17 +159,17 @@ public abstract class MCRFileSystemResourceProviderBase extends MCRResourceProvi
 
     private boolean isUsableFile(File file) {
         String filePath = file.getAbsolutePath();
-        getLogger().debug("Looking for file {}", filePath);
+        logger.debug("Looking for file {}", filePath);
         if (!file.exists()) {
-            getLogger().debug("{} doesn't exist", filePath);
+            logger.debug("{} doesn't exist", filePath);
             return false;
         }
         if (!file.isFile()) {
-            getLogger().debug("{} isn't a file", filePath);
+            logger.debug("{} isn't a file", filePath);
             return false;
         }
         if (!file.canRead()) {
-            getLogger().debug("{} can't be read", filePath);
+            logger.debug("{} can't be read", filePath);
             return false;
         }
         return true;

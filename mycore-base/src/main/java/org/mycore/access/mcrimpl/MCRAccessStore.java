@@ -42,7 +42,7 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
  * @author Arne Seifert
  */
 public abstract class MCRAccessStore {
-    private static final Logger LOGGER = LogManager.getLogger(MCRAccessStore.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     protected static final String SQL_DATEFORMAT = "yyyy-MM-dd HH:mm:ss";
 

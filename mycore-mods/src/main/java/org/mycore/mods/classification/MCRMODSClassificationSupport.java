@@ -42,7 +42,7 @@ import org.w3c.dom.NodeList;
  */
 public final class MCRMODSClassificationSupport {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRMODSClassificationSupport.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private MCRMODSClassificationSupport() {
     }

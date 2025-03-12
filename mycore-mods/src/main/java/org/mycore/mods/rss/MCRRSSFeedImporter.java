@@ -117,7 +117,7 @@ public class MCRRSSFeedImporter {
 
     private static final String PROPERTY_MAIL_ADDRESS = "MCR.Mail.Address";
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRRSSFeedImporter.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static void importFromFeed(String sourceSystemID, String projectID) throws Exception {
         MCRRSSFeedImporter importer = new MCRRSSFeedImporter(sourceSystemID);

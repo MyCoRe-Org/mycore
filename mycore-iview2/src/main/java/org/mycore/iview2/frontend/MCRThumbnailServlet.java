@@ -79,7 +79,7 @@ public class MCRThumbnailServlet extends MCRServlet {
 
     private Queue<ImageWriter> imageWriters = new ConcurrentLinkedQueue<>();
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRThumbnailServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private int thumbnailSize = MCRImage.getTileSize();
 

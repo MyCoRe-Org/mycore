@@ -31,7 +31,7 @@ import java.util.Objects;
  */
 public class MCRRedundantModsGenreEventHandler extends MCRAbstractRedundantModsEventHandler {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRRedundantModsGenreEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     protected static final String CLASSIFICATION_ELEMENT_NAME = "genre";
 

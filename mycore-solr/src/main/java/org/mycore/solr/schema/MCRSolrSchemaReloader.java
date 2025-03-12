@@ -62,7 +62,7 @@ public class MCRSolrSchemaReloader {
     private static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
         MCRSolrAuthenticationManager.getInstance();
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRSolrSchemaReloader.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String SOLR_SCHEMA_UPDATE_FILE_NAME = "solr-schema.json";
 

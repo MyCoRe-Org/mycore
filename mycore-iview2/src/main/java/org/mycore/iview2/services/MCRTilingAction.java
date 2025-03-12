@@ -48,7 +48,7 @@ import jakarta.persistence.EntityTransaction;
  *
  */
 public class MCRTilingAction implements Runnable {
-    private static final Logger LOGGER = LogManager.getLogger(MCRTilingAction.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     protected MCRTileJob tileJob;
 

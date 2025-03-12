@@ -51,7 +51,7 @@ import org.xml.sax.SAXException;
  */
 public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandler {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRSolrMCRContentMapIndexHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private List<MCRSolrIndexHandler> subhandlers;
 

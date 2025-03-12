@@ -27,7 +27,7 @@ import jakarta.ws.rs.container.ContainerRequestContext;
 
 public class MCRAclEditorPermission implements MCRResourceAccessChecker {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRAclEditorPermission.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public boolean isPermitted(ContainerRequestContext request) {

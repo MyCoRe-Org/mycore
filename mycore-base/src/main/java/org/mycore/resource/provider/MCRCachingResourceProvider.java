@@ -83,11 +83,11 @@ public class MCRCachingResourceProvider extends MCRResourceProviderBase {
     protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints) {
         Optional<URL> resourceUrl = cache.get(path);
         if (resourceUrl == null) {
-            getLogger().debug("Cache miss for {}", path);
+            logger.debug("Cache miss for {}", path);
             resourceUrl = provider.provide(path, hints);
             cache.put(path, resourceUrl);
         } else {
-            getLogger().debug("Cache hit for {}", path);
+            logger.debug("Cache hit for {}", path);
         }
         return resourceUrl;
     }

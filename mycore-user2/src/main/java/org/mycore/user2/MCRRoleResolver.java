@@ -40,7 +40,7 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  */
 public class MCRRoleResolver implements URIResolver {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRRoleResolver.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static Element getAssignableGroupsForUser() throws MCRAccessException {
         LOGGER.warn("Please fix http://sourceforge.net/p/mycore/bugs/568/");

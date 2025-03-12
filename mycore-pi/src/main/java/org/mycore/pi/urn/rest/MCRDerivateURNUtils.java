@@ -54,7 +54,7 @@ import org.mycore.pi.MCRPIRegistrationInfo;
  * @author Huu Chi Vu
  */
 public class MCRDerivateURNUtils {
-    private static final Logger LOGGER = LogManager.getLogger(MCRDerivateURNUtils.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String SUPPORTED_CONTENT_TYPE = MCRConfiguration2
         .getString("MCR.PI.URNGranular.SupportedContentTypes").orElse("");

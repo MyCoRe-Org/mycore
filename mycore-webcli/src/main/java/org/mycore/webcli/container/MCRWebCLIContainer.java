@@ -89,7 +89,7 @@ import jakarta.websocket.Session;
  */
 public class MCRWebCLIContainer {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRWebCLIContainer.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCRProcessableExecutor EXECUTOR;
 

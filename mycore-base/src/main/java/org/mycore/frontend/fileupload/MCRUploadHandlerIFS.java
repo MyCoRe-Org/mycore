@@ -64,7 +64,7 @@ import org.mycore.datamodel.niofs.MCRPath;
  */
 public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRUploadHandlerIFS.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String ID_TYPE = MCRDerivate.OBJECT_TYPE;
 

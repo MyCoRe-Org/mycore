@@ -43,7 +43,7 @@ public class MCRCalendar {
     /**
      * Logger
      */
-    private static final Logger LOGGER = LogManager.getLogger(MCRCalendar.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * Tag for Buddhistic calendar

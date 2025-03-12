@@ -71,7 +71,7 @@ public class MCRDFGLinkServlet extends MCRServlet {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRDFGLinkServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static int getOrderNumber(Document metsDoc, String fileHref) {
         int orderNumber = -1;

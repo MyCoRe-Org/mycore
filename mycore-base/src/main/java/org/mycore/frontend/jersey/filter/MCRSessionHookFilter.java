@@ -50,7 +50,7 @@ public class MCRSessionHookFilter implements ContainerRequestFilter, ContainerRe
 
     private static final String ATTR = MCRSessionHookFilter.class.getName() + ".session";
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRSessionHookFilter.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public void filter(ContainerRequestContext request) {

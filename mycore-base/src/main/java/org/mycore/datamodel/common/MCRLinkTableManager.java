@@ -67,7 +67,6 @@ public class MCRLinkTableManager {
     /** The link table manager singleton */
     protected static MCRLinkTableManager singleton;
 
-    // logger
     private static final Logger LOGGER = LogManager.getLogger();
 
     private final MCRLinkTableInterface linkTableInstance;

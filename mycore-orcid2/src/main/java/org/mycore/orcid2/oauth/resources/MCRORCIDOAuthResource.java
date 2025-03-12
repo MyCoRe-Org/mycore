@@ -82,7 +82,7 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 @Path("orcid/oauth")
 public class MCRORCIDOAuthResource {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRORCIDOAuthResource.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String CONFIG_PREFIX = MCRORCIDConstants.CONFIG_PREFIX + "OAuth.";
 

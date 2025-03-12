@@ -48,7 +48,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author Sebastian Hofmann (mcrshofm)
  */
 public class MCRSwordContainerManager implements ContainerManager {
-    private static final Logger LOGGER = LogManager.getLogger(MCRSwordContainerManager.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static void throwObjectDoesNotExist(String objectIdString) throws SwordError {
         throw new SwordError(UriRegistry.ERROR_BAD_REQUEST, HttpServletResponse.SC_NOT_FOUND,

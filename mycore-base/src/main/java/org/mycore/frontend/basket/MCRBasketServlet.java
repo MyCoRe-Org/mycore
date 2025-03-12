@@ -77,7 +77,7 @@ public class MCRBasketServlet extends MCRServlet {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRBasketServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static final String ALLOW_LIST_PROPERTY_NAME = "MCR.Basket.Resolver.AllowList";
 

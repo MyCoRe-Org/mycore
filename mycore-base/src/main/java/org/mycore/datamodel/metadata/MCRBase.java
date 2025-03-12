@@ -68,7 +68,6 @@ public abstract class MCRBase {
 
     protected boolean importMode;
 
-    // logger
     private static final Logger LOGGER = LogManager.getLogger();
 
     static {

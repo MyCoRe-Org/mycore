@@ -53,7 +53,7 @@ public class NavbarIT extends ViewerTestBase {
 
     private static final int TOLERANCE = 20;
 
-    private static final Logger LOGGER = LogManager.getLogger(NavbarIT.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Test
     public void testBasicElementsPresent() {

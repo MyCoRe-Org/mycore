@@ -69,7 +69,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRXSLInfoServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final Map<String, Stylesheet> stylesheets = new HashMap<>();
 
