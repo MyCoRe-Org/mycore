@@ -49,6 +49,7 @@ import org.jsoup.nodes.Entities;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRURLContent;
@@ -184,7 +185,8 @@ public class MCRVueRootServlet extends MCRContentServlet {
      * @return the property value, even if it is an empty string
      */
     private static String resolveProperty(String key) {
-        return MCRConfiguration2.getOrThrow(key, o -> o);
+        return MCRConfigurationBase.getString(key.trim())
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(key));
     }
 
     protected void updateInitProperties() {
