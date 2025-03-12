@@ -38,7 +38,8 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
     public void constructorFactory() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithConstructor instance = MCRConfigurableInstanceHelper.getInstance(configuration);
+        TestClassWithConstructor instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithConstructor.class, configuration);
 
         assertNotNull(instance);
 
@@ -52,7 +53,8 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
     public void factory() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithFactory instance = MCRConfigurableInstanceHelper.getInstance(configuration);
+        TestClassWithFactory instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithFactory.class, configuration);
 
         assertNotNull(instance);
 
@@ -66,7 +68,7 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
     public void noConstructorOrFactory() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurableInstanceHelper.getInstance(configuration);
+        MCRConfigurableInstanceHelper.getInstance(Object.class, configuration);
 
     }
 
@@ -78,7 +80,7 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
     public void multipleFactories() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurableInstanceHelper.getInstance(configuration);
+        MCRConfigurableInstanceHelper.getInstance(Object.class, configuration);
 
     }
 
@@ -91,7 +93,8 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
     public void proxyFactory() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithConfigurationProxy instance = MCRConfigurableInstanceHelper.getInstance(configuration);
+        TestClassWithConfigurationProxy instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithConfigurationProxy.class, configuration);
 
         assertNotNull(instance);
 

@@ -40,7 +40,7 @@ import org.xml.sax.SAXException;
 public abstract class MCRSolrInputDocumentFactory {
 
     private static final MCRSolrInputDocumentFactory SHARED_INSTANCE = MCRConfiguration2
-        .getOrThrow(SOLR_CONFIG_PREFIX + "SolrInputDocument.Factory", MCRConfiguration2::instantiateClass);
+        .getInstanceOfOrThrow(MCRSolrInputDocumentFactory.class, SOLR_CONFIG_PREFIX + "SolrInputDocument.Factory");
 
     /**
      * @deprecated Use {@link #obtainInstance()} instead
