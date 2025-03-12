@@ -237,9 +237,11 @@ public abstract class MCRPath implements Path {
             int thatPos = that.offsets[0];
             if (thisPathLength - thisPos == thatPathLength - thatPos) {
                 while (thisPos < thisPathLength) {
-                    if (path.charAt(thisPos++) != that.path.charAt(thatPos++)) {
+                    if (path.charAt(thisPos) != that.path.charAt(thatPos)) {
                         return false;
                     }
+                    thisPos++;
+                    thatPos++;
                 }
                 return that.getFileSystem().equals(getFileSystem());
             }
@@ -483,7 +485,8 @@ public abstract class MCRPath implements Path {
                 continue;
             }
             sb.append(getPathElement(i));
-            if (--remaining > 0) {
+            remaining--;
+            if (remaining > 0) {
                 sb.append('/');
             }
         }

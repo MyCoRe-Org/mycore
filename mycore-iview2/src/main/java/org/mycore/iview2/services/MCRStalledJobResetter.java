@@ -124,14 +124,15 @@ public final class MCRStalledJobResetter implements Runnable {
     }
 
     private boolean hasPermanentError(MCRTileJob job) {
-        int runs = 0;
+        int runs = 1;
         if (jobCounter.containsKey(job.getId())) {
-            runs = jobCounter.get(job.getId());
+            runs = jobCounter.get(job.getId()) + 1;
         }
-        if (++runs >= MAX_RESET_COUNT) {
+        if (runs >= MAX_RESET_COUNT) {
             return true;
         }
         jobCounter.put(job.getId(), runs);
         return false;
     }
+
 }
