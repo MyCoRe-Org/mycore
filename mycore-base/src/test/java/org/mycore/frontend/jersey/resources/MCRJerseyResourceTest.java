@@ -22,9 +22,9 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Set;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -34,13 +34,13 @@ public class MCRJerseyResourceTest {
 
     private MCRJerseyTestFeature jersey;
 
-    @Before
+    @BeforeEach
     public void setUpJersey() throws Exception {
         jersey = new MCRJerseyTestFeature();
         jersey.setUp(Set.of(TestCase.class));
     }
 
-    @After
+    @AfterEach
     public void tearDownJersey() throws Exception {
         jersey.tearDown();
     }
