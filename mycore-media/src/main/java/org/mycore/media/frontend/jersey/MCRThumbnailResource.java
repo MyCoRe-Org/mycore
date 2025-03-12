@@ -130,8 +130,7 @@ public class MCRThumbnailResource {
     private static Optional<BufferedImage> getThumbnail(MCRPath mainFile, int size) throws IOException {
         String mimeType = Files.probeContentType(mainFile);
         List<MCRThumbnailGenerator> generators = MCRConfiguration2
-            .getOrThrow("MCR.Media.Thumbnail.Generators", MCRConfiguration2::splitValue)
-            .map(MCRConfiguration2::<MCRThumbnailGenerator>instantiateClass)
+            .instantiateClasses(MCRThumbnailGenerator.class, "MCR.Media.Thumbnail.Generators")
             .filter(thumbnailGenerator -> thumbnailGenerator.matchesFileType(mimeType, mainFile))
             .toList();
         return generators.stream()

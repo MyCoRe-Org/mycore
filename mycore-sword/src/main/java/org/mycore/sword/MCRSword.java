@@ -75,7 +75,7 @@ public class MCRSword {
 
         LOGGER.info("Try to init : {}", name);
         MCRSwordCollectionProvider collectionProvider = MCRConfiguration2
-            .getOrThrow(name, MCRConfiguration2::instantiateClass);
+            .getInstanceOfOrThrow(MCRSwordCollectionProvider.class, name);
         collections.put(collection, collectionProvider);
         final MCRSwordLifecycleConfiguration lifecycleConfiguration = new MCRSwordLifecycleConfiguration(collection);
         collectionProvider.init(lifecycleConfiguration);

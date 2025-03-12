@@ -86,6 +86,19 @@ class MCRConfigurableInstanceHelper {
     /**
      * Creates a configured instance of a class.
      *
+     * @param name the property which contains the class name
+     * @return the configured instance of T
+     * @throws MCRConfigurationException if the property is not right configured.
+     */
+    @Deprecated
+    @SuppressWarnings("unchecked")
+    public static <T> Optional<T> getInstance(String name) throws MCRConfigurationException {
+        return (Optional<T>) getInstance(Object.class, name);
+    }
+
+    /**
+     * Creates a configured instance of a class.
+     *
      * @param superClass the intended super class of the instantiated class
      * @param name       the property which contains the class name
      * @return the configured instance of T
@@ -97,39 +110,36 @@ class MCRConfigurableInstanceHelper {
         if (className == null || className.isBlank()) {
             return Optional.empty();
         }
-        Object instance = getInstance(configuration);
-        if (superClass.isAssignableFrom(instance.getClass())) {
-            return Optional.of(superClass.cast(instance));
-        } else {
-            throw new MCRConfigurationException("Configured instance of class " + instance.getClass().getName()
-                + " is incompatible with intended super class " + superClass.getName()
-                + "' in configured class " + name);
-        }
+        return Optional.of(getInstance(superClass, configuration, name));
     }
 
-    /**
-     * Creates a configured instance of a class.
-     *
-     * @param name the property which contains the class name
-     * @return the configured instance of T
-     * @throws MCRConfigurationException if the property is not right configured.
-     */
-    public static <T> Optional<T> getInstance(String name) throws MCRConfigurationException {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName(name);
-        String className = configuration.className();
-        if (className == null || className.isBlank()) {
-            return Optional.empty();
-        }
-        return Optional.of(getInstance(configuration));
-    }
-
+    @Deprecated
+    @SuppressWarnings("unchecked")
     public static <T> T getInstance(MCRInstanceConfiguration configuration) throws MCRConfigurationException {
+        return (T) getInstance(Objects.class, configuration, null);
+    }
+
+    public static <S> S getInstance(Class<S> superClass, MCRInstanceConfiguration configuration)
+        throws MCRConfigurationException {
+        return getInstance(superClass, configuration, null);
+    }
+
+    private static <S> S getInstance(Class<S> superClass, MCRInstanceConfiguration configuration, String name)
+        throws MCRConfigurationException {
         String className = configuration.className();
         if (className == null || className.isBlank()) {
             throw new MCRConfigurationException("Missing or empty property: " + configuration.name().actual());
         }
-        Class<T> targetClass = getClass(configuration.name().actual(), configuration.className());
-        return getInstance(targetClass, configuration);
+        Class<S> targetClass = getClass(configuration.name().actual(), configuration.className());
+        Object instance = createInstance(targetClass, configuration);
+        if (superClass.isAssignableFrom(instance.getClass())) {
+            return superClass.cast(instance);
+        } else {
+            throw new MCRConfigurationException("Configured instance of class " + instance.getClass().getName()
+                + " is incompatible with intended super class " + superClass.getName() + "'"
+                + (name != null ? " in configured class " + name : "")
+            );
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -143,13 +153,13 @@ class MCRConfigurableInstanceHelper {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> T getInstance(Class<T> targetClass, MCRInstanceConfiguration configuration) {
+    private static <T> T createInstance(Class<T> targetClass, MCRInstanceConfiguration configuration) {
         MCRConfigurationProxy productAnnotation = targetClass.getDeclaredAnnotation(MCRConfigurationProxy.class);
         if (productAnnotation != null) {
             Class<Supplier<T>> proxyClass = (Class<Supplier<T>>) productAnnotation.proxyClass();
-            return getInfo(proxyClass).getInstance(configuration).get();
+            return getInfo(proxyClass).createInstance(configuration).get();
         } else {
-            return getInfo(targetClass).getInstance(configuration);
+            return getInfo(targetClass).createInstance(configuration);
         }
     }
 
@@ -388,7 +398,7 @@ class MCRConfigurableInstanceHelper {
         }
 
         @SuppressWarnings("PMD.SingletonClassReturningNewInstance")
-        public T getInstance(MCRInstanceConfiguration configuration) {
+        public T createInstance(MCRInstanceConfiguration configuration) {
             T instance = factory.get();
             for (Injector<T, ?> injector : injectors) {
                 injector.inject(instance, configuration);
@@ -900,7 +910,7 @@ class MCRConfigurableInstanceHelper {
                 }
             }
 
-            Object instance = getInstance(nestedConfiguration);
+            Object instance = getInstance(Object.class, nestedConfiguration);
 
             if (!annotation.valueClass().isAssignableFrom(instance.getClass())) {
                 throwIncompatibleAnnotation(annotation.valueClass(), target, instance);
@@ -976,8 +986,8 @@ class MCRConfigurableInstanceHelper {
                     + getExampleName(configuration, "B") + ", ...");
             }
 
-            Map<String, Object> instanceMap = nestedConfigurationMap.entrySet()
-                .stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> getInstance(entry.getValue())));
+            Map<String, Object> instanceMap = nestedConfigurationMap.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> getInstance(Object.class, entry.getValue())));
 
             instanceMap.values().forEach(instance -> {
                 if (!annotation.valueClass().isAssignableFrom(instance.getClass())) {
@@ -1070,8 +1080,8 @@ class MCRConfigurableInstanceHelper {
                     + getExampleName(configuration, "2") + ", ...");
             }
 
-            List<Object> instanceList = nestedConfigurationList
-                .stream().map(MCRConfigurableInstanceHelper::getInstance).toList();
+            List<Object> instanceList = nestedConfigurationList.stream()
+                .map(c -> getInstance(Object.class, c)).toList();
 
             instanceList.forEach(instance -> {
                 if (!annotation.valueClass().isAssignableFrom(instance.getClass())) {

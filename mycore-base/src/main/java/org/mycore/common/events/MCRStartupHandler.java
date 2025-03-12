@@ -27,7 +27,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.jar.JarFile;
-import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,7 +34,6 @@ import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRComponent;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDirSetup;
-import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.MCRRuntimeComponentDetector;
 import org.mycore.common.log.MCRTableMessage;
 import org.mycore.common.xml.MCRURIResolver;
@@ -89,13 +87,13 @@ public class MCRStartupHandler {
             new MCRTableMessage.Column<>("Name", AutoExecutable::getName),
             new MCRTableMessage.Column<>("Priority", AutoExecutable::getPriority),
             new MCRTableMessage.Column<>("Class", executable -> executable.getClass().getName()));
-        List<AutoExecutable> executables = MCRConfiguration2.getString("MCR.Startup.Class")
-            .map(MCRConfiguration2::splitValue)
-            .orElseGet(Stream::empty)
-            .map(MCRStartupHandler::getAutoExecutable)
+
+        List<AutoExecutable> executables = MCRConfiguration2
+            .instantiateClasses(AutoExecutable.class, "MCR.Startup.Class")
             .sorted()
             .peek(executableTable::add)
             .toList();
+
         LOGGER.info(() -> executableTable.logMessage("Detected auto executables:"));
         executables.forEach(autoExecutable -> startExecutable(servletContext, autoExecutable));
 
@@ -148,14 +146,6 @@ public class MCRStartupHandler {
                 throw e;
             }
             LOGGER.warn(() -> e.toString());
-        }
-    }
-
-    private static AutoExecutable getAutoExecutable(String className) {
-        try {
-            return (AutoExecutable) MCRClassTools.forName(className).getDeclaredConstructor().newInstance();
-        } catch (ReflectiveOperationException e) {
-            throw new MCRConfigurationException("Could not initialize 'MCR.Startup.Class': " + className, e);
         }
     }
 

@@ -64,8 +64,8 @@ public class MCRClassificationBrowser2 extends MCRServlet {
     private static final Logger LOGGER = LogManager.getLogger();
 
     protected MCRQueryAdapter getQueryAdapter(final String fieldName) {
-        MCRQueryAdapter adapter = MCRConfiguration2
-            .getOrThrow("MCR.Module-classbrowser.QueryAdapter", MCRConfiguration2::instantiateClass);
+        MCRQueryAdapter adapter = MCRConfiguration2.getInstanceOfOrThrow(MCRQueryAdapter.class,
+            "MCR.Module-classbrowser.QueryAdapter");
         adapter.setFieldName(fieldName);
         return adapter;
     }
