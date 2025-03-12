@@ -249,7 +249,7 @@ public class MCRCache<K, V> implements Closeable {
      * @return the fill rate of this cache as double value
      */
     public double getFillRate() {
-        return capacity == 0 ? 1.0 : (double) getCurrentSize() / (double) capacity;
+        return capacity == 0 ? 1.0 : (double) getCurrentSize() / capacity;
     }
 
     /**

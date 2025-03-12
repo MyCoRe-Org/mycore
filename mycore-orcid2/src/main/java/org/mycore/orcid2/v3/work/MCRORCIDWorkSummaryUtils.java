@@ -121,7 +121,7 @@ public class MCRORCIDWorkSummaryUtils {
 
     private static long[] getPutCodesNotCreatedByThisAppFromSummaries(Stream<WorkSummary> works) {
         return works.filter(w -> !MCRORCIDUtils.isCreatedByThisApplication(w.retrieveSourcePath()))
-            .map(WorkSummary::getPutCode).mapToLong(l -> (long) l).toArray();
+            .map(WorkSummary::getPutCode).mapToLong(Long::longValue).toArray();
     }
 
     private static long getPutCodeCreatedByThisAppFromSummaries(Stream<WorkSummary> works) {

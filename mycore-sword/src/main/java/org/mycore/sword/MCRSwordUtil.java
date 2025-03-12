@@ -556,7 +556,7 @@ public class MCRSwordUtil {
          */
         public static void addPaginationLinks(IRI collectionIRI, String collection, Feed feed,
             MCRSwordCollectionProvider collectionProvider) throws SwordServerException {
-            final int lastPage = (int) Math.ceil((double) collectionProvider.getIDSupplier().getCount()
+            final int lastPage = (int) Math.ceil(collectionProvider.getIDSupplier().getCount()
                 / (double) MCRSwordConstants.MAX_ENTRYS_PER_PAGE);
             int currentPage = ParseLinkUtil.CollectionIRI.getPaginationFromCollectionIRI(collectionIRI);
 
