@@ -58,7 +58,7 @@ public class MCRTemplatesSource {
     /** Have to use SAX here to resolve entities */
     public SAXSource getSource() throws SAXException, ParserConfigurationException {
         try {
-            return (SAXSource) MCRURIResolver.instance().resolve("resource:" + resource, null);
+            return (SAXSource) MCRURIResolver.obtainInstance().resolve("resource:" + resource, null);
         } catch (TransformerException e) {
             throw new SAXException(e);
         }
@@ -76,7 +76,7 @@ public class MCRTemplatesSource {
 
     public URL getURL() {
         try {
-            return MCRXMLResource.instance().getURL(resource, MCRClassTools.getClassLoader());
+            return MCRXMLResource.getInstance().getURL(resource, MCRClassTools.getClassLoader());
         } catch (IOException e) {
             LOGGER.warn("Could not determine URL of resource {}", resource, e);
             return null;
@@ -86,7 +86,7 @@ public class MCRTemplatesSource {
     /** Returns the timestamp the XSL file was last modified on the filesystem. */
     public long getLastModified() {
         try {
-            return MCRXMLResource.instance().getLastModified(resource, MCRClassTools.getClassLoader());
+            return MCRXMLResource.getInstance().getLastModified(resource, MCRClassTools.getClassLoader());
         } catch (IOException e) {
             LOGGER.warn("Could not determine last modified date of resource {}", resource);
             return -1;
@@ -94,7 +94,7 @@ public class MCRTemplatesSource {
     }
 
     public MCRCache.ModifiedHandle getModifiedHandle(long checkPeriod) {
-        return MCRXMLResource.instance().getModifiedHandle(resource, MCRClassTools.getClassLoader(),
+        return MCRXMLResource.getInstance().getModifiedHandle(resource, MCRClassTools.getClassLoader(),
             checkPeriod);
     }
 }

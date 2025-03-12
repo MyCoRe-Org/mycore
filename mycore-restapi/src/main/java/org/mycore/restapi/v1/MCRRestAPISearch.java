@@ -134,7 +134,8 @@ public class MCRRestAPISearch {
     // Method to execute the Solr query and handle response
     private Response executeSolrQuery(String url, String wt) {
         HttpRequest.Builder reqBuilder = MCRSolrUtils.getRequestBuilder().uri(URI.create(url));
-        MCRSolrAuthenticationManager.getInstance().applyAuthentication(reqBuilder, MCRSolrAuthenticationLevel.SEARCH);
+        MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(reqBuilder,
+            MCRSolrAuthenticationLevel.SEARCH);
         HttpRequest request = reqBuilder.build();
 
         try (HttpClient client = MCRHttpUtils.getHttpClient()) {

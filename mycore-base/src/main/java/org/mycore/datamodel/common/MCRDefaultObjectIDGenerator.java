@@ -101,7 +101,7 @@ public class MCRDefaultObjectIDGenerator implements MCRObjectIDGenerator {
 
     @Override
     public Collection<String> getBaseIDs() {
-        return MCRXMLMetadataManager.instance().getObjectBaseIds();
+        return MCRXMLMetadataManager.getInstance().getObjectBaseIds();
     }
 
     /**
@@ -111,7 +111,7 @@ public class MCRDefaultObjectIDGenerator implements MCRObjectIDGenerator {
      */
     private int getLastIDNumber(String baseId) {
         int lastIDKnown = lastNumber.getOrDefault(baseId, 0);
-        int highestStoredID = MCRXMLMetadataManager.instance().getHighestStoredID(baseId);
+        int highestStoredID = MCRXMLMetadataManager.getInstance().getHighestStoredID(baseId);
 
         return Math.max(lastIDKnown, highestStoredID);
     }

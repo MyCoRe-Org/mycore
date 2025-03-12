@@ -57,7 +57,7 @@ public final class MCRShutdownHandler {
 
     private static final String PROPERTY_SYSTEM_NAME = "MCR.CommandLineInterface.SystemName";
 
-    private static MCRShutdownHandler singleton = new MCRShutdownHandler();
+    private static final MCRShutdownHandler SINGLETON_INSTANCE = new MCRShutdownHandler();
 
     final NavigableSet<Closeable> requests = new ConcurrentSkipListSet<>();
 
@@ -65,8 +65,10 @@ public final class MCRShutdownHandler {
 
     volatile boolean shuttingDown;
 
-    boolean isWebAppRunning;
+    private volatile boolean shutDown;
 
+    boolean isWebAppRunning;
+    
     ClassLoaderLeakPreventor leakPreventor;
 
     private MCRShutdownHandler() {
@@ -80,7 +82,10 @@ public final class MCRShutdownHandler {
     }
 
     public static MCRShutdownHandler getInstance() {
-        return singleton;
+        if (SINGLETON_INSTANCE.shutDown) {
+            return null;
+        }
+        return SINGLETON_INSTANCE;
     }
 
     public void addCloseable(MCRShutdownHandler.Closeable c) {
@@ -127,7 +132,7 @@ public final class MCRShutdownHandler {
         MCRSessionMgr.close();
         LOGGER.info("{} Goodbye, and remember: \"Alles wird gut.\"", system);
         LogManager.shutdown();
-        singleton = null;
+        shutDown = true;
         // may be needed in webapp to release file handles correctly.
         if (leakPreventor != null) {
             ClassLoaderLeakPreventor myLeakPreventor = leakPreventor;

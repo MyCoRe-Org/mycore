@@ -410,7 +410,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
         Optional<String> linkedFileOptional = getLinkedFile(mcrObject);
         // resolve the derivate link using the FileRef API
         Optional<String> resolvedFileHref = linkedFileOptional.map(linkedFile -> {
-            FileRef tempRef = buildFileRef(MCRPath.toMCRPath(getDerivatePath().resolve(linkedFile)), null);
+            FileRef tempRef = buildFileRef(MCRPath.ofPath(getDerivatePath().resolve(linkedFile)), null);
             return tempRef.toFileHref(group);
         });
         // add to struct link map

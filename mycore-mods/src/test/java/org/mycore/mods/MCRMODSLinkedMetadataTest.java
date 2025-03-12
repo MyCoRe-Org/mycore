@@ -72,7 +72,7 @@ public class MCRMODSLinkedMetadataTest extends MCRStoreTestCase {
     @Override
     @After
     public void tearDown() throws Exception {
-        MCRXMLMetadataManager mm = MCRXMLMetadataManager.instance();
+        MCRXMLMetadataManager mm = MCRXMLMetadataManager.getInstance();
         String seriesBase = seriesID.getBase();
         for (List<String> ids = mm.listIDsForBase(seriesBase); !ids.isEmpty(); ids = mm.listIDsForBase(seriesBase)) {
             for (String id : ids) {
@@ -92,14 +92,14 @@ public class MCRMODSLinkedMetadataTest extends MCRStoreTestCase {
     @Test
     public void testLinks() {
         Assert.assertEquals("There should be a reference link from +" + bookID + " to " + seriesID + ".", 1,
-            MCRLinkTableManager.instance().countReferenceLinkTo(seriesID));
+            MCRLinkTableManager.getInstance().countReferenceLinkTo(seriesID));
     }
 
     @Test
     public void testUpdate() throws Exception {
         MCRObject seriesNew = new MCRObject(getResourceAsURL(seriesID + "-updated.xml").toURI());
         MCRMetadataManager.update(seriesNew);
-        Document bookNew = MCRXMLMetadataManager.instance().retrieveXML(bookID);
+        Document bookNew = MCRXMLMetadataManager.getInstance().retrieveXML(bookID);
         XPathBuilder<Element> builder = new XPathBuilder<>(
             "/mycoreobject/metadata/def.modsContainer/modsContainer/mods:mods/mods:relatedItem/mods:titleInfo/mods:title",
             Filters.element());

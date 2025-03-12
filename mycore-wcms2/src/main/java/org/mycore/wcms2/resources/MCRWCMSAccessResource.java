@@ -50,7 +50,7 @@ public class MCRWCMSAccessResource {
         if (!MCRLayoutUtilities.hasRule(perm, webPageID)) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
-        MCRAccessStore accessStore = MCRAccessStore.getInstance();
+        MCRAccessStore accessStore = MCRAccessStore.obtainInstance();
         MCRRuleMapping ruleMap = accessStore.getAccessDefinition(perm, MCRLayoutUtilities.getWebpageACLID(webPageID));
         accessStore.deleteAccessDefinition(ruleMap);
         JsonObject doneObject = new JsonObject();
@@ -62,7 +62,7 @@ public class MCRWCMSAccessResource {
     @POST
     public String createOrUpdate(@QueryParam("webPageID") String webPageID, @QueryParam("perm") String perm,
         @QueryParam("ruleID") String ruleID) {
-        MCRAccessStore accessStore = MCRAccessStore.getInstance();
+        MCRAccessStore accessStore = MCRAccessStore.obtainInstance();
         JsonObject returnObject = new JsonObject();
         if (MCRLayoutUtilities.hasRule(perm, webPageID)) {
             MCRRuleMapping ruleMap = accessStore.getAccessDefinition(perm,
@@ -89,7 +89,7 @@ public class MCRWCMSAccessResource {
     @GET
     public String getRuleList() {
         JsonObject returnObject = new JsonObject();
-        MCRRuleStore store = MCRRuleStore.getInstance();
+        MCRRuleStore store = MCRRuleStore.obtainInstance();
         Collection<String> ruleIds = store.retrieveAllIDs();
         for (String id : ruleIds) {
             MCRAccessRule rule = store.getRule(id);

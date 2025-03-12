@@ -57,12 +57,12 @@ public final class MCRConstants {
 
     private static MCRCategoryID getStatusClassID() {
         final String classID = MCRConfiguration2.getString(CONFIG_PREFIX + "StatusClassID").orElse("objectStatus");
-        return MCRCategoryID.rootID(classID);
+        return new MCRCategoryID(classID);
     }
 
     private static MCRCategoryID getCollectionClassID() {
         final String classID = MCRConfiguration2.getString(CONFIG_PREFIX + "CollectionClassID")
             .orElse("objectCollection");
-        return MCRCategoryID.rootID(classID);
+        return new MCRCategoryID(classID);
     }
 }

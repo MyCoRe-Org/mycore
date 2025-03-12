@@ -44,7 +44,7 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
         if (parentID != null) {
             evt.put("parent", super.getCategory(parentID, -1));
         }
-        MCREventManager.instance().handleEvent(evt);
+        MCREventManager.getInstance().handleEvent(evt);
         return rv;
     }
 
@@ -56,7 +56,7 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
         }
         MCREvent evt = new MCREvent(MCREvent.ObjectType.CLASS, MCREvent.EventType.DELETE);
         evt.put(MCREvent.CLASS_KEY, category);
-        MCREventManager.instance().handleEvent(evt, MCREventManager.BACKWARD);
+        MCREventManager.getInstance().handleEvent(evt, MCREventManager.BACKWARD);
         super.deleteCategory(id);
     }
 
@@ -67,7 +67,7 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
         evt.put("parent", super.getCategory(newParentID, -1));
         // "type" is used for specifying a special update operation
         evt.put(MCRClassificationUpdateType.KEY, MCRClassificationUpdateType.MOVE);
-        MCREventManager.instance().handleEvent(evt);
+        MCREventManager.getInstance().handleEvent(evt);
         super.moveCategory(id, newParentID, index);
     }
 
@@ -76,7 +76,7 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
         MCRCategory rv = super.removeLabel(id, lang);
         MCREvent evt = new MCREvent(MCREvent.ObjectType.CLASS, MCREvent.EventType.UPDATE);
         evt.put(MCREvent.CLASS_KEY, super.getCategory(id, -1));
-        MCREventManager.instance().handleEvent(evt);
+        MCREventManager.getInstance().handleEvent(evt);
         return rv;
     }
 
@@ -87,7 +87,7 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
         evt.put(MCREvent.CLASS_KEY, newCategory);
         evt.put(MCRClassificationUpdateType.KEY, MCRClassificationUpdateType.REPLACE);
         evt.put("replaced", rv);
-        MCREventManager.instance().handleEvent(evt);
+        MCREventManager.getInstance().handleEvent(evt);
         return rv;
     }
 
@@ -96,7 +96,7 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
         MCRCategory rv = super.setLabel(id, label);
         MCREvent evt = new MCREvent(MCREvent.ObjectType.CLASS, MCREvent.EventType.UPDATE);
         evt.put(MCREvent.CLASS_KEY, super.getCategory(id, -1));
-        MCREventManager.instance().handleEvent(evt);
+        MCREventManager.getInstance().handleEvent(evt);
         return rv;
     }
 
@@ -105,7 +105,7 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
         MCRCategory rv = super.setLabels(id, labels);
         MCREvent evt = new MCREvent(MCREvent.ObjectType.CLASS, MCREvent.EventType.UPDATE);
         evt.put(MCREvent.CLASS_KEY, super.getCategory(id, -1));
-        MCREventManager.instance().handleEvent(evt);
+        MCREventManager.getInstance().handleEvent(evt);
         return rv;
     }
 
@@ -114,7 +114,7 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
         MCRCategory rv = super.setURI(id, uri);
         MCREvent evt = new MCREvent(MCREvent.ObjectType.CLASS, MCREvent.EventType.UPDATE);
         evt.put(MCREvent.CLASS_KEY, super.getCategory(id, -1));
-        MCREventManager.instance().handleEvent(evt);
+        MCREventManager.getInstance().handleEvent(evt);
         return rv;
     }
 }

@@ -30,7 +30,15 @@ public interface MCRRequestScopeACL extends MCRAccessInterface {
 
     boolean isPrivate();
 
+    /**
+     * @deprecated Use {@link #extractFromRequestContext(ContainerRequestContext)} instead
+     */
+    @Deprecated
     static MCRRequestScopeACL getInstance(ContainerRequestContext requestContext) {
+        return extractFromRequestContext(requestContext);
+    }
+
+    static MCRRequestScopeACL extractFromRequestContext(ContainerRequestContext requestContext) {
         Object property = requestContext.getProperty(MCRRequestScopeACLFilter.ACL_INSTANT_KEY);
         Objects.requireNonNull(property, "Please register " + MCRRequestScopeACLFilter.class);
         if (property instanceof Supplier) {

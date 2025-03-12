@@ -71,13 +71,13 @@ public class MCREvents {
         URI webAppBase = URI.create(MCRFrontendUtil.getBaseURL()); //use official URL
         Function<URI, URI> uriResolver = webAppBase.resolve(baseUri.getPath())::resolve;
         objectBroadcaster = sse.newBroadcaster();
-        MCREventManager.instance().addEventHandler(MCREvent.ObjectType.OBJECT,
+        MCREventManager.getInstance().addEventHandler(MCREvent.ObjectType.OBJECT,
             new MCREventHandler.MCRObjectHandler(objectBroadcaster, sse, uriResolver));
         derivateBroadcaster = sse.newBroadcaster();
-        MCREventManager.instance().addEventHandler(MCREvent.ObjectType.DERIVATE,
+        MCREventManager.getInstance().addEventHandler(MCREvent.ObjectType.DERIVATE,
             new MCREventHandler.MCRDerivateHandler(derivateBroadcaster, sse, uriResolver));
         pathBroadcaster = sse.newBroadcaster();
-        MCREventManager.instance().addEventHandler(MCREvent.ObjectType.PATH,
+        MCREventManager.getInstance().addEventHandler(MCREvent.ObjectType.PATH,
             new MCREventHandler.MCRPathHandler(pathBroadcaster, sse, uriResolver, context));
     }
 

@@ -41,11 +41,18 @@ import org.mycore.iview2.services.MCRIView2Tools;
 public class MCRIView2XSLFunctionsAdapter {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRLinkTableManager LINK_TABLE_MANAGER = MCRLinkTableManager.instance();
+    private static final MCRLinkTableManager LINK_TABLE_MANAGER = MCRLinkTableManager.getInstance();
 
+    /**
+     * @deprecated Use {@link #obtainInstance()} instead
+     */
+    @Deprecated
     public static MCRIView2XSLFunctionsAdapter getInstance() {
-        return MCRConfiguration2.getInstanceOfOrThrow(
-            MCRIView2XSLFunctionsAdapter.class, MCRIView2Tools.CONFIG_PREFIX + "MCRIView2XSLFunctionsAdapter");
+        return obtainInstance();
+    }
+
+    public static MCRIView2XSLFunctionsAdapter obtainInstance() {
+        return LazyInstanceHolder.SHARED_INSTANCE;
     }
 
     public boolean hasMETSFile(String derivateID) {
@@ -86,4 +93,10 @@ public class MCRIView2XSLFunctionsAdapter {
         LOGGER.debug(options);
         return options.toString();
     }
+
+    private static final class LazyInstanceHolder {
+        public static final MCRIView2XSLFunctionsAdapter SHARED_INSTANCE = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRIView2XSLFunctionsAdapter.class, MCRIView2Tools.CONFIG_PREFIX + "MCRIView2XSLFunctionsAdapter");
+    }
+
 }

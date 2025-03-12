@@ -127,7 +127,7 @@ public class MCRXMLFunctions {
     public static volatile MimetypesFileTypeMap mimetypeMap;
 
     public static Node document(String uri) throws JDOMException, IOException, TransformerException {
-        MCRSourceContent sourceContent = MCRSourceContent.getInstance(uri);
+        MCRSourceContent sourceContent = MCRSourceContent.createInstance(uri);
         if (sourceContent == null) {
             throw new TransformerException("Could not load document: " + uri);
         }
@@ -468,7 +468,7 @@ public class MCRXMLFunctions {
             Document document = documentBuilder.newDocument();
             Element rootElement = document.createElement("linklist");
             document.appendChild(rootElement);
-            MCRLinkTableManager ltm = MCRLinkTableManager.instance();
+            MCRLinkTableManager ltm = MCRLinkTableManager.getInstance();
             for (String id : ltm.getDestinationOf(mcrid, destinationType)) {
                 Element link = document.createElement("link");
                 link.setTextContent(id);
@@ -496,7 +496,7 @@ public class MCRXMLFunctions {
             Document document = documentBuilder.newDocument();
             Element rootElement = document.createElement("linklist");
             document.appendChild(rootElement);
-            MCRLinkTableManager ltm = MCRLinkTableManager.instance();
+            MCRLinkTableManager ltm = MCRLinkTableManager.getInstance();
             for (String id : ltm.getSourceOf(mcrid)) {
                 if (sourceType == null || MCRObjectID.getIDParts(id)[1].equals(sourceType)) {
                     Element link = document.createElement("link");
@@ -636,7 +636,7 @@ public class MCRXMLFunctions {
      */
     public static boolean isInCategory(String objectId, String categoryId) {
         try {
-            MCRCategoryID categID = MCRCategoryID.fromString(categoryId);
+            MCRCategoryID categID = MCRCategoryID.ofString(categoryId);
             MCRObjectID mcrObjectID = MCRObjectID.getInstance(objectId);
             MCRCategLinkReference reference = new MCRCategLinkReference(mcrObjectID);
             return MCRCategLinkServiceHolder.INSTANCE.isInCategory(reference, categID);
@@ -696,7 +696,7 @@ public class MCRXMLFunctions {
 
         MCRCategory category = null;
         try {
-            MCRCategoryID categID = MCRCategoryID.fromString(classificationId + ":" + categoryId);
+            MCRCategoryID categID = MCRCategoryID.ofString(classificationId + ":" + categoryId);
             MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
             category = dao.getCategory(categID, 0);
         } catch (MCRException e) {
@@ -771,7 +771,7 @@ public class MCRXMLFunctions {
      * @param uri the uri to resolve
      */
     public static NodeList resolve(String uri) throws JDOMException {
-        org.jdom2.Element element = MCRURIResolver.instance().resolve(uri);
+        org.jdom2.Element element = MCRURIResolver.obtainInstance().resolve(uri);
         element.detach();
         org.jdom2.Document document = new org.jdom2.Document(element);
         return new DOMOutputter().output(document).getDocumentElement().getChildNodes();

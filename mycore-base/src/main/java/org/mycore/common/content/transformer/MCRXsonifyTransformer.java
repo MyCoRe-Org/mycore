@@ -146,7 +146,8 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
     @MCRPostConstruction
     public void init() throws ParserConfigurationException, SAXException, SerializationException, XsdParseException {
         XmlSaxParser saxParser = new XmlSaxParser();
-        XmlDocumentLoader documentLoader = new XmlEntityResolverDocumentLoader(MCREntityResolver.instance(), saxParser);
+        XmlDocumentLoader documentLoader = new XmlEntityResolverDocumentLoader(
+            MCREntityResolver.getInstance(), saxParser);
         XsdParser xsdParser = new XsdParser(documentLoader);
         Xsd xsd = xsdParser.parse(this.schema);
 

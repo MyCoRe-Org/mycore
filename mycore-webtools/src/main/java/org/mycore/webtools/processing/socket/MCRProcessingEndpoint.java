@@ -32,6 +32,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.processing.MCRProcessable;
 import org.mycore.common.processing.MCRProcessableCollection;
 import org.mycore.common.processing.MCRProcessableCollectionListener;
+import org.mycore.common.processing.MCRProcessableManager;
 import org.mycore.common.processing.MCRProcessableRegistry;
 import org.mycore.common.processing.MCRProcessableRegistryListener;
 import org.mycore.common.processing.MCRProcessableStatus;
@@ -66,7 +67,7 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
         SESSIONS = Collections.synchronizedMap(new HashMap<>());
     }
 
-    private final MCRProcessableRegistry registry = MCRProcessableRegistry.getSingleInstance();
+    private final MCRProcessableRegistry registry = MCRProcessableManager.getInstance().getRegistry();
 
     private final MCRProcessableWebsocketSender sender = MCRConfiguration2.getInstanceOfOrThrow(
         MCRProcessableWebsocketSender.class, "MCR.Processable.WebsocketSender.Class");

@@ -68,7 +68,7 @@ public abstract class MCRJerseyBaseFeature implements DynamicFeature {
     protected void addFilter(FeatureContext context, MCRRestrictedAccess restrictedAccess) {
         MCRResourceAccessChecker accessChecker;
         try {
-            accessChecker = MCRResourceAccessCheckerFactory.getInstance(restrictedAccess.value());
+            accessChecker = MCRResourceAccessCheckerFactory.obtainInstance(restrictedAccess.value());
         } catch (ReflectiveOperationException e) {
             throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
         }

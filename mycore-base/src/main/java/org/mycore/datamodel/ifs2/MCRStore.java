@@ -358,7 +358,7 @@ public class MCRStore {
         }
         Path current = path;
         Path parent = path.getParent();
-        Files.walkFileTree(path, MCRRecursiveDeleter.instance());
+        Files.walkFileTree(path, new MCRRecursiveDeleter());
 
         while (!Files.isSameFile(baseDirectory, parent)) {
 

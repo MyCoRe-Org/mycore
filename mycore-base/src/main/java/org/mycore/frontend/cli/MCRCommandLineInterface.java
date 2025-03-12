@@ -309,7 +309,7 @@ public class MCRCommandLineInterface {
      * Reads XML content from URIResolver and sends output to a local file.
      */
     public static void getURI(String uri, String file) throws Exception {
-        Element resolved = MCRURIResolver.instance().resolve(uri);
+        Element resolved = MCRURIResolver.obtainInstance().resolve(uri);
         Element cloned = resolved.clone();
         new MCRJDOMContent(cloned).sendTo(new File(file));
     }

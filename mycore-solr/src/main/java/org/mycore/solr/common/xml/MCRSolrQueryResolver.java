@@ -123,7 +123,7 @@ public class MCRSolrQueryResolver implements URIResolver {
 
                 HttpRequest.Builder solrRequestBuilder = MCRSolrUtils.getRequestBuilder().uri(solrRequestURI);
 
-                MCRSolrAuthenticationManager.getInstance()
+                MCRSolrAuthenticationManager.obtainInstance()
                     .applyAuthentication(solrRequestBuilder, MCRSolrAuthenticationLevel.SEARCH);
 
                 try (HttpClient httpClient = MCRHttpUtils.getHttpClient()) {

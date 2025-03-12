@@ -52,7 +52,7 @@ import org.mycore.datamodel.metadata.MCRObjectStructure;
  *
  * @author Jens Kupferschmidt
  */
-public class MCRLinkTableManager {
+public final class MCRLinkTableManager {
     /** The list of entry types */
     public static final String ENTRY_TYPE_CHILD = "child";
 
@@ -65,34 +65,38 @@ public class MCRLinkTableManager {
     public static final String ENTRY_TYPE_REFERENCE = "reference";
 
     /** The link table manager singleton */
-    protected static MCRLinkTableManager singleton;
+    private static final MCRLinkTableManager SINGLETON_INSTANCE = new MCRLinkTableManager();
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     private final MCRLinkTableInterface linkTableInstance;
 
     /**
-     * Returns the link table manager singleton.
-     *
-     * @return Returns a MCRLinkTableManager instance.
-     */
-    public static synchronized MCRLinkTableManager instance() {
-        if (singleton == null) {
-            singleton = new MCRLinkTableManager();
-        }
-
-        return singleton;
-    }
-
-    /**
      * The constructor of this class.
      */
-    protected MCRLinkTableManager() {
+    private MCRLinkTableManager() {
         // Load the persistence class
         linkTableInstance = MCRConfiguration2
             .getOrThrow("MCR.Persistence.LinkTable.Store.Class", MCRConfiguration2::instantiateClass);
     }
 
+    /**
+     * @deprecated use {@link #getInstance()} instead
+     */
+    @Deprecated
+    public static synchronized MCRLinkTableManager instance() {
+        return getInstance();
+    }
+
+    /**
+     * Returns the link table manager singleton.
+     *
+     * @return Returns a MCRLinkTableManager instance.
+     */
+    public static synchronized MCRLinkTableManager getInstance() {
+        return SINGLETON_INSTANCE;
+    }
+    
     /**
      * The method add a reference link pair.
      *

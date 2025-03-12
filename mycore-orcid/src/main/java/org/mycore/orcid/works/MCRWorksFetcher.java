@@ -153,7 +153,7 @@ public class MCRWorksFetcher {
 
         work.setMODS(mods);
         String sourceID = workXML.getAttributeValue("source");
-        work.setSource(MCRWorkSource.getInstance(sourceID));
+        work.setSource(MCRWorkSource.obtainInstance(sourceID));
     }
 
     /**

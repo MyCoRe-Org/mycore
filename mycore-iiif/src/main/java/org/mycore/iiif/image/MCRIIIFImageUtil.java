@@ -74,6 +74,6 @@ public class MCRIIIFImageUtil {
     }
 
     public static MCRIIIFImageImpl getImpl(String impl) {
-        return MCRIIIFImageImpl.getInstance(impl);
+        return MCRIIIFImageImpl.obtainInstance(impl);
     }
 }

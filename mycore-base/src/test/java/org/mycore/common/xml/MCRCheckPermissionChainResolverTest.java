@@ -55,14 +55,14 @@ public class MCRCheckPermissionChainResolverTest extends MCRTestCase {
     public void setUp() throws Exception {
         super.setUp();
         MCRMockResolver.setResultSource(resultSource);
-        MCRURIResolver.reInit();
+        MCRURIResolver.obtainInstance().reinitialize();
     }
 
     @Test
     public void resolveReadObjectForbidden() {
         MCRAccessMock.setMethodResult(false);
 
-        Assert.assertThrows(TransformerException.class, () -> MCRURIResolver.instance().resolve(READ_CALL, null));
+        Assert.assertThrows(TransformerException.class, () -> MCRURIResolver.obtainInstance().resolve(READ_CALL, null));
         assertReadCall();
         Assert.assertEquals("The resolver should not have been called", 0, MCRMockResolver.getCalls().size());
     }
@@ -73,7 +73,7 @@ public class MCRCheckPermissionChainResolverTest extends MCRTestCase {
         Source result = null;
 
         try {
-            result = MCRURIResolver.instance().resolve(READ_CALL, null);
+            result = MCRURIResolver.obtainInstance().resolve(READ_CALL, null);
         } catch (TransformerException e) {
             Assert.fail("Exception thrown!");
         }
@@ -90,7 +90,7 @@ public class MCRCheckPermissionChainResolverTest extends MCRTestCase {
         Source result = null;
 
         try {
-            result = MCRURIResolver.instance().resolve(USE_STUFF_CALL, null);
+            result = MCRURIResolver.obtainInstance().resolve(USE_STUFF_CALL, null);
         } catch (TransformerException e) {
             Assert.fail("Exception thrown!");
         }
@@ -106,7 +106,8 @@ public class MCRCheckPermissionChainResolverTest extends MCRTestCase {
     public void resolvePermissionForbidden() {
         MCRAccessMock.setMethodResult(false);
 
-        Assert.assertThrows(TransformerException.class, () -> MCRURIResolver.instance().resolve(USE_STUFF_CALL, null));
+        Assert.assertThrows(TransformerException.class, () -> MCRURIResolver.obtainInstance()
+            .resolve(USE_STUFF_CALL, null));
         assertPermissionCall();
         Assert.assertEquals("The resolver should not have been called", 0, MCRMockResolver.getCalls().size());
     }

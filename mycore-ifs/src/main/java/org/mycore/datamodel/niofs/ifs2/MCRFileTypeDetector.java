@@ -48,7 +48,7 @@ public class MCRFileTypeDetector extends FileTypeDetector {
         if (!(path.getFileSystem() instanceof MCRIFSFileSystem)) {
             return null;
         }
-        MCRStoredNode resolvePath = MCRFileSystemUtils.resolvePath(MCRPath.toMCRPath(path));
+        MCRStoredNode resolvePath = MCRFileSystemUtils.resolvePath(MCRPath.ofPath(path));
         if (resolvePath instanceof MCRDirectory) {
             throw new NoSuchFileException(path.toString());
         }

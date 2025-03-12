@@ -62,7 +62,7 @@ public class MCRSystemUserInformationProviderTest extends MCRTestCase {
     }
 
     private Optional<MCRUserInformation> get(String userId) {
-        return MCRUserInformationResolver.instance().get("system", userId);
+        return MCRUserInformationResolver.obtainInstance().get("system", userId);
     }
 
 }

@@ -83,13 +83,13 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
     public void tearDown() throws Exception {
         for (File projectDir : getStoreBaseDir().toFile().listFiles()) {
             for (File typeDir : projectDir.listFiles()) {
-                Files.walkFileTree(typeDir.toPath(), MCRRecursiveDeleter.instance());
+                Files.walkFileTree(typeDir.toPath(), new MCRRecursiveDeleter());
                 typeDir.mkdir();
             }
         }
         for (File projectDir : getSvnBaseDir().toFile().listFiles()) {
             for (File typeDir : projectDir.listFiles()) {
-                Files.walkFileTree(typeDir.toPath(), MCRRecursiveDeleter.instance());
+                Files.walkFileTree(typeDir.toPath(), new MCRRecursiveDeleter());
                 typeDir.mkdir();
                 SVNRepositoryFactory.createLocalRepository(typeDir, true, false);
             }

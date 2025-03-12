@@ -136,7 +136,7 @@ public class MCROAIObjectManager {
     }
 
     protected Element getURI(String uri) {
-        Element e = MCRURIResolver.instance().resolve(uri).detach();
+        Element e = MCRURIResolver.obtainInstance().resolve(uri).detach();
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("get {}", uri);
             XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
@@ -173,7 +173,7 @@ public class MCROAIObjectManager {
         String mcrId = oaiId.substring(getOAIIDPrefix().length());
         try {
             MCRObjectID mcrObjId = MCRObjectID.getInstance(mcrId);
-            return MCRXMLMetadataManager.instance().exists(mcrObjId);
+            return MCRXMLMetadataManager.getInstance().exists(mcrObjId);
         } catch (Exception ex) {
             return false;
         }

@@ -48,7 +48,7 @@ public class MCRImageTileEventHandler extends MCREventHandlerBase {
             return;
         }
         try {
-            MCRIView2Commands.tileImage(MCRPath.toMCRPath(file));
+            MCRIView2Commands.tileImage(MCRPath.ofPath(file));
         } catch (IOException e) {
             throw new MCRException(e);
         }
@@ -62,7 +62,7 @@ public class MCRImageTileEventHandler extends MCREventHandlerBase {
         if (!(file instanceof MCRPath)) {
             return;
         }
-        MCRPath path = MCRPath.toMCRPath(file);
+        MCRPath path = MCRPath.ofPath(file);
         try {
             MCRIView2Commands.deleteImageTiles(path.getOwner(), path.getOwnerRelativePath());
         } catch (IOException e) {

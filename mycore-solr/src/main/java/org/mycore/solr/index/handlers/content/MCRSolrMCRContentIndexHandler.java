@@ -63,7 +63,7 @@ public class MCRSolrMCRContentIndexHandler extends MCRSolrAbstractIndexHandler {
     @Override
     public void index() throws IOException {
         try {
-            this.document = MCRSolrInputDocumentFactory.getInstance().getDocument(id, content);
+            this.document = MCRSolrInputDocumentFactory.obtainInstance().getDocument(id, content);
         } catch (SAXException e) {
             throw new IOException(e);
         }

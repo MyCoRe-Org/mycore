@@ -126,7 +126,7 @@ public class MCRRSSFeedImporter {
 
     public MCRRSSFeedImporter(String sourceSystemID) {
         this.sourceSystemID = sourceSystemID;
-        this.solrAuthenticationFactory = MCRSolrAuthenticationManager.getInstance();
+        this.solrAuthenticationFactory = MCRSolrAuthenticationManager.obtainInstance();
 
         String prefix = "MCR.MODS.RSSFeedImporter." + sourceSystemID + ".";
 
@@ -239,7 +239,7 @@ public class MCRRSSFeedImporter {
 
     private Element retrieveAndConvertPublication(String externalID) {
         String uri = new MessageFormat(importURI, Locale.ROOT).format(new String[] { externalID });
-        return MCRURIResolver.instance().resolve(uri);
+        return MCRURIResolver.obtainInstance().resolve(uri);
     }
 
     /** If mods:genre was not mapped by conversion/import function, ignore this publication and do not import */

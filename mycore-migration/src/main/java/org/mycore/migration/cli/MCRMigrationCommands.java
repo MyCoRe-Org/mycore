@@ -94,7 +94,7 @@ public class MCRMigrationCommands {
         help = "Create missing servflags for createdby and modifiedby. (MCR-786)",
         order = 20)
     public static List<String> addServFlags() {
-        SortedSet<String> ids = new TreeSet<>(MCRXMLMetadataManager.instance().listIDs());
+        SortedSet<String> ids = new TreeSet<>(MCRXMLMetadataManager.getInstance().listIDs());
         List<String> cmds = new ArrayList<>(ids.size());
         for (String id : ids) {
             cmds.add("migrate author servflags for " + id);
@@ -111,7 +111,7 @@ public class MCRMigrationCommands {
         MCRBase obj = MCRMetadataManager.retrieve(objectID);
         MCRObjectService service = obj.getService();
         if (!service.isFlagTypeSet(MCRObjectService.FLAG_TYPE_CREATEDBY)) { //the egg
-            List<? extends MCRAbstractMetadataVersion<?>> versions = MCRXMLMetadataManager.instance()
+            List<? extends MCRAbstractMetadataVersion<?>> versions = MCRXMLMetadataManager.getInstance()
                 .listRevisions(objectID);
             String createUser = null;
             String modifyUser = null;
@@ -166,7 +166,7 @@ public class MCRMigrationCommands {
         MCRObjectID objectID = MCRObjectID.getInstance(id);
 
         // find derivate links
-        Document xml = MCRXMLMetadataManager.instance().retrieveXML(objectID);
+        Document xml = MCRXMLMetadataManager.getInstance().retrieveXML(objectID);
         Element mcrObjectXML = xml.getRootElement();
         XPathExpression<Element> expression = XPathFactory.instance().compile(xpath, Filters.element());
         List<Element> derivateLinkElements = expression.evaluate(mcrObjectXML);
@@ -212,7 +212,7 @@ public class MCRMigrationCommands {
         // store the mcr object if its changed
         if (changedObject) {
             // we use MCRXMLMetadataMananger because we don't want to validate the old mcr object
-            MCRXMLMetadataManager.instance().update(objectID, xml, new Date());
+            MCRXMLMetadataManager.getInstance().update(objectID, xml, new Date());
             // manually fire update event
             MCRObject newObject = MCRMetadataManager.retrieveMCRObject(objectID);
             newObject.setImportMode(true);
@@ -243,7 +243,7 @@ public class MCRMigrationCommands {
         order = 15)
     public static void fixMissingChildren(String id) {
         MCRObjectID parentId = MCRObjectID.getInstance(id);
-        Collection<String> children = MCRLinkTableManager.instance().getSourceOf(parentId,
+        Collection<String> children = MCRLinkTableManager.getInstance().getSourceOf(parentId,
             MCRLinkTableManager.ENTRY_TYPE_PARENT);
         if (children.isEmpty()) {
             return;
@@ -299,7 +299,7 @@ public class MCRMigrationCommands {
             return;
         }
 
-        final MCRXSLTransformer transformer = MCRXSLTransformer.getInstance("xsl/mets-translation-migration.xsl");
+        final MCRXSLTransformer transformer = MCRXSLTransformer.obtainInstance("xsl/mets-translation-migration.xsl");
 
         final Document xml;
 
@@ -327,7 +327,7 @@ public class MCRMigrationCommands {
 
         List<String> commands = new ArrayList<>();
         for (String t : objectTypes) {
-            for (String objID : MCRXMLMetadataManager.instance().listIDsOfType(t)) {
+            for (String objID : MCRXMLMetadataManager.getInstance().listIDsOfType(t)) {
                 commands.add("migrate derivatelinks for object " + objID);
             }
         }

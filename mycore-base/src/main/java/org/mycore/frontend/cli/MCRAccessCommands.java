@@ -128,7 +128,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
     }
 
     private static Element getPermissionsFromUri(String uri) {
-        Element permissions = MCRURIResolver.instance().resolve(uri);
+        Element permissions = MCRURIResolver.obtainInstance().resolve(uri);
         if (permissions == null || !Objects.equals(permissions.getName(), "mcrpermissions")) {
             LOGGER.warn("ROOT element is not valid, valid permissions would be for example:");
             LOGGER.warn("<mcrpermissions xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
@@ -243,7 +243,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
     }
 
     private static Element getRuleFromUri(String uri) {
-        Element rule = MCRURIResolver.instance().resolve(uri);
+        Element rule = MCRURIResolver.obtainInstance().resolve(uri);
         if (rule == null || !Objects.equals(rule.getName(), "condition")) {
             LOGGER.warn("ROOT element is not valid, a valid rule would be for example:");
             LOGGER.warn("<condition format=\"xml\"><boolean operator=\"true\" /></condition>");

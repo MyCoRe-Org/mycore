@@ -125,7 +125,7 @@ public class MCROAIIdentify extends SimpleIdentify {
         private Element description;
 
         CustomDescription(String descriptionURI) {
-            description = MCRURIResolver.instance().resolve(descriptionURI);
+            description = MCRURIResolver.obtainInstance().resolve(descriptionURI);
         }
 
         @Override

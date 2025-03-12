@@ -80,7 +80,7 @@ public class MCRRoleServlet extends MCRServlet {
         for (String roleID : roleCategoriesSplitted) {
             String categoryId = roleID.trim();
             if (categoryId.length() > 0) {
-                roleCategories.add(MCRCategoryID.fromString(categoryId));
+                roleCategories.add(MCRCategoryID.ofString(categoryId));
             }
         }
         roleClassificationsDefined = roleCategories.size() > 1;
@@ -137,10 +137,10 @@ public class MCRRoleServlet extends MCRServlet {
         MCRCategoryID categoryID;
         String categID = getProperty(request, "categID");
         if (categID != null) {
-            categoryID = MCRCategoryID.fromString(categID);
+            categoryID = MCRCategoryID.ofString(categID);
         } else {
             String rootID = getProperty(request, "classID");
-            categoryID = (rootID == null) ? MCRUser2Constants.ROLE_CLASSID : MCRCategoryID.rootID(rootID);
+            categoryID = (rootID == null) ? MCRUser2Constants.ROLE_CLASSID : new MCRCategoryID(rootID);
         }
         Element rootElement = getRootElement(request);
         rootElement.setAttribute("classID", categoryID.getRootID());

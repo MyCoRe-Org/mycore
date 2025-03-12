@@ -50,7 +50,7 @@ public class MCRObjectIDParamConverterProvider implements ParamConverterProvider
                     try {
                         return rawType.cast(MCRObjectID.getInstance(value));
                     } catch (MCRException e) {
-                        throw MCRErrorResponse.fromStatus(CODE_INVALID)
+                        throw MCRErrorResponse.ofStatusCode(CODE_INVALID)
                             .withErrorCode("MCROBJECTID_INVALID")
                             .withMessage(MSG_INVALID)
                             .withDetail(e.getMessage())

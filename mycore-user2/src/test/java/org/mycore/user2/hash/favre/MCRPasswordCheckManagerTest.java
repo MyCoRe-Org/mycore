@@ -46,7 +46,7 @@ public class MCRPasswordCheckManagerTest extends MCRTestCase {
     })
     public final void testBCrypt() {
 
-        MCRPasswordCheckManager manager = MCRPasswordCheckManager.instantiate();
+        MCRPasswordCheckManager manager = MCRPasswordCheckManager.createInstance();
         MCRPasswordCheckData data = manager.create(PASSWORD);
 
         assertEquals("bcrypt", data.type());

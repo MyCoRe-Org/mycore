@@ -105,26 +105,36 @@ public class MCRClass {
         this.id = value;
     }
 
+    /**
+     * @deprecated Use {@link #ofCategory(MCRCategory)} instead
+     */
+    @Deprecated
     public static MCRClass getClassification(MCRCategory rootCategory) {
+        return ofCategory(rootCategory);
+    }
+
+    public static MCRClass ofCategory(MCRCategory rootCategory) {
         if (!rootCategory.getId().isRootID()) {
             throw new IllegalArgumentException("Not a root category");
         }
         MCRClass mcrClass = new MCRClass();
         mcrClass.setID(rootCategory.getId().getRootID());
-        mcrClass.setUrl(MCRClassURL.getInstance(rootCategory.getURI()));
-        mcrClass.getLabel()
-            .addAll(
-                rootCategory.getLabels()
-                    .stream()
-                    .map(MCRLabel::clone)
-                    .toList());
-        mcrClass.setCategories(MCRClassCategory.getInstance(rootCategory.getChildren()));
+        mcrClass.setUrl(MCRClassURL.ofUri(rootCategory.getURI()));
+        mcrClass.getLabel().addAll(
+            rootCategory.getLabels()
+                .stream()
+                .map(MCRLabel::clone)
+                .toList());
+        mcrClass.setCategories(rootCategory.getChildren()
+            .stream()
+            .map(MCRClassCategory::ofCategory)
+            .toList());
         return mcrClass;
     }
 
     public MCRCategory toCategory() {
         MCRCategoryImpl category = new MCRCategoryImpl();
-        category.setId(MCRCategoryID.rootID(getID()));
+        category.setId(new MCRCategoryID(getID()));
         category.setLevel(0);
         URI uri = Optional.ofNullable(getUrl())
             .map(MCRClassURL::getHref)

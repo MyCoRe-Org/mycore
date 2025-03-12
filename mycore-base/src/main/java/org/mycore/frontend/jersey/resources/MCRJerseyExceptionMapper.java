@@ -162,7 +162,7 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
         public RException marshal(Exception v) {
             RException ep = new RException();
             ep.message = v.getMessage();
-            ep.stackTrace = Stream.of(v.getStackTrace()).map(RStackTraceElement::getInstance)
+            ep.stackTrace = Stream.of(v.getStackTrace()).map(RStackTraceElement::ofStackTraceElement)
                 .toArray(RStackTraceElement[]::new);
             Optional.ofNullable(v.getCause())
                 .filter(Exception.class::isInstance)
@@ -198,7 +198,7 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
         @XmlAttribute
         private int line;
 
-        private static RStackTraceElement getInstance(StackTraceElement ste) {
+        private static RStackTraceElement ofStackTraceElement(StackTraceElement ste) {
             RStackTraceElement rste = new RStackTraceElement();
             rste.className = ste.getClassName();
             rste.method = ste.getMethodName();

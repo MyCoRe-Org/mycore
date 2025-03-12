@@ -150,7 +150,7 @@ public class MCRDeveloperCommands {
         order = 69)
     public static void checkPermission(String permission, String id, String user) throws InterruptedException {
 
-        MCRUserInformation userInformation = MCRUserInformationResolver.instance().getOrThrow(user);
+        MCRUserInformation userInformation = MCRUserInformationResolver.obtainInstance().getOrThrow(user);
 
         MCRScopedSession session = (MCRScopedSession) MCRSessionMgr.getCurrentSession();
         MCRScopedSession.ScopedValues values = new MCRScopedSession.ScopedValues(userInformation);
@@ -166,7 +166,7 @@ public class MCRDeveloperCommands {
         order = 70)
     public static void resolveUri(String uri, String user) throws InterruptedException {
 
-        MCRUserInformation userInformation = MCRUserInformationResolver.instance().getOrThrow(user);
+        MCRUserInformation userInformation = MCRUserInformationResolver.obtainInstance().getOrThrow(user);
 
         MCRScopedSession session = (MCRScopedSession) MCRSessionMgr.getCurrentSession();
         MCRScopedSession.ScopedValues values = new MCRScopedSession.ScopedValues(userInformation);
@@ -185,7 +185,7 @@ public class MCRDeveloperCommands {
 
     private static void doResolveUri(String uri) {
         try {
-            Element resource = MCRURIResolver.instance().resolve(uri);
+            Element resource = MCRURIResolver.obtainInstance().resolve(uri);
             if (null != resource) {
                 String xmlText = new XMLOutputter(Format.getPrettyFormat()).outputString(resource);
                 LOGGER.info("Resolved URI {}:\n{}", uri, xmlText);
@@ -225,7 +225,7 @@ public class MCRDeveloperCommands {
     @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static void doShowResourceUri(MCRResourcePath path) {
         try {
-            URL url = MCRResourceResolver.instance().resolve(path).orElse(null);
+            URL url = MCRResourceResolver.obtainInstance().resolve(path).orElse(null);
             if (url != null) {
                 LOGGER.info("Resolved resource {} as {}", path, url);
             } else {
@@ -264,7 +264,7 @@ public class MCRDeveloperCommands {
     @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static void doShowAllResourceUrls(MCRResourcePath path) {
         try {
-            List<ProvidedUrl> urls = MCRResourceResolver.instance().resolveAll(path);
+            List<ProvidedUrl> urls = MCRResourceResolver.obtainInstance().resolveAll(path);
             if (urls.isEmpty()) {
                 LOGGER.info("Resource {} not found", path);
             } else {
@@ -303,7 +303,7 @@ public class MCRDeveloperCommands {
     @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static void doResolveTextualResource(MCRResourcePath path, String charset) {
         try {
-            URL url = MCRResourceResolver.instance().resolve(path).orElse(null);
+            URL url = MCRResourceResolver.obtainInstance().resolve(path).orElse(null);
             if (url != null) {
                 try (InputStream is = url.openStream()) {
                     String out = new String(is.readAllBytes(), Charset.forName(charset));
@@ -361,7 +361,7 @@ public class MCRDeveloperCommands {
     @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static void doResolveBinaryResource(MCRResourcePath path, String encoder) {
         try {
-            URL url = MCRResourceResolver.instance().resolve(path).orElse(null);
+            URL url = MCRResourceResolver.obtainInstance().resolve(path).orElse(null);
             if (url != null) {
                 try (InputStream is = url.openStream();
                     ByteArrayOutputStream stream = new ByteArrayOutputStream()) {

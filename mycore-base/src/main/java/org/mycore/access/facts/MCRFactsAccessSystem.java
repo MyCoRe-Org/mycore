@@ -120,7 +120,7 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
     }
 
     private MCRCondition buildRulesFromXML() {
-        Element eRules = MCRURIResolver.instance().resolve(rulesURI);
+        Element eRules = MCRURIResolver.obtainInstance().resolve(rulesURI);
         Objects.requireNonNull(eRules, "The rulesURI " + rulesURI + " resolved to null!");
         MCRJDOMContent content = new MCRJDOMContent(eRules);
         try {
@@ -227,7 +227,7 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
             return false;
         }
         try {
-            return MCRCategoryDAOFactory.getInstance().exist(MCRCategoryID.fromString(checkID));
+            return MCRCategoryDAOFactory.getInstance().exist(MCRCategoryID.ofString(checkID));
         } catch (IllegalArgumentException e) {
             return false;
         }

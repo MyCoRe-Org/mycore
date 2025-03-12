@@ -105,7 +105,7 @@ public class MCRRoleManager {
      * @return MCRRole instance or null if category does not exist
      */
     public static MCRRole getExternalRole(String name) {
-        MCRCategoryID categoryID = MCRCategoryID.fromString(name);
+        MCRCategoryID categoryID = MCRCategoryID.ofString(name);
         if (categoryID.isRootID()) {
             LOGGER.debug("External role may not be a rootCategory: {}", categoryID);
             return null;
@@ -179,7 +179,7 @@ public class MCRRoleManager {
             categories.add(categID);
         }
         for (String roleID : user.getExternalRoleIDs()) {
-            MCRCategoryID categID = MCRCategoryID.fromString(roleID);
+            MCRCategoryID categID = MCRCategoryID.ofString(roleID);
             categories.add(categID);
         }
         LOGGER.info("Assigning {} to these roles: {}", user::getUserID, () -> categories);
@@ -191,7 +191,7 @@ public class MCRRoleManager {
     }
 
     static boolean isAssignedToRole(MCRUser user, String roleID) {
-        MCRCategoryID categoryID = MCRCategoryID.fromString(roleID);
+        MCRCategoryID categoryID = MCRCategoryID.ofString(roleID);
         MCRCategLinkReference linkReference = getLinkID(user);
         return CATEG_LINK_SERVICE.isInCategory(linkReference, categoryID);
     }
@@ -211,12 +211,12 @@ public class MCRRoleManager {
         if (role.isSystemRole()) {
             categoryID = new MCRCategoryID(MCRUser2Constants.ROLE_CLASSID.getRootID(), role.getName());
         } else {
-            categoryID = MCRCategoryID.fromString(role.getName());
+            categoryID = MCRCategoryID.ofString(role.getName());
         }
         if (DAO.exist(categoryID)) {
             return;
         }
-        MCRCategoryID rootID = MCRCategoryID.rootID(categoryID.getRootID());
+        MCRCategoryID rootID = new MCRCategoryID(categoryID.getRootID());
         if (!DAO.exist(rootID)) {
             MCRCategoryImpl category = new MCRCategoryImpl();
             category.setId(rootID);
@@ -247,7 +247,7 @@ public class MCRRoleManager {
         if (role.isSystemRole()) {
             categoryID = new MCRCategoryID(MCRUser2Constants.ROLE_CLASSID.getRootID(), role.getName());
         } else {
-            categoryID = MCRCategoryID.fromString(role.getName());
+            categoryID = MCRCategoryID.ofString(role.getName());
         }
         DAO.deleteCategory(categoryID);
     }
@@ -265,6 +265,6 @@ public class MCRRoleManager {
         if (role.isSystemRole()) {
             return new MCRCategoryID(MCRUser2Constants.ROLE_CLASSID.getRootID(), role.getName());
         }
-        return MCRCategoryID.fromString(role.getName());
+        return MCRCategoryID.ofString(role.getName());
     }
 }

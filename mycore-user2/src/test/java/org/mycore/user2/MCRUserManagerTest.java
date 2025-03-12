@@ -304,7 +304,7 @@ public class MCRUserManagerTest extends MCRUserTestCase {
 
     @Test
     public final void testLoadTestUser() {
-        Element input = MCRURIResolver.instance().resolve("resource:test-user.xml");
+        Element input = MCRURIResolver.obtainInstance().resolve("resource:test-user.xml");
         MCRUser mcrUser = MCRUserTransformer.buildMCRUser(input);
         mcrUser.setUserName("junit2");
         MCRUserManager.createUser(mcrUser);

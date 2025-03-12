@@ -62,7 +62,8 @@ public class MCROCFLMigration {
         this(newRepoKey, pruners, new MCROCFLXMLMetadataManager());
     }
 
-    public MCROCFLMigration(String newRepoKey, List<MCROCFLRevisionPruner> pruners, MCROCFLXMLMetadataManager target) {
+    public MCROCFLMigration(String newRepoKey, List<MCROCFLRevisionPruner> pruners,
+        MCROCFLXMLMetadataManager target) {
         this.target = target;
 
         if (newRepoKey != null) {
@@ -168,7 +169,7 @@ public class MCROCFLMigration {
             }
         }
 
-        MCRXMLMetadataManager instance = MCRXMLMetadataManager.instance();
+        MCRXMLMetadataManager instance = MCRXMLMetadataManager.getInstance();
 
         // does it even exist?
         if (instance.exists(objectID)) {
@@ -229,7 +230,7 @@ public class MCROCFLMigration {
 
     private List<? extends MCRAbstractMetadataVersion<?>> readRevisions(MCRObjectID objectID) {
         List<? extends MCRAbstractMetadataVersion<?>> revisions = null;
-        MCRXMLMetadataManager instance = MCRXMLMetadataManager.instance();
+        MCRXMLMetadataManager instance = MCRXMLMetadataManager.getInstance();
 
         try {
             revisions = instance.listRevisions(objectID);

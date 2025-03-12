@@ -146,7 +146,7 @@ public class MCRXMLHelper {
     public static void validate(Document doc, String schemaURI) throws SAXException, IOException {
         Schema schema = resolveSchema(schemaURI, false);
         Validator validator = schema.newValidator();
-        validator.setResourceResolver(MCREntityResolver.instance());
+        validator.setResourceResolver(MCREntityResolver.getInstance());
         validator.validate(new JDOMSource(doc));
     }
 
@@ -163,7 +163,7 @@ public class MCRXMLHelper {
         if (disableSchemaFullCheckingFeature) {
             sf.setFeature("http://apache.org/xml/features/validation/schema-full-checking", false);
         }
-        sf.setResourceResolver(MCREntityResolver.instance());
+        sf.setResourceResolver(MCREntityResolver.getInstance());
         Source source = resolveSource(schemaURI);
         return sf.newSchema(source);
     }
@@ -178,18 +178,18 @@ public class MCRXMLHelper {
      * @return a resolved XML document as Source or null
      */
     public static Source resolveSource(String schemaURI) throws IOException, SAXException {
-        InputSource entity = MCREntityResolver.instance().resolveEntity(null, schemaURI);
+        InputSource entity = MCREntityResolver.getInstance().resolveEntity(null, schemaURI);
         if (entity != null) {
             return new MCRLazyStreamSource(entity::getByteStream, entity.getSystemId());
         }
         try {
-            return MCRURIResolver.instance().resolve(schemaURI, null);
-        } catch (TransformerException ignoredIfSAXorIOException) {
-            Throwable cause = ignoredIfSAXorIOException.getCause();
+            return MCRURIResolver.obtainInstance().resolve(schemaURI, null);
+        } catch (TransformerException ignoredIfCauseIsSaxOrIOException) {
+            Throwable cause = ignoredIfCauseIsSaxOrIOException.getCause();
             switch (cause) {
-                case IOException ioe -> throw ioe;
                 case SAXException se -> throw se;
-                default -> throw new IOException(ignoredIfSAXorIOException);
+                case IOException ioe -> throw ioe;
+                default -> throw new IOException(ignoredIfCauseIsSaxOrIOException);
             }
         }
     }

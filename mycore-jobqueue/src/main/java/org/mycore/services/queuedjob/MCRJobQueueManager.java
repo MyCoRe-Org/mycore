@@ -55,7 +55,7 @@ public class MCRJobQueueManager {
      * @return the singleton instance of the {@link MCRJobQueueManager}
      */
     public static MCRJobQueueManager getInstance() {
-        return InstanceHolder.INSTANCE;
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     private static boolean isJPAEnabled() {
@@ -136,9 +136,9 @@ public class MCRJobQueueManager {
         return config;
     }
 
-    private static final class InstanceHolder {
-        private static final MCRJobQueueManager INSTANCE = new MCRJobQueueManager(new MCRJobDAOJPAImpl(),
-            new MCRConfiguration2JobConfig());
+    private static final class LazyInstanceHolder {
+        private static final MCRJobQueueManager SINGLETON_INSTANCE = new MCRJobQueueManager(
+            new MCRJobDAOJPAImpl(), new MCRConfiguration2JobConfig());
     }
 
 }

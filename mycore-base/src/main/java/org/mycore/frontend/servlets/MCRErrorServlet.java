@@ -59,7 +59,7 @@ public class MCRErrorServlet extends HttpServlet {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRLayoutService LAYOUT_SERVICE = MCRLayoutService.instance();
+    private static final MCRLayoutService LAYOUT_SERVICE = MCRLayoutService.obtainInstance();
 
     /* (non-Javadoc)
      * @see jakarta.servlet.http.HttpServlet#service(jakarta.servlet.http.HttpServletRequest, jakarta.servlet.http.HttpServletResponse)

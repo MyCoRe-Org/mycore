@@ -127,12 +127,12 @@ public class MCRRestDerivates {
             return;
         }
         if (objectId == null) {
-            throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NOT_FOUND)
                 .withMessage("MCRDerivate " + derId + " not found")
                 .toException();
         }
-        throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+        throw MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
             .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NOT_FOUND_IN_OBJECT)
             .withMessage("MCRDerivate " + derId + " not found in object " + mcrId + ".")
             .toException();
@@ -155,9 +155,9 @@ public class MCRRestDerivates {
     @XmlElementWrapper(name = MCRObjectStructure.ELEMENT_DERIVATE_OBJECTS)
     public Response listDerivates()
         throws IOException {
-        long modified = MCRXMLMetadataManager.instance().getLastModified(mcrId);
+        long modified = MCRXMLMetadataManager.getInstance().getLastModified(mcrId);
         if (modified < 0) {
-            throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND)
                 .withMessage("MCRObject " + mcrId + " not found")
                 .toException();
@@ -187,13 +187,13 @@ public class MCRRestDerivates {
     public Response getDerivate(@Parameter(example = "mir_derivate_00004711") @PathParam(PARAM_DERID) MCRObjectID derid)
         throws IOException {
         validateDerivateRelation(mcrId, derid);
-        long modified = MCRXMLMetadataManager.instance().getLastModified(derid);
+        long modified = MCRXMLMetadataManager.getInstance().getLastModified(derid);
         Date lastModified = new Date(modified);
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lastModified);
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
-        MCRContent mcrContent = MCRXMLMetadataManager.instance().retrieveContent(derid);
+        MCRContent mcrContent = MCRXMLMetadataManager.getInstance().retrieveContent(derid);
         return Response.ok()
             .entity(mcrContent,
                 new Annotation[] { MCRParams.Factory
@@ -238,7 +238,7 @@ public class MCRRestDerivates {
             derivate = new MCRDerivate(inputContent.asXML());
             derivate.validate();
         } catch (JDOMException | MCRException e) {
-            throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.BAD_REQUEST.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_INVALID)
                 .withMessage("MCRDerivate " + derid + " is not valid")
                 .withDetail(e.getMessage())
@@ -246,7 +246,7 @@ public class MCRRestDerivates {
                 .toException();
         }
         if (!derid.equals(derivate.getId())) {
-            throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.BAD_REQUEST.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_ID_MISMATCH)
                 .withMessage("MCRDerivate " + derid + " cannot be overwritten by " + derivate.getId() + ".")
                 .toException();
@@ -264,7 +264,7 @@ public class MCRRestDerivates {
                 return Response.status(Response.Status.NO_CONTENT).build();
             }
         } catch (MCRAccessException e) {
-            throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.FORBIDDEN.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NO_PERMISSION)
                 .withMessage("You may not modify or create MCRDerivate " + derid + ".")
                 .withDetail(e.getMessage())
@@ -285,7 +285,7 @@ public class MCRRestDerivates {
     public Response deleteDerivate(
         @Parameter(example = "mir_derivate_00004713") @PathParam(PARAM_DERID) MCRObjectID derid) {
         if (!MCRMetadataManager.exists(derid)) {
-            throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NOT_FOUND)
                 .withMessage("MCRDerivate " + derid + " not found")
                 .toException();
@@ -294,7 +294,7 @@ public class MCRRestDerivates {
             MCRMetadataManager.deleteMCRDerivate(derid);
             return Response.noContent().build();
         } catch (MCRAccessException e) {
-            throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.FORBIDDEN.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NO_PERMISSION)
                 .withMessage("You may not delete MCRDerivate " + derid + ".")
                 .withDetail(e.getMessage())
@@ -376,7 +376,7 @@ public class MCRRestDerivates {
         try {
             MCRMetadataManager.create(derivate);
         } catch (MCRAccessException e) {
-            throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.FORBIDDEN.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NO_PERMISSION)
                 .withMessage("You may not create MCRDerivate for project " + zeroId.getProjectId() + ".")
                 .withDetail(e.getMessage())
@@ -391,7 +391,7 @@ public class MCRRestDerivates {
             try {
                 rootDir.getFileSystem().createRoot(derId.toString());
             } catch (FileSystemException e) {
-                throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
+                throw MCRErrorResponse.ofStatusCode(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
                     .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_CREATE_DIRECTORY)
                     .withMessage("Could not create root directory for MCRDerivate " + derId + ".")
                     .withDetail(e.getMessage())
@@ -425,7 +425,7 @@ public class MCRRestDerivates {
             try {
                 MCRMetadataManager.update(derivate);
             } catch (MCRAccessException e) {
-                throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+                throw MCRErrorResponse.ofStatusCode(Response.Status.FORBIDDEN.getStatusCode())
                     .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NO_PERMISSION)
                     .withMessage("You may not update MCRDerivate " + derivate.getId() + ".")
                     .withDetail(e.getMessage())
@@ -454,7 +454,7 @@ public class MCRRestDerivates {
 
         // Check if the 'classifications' field has been updated
         List<MCRCategoryID> oldClassifications = derivate.getDerivate().getClassifications().stream()
-            .map(x -> MCRCategoryID.fromString(x.getClassId() + ":" + x.getCategId()))
+            .map(x -> MCRCategoryID.ofString(x.getClassId() + ":" + x.getCategId()))
             .toList();
         if (!der.getClassifications().isEmpty()
             && (oldClassifications.size() != der.getClassifications().size()

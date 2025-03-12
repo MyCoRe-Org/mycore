@@ -94,7 +94,7 @@ public class MCRMetadataHistoryCommands {
 
     @MCRCommand(syntax = "clear metadata history completely", help = "clears metadata history completely")
     public static List<String> clearHistory() {
-        return MCRXMLMetadataManager.instance()
+        return MCRXMLMetadataManager.getInstance()
             .getObjectBaseIds()
             .stream()
             .map(s -> "clear metadata history of base " + s)
@@ -103,7 +103,7 @@ public class MCRMetadataHistoryCommands {
 
     @MCRCommand(syntax = "build metadata history completely", help = "build metadata history completely")
     public static List<String> buildHistory() {
-        return MCRXMLMetadataManager.instance()
+        return MCRXMLMetadataManager.getInstance()
             .getObjectBaseIds()
             .stream()
             .map(s -> "build metadata history of base " + s)
@@ -113,7 +113,7 @@ public class MCRMetadataHistoryCommands {
     @MCRCommand(syntax = "build metadata history of base {0}",
         help = "build metadata history of all objects with base id {0}")
     public static List<String> buildHistory(String baseId) {
-        MCRXMLMetadataManager mm = MCRXMLMetadataManager.instance();
+        MCRXMLMetadataManager mm = MCRXMLMetadataManager.getInstance();
         mm.verifyStore(baseId);
         ExecutorService executorService = Executors.newWorkStealingPool();
         MCRSession currentSession = MCRSessionMgr.getCurrentSession();
@@ -161,7 +161,7 @@ public class MCRMetadataHistoryCommands {
 
     private static Stream<MCRMetaHistoryItem> buildDerivateHistory(MCRObjectID derId) {
         try {
-            List<? extends MCRAbstractMetadataVersion<?>> versions = MCRXMLMetadataManager.instance()
+            List<? extends MCRAbstractMetadataVersion<?>> versions = MCRXMLMetadataManager.getInstance()
                 .listRevisions(derId);
             if (versions == null || versions.isEmpty()) {
                 return buildSimpleDerivateHistory(derId);
@@ -176,7 +176,7 @@ public class MCRMetadataHistoryCommands {
 
     private static Stream<MCRMetaHistoryItem> buildObjectHistory(MCRObjectID objId) {
         try {
-            List<? extends MCRAbstractMetadataVersion<?>> versions = MCRXMLMetadataManager.instance()
+            List<? extends MCRAbstractMetadataVersion<?>> versions = MCRXMLMetadataManager.getInstance()
                 .listRevisions(objId);
             if (versions == null || versions.isEmpty()) {
                 return buildSimpleObjectHistory(objId);
@@ -194,7 +194,7 @@ public class MCRMetadataHistoryCommands {
         if (MCRMetadataManager.exists(derId)) {
             MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(derId);
             Instant lastModified = Instant
-                .ofEpochMilli(MCRXMLMetadataManager.instance().getLastModified(derId));
+                .ofEpochMilli(MCRXMLMetadataManager.getInstance().getLastModified(derId));
             String creator;
             try {
                 creator = MCRCreatorCache.getCreator(der.getId());
@@ -222,7 +222,7 @@ public class MCRMetadataHistoryCommands {
         if (MCRMetadataManager.exists(objId)) {
             MCRObject obj = MCRMetadataManager.retrieveMCRObject(objId);
             Instant lastModified = Instant
-                .ofEpochMilli(MCRXMLMetadataManager.instance().getLastModified(objId));
+                .ofEpochMilli(MCRXMLMetadataManager.getInstance().getLastModified(objId));
             String creator;
             try {
                 creator = MCRCreatorCache.getCreator(obj.getId());

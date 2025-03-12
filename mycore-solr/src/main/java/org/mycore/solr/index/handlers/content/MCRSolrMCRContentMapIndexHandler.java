@@ -76,7 +76,8 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
         //multithread processing will result in too many http request
         UpdateResponse updateResponse = null;
         try {
-            Iterator<SolrInputDocument> documents = MCRSolrInputDocumentFactory.getInstance().getDocuments(contentMap);
+            Iterator<SolrInputDocument> documents = MCRSolrInputDocumentFactory.obtainInstance()
+                .getDocuments(contentMap);
 
             for (SolrClient client : getClients()) {
                 if (client instanceof ConcurrentUpdateHttp2SolrClient) {

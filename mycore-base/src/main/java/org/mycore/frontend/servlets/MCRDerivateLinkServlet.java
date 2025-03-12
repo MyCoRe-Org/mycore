@@ -121,7 +121,7 @@ public class MCRDerivateLinkServlet extends MCRServlet {
      * @return a new jdom element
      */
     private Element getMyCoReObjectElement(MCRObjectID objectId) {
-        Collection<String> derivates = MCRLinkTableManager.instance().getDestinationOf(objectId, "derivate");
+        Collection<String> derivates = MCRLinkTableManager.getInstance().getDestinationOf(objectId, "derivate");
         if (derivates.isEmpty()) {
             return null;
         }

@@ -159,7 +159,7 @@ public final class MCRObjectUtils {
      * @return set of derivates
      */
     public static List<MCRObjectID> getDerivates(MCRObjectID mcrObjectID) {
-        MCRLinkTableManager linkTableManager = MCRLinkTableManager.instance();
+        MCRLinkTableManager linkTableManager = MCRLinkTableManager.getInstance();
         Stream<String> derivateStream = linkTableManager
             .getDestinationOf(mcrObjectID, MCRLinkTableManager.ENTRY_TYPE_DERIVATE).stream();
         Stream<String> derivateLinkStream = linkTableManager
@@ -197,7 +197,7 @@ public final class MCRObjectUtils {
      * @return a stream of updated objects where a link of the source was removed
      */
     public static Stream<MCRObject> removeLinks(MCRObjectID sourceId) {
-        return MCRLinkTableManager.instance().getSourceOf(sourceId).stream().filter(MCRObjectID::isValid)
+        return MCRLinkTableManager.getInstance().getSourceOf(sourceId).stream().filter(MCRObjectID::isValid)
             .map(MCRObjectID::getInstance).distinct().map(MCRMetadataManager::retrieveMCRObject)
             .flatMap(linkedObject -> removeLink(linkedObject, sourceId) ? Stream.of(linkedObject)
                 : Stream.empty());
@@ -275,7 +275,7 @@ public final class MCRObjectUtils {
         T mcrBase = (T) (mcrId.getTypeId().equals(MCRDerivate.OBJECT_TYPE) ? new MCRDerivate() : new MCRObject());
 
         // get content
-        MCRXMLMetadataManager xmlMetadataManager = MCRXMLMetadataManager.instance();
+        MCRXMLMetadataManager xmlMetadataManager = MCRXMLMetadataManager.getInstance();
         MCRContent content = xmlMetadataManager.retrieveContent(mcrId, revision);
         if (content == null) {
             throw new MCRPersistenceException("No such object " + mcrId + " with revision " + revision + ".");

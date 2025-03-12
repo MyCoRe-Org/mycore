@@ -35,7 +35,7 @@ import jakarta.xml.bind.Unmarshaller;
 public class MCRActionMappingsManager {
 
     public static MCRActionMappings getActionMappings() throws TransformerException, JAXBException {
-        Source source = MCRURIResolver.instance().resolve("resource:actionmappings.xml", null);
+        Source source = MCRURIResolver.obtainInstance().resolve("resource:actionmappings.xml", null);
         Unmarshaller unmarshaller = MCRConstants.JAXB_CONTEXT.createUnmarshaller();
         JAXBElement<MCRActionMappings> jaxbElement = unmarshaller.unmarshal(source, MCRActionMappings.class);
         return jaxbElement.getValue();

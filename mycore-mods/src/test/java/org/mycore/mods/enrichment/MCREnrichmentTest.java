@@ -98,7 +98,7 @@ public class MCREnrichmentTest extends MCRTestCase {
 
     private boolean checkXMLResult(String resultFile, Element result) throws IOException {
         String uri = "resource:MCREnrichmentTest/" + resultFile;
-        Element expected = MCRURIResolver.instance().resolve(uri);
+        Element expected = MCRURIResolver.obtainInstance().resolve(uri);
 
         boolean asExpected = MCRXMLHelper.deepEqual(result, expected);
 

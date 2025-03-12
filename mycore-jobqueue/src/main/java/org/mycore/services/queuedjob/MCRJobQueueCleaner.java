@@ -46,7 +46,7 @@ import jakarta.persistence.criteria.Root;
  * that selector in order to be deleted.
  * <p>
  * A non-singular, globally available and centrally configured instance can be obtained with
- * {@link MCRJobQueueCleaner#instantiate()}. This instance is configured using the property prefix
+ * {@link MCRJobQueueCleaner#createInstance()}. This instance is configured using the property prefix
  * {@link MCRJobQueueCleaner#CLEANER_PROPERTY} and should be used in order to clean jobs with consistently
  * applied criteria, although custom instances can be created when necessary.
  * <p>
@@ -95,7 +95,15 @@ public final class MCRJobQueueCleaner {
 
     }
 
+    /**
+     * @deprecated Use {@link #createInstance()} instead
+     */
+    @Deprecated
     public static MCRJobQueueCleaner instantiate() {
+        return createInstance();
+    }
+
+    public static MCRJobQueueCleaner createInstance() {
         String classProperty = CLEANER_PROPERTY + ".Class";
         return MCRConfiguration2.getInstanceOfOrThrow(MCRJobQueueCleaner.class, classProperty);
     }

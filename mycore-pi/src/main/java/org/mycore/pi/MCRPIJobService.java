@@ -258,7 +258,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
         if (jobUserPresent) {
             final String jobUser = getJobUser();
             savedUserInformation = session.getUserInformation();
-            MCRUserInformation userInformation = MCRUserInformationResolver.instance().getOrThrow(jobUser);
+            MCRUserInformation userInformation = MCRUserInformationResolver.obtainInstance().getOrThrow(jobUser);
 
             /* workaround https://mycore.atlassian.net/browse/MCR-1400*/
             session.setUserInformation(MCRSystemUserInformation.getGuestInstance());

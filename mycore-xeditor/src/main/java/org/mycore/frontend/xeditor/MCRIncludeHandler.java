@@ -240,7 +240,7 @@ public class MCRIncludeHandler {
             LOGGER.debug(() -> "uri was cached: " + uri);
             return cache.get(uri);
         } else {
-            Element xml = MCRURIResolver.instance().resolve(uri);
+            Element xml = MCRURIResolver.obtainInstance().resolve(uri);
             cache.put(uri, xml);
             return xml;
         }

@@ -47,25 +47,24 @@ public final class MCRXMLResource {
         MCRConfiguration2.getInt("MCR.MCRXMLResource.Cache.Size").orElse(100),
         "XML resources");
 
-    private static volatile MCRXMLResource instance;
-
     private static final Logger LOGGER = LogManager.getLogger();
 
     private MCRXMLResource() {
     }
 
     /**
+     * @deprecated Use {@link #getInstance()} instead
+     */
+    @Deprecated
+    public static MCRXMLResource instance() {
+        return getInstance();
+    }
+
+    /**
      * @return singleton instance
      */
-    public static MCRXMLResource instance() {
-        if (instance == null) {
-            synchronized (MCRXMLResource.class) {
-                if (instance == null) {
-                    instance = new MCRXMLResource();
-                }
-            }
-        }
-        return instance;
+    public static MCRXMLResource getInstance() {
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     private static URLConnection getResourceURLConnection(String name, ClassLoader classLoader) throws IOException {
@@ -248,4 +247,9 @@ public final class MCRXMLResource {
         }
 
     }
+
+    private static final class LazyInstanceHolder {
+        public static final MCRXMLResource SINGLETON_INSTANCE = new MCRXMLResource();
+    }
+
 }

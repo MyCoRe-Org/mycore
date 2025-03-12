@@ -70,7 +70,7 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
     private void checkRestAPIAccess(ContainerRequestContext requestContext, MCRRestAPIACLPermission permission,
         String path)
         throws MCRRestAPIException {
-        MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
+        MCRRequestScopeACL aclProvider = MCRRequestScopeACL.extractFromRequestContext(requestContext);
         LogManager.getLogger().warn(() -> path + ": Checking API access: " + permission);
         String thePath = path.startsWith("/") ? path : "/" + path;
 
@@ -103,7 +103,7 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
             .map(Optional::of)
             .orElseGet(() -> Optional.ofNullable(objectId));
         checkable.ifPresent(id -> LogManager.getLogger().info("Checking " + permission + " access on " + id));
-        MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
+        MCRRequestScopeACL aclProvider = MCRRequestScopeACL.extractFromRequestContext(requestContext);
         boolean allowed = checkable
             .map(id -> aclProvider.checkPermission(id, permission.toString()))
             .orElse(true);
@@ -116,7 +116,7 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
     }
 
     private void checkDetailLevel(ContainerRequestContext requestContext, String... detail) throws MCRRestAPIException {
-        MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
+        MCRRequestScopeACL aclProvider = MCRRequestScopeACL.extractFromRequestContext(requestContext);
         List<String> missedPermissions = Stream.of(detail)
             .map(d -> "rest-detail-" + d)
             .filter(d -> MCRAccessManager.hasRule(MCRAccessControlSystem.POOL_PRIVILEGE_ID, d))

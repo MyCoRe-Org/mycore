@@ -115,7 +115,7 @@ public class MCRCacheFilter implements ContainerResponseFilter {
             cc = getCacheConrol(resourceInfo.getResourceMethod().getAnnotation(MCRCacheControl.class));
         }
 
-        MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
+        MCRRequestScopeACL aclProvider = MCRRequestScopeACL.extractFromRequestContext(requestContext);
         if (aclProvider.isPrivate()) {
             cc.setPrivate(true);
             cc.getPrivateFields().clear();

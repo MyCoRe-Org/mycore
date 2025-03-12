@@ -100,7 +100,7 @@ public final class MCRTransferPackageUtil {
 
         // delete the extracted files, but keep the tar
         LOGGER.info("Deleting expanded tar in {}", targetDirectory);
-        Files.walkFileTree(targetDirectory, MCRRecursiveDeleter.instance());
+        Files.walkFileTree(targetDirectory, new MCRRecursiveDeleter());
     }
 
     /**

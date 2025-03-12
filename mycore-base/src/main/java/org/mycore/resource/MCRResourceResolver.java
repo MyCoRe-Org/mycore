@@ -48,7 +48,7 @@ import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
  * {@link MCRHints} instance. A default set of hints can be provided.
  * <p>
  * A singular, globally available and centrally configured instance can be obtained with
- * {@link MCRResourceResolver#instance()}. This instance is configured using the property prefix
+ * {@link MCRResourceResolver#obtainInstance()}. This instance is configured using the property prefix
  * {@link MCRResourceResolver#RESOLVER_PROPERTY} and should be used wherever resources need to be resolved.
  * This ensures an application-wide consistent behaviour, although custom instances can be created when necessary.
  * <p>
@@ -87,7 +87,7 @@ public final class MCRResourceResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRResourceResolver INSTANCE = instantiate();
+    private static final MCRResourceResolver SHARED_INSTANCE = createInstance();
 
     public static final String RESOLVER_PROPERTY = "MCR.Resource.Resolver";
 
@@ -106,11 +106,27 @@ public final class MCRResourceResolver {
         this.provider = Objects.requireNonNull(provider, "Provider must not be null");
     }
 
+    /**
+     * @deprecated Use {@link #obtainInstance()} instead
+     */
+    @Deprecated
     public static MCRResourceResolver instance() {
-        return INSTANCE;
+        return obtainInstance();
     }
 
+    public static MCRResourceResolver obtainInstance() {
+        return SHARED_INSTANCE;
+    }
+
+    /**
+     * @deprecated Use {@link #createInstance()} instead
+     */
+    @Deprecated
     public static MCRResourceResolver instantiate() {
+        return createInstance();
+    }
+
+    public static MCRResourceResolver createInstance() {
         String classProperty = RESOLVER_PROPERTY + ".Class";
         return MCRConfiguration2.getInstanceOfOrThrow(MCRResourceResolver.class, classProperty);
     }

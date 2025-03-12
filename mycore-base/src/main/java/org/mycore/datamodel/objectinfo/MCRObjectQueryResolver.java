@@ -57,14 +57,21 @@ public interface MCRObjectQueryResolver {
      */
     int count(MCRObjectQuery objectQuery);
 
+    /**
+     * @deprecated Use {@link #obtainInstance()} instead
+     */
+    @Deprecated
     static MCRObjectQueryResolver getInstance() {
-        return InstanceHolder.RESOLVER;
+        return obtainInstance();
+    }
+
+    static MCRObjectQueryResolver obtainInstance() {
+        return InstanceHolder.SHARED_INSTANCE;
     }
 
     class InstanceHolder {
-        private static final String QUERY_RESOLVER_CLASS_PROPERTY = "MCR.Object.QueryResolver.Class";
-
-        private static final MCRObjectQueryResolver RESOLVER = MCRConfiguration2.getSingleInstanceOfOrThrow(
-            MCRObjectQueryResolver.class, QUERY_RESOLVER_CLASS_PROPERTY);
+        private static final MCRObjectQueryResolver SHARED_INSTANCE = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRObjectQueryResolver.class, "MCR.Object.QueryResolver.Class");
     }
+
 }

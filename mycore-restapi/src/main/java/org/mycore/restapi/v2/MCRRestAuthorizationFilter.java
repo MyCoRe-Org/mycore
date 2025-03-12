@@ -77,11 +77,11 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
     private void checkRestAPIAccess(ContainerRequestContext requestContext, String permission, String path)
         throws ForbiddenException {
         LogManager.getLogger().warn(() -> path + ": Checking API access: " + permission);
-        final MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
+        final MCRRequestScopeACL aclProvider = MCRRequestScopeACL.extractFromRequestContext(requestContext);
         if (MCRRestAccessManager.checkRestAPIAccess(aclProvider, permission, path)) {
             return;
         }
-        throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+        throw MCRErrorResponse.ofStatusCode(Response.Status.FORBIDDEN.getStatusCode())
             .withErrorCode(MCRErrorCodeConstants.API_NO_PERMISSION)
             .withMessage("REST-API action is not allowed.")
             .withDetail("Check access right '" + permission + "' on ACLs 'restapi:/' and 'restapi:" + path + "'!")
@@ -102,7 +102,7 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
             .map(OBJECT_ID_PARAM_CONVERTER::fromString) //MCR-3041 check for Bad Request
             .map(MCRObjectID::toString);
         checkable.ifPresent(id -> LogManager.getLogger().info("Checking " + permission + " access on " + id));
-        MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
+        MCRRequestScopeACL aclProvider = MCRRequestScopeACL.extractFromRequestContext(requestContext);
         boolean allowed = checkable
             .map(id -> aclProvider.checkPermission(id, permission))
             .orElse(true);
@@ -110,26 +110,26 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
             return;
         }
         if (checkable.get().equals(objectId)) {
-            throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.FORBIDDEN.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NO_PERMISSION)
                 .withMessage("You do not have " + permission + " permission on MCRObject " + objectId + ".")
                 .toException();
         }
-        throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+        throw MCRErrorResponse.ofStatusCode(Response.Status.FORBIDDEN.getStatusCode())
             .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NO_PERMISSION)
             .withMessage("You do not have " + permission + " permission on MCRDerivate " + derId + ".")
             .toException();
     }
 
     private void checkDetailLevel(ContainerRequestContext requestContext, String... detail) throws ForbiddenException {
-        MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
+        MCRRequestScopeACL aclProvider = MCRRequestScopeACL.extractFromRequestContext(requestContext);
         List<String> missedPermissions = Stream.of(detail)
             .map(d -> "rest-detail-" + d)
             .filter(d -> MCRAccessManager.hasRule(MCRAccessControlSystem.POOL_PRIVILEGE_ID, d))
             .filter(d -> !aclProvider.checkPermission(d))
             .collect(Collectors.toList());
         if (!missedPermissions.isEmpty()) {
-            throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.FORBIDDEN.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.API_NO_PERMISSION)
                 .withMessage("REST-API action is not allowed.")
                 .withDetail("Check access right(s) '" + missedPermissions + "' on "

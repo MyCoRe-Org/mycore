@@ -438,7 +438,7 @@ public class MCRLayoutUtilities {
     }
 
     public static String getRuleID(String permission, String webpageID) {
-        MCRAccessStore as = MCRAccessStore.getInstance();
+        MCRAccessStore as = MCRAccessStore.obtainInstance();
         String ruleID = as.getRuleID(getWebpageACLID(webpageID), permission);
         return Objects.requireNonNullElse(ruleID, "");
     }

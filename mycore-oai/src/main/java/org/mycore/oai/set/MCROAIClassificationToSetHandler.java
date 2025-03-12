@@ -82,7 +82,7 @@ public class MCROAIClassificationToSetHandler extends MCROAISolrSetHandler {
         p.set(CommonParams.FL, "id");
         try {
             QueryRequest queryRequest = new QueryRequest(p);
-            MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
+            MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
                 MCRSolrAuthenticationLevel.SEARCH);
             QueryResponse response = queryRequest.process(solrClient);
             return response.getResults().isEmpty();

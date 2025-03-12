@@ -57,26 +57,42 @@ class MCRAuthorityWithURI extends MCRAuthorityInfo {
     /**
      * The authority URI
      */
-    private String authorityURI;
+    private final String authorityURI;
 
     /**
      * The value URI
      */
-    private String valueURI;
+    private final String valueURI;
+    
+    /**
+     * @deprecated Use {@link #parseXML(Element)} instead
+     */
+    @Deprecated
+    public static MCRAuthorityWithURI getAuthorityInfo(Element element) {
+        return parseXML(element);
+    }
 
     /**
      * Inspects the attributes in the given MODS XML element and returns the AuthorityInfo given there.
      */
-    public static MCRAuthorityWithURI getAuthorityInfo(Element element) {
+    public static MCRAuthorityWithURI parseXML(Element element) {
         String authorityURI = element.getAttribute(ATTRIBUTE_AUTHORITY_URI);
         String valueURI = element.getAttribute(ATTRIBUTE_VALUE_URI);
         return getAuthorityInfo(authorityURI, valueURI);
     }
 
     /**
+     * @deprecated Use {@link #parseXML(org.jdom2.Element)} instead
+     */
+    @Deprecated
+    public static MCRAuthorityWithURI getAuthorityInfo(org.jdom2.Element element) {
+        return parseXML(element);
+    }
+
+    /**
      * Inspects the attributes in the given MODS XML element and returns the AuthorityInfo given there.
      */
-    public static MCRAuthorityWithURI getAuthorityInfo(org.jdom2.Element element) {
+    public static MCRAuthorityWithURI parseXML(org.jdom2.Element element) {
         String authorityURI = element.getAttributeValue(ATTRIBUTE_AUTHORITY_URI);
         String valueURI = element.getAttributeValue(ATTRIBUTE_VALUE_URI);
         return getAuthorityInfo(authorityURI, valueURI);
@@ -92,7 +108,7 @@ class MCRAuthorityWithURI extends MCRAuthorityInfo {
             return null;
         }
 
-        if (valueURI == null || valueURI.length() == 0) {
+        if (valueURI == null || valueURI.isEmpty()) {
             LOGGER.warn("Did find attribute authorityURI='{}', but no valueURI", authorityURI);
             return null;
         }
