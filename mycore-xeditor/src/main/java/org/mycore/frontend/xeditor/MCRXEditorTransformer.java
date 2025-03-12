@@ -51,6 +51,7 @@ import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXPathEvaluator;
 import org.mycore.common.xsl.MCRParameterCollector;
+import org.mycore.frontend.xeditor.includes.MCRIncludeHandler;
 import org.mycore.frontend.xeditor.target.MCRInsertTarget;
 import org.mycore.frontend.xeditor.target.MCRRemoveTarget;
 import org.mycore.frontend.xeditor.target.MCRSubselectTarget;
@@ -87,10 +88,13 @@ public class MCRXEditorTransformer {
     public MCRContent transform(MCRContent editorSource) throws IOException {
         editorSession.getValidator().clearRules();
         editorSession.getSubmission().clear();
+        editorSession.resetIncludeHandler();
 
         MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer("xeditor");
         if (transformer instanceof MCRParameterizedTransformer parameterizedTransformer) {
             transformationParameters.setParameter("transformer", this);
+            transformationParameters.setParameter("sessionID", editorSession.getID());
+            
             MCRContent result = parameterizedTransformer.transform(editorSource, transformationParameters);
             if (result instanceof MCRWrappedContent wrappedContent
                 && result.getClass().getName().contains(MCRXSLTransformer.class.getName())) {
@@ -98,6 +102,7 @@ public class MCRXEditorTransformer {
                 result = wrappedContent.getBaseContent();
             }
             editorSession.getValidator().clearValidationResults();
+            editorSession.resetIncludeHandler();
             return result;
         } else {
             throw new MCRException("Xeditor needs parameterized MCRContentTransformer: " + transformer);

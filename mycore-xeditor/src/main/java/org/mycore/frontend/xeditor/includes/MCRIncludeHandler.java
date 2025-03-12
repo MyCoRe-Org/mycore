@@ -16,44 +16,38 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.frontend.xeditor;
+package org.mycore.frontend.xeditor.includes;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.StreamSupport;
 
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.dom.DOMResult;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.xalan.extensions.ExpressionContext;
-import org.apache.xpath.NodeSet;
-import org.apache.xpath.XPathContext;
-import org.apache.xpath.objects.XNodeSet;
-import org.apache.xpath.objects.XNodeSetForDOM;
 import org.jdom2.Element;
 import org.jdom2.filter.ElementFilter;
-import org.jdom2.transform.JDOMSource;
 import org.jdom2.util.IteratorIterable;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.xml.MCRURIResolver;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
- * Handles xed:include, xed:preload and xed:modify|xed:extend to include XEditor components by URI and ID.
+ * Handles xed:include, xed:preload, xed:modify and xed:extend 
+ * to include or modify XEditor components by URI and ID.
  *
  * @author Frank L\U00FCtzenkirchen
  */
 public class MCRIncludeHandler {
+
+    private static final String CMD_INCLUDE = "include";
+
+    private static final String CMD_REMOVE = "remove";
+
+    private static final String CMD_MODIFY = "modify";
 
     private static final String ATTR_AFTER = "after";
 
@@ -65,28 +59,20 @@ public class MCRIncludeHandler {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRIncludeHandler.class);
 
-    /** Caches preloaded components at application level: resolved only once, used many times (static) */
-    private static final Map<String, Element> CACHE_AT_APPLICATION_LEVEL = new ConcurrentHashMap<>();
-
-    /** Caches preloaded components at transformation level, resolved on every reload of editor form page */
-    private Map<String, Element> cacheAtTransformationLevel = new HashMap<>();
+    private MCRIncludeCache includeCache = new MCRIncludeCache();
 
     /**
      * Preloads editor components from one or more URIs.
      *
-     * @param uris a list of URIs to preload, separated by whitespace
-     * @param sStatic if true, use static cache on application level,
-     *               otherwise reload at each XEditor form transformation
+     * @param uris a list of URIs to preload, separated by comma
      */
-    public void preloadFromURIs(String uris, String sStatic)
-        throws TransformerFactoryConfigurationError {
+    public void preloadFromURIs(String uris) throws TransformerFactoryConfigurationError {
         for (String uri : uris.split(",")) {
-            preloadFromURI(uri, sStatic);
+            preloadFromURI(uri);
         }
     }
 
-    private void preloadFromURI(String uri, String sStatic)
-        throws TransformerFactoryConfigurationError {
+    private void preloadFromURI(String uri) throws TransformerFactoryConfigurationError {
         if (uri.isBlank()) {
             return;
         }
@@ -95,43 +81,34 @@ public class MCRIncludeHandler {
 
         Element xml;
         try {
-            xml = resolve(uri.trim(), sStatic);
+            xml = resolveURI(uri.trim());
         } catch (Exception ex) {
             LOGGER.warn(() -> "Exception preloading " + uri, ex);
             return;
         }
 
-        Map<String, Element> cache = chooseCacheLevel(uri, sStatic);
-        handlePreloadedComponents(xml, cache);
+        handlePreloadedComponents(xml);
     }
 
     /**
      * Cache all descendant components that have an @id, handle xed:modify|xed:extend afterwards
      */
-    private void handlePreloadedComponents(Element xml, Map<String, Element> cache) {
+    private void handlePreloadedComponents(Element xml) {
         for (Element component : xml.getChildren()) {
-            cacheComponent(cache, component);
-            handlePreloadedComponents(component, cache);
-            handleModify(cache, component);
+            includeCache.put(component);
+            handlePreloadedComponents(component);
+            handleModify(component);
         }
     }
 
-    private void cacheComponent(Map<String, Element> cache, Element element) {
-        String id = element.getAttributeValue(ATTR_ID);
-        if ((id != null) && !id.isEmpty()) {
-            LOGGER.debug(() -> "preloaded component " + id);
-            cache.put(id, element);
-        }
-    }
-
-    private void handleModify(Map<String, Element> cache, Element element) {
-        if ("modify".equals(element.getName())) {
+    private void handleModify(Element element) {
+        if (CMD_MODIFY.equals(element.getName())) {
             String refID = element.getAttributeValue(ATTR_REF);
             if (refID == null) {
                 throw new MCRUsageException("<xed:modify /> must have a @ref attribute!");
             }
 
-            Element container = cache.get(refID);
+            Element container = includeCache.get(refID);
             if (container == null) {
                 LOGGER.warn(() -> "Ignoring xed:modify of " + refID + ", no component with that @id found");
                 return;
@@ -149,22 +126,40 @@ public class MCRIncludeHandler {
 
             for (Element command : element.getChildren()) {
                 String commandType = command.getName();
-                if (Objects.equals(commandType, "remove")) {
+                if (Objects.equals(commandType, CMD_REMOVE)) {
                     handleRemove(container, command);
-                } else if (Objects.equals(commandType, "include")) {
+                } else if (Objects.equals(commandType, CMD_INCLUDE)) {
                     handleInclude(container, command);
                 }
             }
-            cacheComponent(cache, container);
+
+            includeCache.put(container);
         }
     }
 
+    /**
+     * Handles xed:remove[@ref] to remove an element from xml.
+     * 
+     * The @ref attribut determines the ID of the element to be removed.
+     * The element to be removed must have an @id matching the given @ref.
+     * 
+     * @param container the container element to remove from, somewhere below
+     * @param removeRule the xed:remove element with @ref attribute
+     */
     private void handleRemove(Element container, Element removeRule) {
         String id = removeRule.getAttributeValue(ATTR_REF);
         LOGGER.debug(() -> "removing " + id);
         findDescendant(container, id).ifPresent(Element::detach);
     }
 
+    /**
+     * Tries to find an element with the given id below the container xml.
+     * This can be a matching @id, or a matching xed:include/@ref with that id.
+     * 
+     * @param container the xml element to search withing
+     * @param id the @id of the element to find
+     * @return the first matching element with the @id, or null.
+     */
     private Optional<Element> findDescendant(Element container, String id) {
         IteratorIterable<Element> descendants = container.getDescendants(new ElementFilter());
         return StreamSupport.stream(descendants.spliterator(), false)
@@ -173,7 +168,7 @@ public class MCRIncludeHandler {
 
     private boolean hasOrIncludesID(Element e, String id) {
         return id.equals(e.getAttributeValue(ATTR_ID))
-            || "include".equals(e.getName()) && id.equals(e.getAttributeValue(ATTR_REF));
+            || CMD_INCLUDE.equals(e.getName()) && id.equals(e.getAttributeValue(ATTR_REF));
     }
 
     private void handleInclude(Element container, Element includeRule) {
@@ -210,61 +205,22 @@ public class MCRIncludeHandler {
         return refID != null;
     }
 
-    public XNodeSet resolve(ExpressionContext context, String ref) throws TransformerException {
-        LOGGER.debug(() -> "including component " + ref);
-        Map<String, Element> cache = chooseCacheLevel(ref, Boolean.FALSE.toString());
-        Element resolved = cache.get(ref);
-        return (resolved == null ? null : asNodeSet(context, jdom2dom(resolved)));
+    Element resolveID(String id) throws TransformerException {
+        LOGGER.debug(() -> "including component " + id);
+        return includeCache.get(id);
     }
 
-    public XNodeSet resolve(ExpressionContext context, String uri, String sStatic)
-        throws TransformerException {
-        LOGGER.debug(() -> "including xml " + uri);
-
-        Element xml = resolve(uri, sStatic);
-        Node node = jdom2dom(xml);
-
-        try {
-            return asNodeSet(context, node);
-        } catch (Exception ex) {
-            LOGGER.error(ex);
-            throw ex;
-        }
-    }
-
-    private Element resolve(String uri, String sStatic)
+    Element resolveURI(String uri)
         throws TransformerFactoryConfigurationError {
-        Map<String, Element> cache = chooseCacheLevel(uri, sStatic);
+        Element resolved = includeCache.get(uri);
 
-        if (cache.containsKey(uri)) {
+        if (resolved != null) {
             LOGGER.debug(() -> "uri was cached: " + uri);
-            return cache.get(uri);
+            return resolved;
         } else {
             Element xml = MCRURIResolver.instance().resolve(uri);
-            cache.put(uri, xml);
+            includeCache.put(xml);
             return xml;
         }
-    }
-
-    private Map<String, Element> chooseCacheLevel(String key, String sStatic) {
-        if (Objects.equals(sStatic, "true") || CACHE_AT_APPLICATION_LEVEL.containsKey(key)) {
-            return CACHE_AT_APPLICATION_LEVEL;
-        } else {
-            return cacheAtTransformationLevel;
-        }
-    }
-
-    private Node jdom2dom(Element element) throws TransformerException {
-        DOMResult result = new DOMResult();
-        JDOMSource source = new JDOMSource(element);
-        TransformerFactory.newInstance().newTransformer().transform(source, result);
-        return result.getNode();
-    }
-
-    private XNodeSet asNodeSet(ExpressionContext context, Node node) throws TransformerException {
-        NodeSet nodeSet = new NodeSet();
-        nodeSet.addNode(node);
-        XPathContext xpc = context.getXPathContext();
-        return new XNodeSetForDOM((NodeList) nodeSet, xpc);
     }
 }
