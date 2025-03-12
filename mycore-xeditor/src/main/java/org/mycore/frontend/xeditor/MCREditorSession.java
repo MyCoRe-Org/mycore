@@ -40,7 +40,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.xsl.MCRParameterCollector;
-import org.mycore.frontend.xeditor.includes.MCRIncludeHandler;
+import org.mycore.frontend.xeditor.includes.MCRElementCache;
 import org.mycore.frontend.xeditor.tracker.MCRBreakpoint;
 import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 import org.mycore.frontend.xeditor.validation.MCRXEditorValidator;
@@ -66,7 +66,7 @@ public class MCREditorSession {
 
     private Document editedXML;
     
-    private MCRIncludeHandler includeHandler;
+    private MCRElementCache elementCache;
 
     private MCRChangeTracker tracker = new MCRChangeTracker();
 
@@ -249,11 +249,11 @@ public class MCREditorSession {
         this.postProcessor = postProcessor;
     }
 
-    public MCRIncludeHandler getIncludeHandler() {
-        return includeHandler;
+    public MCRElementCache getElementCache() {
+        return elementCache;
     }
 
-    public void resetIncludeHandler() {
-        this.includeHandler = new MCRIncludeHandler();
+    public void resetElementCache() {
+        this.elementCache = new MCRElementCache();
     }
 }

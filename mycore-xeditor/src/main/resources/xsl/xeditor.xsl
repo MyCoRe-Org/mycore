@@ -92,20 +92,23 @@
 
   <!-- ========== <xed:include uri="" ref="" /> ========== -->
 
-  <xsl:template match="xed:include[@uri and @ref]" mode="xeditor">
+  <xsl:template match="xed:include[@uri]" mode="xeditor">
     <xsl:variable name="attrURI" select="transformer:replaceParameters($transformer,@uri)" />
     <xsl:variable name="inclURI" select="concat('xedInclude:',$sessionID,':resolveURI:',$attrURI)" />
-    <xsl:variable name="ref" select="transformer:replaceParameters($transformer,@ref)" />
-    <xsl:apply-templates select="document($inclURI)/descendant-or-self::*[@id=$ref]" mode="included" />
+    <xsl:variable name="resolved" select="document($inclURI)" />
+    
+    <xsl:choose>
+      <xsl:when test="@ref">
+        <xsl:variable name="ref" select="transformer:replaceParameters($transformer,@ref)" />
+        <xsl:apply-templates select="$resolved/descendant-or-self::*[@id=$ref]" mode="included" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="$resolved" mode="included" />
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="xed:include[@uri and not(@ref)]" mode="xeditor">
-    <xsl:variable name="attrURI" select="transformer:replaceParameters($transformer,@uri)" />
-    <xsl:variable name="inclURI" select="concat('xedInclude:',$sessionID,':resolveURI:',$attrURI)" />
-    <xsl:apply-templates select="document($inclURI)" mode="included" />
-  </xsl:template>
-
-  <xsl:template match="xed:include[@ref and not(@uri)]" mode="xeditor">
+  <xsl:template match="xed:include[not(@uri)]" mode="xeditor">
     <xsl:variable name="ref" select="transformer:replaceParameters($transformer,@ref)" />
     <xsl:variable name="inclURI" select="concat('xedInclude:',$sessionID,':resolveID:',$ref)" />
     <xsl:variable name="resolved" select="document($inclURI)" />

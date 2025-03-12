@@ -24,24 +24,20 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
 
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.filter.ElementFilter;
 import org.jdom2.util.IteratorIterable;
 import org.mycore.common.MCRUsageException;
-import org.mycore.common.xml.MCRURIResolver;
 
 /**
- * Handles xed:include, xed:preload, xed:modify and xed:extend 
+ * Handles xed:preload with including xed:modify and xed:remove 
  * to include or modify XEditor components by URI and ID.
  *
  * @author Frank L\U00FCtzenkirchen
  */
-public class MCRIncludeHandler {
+public class MCRPreloadHandler {
 
     private static final String CMD_INCLUDE = "include";
 
@@ -57,84 +53,60 @@ public class MCRIncludeHandler {
 
     private static final String ATTR_REF = "ref";
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRIncludeHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRPreloadHandler.class);
 
-    private MCRIncludeCache includeCache = new MCRIncludeCache();
+    private MCRElementCache elementCache;
 
-    /**
-     * Preloads editor components from one or more URIs.
-     *
-     * @param uris a list of URIs to preload, separated by comma
-     */
-    public void preloadFromURIs(String uris) throws TransformerFactoryConfigurationError {
-        for (String uri : uris.split(",")) {
-            preloadFromURI(uri);
-        }
-    }
-
-    private void preloadFromURI(String uri) throws TransformerFactoryConfigurationError {
-        if (uri.isBlank()) {
-            return;
-        }
-
-        LOGGER.debug(() -> "preloading " + uri);
-
-        Element xml;
-        try {
-            xml = resolveURI(uri.trim());
-        } catch (Exception ex) {
-            LOGGER.warn(() -> "Exception preloading " + uri, ex);
-            return;
-        }
-
-        handlePreloadedComponents(xml);
+    MCRPreloadHandler(MCRElementCache elementCache) {
+        this.elementCache = elementCache;
     }
 
     /**
      * Cache all descendant components that have an @id, handle xed:modify|xed:extend afterwards
      */
-    private void handlePreloadedComponents(Element xml) {
-        for (Element component : xml.getChildren()) {
-            includeCache.put(component);
-            handlePreloadedComponents(component);
-            handleModify(component);
+    public void handlePreloadedElements(Element parent) {
+        for (Element childElement : parent.getChildren()) {
+            elementCache.offer(childElement);
+            handlePreloadedElements(childElement);
+
+            if (CMD_MODIFY.equals(childElement.getName())) {
+                handleModify(childElement);
+            }
         }
     }
 
     private void handleModify(Element element) {
-        if (CMD_MODIFY.equals(element.getName())) {
-            String refID = element.getAttributeValue(ATTR_REF);
-            if (refID == null) {
-                throw new MCRUsageException("<xed:modify /> must have a @ref attribute!");
-            }
-
-            Element container = includeCache.get(refID);
-            if (container == null) {
-                LOGGER.warn(() -> "Ignoring xed:modify of " + refID + ", no component with that @id found");
-                return;
-            }
-
-            container = container.clone();
-
-            String newID = element.getAttributeValue(ATTR_ID);
-            if (newID != null) {
-                container.setAttribute(ATTR_ID, newID); // extend rather that modify
-                LOGGER.debug(() -> "extending " + refID + " to " + newID);
-            } else {
-                LOGGER.debug(() -> "modifying " + refID);
-            }
-
-            for (Element command : element.getChildren()) {
-                String commandType = command.getName();
-                if (Objects.equals(commandType, CMD_REMOVE)) {
-                    handleRemove(container, command);
-                } else if (Objects.equals(commandType, CMD_INCLUDE)) {
-                    handleInclude(container, command);
-                }
-            }
-
-            includeCache.put(container);
+        String refID = element.getAttributeValue(ATTR_REF);
+        if (refID == null) {
+            throw new MCRUsageException("<xed:modify /> must have a @ref attribute!");
         }
+
+        Element container = elementCache.get(refID);
+        if (container == null) {
+            LOGGER.warn(() -> "Ignoring xed:modify of " + refID + ", no component with that @id found");
+            return;
+        }
+
+        container = container.clone();
+
+        String newID = element.getAttributeValue(ATTR_ID);
+        if (newID != null) {
+            container.setAttribute(ATTR_ID, newID); // extend rather that modify
+            LOGGER.debug(() -> "extending " + refID + " to " + newID);
+        } else {
+            LOGGER.debug(() -> "modifying " + refID);
+        }
+
+        for (Element command : element.getChildren()) {
+            String commandType = command.getName();
+            if (Objects.equals(commandType, CMD_REMOVE)) {
+                handleRemove(container, command);
+            } else if (Objects.equals(commandType, CMD_INCLUDE)) {
+                handleInclude(container, command);
+            }
+        }
+
+        elementCache.offer(container);
     }
 
     /**
@@ -203,24 +175,5 @@ public class MCRIncludeHandler {
             parent.getChildren().add(pos, includeRule.clone());
         }
         return refID != null;
-    }
-
-    Element resolveID(String id) throws TransformerException {
-        LOGGER.debug(() -> "including component " + id);
-        return includeCache.get(id);
-    }
-
-    Element resolveURI(String uri)
-        throws TransformerFactoryConfigurationError {
-        Element resolved = includeCache.get(uri);
-
-        if (resolved != null) {
-            LOGGER.debug(() -> "uri was cached: " + uri);
-            return resolved;
-        } else {
-            Element xml = MCRURIResolver.instance().resolve(uri);
-            includeCache.put(xml);
-            return xml;
-        }
     }
 }

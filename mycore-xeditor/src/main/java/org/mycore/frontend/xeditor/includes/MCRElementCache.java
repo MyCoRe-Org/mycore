@@ -27,13 +27,14 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 
 /** 
- * Caches preloaded and imported XML during transformation. 
+ * Caches preloaded and imported XML elements by @id during transformation.
+ * The cache size is unlimited, but the cache's lifetime is that of the single transformation. 
  * 
  * @author Frank L\U00FCtzenkirchen
  */
-public class MCRIncludeCache {
+public class MCRElementCache {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRIncludeCache.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRElementCache.class);
 
     private static final String ATTR_ID = "id";
 
@@ -51,16 +52,26 @@ public class MCRIncludeCache {
 
     /**
      * Caches the element for later reference, 
-     * using its @id attribute as key.
+     * only if it has an @id attribute to be used as key.
      *  
      * @param element the xml to be cached
      */
-    void put(Element element) {
+    void offer(Element element) {
         String id = element.getAttributeValue(ATTR_ID);
 
         if (!StringUtils.isEmpty(id)) {
-            LOGGER.debug(() -> "caching element with id " + id);
-            cache.put(id, element);
+            put(id, element);
         }
+    }
+
+    /**
+     * Caches the element for later reference, using the given id.
+     *  
+     * @param id the id to use as key
+     * @param element the xml to be cached
+     */
+    void put(String id, Element element) {
+        LOGGER.debug(() -> "caching element with id " + id);
+        cache.put(id, element);
     }
 }
