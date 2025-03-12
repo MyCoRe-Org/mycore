@@ -18,33 +18,54 @@
 
 package org.mycore.frontend.jersey.resources;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mycore.test.MCRJPATestHelper.executeUpdate;
+import static org.mycore.test.MCRJPATestHelper.getTableName;
+import static org.mycore.test.MCRJPATestHelper.printTable;
+import static org.mycore.test.MCRJPATestHelper.queryTable;
+import static org.mycore.test.MCRJPATestHelper.quoteSchemaIdentifierIfNeeded;
+
 import java.sql.SQLException;
-import java.util.Map;
+import java.util.Locale;
 import java.util.Set;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.apache.logging.log4j.LogManager;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.access.MCRAccessException;
-import org.mycore.common.MCRStoreTestCase;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.jersey.filter.MCRDBTransactionFilter;
 import org.mycore.frontend.jersey.filter.MCRSessionHookFilter;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MCRMetadataExtension;
+import org.mycore.test.MyCoReTest;
 
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.Response;
 
-public class MCRJerseyJPATest extends MCRStoreTestCase {
+@MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
+@ExtendWith(MCRMetadataExtension.class)
+@MCRTestConfiguration(
+    properties = {
+        @MCRTestProperty(key = "MCR.Access.Class", classNameOf = MCRAccessBaseImpl.class),
+        @MCRTestProperty(key = "MCR.Metadata.Type.object", string = "true")
+    })
+public class MCRJerseyJPATest {
 
     private MCRJerseyTestFeature jersey;
 
-    @Before
+    @BeforeEach
     public void setUpJersey() throws Exception {
         jersey = new MCRJerseyTestFeature();
         jersey.setUp(Set.of(
@@ -54,17 +75,9 @@ public class MCRJerseyJPATest extends MCRStoreTestCase {
             MCRJerseyExceptionMapper.class));
     }
 
-    @After
+    @AfterEach
     public void tearDownJersey() throws Exception {
         jersey.tearDown();
-    }
-
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
-        testProperties.put("MCR.Metadata.Type.object", "true");
-        return testProperties;
     }
 
     @Test
@@ -78,6 +91,7 @@ public class MCRJerseyJPATest extends MCRStoreTestCase {
             printTable("MCRObject");
             assertCreateDate("create date should be rolled back and not be null");
         }
+        System.out.println("Finished");
     }
 
     private void assertCreateDate(String message) {
@@ -85,10 +99,10 @@ public class MCRJerseyJPATest extends MCRStoreTestCase {
             try {
                 if (resultSet.next()) {
                     String createDate = resultSet.getString(2);
-                    Assert.assertNotNull(message, createDate);
+                    assertNotNull(createDate, message);
                 }
             } catch (SQLException e) {
-                Assert.fail("Unable to query MCRObject table");
+                fail("Unable to query MCRObject table");
             }
         });
     }
@@ -107,8 +121,13 @@ public class MCRJerseyJPATest extends MCRStoreTestCase {
         @Path("break/{id}")
         @POST
         public void breakIt(@PathParam("id") String id) {
-            String tableName = getTableName("MCRObject");
-            executeUpdate("UPDATE " + tableName + " SET CREATEDATE=null WHERE ID='" + id + "'");
+            String tableName = getTableName("MCRObject"); //MCRObjectInfoEntity
+            String idCol = quoteSchemaIdentifierIfNeeded("id");
+            String createDateCol = quoteSchemaIdentifierIfNeeded("createdate");
+            String stmnt = String.format(Locale.ROOT, "UPDATE %s SET %s=null WHERE %s=?", tableName, createDateCol,
+                idCol);
+            LogManager.getLogger().info(stmnt);
+            executeUpdate(stmnt, id);
             printTable("MCRObject");
             throw new APIException("Breaking!!!");
         }

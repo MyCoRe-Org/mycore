@@ -18,7 +18,8 @@
 
 package org.mycore.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -37,11 +38,10 @@ public class MCRDerivateTest extends MCRIFSTest {
         MCRMetadataManager.create(derivate);
     }
 
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
         MCRMetadataManager.delete(derivate);
         MCRMetadataManager.delete(root);
-        super.tearDown();
     }
 
 }
