@@ -345,7 +345,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
     }
 
     private static void startMasterTilingThread() {
-        MCRIView2TilingThreadStarter.startMasterTilingThread();
+        MCRIView2TilingThreadStarter.getInstance().startMasterTilingThread();
     }
 
     /**
