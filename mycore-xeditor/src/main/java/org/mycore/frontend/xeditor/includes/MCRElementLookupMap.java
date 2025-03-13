@@ -33,7 +33,7 @@ import org.jdom2.Element;
  */
 public class MCRElementLookupMap {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRElementLookupMap.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String ATTR_ID = "id";
 

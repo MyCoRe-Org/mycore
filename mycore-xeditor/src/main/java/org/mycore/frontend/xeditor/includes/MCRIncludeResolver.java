@@ -47,7 +47,7 @@ import org.mycore.frontend.xeditor.MCREditorSessionStoreUtils;
  */
 public class MCRIncludeResolver implements URIResolver {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRIncludeResolver.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private MCRURICache cachedURIs = MCRURICache.obtainInstance();
 

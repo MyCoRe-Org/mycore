@@ -29,7 +29,7 @@ import org.mycore.common.config.MCRConfiguration2;
 
 final class MCRURICache {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRURICache.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String CACHE_LABEL = "XEditor Includes Cache";
 

@@ -53,7 +53,7 @@ public class MCRPreloadHandler {
 
     private static final String ATTR_REF = "ref";
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRPreloadHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private MCRElementLookupMap elementMap;
 
