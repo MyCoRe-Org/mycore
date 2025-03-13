@@ -52,7 +52,7 @@ public class MCRUnmappedCategoryRemover {
 
     public void filter() {
         filtered = new ArrayList<>();
-        final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+        final MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
         final MCRCategory category = dao
             .getCategory(MCRCategoryID.ofString(classificationID), -1);
         collectRemovableCategories(category);
@@ -89,7 +89,7 @@ public class MCRUnmappedCategoryRemover {
     private void initializeMapping() {
         toFromMapping = new HashMap<>();
         final MCRCategoryDAO dao = MCRCategoryDAOFactory
-            .getInstance();
+            .obtainInstance();
         final List<MCRCategory> rootCategories = dao
             .getRootCategories()
             .stream()

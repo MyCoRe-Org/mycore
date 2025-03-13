@@ -829,7 +829,7 @@ public class MCRRestObjects {
         if (!state.isEmpty()) {
             MCRCategoryID categState = new MCRCategoryID(
                 MCRConfiguration2.getString("MCR.Metadata.Service.State.Classification.ID").orElse("state"), state);
-            if (!MCRCategoryDAOFactory.getInstance().exist(categState)) {
+            if (!MCRCategoryDAOFactory.obtainInstance().exist(categState)) {
                 throw MCRErrorResponse.ofStatusCode(Response.Status.BAD_REQUEST.getStatusCode())
                     .withErrorCode(MCRErrorCodeConstants.MCROBJECT_INVALID_STATE)
                     .withMessage("Category " + categState + " not found")

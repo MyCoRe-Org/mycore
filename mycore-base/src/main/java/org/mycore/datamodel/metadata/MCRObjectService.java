@@ -355,7 +355,7 @@ public class MCRObjectService {
         if (state == null) {
             this.state = state;
         } else {
-            if (MCRCategoryDAOFactory.getInstance().exist(state)) {
+            if (MCRCategoryDAOFactory.obtainInstance().exist(state)) {
                 this.state = state;
             } else {
                 MCRException logEx = new MCRException("The category " + state + " does not exist.");

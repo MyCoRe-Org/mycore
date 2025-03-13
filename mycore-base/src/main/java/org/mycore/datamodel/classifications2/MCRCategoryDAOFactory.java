@@ -30,9 +30,17 @@ import org.mycore.common.config.MCRConfiguration2;
 public class MCRCategoryDAOFactory {
 
     /**
+     * @deprecated Use {@link #obtainInstance()} instaed
+     */
+    @Deprecated
+    public static MCRCategoryDAO getInstance() {
+        return obtainInstance();
+    }
+
+    /**
      * Returns an instance of a MCRCategoryDAO implementation.
      */
-    public static MCRCategoryDAO getInstance() {
+    public static MCRCategoryDAO obtainInstance() {
         return Objects.requireNonNull(MCRCategoryDAOHolder.instance,
             "MCRCategoryDAO cannot be NULL - There is a problem with the loading order of classes");
     }

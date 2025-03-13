@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
  */
 class MCRAuthorityAndCode extends MCRAuthorityInfo {
 
-    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.obtainInstance();
 
     private static final Logger LOGGER = LogManager.getLogger();
 

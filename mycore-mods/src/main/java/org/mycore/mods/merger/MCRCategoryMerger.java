@@ -46,7 +46,7 @@ import org.mycore.mods.classification.MCRClassMapper;
  */
 public class MCRCategoryMerger extends MCRMerger {
 
-    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.obtainInstance();
 
     private static final String CONFIG_PREFIX = "MCR.MODS.Merger.CategoryMerger.Repeatable.";
 

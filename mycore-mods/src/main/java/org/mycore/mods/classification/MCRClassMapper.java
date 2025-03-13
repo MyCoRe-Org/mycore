@@ -50,7 +50,7 @@ public final class MCRClassMapper {
 
     private static final String NS_MODS_URI = MCRConstants.MODS_NAMESPACE.getURI();
 
-    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.obtainInstance();
 
     private static final MCRCache<String, String> AUTH_CACHE = new MCRCache<>(100, "MCRCategory authority");
 

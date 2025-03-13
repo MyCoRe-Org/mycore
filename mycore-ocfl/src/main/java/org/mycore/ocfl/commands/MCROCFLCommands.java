@@ -246,7 +246,7 @@ public class MCROCFLCommands {
         MCRCategoryID cId = MCRCategoryID.ofString(classId);
         MCRContent content = manager.retrieveContent(cId, revision);
         MCRCategory category = MCRXMLTransformer.getCategory(content.asXML());
-        MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+        MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
         if (dao.exist(category.getId())) {
             dao.replaceCategory(category);
         } else {

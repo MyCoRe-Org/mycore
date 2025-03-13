@@ -62,7 +62,7 @@ public final class MCRLanguageFactory {
      */
     private final MCRCategoryID classification;
 
-    private final MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
+    private final MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
 
     /**
      * Language classification may change at runtime, so we remember the time we last read the languages in.

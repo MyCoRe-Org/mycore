@@ -26,14 +26,23 @@ import org.mycore.common.config.MCRConfiguration2;
  * @since 2.0
  */
 public class MCRCategLinkServiceFactory {
-    private static final MCRCategLinkService INSTANCE = MCRConfiguration2.getInstanceOfOrThrow(
+
+    private static final MCRCategLinkService SHARED_INSTANCE = MCRConfiguration2.getInstanceOfOrThrow(
         MCRCategLinkService.class, "MCR.Category.LinkService");
+
+    /**
+     * @deprecated use {@link #obtainInstance()} instead
+     */
+    @Deprecated
+    public static MCRCategLinkService getInstance() {
+        return obtainInstance();
+    }
 
     /**
      * Returns an instance of a MCRCategoryDAO implementator.
      */
-    public static MCRCategLinkService getInstance() {
-        return INSTANCE;
+    public static MCRCategLinkService obtainInstance() {
+        return SHARED_INSTANCE;
     }
 
 }

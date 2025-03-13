@@ -796,7 +796,7 @@ public final class MCRURIResolver implements URIResolver {
 
         static {
             try {
-                dao = MCRCategoryDAOFactory.getInstance();
+                dao = MCRCategoryDAOFactory.obtainInstance();
                 categoryCache = new MCRCache<>(
                     MCRConfiguration2.getInt(CONFIG_PREFIX + "Classification.CacheSize").orElse(1000),
                     "URIResolver categories");

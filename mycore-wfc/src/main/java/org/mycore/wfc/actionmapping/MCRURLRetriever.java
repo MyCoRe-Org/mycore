@@ -41,7 +41,7 @@ import org.mycore.wfc.MCRConstants;
 public final class MCRURLRetriever {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.getInstance();
+    private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.obtainInstance();
 
     private static final Map<String, MCRCollection> COLLECTION_MAP = initActionsMappings();
 
