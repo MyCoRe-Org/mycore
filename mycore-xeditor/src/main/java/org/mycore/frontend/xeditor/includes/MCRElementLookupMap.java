@@ -27,31 +27,30 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 
 /** 
- * Caches preloaded and imported XML elements by @id during transformation.
- * The cache size is unlimited, but the cache's lifetime is that of the single transformation. 
+ * Map to lookup preloaded and imported XML elements by their @id.
  * 
  * @author Frank L\U00FCtzenkirchen
  */
-public class MCRElementCache {
+public class MCRElementLookupMap {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRElementCache.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRElementLookupMap.class);
 
     private static final String ATTR_ID = "id";
 
-    private Map<String, Element> cache = new HashMap<>();
+    private Map<String, Element> lookupMap = new HashMap<>();
 
     /**
-     * Returns the cached element with the given @id
+     * Returns the element with the given @id, if any.
      * 
      * @param id the id attribute
      * @return the element, or null if no match found
      */
     Element get(String id) {
-        return cache.get(id);
+        return lookupMap.get(id);
     }
 
     /**
-     * Caches the element for later reference, 
+     * Stores the element for later reference, but
      * only if it has an @id attribute to be used as key.
      *  
      * @param element the xml to be cached
@@ -65,13 +64,13 @@ public class MCRElementCache {
     }
 
     /**
-     * Caches the element for later reference, using the given id.
+     * Stores the element for later reference, using the given id.
      *  
      * @param id the id to use as key
-     * @param element the xml to be cached
+     * @param element the xml to be stored
      */
     void put(String id, Element element) {
         LOGGER.debug(() -> "caching element with id " + id);
-        cache.put(id, element);
+        lookupMap.put(id, element);
     }
 }

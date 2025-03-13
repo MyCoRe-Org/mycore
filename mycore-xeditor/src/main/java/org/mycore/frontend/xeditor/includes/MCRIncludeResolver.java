@@ -59,7 +59,7 @@ public class MCRIncludeResolver implements URIResolver {
         st.nextToken(); // skip leading "xedInclude:"
 
         String sessionID = st.nextToken();
-        MCRElementCache elementCache = getElementCache(sessionID);
+        MCRElementLookupMap elementMap = getElementLookupMap(sessionID);
 
         String action = st.nextToken();
         Element resolved = null;
@@ -67,32 +67,32 @@ public class MCRIncludeResolver implements URIResolver {
         if (Objects.equals("resolveID", action)) {
             String id = st.nextToken();
             LOGGER.debug(() -> "including component " + id);
-            resolved = elementCache.get(id);
+            resolved = elementMap.get(id);
         } else {
             String uri = st.nextToken("").substring(1); // remove leading ":"
 
             if (Objects.equals("preload", action)) {
-                preloadFromURIs(uri, elementCache);
+                preloadFromURIs(uri, elementMap);
             } else if (Objects.equals("resolveURI", action)) {
-                resolved = resolveURI(uri, elementCache);
+                resolved = resolveURI(uri, elementMap);
             }
         }
 
         return (resolved != null ? new JDOMSource(resolved) : new StreamSource());
     }
 
-    private MCRElementCache getElementCache(String sessionID) {
+    private MCRElementLookupMap getElementLookupMap(String sessionID) {
         MCREditorSession session = MCREditorSessionStoreUtils.getSessionStore().getSession(sessionID);
-        return session.getElementCache();
+        return session.getElementLookupMap();
     }
 
-    private Element resolveURI(String uri, MCRElementCache elementCache) {
+    private Element resolveURI(String uri, MCRElementLookupMap elementMap) {
         // first try the global URI cache
         Element resolved = cachedURIs.get(uri);
         
-        // then try the element cache at transformation level
+        // then try the element lookup map at transformation level
         if (resolved == null) {
-            resolved = elementCache.get(uri);
+            resolved = elementMap.get(uri);
         }
         
         // last, resolve the URI
@@ -104,24 +104,24 @@ public class MCRIncludeResolver implements URIResolver {
             // offer to cache in global URI cache
             boolean newlyCached = cachedURIs.offer(uri, resolved);
             
-            // otherwise, cache at transformation level
+            // otherwise, remember for later use at transformation level
             if (!newlyCached) {
-                elementCache.put(uri, resolved);
+                elementMap.put(uri, resolved);
             }
         }
 
         return resolved;
     }
 
-    private void preloadFromURIs(String uris, MCRElementCache elementCache) {
-        MCRPreloadHandler handler = new MCRPreloadHandler(elementCache);
+    private void preloadFromURIs(String uris, MCRElementLookupMap elementMap) {
+        MCRPreloadHandler handler = new MCRPreloadHandler(elementMap);
 
         Arrays.stream(uris.split(","))
             .filter(uri -> !uri.isBlank())
             .forEach(uri -> {
                 LOGGER.debug(() -> "preloading " + uri);
 
-                Element resolved = resolveURI(uri, elementCache);
+                Element resolved = resolveURI(uri, elementMap);
                 if (resolved != null) {
                     handler.handlePreloadedElements(resolved);
                 }

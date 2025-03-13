@@ -87,7 +87,7 @@ public class MCRXEditorTransformer {
     public MCRContent transform(MCRContent editorSource) throws IOException {
         editorSession.getValidator().clearRules();
         editorSession.getSubmission().clear();
-        editorSession.resetElementCache();
+        editorSession.resetElementLookupMap();
 
         MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer("xeditor");
         if (transformer instanceof MCRParameterizedTransformer parameterizedTransformer) {
@@ -101,7 +101,7 @@ public class MCRXEditorTransformer {
                 result = wrappedContent.getBaseContent();
             }
             editorSession.getValidator().clearValidationResults();
-            editorSession.resetElementCache();
+            editorSession.resetElementLookupMap();
             return result;
         } else {
             throw new MCRException("Xeditor needs parameterized MCRContentTransformer: " + transformer);

@@ -55,10 +55,10 @@ public class MCRPreloadHandler {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRPreloadHandler.class);
 
-    private MCRElementCache elementCache;
+    private MCRElementLookupMap elementMap;
 
-    MCRPreloadHandler(MCRElementCache elementCache) {
-        this.elementCache = elementCache;
+    MCRPreloadHandler(MCRElementLookupMap elementMap) {
+        this.elementMap = elementMap;
     }
 
     /**
@@ -66,7 +66,7 @@ public class MCRPreloadHandler {
      */
     public void handlePreloadedElements(Element parent) {
         for (Element childElement : parent.getChildren()) {
-            elementCache.offer(childElement);
+            elementMap.offer(childElement);
             handlePreloadedElements(childElement);
 
             if (CMD_MODIFY.equals(childElement.getName())) {
@@ -81,7 +81,7 @@ public class MCRPreloadHandler {
             throw new MCRUsageException("<xed:modify /> must have a @ref attribute!");
         }
 
-        Element container = elementCache.get(refID);
+        Element container = elementMap.get(refID);
         if (container == null) {
             LOGGER.warn(() -> "Ignoring xed:modify of " + refID + ", no component with that @id found");
             return;
@@ -106,7 +106,7 @@ public class MCRPreloadHandler {
             }
         }
 
-        elementCache.offer(container);
+        elementMap.offer(container);
     }
 
     /**
