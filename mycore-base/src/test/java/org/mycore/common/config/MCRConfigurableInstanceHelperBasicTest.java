@@ -27,8 +27,51 @@ import org.mycore.common.MCRTestCase;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRFactory;
 
 public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
+
+    @Test
+    @MCRTestConfiguration(
+        properties = {
+            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithSingletonFactory.class)
+        })
+    public void singletonFactory() {
+
+        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
+        TestClassWithSingletonFactory instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithSingletonFactory.class, configuration);
+
+        assertNotNull(instance);
+
+    }
+
+    @Test
+    @MCRTestConfiguration(
+        properties = {
+            @MCRTestProperty(key = "Foo", classNameOf = TestClassWitAnnotatedFactory.class)
+        })
+    public void annotatedFactory() {
+
+        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
+        TestClassWitAnnotatedFactory instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWitAnnotatedFactory.class, configuration);
+
+        assertNotNull(instance);
+
+    }
+
+    @Test(expected = MCRConfigurationException.class)
+    @MCRTestConfiguration(
+        properties = {
+            @MCRTestProperty(key = "Foo", classNameOf = TestClassWitAnnotatedFactories.class)
+        })
+    public void annotatedFactories() {
+
+        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
+        MCRConfigurableInstanceHelper.getInstance(TestClassWitAnnotatedFactories.class, configuration);
+
+    }
 
     @Test
     @MCRTestConfiguration(
@@ -48,15 +91,27 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithFactory.class)
+            @MCRTestProperty(key = "Foo", classNameOf = TestClassWitLegacyFactory.class)
         })
-    public void factory() {
+    public void legacyFactory() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithFactory instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithFactory.class, configuration);
+        TestClassWitLegacyFactory instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWitLegacyFactory.class, configuration);
 
         assertNotNull(instance);
+
+    }
+
+    @Test(expected = MCRConfigurationException.class)
+    @MCRTestConfiguration(
+        properties = {
+            @MCRTestProperty(key = "Foo", classNameOf = TestClassWitLegacyFactories.class)
+        })
+    public void legacyFactories() {
+
+        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
+        MCRConfigurableInstanceHelper.getInstance(TestClassWitLegacyFactories.class, configuration);
 
     }
 
@@ -90,7 +145,7 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
             @MCRTestProperty(key = "Foo", classNameOf = TestClassWithConfigurationProxy.class),
             @MCRTestProperty(key = "Foo.Value", string = "Value")
         })
-    public void proxyFactory() {
+    public void configurationProxy() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         TestClassWithConfigurationProxy instance = MCRConfigurableInstanceHelper
@@ -100,22 +155,83 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
 
     }
 
+
+    @SuppressWarnings("InstantiationOfUtilityClass")
+    public static class TestClassWithSingletonFactory {
+
+        public static final TestClassWithSingletonFactory SINGLETON_INSTANCE = new TestClassWithSingletonFactory();
+
+        private TestClassWithSingletonFactory() {
+        }
+
+        public static TestClassWithSingletonFactory getInstance() {
+            return SINGLETON_INSTANCE;
+        }
+
+    }
+
     public static class TestClassWithConstructor {
+    }
+
+    @SuppressWarnings("InstantiationOfUtilityClass")
+    public static class TestClassWitAnnotatedFactory {
+
+        private TestClassWitAnnotatedFactory() {
+        }
+
+        @MCRFactory
+        public static TestClassWitAnnotatedFactory createInstance() {
+            return new TestClassWitAnnotatedFactory();
+        }
 
     }
 
     @SuppressWarnings("InstantiationOfUtilityClass")
-    public static class TestClassWithFactory {
+    public static class TestClassWitAnnotatedFactories {
 
-        private TestClassWithFactory() {
-
+        private TestClassWitAnnotatedFactories() {
         }
 
-        public static TestClassWithFactory getInstance() {
-            return new TestClassWithFactory();
+        @MCRFactory
+        public static TestClassWitAnnotatedFactories obtainInstance() {
+            return createInstance();
+        }
+
+        @MCRFactory
+        public static TestClassWitAnnotatedFactories createInstance() {
+            return new TestClassWitAnnotatedFactories();
         }
 
     }
+
+    @SuppressWarnings("InstantiationOfUtilityClass")
+    public static class TestClassWitLegacyFactory {
+
+        private TestClassWitLegacyFactory() {
+        }
+
+        public static TestClassWitLegacyFactory instance() {
+            return new TestClassWitLegacyFactory();
+        }
+
+    }
+
+    @SuppressWarnings("InstantiationOfUtilityClass")
+    public static class TestClassWitLegacyFactories {
+
+        private TestClassWitLegacyFactories() {
+        }
+
+        public static TestClassWitLegacyFactories instance() {
+            return createInstance();
+        }
+
+        public static TestClassWitLegacyFactories createInstance() {
+            return new TestClassWitLegacyFactories();
+        }
+
+    }
+
 
     public static class TestClassWithoutConstructorOrFactory {
 
