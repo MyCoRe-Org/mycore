@@ -22,14 +22,17 @@ package org.mycore.solr.auth;
  * Enum for the different levels of authentication that can be used with Solr.
  */
 public enum MCRSolrAuthenticationLevel {
+
     /**
      * Should be used for administrative tasks, like creating or deleting collections.
      */
     ADMIN("Admin"),
+
     /**
      * Should be used for indexing tasks, like adding or deleting documents.
      */
     INDEX("Index"),
+
     /**
      * Should be used for search tasks, like querying the index.
      */
@@ -44,4 +47,5 @@ public enum MCRSolrAuthenticationLevel {
     public String getPropertyName() {
         return propertyName;
     }
+
 }
