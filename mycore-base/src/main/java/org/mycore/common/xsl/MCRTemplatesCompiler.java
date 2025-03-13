@@ -43,7 +43,7 @@ import org.mycore.common.xml.MCRURIResolver;
  */
 public class MCRTemplatesCompiler {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRTemplatesCompiler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** The XSL transformer factory to use */
     private static SAXTransformerFactory factory;
@@ -59,7 +59,7 @@ public class MCRTemplatesCompiler {
         }
 
         factory = (SAXTransformerFactory) tf;
-        factory.setURIResolver(MCRURIResolver.instance());
+        factory.setURIResolver(MCRURIResolver.obtainInstance());
         factory.setErrorListener(new ErrorListener() {
             @Override
             public void error(TransformerException ex) {

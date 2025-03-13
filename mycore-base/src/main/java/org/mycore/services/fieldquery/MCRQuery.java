@@ -33,7 +33,7 @@ import org.mycore.parsers.bool.MCRCondition;
 /** Represents a query with its condition and optional parameters */
 public class MCRQuery {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRQuery.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** The query condition */
     private MCRCondition<Void> cond;

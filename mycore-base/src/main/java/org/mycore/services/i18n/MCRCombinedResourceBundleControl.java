@@ -41,9 +41,9 @@ import com.google.common.collect.Lists;
  * @since 2014.04
  */
 public class MCRCombinedResourceBundleControl extends Control {
-    private static final Logger LOGGER = LogManager.getLogger(MCRCombinedResourceBundleControl.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
-    private Locale defaultLocale = MCRLanguageFactory.instance().getDefaultLanguage().getLocale();
+    private Locale defaultLocale = MCRLanguageFactory.obtainInstance().getDefaultLanguage().getLocale();
 
     private static final ResourceBundle.Control CONTROL_HELPER = new ResourceBundle.Control() {
     };

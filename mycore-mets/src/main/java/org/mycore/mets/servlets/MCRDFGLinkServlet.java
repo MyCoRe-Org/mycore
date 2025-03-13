@@ -71,7 +71,7 @@ public class MCRDFGLinkServlet extends MCRServlet {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRDFGLinkServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static int getOrderNumber(Document metsDoc, String fileHref) {
         int orderNumber = -1;
@@ -124,7 +124,7 @@ public class MCRDFGLinkServlet extends MCRServlet {
         try {
             job.getRequest().setAttribute("XSL.derivateID", derivate);
             job.getRequest().setAttribute("XSL.objectID",
-                MCRLinkTableManager.instance().getSourceOf(derivate).iterator().next());
+                MCRLinkTableManager.getInstance().getSourceOf(derivate).iterator().next());
         } catch (Exception x) {
             LOGGER.warn("Unable to set \"XSL.objectID\" attribute to current request", x);
         }
@@ -163,7 +163,7 @@ public class MCRDFGLinkServlet extends MCRServlet {
             return;
         }
         request.setAttribute("XSL.derivateID", derivateID);
-        Collection<String> linkList = MCRLinkTableManager.instance().getSourceOf(derivateID);
+        Collection<String> linkList = MCRLinkTableManager.getInstance().getSourceOf(derivateID);
         if (linkList.isEmpty()) {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, String.format(Locale.ENGLISH,
                 "Derivate %s is not linked with a MCRObject. Please contact an administrator.", derivateID));

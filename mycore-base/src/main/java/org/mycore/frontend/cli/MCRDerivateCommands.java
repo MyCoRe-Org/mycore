@@ -610,7 +610,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                 MCREvent evt = new MCREvent(MCREvent.ObjectType.PATH, MCREvent.EventType.REPAIR);
                 evt.put(MCREvent.PATH_KEY, file);
                 evt.put(MCREvent.FILEATTR_KEY, attrs);
-                MCREventManager.instance().handleEvent(evt);
+                MCREventManager.getInstance().handleEvent(evt);
                 LOGGER.debug("repaired file {}", file);
                 return super.visitFile(file, attrs);
             }
@@ -677,7 +677,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             oldObjectToDerivateLink = new MCRMetaLinkID();
         }
         LOGGER.info("Linking derivate {} to {}", derID, objID);
-        MCRMetaEnrichedLinkID derivateLink = MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(derObj);
+        MCRMetaEnrichedLinkID derivateLink = MCRMetaEnrichedLinkIDFactory.obtainInstance().getDerivateLink(derObj);
         MCRMetadataManager.addOrUpdateDerivateToObject(objID, derivateLink, derObj.isImportMode());
 
         /* removing link from old parent */
@@ -706,7 +706,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             LOGGER.error("The given base ID {} has not the syntax of project_type", baseId);
             return;
         }
-        MCRXMLMetadataManager mgr = MCRXMLMetadataManager.instance();
+        MCRXMLMetadataManager mgr = MCRXMLMetadataManager.getInstance();
         String project = baseId.substring(0, projectPartPosition + 1);
         List<String> idList = mgr.listIDsForBase(project + MCRDerivate.OBJECT_TYPE);
         int counter = 0;
@@ -842,7 +842,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         final MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
         final List<MCRCategoryID> derivateTypes = Stream.of(categoriesCommaList.split(","))
             .map(String::trim)
-            .map(category -> category.contains(":") ? MCRCategoryID.fromString(category)
+            .map(category -> category.contains(":") ? MCRCategoryID.ofString(category)
                 : new MCRCategoryID("derivate_types", category))
             .collect(Collectors.toList());
 

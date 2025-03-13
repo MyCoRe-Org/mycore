@@ -141,11 +141,11 @@ public class MCRSolrRemoteTikaAccumulator implements MCRSolrFileIndexAccumulator
         while (it.hasNext()) {
             String key = it.next();
             String simpleKeyName = MCRTikaMapper.simplifyKeyName(key);
-            Optional<MCRTikaMapper> mapper = MCRTikaMapper.getMapper(simpleKeyName);
+            Optional<MCRTikaMapper> mapper = MCRTikaManager.getInstance().getMapper(simpleKeyName);
             if (mapper.isPresent()) {
                 mapper.get().map(key, json.get(key), document, filePath, attributes);
             } else {
-                MCRTikaMapper defaultMapper = MCRTikaMapper.getDefaultMapper();
+                MCRTikaMapper defaultMapper = MCRTikaManager.getInstance().getDefaultMapper();
                 defaultMapper.map(key, json.get(key), document, filePath, attributes);
             }
         }

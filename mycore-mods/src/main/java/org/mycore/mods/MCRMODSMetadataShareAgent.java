@@ -122,7 +122,7 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
      * @param holderWrapper the mods wrapper which holds the metadata that should be inherited
      */
     protected void distributeLinkedMetadata(MCRMODSWrapper holderWrapper) {
-        Collection<String> recipientIdsStr = MCRLinkTableManager.instance()
+        Collection<String> recipientIdsStr = MCRLinkTableManager.getInstance()
             .getSourceOf(holderWrapper.getMCRObject().getId(), MCRLinkTableManager.ENTRY_TYPE_REFERENCE);
         List<MCRObjectID> recipientIds = recipientIdsStr.stream()
             .map(MCRObjectID::getInstance)

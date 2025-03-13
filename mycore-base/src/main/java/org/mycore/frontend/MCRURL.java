@@ -37,7 +37,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class MCRURL {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRURL.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private URL url;
 

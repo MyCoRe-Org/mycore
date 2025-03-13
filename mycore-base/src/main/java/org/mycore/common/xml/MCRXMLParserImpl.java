@@ -67,7 +67,7 @@ public class MCRXMLParserImpl implements MCRXMLParser {
         builder.setFeature(FEATURE_SCHEMA_SUPPORT, validate);
         builder.setFeature(FEATURE_FULL_SCHEMA_SUPPORT, false);
         builder.setErrorHandler(new MCRXMLParserErrorHandler(silent));
-        builder.setEntityResolver(new AbsoluteToRelativeResolver(MCREntityResolver.instance()));
+        builder.setEntityResolver(new AbsoluteToRelativeResolver(MCREntityResolver.getInstance()));
     }
 
     @Override

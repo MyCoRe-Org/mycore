@@ -68,7 +68,7 @@ public class MCRMODSCommands extends MCRAbstractCommands {
 
     public static final String MODS_V3_XSD_URI = "http://www.loc.gov/standards/mods/v3/mods-3-7.xsd";
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRMODSCommands.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @MCRCommand(syntax = "load all mods documents from directory {0} for project {1}",
         help = "Load all MODS documents as MyCoRe Objects for project {1} from directory {0}",
@@ -215,7 +215,7 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         MCRConfiguration2.getString("MCR.MODS.Import.Derivate.Categories")
             .map(MCRConfiguration2::splitValue)
             .ifPresent(s -> {
-                s.map(MCRCategoryID::fromString)
+                s.map(MCRCategoryID::ofString)
                     .forEach(categId -> derivate.getDerivate().getClassifications()
                         .add(new MCRMetaClassification("classification", 0, null,
                             categId)));

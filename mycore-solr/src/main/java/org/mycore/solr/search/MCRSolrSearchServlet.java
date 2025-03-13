@@ -84,7 +84,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
         QUERY_PARAMETER, SOLR_PARAMETER, SORT_PARAMETER, TYPE_PARAMETER
     }
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRSolrSearchServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String JOIN_PATTERN = "{!join from=returnId to=id}";
 

@@ -26,7 +26,7 @@ import org.jaxen.Context;
 
 class MCRFunctionGenerateID implements org.jaxen.Function {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRFunctionGenerateID.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public Object call(Context context, List args) {

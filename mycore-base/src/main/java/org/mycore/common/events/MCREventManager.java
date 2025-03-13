@@ -52,12 +52,10 @@ public final class MCREventManager {
     /** Call event handlers in backward direction (delete) */
     public static final boolean BACKWARD = false;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCREventManager.class);
-
-    private static MCREventManager instance;
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** Table of all configured event handlers * */
-    private Map<String, List<MCREventHandler>> handlers;
+    private final Map<String, List<MCREventHandler>> handlers;
 
     private MCREventManager() {
         handlers = new ConcurrentHashMap<>();
@@ -92,16 +90,20 @@ public final class MCREventManager {
     }
 
     /**
+     * @deprecated Use {@link #getInstance()} instead
+     */
+    @Deprecated
+    public static MCREventManager instance() {
+        return getInstance();
+    }
+
+    /**
      * The singleton manager instance
      *
      * @return the single event manager
      */
-    public static synchronized MCREventManager instance() {
-        if (instance == null) {
-            instance = new MCREventManager();
-        }
-
-        return instance;
+    public static MCREventManager getInstance() {
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     private boolean propKeyIsSet(String propertyKey) {
@@ -362,4 +364,9 @@ public final class MCREventManager {
         }
 
     }
+
+    private static final class LazyInstanceHolder {
+        public static final MCREventManager SINGLETON_INSTANCE = new MCREventManager();
+    }
+
 }

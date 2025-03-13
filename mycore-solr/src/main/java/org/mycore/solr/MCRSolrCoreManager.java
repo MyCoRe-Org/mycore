@@ -39,7 +39,7 @@ import org.mycore.common.config.MCRConfigurationException;
  */
 public final class MCRSolrCoreManager {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRSolrCoreManager.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static Map<String, MCRSolrCore> coreMap;
 

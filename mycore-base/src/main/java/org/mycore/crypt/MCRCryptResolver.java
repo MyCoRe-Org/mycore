@@ -48,7 +48,7 @@ public class MCRCryptResolver implements URIResolver {
 
     public static final String XML_PREFIX = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRCryptResolver.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String ENCRYPT_ACTION = "encrypt";
 

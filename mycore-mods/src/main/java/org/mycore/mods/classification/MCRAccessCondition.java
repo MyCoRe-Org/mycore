@@ -42,7 +42,7 @@ public class MCRAccessCondition extends MCRAuthorityInfo {
 
     private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRAccessCondition.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public MCRAccessCondition(String href) {
         this.href = href;

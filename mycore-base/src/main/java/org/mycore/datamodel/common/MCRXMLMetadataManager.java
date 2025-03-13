@@ -40,41 +40,31 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  *
  * @author Christoph Neidahl (OPNA2608)
  */
-public class MCRXMLMetadataManager {
+public final class MCRXMLMetadataManager {
+
+    private final MCRXMLMetadataManagerAdapter adapter = MCRConfiguration2.getInstanceOfOrThrow(
+        MCRXMLMetadataManagerAdapter.class, "MCR.Metadata.Manager.Class");
+
+    private MCRXMLMetadataManager() {
+    }
 
     /**
-     * Our own singleton.
+     * @deprecated use {@link #getInstance()} instead
      */
-    private static volatile MCRXMLMetadataManager singleton;
-
-    /**
-     * The implementation's singleton.
-     */
-    private static volatile MCRXMLMetadataManagerAdapter implementation;
-
-    /**
-     * Reads the MCR.Metadata.Manager.Class to instantiate and return the configured xml metadata manager.
-     * If MCR.Metadata.Manager.Class is not set, an instance of {@link MCRDefaultXMLMetadataManager} is returned.
-     *
-     * @return an instance of the configured xml metadata manager if any is set, or MCRDefaultXMLMetadataManager
-     */
+    @Deprecated
     public static synchronized MCRXMLMetadataManager instance() {
-        if (singleton == null) {
-            synchronized (MCRXMLMetadataManager.class) {
-                if (singleton == null) {
-                    singleton = new MCRXMLMetadataManager();
-                }
-            }
-        }
-        if (implementation == null) {
-            synchronized (MCRXMLMetadataManager.class) {
-                if(implementation == null) {
-                    implementation = MCRConfiguration2.getSingleInstanceOfOrThrow(
-                        MCRXMLMetadataManagerAdapter.class, "MCR.Metadata.Manager.Class");
-                }
-            }
-        }
-        return singleton;
+        return getInstance();
+    }
+
+    /**
+     * Returns the singleton instance of {@link MCRXMLMetadataManager}. Reads the property
+     * MCR.Metadata.Manager.Class to instantiate the configured XML metadata manager adapter to be used
+     * to perform the metadata operations.
+     *
+     * @return the XML metadata manager
+     */
+    public static synchronized MCRXMLMetadataManager getInstance() {
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     /*
@@ -87,7 +77,7 @@ public class MCRXMLMetadataManager {
      * @see MCRXMLMetadataManagerAdapter#reload()
      */
     public void reload() {
-        implementation.reload();
+        adapter.reload();
     }
 
     /**
@@ -96,7 +86,7 @@ public class MCRXMLMetadataManager {
      * @see MCRXMLMetadataManagerAdapter#verifyStore(String)
      */
     public void verifyStore(String base) {
-        implementation.verifyStore(base);
+        adapter.verifyStore(base);
     }
 
     /**
@@ -106,7 +96,7 @@ public class MCRXMLMetadataManager {
      */
     public void create(MCRObjectID mcrid, MCRContent xml, Date lastModified)
         throws MCRPersistenceException {
-        implementation.create(mcrid, xml, lastModified);
+        adapter.create(mcrid, xml, lastModified);
     }
 
     /**
@@ -115,7 +105,7 @@ public class MCRXMLMetadataManager {
      * @see MCRXMLMetadataManagerAdapter#delete(MCRObjectID)
      */
     public void delete(MCRObjectID mcrid) throws MCRPersistenceException {
-        implementation.delete(mcrid);
+        adapter.delete(mcrid);
     }
 
     /**
@@ -125,7 +115,7 @@ public class MCRXMLMetadataManager {
      */
     public void update(MCRObjectID mcrid, MCRContent xml, Date lastModified)
         throws MCRPersistenceException {
-        implementation.update(mcrid, xml, lastModified);
+        adapter.update(mcrid, xml, lastModified);
     }
 
     /**
@@ -134,7 +124,7 @@ public class MCRXMLMetadataManager {
      * @see MCRXMLMetadataManagerAdapter#retrieveContent(MCRObjectID)
      */
     public MCRContent retrieveContent(MCRObjectID mcrid) throws IOException {
-        return implementation.retrieveContent(mcrid);
+        return adapter.retrieveContent(mcrid);
     }
 
     /**
@@ -143,7 +133,7 @@ public class MCRXMLMetadataManager {
      * @see MCRXMLMetadataManagerAdapter#retrieveContent(MCRObjectID, String)
      */
     public MCRContent retrieveContent(MCRObjectID mcrid, String revision) throws IOException {
-        return implementation.retrieveContent(mcrid, revision);
+        return adapter.retrieveContent(mcrid, revision);
     }
 
     /**
@@ -152,7 +142,7 @@ public class MCRXMLMetadataManager {
      * @see MCRXMLMetadataManagerAdapter#listRevisions(MCRObjectID)
      */
     public List<? extends MCRAbstractMetadataVersion<?>> listRevisions(MCRObjectID id) throws IOException {
-        return implementation.listRevisions(id);
+        return adapter.listRevisions(id);
     }
 
     /**
@@ -161,11 +151,11 @@ public class MCRXMLMetadataManager {
      * @see MCRXMLMetadataManagerAdapter#getHighestStoredID(String, String)
      */
     public int getHighestStoredID(String project, String type) {
-        return implementation.getHighestStoredID(project, type);
+        return adapter.getHighestStoredID(project, type);
     }
 
     public int getHighestStoredID(String base) {
-        return implementation.getHighestStoredID(
+        return adapter.getHighestStoredID(
             base.substring(0, base.indexOf('_')),
             base.substring(base.indexOf('_') + 1));
     }
@@ -176,7 +166,7 @@ public class MCRXMLMetadataManager {
      * @see MCRXMLMetadataManagerAdapter#exists(MCRObjectID)
      */
     public boolean exists(MCRObjectID mcrid) throws MCRPersistenceException {
-        return implementation.exists(mcrid);
+        return adapter.exists(mcrid);
     }
 
     /**
@@ -185,7 +175,7 @@ public class MCRXMLMetadataManager {
      * @see MCRXMLMetadataManagerAdapter#listIDsForBase(String)
      */
     public List<String> listIDsForBase(String base) {
-        return implementation.listIDsForBase(base);
+        return adapter.listIDsForBase(base);
     }
 
     /**
@@ -194,7 +184,7 @@ public class MCRXMLMetadataManager {
      * @see MCRXMLMetadataManagerAdapter#listIDsOfType(String)
      */
     public List<String> listIDsOfType(String type) {
-        return implementation.listIDsOfType(type);
+        return adapter.listIDsOfType(type);
     }
 
     /**
@@ -203,7 +193,7 @@ public class MCRXMLMetadataManager {
      * @see MCRXMLMetadataManagerAdapter#listIDs()
      */
     public List<String> listIDs() {
-        return implementation.listIDs();
+        return adapter.listIDs();
     }
 
     /**
@@ -212,7 +202,7 @@ public class MCRXMLMetadataManager {
      * @see MCRXMLMetadataManagerAdapter#getObjectTypes()
      */
     public Collection<String> getObjectTypes() {
-        return implementation.getObjectTypes();
+        return adapter.getObjectTypes();
     }
 
     /**
@@ -221,7 +211,7 @@ public class MCRXMLMetadataManager {
      * @see MCRXMLMetadataManagerAdapter#getObjectBaseIds()
      */
     public Collection<String> getObjectBaseIds() {
-        return implementation.getObjectBaseIds();
+        return adapter.getObjectBaseIds();
     }
 
     /**
@@ -230,7 +220,7 @@ public class MCRXMLMetadataManager {
      * @see MCRXMLMetadataManagerAdapter#retrieveObjectDates(List)
      */
     public List<MCRObjectIDDate> retrieveObjectDates(List<String> ids) throws IOException {
-        return implementation.retrieveObjectDates(ids);
+        return adapter.retrieveObjectDates(ids);
     }
 
     /**
@@ -239,7 +229,7 @@ public class MCRXMLMetadataManager {
      * @see MCRXMLMetadataManagerAdapter#getLastModified(MCRObjectID)
      */
     public long getLastModified(MCRObjectID id) throws IOException {
-        return implementation.getLastModified(id);
+        return adapter.getLastModified(id);
     }
 
     /**
@@ -248,7 +238,7 @@ public class MCRXMLMetadataManager {
      * @see MCRXMLMetadataManagerAdapter#getLastModifiedHandle(MCRObjectID, long, TimeUnit)
      */
     public MCRCache.ModifiedHandle getLastModifiedHandle(MCRObjectID id, long expire, TimeUnit unit) {
-        return implementation.getLastModifiedHandle(id, expire, unit);
+        return adapter.getLastModifiedHandle(id, expire, unit);
     }
 
     /*
@@ -374,4 +364,9 @@ public class MCRXMLMetadataManager {
     public long getLastModified() {
         return MCRConfigurationBase.getSystemLastModified();
     }
+
+    private static final class LazyInstanceHolder {
+        public static final MCRXMLMetadataManager SINGLETON_INSTANCE = new MCRXMLMetadataManager();
+    }
+
 }

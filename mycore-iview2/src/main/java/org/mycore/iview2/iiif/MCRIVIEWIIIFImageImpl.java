@@ -73,7 +73,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
 
     private static final String IDENTIFIER_SEPARATOR_PROPERTY = "IdentifierSeparator";
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRIVIEWIIIFImageImpl.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final java.util.List<String> transparentFormats;
 

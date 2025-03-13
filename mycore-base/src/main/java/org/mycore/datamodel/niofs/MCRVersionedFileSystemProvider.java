@@ -76,40 +76,40 @@ public abstract class MCRVersionedFileSystemProvider extends MCRAbstractFileSyst
     @Override
     public SeekableByteChannel newByteChannel(Path path, Set<? extends OpenOption> options, FileAttribute<?>... attrs)
         throws IOException {
-        MCRVersionedPath versionedPath = MCRVersionedPath.toVersionedPath(path);
+        MCRVersionedPath versionedPath = MCRVersionedPath.ofPath(path);
         return newByteChannel(versionedPath, options, attrs);
     }
 
     @Override
     public DirectoryStream<Path> newDirectoryStream(Path path, DirectoryStream.Filter<? super Path> filter)
         throws IOException {
-        MCRVersionedPath versionedPath = MCRVersionedPath.toVersionedPath(path);
+        MCRVersionedPath versionedPath = MCRVersionedPath.ofPath(path);
         return newDirectoryStream(versionedPath, filter);
     }
 
     @Override
     public void createDirectory(Path dir, FileAttribute<?>... attrs) throws IOException {
-        MCRVersionedPath versionedPath = MCRVersionedPath.toVersionedPath(dir);
+        MCRVersionedPath versionedPath = MCRVersionedPath.ofPath(dir);
         createDirectory(versionedPath, attrs);
     }
 
     @Override
     public void delete(Path path) throws IOException {
-        MCRVersionedPath versionedPath = MCRVersionedPath.toVersionedPath(path);
+        MCRVersionedPath versionedPath = MCRVersionedPath.ofPath(path);
         delete(versionedPath);
     }
 
     @Override
     public void copy(Path source, Path target, CopyOption... options) throws IOException {
-        MCRVersionedPath versionedSource = MCRVersionedPath.toVersionedPath(source);
-        MCRVersionedPath versionedTarget = MCRVersionedPath.toVersionedPath(target);
+        MCRVersionedPath versionedSource = MCRVersionedPath.ofPath(source);
+        MCRVersionedPath versionedTarget = MCRVersionedPath.ofPath(target);
         copy(versionedSource, versionedTarget, options);
     }
 
     @Override
     public void move(Path source, Path target, CopyOption... options) throws IOException {
-        MCRVersionedPath versionedSource = MCRVersionedPath.toVersionedPath(source);
-        MCRVersionedPath versionedTarget = MCRVersionedPath.toVersionedPath(target);
+        MCRVersionedPath versionedSource = MCRVersionedPath.ofPath(source);
+        MCRVersionedPath versionedTarget = MCRVersionedPath.ofPath(target);
         move(versionedSource, versionedTarget, options);
     }
 
@@ -118,8 +118,8 @@ public abstract class MCRVersionedFileSystemProvider extends MCRAbstractFileSyst
         if (path1 == null || path2 == null) {
             return false;
         }
-        MCRVersionedPath versionedPath1 = MCRVersionedPath.toVersionedPath(path1);
-        MCRVersionedPath versionedPath2 = MCRVersionedPath.toVersionedPath(path2);
+        MCRVersionedPath versionedPath1 = MCRVersionedPath.ofPath(path1);
+        MCRVersionedPath versionedPath2 = MCRVersionedPath.ofPath(path2);
         return Objects.equals(versionedPath1, versionedPath2);
     }
 
@@ -130,13 +130,13 @@ public abstract class MCRVersionedFileSystemProvider extends MCRAbstractFileSyst
 
     @Override
     public FileStore getFileStore(Path path) throws IOException {
-        MCRVersionedPath versionedPath = MCRVersionedPath.toVersionedPath(path);
+        MCRVersionedPath versionedPath = MCRVersionedPath.ofPath(path);
         return getFileStore(versionedPath);
     }
 
     @Override
     public void checkAccess(Path path, AccessMode... accessModes) throws IOException {
-        MCRVersionedPath versionedPath = MCRVersionedPath.toVersionedPath(path);
+        MCRVersionedPath versionedPath = MCRVersionedPath.ofPath(path);
         checkAccess(versionedPath, accessModes);
     }
 

@@ -48,22 +48,22 @@ public class MCRHighestComponentPriorityResourceSelector extends MCRResourceSele
         List<URL> highestPriorityModuleResourceUrls = new LinkedList<>();
         for (MCRComponent component : componentsByComponentPriority()) {
             int priority = component.getPriority();
-            getLogger().debug(() -> "Testing component " + component.getName() + " with priority " + priority);
+            logger.debug(() -> "Testing component " + component.getName() + " with priority " + priority);
             if (highestPriority != -1 && highestPriority != priority) {
-                getLogger().debug("Found component with priority lower than selected priority {}, stop looking",
+                logger.debug("Found component with priority lower than selected priority {}, stop looking",
                     highestPriority);
                 break;
             }
             String componentUrl = "jar:" + component.getJarFile().toURI();
-            getLogger().debug("Comparing component URL {} ... ", componentUrl);
+            logger.debug("Comparing component URL {} ... ", componentUrl);
             for (URL resourceUrl : unmatchedResourceUrls) {
-                getLogger().debug(" ... with resource URL {}", resourceUrl);
+                logger.debug(" ... with resource URL {}", resourceUrl);
                 if (resourceUrl.toString().startsWith(componentUrl)) {
-                    getLogger().debug("Found match, using component URL {}", componentUrl);
+                    logger.debug("Found match, using component URL {}", componentUrl);
                     highestPriorityModuleResourceUrls.add(resourceUrl);
                     unmatchedResourceUrls.remove(resourceUrl);
                     if (highestPriority != priority) {
-                        getLogger().debug("Selected priority {}, keep looking for components with same priority",
+                        logger.debug("Selected priority {}, keep looking for components with same priority",
                             priority);
                         highestPriority = priority;
                     }

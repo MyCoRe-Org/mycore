@@ -102,7 +102,7 @@ public final class MCRResourceServlet extends HttpServlet {
 
     private Optional<URL> toUrl(String path) {
         LOGGER.debug("Delivering resource for path {}", path);
-        return MCRResourceResolver.instance().resolveWebResource(path);
+        return MCRResourceResolver.obtainInstance().resolveWebResource(path);
     }
 
     private MCRURLContent toContent(URL url) {

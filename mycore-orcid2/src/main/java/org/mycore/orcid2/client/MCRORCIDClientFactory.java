@@ -69,13 +69,21 @@ public final class MCRORCIDClientFactory {
     }
 
     /**
+     * @deprecated Use {@link #obtainInstance(String)} instead
+     */
+    @Deprecated
+    public static MCRORCIDClientFactory getInstance(String version) {
+        return obtainInstance(version);
+    }
+
+    /**
      * Returns an instance of a factory for a version.
      *
      * @param version the version
      * @return MCRORCIDClientFactory
      * @throws MCRConfigurationException if factory cannot be initialized
      */
-    public static MCRORCIDClientFactory getInstance(String version) {
+    public static MCRORCIDClientFactory obtainInstance(String version) {
         MCRORCIDClientFactory factory;
         if (FACTORIES.containsKey(version)) {
             factory = FACTORIES.get(version);

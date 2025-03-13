@@ -50,7 +50,7 @@ import org.mycore.solr.auth.MCRSolrAuthenticationManager;
  */
 public class MCRSolrCore {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRSolrCore.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static final int DEFAULT_SHARD_COUNT = 1;
 
@@ -211,7 +211,7 @@ public class MCRSolrCore {
             if (commit) {
                 UpdateRequest updateRequest = new UpdateRequest();
                 updateRequest.setAction(UpdateRequest.ACTION.COMMIT, false, false);
-                MCRSolrAuthenticationManager.getInstance().applyAuthentication(updateRequest,
+                MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(updateRequest,
                     MCRSolrAuthenticationLevel.INDEX);
                 updateRequest.process(client);
             }

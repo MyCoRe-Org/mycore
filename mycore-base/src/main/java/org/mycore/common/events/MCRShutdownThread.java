@@ -35,9 +35,9 @@ import org.apache.logging.log4j.Logger;
  */
 public final class MCRShutdownThread extends Thread {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRShutdownThread.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRShutdownThread SINGLETON = new MCRShutdownThread();
+    private static final MCRShutdownThread SINGLETON_INSTANCE = new MCRShutdownThread();
 
     private MCRShutdownThread() {
         setName("MCR-exit");
@@ -46,7 +46,7 @@ public final class MCRShutdownThread extends Thread {
     }
 
     static MCRShutdownThread getInstance() {
-        return SINGLETON;
+        return SINGLETON_INSTANCE;
     }
 
     @Override

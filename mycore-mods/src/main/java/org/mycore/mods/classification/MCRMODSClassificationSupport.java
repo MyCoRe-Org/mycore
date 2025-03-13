@@ -42,7 +42,7 @@ import org.w3c.dom.NodeList;
  */
 public final class MCRMODSClassificationSupport {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRMODSClassificationSupport.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private MCRMODSClassificationSupport() {
     }
@@ -61,7 +61,7 @@ public final class MCRMODSClassificationSupport {
             Document document = documentBuilder.newDocument();
             final Element source = (Element) sources.item(0);
             final String categId = source.getAttributeNS(MCRConstants.MCR_NAMESPACE.getURI(), "categId");
-            final MCRCategoryID categoryID = MCRCategoryID.fromString(categId);
+            final MCRCategoryID categoryID = MCRCategoryID.ofString(categId);
             final Element returns = document.createElementNS(source.getNamespaceURI(), source.getLocalName());
             MCRClassMapper.assignCategory(returns, categoryID);
             return returns.getChildNodes();

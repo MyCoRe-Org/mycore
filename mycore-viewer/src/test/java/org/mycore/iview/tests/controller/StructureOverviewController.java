@@ -36,7 +36,7 @@ public class StructureOverviewController extends SideBarController {
 
     public static final String CHAPTER_OVERVIEW_SELECTOR = "chapterOverview";
 
-    private static final Logger LOGGER = LogManager.getLogger(StructureOverviewController.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * @param webdriver

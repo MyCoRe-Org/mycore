@@ -39,8 +39,6 @@ public final class MCRNeo4JDatabaseDriver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static volatile MCRNeo4JDatabaseDriver instance;
-
     private final String url;
 
     private final String user;
@@ -64,14 +62,7 @@ public final class MCRNeo4JDatabaseDriver {
     * @return the MCRNeo4JDatabaseDriver instance
     */
     public static MCRNeo4JDatabaseDriver getInstance() {
-        if (instance == null) {
-            synchronized (MCRNeo4JDatabaseDriver.class) {
-                if (instance == null) {
-                    instance = new MCRNeo4JDatabaseDriver();
-                }
-            }
-        }
-        return instance;
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     /**
@@ -148,4 +139,9 @@ public final class MCRNeo4JDatabaseDriver {
     public void createConnection(String url, String user, String password) {
         this.driver = GraphDatabase.driver(url, AuthTokens.basic(user, password));
     }
+
+    private static final class LazyInstanceHolder {
+        public static final MCRNeo4JDatabaseDriver SINGLETON_INSTANCE = new MCRNeo4JDatabaseDriver();
+    }
+
 }

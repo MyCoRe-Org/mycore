@@ -150,7 +150,7 @@ public class MCRRealmFactory {
                 realm.setCreateURL(createElement.getAttributeValue("url"));
             }
 
-            attributeMapper.put(id, MCRUserAttributeMapper.instance(child));
+            attributeMapper.put(id, MCRUserAttributeMapper.createInstance(child));
 
             realmsMap.put(id, realm);
             realmsList.add(realm);
@@ -166,11 +166,11 @@ public class MCRRealmFactory {
 
     private static Document getRealms() throws JDOMException, TransformerException, IOException {
         if (realmsFile == null) {
-            return MCRSourceContent.getInstance(realmsURI.toASCIIString()).asXML();
+            return MCRSourceContent.createInstance(realmsURI.toASCIIString()).asXML();
         }
         if (!realmsFile.exists() || realmsFile.length() == 0) {
             LOGGER.info("Creating {}...", realmsFile::getAbsolutePath);
-            MCRSourceContent realmsContent = MCRSourceContent.getInstance(RESOURCE_REALMS_URI);
+            MCRSourceContent realmsContent = MCRSourceContent.createInstance(RESOURCE_REALMS_URI);
             realmsContent.sendTo(realmsFile);
         }
         updateLastModified();

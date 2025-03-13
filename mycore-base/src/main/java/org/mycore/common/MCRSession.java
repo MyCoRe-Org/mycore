@@ -86,7 +86,7 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
     ThreadLocal<AtomicInteger> currentThreadCount = ThreadLocal.withInitial(AtomicInteger::new);
 
     /** the logger */
-    private static final Logger LOGGER = LogManager.getLogger(MCRSession.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** The user ID of the session */
     private MCRUserInformation userInformation;

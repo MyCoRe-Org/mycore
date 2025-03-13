@@ -109,7 +109,7 @@ public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
     }
 
     private Optional<MCRTileInfo> createTileInfoForDerivateLink(MCRObjectID mcrID) {
-        Collection<String> linkedImages = MCRLinkTableManager.instance()
+        Collection<String> linkedImages = MCRLinkTableManager.getInstance()
             .getDestinationOf(mcrID, MCRLinkTableManager.ENTRY_TYPE_DERIVATE_LINK);
         for (String linkedImage : linkedImages) {
             MCRObjectID deriID = MCRObjectID.getInstance(

@@ -48,7 +48,7 @@ import org.mycore.util.concurrent.MCRTransactionableRunnable;
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class MCRNeo4JIndexEventHandler extends MCREventHandlerBase {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRNeo4JIndexEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final long DELAY_IN_MS = MCRConfiguration2
         .getLong(MCRNeo4JConstants.NEO4J_CONFIG_PREFIX + "DelayIndexing_inMS").orElse(2000L);
@@ -159,7 +159,7 @@ public class MCRNeo4JIndexEventHandler extends MCREventHandlerBase {
         LOGGER.debug("Neo4j: update id {}", mcrObject::getId);
 
         // do not add objects marked for deletion
-        if (MCRMarkManager.instance().isMarked(mcrObject.getId())) {
+        if (MCRMarkManager.getInstance().isMarked(mcrObject.getId())) {
             return;
         }
 
@@ -193,7 +193,7 @@ public class MCRNeo4JIndexEventHandler extends MCREventHandlerBase {
         LOGGER.debug("Neo4j: add id {}", mcrObject::getId);
 
         // do not add objects marked for deletion
-        if (MCRMarkManager.instance().isMarked(mcrObject.getId())) {
+        if (MCRMarkManager.getInstance().isMarked(mcrObject.getId())) {
             return;
         }
 

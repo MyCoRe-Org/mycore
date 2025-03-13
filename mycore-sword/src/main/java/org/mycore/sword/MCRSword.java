@@ -36,7 +36,7 @@ import org.mycore.sword.application.MCRSwordLifecycleConfiguration;
  */
 public class MCRSword {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRSword.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static volatile Map<String, MCRSwordCollectionProvider> collections;
 

@@ -56,8 +56,8 @@ import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.imagetiler.MCRImage;
 import org.mycore.imagetiler.MCRTiledPictureProps;
+import org.mycore.iview2.events.MCRIView2TilingThreadStarter;
 import org.mycore.iview2.services.MCRIView2Tools;
-import org.mycore.iview2.services.MCRImageTiler;
 import org.mycore.iview2.services.MCRTileJob;
 import org.mycore.iview2.services.MCRTilingQueue;
 
@@ -72,7 +72,7 @@ import jakarta.persistence.TypedQuery;
 
 @MCRCommandGroup(name = "IView2 Tile Commands")
 public class MCRIView2Commands extends MCRAbstractCommands {
-    private static final Logger LOGGER = LogManager.getLogger(MCRIView2Commands.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String TILE_DERIVATE_TILES_COMMAND_SYNTAX = "tile images of derivate {0}";
 
@@ -345,11 +345,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
     }
 
     private static void startMasterTilingThread() {
-        if (!MCRImageTiler.isRunning()) {
-            LOGGER.info("Starting Tiling thread.");
-            final Thread tiling = new Thread(MCRImageTiler.getInstance());
-            tiling.start();
-        }
+        MCRIView2TilingThreadStarter.startMasterTilingThread();
     }
 
     /**
@@ -358,7 +354,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
     @MCRCommand(syntax = "delete all tiles", help = "removes all tiles of all derivates", order = 80)
     public static void deleteAllTiles() throws IOException {
         Path storeDir = MCRIView2Tools.getTileDir();
-        Files.walkFileTree(storeDir, MCRRecursiveDeleter.instance());
+        Files.walkFileTree(storeDir, new MCRRecursiveDeleter());
         MCRTilingQueue.getInstance().clear();
     }
 
@@ -401,7 +397,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         order = 100)
     public static void deleteDerivateTiles(String derivateID) throws IOException {
         Path derivateDir = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivateID, null);
-        Files.walkFileTree(derivateDir, MCRRecursiveDeleter.instance());
+        Files.walkFileTree(derivateDir, new MCRRecursiveDeleter());
         MCRTilingQueue.getInstance().remove(derivateID);
     }
 
@@ -446,7 +442,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
                 Objects.requireNonNull(file);
                 Objects.requireNonNull(attrs);
                 if (MCRIView2Tools.isFileSupported(file)) {
-                    files.add(MCRPath.toMCRPath(file));
+                    files.add(MCRPath.ofPath(file));
                 }
                 return FileVisitResult.CONTINUE;
             }

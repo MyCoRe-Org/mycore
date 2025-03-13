@@ -18,11 +18,11 @@
 
 package org.mycore.solr.auth;
 
-import java.net.http.HttpRequest;
-
 import org.apache.solr.client.solrj.SolrRequest;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.solr.MCRSolrConstants;
+
+import java.net.http.HttpRequest;
 
 /**
  * Interface for adding authentication to Solr requests.
@@ -32,21 +32,32 @@ public interface MCRSolrAuthenticationManager {
     /**
      * Add basic authentication to the request, if username and password are configured.
      * Should be thread-safe.
+     *
      * @param request the request to add the authentication to
-     * @param level the level of authentication to add
+     * @param level   the level of authentication to add
      */
     void applyAuthentication(SolrRequest<?> request, MCRSolrAuthenticationLevel level);
 
     /**
      * Add basic authentication to the request, if username and password are configured.
      * Should be thread-safe.
+     *
      * @param request the request to add the authentication to
-     * @param level the level of authentication to add
+     * @param level   the level of authentication to add
      */
     void applyAuthentication(HttpRequest.Builder request, MCRSolrAuthenticationLevel level);
 
+    /**
+     * @deprecated Use {@link #obtainInstance()} instead
+     */
+    @Deprecated
     static MCRSolrAuthenticationManager getInstance() {
+        return obtainInstance();
+    }
+
+    static MCRSolrAuthenticationManager obtainInstance() {
         return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRSolrAuthenticationManager.class,
             MCRSolrConstants.SOLR_CONFIG_PREFIX + "Server.Auth.Manager.Class");
     }
+
 }

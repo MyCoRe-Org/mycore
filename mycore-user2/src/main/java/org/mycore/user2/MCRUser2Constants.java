@@ -37,7 +37,7 @@ public final class MCRUser2Constants {
     public static final String CONFIG_PREFIX = "MCR.user2.";
     static final String USER_ADMIN_PERMISSION = "administrate-users";
     static final String USER_CREATE_PERMISSION = "create-users";
-    static final MCRCategoryID ROLE_CLASSID = MCRCategoryID.rootID(ROLE_ROOT_ID);
+    static final MCRCategoryID ROLE_CLASSID = new MCRCategoryID(ROLE_ROOT_ID);
     static final String CATEG_LINK_TYPE = "mcr-user";
 
     private MCRUser2Constants() {

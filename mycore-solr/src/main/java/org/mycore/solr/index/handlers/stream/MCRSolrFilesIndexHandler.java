@@ -48,7 +48,7 @@ import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
  */
 public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRSolrFilesIndexHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     protected String mcrID;
 
@@ -83,7 +83,7 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
 
     protected void indexDerivate(MCRObjectID derivateID) throws IOException {
         MCRPath rootPath = MCRPath.getPath(derivateID.toString(), "/");
-        final MCRSolrIndexHandlerFactory ihf = MCRSolrIndexHandlerFactory.getInstance();
+        final MCRSolrIndexHandlerFactory ihf = MCRSolrIndexHandlerFactory.obtainInstance();
         final List<MCRSolrIndexHandler> subHandlerList = this.subHandlerList;
         Files.walkFileTree(rootPath, new SimpleFileVisitor<>() {
 

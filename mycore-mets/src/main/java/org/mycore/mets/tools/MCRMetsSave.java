@@ -105,7 +105,7 @@ public class MCRMetsSave {
 
     public static final String UNKNOWN_FILEGROUP = "UNKNOWN";
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRMetsSave.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * Saves the content of the given document to file and then adds the file to
@@ -498,7 +498,7 @@ public class MCRMetsSave {
      * @param derivate The {@link MCRDerivate} which contains the mets file
      */
     public static void updateMetsOnUrnGenerate(MCRDerivate derivate) {
-        if (MCRMarkManager.instance().isMarkedForDeletion(derivate)) {
+        if (MCRMarkManager.getInstance().isMarkedForDeletion(derivate)) {
             return;
         }
         try {
@@ -588,7 +588,7 @@ public class MCRMetsSave {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                     if (!file.getFileName().toString().equals(getMetsFileName())) {
-                        MCRPath mcrPath = MCRPath.toMCRPath(file);
+                        MCRPath mcrPath = MCRPath.ofPath(file);
                         String path;
                         try {
                             path = MCRXMLFunctions
@@ -690,7 +690,7 @@ public class MCRMetsSave {
      */
     public static List<MCRPath> listFiles(MCRPath path, Collection<MCRPath> ignore) throws IOException {
         try (Stream<Path> pathStream = Files.walk(path).filter(Files::isRegularFile)) {
-            return pathStream.map(MCRPath::toMCRPath)
+            return pathStream.map(MCRPath::ofPath)
                 .filter(MCRStreamUtils.not(ignore::contains))
                 .sorted()
                 .collect(Collectors.toList());
@@ -860,7 +860,7 @@ public class MCRMetsSave {
 
         private static List<String> getDerivateFiles(Stream<Path> pathStream) {
             return pathStream
-                .map(MCRPath::toMCRPath)
+                .map(MCRPath::ofPath)
                 .map(MCRPath::getOwnerRelativePath)
                 .map(path -> path.substring(1))
                 .filter(href -> !Objects.equals(href, "mets.xml"))

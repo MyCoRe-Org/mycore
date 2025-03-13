@@ -138,26 +138,31 @@ public final class MCRURIResolver implements URIResolver {
 
     private static final String ELEMENT_NULL = "null";
 
-    private static Map<String, URIResolver> supportedSchemes;
+    private Map<String, URIResolver> supportedSchemes;
 
-    private static MCRResolverProvider extResolver;
+    private MCRResolverProvider extResolver;
 
-    private static MCRURIResolver singleton;
+    private static final MCRURIResolver SHARED_INSTANCE = new MCRURIResolver();
 
-    private static ServletContext context;
+    public MCRURIResolver() {
+        reinitialize();
+    }
 
-    static {
+    public void reinitialize() {
         try {
-            reInit();
-            singleton = new MCRURIResolver();
+            extResolver = getExternalResolverProvider();
+            supportedSchemes = Collections.unmodifiableMap(getResolverMapping());
         } catch (Exception exc) {
             LOGGER.error("Unable to initialize MCRURIResolver", exc);
         }
     }
-
+    
+    /**
+     * @deprecated Use {@link MCRURIResolver#reinitialize()} instead
+     */
+    @Deprecated
     public static void reInit() {
-        extResolver = getExternalResolverProvider();
-        supportedSchemes = Collections.unmodifiableMap(getResolverMapping());
+        obtainInstance().reinitialize();
     }
 
     private static MCRResolverProvider getExternalResolverProvider() {
@@ -183,12 +188,17 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     /**
-     * Returns the MCRURIResolver singleton
+     * @deprecated Use {@link #obtainInstance()} instead
      */
+    @Deprecated
     public static MCRURIResolver instance() {
-        return singleton;
+        return obtainInstance();
     }
 
+    public static MCRURIResolver obtainInstance() {
+        return SHARED_INSTANCE;
+    }
+    
     /**
      * Initializes the MCRURIResolver for servlet applications.
      *
@@ -196,7 +206,6 @@ public final class MCRURIResolver implements URIResolver {
      *            the servlet context of this web application
      */
     public static synchronized void init(ServletContext ctx) {
-        context = ctx;
     }
 
     public static Map<String, String> getParameterMap(String key) {
@@ -219,12 +228,8 @@ public final class MCRURIResolver implements URIResolver {
             .orElse(URI.create(href));
     }
 
-    public static ServletContext getServletContext() {
-        return context;
-    }
-
     @SuppressWarnings("PMD.AvoidDuplicateLiterals")
-    private static Map<String, URIResolver> getResolverMapping() {
+    private Map<String, URIResolver> getResolverMapping() {
         final Map<String, URIResolver> extResolverMapping = extResolver.getURIResolverMapping();
         extResolverMapping.putAll(new MCRModuleResolverProvider().getURIResolverMapping());
         // set Map to final size with loadfactor: full
@@ -329,7 +334,7 @@ public final class MCRURIResolver implements URIResolver {
             return resolved;
         } else { // try to handle as URL, use default resolver for file:// and
             try {
-                InputSource entity = MCREntityResolver.instance().resolveEntity(null, href);
+                InputSource entity = MCREntityResolver.getInstance().resolveEntity(null, href);
                 if (entity != null) {
                     LOGGER.debug("Resolved via EntityResolver: {}", entity::getSystemId);
                     return new MCRLazyStreamSource(entity::getByteStream, entity.getSystemId());
@@ -398,7 +403,7 @@ public final class MCRURIResolver implements URIResolver {
         }
         MCRSourceContent content;
         try {
-            content = MCRSourceContent.getInstance(uri);
+            content = MCRSourceContent.createInstance(uri);
             return content == null ? null : content.asXML().getRootElement().detach();
         } catch (Exception e) {
             throw new MCRException("Error while resolving " + uri, e);
@@ -546,7 +551,7 @@ public final class MCRURIResolver implements URIResolver {
 
             MCRObjectID mcrid = MCRObjectID.getInstance(id);
             try {
-                MCRXMLMetadataManager xmlmm = MCRXMLMetadataManager.instance();
+                MCRXMLMetadataManager xmlmm = MCRXMLMetadataManager.getInstance();
                 MCRContent content = params.containsKey("r")
                     ? xmlmm.retrieveContent(mcrid, params.get("r"))
                     : xmlmm.retrieveContent(mcrid);
@@ -601,7 +606,7 @@ public final class MCRURIResolver implements URIResolver {
                     } catch (SAXException | ParserConfigurationException e) {
                         throw new TransformerException(e);
                     }
-                    reader.setEntityResolver(MCREntityResolver.instance());
+                    reader.setEntityResolver(MCREntityResolver.getInstance());
                     InputSource input = new InputSource(resource.toString());
                     SAXSource saxSource = new SAXSource(reader, input);
                     LOGGER.debug("include stylesheet: {}", saxSource::getSystemId);
@@ -817,7 +822,7 @@ public final class MCRURIResolver implements URIResolver {
         }
 
         private static long getSystemLastModified() {
-            long xmlLastModified = MCRXMLMetadataManager.instance().getLastModified();
+            long xmlLastModified = MCRXMLMetadataManager.getInstance().getLastModified();
             long classLastModified = dao.getLastModified();
             return Math.max(xmlLastModified, classLastModified);
         }
@@ -907,7 +912,7 @@ public final class MCRURIResolver implements URIResolver {
                 if (!categ.isEmpty()) {
                     cl = dao.getCategory(new MCRCategoryID(classID, categ), levels);
                 } else {
-                    cl = dao.getCategory(MCRCategoryID.rootID(classID), levels);
+                    cl = dao.getCategory(new MCRCategoryID(classID), levels);
                 }
             } else if (axis.equals("parents")) {
                 if (categ.isEmpty()) {
@@ -1132,11 +1137,13 @@ public final class MCRURIResolver implements URIResolver {
                 }
 
                 // prepare transformer
-                String[] stylesheets = augmentStylesheetsPaths(stylesheetPaths.split(","), flavor.xslFolder);
-                MCRXSLTransformer transformer = MCRXSLTransformer.getInstance(flavor.transformerFactory, stylesheets);
+                String[] stylesheets = augmentStylesheetsPaths(stylesheetPaths.split(","),
+                    flavor.xslFolder);
+                MCRXSLTransformer transformer = MCRXSLTransformer.obtainInstance(flavor.transformerFactory,
+                    stylesheets);
 
                 //prepare parameter collector
-                MCRParameterCollector parameterCollector = MCRParameterCollector.getInstanceFromUserSession();
+                MCRParameterCollector parameterCollector = MCRParameterCollector.ofCurrentSession();
                 parameterCollector.setParameters(getParameterMap(parameters));
 
                 // perform transformation
@@ -1199,7 +1206,7 @@ public final class MCRURIResolver implements URIResolver {
                     MCRContentTransformer transformer = factory.getTransformer(transformerId);
                     MCRContent result;
                     if (transformer instanceof MCRParameterizedTransformer parameterizedTransformer) {
-                        MCRParameterCollector paramcollector = MCRParameterCollector.getInstanceFromUserSession();
+                        MCRParameterCollector paramcollector = MCRParameterCollector.ofCurrentSession();
                         paramcollector.setParameters(params);
                         result = parameterizedTransformer.transform(content, paramcollector);
                     } else {
@@ -1529,7 +1536,7 @@ public final class MCRURIResolver implements URIResolver {
             String id = href.substring(href.indexOf(':') + 1);
             LOGGER.debug("Reading version info of MCRObject with ID {}", id);
             MCRObjectID mcrId = MCRObjectID.getInstance(id);
-            MCRXMLMetadataManager metadataManager = MCRXMLMetadataManager.instance();
+            MCRXMLMetadataManager metadataManager = MCRXMLMetadataManager.getInstance();
             try {
                 List<? extends MCRAbstractMetadataVersion<?>> versions = metadataManager.listRevisions(mcrId);
                 if (versions != null && !versions.isEmpty()) {
@@ -1584,7 +1591,7 @@ public final class MCRURIResolver implements URIResolver {
             MCRObjectID mcrId = MCRObjectID.getInstance(parts[parts.length - 1]);
             LOGGER.info("Resolving deleted object {}", mcrId);
             try {
-                MCRContent lastPresentVersion = MCRXMLMetadataManager.instance().retrieveContent(mcrId);
+                MCRContent lastPresentVersion = MCRXMLMetadataManager.getInstance().retrieveContent(mcrId);
                 if (lastPresentVersion == null) {
                     LOGGER.warn("Could not resolve deleted object {}", mcrId);
                     return new JDOMSource(MCRObjectFactory.getSampleObject(mcrId));
@@ -1638,7 +1645,7 @@ public final class MCRURIResolver implements URIResolver {
             String propertyName = "MCR.URIResolver.redirect." + configsuffix;
             String propValue = MCRConfiguration2.getStringOrThrow(propertyName);
             LOGGER.info("Redirect {} to {}", href, propValue);
-            return singleton.resolve(propValue, base);
+            return SHARED_INSTANCE.resolve(propValue, base);
         }
     }
 

@@ -85,7 +85,15 @@ public class MCRObjectStaticContentGenerator {
         this.configID = configID;
     }
 
+    /**
+     * @deprecated Use {@link #obtainInstance(String)} instead
+     */
+    @Deprecated
     static MCRObjectStaticContentGenerator get(String id) {
+        return obtainInstance(id);
+    }
+
+    static MCRObjectStaticContentGenerator obtainInstance(String id) {
         try {
             return MCRConfiguration2.getString(CONFIG_ID_PREFIX + id + CLASS_SUFFIX)
                 .map(c -> {
@@ -96,7 +104,7 @@ public class MCRObjectStaticContentGenerator {
                     }
                 }).orElse(MCRObjectStaticContentGenerator.class).getDeclaredConstructor(String.class).newInstance(id);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException
-            | NoSuchMethodException e) {
+                 | NoSuchMethodException e) {
             throw new MCRException(e);
         }
     }

@@ -31,7 +31,7 @@ import org.apache.logging.log4j.Logger;
 
 public abstract class Selection {
 
-    private static final Logger LOGGER = LogManager.getLogger(Selection.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * @return a List of all Pixel wich contains this selection

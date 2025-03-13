@@ -65,7 +65,7 @@ public final class MCRUserInformationResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRUserInformationResolver INSTANCE = instantiate();
+    private static final MCRUserInformationResolver SHARED_INSTANCE = createInstance();
 
     public static final String RESOLVER_PROPERTY = "MCR.UserInformation.Resolver";
 
@@ -82,11 +82,27 @@ public final class MCRUserInformationResolver {
 
     }
 
+    /**
+     * @deprecated Use {@link #obtainInstance()} instead
+     */
+    @Deprecated
     public static MCRUserInformationResolver instance() {
-        return INSTANCE;
+        return obtainInstance();
     }
 
+    public static MCRUserInformationResolver obtainInstance() {
+        return SHARED_INSTANCE;
+    }
+
+    /**
+     * @deprecated Use {@link #createInstance()} instead
+     */
+    @Deprecated
     public static MCRUserInformationResolver instantiate() {
+        return createInstance();
+    }
+
+    public static MCRUserInformationResolver createInstance() {
         String classProperty = RESOLVER_PROPERTY + ".Class";
         return MCRConfiguration2.getInstanceOfOrThrow(MCRUserInformationResolver.class, classProperty);
     }

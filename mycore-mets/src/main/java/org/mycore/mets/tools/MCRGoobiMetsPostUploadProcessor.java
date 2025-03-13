@@ -35,7 +35,7 @@ public class MCRGoobiMetsPostUploadProcessor extends MCRPostUploadFileProcessor 
     private final MCRXSLTransformer goobiMetsTransformer;
 
     public MCRGoobiMetsPostUploadProcessor() {
-        goobiMetsTransformer = MCRXSLTransformer.getInstance("xsl/goobi-mycore-mets.xsl");
+        goobiMetsTransformer = MCRXSLTransformer.obtainInstance("xsl/goobi-mycore-mets.xsl");
     }
 
     @Override

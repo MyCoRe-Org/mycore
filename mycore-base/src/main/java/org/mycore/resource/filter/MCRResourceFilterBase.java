@@ -35,7 +35,7 @@ import org.mycore.common.log.MCRTreeMessage;
  */
 public abstract class MCRResourceFilterBase implements MCRResourceFilter {
 
-    private final Logger logger = LogManager.getLogger();
+    protected final Logger logger = LogManager.getLogger(getClass());
 
     @Override
     public Stream<URL> filter(Stream<URL> resourceUrls, MCRHints hints) {
@@ -53,10 +53,6 @@ public abstract class MCRResourceFilterBase implements MCRResourceFilter {
             logger.debug("Keeping resource URL {}", resourceUrl);
         }
         return resourceUrls;
-    }
-
-    protected final Logger getLogger() {
-        return logger;
     }
 
     protected abstract Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints);

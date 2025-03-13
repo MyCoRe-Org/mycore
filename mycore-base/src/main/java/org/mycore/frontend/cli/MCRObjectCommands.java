@@ -123,7 +123,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         "export object {0} to directory {1} with stylesheet {2}";
 
     /** The logger */
-    private static final Logger LOGGER = LogManager.getLogger(MCRObjectCommands.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** Default transformer script */
     public static final String DEFAULT_STYLE = "save-object.xsl";
@@ -157,7 +157,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             .compile(xPath, Filters.fpassthrough(), null, MCRConstants.getStandardNamespaces());
 
         List<String> selectedObjectIds = MCRXMLMetadataManager
-            .instance()
+            .getInstance()
             .listIDs()
             .stream()
             .filter(id -> !id.contains("_derivate_"))
@@ -187,7 +187,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     private static void fillWithDescendants(String mcrObjID, List<String> descendants) {
         descendants.add(mcrObjID);
         //add child objects
-        for (String childID : MCRLinkTableManager.instance().getSourceOf(mcrObjID,
+        for (String childID : MCRLinkTableManager.getInstance().getSourceOf(mcrObjID,
             MCRLinkTableManager.ENTRY_TYPE_PARENT)) {
             descendants.add(childID);
             fillWithDescendants(childID, descendants);
@@ -219,7 +219,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "Removes all MCRObjects in topological order.",
         order = 25)
     public static List<String> deleteTopologicalAllObjects() {
-        final List<String> objectIds = MCRXMLMetadataManager.instance().listIDs();
+        final List<String> objectIds = MCRXMLMetadataManager.getInstance().listIDs();
         String[] objects = objectIds.stream().filter(id -> !id.contains("_derivate_")).toArray(String[]::new);
         MCRTopologicalSort<String> ts = new MCRTopologicalSort<>();
         MCRTopologicalSort.prepareMCRObjects(ts, objects);
@@ -240,7 +240,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "Checks if there are circular dependencies in the parent child relationships of MCRObjects.",
         order = 25)
     public static void checkForCircles() {
-        final List<String> objectIds = MCRXMLMetadataManager.instance().listIDs();
+        final List<String> objectIds = MCRXMLMetadataManager.getInstance().listIDs();
         String[] objects = objectIds.stream().filter(id -> !id.contains("_derivate_")).toArray(String[]::new);
         MCRTopologicalSort<String> ts = new MCRTopologicalSort<>();
         MCRTopologicalSort.prepareMCRObjects(ts, objects);
@@ -734,7 +734,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             "with the stylesheet {2}-object.xsl. For {2}, the default is xsl/save.",
         order = 120)
     public static List<String> exportAllObjectsOfTypeWithStylesheet(String type, String dirname, String style) {
-        List<String> objectIds = MCRXMLMetadataManager.instance().listIDsOfType(type);
+        List<String> objectIds = MCRXMLMetadataManager.getInstance().listIDsOfType(type);
         return buildExportCommands(new File(dirname), style, objectIds);
     }
 
@@ -756,7 +756,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             "with the stylesheet {2}-object.xsl. For {2}, the default is xsl/save.",
         order = 130)
     public static List<String> exportAllObjectsOfBaseWithStylesheet(String base, String dirname, String style) {
-        List<String> objectIds = MCRXMLMetadataManager.instance().listIDsForBase(base);
+        List<String> objectIds = MCRXMLMetadataManager.getInstance().listIDsForBase(base);
         return buildExportCommands(new File(dirname), style, objectIds);
     }
 
@@ -816,7 +816,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         MCRContent content;
         try {
             // if object doesn't exist - no exception is caught!
-            content = MCRXMLMetadataManager.instance().retrieveContent(MCRObjectID.getInstance(nid));
+            content = MCRXMLMetadataManager.getInstance().retrieveContent(MCRObjectID.getInstance(nid));
         } catch (MCRException ex) {
             return false;
         }
@@ -915,7 +915,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         MCRObjectID mcrId = MCRObjectID.getInstance(id);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ROOT);
         try {
-            List<? extends MCRAbstractMetadataVersion<?>> revisions = MCRXMLMetadataManager.instance()
+            List<? extends MCRAbstractMetadataVersion<?>> revisions = MCRXMLMetadataManager.getInstance()
                 .listRevisions(mcrId);
             LOGGER.info(() -> {
                 StringBuilder log = new StringBuilder("Revisions:\n");
@@ -1037,20 +1037,20 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         if (xslFile.exists()) {
             xslSource = new StreamSource(xslFile);
         } else {
-            xslSource = MCRURIResolver.instance().resolve(xslFilePath, null);
+            xslSource = MCRURIResolver.obtainInstance().resolve(xslFilePath, null);
             if (xslSource == null) {
                 xslSource = new StreamSource(xslFilePath);
             }
         }
         MCRSourceContent style = new MCRSourceContent(xslSource);
         MCRObjectID mcrId = MCRObjectID.getInstance(objectId);
-        Document document = MCRXMLMetadataManager.instance().retrieveXML(mcrId);
+        Document document = MCRXMLMetadataManager.getInstance().retrieveXML(mcrId);
         // do XSL transform
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        transformerFactory.setErrorListener(MCRErrorListener.getInstance());
-        transformerFactory.setURIResolver(MCRURIResolver.instance());
+        transformerFactory.setErrorListener(new MCRErrorListener());
+        transformerFactory.setURIResolver(MCRURIResolver.obtainInstance());
         XMLReader xmlReader = MCRXMLParserFactory.getNonValidatingParser().getXMLReader();
-        xmlReader.setEntityResolver(MCREntityResolver.instance());
+        xmlReader.setEntityResolver(MCREntityResolver.getInstance());
         SAXSource styleSource = new SAXSource(xmlReader, style.getInputSource());
         Transformer transformer = transformerFactory.newTransformer(styleSource);
         for (Entry<String, String> property : MCRConfiguration2.getPropertiesMap().entrySet()) {
@@ -1182,7 +1182,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             LOGGER.error("Base ID missed for check derivate entries in objects for base {0}");
             return;
         }
-        MCRXMLMetadataManager mgr = MCRXMLMetadataManager.instance();
+        MCRXMLMetadataManager mgr = MCRXMLMetadataManager.getInstance();
         List<String> idList = mgr.listIDsForBase(baseId);
         int counter = 0;
         int maxresults = idList.size();
@@ -1288,7 +1288,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         // MCRMetadataManager -> retrieveMCRObject() -> MCRObject.createXML already validates the contents
         // we need to offer transformation first though, so manual talking to MCRXMLMetadataManager
         // for the object contents, then manually using a validating XML parser later
-        MCRXMLMetadataManager mgr = MCRXMLMetadataManager.instance();
+        MCRXMLMetadataManager mgr = MCRXMLMetadataManager.getInstance();
         Document doc;
         try {
             doc = mgr.retrieveXML(objID);
@@ -1397,7 +1397,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "Creates a cache for all object ids in the configuration directory.",
         order = 175)
     public static void createObjectIDCache() {
-        MCRXMLMetadataManager metadataManager = MCRXMLMetadataManager.instance();
+        MCRXMLMetadataManager metadataManager = MCRXMLMetadataManager.getInstance();
         metadataManager.getObjectBaseIds().forEach(id -> {
             LOGGER.info("Creating cache for base {}", id);
             int highestStoredID = metadataManager.getHighestStoredID(id);
@@ -1458,7 +1458,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "Rebuilds (remove/create) all entries of the link href table for the given object id.",
         order = 188)
     public static void rebuildMCRLinkHrefTableForObject(String objectId) {
-        MCRLinkTableManager.instance().update(MCRObjectID.getInstance(objectId));
+        MCRLinkTableManager.getInstance().update(MCRObjectID.getInstance(objectId));
     }
 
     @MCRCommand(syntax = "clear object export transformer cache",

@@ -91,7 +91,7 @@ public class MCRMailer extends MCRServlet {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRMailer.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String DELIMITER = "\n--------------------------------------\n";
 
@@ -514,8 +514,8 @@ public class MCRMailer extends MCRServlet {
         throws Exception {
         MCRJDOMContent source = new MCRJDOMContent(input);
         final String xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
-        MCRXSL2XMLTransformer transformer = MCRXSL2XMLTransformer.getInstance(xslFolder + "/" + stylesheet + ".xsl");
-        MCRParameterCollector parameterCollector = MCRParameterCollector.getInstanceFromUserSession();
+        MCRXSL2XMLTransformer transformer = MCRXSL2XMLTransformer.obtainInstance(xslFolder + "/" + stylesheet + ".xsl");
+        MCRParameterCollector parameterCollector = MCRParameterCollector.ofCurrentSession();
         parameterCollector.setParameters(parameters);
         MCRContent result = transformer.transform(source, parameterCollector);
         return result.asXML();

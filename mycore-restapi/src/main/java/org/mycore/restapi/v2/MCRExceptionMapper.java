@@ -68,7 +68,7 @@ public class MCRExceptionMapper implements ExceptionMapper<Exception> {
     }
 
     private static Response getResponse(Exception e, int statusCode) {
-        MCRErrorResponse response = MCRErrorResponse.fromStatus(statusCode)
+        MCRErrorResponse response = MCRErrorResponse.ofStatusCode(statusCode)
             .withCause(e)
             .withMessage(e.getMessage())
             .withDetail(Optional.of(e)

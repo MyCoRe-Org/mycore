@@ -38,7 +38,7 @@ import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import jakarta.servlet.http.HttpServletRequest;
 
 public class MCRSolrQueryAdapter implements MCRQueryAdapter {
-    private static final Logger LOGGER = LogManager.getLogger(MCRSolrQueryAdapter.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private String fieldName;
 
@@ -84,7 +84,7 @@ public class MCRSolrQueryAdapter implements MCRQueryAdapter {
         QueryResponse queryResponse;
         try {
             QueryRequest queryRequest = new QueryRequest(solrQuery);
-            MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
+            MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
                 MCRSolrAuthenticationLevel.SEARCH);
             queryResponse = queryRequest.process(MCRSolrCoreManager.getMainSolrClient());
         } catch (SolrServerException | IOException e) {

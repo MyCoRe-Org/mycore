@@ -57,6 +57,7 @@ import jakarta.inject.Singleton;
  *
  * @author Sebastian Hofmann
  */
+@SuppressWarnings("PMD.SingleMethodSingleton")
 class MCRConfigurableInstanceHelper {
 
     private static final ConcurrentMap<Class<?>, ClassInfo<?>> INFOS = new ConcurrentHashMap<>();
@@ -386,6 +387,7 @@ class MCRConfigurableInstanceHelper {
 
         }
 
+        @SuppressWarnings("PMD.SingletonClassReturningNewInstance")
         public T getInstance(MCRInstanceConfiguration configuration) {
             T instance = factory.get();
             for (Injector<T, ?> injector : injectors) {

@@ -41,7 +41,7 @@ import org.mycore.datamodel.metadata.MCRObjectService;
  */
 public class MCRXMLMetadataEventHandler extends MCREventHandlerBase {
 
-    static MCRXMLMetadataManager metaDataManager = MCRXMLMetadataManager.instance();
+    static MCRXMLMetadataManager metaDataManager = MCRXMLMetadataManager.getInstance();
 
     /**
      * This method add the data to SQL table of XML data via MCRXMLMetadataManager.

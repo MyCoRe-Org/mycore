@@ -92,10 +92,18 @@ public class MCRProperties extends Properties {
     }
 
     /**
+     * @deprecated Use {@link #ofProperties(Properties)} instead
+     */
+    @Deprecated
+    public static MCRProperties copy(Properties properties) {
+        return ofProperties(properties);
+    }
+
+    /**
      * Creates a new <code>MCRProperties</code> instance with the values
      * of the given properties.
      */
-    public static MCRProperties copy(Properties properties) {
+    public static MCRProperties ofProperties(Properties properties) {
         MCRProperties p = new MCRProperties();
         p.putAll(properties);
         return p;

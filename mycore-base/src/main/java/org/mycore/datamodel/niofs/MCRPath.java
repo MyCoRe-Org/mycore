@@ -85,7 +85,15 @@ public abstract class MCRPath implements Path {
         initNameComponents();
     }
 
+    /**
+     * @deprecated Use {@link #ofPath(Path)} instead
+     */
+    @Deprecated
     public static MCRPath toMCRPath(final Path other) {
+        return ofPath(other);
+    }
+
+    public static MCRPath ofPath(final Path other) {
         Objects.requireNonNull(other);
         if (!(other instanceof MCRPath)) {
             throw new ProviderMismatchException("other is not an instance of MCRPath: " + other.getClass());
@@ -95,7 +103,7 @@ public abstract class MCRPath implements Path {
 
     public static MCRPath getPath(String owner, String path) {
         Path resolved = MCRPaths.getPath(owner, path);
-        return toMCRPath(resolved);
+        return ofPath(resolved);
     }
 
     /**
@@ -517,7 +525,7 @@ public abstract class MCRPath implements Path {
         if (isAbsolute() != other.isAbsolute()) {
             throw new IllegalArgumentException("'other' must be absolute if and only if this is absolute, too.");
         }
-        final MCRPath that = toMCRPath(other);
+        final MCRPath that = ofPath(other);
         if (!isAbsolute() && isEmpty()) {
             return that;
         }

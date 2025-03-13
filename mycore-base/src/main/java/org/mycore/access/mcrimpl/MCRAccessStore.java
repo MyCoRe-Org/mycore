@@ -42,14 +42,12 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
  * @author Arne Seifert
  */
 public abstract class MCRAccessStore {
-    private static final Logger LOGGER = LogManager.getLogger(MCRAccessStore.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     protected static final String SQL_DATEFORMAT = "yyyy-MM-dd HH:mm:ss";
 
     protected static final String ACCESS_POOLS = MCRConfiguration2.getString("MCR.AccessPools")
         .orElse("read,write,delete");
-
-    private static volatile MCRAccessStore implementation;
 
     public abstract String getRuleID(String objID, String acPool);
 
@@ -77,16 +75,17 @@ public abstract class MCRAccessStore {
      */
     public abstract Collection<String> getDistinctStringIDs();
 
+
+    /**
+     * @deprecated Use {@link #obtainInstance()} instead
+     */
+    @Deprecated
     public static MCRAccessStore getInstance() {
-        if (implementation == null) {
-            synchronized (MCRAccessStore.class) {
-                if(implementation == null) {
-                    implementation = MCRConfiguration2.getSingleInstanceOfOrThrow(
-                        MCRAccessStore.class, "MCR.Persistence.Access.Store.Class");
-                }
-            }
-        }
-        return implementation;
+        return obtainInstance();
+    }
+
+    public static MCRAccessStore obtainInstance() {
+        return LazyInstanceHolder.SHARED_INSTANCE;
     }
 
     public static Collection<String> getPools() {
@@ -104,13 +103,13 @@ public abstract class MCRAccessStore {
     public Collection<MCRAccessDefinition> getDefinition(String type) {
         try {
             Map<String, Collection<String>> sqlDefinition = new HashMap<>();
-            Collection<String> pools = getInstance().getDatabasePools();
+            Collection<String> pools = obtainInstance().getDatabasePools();
             //merge pools
             pools.removeAll(getPools());
             pools.addAll(getPools());
 
             for (String pool : pools) {
-                sqlDefinition.put(pool, getInstance().getMappedObjectId(pool));
+                sqlDefinition.put(pool, obtainInstance().getMappedObjectId(pool));
             }
 
             Collection<MCRAccessDefinition> ret = new ArrayList<>();
@@ -118,7 +117,7 @@ public abstract class MCRAccessStore {
             MCRAccessDefinition def = null;
 
             if (MCRConfiguration2.getOrThrow("MCR.Metadata.Type." + type, Boolean::parseBoolean)) {
-                elements = MCRXMLMetadataManager.instance().listIDsOfType(type);
+                elements = MCRXMLMetadataManager.getInstance().listIDsOfType(type);
             } else {
                 return Collections.emptySet();
             }
@@ -145,7 +144,7 @@ public abstract class MCRAccessStore {
 
     public Collection<MCRAccessDefinition> getRules(String objid) {
         try {
-            Collection<String> pools = getInstance().getDatabasePools();
+            Collection<String> pools = obtainInstance().getDatabasePools();
             //merge pools
             pools.removeAll(getPools());
             pools.addAll(getPools());
@@ -161,6 +160,11 @@ public abstract class MCRAccessStore {
             LOGGER.error("definition loading failed: ");
             return null;
         }
+    }
+
+    private static final class LazyInstanceHolder {
+        public static final MCRAccessStore SHARED_INSTANCE = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRAccessStore.class, "MCR.Persistence.Access.Store.Class");
     }
 
 }

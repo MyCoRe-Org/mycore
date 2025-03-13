@@ -52,7 +52,7 @@ import jakarta.ws.rs.core.Response;
  */
 public class MCRWorksFetcher {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRWorksFetcher.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** The maximum number of works to fetch at once in a bulk request */
     private static final int BULK_FETCH_SIZE = MCRConfiguration2
@@ -153,7 +153,7 @@ public class MCRWorksFetcher {
 
         work.setMODS(mods);
         String sourceID = workXML.getAttributeValue("source");
-        work.setSource(MCRWorkSource.getInstance(sourceID));
+        work.setSource(MCRWorkSource.obtainInstance(sourceID));
     }
 
     /**

@@ -98,7 +98,7 @@ public class MCRSwordUtil {
 
     private static final int COPY_BUFFER_SIZE = 32 * 1024;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRSwordUtil.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static MCRDerivate createDerivate(String documentID)
         throws MCRPersistenceException, IOException, MCRAccessException {

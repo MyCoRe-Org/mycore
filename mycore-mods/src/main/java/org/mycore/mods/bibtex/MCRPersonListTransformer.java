@@ -35,7 +35,7 @@ import bibtex.dom.BibtexPersonList;
  */
 class MCRPersonListTransformer extends MCRFieldTransformer {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRPersonListTransformer.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private MCRPersonTransformer personTransformer;
 

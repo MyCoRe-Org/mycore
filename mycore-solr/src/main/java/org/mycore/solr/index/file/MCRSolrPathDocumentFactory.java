@@ -43,14 +43,26 @@ import org.mycore.solr.index.handlers.stream.MCRSolrFilesIndexHandler;
  */
 public class MCRSolrPathDocumentFactory {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
     private static final String ACCUMULATOR_LIST_PROPERTY_NAME = SOLR_CONFIG_PREFIX + "Indexer.File.AccumulatorList";
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRSolrPathDocumentFactory.class);
+    private static final List<MCRSolrFileIndexAccumulator> ACCUMULATOR_LIST = resolveAccumulators();
 
-    private static MCRSolrPathDocumentFactory instance = MCRConfiguration2
+    private static final MCRSolrPathDocumentFactory SHARED_INSTANCE = MCRConfiguration2
         .getOrThrow(SOLR_CONFIG_PREFIX + "SolrInputDocument.Path.Factory", MCRConfiguration2::instantiateClass);
 
-    private static final List<MCRSolrFileIndexAccumulator> ACCUMULATOR_LIST = resolveAccumulators();
+    /**
+     * @deprecated Use {@link #obtainInstance()} instead
+     */
+    @Deprecated
+    public static MCRSolrPathDocumentFactory getSharedInstance() {
+        return obtainInstance();
+    }
+
+    public static MCRSolrPathDocumentFactory obtainInstance() {
+        return SHARED_INSTANCE;
+    }
 
     /**
      * @return a list of instances of class listet in {@link #ACCUMULATOR_LIST_PROPERTY_NAME}
@@ -82,10 +94,6 @@ public class MCRSolrPathDocumentFactory {
             })
             .filter(MCRSolrFileIndexAccumulator::isEnabled)
             .collect(Collectors.toList());
-    }
-
-    public static MCRSolrPathDocumentFactory getInstance() {
-        return instance;
     }
 
     /**

@@ -49,7 +49,7 @@ public class MCRLayoutServiceTarget implements MCREditorTarget {
             }
 
             MCRContent editedXML = new MCRJDOMContent(result);
-            MCRLayoutService.instance().doLayout(job.getRequest(), job.getResponse(), editedXML);
+            MCRLayoutService.obtainInstance().doLayout(job.getRequest(), job.getResponse(), editedXML);
             session.setBreakpoint("After handling target layout " + style);
         } else {
             session.setBreakpoint("After validation failed, target layout " + style);

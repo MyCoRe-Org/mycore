@@ -65,7 +65,7 @@ public class MCRMODSCSLTest extends MCRStoreTestCase {
         List<MCRContent> testContent = getTestContent();
         for (MCRContent content : testContent) {
             Document jdom = content.asXML();
-            MCRXMLMetadataManager.instance().create(MCRObjectID.getInstance(getIDFromContent(content)), jdom,
+            MCRXMLMetadataManager.getInstance().create(MCRObjectID.getInstance(getIDFromContent(content)), jdom,
                 new Date());
         }
     }

@@ -49,7 +49,7 @@ public final class MCRServletContentHelper {
 
     public static final String ATT_SERVE_CONTENT = MCRServletContentHelper.class.getName() + ".serveContent";
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRServletContentHelper.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private MCRServletContentHelper() {
     }

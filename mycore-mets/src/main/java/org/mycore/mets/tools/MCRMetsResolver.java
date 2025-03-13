@@ -47,7 +47,7 @@ import org.mycore.mets.model.MCRMETSGeneratorFactory;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRMetsResolver implements URIResolver {
-    private static final Logger LOGGER = LogManager.getLogger(MCRMetsResolver.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public Source resolve(String href, String base) throws TransformerException {
@@ -76,7 +76,7 @@ public class MCRMetsResolver implements URIResolver {
     }
 
     private String getDerivateFromObject(String id) {
-        Collection<String> derivates = MCRLinkTableManager.instance().getDestinationOf(id, "derivate");
+        Collection<String> derivates = MCRLinkTableManager.getInstance().getDestinationOf(id, "derivate");
         for (String derID : derivates) {
             if (MCRAccessManager.checkDerivateDisplayPermission(derID)) {
                 return derID;

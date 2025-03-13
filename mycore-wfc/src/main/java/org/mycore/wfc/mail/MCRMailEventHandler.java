@@ -48,7 +48,7 @@ import org.mycore.datamodel.niofs.MCRPathXML;
  */
 public class MCRMailEventHandler extends MCREventHandlerBase {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRMailEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private void sendNotificationMail(MCREvent evt, MCRContent doc, String description) throws Exception {
         LOGGER.info("Preparing mail for: {}", description);
@@ -81,7 +81,7 @@ public class MCRMailEventHandler extends MCREventHandlerBase {
         if (!(file instanceof MCRPath)) {
             return;
         }
-        MCRPath path = MCRPath.toMCRPath(file);
+        MCRPath path = MCRPath.ofPath(file);
         MCRContent xml;
         try {
             xml = new MCRJDOMContent(MCRPathXML.getFileXML(path, attrs));

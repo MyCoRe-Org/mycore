@@ -87,13 +87,21 @@ public class MCRConfigurationInputStream extends InputStream {
     }
 
     /**
-     * {@link InputStream} that includes all properties from {@link MCRRuntimeComponentDetector#getAllComponents()} and
-     * <strong>mycore.properties</strong>. Use system property <code>MCR.Configuration.File</code> to configure
-     * alternative property file.
-     *
-     * @since 2014.04
+     * @deprecated Use {@link #ofMyCoReProperties()} instead
      */
+    @Deprecated
     public static MCRConfigurationInputStream getMyCoRePropertiesInstance() throws IOException {
+        return ofMyCoReProperties();
+    }
+
+        /**
+         * {@link InputStream} that includes all properties from {@link MCRRuntimeComponentDetector#getAllComponents()}
+         * and <strong>mycore.properties</strong>. Use system property <code>MCR.Configuration.File</code> to configure
+         * alternative property file.
+         *
+         * @since 2014.04
+         */
+    public static MCRConfigurationInputStream ofMyCoReProperties() throws IOException {
         File configurationDirectory = MCRConfigurationDir.getConfigurationDirectory();
         InputStream initStream = null;
         if (configurationDirectory != null) {

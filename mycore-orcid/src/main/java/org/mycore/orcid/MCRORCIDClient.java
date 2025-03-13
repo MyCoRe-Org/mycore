@@ -18,11 +18,11 @@
 
 package org.mycore.orcid;
 
-import org.mycore.common.config.MCRConfiguration2;
-
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.WebTarget;
+
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * Utility class to work with the REST API of orcid.org.
@@ -33,20 +33,7 @@ import jakarta.ws.rs.client.WebTarget;
  */
 public final class MCRORCIDClient {
 
-    private static volatile MCRORCIDClient instance;
-
     private final WebTarget baseTarget;
-
-    public static MCRORCIDClient instance() {
-        if(instance == null) {
-            synchronized (MCRORCIDClient.class) {
-                if(instance == null) {
-                    instance = new MCRORCIDClient();
-                }
-            }
-        }
-        return instance;
-    }
 
     private MCRORCIDClient() {
         String baseURL = MCRConfiguration2.getStringOrThrow("MCR.ORCID.BaseURL");
@@ -54,7 +41,24 @@ public final class MCRORCIDClient {
         baseTarget = client.target(baseURL);
     }
 
+    /**
+     * @deprecated Use {@link #getInstance()} instead
+     */
+    @Deprecated
+    public static MCRORCIDClient instance() {
+        return getInstance();
+    }
+
+    public static MCRORCIDClient getInstance() {
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
+    }
+
     public WebTarget getBaseTarget() {
         return baseTarget;
     }
+
+    private static final class LazyInstanceHolder {
+        public static final MCRORCIDClient SINGLETON_INSTANCE = new MCRORCIDClient();
+    }
+
 }

@@ -81,11 +81,19 @@ import jakarta.xml.bind.annotation.XmlValue;
  */
 public class MCRUserAttributeMapper {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRUserAttributeMapper.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final Map<String, List<Attribute>> attributeMapping = new HashMap<>();
 
+    /**
+     * @deprecated Use {@link #createInstance(Element)} instead
+     */
+    @Deprecated
     public static MCRUserAttributeMapper instance(Element attributeMapping) {
+        return createInstance(attributeMapping);
+    }
+
+    public static MCRUserAttributeMapper createInstance(Element attributeMapping) {
         try {
             JAXBContext jaxb = JAXBContext.newInstance(Mappings.class.getPackage().getName(),
                 Thread.currentThread().getContextClassLoader());

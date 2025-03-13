@@ -76,7 +76,7 @@ public class MCRTileCombineServlet extends MCRServlet {
 
     private static final float QUALITY = 0.75f;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRTileCombineServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private transient ThreadLocal<ImageWriter> imageWriter = ThreadLocal.withInitial(
         () -> ImageIO.getImageWritersBySuffix("jpeg").next());

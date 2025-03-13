@@ -72,7 +72,7 @@ public class MCRTransferPackageFileContainer {
     private void createFileList() throws IOException {
         final MCRPath derRoot = MCRPath.getPath(this.derivateId.toString(), "/");
         try (Stream<Path> files = Files.find(derRoot, Integer.MAX_VALUE, (path, attr) -> attr.isRegularFile())) {
-            this.fileList = files.map(MCRPath::toMCRPath)
+            this.fileList = files.map(MCRPath::ofPath)
                 .sorted(Comparator.comparing(MCRPath::getNameCount)
                     .thenComparing(MCRPath::toString))
                 .collect(Collectors.toList());

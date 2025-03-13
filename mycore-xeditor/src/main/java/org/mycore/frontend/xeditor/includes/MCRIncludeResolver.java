@@ -97,7 +97,7 @@ public class MCRIncludeResolver implements URIResolver {
         
         // last, resolve the URI
         if (resolved == null) {
-            resolved = MCRURIResolver.instance().resolve(uri);
+            resolved = MCRURIResolver.obtainInstance().resolve(uri);
         }
 
         if (resolved != null) {

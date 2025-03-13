@@ -57,7 +57,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  *
  */
 public class MCRCreatorRuleStrategy implements MCRCombineableAccessCheckStrategy {
-    private static final Logger LOGGER = LogManager.getLogger(MCRCreatorRuleStrategy.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final List<String> SUBMITTED_CATEGORY_IDS = MCRConfiguration2
         .getString("MCR.Access.Strategy.SubmittedCategories")
@@ -121,7 +121,7 @@ public class MCRCreatorRuleStrategy implements MCRCombineableAccessCheckStrategy
             return false;
         }
         for (String categoryId : categoryIds) {
-            MCRCategoryID category = MCRCategoryID.fromString(categoryId);
+            MCRCategoryID category = MCRCategoryID.ofString(categoryId);
             if (LINK_SERVICE.isInCategory(reference, category)) {
                 return true;
             }

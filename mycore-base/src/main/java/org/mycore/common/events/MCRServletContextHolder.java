@@ -25,15 +25,23 @@ import jakarta.servlet.ServletContextListener;
 
 public final class MCRServletContextHolder implements ServletContextListener {
 
-    private static final MCRServletContextHolder SINGLETON = new MCRServletContextHolder();
+    private static final MCRServletContextHolder SINGLETON_INSTANCE = new MCRServletContextHolder();
 
     private Optional<ServletContext> context = Optional.empty();
 
     private MCRServletContextHolder() {
     }
 
+    /**
+     * @deprecated Use {@link #getInstance()} instead
+     */
+    @Deprecated
     public static MCRServletContextHolder instance() {
-        return SINGLETON;
+        return SINGLETON_INSTANCE;
+    }
+
+    public static MCRServletContextHolder getInstance() {
+        return SINGLETON_INSTANCE;
     }
 
     public Optional<ServletContext> get() {

@@ -31,18 +31,19 @@ import org.apache.xml.utils.WrappedRuntimeException;
  *
  */
 public final class MCRErrorListener implements ErrorListener {
-    private static final Logger LOGGER = LogManager.getLogger(MCRErrorListener.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private TransformerException exceptionThrown;
 
     private String lastMessage;
 
+    /**
+     * @deprecated Use {@code new MCRErrorListener()} instead
+     */
+    @Deprecated
+    @SuppressWarnings("PMD.SingletonClassReturningNewInstance")
     public static MCRErrorListener getInstance() {
         return new MCRErrorListener();
-    }
-
-    private MCRErrorListener() {
-        this.exceptionThrown = null;
     }
 
     public TransformerException getExceptionThrown() {

@@ -36,7 +36,7 @@ import jakarta.servlet.ServletContext;
 
 public class MCRSubselectReturnTarget implements MCREditorTarget {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRSubselectReturnTarget.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter)

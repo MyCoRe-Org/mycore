@@ -40,7 +40,7 @@ import org.mycore.mets.tools.MCRMetsSave;
  * @author shermann
  */
 public class MCRUpdateMetsOnDerivateChangeEventHandler extends MCREventHandlerBase {
-    private static final Logger LOGGER = LogManager.getLogger(MCRUpdateMetsOnDerivateChangeEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private String mets = MCRMetsSave.getMetsFileName();
 
@@ -62,7 +62,7 @@ public class MCRUpdateMetsOnDerivateChangeEventHandler extends MCREventHandlerBa
         if (fileName != null && fileName.toString().equals(mets)) {
             return false;
         }
-        MCRPath mcrPath = MCRPath.toMCRPath(file);
+        MCRPath mcrPath = MCRPath.ofPath(file);
         String derivateId = mcrPath.getOwner();
         // don't update if mets.xml does not exist
         if (Files.notExists(MCRPath.getPath(derivateId, '/' + mets))) {
@@ -71,7 +71,7 @@ public class MCRUpdateMetsOnDerivateChangeEventHandler extends MCREventHandlerBa
         // don't update if derivate or mycore object is marked for deletion
         MCRObjectID mcrDerivateId = MCRObjectID.getInstance(derivateId);
         MCRDerivate mcrDerivate = MCRMetadataManager.retrieveMCRDerivate(mcrDerivateId);
-        return !MCRMarkManager.instance().isMarkedForDeletion(mcrDerivate);
+        return !MCRMarkManager.getInstance().isMarkedForDeletion(mcrDerivate);
     }
 
     /* (non-Javadoc)
@@ -83,7 +83,7 @@ public class MCRUpdateMetsOnDerivateChangeEventHandler extends MCREventHandlerBa
         if (!checkUpdateMets(evt, file, attrs)) {
             return;
         }
-        MCRPath mcrPath = MCRPath.toMCRPath(file);
+        MCRPath mcrPath = MCRPath.ofPath(file);
         try {
             MCRMetsSave.updateMetsOnFileDelete(mcrPath);
         } catch (Exception e) {
@@ -96,7 +96,7 @@ public class MCRUpdateMetsOnDerivateChangeEventHandler extends MCREventHandlerBa
         if (!checkUpdateMets(evt, file, attrs)) {
             return;
         }
-        MCRPath mcrPath = MCRPath.toMCRPath(file);
+        MCRPath mcrPath = MCRPath.ofPath(file);
         try {
             MCRMetsSave.updateMetsOnFileAdd(mcrPath);
         } catch (Exception e) {

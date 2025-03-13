@@ -66,7 +66,7 @@ public final class MCRDOMUtils implements Closeable {
 
     private static DocumentBuilder resetDocumentBuilder(DocumentBuilder documentBuilder) {
         documentBuilder.reset();
-        documentBuilder.setEntityResolver(MCREntityResolver.instance());
+        documentBuilder.setEntityResolver(MCREntityResolver.getInstance());
         return documentBuilder;
     }
 

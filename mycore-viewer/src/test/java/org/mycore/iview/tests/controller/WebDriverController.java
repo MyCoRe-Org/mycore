@@ -37,7 +37,7 @@ public class WebDriverController {
 
     private WebDriver driver;
 
-    private static final Logger LOGGER = LogManager.getLogger(WebDriverController.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * @param driver

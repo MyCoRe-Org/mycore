@@ -39,7 +39,7 @@ import com.google.common.cache.LoadingCache;
  */
 public class MCRCreatorCache {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRCreatorCache.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final long CACHE_SIZE = 5000;
 
@@ -57,7 +57,7 @@ public class MCRCreatorCache {
                     return null;
                 }).orElseGet(() -> {
                     try {
-                        return Optional.ofNullable(MCRXMLMetadataManager.instance().listRevisions(objectId))
+                        return Optional.ofNullable(MCRXMLMetadataManager.getInstance().listRevisions(objectId))
                             .map(versions -> versions.stream()
                                 .sorted(
                                     Collections

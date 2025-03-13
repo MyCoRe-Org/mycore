@@ -88,7 +88,7 @@ import org.mycore.util.concurrent.MCRTransactionableCallable;
  */
 public class MCREnricher {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCREnricher.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String XPATH_HOST_SERIES = "mods:relatedItem[@type='host' or @type='series']";
 
@@ -148,7 +148,7 @@ public class MCREnricher {
         id2call = new HashMap<>();
         for (StringTokenizer st = new StringTokenizer(dsConfig, DELIMITERS, false); st.hasMoreTokens();) {
             String dataSourceID = st.nextToken();
-            MCRDataSource dataSource = MCRDataSourceFactory.instance().getDataSource(dataSourceID);
+            MCRDataSource dataSource = MCRDataSourceFactory.getInstance().getDataSource(dataSourceID);
             MCRDataSourceCall call = new MCRDataSourceCall(dataSource, idPool);
             id2call.put(dataSourceID, call);
         }

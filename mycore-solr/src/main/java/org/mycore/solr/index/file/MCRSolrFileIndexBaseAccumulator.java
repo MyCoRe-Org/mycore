@@ -49,9 +49,9 @@ import com.google.common.io.Files;
 
 public class MCRSolrFileIndexBaseAccumulator implements MCRSolrFileIndexAccumulator {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRSolrFileIndexBaseAccumulator.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRXMLMetadataManager XML_MANAGER = MCRXMLMetadataManager.instance();
+    private static final MCRXMLMetadataManager XML_MANAGER = MCRXMLMetadataManager.getInstance();
 
     private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.getInstance();
 
@@ -63,7 +63,7 @@ public class MCRSolrFileIndexBaseAccumulator implements MCRSolrFileIndexAccumula
         doc.setField("id", input.toUri().toString());
         String absolutePath = '/' + input.subpath(0, input.getNameCount()).toString();
         try {
-            MCRPath mcrPath = MCRPath.toMCRPath(input); //check if this is an MCRPath -> more metadata
+            MCRPath mcrPath = MCRPath.ofPath(input); //check if this is an MCRPath -> more metadata
             MCRObjectID mcrObjID = MCRMetadataManager.getObjectId(MCRObjectID.getInstance(mcrPath.getOwner()), 10,
                 TimeUnit.SECONDS);
             if (mcrObjID == null) {

@@ -81,7 +81,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
     private static final String X_PATH_MAPPING_CLASSIFICATIONS =
         MCRConfiguration2.getString("MCR.Category.XPathMapping.ClassIDs").orElse("");
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRClassificationMappingEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * Reads all {@link MCRClassificationMappingEventHandler#LABEL_LANG_X_MAPPING x-mappings} from a category.
@@ -96,7 +96,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
             final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
             String label = labelOptional.get().getText();
             return Stream.of(label.split("\\s"))
-                .map(MCRCategoryID::fromString)
+                .map(MCRCategoryID::ofString)
                 .filter(id -> !id.isRootID())
                 .filter(dao::exist)
                 .map(mappingTarget -> new AbstractMap.SimpleEntry<>(category.getId(), mappingTarget))

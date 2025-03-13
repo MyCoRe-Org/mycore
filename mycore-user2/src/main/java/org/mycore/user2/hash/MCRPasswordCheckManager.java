@@ -52,7 +52,7 @@ import org.mycore.common.config.annotation.MCRSentinel;
  * selected strategy or if the used strategy already marked it as deprecated.
  * <p>
  * A singular, globally available and centrally configured instance can be obtained with
- * {@link MCRPasswordCheckManager#instance()}. This instance is configured using the property prefix
+ * {@link MCRPasswordCheckManager#obtainInstance()}. This instance is configured using the property prefix
  * {@link MCRPasswordCheckManager#MANAGER_PROPERTY} and should be used in order to create or verify password hashes,
  * although custom instances can be created when necessary.
  * <p>
@@ -88,7 +88,7 @@ public final class MCRPasswordCheckManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRPasswordCheckManager INSTANCE = instantiate();
+    private static final MCRPasswordCheckManager INSTANCE = createInstance();
 
     public static final String MANAGER_PROPERTY = "MCR.User.PasswordCheck";
 
@@ -132,11 +132,27 @@ public final class MCRPasswordCheckManager {
 
     }
 
+    /**
+     * @deprecated Use {@link #obtainInstance()} instead
+     */
+    @Deprecated
     public static MCRPasswordCheckManager instance() {
+        return obtainInstance();
+    }
+
+    public static MCRPasswordCheckManager obtainInstance() {
         return INSTANCE;
     }
 
+    /**
+     * @deprecated Use {@link #createInstance()} instead
+     */
+    @Deprecated
     public static MCRPasswordCheckManager instantiate() {
+       return createInstance();
+    }
+
+    public static MCRPasswordCheckManager createInstance() {
         String classProperty = MANAGER_PROPERTY + ".Class";
         return MCRConfiguration2.getInstanceOfOrThrow(MCRPasswordCheckManager.class, classProperty);
     }

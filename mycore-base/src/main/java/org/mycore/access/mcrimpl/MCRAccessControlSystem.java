@@ -66,7 +66,7 @@ public final class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
     static Map<String, String> ruleIDTable = new ConcurrentHashMap<>();
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRAccessControlSystem.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private MCRAccessControlSystem() {
         String pools = MCRConfiguration2.getString("MCR.Access.AccessPermissions").orElse("read,write,delete");
@@ -75,8 +75,8 @@ public final class MCRAccessControlSystem extends MCRAccessBaseImpl {
             disabled = true;
         }
 
-        accessStore = MCRAccessStore.getInstance();
-        ruleStore = MCRRuleStore.getInstance();
+        accessStore = MCRAccessStore.obtainInstance();
+        ruleStore = MCRRuleStore.obtainInstance();
         dummyRule = new MCRAccessRule(null, null, null, null, "dummy rule, always true");
     }
 

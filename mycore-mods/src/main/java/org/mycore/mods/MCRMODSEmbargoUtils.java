@@ -49,7 +49,7 @@ public class MCRMODSEmbargoUtils {
 
     public static final String POOLPRIVILEGE_EMBARGO = "embargo";
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRMODSEmbargoUtils.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String EMPTY_VALUE = "";
 
@@ -58,7 +58,7 @@ public class MCRMODSEmbargoUtils {
     private static MCRCache<MCRObjectID, String> embargoCache = new MCRCache<>(CAPACITY, "MODS embargo filter cache");
 
     static {
-        MCREventManager.instance().addEventHandler(MCREvent.ObjectType.OBJECT, new MCREventHandlerBase() {
+        MCREventManager.getInstance().addEventHandler(MCREvent.ObjectType.OBJECT, new MCREventHandlerBase() {
             @Override
             protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
                 embargoCache.remove(obj.getId());
@@ -67,7 +67,7 @@ public class MCRMODSEmbargoUtils {
     }
 
     public static String getCachedEmbargo(final MCRObjectID objectId) {
-        MCRCache.ModifiedHandle modifiedHandle = MCRXMLMetadataManager.instance().getLastModifiedHandle(objectId, 10,
+        MCRCache.ModifiedHandle modifiedHandle = MCRXMLMetadataManager.getInstance().getLastModifiedHandle(objectId, 10,
             TimeUnit.MINUTES);
         String embargo = null;
         try {

@@ -45,7 +45,7 @@ public class MCRFile extends MCRStoredNode {
 
     private static final MCRDevNull DEV_NULL = new MCRDevNull();
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRFile.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * The md5 checksum of the empty file
@@ -165,7 +165,7 @@ public class MCRFile extends MCRStoredNode {
     @Override
     public MCRFileAttributes<String> getBasicFileAttributes() throws IOException {
         BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
-        return MCRDefaultFileAttributes.fromAttributes(attrs, new MCRMD5Digest(getMD5()));
+        return MCRDefaultFileAttributes.ofAttributes(attrs, new MCRMD5Digest(getMD5()));
     }
 
 }

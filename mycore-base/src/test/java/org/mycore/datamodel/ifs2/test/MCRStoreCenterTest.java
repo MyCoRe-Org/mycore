@@ -42,12 +42,12 @@ import com.google.common.jimfs.Jimfs;
 public class MCRStoreCenterTest {
     @Before
     public void init() {
-        MCRStoreCenter.instance().clear();
+        MCRStoreCenter.getInstance().clear();
     }
 
     @Test
     public void heapOp() throws Exception {
-        MCRStoreCenter storeHeap = MCRStoreCenter.instance();
+        MCRStoreCenter storeHeap = MCRStoreCenter.getInstance();
 
         FakeStoreConfig config = new FakeStoreConfig("heapOp");
         storeHeap.addStore(config.getID(), new FakeStore(config));
@@ -67,7 +67,7 @@ public class MCRStoreCenterTest {
 
     @Test(expected = MCRStoreAlreadyExistsException.class)
     public void addStoreTwice() throws Exception {
-        MCRStoreCenter storeHeap = MCRStoreCenter.instance();
+        MCRStoreCenter storeHeap = MCRStoreCenter.getInstance();
         FakeStoreConfig config = new FakeStoreConfig("addStoreTwice");
         FakeStore fakeStore = new FakeStore(config);
         storeHeap.addStore(config.getID(), fakeStore);

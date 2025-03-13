@@ -50,7 +50,7 @@ import org.mycore.frontend.xeditor.validation.MCRXEditorValidator;
  */
 public class MCREditorSession {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCREditorSession.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final Pattern PATTERN_URI = Pattern.compile("\\{\\$([^\\}]+)\\}");
 
@@ -208,7 +208,7 @@ public class MCREditorSession {
         }
 
         LOGGER.info("Reading edited XML from {}", uriRe);
-        Document xml = MCRSourceContent.getInstance(uriRe).asXML();
+        Document xml = MCRSourceContent.createInstance(uriRe).asXML();
         setEditedXML(xml);
         setBreakpoint("Reading XML from " + uriRe);
     }

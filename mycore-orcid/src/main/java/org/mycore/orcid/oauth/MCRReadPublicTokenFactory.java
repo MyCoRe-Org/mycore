@@ -37,7 +37,7 @@ import org.mycore.common.config.MCRConfigurationException;
  */
 public class MCRReadPublicTokenFactory {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRReadPublicTokenFactory.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String CONFIG_PROPERTY = "MCR.ORCID.OAuth.ReadPublicToken";
 
@@ -61,7 +61,7 @@ public class MCRReadPublicTokenFactory {
     private static void requestToken() {
         LOGGER.info("requesting read-public access token...");
 
-        MCRTokenRequest request = MCROAuthClient.instance().getTokenRequest();
+        MCRTokenRequest request = MCROAuthClient.getInstance().getTokenRequest();
         request.set("grant_type", "client_credentials");
         request.set("scope", "/read-public");
 

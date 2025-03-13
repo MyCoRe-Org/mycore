@@ -120,7 +120,7 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
             TEST_STATE_2,
             Stream.of(TEST_CATEGORY_2, TEST_CATEGORY_3).collect(Collectors.toList()));
 
-        instance = MCRObjectQueryResolver.getInstance();
+        instance = MCRObjectQueryResolver.obtainInstance();
     }
 
     public MCRObjectInfoEntity storeObjectInfo(String id,
@@ -139,7 +139,7 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
         infoEntity.setModifiedBy(modifiedBy);
         infoEntity.setState(state);
 
-        List<MCRCategoryID> linkedCategories = linkedCategoryIds.stream().map(MCRCategoryID::fromString)
+        List<MCRCategoryID> linkedCategories = linkedCategoryIds.stream().map(MCRCategoryID::ofString)
             .collect(Collectors.toList());
         MCRCategLinkReference objectReference = new MCRCategLinkReference(infoEntity.getId());
         CLS.setLinks(objectReference, linkedCategories);

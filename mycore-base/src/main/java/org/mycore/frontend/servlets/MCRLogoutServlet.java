@@ -42,7 +42,7 @@ public class MCRLogoutServlet extends HttpServlet {
 
     private static final String LOGOUT_REDIRECT_URL_PARAMETER = "url";
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRLogoutServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /* (non-Javadoc)
      * @see jakarta.servlet.http.HttpServlet#doGet(jakarta.servlet.http.HttpServletRequest, jakarta.servlet.http.HttpServletResponse)

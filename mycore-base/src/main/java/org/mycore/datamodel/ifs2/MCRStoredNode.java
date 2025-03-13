@@ -120,7 +120,7 @@ public abstract class MCRStoredNode extends MCRNode {
     public void delete() throws IOException {
         writeData(Element::detach);
         if (Files.isDirectory(path)) {
-            Files.walkFileTree(path, MCRRecursiveDeleter.instance());
+            Files.walkFileTree(path, new MCRRecursiveDeleter());
         } else {
             Files.deleteIfExists(path);
         }
@@ -249,7 +249,7 @@ public abstract class MCRStoredNode extends MCRNode {
 
     public MCRFileAttributes<String> getBasicFileAttributes() throws IOException {
         BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
-        return MCRDefaultFileAttributes.fromAttributes(attrs, null);
+        return MCRDefaultFileAttributes.ofAttributes(attrs, null);
     }
 
 }

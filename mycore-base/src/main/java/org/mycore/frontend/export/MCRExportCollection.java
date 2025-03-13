@@ -70,7 +70,7 @@ public class MCRExportCollection {
      * Adds XML data from the given URI.
      */
     public void add(String uri) {
-        add(MCRURIResolver.instance().resolve(uri));
+        add(MCRURIResolver.obtainInstance().resolve(uri));
     }
 
     /**

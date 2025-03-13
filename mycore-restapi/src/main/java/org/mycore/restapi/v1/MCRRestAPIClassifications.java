@@ -386,7 +386,7 @@ public class MCRRestAPIClassifications {
     }
 
     private MCRCategory getCategoryOrThrow(String classID) throws MCRRestAPIException {
-        MCRCategory category = DAO.getCategory(MCRCategoryID.rootID(classID), -1);
+        MCRCategory category = DAO.getCategory(new MCRCategoryID(classID), -1);
         if (category == null) {
             throw new MCRRestAPIException(Status.NOT_FOUND,
                 new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND, "Classification not found.",
@@ -526,7 +526,7 @@ public class MCRRestAPIClassifications {
             solrQuery.setRows(0);
             try {
                 QueryRequest queryRequest = new QueryRequest(solrQuery);
-                MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
+                MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
                     MCRSolrAuthenticationLevel.SEARCH);
                 QueryResponse response = queryRequest.process(solrClient);
                 SolrDocumentList solrResults = response.getResults();

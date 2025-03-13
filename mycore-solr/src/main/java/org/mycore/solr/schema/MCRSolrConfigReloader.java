@@ -223,7 +223,7 @@ public class MCRSolrConfigReloader {
             .header("Content-Type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(command.toString()));
 
-        MCRSolrAuthenticationManager.getInstance().applyAuthentication(requestBuilder,
+        MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(requestBuilder,
             MCRSolrAuthenticationLevel.ADMIN);
         String commandprefix = command.keySet().stream().findFirst().orElse("unknown command");
         try (HttpClient httpClient = MCRHttpUtils.getHttpClient()) {
@@ -266,7 +266,7 @@ public class MCRSolrConfigReloader {
     private static JsonObject retrieveCurrentSolrConfig(String coreURL) {
         HttpRequest.Builder solrRequestBuilder = MCRSolrUtils.getRequestBuilder()
             .uri(URI.create(coreURL + "/config"));
-        MCRSolrAuthenticationManager.getInstance().applyAuthentication(solrRequestBuilder,
+        MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(solrRequestBuilder,
             MCRSolrAuthenticationLevel.ADMIN);
         return getJSON(solrRequestBuilder.build());
     }
@@ -279,7 +279,7 @@ public class MCRSolrConfigReloader {
     private static JsonObject retrieveCurrentSolrConfigOverlay(String coreURL) {
         HttpRequest.Builder solrRequestBuilder = MCRSolrUtils.getRequestBuilder()
             .uri(URI.create(coreURL + "/config/overlay"));
-        MCRSolrAuthenticationManager.getInstance().applyAuthentication(solrRequestBuilder,
+        MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(solrRequestBuilder,
             MCRSolrAuthenticationLevel.ADMIN);
         return getJSON(solrRequestBuilder.build());
     }

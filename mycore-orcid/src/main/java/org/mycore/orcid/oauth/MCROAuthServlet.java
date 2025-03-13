@@ -55,7 +55,7 @@ public class MCROAuthServlet extends MCRServlet {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCROAuthServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private String scopes = MCRConfiguration2.getStringOrThrow("MCR.ORCID.OAuth.Scopes");
 
@@ -96,13 +96,13 @@ public class MCROAuthServlet extends MCRServlet {
 
     private void redirectToGetAuthorization(MCRServletJob job)
         throws URISyntaxException, IOException {
-        String url = MCROAuthClient.instance().getCodeRequestURL(redirectURL, scopes);
+        String url = MCROAuthClient.getInstance().getCodeRequestURL(redirectURL, scopes);
         job.getResponse().sendRedirect(url);
     }
 
     private MCRTokenResponse exchangeCodeForAccessToken(String code)
         throws JsonProcessingException, IOException {
-        MCRTokenRequest request = MCROAuthClient.instance().getTokenRequest();
+        MCRTokenRequest request = MCROAuthClient.getInstance().getTokenRequest();
         request.set("grant_type", "authorization_code");
         request.set("code", code);
         request.set("redirect_uri", redirectURL);

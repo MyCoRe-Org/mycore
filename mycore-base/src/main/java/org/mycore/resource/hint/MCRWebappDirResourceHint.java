@@ -34,6 +34,6 @@ public class MCRWebappDirResourceHint implements MCRHint<File> {
 
     @Override
     public Optional<File> value() {
-        return MCRServletContextHolder.instance().get().map(context -> context.getRealPath("/")).map(File::new);
+        return MCRServletContextHolder.getInstance().get().map(context -> context.getRealPath("/")).map(File::new);
     }
 }

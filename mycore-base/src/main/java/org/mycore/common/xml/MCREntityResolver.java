@@ -85,8 +85,16 @@ public final class MCREntityResolver implements EntityResolver2, LSResourceResol
         bytesCache = new MCRCache<>(cacheSize, "EntityResolver Resources");
     }
 
+    /**
+     * @deprecated Use {@link #getInstance()} instead
+     */
+    @Deprecated
     public static MCREntityResolver instance() {
-        return MCREntityResolverHolder.instance;
+        return getInstance();
+    }
+
+    public static MCREntityResolver getInstance() {
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     private static boolean isAbsoluteURL(String url) {
@@ -255,10 +263,6 @@ public final class MCREntityResolver implements EntityResolver2, LSResourceResol
         return is.newInputSource();
     }
 
-    private static final class MCREntityResolverHolder {
-        public static MCREntityResolver instance = new MCREntityResolver();
-    }
-
     private static class InputSourceProvider {
         byte[] bytes;
 
@@ -278,6 +282,10 @@ public final class MCREntityResolver implements EntityResolver2, LSResourceResol
     }
 
     private record CatalogEntityIdentifier(String publicId, String systemId) {
+    }
+
+    private static final class LazyInstanceHolder {
+        public static final MCREntityResolver SINGLETON_INSTANCE = new MCREntityResolver();
     }
 
 }

@@ -249,13 +249,6 @@
   <!--
   <rule ref="category/java/errorprone.xml/ProperCloneImplementation"/>
   -->
-  <rule ref="category/java/errorprone.xml/ProperLogger">
-    <properties>
-      <property name="staticLoggerName" value="LOGGER"/>
-      <property name="loggerName" value="logger"/>
-      <property name="loggerClass" value="org.apache.logging.log4j.Logger"/>
-    </properties>
-  </rule>
   <!-- to be evaluated -->
   <!-- TODO: Create PR to fix this rule -->
   <!--
@@ -263,14 +256,8 @@
   -->
   <rule ref="category/java/errorprone.xml/ReturnFromFinallyBlock"/>
   <rule ref="category/java/errorprone.xml/SimpleDateFormatNeedsLocale"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/errorprone.xml/SingleMethodSingleton"/>
-  -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/errorprone.xml/SingletonClassReturningNewInstance"/>
-  -->
   <rule ref="category/java/errorprone.xml/StringBufferInstantiationWithChar"/>
   <!-- TODO: Create PR to fix this rule -->
   <!--

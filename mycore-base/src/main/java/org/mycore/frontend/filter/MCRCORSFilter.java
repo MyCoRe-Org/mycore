@@ -51,15 +51,11 @@ public class MCRCORSFilter implements Filter {
 
     private static final String CORS_FILTER_NAME = "corsFilterSuffix";
 
-    private static final Logger LOGGER;
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String CONFIGURATION_PREFIX = "MCR.CORSFilter";
 
     private String allowOriginValue;
-
-    static {
-        LOGGER = LogManager.getLogger(MCRCORSFilter.class);
-    }
 
     @Override
     public void init(FilterConfig filterConfig) {

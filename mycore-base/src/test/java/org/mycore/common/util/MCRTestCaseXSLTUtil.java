@@ -107,7 +107,7 @@ public class MCRTestCaseXSLTUtil {
         JDOMResult result = new JDOMResult();
 
         TransformerFactory factory = TransformerFactory.newInstance();
-        factory.setURIResolver(MCRURIResolver.instance());
+        factory.setURIResolver(MCRURIResolver.obtainInstance());
 
         Transformer transformer = factory.newTransformer(xslt);
         parameters.forEach(transformer::setParameter);

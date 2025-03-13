@@ -59,7 +59,7 @@ public class MCRDefaultConfigurationLoader implements MCRConfigurationLoader {
 
     private InputStream getConfigInputStream() throws IOException {
         MCRConfigurationInputStream configurationInputStream = MCRConfigurationInputStream
-            .getMyCoRePropertiesInstance();
+            .ofMyCoReProperties();
         File configFile = MCRConfigurationDir.getConfigFile("mycore.active.properties");
         if (configFile != null) {
             OutputStream outputStream = Files.newOutputStream(configFile.toPath());

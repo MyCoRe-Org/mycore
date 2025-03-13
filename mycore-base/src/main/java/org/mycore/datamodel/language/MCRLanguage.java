@@ -89,7 +89,7 @@ public class MCRLanguage {
      * Returns the label in the given language
      */
     public String getLabel(String languageCode) {
-        MCRLanguage language = MCRLanguageFactory.instance().getLanguage(languageCode);
+        MCRLanguage language = MCRLanguageFactory.obtainInstance().getLanguage(languageCode);
         return labelsByLanguage.get(language);
     }
 

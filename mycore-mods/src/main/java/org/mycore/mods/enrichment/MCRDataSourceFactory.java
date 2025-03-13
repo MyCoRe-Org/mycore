@@ -46,26 +46,25 @@ final class MCRDataSourceFactory {
 
     private static final String CONFIG_PREFIX = "MCR.MODS.EnrichmentResolver.";
 
-    private static volatile MCRDataSourceFactory instance;
-
     private final MCRCache<String, MCRDataSource> dataSources = new MCRCache<>(30, "data sources");
 
     private final Boolean defaultStopOnFirstResult;
 
-    static MCRDataSourceFactory instance() {
-        if (instance == null) {
-            synchronized (MCRDataSourceFactory.class) {
-                if (instance == null) {
-                    instance = new MCRDataSourceFactory();
-                }
-            }
-        }
-        return instance;
-    }
-
     private MCRDataSourceFactory() {
         String cfgProperty = CONFIG_PREFIX + "DefaultStopOnFirstResult";
         defaultStopOnFirstResult = MCRConfiguration2.getBoolean(cfgProperty).orElse(Boolean.TRUE);
+    }
+
+    /**
+     * @deprecated Use {@link #getInstance()} instead
+     */
+    @Deprecated
+    static MCRDataSourceFactory instance() {
+        return getInstance();
+    }
+
+    static MCRDataSourceFactory getInstance() {
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     private MCRDataSource buildDataSource(String sourceID) {
@@ -81,7 +80,7 @@ final class MCRDataSourceFactory {
             String property = configPrefix + typeID + ".URI";
             String uri = MCRConfiguration2.getStringOrThrow(property);
 
-            MCRIdentifierType idType = MCRIdentifierTypeFactory.instance().getType(typeID);
+            MCRIdentifierType idType = MCRIdentifierTypeFactory.getInstance().getType(typeID);
             MCRIdentifierResolver resolver = new MCRIdentifierResolver(dataSource, idType, uri);
             dataSource.addResolver(resolver);
         }
@@ -96,4 +95,9 @@ final class MCRDataSourceFactory {
         }
         return dataSource;
     }
+
+    private static final class LazyInstanceHolder {
+        public static final MCRDataSourceFactory SINGLETON_INSTANCE = new MCRDataSourceFactory();
+    }
+
 }

@@ -76,7 +76,7 @@ public class MCRBasketEntry {
      */
     public void resolveContent() {
         if ((uri != null) && !uri.isEmpty()) {
-            setContent(MCRURIResolver.instance().resolve(uri));
+            setContent(MCRURIResolver.obtainInstance().resolve(uri));
         }
     }
 

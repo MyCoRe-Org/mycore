@@ -74,8 +74,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public final class MCRMarkManager {
 
-    private static volatile MCRMarkManager instance;
-
     public enum Operation {
         DELETE, IMPORT
     }
@@ -87,19 +85,20 @@ public final class MCRMarkManager {
     }
 
     /**
+     * @deprecated use {@link #getInstance()} instead
+     */
+    @Deprecated
+    public static MCRMarkManager instance() {
+        return getInstance();
+    }
+
+    /**
      * Returns the instance to the singleton {@link MCRMarkManager}.
      *
      * @return instance of {@link MCRMarkManager}
      */
-    public static MCRMarkManager instance() {
-        if (instance == null) {
-            synchronized (MCRMarkManager.class) {
-                if (instance == null) {
-                    instance = new MCRMarkManager();
-                }
-            }
-        }
-        return instance;
+    public static MCRMarkManager getInstance() {
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     /**
@@ -176,4 +175,7 @@ public final class MCRMarkManager {
         return Operation.IMPORT.equals(this.marks.get(mcrId));
     }
 
+    private static final class LazyInstanceHolder {
+        public static final MCRMarkManager SINGLETON_INSTANCE = new MCRMarkManager();
+    }
 }

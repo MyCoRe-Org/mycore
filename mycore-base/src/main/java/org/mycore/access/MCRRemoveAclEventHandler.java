@@ -36,7 +36,7 @@ import org.mycore.datamodel.metadata.MCRObject;
  */
 public class MCRRemoveAclEventHandler extends MCREventHandlerBase {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRRemoveAclEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {

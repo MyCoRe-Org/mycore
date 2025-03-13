@@ -30,7 +30,7 @@ import org.jdom2.Element;
  */
 class MCRMessageLogger {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRMessageLogger.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     static void logMessage(String message) {
         LOGGER.warn(message);

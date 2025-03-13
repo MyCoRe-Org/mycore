@@ -58,9 +58,9 @@ public class MCRLanguageXML {
         }
 
         if ((code == null) || code.isEmpty()) {
-            return MCRLanguageFactory.instance().getDefaultLanguage();
+            return MCRLanguageFactory.obtainInstance().getDefaultLanguage();
         } else {
-            return MCRLanguageFactory.instance().getLanguage(code);
+            return MCRLanguageFactory.obtainInstance().getLanguage(code);
         }
 
     }

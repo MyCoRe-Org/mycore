@@ -40,7 +40,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 @MCRCommandGroup(name = "Crypt Commands")
 public class MCRCryptCommands extends MCRAbstractCommands {
     /** The logger */
-    private static final Logger LOGGER = LogManager.getLogger(MCRCryptCommands.class.getName());
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * list all cipher configuration

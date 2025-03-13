@@ -60,7 +60,6 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
 
     private static final String META_PACKAGE_NAME = "org.mycore.datamodel.metadata.";
 
-    // logger
     private static final Logger LOGGER = LogManager.getLogger();
 
     private Class<? extends MCRMetaInterface> clazz;

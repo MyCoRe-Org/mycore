@@ -67,7 +67,7 @@ class MCROAIQuerySetResolver extends MCROAISetResolver<String, SolrDocument> {
         QueryResponse response;
         try {
             QueryRequest queryRequest = new QueryRequest(getQuery());
-            MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
+            MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
                 MCRSolrAuthenticationLevel.SEARCH);
             response = queryRequest.process(solrClient);
         } catch (SolrServerException | IOException e) {

@@ -75,7 +75,6 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
 
     protected static final int DEFAULT_SEQUENCE = -1;
 
-    // logger
     private static final Logger LOGGER = LogManager.getLogger();
 
     // MetaLangText data
@@ -424,7 +423,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
         if (subtag == null) {
             throw new MCRException("No tag name defined!");
         }
-        if (lang != null && !MCRLanguageFactory.instance().isSupportedLanguage(lang)) {
+        if (lang != null && !MCRLanguageFactory.obtainInstance().isSupportedLanguage(lang)) {
             throw new MCRException(getSubTag() + ": language is not supported: " + lang);
         }
         if (getInherited() < 0) {

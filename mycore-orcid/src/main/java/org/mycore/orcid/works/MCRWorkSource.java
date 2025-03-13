@@ -35,7 +35,15 @@ public final class MCRWorkSource {
 
     private final String sourceID;
 
+    /**
+     * @deprecated Use {@link #obtainInstance(String)} instead
+     */
+    @Deprecated
     static MCRWorkSource getInstance(String sourceID) {
+        return obtainInstance(sourceID);
+    }
+
+    static MCRWorkSource obtainInstance(String sourceID) {
         return SOURCES.computeIfAbsent(sourceID, MCRWorkSource::new);
     }
 
@@ -52,7 +60,7 @@ public final class MCRWorkSource {
      * the source's ID is our MCR.ORCID.OAuth.ClientID
      */
     public boolean isThisApplication() {
-        return MCROAuthClient.instance().getClientID().equals(sourceID);
+        return MCROAuthClient.getInstance().getClientID().equals(sourceID);
     }
 
     @Override

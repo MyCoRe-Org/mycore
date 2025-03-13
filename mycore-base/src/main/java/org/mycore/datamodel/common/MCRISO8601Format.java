@@ -50,7 +50,15 @@ public enum MCRISO8601Format {
         return format;
     }
 
+    /**
+     * @deprecated use {@link #fromString(String)} instead
+     */
+    @Deprecated
     public static MCRISO8601Format getFormat(String format) {
+        return fromString(format);
+    }
+    
+    public static MCRISO8601Format fromString(String format) {
         return Stream.of(values())
             .filter(f -> f.format.equals(format))
             .findAny()

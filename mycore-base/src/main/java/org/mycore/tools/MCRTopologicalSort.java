@@ -151,7 +151,7 @@ public class MCRTopologicalSort<T> {
             ts.getNodes().forcePut(i, mcrids[i]);
         }
         for (int i = 0; i < mcrids.length; i++) {
-            Collection<String> parents = MCRLinkTableManager.instance().getDestinationOf(String.valueOf(mcrids[i]),
+            Collection<String> parents = MCRLinkTableManager.getInstance().getDestinationOf(String.valueOf(mcrids[i]),
                 MCRLinkTableManager.ENTRY_TYPE_PARENT);
             for (String p : parents) {
                 Integer target = ts.getNodes().inverse().get(p);
@@ -159,7 +159,7 @@ public class MCRTopologicalSort<T> {
                     ts.addEdge(i, target);
                 }
             }
-            Collection<String> refs = MCRLinkTableManager.instance().getDestinationOf(String.valueOf(mcrids[i]),
+            Collection<String> refs = MCRLinkTableManager.getInstance().getDestinationOf(String.valueOf(mcrids[i]),
                 MCRLinkTableManager.ENTRY_TYPE_REFERENCE);
             for (String r : refs) {
                 Integer target = ts.getNodes().inverse().get(r);

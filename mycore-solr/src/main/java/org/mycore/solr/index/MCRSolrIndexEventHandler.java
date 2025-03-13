@@ -57,7 +57,7 @@ import org.mycore.util.concurrent.MCRTransactionableRunnable;
  */
 public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRSolrIndexEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final long DELAY_IN_MS = MCRConfiguration2.getLong("MCR.Solr.DelayIndexing_inMS").orElse(2000L);
 
@@ -207,7 +207,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     protected synchronized void addObject(MCREvent evt, MCRBase objectOrDerivate) {
         // do not add objects which are marked for import or deletion
-        if (MCRMarkManager.instance().isMarked(objectOrDerivate)) {
+        if (MCRMarkManager.getInstance().isMarked(objectOrDerivate)) {
             return;
         }
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
@@ -225,10 +225,10 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
                         if (content == null) {
                             content = new MCRBaseContent(objectOrDerivate);
                         }*/
-                        MCRContent content = MCRXMLMetadataManager.instance()
+                        MCRContent content = MCRXMLMetadataManager.getInstance()
                             .retrieveContent(objectOrDerivate.getId());
 
-                        MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.getInstance()
+                        MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.obtainInstance()
                             .getIndexHandler(content, objectOrDerivate.getId());
                         indexHandler.setCommitWithin(1000);
                         MCRSolrIndexer.submitIndexHandler(indexHandler, MCRSolrIndexer.HIGH_PRIORITY);
@@ -272,7 +272,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
             String owner = mcrPath.getOwner();
             if (MCRObjectID.isValid(owner)) {
                 MCRObjectID mcrObjectID = MCRObjectID.getInstance(owner);
-                if (MCRMarkManager.instance().isMarkedForDeletion(mcrObjectID)) {
+                if (MCRMarkManager.getInstance().isMarkedForDeletion(mcrObjectID)) {
                     return;
                 }
             }
@@ -284,7 +284,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
                     try {
                         MCRSolrIndexer
                             .submitIndexHandler(
-                                MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(path, attrs),
+                                MCRSolrIndexHandlerFactory.obtainInstance().getIndexHandler(path, attrs),
                                 MCRSolrIndexer.HIGH_PRIORITY);
                     } catch (Exception ex) {
                         LOGGER.error("Error creating transfer thread for file {}", path, ex);
@@ -318,7 +318,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
      * @return the derivate identifier
      */
     protected Optional<MCRObjectID> getDerivateId(Path path) {
-        MCRPath mcrPath = MCRPath.toMCRPath(path);
+        MCRPath mcrPath = MCRPath.ofPath(path);
         if (MCRObjectID.isValid(mcrPath.getOwner())) {
             return Optional.of(MCRObjectID.getInstance(mcrPath.getOwner()));
         }
@@ -331,6 +331,6 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
      * @param path the path to check
      */
     protected boolean isMarkedForDeletion(Path path) {
-        return getDerivateId(path).map(MCRMarkManager.instance()::isMarkedForDeletion).orElse(false);
+        return getDerivateId(path).map(MCRMarkManager.getInstance()::isMarkedForDeletion).orElse(false);
     }
 }

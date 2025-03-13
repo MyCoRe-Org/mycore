@@ -50,7 +50,7 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
 
     private static final MCRCategLinkService CATEGLINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRFileMetaEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     protected void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
@@ -92,7 +92,7 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
             MCREvent fileEvent = new MCREvent(MCREvent.ObjectType.PATH, MCREvent.EventType.INDEX);
             fileEvent.put(MCREvent.PATH_KEY, file);
             fileEvent.put(MCREvent.FILEATTR_KEY, attrs);
-            MCREventManager.instance().handleEvent(fileEvent);
+            MCREventManager.getInstance().handleEvent(fileEvent);
         }
     }
 
@@ -107,7 +107,7 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
         if (attrs != null && attrs.isDirectory()) {
             return;
         }
-        MCRPath mcrPath = MCRPath.toMCRPath(path);
+        MCRPath mcrPath = MCRPath.ofPath(path);
         MCRObjectID derivateID = MCRObjectID.getInstance(mcrPath.getOwner());
         if (!MCRMetadataManager.exists(derivateID)) {
             LOGGER.warn("Derivate {} from file '{}' does not exist.", derivateID, path);

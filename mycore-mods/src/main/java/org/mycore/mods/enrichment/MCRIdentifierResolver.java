@@ -52,7 +52,7 @@ import org.xml.sax.SAXException;
  */
 class MCRIdentifierResolver {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRIdentifierResolver.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private MCRDataSource ds;
 
@@ -82,7 +82,7 @@ class MCRIdentifierResolver {
 
         Element resolved = null;
         try {
-            resolved = MCRURIResolver.instance().resolve(uri);
+            resolved = MCRURIResolver.obtainInstance().resolve(uri);
         } catch (Exception ex) {
             LOGGER.warn(() -> "Exception resolving " + uri, ex);
             return null;

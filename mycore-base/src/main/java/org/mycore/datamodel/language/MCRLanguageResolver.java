@@ -44,7 +44,7 @@ public class MCRLanguageResolver implements URIResolver {
         }
         try {
             String code = hrefContent[1];
-            MCRLanguage language = MCRLanguageFactory.instance().getLanguage(code);
+            MCRLanguage language = MCRLanguageFactory.obtainInstance().getLanguage(code);
             Document doc = new Document(buildXML(language));
             return new JDOMSource(doc);
         } catch (Exception ex) {

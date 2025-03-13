@@ -133,7 +133,7 @@ public class MCRJobQueueCommands {
         help = "clean job queue",
         order = 50)
     public static void cleanJobQueue() {
-        MCRJobQueueCleaner cleaner = MCRJobQueueCleaner.instantiate();
+        MCRJobQueueCleaner cleaner = MCRJobQueueCleaner.createInstance();
         int cleaned = cleaner.clean();
         LOGGER.info("Removed {} jobs", cleaned);
     }
@@ -143,7 +143,7 @@ public class MCRJobQueueCommands {
         help = "clean job queue with selector {0}",
         order = 50)
     public static void cleanJobQueue(String selectorName) {
-        MCRJobQueueCleaner cleaner = MCRJobQueueCleaner.instantiate();
+        MCRJobQueueCleaner cleaner = MCRJobQueueCleaner.createInstance();
         int cleaned = cleaner.clean(selectorName);
         LOGGER.info("Removed {} jobs", cleaned);
     }

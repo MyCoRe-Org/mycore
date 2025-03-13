@@ -40,7 +40,7 @@ import org.mycore.common.MCRException;
  * @author Sebastian Hofmann
  */
 public class MCRJobQueue extends AbstractQueue<MCRJob> implements EventListener {
-    private static final Logger LOGGER = LogManager.getLogger(MCRJobQueue.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final Class<? extends MCRJobAction> action;
 
@@ -70,6 +70,14 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements EventListener 
     }
 
     /**
+     * @deprecated Use {@link #obtainInstance(Class)} instead
+     */
+    @Deprecated
+    public static MCRJobQueue getInstance(Class<? extends MCRJobAction> action) {
+        return obtainInstance(action);
+    }
+
+    /**
      * Returns a singleton instance of this class.
      *
      * @param action the {@link MCRJobAction} or <code>null</code>
@@ -78,7 +86,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements EventListener 
      * instead
      */
     @Deprecated
-    public static MCRJobQueue getInstance(Class<? extends MCRJobAction> action) {
+    public static MCRJobQueue obtainInstance(Class<? extends MCRJobAction> action) {
         return MCRJobQueueManager.getInstance().getJobQueue(action);
     }
 

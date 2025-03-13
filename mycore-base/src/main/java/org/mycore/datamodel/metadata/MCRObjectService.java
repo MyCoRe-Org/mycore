@@ -75,7 +75,7 @@ import com.google.gson.JsonObject;
  */
 public class MCRObjectService {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRObjectService.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static final String XML_NAME = "service";
 

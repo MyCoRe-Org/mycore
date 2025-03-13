@@ -88,7 +88,7 @@ public class MCRMetsIIIFPresentationImpl extends MCRIIIFPresentationImpl {
 
     public Document getMets(String id) throws IOException, JDOMException {
 
-        String objectid = MCRLinkTableManager.instance().getSourceOf(id).iterator().next();
+        String objectid = MCRLinkTableManager.getInstance().getSourceOf(id).iterator().next();
         MCRContentTransformer transformer = getTransformer();
         MCRParameterCollector parameter = new MCRParameterCollector();
 

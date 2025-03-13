@@ -48,11 +48,9 @@ public final class MCRLanguageFactory {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRLanguageFactory SINGLETON = new MCRLanguageFactory();
+    public static final MCRLanguage GERMAN = obtainInstance().getLanguage("de");
 
-    public static final MCRLanguage GERMAN = instance().getLanguage("de");
-
-    public static final MCRLanguage ENGLISH = instance().getLanguage("en");
+    public static final MCRLanguage ENGLISH = obtainInstance().getLanguage("en");
 
     /**
      * Map of languages by ISO 639-1 or -2 code
@@ -76,21 +74,27 @@ public final class MCRLanguageFactory {
      */
     private final String codeOfDefaultLanguage;
 
-    private MCRLanguageFactory() {
-        codeOfDefaultLanguage = MCRConfiguration2.getString("MCR.Metadata.DefaultLang")
-            .orElse(MCRConstants.DEFAULT_LANG);
-        initDefaultLanguages();
+    public MCRLanguageFactory() {
+        this(MCRConfiguration2.getString("MCR.Metadata.DefaultLang").orElse(MCRConstants.DEFAULT_LANG),
+            MCRConfiguration2.getString("MCR.LanguageClassification").map(MCRCategoryID::new).orElse(null));
+    }
 
-        classification = MCRConfiguration2.getString("MCR.LanguageClassification")
-            .map(MCRCategoryID::rootID)
-            .orElse(null);
+    public MCRLanguageFactory(String codeOfDefaultLanguage, MCRCategoryID classification) {
+        this.codeOfDefaultLanguage = codeOfDefaultLanguage;
+        this.classification = classification;
+        initDefaultLanguages();
     }
 
     /**
-     * Returns the MCRLanguageFactory singleton
+     * @deprecated use {@link #obtainInstance()} instead
      */
+    @Deprecated
     public static MCRLanguageFactory instance() {
-        return SINGLETON;
+        return obtainInstance();
+    }
+
+    public static MCRLanguageFactory obtainInstance() {
+        return LazyInstanceHolder.SHARED_INSTANCE;
     }
 
     /**
@@ -265,4 +269,9 @@ public final class MCRLanguageFactory {
                 language.setLabel(languageOfLabel, l.getText());
             });
     }
+
+    private static final class LazyInstanceHolder {
+        public static final MCRLanguageFactory SHARED_INSTANCE = new MCRLanguageFactory();
+    }
+
 }

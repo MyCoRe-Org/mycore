@@ -44,12 +44,12 @@ class MCRObjectIDPool {
     static MCRObjectID getMCRObjectID(String id) {
         try {
             return objectIDCache.getUnchecked(id);
-        } catch (UncheckedExecutionException ignoredIfMCRException) {
-            Throwable cause = ignoredIfMCRException.getCause();
+        } catch (UncheckedExecutionException ignoredIfCauseIsMCRException) {
+            Throwable cause = ignoredIfCauseIsMCRException.getCause();
             if (cause instanceof MCRException mcre) {
                 throw mcre;
             }
-            throw ignoredIfMCRException;
+            throw ignoredIfCauseIsMCRException;
         }
     }
 

@@ -146,8 +146,8 @@ public class MCRParameterCollectorTest extends MCRTestCase {
             .map(c -> TransformerFactory.newInstance(c, MCRClassTools.getClassLoader()))
             .orElseGet(TransformerFactory::newInstance);
         LOGGER.info("Transformer factory: {}", () -> transformerFactory.getClass().getName());
-        transformerFactory.setURIResolver(MCRURIResolver.instance());
-        transformerFactory.setErrorListener(MCRErrorListener.getInstance());
+        transformerFactory.setURIResolver(MCRURIResolver.obtainInstance());
+        transformerFactory.setErrorListener(new MCRErrorListener());
         if (transformerFactory.getFeature(SAXSource.FEATURE) && transformerFactory.getFeature(SAXResult.FEATURE)) {
             return (SAXTransformerFactory) transformerFactory;
         } else {

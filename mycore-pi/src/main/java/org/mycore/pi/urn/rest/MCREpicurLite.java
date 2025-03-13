@@ -58,7 +58,15 @@ public final class MCREpicurLite {
         this.isPrimary = true;
     }
 
+    /**
+     * @deprecated Use {@link #createInstance(MCRPIRegistrationInfo, URL)} instead
+     */
+    @Deprecated
     public static MCREpicurLite instance(MCRPIRegistrationInfo urn, URL url) {
+        return createInstance(urn, url);
+    }
+
+    public static MCREpicurLite createInstance(MCRPIRegistrationInfo urn, URL url) {
         return new MCREpicurLite(urn, url);
     }
 

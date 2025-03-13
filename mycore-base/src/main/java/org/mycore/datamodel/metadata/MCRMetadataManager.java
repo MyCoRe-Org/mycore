@@ -78,7 +78,7 @@ public final class MCRMetadataManager {
     private static final MCRCache<MCRObjectID, List<MCRObjectID>> OBJECT_DERIVATE_MAP = new MCRCache<>(10_000,
         "derivate objectid cache");
 
-    private static final MCRXMLMetadataManager XML_MANAGER = MCRXMLMetadataManager.instance();
+    private static final MCRXMLMetadataManager XML_MANAGER = MCRXMLMetadataManager.getInstance();
 
     private static final MCRObjectIDGenerator MCROBJECTID_GENERATOR = MCRConfiguration2.getSingleInstanceOfOrThrow(
         MCRObjectIDGenerator.class, "MCR.Metadata.ObjectID.Generator.Class");
@@ -113,7 +113,7 @@ public final class MCRMetadataManager {
             return mcrObjectID;
         }
         //one cheap db query
-        Collection<String> list = MCRLinkTableManager.instance().getSourceOf(derivateID,
+        Collection<String> list = MCRLinkTableManager.getInstance().getSourceOf(derivateID,
             MCRLinkTableManager.ENTRY_TYPE_DERIVATE);
         if (!(list == null || list.isEmpty())) {
             mcrObjectID = MCRObjectID.getInstance(list.iterator().next());
@@ -233,7 +233,7 @@ public final class MCRMetadataManager {
     private static byte[] retrieveObjectBackup(MCRObjectID objectId) throws MCRPersistenceException {
         byte[] objectBackup;
         try {
-            objectBackup = MCRXMLMetadataManager.instance().retrieveBLOB(objectId);
+            objectBackup = MCRXMLMetadataManager.getInstance().retrieveBLOB(objectId);
         } catch (IOException ioExc) {
             throw new MCRPersistenceException("Unable to retrieve xml blob of " + objectId, ioExc);
         }
@@ -265,7 +265,7 @@ public final class MCRMetadataManager {
 
     private static void addLinkToMetadata(MCRDerivate mcrDerivate, MCRObjectID objectId, byte[] objectBackup)
         throws MCRPersistenceException {
-        final MCRMetaEnrichedLinkID der = MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(mcrDerivate);
+        final MCRMetaEnrichedLinkID der = MCRMetaEnrichedLinkIDFactory.obtainInstance().getDerivateLink(mcrDerivate);
         try {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Adding Derivate in data store");
@@ -325,7 +325,7 @@ public final class MCRMetadataManager {
                 LOGGER.info("Derivate does not exist: {}", derivateID);
                 return;
             }
-            Files.walkFileTree(rootPath, MCRRecursiveDeleter.instance());
+            Files.walkFileTree(rootPath, new MCRRecursiveDeleter());
             rootPath.getFileSystem().removeRoot(derivateID);
         } catch (Exception exc) {
             throw new MCRPersistenceException("Unable to delete derivate " + derivateID, exc);
@@ -435,7 +435,7 @@ public final class MCRMetadataManager {
             throw MCRAccessException.missingPermission("Delete derivate", id.toString(), PERMISSION_DELETE);
         }
         // mark for deletion
-        MCRMarkManager.instance().mark(id, Operation.DELETE);
+        MCRMarkManager.getInstance().mark(id, Operation.DELETE);
 
         // remove link
         MCRObjectID metaId = null;
@@ -464,7 +464,7 @@ public final class MCRMetadataManager {
         fireEvent(mcrDerivate, null, MCREvent.EventType.DELETE);
 
         // remove mark
-        MCRMarkManager.instance().remove(id);
+        MCRMarkManager.getInstance().remove(id);
     }
 
     /**
@@ -529,7 +529,7 @@ public final class MCRMetadataManager {
     }
 
     private static void checkForActiveLinks(MCRObject mcrObject, MCRObjectID id) throws MCRActiveLinkException {
-        final Collection<String> sources = MCRLinkTableManager.instance().getSourceOf(mcrObject.mcrId,
+        final Collection<String> sources = MCRLinkTableManager.getInstance().getSourceOf(mcrObject.mcrId,
             MCRLinkTableManager.ENTRY_TYPE_REFERENCE);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Sources size:{}", sources.size());
@@ -546,7 +546,7 @@ public final class MCRMetadataManager {
     }
 
     private static void markForDeletion(MCRObjectID id) {
-        MCRMarkManager.instance().mark(id, Operation.DELETE);
+        MCRMarkManager.getInstance().mark(id, Operation.DELETE);
     }
 
     private static void removeChildFromParent(MCRObject mcrObject, BiConsumer<MCRObject, MCRObjectID> parentOperation)
@@ -584,7 +584,7 @@ public final class MCRMetadataManager {
     }
 
     private static void removeMark(MCRObjectID id) {
-        MCRMarkManager.instance().remove(id);
+        MCRMarkManager.getInstance().remove(id);
     }
 
     /**
@@ -604,7 +604,7 @@ public final class MCRMetadataManager {
             LOGGER.debug("Parent ID = {}", parentId);
         }
         try {
-            if (MCRXMLMetadataManager.instance().exists(parentId)) {
+            if (MCRXMLMetadataManager.getInstance().exists(parentId)) {
                 final MCRObject parent = retrieveMCRObject(parentId);
                 parent.getStructure().removeChild(mcrObject.getId());
                 fireUpdateEvent(parent);
@@ -680,7 +680,7 @@ public final class MCRMetadataManager {
      *            the xml couldn't be read
      */
     public static boolean exists(final MCRObjectID id) throws MCRPersistenceException {
-        return MCRXMLMetadataManager.instance().exists(id);
+        return MCRXMLMetadataManager.getInstance().exists(id);
     }
 
     /**
@@ -747,7 +747,7 @@ public final class MCRMetadataManager {
      */
     public static MCRDerivate retrieveMCRDerivate(final MCRObjectID id) throws MCRPersistenceException {
         try {
-            Document xml = MCRXMLMetadataManager.instance().retrieveXML(id);
+            Document xml = MCRXMLMetadataManager.getInstance().retrieveXML(id);
             if (xml == null) {
                 throw new MCRPersistenceException("Could not retrieve xml of derivate: " + id);
             }
@@ -767,7 +767,7 @@ public final class MCRMetadataManager {
      */
     public static MCRObject retrieveMCRObject(final MCRObjectID id) throws MCRPersistenceException {
         try {
-            Document xml = MCRXMLMetadataManager.instance().retrieveXML(id);
+            Document xml = MCRXMLMetadataManager.getInstance().retrieveXML(id);
             if (xml == null) {
                 throw new MCRPersistenceException("Could not retrieve xml of object: " + id);
             }
@@ -904,7 +904,7 @@ public final class MCRMetadataManager {
 
     private static void addLinkToMetadata(MCRDerivate mcrDerivate) throws MCRPersistenceException {
         final MCRMetaEnrichedLinkID derivateLink =
-            MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(mcrDerivate);
+            MCRMetaEnrichedLinkIDFactory.obtainInstance().getDerivateLink(mcrDerivate);
         MCRObjectID newMetadataObjectID = mcrDerivate.getDerivate().getMetaLink().getXLinkHrefID();
         addOrUpdateDerivateToObject(newMetadataObjectID, derivateLink, mcrDerivate.isImportMode());
     }
@@ -953,7 +953,7 @@ public final class MCRMetadataManager {
     }
 
     private static boolean isMarkedForDeletion(MCRObjectID id) {
-        return MCRMarkManager.instance().isMarkedForDeletion(id);
+        return MCRMarkManager.getInstance().isMarkedForDeletion(id);
     }
 
     private static void checkUpdatePermission(MCRObjectID id) throws MCRAccessException {
@@ -1145,7 +1145,7 @@ public final class MCRMetadataManager {
             // before updating it again. Otherwise the exception could be thrown again and
             // the object will be in an invalid state (the not existing derivate will be
             // linked with the object).
-            MCRXMLMetadataManager.instance().update(mcrObjectId, obj.createXML(), new Date());
+            MCRXMLMetadataManager.getInstance().update(mcrObjectId, obj.createXML(), new Date());
 
             // update and call event handlers
             update(obj);
@@ -1169,9 +1169,9 @@ public final class MCRMetadataManager {
         Optional.ofNullable(oldBase)
             .ifPresent(b -> evt.put(objectEvent ? MCREvent.OBJECT_OLD_KEY : MCREvent.DERIVATE_OLD_KEY, b));
         if (MCREvent.EventType.DELETE == eventType) {
-            MCREventManager.instance().handleEvent(evt, MCREventManager.BACKWARD);
+            MCREventManager.getInstance().handleEvent(evt, MCREventManager.BACKWARD);
         } else {
-            MCREventManager.instance().handleEvent(evt);
+            MCREventManager.getInstance().handleEvent(evt);
         }
     }
 }

@@ -52,7 +52,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
     public void setUp() throws Exception {
         super.setUp();
 
-        mcrUser = MCRUserTransformer.buildMCRUser(MCRURIResolver.instance().resolve("resource:test-user.xml"));
+        mcrUser = MCRUserTransformer.buildMCRUser(MCRURIResolver.obtainInstance().resolve("resource:test-user.xml"));
     }
 
     @Test

@@ -40,22 +40,21 @@ final class MCRIdentifierTypeFactory {
 
     private static final String DEFAULT_XPATH = "mods:identifier[@type=\"%s\"]";
 
-    private static volatile MCRIdentifierTypeFactory instance;
-
     private final Map<String, MCRIdentifierType> id2type = new HashMap<>();
 
-    static MCRIdentifierTypeFactory instance() {
-        if(instance == null) {
-            synchronized (MCRIdentifierTypeFactory.class) {
-                if(instance == null) {
-                    instance = new MCRIdentifierTypeFactory();
-                }
-            }
-        }
-        return instance;
+    private MCRIdentifierTypeFactory() {
     }
 
-    private MCRIdentifierTypeFactory() {
+    /**
+     * @deprecated Use {@link #getInstance()} instead
+     */
+    @Deprecated
+    static MCRIdentifierTypeFactory instance() {
+        return getInstance();
+    }
+
+    static MCRIdentifierTypeFactory getInstance() {
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     private MCRIdentifierType buildIdentifierType(String typeID) {
@@ -79,4 +78,9 @@ final class MCRIdentifierTypeFactory {
     Collection<MCRIdentifierType> getTypes() {
         return id2type.values();
     }
+
+    private static final class LazyInstanceHolder {
+        public static final MCRIdentifierTypeFactory SINGLETON_INSTANCE = new MCRIdentifierTypeFactory();
+    }
+
 }

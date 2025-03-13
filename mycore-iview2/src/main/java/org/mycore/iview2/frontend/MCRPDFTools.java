@@ -48,7 +48,7 @@ public class MCRPDFTools implements AutoCloseable {
 
     static final int PDF_DEFAULT_DPI = 72; // from private org.apache.pdfbox.pdmodel.PDPage.DEFAULT_USER_SPACE_UNIT_DPI
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRPDFTools.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final MCRPNGTools pngTools;
 

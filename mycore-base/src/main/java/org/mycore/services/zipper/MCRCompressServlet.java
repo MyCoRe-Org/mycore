@@ -90,7 +90,7 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
 
     private static final Pattern PATH_INFO_PATTERN = Pattern.compile("\\A([\\w]+)/([\\w/]+)\\z");
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRCompressServlet.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     protected void think(MCRServletJob job) throws Exception {
@@ -169,11 +169,11 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
     }
 
     private void sendObject(MCRObjectID id, MCRServletJob job, T container) throws Exception {
-        MCRContent content = MCRXMLMetadataManager.instance().retrieveContent(id);
+        MCRContent content = MCRXMLMetadataManager.getInstance().retrieveContent(id);
         if (content == null) {
             throw new FileNotFoundException("Could not find object: " + id);
         }
-        long lastModified = MCRXMLMetadataManager.instance().getLastModified(id);
+        long lastModified = MCRXMLMetadataManager.getInstance().getLastModified(id);
         HttpServletRequest req = job.getRequest();
         byte[] metaDataContent = getMetaDataContent(content, req);
         sendMetadataCompressed("metadata.xml", metaDataContent, lastModified, container);
@@ -279,13 +279,13 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
 
         @Override
         public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-            impl.sendCompressedDirectory(MCRPath.toMCRPath(dir), attrs, container);
+            impl.sendCompressedDirectory(MCRPath.ofPath(dir), attrs, container);
             return super.preVisitDirectory(dir, attrs);
         }
 
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-            impl.sendCompressedFile(MCRPath.toMCRPath(file), attrs, container);
+            impl.sendCompressedFile(MCRPath.ofPath(file), attrs, container);
             LOGGER.debug("file {} zipped", file);
             return super.visitFile(file, attrs);
         }
