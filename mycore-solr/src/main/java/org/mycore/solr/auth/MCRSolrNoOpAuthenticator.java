@@ -18,31 +18,21 @@
 
 package org.mycore.solr.auth;
 
-import java.net.http.HttpRequest;
-
 import org.apache.solr.client.solrj.SolrRequest;
 
+import java.net.http.HttpRequest;
+
 /**
- * Interface for adding authentication to Solr requests.
+ * Authentication implementation that doesn't add any authentication to Solr requests.
  */
-public interface MCRSolrAuthentication {
+public class MCRSolrNoOpAuthenticator implements MCRSolrAuthenticator {
 
-    /**
-     * Set the authentication level for this instance.
-     * @param level the level to set
-     */
-    void setLevel(MCRSolrAuthenticationLevel level);
+    @Override
+    public final void applyAuthentication(SolrRequest<?> request) {
+    }
 
-    /**
-     * Add authentication to a Solr request.
-     * @param request the request to add authentication to
-     */
-    void applyAuthentication(SolrRequest<?> request);
-
-    /**
-     * Add authentication to an HTTP request.
-     * @param request the request to add authentication to
-     */
-    void applyAuthentication(HttpRequest.Builder request);
+    @Override
+    public final void applyAuthentication(HttpRequest.Builder request) {
+    }
 
 }
