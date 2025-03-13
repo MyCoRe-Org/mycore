@@ -18,6 +18,20 @@
 
 package org.mycore.common.config;
 
+import jakarta.inject.Singleton;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRClassTools;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRFactory;
+import org.mycore.common.config.annotation.MCRInstance;
+import org.mycore.common.config.annotation.MCRInstanceList;
+import org.mycore.common.config.annotation.MCRInstanceMap;
+import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRSentinel;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -41,24 +55,15 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.mycore.common.MCRClassTools;
-import org.mycore.common.config.annotation.MCRConfigurationProxy;
-import org.mycore.common.config.annotation.MCRInstance;
-import org.mycore.common.config.annotation.MCRInstanceList;
-import org.mycore.common.config.annotation.MCRInstanceMap;
-import org.mycore.common.config.annotation.MCRPostConstruction;
-import org.mycore.common.config.annotation.MCRProperty;
-import org.mycore.common.config.annotation.MCRSentinel;
-
-import jakarta.inject.Singleton;
-
 /**
  * Creates Objects which are configured with properties.
  *
  * @author Sebastian Hofmann
  */
-@SuppressWarnings("PMD.SingleMethodSingleton")
+@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.SingleMethodSingleton"})
 class MCRConfigurableInstanceHelper {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final ConcurrentMap<Class<?>, ClassInfo<?>> INFOS = new ConcurrentHashMap<>();
 
@@ -284,55 +289,102 @@ class MCRConfigurableInstanceHelper {
             this.injectors = findInjectors(targetClass);
         }
 
+        // TODO: remove legacy factory method option after release of 2025.06 LTS and adjust error message
         private Supplier<T> getFactory(Class<T> targetClass) {
-            try {
-                return createConstructorFactory(findDefaultConstructor(targetClass));
-            } catch (NoSuchMethodException e) {
-                return createFactoryMethodFactory(findFactoryMethod(targetClass));
-            }
+
+            List<Method> declaredFactoryMethods = getFactoryMethods(targetClass, targetClass.getDeclaredMethods());
+            Optional<Supplier<T>> factory = Stream.<Supplier<Optional<Supplier<T>>>>of(
+                    () -> findSingletonFactoryMethod(declaredFactoryMethods),
+                    () -> findAnnotatedFactoryMethod(declaredFactoryMethods),
+                    () -> findDefaultConstructor(targetClass),
+                    () -> findLegacyFactoryMethod(getFactoryMethods(targetClass, targetClass.getMethods())))
+                .map(Supplier::get)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .findFirst();
+
+            return factory.orElseThrow(() ->
+                new MCRConfigurationException("Class " + targetClass.getName() + " has "
+                    + " has no singleton factory method (public, static, matching return type, parameterless, name"
+                    + " equals 'getInstance'), no annotated factory method (public, static, matching return type,"
+                    + " parameterless, annotated with @MCRFactory), no public parameterless constructor and no legacy"
+                    + " factory method (public, static, matching return type, parameterless, name containing"
+                    + " 'instance')")
+            );
+
         }
 
-        private Constructor<T> findDefaultConstructor(Class<T> targetClass) throws NoSuchMethodException {
-            return targetClass.getConstructor();
-        }
-
-        private Supplier<T> createConstructorFactory(Constructor<T> constructor) {
-            return () -> {
-                try {
-                    return constructor.newInstance();
-                } catch (Exception e) {
-                    throw new MCRConfigurationException("Unable to create an instance of "
-                        + constructor.getDeclaringClass().getName() + " using parameterless public constructor", e);
-                }
-            };
-        }
-
-        private Method findFactoryMethod(Class<T> targetClass) {
-
-            List<Method> factoryMethods = Stream.of(targetClass.getMethods())
+        private static <T> List<Method> getFactoryMethods(Class<T> targetClass, Method[] declaredMethods) {
+            return Stream.of(declaredMethods)
                 .filter(method -> Modifier.isPublic(method.getModifiers()))
                 .filter(method -> Modifier.isStatic(method.getModifiers()))
                 .filter(method -> method.getReturnType().isAssignableFrom(targetClass))
                 .filter(method -> method.getParameterTypes().length == 0)
                 .filter(method -> !method.isVarArgs())
+                .toList();
+        }
+
+        private Optional<Supplier<T>> findSingletonFactoryMethod(List<Method> factoryMethods) {
+
+            List<Method> singletonFactoryMethods = factoryMethods.stream()
+                .filter(method -> method.getName().equals("getInstance"))
+                .toList();
+
+            if (singletonFactoryMethods.size() > 1) {
+                throw new MCRConfigurationException("Class " + targetClass.getName()
+                    + " has multiple singleton factory methods (public, static, matching return type, parameterless,"
+                    + " name equals 'getInstance'): " + methodNames(singletonFactoryMethods));
+            }
+
+            return singletonFactoryMethods.stream().findFirst().map(this::createFactoryMethodFactory);
+
+        }
+
+        private Optional<Supplier<T>> findAnnotatedFactoryMethod(List<Method> factoryMethods) {
+
+            List<Method> annotatedFactoryMethods = factoryMethods.stream()
+                .filter(method -> method.getDeclaredAnnotation(MCRFactory.class) != null)
+                .toList();
+
+            if (annotatedFactoryMethods.size() > 1) {
+                throw new MCRConfigurationException("Class " + targetClass.getName()
+                    + " has multiple annotated factory methods (public, static, matching return type, parameterless,"
+                    + " annotated with @MCRFactory): " + methodNames(annotatedFactoryMethods));
+            }
+
+            return annotatedFactoryMethods.stream().findFirst().map(this::createFactoryMethodFactory);
+
+        }
+
+        private Optional<Supplier<T>> findDefaultConstructor(Class<T> targetClass) {
+            try {
+                return Optional.of(createConstructorFactory(targetClass.getConstructor()));
+            } catch (NoSuchMethodException e) {
+                return Optional.empty();
+            }
+        }
+
+        private Optional<Supplier<T>> findLegacyFactoryMethod(List<Method> factoryMethods) {
+
+           
+            List<Method> legacyFactoryMethods = factoryMethods.stream()
                 .filter(method -> method.getName().toLowerCase(Locale.ROOT).contains("instance"))
                 .toList();
 
-            if (factoryMethods.isEmpty()) {
+            if (legacyFactoryMethods.size() > 1) {
                 throw new MCRConfigurationException("Class " + targetClass.getName()
-                    + " has no public, parameterless constructor and no suitable"
-                    + " (public, static, matching return type, parameterless, name containing 'instance')"
-                    + " factory method");
+                    + " has multiple legacy factory methods (public, static, matching return type, parameterless, name"
+                    + " contains 'instance'): " + methodNames(legacyFactoryMethods));
             }
 
-            if (factoryMethods.size() != 1) {
-                throw new MCRConfigurationException("Class " + targetClass.getName()
-                    + " has no public, parameterless constructor but multiple suitable"
-                    + " (public, static, matching return type, parameterless, name containing 'instance')"
-                    + " factory methods (" + methodNames(factoryMethods) + ")");
-            }
-
-            return factoryMethods.getFirst();
+            return legacyFactoryMethods.stream().findFirst().map(method -> {
+                if (LOGGER.isWarnEnabled()) {
+                    LOGGER.warn("Instantiation of {} relies on legacy factory method (public, static,"
+                            + " matching return type, parameterless, name containing 'instance') {}.",
+                        targetClass.getName(), method.getName());
+                }
+                return createFactoryMethodFactory(method);
+            });
 
         }
 
@@ -344,6 +396,17 @@ class MCRConfigurableInstanceHelper {
                 } catch (Exception e) {
                     throw new MCRConfigurationException("Unable to create an instance of "
                         + method.getDeclaringClass().getName() + " using public, parameterless constructor", e);
+                }
+            };
+        }
+
+        private Supplier<T> createConstructorFactory(Constructor<T> constructor) {
+            return () -> {
+                try {
+                    return constructor.newInstance();
+                } catch (Exception e) {
+                    throw new MCRConfigurationException("Unable to create an instance of "
+                        + constructor.getDeclaringClass().getName() + " using parameterless public constructor", e);
                 }
             };
         }
@@ -360,7 +423,6 @@ class MCRConfigurableInstanceHelper {
             return injectors;
         }
 
-        @SuppressWarnings("PMD.AvoidDuplicateLiterals")
         private Optional<Injector<T, ?>> findInjector(Injectable injectable) {
 
             List<Source<?, ?>> sources = new LinkedList<>();
