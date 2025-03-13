@@ -27,7 +27,7 @@ import org.jdom2.Element;
 import org.mycore.common.MCRCache;
 import org.mycore.common.config.MCRConfiguration2;
 
-class MCRURICache {
+final class MCRURICache {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRURICache.class);
 
@@ -41,19 +41,19 @@ class MCRURICache {
 
     private static final MCRURICache SHARED_INSTANCE = new MCRURICache();
 
-    public static MCRURICache obtainInstance() {
-        return SHARED_INSTANCE;
-    }
-
-    private List<Pattern> patternsOfToBeCachedURIs = new ArrayList<Pattern>();
+    private List<Pattern> patternsOfToBeCachedURIs = new ArrayList<>();
 
     private MCRCache<String, Element> cache;
 
     private int cacheNumToAutoIncrement;
 
+    public static MCRURICache obtainInstance() {
+        return SHARED_INSTANCE;
+    }
+
     private MCRURICache() {
         int capacity = MCRConfiguration2.getInt(PROP_CACHE_CAPACITY).get();
-        cache = new MCRCache<String, Element>(capacity, CACHE_LABEL);
+        cache = new MCRCache<>(capacity, CACHE_LABEL);
 
         this.cacheNumToAutoIncrement = MCRConfiguration2.getInt(PROP_CACHE_INCREMENT).get();
 
