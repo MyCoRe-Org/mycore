@@ -183,7 +183,7 @@ public class MCRConfiguration2 {
             .or(() -> Optional.ofNullable(alternative)
                 .map(className -> new ConfigSingletonKey(name, className.getName()))
                 .map(key -> (T) instanceHolder.computeIfAbsent(key,
-                    (k) -> MCRConfigurableInstanceHelper.getInstance(alternative,
+                    (k) -> MCRConfigurableInstanceHelper.createInstance(alternative,
                         MCRInstanceConfiguration.ofClass(alternative)))));
     }
 
@@ -199,7 +199,7 @@ public class MCRConfiguration2 {
         if (MCRConfigurableInstanceHelper.isSingleton(superClass)) {
             return getSingleInstanceOf(superClass, name);
         } else {
-            return MCRConfigurableInstanceHelper.getInstance(superClass, name);
+            return MCRConfigurableInstanceHelper.createInstance(superClass, name);
         }
     }
 
@@ -229,7 +229,7 @@ public class MCRConfiguration2 {
         return getString(name)
             .map(className -> new ConfigSingletonKey(name, className))
             .map(key -> (S) instanceHolder.computeIfAbsent(key,
-                k -> MCRConfigurableInstanceHelper.getInstance(superClass, name).orElse(null)));
+                k -> MCRConfigurableInstanceHelper.createInstance(superClass, name).orElse(null)));
     }
 
     /**
@@ -484,7 +484,7 @@ public class MCRConfiguration2 {
     }
 
     public static <S> S instantiateClass(Class<S> superClass, String className) {
-        return MCRConfigurableInstanceHelper.getInstance(superClass, MCRInstanceConfiguration.ofClass(className));
+        return MCRConfigurableInstanceHelper.createInstance(superClass, MCRInstanceConfiguration.ofClass(className));
     }
 
     public static <S> Stream<S> instantiateClasses(Class<S> superClass, String propertyName) {

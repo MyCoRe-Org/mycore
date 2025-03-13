@@ -303,7 +303,7 @@ public final class MCRObject extends MCRBase {
                 if (inf instanceof MCRMetaClassification classification) {
                     String classID = classification.getClassId();
                     String categID = classification.getCategId();
-                    boolean exists = MCRCategoryDAOFactory.getInstance().exist(new MCRCategoryID(classID, categID));
+                    boolean exists = MCRCategoryDAOFactory.obtainInstance().exist(new MCRCategoryID(classID, categID));
                     if (exists) {
                         continue;
                     }

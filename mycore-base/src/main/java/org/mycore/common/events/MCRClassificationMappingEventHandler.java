@@ -119,7 +119,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
             obj.getMetadata().removeMetadataElement(ELEMENT_MAPPINGS);
         }
 
-        MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+        MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
 
         try {
             Document doc = new Document(obj.getMetadata().createXML().detach());

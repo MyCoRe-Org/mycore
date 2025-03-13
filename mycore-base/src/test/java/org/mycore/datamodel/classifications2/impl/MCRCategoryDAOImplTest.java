@@ -123,7 +123,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         MCRCategory secondCateg = nameIdentifier.getChildren().get(1);
         DAO.addCategory(null, nameIdentifier);
         startNewTransaction();
-        MCRCategLinkServiceFactory.getInstance().getLinksFromCategory(secondCateg.getId());
+        MCRCategLinkServiceFactory.obtainInstance().getLinksFromCategory(secondCateg.getId());
         assertTrue(secondCateg.getId() + " should exist.", DAO.exist(secondCateg.getId()));
         //re-set labels
         DAO.setLabels(secondCateg.getId(), new TreeSet<>(secondCateg.getLabels().stream().collect(Collectors.toSet())));

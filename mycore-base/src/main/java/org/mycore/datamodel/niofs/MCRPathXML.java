@@ -180,7 +180,7 @@ public final class MCRPathXML {
         root.setAttribute("extension", getFileExtension(fileName));
         root.setAttribute("returnId", MCRMetadataManager
             .getObjectId(MCRObjectID.getInstance(path.getOwner()), 10, TimeUnit.SECONDS).toString());
-        Collection<MCRCategoryID> linksFromReference = MCRCategLinkServiceFactory.getInstance()
+        Collection<MCRCategoryID> linksFromReference = MCRCategLinkServiceFactory.obtainInstance()
             .getLinksFromReference(new MCRCategLinkReference(path));
         for (MCRCategoryID category : linksFromReference) {
             Element catEl = new Element("category");

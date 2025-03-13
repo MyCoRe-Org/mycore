@@ -172,7 +172,7 @@ public class MCROAISetManager {
         }
         // cache
         // check if classification changed
-        long lastModified = MCRCategoryDAOFactory.getInstance().getLastModified();
+        long lastModified = MCRCategoryDAOFactory.obtainInstance().getLastModified();
         if (lastModified != this.classLastModified) {
             this.classLastModified = lastModified;
             synchronized (this.cachedSetList) {

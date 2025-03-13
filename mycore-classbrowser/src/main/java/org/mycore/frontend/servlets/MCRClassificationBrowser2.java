@@ -89,7 +89,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         MCRCategoryID id = settings.getCategID()
             .map(categId -> new MCRCategoryID(settings.getClassifID(), categId))
             .orElse(new MCRCategoryID(settings.getClassifID()));
-        MCRCategory category = MCRCategoryDAOFactory.getInstance().getCategory(id, 1);
+        MCRCategory category = MCRCategoryDAOFactory.obtainInstance().getCategory(id, 1);
         if (category == null) {
             job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, "Could not find category: " + id);
             return;
@@ -195,7 +195,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         }
 
         String classifID = category.getId().getRootID();
-        Map<MCRCategoryID, Number> count = MCRCategLinkServiceFactory.getInstance().countLinksForType(category,
+        Map<MCRCategoryID, Number> count = MCRCategLinkServiceFactory.obtainInstance().countLinksForType(category,
             objType, true);
         for (Iterator<Element> it = data.iterator(); it.hasNext();) {
             Element child = it.next();

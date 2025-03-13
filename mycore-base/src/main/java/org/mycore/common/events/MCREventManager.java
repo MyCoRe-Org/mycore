@@ -316,11 +316,11 @@ public final class MCREventManager {
         String className = CONFIG_PREFIX + "Mode." + mode;
         MCREventHandlerInitializer configuredInitializer = MCRConfiguration2.getSingleInstanceOfOrThrow(
             MCREventHandlerInitializer.class, className);
-        return configuredInitializer.getInstance(propertyValue);
+        return configuredInitializer.obtainInstance(propertyValue);
     }
 
     public interface MCREventHandlerInitializer {
-        MCREventHandler getInstance(String propertyValue);
+        MCREventHandler obtainInstance(String propertyValue);
     }
 
     /**

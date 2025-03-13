@@ -95,7 +95,7 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
     private static void createOrUpdateOCFLClassification(MCRCategoryID categoryID, Character eventType)
         throws IOException {
         // read classification from just here
-        final MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
+        final MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
         final MCRCategory categoryRoot = categoryDAO
             .getCategory(categoryID, -1);
         if (categoryID == null) {

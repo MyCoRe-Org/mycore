@@ -480,7 +480,7 @@ public final class MCRLinkTableManager {
         categories.addAll(obj.getService().getClassifications());
         if (!categories.isEmpty()) {
             MCRCategLinkReference objectReference = new MCRCategLinkReference(mcrId);
-            MCRCategLinkServiceFactory.getInstance().setLinks(objectReference, categories);
+            MCRCategLinkServiceFactory.obtainInstance().setLinks(objectReference, categories);
         }
         // add derivate reference
         MCRObjectStructure structure = obj.getStructure();
@@ -502,7 +502,7 @@ public final class MCRLinkTableManager {
     public void delete(MCRObjectID id) {
         deleteReferenceLink(id);
         MCRCategLinkReference reference = new MCRCategLinkReference(id);
-        MCRCategLinkServiceFactory.getInstance().deleteLink(reference);
+        MCRCategLinkServiceFactory.obtainInstance().deleteLink(reference);
     }
 
     /**
@@ -549,7 +549,7 @@ public final class MCRLinkTableManager {
         }
 
         MCRCategLinkReference objectReference = new MCRCategLinkReference(der.getId());
-        MCRCategLinkServiceFactory.getInstance().setLinks(objectReference, categoryList);
+        MCRCategLinkServiceFactory.obtainInstance().setLinks(objectReference, categoryList);
     }
 
     private MCRCategoryID metaClassToCategoryID(MCRMetaClassification metaClazz) {

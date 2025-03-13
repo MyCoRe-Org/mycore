@@ -158,7 +158,7 @@ public class MCRConfigurableInstanceHelperConfigTest extends MCRTestCase {
         assertTrue("Properties should contain " + instanceName, list.contains(fullInstanceName));
 
         Optional<ConfigurableTestInstance> instance = MCRConfigurableInstanceHelper
-            .getInstance(ConfigurableTestInstance.class, fullInstanceName);
+            .createInstance(ConfigurableTestInstance.class, fullInstanceName);
         assertTrue("Test " + fullInstanceName + " should be present", instance.isPresent());
 
         validateFields(instance.get());

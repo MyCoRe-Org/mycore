@@ -55,11 +55,11 @@ public class MCRRoleManager {
     /** List of all defined roles */
     private static List<MCRRole> rolesList = new ArrayList<>();
 
-    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.obtainInstance();
 
     private static long lastLoaded;
 
-    private static final MCRCategLinkService CATEG_LINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
+    private static final MCRCategLinkService CATEG_LINK_SERVICE = MCRCategLinkServiceFactory.obtainInstance();
 
     static {
         loadSystemRoles();

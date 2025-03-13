@@ -310,7 +310,7 @@ public final class MCRUploadHelper {
         if (classifications == null || classifications.isBlank()) {
             return Collections.emptyList();
         }
-        final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+        final MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
         final List<MCRCategoryID> categoryIDS = Stream.of(classifications)
             .filter(Objects::nonNull)
             .filter(Predicate.not(String::isBlank))

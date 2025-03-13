@@ -93,7 +93,7 @@ public class MCRRestClassifications {
         tags = MCRRestUtils.TAG_MYCORE_CLASSIFICATION)
     @XmlElementWrapper(name = "classifications")
     public Response listClassifications() {
-        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
+        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
         Date lastModified = new Date(categoryDAO.getLastModified());
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request.getRequest(), lastModified);
         if (cachedResponse.isPresent()) {
@@ -171,7 +171,7 @@ public class MCRRestClassifications {
     }
 
     private Response getClassification(String classId, Function<MCRCategoryDAO, MCRCategory> categorySupplier) {
-        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
+        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
         Date lastModified = getLastModifiedDate(classId, categoryDAO);
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request.getRequest(), lastModified);
         if (cachedResponse.isPresent()) {
@@ -232,7 +232,7 @@ public class MCRRestClassifications {
                 .withMessage("Classification " + classId + " cannot be overwritten by " + mcrClass.getID() + ".")
                 .toException();
         }
-        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
+        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
         Response.Status status;
         if (!categoryDAO.exist(new MCRCategoryID(classId))) {
             categoryDAO.addCategory(null, mcrClass.toCategory());

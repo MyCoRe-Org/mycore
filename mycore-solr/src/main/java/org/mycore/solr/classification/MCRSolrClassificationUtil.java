@@ -80,7 +80,7 @@ public final class MCRSolrClassificationUtil {
     public static void rebuildIndex(List<MCRSolrCore> cores) {
         LOGGER.info("rebuild classification index...");
         // categories
-        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
+        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
         List<MCRCategoryID> rootCategoryIDs = categoryDAO.getRootCategoryIDs();
         for (MCRCategoryID rootID : rootCategoryIDs) {
             LOGGER.info("rebuild classification '{}'...", rootID);
@@ -92,7 +92,7 @@ public final class MCRSolrClassificationUtil {
             bulkIndex(cores, solrDocumentList);
         }
         // links
-        MCRCategLinkService linkService = MCRCategLinkServiceFactory.getInstance();
+        MCRCategLinkService linkService = MCRCategLinkServiceFactory.obtainInstance();
         Collection<String> linkTypes = linkService.getTypes();
         for (String linkType : linkTypes) {
             LOGGER.info("rebuild '{}' links...", linkType);
@@ -253,7 +253,7 @@ public final class MCRSolrClassificationUtil {
 
     public static void reindex(Collection<MCRCategoryID> categoryIds) {
         List<MCRCategory> categoryList = new ArrayList<>(categoryIds.size());
-        MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+        MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
         for (MCRCategoryID categoryId : categoryIds) {
             MCRCategory category = dao.getCategory(categoryId, 0);
             categoryList.add(category);
