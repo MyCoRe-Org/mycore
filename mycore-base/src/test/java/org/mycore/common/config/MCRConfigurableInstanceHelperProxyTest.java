@@ -43,7 +43,7 @@ public class MCRConfigurableInstanceHelperProxyTest extends MCRTestCase {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         TestClassWithConfigurationProxy instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithConfigurationProxy.class, configuration);
+            .createInstance(TestClassWithConfigurationProxy.class, configuration);
 
         assertNotNull(instance);
         assertEquals("Value1-Value2", instance.value());
