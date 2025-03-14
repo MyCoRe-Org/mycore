@@ -52,7 +52,7 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
     private static final Logger LOGGER = LogManager.getLogger();
 
     public MCRCategoryDAO getDAO() {
-        return MCRCategoryDAOFactory.getInstance();
+        return MCRCategoryDAOFactory.obtainInstance();
     }
 
     @Override

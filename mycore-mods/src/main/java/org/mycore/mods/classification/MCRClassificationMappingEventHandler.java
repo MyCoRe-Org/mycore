@@ -93,7 +93,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
         Optional<MCRLabel> labelOptional = category.getLabel(LABEL_LANG_X_MAPPING);
 
         if (labelOptional.isPresent()) {
-            final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+            final MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
             String label = labelOptional.get().getText();
             return Stream.of(label.split("\\s"))
                 .map(MCRCategoryID::ofString)
@@ -117,7 +117,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
      * with the XPath-Mapping label as value
      */
     private static Map<String, Set<MCRCategory>> loadAllXPathMappings() {
-        final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+        final MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
         return Arrays.stream(X_PATH_MAPPING_CLASSIFICATIONS.trim().split(","))
             .collect(Collectors.toMap(
                 relevantClass -> relevantClass,
@@ -165,7 +165,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
             .stream().forEach(Element::detach);
 
         LOGGER.info("check mappings {}", obj::getId);
-        final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+        final MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
         // check x-mappings
         mcrmodsWrapper.getMcrCategoryIDs().stream()
             .map(categoryId -> {

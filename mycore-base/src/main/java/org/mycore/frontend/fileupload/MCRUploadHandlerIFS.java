@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -95,11 +94,9 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     }
 
     private static List<MCRPostUploadFileProcessor> initProcessorList() {
-        return MCRConfiguration2.getString(FILE_PROCESSOR_PROPERTY)
-            .map(MCRConfiguration2::splitValue)
-            .orElseGet(Stream::empty)
-            .map(MCRConfiguration2::<MCRPostUploadFileProcessor>instantiateClass)
-            .collect(Collectors.toList());
+        return MCRConfiguration2
+            .instantiateClasses(MCRPostUploadFileProcessor.class, FILE_PROCESSOR_PROPERTY)
+            .toList();
     }
 
     @Override

@@ -84,7 +84,7 @@ public class MCRRoleServlet extends MCRServlet {
             }
         }
         roleClassificationsDefined = roleCategories.size() > 1;
-        categoryDao = MCRCategoryDAOFactory.getInstance();
+        categoryDao = MCRCategoryDAOFactory.obtainInstance();
     }
 
     /* (non-Javadoc)

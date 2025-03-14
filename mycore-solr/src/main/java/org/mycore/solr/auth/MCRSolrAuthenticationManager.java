@@ -23,41 +23,61 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.solr.MCRSolrConstants;
 
 import java.net.http.HttpRequest;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**
- * Interface for adding authentication to Solr requests.
+ * Shared manager for adding authentication to Solr requests.
  */
-public interface MCRSolrAuthenticationManager {
+public final class MCRSolrAuthenticationManager {
+
+    private static final String SOLR_AUTH_PROPERTY_PREFIX = MCRSolrConstants.SOLR_CONFIG_PREFIX + "Server.Auth.";
+
+    private final Map<MCRSolrAuthenticationLevel, Optional<MCRSolrAuthenticator>> authenticators
+        = new EnumMap<>(MCRSolrAuthenticationLevel.class);
+
+    private MCRSolrAuthenticationManager() {
+        for (MCRSolrAuthenticationLevel level : MCRSolrAuthenticationLevel.values()) {
+            authenticators.put(level, MCRConfiguration2.getInstanceOf(MCRSolrAuthenticator.class,
+                SOLR_AUTH_PROPERTY_PREFIX + level.getPropertyName() + ".Class"));
+        }
+    }
 
     /**
-     * Add basic authentication to the request, if username and password are configured.
-     * Should be thread-safe.
+     * Add authentication to a Solr request.
      *
      * @param request the request to add the authentication to
      * @param level   the level of authentication to add
      */
-    void applyAuthentication(SolrRequest<?> request, MCRSolrAuthenticationLevel level);
+    public void applyAuthentication(SolrRequest<?> request, MCRSolrAuthenticationLevel level) {
+        authenticators.get(level).ifPresent(authenticator -> authenticator.applyAuthentication(request, level));
+    }
 
     /**
-     * Add basic authentication to the request, if username and password are configured.
-     * Should be thread-safe.
+     * Add basic authentication to an HTTP request.
      *
      * @param request the request to add the authentication to
      * @param level   the level of authentication to add
      */
-    void applyAuthentication(HttpRequest.Builder request, MCRSolrAuthenticationLevel level);
+    public void applyAuthentication(HttpRequest.Builder request, MCRSolrAuthenticationLevel level) {
+        authenticators.get(level).ifPresent(authenticator -> authenticator.applyAuthentication(request, level));
+    }
 
     /**
      * @deprecated Use {@link #obtainInstance()} instead
      */
     @Deprecated
-    static MCRSolrAuthenticationManager getInstance() {
+    public static MCRSolrAuthenticationManager getInstance() {
         return obtainInstance();
     }
 
-    static MCRSolrAuthenticationManager obtainInstance() {
-        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRSolrAuthenticationManager.class,
-            MCRSolrConstants.SOLR_CONFIG_PREFIX + "Server.Auth.Manager.Class");
+    public static MCRSolrAuthenticationManager obtainInstance() {
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
+    }
+
+    private static final class LazyInstanceHolder {
+        public static final MCRSolrAuthenticationManager SINGLETON_INSTANCE = new MCRSolrAuthenticationManager();
     }
 
 }

@@ -178,12 +178,9 @@ public class MCRRestObjects {
 
     public static final String HEADER_X_TOTAL_COUNT = "X-Total-Count";
 
-    public static final List<MCRThumbnailGenerator> THUMBNAIL_GENERATORS = Collections
-        .unmodifiableList(MCRConfiguration2
-            .getOrThrow("MCR.Media.Thumbnail.Generators", MCRConfiguration2::splitValue)
-            .map(MCRConfiguration2::instantiateClass)
-            .map(MCRThumbnailGenerator.class::cast)
-            .collect(Collectors.toList()));
+    public static final List<MCRThumbnailGenerator> THUMBNAIL_GENERATORS = MCRConfiguration2
+        .instantiateClasses(MCRThumbnailGenerator.class, "MCR.Media.Thumbnail.Generators")
+        .toList();
 
     private static final String PARAM_CATEGORIES = "category";
 
@@ -829,7 +826,7 @@ public class MCRRestObjects {
         if (!state.isEmpty()) {
             MCRCategoryID categState = new MCRCategoryID(
                 MCRConfiguration2.getString("MCR.Metadata.Service.State.Classification.ID").orElse("state"), state);
-            if (!MCRCategoryDAOFactory.getInstance().exist(categState)) {
+            if (!MCRCategoryDAOFactory.obtainInstance().exist(categState)) {
                 throw MCRErrorResponse.ofStatusCode(Response.Status.BAD_REQUEST.getStatusCode())
                     .withErrorCode(MCRErrorCodeConstants.MCROBJECT_INVALID_STATE)
                     .withMessage("Category " + categState + " not found")

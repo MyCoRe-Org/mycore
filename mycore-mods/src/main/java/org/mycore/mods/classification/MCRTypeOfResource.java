@@ -114,6 +114,6 @@ class MCRTypeOfResource extends MCRAuthorityInfo {
     }
 
     public static boolean isClassificationPresent() {
-        return MCRCategoryDAOFactory.getInstance().exist(new MCRCategoryID(TYPE_OF_RESOURCE));
+        return MCRCategoryDAOFactory.obtainInstance().exist(new MCRCategoryID(TYPE_OF_RESOURCE));
     }
 }

@@ -50,7 +50,7 @@ public class MCRStateConditionTest extends MCRJPATestCase {
     public void setUp() throws Exception {
         super.setUp();
 
-        MCRCategoryDAO instance = MCRCategoryDAOFactory.getInstance();
+        MCRCategoryDAO instance = MCRCategoryDAOFactory.obtainInstance();
         MCRCategoryImpl state = new MCRCategoryImpl();
         state.setRootID("state");
         state.setRootID("state");

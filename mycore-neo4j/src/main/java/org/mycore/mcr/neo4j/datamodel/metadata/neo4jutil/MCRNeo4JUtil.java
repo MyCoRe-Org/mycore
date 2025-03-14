@@ -54,7 +54,7 @@ public final class MCRNeo4JUtil {
     public static String getClassificationLabel(String classidString, String categidString, String language) {
         String label = "";
         MCRCategoryID categid = new MCRCategoryID(classidString, categidString);
-        MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+        MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
         MCRCategory categ = dao.getCategory(categid, 1);
         MCRLabel categLabel = categ.getLabel(language).orElse(null);
         if (categLabel != null) {
@@ -72,7 +72,7 @@ public final class MCRNeo4JUtil {
      * @return the label of the classification
      */
     public static Optional<String> getClassLabel(final String classID, final String categID, final String lang) {
-        final MCRCategory category = MCRCategoryDAOFactory.getInstance()
+        final MCRCategory category = MCRCategoryDAOFactory.obtainInstance()
             .getCategory(new MCRCategoryID(classID, categID), 1);
 
         if (null == category) {
@@ -115,8 +115,8 @@ public final class MCRNeo4JUtil {
         propertiesMap.forEach((k, v) -> {
             // avoid loop instantiation
             if (!Objects.equals(k, filterClassKey)) {
-                parserMap.put(k, MCRConfiguration2.getOrThrow(NEO4J_CONFIG_PREFIX + "ParserClass." + k,
-                    MCRConfiguration2::instantiateClass));
+                parserMap.put(k, MCRConfiguration2.getInstanceOfOrThrow(MCRNeo4JAbstractDataModelParser.class,
+                    NEO4J_CONFIG_PREFIX + "ParserClass." + k));
             }
         });
         return parserMap;

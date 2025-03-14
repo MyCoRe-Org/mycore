@@ -94,7 +94,7 @@ public class MCRLodClassification {
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS))
     public Response outputLODClassificationRoot() {
-        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
+        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
         Date lastModified = new Date(categoryDAO.getLastModified());
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request.getRequest(), lastModified);
         if (cachedResponse.isPresent()) {
@@ -165,7 +165,7 @@ public class MCRLodClassification {
 
     private Response getClassification(MCRCategoryID categId, Function<MCRCategoryDAO, MCRCategory> categorySupplier,
         List<MediaType> acceptMediaTypes, URI uri) {
-        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
+        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
         String classId = categId.getRootID();
         Date lastModified = getLastModifiedDate(classId, categoryDAO);
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request.getRequest(), lastModified);
@@ -195,7 +195,7 @@ public class MCRLodClassification {
 
     private Document createClassList() {
         Element eBag = new Element("Bag", MCRConstants.RDF_NAMESPACE);
-        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
+        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
         for (MCRCategory categ : categoryDAO.getRootCategories()) {
             eBag.addContent(new Element("li", MCRConstants.RDF_NAMESPACE)
                 .setAttribute("resource",

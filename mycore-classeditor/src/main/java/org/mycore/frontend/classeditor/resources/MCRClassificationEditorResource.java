@@ -107,9 +107,9 @@ import jakarta.ws.rs.core.UriInfo;
  */
 @Path("classifications")
 public class MCRClassificationEditorResource {
-    private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.getInstance();
+    private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.obtainInstance();
 
-    private static final MCRCategLinkService CATEG_LINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
+    private static final MCRCategLinkService CATEG_LINK_SERVICE = MCRCategLinkServiceFactory.obtainInstance();
 
     protected static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
         MCRSolrAuthenticationManager.obtainInstance();
@@ -495,7 +495,7 @@ public class MCRClassificationEditorResource {
         public void run() {
             MCRCategoryID mcrCategoryID = category.getId();
             boolean isAdded = isAdded(jsonObject);
-            if (isAdded && MCRCategoryDAOFactory.getInstance().exist(mcrCategoryID)) {
+            if (isAdded && MCRCategoryDAOFactory.obtainInstance().exist(mcrCategoryID)) {
                 // an added category already exist -> throw conflict error
                 throw new WebApplicationException(
                     Response.status(Status.CONFLICT).entity(buildJsonError("duplicateID", mcrCategoryID)).build());

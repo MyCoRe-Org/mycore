@@ -150,6 +150,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID>, Serializable 
      * @exception MCRException if the given identifier is not valid
      */
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    @SuppressWarnings({"PMD.MCR.Singleton.PrivateConstructor", "PMD.MCR.Singleton.NonPrivateConstructors"})
     public static MCRObjectID getInstance(String id) {
         return MCRObjectIDPool.getMCRObjectID(Objects.requireNonNull(id, "'id' must not be null."));
     }

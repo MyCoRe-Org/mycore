@@ -110,7 +110,7 @@ public class MCRClassificationEditorResourceTest extends MCRTestCase {
              * by a previous test. In this case a class cast exception occur because MCRCategoryDAOImpl
              * was loaded. */
             MCRCategoryDAOFactory.set(CategoryDAOMock.class);
-            categDAO = (CategoryDAOMock) MCRCategoryDAOFactory.getInstance();
+            categDAO = (CategoryDAOMock) MCRCategoryDAOFactory.obtainInstance();
             categDAO.init();
         } catch (Exception exc) {
             fail();

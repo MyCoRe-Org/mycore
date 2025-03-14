@@ -86,7 +86,7 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
 
     private static void initClassifications() throws URISyntaxException, IOException, JDOMException {
         DAO = new MCRCategoryDAOImpl();
-        CLS = MCRCategLinkServiceFactory.getInstance();
+        CLS = MCRCategLinkServiceFactory.obtainInstance();
 
         URL classResourceUrl = MCRObjectInfoEntityQueryResolverTest.class
             .getResource("/mycore-classifications/mir_licenses.xml");

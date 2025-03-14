@@ -107,7 +107,7 @@ public class MCRORCIDUserUtils {
         final MCRORCIDCredential credential = Optional.ofNullable(orcidUser.getCredentialByORCID(orcid))
             .orElseThrow(() -> new MCRORCIDException("Credential does not exist"));
         try {
-            MCRORCIDOAuthClient.getInstance().revokeToken(credential.getAccessToken());
+            MCRORCIDOAuthClient.obtainInstance().revokeToken(credential.getAccessToken());
             orcidUser.removeCredentialByORCID(orcid);
             MCRUserManager.updateUser(orcidUser.getUser());
         } catch (MCRORCIDRequestException e) {

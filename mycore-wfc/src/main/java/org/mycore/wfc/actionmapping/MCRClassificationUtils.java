@@ -35,7 +35,7 @@ import org.mycore.wfc.MCRConstants;
  */
 public class MCRClassificationUtils {
 
-    private static final MCRCategLinkService LINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
+    private static final MCRCategLinkService LINK_SERVICE = MCRCategLinkServiceFactory.obtainInstance();
 
     private static final MCRLinkTableManager LINK_TABLE = MCRLinkTableManager.getInstance();
 

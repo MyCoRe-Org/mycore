@@ -45,7 +45,7 @@ class MCRAuthorityWithURI extends MCRAuthorityInfo {
 
     static final String CLASS_URI_PART = "classifications/";
 
-    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.obtainInstance();
 
     /**
      * xml:lang value of category or classification <label> for MODS @authorityURI or @valueURI.

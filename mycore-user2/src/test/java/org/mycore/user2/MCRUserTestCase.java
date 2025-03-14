@@ -40,7 +40,7 @@ public class MCRUserTestCase extends MCRJPATestCase {
     public void setUp() throws Exception {
         super.setUp();
         MCRCategory groupsCategory = MCRCategoryDAOImplTest.loadClassificationResource("/mcr-roles.xml");
-        MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
+        MCRCategoryDAO DAO = MCRCategoryDAOFactory.obtainInstance();
         DAO.addCategory(null, groupsCategory);
     }
 

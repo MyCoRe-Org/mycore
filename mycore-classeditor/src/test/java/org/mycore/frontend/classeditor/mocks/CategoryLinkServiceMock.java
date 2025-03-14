@@ -36,7 +36,7 @@ public class CategoryLinkServiceMock implements MCRCategLinkService {
     public Map<MCRCategoryID, Boolean> hasLinks(MCRCategory category) {
         List<MCRCategory> categories;
         if (category == null) {
-            categories = MCRCategoryDAOFactory.getInstance().getRootCategories();
+            categories = MCRCategoryDAOFactory.obtainInstance().getRootCategories();
         } else {
             categories = category.getChildren();
         }

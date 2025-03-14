@@ -26,7 +26,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.mycore.backend.jpa.MCREntityManagerProvider;
@@ -65,6 +64,7 @@ public final class MCRPIManager {
 
     private final Map<String, Class<? extends MCRPIParser>> typeParserMap;
 
+    @SuppressWarnings("unchecked")
     private MCRPIManager() {
         parserList = new ArrayList<>();
         typeParserMap = new ConcurrentHashMap<>();
@@ -80,10 +80,10 @@ public final class MCRPIManager {
                 }
             });
 
-        resolverList = MCRConfiguration2.getOrThrow(RESOLVER_CONFIGURATION, MCRConfiguration2::splitValue)
-            .map(MCRConfiguration2::<MCRPIResolver<MCRPersistentIdentifier>>instantiateClass)
-            .collect(Collectors.toList());
-
+        resolverList = MCRConfiguration2
+            .instantiateClasses(MCRPIResolver.class, RESOLVER_CONFIGURATION)
+            .map(resolver -> (MCRPIResolver<MCRPersistentIdentifier>) resolver)
+            .toList();
     }
 
     public static MCRPIManager getInstance() {

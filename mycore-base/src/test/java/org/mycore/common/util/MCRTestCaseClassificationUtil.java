@@ -34,7 +34,7 @@ public class MCRTestCaseClassificationUtil {
         Document classification = new SAXBuilder()
             .build(MCRTestCaseClassificationUtil.class.getResourceAsStream(resourcePath));
         MCRCategory category = MCRXMLTransformer.getCategory(classification);
-        MCRCategoryDAOFactory.getInstance().addCategory(null, category);
+        MCRCategoryDAOFactory.obtainInstance().addCategory(null, category);
     }
 
 }

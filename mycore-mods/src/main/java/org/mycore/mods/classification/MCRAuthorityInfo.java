@@ -40,7 +40,7 @@ abstract class MCRAuthorityInfo {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.obtainInstance();
 
     /**
      * A cache that maps authority information to the category ID that is represented by that info.

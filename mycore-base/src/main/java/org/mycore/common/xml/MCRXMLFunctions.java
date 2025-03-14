@@ -657,13 +657,13 @@ public class MCRXMLFunctions {
     public static boolean hasParentCategory(String classificationId, String categoryId) {
         MCRCategoryID categID = new MCRCategoryID(classificationId, categoryId);
         //root category has level 0
-        return !categID.isRootID() && MCRCategoryDAOFactory.getInstance().getCategory(categID, 0).getLevel() > 1;
+        return !categID.isRootID() && MCRCategoryDAOFactory.obtainInstance().getCategory(categID, 0).getLevel() > 1;
     }
 
     public static String getDisplayName(String classificationId, String categoryId) {
         try {
             MCRCategoryID categID = new MCRCategoryID(classificationId, categoryId);
-            MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+            MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
             MCRCategory category = dao.getCategory(categID, 0);
             return Optional.ofNullable(category)
                 .map(MCRCategory::getCurrentLabel)
@@ -697,7 +697,7 @@ public class MCRXMLFunctions {
         MCRCategory category = null;
         try {
             MCRCategoryID categID = MCRCategoryID.ofString(classificationId + ":" + categoryId);
-            MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+            MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
             category = dao.getCategory(categID, 0);
         } catch (MCRException e) {
             LOGGER.error("Could not determine state for classification id {} and category id {}", classificationId,
@@ -945,7 +945,7 @@ public class MCRXMLFunctions {
     }
 
     private static final class MCRCategLinkServiceHolder {
-        public static final MCRCategLinkService INSTANCE = MCRCategLinkServiceFactory.getInstance();
+        public static final MCRCategLinkService INSTANCE = MCRCategLinkServiceFactory.obtainInstance();
     }
 
     private static final class SetNodeList implements NodeList {
