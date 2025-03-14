@@ -17,7 +17,7 @@
 import {
   AccessKeyConfig,
   AccessKeyManagerRouted,
-} from 'vue-access-key-manager';
+} from '@mycore-org/vue-access-key-manager';
 import { useI18n } from 'vue-i18n';
 import { inject } from 'vue';
 import { AuthStrategy } from '@mycore-test/js-common/auth';

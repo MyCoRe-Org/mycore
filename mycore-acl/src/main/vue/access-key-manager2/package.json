@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@mycore-test/js-common": "npm:@jsr/mycore-test__js-common@^0.1.0",
+    "@mycore-org/vue-access-key-manager": "^0.0.1",
+    "@mycore-org/vue-components": "^0.0.1",
     "vue": "^3.5.13",
     "vue-i18n": "^11.1.0",
     "vue-router": "^4.5.0"
