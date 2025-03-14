@@ -26,10 +26,15 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRFactory;
+import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.digest.MCRMD5Digest;
 import org.mycore.services.http.MCRURLQueryParameter;
 import org.mycore.user2.MCRUser;
@@ -49,56 +54,56 @@ import jakarta.ws.rs.client.ClientBuilder;
  *
  * @author Frank Lützenkirchen
  */
+@MCRConfigurationProxy(proxyClass = MCROAuthClient.Factory.class)
 public final class MCROAuthClient {
 
-    private final String baseURL;
+    private static final String CLIENT_PROPERTY = "MCR.ORCID.OAuth";
 
-    private final String clientID;
-
-    private final String clientSecret;
+    private final Settings settings;
 
     private final Client client;
 
-    private MCROAuthClient() {
-        String prefix = "MCR.ORCID.OAuth.";
-
-        baseURL = MCRConfiguration2.getStringOrThrow(prefix + "BaseURL");
-        clientID = MCRConfiguration2.getStringOrThrow(prefix + "ClientID");
-        clientSecret = MCRConfiguration2.getStringOrThrow(prefix + "ClientSecret");
-
-        client = ClientBuilder.newClient();
+    public MCROAuthClient(Settings settings) {
+        this.settings = Objects.requireNonNull(settings, "Settings must not be null");
+        this.client = ClientBuilder.newClient();
     }
 
     /**
-     * @deprecated Use {@link #getInstance()} instead
+     * @deprecated Use {@link #obtainInstance()} instead
      */
     @Deprecated
     public static MCROAuthClient instance() {
-        return getInstance();
+        return obtainInstance();
     }
 
-    public static MCROAuthClient getInstance() {
-        return LazyInstanceHolder.SINGLETON_INSTANCE;
+    @MCRFactory
+    public static MCROAuthClient obtainInstance() {
+        return LazyInstanceHolder.SHARED_INSTANCE;
+    }
+
+    public static MCROAuthClient createInstance() {
+        String classProperty = CLIENT_PROPERTY + ".Class";
+        return MCRConfiguration2.getInstanceOfOrThrow(MCROAuthClient.class, classProperty);
     }
 
     public String getClientID() {
-        return clientID;
+        return settings.clientId;
     }
 
     /**
      * Builds am OAuth2 token request.
      */
     public MCRTokenRequest getTokenRequest() {
-        MCRTokenRequest req = new MCRTokenRequest(client.target(baseURL));
-        req.set("client_id", clientID);
-        req.set("client_secret", clientSecret);
+        MCRTokenRequest req = new MCRTokenRequest(client.target(settings.baseUrl));
+        req.set("client_id", settings.clientId);
+        req.set("client_secret", settings.clientSecret);
         return req;
     }
 
     public MCRRevokeRequest getRevokeRequest(String token) {
-        MCRRevokeRequest req = new MCRRevokeRequest(client.target(baseURL));
-        req.set("client_id", clientID);
-        req.set("client_secret", clientSecret);
+        MCRRevokeRequest req = new MCRRevokeRequest(client.target(settings.baseUrl));
+        req.set("client_id", settings.clientId);
+        req.set("client_secret", settings.clientSecret);
         req.set("token", token);
         return req;
     }
@@ -117,7 +122,7 @@ public final class MCROAuthClient {
      */
     String getCodeRequestURL(String redirectURL, String scopes) throws URISyntaxException, MalformedURLException {
         List<MCRURLQueryParameter> parameters = new ArrayList<>();
-        parameters.add(new MCRURLQueryParameter("client_id", clientID));
+        parameters.add(new MCRURLQueryParameter("client_id", settings.clientId));
         parameters.add(new MCRURLQueryParameter("response_type", "code"));
         parameters.add(new MCRURLQueryParameter("redirect_uri", redirectURL));
         parameters.add(new MCRURLQueryParameter("scope", scopes.trim()));
@@ -136,7 +141,7 @@ public final class MCROAuthClient {
         if (MCRConfiguration2.getOrThrow("MCR.ORCID.PreFillRegistrationForm", Boolean::parseBoolean)) {
             preFillRegistrationForm(parameters);
         }
-        return new URI(baseURL + "/authorize" + MCRURLQueryParameter.toQueryString(parameters)).toString();
+        return new URI(settings.baseUrl + "/authorize" + MCRURLQueryParameter.toQueryString(parameters)).toString();
     }
 
     /**
@@ -195,8 +200,48 @@ public final class MCROAuthClient {
         return MCRUtils.toHexString(digest);
     }
 
+
+    public record Settings(
+        String baseUrl,
+        String clientId,
+        String clientSecret) {
+
+        public Settings {
+            Objects.requireNonNull(baseUrl, "Base URL must not be null");
+            Objects.requireNonNull(clientId, "Client ID must not be null");
+            Objects.requireNonNull(clientSecret, "Client secret must not be null");
+        }
+
+    }
+
+    public static class Factory implements Supplier<MCROAuthClient> {
+
+        @MCRProperty(name = "BaseURL")
+        public String baseUrl;
+
+        @MCRProperty(name = "ClientID")
+        public String clientId;
+
+        @MCRProperty(name = "ClientSecret")
+        public String clientSecret;
+
+        @Override
+        public MCROAuthClient get() {
+
+            Settings settings = new Settings(
+                baseUrl,
+                clientId,
+                clientSecret
+            );
+
+            return new MCROAuthClient(settings);
+
+        }
+
+    }
+
     private static final class LazyInstanceHolder {
-        public static final MCROAuthClient SINGLETON_INSTANCE = new MCROAuthClient();
+        public static final MCROAuthClient SHARED_INSTANCE = createInstance();
     }
 
 }

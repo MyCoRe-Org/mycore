@@ -41,7 +41,6 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.orcid2.exception.MCRORCIDException;
-import org.mycore.orcid2.oauth.MCRORCIDOAuthClient;
 import org.mycore.orcid2.util.MCRIdentifier;
 
 /**
@@ -129,7 +128,7 @@ public class MCRORCIDUtils {
      * @return true if source path equals client id
      */
     public static boolean isCreatedByThisApplication(String sourcePath) {
-        return Objects.equals(sourcePath, MCRORCIDOAuthClient.CLIENT_ID);
+        return Objects.equals(sourcePath, MCRORCIDConstants.ORCID_CLIENT_ID);
     }
 
     /**

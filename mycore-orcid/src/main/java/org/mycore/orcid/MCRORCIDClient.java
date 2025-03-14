@@ -23,6 +23,7 @@ import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.WebTarget;
 
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.annotation.MCRFactory;
 
 /**
  * Utility class to work with the REST API of orcid.org.
@@ -35,22 +36,26 @@ public final class MCRORCIDClient {
 
     private final WebTarget baseTarget;
 
-    private MCRORCIDClient() {
-        String baseURL = MCRConfiguration2.getStringOrThrow("MCR.ORCID.BaseURL");
+    public MCRORCIDClient(String baseUrl) {
         Client client = ClientBuilder.newClient();
-        baseTarget = client.target(baseURL);
+        baseTarget = client.target(baseUrl);
     }
 
     /**
-     * @deprecated Use {@link #getInstance()} instead
+     * @deprecated Use {@link #obtainInstance()} instead
      */
     @Deprecated
     public static MCRORCIDClient instance() {
-        return getInstance();
+        return obtainInstance();
     }
 
-    public static MCRORCIDClient getInstance() {
-        return LazyInstanceHolder.SINGLETON_INSTANCE;
+    @MCRFactory
+    public static MCRORCIDClient obtainInstance() {
+        return LazyInstanceHolder.SHARED_INSTANCE;
+    }
+
+    public static MCRORCIDClient createInstance() {
+        return new MCRORCIDClient(MCRConfiguration2.getStringOrThrow("MCR.ORCID.BaseURL"));
     }
 
     public WebTarget getBaseTarget() {
@@ -58,7 +63,7 @@ public final class MCRORCIDClient {
     }
 
     private static final class LazyInstanceHolder {
-        public static final MCRORCIDClient SINGLETON_INSTANCE = new MCRORCIDClient();
+        public static final MCRORCIDClient SHARED_INSTANCE = createInstance();
     }
 
 }

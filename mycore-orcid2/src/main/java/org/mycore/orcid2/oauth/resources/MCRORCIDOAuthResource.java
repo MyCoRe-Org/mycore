@@ -152,7 +152,7 @@ public class MCRORCIDOAuthResource {
         final UriBuilder builder = UriBuilder.fromPath(MCRORCIDConstants.ORCID_BASE_URL);
         builder.path("oauth/authorize");
         builder.queryParam("redirect_uri", getRedirectUri());
-        builder.queryParam("client_id", MCRORCIDOAuthClient.CLIENT_ID);
+        builder.queryParam("client_id", MCRORCIDConstants.ORCID_CLIENT_ID);
         builder.queryParam("response_type", "code");
         builder.queryParam("scope", scope);
         builder.queryParam("prompt", "login");
@@ -240,7 +240,7 @@ public class MCRORCIDOAuthResource {
                 || !Objects.equals(MCRORCIDUtils.hashString(MCRSessionMgr.getCurrentSessionID()), state)) {
                 throw new BadRequestException();
             }
-            final MCRORCIDOAuthAccessTokenResponse accessTokenResponse = MCRORCIDOAuthClient.getInstance()
+            final MCRORCIDOAuthAccessTokenResponse accessTokenResponse = MCRORCIDOAuthClient.obtainInstance()
                 .exchangeCode(codeTrimmed, getRedirectUri());
             final MCRORCIDCredential credential = accessTokenResponseToUserCredential(accessTokenResponse);
             if (checkCurrentUserIsGuest()) {
