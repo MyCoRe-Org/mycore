@@ -38,7 +38,7 @@ import org.mycore.common.config.annotation.MCRSentinel;
  * {@link MCRUserInformationProvider} instances that each implement a strategy to create or look up user information.
  * <p>
  * A singular, globally available and centrally configured instance can be obtained with
- * {@link MCRUserInformationResolver#instance()}. This instance is configured using the property prefix
+ * {@link MCRUserInformationResolver#obtainInstance()}. This instance is configured using the property prefix
  * {@link MCRUserInformationResolver#RESOLVER_PROPERTY} and should be used in order obtain user information with
  * consistently applied strategies, although custom instances can be created when necessary.
  * <p>
