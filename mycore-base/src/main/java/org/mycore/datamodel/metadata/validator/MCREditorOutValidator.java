@@ -451,16 +451,16 @@ public class MCREditorOutValidator {
     }
 
     private Document loadDefaultAclDocument() throws IOException, JDOMException {
-        String resourcetype = "/editor_default_acls_" + id.getTypeId() + ".xml";
-        String resourcebase = "/editor_default_acls_" + id.getBase() + ".xml";
-        InputStream aclxml = MCREditorOutValidator.class.getResourceAsStream(resourcebase);
+        String resourcetype = "editor_default_acls_" + id.getTypeId() + ".xml";
+        String resourcebase = "editor_default_acls_" + id.getBase() + ".xml";
+        InputStream aclxml = MCRResourceHelper.getResourceAsStream(resourcebase);
         if (aclxml == null) {
-            aclxml = MCREditorOutValidator.class.getResourceAsStream(resourcetype);
+            aclxml = MCRResourceHelper.getResourceAsStream(resourcetype);
             if (aclxml == null) {
                 LOGGER.warn("Can't find default object ACL file {} or {}",
-                    () -> resourcebase.substring(1), () -> resourcetype.substring(1));
-                String resource = "/editor_default_acls.xml"; // fallback
-                aclxml = MCREditorOutValidator.class.getResourceAsStream(resource);
+                    resourcebase, resourcetype);
+                String resource = "editor_default_acls.xml"; // fallback
+                aclxml = MCRResourceHelper.getResourceAsStream(resource);
                 if (aclxml == null) {
                     return null;
                 }

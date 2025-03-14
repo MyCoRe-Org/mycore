@@ -62,7 +62,7 @@ abstract class MCRPersistenceServlet extends MCRServlet {
     public void init() throws ServletException {
         super.init();
         String configuredPage = MCRConfiguration2.getStringOrThrow("MCR.FileUpload.WebPage");
-        uploadPage = MCRPersistenceHelper.getWebPage(getServletContext(), configuredPage, "fileupload_commit.xml");
+        uploadPage = MCRPersistenceHelper.getWebPage(configuredPage, "fileupload_commit.xml");
     }
 
     @Override

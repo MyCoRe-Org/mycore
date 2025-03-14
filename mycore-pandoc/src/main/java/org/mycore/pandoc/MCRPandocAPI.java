@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.resource.MCRResourceHelper;
 
 /**
  * Interface to the command line utility <a href="https://pandoc.org">Pandoc</a>,
@@ -45,7 +46,7 @@ public class MCRPandocAPI {
     private static final int TIMEOUT = MCRConfiguration2.getInt("MCR.Pandoc.Timeout").orElse(5);
 
     private static final String LUA_PATH = MCRConfiguration2.getString("MCR.Pandoc.LuaPath")
-        .orElse(Thread.currentThread().getContextClassLoader().getResource("lua").getPath() + "?.lua");
+        .orElse(MCRResourceHelper.getResourceUrl("lua").getPath() + "?.lua");
 
     private enum Action {
         READER("Reader"), WRITER("Writer");
@@ -122,7 +123,7 @@ public class MCRPandocAPI {
         String path = MCRConfiguration2.getString("MCR.Pandoc." + action + "." + format + ".Path").orElse("");
         if (!property.isEmpty()) {
             if (path.isEmpty()) {
-                return Thread.currentThread().getContextClassLoader().getResource(property).getFile();
+                return MCRResourceHelper.getResourceUrl(property).getFile();
             } else {
                 return Paths.get(path).resolve(property).toString();
             }
