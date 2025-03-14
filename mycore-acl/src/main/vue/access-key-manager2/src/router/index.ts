@@ -18,7 +18,7 @@
 
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import AppView from '@/views/AppView.vue';
-import { Error401View, Error403View } from 'mcr-vue-components';
+import { Error401View, Error403View } from '@mycore-org/vue-components';
 import { appConfig } from '@/common/config';
 
 const routes: Array<RouteRecordRaw> = [
