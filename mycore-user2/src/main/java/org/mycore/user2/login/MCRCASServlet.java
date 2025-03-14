@@ -128,7 +128,7 @@ public class MCRCASServlet extends MCRServlet {
         }
 
         // Get user properties from LDAP server
-        boolean userChanged = MCRLDAPClient.getInstance().updateUserProperties(user);
+        boolean userChanged = MCRLDAPClient.obtainInstance().updateUserProperties(user);
         if (userChanged && userExists) {
             MCRUserManager.updateUser(user);
         }
