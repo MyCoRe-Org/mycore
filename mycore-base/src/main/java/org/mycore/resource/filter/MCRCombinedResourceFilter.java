@@ -50,6 +50,7 @@ import org.mycore.common.log.MCRTreeMessage;
 public final class MCRCombinedResourceFilter extends MCRResourceFilterBase {
 
     public static final String FILTERS_KEY = "Filters";
+
     private final List<MCRResourceFilter> filters;
 
     public MCRCombinedResourceFilter(MCRResourceFilter... filters) {
