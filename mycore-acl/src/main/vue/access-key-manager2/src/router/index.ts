@@ -17,14 +17,35 @@
  */
 
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import AppView from '@/views/AppView.vue';
 import { Error401View, Error403View } from '@mycore-org/vue-components';
+import ManagerEntry from '@/components/ManagerEntry.vue';
 import { appConfig } from '@/common/config';
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    component: AppView,
+    redirect: '/admin',
+  },
+  {
+    path: '/admin/:reference?',
+    component: ManagerEntry,
+    props: route => ({
+      reference: route.params.reference || undefined,
+      page: Number(route.query.page) || undefined,
+      pageSize: Number(route.query.pageSize) || undefined,
+    }),
+  },
+  {
+    path: '/:reference',
+    component: ManagerEntry,
+    props: route => ({
+      reference: route.params.reference || undefined,
+      permissions: route.query.availablePermissions
+        ? (route.query.availablePermissions as string).split(',')
+        : undefined,
+      page: Number(route.query.page) || undefined,
+      pageSize: Number(route.query.pageSize) || undefined,
+    }),
   },
   {
     path: '/401',
@@ -50,6 +71,10 @@ const getContext = (): string => {
 const router = createRouter({
   history: createWebHistory(getContext()),
   routes,
+});
+
+router.onError(error => {
+  console.log(error);
 });
 
 export default router;

@@ -6,21 +6,35 @@
         <h3>{{ t('component.acl.accesskey.frontend.title.main') }}</h3>
       </div>
     </div>
-    <AccessKeyManagerRouted
+    <AccessKeyManager
       :config="config"
       :auth-strategy="authStrategy"
-    ></AccessKeyManagerRouted>
+      :reference="reference"
+      :permissions="permissions"
+      :current-page="page"
+      :page-size="pageSize"
+      router-enabled
+      @error="handleError"
+    ></AccessKeyManager>
   </div>
 </template>
 
 <script setup lang="ts">
 import {
   AccessKeyConfig,
-  AccessKeyManagerRouted,
+  AccessKeyManager,
 } from '@mycore-org/vue-access-key-manager';
 import { useI18n } from 'vue-i18n';
 import { inject } from 'vue';
 import { AuthStrategy } from '@mycore-test/js-common/auth';
+
+interface Props {
+  reference?: string;
+  permissions?: string[];
+  page?: number;
+  pageSize?: number;
+}
+defineProps<Props>();
 
 const { t } = useI18n();
 const config = inject('accessKeyConfig') as AccessKeyConfig;
@@ -33,5 +47,9 @@ const authStrategy: AuthStrategy | undefined = import.meta.env.DEV
       }
     })()
   : undefined;
+
+const handleError = (error: unknown) => {
+  throw error;
+};
 </script>
 <style></style>
