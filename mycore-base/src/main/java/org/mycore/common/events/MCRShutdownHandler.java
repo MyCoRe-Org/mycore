@@ -45,7 +45,6 @@ import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventor;
  * <code>MCRServletContextListener</code>
  *
  * @author Thomas Scheffler (yagee)
- * @see org.mycore.common.events.MCRShutdownThread
  * @see org.mycore.common.events.MCRServletContextListener
  * @since 1.3
  */
@@ -77,7 +76,13 @@ public final class MCRShutdownHandler {
 
     private void init() {
         if (!isWebAppRunning) {
-            MCRShutdownThread.getInstance();
+            LOGGER.info("adding MyCoRe ShutdownHook");
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                MCRShutdownHandler sh = getInstance();
+                if (sh != null) {
+                    sh.shutDown();
+                }
+            }, "MCR-exit"));
         }
     }
 
