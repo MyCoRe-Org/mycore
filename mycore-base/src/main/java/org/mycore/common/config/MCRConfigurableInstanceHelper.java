@@ -55,6 +55,7 @@ import org.mycore.common.config.annotation.MCRSentinel;
 
 import jakarta.inject.Singleton;
 
+
 /**
  * Creates Objects which are configured with properties.
  *
@@ -93,11 +94,7 @@ class MCRConfigurableInstanceHelper {
     }
 
     /**
-     * Creates a configured instance of a class.
-     *
-     * @param name the property which contains the class name
-     * @return the configured instance of T
-     * @throws MCRConfigurationException if the property is not right configured.
+     * @deprecated Use {@link #getInstance(Class, String)} instead
      */
     @Deprecated
     @SuppressWarnings("unchecked")
@@ -114,33 +111,78 @@ class MCRConfigurableInstanceHelper {
      * @throws MCRConfigurationException if the property is not right configured.
      */
     public static <S> Optional<S> getInstance(Class<S> superClass, String name) throws MCRConfigurationException {
+        return getInstance(superClass, name, false);
+    }
+
+    /**
+     * Creates a configured instance of a class.
+     *
+     * @param superClass the intended super class of the instantiated class
+     * @param name       the property which contains the class name
+     * @return the configured instance of T
+     * @throws MCRConfigurationException if the property is not right configured.
+     */
+    public static <S> Optional<S> getInstance(Class<S> superClass, String name,
+        boolean allowMissingClassNameForFinalClasses) throws MCRConfigurationException {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName(name);
         String className = configuration.className();
         if (className == null || className.isBlank()) {
+            if (allowMissingClassNameForFinalClasses) {
+                return Optional.of(getInstance(superClass, configuration, name, true));
+            }
             return Optional.empty();
         }
-        return Optional.of(getInstance(superClass, configuration, name));
+        return Optional.of(getInstance(superClass, configuration, name, allowMissingClassNameForFinalClasses));
     }
 
+    /**
+     * @deprecated Use {@link #getInstance(Class, MCRInstanceConfiguration)} instead
+     */
     @Deprecated
     @SuppressWarnings("unchecked")
     public static <T> T getInstance(MCRInstanceConfiguration configuration) throws MCRConfigurationException {
-        return (T) getInstance(Objects.class, configuration, null);
+        return (T) getInstance(Objects.class, configuration, null, false);
     }
 
+    /**
+     * Creates a configured instance of a class.
+     *
+     * @param superClass    the intended super class of the instantiated class
+     * @param configuration the configuration to be used
+     * @return the configured instance of T
+     * @throws MCRConfigurationException if the property is not right configured.
+     */
     public static <S> S getInstance(Class<S> superClass, MCRInstanceConfiguration configuration)
         throws MCRConfigurationException {
-        return getInstance(superClass, configuration, null);
+        return getInstance(superClass, configuration, false);
     }
 
-    private static <S> S getInstance(Class<S> superClass, MCRInstanceConfiguration configuration, String name)
-        throws MCRConfigurationException {
+    /**
+     * Creates a configured instance of a class.
+     *
+     * @param superClass    the intended super class of the instantiated class
+     * @param configuration the configuration to be used
+     * @return the configured instance of T
+     * @throws MCRConfigurationException if the property is not right configured.
+     */
+    public static <S> S getInstance(Class<S> superClass, MCRInstanceConfiguration configuration,
+        boolean allowMissingClassNameForFinalClasses) throws MCRConfigurationException {
+        return getInstance(superClass, configuration, null, allowMissingClassNameForFinalClasses);
+    }
+
+    private static <S> S getInstance(Class<S> superClass, MCRInstanceConfiguration configuration, String name,
+        boolean allowMissingClassNameForFinalClasses) throws MCRConfigurationException {
         String className = configuration.className();
         if (className == null || className.isBlank()) {
-            throw new MCRConfigurationException("Missing or empty property: " + configuration.name().actual());
+            if (allowMissingClassNameForFinalClasses && Modifier.isFinal(superClass.getModifiers())) {
+                configuration = configuration.fixedClass(superClass);
+            } else {
+                throw new MCRConfigurationException("Missing or empty property: " + configuration.name().actual()
+                    + " (and expected class " + superClass.getName() + " is not final)");
+            }
         }
         Class<S> targetClass = getClass(configuration.name().actual(), configuration.className());
-        Object instance = createInstance(targetClass, configuration);
+        Object instance = createInstanceDirectorViaProxy(targetClass, configuration);
         if (superClass.isAssignableFrom(instance.getClass())) {
             return superClass.cast(instance);
         } else {
@@ -162,7 +204,7 @@ class MCRConfigurableInstanceHelper {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> T createInstance(Class<T> targetClass, MCRInstanceConfiguration configuration) {
+    private static <T> T createInstanceDirectorViaProxy(Class<T> targetClass, MCRInstanceConfiguration configuration) {
         MCRConfigurationProxy productAnnotation = targetClass.getDeclaredAnnotation(MCRConfigurationProxy.class);
         if (productAnnotation != null) {
             Class<Supplier<T>> proxyClass = (Class<Supplier<T>>) productAnnotation.proxyClass();
@@ -966,15 +1008,16 @@ class MCRConfigurableInstanceHelper {
 
             String nestedClassName = nestedConfiguration.className();
             if (nestedClassName == null || nestedClassName.isBlank()) {
-                if (annotation.required()) {
-                    throw new MCRConfigurationException("Missing or empty property: "
-                        + nestedConfiguration.name().actual());
-                } else {
+                if (!annotation.required()) {
                     return null;
                 }
             }
 
-            Object instance = getInstance(Object.class, nestedConfiguration);
+            boolean allowMissingClassNameForFinalClasses =  annotation.required() &&
+                Modifier.isFinal(annotation.valueClass().getModifiers());
+
+            Object instance = getInstance(annotation.valueClass(), nestedConfiguration,
+                allowMissingClassNameForFinalClasses);
 
             if (!annotation.valueClass().isAssignableFrom(instance.getClass())) {
                 throwIncompatibleAnnotation(annotation.valueClass(), target, instance);
@@ -1050,8 +1093,17 @@ class MCRConfigurableInstanceHelper {
                     + getExampleName(configuration, "B") + ", ...");
             }
 
+            boolean allowMissingClassNameForFinalClasses = annotation.required() &&
+                Modifier.isFinal(annotation.valueClass().getModifiers());
+
             Map<String, Object> instanceMap = nestedConfigurationMap.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> getInstance(Object.class, entry.getValue())));
+                .collect(Collectors.toMap(Map.Entry::getKey,entry -> {
+                    MCRInstanceConfiguration c = entry.getValue();
+                    if (allowMissingClassNameForFinalClasses) {
+                        c = c.fixedClass(annotation.valueClass());
+                    }
+                    return getInstance(annotation.valueClass(), c, allowMissingClassNameForFinalClasses);
+                }));
 
             instanceMap.values().forEach(instance -> {
                 if (!annotation.valueClass().isAssignableFrom(instance.getClass())) {
@@ -1144,8 +1196,16 @@ class MCRConfigurableInstanceHelper {
                     + getExampleName(configuration, "2") + ", ...");
             }
 
+            boolean allowMissingClassNameForFinalClasses = annotation.required() &&
+                Modifier.isFinal(annotation.valueClass().getModifiers());
+
             List<Object> instanceList = nestedConfigurationList.stream()
-                .map(c -> getInstance(Object.class, c)).toList();
+                .map(c -> {
+                    if (allowMissingClassNameForFinalClasses) {
+                        c = c.fixedClass(annotation.valueClass());
+                    }
+                    return (Object) getInstance(annotation.valueClass(), c, allowMissingClassNameForFinalClasses);
+                }).toList();
 
             instanceList.forEach(instance -> {
                 if (!annotation.valueClass().isAssignableFrom(instance.getClass())) {

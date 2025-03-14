@@ -130,10 +130,15 @@ public class MCRConfiguration2 {
      * @throws MCRConfigurationException if the class can not be loaded or instantiated
      */
     public static <S> Optional<S> getInstanceOf(Class<S> superClass, String name) throws MCRConfigurationException {
+        return getInstanceOf(superClass, name, false);
+    }
+
+    private static <S> Optional<S> getInstanceOf(Class<S> superClass, String name,
+        boolean allowMissingClassNameForFinalClasses) {
         if (MCRConfigurableInstanceHelper.isSingleton(superClass)) {
-            return getSingleInstanceOf(superClass, name);
+            return getSingleInstanceOf(superClass, name, allowMissingClassNameForFinalClasses);
         } else {
-            return MCRConfigurableInstanceHelper.getInstance(superClass, name);
+            return MCRConfigurableInstanceHelper.getInstance(superClass, name, allowMissingClassNameForFinalClasses);
         }
     }
 
@@ -147,7 +152,7 @@ public class MCRConfiguration2 {
      * or the configuration property is not set
      */
     public static <S> S getInstanceOfOrThrow(Class<S> superClass, String name) throws MCRConfigurationException {
-        return getInstanceOf(superClass, name).orElseThrow(() -> createConfigurationException(name));
+        return getInstanceOf(superClass, name, true).orElseThrow(() -> createConfigurationException(name));
     }
 
     /**
@@ -160,10 +165,16 @@ public class MCRConfiguration2 {
      * @throws MCRConfigurationException if the class can not be loaded or instantiated
      */
     public static <S> Optional<S> getSingleInstanceOf(Class<S> superClass, String name) {
+        return getSingleInstanceOf(superClass, name, false);
+    }
+
+    private static <S> Optional<S> getSingleInstanceOf(Class<S> superClass, String name,
+        boolean allowMissingClassNameForFinalClasses) {
         return getString(name)
             .map(className -> new ConfigSingletonKey(name, className))
             .map(key -> (S) instanceHolder.computeIfAbsent(key,
-                k -> MCRConfigurableInstanceHelper.getInstance(superClass, name).orElse(null)));
+                k -> MCRConfigurableInstanceHelper.getInstance(superClass, name, 
+                        allowMissingClassNameForFinalClasses).orElse(null)));
     }
 
     /**
@@ -177,7 +188,7 @@ public class MCRConfiguration2 {
      * or the configuration property is not set
      */
     public static <S> S getSingleInstanceOfOrThrow(Class<S> superClass, String name) {
-        return getSingleInstanceOf(superClass, name).orElseThrow(() -> createConfigurationException(name));
+        return getSingleInstanceOf(superClass, name, true).orElseThrow(() -> createConfigurationException(name));
     }
 
     /**
