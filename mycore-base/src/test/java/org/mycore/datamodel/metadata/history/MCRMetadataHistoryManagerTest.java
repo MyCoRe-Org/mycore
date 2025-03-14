@@ -96,13 +96,13 @@ public class MCRMetadataHistoryManagerTest extends MCRJPATestCase {
     }
 
     private void create(MCRObjectID id, Instant time) {
-        MCRMetaHistoryItem created = MCRMetaHistoryItem.createdNow(id);
+        MCRMetaHistoryItem created = MCRMetaHistoryItem.now(id, MCRMetadataHistoryEventType.CREATE);
         created.setTime(time);
         store(created);
     }
 
     private void delete(MCRObjectID id, Instant time) {
-        MCRMetaHistoryItem deleted = MCRMetaHistoryItem.deletedNow(id);
+        MCRMetaHistoryItem deleted = MCRMetaHistoryItem.now(id, MCRMetadataHistoryEventType.DELETE);
         deleted.setTime(time);
         store(deleted);
     }
