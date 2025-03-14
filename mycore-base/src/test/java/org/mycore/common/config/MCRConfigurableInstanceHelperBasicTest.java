@@ -40,7 +40,7 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         TestClassWithSingletonFactory instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithSingletonFactory.class, configuration);
+            .createInstance(TestClassWithSingletonFactory.class, configuration);
 
         assertNotNull(instance);
 
@@ -55,7 +55,7 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         TestClassWitAnnotatedFactory instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWitAnnotatedFactory.class, configuration);
+            .createInstance(TestClassWitAnnotatedFactory.class, configuration);
 
         assertNotNull(instance);
 
@@ -69,7 +69,7 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
     public void annotatedFactories() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurableInstanceHelper.getInstance(TestClassWitAnnotatedFactories.class, configuration);
+        MCRConfigurableInstanceHelper.createInstance(TestClassWitAnnotatedFactories.class, configuration);
 
     }
 
@@ -82,7 +82,7 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         TestClassWithConstructor instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithConstructor.class, configuration);
+            .createInstance(TestClassWithConstructor.class, configuration);
 
         assertNotNull(instance);
 
@@ -97,7 +97,7 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         TestClassWitLegacyFactory instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWitLegacyFactory.class, configuration);
+            .createInstance(TestClassWitLegacyFactory.class, configuration);
 
         assertNotNull(instance);
 
@@ -111,7 +111,7 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
     public void legacyFactories() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurableInstanceHelper.getInstance(TestClassWitLegacyFactories.class, configuration);
+        MCRConfigurableInstanceHelper.createInstance(TestClassWitLegacyFactories.class, configuration);
 
     }
 
@@ -123,7 +123,7 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
     public void noConstructorOrFactory() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurableInstanceHelper.getInstance(Object.class, configuration);
+        MCRConfigurableInstanceHelper.createInstance(Object.class, configuration);
 
     }
 
@@ -135,7 +135,22 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
     public void multipleFactories() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurableInstanceHelper.getInstance(Object.class, configuration);
+        MCRConfigurableInstanceHelper.createInstance(Object.class, configuration);
+
+    }
+
+    @Test
+    @MCRTestConfiguration(
+        properties = {
+            @MCRTestProperty(key = "Foo.Value", string = "Value")
+        })
+    public void configurationFinal() {
+
+        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
+        FinalTestClass instance = MCRConfigurableInstanceHelper
+            .createInstance(FinalTestClass.class, configuration, true);
+
+        assertNotNull(instance);
 
     }
 
@@ -149,7 +164,7 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         TestClassWithConfigurationProxy instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithConfigurationProxy.class, configuration);
+            .createInstance(TestClassWithConfigurationProxy.class, configuration);
 
         assertNotNull(instance);
 
@@ -168,9 +183,6 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
             return SINGLETON_INSTANCE;
         }
 
-    }
-
-    public static class TestClassWithConstructor {
     }
 
     @SuppressWarnings("InstantiationOfUtilityClass")
@@ -202,6 +214,9 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
             return new TestClassWitAnnotatedFactories();
         }
 
+    }
+
+    public static class TestClassWithConstructor {
     }
 
     @SuppressWarnings("InstantiationOfUtilityClass")
@@ -256,6 +271,9 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
             return new TestClassWithMultipleFactories();
         }
 
+    }
+
+    public static final class FinalTestClass {
     }
 
     @SuppressWarnings({ "unused" })
