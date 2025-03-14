@@ -64,7 +64,7 @@ public class MCRIFSCopyTest extends MCRIFSTest {
         MCRTransactionManager.commitTransactions();
 
         // execute threads
-        MCRSystemUserInformation systemUser = MCRSystemUserInformation.getSystemUserInstance();
+        MCRSystemUserInformation systemUser = MCRSystemUserInformation.SYSTEM_USER;
         ExecutorService executorService = Executors.newFixedThreadPool(3);
         Future<Exception> future1 = executorService
             .submit(new MCRFixedUserCallable<>(new CopyTask("anpassbar.jpg", derivate), systemUser));

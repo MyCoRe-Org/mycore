@@ -113,7 +113,7 @@ public final class MCRImageTiler implements Runnable, Closeable {
         //get this MCRSession a speaking name
         MCRSessionMgr.unlock();
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
+        mcrSession.setUserInformation(MCRSystemUserInformation.SYSTEM_USER);
         boolean activated = MCRConfiguration2.getBoolean(MCRIView2Tools.CONFIG_PREFIX + "LocalTiler.activated")
             .orElse(true) && MCRConfiguration2.getBoolean("MCR.Persistence.Database.Enable").orElse(true)
             && MCREntityManagerProvider.getEntityManagerFactory() != null;

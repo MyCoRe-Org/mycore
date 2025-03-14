@@ -81,7 +81,7 @@ public class MCRLockServlet extends MCRServlet {
     @Override
     protected void think(MCRServletJob job) throws Exception {
         if (MCRSessionMgr.getCurrentSession().getUserInformation()
-            .equals(MCRSystemUserInformation.getGuestInstance())) {
+            .equals(MCRSystemUserInformation.GUEST)) {
             job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }

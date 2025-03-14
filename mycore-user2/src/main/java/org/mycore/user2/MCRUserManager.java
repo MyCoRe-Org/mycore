@@ -228,13 +228,13 @@ public class MCRUserManager {
     /**
      * Checks whether the user is invalid.
      *
-     * MCRUser is not allowed to overwrite information returned by {@link MCRSystemUserInformation#getGuestInstance()}
-     * or {@link MCRSystemUserInformation#getSystemUserInstance()}.
+     * MCRUser is not allowed to overwrite information returned by {@link MCRSystemUserInformation#GUEST}
+     * or {@link MCRSystemUserInformation#SYSTEM_USER}.
      * @return true if {@link #createUser(MCRUser)} or {@link #updateUser(MCRUser)} would reject the given user
      */
     public static boolean isInvalidUser(MCRUser user) {
-        return MCRSystemUserInformation.getGuestInstance().getUserID().equals(user.getUserID())
-            || MCRSystemUserInformation.getSystemUserInstance().getUserID().equals(user.getUserID());
+        return MCRSystemUserInformation.GUEST.getUserID().equals(user.getUserID())
+            || MCRSystemUserInformation.SYSTEM_USER.getUserID().equals(user.getUserID());
     }
 
     /**

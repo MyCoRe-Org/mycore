@@ -62,7 +62,7 @@ public class MCRMODSLinkedMetadataTest extends MCRStoreTestCase {
         super.setUp();
         seriesID = MCRObjectID.getInstance("junit_mods_00000001");
         bookID = MCRObjectID.getInstance("junit_mods_00000002");
-        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getSuperUserInstance());
+        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.SUPER_USER);
         MCRObject series = new MCRObject(getResourceAsURL(seriesID + ".xml").toURI());
         MCRObject book = new MCRObject(getResourceAsURL(bookID + ".xml").toURI());
         MCRMetadataManager.create(series);

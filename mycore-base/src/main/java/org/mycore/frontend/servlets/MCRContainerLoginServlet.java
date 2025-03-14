@@ -82,7 +82,7 @@ public class MCRContainerLoginServlet extends MCRServlet {
                 .flatMap(r -> Optional.ofNullable(r.getUserPrincipal()))
                 .map(Principal::getName)
                 .orElseGet(() -> Optional.ofNullable(lastUser)
-                    .orElseGet(MCRSystemUserInformation.getGuestInstance()::getUserID));
+                    .orElseGet(MCRSystemUserInformation.GUEST::getUserID));
             return lastUser;
         }
 

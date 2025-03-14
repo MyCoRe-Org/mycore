@@ -120,7 +120,7 @@ public class MCROAISetManager {
     }
 
     private Runnable getUpdateRunnable() {
-        return new MCRFixedUserRunnable(this::updateCachedSetList, MCRSystemUserInformation.getSystemUserInstance());
+        return new MCRFixedUserRunnable(this::updateCachedSetList, MCRSystemUserInformation.SYSTEM_USER);
     }
 
     private void updateCachedSetList() {

@@ -94,7 +94,7 @@ public class MCROCFLXMLUserManager {
          * Usually guests do not have rights to modify users, so the only time they trigger this event
          * is during the update of "lastLogin", since the user switch has not happened yet.
          */
-        if (MCRSystemUserInformation.getGuestInstance().getUserID().equals(currentUser.getUserID())) {
+        if (MCRSystemUserInformation.GUEST.getUserID().equals(currentUser.getUserID())) {
             LOGGER.debug("Login Detected, ignoring...");
             return;
         }

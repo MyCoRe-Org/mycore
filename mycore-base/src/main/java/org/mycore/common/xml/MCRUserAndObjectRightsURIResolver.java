@@ -100,7 +100,7 @@ public class MCRUserAndObjectRightsURIResolver implements URIResolver {
                 result.appendChild(
                     doc.createTextNode(
                         Boolean.toString(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
-                            .equals(MCRSystemUserInformation.getSuperUserInstance().getUserID()))));
+                            .equals(MCRSystemUserInformation.SUPER_USER.getUserID()))));
                 return new DOMSource(doc);
             }
 
@@ -108,7 +108,7 @@ public class MCRUserAndObjectRightsURIResolver implements URIResolver {
                 result.appendChild(
                     doc.createTextNode(
                         Boolean.toString(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
-                            .equals(MCRSystemUserInformation.getGuestInstance().getUserID()))));
+                            .equals(MCRSystemUserInformation.GUEST.getUserID()))));
                 return new DOMSource(doc);
             }
 

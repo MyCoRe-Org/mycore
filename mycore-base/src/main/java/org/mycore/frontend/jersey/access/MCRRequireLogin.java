@@ -38,7 +38,7 @@ public class MCRRequireLogin implements MCRResourceAccessChecker {
         boolean result = false;
         if (MCRSessionMgr.hasCurrentSession()) {
             result = !MCRSessionMgr.getCurrentSession().getUserInformation().getUserID().equals(
-                MCRSystemUserInformation.getGuestInstance().getUserID());
+                MCRSystemUserInformation.GUEST.getUserID());
         }
         return result;
     }

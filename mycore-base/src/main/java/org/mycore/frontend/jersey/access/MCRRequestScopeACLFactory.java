@@ -36,7 +36,7 @@ public class MCRRequestScopeACLFactory implements Factory<MCRRequestScopeACL> {
     }
 
     private static class MCRRequestScopeACLImpl implements MCRRequestScopeACL {
-        public static final MCRSystemUserInformation GUEST = MCRSystemUserInformation.getGuestInstance();
+        public static final MCRSystemUserInformation GUEST = MCRSystemUserInformation.GUEST;
 
         private boolean isPrivate;
 

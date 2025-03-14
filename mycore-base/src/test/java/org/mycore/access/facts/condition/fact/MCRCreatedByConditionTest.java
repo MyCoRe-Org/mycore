@@ -45,7 +45,7 @@ public class MCRCreatedByConditionTest extends MCRTestCase {
 
     @Test
     public void testConditionMatch() throws NoSuchFieldException, IllegalAccessException {
-        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getSuperUserInstance());
+        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.SUPER_USER);
 
         MCRObject object = new MCRObject();
         object.getService().addFlag("createdby", "administrator");
@@ -63,7 +63,7 @@ public class MCRCreatedByConditionTest extends MCRTestCase {
 
     @Test
     public void testNotMatch() throws NoSuchFieldException, IllegalAccessException {
-        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getGuestInstance());
+        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.GUEST);
 
         MCRObject object = new MCRObject();
         object.getService().addFlag("createdby", "administrator");

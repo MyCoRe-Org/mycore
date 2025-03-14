@@ -88,7 +88,7 @@ public class MCRJobRunnable extends MCRAbstractProcessable implements Runnable {
         //prepare environment
         MCRSessionMgr.unlock();
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
+        mcrSession.setUserInformation(MCRSystemUserInformation.SYSTEM_USER);
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         EntityTransaction transaction = em.getTransaction();
         try {

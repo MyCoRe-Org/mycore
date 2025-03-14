@@ -203,7 +203,7 @@ public class MCRMetadataHistoryCommands {
                 creator = null;
             }
             String user = Optional.ofNullable(creator)
-                .orElseGet(() -> MCRSystemUserInformation.getSystemUserInstance().getUserID());
+                .orElseGet(() -> MCRSystemUserInformation.SYSTEM_USER.getUserID());
             MCRMetaHistoryItem create = create(derId,
                 user,
                 lastModified);
@@ -231,7 +231,7 @@ public class MCRMetadataHistoryCommands {
                 creator = null;
             }
             String user = Optional.ofNullable(creator)
-                .orElseGet(() -> MCRSystemUserInformation.getSystemUserInstance().getUserID());
+                .orElseGet(() -> MCRSystemUserInformation.SYSTEM_USER.getUserID());
             MCRMetaHistoryItem create = create(objId, user, lastModified);
             boolean objectIsHidden = MCRMetadataHistoryManager.objectIsHidden(obj);
             if (objectIsHidden) {

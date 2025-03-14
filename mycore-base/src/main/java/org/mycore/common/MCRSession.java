@@ -120,7 +120,7 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
 
     private static final ExecutorService COMMIT_SERVICE;
 
-    private static final MCRUserInformation GUEST_USER_INFORMATION = MCRSystemUserInformation.getGuestInstance();
+    private static final MCRUserInformation GUEST_USER_INFORMATION = MCRSystemUserInformation.GUEST;
 
     static {
         ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("MCRSession-OnCommitService-#%d")
@@ -544,15 +544,15 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
 
     private boolean isTransitionAllowed(MCRUserInformation userSystemAdapter) {
         //allow if current user super user or system user or not logged in
-        if (MCRSystemUserInformation.getSuperUserInstance().getUserID().equals(userInformation.getUserID())
-            || MCRSystemUserInformation.getGuestInstance().getUserID().equals(userInformation.getUserID())
-            || MCRSystemUserInformation.getSystemUserInstance().getUserID().equals(userInformation.getUserID())) {
+        if (MCRSystemUserInformation.SUPER_USER.getUserID().equals(userInformation.getUserID())
+            || MCRSystemUserInformation.GUEST.getUserID().equals(userInformation.getUserID())
+            || MCRSystemUserInformation.SYSTEM_USER.getUserID().equals(userInformation.getUserID())) {
             return true;
         }
         //allow if new user information has default rights of guest user
         //or userID equals old userID
-        return MCRSystemUserInformation.getGuestInstance().getUserID().equals(userSystemAdapter.getUserID())
-            || MCRSystemUserInformation.getSystemUserInstance().getUserID().equals(userSystemAdapter.getUserID())
+        return MCRSystemUserInformation.GUEST.getUserID().equals(userSystemAdapter.getUserID())
+            || MCRSystemUserInformation.SYSTEM_USER.getUserID().equals(userSystemAdapter.getUserID())
             || userInformation.getUserID().equals(userSystemAdapter.getUserID());
     }
 

@@ -291,7 +291,7 @@ public final class MCRAccessControlSystem extends MCRAccessBaseImpl {
         MCRAccessRule rule = getAccessRule(objID, permission);
         LOGGER.debug("getAccess() is done");
         if (rule == null) {
-            return userID.equals(MCRSystemUserInformation.getSuperUserInstance().getUserID());
+            return userID.equals(MCRSystemUserInformation.SUPER_USER.getUserID());
         }
         return rule.checkAccess(userID, date, ip);
     }
@@ -315,7 +315,7 @@ public final class MCRAccessControlSystem extends MCRAccessBaseImpl {
         MCRAccessRule rule = getAccessRule(objID, permission);
         LOGGER.debug("getAccess() is done");
         if (rule == null) {
-            return userInfo.getUserID().equals(MCRSystemUserInformation.getSuperUserInstance().getUserID());
+            return userInfo.getUserID().equals(MCRSystemUserInformation.SUPER_USER.getUserID());
         }
         return rule.checkAccess(userInfo, date, ip);
     }

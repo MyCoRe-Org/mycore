@@ -142,7 +142,7 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
             MCRAccessRule rule = getAccessRule(id, permission);
             if (rule == null) {
                 LOGGER.debug("No rule defined. Checking if current user is super user.");
-                MCRSystemUserInformation superUserInstance = MCRSystemUserInformation.getSuperUserInstance();
+                MCRSystemUserInformation superUserInstance = MCRSystemUserInformation.SUPER_USER;
                 String superUserID = superUserInstance.getUserID();
                 return superUserID.equals(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
             }

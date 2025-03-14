@@ -140,7 +140,7 @@ public class MCRLoginServlet extends MCRServlet {
 
     private static boolean currentUserIsGuest() {
         return MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
-            .equals(MCRSystemUserInformation.getGuestInstance().getUserID());
+            .equals(MCRSystemUserInformation.GUEST.getUserID());
     }
 
     /**

@@ -70,7 +70,7 @@ public class MCRTilingAction implements Runnable {
         image.setTileDir(tileDir);
         MCRSessionMgr.unlock();
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
+        mcrSession.setUserInformation(MCRSystemUserInformation.SYSTEM_USER);
         AtomicReference<EntityTransaction> imageReaderTransactionReference = new AtomicReference<>();
         EntityTransaction mergeTransaction = null;
 

@@ -23,7 +23,7 @@ import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
 
 /**
- * A EventHandler which runs as {@link MCRSystemUserInformation#getJanitorInstance()}.
+ * A EventHandler which runs as {@link MCRSystemUserInformation#JANITOR}.
  */
 public class MCRJanitorEventHandlerBase extends MCREventHandlerBase {
 
@@ -31,11 +31,11 @@ public class MCRJanitorEventHandlerBase extends MCREventHandlerBase {
     public void doHandleEvent(MCREvent evt) {
         MCRUserInformation prevUserInformation = MCRSessionMgr.getCurrentSession().getUserInformation();
         try {
-            MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getGuestInstance());
-            MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getJanitorInstance());
+            MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.GUEST);
+            MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.JANITOR);
             super.doHandleEvent(evt);
         } finally {
-            MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getGuestInstance());
+            MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.GUEST);
             MCRSessionMgr.getCurrentSession().setUserInformation(prevUserInformation);
         }
     }

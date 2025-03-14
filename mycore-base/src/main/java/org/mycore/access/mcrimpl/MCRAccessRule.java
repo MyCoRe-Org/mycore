@@ -62,7 +62,7 @@ public class MCRAccessRule implements org.mycore.access.MCRAccessRule {
     @Deprecated
     public boolean checkAccess(String userID, Date date, MCRIPAddress ip) {
         if (parsedRule == null) {
-            if (userID.equals(MCRSystemUserInformation.getSuperUserInstance().getUserID())) {
+            if (userID.equals(MCRSystemUserInformation.SUPER_USER.getUserID())) {
                 LogManager.getLogger(MCRAccessRule.class).debug("No rule defined, grant access to super user.");
                 return true;
             }
@@ -80,7 +80,7 @@ public class MCRAccessRule implements org.mycore.access.MCRAccessRule {
 
     public boolean checkAccess(MCRUserInformation userInfo, Date date, MCRIPAddress ip) {
         if (parsedRule == null) {
-            if (userInfo.getUserID().equals(MCRSystemUserInformation.getSuperUserInstance().getUserID())) {
+            if (userInfo.getUserID().equals(MCRSystemUserInformation.SUPER_USER.getUserID())) {
                 LogManager.getLogger(MCRAccessRule.class).debug("No rule defined, grant access to super user.");
                 return true;
             }

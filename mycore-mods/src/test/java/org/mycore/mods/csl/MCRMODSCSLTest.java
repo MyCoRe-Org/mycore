@@ -61,7 +61,7 @@ public class MCRMODSCSLTest extends MCRStoreTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getSuperUserInstance());
+        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.SUPER_USER);
         List<MCRContent> testContent = getTestContent();
         for (MCRContent content : testContent) {
             Document jdom = content.asXML();

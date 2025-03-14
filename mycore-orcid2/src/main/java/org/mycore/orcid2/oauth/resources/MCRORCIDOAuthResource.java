@@ -303,7 +303,7 @@ public class MCRORCIDOAuthResource {
     }
 
     private boolean checkCurrentUserIsGuest() {
-        return Objects.equals(MCRSystemUserInformation.getGuestInstance().getUserID(),
+        return Objects.equals(MCRSystemUserInformation.GUEST.getUserID(),
             MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
     }
 

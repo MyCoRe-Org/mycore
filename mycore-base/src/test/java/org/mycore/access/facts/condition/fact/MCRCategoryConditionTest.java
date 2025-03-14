@@ -80,7 +80,7 @@ public class MCRCategoryConditionTest extends MCRJPATestCase {
 
     @Test
     public void testConditionMatch() throws NoSuchFieldException, IllegalAccessException {
-        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getSuperUserInstance());
+        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.SUPER_USER);
 
         MCRObject object = new MCRObject();
         MCRObjectID testId = MCRObjectID.getInstance("test_test_00000001");
@@ -102,7 +102,7 @@ public class MCRCategoryConditionTest extends MCRJPATestCase {
 
     @Test
     public void testConditionNotMatch() throws NoSuchFieldException, IllegalAccessException {
-        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getSuperUserInstance());
+        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.SUPER_USER);
 
         MCRObject object = new MCRObject();
         MCRObjectID testId = MCRObjectID.getInstance("test_test_00000001");

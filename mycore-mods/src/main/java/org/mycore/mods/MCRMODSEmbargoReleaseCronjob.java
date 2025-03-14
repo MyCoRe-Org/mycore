@@ -89,7 +89,7 @@ public class MCRMODSEmbargoReleaseCronjob extends MCRCronjob {
                     .peek(id -> LOGGER.info("Found embargoed object " + id))
                     .forEach(this::releaseDocument);
 
-            }, MCRSystemUserInformation.getSuperUserInstance()).run();
+            }, MCRSystemUserInformation.SUPER_USER).run();
 
         } catch (Exception e) {
             LOGGER.error("Failed to search embargoed objects", e);

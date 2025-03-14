@@ -32,7 +32,7 @@ public class MCRUserConditionTest extends MCRTestCase {
 
     @Test
     public void testConditionMatch() {
-        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getSuperUserInstance());
+        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.SUPER_USER);
         MCRFactsHolder holder = new MCRFactsHolder(new ArrayList<>());
         MCRUserCondition userCondition = new MCRUserCondition();
         userCondition.parse(new Element("user").setText("administrator"));
@@ -41,7 +41,7 @@ public class MCRUserConditionTest extends MCRTestCase {
 
     @Test
     public void testConditionNotMatch() {
-        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getSuperUserInstance());
+        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.SUPER_USER);
         MCRFactsHolder holder = new MCRFactsHolder(new ArrayList<>());
         MCRUserCondition userCondition = new MCRUserCondition();
         userCondition.parse(new Element("user").setText("guest"));
