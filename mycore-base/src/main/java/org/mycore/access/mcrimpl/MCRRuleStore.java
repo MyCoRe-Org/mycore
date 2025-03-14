@@ -26,7 +26,7 @@ import org.mycore.common.config.MCRConfiguration2;
  * The purpose of this interface is to make the choice of the persistence layer
  * configurable. Any concrete database-class which stores MyCoRe Access control
  * must implement this interface. Which database actually will be used can then
- * be configured by reading the value <code>MCR.Persistence.Rule.Store_Class</code>
+ * be configured by reading the value <code>MCR.Persistence.Rule.Store.Class</code>
  * from mycore.properties.access
  * 
  * @author Arne Seifert
@@ -65,7 +65,7 @@ public abstract class MCRRuleStore {
 
     private static final class LazyInstanceHolder {
         public static final MCRRuleStore SHARED_INSTANCE = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRRuleStore.class, "MCR.Persistence.Rule.Store_Class");
+            MCRRuleStore.class, "MCR.Persistence.Rule.Store.Class");
     }
 
 }
