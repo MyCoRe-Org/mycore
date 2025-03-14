@@ -16,8 +16,8 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { AppConfig } from 'mcr-vue-components';
-import { AccessKeyConfig } from 'vue-access-key-manager';
+import { AppConfig } from '@mycore-org/vue-components';
+import { AccessKeyConfig } from '@mycore-org/vue-access-key-manager';
 
 interface RawConfig {
   webApplicationBaseURL: string;
