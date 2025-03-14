@@ -144,11 +144,11 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
         properties = {
             @MCRTestProperty(key = "Foo.Value", string = "Value")
         })
-    public void configurationFinal() {
+    public void configurationImplicit() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        FinalTestClass instance = MCRConfigurableInstanceHelper
-            .getInstance(FinalTestClass.class, configuration, true);
+        ImplicitTestClass instance = MCRConfigurableInstanceHelper.getInstance(ImplicitTestClass.class, configuration,
+            MCRConfigurableInstanceHelper.ADD_IMPLICIT_CLASS_PROPERTIES);
 
         assertNotNull(instance);
 
@@ -273,7 +273,7 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
 
     }
 
-    public static final class FinalTestClass {
+    public static final class ImplicitTestClass {
     }
 
     @SuppressWarnings({ "unused" })

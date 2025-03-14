@@ -64,13 +64,13 @@ public class MCRConfigurableInstanceHelperDefaultTest extends MCRTestCase {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithFinalNestedClass.class)
+            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithImplicitNestedClass.class)
         })
-    public void nestedFinal() {
+    public void nestedImplicit() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithFinalNestedClass instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithFinalNestedClass.class, configuration);
+        TestClassWithImplicitNestedClass instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithImplicitNestedClass.class, configuration);
 
         assertNotNull(instance);
         assertNotNull(instance.nested);
@@ -132,29 +132,29 @@ public class MCRConfigurableInstanceHelperDefaultTest extends MCRTestCase {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithNestedMapOfFinalEntries.class),
+            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithNestedMapOfImplicitEntries.class),
             @MCRTestProperty(key = "Foo.EntryA.Property1", string = "Custom1"),
             @MCRTestProperty(key = "Foo.EntryB.Property2", string = "Custom2"),
         })
-    public void nestedMapFinal() {
+    public void nestedMapImplicit() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithNestedMapOfFinalEntries instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithNestedMapOfFinalEntries.class, configuration);
+        TestClassWithNestedMapOfImplicitEntries instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithNestedMapOfImplicitEntries.class, configuration);
 
         assertNotNull(instance);
         assertNotNull(instance.map);
         assertEquals(2, instance.map.size());
 
-        FinalEntry oneEntry = instance.map.get("EntryA");
+        ImplicitEntry oneEntry = instance.map.get("EntryA");
         assertNotNull(oneEntry);
-        assertEquals(FinalEntry.class, oneEntry.getClass());
+        assertEquals(ImplicitEntry.class, oneEntry.getClass());
         assertEquals("Custom1", oneEntry.string1);
         assertEquals("Value2", oneEntry.string2);
 
-        FinalEntry otherEntry = instance.map.get("EntryB");
+        ImplicitEntry otherEntry = instance.map.get("EntryB");
         assertNotNull(otherEntry);
-        assertEquals(FinalEntry.class, otherEntry.getClass());
+        assertEquals(ImplicitEntry.class, otherEntry.getClass());
         assertEquals("Value1", otherEntry.string1);
         assertEquals("Custom2", otherEntry.string2);
 
@@ -192,29 +192,29 @@ public class MCRConfigurableInstanceHelperDefaultTest extends MCRTestCase {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithNestedListOfFinalEntries.class),
+            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithNestedListOfImplicitEntries.class),
             @MCRTestProperty(key = "Foo.23.Property1", string = "Custom1"),
             @MCRTestProperty(key = "Foo.42.Property2", string = "Custom2"),
         })
-    public void nestedListFinal() {
+    public void nestedListImplicit() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithNestedListOfFinalEntries instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWithNestedListOfFinalEntries.class, configuration);
+        TestClassWithNestedListOfImplicitEntries instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithNestedListOfImplicitEntries.class, configuration);
 
         assertNotNull(instance);
         assertNotNull(instance.list);
         assertEquals(2, instance.list.size());
 
-        FinalEntry oneEntry = instance.list.getFirst();
+        ImplicitEntry oneEntry = instance.list.getFirst();
         assertNotNull(oneEntry);
-        assertEquals(FinalEntry.class, oneEntry.getClass());
+        assertEquals(ImplicitEntry.class, oneEntry.getClass());
         assertEquals("Custom1", oneEntry.string1);
         assertEquals("Value2", oneEntry.string2);
 
-        FinalEntry otherEntry = instance.list.get(1);
+        ImplicitEntry otherEntry = instance.list.get(1);
         assertNotNull(otherEntry);
-        assertEquals(FinalEntry.class, otherEntry.getClass());
+        assertEquals(ImplicitEntry.class, otherEntry.getClass());
         assertEquals("Value1", otherEntry.string1);
         assertEquals("Custom2", otherEntry.string2);
 
@@ -230,7 +230,7 @@ public class MCRConfigurableInstanceHelperDefaultTest extends MCRTestCase {
 
     }
 
-    public static final class FinalNestedClass {
+    public static final class ImplicitNestedClass {
 
         @MCRProperty(name = "Property1", defaultName = "Default.Property1")
         public String string1;
@@ -247,10 +247,10 @@ public class MCRConfigurableInstanceHelperDefaultTest extends MCRTestCase {
 
     }
 
-    public static class TestClassWithFinalNestedClass {
+    public static class TestClassWithImplicitNestedClass {
 
-        @MCRInstance(name = "Nested", valueClass = FinalNestedClass.class)
-        public FinalNestedClass nested;
+        @MCRInstance(name = "Nested", valueClass = ImplicitNestedClass.class)
+        public ImplicitNestedClass nested;
 
     }
 
@@ -268,7 +268,7 @@ public class MCRConfigurableInstanceHelperDefaultTest extends MCRTestCase {
 
     }
 
-    public static final class FinalEntry {
+    public static final class ImplicitEntry {
 
         @MCRProperty(name = "Property1", defaultName = "Default.Property1")
         public String string1;
@@ -315,10 +315,10 @@ public class MCRConfigurableInstanceHelperDefaultTest extends MCRTestCase {
 
     }
 
-    public static class TestClassWithNestedMapOfFinalEntries {
+    public static class TestClassWithNestedMapOfImplicitEntries {
 
-        @MCRInstanceMap(valueClass = FinalEntry.class)
-        public Map<String, FinalEntry> map;
+        @MCRInstanceMap(valueClass = ImplicitEntry.class)
+        public Map<String, ImplicitEntry> map;
 
     }
 
@@ -329,10 +329,10 @@ public class MCRConfigurableInstanceHelperDefaultTest extends MCRTestCase {
 
     }
 
-    public static class TestClassWithNestedListOfFinalEntries {
+    public static class TestClassWithNestedListOfImplicitEntries {
 
-        @MCRInstanceList(valueClass = FinalEntry.class)
-        public List<FinalEntry> list;
+        @MCRInstanceList(valueClass = ImplicitEntry.class)
+        public List<ImplicitEntry> list;
 
     }
 

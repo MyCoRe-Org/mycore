@@ -55,7 +55,6 @@ import org.mycore.common.config.annotation.MCRSentinel;
 
 import jakarta.inject.Singleton;
 
-
 /**
  * Creates Objects which are configured with properties.
  *
@@ -69,6 +68,11 @@ import jakarta.inject.Singleton;
 class MCRConfigurableInstanceHelper {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    public static final Set<Option> NO_OPTIONS = Collections.emptySet();
+
+    public static final Set<Option> ADD_IMPLICIT_CLASS_PROPERTIES
+        = Collections.singleton(Option.ADD_IMPLICIT_CLASS_PROPERTIES);
 
     private static final ConcurrentMap<Class<?>, ClassInfo<?>> INFOS = new ConcurrentHashMap<>();
 
@@ -103,15 +107,10 @@ class MCRConfigurableInstanceHelper {
     }
 
     /**
-     * Creates a configured instance of a class.
-     *
-     * @param superClass the intended super class of the instantiated class
-     * @param name       the property which contains the class name
-     * @return the configured instance of T
-     * @throws MCRConfigurationException if the property is not right configured.
+     * Shorthand for {@link #getInstance(Class, String, Set)} that uses no options.
      */
     public static <S> Optional<S> getInstance(Class<S> superClass, String name) throws MCRConfigurationException {
-        return getInstance(superClass, name, false);
+        return getInstance(superClass, name, NO_OPTIONS);
     }
 
     /**
@@ -119,20 +118,22 @@ class MCRConfigurableInstanceHelper {
      *
      * @param superClass the intended super class of the instantiated class
      * @param name       the property which contains the class name
+     * @param options    the options to be used
      * @return the configured instance of T
      * @throws MCRConfigurationException if the property is not right configured.
      */
-    public static <S> Optional<S> getInstance(Class<S> superClass, String name,
-        boolean allowMissingClassNameForFinalClasses) throws MCRConfigurationException {
+    public static <S> Optional<S> getInstance(Class<S> superClass, String name, Set<Option> options)
+        throws MCRConfigurationException {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName(name);
         String className = configuration.className();
-        if (className == null || className.isBlank()) {
-            if (allowMissingClassNameForFinalClasses) {
-                return Optional.of(getInstance(superClass, configuration, name, true));
-            }
+        if (isAbsent(className) && !options.contains(Option.ADD_IMPLICIT_CLASS_PROPERTIES)) {
             return Optional.empty();
         }
-        return Optional.of(getInstance(superClass, configuration, name, allowMissingClassNameForFinalClasses));
+        return Optional.of(getInstance(superClass, configuration, name, options));
+    }
+
+    private static boolean isAbsent(String className) {
+        return className == null || className.isBlank();
     }
 
     /**
@@ -141,20 +142,15 @@ class MCRConfigurableInstanceHelper {
     @Deprecated
     @SuppressWarnings("unchecked")
     public static <T> T getInstance(MCRInstanceConfiguration configuration) throws MCRConfigurationException {
-        return (T) getInstance(Objects.class, configuration, null, false);
+        return (T) getInstance(Objects.class, configuration, null, NO_OPTIONS);
     }
 
     /**
-     * Creates a configured instance of a class.
-     *
-     * @param superClass    the intended super class of the instantiated class
-     * @param configuration the configuration to be used
-     * @return the configured instance of T
-     * @throws MCRConfigurationException if the property is not right configured.
+     * Shorthand for {@link #getInstance(Class, MCRInstanceConfiguration, Set)} that uses no options.
      */
     public static <S> S getInstance(Class<S> superClass, MCRInstanceConfiguration configuration)
         throws MCRConfigurationException {
-        return getInstance(superClass, configuration, false);
+        return getInstance(superClass, configuration, NO_OPTIONS);
     }
 
     /**
@@ -162,20 +158,25 @@ class MCRConfigurableInstanceHelper {
      *
      * @param superClass    the intended super class of the instantiated class
      * @param configuration the configuration to be used
+     * @param options    the options to be used
      * @return the configured instance of T
      * @throws MCRConfigurationException if the property is not right configured.
      */
     public static <S> S getInstance(Class<S> superClass, MCRInstanceConfiguration configuration,
-        boolean allowMissingClassNameForFinalClasses) throws MCRConfigurationException {
-        return getInstance(superClass, configuration, null, allowMissingClassNameForFinalClasses);
+        Set<Option> options) throws MCRConfigurationException {
+        return getInstance(superClass, configuration, null, options);
     }
 
     private static <S> S getInstance(Class<S> superClass, MCRInstanceConfiguration configuration, String name,
-        boolean allowMissingClassNameForFinalClasses) throws MCRConfigurationException {
+        Set<Option> options) throws MCRConfigurationException {
         String className = configuration.className();
         if (className == null || className.isBlank()) {
-            if (allowMissingClassNameForFinalClasses && Modifier.isFinal(superClass.getModifiers())) {
+            if (options.contains(Option.ADD_IMPLICIT_CLASS_PROPERTIES) && Modifier.isFinal(superClass.getModifiers())) {
                 configuration = configuration.fixedClass(superClass);
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("Adding implicit property {}={}", configuration.name().actual(),
+                        configuration.className());
+                }
             } else {
                 throw new MCRConfigurationException("Missing or empty property: " + configuration.name().actual()
                     + " (and expected class " + superClass.getName() + " is not final)");
@@ -831,6 +832,11 @@ class MCRConfigurableInstanceHelper {
 
         public abstract V get(MCRInstanceConfiguration configuration, Target<?> target);
 
+        public final Set<Option> createOptions(Class<?> valueClass, boolean required) {
+            return required && Modifier.isFinal(valueClass.getModifiers())
+                ? ADD_IMPLICIT_CLASS_PROPERTIES : NO_OPTIONS;
+        }
+
     }
 
     private static final class PropertySource extends Source<MCRProperty, String> {
@@ -1013,11 +1019,8 @@ class MCRConfigurableInstanceHelper {
                 }
             }
 
-            boolean allowMissingClassNameForFinalClasses =  annotation.required() &&
-                Modifier.isFinal(annotation.valueClass().getModifiers());
-
-            Object instance = getInstance(annotation.valueClass(), nestedConfiguration,
-                allowMissingClassNameForFinalClasses);
+            Set<Option> options = createOptions(annotation.valueClass(), annotation.required());
+            Object instance = getInstance(annotation.valueClass(), nestedConfiguration, options);
 
             if (!annotation.valueClass().isAssignableFrom(instance.getClass())) {
                 throwIncompatibleAnnotation(annotation.valueClass(), target, instance);
@@ -1093,17 +1096,10 @@ class MCRConfigurableInstanceHelper {
                     + getExampleName(configuration, "B") + ", ...");
             }
 
-            boolean allowMissingClassNameForFinalClasses = annotation.required() &&
-                Modifier.isFinal(annotation.valueClass().getModifiers());
-
+            Set<Option> options = createOptions(annotation.valueClass(), annotation.required());
             Map<String, Object> instanceMap = nestedConfigurationMap.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey,entry -> {
-                    MCRInstanceConfiguration c = entry.getValue();
-                    if (allowMissingClassNameForFinalClasses) {
-                        c = c.fixedClass(annotation.valueClass());
-                    }
-                    return getInstance(annotation.valueClass(), c, allowMissingClassNameForFinalClasses);
-                }));
+                .collect(Collectors.toMap(Map.Entry::getKey, entry ->
+                    getInstance(annotation.valueClass(), entry.getValue(), options)));
 
             instanceMap.values().forEach(instance -> {
                 if (!annotation.valueClass().isAssignableFrom(instance.getClass())) {
@@ -1196,16 +1192,9 @@ class MCRConfigurableInstanceHelper {
                     + getExampleName(configuration, "2") + ", ...");
             }
 
-            boolean allowMissingClassNameForFinalClasses = annotation.required() &&
-                Modifier.isFinal(annotation.valueClass().getModifiers());
-
-            List<Object> instanceList = nestedConfigurationList.stream()
-                .map(c -> {
-                    if (allowMissingClassNameForFinalClasses) {
-                        c = c.fixedClass(annotation.valueClass());
-                    }
-                    return (Object) getInstance(annotation.valueClass(), c, allowMissingClassNameForFinalClasses);
-                }).toList();
+            Set<Option> options = createOptions(annotation.valueClass(), annotation.required());
+            List<Object> instanceList = nestedConfigurationList.stream().map(c ->
+                (Object) getInstance(annotation.valueClass(), c, options)).toList();
 
             instanceList.forEach(instance -> {
                 if (!annotation.valueClass().isAssignableFrom(instance.getClass())) {
@@ -1312,5 +1301,19 @@ class MCRConfigurableInstanceHelper {
         }
 
     }
+
+    public enum Option {
+
+        /**
+         * If a class is required to be in the configuration properties (for example, because of usage of
+         * {@link MCRConfiguration2#getInstanceOfOrThrow(Class, String)} or because of an annotation with
+         * required=true) and the expected super class is a final class (i.e. if the class name that has
+         * to be present in the properties could ever be only exactly the class name of that final class),
+         * add corresponding entries to the properties during instantiation, if not present anyway.
+         */
+        ADD_IMPLICIT_CLASS_PROPERTIES;
+
+    }
+
 
 }
