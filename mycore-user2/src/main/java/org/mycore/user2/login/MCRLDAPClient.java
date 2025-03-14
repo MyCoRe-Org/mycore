@@ -18,33 +18,34 @@
 
 package org.mycore.user2.login;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRUsageException;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRInstance;
+import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.user2.MCRRoleManager;
+import org.mycore.user2.MCRUser;
+
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Locale;
-import java.util.Optional;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 import javax.naming.Context;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
-import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
-import org.mycore.common.MCRUsageException;
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.user2.MCRRole;
-import org.mycore.user2.MCRRoleManager;
-import org.mycore.user2.MCRUser;
-import org.mycore.user2.MCRUserManager;
-import org.mycore.user2.utils.MCRUserTransformer;
 
 /**
  * Queries an LDAP server for the user's properties.
@@ -91,152 +92,114 @@ import org.mycore.user2.utils.MCRUserTransformer;
  *
  * @author Frank Lützenkirchen
  */
+@SuppressWarnings({"PMD.ReplaceHashtableWithMap"})
+@MCRConfigurationProxy(proxyClass = MCRLDAPClient.Factory.class)
 public final class MCRLDAPClient {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    /** Base DN */
-    private final String baseDN;
+    public static final String CLIENT_PROPERTY = "MCR.user2.LDAP";
 
-    /** Filter for user ID */
-    private final String uidFilter;
+    private final Settings settings;
 
-    /** Mapping from LDAP attribute to real name of user */
-    private final String mapName;
+    @SuppressWarnings({"PMD.LooseCoupling"})
+    private final Hashtable<String, String> ldapSettings;
 
-    /** Mapping from LDAP attribute to E-Mail address of user */
-    private final String mapEMail;
-
-    /** Default group of user */
-    private MCRRole defaultGroup;
-
-    @SuppressWarnings({ "PMD.LooseCoupling", "PMD.ReplaceHashtableWithMap" })
-    private final Hashtable<String, String> ldapEnv;
-
-    @SuppressWarnings("PMD.ReplaceHashtableWithMap")
-    private MCRLDAPClient() {
-        String prefix = "MCR.user2.LDAP.";
-        /* Timeout when connecting to LDAP server */
-        String readTimeout = MCRConfiguration2.getString(prefix + "ReadTimeout").orElse("10000");
-        /* LDAP server */
-        String providerURL = MCRConfiguration2.getStringOrThrow(prefix + "ProviderURL");
-        /* Security principal for logging in at LDAP server */
-        String securityPrincipal = MCRConfiguration2.getStringOrThrow(prefix + "SecurityPrincipal");
-        /* Security credentials for logging in at LDAP server */
-        String securityCredentials = MCRConfiguration2.getStringOrThrow(prefix + "SecurityCredentials");
-        baseDN = MCRConfiguration2.getStringOrThrow(prefix + "BaseDN");
-        uidFilter = MCRConfiguration2.getStringOrThrow(prefix + "UIDFilter");
-
-        prefix += "Mapping.";
-        mapName = MCRConfiguration2.getStringOrThrow(prefix + "Name");
-        mapEMail = MCRConfiguration2.getStringOrThrow(prefix + "E-Mail");
-
-        String group = MCRConfiguration2.getString(prefix + "Group.DefaultGroup").orElse(null);
-        if (group != null) {
-            defaultGroup = MCRRoleManager.getRole(group);
-        }
-
-        ldapEnv = new Hashtable<>();
-        ldapEnv.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        ldapEnv.put("com.sun.jndi.ldap.read.timeout", readTimeout);
-        ldapEnv.put(Context.PROVIDER_URL, providerURL);
-        ldapEnv.put(Context.SECURITY_AUTHENTICATION, "simple");
-        ldapEnv.put(Context.SECURITY_PRINCIPAL, securityPrincipal);
-        ldapEnv.put(Context.SECURITY_CREDENTIALS, securityCredentials);
+    public MCRLDAPClient(ConnectionSettings connectionSettings, Settings settings) {
+        this(Objects.requireNonNull(connectionSettings, "Connection settings must not be null")
+            .validate().toLdapSettings(), settings);
     }
 
+    public MCRLDAPClient(Map<String, String> ldapSettings, Settings settings) {
+        this.ldapSettings = new Hashtable<>(Objects.requireNonNull(ldapSettings, "LDAP settings must not be null"));
+        this.settings = Objects.requireNonNull(settings, "Settings must not be null").validate();
+    }
 
     /**
-     * @deprecated Use {@link #getInstance()} instead
+     * @deprecated Use {@link #obtainInstance()} instead
      */
     @Deprecated
     public static MCRLDAPClient instance() {
-        return getInstance();
+        return obtainInstance();
     }
 
-    public static MCRLDAPClient getInstance() {
+    public static MCRLDAPClient obtainInstance() {
         return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
-    public static void main(String[] args) throws Exception {
-        String userName = args[0];
-        String realmID = args[1];
-        MCRUser user = Optional.ofNullable(MCRUserManager.getUser(userName, realmID))
-            .orElseGet(() -> new MCRUser(userName, realmID));
-
-        LOGGER.info("\n{}",
-            () -> new XMLOutputter(Format.getPrettyFormat())
-                .outputString(MCRUserTransformer.buildExportableSafeXML(user)));
-        getInstance().updateUserProperties(user);
-        LOGGER.info("\n{}",
-            () -> new XMLOutputter(Format.getPrettyFormat())
-                .outputString(MCRUserTransformer.buildExportableSafeXML(user)));
+    public static MCRLDAPClient createInstance() {
+        String classProperty = CLIENT_PROPERTY + ".Class";
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRLDAPClient.class, classProperty);
     }
 
     public boolean updateUserProperties(MCRUser user) throws NamingException {
+
         String userName = user.getUserName();
         boolean userChanged = false;
 
-        if ((defaultGroup != null) && (!user.isUserInRole((defaultGroup.getName())))) {
-            LOGGER.info("User {} add to group {}", userName, defaultGroup);
+        if (settings.defaultGroup != null && !user.isUserInRole(settings.defaultGroup)) {
+            LOGGER.info("Adding {} to group {}", userName, settings.defaultGroup);
+            user.assignRole(MCRRoleManager.getRole(settings.defaultGroup).getName());
             userChanged = true;
-            user.assignRole(defaultGroup.getName());
         }
 
-        // Get user properties from LDAP server
-        DirContext ctx = new InitialDirContext(ldapEnv);
+        DirContext ldapContext = new InitialDirContext(ldapSettings);
 
         try {
+
             SearchControls controls = new SearchControls();
             controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-            NamingEnumeration<SearchResult> results = ctx.search(baseDN,
-                String.format(Locale.ROOT, uidFilter, userName), controls);
+            NamingEnumeration<SearchResult> results = ldapContext.search(settings.baseDn,
+                String.format(Locale.ROOT, settings.uidFilter, userName), controls);
 
             while (results.hasMore()) {
+
                 SearchResult searchResult = results.next();
                 Attributes attributes = searchResult.getAttributes();
+                NamingEnumeration<String> attributeIDs = attributes.getIDs();
 
-                for (NamingEnumeration<String> attributeIDs = attributes.getIDs(); attributeIDs.hasMore();) {
-                    String attributeID = attributeIDs.next();
-                    Attribute attribute = attributes.get(attributeID);
+                while (attributeIDs.hasMore()) {
 
-                    for (NamingEnumeration<?> values = attribute.getAll(); values.hasMore();) {
+                    String attributeId = attributeIDs.next();
+                    javax.naming.directory.Attribute attribute = attributes.get(attributeId);
+                    NamingEnumeration<?> values = attribute.getAll();
+
+                    while (values.hasMore()) {
+
                         String attributeValue = values.next().toString();
-                        LOGGER.debug("{}={}", attributeID, attributeValue);
+                        LOGGER.debug("{}={}", attributeId, attributeValue);
 
-                        if (attributeID.equals(mapName) && (user.getRealName() == null)) {
-                            attributeValue = formatName(attributeValue);
-                            LOGGER.info("User {} name = {}", userName, attributeValue);
-                            user.setRealName(attributeValue);
+                        if (user.getRealName() == null && attributeId.equals(settings.nameAttributeId)) {
+                            String formattedName = formatName(attributeValue);
+                            LOGGER.info("Updating name of {} to {}", userName, formattedName);
+                            user.setRealName(formattedName);
                             userChanged = true;
                         }
-                        if (attributeID.equals(mapEMail) && (user.getEMailAddress() == null)) {
-                            LOGGER.info("User {} e-mail = {}", userName, attributeValue);
+                        if (user.getEMailAddress() == null && attributeId.equals(settings.emailAttributeId)) {
+                            LOGGER.info("Updating e-mail of {} to {}", userName, attributeValue);
                             user.setEMail(attributeValue);
                             userChanged = true;
                         }
-                        String groupMapping = "MCR.user2.LDAP.Mapping.Group." + attributeID + "." + attributeValue;
-                        String group = MCRConfiguration2.getString(groupMapping).orElse(null);
-                        if ((group != null) && (!user.isUserInRole((group)))) {
-                            LOGGER.info("User {} add to group {}", userName, group);
-                            user.assignRole(group);
+
+                        String group = settings.groupMappings.get(attributeId + "." + attributeValue);
+                        if (group != null && !user.isUserInRole(group)) {
+                            LOGGER.info("Adding {} to group {}", userName, group);
+                            user.assignRole(MCRRoleManager.getRole(group).getName());
                             userChanged = true;
                         }
                     }
                 }
             }
-        } catch (NameNotFoundException ex) {
-            String msg = "LDAP base name not found: " + ex.getMessage() + " " + ex.getExplanation();
-            throw new MCRConfigurationException(msg, ex);
-        } catch (NamingException ex) {
-            String msg = "Exception accessing LDAP server";
-            throw new MCRUsageException(msg, ex);
+        } catch (NameNotFoundException e) {
+            throw new MCRConfigurationException("LDAP base name not found: "
+                + e.getMessage() + " " + e.getExplanation(), e);
+        } catch (NamingException e) {
+            throw new MCRUsageException("Exception accessing LDAP server", e);
         } finally {
-            if (ctx != null) {
-                try {
-                    ctx.close();
-                } catch (Exception ignored) {
-                }
+            try {
+                ldapContext.close();
+            } catch (Exception e) {
+                LOGGER.warn("Failed to close LDAP context", e);
             }
         }
 
@@ -244,7 +207,7 @@ public final class MCRLDAPClient {
     }
 
     /**
-     * Formats a user name into "lastname, firstname" syntax.
+     * Formats a users name into "lastname, firstname" syntax, if possible.
      */
     private String formatName(String name) {
         String trimmedName = name.replaceAll("\\s+", " ").trim();
@@ -258,8 +221,134 @@ public final class MCRLDAPClient {
         return trimmedName.substring(pos + 1) + ", " + trimmedName.substring(0, pos);
     }
 
+    public record ConnectionSettings(
+        String providerUrl,
+        String securityPrincipal,
+        String securityCredentials,
+        Integer readTimeoutMillis) {
+
+        public ConnectionSettings validate() {
+            Objects.requireNonNull(providerUrl, "Provider URL must not be null");
+            return this;
+        }
+
+        public Map<String, String> toLdapSettings() {
+            validate();
+            Map<String, String> ldapEnv = new HashMap<>();
+            ldapEnv.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+            ldapEnv.put(Context.PROVIDER_URL, providerUrl);
+            ldapEnv.put(Context.SECURITY_AUTHENTICATION, "simple");
+            if (securityPrincipal != null) {
+                ldapEnv.put(Context.SECURITY_PRINCIPAL, securityPrincipal);
+                if (securityCredentials != null) {
+                    ldapEnv.put(Context.SECURITY_CREDENTIALS, securityCredentials);
+                }
+            }
+            ldapEnv.put("com.sun.jndi.ldap.read.timeout",
+                readTimeoutMillis != null ? readTimeoutMillis.toString() : "1000");
+            return ldapEnv;
+        }
+
+    }
+
+    public record Settings(
+        String baseDn,
+        String uidFilter,
+        String nameAttributeId,
+        String emailAttributeId,
+        String defaultGroup,
+        Map<String, String> groupMappings) {
+
+        public Settings validate() {
+            Objects.requireNonNull(baseDn, "Base DN must not be null");
+            Objects.requireNonNull(uidFilter, "UID filter must not be null");
+            Objects.requireNonNull(nameAttributeId, "Name attribute ID must not be null");
+            Objects.requireNonNull(emailAttributeId, "Email attribute ID must not be null");
+            groupMappings.forEach((key, value) -> Objects.requireNonNull(
+                value, () -> "Group mapping for " + key + " must not be null"));
+            return this;
+        }
+
+    }
+
+    public static class Factory implements Supplier<MCRLDAPClient> {
+
+        @MCRProperty(name = "ProviderURL")
+        public String providerUrl;
+
+        @MCRProperty(name = "SecurityPrincipal", required = false)
+        public String securityPrincipal;
+
+        @MCRProperty(name = "SecurityCredentials", required = false)
+        public String securityCredentials;
+
+        @MCRProperty(name = "ReadTimeout", required = false)
+        public String readTimeoutMillis;
+
+        @MCRProperty(name = "BaseDN")
+        public String baseDn;
+
+        @MCRProperty(name = "UIDFilter")
+        public String uidFilter;
+
+        @MCRInstance(name = "Mapping", valueClass = Mapping.class)
+        public Mapping mapping;
+
+        @Override
+        public MCRLDAPClient get() {
+
+            ConnectionSettings connectionSettings = new ConnectionSettings(
+                providerUrl,
+                securityPrincipal,
+                securityCredentials,
+                readTimeoutMillis != null ? Integer.parseInt(readTimeoutMillis) : null
+            );
+
+            Settings settings = new Settings(
+                baseDn,
+                uidFilter,
+                mapping.nameAttributeId,
+                mapping.emailAttributeId,
+                mapping.group.defaultGroup,
+                mapping.group.groupMappings
+            );
+
+            return new MCRLDAPClient(connectionSettings, settings);
+
+        }
+
+        public static final class Mapping {
+
+            @MCRProperty(name = "Name")
+            public String nameAttributeId;
+
+            @MCRProperty(name = "E-Mail")
+            public String emailAttributeId;
+
+            @MCRInstance(name = "Group", valueClass = Group.class)
+            public Group group;
+
+            public static final class Group {
+
+                @MCRProperty(name = "DefaultGroup", required = false)
+                public String defaultGroup;
+
+                @MCRProperty(name = "*")
+                public Map<String, String> groupMappings;
+
+                @MCRPostConstruction
+                public void removeDefaultGroupFromGroupMappings() {
+                    groupMappings.remove("DefaultGroup");
+                }
+
+            }
+
+        }
+
+    }
+
     private static final class LazyInstanceHolder {
-        public static final MCRLDAPClient SINGLETON_INSTANCE = new MCRLDAPClient();
+        public static final MCRLDAPClient SINGLETON_INSTANCE = createInstance();
     }
 
 }
