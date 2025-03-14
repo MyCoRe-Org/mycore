@@ -22,6 +22,10 @@ import router from './router';
 import { createI18n } from 'vue-i18n';
 import { LangService } from '@mycore-test/js-common/i18n';
 import { appConfig, accessKeyConfig } from './common/config';
+import {
+  UnauthorizedActionError,
+  PermissionError,
+} from '@mycore-test/js-common/utils/errors';
 if (import.meta.env.DEV) {
   import('bootstrap/dist/css/bootstrap.min.css');
   import('font-awesome/css/font-awesome.min.css');
@@ -31,15 +35,22 @@ const I18N_PREFIX = 'component.acl.accesskey.*';
 const APP_ID = 'app';
 
 const setErrorHandler = (app: App): void => {
-  app.config.errorHandler = (err, instance, info) => {
-    console.error('Global error:', err);
+  app.config.errorHandler = (error, instance, info) => {
     console.log('Vue instance:', instance);
     console.log('Error info:', info);
+    console.log('Error:', error);
+    if (error instanceof UnauthorizedActionError) {
+      router.push({ name: '401' });
+    } else if (error instanceof PermissionError) {
+      router.push({ name: '403' });
+    } else {
+      // TODO create error view
+      router.push({ name: 'error' });
+    }
   };
 };
 
 // TODO validate config
-
 const langService = new LangService(appConfig.baseUrl);
 
 const initApp = async () => {
