@@ -51,7 +51,7 @@ public class MCRORCIDProfile {
 
     public MCRORCIDProfile(String orcid) {
         this.orcid = orcid;
-        this.target = MCRORCIDClient.getInstance().getBaseTarget().path(orcid);
+        this.target = MCRORCIDClient.obtainInstance().getBaseTarget().path(orcid);
     }
 
     public String getORCID() {
