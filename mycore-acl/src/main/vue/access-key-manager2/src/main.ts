@@ -30,6 +30,7 @@ if (import.meta.env.DEV) {
   import('bootstrap/dist/css/bootstrap.min.css');
   import('font-awesome/css/font-awesome.min.css');
 }
+import '@mycore-org/vue-access-key-manager/dist/vue-access-key-manager.css';
 
 const I18N_PREFIX = 'component.acl.accesskey.*';
 const APP_ID = 'app';
