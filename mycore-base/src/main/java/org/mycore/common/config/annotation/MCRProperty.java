@@ -40,7 +40,8 @@ import org.mycore.common.config.MCRConfigurationException;
 public @interface MCRProperty {
 
     /**
-     * @return The name of property, or <code>*</code> for a map of all properties;
+     * @return The name of property, <code>*</code> for a map of all properties or a prefix,
+     * followed by <code>.*</code> for a map of all properties whose name starts with that prefix;
      */
     String name();
 
