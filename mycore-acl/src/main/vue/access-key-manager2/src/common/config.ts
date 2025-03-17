@@ -21,7 +21,7 @@ import { AccessKeyConfig } from '@mycore-org/vue-access-key-manager';
 
 interface RawConfig {
   webApplicationBaseURL: string;
-  CurrentLang: string;
+  currentLang: string;
   'MCR.ACL.AccessKey.Strategy.AllowedSessionPermissionTypes': string;
 }
 
@@ -37,7 +37,7 @@ const rawConfig = (
 
 export const appConfig: AppConfig = {
   baseUrl: rawConfig.webApplicationBaseURL,
-  currentLang: rawConfig.CurrentLang,
+  currentLang: rawConfig.currentLang,
 };
 
 export const accessKeyConfig: AccessKeyConfig = {
