@@ -43,7 +43,36 @@ import io.ocfl.core.storage.OcflStorage;
 import io.ocfl.core.storage.OcflStorageBuilder;
 
 /**
- * This is a copy of the {@link io.ocfl.core.OcflRepositoryBuilder}.
+ * MyCoRe-specific repository builder for constructing OCFL repositories.
+ * <p>
+ * This class extends the standard {@link io.ocfl.core.OcflRepositoryBuilder} and provides additional 
+ * configuration and customization for the MyCoRe system. It allows you to specify repository properties such 
+ * as the repository ID, remote mode, working directory, storage configuration, object locking, inventory 
+ * caching, and various OCFL-specific options.
+ * <p>
+ * The builder methods are chainable and return an instance of {@code MCROCFLRepositoryBuilder} for 
+ * convenient configuration. Once configured, calling {@link #buildMCR()} builds a new 
+ * {@link MCROCFLRepository} instance, wrapping the underlying OCFL repository with MyCoRe-specific behavior.
+ * <p>
+ * <b>Example Usage:</b>
+ * <pre>{@code
+ * MCROCFLRepository repository = new MCROCFLRepositoryBuilder()
+ *     .id("myRepositoryId")
+ *     .remote(false)
+ *     .workDir(Paths.get("/path/to/workDir"))
+ *     .storage(storage -> {
+ *         // Configure storage settings...
+ *     })
+ *     .objectLock(lock -> {
+ *         // Configure object locking...
+ *     })
+ *     .defaultLayoutConfig(myExtensionConfig)
+ *     .buildMCR();
+ * }</pre>
+ * </p>
+ *
+ * @see io.ocfl.core.OcflRepositoryBuilder
+ * @see MCROCFLRepository
  */
 public class MCROCFLRepositoryBuilder extends OcflRepositoryBuilder {
 
@@ -63,11 +92,31 @@ public class MCROCFLRepositoryBuilder extends OcflRepositoryBuilder {
         remote = false;
     }
 
+    /**
+     * Sets the unique identifier for the OCFL repository.
+     * <p>
+     * This identifier uniquely distinguishes the repository within the MyCoRe system.
+     * If not explicitly set, the builder will generate a random UUID by default.
+     *
+     * @param id the unique repository identifier; must not be {@code null}.
+     * @return this builder instance for chaining.
+     * @throws NullPointerException if {@code id} is {@code null}.
+     */
     public MCROCFLRepositoryBuilder id(String id) {
         this.id = Enforce.notNull(id, "id cannot be null");
         return this;
     }
 
+    /**
+     * Configures the repository mode as remote or local.
+     * <p>
+     * When set to {@code true}, the repository is treated as remote, and the builder will apply additional
+     * configuration appropriate for remote storage. By default, the repository is configured in local mode
+     * ({@code false}).
+     *
+     * @param remote {@code true} to configure the repository as remote; {@code false} for local.
+     * @return this builder instance for chaining.
+     */
     public MCROCFLRepositoryBuilder remote(boolean remote) {
         this.remote = remote;
         return this;
