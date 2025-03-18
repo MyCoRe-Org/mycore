@@ -314,13 +314,6 @@ public final class MCRMetaNumber extends MCRMetaDefault {
         return elm;
     }
 
-    /**
-     * clone of this instance
-     *
-     * you will get a (deep) clone of this element
-     *
-     * @see java.lang.Object#clone()
-     */
     @Override
     public MCRMetaNumber clone() {
         MCRMetaNumber clone = (MCRMetaNumber) super.clone();

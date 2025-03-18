@@ -95,13 +95,6 @@ public final class MCRMetaAddress extends MCRMetaDefault {
         setNumber(number);
     }
 
-    /**
-     * clone of this instance
-     *
-     * you will get a (deep) clone of this element
-     *
-     * @see java.lang.Object#clone()
-     */
     @Override
     public MCRMetaAddress clone() {
         MCRMetaAddress clone = (MCRMetaAddress) super.clone();

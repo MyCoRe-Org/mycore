@@ -32,6 +32,8 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
+import org.mycore.common.MCRClassTools;
+
 /**
  * This class represents a label of a MCRCategory.
  * 
@@ -132,13 +134,14 @@ public class MCRLabel implements Cloneable, Serializable, Comparable<MCRLabel> {
 
     @Override
     public MCRLabel clone() {
-        MCRLabel clone = null;
-        try {
-            clone = (MCRLabel) super.clone();
-        } catch (CloneNotSupportedException ce) {
-            // Can not happen
-        }
-        return clone;
+            MCRLabel clone = MCRClassTools.clone(getClass(), super::clone);
+
+            clone.setDescription(description);
+            clone.setLang(lang);
+            clone.setText(text);
+
+            return clone;
+
     }
 
     @Override

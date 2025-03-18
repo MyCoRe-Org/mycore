@@ -215,20 +215,15 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
         }
     }
 
-    /**
-     * clone of this instance
-     *
-     * you will get a (deep) clone of this element
-     *
-     * @see java.lang.Object#clone()
-     */
     @Override
     public MCRMetaISO8601Date clone() {
         MCRMetaISO8601Date clone = (MCRMetaISO8601Date) super.clone();
 
-        clone.changed = this.changed;
-        clone.export = this.export.clone();
-        clone.isoDate = this.isoDate; // this is ok because iso Date is immutable
+        clone.changed = changed;
+        clone.export = export.clone();
+        clone.isoDate = new MCRISO8601Date();
+        clone.isoDate.setFormat(isoDate.getIsoFormat());
+        clone.isoDate.setDate(isoDate.getDate());
 
         return clone;
     }
