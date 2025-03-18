@@ -33,6 +33,8 @@ import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
+import org.mycore.common.MCRClassTools;
+
 /**
  * Container class handled by hibernate to store and retrieve job information for the next tiling request.
  * @author Thomas Scheffler (yagee)
@@ -218,8 +220,9 @@ public class MCRTileJob implements Cloneable {
      * @see java.lang.Object#clone()
      */
     @Override
-    public MCRTileJob clone() {
-        MCRTileJob clone = new MCRTileJob();
+    public MCRTileJob clone()  {
+        MCRTileJob clone = MCRClassTools.clone(getClass(), super::clone);
+
         clone.setAdded(getAdded());
         clone.setDerivate(getDerivate());
         clone.setFinished(getFinished());
@@ -231,6 +234,7 @@ public class MCRTileJob implements Cloneable {
         clone.setTiles(getTiles());
         clone.setWidth(getWidth());
         clone.setZoomLevel(getZoomLevel());
+
         return clone;
     }
 

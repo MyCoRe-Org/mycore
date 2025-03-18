@@ -28,12 +28,14 @@ import jakarta.persistence.Table;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
+import org.mycore.common.MCRClassTools;
+
 @Embeddable
 @Table(name = "MCRUserAttr",
     indexes = { @Index(name = "MCRUserAttributes", columnList = "name, value"),
         @Index(name = "MCRUserValues", columnList = "value") })
 @XmlRootElement(name = "attribute")
-public class MCRUserAttribute implements Comparable<MCRUserAttribute> {
+public class MCRUserAttribute implements Comparable<MCRUserAttribute>, Cloneable {
 
     private String name;
 
@@ -92,5 +94,15 @@ public class MCRUserAttribute implements Comparable<MCRUserAttribute> {
     @Override
     public int compareTo(MCRUserAttribute o) {
         return NATURAL_ORDER_COMPARATOR.compare(this, o);
+    }
+
+    @Override
+    public MCRUserAttribute clone() {
+        MCRUserAttribute clone = MCRClassTools.clone(getClass(), super::clone);
+        
+        clone.name =name;
+        clone.value = value;
+        
+        return clone;
     }
 }

@@ -194,32 +194,15 @@ public class MCRUserManager {
             throw new MCRException("User is invalid: " + user.getUserID());
         }
 
-        if (user instanceof MCRTransientUser transientUser) {
-            createUser(transientUser);
-            return;
-        }
+        MCRUser persistableUser = user.toPersistableUser();
 
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        em.persist(user);
-        LOGGER.info(() -> "user saved: " + user.getUserID());
-        MCRRoleManager.storeRoleAssignments(user);
+        em.persist(persistableUser);
+        LOGGER.info(() -> "user saved: " + persistableUser.getUserID());
+        MCRRoleManager.storeRoleAssignments(persistableUser);
         MCREvent evt = new MCREvent(MCREvent.ObjectType.USER, MCREvent.EventType.CREATE);
-        evt.put(MCREvent.USER_KEY, user);
+        evt.put(MCREvent.USER_KEY, persistableUser);
         MCREventManager.getInstance().handleEvent(evt);
-    }
-
-    /**
-     * Creates and store a new login user in the database, do also attribute mapping is needed.
-     * This will also store role membership information.
-     *
-     * @param user the user to create in the database.
-     */
-    public static void createUser(MCRTransientUser user) {
-        if (isInvalidUser(user)) {
-            throw new MCRException("User is invalid: " + user.getUserID());
-        }
-
-        createUser(user.clone());
     }
 
     /**

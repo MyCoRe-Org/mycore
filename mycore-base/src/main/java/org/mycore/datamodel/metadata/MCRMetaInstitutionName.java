@@ -227,13 +227,6 @@ public final class MCRMetaInstitutionName extends MCRMetaDefault {
             .orElseThrow(() -> new MCRException(getSubTag() + ": fullname is null or empty"));
     }
 
-    /**
-     * clone of this instance
-     *
-     * you will get a (deep) clone of this element
-     *
-     * @see java.lang.Object#clone()
-     */
     @Override
     public MCRMetaInstitutionName clone() {
         MCRMetaInstitutionName clone = (MCRMetaInstitutionName) super.clone();

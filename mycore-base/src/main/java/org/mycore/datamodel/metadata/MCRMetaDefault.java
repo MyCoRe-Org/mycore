@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
@@ -491,20 +492,16 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
 
     @Override
     public MCRMetaDefault clone() {
-        try {
-            MCRMetaDefault clone = (MCRMetaDefault) super.clone();
+        MCRMetaDefault clone = MCRClassTools.clone(getClass(), super::clone);
 
-            clone.subtag = this.subtag;
-            clone.lang = this.lang;
-            clone.type = this.type;
-            clone.sequence = this.sequence;
-            clone.datapart = this.datapart;
-            clone.inherited = this.inherited;
+        clone.subtag = this.subtag;
+        clone.lang = this.lang;
+        clone.type = this.type;
+        clone.sequence = this.sequence;
+        clone.datapart = this.datapart;
+        clone.inherited = this.inherited;
 
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            //this is impossible!
-            return null;
-        }
+        return clone;
     }
+
 }

@@ -44,6 +44,8 @@ import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
+import org.mycore.common.MCRClassTools;
+
 /**
  * Container class handled by hibernate to store and retrieve job information.
  * 
@@ -293,7 +295,8 @@ public class MCRJob implements Cloneable {
      */
     @Override
     public MCRJob clone() {
-        MCRJob clone = new MCRJob();
+        MCRJob clone = MCRClassTools.clone(getClass(), super::clone);
+
         clone.setAction(getAction());
         clone.setAdded(getAdded());
         clone.setFinished(getFinished());
@@ -302,9 +305,7 @@ public class MCRJob implements Cloneable {
         clone.setStatus(getStatus());
         clone.setTries(getTries());
         clone.setException(getException());
-
-        Map<String, String> map = new HashMap<>(getParameters());
-        clone.setParameters(map);
+        clone.setParameters(new HashMap<>(getParameters()));
 
         return clone;
     }

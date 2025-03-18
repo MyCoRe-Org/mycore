@@ -88,4 +88,15 @@ public class MCRTransientUser extends MCRUser {
         return this.userInfo.getUserAttribute(attribute);
     }
 
+    @Override
+    public MCRTransientUser clone() throws CloneNotSupportedException {
+        // MCRUserInformation cannot be cloned
+        throw new CloneNotSupportedException("Unable to clone transient user");
+    }
+
+    @Override
+    public MCRUser toPersistableUser() {
+        return getFullCopy();
+    }
+
 }

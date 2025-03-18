@@ -145,9 +145,6 @@ public interface MCRMetaInterface extends Cloneable {
      */
     void validate() throws MCRException;
 
-    /**
-     * This method make a clone of this class.
-     */
     MCRMetaInterface clone();
 
     /**

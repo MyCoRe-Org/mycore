@@ -193,9 +193,6 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
         }
     }
 
-    /**
-     * This method make a clone of this class.
-     */
     @Override
     public MCRMetaAccessRule clone() {
         MCRMetaAccessRule clone = (MCRMetaAccessRule) super.clone();

@@ -87,10 +87,13 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      */
     public final MCRObjectMetadata getHeritableMetadata() {
         MCRObjectMetadata heritableMetadata = new MCRObjectMetadata();
-        stream().filter(MCRMetaElement::isHeritable).map(MCRMetaElement::clone).forEach(metaElement -> {
-            metaElement.stream().forEach(MCRMetaInterface::incrementInherited);
-            heritableMetadata.setMetadataElement(metaElement);
-        });
+        stream()
+            .filter(MCRMetaElement::isHeritable)
+            .map(MCRMetaElement::clone)
+            .forEach(metaElement -> {
+                metaElement.stream().forEach(MCRMetaInterface::incrementInherited);
+                heritableMetadata.setMetadataElement(metaElement);
+            });
         return heritableMetadata;
     }
 

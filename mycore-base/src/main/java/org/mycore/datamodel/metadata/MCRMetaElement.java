@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
@@ -71,7 +72,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
 
     private boolean notinherit;
 
-    private final List<MCRMetaInterface> list;
+    private List<MCRMetaInterface> list;
 
     /**
      * This is the constructor of the MCRMetaElement class. The default language
@@ -447,23 +448,18 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
         }
     }
 
-    /**
-     * This method make a clone of this class.
-     */
     @Override
-    public final MCRMetaElement clone() {
-        MCRMetaElement out = new MCRMetaElement();
-        out.setClass(getClazz());
-        out.setTag(tag);
-        out.setHeritable(heritable);
-        out.setNotInherit(notinherit);
+    public MCRMetaElement clone() {
+        MCRMetaElement clone = MCRClassTools.clone(getClass(), super::clone);
 
-        for (int i = 0; i < size(); i++) {
-            MCRMetaInterface mif = (list.get(i)).clone();
-            out.addMetaObject(mif);
-        }
+        clone.clazz = clazz;
+        clone.tag = tag;
+        clone.heritable = heritable;
+        clone.notinherit = notinherit;
+        clone.list = list.stream().map(MCRMetaInterface::clone)
+            .collect(Collectors.toCollection(ArrayList::new));
 
-        return out;
+        return clone;
     }
 
     /**

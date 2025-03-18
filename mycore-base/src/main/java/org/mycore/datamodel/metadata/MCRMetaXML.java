@@ -182,14 +182,13 @@ public class MCRMetaXML extends MCRMetaDefault {
         }
     }
 
-    /**
-     * This method make a clone of this class.
-     */
+
     @Override
     public MCRMetaXML clone() {
         MCRMetaXML clone = (MCRMetaXML) super.clone();
 
-        clone.content = this.content.stream().map(Content::clone).collect(Collectors.toList());
+        clone.content = content.stream().map(Content::clone)
+            .collect(Collectors.toCollection(ArrayList::new));
 
         return clone;
     }

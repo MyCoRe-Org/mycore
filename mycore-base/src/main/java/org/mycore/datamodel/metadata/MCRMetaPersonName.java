@@ -346,11 +346,6 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
         }
     }
 
-    /**
-     * Clone of this instance. You will get a (deep) clone of this element.
-     *
-     * @see java.lang.Object#clone()
-     */
     @Override
     public MCRMetaPersonName clone() {
         MCRMetaPersonName clone = (MCRMetaPersonName) super.clone();

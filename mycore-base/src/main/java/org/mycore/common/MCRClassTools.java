@@ -79,4 +79,30 @@ public class MCRClassTools {
             .orElseGet(MCRClassTools.class::getClassLoader);
     }
 
+    /**
+     * This is a helper function for top most classes in class hierarchies that implement
+     * {@link Cloneable} and expect every subclass to implement a proper {@link Object#clone()}
+     * method, i.e. to never throw a {@link CloneNotSupportedException}.
+     * <p>
+     * It is meant to simplify and harmonize suppression of this exception in the method
+     * signatures of the clone-method of such classes and needs to be called as
+     * <code>MCRClassTools.clone(getClass(), super::clone)</code> exactly.
+     *
+     * @param cloneClass the class to be cloned
+     * @param superClone a method reference to the super classes clone-methode
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T clone(Class<T> cloneClass, SuperClone<T> superClone) {
+        try {
+            return (T) superClone.getClone();
+        } catch (CloneNotSupportedException e) {
+            throw new MCRException(cloneClass.getName() + " doesn't implement a proper clone-method"
+                + " - this is an implementation mistake", e);
+        }
+    }
+
+    public interface SuperClone<T> {
+        Object getClone() throws CloneNotSupportedException;
+    }
+
 }

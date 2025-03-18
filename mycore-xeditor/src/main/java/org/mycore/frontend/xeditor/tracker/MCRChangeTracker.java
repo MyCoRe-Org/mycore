@@ -24,6 +24,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.ProcessingInstruction;
 import org.jdom2.filter.Filters;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 
@@ -104,9 +105,11 @@ public class MCRChangeTracker implements Cloneable {
     }
 
     @Override
-    public MCRChangeTracker clone() {
-        MCRChangeTracker tracker = new MCRChangeTracker();
-        tracker.counter = this.counter;
-        return tracker;
+    public MCRChangeTracker clone()  {
+        MCRChangeTracker clone = MCRClassTools.clone(getClass(), super::clone);
+
+        clone.counter = this.counter;
+
+        return clone;
     }
 }
