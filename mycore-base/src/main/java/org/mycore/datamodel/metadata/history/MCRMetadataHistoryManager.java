@@ -131,11 +131,11 @@ public class MCRMetadataHistoryManager extends MCREventHandlerBase {
     }
 
     private void createNow(MCRObjectID id) {
-        store(MCRMetaHistoryItem.createdNow(id));
+        store(MCRMetaHistoryItem.now(id, MCRMetadataHistoryEventType.CREATE));
     }
 
     private void deleteNow(MCRObjectID id) {
-        store(MCRMetaHistoryItem.deletedNow(id));
+        store(MCRMetaHistoryItem.now(id, MCRMetadataHistoryEventType.DELETE));
     }
 
     private void store(MCRMetaHistoryItem item) {
