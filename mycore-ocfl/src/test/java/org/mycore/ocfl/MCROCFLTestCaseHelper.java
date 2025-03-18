@@ -32,6 +32,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.repository.MCROCFLHashRepositoryProvider;
 import org.mycore.ocfl.repository.MCROCFLRepository;
+import org.mycore.ocfl.repository.MCROCFLRepositoryBuilder;
 import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
 
 import io.ocfl.api.model.ObjectVersionId;
@@ -89,9 +90,16 @@ public abstract class MCROCFLTestCaseHelper {
         }
 
         @Override
-        public boolean isRemote() {
-            return remote;
+        protected MCROCFLRepository buildRepository(String id) {
+            return new MCROCFLRepositoryBuilder()
+                .id(id)
+                .remote(this.remote)
+                .defaultLayoutConfig(getExtensionConfig())
+                .storage(this::configureStorage)
+                .workDir(workDir)
+                .buildMCR();
         }
+
     }
 
     private static class CopyFileVisitor extends SimpleFileVisitor<Path> {

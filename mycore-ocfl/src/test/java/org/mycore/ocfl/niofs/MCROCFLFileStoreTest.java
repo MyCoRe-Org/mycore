@@ -14,6 +14,12 @@ public class MCROCFLFileStoreTest extends MCROCFLNioTestCase {
         super(remote);
     }
 
+    @Override
+    public void tearDown() throws Exception {
+        MCROCFLFileSystemProvider.getMCROCFLFileSystem().resetFileStore();
+        super.tearDown();
+    }
+
     @Test
     public void name() {
         assertNotNull("file store should have a name", fs().name());
@@ -36,7 +42,7 @@ public class MCROCFLFileStoreTest extends MCROCFLNioTestCase {
         assertNotEquals("file store should have usable space", 0, fs().getUsableSpace());
     }
 
-    private static MCROCFLLocalFileStore fs() {
+    private static MCROCFLFileStore fs() {
         return MCROCFLFileSystemProvider.getMCROCFLFileSystem().getFileStore();
     }
 
