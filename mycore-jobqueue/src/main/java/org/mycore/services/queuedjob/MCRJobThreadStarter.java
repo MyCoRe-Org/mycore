@@ -130,7 +130,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
         //get this MCRSession a speaking name
         MCRSessionMgr.unlock();
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
+        mcrSession.setUserInformation(MCRSystemUserInformation.SYSTEM_USER);
 
         running = true;
         processableExecutor = MCRProcessableFactory.newPool(jobExecutor, processableCollection);

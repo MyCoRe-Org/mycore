@@ -40,23 +40,46 @@ import java.util.Optional;
  */
 public final class MCRSystemUserInformationProvider implements MCRUserInformationProvider {
 
+    private static final MCRSystemUserInformationProvider INSTANCE = new MCRSystemUserInformationProvider();
+
+    /**
+     * @deprecated Use {@code name()} of {@link MCRSystemUserInformation#GUEST} instead
+     */
+    @Deprecated 
     public static final String GUEST = "GUEST";
 
+    /**
+     * @deprecated Use {@code name()} of {@link MCRSystemUserInformation#JANITOR} instead
+     */
+    @Deprecated
     public static final String JANITOR = "JANITOR";
 
+    /**
+     * @deprecated Use {@code name()} of {@link MCRSystemUserInformation#SYSTEM_USER} instead
+     */
+    @Deprecated
     public static final String SYSTEM_USER = "SYSTEM_USER";
 
+    /**
+     * @deprecated Use {@code name()} of {@link MCRSystemUserInformation#SUPER_USER} instead
+     */
+    @Deprecated
     public static final String SUPER_USER = "SUPER_USER";
+
+    private MCRSystemUserInformationProvider(){
+    }
+
+    public static MCRSystemUserInformationProvider getInstance() {
+        return INSTANCE;
+    }
 
     @Override
     public Optional<MCRUserInformation> get(String userId) {
-        return switch (userId) {
-            case GUEST -> Optional.of(MCRSystemUserInformation.getGuestInstance());
-            case JANITOR -> Optional.of(MCRSystemUserInformation.getJanitorInstance());
-            case SYSTEM_USER -> Optional.of(MCRSystemUserInformation.getSystemUserInstance());
-            case SUPER_USER -> Optional.of(MCRSystemUserInformation.getSuperUserInstance());
-            default -> Optional.empty();
-        };
+        try {
+            return Optional.of(MCRSystemUserInformation.valueOf(userId));
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
+        }
     }
 
 }

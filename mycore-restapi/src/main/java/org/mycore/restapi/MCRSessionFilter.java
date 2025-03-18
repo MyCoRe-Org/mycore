@@ -392,7 +392,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
 
         @Override
         public String getAuthenticationScheme() {
-            if (ui.getUserID().equals(MCRSystemUserInformation.getGuestInstance().getUserID())) {
+            if (ui.getUserID().equals(MCRSystemUserInformation.GUEST.getUserID())) {
                 return null;
             }
             if (ui instanceof MCRUser) {

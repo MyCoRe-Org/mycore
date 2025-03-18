@@ -39,7 +39,7 @@ public class MCRUserInformationLookupTest extends MCRTestCase {
         MCRUserInformationLookup lookup = new MCRUserInformationLookup();
         assertNull("User information should not be available", lookup.lookup("id"));
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        assertEquals(MCRSystemUserInformation.getGuestInstance().getUserID(), lookup.lookup("id"));
+        assertEquals(MCRSystemUserInformation.GUEST.getUserID(), lookup.lookup("id"));
         assertNull("Guest user should have no role", lookup.lookup("role:admin:editor:submitter"));
         mcrSession.setUserInformation(new MCRUserInformation() {
 

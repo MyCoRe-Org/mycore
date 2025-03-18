@@ -175,7 +175,7 @@ public class MCRUserServlet extends MCRServlet {
 
     private static boolean forbidIfGuest(HttpServletResponse res) throws IOException {
         if (MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
-            .equals(MCRSystemUserInformation.getGuestInstance().getUserID())) {
+            .equals(MCRSystemUserInformation.GUEST.getUserID())) {
             String msg = MCRTranslation.translate("component.user2.UserServlet.noGuestAction");
             res.sendError(HttpServletResponse.SC_FORBIDDEN, msg);
             return true;

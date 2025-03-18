@@ -44,7 +44,7 @@ public class MCRJanitorEventHandlerBaseTest extends MCRTestCase {
             }
         };
 
-        MCRSystemUserInformation oldUserInformation = MCRSystemUserInformation.getGuestInstance();
+        MCRSystemUserInformation oldUserInformation = MCRSystemUserInformation.GUEST;
         MCRSessionMgr.getCurrentSession().setUserInformation(oldUserInformation);
 
         boolean exceptionCatched = false;

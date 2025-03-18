@@ -164,14 +164,14 @@ public class MCRORCIDObjectResource {
         }
         final MCRSession session = MCRSessionMgr.getCurrentSession();
         final MCRUserInformation savedUserInformation = session.getUserInformation();
-        session.setUserInformation(MCRSystemUserInformation.getGuestInstance());
-        session.setUserInformation(MCRSystemUserInformation.getJanitorInstance());
+        session.setUserInformation(MCRSystemUserInformation.GUEST);
+        session.setUserInformation(MCRSystemUserInformation.JANITOR);
         try {
             new MCRORCIDWorkService(orcid, credential).createWork(object);
         } catch (Exception e) {
             throw new BadRequestException("Failed to create ORCID work.", e);
         } finally {
-            session.setUserInformation(MCRSystemUserInformation.getGuestInstance());
+            session.setUserInformation(MCRSystemUserInformation.GUEST);
             session.setUserInformation(savedUserInformation);
         }
         return Response.ok().build();

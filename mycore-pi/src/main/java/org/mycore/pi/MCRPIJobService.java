@@ -261,13 +261,13 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
             MCRUserInformation userInformation = MCRUserInformationResolver.obtainInstance().getOrThrow(jobUser);
 
             /* workaround https://mycore.atlassian.net/browse/MCR-1400*/
-            session.setUserInformation(MCRSystemUserInformation.getGuestInstance());
+            session.setUserInformation(MCRSystemUserInformation.GUEST);
             session.setUserInformation(userInformation);
             LOGGER.info("Continue as User {}", jobUser);
         } else {
             savedUserInformation = session.getUserInformation();
-            session.setUserInformation(MCRSystemUserInformation.getGuestInstance());
-            session.setUserInformation(MCRSystemUserInformation.getJanitorInstance());
+            session.setUserInformation(MCRSystemUserInformation.GUEST);
+            session.setUserInformation(MCRSystemUserInformation.JANITOR);
         }
 
         boolean transactionActive = !MCRTransactionManager.hasActiveTransactions();
@@ -285,7 +285,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
                 LOGGER.info("Continue as previous User {}", savedUserInformation::getUserID);
 
                 /* workaround https://mycore.atlassian.net/browse/MCR-1400*/
-                session.setUserInformation(MCRSystemUserInformation.getGuestInstance());
+                session.setUserInformation(MCRSystemUserInformation.GUEST);
                 session.setUserInformation(savedUserInformation);
             }
         }
