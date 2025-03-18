@@ -16,26 +16,21 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.solr.index.strategy;
+package org.mycore.common.config.annotation;
 
-import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
-
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-
-import org.mycore.common.config.MCRConfiguration2;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * @author Matthias Eichner
- * @author Thomas Scheffler (yagee)
+ * This annotation is used to mark a static factory method that should be used instead of a
+ * constructor to supply the requested instance.
  */
-public class MCRSolrIndexStrategyManager {
-
-    private static final MCRSolrFileStrategy FILE_STRATEGY = MCRConfiguration2
-        .getInstanceOfOrThrow(MCRSolrFileStrategy.class, SOLR_CONFIG_PREFIX + "FileIndexStrategy");
-
-    public static boolean checkFile(Path file, BasicFileAttributes attrs) {
-        return FILE_STRATEGY.check(file, attrs);
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.METHOD })
+@Inherited
+public @interface MCRFactory {
 
 }
