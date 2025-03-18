@@ -18,34 +18,29 @@
 
 package org.mycore.datamodel.classifications2.impl;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Map;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTestCase;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRLabel;
+import org.mycore.test.MyCoReTest;
 
-public class MCRAbstractCategoryImplTest extends MCRTestCase {
-
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-        System.setProperty("MCR.Metadata.DefaultLang.foo", "true");
-    }
-
-    @After
-    public void clean() {
-        System.setProperty("MCR.Metadata.DefaultLang.foo", "false");
-    }
+@MyCoReTest
+@MCRTestConfiguration(
+    properties = {
+        @MCRTestProperty(key = "MCR.Metadata.DefaultLang.foo", string = "true")
+    })
+public class MCRAbstractCategoryImplTest {
 
     @Test
+    @MCRTestConfiguration(
+        properties = {
+            @MCRTestProperty(key = "MCR.Metadata.DefaultLang", string = "at")
+        })
     public void getCurrentLabel() {
         MCRCategory cat = new MCRSimpleAbstractCategoryImpl();
         MCRLabel label1 = new MCRLabel("de", "german", null);
@@ -56,19 +51,12 @@ public class MCRAbstractCategoryImplTest extends MCRTestCase {
         cat.getLabels().add(label3);
         MCRSession session = MCRSessionMgr.getCurrentSession();
         session.setCurrentLanguage("en");
-        assertEquals("German label expected", label3, cat.getCurrentLabel().get());
+        assertEquals(label3, cat.getCurrentLabel().get(), "German label expected");
         cat.getLabels().clear();
         cat.getLabels().add(label2);
         cat.getLabels().add(label3);
         cat.getLabels().add(label1);
-        assertEquals("German label expected", label3, cat.getCurrentLabel().get());
-    }
-
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.Metadata.DefaultLang", "at");
-        return testProperties;
+        assertEquals(label3, cat.getCurrentLabel().get(), "German label expected");
     }
 
 }
