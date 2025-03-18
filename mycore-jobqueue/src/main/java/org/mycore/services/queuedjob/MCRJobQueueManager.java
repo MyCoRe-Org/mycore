@@ -33,7 +33,7 @@ import org.mycore.services.queuedjob.config2.MCRConfiguration2JobConfig;
  * Manages the {@link MCRJobQueue} and other related instances for all {@link MCRJobAction} implementations.
  * @author Sebastian Hofmann
  */
-public class MCRJobQueueManager {
+public final class MCRJobQueueManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -46,7 +46,7 @@ public class MCRJobQueueManager {
 
     private final MCRJobConfig config;
 
-    MCRJobQueueManager(MCRJobDAO dao, MCRJobConfig config) {
+    private MCRJobQueueManager(MCRJobDAO dao, MCRJobConfig config) {
         this.dao = dao;
         this.config = config;
     }

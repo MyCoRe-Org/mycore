@@ -72,7 +72,7 @@ public class MCRCategoryCondition extends MCRAbstractFactCondition<MCRCategoryID
             MCRObjectID objectID = idc.get().getValue();
             if (objectID != null) {
                 MCRCategoryID categoryID = MCRCategoryID.ofString(getTerm());
-                MCRCategLinkService linkService = MCRCategLinkServiceFactory.getInstance();
+                MCRCategLinkService linkService = MCRCategLinkServiceFactory.obtainInstance();
                 if (linkService.isInCategory(new MCRCategLinkReference(objectID), categoryID)) {
                     MCRCategoryIDFact result = new MCRCategoryIDFact(getFactName(), getTerm());
                     result.setValue(categoryID);

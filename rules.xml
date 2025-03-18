@@ -199,6 +199,116 @@
     </properties>
   </rule-->
 
+  <rule name="MCR.Singleton.MethodModifiers"
+        language="java"
+        message="A method named 'getInstance' should be static"
+        class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+    <priority>4</priority>
+    <properties>
+      <property name="xpath">
+        <value>
+          //MethodDeclaration
+            [
+              @Name='getInstance'
+                and
+              not(ModifierList/Annotation/ClassType[pmd-java:typeIs('java.lang.Deprecated')])
+            ]
+            [
+              not(pmd-java:modifiers()='static')
+            ]
+        </value>
+      </property>
+    </properties>
+  </rule>
+
+  <rule name="MCR.Singleton.MethodReturnType"
+        language="java"
+        message="A method named 'getInstance' should return an instance of the enclosing class"
+        class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+    <priority>4</priority>
+    <properties>
+      <property name="xpath">
+        <value>
+          //MethodDeclaration
+            [
+              @Name='getInstance'
+                and
+              not(ModifierList/Annotation/ClassType[pmd-java:typeIs('java.lang.Deprecated')])
+            ]
+            [
+              not(ClassType[pmd-java:typeIs(../../../@CanonicalName)])
+            ]
+        </value>
+      </property>
+    </properties>
+  </rule>
+
+  <rule name="MCR.Singleton.ClassModifiers"
+        language="java"
+        message="A singleton class (with method named 'getInstance') should be final"
+        class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+    <priority>4</priority>
+    <properties>
+      <property name="xpath">
+        <value>
+          //MethodDeclaration
+            [
+              @Name='getInstance'
+                and
+              not(ModifierList/Annotation/ClassType[pmd-java:typeIs('java.lang.Deprecated')])
+            ]
+            [
+              not(../..[pmd-java:modifiers()='final'])
+            ]
+        </value>
+      </property>
+    </properties>
+  </rule>
+
+  <rule name="MCR.Singleton.PrivateConstructor"
+        language="java"
+        message="A singleton class with (method named 'getInstance') should have a private constructor"
+        class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+    <priority>4</priority>
+    <properties>
+      <property name="xpath">
+        <value>
+          //MethodDeclaration
+            [
+              @Name='getInstance'
+                and
+              not(ModifierList/Annotation/ClassType[pmd-java:typeIs('java.lang.Deprecated')])
+            ]
+            [
+              not(../ConstructorDeclaration[pmd-java:modifiers()='private'])
+            ]
+        </value>
+      </property>
+    </properties>
+  </rule>
+
+  <rule name="MCR.Singleton.NonPrivateConstructors"
+        language="java"
+        message="A singleton class with (method named 'getInstance') should only have a private constructors"
+        class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+    <priority>4</priority>
+    <properties>
+      <property name="xpath">
+        <value>
+          //MethodDeclaration
+            [
+              @Name='getInstance'
+                and
+              not(ModifierList/Annotation/ClassType[pmd-java:typeIs('java.lang.Deprecated')])
+            ]
+            [
+              ../ConstructorDeclaration[not(deep-equal(pmd-java:modifiers(),('private')))]
+            ]
+        </value>
+      </property>
+    </properties>
+  </rule>
+
   <rule name="MCR.SerialVersionUid.ModifiersAndType"
         language="java"
         message="The serialVersionUID should have modifiers private static final and type long"

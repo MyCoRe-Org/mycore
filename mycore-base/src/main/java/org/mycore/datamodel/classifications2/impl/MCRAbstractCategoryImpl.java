@@ -89,7 +89,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
     }
 
     private void initChildren() {
-        setChildrenUnlocked(MCRCategoryDAOFactory.getInstance().getChildren(id));
+        setChildrenUnlocked(MCRCategoryDAOFactory.obtainInstance().getChildren(id));
     }
 
     protected void setChildrenUnlocked(List<MCRCategory> children) {
@@ -136,7 +136,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
     public boolean hasChildren() {
         return childGuard
             .read(() -> Optional.ofNullable(children).map(c -> !c.isEmpty()))
-            .orElse(MCRCategoryDAOFactory.getInstance().hasChildren(id));
+            .orElse(MCRCategoryDAOFactory.obtainInstance().hasChildren(id));
     }
 
     @Override

@@ -40,7 +40,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 public class MCRAccessCondition extends MCRAuthorityInfo {
     public String href;
 
-    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.obtainInstance();
 
     private static final Logger LOGGER = LogManager.getLogger();
 

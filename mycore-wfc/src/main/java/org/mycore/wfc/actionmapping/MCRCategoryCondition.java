@@ -38,7 +38,7 @@ public class MCRCategoryCondition implements MCRCondition<MCRWorkflowData> {
 
     private final String fieldName;
 
-    private static final MCRCategLinkService LINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
+    private static final MCRCategLinkService LINK_SERVICE = MCRCategLinkServiceFactory.obtainInstance();
 
     public MCRCategoryCondition(String fieldName, MCRCategoryID mcrCategoryID, boolean not) {
         this.fieldName = fieldName;

@@ -115,7 +115,7 @@ public class MCRSkosTransformer {
             // on reimplementation / consolidation we could try to integrate this additional query
             // into the main query
             if (categ.getId().equals(current)) {
-                MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
+                MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
                 for (MCRCategory c : categoryDAO.getChildren(current)) {
                     eConcept.addContent(new Element("narrower", MCRConstants.SKOS_NAMESPACE)
                         .setAttribute(ATTRIBUTE_RESOURCE, retrieveURI(c), MCRConstants.RDF_NAMESPACE));

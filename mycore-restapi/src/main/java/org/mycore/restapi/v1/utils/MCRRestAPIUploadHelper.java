@@ -189,7 +189,7 @@ public class MCRRestAPIUploadHelper {
     private static MCRObjectID findDerivateID(MCRObject mcrObj, String label, String classifications)
         throws MCRRestAPIException {
         MCRObjectID derID = null;
-        final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+        final MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
         final List<MCRMetaEnrichedLinkID> currentDerivates = mcrObj.getStructure().getDerivates();
         if (label != null && !label.isEmpty()) {
             derID = findDerIDByLabel(currentDerivates, label);
@@ -266,7 +266,7 @@ public class MCRRestAPIUploadHelper {
     }
 
     private static void addClassificationsToDerivate(MCRDerivate mcrDerivate, String classifications) {
-        final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+        final MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
         final List<MCRMetaClassification> currentClassifications = mcrDerivate.getDerivate().getClassifications();
 
         Stream.of(classifications.split(" "))

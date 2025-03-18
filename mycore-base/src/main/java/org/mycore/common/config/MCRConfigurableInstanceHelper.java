@@ -57,7 +57,9 @@ import jakarta.inject.Singleton;
  *
  * @author Sebastian Hofmann
  */
-@SuppressWarnings("PMD.SingleMethodSingleton")
+@SuppressWarnings({"PMD.SingleMethodSingleton", "PMD.MCR.Singleton.MethodModifiers",
+    "PMD.MCR.Singleton.MethodReturnType", "PMD.MCR.Singleton.ClassModifiers",
+    "PMD.MCR.Singleton.PrivateConstructor", "PMD.MCR.Singleton.NonPrivateConstructors"})
 class MCRConfigurableInstanceHelper {
 
     private static final ConcurrentMap<Class<?>, ClassInfo<?>> INFOS = new ConcurrentHashMap<>();

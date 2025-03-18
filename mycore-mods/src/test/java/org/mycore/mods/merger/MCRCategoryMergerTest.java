@@ -57,7 +57,7 @@ public class MCRCategoryMergerTest extends MCRJPATestCase {
         SAXBuilder saxBuilder = new SAXBuilder();
         InputStream categoryStream = classLoader.getResourceAsStream(TEST_DIRECTORY + categoryFileName);
         MCRCategory category = MCRXMLTransformer.getCategory(saxBuilder.build(categoryStream));
-        MCRCategoryDAOFactory.getInstance().addCategory(null, category);
+        MCRCategoryDAOFactory.obtainInstance().addCategory(null, category);
     }
 
     @Test
