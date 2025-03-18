@@ -52,6 +52,7 @@ public class MCRCoreVersion {
         return VERSION;
     }
 
+    @SuppressWarnings("PMD.MCR.ResourceResolver")
     private static Properties loadVersionProperties() {
         Properties props = new Properties();
         URL gitPropURL = MCRCoreVersion.class.getResource("/org/mycore/git.properties");

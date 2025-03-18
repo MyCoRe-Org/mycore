@@ -20,7 +20,6 @@ package org.mycore.frontend.servlets.persistence;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.net.MalformedURLException;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -37,6 +36,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.validator.MCREditorOutValidator;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.resource.MCRResourceHelper;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
@@ -130,18 +130,17 @@ class MCRPersistenceHelper {
         return new MCRObject(validMyCoReObject);
     }
 
-    protected static String getWebPage(ServletContext context, String modernPage, String deprecatedPage)
-        throws ServletException {
-        try {
-            if (context.getResource("/" + modernPage) == null
-                && context.getResource("/" + deprecatedPage) != null) {
-                LogManager.getLogger()
-                    .warn("Could not find {} in webapp root, using deprecated {} instead.", modernPage,
-                        deprecatedPage);
-                return deprecatedPage;
-            }
-        } catch (MalformedURLException e) {
-            throw new ServletException(e);
+    @Deprecated
+    protected static String getWebPage(ServletContext context, String modernPage, String deprecatedPage) {
+        return getWebPage(modernPage, deprecatedPage);
+    }
+
+    protected static String getWebPage(String modernPage, String deprecatedPage) {
+        if (MCRResourceHelper.getWebResourceUrl(modernPage) == null
+            && MCRResourceHelper.getWebResourceUrl(deprecatedPage) != null) {
+            LOGGER.warn("Could not find {} in webapp root, using deprecated {} instead.",
+                modernPage, deprecatedPage);
+            return deprecatedPage;
         }
         return modernPage; //even if it does not exist: nice 404 helps the user
     }

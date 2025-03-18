@@ -41,6 +41,7 @@ import org.mycore.common.MCRException;
  * @since 2013.12
  * @see MCRRuntimeComponentDetector
  */
+@SuppressWarnings("PMD.MCR.ResourceResolver")
 public class MCRComponent implements Comparable<MCRComponent> {
 
     private static final Logger LOGGER = LogManager.getLogger();

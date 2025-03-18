@@ -64,6 +64,7 @@ import org.xml.sax.SAXException;
  *
  * @author Frank Lützenkirchen
  */
+@SuppressWarnings("PMD.MCR.ResourceResolver")
 public final class MCRXSLInfoServlet extends MCRServlet {
 
     @Serial

@@ -109,6 +109,7 @@ public class MCRWCMSNavigationResource {
     @GET
     @Path("templates")
     @Produces(MediaType.APPLICATION_JSON)
+    @SuppressWarnings("PMD.MCR.ResourceResolver")
     public String getTemplates(@Context ServletContext servletContext) {
         // templates of navigation.xml
         Document xml = MCRWCMSNavigationUtils.getNavigationAsXML();

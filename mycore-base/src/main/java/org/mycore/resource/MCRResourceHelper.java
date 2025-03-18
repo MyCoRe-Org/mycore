@@ -109,7 +109,7 @@ public final class MCRResourceHelper {
 
     /**
      * Shorthand for {@link MCRResourceResolver#reverse(URL)} returning <code>null</code>
-     * instead of an empty {@link java.util.Optional} and taking a String instead of an {@link URL} the .
+     * instead of an empty {@link java.util.Optional} and taking a String instead of an {@link URL}.
      */
     public static MCRResourcePath getResourcePath(String resourceUrl) {
         try {

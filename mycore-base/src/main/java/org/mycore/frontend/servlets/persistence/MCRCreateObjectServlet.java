@@ -140,7 +140,7 @@ public class MCRCreateObjectServlet extends MCRPersistenceServlet {
             sb.append('-').append(layout);
         }
         String baseName = sb.toString();
-        String form = MCRPersistenceHelper.getWebPage(getServletContext(), baseName + ".xed", baseName + ".xml");
+        String form = MCRPersistenceHelper.getWebPage(baseName + ".xed", baseName + ".xml");
         Properties params = new Properties();
         params.put("cancelUrl", MCRPersistenceHelper.getCancelUrl(request));
         params.put("mcrid", objectID.toString());
