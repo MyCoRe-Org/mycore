@@ -130,8 +130,6 @@ public final class MCRInstanceConfiguration {
     }
 
     @SuppressWarnings("PMD.CollapsibleIfStatements")
-    //The condition was intentionally split into two parts, to make it easier to follow the thought-process.
-    //The latter two checks only make sense in the case, where the first condition is met.
     private static Map<String, String> reduceProperties(MCRInstanceName name, String prefix,
         Map<String, String> properties) {
         Map<String, String> reducedProperties = new HashMap<>();
@@ -167,7 +165,8 @@ public final class MCRInstanceConfiguration {
      * @param instanceClass the class
      * @return the configuration
      */
-    public static MCRInstanceConfiguration ofClass(Class<?> instanceClass, Map<String, String> properties) {
+    public static MCRInstanceConfiguration ofClass(Class<?> instanceClass, 
+        Map<String, String> properties) {
         return ofClass(instanceClass.getName(), properties);
     }
 
@@ -534,12 +533,42 @@ public final class MCRInstanceConfiguration {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Returns the configuration with a fixed class name.
+     * <p>
+     * Example: Given an {@link MCRInstanceConfiguration}
+     * representing the {@link MCRInstanceName} <code>Some.Instance.Name</code>, properties
+     * <ul>
+     *     <li><code>Foo=some.nested.ClassName</code></li>
+     *     <li><code>Foo.Key1=Value1</code></li>
+     *     <li><code>Foo.Key2=Value2</code></li>
+     *     <li><code>Bar=UnrelatedValue</code></li>
+     * </ul>
+     * and a <em>class</em> with class name <code>some.other.ClassName</code>, this will return 
+     * an {@link MCRInstanceConfiguration} representing the {@link MCRInstanceConfiguration#name()}
+     * <code>Some.Instance.Name</code>, {@link MCRInstanceConfiguration#className()}
+     * <code>some.other.ClassName</code> and properties
+     * <ul>
+     *     <li><code>Foo=some.nested.ClassName</code></li>
+     *     <li><code>Foo.Key1=Value1</code></li>
+     *     <li><code>Foo.Key2=Value2</code></li>
+     *     <li><code>Bar=UnrelatedValue</code></li>
+     * </ul>
+     *
+     * @param fixedClass the class to be used as a class name
+     * @return the modified configuration
+     */
+    public <S> MCRInstanceConfiguration fixedClass(Class<S> fixedClass) {
+        return new MCRInstanceConfiguration(name, fixedClass.getName(), properties, fullProperties);
+    }
+
     @Override
     public String toString() {
         return "MCRInstanceConfiguration {" +
             "name=" + name + ", " +
             "className=" + className + ", " +
-            "properties=" + properties + "}";
+            "fullProperties=" + properties + ", " +
+            "#fullProperties=" + fullProperties.size() + "}";
     }
 
 }
