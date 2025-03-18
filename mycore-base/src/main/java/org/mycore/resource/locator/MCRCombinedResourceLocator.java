@@ -56,6 +56,7 @@ import org.mycore.resource.provider.MCRResourceProvider.PrefixStripper;
 public class MCRCombinedResourceLocator extends MCRResourceLocatorBase {
 
     public static final String LOCATORS_KEY = "Locators";
+
     private final List<MCRResourceLocator> locators;
 
     public MCRCombinedResourceLocator(MCRResourceLocator... locators) {
