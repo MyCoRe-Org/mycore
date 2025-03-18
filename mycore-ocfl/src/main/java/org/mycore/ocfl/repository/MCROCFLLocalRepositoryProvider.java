@@ -67,17 +67,17 @@ public abstract class MCROCFLLocalRepositoryProvider implements MCROCFLRepositor
         Files.createDirectories(workDir);
         Files.createDirectories(repositoryRoot);
         String id = prop.substring(REPOSITORY_PROPERTY_PREFIX.length());
-        repository = new MCROCFLRepositoryBuilder()
+        repository = buildRepository(id);
+    }
+
+    protected MCROCFLRepository buildRepository(String id) {
+        return new MCROCFLRepositoryBuilder()
             .id(id)
-            .remote(isRemote())
+            .remote(false)
             .defaultLayoutConfig(getExtensionConfig())
             .storage(this::configureStorage)
             .workDir(workDir)
             .buildMCR();
-    }
-
-    public boolean isRemote() {
-        return false;
     }
 
     /**
