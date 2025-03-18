@@ -30,6 +30,7 @@ import java.util.stream.Stream;
 
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRVersionedFileSystem;
+import org.mycore.ocfl.repository.MCROCFLRepository;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 
 import io.ocfl.api.OcflRepository;
@@ -41,8 +42,7 @@ import io.ocfl.api.OcflRepository;
  */
 public class MCROCFLFileSystem extends MCRVersionedFileSystem {
 
-    // TODO we need a bridge for a localfilestore and a remotefilestore
-    private static volatile MCROCFLLocalFileStore fileStore;
+    private static volatile MCROCFLFileStore fileStore;
 
     private final Object fileStoreLock = new Object();
 
@@ -158,17 +158,35 @@ public class MCROCFLFileSystem extends MCRVersionedFileSystem {
     /**
      * Returns the file store for the OCFL file system.
      *
-     * @return the {@link MCROCFLLocalFileStore}.
+     * @return the {@link MCROCFLFileStore}.
      */
-    public MCROCFLLocalFileStore getFileStore() {
+    public MCROCFLFileStore getFileStore() {
         if (fileStore == null) {
             synchronized (fileStoreLock) {
                 if (fileStore == null) {
-                    fileStore = new MCROCFLLocalFileStore(provider());
+                    fileStore = buildFileStore();
                 }
             }
         }
         return fileStore;
+    }
+
+    /**
+     * Resets the fileStore.
+     * <p>
+     * This should only be used in unit testing.
+     */
+    public void resetFileStore() {
+        synchronized (fileStoreLock) {
+            fileStore = null;
+        }
+    }
+
+    private MCROCFLFileStore buildFileStore() {
+        MCROCFLFileSystemProvider fileSystemProvider = provider();
+        MCROCFLRepository repository = fileSystemProvider.getRepository();
+        return repository.isRemote() ? new MCROCFLRemoteFileStore(fileSystemProvider)
+            : new MCROCFLLocalFileStore(fileSystemProvider);
     }
 
 }
