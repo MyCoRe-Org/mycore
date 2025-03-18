@@ -21,14 +21,8 @@ package org.mycore.ocfl.niofs;
 import java.io.IOException;
 import java.nio.file.FileStore;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.FileAttributeView;
-import java.nio.file.attribute.FileStoreAttributeView;
 
-import org.mycore.common.MCRException;
 import org.mycore.datamodel.niofs.MCRAbstractFileStore;
-import org.mycore.datamodel.niofs.MCRPath;
-import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.MCROCFLException;
 import org.mycore.ocfl.repository.MCROCFLLocalRepositoryProvider;
 
@@ -38,11 +32,8 @@ import org.mycore.ocfl.repository.MCROCFLLocalRepositoryProvider;
  * This class extends {@link MCRAbstractFileStore} to provide a custom file store for OCFL-managed files.
  * It integrates with the OCFL file system provider to offer file store operations such as retrieving
  * the total, usable, and unallocated space, and supports file attribute views.
- * </p>
  */
-public class MCROCFLLocalFileStore extends MCRAbstractFileStore {
-
-    private final MCROCFLFileSystemProvider fileSystemProvider;
+public class MCROCFLLocalFileStore extends MCROCFLFileStore {
 
     /**
      * Constructs a new {@code MCROCFLLocalFileStore} with the specified file system provider.
@@ -50,35 +41,7 @@ public class MCROCFLLocalFileStore extends MCRAbstractFileStore {
      * @param fileSystemProvider the OCFL file system provider.
      */
     public MCROCFLLocalFileStore(MCROCFLFileSystemProvider fileSystemProvider) {
-        this.fileSystemProvider = fileSystemProvider;
-    }
-
-    /**
-     * Returns the name of this file store, which is the repository ID of the file system provider.
-     *
-     * @return the name of this file store.
-     */
-    @Override
-    public String name() {
-        return this.fileSystemProvider.getRepositoryId();
-    }
-
-    /**
-     * Returns the type of this file store, which is the canonical name of the repository class.
-     *
-     * @return the type of this file store.
-     */
-    @Override
-    public String type() {
-        return this.fileSystemProvider.getRepository().getClass().getCanonicalName();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isReadOnly() {
-        return false;
+        super(fileSystemProvider);
     }
 
     /**
@@ -112,66 +75,6 @@ public class MCROCFLLocalFileStore extends MCRAbstractFileStore {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean supportsFileAttributeView(Class<? extends FileAttributeView> type) {
-        try {
-            return localStorageFileStore().supportsFileAttributeView(type);
-        } catch (IOException ioException) {
-            return false;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean supportsFileAttributeView(String name) {
-        try {
-            return localStorageFileStore().supportsFileAttributeView(name);
-        } catch (IOException ioException) {
-            return false;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public <V extends FileStoreAttributeView> V getFileStoreAttributeView(Class<V> type) {
-        try {
-            return localStorageFileStore().getFileStoreAttributeView(type);
-        } catch (IOException ioException) {
-            throw new MCRException("Unable to get fileStoreAttributeView for class type '" + type + "'", ioException);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Object getAttribute(String attribute) throws IOException {
-        return localStorageFileStore().getAttribute(attribute);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Path getBaseDirectory() {
-        return this.fileSystemProvider.localStorage().getRoot();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Path getPhysicalPath(MCRPath path) {
-        return this.fileSystemProvider.localStorage().toPhysicalPath(MCRVersionedPath.toVersionedPath(path));
-    }
-
-    /**
      * Returns the file store for the OCFL repository root.
      *
      * @return the file store for the repository root.
@@ -184,16 +87,6 @@ public class MCROCFLLocalFileStore extends MCRAbstractFileStore {
         }
         throw new MCROCFLException("Excepted instance of MCROCFLLocalRepositoryProvider, but got "
             + this.fileSystemProvider.getRepositoryProvider().getClass().getSimpleName());
-    }
-
-    /**
-     * Returns the file store for the local storage root.
-     *
-     * @return the file store for the local storage root.
-     * @throws IOException if an I/O error occurs.
-     */
-    private FileStore localStorageFileStore() throws IOException {
-        return Files.getFileStore(this.fileSystemProvider.localStorage().getRoot());
     }
 
 }

@@ -261,7 +261,7 @@ public class MCROCFLRepository implements OcflRepository {
     protected Inventory requireInventory(ObjectVersionId objectId) {
         var inventory = loadInventory(objectId);
         if (inventory == null) {
-            throw new NotFoundException(String.format("Object %s was not found.", objectId));
+            throw new NotFoundException("Object " + objectId + " was not found.");
         }
         return inventory;
     }
