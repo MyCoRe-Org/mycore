@@ -234,7 +234,7 @@ public class MCROAISetManager {
                 .stream() //all setDescription
                 .flatMap(e -> e.getChildren().stream().limit(1)) //first childElement of setDescription
                 .peek(Element::detach)
-                .map(d -> (Description) new Description() {
+                .map(d -> new Description() {
                     @Override
                     public Element toXML() {
                         return d;
