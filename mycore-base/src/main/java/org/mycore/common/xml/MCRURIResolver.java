@@ -166,15 +166,9 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     private static MCRResolverProvider getExternalResolverProvider() {
-        return MCRConfiguration2.getClass(CONFIG_PREFIX + "ExternalResolver.Class")
-            .map(c -> {
-                try {
-                    return (MCRResolverProvider) c.getDeclaredConstructor().newInstance();
-                } catch (ReflectiveOperationException e) {
-                    LOGGER.warn("Could not instantiate external Resolver class", e);
-                    return null;
-                }
-            }).orElse(HashMap::new);
+        return MCRConfiguration2
+            .getInstanceOf(MCRResolverProvider.class, CONFIG_PREFIX + "ExternalResolver.Class")
+            .orElse(HashMap::new);
     }
 
     private static void findAndThrowTransformerException(Exception e) throws TransformerException {
@@ -479,7 +473,7 @@ public final class MCRURIResolver implements URIResolver {
 
         private void registerUriResolver(String scheme, String className) {
             try {
-                resolverMap.put(scheme, MCRConfiguration2.instantiateClass(className));
+                resolverMap.put(scheme, MCRConfiguration2.instantiateClass(URIResolver.class, className));
             } catch (RuntimeException re) {
                 throw new MCRException("Cannot instantiate " + className + " for URI scheme " + scheme, re);
             }
@@ -1255,8 +1249,8 @@ public final class MCRURIResolver implements URIResolver {
             String propertyName = "MCR.URIResolver.xslIncludes." + includePart;
             List<String> propValue;
             if (includePart.startsWith("class.")) {
-                MCRXslIncludeHrefs incHrefClass = MCRConfiguration2
-                    .getOrThrow(propertyName, MCRConfiguration2::instantiateClass);
+                MCRXslIncludeHrefs incHrefClass = MCRConfiguration2.getInstanceOfOrThrow(
+                    MCRXslIncludeHrefs.class, propertyName);
                 propValue = incHrefClass.getHrefs();
             } else {
                 propValue = MCRConfiguration2.getString(propertyName)

@@ -38,6 +38,11 @@ public class MCRORCIDConstants {
     public static final String ORCID_BASE_URL = MCRConfiguration2.getStringOrThrow(CONFIG_PREFIX + "BaseURL");
 
     /**
+     * ORCID Client ID.
+     */
+    public static final String ORCID_CLIENT_ID = MCRConfiguration2.getStringOrThrow(CONFIG_PREFIX + "ClientID");
+
+    /**
      * List of all language codes supported by ORCID.
      */
     public static final List<String> SUPPORTED_LANGUAGE_CODES = MCRConfiguration2

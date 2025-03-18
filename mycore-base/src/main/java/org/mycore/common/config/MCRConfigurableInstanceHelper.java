@@ -18,6 +18,20 @@
 
 package org.mycore.common.config;
 
+import jakarta.inject.Singleton;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRClassTools;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRFactory;
+import org.mycore.common.config.annotation.MCRInstance;
+import org.mycore.common.config.annotation.MCRInstanceList;
+import org.mycore.common.config.annotation.MCRInstanceMap;
+import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRSentinel;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -41,24 +55,15 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.mycore.common.MCRClassTools;
-import org.mycore.common.config.annotation.MCRConfigurationProxy;
-import org.mycore.common.config.annotation.MCRInstance;
-import org.mycore.common.config.annotation.MCRInstanceList;
-import org.mycore.common.config.annotation.MCRInstanceMap;
-import org.mycore.common.config.annotation.MCRPostConstruction;
-import org.mycore.common.config.annotation.MCRProperty;
-import org.mycore.common.config.annotation.MCRSentinel;
-
-import jakarta.inject.Singleton;
-
 /**
  * Creates Objects which are configured with properties.
  *
  * @author Sebastian Hofmann
  */
-@SuppressWarnings("PMD.SingleMethodSingleton")
+@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.SingleMethodSingleton"})
 class MCRConfigurableInstanceHelper {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final ConcurrentMap<Class<?>, ClassInfo<?>> INFOS = new ConcurrentHashMap<>();
 
@@ -86,6 +91,19 @@ class MCRConfigurableInstanceHelper {
     /**
      * Creates a configured instance of a class.
      *
+     * @param name the property which contains the class name
+     * @return the configured instance of T
+     * @throws MCRConfigurationException if the property is not right configured.
+     */
+    @Deprecated
+    @SuppressWarnings("unchecked")
+    public static <T> Optional<T> getInstance(String name) throws MCRConfigurationException {
+        return (Optional<T>) getInstance(Object.class, name);
+    }
+
+    /**
+     * Creates a configured instance of a class.
+     *
      * @param superClass the intended super class of the instantiated class
      * @param name       the property which contains the class name
      * @return the configured instance of T
@@ -97,39 +115,36 @@ class MCRConfigurableInstanceHelper {
         if (className == null || className.isBlank()) {
             return Optional.empty();
         }
-        Object instance = getInstance(configuration);
-        if (superClass.isAssignableFrom(instance.getClass())) {
-            return Optional.of(superClass.cast(instance));
-        } else {
-            throw new MCRConfigurationException("Configured instance of class " + instance.getClass().getName()
-                + " is incompatible with intended super class " + superClass.getName()
-                + "' in configured class " + name);
-        }
+        return Optional.of(getInstance(superClass, configuration, name));
     }
 
-    /**
-     * Creates a configured instance of a class.
-     *
-     * @param name the property which contains the class name
-     * @return the configured instance of T
-     * @throws MCRConfigurationException if the property is not right configured.
-     */
-    public static <T> Optional<T> getInstance(String name) throws MCRConfigurationException {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName(name);
-        String className = configuration.className();
-        if (className == null || className.isBlank()) {
-            return Optional.empty();
-        }
-        return Optional.of(getInstance(configuration));
-    }
-
+    @Deprecated
+    @SuppressWarnings("unchecked")
     public static <T> T getInstance(MCRInstanceConfiguration configuration) throws MCRConfigurationException {
+        return (T) getInstance(Objects.class, configuration, null);
+    }
+
+    public static <S> S getInstance(Class<S> superClass, MCRInstanceConfiguration configuration)
+        throws MCRConfigurationException {
+        return getInstance(superClass, configuration, null);
+    }
+
+    private static <S> S getInstance(Class<S> superClass, MCRInstanceConfiguration configuration, String name)
+        throws MCRConfigurationException {
         String className = configuration.className();
         if (className == null || className.isBlank()) {
             throw new MCRConfigurationException("Missing or empty property: " + configuration.name().actual());
         }
-        Class<T> targetClass = getClass(configuration.name().actual(), configuration.className());
-        return getInstance(targetClass, configuration);
+        Class<S> targetClass = getClass(configuration.name().actual(), configuration.className());
+        Object instance = createInstance(targetClass, configuration);
+        if (superClass.isAssignableFrom(instance.getClass())) {
+            return superClass.cast(instance);
+        } else {
+            throw new MCRConfigurationException("Configured instance of class " + instance.getClass().getName()
+                + " is incompatible with intended super class " + superClass.getName() + "'"
+                + (name != null ? " in configured class " + name : "")
+            );
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -143,13 +158,13 @@ class MCRConfigurableInstanceHelper {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> T getInstance(Class<T> targetClass, MCRInstanceConfiguration configuration) {
+    private static <T> T createInstance(Class<T> targetClass, MCRInstanceConfiguration configuration) {
         MCRConfigurationProxy productAnnotation = targetClass.getDeclaredAnnotation(MCRConfigurationProxy.class);
         if (productAnnotation != null) {
             Class<Supplier<T>> proxyClass = (Class<Supplier<T>>) productAnnotation.proxyClass();
-            return getInfo(proxyClass).getInstance(configuration).get();
+            return getInfo(proxyClass).createInstance(configuration).get();
         } else {
-            return getInfo(targetClass).getInstance(configuration);
+            return getInfo(targetClass).createInstance(configuration);
         }
     }
 
@@ -274,55 +289,102 @@ class MCRConfigurableInstanceHelper {
             this.injectors = findInjectors(targetClass);
         }
 
+        // TODO: remove legacy factory method option after release of 2025.06 LTS and adjust error message
         private Supplier<T> getFactory(Class<T> targetClass) {
-            try {
-                return createConstructorFactory(findDefaultConstructor(targetClass));
-            } catch (NoSuchMethodException e) {
-                return createFactoryMethodFactory(findFactoryMethod(targetClass));
-            }
+
+            List<Method> declaredFactoryMethods = getFactoryMethods(targetClass, targetClass.getDeclaredMethods());
+            Optional<Supplier<T>> factory = Stream.<Supplier<Optional<Supplier<T>>>>of(
+                    () -> findSingletonFactoryMethod(declaredFactoryMethods),
+                    () -> findAnnotatedFactoryMethod(declaredFactoryMethods),
+                    () -> findDefaultConstructor(targetClass),
+                    () -> findLegacyFactoryMethod(getFactoryMethods(targetClass, targetClass.getMethods())))
+                .map(Supplier::get)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .findFirst();
+
+            return factory.orElseThrow(() ->
+                new MCRConfigurationException("Class " + targetClass.getName() + " has "
+                    + " has no singleton factory method (public, static, matching return type, parameterless, name"
+                    + " equals 'getInstance'), no annotated factory method (public, static, matching return type,"
+                    + " parameterless, annotated with @MCRFactory), no public parameterless constructor and no legacy"
+                    + " factory method (public, static, matching return type, parameterless, name containing"
+                    + " 'instance')")
+            );
+
         }
 
-        private Constructor<T> findDefaultConstructor(Class<T> targetClass) throws NoSuchMethodException {
-            return targetClass.getConstructor();
-        }
-
-        private Supplier<T> createConstructorFactory(Constructor<T> constructor) {
-            return () -> {
-                try {
-                    return constructor.newInstance();
-                } catch (Exception e) {
-                    throw new MCRConfigurationException("Unable to create an instance of "
-                        + constructor.getDeclaringClass().getName() + " using parameterless public constructor", e);
-                }
-            };
-        }
-
-        private Method findFactoryMethod(Class<T> targetClass) {
-
-            List<Method> factoryMethods = Stream.of(targetClass.getMethods())
+        private static <T> List<Method> getFactoryMethods(Class<T> targetClass, Method[] declaredMethods) {
+            return Stream.of(declaredMethods)
                 .filter(method -> Modifier.isPublic(method.getModifiers()))
                 .filter(method -> Modifier.isStatic(method.getModifiers()))
                 .filter(method -> method.getReturnType().isAssignableFrom(targetClass))
                 .filter(method -> method.getParameterTypes().length == 0)
                 .filter(method -> !method.isVarArgs())
+                .toList();
+        }
+
+        private Optional<Supplier<T>> findSingletonFactoryMethod(List<Method> factoryMethods) {
+
+            List<Method> singletonFactoryMethods = factoryMethods.stream()
+                .filter(method -> method.getName().equals("getInstance"))
+                .toList();
+
+            if (singletonFactoryMethods.size() > 1) {
+                throw new MCRConfigurationException("Class " + targetClass.getName()
+                    + " has multiple singleton factory methods (public, static, matching return type, parameterless,"
+                    + " name equals 'getInstance'): " + methodNames(singletonFactoryMethods));
+            }
+
+            return singletonFactoryMethods.stream().findFirst().map(this::createFactoryMethodFactory);
+
+        }
+
+        private Optional<Supplier<T>> findAnnotatedFactoryMethod(List<Method> factoryMethods) {
+
+            List<Method> annotatedFactoryMethods = factoryMethods.stream()
+                .filter(method -> method.getDeclaredAnnotation(MCRFactory.class) != null)
+                .toList();
+
+            if (annotatedFactoryMethods.size() > 1) {
+                throw new MCRConfigurationException("Class " + targetClass.getName()
+                    + " has multiple annotated factory methods (public, static, matching return type, parameterless,"
+                    + " annotated with @MCRFactory): " + methodNames(annotatedFactoryMethods));
+            }
+
+            return annotatedFactoryMethods.stream().findFirst().map(this::createFactoryMethodFactory);
+
+        }
+
+        private Optional<Supplier<T>> findDefaultConstructor(Class<T> targetClass) {
+            try {
+                return Optional.of(createConstructorFactory(targetClass.getConstructor()));
+            } catch (NoSuchMethodException e) {
+                return Optional.empty();
+            }
+        }
+
+        private Optional<Supplier<T>> findLegacyFactoryMethod(List<Method> factoryMethods) {
+
+           
+            List<Method> legacyFactoryMethods = factoryMethods.stream()
                 .filter(method -> method.getName().toLowerCase(Locale.ROOT).contains("instance"))
                 .toList();
 
-            if (factoryMethods.isEmpty()) {
+            if (legacyFactoryMethods.size() > 1) {
                 throw new MCRConfigurationException("Class " + targetClass.getName()
-                    + " has no public, parameterless constructor and no suitable"
-                    + " (public, static, matching return type, parameterless, name containing 'instance')"
-                    + " factory method");
+                    + " has multiple legacy factory methods (public, static, matching return type, parameterless, name"
+                    + " contains 'instance'): " + methodNames(legacyFactoryMethods));
             }
 
-            if (factoryMethods.size() != 1) {
-                throw new MCRConfigurationException("Class " + targetClass.getName()
-                    + " has no public, parameterless constructor but multiple suitable"
-                    + " (public, static, matching return type, parameterless, name containing 'instance')"
-                    + " factory methods (" + methodNames(factoryMethods) + ")");
-            }
-
-            return factoryMethods.getFirst();
+            return legacyFactoryMethods.stream().findFirst().map(method -> {
+                if (LOGGER.isWarnEnabled()) {
+                    LOGGER.warn("Instantiation of {} relies on legacy factory method (public, static,"
+                            + " matching return type, parameterless, name containing 'instance') {}.",
+                        targetClass.getName(), method.getName());
+                }
+                return createFactoryMethodFactory(method);
+            });
 
         }
 
@@ -334,6 +396,17 @@ class MCRConfigurableInstanceHelper {
                 } catch (Exception e) {
                     throw new MCRConfigurationException("Unable to create an instance of "
                         + method.getDeclaringClass().getName() + " using public, parameterless constructor", e);
+                }
+            };
+        }
+
+        private Supplier<T> createConstructorFactory(Constructor<T> constructor) {
+            return () -> {
+                try {
+                    return constructor.newInstance();
+                } catch (Exception e) {
+                    throw new MCRConfigurationException("Unable to create an instance of "
+                        + constructor.getDeclaringClass().getName() + " using parameterless public constructor", e);
                 }
             };
         }
@@ -350,7 +423,6 @@ class MCRConfigurableInstanceHelper {
             return injectors;
         }
 
-        @SuppressWarnings("PMD.AvoidDuplicateLiterals")
         private Optional<Injector<T, ?>> findInjector(Injectable injectable) {
 
             List<Source<?, ?>> sources = new LinkedList<>();
@@ -387,8 +459,7 @@ class MCRConfigurableInstanceHelper {
 
         }
 
-        @SuppressWarnings("PMD.SingletonClassReturningNewInstance")
-        public T getInstance(MCRInstanceConfiguration configuration) {
+        public T createInstance(MCRInstanceConfiguration configuration) {
             T instance = factory.get();
             for (Injector<T, ?> injector : injectors) {
                 injector.inject(instance, configuration);
@@ -900,7 +971,7 @@ class MCRConfigurableInstanceHelper {
                 }
             }
 
-            Object instance = getInstance(nestedConfiguration);
+            Object instance = getInstance(Object.class, nestedConfiguration);
 
             if (!annotation.valueClass().isAssignableFrom(instance.getClass())) {
                 throwIncompatibleAnnotation(annotation.valueClass(), target, instance);
@@ -976,8 +1047,8 @@ class MCRConfigurableInstanceHelper {
                     + getExampleName(configuration, "B") + ", ...");
             }
 
-            Map<String, Object> instanceMap = nestedConfigurationMap.entrySet()
-                .stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> getInstance(entry.getValue())));
+            Map<String, Object> instanceMap = nestedConfigurationMap.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> getInstance(Object.class, entry.getValue())));
 
             instanceMap.values().forEach(instance -> {
                 if (!annotation.valueClass().isAssignableFrom(instance.getClass())) {
@@ -1070,8 +1141,8 @@ class MCRConfigurableInstanceHelper {
                     + getExampleName(configuration, "2") + ", ...");
             }
 
-            List<Object> instanceList = nestedConfigurationList
-                .stream().map(MCRConfigurableInstanceHelper::getInstance).toList();
+            List<Object> instanceList = nestedConfigurationList.stream()
+                .map(c -> getInstance(Object.class, c)).toList();
 
             instanceList.forEach(instance -> {
                 if (!annotation.valueClass().isAssignableFrom(instance.getClass())) {
