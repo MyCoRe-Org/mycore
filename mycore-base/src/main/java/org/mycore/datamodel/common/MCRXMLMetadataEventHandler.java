@@ -41,8 +41,6 @@ import org.mycore.datamodel.metadata.MCRObjectService;
  */
 public class MCRXMLMetadataEventHandler extends MCREventHandlerBase {
 
-    static MCRXMLMetadataManager metaDataManager = MCRXMLMetadataManager.getInstance();
-
     /**
      * This method add the data to SQL table of XML data via MCRXMLMetadataManager.
      * 
@@ -131,6 +129,7 @@ public class MCRXMLMetadataEventHandler extends MCREventHandlerBase {
     }
 
     private void handleStoreEvent(MCREvent evt, MCRBase obj) {
+        MCRXMLMetadataManager manager = MCRXMLMetadataManager.getInstance();
         MCREvent.EventType eventType = evt.getEventType();
         MCRObjectID id = obj.getId();
         try {
@@ -140,16 +139,16 @@ public class MCRXMLMetadataEventHandler extends MCREventHandlerBase {
                     Date modified = obj.getService().getDate(MCRObjectService.DATE_TYPE_MODIFYDATE);
                     switch (eventType) {
                         case REPAIR:
-                            MCRContent retrieveContent = metaDataManager.retrieveContent(id);
+                            MCRContent retrieveContent = manager.retrieveContent(id);
                             if (isUptodate(retrieveContent, content)) {
                                 return;
                             }
                             //Fall-Through
                         case UPDATE:
-                            metaDataManager.update(id, content, modified);
+                            manager.update(id, content, modified);
                             break;
                         case CREATE:
-                            metaDataManager.create(id, content, modified);
+                            manager.create(id, content, modified);
                             break;
 
                         default:
@@ -157,7 +156,7 @@ public class MCRXMLMetadataEventHandler extends MCREventHandlerBase {
                     }
                     evt.put("content", content);
                 }
-                case DELETE -> metaDataManager.delete(id);
+                case DELETE -> manager.delete(id);
                 default -> throw new IllegalArgumentException("Invalid event type " + eventType + " for object " + id);
             }
         } catch (IOException e) {

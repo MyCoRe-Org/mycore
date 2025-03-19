@@ -95,7 +95,7 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
         } catch (URISyntaxException e) {
             throw new MCRException(e);
         }
-        for (FileSystemProvider provider : Iterables.concat(MCRPaths.webAppProvider,
+        for (FileSystemProvider provider : Iterables.concat(MCRPaths.getWebAppProvider(),
             FileSystemProvider.installedProviders())) {
             if (provider.getScheme().equals(scheme)) {
                 return (MCRAbstractFileSystem) provider.getFileSystem(uri);

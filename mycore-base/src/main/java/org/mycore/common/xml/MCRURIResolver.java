@@ -387,7 +387,7 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     private void addDebugInfo(String href, String base) {
-        MCRURIResolverFilter.uriList.get().add(href + " from " + base);
+        MCRURIResolverFilter.addUri(href + " from " + base);
     }
 
     /**

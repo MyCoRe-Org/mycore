@@ -46,7 +46,7 @@ public class MCRWebCLICommandManager extends MCRCommandManager {
     }
 
     public SortedMap<String, List<MCRCommand>> getCommandsMap() {
-        return knownCommands;
+        return getKnownCommands();
     }
 
 }

@@ -167,10 +167,7 @@
   <rule ref="category/java/design.xml/ExcessiveParameterList"/>
   <rule ref="category/java/design.xml/FinalFieldCouldBeStatic"/>
   <rule ref="category/java/design.xml/InvalidJavaBean"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/design.xml/MutableStaticState"/>
-  -->
   <rule ref="category/java/design.xml/NcssCount"/>
   <rule ref="category/java/design.xml/NPathComplexity"/>
   <rule ref="category/java/design.xml/SimplifyConditional"/>

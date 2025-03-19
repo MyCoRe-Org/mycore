@@ -42,7 +42,7 @@ public class MCRDerivateLinkServlet extends MCRServlet {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    protected static String derivateLinkErrorPage = "error_derivatelink.xml";
+    private static final String DERIVATE_LINK_ERROR_PAGE = "error_derivatelink.xml";
 
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
@@ -72,7 +72,7 @@ public class MCRDerivateLinkServlet extends MCRServlet {
         // check if root element has content -> if not, show an error page
         if (rootElement.getContentSize() == 0) {
             job.getResponse().sendRedirect(
-                job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + derivateLinkErrorPage));
+                job.getResponse().encodeRedirectURL(MCRFrontendUtil.getBaseURL() + DERIVATE_LINK_ERROR_PAGE));
             return;
         }
 
