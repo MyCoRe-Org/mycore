@@ -542,11 +542,11 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         return fieldTest && textTest;
     }
 
-    private boolean equalText(List<MCRMetaHistoryDateText> objtexts) {
+    private boolean equalText(List<MCRMetaHistoryDateText> otherTexts) {
         boolean testflag = true;
-        int size = texts.size() < objtexts.size() ? texts.size() : objtexts.size();
+        int size = Math.min(texts.size(), otherTexts.size());
         for (int i = 0; i < size; i++) {
-            testflag &= texts.get(i).equals(objtexts.get(i));
+            testflag &= texts.get(i).equalLangAndText(otherTexts.get(i));
         }
         return testflag;
     }
@@ -650,13 +650,24 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         }
 
         /**
+         * This method compares this instance with a MCRMetaHistoryDate object
+         */
+        @Override
+        public boolean equals(Object obj) {
+            if (!super.equals(obj)) {
+                return false;
+            }
+            return equalLangAndText((MCRMetaHistoryDateText) obj);
+        }
+
+        /**
          * This method check the equivalence of lang and text between this object
          * and a given MCRMetaHistoryDateText object.
          *
          * @param obj a MCRMetaHistoryDateText instance
          * @return true if both parts are equal
          */
-        public boolean equals(MCRMetaHistoryDateText obj) {
+        public boolean equalLangAndText(MCRMetaHistoryDateText obj) {
             return lang.equals(obj.getLang()) && text.equals(obj.getText());
         }
 
