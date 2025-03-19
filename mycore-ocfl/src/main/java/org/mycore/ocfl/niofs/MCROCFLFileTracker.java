@@ -153,6 +153,15 @@ public class MCROCFLFileTracker<P, D> {
     }
 
     /**
+     * Returns a list of the original paths.
+     *
+     * @return a list of original paths.
+     */
+    public List<P> originalPaths() {
+        return this.originalPaths.keySet().stream().toList();
+    }
+
+    /**
      * Checks if a path exists in the tracker.
      *
      * @param path the path to check.

@@ -137,7 +137,8 @@ public class MCROCFLFileSystem extends MCRVersionedFileSystem {
             .filter(MCRObjectID::isValid)
             .map(MCRObjectID::getInstance)
             .map(MCRObjectID::toString)
-            .filter(virtualObjectProvider::exists);
+            .filter(virtualObjectProvider::exists)
+            .filter(owner -> !virtualObjectProvider.isDeleted(owner));
 
         return () -> Stream.concat(createdObjectStream, repositoryObjectStream)
             .filter(owner -> !deletedObjects.contains(owner))
