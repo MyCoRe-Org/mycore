@@ -12,8 +12,8 @@ import org.mycore.datamodel.niofs.MCRPath;
 
 public class MCROCFLVirtualObjectProviderTest extends MCROCFLNioTestCase {
 
-    public MCROCFLVirtualObjectProviderTest(boolean remote) {
-        super(remote);
+    public MCROCFLVirtualObjectProviderTest(boolean remote, boolean purge) {
+        super(remote, purge);
     }
 
     @Test
@@ -37,6 +37,41 @@ public class MCROCFLVirtualObjectProviderTest extends MCROCFLNioTestCase {
         assertTrue(virtualObjectProvider.exists(DERIVATE_2));
         MCRTransactionManager.commitTransactions();
         assertTrue(virtualObjectProvider.exists(DERIVATE_2));
+
+        // check after rm
+        MCRTransactionManager.beginTransactions();
+        fs.removeRoot(DERIVATE_2);
+        assertTrue(virtualObjectProvider.exists(DERIVATE_2));
+        MCRTransactionManager.commitTransactions();
+
+        if (isPurge()) {
+            assertFalse(virtualObjectProvider.exists(DERIVATE_2));
+        } else {
+            assertTrue(virtualObjectProvider.exists(DERIVATE_2));
+        }
+    }
+
+    @Test
+    public void isDeleted() throws FileSystemException {
+        MCROCFLVirtualObjectProvider virtualObjectProvider = MCROCFLFileSystemProvider.get().virtualObjectProvider();
+        MCROCFLFileSystem fs = MCROCFLFileSystemProvider.getMCROCFLFileSystem();
+
+        // check default
+        assertFalse(virtualObjectProvider.isDeleted(DERIVATE_1));
+        assertFalse(virtualObjectProvider.isDeleted(DERIVATE_2));
+
+        // delete
+        MCRTransactionManager.beginTransactions();
+        fs.removeRoot(DERIVATE_1);
+        assertFalse(virtualObjectProvider.isDeleted(DERIVATE_1));
+        MCRTransactionManager.commitTransactions();
+
+        // check after commit
+        if (isPurge()) {
+            assertFalse(virtualObjectProvider.isDeleted(DERIVATE_1));
+        } else {
+            assertTrue(virtualObjectProvider.isDeleted(DERIVATE_1));
+        }
     }
 
 }
