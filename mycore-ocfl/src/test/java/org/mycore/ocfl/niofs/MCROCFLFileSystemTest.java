@@ -18,8 +18,8 @@ import org.mycore.datamodel.niofs.MCRVersionedPath;
 
 public class MCROCFLFileSystemTest extends MCROCFLNioTestCase {
 
-    public MCROCFLFileSystemTest(boolean remote) {
-        super(remote);
+    public MCROCFLFileSystemTest(boolean remote, boolean purge) {
+        super(remote, purge);
     }
 
     @Test
@@ -53,9 +53,9 @@ public class MCROCFLFileSystemTest extends MCROCFLNioTestCase {
 
         MCRTransactionManager.beginTransactions();
         fs.removeRoot(DERIVATE_1);
-        assertFalse(Files.exists(MCRVersionedPath.head(DERIVATE_1, "/")));
+        assertFalse("root path should not exist", Files.exists(MCRVersionedPath.head(DERIVATE_1, "/")));
         MCRTransactionManager.commitTransactions();
-        assertFalse(Files.exists(MCRVersionedPath.head(DERIVATE_1, "/")));
+        assertFalse("root path should not exist", Files.exists(MCRVersionedPath.head(DERIVATE_1, "/")));
     }
 
     @Test

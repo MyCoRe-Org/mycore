@@ -1,17 +1,17 @@
 package org.mycore.ocfl.niofs;
 
-import org.junit.Test;
-import org.mycore.datamodel.niofs.MCRPath;
+import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.nio.file.Files;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+import org.mycore.datamodel.niofs.MCRPath;
 
 public class MCROCFLFileTypeDetectorTest extends MCROCFLNioTestCase {
 
-    public MCROCFLFileTypeDetectorTest(boolean remote) {
-        super(remote);
+    public MCROCFLFileTypeDetectorTest(boolean remote, boolean purge) {
+        super(remote, purge);
     }
 
     @Test
