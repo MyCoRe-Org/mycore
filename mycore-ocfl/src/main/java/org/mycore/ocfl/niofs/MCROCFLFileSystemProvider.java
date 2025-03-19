@@ -61,6 +61,7 @@ import jakarta.inject.Singleton;
 
 /**
  * Singleton class providing the OCFL file system implementation.
+ * <p>
  * This class implements the file system provider for the OCFL file system, managing interactions
  * with the underlying OCFL repository and handling file operations such as reading, writing, copying,
  * and deleting files.
@@ -344,6 +345,10 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
     @Override
     public void checkAccess(MCRVersionedPath path, AccessMode... accessModes) throws IOException {
         try {
+            String owner = path.getOwner();
+            if(virtualObjectProvider().isDeleted(owner)) {
+                throw new NoSuchFileException(path.toString());
+            }
             MCROCFLVirtualObject virtualObject = virtualObjectProvider().get(path);
             if (virtualObject.isMarkedForPurge()) {
                 throw new NoSuchFileException(path.toString());

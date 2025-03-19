@@ -36,8 +36,8 @@ import io.ocfl.api.model.ObjectVersionId;
 
 public class MCROCFLFileSystemProviderTest extends MCROCFLNioTestCase {
 
-    public MCROCFLFileSystemProviderTest(boolean remote) {
-        super(remote);
+    public MCROCFLFileSystemProviderTest(boolean remote, boolean purge) {
+        super(remote, purge);
     }
 
     @Test

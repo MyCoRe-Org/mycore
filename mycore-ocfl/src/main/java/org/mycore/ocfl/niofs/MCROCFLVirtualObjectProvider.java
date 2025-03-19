@@ -18,6 +18,8 @@
 
 package org.mycore.ocfl.niofs;
 
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.convertMessageToType;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,9 +29,11 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import io.ocfl.api.model.VersionDetails;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.niofs.storage.MCROCFLTransactionalTempFileStorage;
 import org.mycore.ocfl.repository.MCROCFLRepository;
+import org.mycore.ocfl.util.MCROCFLMetadataVersion;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 
 import io.ocfl.api.exception.NotFoundException;
@@ -170,6 +174,9 @@ public class MCROCFLVirtualObjectProvider {
 
     /**
      * Checks if the specified owner exists in the repository.
+     * <p>
+     * This also will return true if the owner was marked for purge or was deleted (and not purged),
+     * because the object still exists in the OCFL repository.
      *
      * @param owner the owner of the object.
      * @return {@code true} if the owner exists, {@code false} otherwise.
@@ -194,6 +201,28 @@ public class MCROCFLVirtualObjectProvider {
         return object.getFiles().stream()
             .map(OcflObjectVersionFile::getPath)
             .anyMatch(path -> path.startsWith(MCROCFLVirtualObject.FILES_DIRECTORY));
+    }
+
+    /**
+     * Returns true if the owner was deleted. In the MyCoRe OCFL API you can either delete or purge an object. Where
+     * a 'purge' is permanent and a 'delete' isn't.
+     * <p>
+     * This method will only return true if the object is actually deleted.
+     * Therefore, the last commit message is equal to {@link org.mycore.ocfl.util.MCROCFLMetadataVersion#DELETED}.
+     *
+     * @param owner the owner of the object.
+     * @return {@code true} if the owner was deleted, {@code false} otherwise.
+     */
+    public boolean isDeleted(String owner) {
+        ObjectVersionId head = toObjectVersionId(owner, null);
+        try {
+            VersionDetails headVersionDetails = repository.describeVersion(head);
+            String commitMessage = headVersionDetails.getVersionInfo().getMessage();
+            char type = convertMessageToType(commitMessage);
+            return type == MCROCFLMetadataVersion.DELETED;
+        } catch (NotFoundException ignore) {
+            return false;
+        }
     }
 
     /**
@@ -248,7 +277,7 @@ public class MCROCFLVirtualObjectProvider {
         return toObjectVersionId(owner, headVersion);
     }
 
-    private MCROCFLVirtualObject getOrCreateReadable(ObjectVersionId id) {
+    private MCROCFLVirtualObject getOrCreateReadable(ObjectVersionId id) throws NotFoundException {
         return this.readMap.computeIfAbsent(id, (key) -> {
             updateReadCache(id);
             OcflObjectVersion object = repository.getObject(id);
