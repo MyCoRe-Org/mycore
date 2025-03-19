@@ -108,14 +108,7 @@
   <rule ref="category/java/codestyle.xml/PackageCase"/>
   <rule ref="category/java/codestyle.xml/UnnecessaryAnnotationValueElement"/>
   <rule ref="category/java/codestyle.xml/UnnecessaryBoxing"/>
-  <!--
-  Rule remains inactive due to two known bugs in PMD:
-   - https://github.com/pmd/pmd/issues/5523
-   - https://github.com/pmd/pmd/issues/5440
-  Both bugs should be resolved in PMD 7.11.
-  TODO: Activate rule, once we use PMD 7.11 or later.
   <rule ref="category/java/codestyle.xml/UnnecessaryCast"/>
-  -->
   <rule ref="category/java/codestyle.xml/UnnecessaryConstructor"/>
   <rule ref="category/java/codestyle.xml/UnnecessaryFullyQualifiedName"/>
   <rule ref="category/java/codestyle.xml/UnnecessaryImport"/>
