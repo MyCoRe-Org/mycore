@@ -30,6 +30,7 @@ import io.ocfl.api.OcflObjectUpdater;
 import io.ocfl.api.OcflOption;
 import io.ocfl.api.OcflRepository;
 import io.ocfl.api.exception.NotFoundException;
+import io.ocfl.api.exception.ObjectOutOfSyncException;
 import io.ocfl.api.model.FileChange;
 import io.ocfl.api.model.FileChangeHistory;
 import io.ocfl.api.model.FileChangeType;
@@ -98,7 +99,7 @@ public class MCROCFLRepository implements OcflRepository {
      */
     @Override
     public ObjectVersionId updateObject(ObjectVersionId objectVersionId, VersionInfo versionInfo,
-        Consumer<OcflObjectUpdater> objectUpdater) {
+        Consumer<OcflObjectUpdater> objectUpdater) throws NotFoundException, ObjectOutOfSyncException {
         return base.updateObject(objectVersionId, versionInfo, objectUpdater);
     }
 
@@ -106,7 +107,7 @@ public class MCROCFLRepository implements OcflRepository {
      * {@inheritDoc}
      */
     @Override
-    public void getObject(ObjectVersionId objectVersionId, Path outputPath) {
+    public void getObject(ObjectVersionId objectVersionId, Path outputPath) throws NotFoundException {
         base.getObject(objectVersionId, outputPath);
     }
 
@@ -114,7 +115,7 @@ public class MCROCFLRepository implements OcflRepository {
      * {@inheritDoc}
      */
     @Override
-    public OcflObjectVersion getObject(ObjectVersionId objectVersionId) {
+    public OcflObjectVersion getObject(ObjectVersionId objectVersionId) throws NotFoundException {
         return base.getObject(objectVersionId);
     }
 
@@ -122,7 +123,7 @@ public class MCROCFLRepository implements OcflRepository {
      * {@inheritDoc}
      */
     @Override
-    public ObjectDetails describeObject(String objectId) {
+    public ObjectDetails describeObject(String objectId) throws NotFoundException {
         return base.describeObject(objectId);
     }
 
@@ -130,7 +131,7 @@ public class MCROCFLRepository implements OcflRepository {
      * {@inheritDoc}
      */
     @Override
-    public VersionDetails describeVersion(ObjectVersionId objectVersionId) {
+    public VersionDetails describeVersion(ObjectVersionId objectVersionId) throws NotFoundException {
         return base.describeVersion(objectVersionId);
     }
 
