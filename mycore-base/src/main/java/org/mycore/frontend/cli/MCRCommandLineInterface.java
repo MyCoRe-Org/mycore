@@ -76,9 +76,9 @@ public class MCRCommandLineInterface {
 
     /** A queue of commands waiting to be executed */
     @SuppressWarnings("PMD.LooseCoupling")
-    protected static LinkedList<String> commandQueue = new LinkedList<>();
+    private static final LinkedList<String> COMMAND_QUEUE = new LinkedList<>();
 
-    protected static Queue<String> failedCommands = new LinkedList<>();
+    private static final Queue<String> FAILED_COMMANDS = new LinkedList<>();
 
     private static boolean interactiveMode = true;
 
@@ -126,7 +126,7 @@ public class MCRCommandLineInterface {
 
         MCRCommandPrompt prompt = new MCRCommandPrompt(system);
         while (true) {
-            if (commandQueue.isEmpty()) {
+            if (COMMAND_QUEUE.isEmpty()) {
                 if (interactiveMode) {
                     command = prompt.readCommand();
                 } else if (MCRConfiguration2.getString("MCR.CommandLineInterface.unitTest").orElse("false")
@@ -136,7 +136,7 @@ public class MCRCommandLineInterface {
                     exit();
                 }
             } else {
-                command = commandQueue.poll();
+                command = COMMAND_QUEUE.poll();
                 System.out.println(system + "> " + command);
             }
 
@@ -157,7 +157,7 @@ public class MCRCommandLineInterface {
         Stream.of(line.split(";;"))
             .map(String::trim)
             .filter(s -> !s.isEmpty())
-            .forEachOrdered(commandQueue::add);
+            .forEachOrdered(COMMAND_QUEUE::add);
     }
 
     private static String readLineFromArguments(String[] args) {
@@ -205,7 +205,7 @@ public class MCRCommandLineInterface {
                 if (!interactiveMode) {
                     System.exit(1);
                 }
-                commandQueue.clear();
+                COMMAND_QUEUE.clear();
             }
         } finally {
             MCRSessionMgr.releaseCurrentSession();
@@ -244,7 +244,7 @@ public class MCRCommandLineInterface {
     private static void addCommandsToQueue(List<String> commandsReturned) {
         if (!commandsReturned.isEmpty()) {
             output("Queueing " + commandsReturned.size() + " commands to process");
-            commandQueue.addAll(0, commandsReturned);
+            COMMAND_QUEUE.addAll(0, commandsReturned);
         }
     }
 
@@ -252,14 +252,14 @@ public class MCRCommandLineInterface {
         output("");
         output("The following command failed:");
         output(lastCommand);
-        if (!commandQueue.isEmpty()) {
+        if (!COMMAND_QUEUE.isEmpty()) {
             System.out.printf(Locale.ROOT, "%s There are %s other commands still unprocessed.%n", system,
-                commandQueue.size());
+                COMMAND_QUEUE.size());
         } else if (interactiveMode) {
             return;
         }
-        commandQueue.addFirst(lastCommand);
-        saveCommandQueueToFile(commandQueue, "unprocessed-commands.txt");
+        COMMAND_QUEUE.addFirst(lastCommand);
+        saveCommandQueueToFile(COMMAND_QUEUE, "unprocessed-commands.txt");
     }
 
     private static void saveCommandQueueToFile(final Collection<String> queue, String fname) {
@@ -277,17 +277,17 @@ public class MCRCommandLineInterface {
         output("");
         output("The following command failed:");
         output(lastCommand);
-        if (!commandQueue.isEmpty()) {
+        if (!COMMAND_QUEUE.isEmpty()) {
             System.out.printf(Locale.ROOT, "%s There are %s other commands still unprocessed.%n", system,
-                commandQueue.size());
+                COMMAND_QUEUE.size());
         }
-        failedCommands.add(lastCommand);
+        FAILED_COMMANDS.add(lastCommand);
     }
 
     protected static void handleFailedCommands() {
-        if (!failedCommands.isEmpty()) {
+        if (!FAILED_COMMANDS.isEmpty()) {
             System.err.println(system + " Several command failed.");
-            saveCommandQueueToFile(failedCommands, "failed-commands.txt");
+            saveCommandQueueToFile(FAILED_COMMANDS, "failed-commands.txt");
         }
     }
 

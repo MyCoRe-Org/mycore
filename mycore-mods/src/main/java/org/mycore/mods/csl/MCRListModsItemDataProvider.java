@@ -45,7 +45,7 @@ import de.undercouch.citeproc.csl.CSLItemData;
  */
 public class MCRListModsItemDataProvider extends MCRItemDataProvider {
 
-    protected static MCRCache<String, CSLItemData> cslCache = new MCRCache<>(2000, "CSL Mods Data");
+    private static final MCRCache<String, CSLItemData> CSL_CACHE = new MCRCache<>(2000, "CSL Mods Data");
 
     private final SequencedMap<String, CSLItemData> store = new LinkedHashMap<>();
 
@@ -58,13 +58,13 @@ public class MCRListModsItemDataProvider extends MCRItemDataProvider {
             Element copy = object.clone().detach();
             String objectID = copy.getAttributeValue(MCRXMLConstants.ID);
             MCRObjectID mcrObjectID = MCRObjectID.getInstance(objectID);
-            CSLItemData itemData = cslCache.getIfUpToDate(objectID, MCRXMLMetadataManager.getInstance()
+            CSLItemData itemData = CSL_CACHE.getIfUpToDate(objectID, MCRXMLMetadataManager.getInstance()
                 .getLastModified(mcrObjectID));
             if (itemData == null) {
                 MCRModsItemDataProvider midp = new MCRModsItemDataProvider();
                 midp.addContent(new MCRJDOMContent(copy));
                 itemData = midp.retrieveItem(objectID);
-                cslCache.put(objectID, itemData);
+                CSL_CACHE.put(objectID, itemData);
             }
 
             store.put(objectID, itemData);

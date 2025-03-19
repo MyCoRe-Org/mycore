@@ -79,6 +79,8 @@ import org.mycore.common.function.MCRTriConsumer;
  * @author Thomas Scheffler (yagee)
  * @since 2018.05
  */
+// because of intrusive test case org.mycore.common.config.MCRConfigurationTest.testSingletonMapGet
+@SuppressWarnings("PMD.MutableStaticState") 
 public class MCRConfiguration2 {
 
     private static final Map<UUID, EventListener> LISTENERS = new ConcurrentHashMap<>();

@@ -50,7 +50,11 @@ public class MCRURIResolverFilter implements Filter {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    static ThreadLocal<List<String>> uriList = ThreadLocal.withInitial(ArrayList::new);
+    private static final ThreadLocal<List<String>> URI_LIST = ThreadLocal.withInitial(ArrayList::new);
+    
+    static void addUri(String uri) {
+        URI_LIST.get().add(uri);
+    }
 
     /**
      * adds debug information from MCRURIResolver to Servlet output.
@@ -81,12 +85,12 @@ public class MCRURIResolverFilter implements Filter {
             filterChain.doFilter(request, wrapper);
             final String origOutput = wrapper.toString();
             final String characterEncoding = wrapper.getCharacterEncoding();
-            if (!uriList.get().isEmpty() && origOutput.length() > 0
+            if (!URI_LIST.get().isEmpty() && origOutput.length() > 0
                 && (response.getContentType().contains("text/html")
                     || response.getContentType().contains("text/xml"))) {
                 final StringBuilder buf =
                     new StringBuilder("\n<!-- \nThe following includes where resolved by MCRURIResolver:\n\n");
-                for (String obj : uriList.get()) {
+                for (String obj : URI_LIST.get()) {
                     buf.append(obj);
                     buf.append('\n');
                 }
@@ -100,7 +104,7 @@ public class MCRURIResolverFilter implements Filter {
                     out.write(insertBytes);
                     out.write(origOutput.substring(pos).getBytes(characterEncoding));
                     // delete debuglist
-                    uriList.remove();
+                    URI_LIST.remove();
                     LOGGER.debug("end filter: {}", () -> origOutput.substring(origOutput.length() - 10));
                 }
             } else {

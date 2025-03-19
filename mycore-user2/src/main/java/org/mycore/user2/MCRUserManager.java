@@ -65,9 +65,6 @@ public class MCRUserManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    /** The table that stores login user information */
-    static String table;
-
     /**
      * Returns the user with the given userName, in the default realm
      *

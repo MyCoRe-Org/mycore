@@ -56,7 +56,7 @@ public class MCRMetsCommands extends MCRAbstractCommands {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public static Queue<String> invalidMetsQueue = new ConcurrentLinkedQueue<>();
+    public static final Queue<String> INVALID_METS_QUEUE = new ConcurrentLinkedQueue<>();
 
     @MCRCommand(syntax = "validate selected mets", help = "validates all mets.xml of selected derivates", order = 10)
     public static void validateSelectedMets() {
@@ -72,7 +72,7 @@ public class MCRMetsCommands extends MCRAbstractCommands {
                     METSValidator mv = new METSValidator(metsIS);
                     List<ValidationException> validationExceptionList = mv.validate();
                     if (!validationExceptionList.isEmpty()) {
-                        invalidMetsQueue.add(objectID);
+                        INVALID_METS_QUEUE.add(objectID);
                     }
                     for (ValidationException validationException : validationExceptionList) {
                         LOGGER.error(validationException::getMessage);
@@ -92,7 +92,7 @@ public class MCRMetsCommands extends MCRAbstractCommands {
         order = 15)
     public static void fixInvalidMets() {
         while (true) {
-            String selectedObjectID = invalidMetsQueue.poll();
+            String selectedObjectID = INVALID_METS_QUEUE.poll();
             if (selectedObjectID == null) {
                 break;
             }

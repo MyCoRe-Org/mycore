@@ -100,7 +100,7 @@ public class MCRMailer extends MCRServlet {
     protected static final String ENCODING;
 
     /** How often should MCRMailer try to send mail? */
-    protected static int numTries;
+    private static int numTries;
 
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {

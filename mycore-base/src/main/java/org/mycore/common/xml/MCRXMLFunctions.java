@@ -124,7 +124,7 @@ public class MCRXMLFunctions {
             Pattern.DOTALL);
 
     private static final Logger LOGGER = LogManager.getLogger();
-    public static volatile MimetypesFileTypeMap mimetypeMap;
+    private static volatile MimetypesFileTypeMap mimetypeMap;
 
     public static Node document(String uri) throws JDOMException, IOException, TransformerException {
         MCRSourceContent sourceContent = MCRSourceContent.createInstance(uri);

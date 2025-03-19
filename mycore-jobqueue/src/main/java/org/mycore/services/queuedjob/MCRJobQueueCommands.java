@@ -37,8 +37,6 @@ public class MCRJobQueueCommands {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    static MCRJobDAOJPAImpl dao = new MCRJobDAOJPAImpl();
-
     /**
      * Lists all jobs with status MAX_TRIES.
      */
@@ -47,7 +45,7 @@ public class MCRJobQueueCommands {
         help = "List all jobs with status MAX_TRIES",
         order = 10)
     public static void listMaxTryJobs() {
-        List<MCRJob> jobs = dao.getJobs(null, null, List.of(MCRJobStatus.MAX_TRIES), null, null);
+        List<MCRJob> jobs = new MCRJobDAOJPAImpl().getJobs(null, null, List.of(MCRJobStatus.MAX_TRIES), null, null);
 
         jobs.forEach(job -> {
             LOGGER.info("{}: {} {} {} {} {}", job::getId, job::getAction, job::getStatus, job::getTries, job::getAdded,

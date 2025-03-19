@@ -38,16 +38,6 @@ public class MCRConfigurationTest extends MCRTestCase {
 
     public static final String COLLISION_PROPERTY_NAME = "MCR.Configuration.SingletonCollision.PropertyName";
 
-    /**
-     * Clears instances of classes.
-     *
-     * @see MCRConfiguration2#getSingleInstanceOf(Class, String)
-     * @see MCRConfiguration2#getSingleInstanceOfOrThrow(Class, String)
-     */
-    public static void clearInstanceHolder() {
-        MCRConfiguration2.instanceHolder.clear();
-    }
-
     @Test(expected = MCRConfigurationException.class)
     public final void testDeprecatedProperties() {
         String deprecatedProperty = "MCR.Editor.FileUpload.MaxSize";
