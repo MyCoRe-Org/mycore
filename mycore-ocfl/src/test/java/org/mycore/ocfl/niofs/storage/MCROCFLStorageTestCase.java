@@ -27,8 +27,8 @@ public abstract class MCROCFLStorageTestCase extends MCROCFLNioTestCase {
 
     protected MCRVersionedPath path3;
 
-    public MCROCFLStorageTestCase(boolean remote) {
-        super(remote);
+    public MCROCFLStorageTestCase(boolean remote, boolean purge) {
+        super(remote, purge);
     }
 
     @Override

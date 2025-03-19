@@ -21,8 +21,8 @@ import org.mycore.datamodel.niofs.MCRPath;
 
 public class MCROCFLBasicFileAttributesTest extends MCROCFLNioTestCase {
 
-    public MCROCFLBasicFileAttributesTest(boolean remote) {
-        super(remote);
+    public MCROCFLBasicFileAttributesTest(boolean remote, boolean purge) {
+        super(remote, purge);
     }
 
     @Test
