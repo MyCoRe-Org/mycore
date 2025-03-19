@@ -14,8 +14,8 @@ public class MCROCFLDefaultTransactionalTempFileStorageTest extends MCROCFLStora
 
     private MCROCFLDefaultTransactionalTempFileStorage storage;
 
-    public MCROCFLDefaultTransactionalTempFileStorageTest(boolean remote) {
-        super(remote);
+    public MCROCFLDefaultTransactionalTempFileStorageTest(boolean remote, boolean purge) {
+        super(remote, purge);
     }
 
     @Override
