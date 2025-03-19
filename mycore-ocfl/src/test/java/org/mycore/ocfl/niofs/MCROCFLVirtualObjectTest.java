@@ -23,13 +23,14 @@ import org.junit.Test;
 import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 
+import io.ocfl.api.exception.NotFoundException;
 import io.ocfl.api.model.ObjectVersionId;
 import io.ocfl.api.model.OcflObjectVersion;
 
 public class MCROCFLVirtualObjectTest extends MCROCFLNioTestCase {
 
-    public MCROCFLVirtualObjectTest(boolean remote) {
-        super(remote);
+    public MCROCFLVirtualObjectTest(boolean remote, boolean purge) {
+        super(remote, purge);
     }
 
     @Test
@@ -127,10 +128,17 @@ public class MCROCFLVirtualObjectTest extends MCROCFLNioTestCase {
         assertFalse("'testFile' should not be added", getVirtualObject().isAdded(testFile));
         MCRTransactionManager.commitTransactions();
 
-        MCRTransactionManager.beginTransactions();
-        root.getFileSystem().createRoot(DERIVATE_1);
-        assertTrue("'root' should be added", getVirtualObject().isAdded(root));
-        MCRTransactionManager.commitTransactions();
+        if (isPurge()) {
+            // if the object was purged, then we can add it again
+            MCRTransactionManager.beginTransactions();
+            root.getFileSystem().createRoot(DERIVATE_1);
+            assertTrue("'root' should be added", getVirtualObject().isAdded(root));
+            MCRTransactionManager.commitTransactions();
+        } else {
+            MCRTransactionManager.beginTransactions();
+            assertThrows("derivate cannot be created because it was soft deleted and therefore should still exist.'",
+                FileAlreadyExistsException.class, () -> root.getFileSystem().createRoot(DERIVATE_1));
+        }
     }
 
     @Test
@@ -234,6 +242,20 @@ public class MCROCFLVirtualObjectTest extends MCROCFLNioTestCase {
         derivate1 = repository.getObject(ObjectVersionId.head(DERIVATE_1_OBJECT_ID));
         assertEquals("there should be 1 file in " + DERIVATE_1, 1, derivate1.getFiles().size());
         assertNotNull("should have a 'white.png' file", derivate1.getFile(FILES_DIRECTORY + "white.png"));
+
+        assertTrue("derivate should exist",
+            MCROCFLFileSystemProvider.get().virtualObjectProvider().exists(DERIVATE_1));
+        MCRTransactionManager.beginTransactions();
+        getVirtualObject().purge();
+        MCRTransactionManager.commitTransactions();
+        assertFalse("derivate should not exist",
+            MCROCFLFileSystemProvider.get().virtualObjectProvider().exists(DERIVATE_1));
+
+        if (isPurge()) {
+            assertThrows(NotFoundException.class, MCROCFLVirtualObjectTest::getVirtualObject);
+        } else {
+            assertFalse("white.png should not exist", getVirtualObject().exists(whitePng));
+        }
     }
 
     @Test

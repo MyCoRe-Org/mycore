@@ -256,7 +256,7 @@ public class MCROCFLLocalVirtualObject extends MCROCFLVirtualObject {
             this.localStorage,
             readonly,
             this.fileTracker.deepClone(),
-            this.emptyDirectoryTracker.deepClone());
+            this.directoryTracker.deepClone());
         clonedVirtualObject.fileTracker.setDigestCalculator(clonedVirtualObject::calculateDigest);
         return clonedVirtualObject;
     }

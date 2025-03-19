@@ -17,8 +17,8 @@ public class MCROCFLRollingCacheStorageTest extends MCROCFLStorageTestCase {
 
     private MCROCFLRollingCacheStorage storage;
 
-    public MCROCFLRollingCacheStorageTest(boolean remote) {
-        super(remote);
+    public MCROCFLRollingCacheStorageTest(boolean remote, boolean purge) {
+        super(remote, purge);
     }
 
     @Override

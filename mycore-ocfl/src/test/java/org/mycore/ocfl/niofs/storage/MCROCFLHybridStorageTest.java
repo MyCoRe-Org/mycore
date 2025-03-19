@@ -15,8 +15,8 @@ public class MCROCFLHybridStorageTest extends MCROCFLStorageTestCase {
 
     private MCROCFLHybridStorage storage;
 
-    public MCROCFLHybridStorageTest(boolean remote) {
-        super(remote);
+    public MCROCFLHybridStorageTest(boolean remote, boolean purge) {
+        super(remote, purge);
     }
 
     @Override

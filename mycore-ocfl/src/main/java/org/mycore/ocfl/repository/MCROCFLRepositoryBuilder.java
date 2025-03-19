@@ -69,7 +69,6 @@ import io.ocfl.core.storage.OcflStorageBuilder;
  *     .defaultLayoutConfig(myExtensionConfig)
  *     .buildMCR();
  * }</pre>
- * </p>
  *
  * @see io.ocfl.core.OcflRepositoryBuilder
  * @see MCROCFLRepository

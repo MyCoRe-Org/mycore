@@ -5,8 +5,10 @@ import java.util.Arrays;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mycore.common.MCRTransactionManager;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.ocfl.MCROCFLTestCase;
 import org.mycore.ocfl.MCROCFLTestCaseHelper;
+import org.mycore.ocfl.util.MCROCFLDeleteUtils;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 
 @RunWith(Parameterized.class)
@@ -28,19 +30,28 @@ public abstract class MCROCFLNioTestCase extends MCROCFLTestCase {
 
     private final boolean remote;
 
-    @Parameterized.Parameters(name = "remote: {0}")
+    private final boolean purge;
+
+    @Parameterized.Parameters(name = "remote: {0}, purge: {1}")
     public static Iterable<Object[]> data() {
-        return Arrays.asList(new Object[][] { { false }, { true } });
+        return Arrays.asList(new Object[][] { { false, false }, { false, true }, { true, false }, { true, true } });
     }
 
-    public MCROCFLNioTestCase(boolean remote) {
+    public MCROCFLNioTestCase(boolean remote, boolean purge) {
         this.remote = remote;
+        this.purge = purge;
     }
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
+        // set remote
         this.setUpRepository(remote);
+        // set purge
+        String purgePropertyName
+            = MCROCFLDeleteUtils.PROPERTY_PREFIX + MCROCFLObjectIDPrefixHelper.MCRDERIVATE.replace(":", "");
+        MCRConfiguration2.set(purgePropertyName, Boolean.toString(purge));
+        // setup
         MCROCFLFileSystemProvider.get().init();
         MCRTransactionManager.beginTransactions(MCROCFLFileSystemTransaction.class);
         MCROCFLTestCaseHelper.loadDerivate(DERIVATE_1);
@@ -53,6 +64,14 @@ public abstract class MCROCFLNioTestCase extends MCROCFLTestCase {
         MCRTransactionManager.rollbackTransactions();
         MCROCFLFileSystemTransaction.resetTransactionCounter();
         super.tearDown();
+    }
+
+    public boolean isRemote() {
+        return remote;
+    }
+
+    public boolean isPurge() {
+        return purge;
     }
 
 }

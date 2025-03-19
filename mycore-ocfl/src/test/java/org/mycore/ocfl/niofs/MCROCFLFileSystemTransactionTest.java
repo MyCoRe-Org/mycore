@@ -16,8 +16,8 @@ import io.ocfl.api.model.OcflObjectVersion;
 
 public class MCROCFLFileSystemTransactionTest extends MCROCFLNioTestCase {
 
-    public MCROCFLFileSystemTransactionTest(boolean remote) {
-        super(remote);
+    public MCROCFLFileSystemTransactionTest(boolean remote, boolean purge) {
+        super(remote, purge);
     }
 
     @Test

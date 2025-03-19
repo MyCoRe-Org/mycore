@@ -10,8 +10,8 @@ import org.junit.Test;
 
 public class MCROCFLFileStoreTest extends MCROCFLNioTestCase {
 
-    public MCROCFLFileStoreTest(boolean remote) {
-        super(remote);
+    public MCROCFLFileStoreTest(boolean remote, boolean purge) {
+        super(remote, purge);
     }
 
     @Override

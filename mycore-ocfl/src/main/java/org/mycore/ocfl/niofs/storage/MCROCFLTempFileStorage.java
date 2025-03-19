@@ -149,7 +149,6 @@ public interface MCROCFLTempFileStorage {
      * @throws IOException if an I/O error occurs.
      */
     default long size(MCRVersionedPath path) throws IOException {
-        // TODO implement
         return Files.size(toPhysicalPath(path));
     }
 

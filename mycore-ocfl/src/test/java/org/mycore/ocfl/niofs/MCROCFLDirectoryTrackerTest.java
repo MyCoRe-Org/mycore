@@ -14,8 +14,8 @@ public class MCROCFLDirectoryTrackerTest extends MCROCFLNioTestCase {
 
     private MCROCFLDirectoryTracker directoryTracker;
 
-    public MCROCFLDirectoryTrackerTest(boolean remote) {
-        super(remote);
+    public MCROCFLDirectoryTrackerTest(boolean remote, boolean purge) {
+        super(remote, purge);
     }
 
     @Before

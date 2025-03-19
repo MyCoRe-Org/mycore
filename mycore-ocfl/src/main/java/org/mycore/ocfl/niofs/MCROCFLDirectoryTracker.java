@@ -82,6 +82,27 @@ public class MCROCFLDirectoryTracker {
     }
 
     /**
+     * Returns a list of the original paths.
+     *
+     * @return a list of original paths.
+     */
+    public List<MCRVersionedPath> originalPaths() {
+        return this.original.keySet().stream().toList();
+    }
+
+    /**
+     * Returns a list of the original paths which has a .keep file.
+     *
+     * @return a list of original paths.
+     */
+    public List<MCRVersionedPath> originalPathsWithKeepFile() {
+        return this.original.entrySet().stream()
+            .filter(Map.Entry::getValue)
+            .map(Map.Entry::getKey)
+            .toList();
+    }
+
+    /**
      * Checks if the specified path exists in the current state.
      *
      * @param path the path to check.

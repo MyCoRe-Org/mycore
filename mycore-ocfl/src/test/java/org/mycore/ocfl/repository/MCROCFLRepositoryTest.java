@@ -23,8 +23,8 @@ import io.ocfl.api.model.VersionInfo;
 
 public class MCROCFLRepositoryTest extends MCROCFLNioTestCase {
 
-    public MCROCFLRepositoryTest(boolean remote) {
-        super(remote);
+    public MCROCFLRepositoryTest(boolean remote, boolean purge) {
+        super(remote, purge);
     }
 
     @Test
