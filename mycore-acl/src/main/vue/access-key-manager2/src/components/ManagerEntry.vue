@@ -19,12 +19,12 @@
 </template>
 
 <script setup lang="ts">
+import { inject } from 'vue';
+import { useI18n } from 'vue-i18n';
 import {
   AccessKeyConfig,
   AccessKeyManager,
 } from '@mycore-org/vue-access-key-manager';
-import { useI18n } from 'vue-i18n';
-import { inject } from 'vue';
 import { AuthStrategy } from '@mycore-test/js-common/auth';
 
 interface Props {
