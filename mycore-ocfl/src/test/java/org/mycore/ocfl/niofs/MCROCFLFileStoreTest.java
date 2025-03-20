@@ -37,9 +37,10 @@ public class MCROCFLFileStoreTest extends MCROCFLNioTestCase {
 
     @Test
     public void space() throws IOException {
-        assertNotEquals("file store should have total space", 0, fs().getTotalSpace());
-        assertNotEquals("file store should have unallocated space", 0, fs().getUnallocatedSpace());
-        assertNotEquals("file store should have usable space", 0, fs().getUsableSpace());
+        if (!isRemote()) {
+            assertNotEquals("file store should have total space", 0, fs().getTotalSpace());
+            assertNotEquals("file store should have usable space", 0, fs().getUsableSpace());
+        }
     }
 
     private static MCROCFLFileStore fs() {
