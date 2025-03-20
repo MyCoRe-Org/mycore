@@ -94,7 +94,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <site.suffix />
     <swagger.version>2.2.25</swagger.version>
     <uniqueVersion>false</uniqueVersion>
-    <verapdf.version>1.26.1</verapdf.version>
+    <verapdf.version>1.26.2</verapdf.version>
     <vis-network.version>9.1.2</vis-network.version>
     <xalan.version>2.7.3</xalan.version>
     <xsonify.version>1.0</xsonify.version>
