@@ -34,10 +34,10 @@ import org.mycore.datamodel.niofs.MCRVersionedPath;
  * The base FileStore implementation for the OCFL file system.
  * <p>
  * This class extends {@link MCRAbstractFileStore} to provide a custom file store for OCFL-managed files.
- * It integrates with the OCFL file system provider to offer file store operations such as retrieving
- * the total, usable, and unallocated space, and supports file attribute views.
+ * <p>
+ * The retrieval of the total, usable, and unallocated space is not supported!
  */
-public abstract class MCROCFLFileStore extends MCRAbstractFileStore {
+public class MCROCFLFileStore extends MCRAbstractFileStore {
 
     protected final MCROCFLFileSystemProvider fileSystemProvider;
 
@@ -76,6 +76,30 @@ public abstract class MCROCFLFileStore extends MCRAbstractFileStore {
     @Override
     public boolean isReadOnly() {
         return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getUsableSpace() throws IOException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getUnallocatedSpace() throws IOException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getTotalSpace() throws IOException {
+        throw new UnsupportedOperationException();
     }
 
     /**

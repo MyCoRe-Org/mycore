@@ -44,8 +44,6 @@ public class MCROCFLFileSystem extends MCRVersionedFileSystem {
 
     private static volatile MCROCFLFileStore fileStore;
 
-    private final Object fileStoreLock = new Object();
-
     /**
      * Constructs a new {@code MCROCFLFileSystem} with the specified OCFL provider.
      *
@@ -163,7 +161,7 @@ public class MCROCFLFileSystem extends MCRVersionedFileSystem {
      */
     public MCROCFLFileStore getFileStore() {
         if (fileStore == null) {
-            synchronized (fileStoreLock) {
+            synchronized (MCROCFLFileSystem.class) {
                 if (fileStore == null) {
                     fileStore = buildFileStore();
                 }
@@ -178,7 +176,7 @@ public class MCROCFLFileSystem extends MCRVersionedFileSystem {
      * This should only be used in unit testing.
      */
     public void resetFileStore() {
-        synchronized (fileStoreLock) {
+        synchronized (MCROCFLFileSystem.class) {
             fileStore = null;
         }
     }
@@ -186,7 +184,7 @@ public class MCROCFLFileSystem extends MCRVersionedFileSystem {
     private MCROCFLFileStore buildFileStore() {
         MCROCFLFileSystemProvider fileSystemProvider = provider();
         MCROCFLRepository repository = fileSystemProvider.getRepository();
-        return repository.isRemote() ? new MCROCFLRemoteFileStore(fileSystemProvider)
+        return repository.isRemote() ? new MCROCFLFileStore(fileSystemProvider)
             : new MCROCFLLocalFileStore(fileSystemProvider);
     }
 
