@@ -87,7 +87,7 @@ public class MCRXEditorServlet extends MCRServlet {
     }
 
     private MCREditorTarget getTarget(String targetID) {
-        String property = "MCR.XEditor.Target." + targetID + ".Class";
-        return MCRConfiguration2.getOrThrow(property, MCRConfiguration2::instantiateClass);
+        return MCRConfiguration2.getInstanceOfOrThrow(MCREditorTarget.class,
+            "MCR.XEditor.Target." + targetID + ".Class");
     }
 }

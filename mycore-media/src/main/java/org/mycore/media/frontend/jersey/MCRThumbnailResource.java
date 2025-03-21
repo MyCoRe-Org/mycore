@@ -129,22 +129,22 @@ public class MCRThumbnailResource {
 
     private static Optional<BufferedImage> getThumbnail(MCRPath mainFile, int size) throws IOException {
         String mimeType = Files.probeContentType(mainFile);
-        List<MCRThumbnailGenerator> generators = MCRConfiguration2
-            .getOrThrow("MCR.Media.Thumbnail.Generators", MCRConfiguration2::splitValue)
-            .map(MCRConfiguration2::<MCRThumbnailGenerator>instantiateClass)
+        return MCRConfiguration2
+            .instantiateClasses(MCRThumbnailGenerator.class, "MCR.Media.Thumbnail.Generators")
             .filter(thumbnailGenerator -> thumbnailGenerator.matchesFileType(mimeType, mainFile))
-            .toList();
-        return generators.stream()
-            .map(thumbnailGenerator -> {
-                try {
-                    return thumbnailGenerator.getThumbnail(mainFile, size);
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
-            })
+            .map(thumbnailGenerator -> getThumbnail(mainFile, size, thumbnailGenerator))
             .filter(Optional::isPresent)
             .map(Optional::get)
             .findFirst();
+    }
+
+    private static Optional<BufferedImage> getThumbnail(MCRPath mainFile, int size,
+        MCRThumbnailGenerator thumbnailGenerator) {
+        try {
+            return thumbnailGenerator.getThumbnail(mainFile, size);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
 }
