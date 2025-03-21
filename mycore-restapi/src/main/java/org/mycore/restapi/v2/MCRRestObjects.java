@@ -486,7 +486,7 @@ public class MCRRestObjects {
     }
 
     private Response getThumbnail(String id, int size, String ext) {
-        List<MCRPath> mainDocs = MCRMetadataManager.getDerivateIds(MCRObjectID.getInstance(id), 1, TimeUnit.MINUTES)
+        List<MCRPath> mainDocs = MCRMetadataManager.getDerivateIds(MCRObjectID.getInstance(id))
             .stream()
             .filter(d -> MCRAccessManager.checkDerivateContentPermission(d, MCRAccessManager.PERMISSION_READ))
             .map(d -> {
