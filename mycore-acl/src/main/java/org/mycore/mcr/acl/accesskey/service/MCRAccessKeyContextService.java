@@ -20,7 +20,6 @@ package org.mycore.mcr.acl.accesskey.service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import org.mycore.access.MCRAccessCacheHelper;
 import org.mycore.access.MCRAccessManager;
@@ -129,7 +128,7 @@ public abstract class MCRAccessKeyContextService<T> {
             } catch (MCRAccessKeyException e) {
                 // ignored
             }
-            final List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(objectId, 0, TimeUnit.SECONDS);
+            final List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(objectId);
             for (final MCRObjectID derivateId : derivateIds) {
                 try {
                     addAccessKeyForObjectToContext(context, derivateId, secret);
