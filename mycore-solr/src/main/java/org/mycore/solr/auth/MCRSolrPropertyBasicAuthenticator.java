@@ -26,18 +26,15 @@ import java.util.function.Supplier;
 /**
  * Basic authentication implementation that uses the username and password from the configuration.
  * The username and password are configured using the properties {@code Username} and {@code Password}.
- *
- * @deprecated Use {@link MCRSolrPropertyBasicAuthenticator} instead.
  */
-@Deprecated
-@MCRConfigurationProxy(proxyClass = MCRSolrBasicPropertyAuthentication.Factory.class)
-public final class MCRSolrBasicPropertyAuthentication extends MCRSolrBasicAuthenticatorBase {
+@MCRConfigurationProxy(proxyClass = MCRSolrPropertyBasicAuthenticator.Factory.class)
+public final class MCRSolrPropertyBasicAuthenticator extends MCRSolrBasicAuthenticatorBase {
 
     private final String username;
 
     private final String password;
 
-    public MCRSolrBasicPropertyAuthentication(String username, String password) {
+    public MCRSolrPropertyBasicAuthenticator(String username, String password) {
         this.username = username;
         this.password = password;
     }
@@ -52,7 +49,7 @@ public final class MCRSolrBasicPropertyAuthentication extends MCRSolrBasicAuthen
         return password;
     }
 
-    public static class Factory implements Supplier<MCRSolrBasicPropertyAuthentication> {
+    public static class Factory implements Supplier<MCRSolrPropertyBasicAuthenticator> {
 
         @MCRProperty(name = "Username")
         public String username;
@@ -61,8 +58,8 @@ public final class MCRSolrBasicPropertyAuthentication extends MCRSolrBasicAuthen
         public String password;
 
         @Override
-        public MCRSolrBasicPropertyAuthentication get() {
-            return new MCRSolrBasicPropertyAuthentication(username, password);
+        public MCRSolrPropertyBasicAuthenticator get() {
+            return new MCRSolrPropertyBasicAuthenticator(username, password);
         }
 
     }

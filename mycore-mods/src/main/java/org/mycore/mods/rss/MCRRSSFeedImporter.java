@@ -99,7 +99,7 @@ import com.rometools.rome.io.XmlReader;
  */
 public class MCRRSSFeedImporter {
 
-    protected final MCRSolrAuthenticationManager solrAuthenticationFactory;
+    protected final MCRSolrAuthenticationManager solrAuthenticationManager;
 
     private String sourceSystemID;
 
@@ -126,7 +126,7 @@ public class MCRRSSFeedImporter {
 
     public MCRRSSFeedImporter(String sourceSystemID) {
         this.sourceSystemID = sourceSystemID;
-        this.solrAuthenticationFactory = MCRSolrAuthenticationManager.obtainInstance();
+        this.solrAuthenticationManager = MCRSolrAuthenticationManager.obtainInstance();
 
         String prefix = "MCR.MODS.RSSFeedImporter." + sourceSystemID + ".";
 
@@ -227,7 +227,7 @@ public class MCRRSSFeedImporter {
         SolrDocumentList results;
         try {
             QueryRequest queryRequest = new QueryRequest(query);
-            solrAuthenticationFactory.applyAuthentication(queryRequest,
+            solrAuthenticationManager.applyAuthentication(queryRequest,
                 MCRSolrAuthenticationLevel.SEARCH);
             results = queryRequest.process(solrClient).getResults();
 
