@@ -43,6 +43,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRExpandedObjectManager;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
@@ -80,7 +81,6 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-
 import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -119,9 +119,9 @@ public class MCRRestDerivates {
 
     @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     public static void validateDerivateRelation(MCRObjectID mcrId, MCRObjectID derId) {
-        MCRObjectID objectId = MCRMetadataManager.getObjectId(derId, 1, TimeUnit.DAYS);
+        MCRObjectID objectId = MCRMetadataManager.getObjectId(derId);
         if (objectId != null && !mcrId.equals(objectId)) {
-            objectId = MCRMetadataManager.getObjectId(derId, 0, TimeUnit.SECONDS);
+            objectId = MCRMetadataManager.getObjectId(derId);
         }
         if (mcrId.equals(objectId)) {
             return;
@@ -168,7 +168,9 @@ public class MCRRestDerivates {
             return cachedResponse.get();
         }
         MCRObject obj = MCRMetadataManager.retrieveMCRObject(mcrId);
-        List<MCRMetaEnrichedLinkID> derivates = obj.getStructure().getDerivates();
+        List<MCRMetaEnrichedLinkID> derivates = MCRExpandedObjectManager.getInstance().getExpandedObject(obj)
+            .getStructure()
+            .getDerivates();
         return Response.ok()
             .entity(new GenericEntity<>(derivates) {
             })

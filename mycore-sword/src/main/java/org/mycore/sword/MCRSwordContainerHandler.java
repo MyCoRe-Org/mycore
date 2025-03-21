@@ -24,7 +24,6 @@ import java.util.Optional;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.common.MCRActiveLinkException;
-import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -110,18 +109,6 @@ public class MCRSwordContainerHandler implements MCRSwordLifecycle {
 
     public void deleteObject(MCRObject object) throws SwordServerException {
         try {
-            object
-                .getStructure()
-                .getDerivates()
-                .stream()
-                .map(MCRMetaLinkID::getXLinkHrefID)
-                .forEach(id -> {
-                    try {
-                        MCRMetadataManager.deleteMCRDerivate(id);
-                    } catch (Exception e) {
-                        throw new MCRException(e);
-                    }
-                });
             MCRMetadataManager.delete(object);
         } catch (MCRActiveLinkException | MCRAccessException e) {
             throw new SwordServerException("Error while deleting Object.", e);

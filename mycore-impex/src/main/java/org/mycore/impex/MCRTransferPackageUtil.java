@@ -45,6 +45,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.classifications2.utils.MCRClassificationUtils;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRExpandedObject;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -182,11 +183,7 @@ public final class MCRTransferPackageUtil {
     public static void importObject(Path targetDirectory, String objectId, String parentId)
         throws JDOMException, IOException, MCRAccessException {
         // import object
-        List<String> derivates = importObjectCLI(targetDirectory, objectId, parentId);
-        // process the saved derivates
-        for (String derivateId : derivates) {
-            importDerivate(targetDirectory, derivateId);
-        }
+        importObjectCLI(targetDirectory, objectId, parentId);
     }
 
     /**
@@ -214,7 +211,7 @@ public final class MCRTransferPackageUtil {
             LOGGER.debug("Importing {}", targetXML.toAbsolutePath().toString());
         }
         Document objXML = sax.build(targetXML.toFile());
-        MCRObject mcr = new MCRObject(objXML);
+        MCRExpandedObject mcr = new MCRExpandedObject(objXML);
         if (parentId != null) {
             mcr.getStructure().setParent(parentId);
         }
@@ -238,7 +235,6 @@ public final class MCRTransferPackageUtil {
      * Imports a derivate from the given target directory path.
      *
      * @param targetDirectory path to the extracted *.tar archive
-     * @param derivateId the derivate to import
      * @throws JDOMException derivate xml couldn't be read
      * @throws IOException some file system stuff went wrong
      * @throws MCRAccessException you do not have the permissions to do the import
