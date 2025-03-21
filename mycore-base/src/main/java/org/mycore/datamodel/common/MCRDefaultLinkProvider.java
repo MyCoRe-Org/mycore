@@ -1,5 +1,6 @@
 package org.mycore.datamodel.common;
 
+import static org.mycore.datamodel.common.MCRLinkTableManager.ENTRY_TYPE_DERIVATE;
 import static org.mycore.datamodel.common.MCRLinkTableManager.ENTRY_TYPE_DERIVATE_LINK;
 import static org.mycore.datamodel.common.MCRLinkTableManager.ENTRY_TYPE_REFERENCE;
 import static org.mycore.datamodel.common.MCRLinkTableManager.MCRLinkReference;
@@ -98,7 +99,7 @@ public class MCRDefaultLinkProvider implements MCRBaseLinkProvider {
 
     @Override
     public Collection<MCRLinkReference> getLinksOfDerivate(MCRDerivate der) throws OperationNotSupportedException {
-        return List.of(new MCRLinkReference(der.getId(), der.getOwnerID(), ENTRY_TYPE_DERIVATE_LINK, ""));
+        return List.of(new MCRLinkReference(der.getId(), der.getOwnerID(), ENTRY_TYPE_DERIVATE, ""));
     }
 
     private MCRCategoryID metaClassToCategoryID(MCRMetaClassification metaClazz) {
