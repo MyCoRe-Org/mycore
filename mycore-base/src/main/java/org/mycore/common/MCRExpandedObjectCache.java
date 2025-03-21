@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,6 +21,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRExpandedObject;
@@ -116,9 +118,9 @@ public final class MCRExpandedObjectCache {
             FileChannel.open(expandedObjectPath, StandardOpenOption.WRITE,
                 StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.SYNC);
             FileLock fl = channel.lock()) {
-            XMLOutputter xmlOutput = new XMLOutputter();
+            XMLOutputter xmlOutput = new XMLOutputter(Format.getPrettyFormat());
             String file = xmlOutput.outputString(expandedObject.createXML());
-            byte[] fileContent = file.getBytes();
+            byte[] fileContent = file.getBytes(StandardCharsets.UTF_8);
             ByteBuffer buffer = ByteBuffer.wrap(fileContent);
             int written = channel.write(buffer);
             if (written != fileContent.length) {
