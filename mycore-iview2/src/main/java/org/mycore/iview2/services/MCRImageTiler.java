@@ -92,7 +92,7 @@ public final class MCRImageTiler implements Runnable, Closeable {
      */
     @Deprecated
     public static boolean isRunning() {
-        return MCRIView2TilingThreadStarter.isStarted();
+        return MCRIView2TilingThreadStarter.getInstance().isStarted();
     }
 
     /**

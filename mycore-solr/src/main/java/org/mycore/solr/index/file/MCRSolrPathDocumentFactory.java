@@ -50,7 +50,7 @@ public class MCRSolrPathDocumentFactory {
     private static final List<MCRSolrFileIndexAccumulator> ACCUMULATOR_LIST = resolveAccumulators();
 
     private static final MCRSolrPathDocumentFactory SHARED_INSTANCE = MCRConfiguration2
-        .getOrThrow(SOLR_CONFIG_PREFIX + "SolrInputDocument.Path.Factory", MCRConfiguration2::instantiateClass);
+        .getInstanceOfOrThrow(MCRSolrPathDocumentFactory.class, SOLR_CONFIG_PREFIX + "SolrInputDocument.Path.Factory");
 
     /**
      * @deprecated Use {@link #obtainInstance()} instead

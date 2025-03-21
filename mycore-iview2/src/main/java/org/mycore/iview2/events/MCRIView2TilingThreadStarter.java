@@ -34,7 +34,16 @@ public final class MCRIView2TilingThreadStarter implements MCRStartupHandler.Aut
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static boolean started;
+    private static final MCRIView2TilingThreadStarter SINGLETON_INSTANCE = new MCRIView2TilingThreadStarter();
+
+    private boolean started;
+
+    private MCRIView2TilingThreadStarter(){
+    }
+
+    public static MCRIView2TilingThreadStarter getInstance(){
+        return SINGLETON_INSTANCE;
+    }
 
     @Override
     public String getName() {
@@ -53,7 +62,7 @@ public final class MCRIView2TilingThreadStarter implements MCRStartupHandler.Aut
         }
     }
 
-    public static synchronized void startMasterTilingThread() {
+    public synchronized void startMasterTilingThread() {
         if (!started) {
             LOGGER.info("Starting Tiling thread.");
             System.setProperty("java.awt.headless", "true");
@@ -63,7 +72,7 @@ public final class MCRIView2TilingThreadStarter implements MCRStartupHandler.Aut
         }
     }
 
-    public static synchronized boolean isStarted() {
+    public synchronized boolean isStarted() {
         return started;
     }
 
