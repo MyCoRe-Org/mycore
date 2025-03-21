@@ -68,11 +68,8 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
-import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
-import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkIDFactory;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -656,25 +653,12 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         MCRDerivate derObj = MCRMetadataManager.retrieveMCRDerivate(derID);
         MCRMetaLinkID oldDerivateToObjectLink = derObj.getDerivate().getMetaLink();
-        MCRObjectID oldOwnerId = oldDerivateToObjectLink.getXLinkHrefID();
 
         /* set link to new parent in the derivate object */
         LOGGER.info("Setting {} as parent for derivate {}", objID, derID);
         derObj.getDerivate().getMetaLink()
             .setReference(objID, oldDerivateToObjectLink.getXLinkLabel(), oldDerivateToObjectLink.getXLinkTitle());
         MCRMetadataManager.update(derObj);
-
-        /* set link to derivate in the new parent */
-        MCRObject oldOwner = MCRMetadataManager.retrieveMCRObject(oldOwnerId);
-
-        LOGGER.info("Linking derivate {} to {}", derID, objID);
-        MCRMetaEnrichedLinkID derivateLink = MCRMetaEnrichedLinkIDFactory.obtainInstance().getDerivateLink(derObj);
-        MCRMetadataManager.addOrUpdateDerivateToObject(objID, derivateLink, derObj.isImportMode());
-
-        /* removing link from old parent */
-        boolean flag = oldOwner.getStructure().removeDerivate(derID);
-        LOGGER.info("Unlinking derivate {} from object {}. Success={}", derID, oldOwnerId, flag);
-        MCRMetadataManager.fireUpdateEvent(oldOwner);
     }
 
     /**

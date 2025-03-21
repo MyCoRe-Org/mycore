@@ -19,7 +19,6 @@ package org.mycore.access;
 
 import java.util.Collection;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
@@ -221,7 +220,7 @@ public class MCRAccessManager {
      * @return true, if the access is allowed
      */
     public static boolean checkDerivateMetadataPermission(MCRObjectID derId, String permission) {
-        MCRObjectID objectId = MCRMetadataManager.getObjectId(derId, 10, TimeUnit.MINUTES);
+        MCRObjectID objectId = MCRMetadataManager.getObjectId(derId);
         if (objectId != null) {
             return checkPermission(objectId, permission);
         }

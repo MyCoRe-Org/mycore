@@ -89,11 +89,13 @@ public abstract class MCRBase {
      *                general Exception of MyCoRe
      */
     public MCRBase() throws MCRException {
+        this(new MCRObjectService());
+    }
+
+    protected MCRBase(MCRObjectService mcrService) throws MCRException {
         mcrVersion = MCRCoreVersion.getVersion();
         mcrSchema = "";
-
-        // Service class
-        mcrService = new MCRObjectService();
+        this.mcrService = mcrService;
     }
 
     protected void setFromJDOM(Document doc) {
