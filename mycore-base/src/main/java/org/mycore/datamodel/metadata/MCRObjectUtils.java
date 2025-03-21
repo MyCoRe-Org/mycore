@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -33,6 +32,7 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRExpandedObjectManager;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -118,7 +118,8 @@ public final class MCRObjectUtils {
      * @return list of all children
      */
     public static List<MCRObject> getChildren(MCRObject mcrObject) {
-        return mcrObject.getStructure()
+        return MCRExpandedObjectManager.getInstance().getExpandedObject(mcrObject)
+            .getStructure()
             .getChildren()
             .stream()
             .map(MCRMetaLinkID::getXLinkHrefID)
@@ -161,7 +162,7 @@ public final class MCRObjectUtils {
     public static List<MCRObjectID> getDerivates(MCRObjectID mcrObjectID) {
         MCRLinkTableManager linkTableManager = MCRLinkTableManager.getInstance();
         Stream<String> derivateStream = linkTableManager
-            .getDestinationOf(mcrObjectID, MCRLinkTableManager.ENTRY_TYPE_DERIVATE).stream();
+            .getSourceOf(mcrObjectID, MCRLinkTableManager.ENTRY_TYPE_DERIVATE).stream();
         Stream<String> derivateLinkStream = linkTableManager
             .getDestinationOf(mcrObjectID, MCRLinkTableManager.ENTRY_TYPE_DERIVATE_LINK).stream()
             .map(link -> link.substring(0, link.indexOf('/')));
@@ -189,59 +190,7 @@ public final class MCRObjectUtils {
     }
 
     /**
-     * <p>Removes all links of the source object. This includes parent links, children links and metadata links. A list
-     * of all updated objects is returned.</p>
-     * <p>Be aware that this method does not take care of storing the returned objects.</p>
-     *
-     * @param sourceId id of the object
-     * @return a stream of updated objects where a link of the source was removed
-     */
-    public static Stream<MCRObject> removeLinks(MCRObjectID sourceId) {
-        return MCRLinkTableManager.getInstance().getSourceOf(sourceId).stream().filter(MCRObjectID::isValid)
-            .map(MCRObjectID::getInstance).distinct().map(MCRMetadataManager::retrieveMCRObject)
-            .flatMap(linkedObject -> removeLink(linkedObject, sourceId) ? Stream.of(linkedObject)
-                : Stream.empty());
-    }
 
-    /**
-     * <p>Removes the <b>linkToRemove</b> in the metadata and the structure part of the <b>source</b> object. Be aware
-     * that this can lead to a zombie source object without a parent! Use this method with care!</p>
-     *
-     * <p>This method does not take care of storing the source object.</p>
-     *
-     * @param source the source object where the links should be removed from
-     * @param linkToRemove the link id to remove
-     * @return true if a link was removed (the source object changed)
-     */
-    public static boolean removeLink(MCRObject source, MCRObjectID linkToRemove) {
-        final AtomicBoolean updated = new AtomicBoolean(false);
-        // remove parent
-        if (source.getParent() != null && source.getParent().equals(linkToRemove)) {
-            source.getStructure().removeParent();
-            updated.set(true);
-        }
-        // remove children
-        if (source.getStructure().removeChild(linkToRemove)) {
-            updated.set(true);
-        }
-        // remove metadata parts
-        List<MCRMetaElement> emptyElements = source.getMetadata().stream()
-            .filter(metaElement -> metaElement.getClazz().equals(MCRMetaLinkID.class))
-            .flatMap(metaElement -> {
-                List<MCRMetaLinkID> linksToRemove = metaElement.stream().map(MCRMetaLinkID.class::cast)
-                    .filter(metaLinkID -> metaLinkID.getXLinkHrefID().equals(linkToRemove))
-                    .collect(Collectors.toList());
-                if (!linksToRemove.isEmpty()) {
-                    updated.set(true);
-                    linksToRemove.forEach(metaElement::removeMetaObject);
-                }
-                return metaElement.isEmpty() ? Stream.of(metaElement) : Stream.empty();
-            }).collect(Collectors.toList());
-        emptyElements.forEach(source.getMetadata()::removeMetadataElement);
-        return updated.get();
-    }
-
-    /**
      * Returns a list of {@link MCRCategoryID}s which are used in the given object.
      *
      * @param object the object where to get the categories from

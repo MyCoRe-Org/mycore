@@ -26,7 +26,6 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -103,7 +102,7 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
     }
 
     protected void indexObject(MCRObjectID objectID) throws IOException {
-        List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(objectID, 0, TimeUnit.MILLISECONDS);
+        List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(objectID);
         for (MCRObjectID derivateID : derivateIds) {
             indexDerivate(derivateID);
         }

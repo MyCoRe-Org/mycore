@@ -41,11 +41,9 @@ import org.mycore.common.content.MCRPathContent;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRClassificationUtils;
 import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.datamodel.metadata.MCRObjectUtils;
 import org.mycore.datamodel.niofs.MCRPath;
 
@@ -128,8 +126,7 @@ public class MCRTransferPackage {
         objectMap.put(object.getId(), object);
 
         // resolve children
-        for (MCRMetaLinkID metaLinkId : object.getStructure().getChildren()) {
-            MCRObjectID childId = MCRObjectID.getInstance(metaLinkId.toString());
+        for (MCRObjectID childId : MCRMetadataManager.getDerivateIds(object.getId())) {
             if (!MCRMetadataManager.exists(childId)) {
                 throw new MCRUsageException(
                     "Requested object '" + childId + "' does not exist. Thus a transfer package cannot be created.");
@@ -152,10 +149,9 @@ public class MCRTransferPackage {
         List<MCRTransferPackageFileContainer> fileContainerList = new ArrayList<>();
         MCRObjectUtils.getDescendantsAndSelf(object)
             .stream()
-            .map(MCRObject::getStructure)
-            .map(MCRObjectStructure::getDerivates)
+            .map(MCRObject::getId)
+            .map(MCRMetadataManager::getDerivateIds)
             .flatMap(Collection::stream)
-            .map(MCRMetaLinkID::getXLinkHrefID)
             .peek(derivateId -> {
                 if (!MCRMetadataManager.exists(derivateId)) {
                     throw new MCRUsageException("Requested derivate '" + derivateId

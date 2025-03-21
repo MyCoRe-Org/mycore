@@ -19,6 +19,7 @@
 package org.mycore.datamodel.niofs;
 
 //@TODO TEST: testclass and test (0% coverage)
+
 import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR;
 import static org.mycore.datamodel.niofs.MCRAbstractFileSystem.SEPARATOR_STRING;
 
@@ -34,7 +35,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
@@ -176,7 +176,7 @@ public final class MCRPathXML {
         root.setAttribute("path", absolutePath);
         root.setAttribute("extension", getFileExtension(fileName));
         root.setAttribute("returnId", MCRMetadataManager
-            .getObjectId(MCRObjectID.getInstance(path.getOwner()), 10, TimeUnit.SECONDS).toString());
+            .getObjectId(MCRObjectID.getInstance(path.getOwner())).toString());
         Collection<MCRCategoryID> linksFromReference = MCRCategLinkServiceFactory.obtainInstance()
             .getLinksFromReference(new MCRCategLinkReference(path));
         for (MCRCategoryID category : linksFromReference) {

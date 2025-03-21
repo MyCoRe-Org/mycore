@@ -64,7 +64,6 @@ import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectDerivate;
@@ -479,9 +478,8 @@ public class MCRRestAPIObjectsHelper {
 
     protected static List<MCRObjectIDDate> getDerivateObjectIDDates(MCRObjectID mcrObjId,
         MCRRestAPISortObject sortObj) {
-        return MCRMetadataManager.retrieveMCRObject(mcrObjId)
-            .getStructure().getDerivates().stream()
-            .map(MCRMetaLinkID::getXLinkHrefID)
+        return MCRMetadataManager.getDerivateIds(mcrObjId)
+            .stream()
             .filter(MCRMetadataManager::exists)
             .map(MCRRestAPIObjectsHelper::createMCRObjectIDDate)
             .sorted(new MCRRestAPISortObjectComparator(sortObj))

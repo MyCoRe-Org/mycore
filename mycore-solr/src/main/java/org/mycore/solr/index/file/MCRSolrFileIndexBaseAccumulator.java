@@ -64,8 +64,7 @@ public class MCRSolrFileIndexBaseAccumulator implements MCRSolrFileIndexAccumula
         String absolutePath = '/' + input.subpath(0, input.getNameCount()).toString();
         try {
             MCRPath mcrPath = MCRPath.ofPath(input); //check if this is an MCRPath -> more metadata
-            MCRObjectID mcrObjID = MCRMetadataManager.getObjectId(MCRObjectID.getInstance(mcrPath.getOwner()), 10,
-                TimeUnit.SECONDS);
+            MCRObjectID mcrObjID = MCRMetadataManager.getObjectId(MCRObjectID.getInstance(mcrPath.getOwner()));
             if (mcrObjID == null) {
                 LOGGER.warn("Could not determine MCRObject for file {}", absolutePath);
                 doc.setField("returnId", mcrPath.getOwner());

@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import javax.xml.validation.Schema;
 
@@ -231,7 +230,7 @@ public class MCRDOIService extends MCRDOIBaseService {
      */
     public List<Map.Entry<String, URI>> getMediaList(MCRObject obj) {
         List<Map.Entry<String, URI>> entryList = new ArrayList<>();
-        Optional<MCRObjectID> derivateIdOptional = MCRMetadataManager.getDerivateIds(obj.getId(), 1, TimeUnit.MINUTES)
+        Optional<MCRObjectID> derivateIdOptional = MCRMetadataManager.getDerivateIds(obj.getId())
             .stream().findFirst();
         derivateIdOptional.ifPresent(derivateId -> {
             MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateId);

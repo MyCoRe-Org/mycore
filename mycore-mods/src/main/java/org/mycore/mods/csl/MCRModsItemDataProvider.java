@@ -43,7 +43,9 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.csl.MCRItemDataProvider;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.mods.classification.MCRClassMapper;
@@ -184,7 +186,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             .or(() -> Optional.ofNullable(wrapper.getElement("mods:location/mods:url"))
                 .map(Element::getTextNormalize))
             .or(() -> Optional.of(MCRFrontendUtil.getBaseURL() + "receive/" + id)
-                .filter(url -> !this.wrapper.getMCRObject().getStructure().getDerivates().isEmpty()))
+                .filter(url -> !MCRMetadataManager.getDerivateIds(MCRObjectID.getInstance(id)).isEmpty()))
             .or(() -> Optional.ofNullable(wrapper.getElement("mods:relatedItem[@type='host']/mods:location/mods:url"))
                 .map(Element::getTextNormalize))
             .ifPresent(idb::URL);

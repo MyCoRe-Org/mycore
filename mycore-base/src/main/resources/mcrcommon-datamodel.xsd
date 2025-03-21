@@ -149,6 +149,15 @@
       <xs:attributeGroup ref="structureInheritance" />
     </xs:complexType>
   </xs:element>
+  <xs:element name="childrenOrder">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="child" />
+      </xs:sequence>
+      <xs:attribute name="class" use="required" type="xs:string" fixed="MCRMetaLinkID" />
+      <xs:attributeGroup ref="structureInheritance" />
+    </xs:complexType>
+  </xs:element>
   <xs:element name="child">
     <xs:complexType>
       <xs:attribute name="inherited" use="optional" type="xs:integer" fixed="0" />

@@ -46,7 +46,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
@@ -70,6 +69,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCalendar;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRExpandedObjectManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUtils;
@@ -85,11 +85,12 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRLinkTableManager;
+import org.mycore.datamodel.common.MCRLinkType;
+import org.mycore.datamodel.metadata.MCRExpandedObject;
+import org.mycore.datamodel.metadata.MCRExpandedObjectStructure;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.resource.MCRResourceHelper;
 import org.w3c.dom.Document;
@@ -399,7 +400,7 @@ public class MCRXMLFunctions {
     }
 
     private static boolean checkReadPermissionOfDerivates(MCRObjectID mcrObjectID) {
-        List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(mcrObjectID, 0, TimeUnit.SECONDS);
+        List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(mcrObjectID);
         if (derivateIds.isEmpty()) {
             return MCRConfiguration2.getOrThrow("MCR.XMLFunctions.WorldReadableComplete.NoDerivates",
                 Boolean::parseBoolean);
@@ -443,8 +444,9 @@ public class MCRXMLFunctions {
         return Optional.of(MCRObjectID.getInstance(objectId))
             .filter(MCRMetadataManager::exists)
             .map(MCRMetadataManager::retrieveMCRObject)
-            .map(MCRObject::getStructure)
-            .map(MCRObjectStructure::getDerivates)
+                .map(MCRExpandedObjectManager.getInstance()::getExpandedObject)
+            .map(MCRExpandedObject::getStructure)
+            .map(MCRExpandedObjectStructure::getDerivates)
             .map(List::stream)
             .map(s -> s.map(MCRMetaLinkID::getXLinkHrefID)
                 .map(MCRMetadataManager::retrieveMCRDerivate)
@@ -469,7 +471,7 @@ public class MCRXMLFunctions {
             Element rootElement = document.createElement("linklist");
             document.appendChild(rootElement);
             MCRLinkTableManager ltm = MCRLinkTableManager.getInstance();
-            for (String id : ltm.getDestinationOf(mcrid, destinationType)) {
+            for (String id : ltm.getDestinationOf(mcrid, MCRLinkType.fromString(destinationType))) {
                 Element link = document.createElement("link");
                 link.setTextContent(id);
                 rootElement.appendChild(link);
@@ -785,10 +787,10 @@ public class MCRXMLFunctions {
     }
 
     /**
-     * Same as {@link MCRMetadataManager#getObjectId(MCRObjectID, long, TimeUnit)} with String representation.
+     * Same as {@link MCRMetadataManager#getObjectId(MCRObjectID)} with String representation.
      */
     public static String getMCRObjectID(final String derivateID, final long expire) {
-        return MCRMetadataManager.getObjectId(MCRObjectID.getInstance(derivateID), expire, TimeUnit.MILLISECONDS)
+        return MCRMetadataManager.getObjectId(MCRObjectID.getInstance(derivateID))
             .toString();
     }
 

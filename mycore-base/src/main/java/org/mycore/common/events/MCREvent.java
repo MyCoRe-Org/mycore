@@ -23,6 +23,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Represents an event that occured in the MyCoRe system. Events are of a
@@ -37,7 +38,7 @@ public class MCREvent {
 
     /** Pre-defined event types * */
     public enum EventType {
-        CREATE, UPDATE, DELETE, REPAIR, INDEX, MOVE, CUSTOM;
+        CREATE, UPDATE, DELETE, LINKED_UPDATED, ANCESTOR_UPDATED, REPAIR, INDEX, MOVE, CUSTOM;
 
         @Override
         public String toString() {
@@ -98,6 +99,10 @@ public class MCREvent {
     public static final String CLASS_KEY = "class";
 
     public static final String CLASS_OLD_KEY = "class.old";
+
+    public static final String RELATED_OBJECT_KEY = "related";
+
+    public static final String LINK_TYPE_KEY = "linkType";
 
     /** The object type like object or file * */
     private ObjectType objType;
@@ -215,6 +220,22 @@ public class MCREvent {
         return data.get(key);
     }
 
+    public <T> T get(String key, Class<T> type) {
+        Objects.requireNonNull(key, "key is null");
+        Objects.requireNonNull(type, "type is null");
+
+        Object o = get(key);
+        if(o == null) {
+            return null;
+        }
+        if (type.isInstance(o)) {
+            return type.cast(o);
+        } else {
+            throw new ClassCastException(
+                "The object stored under the key '" + key + "' is not of the expected type " + type.getName());
+        }
+    }
+
     /**
      * adds an object to the event data
      * @param key - the key for the object
@@ -231,5 +252,18 @@ public class MCREvent {
      */
     public Set<Map.Entry<String, Object>> entrySet() {
         return data.entrySet();
+    }
+
+    @Override
+    public String toString() {
+        return "MCREvent{" +
+            "customEventType='" + customEventType + '\'' +
+            ", evtType=" + evtType +
+            ", customObjectType='" + customObjectType + '\'' +
+            ", objType=" + objType +
+            ", data={"
+            + data.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())
+                .collect(Collectors.joining(',' + System.lineSeparator()))
+            + "}}";
     }
 }

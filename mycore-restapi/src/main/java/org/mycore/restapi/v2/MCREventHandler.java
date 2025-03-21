@@ -28,7 +28,6 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
@@ -278,7 +277,7 @@ class MCREventHandler {
             addUserInfo(file);
             String derId = ((MCRPath) path).getOwner();
             String fPath = ((MCRPath) path).getOwnerRelativePath();
-            String objId = MCRMetadataManager.getObjectId(MCRObjectID.getInstance(derId), 1, TimeUnit.MINUTES)
+            String objId = MCRMetadataManager.getObjectId(MCRObjectID.getInstance(derId))
                 .toString();
             String relPath = String.format(Locale.ROOT, "objects/%s/derivates/%s/contents/%s", objId, derId, fPath);
             String uri = uriResolver.apply(getPathURI(relPath)).toString();

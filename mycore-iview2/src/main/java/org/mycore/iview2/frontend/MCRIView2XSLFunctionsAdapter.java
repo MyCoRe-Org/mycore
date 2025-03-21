@@ -19,16 +19,9 @@
 package org.mycore.iview2.frontend;
 
 import java.nio.file.Files;
-import java.util.Collection;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.mycore.access.MCRAccessManager;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.niofs.MCRPath;
-import org.mycore.frontend.MCRFrontendUtil;
-import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.iview2.services.MCRIView2Tools;
 
 /**
@@ -39,9 +32,6 @@ import org.mycore.iview2.services.MCRIView2Tools;
  *
  */
 public class MCRIView2XSLFunctionsAdapter {
-    private static final Logger LOGGER = LogManager.getLogger();
-
-    private static final MCRLinkTableManager LINK_TABLE_MANAGER = MCRLinkTableManager.getInstance();
 
     public static MCRIView2XSLFunctionsAdapter obtainInstance() {
         return LazyInstanceHolder.SHARED_INSTANCE;
@@ -53,37 +43,6 @@ public class MCRIView2XSLFunctionsAdapter {
 
     public String getSupportedMainFile(String derivateID) {
         return MCRIView2Tools.getSupportedMainFile(derivateID);
-    }
-
-    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
-    public String getOptions(String derivateID, String extensions) {
-        final Collection<String> sources = LINK_TABLE_MANAGER.getSourceOf(derivateID, "derivate");
-        String objectID = (sources != null && !sources.isEmpty()) ? sources.iterator().next() : "";
-        StringBuilder options = new StringBuilder();
-        options.append('{');
-        options.append("\"derivateId\":").append('\"').append(derivateID).append("\",");
-        options.append("\"objectId\":").append('\"').append(objectID).append("\",");
-        options.append("\"webappBaseUri\":").append('\"').append(MCRFrontendUtil.getBaseURL()).append("\",");
-        String baseUris = MCRConfiguration2.getString("MCR.Module-iview2.BaseURL").orElse("");
-        if (baseUris.length() < 10) {
-            baseUris = MCRServlet.getServletBaseURL() + "MCRTileServlet";
-        }
-        options.append("\"baseUri\":").append('\"').append(baseUris).append("\".split(\",\")");
-        if (MCRAccessManager.checkPermission(derivateID, "create-pdf")) {
-            options.append(",\"pdfCreatorURI\":").append('\"')
-                .append(MCRConfiguration2.getString("MCR.Module-iview2.PDFCreatorURI").orElse("")).append("\",");
-            options.append("\"pdfCreatorStyle\":").append('\"')
-                .append(MCRConfiguration2.getString("MCR.Module-iview2.PDFCreatorStyle").orElse("")).append('\"');
-        }
-
-        if (extensions != null && !extensions.isEmpty()) {
-            options.append(',');
-            options.append(extensions);
-        }
-
-        options.append('}');
-        LOGGER.debug(options);
-        return options.toString();
     }
 
     private static final class LazyInstanceHolder {

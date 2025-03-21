@@ -70,11 +70,13 @@ import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRExpandedObjectManager;
 import org.mycore.common.MCRHTTPClient;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRPathContent;
@@ -93,8 +95,10 @@ import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRDataURL;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRExpandedObject;
 import org.mycore.datamodel.metadata.MCRFileMetadata;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLConstants;
@@ -510,9 +514,21 @@ public final class MCRURIResolver implements URIResolver {
             MCRObjectID mcrid = MCRObjectID.getInstance(id);
             try {
                 MCRXMLMetadataManager xmlmm = MCRXMLMetadataManager.getInstance();
-                MCRContent content = params.containsKey("r")
-                    ? xmlmm.retrieveContent(mcrid, params.get("r"))
-                    : xmlmm.retrieveContent(mcrid);
+
+                MCRContent content;
+                if (params.containsKey("r")) {
+                    content = xmlmm.retrieveContent(mcrid, params.get("r"));
+                } else {
+                    if (mcrid.getTypeId().equals(MCRDerivate.OBJECT_TYPE) ||
+                        (params.containsKey("expanded") && params.get("expanded").equals("false"))) {
+                        content = xmlmm.retrieveContent(mcrid);
+                    } else {
+                        MCRObject expanded = MCRMetadataManager.retrieveMCRObject(mcrid);
+                        MCRExpandedObject expandedObject =
+                            MCRExpandedObjectManager.getInstance().getExpandedObject(expanded);
+                        content = new MCRBaseContent(expandedObject);
+                    }
+                }
                 if (content == null) {
                     return null;
                 }

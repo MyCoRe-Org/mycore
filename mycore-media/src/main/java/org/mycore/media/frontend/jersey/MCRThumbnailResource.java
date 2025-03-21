@@ -82,8 +82,7 @@ public class MCRThumbnailResource {
     }
 
     private Response getThumbnailResponse(String documentId, int size, String ext) {
-        List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(MCRJerseyUtil.getID(documentId),
-            1, TimeUnit.MINUTES);
+        List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(MCRJerseyUtil.getID(documentId));
         for (MCRObjectID derivateId : derivateIds) {
             if (!MCRAccessManager.checkDerivateDisplayPermission(derivateId.toString())) {
                 continue;

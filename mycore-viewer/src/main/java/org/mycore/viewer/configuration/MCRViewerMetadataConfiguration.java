@@ -19,7 +19,6 @@
 package org.mycore.viewer.configuration;
 
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -34,16 +33,13 @@ import jakarta.ws.rs.core.Response.Status;
 
 public class MCRViewerMetadataConfiguration extends MCRViewerConfiguration {
 
-    private static final int EXPIRE_METADATA_CACHE_TIME = 10; // in seconds
-
     @Override
     public MCRViewerConfiguration setup(HttpServletRequest request) {
         super.setup(request);
 
         String derivate = getDerivate(request);
         MCRObjectID derivateID = MCRObjectID.getInstance(derivate);
-        final MCRObjectID objectID = MCRMetadataManager.getObjectId(derivateID, EXPIRE_METADATA_CACHE_TIME,
-            TimeUnit.SECONDS);
+        final MCRObjectID objectID = MCRMetadataManager.getObjectId(derivateID);
         if (objectID == null) {
             String errorMessage = MCRTranslation.translate("component.viewer.MCRIViewClientServlet.object.not.found");
             // TODO: we should not throw an webapplication exc. here -> instead throw something líke ConfigException

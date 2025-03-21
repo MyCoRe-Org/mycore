@@ -140,54 +140,6 @@ public class MCRObjectUtilsTest extends MCRStoreTestCase {
         assertEquals(7, descendants.size());
     }
 
-    @Test
-    public void removeLink() throws MCRAccessException {
-        // remove parent link
-        assertTrue(MCRObjectUtils.removeLink(l22, l11.getId()));
-        MCRMetadataManager.update(l22);
-        l11 = MCRMetadataManager.retrieveMCRObject(l11.getId());
-        l22 = MCRMetadataManager.retrieveMCRObject(l22.getId());
-        assertNull(l22.getParent());
-        assertFalse(l11.getStructure().containsChild(l22.getId()));
-
-        // add metadata links to test
-        addLinksToL22();
-        assertEquals(2, l22.getMetadata().stream("links").count());
-
-        // remove metadata link
-        assertTrue(MCRObjectUtils.removeLink(l22, l31.getId()));
-        assertEquals(1, l22.getMetadata().stream("links").count());
-        assertTrue(MCRObjectUtils.removeLink(l22, l11.getId()));
-        assertEquals(0, l22.getMetadata().stream("links").count());
-
-        // check if links element is completely removed
-        MCRMetadataManager.update(l22);
-        l22 = MCRMetadataManager.retrieveMCRObject(l22.getId());
-        assertNull(l22.getMetadata().getMetadataElement("links"));
-    }
-
-    @Test
-    public void removeLinks() throws MCRAccessException {
-        // add metadata links to test
-        addLinksToL22();
-        assertEquals(2, l22.getMetadata().stream("links").count());
-
-        // remove l11
-        for (MCRObject linkedObject : MCRObjectUtils.removeLinks(l11.getId()).collect(Collectors.toList())) {
-            MCRMetadataManager.update(linkedObject);
-        }
-        l22 = MCRMetadataManager.retrieveMCRObject(l22.getId());
-        assertEquals(1, l22.getMetadata().stream("links").count());
-
-        // remove l31
-        for (MCRObject linkedObject : MCRObjectUtils.removeLinks(l31.getId()).collect(Collectors.toList())) {
-            MCRMetadataManager.update(linkedObject);
-        }
-        l22 = MCRMetadataManager.retrieveMCRObject(l22.getId());
-        assertEquals(0, l22.getMetadata().stream("links").count());
-
-    }
-
     private void addLinksToL22() throws MCRAccessException {
         MCRMetaLinkID l11Link = new MCRMetaLinkID("link", l11.getId(), "l11", "l11");
         MCRMetaLinkID l31Link = new MCRMetaLinkID("link", l31.getId(), "l31", "l31");

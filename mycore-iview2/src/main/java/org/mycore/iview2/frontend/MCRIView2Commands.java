@@ -33,7 +33,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
@@ -378,7 +377,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
             LOGGER.error("The object ID {} is wrong", objectID);
             return null;
         }
-        List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(mcrobjid, 0, TimeUnit.MILLISECONDS);
+        List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(mcrobjid);
         if (derivateIds == null) {
             LOGGER.error("Object does not exist: {}", mcrobjid);
         }
