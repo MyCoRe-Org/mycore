@@ -169,18 +169,12 @@ public class MCRMetaDateLangText extends MCRMetaLangText {
         return obj;
     }
 
-    /**
-     * clone of this instance
-     *
-     * you will get a (deep) clone of this element
-     *
-     * @see Object#clone()
-     */
+
     @Override
     public MCRMetaDateLangText clone() {
         MCRMetaDateLangText clone = (MCRMetaDateLangText) super.clone();
 
-        clone.isoDate = this.isoDate; // this is ok because iso Date is immutable
+        clone.isoDate = this.isoDate; // immutable
 
         return clone;
     }
