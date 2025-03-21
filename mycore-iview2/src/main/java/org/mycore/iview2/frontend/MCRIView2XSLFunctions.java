@@ -26,9 +26,7 @@ import java.util.stream.IntStream;
 
 import org.mycore.common.MCRXlink;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -53,9 +51,6 @@ public class MCRIView2XSLFunctions {
         return ADAPTER.getSupportedMainFile(derivateID);
     }
 
-    public static String getOptions(String derivateID, String extensions) {
-        return ADAPTER.getOptions(derivateID, extensions);
-    }
 
     /**
      * Get the full path of the main file of the first derivate.
@@ -71,8 +66,7 @@ public class MCRIView2XSLFunctions {
             return null;
         }
 
-        MCRObject obj = MCRMetadataManager.retrieveMCRObject(objectID);
-        List<MCRMetaEnrichedLinkID> derivates = obj.getStructure().getDerivates();
+        List<MCRObjectID> derivates = MCRMetadataManager.getDerivateIds(objectID);
         if (!derivates.isEmpty()) {
             return derivates.getFirst() + "/" + ADAPTER.getSupportedMainFile(derivates.getFirst().toString());
         }

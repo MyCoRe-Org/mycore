@@ -25,6 +25,7 @@ import java.util.Map;
 import org.jdom2.Element;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.common.MCRLinkTableManager;
+import org.mycore.datamodel.common.MCRLinkType;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -122,7 +123,7 @@ public class MCRDerivateLinkServlet extends MCRServlet {
      * @return a new jdom element
      */
     private Element getMyCoReObjectElement(MCRObjectID objectId) {
-        Collection<String> derivates = MCRLinkTableManager.getInstance().getDestinationOf(objectId, "derivate");
+        Collection<String> derivates = MCRLinkTableManager.getInstance().getSourceOf(objectId, MCRLinkType.DERIVATE);
         if (derivates.isEmpty()) {
             return null;
         }

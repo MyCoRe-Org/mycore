@@ -23,8 +23,6 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 import static org.mycore.access.MCRAccessManager.PERMISSION_VIEW;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
-import java.util.concurrent.TimeUnit;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.strategies.MCRAccessCheckStrategy;
@@ -94,7 +92,7 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
             if (checkObjectPermission(objectId, permission)) {
                 return true;
             }
-            final MCRObjectID parentObjectId = MCRMetadataManager.getObjectId(objectId, 10, TimeUnit.MINUTES);
+            final MCRObjectID parentObjectId = MCRMetadataManager.getObjectId(objectId);
             if (parentObjectId != null) {
                 return checkObjectPermission(parentObjectId, permission);
             }
