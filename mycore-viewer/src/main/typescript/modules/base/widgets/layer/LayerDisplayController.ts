@@ -147,19 +147,6 @@ export class LayerDisplayController {
           this._layerIdCallbackMap.has(layerId) &&
           this._layerIdCallbackMap.get(layerId) == onResolve) {
 
-          /* TODO: FIX POPUP HACK
-          content.find(".popupTrigger").each(function(i, popupTrigger) {
-            const popup = (jQuery as any)(popupTrigger);
-            popup.attr("data-placement", "bottom");
-            popup.popover({
-              html: true,
-              content: () => {
-                return popup.find(".popupBox").html();
-              }
-            });
-          });
-          */
-
           this.getLayerView(currentDisplayedLayer.getId()).append(content);
           this._layerIdCallbackMap.remove(layerId); // remove this callback
         }
