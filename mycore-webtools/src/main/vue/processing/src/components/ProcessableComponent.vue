@@ -43,12 +43,12 @@ function showModal() {
 <template>
   <!-- row -->
   <tr >
-    <td class="col col-name">
+    <td class="col-name">
       <a href="#" @click.prevent="showModal">(P)</a> {{ model.name }}
     </td>
-    <td class="col col-user">{{ model.user }}</td>
-    <td class="col col-create">{{ Util.formatDate(model.createTime) }}</td>
-    <td class="col col-progress">
+    <td class="col-user">{{ model.user }}</td>
+    <td class="col-create">{{ Util.formatDate(model.createTime) }}</td>
+    <td class="col-progress">
       <!-- If progress is undefined -->
       <div v-if="model.progress === undefined">{{ model.status }}</div>
       <!-- Default case -->
