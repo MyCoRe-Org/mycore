@@ -172,14 +172,13 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
     }
 
     private int getImageType(MCRIIIFImageQuality imageQuality, String format) {
-        final int imageType = switch (imageQuality) {
+        return switch (imageQuality) {
             case BITONAL -> BufferedImage.TYPE_BYTE_BINARY;
             case GRAY -> BufferedImage.TYPE_BYTE_GRAY;
             //color is also default case
             default -> transparentFormats.contains(format) ? BufferedImage.TYPE_4BYTE_ABGR
                 : BufferedImage.TYPE_3BYTE_BGR;
         };
-        return imageType;
     }
 
     private static MCRIIIFImageTargetSize getRotatedSize(MCRIIIFImageTargetSize targetSize,
@@ -190,14 +189,13 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         if (rotation.degrees() % 90 == 0) {
             return new MCRIIIFImageTargetSize(targetSize.height(), targetSize.width());
         }
-        double rotatationRadians = Math.toRadians(rotation.degrees());
-        double sinRotation = Math.sin(rotatationRadians);
-        double cosRotation = Math.cos(rotatationRadians);
+        double rotationRadians = Math.toRadians(rotation.degrees());
+        double sinRotation = Math.sin(rotationRadians);
+        double cosRotation = Math.cos(rotationRadians);
 
-        MCRIIIFImageTargetSize rotatedSize = new MCRIIIFImageTargetSize(
+        return new MCRIIIFImageTargetSize(
             (int) (Math.abs(targetSize.width() * cosRotation) + Math.abs(targetSize.height() * sinRotation)),
             (int) (Math.abs(targetSize.width() * sinRotation) + Math.abs(targetSize.height() * cosRotation)));
-        return rotatedSize;
     }
 
     private void checkMaximumFileSize(MCRIIIFImageTargetSize targetSize, MCRIIIFImageQuality imageQuality)
