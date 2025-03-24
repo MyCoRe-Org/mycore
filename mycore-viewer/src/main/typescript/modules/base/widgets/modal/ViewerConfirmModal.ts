@@ -33,8 +33,8 @@ export class ViewerConfirmModal extends ViewerModalWindow {
     this.modalBody.appendChild(p);
 
 
-    for (let i = 0; i < this.modalFooter.children.length; i++) {
-        this.modalFooter.children[i].remove();
+    while (this.modalFooter.children.length > 0) {
+      this.modalFooter.children[0].remove();
     }
 
     this.createButton(true, callback);
