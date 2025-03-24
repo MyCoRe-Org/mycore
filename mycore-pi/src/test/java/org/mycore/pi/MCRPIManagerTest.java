@@ -163,17 +163,6 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
         return mcrUuidUrnGenerator.generate(mcrObject, "");
     }
 
-    @Before
-    public void resetManagerInstance() {
-        try {
-            Field instance = MCRPIManager.class.getDeclaredField("instance");
-            instance.setAccessible(true);
-            instance.set(null, null);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-    }
-
     @Override
     protected Map<String, String> getTestProperties() {
         Map<String, String> configuration = super.getTestProperties();
