@@ -78,7 +78,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
     protected static final String LINKED_UPDATED_TRIGGER_UPDATE = "LinkedUpdatedTriggerUpdate";
 
-    protected static final String DEFAULT_PROPERTY_PREFIX = "MCR.PI.Service.Default.";
+    protected static final String DEFAULT_PROPERTY_PREFIX = "MCR.PI.Default.Service.";
 
     public static final String PI_FLAG = "MyCoRe-PI";
 
