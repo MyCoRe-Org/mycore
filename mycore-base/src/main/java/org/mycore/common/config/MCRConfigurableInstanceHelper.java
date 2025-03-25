@@ -37,8 +37,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -52,6 +52,7 @@ import org.mycore.common.config.annotation.MCRInstanceList;
 import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRRawProperties;
 import org.mycore.common.config.annotation.MCRSentinel;
 
 import jakarta.inject.Singleton;
@@ -274,15 +275,12 @@ class MCRConfigurableInstanceHelper {
      *     Source implementations exist for all supported annotations:
      *     <ol>
      *       <li>{@link MCRProperty}</li>
+     *       <li>{@link MCRRawProperties}</li>
      *       <li>{@link MCRInstance}</li>
      *       <li>{@link MCRInstanceMap}</li>
      *       <li>{@link MCRInstanceList}</li>
      *       <li>{@link MCRPostConstruction}</li>
      *     </ol>
-     *     Since {@link MCRProperty} produces (based on the value of {@link MCRProperty#name()}) different kinds
-     *     of values ({@link String} or {@link Map}), two different source implementations ({@link PropertySource},
-     *     {@link AllPropertiesSource}) exists for that annotation.
-     *     <br/>
      *     Targets are:
      *     <ul>
      *       <li>public fields,</li>
@@ -292,12 +290,12 @@ class MCRConfigurableInstanceHelper {
      *     The list of injectors is created by
      *     <ol>
      *       <li>
-     *         examining all possible fields and methods
-     *         (as {@link Injectable}, in {@link ClassInfo#findInjectors(Class)}),
+     *         examining all possible fields and methods, generalized as {@link Injectable},
+     *         (done in {@link ClassInfo#findInjectors(Class)}),
      *       </li>
      *       <li>
-     *         checking, if such a target is annotated with a supported annotation
-     *         (using {@link AnnotationMapper#injectableToSource(Injectable)}),
+     *         checking, if such an injectable is annotated with a supported annotation
+     *         (done in {@link AnnotationMapper#injectableToSource(Injectable)}),
      *       </li>
      *       <li>
      *         creating a corresponding source for that annotation
@@ -315,8 +313,9 @@ class MCRConfigurableInstanceHelper {
      *     {@link InstanceSource} are not assignment-compatible with {@link String}) (as far as type erasure allows it
      *     to determine this preemptively).
      *     <br/>
-     *     The list is ordered by the type of target (fields first), the source annotation (see list above)
-     *     and lastly the order attribute of the source annotations (i.e. {@link MCRProperty#order()}).
+     *     The list is ordered by the type of target (all fields first, then all methods), the type of source annotation
+     *     (first everything other than {@link MCRPostConstruction}, then {@link MCRPostConstruction}) and lastly the
+     *     order attribute of the source annotations, if available (for example {@link MCRProperty#order()}).
      *   </li>
      * </ul>
      * <p>
@@ -718,9 +717,17 @@ class MCRConfigurableInstanceHelper {
 
     }
 
+    private enum SourceGroup {
+
+        VALUE_INJECTION,
+
+        POST_CONSTRUCTION;
+
+    }
+
     private enum SourceType {
 
-        PROPERTY(0, new AnnotationMapper<MCRProperty>() {
+        PROPERTY(SourceGroup.VALUE_INJECTION, new AnnotationMapper<MCRProperty>() {
 
             @Override
             public Class<MCRProperty> annotationClass() {
@@ -731,8 +738,10 @@ class MCRConfigurableInstanceHelper {
             public Source<MCRProperty, ?> annotationToSource(MCRProperty annotation) {
                 String annotationName = annotation.name();
                 if (annotationName.equals("*")) {
+                    warnAboutDeprecatedNamePattern(annotationName);
                     return new AllPropertiesSource(annotation, "");
                 } else if (annotationName.endsWith(".*")) {
+                    warnAboutDeprecatedNamePattern(annotationName);
                     return new AllPropertiesSource(annotation, annotationName
                         .substring(0, annotationName.length() - 1));
                 } else {
@@ -740,9 +749,29 @@ class MCRConfigurableInstanceHelper {
                 }
             }
 
+            private void warnAboutDeprecatedNamePattern(String annotationName) {
+                LOGGER.warn("Injection property map with @MCRProperty amd name pattern {}."
+                    + " You should migrate to @MCRRawProperties, as this feature will be removed"
+                    + " in a future release of MyCoRe.", annotationName);
+            }
+
         }),
 
-        INSTANCE(0, new AnnotationMapper<MCRInstance>() {
+        RAW_PROPERTIES(SourceGroup.VALUE_INJECTION, new AnnotationMapper<MCRRawProperties>() {
+
+            @Override
+            public Class<MCRRawProperties> annotationClass() {
+                return MCRRawProperties.class;
+            }
+
+            @Override
+            public Source<MCRRawProperties, ?> annotationToSource(MCRRawProperties annotation) {
+              return new RawPropertiesSource(annotation);
+            }
+
+        }),
+
+        INSTANCE(SourceGroup.VALUE_INJECTION, new AnnotationMapper<MCRInstance>() {
 
             @Override
             public Class<MCRInstance> annotationClass() {
@@ -756,7 +785,7 @@ class MCRConfigurableInstanceHelper {
 
         }),
 
-        INSTANCE_MAP(0, new AnnotationMapper<MCRInstanceMap>() {
+        INSTANCE_MAP(SourceGroup.VALUE_INJECTION, new AnnotationMapper<MCRInstanceMap>() {
 
             @Override
             public Class<MCRInstanceMap> annotationClass() {
@@ -770,7 +799,7 @@ class MCRConfigurableInstanceHelper {
 
         }),
 
-        INSTANCE_LIST(0, new AnnotationMapper<MCRInstanceList>() {
+        INSTANCE_LIST(SourceGroup.VALUE_INJECTION, new AnnotationMapper<MCRInstanceList>() {
 
             @Override
             public Class<MCRInstanceList> annotationClass() {
@@ -784,7 +813,7 @@ class MCRConfigurableInstanceHelper {
 
         }),
 
-        POST_CONSTRUCTION(1, new AnnotationMapper<MCRPostConstruction>() {
+        POST_CONSTRUCTION(SourceGroup.POST_CONSTRUCTION, new AnnotationMapper<MCRPostConstruction>() {
 
             @Override
             public Class<MCRPostConstruction> annotationClass() {
@@ -802,8 +831,8 @@ class MCRConfigurableInstanceHelper {
 
         public final AnnotationMapper<? extends Annotation> mapper;
 
-        SourceType(int order, AnnotationMapper<? extends Annotation> mapper) {
-            this.order = order;
+        SourceType(SourceGroup group, AnnotationMapper<? extends Annotation> mapper) {
+            this.order = group.ordinal();
             this.mapper = mapper;
         }
 
@@ -966,6 +995,79 @@ class MCRConfigurableInstanceHelper {
                     filteredProperties.put(key.substring(prefix.length()), value);
                 }
             });
+
+            return filteredProperties;
+
+        }
+
+    }
+
+    private static final class RawPropertiesSource extends Source<MCRRawProperties, Map<String, String>> {
+
+        private final MCRRawProperties annotation;
+
+        private final String prefix;
+
+        private RawPropertiesSource(MCRRawProperties annotation) {
+            this.annotation = annotation;
+            String namePattern = annotation.namePattern();
+            if (namePattern.equals("*")) {
+                this.prefix = "";
+            } else if (namePattern.endsWith(".*")) {
+                this.prefix = namePattern.substring(0, namePattern.length() - 1);
+            } else {
+                throw new MCRConfigurationException("Unsupported name pattern:" + annotation.namePattern());
+            }
+        }
+
+        @Override
+        public SourceType type() {
+            return SourceType.RAW_PROPERTIES;
+        }
+
+        @Override
+        public Class<MCRRawProperties> annotationClass() {
+            return MCRRawProperties.class;
+        }
+
+        @Override
+        public MCRRawProperties annotation() {
+            return annotation;
+        }
+
+        @Override
+        public int order() {
+            return annotation.order();
+        }
+
+        @Override
+        public Set<TargetType> allowedTargetTypes() {
+            return EnumSet.allOf(TargetType.class);
+        }
+
+        @Override
+        public Class<?> valueClass() {
+            return Map.class;
+        }
+
+        @Override
+        public Map<String, String> get(MCRInstanceConfiguration configuration, Target<?> target) {
+
+            Map<String, String> properties = annotation.absolute() ?
+                configuration.fullProperties() : configuration.properties();
+
+            Map<String, String> filteredProperties = new HashMap<>();
+            properties.forEach((key, value) -> {
+                if (key.startsWith(prefix)) {
+                    filteredProperties.put(key.substring(prefix.length()), value);
+                }
+            });
+
+            if (filteredProperties.isEmpty() && annotation.required()) {
+                throw new MCRConfigurationException("The required property "
+                    + configuration.name().canonical() + "."
+                    + annotation.namePattern() + " has no values");
+            }
 
             return filteredProperties;
 
@@ -1291,9 +1393,9 @@ class MCRConfigurableInstanceHelper {
     private static final class Injector<T, A extends Annotation> implements Comparable<Injector<?, ?>> {
 
         private static final Comparator<Injector<?, ?>> COMPARATOR = Comparator
-            .comparing((Function<Injector<?, ?>, Integer>) injector -> injector.target.type().order)
-            .thenComparing(injector -> injector.source.type().order)
-            .thenComparing(injector -> injector.source.order());
+            .comparingInt((ToIntFunction<Injector<?, ?>>) injector -> injector.target.type().order)
+            .thenComparingInt(injector -> injector.source.type().order)
+            .thenComparingInt(injector -> injector.source.order());
 
         private final Target<T> target;
 
