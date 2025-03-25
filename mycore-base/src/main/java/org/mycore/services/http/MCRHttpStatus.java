@@ -489,24 +489,42 @@ public enum MCRHttpStatus {
     public String toString() {
         return this.value + " " + name();
     }
+    
+    /**
+     * @deprecated Use {@link #fromStatusCode(int)} instead
+     */
+    @Deprecated
+    public static MCRHttpStatus valueOf(int statusCode) {
+        return fromStatusCode(statusCode);
+    }
 
     /**
      * Return the {@code MCRHttpStatus} enum constant with the specified numeric value.
+     *
      * @param statusCode the numeric value of the enum to be returned
      * @return the enum constant with the specified numeric value
      * @throws IllegalArgumentException if this enum has no constant for the specified numeric value
      */
-    public static MCRHttpStatus valueOf(int statusCode) {
-        return resolve(statusCode)
+    public static MCRHttpStatus fromStatusCode(int statusCode) {
+        return resolveStatusCode(statusCode)
             .orElseThrow(() -> new IllegalArgumentException("No matching constant for [" + statusCode + "]"));
     }
 
     /**
+     * @deprecated Use {@link #resolveStatusCode(int)} instead
+     */
+    @Deprecated
+    public static Optional<MCRHttpStatus> resolve(int statusCode) {
+        return resolveStatusCode(statusCode);
+    }
+
+    /**
      * Resolve the given status code to an {@code MCRHttpStatus}, if possible.
+     *
      * @param statusCode the HTTP status code (potentially non-standard)
      * @return the corresponding {@code MCRHttpStatus}, or {@code Optional.empty()} if not found
      */
-    public static Optional<MCRHttpStatus> resolve(int statusCode) {
+    public static Optional<MCRHttpStatus> resolveStatusCode(int statusCode) {
         // Use cached VALUES instead of values() to prevent array allocation.
         for (MCRHttpStatus status : VALUES) {
             if (status.value == statusCode) {
@@ -542,33 +560,49 @@ public enum MCRHttpStatus {
         }
 
         /**
+         * @deprecated Use {@link #fromStatusCode(int)} instead
+         */
+        @Deprecated
+        public static Series valueOf(int statusCode) {
+            return fromStatusCode(statusCode);
+        }
+
+        /**
          * Return the {@code Series} enum constant for the supplied status code.
+         *
          * @param statusCode the HTTP status code (potentially non-standard)
          * @return the {@code Series} enum constant for the supplied status code
          * @throws IllegalArgumentException if this enum has no corresponding constant
          */
-        public static Series valueOf(int statusCode) {
-            Series series = resolve(statusCode);
-            if (series == null) {
-                throw new IllegalArgumentException("No matching constant for [" + statusCode + "]");
-            }
-            return series;
+        public static Series fromStatusCode(int statusCode) {
+            return resolveStatusCode(statusCode)
+                .orElseThrow(() -> new IllegalArgumentException("No matching constant for [" + statusCode + "]"));
+        }
+
+        /**
+         * @deprecated Use {@link #resolveStatusCode(int)} instead
+         */
+        @Deprecated
+        public static Series resolve(int statusCode) {
+            return resolveStatusCode(statusCode).orElse(null);
         }
 
         /**
          * Resolve the given status code to an {@code MCRHttpStatus.Series}, if possible.
+         *
          * @param statusCode the HTTP status code (potentially non-standard)
          * @return the corresponding {@code Series}, or {@code null} if not found
          */
-        public static Series resolve(int statusCode) {
+        public static Optional<Series> resolveStatusCode(int statusCode) {
             int seriesCode = statusCode / 100;
             for (Series series : values()) {
                 if (series.value == seriesCode) {
-                    return series;
+                    return Optional.of(series);
                 }
             }
-            return null;
+            return Optional.empty();
         }
+
     }
 
 }

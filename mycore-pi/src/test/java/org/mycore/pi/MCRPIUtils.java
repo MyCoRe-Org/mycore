@@ -87,6 +87,6 @@ public class MCRPIUtils {
     }
 
     public static MCRURNJsonBundle getBundle(MCRPIRegistrationInfo urnInfo) {
-        return MCRURNJsonBundle.instance(urnInfo, getUrl(urnInfo));
+        return new MCRURNJsonBundle(urnInfo, getUrl(urnInfo));
     }
 }

@@ -51,6 +51,7 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlRootElement(name = "category")
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonPropertyOrder({ "ID", "url", "labels", "categories" })
+@SuppressWarnings("PMD.SingleMethodSingleton")
 public class MCRClassCategory {
 
     @XmlElement(required = true)
@@ -97,26 +98,37 @@ public class MCRClassCategory {
         this.id = value;
     }
 
+    /**
+     * @deprecated Use {@link #ofCategory(MCRCategory)} instead
+     */
+    @Deprecated
     public static MCRClassCategory getInstance(MCRCategory from) {
+        return ofCategory(from);
+    }
+
+    public static MCRClassCategory ofCategory(MCRCategory from) {
         MCRClassCategory categ = new MCRClassCategory();
         MCRCategoryID categoryID = from.getId();
         categ.setID(categoryID.isRootID() ? categoryID.getRootID() : categoryID.getId());
-        categ.setUrl(MCRClassURL.getInstance(from.getURI()));
-        categ.getCategory()
-            .addAll(getInstance(from.getChildren()));
-        categ.getLabel()
-            .addAll(
-                from.getLabels()
-                    .stream()
-                    .map(MCRLabel::clone)
-                    .collect(Collectors.toList()));
+        categ.setUrl(MCRClassURL.ofUri(from.getURI()));
+        categ.getCategory().addAll(
+            from.getChildren()
+                .stream()
+                .map(MCRClassCategory::ofCategory)
+                .toList());
+        categ.getLabel().addAll(
+            from.getLabels()
+                .stream()
+                .map(MCRLabel::clone)
+                .toList());
         return categ;
     }
 
+    @Deprecated
     public static List<MCRClassCategory> getInstance(List<MCRCategory> children) {
         return children
             .stream()
-            .map(MCRClassCategory::getInstance)
+            .map(MCRClassCategory::ofCategory)
             .collect(Collectors.toList());
     }
 

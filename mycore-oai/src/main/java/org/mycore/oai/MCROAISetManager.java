@@ -120,7 +120,7 @@ public class MCROAISetManager {
     }
 
     private Runnable getUpdateRunnable() {
-        return new MCRFixedUserRunnable(this::updateCachedSetList, MCRSystemUserInformation.getSystemUserInstance());
+        return new MCRFixedUserRunnable(this::updateCachedSetList, MCRSystemUserInformation.SYSTEM_USER);
     }
 
     private void updateCachedSetList() {
@@ -172,7 +172,7 @@ public class MCROAISetManager {
         }
         // cache
         // check if classification changed
-        long lastModified = MCRCategoryDAOFactory.getInstance().getLastModified();
+        long lastModified = MCRCategoryDAOFactory.obtainInstance().getLastModified();
         if (lastModified != this.classLastModified) {
             this.classLastModified = lastModified;
             synchronized (this.cachedSetList) {
@@ -206,7 +206,7 @@ public class MCROAISetManager {
                 Map<String, MCRSet> setMap = handler.getSetMap();
                 synchronized (setMap) {
                     setMap.clear();
-                    Element resolved = MCRURIResolver.instance().resolve(conf.getURI());
+                    Element resolved = MCRURIResolver.obtainInstance().resolve(conf.getURI());
                     if (resolved == null) {
                         throw new MCRException(
                             "Could not resolve set URI " + conf.getURI() + " for set " + conf.getId() + ".");
@@ -234,7 +234,7 @@ public class MCROAISetManager {
                 .stream() //all setDescription
                 .flatMap(e -> e.getChildren().stream().limit(1)) //first childElement of setDescription
                 .peek(Element::detach)
-                .map(d -> (Description) new Description() {
+                .map(d -> new Description() {
                     @Override
                     public Element toXML() {
                         return d;

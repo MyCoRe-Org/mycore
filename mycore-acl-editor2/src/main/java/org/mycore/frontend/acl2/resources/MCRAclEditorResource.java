@@ -64,9 +64,9 @@ import jakarta.ws.rs.core.Response.Status;
 @Path("ACLE")
 public class MCRAclEditorResource {
 
-    private static final MCRRuleStore RULE_STORE = MCRRuleStore.getInstance();
+    private static final MCRRuleStore RULE_STORE = MCRRuleStore.obtainInstance();
 
-    private static final MCRAccessStore ACCESS_STORE = MCRAccessStore.getInstance();
+    private static final MCRAccessStore ACCESS_STORE = MCRAccessStore.obtainInstance();
 
     private static final String JSON_ACCESSID = "accessID";
 

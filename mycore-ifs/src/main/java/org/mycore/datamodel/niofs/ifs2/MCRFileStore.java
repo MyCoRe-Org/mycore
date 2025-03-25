@@ -42,6 +42,7 @@ import com.google.common.cache.LoadingCache;
 /**
  * IFS2 MyCoRe FileStore implementation
  */
+@SuppressWarnings("PMD.SingleMethodSingleton")
 public final class MCRFileStore extends MCRAbstractFileStore {
 
     private final MCRStore contentStore;
@@ -79,16 +80,32 @@ public final class MCRFileStore extends MCRAbstractFileStore {
         return Files.exists(baseDir) ? Files.getFileStore(baseDir) : getFileStore(baseDir.getParent());
     }
 
+    /**
+     * @deprecated Use {@link #obtainInstance(String)} instead
+     */
+    @Deprecated
     static MCRFileStore getInstance(String storeId) throws IOException {
+        return obtainInstance(storeId);
+    }
+
+    static MCRFileStore obtainInstance(String storeId) throws IOException {
         try {
             return INSTANCE_HOLDER.get(storeId);
-        } catch (ExecutionException ignoredIfCauseIOE) {
-            Throwable cause = ignoredIfCauseIOE.getCause();
+        } catch (ExecutionException ignoredIfCauseIsIOException) {
+            Throwable cause = ignoredIfCauseIsIOException.getCause();
             if (cause instanceof IOException ioe) {
                 throw ioe;
             }
-            throw new IOException("Error while geting instance of " + MCRFileStore.class.getSimpleName(), cause);
+            throw new IOException("Error while getting instance of " + MCRFileStore.class.getSimpleName(), cause);
         }
+    }
+
+    /**
+     * @deprecated Use {@link #obtainInstance(MCRStoredNode)} instead
+     */
+    @Deprecated
+    public static MCRFileStore getInstance(MCRStoredNode node) throws IOException {
+        return obtainInstance(node);
     }
 
     /**
@@ -97,8 +114,8 @@ public final class MCRFileStore extends MCRAbstractFileStore {
      * @return the MCRFileStore instance
      * @throws IOException if the MCRFileStore could not be created
      */
-    public static MCRFileStore getInstance(MCRStoredNode node) throws IOException {
-        return getInstance(node.getRoot().getStore().getID());
+    public static MCRFileStore obtainInstance(MCRStoredNode node) throws IOException {
+        return obtainInstance(node.getRoot().getStore().getID());
     }
 
     @Override

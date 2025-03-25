@@ -73,7 +73,7 @@ public class MCRSolrResourceConfigSetProvider extends MCRSolrConfigSetProvider {
                 try (ZipOutputStream outputStream = new ZipOutputStream(baos)) {
                     List<String> files = MCRConfiguration2.splitValue(this.getFilesString()).toList();
                     for (String file : files) {
-                        Optional<URL> resolve = MCRResourceResolver.instance()
+                        Optional<URL> resolve = MCRResourceResolver.obtainInstance()
                             .resolve(MCRResourcePath.ofPath(base + file));
                         if (resolve.isEmpty()) {
                             throw new MCRException("File not found: " + base + file);

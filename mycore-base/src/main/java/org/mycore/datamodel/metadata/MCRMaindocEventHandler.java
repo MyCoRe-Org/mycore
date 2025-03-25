@@ -46,7 +46,7 @@ public class MCRMaindocEventHandler extends MCREventHandlerBase {
         if (attrs != null && attrs.isDirectory()) {
             return;
         }
-        MCRObjectID derivateID = MCRObjectID.getInstance(MCRPath.toMCRPath(path).getOwner());
+        MCRObjectID derivateID = MCRObjectID.getInstance(MCRPath.ofPath(path).getOwner());
         if (!MCRMetadataManager.exists(derivateID)) {
             LOGGER.warn("Derivate {} from file '{}' does not exist.", derivateID, path);
             return;

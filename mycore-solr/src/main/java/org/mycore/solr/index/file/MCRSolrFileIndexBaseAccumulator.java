@@ -51,9 +51,9 @@ public class MCRSolrFileIndexBaseAccumulator implements MCRSolrFileIndexAccumula
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRXMLMetadataManager XML_MANAGER = MCRXMLMetadataManager.instance();
+    private static final MCRXMLMetadataManager XML_MANAGER = MCRXMLMetadataManager.getInstance();
 
-    private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.getInstance();
+    private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.obtainInstance();
 
     private static final MCRCache<String, String> DERIVATE_MODIFIED_CACHE
         = new MCRCache<>(10_000, "derivateID ISODateString cache");
@@ -63,7 +63,7 @@ public class MCRSolrFileIndexBaseAccumulator implements MCRSolrFileIndexAccumula
         doc.setField("id", input.toUri().toString());
         String absolutePath = '/' + input.subpath(0, input.getNameCount()).toString();
         try {
-            MCRPath mcrPath = MCRPath.toMCRPath(input); //check if this is an MCRPath -> more metadata
+            MCRPath mcrPath = MCRPath.ofPath(input); //check if this is an MCRPath -> more metadata
             MCRObjectID mcrObjID = MCRMetadataManager.getObjectId(MCRObjectID.getInstance(mcrPath.getOwner()), 10,
                 TimeUnit.SECONDS);
             if (mcrObjID == null) {
@@ -76,7 +76,7 @@ public class MCRSolrFileIndexBaseAccumulator implements MCRSolrFileIndexAccumula
             String ownerID = mcrPath.getOwner();
             doc.setField("derivateID", ownerID);
             doc.setField("derivateModified", getDerivateModified(ownerID));
-            Collection<MCRCategoryID> linksFromReference = MCRCategLinkServiceFactory.getInstance()
+            Collection<MCRCategoryID> linksFromReference = MCRCategLinkServiceFactory.obtainInstance()
                 .getLinksFromReference(new MCRCategLinkReference(mcrPath));
             Set<MCRCategoryID> linkedCategories = new HashSet<>(linksFromReference);
             for (MCRCategoryID category : linksFromReference) {

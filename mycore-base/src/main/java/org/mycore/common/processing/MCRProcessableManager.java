@@ -16,33 +16,31 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.datamodel.classifications2;
+package org.mycore.common.processing;
 
 import org.mycore.common.config.MCRConfiguration2;
 
 /**
- * @author Thomas Scheffler (yagee)
- * 
- * @since 2.0
+ * Manager for {@link MCRProcessable} and {@link MCRProcessableCollection} that manages a shared
+ * {@link MCRProcessableRegistry}.
  */
-public class MCRCategLinkServiceFactory {
+public final class MCRProcessableManager {
 
-    private static final MCRCategLinkService SHARED_INSTANCE = MCRConfiguration2.getInstanceOfOrThrow(
-        MCRCategLinkService.class, "MCR.Category.LinkService");
+    private static final MCRProcessableManager SINGLETON_INSTANCE = new MCRProcessableManager();
 
-    /**
-     * @deprecated use {@link #obtainInstance()} instead
-     */
-    @Deprecated
-    public static MCRCategLinkService getInstance() {
-        return obtainInstance();
+    private final MCRProcessableRegistry registry;
+
+    private MCRProcessableManager() {
+        registry = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRProcessableRegistry.class, "MCR.Processable.Registry.Class");
+    }
+    
+    public static MCRProcessableManager getInstance() {
+        return SINGLETON_INSTANCE;
     }
 
-    /**
-     * Returns an instance of a MCRCategoryDAO implementator.
-     */
-    public static MCRCategLinkService obtainInstance() {
-        return SHARED_INSTANCE;
+    public MCRProcessableRegistry getRegistry() {
+        return registry;
     }
 
 }

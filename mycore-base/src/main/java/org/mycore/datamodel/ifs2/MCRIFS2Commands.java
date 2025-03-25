@@ -59,7 +59,7 @@ public class MCRIFS2Commands extends MCRAbstractCommands {
         help = "Lists all currently configured IFS2 MCRStore instances")
     public static void listAllStores() throws IOException {
         initStores();
-        final Stream<MCRStore> stores = MCRStoreCenter.instance().getCurrentStores(MCRStore.class);
+        final Stream<MCRStore> stores = MCRStoreCenter.getInstance().getCurrentStores(MCRStore.class);
         stores.map(MCRIFS2Commands::toString)
             .forEach(LOGGER::info);
     }
@@ -68,7 +68,7 @@ public class MCRIFS2Commands extends MCRAbstractCommands {
         help = "Lists all currently configured IFS2 MCRFileStore instances")
     public static void listAllFileStores() {
         initFileStores();
-        final Stream<MCRFileStore> stores = MCRStoreCenter.instance().getCurrentStores(MCRFileStore.class);
+        final Stream<MCRFileStore> stores = MCRStoreCenter.getInstance().getCurrentStores(MCRFileStore.class);
         stores.map(MCRIFS2Commands::toString)
             .forEach(LOGGER::info);
     }
@@ -87,7 +87,7 @@ public class MCRIFS2Commands extends MCRAbstractCommands {
     }
 
     private static void initMetadataStores() {
-        final MCRXMLMetadataManager metadataManager = MCRXMLMetadataManager.instance();
+        final MCRXMLMetadataManager metadataManager = MCRXMLMetadataManager.getInstance();
         metadataManager.getObjectBaseIds().forEach(id -> {
             final String[] parts = id.split("_");
             metadataManager.getHighestStoredID(parts[0], parts[1]);
@@ -117,7 +117,7 @@ public class MCRIFS2Commands extends MCRAbstractCommands {
             throw new NotDirectoryException(targetPath.toString());
         }
         initFileStores();
-        return MCRStoreCenter.instance().getCurrentStores(MCRFileStore.class)
+        return MCRStoreCenter.getInstance().getCurrentStores(MCRFileStore.class)
             .sorted(Comparator.comparing(MCRStore::getID))
             .map(s -> "generate md5sum file " + targetPath.resolve(s.getID() + ".md5") + " for ifs2 file store "
                 + s.getID())
@@ -128,7 +128,7 @@ public class MCRIFS2Commands extends MCRAbstractCommands {
         help = "writes md5sum file {0} for every file in MCRFileStore with ID {1}")
     public static void writeMD5SumFile(String targetFile, String ifsStoreId) throws IOException {
         initFileStores();
-        final MCRStore store = MCRStoreCenter.instance().getStore(ifsStoreId);
+        final MCRStore store = MCRStoreCenter.getInstance().getStore(ifsStoreId);
         if (!(store instanceof MCRFileStore)) {
             throw new MCRException("Store " + ifsStoreId + " is not found or is not a file store.");
         }
@@ -193,7 +193,7 @@ public class MCRIFS2Commands extends MCRAbstractCommands {
         help = "checks versioning metadata store {0} for errors")
     public static void verifyVersioningMetadataStore(String storeId) {
         initMetadataStores();
-        MCRVersioningMetadataStore store = MCRStoreCenter.instance().getStore(storeId);
+        MCRVersioningMetadataStore store = MCRStoreCenter.getInstance().getStore(storeId);
         if (store == null) {
             throw new MCRException("MCRVersioningMetadataStore with id " + storeId + " was not found.");
         }
@@ -204,7 +204,7 @@ public class MCRIFS2Commands extends MCRAbstractCommands {
         help = "checks all versioning metadata stores for errors")
     public static List<String> verifyVersioningMetadataStores() {
         initMetadataStores();
-        return MCRStoreCenter.instance().getCurrentStores(MCRVersioningMetadataStore.class)
+        return MCRStoreCenter.getInstance().getCurrentStores(MCRVersioningMetadataStore.class)
             .map(s -> "verify versioning metadata store " + s.getID())
             .collect(Collectors.toList());
     }
@@ -213,7 +213,7 @@ public class MCRIFS2Commands extends MCRAbstractCommands {
         help = "repairs checksums in file collection {0} of ifs2 file store {1}")
     public static void repairMetaXML(int fileCollection, String storeId) throws IOException {
         initFileStores();
-        MCRFileStore store = MCRStoreCenter.instance().getStore(storeId);
+        MCRFileStore store = MCRStoreCenter.getInstance().getStore(storeId);
         if (store == null) {
             throw new MCRException("MCRFileStore with id " + storeId + " was not found.");
         }

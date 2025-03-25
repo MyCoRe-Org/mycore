@@ -28,7 +28,7 @@ public class MCRURIResolverFlavorTest extends MCRTestCase {
     @Test
     public void testSaxonFlavor() {
 
-        Element resolved = MCRURIResolver.instance().resolve("xslStyle:reflection#xslt:buildxml:_rootName_=test");
+        Element resolved = MCRURIResolver.obtainInstance().resolve("xslStyle:reflection#xslt:buildxml:_rootName_=test");
         assert resolved != null;
 
         String id = resolved.getAttributeValue("id");
@@ -46,7 +46,7 @@ public class MCRURIResolverFlavorTest extends MCRTestCase {
     @Test
     public void testXalanFlavor() {
 
-        Element resolved = MCRURIResolver.instance().resolve("xslStyle:reflection#xsl:buildxml:_rootName_=test");
+        Element resolved = MCRURIResolver.obtainInstance().resolve("xslStyle:reflection#xsl:buildxml:_rootName_=test");
         assert resolved != null;
 
         String id = resolved.getAttributeValue("id");

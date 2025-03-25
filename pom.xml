@@ -88,7 +88,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <oaipmh.version>3.0</oaipmh.version>
     <ocfl-java.version>2.2.1</ocfl-java.version>
     <pmd.failOnViolation>true</pmd.failOnViolation>
-    <pmd.version>7.7.0</pmd.version>
+    <pmd.version>7.11.0</pmd.version>
     <rdf4j.version>5.0.2</rdf4j.version>
     <selenium.version>4.25.0</selenium.version>
     <site.suffix />
@@ -132,7 +132,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
                 <goal>yarn</goal>
               </goals>
               <phase>generate-resources</phase>
-              <configuration combine.children="override">
+              <configuration combine.children="append">
                 <arguments>install ${yarn.install.args}</arguments>
               </configuration>
             </execution>

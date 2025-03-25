@@ -64,7 +64,7 @@ public class MCRHttpUtils {
 
     // Utility method to map status codes to reason phrases
     public static Optional<String> getReasonPhrase(int statusCode) {
-        return MCRHttpStatus.resolve(statusCode).map(MCRHttpStatus::getReasonPhrase);
+        return MCRHttpStatus.resolveStatusCode(statusCode).map(MCRHttpStatus::getReasonPhrase);
     }
 
     /**

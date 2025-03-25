@@ -30,8 +30,11 @@ import jakarta.servlet.ServletContext;
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRIView2TilingThreadStarter implements MCRStartupHandler.AutoExecutable {
+public final class MCRIView2TilingThreadStarter implements MCRStartupHandler.AutoExecutable {
+
     private static final Logger LOGGER = LogManager.getLogger();
+
+    private static boolean started;
 
     @Override
     public String getName() {
@@ -45,12 +48,23 @@ public class MCRIView2TilingThreadStarter implements MCRStartupHandler.AutoExecu
 
     @Override
     public void startUp(ServletContext servletContext) {
-        if (servletContext != null && !MCRImageTiler.isRunning()) {
+        if (servletContext != null) {
+            startMasterTilingThread();
+        }
+    }
+
+    public static synchronized void startMasterTilingThread() {
+        if (!started) {
             LOGGER.info("Starting Tiling thread.");
             System.setProperty("java.awt.headless", "true");
             Thread tilingThread = new Thread(MCRImageTiler.getInstance());
             tilingThread.start();
+            started = true;
         }
+    }
+
+    public static synchronized boolean isStarted() {
+        return started;
     }
 
 }

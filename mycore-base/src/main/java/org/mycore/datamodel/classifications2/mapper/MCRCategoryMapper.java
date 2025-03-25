@@ -32,7 +32,7 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  */
 public class MCRCategoryMapper extends MCRCategoryMapperBase {
 
-    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.obtainInstance();
 
     @Override
     protected String getMappingRule(MCRCategoryID categoryID) {

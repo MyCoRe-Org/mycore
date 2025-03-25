@@ -189,7 +189,7 @@ public class MCRRestAPIUploadHelper {
     private static MCRObjectID findDerivateID(MCRObject mcrObj, String label, String classifications)
         throws MCRRestAPIException {
         MCRObjectID derID = null;
-        final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+        final MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
         final List<MCRMetaEnrichedLinkID> currentDerivates = mcrObj.getStructure().getDerivates();
         if (label != null && !label.isEmpty()) {
             derID = findDerIDByLabel(currentDerivates, label);
@@ -214,7 +214,7 @@ public class MCRRestAPIUploadHelper {
         String classifications,
         MCRCategoryDAO dao) throws MCRRestAPIException {
         final List<MCRCategoryID> categories = Stream.of(classifications.split(" "))
-            .map(MCRCategoryID::fromString)
+            .map(MCRCategoryID::ofString)
             .toList();
 
         final List<MCRCategoryID> notExisting = categories.stream()
@@ -259,18 +259,18 @@ public class MCRRestAPIUploadHelper {
         }
         MCRMetadataManager.create(mcrDerivate);
         MCRMetadataManager.addOrUpdateDerivateToObject(mcrObjIDObj,
-            MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(mcrDerivate),
+            MCRMetaEnrichedLinkIDFactory.obtainInstance().getDerivateLink(mcrDerivate),
             mcrDerivate.isImportMode());
 
         return mcrDerivate.getId();
     }
 
     private static void addClassificationsToDerivate(MCRDerivate mcrDerivate, String classifications) {
-        final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+        final MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
         final List<MCRMetaClassification> currentClassifications = mcrDerivate.getDerivate().getClassifications();
 
         Stream.of(classifications.split(" "))
-            .map(MCRCategoryID::fromString)
+            .map(MCRCategoryID::ofString)
             .filter(dao::exist)
             .map(categoryID -> new MCRMetaClassification("classification", 0, null, categoryID))
             .forEach(currentClassifications::add);
@@ -372,7 +372,7 @@ public class MCRRestAPIUploadHelper {
 
     private static void cleanUploadDirectory(java.nio.file.Path dir) throws IOException {
         if (Files.exists(dir)) {
-            Files.walkFileTree(dir, MCRRecursiveDeleter.instance());
+            Files.walkFileTree(dir, new MCRRecursiveDeleter());
         }
     }
 
@@ -446,7 +446,7 @@ public class MCRRestAPIUploadHelper {
 
             final MCRPath rootPath = MCRPath.getPath(der.getId().toString(), "/");
             try {
-                Files.walkFileTree(rootPath, MCRRecursiveDeleter.instance());
+                Files.walkFileTree(rootPath, new MCRRecursiveDeleter());
                 Files.createDirectory(rootPath);
             } catch (IOException e) {
                 LOGGER.error(e);

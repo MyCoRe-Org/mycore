@@ -39,7 +39,7 @@ import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 import org.mycore.common.processing.MCRProcessableCollection;
 import org.mycore.common.processing.MCRProcessableDefaultCollection;
-import org.mycore.common.processing.MCRProcessableRegistry;
+import org.mycore.common.processing.MCRProcessableManager;
 import org.mycore.util.concurrent.processing.MCRProcessableExecutor;
 import org.mycore.util.concurrent.processing.MCRProcessableFactory;
 
@@ -104,14 +104,12 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
         jobExecutor = new ActiveCountingThreadPoolExecutor(maxJobThreadCount, workQueue,
             new JobThreadFactory(getSimpleActionName()), activeThreads);
 
-        MCRProcessableRegistry registry = MCRProcessableRegistry.getSingleInstance();
         processableCollection = new MCRProcessableDefaultCollection(getName());
         processableCollection.setProperty("activated", activated);
         processableCollection.setProperty("maxTryCount", maxTryCount);
         processableCollection.setProperty("maxJobThreadCount", maxJobThreadCount);
         processableCollection.setProperty("timeTillReset", timeTillReset.toString());
-
-        registry.register(processableCollection);
+        MCRProcessableManager.getInstance().getRegistry().register(processableCollection);
     }
 
     /**
@@ -132,7 +130,7 @@ public class MCRJobThreadStarter implements Runnable, Closeable {
         //get this MCRSession a speaking name
         MCRSessionMgr.unlock();
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
+        mcrSession.setUserInformation(MCRSystemUserInformation.SYSTEM_USER);
 
         running = true;
         processableExecutor = MCRProcessableFactory.newPool(jobExecutor, processableCollection);

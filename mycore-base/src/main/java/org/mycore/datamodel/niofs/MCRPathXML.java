@@ -122,9 +122,9 @@ public final class MCRPathXML {
                     throw ignoredUnchecked.getCause();
                 }
                 if (childAttrs.isDirectory()) {
-                    directories.put(MCRPath.toMCRPath(child), childAttrs);
+                    directories.put(MCRPath.ofPath(child), childAttrs);
                 } else {
-                    files.put(MCRPath.toMCRPath(child), childAttrs);
+                    files.put(MCRPath.ofPath(child), childAttrs);
                 }
             }
         }
@@ -180,7 +180,7 @@ public final class MCRPathXML {
         root.setAttribute("extension", getFileExtension(fileName));
         root.setAttribute("returnId", MCRMetadataManager
             .getObjectId(MCRObjectID.getInstance(path.getOwner()), 10, TimeUnit.SECONDS).toString());
-        Collection<MCRCategoryID> linksFromReference = MCRCategLinkServiceFactory.getInstance()
+        Collection<MCRCategoryID> linksFromReference = MCRCategLinkServiceFactory.obtainInstance()
             .getLinksFromReference(new MCRCategLinkReference(path));
         for (MCRCategoryID category : linksFromReference) {
             Element catEl = new Element("category");

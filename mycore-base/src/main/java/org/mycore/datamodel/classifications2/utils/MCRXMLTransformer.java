@@ -44,7 +44,7 @@ public class MCRXMLTransformer {
         category.setRoot(category);
         final String classID = xml.getRootElement().getAttributeValue("ID");
         category.setLevel(0);
-        category.setId(MCRCategoryID.rootID(classID));
+        category.setId(new MCRCategoryID(classID));
         setURL(xml.getRootElement(), category);
         //setChildren has to be called before setParent (below) can be called without
         //database access see: org.mycore.datamodel.classifications2.impl.MCRAbstractCategoryImpl.getChildren()

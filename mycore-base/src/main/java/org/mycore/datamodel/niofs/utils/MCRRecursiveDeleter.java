@@ -29,20 +29,20 @@ import java.nio.file.attribute.BasicFileAttributes;
 /**
  * A {@link FileVisitor} to delete a directory recursivly
  * <pre>
- *   Files.walkFileTree(rootPath, MCRRecursiveDeleter.instance())
+ *   Files.walkFileTree(rootPath, new MCRRecursiveDeleter())
  * </pre>
  * @author Thomas Scheffler (yagee)
  *
  */
 public final class MCRRecursiveDeleter extends SimpleFileVisitor<Path> {
 
-    private static final MCRRecursiveDeleter INSTANCE = new MCRRecursiveDeleter();
 
-    private MCRRecursiveDeleter() {
-    }
-
+    /**
+     * @deprecated Use {@code new MCRMCRRecursiveDeleter()} instead
+     */
+    @Deprecated
     public static MCRRecursiveDeleter instance() {
-        return INSTANCE;
+        return new MCRRecursiveDeleter();
     }
 
     @Override
@@ -61,4 +61,5 @@ public final class MCRRecursiveDeleter extends SimpleFileVisitor<Path> {
         }
         return super.postVisitDirectory(dir, exc);
     }
+
 }

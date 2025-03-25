@@ -94,7 +94,7 @@ public class MCRLodClassification {
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS))
     public Response outputLODClassificationRoot() {
-        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
+        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
         Date lastModified = new Date(categoryDAO.getLastModified());
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request.getRequest(), lastModified);
         if (cachedResponse.isPresent()) {
@@ -109,7 +109,7 @@ public class MCRLodClassification {
             URI uri = request.getUriInfo().getBaseUri();
             return MCRJerseyLodApp.returnLinkedData(rdfxmlString, uri, mimeTypes);
         } catch (IOException e) {
-            throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
                 .withCause(e)
                 .withErrorCode(ERROR_MCRCLASS_TRANSFORMATION)
                 .withMessage("Could create classification list.")
@@ -128,8 +128,8 @@ public class MCRLodClassification {
     @Path("/{" + PARAM_CLASSID + "}")
     public Response getClassification(@PathParam(PARAM_CLASSID) String classId) {
         List<MediaType> mediaTypes = request.getAcceptableMediaTypes();
-        return getClassification(MCRCategoryID.rootID(classId),
-            dao -> dao.getCategory(MCRCategoryID.rootID(classId), 1), mediaTypes,
+        return getClassification(new MCRCategoryID(classId),
+            dao -> dao.getCategory(new MCRCategoryID(classId), 1), mediaTypes,
             request.getUriInfo().getBaseUri());
     }
 
@@ -165,7 +165,7 @@ public class MCRLodClassification {
 
     private Response getClassification(MCRCategoryID categId, Function<MCRCategoryDAO, MCRCategory> categorySupplier,
         List<MediaType> acceptMediaTypes, URI uri) {
-        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
+        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
         String classId = categId.getRootID();
         Date lastModified = getLastModifiedDate(classId, categoryDAO);
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request.getRequest(), lastModified);
@@ -174,7 +174,7 @@ public class MCRLodClassification {
         }
         MCRCategory classification = categorySupplier.apply(categoryDAO);
         if (classification == null) {
-            throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
                 .withErrorCode(ERROR_MCRCLASS_NOT_FOUND)
                 .withMessage("Could not find classification or category in " + classId + ".")
                 .toException();
@@ -185,7 +185,7 @@ public class MCRLodClassification {
             List<String> mimeTypes = acceptMediaTypes.parallelStream().map(MediaType::toString).toList();
             return MCRJerseyLodApp.returnLinkedData(rdfxmlString, uri, mimeTypes);
         } catch (IOException e) {
-            throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
                 .withCause(e)
                 .withErrorCode(ERROR_MCRCLASS_TRANSFORMATION)
                 .withMessage("Could not find classification or category in " + classId + ".")
@@ -195,7 +195,7 @@ public class MCRLodClassification {
 
     private Document createClassList() {
         Element eBag = new Element("Bag", MCRConstants.RDF_NAMESPACE);
-        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
+        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
         for (MCRCategory categ : categoryDAO.getRootCategories()) {
             eBag.addContent(new Element("li", MCRConstants.RDF_NAMESPACE)
                 .setAttribute("resource",

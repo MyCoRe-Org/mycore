@@ -68,7 +68,7 @@ public class MCRParentRuleStrategy implements MCRAccessCheckStrategy {
     private static String getParentID(String objectID) {
         Document parentDoc;
         try {
-            parentDoc = MCRXMLMetadataManager.instance().retrieveXML(MCRObjectID.getInstance(objectID));
+            parentDoc = MCRXMLMetadataManager.getInstance().retrieveXML(MCRObjectID.getInstance(objectID));
         } catch (IOException | JDOMException e) {
             LOGGER.error("Could not read object: {}", objectID, e);
             return null;

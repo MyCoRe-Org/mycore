@@ -168,14 +168,14 @@ public class MCROCFLCommands {
     @MCRCommand(syntax = "update ocfl classification {0}",
         help = "Update classification {0} in the OCFL Store from database")
     public static void updateOCFLClassification(String classId) {
-        final MCRCategoryID rootID = MCRCategoryID.rootID(classId);
+        final MCRCategoryID rootID = new MCRCategoryID(classId);
         MCROCFLPersistenceTransaction.addClassficationEvent(rootID, MCRAbstractMetadataVersion.UPDATED);
     }
 
     @MCRCommand(syntax = "delete ocfl classification {0}",
         help = "Delete classification {0} in the OCFL Store")
     public static void deleteOCFLClassification(String classId) {
-        final MCRCategoryID rootID = MCRCategoryID.rootID(classId);
+        final MCRCategoryID rootID = new MCRCategoryID(classId);
         MCROCFLPersistenceTransaction.addClassficationEvent(rootID, MCRAbstractMetadataVersion.DELETED);
     }
 
@@ -249,10 +249,10 @@ public class MCROCFLCommands {
         throws URISyntaxException, JDOMException, IOException, SAXException {
         MCROCFLXMLClassificationManager manager = MCRConfiguration2.getSingleInstanceOfOrThrow(
             MCROCFLXMLClassificationManager.class, "MCR.Classification.Manager");
-        MCRCategoryID cId = MCRCategoryID.fromString(classId);
+        MCRCategoryID cId = MCRCategoryID.ofString(classId);
         MCRContent content = manager.retrieveContent(cId, revision);
         MCRCategory category = MCRXMLTransformer.getCategory(content.asXML());
-        MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+        MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
         if (dao.exist(category.getId())) {
             dao.replaceCategory(category);
         } else {
@@ -276,9 +276,9 @@ public class MCROCFLCommands {
         manager.setRepositoryKey(MCRConfiguration2.getStringOrThrow("MCR.Metadata.Manager.Repository"));
         MCRContent content = manager.retrieveContent(mcrid, revision);
         try {
-            MCRXMLMetadataManager.instance().update(mcrid, content, new Date(content.lastModified()));
+            MCRXMLMetadataManager.getInstance().update(mcrid, content, new Date(content.lastModified()));
         } catch (MCRUsageException e) {
-            MCRXMLMetadataManager.instance().create(mcrid, content, new Date(content.lastModified()));
+            MCRXMLMetadataManager.getInstance().create(mcrid, content, new Date(content.lastModified()));
         }
     }
 
@@ -300,7 +300,7 @@ public class MCROCFLCommands {
     @MCRCommand(syntax = "purge classification {0} from ocfl",
         help = "Permanently delete classification {0} and its history from ocfl")
     public static void purgeClass(String mcrCgIdString) {
-        MCRCategoryID mcrCgId = MCRCategoryID.fromString(mcrCgIdString);
+        MCRCategoryID mcrCgId = MCRCategoryID.ofString(mcrCgIdString);
         if (!mcrCgId.isRootID()) {
             throw new MCRUsageException("You can only purge root classifications!");
         }
@@ -373,7 +373,7 @@ public class MCROCFLCommands {
             .filter(obj -> Objects.equals(repository.describeObject(obj).getHeadVersion().getVersionInfo().getMessage(),
                 MCROCFLXMLClassificationManager.MESSAGE_DELETED))
             .map(obj -> obj.replace(MCROCFLObjectIDPrefixHelper.CLASSIFICATION, ""))
-            .forEach(cId -> manager.purge(MCRCategoryID.fromString(cId)));
+            .forEach(cId -> manager.purge(MCRCategoryID.ofString(cId)));
         confirmPurgeMarked = false;
     }
 

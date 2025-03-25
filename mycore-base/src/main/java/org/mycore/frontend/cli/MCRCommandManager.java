@@ -48,7 +48,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 public class MCRCommandManager {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    protected static SortedMap<String, List<MCRCommand>> knownCommands = new TreeMap<>();
+    private static final SortedMap<String, List<MCRCommand>> KNOWN_COMMANDS = new TreeMap<>();
 
     public MCRCommandManager() {
         try {
@@ -67,7 +67,7 @@ public class MCRCommandManager {
     }
 
     public static SortedMap<String, List<MCRCommand>> getKnownCommands() {
-        return knownCommands;
+        return KNOWN_COMMANDS;
     }
 
     protected void initBuiltInCommands() {
@@ -127,7 +127,7 @@ public class MCRCommandManager {
 
     //fixes MCR-1594 deep in the code
     private List<MCRCommand> addCommandGroup(String groupName, List<MCRCommand> commands) {
-        return knownCommands.put(groupName, Collections.unmodifiableList(commands));
+        return KNOWN_COMMANDS.put(groupName, Collections.unmodifiableList(commands));
     }
 
     protected void addDefaultCLIClass(String className) {
@@ -151,7 +151,7 @@ public class MCRCommandManager {
             //ignore comment
             return new ArrayList<>();
         }
-        for (List<MCRCommand> commands : knownCommands.values()) {
+        for (List<MCRCommand> commands : KNOWN_COMMANDS.values()) {
             for (MCRCommand currentCommand : commands) {
                 long start = System.currentTimeMillis();
                 List<String> commandsReturned = currentCommand.invoke(command);

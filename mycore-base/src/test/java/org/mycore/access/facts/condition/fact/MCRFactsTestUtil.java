@@ -29,7 +29,7 @@ public class MCRFactsTestUtil {
 
     public static void hackObjectIntoCache(MCRObject object, MCRObjectID testId) throws NoSuchFieldException,
         IllegalAccessException {
-        MCRObjectCacheFactory instance = MCRObjectCacheFactory.instance();
+        MCRObjectCacheFactory instance = MCRObjectCacheFactory.getInstance();
         Field objectCacheField = instance.getClass().getDeclaredField("objectCache");
         objectCacheField.setAccessible(true);
         MCRCache<MCRObjectID, MCRObject> o = (MCRCache<MCRObjectID, MCRObject>) objectCacheField.get(instance);

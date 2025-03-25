@@ -101,7 +101,7 @@ public class MCRServlet extends HttpServlet {
     public void init() throws ServletException {
         super.init();
         if (layoutService == null) {
-            layoutService = MCRLayoutService.instance();
+            layoutService = MCRLayoutService.obtainInstance();
         }
     }
 

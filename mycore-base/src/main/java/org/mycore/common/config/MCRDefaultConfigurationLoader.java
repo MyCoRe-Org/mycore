@@ -37,6 +37,7 @@ import org.mycore.common.content.MCRURLContent;
  * @author Thomas Scheffler (yagee)
  * @since 2013.12
  */
+@SuppressWarnings("PMD.MCR.ResourceResolver")
 public class MCRDefaultConfigurationLoader implements MCRConfigurationLoader {
 
     MCRProperties properties;
@@ -59,7 +60,7 @@ public class MCRDefaultConfigurationLoader implements MCRConfigurationLoader {
 
     private InputStream getConfigInputStream() throws IOException {
         MCRConfigurationInputStream configurationInputStream = MCRConfigurationInputStream
-            .getMyCoRePropertiesInstance();
+            .ofMyCoReProperties();
         File configFile = MCRConfigurationDir.getConfigFile("mycore.active.properties");
         if (configFile != null) {
             OutputStream outputStream = Files.newOutputStream(configFile.toPath());

@@ -50,7 +50,7 @@ public class MCRRedundantModsClassificationEventHandlerTest extends MCRJPATestCa
     public void setUp() throws Exception {
         super.setUp();
 
-        MCRCategoryDAO categoryDao = MCRCategoryDAOFactory.getInstance();
+        MCRCategoryDAO categoryDao = MCRCategoryDAOFactory.obtainInstance();
         categoryDao.addCategory(null, MCRXMLTransformer.getCategory(loadXml("sdnb.xml")));
         categoryDao.addCategory(null, MCRXMLTransformer.getCategory(loadXml("sdnb2.xml")));
         categoryDao.addCategory(null, MCRXMLTransformer.getCategory(loadXml("sdnb3.xml")));

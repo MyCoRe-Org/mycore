@@ -40,7 +40,7 @@ public class MCRSolrCollectionHelper {
     public static void createCollection(MCRSolrCore core) throws SolrServerException, IOException {
         CollectionAdminRequest.Create collectionCreateRequest = CollectionAdminRequest
             .createCollection(core.getName(), core.buildRemoteConfigSetName(), core.getShardCount(), null, null, null);
-        MCRSolrAuthenticationManager.getInstance().applyAuthentication(collectionCreateRequest,
+        MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(collectionCreateRequest,
             MCRSolrAuthenticationLevel.ADMIN);
         CollectionAdminResponse collectionAdminResponse = collectionCreateRequest
             .process(core.getBaseClient());
@@ -56,7 +56,7 @@ public class MCRSolrCollectionHelper {
     public static void removeCollection(MCRSolrCore core) throws SolrServerException,
         IOException {
         CollectionAdminRequest.Delete collectionDeleteReq = CollectionAdminRequest.deleteCollection(core.getName());
-        MCRSolrAuthenticationManager.getInstance().applyAuthentication(collectionDeleteReq,
+        MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(collectionDeleteReq,
             MCRSolrAuthenticationLevel.ADMIN);
         CollectionAdminResponse collectionAdminResponse = collectionDeleteReq
             .process(core.getBaseClient());

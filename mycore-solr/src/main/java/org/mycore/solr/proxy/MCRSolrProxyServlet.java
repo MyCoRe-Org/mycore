@@ -109,7 +109,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
     public static final String QUERY_CORE_PARAMETER = "core";
 
     public static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
-        MCRSolrAuthenticationManager.getInstance();
+        MCRSolrAuthenticationManager.obtainInstance();
 
     private static final Map<String, String> NEW_HTTP_RESPONSE_HEADER;
 
@@ -270,7 +270,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
                     MCRStreamContent solrResponse = new MCRStreamContent(solrResponseStream,
                         solrRequest.uri().toString(),
                         "response");
-                    MCRLayoutService.instance().doLayout(request, resp, solrResponse);
+                    MCRLayoutService.obtainInstance().doLayout(request, resp, solrResponse);
                 }
             }
         } catch (InterruptedException ex) {

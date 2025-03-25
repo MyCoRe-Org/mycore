@@ -250,7 +250,7 @@ public final class MCRUploadHelper {
         paths.sort(Comparator.comparing(Path::getNameCount)
             .thenComparing(Path::getFileName));
         //extract first file, before filtering
-        MCRPath firstPath = MCRPath.toMCRPath(paths.getFirst());
+        MCRPath firstPath = MCRPath.ofPath(paths.getFirst());
 
         //filter files, remove files that should be ignored for mainfile
         return paths.stream()
@@ -310,7 +310,7 @@ public final class MCRUploadHelper {
         if (classifications == null || classifications.isBlank()) {
             return Collections.emptyList();
         }
-        final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+        final MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
         final List<MCRCategoryID> categoryIDS = Stream.of(classifications)
             .filter(Objects::nonNull)
             .filter(Predicate.not(String::isBlank))

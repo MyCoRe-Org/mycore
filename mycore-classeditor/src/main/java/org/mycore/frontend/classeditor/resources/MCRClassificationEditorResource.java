@@ -107,12 +107,12 @@ import jakarta.ws.rs.core.UriInfo;
  */
 @Path("classifications")
 public class MCRClassificationEditorResource {
-    private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.getInstance();
+    private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.obtainInstance();
 
-    private static final MCRCategLinkService CATEG_LINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
+    private static final MCRCategLinkService CATEG_LINK_SERVICE = MCRCategLinkServiceFactory.obtainInstance();
 
     protected static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
-        MCRSolrAuthenticationManager.getInstance();
+        MCRSolrAuthenticationManager.obtainInstance();
 
     @Context
     UriInfo uriInfo;
@@ -129,7 +129,7 @@ public class MCRClassificationEditorResource {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
 
-        MCRCategoryID id = MCRCategoryID.rootID(rootidStr);
+        MCRCategoryID id = new MCRCategoryID(rootidStr);
         return getCategory(id);
     }
 
@@ -155,7 +155,7 @@ public class MCRClassificationEditorResource {
     @Path("newID/{rootID}")
     @Produces(MediaType.APPLICATION_JSON)
     public String newIDJson(@PathParam("rootID") String rootID) {
-        Gson gson = MCRJSONManager.instance().createGson();
+        Gson gson = MCRJSONManager.obtainInstance().createGson();
         return gson.toJson(newRandomUUID(rootID));
     }
 
@@ -164,7 +164,7 @@ public class MCRClassificationEditorResource {
     @MCRRestrictedAccess(MCRNewClassificationPermission.class)
     @Produces(MediaType.APPLICATION_JSON)
     public String newRootIDJson() {
-        Gson gson = MCRJSONManager.instance().createGson();
+        Gson gson = MCRJSONManager.obtainInstance().createGson();
         return gson.toJson(newRootID());
     }
 
@@ -185,7 +185,7 @@ public class MCRClassificationEditorResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getClassification() {
-        Gson gson = MCRJSONManager.instance().createGson();
+        Gson gson = MCRJSONManager.obtainInstance().createGson();
         List<MCRCategory> rootCategories = new ArrayList<>(CATEGORY_DAO.getRootCategories());
         rootCategories.removeIf(
             category -> !MCRAccessManager.checkPermission(category.getId().getRootID(), PERMISSION_WRITE));
@@ -315,7 +315,7 @@ public class MCRClassificationEditorResource {
 
     protected MCRCategoryID newRootID() {
         String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-        return MCRCategoryID.rootID(uuid);
+        return new MCRCategoryID(uuid);
     }
 
     private MCRCategoryID newRandomUUID(String rootID) {
@@ -335,7 +335,7 @@ public class MCRClassificationEditorResource {
         if (!(category instanceof MCRJSONCategory)) {
             category = new MCRJSONCategory(category);
         }
-        Gson gson = MCRJSONManager.instance().createGson();
+        Gson gson = MCRJSONManager.obtainInstance().createGson();
 
         return gson.toJson(category);
     }
@@ -366,12 +366,12 @@ public class MCRClassificationEditorResource {
     }
 
     private MCRJSONCategory parseJson(String json) {
-        Gson gson = MCRJSONManager.instance().createGson();
+        Gson gson = MCRJSONManager.obtainInstance().createGson();
         return gson.fromJson(json, MCRJSONCategory.class);
     }
 
     protected String buildJsonError(String errorType, MCRCategoryID mcrCategoryID) {
-        Gson gson = MCRJSONManager.instance().createGson();
+        Gson gson = MCRJSONManager.obtainInstance().createGson();
         JsonObject error = new JsonObject();
         error.addProperty("type", errorType);
         error.addProperty("rootid", mcrCategoryID.getRootID());
@@ -495,7 +495,7 @@ public class MCRClassificationEditorResource {
         public void run() {
             MCRCategoryID mcrCategoryID = category.getId();
             boolean isAdded = isAdded(jsonObject);
-            if (isAdded && MCRCategoryDAOFactory.getInstance().exist(mcrCategoryID)) {
+            if (isAdded && MCRCategoryDAOFactory.obtainInstance().exist(mcrCategoryID)) {
                 // an added category already exist -> throw conflict error
                 throw new WebApplicationException(
                     Response.status(Status.CONFLICT).entity(buildJsonError("duplicateID", mcrCategoryID)).build());

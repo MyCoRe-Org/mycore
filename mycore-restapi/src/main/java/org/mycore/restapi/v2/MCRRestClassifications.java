@@ -93,7 +93,7 @@ public class MCRRestClassifications {
         tags = MCRRestUtils.TAG_MYCORE_CLASSIFICATION)
     @XmlElementWrapper(name = "classifications")
     public Response listClassifications() {
-        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
+        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
         Date lastModified = new Date(categoryDAO.getLastModified());
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request.getRequest(), lastModified);
         if (cachedResponse.isPresent()) {
@@ -115,7 +115,7 @@ public class MCRRestClassifications {
         mcrClass.setID(cat.getId().getRootID());
         mcrClass.getLabel().addAll(cat.getLabels().stream().map(MCRLabel::clone).toList());
         Optional.ofNullable(cat.getURI())
-            .map(MCRClassURL::getInstance)
+            .map(MCRClassURL::ofUri)
             .ifPresent(mcrClass::setUrl);
         return mcrClass;
     }
@@ -132,7 +132,7 @@ public class MCRRestClassifications {
             content = @Content(schema = @Schema(implementation = MCRClass.class))),
         tags = MCRRestUtils.TAG_MYCORE_CLASSIFICATION)
     public Response getClassification(@PathParam(PARAM_CLASSID) String classId) {
-        return getClassification(classId, dao -> dao.getCategory(MCRCategoryID.rootID(classId), -1));
+        return getClassification(classId, dao -> dao.getCategory(new MCRCategoryID(classId), -1));
     }
 
     @GET
@@ -171,7 +171,7 @@ public class MCRRestClassifications {
     }
 
     private Response getClassification(String classId, Function<MCRCategoryDAO, MCRCategory> categorySupplier) {
-        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
+        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
         Date lastModified = getLastModifiedDate(classId, categoryDAO);
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request.getRequest(), lastModified);
         if (cachedResponse.isPresent()) {
@@ -179,18 +179,18 @@ public class MCRRestClassifications {
         }
         MCRCategory classification = categorySupplier.apply(categoryDAO);
         if (classification == null) {
-            throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCRCLASS_NOT_FOUND)
                 .withMessage("Could not find classification or category in " + classId + ".")
                 .toException();
         }
         if (request.getAcceptableMediaTypes().contains(MediaType.valueOf(APPLICATION_RDF_XML))) {
-            Document docSKOS = MCRSkosTransformer.getSkosInRDFXML(classification, MCRCategoryID.fromString(classId));
+            Document docSKOS = MCRSkosTransformer.getSkosInRDFXML(classification, MCRCategoryID.ofString(classId));
             MCRJDOMContent content = new MCRJDOMContent(docSKOS);
             try {
                 return Response.ok(content.asString()).type(APPLICATION_RDF_XML_UTF_8).build();
             } catch (IOException e) {
-                throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
+                throw MCRErrorResponse.ofStatusCode(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
                     .withCause(e)
                     .withErrorCode(MCRErrorCodeConstants.MCRCLASS_NOT_FOUND)
                     .withMessage("Could not find classification or category in " + classId + ".")
@@ -199,8 +199,8 @@ public class MCRRestClassifications {
         }
 
         return Response.ok()
-            .entity(classification.isClassification() ? MCRClass.getClassification(classification)
-                : MCRClassCategory.getInstance(classification))
+            .entity(classification.isClassification() ? MCRClass.ofCategory(classification)
+                : MCRClassCategory.ofCategory(classification))
             .lastModified(lastModified)
             .build();
     }
@@ -227,14 +227,14 @@ public class MCRRestClassifications {
     @MCRRequireTransaction
     public Response createClassification(@PathParam(PARAM_CLASSID) String classId, MCRClass mcrClass) {
         if (!classId.equals(mcrClass.getID())) {
-            throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
+            throw MCRErrorResponse.ofStatusCode(Response.Status.BAD_REQUEST.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCRCLASS_ID_MISMATCH)
                 .withMessage("Classification " + classId + " cannot be overwritten by " + mcrClass.getID() + ".")
                 .toException();
         }
-        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
+        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
         Response.Status status;
-        if (!categoryDAO.exist(MCRCategoryID.rootID(classId))) {
+        if (!categoryDAO.exist(new MCRCategoryID(classId))) {
             categoryDAO.addCategory(null, mcrClass.toCategory());
             status = Response.Status.CREATED;
         } else {

@@ -52,7 +52,7 @@ public class MCRAccessKeyRestExceptionMapper implements ExceptionMapper<MCRAcces
     }
 
     private static Response getResponse(Exception e, int statusCode, String errorCode) {
-        MCRErrorResponse response = MCRErrorResponse.fromStatus(statusCode)
+        MCRErrorResponse response = MCRErrorResponse.ofStatusCode(statusCode)
             .withCause(e)
             .withMessage(e.getMessage())
             .withDetail(Optional.of(e)

@@ -50,7 +50,7 @@ public class MCRRedundantModsGenreEventHandlerTest extends MCRJPATestCase {
     public void setUp() throws Exception {
         super.setUp();
 
-        MCRCategoryDAO categoryDao = MCRCategoryDAOFactory.getInstance();
+        MCRCategoryDAO categoryDao = MCRCategoryDAOFactory.obtainInstance();
         categoryDao.addCategory(null, MCRXMLTransformer.getCategory(loadXml("genre.xml")));
         categoryDao.addCategory(null, MCRXMLTransformer.getCategory(loadXml("genre2.xml")));
     }

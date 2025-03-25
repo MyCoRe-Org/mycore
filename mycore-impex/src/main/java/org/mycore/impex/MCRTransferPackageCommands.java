@@ -138,7 +138,7 @@ public class MCRTransferPackageCommands {
 
         // import objects
         List<String> mcrObjects = MCRTransferPackageUtil.getMCRObjects(sourcePath);
-        MCRMarkManager markManager = MCRMarkManager.instance();
+        MCRMarkManager markManager = MCRMarkManager.getInstance();
 
         if (mycoreTargetId != null && !mcrObjects.isEmpty()) {
             String rootId = mcrObjects.getFirst();
@@ -185,7 +185,7 @@ public class MCRTransferPackageCommands {
         Path targetDirectory = Paths.get(targetDirectoryPath);
         // delete mark of imported object
         List<String> mcrObjects = MCRTransferPackageUtil.getMCRObjects(targetDirectory);
-        MCRMarkManager markManager = MCRMarkManager.instance();
+        MCRMarkManager markManager = MCRMarkManager.getInstance();
         for (String id : mcrObjects) {
             markManager.remove(MCRObjectID.getInstance(id));
         }
@@ -194,7 +194,7 @@ public class MCRTransferPackageCommands {
 
         // deleting expanded directory
         LOGGER.info("Deleting expanded tar in {}...", targetDirectoryPath);
-        Files.walkFileTree(Paths.get(targetDirectoryPath), MCRRecursiveDeleter.instance());
+        Files.walkFileTree(Paths.get(targetDirectoryPath), new MCRRecursiveDeleter());
     }
 
 }

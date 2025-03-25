@@ -42,11 +42,15 @@ public final class MCRURNJsonBundle {
 
     private final URL url;
 
-    private MCRURNJsonBundle(MCRPIRegistrationInfo urn, URL url) {
+    public MCRURNJsonBundle(MCRPIRegistrationInfo urn, URL url) {
         this.urn = urn;
         this.url = url;
     }
 
+    /**
+     * @deprecated Use {@link #MCRURNJsonBundle(MCRPIRegistrationInfo, URL)} instead
+     */
+    @Deprecated
     public static MCRURNJsonBundle instance(MCRPIRegistrationInfo urn, URL url) {
         return new MCRURNJsonBundle(urn, url);
     }

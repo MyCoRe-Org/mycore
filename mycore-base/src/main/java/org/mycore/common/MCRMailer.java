@@ -100,7 +100,7 @@ public class MCRMailer extends MCRServlet {
     protected static final String ENCODING;
 
     /** How often should MCRMailer try to send mail? */
-    protected static int numTries;
+    private static int numTries;
 
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
@@ -514,8 +514,8 @@ public class MCRMailer extends MCRServlet {
         throws Exception {
         MCRJDOMContent source = new MCRJDOMContent(input);
         final String xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
-        MCRXSL2XMLTransformer transformer = MCRXSL2XMLTransformer.getInstance(xslFolder + "/" + stylesheet + ".xsl");
-        MCRParameterCollector parameterCollector = MCRParameterCollector.getInstanceFromUserSession();
+        MCRXSL2XMLTransformer transformer = MCRXSL2XMLTransformer.obtainInstance(xslFolder + "/" + stylesheet + ".xsl");
+        MCRParameterCollector parameterCollector = MCRParameterCollector.ofCurrentSession();
         parameterCollector.setParameters(parameters);
         MCRContent result = transformer.transform(source, parameterCollector);
         return result.asXML();

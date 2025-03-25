@@ -57,7 +57,7 @@ public class MCRCreatorCache {
                     return null;
                 }).orElseGet(() -> {
                     try {
-                        return Optional.ofNullable(MCRXMLMetadataManager.instance().listRevisions(objectId))
+                        return Optional.ofNullable(MCRXMLMetadataManager.getInstance().listRevisions(objectId))
                             .map(versions -> versions.stream()
                                 .sorted(
                                     Collections

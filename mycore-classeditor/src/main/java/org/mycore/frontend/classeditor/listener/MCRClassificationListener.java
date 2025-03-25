@@ -33,7 +33,7 @@ public class MCRClassificationListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent arg0) {
-        MCRJSONManager mg = MCRJSONManager.instance();
+        MCRJSONManager mg = MCRJSONManager.obtainInstance();
         mg.registerAdapter(new MCRCategoryTypeAdapter());
         mg.registerAdapter(new MCRCategoryIDTypeAdapter());
         mg.registerAdapter(new MCRLabelSetTypeAdapter());

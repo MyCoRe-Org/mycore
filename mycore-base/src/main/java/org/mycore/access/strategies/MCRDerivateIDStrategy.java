@@ -32,7 +32,7 @@ public class MCRDerivateIDStrategy implements MCRAccessCheckStrategy {
         if (!id.contains("_derivate_")) {
             return new MCRObjectIDStrategy().checkPermission(id, permission);
         }
-        final Collection<String> l = MCRLinkTableManager.instance().getSourceOf(id, "derivate");
+        final Collection<String> l = MCRLinkTableManager.getInstance().getSourceOf(id, "derivate");
         if (l != null && !l.isEmpty()) {
             return checkPermission(l.iterator().next(), permission);
         }

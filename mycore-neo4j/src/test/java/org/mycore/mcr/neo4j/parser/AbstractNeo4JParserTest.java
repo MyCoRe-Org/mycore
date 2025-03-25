@@ -60,6 +60,6 @@ public abstract class AbstractNeo4JParserTest extends MCRStoreTestCase {
     protected void addClassification(String file) throws Exception {
         Document classification = (new SAXBuilder()).build(this.getClass().getResourceAsStream(file));
         MCRCategory category = MCRXMLTransformer.getCategory(classification);
-        MCRCategoryDAOFactory.getInstance().addCategory((MCRCategoryID) null, category);
+        MCRCategoryDAOFactory.obtainInstance().addCategory((MCRCategoryID) null, category);
     }
 }

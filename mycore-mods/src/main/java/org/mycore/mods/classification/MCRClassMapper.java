@@ -50,7 +50,7 @@ public final class MCRClassMapper {
 
     private static final String NS_MODS_URI = MCRConstants.MODS_NAMESPACE.getURI();
 
-    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.obtainInstance();
 
     private static final MCRCache<String, String> AUTH_CACHE = new MCRCache<>(100, "MCRCategory authority");
 
@@ -86,7 +86,7 @@ public final class MCRClassMapper {
                 authInfo = new MCRAuthorityWithURI(authorityURI, valueURI);
             } else if (modsElement.getAttributeValue(ATTRIBUTE_AUTHORITY) != null) {
                 //authority
-                authInfo = MCRAuthorityAndCode.getAuthorityInfo(modsElement);
+                authInfo = MCRAuthorityAndCode.parseXML(modsElement);
             } else if (modsElement.getName().equals(ACCESS_CONDITION)) {
                 //accessDefinition
                 String href = modsElement.getAttributeValue(MCRXlink.HREF, MCRConstants.XLINK_NAMESPACE, "");
@@ -116,7 +116,7 @@ public final class MCRClassMapper {
                 authInfo = new MCRAuthorityWithURI(authorityURI, valueURI);
             } else if (!modsElement.getAttribute(ATTRIBUTE_AUTHORITY).isEmpty()) {
                 //authority
-                authInfo = MCRAuthorityAndCode.getAuthorityInfo(modsElement);
+                authInfo = MCRAuthorityAndCode.parseXML(modsElement);
             } else if (modsElement.getLocalName().equals(ACCESS_CONDITION)) {
                 //accessDefinition
                 String href = modsElement.getAttributeNS(MCRConstants.XLINK_NAMESPACE.getURI(), MCRXlink.HREF);
@@ -190,7 +190,7 @@ public final class MCRClassMapper {
         long classLastModified = Math.max(0, DAO.getLastModified(rootID));
         String auth = AUTH_CACHE.getIfUpToDate(rootID, classLastModified);
         if (auth == null) {
-            MCRCategory rootCategory = DAO.getRootCategory(MCRCategoryID.rootID(rootID), 0);
+            MCRCategory rootCategory = DAO.getRootCategory(new MCRCategoryID(rootID), 0);
             auth = rootCategory.getLabel("x-auth").map(MCRLabel::getText).orElse("");
             AUTH_CACHE.put(rootID, auth, classLastModified);
         }
@@ -201,7 +201,7 @@ public final class MCRClassMapper {
         long classLastModified = Math.max(0, DAO.getLastModified(rootID));
         String authURI = AUTH_URI_CACHE.getIfUpToDate(rootID, classLastModified);
         if (authURI == null) {
-            MCRCategory rootCategory = DAO.getRootCategory(MCRCategoryID.rootID(rootID), 0);
+            MCRCategory rootCategory = DAO.getRootCategory(new MCRCategoryID(rootID), 0);
             authURI = MCRAuthorityWithURI.getAuthorityURI(rootCategory);
             AUTH_URI_CACHE.put(rootID, authURI, classLastModified);
         }

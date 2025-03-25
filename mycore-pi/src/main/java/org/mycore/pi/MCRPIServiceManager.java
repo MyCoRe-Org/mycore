@@ -25,12 +25,15 @@ import java.util.stream.Collectors;
 
 import org.mycore.common.config.MCRConfiguration2;
 
-public class MCRPIServiceManager {
+public final class MCRPIServiceManager {
 
     public static final String REGISTRATION_SERVICE_CONFIG_PREFIX = "MCR.PI.Service.";
 
+    private MCRPIServiceManager(){
+    }
+
     public static MCRPIServiceManager getInstance() {
-        return InstanceHolder.INSTANCE;
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     public List<String> getServiceIDList() {
@@ -61,8 +64,8 @@ public class MCRPIServiceManager {
             MCRPIService.class, REGISTRATION_SERVICE_CONFIG_PREFIX + id);
     }
 
-    private static final class InstanceHolder {
-        private static final MCRPIServiceManager INSTANCE = new MCRPIServiceManager();
+    private static final class LazyInstanceHolder {
+        private static final MCRPIServiceManager SINGLETON_INSTANCE = new MCRPIServiceManager();
     }
 
 }

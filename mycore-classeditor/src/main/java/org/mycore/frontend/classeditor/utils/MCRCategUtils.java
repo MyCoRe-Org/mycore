@@ -66,7 +66,7 @@ public class MCRCategUtils {
                     state = "new";
                 }
 
-                categories.put(MCRCategoryID.rootID(rootId), state);
+                categories.put(new MCRCategoryID(rootId), state);
             }
         } else {
             return null;

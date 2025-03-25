@@ -108,10 +108,7 @@
   <rule ref="category/java/codestyle.xml/PackageCase"/>
   <rule ref="category/java/codestyle.xml/UnnecessaryAnnotationValueElement"/>
   <rule ref="category/java/codestyle.xml/UnnecessaryBoxing"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/codestyle.xml/UnnecessaryCast"/>
-  -->
   <rule ref="category/java/codestyle.xml/UnnecessaryConstructor"/>
   <rule ref="category/java/codestyle.xml/UnnecessaryFullyQualifiedName"/>
   <rule ref="category/java/codestyle.xml/UnnecessaryImport"/>
@@ -163,10 +160,7 @@
   <rule ref="category/java/design.xml/ExcessiveParameterList"/>
   <rule ref="category/java/design.xml/FinalFieldCouldBeStatic"/>
   <rule ref="category/java/design.xml/InvalidJavaBean"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/design.xml/MutableStaticState"/>
-  -->
   <rule ref="category/java/design.xml/NcssCount"/>
   <rule ref="category/java/design.xml/NPathComplexity"/>
   <rule ref="category/java/design.xml/SimplifyConditional"/>
@@ -256,19 +250,10 @@
   -->
   <rule ref="category/java/errorprone.xml/ReturnFromFinallyBlock"/>
   <rule ref="category/java/errorprone.xml/SimpleDateFormatNeedsLocale"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/errorprone.xml/SingleMethodSingleton"/>
-  -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/errorprone.xml/SingletonClassReturningNewInstance"/>
-  -->
   <rule ref="category/java/errorprone.xml/StringBufferInstantiationWithChar"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/errorprone.xml/SuspiciousEqualsMethodName"/>
-  -->
   <rule ref="category/java/errorprone.xml/SuspiciousHashcodeMethodName"/>
   <rule ref="category/java/errorprone.xml/SuspiciousOctalEscape"/>
   <rule ref="category/java/errorprone.xml/UnconditionalIfStatement"/>

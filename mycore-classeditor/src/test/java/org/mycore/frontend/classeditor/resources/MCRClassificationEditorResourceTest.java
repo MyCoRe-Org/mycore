@@ -93,7 +93,7 @@ public class MCRClassificationEditorResourceTest extends MCRTestCase {
             MCRSessionHookFilter.class,
             MultiPartFeature.class));
 
-        MCRJSONManager mg = MCRJSONManager.instance();
+        MCRJSONManager mg = MCRJSONManager.obtainInstance();
         mg.registerAdapter(new MCRCategoryTypeAdapter());
         mg.registerAdapter(new MCRCategoryIDTypeAdapter());
         mg.registerAdapter(new MCRLabelSetTypeAdapter());
@@ -110,7 +110,7 @@ public class MCRClassificationEditorResourceTest extends MCRTestCase {
              * by a previous test. In this case a class cast exception occur because MCRCategoryDAOImpl
              * was loaded. */
             MCRCategoryDAOFactory.set(CategoryDAOMock.class);
-            categDAO = (CategoryDAOMock) MCRCategoryDAOFactory.getInstance();
+            categDAO = (CategoryDAOMock) MCRCategoryDAOFactory.obtainInstance();
             categDAO.init();
         } catch (Exception exc) {
             fail();
@@ -126,7 +126,7 @@ public class MCRClassificationEditorResourceTest extends MCRTestCase {
     @Test
     public void getRootCategories() {
         final String categoryJsonStr = jersey.target("classifications").request().get(String.class);
-        MCRCategoryListWrapper categListWrapper = MCRJSONManager.instance().createGson().fromJson(categoryJsonStr,
+        MCRCategoryListWrapper categListWrapper = MCRJSONManager.obtainInstance().createGson().fromJson(categoryJsonStr,
             MCRCategoryListWrapper.class);
         List<MCRCategory> categList = categListWrapper.getList();
         assertEquals("Wrong number of root categories.", 2, categList.size());
@@ -143,7 +143,7 @@ public class MCRClassificationEditorResourceTest extends MCRTestCase {
                 path = path + "/" + categID;
             }
             String categoryJsonStr = jersey.target("/classifications/" + path).request().get(String.class);
-            MCRJSONCategory retrievedCateg = MCRJSONManager.instance().createGson().fromJson(categoryJsonStr,
+            MCRJSONCategory retrievedCateg = MCRJSONManager.obtainInstance().createGson().fromJson(categoryJsonStr,
                 MCRJSONCategory.class);
             String errorMsg = new MessageFormat("We want to retrieve the category {0} but it was {1}", Locale.ROOT)
                 .format(new Object[] { id, retrievedCateg.getId() });

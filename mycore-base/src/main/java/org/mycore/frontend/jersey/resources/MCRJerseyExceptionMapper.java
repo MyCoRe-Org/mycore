@@ -108,22 +108,40 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
 
     private Response getResponse(Exception exc) {
         if (exc instanceof WebApplicationException wae) {
-            Response response = wae.getResponse();
-            if (response.hasEntity()) {
-                return response;
-            }
-            return Response.fromResponse(response)
-                .entity(exc.getMessage())
+            return getResponse(wae);
+        }
+
+        String message = exc.getMessage();
+        boolean hasMessage = message != null;
+        boolean isFormRequest = isFormRequest();
+
+        Object entity = isFormRequest && hasMessage ? message : new MCRExceptionContainer(exc);
+        return Response.status(Status.INTERNAL_SERVER_ERROR).entity(entity).build();
+    }
+
+    private static Response getResponse(WebApplicationException wae) {
+        Response response = wae.getResponse();
+        if (!response.hasEntity()) {
+            response = Response
+                .fromResponse(response)
+                .entity(wae.getMessage())
                 .type(MediaType.TEXT_PLAIN_TYPE)
                 .build();
         }
-        Object entity = Optional.ofNullable(request.getContentType())
+        return response;
+    }
+    
+    private boolean isFormRequest() {
+        return Optional
+            .ofNullable(request.getContentType())
             .map(MediaType::valueOf)
-            .filter(t -> t.isCompatible(MediaType.APPLICATION_FORM_URLENCODED_TYPE) || t
-                .isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE))
-            .map(t -> (Object) exc.getMessage()) //do not container form requests responses
-            .orElseGet(() -> new MCRExceptionContainer(exc));
-        return Response.status(Status.INTERNAL_SERVER_ERROR).entity(entity).build();
+            .stream()
+            .anyMatch(MCRJerseyExceptionMapper::isFormRequestMediaType);
+    }
+
+    private static boolean isFormRequestMediaType(MediaType mediaType) {
+        return mediaType.isCompatible(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
+            || mediaType.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE);
     }
 
     @XmlRootElement(name = "error")
@@ -162,7 +180,7 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
         public RException marshal(Exception v) {
             RException ep = new RException();
             ep.message = v.getMessage();
-            ep.stackTrace = Stream.of(v.getStackTrace()).map(RStackTraceElement::getInstance)
+            ep.stackTrace = Stream.of(v.getStackTrace()).map(RStackTraceElement::ofStackTraceElement)
                 .toArray(RStackTraceElement[]::new);
             Optional.ofNullable(v.getCause())
                 .filter(Exception.class::isInstance)
@@ -198,7 +216,7 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
         @XmlAttribute
         private int line;
 
-        private static RStackTraceElement getInstance(StackTraceElement ste) {
+        private static RStackTraceElement ofStackTraceElement(StackTraceElement ste) {
             RStackTraceElement rste = new RStackTraceElement();
             rste.className = ste.getClassName();
             rste.method = ste.getMethodName();

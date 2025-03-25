@@ -39,33 +39,49 @@ class MCRTypeOfResource extends MCRAuthorityInfo {
     /**
      * The mods:typeOfResource code, which is same as the category ID
      */
-    private String code;
+    private final String code;
 
     MCRTypeOfResource(String code) {
         this.code = code;
     }
 
     /**
-     * If the given element is mods:typeOfResource, returns the MCRTypeOfResource mapping.
+     * @deprecated Use {@link #parseXML(Element)} instead
      */
-    public static MCRTypeOfResource getAuthorityInfo(org.jdom2.Element modsElement) {
-        if (modsElement == null) {
-            return null;
-        }
-        String name = modsElement.getName();
-        String code = modsElement.getTextTrim();
-        return getTypeOfResource(name, code);
+    @Deprecated
+    public static MCRTypeOfResource getAuthorityInfo(Element modsElement) {
+        return parseXML(modsElement);
     }
 
     /**
      * If the given element is mods:typeOfResource, returns the MCRTypeOfResource mapping.
      */
-    public static MCRTypeOfResource getAuthorityInfo(Element modsElement) {
+    public static MCRTypeOfResource parseXML(Element modsElement) {
         if (modsElement == null) {
             return null;
         }
         String name = modsElement.getLocalName();
         String code = MCRMODSClassificationSupport.getText(modsElement).trim();
+        return getTypeOfResource(name, code);
+    }
+
+    /**
+     * @deprecated Use {@link #parseXML(org.jdom2.Element)} instead
+     */
+    @Deprecated
+    public static MCRTypeOfResource getAuthorityInfo(org.jdom2.Element modsElement) {
+        return parseXML(modsElement);
+    }
+
+    /**
+     * If the given element is mods:typeOfResource, returns the MCRTypeOfResource mapping.
+     */
+    public static MCRTypeOfResource parseXML(org.jdom2.Element modsElement) {
+        if (modsElement == null) {
+            return null;
+        }
+        String name = modsElement.getName();
+        String code = modsElement.getTextTrim();
         return getTypeOfResource(name, code);
     }
 
@@ -98,6 +114,6 @@ class MCRTypeOfResource extends MCRAuthorityInfo {
     }
 
     public static boolean isClassificationPresent() {
-        return MCRCategoryDAOFactory.getInstance().exist(MCRCategoryID.rootID(TYPE_OF_RESOURCE));
+        return MCRCategoryDAOFactory.obtainInstance().exist(new MCRCategoryID(TYPE_OF_RESOURCE));
     }
 }

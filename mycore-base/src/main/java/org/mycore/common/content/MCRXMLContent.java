@@ -44,16 +44,16 @@ public abstract class MCRXMLContent extends MCRContent {
      * By default, content is outputted using {@link MCRConstants#DEFAULT_ENCODING}.
      * If MCR.IFS2.PrettyXML=true, a pretty format with indentation is used. 
      */
-    protected static Format defaultFormat;
+    private static final Format DEFAULT_FORMAT;
 
     static {
         boolean prettyXML = MCRConfiguration2.getBoolean("MCR.IFS2.PrettyXML").orElse(true);
-        defaultFormat = prettyXML ? Format.getPrettyFormat().setIndent("  ") : Format.getRawFormat();
-        defaultFormat.setEncoding(MCRConstants.DEFAULT_ENCODING);
+        DEFAULT_FORMAT = prettyXML ? Format.getPrettyFormat().setIndent("  ") : Format.getRawFormat();
+        DEFAULT_FORMAT.setEncoding(MCRConstants.DEFAULT_ENCODING);
     }
 
     /** The default format used when outputting this XML as a byte stream */
-    protected Format format = defaultFormat;
+    protected Format format = DEFAULT_FORMAT;
 
     public MCRXMLContent() {
         try {

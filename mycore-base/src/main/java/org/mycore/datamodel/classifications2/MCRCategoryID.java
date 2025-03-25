@@ -73,17 +73,37 @@ public class MCRCategoryID implements Serializable {
     /**
      * @param rootID
      *            aka Classification ID
+     */
+    public MCRCategoryID(String rootID) {
+        this(rootID, "");
+    }
+
+    /**
+     * @param rootID
+     *            aka Classification ID
      * @param id
      *            aka Category ID
      */
     public MCRCategoryID(String rootID, String id) {
-        this();
+        super();
         setId(id);
         setRootID(rootID);
     }
 
+    /**
+     * @deprecated Use {@link #MCRCategoryID(String)}} instead
+     */
+    @Deprecated
     public static MCRCategoryID rootID(String rootID) {
-        return new MCRCategoryID(rootID, "");
+        return new MCRCategoryID(rootID);
+    }
+
+    /**
+     * @deprecated Use {@link #ofString(String)} instead
+     */
+    @Deprecated
+    public static MCRCategoryID fromString(String categoryId) {
+        return ofString(categoryId);
     }
 
     /**
@@ -92,11 +112,11 @@ public class MCRCategoryID implements Serializable {
      * @throws IllegalArgumentException if the given categoryId is invalid
      */
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-    public static MCRCategoryID fromString(String categoryId) {
+    public static MCRCategoryID ofString(String categoryId) {
         String[] parts = categoryId.split(":");
         try {
             return switch (parts.length) {
-                case 1 -> rootID(parts[0]);
+                case 1 -> new MCRCategoryID(parts[0]);
                 case 2 -> new MCRCategoryID(parts[0], parts[1]);
                 default -> throw new IllegalArgumentException("CategoryId is ambiguous: " + categoryId);
             };
@@ -196,7 +216,7 @@ public class MCRCategoryID implements Serializable {
      */
     public static boolean isValid(String id) {
         try {
-            fromString(id);
+            ofString(id);
             return true;
         } catch (Exception e) {
             return false;

@@ -119,7 +119,7 @@ public class MCRPICommands {
         order = 30)
     public static void migrateURNGranularToServiceID(String serviceID) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        MCRXMLMetadataManager.instance().listIDsOfType(MCRDerivate.OBJECT_TYPE).forEach(derivateID -> {
+        MCRXMLMetadataManager.getInstance().listIDsOfType(MCRDerivate.OBJECT_TYPE).forEach(derivateID -> {
             MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateID));
 
             String urn = derivate.getDerivate().getURN();

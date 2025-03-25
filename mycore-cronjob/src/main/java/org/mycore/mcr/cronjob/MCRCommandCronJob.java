@@ -52,7 +52,7 @@ public class MCRCommandCronJob extends MCRCronjob {
             String command = getCommand();
             MCRCommandManager cmdMgr = new MCRCommandManager();
             invokeCommand(command, cmdMgr);
-        }, MCRUserInformationResolver.instance().getOrThrow(user)).run();
+        }, MCRUserInformationResolver.obtainInstance().getOrThrow(user)).run();
     }
 
     private void invokeCommand(String command, MCRCommandManager cmdMgr) {

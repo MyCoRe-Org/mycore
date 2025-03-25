@@ -59,9 +59,9 @@ public class MCRObjectUtilsTest extends MCRStoreTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        MCREventManager.instance().clear();
-        MCREventManager.instance().addEventHandler(ObjectType.OBJECT, new MCRXMLMetadataEventHandler());
-        MCREventManager.instance().addEventHandler(ObjectType.OBJECT, new MCRLinkTableEventHandler());
+        MCREventManager.getInstance().clear();
+        MCREventManager.getInstance().addEventHandler(ObjectType.OBJECT, new MCRXMLMetadataEventHandler());
+        MCREventManager.getInstance().addEventHandler(ObjectType.OBJECT, new MCRLinkTableEventHandler());
         root = createObject("test_document_00000001", null);
         l11 = createObject("test_document_00000002", root.getId());
         l12 = createObject("test_document_00000003", root.getId());

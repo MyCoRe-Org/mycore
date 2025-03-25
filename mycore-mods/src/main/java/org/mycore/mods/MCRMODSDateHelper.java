@@ -50,8 +50,8 @@ public class MCRMODSDateHelper {
 
         String encoding = element.getAttributeValue("encoding", "unknown").toLowerCase(DATE_LOCALE);
         String key = encoding + "-" + text.length();
-        MCRMODSDateFormat format = firstNonNull(MCRMODSDateFormat.getFormat(key),
-            MCRMODSDateFormat.getFormat(encoding));
+        MCRMODSDateFormat format = firstNonNull(MCRMODSDateFormat.obtainInstance(key),
+            MCRMODSDateFormat.obtainInstance(encoding));
         if (format == null) {
             throw reportParseException(encoding, text, null);
         }

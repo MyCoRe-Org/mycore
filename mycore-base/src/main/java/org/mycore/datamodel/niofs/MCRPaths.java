@@ -26,6 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -40,9 +41,13 @@ final class MCRPaths {
 
     static final String DEFAULT_SCHEME_PROPERTY = "MCR.NIO.DefaultScheme";
 
-    static List<FileSystemProvider> webAppProvider = new ArrayList<>(4);
+    private static final List<FileSystemProvider> WEB_APP_PROVIDER = new ArrayList<>(4);
 
     private MCRPaths() {
+    }
+
+    static List<FileSystemProvider> getWebAppProvider() {
+        return Collections.unmodifiableList(WEB_APP_PROVIDER);
     }
 
     static URI getURI(String owner, String path) throws URISyntaxException {
@@ -96,7 +101,7 @@ final class MCRPaths {
         try {
             return Paths.get(uri);
         } catch (FileSystemNotFoundException e) {
-            for (FileSystemProvider provider : webAppProvider) {
+            for (FileSystemProvider provider : WEB_APP_PROVIDER) {
                 if (provider.getScheme().equals(uri.getScheme())) {
                     return provider.getPath(uri);
                 }
@@ -111,7 +116,7 @@ final class MCRPaths {
     }
 
     static void addFileSystemProvider(FileSystemProvider provider) {
-        webAppProvider.add(provider);
+        WEB_APP_PROVIDER.add(provider);
     }
 
 }

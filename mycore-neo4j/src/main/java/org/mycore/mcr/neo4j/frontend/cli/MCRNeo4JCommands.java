@@ -57,7 +57,7 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
     public static void cleanForBase(final String baseId) {
         LOGGER.info("Start clean data from Neo4J instance for MCRBase {}", baseId);
         List<String> selectedObjectIds = MCRXMLMetadataManager
-            .instance().listIDsForBase(baseId);
+            .getInstance().listIDsForBase(baseId);
         for (String objectId : selectedObjectIds) {
             String queryString = "MATCH (n {id:'" + objectId + "'}) DETACH DELETE n";
             LOGGER.info("Query: {}", queryString);
@@ -102,7 +102,7 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
         MCRNeo4JManager clazz = MCRConfiguration2.getOrThrow(NEO4J_MANAGER_CLASS_PROPERTY,
             MCRConfiguration2::instantiateClass);
         List<String> selectedObjectIds = MCRXMLMetadataManager
-            .instance().listIDsForBase(baseId);
+            .getInstance().listIDsForBase(baseId);
         for (String objectId : selectedObjectIds) {
             MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(objectId));
             clazz.updateNodeByMCRObject(mcrObject);
@@ -117,7 +117,7 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
         MCRNeo4JManager clazz = MCRConfiguration2.getOrThrow(NEO4J_MANAGER_CLASS_PROPERTY,
             MCRConfiguration2::instantiateClass);
         List<String> selectedObjectIds = MCRXMLMetadataManager
-            .instance().listIDsOfType(type);
+            .getInstance().listIDsOfType(type);
         for (String objectId : selectedObjectIds) {
             MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(objectId));
             clazz.updateNodeByMCRObject(mcrObject);
@@ -130,7 +130,7 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
         MCRNeo4JManager clazz = MCRConfiguration2.getOrThrow(NEO4J_MANAGER_CLASS_PROPERTY,
             MCRConfiguration2::instantiateClass);
         List<String> selectedObjectIds = MCRXMLMetadataManager
-            .instance()
+            .getInstance()
             .listIDs();
         for (String objectId : selectedObjectIds) {
             MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(objectId));

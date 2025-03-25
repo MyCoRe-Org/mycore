@@ -150,6 +150,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID>, Serializable 
      * @exception MCRException if the given identifier is not valid
      */
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    @SuppressWarnings({"PMD.MCR.Singleton.PrivateConstructor", "PMD.MCR.Singleton.NonPrivateConstructors"})
     public static MCRObjectID getInstance(String id) {
         return MCRObjectIDPool.getMCRObjectID(Objects.requireNonNull(id, "'id' must not be null."));
     }
@@ -309,6 +310,9 @@ public final class MCRObjectID implements Comparable<MCRObjectID>, Serializable 
      *            the MCRObjectID to check
      * @return true if all parts are equal, else return false
      */
+    // ordinary equals method exists and delegates to this methode, which is available
+    // as a more efficient direct entry w/o need for additional type check and cast.
+    @SuppressWarnings("PMD.SuspiciousEqualsMethodName")
     public boolean equals(MCRObjectID in) {
         return this == in || (in != null && toString().equals(in.toString()));
     }
@@ -324,11 +328,10 @@ public final class MCRObjectID implements Comparable<MCRObjectID>, Serializable 
      */
     @Override
     public boolean equals(Object in) {
-        boolean result = false;
         if (in instanceof MCRObjectID objectID) {
-            result = equals(objectID);
+            return equals(objectID);
         }
-        return result;
+        return false;
     }
 
     @Override

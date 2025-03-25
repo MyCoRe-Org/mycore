@@ -51,8 +51,6 @@ import jakarta.ws.rs.client.ClientBuilder;
  */
 public final class MCROAuthClient {
 
-    private static volatile MCROAuthClient singleton;
-
     private final String baseURL;
 
     private final String clientID;
@@ -60,17 +58,6 @@ public final class MCROAuthClient {
     private final String clientSecret;
 
     private final Client client;
-
-    public static MCROAuthClient instance() {
-        if (singleton == null) {
-            synchronized (MCROAuthClient.class) {
-                if (singleton == null) {
-                    singleton = new MCROAuthClient();
-                }
-            }
-        }
-        return singleton;
-    }
 
     private MCROAuthClient() {
         String prefix = "MCR.ORCID.OAuth.";
@@ -80,6 +67,18 @@ public final class MCROAuthClient {
         clientSecret = MCRConfiguration2.getStringOrThrow(prefix + "ClientSecret");
 
         client = ClientBuilder.newClient();
+    }
+
+    /**
+     * @deprecated Use {@link #getInstance()} instead
+     */
+    @Deprecated
+    public static MCROAuthClient instance() {
+        return getInstance();
+    }
+
+    public static MCROAuthClient getInstance() {
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     public String getClientID() {
@@ -195,4 +194,9 @@ public final class MCROAuthClient {
         byte[] digest = md5Digest.digest();
         return MCRUtils.toHexString(digest);
     }
+
+    private static final class LazyInstanceHolder {
+        public static final MCROAuthClient SINGLETON_INSTANCE = new MCROAuthClient();
+    }
+
 }

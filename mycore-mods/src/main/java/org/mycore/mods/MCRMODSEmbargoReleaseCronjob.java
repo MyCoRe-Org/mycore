@@ -48,7 +48,7 @@ public class MCRMODSEmbargoReleaseCronjob extends MCRCronjob {
     private static final Logger LOGGER = LogManager.getLogger();
 
     protected static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
-        MCRSolrAuthenticationManager.getInstance();
+        MCRSolrAuthenticationManager.obtainInstance();
 
     @Override
     public String getDescription() {
@@ -89,7 +89,7 @@ public class MCRMODSEmbargoReleaseCronjob extends MCRCronjob {
                     .peek(id -> LOGGER.info("Found embargoed object " + id))
                     .forEach(this::releaseDocument);
 
-            }, MCRSystemUserInformation.getSuperUserInstance()).run();
+            }, MCRSystemUserInformation.SUPER_USER).run();
 
         } catch (Exception e) {
             LOGGER.error("Failed to search embargoed objects", e);

@@ -21,7 +21,6 @@ package org.mycore.services.staticcontent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,8 +30,6 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.MCRClassTools;
-import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRBaseContent;
@@ -85,20 +82,17 @@ public class MCRObjectStaticContentGenerator {
         this.configID = configID;
     }
 
+    /**
+     * @deprecated Use {@link #obtainInstance(String)} instead
+     */
+    @Deprecated
     static MCRObjectStaticContentGenerator get(String id) {
-        try {
-            return MCRConfiguration2.getString(CONFIG_ID_PREFIX + id + CLASS_SUFFIX)
-                .map(c -> {
-                    try {
-                        return (Class<MCRObjectStaticContentGenerator>) MCRClassTools.forName(c);
-                    } catch (ClassNotFoundException e) {
-                        throw new MCRException(e);
-                    }
-                }).orElse(MCRObjectStaticContentGenerator.class).getDeclaredConstructor(String.class).newInstance(id);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException
-            | NoSuchMethodException e) {
-            throw new MCRException(e);
-        }
+        return obtainInstance(id);
+    }
+
+    static MCRObjectStaticContentGenerator obtainInstance(String id) {
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRObjectStaticContentGenerator.class,
+            CONFIG_ID_PREFIX + id + CLASS_SUFFIX);
     }
 
     public static List<String> getContentGenerators() {

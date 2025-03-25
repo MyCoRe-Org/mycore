@@ -54,10 +54,8 @@ public final class MCREventManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static MCREventManager instance;
-
     /** Table of all configured event handlers * */
-    private Map<String, List<MCREventHandler>> handlers;
+    private final Map<String, List<MCREventHandler>> handlers;
 
     private MCREventManager() {
         handlers = new ConcurrentHashMap<>();
@@ -92,16 +90,20 @@ public final class MCREventManager {
     }
 
     /**
+     * @deprecated Use {@link #getInstance()} instead
+     */
+    @Deprecated
+    public static MCREventManager instance() {
+        return getInstance();
+    }
+
+    /**
      * The singleton manager instance
      *
      * @return the single event manager
      */
-    public static synchronized MCREventManager instance() {
-        if (instance == null) {
-            instance = new MCREventManager();
-        }
-
-        return instance;
+    public static MCREventManager getInstance() {
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     private boolean propKeyIsSet(String propertyKey) {
@@ -314,11 +316,11 @@ public final class MCREventManager {
         String className = CONFIG_PREFIX + "Mode." + mode;
         MCREventHandlerInitializer configuredInitializer = MCRConfiguration2.getSingleInstanceOfOrThrow(
             MCREventHandlerInitializer.class, className);
-        return configuredInitializer.getInstance(propertyValue);
+        return configuredInitializer.obtainInstance(propertyValue);
     }
 
     public interface MCREventHandlerInitializer {
-        MCREventHandler getInstance(String propertyValue);
+        MCREventHandler obtainInstance(String propertyValue);
     }
 
     /**
@@ -362,4 +364,9 @@ public final class MCREventManager {
         }
 
     }
+
+    private static final class LazyInstanceHolder {
+        public static final MCREventManager SINGLETON_INSTANCE = new MCREventManager();
+    }
+
 }

@@ -474,7 +474,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
 
     public void setRootID(String rootID) {
         if (getId() == null) {
-            setId(MCRCategoryID.rootID(rootID));
+            setId(new MCRCategoryID(rootID));
         } else if (!getId().getRootID().equals(rootID)) {
             setId(new MCRCategoryID(rootID, getId().getId()));
         }

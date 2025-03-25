@@ -90,7 +90,7 @@ public class MCRMetaHistoryItem implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long internalid;
+    private long internalId;
 
     @Column(length = MCRObjectID.MAX_LENGTH)
     @Convert(converter = MCRObjectIDConverter.class)
@@ -106,10 +106,18 @@ public class MCRMetaHistoryItem implements Serializable {
 
     private String userIP;
 
+    /**
+     * @deprecated Use {@link #now(MCRObjectID, MCRMetadataHistoryEventType)} instead
+     */
+    @Deprecated
     static MCRMetaHistoryItem createdNow(MCRObjectID id) {
         return now(id, MCRMetadataHistoryEventType.CREATE);
     }
 
+    /**
+     * @deprecated Use {@link #now(MCRObjectID, MCRMetadataHistoryEventType)} instead
+     */
+    @Deprecated
     static MCRMetaHistoryItem deletedNow(MCRObjectID id) {
         return now(id, MCRMetadataHistoryEventType.DELETE);
     }
@@ -127,12 +135,28 @@ public class MCRMetaHistoryItem implements Serializable {
         return historyItem;
     }
 
+    /**
+     * @deprecated Use {@link #getInternalId()} instead
+     */
+    @Deprecated
     public long getInternalid() {
-        return this.internalid;
+        return getInternalId();
     }
 
-    public void setInternalid(long internalid) {
-        this.internalid = internalid;
+    public long getInternalId() {
+        return this.internalId;
+    }
+
+    /**
+     * @deprecated Use {@link #setInternalId(long)} instead 
+     */
+    @Deprecated
+    public void setInternalid(long internalId) {
+      setInternalId(internalId);
+    }
+
+    public void setInternalId(long internalId) {
+        this.internalId = internalId;
     }
 
     public MCRObjectID getId() {

@@ -51,7 +51,7 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    static Map<String, ReentrantReadWriteLock> locks = new ConcurrentHashMap<>();
+    private static final Map<String, ReentrantReadWriteLock> LOCKS = new ConcurrentHashMap<>();
 
     @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static Path getCacheFilePath(String baseId) {
@@ -147,7 +147,7 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
 
         MCRObjectID nextID;
 
-        ReentrantReadWriteLock lock = locks.computeIfAbsent(baseId, k -> new ReentrantReadWriteLock());
+        ReentrantReadWriteLock lock = LOCKS.computeIfAbsent(baseId, k -> new ReentrantReadWriteLock());
         ReentrantReadWriteLock.WriteLock writeLock = lock.writeLock();
 
         try {
@@ -197,7 +197,7 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
     @Override
     public MCRObjectID getLastID(String baseId) {
         Path cacheFilePath = getCacheFilePath(baseId);
-        ReentrantReadWriteLock lock = locks.computeIfAbsent(baseId, k -> new ReentrantReadWriteLock());
+        ReentrantReadWriteLock lock = LOCKS.computeIfAbsent(baseId, k -> new ReentrantReadWriteLock());
         ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
         try {
             readLock.lock();

@@ -39,6 +39,7 @@ import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventorFactory;
 /**
  * @author Thomas Scheffler (yagee)
  */
+@SuppressWarnings("PMD.MCR.ResourceResolver")
 public class MCRServletContainerInitializer implements ServletContainerInitializer {
 
     /* (non-Javadoc)
@@ -55,9 +56,11 @@ public class MCRServletContainerInitializer implements ServletContainerInitializ
             leakPreventor.runPreClassLoaderInitiators();
         }
         MCRShutdownHandler shutdownHandler = MCRShutdownHandler.getInstance();
-        shutdownHandler.isWebAppRunning = true;
-        shutdownHandler.leakPreventor = leakPreventor;
-        MCRServletContextHolder.instance().set(ctx);
+        if (shutdownHandler != null) {
+            shutdownHandler.isWebAppRunning = true;
+            shutdownHandler.leakPreventor = leakPreventor;
+        }
+        MCRServletContextHolder.getInstance().set(ctx);
         MCRStartupHandler.startUp(ctx);
         //Make sure logging is configured
         final Logger logger = LogManager.getLogger();

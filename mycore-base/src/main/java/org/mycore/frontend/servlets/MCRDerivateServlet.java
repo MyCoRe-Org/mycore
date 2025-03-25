@@ -131,7 +131,7 @@ public class MCRDerivateServlet extends MCRServlet {
             if (!Files.isDirectory(pathToFile)) {
                 Files.delete(pathToFile);
             } else {
-                Files.walkFileTree(pathToFile, MCRRecursiveDeleter.instance());
+                Files.walkFileTree(pathToFile, new MCRRecursiveDeleter());
             }
         } else {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, String.format(Locale.ENGLISH, "User has not the \""

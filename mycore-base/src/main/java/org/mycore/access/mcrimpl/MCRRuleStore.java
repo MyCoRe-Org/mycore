@@ -26,7 +26,7 @@ import org.mycore.common.config.MCRConfiguration2;
  * The purpose of this interface is to make the choice of the persistence layer
  * configurable. Any concrete database-class which stores MyCoRe Access control
  * must implement this interface. Which database actually will be used can then
- * be configured by reading the value <code>MCR.Persistence.Rule.Store_Class</code>
+ * be configured by reading the value <code>MCR.Persistence.Rule.Store.Class</code>
  * from mycore.properties.access
  * 
  * @author Arne Seifert
@@ -34,8 +34,6 @@ import org.mycore.common.config.MCRConfiguration2;
 public abstract class MCRRuleStore {
 
     protected static final String SQL_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-
-    private static volatile MCRRuleStore implementation;
 
     public abstract void createRule(MCRAccessRule rule);
 
@@ -53,16 +51,21 @@ public abstract class MCRRuleStore {
 
     public abstract int getNextFreeRuleID(String prefix);
 
+    /**
+     * @deprecated Use {@link #obtainInstance()} instead
+     */
+    @Deprecated
     public static MCRRuleStore getInstance() {
-        if (implementation == null) {
-            synchronized (MCRRuleStore.class) {
-                if (implementation == null) {
-                    implementation = MCRConfiguration2.getSingleInstanceOfOrThrow(
-                        MCRRuleStore.class, "MCR.Persistence.Rule.Store_Class");
-                }
-            }
-        }
-        return implementation;
+        return obtainInstance();
+    }
+
+    public static MCRRuleStore obtainInstance() {
+        return LazyInstanceHolder.SHARED_INSTANCE;
+    }
+
+    private static final class LazyInstanceHolder {
+        public static final MCRRuleStore SHARED_INSTANCE = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRRuleStore.class, "MCR.Persistence.Rule.Store.Class");
     }
 
 }

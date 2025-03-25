@@ -83,7 +83,7 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
 
     protected void indexDerivate(MCRObjectID derivateID) throws IOException {
         MCRPath rootPath = MCRPath.getPath(derivateID.toString(), "/");
-        final MCRSolrIndexHandlerFactory ihf = MCRSolrIndexHandlerFactory.getInstance();
+        final MCRSolrIndexHandlerFactory ihf = MCRSolrIndexHandlerFactory.obtainInstance();
         final List<MCRSolrIndexHandler> subHandlerList = this.subHandlerList;
         Files.walkFileTree(rootPath, new SimpleFileVisitor<>() {
 

@@ -55,9 +55,9 @@ public class MCRDerivateDefaultClassEventHandler extends MCREventHandlerBase {
         }
 
         final List<MCRCategoryID> categories = DEFAULT_CATEGORIES.stream()
-            .map(MCRCategoryID::fromString) //checks syntax
+            .map(MCRCategoryID::ofString) //checks syntax
             .collect(Collectors.toList());
-        final MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
+        final MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
         final List<MCRCategoryID> missingCategories = categories.stream()
             .filter(Predicate.not(categoryDAO::exist))
             .collect(Collectors.toList());

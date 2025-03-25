@@ -77,7 +77,7 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
     final ResourceResolver resolver = new ResourceResolver() {
         @Override
         public OutputStream getOutputStream(URI uri) throws IOException {
-            URL url = MCRURIResolver.getServletContext().getResource(uri.toString());
+            URL url = MCRResourceHelper.getResourceUrl(uri.toString());
             return url.openConnection().getOutputStream();
         }
 
@@ -85,7 +85,7 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
         public Resource getResource(URI uri) throws IOException {
             MCRContent content;
             try {
-                content = MCRSourceContent.getInstance(uri.toString());
+                content = MCRSourceContent.createInstance(uri.toString());
                 return new Resource(uri.getScheme(), content.getInputStream());
             } catch (TransformerException e) {
                 LOGGER.error("Error while resolving uri: {}", uri);
@@ -148,8 +148,8 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
             .getString("MCR.LayoutService.FoFormatter.transformerFactoryImpl")
             .map(impl -> TransformerFactory.newInstance(impl, MCRClassTools.getClassLoader()))
             .orElseGet(TransformerFactory::newInstance);
-        transformerFactory.setURIResolver(MCRURIResolver.instance());
-        transformerFactory.setErrorListener(MCRErrorListener.getInstance());
+        transformerFactory.setURIResolver(MCRURIResolver.obtainInstance());
+        transformerFactory.setErrorListener(new MCRErrorListener());
         return transformerFactory;
     }
 

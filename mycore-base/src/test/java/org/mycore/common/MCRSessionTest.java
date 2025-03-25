@@ -19,6 +19,8 @@
 package org.mycore.common;
 
 import static org.junit.Assert.assertEquals;
+import static org.mycore.common.MCRSystemUserInformation.GUEST;
+import static org.mycore.common.MCRSystemUserInformation.SUPER_USER;
 
 import org.junit.After;
 import org.junit.Before;
@@ -29,10 +31,6 @@ import org.junit.Test;
  *
  */
 public class MCRSessionTest extends MCRTestCase {
-
-    private static final MCRSystemUserInformation SUPER_USER_INSTANCE = MCRSystemUserInformation.getSuperUserInstance();
-
-    private static final MCRSystemUserInformation GUEST_INSTANCE = MCRSystemUserInformation.getGuestInstance();
 
     private MCRSession session;
 
@@ -58,30 +56,30 @@ public class MCRSessionTest extends MCRTestCase {
 
     @Test
     public void testIsGuestDefault() {
-        assertEquals(GUEST_INSTANCE, session.getUserInformation());
+        assertEquals(GUEST, session.getUserInformation());
     }
 
     @Test
     public void loginSuperUser() {
-        session.setUserInformation(SUPER_USER_INSTANCE);
-        assertEquals(SUPER_USER_INSTANCE, session.getUserInformation());
+        session.setUserInformation(SUPER_USER);
+        assertEquals(SUPER_USER, session.getUserInformation());
     }
 
     @Test
     public void downGradeUser() {
         MCRUserInformation otherUser = getSimpleUserInformation("JUnit");
-        session.setUserInformation(SUPER_USER_INSTANCE);
+        session.setUserInformation(SUPER_USER);
         session.setUserInformation(otherUser);
         assertEquals(otherUser, session.getUserInformation());
-        session.setUserInformation(GUEST_INSTANCE);
-        assertEquals(GUEST_INSTANCE, session.getUserInformation());
+        session.setUserInformation(GUEST);
+        assertEquals(GUEST, session.getUserInformation());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void upgradeFail() {
         MCRUserInformation otherUser = getSimpleUserInformation("JUnit");
         session.setUserInformation(otherUser);
-        session.setUserInformation(SUPER_USER_INSTANCE);
+        session.setUserInformation(SUPER_USER);
     }
 
     private static MCRUserInformation getSimpleUserInformation(String userID) {

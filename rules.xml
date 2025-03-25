@@ -199,9 +199,119 @@
     </properties>
   </rule-->
 
-  <rule name="MCR.SerialVersionUid.Annotation"
+  <rule name="MCR.Singleton.MethodModifiers"
         language="java"
-        message="The serialVersionUID should be annotated with @java.io.Serial"
+        message="A method named 'getInstance' should be static"
+        class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+    <priority>4</priority>
+    <properties>
+      <property name="xpath">
+        <value>
+          //MethodDeclaration
+            [
+              @Name='getInstance'
+                and
+              not(ModifierList/Annotation/ClassType[pmd-java:typeIs('java.lang.Deprecated')])
+            ]
+            [
+              not(pmd-java:modifiers()='static')
+            ]
+        </value>
+      </property>
+    </properties>
+  </rule>
+
+  <rule name="MCR.Singleton.MethodReturnType"
+        language="java"
+        message="A method named 'getInstance' should return an instance of the enclosing class"
+        class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+    <priority>4</priority>
+    <properties>
+      <property name="xpath">
+        <value>
+          //MethodDeclaration
+            [
+              @Name='getInstance'
+                and
+              not(ModifierList/Annotation/ClassType[pmd-java:typeIs('java.lang.Deprecated')])
+            ]
+            [
+              not(ClassType[pmd-java:typeIs(../../../@CanonicalName)])
+            ]
+        </value>
+      </property>
+    </properties>
+  </rule>
+
+  <rule name="MCR.Singleton.ClassModifiers"
+        language="java"
+        message="A singleton class (with method named 'getInstance') should be final"
+        class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+    <priority>4</priority>
+    <properties>
+      <property name="xpath">
+        <value>
+          //MethodDeclaration
+            [
+              @Name='getInstance'
+                and
+              not(ModifierList/Annotation/ClassType[pmd-java:typeIs('java.lang.Deprecated')])
+            ]
+            [
+              not(../..[pmd-java:modifiers()='final'])
+            ]
+        </value>
+      </property>
+    </properties>
+  </rule>
+
+  <rule name="MCR.Singleton.PrivateConstructor"
+        language="java"
+        message="A singleton class with (method named 'getInstance') should have a private constructor"
+        class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+    <priority>4</priority>
+    <properties>
+      <property name="xpath">
+        <value>
+          //MethodDeclaration
+            [
+              @Name='getInstance'
+                and
+              not(ModifierList/Annotation/ClassType[pmd-java:typeIs('java.lang.Deprecated')])
+            ]
+            [
+              not(../ConstructorDeclaration[pmd-java:modifiers()='private'])
+            ]
+        </value>
+      </property>
+    </properties>
+  </rule>
+
+  <rule name="MCR.Singleton.NonPrivateConstructors"
+        language="java"
+        message="A singleton class with (method named 'getInstance') should only have a private constructors"
+        class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+    <priority>4</priority>
+    <properties>
+      <property name="xpath">
+        <value>
+          //MethodDeclaration
+            [
+              @Name='getInstance'
+                and
+              not(ModifierList/Annotation/ClassType[pmd-java:typeIs('java.lang.Deprecated')])
+            ]
+            [
+              ../ConstructorDeclaration[not(deep-equal(pmd-java:modifiers(),('private')))]
+            ]
+        </value>
+      </property>
+    </properties>
+  </rule>
+
+  <rule name="MCR.SerialVersionUid.ModifiersAndType"
+        language="java"
+        message="The serialVersionUID should have modifiers private static final and type long"
         class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
     <priority>4</priority>
     <properties>
@@ -210,14 +320,38 @@
           <![CDATA[
             //ClassBody/FieldDeclaration
               [
-                pmd-java:modifiers()='private'
-                  and
-                pmd-java:modifiers()='static'
-                  and
-                pmd-java:modifiers()='final'
-                  and
-                PrimitiveType[@Kind='long']
-                  and
+                VariableDeclarator/VariableId[@Name='serialVersionUID']
+              ]
+              [
+                not(
+                  deep-equal(pmd-java:modifiers(), ('private','static','final'))
+                    and
+                  PrimitiveType[@Kind='long']
+                )
+              ]
+          ]]>
+        </value>
+      </property>
+    </properties>
+  </rule>
+
+  <rule name="MCR.SerialVersionUid.Annotation"
+        language="java"
+        message="The serialVersionUID should be annotated with @java.io.Serial"
+        class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+    <priority>4</priority>
+    <description>
+      Field should look like this:
+
+      @Serial
+      private static final long serialVersionUID = 1L;
+    </description>
+    <properties>
+      <property name="xpath">
+        <value>
+          <![CDATA[
+            //ClassBody/FieldDeclaration
+              [
                 VariableDeclarator/VariableId[@Name='serialVersionUID']
               ]
               [
@@ -234,25 +368,68 @@
         message="The serialVersionUID should have literal value '1L'"
         class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
     <priority>4</priority>
+    <description>
+      Field should look like this:
+
+      @Serial
+      private static final long serialVersionUID = 1L;
+    </description>
     <properties>
       <property name="xpath">
         <value>
           <![CDATA[
             //ClassBody/FieldDeclaration
               [
-                pmd-java:modifiers()='private'
-                  and
-                pmd-java:modifiers()='static'
-                  and
-                pmd-java:modifiers()='final'
-                  and
-                PrimitiveType[@Kind='long']
-                  and
                 VariableDeclarator/VariableId[@Name='serialVersionUID']
               ]
               [
                 not(VariableDeclarator/NumericLiteral[@Image='1L'])
               ]
+          ]]>
+        </value>
+      </property>
+    </properties>
+  </rule>
+
+  <rule name="MCR.ResourceResolver"
+        language="java"
+        message="Resources should be accessed using MCRResourceResolver or MCRResourceHelper"
+        class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+    <description>
+      Accessing resources directly via Class, ClassLoader or ServletContext should only be done
+      - in classes that are part of the setup of the MyCoRe application (e.g. MCRConfigurationInputStream, MCRComponent),
+      - in classes that are used by MCRResourceResolver (e.g. MCRResourceProvider, MCRResourceLocator) or
+      - in rare cases where module specific files need to be accessed (e.g. MCRCoreVersion accessing git.properties).
+      Otherwise, MCRResourceResolver or MCRResourceHelper should be used.
+    </description>
+    <priority>1</priority>
+    <properties>
+      <property name="xpath">
+        <value>
+          <![CDATA[
+            //(MethodCall|MethodReference)
+              [*[position() = 1 and pmd-java:typeIs('java.lang.Class')]]
+              [@MethodName=(
+                'getResource',
+                'getResourceAsStream'
+              )]
+              |
+            //(MethodCall|MethodReference)
+              [*[position() = 1 and pmd-java:typeIs('java.lang.ClassLoader')]]
+              [@MethodName=(
+                'resources',
+                'getResource',
+                'getResources',
+                'getResourceAsStream'
+              )]
+              |
+            //(MethodCall|MethodReference)
+              [*[position() = 1 and pmd-java:typeIs('jakarta.servlet.ServletContext')]]
+              [@MethodName=(
+                'getResource',
+                'getResourcePaths',
+                'getResourceAsStream'
+              )]
           ]]>
         </value>
       </property>

@@ -51,9 +51,18 @@ public class MCRClassURL {
     public void setHref(String value) {
         this.href = value;
     }
+    
+    /**
+     * @deprecated Use {@link #ofUri(URI)} instead
+     */
+    @Deprecated
+    @SuppressWarnings("PMD.SingletonClassReturningNewInstance")
+    public static MCRClassURL getInstance(URI uri) {
+        return ofUri(uri);
+    }
 
     @JsonCreator
-    public static MCRClassURL getInstance(URI uri) {
+    public static MCRClassURL ofUri(URI uri) {
         if (uri == null) {
             return null;
         }

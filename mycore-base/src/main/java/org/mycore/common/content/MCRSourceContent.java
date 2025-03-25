@@ -47,7 +47,7 @@ import jakarta.xml.bind.util.JAXBSource;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRSourceContent extends MCRWrappedContent {
-    private static final MCRURIResolver URI_RESOLVER = MCRURIResolver.instance();
+    private static final MCRURIResolver URI_RESOLVER = MCRURIResolver.obtainInstance();
 
     private Source source;
 
@@ -121,12 +121,20 @@ public class MCRSourceContent extends MCRWrappedContent {
     }
 
     /**
+     * @deprecated Use {@link #createInstance(String)} instead
+     */
+    @Deprecated
+    public static MCRSourceContent getInstance(String uri) throws TransformerException {
+        return createInstance(uri);
+    }
+
+    /**
      * Build instance of MCRSourceContent by resolving via {@link MCRURIResolver}
      * 
      * @throws TransformerException
      *             thrown by {@link MCRURIResolver#resolve(String, String)}
      */
-    public static MCRSourceContent getInstance(String uri) throws TransformerException {
+    public static MCRSourceContent createInstance(String uri) throws TransformerException {
         Source source = URI_RESOLVER.resolve(uri, null);
         if (source == null) {
             return null;

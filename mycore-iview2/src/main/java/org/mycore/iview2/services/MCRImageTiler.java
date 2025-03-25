@@ -42,7 +42,8 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 import org.mycore.common.processing.MCRProcessableDefaultCollection;
-import org.mycore.common.processing.MCRProcessableRegistry;
+import org.mycore.common.processing.MCRProcessableManager;
+import org.mycore.iview2.events.MCRIView2TilingThreadStarter;
 import org.mycore.util.concurrent.processing.MCRProcessableExecutor;
 import org.mycore.util.concurrent.processing.MCRProcessableFactory;
 
@@ -56,8 +57,6 @@ import jakarta.persistence.PersistenceException;
  * @author Thomas Scheffler (yagee)
  */
 public final class MCRImageTiler implements Runnable, Closeable {
-
-    private static volatile MCRImageTiler instance;
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -89,23 +88,18 @@ public final class MCRImageTiler implements Runnable, Closeable {
 
     /**
      * @return true if image tiler thread is running.
+     * @deprecated Use {@link MCRIView2TilingThreadStarter#isStarted()} instead
      */
+    @Deprecated
     public static boolean isRunning() {
-        return instance != null;
+        return MCRIView2TilingThreadStarter.isStarted();
     }
 
     /**
      * @return an instance of this class.
      */
     public static MCRImageTiler getInstance() {
-        if (instance == null) {
-            synchronized (MCRImageTiler.class) {
-                if (instance == null) {
-                    instance = new MCRImageTiler();
-                }
-            }
-        }
-        return instance;
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     /**
@@ -119,7 +113,7 @@ public final class MCRImageTiler implements Runnable, Closeable {
         //get this MCRSession a speaking name
         MCRSessionMgr.unlock();
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
+        mcrSession.setUserInformation(MCRSystemUserInformation.SYSTEM_USER);
         boolean activated = MCRConfiguration2.getBoolean(MCRIView2Tools.CONFIG_PREFIX + "LocalTiler.activated")
             .orElse(true) && MCRConfiguration2.getBoolean("MCR.Persistence.Database.Enable").orElse(true)
             && MCREntityManagerProvider.getEntityManagerFactory() != null;
@@ -129,8 +123,7 @@ public final class MCRImageTiler implements Runnable, Closeable {
             () -> Arrays.toString(ImageIO.getReaderFormatNames()));
 
         MCRProcessableDefaultCollection imageTilerCollection = new MCRProcessableDefaultCollection("Image Tiler");
-        MCRProcessableRegistry registry = MCRProcessableRegistry.getSingleInstance();
-        registry.register(imageTilerCollection);
+        MCRProcessableManager.getInstance().getRegistry().register(imageTilerCollection);
 
         if (activated) {
             startTilingThreads(imageTilerCollection);
@@ -321,4 +314,9 @@ public final class MCRImageTiler implements Runnable, Closeable {
     public int getPriority() {
         return MCRShutdownHandler.Closeable.DEFAULT_PRIORITY - 1;
     }
+
+    private static final class LazyInstanceHolder {
+        public static final MCRImageTiler SINGLETON_INSTANCE = new MCRImageTiler();
+    }
+
 }

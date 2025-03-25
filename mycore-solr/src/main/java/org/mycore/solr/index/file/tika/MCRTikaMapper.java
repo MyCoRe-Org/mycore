@@ -18,15 +18,12 @@
 
 package org.mycore.solr.index.file.tika;
 
-import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
+import org.apache.solr.common.SolrInputDocument;
 
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Locale;
 import java.util.Optional;
-
-import org.apache.solr.common.SolrInputDocument;
-import org.mycore.common.config.MCRConfiguration2;
 
 import com.fasterxml.jackson.core.TreeNode;
 
@@ -51,20 +48,22 @@ public interface MCRTikaMapper {
     /**
      * Returns the default Tika mapper. This mapper is used if no mapper is defined for a key.
      * @return The default Tika mapper
+     * @deprecated Use {@link MCRTikaManager#getDefaultMapper()} instead
      */
+    @Deprecated
     static MCRTikaMapper getDefaultMapper() {
-        return MCRConfiguration2.getInstanceOfOrThrow(MCRTikaMapper.class,
-            SOLR_CONFIG_PREFIX + "Tika.Mapper.Default.Class");
+        return MCRTikaManager.getInstance().getDefaultMapper();
     }
 
     /**
      * Returns the Tika mapper for the given key. If no mapper is defined for the key, the default mapper is returned.
      * @param key The key for which the mapper should be returned
      * @return The Tika mapper for the given key
+     * @deprecated Use {@link MCRTikaManager#getMapper(String)} instead
      */
+    @Deprecated
     static Optional<MCRTikaMapper> getMapper(String key) {
-        return MCRConfiguration2.getInstanceOf(MCRTikaMapper.class,
-            SOLR_CONFIG_PREFIX + "Tika.Mapper." + key + ".Class");
+        return MCRTikaManager.getInstance().getMapper(key);
     }
 
     /**

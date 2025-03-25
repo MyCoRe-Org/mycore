@@ -69,8 +69,8 @@ public class MCRClassificationUtils {
      * @return the classification as jdom document
      */
     public static Document asDocument(String classId) {
-        MCRCategoryID categoryId = MCRCategoryID.rootID(classId);
-        MCRCategory classification = MCRCategoryDAOFactory.getInstance().getRootCategory(categoryId, -1);
+        MCRCategoryID categoryId = new MCRCategoryID(classId);
+        MCRCategory classification = MCRCategoryDAOFactory.obtainInstance().getRootCategory(categoryId, -1);
         if (classification == null) {
             return null;
         }
@@ -104,7 +104,7 @@ public class MCRClassificationUtils {
      */
     public static void fromStream(InputStream inputStream)
         throws MCRException, URISyntaxException, MCRAccessException, IOException {
-        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
+        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
         Document jdom = null;
         try {
             jdom = MCRXMLParserFactory.getParser().parseXML(new MCRStreamContent(inputStream));

@@ -49,7 +49,7 @@ public final class MCRRestUtils {
 
     public static Response getCachedResponseIgnoreExceptions(Request request, MCRObjectID id) {
         try {
-            long lastModified = MCRXMLMetadataManager.instance().getLastModified(id);
+            long lastModified = MCRXMLMetadataManager.getInstance().getLastModified(id);
             if (lastModified >= 0) {
                 Date lmDate = new Date(lastModified);
                 Optional<Response> cachedResponse = getCachedResponse(request, lmDate);

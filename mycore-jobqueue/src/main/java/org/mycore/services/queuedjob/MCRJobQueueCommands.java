@@ -37,8 +37,6 @@ public class MCRJobQueueCommands {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    static MCRJobDAOJPAImpl dao = new MCRJobDAOJPAImpl();
-
     /**
      * Lists all jobs with status MAX_TRIES.
      */
@@ -47,7 +45,7 @@ public class MCRJobQueueCommands {
         help = "List all jobs with status MAX_TRIES",
         order = 10)
     public static void listMaxTryJobs() {
-        List<MCRJob> jobs = dao.getJobs(null, null, List.of(MCRJobStatus.MAX_TRIES), null, null);
+        List<MCRJob> jobs = new MCRJobDAOJPAImpl().getJobs(null, null, List.of(MCRJobStatus.MAX_TRIES), null, null);
 
         jobs.forEach(job -> {
             LOGGER.info("{}: {} {} {} {} {}", job::getId, job::getAction, job::getStatus, job::getTries, job::getAdded,
@@ -133,7 +131,7 @@ public class MCRJobQueueCommands {
         help = "clean job queue",
         order = 50)
     public static void cleanJobQueue() {
-        MCRJobQueueCleaner cleaner = MCRJobQueueCleaner.instantiate();
+        MCRJobQueueCleaner cleaner = MCRJobQueueCleaner.createInstance();
         int cleaned = cleaner.clean();
         LOGGER.info("Removed {} jobs", cleaned);
     }
@@ -143,7 +141,7 @@ public class MCRJobQueueCommands {
         help = "clean job queue with selector {0}",
         order = 50)
     public static void cleanJobQueue(String selectorName) {
-        MCRJobQueueCleaner cleaner = MCRJobQueueCleaner.instantiate();
+        MCRJobQueueCleaner cleaner = MCRJobQueueCleaner.createInstance();
         int cleaned = cleaner.clean(selectorName);
         LOGGER.info("Removed {} jobs", cleaned);
     }

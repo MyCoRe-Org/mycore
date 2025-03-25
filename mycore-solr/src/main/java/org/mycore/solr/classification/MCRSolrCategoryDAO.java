@@ -74,7 +74,7 @@ public class MCRSolrCategoryDAO extends MCRCategoryDAOImpl {
 
     @Override
     public void deleteCategory(MCRCategoryID id) {
-        MCRCategory category = MCRCategoryDAOFactory.getInstance().getCategory(id, 0);
+        MCRCategory category = MCRCategoryDAOFactory.obtainInstance().getCategory(id, 0);
         MCRCategory parent = category.getParent();
         super.deleteCategory(id);
         MCRSolrClassificationUtil.solrDelete(id, parent);

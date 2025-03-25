@@ -29,29 +29,29 @@ public class MCRSystemUserInformationProviderTest extends MCRTestCase {
     @Test
     public void getGuest() {
         assertEquals(
-            Optional.of(MCRSystemUserInformation.getGuestInstance()),
-            get(MCRSystemUserInformationProvider.GUEST));
+            Optional.of(MCRSystemUserInformation.GUEST),
+            get(MCRSystemUserInformation.GUEST.name()));
     }
 
     @Test
     public void getJanitor() {
         assertEquals(
-            Optional.of(MCRSystemUserInformation.getJanitorInstance()),
-            get(MCRSystemUserInformationProvider.JANITOR));
+            Optional.of(MCRSystemUserInformation.JANITOR),
+            get(MCRSystemUserInformation.JANITOR.name()));
     }
 
     @Test
     public void getSystemUser() {
         assertEquals(
-            Optional.of(MCRSystemUserInformation.getSystemUserInstance()),
-            get(MCRSystemUserInformationProvider.SYSTEM_USER));
+            Optional.of(MCRSystemUserInformation.SYSTEM_USER),
+            get(MCRSystemUserInformation.SYSTEM_USER.name()));
     }
 
     @Test
     public void getSuperUser() {
         assertEquals(
-            Optional.of(MCRSystemUserInformation.getSuperUserInstance()),
-            get(MCRSystemUserInformationProvider.SUPER_USER));
+            Optional.of(MCRSystemUserInformation.SUPER_USER),
+            get(MCRSystemUserInformation.SUPER_USER.name()));
     }
 
     @Test
@@ -62,7 +62,7 @@ public class MCRSystemUserInformationProviderTest extends MCRTestCase {
     }
 
     private Optional<MCRUserInformation> get(String userId) {
-        return MCRUserInformationResolver.instance().get("system", userId);
+        return MCRUserInformationResolver.obtainInstance().get("system", userId);
     }
 
 }

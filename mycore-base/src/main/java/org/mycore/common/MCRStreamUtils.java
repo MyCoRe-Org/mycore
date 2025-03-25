@@ -55,7 +55,7 @@ public class MCRStreamUtils {
     /**
      * Example:
      * <pre>
-     *   MCRCategory foo = MCRCategoryDAOFactory.getInstance().getCategory(MCRCategoryID.rootID("foo"), -1);
+     *   MCRCategory foo = MCRCategoryDAOFactory.getInstance().getCategory(new MCRCategoryID("foo"), -1);
      *   Stream&lt;MCRCategory&gt; parentCategories = flatten(foo, MCRCategory::getChildren, true, MCRCategory::hasChildren);
      * </pre>
      * @param node first node the stream is made of

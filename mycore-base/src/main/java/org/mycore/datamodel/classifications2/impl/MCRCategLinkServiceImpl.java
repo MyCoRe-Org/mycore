@@ -81,7 +81,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         MCRConfiguration2.getInt("MCR.Classifications.LinkServiceImpl.CategCache.Size").orElse(1000),
         "MCRCategLinkService category cache");
 
-    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.obtainInstance();
 
     @Override
     public Map<MCRCategoryID, Number> countLinks(MCRCategory parent, boolean childrenOnly) {
@@ -280,7 +280,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             return hasLinksForClassifications();
         }
 
-        MCRCategoryImpl rootImpl = (MCRCategoryImpl) MCRCategoryDAOFactory.getInstance()
+        MCRCategoryImpl rootImpl = (MCRCategoryImpl) MCRCategoryDAOFactory.obtainInstance()
             .getCategory(category.getRoot().getId(), -1);
         if (rootImpl == null) {
             //Category does not exist, so it has no links
@@ -307,7 +307,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             String.class);
         setReadOnly(linkedClassifications);
         linkedClassifications.getResultList()
-            .stream().map(MCRCategoryID::rootID)
+            .stream().map(MCRCategoryID::new)
             .forEach(id -> boolMap.put(id, true));
         return boolMap;
     }

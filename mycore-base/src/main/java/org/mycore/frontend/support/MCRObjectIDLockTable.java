@@ -31,26 +31,17 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 
 public final class MCRObjectIDLockTable implements MCRSessionListener {
 
-    private static volatile MCRObjectIDLockTable instance;
-
     private static final Logger LOGGER = LogManager.getLogger();
 
     private final ConcurrentMap<MCRObjectID, MCRSession> lockMap;
 
-    private static MCRObjectIDLockTable getInstance() {
-        if(instance == null) {
-            synchronized (MCRObjectIDLockTable.class) {
-                if(instance == null) {
-                    instance = new MCRObjectIDLockTable();
-                }
-            }
-        }
-        return instance;
-    }
-
     private MCRObjectIDLockTable() {
         this.lockMap = new ConcurrentHashMap<>();
         MCRSessionMgr.addSessionListener(this);
+    }
+
+    private static MCRObjectIDLockTable getInstance() {
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     public void clearTable(MCRSession session) {
@@ -97,4 +88,9 @@ public final class MCRObjectIDLockTable implements MCRSessionListener {
         }
         return locker.getUserInformation().getUserID();
     }
+
+    private static final class LazyInstanceHolder {
+        public static final MCRObjectIDLockTable SINGLETON_INSTANCE = new MCRObjectIDLockTable();
+    }
+
 }

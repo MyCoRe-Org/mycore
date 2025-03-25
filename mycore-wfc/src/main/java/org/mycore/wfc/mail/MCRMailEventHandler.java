@@ -81,7 +81,7 @@ public class MCRMailEventHandler extends MCREventHandlerBase {
         if (!(file instanceof MCRPath)) {
             return;
         }
-        MCRPath path = MCRPath.toMCRPath(file);
+        MCRPath path = MCRPath.ofPath(file);
         MCRContent xml;
         try {
             xml = new MCRJDOMContent(MCRPathXML.getFileXML(path, attrs));

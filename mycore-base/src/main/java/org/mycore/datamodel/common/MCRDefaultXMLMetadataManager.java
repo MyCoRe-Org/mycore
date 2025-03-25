@@ -140,15 +140,18 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
      */
     private URI svnBase;
 
-    protected MCRDefaultXMLMetadataManager() {
+    public MCRDefaultXMLMetadataManager() {
         this.createdStores = new HashSet<>();
         reload();
     }
 
-    /** Returns the singleton */
-    public static synchronized MCRDefaultXMLMetadataManager instance() {
+    /**
+     * @deprecated Use {@link #MCRDefaultXMLMetadataManager()} instead 
+     */
+    @Deprecated
+    public static MCRDefaultXMLMetadataManager instance() {
         if (singleton == null) {
-            singleton = new MCRDefaultXMLMetadataManager();
+            return new MCRDefaultXMLMetadataManager();
         }
         return singleton;
     }
@@ -202,7 +205,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
 
     private synchronized void closeCreatedStores() {
         for (String storeId : createdStores) {
-            MCRStoreCenter.instance().removeStore(storeId);
+            MCRStoreCenter.getInstance().removeStore(storeId);
         }
         createdStores.clear();
     }

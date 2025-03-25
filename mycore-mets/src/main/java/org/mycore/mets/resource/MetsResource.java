@@ -30,7 +30,6 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -44,6 +43,7 @@ import org.mycore.mets.model.converter.MCRSimpleModelXMLConverter;
 import org.mycore.mets.model.converter.MCRXMLSimpleModelConverter;
 import org.mycore.mets.model.simple.MCRMetsSimpleModel;
 import org.mycore.mets.tools.MCRMetsLock;
+import org.mycore.resource.MCRResourceHelper;
 
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -72,7 +72,7 @@ public class MetsResource {
         checkDerivateExists(derivateIdObject);
         checkDerivateAccess(derivateIdObject, MCRAccessManager.PERMISSION_WRITE);
 
-        try (InputStream resourceAsStream = MCRClassTools.getClassLoader().getResourceAsStream("mets-editor.html")) {
+        try (InputStream resourceAsStream = MCRResourceHelper.getResourceAsStream("mets-editor.html")) {
             String htmlTemplate = new String(resourceAsStream.readAllBytes(), StandardCharsets.UTF_8);
             // add additional javascript code
             String js = MCRConfiguration2.getString("MCR.Mets.Editor.additional.javascript").orElse(null);

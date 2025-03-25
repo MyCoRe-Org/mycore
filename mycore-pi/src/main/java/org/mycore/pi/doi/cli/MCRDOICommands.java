@@ -69,6 +69,7 @@ import org.mycore.pi.doi.client.datacite.MCRDataciteClient;
 import org.mycore.pi.doi.crossref.MCRCrossrefUtil;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+import org.mycore.resource.MCRResourceHelper;
 import org.xml.sax.SAXException;
 
 @MCRCommandGroup(name = "DOI Commands")
@@ -303,7 +304,7 @@ public class MCRDOICommands {
         final Schema schema;
         try {
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            URL localSchemaURL = Thread.currentThread().getContextClassLoader().getResource(CROSSREF_SCHEMA_PATH);
+            URL localSchemaURL = MCRResourceHelper.getResourceUrl(CROSSREF_SCHEMA_PATH);
             if (localSchemaURL == null) {
                 LOGGER.error(CROSSREF_SCHEMA_PATH + " was not found!");
                 return;

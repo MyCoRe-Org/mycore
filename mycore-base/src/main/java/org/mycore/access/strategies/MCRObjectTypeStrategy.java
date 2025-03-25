@@ -46,7 +46,7 @@ public class MCRObjectTypeStrategy implements MCRCombineableAccessCheckStrategy 
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.obtainInstance();
 
     private static final MCRObjectIDStrategy ID_STRATEGY = new MCRObjectIDStrategy();
 
@@ -87,7 +87,7 @@ public class MCRObjectTypeStrategy implements MCRCombineableAccessCheckStrategy 
         } else {
             MCRCategoryID rootID;
             try {
-                rootID = MCRCategoryID.rootID(id);
+                rootID = new MCRCategoryID(id);
             } catch (Exception e) {
                 LOGGER.debug("ID '{}' is not a valid category id.", id);
                 return null;

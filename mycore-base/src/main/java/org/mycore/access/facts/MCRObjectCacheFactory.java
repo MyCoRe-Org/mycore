@@ -40,7 +40,7 @@ public final class MCRObjectCacheFactory extends MCREventHandlerBase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRObjectCacheFactory SINGLETON = new MCRObjectCacheFactory();
+    private static final MCRObjectCacheFactory SINGLETON_INSTANCE = new MCRObjectCacheFactory();
 
     private static final int CACHE_MAX_SIZE = 100;
 
@@ -48,11 +48,19 @@ public final class MCRObjectCacheFactory extends MCREventHandlerBase {
 
     private MCRObjectCacheFactory() {
         objectCache = new MCRCache<>(CACHE_MAX_SIZE, this.getClass().getName());
-        MCREventManager.instance().addEventHandler(MCREvent.ObjectType.OBJECT, this);
+        MCREventManager.getInstance().addEventHandler(MCREvent.ObjectType.OBJECT, this);
     }
 
+    /**
+     * @deprecated Use {@link #getInstance()} instead
+     */
+    @Deprecated
     public static MCRObjectCacheFactory instance() {
-        return SINGLETON;
+        return getInstance();
+    }
+
+    public static MCRObjectCacheFactory getInstance() {
+        return SINGLETON_INSTANCE;
     }
 
     public MCRObject getObject(MCRObjectID oid) {

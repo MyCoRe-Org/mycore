@@ -46,7 +46,7 @@ public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler
 
     public MCRSolrAbstractIndexHandler() {
         this.commitWithin = MCRConfiguration2.getInt("MCR.Solr.commitWithIn").orElseThrow();
-        this.solrAuthenticationFactory = MCRSolrAuthenticationManager.getInstance();
+        this.solrAuthenticationFactory = MCRSolrAuthenticationManager.obtainInstance();
     }
 
     @Override
@@ -98,7 +98,7 @@ public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler
 
     protected UpdateRequest getUpdateRequest(String path) {
         UpdateRequest req = path != null ? new UpdateRequest(path) : new UpdateRequest();
-        MCRSolrAuthenticationManager.getInstance().applyAuthentication(req, MCRSolrAuthenticationLevel.INDEX);
+        MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(req, MCRSolrAuthenticationLevel.INDEX);
         req.setCommitWithin(getCommitWithin());
         return req;
     }

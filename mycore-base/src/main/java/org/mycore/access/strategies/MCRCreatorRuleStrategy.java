@@ -87,7 +87,7 @@ public class MCRCreatorRuleStrategy implements MCRCombineableAccessCheckStrategy
         MCRConfiguration2.getString("MCR.Access.Strategy.CreatorAnyStatePermissions").stream()
             .flatMap(MCRConfiguration2::splitValue).toList();
 
-    private static final MCRCategLinkService LINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
+    private static final MCRCategLinkService LINK_SERVICE = MCRCategLinkServiceFactory.obtainInstance();
 
     private static final MCRObjectTypeStrategy BASE_STRATEGY = new MCRObjectTypeStrategy();
 
@@ -121,7 +121,7 @@ public class MCRCreatorRuleStrategy implements MCRCombineableAccessCheckStrategy
             return false;
         }
         for (String categoryId : categoryIds) {
-            MCRCategoryID category = MCRCategoryID.fromString(categoryId);
+            MCRCategoryID category = MCRCategoryID.ofString(categoryId);
             if (LINK_SERVICE.isInCategory(reference, category)) {
                 return true;
             }

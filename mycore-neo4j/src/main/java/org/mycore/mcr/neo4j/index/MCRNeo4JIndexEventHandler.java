@@ -159,7 +159,7 @@ public class MCRNeo4JIndexEventHandler extends MCREventHandlerBase {
         LOGGER.debug("Neo4j: update id {}", mcrObject::getId);
 
         // do not add objects marked for deletion
-        if (MCRMarkManager.instance().isMarked(mcrObject.getId())) {
+        if (MCRMarkManager.getInstance().isMarked(mcrObject.getId())) {
             return;
         }
 
@@ -193,7 +193,7 @@ public class MCRNeo4JIndexEventHandler extends MCREventHandlerBase {
         LOGGER.debug("Neo4j: add id {}", mcrObject::getId);
 
         // do not add objects marked for deletion
-        if (MCRMarkManager.instance().isMarked(mcrObject.getId())) {
+        if (MCRMarkManager.getInstance().isMarked(mcrObject.getId())) {
             return;
         }
 

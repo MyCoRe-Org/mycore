@@ -59,7 +59,7 @@ public class MCRCategoryTransformer {
     public static Document getMetaDataDocument(MCRCategory cl, boolean withCounter) {
         Map<MCRCategoryID, Number> countMap = null;
         if (withCounter) {
-            countMap = MCRCategLinkServiceFactory.getInstance().countLinks(cl, false);
+            countMap = MCRCategLinkServiceFactory.obtainInstance().countLinks(cl, false);
         }
         return MetaDataElementFactory.getDocument(cl, countMap);
     }
@@ -75,7 +75,7 @@ public class MCRCategoryTransformer {
     public static Element getMetaDataElement(MCRCategory category, boolean withCounter) {
         Map<MCRCategoryID, Number> countMap = null;
         if (withCounter) {
-            countMap = MCRCategLinkServiceFactory.getInstance().countLinks(category, false);
+            countMap = MCRCategLinkServiceFactory.obtainInstance().countLinks(category, false);
         }
         return MetaDataElementFactory.getElement(category, countMap);
     }
@@ -217,15 +217,15 @@ public class MCRCategoryTransformer {
              */
             if (countMatcher.find()) {
                 if (countMatcher.group(1) == null) {
-                    countMap = MCRCategLinkServiceFactory.getInstance().countLinks(cl, false);
+                    countMap = MCRCategLinkServiceFactory.obtainInstance().countLinks(cl, false);
                 } else {
                     // group(2) contains objectType
                     String objectType = countMatcher.group(2);
-                    countMap = MCRCategLinkServiceFactory.getInstance().countLinksForType(cl, objectType, false);
+                    countMap = MCRCategLinkServiceFactory.obtainInstance().countLinksForType(cl, objectType, false);
                 }
             }
             if (!emptyLeaves) {
-                linkedMap = MCRCategLinkServiceFactory.getInstance().hasLinks(cl);
+                linkedMap = MCRCategLinkServiceFactory.obtainInstance().hasLinks(cl);
             }
 
             root = new Element("items");

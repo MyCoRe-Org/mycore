@@ -50,7 +50,7 @@ public class MCRPasswordCheckManagerTest extends MCRTestCase {
     })
     public final void testCrypt() {
 
-        MCRPasswordCheckManager manager = MCRPasswordCheckManager.instantiate();
+        MCRPasswordCheckManager manager = MCRPasswordCheckManager.createInstance();
         MCRPasswordCheckData data = manager.create(PASSWORD);
 
         assertEquals("crypt", data.type());
@@ -64,7 +64,7 @@ public class MCRPasswordCheckManagerTest extends MCRTestCase {
     })
     public final void testMD5() {
 
-        MCRPasswordCheckManager manager = MCRPasswordCheckManager.instantiate();
+        MCRPasswordCheckManager manager = MCRPasswordCheckManager.createInstance();
         MCRPasswordCheckData data = manager.create(PASSWORD);
 
         assertEquals("md5", data.type());
@@ -78,7 +78,7 @@ public class MCRPasswordCheckManagerTest extends MCRTestCase {
     })
     public final void testSHA1() {
 
-        MCRPasswordCheckManager manager = MCRPasswordCheckManager.instantiate();
+        MCRPasswordCheckManager manager = MCRPasswordCheckManager.createInstance();
         MCRPasswordCheckData data = manager.create(PASSWORD);
 
         assertEquals("sha1", data.type());
@@ -92,7 +92,7 @@ public class MCRPasswordCheckManagerTest extends MCRTestCase {
     })
     public final void testSHA256() {
 
-        MCRPasswordCheckManager manager = MCRPasswordCheckManager.instantiate();
+        MCRPasswordCheckManager manager = MCRPasswordCheckManager.createInstance();
         MCRPasswordCheckData data = manager.create(PASSWORD);
 
         assertEquals("sha256", data.type());
@@ -106,7 +106,7 @@ public class MCRPasswordCheckManagerTest extends MCRTestCase {
     })
     public final void testSHA512() {
 
-        MCRPasswordCheckManager manager = MCRPasswordCheckManager.instantiate();
+        MCRPasswordCheckManager manager = MCRPasswordCheckManager.createInstance();
         MCRPasswordCheckData data = manager.create(PASSWORD);
 
         assertEquals("sha512", data.type());
@@ -120,7 +120,7 @@ public class MCRPasswordCheckManagerTest extends MCRTestCase {
     })
     public final void testS2K() {
 
-        MCRPasswordCheckManager manager = MCRPasswordCheckManager.instantiate();
+        MCRPasswordCheckManager manager = MCRPasswordCheckManager.createInstance();
         MCRPasswordCheckData data = manager.create(PASSWORD);
 
         assertEquals("s2k", data.type());
@@ -134,7 +134,7 @@ public class MCRPasswordCheckManagerTest extends MCRTestCase {
     })
     public final void testPBKDF2() {
 
-        MCRPasswordCheckManager manager = MCRPasswordCheckManager.instantiate();
+        MCRPasswordCheckManager manager = MCRPasswordCheckManager.createInstance();
         MCRPasswordCheckData data = manager.create(PASSWORD);
 
         assertEquals("pbkdf2", data.type());

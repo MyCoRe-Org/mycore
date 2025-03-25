@@ -89,16 +89,14 @@ public class MCRXSLTransformation {
 
     private static final Map EMPTY_PARAMETERS = Collections.unmodifiableMap(new HashMap<>(0, 1));
 
-    private static MCRXSLTransformation singleton;
-
     static {
-        factory.setURIResolver(MCRURIResolver.instance());
+        factory.setURIResolver(MCRURIResolver.obtainInstance());
         try {
             TransformerFactory tf = TransformerFactory.newInstance();
 
             if (tf.getFeature(SAXTransformerFactory.FEATURE)) {
                 saxFactory = (SAXTransformerFactory) tf;
-                saxFactory.setURIResolver(MCRURIResolver.instance());
+                saxFactory.setURIResolver(MCRURIResolver.obtainInstance());
             } else {
                 LOGGER.fatal("TransformerFactory could not be initialized.");
             }
@@ -112,17 +110,21 @@ public class MCRXSLTransformation {
     }
 
     /**
+     * @deprecated Use {@link #obtainInstance()} instead
+     */
+    @Deprecated
+    public static synchronized MCRXSLTransformation getInstance() {
+        return obtainInstance();
+    }
+
+    /**
      * Method getInstance. Creates an instance of MCRXSLTransformation, when
      * called the first time.
      * 
      * @return MCRXSLTransformation
      */
-    public static synchronized MCRXSLTransformation getInstance() {
-        if (singleton == null) {
-            singleton = new MCRXSLTransformation();
-        }
-
-        return singleton;
+    public static MCRXSLTransformation obtainInstance() {
+        return LazyInstanceHolder.SHARED_INSTANCE;
     }
 
     /**
@@ -295,4 +297,9 @@ public class MCRXSLTransformation {
         transformer.transform(new JDOMSource(in), out);
         return out.getDocument();
     }
+
+    private static final class LazyInstanceHolder {
+        public static final MCRXSLTransformation SHARED_INSTANCE = new MCRXSLTransformation();
+    }
+
 }

@@ -74,13 +74,14 @@ import org.xml.sax.XMLReader;
  *
  * @author Frank Lützenkirchen
  */
+@SuppressWarnings("PMD.SingleMethodSingleton")
 public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     private static final int INITIAL_BUFFER_SIZE = 32 * 1024;
 
-    private static final MCRURIResolver URI_RESOLVER = MCRURIResolver.instance();
+    private static final MCRURIResolver URI_RESOLVER = MCRURIResolver.obtainInstance();
 
-    private static final MCREntityResolver ENTITY_RESOLVER = MCREntityResolver.instance();
+    private static final MCREntityResolver ENTITY_RESOLVER = MCREntityResolver.getInstance();
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -105,18 +106,21 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     protected SAXTransformerFactory tFactory;
 
-    public MCRXSLTransformer(String... stylesheets) {
-        this(DEFAULT_FACTORY_CLASS);
-        setStylesheets(stylesheets);
-    }
-
     public MCRXSLTransformer() {
-        this(DEFAULT_FACTORY_CLASS);
+        this(DEFAULT_FACTORY_CLASS, new String[0]);
     }
 
-    public MCRXSLTransformer(Class<? extends TransformerFactory> tfClass) {
-        super();
-        setTransformerFactory(tfClass.getName());
+    public MCRXSLTransformer(String... stylesheets) {
+        this(DEFAULT_FACTORY_CLASS, stylesheets);
+    }
+
+    public MCRXSLTransformer(Class<? extends TransformerFactory> factoryClass) {
+        this(factoryClass, new String[0]);
+    }
+
+    public MCRXSLTransformer(Class<? extends TransformerFactory> factoryClass, String... stylesheets) {
+        setTransformerFactory(factoryClass.getName());
+        setStylesheets(stylesheets);
     }
 
     /**
@@ -130,7 +134,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             .orElseGet(TransformerFactory::newInstance);
         LOGGER.debug("Transformerfactory: {}", () -> transformerFactory.getClass().getName());
         transformerFactory.setURIResolver(URI_RESOLVER);
-        transformerFactory.setErrorListener(MCRErrorListener.getInstance());
+        transformerFactory.setErrorListener(new MCRErrorListener());
         if (transformerFactory.getFeature(SAXSource.FEATURE) && transformerFactory.getFeature(SAXResult.FEATURE)) {
             this.tFactory = (SAXTransformerFactory) transformerFactory;
         } else {
@@ -139,17 +143,34 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         }
     }
 
+    /**
+     * @deprecated Use {@link #obtainInstance(String...)} instead
+     */
+    @Deprecated
     public static MCRXSLTransformer getInstance(String... stylesheets) {
-        return getInstance(DEFAULT_FACTORY_CLASS, stylesheets);
+        return obtainInstance(stylesheets);
     }
 
-    public static MCRXSLTransformer getInstance(Class<? extends TransformerFactory> tfClass, String... stylesheets) {
-        String key = tfClass.getName() + "_"
+   public static MCRXSLTransformer obtainInstance(String... stylesheets) {
+        return obtainInstance(DEFAULT_FACTORY_CLASS, stylesheets);
+    }
+
+    /**
+     * @deprecated Use {@link #obtainInstance(Class, String...)} instead
+     */
+    @Deprecated
+    public static MCRXSLTransformer getInstance(Class<? extends TransformerFactory> factoryClass,
+        String... stylesheets) {
+        return obtainInstance(factoryClass, stylesheets);
+    }
+
+    public static MCRXSLTransformer obtainInstance(Class<? extends TransformerFactory> factoryClass,
+        String... stylesheets) {
+        String key = factoryClass.getName() + "_"
             + (stylesheets.length == 1 ? stylesheets[0] : Arrays.toString(stylesheets));
         MCRXSLTransformer instance = INSTANCE_CACHE.get(key);
         if (instance == null) {
-            instance = new MCRXSLTransformer(tfClass);
-            instance.setStylesheets(stylesheets);
+            instance = new MCRXSLTransformer(factoryClass, stylesheets);
             INSTANCE_CACHE.put(key, instance);
         }
         return instance;
@@ -302,11 +323,10 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         checkTemplateUptodate();
         Deque<TransformerHandler> xslSteps = new ArrayDeque<>();
         //every transformhandler shares the same ErrorListener instance
-        MCRErrorListener errorListener = MCRErrorListener.getInstance();
         for (Templates template : templates) {
             TransformerHandler handler = tFactory.newTransformerHandler(template);
             parameterCollector.setParametersTo(handler.getTransformer());
-            handler.getTransformer().setErrorListener(errorListener);
+            handler.getTransformer().setErrorListener(new MCRErrorListener());
             if (!xslSteps.isEmpty()) {
                 Result result = new SAXResult(handler);
                 xslSteps.getLast().setResult(result);

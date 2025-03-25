@@ -123,7 +123,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         MCRCategory secondCateg = nameIdentifier.getChildren().get(1);
         DAO.addCategory(null, nameIdentifier);
         startNewTransaction();
-        MCRCategLinkServiceFactory.getInstance().getLinksFromCategory(secondCateg.getId());
+        MCRCategLinkServiceFactory.obtainInstance().getLinksFromCategory(secondCateg.getId());
         assertTrue(secondCateg.getId() + " should exist.", DAO.exist(secondCateg.getId()));
         //re-set labels
         DAO.setLabels(secondCateg.getId(), new TreeSet<>(secondCateg.getLabels().stream().collect(Collectors.toSet())));
@@ -173,7 +173,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     @Test
     public void addCategorySingleSteps() {
         MCRCategory root = new MCRCategoryImpl();
-        MCRCategoryID rootID = MCRCategoryID.rootID("junit");
+        MCRCategoryID rootID = new MCRCategoryID("junit");
         root.setId(rootID);
         DAO.addCategory(null, root);
         startNewTransaction();
@@ -406,7 +406,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     @Test
     public void moveRightCategory() {
         String rootIDStr = "rootID";
-        MCRCategoryID rootID = MCRCategoryID.rootID(rootIDStr);
+        MCRCategoryID rootID = new MCRCategoryID(rootIDStr);
         MCRCategoryID child1ID = new MCRCategoryID(rootIDStr, "child1");
         MCRCategoryID child2ID = new MCRCategoryID(rootIDStr, "child2");
         MCRCategoryID child3ID = new MCRCategoryID(rootIDStr, "child3");
@@ -441,7 +441,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     @Test
     public void moveCategoryUp() {
         String rootIDStr = "rootID";
-        MCRCategoryID rootID = MCRCategoryID.rootID(rootIDStr);
+        MCRCategoryID rootID = new MCRCategoryID(rootIDStr);
         MCRCategoryID child1ID = new MCRCategoryID(rootIDStr, "child1");
         MCRCategoryID child2ID = new MCRCategoryID(rootIDStr, "child2");
         MCRCategoryImpl root = newCategory(rootID, "root node");
@@ -470,7 +470,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     @Test
     public void moveCategoryDeep() {
         String rootIDStr = "rootID";
-        MCRCategoryID rootID = MCRCategoryID.rootID(rootIDStr);
+        MCRCategoryID rootID = new MCRCategoryID(rootIDStr);
         MCRCategoryID child1ID = new MCRCategoryID(rootIDStr, "child1");
         MCRCategoryID child2ID = new MCRCategoryID(rootIDStr, "child2");
         MCRCategoryID child3ID = new MCRCategoryID(rootIDStr, "child3");
@@ -605,8 +605,8 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     public void setLabels() {
         addWorldClassification();
         startNewTransaction();
-        MCRCategory germany = DAO.getCategory(MCRCategoryID.fromString("World:Germany"), 0);
-        MCRCategory france = DAO.getCategory(MCRCategoryID.fromString("World:France"), 0);
+        MCRCategory germany = DAO.getCategory(MCRCategoryID.ofString("World:Germany"), 0);
+        MCRCategory france = DAO.getCategory(MCRCategoryID.ofString("World:France"), 0);
         SortedSet<MCRLabel> labels1 = new TreeSet<>();
         labels1.add(new MCRLabel("de", "deutschland", null));
         DAO.setLabels(germany.getId(), labels1);
@@ -615,8 +615,8 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         labels2.add(new MCRLabel("de", "frankreich", null));
         DAO.setLabels(france.getId(), labels2);
         startNewTransaction();
-        germany = DAO.getCategory(MCRCategoryID.fromString("World:Germany"), 0);
-        france = DAO.getCategory(MCRCategoryID.fromString("World:France"), 0);
+        germany = DAO.getCategory(MCRCategoryID.ofString("World:Germany"), 0);
+        france = DAO.getCategory(MCRCategoryID.ofString("World:France"), 0);
         assertEquals(1, germany.getLabels().size());
         assertEquals(1, france.getLabels().size());
         assertEquals("deutschland", germany.getLabel("de").get().getText());

@@ -53,11 +53,11 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
         final Set<MCRCategoryID> categories = new HashSet<>(modsWrapper.getMcrCategoryIDs());
         if (!categories.isEmpty()) {
             final MCRCategLinkReference objectReference = new MCRCategLinkReference(obj.getId());
-            MCRCategLinkServiceFactory.getInstance().setLinks(objectReference, categories);
+            MCRCategLinkServiceFactory.obtainInstance().setLinks(objectReference, categories);
         }
         List<Element> linkingNodes = modsWrapper.getLinkedRelatedItems();
         if (!linkingNodes.isEmpty()) {
-            MCRLinkTableManager linkTableManager = MCRLinkTableManager.instance();
+            MCRLinkTableManager linkTableManager = MCRLinkTableManager.getInstance();
             for (Element linkingNode : linkingNodes) {
                 String targetID = linkingNode.getAttributeValue(MCRXlink.HREF, MCRConstants.XLINK_NAMESPACE);
                 if (targetID == null) {

@@ -59,7 +59,7 @@ public class MCRCategoryConditionTest extends MCRJPATestCase {
     public void setUp() throws Exception {
         super.setUp();
 
-        MCRCategoryDAO instance = MCRCategoryDAOFactory.getInstance();
+        MCRCategoryDAO instance = MCRCategoryDAOFactory.obtainInstance();
         MCRCategoryImpl clazz = new MCRCategoryImpl();
         clazz.setRootID("clazz");
         clazz.setRootID("clazz");
@@ -80,7 +80,7 @@ public class MCRCategoryConditionTest extends MCRJPATestCase {
 
     @Test
     public void testConditionMatch() throws NoSuchFieldException, IllegalAccessException {
-        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getSuperUserInstance());
+        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.SUPER_USER);
 
         MCRObject object = new MCRObject();
         MCRObjectID testId = MCRObjectID.getInstance("test_test_00000001");
@@ -90,7 +90,7 @@ public class MCRCategoryConditionTest extends MCRJPATestCase {
         holder.add(new MCRObjectIDFact("objid", testId.toString(), testId));
 
         Collection<MCRCategoryID> collect = Stream.of(clazz1.getId()).collect(Collectors.toList());
-        MCRCategLinkServiceFactory.getInstance().setLinks(new MCRCategLinkReference(testId), collect);
+        MCRCategLinkServiceFactory.obtainInstance().setLinks(new MCRCategLinkReference(testId), collect);
 
         MCRCategoryCondition categoryCondition = new MCRCategoryCondition();
 
@@ -102,7 +102,7 @@ public class MCRCategoryConditionTest extends MCRJPATestCase {
 
     @Test
     public void testConditionNotMatch() throws NoSuchFieldException, IllegalAccessException {
-        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getSuperUserInstance());
+        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.SUPER_USER);
 
         MCRObject object = new MCRObject();
         MCRObjectID testId = MCRObjectID.getInstance("test_test_00000001");
@@ -112,7 +112,7 @@ public class MCRCategoryConditionTest extends MCRJPATestCase {
         holder.add(new MCRObjectIDFact("objid", testId.toString(), testId));
 
         Collection<MCRCategoryID> collect = Stream.of(clazz1.getId()).collect(Collectors.toList());
-        MCRCategLinkServiceFactory.getInstance().setLinks(new MCRCategLinkReference(testId), collect);
+        MCRCategLinkServiceFactory.obtainInstance().setLinks(new MCRCategLinkReference(testId), collect);
 
         MCRCategoryCondition categoryCondition = new MCRCategoryCondition();
 

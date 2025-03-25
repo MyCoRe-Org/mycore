@@ -69,8 +69,8 @@ public class MCRMODSDistributeMetadataJobAction extends MCRJobAction {
     public void execute() {
         MCRSession session = MCRSessionMgr.getCurrentSession();
         try {
-            session.setUserInformation(MCRSystemUserInformation.getGuestInstance());
-            session.setUserInformation(MCRSystemUserInformation.getJanitorInstance());
+            session.setUserInformation(MCRSystemUserInformation.GUEST);
+            session.setUserInformation(MCRSystemUserInformation.JANITOR);
             MCRObjectID id = MCRObjectID.getInstance(getID());
             MCRObject holder = MCRMetadataManager.retrieveMCRObject(id);
             MCRMODSWrapper holderWrapper = new MCRMODSWrapper(holder);
@@ -85,8 +85,8 @@ public class MCRMODSDistributeMetadataJobAction extends MCRJobAction {
             agent.distributeInheritedMetadata(holderWrapper);
             agent.distributeLinkedMetadata(holderWrapper);
         } finally {
-            session.setUserInformation(MCRSystemUserInformation.getGuestInstance());
-            session.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
+            session.setUserInformation(MCRSystemUserInformation.GUEST);
+            session.setUserInformation(MCRSystemUserInformation.SYSTEM_USER);
         }
     }
 

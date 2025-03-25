@@ -33,7 +33,7 @@ import org.mycore.services.queuedjob.config2.MCRConfiguration2JobConfig;
  * Manages the {@link MCRJobQueue} and other related instances for all {@link MCRJobAction} implementations.
  * @author Sebastian Hofmann
  */
-public class MCRJobQueueManager {
+public final class MCRJobQueueManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -46,7 +46,7 @@ public class MCRJobQueueManager {
 
     private final MCRJobConfig config;
 
-    MCRJobQueueManager(MCRJobDAO dao, MCRJobConfig config) {
+    private MCRJobQueueManager(MCRJobDAO dao, MCRJobConfig config) {
         this.dao = dao;
         this.config = config;
     }
@@ -55,7 +55,7 @@ public class MCRJobQueueManager {
      * @return the singleton instance of the {@link MCRJobQueueManager}
      */
     public static MCRJobQueueManager getInstance() {
-        return InstanceHolder.INSTANCE;
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     private static boolean isJPAEnabled() {
@@ -136,9 +136,9 @@ public class MCRJobQueueManager {
         return config;
     }
 
-    private static final class InstanceHolder {
-        private static final MCRJobQueueManager INSTANCE = new MCRJobQueueManager(new MCRJobDAOJPAImpl(),
-            new MCRConfiguration2JobConfig());
+    private static final class LazyInstanceHolder {
+        private static final MCRJobQueueManager SINGLETON_INSTANCE = new MCRJobQueueManager(
+            new MCRJobDAOJPAImpl(), new MCRConfiguration2JobConfig());
     }
 
 }

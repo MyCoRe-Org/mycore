@@ -26,23 +26,21 @@ import java.util.stream.Stream;
 
 public final class MCRStoreCenter {
 
-    private final Map<String, MCRStore> storeHeap;
-
-    private static volatile MCRStoreCenter instance;
+    private final Map<String, MCRStore> storeHeap = new ConcurrentHashMap<>();
 
     private MCRStoreCenter() {
-        this.storeHeap = new ConcurrentHashMap<>();
     }
 
+    /**
+     * @deprecated use {@link #getInstance()} instead
+     */
+    @Deprecated
     public static MCRStoreCenter instance() {
-        if (instance == null) {
-            synchronized (MCRStoreCenter.class) {
-                if (instance == null) {
-                    instance = new MCRStoreCenter();
-                }
-            }
-        }
-        return instance;
+        return getInstance();
+    }
+
+    public static MCRStoreCenter getInstance() {
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     /**
@@ -120,6 +118,10 @@ public final class MCRStoreCenter {
      */
     public void clear() {
         storeHeap.clear();
+    }
+
+    private static final class LazyInstanceHolder {
+        public static final MCRStoreCenter SINGLETON_INSTANCE = new MCRStoreCenter();
     }
 
 }

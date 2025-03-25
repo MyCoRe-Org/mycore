@@ -52,7 +52,7 @@ import org.mycore.datamodel.metadata.MCRObjectStructure;
  *
  * @author Jens Kupferschmidt
  */
-public class MCRLinkTableManager {
+public final class MCRLinkTableManager {
     /** The list of entry types */
     public static final String ENTRY_TYPE_CHILD = "child";
 
@@ -65,34 +65,38 @@ public class MCRLinkTableManager {
     public static final String ENTRY_TYPE_REFERENCE = "reference";
 
     /** The link table manager singleton */
-    protected static MCRLinkTableManager singleton;
+    private static final MCRLinkTableManager SINGLETON_INSTANCE = new MCRLinkTableManager();
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     private final MCRLinkTableInterface linkTableInstance;
 
     /**
-     * Returns the link table manager singleton.
-     *
-     * @return Returns a MCRLinkTableManager instance.
-     */
-    public static synchronized MCRLinkTableManager instance() {
-        if (singleton == null) {
-            singleton = new MCRLinkTableManager();
-        }
-
-        return singleton;
-    }
-
-    /**
      * The constructor of this class.
      */
-    protected MCRLinkTableManager() {
+    private MCRLinkTableManager() {
         // Load the persistence class
         linkTableInstance = MCRConfiguration2
             .getOrThrow("MCR.Persistence.LinkTable.Store.Class", MCRConfiguration2::instantiateClass);
     }
 
+    /**
+     * @deprecated use {@link #getInstance()} instead
+     */
+    @Deprecated
+    public static synchronized MCRLinkTableManager instance() {
+        return getInstance();
+    }
+
+    /**
+     * Returns the link table manager singleton.
+     *
+     * @return Returns a MCRLinkTableManager instance.
+     */
+    public static synchronized MCRLinkTableManager getInstance() {
+        return SINGLETON_INSTANCE;
+    }
+    
     /**
      * The method add a reference link pair.
      *
@@ -476,7 +480,7 @@ public class MCRLinkTableManager {
         categories.addAll(obj.getService().getClassifications());
         if (!categories.isEmpty()) {
             MCRCategLinkReference objectReference = new MCRCategLinkReference(mcrId);
-            MCRCategLinkServiceFactory.getInstance().setLinks(objectReference, categories);
+            MCRCategLinkServiceFactory.obtainInstance().setLinks(objectReference, categories);
         }
         // add derivate reference
         MCRObjectStructure structure = obj.getStructure();
@@ -498,7 +502,7 @@ public class MCRLinkTableManager {
     public void delete(MCRObjectID id) {
         deleteReferenceLink(id);
         MCRCategLinkReference reference = new MCRCategLinkReference(id);
-        MCRCategLinkServiceFactory.getInstance().deleteLink(reference);
+        MCRCategLinkServiceFactory.obtainInstance().deleteLink(reference);
     }
 
     /**
@@ -545,7 +549,7 @@ public class MCRLinkTableManager {
         }
 
         MCRCategLinkReference objectReference = new MCRCategLinkReference(der.getId());
-        MCRCategLinkServiceFactory.getInstance().setLinks(objectReference, categoryList);
+        MCRCategLinkServiceFactory.obtainInstance().setLinks(objectReference, categoryList);
     }
 
     private MCRCategoryID metaClassToCategoryID(MCRMetaClassification metaClazz) {

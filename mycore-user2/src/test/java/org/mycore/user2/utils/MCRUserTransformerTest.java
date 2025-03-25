@@ -62,7 +62,7 @@ public class MCRUserTransformerTest extends MCRUserTestCase {
      */
     @Test
     public final void testBuildMCRUser() throws IOException {
-        Element input = MCRURIResolver.instance().resolve("resource:test-user.xml");
+        Element input = MCRURIResolver.obtainInstance().resolve("resource:test-user.xml");
         MCRUser mcrUser = MCRUserTransformer.buildMCRUser(input);
         Document output = MCRUserTransformer.buildExportableXML(mcrUser);
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());

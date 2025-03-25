@@ -55,6 +55,7 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRContentServlet;
+import org.mycore.resource.MCRResourceHelper;
 import org.mycore.services.i18n.MCRTranslation;
 import org.mycore.tools.MyCoReWebPageProvider;
 import org.xml.sax.SAXException;
@@ -144,23 +145,30 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class MCRVueRootServlet extends MCRContentServlet {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
-
     protected static final String VUE_PASSTHROUGH_PROPERTY_NAME = "MCR.Vue.Properties";
-
     protected static final String HEADING_INIT_PARAM = "heading";
     protected static final String PROPERTIES_INIT_PARAM = "properties";
-
+    @Serial
+    private static final long serialVersionUID = 1L;
+    private static final Set<Integer> PASSTHROUGH_HTTP_STATUS_CODE_LIST = Set.of(
+        HttpServletResponse.SC_NOT_FOUND,
+        HttpServletResponse.SC_UNAUTHORIZED,
+        HttpServletResponse.SC_FORBIDDEN);
     protected String headingI18nKey;
     protected Set<String> servletInitPropertiesKeys;
     private Map<String, String> servletInitProperties;
 
-    private static final Set<Integer> PASSTHROUGH_HTTP_STATUS_CODE_LIST = Set.of(
-        HttpServletResponse.SC_NOT_FOUND,
-        HttpServletResponse.SC_UNAUTHORIZED,
-        HttpServletResponse.SC_FORBIDDEN
-    );
+    /**
+     * Resolves the property value from the configuration. If the property is not found, an exception is thrown.
+     * If the property is found, but the value is empty, then the value is still returned.
+     * {@link MCRConfiguration2#getString(String)} would return an empty optional in this case.
+     * @param key the property key
+     * @return the property value, even if it is an empty string
+     */
+    private static String resolveProperty(String key) {
+        return MCRConfigurationBase.getString(key.trim())
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(key));
+    }
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -177,18 +185,6 @@ public class MCRVueRootServlet extends MCRContentServlet {
         MCRConfiguration2.addPropertyChangeEventLister(servletInitPropertiesKeys::contains, this::changeProperty);
     }
 
-    /**
-     * Resolves the property value from the configuration. If the property is not found, an exception is thrown.
-     * If the property is found, but the value is empty, then the value is still returned.
-     * {@link MCRConfiguration2#getString(String)} would return an empty optional in this case.
-     * @param key the property key
-     * @return the property value, even if it is an empty string
-     */
-    private static String resolveProperty(String key) {
-        return MCRConfigurationBase.getString(key.trim())
-            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(key));
-    }
-
     protected void updateInitProperties() {
         servletInitProperties = new HashMap<>();
         servletInitPropertiesKeys.forEach(key -> {
@@ -201,31 +197,34 @@ public class MCRVueRootServlet extends MCRContentServlet {
         String pathInfo = req.getPathInfo();
         String indexHtmlPage = getIndexPage();
         String indexHtmlPath = req.getServletPath() + "/" + indexHtmlPage;
-        URL resource = getServletContext().getResource(req.getServletPath() + pathInfo);
 
-        if (resource != null && !pathInfo.endsWith("/") && !pathInfo.endsWith(indexHtmlPage)) {
-            return new MCRURLContent(resource);
-        } else {
-            URL indexResource = getServletContext().getResource(indexHtmlPath);
-            org.jdom2.Document mycoreWebpage = getIndexDocument(indexResource, getAbsoluteServletPath(req));
-
-            if (pathInfo != null){
-                Optional<Integer> matchingPathCode = PASSTHROUGH_HTTP_STATUS_CODE_LIST.stream()
-                        .filter(httpCode -> pathInfo.endsWith("/".concat(httpCode.toString())))
-                        .findFirst();
-
-                /* if there is a requested route which does not exist, the app should
-                 * redirect to this /404 route the get the actual 404 Code.
-                 * see also https://www.youtube.com/watch?v=vjj8B4sq0UI&t=1815s
-                 * */
-                matchingPathCode.ifPresent(resp::setStatus);
-            }
-            try {
-                return getLayoutService().getTransformedContent(req, resp, new MCRJDOMContent(mycoreWebpage));
-            } catch (TransformerException | SAXException e) {
-                throw new IOException(e);
+        if (pathInfo != null && !pathInfo.endsWith("/") && !pathInfo.endsWith(indexHtmlPage)) {
+            URL resource = MCRResourceHelper.getWebResourceUrl(req.getServletPath() + pathInfo);
+            if (resource != null) {
+                return new MCRURLContent(resource);
             }
         }
+
+        URL indexResource = MCRResourceHelper.getWebResourceUrl(indexHtmlPath);
+        org.jdom2.Document mycoreWebpage = getIndexDocument(indexResource, getAbsoluteServletPath(req));
+        if (pathInfo != null) {
+            Optional<Integer> matchingPathCode = PASSTHROUGH_HTTP_STATUS_CODE_LIST.stream()
+                .filter(httpCode -> pathInfo.endsWith("/".concat(httpCode.toString())))
+                .findFirst();
+
+            /* if there is a requested route which does not exist, the app should
+             * redirect to this /404 route the get the actual 404 Code.
+             * see also https://www.youtube.com/watch?v=vjj8B4sq0UI&t=1815s
+             * */
+            matchingPathCode.ifPresent(resp::setStatus);
+        }
+
+        try {
+            return getLayoutService().getTransformedContent(req, resp, new MCRJDOMContent(mycoreWebpage));
+        } catch (TransformerException | SAXException e) {
+            throw new IOException(e);
+        }
+
     }
 
     protected String getIndexPage() {
@@ -284,8 +283,8 @@ public class MCRVueRootServlet extends MCRContentServlet {
             .toList();
 
         MyCoReWebPageProvider mycoreWebPage = new MyCoReWebPageProvider();
-        String translatedHeading = this.headingI18nKey != null && MCRTranslation.exists(this.headingI18nKey) ?
-                MCRTranslation.translate(this.headingI18nKey) : "";
+        String translatedHeading = this.headingI18nKey != null && MCRTranslation.exists(this.headingI18nKey)
+            ? MCRTranslation.translate(this.headingI18nKey) : "";
 
         String currentLanguage = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
         mycoreWebPage.addSection(translatedHeading, content, currentLanguage);
@@ -326,7 +325,7 @@ public class MCRVueRootServlet extends MCRContentServlet {
         propertiesJson.append(System.lineSeparator());
         getProperties().forEach((key, value) -> {
             propertiesJson.append("mycore[\"").append(key)
-                    .append("\"]").append('=');
+                .append("\"]").append('=');
             propertiesJson.append('"').append(value).append("\";").append(System.lineSeparator());
         });
         propertiesScript.setText(propertiesJson.toString());

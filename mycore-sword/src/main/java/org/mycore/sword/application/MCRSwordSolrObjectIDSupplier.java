@@ -57,7 +57,7 @@ public class MCRSwordSolrObjectIDSupplier extends MCRSwordObjectIDSupplier {
             queryCopy.setStart(0);
             queryCopy.setRows(0);
             QueryRequest queryRequest = new QueryRequest(queryCopy);
-            MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
+            MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
                 MCRSolrAuthenticationLevel.SEARCH);
             final QueryResponse queryResponse = queryRequest.process(MCRSolrCoreManager.getMainSolrClient());
 
@@ -76,7 +76,7 @@ public class MCRSwordSolrObjectIDSupplier extends MCRSwordObjectIDSupplier {
         queryCopy.setRows(count);
         try {
             QueryRequest queryRequest = new QueryRequest(queryCopy);
-            MCRSolrAuthenticationManager.getInstance().applyAuthentication(queryRequest,
+            MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
                 MCRSolrAuthenticationLevel.SEARCH);
             final QueryResponse queryResponse = queryRequest.process(MCRSolrCoreManager.getMainSolrClient());
             return queryResponse.getResults().stream()

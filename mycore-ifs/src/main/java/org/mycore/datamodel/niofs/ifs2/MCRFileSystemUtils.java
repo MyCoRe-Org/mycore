@@ -130,7 +130,7 @@ final class MCRFileSystemUtils {
     }
 
     static MCRPath checkPathAbsolute(Path path) {
-        MCRPath mcrPath = MCRPath.toMCRPath(path);
+        MCRPath mcrPath = MCRPath.ofPath(path);
         if (!(Objects.requireNonNull(mcrPath.getFileSystem(), "'path' requires a associated filesystem.")
             .provider() instanceof MCRFileSystemProvider)) {
             throw new ProviderMismatchException("Path does not match to this provider: " + path);

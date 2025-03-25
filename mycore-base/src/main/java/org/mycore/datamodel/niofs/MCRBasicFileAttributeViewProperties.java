@@ -61,7 +61,15 @@ public class MCRBasicFileAttributeViewProperties<V extends BasicFileAttributeVie
             return name;
         }
 
+        /**
+         * @deprecated use {@link #fromName(String)} instead
+         */
+        @Deprecated
         public static Attribute ofName(String name) {
+            return fromName(name);
+        }
+
+        public static Attribute fromName(String name) {
             return Arrays.stream(values())
                 .filter(attribute -> attribute.getName().equals(name))
                 .findAny()
@@ -130,7 +138,7 @@ public class MCRBasicFileAttributeViewProperties<V extends BasicFileAttributeVie
         Map<String, Object> map = new HashMap<>();
         BasicFileAttributes attrs = view.readAttributes();
         for (String attributeName : requested) {
-            Attribute attribute = Attribute.ofName(attributeName);
+            Attribute attribute = Attribute.fromName(attributeName);
             switch (attribute) {
                 case SIZE_NAME -> map.put(attributeName, attrs.size());
                 case CREATION_TIME_NAME -> map.put(attributeName, attrs.creationTime());
@@ -161,7 +169,7 @@ public class MCRBasicFileAttributeViewProperties<V extends BasicFileAttributeVie
         if (Objects.equals(name, Attribute.ALL.getName()) || !allowed.contains(name)) {
             throw new IllegalArgumentException("'" + name + "' not recognized");
         }
-        Attribute attribute = Attribute.ofName(name);
+        Attribute attribute = Attribute.fromName(name);
         switch (attribute) {
             case CREATION_TIME_NAME -> view.setTimes(null, null, (FileTime) value);
             case LAST_ACCESS_TIME_NAME -> view.setTimes(null, (FileTime) value, null);

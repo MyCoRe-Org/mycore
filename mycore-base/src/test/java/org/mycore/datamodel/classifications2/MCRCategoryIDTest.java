@@ -56,7 +56,7 @@ public class MCRCategoryIDTest {
 
     @Test
     public void testRootID() {
-        assertEquals("RootIds do not match", validRootID, MCRCategoryID.rootID(validRootID).getRootID());
+        assertEquals("RootIds do not match", validRootID, new MCRCategoryID(validRootID).getRootID());
     }
 
     @Test
@@ -88,7 +88,7 @@ public class MCRCategoryIDTest {
         "", "foo:bar:baz", ":bar", ":bar:", ":bar:baz", "foo::bar", "foo::bar::", "foo::bar::baz", "::bar", "::bar::baz"
     })
     public void testInvalidEdgeCases(String invalidCategoryId) {
-        assertThrows(IllegalArgumentException.class, () -> MCRCategoryID.fromString(invalidCategoryId));
+        assertThrows(IllegalArgumentException.class, () -> MCRCategoryID.ofString(invalidCategoryId));
     }
 
 }

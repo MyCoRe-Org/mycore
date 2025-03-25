@@ -63,7 +63,7 @@ public class MCRPIClassificationXPathPredicate extends MCRPIPredicateBase
 
     @Override
     public boolean test(MCRBase mcrBase) {
-        MCRURIResolver resolver = MCRURIResolver.instance();
+        MCRURIResolver resolver = MCRURIResolver.obtainInstance();
         return classificationBaseExpression.evaluate(mcrBase.createXML()).stream().anyMatch(baseElement -> {
 
             String classificationId = classificationIdExpression.evaluateFirst(baseElement);

@@ -40,7 +40,7 @@ public abstract class MCRStoreTestCase extends MCRJPATestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        store = MCRXMLMetadataManager.instance();
+        store = MCRXMLMetadataManager.getInstance();
         store.reload();
     }
 

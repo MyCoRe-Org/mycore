@@ -46,7 +46,7 @@ public final class MCRResourceHelper {
      * instead of an empty {@link java.util.Optional}.
      */
     public static URL getResourceUrl(String path) {
-        return MCRResourceResolver.instance().resolveResource(path).orElse(null);
+        return MCRResourceResolver.obtainInstance().resolveResource(path).orElse(null);
     }
 
     /**
@@ -54,7 +54,7 @@ public final class MCRResourceHelper {
      * returning <code>null</code> instead of an empty {@link java.util.Optional}.
      */
     public static URL getResourceUrl(String path, ClassLoader classLoader) {
-        return MCRResourceResolver.instance().resolveResource(path, modifyHints(classLoader)).orElse(null);
+        return MCRResourceResolver.obtainInstance().resolveResource(path, modifyHints(classLoader)).orElse(null);
     }
 
     /**
@@ -79,7 +79,7 @@ public final class MCRResourceHelper {
      * instead of an empty {@link java.util.Optional}.
      */
     public static URL getWebResourceUrl(String path) {
-        return MCRResourceResolver.instance().resolveWebResource(path).orElse(null);
+        return MCRResourceResolver.obtainInstance().resolveWebResource(path).orElse(null);
     }
 
     /**
@@ -87,7 +87,7 @@ public final class MCRResourceHelper {
      * returning <code>null</code> instead of an empty {@link java.util.Optional}.
      */
     public static URL getWebResourceUrl(String path, ClassLoader classLoader) {
-        return MCRResourceResolver.instance().resolveWebResource(path, modifyHints(classLoader)).orElse(null);
+        return MCRResourceResolver.obtainInstance().resolveWebResource(path, modifyHints(classLoader)).orElse(null);
     }
 
     /**
@@ -109,18 +109,18 @@ public final class MCRResourceHelper {
 
     /**
      * Shorthand for {@link MCRResourceResolver#reverse(URL)} returning <code>null</code>
-     * instead of an empty {@link java.util.Optional} and taking a String instead of an {@link URL} the .
+     * instead of an empty {@link java.util.Optional} and taking a String instead of an {@link URL}.
      */
     public static MCRResourcePath getResourcePath(String resourceUrl) {
         try {
-            return MCRResourceResolver.instance().reverse(new URI(resourceUrl).toURL()).orElse(null);
+            return MCRResourceResolver.obtainInstance().reverse(new URI(resourceUrl).toURL()).orElse(null);
         } catch (URISyntaxException | MalformedURLException e) {
             throw new MCRException("Unable to convert string tu URL", e);
         }
     }
 
     private static MCRHints modifyHints(ClassLoader classLoader) {
-        MCRHintsBuilder builder = MCRResourceResolver.instance().defaultHints().builder();
+        MCRHintsBuilder builder = MCRResourceResolver.obtainInstance().defaultHints().builder();
         builder.add(MCRResourceHintKeys.CLASS_LOADER, classLoader);
         return builder.build();
     }

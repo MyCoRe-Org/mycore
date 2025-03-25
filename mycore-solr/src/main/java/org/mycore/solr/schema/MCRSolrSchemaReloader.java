@@ -60,7 +60,7 @@ import com.google.gson.JsonParser;
  */
 public class MCRSolrSchemaReloader {
     private static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
-        MCRSolrAuthenticationManager.getInstance();
+        MCRSolrAuthenticationManager.obtainInstance();
 
     private static final Logger LOGGER = LogManager.getLogger();
 

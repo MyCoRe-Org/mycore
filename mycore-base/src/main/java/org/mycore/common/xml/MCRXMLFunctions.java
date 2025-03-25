@@ -124,10 +124,10 @@ public class MCRXMLFunctions {
             Pattern.DOTALL);
 
     private static final Logger LOGGER = LogManager.getLogger();
-    public static volatile MimetypesFileTypeMap mimetypeMap;
+    private static volatile MimetypesFileTypeMap mimetypeMap;
 
     public static Node document(String uri) throws JDOMException, IOException, TransformerException {
-        MCRSourceContent sourceContent = MCRSourceContent.getInstance(uri);
+        MCRSourceContent sourceContent = MCRSourceContent.createInstance(uri);
         if (sourceContent == null) {
             throw new TransformerException("Could not load document: " + uri);
         }
@@ -389,7 +389,7 @@ public class MCRXMLFunctions {
         MCRObjectID mcrObjectID = MCRObjectID.getInstance(objId);
         try {
             return MCRAccessManager.checkPermission(
-                MCRSystemUserInformation.getGuestInstance(),
+                MCRSystemUserInformation.GUEST,
                 () -> MCRAccessManager.checkPermission(mcrObjectID, MCRAccessManager.PERMISSION_READ)
                     && checkReadPermissionOfDerivates(mcrObjectID));
         } catch (RuntimeException e) {
@@ -424,7 +424,7 @@ public class MCRXMLFunctions {
         MCRObjectID mcrObjectID = MCRObjectID.getInstance(objId);
         try {
             return MCRAccessManager.checkPermission(
-                MCRSystemUserInformation.getGuestInstance(),
+                MCRSystemUserInformation.GUEST,
                 () -> MCRAccessManager.checkPermission(mcrObjectID, MCRAccessManager.PERMISSION_READ));
         } catch (RuntimeException e) {
             LOGGER.error("Error while retriving ACL information for Object {}", objId, e);
@@ -468,7 +468,7 @@ public class MCRXMLFunctions {
             Document document = documentBuilder.newDocument();
             Element rootElement = document.createElement("linklist");
             document.appendChild(rootElement);
-            MCRLinkTableManager ltm = MCRLinkTableManager.instance();
+            MCRLinkTableManager ltm = MCRLinkTableManager.getInstance();
             for (String id : ltm.getDestinationOf(mcrid, destinationType)) {
                 Element link = document.createElement("link");
                 link.setTextContent(id);
@@ -496,7 +496,7 @@ public class MCRXMLFunctions {
             Document document = documentBuilder.newDocument();
             Element rootElement = document.createElement("linklist");
             document.appendChild(rootElement);
-            MCRLinkTableManager ltm = MCRLinkTableManager.instance();
+            MCRLinkTableManager ltm = MCRLinkTableManager.getInstance();
             for (String id : ltm.getSourceOf(mcrid)) {
                 if (sourceType == null || MCRObjectID.getIDParts(id)[1].equals(sourceType)) {
                     Element link = document.createElement("link");
@@ -611,12 +611,12 @@ public class MCRXMLFunctions {
 
     public static boolean isCurrentUserSuperUser() {
         return MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
-            .equals(MCRSystemUserInformation.getSuperUserInstance().getUserID());
+            .equals(MCRSystemUserInformation.SUPER_USER.getUserID());
     }
 
     public static boolean isCurrentUserGuestUser() {
         return MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
-            .equals(MCRSystemUserInformation.getGuestInstance().getUserID());
+            .equals(MCRSystemUserInformation.GUEST.getUserID());
     }
 
     public static String getCurrentUserAttribute(String attribute) {
@@ -636,7 +636,7 @@ public class MCRXMLFunctions {
      */
     public static boolean isInCategory(String objectId, String categoryId) {
         try {
-            MCRCategoryID categID = MCRCategoryID.fromString(categoryId);
+            MCRCategoryID categID = MCRCategoryID.ofString(categoryId);
             MCRObjectID mcrObjectID = MCRObjectID.getInstance(objectId);
             MCRCategLinkReference reference = new MCRCategLinkReference(mcrObjectID);
             return MCRCategLinkServiceHolder.INSTANCE.isInCategory(reference, categID);
@@ -657,13 +657,13 @@ public class MCRXMLFunctions {
     public static boolean hasParentCategory(String classificationId, String categoryId) {
         MCRCategoryID categID = new MCRCategoryID(classificationId, categoryId);
         //root category has level 0
-        return !categID.isRootID() && MCRCategoryDAOFactory.getInstance().getCategory(categID, 0).getLevel() > 1;
+        return !categID.isRootID() && MCRCategoryDAOFactory.obtainInstance().getCategory(categID, 0).getLevel() > 1;
     }
 
     public static String getDisplayName(String classificationId, String categoryId) {
         try {
             MCRCategoryID categID = new MCRCategoryID(classificationId, categoryId);
-            MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+            MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
             MCRCategory category = dao.getCategory(categID, 0);
             return Optional.ofNullable(category)
                 .map(MCRCategory::getCurrentLabel)
@@ -696,8 +696,8 @@ public class MCRXMLFunctions {
 
         MCRCategory category = null;
         try {
-            MCRCategoryID categID = MCRCategoryID.fromString(classificationId + ":" + categoryId);
-            MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+            MCRCategoryID categID = MCRCategoryID.ofString(classificationId + ":" + categoryId);
+            MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
             category = dao.getCategory(categID, 0);
         } catch (MCRException e) {
             LOGGER.error("Could not determine state for classification id {} and category id {}", classificationId,
@@ -771,7 +771,7 @@ public class MCRXMLFunctions {
      * @param uri the uri to resolve
      */
     public static NodeList resolve(String uri) throws JDOMException {
-        org.jdom2.Element element = MCRURIResolver.instance().resolve(uri);
+        org.jdom2.Element element = MCRURIResolver.obtainInstance().resolve(uri);
         element.detach();
         org.jdom2.Document document = new org.jdom2.Document(element);
         return new DOMOutputter().output(document).getDocumentElement().getChildNodes();
@@ -945,7 +945,7 @@ public class MCRXMLFunctions {
     }
 
     private static final class MCRCategLinkServiceHolder {
-        public static final MCRCategLinkService INSTANCE = MCRCategLinkServiceFactory.getInstance();
+        public static final MCRCategLinkService INSTANCE = MCRCategLinkServiceFactory.obtainInstance();
     }
 
     private static final class SetNodeList implements NodeList {

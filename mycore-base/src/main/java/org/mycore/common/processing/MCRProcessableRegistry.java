@@ -20,8 +20,6 @@ package org.mycore.common.processing;
 
 import java.util.stream.Stream;
 
-import org.mycore.common.config.MCRConfiguration2;
-
 /**
  * Registry for {@link MCRProcessable} and {@link MCRProcessableCollection}.
  * Can be used for managing and monitoring purposes.
@@ -30,14 +28,13 @@ import org.mycore.common.config.MCRConfiguration2;
  */
 public interface MCRProcessableRegistry {
 
+
     /**
-     * Return the default instance of the processable registry
-     * 
-     * @return the singleton instance
+     * @deprecated Use {@link MCRProcessableManager#getRegistry()} instead
      */
+    @Deprecated
     static MCRProcessableRegistry getSingleInstance() {
-        return MCRConfiguration2.getSingleInstanceOfOrThrow(
-            MCRProcessableRegistry.class, "MCR.Processable.Registry.Class");
+        return MCRProcessableManager.getInstance().getRegistry();
     }
 
     /**

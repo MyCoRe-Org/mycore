@@ -109,7 +109,7 @@ public class MCRWorksPublisher {
 
     /** Retrieves the MyCoRe object, transforms it to ORCID work xml and validates */
     private Document buildWorkXMLFrom(MCRObjectID objectID) throws IOException, JDOMException {
-        MCRContent mcrObject = MCRXMLMetadataManager.instance().retrieveContent(objectID);
+        MCRContent mcrObject = MCRXMLMetadataManager.getInstance().retrieveContent(objectID);
         MCRContent workXML = T_MCR2WORK.transform(mcrObject);
         return MCRXMLParserFactory.getValidatingParser().parseXML(workXML);
     }

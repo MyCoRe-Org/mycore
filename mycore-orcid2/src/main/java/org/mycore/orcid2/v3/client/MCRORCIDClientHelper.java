@@ -102,6 +102,6 @@ public class MCRORCIDClientHelper {
      * @return MCRORCIDClientFactory
      */
     public static MCRORCIDClientFactory getClientFactory() {
-        return MCRORCIDClientFactory.getInstance("V3");
+        return MCRORCIDClientFactory.obtainInstance("V3");
     }
 }

@@ -76,7 +76,7 @@ public class MCRRateLimitResolver implements URIResolver {
         if (behaviorConfig.equals(RateLimitBehavior.BLOCK)) {
             try {
                 currentRateLimit.asBlocking().consume(1);
-                return MCRURIResolver.instance().resolve(resolvedHref, base);
+                return MCRURIResolver.obtainInstance().resolve(resolvedHref, base);
             } catch (InterruptedException e) {
                 return probeAccessLimit(resolvedHref, base, bucketConfig);
             }
@@ -98,7 +98,7 @@ public class MCRRateLimitResolver implements URIResolver {
         ConsumptionProbe probe = config.bucket().tryConsumeAndReturnRemaining(1);
         if (probe.isConsumed()) {
             LOGGER.debug(() -> "There are " + probe.getRemainingTokens() + " accesses remaining");
-            return MCRURIResolver.instance().resolve(href, base);
+            return MCRURIResolver.obtainInstance().resolve(href, base);
         } else {
             return handleError(probe, config);
         }

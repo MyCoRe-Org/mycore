@@ -82,14 +82,14 @@ public class MCRClassificationBrowser2 extends MCRServlet {
 
     private void processRequest(MCRServletJob job) throws IOException, TransformerException, SAXException {
         HttpServletRequest req = job.getRequest();
-        Settings settings = Settings.fromRequest(req);
+        Settings settings = Settings.ofRequest(req);
 
         LOGGER.info("ClassificationBrowser {}", settings);
 
         MCRCategoryID id = settings.getCategID()
             .map(categId -> new MCRCategoryID(settings.getClassifID(), categId))
-            .orElse(MCRCategoryID.rootID(settings.getClassifID()));
-        MCRCategory category = MCRCategoryDAOFactory.getInstance().getCategory(id, 1);
+            .orElse(new MCRCategoryID(settings.getClassifID()));
+        MCRCategory category = MCRCategoryDAOFactory.obtainInstance().getCategory(id, 1);
         if (category == null) {
             job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, "Could not find category: " + id);
             return;
@@ -195,7 +195,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         }
 
         String classifID = category.getId().getRootID();
-        Map<MCRCategoryID, Number> count = MCRCategLinkServiceFactory.getInstance().countLinksForType(category,
+        Map<MCRCategoryID, Number> count = MCRCategLinkServiceFactory.obtainInstance().countLinksForType(category,
             objType, true);
         for (Iterator<Element> it = data.iterator(); it.hasNext();) {
             Element child = it.next();
@@ -280,7 +280,15 @@ public class MCRClassificationBrowser2 extends MCRServlet {
 
         private String style;
 
+        /**
+         * @deprecated Use {@link #ofRequest(HttpServletRequest)} instead
+         */
+        @Deprecated
         static Settings fromRequest(HttpServletRequest req) {
+            return ofRequest(req);
+        }
+
+        static Settings ofRequest(HttpServletRequest req) {
             Settings s = new Settings();
             s.classifID = req.getParameter("classification");
             s.categID = req.getParameter("category");

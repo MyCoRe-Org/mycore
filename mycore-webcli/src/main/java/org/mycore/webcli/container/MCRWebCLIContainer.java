@@ -60,7 +60,7 @@ import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.processing.MCRProcessableCollection;
 import org.mycore.common.processing.MCRProcessableDefaultCollection;
-import org.mycore.common.processing.MCRProcessableRegistry;
+import org.mycore.common.processing.MCRProcessableManager;
 import org.mycore.frontend.cli.MCRCommand;
 import org.mycore.frontend.ws.common.MCRWebsocketDefaultConfigurator;
 import org.mycore.util.concurrent.processing.MCRProcessableExecutor;
@@ -105,8 +105,7 @@ public class MCRWebCLIContainer {
 
     static {
         PROCESSABLE_COLLECTION = new MCRProcessableDefaultCollection("Web CLI");
-        MCRProcessableRegistry registry = MCRProcessableRegistry.getSingleInstance();
-        registry.register(PROCESSABLE_COLLECTION);
+        MCRProcessableManager.getInstance().getRegistry().register(PROCESSABLE_COLLECTION);
 
         ExecutorService service = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, "WebCLI"));
         EXECUTOR = MCRProcessableFactory.newPool(service, PROCESSABLE_COLLECTION);

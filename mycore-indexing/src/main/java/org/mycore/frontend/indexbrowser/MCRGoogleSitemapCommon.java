@@ -110,7 +110,7 @@ public final class MCRGoogleSitemapCommon {
     private static final String SOLR_QUERY = MCRConfiguration2.getStringOrThrow("MCR.GoogleSitemap.SolrQuery");
 
     public static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
-        MCRSolrAuthenticationManager.getInstance();
+        MCRSolrAuthenticationManager.obtainInstance();
 
     /** The logger */
     private static final Logger LOGGER = LogManager.getLogger();

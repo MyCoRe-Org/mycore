@@ -65,7 +65,7 @@ public class MCRIFSFileSystem extends MCRAbstractFileSystem {
      */
     @Override
     public Iterable<Path> getRootDirectories() {
-        return MCRStoreCenter.instance().getCurrentStores(org.mycore.datamodel.ifs2.MCRFileStore.class)
+        return MCRStoreCenter.getInstance().getCurrentStores(org.mycore.datamodel.ifs2.MCRFileStore.class)
             .filter(s -> s.getID().startsWith(MCRFileSystemUtils.STORE_ID_PREFIX))
             .sorted(Comparator.comparing(MCRStore::getID))
             .flatMap(s -> s.getStoredIDs()
@@ -80,14 +80,14 @@ public class MCRIFSFileSystem extends MCRAbstractFileSystem {
      */
     @Override
     public Iterable<FileStore> getFileStores() {
-        return MCRStoreCenter.instance().getCurrentStores(org.mycore.datamodel.ifs2.MCRFileStore.class)
+        return MCRStoreCenter.getInstance().getCurrentStores(org.mycore.datamodel.ifs2.MCRFileStore.class)
             .filter(s -> s.getID().startsWith(MCRFileSystemUtils.STORE_ID_PREFIX))
             .sorted(Comparator.comparing(MCRStore::getID))
             .map(MCRStore::getID)
             .distinct()
             .map(storeId -> {
                 try {
-                    return MCRFileStore.getInstance(storeId);
+                    return MCRFileStore.obtainInstance(storeId);
                 } catch (IOException e) {
                     LogManager.getLogger().error("Error while iterating FileStores.", e);
                     return null;

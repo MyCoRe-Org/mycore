@@ -47,7 +47,7 @@ public class MCRPropertyHelperContentServlet extends MCRContentServlet {
         throws IOException {
 
         if (!MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
-            .equals(MCRSystemUserInformation.getSuperUserInstance().getUserID())) {
+            .equals(MCRSystemUserInformation.SUPER_USER.getUserID())) {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN);
             return null;
         }

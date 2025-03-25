@@ -100,7 +100,7 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
 
     private ModifiableSolrParams getSolrParams(Path file, BasicFileAttributes attrs) {
         ModifiableSolrParams params = new ModifiableSolrParams();
-        SolrInputDocument doc = MCRSolrPathDocumentFactory.getInstance().getDocument(file, attrs);
+        SolrInputDocument doc = MCRSolrPathDocumentFactory.obtainInstance().getDocument(file, attrs);
         for (SolrInputField field : doc) {
             String name = "literal." + field.getName();
             if (field.getValueCount() > 1) {
