@@ -48,6 +48,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRRawProperties;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStringContent;
 import org.mycore.common.xml.MCREntityResolver;
@@ -128,7 +129,7 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
      * Map of namespaces. This setting is required for the json2xml serialisation process if the
      * {@link SerializerSettings#namespaceDeclaration()} is set to <b>OMIT</b>.
      */
-    @MCRProperty(name = "Namespaces.*", required = false)
+    @MCRRawProperties(namePattern = "Namespaces.*", required = false)
     public Map<String, String> namespaces;
 
     @MCRInstance(name = "Settings", valueClass = SettingsBuilder.class, required = false)
