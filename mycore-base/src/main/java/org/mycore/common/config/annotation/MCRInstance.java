@@ -50,7 +50,7 @@ public @interface MCRInstance {
 
     /**
      * @return true if the property specified by {@link MCRInstance#name()} has to be present in the properties.
-     * {@link MCRConfigurationException} is thrown if the property is required but not present.
+     * {@link MCRConfigurationException} is thrown if a value is required but not present.
      */
     boolean required() default true;
 
