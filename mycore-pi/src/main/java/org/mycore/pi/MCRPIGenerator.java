@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRPostConstruction;
-import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRRawProperties;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
@@ -43,7 +43,7 @@ public abstract class MCRPIGenerator<T extends MCRPersistentIdentifier> {
         generatorID = property.substring(GENERATOR_CONFIG_PREFIX.length());
     }
 
-    @MCRProperty(name = "*")
+    @MCRRawProperties(namePattern = "*", required = false)
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
     }
