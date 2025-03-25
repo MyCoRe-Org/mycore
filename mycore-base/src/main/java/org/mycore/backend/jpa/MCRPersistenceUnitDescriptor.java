@@ -34,6 +34,7 @@ import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRRawProperties;
 
 import jakarta.persistence.SharedCacheMode;
 import jakarta.persistence.ValidationMode;
@@ -219,7 +220,7 @@ public class MCRPersistenceUnitDescriptor implements PersistenceUnitDescriptor {
         return createdProperties;
     }
 
-    @MCRProperty(name = "*")
+    @MCRRawProperties(namePattern = "*", required = false)
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
     }

@@ -21,7 +21,7 @@ package org.mycore.pi;
 import java.util.Map;
 import java.util.Optional;
 
-import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRRawProperties;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
@@ -39,7 +39,7 @@ public abstract class MCRPIMetadataService<T extends MCRPersistentIdentifier> {
         return properties;
     }
 
-    @MCRProperty(name = "*")
+    @MCRRawProperties(namePattern = "*", required = false)
     public final void setProperties(Map<String, String> properties) {
         this.properties = properties;
     }

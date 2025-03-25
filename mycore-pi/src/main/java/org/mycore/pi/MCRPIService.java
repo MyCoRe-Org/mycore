@@ -47,7 +47,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRPostConstruction;
-import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRRawProperties;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -429,7 +429,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         return properties;
     }
 
-    @MCRProperty(name = "*")
+    @MCRRawProperties(namePattern = "*", required = false)
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
     }
