@@ -32,6 +32,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRExpandedObjectManager;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
@@ -82,8 +83,12 @@ public class MCRCrossrefService extends MCRDOIBaseService {
     @Override
     protected boolean validateRegistrationDocument(MCRBase obj, MCRDigitalObjectIdentifier identifier,
         String additional) {
+        MCRBase objToCheck = obj;
+        if (obj instanceof MCRObject mcrObject) {
+            objToCheck = MCRExpandedObjectManager.getInstance().getExpandedObject(mcrObject);
+        }
         try {
-            validateDocument(obj.getId().toString(), transform(obj, identifier.asString()));
+            validateDocument(obj.getId().toString(), transform(objToCheck, identifier.asString()));
             return true;
         } catch (MCRPersistentIdentifierException | MCRConfigurationException e) {
             return false;
@@ -147,7 +152,7 @@ public class MCRCrossrefService extends MCRDOIBaseService {
 
         MCRObjectID objectID = MCRObjectID.getInstance(idString);
         this.validateJobUserRights(objectID);
-        MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
+        MCRObject object = MCRMetadataManager.retrieveMCRExpandedObject(objectID);
         Document newCrossrefBatch = transform(object, doi);
         validateDocument(object.getId().toString(), newCrossrefBatch);
         final MCRCrossrefClient client = new MCRCrossrefClient(getHost(), getUsername(), getPassword());
