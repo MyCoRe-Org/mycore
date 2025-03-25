@@ -41,6 +41,7 @@ import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRExpandedObjectManager;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCREvent;
@@ -552,6 +553,16 @@ public final class MCRMetadataManager {
         } catch (IOException | JDOMException e) {
             throw new MCRPersistenceException("Could not retrieve xml of object: " + id, e);
         }
+    }
+
+    /**
+     * Retrieves an instance of {@link MCRExpandedObject} with the given {@link MCRObjectID}
+     * @param id the object ID
+     * @return the expanded object
+     * @throws MCRPersistenceException if a persistence problem is occurred
+     */
+    public static MCRExpandedObject retrieveMCRExpandedObject(final MCRObjectID id) throws MCRPersistenceException {
+        return MCRExpandedObjectManager.getInstance().getExpandedObject(retrieveMCRObject(id));
     }
 
     /**
