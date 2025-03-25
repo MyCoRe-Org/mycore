@@ -39,7 +39,7 @@ public class MCRDefaultLinkProviderTest extends MCRStoreTestCase {
 
     private void setUpTestDerivate() throws IOException, JDOMException {
         try (InputStream resourceAsStream =
-                     MCRResourceHelper.getResourceAsStream("MCRDefaultLinkProviderTest/HisBest_derivate_00035540.xml")) {
+            MCRResourceHelper.getResourceAsStream("MCRDefaultLinkProviderTest/HisBest_derivate_00035540.xml")) {
             byte[] bytes = resourceAsStream.readAllBytes();
             derivate = new MCRDerivate(bytes, false);
         }
@@ -75,9 +75,9 @@ public class MCRDefaultLinkProviderTest extends MCRStoreTestCase {
         Collection<MCRCategoryID> categoriesOfDerivate = provider.getCategoriesOfDerivate(derivate);
 
         Set<MCRCategoryID> expectedCategories =
-                Stream.of("derivate_types:content", "state:published")
-                        .map(MCRCategoryID::fromString)
-                        .collect(Collectors.toSet());
+            Stream.of("derivate_types:content", "state:published")
+                .map(MCRCategoryID::fromString)
+                .collect(Collectors.toSet());
 
         assertEquals("Unexpected category found", categoriesOfDerivate.size(), expectedCategories.size());
     }
@@ -90,7 +90,8 @@ public class MCRDefaultLinkProviderTest extends MCRStoreTestCase {
             && lo.to().equals(MCRObjectID.getInstance("HisBest_cbu_00116987")) && lo.type().equals(MCRLinkType.PARENT));
 
         boolean containsCorporation = linksOfObject.stream().anyMatch(lo -> lo.from().equals(object.getId())
-            && lo.to().equals(MCRObjectID.getInstance("HisBest_corporation_00000415")) && lo.type().equals(MCRLinkType.REFERENCE));
+            && lo.to().equals(MCRObjectID.getInstance("HisBest_corporation_00000415"))
+            && lo.type().equals(MCRLinkType.REFERENCE));
 
         assertTrue("Expected link not found: Parent", containsParent);
         assertTrue("Expected link not found: Corporation", containsCorporation);
@@ -103,7 +104,8 @@ public class MCRDefaultLinkProviderTest extends MCRStoreTestCase {
         Collection<MCRLinkTableManager.MCRLinkReference> linksOfDerivate = provider.getLinksOfDerivate(derivate);
 
         boolean containsDerivateLink = linksOfDerivate.stream().anyMatch(lo -> lo.from().equals(derivate.getId())
-            && lo.to().equals(MCRObjectID.getInstance("HisBest_cbu_00149763")) && lo.type().equals(MCRLinkType.DERIVATE));
+            && lo.to().equals(MCRObjectID.getInstance("HisBest_cbu_00149763"))
+            && lo.type().equals(MCRLinkType.DERIVATE));
 
         assertTrue("Expected link not found: Parent", containsDerivateLink);
         assertEquals("Unexpected number of links", 1, linksOfDerivate.size());
