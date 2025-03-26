@@ -20,7 +20,9 @@ import static org.mycore.xsonify.serialize.SerializerSettings.PrefixHandling;
 import static org.mycore.xsonify.serialize.SerializerSettings.XsAnyNamespaceStrategy;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -41,6 +43,7 @@ import org.mycore.xsonify.xml.XmlDocument;
 import org.mycore.xsonify.xml.XmlDocumentLoader;
 import org.mycore.xsonify.xml.XmlEntityResolverDocumentLoader;
 import org.mycore.xsonify.xml.XmlName;
+import org.mycore.xsonify.xml.XmlNamespace;
 import org.mycore.xsonify.xml.XmlParseException;
 import org.mycore.xsonify.xml.XmlSaxParser;
 import org.mycore.xsonify.xsd.Xsd;
@@ -105,10 +108,9 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
     /**
      * Map of namespaces. This setting is required for the json2xml serialisation process if the
      * {@link SerializerSettings#namespaceDeclaration()} is set to <b>OMIT</b>.
-     * TODO: Map property doesn't seem to work right now
      */
-    //@MCRProperty(name = "Namespaces", required = false)
-    //public Map<String, String> namespaces;
+    @MCRProperty(name = "Namespaces.*", required = false)
+    public Map<String, String> namespaces;
 
     @MCRInstance(name = "Settings", valueClass = SettingsBuilder.class, required = false)
     public SettingsBuilder settingsBuilder;
@@ -143,12 +145,12 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
             // TODO setRootName should set local name -> fix in xsonify API
             this.json2XmlSerializer.setRootName(new XmlName(this.rootName, null));
         }
-        /*if (this.namespaces != null && !this.namespaces.isEmpty()) {
+        if (!this.namespaces.isEmpty()) {
             List<XmlNamespace> namespaceList = namespaces.entrySet().stream()
                 .map(entry -> new XmlNamespace(entry.getKey(), entry.getValue()))
                 .toList();
             this.json2XmlSerializer.setNamespaces(namespaceList);
-        }*/
+        }
     }
 
     /**
@@ -168,7 +170,7 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
                 return json2xml(source);
             }
         } catch (SerializationException serializerException) {
-            throw new MCRException("unable to serialize source.", serializerException);
+            throw new MCRException("Unable to serialize source.", serializerException);
         }
         throw new MCRException(
             "Unable to transform source because mimeType '" + mimeType + "' is neither xml nor json.");
@@ -213,7 +215,7 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
             if (jsonNode.isObject()) {
                 return (ObjectNode) jsonNode;
             }
-            throw new MCRException("json is not a json object '" + jsonNode + "'");
+            throw new MCRException("Source is not a json object '" + jsonNode + "'");
         } catch (IOException ioException) {
             throw new MCRException("Unable to parse json source", ioException);
         }
