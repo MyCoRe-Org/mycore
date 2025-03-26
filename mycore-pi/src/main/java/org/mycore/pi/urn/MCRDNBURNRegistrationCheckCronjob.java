@@ -56,7 +56,7 @@ public class MCRDNBURNRegistrationCheckCronjob extends MCRCronjob {
             LOGGER.info("Searching unregistered URNs");
 
             EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-            MCRPIManager.getInstance().getUnregisteredIdentifiers(MCRDNBURN.TYPE, -1)
+            MCRPIManager.obtainInstance().getUnregisteredIdentifiers(MCRDNBURN.TYPE, -1)
                 .stream()
                 .peek(em::detach)
                 .peek(mcrpi -> LOGGER.info("Found unregistered URN " + mcrpi.getIdentifier()))

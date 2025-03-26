@@ -61,7 +61,7 @@ public class MCRURNGranularRESTRegistrationCronjob extends MCRCronjob {
         MCRDNBURNRestClient client = new MCRDNBURNRestClient(getBundleProvider(), getUsernamePasswordCredentials());
 
         try {
-            List<MCRPI> unregisteredURNs = MCRPIManager.getInstance().getUnregisteredIdentifiers(MCRDNBURN.TYPE,
+            List<MCRPI> unregisteredURNs = MCRPIManager.obtainInstance().getUnregisteredIdentifiers(MCRDNBURN.TYPE,
                 batchSize);
 
             for (MCRPI urn : unregisteredURNs) {

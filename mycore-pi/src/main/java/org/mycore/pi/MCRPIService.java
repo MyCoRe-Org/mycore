@@ -182,7 +182,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
                 entry.setMycoreID(obj.getId().toString());
                 return entry;
             })
-            .filter(entry -> !MCRPIManager.getInstance().exist(entry))
+            .filter(entry -> !MCRPIManager.obtainInstance().exist(entry))
             .forEach(entry -> {
                 LOGGER.info("Add PI : {} with service {} to database!", entry::getIdentifier, entry::getService);
                 MCREntityManagerProvider.getCurrentEntityManager().persist(entry);
@@ -379,7 +379,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     protected final void onDelete(T identifier, MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
         delete(identifier, obj, additional);
-        MCRPIManager.getInstance().delete(obj.getId().toString(), additional, getType(),
+        MCRPIManager.obtainInstance().delete(obj.getId().toString(), additional, getType(),
             this.getServiceID());
     }
 
@@ -413,15 +413,15 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         throws MCRPersistentIdentifierException;
 
     public boolean isCreated(MCRObjectID id, String additional) {
-        return MCRPIManager.getInstance().isCreated(id, additional, type, registrationServiceID);
+        return MCRPIManager.obtainInstance().isCreated(id, additional, type, registrationServiceID);
     }
 
     public boolean isRegistered(MCRObjectID id, String additional) {
-        return MCRPIManager.getInstance().isRegistered(id, additional, type, registrationServiceID);
+        return MCRPIManager.obtainInstance().isRegistered(id, additional, type, registrationServiceID);
     }
 
     public boolean hasRegistrationStarted(MCRObjectID id, String additional) {
-        return MCRPIManager.getInstance()
+        return MCRPIManager.obtainInstance()
             .hasRegistrationStarted(id, additional, type, registrationServiceID);
     }
 
@@ -438,7 +438,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         MCRPIGenerator<T> persitentIdentifierGenerator = getGenerator();
         final T generated = persitentIdentifierGenerator.generate(id, additional);
         final String generatedIdentifier = generated.asString();
-        final Optional<MCRPIRegistrationInfo> mayInfo = MCRPIManager.getInstance()
+        final Optional<MCRPIRegistrationInfo> mayInfo = MCRPIManager.obtainInstance()
             .getInfo(generatedIdentifier, getType());
         if (mayInfo.isPresent()) {
             final String presentObject = mayInfo.get().getMycoreID();
@@ -452,7 +452,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     }
 
     protected MCRPI getTableEntry(MCRObjectID id, String additional) {
-        return MCRPIManager.getInstance().get(getServiceID(), id.toString(), additional);
+        return MCRPIManager.obtainInstance().get(getServiceID(), id.toString(), additional);
     }
 
     public void updateFlag(MCRObjectID id, String additional, MCRPI mcrpi) {

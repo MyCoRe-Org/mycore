@@ -68,11 +68,11 @@ public class MCRPersistentIdentifierRegistrationResource {
         if (errorResponse != null) {
             return errorResponse;
         }
-        List<MCRPIRegistrationInfo> mcrpiRegistrationInfos = MCRPIManager.getInstance().getList(type,
+        List<MCRPIRegistrationInfo> mcrpiRegistrationInfos = MCRPIManager.obtainInstance().getList(type,
             from, size);
         return Response.status(Response.Status.OK)
             .entity(new Gson().toJson(new MCRPIListJSON(type, from, size,
-                MCRPIManager.getInstance().getCount(type), mcrpiRegistrationInfos)))
+                MCRPIManager.obtainInstance().getCount(type), mcrpiRegistrationInfos)))
             .build();
     }
 
@@ -84,11 +84,11 @@ public class MCRPersistentIdentifierRegistrationResource {
         if (errorResponse != null) {
             return errorResponse;
         }
-        List<MCRPIRegistrationInfo> mcrpiRegistrationInfos = MCRPIManager.getInstance().getList(from,
+        List<MCRPIRegistrationInfo> mcrpiRegistrationInfos = MCRPIManager.obtainInstance().getList(from,
             size);
         return Response.status(Response.Status.OK)
             .entity(new Gson().toJson(new MCRPIListJSON(null, from, size,
-                MCRPIManager.getInstance().getCount(), mcrpiRegistrationInfos)))
+                MCRPIManager.obtainInstance().getCount(), mcrpiRegistrationInfos)))
             .build();
     }
 

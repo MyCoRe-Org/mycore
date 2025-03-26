@@ -258,7 +258,7 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
             LOGGER.info(resultingPI);
         }
 
-        final MCRPIParser<MCRPersistentIdentifier> parser = MCRPIManager.getInstance()
+        final MCRPIParser<MCRPersistentIdentifier> parser = MCRPIManager.obtainInstance()
             .getParserForType(getType());
 
         String result;
@@ -337,7 +337,7 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
         Pattern regExpPattern = Pattern.compile(countPattern);
         Predicate<String> matching = regExpPattern.asPredicate();
 
-        List<MCRPIRegistrationInfo> list = MCRPIManager.getInstance()
+        List<MCRPIRegistrationInfo> list = MCRPIManager.obtainInstance()
             .getList(getType(), -1, -1);
 
         // extract the number of the PI

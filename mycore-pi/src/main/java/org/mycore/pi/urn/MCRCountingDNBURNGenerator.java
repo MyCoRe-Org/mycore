@@ -47,7 +47,7 @@ public abstract class MCRCountingDNBURNGenerator extends MCRDNBURNGenerator {
         Pattern regExpPattern = Pattern.compile(countPattern);
         Predicate<String> matching = regExpPattern.asPredicate();
 
-        List<MCRPIRegistrationInfo> list = MCRPIManager.getInstance()
+        List<MCRPIRegistrationInfo> list = MCRPIManager.obtainInstance()
             .getList(MCRDNBURN.TYPE, -1, -1);
 
         // extract the number of the PI

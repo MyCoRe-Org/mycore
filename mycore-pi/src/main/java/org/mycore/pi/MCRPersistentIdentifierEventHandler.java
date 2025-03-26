@@ -47,7 +47,7 @@ public class MCRPersistentIdentifierEventHandler extends MCRJanitorEventHandlerB
     private static void detectServices(MCRObject obj, BiConsumer<MCRPIService, MCRPIRegistrationInfo> r) {
         MCRPIServiceManager serviceManager = MCRPIServiceManager.getInstance();
 
-        List<MCRPIRegistrationInfo> registered = MCRPIManager.getInstance().getRegistered(obj);
+        List<MCRPIRegistrationInfo> registered = MCRPIManager.obtainInstance().getRegistered(obj);
         List<String> serviceList = serviceManager.getServiceIDList();
 
         for (MCRPIRegistrationInfo pi : registered) {
@@ -65,7 +65,7 @@ public class MCRPersistentIdentifierEventHandler extends MCRJanitorEventHandlerB
     }
 
     private static MCRPersistentIdentifier getIdentifier(MCRPIRegistrationInfo pi) {
-        MCRPIManager identifierManager = MCRPIManager.getInstance();
+        MCRPIManager identifierManager = MCRPIManager.obtainInstance();
         MCRPIParser<?> parser = identifierManager.getParserForType(pi.getType());
 
         return parser.parse(pi.getIdentifier())
@@ -75,8 +75,8 @@ public class MCRPersistentIdentifierEventHandler extends MCRJanitorEventHandlerB
     @Override
     protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
         /* Add PIs to DB if they are not there */
-        MCRPIManager.getInstance().getRegistered(obj)
-            .forEach(pi -> MCRPIManager.getInstance().delete(pi.getMycoreID(), pi.getAdditional(),
+        MCRPIManager.obtainInstance().getRegistered(obj)
+            .forEach(pi -> MCRPIManager.obtainInstance().delete(pi.getMycoreID(), pi.getAdditional(),
                 pi.getType(),
                 pi.getService()));
 

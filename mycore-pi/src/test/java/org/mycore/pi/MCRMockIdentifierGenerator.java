@@ -29,7 +29,7 @@ public class MCRMockIdentifierGenerator extends MCRPIGenerator<MCRMockIdentifier
 
     @Override
     public MCRMockIdentifier generate(MCRBase mcrBase, String additional) {
-        Assert.assertEquals("Test propterties should be set!", getProperties().get(TEST_PROPERTY), TEST_PROPERTY_VALUE);
+        Assert.assertEquals("Test properties should be set!", getProperties().get(TEST_PROPERTY), TEST_PROPERTY_VALUE);
 
         return (MCRMockIdentifier) new MCRMockIdentifierParser()
             .parse(MCRMockIdentifier.MOCK_SCHEME + mcrBase.getId() + ":" + additional).get();

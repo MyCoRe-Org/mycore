@@ -19,7 +19,9 @@
 package org.mycore.pi;
 
 public class MCRMockIdentifier implements MCRPersistentIdentifier {
+
     public static final String MOCK_SCHEME = "MOCK:";
+
     private String text;
 
     protected MCRMockIdentifier(String text) {
@@ -29,6 +31,11 @@ public class MCRMockIdentifier implements MCRPersistentIdentifier {
     @Override
     public String asString() {
         return this.text;
+    }
+
+    @Override
+    public String toString() {
+        return text;
     }
 
 }

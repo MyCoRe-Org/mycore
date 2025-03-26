@@ -84,7 +84,7 @@ public class MCRCreateDateDOIGenerator extends MCRPIGenerator<MCRDigitalObjectId
             Pattern regExpPattern = Pattern.compile(pattern_);
             Predicate<String> matching = regExpPattern.asPredicate();
 
-            List<MCRPIRegistrationInfo> list = MCRPIManager.getInstance()
+            List<MCRPIRegistrationInfo> list = MCRPIManager.obtainInstance()
                 .getList(MCRDigitalObjectIdentifier.TYPE, -1, -1);
 
             Comparator<Integer> integerComparator = Integer::compareTo;

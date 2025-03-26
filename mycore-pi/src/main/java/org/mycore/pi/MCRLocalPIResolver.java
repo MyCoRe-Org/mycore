@@ -33,7 +33,7 @@ public class MCRLocalPIResolver extends MCRPIResolver<MCRPersistentIdentifier> {
 
     @Override
     public Stream<String> resolve(MCRPersistentIdentifier identifier) {
-        return MCRPIManager.getInstance()
+        return MCRPIManager.obtainInstance()
             .getInfo(identifier)
             .stream()
             .map(MCRPIRegistrationInfo::getMycoreID)

@@ -56,7 +56,7 @@ public class MCRPIHasRegisteredCondition extends MCRStringCondition {
             if (objectID != null) {
                 boolean anyRegistered = MCRPIServiceManager.getInstance().getServiceList().stream()
                     .anyMatch(service -> {
-                        final List<MCRPIRegistrationInfo> createdIdentifiers = MCRPIManager.getInstance()
+                        final List<MCRPIRegistrationInfo> createdIdentifiers = MCRPIManager.obtainInstance()
                             .getCreatedIdentifiers(objectID, service.getType(), service.getServiceID());
                         return createdIdentifiers.stream()
                             .anyMatch(pid -> service.isRegistered(objectID, pid.getAdditional()));
