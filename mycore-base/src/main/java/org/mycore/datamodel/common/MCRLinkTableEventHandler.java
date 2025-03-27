@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
@@ -70,43 +71,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
         handleObjectRepaired(evt, obj);
     }
 
-    /**
-     * This method delete the data from the link and classification table via MCRLinkTableManager.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param obj
-     *            the MCRObject that caused the event
-     */
-    @Override
-    protected final void handleObjectDeleted(MCREvent evt, MCRObject obj) {
-        instance().delete(obj.getId());
-    }
-
-    private static MCREvent createLinkedObjectChangedEvent(MCRBase obj, MCRLinkType type, MCRObjectID linkedObject) {
-        MCREvent.ObjectType eventObjectType =
-            type.isDerivateLinkType() ? MCREvent.ObjectType.DERIVATE : MCREvent.ObjectType.OBJECT;
-
-        MCREvent event = new MCREvent(eventObjectType, MCREvent.EventType.LINKED_UPDATED);
-        event.put(MCREvent.OBJECT_KEY, obj);
-        event.put(RELATED_OBJECT_KEY, linkedObject);
-        event.put(MCREvent.LINK_TYPE_KEY, type);
-
-        return event;
-    }
-
-    /**
-     * This method repair the data from the link and classification table via MCRLinkTableManager.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param obj
-     *            the MCRObject that caused the event
-     */
-    @Override
-    protected final void handleObjectRepaired(MCREvent evt, MCRObject obj) {
-        instance().update(obj);
-        
+    private static void triggerLinkedObjectChanged(MCREvent evt, MCRObject obj) {
         List<MCREvent> events = new ArrayList<>();
         // First handle all objects which have a pointer to this object, since the pointers did not change
         // TODO: This is a workaround to also get types. It would be better to have a method in MCRLinkTableManager,
@@ -129,10 +94,10 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
         Collection<MCRLinkReference> oldLinks =
             oldObject == null ? List.of() : instance().getLinks(oldObject);
         Collection<MCRLinkReference> newLinks = instance().getLinks(obj);
-        
+
         Collection<MCRLinkReference> combinedLinks = new HashSet<>(oldLinks);
         combinedLinks.addAll(newLinks);
-        
+
         combinedLinks.forEach(link -> {
             events.add(createLinkedObjectChangedEvent(obj, link.type(), link.to()));
         });
@@ -140,24 +105,73 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
         events.forEach(MCREventManager.instance()::handleEvent);
     }
 
+    private static MCREvent createLinkedObjectChangedEvent(MCRBase obj, MCRLinkType type, MCRObjectID linkedObject) {
+        boolean isDerivate = Objects.equals(obj.getId().getTypeId(), MCRDerivate.OBJECT_TYPE);
+        MCREvent.ObjectType eventObjectType = isDerivate ? MCREvent.ObjectType.DERIVATE : MCREvent.ObjectType.OBJECT;
+
+        MCREvent event = new MCREvent(eventObjectType, MCREvent.EventType.LINKED_UPDATED);
+        event.put(isDerivate ? MCREvent.DERIVATE_KEY : MCREvent.OBJECT_KEY, obj);
+        event.put(RELATED_OBJECT_KEY, linkedObject);
+        event.put(MCREvent.LINK_TYPE_KEY, type);
+
+        return event;
+    }
+
+    /**
+     * This method delete the data from the link and classification table via MCRLinkTableManager.
+     *
+     * @param evt
+     *            the event that occured
+     * @param obj
+     *            the MCRObject that caused the event
+     */
+    @Override
+    protected final void handleObjectDeleted(MCREvent evt, MCRObject obj) {
+        instance().delete(obj.getId());
+        triggerLinkedObjectChanged(evt, obj);
+
+    }
+
+    /**
+     * This method repair the data from the link and classification table via MCRLinkTableManager.
+     *
+     * @param evt
+     *            the event that occured
+     * @param obj
+     *            the MCRObject that caused the event
+     */
+    @Override
+    protected final void handleObjectRepaired(MCREvent evt, MCRObject obj) {
+        instance().update(obj);
+
+        triggerLinkedObjectChanged(evt, obj);
+    }
+
     @Override
     protected void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
         instance().create(der);
-        createLinkedObjectChangedEvent(der, MCRLinkType.DERIVATE, der.getOwnerID());
+        MCREventManager.instance()
+            .handleEvent(createLinkedObjectChangedEvent(der, MCRLinkType.DERIVATE, der.getOwnerID()));
     }
 
     @Override
     protected void handleDerivateRepaired(MCREvent evt, MCRDerivate der) {
         instance().update(der);
+        MCREventManager.instance()
+            .handleEvent(createLinkedObjectChangedEvent(der, MCRLinkType.DERIVATE, der.getOwnerID()));
     }
 
     @Override
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
         handleDerivateRepaired(evt, der);
+        MCREventManager.instance()
+            .handleEvent(createLinkedObjectChangedEvent(der, MCRLinkType.DERIVATE, der.getOwnerID()));
     }
 
     @Override
     protected void handleDerivateDeleted(MCREvent evt, MCRDerivate der) {
         instance().delete(der.getId());
+        MCREventManager.instance()
+            .handleEvent(createLinkedObjectChangedEvent(der, MCRLinkType.DERIVATE, der.getOwnerID()));
     }
 }

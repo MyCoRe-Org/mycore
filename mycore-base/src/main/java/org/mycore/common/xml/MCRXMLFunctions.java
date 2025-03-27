@@ -69,7 +69,6 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCalendar;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRExpandedObjectManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUtils;
@@ -443,8 +442,7 @@ public class MCRXMLFunctions {
     public static boolean hasDisplayableDerivates(String objectId) {
         return Optional.of(MCRObjectID.getInstance(objectId))
             .filter(MCRMetadataManager::exists)
-            .map(MCRMetadataManager::retrieveMCRObject)
-                .map(MCRExpandedObjectManager.getInstance()::getExpandedObject)
+            .map(MCRMetadataManager::retrieveMCRExpandedObject)
             .map(MCRExpandedObject::getStructure)
             .map(MCRExpandedObjectStructure::getDerivates)
             .map(List::stream)
