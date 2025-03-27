@@ -18,15 +18,8 @@
 
 package org.mycore.mcr.neo4j.utils;
 
-import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_PARAMETER_SEPARATOR;
-import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JUtil.getClassificationLabel;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,8 +37,14 @@ import org.neo4j.driver.types.Node;
 import org.neo4j.driver.types.Path;
 import org.neo4j.driver.types.Relationship;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_PARAMETER_SEPARATOR;
+import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JUtil.getClassificationLabel;
 
 public class MCRNeo4JQueryRunner {
 
@@ -54,11 +53,11 @@ public class MCRNeo4JQueryRunner {
     private static final String LANGUAGE = MCRConfiguration2.getString("MCR.Metadata.DefaultLang").orElse("de");
 
     /**
-    * Executes a write-only query in Neo4j using the provided query string. This function is responsible for executing
-    * queries that modify the Neo4j database.
-    *
-    * @param queryString the query string to be executed
-    */
+     * Executes a write-only query in Neo4j using the provided query string. This function is responsible for executing
+     * queries that modify the Neo4j database.
+     *
+     * @param queryString the query string to be executed
+     */
     public static void commitWriteOnlyQuery(String queryString) {
         Driver driver = MCRNeo4JDatabaseDriver.getInstance().getDriver();
         try {
@@ -76,14 +75,14 @@ public class MCRNeo4JQueryRunner {
     }
 
     /**
-    * Executes a read-only query in Neo4j using the provided query string and returns the result as a list of JSON
-    * strings. This function is responsible for executing queries that retrieve data from the Neo4j database.
-    *
-    * @param queryString the query string to be executed
-    * @param lang        the language for parsing
-    * @return a list of a Map with keys containing the type_recordKey and as value the JSON strings representing the
-    * query result for the given key
-    */
+     * Executes a read-only query in Neo4j using the provided query string and returns the result as a list of JSON
+     * strings. This function is responsible for executing queries that retrieve data from the Neo4j database.
+     *
+     * @param queryString the query string to be executed
+     * @param lang        the language for parsing
+     * @return a list of a Map with keys containing the type_recordKey and as value the JSON strings representing the
+     * query result for the given key
+     */
     public static List<Map<String, String>> commitReadOnlyQuery(String queryString, String lang) {
         Driver driver = MCRNeo4JDatabaseDriver.getInstance().getDriver();
         Gson gson = new GsonBuilder().disableHtmlEscaping().create();
@@ -166,15 +165,15 @@ public class MCRNeo4JQueryRunner {
     }
 
     /**
-    * Wrapper between MyCore i18n translation logic and (non language specific) neo4j database representation.
-    * if lang is null -> use default language or de for translation
-    * if key is longer than 3 chars and ends with _xy checks if xy equals lang, if true translate else skip this key
-    * else case: translate value with corresponding lang
-    *
-    * @param map key-value-pairs, translate the values
-    * @param lang MyCore Language short notation
-    * @return List of translated Neo4JMetaData Objects
-    */
+     * Wrapper between MyCore i18n translation logic and (non language specific) neo4j database representation.
+     * if lang is null -> use default language or de for translation
+     * if key is longer than 3 chars and ends with _xy checks if xy equals lang, if true translate else skip this key
+     * else case: translate value with corresponding lang
+     *
+     * @param map  key-value-pairs, translate the values
+     * @param lang MyCore Language short notation
+     * @return List of translated Neo4JMetaData Objects
+     */
     private static List<Neo4JMetaData> wrapPropertiesMapTranslation(Map<String, Object> map, String lang) {
         List<Neo4JMetaData> metaDataList = new ArrayList<>();
 
@@ -198,22 +197,25 @@ public class MCRNeo4JQueryRunner {
         return metaDataList;
     }
 
-    private static void translateAndMapProperties(List<Neo4JMetaData> metaDataList, String key, Object value,
+    static void translateAndMapProperties(List<Neo4JMetaData> metaDataList, String key, Object value,
         String lang) {
-        if (value instanceof List<?>) {
-            List<String> stringList = ((List<?>) value).stream().map(Object::toString).toList();
+        if (value instanceof List<?> content) {
+            final List<String> stringList = content
+                .stream()
+                .map(Object::toString)
+                .map(current -> {
+                    if (StringUtils.contains(current, NEO4J_PARAMETER_SEPARATOR)) {
+                        final String[] values = StringUtils.splitByWholeSeparator(current, NEO4J_PARAMETER_SEPARATOR);
+                        return getClassificationLabel(values[0], values[1], lang);
+                    } else {
+                        return current;
+                    }
+                })
+                .toList();
 
-            if (stringList.size() == 1) {
-                if (stringList.get(0).contains(NEO4J_PARAMETER_SEPARATOR)) {
-                    String[] sep = stringList.get(0).split(NEO4J_PARAMETER_SEPARATOR);
-                    String classification = getClassificationLabel(sep[0], sep[1], lang);
-                    metaDataList.add(new Neo4JMetaData(key, List.of(classification)));
-                }
-            } else {
-                metaDataList.add(new Neo4JMetaData(key, stringList));
-            }
-        } else if (value instanceof String) {
-            if (((String) value).contains(NEO4J_PARAMETER_SEPARATOR)) {
+            metaDataList.add(new Neo4JMetaData(key, stringList));
+        } else if (value instanceof String content) {
+            if (content.contains(NEO4J_PARAMETER_SEPARATOR)) {
                 String[] sep = ((String) value).split(NEO4J_PARAMETER_SEPARATOR);
                 String classification = getClassificationLabel(sep[0], sep[1], lang);
                 metaDataList.add(new Neo4JMetaData(key, List.of(classification)));
