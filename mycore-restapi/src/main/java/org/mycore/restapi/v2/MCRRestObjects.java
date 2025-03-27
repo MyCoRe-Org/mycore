@@ -63,6 +63,7 @@ import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRStreamContent;
@@ -105,7 +106,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import jakarta.servlet.ServletContext;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
@@ -421,7 +421,8 @@ public class MCRRestObjects {
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
-        MCRContent mcrContent = MCRXMLMetadataManager.getInstance().retrieveContent(id);
+
+        MCRContent mcrContent = new MCRBaseContent(MCRMetadataManager.retrieveMCRExpandedObject(id));
         return Response.ok()
             .entity(mcrContent,
                 new Annotation[] { MCRParams.Factory
@@ -449,7 +450,7 @@ public class MCRRestObjects {
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
-        MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(id);
+        MCRObject mcrObj = MCRMetadataManager.retrieveMCRExpandedObject(id);
         MCRContent mcrContent = new MCRJDOMContent(mcrObj.getMetadata().createXML());
         return Response.ok()
             .entity(mcrContent,

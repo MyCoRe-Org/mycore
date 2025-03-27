@@ -139,7 +139,7 @@ public class MCRBatchEditorCommands extends MCRAbstractCommands {
 
     private static Document getObjectXML(String objectID) {
         MCRObjectID oid = MCRObjectID.getInstance(objectID);
-        MCRObject obj = MCRMetadataManager.retrieveMCRObject(oid);
+        MCRObject obj = MCRMetadataManager.retrieveMCRExpandedObject(oid);
         return obj.createXML();
     }
 

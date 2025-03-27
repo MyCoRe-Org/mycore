@@ -43,8 +43,8 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.csl.MCRItemDataProvider;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.metadata.MCRExpandedObject;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.mods.MCRMODSWrapper;
@@ -640,7 +640,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     }
 
     protected void addContent(Document document) {
-        final MCRObject object = new MCRObject(document);
+        final MCRExpandedObject object = new MCRExpandedObject(document);
         wrapper = new MCRMODSWrapper(object);
         this.id = object.getId().toString();
     }

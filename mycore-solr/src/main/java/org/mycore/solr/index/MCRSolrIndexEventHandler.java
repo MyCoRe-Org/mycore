@@ -148,9 +148,8 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
             // this is handled by handleAncestorUpdated
             return;
         }
-        MCRObject linkedObject = MCRMetadataManager.retrieveMCRObject(linkedID);
-        MCRExpandedObject expandedObject = MCRExpandedObjectManager.getInstance().getExpandedObject(linkedObject);
-        addObject(evt, expandedObject);
+        MCRObject linkedObject = MCRMetadataManager.retrieveMCRExpandedObject(linkedID);
+        addObject(evt, linkedObject);
     }
 
     @Override
@@ -161,9 +160,8 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleDerivateLinkUpdated(MCREvent evt, MCRDerivate updatedDerivate, MCRObjectID linkedID) {
-        MCRObject linkedObject = MCRMetadataManager.retrieveMCRObject(linkedID);
-        MCRExpandedObject expandedObject = MCRExpandedObjectManager.getInstance().getExpandedObject(linkedObject);
-        addObject(evt, expandedObject);
+        MCRObject linkedObject = MCRMetadataManager.retrieveMCRExpandedObject(linkedID);
+        addObject(evt, linkedObject);
     }
 
     @Override
