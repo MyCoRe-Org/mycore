@@ -198,6 +198,16 @@ public class MCRMetaEnrichedLinkID extends MCRMetaLinkID {
     }
 
     @Override
+    public MCRMetaEnrichedLinkID clone() {
+        MCRMetaEnrichedLinkID clone = (MCRMetaEnrichedLinkID) super.clone();
+
+        clone.contentList = contentList.stream().map(Content::clone)
+            .collect(Collectors.toCollection(ArrayList::new));
+
+        return clone;
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), getContentList());
     }

@@ -247,13 +247,6 @@ public class MCRMetaLangText extends MCRMetaDefault {
             .orElse(FORM_PLAIN);
     }
 
-    /**
-     * clone of this instance
-     *
-     * you will get a (deep) clone of this element
-     *
-     * @see java.lang.Object#clone()
-     */
     @Override
     public MCRMetaLangText clone() {
         MCRMetaLangText clone = (MCRMetaLangText) super.clone();

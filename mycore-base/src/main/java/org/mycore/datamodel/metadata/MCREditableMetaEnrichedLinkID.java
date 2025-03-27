@@ -63,4 +63,9 @@ public class MCREditableMetaEnrichedLinkID extends MCRMetaEnrichedLinkID {
         return orderElement;
     }
 
+    @Override
+    public MCREditableMetaEnrichedLinkID clone() {
+        return (MCREditableMetaEnrichedLinkID) super.clone();
+    }
+
 }

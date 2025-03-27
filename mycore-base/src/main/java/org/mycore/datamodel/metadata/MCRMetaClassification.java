@@ -210,18 +210,11 @@ public class MCRMetaClassification extends MCRMetaDefault {
         }
     }
 
-    /**
-     * clone of this instance
-     *
-     * you will get a (deep) clone of this element
-     *
-     * @see java.lang.Object#clone()
-     */
     @Override
     public MCRMetaClassification clone() {
         MCRMetaClassification clone = (MCRMetaClassification) super.clone();
 
-        clone.category = this.category; // immutable so shallow copy ok
+        clone.category = this.category; // immutable
 
         return clone;
     }
