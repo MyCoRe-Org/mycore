@@ -48,7 +48,8 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     public void nested() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithNestedClass instance = MCRConfigurableInstanceHelper.getInstance(configuration);
+        TestClassWithNestedClass instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithNestedClass.class, configuration);
 
         assertNotNull(instance);
         assertNotNull(instance.nested);
@@ -65,7 +66,7 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     public void nestedNotPresent() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurableInstanceHelper.getInstance(configuration);
+        MCRConfigurableInstanceHelper.getInstance(Object.class, configuration);
 
     }
 
@@ -80,7 +81,8 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     public void nestedOptional() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithOptionalNestedClass instance = MCRConfigurableInstanceHelper.getInstance(configuration);
+        TestClassWithOptionalNestedClass instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithOptionalNestedClass.class, configuration);
 
         assertNotNull(instance);
         assertNotNull(instance.nested);
@@ -97,7 +99,8 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     public void nestedOptionalNotPresent() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithOptionalNestedClass instance = MCRConfigurableInstanceHelper.getInstance(configuration);
+        TestClassWithOptionalNestedClass instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithOptionalNestedClass.class, configuration);
 
         assertNotNull(instance);
         assertNull(instance.nested);
@@ -116,7 +119,8 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     public void nestedNested() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithNestedNestedClass instance = MCRConfigurableInstanceHelper.getInstance(configuration);
+        TestClassWithNestedNestedClass instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithNestedNestedClass.class, configuration);
 
         assertNotNull(instance);
         assertNotNull(instance.nested);
@@ -138,7 +142,8 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     public void nestedOptionalAndSentinel() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithOptionalNestedClassAndSentinel instance = MCRConfigurableInstanceHelper.getInstance(configuration);
+        TestClassWithOptionalNestedClassAndSentinel instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithOptionalNestedClassAndSentinel.class, configuration);
 
         assertNotNull(instance);
         assertNotNull(instance.nested);
@@ -159,7 +164,8 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     public void nestedOptionalAndSentinelNotPresent() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithOptionalNestedClassAndSentinel instance = MCRConfigurableInstanceHelper.getInstance(configuration);
+        TestClassWithOptionalNestedClassAndSentinel instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithOptionalNestedClassAndSentinel.class, configuration);
 
         assertNotNull(instance);
         assertNull(instance.nested);
@@ -178,7 +184,8 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     public void nestedMap() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithNestedMap instance = MCRConfigurableInstanceHelper.getInstance(configuration);
+        TestClassWithNestedMap instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithNestedMap.class, configuration);
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -204,7 +211,7 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     public void nestedMapNotPresent() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurableInstanceHelper.getInstance(configuration);
+        MCRConfigurableInstanceHelper.getInstance(Object.class, configuration);
 
     }
 
@@ -220,7 +227,8 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     public void nestedOptionalMap() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithOptionalNestedMap instance = MCRConfigurableInstanceHelper.getInstance(configuration);
+        TestClassWithOptionalNestedMap instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithOptionalNestedMap.class, configuration);
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -246,7 +254,8 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     public void nestedOptionalMapNotPresent() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithOptionalNestedMap instance = MCRConfigurableInstanceHelper.getInstance(configuration);
+        TestClassWithOptionalNestedMap instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithOptionalNestedMap.class, configuration);
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -271,7 +280,8 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     public void nestedMapWithSentinel() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithNestedMapWithSentinel instance = MCRConfigurableInstanceHelper.getInstance(configuration);
+        TestClassWithNestedMapWithSentinel instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithNestedMapWithSentinel.class, configuration);
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -297,7 +307,8 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     public void nestedMapWithPrefix() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithNestedMapWithPrefix instance = MCRConfigurableInstanceHelper.getInstance(configuration);
+        TestClassWithNestedMapWithPrefix instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithNestedMapWithPrefix.class, configuration);
 
         assertNotNull(instance);
         assertNotNull(instance.map1);
@@ -334,7 +345,8 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     public void nestedMapWithPrefixAndSentinel() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithNestedMapWithPrefixAndSentinel instance = MCRConfigurableInstanceHelper.getInstance(configuration);
+        TestClassWithNestedMapWithPrefixAndSentinel instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithNestedMapWithPrefixAndSentinel.class, configuration);
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -360,7 +372,8 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     public void nestedList() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithNestedList instance = MCRConfigurableInstanceHelper.getInstance(configuration);
+        TestClassWithNestedList instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithNestedList.class, configuration);
 
         assertNotNull(instance);
         assertNotNull(instance.list);
@@ -386,7 +399,7 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     public void nestedListNotPresent() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurableInstanceHelper.getInstance(configuration);
+        MCRConfigurableInstanceHelper.getInstance(Object.class, configuration);
 
     }
 
@@ -402,7 +415,8 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     public void nestedOptionalList() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithOptionalNestedList instance = MCRConfigurableInstanceHelper.getInstance(configuration);
+        TestClassWithOptionalNestedList instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithOptionalNestedList.class, configuration);
 
         assertNotNull(instance);
         assertNotNull(instance.list);
@@ -428,7 +442,8 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     public void nestedOptionalListNotPresent() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithOptionalNestedList instance = MCRConfigurableInstanceHelper.getInstance(configuration);
+        TestClassWithOptionalNestedList instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithOptionalNestedList.class, configuration);
 
         assertNotNull(instance);
         assertNotNull(instance.list);
@@ -453,7 +468,8 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     public void nestedListWithSentinel() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithNestedListAndSentinel instance = MCRConfigurableInstanceHelper.getInstance(configuration);
+        TestClassWithNestedListAndSentinel instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithNestedListAndSentinel.class, configuration);
 
         assertNotNull(instance);
         assertNotNull(instance.list);
@@ -476,7 +492,8 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     public void nestedListWithPrefix() {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWithNestedListWithPrefix instance = MCRConfigurableInstanceHelper.getInstance(configuration);
+        TestClassWithNestedListWithPrefix instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithNestedListWithPrefix.class, configuration);
 
         assertNotNull(instance);
         assertNotNull(instance.list1);
@@ -513,7 +530,7 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         TestClassWithNestedListWithPrefixAndSentinel instance = MCRConfigurableInstanceHelper
-            .getInstance(configuration);
+            .getInstance(TestClassWithNestedListWithPrefixAndSentinel.class, configuration);
 
         assertNotNull(instance);
         assertNotNull(instance.list);
