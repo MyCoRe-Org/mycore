@@ -799,12 +799,6 @@ class MCRConfigurableInstanceHelper {
                 }
             });
 
-            if (filteredProperties.isEmpty() && annotation.required()) {
-                throw new MCRConfigurationException("The required property "
-                    + configuration.name().canonical() + "."
-                    + annotation.name() + " has no values");
-            }
-
             return filteredProperties;
 
         }
