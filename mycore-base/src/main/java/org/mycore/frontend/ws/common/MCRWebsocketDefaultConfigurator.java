@@ -38,7 +38,7 @@ public class MCRWebsocketDefaultConfigurator extends ServerEndpointConfig.Config
 
     @Override
     public <T> T getEndpointInstance(Class<T> endpointClass) {
-        return MCRConfiguration2.instantiateClass(endpointClass.getName());
+        return MCRConfiguration2.instantiateClass(endpointClass, endpointClass.getName());
     }
 
     @Override

@@ -32,7 +32,7 @@ import org.mycore.resource.provider.MCRLFSResourceProvider;
  * <p>
  * The <em>select</em>-phase differs from the <em>filter</em>-phase in that in the <em>filter</em>-phase
  * resources are evaluated as they are, in the <em>select</em>-phase resources are compared to other
- * resources that have been located and filtered.
+ * resources that have been located and filtered and potentially reordered.
  */
 public interface MCRResourceSelector {
 

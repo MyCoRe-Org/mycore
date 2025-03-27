@@ -115,8 +115,8 @@ public final class MCRNeo4JUtil {
         propertiesMap.forEach((k, v) -> {
             // avoid loop instantiation
             if (!Objects.equals(k, filterClassKey)) {
-                parserMap.put(k, MCRConfiguration2.getOrThrow(NEO4J_CONFIG_PREFIX + "ParserClass." + k,
-                    MCRConfiguration2::instantiateClass));
+                parserMap.put(k, MCRConfiguration2.getInstanceOfOrThrow(MCRNeo4JAbstractDataModelParser.class,
+                    NEO4J_CONFIG_PREFIX + "ParserClass." + k));
             }
         });
         return parserMap;

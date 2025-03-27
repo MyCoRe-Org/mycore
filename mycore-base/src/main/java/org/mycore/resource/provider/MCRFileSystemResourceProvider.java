@@ -63,7 +63,8 @@ public class MCRFileSystemResourceProvider extends MCRFileSystemResourceProvider
 
     public MCRFileSystemResourceProvider(String coverage, MCRResourceProviderMode mode, List<File> baseDirs) {
         super(coverage, mode);
-        this.baseDirs = Objects.requireNonNull(baseDirs);
+        this.baseDirs = Objects.requireNonNull(baseDirs, "Base dirs must not be null");
+        this.baseDirs.forEach(baseDir -> Objects.requireNonNull(baseDir, "Base dir must not be null"));
     }
 
     @Override
