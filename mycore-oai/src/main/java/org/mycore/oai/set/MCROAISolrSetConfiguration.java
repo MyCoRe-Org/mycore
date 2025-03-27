@@ -50,7 +50,7 @@ public class MCROAISolrSetConfiguration implements MCROAISetConfiguration<SolrQu
                     throw new MCRConfigurationException("Configuration property " + setConfigPrefix
                         + ".Handler is not set and no fallback handler could be determined.");
                 }
-                return MCRConfiguration2.instantiateClass(fallbackHandlerClassName);
+                return MCRConfiguration2.instantiateClass(MCROAISolrSetHandler.class, fallbackHandlerClassName);
             });
         handler.init(configPrefix, setId);
         this.id = setId;

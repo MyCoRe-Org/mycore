@@ -31,12 +31,8 @@ import org.mycore.common.config.MCRConfiguration2;
  */
 public class MCRSolrIndexStrategyManager {
 
-    private static final MCRSolrFileStrategy FILE_STRATEGY;
-
-    static {
-        FILE_STRATEGY = MCRConfiguration2
-            .getOrThrow(SOLR_CONFIG_PREFIX + "FileIndexStrategy", MCRConfiguration2::instantiateClass);
-    }
+    private static final MCRSolrFileStrategy FILE_STRATEGY = MCRConfiguration2
+        .getInstanceOfOrThrow(MCRSolrFileStrategy.class, SOLR_CONFIG_PREFIX + "FileIndexStrategy");
 
     public static boolean checkFile(Path file, BasicFileAttributes attrs) {
         return FILE_STRATEGY.check(file, attrs);

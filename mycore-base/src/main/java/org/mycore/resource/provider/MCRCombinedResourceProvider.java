@@ -74,8 +74,8 @@ public class MCRCombinedResourceProvider extends MCRResourceProviderBase {
 
     public MCRCombinedResourceProvider(String coverage, List<MCRResourceProvider> providers) {
         super(coverage);
-        this.providers = new ArrayList<>(Objects.requireNonNull(providers));
-        this.providers.forEach(Objects::requireNonNull);
+        this.providers = new ArrayList<>(Objects.requireNonNull(providers, "Providers must not be null"));
+        this.providers.forEach(provider -> Objects.requireNonNull(provider, "Provider must not be null"));
     }
 
     @Override

@@ -18,6 +18,7 @@
 
 package org.mycore.resource.provider;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import org.apache.logging.log4j.Level;
@@ -72,7 +73,7 @@ public final class MCRWebappLibraryResourceProvider extends MCRLFSResourceProvid
             new MCRCombinedResourceSelector(
                 new MCRHighestComponentPriorityResourceSelector(),
                 new MCRFirstLibraryJarResourceSelector()));
-        this.mode = mode;
+        this.mode = Objects.requireNonNull(mode, "Mode must not be null");
     }
 
     @Override

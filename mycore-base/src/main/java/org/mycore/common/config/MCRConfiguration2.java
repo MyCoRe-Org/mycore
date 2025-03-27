@@ -67,7 +67,7 @@ import org.mycore.common.function.MCRTriConsumer;
  * <ul>
  *     <li>{@link #getOrThrow(String, Function)}</li>
  *     <li>{@link #splitValue(String)}</li>
- *     <li>{@link #instantiateClass(String)}</li>
+ *     <li>{@link #instantiateClass(Class, String)}</li>
  * </ul>
  *
  * As you see, the class provides methods to get configuration properties as different data types and allows you to
@@ -423,8 +423,21 @@ public class MCRConfiguration2 {
         return LISTENERS.remove(uuid) != null;
     }
 
+    @Deprecated
+    @SuppressWarnings("unchecked")
     public static <T> T instantiateClass(String className) {
-        return MCRConfigurableInstanceHelper.getInstance(MCRInstanceConfiguration.ofClass(className));
+        return (T) instantiateClass(Object.class, className);
+    }
+
+    public static <S> S instantiateClass(Class<S> superClass, String className) {
+        return MCRConfigurableInstanceHelper.getInstance(superClass, MCRInstanceConfiguration.ofClass(className));
+    }
+
+    public static <S> Stream<S> instantiateClasses(Class<S> superClass, String propertyName) {
+        return getString(propertyName)
+            .map(MCRConfiguration2::splitValue)
+            .orElseGet(Stream::empty)
+            .map(className -> instantiateClass(superClass, className));
     }
 
     private static <T> Class<? extends T> getClassObject(String classname) {

@@ -50,7 +50,7 @@ import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.ocfl.MCROCFLPersistenceTransaction;
 import org.mycore.ocfl.classification.MCROCFLXMLClassificationManager;
-import org.mycore.ocfl.metadata.MCROCFLXMLMetadataManager;
+import org.mycore.ocfl.metadata.MCROCFLXMLMetadataManagerAdapter;
 import org.mycore.ocfl.metadata.migration.MCROCFLMigration;
 import org.mycore.ocfl.metadata.migration.MCROCFLRevisionPruner;
 import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
@@ -100,8 +100,8 @@ public class MCROCFLCommands {
 
         MCROCFLMigration migration;
         if (metadataManagerConfigKey != null && !metadataManagerConfigKey.isEmpty()) {
-            MCROCFLXMLMetadataManager metadataManager =
-                MCRConfiguration2.getInstanceOf(MCROCFLXMLMetadataManager.class, metadataManagerConfigKey)
+            MCROCFLXMLMetadataManagerAdapter metadataManager =
+                MCRConfiguration2.getInstanceOf(MCROCFLXMLMetadataManagerAdapter.class, metadataManagerConfigKey)
                     .orElseThrow(() -> MCRConfiguration2.createConfigurationException(metadataManagerConfigKey));
             migration = new MCROCFLMigration(null, prunerList, metadataManager);
         } else if (repository != null && !repository.isEmpty()) {
@@ -272,7 +272,7 @@ public class MCROCFLCommands {
         help = "restore mcrobject {0} with version {1} to current store from ocfl history")
     public static void restoreObjFromOCFLVersioned(String mcridString, String revision) throws IOException {
         MCRObjectID mcrid = MCRObjectID.getInstance(mcridString);
-        MCROCFLXMLMetadataManager manager = new MCROCFLXMLMetadataManager();
+        MCROCFLXMLMetadataManagerAdapter manager = new MCROCFLXMLMetadataManagerAdapter();
         manager.setRepositoryKey(MCRConfiguration2.getStringOrThrow("MCR.Metadata.Manager.Repository"));
         MCRContent content = manager.retrieveContent(mcrid, revision);
         try {
@@ -292,7 +292,7 @@ public class MCROCFLCommands {
         help = "Permanently delete object {0} and its history from ocfl")
     public static void purgeObject(String mcridString) {
         MCRObjectID mcrid = MCRObjectID.getInstance(mcridString);
-        MCROCFLXMLMetadataManager manager = new MCROCFLXMLMetadataManager();
+        MCROCFLXMLMetadataManagerAdapter manager = new MCROCFLXMLMetadataManagerAdapter();
         manager.setRepositoryKey(MCRConfiguration2.getStringOrThrow("MCR.Metadata.Manager.Repository"));
         manager.purge(mcrid, new Date(), MCRUserManager.getCurrentUser().getUserName());
     }
@@ -340,7 +340,7 @@ public class MCROCFLCommands {
             return;
         }
         String repositoryKey = MCRConfiguration2.getStringOrThrow("MCR.Metadata.Manager.Repository");
-        MCROCFLXMLMetadataManager manager = new MCROCFLXMLMetadataManager();
+        MCROCFLXMLMetadataManagerAdapter manager = new MCROCFLXMLMetadataManagerAdapter();
         manager.setRepositoryKey(repositoryKey);
         OcflRepository repository = manager.getRepository();
         repository.listObjectIds()

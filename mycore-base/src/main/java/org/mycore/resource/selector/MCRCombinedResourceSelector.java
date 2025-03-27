@@ -62,8 +62,8 @@ public final class MCRCombinedResourceSelector extends MCRResourceSelectorBase {
     }
 
     public MCRCombinedResourceSelector(List<MCRResourceSelector> selectors) {
-        this.selectors = new ArrayList<>(Objects.requireNonNull(selectors));
-        this.selectors.forEach(Objects::requireNonNull);
+        this.selectors = new ArrayList<>(Objects.requireNonNull(selectors, "Selectors must not be null"));
+        this.selectors.forEach(selector -> Objects.requireNonNull(selector, "Selector must not be null"));
     }
 
     @Override

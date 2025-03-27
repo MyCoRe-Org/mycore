@@ -35,7 +35,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * Provides an abstract class for persistence managers of MCRObject and MCRDerivate xml
  * metadata to extend, with methods to perform CRUD operations on object metadata.
  *
- * The default xml metadata manager is {@link MCRDefaultXMLMetadataManager}. If you wish to use
+ * The default xml metadata manager is {@link MCRDefaultXMLMetadataManagerAdapter}. If you wish to use
  * another manager implementation instead, change the following property accordingly:
  *
  * MCR.Metadata.Manager.Class=org.mycore.datamodel.common.MCRDefaultXMLMetadataManager

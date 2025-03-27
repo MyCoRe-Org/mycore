@@ -37,12 +37,12 @@ public abstract class MCRUrlPrefixResourceFilterBase extends MCRResourceFilterBa
     private final MCRResourceFilterMode mode;
 
     public MCRUrlPrefixResourceFilterBase(MCRResourceFilterMode mode) {
-        this.mode = Objects.requireNonNull(mode);
+        this.mode = Objects.requireNonNull(mode, "Mode must not be null");
     }
 
     @Override
     protected final Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints) {
-        return getPrefix(hints).map(prefix -> filter(resourceUrls, prefix)).orElse(Stream.empty());
+        return getPrefix(hints).stream().flatMap(prefix -> filter(resourceUrls, prefix));
     }
 
     protected abstract Optional<String> getPrefix(MCRHints hints);
