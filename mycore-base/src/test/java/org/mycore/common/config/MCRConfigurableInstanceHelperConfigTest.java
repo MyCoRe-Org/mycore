@@ -19,7 +19,6 @@
 package org.mycore.common.config;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -34,6 +33,7 @@ import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRRawProperties;
 
 public class MCRConfigurableInstanceHelperConfigTest extends MCRTestCase {
 
@@ -53,9 +53,11 @@ public class MCRConfigurableInstanceHelperConfigTest extends MCRTestCase {
 
     private static final String ASSIGNED_KEY = "AssignedKey";
 
+    private static final String PREFIX_ASSIGNED_KEY = "Prefix.AssignedKey";
+
     private static final String ASSIGNED_VALUE = "AssignedValue";
 
-    private static final String UNASSIGNED_KEY = "UnassignedKey";
+    private static final String PREFIX_ASSIGNED_VALUE = "Prefix.AssignedValue";
 
     private static final String KEY_REQUIRED_FIELD = "KeyRequiredField";
 
@@ -169,13 +171,46 @@ public class MCRConfigurableInstanceHelperConfigTest extends MCRTestCase {
     void validateFields(ConfigurableTestInstance instance) {
 
         assertTrue("The map field should contain the assigned test key",
+            instance.legacyMap.containsKey(ASSIGNED_KEY));
+
+        assertTrue("The map field should contain the assigned test key with prefix",
+            instance.legacyMap.containsKey(PREFIX_ASSIGNED_KEY));
+
+        assertEquals("The assigned test key should have the assigned value",
+            ASSIGNED_VALUE, instance.legacyMap.get(ASSIGNED_KEY));
+
+        assertEquals("The assigned test key with prefix should have the assigned value",
+            PREFIX_ASSIGNED_VALUE, instance.legacyMap.get(PREFIX_ASSIGNED_KEY));
+
+        assertTrue("The prefix map field should contain the assigned test key",
+            instance.legacyPrefixMap.containsKey(ASSIGNED_KEY));
+
+        assertEquals("The map field should have exactly one entry",
+            1, instance.legacyPrefixMap.size());
+
+        assertEquals("The assigned test key should have the assigned value",
+            PREFIX_ASSIGNED_VALUE, instance.legacyPrefixMap.get(ASSIGNED_KEY));
+
+        assertTrue("The map field should contain the assigned test key",
             instance.map.containsKey(ASSIGNED_KEY));
 
-        assertEquals("The assigned test property should be present in map field",
+        assertTrue("The map field should contain the assigned test key with prefix",
+            instance.map.containsKey(PREFIX_ASSIGNED_KEY));
+
+        assertEquals("The assigned test key should have the assigned value",
             ASSIGNED_VALUE, instance.map.get(ASSIGNED_KEY));
 
-        assertFalse("The unassigned test property should not be present in map field",
-            instance.map.containsKey(UNASSIGNED_KEY));
+        assertEquals("The assigned test key with prefix should have the assigned value",
+            PREFIX_ASSIGNED_VALUE, instance.map.get(PREFIX_ASSIGNED_KEY));
+
+        assertTrue("The prefix map field should contain the assigned test key",
+            instance.prefixMap.containsKey(ASSIGNED_KEY));
+
+        assertEquals("The map field should have exactly one entry",
+            1, instance.prefixMap.size());
+
+        assertEquals("The assigned test key should have the assigned value",
+            PREFIX_ASSIGNED_VALUE, instance.prefixMap.get(ASSIGNED_KEY));
 
         assertEquals("The required field should match",
             VALUE_REQUIRED_FIELD, instance.required);
@@ -203,13 +238,46 @@ public class MCRConfigurableInstanceHelperConfigTest extends MCRTestCase {
     void validateMethods(ConfigurableTestInstance instance) {
 
         assertTrue("The map method value should contain the assigned test key",
+            instance.getLegacyMap().containsKey(ASSIGNED_KEY));
+
+        assertTrue("The map method value should contain the assigned test key with prefix",
+            instance.getLegacyMap().containsKey(PREFIX_ASSIGNED_KEY));
+
+        assertEquals("The assigned test key should have the assigned value",
+            ASSIGNED_VALUE, instance.getLegacyMap().get(ASSIGNED_KEY));
+
+        assertEquals("The assigned test key with prefix should have the assigned value",
+            PREFIX_ASSIGNED_VALUE, instance.getLegacyMap().get(PREFIX_ASSIGNED_KEY));
+
+        assertTrue("The prefix map method value should contain the assigned test key",
+            instance.getLegacyPrefixMap().containsKey(ASSIGNED_KEY));
+
+        assertEquals("The map field should have exactly one entry",
+            1, instance.getLegacyPrefixMap().size());
+
+        assertEquals("The assigned test key should have the assigned value",
+            PREFIX_ASSIGNED_VALUE, instance.getLegacyPrefixMap().get(ASSIGNED_KEY));
+
+        assertTrue("The map method value should contain the assigned test key",
             instance.getMap().containsKey(ASSIGNED_KEY));
 
-        assertEquals("The assigned test property should be present in map method value",
+        assertTrue("The map method value should contain the assigned test key with prefix",
+            instance.getMap().containsKey(PREFIX_ASSIGNED_KEY));
+
+        assertEquals("The assigned test key should have the assigned value",
             ASSIGNED_VALUE, instance.getMap().get(ASSIGNED_KEY));
 
-        assertFalse("The unassigned test property should not be present in map method value",
-            instance.getMap().containsKey(UNASSIGNED_KEY));
+        assertEquals("The assigned test key with prefix should have the assigned value",
+            PREFIX_ASSIGNED_VALUE, instance.getMap().get(PREFIX_ASSIGNED_KEY));
+
+        assertTrue("The prefix map method value should contain the assigned test key",
+            instance.getPrefixMap().containsKey(ASSIGNED_KEY));
+
+        assertEquals("The map field should have exactly one entry",
+            1, instance.getPrefixMap().size());
+
+        assertEquals("The assigned test key should have the assigned value",
+            PREFIX_ASSIGNED_VALUE, instance.getPrefixMap().get(ASSIGNED_KEY));
 
         assertEquals("The required method value should match",
             VALUE_REQUIRED_METHOD, instance.getRequired());
@@ -272,6 +340,7 @@ public class MCRConfigurableInstanceHelperConfigTest extends MCRTestCase {
         String fullInstanceName = withClassSuffix(instanceName, withClassSuffix);
         testProperties.put(fullInstanceName, ConfigurableTestInstance.class.getName());
         testProperties.put(instanceName + "." + ASSIGNED_KEY, ASSIGNED_VALUE);
+        testProperties.put(instanceName + "." + PREFIX_ASSIGNED_KEY, PREFIX_ASSIGNED_VALUE);
         testProperties.put(instanceName + "." + KEY_REQUIRED_FIELD, VALUE_REQUIRED_FIELD);
         testProperties.put(instanceName + "." + KEY_PRESENT_OPTIONAL_FIELD, VALUE_PRESENT_OPTIONAL_FIELD);
         testProperties.put(instanceName + "." + KEY_PRESENT_OPTIONAL_FIELD_WITH_DEFAULT,
@@ -293,7 +362,16 @@ public class MCRConfigurableInstanceHelperConfigTest extends MCRTestCase {
     public static class ConfigurableTestInstance {
 
         @MCRProperty(name = "*")
+        public Map<String, String> legacyMap;
+
+        @MCRProperty(name = "Prefix.*")
+        public Map<String, String> legacyPrefixMap;
+
+        @MCRRawProperties(namePattern = "*")
         public Map<String, String> map;
+
+        @MCRRawProperties(namePattern = "Prefix.*")
+        public Map<String, String> prefixMap;
 
         @MCRProperty(name = KEY_REQUIRED_FIELD)
         public String required;
@@ -316,7 +394,13 @@ public class MCRConfigurableInstanceHelperConfigTest extends MCRTestCase {
         @MCRProperty(name = KEY_ABSOLUTE_FIELD, absolute = true)
         public String absolute;
 
+        private Map<String, String> legacyMapMethodValue;
+
+        private Map<String, String> legacyPrefixMapMethodValue;
+
         private Map<String, String> mapMethodValue;
+
+        private Map<String, String> prefixMapMethodValue;
 
         private String requiredMethodValue;
 
@@ -342,13 +426,40 @@ public class MCRConfigurableInstanceHelperConfigTest extends MCRTestCase {
 
         private final List<String> orderedOverallValues = new ArrayList<>(6);
 
+        public Map<String, String> getLegacyMap() {
+            return legacyMapMethodValue;
+        }
+
+        @MCRProperty(name = "*")
+        public void setLegacyMap(Map<String, String> mapValue) {
+            this.legacyMapMethodValue = mapValue;
+        }
+
+        public Map<String, String> getLegacyPrefixMap() {
+            return legacyPrefixMapMethodValue;
+        }
+
+        @MCRProperty(name = "Prefix.*")
+        public void setLegacyPrefixMap(Map<String, String> prefixMapValue) {
+            this.legacyPrefixMapMethodValue = prefixMapValue;
+        }
+
         public Map<String, String> getMap() {
             return mapMethodValue;
         }
 
-        @MCRProperty(name = "*")
+        @MCRRawProperties(namePattern = "*")
         public void setMap(Map<String, String> mapValue) {
             this.mapMethodValue = mapValue;
+        }
+
+        public Map<String, String> getPrefixMap() {
+            return prefixMapMethodValue;
+        }
+
+        @MCRRawProperties(namePattern = "Prefix.*")
+        public void setPrefixMap(Map<String, String> prefixMapValue) {
+            this.prefixMapMethodValue = prefixMapValue;
         }
 
         public String getRequired() {
