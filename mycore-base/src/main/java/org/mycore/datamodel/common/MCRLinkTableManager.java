@@ -76,8 +76,8 @@ public final class MCRLinkTableManager {
      */
     private MCRLinkTableManager() {
         // Load the persistence class
-        linkTableInstance = MCRConfiguration2
-            .getOrThrow("MCR.Persistence.LinkTable.Store.Class", MCRConfiguration2::instantiateClass);
+        linkTableInstance = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRLinkTableInterface.class, "MCR.Persistence.LinkTable.Store.Class");
     }
 
     /**

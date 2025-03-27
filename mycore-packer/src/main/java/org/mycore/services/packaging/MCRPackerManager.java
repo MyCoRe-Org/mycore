@@ -85,8 +85,8 @@ public class MCRPackerManager {
 
     private static void checkPacker(String packer, Map<String, String> jobParameters)
         throws MCRUsageException, MCRAccessException {
-        MCRPacker instance = MCRConfiguration2
-            .getOrThrow("MCR.Packaging.Packer." + packer + ".Class", MCRConfiguration2::instantiateClass);
+        MCRPacker instance = MCRConfiguration2.getInstanceOfOrThrow(MCRPacker.class,
+            "MCR.Packaging.Packer." + packer + ".Class");
         instance.setParameter(jobParameters);
         instance.setConfiguration(MCRPackerJobAction.getConfiguration(packer));
         instance.checkSetup();
