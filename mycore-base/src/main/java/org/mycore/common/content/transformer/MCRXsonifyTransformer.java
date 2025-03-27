@@ -1,40 +1,10 @@
 package org.mycore.common.content.transformer;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import jakarta.inject.Singleton;
-import org.mycore.common.MCRException;
-import org.mycore.common.config.annotation.MCRInstance;
-import org.mycore.common.config.annotation.MCRPostConstruction;
-import org.mycore.common.config.annotation.MCRProperty;
-import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRStringContent;
-import org.mycore.common.xml.MCREntityResolver;
-import org.mycore.xsonify.serialize.Json2XmlSerializer;
-import org.mycore.xsonify.serialize.SerializationException;
-import org.mycore.xsonify.serialize.SerializerSettings;
-import org.mycore.xsonify.serialize.SerializerStyle;
-import org.mycore.xsonify.serialize.Xml2JsonSerializer;
-import org.mycore.xsonify.xml.XmlDocument;
-import org.mycore.xsonify.xml.XmlDocumentLoader;
-import org.mycore.xsonify.xml.XmlEntityResolverDocumentLoader;
-import org.mycore.xsonify.xml.XmlName;
-import org.mycore.xsonify.xml.XmlParseException;
-import org.mycore.xsonify.xml.XmlSaxParser;
-import org.mycore.xsonify.xsd.Xsd;
-import org.mycore.xsonify.xsd.XsdParseException;
-import org.mycore.xsonify.xsd.XsdParser;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.util.Locale;
-
 import static org.mycore.xsonify.serialize.SerializerSettings.AdditionalNamespaceDeclarationStrategy;
 import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_ADDITIONAL_NAMESPACE_DECLARATION_STRATEGY;
 import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_ATTRIBUTE_PREFIX_HANDLING;
 import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_ELEMENT_PREFIX_HANDLING;
+import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_FIXED_ATTRIBUTE_HANDLING;
 import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_JSON_STRUCTURE;
 import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_MIXED_CONTENT_HANDLING;
 import static org.mycore.xsonify.serialize.SerializerSettings.DEFAULT_NAMESPACE_HANDLING;
@@ -48,6 +18,44 @@ import static org.mycore.xsonify.serialize.SerializerSettings.NamespaceDeclarati
 import static org.mycore.xsonify.serialize.SerializerSettings.PlainTextHandling;
 import static org.mycore.xsonify.serialize.SerializerSettings.PrefixHandling;
 import static org.mycore.xsonify.serialize.SerializerSettings.XsAnyNamespaceStrategy;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.mycore.common.MCRException;
+import org.mycore.common.config.annotation.MCRInstance;
+import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRStringContent;
+import org.mycore.common.xml.MCREntityResolver;
+import org.mycore.xsonify.serialize.Json2XmlSerializer;
+import org.mycore.xsonify.serialize.SerializationException;
+import org.mycore.xsonify.serialize.SerializerSettings;
+import org.mycore.xsonify.serialize.SerializerSettings.FixedAttributeHandling;
+import org.mycore.xsonify.serialize.SerializerStyle;
+import org.mycore.xsonify.serialize.Xml2JsonSerializer;
+import org.mycore.xsonify.xml.XmlDocument;
+import org.mycore.xsonify.xml.XmlDocumentLoader;
+import org.mycore.xsonify.xml.XmlEntityResolverDocumentLoader;
+import org.mycore.xsonify.xml.XmlName;
+import org.mycore.xsonify.xml.XmlNamespace;
+import org.mycore.xsonify.xml.XmlParseException;
+import org.mycore.xsonify.xml.XmlSaxParser;
+import org.mycore.xsonify.xsd.Xsd;
+import org.mycore.xsonify.xsd.XsdParseException;
+import org.mycore.xsonify.xsd.XsdParser;
+import org.xml.sax.SAXException;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import jakarta.inject.Singleton;
 
 /**
  * <p>Content Transformer to convert XML to JSON and vice versa.
@@ -100,10 +108,9 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
     /**
      * Map of namespaces. This setting is required for the json2xml serialisation process if the
      * {@link SerializerSettings#namespaceDeclaration()} is set to <b>OMIT</b>.
-     * TODO: Map property doesn't seem to work right now
      */
-    //@MCRProperty(name = "Namespaces", required = false)
-    //public Map<String, String> namespaces;
+    @MCRProperty(name = "Namespaces.*", required = false)
+    public Map<String, String> namespaces;
 
     @MCRInstance(name = "Settings", valueClass = SettingsBuilder.class, required = false)
     public SettingsBuilder settingsBuilder;
@@ -138,12 +145,12 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
             // TODO setRootName should set local name -> fix in xsonify API
             this.json2XmlSerializer.setRootName(new XmlName(this.rootName, null));
         }
-        /*if (this.namespaces != null && !this.namespaces.isEmpty()) {
+        if (!this.namespaces.isEmpty()) {
             List<XmlNamespace> namespaceList = namespaces.entrySet().stream()
                 .map(entry -> new XmlNamespace(entry.getKey(), entry.getValue()))
                 .toList();
             this.json2XmlSerializer.setNamespaces(namespaceList);
-        }*/
+        }
     }
 
     /**
@@ -163,7 +170,7 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
                 return json2xml(source);
             }
         } catch (SerializationException serializerException) {
-            throw new MCRException("unable to serialize source.", serializerException);
+            throw new MCRException("Unable to serialize source.", serializerException);
         }
         throw new MCRException(
             "Unable to transform source because mimeType '" + mimeType + "' is neither xml nor json.");
@@ -208,7 +215,7 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
             if (jsonNode.isObject()) {
                 return (ObjectNode) jsonNode;
             }
-            throw new MCRException("json is not a json object '" + jsonNode + "'");
+            throw new MCRException("Source is not a json object '" + jsonNode + "'");
         } catch (IOException ioException) {
             throw new MCRException("Unable to parse json source", ioException);
         }
@@ -264,6 +271,9 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
         @MCRProperty(name = "XsAnyNamespaceStrategy", required = false)
         public String xsAnyNamespaceStrategy = DEFAULT_XS_ANY_NAMESPACE_STRATEGY.name();
 
+        @MCRProperty(name = "FixedAttributeHandling", required = false)
+        public String fixedAttributeHandling = DEFAULT_FIXED_ATTRIBUTE_HANDLING.name();
+
         public SerializerSettings get() {
             return new SerializerSettings(
                 Boolean.parseBoolean(omitRootElement),
@@ -275,8 +285,8 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
                 PlainTextHandling.valueOf(plainTextHandling),
                 MixedContentHandling.valueOf(mixedContentHandling),
                 AdditionalNamespaceDeclarationStrategy.valueOf(additionalNamespaceDeclarationStrategy),
-                XsAnyNamespaceStrategy.valueOf(xsAnyNamespaceStrategy)
-            );
+                XsAnyNamespaceStrategy.valueOf(xsAnyNamespaceStrategy),
+                FixedAttributeHandling.valueOf(fixedAttributeHandling));
         }
 
     }
@@ -312,8 +322,7 @@ public class MCRXsonifyTransformer extends MCRContentTransformer {
                 textKey,
                 mixedContentKey,
                 mixedContentElementNameKey,
-                indexKey
-            );
+                indexKey);
         }
 
     }
