@@ -56,8 +56,8 @@ class MCRORCIDRequest {
         Entity<Form> formEntity = Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE);
 
         WebTarget target = baseTarget.path(path);
-        Builder b = target.request().accept(MediaType.APPLICATION_JSON);
-        Response r = b.post(formEntity);
-        return r;
+        Builder builder = target.request().accept(MediaType.APPLICATION_JSON);
+        return builder.post(formEntity);
     }
+
 }
