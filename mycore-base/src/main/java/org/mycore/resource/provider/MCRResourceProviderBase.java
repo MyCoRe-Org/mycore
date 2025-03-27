@@ -32,8 +32,8 @@ import org.mycore.resource.MCRResourcePath;
 
 /**
  * {@link MCRResourceProviderBase} is a base implementation of {@link MCRResourceProvider} that
- * facilitates consistent logging. Implementors must provide a class-specific {@link Logger} and the
- * actual lookup strategy ({@link MCRResourceProviderBase#doProvide(MCRResourcePath, MCRHints)},
+ * facilitates consistent logging. Implementors must provide the actual lookup strategy
+ * ({@link MCRResourceProviderBase#doProvide(MCRResourcePath, MCRHints)},
  * {@link MCRResourceProviderBase#doProvideAll(MCRResourcePath, MCRHints)}).
  */
 public abstract class MCRResourceProviderBase implements MCRResourceProvider {
@@ -43,7 +43,7 @@ public abstract class MCRResourceProviderBase implements MCRResourceProvider {
     private final String coverage;
 
     public MCRResourceProviderBase(String coverage) {
-        this.coverage = Objects.requireNonNull(coverage);
+        this.coverage = Objects.requireNonNull(coverage, "Coverage must not be null").trim();
     }
 
     @Override
@@ -67,15 +67,14 @@ public abstract class MCRResourceProviderBase implements MCRResourceProvider {
         logger.debug("Providing all resource URLs for path {} [{}]", path, coverage);
         List<ProvidedUrl> resourceUrls = doProvideAll(path, hints);
         if (logger.isDebugEnabled()) {
-            return logResourceUrls(resourceUrls);
-        } else {
-            return resourceUrls;
+            logResourceUrls(resourceUrls);
         }
+        return resourceUrls;
+
     }
 
-    private List<ProvidedUrl> logResourceUrls(List<ProvidedUrl> resourceUrl) {
+    private void logResourceUrls(List<ProvidedUrl> resourceUrl) {
         resourceUrl.forEach(url -> logger.debug("Providing resource URL {} [{}]", url.url, coverage));
-        return resourceUrl;
     }
 
     protected abstract Optional<URL> doProvide(MCRResourcePath path, MCRHints hints);

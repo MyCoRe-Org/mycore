@@ -44,6 +44,11 @@ public interface MCRResourceLocator {
      */
     MCRTreeMessage compileDescription(Level level);
 
+    /**
+     * Returns a stream of {@link PrefixStripper} using the given hints, each of which can remove multiple prefixes
+     * from a given resource URL in order to facilitate the reversal of resource path resolution.
+     * ({@link org.mycore.resource.MCRResourceResolver#reverse(URL, MCRHints)}).
+     */
     Stream<PrefixStripper> prefixStrippers(MCRHints hints);
 
 }

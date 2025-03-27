@@ -56,6 +56,7 @@ import org.mycore.resource.provider.MCRResourceProvider.PrefixStripper;
 public class MCRCombinedResourceLocator extends MCRResourceLocatorBase {
 
     public static final String LOCATORS_KEY = "Locators";
+
     private final List<MCRResourceLocator> locators;
 
     public MCRCombinedResourceLocator(MCRResourceLocator... locators) {
@@ -63,8 +64,8 @@ public class MCRCombinedResourceLocator extends MCRResourceLocatorBase {
     }
 
     public <T> MCRCombinedResourceLocator(List<MCRResourceLocator> locators) {
-        this.locators = new ArrayList<>(Objects.requireNonNull(locators));
-        this.locators.forEach(Objects::requireNonNull);
+        this.locators = new ArrayList<>(Objects.requireNonNull(locators, "Locators must not be null"));
+        this.locators.forEach(locator -> Objects.requireNonNull(locator, "Locator must not be null"));
         Collections.reverse(this.locators);
     }
 

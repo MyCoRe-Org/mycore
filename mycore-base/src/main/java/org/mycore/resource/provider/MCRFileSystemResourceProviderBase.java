@@ -96,7 +96,7 @@ public abstract class MCRFileSystemResourceProviderBase extends MCRResourceProvi
 
     public MCRFileSystemResourceProviderBase(String coverage, MCRResourceProviderMode mode) {
         super(coverage);
-        this.mode = Objects.requireNonNull(mode);
+        this.mode = Objects.requireNonNull(mode, "Mode must not be null");
     }
 
     @Override
