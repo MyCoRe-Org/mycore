@@ -21,10 +21,6 @@ public enum MCRLinkType {
         return relationName;
     }
 
-    public boolean isDerivateLinkType() {
-        return this == DERIVATE || this == DERIVATE_LINK;
-    }
-
     public static MCRLinkType fromString(String text) {
         for (MCRLinkType b : values()) {
             if (b.relationName.equalsIgnoreCase(text)) {
