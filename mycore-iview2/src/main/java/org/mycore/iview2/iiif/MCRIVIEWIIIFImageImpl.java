@@ -38,6 +38,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.access.MCRMissingPermissionException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.iiif.image.MCRIIIFImageUtil;
 import org.mycore.iiif.image.impl.MCRIIIFImageImpl;
@@ -347,9 +348,8 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         }
         if (tileInfo.derivate() != null
             && !checkPermission(identifier, tileInfo)) {
-            throw MCRAccessException.missingPermission(
-                "View the file " + tileInfo.imagePath() + " in " + tileInfo.derivate(), tileInfo.derivate(),
-                MCRAccessManager.PERMISSION_VIEW);
+            throw new MCRMissingPermissionException("View the file " + tileInfo.imagePath() + " in "
+                + tileInfo.derivate(), tileInfo.derivate(), MCRAccessManager.PERMISSION_VIEW);
         }
     }
 

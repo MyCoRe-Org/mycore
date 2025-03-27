@@ -16,36 +16,17 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.solr.auth;
+package org.mycore.access;
 
-/**
- * Enum for the different levels of authentication that can be used with Solr.
- */
-public enum MCRSolrAuthenticationLevel {
+import java.io.Serial;
 
-    /**
-     * Should be used for administrative tasks, like creating or deleting collections.
-     */
-    ADMIN("Admin"),
+public final class MCRMissingPermissionException extends MCRAccessException {
 
-    /**
-     * Should be used for indexing tasks, like adding or deleting documents.
-     */
-    INDEX("Index"),
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-    /**
-     * Should be used for search tasks, like querying the index.
-     */
-    SEARCH("Search");
-
-    private final String propertyName;
-
-    MCRSolrAuthenticationLevel(String propertyName) {
-        this.propertyName = propertyName;
-    }
-
-    public String getPropertyName() {
-        return propertyName;
+    public MCRMissingPermissionException(String action, String id, String permission) {
+        super(action, id, permission);
     }
 
 }

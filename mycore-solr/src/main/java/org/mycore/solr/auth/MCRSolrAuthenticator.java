@@ -18,34 +18,27 @@
 
 package org.mycore.solr.auth;
 
+import org.apache.solr.client.solrj.SolrRequest;
+
+import java.net.http.HttpRequest;
+
 /**
- * Enum for the different levels of authentication that can be used with Solr.
+ * Interface for adding authentication to Solr requests.
  */
-public enum MCRSolrAuthenticationLevel {
+public interface MCRSolrAuthenticator {
 
     /**
-     * Should be used for administrative tasks, like creating or deleting collections.
+     * Add authentication to a Solr request.
+     * 
+     * @param request the request to add the authentication to
      */
-    ADMIN("Admin"),
+    void applyAuthentication(SolrRequest<?> request);
 
     /**
-     * Should be used for indexing tasks, like adding or deleting documents.
+     * Add authentication to an HTTP request.
+     *
+     * @param request the request to add the authentication to
      */
-    INDEX("Index"),
-
-    /**
-     * Should be used for search tasks, like querying the index.
-     */
-    SEARCH("Search");
-
-    private final String propertyName;
-
-    MCRSolrAuthenticationLevel(String propertyName) {
-        this.propertyName = propertyName;
-    }
-
-    public String getPropertyName() {
-        return propertyName;
-    }
+    void applyAuthentication(HttpRequest.Builder request);
 
 }
