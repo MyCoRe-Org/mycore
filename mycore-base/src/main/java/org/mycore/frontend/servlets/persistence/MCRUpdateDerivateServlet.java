@@ -31,6 +31,7 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.access.MCRMissingPermissionException;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -64,7 +65,7 @@ public class MCRUpdateDerivateServlet extends MCRPersistenceServlet {
             MCRObjectID derivateID = MCRObjectID.getInstance(getProperty(request, "id"));
             request.setAttribute("id", derivateID.toString());
             if (!MCRAccessManager.checkPermission(derivateID, PERMISSION_WRITE)) {
-                throw MCRAccessException.missingPermission("Change derivate title.", derivateID.toString(),
+                throw new MCRMissingPermissionException("Change derivate title.", derivateID.toString(),
                     PERMISSION_WRITE);
             }
             if (objectID != null) {
@@ -72,7 +73,7 @@ public class MCRUpdateDerivateServlet extends MCRPersistenceServlet {
                 MCRObjectID mcrObjectID = MCRObjectID.getInstance(objectID);
                 request.setAttribute("objectid", mcrObjectID.toString());
                 if (!MCRAccessManager.checkPermission(mcrObjectID, PERMISSION_WRITE)) {
-                    throw MCRAccessException.missingPermission("Change derivate title.", mcrObjectID.toString(),
+                    throw new MCRMissingPermissionException("Change derivate title.", mcrObjectID.toString(),
                         PERMISSION_WRITE);
                 }
             }
