@@ -275,9 +275,9 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     }
 
     @Override
-    public Map<MCRCategoryID, Boolean> hasLinks(MCRCategory category) {
+    public Map<MCRCategoryID, Boolean> checkForLinks(MCRCategory category) {
         if (category == null) {
-            return hasLinksForClassifications();
+            return checkLinksForClassifications();
         }
 
         MCRCategoryImpl rootImpl = (MCRCategoryImpl) MCRCategoryDAOFactory.obtainInstance()
@@ -292,7 +292,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         return boolMap;
     }
 
-    private Map<MCRCategoryID, Boolean> hasLinksForClassifications() {
+    private Map<MCRCategoryID, Boolean> checkLinksForClassifications() {
         Map<MCRCategoryID, Boolean> boolMap = new HashMap<>() {
             @Serial
             private static final long serialVersionUID = 1L;
@@ -375,7 +375,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     @Override
     public boolean hasLink(MCRCategory mcrCategory) {
-        return !hasLinks(mcrCategory).isEmpty();
+        return !checkForLinks(mcrCategory).isEmpty();
     }
 
     @Override

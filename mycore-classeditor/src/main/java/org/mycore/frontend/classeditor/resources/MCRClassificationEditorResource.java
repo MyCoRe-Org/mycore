@@ -193,7 +193,7 @@ public class MCRClassificationEditorResource {
             && !MCRAccessManager.checkPermission(MCRClassificationUtils.CREATE_CLASS_PERMISSION)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
-        Map<MCRCategoryID, Boolean> linkMap = CATEG_LINK_SERVICE.hasLinks(null);
+        Map<MCRCategoryID, Boolean> linkMap = CATEG_LINK_SERVICE.checkForLinks(null);
         String json = gson.toJson(new MCRCategoryListWrapper(rootCategories, linkMap));
         return Response.ok(json).build();
     }

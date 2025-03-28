@@ -35,7 +35,14 @@ public interface MCRCategLinkService {
      *            a subtree rooted at a MCRCategory for which links should be counted
      * @return true if the classification is used
      */
-    Map<MCRCategoryID, Boolean> hasLinks(MCRCategory category);
+    
+    Map<MCRCategoryID, Boolean> checkForLinks(MCRCategory category);
+    
+    @Deprecated
+    @SuppressWarnings("PMD.LinguisticNaming")
+    default Map<MCRCategoryID, Boolean> hasLinks(MCRCategory category){
+        return checkForLinks(category);
+    }
 
     /**
      * Checks if the category with the given id is liked with an object

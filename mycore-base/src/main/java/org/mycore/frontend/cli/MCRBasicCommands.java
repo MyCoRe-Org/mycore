@@ -178,8 +178,8 @@ public class MCRBasicCommands {
     @MCRCommand(syntax = "get uri {0} to file {1}",
         help = "Get XML content from URI {0} and save it to a local file {1}",
         order = 120)
-    public static void getURI(String uri, String file) throws Exception {
-        MCRCommandLineInterface.getURI(uri, file);
+    public static void uriToFile(String uri, String file) throws Exception {
+        MCRCommandLineInterface.uriToFile(uri, file);
     }
 
     @MCRCommand(syntax = "create configuration directory",

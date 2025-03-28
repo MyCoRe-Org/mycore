@@ -125,7 +125,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             this.derivate = createDerivate(derivateID);
         }
 
-        getOrCreateRootDirectory();
+        retrieveOrCreateRootDirectory();
 
         LOGGER.debug("uploading into {} of {}", this.derivateID, this.documentID);
     }
@@ -182,7 +182,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         }
     }
 
-    private void getOrCreateRootDirectory() throws FileSystemException {
+    private void retrieveOrCreateRootDirectory() throws FileSystemException {
         this.rootDir = MCRPath.getPath(derivateID, "/");
         if (Files.notExists(rootDir)) {
             rootDir.getFileSystem().createRoot(derivateID);

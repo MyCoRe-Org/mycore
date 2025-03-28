@@ -135,10 +135,10 @@ public class MCRRSSFeedImporter {
         field2queryID = MCRConfiguration2.getStringOrThrow(prefix + "Field2QueryID");
         xsl2BuildNotificationMail = MCRConfiguration2.getString(prefix + "XSL2BuildNotificationMail").orElse(null);
 
-        getPattern2FindID(prefix);
+        retrievePattern2FindID(prefix);
     }
 
-    private void getPattern2FindID(String prefix) {
+    private void retrievePattern2FindID(String prefix) {
         String patternProperty = prefix + "Pattern2FindID";
         try {
             String pattern = MCRConfiguration2.getStringOrThrow(patternProperty);

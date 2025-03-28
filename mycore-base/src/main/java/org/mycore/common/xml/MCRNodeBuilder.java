@@ -86,7 +86,7 @@ public class MCRNodeBuilder {
         } else if (expression instanceof LocationPath locationPathExpr) {
             return buildLocationPath(locationPathExpr, value, parent);
         } else {
-            return canNotBuild(expression);
+            return logCanNotBuild(expression);
         }
     }
 
@@ -210,7 +210,7 @@ public class MCRNodeBuilder {
                 }
             }
         }
-        return canNotBuild(ee);
+        return logCanNotBuild(ee);
     }
 
     /**
@@ -285,7 +285,7 @@ public class MCRNodeBuilder {
         return xPath.replaceAll("child::", "").replaceAll("attribute::", "@");
     }
 
-    private Object canNotBuild(Expr expression) {
+    private Object logCanNotBuild(Expr expression) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("ignoring expression, can not be built: {} {}", expression.getClass().getName(),
                 simplify(expression.getText()));
