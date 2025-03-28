@@ -159,9 +159,9 @@ public class MCRLoginServlet extends MCRServlet {
     @Override
     public void init() throws ServletException {
         if (!LOCAL_LOGIN_SECURE_ONLY) {
-            LOGGER.warn(
-                "Login over unsecure connection is permitted. Set '{}=true' to prevent cleartext transmissions of passwords.",
-                HTTPS_ONLY_PROPERTY);
+            String logMsg = "Login over unsecure connection is permitted. "
+                + "Set '{}=true' to prevent cleartext transmissions of passwords.";
+            LOGGER.warn(logMsg, HTTPS_ONLY_PROPERTY);
         }
         super.init();
     }
