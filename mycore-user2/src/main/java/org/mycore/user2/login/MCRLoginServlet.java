@@ -159,8 +159,9 @@ public class MCRLoginServlet extends MCRServlet {
     @Override
     public void init() throws ServletException {
         if (!LOCAL_LOGIN_SECURE_ONLY) {
-            LOGGER.warn("Login over unsecure connection is permitted. Set '" + HTTPS_ONLY_PROPERTY
-                + "=true' to prevent cleartext transmissions of passwords.");
+            LOGGER.warn(
+                "Login over unsecure connection is permitted. Set '{}=true' to prevent cleartext transmissions of passwords.",
+                HTTPS_ONLY_PROPERTY);
         }
         super.init();
     }
@@ -175,7 +176,7 @@ public class MCRLoginServlet extends MCRServlet {
      * MCRLoginServlet?url=foo&amp;realm=ID
      * stores foo as redirect url and redirects
      * to the login URL of the given realm.
-
+    
      * MCRLoginServlet?action=login
      * checks input from editor login form and
      * changes the current login user and redirects
