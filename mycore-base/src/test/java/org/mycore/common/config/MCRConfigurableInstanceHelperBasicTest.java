@@ -142,6 +142,21 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
     @Test
     @MCRTestConfiguration(
         properties = {
+            @MCRTestProperty(key = "Foo.Value", string = "Value")
+        })
+    public void configurationImplicit() {
+
+        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
+        ImplicitTestClass instance = MCRConfigurableInstanceHelper.getInstance(ImplicitTestClass.class, configuration,
+            MCRConfigurableInstanceHelper.ADD_IMPLICIT_CLASS_PROPERTIES);
+
+        assertNotNull(instance);
+
+    }
+
+    @Test
+    @MCRTestConfiguration(
+        properties = {
             @MCRTestProperty(key = "Foo", classNameOf = TestClassWithConfigurationProxy.class),
             @MCRTestProperty(key = "Foo.Value", string = "Value")
         })
@@ -168,9 +183,6 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
             return SINGLETON_INSTANCE;
         }
 
-    }
-
-    public static class TestClassWithConstructor {
     }
 
     @SuppressWarnings("InstantiationOfUtilityClass")
@@ -202,6 +214,9 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
             return new TestClassWitAnnotatedFactories();
         }
 
+    }
+
+    public static class TestClassWithConstructor {
     }
 
     @SuppressWarnings("InstantiationOfUtilityClass")
@@ -256,6 +271,9 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
             return new TestClassWithMultipleFactories();
         }
 
+    }
+
+    public static final class ImplicitTestClass {
     }
 
     @SuppressWarnings({ "unused" })
