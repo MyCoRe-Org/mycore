@@ -162,8 +162,8 @@ public class MCRSolrCore {
             : new HttpJdkSolrClient.Builder(baseSolrUrl);
 
         MCRConfiguration2.getBoolean(USE_HTTP_1_1_PROPERTY)
-            .filter(useHttp1_1 -> useHttp1_1)
-            .ifPresent(useHttp1_1 -> {
+            .filter(useHttp11 -> useHttp11)
+            .ifPresent(useHttp11 -> {
                 baseBuilder.useHttp1_1(true);
             });
 

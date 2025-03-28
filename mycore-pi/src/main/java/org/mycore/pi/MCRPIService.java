@@ -154,8 +154,8 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         MCRObjectService service = obj.getService();
         List<String> flags = service.getFlags(PI_FLAG);
         Gson gson = getGson();
-        return flags.stream().anyMatch(_stringFlag -> {
-            MCRPI flag = gson.fromJson(_stringFlag, MCRPI.class);
+        return flags.stream().anyMatch(sflag -> {
+            MCRPI flag = gson.fromJson(sflag, MCRPI.class);
             return flag.getAdditional().equals(additional) && flag.getIdentifier().equals(mcrpi.getIdentifier());
         });
     }
@@ -164,8 +164,8 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         MCRObjectService service = obj.getService();
         List<String> flags = service.getFlags(PI_FLAG);
         Gson gson = getGson();
-        return flags.stream().anyMatch(_stringFlag -> {
-            MCRPI flag = gson.fromJson(_stringFlag, MCRPI.class);
+        return flags.stream().anyMatch(sflag -> {
+            MCRPI flag = gson.fromJson(sflag, MCRPI.class);
             return flag.getAdditional().equals(additional)
                 && Objects.equals(flag.getService(), piService.getServiceID());
         });
@@ -460,8 +460,8 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         MCRObjectService service = obj.getService();
         List<String> flags = service.getFlags(PI_FLAG);
         Gson gson = getGson();
-        String stringFlag = flags.stream().filter(_stringFlag -> {
-            MCRPI flag = gson.fromJson(_stringFlag, MCRPI.class);
+        String stringFlag = flags.stream().filter(sflag -> {
+            MCRPI flag = gson.fromJson(sflag, MCRPI.class);
             return Objects.equals(flag.getAdditional(), additional) && Objects
                 .equals(flag.getIdentifier(), mcrpi.getIdentifier());
         }).findAny().orElseThrow(() -> new MCRException(new MCRPersistentIdentifierException(
