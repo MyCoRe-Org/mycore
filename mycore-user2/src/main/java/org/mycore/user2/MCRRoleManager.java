@@ -208,7 +208,7 @@ public class MCRRoleManager {
      */
     public static void addRole(MCRRole role) {
         MCRCategoryID categoryID = role.isSystemRole()
-            ? new MCRCategoryID(MCRUser2Constants.ROLE_CLASSID.getRootID(), role.getName());
+            ? new MCRCategoryID(MCRUser2Constants.ROLE_CLASSID.getRootID(), role.getName())
             : MCRCategoryID.ofString(role.getName());
         if (DAO.exist(categoryID)) {
             return;
