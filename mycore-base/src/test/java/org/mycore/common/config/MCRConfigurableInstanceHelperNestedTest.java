@@ -73,6 +73,27 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     @Test
     @MCRTestConfiguration(
         properties = {
+            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithImplicitNestedClass.class),
+            @MCRTestProperty(key = "Foo.Nested.Property1", string = "Value1"),
+            @MCRTestProperty(key = "Foo.Nested.Property2", string = "Value2")
+        })
+    public void nestedImplicit() {
+
+        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
+        TestClassWithImplicitNestedClass instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithImplicitNestedClass.class, configuration);
+
+        assertNotNull(instance);
+        assertNotNull(instance.nested);
+        assertEquals("Value1", instance.nested.string1);
+        assertEquals("Value2", instance.nested.string2);
+
+    }
+
+
+    @Test
+    @MCRTestConfiguration(
+        properties = {
             @MCRTestProperty(key = "Foo", classNameOf = TestClassWithOptionalNestedClass.class),
             @MCRTestProperty(key = "Foo.Nested", classNameOf = NestedClass.class),
             @MCRTestProperty(key = "Foo.Nested.Property1", string = "Value1"),
@@ -212,6 +233,35 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurableInstanceHelper.getInstance(Object.class, configuration);
+
+    }
+
+    @Test
+    @MCRTestConfiguration(
+        properties = {
+            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithNestedMapOfImplicitEntries.class),
+            @MCRTestProperty(key = "Foo.EntryA.Property", string = "A"),
+            @MCRTestProperty(key = "Foo.EntryB.Property", string = "B"),
+        })
+    public void nestedMapImplicit() {
+
+        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
+        TestClassWithNestedMapOfImplicitEntries instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithNestedMapOfImplicitEntries.class, configuration);
+
+        assertNotNull(instance);
+        assertNotNull(instance.map);
+        assertEquals(2, instance.map.size());
+
+        ImplicitEntry oneEntry = instance.map.get("EntryA");
+        assertNotNull(oneEntry);
+        assertEquals(ImplicitEntry.class, oneEntry.getClass());
+        assertEquals("A", oneEntry.string);
+
+        ImplicitEntry otherEntry = instance.map.get("EntryB");
+        assertNotNull(otherEntry);
+        assertEquals(ImplicitEntry.class, otherEntry.getClass());
+        assertEquals("B", otherEntry.string);
 
     }
 
@@ -406,6 +456,35 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     @Test
     @MCRTestConfiguration(
         properties = {
+            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithNestedListOfImplicitEntries.class),
+            @MCRTestProperty(key = "Foo.23.Property", string = "23"),
+            @MCRTestProperty(key = "Foo.42.Property", string = "42"),
+        })
+    public void nestedListImplicit() {
+
+        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
+        TestClassWithNestedListOfImplicitEntries instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithNestedListOfImplicitEntries.class, configuration);
+
+        assertNotNull(instance);
+        assertNotNull(instance.list);
+        assertEquals(2, instance.list.size());
+
+        ImplicitEntry oneEntry = instance.list.getFirst();
+        assertNotNull(oneEntry);
+        assertEquals(ImplicitEntry.class, oneEntry.getClass());
+        assertEquals("23", oneEntry.string);
+
+        ImplicitEntry otherEntry = instance.list.get(1);
+        assertNotNull(otherEntry);
+        assertEquals(ImplicitEntry.class, otherEntry.getClass());
+        assertEquals("42", otherEntry.string);
+
+    }
+
+    @Test
+    @MCRTestConfiguration(
+        properties = {
             @MCRTestProperty(key = "Foo", classNameOf = TestClassWithOptionalNestedList.class),
             @MCRTestProperty(key = "Foo.23", classNameOf = OneKindOfEntry.class),
             @MCRTestProperty(key = "Foo.23.OneProperty", string = "OneValue"),
@@ -551,10 +630,27 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
 
     }
 
+    public static final class ImplicitNestedClass {
+
+        @MCRProperty(name = "Property1")
+        public String string1;
+
+        @MCRProperty(name = "Property2")
+        public String string2;
+
+    }
+
     public static class TestClassWithNestedClass {
 
         @MCRInstance(name = "Nested", valueClass = NestedClass.class)
         public NestedClass nested;
+
+    }
+
+    public static class TestClassWithImplicitNestedClass {
+
+        @MCRInstance(name = "Nested", valueClass = ImplicitNestedClass.class)
+        public ImplicitNestedClass nested;
 
     }
 
@@ -581,6 +677,13 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
     }
 
     public static class SimpleEntry {
+
+        @MCRProperty(name = "Property")
+        public String string;
+
+    }
+
+    public static final class ImplicitEntry {
 
         @MCRProperty(name = "Property")
         public String string;
@@ -624,6 +727,13 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
 
     }
 
+    public static class TestClassWithNestedMapOfImplicitEntries {
+
+        @MCRInstanceMap(valueClass = ImplicitEntry.class)
+        public Map<String, ImplicitEntry> map;
+
+    }
+
     public static class TestClassWithOptionalNestedMap {
 
         @MCRInstanceMap(valueClass = Entry.class, required = false)
@@ -659,6 +769,13 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
 
         @MCRInstanceList(valueClass = Entry.class)
         public List<Entry> list;
+
+    }
+
+    public static class TestClassWithNestedListOfImplicitEntries {
+
+        @MCRInstanceList(valueClass = ImplicitEntry.class)
+        public List<ImplicitEntry> list;
 
     }
 

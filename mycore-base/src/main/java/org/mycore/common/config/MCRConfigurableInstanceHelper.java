@@ -69,6 +69,11 @@ class MCRConfigurableInstanceHelper {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    public static final Set<Option> NO_OPTIONS = Collections.emptySet();
+
+    public static final Set<Option> ADD_IMPLICIT_CLASS_PROPERTIES
+        = Collections.singleton(Option.ADD_IMPLICIT_CLASS_PROPERTIES);
+
     private static final ConcurrentMap<Class<?>, ClassInfo<?>> INFOS = new ConcurrentHashMap<>();
 
     /**
@@ -93,11 +98,7 @@ class MCRConfigurableInstanceHelper {
     }
 
     /**
-     * Creates a configured instance of a class.
-     *
-     * @param name the property which contains the class name
-     * @return the configured instance of T
-     * @throws MCRConfigurationException if the property is not right configured.
+     * @deprecated Use {@link #getInstance(Class, String)} instead
      */
     @Deprecated
     @SuppressWarnings("unchecked")
@@ -106,41 +107,83 @@ class MCRConfigurableInstanceHelper {
     }
 
     /**
+     * Shorthand for {@link #getInstance(Class, String, Set)} that uses no options.
+     */
+    public static <S> Optional<S> getInstance(Class<S> superClass, String name) throws MCRConfigurationException {
+        return getInstance(superClass, name, NO_OPTIONS);
+    }
+
+    /**
      * Creates a configured instance of a class.
      *
      * @param superClass the intended super class of the instantiated class
      * @param name       the property which contains the class name
+     * @param options    the options to be used
      * @return the configured instance of T
      * @throws MCRConfigurationException if the property is not right configured.
      */
-    public static <S> Optional<S> getInstance(Class<S> superClass, String name) throws MCRConfigurationException {
+    public static <S> Optional<S> getInstance(Class<S> superClass, String name, Set<Option> options)
+        throws MCRConfigurationException {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName(name);
         String className = configuration.className();
-        if (className == null || className.isBlank()) {
+        if (isAbsent(className) && !options.contains(Option.ADD_IMPLICIT_CLASS_PROPERTIES)) {
             return Optional.empty();
         }
-        return Optional.of(getInstance(superClass, configuration, name));
+        return Optional.of(getInstance(superClass, configuration, name, options));
     }
 
+    private static boolean isAbsent(String className) {
+        return className == null || className.isBlank();
+    }
+
+    /**
+     * @deprecated Use {@link #getInstance(Class, MCRInstanceConfiguration)} instead
+     */
     @Deprecated
     @SuppressWarnings("unchecked")
     public static <T> T getInstance(MCRInstanceConfiguration configuration) throws MCRConfigurationException {
-        return (T) getInstance(Objects.class, configuration, null);
+        return (T) getInstance(Objects.class, configuration, null, NO_OPTIONS);
     }
 
+    /**
+     * Shorthand for {@link #getInstance(Class, MCRInstanceConfiguration, Set)} that uses no options.
+     */
     public static <S> S getInstance(Class<S> superClass, MCRInstanceConfiguration configuration)
         throws MCRConfigurationException {
-        return getInstance(superClass, configuration, null);
+        return getInstance(superClass, configuration, NO_OPTIONS);
     }
 
-    private static <S> S getInstance(Class<S> superClass, MCRInstanceConfiguration configuration, String name)
-        throws MCRConfigurationException {
+    /**
+     * Creates a configured instance of a class.
+     *
+     * @param superClass    the intended super class of the instantiated class
+     * @param configuration the configuration to be used
+     * @param options    the options to be used
+     * @return the configured instance of T
+     * @throws MCRConfigurationException if the property is not right configured.
+     */
+    public static <S> S getInstance(Class<S> superClass, MCRInstanceConfiguration configuration,
+        Set<Option> options) throws MCRConfigurationException {
+        return getInstance(superClass, configuration, null, options);
+    }
+
+    private static <S> S getInstance(Class<S> superClass, MCRInstanceConfiguration configuration, String name,
+        Set<Option> options) throws MCRConfigurationException {
         String className = configuration.className();
         if (className == null || className.isBlank()) {
-            throw new MCRConfigurationException("Missing or empty property: " + configuration.name().actual());
+            if (options.contains(Option.ADD_IMPLICIT_CLASS_PROPERTIES) && Modifier.isFinal(superClass.getModifiers())) {
+                configuration = configuration.fixedClass(superClass);
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("Adding implicit property {}={}", configuration.name().actual(),
+                        configuration.className());
+                }
+            } else {
+                throw new MCRConfigurationException("Missing or empty property: " + configuration.name().actual()
+                    + " (and expected class " + superClass.getName() + " is not final)");
+            }
         }
         Class<S> targetClass = getClass(configuration.name().actual(), configuration.className());
-        Object instance = createInstance(targetClass, configuration);
+        Object instance = createInstanceDirectorViaProxy(targetClass, configuration);
         if (superClass.isAssignableFrom(instance.getClass())) {
             return superClass.cast(instance);
         } else {
@@ -162,7 +205,7 @@ class MCRConfigurableInstanceHelper {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> T createInstance(Class<T> targetClass, MCRInstanceConfiguration configuration) {
+    private static <T> T createInstanceDirectorViaProxy(Class<T> targetClass, MCRInstanceConfiguration configuration) {
         MCRConfigurationProxy productAnnotation = targetClass.getDeclaredAnnotation(MCRConfigurationProxy.class);
         if (productAnnotation != null) {
             Class<Supplier<T>> proxyClass = (Class<Supplier<T>>) productAnnotation.proxyClass();
@@ -789,6 +832,11 @@ class MCRConfigurableInstanceHelper {
 
         public abstract V get(MCRInstanceConfiguration configuration, Target<?> target);
 
+        public final Set<Option> createOptions(Class<?> valueClass, boolean required) {
+            return required && Modifier.isFinal(valueClass.getModifiers())
+                ? ADD_IMPLICIT_CLASS_PROPERTIES : NO_OPTIONS;
+        }
+
     }
 
     private static final class PropertySource extends Source<MCRProperty, String> {
@@ -966,15 +1014,13 @@ class MCRConfigurableInstanceHelper {
 
             String nestedClassName = nestedConfiguration.className();
             if (nestedClassName == null || nestedClassName.isBlank()) {
-                if (annotation.required()) {
-                    throw new MCRConfigurationException("Missing or empty property: "
-                        + nestedConfiguration.name().actual());
-                } else {
+                if (!annotation.required()) {
                     return null;
                 }
             }
 
-            Object instance = getInstance(Object.class, nestedConfiguration);
+            Set<Option> options = createOptions(annotation.valueClass(), annotation.required());
+            Object instance = getInstance(annotation.valueClass(), nestedConfiguration, options);
 
             if (!annotation.valueClass().isAssignableFrom(instance.getClass())) {
                 throwIncompatibleAnnotation(annotation.valueClass(), target, instance);
@@ -1050,8 +1096,10 @@ class MCRConfigurableInstanceHelper {
                     + getExampleName(configuration, "B") + ", ...");
             }
 
+            Set<Option> options = createOptions(annotation.valueClass(), annotation.required());
             Map<String, Object> instanceMap = nestedConfigurationMap.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> getInstance(Object.class, entry.getValue())));
+                .collect(Collectors.toMap(Map.Entry::getKey, entry ->
+                    getInstance(annotation.valueClass(), entry.getValue(), options)));
 
             instanceMap.values().forEach(instance -> {
                 if (!annotation.valueClass().isAssignableFrom(instance.getClass())) {
@@ -1144,8 +1192,9 @@ class MCRConfigurableInstanceHelper {
                     + getExampleName(configuration, "2") + ", ...");
             }
 
-            List<Object> instanceList = nestedConfigurationList.stream()
-                .map(c -> getInstance(Object.class, c)).toList();
+            Set<Option> options = createOptions(annotation.valueClass(), annotation.required());
+            List<Object> instanceList = nestedConfigurationList.stream().map(c ->
+                (Object) getInstance(annotation.valueClass(), c, options)).toList();
 
             instanceList.forEach(instance -> {
                 if (!annotation.valueClass().isAssignableFrom(instance.getClass())) {
@@ -1252,5 +1301,19 @@ class MCRConfigurableInstanceHelper {
         }
 
     }
+
+    public enum Option {
+
+        /**
+         * If a class is required to be in the configuration properties (for example, because of usage of
+         * {@link MCRConfiguration2#getInstanceOfOrThrow(Class, String)} or because of an annotation with
+         * required=true) and the expected super class is a final class (i.e. if the class name that has
+         * to be present in the properties could ever be only exactly the class name of that final class),
+         * add corresponding entries to the properties during instantiation, if not present anyway.
+         */
+        ADD_IMPLICIT_CLASS_PROPERTIES;
+
+    }
+
 
 }

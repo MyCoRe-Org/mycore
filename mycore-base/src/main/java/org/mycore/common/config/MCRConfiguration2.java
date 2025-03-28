@@ -21,6 +21,7 @@ package org.mycore.common.config;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -130,10 +131,15 @@ public class MCRConfiguration2 {
      * @throws MCRConfigurationException if the class can not be loaded or instantiated
      */
     public static <S> Optional<S> getInstanceOf(Class<S> superClass, String name) throws MCRConfigurationException {
+        return getInstanceOf(superClass, name, MCRConfigurableInstanceHelper.NO_OPTIONS);
+    }
+
+    private static <S> Optional<S> getInstanceOf(Class<S> superClass, String name,
+        Set<MCRConfigurableInstanceHelper.Option> options) {
         if (MCRConfigurableInstanceHelper.isSingleton(superClass)) {
-            return getSingleInstanceOf(superClass, name);
+            return getSingleInstanceOf(superClass, name, options);
         } else {
-            return MCRConfigurableInstanceHelper.getInstance(superClass, name);
+            return MCRConfigurableInstanceHelper.getInstance(superClass, name, options);
         }
     }
 
@@ -147,7 +153,8 @@ public class MCRConfiguration2 {
      * or the configuration property is not set
      */
     public static <S> S getInstanceOfOrThrow(Class<S> superClass, String name) throws MCRConfigurationException {
-        return getInstanceOf(superClass, name).orElseThrow(() -> createConfigurationException(name));
+        return getInstanceOf(superClass, name, MCRConfigurableInstanceHelper.ADD_IMPLICIT_CLASS_PROPERTIES)
+            .orElseThrow(() -> createConfigurationException(name));
     }
 
     /**
@@ -160,10 +167,15 @@ public class MCRConfiguration2 {
      * @throws MCRConfigurationException if the class can not be loaded or instantiated
      */
     public static <S> Optional<S> getSingleInstanceOf(Class<S> superClass, String name) {
+        return getSingleInstanceOf(superClass, name, MCRConfigurableInstanceHelper.NO_OPTIONS);
+    }
+
+    private static <S> Optional<S> getSingleInstanceOf(Class<S> superClass, String name,
+        Set<MCRConfigurableInstanceHelper.Option> options) {
         return getString(name)
             .map(className -> new ConfigSingletonKey(name, className))
             .map(key -> (S) instanceHolder.computeIfAbsent(key,
-                k -> MCRConfigurableInstanceHelper.getInstance(superClass, name).orElse(null)));
+                k -> MCRConfigurableInstanceHelper.getInstance(superClass, name, options).orElse(null)));
     }
 
     /**
@@ -177,7 +189,8 @@ public class MCRConfiguration2 {
      * or the configuration property is not set
      */
     public static <S> S getSingleInstanceOfOrThrow(Class<S> superClass, String name) {
-        return getSingleInstanceOf(superClass, name).orElseThrow(() -> createConfigurationException(name));
+        return getSingleInstanceOf(superClass, name, MCRConfigurableInstanceHelper.ADD_IMPLICIT_CLASS_PROPERTIES)
+            .orElseThrow(() -> createConfigurationException(name));
     }
 
     /**
