@@ -31,7 +31,7 @@ import java.util.Locale;
  */
 public class MCRDecimalConverter {
 
-    private Locale locale = Locale.getDefault();
+    private Locale locale;
 
     public MCRDecimalConverter(String localeID) {
         this.locale = Locale.forLanguageTag(localeID);

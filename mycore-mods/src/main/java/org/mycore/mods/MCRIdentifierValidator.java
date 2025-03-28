@@ -55,13 +55,8 @@ public class MCRIdentifierValidator {
         // ISBN- 13
         if (isbn.length() == ISBN13_LENGTH) {
             int checkSum = 0;
-            int digit = 0;
             for (int i = 0; i < ISBN13_LENGTH; ++i) {
-                if (isbn.charAt(i) == 'X') {
-                    digit = 10;
-                } else {
-                    digit = Character.digit(isbn.charAt(i), 10);
-                }
+                int digit = (isbn.charAt(i) == 'X') ? 10 : Character.digit(isbn.charAt(i), 10);
                 if (i % 2 == 1) {
                     digit *= 3;
                 }

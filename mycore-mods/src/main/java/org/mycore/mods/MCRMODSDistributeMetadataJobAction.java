@@ -90,6 +90,7 @@ public class MCRMODSDistributeMetadataJobAction extends MCRJobAction {
         }
     }
 
+    @SuppressWarnings("PMD.UnusedAssignment")
     public void runWithLockedObject(List<MCRObjectID> objects, Consumer<MCRObjectID> lockedObjectConsumer) {
         try {
             // wait to get the lock for the object

@@ -80,7 +80,7 @@ class MCRIdentifierResolver {
         Object[] params = { identifier, URLEncoder.encode(identifier, StandardCharsets.UTF_8) };
         String uri = new MessageFormat(uriPattern, Locale.ROOT).format(params);
 
-        Element resolved = null;
+        Element resolved;
         try {
             resolved = MCRURIResolver.obtainInstance().resolve(uri);
         } catch (Exception ex) {

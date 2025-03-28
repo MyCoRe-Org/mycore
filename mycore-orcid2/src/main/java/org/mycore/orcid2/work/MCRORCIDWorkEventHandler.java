@@ -128,7 +128,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
             LOGGER.info("MODS object is required. Skipping {}...", objectID);
             return;
         }
-        MCRObject filteredObject = null;
+        MCRObject filteredObject;
         try {
             filteredObject = MCRORCIDUtils.filterObject(object);
         } catch (MCRORCIDException e) {
