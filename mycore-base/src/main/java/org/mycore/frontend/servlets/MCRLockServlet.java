@@ -115,7 +115,6 @@ public class MCRLockServlet extends MCRServlet {
         } catch (IllegalArgumentException e) {
             job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST,
                 "Unsupported value for parameter " + PARAM_ACTION + ": " + actionValue);
-            return;
         }
     }
 

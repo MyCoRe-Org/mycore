@@ -202,10 +202,9 @@ public class MCRLayoutUtilities {
         while (ic.getName().equals("item")) {
             ic = ic.getParentElement();
             String webpageID = getWebpageID(ic);
-            Element labelEl = null;
             xpath = XPATH_FACTORY.compile("//.[@href='" + webpageID + "']/label[@xml:lang='" + lang + "']",
                 Filters.element());
-            labelEl = xpath.evaluateFirst(getNavi());
+            Element labelEl = xpath.evaluateFirst(getNavi());
             if (labelEl != null) {
                 if (label.isEmpty()) {
                     label = new StringBuilder(labelEl.getTextTrim());
