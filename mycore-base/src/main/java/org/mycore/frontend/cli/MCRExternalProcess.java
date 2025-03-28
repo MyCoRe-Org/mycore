@@ -78,7 +78,7 @@ public class MCRExternalProcess {
             throw e;
         }
         CompletableFuture.allOf(input, output, errors)
-            .whenComplete((Void, ex) -> MCRStreamSucker.destroyProcess(p, ex));
+            .whenComplete((ignore, ex) -> MCRStreamSucker.destroyProcess(p, ex));
         return exitValue;
     }
 
