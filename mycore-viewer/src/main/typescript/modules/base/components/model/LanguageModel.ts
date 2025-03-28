@@ -35,16 +35,17 @@ export class LanguageModel {
     return this._keyTranslationMap.has(key);
   }
 
-  public translate(element: JQuery) {
+  public translate(element: HTMLElement) {
     let that = this;
-    element.find("[data-i18n]").each(function() {
-      let sub = $(this);
-      let key: string = sub.data("i18n");
+    let elements = element.querySelectorAll("[data-i18n]");
+    for (let i = 0; i < elements.length; i++) {
+      let sub = elements[i];
+      let key: string = sub.getAttribute("data-i18n");
       if (!that.hasTranslation(key)) {
-        return;
+        continue;
       }
-      sub.html(that.getTranslation(key));
-    });
+      sub.innerHTML = that.getTranslation(key);
+    }
   }
 
 }

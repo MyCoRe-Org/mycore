@@ -22,23 +22,23 @@ import { AltoChange, AltoWordChange } from "./AltoChange";
 import { LanguageModel } from "../../../base/components/model/LanguageModel";
 
 export class AltoEditorWidget {
-  private widgetElement: JQuery;
+  private widgetElement: HTMLElement;
 
-  private tableContainer: JQuery;
+  private tableContainer: HTMLElement;
 
-  private buttonContainer: JQuery;
+  private buttonContainer: HTMLElement;
 
-  public changeWordButton: JQuery;
+  public changeWordButton: HTMLElement;
 
   private idChangeMap = new MyCoReMap<string, AltoChange>();
   private fileChangeMap = new MyCoReMap<string, Array<AltoChange>>();
 
-  private idViewMap = new MyCoReMap<string, JQuery>();
-  private pageHeading: JQuery;
+  private idViewMap = new MyCoReMap<string, HTMLElement>();
+  private pageHeading: HTMLElement;
 
-  private actionHeading: JQuery;
+  private actionHeading: HTMLElement;
 
-  private infoHeading: JQuery;
+  private infoHeading: HTMLElement;
 
   private changeClickHandler: Array<(change: AltoChange) => void> = new Array<(change: AltoChange) => void>();
   private changeRemoveClickHandler: Array<(change: AltoChange) => void> = new Array<(change: AltoChange) => void>();
@@ -46,42 +46,42 @@ export class AltoEditorWidget {
   private applyClickHandler: Array<() => void> = new Array<() => void>();
   private deleteClickHandler: Array<() => void> = new Array<() => void>();
 
-  private submitButton: JQuery;
-  private applyButton: JQuery;
-  private deleteButton: JQuery;
+  private submitButton: HTMLElement;
+  private applyButton: HTMLElement;
+  private deleteButton: HTMLElement;
 
-  constructor(container: JQuery, private i18n: LanguageModel) {
-    this.widgetElement = jQuery(this.createHTML());
-    this.widgetElement.appendTo(container);
+  constructor(container: HTMLElement, private i18n: LanguageModel) {
+    this.widgetElement = this.createHTML();
+    container.append(this.widgetElement);
 
-    this.tableContainer = this.widgetElement.find("tbody.table-line-container");
-    this.buttonContainer = this.widgetElement.find("div.button-group-container");
-    this.changeWordButton = this.widgetElement.find("button.changeWord");
-    this.submitButton = this.widgetElement.find(".submit-button");
-    this.applyButton = this.widgetElement.find(".apply-button");
-    this.deleteButton = this.widgetElement.find(".delete-button");
+    this.tableContainer = this.widgetElement.querySelector("tbody.table-line-container");
+    this.buttonContainer = this.widgetElement.querySelector("div.button-group-container");
+    this.changeWordButton = this.widgetElement.querySelector("button.changeWord");
+    this.submitButton = this.widgetElement.querySelector(".submit-button");
+    this.applyButton = this.widgetElement.querySelector(".apply-button");
+    this.deleteButton = this.widgetElement.querySelector(".delete-button");
 
-    this.pageHeading = this.widgetElement.find("[data-sort=pageHeading]");
-    this.actionHeading = this.widgetElement.find("[data-sort=actionHeading]");
-    this.infoHeading = this.widgetElement.find("[data-sort=infoHeading]");
+    this.pageHeading = this.widgetElement.querySelector("[data-sort=pageHeading]");
+    this.actionHeading = this.widgetElement.querySelector("[data-sort=actionHeading]");
+    this.infoHeading = this.widgetElement.querySelector("[data-sort=infoHeading]");
 
-    this.pageHeading.click(this.getSortClickEventHandler('pageHeading'));
-    this.actionHeading.click(this.getSortClickEventHandler('actionHeading'));
-    this.infoHeading.click(this.getSortClickEventHandler('infoHeading'));
+    this.pageHeading.addEventListener('click', this.getSortClickEventHandler('pageHeading'));
+    this.actionHeading.addEventListener('click', this.getSortClickEventHandler('actionHeading'));
+    this.infoHeading.addEventListener('click', this.getSortClickEventHandler('infoHeading'));
 
-    this.submitButton.click(() => {
+    this.submitButton.addEventListener('click', () => {
       this.submitClickHandler.forEach((e) => {
         e();
       });
     });
 
-    this.applyButton.click(() => {
+    this.applyButton.addEventListener('click', () => {
       this.applyClickHandler.forEach((e) => {
         e();
       });
     });
 
-    this.deleteButton.click(() => {
+    this.deleteButton.addEventListener('click', () => {
       this.deleteClickHandler.forEach((e) => {
         e();
       });
@@ -90,9 +90,9 @@ export class AltoEditorWidget {
 
   public enableApplyButton(enabled: boolean = true) {
     if (enabled) {
-      this.applyButton.show();
+      this.applyButton.style.display = "block";
     } else {
-      this.applyButton.hide();
+      this.applyButton.style.display = "none";
     }
   }
 
@@ -128,22 +128,27 @@ export class AltoEditorWidget {
   }
 
   private getCurrentSortMethod() {
-    let headerAttached, arrowAttached;
-    if ((headerAttached = (arrowAttached = this.downArrow).parent()).length > 0 ||
-      (headerAttached = (arrowAttached = this.upArrow).parent()).length > 0) {
-      let sortBy = headerAttached.attr("data-sort");
-
-      return { sortBy: sortBy, down: arrowAttached[0] === this.downArrow[0] }
+    let headerAttached;
+    let arrowAttached
+    if (this.downArrow.parentElement != null) {
+      headerAttached = this.downArrow.parentElement.parentElement;
+      arrowAttached = this.downArrow;
+    } else if (this.upArrow.parentElement != null) {
+      headerAttached = this.upArrow.parentElement.parentElement;
+      arrowAttached = this.upArrow;
+    } else {
+      return null;
     }
 
-    return null;
+    let sortBy = headerAttached.attr("data-sort");
+    return {sortBy: sortBy, down: arrowAttached[0] === this.downArrow[0]}
   }
 
   private sortBy(by: string, down: boolean) {
-    this.downArrow.detach();
-    this.upArrow.detach();
+    this.downArrow.remove();
+    this.upArrow.remove();
 
-    let elem = this.widgetElement.find(`[data-sort=${by}]`);
+    let elem = this.widgetElement.querySelector(`[data-sort=${by}]`);
     if (down) {
       elem.append(this.downArrow);
     } else {
@@ -152,7 +157,7 @@ export class AltoEditorWidget {
 
     let sortedList = [];
     this.idViewMap.forEach((k, v) => {
-      v.detach();
+      v.remove();
       sortedList.push(v);
     });
 
@@ -162,20 +167,24 @@ export class AltoEditorWidget {
 
   }
 
-  private getSortFn(by: string, down: boolean): (x, y) => number {
+  private getSortFn(by: string, down: boolean): (x: HTMLElement, y:HTMLElement) => number {
     let headerIndex = ["action", "pageHeading", "actionHeading", "infoHeading"];
     switch (by) {
       case headerIndex[1]:
-        return (x: JQuery, y: JQuery) => {
-          let order1 = this.idChangeMap.get(x.attr("data-id")).pageOrder;
-          let order2 = this.idChangeMap.get(y.attr("data-id")).pageOrder;
+        return (x: HTMLElement, y: HTMLElement) => {
+          let order1 = this.idChangeMap.get(x.getAttribute("data-id")).pageOrder;
+          let order2 = this.idChangeMap.get(y.getAttribute("data-id")).pageOrder;
           return (down ? 1 : -1) * (order1 - order2);
         };
       case headerIndex[2]:
       case headerIndex[3]:
-        return (x: JQuery, y: JQuery) => {
-          let text1 = jQuery(x.children("td").get(headerIndex.indexOf(by))).text();
-          let text2 = jQuery(y.children("td").get(headerIndex.indexOf(by))).text();
+        return (x: HTMLElement, y: HTMLElement) => {
+          let text1 = Array.from(x.children)
+              .filter(el => el.tagName == 'TD')
+              .map(el => el as HTMLTableDataCellElement)[headerIndex.indexOf(by)].innerText;
+          let text2 = Array.from(y.children)
+              .filter(el => el.tagName == 'TD')
+              .map(el => el as HTMLTableDataCellElement)[headerIndex.indexOf(by)].innerText;
 
           return (down ? 1 : -1) * text1.localeCompare(text2);
         }
@@ -183,20 +192,25 @@ export class AltoEditorWidget {
     return (x, y) => -1;
   }
 
-  private downArrow = jQuery(`
-<span class='fas fa-caret-down sortArrow'>
-</span> 
-`);
+  private createDownArrow() {
+    const downArrow = document.createElement("span");
+    downArrow.classList.add("fas", "fa-caret-down", "sortArrow");
+    return downArrow;
+  }
 
-  private upArrow = jQuery(`    
-<span class='fas fa-caret-up sortArrow'>
-</span> 
-`);
+  private downArrow = this.createDownArrow();
+
+    private createUpArrow() {
+        const upArrow = document.createElement("span");
+        upArrow.classList.add("fas", "fa-caret-up", "sortArrow");
+        return upArrow;
+    }
+
+  private upArrow = this.createUpArrow();
 
 
   private createHTML() {
-    return `
-<div class="alto-editor-widget container-fluid">
+    const html = `
     <h3 class="small-heading">${this.getLabel("altoWidget.heading")}</h3>     
     <div class="btn-toolbar edit">
         <div class="btn-group btn-group-xs button-group-container">
@@ -226,8 +240,10 @@ export class AltoEditorWidget {
             <button type="button" class="btn btn-danger delete-button">${this.getLabel("altoWidget.delete")}</button>
         </div>
     </div>
-</div>
 `;
+    const element = document.createElement("div");
+    element.innerHTML = html;
+    return element;
   }
 
   private getLabel(id: string) {
@@ -267,22 +283,22 @@ export class AltoEditorWidget {
   }
 
   private addRow(id: string, change: AltoChange) {
-    let view = jQuery(`
-<tr data-id="${id}">
-    ${this.getChangeHTMLContent(change)}
-</tr>
-`);
+    let view = document.createElement("tr");
+    view.setAttribute("data-id", id);
+    view.innerHTML = this.getChangeHTMLContent(change);
+
     let sortMethod = this.getCurrentSortMethod();
     if (sortMethod != null) {
       let sortFn = this.getSortFn(sortMethod.sortBy, sortMethod.down);
       let inserted = false;
-      this.tableContainer.children("tr").each((i, elem) => {
-        let jqElem = jQuery(elem);
-        if (!inserted && sortFn(view, jqElem) == -1) {
-          view.insertBefore(jqElem);
-          inserted = true;
-        }
-      });
+      Array.from(this.tableContainer.children)
+          .filter((e) => e.tagName == "TR")
+          .forEach((elem) => {
+            if (!inserted && sortFn(view, elem as HTMLElement) == -1) {
+              elem.parentElement.insertBefore(view, elem);
+              inserted = true;
+            }
+          });
       if (!inserted) {
         this.tableContainer.append(view);
       }
@@ -291,8 +307,8 @@ export class AltoEditorWidget {
       this.tableContainer.append(view);
     }
 
-    view.click((e) => {
-      if (jQuery(e.target).hasClass("remove")) {
+    view.addEventListener('click', (e) => {
+      if("classList" in e.target && (e.target as HTMLElement).classList.contains("remove")) {
         this.changeRemoveClickHandler.forEach((handler) => {
           handler(change);
         });
@@ -317,7 +333,7 @@ export class AltoEditorWidget {
   public updateChange(change: AltoChange) {
     let changeID = this.getChangeID(change);
 
-    this.idViewMap.get(changeID).html(this.getChangeHTMLContent(change));
+    this.idViewMap.get(changeID).innerHTML = this.getChangeHTMLContent(change);
   }
 
   public getChangeID(change: AltoChange) {

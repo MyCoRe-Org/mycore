@@ -26,7 +26,7 @@ import { WaitForEvent } from "./components/events/WaitForEvent";
 
 export class MyCoReViewer {
 
-  constructor(private _container: JQuery, private _settings: MyCoReViewerSettings) {
+  constructor(private _container: HTMLElement, private _settings: MyCoReViewerSettings) {
     this._eventHandlerMap = new MyCoReMap<string, Array<ViewerComponent>>();
     this._components = new Array<ViewerComponent>();
     this._initializingEvents = new Array<ViewerEvent>();
@@ -82,8 +82,8 @@ export class MyCoReViewer {
 
   private initialize(): void {
     this._settings = MyCoReViewerSettings.normalize(this._settings);
-    if (!this._container.hasClass("mycoreViewer")) {
-      this._container.addClass("mycoreViewer");
+    if (!this._container.classList.contains("mycoreViewer")) {
+      this._container.classList.add("mycoreViewer");
     }
 
     for (const ic of VIEWER_COMPONENTS) {

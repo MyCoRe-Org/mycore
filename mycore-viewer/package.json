@@ -9,9 +9,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@types/jquery": "^3.5.30",
+    "@types/bootstrap": "^5.2.10",
     "epubjs": "0.3.89",
-    "jquery": "^3.5.1",
     "jszip": "^3.2.1",
     "manifesto.js": "^4.2.17",
     "pdfjs-dist": "^v4.5.136"

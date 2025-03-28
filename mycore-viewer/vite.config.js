@@ -30,6 +30,7 @@ const inputs = {
   piwik: 'src/main/typescript/modules/piwik/module.ts',
   "toolbar-extender": 'src/main/typescript/modules/toolbar-extender/module.ts',
   epub: 'src/main/typescript/modules/epub/module.ts',
+  tei: 'src/main/typescript/modules/tei/module.ts',
   iiif: 'src/main/typescript/modules/iiif/module.ts',
   style_default: 'src/main/less/templates/default/Iview.less',
   style_tei: 'src/main/less/tei.less',
@@ -53,10 +54,6 @@ export default defineConfig({
           dest: 'js/lib/jszip/'
         },
         {
-          src: 'node_modules/jquery/dist/*',
-          dest: 'js/lib/'
-        },
-        {
           src: 'node_modules/pdfjs-dist/cmaps/*',
           dest: 'cmaps/'
         }
@@ -71,6 +68,7 @@ export default defineConfig({
         return "js/iview-client-" + entryName + "." + format + ".js";
       }
     },
+    sourcemap: "inline",
     cssCodeSplit: true,
     rollupOptions: {
       input: inputs,

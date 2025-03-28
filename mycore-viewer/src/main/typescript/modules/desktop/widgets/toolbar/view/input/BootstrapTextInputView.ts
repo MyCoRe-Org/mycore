@@ -22,23 +22,27 @@ import { TextInputView } from "../../../../../base/widgets/toolbar/view/input/Te
 export class BootstrapTextInputView implements TextInputView {
 
   constructor(private _id: string) {
-    this.element = jQuery("<form></form>");
-    this.element.addClass("navbar-form");
-    this.element.css({ display: "inline-block" });
+    this.element = document.createElement("form");
+    this.element.classList.add("navbar-form");
+    this.element.style.display = "inline-block";
 
-    this.childText = jQuery("<input type='text' class='form-control'/>");
-    this.childText.appendTo(this.element);
+    this.childText = document.createElement("input");
+    this.childText.classList.add("form-control");
+    this.childText.setAttribute("type", "text");
 
-    this.childText.keydown((e) => {
+    this.element.append(this.childText);
+
+    this.childText.addEventListener('keydown', (e) => {
       if (e.keyCode == 13) {
         e.preventDefault();
       }
     });
 
-    this.childText.keyup((e) => {
+    this.childText.addEventListener('keyup', (e) => {
+      console.log(e);
       if (e.keyCode) {
         if (e.keyCode == 27) { // Unfocus when pressing escape
-          this.childText.val("");
+          this.childText.value = "";
           this.childText.blur()
         }
       }
@@ -49,25 +53,25 @@ export class BootstrapTextInputView implements TextInputView {
     });
   }
 
-  private element: JQuery;
-  private childText: JQuery;
+  private element: HTMLElement;
+  private childText: HTMLInputElement;
 
   public onChange: () => void = null;
 
   updateValue(value: string): void {
-    this.childText.val(value);
+    this.childText.value = value;
   }
 
   getValue(): string {
-    return this.childText.val() + "";
+    return this.childText.value;
   }
 
-  getElement(): JQuery {
+  getElement(): HTMLElement {
     return this.element;
   }
 
   updatePlaceholder(placeHolder: string): void {
-    this.childText.attr("placeholder", placeHolder);
+    this.childText.setAttribute("placeholder", placeHolder);
   }
 }
 

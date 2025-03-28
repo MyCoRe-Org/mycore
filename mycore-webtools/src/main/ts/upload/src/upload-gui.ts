@@ -335,7 +335,7 @@ class FileTransferGUITemplates {
     <div class="card" style="height: 100%;">
         <div class="card-header">
             <span class="mcr-upload-title" data-i18n="component.webtools.upload.title"></span>
-            <span class="fas fa-window-minimize minimize float-right" style="font-size: 11px;line-height: 22px;"></span></div>
+            <span class="fas fa-window-minimize minimize float-end" style="font-size: 11px;line-height: 22px;"></span></div>
         <div class="card-body mcr-upload-entry-list" style="overflow-y:  scroll;">
             <div class="container-fluid">
                 <div class="row d-none mcr-commit-error bg-danger rounded">

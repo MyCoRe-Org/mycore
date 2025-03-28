@@ -20,8 +20,8 @@
 
             <xed:include ref="editor4changeAdmins" />
           </div>
-          <div class="card-footer">
-            <div class="float-right">
+          <div class="card-footer clearfix">
+            <div class="float-end">
               <xed:include ref="buttons" />
             </div>
           </div>

@@ -32,7 +32,7 @@ export class TextRenderer {
 
 
     this.textContainer.setAttribute("class", "textContainer");
-    const htmlElement = this._view.container[0] as HTMLElement;
+    const htmlElement = this._view.container as HTMLElement;
     htmlElement.appendChild(this.textContainer);
   }
 
