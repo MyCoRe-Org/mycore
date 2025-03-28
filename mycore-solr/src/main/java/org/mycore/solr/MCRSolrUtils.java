@@ -78,8 +78,8 @@ public class MCRSolrUtils {
         HttpRequest.Builder requestBuilder = MCRHttpUtils.getRequestBuilder();
 
         MCRConfiguration2.getBoolean(USE_HTTP_1_1_PROPERTY)
-            .filter(useHttp1_1 -> useHttp1_1)
-            .ifPresent(useHttp1_1 -> {
+            .filter(useHttp11 -> useHttp11)
+            .ifPresent(useHttp11 -> {
                 requestBuilder.version(HttpClient.Version.HTTP_1_1);
             });
 
