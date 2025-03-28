@@ -96,7 +96,7 @@ public class MCRAbstractMODSMetadataService
 
         String text = element.getTextNormalize();
 
-        return MCRPIManager.getInstance().getParserForType(getIdentifierType())
+        return MCRPIManager.obtainInstance().getParserForType(getIdentifierType())
             .parse(text)
             .map(MCRPersistentIdentifier.class::cast);
     }

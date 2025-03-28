@@ -126,7 +126,7 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
         MCRObjectID derivID = deriv.getId();
 
         Function<String, Integer> countCreatedPI = s -> MCRPIManager
-            .getInstance()
+            .obtainInstance()
             .getCreatedIdentifiers(derivID, getType(), getServiceID())
             .size();
 

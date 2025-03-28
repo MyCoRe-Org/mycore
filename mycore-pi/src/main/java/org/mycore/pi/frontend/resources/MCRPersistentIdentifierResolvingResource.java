@@ -42,8 +42,8 @@ public class MCRPersistentIdentifierResolvingResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response resolve(@PathParam("identifier") String identifier) {
         Map<String, List<String>> resolveMap = new HashMap<>();
-        MCRPIManager.getInstance().getResolvers().forEach(resolver -> MCRPIManager
-            .getInstance().get(identifier)
+        MCRPIManager.obtainInstance().getResolvers().forEach(resolver -> MCRPIManager
+            .obtainInstance().get(identifier)
             .forEach(mcrPersistentIdentifier -> resolveMap.put(resolver.getName(),
                 resolver.resolveSuppress(mcrPersistentIdentifier).collect(Collectors.toList()))));
         return Response.ok().entity(new Gson().toJson(resolveMap)).build();

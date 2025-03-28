@@ -188,7 +188,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
      * @param date       the new registration date
      */
     protected void updateRegistrationDate(MCRObjectID mycoreID, String additional, Date date) {
-        MCRPI pi = MCRPIManager.getInstance()
+        MCRPI pi = MCRPIManager.obtainInstance()
             .get(this.getServiceID(), mycoreID.toString(), additional);
         pi.setRegistered(date);
         updateFlag(mycoreID, additional, pi);
@@ -205,7 +205,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
      * @param date       the new registration date
      */
     protected void updateStartRegistrationDate(MCRObjectID mycoreID, String additional, Date date) {
-        MCRPI pi = MCRPIManager.getInstance()
+        MCRPI pi = MCRPIManager.obtainInstance()
             .get(this.getServiceID(), mycoreID.toString(), additional);
         pi.setRegistrationStarted(date);
         updateFlag(mycoreID, additional, pi);
@@ -220,7 +220,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
      * @throws ClassCastException when type does not match the type of T
      */
     protected Optional<T> parseIdentifier(String identifier) {
-        MCRPIParser<T> parserForType = MCRPIManager.getInstance()
+        MCRPIParser<T> parserForType = MCRPIManager.obtainInstance()
             .getParserForType(getType());
 
         if (parserForType == null) {

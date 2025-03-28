@@ -68,7 +68,7 @@ public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
 
         Assert.assertNull("Registered date should be null.", urn1.getRegistered());
 
-        MCRPIManager.getInstance()
+        MCRPIManager.obtainInstance()
             .getUnregisteredIdentifiers(urn1.getType())
             .stream()
             .map(MCRPIRegistrationInfo::getIdentifier)
@@ -78,11 +78,11 @@ public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
         Integer progressedIdentifiersFromDatabase;
         Function<MCRPIRegistrationInfo, Optional<Date>> registerFn = MCRPIUtils.getMCRURNClient()::register;
         do {
-            progressedIdentifiersFromDatabase = MCRPIManager.getInstance()
+            progressedIdentifiersFromDatabase = MCRPIManager.obtainInstance()
                 .setRegisteredDateForUnregisteredIdentifiers(MCRDNBURN.TYPE, registerFn, BATCH_SIZE);
         } while (progressedIdentifiersFromDatabase > 0);
 
-        boolean registered = MCRPIManager.getInstance().isRegistered(urn1);
+        boolean registered = MCRPIManager.obtainInstance().isRegistered(urn1);
         LOGGER.info("Registered: {}", registered);
 
         MCRPI mcrpi = MCREntityManagerProvider.getCurrentEntityManager().find(MCRPI.class, urn1.getId());
@@ -93,7 +93,7 @@ public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
             .map("URN registered: "::concat)
             .ifPresent(LOGGER::info);
 
-        MCRPIManager.getInstance().getUnregisteredIdentifiers(urn1.getType())
+        MCRPIManager.obtainInstance().getUnregisteredIdentifiers(urn1.getType())
             .stream()
             .map(MCRPIRegistrationInfo::getIdentifier)
             .map("URN update: "::concat)

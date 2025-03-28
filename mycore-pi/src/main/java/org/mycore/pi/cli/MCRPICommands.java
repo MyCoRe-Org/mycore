@@ -60,7 +60,7 @@ public class MCRPICommands {
         help = "Should only be used if you used mycore-pi pre 2016 lts!",
         order = 10)
     public static List<String> addFlagsToObjects() {
-        return MCRPIManager.getInstance().getList().stream()
+        return MCRPIManager.obtainInstance().getList().stream()
             .filter(registrationInfo -> {
                 String mycoreID = registrationInfo.getMycoreID();
                 MCRObjectID objectID = MCRObjectID.getInstance(mycoreID);
@@ -79,7 +79,7 @@ public class MCRPICommands {
     public static void addFlagToObject(String mycoreIDString) {
         MCRObjectID objectID = MCRObjectID.getInstance(mycoreIDString);
         MCRBase base = MCRMetadataManager.retrieve(objectID);
-        final List<MCRPIRegistrationInfo> piRegistrationInfos = MCRPIManager.getInstance().getRegistered(base);
+        final List<MCRPIRegistrationInfo> piRegistrationInfos = MCRPIManager.obtainInstance().getRegistered(base);
         boolean addedAFlag = false;
         for (MCRPIRegistrationInfo registrationInfo : piRegistrationInfos) {
             if (!MCRPIService.hasFlag(base, registrationInfo.getAdditional(), registrationInfo)) {
@@ -127,14 +127,14 @@ public class MCRPICommands {
                 LOGGER.info("Found URN in :{}", derivateID);
                 MCRPI derivatePI = new MCRPI(urn, MCRDNBURN.TYPE, derivateID, "", serviceID,
                     new MCRPIServiceDates(new Date(), null));
-                if (MCRPIManager.getInstance().exist(derivatePI)) {
+                if (MCRPIManager.obtainInstance().exist(derivatePI)) {
                     LOGGER.warn("PI-Entry for {} already exist!", urn);
                 } else {
                     em.persist(derivatePI);
                     derivate.getUrnMap().forEach((file, fileURN) -> {
                         MCRPI filePI = new MCRPI(fileURN, MCRDNBURN.TYPE, derivateID, file, serviceID,
                             new MCRPIServiceDates(new Date(), null));
-                        if (MCRPIManager.getInstance().exist(filePI)) {
+                        if (MCRPIManager.obtainInstance().exist(filePI)) {
                             LOGGER.warn("PI-Entry for {} already exist!", fileURN);
                         } else {
                             em.persist(fileURN);
@@ -205,9 +205,9 @@ public class MCRPICommands {
     public static void removeControlFromObject(String objectIDString, String serviceID, String additional)
         throws MCRAccessException, MCRPersistentIdentifierException {
         MCRObjectID objectID = MCRObjectID.getInstance(objectIDString);
-        MCRPI mcrpi = MCRPIManager.getInstance()
+        MCRPI mcrpi = MCRPIManager.obtainInstance()
             .get(serviceID, objectIDString, additional != null ? additional.trim() : null);
-        MCRPIManager.getInstance()
+        MCRPIManager.obtainInstance()
             .delete(mcrpi.getMycoreID(), mcrpi.getAdditional(), mcrpi.getType(), mcrpi.getService());
 
         MCRBase base = MCRMetadataManager.retrieve(objectID);

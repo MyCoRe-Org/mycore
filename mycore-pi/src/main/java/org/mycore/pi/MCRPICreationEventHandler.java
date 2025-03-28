@@ -43,7 +43,7 @@ public class MCRPICreationEventHandler extends MCREventHandlerBase {
     }
 
     private void processPIServices(MCRObject obj) {
-        List<MCRPIRegistrationInfo> registered = MCRPIManager.getInstance().getRegistered(obj);
+        List<MCRPIRegistrationInfo> registered = MCRPIManager.obtainInstance().getRegistered(obj);
 
         final List<String> services = registered.stream().map(MCRPIRegistrationInfo::getService)
             .collect(Collectors.toList());

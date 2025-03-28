@@ -92,7 +92,7 @@ public class MCRPIXPathMetadataService extends MCRPIMetadataService<MCRPersisten
         Element identifierElement = evaluate.listIterator().next();
         String identifierString = identifierElement.getTextNormalize();
 
-        Optional<MCRPersistentIdentifier> parsedIdentifierOptional = MCRPIManager.getInstance()
+        Optional<MCRPersistentIdentifier> parsedIdentifierOptional = MCRPIManager.obtainInstance()
             .getParserForType(getProperties().get("Type")).parse(identifierString);
         return parsedIdentifierOptional.map(MCRPersistentIdentifier.class::cast);
     }

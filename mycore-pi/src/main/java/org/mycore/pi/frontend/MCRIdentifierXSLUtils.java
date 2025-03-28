@@ -57,12 +57,12 @@ public class MCRIdentifierXSLUtils {
     }
 
     public static boolean hasManagedPI(String objectID) {
-        return !MCRPIManager.getInstance()
+        return !MCRPIManager.obtainInstance()
             .getRegistered(MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(objectID))).isEmpty();
     }
 
     public static boolean isManagedPI(String pi, String id) {
-        return MCRPIManager.getInstance().getInfo(pi).stream().anyMatch(info -> info.getMycoreID()
+        return MCRPIManager.obtainInstance().getInfo(pi).stream().anyMatch(info -> info.getMycoreID()
             .equals(id));
     }
 

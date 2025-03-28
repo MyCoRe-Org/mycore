@@ -105,7 +105,7 @@ public abstract class MCRDOIBaseService extends MCRPIJobService<MCRDigitalObject
         final boolean exists = MCRMetadataManager.exists(objectID);
 
         try {
-            MCRPIManager.getInstance().get(getServiceID(), mycoreID, "");
+            MCRPIManager.obtainInstance().get(getServiceID(), mycoreID, "");
         } catch (NoResultException r) {
             return false;
         }

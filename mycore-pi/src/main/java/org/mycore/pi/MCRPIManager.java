@@ -20,19 +20,16 @@ package org.mycore.pi;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
@@ -59,40 +56,46 @@ public final class MCRPIManager {
 
     private static final String RESOLVER_CONFIGURATION = "MCR.PI.Resolvers";
 
-    private final List<MCRPIResolver<MCRPersistentIdentifier>> resolverList;
+    private final Map<String, MCRPIParser<? extends MCRPersistentIdentifier>> parsers;
 
-    private final List<Class<? extends MCRPIParser<? extends MCRPersistentIdentifier>>> parserList;
+    private final List<MCRPIResolver<? extends MCRPersistentIdentifier>> resolvers;
 
-    private final Map<String, Class<? extends MCRPIParser>> typeParserMap;
-
-    private MCRPIManager() {
-        parserList = new ArrayList<>();
-        typeParserMap = new ConcurrentHashMap<>();
-
-        MCRConfiguration2.getSubPropertiesMap(PARSER_CONFIGURATION)
-            .forEach((type, className) -> {
-                try {
-                    Class<? extends MCRPIParser<?>> parserClass = MCRClassTools.forName(className);
-                    registerParser(type, parserClass);
-                } catch (ClassNotFoundException e) {
-                    throw new MCRConfigurationException(
-                        "Could not load class " + className + " defined in " + PARSER_CONFIGURATION + type, e);
-                }
-            });
-
-        resolverList = MCRConfiguration2.getOrThrow(RESOLVER_CONFIGURATION, MCRConfiguration2::splitValue)
-            .map(MCRConfiguration2::<MCRPIResolver<MCRPersistentIdentifier>>instantiateClass)
-            .collect(Collectors.toList());
-
+    public MCRPIManager(Map<String, MCRPIParser<? extends MCRPersistentIdentifier>> parsers,
+        List<? extends MCRPIResolver<? extends MCRPersistentIdentifier>> resolvers) {
+        this.parsers = new HashMap<>(parsers);
+        this.resolvers = new ArrayList<>(resolvers);
     }
 
+    /**
+     * @deprecated use {@link #obtainInstance()} instead
+     */
+    @Deprecated
     public static MCRPIManager getInstance() {
-        return LazyInstanceHolder.SINGLETON_INSTANCE;
+        return obtainInstance();
+    }
+
+    public static MCRPIManager obtainInstance() {
+        return LazyInstanceHolder.SHARED_INSTANCE;
     }
 
     @SuppressWarnings("unchecked")
-    private static <T extends MCRPersistentIdentifier> MCRPIParser<T> getParserInstance(
-        Class<? extends MCRPIParser> detectorClass) throws ClassCastException {
+    public static MCRPIManager createInstance() {
+
+        Map<String, MCRPIParser<? extends MCRPersistentIdentifier>> parsers = new HashMap<>();
+        MCRConfiguration2.getSubPropertiesMap(PARSER_CONFIGURATION).forEach((type, className) ->
+            parsers.put(type, MCRConfiguration2.getInstanceOfOrThrow(MCRPIParser.class, PARSER_CONFIGURATION + type)));
+
+        List<MCRPIResolver<? extends MCRPersistentIdentifier>> resolvers = new ArrayList<>();
+        MCRConfiguration2.getOrThrow(RESOLVER_CONFIGURATION, MCRConfiguration2::splitValue)
+            .map(MCRConfiguration2::<MCRPIResolver<MCRPersistentIdentifier>>instantiateClass)
+            .forEach(resolvers::add);
+
+        return new MCRPIManager(parsers, resolvers);
+
+    }
+
+    private static MCRPIParser<? extends MCRPersistentIdentifier> getParserInstance(
+        Class<MCRPIParser<? extends MCRPersistentIdentifier>> detectorClass) throws ClassCastException {
         try {
             return detectorClass.getDeclaredConstructor().newInstance();
         } catch (ReflectiveOperationException e) {
@@ -340,10 +343,9 @@ public final class MCRPIManager {
      * @return a MCRPIParser
      * @throws ClassCastException when the wrong type is passed
      */
-    @SuppressWarnings("WeakerAccess")
-    public <T extends MCRPersistentIdentifier> MCRPIParser<T> getParserForType(String type)
-        throws ClassCastException {
-        return getParserInstance(typeParserMap.get(type));
+    @SuppressWarnings("unchecked")
+    public <T extends MCRPersistentIdentifier> MCRPIParser<T> getParserForType(String type) {
+        return (MCRPIParser<T>) parsers.get(type);
     }
 
     /**
@@ -351,32 +353,32 @@ public final class MCRPIManager {
      *
      * @param type        the type of the parser
      * @param parserClass the class of the parser
+     * @deprecated Provide parsers to the constructor or define them in properties.
      */
-    @SuppressWarnings("WeakerAccess")
-    public void registerParser(
-        String type,
+    @Deprecated
+    @SuppressWarnings("unchecked")
+    public void registerParser(String type,
         Class<? extends MCRPIParser<? extends MCRPersistentIdentifier>> parserClass) {
-
-        this.parserList.add(parserClass);
-        this.typeParserMap.put(type, parserClass);
+        this.parsers.put(type, getParserInstance((Class<MCRPIParser<? extends MCRPersistentIdentifier>>) parserClass));
     }
 
+    @SuppressWarnings("unchecked")
     public List<MCRPIResolver<MCRPersistentIdentifier>> getResolvers() {
-        return this.resolverList;
+        return this.resolvers.stream()
+            .map(resolver -> (MCRPIResolver<MCRPersistentIdentifier>) resolver)
+            .toList();
     }
 
     public Stream<MCRPersistentIdentifier> get(String pi) {
-        return parserList
+        return parsers.values()
             .stream()
-            .map(MCRPIManager::getParserInstance)
-            .map(p -> p.parse(pi))
+            .map(parser -> parser.parse(pi))
             .filter(Optional::isPresent)
-            .map(Optional::get)
-            .map(MCRPersistentIdentifier.class::cast);
+            .map(Optional::get);
     }
 
     private static final class LazyInstanceHolder {
-        public static final MCRPIManager SINGLETON_INSTANCE = new MCRPIManager();
+        public static final MCRPIManager SHARED_INSTANCE = createInstance();
     }
 
 }

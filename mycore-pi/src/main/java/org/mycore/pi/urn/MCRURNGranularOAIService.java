@@ -100,7 +100,7 @@ public class MCRURNGranularOAIService extends MCRPIService<MCRDNBURN> {
         }
 
         int count = Math.toIntExact(derivate.getFileMetadata().stream().filter(file -> file.getUrn() != null).count());
-        MCRDNBURN newURN = (MCRDNBURN) MCRPIManager.getInstance().get(derivate.getURN())
+        MCRDNBURN newURN = (MCRDNBURN) MCRPIManager.obtainInstance().get(derivate.getURN())
             .findFirst().get();
 
         String setID = obj.getId().getNumberAsString();

@@ -49,7 +49,7 @@ public class MCRPIOtherPIRegisteredPredicate extends MCRPIPredicateBase
 
     @Override
     public boolean test(MCRBase mcrBase) {
-        return MCRPIManager.getInstance().isRegistered(mcrBase.getId(), "", type, service);
+        return MCRPIManager.obtainInstance().isRegistered(mcrBase.getId(), "", type, service);
     }
 
 }
