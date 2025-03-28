@@ -33,7 +33,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryLink;
 public class CategoryLinkServiceMock implements MCRCategLinkService {
 
     @Override
-    public Map<MCRCategoryID, Boolean> hasLinks(MCRCategory category) {
+    public Map<MCRCategoryID, Boolean> checkForLinks(MCRCategory category) {
         List<MCRCategory> categories;
         if (category == null) {
             categories = MCRCategoryDAOFactory.obtainInstance().getRootCategories();

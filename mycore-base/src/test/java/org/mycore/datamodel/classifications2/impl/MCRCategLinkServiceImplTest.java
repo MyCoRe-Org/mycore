@@ -231,14 +231,14 @@ public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
     @Test
     public void hasLinks() {
         MCRCategoryImpl germany = (MCRCategoryImpl) category.getChildren().getFirst().getChildren().getFirst();
-        assertFalse("Classification should not be in use", SERVICE.hasLinks(category).get(category.getId()));
-        assertFalse("Classification should not be in use", SERVICE.hasLinks(null).get(category.getId()));
-        assertFalse("Category should not be in use", SERVICE.hasLinks(germany).get(germany.getId()));
+        assertFalse("Classification should not be in use", SERVICE.checkForLinks(category).get(category.getId()));
+        assertFalse("Classification should not be in use", SERVICE.checkForLinks(null).get(category.getId()));
+        assertFalse("Category should not be in use", SERVICE.checkForLinks(germany).get(germany.getId()));
         addTestLinks();
         startNewTransaction();
-        assertTrue("Classification should be in use", SERVICE.hasLinks(category).get(category.getId()));
-        assertTrue("Classification should be in use", SERVICE.hasLinks(null).get(category.getId()));
-        assertTrue("Category should be in use", SERVICE.hasLinks(germany).get(germany.getId()));
+        assertTrue("Classification should be in use", SERVICE.checkForLinks(category).get(category.getId()));
+        assertTrue("Classification should be in use", SERVICE.checkForLinks(null).get(category.getId()));
+        assertTrue("Category should be in use", SERVICE.checkForLinks(germany).get(germany.getId()));
     }
 
     @Test
