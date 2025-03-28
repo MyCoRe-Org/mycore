@@ -59,7 +59,7 @@ public class MCRIIIFScaleParser {
 
         StringBuilder wBuilder = new StringBuilder();
         StringBuilder hBuilder = new StringBuilder();
-        getWidthAndHeightStrings(wBuilder, hBuilder);
+        retrieveWidthAndHeightStrings(wBuilder, hBuilder);
         String w = wBuilder.toString();
         String h = hBuilder.toString();
 
@@ -135,7 +135,7 @@ public class MCRIIIFScaleParser {
             (int) Math.ceil(percentValue / 100 * sourceRegionHeight));
     }
 
-    private void getWidthAndHeightStrings(StringBuilder wBuilder, StringBuilder hBuilder) {
+    private void retrieveWidthAndHeightStrings(StringBuilder wBuilder, StringBuilder hBuilder) {
         char[] chars = this.targetScale.toCharArray();
         boolean writeW = true;
         boolean first = true;

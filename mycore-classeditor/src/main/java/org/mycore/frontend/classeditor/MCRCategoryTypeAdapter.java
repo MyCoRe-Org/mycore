@@ -106,7 +106,7 @@ public class MCRCategoryTypeAdapter extends MCRJSONTypeAdapter<MCRJSONCategory> 
 
         if (category.hasChildren()) {
             List<MCRCategory> children = category.getChildren();
-            Map<MCRCategoryID, Boolean> linkMap = getLinkService().hasLinks(category);
+            Map<MCRCategoryID, Boolean> linkMap = getLinkService().checkForLinks(category);
             if (linkMap.containsValue(true)) {
                 rubricJsonObject.addProperty(PROP_HAS_LINK, true);
             }

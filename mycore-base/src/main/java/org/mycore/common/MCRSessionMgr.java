@@ -61,11 +61,14 @@ public class MCRSessionMgr {
      *
      * @see ThreadLocal
      */
-    private static ThreadLocal<MCRSession> theThreadLocalSession = ThreadLocal.withInitial(MCRScopedSession::new);
+    private static ThreadLocal<MCRSession> threadLocalSession
+        = ThreadLocal.withInitial(MCRScopedSession::new);
 
-    private static ThreadLocal<Boolean> isSessionAttached = ThreadLocal.withInitial(() -> Boolean.FALSE);
+    private static ThreadLocal<Boolean> threadLocalIsSessionAttached
+        = ThreadLocal.withInitial(() -> Boolean.FALSE);
 
-    private static ThreadLocal<Boolean> isSessionCreationLocked = ThreadLocal.withInitial(() -> Boolean.TRUE);
+    private static ThreadLocal<Boolean> threadLocalIsSessionCreationLocked
+        = ThreadLocal.withInitial(() -> Boolean.TRUE);
 
     /**
      * This method returns the unique MyCoRe session object for the current Thread. The session object is initialized
@@ -75,11 +78,11 @@ public class MCRSessionMgr {
      * @throws MCRException if the current Thread {@link #isLocked()}
      */
     public static MCRSession getCurrentSession() {
-        if (isSessionCreationLocked.get()) {
+        if (threadLocalIsSessionCreationLocked.get()) {
             throw new MCRException("Session creation is locked!");
         }
-        isSessionAttached.set(Boolean.TRUE);
-        return theThreadLocalSession.get();
+        threadLocalIsSessionAttached.set(Boolean.TRUE);
+        return threadLocalSession.get();
     }
 
     /**
@@ -101,8 +104,8 @@ public class MCRSessionMgr {
         }
         unlock();
         theSession.activate();
-        theThreadLocalSession.set(theSession);
-        isSessionAttached.set(Boolean.TRUE);
+        threadLocalSession.set(theSession);
+        threadLocalIsSessionAttached.set(Boolean.TRUE);
     }
 
     /**
@@ -115,12 +118,12 @@ public class MCRSessionMgr {
      */
     public static void releaseCurrentSession() {
         //theThreadLocalSession maybe null if called after close()
-        if (theThreadLocalSession != null && hasCurrentSession()) {
-            MCRSession session = theThreadLocalSession.get();
+        if (threadLocalSession != null && hasCurrentSession()) {
+            MCRSession session = threadLocalSession.get();
             session.passivate();
             LOGGER.debug("MCRSession released {}", session::getID);
-            theThreadLocalSession.remove();
-            isSessionAttached.remove();
+            threadLocalSession.remove();
+            threadLocalIsSessionAttached.remove();
             lock();
         }
     }
@@ -131,7 +134,7 @@ public class MCRSessionMgr {
      * @return true if a session is bound to the current thread
      */
     public static boolean hasCurrentSession() {
-        return isSessionAttached.get();
+        return threadLocalIsSessionAttached.get();
     }
 
     /**
@@ -151,21 +154,21 @@ public class MCRSessionMgr {
      * Locks the MCRSessionMgr and no {@link MCRSession}s can be attached to the current Thread.
      */
     public static void lock() {
-        isSessionCreationLocked.set(true);
+        threadLocalIsSessionCreationLocked.set(true);
     }
 
     /**
      * Unlocks the MCRSessionMgr to allow management of {@link MCRSession}s on the current Thread.
      */
     public static void unlock() {
-        isSessionCreationLocked.set(false);
+        threadLocalIsSessionCreationLocked.set(false);
     }
 
     /**
      * @return the lock status of MCRSessionMgr, defaults to <code>true</code> on new Threads
      */
     public static boolean isLocked() {
-        return isSessionCreationLocked.get();
+        return threadLocalIsSessionCreationLocked.get();
     }
 
     /**
@@ -235,8 +238,8 @@ public class MCRSessionMgr {
                 session.close();
             }
             LogManager.getLogger(MCRSessionMgr.class).info("Removing thread locals...");
-            isSessionAttached = null;
-            theThreadLocalSession = null;
+            threadLocalIsSessionAttached = null;
+            threadLocalSession = null;
             listeners.clear();
             LogManager.getLogger(MCRSessionMgr.class).info("...done.");
         });

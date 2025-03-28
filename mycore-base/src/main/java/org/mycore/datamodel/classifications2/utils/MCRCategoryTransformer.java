@@ -225,7 +225,7 @@ public class MCRCategoryTransformer {
                 }
             }
             if (!emptyLeaves) {
-                linkedMap = MCRCategLinkServiceFactory.obtainInstance().hasLinks(cl);
+                linkedMap = MCRCategLinkServiceFactory.obtainInstance().checkForLinks(cl);
             }
 
             root = new Element("items");

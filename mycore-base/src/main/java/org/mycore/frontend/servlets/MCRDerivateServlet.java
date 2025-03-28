@@ -72,7 +72,7 @@ public class MCRDerivateServlet extends MCRServlet {
                 response.sendRedirect(response.encodeRedirectURL(url));
                 return;
             }
-            toReferrer(request, response,
+            redirectToReferrer(request, response,
                 response.encodeRedirectURL(getServletBaseURL() + "MCRFileNodeServlet/" + derivateId + "/"));
         }
     }
