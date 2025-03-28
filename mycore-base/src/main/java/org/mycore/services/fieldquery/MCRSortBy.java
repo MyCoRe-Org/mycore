@@ -33,11 +33,10 @@ public class MCRSortBy {
     public static final boolean DESCENDING = false;
 
     /** The field to sort by */
-    private String fieldName;
+    private final String fieldName;
 
     /** Sort order of this field */
-    @SuppressWarnings("PMD.UnusedAssignment")
-    private boolean order = ASCENDING;
+    private final boolean order;
 
     /** 
      * Creates a new sort criteria

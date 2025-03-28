@@ -42,7 +42,7 @@ public class MCRDelayedRunnable implements Delayed, Runnable, MCRDecorator<Runna
 
     protected Runnable runnable;
 
-    private long startTimeInMs;
+    private final long startTimeInMs;
 
     private final String id;
 
