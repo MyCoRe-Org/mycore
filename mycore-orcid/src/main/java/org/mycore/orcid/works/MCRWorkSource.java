@@ -60,7 +60,7 @@ public final class MCRWorkSource {
      * the source's ID is our MCR.ORCID.OAuth.ClientID
      */
     public boolean isThisApplication() {
-        return MCROAuthClient.getInstance().getClientID().equals(sourceID);
+        return MCROAuthClient.obtainInstance().getClientID().equals(sourceID);
     }
 
     @Override

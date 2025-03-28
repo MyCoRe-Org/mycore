@@ -96,13 +96,13 @@ public class MCROAuthServlet extends MCRServlet {
 
     private void redirectToGetAuthorization(MCRServletJob job)
         throws URISyntaxException, IOException {
-        String url = MCROAuthClient.getInstance().getCodeRequestURL(redirectURL, scopes);
+        String url = MCROAuthClient.obtainInstance().getCodeRequestURL(redirectURL, scopes);
         job.getResponse().sendRedirect(url);
     }
 
     private MCRTokenResponse exchangeCodeForAccessToken(String code)
         throws JsonProcessingException, IOException {
-        MCRTokenRequest request = MCROAuthClient.getInstance().getTokenRequest();
+        MCRTokenRequest request = MCROAuthClient.obtainInstance().getTokenRequest();
         request.set("grant_type", "authorization_code");
         request.set("code", code);
         request.set("redirect_uri", redirectURL);

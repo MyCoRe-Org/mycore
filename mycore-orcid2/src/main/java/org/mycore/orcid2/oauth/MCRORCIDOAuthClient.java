@@ -20,7 +20,7 @@ package org.mycore.orcid2.oauth;
 
 import java.util.Objects;
 
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.annotation.MCRFactory;
 import org.mycore.orcid2.MCRORCIDConstants;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 
@@ -41,19 +41,13 @@ import jakarta.ws.rs.core.Response;
  */
 public final class MCRORCIDOAuthClient {
 
-    private static final String CONFIG_PREFIX = MCRORCIDConstants.CONFIG_PREFIX + "OAuth.";
-
-    /**
-     * Client id of the client.
-     */
-    public static final String CLIENT_ID = MCRConfiguration2.getStringOrThrow(CONFIG_PREFIX + "ClientID");
-
-    private static final String CLIENT_SECRET = MCRConfiguration2.getStringOrThrow(CONFIG_PREFIX + "ClientSecret");
+    private final Settings settings;
 
     private final WebTarget webTarget;
 
-    private MCRORCIDOAuthClient() {
-        webTarget = ClientBuilder.newClient().target(MCRORCIDConstants.ORCID_BASE_URL).path("oauth");
+    public MCRORCIDOAuthClient(Settings settings) {
+        this.settings = Objects.requireNonNull(settings, "Settings must not be null");
+        webTarget = ClientBuilder.newClient().target(settings.baseUrl).path("oauth");
     }
 
     /**
@@ -61,11 +55,20 @@ public final class MCRORCIDOAuthClient {
      *
      * @return client instance
      */
-    public static MCRORCIDOAuthClient getInstance() {
-        return LazyInstanceHelper.SINGLETON_INSTANCE;
+    @MCRFactory
+    public static MCRORCIDOAuthClient obtainInstance() {
+        return LazyInstanceHelper.SHARED_INSTANCE;
     }
 
-    /**
+    public static MCRORCIDOAuthClient createInstance() {
+        return new MCRORCIDOAuthClient(new Settings(
+            MCRORCIDConstants.ORCID_BASE_URL,
+            MCRORCIDConstants.ORCID_CLIENT_ID,
+            MCRORCIDConstants.ORCID_CLIENT_SECRET
+        ));
+    }
+
+     /**
      * Revokes given bearer access token.
      *
      * @param token revoke token
@@ -73,8 +76,8 @@ public final class MCRORCIDOAuthClient {
      */
     public void revokeToken(String token) {
         Form form = new Form();
-        form.param("client_id", CLIENT_ID);
-        form.param("client_secret", CLIENT_SECRET);
+        form.param("client_id", settings.clientId);
+        form.param("client_secret", settings.clientSecret);
         form.param("token", token);
         final Response response = webTarget.path("revoke").request().post(Entity.form(form));
         if (!Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.SUCCESSFUL)) {
@@ -93,8 +96,8 @@ public final class MCRORCIDOAuthClient {
      */
     public MCRORCIDOAuthAccessTokenResponse exchangeCode(String code, String redirectURI) {
         Form form = new Form();
-        form.param("client_id", CLIENT_ID);
-        form.param("client_secret", CLIENT_SECRET);
+        form.param("client_id", settings.clientId);
+        form.param("client_secret", settings.clientSecret);
         form.param("grant_type", "authorization_code");
         form.param("code", code);
         form.param("redirect_uri", redirectURI);
@@ -109,7 +112,21 @@ public final class MCRORCIDOAuthClient {
         throw new MCRORCIDRequestException(response);
     }
 
-    private static final class LazyInstanceHelper {
-        static final MCRORCIDOAuthClient SINGLETON_INSTANCE = new MCRORCIDOAuthClient();
+    public record Settings(
+        String baseUrl,
+        String clientId,
+        String clientSecret) {
+
+        public Settings {
+            Objects.requireNonNull(baseUrl, "Base URL must not be null");
+            Objects.requireNonNull(clientId, "Client ID must not be null");
+            Objects.requireNonNull(clientSecret, "Client secret must not be null");
+        }
+
     }
+
+    private static final class LazyInstanceHelper {
+        static final MCRORCIDOAuthClient SHARED_INSTANCE = createInstance();
+    }
+
 }
