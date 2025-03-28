@@ -72,10 +72,9 @@ public class MCROCFLRegexCommands {
      */
 
     // Purge
-    @SuppressWarnings("MixedMutabilityReturnType")
+    @SuppressWarnings({"MixedMutabilityReturnType", "PMD.UnusedAssignment"})
     @MCRCommand(syntax = "purge all ocfl entries matching {0}",
         help = "Purge all ocfl entries that match the given regex, use .* for all")
-    @SuppressWarnings("PMD.UnusedAssignment")
     public static List<String> purgeMatchAll(String regex) {
         if (!confirmPurge) {
             logConfirm("entries");
