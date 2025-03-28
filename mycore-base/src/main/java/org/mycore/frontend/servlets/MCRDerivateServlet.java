@@ -175,16 +175,14 @@ public class MCRDerivateServlet extends MCRServlet {
             return;
         }
 
-        boolean updateMainFile = false;
         MCRObjectID derivateId = MCRObjectID.getInstance(derivateIdStr);
-
-        // check if the main file is moved, need to be done before the move,
-        // because the main file gets lost after the move.
-        updateMainFile = isMainFileUpdateRequired(pathFrom, derivateId);
 
         // this should always be a MCRPath, if not then ClassCastException is okay
         MCRPath resultingFile = (MCRPath) Files.move(pathFrom, pathTo);
 
+        // check if the main file is moved, need to be done before the move,
+        // because the main file gets lost after the move.
+        boolean updateMainFile = isMainFileUpdateRequired(pathFrom, derivateId);
         if (updateMainFile) {
             setMainFile(derivateId, resultingFile);
         }

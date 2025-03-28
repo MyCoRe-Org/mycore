@@ -34,6 +34,7 @@ import java.util.stream.Stream;
  */
 public record MCRURLQueryParameter(String name, String value) {
 
+    @SuppressWarnings("PMD.UnusedAssignment")
     public MCRURLQueryParameter {
         name = (name == null ? "" : name);
         value = (value == null ? "" : value);

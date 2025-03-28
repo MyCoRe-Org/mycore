@@ -197,6 +197,7 @@ public class MCRServlet extends HttpServlet {
         doGetPost(job);
     }
 
+    @SuppressWarnings("PMD.UnusedAssignment")
     public static MCRSession getSession(HttpServletRequest req) {
         boolean reusedSession = req.isRequestedSessionIdValid();
         HttpSession theSession = req.getSession(true);
@@ -559,8 +560,7 @@ public class MCRServlet extends HttpServlet {
             }
 
             String name = (String) e.nextElement();
-            String value = null;
-            value = URLEncoder.encode(parameters.getProperty(name), StandardCharsets.UTF_8);
+            String value = URLEncoder.encode(parameters.getProperty(name), StandardCharsets.UTF_8);
 
             redirectURL.append(name).append('=').append(value);
         }

@@ -36,6 +36,7 @@ public class MCRSortBy {
     private String fieldName;
 
     /** Sort order of this field */
+    @SuppressWarnings("PMD.UnusedAssignment")
     private boolean order = ASCENDING;
 
     /** 

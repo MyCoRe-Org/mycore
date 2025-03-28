@@ -66,6 +66,7 @@ public final class MCRPathXML {
     /**
      * Sends the contents of an MCRDirectory as XML data to the client
      */
+    @SuppressWarnings("PMD.UnusedAssignment")
     public static Document getDirectoryXML(MCRPath path, BasicFileAttributes attr) throws IOException {
         LOGGER.debug("MCRDirectoryXML: start listing of directory {}", path);
 
