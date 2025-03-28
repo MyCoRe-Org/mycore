@@ -139,7 +139,7 @@ public final class MCRORCIDClientFactory {
     }
 
     private MCRORCIDReadClient initReadClient() {
-        MCRORCIDReadClientImpl client = null;
+        MCRORCIDReadClientImpl client;
         if (checkMemberMode()) {
             if (READ_PUBLIC_TOKEN == null) {
                 throw new MCRORCIDException("MCR.ORCID2.Client.ReadPublicToken is not set");

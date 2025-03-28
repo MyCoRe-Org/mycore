@@ -106,7 +106,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         help = "Starts the login dialog for the user {0}.",
         order = 20)
     public static void login(String user) {
-        char[] password = {};
+        char[] password;
         do {
             password = System.console().readPassword("{0} Enter password for user {1} :> ", SYSTEM, user);
         } while (password.length == 0);

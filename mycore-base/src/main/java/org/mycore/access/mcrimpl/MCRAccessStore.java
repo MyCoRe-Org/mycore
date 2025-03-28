@@ -75,7 +75,6 @@ public abstract class MCRAccessStore {
      */
     public abstract Collection<String> getDistinctStringIDs();
 
-
     /**
      * @deprecated Use {@link #obtainInstance()} instead
      */
@@ -114,7 +113,6 @@ public abstract class MCRAccessStore {
 
             Collection<MCRAccessDefinition> ret = new ArrayList<>();
             Collection<String> elements;
-            MCRAccessDefinition def = null;
 
             if (MCRConfiguration2.getOrThrow("MCR.Metadata.Type." + type, Boolean::parseBoolean)) {
                 elements = MCRXMLMetadataManager.getInstance().listIDsOfType(type);
@@ -123,7 +121,7 @@ public abstract class MCRAccessStore {
             }
 
             for (String element : elements) {
-                def = new MCRAccessDefinition();
+                MCRAccessDefinition def = new MCRAccessDefinition();
                 def.setObjID(element);
                 for (String pool : pools) {
                     Collection<String> l = sqlDefinition.get(pool);

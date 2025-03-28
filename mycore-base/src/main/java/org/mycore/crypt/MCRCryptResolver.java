@@ -71,24 +71,18 @@ public class MCRCryptResolver implements URIResolver {
         String cipherID = parts[2];
         String value = parts[3];
 
-        String returnString;
+        final Element root = new Element("value");
+        root.setText(action.equals(ENCRYPT_ACTION) ? "" : value);
         try {
             MCRCipher cipher = MCRCipherManager.getCipher(cipherID);
-            returnString = action.equals(ENCRYPT_ACTION) ? cipher.encrypt(value) : cipher.decrypt(value);
+            root.setText(action.equals(ENCRYPT_ACTION) ? cipher.encrypt(value) : cipher.decrypt(value));
         } catch (MCRCryptKeyFileNotFoundException e) {
             LOGGER.error(e::getMessage, e);
-            returnString = action.equals(ENCRYPT_ACTION) ? "" : value;
         } catch (MCRCryptKeyNoPermissionException e) {
             LOGGER.info(() -> "No permission to read cryptkey" + cipherID + ".");
-            returnString = action.equals(ENCRYPT_ACTION) ? "" : value;
         } catch (MCRCryptCipherConfigurationException e) {
             LOGGER.error("Invalid configuration or key.", e);
-            returnString = action.equals(ENCRYPT_ACTION) ? "" : value;
         }
-
-        final Element root = new Element("value");
-        root.setText(returnString);
-
         return new JDOMSource(root);
     }
 

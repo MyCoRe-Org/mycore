@@ -65,9 +65,8 @@ public class MCRFunctionResolver implements URIResolver {
             Class[] types = new Class[params.length];
             Arrays.fill(types, String.class);
 
-            Object result = null;
             Method method = MCRClassTools.forName(className).getMethod(methodName, types);
-            result = method.invoke(null, params);
+            Object result = method.invoke(null, params);
 
             Element string = new Element("string");
             string.setText(result == null ? "" : String.valueOf(result));

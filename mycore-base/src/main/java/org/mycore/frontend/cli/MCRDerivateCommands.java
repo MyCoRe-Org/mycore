@@ -666,16 +666,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         /* set link to derivate in the new parent */
         MCRObject oldOwner = MCRMetadataManager.retrieveMCRObject(oldOwnerId);
-        List<MCRMetaEnrichedLinkID> derivates = oldOwner.getStructure().getDerivates();
-        MCRMetaLinkID oldObjectToDerivateLink = null;
-        for (MCRMetaLinkID derivate : derivates) {
-            if (derivate.getXLinkHrefID().equals(derID)) {
-                oldObjectToDerivateLink = derivate;
-            }
-        }
-        if (oldObjectToDerivateLink == null) {
-            oldObjectToDerivateLink = new MCRMetaLinkID();
-        }
+
         LOGGER.info("Linking derivate {} to {}", derID, objID);
         MCRMetaEnrichedLinkID derivateLink = MCRMetaEnrichedLinkIDFactory.obtainInstance().getDerivateLink(derObj);
         MCRMetadataManager.addOrUpdateDerivateToObject(objID, derivateLink, derObj.isImportMode());

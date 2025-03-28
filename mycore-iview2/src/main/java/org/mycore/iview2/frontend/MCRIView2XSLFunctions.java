@@ -64,8 +64,7 @@ public class MCRIView2XSLFunctions {
      *         null if there are no derivates related to the given mcrid
      */
     public static String getSupportedMainFileByOwner(String mcrID) {
-        MCRObjectID objectID = null;
-
+        MCRObjectID objectID;
         try {
             objectID = MCRObjectID.getInstance(mcrID);
         } catch (Exception e) {
