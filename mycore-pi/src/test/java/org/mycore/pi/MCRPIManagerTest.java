@@ -18,7 +18,8 @@
 
 package org.mycore.pi;
 
-import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -61,6 +62,7 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
+        resetManagerInstance();
     }
 
     @Test
@@ -163,13 +165,13 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
         return mcrUuidUrnGenerator.generate(mcrObject, "");
     }
 
-    @Before
     public void resetManagerInstance() {
         try {
-            Field instance = MCRPIManager.class.getDeclaredField("instance");
-            instance.setAccessible(true);
-            instance.set(null, null);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+            MCRPIManager piManager = MCRPIManager.getInstance();
+            Method applyConfiguration = piManager.getClass().getDeclaredMethod("applyConfiguration");
+            applyConfiguration.setAccessible(true);
+            applyConfiguration.invoke(piManager);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             LOGGER.error(e.getMessage(), e);
         }
     }
