@@ -130,7 +130,7 @@ public class MCRDirectory extends MCRStoredNode {
      * Repairs additional metadata of this directory and all its children
      */
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("PMD.ExceptionAsFlowControl")
     void repairMetadata() throws IOException {
         writeData(e -> {
             e.setName("dir");

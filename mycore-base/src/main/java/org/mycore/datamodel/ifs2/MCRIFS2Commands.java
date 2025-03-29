@@ -124,6 +124,7 @@ public class MCRIFS2Commands extends MCRAbstractCommands {
             .collect(Collectors.toList());
     }
 
+    @SuppressWarnings("PMD.ExceptionAsFlowControl")
     @MCRCommand(syntax = "generate md5sum file {0} for ifs2 file store {1}",
         help = "writes md5sum file {0} for every file in MCRFileStore with ID {1}")
     public static void writeMD5SumFile(String targetFile, String ifsStoreId) throws IOException {
@@ -167,6 +168,7 @@ public class MCRIFS2Commands extends MCRAbstractCommands {
         }
     }
 
+    @SuppressWarnings("PMD.ExceptionAsFlowControl")
     private static Stream<FileInfo> getAllFiles(Path nodePath, Element node)
         throws IOException {
         Function<Element, String> getName = e -> e.getAttributeValue("name");
