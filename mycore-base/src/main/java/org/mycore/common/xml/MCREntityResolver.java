@@ -115,7 +115,7 @@ public final class MCREntityResolver implements EntityResolver2, LSResourceResol
                 return resolvedEntity(entity);
             }
         } catch (CatalogException e) {
-            LOGGER.debug(() -> e.getMessage());
+            LOGGER.debug(e::getMessage);
         }
         return alternative.apply(new CatalogEntityIdentifier(publicId, systemId));
     }

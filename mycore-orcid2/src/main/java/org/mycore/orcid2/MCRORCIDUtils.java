@@ -81,7 +81,7 @@ public class MCRORCIDUtils {
      * @return true if state is ready to publish or there is not state
      */
     public static boolean checkPublishState(MCRObject object) {
-        return getStateValue(object).map(s -> checkPublishState(s)).orElse(true);
+        return getStateValue(object).map(MCRORCIDUtils::checkPublishState).orElse(true);
     }
 
     /**
@@ -140,7 +140,7 @@ public class MCRORCIDUtils {
      */
     public static Element buildMODSCollection(List<Element> elements) {
         final Element modsCollection = new Element("modsCollection", MCRConstants.MODS_NAMESPACE);
-        elements.forEach(w -> modsCollection.addContent(w));
+        elements.forEach(modsCollection::addContent);
         return modsCollection;
     }
 
@@ -173,7 +173,7 @@ public class MCRORCIDUtils {
      */
     public static Set<MCRIdentifier> getNameIdentifiers(Element nameElement) {
         return nameElement.getChildren("nameIdentifier", MCRConstants.MODS_NAMESPACE).stream()
-            .map(e -> getIdentfierFromElement(e))
+            .map(MCRORCIDUtils::getIdentfierFromElement)
             .collect(Collectors.toSet());
     }
 
@@ -184,7 +184,7 @@ public class MCRORCIDUtils {
      * @return Set of MCRIdentifier
      */
     public static Set<MCRIdentifier> getNameIdentifiers(MCRMODSWrapper wrapper) {
-        return wrapper.getElements("mods:nameIdentifier").stream().map(e -> getIdentfierFromElement(e))
+        return wrapper.getElements("mods:nameIdentifier").stream().map(MCRORCIDUtils::getIdentfierFromElement)
             .collect(Collectors.toSet());
     }
 
