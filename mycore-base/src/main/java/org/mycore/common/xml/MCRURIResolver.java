@@ -156,7 +156,7 @@ public final class MCRURIResolver implements URIResolver {
             LOGGER.error("Unable to initialize MCRURIResolver", exc);
         }
     }
-    
+
     /**
      * @deprecated Use {@link MCRURIResolver#reinitialize()} instead
      */
@@ -198,7 +198,7 @@ public final class MCRURIResolver implements URIResolver {
     public static MCRURIResolver obtainInstance() {
         return SHARED_INSTANCE;
     }
-    
+
     /**
      * Initializes the MCRURIResolver for servlet applications.
      *
@@ -579,12 +579,11 @@ public final class MCRURIResolver implements URIResolver {
                 URL resource = MCRResourceHelper.getWebResourceUrl(path);
                 if (resource != null) {
                     return new StreamSource(resource.toURI().toASCIIString());
-                } else {
-                    throw new TransformerException("Could not find web resource: " + path);
                 }
             } catch (Exception ex) {
                 throw new TransformerException("Could not load web resource: " + path, ex);
             }
+            throw new TransformerException("Could not find web resource: " + path);
         }
     }
 

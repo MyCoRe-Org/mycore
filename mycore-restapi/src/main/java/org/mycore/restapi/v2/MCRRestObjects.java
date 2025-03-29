@@ -488,6 +488,7 @@ public class MCRRestObjects {
         return getThumbnail(id, defaultSize, ext);
     }
 
+    @SuppressWarnings("PMD.ExceptionAsFlowControl")
     private Response getThumbnail(String id, int size, String ext) {
         List<MCRPath> mainDocs = MCRMetadataManager.getDerivateIds(MCRObjectID.getInstance(id), 1, TimeUnit.MINUTES)
             .stream()

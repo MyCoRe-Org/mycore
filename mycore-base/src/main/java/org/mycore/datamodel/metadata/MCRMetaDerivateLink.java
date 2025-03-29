@@ -167,19 +167,19 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
     @Override
     public void validate() throws MCRException {
         super.validate();
+
+        MCRPath linkedFile;
         try {
-            MCRPath linkedFile = getLinkedFile();
-
-            if (linkedFile == null) {
-                throw new MCRException(getSubTag() + ": linked file is null");
-            }
-
-            if (!Files.exists(linkedFile)) {
-                LOGGER.warn("{}: File not found: {}", this::getSubTag, () -> super.href);
-            }
-
+            linkedFile = getLinkedFile();
         } catch (Exception exc) {
             throw new MCRException(getSubTag() + ": Error while getting linked file " + super.href, exc);
+        }
+
+        if (linkedFile == null) {
+            throw new MCRException(getSubTag() + ": linked file is null");
+        }
+        if (!Files.exists(linkedFile)) {
+            LOGGER.warn("{}: File not found: {}", this::getSubTag, () -> super.href);
         }
     }
 

@@ -128,7 +128,9 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
             if (configFile != null) {
                 content.sendTo(configFile);
             } else {
-                throw new IOException("MCRConfigurationDir is not available!");
+                LOGGER.error(() -> "MCRConfigurationDir is not availabel to write file + " + RESOLVED_RULES_FILE_NAME);
+                LOGGER.info(() -> "Rules file is: \n"
+                    + new XMLOutputter(Format.getPrettyFormat()).outputString(eRules));
             }
         } catch (IOException e) {
             LOGGER.error(() -> "Could not write file '" + RESOLVED_RULES_FILE_NAME + "' to config directory", e);

@@ -36,7 +36,9 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 public class MCRPIXPathMetadataService extends MCRPIMetadataService<MCRPersistentIdentifier> {
+
     @Override
+    @SuppressWarnings("PMD.ExceptionAsFlowControl")
     public void insertIdentifier(MCRPersistentIdentifier identifier, MCRBase obj, String additional) {
         String xpath = getProperties().get("Xpath");
         Document xml = obj.createXML();

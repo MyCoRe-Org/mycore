@@ -150,10 +150,7 @@
   </rule>
   -->
   <rule ref="category/java/design.xml/DoNotExtendJavaLangError"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/design.xml/ExceptionAsFlowControl"/>
-  -->
   <rule ref="category/java/design.xml/ExcessiveParameterList"/>
   <rule ref="category/java/design.xml/FinalFieldCouldBeStatic"/>
   <rule ref="category/java/design.xml/InvalidJavaBean"/>

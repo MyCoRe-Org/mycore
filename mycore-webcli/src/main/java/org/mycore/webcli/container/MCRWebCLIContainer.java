@@ -325,6 +325,7 @@ public class MCRWebCLIContainer {
          *
          * @return true if command processed successfully
          */
+        @SuppressWarnings("PMD.ExceptionAsFlowControl")
         private boolean processCommand(String command) {
             if (command.trim().startsWith("#")) {
                 // ignore comment

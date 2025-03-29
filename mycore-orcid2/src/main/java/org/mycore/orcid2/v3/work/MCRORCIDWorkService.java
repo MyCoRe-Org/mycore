@@ -82,6 +82,7 @@ public class MCRORCIDWorkService {
      * @param object the MCRObject
      * @throws MCRORCIDException if cannot create work, transformation fails or cannot update flags
      */
+    @SuppressWarnings("PMD.ExceptionAsFlowControl")
     public void createWork(MCRObject object) {
         if (!MCRORCIDUtils.checkPublishState(object)) {
             throw new MCRORCIDException("Object has wrong state");

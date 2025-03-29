@@ -19,7 +19,6 @@
 package org.mycore.datamodel.common;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -221,13 +220,14 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
     private void checkPath(Path path, String type) {
         if (!Files.exists(path)) {
             try {
-                if (!Files.exists(Files.createDirectories(path))) {
-                    throw new MCRConfigurationException(
-                        "The metadata store " + type + " directory " + path.toAbsolutePath() + " does not exist.");
-                }
+                Files.createDirectories(path);
             } catch (Exception ex) {
                 String msg = "Exception while creating metadata store " + type + " directory " + path.toAbsolutePath();
                 throw new MCRConfigurationException(msg, ex);
+            }
+            if (!Files.exists(path)) {
+                throw new MCRConfigurationException(
+                    "The metadata store " + type + " directory " + path.toAbsolutePath() + " does not exist.");
             }
         } else {
             if (!Files.isDirectory(path)) {
@@ -358,8 +358,8 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         }
         MCRConfiguration2.set(configPrefix + "BaseDir", typePath.toAbsolutePath().toString());
         MCRConfiguration2.set(configPrefix + "ForceXML", String.valueOf(true));
-        String value = Objects.equals(objectType, MCRDerivate.OBJECT_TYPE) ?
-                       MCRDerivate.ROOT_NAME : MCRObject.ROOT_NAME;
+        String value =
+            Objects.equals(objectType, MCRDerivate.OBJECT_TYPE) ? MCRDerivate.ROOT_NAME : MCRObject.ROOT_NAME;
         MCRConfiguration2.set(configPrefix + "ForceDocType", value);
         createdStores.add(baseID);
         MCRStoreManager.createStore(baseID, clazz);
@@ -377,15 +377,20 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
                 path.toAbsolutePath(), project, objectType, configPrefix));
         }
         try {
-            if (!Files.exists(Files.createDirectories(path))) {
-                throw new FileNotFoundException(path.toAbsolutePath() + " does not exists.");
-            }
+            Files.createDirectories(path);
         } catch (Exception e) {
             throw new MCRPersistenceException(String.format(Locale.ENGLISH,
                 "Couldn'e create directory ''%s'' to set up store for project ''%s'' and objectType ''%s'' "
                     + "and config prefix ''%s''",
                 path.toAbsolutePath(), project, objectType, configPrefix), e);
         }
+        if (!Files.exists(path)) {
+            throw new MCRPersistenceException(String.format(Locale.ENGLISH,
+                "Path does not exists ''%s'' to set up store for project ''%s'' and objectType ''%s'' "
+                    + "and config prefix ''%s''",
+                path.toAbsolutePath(), project, objectType, configPrefix));
+        }
+
     }
 
     private String getStoryKey(String project, String objectType) {

@@ -80,6 +80,7 @@ public final class MCRFileUploadBucket implements MCRSessionListener, MCRShutdow
         return BUCKET_MAP.get(bucketID);
     }
 
+    @SuppressWarnings("PMD.ExceptionAsFlowControl")
     public static synchronized MCRFileUploadBucket createBucket(String bucketID,
         Map<String, List<String>> parameters,
         MCRUploadHandler uploadHandler) throws MCRUploadServerException {
