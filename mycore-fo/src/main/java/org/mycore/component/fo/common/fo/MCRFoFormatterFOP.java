@@ -130,6 +130,7 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
                                 hyphPatMap.put(lang, file);
                             }
                         } catch (Exception e) {
+                            // exception expected and safely ignored
                         }
                     });
                     fopFactoryBuilder.setHyphPatNames(hyphPatMap);
