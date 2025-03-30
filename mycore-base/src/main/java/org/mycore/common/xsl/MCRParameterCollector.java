@@ -386,6 +386,26 @@ public class MCRParameterCollector {
         return hashCode;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        MCRParameterCollector other = (MCRParameterCollector) obj;
+        return hashCode == other.hashCode
+            && modified == other.modified
+            && onlySetXSLParameters == other.onlySetXSLParameters
+            && setPropertiesFromConfiguration == other.setPropertiesFromConfiguration
+            && Objects.equals(parameters, other.parameters);
+
+    }
+
     private static final class SavePropertiesCacheHolder {
         private final static AtomicInteger COMPUTED_HASH_CODE = new AtomicInteger(0);
         private final static AtomicReference<UUID> PROPERTIES_CHANGE_LISTENER_ID = new AtomicReference<>();
@@ -452,7 +472,7 @@ public class MCRParameterCollector {
             return builder.toString();
         }
 
-        public static int getSafePropertiesHashCode() {
+        public static int hashCodeOfProps() {
             return COMPUTED_HASH_CODE.get();
         }
     }

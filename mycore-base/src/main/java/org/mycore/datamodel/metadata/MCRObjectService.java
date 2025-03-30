@@ -1279,4 +1279,29 @@ public class MCRObjectService {
         classifications.removeIf(c -> StringUtils.equals(lType, c.getType()));
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(classifications, dates, flags, messages, rules, state);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final MCRObjectService other = (MCRObjectService) obj;
+        return Objects.equals(classifications, other.classifications)
+            && Objects.equals(dates, other.dates)
+            && Objects.equals(flags, other.flags)
+            && Objects.equals(messages, other.messages)
+            && Objects.equals(rules, other.rules)
+            && Objects.equals(state, other.state);
+    }
+
 }

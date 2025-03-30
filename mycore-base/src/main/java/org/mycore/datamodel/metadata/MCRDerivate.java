@@ -23,6 +23,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
@@ -272,5 +273,29 @@ public final class MCRDerivate extends MCRBase {
             base.addProperty("label", mcrLabel);
         }
         return base;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + Objects.hash(mcrDerivate, mcrLabel, order);
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        MCRDerivate other = (MCRDerivate) obj;
+        return Objects.equals(mcrDerivate, other.mcrDerivate) && Objects.equals(mcrLabel, other.mcrLabel)
+            && order == other.order;
     }
 }

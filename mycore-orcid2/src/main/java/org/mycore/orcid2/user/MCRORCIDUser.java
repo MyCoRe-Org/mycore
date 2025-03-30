@@ -289,6 +289,11 @@ public class MCRORCIDUser {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(user);
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -299,7 +304,7 @@ public class MCRORCIDUser {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        MCRORCIDUser other = (MCRORCIDUser) obj;
+        final MCRORCIDUser other = (MCRORCIDUser) obj;
         return Objects.equals(user, other.user);
     }
 

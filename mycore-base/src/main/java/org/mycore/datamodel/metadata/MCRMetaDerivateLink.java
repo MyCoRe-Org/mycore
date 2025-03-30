@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -190,5 +191,28 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
         clone.map = new HashMap<>(this.map);
 
         return clone;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + Objects.hash(map);
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final MCRMetaDerivateLink other = (MCRMetaDerivateLink) obj;
+        return Objects.equals(map, other.map);
     }
 }

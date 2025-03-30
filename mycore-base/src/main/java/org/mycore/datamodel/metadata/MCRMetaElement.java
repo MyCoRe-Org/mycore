@@ -21,6 +21,7 @@ package org.mycore.datamodel.metadata;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
@@ -225,7 +226,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     public final int size() {
         return list.size();
     }
-    
+
     /**
      * returns true if there are no elements in this instance.
      *
@@ -494,6 +495,28 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     @Override
     public Iterator<MCRMetaInterface> iterator() {
         return list.iterator();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getClassName(), heritable, list, notinherit, tag);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final MCRMetaElement other = (MCRMetaElement) obj;
+        return Objects.equals(getClassName(), other.getClassName())
+            && heritable == other.heritable && notinherit == other.notinherit
+            && Objects.equals(tag, other.tag) && Objects.equals(list, other.list);
     }
 
 }

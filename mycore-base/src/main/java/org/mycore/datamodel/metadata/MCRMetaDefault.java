@@ -441,13 +441,19 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
         if (this == obj) {
             return true;
         }
-        if (obj == null || getClass() != obj.getClass()) {
+        if (!super.equals(obj)) {
             return false;
         }
-        MCRMetaDefault other = (MCRMetaDefault) obj;
-        return Objects.equals(datapart, other.datapart) && Objects.equals(inherited, other.inherited)
-            && Objects.equals(lang, other.lang) && Objects.equals(subtag, other.subtag)
-            && Objects.equals(type, other.type) && Objects.equals(sequence, other.sequence);
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final MCRMetaDefault other = (MCRMetaDefault) obj;
+        return Objects.equals(datapart, other.datapart)
+            && Objects.equals(inherited, other.inherited)
+            && Objects.equals(lang, other.lang)
+            && Objects.equals(subtag, other.subtag)
+            && Objects.equals(type, other.type)
+            && Objects.equals(sequence, other.sequence);
     }
 
     /**

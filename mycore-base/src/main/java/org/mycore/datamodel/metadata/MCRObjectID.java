@@ -317,18 +317,15 @@ public final class MCRObjectID implements Comparable<MCRObjectID>, Serializable 
         return this == in || (in != null && toString().equals(in.toString()));
     }
 
-    /**
-     * This method check this data again the input and retuns the result as
-     * boolean.
-     *
-     * @param in
-     *            the MCRObjectID to check
-     * @return true if all parts are equal, else return false.
-     * @see java.lang.Object#equals(Object)
-     */
     @Override
-    public boolean equals(Object in) {
-        if (in instanceof MCRObjectID objectID) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (obj instanceof MCRObjectID objectID) {
             return equals(objectID);
         }
         return false;

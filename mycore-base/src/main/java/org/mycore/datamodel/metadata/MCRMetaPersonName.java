@@ -390,19 +390,36 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
         }
     }
 
-    /**
-     * This method compares this instance with a MCRMetaPersonName object
-     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result
+            + Objects.hash(academic, affix, callname, firstname, fullname, numeration, peerage, prefix, surname, title);
+        return result;
+    }
+
     @Override
     public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
         if (!super.equals(obj)) {
             return false;
         }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
         final MCRMetaPersonName other = (MCRMetaPersonName) obj;
-        return Objects.equals(this.firstname, other.firstname) && Objects.equals(this.callname, other.callname) &&
-            Objects.equals(this.surname, other.surname) && Objects.equals(this.fullname, other.fullname) &&
-            Objects.equals(this.academic, other.academic) && Objects.equals(this.peerage, other.peerage) &&
-            Objects.equals(this.numeration, other.numeration) && Objects.equals(this.title, other.title) &&
-            Objects.equals(this.prefix, other.prefix) && Objects.equals(this.affix, other.affix);
+        return Objects.equals(academic, other.academic)
+            && Objects.equals(affix, other.affix)
+            && Objects.equals(callname, other.callname)
+            && Objects.equals(firstname, other.firstname)
+            && Objects.equals(fullname, other.fullname)
+            && Objects.equals(numeration, other.numeration)
+            && Objects.equals(peerage, other.peerage)
+            && Objects.equals(prefix, other.prefix)
+            && Objects.equals(surname, other.surname)
+            && Objects.equals(title, other.title);
     }
 }

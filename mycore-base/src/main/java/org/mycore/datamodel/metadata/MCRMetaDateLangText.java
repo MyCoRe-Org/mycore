@@ -185,20 +185,27 @@ public class MCRMetaDateLangText extends MCRMetaLangText {
         return clone;
     }
 
-    /**
-     * Check the equivalence between this instance and the given object.
-     *
-     * @param obj the MCRMetaDateLangText object
-     * @return true if its equal
-     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + Objects.hash(isoDate);
+        return result;
+    }
+
     @Override
     public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
         if (!super.equals(obj)) {
             return false;
         }
-        final MCRMetaDateLangText other = (MCRMetaDateLangText) obj;
-        return Objects.equals(this.text, other.text) && Objects.equals(this.form, other.form)
-            && Objects.equals(this.isoDate, other.isoDate);
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        MCRMetaDateLangText other = (MCRMetaDateLangText) obj;
+        return Objects.equals(isoDate, other.isoDate);
     }
 
 }
