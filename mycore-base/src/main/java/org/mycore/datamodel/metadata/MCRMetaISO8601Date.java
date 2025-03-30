@@ -253,12 +253,28 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + Objects.hash(changed, export, isoDate);
+        return result;
+    }
+
+    @Override
     public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
         if (!super.equals(obj)) {
             return false;
         }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
         final MCRMetaISO8601Date other = (MCRMetaISO8601Date) obj;
-        return Objects.equals(this.isoDate, other.isoDate);
+        return changed == other.changed
+            && Objects.equals(export, other.export)
+            && Objects.equals(isoDate, other.isoDate);
     }
 
 }

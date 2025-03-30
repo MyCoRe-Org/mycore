@@ -20,6 +20,7 @@ package org.mycore.datamodel.metadata;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -327,6 +328,31 @@ public final class MCRObject extends MCRBase {
                 }
             }
         }
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + Objects.hash(mcrLabel, metadata, structure);
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final MCRObject other = (MCRObject) obj;
+        return Objects.equals(mcrLabel, other.mcrLabel)
+            && Objects.equals(metadata, other.metadata)
+            && Objects.equals(structure, other.structure);
     }
 
 }

@@ -271,7 +271,15 @@ public class MCRISO8601Date {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(dateTimeFormatter, dt, isoFormat);
+    }
+
+    @Override
     public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
         if (obj == null) {
             return false;
         }
@@ -279,7 +287,9 @@ public class MCRISO8601Date {
             return false;
         }
         final MCRISO8601Date other = (MCRISO8601Date) obj;
-        return Objects.equals(this.dt, other.dt);
+        return Objects.equals(dateTimeFormatter, other.dateTimeFormatter)
+            && Objects.equals(dt, other.dt)
+            && isoFormat == other.isoFormat;
     }
 
 }

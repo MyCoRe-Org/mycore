@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.jdom2.Element;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -140,5 +141,28 @@ public class MCRFileMetadata implements Comparable<MCRFileMetadata> {
     @Override
     public int compareTo(MCRFileMetadata o) {
         return this.name.compareTo(o.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(categories, handle, name, urn);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final MCRFileMetadata other = (MCRFileMetadata) obj;
+        return Objects.equals(categories, other.categories)
+            && Objects.equals(handle, other.handle)
+            && Objects.equals(name, other.name)
+            && Objects.equals(urn, other.urn);
     }
 }

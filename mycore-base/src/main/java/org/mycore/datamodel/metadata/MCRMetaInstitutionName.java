@@ -246,12 +246,27 @@ public final class MCRMetaInstitutionName extends MCRMetaDefault {
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + Objects.hash(fullname, nickname, property);
+        return result;
+    }
+
+    @Override
     public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
         if (!super.equals(obj)) {
             return false;
         }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
         final MCRMetaInstitutionName other = (MCRMetaInstitutionName) obj;
-        return Objects.equals(fullname, other.fullname) && Objects.equals(nickname, other.nickname)
+        return Objects.equals(fullname, other.fullname)
+            && Objects.equals(nickname, other.nickname)
             && Objects.equals(property, other.property);
     }
 
