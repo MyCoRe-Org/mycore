@@ -440,7 +440,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      * checks if two metadata objects are equal
      * 
      * This method should not call super.equals(obj)
-     * to avoid identity check `this == obj`.
+     * to avoid identity check <code>this == obj</code>.
      *  
      * 
      */
