@@ -238,8 +238,7 @@ public final class MCRImageTiler implements Runnable, Closeable {
                 activeThreads.incrementAndGet();
             }
         };
-        MCRProcessableExecutor processableExecutor = MCRProcessableFactory.newPool(baseExecutor, imageTilerCollection);
-        return processableExecutor;
+        return MCRProcessableFactory.newPool(baseExecutor, imageTilerCollection);
     }
 
     private MCRTilingAction getTilingAction(MCRTileJob job) {

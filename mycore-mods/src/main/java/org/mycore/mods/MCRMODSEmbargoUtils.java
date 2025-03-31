@@ -144,8 +144,7 @@ public class MCRMODSEmbargoUtils {
         try {
             final Optional<LocalDate> ed = parseEmbargo(embargoDate);
             final LocalDate now = Instant.now().atZone(ZoneId.systemDefault()).toLocalDate();
-            final boolean bool = ed.map(ded -> ded.isAfter(now)).orElseGet(() -> false);
-            return bool;
+            return ed.map(ded -> ded.isAfter(now)).orElse(false);
         } catch (DateTimeException ex) {
             return embargoDate.compareTo(MCRISO8601Date.now().getISOString()) > 0;
         }

@@ -44,10 +44,6 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRStoreManager;
-import org.mycore.frontend.classeditor.MCRCategoryIDTypeAdapter;
-import org.mycore.frontend.classeditor.MCRCategoryListTypeAdapter;
-import org.mycore.frontend.classeditor.MCRCategoryTypeAdapter;
-import org.mycore.frontend.classeditor.MCRLabelSetTypeAdapter;
 import org.mycore.frontend.classeditor.json.MCRJSONCategory;
 import org.mycore.frontend.classeditor.mocks.CategoryDAOMock;
 import org.mycore.frontend.classeditor.mocks.CategoryLinkServiceMock;
@@ -92,12 +88,6 @@ public class MCRClassificationEditorResourceTest extends MCRTestCase {
             MCRClassificationEditorResource.class,
             MCRSessionHookFilter.class,
             MultiPartFeature.class));
-
-        MCRJSONManager mg = MCRJSONManager.obtainInstance();
-        mg.registerAdapter(new MCRCategoryTypeAdapter());
-        mg.registerAdapter(new MCRCategoryIDTypeAdapter());
-        mg.registerAdapter(new MCRLabelSetTypeAdapter());
-        mg.registerAdapter(new MCRCategoryListTypeAdapter());
 
         try {
             MCRStoreManager.createStore("ClasseditorTempStore", MCRMetadataStore.class);

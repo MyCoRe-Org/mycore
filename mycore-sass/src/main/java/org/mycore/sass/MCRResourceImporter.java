@@ -102,8 +102,7 @@ public class MCRResourceImporter extends CustomImporter {
             return null;
         }
         String resourcePath = url.substring(SASS_URL_PREFIX.length());
-        URL configResource = getWebResourceUrl(resourcePath);
-        return configResource;
+        return getWebResourceUrl(resourcePath);
     }
 
     /**
