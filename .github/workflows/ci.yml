@@ -38,7 +38,7 @@ jobs:
         export FIREFOX_BIN=$(which firefox)
         export SELENIUM_BROWSER=firefox
 
-        mvn -B -Plocal-testing,!standard-with-extra-repos install -Dlog4j.configurationFile=$PWD/ci/log4j2.xml -T3
+        mvn -B -Plocal-testing,!standard-with-extra-repos install -Dlog4j.configurationFile=$PWD/ci/log4j2.xml -T2
         mvn -P!standard-with-extra-repos -B javadoc:javadoc -T1C
 
     - name: Upload logs on build failure
