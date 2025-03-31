@@ -12,17 +12,18 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up JDK
-      uses: actions/setup-java@v2
+      uses: actions/setup-java@v4
       with:
         java-version: 17
         distribution: temurin
+        cache: 'maven'
 
     - name: Fetch Geckodriver cache
       id: geckodriver-cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/geckodriver
         key: ${{ env.GECKODRIVER_VERSION }}
@@ -53,11 +54,6 @@ jobs:
         ~/geckodriver/geckodriver --version
         echo "${HOME}/geckodriver" >> $GITHUB_PATH
 
-    - name: Restore Maven cache
-      uses: skjolber/maven-cache-github-action@v3.1.1
-      with:
-        step: restore
-
     - name: Build
       run: |
         export $(dbus-launch)
@@ -80,8 +76,3 @@ jobs:
           ./**/screenshots
           ./**/*error*.log
           ./**/*test.log
-
-    - name: Save Maven cache
-      uses: skjolber/maven-cache-github-action@v3.1.1
-      with:
-        step: save
