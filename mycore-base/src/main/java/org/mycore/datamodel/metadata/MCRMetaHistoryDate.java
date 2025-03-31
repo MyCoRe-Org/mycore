@@ -531,7 +531,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + Objects.hash(bis, von, calendar, ibis, ivon, texts);
+        result = prime * result + Objects.hash(ivon, ibis, calendar, texts);
         return result;
     }
 
@@ -547,10 +547,8 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
             return false;
         }
         final MCRMetaHistoryDate other = (MCRMetaHistoryDate) obj;
-        return Objects.equals(bis, other.bis)
-            && Objects.equals(von, other.von)
+        return  ivon == other.ivon
             && ibis == other.ibis
-            && ivon == other.ivon
             && Objects.equals(calendar, other.calendar)
             && Objects.equals(texts, other.texts);
     }
