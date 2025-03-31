@@ -21,7 +21,7 @@ import router from './router';
 import ContactManager from '@/App.vue';
 import { createI18n } from 'vue-i18n';
 import { LangService } from '@mycore-test/js-common/i18n';
-import { appConfig, accessKeyConfig } from './common/config';
+import { appConfig, accessKeyConfig, I18N_PREFIX } from './common/config';
 import {
   UnauthorizedActionError,
   PermissionError,
@@ -32,7 +32,6 @@ if (import.meta.env.DEV) {
 }
 import '@mycore-org/vue-access-key-manager/dist/vue-access-key-manager.css';
 
-const I18N_PREFIX = 'component.acl.accesskey.*';
 const APP_ID = 'app';
 
 const setErrorHandler = (app: App): void => {
@@ -43,13 +42,12 @@ const setErrorHandler = (app: App): void => {
     } else if (error instanceof PermissionError) {
       router.push({ name: '403' });
     } else {
-      // TODO create error view
       router.push({ name: 'error' });
     }
   };
 };
 
-// TODO validate config
+// TODO validate config?
 const langService = new LangService(appConfig.baseUrl);
 
 const initApp = async () => {
@@ -58,6 +56,7 @@ const initApp = async () => {
       I18N_PREFIX,
       appConfig.currentLang
     );
+    // TODO load error messages
     const i18n = createI18n({
       legacy: false,
       locale: appConfig.currentLang,

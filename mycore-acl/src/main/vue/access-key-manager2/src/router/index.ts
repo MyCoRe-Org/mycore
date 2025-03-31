@@ -17,14 +17,10 @@
  */
 
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import { Error401View, Error403View } from '@mycore-org/vue-components';
-import ManagerEntry from '@/components/ManagerEntry.vue';
+import AdminView from '@/views/AdminView.vue';
+import ReferenceView from '@/views/ReferenceView.vue';
 import { appConfig } from '@/common/config';
-import {
-  PermissionError,
-  ResourceNotFoundError,
-  UnauthorizedActionError,
-} from '@mycore-test/js-common/utils/errors';
+import { errorRoutes } from '@mycore-org/vue-components';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -33,7 +29,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/admin/:reference?',
-    component: ManagerEntry,
+    component: AdminView,
     props: route => ({
       reference: route.params.reference || undefined,
       page: Number(route.query.page) || undefined,
@@ -42,7 +38,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/:reference',
-    component: ManagerEntry,
+    component: ReferenceView,
     props: route => ({
       reference: route.params.reference || undefined,
       permissions: route.query.availablePermissions
@@ -52,16 +48,7 @@ const routes: Array<RouteRecordRaw> = [
       pageSize: Number(route.query.pageSize) || undefined,
     }),
   },
-  {
-    path: '/401',
-    name: '401',
-    component: Error401View,
-  },
-  {
-    path: '/403',
-    name: '403',
-    component: Error403View,
-  },
+  ...errorRoutes,
 ];
 
 const getContext = (): string => {
@@ -76,17 +63,6 @@ const getContext = (): string => {
 const router = createRouter({
   history: createWebHistory(getContext()),
   routes,
-});
-
-router.onError(error => {
-  if (error instanceof PermissionError) {
-    console.log('permission error');
-  } else if (error instanceof UnauthorizedActionError) {
-    console.log('unauthorized');
-  } else if (error instanceof ResourceNotFoundError) {
-    console.log('resource not found');
-  }
-  console.log('blub', error);
 });
 
 export default router;

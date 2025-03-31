@@ -46,3 +46,5 @@ export const accessKeyConfig: AccessKeyConfig = {
       ','
     ),
 };
+
+export const I18N_PREFIX = 'component.acl.accesskey.*';
