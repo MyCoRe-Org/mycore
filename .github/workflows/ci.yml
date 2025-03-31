@@ -8,7 +8,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     steps:
     - name: Checkout
@@ -52,6 +52,14 @@ jobs:
 
         # Selenium wants to run non-ESR FF
         firefox --version
+
+        # Geckodriver
+        find ${GECKOWEBDRIVER}
+
+        # Chromedriver
+        find ${CHROMEWEBDRIVER}
+
+        echo $PATH
 
         ~/geckodriver/geckodriver --version
         echo "${HOME}/geckodriver" >> $GITHUB_PATH
