@@ -246,10 +246,10 @@ public class MCRMetaLinkID extends MCRMetaLink {
         if (this == obj) {
             return true;
         }
-        if (getClass() != obj.getClass()) {
+        if (!super.equals(obj)) {
             return false;
         }
-        if (!super.equals(obj)) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
         return true;
