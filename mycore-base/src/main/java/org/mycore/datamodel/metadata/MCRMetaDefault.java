@@ -436,13 +436,18 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
         return Objects.hash(datapart, inherited, lang, subtag, type, sequence);
     }
 
+    /**
+     * checks if two metadata objects are equal
+     * 
+     * This method should not call super.equals(obj)
+     * to avoid identity check `this == obj`.
+     *  
+     * 
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
         }
         if (getClass() != obj.getClass()) {
             return false;
