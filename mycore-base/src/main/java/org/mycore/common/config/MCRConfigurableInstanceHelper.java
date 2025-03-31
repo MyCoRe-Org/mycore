@@ -797,7 +797,7 @@ class MCRConfigurableInstanceHelper {
 
         private final MCRProperty annotation;
 
-        protected final String prefix;
+        private final String prefix;
 
         private AllPropertiesSource(MCRProperty annotation, String prefix) {
             this.annotation = annotation;
