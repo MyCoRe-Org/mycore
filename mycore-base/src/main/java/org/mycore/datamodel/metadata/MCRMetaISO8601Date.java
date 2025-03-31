@@ -262,13 +262,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
         if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
             return false;
         }
         final MCRMetaISO8601Date other = (MCRMetaISO8601Date) obj;
