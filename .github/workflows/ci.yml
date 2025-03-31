@@ -33,9 +33,8 @@ jobs:
 
     - name: Build
       run: |
-        export $(dbus-launch)
-        mkdir ~/tmp
-        export TMPDIR=~/tmp
+        mkdir ${{ runner.temp }}/${{ github.run_id }}.tmp
+        export TMPDIR=${{ runner.temp }}/${{ github.run_id }}.tmp
         export FIREFOX_BIN=$(which firefox)
         export SELENIUM_BROWSER=firefox
 
