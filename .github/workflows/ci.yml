@@ -35,20 +35,22 @@ jobs:
         curl -L https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz | \
           tar -C ~/geckodriver/ -xzvf-
 
+    - name: Install Firefox ESR
+      uses: browser-actions/setup-firefox@v1
+      with:
+        firefox-version: 'latest-esr'
+
+    - name: Install Chrome (stable)
+      uses: browser-actions/setup-chrome@v1
+      with:
+        chrome-version: 'stable'
+        install-chromedriver: true
+
     - name: Set up test dependencies
       run: |
-        # PPA by Mozilla for ESR releases
-        # replace 'sudo add-apt-repository ppa:mozillateam/ppa' with simple commands as workaround for https://github.com/orgs/community/discussions/69720
-        sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 0AB215679C571D1C8325275B9BDB3D89CE49EC21
-        sudo add-apt-repository "deb https://ppa.launchpadcontent.net/mozillateam/ppa/ubuntu/ focal main"
-
-        sudo apt update
-        sudo apt install firefox-esr chromium-browser chromium-chromedriver dbus-x11
+        sudo apt install dbus-x11
 
         # Selenium wants to run non-ESR FF
-        sudo rm -rf /usr/lib/firefox/
-        sudo ln -s firefox-esr /usr/lib/firefox
-        sudo ln -s firefox-esr /usr/lib/firefox/firefox
         firefox --version
 
         ~/geckodriver/geckodriver --version
@@ -59,7 +61,7 @@ jobs:
         export $(dbus-launch)
         mkdir ~/tmp
         export TMPDIR=~/tmp
-        export FIREFOX_BIN=$(which firefox-esr)
+        export FIREFOX_BIN=$(which firefox)
         export SELENIUM_BROWSER=firefox
 
         mvn -B -Plocal-testing,!standard-with-extra-repos clean install -Dlog4j.configurationFile=$PWD/ci/log4j2.xml -T2
