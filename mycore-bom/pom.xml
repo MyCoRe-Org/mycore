@@ -50,7 +50,7 @@
     <verapdf.version>1.24.2</verapdf.version>
     <vis-network.version>9.1.2</vis-network.version>
     <xalan.version>2.7.3</xalan.version>
-    <xsonify.version>1.0</xsonify.version>
+    <xsonify.version>1.1.1</xsonify.version>
   </properties>
 
   <dependencyManagement>
