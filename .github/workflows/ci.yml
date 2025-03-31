@@ -20,20 +20,15 @@ jobs:
         distribution: temurin
         cache: 'maven'
 
-    - name: Set up test dependencies
+    - name: Set up Browser
       run: |
-        firefox --version
-
         # Geckodriver
         echo ${GECKOWEBDRIVER} >> $GITHUB_PATH
 
         # Chromedriver
         echo ${CHROMEWEBDRIVER} >> $GITHUB_PATH
 
-        echo $PATH
-
-        cat /proc/cpuinfo
-
+        firefox --version
         ${GECKOWEBDRIVER}/geckodriver --version
 
     - name: Build
@@ -44,7 +39,7 @@ jobs:
         export FIREFOX_BIN=$(which firefox)
         export SELENIUM_BROWSER=firefox
 
-        mvn -B -Plocal-testing,!standard-with-extra-repos clean install -Dlog4j.configurationFile=$PWD/ci/log4j2.xml -T2
+        mvn -B -Plocal-testing,!standard-with-extra-repos verify -Dlog4j.configurationFile=$PWD/ci/log4j2.xml -T3
         mvn -P!standard-with-extra-repos -B javadoc:javadoc
 
     - name: Upload logs on build failure
