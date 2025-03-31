@@ -54,7 +54,7 @@ jobs:
         echo "${HOME}/geckodriver" >> $GITHUB_PATH
 
     - name: Restore Maven cache
-      uses: skjolber/maven-cache-github-action@v1
+      uses: skjolber/maven-cache-github-action@v3.1.1
       with:
         step: restore
 
@@ -82,6 +82,6 @@ jobs:
           ./**/*test.log
 
     - name: Save Maven cache
-      uses: skjolber/maven-cache-github-action@v1
+      uses: skjolber/maven-cache-github-action@v3.1.1
       with:
         step: save
