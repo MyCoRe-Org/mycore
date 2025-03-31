@@ -170,6 +170,44 @@ public class MCRModsItemDataProviderTest extends MCRTestCase {
         Assert.assertEquals("Pantent Inventor should author (given)", givenName, build2.getAuthor()[0].getGiven());
     }
 
+    @Test
+    public void testCollectionTitle() throws IOException, JDOMException {
+        final String testData = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<mycoreobject xmlns:xlink=\"http://www.w3.org/1999/xlink\" " +
+            "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" +
+            " xsi:noNamespaceSchemaLocation=\"datamodel-mods.xsd\" ID=\"bibthk_mods_00011370\">\n" +
+            "  <metadata>\n" +
+            "    <def.modsContainer class=\"MCRMetaXML\" heritable=\"false\" notinherit=\"true\">\n" +
+            "      <modsContainer inherited=\"0\">\n" +
+            "        <mods:mods xmlns:mods=\"http://www.loc.gov/mods/v3\">\n" +
+            "          <mods:typeOfResource>text</mods:typeOfResource>\n" +
+            "          <mods:titleInfo>\n" +
+            "            <mods:title>MILeS 2023</mods:title>\n" +
+            "            <mods:subTitle>Proceedings of the Third International Workshop on Multimodal Immersive Learning Systems</mods:subTitle>\n" +
+            "          </mods:titleInfo>\n" +
+            "          <mods:genre authorityURI=\"http://bibliografie.th-koeln.de/classifications/ubogenre\" valueURI=\"http://bibliografie.th-koeln.de/classifications/ubogenre#proceedings\" type=\"intern\" />\n" +
+            "          <mods:relatedItem xlink:href=\"bibthk_mods_00007211\" type=\"host\">\n" +
+            "            <mods:genre authorityURI=\"http://bibliografie.th-koeln.de/classifications/ubogenre\" valueURI=\"http://bibliografie.th-koeln.de/classifications/ubogenre#series\" type=\"intern\" />\n" +
+            "            <mods:titleInfo displayLabel=\"Short form of the title\" type=\"abbreviated\">\n" +
+            "              <mods:title>CEUR Workshop Proceedings</mods:title>\n" +
+            "            </mods:titleInfo>\n" +
+            "          </mods:relatedItem>\n" +
+            "        </mods:mods>\n" +
+            "      </modsContainer>\n" +
+            "    </def.modsContainer>\n" +
+            "  </metadata>\n" +
+            "</mycoreobject>\n";
+
+        MCRModsItemDataProvider midp = new MCRModsItemDataProvider();
+        Document testDataDoc = new SAXBuilder().build(new StringReader(testData));
+
+        CSLItemDataBuilder dataBuilder = new CSLItemDataBuilder();
+        midp.addContent(testDataDoc);
+        midp.processTitles(dataBuilder);
+        CSLItemData build = dataBuilder.build();
+        Assert.assertEquals("The collection title should be", "CEUR Workshop Proceedings", build.getCollectionTitle());
+    }
+    
     private CSLItemData testModsPart(String testData) throws JDOMException, IOException {
         MCRModsItemDataProvider midp = new MCRModsItemDataProvider();
         Document testDataDoc = new SAXBuilder().build(new StringReader(testData));
