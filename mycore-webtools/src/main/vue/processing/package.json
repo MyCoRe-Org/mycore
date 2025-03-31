@@ -16,7 +16,7 @@
     "@vue/tsconfig": "^0.7.0",
     "@types/node": "^20.11.10",
     "typescript": "~5.7.2",
-    "vite": "^6.0.9",
+    "vite": "^6.0.13",
     "vue-tsc": "^2.2.0"
   }
 }
