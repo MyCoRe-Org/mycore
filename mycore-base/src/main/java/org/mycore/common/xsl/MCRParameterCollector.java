@@ -376,10 +376,10 @@ public class MCRParameterCollector {
     @Override
     public int hashCode() {
         if (modified) {
-            int result = LOGGER.hashCode();
+            int result = 1;
             //order of map should not harm result
-            result += SavePropertiesCacheHolder.getSafePropertiesCache().hashCode();
-            result += parameters.entrySet().stream().mapToInt(Map.Entry::hashCode).sum();
+            result = 31 * result + SavePropertiesCacheHolder.getSafePropertiesHashCode();
+            result = 31 * result + parameters.entrySet().stream().mapToInt(Map.Entry::hashCode).sum();
             hashCode = result;
             modified = false;
         }
@@ -398,8 +398,7 @@ public class MCRParameterCollector {
             return false;
         }
         MCRParameterCollector other = (MCRParameterCollector) obj;
-        return hashCode == other.hashCode
-            && modified == other.modified
+        return hashCode() == other.hashCode()
             && onlySetXSLParameters == other.onlySetXSLParameters
             && setPropertiesFromConfiguration == other.setPropertiesFromConfiguration
             && Objects.equals(parameters, other.parameters);
@@ -472,8 +471,7 @@ public class MCRParameterCollector {
             return builder.toString();
         }
 
-        //TODO Question the cache is in a static property - no use case for equals and hashCode:
-        public static int hashCodeOfProps() {
+        public static int getSafePropertiesHashCode() {
             return COMPUTED_HASH_CODE.get();
         }
     }
