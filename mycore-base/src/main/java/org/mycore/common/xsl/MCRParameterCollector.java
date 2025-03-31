@@ -376,10 +376,15 @@ public class MCRParameterCollector {
     @Override
     public int hashCode() {
         if (modified) {
-            int result = LOGGER.hashCode();
+            int result = 1;
             //order of map should not harm result
+<<<<<<< Upstream, based on 510dc981cf17b728ea298d944bf560e7e03a906b
             result += SavePropertiesCacheHolder.getSafePropertiesHashCode();
             result += parameters.entrySet().stream().mapToInt(Map.Entry::hashCode).sum();
+=======
+            result = 31 * result + SavePropertiesCacheHolder.getSafePropertiesHashCode();
+            result = 31 * result + parameters.entrySet().stream().mapToInt(Map.Entry::hashCode).sum();
+>>>>>>> f56c9eb MCR-3272 fix HashCode calculation for MCRParameterCollector
             hashCode = result;
             modified = false;
         }
@@ -398,8 +403,7 @@ public class MCRParameterCollector {
             return false;
         }
         MCRParameterCollector other = (MCRParameterCollector) obj;
-        return hashCode == other.hashCode
-            && modified == other.modified
+        return hashCode() == other.hashCode()
             && onlySetXSLParameters == other.onlySetXSLParameters
             && setPropertiesFromConfiguration == other.setPropertiesFromConfiguration
             && Objects.equals(parameters, other.parameters);
@@ -472,7 +476,11 @@ public class MCRParameterCollector {
             return builder.toString();
         }
 
+<<<<<<< Upstream, based on 510dc981cf17b728ea298d944bf560e7e03a906b
         public static int hashCodeOfProps() {
+=======
+        public static int getSafePropertiesHashCode() {
+>>>>>>> f56c9eb MCR-3272 fix HashCode calculation for MCRParameterCollector
             return COMPUTED_HASH_CODE.get();
         }
     }
