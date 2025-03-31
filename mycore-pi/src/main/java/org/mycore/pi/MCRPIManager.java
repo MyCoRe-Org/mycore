@@ -74,7 +74,13 @@ public final class MCRPIManager {
         applyConfiguration();
     }
 
-    private void applyConfiguration() {
+    /**
+     * Reads the configuration and applies it to the manager.
+     * <p>
+     *     No sychronization is done, so this method is not thread-safe.
+     *     It is intended to be called from the constructor and test classes only.
+     */
+    void applyConfiguration() {
         Map<String, Class<? extends MCRPIParser<? extends MCRPersistentIdentifier>>> parserMap = new HashMap<>();
         MCRConfiguration2.getSubPropertiesMap(PARSER_CONFIGURATION)
             .forEach((type, className) -> {
