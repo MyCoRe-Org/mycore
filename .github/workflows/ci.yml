@@ -4,7 +4,6 @@ on: [ push, pull_request ]
 
 env:
   MAVEN_OPTS: -Xmx1024M -Xss128M
-  GECKODRIVER_VERSION: 0.27.0
 
 jobs:
   build:
@@ -21,48 +20,21 @@ jobs:
         distribution: temurin
         cache: 'maven'
 
-    - name: Fetch Geckodriver cache
-      id: geckodriver-cache
-      uses: actions/cache@v4
-      with:
-        path: ~/geckodriver
-        key: ${{ env.GECKODRIVER_VERSION }}
-
-    - name: Fetch Geckodriver
-      if: steps.geckodriver-cache.outputs.cache-hit != 'true'
-      run: |
-        mkdir ~/geckodriver
-        curl -L https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz | \
-          tar -C ~/geckodriver/ -xzvf-
-
-    - name: Install Firefox ESR
-      uses: browser-actions/setup-firefox@v1
-      with:
-        firefox-version: 'latest-esr'
-
-    - name: Install Chrome (stable)
-      uses: browser-actions/setup-chrome@v1
-      with:
-        chrome-version: 'stable'
-        install-chromedriver: true
-
     - name: Set up test dependencies
       run: |
-        sudo apt install dbus-x11
-
-        # Selenium wants to run non-ESR FF
         firefox --version
 
         # Geckodriver
-        find ${GECKOWEBDRIVER}
+        echo ${GECKOWEBDRIVER} >> $GITHUB_PATH
 
         # Chromedriver
-        find ${CHROMEWEBDRIVER}
+        echo ${CHROMEWEBDRIVER} >> $GITHUB_PATH
 
         echo $PATH
 
-        ~/geckodriver/geckodriver --version
-        echo "${HOME}/geckodriver" >> $GITHUB_PATH
+        cat /proc/cpuinfo
+
+        ${GECKOWEBDRIVER}/geckodriver --version
 
     - name: Build
       run: |
