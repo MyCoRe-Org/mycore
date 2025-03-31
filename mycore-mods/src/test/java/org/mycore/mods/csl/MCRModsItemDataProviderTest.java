@@ -183,11 +183,15 @@ public class MCRModsItemDataProviderTest extends MCRTestCase {
             "          <mods:typeOfResource>text</mods:typeOfResource>\n" +
             "          <mods:titleInfo>\n" +
             "            <mods:title>MILeS 2023</mods:title>\n" +
-            "            <mods:subTitle>Proceedings of the Third International Workshop on Multimodal Immersive Learning Systems</mods:subTitle>\n" +
+            "            <mods:subTitle>Proceedings of Learning Systems</mods:subTitle>\n" +
             "          </mods:titleInfo>\n" +
-            "          <mods:genre authorityURI=\"http://bibliografie.th-koeln.de/classifications/ubogenre\" valueURI=\"http://bibliografie.th-koeln.de/classifications/ubogenre#proceedings\" type=\"intern\" />\n" +
+            "          <mods:genre authorityURI=\"http://bibliografie.th-koeln.de/classifications/ubogenre\"\n" +
+            "                      valueURI=\"http://bibliografie.th-koeln.de/classifications/ubogenre#proceedings\"\n" +
+            "                      type=\"intern\" />\n" +
             "          <mods:relatedItem xlink:href=\"bibthk_mods_00007211\" type=\"host\">\n" +
-            "            <mods:genre authorityURI=\"http://bibliografie.th-koeln.de/classifications/ubogenre\" valueURI=\"http://bibliografie.th-koeln.de/classifications/ubogenre#series\" type=\"intern\" />\n" +
+            "            <mods:genre authorityURI=\"http://bibliografie.th-koeln.de/classifications/ubogenre\"\n" +
+            "                        valueURI=\"http://bibliografie.th-koeln.de/classifications/ubogenre#series\"\n" +
+            "                        type=\"intern\" />\n" +
             "            <mods:titleInfo displayLabel=\"Short form of the title\" type=\"abbreviated\">\n" +
             "              <mods:title>CEUR Workshop Proceedings</mods:title>\n" +
             "            </mods:titleInfo>\n" +
