@@ -218,13 +218,7 @@ public final class MCRMetaBoolean extends MCRMetaDefault {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
         if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
             return false;
         }
         final MCRMetaBoolean other = (MCRMetaBoolean) obj;

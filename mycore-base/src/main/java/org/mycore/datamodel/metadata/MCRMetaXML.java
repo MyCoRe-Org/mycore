@@ -215,13 +215,7 @@ public class MCRMetaXML extends MCRMetaDefault {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
         if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
             return false;
         }
         final MCRMetaXML other = (MCRMetaXML) obj;

@@ -360,13 +360,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
         if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
             return false;
         }
         final MCRMetaNumber other = (MCRMetaNumber) obj;
