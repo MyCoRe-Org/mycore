@@ -59,7 +59,7 @@ public class MCRDefaultLinkProviderTest extends MCRStoreTestCase {
 
         Set<MCRCategoryID> expectedCategories =
             Stream.of("genre:letter", "ArchFile_class_001:eb78cfc6-eca3-47a6-baae-205f0943448d", "state:published")
-                .map(MCRCategoryID::fromString)
+                .map(MCRCategoryID::ofString)
                 .collect(Collectors.toSet());
 
         for (MCRCategoryID expectedCategory : expectedCategories) {
@@ -76,7 +76,7 @@ public class MCRDefaultLinkProviderTest extends MCRStoreTestCase {
 
         Set<MCRCategoryID> expectedCategories =
             Stream.of("derivate_types:content", "state:published")
-                .map(MCRCategoryID::fromString)
+                .map(MCRCategoryID::ofString)
                 .collect(Collectors.toSet());
 
         assertEquals("Unexpected category found", categoriesOfDerivate.size(), expectedCategories.size());
