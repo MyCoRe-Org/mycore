@@ -18,7 +18,6 @@
 
 package org.mycore.pi;
 
-import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -27,6 +26,7 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -61,6 +61,7 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
+        resetManagerInstance();
     }
 
     @Test
@@ -163,15 +164,9 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
         return mcrUuidUrnGenerator.generate(mcrObject, "");
     }
 
-    @Before
-    public void resetManagerInstance() {
-        try {
-            Field instance = MCRPIManager.class.getDeclaredField("instance");
-            instance.setAccessible(true);
-            instance.set(null, null);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
+    @AfterClass
+    public static void resetManagerInstance() {
+        MCRPIManager.getInstance().applyConfiguration();
     }
 
     @Override
@@ -223,4 +218,5 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
     public void tearDown() throws Exception {
         super.tearDown();
     }
+
 }
