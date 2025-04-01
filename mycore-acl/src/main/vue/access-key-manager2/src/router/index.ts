@@ -19,7 +19,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import AdminView from '@/views/AdminView.vue';
 import ReferenceView from '@/views/ReferenceView.vue';
-import { appConfig } from '@/common/config';
+import { appConfig } from '@/config/provider';
 import { errorRoutes } from '@mycore-org/vue-components';
 
 const routes: Array<RouteRecordRaw> = [

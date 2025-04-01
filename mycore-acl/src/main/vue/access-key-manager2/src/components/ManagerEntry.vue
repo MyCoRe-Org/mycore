@@ -19,10 +19,11 @@
 </template>
 
 <script setup lang="ts">
-import { AccessKeyManager } from '@mycore-org/vue-access-key-manager';
-import { AccessKeyConfig, AppConfig } from '@/common/config';
 import { inject } from 'vue';
+import { AccessKeyManager } from '@mycore-org/vue-access-key-manager';
+import { AccessKeyConfig, AppConfig } from '@/config/types';
 import { AuthStrategy } from '@mycore-test/js-common/auth';
+import { AppConfigKey, AccessKeyConfigKey } from '@/keys';
 
 interface Props {
   reference?: string;
@@ -32,8 +33,8 @@ interface Props {
 }
 defineProps<Props>();
 
-const accessKeyConfig = inject('accessKeyConfig') as AccessKeyConfig;
-const appConfig = inject('appConfig') as AppConfig;
+const appConfig = inject(AppConfigKey) as AppConfig;
+const accessKeyConfig = inject(AccessKeyConfigKey) as AccessKeyConfig;
 const authStrategy: AuthStrategy | undefined = import.meta.env.DEV
   ? new (class implements AuthStrategy {
       getHeaders(): Record<string, string> {

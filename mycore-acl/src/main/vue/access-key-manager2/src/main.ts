@@ -17,11 +17,11 @@
  */
 
 import { App, createApp } from 'vue';
-import router from './router';
+import router from '@/router';
 import ContactManager from '@/App.vue';
 import { createI18n } from 'vue-i18n';
 import { LangService } from '@mycore-test/js-common/i18n';
-import { appConfig, accessKeyConfig, I18N_PREFIX } from './common/config';
+import { appConfig, accessKeyConfig, I18N_PREFIX } from '@/config/provider';
 import {
   UnauthorizedActionError,
   PermissionError,
@@ -31,6 +31,7 @@ if (import.meta.env.DEV) {
   import('font-awesome/css/font-awesome.min.css');
 }
 import '@mycore-org/vue-access-key-manager/dist/vue-access-key-manager.css';
+import { AppConfigKey, AccessKeyConfigKey } from './keys';
 
 const APP_ID = 'app';
 
@@ -65,8 +66,8 @@ const initApp = async () => {
     const app = createApp(ContactManager);
     app.use(i18n);
     app.use(router);
-    app.provide('appConfig', appConfig);
-    app.provide('accessKeyConfig', accessKeyConfig);
+    app.provide(AppConfigKey, appConfig);
+    app.provide(AccessKeyConfigKey, accessKeyConfig);
     setErrorHandler(app);
     app.mount(`#${APP_ID}`);
   } catch (error) {
