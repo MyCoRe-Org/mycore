@@ -272,10 +272,10 @@
   resolved "https://registry.yarnpkg.com/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.5.0.tgz#3188bcb273a414b0d215fd22a58540b989b9409a"
   integrity sha512-gv3ZRaISU3fjPAgNsriBRqGWQL6quFx04YMPW/zD8XMLsU32mhCCbfbO6KZFLjvYpCZ8zyDEgqsgf+PwPaM7GQ==
 
-"@mycore-org/vue-access-key-manager@^0.0.32":
-  version "0.0.32"
-  resolved "https://registry.yarnpkg.com/@mycore-org/vue-access-key-manager/-/vue-access-key-manager-0.0.32.tgz#686c161b7ddb370661f2461d20b4d082f7254e1f"
-  integrity sha512-PiyC1CoamMpEK+bimZ+Wtw/DCTnYNzbF5AoQ4yHYUZmG2o7JkUiZNfBoHuSyMY4fJJF1dMffEPzQ8RDy2JiJ0g==
+"@mycore-org/vue-access-key-manager@^0.0.33":
+  version "0.0.33"
+  resolved "https://registry.yarnpkg.com/@mycore-org/vue-access-key-manager/-/vue-access-key-manager-0.0.33.tgz#95fbb07981db80634ee1c5d363f68dc11779457a"
+  integrity sha512-0u67YX6AhehlXQqm4sOrRb8MCCWqfpE5Kmrz3EsaUEa2vWLQra4gviAl3v7KLLRyTv81UOmox8eBFDJ194eBmw==
   dependencies:
     "@vuelidate/core" "^2.0.3"
     "@vuelidate/validators" "^2.0.4"

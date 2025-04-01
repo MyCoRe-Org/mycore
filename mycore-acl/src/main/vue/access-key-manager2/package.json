@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build --emptyOutDir",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@mycore-org/vue-access-key-manager": "^0.0.32",
+    "@mycore-org/vue-access-key-manager": "^0.0.33",
     "@mycore-org/vue-components": "^0.0.31",
     "@mycore-test/js-common": "npm:@jsr/mycore-test__js-common@^0.1.29",
     "vue": "^3.5.13",
