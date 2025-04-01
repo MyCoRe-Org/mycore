@@ -80,8 +80,8 @@ public class MCRCreateDateDOIGenerator extends MCRPIGenerator<MCRDigitalObjectId
     }
 
     private synchronized int getCount(final String pattern) {
-        AtomicInteger count = PATTERN_COUNT_MAP.computeIfAbsent(pattern, (pttrn) -> {
-            Pattern regExpPattern = Pattern.compile(pttrn);
+        AtomicInteger count = PATTERN_COUNT_MAP.computeIfAbsent(pattern, p -> {
+            Pattern regExpPattern = Pattern.compile(p);
             Predicate<String> matching = regExpPattern.asPredicate();
 
             List<MCRPIRegistrationInfo> list = MCRPIManager.getInstance()
