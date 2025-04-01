@@ -112,9 +112,9 @@ public class MCRMerger {
      */
     protected void mergeElements(MCRMerger other) {
         List<MCRMerger> oldEntries = this.element.getChildren()
-            .stream().map(child -> MCRMergerFactory.buildFrom(child)).collect(Collectors.toList());
+            .stream().map(MCRMergerFactory::buildFrom).collect(Collectors.toList());
         List<MCRMerger> newEntries = other.element.getChildren()
-            .stream().map(child -> MCRMergerFactory.buildFrom(child)).collect(Collectors.toList());
+            .stream().map(MCRMergerFactory::buildFrom).collect(Collectors.toList());
 
         for (MCRMerger newEntry : newEntries) {
             MCRMerger matchingEntry = mergeIntoExistingEntries(oldEntries, newEntry);

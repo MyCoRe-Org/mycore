@@ -113,7 +113,9 @@ public final class MCRJMXBridge implements Closeable {
 
     @Override
     public void close() {
-        LOGGER.debug("Shutting down {}", () -> MCRJMXBridge.class.getSimpleName());
+        if (LOGGER.isDebugEnabled()) {// false-positive on PMD:GuardLogStatement (static method reference)
+            LOGGER.debug("Shutting down {}", MCRJMXBridge.class::getSimpleName);
+        }
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         Iterator<WeakReference<ObjectName>> wrIterator = ONAME_LIST.iterator();
         while (wrIterator.hasNext()) {

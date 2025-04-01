@@ -41,7 +41,7 @@ public class MCRAccessCacheEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
-        LOGGER.info("Invalidate permission cache for derivate {}", () -> der.getId());
+        LOGGER.info("Invalidate permission cache for derivate {}", der::getId);
         MCRAccessManager.invalidAllPermissionCachesById(der.getId().toString());
     }
 

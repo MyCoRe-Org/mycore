@@ -57,7 +57,9 @@ public class MCRORCIDMetadataUtils {
      */
     public static MCRORCIDFlagContent getORCIDFlagContent(MCRObject object) {
         try {
-            return getORCIDFlagContentString(object).map(s -> transformFlagContentString(s)).orElse(null);
+            return getORCIDFlagContentString(object)
+                .map(MCRORCIDMetadataUtils::transformFlagContentString)
+                .orElse(null);
         } catch (MCRORCIDTransformationException e) {
             throw new MCRORCIDException("ORCID flag of object " + object.getId() + "is broken", e);
         }
