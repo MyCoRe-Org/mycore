@@ -2,10 +2,13 @@
   <div class="row">
     <div class="col-12">
       <AccessKeyManager
-        :config="config"
+        :base-url="appConfig.baseUrl"
         :auth-strategy="authStrategy"
         :reference="reference"
         :permissions="permissions"
+        :allowed-session-permissions="
+          accessKeyConfig.allowedAccessKeySessionPermissions
+        "
         :current-page="page"
         :page-size="pageSize"
         router-enabled
@@ -22,6 +25,7 @@ import {
 } from '@mycore-org/vue-access-key-manager';
 import { inject } from 'vue';
 import { AuthStrategy } from '@mycore-test/js-common/auth';
+import { AppConfig } from '@mycore-org/vue-components';
 
 interface Props {
   reference?: string;
@@ -31,7 +35,8 @@ interface Props {
 }
 defineProps<Props>();
 
-const config = inject('accessKeyConfig') as AccessKeyConfig;
+const accessKeyConfig = inject('accessKeyConfig') as AccessKeyConfig;
+const appConfig = inject('appConfig') as AppConfig;
 const authStrategy: AuthStrategy | undefined = import.meta.env.DEV
   ? new (class implements AuthStrategy {
       getHeaders(): Record<string, string> {

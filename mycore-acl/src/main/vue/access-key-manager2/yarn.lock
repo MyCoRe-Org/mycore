@@ -272,18 +272,18 @@
   resolved "https://registry.yarnpkg.com/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.5.0.tgz#3188bcb273a414b0d215fd22a58540b989b9409a"
   integrity sha512-gv3ZRaISU3fjPAgNsriBRqGWQL6quFx04YMPW/zD8XMLsU32mhCCbfbO6KZFLjvYpCZ8zyDEgqsgf+PwPaM7GQ==
 
-"@mycore-org/vue-access-key-manager@^0.0.26":
-  version "0.0.26"
-  resolved "https://registry.yarnpkg.com/@mycore-org/vue-access-key-manager/-/vue-access-key-manager-0.0.26.tgz#f30a46a8abdd257192668532e6f609f96d84810b"
-  integrity sha512-j60wUrwGaOpvItDnbDgWdFgBDWOlh1SU5wIXGdlHdZBwy64BxFEkFQC5pil5btZQbBHFkniekNRDFK5AIlnmeg==
+"@mycore-org/vue-access-key-manager@^0.0.29":
+  version "0.0.29"
+  resolved "https://registry.yarnpkg.com/@mycore-org/vue-access-key-manager/-/vue-access-key-manager-0.0.29.tgz#382b7f76b95528356af7c8ef784fd57ad90405eb"
+  integrity sha512-QFipgr0amRerHw+y67ZzB4kUK5K31rV909/u/pQuGLab167JPnpUPdeHsEBnXMfV0SKgDPD21tfj/Eqg+XJ+mw==
   dependencies:
     "@vuelidate/core" "^2.0.3"
     "@vuelidate/validators" "^2.0.4"
 
-"@mycore-org/vue-components@^0.0.26":
-  version "0.0.26"
-  resolved "https://registry.yarnpkg.com/@mycore-org/vue-components/-/vue-components-0.0.26.tgz#395462a98d265ebbb9d2fb4385b76914fe14db12"
-  integrity sha512-tiC8bUzOzgXVA6z2AOu/zif0ptkoZFEAaiRueKuRphgOosAEB0fyn4u3MLZRAUTE/LiZ2kGTgq1/yyRqYlPvZw==
+"@mycore-org/vue-components@^0.0.29":
+  version "0.0.29"
+  resolved "https://registry.yarnpkg.com/@mycore-org/vue-components/-/vue-components-0.0.29.tgz#a77ef202c6d8d23d997e4ecabd91d91aaca67a13"
+  integrity sha512-BGojT0NrinoGDb9WYuekuNbXsp281U7m/ObW4B1K3mzWfYtr7vj6oiyMyxpwWzxajThndAfsin9dHxNpIskDHw==
 
 "@mycore-test/js-common@npm:@jsr/mycore-test__js-common@^0.1.29":
   version "0.1.29"
