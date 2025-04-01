@@ -16,9 +16,6 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { AppConfig } from '@mycore-org/vue-components';
-import { AccessKeyConfig } from '@mycore-org/vue-access-key-manager';
-
 interface RawConfig {
   webApplicationBaseURL: string;
   currentLang: string;
@@ -35,10 +32,19 @@ const rawConfig = (
     : window.mycore
 ) as RawConfig;
 
+export interface AppConfig {
+  baseUrl: string;
+  currentLang: string;
+}
+
 export const appConfig: AppConfig = {
   baseUrl: rawConfig.webApplicationBaseURL,
   currentLang: rawConfig.currentLang,
 };
+
+export interface AccessKeyConfig {
+  allowedAccessKeySessionPermissions: string[];
+}
 
 export const accessKeyConfig: AccessKeyConfig = {
   allowedAccessKeySessionPermissions:

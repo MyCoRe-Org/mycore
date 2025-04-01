@@ -19,13 +19,10 @@
 </template>
 
 <script setup lang="ts">
-import {
-  AccessKeyConfig,
-  AccessKeyManager,
-} from '@mycore-org/vue-access-key-manager';
+import { AccessKeyManager } from '@mycore-org/vue-access-key-manager';
+import { AccessKeyConfig, AppConfig } from '@/common/config';
 import { inject } from 'vue';
 import { AuthStrategy } from '@mycore-test/js-common/auth';
-import { AppConfig } from '@mycore-org/vue-components';
 
 interface Props {
   reference?: string;
