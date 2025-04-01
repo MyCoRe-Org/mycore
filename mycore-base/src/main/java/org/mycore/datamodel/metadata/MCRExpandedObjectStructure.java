@@ -217,7 +217,7 @@ public class MCRExpandedObjectStructure extends MCRObjectStructure {
             List<Element> derobjectList = subElement.getChildren();
 
             for (Element derElement : derobjectList) {
-                addDerivate(MCRMetaEnrichedLinkIDFactory.getInstance().fromDom(derElement));
+                addDerivate(MCRMetaEnrichedLinkIDFactory.obtainInstance().fromDom(derElement));
             }
         }
     }
