@@ -32,8 +32,4 @@
 
   <xsl:template name="workCitation"/>
 
-  <xsl:template name="publicationDate">
-    <xsl:apply-templates select="(mods:originInfo/mods:dateIssued[@encoding='w3cdtf'][@keyDate='yes'],descendant::mods:relatedItem[@type='host'][not(ancestor::mods:relatedItem[not(@type='host')])]/mods:originInfo/mods:dateIssued[@encoding='w3cdtf'][@keyDate='yes'],mods:originInfo/mods:dateIssued[@encoding='w3cdtf'])[1],descendant::mods:relatedItem[@type='host'][not(ancestor::mods:relatedItem[not(@type='host')])]/mods:originInfo/mods:dateIssued[@encoding='w3cdtf']" />
-  </xsl:template>
-
 </xsl:stylesheet>
