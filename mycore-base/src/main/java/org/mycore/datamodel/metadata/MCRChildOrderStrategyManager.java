@@ -2,11 +2,14 @@ package org.mycore.datamodel.metadata;
 
 import org.mycore.common.config.MCRConfiguration2;
 
-public class MCRChildOrderStrategyManager {
+public final class MCRChildOrderStrategyManager {
 
     private static volatile MCRChildOrderStrategy instance;
 
-    public static MCRChildOrderStrategy getInstance() {
+    private MCRChildOrderStrategyManager() {
+    }
+
+    public static MCRChildOrderStrategy getChildOrderStrategy() {
         if (instance == null) {
             synchronized (MCRChildOrderStrategyManager.class) {
                 if (instance == null) {

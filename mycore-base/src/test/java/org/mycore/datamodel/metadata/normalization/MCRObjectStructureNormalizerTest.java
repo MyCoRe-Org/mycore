@@ -26,7 +26,7 @@ public class MCRObjectStructureNormalizerTest extends MCRTestCase {
 
         object.setSchema("noSchema");
 
-        MCREditableMetaEnrichedLinkID emptyLinkID = MCRMetaEnrichedLinkIDFactory.getInstance().getEmptyLinkID();
+        MCREditableMetaEnrichedLinkID emptyLinkID = MCRMetaEnrichedLinkIDFactory.obtainInstance().getEmptyLinkID();
         emptyLinkID.setMainDoc("Test.png");
         emptyLinkID.setOrder(1);
         emptyLinkID.setSubTag("derobject");

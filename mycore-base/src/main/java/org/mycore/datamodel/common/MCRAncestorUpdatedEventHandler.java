@@ -22,7 +22,7 @@ public class MCRAncestorUpdatedEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleAncestorUpdated(MCREvent evt, MCRObject obj) {
-        Collection<String> sourceOf = MCRLinkTableManager.instance().getSourceOf(obj.getId(), MCRLinkType.PARENT);
+        Collection<String> sourceOf = MCRLinkTableManager.getInstance().getSourceOf(obj.getId(), MCRLinkType.PARENT);
 
         sourceOf.forEach(source -> {
             MCRObjectID childID = MCRObjectID.getInstance(source);
@@ -34,7 +34,7 @@ public class MCRAncestorUpdatedEventHandler extends MCREventHandlerBase {
     private void triggerAncestorUpdatedEvent(MCRObject object) {
         MCREvent event = new MCREvent(MCREvent.ObjectType.OBJECT, MCREvent.EventType.ANCESTOR_UPDATED);
         event.put(MCREvent.OBJECT_KEY, object);
-        MCREventManager.instance().handleEvent(event);
+        MCREventManager.getInstance().handleEvent(event);
     }
 
 

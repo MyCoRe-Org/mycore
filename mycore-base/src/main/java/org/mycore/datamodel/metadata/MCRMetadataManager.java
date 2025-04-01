@@ -834,7 +834,7 @@ public final class MCRMetadataManager {
     }
 
     public static List<MCRObjectID> getChildren(MCRObjectID id) {
-        return MCRLinkTableManager.instance()
+        return MCRLinkTableManager.getInstance()
             .getSourceOf(id, MCRLinkType.PARENT)
             .stream()
             .map(MCRObjectID::getInstance)
@@ -842,14 +842,14 @@ public final class MCRMetadataManager {
     }
 
     public static List<MCRObjectID> getDerivateIds(MCRObjectID id) {
-        return MCRLinkTableManager.instance().getSourceOf(id, MCRLinkType.DERIVATE)
+        return MCRLinkTableManager.getInstance().getSourceOf(id, MCRLinkType.DERIVATE)
             .stream()
             .map(MCRObjectID::getInstance)
             .toList();
     }
 
     public static MCRObjectID getObjectId(MCRObjectID derivateID) {
-        return MCRLinkTableManager.instance()
+        return MCRLinkTableManager.getInstance()
             .getDestinationOf(derivateID, MCRLinkType.DERIVATE)
             .stream()
             .map(MCRObjectID::getInstance)

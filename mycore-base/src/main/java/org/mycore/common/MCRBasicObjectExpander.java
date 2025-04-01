@@ -23,7 +23,7 @@ public class MCRBasicObjectExpander implements MCRObjectExpander {
             newStructure.setParent(mcrObject.getParent());
         }
 
-        for (MCRObjectID mcrObjectID : MCRChildOrderStrategyManager.getInstance().getChildOrder(mcrObject)) {
+        for (MCRObjectID mcrObjectID : MCRChildOrderStrategyManager.getChildOrderStrategy().getChildOrder(mcrObject)) {
             newStructure.addChild(new MCRMetaLinkID("child", mcrObjectID, null, mcrObjectID.toString()));
         }
 
@@ -32,7 +32,7 @@ public class MCRBasicObjectExpander implements MCRObjectExpander {
         MCRMetadataManager.getDerivateIds(mcrObject.getId())
             .stream()
             .map(MCRMetadataManager::retrieveMCRDerivate)
-            .map(MCRMetaEnrichedLinkIDFactory.getInstance()::getDerivateLink)
+            .map(MCRMetaEnrichedLinkIDFactory.obtainInstance()::getDerivateLink)
             .forEach(newStructure::addDerivate);
 
         MCRExpandedObject expandedObject =
