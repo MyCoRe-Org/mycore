@@ -227,7 +227,7 @@ public class MCROCFLDirectoryTracker {
      * @return the keep file path.
      */
     protected MCRVersionedPath toKeepFile(MCRVersionedPath path) {
-        return MCRVersionedPath.toVersionedPath(path.resolve(MCROCFLVirtualObject.KEEP_FILE));
+        return MCRVersionedPath.ofPath(path.resolve(MCROCFLVirtualObject.KEEP_FILE));
     }
 
     /**

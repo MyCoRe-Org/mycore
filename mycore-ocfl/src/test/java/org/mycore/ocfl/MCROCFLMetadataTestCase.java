@@ -44,7 +44,7 @@ public abstract class MCROCFLMetadataTestCase extends MCRJPATestCase {
     @Override
     public void tearDown() throws Exception {
         MCROCFLTestCaseHelper.tearDown(this.repository);
-        MCREventManager.instance().clear();
+        MCREventManager.getInstance().clear();
         super.tearDown();
     }
 
