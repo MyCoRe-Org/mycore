@@ -18,7 +18,7 @@
 
 package org.mycore.services.queuedjob;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mycore.services.queuedjob.MCRSimpleJobSelector.Mode.EXCLUDE;
 import static org.mycore.services.queuedjob.MCRSimpleJobSelector.Mode.INCLUDE;
 
@@ -30,18 +30,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.mycore.common.MCRJPATestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.services.queuedjob.action.MCRTestJobAction1;
 import org.mycore.services.queuedjob.action.MCRTestJobAction2;
 import org.mycore.services.queuedjob.action.MCRTestJobAction3;
 import org.mycore.services.queuedjob.action.MCRTestJobAction4;
 import org.mycore.services.queuedjob.action.MCRTestJobAction5;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MyCoReTest;
 
 import jakarta.persistence.EntityManager;
 
-public class MCRJobQueueCleanerTest extends MCRJPATestCase {
+@MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
+public class MCRJobQueueCleanerTest {
 
     public static final Class<MCRTestJobAction1> ACTION_1 = MCRTestJobAction1.class;
     public static final Class<MCRTestJobAction2> ACTION_2 = MCRTestJobAction2.class;
@@ -55,48 +60,40 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
     public static final MCRJobStatus STATUS_4 = MCRJobStatus.MAX_TRIES;
     public static final MCRJobStatus STATUS_5 = MCRJobStatus.ERROR;
 
+    private static final long DAY_MILLIS = ChronoUnit.DAYS.getDuration().getSeconds() * 1000L;
+
     private MCRJobDAOJPAImpl dao;
 
     private List<MCRJob> jobs;
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
+    @BeforeEach
+    public void setup() throws Exception {
 
         dao = new MCRJobDAOJPAImpl();
 
         Date baseTime = new Date();
-        long day = ChronoUnit.DAYS.getDuration().getSeconds() * 1000L;
-
-        MCRJob job1 = new MCRJob(ACTION_1);
-        job1.setStatus(STATUS_1);
-        job1.setAdded(new Date(baseTime.getTime() - 1 * day));
-
-        MCRJob job2 = new MCRJob(ACTION_2);
-        job2.setStatus(STATUS_2);
-        job2.setAdded(new Date(baseTime.getTime() - 2 * day));
-
-        MCRJob job3 = new MCRJob(ACTION_3);
-        job3.setStatus(STATUS_3);
-        job3.setAdded(new Date(baseTime.getTime() - 3 * day));
-
-        MCRJob job4 = new MCRJob(ACTION_4);
-        job4.setStatus(STATUS_4);
-        job4.setAdded(new Date(baseTime.getTime() - 4 * day));
-
-        MCRJob job5 = new MCRJob(ACTION_5);
-        job5.setStatus(STATUS_5);
-        job5.setAdded(new Date(baseTime.getTime() - 5 * day));
+        MCRJob job1 = createJob(ACTION_1, STATUS_1, baseTime, 1);
+        MCRJob job2 = createJob(ACTION_2, STATUS_2, baseTime, 2);
+        MCRJob job3 = createJob(ACTION_3, STATUS_3, baseTime, 3);
+        MCRJob job4 = createJob(ACTION_4, STATUS_4, baseTime, 4);
+        MCRJob job5 = createJob(ACTION_5, STATUS_5, baseTime, 5);
 
         jobs = List.of(job1, job2, job3, job4, job5);
+        EntityManager manager = MCREntityManagerProvider.getCurrentEntityManager();
+        jobs.forEach(manager::persist);
 
+    }
+
+    private static MCRJob createJob(Class<? extends MCRJobAction> action, MCRJobStatus status,
+        Date baseTime, int numberOfDaysInThePast) {
+        MCRJob job = new MCRJob(action);
+        job.setStatus(status);
+        job.setAdded(new Date(baseTime.getTime() - numberOfDaysInThePast * DAY_MILLIS));
+        return job;
     }
 
     @Test
     public void testIncludeNothing() {
-
-        insertAllJobs();
 
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = Collections.emptyList();
@@ -114,8 +111,6 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
     @Test
     public void testExcludeNothing() {
 
-        insertAllJobs();
-
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = Collections.emptyList();
         List<MCRJobStatus> statuses = Collections.emptyList();
@@ -131,8 +126,6 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
 
     @Test
     public void testExcludeNothingWithLargeAge() {
-
-        insertAllJobs();
 
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = Collections.emptyList();
@@ -150,8 +143,6 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
     @Test
     public void testExcludeNothingWithMediumAge() {
 
-        insertAllJobs();
-
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = Collections.emptyList();
         List<MCRJobStatus> statuses = Collections.emptyList();
@@ -168,8 +159,6 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
     @Test
     public void testExcludeNothingWithSmallAge() {
 
-        insertAllJobs();
-
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = Collections.emptyList();
         List<MCRJobStatus> statuses = Collections.emptyList();
@@ -185,8 +174,6 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
 
     @Test
     public void testIncludeOneJobType() {
-
-        insertAllJobs();
 
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = List.of(ACTION_1);
@@ -205,8 +192,6 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
     @Test
     public void testIncludeMultipleJobTypes() {
 
-        insertAllJobs();
-
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = List.of(ACTION_1, ACTION_2);
         List<MCRJobStatus> statuses = Collections.emptyList();
@@ -223,8 +208,6 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
 
     @Test
     public void testExcludeOneJobType() {
-
-        insertAllJobs();
 
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = List.of(ACTION_1);
@@ -243,8 +226,6 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
     @Test
     public void testExcludeMultipleJobTypes() {
 
-        insertAllJobs();
-
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = List.of(ACTION_1, ACTION_2);
         List<MCRJobStatus> statuses = Collections.emptyList();
@@ -261,8 +242,6 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
 
     @Test
     public void testIncludeOneStatus() {
-
-        insertAllJobs();
 
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = Collections.emptyList();
@@ -281,8 +260,6 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
     @Test
     public void testIncludeMultipleStatuses() {
 
-        insertAllJobs();
-
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = Collections.emptyList();
         List<MCRJobStatus> statuses = List.of(STATUS_1, STATUS_3);
@@ -299,8 +276,6 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
 
     @Test
     public void testExcludeOneStatus() {
-
-        insertAllJobs();
 
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = Collections.emptyList();
@@ -319,8 +294,6 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
     @Test
     public void testExcludeMultipleStatuses() {
 
-        insertAllJobs();
-
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = Collections.emptyList();
         List<MCRJobStatus> statuses = List.of(STATUS_1, STATUS_2);
@@ -337,8 +310,6 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
 
     @Test
     public void testIncludeJobTypeIncludeStatusWithoutMatch() {
-
-        insertAllJobs();
 
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = List.of(ACTION_1);
@@ -357,8 +328,6 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
     @Test
     public void testIncludeJobTypeIncludeStatusWithMatches() {
 
-        insertAllJobs();
-
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = List.of(ACTION_1, ACTION_5);
         List<MCRJobStatus> statuses = List.of(STATUS_1, STATUS_5);
@@ -375,8 +344,6 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
 
     @Test
     public void testExcludeJobTypeExcludeStatusWithoutMatch() {
-
-        insertAllJobs();
 
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = List.of(ACTION_1, ACTION_2, ACTION_3);
@@ -395,8 +362,6 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
     @Test
     public void testExcludeJobTypeExcludeStatusWithMatches() {
 
-        insertAllJobs();
-
         Map<String, MCRJobSelector> selectors = new HashMap<>();
         List<Class<? extends MCRJobAction>> actions = List.of(ACTION_2, ACTION_3, ACTION_4);
         List<MCRJobStatus> statuses = List.of(STATUS_2, STATUS_3, STATUS_4);
@@ -409,12 +374,6 @@ public class MCRJobQueueCleanerTest extends MCRJPATestCase {
         Predicate<MCRJob> predicate = job -> !actions.contains(job.getAction()) && !statuses.contains(job.getStatus());
         assertEquals(jobs.stream().filter(predicate.negate()).count(), remainingJobs.size());
 
-    }
-
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
-    private void insertAllJobs() {
-        EntityManager manager = getEntityManager().get();
-        jobs.forEach(manager::persist);
     }
 
     private List<MCRJob> getAllJobs() {
