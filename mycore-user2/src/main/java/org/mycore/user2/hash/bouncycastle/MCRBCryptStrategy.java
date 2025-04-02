@@ -36,7 +36,7 @@ import org.mycore.user2.hash.MCRPasswordCheckStrategy;
 import org.mycore.user2.hash.MCRPasswordCheckStrategyBase;
 
 /**
- * {@link MCRBCryptStrategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the BCrypt algorithm.
+ * {@link MCRBCryptStrategy} is a {@link MCRPasswordCheckStrategy} that uses the BCrypt algorithm.
  * <p>
  * The version and salt are encoded in the hash using the Modular Crypt Format (MCF) for BCrypt. No explicit salt
  * values are generated.
