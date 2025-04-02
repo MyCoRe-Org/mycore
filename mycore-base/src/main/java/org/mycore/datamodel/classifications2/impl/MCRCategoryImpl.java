@@ -287,7 +287,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
      */
     public void setChildren(List<MCRCategory> children) {
         LOGGER.debug("Set children called for {} list '{}': {}",
-            () -> getId(), () -> children.getClass().getName(), () -> children);
+            this::getId, () -> children.getClass().getName(), () -> children);
         childGuard.write(() -> setChildrenUnlocked(children));
     }
 

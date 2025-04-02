@@ -135,7 +135,7 @@ public class MCRStartupHandler {
     }
 
     private static void startExecutable(ServletContext servletContext, AutoExecutable autoExecutable) {
-        LOGGER.info("{}: Starting {}", () -> autoExecutable.getPriority(), () -> autoExecutable.getName());
+        LOGGER.info("{}: Starting {}", autoExecutable::getPriority, autoExecutable::getName);
         try {
             autoExecutable.startUp(servletContext);
         } catch (ExceptionInInitializerError | RuntimeException e) {
@@ -145,7 +145,7 @@ public class MCRStartupHandler {
             if (haltOnError) {
                 throw e;
             }
-            LOGGER.warn(() -> e.toString());
+            LOGGER.warn(e::toString);
         }
     }
 

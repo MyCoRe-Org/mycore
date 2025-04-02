@@ -94,10 +94,7 @@
   <rule ref="category/java/codestyle.xml/FormalParameterNamingConventions"/>
   -->
   <rule ref="category/java/codestyle.xml/IdenticalCatchBranches"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/codestyle.xml/LambdaCanBeMethodReference"/>
-  -->
   <!-- TODO: Create PR to fix this rule -->
   <!--
   <rule ref="category/java/codestyle.xml/LinguisticNaming"/>

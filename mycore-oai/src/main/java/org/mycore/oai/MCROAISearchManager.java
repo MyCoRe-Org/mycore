@@ -113,7 +113,7 @@ public class MCROAISearchManager {
         };
         Timer cleanupTimer = new Timer("OAISearchManager-Timer " + identify.getConfigPrefix());
         cleanupTimer.schedule(tt, new Date(System.currentTimeMillis() + MAX_AGE), MAX_AGE);
-        MCRShutdownHandler.getInstance().addCloseable(() -> cleanupTimer.cancel());
+        MCRShutdownHandler.getInstance().addCloseable(cleanupTimer::cancel);
     }
 
     public Optional<Header> getHeader(String oaiId) {

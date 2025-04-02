@@ -51,8 +51,10 @@ class MCRPersonListTransformer extends MCRFieldTransformer {
     @SuppressWarnings("unchecked")
     void buildField(BibtexAbstractValue value, Element parent) {
         if (!(value instanceof BibtexPersonList personList)) {
-            LOGGER.error("Cannot not cast {} ({}) to {}", () -> BibtexAbstractValue.class.getName(), () -> value,
-                () -> BibtexPersonList.class.getName());
+            if (LOGGER.isErrorEnabled()) {// false-positive on PMD:GuardLogStatement (static method reference)
+                LOGGER.error("Cannot not cast {} ({}) to {}", BibtexAbstractValue.class::getName, () -> value,
+                    BibtexPersonList.class::getName);
+            }
             return;
         }
         for (BibtexPerson person : (List<BibtexPerson>) (personList.getList())) {
