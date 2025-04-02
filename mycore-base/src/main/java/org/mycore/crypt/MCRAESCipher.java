@@ -156,23 +156,20 @@ public class MCRAESCipher extends MCRCipher {
     @Override
     protected String encryptImpl(String text) throws MCRCryptCipherConfigurationException {
         byte[] encryptedBytes = encryptImpl(text.getBytes(StandardCharsets.UTF_8));
-        String encryptedString = java.util.Base64.getEncoder().encodeToString(encryptedBytes);
-        return encryptedString;
+        return java.util.Base64.getEncoder().encodeToString(encryptedBytes);
     }
 
     @Override
     protected String decryptImpl(String text) throws MCRCryptCipherConfigurationException {
         byte[] encryptedBytes = java.util.Base64.getDecoder().decode(text);
         byte[] decryptedBytes = decryptImpl(encryptedBytes);
-        String decryptedText = new String(decryptedBytes, StandardCharsets.UTF_8);
-        return decryptedText;
+        return new String(decryptedBytes, StandardCharsets.UTF_8);
     }
 
     @Override
     protected byte[] encryptImpl(byte[] bytes) throws MCRCryptCipherConfigurationException {
         try {
-            byte[] encryptedBytes = encryptCipher.doFinal(bytes);
-            return encryptedBytes;
+            return encryptCipher.doFinal(bytes);
         } catch (BadPaddingException | IllegalBlockSizeException e) {
             throw new MCRCryptCipherConfigurationException("Can't encrypt value - wrong configuration.", e);
         }
@@ -181,8 +178,7 @@ public class MCRAESCipher extends MCRCipher {
     @Override
     protected byte[] decryptImpl(byte[] bytes) throws MCRCryptCipherConfigurationException {
         try {
-            byte[] decryptedBytes = decryptCipher.doFinal(bytes);
-            return decryptedBytes;
+            return decryptCipher.doFinal(bytes);
         } catch (BadPaddingException | IllegalBlockSizeException e) {
             throw new MCRCryptCipherConfigurationException("Can't decrypt value - "
                 + " possible issues: corrupted crypted value, wrong configuration or bad key.", e);

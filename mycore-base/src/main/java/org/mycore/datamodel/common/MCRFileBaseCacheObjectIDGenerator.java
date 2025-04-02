@@ -28,7 +28,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -230,10 +229,9 @@ public class MCRFileBaseCacheObjectIDGenerator implements MCRObjectIDGenerator {
         Path cacheDir = getCacheDirPath();
 
         try (Stream<Path> list = Files.list(cacheDir);) {
-            List<String> baseIdList = list.filter(Files::isRegularFile)
+            return list.filter(Files::isRegularFile)
                 .map(Path::getFileName).map(Path::toString)
                 .collect(Collectors.toList());
-            return baseIdList;
         } catch (IOException e) {
             throw new MCRException("Could not detect cache files!", e);
         }

@@ -112,10 +112,7 @@
   <rule ref="category/java/codestyle.xml/UnnecessaryConstructor"/>
   <rule ref="category/java/codestyle.xml/UnnecessaryFullyQualifiedName"/>
   <rule ref="category/java/codestyle.xml/UnnecessaryImport"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/codestyle.xml/UnnecessaryLocalBeforeReturn"/>
-  -->
   <rule ref="category/java/codestyle.xml/UnnecessaryModifier"/>
   <rule ref="category/java/codestyle.xml/UnnecessaryReturn"/>
   <rule ref="category/java/codestyle.xml/UnnecessarySemicolon"/>

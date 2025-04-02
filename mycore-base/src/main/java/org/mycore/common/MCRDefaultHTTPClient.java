@@ -106,7 +106,7 @@ public class MCRDefaultHTTPClient implements MCRHTTPClient {
     public MCRContent get(URI hrefURI) throws IOException {
         HttpCacheContext context = HttpCacheContext.create();
         HttpGet get = new HttpGet(hrefURI);
-        MCRContent retContent = restClient.execute(get, context, new AbstractHttpClientResponseHandler<>() {
+        return restClient.execute(get, context, new AbstractHttpClientResponseHandler<>() {
             @Override
             public MCRContent handleResponse(ClassicHttpResponse response) throws IOException {
                 LOGGER.debug("http query: {}", hrefURI);
@@ -122,7 +122,6 @@ public class MCRDefaultHTTPClient implements MCRHTTPClient {
                 }
             }
         });
-        return retContent;
     }
 
     private String getCacheDebugMsg(URI hrefURI, HttpCacheContext context) {

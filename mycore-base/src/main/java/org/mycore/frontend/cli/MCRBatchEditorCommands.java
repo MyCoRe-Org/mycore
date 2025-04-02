@@ -168,8 +168,7 @@ public class MCRBatchEditorCommands extends MCRAbstractCommands {
         String path = MCRConfiguration2.getStringOrThrow(CFG_PREFIX + field + CFG_SUFFIX_REMOVE);
         path = new MessageFormat(path, Locale.ROOT).format(new String[] { value });
         XPathExpression<Element> fPath = XPathFactory.instance().compile(path, FE, null, NS);
-        List<Element> selected = fPath.evaluate(base);
-        return selected;
+        return fPath.evaluate(base);
     }
 
     private enum Action {

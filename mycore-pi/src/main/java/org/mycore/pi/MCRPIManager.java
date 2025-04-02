@@ -19,7 +19,9 @@
 package org.mycore.pi;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -68,22 +70,41 @@ public final class MCRPIManager {
     private MCRPIManager() {
         parserList = new ArrayList<>();
         typeParserMap = new ConcurrentHashMap<>();
+        resolverList = new ArrayList<>();
+        applyConfiguration();
+    }
 
+    /**
+     * Reads the configuration and applies it to the manager.
+     * <p>
+     *     No sychronization is done, so this method is not thread-safe.
+     *     It is intended to be called from the constructor and test classes only.
+     */
+    void applyConfiguration() {
+        Map<String, Class<? extends MCRPIParser<? extends MCRPersistentIdentifier>>> parserMap = new HashMap<>();
         MCRConfiguration2.getSubPropertiesMap(PARSER_CONFIGURATION)
             .forEach((type, className) -> {
                 try {
                     Class<? extends MCRPIParser<?>> parserClass = MCRClassTools.forName(className);
-                    registerParser(type, parserClass);
+                    parserMap.put(type, parserClass);
                 } catch (ClassNotFoundException e) {
                     throw new MCRConfigurationException(
                         "Could not load class " + className + " defined in " + PARSER_CONFIGURATION + type, e);
                 }
             });
 
-        resolverList = MCRConfiguration2
+        List<MCRPIResolver<MCRPersistentIdentifier>> resolverList = MCRConfiguration2
             .instantiateClasses(MCRPIResolver.class, RESOLVER_CONFIGURATION)
             .map(resolver -> (MCRPIResolver<MCRPersistentIdentifier>) resolver)
             .toList();
+        parserList.clear();
+        typeParserMap.clear();
+        parserMap.forEach((type, className) -> {
+            registerParser(type, className);
+        });
+
+        this.resolverList.clear();
+        this.resolverList.addAll(resolverList);
     }
 
     public static MCRPIManager getInstance() {
@@ -362,7 +383,7 @@ public final class MCRPIManager {
     }
 
     public List<MCRPIResolver<MCRPersistentIdentifier>> getResolvers() {
-        return this.resolverList;
+        return Collections.unmodifiableList(this.resolverList);
     }
 
     public Stream<MCRPersistentIdentifier> get(String pi) {

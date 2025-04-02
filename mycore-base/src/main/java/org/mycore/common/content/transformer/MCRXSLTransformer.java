@@ -348,8 +348,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         throws TransformerConfigurationException, SAXException, ParserConfigurationException {
         checkTemplateUptodate();
         Templates lastTemplate = templates[templates.length - 1];
-        Properties outputProperties = lastTemplate.getOutputProperties();
-        return outputProperties;
+        return lastTemplate.getOutputProperties();
     }
 
     /* (non-Javadoc)

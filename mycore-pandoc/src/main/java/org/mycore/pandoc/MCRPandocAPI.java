@@ -75,8 +75,7 @@ public class MCRPandocAPI {
         String[] argsArray = command.split(" ");
         byte[] inputByteArray = input.getBytes(StandardCharsets.UTF_8);
         byte[] outputByteArray = callPandoc(argsArray, inputByteArray);
-        String output = new String(outputByteArray, StandardCharsets.UTF_8);
-        return output;
+        return new String(outputByteArray, StandardCharsets.UTF_8);
     }
 
     /**
