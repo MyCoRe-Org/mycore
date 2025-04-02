@@ -35,7 +35,6 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.mycore.ocfl.classification.MCROCFLXMLClassificationManager;
 import org.mycore.ocfl.metadata.MCROCFLXMLMetadataManagerAdapter;
 import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;

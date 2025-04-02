@@ -159,7 +159,7 @@ public class MCROCFLFileStore extends MCRAbstractFileStore {
      */
     @Override
     public Path getPhysicalPath(MCRPath path) {
-        return this.fileSystemProvider.localStorage().toPhysicalPath(MCRVersionedPath.toVersionedPath(path));
+        return this.fileSystemProvider.localStorage().toPhysicalPath(MCRVersionedPath.ofPath(path));
     }
 
     /**
