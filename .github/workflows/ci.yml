@@ -4,70 +4,42 @@ on: [ push, pull_request ]
 
 env:
   MAVEN_OPTS: -Xmx1024M -Xss128M
-  GECKODRIVER_VERSION: 0.27.0
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up JDK
-      uses: actions/setup-java@v2
+      uses: actions/setup-java@v4
       with:
         java-version: 17
         distribution: temurin
+        cache: 'maven'
 
-    - name: Fetch Geckodriver cache
-      id: geckodriver-cache
-      uses: actions/cache@v3
-      with:
-        path: ~/geckodriver
-        key: ${{ env.GECKODRIVER_VERSION }}
-
-    - name: Fetch Geckodriver
-      if: steps.geckodriver-cache.outputs.cache-hit != 'true'
+    - name: Set up Browser
       run: |
-        mkdir ~/geckodriver
-        curl -L https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz | \
-          tar -C ~/geckodriver/ -xzvf-
+        # Geckodriver
+        echo ${GECKOWEBDRIVER} >> $GITHUB_PATH
 
-    - name: Set up test dependencies
-      run: |
-        # PPA by Mozilla for ESR releases
-        # replace 'sudo add-apt-repository ppa:mozillateam/ppa' with simple commands as workaround for https://github.com/orgs/community/discussions/69720
-        sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 0AB215679C571D1C8325275B9BDB3D89CE49EC21
-        sudo add-apt-repository "deb https://ppa.launchpadcontent.net/mozillateam/ppa/ubuntu/ focal main"
+        # Chromedriver
+        echo ${CHROMEWEBDRIVER} >> $GITHUB_PATH
 
-        sudo apt update
-        sudo apt install firefox-esr chromium-browser chromium-chromedriver dbus-x11
-
-        # Selenium wants to run non-ESR FF
-        sudo rm -rf /usr/lib/firefox/
-        sudo ln -s firefox-esr /usr/lib/firefox
-        sudo ln -s firefox-esr /usr/lib/firefox/firefox
         firefox --version
-
-        ~/geckodriver/geckodriver --version
-        echo "${HOME}/geckodriver" >> $GITHUB_PATH
-
-    - name: Restore Maven cache
-      uses: skjolber/maven-cache-github-action@v1
-      with:
-        step: restore
+        ${GECKOWEBDRIVER}/geckodriver --version
 
     - name: Build
       run: |
-        export $(dbus-launch)
-        mkdir ~/tmp
-        export TMPDIR=~/tmp
-        export FIREFOX_BIN=$(which firefox-esr)
+        mkdir ${{ runner.temp }}/${{ github.run_id }}.tmp
+        export TMPDIR=${{ runner.temp }}/${{ github.run_id }}.tmp
+        export FIREFOX_BIN=$(which firefox)
         export SELENIUM_BROWSER=firefox
 
-        mvn -B -Plocal-testing,!standard-with-extra-repos clean install -Dlog4j.configurationFile=$PWD/ci/log4j2.xml -T2
-        mvn -P!standard-with-extra-repos -B javadoc:javadoc
+        mvn -B -Plocal-testing,!standard-with-extra-repos install -Dlog4j.configurationFile=$PWD/ci/log4j2.xml -T2
+        mvn -P!standard-with-extra-repos -B javadoc:javadoc -T1C
 
     - name: Upload logs on build failure
       if: failure()
@@ -80,8 +52,3 @@ jobs:
           ./**/screenshots
           ./**/*error*.log
           ./**/*test.log
-
-    - name: Save Maven cache
-      uses: skjolber/maven-cache-github-action@v1
-      with:
-        step: save
