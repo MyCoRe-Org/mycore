@@ -18,7 +18,9 @@
 
 package org.mycore.datamodel.language;
 
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
@@ -36,6 +38,15 @@ import org.mycore.tools.MCRLanguageOrientationHelper;
  */
 public class MCRLanguageResolver implements URIResolver {
 
+    private static final Map<MCRLanguageCodeType, String> XML_ATTRIBUTE_CODE_NAMES;
+
+    static {
+        XML_ATTRIBUTE_CODE_NAMES = new ConcurrentHashMap<>();
+        XML_ATTRIBUTE_CODE_NAMES.put(MCRLanguageCodeType.XML_CODE, "xmlCode");
+        XML_ATTRIBUTE_CODE_NAMES.put(MCRLanguageCodeType.BIBL_CODE, "biblCode");
+        XML_ATTRIBUTE_CODE_NAMES.put(MCRLanguageCodeType.TERM_CODE, "termCode");
+    }
+
     @Override
     public Source resolve(String href, String base) throws TransformerException, IllegalArgumentException {
         String[] hrefContent = href.split(":");
@@ -47,16 +58,23 @@ public class MCRLanguageResolver implements URIResolver {
             MCRLanguage language = MCRLanguageFactory.obtainInstance().getLanguage(code);
             Document doc = new Document(buildXML(language));
             return new JDOMSource(doc);
+        } catch (TransformerException transformerException) {
+            throw transformerException;
         } catch (Exception ex) {
             throw new TransformerException(ex);
         }
     }
 
-    private Element buildXML(MCRLanguage language) {
+    private Element buildXML(MCRLanguage language) throws TransformerException {
         Element xml = new Element("language");
 
         for (Entry<MCRLanguageCodeType, String> entry : language.getCodes().entrySet()) {
-            xml.setAttribute(entry.getKey().name(), entry.getValue());
+            String attributeName = XML_ATTRIBUTE_CODE_NAMES.get(entry.getKey());
+            if (attributeName == null) {
+                throw new TransformerException(
+                    "Undefined language code '" + entry.getKey() + "' for language '" + language + "'.");
+            }
+            xml.setAttribute(attributeName, entry.getValue());
         }
 
         for (Entry<MCRLanguage, String> entry : language.getLabels().entrySet()) {
