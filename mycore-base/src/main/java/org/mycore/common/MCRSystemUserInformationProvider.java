@@ -21,8 +21,8 @@ package org.mycore.common;
 import java.util.Optional;
 
 /**
- * {@link MCRSystemUserInformationProvider} is an implementation of {@link MCRUserInformationProvider} that that looks
- * up user information of type {@link MCRSystemUserInformation} as defined in {@link MCRSystemUserInformation}.
+ * {@link MCRSystemUserInformationProvider} is a {@link MCRUserInformationProvider} that that looks up user
+ * information of type {@link MCRSystemUserInformation} as defined in {@link MCRSystemUserInformation}.
  * <p>
  * Possible user IDs are:
  * <ul>
