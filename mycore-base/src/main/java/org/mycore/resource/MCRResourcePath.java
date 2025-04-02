@@ -18,6 +18,8 @@
 
 package org.mycore.resource;
 
+import java.io.Serial;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
@@ -99,17 +101,40 @@ public sealed abstract class MCRResourcePath {
     }
 
     /**
-     * Creates a {@link MCRResourcePath} that represents the given path as a resource path
+     * Creates a {@link MCRResourcePath} that represents the given path as a resource path.
+     * <p>
+     * Returns an empty {@link Optional} in case of an empty path or in case
+     * of a path targeting a directory.
+     * <p>
+     * Throws a {@link IllegalPathException} in case of a path starting with <code>/META-INF/resources/META-INF</code>
+     * or <code>/META-INF/resources/WEB-INF</code> or in case of a path targeting a class.
      */
     public static Optional<MCRResourcePath> ofPath(Optional<String> path) {
-        return path.flatMap(MCRResourcePath::ofPath);
+        return Objects.requireNonNull(path, "Path must not be null").flatMap(MCRResourcePath::ofPath);
     }
 
     /**
-     * Creates a {@link MCRResourcePath} that represents the given path as a resource path
+     * Creates a {@link MCRResourcePath} that represents the given path as a resource path.
+     * <p>
+     * Returns an empty {@link Optional} in case of a missing or empty path or in case
+     * of a path targeting a directory.
+     * <p>
+     * Throws a {@link IllegalPathException} in case of a path starting with <code>/META-INF/resources/META-INF</code>
+     * or <code>/META-INF/resources/WEB-INF</code> or in case of a path targeting a class.
      */
     public static Optional<MCRResourcePath> ofPath(String path) {
-        return cleanAndSafePath(path).map(MCRResourcePath::createResourcePath);
+        return Optional.ofNullable(cleanAndSafePath(path, false)).map(MCRResourcePath::createResourcePath);
+    }
+
+    /**
+     * Creates a {@link MCRResourcePath} that represents the given path as a resource path.
+     * <p>
+     * Throws a {@link IllegalPathException} in case of a missing or empty path or in case
+     * of a path targeting a directory or in case of a path starting with <code>/META-INF/resources/META-INF</code>
+     * or <code>/META-INF/resources/WEB-INF</code> or in case of a path targeting a class.
+     */
+    public static MCRResourcePath ofPathOrThrow(String path) {
+        return createResourcePath(cleanAndSafePath(path, true));
     }
 
     private static MCRResourcePath createResourcePath(String path) {
@@ -117,7 +142,7 @@ public sealed abstract class MCRResourcePath {
             return createWebResourcePath(path.substring(WEB_RESOURCE_PREFIX.length()));
         }
         if (path.endsWith(".class")) {
-            throw new MCRResourceException("Path points to undeliverable resource: " + path);
+            throw IllegalPathException.Code.PATH_POINTS_TO_CLASS_RESOURCE.createException(path);
         }
         LOGGER.debug("Creating resource path {}", path);
         return new ResourcePath(path);
@@ -126,36 +151,87 @@ public sealed abstract class MCRResourcePath {
     /**
      * Creates a {@link MCRResourcePath} that represents the given path as a web resource path,
      * i.e. a resource path that implicitly starts with <code>/META-INF/resources/</code>.
+     * <p>
+     * Returns an empty {@link Optional} in case of an empty path or in case
+     * of a path targeting a directory.
+     * <p>
+     * Throws a {@link IllegalPathException} in case of a path starting with <code>/META-INF</code>
+     * or <code>/WEB-INF</code> or in case of a path targeting a class.
+     */
+    public static Optional<MCRResourcePath> ofWebPath(Optional<String> path) throws IllegalPathException {
+        return Objects.requireNonNull(path, "Path must not be null").flatMap(MCRResourcePath::ofWebPath);
+    }
+
+    /**
+     * Creates a {@link MCRResourcePath} that represents the given path as a web resource path,
+     * i.e. a resource path that implicitly starts with <code>/META-INF/resources/</code>.
+     * <p>
+     * Returns an empty {@link Optional} in case of a missing or empty path or in case
+     * of a path targeting a directory.
+     * <p>
+     * Throws a {@link IllegalPathException} in case of a path starting with <code>/META-INF</code>
+     * or <code>/WEB-INF</code> or in case of a path targeting a class.
      */
     public static Optional<MCRResourcePath> ofWebPath(String path) {
-        return cleanAndSafePath(path).map(MCRResourcePath::createWebResourcePath);
+        return Optional.ofNullable(cleanAndSafePath(path, false)).map(MCRResourcePath::createWebResourcePath);
+    }
+
+    /**
+     * Creates a {@link MCRResourcePath} that represents the given path as a web resource path,
+     * i.e. a resource path that implicitly starts with <code>/META-INF/resources/</code>.
+     * <p>
+     * Throws a {@link IllegalPathException} in case of a missing or empty path or in case
+     * of a path targeting a directory or in case of a path starting with <code>/META-INF</code>
+     * or <code>/WEB-INF</code> path or in case of a path targeting a class.
+     */
+    public static MCRResourcePath ofWebPathOrThrow(String path) {
+        return createWebResourcePath(cleanAndSafePath(path, true));
     }
 
     private static WebResourcePath createWebResourcePath(String path) {
-        if (path.startsWith("/META-INF/") || path.startsWith("/WEB-INF/") || path.endsWith(".class")) {
-            throw new MCRResourceException("Path points to undeliverable web resource: " + path);
+        if (path.startsWith("/META-INF/")) {
+            throw IllegalPathException.Code.PATH_POINTS_TO_META_INF_RESOURCE.createException(path);
+        }
+        if (path.startsWith("/WEB-INF/")) {
+            throw IllegalPathException.Code.PATH_POINTS_TO_WEB_INF_RESOURCE.createException(path);
+        }
+        if (path.endsWith(".class")) {
+            throw IllegalPathException.Code.PATH_POINTS_TO_CLASS_RESOURCE.createException(path);
         }
         LOGGER.debug("Creating web resource path {}", path);
         return new WebResourcePath(path);
     }
 
-    private static Optional<String> cleanAndSafePath(String path) {
-        if (path == null || path.isEmpty() || path.endsWith("/")) {
-            return Optional.empty();
-        } else if (!path.startsWith("/")) {
-            return Optional.of(safePath("/" + path));
-        } else {
-            return Optional.of(safePath(path));
+    private static String cleanAndSafePath(String path, boolean orThrow) {
+        if (path == null || path.isEmpty()) {
+            if (orThrow) {
+                throw IllegalPathException.Code.MISSING_OR_EMPTY_PATH.createException(path);
+            } else {
+                return null;
+            }
         }
+        if (path.endsWith("/")) {
+            if (orThrow) {
+                throw IllegalPathException.Code.DIRECTORY_PATH.createException(path);
+            } else {
+                return null;
+            }
+        }
+        if (!path.startsWith("/")) {
+            return safePath("/" + path);
+        }
+        return safePath(path);
     }
 
     private static String safePath(String path) {
         if (path.contains("//")) {
-            throw new MCRResourceException("Path contains empty segment (i.e. '//'): " + path);
-        } else if (path.contains("/./")) {
-            throw new MCRResourceException("Path contains segment link to self (i.e. '/./'): " + path);
-        } else if (path.contains("/../")) {
-            throw new MCRResourceException("Path contains segment link to parent  (i.e. '/../'): " + path);
+            throw IllegalPathException.Code.PATH_CONTAINS_EMPTY_SEGMENT.createException(path);
+        }
+        if (path.contains("/./")) {
+            throw IllegalPathException.Code.PATH_CONTAINS_LINK_TO_SELF.createException(path);
+        }
+        if (path.contains("/../")) {
+            throw IllegalPathException.Code.PATH_CONTAINS_LINK_TO_PARENT.createException(path);
         }
         return path;
     }
@@ -206,6 +282,55 @@ public sealed abstract class MCRResourcePath {
         @Override
         public Optional<String> asAbsoluteWebPath() {
             return webResourcePath;
+        }
+
+    }
+
+    /**
+     * A {@link IllegalPathException} indicates that an illegal path is used as a resource or web resource path.
+     * <p>
+     * The {@link #code} specifies the nature of the violation.
+     */
+    public static class IllegalPathException extends IllegalArgumentException {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
+
+        public final Code code;
+
+        IllegalPathException(Code code, String path) {
+            super(code.description + ": " + path);
+            this.code = code;
+        }
+
+        public enum Code {
+
+            PATH_POINTS_TO_META_INF_RESOURCE("Path points to META-INF resource (i.e. beginning with /META-INF/...)"),
+
+            PATH_POINTS_TO_WEB_INF_RESOURCE("Path points to META-INF resource (i.e. beginning with /WEB-INF/...)"),
+
+            PATH_POINTS_TO_CLASS_RESOURCE("Path points to META-INF resource (i.e. ending with .class)"),
+
+            PATH_CONTAINS_EMPTY_SEGMENT("Path contains empty segment (i.e. '//')"),
+
+            PATH_CONTAINS_LINK_TO_SELF("Path contains segment link to self (i.e. '/./')"),
+
+            PATH_CONTAINS_LINK_TO_PARENT("Path contains segment link to parent  (i.e. '/../')"),
+
+            MISSING_OR_EMPTY_PATH("Path is null or empty"),
+
+            DIRECTORY_PATH("Path point to a directory");
+
+            private final String description;
+
+            Code(String description) {
+                this.description = description;
+            }
+
+            private IllegalPathException createException(String path) {
+                return new IllegalPathException(this, path);
+            }
+
         }
 
     }

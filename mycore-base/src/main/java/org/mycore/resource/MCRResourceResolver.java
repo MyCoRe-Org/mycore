@@ -30,6 +30,7 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.annotation.MCRProperty;
@@ -382,7 +383,7 @@ public final class MCRResourceResolver {
         private MCRResourceProvider getProvider(String selectedProviderName) {
             MCRResourceProvider selectedProvider = providers.get(selectedProviderName);
             if (selectedProvider == null) {
-                throw new IllegalArgumentException("Selected provider " + selectedProviderName + " unavailable, got: "
+                throw new MCRConfigurationException("Selected provider " + selectedProviderName + " unavailable, got: "
                     + String.join(", ", providers.keySet()));
             }
             MCRTreeMessage description = selectedProvider.compileDescription(LOGGER.getLevel());

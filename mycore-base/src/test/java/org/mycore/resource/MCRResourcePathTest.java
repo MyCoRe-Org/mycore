@@ -18,17 +18,24 @@
 
 package org.mycore.resource;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Optional;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.test.MyCoReTest;
 
-@SuppressWarnings("OptionalGetWithoutIsPresent")
-public class MCRResourcePathTest extends MCRTestCase {
+@MyCoReTest
+public class MCRResourcePathTest {
 
     public static final Optional<Object> EMPTY = Optional.empty();
+
+    @Test
+    @SuppressWarnings("OptionalAssignedToNull")
+    public void nullIsNoOptionalResourcePath() {
+        assertThrows(NullPointerException.class, () -> MCRResourcePath.ofPath((Optional<String>) null));
+    }
 
     @Test
     public void nullIsNoResourcePath() {
@@ -36,8 +43,28 @@ public class MCRResourcePathTest extends MCRTestCase {
     }
 
     @Test
+    public void nullIsNoResourcePathOrThrow() {
+        assertEquals(MCRResourcePath.IllegalPathException.Code.MISSING_OR_EMPTY_PATH,
+            assertThrows(MCRResourcePath.IllegalPathException.class,
+                () -> MCRResourcePath.ofPathOrThrow(null)).code);
+    }
+
+    @Test
+    @SuppressWarnings("OptionalAssignedToNull")
+    public void nullIsNoOptionalWebResourcePath() {
+        assertThrows(NullPointerException.class, () -> MCRResourcePath.ofWebPath((Optional<String>) null));
+    }
+
+    @Test
     public void nullIsNoWebResourcePath() {
-        assertEquals(EMPTY, MCRResourcePath.ofWebPath(null));
+        assertEquals(EMPTY, MCRResourcePath.ofWebPath((String) null));
+    }
+
+    @Test
+    public void nullIsNoWebResourcePathOrThrow() {
+        assertEquals(MCRResourcePath.IllegalPathException.Code.MISSING_OR_EMPTY_PATH,
+            assertThrows(MCRResourcePath.IllegalPathException.class,
+                () -> MCRResourcePath.ofWebPathOrThrow(null)).code);
     }
 
     @Test
@@ -46,8 +73,22 @@ public class MCRResourcePathTest extends MCRTestCase {
     }
 
     @Test
+    public void emptyStringIsNoResourcePathOrThrow() {
+        assertEquals(MCRResourcePath.IllegalPathException.Code.MISSING_OR_EMPTY_PATH,
+            assertThrows(MCRResourcePath.IllegalPathException.class,
+                () -> MCRResourcePath.ofPathOrThrow("")).code);
+    }
+
+    @Test
     public void emptyStringIsNoWebResourcePath() {
         assertEquals(EMPTY, MCRResourcePath.ofWebPath(""));
+    }
+
+    @Test
+    public void emptyStringIsNoWebResourcePathOrThrow() {
+        assertEquals(MCRResourcePath.IllegalPathException.Code.MISSING_OR_EMPTY_PATH,
+            assertThrows(MCRResourcePath.IllegalPathException.class,
+                () -> MCRResourcePath.ofWebPathOrThrow("")).code);
     }
 
     @Test
@@ -58,6 +99,19 @@ public class MCRResourcePathTest extends MCRTestCase {
     }
 
     @Test
+    public void directoryIsNoResourcePathOrThrow() {
+        assertEquals(MCRResourcePath.IllegalPathException.Code.DIRECTORY_PATH,
+            assertThrows(MCRResourcePath.IllegalPathException.class,
+                () -> MCRResourcePath.ofPathOrThrow("/")).code);
+        assertEquals(MCRResourcePath.IllegalPathException.Code.DIRECTORY_PATH,
+            assertThrows(MCRResourcePath.IllegalPathException.class,
+                () -> MCRResourcePath.ofPathOrThrow("foo/")).code);
+        assertEquals(MCRResourcePath.IllegalPathException.Code.DIRECTORY_PATH,
+            assertThrows(MCRResourcePath.IllegalPathException.class,
+                () -> MCRResourcePath.ofPathOrThrow("foo/bar/")).code);
+    }
+
+    @Test
     public void directoryIsNoWebResourcePath() {
         assertEquals(EMPTY, MCRResourcePath.ofWebPath("/"));
         assertEquals(EMPTY, MCRResourcePath.ofWebPath("foo/"));
@@ -65,125 +119,157 @@ public class MCRResourcePathTest extends MCRTestCase {
     }
 
     @Test
+    public void directoryIsNoWebResourcePathOrThrow() {
+        assertEquals(MCRResourcePath.IllegalPathException.Code.DIRECTORY_PATH,
+            assertThrows(MCRResourcePath.IllegalPathException.class,
+                () -> MCRResourcePath.ofWebPathOrThrow("/")).code);
+        assertEquals(MCRResourcePath.IllegalPathException.Code.DIRECTORY_PATH,
+            assertThrows(MCRResourcePath.IllegalPathException.class,
+                () -> MCRResourcePath.ofWebPathOrThrow("foo/")).code);
+        assertEquals(MCRResourcePath.IllegalPathException.Code.DIRECTORY_PATH,
+            assertThrows(MCRResourcePath.IllegalPathException.class,
+                () -> MCRResourcePath.ofWebPathOrThrow("foo/bar/")).code);
+    }
+
+    @Test
     public void equalsResourcePath() {
-        MCRResourcePath path1 = MCRResourcePath.ofPath("/foo/bar/baz").get();
-        MCRResourcePath path2 = MCRResourcePath.ofPath("/foo/bar/baz").get();
+        MCRResourcePath path1 = MCRResourcePath.ofPath("/foo/bar/baz").orElseThrow();
+        MCRResourcePath path2 = MCRResourcePath.ofPath("/foo/bar/baz").orElseThrow();
         assertEquals(path1, path2);
     }
 
     @Test
     public void equalsWebResourcePath() {
-        MCRResourcePath path1 = MCRResourcePath.ofWebPath("/foo/bar/baz").get();
-        MCRResourcePath path2 = MCRResourcePath.ofWebPath("/foo/bar/baz").get();
+        MCRResourcePath path1 = MCRResourcePath.ofWebPath("/foo/bar/baz").orElseThrow();
+        MCRResourcePath path2 = MCRResourcePath.ofWebPath("/foo/bar/baz").orElseThrow();
         assertEquals(path1, path2);
     }
 
     @Test
     public void leadingSlashIsIrrelevantForResourcePath() {
-        MCRResourcePath path2 = MCRResourcePath.ofPath("foo/bar/baz").get();
-        MCRResourcePath path1 = MCRResourcePath.ofPath("/foo/bar/baz").get();
+        MCRResourcePath path2 = MCRResourcePath.ofPath("foo/bar/baz").orElseThrow();
+        MCRResourcePath path1 = MCRResourcePath.ofPath("/foo/bar/baz").orElseThrow();
         assertEquals(path1, path2);
     }
 
     @Test
     public void leadingSlashIsIrrelevantForWebResourcePath() {
-        MCRResourcePath path2 = MCRResourcePath.ofWebPath("foo/bar/baz").get();
-        MCRResourcePath path1 = MCRResourcePath.ofWebPath("/foo/bar/baz").get();
+        MCRResourcePath path2 = MCRResourcePath.ofWebPath("foo/bar/baz").orElseThrow();
+        MCRResourcePath path1 = MCRResourcePath.ofWebPath("/foo/bar/baz").orElseThrow();
         assertEquals(path1, path2);
     }
 
-    @Test(expected = MCRResourceException.class)
+    @Test
     public void resourceCanNotHaveClassExtension() {
-        MCRResourcePath.ofWebPath("/foo/bar/baz.class");
+        assertEquals(MCRResourcePath.IllegalPathException.Code.PATH_POINTS_TO_CLASS_RESOURCE,
+            assertThrows(MCRResourcePath.IllegalPathException.class,
+                () -> MCRResourcePath.ofPath("/foo/bar/baz.class")).code);
     }
 
-    @Test(expected = MCRResourceException.class)
+    @Test
     public void resourceCanNotContainEmptySegment() {
-        MCRResourcePath.ofPath("//foo/bar/baz");
+        assertEquals(MCRResourcePath.IllegalPathException.Code.PATH_CONTAINS_EMPTY_SEGMENT,
+            assertThrows(MCRResourcePath.IllegalPathException.class,
+                () -> MCRResourcePath.ofPath("//foo/bar/baz")).code);
     }
 
-    @Test(expected = MCRResourceException.class)
+    @Test
     public void webResourceCanNotContainEmptySegment() {
-        MCRResourcePath.ofWebPath("//foo/bar/baz");
+        assertEquals(MCRResourcePath.IllegalPathException.Code.PATH_CONTAINS_EMPTY_SEGMENT,
+            assertThrows(MCRResourcePath.IllegalPathException.class,
+                () -> MCRResourcePath.ofWebPath("//foo/bar/baz")).code);
     }
 
-    @Test(expected = MCRResourceException.class)
+    @Test
     public void resourceCanNotContainContainSegmentLinkToSelf() {
-        MCRResourcePath.ofPath("/./foo/bar/baz");
+        assertEquals(MCRResourcePath.IllegalPathException.Code.PATH_CONTAINS_LINK_TO_SELF,
+            assertThrows(MCRResourcePath.IllegalPathException.class,
+                () -> MCRResourcePath.ofPath("/./foo/bar/baz")).code);
     }
 
-    @Test(expected = MCRResourceException.class)
+    @Test
     public void webResourceCanNotContainSegmentLinkToSelf() {
-        MCRResourcePath.ofWebPath("/./foo/bar/baz");
+        assertEquals(MCRResourcePath.IllegalPathException.Code.PATH_CONTAINS_LINK_TO_SELF,
+            assertThrows(MCRResourcePath.IllegalPathException.class,
+                () -> MCRResourcePath.ofWebPath("/./foo/bar/baz")).code);
     }
 
-    @Test(expected = MCRResourceException.class)
+    @Test
     public void resourceCanNotContainSegmentLinkToParent() {
-        MCRResourcePath.ofPath("/../foo/bar/baz");
+        assertEquals(MCRResourcePath.IllegalPathException.Code.PATH_CONTAINS_LINK_TO_PARENT,
+            assertThrows(MCRResourcePath.IllegalPathException.class,
+                () -> MCRResourcePath.ofPath("/../foo/bar/baz")).code);
     }
 
-    @Test(expected = MCRResourceException.class)
+    @Test
     public void webResourceCanNotContainSegmentLinkToParent() {
-        MCRResourcePath.ofWebPath("/../foo/bar/baz");
+        assertEquals(MCRResourcePath.IllegalPathException.Code.PATH_CONTAINS_LINK_TO_PARENT,
+            assertThrows(MCRResourcePath.IllegalPathException.class,
+                () -> MCRResourcePath.ofWebPath("/../foo/bar/baz")).code);
+
     }
 
     @Test
     public void prefixDistinguishesResourcePathAndWebResourcePath() {
-        MCRResourcePath path2 = MCRResourcePath.ofPath("/META-INF/resources/foo/bar/baz").get();
-        MCRResourcePath path1 = MCRResourcePath.ofWebPath("/foo/bar/baz").get();
+        MCRResourcePath path2 = MCRResourcePath.ofPath("/META-INF/resources/foo/bar/baz").orElseThrow();
+        MCRResourcePath path1 = MCRResourcePath.ofWebPath("/foo/bar/baz").orElseThrow();
         assertEquals(path1, path2);
     }
 
-    @Test(expected = MCRResourceException.class)
+    @Test
     public void webResourceCanNotHaveMetaInfPrefix() {
-        MCRResourcePath.ofWebPath("/META-INF/foo/bar/baz");
+        assertEquals(MCRResourcePath.IllegalPathException.Code.PATH_POINTS_TO_META_INF_RESOURCE,
+            assertThrows(MCRResourcePath.IllegalPathException.class,
+                () -> MCRResourcePath.ofWebPath("/META-INF/foo/bar/baz")).code);
     }
 
-    @Test(expected = MCRResourceException.class)
+    @Test
     public void webResourceCanNotHaveWebInfPrefix() {
-        MCRResourcePath.ofWebPath("/WEB-INF/foo/bar/baz");
+        assertEquals(MCRResourcePath.IllegalPathException.Code.PATH_POINTS_TO_WEB_INF_RESOURCE,
+            assertThrows(MCRResourcePath.IllegalPathException.class,
+                () -> MCRResourcePath.ofWebPath("/WEB-INF/foo/bar/baz")).code);
     }
 
     @Test
     public void resourcePathWithoutPrefixAsResourcePathEqualsOriginalPath() {
-        MCRResourcePath path = MCRResourcePath.ofPath("/foo/bar/baz").get();
+        MCRResourcePath path = MCRResourcePath.ofPath("/foo/bar/baz").orElseThrow();
         assertEquals("/foo/bar/baz", path.asAbsolutePath());
         assertEquals("foo/bar/baz", path.asRelativePath());
     }
 
     @Test
     public void resourcePathWithPrefixAsResourcePathEqualsOriginalPath() {
-        MCRResourcePath path = MCRResourcePath.ofPath("/META-INF/resources/foo/bar/baz").get();
+        MCRResourcePath path = MCRResourcePath.ofPath("/META-INF/resources/foo/bar/baz").orElseThrow();
         assertEquals("/META-INF/resources/foo/bar/baz", path.asAbsolutePath());
         assertEquals("META-INF/resources/foo/bar/baz", path.asRelativePath());
     }
 
     @Test
     public void webResourcePathWithoutPrefixAsResourcePathAddsPrefixToOriginalPath() {
-        MCRResourcePath path = MCRResourcePath.ofWebPath("/foo/bar/baz").get();
+        MCRResourcePath path = MCRResourcePath.ofWebPath("/foo/bar/baz").orElseThrow();
         assertEquals("/META-INF/resources/foo/bar/baz", path.asAbsolutePath());
         assertEquals("META-INF/resources/foo/bar/baz", path.asRelativePath());
     }
 
     @Test
     public void resourcePathWithoutPrefixAsWebResourcePathDoesNotExist() {
-        MCRResourcePath path = MCRResourcePath.ofPath("/foo/bar/baz").get();
+        MCRResourcePath path = MCRResourcePath.ofPath("/foo/bar/baz").orElseThrow();
         assertEquals(EMPTY, path.asAbsoluteWebPath());
         assertEquals(EMPTY, path.asRelativeWebPath());
     }
 
     @Test
     public void resourcePathWithPrefixAsWebResourcePathRemovesPrefixFromOriginalPath() {
-        MCRResourcePath path = MCRResourcePath.ofPath("/META-INF/resources/foo/bar/baz").get();
-        assertEquals("/foo/bar/baz", path.asAbsoluteWebPath().get());
-        assertEquals("foo/bar/baz", path.asRelativeWebPath().get());
+        MCRResourcePath path = MCRResourcePath.ofPath("/META-INF/resources/foo/bar/baz").orElseThrow();
+        assertEquals("/foo/bar/baz", path.asAbsoluteWebPath().orElseThrow());
+        assertEquals("foo/bar/baz", path.asRelativeWebPath().orElseThrow());
     }
 
     @Test
     public void webResourcePathWithoutPrefixAsWebResourcePathEqualsOriginalPath() {
-        MCRResourcePath path = MCRResourcePath.ofWebPath("/foo/bar/baz").get();
-        assertEquals("/foo/bar/baz", path.asAbsoluteWebPath().get());
-        assertEquals("foo/bar/baz", path.asRelativeWebPath().get());
+        MCRResourcePath path = MCRResourcePath.ofWebPath("/foo/bar/baz").orElseThrow();
+        assertEquals("/foo/bar/baz", path.asAbsoluteWebPath().orElseThrow());
+        assertEquals("foo/bar/baz", path.asRelativeWebPath().orElseThrow());
     }
 
 }

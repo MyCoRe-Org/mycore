@@ -68,7 +68,7 @@ public class MCRClassLoaderResourceLocator extends MCRResourceLocatorBase {
         try {
             return classLoader.getResources(path.asRelativePath());
         } catch (IOException e) {
-            throw new MCRException(e);
+            throw new MCRException("Failed to obtain resources from class loader for path " + path.asRelativePath(), e);
         }
     }
 
