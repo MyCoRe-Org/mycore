@@ -18,17 +18,17 @@
 
 package org.mycore.ocfl.metadata.migration;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.common.MCRMetadataVersionType;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * A pruner that combines and compares revisions to decide which to keep and which to discard.
