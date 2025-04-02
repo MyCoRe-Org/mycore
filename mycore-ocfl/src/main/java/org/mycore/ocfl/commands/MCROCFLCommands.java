@@ -190,7 +190,7 @@ public class MCROCFLCommands {
     @MCRCommand(syntax = "update ocfl classification {0}",
         help = "Update classification {0} in the OCFL Store from database")
     public static void updateOCFLClassification(String classId) {
-        final MCRCategoryID rootID = new MCRCategoryID(classId);;
+        final MCRCategoryID rootID = new MCRCategoryID(classId);
         MCROCFLClassificationTransaction.addClassificationEvent(rootID, MCRAbstractMetadataVersion.UPDATED);
     }
 
@@ -422,7 +422,7 @@ public class MCROCFLCommands {
 
     @MCRCommand(syntax = "migrate derivates to ocfl", help = "migrates all ifs2 derivates to ocfl")
     public static List<String> migrateDerivates() {
-        List<String> derivateIds = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
+        List<String> derivateIds = MCRXMLMetadataManager.getInstance().listIDsOfType("derivate");
         return derivateIds.stream().map(derivateId -> {
             return "migrate derivate " + derivateId + " to ocfl";
         }).toList();
@@ -450,7 +450,7 @@ public class MCROCFLCommands {
         Files.deleteIfExists(errorFilePath);
         LOGGER.info("Validation errors will be written to: '{}'. If this file does not exists, all derivates "
             + "are successfully migrated to ocfl and can be removed from ifs2.", errorFilePath);
-        List<String> derivateIds = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
+        List<String> derivateIds = MCRXMLMetadataManager.getInstance().listIDsOfType("derivate");
         return derivateIds.stream().map(derivateId -> {
             return "validate ocfl derivate " + derivateId;
         }).toList();
@@ -555,7 +555,7 @@ public class MCROCFLCommands {
 
         @Override
         public FileVisitResult visitFile(Path path, BasicFileAttributes basicFileAttributes) throws IOException {
-            String relativePath = MCRPath.toMCRPath(path).getOwnerRelativePath();
+            String relativePath = MCRPath.ofPath(path).getOwnerRelativePath();
             if (basicFileAttributes instanceof MCRFileAttributes<?> mcrFileAttributes) {
                 map.put(relativePath, mcrFileAttributes.digest());
             } else {
@@ -566,7 +566,7 @@ public class MCROCFLCommands {
 
         @Override
         public FileVisitResult postVisitDirectory(Path path, IOException e) {
-            map.put(MCRPath.toMCRPath(path).getOwnerRelativePath(), null);
+            map.put(MCRPath.ofPath(path).getOwnerRelativePath(), null);
             return FileVisitResult.CONTINUE;
         }
 
