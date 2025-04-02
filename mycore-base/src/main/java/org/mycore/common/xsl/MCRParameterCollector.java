@@ -414,12 +414,12 @@ public class MCRParameterCollector {
         static Map<String, String> initializeSafeProperties() {
             Map<String, String> safeProperties = new ConcurrentHashMap<>();
 
-            UUID uuid = MCRConfiguration2.addPropertyChangeEventLister((k) -> true, (k, old, _new) -> {
-                if (_new.isEmpty() && old.isPresent()) {
+            UUID uuid = MCRConfiguration2.addPropertyChangeEventLister((k) -> true, (k, old, current) -> {
+                if (current.isEmpty() && old.isPresent()) {
                     safeProperties.remove(xmlSafe(k));
                     COMPUTED_HASH_CODE.set(computeHashCode(safeProperties));
-                } else if (_new.isPresent()) {
-                    safeProperties.put(xmlSafe(k), _new.get());
+                } else if (current.isPresent()) {
+                    safeProperties.put(xmlSafe(k), current.get());
                     COMPUTED_HASH_CODE.set(computeHashCode(safeProperties));
                 }
             });
