@@ -24,10 +24,11 @@ import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.MCRUserInformationResolver;
 
-public class MCRUserProviderTest extends MCRUserTestCase {
+public class MCRUserProviderTest extends MCRJPATestCase {
 
     private MCRUser userWithoutRealm;
 
