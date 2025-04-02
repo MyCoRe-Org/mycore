@@ -377,7 +377,7 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
         if (!BasicFileAttributeView.class.isAssignableFrom(type)) {
             return null;
         }
-        return (V) new MCROCFLBasicFileAttributeView(MCRVersionedPath.toVersionedPath(path));
+        return (V) new MCROCFLBasicFileAttributeView(MCRVersionedPath.ofPath(path));
     }
 
     /**
@@ -406,7 +406,7 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
         if (!"basic".equals(s[0])) {
             throw new UnsupportedOperationException("View '" + s[0] + "' not available");
         }
-        MCRVersionedPath versionedPath = MCRVersionedPath.toVersionedPath(path);
+        MCRVersionedPath versionedPath = MCRVersionedPath.ofPath(path);
         return new MCROCFLBasicFileAttributeView(versionedPath).getAttributeMap(s[1].split(","));
     }
 
@@ -502,7 +502,7 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
      * @throws FileSystemNotFoundException if the OCFL file system is not available.
      */
     public static MCROCFLFileSystem getMCROCFLFileSystem() throws FileSystemNotFoundException {
-        return fileSystem != null ? fileSystem : (MCROCFLFileSystem) MCRAbstractFileSystem.getInstance(SCHEME);
+        return fileSystem != null ? fileSystem : (MCROCFLFileSystem) MCRAbstractFileSystem.obtainInstance(SCHEME);
     }
 
     /**
