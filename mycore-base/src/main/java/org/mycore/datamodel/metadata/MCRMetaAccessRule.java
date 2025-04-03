@@ -18,6 +18,8 @@
 
 package org.mycore.datamodel.metadata;
 
+import java.util.Objects;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
@@ -215,6 +217,24 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
             LOGGER.debug("Rule               = " + ELEMENT_CONDITION);
             LOGGER.debug(" ");
         }
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + Objects.hash(condition, permission);
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        final MCRMetaAccessRule other = (MCRMetaAccessRule) obj;
+        return Objects.equals(condition, other.condition)
+            && Objects.equals(permission, other.permission);
     }
 
 }

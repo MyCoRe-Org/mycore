@@ -20,6 +20,7 @@ package org.mycore.datamodel.metadata;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -205,12 +206,20 @@ public class MCRMetaXML extends MCRMetaDefault {
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + Objects.hash(content);
+        return result;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (!super.equals(obj)) {
             return false;
         }
         final MCRMetaXML other = (MCRMetaXML) obj;
-        return MCRXMLHelper.deepEqual(this.createXML(), other.createXML());
+        return MCRXMLHelper.deepEqual(createXML(), other.createXML());
     }
 
 }

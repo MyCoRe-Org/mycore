@@ -206,6 +206,14 @@ public final class MCRMetaAddress extends MCRMetaDefault {
         }
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + Objects.hash(city, country, number, state, street, zipCode);
+        return result;
+    }
+
     /**
      * Check the equivalence between this instance and the given object.
      *
@@ -218,9 +226,12 @@ public final class MCRMetaAddress extends MCRMetaDefault {
             return false;
         }
         final MCRMetaAddress other = (MCRMetaAddress) obj;
-        return Objects.equals(this.country, other.country) && Objects.equals(this.state, other.state)
-            && Objects.equals(this.zipCode, other.zipCode) && Objects.equals(this.city, other.city)
-            && Objects.equals(this.street, other.street) && Objects.equals(this.number, other.number);
+        return Objects.equals(city, other.city)
+            && Objects.equals(country, other.country)
+            && Objects.equals(number, other.number)
+            && Objects.equals(state, other.state)
+            && Objects.equals(street, other.street)
+            && Objects.equals(zipCode, other.zipCode);
     }
 
     /**

@@ -18,8 +18,6 @@
 
 package org.mycore.datamodel.metadata;
 
-import java.util.Objects;
-
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
@@ -238,20 +236,17 @@ public class MCRMetaLinkID extends MCRMetaLink {
     }
 
     @Override
+    @SuppressWarnings("PMD.UselessOverridingMethod") // collision with rule "PMD.OverrideBothEqualsAndHashcode" 
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
     public boolean equals(Object obj) {
-        boolean result;
-        MCRMetaLinkID other = (MCRMetaLinkID) obj;
-        if (!super.equals(obj) || (!Objects.equals(from, other.from)
-            || !Objects.equals(href, other.href)
-            || !Objects.equals(label, other.label)
-            || !Objects.equals(linktype, other.linktype)
-            || !Objects.equals(title, other.title)
-            || !Objects.equals(role, other.role))) {
-            result = false;
-        } else {
-            result = Objects.equals(to, other.to);
+        if (!super.equals(obj)) {
+            return false;
         }
-        return result;
+        return true;
     }
 
     @Override

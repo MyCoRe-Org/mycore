@@ -21,6 +21,7 @@ package org.mycore.datamodel.metadata;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -475,6 +476,27 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
     @Override
     public Iterator<MCRMetaElement> iterator() {
         return metadataElements.iterator();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(heritedXML, metadataElements);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final MCRObjectMetadata other = (MCRObjectMetadata) obj;
+        return heritedXML == other.heritedXML
+            && Objects.equals(metadataElements, other.metadataElements);
     }
 
 }
