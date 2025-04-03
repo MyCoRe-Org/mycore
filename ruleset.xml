@@ -89,10 +89,12 @@
   <rule ref="category/java/codestyle.xml/FormalParameterNamingConventions"/>
   <rule ref="category/java/codestyle.xml/IdenticalCatchBranches"/>
   <rule ref="category/java/codestyle.xml/LambdaCanBeMethodReference"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
-  <rule ref="category/java/codestyle.xml/LinguisticNaming"/>
-  -->
+  <rule ref="category/java/codestyle.xml/LinguisticNaming">
+    <properties>
+      <!-- we use some setters as 'fluent api' -->
+      <property name="checkSetters" value="false"/>
+    </properties>
+  </rule>
   <rule ref="category/java/codestyle.xml/LocalVariableNamingConventions"/>
   <rule ref="category/java/codestyle.xml/MethodNamingConventions"/>
   <rule ref="category/java/codestyle.xml/NoPackage"/>

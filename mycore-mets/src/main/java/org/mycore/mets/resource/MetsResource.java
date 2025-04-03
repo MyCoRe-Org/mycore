@@ -91,7 +91,7 @@ public class MetsResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/editor/islocked/{derivateId}")
-    public String isLocked(@PathParam(DERIVATE_ID) String derivateId) {
+    public String showIsLocked(@PathParam(DERIVATE_ID) String derivateId) {
         checkDerivateAccess(MCRObjectID.getInstance(derivateId), MCRAccessManager.PERMISSION_READ);
         boolean isLocked = MCRMetsLock.isLocked(derivateId);
         return "{\"lock\": " + isLocked + " }";
