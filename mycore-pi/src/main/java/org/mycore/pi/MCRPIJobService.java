@@ -253,7 +253,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     public void runAsJobUser(PIRunnable task) throws MCRPersistentIdentifierException {
         final boolean jobUserPresent = isJobUserPresent();
         MCRSession session = MCRSessionMgr.getCurrentSession();
-        MCRUserInformation savedUserInformation = null;
+        MCRUserInformation savedUserInformation;
 
         if (jobUserPresent) {
             final String jobUser = getJobUser();

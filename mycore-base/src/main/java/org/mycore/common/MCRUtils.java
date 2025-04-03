@@ -263,7 +263,7 @@ public class MCRUtils {
     }
 
     public static String parseDocumentType(InputStream in) {
-        SAXParser parser = null;
+        SAXParser parser;
 
         try {
             parser = SAXParserFactory.newInstance().newSAXParser();

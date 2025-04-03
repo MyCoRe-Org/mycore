@@ -53,7 +53,7 @@ import org.mycore.common.content.MCRURLContent;
  * @author Robert Stephan
  * @since 2013.12
  */
-@SuppressWarnings("PMD.MCR.ResourceResolver")
+@SuppressWarnings({"PMD.MCR.ResourceResolver", "PMD.UnusedAssignment"})
 public class MCRConfigurationInputStream extends InputStream {
 
     private static final String MYCORE_PROPERTIES = "mycore.properties";

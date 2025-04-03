@@ -313,7 +313,7 @@ public class MCRQuery {
     public static MCRQuery parseXML(Document doc) {
         Element xml = doc.getRootElement();
         Element conditions = xml.getChild("conditions");
-        MCRQuery query = null;
+        MCRQuery query;
         if (conditions.getAttributeValue("format", "xml").equals("xml")) {
             Element condElem = conditions.getChildren().getFirst();
             query = new MCRQuery(new MCRQueryParser().parse(condElem));

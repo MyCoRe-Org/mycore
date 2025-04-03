@@ -105,7 +105,7 @@ public class MCRClassificationUtils {
     public static void fromStream(InputStream inputStream)
         throws MCRException, URISyntaxException, MCRAccessException, IOException {
         MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
-        Document jdom = null;
+        Document jdom;
         try {
             jdom = MCRXMLParserFactory.getParser().parseXML(new MCRStreamContent(inputStream));
         } catch (JDOMException e) {

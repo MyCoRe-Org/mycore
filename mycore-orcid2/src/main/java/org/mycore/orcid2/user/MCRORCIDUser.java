@@ -131,13 +131,12 @@ public class MCRORCIDUser {
         if (!MCRORCIDValidationHelper.validateCredential(credential)) {
             throw new MCRORCIDException("Credential is invalid");
         }
-        String credentialString = null;
         try {
-            credentialString = MCRORCIDJSONMapper.credentialToJSON(credential);
+            String credentialString = MCRORCIDJSONMapper.credentialToJSON(credential);
+            user.setUserAttribute(getCredentialAttributeNameByORCID(orcid), credentialString);
         } catch (IllegalArgumentException e) {
             throw new MCRORCIDException("Credential is invalid", e);
         }
-        user.setUserAttribute(getCredentialAttributeNameByORCID(orcid), credentialString);
     }
 
     /**
@@ -281,13 +280,12 @@ public class MCRORCIDUser {
         if (!getORCIDs().contains(orcid)) {
             throw new MCRORCIDException("Linked ORCID iD " + orcid + " does not exist");
         }
-        String userPropertiesString = null;
         try {
-            userPropertiesString = MCRORCIDJSONMapper.userPropertiesToString(userProperties);
+            String userPropertiesString = MCRORCIDJSONMapper.userPropertiesToString(userProperties);
+            user.setUserAttribute(getUserPropertiesAttributeNameByORCID(orcid), userPropertiesString);
         } catch (IllegalArgumentException e) {
             throw new MCRORCIDException("User properties are invalid", e);
         }
-        user.setUserAttribute(getUserPropertiesAttributeNameByORCID(orcid), userPropertiesString);
     }
 
     @Override
