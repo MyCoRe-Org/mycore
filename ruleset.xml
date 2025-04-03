@@ -227,10 +227,7 @@
   <!--
   <rule ref="category/java/errorprone.xml/OverrideBothEqualsAndHashcode"/>
   -->
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/errorprone.xml/ProperCloneImplementation"/>
-  -->
   <!-- to be evaluated -->
   <!-- TODO: Create PR to fix this rule -->
   <!--

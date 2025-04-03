@@ -88,4 +88,39 @@ public class MCRTransientUser extends MCRUser {
         return this.userInfo.getUserAttribute(attribute);
     }
 
+    @Override
+    public MCRTransientUser clone() {
+        MCRTransientUser clone = (MCRTransientUser) super.clone();
+
+        clone.userInfo = userInfo;
+
+        return clone;
+    }
+
+    @Override
+    protected MCRUser copyPropertiesTo(CopyMode mode, MCRUser other) {
+
+        super.copyPropertiesTo(mode, other);
+
+        if(other instanceof MCRTransientUser otherTransient) {
+
+            // null out properties in cloned instance
+            otherTransient.userInfo = null;
+
+            // include only in FULL mode
+            if (mode == CopyMode.FULL) {
+                otherTransient.userInfo = userInfo;
+            }
+
+        }
+
+        return other;
+
+    }
+
+    @Override
+    public MCRUser toPersistableUser(){
+        return copyPropertiesTo(CopyMode.FULL, new MCRUser());
+    }
+
 }
