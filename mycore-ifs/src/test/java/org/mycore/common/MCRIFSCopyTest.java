@@ -18,26 +18,27 @@
 
 package org.mycore.common;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.niofs.MCRPath;
-import org.mycore.util.concurrent.MCRFixedUserCallable;
 
 public class MCRIFSCopyTest extends MCRIFSTest {
 
@@ -47,36 +48,29 @@ public class MCRIFSCopyTest extends MCRIFSTest {
 
     @Test
     public void sync() throws Exception {
-        create();
         copy("/anpassbar.jpg", "anpassbar.jpg", derivate);
         copy("/nachhaltig.jpg", "nachhaltig.jpg", derivate);
         copy("/vielseitig.jpg", "vielseitig.jpg", derivate);
         try (Stream<Path> streamPath = Files.list(MCRPath.getPath(derivate.getId().toString(), "/"))) {
-            assertEquals("the derivate should contain three files", 3, streamPath.count());
+            assertEquals(3, streamPath.count(), "the derivate should contain three files");
         }
     }
 
     @Test
     public void async() throws Exception {
-        // create derivate
-        create();
         MCRSessionMgr.getCurrentSession();
         MCRTransactionManager.commitTransactions();
 
         // execute threads
         MCRSystemUserInformation systemUser = MCRSystemUserInformation.SYSTEM_USER;
-        ExecutorService executorService = Executors.newFixedThreadPool(3);
-        Future<Exception> future1 = executorService
-            .submit(new MCRFixedUserCallable<>(new CopyTask("anpassbar.jpg", derivate), systemUser));
-        Future<Exception> future2 = executorService
-            .submit(new MCRFixedUserCallable<>(new CopyTask("nachhaltig.jpg", derivate), systemUser));
-        Future<Exception> future3 = executorService
-            .submit(new MCRFixedUserCallable<>(new CopyTask("vielseitig.jpg", derivate), systemUser));
-        throwException(future1.get(5, TimeUnit.SECONDS));
-        throwException(future2.get(5, TimeUnit.SECONDS));
-        throwException(future3.get(5, TimeUnit.SECONDS));
+        ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
+        CompletableFuture.allOf(
+            CompletableFuture.runAsync(copy("anpassbar.jpg", derivate), executorService),
+            CompletableFuture.runAsync(copy("nachhaltig.jpg", derivate), executorService),
+            CompletableFuture.runAsync(copy("vielseitig.jpg", derivate), executorService))
+            .get(5, TimeUnit.SECONDS);
         try (Stream<Path> streamPath = Files.list(MCRPath.getPath(derivate.getId().toString(), "/"))) {
-            assertEquals("the derivate should contain three files", 3, streamPath.count());
+            assertEquals(3, streamPath.count(), "the derivate should contain three files");
         }
 
         executorService.awaitTermination(1, TimeUnit.SECONDS);
@@ -88,6 +82,7 @@ public class MCRIFSCopyTest extends MCRIFSTest {
         }
     }
 
+    @BeforeEach
     public void create() throws Exception {
         root = createObject();
         derivate = createDerivate(root.getId());
@@ -95,41 +90,27 @@ public class MCRIFSCopyTest extends MCRIFSTest {
         MCRMetadataManager.create(derivate);
     }
 
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
         MCRMetadataManager.delete(derivate);
         MCRMetadataManager.delete(root);
-        super.tearDown();
     }
 
     public static void copy(String from, String to, MCRDerivate derivate) throws IOException {
         try (InputStream fileInputStream = MCRIFSTest.class.getResourceAsStream(from)) {
-            assertNotNull("cannot find file " + from, fileInputStream);
+            assertNotNull(fileInputStream, "cannot find file " + from);
             Files.copy(fileInputStream, MCRPath.getPath(derivate.toString(), to));
         }
     }
 
-    private static class CopyTask implements Callable<Exception> {
-
-        private String fileName;
-
-        private MCRDerivate derivate;
-
-        CopyTask(String fileName, MCRDerivate derivate) {
-            this.fileName = fileName;
-            this.derivate = derivate;
-        }
-
-        @Override
-        public Exception call() {
+    public static Runnable copy(String fileName, MCRDerivate derivate) throws UncheckedIOException {
+        return () -> {
             try {
-                MCRIFSCopyTest.copy("/" + fileName, fileName, derivate);
-                return null;
-            } catch (Exception exc) {
-                return exc;
+                copy("/" + fileName, fileName, derivate);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
             }
-        }
-
+        };
     }
 
 }

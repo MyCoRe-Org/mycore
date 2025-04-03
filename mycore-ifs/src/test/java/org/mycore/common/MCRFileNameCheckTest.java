@@ -18,11 +18,13 @@
 
 package org.mycore.common;
 
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+
 import java.io.IOException;
 import java.nio.file.Files;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mycore.access.MCRAccessException;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -33,7 +35,7 @@ public class MCRFileNameCheckTest extends MCRIFSTest {
 
     private MCRDerivate derivate;
 
-    @Before
+    @BeforeEach
     public void setup() throws MCRAccessException {
         MCRObject root = createObject();
         derivate = createDerivate(root.getId());
@@ -41,22 +43,22 @@ public class MCRFileNameCheckTest extends MCRIFSTest {
         MCRMetadataManager.create(derivate);
     }
 
-    @Test(expected = IOException.class)
+    @Test
     public void checkIllegalWindowsFileName() throws IOException {
         final MCRPath aux = MCRPath.getPath(derivate.toString(), "aux");
-        Files.createFile(aux);
+        assertThrowsExactly(IOException.class, () -> Files.createFile(aux));
     }
 
-    @Test(expected = IOException.class)
+    @Test
     public void checkIllegalFileName() throws IOException {
         final MCRPath info = MCRPath.getPath(derivate.toString(), "info@mycore.de");
-        Files.createFile(info);
+        assertThrowsExactly(IOException.class, () -> Files.createFile(info));
     }
 
-    @Test(expected = IOException.class)
+    @Test
     public void checkIllegalDirectoryName() throws IOException {
         final MCRPath dirName = MCRPath.getPath(derivate.toString(), "Nur ein \"Test\"");
-        Files.createDirectory(dirName);
+        assertThrowsExactly(IOException.class, () -> Files.createDirectory(dirName));
     }
 
 }

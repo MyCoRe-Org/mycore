@@ -21,21 +21,19 @@ package org.mycore.frontend.fileupload;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRStreamUtils;
-import org.mycore.common.MCRTestCase;
+import org.mycore.test.MyCoReTest;
 
 /**
  * @author Thomas Scheffler (yagee)
  *
  */
-@RunWith(Parameterized.class)
-public class MCRUploadHelperTest extends MCRTestCase {
+@MyCoReTest
+public class MCRUploadHelperTest {
     static String prefix = "junit";
 
     static String suffix = "test..file";
@@ -49,16 +47,9 @@ public class MCRUploadHelperTest extends MCRTestCase {
     private static final String[] RESERVED_NAMES = { "com1", "com2", "com3", "com4", "com5", "com6", "com7", "com8",
         "com9", "lpt1", "lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7", "lpt8", "lpt9", "con", "nul", "prn", "aux" };
 
-    @Parameter(0)
-    public String path;
-
-    @Parameter(1)
-    public Class<? extends Exception> expectedException;
-
-    @Parameters
-    public static Iterable<Object[]> data() {
+    static Stream<Object[]> testData() {
         return Stream.concat(toParameter(validNames(), null),
-            toParameter(invalidNames(), MCRException.class))::iterator;
+            toParameter(invalidNames(), MCRException.class));
     }
 
     private static Stream<String> invalidNames() {
@@ -81,19 +72,13 @@ public class MCRUploadHelperTest extends MCRTestCase {
         return input.map(s -> new Object[] { s, exp });
     }
 
-    @Test
-    public void checkPathName() {
-        try {
-            MCRUploadHelper.checkPathName(path);
-            if (expectedException != null) {
-                throw new AssertionError(
-                    "Expected test to throw instance of " + expectedException.getName() + " for path=\"" + path + "\"");
-            }
-        } catch (RuntimeException e) {
-            if (expectedException == null || !expectedException.isAssignableFrom(e.getClass())) {
-                throw e;
-            }
+    @ParameterizedTest
+    @MethodSource("testData")
+    public void checkPathName(String path, Class<? extends Exception> expectedException) {
+        if (expectedException == null) {
+            Assertions.assertDoesNotThrow(() -> MCRUploadHelper.checkPathName(path));
+        } else {
+            Assertions.assertThrows(expectedException, () -> MCRUploadHelper.checkPathName(path));
         }
     }
-
 }
