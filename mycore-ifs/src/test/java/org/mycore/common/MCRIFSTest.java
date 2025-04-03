@@ -18,42 +18,51 @@
 
 package org.mycore.common;
 
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.access.strategies.MCRAccessCheckStrategy;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
+import org.mycore.datamodel.common.MCRLinkTableInterface;
 import org.mycore.datamodel.common.MCRXMLMetadataEventHandler;
+import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.test.MCRMetadataExtension;
+import org.mycore.test.MyCoReTest;
 
-public abstract class MCRIFSTest extends MCRStoreTestCase {
+@MyCoReTest
+@ExtendWith(MCRMetadataExtension.class)
+@MCRTestConfiguration(
+    properties = {
+        @MCRTestProperty(key = "MCR.Metadata.Type.object", string = "true"),
+        @MCRTestProperty(key = "MCR.Metadata.Type.derivate", string = "true"),
+        @MCRTestProperty(key = "MCR.Access.Class", classNameOf = MCRAccessBaseImpl.class),
+        @MCRTestProperty(key = "MCR.Access.Strategy.Class", classNameOf = MCRIFSTest.AlwaysTrueStrategy.class),
+        @MCRTestProperty(key = "MCR.Persistence.LinkTable.Store.Class",
+            classNameOf = MCRIFSTest.FakeLinkTableStore.class),
+        @MCRTestProperty(key = "MCR.Metadata.Store.DefaultClass", classNameOf = MCRMetadataStore.class)
+    })
+public abstract class MCRIFSTest {
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
+    @TempDir
+    static Path tempDir;
+
+    @BeforeEach
+    public void prepareEventHandler() throws Exception {
         MCREventManager.getInstance().clear().addEventHandler(MCREvent.ObjectType.OBJECT,
             new MCRXMLMetadataEventHandler());
-    }
-
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.datadir", "%MCR.basedir%/data");
-        testProperties
-            .put("MCR.Persistence.LinkTable.Store.Class", "org.mycore.backend.hibernate.MCRHIBLinkTableStore");
-        testProperties.put("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
-        testProperties.put("MCR.Access.Strategy.Class", AlwaysTrueStrategy.class.getName());
-        testProperties.put("MCR.Metadata.Type.object", "true");
-        testProperties.put("MCR.Metadata.Type.derivate", "true");
-        return testProperties;
     }
 
     public static MCRObject createObject() {
@@ -84,6 +93,38 @@ public abstract class MCRIFSTest extends MCRStoreTestCase {
             return true;
         }
 
+    }
+
+    public static class FakeLinkTableStore implements MCRLinkTableInterface {
+        @Override
+        public void create(String from, String to, String type, String attr) {
+
+        }
+
+        @Override
+        public void delete(String from, String to, String type) {
+
+        }
+
+        @Override
+        public int countTo(String fromtype, String to, String type, String restriction) {
+            return 0;
+        }
+
+        @Override
+        public Map<String, Number> getCountedMapOfMCRTO(String mcrtoPrefix) {
+            return Map.of();
+        }
+
+        @Override
+        public Collection<String> getSourcesOf(String to, String type) {
+            return List.of();
+        }
+
+        @Override
+        public Collection<String> getDestinationsOf(String from, String type) {
+            return List.of();
+        }
     }
 
 }
