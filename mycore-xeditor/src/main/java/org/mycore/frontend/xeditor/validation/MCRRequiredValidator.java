@@ -20,6 +20,7 @@ package org.mycore.frontend.xeditor.validation;
 
 import org.mycore.common.MCRException;
 import org.mycore.frontend.xeditor.MCRBinding;
+import org.mycore.frontend.xeditor.MCRNodes;
 
 /**
  * Validates input to be required. XML is valid if at least one value exists at the given XPath.
@@ -58,7 +59,7 @@ public class MCRRequiredValidator extends MCRValidator {
 
         // at least one value must exist
         for (Object node : binding.getBoundNodes()) {
-            if (!MCRBinding.getValue(node).isEmpty()) {
+            if (!MCRNodes.getValue(node).isEmpty()) {
                 isValid = true;
             }
         }
