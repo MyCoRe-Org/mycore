@@ -22,15 +22,15 @@ import { MyCoReMap } from "../../Utils";
 
 export class MobileChapterTreeView implements ChapterTreeView {
 
-  constructor(private _container: JQuery, private _inputHandler: ChapterTreeInputHandler, className: string = "chapterTreeDesktop") {
-    this.list = jQuery("<ul></ul>");
+  constructor(private _container: HTMLElement, private _inputHandler: ChapterTreeInputHandler, className: string = "chapterTreeDesktop") {
+    this.list = document.createElement("ul");
 
-    this.list.addClass("mobileListview")
+    this.list.classList.add("mobileListview")
     this.levelMap = new MyCoReMap<string, number>();
-    this.list.appendTo(_container);
+    _container.append(this.list);
   }
 
-  private list: JQuery;
+  private list: HTMLElement;
   private levelMap: MyCoReMap<string, number>;
   private static LEVEL_MARGIN = 15;
 
@@ -38,21 +38,21 @@ export class MobileChapterTreeView implements ChapterTreeView {
     if (label === childLabel) {
       childLabel = '';
     }
-    const newElement = jQuery("<li></li>");
-    const labelElement = jQuery("<a></a>");
+    const newElement = document.createElement("li");
+    const labelElement = document.createElement("a");
 
-    labelElement.addClass("label");
-    labelElement.text(label);
-    labelElement.attr("data-id", id);
-    labelElement.appendTo(newElement);
+    labelElement.classList.add("label");
+    labelElement.innerText = label;
+    labelElement.setAttribute("data-id", id);
+    newElement.appendChild(labelElement);
 
-    const childlabelElement = jQuery("<a></a>");
+    const childlabelElement = document.createElement("a");
 
-    childlabelElement.text(childLabel);
-    childlabelElement.addClass("childLabel");
-    childlabelElement.appendTo(newElement);
+    childlabelElement.innerText = childLabel;
+    childlabelElement.classList.add("childLabel");
+    newElement.append(childlabelElement);
 
-    newElement.attr("data-id", id);
+    newElement.setAttribute("data-id", id);
 
     let level = 0;
     if (parentId != null && this.levelMap.has(parentId)) {
@@ -60,7 +60,7 @@ export class MobileChapterTreeView implements ChapterTreeView {
     }
     this.levelMap.set(id, level);
 
-    labelElement.css({ "padding-left": (15 * level) + "px" })
+    labelElement.style.paddingLeft = (15*level) + "px";
 
     this.list.append(newElement);
     this._inputHandler.registerNode(newElement, id);

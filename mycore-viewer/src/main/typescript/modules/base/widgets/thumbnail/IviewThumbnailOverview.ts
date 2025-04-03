@@ -17,7 +17,7 @@
  */
 
 
-import { MoveVector, MyCoReMap, Position2D, Size2D } from "../../Utils";
+import {getElementHeight, getElementOuterHeight, MoveVector, MyCoReMap, Position2D, Size2D} from "../../Utils";
 import {
   ThumbnailOverviewResizeHandler,
   ThumbnailOverviewScrollHandler,
@@ -32,10 +32,8 @@ export class IviewThumbnailOverview implements ThumbnailOverviewScrollHandler, T
   constructor(private _settings: ThumbnailOverviewSettings) {
     this._model = new ThumbnailOverviewModel(this._settings.thumbnails);
     this._view = new ThumbnailOverviewView(this._settings.container, this, this, this._settings.inputHandler);
-    this._settings.container.css({
-      "min-width": this._settings.maxThumbnailSize.width + "px",
-      "min-height": this._settings.maxThumbnailSize.height + "px"
-    });
+    this._settings.container.style.minWidth = this._settings.maxThumbnailSize.width + "px";
+    this._settings.container.style.minHeight = this._settings.maxThumbnailSize.height + "px";
     this.update(true);
 
   }
@@ -80,18 +78,16 @@ export class IviewThumbnailOverview implements ThumbnailOverviewScrollHandler, T
   public update(resize: boolean = false): void {
     const vpSize = this._view.getViewportSize();
 
-    const sizeOfOther = ((childs: JQuery) => {
-      let height = 0;
-      childs.each((i, e: Element) => {
-        if (this._settings.container[0] != e && jQuery(e).css("position") != "absolute") {
-          height += jQuery(e).outerHeight();
+    const children = this._settings?.container?.parentElement?.children || [];
+    let sizeIfOther = 0;
+    for (let i = 0 /* skip first */; i < children.length; i++) {
+        const child = children[i] as HTMLElement;
+        if(child.style.position != "absolute" && this._settings.container !== child) {
+          sizeIfOther += getElementOuterHeight(child as HTMLElement);
         }
-      });
-      return height;
-    })(this._settings.container.parent().children());
+    }
 
-
-    this._settings.container.css({ "height": this._settings.container.parent().height() - sizeOfOther });
+    this._settings.container.style.height = (getElementHeight(this._settings.container.parentElement) - sizeIfOther) + "px";
     if (vpSize.width == 0 || vpSize.height == 0) {
       return;
     }

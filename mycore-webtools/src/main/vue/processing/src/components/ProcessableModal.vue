@@ -21,6 +21,10 @@
 // Props
 import type {Processable} from "../model/model.ts";
 import {Util} from "../common/util.ts";
+import {onMounted, useTemplateRef} from "vue";
+import type { Modal } from "bootstrap";
+
+declare const bootstrap: { Modal: typeof Modal };
 
 defineProps<{
   model: Processable;
@@ -28,68 +32,116 @@ defineProps<{
 
 const emit = defineEmits(['close']);
 
+const modal = useTemplateRef('modal');
+let bootStrapModel: Modal;
+
+onMounted(() => {
+  if (modal.value) {
+    bootStrapModel = new bootstrap.Modal(modal.value);
+  }
+});
+
+function show() {
+  bootStrapModel.show();
+}
+
+defineExpose({
+  show
+});
+
 </script>
 
 <template>
-  <div class="modal-backdrop" @click.self="emit('close')">
-    <div class="processing-modal">
-      <div class="processing-modal-header">
-        <h4 class="modal-title">Properties</h4>
-        <button @click="emit('close')">&times;</button>
-      </div>
-      <div class="processing-modal-body">
+  <div class="modal" ref="modal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Properties</h4>
+          <button @click="emit('close')" type="button" class="btn-close" data-bs-dismiss="modal"
+                  aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
         <!-- Basic Properties -->
-        <div class="card">
-          <h5>Basic Properties</h5>
-          <div class="card-content">
-            <div class="property-row">
-              <span class="propertyKey">Name:</span>
-              <span class="propertyValue">{{ model.name }}</span>
+          <div class="card mb-3">
+            <div class="card-header">
+              <h3 class="h5">Basic Properties</h3>
             </div>
-            <div class="property-row">
-              <span class="propertyKey">Status:</span>
-              <span class="propertyValue">{{ model.status }}</span>
-            </div>
-            <div class="property-row">
-              <span class="propertyKey">Create Time:</span>
-              <span class="propertyValue">{{ Util.formatDate(model.createTime) }}</span>
-            </div>
-            <div class="property-row">
-              <span class="propertyKey">Start Time:</span>
-              <span class="propertyValue">{{ Util.formatDate(model.startTime) }}</span>
-            </div>
-            <div class="property-row">
-              <span class="propertyKey">End Time:</span>
-              <span class="propertyValue">{{ Util.formatDate(model.endTime) }}</span>
-            </div>
-            <div class="property-row">
-              <span class="propertyKey">Took:</span>
-              <span class="propertyValue">{{ model.took }}ms</span>
-            </div>
+            <div class="card-body">
+              <table class="table table-hover">
+                <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                  <td>Name</td>
+                  <td>{{ model.name }}</td>
+                </tr>
+                <tr>
+                  <td>Status</td>
+                  <td>{{ model.status }}</td>
+                </tr>
+                <tr>
+                  <td>Create Time</td>
+                  <td>{{ Util.formatDate(model.createTime) }}</td>
+                </tr>
+                <tr>
+                  <td>Start Time</td>
+                  <td>{{ Util.formatDate(model.startTime) }}</td>
+                </tr>
+                <tr>
+                  <td>End Time</td>
+                  <td>{{ Util.formatDate(model.endTime) }}</td>
+                </tr>
+                <tr>
+                  <td>Took</td>
+                  <td>{{ model.took }}ms</td>
+                </tr>
+                </tbody>
+              </table>
           </div>
         </div>
 
         <!-- Error Section -->
         <div v-if="model.status === 'failed'">
           <div class="property-row">
-            <span class="propertyKey">Error:</span>
+            <h4 class="h5">Error</h4>
             <pre class="scrollContainer">{{ model.error }}</pre>
           </div>
         </div>
 
         <!-- External Properties -->
         <div class="card">
-          <h5>External Properties</h5>
-          <div class="card-content">
-            <div v-if="model.propertyKeys.length === 0">No properties set</div>
-            <div v-for="key in model.propertyKeys" :key="key" class="property-row">
-              <span class="propertyKey">{{ key }}:</span>
-              <span class="propertyValue" v-html="Util.useJsonString(model.properties[key])"></span>
-            </div>
+          <div class="card-header">
+            <h3 class="h5">External Properties</h3>
+          </div>
+          <div class="card-body">
+            <table class="table table-hover">
+              <thead>
+              <tr>
+                <th>Key</th>
+                <th>Value</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-if="model.propertyKeys.length === 0">
+                <td colspan="2">No external properties set</td>
+              </tr>
+              <tr v-for="key in model.propertyKeys" :key="key" class="property-row">
+                <td>{{ key }}</td>
+                <td v-html="Util.useJsonString(model.properties[key])"></td>
+              </tr>
+              </tbody>
+            </table>
           </div>
         </div>
+
       </div>
     </div>
+  </div>
   </div>
 </template>
 

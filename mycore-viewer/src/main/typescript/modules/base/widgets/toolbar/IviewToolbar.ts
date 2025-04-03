@@ -39,7 +39,7 @@ import { ViewerEventManager } from "../events/ViewerEventManager";
 
 export class IviewToolbar implements ContainerObserver<ToolbarGroup, ToolbarComponent>, ContainerObserver<ToolbarModel, ToolbarGroup> {
 
-  constructor(private _container: JQuery, private _mobile: boolean = false, private _model: ToolbarModel = new ToolbarModel("default")) {
+  constructor(private _container: HTMLElement, private _mobile: boolean = false, private _model: ToolbarModel = new ToolbarModel("default")) {
     this._idViewMap = new MyCoReMap<string, any>();
     this._idGroupViewMap = new MyCoReMap<string, GroupView>();
     this._eventManager = new ViewerEventManager();
@@ -65,7 +65,7 @@ export class IviewToolbar implements ContainerObserver<ToolbarGroup, ToolbarComp
   }
 
   private _eventManager: ViewerEventManager;
-  private _toolbarElement: JQuery;
+  private _toolbarElement: HTMLElement;
   private _toolbarView: ToolbarView;
   private _idViewMap: MyCoReMap<string, any>;
   private _idGroupViewMap: MyCoReMap<string, GroupView>;
@@ -87,13 +87,10 @@ export class IviewToolbar implements ContainerObserver<ToolbarGroup, ToolbarComp
   private _createView(): void {
     this._toolbarView = this.createToolbarView();
     this._toolbarElement = this._toolbarView.getElement();
-    this._toolbarElement.appendTo(this._container);
+    this._container.append(this._toolbarElement);
     const groups = this._model.getGroups();
     for (const group of groups) {
       this.childAdded(this._model, group);
-    }
-    if (this._mobile) {
-      this._toolbarView.getElement().trigger("create");
     }
   }
 

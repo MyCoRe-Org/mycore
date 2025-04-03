@@ -23,8 +23,13 @@ export class ViewerInfoModal extends ViewerModalWindow {
 
   constructor(_mobile: boolean, title: string, text: string, parent: HTMLElement = document.body) {
     super(_mobile, title, parent);
-    this.modalHeader.children("h4").addClass("text-info");
-    this.modalBody.append("<p><span data-i18n='" + text + "'>" + text + "</span></p>");
+    this.modalHeader.querySelectorAll(">h4").forEach(el => el.classList.add("text-info"));
+    const p = document.createElement("p");
+    const span = document.createElement("span");
+    span.innerText = text;
+    span.setAttribute("data-i18n", text);
+    p.append(span);
+    this.modalBody.append(p);
   }
 }
 

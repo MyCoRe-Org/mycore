@@ -56,7 +56,7 @@ export class MyCoReViewerSearcher {
 }
 
 export class ResultObject {
-  constructor(public arr: Array<TextElement>, public matchWords: Array<string>, public context: JQuery) {
+  constructor(public arr: Array<TextElement>, public matchWords: Array<string>, public context: HTMLElement) {
   }
 }
 

@@ -56,6 +56,7 @@ export class MyCoReSolrSearcher extends MyCoReViewerSearcher {
 
   public search(query: string, resultReporter: (objects: Array<ResultObject>) => void,
     searchCompleteCallback: () => void, count?: number, start?: number) {
+    console.log("searching for: " + query);
     // first stop running request!
     if (this._currentRequest != null && !this._currentRequest.isComplete) {
       this._currentRequest.abortRequest();
@@ -97,7 +98,7 @@ export class MyCoReSolrSearcher extends MyCoReViewerSearcher {
         hit.positions.forEach(position => {
           altoTextContents.push(new SolrAltoTextContent(position, metsPage.href));
         });
-        let result = new ResultObject(altoTextContents, matchWords, jQuery(context));
+        let result = new ResultObject(altoTextContents, matchWords, context);
         (<any>result).order = metsPage.order;
         results.push(result);
       });

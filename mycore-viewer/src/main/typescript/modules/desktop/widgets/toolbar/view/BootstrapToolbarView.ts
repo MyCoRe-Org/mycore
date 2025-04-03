@@ -17,36 +17,50 @@
  */
 
 
-import { ToolbarView } from "../../../../base/widgets/toolbar/view/ToolbarView";
+import {ToolbarView} from "../../../../base/widgets/toolbar/view/ToolbarView";
 
 export class BootstrapToolbarView implements ToolbarView {
 
-  private _toolbar: JQuery;
+  private _toolbar: HTMLElement;
+  private _toolbarContainer: HTMLElement;
 
   constructor() {
-    this._toolbar = jQuery('<nav></nav>');
-    this._toolbar.addClass('navbar navbar-expand-lg navbar-light bg-light');
+    this._toolbar = document.createElement('nav');
+    this._toolbar.classList.add('navbar', 'navbar-expand-lg', 'navbar-light', 'bg-light');
+
+    this._toolbarContainer = document.createElement('div');
+    this._toolbarContainer.classList.add('container-fluid');
+    this._toolbar.append(this._toolbarContainer);
   }
 
   //navbar-header
-  public addChild(child: JQuery): void {
-    this._toolbar.append(child);
-    this._toolbar.find('.btn-group.right.ml-auto').removeClass('ml-auto');
-    const sortedElements = this._toolbar.find('.btn-group.right[data-tb-order]')
-      .toArray()
-      .sort((a, b) => parseInt(a.getAttribute('data-tb-order')) - parseInt(b.getAttribute('data-tb-order')));
+  public addChild(child: HTMLElement): void {
+    this._toolbarContainer.append(child);
+    this._toolbarContainer.querySelectorAll('.btn-group.right.ms-auto')
+        .forEach(el => el.classList.remove('ms-auto'));
+
+    const sortedElements = Array.from(this._toolbarContainer.querySelectorAll('.btn-group.right[data-tb-order]'))
+      .sort((a, b) => {
+        const orderA = parseInt(a.getAttribute('data-tb-order'));
+        const orderB = parseInt(b.getAttribute('data-tb-order'));
+        return orderA - orderB;
+      });
 
     if (sortedElements.length > 0) {
-      jQuery(sortedElements[0]).addClass('ml-auto');
+      sortedElements[0].classList.add('ms-auto');
     }
   }
 
-  public removeChild(child: JQuery): void {
+  public removeChild(child: HTMLElement): void {
     child.remove();
   }
 
-  public getElement(): JQuery {
+  public getElement(): HTMLElement {
     return this._toolbar;
+  }
+
+  public getToolbarContainer(): HTMLElement {
+    return this._toolbarContainer;
   }
 }
 

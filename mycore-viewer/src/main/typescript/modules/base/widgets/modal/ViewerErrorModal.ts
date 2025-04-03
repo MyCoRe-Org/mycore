@@ -23,9 +23,22 @@ export class ViewerErrorModal extends ViewerModalWindow {
 
   constructor(_mobile: boolean, errorTitle: string, errorText: string, imageUrl?: string, parent: HTMLElement = document.body) {
     super(_mobile, errorTitle, parent);
-    this.modalHeader.children("h4").addClass("text-danger");
-    const img = imageUrl != null ? `<img class='thumbnail error-image' src='${imageUrl}' />` : "";
-    this.modalBody.append(`<div class='error-image-holder'> ${img} <span data-i18n='" + text + "'>${errorText}</span></div>`)
+    this.modalHeader.querySelectorAll(">h4").forEach(el => el.classList.add("text-danger"));
+
+    const errorImageHolder = document.createElement("div");
+    errorImageHolder.classList.add("error-image-holder");
+    this.modalBody.append(errorImageHolder);
+
+    if(imageUrl != null) {
+      const img = document.createElement("img")
+      img.classList.add("thumbnail", "error-image");
+      img.src = imageUrl;
+        errorImageHolder.append(img);
+    }
+
+    const span = document.createElement("span");
+    span.innerText = errorText;
+    errorImageHolder.append(span);
   }
 }
 

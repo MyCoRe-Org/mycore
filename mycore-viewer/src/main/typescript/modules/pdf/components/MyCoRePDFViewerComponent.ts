@@ -61,7 +61,7 @@ export class MyCoRePDFViewerComponent extends ViewerComponent {
     new ViewerErrorModal(
       this._settings.mobile,
       messageBoxTitle, errorText, this._settings.webApplicationBaseURL + "/modules/iview2/img/sad-emotion-egg.jpg", this.container[0]).show();
-    context.trigger(new ShowContentEvent(this, jQuery(), ViewerBorderLayout.DIRECTION_WEST, 0));
+    context.trigger(new ShowContentEvent(this, null, ViewerBorderLayout.DIRECTION_WEST, 0));
   });
 
   private error = false;
