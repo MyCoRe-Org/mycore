@@ -85,8 +85,10 @@ public class MCRDerivateURNUtils {
                 }
 
                 if (!isFileSupported(file)) {
-                    LOGGER.info("File is not displayable within iView2. Use {} as url",
-                        () -> MCRFileNodeServlet.class.getSimpleName());
+                    if (LOGGER.isInfoEnabled()) { // false-positive on PMD:GuardLogStatement (static method reference)
+                        LOGGER.info("File is not displayable within iView2. Use {} as url",
+                            MCRFileNodeServlet.class::getSimpleName);
+                    }
                     String filePath = "/" + file.getOwner()
                         + MCRXMLFunctions.encodeURIPath(file.getOwnerRelativePath());
                     return new URI(MCRFrontendUtil.getBaseURL() + "servlets/" + MCRFileNodeServlet.class.getSimpleName()

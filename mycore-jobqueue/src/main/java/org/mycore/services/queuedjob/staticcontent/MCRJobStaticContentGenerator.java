@@ -19,24 +19,42 @@
 package org.mycore.services.queuedjob.staticcontent;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.content.transformer.MCRContentTransformer;
+import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.services.queuedjob.MCRJob;
 import org.mycore.services.queuedjob.MCRJobQueueManager;
 import org.mycore.services.queuedjob.MCRJobStatus;
 import org.mycore.services.staticcontent.MCRObjectStaticContentGenerator;
 
+@MCRConfigurationProxy(proxyClass = MCRJobStaticContentGenerator.Factory.class)
 public class MCRJobStaticContentGenerator extends MCRObjectStaticContentGenerator {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     public MCRJobStaticContentGenerator(String configID) {
         super(configID);
+    }
+
+    public MCRJobStaticContentGenerator(String transformer, String staticFileRootPath, String configID) {
+        super(transformer, staticFileRootPath, configID);
+    }
+
+    public MCRJobStaticContentGenerator(MCRContentTransformer transformer, Path staticFileRootPath, String configID) {
+        super(transformer, staticFileRootPath, configID);
     }
 
     @Override
@@ -59,4 +77,30 @@ public class MCRJobStaticContentGenerator extends MCRObjectStaticContentGenerato
                 object::getId, () -> configID);
         }
     }
+
+    public static class Factory implements Supplier<MCRJobStaticContentGenerator> {
+
+        @MCRProperty(name = "Transformer")
+        public String transformer;
+
+        @MCRProperty(name = "Path", required = false)
+        public String path;
+
+        private String configId;
+
+        @MCRPostConstruction(MCRPostConstruction.Value.CANONICAL)
+        public void setConfigId(String property) {
+            this.configId = property.substring(property.lastIndexOf('.') + 1 );
+        }
+
+        @Override
+        public MCRJobStaticContentGenerator get() {
+            return new MCRJobStaticContentGenerator(
+                MCRContentTransformerFactory.getTransformer(transformer),
+                Paths.get(createStaticFileRootPath(Optional.ofNullable(path), configId)),
+                configId);
+        }
+
+    }
+
 }

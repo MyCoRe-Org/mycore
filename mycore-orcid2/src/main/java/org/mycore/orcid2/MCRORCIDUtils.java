@@ -76,17 +76,17 @@ public class MCRORCIDUtils {
 
     /**
      * Checks if MCRObjects' state is ready to publish.
-     * 
+     *
      * @param object the MCRObject
      * @return true if state is ready to publish or there is not state
      */
     public static boolean checkPublishState(MCRObject object) {
-        return getStateValue(object).map(s -> checkPublishState(s)).orElse(true);
+        return getStateValue(object).map(MCRORCIDUtils::checkPublishState).orElse(true);
     }
 
     /**
      * Checks if state is ready to publish.
-     * 
+     *
      * @param state the state
      * @return true if state is ready to publish
      */
@@ -96,7 +96,7 @@ public class MCRORCIDUtils {
 
     /**
      * Checks if MCRObject has empty MODS.
-     * 
+     *
      * @param object the MCRObject
      * @return true if MCRObject's MODS has children
      */
@@ -107,7 +107,7 @@ public class MCRORCIDUtils {
 
     /**
      * Filters MCRObject.
-     * 
+     *
      * @param object the MCRObject
      * @return filtered MCRObject
      * @throws MCRORCIDException if filtering fails
@@ -124,7 +124,7 @@ public class MCRORCIDUtils {
 
     /**
      * Compares String with auth client's client id.
-     * 
+     *
      * @param sourcePath source path
      * @return true if source path equals client id
      */
@@ -134,19 +134,19 @@ public class MCRORCIDUtils {
 
     /**
      * Builds a modsCollection Element and adds given elements.
-     * 
+     *
      * @param elements List of elements
      * @return Element containing elements
      */
     public static Element buildMODSCollection(List<Element> elements) {
         final Element modsCollection = new Element("modsCollection", MCRConstants.MODS_NAMESPACE);
-        elements.forEach(w -> modsCollection.addContent(w));
+        elements.forEach(modsCollection::addContent);
         return modsCollection;
     }
 
     /**
      * Extracts all ORCID name identifiers of MCRObject.
-     * 
+     *
      * @param object the MCRObject
      * @return Set of ORCID MCRIdentifier
      */
@@ -157,7 +157,7 @@ public class MCRORCIDUtils {
 
     /**
      * Lists mods:name Elements.
-     * 
+     *
      * @param wrapper the MCRMODSWrapper
      * @return List of name elements
      */
@@ -167,24 +167,24 @@ public class MCRORCIDUtils {
 
     /**
      * Returns mods:nameIdentifer.
-     * 
+     *
      * @param nameElement the mods:name Element
      * @return Set of MCRIdentifier
      */
     public static Set<MCRIdentifier> getNameIdentifiers(Element nameElement) {
         return nameElement.getChildren("nameIdentifier", MCRConstants.MODS_NAMESPACE).stream()
-            .map(e -> getIdentfierFromElement(e))
+            .map(MCRORCIDUtils::getIdentfierFromElement)
             .collect(Collectors.toSet());
     }
 
     /**
      * Returns mods:nameIdentifer.
-     * 
+     *
      * @param wrapper the MCRMODSWrapper
      * @return Set of MCRIdentifier
      */
     public static Set<MCRIdentifier> getNameIdentifiers(MCRMODSWrapper wrapper) {
-        return wrapper.getElements("mods:nameIdentifier").stream().map(e -> getIdentfierFromElement(e))
+        return wrapper.getElements("mods:name/mods:nameIdentifier").stream().map(MCRORCIDUtils::getIdentfierFromElement)
             .collect(Collectors.toSet());
     }
 

@@ -456,7 +456,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             .ifPresent((titleInfo) -> idb.containerTitleShort(buildShortTitle(titleInfo)));
 
         wrapper.getElements(".//mods:relatedItem[@type='series' or (@type='host' and "
-            + "mods:genre[@type='intern'] = 'series')]/" + USABLE_TITLE_XPATH).stream()
+            + "substring-after(mods:genre[@type='intern']/@valueURI,'#') = 'series')]/" + USABLE_TITLE_XPATH).stream()
             .findFirst().ifPresent((relatedItem) -> idb.collectionTitle(buildTitle(relatedItem)));
     }
 

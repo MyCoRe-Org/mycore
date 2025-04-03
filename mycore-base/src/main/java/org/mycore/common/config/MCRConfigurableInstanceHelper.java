@@ -26,6 +26,7 @@ import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -613,8 +614,12 @@ class MCRConfigurableInstanceHelper {
 
             @Override
             public Source<MCRProperty, ?> annotationToSource(MCRProperty annotation) {
-                if (Objects.equals("*", annotation.name())) {
-                    return new AllPropertiesSource(annotation);
+                String annotationName = annotation.name();
+                if (annotationName.equals("*")) {
+                    return new AllPropertiesSource(annotation, "");
+                } else if (annotationName.endsWith(".*")) {
+                    return new AllPropertiesSource(annotation, annotationName
+                        .substring(0, annotationName.length() - 1));
                 } else {
                     return new PropertySource(annotation);
                 }
@@ -792,8 +797,11 @@ class MCRConfigurableInstanceHelper {
 
         private final MCRProperty annotation;
 
-        private AllPropertiesSource(MCRProperty annotation) {
+        private final String prefix;
+
+        private AllPropertiesSource(MCRProperty annotation, String prefix) {
             this.annotation = annotation;
+            this.prefix = prefix;
         }
 
         @Override
@@ -828,11 +836,19 @@ class MCRConfigurableInstanceHelper {
 
         @Override
         public Map<String, String> get(MCRInstanceConfiguration configuration, Target<?> target) {
-            if (!annotation.absolute()) {
-                return configuration.properties();
-            } else {
-                return configuration.fullProperties();
-            }
+
+            Map<String, String> properties = annotation.absolute() ?
+                configuration.fullProperties() : configuration.properties();
+
+            Map<String, String> filteredProperties = new HashMap<>();
+            properties.forEach((key, value) -> {
+                if (key.startsWith(prefix)) {
+                    filteredProperties.put(key.substring(prefix.length()), value);
+                }
+            });
+
+            return filteredProperties;
+
         }
 
     }

@@ -304,7 +304,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
                 }
             }
             LOGGER.warn("Metadata object {} in store {} has no revision ''{}''!",
-                () -> getID(), () -> getStore().getID(), () -> getRevision());
+                this::getID, () -> getStore().getID(), this::getRevision);
             return null;
         } catch (SVNException svnExc) {
             throw new IOException(svnExc);

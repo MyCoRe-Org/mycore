@@ -4,65 +4,41 @@ on: [ push, pull_request ]
 
 env:
   MAVEN_OPTS: -Dorg.slf4j.simpleLogger.showDateTime=true -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss,SSS
-  GECKODRIVER_VERSION: 0.34.0
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up JDK
-      uses: actions/setup-java@v2
+      uses: actions/setup-java@v4
       with:
         java-version: 21
         distribution: temurin
         cache: maven
 
-    - name: Setup Gecko driver
-      uses: browser-actions/setup-geckodriver@latest
-      with:
-        geckodriver-version: ${{ env.GECKODRIVER_VERSION }}
-
-    - name: Setup firefox
-      id: setup-firefox
-      uses: browser-actions/setup-firefox@v1
-      with:
-        firefox-version: latest-esr
-
-    - name: Setup Chrome
-      id: setup-chrome
-      uses: browser-actions/setup-chrome@v1
-      with:
-        chrome-version: stable
-
-    - name: Setup Chromedriver
-      uses: nanasess/setup-chromedriver@v2
-      with:
-        chromedriver-version: ${{ steps.setup-chrome.outputs.chrome-version }}
-
-    - name: Set up test dependencies
+    - name: Set up Browser
       run: |
-        sudo apt install dbus-x11
+        # Geckodriver
+        echo ${GECKOWEBDRIVER} >> $GITHUB_PATH
 
-        # Selenium wants to run non-ESR FF
-        sudo ln -sfn ${{ steps.setup-firefox.outputs.firefox-path }} /usr/bin/firefox
-        sudo ln -sfn ${{ steps.setup-firefox.outputs.firefox-path }} /usr/bin/firefox-esr
+        # Chromedriver
+        echo ${CHROMEWEBDRIVER} >> $GITHUB_PATH
+
         firefox --version
-
-        geckodriver --version
+        ${GECKOWEBDRIVER}/geckodriver --version
 
     - name: Build
       run: |
-        export $(dbus-launch)
-        mkdir ~/tmp
-        export TMPDIR=~/tmp
-        export FIREFOX_BIN=$(which firefox-esr)
+        mkdir ${{ runner.temp }}/${{ github.run_id }}.tmp
+        export TMPDIR=${{ runner.temp }}/${{ github.run_id }}.tmp
+        export FIREFOX_BIN=$(which firefox)
         export SELENIUM_BROWSER=firefox
 
-        mvn -B -Plocal-testing,!standard-with-extra-repos clean install -T1C -DreuseForks=true -DforkCount=1
+        mvn -B -Plocal-testing,!standard-with-extra-repos install -T1C -DreuseForks=true -DforkCount=1
         mvn -P!standard-with-extra-repos -B javadoc:javadoc javadoc:test-javadoc -T1C
 
     - name: Upload logs on build failure
@@ -75,6 +51,5 @@ jobs:
           ./**/failsafe-reports
           ./**/screenshots
           ./**/*error*.log
-          ./**/*test.log
           ./**/*test.log
           ./**/jetty-*.out

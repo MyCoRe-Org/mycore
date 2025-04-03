@@ -36,7 +36,8 @@ public class MCRStaticContentResolver implements URIResolver {
 
         final String contentGeneratorID = parts[1];
         final MCRObjectID objectID = MCRObjectID.getInstance(parts[2]);
-        final MCRObjectStaticContentGenerator generator = new MCRObjectStaticContentGenerator(contentGeneratorID);
+        final MCRObjectStaticContentGenerator generator =
+            MCRObjectStaticContentGenerator.obtainInstance(contentGeneratorID);
 
         return new MCRLazyStreamSource(() -> generator.get(objectID), href);
     }

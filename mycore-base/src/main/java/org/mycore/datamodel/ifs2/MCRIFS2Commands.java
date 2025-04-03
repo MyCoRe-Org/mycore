@@ -142,10 +142,7 @@ public class MCRIFS2Commands extends MCRAbstractCommands {
             MCRFileStore fileStore = (MCRFileStore) store;
             fileStore.getStoredIDs()
                 .sorted()
-                .mapToObj(id -> {
-                    //retrieve MCRFileCollection
-                    return fileStore.retrieve(id);
-                })
+                .mapToObj(fileStore::retrieve)
                 .flatMap(fc -> {
                     //List every file in FileCollection
                     try {

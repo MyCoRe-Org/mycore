@@ -18,21 +18,31 @@
 
 package org.mycore.services.staticcontent;
 
+import java.io.IOException;
 import java.nio.file.Paths;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectIDTest;
 
 public class MCRObjectStaticContentGeneratorTest extends MCRTestCase {
 
+    public static final MCRContentTransformer NOOP_TRANSFORMER = new MCRContentTransformer() {
+        @Override
+        public MCRContent transform(MCRContent source) throws IOException {
+            return source;
+        }
+    };
+
     @Test
     public void getSlotDirPath() {
         final MCRObjectStaticContentGenerator generator = new MCRObjectStaticContentGenerator(
-            null, Paths.get("/"), "test");
+            NOOP_TRANSFORMER, Paths.get("/"), "test");
 
         MCRConfiguration2.set("MCR.Metadata.ObjectID.NumberPattern", "00000");
         MCRObjectIDTest.resetObjectIDFormat();
@@ -43,7 +53,7 @@ public class MCRObjectStaticContentGeneratorTest extends MCRTestCase {
     @Test
     public void getSlotDirPath2() {
         final MCRObjectStaticContentGenerator generator = new MCRObjectStaticContentGenerator(
-            null, Paths.get("/"), "test");
+            NOOP_TRANSFORMER, Paths.get("/"), "test");
         MCRConfiguration2.set("MCR.Metadata.ObjectID.NumberPattern", "000000");
         MCRObjectIDTest.resetObjectIDFormat();
         MCRObjectID derivate = MCRObjectID.getInstance("mcr_derivate_000001");
@@ -53,7 +63,7 @@ public class MCRObjectStaticContentGeneratorTest extends MCRTestCase {
     @Test
     public void getSlotDirPath3() {
         final MCRObjectStaticContentGenerator generator = new MCRObjectStaticContentGenerator(
-            null, Paths.get("/"), "test");
+            NOOP_TRANSFORMER, Paths.get("/"), "test");
         MCRConfiguration2.set("MCR.Metadata.ObjectID.NumberPattern", "0000000");
         MCRObjectIDTest.resetObjectIDFormat();
         MCRObjectID derivate = MCRObjectID.getInstance("mcr_derivate_0000001");

@@ -153,7 +153,7 @@ public class MCRMetsSave {
             XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
             xout.output(document, metsOut);
             LOGGER.info("Storing file content from \"{}\" to derivate \"{}\"",
-                () -> getMetsFileName(), () -> derivateId);
+                MCRMetsSave::getMetsFileName, () -> derivateId);
         } catch (Exception e) {
             LOGGER.error(e);
             return false;

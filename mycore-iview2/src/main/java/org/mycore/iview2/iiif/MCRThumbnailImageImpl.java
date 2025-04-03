@@ -94,7 +94,7 @@ public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
             for (MCRMetaEnrichedLinkID derLink : mcrObj.getStructure().getDerivates()) {
                 if (derLink.getClassifications().stream()
                     .map(MCRCategoryID::toString)
-                    .anyMatch(x -> derType.equals(x))) {
+                    .anyMatch(derType::equals)) {
                     final String maindoc = derLink.getMainDoc();
                     if (maindoc != null) {
                         Optional<MCRTileInfo> tileInfoForFile = createTileInfoForFile(derLink.getXLinkHref(), maindoc);

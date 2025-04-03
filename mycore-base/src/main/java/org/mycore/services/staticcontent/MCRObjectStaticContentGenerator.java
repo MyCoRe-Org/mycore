@@ -26,12 +26,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
@@ -39,6 +45,7 @@ import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
+@MCRConfigurationProxy(proxyClass = MCRObjectStaticContentGenerator.Factory.class)
 public class MCRObjectStaticContentGenerator {
 
     public static final String TRANSFORMER_SUFFIX = ".Transformer";
@@ -55,18 +62,17 @@ public class MCRObjectStaticContentGenerator {
 
     protected final String configID;
 
-    private MCRContentTransformer transformer;
+    private final MCRContentTransformer transformer;
 
-    private Path staticFileRootPath;
+    private final Path staticFileRootPath;
 
     public MCRObjectStaticContentGenerator(String configID) {
         this(
             MCRConfiguration2.getString(CONFIG_ID_PREFIX + configID + TRANSFORMER_SUFFIX).orElseThrow(
                 () -> new MCRConfigurationException(
                     "The suffix " + TRANSFORMER_SUFFIX + " is not set for " + CONFIG_ID_PREFIX + configID)),
-            MCRConfiguration2.getString(CONFIG_ID_PREFIX + configID + ROOT_PATH_SUFFIX)
-                .orElseGet(() -> MCRConfiguration2.getStringOrThrow(DEFAULT_TRANSFORMER_PATH_PROPERTY) + "/"
-                    + configID),
+            createStaticFileRootPath(MCRConfiguration2.getString(CONFIG_ID_PREFIX + configID + ROOT_PATH_SUFFIX),
+                configID),
             configID);
     }
 
@@ -77,9 +83,14 @@ public class MCRObjectStaticContentGenerator {
 
     protected MCRObjectStaticContentGenerator(MCRContentTransformer transformer, Path staticFileRootPath,
         String configID) {
-        this.transformer = transformer;
-        this.staticFileRootPath = staticFileRootPath;
-        this.configID = configID;
+        this.transformer = Objects.requireNonNull(transformer, "Transformer must not be null");
+        this.staticFileRootPath = Objects.requireNonNull(staticFileRootPath, "Root path must not be null");
+        this.configID = Objects.requireNonNull(configID, "Config ID must not be null");
+    }
+
+    public static String createStaticFileRootPath(Optional<String> path, String configId) {
+        return path.orElseGet(() -> MCRConfiguration2.getStringOrThrow(DEFAULT_TRANSFORMER_PATH_PROPERTY)
+            + "/" + configId);
     }
 
     /**
@@ -179,4 +190,30 @@ public class MCRObjectStaticContentGenerator {
     public String getConfigID() {
         return configID;
     }
+
+    public static class Factory implements Supplier<MCRObjectStaticContentGenerator> {
+
+        @MCRProperty(name = "Transformer")
+        public String transformer;
+
+        @MCRProperty(name = "Path", required = false)
+        public String path;
+
+        private String configId;
+
+        @MCRPostConstruction(MCRPostConstruction.Value.CANONICAL)
+        public void setConfigId(String property) {
+            this.configId = property.substring(property.lastIndexOf('.') + 1 );
+        }
+
+        @Override
+        public MCRObjectStaticContentGenerator get() {
+            return new MCRObjectStaticContentGenerator(
+                MCRContentTransformerFactory.getTransformer(transformer),
+                Paths.get(createStaticFileRootPath(Optional.ofNullable(path), configId)),
+                configId);
+        }
+
+    }
+
 }
