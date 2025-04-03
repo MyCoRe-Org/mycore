@@ -182,6 +182,7 @@ public class MCRTranslation {
                 try {
                     result = message.getString(newLabel);
                 } catch (MissingResourceException e) {
+                    // exception expected and safely ignored
                 }
                 if (result != null) {
                     LOGGER.warn("Usage of deprecated I18N key '{}'. Please use '{}' instead.", label, newLabel);

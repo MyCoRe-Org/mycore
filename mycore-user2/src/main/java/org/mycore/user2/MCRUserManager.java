@@ -669,6 +669,7 @@ public class MCRUserManager {
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
+            // exception safely ignored
         }
     }
 

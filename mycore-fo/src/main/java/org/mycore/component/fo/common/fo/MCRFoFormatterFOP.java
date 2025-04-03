@@ -122,14 +122,10 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
                 hyphPat.ifPresent(configurations -> {
                     Map<String, String> hyphPatMap = new HashMap<>();
                     Arrays.stream(configurations).forEach(c -> {
-                        try {
-                            String lang = c.getAttribute("lang");
-                            String file = c.getValue();
-
-                            if ((lang != null && !lang.isEmpty()) && (file != null && !file.isEmpty())) {
-                                hyphPatMap.put(lang, file);
-                            }
-                        } catch (Exception e) {
+                        String lang = c.getAttribute("lang", null);
+                        String file = c.getValue(null);
+                        if (lang != null && !lang.isEmpty() && file != null && !file.isEmpty()) {
+                            hyphPatMap.put(lang, file);
                         }
                     });
                     fopFactoryBuilder.setHyphPatNames(hyphPatMap);
