@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mycoreobject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:noNamespaceSchemaLocation="datamodel-test.xsd" xmlns:xlink="http://www.w3.org/1999/xlink" ID="mcr_test_02"
-  label="JUnit Test object 2">
+  xsi:noNamespaceSchemaLocation="datamodel-test.xsd" xmlns:xlink="http://www.w3.org/1999/xlink" ID="mcr_test_03"
+  label="JUnit Test object 3">
   <structure />
   <metadata>
     <element class="MCRMetaClassification" name="genre" type="classification">
       <classification id="genre" categid="article" classid="mir_genres" />
+    </element>
+    <element class="MCRMetaLangText">
+      <publishedin type="book">A book name</publishedin>
     </element>
   </metadata>
 </mycoreobject>
