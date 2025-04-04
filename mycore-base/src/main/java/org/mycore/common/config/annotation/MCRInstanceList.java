@@ -50,7 +50,7 @@ public @interface MCRInstanceList {
 
     /**
      * @return true if the at least one sub-property of the property specified by {@link MCRInstanceMap#name()}
-     * has to be present in the properties. {@link MCRConfigurationException} is thrown if the property is required
+     * has to be present in the properties. {@link MCRConfigurationException} is thrown if a value is required
      * but not present.
      */
     boolean required() default true;

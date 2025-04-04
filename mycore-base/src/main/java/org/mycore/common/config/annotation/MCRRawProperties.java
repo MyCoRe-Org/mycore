@@ -18,47 +18,47 @@
 
 package org.mycore.common.config.annotation;
 
+import org.mycore.common.config.MCRConfigurationException;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.mycore.common.config.MCRConfigurationException;
-
 /**
  * This annotation is used to mark fields or methods that should be set to or called with
- * a map of configured instances of a type compatible with {@link MCRInstanceMap#valueClass()}
- * which are configured from the configuration properties.
+ * a map of string values from the configuration properties.
  * <p>
  * The field or method needs to be public.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Inherited
-public @interface MCRInstanceMap {
+public @interface MCRRawProperties {
 
     /**
-     * @return The prefix for names of properties containing the class names.
+     * @return The pattern describing the properties to be included.
+     * <ul>
+     *  <li><code>*</code> for a map of all properties.
+     *  <li>prefix followed by <code>.*</code> for a map of all properties
+     *      starting with the given prefix and <code>.</code>.
+     * </ul>
      */
-    String name() default "";
+    String namePattern();
 
     /**
-     * @return The class or a superclass of the configured instances.
-     */
-    Class<?> valueClass();
-
-    /**
-     * @return true if the at least one sub-property of the property specified by {@link MCRInstanceMap#name()}
+     * @return true if at least one property matching the patter specified by {@link MCRRawProperties#namePattern()}
      * has to be present in the properties. {@link MCRConfigurationException} is thrown if a value is required
      * but not present.
      */
     boolean required() default true;
 
     /**
-     * @return The {@link MCRSentinel} for the configured instances.
+     * @return true if the property name pattern specified by {@link MCRRawProperties#namePattern()}
+     * is absolute and not specific for this instance e.g. MCR.NameOfProject.
      */
-    MCRSentinel sentinel() default @MCRSentinel(enabled = false);
+    boolean absolute() default false;
 
     /**
      * @return The order in which the annotated fields or methods are processed. The higher the value, the later the

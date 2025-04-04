@@ -46,6 +46,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRRawProperties;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -114,7 +115,7 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
         return properties;
     }
 
-    @MCRProperty(name = "*")
+    @MCRRawProperties(namePattern = "*", required = false)
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
     }
