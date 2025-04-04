@@ -45,7 +45,7 @@ import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 
-public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
+public class MCRMODSClassificationMapperTest extends MCRJPATestCase {
 
     public static final String TEST_DIRECTORY = "MCRClassificationMappingEventHandlerTest/";
 
@@ -72,8 +72,8 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 1);
 
-        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
-        mapper.handleObjectUpdated(null, mcro);
+        MCRMODSClassificationMapper mapper = new MCRMODSClassificationMapper();
+        mapper.createMapping(mcro);
 
         String expression =
             "//mods:classification[contains(@generator,'-mycore') and contains(@valueURI, 'StudyThesis')]";
@@ -119,8 +119,8 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 2);
 
-        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
-        mapper.handleObjectUpdated(null, mcro);
+        MCRMODSClassificationMapper mapper = new MCRMODSClassificationMapper();
+        mapper.createMapping(mcro);
 
         Document xml = mcro.createXML();
 
@@ -176,8 +176,8 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 3);
 
-        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
-        mapper.handleObjectUpdated(null, mcro);
+        MCRMODSClassificationMapper mapper = new MCRMODSClassificationMapper();
+        mapper.createMapping(mcro);
 
         Document xml = mcro.createXML();
 
@@ -235,8 +235,8 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 4);
 
-        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
-        mapper.handleObjectUpdated(null, mcro);
+        MCRMODSClassificationMapper mapper = new MCRMODSClassificationMapper();
+        mapper.createMapping(mcro);
 
         Document xml = mcro.createXML();
         LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
@@ -259,7 +259,7 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 5);
 
-        mapper.handleObjectUpdated(null, mcro);
+        mapper.createMapping(mcro);
         xml = mcro.createXML();
         LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
 
@@ -280,7 +280,7 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 6);
 
-        mapper.handleObjectUpdated(null, mcro);
+        mapper.createMapping(mcro);
         xml = mcro.createXML();
         LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
 
@@ -301,7 +301,7 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 7);
 
-        mapper.handleObjectUpdated(null, mcro);
+        mapper.createMapping(mcro);
         xml = mcro.createXML();
         LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
 

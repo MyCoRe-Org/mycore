@@ -17,6 +17,7 @@ import com.google.gson.JsonObject;
 public class MCRExpandedObjectStructure extends MCRObjectStructure {
 
     private static final Logger LOGGER = LogManager.getLogger();
+    public static final String CHILDREN_ELEMENT_NAME = "children";
 
     private final List<MCRMetaEnrichedLinkID> derivates;
     private final List<MCRMetaLinkID> children;
@@ -198,7 +199,7 @@ public class MCRExpandedObjectStructure extends MCRObjectStructure {
     @Override
     public void setFromDOM(Element element) {
         super.setFromDOM(element);
-        Element subElement = element.getChild("children");
+        Element subElement = element.getChild(CHILDREN_ELEMENT_NAME);
 
         if (subElement != null) {
             List<Element> childList = subElement.getChildren();
@@ -227,7 +228,7 @@ public class MCRExpandedObjectStructure extends MCRObjectStructure {
         Element root = super.createXML();
 
         if (!children.isEmpty()) {
-            Element elmm = new Element("children");
+            Element elmm = new Element(CHILDREN_ELEMENT_NAME);
             elmm.setAttribute("class", "MCRMetaLinkID");
             for (MCRMetaLinkID child : getChildren()) {
                 elmm.addContent(child.createXML());
@@ -272,7 +273,7 @@ public class MCRExpandedObjectStructure extends MCRObjectStructure {
         // children
         JsonArray children = new JsonArray();
         getChildren().forEach(child -> children.add(child.createJSON()));
-        structure.add("children", children);
+        structure.add(CHILDREN_ELEMENT_NAME, children);
         // derivates
         JsonArray derivates = new JsonArray();
         getDerivates().forEach(derivate -> derivates.add(derivate.createJSON()));
