@@ -22,14 +22,19 @@ import org.jdom2.Document;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
- * A {@link ChildrenOrderMigrationStrategy} that never decides to add the childrenOrder element.
- * This is the default strategy if no specific strategy is configured.
+ * Strategy interface to decide whether the children element should be migrated
+ * to childrenOrder during the object normalization migration (MCR-3375).
  */
-public class NeverAddChildrenOrderStrategy implements ChildrenOrderMigrationStrategy {
+@FunctionalInterface
+public interface MCRChildrenOrderMigrationStrategy {
 
-    @Override
-    public boolean shouldAddChildrenOrder(MCRObjectID objectId, Document objectXML) {
-        return false;
-    }
+    /**
+     * Decides if the children element should be migrated to childrenOrder for the given object.
+     *
+     * @param objectId The ID of the object being migrated.
+     * @param objectXML The XML document of the object being migrated.
+     * @return true if the children element should be renamed to childrenOrder and attributes removed, false otherwise.
+     */
+    boolean shouldAddChildrenOrder(MCRObjectID objectId, Document objectXML);
 
 }
