@@ -1,5 +1,11 @@
 package org.mycore.common;
 
+import java.util.function.Supplier;
+
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.datamodel.classifications2.MCRClassificationMapper;
+import org.mycore.datamodel.classifications2.MCRDefaultClassificationMapper;
 import org.mycore.datamodel.metadata.MCRChildOrderStrategyManager;
 import org.mycore.datamodel.metadata.MCRExpandedObject;
 import org.mycore.datamodel.metadata.MCRExpandedObjectStructure;
@@ -12,8 +18,14 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 /**
  * This class expands common elements of MCRObjects, including: children and derivates.
  */
+@MCRConfigurationProxy(proxyClass = MCRBasicObjectExpander.Factory.class)
 public class MCRBasicObjectExpander implements MCRObjectExpander {
 
+    private final MCRClassificationMapper mapper;
+
+    public MCRBasicObjectExpander(MCRClassificationMapper mapper) {
+        this.mapper = mapper;
+    }
 
     @Override
     public MCRExpandedObject expand(MCRObject mcrObject) {
@@ -42,7 +54,29 @@ public class MCRBasicObjectExpander implements MCRObjectExpander {
         expandedObject.setVersion(mcrObject.getVersion());
         expandedObject.setSchema(mcrObject.getSchema());
 
+        expandClassifications(mcrObject);
+
         return expandedObject;
+    }
+
+    void expandClassifications(MCRObject mcrObject) {
+        if (mapper != null) {
+            mapper.clearMappings(mcrObject);
+            mapper.createMapping(mcrObject);
+        }
+    }
+
+    public static final class Factory implements Supplier<MCRBasicObjectExpander> {
+
+        @MCRProperty(name = "ClassificationMappingEnabled")
+        public String classificationMappingEnabled;
+
+        @Override
+        public MCRBasicObjectExpander get() {
+            MCRDefaultClassificationMapper mapper =
+                Boolean.parseBoolean(classificationMappingEnabled) ? new MCRDefaultClassificationMapper() : null;
+            return new MCRBasicObjectExpander(mapper);
+        }
     }
 
 }

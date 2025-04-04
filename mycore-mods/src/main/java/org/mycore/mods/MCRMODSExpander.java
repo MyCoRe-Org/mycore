@@ -1,6 +1,7 @@
 package org.mycore.mods;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,20 +11,29 @@ import org.mycore.common.MCRBasicObjectExpander;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRExpandedObjectManager;
 import org.mycore.common.MCRXlink;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.datamodel.classifications2.MCRClassificationMapper;
 import org.mycore.datamodel.metadata.MCRExpandedObject;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.mods.classification.MCRMODSClassificationMapper;
 
 /**
  * This class is used to expand the content of mods:relatedItems by inheriting metadata from the parent object and
  * linked objects.
  */
+@MCRConfigurationProxy(proxyClass = MCRMODSExpander.Factory.class)
 public class MCRMODSExpander extends MCRBasicObjectExpander {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String HOST_SECTION_XPATH = "mods:relatedItem[@type='host']";
+
+    public MCRMODSExpander(MCRClassificationMapper mapper) {
+        super(mapper);
+    }
 
     @Override
     public MCRExpandedObject expand(MCRObject mcrObject) {
@@ -104,4 +114,22 @@ public class MCRMODSExpander extends MCRBasicObjectExpander {
         return relatedItem.getAttributeValue(MCRXlink.HREF, MCRConstants.XLINK_NAMESPACE) != null;
     }
 
+
+
+    public static class Factory implements Supplier<MCRMODSExpander> {
+
+        public static final String CLASSIFICATION_MAPPING_ENABLED_PROPERTY = "ClassificationMappingEnabled";
+
+        @MCRProperty(name = CLASSIFICATION_MAPPING_ENABLED_PROPERTY)
+        public String classificationMappingEnabled;
+
+        @Override
+        public MCRMODSExpander get() {
+            if(Boolean.parseBoolean(classificationMappingEnabled)) {
+                return new MCRMODSExpander(new MCRMODSClassificationMapper());
+            } else {
+                return new MCRMODSExpander(null);
+            }
+        }
+    }
 }

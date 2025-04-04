@@ -51,16 +51,19 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.xml.MCRXMLFunctions;
+import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRExpandedObjectStructure;
 import org.mycore.datamodel.metadata.MCRMetaDerivateLink;
 import org.mycore.datamodel.metadata.MCRMetaLangText;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
+import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
@@ -78,72 +81,76 @@ public class MCRMigrationCommands {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    /*
-    public static final String CHECK_AND_MIGRATE_PARENT_COMMAND = "_check and migrate child index of {0}";
 
-    private static final String SET_INDEX_OF_OBJECT_COMMAND = "add child {0} via childOrderStrategy {1}";
+    public static final String MIGRATE_NORMALIZED_OBJECT = "migrate to normalized object {0}";
 
-
-    @MCRCommand(syntax = "migrate child index",
-        help = "Migrate the sort order to the child objects (index).",
+    @MCRCommand(syntax = MIGRATE_NORMALIZED_OBJECT,
+        help = "migrates a object to a normalized one (MCR-3375)",
         order = 30)
-    public static List<String> migrateChildIndex() {
-        MCRXMLMetadataManager mm = MCRXMLMetadataManager.instance();
+    public static void migrateNormalizedObject(String mcrObjectIDStr) throws IOException, JDOMException {
+        MCRXMLMetadataManager mm = MCRXMLMetadataManager.getInstance();
 
-        List<String> mycoreIds = mm.listIDs();
+        // TODO: check if child order needs to be migrated
 
-        List<MCRObjectID> mcrObjectIds = mycoreIds.stream()
-            .map(MCRObjectID::getInstance)
-            .filter((oid) -> !MCRDerivate.OBJECT_TYPE.equals(oid.getTypeId()))
-            .toList();
+        MCRObjectID objectID = MCRObjectID.getInstance(mcrObjectIDStr);
+        if (!mm.exists(objectID)) {
+            LOGGER.error("Object {} does not exist!", mcrObjectIDStr);
+            return;
+        }
 
-        return mcrObjectIds.stream()
-            .map(id -> CHECK_AND_MIGRATE_PARENT_COMMAND.replace("{0}", id.toString()))
-            .toList();
-    }
+        Document document = mm.retrieveXML(objectID);
 
-    @MCRCommand(syntax = CHECK_AND_MIGRATE_PARENT_COMMAND,
-        help = "Checks if the object has children and if so, migrates the sort order to the child objects (index).",
-        order = 30)
-    public static List<String> checkAndMigrateChildIndex(String id) throws IOException, JDOMException {
-        MCRObjectID objectID = MCRObjectID.getInstance(id);
+        if (document == null) {
+            LOGGER.error("Object {} has no XML!", mcrObjectIDStr);
+            return ;
+        }
 
-        Document document = MCRXMLMetadataManager.instance().retrieveXML(objectID);
-
+        Document oldDocument = document.clone();
         Element rootElement = document.getRootElement();
 
-        Element structureElement = rootElement.getChild("structure");
 
-        if (structureElement == null) {
-            LOGGER.info("No structure element found for object {}", id);
-            return List.of();
+
+        Element structureElement = rootElement.getChild(MCRObjectStructure.XML_NAME);
+        if (structureElement != null) {
+
+            Element derivatesElement = structureElement.getChild(MCRObjectStructure.ELEMENT_DERIVATE_OBJECTS);
+
+            if (derivatesElement != null) {
+                // trigger repair on all derivates to recreate the derivate links in the right direction
+                List<Element> derObjects = derivatesElement.getChildren("derobject");
+                derObjects.stream()
+                        .map(derObject -> derObject.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE))
+                        .map(MCRObjectID::getInstance)
+                        .map(MCRMetadataManager::retrieveMCRDerivate)
+                        .forEach(MCRMetadataManager::fireRepairEvent);
+            }
+
+            Element childrenElement = structureElement.getChild(MCRExpandedObjectStructure.CHILDREN_ELEMENT_NAME);
+            if (childrenElement != null) {
+
+                childrenElement.setName(MCRObjectStructure.CHILDREN_ORDER_ELEMENT_NAME);
+                List<Element> children = childrenElement.getChildren(MCRObjectStructure.CHILD_ELEMENT_NAME);
+
+                for (Element child : children) {
+                    child.removeAttribute("title", MCRConstants.XLINK_NAMESPACE);
+                    child.removeAttribute("inherited");
+                }
+            }
         }
 
-        Element children = structureElement.getChild("children");
-        if (children == null) {
-            LOGGER.info("No children element found for object {}", id);
-            return List.of();
+
+        MCRObject object = new MCRObject(document);
+
+        MCRMetadataManager.validateObject(object);
+        MCRMetadataManager.normalizeObject(object);
+
+        Document afterMigration = object.createXML();
+
+        if (!MCRXMLHelper.deepEqual(oldDocument, afterMigration)) {
+            LOGGER.info("Object {} has changed after migration... Save it!", mcrObjectIDStr);
+            mm.update(objectID, afterMigration, new Date());
         }
-
-        List<Element> childElements = children.getChildren("child");
-        if (childElements.isEmpty()) {
-            LOGGER.info("No child elements found for object {}", id);
-            return List.of();
-        }
-
-        List<String> subcommands = new ArrayList<>(childElements.size());
-
-        for (int i = 0; i < childElements.size(); i++) {
-            Element childElement = childElements.get(i);
-            String childID = childElement.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
-
-        }
-
-        // TODO: add command to set the childrenOrderStrategy
-        return subcommands;
     }
-
-*/
 
     @MCRCommand(syntax = "migrate author servflags",
         help = "Create missing servflags for createdby and modifiedby. (MCR-786)",
