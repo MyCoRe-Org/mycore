@@ -23,10 +23,22 @@ public class MCRBasicObjectExpander implements MCRObjectExpander {
 
     private final MCRClassificationMapper mapper;
 
+    /**
+     * Constructs a new MCRBasicObjectExpander.
+     *
+     * @param mapper The classification mapper to use, or null if classification mapping is disabled.
+     */
     public MCRBasicObjectExpander(MCRClassificationMapper mapper) {
         this.mapper = mapper;
     }
 
+    /**
+     * Expands the given MCRObject by resolving its structure (parent, children, derivates)
+     * and potentially handling classification mappings.
+     *
+     * @param mcrObject The MCRObject to expand.
+     * @return An MCRExpandedObject containing the expanded structure and metadata.
+     */
     @Override
     public MCRExpandedObject expand(MCRObject mcrObject) {
 
