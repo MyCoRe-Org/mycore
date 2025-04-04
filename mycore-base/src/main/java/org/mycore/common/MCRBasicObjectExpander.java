@@ -59,6 +59,12 @@ public class MCRBasicObjectExpander implements MCRObjectExpander {
         return expandedObject;
     }
 
+    /**
+     * Handles the expansion of classifications for the given MCRObject,
+     * if a classification mapper is configured.
+     *
+     * @param mcrObject The MCRObject whose classifications should be expanded.
+     */
     void expandClassifications(MCRObject mcrObject) {
         if (mapper != null) {
             mapper.clearMappings(mcrObject);
