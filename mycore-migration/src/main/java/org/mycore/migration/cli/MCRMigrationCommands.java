@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import java.util.Optional;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -47,6 +49,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRXlink;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
@@ -68,6 +71,8 @@ import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.iview2.services.MCRTileJob;
+import org.mycore.migration.strategy.ChildrenOrderMigrationStrategy;
+import org.mycore.migration.strategy.NeverAddChildrenOrderStrategy;
 import org.xml.sax.SAXException;
 
 import jakarta.persistence.EntityManager;
@@ -81,11 +86,14 @@ public class MCRMigrationCommands {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private static final String CHILDREN_ORDER_STRATEGY_PROPERTY = "MCR.Migration.ChildrenOrder.Strategy.Class";
 
     public static final String MIGRATE_NORMALIZED_OBJECT = "migrate to normalized object {0}";
 
     @MCRCommand(syntax = MIGRATE_NORMALIZED_OBJECT,
-        help = "migrates a object to a normalized one (MCR-3375)",
+        help = "Migrates an object to a normalized one (MCR-3375). "
+            + "Uses strategy defined in " + CHILDREN_ORDER_STRATEGY_PROPERTY
+            + " (default: NeverAddChildrenOrderStrategy) to decide if <children> should become <childrenOrder>.",
         order = 30)
     public static void migrateNormalizedObject(String mcrObjectIDStr) throws IOException, JDOMException {
         MCRXMLMetadataManager mm = MCRXMLMetadataManager.getInstance();
@@ -102,13 +110,21 @@ public class MCRMigrationCommands {
 
         if (document == null) {
             LOGGER.error("Object {} has no XML!", mcrObjectIDStr);
-            return ;
+            return;
         }
+
+        // Load the strategy for childrenOrder migration
+        ChildrenOrderMigrationStrategy strategy = MCRConfiguration2
+            .getSingleInstanceOf(ChildrenOrderMigrationStrategy.class, CHILDREN_ORDER_STRATEGY_PROPERTY)
+            .orElseGet(() -> {
+                LOGGER.info("No strategy configured for '{}', using default: NeverAddChildrenOrderStrategy",
+                    CHILDREN_ORDER_STRATEGY_PROPERTY);
+                return new NeverAddChildrenOrderStrategy();
+            });
+        LOGGER.debug("Using ChildrenOrderMigrationStrategy: {}", strategy.getClass().getName());
 
         Document oldDocument = document.clone();
         Element rootElement = document.getRootElement();
-
-
 
         Element structureElement = rootElement.getChild(MCRObjectStructure.XML_NAME);
         if (structureElement != null) {
@@ -127,13 +143,24 @@ public class MCRMigrationCommands {
 
             Element childrenElement = structureElement.getChild(MCRExpandedObjectStructure.CHILDREN_ELEMENT_NAME);
             if (childrenElement != null) {
+                if (strategy.shouldAddChildrenOrder(objectID, document)) {
+                    LOGGER.info("Migrating <children> to <childrenOrder> for object {} based on strategy {}",
+                        mcrObjectIDStr, strategy.getClass().getSimpleName());
+                    childrenElement.setName(MCRObjectStructure.CHILDREN_ORDER_ELEMENT_NAME);
+                    List<Element> children = childrenElement.getChildren(MCRObjectStructure.CHILD_ELEMENT_NAME);
 
-                childrenElement.setName(MCRObjectStructure.CHILDREN_ORDER_ELEMENT_NAME);
-                List<Element> children = childrenElement.getChildren(MCRObjectStructure.CHILD_ELEMENT_NAME);
-
-                for (Element child : children) {
-                    child.removeAttribute("title", MCRConstants.XLINK_NAMESPACE);
-                    child.removeAttribute("inherited");
+                    for (Element child : children) {
+                        child.removeAttribute("title", MCRConstants.XLINK_NAMESPACE);
+                        child.removeAttribute("inherited");
+                    }
+                } else {
+                    LOGGER.info("Skipping <children> migration for object {} based on strategy {}",
+                        mcrObjectIDStr, strategy.getClass().getSimpleName());
+                    // Remove the old <children> element as it's not needed in the normalized structure
+                    // and the strategy decided against migrating it to <childrenOrder>.
+                    // MCRMetadataManager.normalizeObject will handle the structure correctly later.
+                    // However, explicitly removing it here makes the intent clearer for this migration step.
+                    structureElement.removeChild(MCRExpandedObjectStructure.CHILDREN_ELEMENT_NAME);
                 }
             }
         }
