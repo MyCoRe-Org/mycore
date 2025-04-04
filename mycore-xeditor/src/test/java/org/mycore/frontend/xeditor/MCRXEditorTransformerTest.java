@@ -56,6 +56,7 @@ public class MCRXEditorTransformerTest extends MCRTestCase {
         collector.setParameter("input", editedXMLFile);
         MCREditorSession editorSession = new MCREditorSession(parameters, collector);
         editorSession.setID("1");
+        MCREditorSessionStoreUtils.getSessionStore().storeSession(editorSession);
         return editorSession;
     }
 
