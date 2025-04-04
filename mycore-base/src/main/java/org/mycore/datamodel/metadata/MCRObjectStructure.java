@@ -62,6 +62,10 @@ public class MCRObjectStructure {
     public static final String XML_NAME = "structure";
 
     public static final String ELEMENT_DERIVATE_OBJECTS = "derobjects";
+    public static final String PARENTS_ELEMENT_NAME = "parents";
+    public static final String PARENT_ELEMENT_NAME = "parent";
+    public static final String CHILDREN_ORDER_ELEMENT_NAME = "childrenOrder";
+    public static final String CHILD_ELEMENT_NAME = "child";
 
     private MCRMetaParentID parent;
 
@@ -137,16 +141,16 @@ public class MCRObjectStructure {
         clear();
 
         // Stricture parent part
-        Element subElement = element.getChild("parents");
+        Element subElement = element.getChild(PARENTS_ELEMENT_NAME);
 
         if (subElement != null) {
             parent = new MCRMetaParentID();
-            parent.setFromDOM(subElement.getChild("parent"));
+            parent.setFromDOM(subElement.getChild(PARENT_ELEMENT_NAME));
         }
 
-        Element childrenOrderElement = element.getChild("childrenOrder");
+        Element childrenOrderElement = element.getChild(CHILDREN_ORDER_ELEMENT_NAME);
         if (childrenOrderElement != null) {
-            for (Element child : childrenOrderElement.getChildren("child")) {
+            for (Element child : childrenOrderElement.getChildren(CHILD_ELEMENT_NAME)) {
                 String childID = child.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
                 if (childID != null) {
                     childrenOrder.add(MCRObjectID.getInstance(childID));
@@ -173,17 +177,18 @@ public class MCRObjectStructure {
         Element elm = new Element(XML_NAME);
 
         if (parent != null) {
-            Element elmm = new Element("parents");
+            Element elmm = new Element(PARENTS_ELEMENT_NAME);
             elmm.setAttribute("class", "MCRMetaLinkID");
             elmm.addContent(parent.createXML());
             elm.addContent(elmm);
         }
 
         if (!childrenOrder.isEmpty()) {
-            Element childrenOrderElement = new Element("childrenOrder");
+            Element childrenOrderElement = new Element(CHILDREN_ORDER_ELEMENT_NAME);
             for (MCRObjectID child : childrenOrder) {
-                Element childElement = new Element("child");
+                Element childElement = new Element(CHILD_ELEMENT_NAME);
                 childElement.setAttribute("href", child.toString(), MCRConstants.XLINK_NAMESPACE);
+                childElement.setAttribute("type", "locator", MCRConstants.XLINK_NAMESPACE);
                 childrenOrderElement.addContent(childElement);
             }
             elm.addContent(childrenOrderElement);
@@ -206,7 +211,7 @@ public class MCRObjectStructure {
     public JsonObject createJSON() {
         JsonObject structure = new JsonObject();
         // parent
-        Optional.ofNullable(getParent()).ifPresent(link -> structure.add("parent", link.createJSON()));
+        Optional.ofNullable(getParent()).ifPresent(link -> structure.add(PARENT_ELEMENT_NAME, link.createJSON()));
         return structure;
     }
 

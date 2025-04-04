@@ -40,7 +40,6 @@ import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
-
 import org.mycore.access.MCRMissingPermissionException;
 import org.mycore.access.MCRMissingPrivilegeException;
 import org.mycore.common.MCRException;
@@ -710,7 +709,12 @@ public final class MCRMetadataManager {
         return mcrObject;
     }
 
-    private static void normalizeObject(MCRObject mcrObject) {
+    /**
+     * Normalizes the object. The normalization is done by the normalizers defined in
+     * {@link #NORMALIZERS_PROPERTY_PREFIX}
+     * @param mcrObject the object to normalize
+     */
+    public static void normalizeObject(MCRObject mcrObject) {
         List<MCRObjectNormalizer> normalizers =
             instanciateConfigurableList(MCRObjectNormalizer.class, mcrObject, NORMALIZERS_PROPERTY_PREFIX);
 
@@ -719,7 +723,12 @@ public final class MCRMetadataManager {
         }
     }
 
-    private static void validateObject(MCRObject mcrObject) {
+    /**
+     *  Validates the object. The validation is done by the validators defined in {@link #VALIDATORS_PROPERTY_PREFIX}
+     * @param mcrObject the object to validate
+     * @throws MCRPersistenceException if the object is not valid
+     */
+    public static void validateObject(MCRObject mcrObject) throws MCRPersistenceException {
         List<MCRObjectValidator> validatorList =
             instanciateConfigurableList(MCRObjectValidator.class, mcrObject, VALIDATORS_PROPERTY_PREFIX);
 

@@ -35,13 +35,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.events.MCREvent;
-import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.common.xml.MCRXPathEvaluator;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.MCRClassificationMapper;
+import org.mycore.datamodel.classifications2.MCRDefaultClassificationMapper;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
@@ -65,7 +65,7 @@ import org.mycore.mods.MCRMODSWrapper;
  *
  * @author Sebastian Hofmann (mcrshofm)
  */
-public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
+public class MCRMODSClassificationMapper implements MCRClassificationMapper {
 
     public static final String GENERATOR_SUFFIX = "-mycore";
 
@@ -84,7 +84,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**
-     * Reads all {@link MCRClassificationMappingEventHandler#LABEL_LANG_X_MAPPING x-mappings} from a category.
+     * Reads all {@link MCRMODSClassificationMapper#LABEL_LANG_X_MAPPING x-mappings} from a category.
      * All mapped categories that exist are returned as a list.
      * @param category the source category containing a mapping
      * @return a list of all mapped categories
@@ -108,9 +108,9 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
 
     /**
      * Searches all configured classifications
-     * (see {@link MCRClassificationMappingEventHandler#X_PATH_MAPPING_CLASSIFICATIONS}) for categories
-     * with language labels {@link MCRClassificationMappingEventHandler#LABEL_LANG_XPATH_MAPPING} or
-     * {@link MCRClassificationMappingEventHandler#LABEL_LANG_XPATH_MAPPING_FALLBACK}.
+     * (see {@link MCRMODSClassificationMapper#X_PATH_MAPPING_CLASSIFICATIONS}) for categories
+     * with language labels {@link MCRMODSClassificationMapper#LABEL_LANG_XPATH_MAPPING} or
+     * {@link MCRMODSClassificationMapper#LABEL_LANG_XPATH_MAPPING_FALLBACK}.
      * All categories with said label and present in database are returned in a Map of Sets,
      * separated by their classification.
      * @return a Map with classification-IDs as key and Sets of {@link MCRCategory categories}
@@ -127,21 +127,6 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                     .collect(Collectors.toSet())));
     }
 
-    @Override
-    protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
-        createMapping(obj);
-    }
-
-    @Override
-    protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-        createMapping(obj);
-    }
-
-    @Override
-    protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
-        createMapping(obj);
-    }
-
     private static String getGenerator(MCRCategoryID src, MCRCategoryID target) {
         return String.format(Locale.ROOT, "%s2%s%s", src.getRootID(), target.getRootID(), GENERATOR_SUFFIX);
     }
@@ -155,14 +140,12 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
      * Creates x-mappings and XPath-mappings for a given object.
      * @param obj the {@link MCRObject} to add mappings to
      */
-    private void createMapping(MCRObject obj) {
+    @Override
+    public void createMapping(MCRObject obj) {
         MCRMODSWrapper mcrmodsWrapper = new MCRMODSWrapper(obj);
         if (mcrmodsWrapper.getMODS() == null) {
             return;
         }
-        // vorher alle mit generator *-mycore löschen
-        mcrmodsWrapper.getElements("mods:classification[contains(@generator, '" + GENERATOR_SUFFIX + "')]")
-            .stream().forEach(Element::detach);
 
         LOGGER.info("check mappings {}", obj::getId);
         final MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
@@ -172,7 +155,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                 return dao.getCategory(categoryId, 0);
             })
             .filter(Objects::nonNull)
-            .map(MCRClassificationMappingEventHandler::getXMappings)
+            .map(MCRMODSClassificationMapper::getXMappings)
             .flatMap(Collection::stream)
             .distinct()
             .forEach(mapping -> {
@@ -193,7 +176,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                 if (category.getLabel(LABEL_LANG_XPATH_MAPPING).isPresent()) {
 
                     String xPath = category.getLabel(LABEL_LANG_XPATH_MAPPING).get().getText();
-                    xPath = org.mycore.common.events.MCRClassificationMappingEventHandler.replacePattern(xPath);
+                    xPath = MCRDefaultClassificationMapper.replacePattern(xPath);
                     MCRXPathEvaluator evaluator = new MCRXPathEvaluator(new HashMap<>(), mcrmodsWrapper.getMODS());
 
                     if (evaluator.test(xPath)) {
@@ -214,7 +197,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
                     if (category.getLabel(LABEL_LANG_XPATH_MAPPING_FALLBACK).isPresent()) {
 
                         String xPath = category.getLabel(LABEL_LANG_XPATH_MAPPING_FALLBACK).get().getText();
-                        xPath = org.mycore.common.events.MCRClassificationMappingEventHandler.replacePattern(xPath);
+                        xPath = MCRDefaultClassificationMapper.replacePattern(xPath);
                         MCRXPathEvaluator evaluator = new MCRXPathEvaluator(new HashMap<>(), mcrmodsWrapper.getMODS());
 
                         if (evaluator.test(xPath)) {
@@ -232,6 +215,21 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
         }
 
         LOGGER.debug("mapping complete.");
+    }
+
+    @Override
+    public void clearMappings(MCRObject obj) {
+        if (!MCRMODSWrapper.isSupported(obj)) {
+            throw new IllegalArgumentException("The given object is not a supported MODS MCR object");
+        }
+
+        MCRMODSWrapper mcrmodsWrapper = new MCRMODSWrapper(obj);
+        if (mcrmodsWrapper.getMODS() == null) {
+            return;
+        }
+        // alle mit generator *-mycore löschen
+        mcrmodsWrapper.getElements("mods:classification[contains(@generator, '" + GENERATOR_SUFFIX + "')]")
+                .forEach(Element::detach);
     }
 
 }
