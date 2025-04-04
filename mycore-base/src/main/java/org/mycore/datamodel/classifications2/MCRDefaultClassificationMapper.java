@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.mycore.common.events;
+package org.mycore.datamodel.classifications2;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,23 +40,19 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRXPathEvaluator;
-import org.mycore.datamodel.classifications2.MCRCategory;
-import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
-import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRObject;
 
 /**
- * This class implements an event handler, which reloads classification entries
- * stored in datafield mappings/mapping. These entries are retrieved from other
+ * This MCRClassificationMapper is used to create classification mappings for a given object.
+ * The mapped classifications are stored in datafield mappings/mapping. These entries are retrieved from other
  * classifications where they are stored in as labels with language "x-mapping" or "x-mapping-xpath".
  *
  * @author Robert Stephan
  *
  */
-public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
+public class MCRDefaultClassificationMapper implements MCRClassificationMapper {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -71,54 +67,20 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
     /** This configuration lists all eligible classifications for x-path-mapping */
     private final String xPathMappingClassifications;
 
-    private MCRMetaElement oldMappings;
-
-    public MCRClassificationMappingEventHandler() {
+    public MCRDefaultClassificationMapper() {
         this.xPathMappingClassifications = MCRConfiguration2.getString("MCR.Category.XPathMapping.ClassIDs")
             .orElse("");
     }
 
-    @Override
-    protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
-        createMapping(obj);
-    }
 
-    @Override
-    protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-        createMapping(obj);
-    }
-
-    @Override
-    protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
-        createMapping(obj);
-    }
-
-    @Override
-    protected void undoObjectCreated(MCREvent evt, MCRObject obj) {
-        undo(obj);
-    }
-
-    @Override
-    protected void undoObjectUpdated(MCREvent evt, MCRObject obj) {
-        undo(obj);
-    }
-
-    @Override
-    protected void undoObjectRepaired(MCREvent evt, MCRObject obj) {
-        undo(obj);
-    }
 
     /**
      * Creates x-mappings and XPath-mappings for a given object.
      * @param obj the {@link MCRObject} to add mappings to
      */
-    private void createMapping(MCRObject obj) {
+    @Override
+    public void createMapping(MCRObject obj) {
         MCRMetaElement mappings = obj.getMetadata().getMetadataElement(ELEMENT_MAPPINGS);
-        if (mappings != null) {
-            oldMappings = mappings.clone();
-            obj.getMetadata().removeMetadataElement(ELEMENT_MAPPINGS);
-        }
-
         MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
 
         try {
@@ -139,6 +101,14 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
             if (mappings == null || mappings.isEmpty()) {
                 obj.getMetadata().removeMetadataElement(ELEMENT_MAPPINGS);
             }
+        }
+    }
+
+    @Override
+    public void clearMappings(MCRObject obj) {
+        MCRMetaElement mappings = obj.getMetadata().getMetadataElement(ELEMENT_MAPPINGS);
+        if (mappings != null) {
+            obj.getMetadata().removeMetadataElement(ELEMENT_MAPPINGS);
         }
     }
 
@@ -181,10 +151,10 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
 
     /**
      * For a list of configured classifications
-     * (see {@link MCRClassificationMappingEventHandler#xPathMappingClassifications}),
+     * (see {@link MCRDefaultClassificationMapper#xPathMappingClassifications}),
      * searches for categories with at least one of the labels
-     * {@link MCRClassificationMappingEventHandler#LABEL_LANG_XPATH_MAPPING}
-     * or {@link MCRClassificationMappingEventHandler#LABEL_LANG_XPATH_MAPPING_FALLBACK}
+     * {@link MCRDefaultClassificationMapper#LABEL_LANG_XPATH_MAPPING}
+     * or {@link MCRDefaultClassificationMapper#LABEL_LANG_XPATH_MAPPING_FALLBACK}
      * through a given DAO. The XPaths attached to those categories are then evaluated against a given document.
      * The fallback is evaluated per classification.
      * A list with all {@link MCRCategory MCRCategories} with matching XPaths is returned.
@@ -248,9 +218,9 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
      * Searches a given list with {@link MCRCategory MCRCategories} for labels that signal a mapping to a
      * classification. When the relevant labels are found, new mappings are added to the given
      * {@link MCRMetaElement mappings-element}.
-     * The relevant language labels are: {@link MCRClassificationMappingEventHandler#LABEL_LANG_X_MAPPING},
-     * {@link MCRClassificationMappingEventHandler#LABEL_LANG_XPATH_MAPPING} and
-     * {@link MCRClassificationMappingEventHandler#LABEL_LANG_XPATH_MAPPING_FALLBACK}.
+     * The relevant language labels are: {@link MCRDefaultClassificationMapper#LABEL_LANG_X_MAPPING},
+     * {@link MCRDefaultClassificationMapper#LABEL_LANG_XPATH_MAPPING} and
+     * {@link MCRDefaultClassificationMapper#LABEL_LANG_XPATH_MAPPING_FALLBACK}.
      * @param mappings the element that contains all mappings
      * @param categories the relevant categories that should be searched for specific language labels
      */
@@ -372,21 +342,4 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
         }
     }
 
-    /**
-     * Undos an executed mapping event by either removing all mappings or restoring mappings from before the execution.
-     * @param obj the {@link MCRObject} in which changes are rolled back
-     */
-    private void undo(MCRObject obj) {
-        if (oldMappings == null) {
-            obj.getMetadata().removeMetadataElement(ELEMENT_MAPPINGS);
-        } else {
-            MCRMetaElement mmap = obj.getMetadata().getMetadataElement(ELEMENT_MAPPINGS);
-            if (mmap == null) {
-                obj.getMetadata().setMetadataElement(createMappingsElement());
-            }
-            for (int i = 0; i < oldMappings.size(); i++) {
-                mmap.addMetaObject(oldMappings.getElement(i));
-            }
-        }
-    }
 }

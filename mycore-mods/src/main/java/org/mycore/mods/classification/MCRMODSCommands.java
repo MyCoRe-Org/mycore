@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.mods;
+package org.mycore.mods.classification;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,6 +55,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
+import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.mods.enrichment.MCREnricher;
 import org.mycore.mods.rss.MCRRSSFeedImporter;
 import org.xml.sax.SAXException;

@@ -38,10 +38,11 @@ import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRDefaultClassificationMapper;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.metadata.MCRObject;
 
-public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
+public class MCRDefaultClassificationMapperTest extends MCRJPATestCase {
 
     public static final String TEST_DIRECTORY = "MCRClassificationMappingEventHandlerTest/";
 
@@ -71,8 +72,9 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         Document document = saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + "testMcrObject.xml"));
         MCRObject mcro = new MCRObject(document);
 
-        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
-        mapper.handleObjectUpdated(null, mcro);
+        MCRDefaultClassificationMapper mapper = new MCRDefaultClassificationMapper();
+        mapper.clearMappings(mcro);
+        mapper.createMapping(mcro);
         Document xml = mcro.createXML();
 
         String expression1 =
@@ -133,8 +135,9 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         Document document = saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + "testMcrObject2.xml"));
         MCRObject mcro = new MCRObject(document);
 
-        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
-        mapper.handleObjectUpdated(null, mcro);
+        MCRDefaultClassificationMapper mapper = new MCRDefaultClassificationMapper();
+        mapper.clearMappings(mcro);
+        mapper.createMapping(mcro);
         Document xml = mcro.createXML();
 
         String expression1 = "//mappings[@class='MCRMetaClassification']/mapping[@classid='orcidWorkType' "

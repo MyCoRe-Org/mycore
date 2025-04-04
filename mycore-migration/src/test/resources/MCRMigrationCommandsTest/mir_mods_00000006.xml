@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mycoreobject xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="datamodel-mods.xsd" ID="mir_mods_00000006" version="2024.06.1-SNAPSHOT" label="mir_mods_00000003">
+  <structure>
+    <parents class="MCRMetaLinkID">
+      <parent inherited="0" xlink:type="locator" xlink:href="mir_mods_00000002" />
+    </parents>
+  </structure>
+  <metadata>
+    <def.modsContainer class="MCRMetaXML" heritable="false" notinherit="true">
+      <modsContainer inherited="0">
+        <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+          <mods:typeOfResource>text</mods:typeOfResource>
+          <mods:genre type="intern" authorityURI="http://www.mycore.org/classifications/mir_genres" valueURI="http://www.mycore.org/classifications/mir_genres#article" />
+          <mods:classification generator="mir_genres2marcgt-mycore" authority="marcgt">article</mods:classification>
+          <mods:classification generator="mir_genres2diniPublType-mycore" authorityURI="http://www.mycore.org/classifications/diniPublType" valueURI="http://www.mycore.org/classifications/diniPublType#article" />
+          <mods:classification generator="mir_genres2diniPublType2022-mycore" authorityURI="http://www.mycore.org/classifications/diniPublType2022" valueURI="http://www.mycore.org/classifications/diniPublType2022#Article" />
+          <mods:classification generator="mir_genres2schemaOrg-mycore" authorityURI="http://schema.org/" valueURI="http://schema.org/ScholarlyArticle" />
+          <mods:titleInfo xml:lang="de" xlink:type="simple">
+            <mods:title>Artikel 2</mods:title>
+          </mods:titleInfo>
+          <mods:language>
+            <mods:languageTerm authority="rfc5646" type="code">de</mods:languageTerm>
+          </mods:language>
+          <mods:classification displayLabel="sdnb" authority="sdnb">320</mods:classification>
+          <mods:accessCondition type="use and reproduction" xlink:href="http://www.mycore.org/classifications/mir_licenses#rights_reserved" xlink:type="simple" />
+          <mods:relatedItem type="host" xlink:href="mir_mods_00000002" xlink:type="simple">
+            <mods:classification generator="mir_genres2marcgt-mycore" authority="marcgt">issue</mods:classification>
+            <mods:classification generator="mir_genres2diniPublType-mycore" authorityURI="http://www.mycore.org/classifications/diniPublType" valueURI="http://www.mycore.org/classifications/diniPublType#PeriodicalPart" />
+            <mods:classification generator="mir_genres2diniPublType2022-mycore" authorityURI="http://www.mycore.org/classifications/diniPublType2022" valueURI="http://www.mycore.org/classifications/diniPublType2022#PeriodicalPart" />
+            <mods:classification generator="mir_genres2schemaOrg-mycore" authorityURI="http://schema.org/" valueURI="http://schema.org/PublicationIssue" />
+            <mods:relatedItem xlink:href="mir_mods_00000001" type="host" xlink:type="simple">
+              <mods:typeOfResource>text</mods:typeOfResource>
+              <mods:genre type="intern" authorityURI="http://www.mycore.org/classifications/mir_genres" valueURI="http://www.mycore.org/classifications/mir_genres#journal" />
+              <mods:classification generator="mir_genres2marcgt-mycore" authority="marcgt">journal</mods:classification>
+              <mods:classification generator="mir_genres2diniPublType-mycore" authorityURI="http://www.mycore.org/classifications/diniPublType" valueURI="http://www.mycore.org/classifications/diniPublType#Periodical" />
+              <mods:classification generator="mir_genres2diniPublType2022-mycore" authorityURI="http://www.mycore.org/classifications/diniPublType2022" valueURI="http://www.mycore.org/classifications/diniPublType2022#Periodical" />
+              <mods:classification generator="mir_genres2schemaOrg-mycore" authorityURI="http://schema.org/" valueURI="http://schema.org/Periodical" />
+              <mods:name type="personal" xlink:type="simple">
+                <mods:displayForm>Hofmann, Sebastian</mods:displayForm>
+                <mods:role>
+                  <mods:roleTerm authority="marcrelator" type="code">aut</mods:roleTerm>
+                </mods:role>
+                <mods:namePart type="family">Hofmann</mods:namePart>
+                <mods:namePart type="given">Sebastian</mods:namePart>
+              </mods:name>
+              <mods:language>
+                <mods:languageTerm authority="rfc5646" type="code">de</mods:languageTerm>
+              </mods:language>
+              <mods:classification displayLabel="sdnb" authority="sdnb">430</mods:classification>
+              <mods:accessCondition type="use and reproduction" xlink:href="http://www.mycore.org/classifications/mir_licenses#cc_by_3.0" xlink:type="simple" />
+              <mods:titleInfo xml:lang="de" xlink:type="simple">
+                <mods:title>Zeitschrift</mods:title>
+              </mods:titleInfo>
+            </mods:relatedItem>
+            <mods:typeOfResource>text</mods:typeOfResource>
+            <mods:genre type="intern" authorityURI="http://www.mycore.org/classifications/mir_genres" valueURI="http://www.mycore.org/classifications/mir_genres#issue" />
+            <mods:titleInfo xml:lang="de" xlink:type="simple">
+              <mods:title>Zeitschriftenheft 1</mods:title>
+            </mods:titleInfo>
+            <mods:language>
+              <mods:languageTerm authority="rfc5646" type="code">de</mods:languageTerm>
+            </mods:language>
+            <mods:classification displayLabel="sdnb" authority="sdnb">000</mods:classification>
+            <mods:accessCondition type="use and reproduction" xlink:href="http://www.mycore.org/classifications/mir_licenses#rights_reserved" xlink:type="simple" />
+          </mods:relatedItem>
+        </mods:mods>
+      </modsContainer>
+    </def.modsContainer>
+  </metadata>
+  <service>
+    <servdates class="MCRMetaISO8601Date">
+      <servdate type="createdate" inherited="0">2025-04-02T13:26:09.159Z</servdate>
+      <servdate type="modifydate" inherited="0">2025-04-02T13:26:09.159Z</servdate>
+    </servdates>
+    <servflags class="MCRMetaLangText">
+      <servflag type="createdby" inherited="0" form="plain">administrator</servflag>
+      <servflag type="modifiedby" inherited="0" form="plain">administrator</servflag>
+    </servflags>
+    <servstates class="MCRMetaClassification">
+      <servstate inherited="0" classid="state" categid="submitted" />
+    </servstates>
+  </service>
+</mycoreobject>
