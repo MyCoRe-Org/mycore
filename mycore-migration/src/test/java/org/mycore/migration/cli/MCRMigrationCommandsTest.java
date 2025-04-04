@@ -1,12 +1,12 @@
 package org.mycore.migration.cli;
 
+import static org.mycore.migration.cli.MCRMigrationCommands.CHILDREN_ORDER_STRATEGY_PROPERTY;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -22,6 +22,7 @@ import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectStructure;
+import org.mycore.migration.strategy.MCRAlwaysAddChildrenOrderStrategy;
 import org.mycore.mods.classification.MCRMODSClassificationMapper;
 
 public class MCRMigrationCommandsTest extends MCRStoreTestCase {
@@ -41,9 +42,6 @@ public class MCRMigrationCommandsTest extends MCRStoreTestCase {
     public static final String TEST_FILE_12 = "mir_mods_00000012.xml";
     public static final String TEST_FILE_13 = "mir_mods_00000013.xml";
     public static final String TEST_DERIVATE_FILE = "mir_derivate_00000011.xml";
-
-    public static final String EXPECTED_REPAIR_COMMAND = "repair metadata search of ID mir_derivate_00000011";
-    private static final Logger LOGGER = LogManager.getLogger();
 
     private static void verifyNoChildrenElementLeft(Document migratedObject1) {
         // check if there are no children elements anymore in structure
@@ -81,7 +79,8 @@ public class MCRMigrationCommandsTest extends MCRStoreTestCase {
     @Test
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "MCR.Metadata.Type.mods", string = "true")
+            @MCRTestProperty(key = "MCR.Metadata.Type.mods", string = "true"),
+            @MCRTestProperty(key = CHILDREN_ORDER_STRATEGY_PROPERTY, classNameOf = MCRAlwaysAddChildrenOrderStrategy.class),
         })
     public void migrateChildOrder() throws IOException, JDOMException {
         MCRObjectID testID1 = createTestData(TEST_FILE_DIRECTORY + TEST_FILE_1);
@@ -123,11 +122,6 @@ public class MCRMigrationCommandsTest extends MCRStoreTestCase {
 
         checkNoGeneratedClassifications(migratedObject7);
         checkRelatedItemIsEmpty(migratedObject7);
-
-
-        //XMLOutputter outputter = new XMLOutputter();
-        //LOGGER.info(outputter.outputString(migratedObject1));
-
     }
 
     private static void checkRelatedItemIsEmpty(Document migratedObject1) {

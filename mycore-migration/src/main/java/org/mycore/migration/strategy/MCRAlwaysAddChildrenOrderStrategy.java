@@ -22,9 +22,9 @@ import org.jdom2.Document;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
- * A {@link ChildrenOrderMigrationStrategy} that always decides to add the childrenOrder element.
+ * A {@link MCRChildrenOrderMigrationStrategy} that always decides to add the childrenOrder element.
  */
-public class AlwaysAddChildrenOrderStrategy implements ChildrenOrderMigrationStrategy {
+public class MCRAlwaysAddChildrenOrderStrategy implements MCRChildrenOrderMigrationStrategy {
 
     @Override
     public boolean shouldAddChildrenOrder(MCRObjectID objectId, Document objectXML) {
