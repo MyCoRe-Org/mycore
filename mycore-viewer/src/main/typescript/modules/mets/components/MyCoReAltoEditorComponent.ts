@@ -572,23 +572,19 @@ export class MyCoReAltoEditorComponent extends ViewerComponent {
     requestURL += "/apply/" + this._settings.altoChangePID;
 
     fetch(requestURL, {
-      method: "POST",
-      headers: {
+      method: "POST", headers: {
         "Content-Type": "application/json"
       }
-    })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok ' + response.statusText);
-          }
-          return response.json();
-        })
-        .then(data => {
-          successCallback(data);
-        })
-        .catch(error => {
-          errorCallback(error);
-        });
+    }).then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+      return response.json();
+    }).then(data => {
+      successCallback(data);
+    }).catch(error => {
+      errorCallback(error);
+    });
   }
 
   private submitChanges(successCallback: (result: { pid: string }) => any, errorCallback) {
