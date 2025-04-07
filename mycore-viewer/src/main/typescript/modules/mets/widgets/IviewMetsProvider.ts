@@ -29,19 +29,18 @@ export class IviewMetsProvider {
   }, any> {
     let promise = new ViewerPromise<{ model: StructureModel; document: Document }, any>();
     fetch(metsDocumentLocation)
-        .then(response => {
-          if (!response.ok) {
-            promise.reject(response.statusText);
-            return null;
-          }
-          return response.text();
-        })
-        .then(text => {
-        let parser = new DOMParser();
-        let xmlDoc = parser.parseFromString(text, "text/xml");
-        let builder = new MetsStructureBuilder(xmlDoc, tilePathBuilder);
-        promise.resolve({ model: builder.processMets(), document: xmlDoc });
-
+    .then(response => {
+      if (!response.ok) {
+        promise.reject(response.statusText);
+        return null;
+      }
+      return response.text();
+    })
+    .then(text => {
+      let parser = new DOMParser();
+      let xmlDoc = parser.parseFromString(text, "text/xml");
+      let builder = new MetsStructureBuilder(xmlDoc, tilePathBuilder);
+      promise.resolve({ model: builder.processMets(), document: xmlDoc });
     }).catch(error => {
       promise.reject(error);
     });
