@@ -80,7 +80,8 @@ public class MCRMigrationCommandsTest extends MCRStoreTestCase {
     @MCRTestConfiguration(
         properties = {
             @MCRTestProperty(key = "MCR.Metadata.Type.mods", string = "true"),
-            @MCRTestProperty(key = CHILDREN_ORDER_STRATEGY_PROPERTY, classNameOf = MCRAlwaysAddChildrenOrderStrategy.class),
+            @MCRTestProperty(key = CHILDREN_ORDER_STRATEGY_PROPERTY,
+                    classNameOf = MCRAlwaysAddChildrenOrderStrategy.class),
         })
     public void migrateChildOrder() throws IOException, JDOMException {
         MCRObjectID testID1 = createTestData(TEST_FILE_DIRECTORY + TEST_FILE_1);
