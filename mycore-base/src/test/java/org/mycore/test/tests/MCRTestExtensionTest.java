@@ -61,7 +61,8 @@ public class MCRTestExtensionTest {
     @MCRTestConfiguration(
         properties = {
             @MCRTestProperty(key = "foo", string = "foo"),
-            @MCRTestProperty(key = "bar", string = "bar")
+            @MCRTestProperty(key = "bar", string = "bar"),
+            @MCRTestProperty(key = "hello", classNameOf = SayHello.class)
         })
     class MCRTestExtensionTest1 {
         @Test
@@ -78,12 +79,25 @@ public class MCRTestExtensionTest {
             Assertions.assertEquals("foo2", MCRConfiguration2.getStringOrThrow("foo2"));
         }
 
+        @Test
+        public void testSayHello() {
+            //Checks implementation of the class SayHello or subclasses.
+            MCRConfiguration2.getInstanceOf(SayHello.class, "hello").ifPresent(sayHello -> {
+                String name = "Junit";
+                String helloResponse = sayHello.sayHello(name);
+                Assertions.assertNotNull(helloResponse, "Hello response should not be null");
+                System.out.println(helloResponse);
+                Assertions.assertTrue(helloResponse.contains(name),
+                    "Could not find name '" + name + "' in response: " + helloResponse);
+            });
+        }
     }
 
     @Nested
     @MCRTestConfiguration(
         properties = {
-            @MCRTestProperty(key = "bar", string = "foo")
+            @MCRTestProperty(key = "bar", string = "foo"),
+            @MCRTestProperty(key = "hello", classNameOf = SagHallo.class)
         })
     class MCRTestExtensionTest2 extends MCRTestExtensionTest1 {
         @Test
@@ -96,4 +110,18 @@ public class MCRTestExtensionTest {
             Assertions.assertEquals("foo", MCRConfiguration2.getStringOrThrow("bar"));
         }
     }
+
+    public static class SayHello {
+        public String sayHello(String name) {
+            return "Hello " + name + "!";
+        }
+    }
+
+    public static class SagHallo extends SayHello {
+        @Override
+        public String sayHello(String name) {
+            return "Hallo " + name + "!";
+        }
+    }
+
 }
