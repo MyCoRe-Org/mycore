@@ -33,8 +33,20 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 
+/**
+ * JUnit 5 extension for setting up and tearing down the MCR metadata store and SVN directories.
+ * This extension creates temporary directories for the metadata store and SVN base directory,
+ * and cleans them up after each test.
+ *
+ * Sets the following properties in the class properties:
+ * <dl>
+ * <dt><code>MCR.Metadata.Store.BaseDir</code></dt><dd>Path to the metadata store base directory</dd>
+ * <dt><code>MCR.Metadata.Store.SVNBase</code></dt><dd>URI of the SVN base directory</dd>
+ * </dl>
+ *
+ */
 public class MCRMetadataExtension implements Extension, BeforeAllCallback, BeforeEachCallback,
-    AfterEachCallback, AfterAllCallback {
+    AfterEachCallback {
 
     private static final String STORE_BASE_DIR_KEY = "MCRMetadataExtension.storeBaseDir";
     private static final String SVN_BASE_DIR_KEY = "MCRMetadataExtension.svnBaseDir";
@@ -76,10 +88,6 @@ public class MCRMetadataExtension implements Extension, BeforeAllCallback, Befor
         Path svnBaseDir = getSvnBaseDir(context);
 
         MCRTestHelper.deleteRecursively(storeBaseDir, svnBaseDir);
-    }
-
-    @Override
-    public void afterAll(ExtensionContext context) throws Exception {
     }
 
     /**
