@@ -293,7 +293,7 @@ export class MyCoReSearchComponent extends ViewerComponent {
 
     if (e.type == ShowContentEvent.TYPE) {
       const sce = e as ShowContentEvent;
-      if (sce.containerDirection == ShowContentEvent.DIRECTION_EAST && sce.component !== this) {
+      if (sce.containerDirection == ShowContentEvent.DIRECTION_EAST && sce.content == this._container) {
         if (sce.size == 0) {
           this._searchResultCanvasPageLayer.clear();
           this.trigger(new RedrawEvent(this));
