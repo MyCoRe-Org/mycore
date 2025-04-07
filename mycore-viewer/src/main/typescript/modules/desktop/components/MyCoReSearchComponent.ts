@@ -173,8 +173,8 @@ export class MyCoReSearchComponent extends ViewerComponent {
       this.trigger(new ShowContentEvent(this, this._container, direction, 0, this._sidebarLabel));
     }
 
-    for (let i = 0; i < this._searchContainer.children.length; i++) {
-      this._searchContainer.children[i].remove();
+    while (this._searchContainer.children.length > 0) {
+        this._searchContainer.children[0].remove();
     }
 
     let textContents = [];
