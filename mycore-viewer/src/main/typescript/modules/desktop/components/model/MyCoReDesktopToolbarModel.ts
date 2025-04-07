@@ -40,8 +40,6 @@ export class MyCoReDesktopToolbarModel extends MyCoReBasicToolbarModel {
   public selectionSwitchButton: ToolbarButton;
 
   public addComponents(): void {
-    ;
-
     this.addGroup(this._sidebarControllGroup);
     this.addGroup(this._zoomControllGroup);
     this.addGroup(this._layoutControllGroup);
