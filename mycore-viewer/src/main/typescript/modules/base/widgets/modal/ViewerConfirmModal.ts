@@ -46,7 +46,6 @@ export class ViewerConfirmModal extends ViewerModalWindow {
     const button = document.createElement("a");
     button.setAttribute("type", "button");
     button.classList.add("btn", "btn-secondary");
-    button.innerText = key;
     button.setAttribute("data-i18n", "modal." + key);
     this.modalFooter.appendChild(button);
 
