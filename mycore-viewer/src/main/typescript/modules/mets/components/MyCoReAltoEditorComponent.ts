@@ -501,24 +501,20 @@ export class MyCoReAltoEditorComponent extends ViewerComponent {
           requestURL += "/delete/" + this._settings.altoChangePID;
 
           fetch(requestURL, {
-            method: "POST",
-            headers: {
+            method: "POST", headers: {
               "Content-Type": "application/json"
             }
-          })
-              .then(response => {
-                if (!response.ok) {
-                  throw new Error('Network response was not ok ' + response.statusText);
-                }
-                return response.json();
-              })
-              .then(data => {
-                this._settings.altoChangePID = null;
-                this.trigger(new UpdateURLEvent(this));
-              })
-              .catch(error => {
-                errorDeleteCallback(error);
-              });
+          }).then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+          }).then(data => {
+            this._settings.altoChangePID = null;
+            this.trigger(new UpdateURLEvent(this));
+          }).catch(error => {
+            errorDeleteCallback(error);
+          });
         }
         this.editorWidget.getChanges().forEach((file, change) => {
           this.removeChange(change);
