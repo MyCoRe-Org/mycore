@@ -79,10 +79,10 @@ export class BootstrapButtonView implements ButtonView {
 
   updateButtonClass(buttonClass: string): void {
     if (this._lastButtonClass != null) {
-      this._buttonElement.classList.remove("btn-" + this._lastButtonClass);
+      this._buttonElement.classList.remove(`btn-${this._lastButtonClass}`);
     }
 
-    this._buttonElement.classList.add("btn-" + buttonClass);
+    this._buttonElement.classList.add(`btn-${buttonClass}`);
     this._lastButtonClass = buttonClass;
   }
 
