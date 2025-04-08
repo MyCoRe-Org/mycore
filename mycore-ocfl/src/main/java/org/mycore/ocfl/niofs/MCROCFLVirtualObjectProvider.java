@@ -29,7 +29,6 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import io.ocfl.api.model.VersionDetails;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.niofs.storage.MCROCFLTransactionalTempFileStorage;
 import org.mycore.ocfl.repository.MCROCFLRepository;
@@ -40,6 +39,7 @@ import io.ocfl.api.exception.NotFoundException;
 import io.ocfl.api.model.ObjectVersionId;
 import io.ocfl.api.model.OcflObjectVersion;
 import io.ocfl.api.model.OcflObjectVersionFile;
+import io.ocfl.api.model.VersionDetails;
 
 /**
  * Provides and manages virtual objects.
