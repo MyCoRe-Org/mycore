@@ -40,6 +40,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -465,7 +466,7 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     private static class MCRModuleResolverProvider implements MCRResolverProvider {
-        private final Map<String, URIResolver> resolverMap = new HashMap<>();
+        private final Map<String, URIResolver> resolverMap = new ConcurrentHashMap<>();
 
         MCRModuleResolverProvider() {
             MCRConfiguration2.getSubPropertiesMap(CONFIG_PREFIX + "ModuleResolver.")

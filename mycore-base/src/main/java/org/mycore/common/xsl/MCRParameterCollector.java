@@ -60,7 +60,7 @@ public class MCRParameterCollector {
     private static final String HEADER_REFERER = "Referer";
 
     /** The collected parameters */
-    private final Map<String, Object> parameters = new HashMap<>();
+    private final Map<String, Object> parameters = new ConcurrentHashMap<>();
 
     /** If true (which is default), only those parameters starting with "XSL." are copied from session and request */
     private boolean onlySetXSLParameters = true;

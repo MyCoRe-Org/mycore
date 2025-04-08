@@ -19,9 +19,9 @@
 package org.mycore.datamodel.language;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -55,7 +55,7 @@ public final class MCRLanguageFactory {
     /**
      * Map of languages by ISO 639-1 or -2 code
      */
-    private final Map<String, MCRLanguage> languageByCode = new HashMap<>();
+    private final Map<String, MCRLanguage> languageByCode = new ConcurrentHashMap<>();
 
     /**
      * The ID of the classification containing the language codes and labels

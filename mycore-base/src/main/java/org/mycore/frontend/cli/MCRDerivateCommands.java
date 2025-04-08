@@ -30,10 +30,10 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -102,7 +102,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     public static final String DEFAULT_STYLE = "save-derivate.xsl";
 
     /** Static compiled transformer stylesheets */
-    private static final Map<String, Transformer> TRANSFORMER_CACHE = new HashMap<>();
+    private static final Map<String, Transformer> TRANSFORMER_CACHE = new ConcurrentHashMap<>();
 
     /**
      * deletes all MCRDerivate from the datastore.

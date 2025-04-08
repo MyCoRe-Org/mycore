@@ -22,7 +22,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -76,7 +75,7 @@ public class MCRMetsMods2IIIFConverter {
 
     protected final FileGrp imageGrp;
 
-    protected final Map<String, List<String>> logicalIdIdentifiersMap = new HashMap<>();
+    protected final Map<String, List<String>> logicalIdIdentifiersMap = new ConcurrentHashMap<>();
 
     protected final Map<String, PhysicalSubDiv> identifierPhysicalMap = new ConcurrentHashMap<>();
 

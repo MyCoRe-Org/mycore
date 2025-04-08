@@ -21,9 +21,9 @@ package org.mycore.viewer.alto.service.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.mycore.common.MCRSessionMgr;
@@ -38,11 +38,11 @@ public class MCRMemoryChangeSetStore implements MCRAltoChangeSetStore {
     private final MCRDerivateTitleResolver titleResolver = MCRConfiguration2.getInstanceOfOrThrow(
         MCRDerivateTitleResolver.class, "MCR.Viewer.DerivateTitleResolver.Class");
 
-    private final Map<String, List<MCRStoredChangeSet>> derivateChangeSet = new HashMap<>();
+    private final Map<String, List<MCRStoredChangeSet>> derivateChangeSet = new ConcurrentHashMap<>();
 
-    private final Map<String, List<MCRStoredChangeSet>> sessionIDChangeSet = new HashMap<>();
+    private final Map<String, List<MCRStoredChangeSet>> sessionIDChangeSet = new ConcurrentHashMap<>();
 
-    private final Map<String, MCRStoredChangeSet> idChangeSet = new HashMap<>();
+    private final Map<String, MCRStoredChangeSet> idChangeSet = new ConcurrentHashMap<>();
 
     @Override
     public MCRStoredChangeSet get(String pid) {

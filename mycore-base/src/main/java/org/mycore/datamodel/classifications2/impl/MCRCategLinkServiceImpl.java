@@ -143,7 +143,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     }
 
     private Map<MCRCategoryID, Number> initializeCountLinkMap(boolean childrenOnly, MCRCategory parent) {
-        Map<MCRCategoryID, Number> countLinks = new HashMap<>();
+        Map<MCRCategoryID, Number> countLinks = new ConcurrentHashMap<>();
         Collection<MCRCategoryID> ids = childrenOnly ? getAllChildIDs(parent) : getAllCategIDs(parent);
         for (MCRCategoryID id : ids) {
             // initialize all categIDs with link count of zero

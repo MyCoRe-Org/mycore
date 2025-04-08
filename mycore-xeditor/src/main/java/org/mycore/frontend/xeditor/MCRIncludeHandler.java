@@ -19,7 +19,6 @@
 package org.mycore.frontend.xeditor;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -69,7 +68,7 @@ public class MCRIncludeHandler {
     private static final Map<String, Element> CACHE_AT_APPLICATION_LEVEL = new ConcurrentHashMap<>();
 
     /** Caches preloaded components at transformation level, resolved on every reload of editor form page */
-    private Map<String, Element> cacheAtTransformationLevel = new HashMap<>();
+    private Map<String, Element> cacheAtTransformationLevel = new ConcurrentHashMap<>();
 
     /**
      * Preloads editor components from one or more URIs.

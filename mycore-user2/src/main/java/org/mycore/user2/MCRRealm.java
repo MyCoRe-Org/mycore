@@ -20,10 +20,10 @@ package org.mycore.user2;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSessionMgr;
@@ -42,7 +42,7 @@ public class MCRRealm {
     private String id;
 
     /** The labels of the realm */
-    private Map<String, String> labels = new HashMap<>();
+    private Map<String, String> labels = new ConcurrentHashMap<>();
 
     /** The URL where users from this realm can change their password */
     private String passwordChangeURL;

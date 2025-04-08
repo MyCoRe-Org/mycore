@@ -22,9 +22,9 @@ import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JConstant
 import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JUtil.getClassificationLabel;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang3.StringUtils;
@@ -94,7 +94,7 @@ public class MCRNeo4JQueryRunner {
                 Result result = tx.run(queryString);
                 while (result.hasNext()) {
                     Record thisRecord = result.next();
-                    Map<String, String> keyMap = new HashMap<>();
+                    Map<String, String> keyMap = new ConcurrentHashMap<>();
 
                     for (String key : thisRecord.keys()) {
                         Value recordData = thisRecord.get(key);

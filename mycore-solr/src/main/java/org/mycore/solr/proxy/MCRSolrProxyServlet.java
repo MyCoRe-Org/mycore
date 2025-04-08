@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import javax.xml.transform.TransformerException;
@@ -181,7 +182,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
         NamedList<Object> namedList = solrQueryParameter.toNamedList();
         //disabled for MCR-953 and https://issues.apache.org/jira/browse/SOLR-7508
         //Map<String, String[]> parameters = ModifiableSolrParams.toMultiMap(namedList);
-        Map<String, String[]> parameters = new HashMap<>();
+        Map<String, String[]> parameters = new ConcurrentHashMap<>();
         for (int i = 0; i < namedList.size(); i++) {
             String name = namedList.getName(i);
             Object val = namedList.getVal(i);

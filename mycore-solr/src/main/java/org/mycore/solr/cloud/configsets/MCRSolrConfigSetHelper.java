@@ -21,10 +21,10 @@ package org.mycore.solr.cloud.configsets;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -75,7 +75,7 @@ public class MCRSolrConfigSetHelper {
      */
     public static Map<String, MCRSolrConfigSetProvider> getLocalConfigSets() {
         Map<String, Callable<Object>> instances = MCRConfiguration2.getInstances(CONFIG_SET_PROPERTY_PREFIX);
-        Map<String, MCRSolrConfigSetProvider> configSets = new HashMap<>(instances.size());
+        Map<String, MCRSolrConfigSetProvider> configSets = new ConcurrentHashMap<>(instances.size());
 
         instances.forEach((name, supplier) -> {
             try {
