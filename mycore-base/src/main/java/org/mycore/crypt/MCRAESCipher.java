@@ -69,10 +69,9 @@ public class MCRAESCipher extends MCRCipher {
     public void init(String id) throws MCRCryptKeyFileNotFoundException, InvalidKeyException {
         cipherID = id;
 
-        String encodedKey = null;
         try {
             LOGGER.info("Get key from file {}.", keyFile);
-            encodedKey = Files.readString(FileSystems.getDefault().getPath(keyFile));
+            String encodedKey = Files.readString(FileSystems.getDefault().getPath(keyFile));
             byte[] decodedKey = java.util.Base64.getDecoder().decode(encodedKey);
             LOGGER.info("Set secret key");
             secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");

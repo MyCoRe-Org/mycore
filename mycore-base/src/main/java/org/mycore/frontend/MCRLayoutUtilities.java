@@ -196,17 +196,15 @@ public class MCRLayoutUtilities {
     public static String getAncestorLabels(Element item) {
         StringBuilder label = new StringBuilder();
         String lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage().trim();
-        XPathExpression<Element> xpath;
-        Element ic = null;
-        xpath = XPATH_FACTORY.compile("//.[@href='" + getWebpageID(item) + "']", Filters.element());
-        ic = xpath.evaluateFirst(getNavi());
+        XPathExpression<Element> xpath
+            = XPATH_FACTORY.compile("//.[@href='" + getWebpageID(item) + "']", Filters.element());
+        Element ic = xpath.evaluateFirst(getNavi());
         while (ic.getName().equals("item")) {
             ic = ic.getParentElement();
             String webpageID = getWebpageID(ic);
-            Element labelEl = null;
             xpath = XPATH_FACTORY.compile("//.[@href='" + webpageID + "']/label[@xml:lang='" + lang + "']",
                 Filters.element());
-            labelEl = xpath.evaluateFirst(getNavi());
+            Element labelEl = xpath.evaluateFirst(getNavi());
             if (labelEl != null) {
                 if (label.isEmpty()) {
                     label = new StringBuilder(labelEl.getTextTrim());

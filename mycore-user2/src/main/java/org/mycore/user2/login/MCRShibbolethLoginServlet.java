@@ -52,7 +52,7 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
 
-        String msg = null;
+        String msg;
 
         String uid = (String) req.getAttribute("uid");
         String userId = uid != null ? uid : req.getRemoteUser();

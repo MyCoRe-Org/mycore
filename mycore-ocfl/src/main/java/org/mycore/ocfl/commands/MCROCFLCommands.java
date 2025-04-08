@@ -317,6 +317,7 @@ public class MCROCFLCommands {
 
     @MCRCommand(syntax = "purge all marked from ocfl",
         help = "Permanently delete all hidden/archived ocfl entries")
+    @SuppressWarnings("PMD.UnusedAssignment")
     public static void purgeMarked() {
         if (!confirmPurgeMarked) {
             logConfirm("entries");

@@ -90,6 +90,7 @@ public class MCRMODSDistributeMetadataJobAction extends MCRJobAction {
         }
     }
 
+    @SuppressWarnings("PMD.UnusedAssignment")
     public void runWithLockedObject(List<MCRObjectID> objects, Consumer<MCRObjectID> lockedObjectConsumer) {
         try {
             // wait to get the lock for the object
@@ -103,7 +104,8 @@ public class MCRMODSDistributeMetadataJobAction extends MCRJobAction {
                     LOGGER.info("Wait 1 minute for lock");
                     Thread.sleep(TimeUnit.MINUTES.toMillis(1));
                 }
-            } while (!notLocked.isEmpty() && maxTries-- > 0);
+                maxTries--;
+            } while (!notLocked.isEmpty() && maxTries > 0);
             objects.forEach(lockedObjectConsumer);
         } catch (InterruptedException e) {
             throw new MCRException("Error while waiting for object lock", e);

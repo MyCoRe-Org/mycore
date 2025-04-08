@@ -45,7 +45,7 @@ public class MCRRoleResolver implements URIResolver {
 
     public static Element getAssignableGroupsForUser() throws MCRAccessException {
         LOGGER.warn("Please fix http://sourceforge.net/p/mycore/bugs/568/");
-        List<MCRRole> groupIDs = null;
+        List<MCRRole> groupIDs;
 
         // The list of assignable groups depends on the privileges of the
         // current user.

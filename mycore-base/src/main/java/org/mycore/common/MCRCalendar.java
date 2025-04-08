@@ -882,15 +882,15 @@ public class MCRCalendar {
      * @return the date in format yyyy-MM-ddThh:mm:ssZ
      */
     public static String getISODateToFormattedString(String date, boolean useLastValue, String calendarName) {
-        String formattedDate = null;
         try {
             Calendar calendar = getHistoryDateAsCalendar(date, useLastValue, calendarName);
             GregorianCalendar gregorianCalendar = getGregorianCalendarOfACalendar(calendar);
-            formattedDate = getCalendarDateToFormattedString(gregorianCalendar, "yyyy-MM-dd")
+            String formattedDate = getCalendarDateToFormattedString(gregorianCalendar, "yyyy-MM-dd")
                 + "T00:00:00.000Z";
             if (gregorianCalendar.get(Calendar.ERA) == GregorianCalendar.BC) {
                 formattedDate = "-" + formattedDate;
             }
+            return formattedDate;
         } catch (Exception e) {
             String errorMsg = "Error while converting date string : " + date + " - " + useLastValue +
                 " - " + calendarName;
@@ -900,7 +900,6 @@ public class MCRCalendar {
             LOGGER.warn(errorMsg);
             return "";
         }
-        return formattedDate;
     }
 
     /**

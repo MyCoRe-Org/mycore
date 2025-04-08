@@ -21,7 +21,7 @@ package org.mycore.ocfl.metadata;
 /**
  * Manages persistence of MCRObject and MCRDerivate xml metadata. Provides
  * methods to create, retrieve, update and delete object metadata using OCFL
- * 
+ *
  * @deprecated use {@link MCROCFLXMLMetadataManagerAdapter} instead
  */
 @Deprecated

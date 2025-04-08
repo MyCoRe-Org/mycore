@@ -103,21 +103,19 @@ public class MCRLockServlet extends MCRServlet {
                 "You must provide parameter: " + PARAM_OBJECTID);
             return;
         }
-        Action action = null;
         try {
-            action = actionValue != null ? Action.fromString(actionValue) : Action.LOCK;
+            Action action = actionValue != null ? Action.fromString(actionValue) : Action.LOCK;
+            MCRObjectID objectID = MCRObjectID.getInstance(idValue);
+            switch (action) {
+                case LOCK -> MCRObjectIDLockTable.lock(objectID);
+                case UNLOCK -> MCRObjectIDLockTable.unlock(objectID);
+            }
+            job.getRequest().setAttribute(OBJECT_ID_KEY, objectID);
+            job.getRequest().setAttribute(ACTION_KEY, action);
         } catch (IllegalArgumentException e) {
             job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST,
                 "Unsupported value for parameter " + PARAM_ACTION + ": " + actionValue);
-            return;
         }
-        MCRObjectID objectID = MCRObjectID.getInstance(idValue);
-        switch (action) {
-            case LOCK -> MCRObjectIDLockTable.lock(objectID);
-            case UNLOCK -> MCRObjectIDLockTable.unlock(objectID);
-        }
-        job.getRequest().setAttribute(OBJECT_ID_KEY, objectID);
-        job.getRequest().setAttribute(ACTION_KEY, action);
     }
 
     @Override

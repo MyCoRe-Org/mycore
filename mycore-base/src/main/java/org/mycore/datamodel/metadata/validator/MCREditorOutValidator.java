@@ -176,14 +176,13 @@ public class MCREditorOutValidator {
         if (!keepLang) {
             datasubtag.removeAttribute(MCRXMLConstants.LANG, XML_NAMESPACE);
         }
-        MCRMetaInterface test = null;
         try {
-            test = metaClass.getDeclaredConstructor().newInstance();
+            MCRMetaInterface test = metaClass.getDeclaredConstructor().newInstance();
+            test.setFromDOM(datasubtag);
+            test.validate();
         } catch (Exception e) {
             throw new MCRException("Could not instantiate " + metaClass.getCanonicalName(), e);
         }
-        test.setFromDOM(datasubtag);
-        test.validate();
         return null;
     }
 
@@ -339,6 +338,7 @@ public class MCREditorOutValidator {
         checkObjectService(root, service);
     }
 
+    @SuppressWarnings("PMD.UnusedAssignment")
     private boolean checkMetaTags(Element datatag) {
         String mcrclass = datatag.getAttributeValue(MCRXMLConstants.CLASS);
         List<Element> datataglist = datatag.getChildren();

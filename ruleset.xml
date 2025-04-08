@@ -61,10 +61,7 @@
   <rule ref="category/java/bestpractices.xml/NonExhaustiveSwitch"/>
   <rule ref="category/java/bestpractices.xml/SystemPrintln"/>
   <rule ref="category/java/bestpractices.xml/UnnecessaryVarargsArrayCreation"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/bestpractices.xml/UnusedAssignment"/>
-  -->
   <rule ref="category/java/bestpractices.xml/UnusedFormalParameter"/>
   <rule ref="category/java/bestpractices.xml/UnusedLocalVariable"/>
   <rule ref="category/java/bestpractices.xml/UnusedPrivateField"/>
@@ -89,10 +86,7 @@
   <rule ref="category/java/codestyle.xml/FieldNamingConventions"/>
   <rule ref="category/java/codestyle.xml/FinalParameterInAbstractMethod"/>
   <rule ref="category/java/codestyle.xml/ForLoopShouldBeWhileLoop"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/codestyle.xml/FormalParameterNamingConventions"/>
-  -->
   <rule ref="category/java/codestyle.xml/IdenticalCatchBranches"/>
   <rule ref="category/java/codestyle.xml/LambdaCanBeMethodReference"/>
   <!-- TODO: Create PR to fix this rule -->
