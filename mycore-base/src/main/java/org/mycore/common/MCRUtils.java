@@ -344,8 +344,8 @@ public class MCRUtils {
     private static String getHash(int iterations, byte[] salt, String text, String algorithm)
         throws NoSuchAlgorithmException {
         MessageDigest digest;
-        int currentIndex = iterations;
-        if (--currentIndex < 0) {
+        int currentIndex = iterations - 1;
+        if (currentIndex < 0) {
             currentIndex = 0;
         }
         byte[] data;
@@ -398,21 +398,21 @@ public class MCRUtils {
     }
 
     /**
-     * Extracts files in a tar archive. Currently works only on uncompressed tar files.
+     * Extracts files in a tar archive. Currently, works only on uncompressed tar files.
      *
      * @param source
      *            the uncompressed tar to extract
      * @param expandToDirectory
      *            the directory to extract the tar file to
      * @throws IOException
-     *             if the source file does not exists
+     *             if the source file does not exist
      */
     public static void untar(Path source, Path expandToDirectory) throws IOException {
         try (TarArchiveInputStream tain = new TarArchiveInputStream(Files.newInputStream(source))) {
-            TarArchiveEntry tarEntry;
             FileSystem targetFS = expandToDirectory.getFileSystem();
             Map<Path, FileTime> directoryTimes = new HashMap<>();
-            while ((tarEntry = tain.getNextEntry()) != null) {
+            TarArchiveEntry tarEntry = tain.getNextEntry();
+            while (tarEntry != null) {
                 Path target = MCRPathUtils.getPath(targetFS, tarEntry.getName());
                 Path absoluteTarget = expandToDirectory.resolve(target).normalize().toAbsolutePath();
                 if (tarEntry.isDirectory()) {
@@ -426,6 +426,7 @@ public class MCRUtils {
                     Files.setLastModifiedTime(absoluteTarget,
                         FileTime.fromMillis(tarEntry.getLastModifiedDate().getTime()));
                 }
+                tarEntry = tain.getNextEntry();
             }
             //restore directory dates
             Files.walkFileTree(expandToDirectory, new SimpleFileVisitor<>() {

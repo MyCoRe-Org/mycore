@@ -199,12 +199,13 @@ public class MCRPandocAPI {
         BufferedInputStream pandocStream = new BufferedInputStream(s);
         byte[] buffer = new byte[BUFFER_SIZE];
         byte[] output = new byte[0];
-        int readBytes;
-        while ((readBytes = pandocStream.read(buffer, 0, BUFFER_SIZE)) >= 0) {
+        int readBytes = pandocStream.read(buffer, 0, BUFFER_SIZE);
+        while (readBytes >= 0) {
             byte[] newOutput = new byte[output.length + readBytes];
             System.arraycopy(output, 0, newOutput, 0, output.length);
             System.arraycopy(buffer, 0, newOutput, output.length, readBytes);
             output = newOutput;
+            readBytes = pandocStream.read(buffer, 0, BUFFER_SIZE);
         }
         pandocStream.close();
         return output;

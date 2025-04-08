@@ -389,8 +389,8 @@ public class MCRRestAPIUploadHelper {
         boolean formParamMaindoc, MCRDerivate der) throws IOException {
         String maindoc = null;
         try (ZipInputStream zis = new ZipInputStream(new BufferedInputStream(uploadedInputStream))) {
-            ZipEntry entry;
-            while ((entry = zis.getNextEntry()) != null) {
+            ZipEntry entry = zis.getNextEntry();
+            while (entry != null) {
                 LOGGER.debug("Unzipping: {}", entry::getName);
                 java.nio.file.Path target = MCRUtils.safeResolve(derDir, entry.getName());
                 Files.createDirectories(target.getParent());
@@ -398,6 +398,7 @@ public class MCRRestAPIUploadHelper {
                 if (maindoc == null && !entry.isDirectory()) {
                     maindoc = entry.getName();
                 }
+                entry = zis.getNextEntry();
             }
         }
         Files.walkFileTree(derDir, new MCRTreeCopier(derDir, derRoot, true));

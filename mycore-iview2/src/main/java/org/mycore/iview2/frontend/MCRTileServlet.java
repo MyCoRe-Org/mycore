@@ -152,14 +152,19 @@ public class MCRTileServlet extends HttpServlet {
         } else {
             int pos = imagePath.length();
             int cnt = 0;
-            while (--pos > 0 && cnt < 3) {
-                if (imagePath.charAt(pos) == '/') {
-                    cnt++;
-                }
+            if(pos > 0) {
+                do {
+                    pos--;
+                    if (imagePath.charAt(pos) == '/') {
+                        cnt++;
+                    }
+                } while(pos > 0 && cnt < 3);
             }
-            tile = imagePath.substring(pos + 2);
-            imagePath = imagePath.substring(0, ++pos);
+            pos++;
+            tile = imagePath.substring(pos + 1);
+            imagePath = imagePath.substring(0, pos);
         }
         return new MCRTileInfo(derivate, imagePath, tile);
     }
+
 }
