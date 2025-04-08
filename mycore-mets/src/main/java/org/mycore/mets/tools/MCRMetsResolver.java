@@ -33,8 +33,8 @@ import org.jdom2.Namespace;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.content.MCRPathContent;
-import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.mets.model.MCRMETSGeneratorFactory;
@@ -55,11 +55,11 @@ public class MCRMetsResolver implements URIResolver {
         LOGGER.debug("Reading METS for ID {}", id);
         MCRObjectID objId = MCRObjectID.getInstance(id);
         if (!objId.getTypeId().equals(MCRDerivate.OBJECT_TYPE)) {
-            String derivateID = getDerivateFromObject(id);
+            MCRObjectID derivateID = getDerivateFromObject(id);
             if (derivateID == null) {
                 return new JDOMSource(new Element("mets", Namespace.getNamespace("mets", "http://www.loc.gov/METS/")));
             }
-            id = derivateID;
+            id = derivateID.toString();
         }
         MCRPath metsPath = MCRPath.getPath(id, "/mets.xml");
         try {
@@ -75,10 +75,10 @@ public class MCRMetsResolver implements URIResolver {
         }
     }
 
-    private String getDerivateFromObject(String id) {
-        Collection<String> derivates = MCRLinkTableManager.getInstance().getDestinationOf(id, "derivate");
-        for (String derID : derivates) {
-            if (MCRAccessManager.checkDerivateDisplayPermission(derID)) {
+    private MCRObjectID getDerivateFromObject(String id) {
+        Collection<MCRObjectID> derivates = MCRMetadataManager.getDerivateIds(MCRObjectID.getInstance(id));
+        for (MCRObjectID derID : derivates) {
+            if (MCRAccessManager.checkDerivateDisplayPermission(derID.toString())) {
                 return derID;
             }
         }
