@@ -18,6 +18,12 @@
 
 package org.mycore.ocfl.metadata.migration;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.IntStream;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -31,12 +37,6 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.ocfl.metadata.MCROCFLXMLMetadataManagerAdapter;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.IntStream;
 
 public class MCROCFLMigration {
 
