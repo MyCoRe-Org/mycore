@@ -18,6 +18,7 @@
 
 package org.mycore.frontend.xeditor;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -43,7 +44,7 @@ public class MCREditorSubmission {
 
     private Set<String> xPaths2CheckResubmission = new LinkedHashSet<>();
 
-    private Map<String, String> xPath2DefaultValue = new LinkedHashMap<>();
+    private Map<String, String> xPath2DefaultValue = Collections.synchronizedMap(new LinkedHashMap<>());
 
     private MCREditorSession session;
 

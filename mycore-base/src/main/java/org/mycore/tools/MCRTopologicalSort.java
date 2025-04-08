@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +74,7 @@ public class MCRTopologicalSort<T> {
      * store the edges as adjacent list
      *  for each target node a list of corresponding source node is stored
      */
-    Map<Integer, SortedSet<Integer>> edgeSources = new TreeMap<>();
+    Map<Integer, SortedSet<Integer>> edgeSources = Collections.synchronizedMap(new TreeMap<>());
 
     /**
      * store the position of elements to sort in BiMap

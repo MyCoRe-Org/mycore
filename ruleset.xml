@@ -176,6 +176,7 @@
   <rule ref="category/java/errorprone.xml/AvoidDuplicateLiterals">
     <properties>
       <property name="exceptionList" value="unchecked,rawtypes" />
+      <property name="skipAnnotations" value="true" />
     </properties>
   </rule>
   <rule ref="category/java/errorprone.xml/AvoidEnumAsIdentifier" />
@@ -271,10 +272,7 @@
   <rule ref="category/java/multithreading.xml/DoubleCheckedLocking"/>
   <rule ref="category/java/multithreading.xml/NonThreadSafeSingleton"/>
   <rule ref="category/java/multithreading.xml/UnsynchronizedStaticFormatter"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/multithreading.xml/UseConcurrentHashMap"/>
-  -->
   <rule ref="category/java/multithreading.xml/UseNotifyAllInsteadOfNotify"/>
 
   <!-- Performance Rules -->
