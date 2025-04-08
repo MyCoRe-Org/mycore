@@ -299,12 +299,13 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         Enumeration<? extends ZipEntry> entries = iviewImage.entries();
         CRC32 crc = new CRC32();
         byte[] data = new byte[4096];
-        int read;
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
             try (InputStream is = iviewImage.getInputStream(entry)) {
-                while ((read = is.read(data, 0, data.length)) != -1) {
+                int read = is.read(data, 0, data.length);
+                while (read != -1) {
                     crc.update(data, 0, read);
+                    read = is.read(data, 0, data.length);
                 }
             }
             if (entry.getCrc() != crc.getValue()) {

@@ -82,24 +82,25 @@ public class MCRLanguageDetector {
         StringTokenizer st = new StringTokenizer(wordList, " ");
         while (st.hasMoreTokens()) {
             String word = st.nextToken();
-            int pos = 0;
-            while ((pos = cleanedText.indexOf(" " + word + " ", pos)) >= 0) {
+            int pos = cleanedText.indexOf(" " + word + " ");
+            while (pos >= 0) {
                 score += 2;
-                pos = Math.min(pos + word.length() + 1, cleanedText.length());
+                int fromIndex = Math.min(pos + word.length() + 1, cleanedText.length());
+                pos = cleanedText.indexOf(" " + word + " ", fromIndex);
             }
         }
 
         st = new StringTokenizer(endings, " ");
         while (st.hasMoreTokens()) {
             String ending = st.nextToken();
-
             if (cleanedText.contains(ending + " ")) {
                 score += 1;
             }
-            int pos = 0;
-            while ((pos = cleanedText.indexOf(ending + " ", pos)) >= 0) {
+            int pos = cleanedText.indexOf(ending + " ");
+            while (pos >= 0) {
                 score += 1;
-                pos = Math.min(pos + ending.length() + 1, cleanedText.length());
+                int fromIndex = Math.min(pos + ending.length() + 1, cleanedText.length());
+                pos = cleanedText.indexOf(ending + " ", fromIndex);
             }
         }
 
