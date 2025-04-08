@@ -527,27 +527,24 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         }
     }
 
-    /**
-     * This method compares this instance with a MCRMetaHistoryDate object
-     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + Objects.hash(ivon, ibis, calendar, texts);
+        return result;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!super.equals(obj)) {
             return false;
         }
         final MCRMetaHistoryDate other = (MCRMetaHistoryDate) obj;
-        boolean fieldTest = Objects.equals(this.calendar, other.calendar) && Objects.equals(this.ivon, other.ivon);
-        boolean textTest = equalText(other.getTexts());
-        return fieldTest && textTest;
-    }
-
-    private boolean equalText(List<MCRMetaHistoryDateText> otherTexts) {
-        boolean testflag = true;
-        int size = Math.min(texts.size(), otherTexts.size());
-        for (int i = 0; i < size; i++) {
-            testflag &= texts.get(i).equalLangAndText(otherTexts.get(i));
-        }
-        return testflag;
+        return  ivon == other.ivon
+            && ibis == other.ibis
+            && Objects.equals(calendar, other.calendar)
+            && Objects.equals(texts, other.texts);
     }
 
     /**
@@ -648,26 +645,36 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
             return !(lang.isEmpty() || text.isEmpty());
         }
 
-        /**
-         * This method compares this instance with a MCRMetaHistoryDate object
-         */
+        @Override
+        public int hashCode() {
+            return Objects.hash(lang, text);
+        }
+
         @Override
         public boolean equals(Object obj) {
-            if (!super.equals(obj)) {
+            if (this == obj) {
+                return true;
+            }
+            if(obj == null) {
                 return false;
             }
-            return equalLangAndText((MCRMetaHistoryDateText) obj);
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final MCRMetaHistoryDateText other = (MCRMetaHistoryDateText) obj;
+            return Objects.equals(lang, other.lang) && Objects.equals(text, other.text);
         }
 
         /**
          * This method check the equivalence of lang and text between this object
          * and a given MCRMetaHistoryDateText object.
          *
-         * @param obj a MCRMetaHistoryDateText instance
+         * @param other a MCRMetaHistoryDateText instance
          * @return true if both parts are equal
          */
-        public boolean equalLangAndText(MCRMetaHistoryDateText obj) {
-            return lang.equals(obj.getLang()) && text.equals(obj.getText());
+        @Deprecated //use equals()
+        public boolean equalLangAndText(MCRMetaHistoryDateText other) {
+            return lang.equals(other.getLang()) && text.equals(other.getText());
         }
 
         @Override

@@ -328,6 +328,9 @@ public final class MCRMetaNumber extends MCRMetaDefault {
         clone.dimension = this.dimension;
         clone.measurement = this.measurement;
         clone.number = this.number;
+        clone.dimensionLength = this.dimensionLength;
+        clone.measurementLength = this.measurementLength;
+        clone.fractionDigits = this.fractionDigits;
 
         return clone;
     }
@@ -347,12 +350,25 @@ public final class MCRMetaNumber extends MCRMetaDefault {
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result
+            + Objects.hash(dimension, dimensionLength, fractionDigits, measurement, measurementLength, number);
+        return result;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (!super.equals(obj)) {
             return false;
         }
         final MCRMetaNumber other = (MCRMetaNumber) obj;
-        return Objects.equals(measurement, other.measurement) && Objects.equals(dimension, other.dimension)
+        return Objects.equals(dimension, other.dimension)
+            && dimensionLength == other.dimensionLength
+            && fractionDigits == other.fractionDigits
+            && Objects.equals(measurement, other.measurement)
+            && measurementLength == other.measurementLength
             && Objects.equals(number, other.number);
     }
 

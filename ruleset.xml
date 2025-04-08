@@ -220,10 +220,7 @@
   <rule ref="category/java/errorprone.xml/NonCaseLabelInSwitch"/>
   <rule ref="category/java/errorprone.xml/NonSerializableClass"/>
   <rule ref="category/java/errorprone.xml/NonStaticInitializer"/>
-  <!-- TODO: Create PR to fix this rule -->
-  <!--
   <rule ref="category/java/errorprone.xml/OverrideBothEqualsAndHashcode"/>
-  -->
   <!-- TODO: Create PR to fix this rule -->
   <!--
   <rule ref="category/java/errorprone.xml/ProperCloneImplementation"/>

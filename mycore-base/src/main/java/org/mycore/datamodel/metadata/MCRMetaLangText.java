@@ -277,18 +277,21 @@ public class MCRMetaLangText extends MCRMetaDefault {
         }
     }
 
-    /**
-     * Check the equivalence between this instance and the given object.
-     *
-     * @param obj the MCRMetaLangText object
-     * @return true if its equal
-     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + Objects.hash(form, text);
+        return result;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!super.equals(obj)) {
             return false;
         }
         final MCRMetaLangText other = (MCRMetaLangText) obj;
-        return Objects.equals(this.text, other.text) && Objects.equals(this.form, other.form);
+        return Objects.equals(form, other.form)
+            && Objects.equals(text, other.text);
     }
 }

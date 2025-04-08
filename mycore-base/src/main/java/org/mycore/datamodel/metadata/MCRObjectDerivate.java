@@ -530,4 +530,31 @@ public class MCRObjectDerivate {
     public List<MCRMetaLangText> getTitles() {
         return titles;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(classifications, derivateID, derivateURN, externals, files, internals, linkmeta, titles);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final MCRObjectDerivate other = (MCRObjectDerivate) obj;
+        return Objects.equals(classifications, other.classifications)
+            && Objects.equals(derivateID, other.derivateID)
+            && Objects.equals(derivateURN, other.derivateURN)
+            && Objects.equals(externals, other.externals)
+            && Objects.equals(files, other.files)
+            && Objects.equals(internals, other.internals)
+            && Objects.equals(linkmeta, other.linkmeta)
+            && Objects.equals(titles, other.titles);
+    }
 }

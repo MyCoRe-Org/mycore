@@ -24,6 +24,7 @@ import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -317,5 +318,28 @@ public abstract class MCRBase {
     @Override
     public String toString() {
         return this.mcrId.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(mcrId, mcrSchema, mcrService, mcrVersion);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final MCRBase other = (MCRBase) obj;
+        return Objects.equals(mcrId, other.mcrId)
+            && Objects.equals(mcrSchema, other.mcrSchema)
+            && Objects.equals(mcrService, other.mcrService)
+            && Objects.equals(mcrVersion, other.mcrVersion);
     }
 }

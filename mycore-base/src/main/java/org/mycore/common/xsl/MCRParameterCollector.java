@@ -376,14 +376,33 @@ public class MCRParameterCollector {
     @Override
     public int hashCode() {
         if (modified) {
-            int result = LOGGER.hashCode();
+            int result = 1;
             //order of map should not harm result
-            result += SavePropertiesCacheHolder.getSafePropertiesHashCode();
-            result += parameters.entrySet().stream().mapToInt(Map.Entry::hashCode).sum();
+            result = 31 * result + SavePropertiesCacheHolder.getSafePropertiesHashCode();
+            result = 31 * result + parameters.entrySet().stream().mapToInt(Map.Entry::hashCode).sum();
             hashCode = result;
             modified = false;
         }
         return hashCode;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        MCRParameterCollector other = (MCRParameterCollector) obj;
+        return hashCode() == other.hashCode()
+            && onlySetXSLParameters == other.onlySetXSLParameters
+            && setPropertiesFromConfiguration == other.setPropertiesFromConfiguration
+            && Objects.equals(parameters, other.parameters);
+
     }
 
     private static final class SavePropertiesCacheHolder {

@@ -18,6 +18,8 @@
 
 package org.mycore.datamodel.metadata;
 
+import java.util.Objects;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
@@ -207,12 +209,20 @@ public final class MCRMetaBoolean extends MCRMetaDefault {
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + Objects.hash(value);
+        return result;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (!super.equals(obj)) {
             return false;
         }
         final MCRMetaBoolean other = (MCRMetaBoolean) obj;
-        return this.value == other.value;
+        return value == other.value;
     }
 
 }

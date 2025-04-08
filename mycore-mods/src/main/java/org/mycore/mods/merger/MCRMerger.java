@@ -66,16 +66,27 @@ public class MCRMerger {
         return false;
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(element);
+    }
+
     /**
      * Two mergers are equal if they wrap elements that are deep equals.
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof MCRMerger other) {
-            return sameElementName(other) && MCRXMLHelper.deepEqual(this.element, other.element);
-        } else {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
             return false;
         }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final MCRMerger other = (MCRMerger) obj;
+        return sameElementName(other) && MCRXMLHelper.deepEqual(this.element, other.element);
     }
 
     protected boolean sameElementName(MCRMerger other) {

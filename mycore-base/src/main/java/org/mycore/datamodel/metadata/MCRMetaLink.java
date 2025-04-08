@@ -230,7 +230,7 @@ public class MCRMetaLink extends MCRMetaDefault {
      * @return true if it is compare, else return false
      */
     public final boolean compare(MCRMetaLink input) {
-        if (linktype.equals(MCRXlink.TYPE_LOCATOR) && linktype.equals(input.getXLinkType()) 
+        if (linktype.equals(MCRXlink.TYPE_LOCATOR) && linktype.equals(input.getXLinkType())
             && href.equals(input.getXLinkHref())) {
             return true;
         }
@@ -240,31 +240,6 @@ public class MCRMetaLink extends MCRMetaDefault {
                 && to.equals(input.getXLinkTo());
         }
         return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), from, href, label, linktype, role, title, to);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        boolean result;
-        if (this == obj) {
-            result = true;
-        } else if (!super.equals(obj) || getClass() != obj.getClass()) {
-            result = false;
-        } else {
-            MCRMetaLink other = (MCRMetaLink) obj;
-            result = Objects.equals(from, other.from) &&
-                Objects.equals(href, other.href) &&
-                Objects.equals(label, other.label) &&
-                Objects.equals(linktype, other.linktype) &&
-                Objects.equals(role, other.role) &&
-                Objects.equals(title, other.title) &&
-                Objects.equals(to, other.to);
-        }
-        return result;
     }
 
     /**
@@ -460,5 +435,28 @@ public class MCRMetaLink extends MCRMetaDefault {
             LOGGER.debug("To                 = {}", to);
             LOGGER.debug("");
         }
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + Objects.hash(from, href, label, linktype, role, title, to);
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        final MCRMetaLink other = (MCRMetaLink) obj;
+        return Objects.equals(from, other.from)
+            && Objects.equals(href, other.href)
+            && Objects.equals(label, other.label)
+            && Objects.equals(linktype, other.linktype)
+            && Objects.equals(role, other.role)
+            && Objects.equals(title, other.title)
+            && Objects.equals(to, other.to);
     }
 }
