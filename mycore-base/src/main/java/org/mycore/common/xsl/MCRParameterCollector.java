@@ -378,7 +378,7 @@ public class MCRParameterCollector {
         if (modified) {
             int result = LOGGER.hashCode();
             //order of map should not harm result
-            result += SavePropertiesCacheHolder.getSafePropertiesCache().hashCode();
+            result += SavePropertiesCacheHolder.getSafePropertiesHashCode();
             result += parameters.entrySet().stream().mapToInt(Map.Entry::hashCode).sum();
             hashCode = result;
             modified = false;
@@ -452,8 +452,7 @@ public class MCRParameterCollector {
             return builder.toString();
         }
 
-        @Override
-        public int hashCode() {
+        public static int getSafePropertiesHashCode() {
             return COMPUTED_HASH_CODE.get();
         }
     }
