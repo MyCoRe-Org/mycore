@@ -25,16 +25,21 @@ import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 
 /**
  * The {@code MCROCFLCachingSeekableByteChannel} class implements a {@link SeekableByteChannel} that
- * delegates read operations to another {@link SeekableByteChannel} and simultaneously stores the
- * read data into a file at the specified {@link java.nio.file.Path}.
- *
- * <p>This class also provides a method to check if the entire file has been read and
- * is fully available at the provided path.
+ * delegates read operations to another {@link SeekableByteChannel} while caching the read data to a file.
+ * <p>
+ * This class maintains a cache of byte ranges using a {@link java.util.TreeMap} for efficient merging and lookups.
+ * The caching mechanism is thread-safe through synchronization on an internal lock.
+ * Note that while this class protects its own caching state, the underlying delegate channel
+ * may not be thread safe. External synchronization may be required if it is shared among threads.
+ * <p>
+ * <b>Usage:</b> Each time data is read, it is written to the cache file at the provided {@code Path}
+ * and recorded in the cache range map. The {@code isFileComplete} method verifies whether the entire file has
+ * been cached.
  *
  * <p>Be aware that reading from the end of the delegated channel will result in a cache file of the same size.
  * E.g. reading the last 10 Bytes of a 10 GB file will result in 10 GB cache file.
@@ -42,11 +47,18 @@ import java.util.List;
 public class MCROCFLCachingSeekableByteChannel implements SeekableByteChannel {
 
     private final SeekableByteChannel delegate;
+
     private final Path cacheFilePath;
-    private final FileChannel cacheFileChannel; // Use FileChannel for writing
-    private final List<Range> cachedRanges; // Store ranges of cached data
+
+    private final FileChannel cacheFileChannel;
+
+    private final NavigableMap<Long, Range> cachedRanges;
+
     private final long delegateSize;
+
     private boolean isOpen;
+
+    private final Object lock = new Object();
 
     /**
      * Constructs a new {@code CachingSeekableByteChannel} with the given delegate channel and path.
@@ -60,21 +72,19 @@ public class MCROCFLCachingSeekableByteChannel implements SeekableByteChannel {
         this.delegate = delegate;
         this.cacheFilePath = cacheFilePath;
         this.cacheFileChannel = FileChannel.open(cacheFilePath, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-        this.cachedRanges = new ArrayList<>();
+        this.cachedRanges = new TreeMap<>();
         this.delegateSize = delegate.size();
         this.isOpen = true;
     }
 
     /**
-     * Reads a sequence of bytes from the delegate channel into the given byte buffer and stores the
-     * read data into the file at {@link Path}.
-     *
-     * <p>The method also tracks which byte ranges have been cached to ensure that
-     * the cached file matches the original file.
+     * Reads bytes from the delegate channel into the given byte buffer and caches the data to the file.
+     * <p>
+     * The method writes the read bytes into the cache file and records the cached byte range in a thread-safe way.
      *
      * @param byteBuffer the buffer into which bytes are transferred
      * @return the number of bytes read, possibly zero, or {@code -1} if the channel has reached end-of-file
-     * @throws IOException if an I/O error occurs, or if the channel is closed
+     * @throws IOException if an I/O error occurs or if the channel is closed
      */
     @Override
     public int read(ByteBuffer byteBuffer) throws IOException {
@@ -82,20 +92,22 @@ public class MCROCFLCachingSeekableByteChannel implements SeekableByteChannel {
             throw new IOException("Channel is closed");
         }
 
-        // Delegate the reading operation to the underlying channel
-        long currentPosition = delegate.position(); // Track current position
+        // Record the current position in the delegate channel.
+        long currentPosition = delegate.position();
         int bytesRead = delegate.read(byteBuffer);
 
         if (bytesRead > 0) {
-            // Write the read bytes into the file using FileChannel
+            // Prepare for reading from the buffer.
             byteBuffer.flip();
+
+            // Write the data into the cache file.
             cacheFileChannel.position(currentPosition);
             cacheFileChannel.write(byteBuffer);
 
-            // Track the range that was cached
+            // Add the new cached byte range in a thread-safe way.
             addCachedRange(currentPosition, currentPosition + bytesRead - 1);
 
-            // Prepare the buffer for further operations
+            // Clear the buffer for further operations.
             byteBuffer.clear();
         }
 
@@ -103,46 +115,73 @@ public class MCROCFLCachingSeekableByteChannel implements SeekableByteChannel {
     }
 
     /**
-     * Adds a cached range and merges it with existing ranges if necessary.
+     * Adds a cached byte range and merges it with any overlapping or adjacent ranges.
+     * <p>
+     * This method uses a {@link TreeMap} to quickly locate overlapping ranges and merges them in a
+     * thread-safe block.
      *
      * @param start the start position of the cached range
      * @param end the end position of the cached range
      */
     private void addCachedRange(long start, long end) {
-        Range newRange = new Range(start, end);
+        synchronized (lock) {
+            Range newRange = new Range(start, end);
 
-        // Try to merge with existing ranges
-        for (Range existingRange : cachedRanges) {
-            if (existingRange.overlapsOrAdjacent(newRange)) {
-                existingRange.merge(newRange);
-                return;
+            // Look for a range with a start lower than or equal to the new range.
+            var lowerEntry = cachedRanges.floorEntry(newRange.start);
+            if (lowerEntry != null && lowerEntry.getValue().overlapsOrAdjacent(newRange)) {
+                newRange.merge(lowerEntry.getValue());
+                cachedRanges.remove(lowerEntry.getKey());
             }
-        }
 
-        // If no merge was possible, add as a new range
-        cachedRanges.add(newRange);
+            // Merge any subsequent ranges that overlap or are adjacent.
+            while (true) {
+                var higherEntry = cachedRanges.ceilingEntry(newRange.start);
+                if (higherEntry == null || !higherEntry.getValue().overlapsOrAdjacent(newRange)) {
+                    break;
+                }
+                newRange.merge(higherEntry.getValue());
+                cachedRanges.remove(higherEntry.getKey());
+            }
+
+            // Put the newly merged range back into the map.
+            cachedRanges.put(newRange.start, newRange);
+        }
+    }
+
+    boolean hasSingleMergedRange(long expectedStart, long expectedEnd) {
+        synchronized (lock) {
+            if (cachedRanges.size() != 1) {
+                return false;
+            }
+            Range range = cachedRanges.firstEntry().getValue();
+            return range.start == expectedStart && range.end == expectedEnd;
+        }
     }
 
     /**
-     * Returns {@code true} if the entire file has been read and the cached file matches the original file.
+     * Returns {@code true} if the entire file has been read and cached.
+     * <p>
+     * This method first compares the size of the cache file with the delegate size,
+     * then checks if the cached ranges cover the entire file.
      *
      * @return {@code true} if the cache file is complete, {@code false} otherwise
      * @throws IOException if an I/O error occurs while checking file sizes
      */
     public boolean isFileComplete() throws IOException {
-        // Ensure the sizes are the same
+        // Compare the physical cache file size with the delegate's size.
         if (Files.size(this.cacheFilePath) != this.delegateSize) {
             return false;
         }
 
-        // Check if the cached ranges cover the entire file
-        if (this.cachedRanges.isEmpty()) {
-            return false;
+        // Check if there is a single cached range covering the full file in a thread-safe manner.
+        synchronized (lock) {
+            if (cachedRanges.size() != 1) {
+                return false;
+            }
+            Range completeRange = cachedRanges.firstEntry().getValue();
+            return completeRange.start == 0 && completeRange.end == this.delegateSize - 1;
         }
-
-        // Ensure we have a single range that covers the entire file
-        Range firstRange = this.cachedRanges.getFirst();
-        return firstRange.start == 0 && firstRange.end == this.delegateSize - 1;
     }
 
     /**
@@ -177,7 +216,8 @@ public class MCROCFLCachingSeekableByteChannel implements SeekableByteChannel {
      */
     @Override
     public SeekableByteChannel position(long newPosition) throws IOException {
-        return this.delegate.position(newPosition);
+        this.delegate.position(newPosition);
+        return this;
     }
 
     /**
