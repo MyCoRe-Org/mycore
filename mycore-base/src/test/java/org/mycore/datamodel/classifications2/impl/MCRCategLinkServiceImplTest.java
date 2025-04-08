@@ -18,12 +18,13 @@
 
 package org.mycore.datamodel.classifications2.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImplTest.DAO;
 import static org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImplTest.WORLD_CLASS_RESOURCE_NAME;
+import static org.mycore.test.MCRJPATestHelper.startNewTransaction;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -39,17 +40,19 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MyCoReTest;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -58,7 +61,9 @@ import jakarta.persistence.criteria.CriteriaQuery;
 /**
  * @author Thomas Scheffler (yagee) Need to insert some things here
  */
-public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
+@MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
+public class MCRCategLinkServiceImplTest {
     private static final MCRCategLinkReference ENGLAND_REFERENCE = new MCRCategLinkReference("England", "state");
 
     private static final MCRCategLinkReference LONDON_REFERENCE = new MCRCategLinkReference("London", "city");
@@ -71,10 +76,8 @@ public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
+    @BeforeEach
+    public void setUpLinks() throws Exception {
         if (SERVICE == null) {
             SERVICE = new MCRCategLinkServiceImpl();
         }
@@ -104,7 +107,7 @@ public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
     public void setLinks() {
         addTestLinks();
         startNewTransaction();
-        assertEquals("Link count does not match.", testLinks.size(), getLinkCount());
+        assertEquals(testLinks.size(), getLinkCount(), "Link count does not match.");
     }
 
     private int getLinkCount() {
@@ -128,7 +131,7 @@ public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
         addTestLinks();
         startNewTransaction();
         SERVICE.deleteLink(LONDON_REFERENCE);
-        assertEquals("Link count does not match.", testLinks.size() - 1, getLinkCount());
+        assertEquals(testLinks.size() - 1, getLinkCount(), "Link count does not match.");
     }
 
     /**
@@ -139,7 +142,7 @@ public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
         addTestLinks();
         startNewTransaction();
         SERVICE.deleteLinks(Arrays.asList(LONDON_REFERENCE, ENGLAND_REFERENCE));
-        assertEquals("Link count does not match.", testLinks.size() - 2, getLinkCount());
+        assertEquals(testLinks.size() - 2, getLinkCount(), "Link count does not match.");
     }
 
     /**
@@ -150,8 +153,8 @@ public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
         addTestLinks();
         startNewTransaction();
         MCRCategoryLinkImpl link = testLinks.iterator().next();
-        assertTrue("Did not find category: " + link.getCategory().getId(),
-            SERVICE.getLinksFromReference(link.getObjectReference()).contains(link.getCategory().getId()));
+        assertTrue(SERVICE.getLinksFromReference(link.getObjectReference()).contains(link.getCategory().getId()),
+            "Did not find category: " + link.getCategory().getId());
     }
 
     /**
@@ -162,8 +165,9 @@ public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
         addTestLinks();
         startNewTransaction();
         MCRCategoryLinkImpl link = testLinks.iterator().next();
-        assertTrue("Did not find object: " + link.getObjectReference(),
-            SERVICE.getLinksFromCategory(link.getCategory().getId()).contains(link.getObjectReference().getObjectID()));
+        assertTrue(
+            SERVICE.getLinksFromCategory(link.getCategory().getId()).contains(link.getObjectReference().getObjectID()),
+            "Did not find object: " + link.getObjectReference());
     }
 
     /**
@@ -178,10 +182,10 @@ public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
         final MCRCategoryID categoryID = link.getCategory().getId();
         final String objectID = link.getObjectReference().getObjectID();
         final Collection<String> result = SERVICE.getLinksFromCategoryForType(categoryID, objectType);
-        assertTrue("Did not find object: " + link.getObjectReference(), result.contains(objectID));
+        assertTrue(result.contains(objectID), "Did not find object: " + link.getObjectReference());
         for (String id : result) {
             String type = getType(id);
-            assertEquals("Wrong return type detected: " + id, objectType, type);
+            assertEquals(objectType, type, "Wrong return type detected: " + id);
         }
     }
 
@@ -203,14 +207,14 @@ public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
         Map<MCRCategoryID, Number> map = SERVICE.countLinks(category, false);
         LOGGER.debug("****List of returned map");
         LOGGER.debug(map);
-        assertEquals("Returned amount of MCRCategoryIDs does not match.", getAllCategIDs(category).size(), map.size());
-        assertEquals("Count of Europe links does not match.", 8, map.get(category.getChildren().getFirst().getId())
-            .intValue());
-        assertEquals("Count of Germany links does not match.", 5,
-            map.get(category.getChildren().getFirst().getChildren().getFirst().getId()).intValue());
+        assertEquals(getAllCategIDs(category).size(), map.size(), "Returned amount of MCRCategoryIDs does not match.");
+        assertEquals(8, map.get(category.getChildren().getFirst().getId()).intValue(),
+            "Count of Europe links does not match.");
+        assertEquals(5, map.get(category.getChildren().getFirst().getChildren().getFirst().getId()).intValue(),
+            "Count of Germany links does not match.");
         map = SERVICE.countLinks(category, true);
-        assertEquals("Count of Europe links does not match.", 8, map.get(category.getChildren().getFirst().getId())
-            .intValue());
+        assertEquals(8, map.get(category.getChildren().getFirst().getId()).intValue(),
+            "Count of Europe links does not match.");
     }
 
     /**
@@ -223,22 +227,22 @@ public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
         Map<MCRCategoryID, Number> map = SERVICE.countLinksForType(category, "city", false);
         LOGGER.debug("****List of returned map");
         LOGGER.debug(map);
-        assertEquals("Returned amount of MCRCategoryIDs does not match.", getAllCategIDs(category).size(), map.size());
-        assertEquals("Count of Europe links does not match.", 2, map.get(category.getChildren().getFirst().getId())
-            .intValue());
+        assertEquals(getAllCategIDs(category).size(), map.size(), "Returned amount of MCRCategoryIDs does not match.");
+        assertEquals(2, map.get(category.getChildren().getFirst().getId()).intValue(),
+            "Count of Europe links does not match.");
     }
 
     @Test
     public void hasLinks() {
         MCRCategoryImpl germany = (MCRCategoryImpl) category.getChildren().getFirst().getChildren().getFirst();
-        assertFalse("Classification should not be in use", SERVICE.hasLinks(category).get(category.getId()));
-        assertFalse("Classification should not be in use", SERVICE.hasLinks(null).get(category.getId()));
-        assertFalse("Category should not be in use", SERVICE.hasLinks(germany).get(germany.getId()));
+        assertFalse(SERVICE.hasLinks(category).get(category.getId()), "Classification should not be in use");
+        assertFalse(SERVICE.hasLinks(null).get(category.getId()), "Classification should not be in use");
+        assertFalse(SERVICE.hasLinks(germany).get(germany.getId()), "Category should not be in use");
         addTestLinks();
         startNewTransaction();
-        assertTrue("Classification should be in use", SERVICE.hasLinks(category).get(category.getId()));
-        assertTrue("Classification should be in use", SERVICE.hasLinks(null).get(category.getId()));
-        assertTrue("Category should be in use", SERVICE.hasLinks(germany).get(germany.getId()));
+        assertTrue(SERVICE.hasLinks(category).get(category.getId()), "Classification should be in use");
+        assertTrue(SERVICE.hasLinks(null).get(category.getId()), "Classification should be in use");
+        assertTrue(SERVICE.hasLinks(germany).get(germany.getId()), "Category should be in use");
     }
 
     @Test
@@ -249,9 +253,9 @@ public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
         MCRCategLinkReference jena = new MCRCategLinkReference("Jena", "city");
         addTestLinks();
         startNewTransaction();
-        assertTrue("Jena should be in Germany", SERVICE.isInCategory(jena, germany.getId()));
-        assertTrue("Jena should be in Europe", SERVICE.isInCategory(jena, europe.getId()));
-        assertFalse("Jena should not be in Asia", SERVICE.isInCategory(jena, asia.getId()));
+        assertTrue(SERVICE.isInCategory(jena, germany.getId()), "Jena should be in Germany");
+        assertTrue(SERVICE.isInCategory(jena, europe.getId()), "Jena should be in Europe");
+        assertFalse(SERVICE.isInCategory(jena, asia.getId()), "Jena should not be in Asia");
     }
 
     @Test
@@ -260,20 +264,20 @@ public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
         startNewTransaction();
         String type = "state";
         Collection<MCRCategLinkReference> references = SERVICE.getReferences(type);
-        assertNotNull("Did not return a collection", references);
-        assertFalse("Collection is empty", references.isEmpty());
+        assertNotNull(references, "Did not return a collection");
+        assertFalse(references.isEmpty(), "Collection is empty");
         for (MCRCategLinkReference ref : references) {
-            assertEquals("Type of reference is not correct.", type, ref.getType());
+            assertEquals(type, ref.getType(), "Type of reference is not correct.");
         }
-        assertEquals("Collection is not complete",
-            testLinks.stream()
-                .filter(link -> link.getObjectReference().getType().equals(type))
-                .count(),
-            references.size());
+        assertEquals(testLinks.stream()
+            .filter(link -> link.getObjectReference().getType().equals(type))
+            .count(),
+            references.size(), "Collection is not complete");
     }
 
-    private void loadWorldClassification() throws URISyntaxException, MCRException, IOException, JDOMException {
-        URL worlClassUrl = this.getClass().getResource(WORLD_CLASS_RESOURCE_NAME);
+    public void loadWorldClassification() throws URISyntaxException, MCRException, IOException, JDOMException {
+        LOGGER.error("Start loadWorldClassification");
+        URL worlClassUrl = getClass().getResource(WORLD_CLASS_RESOURCE_NAME);
         Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRURLContent(worlClassUrl));
         category = MCRXMLTransformer.getCategory(xml);
     }

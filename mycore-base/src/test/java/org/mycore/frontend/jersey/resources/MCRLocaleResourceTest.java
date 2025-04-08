@@ -21,29 +21,33 @@ package org.mycore.frontend.jersey.resources;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.frontend.jersey.filter.MCRSessionHookFilter;
 import org.mycore.services.i18n.MCRTranslationTest;
+import org.mycore.test.MyCoReTest;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 
 import jakarta.ws.rs.core.MediaType;
 
-public class MCRLocaleResourceTest extends MCRTestCase {
+@MyCoReTest
+@MCRTestConfiguration(
+    properties = {
+        @MCRTestProperty(key = "MCR.Metadata.Languages", string = "de,en,it")
+    })
+public class MCRLocaleResourceTest {
 
     private MCRJerseyTestFeature jersey;
 
-    @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         jersey = new MCRJerseyTestFeature();
         jersey.setUp(Set.of(
             MCRSessionHookFilter.class,
@@ -51,21 +55,9 @@ public class MCRLocaleResourceTest extends MCRTestCase {
         MCRTranslationTest.reInit();
     }
 
-    @Override
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
-        try {
-            jersey.tearDown();
-        } finally {
-            super.tearDown();
-        }
-    }
-
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> map = super.getTestProperties();
-        map.put("MCR.Metadata.Languages", "de,en,it");
-        return map;
+        jersey.tearDown();
     }
 
     @Test

@@ -18,6 +18,8 @@
 
 package org.mycore.frontend;
 
+import org.junit.jupiter.api.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -25,10 +27,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
 
-public class MCRURLTest extends MCRTestCase {
+public class MCRURLTest {
 
     @Test
     public void getParameter() throws Exception {
