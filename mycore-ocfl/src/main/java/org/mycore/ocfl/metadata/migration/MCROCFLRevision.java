@@ -18,11 +18,11 @@
 
 package org.mycore.ocfl.metadata.migration;
 
+import java.util.Date;
+
 import org.mycore.datamodel.common.MCRMetadataVersionType;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.ocfl.metadata.migration.MCROCFLMigration.ContentSupplier;
-
-import java.util.Date;
 
 public record MCROCFLRevision(MCRMetadataVersionType type,
     ContentSupplier contentSupplier,
