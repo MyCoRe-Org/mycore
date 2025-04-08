@@ -20,6 +20,7 @@ package org.mycore.mcr.neo4j.utils;
 
 import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JConstants.NEO4J_CONFIG_PREFIX;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -83,7 +84,7 @@ public final class MCRNeo4JUtilsConfigurationHelper {
             }
         });
         ATTRIBUTE_PATHS.put(type, attributes);
-        return attributes;
+        return Collections.unmodifiableMap(attributes);
     }
 
     private MCRNeo4JUtilsConfigurationHelper() {

@@ -176,7 +176,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
 
         queryParameterMap.put(SORT, new String[] { buildSolrSortParameter(sortParameters) });
 
-        return queryParameterMap;
+        return Collections.unmodifiableMap(queryParameterMap);
     }
 
     @SuppressWarnings("PMD.UseConcurrentHashMap")

@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -227,7 +228,7 @@ public class MCRTranslation {
                 map.put(key, message.getString(key));
             }
         }
-        return map;
+        return Collections.unmodifiableMap(map);
     }
 
     /**

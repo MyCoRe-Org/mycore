@@ -18,6 +18,7 @@
 
 package org.mycore.frontend.classeditor.utils;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
@@ -72,7 +73,7 @@ public class MCRCategUtils {
         } else {
             return null;
         }
-        return categories;
+        return Collections.unmodifiableMap(categories);
     }
 
 }

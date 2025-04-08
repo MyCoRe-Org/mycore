@@ -170,7 +170,7 @@ public class MCRSolrCoreAdminCommands {
             }
         });
 
-        return solrConfiguration;
+        return Collections.unmodifiableMap(solrConfiguration);
     }
 
     /**

@@ -311,7 +311,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
                 LOGGER.warn(e);
             }
         }
-        return userOrcidPair;
+        return Collections.unmodifiableMap(userOrcidPair);
     }
 
     private Map<String, MCRORCIDUser> listUserOrcidPairFromObject(MCRObject object) {
@@ -328,7 +328,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
             }
             updateOrcidPair(orcid, users, userOrcidPair);
         }
-        return userOrcidPair;
+        return Collections.unmodifiableMap(userOrcidPair);
     }
 
     private void updateOrcidPair(String orcid, Set<MCRUser> users, Map<String, MCRORCIDUser> userOrcidPair) {

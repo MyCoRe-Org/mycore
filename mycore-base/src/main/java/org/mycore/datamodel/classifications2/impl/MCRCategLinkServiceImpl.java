@@ -31,6 +31,7 @@ import java.io.Serial;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -292,7 +293,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         Map<MCRCategoryID, Boolean> boolMap = new HashMap<>();
         final BitSet linkedInternalIds = getLinkedInternalIds();
         storeHasLinkValues(boolMap, linkedInternalIds, rootImpl);
-        return boolMap;
+        return Collections.unmodifiableMap(boolMap);
     }
 
     private Map<MCRCategoryID, Boolean> hasLinksForClassifications() {
@@ -313,7 +314,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         linkedClassifications.getResultList()
             .stream().map(MCRCategoryID::new)
             .forEach(id -> boolMap.put(id, true));
-        return boolMap;
+        return Collections.unmodifiableMap(boolMap);
     }
 
     private Map<MCRCategoryID, Boolean> getNoLinksMap(MCRCategory category) {
@@ -322,7 +323,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         for (MCRCategoryID categID : getAllCategIDs(category)) {
             boolMap.put(categID, false);
         }
-        return boolMap;
+        return Collections.unmodifiableMap(boolMap);
     }
 
     private void storeHasLinkValues(Map<MCRCategoryID, Boolean> boolMap, BitSet internalIds,

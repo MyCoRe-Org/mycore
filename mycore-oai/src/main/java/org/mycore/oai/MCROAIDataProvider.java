@@ -134,7 +134,7 @@ public class MCROAIDataProvider extends MCRServlet {
             Collections.addAll(valueList, (String[]) entry.getValue());
             rMap.put((String) entry.getKey(), valueList);
         }
-        return rMap;
+        return Collections.unmodifiableMap(rMap);
     }
 
     protected void logRequest(HttpServletRequest req) {

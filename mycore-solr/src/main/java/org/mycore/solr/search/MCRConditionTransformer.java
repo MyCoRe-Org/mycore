@@ -21,6 +21,7 @@ package org.mycore.solr.search;
 import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -355,7 +356,7 @@ public class MCRConditionTransformer {
             String index = getIndex(child);
             table.computeIfAbsent(index, k -> new ArrayList<>()).add(child);
         }
-        return table;
+        return Collections.unmodifiableMap(table);
     }
 
     /**

@@ -19,6 +19,7 @@
 package org.mycore.user2.login;
 
 import java.io.Serial;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -86,7 +87,8 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
 
                     userinfo = user;
                 } else {
-                    userinfo = new MCRShibbolethUserInformation(userId, realmId, attributes);
+                    userinfo = new MCRShibbolethUserInformation(userId, realmId,
+                        Collections.unmodifiableMap(attributes));
                 }
 
                 MCRSessionMgr.getCurrentSession().setUserInformation(userinfo);

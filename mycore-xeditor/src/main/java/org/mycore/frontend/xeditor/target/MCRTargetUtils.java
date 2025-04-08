@@ -18,6 +18,7 @@
 
 package org.mycore.frontend.xeditor.target;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,6 +36,6 @@ public class MCRTargetUtils {
                 valuesToSet.put(xPath, values);
             }
         }
-        return valuesToSet;
+        return Collections.unmodifiableMap(valuesToSet);
     }
 }

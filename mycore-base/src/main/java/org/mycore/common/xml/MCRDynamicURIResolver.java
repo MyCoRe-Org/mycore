@@ -20,6 +20,7 @@ package org.mycore.common.xml;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -153,7 +154,7 @@ public abstract class MCRDynamicURIResolver implements URIResolver {
                 variablesMap.put(varName, varValue);
             }
         }
-        return variablesMap;
+        return Collections.unmodifiableMap(variablesMap);
     }
 
     /**

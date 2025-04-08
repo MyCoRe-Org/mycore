@@ -273,7 +273,7 @@ public class MCRBinding {
                 }
             }
         }
-        return variables;
+        return Collections.unmodifiableMap(variables);
     }
 
     public String getAbsoluteXPath() {

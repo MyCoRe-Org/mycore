@@ -23,6 +23,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,7 +80,7 @@ public class MCRURL {
                 p.put(key, valueList);
             }
         }
-        return p;
+        return Collections.unmodifiableMap(p);
     }
 
     private String buildQueryString(Map<String, List<String>> parameterMap) {

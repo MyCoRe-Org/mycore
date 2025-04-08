@@ -20,6 +20,7 @@ package org.mycore.mets.model.converter;
 
 import static java.util.stream.Collectors.toList;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,7 +89,7 @@ public class MCRJSONSimpleModelConverter {
             .filter(file -> file.getUse().equals(MCRMetsModelHelper.ALTO_USE))
             .forEach(file -> idFileMap.put(file.getId(), file)));
 
-        return idFileMap;
+        return Collections.unmodifiableMap(idFileMap) ;
     }
 
     private static void processSections(MCRMetsSection current, Map<String, MCRMetsSection> idSectionTable,
