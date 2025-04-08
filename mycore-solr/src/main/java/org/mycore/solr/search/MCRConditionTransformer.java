@@ -347,6 +347,7 @@ public class MCRConditionTransformer {
      */
     @SuppressWarnings("rawtypes")
     public static Map<String, List<MCRCondition>> groupConditionsByIndex(MCRSetCondition cond) {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, List<MCRCondition>> table = new HashMap<>();
         List<MCRCondition> children = cond.getChildren();
 

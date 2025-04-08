@@ -52,11 +52,13 @@ public class MCRJSONSimpleModelConverter {
 
         MCRMetsSimpleModel metsSimpleModel = gsonBuilder.create().fromJson(model, MCRMetsSimpleModel.class);
 
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, MCRMetsPage> idPageMap = new HashMap<>();
         metsSimpleModel.getMetsPageList().stream().forEach(page -> idPageMap.put(page.getId(), page));
 
         final Map<String, MCRMetsFile> idMCRMetsFileMap = extractIdFileMap(metsSimpleModel.getMetsPageList());
 
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, MCRMetsSection> idSectionMap = new HashMap<>();
         processSections(metsSimpleModel.getRootSection(), idSectionMap, idMCRMetsFileMap);
 

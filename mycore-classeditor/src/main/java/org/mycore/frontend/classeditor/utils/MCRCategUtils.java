@@ -49,6 +49,7 @@ public class MCRCategUtils {
     }
 
     public static Map<MCRCategoryID, String> getCategoryIDMap(String json) {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<MCRCategoryID, String> categories = new HashMap<>();
         JsonStreamParser jsonStreamParser = new JsonStreamParser(json);
         if (jsonStreamParser.hasNext()) {

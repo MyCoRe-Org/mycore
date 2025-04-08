@@ -188,6 +188,7 @@ public abstract class MCRStoredNode extends MCRNode {
      * is the label for that language.
      */
     public Map<String, String> getLabels() {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String> labels = new TreeMap<>();
         for (Element label : readData(e -> e.getChildren(LABEL_ELEMENT))) {
             labels.put(label.getAttributeValue(LANG_ATT, Namespace.XML_NAMESPACE), label.getText());

@@ -173,6 +173,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
      */
     @Override
     public Map<String, Number> getCountedMapOfMCRTO(String mcrtoPrefix) {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, Number> map = new HashMap<>();
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         TypedQuery<Object[]> groupQuery = em.createNamedQuery("MCRLINKHREF.group", Object[].class);

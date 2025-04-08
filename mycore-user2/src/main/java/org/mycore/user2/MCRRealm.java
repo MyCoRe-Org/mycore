@@ -171,6 +171,7 @@ public class MCRRealm {
      * @return the same as {@link #getLoginURL()} if <code>redirectParameter</code> is undefined for this realm
      */
     public String getLoginURL(String redirectURL) {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String> parameter = new LinkedHashMap<>();
         String redirect = getRedirectParameter();
         if (redirect != null && redirectURL != null) {

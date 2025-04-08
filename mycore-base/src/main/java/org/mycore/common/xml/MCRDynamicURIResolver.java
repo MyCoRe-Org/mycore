@@ -137,6 +137,7 @@ public abstract class MCRDynamicURIResolver implements URIResolver {
      * @return a hashtable with all variables from the uri
      */
     protected Map<String, String> createVariablesMap(String uri) {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String> variablesMap = new HashMap<>();
         String uriValue = uri.substring(uri.indexOf(':') + 1);
         String[] variablesArr = uriValue.split(":");

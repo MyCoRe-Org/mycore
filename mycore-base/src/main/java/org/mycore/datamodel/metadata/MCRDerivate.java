@@ -149,6 +149,7 @@ public final class MCRDerivate extends MCRBase {
      * If no URN assigned the map will be empty.
      */
     public Map<String, String> getUrnMap() {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String> fileUrnMap = new HashMap<>();
 
         XPathExpression<Element> filesetPath = XPathFactory.instance().compile("./mycorederivate/derivate/fileset",

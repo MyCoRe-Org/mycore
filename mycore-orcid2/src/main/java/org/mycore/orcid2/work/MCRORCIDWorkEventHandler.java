@@ -157,8 +157,10 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
             .orElse(new MCRORCIDFlagContent());
         final Map<String, MCRORCIDUser> userOrcidPairFromFlag = listUserOrcidPairFromFlag(flagContent);
         final Map<String, MCRORCIDUser> userOrcidPairFromObject = listUserOrcidPairFromObject(object);
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         final Map<String, MCRORCIDUser> toDelete = new HashMap<>(userOrcidPairFromFlag);
         toDelete.keySet().removeAll(userOrcidPairFromObject.keySet());
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         final Map<String, MCRORCIDUser> toPublish = new HashMap<>(userOrcidPairFromFlag);
         toPublish.putAll(userOrcidPairFromObject);
         toPublish.keySet().removeAll(toDelete.keySet());
@@ -300,6 +302,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         }
         final List<String> orcids = flagContent.getUserInfos().stream().filter(u -> u.getWorkInfo() != null)
             .filter(u -> u.getWorkInfo().hasOwnPutCode()).map(MCRORCIDUserInfo::getORCID).toList();
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         final Map<String, MCRORCIDUser> userOrcidPair = new HashMap<>();
         for (String orcid : orcids) {
             try {
@@ -312,6 +315,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
     }
 
     private Map<String, MCRORCIDUser> listUserOrcidPairFromObject(MCRObject object) {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         final Map<String, MCRORCIDUser> userOrcidPair = new HashMap<>();
         for (Element nameElement : MCRORCIDUtils.listNameElements(new MCRMODSWrapper(object))) {
             String orcid = null;

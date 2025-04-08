@@ -25,6 +25,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
 
 public class MCRTargetUtils {
     static Map<String, String[]> getSubmittedValues(MCRServletJob job, String baseXPath) {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String[]> valuesToSet = new HashMap<>();
 
         for (String paramName : job.getRequest().getParameterMap().keySet()) {

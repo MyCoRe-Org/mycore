@@ -197,6 +197,7 @@ public class MCRParameterCollector {
      * Returns the parameter map.
      */
     public Map<String, Object> getParameterMap() {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, Object> mergedMap = new HashMap<>(SavePropertiesCacheHolder.getSafePropertiesCache());
         mergedMap.putAll(parameters);
         return Collections.unmodifiableMap(mergedMap);

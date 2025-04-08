@@ -217,6 +217,7 @@ public class MCROAIAdapter implements OAIAdapter {
     }
 
     protected Map<String, MetadataFormat> getMetadataFormatMap() {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, MetadataFormat> metdataFormatMap = new HashMap<>();
         String formats = MCRConfiguration2.getString(getConfigPrefix() + "MetadataFormats").orElse("");
         StringTokenizer st = new StringTokenizer(formats, ", ");

@@ -141,6 +141,7 @@ public class MCRSolrCoreAdminCommands {
     }
 
     public static Map<String, String> getSolrConfiguration() {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String> solrConfiguration = new LinkedHashMap<>();
 
         MCRSolrCoreManager.getCoreMap().entrySet().stream().forEach(entry -> {

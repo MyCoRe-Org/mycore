@@ -224,6 +224,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
             return Optional.ofNullable(MCRUserManager.checkPassword(username, password))
                 .map(MCRUserInformation.class::cast)
                 .orElseThrow(() -> {
+                    @SuppressWarnings("PMD.UseConcurrentHashMap")
                     Map<String, String> attrs = new LinkedHashMap<>();
                     attrs.put("error", "invalid_login");
                     attrs.put("error_description", "Wrong login or password.");
@@ -278,6 +279,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
             }
         } catch (JWTVerificationException e) {
             LOGGER.error(e::getMessage);
+            @SuppressWarnings("PMD.UseConcurrentHashMap")
             Map<String, String> attrs = new LinkedHashMap<>();
             attrs.put("error", "invalid_token");
             attrs.put("error_description", e.getMessage());

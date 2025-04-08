@@ -262,6 +262,7 @@ public class MCRBinding {
     }
 
     public Map<String, Object> buildXPathVariables() {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, Object> variables = new HashMap<>(getVariables());
 
         for (MCRBinding ancestor : getAncestorsAndSelf()) {

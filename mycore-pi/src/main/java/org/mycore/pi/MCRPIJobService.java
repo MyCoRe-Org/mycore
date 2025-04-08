@@ -233,6 +233,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     private MCRJob createJob(Map<String, String> contextParameters, PiJobAction action) {
         MCRJob job = new MCRJob(MCRPIRegisterJobAction.class);
 
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String> params = new HashMap<>(contextParameters);
         params.put("action", action.toString());
         params.put("registrationServiceID", this.getServiceID());

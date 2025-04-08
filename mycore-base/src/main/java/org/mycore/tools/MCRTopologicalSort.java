@@ -95,6 +95,7 @@ public class MCRTopologicalSort<T> {
     public static void prepareData(MCRTopologicalSort<String> ts, String[] files, Path dir) {
         ts.reset();
 
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<Integer, List<String>> parentNames = new HashMap<>();
         XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);

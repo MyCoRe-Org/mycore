@@ -545,6 +545,7 @@ public class MCRMetsSave {
         }
 
         // combine the filename and the id in a map
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String> idFileMap = new HashMap<>();
         for (File file : files) {
             idFileMap.put(file.getId(), file.getFLocat().getHref());

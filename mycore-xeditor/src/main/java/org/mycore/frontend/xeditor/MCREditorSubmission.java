@@ -109,6 +109,7 @@ public class MCREditorSubmission {
 
         xPath2DefaultValue.clear();
 
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<MCRBinding, String[]> valuesToSet = new HashMap<>();
 
         for (String paramName : values.keySet()) {

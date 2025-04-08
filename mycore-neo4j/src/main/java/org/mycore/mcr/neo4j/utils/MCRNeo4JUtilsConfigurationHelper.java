@@ -66,6 +66,7 @@ public final class MCRNeo4JUtilsConfigurationHelper {
 
         Map<String, String> properties = MCRConfiguration2.getSubPropertiesMap(NEO4J_CONFIG_PREFIX
             + "NodeAttribute." + type + ".");
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String> attributes = new HashMap<>();
         attributes.put("id", "/mycoreobject/@ID");
         attributes.put("type", type);

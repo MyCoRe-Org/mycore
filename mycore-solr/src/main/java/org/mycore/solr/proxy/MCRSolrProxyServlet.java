@@ -115,6 +115,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
     private static final Map<String, String> NEW_HTTP_RESPONSE_HEADER;
 
     static {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String> newRespHeader = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         newRespHeader.putAll(MCRConfiguration2.getSubPropertiesMap(SOLR_CONFIG_PREFIX + "HTTPResponseHeader."));
         NEW_HTTP_RESPONSE_HEADER = Collections.unmodifiableMap(newRespHeader);
@@ -201,6 +202,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
      */
     private static void redirectToQueryHandler(Document input, HttpServletResponse resp)
         throws IOException {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String[]> parameters = new LinkedHashMap<>();
         List<Element> children = input.getRootElement().getChildren();
         for (Element param : children) {
@@ -345,6 +347,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
 
     private static ModifiableSolrParams toSolrParams(Map<String, String[]> parameters) {
         // to maintain order
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String[]> copy = new LinkedHashMap<>(parameters);
         ModifiableSolrParams solrParams = new ModifiableSolrParams(copy);
         if (!parameters.containsKey("version") && !parameters.containsKey("wt")) {

@@ -33,6 +33,7 @@ public class MCRLanguage {
     /**
      * A map from codes used for this language, by code type
      */
+    @SuppressWarnings("PMD.UseConcurrentHashMap")
     private final Map<MCRLanguageCodeType, String> codesByType = new EnumMap<>(MCRLanguageCodeType.class);
 
     /**

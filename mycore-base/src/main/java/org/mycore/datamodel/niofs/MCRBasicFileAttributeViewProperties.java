@@ -135,6 +135,7 @@ public class MCRBasicFileAttributeViewProperties<V extends BasicFileAttributeVie
      * @throws IOException if an I/O error occurs.
      */
     protected Map<String, Object> buildMap(Set<String> requested) throws IOException {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, Object> map = new HashMap<>();
         BasicFileAttributes attrs = view.readAttributes();
         for (String attributeName : requested) {
