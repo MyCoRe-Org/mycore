@@ -18,6 +18,8 @@
 
 package org.mycore.ocfl.classification;
 
+import static org.mycore.ocfl.classification.MCROCFLClassificationTransaction.addClassificationEvent;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
@@ -25,8 +27,6 @@ import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandler;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
-
-import static org.mycore.ocfl.classification.MCROCFLClassificationTransaction.addClassificationEvent;
 
 /**
  * @author Tobias Lenhardt [Hammer1279]

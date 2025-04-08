@@ -18,14 +18,15 @@
 
 package org.mycore.ocfl.util;
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlRootElement;
+import java.io.IOException;
+import java.util.Date;
+
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 
-import java.io.IOException;
-import java.util.Date;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 /**
  * Provides information about a stored version of metadata and allows to

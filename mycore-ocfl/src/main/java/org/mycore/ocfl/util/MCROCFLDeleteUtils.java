@@ -20,13 +20,13 @@ package org.mycore.ocfl.util;
 
 // actually increases readability
 
-import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.metadata.MCRObjectID;
+import static org.mycore.common.config.MCRConfiguration2.getBoolean;
+import static org.mycore.common.config.MCRConfiguration2.getString;
 
 import java.util.Optional;
 
-import static org.mycore.common.config.MCRConfiguration2.getBoolean;
-import static org.mycore.common.config.MCRConfiguration2.getString;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * Utility Class to decide when to keep or drop the history of elements
