@@ -23,7 +23,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -58,9 +57,9 @@ public class MCRTransferPackageCommands {
     public static void create(String query) throws MCRAccessException {
         List<String> ids = MCRSolrSearchUtils.listIDs(MCRSolrCoreManager.getMainSolrClient(), query);
         for (String objectId : ids) {
-            Map<String, String> parameters = new HashMap<>();
-            parameters.put("packer", "TransferPackage");
-            parameters.put("source", objectId);
+            Map<String, String> parameters = Map.ofEntries(
+                Map.entry("packer", "TransferPackage"),
+                Map.entry("source", objectId));
             MCRPackerManager.startPacking(parameters);
         }
     }

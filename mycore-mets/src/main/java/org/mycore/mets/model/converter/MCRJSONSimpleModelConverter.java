@@ -82,6 +82,7 @@ public class MCRJSONSimpleModelConverter {
     }
 
     private static Map<String, MCRMetsFile> extractIdFileMap(List<MCRMetsPage> pages) {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         final Map<String, MCRMetsFile> idFileMap = new HashMap<>();
         pages.forEach(p -> p.getFileList().stream()
             .filter(file -> file.getUse().equals(MCRMetsModelHelper.ALTO_USE))

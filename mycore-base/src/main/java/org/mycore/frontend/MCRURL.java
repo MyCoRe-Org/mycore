@@ -61,6 +61,7 @@ public class MCRURL {
     }
 
     private Map<String, List<String>> buildParameterMap(URL url) {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, List<String>> p = new HashMap<>();
         String queryString = url.getQuery();
         if (queryString == null) {

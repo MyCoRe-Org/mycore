@@ -51,6 +51,7 @@ public class MCRJSONUtils {
     }
 
     public static String getTranslations(String prefixes, String lang) {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String> transMap = new HashMap<>();
 
         Arrays.stream(prefixes.split(","))

@@ -93,6 +93,7 @@ public enum MCRMODSDateFormat {
     }
 
     private static void initMap() {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, MCRMODSDateFormat> encodingToFormatMap = new HashMap<>();
         for (MCRMODSDateFormat f : values()) {
             encodingToFormatMap.put(f.encoding, f);

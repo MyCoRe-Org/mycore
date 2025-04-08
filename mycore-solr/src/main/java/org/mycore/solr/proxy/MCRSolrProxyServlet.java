@@ -34,7 +34,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.text.MessageFormat;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -90,7 +89,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
 
     @Serial
     private static final long serialVersionUID = 1L;
-    
+
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**

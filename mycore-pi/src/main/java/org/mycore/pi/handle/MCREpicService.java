@@ -21,7 +21,6 @@ package org.mycore.pi.handle;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -189,10 +188,9 @@ public class MCREpicService extends MCRPIJobService<MCRHandle> {
     @Override
     protected Map<String, String> createJobContextParams(PiJobAction action, MCRBase obj, MCRHandle epic,
         String additional) {
-        Map<String, String> contextParameters = new HashMap<>();
-        contextParameters.put(EPIC_KEY, epic.asString());
-        contextParameters.put(OBJECT_ID_KEY, obj.getId().toString());
-        return contextParameters;
+        return Map.ofEntries(
+            Map.entry(EPIC_KEY, epic.asString()),
+            Map.entry(OBJECT_ID_KEY, obj.getId().toString()));
     }
 
     private MCREpicClient getClient() {

@@ -44,6 +44,7 @@ public class MCRLanguageDetector {
 
     private static final Properties ENDINGS = new Properties();
 
+    @SuppressWarnings("PMD.UseConcurrentHashMap")
     private static final Map<UnicodeScript, String> CODE_2_LANGUAGE_CODES = new EnumMap<>(UnicodeScript.class);
 
     static {
@@ -114,6 +115,7 @@ public class MCRLanguageDetector {
         }
         LOGGER.debug("Detecting language of [{}]", text);
 
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<UnicodeScript, AtomicInteger> scores = new EnumMap<>(UnicodeScript.class);
         buildScores(text, scores);
         UnicodeScript code = getCodeWithMaxScore(scores);

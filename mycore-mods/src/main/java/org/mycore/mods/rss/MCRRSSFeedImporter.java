@@ -26,7 +26,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -262,8 +261,8 @@ public class MCRRSSFeedImporter {
             xml.addContent(obj.createXML().detachRootElement());
         }
 
-        Map<String, String> parameters = new HashMap<>();
-        parameters.put(PROPERTY_MAIL_ADDRESS, MCRConfiguration2.getStringOrThrow(PROPERTY_MAIL_ADDRESS));
+        Map<String, String> parameters = Map.ofEntries(Map.entry(
+            PROPERTY_MAIL_ADDRESS, MCRConfiguration2.getStringOrThrow(PROPERTY_MAIL_ADDRESS)));
         MCRMailer.sendMail(new Document(xml), xsl2BuildNotificationMail, parameters);
     }
 }
