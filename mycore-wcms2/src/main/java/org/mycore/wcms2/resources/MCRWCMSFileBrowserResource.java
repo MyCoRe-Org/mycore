@@ -124,7 +124,7 @@ public class MCRWCMSFileBrowserResource {
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
         File file = new File(MCRLayoutUtilities.getNavigationURL().getPath());
         Document doc = docBuilder.parse(file);
-        retrieveAllowedPaths(doc.getDocumentElement());
+        updateFolderList(doc.getDocumentElement());
 
         File dir = MCRWCMSUtil.getWCMSDataDir();
         JsonObject jsonObj = new JsonObject();
@@ -248,7 +248,7 @@ public class MCRWCMSFileBrowserResource {
         return newPath.startsWith("/") ? newPath.substring(1) : newPath;
     }
 
-    protected void retrieveAllowedPaths(Element element) {
+    protected void updateFolderList(Element element) {
         String pathString = element.getAttribute("dir");
         if (!Objects.equals(pathString, "")) {
             folderList.add(MCRWCMSUtil.getWCMSDataDir().getPath() + pathString);
@@ -257,7 +257,7 @@ public class MCRWCMSFileBrowserResource {
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node node = nodeList.item(i);
             if (node.getNodeType() == Node.ELEMENT_NODE) {
-                retrieveAllowedPaths((Element) node);
+                updateFolderList((Element) node);
             }
         }
     }
