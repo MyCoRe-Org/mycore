@@ -235,14 +235,14 @@ public class MCRCategLinkServiceImplTest {
     @Test
     public void hasLinks() {
         MCRCategoryImpl germany = (MCRCategoryImpl) category.getChildren().getFirst().getChildren().getFirst();
-        assertFalse(SERVICE.hasLinks(category).get(category.getId()), "Classification should not be in use");
-        assertFalse(SERVICE.hasLinks(null).get(category.getId()), "Classification should not be in use");
-        assertFalse(SERVICE.hasLinks(germany).get(germany.getId()), "Category should not be in use");
+        assertFalse(SERVICE.checkForLinks(category).get(category.getId()), "Classification should not be in use");
+        assertFalse(SERVICE.checkForLinks(null).get(category.getId()), "Classification should not be in use");
+        assertFalse(SERVICE.checkForLinks(germany).get(germany.getId()), "Category should not be in use");
         addTestLinks();
         startNewTransaction();
-        assertTrue(SERVICE.hasLinks(category).get(category.getId()), "Classification should be in use");
-        assertTrue(SERVICE.hasLinks(null).get(category.getId()), "Classification should be in use");
-        assertTrue(SERVICE.hasLinks(germany).get(germany.getId()), "Category should be in use");
+        assertTrue(SERVICE.checkForLinks(category).get(category.getId()), "Classification should be in use");
+        assertTrue(SERVICE.checkForLinks(null).get(category.getId()), "Classification should be in use");
+        assertTrue(SERVICE.checkForLinks(germany).get(germany.getId()), "Category should be in use");
     }
 
     @Test

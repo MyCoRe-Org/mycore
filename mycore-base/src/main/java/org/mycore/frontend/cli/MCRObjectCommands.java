@@ -535,6 +535,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
         return mcrObject;
     }
+    
 
     /**
      * Shows the next free MCRObjectIDs.
@@ -542,11 +543,14 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param base
      *            the base String of the MCRObjectID
      */
+    @MCRCommand(
+        syntax = "get next ID for base {0}",
+        help = "Returns the next free MCRObjectID for the ID base {0}.",
+        order = 150)
     public static void showNextID(String base) {
-
         try {
-            LOGGER.info("The next free ID  is {}",
-                () -> MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(base));
+            MCRObjectID nextFreeId = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(base);
+            LOGGER.info(nextFreeId);
         } catch (MCRException ex) {
             LOGGER.error(ex::getMessage);
         }
@@ -558,10 +562,14 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param base
      *            the base String of the MCRObjectID
      */
+    @MCRCommand(
+        syntax = "get last ID for base {0}",
+        help = "Returns the last used MCRObjectID for the ID base {0}.",
+        order = 140)
     public static void showLastID(String base) {
         try {
-            LOGGER.info("The last used ID  is {}",
-                () -> MCRMetadataManager.getMCRObjectIDGenerator().getLastID(base));
+            MCRObjectID lastID = MCRMetadataManager.getMCRObjectIDGenerator().getLastID(base);
+            LOGGER.info(lastID);
         } catch (MCRException ex) {
             LOGGER.error(ex::getMessage);
         }
@@ -844,38 +852,16 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         return true;
     }
 
-    /**
-     * Get the next free MCRObjectID for the given MCRObjectID base.
-     *
-     * @param base
-     *            the MCRObjectID base string
-     */
-    @MCRCommand(
-        syntax = "get next ID for base {0}",
-        help = "Returns the next free MCRObjectID for the ID base {0}.",
-        order = 150)
+    @SuppressWarnings("PMD.LinguisticNaming")
+    @Deprecated
     public static void getNextID(String base) {
-        try {
-            MCRObjectID nextFreeId = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(base);
-            LOGGER.info(nextFreeId);
-        } catch (MCRException ex) {
-            LOGGER.error(ex::getMessage);
-        }
+        showNextID(base);
     }
 
-    /**
-     * Get the last used MCRObjectID for the given MCRObjectID base.
-     *
-     * @param base
-     *            the MCRObjectID base string
-     */
-
-    @MCRCommand(
-        syntax = "get last ID for base {0}",
-        help = "Returns the last used MCRObjectID for the ID base {0}.",
-        order = 140)
+    @SuppressWarnings("PMD.LinguisticNaming")
+    @Deprecated
     public static void getLastID(String base) {
-        LOGGER.info(() -> MCRMetadataManager.getMCRObjectIDGenerator().getLastID(base));
+        showLastID(base);
     }
 
     /**

@@ -57,24 +57,16 @@ public class MCRIIIFScaleParser {
             return parsePercentValue();
         }
 
-        StringBuilder wBuilder = new StringBuilder();
-        StringBuilder hBuilder = new StringBuilder();
-        getWidthAndHeightStrings(wBuilder, hBuilder);
-        String w = wBuilder.toString();
-        String h = hBuilder.toString();
+        Dimension d = Dimension.build(this.targetScale);
 
-        try {
-            if (w.length() == 0) {
-                return scaleToHeight(Integer.parseInt(h));
-            } else if (h.length() == 0) {
-                return scaleToWidth(Integer.parseInt(w));
-            } else if (isBestFit()) {
-                return bestFit(Integer.parseInt(w), Integer.parseInt(h));
-            } else {
-                return scale(Integer.parseInt(w), Integer.parseInt(h));
-            }
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(h + " or " + w + " ist not a valid scale value!", e);
+        if (d.isWidthEmpty()) {
+            return scaleToHeight(d.height());
+        } else if (d.isHeightEmpty()) {
+            return scaleToWidth(d.width());
+        } else if (isBestFit()) {
+            return bestFit(d.width(), d.height());
+        } else {
+            return scale(d.width(), d.height());
         }
 
     }
@@ -135,36 +127,58 @@ public class MCRIIIFScaleParser {
             (int) Math.ceil(percentValue / 100 * sourceRegionHeight));
     }
 
-    private void getWidthAndHeightStrings(StringBuilder wBuilder, StringBuilder hBuilder) {
-        char[] chars = this.targetScale.toCharArray();
-        boolean writeW = true;
-        boolean first = true;
-        for (char currentChar : chars) {
-            switch (currentChar) {
-                case ',' -> {
-                    first = false;
-                    if (!writeW) {
-                        throw new IllegalArgumentException("second , found in scale!");
+    private record Dimension(Integer width, Integer height) {
+
+        static Dimension build(String scale) {
+            StringBuilder wBuilder = new StringBuilder();
+            StringBuilder hBuilder = new StringBuilder();
+
+            char[] chars = scale.toCharArray();
+            boolean writeW = true;
+            boolean first = true;
+            for (char currentChar : chars) {
+                switch (currentChar) {
+                    case ',' -> {
+                        first = false;
+                        if (!writeW) {
+                            throw new IllegalArgumentException("second , found in scale!");
+                        }
+                        writeW = false;
                     }
-                    writeW = false;
-                }
-                case '!' -> {
-                    if (!first) {
-                        throw new IllegalArgumentException("! should be located only in the first position of scale!");
+                    case '!' -> {
+                        if (!first) {
+                            throw new IllegalArgumentException(
+                                "! should be located only in the first position of scale!");
+                        }
+                        first = false;
                     }
-                    first = false;
-                }
-                default -> {
-                    first = false;
-                    if (writeW) {
-                        wBuilder.append(currentChar);
-                    } else {
-                        hBuilder.append(currentChar);
+                    default -> {
+                        first = false;
+                        if (writeW) {
+                            wBuilder.append(currentChar);
+                        } else {
+                            hBuilder.append(currentChar);
+                        }
                     }
                 }
             }
+
+            try {
+                Integer w = wBuilder.isEmpty() ? null : Integer.parseInt(wBuilder.toString());
+                Integer h = hBuilder.isEmpty() ? null : Integer.parseInt(hBuilder.toString());
+                return new Dimension(w, h);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException(wBuilder + " or " + hBuilder + " ist not a valid scale value!", e);
+            }
         }
 
+        boolean isWidthEmpty() {
+            return width == null;
+        }
+
+        boolean isHeightEmpty() {
+            return height == null;
+        }
     }
 
 }
