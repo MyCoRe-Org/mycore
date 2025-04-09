@@ -18,158 +18,36 @@
 
 package org.mycore.frontend.xeditor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
 
 import org.jaxen.JaxenException;
-import org.jdom2.Document;
-import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
-import org.mycore.common.xml.MCRNodeBuilder;
-import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
+import org.xml.sax.SAXException;
 
 /**
- * @author Frank Lützenkirchen
+ * @author Frank L\u00FCtzenkirchen
  */
 public class MCREditorSubmissionTest extends MCRTestCase {
 
     @Test
-    public void testSubmitTextfields() throws JaxenException, JDOMException {
-        String template = "document[title='Titel'][author[@firstName='John'][@lastName='Doe']]";
-        MCREditorSession session = new MCREditorSession();
-        session.setEditedXML(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
-
-        Map<String, String[]> submittedValues = new HashMap<>();
-        submittedValues.put("/document/title[1]", new String[] { "Title" });
-        submittedValues.put("/document/author[1]/@firstName", new String[] { "Jim" });
-        submittedValues.put("/document/author[1]/@lastName", new String[] { "" });
-        session.getSubmission().setSubmittedValues(submittedValues);
-        session.getSubmission().emptyNotResubmittedNodes();
-
-        template = "document[title='Title'][author[@firstName='Jim'][@lastName='']]";
-        Document expected = new Document(new MCRNodeBuilder().buildElement(template, null, null));
-        Document result = session.getEditedXML();
-        result = MCRChangeTracker.removeChangeTracking(result);
-        assertTrue(MCRXMLHelper.deepEqual(expected, result));
+    public void testSubmitTextfields() throws JDOMException, SAXException, JaxenException, IOException {
+         new MCRXEditorTestRunner("testSubmitTextfields");
     }
 
     @Test
-    public void testSubmitSingleCheckbox() throws JaxenException, JDOMException {
-        String template = "document[@archive='false']";
-        MCREditorSession session = new MCREditorSession();
-        session.setEditedXML(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
-
-        session.getSubmission().setXPaths2CheckResubmission("@archive");
-        session.getSubmission().emptyNotResubmittedNodes();
-
-        assertEquals("", session.getEditedXML().getRootElement().getAttributeValue("archive"));
-
-        session.getSubmission().setXPaths2CheckResubmission("@archive");
-
-        Map<String, String[]> submittedValues = new HashMap<>();
-        submittedValues.put("/document/@archive", new String[] { "true" });
-        session.getSubmission().setSubmittedValues(submittedValues);
-
-        session.getSubmission().emptyNotResubmittedNodes();
-
-        assertEquals("true", session.getEditedXML().getRootElement().getAttributeValue("archive"));
+    public void testSubmitSingleCheckbox() throws JDOMException, SAXException, JaxenException, IOException {
+         new MCRXEditorTestRunner("testSubmitSingleCheckbox");
     }
-
+    
     @Test
-    public void testSubmitSelectSingleOption()
-        throws JaxenException, JDOMException {
-        String template = "document[category='a']";
-        MCREditorSession session = new MCREditorSession();
-        session.setEditedXML(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
-
-        session.getSubmission()
-            .mark2checkResubmission(new MCRBinding("/document/category[1]", true, session.getRootBinding()));
-        session.getSubmission().emptyNotResubmittedNodes();
-
-        List<Element> categories = session.getEditedXML().getRootElement().getChildren("category");
-        assertEquals(1, categories.size());
-        assertEquals("", categories.get(0).getText());
-
-        session.getSubmission()
-            .mark2checkResubmission(new MCRBinding("/document/category[1]", true, session.getRootBinding()));
-
-        Map<String, String[]> submittedValues = new HashMap<>();
-        submittedValues.put("/document/category[1]", new String[] { "b" });
-        session.getSubmission().setSubmittedValues(submittedValues);
-
-        session.getSubmission().emptyNotResubmittedNodes();
-
-        categories = session.getEditedXML().getRootElement().getChildren("category");
-        assertEquals(1, categories.size());
-        assertEquals("b", categories.get(0).getText());
+    public void testSubmitSelectSingleOption() throws JDOMException, SAXException, JaxenException, IOException {
+         new MCRXEditorTestRunner("testSubmitSelectSingleOption");
     }
-
+    
     @Test
-    public void testSubmitSelectMultipleOptions()
-        throws JaxenException, JDOMException {
-        String template = "document[category[1]='a'][category[2]='b'][category[3]='c']";
-        MCREditorSession session = new MCREditorSession();
-        session.setEditedXML(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
-
-        session.getSubmission()
-            .mark2checkResubmission(new MCRBinding("/document/category[1]", true, session.getRootBinding()));
-        session.getSubmission()
-            .mark2checkResubmission(new MCRBinding("/document/category[2]", true, session.getRootBinding()));
-        session.getSubmission()
-            .mark2checkResubmission(new MCRBinding("/document/category[3]", true, session.getRootBinding()));
-
-        session.getSubmission().emptyNotResubmittedNodes();
-
-        List<Element> categories = session.getEditedXML().getRootElement().getChildren("category");
-        assertEquals(3, categories.size());
-        assertEquals("", categories.get(0).getText());
-        assertEquals("", categories.get(1).getText());
-        assertEquals("", categories.get(2).getText());
-
-        session.getSubmission()
-            .mark2checkResubmission(new MCRBinding("/document/category[1]", true, session.getRootBinding()));
-        session.getSubmission()
-            .mark2checkResubmission(new MCRBinding("/document/category[2]", true, session.getRootBinding()));
-        session.getSubmission()
-            .mark2checkResubmission(new MCRBinding("/document/category[3]", true, session.getRootBinding()));
-
-        Map<String, String[]> submittedValues = new HashMap<>();
-        submittedValues.put("/document/category", new String[] { "c", "d" });
-        session.getSubmission().setSubmittedValues(submittedValues);
-
-        session.getSubmission().emptyNotResubmittedNodes();
-
-        categories = session.getEditedXML().getRootElement().getChildren("category");
-        assertEquals(3, categories.size());
-        assertEquals("c", categories.get(0).getText());
-        assertEquals("d", categories.get(1).getText());
-        assertEquals("", categories.get(2).getText());
-
-        session.getSubmission()
-            .mark2checkResubmission(new MCRBinding("/document/category[1]", true, session.getRootBinding()));
-        session.getSubmission()
-            .mark2checkResubmission(new MCRBinding("/document/category[2]", true, session.getRootBinding()));
-        session.getSubmission()
-            .mark2checkResubmission(new MCRBinding("/document/category[3]", true, session.getRootBinding()));
-
-        submittedValues.clear();
-        submittedValues.put("/document/category", new String[] { "a", "b", "c", "d" });
-        session.getSubmission().setSubmittedValues(submittedValues);
-
-        session.getSubmission().emptyNotResubmittedNodes();
-
-        categories = session.getEditedXML().getRootElement().getChildren("category");
-        assertEquals(4, categories.size());
-        assertEquals("a", categories.get(0).getText());
-        assertEquals("b", categories.get(1).getText());
-        assertEquals("c", categories.get(2).getText());
-        assertEquals("d", categories.get(3).getText());
+    public void testSubmitSelectMultipleOptions() throws JDOMException, SAXException, JaxenException, IOException {
+         new MCRXEditorTestRunner("testSubmitSelectMultipleOptions");
     }
 }

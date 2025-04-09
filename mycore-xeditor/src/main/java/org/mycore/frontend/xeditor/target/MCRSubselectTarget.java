@@ -26,6 +26,7 @@ import org.mycore.common.MCRUtils;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
+import org.mycore.frontend.xeditor.MCREditorSubmission;
 
 import jakarta.servlet.ServletContext;
 import jakarta.xml.bind.DatatypeConverter;
@@ -41,7 +42,7 @@ public class MCRSubselectTarget implements MCREditorTarget {
 
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter)
         throws Exception {
-        session.getSubmission().setSubmittedValues(job.getRequest().getParameterMap());
+        new MCREditorSubmission(session).setSubmittedValues(job.getRequest().getParameterMap());
 
         int pos = parameter.lastIndexOf(":");
         String xPath = parameter.substring(0, pos);
