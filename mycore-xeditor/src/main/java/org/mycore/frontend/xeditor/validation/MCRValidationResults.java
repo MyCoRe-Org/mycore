@@ -19,10 +19,10 @@
 package org.mycore.frontend.xeditor.validation;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.SequencedMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.mycore.common.config.MCRConfiguration2;
 
@@ -41,7 +41,7 @@ public class MCRValidationResults {
         MARKER_ERROR = MCRConfiguration2.getString(prefix + "error").orElse("mcr-invalid");
     }
 
-    private Map<String, String> xPath2Marker = new HashMap<>();
+    private Map<String, String> xPath2Marker = new ConcurrentHashMap<>();
 
     private SequencedMap<String, MCRValidator> xPath2FailedRule = new LinkedHashMap<>();
 

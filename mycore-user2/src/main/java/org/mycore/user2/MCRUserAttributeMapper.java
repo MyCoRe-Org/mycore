@@ -22,12 +22,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -83,7 +85,7 @@ public class MCRUserAttributeMapper {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final Map<String, List<Attribute>> attributeMapping = new HashMap<>();
+    private final Map<String, List<Attribute>> attributeMapping = new ConcurrentHashMap<>();
 
     /**
      * @deprecated Use {@link #createInstance(Element)} instead
@@ -331,11 +333,12 @@ public class MCRUserAttributeMapper {
                 return null;
             }
 
+            @SuppressWarnings("PMD.UseConcurrentHashMap")
             Map<String, String> map = new HashMap<>();
             for (ValueMapping vm : valueMapping) {
                 map.put(vm.name, vm.mapping);
             }
-            return map;
+            return Collections.unmodifiableMap(map);
         }
     }
 

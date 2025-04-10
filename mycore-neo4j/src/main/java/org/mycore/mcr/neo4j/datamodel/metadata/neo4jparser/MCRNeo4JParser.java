@@ -23,9 +23,9 @@ import static org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.MCRNeo4JUtil.get
 import static org.mycore.mcr.neo4j.utils.MCRNeo4JUtilsConfigurationHelper.getConfiguration;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -108,7 +108,7 @@ public class MCRNeo4JParser implements MCRNeo4JMetaParser {
 
                 for (Element elm : elements) {
                     final List<Neo4JNode> nodes = clazz.parse(elm);
-                    final Map<String, List<String>> langNodes = new HashMap<>(nodes.size());
+                    final Map<String, List<String>> langNodes = new ConcurrentHashMap<>(nodes.size());
 
                     // add nodes with a language to their respective key
                     nodes.stream()

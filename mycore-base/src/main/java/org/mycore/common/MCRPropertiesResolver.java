@@ -19,10 +19,10 @@
 package org.mycore.common;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The <code>MCRPropertiesResolver</code> supports substitution of any %reference%
@@ -101,7 +101,7 @@ public class MCRPropertiesResolver extends MCRTextResolver {
      * @return resolved properties
      */
     public Map<String, String> resolveAll(Map<String, String> toResolve) {
-        Map<String, String> resolvedMap = new HashMap<>();
+        Map<String, String> resolvedMap = new ConcurrentHashMap<>();
         for (Entry<String, String> entrySet : toResolve.entrySet()) {
             String key = entrySet.getKey();
             String value = removeSelfReference(key, entrySet.getValue());

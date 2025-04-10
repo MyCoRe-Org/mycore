@@ -20,10 +20,10 @@ package org.mycore.datamodel.classifications2.utils;
 
 import java.text.Collator;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.jdom2.Element;
 import org.jdom2.Namespace;
@@ -31,7 +31,7 @@ import org.mycore.common.MCRSessionMgr;
 
 public final class MCREditorItemComparator implements Comparator<Element> {
 
-    private static final Map<String, MCREditorItemComparator> MY_COLLATORS = new HashMap<>();
+    private static final Map<String, MCREditorItemComparator> MY_COLLATORS = new ConcurrentHashMap<>();
 
     private final Collator myCollator;
 

@@ -33,6 +33,7 @@ import jakarta.ws.rs.core.Application;
 public class MCRRestAPIUtil {
     public static String getWWWAuthenticateHeader(String s,
         Map<String, String> attributes, Application app) {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String> attrMap = new LinkedHashMap<>();
         String realm = app.getProperties()
             .getOrDefault(ServerProperties.APPLICATION_NAME, "REST API")

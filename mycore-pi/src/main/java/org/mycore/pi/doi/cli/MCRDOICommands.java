@@ -236,6 +236,7 @@ public class MCRDOICommands {
                         oldMediaList = new ArrayList<>();
                     }
 
+                    @SuppressWarnings("PMD.UseConcurrentHashMap")
                     Map<String, URI> newHashMap = new HashMap<>();
 
                     newMediaList.forEach(e -> newHashMap.put(e.getKey(), e.getValue()));

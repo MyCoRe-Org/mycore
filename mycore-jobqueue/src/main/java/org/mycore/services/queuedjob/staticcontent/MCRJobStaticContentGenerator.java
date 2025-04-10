@@ -21,7 +21,6 @@ package org.mycore.services.queuedjob.staticcontent;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -59,9 +58,9 @@ public class MCRJobStaticContentGenerator extends MCRObjectStaticContentGenerato
 
     @Override
     public void generate(MCRObject object) throws IOException {
-        Map<String, String> parameters = new HashMap<>();
-        parameters.put(MCRStaticContentGeneratorJobAction.CONFIG_ID_PARAMETER, configID);
-        parameters.put(MCRStaticContentGeneratorJobAction.OBJECT_ID_PARAMETER, object.getId().toString());
+        Map<String, String> parameters = Map.ofEntries(
+            Map.entry(MCRStaticContentGeneratorJobAction.CONFIG_ID_PARAMETER, configID),
+            Map.entry(MCRStaticContentGeneratorJobAction.OBJECT_ID_PARAMETER, object.getId().toString()));
 
         MCRJobQueueManager jobQueueManager = MCRJobQueueManager.getInstance();
 
