@@ -78,15 +78,16 @@ public class MCRSolrConfigSetHelper {
         Map<String, MCRSolrConfigSetProvider> configSets = new HashMap<>(instances.size());
 
         instances.forEach((name, supplier) -> {
+            Object cs;
             try {
-                Object cs = supplier.call();
-                if (cs instanceof MCRSolrConfigSetProvider configSet) {
-                    configSets.put(name, configSet);
-                } else {
-                    throw new MCRConfigurationException("Invalid config set instance " + name);
-                }
+                cs = supplier.call();
             } catch (Exception e) {
                 throw new MCRConfigurationException("Error while initializing config set " + name, e);
+            }
+            if (cs instanceof MCRSolrConfigSetProvider configSet) {
+                configSets.put(name, configSet);
+            } else {
+                throw new MCRConfigurationException("Invalid config set instance " + name);
             }
         });
 
