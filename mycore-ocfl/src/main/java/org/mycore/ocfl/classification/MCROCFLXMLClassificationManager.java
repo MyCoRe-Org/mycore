@@ -18,16 +18,19 @@
 
 package org.mycore.ocfl.classification;
 
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_CREATED;
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_DELETED;
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_UPDATED;
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.convertMessageToType;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.ZoneOffset;
 import java.util.Date;
-import java.util.Map;
 import java.util.Objects;
 
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
-import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.content.MCRContent;
@@ -53,29 +56,10 @@ import io.ocfl.api.model.VersionInfo;
  */
 public class MCROCFLXMLClassificationManager implements MCRXMLClassificationManager {
 
-    public static final String MESSAGE_CREATED = "Created";
-
-    public static final String MESSAGE_UPDATED = "Updated";
-
-    public static final String MESSAGE_DELETED = "Deleted";
-
     private static final String ROOT_FOLDER = "classification/";
 
     @MCRProperty(name = "Repository")
     public String repositoryKey;
-
-    // FIXME make seperate versionhelper
-    protected static final Map<String, Character> MESSAGE_TYPE_MAPPING = Map.ofEntries(
-        Map.entry(MESSAGE_CREATED, MCROCFLMetadataVersion.CREATED),
-        Map.entry(MESSAGE_UPDATED, MCROCFLMetadataVersion.UPDATED),
-        Map.entry(MESSAGE_DELETED, MCROCFLMetadataVersion.DELETED));
-
-    protected static char convertMessageToType(String message) throws MCRPersistenceException {
-        if (!MESSAGE_TYPE_MAPPING.containsKey(message)) {
-            throw new MCRPersistenceException("Cannot identify version type from message '" + message + "'");
-        }
-        return MESSAGE_TYPE_MAPPING.get(message);
-    }
 
     protected OcflRepository getRepository() throws ClassCastException {
         return MCROCFLRepositoryProvider.getRepository(repositoryKey);
