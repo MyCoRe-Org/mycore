@@ -31,10 +31,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hibernate.annotations.SortNatural;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.user2.annotation.MCRUserAttributeJavaConverter;
@@ -748,92 +750,141 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         setOwner(owner);
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#clone()
-     */
     @Override
-    public MCRUser clone() {
-        MCRUser copy = getSafeCopy();
-        if (copy.password == null) {
-            copy.password = new Password();
-        }
-        copy.password.hashType = this.password.hashType;
-        copy.password.hash = this.password.hash;
-        copy.password.salt = this.password.salt;
-        return copy;
+    public MCRUser clone() throws CloneNotSupportedException {
+        return copyPropertiesTo(CopyMode.FULL, (MCRUser) super.clone());
     }
 
     /**
-     * Returns this MCRUser with basic information.
-     * Same as {@link #getSafeCopy()} but without these informations:
-     * <ul>
-     * <li>real name
-     * <li>eMail
-     * <li>attributes
-     * <li>role information
-     * <li>last login
-     * <li>valid until
-     * <li>password hint
-     * </ul>
-     * @return a clone copy of this instance
+     * Returns a copy of this MCRUser with full information.
+     * Same as {@link #clone()} but the class is always {@link MCRUser}, never a subclass.
      */
     @Transient
-    public MCRUser getBasicCopy() {
-        MCRUser copy = new MCRUser(userName, realmID);
-        copy.locked = locked;
-        copy.disabled = disabled;
-        copy.owner = this.equals(this.owner) ? copy : this.owner;
-        copy.setAttributes(null);
-        copy.password = null;
-        return copy;
+    public MCRUser getFullCopy() {
+        return copyPropertiesTo(CopyMode.FULL, new MCRUser());
     }
 
     /**
      * Returns this MCRUser with safe information.
-     * Same as {@link #clone()} but without these informations:
+     * Same as {@link #getFullCopy()} but without these information:
      * <ul>
      * <li>password hash type
      * <li>password hash value
      * <li>password salt
+     * <li>attributes
      * </ul>
      * @return a clone copy of this instance
      */
     @Transient
     public MCRUser getSafeCopy() {
-        MCRUser copy = getBasicCopy();
-        if (getHint() != null) {
-            copy.password = new Password();
-            copy.password.hint = getHint();
-        }
-        copy.setAttributes(new TreeSet<>());
-        copy.eMail = this.eMail;
-        copy.lastLogin = this.lastLogin;
-        copy.validUntil = this.validUntil;
-        copy.realName = this.realName;
-        copy.systemRoles.addAll(this.systemRoles);
-        copy.externalRoles.addAll(this.externalRoles);
-        copy.attributes.addAll(this.attributes);
-        return copy;
+        return copyPropertiesTo(CopyMode.SAFE, new MCRUser());
     }
 
-    private static final class Password implements Serializable {
+    /**
+     * Returns this MCRUser with basic information.
+     * Same as {@link #getFullCopy()} but without these information:
+     * <ul>
+     * <li>password hash type
+     * <li>password hash value
+     * <li>password salt
+     * <li>password hint
+     * <li>real name
+     * <li>eMail
+     * <li>last login
+     * <li>valid until
+     * <li>attributes
+     * <li>system roles
+     * <li>external roles
+     * </ul>
+     * @return a clone copy of this instance
+     */
+    @Transient
+    public MCRUser getBasicCopy() {
+        return copyPropertiesTo(CopyMode.BASIC, new MCRUser());
+    }
+
+    protected MCRUser copyPropertiesTo(CopyMode mode, MCRUser other) {
+
+        other.locked = locked;
+        other.disabled = disabled;
+        other.userName = userName;
+        other.password = password == null ? null : mode.passwordCopier.apply(password);
+        other.realmID = realmID;
+        other.owner = owner == null ? null : (owner.equals(this) ? other : mode.userCopier.apply(owner));
+
+        if (mode == CopyMode.SAFE || mode == CopyMode.FULL) {
+            other.realName = realName;
+            other.eMail = eMail;
+            other.lastLogin = lastLogin;
+            other.validUntil = validUntil;
+            other.systemRoles = new HashSet<>(systemRoles);
+            other.externalRoles = new HashSet<>(externalRoles);
+        }
+
+        if (mode == CopyMode.FULL) {
+            other.attributes = attributes.stream().map(MCRUserAttribute::clone)
+                .collect(Collectors.toCollection(TreeSet::new));
+        }
+
+        return other;
+
+    }
+
+    public MCRUser toPersistableUser() {
+        return this;
+    }
+
+    protected enum CopyMode {
+
+        FULL(MCRUser::getFullCopy, Password::clone),
+
+        SAFE(MCRUser::getSafeCopy, password -> {
+            Password copy = new Password();
+            copy.hint = password.hint;
+            return copy;
+        }),
+
+        BASIC(MCRUser::getBasicCopy, password -> null);
+
+        private final Function<MCRUser, MCRUser> userCopier;
+
+        private final Function<Password, Password> passwordCopier;
+
+        CopyMode(Function<MCRUser, MCRUser> userCopier, Function<Password, Password> passwordCopier) {
+            this.userCopier = userCopier;
+            this.passwordCopier = passwordCopier;
+        }
+
+    }
+
+    private static final class Password implements Serializable, Cloneable {
 
         @Serial
         private static final long serialVersionUID = 1L;
 
         @XmlAttribute
+        private String hashType;
+
+        @XmlAttribute
         private String hash;
 
-        //base64 encoded
         @XmlAttribute
         private String salt;
 
         @XmlAttribute
-        private String hashType;
-
-        /** A hint stored by the user in case hash is forgotten */
-        @XmlAttribute
         private String hint;
+
+        @Override
+        public Password clone() {
+            Password clone = MCRClassTools.clone(getClass(), super::clone);
+
+            clone.hashType = hashType;
+            clone.hash = hash;
+            clone.salt = salt;
+            clone.hint = hint;
+
+            return clone;
+        }
 
     }
 

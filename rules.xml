@@ -436,4 +436,40 @@
     </properties>
   </rule>
 
+
+  <rule name="MCR.ClassTools.Clone"
+        language="java"
+        message="MCRClassTools#clone should be called as MCRClassTools.clone(getClass(), super::clone) exactly"
+        class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+    <description>
+      MCRClassTools#clone is a helper function for top most classes in class hierarchies that implement Cloneable
+      and expect every subclass to implement a proper clone method, i.e. to never throw a CloneNotSupportedException.
+      It is meant to simplify and harmonize suppression of this exception in the method signatures of the clone-Method
+      of such classes and needs to be called as MCRClassTools.clone(getClass(), super::clone) exactly
+    </description>
+    <priority>1</priority>
+    <properties>
+      <property name="xpath">
+        <value>
+          <![CDATA[
+            //(MethodCall|MethodReference)
+              [
+                *[position() = 1 and pmd-java:typeIs('org.mycore.common.MCRClassTools')]
+                  and
+                @MethodName='clone'
+              ]
+              [
+                 not(ArgumentList/*[1][name()='MethodCall' and @MethodName='getClass' and ArgumentList and count(*)=1])
+                   or
+                 not(ArgumentList/*[2][name()='MethodReference' and @MethodName='clone' and SuperExpression and count(*)=1])
+              ]
+          ]]>
+        </value>
+      </property>
+    </properties>
+  </rule>
+
+
+
+
 </ruleset>

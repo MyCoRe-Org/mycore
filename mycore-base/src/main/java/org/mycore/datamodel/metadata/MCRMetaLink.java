@@ -397,13 +397,6 @@ public class MCRMetaLink extends MCRMetaDefault {
         }
     }
 
-    /**
-     * clone of this instance
-     *
-     * you will get a (deep) clone of this element
-     *
-     * @see java.lang.Object#clone()
-     */
     @Override
     public MCRMetaLink clone() {
         MCRMetaLink clone = (MCRMetaLink) super.clone();

@@ -144,18 +144,11 @@ public class MCRMetaSpatial extends MCRMetaDefault {
         }
     }
 
-    /**
-     * clone of this instance
-     * 
-     * you will get a (deep) clone of this element
-     * 
-     * @see java.lang.Object#clone()
-     */
     @Override
     public MCRMetaSpatial clone() {
         MCRMetaSpatial clone = (MCRMetaSpatial) super.clone();
 
-        clone.data = new ArrayList<>(this.data); // Big Integer is immutable
+        clone.data = new ArrayList<>(this.data); // immutable
 
         return clone;
     }

@@ -180,13 +180,6 @@ public final class MCRMetaBoolean extends MCRMetaDefault {
         return obj;
     }
 
-    /**
-     * clone of this instance
-     * 
-     * you will get a (deep) clone of this element
-     * 
-     * @see java.lang.Object#clone()
-     */
     @Override
     public MCRMetaBoolean clone() {
         MCRMetaBoolean clone = (MCRMetaBoolean) super.clone();

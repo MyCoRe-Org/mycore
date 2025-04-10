@@ -28,6 +28,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.mycore.common.MCRCalendar;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 
 import com.ibm.icu.util.Calendar;
@@ -486,13 +487,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         }
     }
 
-    /**
-     * clone of this instance
-     *
-     * you will get a (deep) clone of this element
-     *
-     * @see java.lang.Object#clone()
-     */
+
     @Override
     public MCRMetaHistoryDate clone() {
         MCRMetaHistoryDate clone = (MCRMetaHistoryDate) super.clone();
@@ -679,14 +674,11 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
 
         @Override
         public MCRMetaHistoryDateText clone() {
-            MCRMetaHistoryDateText clone = null;
-            try {
-                clone = (MCRMetaHistoryDateText) super.clone();
-                clone.text = this.text;
-                clone.lang = this.lang;
-            } catch (CloneNotSupportedException e) {
-                // this can not happen, as MCRMetaInterface implements Cloneable
-            }
+            MCRMetaHistoryDateText clone = MCRClassTools.clone(getClass(), super::clone);
+
+            clone.text = this.text;
+            clone.lang = this.lang;
+
             return clone;
         }
     }
