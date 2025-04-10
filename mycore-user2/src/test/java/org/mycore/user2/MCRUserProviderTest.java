@@ -18,30 +18,36 @@
 
 package org.mycore.user2;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.MCRUserInformationResolver;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MyCoReTest;
 
-public class MCRUserProviderTest extends MCRUserTestCase {
+@MyCoReTest
+@ExtendWith({ MCRJPAExtension.class })
+public class MCRUserProviderTest {
 
     private MCRUser userWithoutRealm;
 
     private MCRUser userWithRealm;
 
-    @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
+
         userWithoutRealm = new MCRUser("hugo");
         MCRUserManager.createUser(userWithoutRealm);
+
         userWithRealm = new MCRUser("hugo");
         userWithRealm.setRealm(MCRRealmFactory.getRealm("mycore.de"));
         MCRUserManager.createUser(userWithRealm);
+
     }
 
     @Test
