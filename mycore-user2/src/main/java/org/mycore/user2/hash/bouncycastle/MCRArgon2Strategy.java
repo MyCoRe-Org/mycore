@@ -33,7 +33,7 @@ import org.mycore.user2.hash.MCRPasswordCheckStrategy;
 import org.mycore.user2.hash.MCRPasswordCheckStrategyBase;
 
 /**
- * {@link MCRArgon2Strategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the Argon2 algorithm.
+ * {@link MCRArgon2Strategy} is a {@link MCRPasswordCheckStrategy} that uses the Argon2 algorithm.
  * <p>
  * The version and salt are encoded in the hash using the Modular Crypt Format (MCF) for Argon2. No explicit salt
  * values are generated.

@@ -26,7 +26,7 @@ import org.mycore.common.annotation.MCROutdated;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 
 /**
- * {@link MCRCryptStrategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the traditional
+ * {@link MCRCryptStrategy} is a {@link MCRPasswordCheckStrategy} that uses the traditional
  * DES-based password hashing scheme of the POSIX C crypt(3) command.
  * <p>
  * The salt is encoded in the hash using the Modular Crypt Format (MCF) for the traditional DES-based password

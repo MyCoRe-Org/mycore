@@ -28,7 +28,7 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 
 /**
- * {@link MCRMD5Strategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the MD5 algorithm.
+ * {@link MCRMD5Strategy} is a {@link MCRPasswordCheckStrategy} that uses the MD5 algorithm.
  * <p>
  * The salt is returned as a base 64 encoded string. The hash is returned as a hex encoded string.
  * <p>

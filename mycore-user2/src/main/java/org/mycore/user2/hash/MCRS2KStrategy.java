@@ -35,7 +35,7 @@ import org.mycore.common.config.annotation.MCRProperty;
 import com.google.common.primitives.Bytes;
 
 /**
- * {@link MCRS2KStrategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the iterated and
+ * {@link MCRS2KStrategy} is a {@link MCRPasswordCheckStrategy} that uses the iterated and
  * salted String-to-Key (S2K) algorithm describes in RFC 4880 (OpenPGP Message Format).
  * <p>
  * The salt is returned as a hex encoded string. The hash is returned as a hex encoded string.

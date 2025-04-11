@@ -27,7 +27,7 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 
 /**
- * {@link MCRSHA512Strategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the SHA-512 algorithm.
+ * {@link MCRSHA512Strategy} is a {@link MCRPasswordCheckStrategy} that uses the SHA-512 algorithm.
  * <p>
  * The salt is returned as a base 64 encoded string. The hash is returned as a hex encoded string.
  * <p>

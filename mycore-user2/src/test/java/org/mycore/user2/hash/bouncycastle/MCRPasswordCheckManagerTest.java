@@ -18,20 +18,21 @@
 
 package org.mycore.user2.hash.bouncycastle;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.test.MyCoReTest;
 import org.mycore.user2.hash.MCRPasswordCheckData;
 import org.mycore.user2.hash.MCRPasswordCheckManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
+@MyCoReTest
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.User.PasswordCheck.ConfigurationChecks", empty = true)
 })
-public class MCRPasswordCheckManagerTest extends MCRTestCase {
+public class MCRPasswordCheckManagerTest {
 
     protected static final String TYPE = "type";
 

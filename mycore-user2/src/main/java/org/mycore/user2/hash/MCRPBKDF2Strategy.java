@@ -33,7 +33,7 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 
 /**
- * {@link MCRPBKDF2Strategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the PBKDF2 algorithm.
+ * {@link MCRPBKDF2Strategy} is a {@link MCRPasswordCheckStrategy} that uses the PBKDF2 algorithm.
  * <p>
  * The salt is returned as a hex encoded string. The hash is returned as a hex encoded string.
  * <p>
