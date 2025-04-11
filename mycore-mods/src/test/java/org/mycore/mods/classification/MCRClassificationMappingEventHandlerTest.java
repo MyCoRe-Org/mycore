@@ -21,15 +21,11 @@ package org.mycore.mods.classification;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.junit.Assert;
@@ -48,8 +44,6 @@ import org.mycore.mods.MCRMODSWrapper;
 public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
 
     public static final String TEST_DIRECTORY = "MCRClassificationMappingEventHandlerTest/";
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     public MCRCategoryDAO getDAO() {
         return MCRCategoryDAOFactory.obtainInstance();
@@ -91,7 +85,6 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         Assert.assertNull("The mapped classification of the child should not be contained in the MyCoReObject now!",
             expressionObject.evaluateFirst(xml));
 
-        LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
     }
 
     /**
@@ -149,7 +142,6 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         Assert.assertNotNull("The mapped dummy classification should be in the MyCoReObject now!",
             expressionObject.evaluateFirst(xml));
 
-        LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
     }
 
     /**
@@ -206,7 +198,6 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         Assert.assertNotNull("The mapped dummy classification should be in the MyCoReObject now!",
             expressionObject.evaluateFirst(xml));
 
-        LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
     }
 
     /**
@@ -239,7 +230,6 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         mapper.handleObjectUpdated(null, mcro);
 
         Document xml = mcro.createXML();
-        LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
 
         String expression = "//mods:classification[contains(@generator,'-mycore') and "
             + "contains(@generator,'xpathmapping2placeholderClassification') "
@@ -261,7 +251,6 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
 
         mapper.handleObjectUpdated(null, mcro);
         xml = mcro.createXML();
-        LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
 
         expression = "//mods:classification[contains(@generator,'-mycore') and "
             + "contains(@generator,'xpathmapping2placeholderClassification') "
@@ -282,7 +271,6 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
 
         mapper.handleObjectUpdated(null, mcro);
         xml = mcro.createXML();
-        LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
 
         expression = "//mods:classification[contains(@generator,'-mycore') and "
             + "contains(@generator,'xpathmapping2placeholderClassification') "
@@ -303,7 +291,6 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
 
         mapper.handleObjectUpdated(null, mcro);
         xml = mcro.createXML();
-        LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
 
         expression = "//mods:classification[contains(@generator,'-mycore') and "
             + "contains(@generator,'xpathmapping2placeholderClassification') "
@@ -317,6 +304,101 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
                 xml));
 
     }
+
+
+    /**
+     * Tests if placeholder patterns containing OR-conditions are properly evaluated.
+     */
+    @Test
+    public void testXPathMappingPlaceholdersOROperator() throws URISyntaxException, IOException, JDOMException {
+        MCRSessionMgr.getCurrentSession();
+        MCRTransactionManager.hasActiveTransactions();
+        ClassLoader classLoader = getClass().getClassLoader();
+        SAXBuilder saxBuilder = new SAXBuilder();
+        loadCategory("placeholderOrCondition.xml");
+
+        // test placeholder with or-condition
+        Document document = saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + "testMods2.xml"));
+        MCRObject mcro = new MCRObject();
+
+        MCRMODSWrapper mw = new MCRMODSWrapper(mcro);
+        mw.setMODS(document.getRootElement().detach());
+        mw.setID("junit", 8);
+
+        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
+        mapper.handleObjectUpdated(null, mcro);
+
+        Document xml = mcro.createXML();
+
+        String expression = "//mods:classification[contains(@generator,'-mycore') and "
+            + "contains(@generator,'xpathmapping2placeholderOrCondition') "
+            + "and contains(@valueURI, 'dummy-placeholder-or-condition')]";
+        XPathExpression<Element> expressionObject = XPathFactory.instance()
+            .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
+
+        Assert.assertNotNull(
+            "The mapped classification 'dummy-placeholder-or-condition' should be in the MyCoReObject now!",
+            expressionObject.evaluateFirst(
+                xml));
+    }
+
+    /**
+     * Tests if placeholder patterns containing OR-conditions are properly evaluated in the fallback mechanism.
+     */
+    @Test
+    public void testXPathMappingFallbackAndORCondition() throws IOException, JDOMException, URISyntaxException {
+        MCRSessionMgr.getCurrentSession();
+        MCRTransactionManager.hasActiveTransactions();
+        ClassLoader classLoader = getClass().getClassLoader();
+        SAXBuilder saxBuilder = new SAXBuilder();
+        loadCategory("placeholderOrCondition.xml");
+
+        // test fallback with a placeholder with or-condition
+        Document document1 = saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + "testMods3.xml"));
+        MCRObject mcro = new MCRObject();
+
+        MCRMODSWrapper mw = new MCRMODSWrapper(mcro);
+        mw.setMODS(document1.getRootElement().detach());
+        mw.setID("junit", 9);
+
+        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
+        mapper.handleObjectUpdated(null, mcro);
+
+        Document xml = mcro.createXML();
+
+        String expression = "//mods:classification[contains(@generator,'-mycore') and "
+            + "contains(@generator,'xpathmapping2placeholderOrCondition') "
+            + "and contains(@valueURI, 'dummy-placeholder-or-condition-fb')]";
+        XPathExpression<Element> expressionObject = XPathFactory.instance()
+            .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
+
+        Assert.assertNotNull(
+            "The mapped classification 'dummy-placeholder-or-condition-fb' should be in the MyCoReObject now!",
+            expressionObject.evaluateFirst(
+                xml));
+
+        // test fallback with a placeholder with or-condition
+        Document document2 = saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + "testMods4.xml"));
+        mcro = new MCRObject();
+
+        mw = new MCRMODSWrapper(mcro);
+        mw.setMODS(document2.getRootElement().detach());
+        mw.setID("junit", 10);
+
+        mapper.handleObjectUpdated(null, mcro);
+
+        xml = mcro.createXML();
+
+        expression = "//mods:classification";
+        expressionObject = XPathFactory.instance()
+            .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
+
+        Assert.assertNull(
+            "The mapped classification 'dummy-placeholder-or-condition-fb' should NOT be in the MyCoReObject now!",
+            expressionObject.evaluateFirst(
+                xml));
+    }
+
 
     private void loadCategory(String categoryFileName) throws URISyntaxException, JDOMException, IOException {
         ClassLoader classLoader = getClass().getClassLoader();

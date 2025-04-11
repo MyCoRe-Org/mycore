@@ -22,15 +22,11 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Map;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.junit.Assert;
@@ -49,8 +45,6 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
 
     public static final String TEST_DIRECTORY = "MCRClassificationMappingEventHandlerTest/";
 
-    private static final Logger LOGGER = LogManager.getLogger();
-
     public MCRCategoryDAO getDAO() {
         return MCRCategoryDAOFactory.obtainInstance();
     }
@@ -62,9 +56,6 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
 
     /**
      * Tests if x-mappings and XPath-mappings are properly added into a Document.
-     * @throws IOException in case of error
-     * @throws JDOMException in case of error
-     * @throws URISyntaxException in case of error
      */
     @Test
     public void testXMapping() throws IOException, JDOMException, URISyntaxException {
@@ -123,16 +114,11 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         Assert.assertNotNull("The mapped placeholder classification should be in the MyCoReObject now!",
             expressionObject.evaluateFirst(
                 xml));
-
-        LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
     }
 
     /**
      * Tests if the XPath-mappings-fallback mechanism is working correctly and that fallbacks are
      * evaluated per classification.
-     * @throws IOException in case of error
-     * @throws JDOMException in case of error
-     * @throws URISyntaxException in case of error
      */
     @Test
     public void testXPathMappingFallback() throws IOException, JDOMException, URISyntaxException {
@@ -167,7 +153,35 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
             expressionObject.evaluateFirst(
                 xml));
 
-        LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(xml));
+    }
+
+    /**
+     * Tests that XPath-mappings with OR-condition are properly added into a Document.
+     */
+    @Test
+    public void testXPathMappingPatternORCondition() throws IOException, JDOMException, URISyntaxException {
+
+        MCRSessionMgr.getCurrentSession();
+        MCRTransactionManager.hasActiveTransactions();
+        ClassLoader classLoader = getClass().getClassLoader();
+        SAXBuilder saxBuilder = new SAXBuilder();
+
+        loadCategory("dummyClassification.xml");
+
+        Document document = saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + "testMcrObject3.xml"));
+        MCRObject mcro = new MCRObject(document);
+
+        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
+        mapper.handleObjectUpdated(null, mcro);
+        Document xml = mcro.createXML();
+
+        String expression = "//mappings[@class='MCRMetaClassification']/mapping[@classid='dummyClassification' "
+            + "and @categid='dummy-or-condition']";
+        XPathExpression<Element> expressionObject = XPathFactory.instance()
+            .compile(expression, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
+        Assert.assertNotNull("The mapped or-condition dummy classification should be in the MyCoReObject now!",
+            expressionObject.evaluateFirst(
+                xml));
     }
 
     private void loadCategory(String categoryFileName) throws URISyntaxException, JDOMException, IOException {
