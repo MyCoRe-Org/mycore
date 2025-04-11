@@ -20,7 +20,7 @@
 import {Processable} from "../model/model.ts";
 import ProcessableModal from "./ProcessableModal.vue";
 import {Util} from "../common/util.ts";
-import {ref} from "vue";
+import {useTemplateRef} from "vue";
 
 defineProps<{
   model: Processable;
@@ -30,22 +30,25 @@ function getProgress(model: Processable) {
   return `${model.progress || 0}%`;
 }
 
-function toggleModal() {
-  isModalVisible.value = !isModalVisible.value;
+const processableModal = useTemplateRef("processableModal");
+
+function showModal() {
+  if (processableModal.value) {
+    processableModal.value.show();
+  }
 }
-const isModalVisible = ref(false);
 
 </script>
 
 <template>
   <!-- row -->
-  <div class="table-content">
-    <div class="col col-name">
-      <a href="#" @click.prevent="toggleModal">(P)</a> {{ model.name }}
-    </div>
-    <div class="col col-user">{{ model.user }}</div>
-    <div class="col col-create">{{ Util.formatDate(model.createTime) }}</div>
-    <div class="col col-progress">
+  <tr >
+    <td class="col-name">
+      <a href="#" @click.prevent="showModal">(P)</a> {{ model.name }}
+    </td>
+    <td class="col-user">{{ model.user }}</td>
+    <td class="col-create">{{ Util.formatDate(model.createTime) }}</td>
+    <td class="col-progress">
       <!-- If progress is undefined -->
       <div v-if="model.progress === undefined">{{ model.status }}</div>
       <!-- Default case -->
@@ -60,12 +63,9 @@ const isModalVisible = ref(false);
         </div>
         <div class="progress-text">{{ model.progressText }}</div>
       </div>
-    </div>
-  </div>
-  <!-- modal -->
-  <transition name="modal-transition">
-    <ProcessableModal v-if="isModalVisible" :model="model" @close="toggleModal"/>
-  </transition>
+    </td>
+    <ProcessableModal ref="processableModal" :model="model" />
+  </tr>
 </template>
 
 <style scoped>

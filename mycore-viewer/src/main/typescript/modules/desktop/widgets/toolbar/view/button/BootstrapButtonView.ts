@@ -22,42 +22,42 @@ import { ButtonView } from "../../../../../base/widgets/toolbar/view/button/Butt
 export class BootstrapButtonView implements ButtonView {
 
   constructor(id: string) {
-    this._buttonElement = jQuery("<button></button>");
-    this._buttonElement.attr("data-id", id);
-    this._buttonElement.addClass("btn btn-secondary navbar-btn");
+    this._buttonElement = document.createElement("button");
+    this._buttonElement.setAttribute("data-id", id);
+    this._buttonElement.classList.add("btn", "btn-secondary", "navbar-btn");
 
-    this._buttonLabel = jQuery("<span></span>");
-    this._buttonLabel.appendTo(this._buttonElement);
+    this._buttonLabel = document.createElement("span");
+    this._buttonElement.append(this._buttonLabel);
 
-    this._icon = jQuery("<i></i>");
+    this._icon = document.createElement("i");
     this._attached = false;
     this._lastIconClass = "";
     this._lastButtonClass = null;
   }
 
-  public _buttonElement: JQuery;
-  private _icon: JQuery;
+  public _buttonElement: HTMLElement;
+  private _icon: HTMLElement;
   private _attached: boolean;
-  private _buttonLabel: JQuery;
+  private _buttonLabel: HTMLElement;
   private _lastIconClass: string;
   private _lastButtonClass: string;
 
   public updateButtonLabel(label: string): void {
-    this._buttonLabel.text(label);
+    this._buttonLabel.innerText = label;
     if (label.length > 0) {
-      this._icon.addClass("textpresent");
+      this._icon.classList.add("textpresent");
     } else {
-      this._icon.removeClass("textpresent");
+      this._icon.classList.remove("textpresent");
     }
   }
 
   public updateButtonTooltip(tooltip: string): void {
-    this._buttonElement.attr("title", tooltip);
+    this._buttonElement.setAttribute("title", tooltip);
   }
 
   public updateButtonIcon(icon: string): void {
     if (!this._attached && icon != null) {
-      this._icon.prependTo(this._buttonElement);
+      this._buttonElement.prepend(this._icon);
       this._attached = true;
     } else if (this._attached && icon == null) {
       this._icon.remove();
@@ -65,52 +65,54 @@ export class BootstrapButtonView implements ButtonView {
       return;
     }
 
-    this._icon.removeClass(`fa-${this._lastIconClass}`);
-    this._icon.removeClass(this._lastIconClass);
-    this._icon.removeClass(`icon-${this._lastIconClass}`);
+    this._icon.classList.remove(`fa-${this._lastIconClass}`);
+    if(this._lastIconClass) {
+      this._icon.classList.remove(this._lastIconClass);
+    }
+    this._icon.classList.remove(`icon-${this._lastIconClass}`);
 
-    this._icon.addClass('fas');
-    this._icon.addClass(`fa-${icon}`);
+    this._icon.classList.add('fas');
+    this._icon.classList.add(`fa-${icon}`);
 
     this._lastIconClass = icon;
   }
 
   updateButtonClass(buttonClass: string): void {
     if (this._lastButtonClass != null) {
-      this._buttonElement.removeClass("btn-" + this._lastButtonClass);
+      this._buttonElement.classList.remove(`btn-${this._lastButtonClass}`);
     }
 
-    this._buttonElement.addClass("btn-" + buttonClass);
+    this._buttonElement.classList.add(`btn-${buttonClass}`);
     this._lastButtonClass = buttonClass;
   }
 
   updateButtonActive(active: boolean): void {
-    const isActive = this._buttonElement.hasClass("active");
+    const isActive = this._buttonElement.classList.contains("active");
 
     if (active && !isActive) {
-      this._buttonElement.addClass("active");
+      this._buttonElement.classList.add("active");
     }
 
     if (!active && isActive) {
-      this._buttonElement.removeClass("active");
+      this._buttonElement.classList.remove("active");
     }
   }
 
   updateButtonDisabled(disabled: boolean): void {
-    const isDisabled = this._buttonElement.attr("disabled") == "disabled";
+    const isDisabled = this._buttonElement.getAttribute("disabled") == "disabled";
 
     if (disabled && !isDisabled) {
-      this._buttonElement.attr("disabled", "disabled");
+      this._buttonElement.setAttribute("disabled", "disabled");
     }
 
     if (!disabled && isDisabled) {
-      this._buttonElement.removeAttr("disabled");
+      this._buttonElement.removeAttribute("disabled");
     }
   }
 
 
-  public getElement(): JQuery {
-    return this._buttonElement;
+  public getElement(): HTMLElement[] {
+    return [this._buttonElement];
   }
 }
 

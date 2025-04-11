@@ -17,30 +17,30 @@
  */
 
 
-import { ViewerComponent } from "../../base/components/ViewerComponent";
-import { MyCoReViewerSettings } from "../../base/MyCoReViewerSettings";
-import { StructureModel } from "../../base/components/model/StructureModel";
-import { ToolbarTextInput } from "../../base/widgets/toolbar/model/ToolbarTextInput";
-import { MyCoReViewerSearcher } from "./model/MyCoReViewerSearcher";
-import { MyCoReMap, Rect, Utils, ViewerProperty } from "../../base/Utils";
-import { StructureImage } from "../../base/components/model/StructureImage";
-import { SearchResultCanvasPageLayer } from "../widgets/canvas/SearchResultCanvasPageLayer";
-import { AddCanvasPageLayerEvent } from "../../base/components/events/AddCanvasPageLayerEvent";
-import { MyCoReBasicToolbarModel } from "../../base/components/model/MyCoReBasicToolbarModel";
-import { LanguageModel } from "../../base/components/model/LanguageModel";
-import { WaitForEvent } from "../../base/components/events/WaitForEvent";
-import { ProvideViewerSearcherEvent } from "./events/ProvideViewerSearcherEvent";
-import { StructureModelLoadedEvent } from "../../base/components/events/StructureModelLoadedEvent";
-import { ProvideToolbarModelEvent } from "../../base/components/events/ProvideToolbarModelEvent";
-import { LanguageModelLoadedEvent } from "../../base/components/events/LanguageModelLoadedEvent";
-import { RestoreStateEvent } from "../../base/components/events/RestoreStateEvent";
-import { ShowContentEvent } from "../../base/components/events/ShowContentEvent";
-import { RedrawEvent } from "../../base/components/events/RedrawEvent";
-import { ImageSelectedEvent } from "../../base/components/events/ImageSelectedEvent";
-import { DropdownButtonPressedEvent } from "../../base/widgets/toolbar/events/DropdownButtonPressedEvent";
-import { RequestStateEvent } from "../../base/components/events/RequestStateEvent";
-import { ViewerEvent } from "../../base/widgets/events/ViewerEvent";
-import { RequestTextContentEvent } from "../../base/components/events/RequestTextContentEvent";
+import {ViewerComponent} from "../../base/components/ViewerComponent";
+import {MyCoReViewerSettings} from "../../base/MyCoReViewerSettings";
+import {StructureModel} from "../../base/components/model/StructureModel";
+import {ToolbarTextInput} from "../../base/widgets/toolbar/model/ToolbarTextInput";
+import {MyCoReViewerSearcher} from "./model/MyCoReViewerSearcher";
+import {getElementHeight, getElementOuterHeight, MyCoReMap, Rect, Utils, ViewerProperty} from "../../base/Utils";
+import {StructureImage} from "../../base/components/model/StructureImage";
+import {SearchResultCanvasPageLayer} from "../widgets/canvas/SearchResultCanvasPageLayer";
+import {AddCanvasPageLayerEvent} from "../../base/components/events/AddCanvasPageLayerEvent";
+import {MyCoReBasicToolbarModel} from "../../base/components/model/MyCoReBasicToolbarModel";
+import {LanguageModel} from "../../base/components/model/LanguageModel";
+import {WaitForEvent} from "../../base/components/events/WaitForEvent";
+import {ProvideViewerSearcherEvent} from "./events/ProvideViewerSearcherEvent";
+import {StructureModelLoadedEvent} from "../../base/components/events/StructureModelLoadedEvent";
+import {ProvideToolbarModelEvent} from "../../base/components/events/ProvideToolbarModelEvent";
+import {LanguageModelLoadedEvent} from "../../base/components/events/LanguageModelLoadedEvent";
+import {RestoreStateEvent} from "../../base/components/events/RestoreStateEvent";
+import {ShowContentEvent} from "../../base/components/events/ShowContentEvent";
+import {RedrawEvent} from "../../base/components/events/RedrawEvent";
+import {ImageSelectedEvent} from "../../base/components/events/ImageSelectedEvent";
+import {DropdownButtonPressedEvent} from "../../base/widgets/toolbar/events/DropdownButtonPressedEvent";
+import {RequestStateEvent} from "../../base/components/events/RequestStateEvent";
+import {ViewerEvent} from "../../base/widgets/events/ViewerEvent";
+import {RequestTextContentEvent} from "../../base/components/events/RequestTextContentEvent";
 
 
 export class MyCoReSearchComponent extends ViewerComponent {
@@ -49,9 +49,9 @@ export class MyCoReSearchComponent extends ViewerComponent {
     super();
   }
 
-  private _container: JQuery;
-  private _searchContainer: JQuery;
-  private _sidebarLabel = jQuery("<span>Suche</span>");
+  private _container: HTMLElement;
+  private _searchContainer: HTMLElement;
+  private _sidebarLabel = this.createSidebarLabel();
   private _model: StructureModel = null;
   private _valueToApply: string = null;
   private _containerVisible: boolean = false;
@@ -84,7 +84,7 @@ export class MyCoReSearchComponent extends ViewerComponent {
       this.trigger(new AddCanvasPageLayerEvent(this, 1, this._searchResultCanvasPageLayer));
       let searchLabel = _self._languageModel.getTranslation("sidebar.search");
       this._toolbarTextInput.placeHolder = _self._languageModel.getTranslation("search.placeHolder");
-      _self._sidebarLabel.text(searchLabel);
+      _self._sidebarLabel.innerText = searchLabel;
       _self._tbModel._searchGroup.addComponent(this._toolbarTextInput);
       if (this._valueToApply != null) {
         this._toolbarTextInput.value = this._valueToApply;
@@ -95,37 +95,46 @@ export class MyCoReSearchComponent extends ViewerComponent {
   private _tbModel: MyCoReBasicToolbarModel = null;
   private _languageModel: LanguageModel = null;
 
-  private _panel: JQuery = null;
-  private _progressbar: JQuery = null;
-  private _progressbarInner: JQuery = null;
+  private _panel: HTMLElement = null;
+  private _progressbar: HTMLElement = null;
+  private _progressbarInner: HTMLElement = null;
   private _searchTextTimeout = -1;
   private _searchAreaReady = false;
+
+  public createSidebarLabel() {
+    const sidebarLabelElement = document.createElement("span");
+    sidebarLabelElement.innerText = "Suche";
+    return sidebarLabelElement;
+  }
 
   public get container() {
     return this._container;
   }
 
   private initSearchArea() {
-    this._progressbar.parent().remove();
+    this._progressbar.parentElement.remove();
     this._progressbar.remove();
-    this._container.css({ "text-align": "left" });
+    this._container.style.textAlign = "left";
 
 
-    this._searchContainer = jQuery("<ul class='list-group textSearch'></ul>");
-    this._searchContainer.appendTo(this.container);
+    this._searchContainer = document.createElement("ul");
+    this._searchContainer.classList.add("list-group", "textSearch");
+    this.container.append(this._searchContainer);
 
     this._searchAreaReady = true;
     this._search(this._toolbarTextInput.value);
   }
 
   public init() {
-    this._container = jQuery("<div></div>");
-    this._container.css({ overflowY: "scroll", "text-align": "center" });
-    this._container.bind("iviewResize", () => {
+    this._container = document.createElement("div");
+    this._container.style.overflowY = "scroll";
+    this._container.style.textAlign = "center";
+    this._container.addEventListener("iviewResize", () => {
       this.updateContainerSize();
     });
 
-    this._panel = jQuery("<div class='card search'></div>");
+    this._panel = document.createElement("div");
+    this._panel.classList.add("card", "search");
     this._container.append(this._panel);
 
     this._initProgressbar();
@@ -164,7 +173,9 @@ export class MyCoReSearchComponent extends ViewerComponent {
       this.trigger(new ShowContentEvent(this, this._container, direction, 0, this._sidebarLabel));
     }
 
-    this._searchContainer.children().remove();
+    while (this._searchContainer.children.length > 0) {
+        this._searchContainer.children[0].remove();
+    }
 
     let textContents = [];
 
@@ -179,13 +190,15 @@ export class MyCoReSearchComponent extends ViewerComponent {
         results.arr.forEach(p => textContents.push(p));
       });
 
-      let lastClicked: JQuery = null;
+      let lastClicked: HTMLElement = null;
       searchResults.forEach((results) => {
         if (results.arr.length <= 0) {
           return;
         }
-        let result = jQuery("<li class='list-group-item'></li>");
-        let link = jQuery("<a></a>").append(results.context.clone());
+        let result = document.createElement("li");
+        result.classList.add("list-group-item");
+        let link = document.createElement("a");
+        link.append(results.context.cloneNode(true));
         result.append(link);
         this._searchContainer.append(result);
         let altoTextContent = results.arr[0];
@@ -194,13 +207,13 @@ export class MyCoReSearchComponent extends ViewerComponent {
           return;
         }
         let image = this._imageHrefImageMap.get(altoTextContent.pageHref);
-        link.click(() => {
+        link.addEventListener('click', () => {
           if (lastClicked != null) {
-            lastClicked.removeClass("active");
+            lastClicked.classList.remove("active");
             this._searchResultCanvasPageLayer.clearSelected();
           }
           lastClicked = result;
-          result.addClass("active");
+          result.classList.add("active");
           results.arr.forEach(context => {
             let areaRect: Rect = Rect.fromXYWH(context.pos.x, context.pos.y, context.size.width, context.size.height);
             this._searchResultCanvasPageLayer.select(context.pageHref, areaRect);
@@ -208,7 +221,9 @@ export class MyCoReSearchComponent extends ViewerComponent {
           this.trigger(new ImageSelectedEvent(this, image));
           this.trigger(new RedrawEvent(this));
         });
-        let page = jQuery("<span class='childLabel'>" + (image.orderLabel || image.order) + "</span>");
+        let page = document.createElement("span");
+        page.classList.add("childLabel")
+        page.innerText = (image.orderLabel || image.order) + "";
         result.append(page);
       });
     }, () => {
@@ -227,7 +242,7 @@ export class MyCoReSearchComponent extends ViewerComponent {
   }
 
   private updateContainerSize() {
-    this._container.css({ "height": (this._container.parent().height() - this._sidebarLabel.parent().outerHeight()) + "px" });
+    this._container.style.height = (getElementHeight(this._container.parentElement) - getElementOuterHeight(this._sidebarLabel.parentElement)) + "px";
   }
 
   public get handlesEvents(): string[] {
@@ -354,19 +369,21 @@ export class MyCoReSearchComponent extends ViewerComponent {
   }
 
   private _updateLabel(current: number, of: number) {
-    this._progressbarInner.attr({ "aria-valuenow": current, "aria-valuemin": 0, "aria-valuemax": of });
-    this._progressbarInner.css({ width: ((current / of) * 100) + "%" });
+    this._progressbarInner.setAttribute("aria-valuenow", current + "");
+    this._progressbarInner.setAttribute("aria-valuemin", "0");
+    this._progressbarInner.setAttribute("aria-valuemax", of + "");
+    this._progressbarInner.style.width = ((current / of) * 100) + "%";
   }
 
   private _initProgressbar() {
-    this._progressbar = jQuery("<div></div>");
-    this._progressbar.addClass("progress");
+    this._progressbar = document.createElement("div");
+    this._progressbar.classList.add("progress");
 
-    this._progressbarInner = jQuery("<div></div>");
-    this._progressbarInner.addClass("progress-bar progress-bar-info");
-    this._progressbarInner.appendTo(this._progressbar);
+    this._progressbarInner = document.createElement("div");
+    this._progressbarInner.classList.add("progress-bar", "progress-bar-info");
+    this._progressbar.append(this._progressbarInner);
 
-    this._progressbarInner.attr({ role: "progressbar" });
+    this._progressbarInner.setAttribute("role", "progressbar");
   }
 
 }

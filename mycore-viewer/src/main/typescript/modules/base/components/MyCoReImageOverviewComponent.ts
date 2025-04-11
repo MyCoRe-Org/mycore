@@ -49,17 +49,23 @@ export class MyCoReImageOverviewComponent extends ViewerComponent implements Thu
   }
 
   private _enabled: boolean;
-  private _container: JQuery;
+  private _container: HTMLElement;
   private _overview: IviewThumbnailOverview;
   private _overviewSettings: DefaultThumbnailOverviewSettings;
-  private _sidebarLabel = jQuery("<span>Bildübersicht</span>");
+  private _sidebarLabel = this.createSidebarLabel();
   private _currentImageId: string = null;
   private _idMetsImageMap: MyCoReMap<string, StructureImage>;
-  private _spinner: JQuery = null;
+  private _spinner: HTMLElement = null;
+
+  private createSidebarLabel() {
+    const sidebar = document.createElement("span")
+    sidebar.innerText = "Bildübersicht";
+    return sidebar;
+  }
 
   public init() {
     if (this._enabled) {
-      this._container = jQuery("<div></div>");
+      this._container = document.createElement("div");
       this._idMetsImageMap = new MyCoReMap<string, StructureImage>();
       this.trigger(new WaitForEvent(this, StructureModelLoadedEvent.TYPE));
       this.trigger(new WaitForEvent(this, LanguageModelLoadedEvent.TYPE));
@@ -67,9 +73,10 @@ export class MyCoReImageOverviewComponent extends ViewerComponent implements Thu
       const showImageOverViewOnStart = Utils.getVar<string>(this._settings, "leftShowOnStart", "chapterOverview")
         == "imageOverview";
       if (this._settings.mobile == false && showImageOverViewOnStart) {
-        this._spinner = jQuery(`<div class='spinner'><img src='${this._settings.webApplicationBaseURL}` +
-          `/modules/iview2/img/spinner.gif'></div>`);
-        this._container.append(this._spinner);
+        this._spinner = document.createElement("div");
+        this._spinner.className = "spinner";
+        this._spinner.innerHTML = "<img src='" + this._settings.webApplicationBaseURL + "/modules/iview2/img/spinner.gif'>";
+        this._container.appendChild(this._spinner);
 
         let direction = (this._settings.mobile)
           ? ShowContentEvent.DIRECTION_CENTER : ShowContentEvent.DIRECTION_WEST;
@@ -129,7 +136,7 @@ export class MyCoReImageOverviewComponent extends ViewerComponent implements Thu
       this._overview.setThumbnailSelected(startImage);
       this._currentImageId = startImage;
       if (this._spinner != null) {
-        this._spinner.detach();
+        this._spinner.remove();
       }
       this.trigger(new ComponentInitializedEvent(this));
     }
@@ -145,7 +152,7 @@ export class MyCoReImageOverviewComponent extends ViewerComponent implements Thu
 
     if (e.type == LanguageModelLoadedEvent.TYPE) {
       const lmle = <LanguageModelLoadedEvent>e;
-      this._sidebarLabel.text(lmle.languageModel.getTranslation("sidebar.imageOverview"));
+      this._sidebarLabel.innerText = lmle.languageModel.getTranslation("sidebar.imageOverview");
     }
 
     return;
@@ -168,8 +175,9 @@ export class MyCoReImageOverviewComponent extends ViewerComponent implements Thu
   }
 
 
-  public addedThumbnail(id: string, element: JQuery): void {
-    jQuery(element).bind("click", () => {
+  public addedThumbnail(id: string, element: HTMLElement): void {
+
+    element.addEventListener("click", () => {
       this.trigger(new ImageSelectedEvent(this, this._idMetsImageMap.get(id)));
     });
   }

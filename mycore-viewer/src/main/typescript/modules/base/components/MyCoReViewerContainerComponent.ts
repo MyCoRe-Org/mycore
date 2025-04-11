@@ -31,21 +31,19 @@ import { ImageSelectedEvent } from "./events/ImageSelectedEvent";
 
 export class MyCoReViewerContainerComponent extends ViewerComponent {
 
-  constructor(private _settings: MyCoReViewerSettings, private _container: JQuery, private _contentContainer = jQuery("<div></div>")) {
+  constructor(private _settings: MyCoReViewerSettings, private _container: HTMLElement, private _contentContainer = document.createElement("div")) {
     super();
   }
 
   public init() {
     this._container.append(this._contentContainer);
 
-    this._container.css({ "overflow": "hidden" });
+    this._container.style.overflow = "hidden";
 
-    jQuery(this._contentContainer).css({
-      "left": "0px",
-      "bottom": "0px",
-      "right": "0px",
-      "position": "absolute"
-    });
+    this._contentContainer.style.left = "0px";
+    this._contentContainer.style.bottom = "0px";
+    this._contentContainer.style.right = "0px";
+    this._contentContainer.style.position = "absolute";
 
     let containerDescriptions: ContainerDescription[] = [];
 
@@ -63,29 +61,38 @@ export class MyCoReViewerContainerComponent extends ViewerComponent {
     if (!this._settings.mobile) {
       this._sidebar = this._layout.getContainer(MyCoReViewerContainerComponent.SIDEBAR_DIRECTION);
       this._informationBar = this._layout.getContainer(MyCoReViewerContainerComponent.INFORMATION_BAR_DIRECTION);
-      this._sidebar.addClass("card sidebar");
+      this._sidebar.classList.add("card", "sidebar");
 
       this._informationBar = this._layout.getContainer(MyCoReViewerContainerComponent.INFORMATION_BAR_DIRECTION);
-      this._layout.getContainer(ViewerBorderLayout.DIRECTION_EAST).addClass("card sidebar");
-      this._container.bind("iviewResize", () => {
+      this._layout.getContainer(ViewerBorderLayout.DIRECTION_EAST).classList.add("card", "sidebar");
+      this._container.addEventListener("iviewResize", () => {
         this.correctToToolbarSize();
       });
     }
   }
 
   private correctToToolbarSize() {
-    const toolbar = this._container.parent().find(".navbar.navbar-light");
-    const heightOfToolbar = toolbar.outerHeight(false);
-    toolbar.siblings().css({ "top": heightOfToolbar + "px" });
+    const toolbar = this._container.querySelector(".navbar.navbar-light") as HTMLElement;
+    if(toolbar==null){
+        return;
+    }
+    const heightOfToolbar = toolbar.offsetHeight;
+    const elements = Array.prototype.filter.call(
+        toolbar.parentNode.children,
+        (child) => child !== toolbar
+    );
+    elements.forEach((element: HTMLElement) => {
+      element.style.top = heightOfToolbar + "px";
+    });
   }
 
   private static SIDEBAR_DIRECTION = ViewerBorderLayout.DIRECTION_WEST;
   private static CONTENT_DIRECTION = ViewerBorderLayout.DIRECTION_CENTER;
   private static INFORMATION_BAR_DIRECTION = ViewerBorderLayout.DIRECTION_SOUTH;
 
-  private _sidebar: JQuery;
-  private _content: JQuery;
-  private _informationBar: JQuery;
+  private _sidebar: HTMLElement;
+  private _content: HTMLElement;
+  private _informationBar: HTMLElement;
   private _layout: ViewerBorderLayout;
   private _lastSizeMap = new MyCoReMap<number, number>();
 
@@ -100,25 +107,32 @@ export class MyCoReViewerContainerComponent extends ViewerComponent {
       this._clearOldContent(container);
 
 
-      container.append(sce.content);
+      if(sce.content != null) {
+        if(sce.content instanceof Array) {
+            for (let i = 0; i < sce.content.length; i++) {
+                container.append(sce.content[i]);
+            }
+        } else {
+          container.append(sce.content);
+        }
+      }
 
 
       if (sce.text != null && !this._settings.mobile) {
-        const header = jQuery("<div></div>");
-        header.addClass("card-header");
+        const header = document.createElement("div");
+        header.classList.add("card-header");
 
-        const closeButton = jQuery("<button></button>");
-        closeButton.attr("type", "button");
-        closeButton.addClass("close");
+        const closeButton = document.createElement("button");
+        closeButton.setAttribute("type", "button");
+        closeButton.classList.add("btn", "btn-close", "float-end");
+        closeButton.setAttribute("aria-label", "Close");
 
-        const inSpan = jQuery("<span aria-hidden=\"true\">&times;</span><span class=\"sr-only\">Close</span>")
-        closeButton.append(inSpan);
         header.prepend(sce.text);
         header.append(closeButton);
 
         container.prepend(header);
 
-        closeButton.click(() => {
+        closeButton.addEventListener("click", () => {
           sce.component = this;
           sce.size = 0;
           this.trigger(sce);
@@ -129,16 +143,16 @@ export class MyCoReViewerContainerComponent extends ViewerComponent {
         const containerDescription = this._layout.getContainerDescription(sce.containerDirection);
         if (sce.size != -1) {
           if (sce.size == 0) {
-            container.css({ display: "none" });
+            container.style.display = "none";
             this._lastSizeMap.set(containerDescription.direction, containerDescription.size);
             containerDescription.size = 0;
           } else {
-            container.css({ display: "block" });
+            container.style.display = "block";
             containerDescription.size = sce.size;
           }
 
         } else {
-          container.css({ display: "block" });
+          container.style.display = "block";
           if (containerDescription.size == 0 && this._lastSizeMap.has(containerDescription.direction)) {
             containerDescription.size = this._lastSizeMap.get(containerDescription.direction);
           } else if (containerDescription.size > 0) {
@@ -187,8 +201,15 @@ export class MyCoReViewerContainerComponent extends ViewerComponent {
     this._layout.updateSizes();
   }
 
-  private _clearOldContent(container: JQuery) {
-    container.children().not(".resizer").detach();
+  private _clearOldContent(container: HTMLElement) {
+    for (let i = 0; i < container.children.length; i++) {
+      const child = container.children[i];
+        if (child.classList.contains("resizer")) {
+            continue;
+        }
+
+        container.removeChild(child);
+    }
   }
 
 

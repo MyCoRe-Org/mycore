@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { MyCoReMap, Position2D } from "../../Utils";
+import {getElementHeight, getElementWidth, MyCoReMap, Position2D} from "../../Utils";
 
 /**
  * Border Layout designed for Desktop.
@@ -32,13 +32,13 @@ export class ViewerBorderLayout {
 
   /**
    * Creates a new Border Layout.
-   * @param _parent the Container in wich the layout will be applyed.
+   * @param _parent the Container in wich the layout will be applied.
    * @param _horizontalStronger if true the East and West container get the full height
    * @param descriptions see ContainerDescription
    */
-  constructor(private _parent: JQuery, private _horizontalStronger: boolean, descriptions: ContainerDescription[]) {
+  constructor(private _parent: HTMLElement, private _horizontalStronger: boolean, descriptions: ContainerDescription[]) {
 
-    this._containerMap = new MyCoReMap<number, JQuery>();
+    this._containerMap = new MyCoReMap<number, HTMLElement>();
     this._descriptionMap = new MyCoReMap<number, ContainerDescription>();
 
     for (let i in descriptions) {
@@ -60,28 +60,26 @@ export class ViewerBorderLayout {
 
 
   private _initCenter() {
-    const centerContainerDiv = jQuery("<div></div>");
-    centerContainerDiv.addClass(this.getDirectionDescription(ViewerBorderLayout.DIRECTION_CENTER));
-    const cssDescription = this._updateCenterCss();
+    const centerContainerDiv = document.createElement("div");
+    centerContainerDiv.classList.add(this.getDirectionString(ViewerBorderLayout.DIRECTION_CENTER));
+    this._updateCenterCss(centerContainerDiv.style);
     this._parent.append(centerContainerDiv);
-    centerContainerDiv.css(cssDescription);
     this._containerMap.set(ViewerBorderLayout.DIRECTION_CENTER, centerContainerDiv);
   }
 
-  private _updateCenterCss(): any {
-    const cssDescription = {} as any;
-    cssDescription.position = "absolute";
-    cssDescription.left = this.getContainerSize(ViewerBorderLayout.DIRECTION_WEST) + "px";
-    cssDescription.top = this.getContainerSize(ViewerBorderLayout.DIRECTION_NORTH) + "px";
-    cssDescription.bottom = this.getContainerSize(ViewerBorderLayout.DIRECTION_SOUTH) + "px";
-    cssDescription.right = this.getContainerSize(ViewerBorderLayout.DIRECTION_EAST) + "px";
-    return cssDescription;
+  private _updateCenterCss(style:CSSStyleDeclaration) {
+    style.position = "absolute";
+    style.left = this.getContainerSize(ViewerBorderLayout.DIRECTION_WEST) + "px";
+    style.top = this.getContainerSize(ViewerBorderLayout.DIRECTION_NORTH) + "px";
+    style.bottom = this.getContainerSize(ViewerBorderLayout.DIRECTION_SOUTH) + "px";
+    style.right = this.getContainerSize(ViewerBorderLayout.DIRECTION_EAST) + "px";
   }
 
   private _initContainer(description: ContainerDescription) {
-    const containerDiv = jQuery("<div></div>");
+    const containerDiv = document.createElement("div");
 
-    containerDiv.addClass(this.getDirectionDescription(description.direction));
+    const direction = this.getDirectionString(description.direction);
+    containerDiv.classList.add(direction);
 
     if (typeof description.resizeable == "undefined") {
       description.resizeable = false;
@@ -92,66 +90,60 @@ export class ViewerBorderLayout {
     }
 
     this._correctDescription(description);
-    const cssDescription = this._updateCssDescription(description);
+    this._updateCssDescription(description,containerDiv.style);
 
-    containerDiv.css(cssDescription);
     this._parent.append(containerDiv);
     this._containerMap.set(description.direction, containerDiv);
   }
 
   private _correctDescription(description: ContainerDescription) {
     if ("minSize" in description && !isNaN(description.minSize)) {
-      const minimumSize = description.minSize;
-
       description.size = Math.max(description.minSize, description.size);
     }
   }
 
-  private _updateCssDescription(description: ContainerDescription): any {
-    const cssDescription = {} as any;
-    cssDescription.position = "absolute";
+  private _updateCssDescription(description: ContainerDescription, style: CSSStyleDeclaration) {
+    style.position = "absolute";
 
-    cssDescription.right = "0px";
-    cssDescription.top = "0px";
-    cssDescription.bottom = "0px";
-    cssDescription.left = "0px";
-    cssDescription.display = description.size !== 0 ? "block" : "none";
+    style.right = "0px";
+    style.top = "0px";
+    style.bottom = "0px";
+    style.left = "0px";
+    style.display = description.size !== 0 ? "block" : "none";
 
     switch (description.direction) {
       case ViewerBorderLayout.DIRECTION_EAST:
-        delete cssDescription.left;
+        style.left = "";
         break;
       case ViewerBorderLayout.DIRECTION_WEST:
-        delete cssDescription.right;
+        style.right = "";
         break;
       case ViewerBorderLayout.DIRECTION_SOUTH:
-        delete cssDescription.top;
+        style.top = "";
         break;
       case ViewerBorderLayout.DIRECTION_NORTH:
-        delete cssDescription.bottom;
+        style.bottom = "";
         break;
     }
 
     if (description.direction == ViewerBorderLayout.DIRECTION_NORTH || description.direction == ViewerBorderLayout.DIRECTION_SOUTH) {
       if (this.hasContainer(ViewerBorderLayout.DIRECTION_WEST) && this.horizontalStronger) {
-        cssDescription.left = this.getContainerSizeDescription(ViewerBorderLayout.DIRECTION_WEST) + "px";
+        style.left = this.getContainerSizeDescription(ViewerBorderLayout.DIRECTION_WEST) + "px";
       }
       if (this.hasContainer(ViewerBorderLayout.DIRECTION_EAST) && this.horizontalStronger) {
-        cssDescription.right = this.getContainerSizeDescription(ViewerBorderLayout.DIRECTION_EAST) + "px";
+        style.right = this.getContainerSizeDescription(ViewerBorderLayout.DIRECTION_EAST) + "px";
       }
-      cssDescription.height = description.size + "px";
+      style.height = description.size + "px";
     } else {
       if (this.hasContainer(ViewerBorderLayout.DIRECTION_NORTH) && !this.horizontalStronger) {
-        cssDescription.top = this.getContainerSizeDescription(ViewerBorderLayout.DIRECTION_NORTH) + "px";
+        style.top = this.getContainerSizeDescription(ViewerBorderLayout.DIRECTION_NORTH) + "px";
       }
       if (this.hasContainer(ViewerBorderLayout.DIRECTION_SOUTH) && !this.horizontalStronger) {
-        cssDescription.bottom = this.getContainerSizeDescription(ViewerBorderLayout.DIRECTION_SOUTH) + "px";
+        style.bottom = this.getContainerSizeDescription(ViewerBorderLayout.DIRECTION_SOUTH) + "px";
       }
-      cssDescription.width = description.size + "px";
+      style.width = description.size + "px";
     }
 
-
-    return cssDescription;
   }
 
   public updateSizes() {
@@ -159,24 +151,32 @@ export class ViewerBorderLayout {
     for (const description of descriptions) {
       const container = this._containerMap.get(description.direction);
       this._correctDescription(description);
-      container.css(this._updateCssDescription(description));
-      container.delay(10).children().trigger("iviewResize");
+      this._updateCssDescription(description, container.style);
+      window.setTimeout(() => {
+        Array.from(container.children).forEach(child => {
+          child.dispatchEvent(new Event("iviewResize"));
+        });
+      }, 10);
     }
 
     const container = this._containerMap.get(ViewerBorderLayout.DIRECTION_CENTER);
-    container.css(this._updateCenterCss());
-    container.delay(10).children().trigger("iviewResize")
+    this._updateCenterCss(container.style);
+    window.setTimeout(() => {
+      Array.from(container.children).forEach(child => {
+        child.dispatchEvent(new Event("iviewResize"));
+      });
+    }, 10);
   }
 
-  private _initContainerResizeable(containerDiv: JQuery, description: ContainerDescription) {
-    const resizerElement = jQuery("<span></span>");
+  private _initContainerResizeable(containerDiv: HTMLElement, description: ContainerDescription) {
+    const resizerElement = document.createElement("span");
 
-    resizerElement.addClass("resizer");
-    resizerElement.bind("mousedown", (e: JQuery.MouseDownEvent) => {
+    resizerElement.classList.add("resizer");
+    resizerElement.addEventListener("mousedown", (e: MouseEvent) => {
       const startPos = new Position2D(e.clientX, e.clientY);
       const startSize = description.size;
 
-      const MOUSE_MOVE = (e: JQuery.MouseEventBase) => {
+      const MOUSE_MOVE = (e: MouseEvent) => {
         const curPos = new Position2D(e.clientX, e.clientY);
 
         description.size = this._getNewSize(startPos, curPos, startSize, description.direction);
@@ -184,58 +184,55 @@ export class ViewerBorderLayout {
         this.updateSizes();
       };
 
-      const MOUSE_UP = (e: JQuery.MouseEventBase) => {
+      const MOUSE_UP = (e: MouseEvent) => {
         const curPos = new Position2D(e.clientX, e.clientY);
-        this._parent.unbind("mousemove");
-        this._parent.unbind("mouseup");
+        this._parent.removeEventListener("mousemove", MOUSE_MOVE);
+        this._parent.removeEventListener("mouseup", MOUSE_UP);
         // trigger resize in this and center
       };
 
       e.preventDefault();
-      jQuery(this._parent).bind("mousemove", MOUSE_MOVE);
-      jQuery(this._parent).bind("mouseup", MOUSE_UP);
+      this._parent.addEventListener("mousemove", MOUSE_MOVE);
+      this._parent.addEventListener("mouseup", MOUSE_UP);
     });
 
 
-    const cssElem = {} as any;
-    cssElem.position = "absolute";
+    const cssStyleList = resizerElement.style;
+    cssStyleList.position = "absolute";
     const resizeWidth = 6;
 
     if (description.direction == ViewerBorderLayout.DIRECTION_NORTH || ViewerBorderLayout.DIRECTION_SOUTH == description.direction) {
-      cssElem.cursor = "row-resize";
-      cssElem.left = "0px";
-      cssElem.height = resizeWidth + "px";
-      cssElem.right = "0px";
+      cssStyleList.cursor = "row-resize";
+      cssStyleList.left = "0px";
+      cssStyleList.height = resizeWidth + "px";
+      cssStyleList.right = "0px";
       if (description.direction == ViewerBorderLayout.DIRECTION_NORTH) {
-        cssElem.bottom = -(resizeWidth / 2) + "px";
+        cssStyleList.bottom = -(resizeWidth / 2) + "px";
       } else {
-        cssElem.top = -(resizeWidth / 2) + "px";
+        cssStyleList.top = -(resizeWidth / 2) + "px";
       }
     }
 
     if (description.direction == ViewerBorderLayout.DIRECTION_WEST || ViewerBorderLayout.DIRECTION_EAST == description.direction) {
-      cssElem.cursor = "col-resize";
-      cssElem.top = "0px";
-      cssElem.bottom = "0px";
-      cssElem.width = resizeWidth + "px";
+      cssStyleList.cursor = "col-resize";
+      cssStyleList.top = "0px";
+      cssStyleList.bottom = "0px";
+      cssStyleList.width = resizeWidth + "px";
       if (description.direction == ViewerBorderLayout.DIRECTION_WEST) {
-        cssElem.right = -(resizeWidth / 2) + "px";
+        cssStyleList.right = -(resizeWidth / 2) + "px";
       } else {
-        cssElem.left = -(resizeWidth / 2) + "px";
+        cssStyleList.left = -(resizeWidth / 2) + "px";
       }
     }
 
-
-    resizerElement.css(cssElem);
-    resizerElement.appendTo(containerDiv);
-
+    containerDiv.append(resizerElement);
   }
 
   private _descriptionMap: MyCoReMap<number, ContainerDescription>;
-  private _containerMap: MyCoReMap<number, JQuery>;
+  private _containerMap: MyCoReMap<number, HTMLElement>;
 
   private _getNewSize(startPosition: Position2D, currentPosition: Position2D, startSize: number, direction: number): number {
-    let newSize;
+    let newSize: number;
     if (direction == ViewerBorderLayout.DIRECTION_EAST || direction == ViewerBorderLayout.DIRECTION_WEST) {
       const diff = startPosition.x - currentPosition.x;
       if (direction == ViewerBorderLayout.DIRECTION_EAST) {
@@ -285,16 +282,13 @@ export class ViewerBorderLayout {
 
   public getContainerSize(direction: number) {
     if (this.hasContainer(direction)) {
-      const container: JQuery = this.getContainer(direction);
+      const container: HTMLElement = this.getContainer(direction);
       if (direction == ViewerBorderLayout.DIRECTION_EAST || direction == ViewerBorderLayout.DIRECTION_WEST) {
-        return container.width();
-
+        return getElementWidth(container);
       } else if (direction == ViewerBorderLayout.DIRECTION_NORTH || direction == ViewerBorderLayout.DIRECTION_SOUTH) {
-        return container.height();
-
+        return getElementHeight(container);
       } else {
-        // its center..
-        return container.width();
+        return getElementWidth(container);
       }
 
     } else {
@@ -302,7 +296,7 @@ export class ViewerBorderLayout {
     }
   }
 
-  private getDirectionDescription(direction: number): string {
+  private getDirectionString(direction: number): string {
     return ["center", "east", "south", "west", "north"][direction];
   }
 }

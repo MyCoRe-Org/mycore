@@ -29,7 +29,7 @@ import { ViewerEvent } from "../../base/widgets/events/ViewerEvent";
 
 export class MyCoReIIIFComponent extends MyCoReStructFileComponent {
 
-  constructor(protected settings: IIIFSettings, protected container: JQuery) {
+  constructor(protected settings: IIIFSettings, protected container: HTMLElement) {
     super(settings, container);
   }
 

@@ -18,68 +18,75 @@
 
 
 import { LanguageModel } from "../../components/model/LanguageModel";
+import type { Modal } from "bootstrap";
 
 export class ViewerModalWindow {
   constructor(private _mobile: boolean, _title: string, parent: HTMLElement = document.body) {
-    let that = this;
 
-    this._wrapper = jQuery("<div></div>");
-    this._wrapper.addClass("modal fade bs-modal-sm");
-    this._wrapper.attr("tabindex", "-1");
-    this._wrapper.attr("role", "dialog");
-    this._wrapper.attr("aria-labeleby", "permalinkLabel");
-    this._wrapper.attr("aria-hidden", "true");
-    this._wrapper.on("click", function(e) {
-      if (e.target == that._wrapper[0]) {
-        that.hide();
+    this._wrapper = document.createElement("div");
+    this._wrapper.classList.add("modal", "fade", "bs-modal-sm");
+    this._wrapper.tabIndex= -1;
+    this._wrapper.setAttribute("role", "dialog");
+    this._wrapper.setAttribute("aria-labeleby", "permalinkLabel");
+    this._wrapper.setAttribute("aria-hidden", "true");
+    this._wrapper.addEventListener("click", (e) => {
+      if (e.target == this._wrapper[0]) {
+        this.hide();
       }
     });
 
-    this._box = jQuery("<div></div>");
-    this._box.addClass("modal-dialog modal-sm");
-    this._box.appendTo(this._wrapper);
+    this._box = document.createElement("div");
+    this._box.classList.add("modal-dialog", "modal-sm");
+    this.wrapper.append(this._box);
 
-    this._content = jQuery("<div></div>");
-    this._content.addClass("modal-content");
-    this._content.appendTo(this._box);
+    this._content = document.createElement("div");
+    this._content.classList.add("modal-content");
+    this._box.append(this._content);
 
-    this._header = jQuery("<div><h4 class='modal-title' data-i18n='" + _title + "'>" + _title + "</h4></div>");
-    this._header.addClass("modal-header");
-    this._header.appendTo(this._content);
+    this._header = document.createElement("div");
+    this._header.classList.add("modal-header");
+    this._content.append(this._header);
 
-    this._body = jQuery("<div></div>");
-    this._body.addClass("modal-body");
-    this._body.appendTo(this._content);
 
-    this._footer = jQuery("<div></div>");
-    this._footer.addClass("modal-footer");
-    this._footer.appendTo(this._content);
+    this._headerTitle = document.createElement("h4");
+    this._headerTitle.classList.add("modal-title");
+    this._headerTitle.setAttribute("data-i18n", _title);
+    this._headerTitle.textContent = _title;
+    this._header.append(this._headerTitle);
 
-    this._close = jQuery("<button data-i18n='modal.close'>Close</button>");
-    this._close.attr("type", "button");
-    this._close.addClass("btn btn-secondary");
-    this._close.appendTo(this._footer);
+    this._body = document.createElement("div");
+    this._body.classList.add("modal-body");
+    this._content.append(this._body);
 
-    this._close.click(() => {
-      that.hide();
+    this._footer = document.createElement("div");
+    this._footer.classList.add("modal-footer");
+    this._content.append(this._footer);
+
+    this._close = document.createElement("button");
+    this._close.setAttribute("type", "button");
+    this._close.classList.add("btn", "btn-secondary");
+    this._close.setAttribute("data-i18n", "modal.close");
+    this._close.textContent = "Close";
+    this._footer.append(this._close);
+
+    this._close.addEventListener("click", () => {
+      this.hide();
     });
 
-    if (!this._mobile) {
-      (<any>this._wrapper).modal({ show: false });
-    } else {
-      this.hide();
-    }
+    parent.prepend(this._wrapper);
 
-    jQuery(parent).prepend(this._wrapper);
+    this._modal = new (window["bootstrap"]).Modal(this._wrapper) as Modal;
   }
 
-  private _wrapper: JQuery;
-  private _box: JQuery;
-  private _content: JQuery;
-  private _header: JQuery;
-  private _body: JQuery;
-  private _footer: JQuery;
-  private _close: JQuery;
+  private _modal: Modal;
+  private _wrapper: HTMLElement;
+  private _box: HTMLElement;
+  private _content: HTMLElement;
+  private _header: HTMLElement;
+  private _headerTitle: HTMLElement;
+  private _body: HTMLElement;
+  private _footer: HTMLElement;
+  private _close: HTMLElement;
 
   public get box() {
     return this._box;
@@ -97,6 +104,10 @@ export class ViewerModalWindow {
     return this._header;
   }
 
+  public get modalHeaderTitle() {
+    return this._headerTitle;
+  }
+
   public get modalBody() {
     return this._body;
   }
@@ -106,19 +117,11 @@ export class ViewerModalWindow {
   }
 
   public show(): void {
-    if (!this._mobile) {
-      (<any>this._wrapper).modal("show");
-    } else {
-      this._wrapper.show();
-    }
+    this._modal.show();
   }
 
   public hide(): void {
-    if (!this._mobile) {
-      (<any>this._wrapper).modal("hide");
-    } else {
-      this._wrapper.hide();
-    }
+   this._modal.hide();
   }
 
   public get closeButton() {
@@ -126,15 +129,15 @@ export class ViewerModalWindow {
   }
 
   public set closeLabel(label: string) {
-    this._close.text(label);
+    this._close.innerText = label;
   }
 
   public get title() {
-    return <string>this._header.find(".modal-title").text();
+    return this._headerTitle.innerText;
   }
 
   public set title(title: string) {
-    this._header.find(".modal-title").text(title);
+    this._headerTitle.innerText = title;
   }
 
   public updateI18n(languageModel: LanguageModel): ViewerModalWindow {

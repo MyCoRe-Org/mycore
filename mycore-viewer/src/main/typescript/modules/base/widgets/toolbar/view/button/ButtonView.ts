@@ -30,7 +30,7 @@ export interface ButtonView {
 
   updateButtonDisabled(disabled: boolean): void;
 
-  getElement(): JQuery;
+  getElement(): HTMLElement[];
 }
 
 

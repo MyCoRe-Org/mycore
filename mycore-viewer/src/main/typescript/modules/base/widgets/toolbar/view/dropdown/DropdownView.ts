@@ -23,5 +23,5 @@ export interface DropdownView extends ButtonView {
     id: string; label: string; icon: string
   }>): void;
 
-  getChildElement(id: string): JQuery;
+  getChildElement(id: string): HTMLElement[];
 }

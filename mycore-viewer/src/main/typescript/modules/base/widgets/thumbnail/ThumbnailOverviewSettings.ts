@@ -29,7 +29,7 @@ export interface ThumbnailOverviewSettings {
   /**
    * Container needs a size(width/height).
    */
-  container: JQuery;
+  container: HTMLElement;
 
   /**
    * Maximal Size a Thumbnail should displayed. (this should include the gaps between thumbnails)
@@ -41,9 +41,9 @@ export interface ThumbnailOverviewSettings {
 
 export class DefaultThumbnailOverviewSettings implements ThumbnailOverviewSettings {
   constructor(private _thumbnails: Array<ThumbnailOverviewThumbnail>,
-    private _container: JQuery,
+    private _container: HTMLElement,
     private _inputHandler: ThumbnailOverviewInputHandler = {
-      addedThumbnail: function(id: string, element: JQuery) {
+      addedThumbnail: function(id: string, element: HTMLElement) {
       }
     },
     private _maxThumbnailSize = new Size2D(255, 255)) {

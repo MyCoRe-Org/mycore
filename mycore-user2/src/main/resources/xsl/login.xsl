@@ -66,7 +66,7 @@
             <button class="btn btn-secondary" type="button" onClick="self.location.href='{../returnURL}'" tabindex="999">
               <xsl:value-of select="i18n:translate('component.user2.button.cancel')" />
             </button>
-            <button class="btn btn-primary ml-3" type="submit" name="LoginSubmit">
+            <button class="btn btn-primary ms-3" type="submit" name="LoginSubmit">
               <xsl:value-of select="i18n:translate('component.user2.button.login')" />
             </button>
           </xsl:when>
@@ -74,7 +74,7 @@
             <button class="btn btn-primary" type="submit" name="LoginSubmit">
               <xsl:value-of select="i18n:translate('component.user2.button.login')" />
             </button>
-            <button class="btn btn-secondary ml-3" type="button" onClick="self.location.href='{../returnURL}'" tabindex="999">
+            <button class="btn btn-secondary ms-3" type="button" onClick="self.location.href='{../returnURL}'" tabindex="999">
               <xsl:value-of select="i18n:translate('component.user2.button.cancel')" />
             </button>
           </xsl:otherwise>
@@ -134,7 +134,7 @@
 
   <xsl:template match="input" mode="controlGroupClass">
     <xsl:attribute name="class">
-      <xsl:value-of select="'form-group'" />
+      <xsl:value-of select="'mcr-form-group mb-3'" />
       <xsl:if test="@loginFailed='true'">
         <xsl:value-of select="' mcr-invalid'" />
       </xsl:if>

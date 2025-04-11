@@ -21,6 +21,9 @@
 // Props
 import {Collection} from "../model/model.ts";
 import {Util} from "../common/util.ts";
+import {onMounted, useTemplateRef} from "vue";
+import type {Modal} from "bootstrap";
+declare const bootstrap: { Modal: typeof Modal };
 
 defineProps<{
   model: Collection;
@@ -28,28 +31,57 @@ defineProps<{
 
 const emit = defineEmits(['close']);
 
+const modal = useTemplateRef('modal');
+let bootStrapModel: Modal;
+
+onMounted(() => {
+  if (modal.value) {
+    bootStrapModel = new bootstrap.Modal(modal.value);
+  }
+});
+
+function show() {
+  bootStrapModel.show();
+}
+
+defineExpose({
+  show
+});
+
 </script>
 
 <template>
-  <div class="modal-backdrop" @click.self="emit('close')">
-    <div class="processing-modal">
-      <div class="processing-modal-header">
-        <h4 class="modal-title">Properties</h4>
-        <button @click="emit('close')">&times;</button>
-      </div>
-      <div class="processing-modal-body">
-        <div class="card">
-          <h5>Properties</h5>
-          <div class="card-content">
-            <div v-if="model.propertyKeys.length === 0">No properties set</div>
-            <div v-for="key in model.propertyKeys" :key="key" class="property-row">
-              <span class="propertyKey">{{ key }}:</span>
-              <span class="propertyValue" v-html="Util.useJsonString(model.properties[key])"></span>
-            </div>
-          </div>
+  <div class="modal" ref="modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Properties</h4>
+          <button @click="emit('close')" type="button" class="btn-close" data-bs-dismiss="modal"
+                  aria-label="Close"></button>
         </div>
+
+        <div class="modal-body">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Key</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-if="model.propertyKeys.length === 0">
+                <td colspan="2">No properties set</td>
+              </tr>
+              <tr v-for="key in model.propertyKeys" :key="key" class="property-row">
+                <td>{{ key }}</td>
+                <td v-html="Util.useJsonString(model.properties[key])"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
       </div>
-    </div>
+  </div>
   </div>
 </template>
 

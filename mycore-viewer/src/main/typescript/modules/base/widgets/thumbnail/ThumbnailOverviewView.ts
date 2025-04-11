@@ -17,33 +17,31 @@
  */
 
 import { ThumbnailOverviewInputHandler } from "./ThumbnailOverviewInputHandler";
-import { Position2D, Size2D } from "../../Utils";
+import {getElementHeight, getElementWidth, Position2D, Size2D} from "../../Utils";
 
 export class ThumbnailOverviewView {
-  constructor(private _container: JQuery,
+  constructor(private _container: HTMLElement,
     private _scrollHandler: ThumbnailOverviewScrollHandler,
     private _resizeHandler: ThumbnailOverviewResizeHandler,
     private _inputHandler: ThumbnailOverviewInputHandler) {
     this._gap = 0;
-    this._spacer = jQuery("<div></div>");
-    this._spacer.appendTo(this._container);
+    this._spacer = document.createElement("div");
+    this._container.append(this._spacer)
 
 
-    const cssObj = { "position": "relative" };
+    const cssObj = this._container.style;
+    cssObj.position = "relative";
+    cssObj.overflowY = "scroll";
+    cssObj.overflowX = "hidden";
 
-    cssObj["overflow-y"] = "scroll";
-    cssObj["overflow-x"] = "hidden";
-    cssObj["-webkit-overflow-scrolling"] = "touch";
-
-    this._container.css(cssObj);
     this._lastViewPortSize = this.getViewportSize();
     const scrollHandler = () => {
-      const newPos = new Position2D(this._container.scrollLeft(), this._container.scrollTop());
+      const newPos = new Position2D(this._container.scrollLeft, this._container.scrollTop);
       this._scrollHandler.scrolled(newPos);
     };
 
     // TODO: Use touch
-    this._container.bind("scroll", scrollHandler);
+    this._container.addEventListener("scroll", scrollHandler);
 
 
     const resizeHandler = () => {
@@ -55,13 +53,13 @@ export class ThumbnailOverviewView {
       }
     }
 
-    jQuery(this._container).bind("iviewResize", resizeHandler);
+    this._container.addEventListener("iviewResize", resizeHandler);
 
   }
 
   private _gap: number;
   private _lastViewPortSize: Size2D;
-  private _spacer: JQuery;
+  private _spacer: HTMLElement;
 
   public set gap(num: number) {
     this._gap = num;
@@ -72,50 +70,49 @@ export class ThumbnailOverviewView {
   }
 
   public setContainerSize(newContainerSize: Size2D) {
-    this._spacer.css({
-      "width": newContainerSize.width,
-      "height": newContainerSize.height
-    });
+    this._spacer.style.width = newContainerSize.width + "px";
+    this._spacer.style.height = newContainerSize.height + "px";
   }
 
   public setContainerScrollPosition(position: Position2D) {
-    this._container.scrollLeft(position.x);
-    this._container.scrollTop(position.y);
+    this._container.scrollLeft = position.x;
+    this._container.scrollTop = position.y;
   }
 
   public setThumnailSelected(id: string, selected: boolean) {
-    const thumb = this._container.find("[data-id='" + CSS.escape(id) + "']");
+    const thumb = this._container.querySelector("[data-id='" + CSS.escape(id) + "']");
+
+    if(!thumb){
+        return;
+    }
 
     if (selected) {
-      thumb.addClass("selected");
+      thumb.classList.add("selected");
     } else {
-      thumb.removeClass("selected");
+      thumb.classList.remove("selected");
     }
   }
 
   public injectTile(id: string, position: Position2D, label: string) {
-    const thumbnailImage = jQuery("<img />");
-    thumbnailImage.attr("alt", label);
+    const thumbnailImage = document.createElement("img");
+    thumbnailImage.setAttribute("alt", label);
 
-    const thumbnailLabel = jQuery("<div>" + label + "</div>");
-    thumbnailLabel.addClass("caption");
+    const thumbnailLabel = document.createElement("div");
+    thumbnailLabel.innerText = label;
+    thumbnailLabel.classList.add("caption");
 
-    const imageSpacer = jQuery("<div></div>");
-    imageSpacer.addClass("imgSpacer");
+    const imageSpacer = document.createElement("div");
+    imageSpacer.classList.add("imgSpacer");
     imageSpacer.append(thumbnailImage);
 
-    const thumbnailDiv = jQuery("<div/>");
-    thumbnailDiv.attr("data-id", id);
-    thumbnailDiv.toggleClass("iviewThumbnail");
-    thumbnailDiv.addClass("thumbnail");
+    const thumbnailDiv = document.createElement("div");
+    thumbnailDiv.setAttribute("data-id", id);
+    thumbnailDiv.classList.add("iviewThumbnail");
+    thumbnailDiv.classList.add("thumbnail");
     thumbnailDiv.prepend(imageSpacer);
     thumbnailDiv.append(thumbnailLabel);
-    thumbnailDiv.css({
-      /* "display": "block" ,*/
-      /*"position": "relative",*/
-      "left": this.gap + position.x,
-      "top": position.y
-    });
+    thumbnailDiv.style.left = (this.gap + position.x) + "px";
+    thumbnailDiv.style.top = position.y + "px";
 
     this._inputHandler.addedThumbnail(id, thumbnailDiv);
 
@@ -123,30 +120,34 @@ export class ThumbnailOverviewView {
   }
 
   public updateTileHref(id: string, href: string) {
-    this._container.find("div[data-id='" + CSS.escape(id) + "'] img").attr("src", href);
+    let htmlImageElement = this._container.querySelector("div[data-id='" + CSS.escape(id) + "'] img") as (HTMLImageElement|null);
+    if(htmlImageElement != null){
+      htmlImageElement.src =  href;
+    }
   }
 
   public removeTile(id: string) {
-    this._container.find("div[data-id='" + CSS.escape(id) + "']").remove();
+    let thumbnailDivElement = this._container.querySelector("div[data-id='" + CSS.escape(id) + "']");
+    if(thumbnailDivElement != null){
+      thumbnailDivElement.remove();
+    }
   }
 
   public updateTilePosition(id: string, position: Position2D) {
-    const thumbnailDiv = this._container.find("div[data-id='" + id + "']");
-    thumbnailDiv.css({
-      /* "display": "block" ,*/
-      /*"position": "relative",*/
-      "left": this.gap + position.x,
-      "top": position.y
-    });
+    const thumbnailDiv = this._container.querySelector("div[data-id='" + id + "']") as HTMLDivElement;
+    if(thumbnailDiv){
+      thumbnailDiv.style.left = this.gap + position.x + "px";
+      thumbnailDiv.style.top = position.y + "px";
+    }
   }
 
   public getViewportSize(): Size2D {
-    return new Size2D(this._container.width(), this._container.height());
+    return new Size2D(getElementWidth(this._container), getElementHeight(this._container));
   }
 
 
   public jumpToThumbnail(thumbnailPos: number) {
-    this._container.scrollTop(thumbnailPos);
+    this._container.scrollTop = thumbnailPos;
   }
 }
 

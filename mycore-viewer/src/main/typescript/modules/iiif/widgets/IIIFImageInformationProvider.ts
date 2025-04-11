@@ -50,19 +50,14 @@ export class IIIFImageInformationProvider {
     => void, errorCallback: (err: string) => void = (err: string) => {
       return;
     }) {
-    const settings = {
-      url: href + '/info.json',
-      async: true,
-      success: (response: any) => {
-        const imageInformation = IIIFImageInformationProvider.proccessJSON(response, href);
-        callback(imageInformation);
-      },
-      error: (request: any, status: string, exception: string) => {
-        errorCallback(exception);
-      }
-    };
-
-    jQuery.ajax(settings);
+    fetch(href + '/info.json')
+        .then((response) => response.json())
+        .then(response => {
+          const imageInformation = IIIFImageInformationProvider.proccessJSON(response, href);
+          callback(imageInformation);
+        }).catch((error) => {
+      errorCallback(error);
+    });
 
   }
 

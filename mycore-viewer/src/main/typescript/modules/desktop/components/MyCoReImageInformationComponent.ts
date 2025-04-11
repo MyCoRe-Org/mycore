@@ -37,30 +37,35 @@ export class MyCoReImageInformationComponent extends ViewerComponent {
   }
 
   public init() {
-    this._informationBar = jQuery("<div></div>");
-    this._informationBar.addClass("informationBar");
+    this._informationBar = document.createElement("div");
+    this._informationBar.classList.add("informationBar");
 
-    this._scale = jQuery("<span></span>");
-    this._scale.addClass("scale");
-    this._scale.appendTo(this._informationBar);
+    this._scale = document.createElement("span");
+    this._scale.classList.add("scale");
+    this._informationBar.append(this._scale);
 
-    this._scaleEditForm = jQuery("<div class='form-group'></div>")
+    this._scaleEditForm = document.createElement("div")
+    this._scaleEditForm.classList.add("form-group");
 
-    this._scaleEdit = jQuery("<input type='text'>");
-    this._scaleEdit.addClass("scale form-control");
-    this._scaleEdit.appendTo(this._scaleEditForm);
+    this._scaleEdit = document.createElement("input");
+    this._scaleEdit.setAttribute("type", "text");
+    this._scaleEdit.classList.add("scale", "form-control");
+    this._scaleEditForm.append(this._scaleEdit);
     this.initScaleChangeLogic();
 
-    this._informationBar.addClass("card");
-    this._imageLabel = jQuery("<span></span>");
-    this._imageLabel.addClass("imageLabel");
-    this._imageLabel.appendTo(this._informationBar);
+    this._informationBar.classList.add("card");
+    this._imageLabel = document.createElement("span");
+    this._imageLabel.classList.add("imageLabel");
+    this._informationBar.append(this._imageLabel);
 
-    this._imageLabel.mousedown(Utils.stopPropagation).mousemove(Utils.stopPropagation).mouseup(Utils.stopPropagation);
+    this._imageLabel.addEventListener('mousedown', Utils.stopPropagation);
+    this._imageLabel.addEventListener('mouseup', Utils.stopPropagation);
+    this._imageLabel.addEventListener('mousemove', Utils.stopPropagation);
 
-    this._rotation = jQuery("<span>0 °</span>");
-    this._rotation.addClass("rotation");
-    this._rotation.appendTo(this._informationBar);
+    this._rotation = document.createElement("span");
+    this._rotation.innerText = "0 °";
+    this._rotation.classList.add("rotation");
+    this._informationBar.append(this._rotation);
 
     this.trigger(new ComponentInitializedEvent(this));
     this.trigger(new ShowContentEvent(this, this._informationBar, ShowContentEvent.DIRECTION_SOUTH, 30));
@@ -72,13 +77,13 @@ export class MyCoReImageInformationComponent extends ViewerComponent {
     // TODO: find workarround for this hack (we need to know when this._pageLayout.getCurrentPageZoom() returns the real val)
   }
 
-  private _informationBar: JQuery;
-  private _imageLabel: JQuery;
-  private _rotation: JQuery;
-  private _scale: JQuery;
+  private _informationBar: HTMLElement;
+  private _imageLabel: HTMLElement;
+  private _rotation: HTMLElement;
+  private _scale: HTMLElement;
 
-  private _scaleEditForm: JQuery;
-  private _scaleEdit: JQuery;
+  private _scaleEditForm: HTMLElement;
+  private _scaleEdit: HTMLInputElement;
 
   private _pageLayout: PageLayout;
 
@@ -86,13 +91,13 @@ export class MyCoReImageInformationComponent extends ViewerComponent {
   private _currentRotation = -1;
 
   private initScaleChangeLogic() {
-    this._scale.click(() => {
-      this._scale.detach();
-      this._scaleEdit.val(this._pageLayout.getCurrentPageZoom() * 100 + "");
-      this._scaleEdit.appendTo(this._informationBar);
-      Utils.selectElementText(this._scaleEdit.get(0));
+    this._scale.addEventListener('click', () => {
+      this._scale.remove();
+      this._scaleEdit.value = this._pageLayout.getCurrentPageZoom() * 100 + "";
+      this._informationBar.append(this._scaleEdit);
+      Utils.selectElementText(this._scaleEdit);
 
-      this._scaleEdit.keyup((ev) => {
+      this._scaleEdit.addEventListener('keyup', (ev) => {
         const isValid = this.validateScaleEdit();
 
         if (ev.keyCode == 13) {
@@ -109,31 +114,31 @@ export class MyCoReImageInformationComponent extends ViewerComponent {
 
   private endEdit() {
     this._scaleEdit.remove();
-    this._scale.appendTo(this._informationBar);
+    this._informationBar.append(this._scale);
   }
 
   private applyNewZoom() {
-    const zoom = parseFloat((this._scaleEdit.val() + "").trim());
+    const zoom = parseFloat((this._scaleEdit.value + "").trim());
     if (typeof this._pageLayout != "undefined" && this._pageLayout != null) {
       this._pageLayout.setCurrentPageZoom(zoom / 100)
     }
   }
 
   public validateScaleEdit() {
-    const zoom = parseFloat((this._scaleEdit.val() + "").trim());
+    const zoom = parseFloat((this._scaleEdit.value + "").trim());
 
     if (isNaN(zoom)) {
-      this._scaleEdit.addClass("error");
+      this._scaleEdit.classList.add("error");
       return false;
     }
 
     const zoomNumber = (zoom * 1);
     if (zoomNumber < 50 || zoomNumber > 400) {
-      this._scaleEdit.addClass("error");
+      this._scaleEdit.classList.add("error");
       return false;
     }
 
-    this._scaleEdit.removeClass("error");
+    this._scaleEdit.classList.remove("error");
     return true;
   }
 
@@ -190,11 +195,11 @@ export class MyCoReImageInformationComponent extends ViewerComponent {
     if (e.type == ImageChangedEvent.TYPE) {
       const imageChangedEvent = e as ImageChangedEvent;
       if (typeof imageChangedEvent.image != "undefined" && imageChangedEvent.image != null) {
-        let text = imageChangedEvent.image.orderLabel || imageChangedEvent.image.order;
+        let text = (imageChangedEvent.image.orderLabel || imageChangedEvent.image.order)+"";
         if (imageChangedEvent.image.uniqueIdentifier != null) {
           text += " - " + imageChangedEvent.image.uniqueIdentifier;
         }
-        this._imageLabel.text(text);
+        this._imageLabel.innerText = text;
       }
       this.updateLayoutInformation();
     }
@@ -205,13 +210,13 @@ export class MyCoReImageInformationComponent extends ViewerComponent {
     if (typeof this._pageLayout != "undefined") {
       const currentPageZoom = this._pageLayout.getCurrentPageZoom();
       if (this._currentZoom != currentPageZoom) {
-        this._scale.text(Math.round(currentPageZoom * 100) + "%");
+        this._scale.innerText = Math.round(currentPageZoom * 100) + "%";
         this._currentZoom = currentPageZoom;
       }
 
       const currentPageRotation = this._pageLayout.getCurrentPageRotation();
       if (this._currentRotation != currentPageRotation) {
-        this._rotation.text(currentPageRotation + " °");
+        this._rotation.innerText = currentPageRotation + " °";
         this._currentRotation = currentPageRotation;
       }
 

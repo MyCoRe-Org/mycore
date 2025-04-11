@@ -18,7 +18,10 @@
 
 <script setup lang="ts">
 import {Settings} from "../common/settings.ts";
-import {ref} from "vue";
+import {onMounted, ref, useTemplateRef} from "vue";
+import type { Modal } from "bootstrap";
+
+declare const bootstrap: { Modal: typeof Modal };
 // Props
 
 const emit = defineEmits(['close']);
@@ -31,20 +34,38 @@ function updateSetting() {
   Settings.set('maxNumberFinished', maxNumberFinished.value);
 }
 
+const modal = useTemplateRef('modal');
+let bootStrapModel: Modal;
+
+onMounted(() => {
+  if(modal.value) {
+    bootStrapModel = new bootstrap.Modal(modal.value);
+  }
+});
+
+function show() {
+  bootStrapModel.show();
+}
+
+defineExpose({
+  show
+});
+
 </script>
 
 <template>
-  <div class="modal-backdrop" @click.self="emit('close')">
-    <div class="processing-modal">
-      <div class="processing-modal-header">
-        <h4 class="modal-title">Settings</h4>
-        <button @click="emit('close')">&times;</button>
-      </div>
-      <div class="processing-modal-body">
-        <div>
-          <div>maximum number of finished processes to display (-1 for unlimited)</div>
+  <div class="modal" ref="modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Settings</h4>
+          <button @click="emit('close')" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>maximum number of finished processes to display (-1 for unlimited)</p>
           <input
               type="number"
+              class="form-control"
               v-model="maxNumberFinished"
               @input="updateSetting" />
         </div>
@@ -54,24 +75,5 @@ function updateSetting() {
 </template>
 
 <style scoped>
-.processing-modal-body div {
-  font-size: 1rem;
-  font-weight: bold;
-  margin-bottom: 8px;
-}
 
-.processing-modal-body input {
-  width: 100%;
-  padding: 10px;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-.processing-modal-body input:focus {
-  border-color: #ff6347;
-  outline: none;
-  box-shadow: 0 0 5px #e5533d;
-}
 </style>

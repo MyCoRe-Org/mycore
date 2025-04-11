@@ -29,7 +29,7 @@ import { IviewMetsProvider } from "../widgets/IviewMetsProvider";
 
 export class MyCoReMetsComponent extends MyCoReStructFileComponent {
 
-  constructor(protected settings: MetsSettings, protected container: JQuery) {
+  constructor(protected settings: MetsSettings, protected container: HTMLElement) {
     super(settings, container);
   }
 

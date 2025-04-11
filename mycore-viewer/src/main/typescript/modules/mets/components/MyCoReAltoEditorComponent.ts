@@ -17,38 +17,47 @@
  */
 
 
-import { ViewerComponent } from "../../base/components/ViewerComponent";
-import { StructureImage } from "../../base/components/model/StructureImage";
-import { StructureModel } from "../../base/components/model/StructureModel";
-import { LanguageModel } from "../../base/components/model/LanguageModel";
-import { MyCoReBasicToolbarModel } from "../../base/components/model/MyCoReBasicToolbarModel";
-import { ToolbarDropdownButton } from "../../base/widgets/toolbar/model/ToolbarDropdownButton";
-import { MyCoReMap, Position2D, Size2D, Utils, viewerClearTextSelection, ViewerProperty } from "../../base/Utils";
-import { AltoChange, AltoWordChange } from "../widgets/alto/AltoChange";
-import { MetsSettings } from "./MetsSettings";
-import { WaitForEvent } from "../../base/components/events/WaitForEvent";
-import { ProvideToolbarModelEvent } from "../../base/components/events/ProvideToolbarModelEvent";
-import { ViewerEvent } from "../../base/widgets/events/ViewerEvent";
-import { StructureModelLoadedEvent } from "../../base/components/events/StructureModelLoadedEvent";
-import { LanguageModelLoadedEvent } from "../../base/components/events/LanguageModelLoadedEvent";
-import { DropdownButtonPressedEvent } from "../../base/widgets/toolbar/events/DropdownButtonPressedEvent";
-import { PageLoadedEvent } from "../../base/components/events/PageLoadedEvent";
-import { TileImagePage } from "../../base/widgets/canvas/TileImagePage";
-import { ShowContentEvent } from "../../base/components/events/ShowContentEvent";
-import { RequestStateEvent } from "../../base/components/events/RequestStateEvent";
-import { RedrawEvent } from "../../base/components/events/RedrawEvent";
-import { ImageChangedEvent } from "../../base/components/events/ImageChangedEvent";
-import { TextEditEvent } from "../../base/components/events/TextEditEvent";
-import { AltoEditorWidget } from "../widgets/alto/AltoEditorWidget";
-import { ImageSelectedEvent } from "../../base/components/events/ImageSelectedEvent";
-import { ViewerInfoModal } from "../../base/widgets/modal/ViewerInfoModal";
-import { UpdateURLEvent } from "../../base/components/events/UpdateURLEvent";
-import { ViewerErrorModal } from "../../base/widgets/modal/ViewerErrorModal";
-import { ViewerConfirmModal } from "../../base/widgets/modal/ViewerConfirmModal";
-import { AddCanvasPageLayerEvent } from "../../base/components/events/AddCanvasPageLayerEvent";
-import { RequestDesktopInputEvent } from "../../base/components/events/RequestDesktopInputEvent";
-import { DesktopInputAdapter } from "../../base/widgets/canvas/input/DesktopInputListener";
-import { CanvasPageLayer } from "../../base/widgets/canvas/CanvasPageLayer";
+import {ViewerComponent} from "../../base/components/ViewerComponent";
+import {StructureImage} from "../../base/components/model/StructureImage";
+import {StructureModel} from "../../base/components/model/StructureModel";
+import {LanguageModel} from "../../base/components/model/LanguageModel";
+import {MyCoReBasicToolbarModel} from "../../base/components/model/MyCoReBasicToolbarModel";
+import {ToolbarDropdownButton} from "../../base/widgets/toolbar/model/ToolbarDropdownButton";
+import {
+  getElementHeight,
+  getElementOuterHeight,
+  MyCoReMap,
+  Position2D,
+  Size2D,
+  Utils,
+  viewerClearTextSelection,
+  ViewerProperty
+} from "../../base/Utils";
+import {AltoChange, AltoWordChange} from "../widgets/alto/AltoChange";
+import {MetsSettings} from "./MetsSettings";
+import {WaitForEvent} from "../../base/components/events/WaitForEvent";
+import {ProvideToolbarModelEvent} from "../../base/components/events/ProvideToolbarModelEvent";
+import {ViewerEvent} from "../../base/widgets/events/ViewerEvent";
+import {StructureModelLoadedEvent} from "../../base/components/events/StructureModelLoadedEvent";
+import {LanguageModelLoadedEvent} from "../../base/components/events/LanguageModelLoadedEvent";
+import {DropdownButtonPressedEvent} from "../../base/widgets/toolbar/events/DropdownButtonPressedEvent";
+import {PageLoadedEvent} from "../../base/components/events/PageLoadedEvent";
+import {TileImagePage} from "../../base/widgets/canvas/TileImagePage";
+import {ShowContentEvent} from "../../base/components/events/ShowContentEvent";
+import {RequestStateEvent} from "../../base/components/events/RequestStateEvent";
+import {RedrawEvent} from "../../base/components/events/RedrawEvent";
+import {ImageChangedEvent} from "../../base/components/events/ImageChangedEvent";
+import {TextEditEvent} from "../../base/components/events/TextEditEvent";
+import {AltoEditorWidget} from "../widgets/alto/AltoEditorWidget";
+import {ImageSelectedEvent} from "../../base/components/events/ImageSelectedEvent";
+import {ViewerInfoModal} from "../../base/widgets/modal/ViewerInfoModal";
+import {UpdateURLEvent} from "../../base/components/events/UpdateURLEvent";
+import {ViewerErrorModal} from "../../base/widgets/modal/ViewerErrorModal";
+import {ViewerConfirmModal} from "../../base/widgets/modal/ViewerConfirmModal";
+import {AddCanvasPageLayerEvent} from "../../base/components/events/AddCanvasPageLayerEvent";
+import {RequestDesktopInputEvent} from "../../base/components/events/RequestDesktopInputEvent";
+import {DesktopInputAdapter} from "../../base/widgets/canvas/input/DesktopInputListener";
+import {CanvasPageLayer} from "../../base/widgets/canvas/CanvasPageLayer";
 
 export class MyCoReAltoEditorComponent extends ViewerComponent {
   private _structureImages: Array<StructureImage>;
@@ -58,8 +67,8 @@ export class MyCoReAltoEditorComponent extends ViewerComponent {
   private _toolbarModel: MyCoReBasicToolbarModel;
   private _sidebarControllDropdownButton: ToolbarDropdownButton;
   private _altoDropdownChildItem: { id: string; label: string };
-  private container: JQuery;
-  private containerTitle: JQuery;
+  private container: HTMLElement;
+  private containerTitle: HTMLElement;
   public editorWidget: AltoEditorWidget;
   private static DROP_DOWN_CHILD_ID = "altoButtonChild";
   private currentOrder: number;
@@ -91,12 +100,13 @@ export class MyCoReAltoEditorComponent extends ViewerComponent {
 
   public init() {
     if (this.editorEnabled()) {
-      this.container = jQuery("<div></div>");
-      this.containerTitle = jQuery("<span>ALTO-Editor</span>");
+      this.container = document.createElement("div");
+      this.containerTitle = document.createElement("span");
+      this.containerTitle.innerText = "ALTO-Editor";
 
       this.trigger(new WaitForEvent(this, ProvideToolbarModelEvent.TYPE));
 
-      this.container.bind("iviewResize", () => {
+      this.container.addEventListener("iviewResize", () => {
         this.updateContainerSize();
       });
     }
@@ -198,7 +208,7 @@ export class MyCoReAltoEditorComponent extends ViewerComponent {
     }
   }
 
-  public mouseClick(position: Position2D, ev: JQuery.MouseEventBase) {
+  public mouseClick(position: Position2D, ev: MouseEvent) {
     if (this.isEditing()) {
       let element = <HTMLElement>ev.target;
       let vpos = parseInt(element.getAttribute("data-vpos")),
@@ -267,7 +277,7 @@ export class MyCoReAltoEditorComponent extends ViewerComponent {
     this.trigger(new RedrawEvent(this));
   }
 
-  public keyDown(e: JQuery.KeyboardEventBase) {
+  public keyDown(e: KeyboardEvent) {
     if (this.currentEditWord != null) {
       if (e.keyCode == MyCoReAltoEditorComponent.ENTER_KEY) {
         this.applyEdit(this.currentEditWord, this.currentAltoID, this.currentOrder);
@@ -372,15 +382,15 @@ export class MyCoReAltoEditorComponent extends ViewerComponent {
     if (this.editorWidget == null) {
       return;
     }
-    enable = enable == null ? !this.editorWidget.changeWordButton.hasClass("active") : enable;
+    enable = enable == null ? !this.editorWidget.changeWordButton.classList.contains("active") : enable;
     let button = this.editorWidget.changeWordButton;
     if (enable) {
-      button.addClass("active");
+      button.classList.add("active");
       this.imageHrefAltoContentMap.values.forEach(html => {
         this.applyConfidenceLevel(html);
       });
     } else {
-      button.removeClass("active");
+      button.classList.remove("active");
       if (this.currentEditWord != null) {
         this.endEdit(this.currentEditWord);
       }
@@ -393,7 +403,7 @@ export class MyCoReAltoEditorComponent extends ViewerComponent {
   }
 
   public isEditing() {
-    return this.editorWidget != null && this.editorWidget.changeWordButton.hasClass("active");
+    return this.editorWidget != null && this.editorWidget.changeWordButton.classList.contains("active");
   }
 
   private completeLoaded() {
@@ -404,7 +414,7 @@ export class MyCoReAltoEditorComponent extends ViewerComponent {
     this._sidebarControllDropdownButton.children.push(this._altoDropdownChildItem);
     this._sidebarControllDropdownButton.children = this._sidebarControllDropdownButton.children;
     this.editorWidget = new AltoEditorWidget(this.container, this._languageModel);
-    this.containerTitle.text(`${this._languageModel.getTranslation("altoEditor")}`);
+    this.containerTitle.innerText = `${this._languageModel.getTranslation("altoEditor")}`;
 
     if (typeof this._settings.altoReviewer !== "undefined" && this._settings.altoReviewer != null && this._settings.altoReviewer) {
       this.editorWidget.enableApplyButton(true);
@@ -420,7 +430,7 @@ export class MyCoReAltoEditorComponent extends ViewerComponent {
       }
     }
 
-    this.editorWidget.changeWordButton.click((ev) => {
+    this.editorWidget.changeWordButton.addEventListener('click', (ev) => {
       this.toggleEditWord();
     });
 
@@ -490,14 +500,20 @@ export class MyCoReAltoEditorComponent extends ViewerComponent {
           let requestURL = this._settings.altoEditorPostURL;
           requestURL += "/delete/" + this._settings.altoChangePID;
 
-          jQuery.ajax(requestURL, {
-            contentType: "application/json",
-            type: "POST",
-            success: () => {
-              this._settings.altoChangePID = null;
-              this.trigger(new UpdateURLEvent(this));
-            },
-            error: errorDeleteCallback
+          fetch(requestURL, {
+            method: "POST", headers: {
+              "Content-Type": "application/json"
+            }
+          }).then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+          }).then(data => {
+            this._settings.altoChangePID = null;
+            this.trigger(new UpdateURLEvent(this));
+          }).catch(error => {
+            errorDeleteCallback(error);
           });
         }
         this.editorWidget.getChanges().forEach((file, change) => {
@@ -539,10 +555,10 @@ export class MyCoReAltoEditorComponent extends ViewerComponent {
         let wordChange = <AltoWordChange>change;
         let searchResult = this.findChange(wordChange, altoContent);
 
-        if (searchResult.length == 0) {
+        if (!searchResult) {
           console.log("Could not find change " + wordChange);
         } else {
-          this.resetWordEdit(searchResult.get(0));
+          this.resetWordEdit(searchResult as HTMLElement);
         }
 
       }
@@ -555,11 +571,20 @@ export class MyCoReAltoEditorComponent extends ViewerComponent {
     let requestURL = this._settings.altoEditorPostURL;
     requestURL += "/apply/" + this._settings.altoChangePID;
 
-    jQuery.ajax(requestURL, {
-      contentType: "application/json",
-      type: "POST"
-    }).done(successCallback)
-      .fail(errorCallback);
+    fetch(requestURL, {
+      method: "POST", headers: {
+        "Content-Type": "application/json"
+      }
+    }).then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+      return response.json();
+    }).then(data => {
+      successCallback(data);
+    }).catch(error => {
+      errorCallback(error);
+    });
   }
 
   private submitChanges(successCallback: (result: { pid: string }) => any, errorCallback) {
@@ -574,12 +599,22 @@ export class MyCoReAltoEditorComponent extends ViewerComponent {
       requestURL += "/store"
     }
 
-    jQuery.ajax(requestURL, {
-      data: this.prepareData(changeSet),
-      contentType: "application/json",
-      type: "POST"
-    }).done(successCallback)
-      .fail(errorCallback);
+    fetch(requestURL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(this.prepareData(changeSet))
+    }).then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+      return response.json();
+    }).then(data => {
+      successCallback(data);
+    }).catch(error => {
+      errorCallback(error);
+    })
   }
 
   private prepareData(changeSet: { wordChanges: Array<AltoChange> }) {
@@ -597,25 +632,24 @@ export class MyCoReAltoEditorComponent extends ViewerComponent {
   private findChange(wordChange: AltoWordChange, altoContent: HTMLElement) {
     let find = `[data-hpos=${wordChange.hpos}][data-vpos=${wordChange.vpos}]` +
       `[data-width=${wordChange.width}][data-height=${wordChange.height}]`;
-    let searchResult = jQuery(altoContent).find(find);
+    let searchResult = altoContent.querySelector(find);
     return searchResult;
   }
 
   private updateContainerSize() {
-    this.container.css({
-      "height": (this.container.parent().height() - this.containerTitle.parent().outerHeight()) + "px",
-      "overflow-y": "scroll"
-    });
+    this.container.style.height = getElementHeight(this.container.parentElement) -
+        getElementOuterHeight(this.containerTitle.parentElement) + "px";
+    this.container.style.overflowY = "scroll";
   }
 
 
-  public drag(currentPosition: Position2D, startPosition: Position2D, startViewport: Position2D, e: JQuery.MouseEventBase) {
+  public drag(currentPosition: Position2D, startPosition: Position2D, startViewport: Position2D, e: MouseEvent) {
     if (e.target !== this.currentEditWord) {
       e.preventDefault();
     }
   }
 
-  public mouseDown(position: Position2D, e: JQuery.MouseEventBase) {
+  public mouseDown(position: Position2D, e: MouseEvent) {
     if (e.target !== this.currentEditWord) {
       e.preventDefault();
     }
@@ -626,10 +660,10 @@ export class MyCoReAltoEditorComponent extends ViewerComponent {
     changesInFile.forEach(change => {
       if (change.type == AltoWordChange.TYPE) {
         let wordChange = <AltoWordChange>change;
-        let elementToChange = this.findChange(wordChange, altoContent);
-        if (elementToChange.length > 0) {
-          elementToChange[0].innerText = wordChange.to;
-          elementToChange.addClass("edited");
+        let elementToChange = this.findChange(wordChange, altoContent) as HTMLElement;
+        if (elementToChange) {
+          elementToChange.innerText = wordChange.to;
+          elementToChange.classList.add("edited");
         } else {
           console.log("Could not find Change: " + change);
         }
@@ -639,17 +673,16 @@ export class MyCoReAltoEditorComponent extends ViewerComponent {
   }
 
   private applyConfidenceLevel(altoContent: HTMLElement) {
-    jQuery(altoContent).find("[data-wc]:not([data-wc='1'])").each((i, e) => {
-      let element = jQuery(e);
-      let wc: number = parseFloat(element.attr("data-wc"));
+    altoContent.querySelectorAll("[data-wc]:not([data-wc='1'])").forEach((element, i) => {
+      let wc: number = parseFloat(element.getAttribute("data-wc"));
       if (wc < 0.9) {
-        element.addClass('unconfident');
+        element.classList.add('unconfident');
       }
     });
   }
 
   private removeConfidenceLevel(altoContent: HTMLElement) {
-    jQuery(altoContent).find(".unconfident").removeClass("unconfident");
+    altoContent.querySelectorAll(".unconfident").forEach(el => el.classList.remove("unconfident"));
   }
 
 }
@@ -660,34 +693,34 @@ export class EditAltoInputListener extends DesktopInputAdapter {
     super();
   }
 
-  public mouseDown(position: Position2D, e: JQuery.MouseEventBase): void {
+  public mouseDown(position: Position2D, e: MouseEvent): void {
     if (this.editAltoComponent.isEditing()) {
       this.editAltoComponent.mouseDown(position, e);
     }
   }
 
-  public mouseUp(position: Position2D, e: JQuery.MouseEventBase) {
+  public mouseUp(position: Position2D, e: MouseEvent) {
   }
 
-  public mouseMove(position: Position2D, e: JQuery.MouseEventBase) {
+  public mouseMove(position: Position2D, e: MouseEvent) {
 
   }
 
-  public mouseClick(position: Position2D, e: JQuery.MouseEventBase) {
+  public mouseClick(position: Position2D, e: MouseEvent) {
     if (this.editAltoComponent.isEditing()) {
       this.editAltoComponent.mouseClick(position, e);
     }
   }
 
-  public mouseDoubleClick(position: Position2D, e: JQuery.MouseEventBase): void {
+  public mouseDoubleClick(position: Position2D, e: MouseEvent): void {
   }
 
-  public keydown(e: JQuery.KeyboardEventBase): void {
+  public keydown(e: KeyboardEvent): void {
     this.editAltoComponent.keyDown(e);
   }
 
   public mouseDrag(currentPosition: Position2D, startPosition: Position2D, startViewport: Position2D,
-    e: JQuery.MouseEventBase): void {
+    e: MouseEvent): void {
 
     if (this.editAltoComponent.isEditing()) {
       this.editAltoComponent.drag(currentPosition, startPosition, startViewport,

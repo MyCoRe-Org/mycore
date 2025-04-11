@@ -33,7 +33,7 @@ import { StructureImage } from "./model/StructureImage";
 
 export class MyCoReStructFileComponent extends ViewerComponent {
 
-  constructor(protected settings: MyCoReViewerSettings, protected container: JQuery) {
+  constructor(protected settings: MyCoReViewerSettings, protected container: HTMLElement) {
     super();
   }
 
@@ -46,8 +46,8 @@ export class MyCoReStructFileComponent extends ViewerComponent {
       context.lm.getFormatedTranslation('noStructFile', '<a href="mailto:"'
         + this.settings.adminMail + '>' + this.settings.adminMail + '</a>'),
       this.settings.webApplicationBaseURL + '/modules/iview2/img/sad-emotion-egg.jpg',
-      this.container[0]).show();
-    context.trigger(new ShowContentEvent(this, jQuery(), ViewerBorderLayout.DIRECTION_WEST, 0));
+      this.container).show();
+    context.trigger(new ShowContentEvent(this, null, ViewerBorderLayout.DIRECTION_WEST, 0));
   });
 
   protected error: boolean = false;

@@ -88,9 +88,17 @@ export class MyCoRePiwikComponent extends ViewerComponent {
     }
     window["_paq"].push(["setTrackerUrl", piwikURL + "piwik.php"]);
     window["_paq"].push(["setSiteId", pageID]);
-    jQuery.getScript(piwikURL + 'piwik.js', () => {
+    this.loadScript(piwikURL + 'piwik.js', () => {
       this.trigger(new ComponentInitializedEvent(this));
     });
+  }
+
+  // Function to dynamically load a script
+   public loadScript(url, callback)  {
+    const script = document.createElement('script');
+     script.onload = callback;
+    script.src = url;
+    document.head.appendChild(script);
   }
 
 }

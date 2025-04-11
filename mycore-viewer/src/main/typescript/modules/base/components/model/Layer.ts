@@ -22,7 +22,7 @@ export interface Layer {
 
   getId(): string;
 
-  resolveLayer(pageHref: string, callback: (success: boolean, content?: JQuery) => void): void;
+  resolveLayer(pageHref: string, callback: (success: boolean, content?: HTMLElement) => void): void;
 }
 
 

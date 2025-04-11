@@ -18,11 +18,11 @@
 
 
 import { Viewport } from "../viewport/Viewport";
-import { Position2D, Rect, viewerCrossBrowserWheel } from "../../../Utils";
+import {offset, Position2D, Rect, viewerCrossBrowserWheel} from "../../../Utils";
 import { DesktopInputListener } from "./DesktopInputListener";
 
 export class DesktopInputDelegator {
-  constructor(private _inputElement: JQuery, private _viewport: Viewport, private _handler: DesktopInputListener) {
+  constructor(private _inputElement: HTMLElement, private _viewport: Viewport, private _handler: DesktopInputListener) {
     this.initMove();
     this.initScale();
   }
@@ -34,17 +34,17 @@ export class DesktopInputDelegator {
   private _lastMouseSession: MouseSession = null;
   private _currentMouseSession: MouseSession;
 
-  private _mouseDownHandler: (e: JQuery.MouseEventBase) => void;
-  private _mouseUpHandler: (e: JQuery.MouseEventBase) => void;
-  private _mouseMoveHandler: (e: JQuery.MouseEventBase) => void;
-  private _mouseDragHandler: (e: JQuery.MouseEventBase) => void;
-  private _mouseLeaveHandler: (e: JQuery.MouseEventBase) => void;
+  private _mouseDownHandler: (e: MouseEvent) => void;
+  private _mouseUpHandler: (e: MouseEvent) => void;
+  private _mouseMoveHandler: (e: MouseEvent) => void;
+  private _mouseDragHandler: (e: MouseEvent) => void;
+  private _mouseLeaveHandler: (e: MouseEvent) => void;
 
   public initMove(): void {
-    let inputElement = jQuery(this._inputElement[0]);
+    let inputElement = this._inputElement;
 
-    this._mouseMoveHandler = (e: JQuery.MouseEventBase) => {
-      let target = this.getTarget(e);
+    this._mouseMoveHandler = (e: MouseEvent) => {
+      let target = this.getTarget(e.target);
       if (target == null) {
         return;
       }
@@ -52,8 +52,8 @@ export class DesktopInputDelegator {
       this._handler.mouseMove(mousePosition, e);
     };
 
-    this._mouseDragHandler = (e: JQuery.MouseEventBase) => {
-      let target = this.getTarget(e);
+    this._mouseDragHandler = (e: MouseEvent) => {
+      let target = this.getTarget(e.target);
       if (target == null) {
         return;
       }
@@ -63,8 +63,8 @@ export class DesktopInputDelegator {
         this._currentMouseSession.startViewport, e);
     };
 
-    this._mouseDownHandler = (e: JQuery.MouseEventBase) => {
-      let target = this.getTarget(e);
+    this._mouseDownHandler = (e: MouseEvent) => {
+      let target = this.getTarget(e.target);
       if (target == null) {
         return;
       }
@@ -73,19 +73,18 @@ export class DesktopInputDelegator {
 
       // start mouse session for drag and double click support
       this._currentMouseSession = this.createMouseSession(mousePosition, this._viewport.position.copy());
-      inputElement.unbind("mousemove", this._mouseMoveHandler);
-      inputElement.bind("mousemove", this._mouseDragHandler);
-      inputElement.bind("mouseleave", this._mouseLeaveHandler);
+      inputElement.removeEventListener("mousemove", this._mouseMoveHandler);
+      inputElement.addEventListener("mousemove", this._mouseDragHandler);
+      inputElement.addEventListener("mouseleave", this._mouseLeaveHandler);
 
     };
 
-    this._mouseLeaveHandler = (e: JQuery.MouseEventBase) => {
+    this._mouseLeaveHandler = (e: MouseEvent) => {
       this._mouseUpHandler(e);
     };
 
 
     this._mouseUpHandler = (e) => {
-      const target = jQuery(e.target);
       const mousePosition: Position2D = this.getMousePosition(inputElement, e);
       this._handler.mouseUp(mousePosition, e);
 
@@ -106,29 +105,30 @@ export class DesktopInputDelegator {
           this._handler.mouseDoubleClick(mousePosition, e);
         }
         // handle drag
-        inputElement.unbind("mousemove", this._mouseDragHandler);
-        inputElement.unbind("mouseleave", this._mouseLeaveHandler);
-        inputElement.bind("mousemove", this._mouseMoveHandler);
+        inputElement.removeEventListener("mousemove", this._mouseDragHandler);
+        inputElement.removeEventListener("mouseleave", this._mouseLeaveHandler);
+        inputElement.addEventListener("mousemove", this._mouseMoveHandler);
         // reset mouse session
         this._lastMouseSession = this._currentMouseSession;
         this._currentMouseSession = null;
       }
     };
 
-    inputElement.bind("mousemove", this._mouseMoveHandler);
-    inputElement.bind("mousedown", this._mouseDownHandler);
-    inputElement.bind("mouseup", this._mouseUpHandler);
 
-    const body = jQuery(document.body);
-    body.keydown((e) => {
+    inputElement.addEventListener("mousemove", this._mouseMoveHandler);
+    inputElement.addEventListener("mousedown", this._mouseDownHandler);
+    inputElement.addEventListener("mouseup", this._mouseUpHandler);
+
+
+    document.body.addEventListener("keydown", (e) => {
       this._handler.keydown(e);
     });
 
-    body.keyup((e) => {
+    document.body.addEventListener('keyup',(e) => {
       this._handler.keyup(e);
     });
 
-    body.keypress((e) => {
+    document.body.addEventListener('keypress', (e) => {
       this._handler.keypress(e);
     });
 
@@ -138,25 +138,27 @@ export class DesktopInputDelegator {
     return typeof o !== "undefined" && o != null;
   }
 
-  private getTarget(e: JQuery.MouseEventBase) {
-    const target = jQuery(e.target);
-    if (target.hasClass("overview")) {
+  private getTarget(e: EventTarget) {
+    const target = e as HTMLElement;
+    if ("classList" in target && target.classList.contains("overview")) {
+      return null;
+    } else if (!("classList" in target)){
       return null;
     }
     return target;
   }
 
-  private getMousePosition(inputElement: any, e: JQuery.MouseEventBase): Position2D {
-    const x = ((e.clientX + window.pageXOffset) - inputElement.offset().left) * window.devicePixelRatio;
-    const y = ((e.clientY + window.pageYOffset) - inputElement.offset().top) * window.devicePixelRatio;
+  private getMousePosition(inputElement: HTMLElement, e: MouseEvent): Position2D {
+    const x = ((e.clientX + window.pageXOffset) - offset(inputElement).left) * window.devicePixelRatio;
+    const y = ((e.clientY + window.pageYOffset) - offset(inputElement).top) * window.devicePixelRatio;
     return new Position2D(x, y);
   }
 
   public clearRunning() {
     if (this._currentMouseSession != null) {
-      const inputElement = jQuery(this._inputElement[0]);
-      inputElement.unbind("mousemove", this._mouseDragHandler);
-      inputElement.bind("mousemove", this._mouseMoveHandler);
+      const inputElement = this._inputElement;
+      inputElement.removeEventListener("mousemove", this._mouseDragHandler);
+      inputElement.addEventListener("mousemove", this._mouseMoveHandler);
       this._lastMouseSession = this._currentMouseSession;
       this._handler.mouseUp(this._currentMouseSession.currentPosition, null);
       this._currentMouseSession = null;
@@ -164,7 +166,7 @@ export class DesktopInputDelegator {
   }
 
   public initScale() {
-    viewerCrossBrowserWheel(this._inputElement[0], (e) => {
+    viewerCrossBrowserWheel(this._inputElement, (e) => {
       this._handler.scroll(e);
     });
   }

@@ -27,7 +27,7 @@ import { TouchInputListener } from "./TouchInputListener";
 
 export class TouchInputDelegator {
 
-  constructor(private _inputElement: JQuery, private _viewport: Viewport, private _handler: TouchInputListener) {
+  constructor(private _inputElement: HTMLElement, private _viewport: Viewport, private _handler: TouchInputListener) {
     this.initTouch();
   }
 
@@ -43,12 +43,12 @@ export class TouchInputDelegator {
   }>();
 
   public initTouch(): void {
-    let surface = this._inputElement[0];
+    let surface = this._inputElement;
     let that = this;
     let velocityCalculator = new VelocityCalculationQueue();
     let touchPoly = new TouchPolyfill(surface);
 
-    let touchStartListener = function(e: any) {
+    let touchStartListener = (e: any) => {
       e.preventDefault();
       if (this.session == null) {
         let angle = 0;
@@ -74,7 +74,7 @@ export class TouchInputDelegator {
       that._handler.touchStart(this.session);
     };
 
-    let touchEndListener = function(e: any) {
+    let touchEndListener = (e: any) => {
       this.session.touches--;
       this.session.touchLeft = true;
 
@@ -87,7 +87,7 @@ export class TouchInputDelegator {
       e.preventDefault();
     };
 
-    let touchMoveListener = function(e: any) {
+    let touchMoveListener = (e: any) => {
       e.preventDefault();
       let currentMiddle = that.getMiddle(e.targetTouches);
       let positions = that.getPositions(e.targetTouches);

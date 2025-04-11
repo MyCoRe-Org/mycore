@@ -26,7 +26,7 @@ export class HtmlRenderer {
   constructor(private _vp: Viewport, private _area: PageArea, private _view: PageView) {
     this.htmlContainer = document.createElement("div");
     this.htmlContainer.setAttribute("class", "textContainer");
-    const htmlElement = <HTMLElement>this._view.container[0];
+    const htmlElement = this._view.container;
     htmlElement.appendChild(this.htmlContainer);
   }
 

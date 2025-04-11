@@ -33,16 +33,31 @@ export class TEILayer implements Layer {
     return this._label;
   }
 
-  resolveLayer(pageHref: string, callback: (success: boolean, content?: JQuery) => void): void {
+  resolveLayer(pageHref: string, callback: (success: boolean, content?: HTMLElement) => void): void {
     if (this.mapping.has(pageHref)) {
-      const settings: JQueryAjaxSettings = {};
+      const url = `${this.contentLocation}${this.mapping.get(pageHref)}?XSL.Style=${this.teiStylesheet}`;
 
-      settings.async = true;
-      settings.success = function(data: any, textStatus: string, jqXHR: JQueryXHR) {
-        callback(true, jQuery(data));
-      };
-
-      jQuery.ajax(this.contentLocation + this.mapping.get(pageHref) + "?XSL.Style=" + this.teiStylesheet, settings);
+      fetch(url)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.text();
+          })
+          .then(data => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(data, 'text/html');
+              const rootNode = doc.getRootNode() as HTMLDocument;
+              const wrapper = document.createElement("div");
+              rootNode.body.childNodes.forEach(node => {
+                 wrapper.append(node.cloneNode(true));
+              });
+              callback(true, wrapper);
+          })
+          .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+            callback(false);
+          });
     } else {
       callback(false);
     }
