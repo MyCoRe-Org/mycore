@@ -1,6 +1,5 @@
 package org.mycore.ocfl.niofs;
 
-import static org.junit.Assert.assertThrows;
 import static org.mycore.ocfl.MCROCFLTestCaseHelper.DERIVATE_1;
 import static org.mycore.ocfl.MCROCFLTestCaseHelper.DERIVATE_2;
 
@@ -87,7 +86,7 @@ public class MCROCFLBasicFileAttributesTest {
         BasicFileAttributes targetFileAttributes = Files.readAttributes(target, BasicFileAttributes.class);
         Assertions.assertNotNull(targetFileAttributes, "'moved.png' should have basic file attributes");
         Assertions.assertTrue(targetFileAttributes.isRegularFile(), "'moved.png' should be a regular file");
-        assertThrows(NoSuchFileException.class, () -> Files.readAttributes(source, BasicFileAttributes.class));
+        Assertions.assertThrows(NoSuchFileException.class, () -> Files.readAttributes(source, BasicFileAttributes.class));
         MCRTransactionManager.commitTransactions();
     }
 
