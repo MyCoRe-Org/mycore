@@ -690,7 +690,8 @@ public class MCRXMLFunctions {
      * @param categoryId the category id
      * @param lang the desired language for which to get the display name
      *
-     * @return the display name or an empty string when there is no label in the desired language
+     * @return the display name in the desired language, if the label for the desired language cannot be found the
+     *         method trys to deliver the default label. If this fails an empty string is returned.
      */
     public static String getDisplayName(String classificationId, String categoryId, String lang) {
         try {
@@ -698,7 +699,8 @@ public class MCRXMLFunctions {
             MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
             MCRCategory category = dao.getCategory(categID, 0);
             Optional<MCRLabel> label = category.getLabel(lang);
-            return label.isEmpty() ? "" : label.get().getText();
+            return label.isEmpty() ? MCRXMLFunctions.getDisplayName(classificationId, categoryId)
+                                   : label.get().getText();
         } catch (Throwable e) {
             LOGGER.error("Could not determine display name for classification id {} and category id {}",
                 classificationId, categoryId, e);
