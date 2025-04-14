@@ -18,106 +18,115 @@
 
 package org.mycore.ocfl.niofs.channels;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mycore.ocfl.MCROCFLTestCase;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.ocfl.MCROCFLTestCaseHelper;
+import org.mycore.ocfl.repository.MCROCFLRepository;
+import org.mycore.ocfl.test.PermutedParam;
+import org.mycore.ocfl.test.MCRPermutationExtension;
+import org.mycore.ocfl.test.MCROCFLSetupExtension;
+import org.mycore.test.MyCoReTest;
 
 import io.ocfl.api.model.ObjectVersionId;
 import io.ocfl.api.model.OcflObjectVersion;
 
-public class MCROCFLReadableByteChannelTest extends MCROCFLTestCase {
+@MyCoReTest
+@ExtendWith({ MCRPermutationExtension.class, MCROCFLSetupExtension.class })
+class MCROCFLReadableByteChannelTest {
 
     private static final String TEST_DATA = "This is some test data for the OCFL readable byte channel.";
 
+    protected MCROCFLRepository repository;
+
     private MCROCFLReadableByteChannel channel;
 
-    @Before
+    @PermutedParam
+    private boolean remote;
+
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
-        this.setUpRepository(false);
         ObjectVersionId channelTestId = MCROCFLTestCaseHelper.writeFile(repository, "channelTest", "file", TEST_DATA);
         OcflObjectVersion channelTest = repository.getObject(channelTestId);
         channel = new MCROCFLReadableByteChannel(channelTest.getFile("file"));
     }
 
-    @Test
-    public void testSequentialRead() throws IOException {
+    @TestTemplate
+    void testSequentialRead() throws IOException {
         ByteBuffer buffer = ByteBuffer.allocate(10);
 
         // Read the first 10 bytes
         int bytesRead = channel.read(buffer);
-        assertEquals("Expected to read 10 bytes.", 10, bytesRead);
-        assertArrayEquals("First 10 bytes should match.", "This is so".getBytes(), buffer.array());
-        assertEquals("Position should be updated to 10.", 10, channel.position());
-        assertArrayEquals("First 10 bytes should match.", "This is so".getBytes(), buffer.array());
+        Assertions.assertEquals(10, bytesRead, "Expected to read 10 bytes.");
+        Assertions.assertArrayEquals("This is so".getBytes(), buffer.array(), "First 10 bytes should match.");
+        Assertions.assertEquals(10, channel.position(), "Position should be updated to 10.");
+        Assertions.assertArrayEquals("This is so".getBytes(), buffer.array(), "First 10 bytes should match.");
 
         // Read the next 10 bytes
         buffer.clear();
         bytesRead = channel.read(buffer);
-        assertEquals("Expected to read another 10 bytes.", 10, bytesRead);
-        assertEquals("Position should be updated to 20.", 20, channel.position());
-        assertArrayEquals("Next 10 bytes should match.", "me test da".getBytes(), buffer.array());
+        Assertions.assertEquals(10, bytesRead, "Expected to read another 10 bytes.");
+        Assertions.assertEquals(20, channel.position(), "Position should be updated to 20.");
+        Assertions.assertArrayEquals("me test da".getBytes(), buffer.array(), "Next 10 bytes should match.");
     }
 
-    @Test
-    public void testNonSequentialRead() throws IOException {
+    @TestTemplate
+    void testNonSequentialRead() throws IOException {
         ByteBuffer buffer = ByteBuffer.allocate(5);
 
         // Jump to position 10 and read
         channel.position(5);
         int bytesRead = channel.read(buffer);
-        assertEquals("Expected to read 5 bytes at position 5.", 5, bytesRead);
-        assertArrayEquals("Bytes from position 5 should match.", "is so".getBytes(), buffer.array());
+        Assertions.assertEquals(5, bytesRead, "Expected to read 5 bytes at position 5.");
+        Assertions.assertArrayEquals("is so".getBytes(), buffer.array(), "Bytes from position 5 should match.");
 
         // Verify the current position
-        assertEquals("Position should be updated to 10.", 10, channel.position());
+        Assertions.assertEquals(10, channel.position(), "Position should be updated to 10.");
 
         // Jump back to position 0 and read
         channel.position(0);
         buffer.clear();
         bytesRead = channel.read(buffer);
-        assertEquals("Expected to read 5 bytes at position 0.", 5, bytesRead);
-        assertArrayEquals("Bytes from position 0 should match.", "This ".getBytes(), buffer.array());
+        Assertions.assertEquals(5, bytesRead, "Expected to read 5 bytes at position 0.");
+        Assertions.assertArrayEquals("This ".getBytes(), buffer.array(), "Bytes from position 0 should match.");
     }
 
-    @Test
-    public void testUnsupportedOperations() throws IOException {
+    @TestTemplate
+    void testUnsupportedOperations() throws IOException {
         ByteBuffer buffer = ByteBuffer.allocate(10);
         // Test that write throws UnsupportedOperationException
-        Assert.assertThrows("Expected UnsupportedOperationException for write operation.",
-            UnsupportedOperationException.class, () -> channel.write(buffer));
+        Assertions.assertThrows(UnsupportedOperationException.class, () -> channel.write(buffer),
+            "Expected UnsupportedOperationException for write operation.");
         // Test that truncate throws UnsupportedOperationException
-        Assert.assertThrows("Expected UnsupportedOperationException for truncate operation.",
-            UnsupportedOperationException.class, () -> channel.truncate(10));
+        Assertions.assertThrows(
+            UnsupportedOperationException.class, () -> channel.truncate(10),
+            "Expected UnsupportedOperationException for truncate operation.");
     }
 
-    @Test
-    public void testCloseAndAccess() throws IOException {
+    @TestTemplate
+    void testCloseAndAccess() throws IOException {
         // Close the channel
         channel.close();
-        assertFalse("Channel should be closed.", channel.isOpen());
+        Assertions.assertFalse(channel.isOpen(), "Channel should be closed.");
         // Test that operations on a closed channel throw ClosedChannelException
-        Assert.assertThrows("Expected ClosedChannelException for read operation.",
-            ClosedChannelException.class, () -> channel.read(ByteBuffer.allocate(10)));
-        Assert.assertThrows("Expected ClosedChannelException for position operation.",
-            ClosedChannelException.class, () -> channel.position());
+        Assertions.assertThrows(
+            ClosedChannelException.class, () -> channel.read(ByteBuffer.allocate(10)),
+            "Expected ClosedChannelException for read operation.");
+        Assertions.assertThrows(
+            ClosedChannelException.class, () -> channel.position(),
+            "Expected ClosedChannelException for position operation.");
     }
 
-    @Test
-    public void testSize() throws IOException {
+    @TestTemplate
+    void testSize() throws IOException {
         // Verify the size of the file
         long size = channel.size();
-        assertEquals("Expected size of the file.", TEST_DATA.length(), size);
+        Assertions.assertEquals(TEST_DATA.length(), size, "Expected size of the file.");
     }
 
 }

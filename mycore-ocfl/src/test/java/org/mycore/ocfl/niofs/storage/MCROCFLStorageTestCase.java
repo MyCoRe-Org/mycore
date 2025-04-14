@@ -9,15 +9,13 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.io.TempDir;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
-import org.mycore.ocfl.niofs.MCROCFLNioTestCase;
 
-public abstract class MCROCFLStorageTestCase extends MCROCFLNioTestCase {
+public abstract class MCROCFLStorageTestCase {
 
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    @TempDir
+    public Path folder;
 
     protected Path rootPath;
 
@@ -27,14 +25,8 @@ public abstract class MCROCFLStorageTestCase extends MCROCFLNioTestCase {
 
     protected MCRVersionedPath path3;
 
-    public MCROCFLStorageTestCase(boolean remote, boolean purge) {
-        super(remote, purge);
-    }
-
-    @Override
     public void setUp() throws Exception {
-        super.setUp();
-        this.rootPath = folder.newFolder("ocfl-rolling-cache").toPath();
+        this.rootPath = folder.resolve("ocfl-rolling-cache");
         path1 = MCRVersionedPath.head("owner1", "file1");
         path2 = MCRVersionedPath.head("owner1", "file2");
         path3 = MCRVersionedPath.head("owner1", "file3");

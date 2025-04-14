@@ -444,7 +444,14 @@ public class MCROCFLXMLMetadataManagerAdapter implements MCRXMLMetadataManagerAd
     @Override
     public boolean exists(MCRObjectID mcrid) throws MCRPersistenceException {
         String ocflObjectID = getOCFLObjectID(mcrid);
-        return getRepository().containsObject(ocflObjectID) && isNotDeleted(ocflObjectID);
+        if (!getRepository().containsObject(ocflObjectID)) {
+            return false;
+        }
+        if (isDeleted(ocflObjectID)) {
+            return false;
+        }
+        VersionDetails versionDetails = getRepository().describeVersion(ObjectVersionId.head(ocflObjectID));
+        return versionDetails.getFile(buildFilePath(mcrid)) != null;
     }
 
     @Override
@@ -479,9 +486,13 @@ public class MCROCFLXMLMetadataManagerAdapter implements MCRXMLMetadataManagerAd
             .collect(Collectors.toList());
     }
 
-    private boolean isNotDeleted(String ocflID) {
+    private boolean isDeleted(String ocflID) {
         return convertMessageToType(getRepository().describeVersion(ObjectVersionId.head(ocflID)).getVersionInfo()
-            .getMessage()) != MCROCFLMetadataVersion.DELETED;
+            .getMessage()) == MCROCFLMetadataVersion.DELETED;
+    }
+
+    private boolean isNotDeleted(String ocflID) {
+        return !isDeleted(ocflID);
     }
 
     @Override
