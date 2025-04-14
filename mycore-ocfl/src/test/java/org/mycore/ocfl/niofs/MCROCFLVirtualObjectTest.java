@@ -1,9 +1,9 @@
 package org.mycore.ocfl.niofs;
 
-import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mycore.ocfl.niofs.MCROCFLVirtualObject.FILES_DIRECTORY;
 
@@ -72,7 +72,8 @@ public class MCROCFLVirtualObjectTest {
         MCRVersionedPath nonExistentDir = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "nonExistentDir");
         MCRVersionedPath nonExistentDir2 = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "nonExistentDir2");
         MCRVersionedPath notEmptyDir = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "notEmptyDir");
-        MCRVersionedPath fileInNotEmptyDir = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "notEmptyDir/file.txt");
+        MCRVersionedPath fileInNotEmptyDir =
+            MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "notEmptyDir/file.txt");
         MCRVersionedPath emptyDir = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "empty");
 
         // Create initial directory structures for testing
@@ -85,17 +86,17 @@ public class MCROCFLVirtualObjectTest {
         // Test 1: Directory must exist
         assertFalse(getVirtualObject().exists(nonExistentDir), "nonExistentDir should not exist");
         MCRTransactionManager.beginTransactions();
-        assertThrows("Renaming should fail if the directory does not exist", NoSuchFileException.class, () -> {
+        assertThrows(NoSuchFileException.class, () -> {
             Files.move(nonExistentDir, nonExistentDir2);
-        });
+        }, "Renaming should fail if the directory does not exist");
         MCRTransactionManager.commitTransactions();
 
         // Test 2: Directory must be empty
         assertTrue(getVirtualObject().exists(notEmptyDir), "notEmptyDir should exist");
         MCRTransactionManager.beginTransactions();
-        assertThrows("Renaming should fail if the directory is not empty", DirectoryNotEmptyException.class, () -> {
+        assertThrows(DirectoryNotEmptyException.class, () -> {
             Files.move(notEmptyDir, nonExistentDir);
-        });
+        }, "Renaming should fail if the directory is not empty");
         MCRTransactionManager.commitTransactions();
 
         // Test 3: New directory name must be available
@@ -103,17 +104,17 @@ public class MCROCFLVirtualObjectTest {
         assertFalse(getVirtualObject().exists(newDir), "newDir should not exist yet");
         MCRTransactionManager.beginTransactions();
         Files.createDirectory(newDir);
-        assertThrows("Renaming should fail if the new directory name is already taken",
+        assertThrows(
             FileAlreadyExistsException.class, () -> {
                 Files.move(existingDir, newDir);
-            });
+            }, "Renaming should fail if the new directory name is already taken");
         MCRTransactionManager.commitTransactions();
 
         // Test 4: Directory should not be the root directory
         MCRTransactionManager.beginTransactions();
-        assertThrows("Renaming should fail if trying to rename the root directory", IOException.class, () -> {
+        assertThrows(IOException.class, () -> {
             Files.move(rootDir, nonExistentDir);
-        });
+        }, "Renaming should fail if trying to rename the root directory");
         MCRTransactionManager.commitTransactions();
 
         // Test 5: Successfully move an empty directory
@@ -149,8 +150,9 @@ public class MCROCFLVirtualObjectTest {
             MCRTransactionManager.commitTransactions();
         } else {
             MCRTransactionManager.beginTransactions();
-            assertThrows("derivate cannot be created because it was soft deleted and therefore should still exist.'",
-                FileAlreadyExistsException.class, () -> root.getFileSystem().createRoot(MCROCFLTestCaseHelper.DERIVATE_1));
+            assertThrows(FileAlreadyExistsException.class,
+                () -> root.getFileSystem().createRoot(MCROCFLTestCaseHelper.DERIVATE_1),
+                "derivate cannot be created because it was soft deleted and therefore should still exist.'");
         }
     }
 
@@ -307,8 +309,8 @@ public class MCROCFLVirtualObjectTest {
 
         assertNotNull(v1WhitePngFileKey, "fileKey of original white.png should not be null");
         assertNotNull(v1BlackPngFileKey, "fileKey of original black.png should not be null");
-        assertThrows("fileKey of notFound.png should not exist yet", NoSuchFileException.class,
-            () -> getFileKey(notFoundPng));
+        assertThrows(NoSuchFileException.class, () -> getFileKey(notFoundPng),
+            "fileKey of notFound.png should not exist yet");
     }
 
     @TestTemplate
