@@ -47,7 +47,8 @@ public class MCROCFLRepositoryTest {
         MCROCFLTestCaseHelper.loadDerivate(MCROCFLTestCaseHelper.DERIVATE_2);
         MCRTransactionManager.commitTransactions(MCROCFLFileSystemTransaction.class);
 
-        FileChangeHistory changeHistory = repository.directoryChangeHistory(MCROCFLTestCaseHelper.DERIVATE_2_OBJECT_ID, "/");
+        FileChangeHistory changeHistory =
+            repository.directoryChangeHistory(MCROCFLTestCaseHelper.DERIVATE_2_OBJECT_ID, "/");
         check(changeHistory, FileChangeType.UPDATE, 1);
 
         // adding a file should not change version history of directory
@@ -82,15 +83,17 @@ public class MCROCFLRepositoryTest {
     }
 
     private void write(String path) {
-        repository.updateObject(ObjectVersionId.head(MCROCFLTestCaseHelper.DERIVATE_2_OBJECT_ID), new VersionInfo(), updater -> {
-            updater.writeFile(new ByteArrayInputStream(new byte[] { 1, 3, 3, 7 }), path);
-        });
+        repository.updateObject(ObjectVersionId.head(MCROCFLTestCaseHelper.DERIVATE_2_OBJECT_ID), new VersionInfo(),
+            updater -> {
+                updater.writeFile(new ByteArrayInputStream(new byte[] { 1, 3, 3, 7 }), path);
+            });
     }
 
     private void remove(String path) {
-        repository.updateObject(ObjectVersionId.head(MCROCFLTestCaseHelper.DERIVATE_2_OBJECT_ID), new VersionInfo(), updater -> {
-            updater.removeFile(path);
-        });
+        repository.updateObject(ObjectVersionId.head(MCROCFLTestCaseHelper.DERIVATE_2_OBJECT_ID), new VersionInfo(),
+            updater -> {
+                updater.removeFile(path);
+            });
     }
 
     private void check(FileChangeHistory changeHistory, FileChangeType mostRecentChangeType, long numChanges) {
