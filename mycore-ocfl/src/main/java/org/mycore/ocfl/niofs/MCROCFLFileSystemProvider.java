@@ -93,7 +93,7 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
      *
      * @throws IOException if an I/O error occurs during initialization.
      */
-    void init() throws IOException {
+    public void init() throws IOException {
         try {
             String tempStorageProperty = "MCR.Content.TempStorage";
             this.localStorage = MCRConfiguration2

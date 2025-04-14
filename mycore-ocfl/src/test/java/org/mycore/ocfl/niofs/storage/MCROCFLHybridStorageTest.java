@@ -1,25 +1,31 @@
 package org.mycore.ocfl.niofs.storage;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRTransactionManager;
 import org.mycore.ocfl.niofs.MCROCFLInactiveTransactionException;
+import org.mycore.ocfl.test.PermutedParam;
+import org.mycore.ocfl.test.MCRPermutationExtension;
+import org.mycore.test.MyCoReTest;
 
+@MyCoReTest
+@ExtendWith({ MCRPermutationExtension.class })
 public class MCROCFLHybridStorageTest extends MCROCFLStorageTestCase {
 
     private MCROCFLHybridStorage storage;
 
-    public MCROCFLHybridStorageTest(boolean remote, boolean purge) {
-        super(remote, purge);
-    }
+    @PermutedParam
+    private boolean remote;
 
-    @Override
+    @PermutedParam
+    private boolean purge;
+
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         FileCountEvictionStrategy evictionStrategy = new FileCountEvictionStrategy(2);
@@ -31,98 +37,102 @@ public class MCROCFLHybridStorageTest extends MCROCFLStorageTestCase {
         return storage;
     }
 
-    @Test
+    @TestTemplate
     public void exists() throws IOException {
-        assertFalse("'path1' should not exist before any operation", storage.exists(path1));
+        Assertions.assertFalse(storage.exists(path1), "'path1' should not exist before any operation");
         write(path1);
-        assertTrue("'path1' should exist after write operation", storage.exists(path1));
+        Assertions.assertTrue(storage.exists(path1), "'path1' should exist after write operation");
         MCRTransactionManager.beginTransactions();
-        assertTrue("'path1' should exist after transaction start", storage.exists(path1));
+        Assertions.assertTrue(storage.exists(path1), "'path1' should exist after transaction start");
         MCRTransactionManager.commitTransactions();
     }
 
-    @Test
+    @TestTemplate
     public void toPhysicalPath() throws IOException {
         String rollingDirectory = "/" + MCROCFLHybridStorage.ROLLING_DIRECTORY + "/";
         String transactionDirectory = "/" + MCROCFLHybridStorage.TRANSACTION_DIRECTORY + "/";
-        assertTrue("should access rolling store", storage.toPhysicalPath(path1).toString().contains(rollingDirectory));
+        Assertions.assertTrue(storage.toPhysicalPath(path1).toString().contains(rollingDirectory),
+            "should access rolling store");
         MCRTransactionManager.beginTransactions();
-        assertTrue("should access rolling store because the transaction store is empty",
-            storage.toPhysicalPath(path1).toString().contains(rollingDirectory));
+        Assertions.assertTrue(storage.toPhysicalPath(path1).toString().contains(rollingDirectory),
+            "should access rolling store because the transaction store is empty");
         write(path1);
-        assertTrue("should access transactional store because a file was written there",
-            storage.toPhysicalPath(path1).toString().contains(transactionDirectory));
+        Assertions.assertTrue(storage.toPhysicalPath(path1).toString().contains(transactionDirectory),
+            "should access transactional store because a file was written there");
         MCRTransactionManager.commitTransactions();
-        assertTrue("should access rolling store because there is no active transaction",
-            storage.toPhysicalPath(path1).toString().contains(rollingDirectory));
+        Assertions.assertTrue(storage.toPhysicalPath(path1).toString().contains(rollingDirectory),
+            "should access rolling store because there is no active transaction");
         MCRTransactionManager.beginTransactions();
-        assertTrue("should access rolling store because the transaction store is empty",
-            storage.toPhysicalPath(path1).toString().contains(rollingDirectory));
+        Assertions.assertTrue(storage.toPhysicalPath(path1).toString().contains(rollingDirectory),
+            "should access rolling store because the transaction store is empty");
         MCRTransactionManager.commitTransactions();
     }
 
-    @Test
+    @TestTemplate
     public void copyInputStream() throws IOException, MCROCFLInactiveTransactionException {
         storage.copy(new ByteArrayInputStream(new byte[] { 1 }), path1);
-        assertTrue("'path1' should exist", storage.exists(path1));
+        Assertions.assertTrue(storage.exists(path1), "'path1' should exist");
 
         MCRTransactionManager.beginTransactions();
-        assertTrue("'path1' should exist", storage.exists(path1));
+        Assertions.assertTrue(storage.exists(path1), "'path1' should exist");
         storage.copy(new ByteArrayInputStream(new byte[] { 2 }), path1);
-        assertTrue("'path1' should exist", storage.exists(path1));
-        assertArrayEquals("'path1' should have the content of the transactional store", new byte[] { 2 }, read(path1));
+        Assertions.assertTrue(storage.exists(path1), "'path1' should exist");
+        Assertions.assertArrayEquals(new byte[] { 2 }, read(path1),
+            "'path1' should have the content of the transactional store");
         MCRTransactionManager.commitTransactions();
 
-        assertArrayEquals("'path1' should have the content of the rollover store", new byte[] { 1 }, read(path1));
+        Assertions.assertArrayEquals(new byte[] { 1 }, read(path1),
+            "'path1' should have the content of the rollover store");
     }
 
-    @Test
+    @TestTemplate
     public void copyWithSourceAndTarget() throws IOException, MCROCFLInactiveTransactionException {
         byte[] path1Data = { 1 };
         byte[] path3Data = { 2 };
 
         write(path1, path1Data);
         storage.copy(path1, path2);
-        assertTrue("'path1' should exist", storage.exists(path1));
-        assertTrue("'path2' should exist", storage.exists(path2));
-        assertArrayEquals("'path1' should have the content of the rollover store", path1Data, read(path1));
-        assertArrayEquals("'path2' should have the content of the rollover store", path1Data, read(path2));
+        Assertions.assertTrue(storage.exists(path1), "'path1' should exist");
+        Assertions.assertTrue(storage.exists(path2), "'path2' should exist");
+        Assertions.assertArrayEquals(path1Data, read(path1), "'path1' should have the content of the rollover store");
+        Assertions.assertArrayEquals(path1Data, read(path2), "'path2' should have the content of the rollover store");
 
         MCRTransactionManager.beginTransactions();
-        assertArrayEquals("'path1' should have the content of the rollover store", path1Data, read(path1));
-        assertArrayEquals("'path2' should have the content of the rollover store", path1Data, read(path2));
+        Assertions.assertArrayEquals(path1Data, read(path1), "'path1' should have the content of the rollover store");
+        Assertions.assertArrayEquals(path1Data, read(path2), "'path2' should have the content of the rollover store");
         storage.copy(path1, path3);
-        assertArrayEquals("'path3' should have the content of the rollover store", path1Data, read(path3));
+        Assertions.assertArrayEquals(path1Data, read(path3), "'path3' should have the content of the rollover store");
         write(path3, path3Data);
         storage.copy(path3, path2);
-        assertArrayEquals("'path2' should have the content of the transactional store", path3Data, read(path2));
+        Assertions.assertArrayEquals(path3Data, read(path2),
+            "'path2' should have the content of the transactional store");
         MCRTransactionManager.commitTransactions();
     }
 
-    @Test
+    @TestTemplate
     public void move() throws IOException {
         storage.copy(new ByteArrayInputStream(new byte[] { 1 }), path1);
         storage.move(path1, path2);
-        assertTrue("'path2' should exist after move", storage.exists(path2));
+        Assertions.assertTrue(storage.exists(path2), "'path2' should exist after move");
 
         MCRTransactionManager.beginTransactions();
         storage.move(path2, path3);
-        assertTrue("'path3' should exist after move", storage.exists(path3));
+        Assertions.assertTrue(storage.exists(path3), "'path3' should exist after move");
         MCRTransactionManager.commitTransactions();
     }
 
-    @Test
+    @TestTemplate
     public void deleteIfExists() throws IOException {
         write(path1);
-        assertTrue("'path1' should exist before deletion", storage.exists(path1));
+        Assertions.assertTrue(storage.exists(path1), "'path1' should exist before deletion");
         storage.deleteIfExists(path1);
-        assertFalse("'path1' should not exist after deletion", storage.exists(path1));
+        Assertions.assertFalse(storage.exists(path1), "'path1' should not exist after deletion");
 
         MCRTransactionManager.beginTransactions();
         write(path1);
-        assertTrue("'path1' should exist before deletion", storage.exists(path1));
+        Assertions.assertTrue(storage.exists(path1), "'path1' should exist before deletion");
         storage.deleteIfExists(path1);
-        assertFalse("'path1' should not exist after deletion", storage.exists(path1));
+        Assertions.assertFalse(storage.exists(path1), "'path1' should not exist after deletion");
         MCRTransactionManager.commitTransactions();
     }
 

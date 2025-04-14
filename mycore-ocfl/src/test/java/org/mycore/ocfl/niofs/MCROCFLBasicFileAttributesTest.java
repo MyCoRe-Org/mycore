@@ -1,11 +1,8 @@
 package org.mycore.ocfl.niofs;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.mycore.ocfl.MCROCFLTestCaseHelper.DERIVATE_1;
+import static org.mycore.ocfl.MCROCFLTestCaseHelper.DERIVATE_2;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,69 +10,83 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.TestTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.digest.MCRDigest;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.ocfl.repository.MCROCFLRepository;
+import org.mycore.ocfl.test.MCROCFLSetupExtension;
+import org.mycore.ocfl.test.MCRPermutationExtension;
+import org.mycore.ocfl.test.PermutedParam;
+import org.mycore.test.MyCoReTest;
 
-public class MCROCFLBasicFileAttributesTest extends MCROCFLNioTestCase {
+@MyCoReTest
+@ExtendWith({ MCRPermutationExtension.class, MCROCFLSetupExtension.class })
+public class MCROCFLBasicFileAttributesTest {
 
-    public MCROCFLBasicFileAttributesTest(boolean remote, boolean purge) {
-        super(remote, purge);
-    }
+    protected MCROCFLRepository repository;
 
-    @Test
+    @PermutedParam
+    private boolean remote;
+
+    @PermutedParam
+    private boolean purge;
+
+    @TestTemplate
     public void testDirectoryAttributes() throws IOException, InterruptedException {
         MCRPath root = MCRPath.getPath(DERIVATE_1, "/");
         MCRFileAttributes<?> rootAttributes = Files.readAttributes(root, MCRFileAttributes.class);
-        assertTrue("root should be a directory", rootAttributes.isDirectory());
-        assertNull("directory digest should be null", rootAttributes.digest());
+        Assertions.assertTrue(rootAttributes.isDirectory(), "root should be a directory");
+        Assertions.assertNull(rootAttributes.digest(), "directory digest should be null");
 
         Thread.sleep(1);
         MCRTransactionManager.requireTransactions(MCROCFLFileSystemTransaction.class);
         Files.write(MCRPath.getPath(DERIVATE_1, "file1"), new byte[] { 1, 3, 3, 7 });
         MCRFileAttributes<?> rootAttributes2 = Files.readAttributes(root, MCRFileAttributes.class);
-        assertEquals("should have the same creation time after writing a file", rootAttributes.creationTime(),
-            rootAttributes2.creationTime());
-        assertTrue("modified time should be later",
-            rootAttributes2.lastModifiedTime().toInstant().isAfter(rootAttributes.lastModifiedTime().toInstant()));
+        Assertions.assertEquals(rootAttributes.creationTime(), rootAttributes2.creationTime(),
+            "should have the same creation time after writing a file");
+        Assertions.assertTrue(
+            rootAttributes2.lastModifiedTime().toInstant().isAfter(rootAttributes.lastModifiedTime().toInstant()),
+            "modified time should be later");
         MCRTransactionManager.commitTransactions(MCROCFLFileSystemTransaction.class);
     }
 
-    @Test
+    @TestTemplate
     public void testFileAttributes() throws IOException {
         Path whitePng = MCRPath.getPath(DERIVATE_1, "white.png");
         MCRFileAttributes<?> sourceAttributes = Files.readAttributes(whitePng, MCRFileAttributes.class);
-        assertFalse("'white.png' should not be a directory", sourceAttributes.isDirectory());
-        assertTrue("'white.png' should not be a regular file", sourceAttributes.isRegularFile());
-        assertNotNull("'white.png' should have a digest", sourceAttributes.digest());
+        Assertions.assertFalse(sourceAttributes.isDirectory(), "'white.png' should not be a directory");
+        Assertions.assertTrue(sourceAttributes.isRegularFile(), "'white.png' should not be a regular file");
+        Assertions.assertNotNull(sourceAttributes.digest(), "'white.png' should have a digest");
 
         MCRPath newFile = MCRPath.getPath(DERIVATE_1, "file1");
         MCRTransactionManager.beginTransactions();
         Files.write(newFile, new byte[] { 1, 3, 3, 7 });
         MCRFileAttributes<?> newFileAttributes = Files.readAttributes(newFile, MCRFileAttributes.class);
-        assertFalse("'file1' should not be a directory", newFileAttributes.isDirectory());
-        assertTrue("'file1' should not be a regular file", newFileAttributes.isRegularFile());
+        Assertions.assertFalse(newFileAttributes.isDirectory(), "'file1' should not be a directory");
+        Assertions.assertTrue(newFileAttributes.isRegularFile(), "'file1' should not be a regular file");
         MCRDigest newFileDigest = newFileAttributes.digest();
-        assertNotNull("'file1' should have a digest", newFileDigest);
+        Assertions.assertNotNull(newFileDigest, "'file1' should have a digest");
         MCRTransactionManager.commitTransactions();
 
         MCRFileAttributes<?> newFileAttributesAfterCommit = Files.readAttributes(newFile, MCRFileAttributes.class);
         MCRDigest afterCommitDigest = newFileAttributesAfterCommit.digest();
-        assertNotNull("'file1' should have a digest", afterCommitDigest);
-        assertEquals(newFileDigest, afterCommitDigest);
+        Assertions.assertNotNull(afterCommitDigest, "'file1' should have a digest");
+        Assertions.assertEquals(newFileDigest, afterCommitDigest);
     }
 
-    @Test
+    @TestTemplate
     public void moveAndCheckAttributes() throws IOException {
         Path source = MCRPath.getPath(DERIVATE_1, "white.png");
         Path target = MCRPath.getPath(DERIVATE_2, "moved.png");
         MCRTransactionManager.beginTransactions();
         Files.move(source, target);
         BasicFileAttributes targetFileAttributes = Files.readAttributes(target, BasicFileAttributes.class);
-        assertNotNull("'moved.png' should have basic file attributes", targetFileAttributes);
-        assertTrue("'moved.png' should be a regular file", targetFileAttributes.isRegularFile());
+        Assertions.assertNotNull(targetFileAttributes, "'moved.png' should have basic file attributes");
+        Assertions.assertTrue(targetFileAttributes.isRegularFile(), "'moved.png' should be a regular file");
         assertThrows(NoSuchFileException.class, () -> Files.readAttributes(source, BasicFileAttributes.class));
         MCRTransactionManager.commitTransactions();
     }

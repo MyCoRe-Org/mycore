@@ -1,26 +1,37 @@
 package org.mycore.ocfl.niofs;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
+import org.mycore.ocfl.repository.MCROCFLRepository;
+import org.mycore.ocfl.test.PermutedParam;
+import org.mycore.ocfl.test.MCRPermutationExtension;
+import org.mycore.ocfl.test.MCROCFLSetupExtension;
+import org.mycore.test.MyCoReTest;
 
-public class MCROCFLDirectoryTrackerTest extends MCROCFLNioTestCase {
+@MyCoReTest
+@ExtendWith({ MCRPermutationExtension.class, MCROCFLSetupExtension.class })
+public class MCROCFLDirectoryTrackerTest {
 
     private MCROCFLDirectoryTracker directoryTracker;
 
-    public MCROCFLDirectoryTrackerTest(boolean remote, boolean purge) {
-        super(remote, purge);
-    }
+    protected MCROCFLRepository repository;
 
-    @Before
+    @PermutedParam
+    private boolean remote;
+
+    @PermutedParam
+    private boolean purge;
+
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
+        // directoryTracker
         Map<MCRVersionedPath, Boolean> paths = new HashMap<>();
         paths.put(MCRVersionedPath.getPath("der_1", "v1", "path1"), false);
         paths.put(MCRVersionedPath.getPath("der_1", "v1", "path2"), false);
@@ -28,7 +39,7 @@ public class MCROCFLDirectoryTrackerTest extends MCROCFLNioTestCase {
         directoryTracker = new MCROCFLDirectoryTracker(paths);
     }
 
-    @Test
+    @TestTemplate
     public void update() {
         MCRVersionedPath path4 = MCRVersionedPath.getPath("der_1", "v1", "path4");
         directoryTracker.update(path4, true);
@@ -36,7 +47,7 @@ public class MCROCFLDirectoryTrackerTest extends MCROCFLNioTestCase {
         assertChange(path4, MCROCFLDirectoryTracker.ChangeType.ADD_KEEP);
     }
 
-    @Test
+    @TestTemplate
     public void remove() {
         MCRVersionedPath path1 = MCRVersionedPath.getPath("der_1", "v1", "path1");
         directoryTracker.remove(path1);
@@ -45,7 +56,7 @@ public class MCROCFLDirectoryTrackerTest extends MCROCFLNioTestCase {
     }
 
     private void assertChanges(int numberOfChanges) {
-        assertEquals(numberOfChanges, directoryTracker.changes().size());
+        Assertions.assertEquals(numberOfChanges, directoryTracker.changes().size());
     }
 
     private void assertChange(MCRVersionedPath path, MCROCFLDirectoryTracker.ChangeType changeType) {

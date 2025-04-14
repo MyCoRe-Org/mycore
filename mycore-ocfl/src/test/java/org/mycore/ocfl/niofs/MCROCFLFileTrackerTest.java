@@ -1,19 +1,19 @@
 package org.mycore.ocfl.niofs;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mycore.ocfl.niofs.MCROCFLFileTracker.Change;
 import org.mycore.ocfl.niofs.MCROCFLFileTracker.ChangeType;
 
@@ -32,7 +32,7 @@ public class MCROCFLFileTrackerTest {
         DATA.put("path5", "5");
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         Map<String, String> original = new HashMap<>();
         original.put("path1", DATA.get("path1"));
@@ -132,7 +132,6 @@ public class MCROCFLFileTrackerTest {
         assertChange("path1", ChangeType.DELETED);
         assertChange("new_path1", ChangeType.ADDED_OR_MODIFIED);
 
-        // TODO this is not supported yet. We cannot recover to a rename.
         fileTracker.write("new_path1", DATA.get("path1"));
         assertChanges(1);
         assertChangeRename("path1", "new_path1");
@@ -281,7 +280,7 @@ public class MCROCFLFileTrackerTest {
             c -> c.type().equals(ChangeType.RENAMED)
                 && c.source().equals("path1")
                 && c.target().equals("conflict"));
-        assertTrue("Expected a rename change for 'path1' -> 'conflict'", foundRename);
+        assertTrue(foundRename, "Expected a rename change for 'path1' -> 'conflict'");
     }
 
     @Test
