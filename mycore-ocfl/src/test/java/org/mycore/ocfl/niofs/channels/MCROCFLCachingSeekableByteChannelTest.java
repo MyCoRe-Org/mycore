@@ -18,9 +18,9 @@
 
 package org.mycore.ocfl.niofs.channels;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -29,24 +29,23 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 public class MCROCFLCachingSeekableByteChannelTest {
 
-    @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder();
+    @TempDir
+    Path tempFolder;
 
     @Test
     public void testCachingSeekableByteChannel() throws IOException {
         // Create a temporary file with some test data
-        Path originalFilePath = tempFolder.newFile("original.txt").toPath();
+        Path originalFilePath = tempFolder.resolve("original.txt");
         String testData = "This is some test data for the SeekableByteChannel.";
         Files.write(originalFilePath, testData.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
 
         // Create a temporary file for caching the read data
-        Path cacheFilePath = tempFolder.newFile("cached.txt").toPath();
+        Path cacheFilePath = tempFolder.resolve("cached.txt");
 
         // Create a SeekableByteChannel for the original file
         try (SeekableByteChannel originalChannel = Files.newByteChannel(originalFilePath, StandardOpenOption.READ);
@@ -57,25 +56,27 @@ public class MCROCFLCachingSeekableByteChannelTest {
 
             // Read the first 10 bytes
             int bytesRead = cachingChannel.read(buffer);
-            assertEquals("Expected to read 10 bytes, but read " + bytesRead + " bytes.", 10, bytesRead);
+            assertEquals(10, bytesRead, "Expected to read 10 bytes, but read " + bytesRead + " bytes.");
             buffer.clear();
-            assertFalse("File should not be marked complete after reading only 10 bytes.",
-                cachingChannel.isFileComplete());
+            assertFalse(cachingChannel.isFileComplete(),
+                "File should not be marked complete after reading only 10 bytes.");
 
             // Jump to position 20 and read another 10 bytes
             cachingChannel.position(20);
             bytesRead = cachingChannel.read(buffer);
-            assertEquals("Expected to read 10 bytes at position 20, but read " + bytesRead + " bytes.", 10, bytesRead);
+            assertEquals(10, bytesRead,
+                "Expected to read 10 bytes at position 20, but read " + bytesRead + " bytes.");
             buffer.clear();
-            assertFalse("File should not be marked complete after reading two chunks.",
-                cachingChannel.isFileComplete());
+            assertFalse(cachingChannel.isFileComplete(),
+                "File should not be marked complete after reading two chunks.");
 
             // Read the remaining bytes sequentially
             cachingChannel.position(10); // Jump back to position 10
             bytesRead = cachingChannel.read(buffer);
-            assertEquals("Expected to read 10 bytes at position 10, but read " + bytesRead + " bytes.", 10, bytesRead);
-            assertFalse("File should not be marked complete after reading three chunks.",
-                cachingChannel.isFileComplete());
+            assertEquals(10, bytesRead,
+                "Expected to read 10 bytes at position 10, but read " + bytesRead + " bytes.");
+            assertFalse(cachingChannel.isFileComplete(),
+                "File should not be marked complete after reading three chunks.");
 
             // Read until the end
             do {
@@ -83,21 +84,22 @@ public class MCROCFLCachingSeekableByteChannelTest {
             } while (cachingChannel.read(buffer) != -1);
 
             // Check if the cached file is complete
-            assertTrue("File should be marked complete after reading all the data.", cachingChannel.isFileComplete());
+            assertTrue(cachingChannel.isFileComplete(),
+                "File should be marked complete after reading all the data.");
 
             // Verify the content of the cached file
             String cachedData = new String(Files.readAllBytes(cacheFilePath));
-            assertEquals("Cached file content does not match the original content.", testData, cachedData);
+            assertEquals(testData, cachedData, "Cached file content does not match the original content.");
         }
     }
 
     @Test
     public void testOverlappingRangesMerging() throws IOException {
         String testData = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-        Path originalFilePath = tempFolder.newFile("original2.txt").toPath();
+        Path originalFilePath = tempFolder.resolve("original2.txt");
         Files.write(originalFilePath, testData.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
 
-        Path cacheFilePath = tempFolder.newFile("cached2.txt").toPath();
+        Path cacheFilePath = tempFolder.resolve("cached2.txt");
 
         try (SeekableByteChannel originalChannel = Files.newByteChannel(originalFilePath, StandardOpenOption.READ);
             MCROCFLCachingSeekableByteChannel cachingChannel =
@@ -107,18 +109,19 @@ public class MCROCFLCachingSeekableByteChannelTest {
             ByteBuffer buffer = ByteBuffer.allocate(30);
             cachingChannel.position(0);
             int bytesRead = cachingChannel.read(buffer);
-            assertEquals("Expected to read 30 bytes, but read " + bytesRead + " bytes.", 30, bytesRead);
+            assertEquals(30, bytesRead, "Expected to read 30 bytes, but read " + bytesRead + " bytes.");
             buffer.clear();
 
             // Read 20 bytes from position 20 (overlap: positions 20 - 39)
             ByteBuffer buffer2 = ByteBuffer.allocate(20);
             cachingChannel.position(20);
             bytesRead = cachingChannel.read(buffer2);
-            assertEquals("Expected to read 20 bytes at position 20, but read " + bytesRead + " bytes.", 20, bytesRead);
+            assertEquals(20, bytesRead,
+                "Expected to read 20 bytes at position 20, but read " + bytesRead + " bytes.");
 
             // Verify that the internal cache has a single merged range [0, 39]
-            assertTrue("Expected a single merged cached range from 0 to 39.",
-                cachingChannel.hasSingleMergedRange(0, 39));
+            assertTrue(cachingChannel.hasSingleMergedRange(0, 39),
+                "Expected a single merged cached range from 0 to 39.");
         }
     }
 

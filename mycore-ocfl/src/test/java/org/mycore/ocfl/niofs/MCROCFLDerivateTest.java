@@ -18,27 +18,52 @@
 
 package org.mycore.ocfl.niofs;
 
-import org.junit.Test;
+import org.junit.jupiter.api.TestTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mycore.access.strategies.MCRAccessCheckStrategy;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetaIFS;
+import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.ocfl.MCROCFLMetadataTestCase;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.ocfl.MCROCFLTestCaseHelper;
+import org.mycore.ocfl.repository.MCROCFLRepository;
+import org.mycore.ocfl.test.PermutedParam;
+import org.mycore.ocfl.test.MCRPermutationExtension;
+import org.mycore.ocfl.test.MCROCFLSetupExtension;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MyCoReTest;
 
-public class MCROCFLDerivateTest extends MCROCFLMetadataTestCase {
+@MyCoReTest
+@ExtendWith({ MCRJPAExtension.class, MCRPermutationExtension.class, MCROCFLSetupExtension.class })
+@MCROCFLSetupExtension.LoadDefaultDerivate(false)
+@MCRTestConfiguration(
+    properties = {
+        // set jpa mappings, only use mycore-base
+        @MCRTestProperty(key = "MCR.JPA.MappingFileNames", string = "META-INF/mycore-base-mappings.xml"),
+        // use ocfl metadata
+        @MCRTestProperty(key = "MCR.Metadata.Type.object", string = "true"),
+        @MCRTestProperty(key = "MCR.Metadata.Type.derivate", string = "true"),
+        // set free access
+        @MCRTestProperty(key = "MCR.Access.Class", string = "org.mycore.access.MCRAccessBaseImpl"),
+        @MCRTestProperty(key = "MCR.Access.Strategy.Class",
+            string = "org.mycore.ocfl.niofs.MCROCFLDerivateTest$AlwaysTrueStrategy")
+    })
+public class MCROCFLDerivateTest {
 
-    @Override
-    public void tearDown() throws Exception {
-        MCROCFLFileSystemProvider.get().clearCache();
-        if (MCRTransactionManager.isActive(MCROCFLFileSystemTransaction.class)) {
-            MCRTransactionManager.rollbackTransactions(MCROCFLFileSystemTransaction.class);
-        }
-        MCROCFLFileSystemTransaction.resetTransactionCounter();
-        super.tearDown();
-    }
+    protected MCROCFLRepository repository;
 
-    @Test
+    @PermutedParam
+    private boolean remote;
+
+    @PermutedParam
+    private boolean purge;
+
+    @TestTemplate
     public void create() throws Exception {
         MCRObject object = createObject("junit_object_00000001");
         MCRDerivate derivate = createDerivate(object.getId().toString(), "junit_derivate_00000001");
@@ -48,6 +73,34 @@ public class MCROCFLDerivateTest extends MCROCFLMetadataTestCase {
         MCRMetadataManager.create(derivate);
         MCROCFLTestCaseHelper.loadDerivate(derivate.getId().toString());
         MCRTransactionManager.commitTransactions(MCROCFLFileSystemTransaction.class);
+    }
+
+    public MCRObject createObject(String objectId) {
+        MCRObject object = new MCRObject();
+        object.setId(MCRObjectID.getInstance(objectId));
+        object.setSchema("noSchema");
+        return object;
+    }
+
+    public MCRDerivate createDerivate(String objectId, String derivateId) {
+        MCRDerivate derivate = new MCRDerivate();
+        derivate.setId(MCRObjectID.getInstance(derivateId));
+        derivate.setSchema("datamodel-derivate.xsd");
+        MCRMetaIFS ifs = new MCRMetaIFS("internal", null);
+        derivate.getDerivate().setInternals(ifs);
+        MCRMetaLinkID mcrMetaLinkID = new MCRMetaLinkID("linkmeta", 0);
+        mcrMetaLinkID.setReference(objectId, null, null);
+        derivate.getDerivate().setLinkMeta(mcrMetaLinkID);
+        return derivate;
+    }
+
+    public static class AlwaysTrueStrategy implements MCRAccessCheckStrategy {
+
+        @Override
+        public boolean checkPermission(String id, String permission) {
+            return true;
+        }
+
     }
 
 }
