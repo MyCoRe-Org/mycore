@@ -1,45 +1,54 @@
 package org.mycore.ocfl.niofs;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-
 import java.io.IOException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.TestTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mycore.ocfl.repository.MCROCFLRepository;
+import org.mycore.ocfl.test.PermutedParam;
+import org.mycore.ocfl.test.MCRPermutationExtension;
+import org.mycore.ocfl.test.MCROCFLSetupExtension;
+import org.mycore.test.MyCoReTest;
 
-public class MCROCFLFileStoreTest extends MCROCFLNioTestCase {
+@MyCoReTest
+@ExtendWith({ MCRPermutationExtension.class, MCROCFLSetupExtension.class })
+public class MCROCFLFileStoreTest {
 
-    public MCROCFLFileStoreTest(boolean remote, boolean purge) {
-        super(remote, purge);
-    }
+    protected MCROCFLRepository repository;
 
-    @Override
-    public void tearDown() throws Exception {
+    @PermutedParam
+    private boolean remote;
+
+    @PermutedParam
+    private boolean purge;
+
+    @AfterEach
+    public void tearDown() {
         MCROCFLFileSystemProvider.getMCROCFLFileSystem().resetFileStore();
-        super.tearDown();
     }
 
-    @Test
+    @TestTemplate
     public void name() {
-        assertNotNull("file store should have a name", fs().name());
+        Assertions.assertNotNull(fs().name(), "file store should have a name");
     }
 
-    @Test
+    @TestTemplate
     public void type() {
-        assertNotNull("file store should have a type", fs().type());
+        Assertions.assertNotNull(fs().type(), "file store should have a type");
     }
 
-    @Test
+    @TestTemplate
     public void isReadOnly() {
-        assertFalse("file store shouldn't be readonly", fs().isReadOnly());
+        Assertions.assertFalse(fs().isReadOnly(), "file store shouldn't be readonly");
     }
 
-    @Test
+    @TestTemplate
     public void space() throws IOException {
-        if (!isRemote()) {
-            assertNotEquals("file store should have total space", 0, fs().getTotalSpace());
-            assertNotEquals("file store should have usable space", 0, fs().getUsableSpace());
+        if (!remote) {
+            Assertions.assertNotEquals(0, fs().getTotalSpace(), "file store should have total space");
+            Assertions.assertNotEquals(0, fs().getUsableSpace(), "file store should have usable space");
         }
     }
 
