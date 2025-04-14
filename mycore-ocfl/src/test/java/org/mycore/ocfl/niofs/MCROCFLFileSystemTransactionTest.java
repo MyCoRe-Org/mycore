@@ -1,26 +1,41 @@
 package org.mycore.ocfl.niofs;
 
+import static org.mycore.ocfl.MCROCFLTestCaseHelper.DERIVATE_1;
+import static org.mycore.ocfl.MCROCFLTestCaseHelper.DERIVATE_1_OBJECT_ID;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
 import java.nio.file.StandardOpenOption;
 import java.util.Set;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.TestTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
+import org.mycore.ocfl.repository.MCROCFLRepository;
+import org.mycore.ocfl.test.PermutedParam;
+import org.mycore.ocfl.test.MCRPermutationExtension;
+import org.mycore.ocfl.test.MCROCFLSetupExtension;
+import org.mycore.test.MyCoReTest;
 
 import io.ocfl.api.model.ObjectVersionId;
 import io.ocfl.api.model.OcflObjectVersion;
 
-public class MCROCFLFileSystemTransactionTest extends MCROCFLNioTestCase {
+@MyCoReTest
+@ExtendWith({ MCRPermutationExtension.class, MCROCFLSetupExtension.class })
+public class MCROCFLFileSystemTransactionTest {
 
-    public MCROCFLFileSystemTransactionTest(boolean remote, boolean purge) {
-        super(remote, purge);
-    }
+    protected MCROCFLRepository repository;
 
-    @Test
+    @PermutedParam
+    private boolean remote;
+
+    @PermutedParam
+    private boolean purge;
+
+    @TestTemplate
     public void commit() throws IOException {
         MCRVersionedPath whitePng = MCRVersionedPath.head(DERIVATE_1, "white.png");
         MCRVersionedPath other = MCRVersionedPath.head(DERIVATE_1, "other");
@@ -69,7 +84,7 @@ public class MCROCFLFileSystemTransactionTest extends MCROCFLNioTestCase {
 
     private void checkVersion(int version) {
         OcflObjectVersion derivate1 = repository.getObject(ObjectVersionId.head(DERIVATE_1_OBJECT_ID));
-        Assert.assertEquals("derivate version is wrong", version, derivate1.getVersionNum().getVersionNum());
+        Assertions.assertEquals(version, derivate1.getVersionNum().getVersionNum(), "derivate version is wrong");
     }
 
 }
