@@ -28,12 +28,9 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
-import org.mycore.ocfl.repository.MCROCFLHashRepositoryProvider;
 import org.mycore.ocfl.repository.MCROCFLRepository;
-import org.mycore.ocfl.repository.MCROCFLRepositoryBuilder;
-import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
+import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 
 import io.ocfl.api.model.ObjectVersionId;
 import io.ocfl.api.model.SizeDigestAlgorithm;
@@ -41,23 +38,19 @@ import io.ocfl.api.model.VersionInfo;
 
 public abstract class MCROCFLTestCaseHelper {
 
-    public static MCROCFLRepository setUp(boolean remote) throws IOException {
-        String repositoryId = MCRConfiguration2.getString("MCR.Content.Manager.Repository").orElseThrow();
-        MCROCFLRepositoryProvider repositoryProvider = MCROCFLRepositoryProvider.getProvider(repositoryId);
-        if (!(repositoryProvider instanceof RepositoryProviderMock repositoryProviderMock)) {
-            throw new MCROCFLException("Invalid provider. Should be RepositoryProviderMock, but is "
-                + repositoryProvider.getClass().getSimpleName());
-        }
-        repositoryProviderMock.setRemote(remote);
-        repositoryProviderMock.init(MCROCFLRepositoryProvider.REPOSITORY_PROPERTY_PREFIX + repositoryId);
-        return repositoryProvider.getRepository();
-    }
+    /**
+     * This ocfl object is created on test startup.
+     */
+    public static final String DERIVATE_1 = "junit_derivate_00000001";
 
-    public static void tearDown(MCROCFLRepository repository) {
-        for (String objectId : repository.listObjectIds().toList()) {
-            repository.purgeObject(objectId);
-        }
-    }
+    public static final String DERIVATE_1_OBJECT_ID = MCROCFLObjectIDPrefixHelper.MCRDERIVATE + DERIVATE_1;
+
+    /**
+     * This ocfl object is NOT created on test startup.
+     */
+    public static final String DERIVATE_2 = "junit_derivate_00000002";
+
+    public static final String DERIVATE_2_OBJECT_ID = MCROCFLObjectIDPrefixHelper.MCRDERIVATE + DERIVATE_2;
 
     public static ObjectVersionId writeFile(MCROCFLRepository repository, String ocflObjectId, String fileName,
         String data) {
@@ -79,27 +72,6 @@ public abstract class MCROCFLTestCaseHelper {
         final Path sourcePath = Path.of(derivateURL.toURI());
         final MCRVersionedPath targetPath = MCRVersionedPath.head(derivateId, "/");
         Files.walkFileTree(sourcePath, new CopyFileVisitor(targetPath));
-    }
-
-    public static class RepositoryProviderMock extends MCROCFLHashRepositoryProvider {
-
-        private boolean remote;
-
-        public void setRemote(boolean remote) {
-            this.remote = remote;
-        }
-
-        @Override
-        protected MCROCFLRepository buildRepository(String id) {
-            return new MCROCFLRepositoryBuilder()
-                .id(id)
-                .remote(this.remote)
-                .defaultLayoutConfig(getExtensionConfig())
-                .storage(this::configureStorage)
-                .workDir(workDir)
-                .buildMCR();
-        }
-
     }
 
     private static class CopyFileVisitor extends SimpleFileVisitor<Path> {
