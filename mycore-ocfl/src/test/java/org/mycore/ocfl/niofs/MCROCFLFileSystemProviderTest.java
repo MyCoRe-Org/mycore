@@ -1,6 +1,6 @@
 package org.mycore.ocfl.niofs;
 
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mycore.ocfl.MCROCFLTestCaseHelper.DERIVATE_1;
 import static org.mycore.ocfl.MCROCFLTestCaseHelper.DERIVATE_2;
@@ -221,9 +221,9 @@ public class MCROCFLFileSystemProviderTest {
 
         // copy to v1
         MCRTransactionManager.beginTransactions();
-        assertThrows("cannot copy to non head version", IOException.class, () -> {
+        assertThrows(IOException.class, () -> {
             Files.copy(copiedV3, whiteV1);
-        });
+        }, "cannot copy to non head version");
         MCRTransactionManager.commitTransactions();
 
         // copy foreign source file
@@ -295,9 +295,9 @@ public class MCROCFLFileSystemProviderTest {
         Path emptyDirectory = MCRPath.getPath(DERIVATE_1, "/empty");
         try (DirectoryStream<Path> paths = Files.newDirectoryStream(emptyDirectory)) {
             assertThrows(
-                "'empty' directory should be empty",
                 NoSuchElementException.class,
-                () -> paths.iterator().next());
+                () -> paths.iterator().next(),
+                "'empty' directory should be empty");
         }
     }
 
@@ -362,9 +362,9 @@ public class MCROCFLFileSystemProviderTest {
         BasicFileAttributes existingIdRootAttributes = Files.readAttributes(MCRPath.getPath(DERIVATE_1, "/"),
             BasicFileAttributes.class);
         assertTrue(existingIdRootAttributes.isDirectory(), "root directory should exist");
-        assertThrows("root directory should not exist", NoSuchFileException.class, () -> {
+        assertThrows(NoSuchFileException.class, () -> {
             Files.readAttributes(MCRPath.getPath(DERIVATE_2, "/"), BasicFileAttributes.class);
-        });
+        }, "root directory should not exist");
     }
 
     @TestTemplate
