@@ -48,8 +48,9 @@ import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 /**
  * JUnit 5 extension that sets up and tears down an {@code MCROCFLRepository} before and after each test.
  * <p>
- * It detects {@code remote} and {@code purge} fields on the test class (optionally annotated with {@link PermutedParam}),
- * configures a {@link RepositoryProviderMock}, and injects the repository into a field named {@code repository}.
+ * It detects {@code remote} and {@code purge} fields on the test class (optionally annotated with
+ * {@link PermutedParam}), configures a {@link RepositoryProviderMock}, and injects the repository into a field named
+ * {@code repository}.
  * <p>
  * Optionally loads a test derivate if the test class or method is annotated with {@link LoadDefaultDerivate}.
  * <p>
