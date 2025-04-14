@@ -86,7 +86,8 @@ public class MCROCFLBasicFileAttributesTest {
         BasicFileAttributes targetFileAttributes = Files.readAttributes(target, BasicFileAttributes.class);
         Assertions.assertNotNull(targetFileAttributes, "'moved.png' should have basic file attributes");
         Assertions.assertTrue(targetFileAttributes.isRegularFile(), "'moved.png' should be a regular file");
-        Assertions.assertThrows(NoSuchFileException.class, () -> Files.readAttributes(source, BasicFileAttributes.class));
+        Assertions.assertThrows(NoSuchFileException.class,
+            () -> Files.readAttributes(source, BasicFileAttributes.class));
         MCRTransactionManager.commitTransactions();
     }
 
