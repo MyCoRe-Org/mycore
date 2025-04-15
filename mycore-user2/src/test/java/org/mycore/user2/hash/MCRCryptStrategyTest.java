@@ -18,16 +18,15 @@
 
 package org.mycore.user2.hash;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.security.SecureRandom;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 
-public class MCRCryptStrategyTest extends MCRTestCase {
+public class MCRCryptStrategyTest {
 
     public static final String TYPE = "type";
 
