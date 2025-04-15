@@ -21,13 +21,11 @@ package org.mycore.user2.hash;
 import java.security.SecureRandom;
 import java.util.Base64;
 
-/**
- * A {@link MCRSaltedHashPasswordCheckStrategyBase} is a base implementation of {@link MCRPasswordCheckStrategy} that
- * facilitates verification by comparing a generated hash string and employs a randomly generated salt.
- * <p>
- * The salt is stored as a Base64 encoded String. The verification result will be marked as outdated if the size of
- * the salt doesn't equal the expected size.
- */
+/// A [MCRSaltedHashPasswordCheckStrategyBase] is a base implementation of [MCRPasswordCheckStrategy] that
+/// facilitates verification by comparing a generated hash string and employs a randomly generated salt.
+/// 
+/// The salt is stored as a Base64 encoded String. The verification result will be marked as outdated
+/// if the size of the salt doesn't equal the expected size.
 public abstract class MCRSaltedHashPasswordCheckStrategyBase extends MCRHashPasswordCheckStrategyBase {
 
     private final int saltSizeBytes;

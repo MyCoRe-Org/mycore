@@ -34,35 +34,35 @@ import org.mycore.common.config.annotation.MCRProperty;
 
 import com.google.common.primitives.Bytes;
 
-/**
- * {@link MCRS2KStrategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the iterated and
- * salted String-to-Key (S2K) algorithm describes in RFC 4880 (OpenPGP Message Format).
- * <p>
- * The salt is returned as a hex encoded string. The hash is returned as a hex encoded string.
- * <p>
- * The following configuration options are available, if configured automatically:
- * <ul>
- * <li> The configuration suffix {@link MCRS2KStrategy#SALT_SIZE_BYTES_KEY} can be used to specify the size of
- * generated salt values in bytes.
- * <li> The configuration suffix {@link MCRS2KStrategy#HASH_SIZE_BYTES_KEY} can be used to specify the size of
- * generated hash values in bytes.
- * <li> The configuration suffix {@link MCRS2KStrategy#HASH_ALGORITHM_KEY} can be used to specify the hash algorithm
- * to be used.
- * <li> The configuration suffix {@link MCRS2KStrategy#COUNT_KEY} can be used to specify the count parameter the
- * determines the number of hashed bytes.
- * </ul>
- * Example:
- * <pre>
- * [...].Class=org.mycore.user2.hash.MCRS2KStrategy
- * [...].SaltSizeBytes=16
- * [...].HashSizeBytes=32
- * [...].HashAlgorithm=SHA256
- * [...].Count=275
- * </pre>
- * Changes to the hash algorithm or count parameter will result in deviating hashes and therefore prevent the
- * successful verification of existing hashes, even if the correct password is supplied. Changes to the salt size or
- * the hash size will not prevent verification, but successful verification results will be marked as outdated.
- */
+/// [MCRS2KStrategy] is an implementation of [MCRPasswordCheckStrategy] that uses the iterated and
+/// salted String-to-Key (S2K) algorithm describes in RFC 4880 (OpenPGP Message Format).
+/// 
+/// The salt is returned as a hex encoded string. The hash is returned as a hex encoded string.
+/// 
+/// The following configuration options are available, if configured automatically:
+/// 
+/// - The configuration suffix [MCRS2KStrategy#SALT_SIZE_BYTES_KEY] can be used to specify
+///   the size of generated salt values in bytes.
+/// - The configuration suffix [MCRS2KStrategy#HASH_SIZE_BYTES_KEY] can be used to specify
+///   the size of generated hash values in bytes.
+/// - The configuration suffix [MCRS2KStrategy#HASH_ALGORITHM_KEY] can be used to specify
+///   the hash algorithm to be used.
+/// - The configuration suffix [MCRS2KStrategy#COUNT_KEY] can be used to specify
+///   the count parameter the determines the number of hashed bytes.
+/// 
+/// Example:
+/// ```properties
+/// [...].Class=org.mycore.user2.hash.MCRS2KStrategy
+/// [...].SaltSizeBytes=16
+/// [...].HashSizeBytes=32
+/// [...].HashAlgorithm=SHA256
+/// [...].Count=275
+/// ```
+/// Changes to the hash algorithm or count parameter will result in deviating hashes and therefore prevent
+/// the successful verification of existing hashes, even if the correct password is supplied.
+/// 
+/// Changes to the salt size or the hash size will not prevent verification, but successful verification
+/// results will be marked as outdated.
 @MCRConfigurationProxy(proxyClass = MCRS2KStrategy.Factory.class)
 public class MCRS2KStrategy extends MCRPasswordCheckStrategyBase {
 

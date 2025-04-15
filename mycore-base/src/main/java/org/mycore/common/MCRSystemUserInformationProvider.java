@@ -20,24 +20,21 @@ package org.mycore.common;
 
 import java.util.Optional;
 
-/**
- * {@link MCRSystemUserInformationProvider} is an implementation of {@link MCRUserInformationProvider} that that looks
- * up user information of type {@link MCRSystemUserInformation} as defined in {@link MCRSystemUserInformation}.
- * <p>
- * Possible user IDs are:
- * <ul>
- * <li> {@link MCRSystemUserInformationProvider#GUEST}
- * <li >{@link MCRSystemUserInformationProvider#JANITOR}
- * <li> {@link MCRSystemUserInformationProvider#SYSTEM_USER}
- * <li >{@link MCRSystemUserInformationProvider#SUPER_USER}
- * </ul>
- * No configuration options are available, if configured automatically.
- * <p>
- * Example:
- * <pre>
- * [...].Class=org.mycore.common.MCRSystemUserInformationProvider
- * </pre>
- */
+/// [MCRSystemUserInformationProvider] is a [MCRUserInformationProvider] that that looks up user information
+/// of type [MCRSystemUserInformation] as defined in [MCRSystemUserInformation].
+/// 
+/// Possible user IDs are:
+/// - [MCRSystemUserInformation#GUEST]
+/// - [MCRSystemUserInformation#JANITOR]
+/// - [MCRSystemUserInformation#SYSTEM_USER]
+/// - [MCRSystemUserInformation#SUPER_USER]
+/// 
+/// No configuration options are available, if configured automatically.
+/// 
+/// Example:
+/// ```properties
+/// [...].Class=org.mycore.common.MCRSystemUserInformationProvider
+/// ```
 public final class MCRSystemUserInformationProvider implements MCRUserInformationProvider {
 
     private static final MCRSystemUserInformationProvider INSTANCE = new MCRSystemUserInformationProvider();

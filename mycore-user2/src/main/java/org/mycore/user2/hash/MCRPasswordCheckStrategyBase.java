@@ -22,10 +22,8 @@ import java.security.SecureRandom;
 
 import org.mycore.common.MCRException;
 
-/**
- * {@link MCRPasswordCheckStrategyBase} is a base implementation of {@link MCRPasswordCheckStrategy} that
- * facilitates consistent exception handling.
- */
+/// [MCRPasswordCheckStrategyBase] is a base implementation of [MCRPasswordCheckStrategy] that
+/// facilitates consistent exception handling.
 public abstract class MCRPasswordCheckStrategyBase implements MCRPasswordCheckStrategy {
 
     @Override

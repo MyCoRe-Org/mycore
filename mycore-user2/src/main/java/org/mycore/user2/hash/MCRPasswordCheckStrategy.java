@@ -20,9 +20,7 @@ package org.mycore.user2.hash;
 
 import java.security.SecureRandom;
 
-/**
- * A {@link MCRPasswordCheckStrategy} implements a password hashing and verification strategy.
- */
+/// A [MCRPasswordCheckStrategy] implements a password hashing and verification strategy.
 public interface MCRPasswordCheckStrategy {
 
     String unmodifiableConfigurationHint();

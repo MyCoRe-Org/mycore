@@ -41,48 +41,54 @@ import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.config.annotation.MCRSentinel;
 
-/**
- * A {@link MCRPasswordCheckManager} can be used to create password hashes and to verify an existing hash
- * against a given password, without knowledge of the underlying algorithm that performs these actions. To do so,
- * it uses {@link MCRPasswordCheckStrategy} instances that each implement a password hashing and verification strategy.
- * A single strategy is selected to create new password hashes. Alle strategies are available to verify existing
- * password hashes.
- * <p>
- * The verification result is marked as deprecated, when the strategy used to verify the hash isn't the
- * selected strategy or if the used strategy already marked it as deprecated.
- * <p>
- * A singular, globally available and centrally configured instance can be obtained with
- * {@link MCRPasswordCheckManager#obtainInstance()}. This instance is configured using the property prefix
- * {@link MCRPasswordCheckManager#MANAGER_PROPERTY} and should be used in order to create or verify password hashes,
- * although custom instances can be created when necessary.
- * <p>
- * The following configuration options are available, if configured automatically:
- * <ul>
- * <li> Strategies are configured as a map using the property suffix {@link MCRPasswordCheckManager#STRATEGIES_KEY}.
- * <li> Each strategy can be excluded from the configuration using the property {@link MCRSentinel#ENABLED_KEY}.
- * <li> The selected strategy is configured using the property suffix
- * {@link MCRPasswordCheckManager#SELECTED_STRATEGY_KEY}.
- * <li> The property suffix {@link MCRPasswordCheckManager#CONFIGURATION_CHECKS_KEY} can be used to enable or
- * disable configuration checks during instantiation, specifically: (1) whether a strategy annotated with
- * {@link MCROutdated} has been selected and (2) whether the configuration of a strategy has been changed in a way
- * that will prevent existing password hashes from being successfully verified, even if the correct password
- * was supplied.
- * </ul>
- * Example:
- * <pre>
- * MCR.User.PasswordCheck.Class=org.mycore.user2.hash.MCRPasswordCheckManager
- * MCR.User.PasswordCheck.Strategies.foo.Class=foo.bar.FooStrategy
- * MCR.User.PasswordCheck.Strategies.foo.Enabled=true
- * MCR.User.PasswordCheck.Strategies.foo.Key1=Value1
- * MCR.User.PasswordCheck.Strategies.foo.Key2=Value2
- * MCR.User.PasswordCheck.Strategies.bar.Class=foo.bar.FooStrategy
- * MCR.User.PasswordCheck.Strategies.bar.Enabled=false
- * MCR.User.PasswordCheck.Strategies.bar.Key1=Value1
- * MCR.User.PasswordCheck.Strategies.bar.Key2=Value2
- * MCR.User.PasswordCheck.SelectedStrategy=foo
- * MCR.User.PasswordCheck.ConfigurationChecks=OUTDATED_STRATEGY,INCOMPATIBLE_CHANGE
- * </pre>
- */
+/// A [MCRPasswordCheckManager] can be used to create password hashes and to verify an existing hash
+/// against a given password, without knowledge of the underlying algorithm that performs these actions.
+/// To do so, it uses [MCRPasswordCheckStrategy] instances that each implement a password hashing
+/// and verification strategy. A single strategy is selected to create new password hashes.
+/// All strategies are available to verify existing password hashes.
+/// 
+/// The verification result is marked as deprecated, when the strategy used to verify the hash isn't the
+/// selected strategy or if the used strategy already marked it as deprecated.
+/// 
+/// A singular, globally available and centrally configured instance can be obtained with
+/// [MCRPasswordCheckManager#obtainInstance()]. This instance should generally be used,
+/// although custom instances can be created when necessary.
+/// It is configured using the property prefix [MCRPasswordCheckManager#MANAGER_PROPERTY].
+///
+/// ```properties
+/// MCR.User.PasswordCheck.Class=org.mycore.user2.hash.MCRPasswordCheckManager
+/// ```
+/// 
+/// The following configuration options are available, if configured automatically:
+/// - The configuration suffix [MCRPasswordCheckManager#STRATEGIES_KEY] can be used to specify
+///   the map of strategies to be used.
+/// - For each strategy, the configuration suffix [MCRSentinel#ENABLED_KEY] can be used to
+///   excluded that strategy from the configuration.
+/// - The configuration suffix [MCRPasswordCheckManager#SELECTED_STRATEGY_KEY] can be used to specify
+///   the selected strategy.
+/// - The configuration suffix [MCRPasswordCheckManager#CONFIGURATION_CHECKS_KEY] can be used to specify
+///   the set of {@link ConfigurationCheck} names of the configuration checks
+///   to be performed, specifically: 
+///   - {@link ConfigurationCheck#OUTDATED_STRATEGY}: Whether a strategy annotated with [MCROutdated]
+///     has been selected.
+///   - {@link ConfigurationCheck#INCOMPATIBLE_CHANGE}: Whether the configuration of a strategy has been changed
+///     in a way that will prevent existing password hashes from being successfully verified,
+///     even if the correct password was supplied.
+/// 
+/// Example:
+/// ```properties
+/// [...].Class=org.mycore.user2.hash.MCRPasswordCheckManager
+/// [...].Strategies.foo.Class=foo.bar.FooStrategy
+/// [...].Strategies.foo.Enabled=true
+/// [...].Strategies.foo.Key1=Value1
+/// [...].Strategies.foo.Key2=Value2
+/// [...].Strategies.bar.Class=foo.bar.FooStrategy
+/// [...].Strategies.bar.Enabled=false
+/// [...].Strategies.bar.Key1=Value1
+/// [...].Strategies.bar.Key2=Value2
+/// [...].SelectedStrategy=foo
+/// [...].ConfigurationChecks=OUTDATED_STRATEGY,INCOMPATIBLE_CHANGE
+/// ```
 @MCRConfigurationProxy(proxyClass = MCRPasswordCheckManager.Factory.class)
 public final class MCRPasswordCheckManager {
 
@@ -111,8 +117,8 @@ public final class MCRPasswordCheckManager {
 
         this.random = Objects.requireNonNull(random, "Random must not be null");
         this.strategies = new HashMap<>(Objects.requireNonNull(strategies, "Strategies must not be null"));
-        this.strategies.forEach((type, strategy) ->
-            Objects.requireNonNull(strategy, "Strategy " + type + " must not be null"));
+        this.strategies
+            .forEach((type, strategy) -> Objects.requireNonNull(strategy, "Strategy " + type + " must not be null"));
         this.selectedStrategyType = Objects.requireNonNull(selectedStrategyType, "Selected strategy must not be null");
         this.selectedStrategy = this.strategies.get(selectedStrategyType);
 
@@ -150,7 +156,7 @@ public final class MCRPasswordCheckManager {
      */
     @Deprecated
     public static MCRPasswordCheckManager instantiate() {
-       return createInstance();
+        return createInstance();
     }
 
     public static MCRPasswordCheckManager createInstance() {

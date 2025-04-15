@@ -30,36 +30,41 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.annotation.MCRSentinel;
 
-/**
- * A {@link MCRUserInformationResolver} can be used to obtain {@link MCRUserInformation}, without knowledge
- * of the underlying mechanism that creates or looks up that user information, by providing a string specification.
- * The specification can be created from a schema and a user ID with
- * {@link MCRUserInformationResolver#getSpecification(String, String)}. To do so, it uses
- * {@link MCRUserInformationProvider} instances that each implement a strategy to create or look up user information.
- * <p>
- * A singular, globally available and centrally configured instance can be obtained with
- * {@link MCRUserInformationResolver#obtainInstance()}. This instance is configured using the property prefix
- * {@link MCRUserInformationResolver#RESOLVER_PROPERTY} and should be used in order obtain user information with
- * consistently applied strategies, although custom instances can be created when necessary.
- * <p>
- * The following configuration options are available, if configured automatically:
- * <ul>
- * <li> Providers are configured as a map using the property suffix {@link MCRUserInformationResolver#PROVIDERS_KEY}.
- * <li> Each resolver can be excluded from the configuration using the property {@link MCRSentinel#ENABLED_KEY}.
- * </ul>
- * Example:
- * <pre>
- * MCR.UserInformation.Resolver.Class=org.mycore.common.MCRUserInformationResolver
- * MCR.UserInformation.Resolver.Providers.foo.Class=foo.bar.FooProvider
- * MCR.UserInformation.Resolver.Providers.foo.Enabled=true
- * MCR.UserInformation.Resolver.Providers.foo.Key1=Value1
- * MCR.UserInformation.Resolver.Providers.foo.Key2=Value2
- * MCR.UserInformation.Resolver.Providers.bar.Class=foo.bar.BarProvider
- * MCR.UserInformation.Resolver.Providers.bar.Enabled=false
- * MCR.UserInformation.Resolver.Providers.bar.Key1=Value1
- * MCR.UserInformation.Resolver.Providers.bar.Key2=Value2
- * </pre>
- */
+/// A [MCRUserInformationResolver] can be used to obtain [MCRUserInformation],
+/// without knowledge of the underlying mechanism that creates or looks up that user information,
+/// by providing a string specification. To do so, it uses [MCRUserInformationProvider] instances
+/// that each implement a strategy to create or look up user information.
+/// 
+/// A specification can be created from a schema and a user ID with
+/// [MCRUserInformationResolver#getSpecification(String,String)].
+/// 
+/// A singular, globally available and automatically configured instance can be obtained with
+/// [MCRUserInformationResolver#obtainInstance()]. This instance should generally be used,
+/// although custom instances can be created when necessary.
+/// It is configured using the property prefix [MCRUserInformationResolver#RESOLVER_PROPERTY]. 
+/// 
+/// ```properties
+/// MCR.UserInformation.Resolver.Class=org.mycore.common.MCRUserInformationResolver
+/// ```
+/// 
+/// The following configuration options are available, if configured automatically:
+/// - The configuration suffix [MCRUserInformationResolver#PROVIDERS_KEY] can be used to specify
+///   the map of providers to be used.
+/// - For each provider, the configuration suffix [MCRSentinel#ENABLED_KEY] can be used to
+///   excluded that provider from the configuration.
+/// 
+/// Example:
+/// ```properties
+/// [...].Class=org.mycore.common.MCRUserInformationResolver
+/// [...].Providers.foo.Class=foo.bar.FooProvider
+/// [...].Providers.foo.Enabled=true
+/// [...].Providers.foo.Key1=Value1
+/// [...].Providers.foo.Key2=Value2
+/// [...].Providers.bar.Class=foo.bar.BarProvider
+/// [...].Providers.bar.Enabled=false
+/// [...].Providers.bar.Key1=Value1
+/// [...].Providers.bar.Key2=Value2
+/// ```
 @MCRConfigurationProxy(proxyClass = MCRUserInformationResolver.Factory.class)
 public final class MCRUserInformationResolver {
 
@@ -76,8 +81,8 @@ public final class MCRUserInformationResolver {
     public MCRUserInformationResolver(Map<String, MCRUserInformationProvider> providers) {
 
         this.providers = Objects.requireNonNull(providers, "Providers must not be null");
-        this.providers.forEach((name, provider) ->
-            Objects.requireNonNull(provider, "Provider " + name + " must not be null"));
+        this.providers
+            .forEach((name, provider) -> Objects.requireNonNull(provider, "Provider " + name + " must not be null"));
 
         LOGGER.info(() -> "Working with providers: " + String.join(", ", providers.keySet()));
 

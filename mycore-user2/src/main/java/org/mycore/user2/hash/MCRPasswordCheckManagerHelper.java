@@ -36,22 +36,20 @@ import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.resource.MCRResourceHelper;
 
-/**
- * Helper class that performs optional configuration checks for instances of {@link MCRPasswordCheckManager}.
- * <p>
- * The check selected with {@link MCRPasswordCheckManager.ConfigurationCheck#OUTDATED_STRATEGY} ensures that
- * the selected strategy is not annotated with {@link MCROutdated}.
- * <p>
- * The check selected with {@link MCRPasswordCheckManager.ConfigurationCheck#INCOMPATIBLE_CHANGE} ensures that
- * the configuration of a strategy has not been changed in a way that will prevent existing password hashes from
- * being successfully verified, even if the correct password was supplied.
- * For this, every strategies implementation of {@link MCRPasswordCheckStrategy#unmodifiableConfigurationHint()} must
- * provide a string that encodes the relevant configuration values. When a new strategy is first encountered,
- * this value, together with the fully qualified class name of the strategy implementation is stored in a file
- * inside a subdirectory named {@link MCRPasswordCheckManagerHelper#DATA_DIRECTORY_NAME} in the applications
- * configuration directory. The content of this file is compared to the corresponding values, when a strategy is
- * encountered again. For build-in strategies, corresponding files are provided as a ressource.
- */
+/// Helper class that performs optional configuration checks for instances of [MCRPasswordCheckManager].
+/// 
+/// The check selected with [MCRPasswordCheckManager.ConfigurationCheck#OUTDATED_STRATEGY] ensures that
+/// the selected strategy is not annotated with [MCROutdated].
+/// 
+/// The check selected with [MCRPasswordCheckManager.ConfigurationCheck#INCOMPATIBLE_CHANGE] ensures that
+/// the configuration of a strategy has not been changed in a way that will prevent existing password hashes
+/// from being successfully verified, even if the correct password was supplied. For this, every strategies
+/// implementation of [MCRPasswordCheckStrategy#unmodifiableConfigurationHint()] must provide a string
+/// that encodes the relevant configuration values. When a new strategy is first encountered, this value,
+/// together with the fully qualified class name of the strategy implementation is stored in a file
+/// inside the [MCRPasswordCheckManagerHelper#DATA_DIRECTORY_NAME] subdirectory in the applications 
+/// configuration directory. When a strategy is encountered again, this value is compared to the stored
+/// value and must match. For build-in strategies, corresponding files are provided as a resource.
 final class MCRPasswordCheckManagerHelper {
 
     private static final String DATA_DIRECTORY_NAME = "passwordCheckStrategies";

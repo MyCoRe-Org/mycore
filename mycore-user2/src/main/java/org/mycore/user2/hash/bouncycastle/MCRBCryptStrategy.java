@@ -35,25 +35,23 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.user2.hash.MCRPasswordCheckStrategy;
 import org.mycore.user2.hash.MCRPasswordCheckStrategyBase;
 
-/**
- * {@link MCRBCryptStrategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the BCrypt algorithm.
- * <p>
- * The version and salt are encoded in the hash using the Modular Crypt Format (MCF) for BCrypt. No explicit salt
- * values are generated.
- * <p>
- * The following configuration options are available, if configured automatically:
- * <ul>
- * <li> The configuration suffix {@link MCRBCryptStrategy#COST_KEY} can be used to specify the cost parameter the
- * determines the number of iterations to be performed.
- * </ul>
- * Example:
- * <pre>
- * [...].Class=org.mycore.user2.hash.bouncycastle.MCRBCryptStrategy
- * [...].Cost=12
- * </pre>
- * Changes to the cost parameter will not prevent verification, but successful verification results will be marked as
- * outdated.
- */
+/// [MCRBCryptStrategy] is an implementation of [MCRPasswordCheckStrategy] that uses the BCrypt algorithm.
+/// 
+/// The version and salt are encoded in the hash using the Modular Crypt Format (MCF) for BCrypt.
+/// No explicit salt values are generated.
+/// 
+/// The following configuration options are available, if configured automatically:
+/// 
+/// - The configuration suffix [MCRBCryptStrategy#COST_KEY] can be used to specify
+///   the cost parameter the determines the number of iterations to be performed.
+/// 
+/// Example:
+/// ```properties
+/// [...].Class=org.mycore.user2.hash.bouncycastle.MCRBCryptStrategy
+/// [...].Cost=12
+/// ```
+/// Changes to the cost parameter will not prevent verification, but successful verification results
+/// will be marked as outdated.
 @MCRConfigurationProxy(proxyClass = MCRBCryptStrategy.Factory.class)
 public class MCRBCryptStrategy extends MCRPasswordCheckStrategyBase {
 

@@ -27,6 +27,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRUsageException;
+import org.mycore.common.MCRUserInformationResolver;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceMap;
@@ -39,37 +40,41 @@ import jakarta.persistence.criteria.CriteriaDelete;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
-/**
- * A {@link MCRJobQueueCleaner} performs bulk removal of persisted {@link MCRJob} instances. To do so, it uses
- * {@link MCRJobSelector} instances that each provide selection criteria in form of af a list of {@link Predicate}
- * instances. Each selector is processes separately. A job has to match all predicates provided by
- * that selector in order to be deleted.
- * <p>
- * A non-singular, globally available and centrally configured instance can be obtained with
- * {@link MCRJobQueueCleaner#createInstance()}. This instance is configured using the property prefix
- * {@link MCRJobQueueCleaner#CLEANER_PROPERTY} and should be used in order to clean jobs with consistently
- * applied criteria, although custom instances can be created when necessary.
- * <p>
- * The following configuration options are available, if configured automatically:
- * <ul>
- * <li> Selectors are configured as a map using the property suffix {@link MCRJobQueueCleaner#SELECTORS_KEY}.
- * <li> Each selector can be excluded from the configuration using the property {@link MCRSentinel#ENABLED_KEY}.
- * <li> The property suffix {@link MCRJobQueueCleaner#ENABLED_KEY} can be used to enable or disable all selectors.
- * </ul>
- * Example:
- * <pre>
- * MCR.QueuedJob.Cleaner.Class=org.mycore.services.queuedjob.MCRJobQueueCleaner
- * MCR.QueuedJob.Cleaner.Selectors.foo.Class=foo.bar.FooSelector
- * MCR.QueuedJob.Cleaner.Selectors.foo.Enabled=true
- * MCR.QueuedJob.Cleaner.Selectors.foo.Key1=Value1
- * MCR.QueuedJob.Cleaner.Selectors.foo.Key2=Value2
- * MCR.QueuedJob.Cleaner.Selectors.bar.Class=foo.bar.BarSelector
- * MCR.QueuedJob.Cleaner.Selectors.bar.Enabled=false
- * MCR.QueuedJob.Cleaner.Selectors.bar.Key1=Value1
- * MCR.QueuedJob.Cleaner.Selectors.bar.Key2=Value2
- * MCR.QueuedJob.Cleaner.Enabled=true
- * </pre>
- */
+/// A [MCRJobQueueCleaner] performs bulk removal of persisted [MCRJob] instances. To do so, it uses
+/// [MCRJobSelector] instances that each provide selection criteria in form of af a list of [Predicate]
+/// instances. Each selector is processes separately. A job has to match all predicates provided by
+/// that selector in order to be deleted.
+/// 
+/// A non-singular, globally available and centrally configured instance can be obtained with
+/// [MCRJobQueueCleaner#createInstance()]. This instance should generally be used,
+/// although custom instances can be created when necessary.
+/// It is configured using the property prefix [MCRJobQueueCleaner#CLEANER_PROPERTY].
+///
+/// ```properties
+/// MCR.QueuedJob.Cleaner.Class=org.mycore.services.queuedjob.MCRJobQueueCleaner
+/// ```
+/// 
+/// The following configuration options are available, if configured automatically:
+/// - The configuration suffix [MCRJobQueueCleaner#SELECTORS_KEY] can be used to specify
+///   the map of selectors to be used.
+/// - For each selector, the configuration suffix [MCRSentinel#ENABLED_KEY] can be used to
+///   excluded that selector from the configuration.
+/// - The configuration suffix [MCRJobQueueCleaner#ENABLED_KEY] can be used to
+///   enable or disable all selectors.
+/// 
+/// Example:
+/// ```properties
+/// [...].Class=org.mycore.services.queuedjob.MCRJobQueueCleaner
+/// [...].Selectors.foo.Class=foo.bar.FooSelector
+/// [...].Selectors.foo.Enabled=true
+/// [...].Selectors.foo.Key1=Value1
+/// [...].Selectors.foo.Key2=Value2
+/// [...].Selectors.bar.Class=foo.bar.BarSelector
+/// [...].Selectors.bar.Enabled=false
+/// [...].Selectors.bar.Key1=Value1
+/// [...].Selectors.bar.Key2=Value2
+/// [...].Enabled=true
+/// ```
 @MCRConfigurationProxy(proxyClass = MCRJobQueueCleaner.Factory.class)
 public final class MCRJobQueueCleaner {
 

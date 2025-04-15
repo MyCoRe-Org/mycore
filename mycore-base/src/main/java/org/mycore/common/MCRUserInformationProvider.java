@@ -20,9 +20,7 @@ package org.mycore.common;
 
 import java.util.Optional;
 
-/**
- * A {@link MCRUserInformationProvider} implements a strategy to create or look up user information for a given user ID.
- */
+/// A [MCRUserInformationProvider] implements a strategy to create or look up user information for a given user ID.
 public interface MCRUserInformationProvider {
 
     Optional<MCRUserInformation> get(String userId);

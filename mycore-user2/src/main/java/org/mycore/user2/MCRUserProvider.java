@@ -23,17 +23,15 @@ import java.util.Optional;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.MCRUserInformationProvider;
 
-/**
- * {@link MCRUserProvider} is an implementation of {@link MCRUserInformationProvider} that looks up user information
- * of type {@link MCRUser} with {@link MCRUserManager#getUser(String)}.
- * <p>
- * No configuration options are available, if configured automatically.
- * <p>
- * Example:
- * <pre>
- * [...].Class=org.mycore.user2.MCRUserProvider
- * </pre>
- */
+/// [MCRUserProvider] is a [MCRUserInformationProvider] that looks up user information
+/// of type [MCRUser] with [MCRUserManager#getUser(String)].
+/// 
+/// No configuration options are available, if configured automatically.
+/// 
+/// Example:
+/// ```properties
+/// [...].Class=org.mycore.user2.MCRUserProvider
+/// ```
 public final class MCRUserProvider implements MCRUserInformationProvider {
 
     @Override

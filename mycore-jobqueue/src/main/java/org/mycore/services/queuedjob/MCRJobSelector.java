@@ -24,10 +24,8 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
-/**
- * A {@link MCRJobSelector} provide selection criteria for persisted {@link MCRJob} instances in form of af a list of
- * {@link Predicate} instances.
- */
+/// A [MCRJobSelector] provide selection criteria for persisted [MCRJob] instances in form of af a list of
+/// [Predicate] instances.
 public interface MCRJobSelector {
 
     List<Predicate> getPredicates(CriteriaBuilder builder, Root<MCRJob> jobs);

@@ -25,9 +25,7 @@ import javax.crypto.SecretKeyFactory;
 
 import org.mycore.common.config.MCRConfigurationException;
 
-/**
- * Utility class providing functions commonly used by implementations of {@link MCRPasswordCheckStrategy}.
- */
+/// Utility class providing functions commonly used by implementations of [MCRPasswordCheckStrategy].
 public final class MCRPasswordCheckUtils {
 
     private MCRPasswordCheckUtils() {
