@@ -128,7 +128,7 @@ public class MCRORCIDUtils {
      * @return true if source path equals client id
      */
     public static boolean isCreatedByThisApplication(String sourcePath) {
-        return Objects.equals(sourcePath, MCRORCIDConstants.ORCID_CLIENT_ID);
+        return Objects.equals(sourcePath, MCRORCIDConstants.ORCID_OAUTH_CLIENT_ID);
     }
 
     /**
