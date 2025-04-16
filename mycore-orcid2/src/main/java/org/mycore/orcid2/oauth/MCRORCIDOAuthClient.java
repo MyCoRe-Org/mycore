@@ -63,8 +63,8 @@ public final class MCRORCIDOAuthClient {
     public static MCRORCIDOAuthClient createInstance() {
         return new MCRORCIDOAuthClient(new Settings(
             MCRORCIDConstants.ORCID_BASE_URL,
-            MCRORCIDConstants.ORCID_CLIENT_ID,
-            MCRORCIDConstants.ORCID_CLIENT_SECRET
+            MCRORCIDConstants.ORCID_OAUTH_CLIENT_ID,
+            MCRORCIDConstants.ORCID_OAUTH_CLIENT_SECRET
         ));
     }
 

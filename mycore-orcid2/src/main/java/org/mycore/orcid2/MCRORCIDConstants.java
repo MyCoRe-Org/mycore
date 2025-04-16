@@ -40,12 +40,14 @@ public class MCRORCIDConstants {
     /**
      * ORCID Client ID.
      */
-    public static final String ORCID_CLIENT_ID = MCRConfiguration2.getStringOrThrow(CONFIG_PREFIX + "ClientID");
+    public static final String ORCID_OAUTH_CLIENT_ID
+        = MCRConfiguration2.getStringOrThrow(CONFIG_PREFIX + "OAuth.ClientID");
 
     /**
      * ORCID Client Secret.
      */
-    public static final String ORCID_CLIENT_SECRET = MCRConfiguration2.getStringOrThrow(CONFIG_PREFIX + "ClientSecret");
+    public static final String ORCID_OAUTH_CLIENT_SECRET
+        = MCRConfiguration2.getStringOrThrow(CONFIG_PREFIX + "OAuth.ClientSecret");
 
     /**
      * List of all language codes supported by ORCID.

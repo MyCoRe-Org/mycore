@@ -152,7 +152,7 @@ public class MCRORCIDOAuthResource {
         final UriBuilder builder = UriBuilder.fromPath(MCRORCIDConstants.ORCID_BASE_URL);
         builder.path("oauth/authorize");
         builder.queryParam("redirect_uri", getRedirectUri());
-        builder.queryParam("client_id", MCRORCIDConstants.ORCID_CLIENT_ID);
+        builder.queryParam("client_id", MCRORCIDConstants.ORCID_OAUTH_CLIENT_ID);
         builder.queryParam("response_type", "code");
         builder.queryParam("scope", scope);
         builder.queryParam("prompt", "login");
