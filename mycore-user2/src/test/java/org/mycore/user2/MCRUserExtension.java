@@ -25,7 +25,6 @@ import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImplTest;
@@ -61,9 +60,9 @@ public class MCRUserExtension implements Extension, BeforeEachCallback, BeforeAl
      */
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
-        MCRCategory groupsCategory = MCRCategoryDAOImplTest.loadClassificationResource("/mcr-roles.xml");
         MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
-        dao.addCategory(null, groupsCategory);
+        dao.addCategory(null, MCRCategoryDAOImplTest.loadClassificationResource("/mcr-roles.xml"));
+        dao.addCategory(null, MCRCategoryDAOImplTest.loadClassificationResource("/ext-roles.xml"));
     }
 
 }
