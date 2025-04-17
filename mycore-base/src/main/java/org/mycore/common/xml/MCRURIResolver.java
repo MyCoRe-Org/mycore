@@ -110,8 +110,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-import jakarta.servlet.ServletContext;
-
 /**
  * Reads XML documents from various URI types. This resolver is used to read DTDs, XML Schema files, XSL document()
  * usages, xsl:include usages and MyCoRe Editor include declarations. DTDs and Schema files are read from the CLASSPATH
@@ -193,15 +191,6 @@ public final class MCRURIResolver implements URIResolver {
         return SHARED_INSTANCE;
     }
     
-    /**
-     * Initializes the MCRURIResolver for servlet applications.
-     *
-     * @param ctx
-     *            the servlet context of this web application
-     */
-    public static synchronized void init(ServletContext ctx) {
-    }
-
     public static Map<String, String> getParameterMap(String key) {
         String[] param;
         StringTokenizer tok = new StringTokenizer(key, "&");

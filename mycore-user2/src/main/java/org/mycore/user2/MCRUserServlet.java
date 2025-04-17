@@ -551,7 +551,7 @@ public class MCRUserServlet extends MCRServlet {
             for (MCRUser user : results) {
                 Element u = MCRUserTransformer.buildBasicXML(user).detachRootElement();
                 addString(u, "realName", user.getRealName());
-                addString(u, "eMail", user.getEMailAddress());
+                addString(u, "eMail", user.getEMail());
                 users.addContent(u);
             }
         }
