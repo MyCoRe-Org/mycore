@@ -38,28 +38,32 @@ import com.google.gson.GsonBuilder;
  * A {@link MCRJSONManager} can be used to obtain consistently configured JSON processing
  * capabilities.
  * <p>
- * A singular, globally available and centrally configured instance can be obtained with
- * {@link MCRJSONManager#obtainInstance()}. This instance is configured using the property prefix
- * {@link MCRJSONManager#MANAGER_PROPERTY} and should be used in order to obtain consistently
- * configured JSON processing capabilities, although custom instances can be created when necessary.
- * <p>
- * The following configuration options are available, if configured automatically:
+ * An automatically configured shared instance can be obtained with
+ * {@link MCRJSONManager#obtainInstance()}. This instance should generally be used,
+ * although custom instances can be created when necessary. It is configured using the property prefix
+ * {@link MCRJSONManager#MANAGER_PROPERTY}.
+ * <pre><code>
+ * MCR.JSON.Manger.Class=org.mycore.common.MCRJSONManager
+ * </code></pre>
+ * The following configuration options are available:
  * <ul>
- * <li> Type adapters are configured as a map using the property suffix {@link MCRJSONManager#TYPE_ADAPTERS_KEY}.
- * <li> Each type adapter can be excluded from the configuration using the property {@link MCRSentinel#ENABLED_KEY}.
+ * <li> The property suffix {@link MCRJSONManager#TYPE_ADAPTERS_KEY} can be used to
+ * specify the list of type adapters to be used.
+ * <li> Each type adapter, the property suffix {@link MCRSentinel#ENABLED_KEY} can be used to
+ * excluded that adapter from the configuration.
  * </ul>
  * Example:
- * <pre>
- * MCR.JSON.Manger.Class=org.mycore.common.MCRJSONManager
- * MCR.JSON.Manger.TypeAdapters.foo.Class=foo.bar.FooTypeAdapter
- * MCR.JSON.Manger.TypeAdapters.foo.Enabled=true
- * MCR.JSON.Manger.TypeAdapters.foo.Key1=Value1
- * MCR.JSON.Manger.TypeAdapters.foo.Key2=Value2
- * MCR.JSON.Manger.TypeAdapters.bar.Class=foo.bar.BarTypeAdapter
- * MCR.JSON.Manger.TypeAdapters.bar.Enabled=false
- * MCR.JSON.Manger.TypeAdapters.bar.Key1=Value1
- * MCR.JSON.Manger.TypeAdapters.bar.Key2=Value2
- * </pre>
+ * <pre><code>
+ * [...].Class=org.mycore.common.MCRJSONManager
+ * [...].TypeAdapters.foo.Class=foo.bar.FooTypeAdapter
+ * [...].TypeAdapters.foo.Enabled=true
+ * [...].TypeAdapters.foo.Key1=Value1
+ * [...].TypeAdapters.foo.Key2=Value2
+ * [...].TypeAdapters.bar.Class=foo.bar.BarTypeAdapter
+ * [...].TypeAdapters.bar.Enabled=false
+ * [...].TypeAdapters.bar.Key1=Value1
+ * [...].TypeAdapters.bar.Key2=Value2
+ * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRJSONManager.Factory.class)
 public final class MCRJSONManager {
