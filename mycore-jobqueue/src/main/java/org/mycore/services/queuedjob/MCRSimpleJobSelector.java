@@ -18,19 +18,20 @@
 
 package org.mycore.services.queuedjob;
 
-import static org.mycore.common.config.MCRConfiguration2.splitValue;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.mycore.common.MCRClassTools;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRPostConstruction;
@@ -41,29 +42,25 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
 /**
- * A {@link MCRSimpleJobSelector} is a {@link MCRJobSelector} that combines multiple simple but commonly required
- * selection criteria.
- * <p>
+ * A {@link MCRSimpleJobSelector} is a {@link MCRJobSelector} that combines multiple simple
+ * but commonly required selection criteria.
  * <ul>
- * <li> It can be used to select jobs that have an action that is one of or none of a given list of actions.
- * <li> It can be used to select jobs that have a status that is one of or none of a given list of statuses.
- * <li> It can be used to select jobs that were added at least a given number of days ago.
+ * <li> Jobs that have an action that is one of or none of a given set of actions.
+ * <li> Jobs that have a status that is one of or none of a given set of statuses.
+ * <li> Jobs that were added at least a given number of days ago.
  * </ul>
- * All of the above criteria are always considered. To decide whether the action or the state of a job has to be one
- * of or none of a given list, {@link Mode} values are used.
- * <p>
- * If automatically configured:
+ * The following configuration options are available:
  * <ul>
- * <li> The list of actions to be considered is configured as a comma separated list using the property suffix
- * {@link MCRSimpleJobSelector#ACTIONS_KEY}.
- * <li> The mode for the list of actions is configured using the property suffix
- * {@link MCRSimpleJobSelector#ACTION_MODE_KEY}.
- * <li> The list of statuses to be considered is configured as a comma separated list using the property suffix
- * {@link MCRSimpleJobSelector#STATUSES_KEY}.
- * <li> The mode for the list of statuses is configured using the property suffix
- * {@link MCRSimpleJobSelector#STATUS_MODE_KEY}.
- * <li> The number of days con be configured using the configuration property
- * {@link MCRSimpleJobSelector#AGE_DAYS_KEY}.
+ * <li> The property suffix {@link MCRSimpleJobSelector#ACTIONS_KEY} can be used to
+ * specify the set of fully qualified action class names to be considered, as a comma-separated list.
+ * <li> The property suffix {@link MCRSimpleJobSelector#ACTION_MODE_KEY} can be used to
+ * specify the set {@link Mode} to be used in conjunction with the set of action class names.
+ * <li> The property suffix {@link MCRSimpleJobSelector#STATUSES_KEY} can be used to
+ * specify the set of {@link MCRJobStatus} names to be considered, as a comma-separated list.
+ * <li> The property suffix {@link MCRSimpleJobSelector#STATUS_MODE_KEY} can be used to
+ * specify the set {@link Mode} to be used in conjunction with the set of statuses.
+ * <li> The property suffix {@link MCRSimpleJobSelector#AGE_DAYS_KEY} can be used to
+ * specify the number of days to be used (where `0` disables the criteria).
  * </ul>
  * Example:
  * <pre>
@@ -88,11 +85,11 @@ public final class MCRSimpleJobSelector implements MCRJobSelector {
 
     public static final String AGE_DAYS_KEY = "AgeDays";
 
-    private final List<Class<? extends MCRJobAction>> actions;
+    private final Set<Class<? extends MCRJobAction>> actions;
 
     private final Mode actionMode;
 
-    private final List<MCRJobStatus> statuses;
+    private final Set<MCRJobStatus> statuses;
 
     private final Mode statusMode;
 
@@ -100,10 +97,16 @@ public final class MCRSimpleJobSelector implements MCRJobSelector {
 
     public MCRSimpleJobSelector(List<Class<? extends MCRJobAction>> actions, Mode actionMode,
         List<MCRJobStatus> statuses, Mode statusMode, int ageDays) {
-        this.actions = new ArrayList<>(Objects.requireNonNull(actions, "Actions must not be null"));
+        this(new HashSet<>(Objects.requireNonNull(actions, "Actions must not be null")), actionMode,
+            EnumSet.copyOf(Objects.requireNonNull(statuses, "Statuses must not be null")), statusMode, ageDays);
+    }
+
+    public MCRSimpleJobSelector(Set<Class<? extends MCRJobAction>> actions, Mode actionMode,
+        Set<MCRJobStatus> statuses, Mode statusMode, int ageDays) {
+        this.actions = new HashSet<>(Objects.requireNonNull(actions, "Actions must not be null"));
         this.actions.forEach(obj -> Objects.requireNonNull(obj, "Action must not be null"));
         this.actionMode = Objects.requireNonNull(actionMode, "Action mode must not be null");
-        this.statuses = new ArrayList<>(Objects.requireNonNull(statuses, "Statuses must not be null"));
+        this.statuses = EnumSet.copyOf(Objects.requireNonNull(statuses, "Statuses must not be null"));
         this.statuses.forEach(obj -> Objects.requireNonNull(obj, "Status must not be null"));
         this.statusMode = Objects.requireNonNull(statusMode, "Status mode must not be null");
         if (ageDays < 0) {
@@ -181,12 +184,12 @@ public final class MCRSimpleJobSelector implements MCRJobSelector {
         @Override
         public MCRSimpleJobSelector get() {
 
-            List<Class<? extends MCRJobAction>> actions = splitValue(this.actions)
-                .map(this::toActionJobClass).collect(Collectors.toList());
+            Set<Class<? extends MCRJobAction>> actions = MCRConfiguration2.splitValue(this.actions)
+                .map(this::toActionJobClass).collect(Collectors.toSet());
             Mode actionMode = Mode.valueOf(this.actionMode);
 
-            List<MCRJobStatus> statuses = splitValue(this.statuses)
-                .map(MCRJobStatus::valueOf).toList();
+            Set<MCRJobStatus> statuses = MCRConfiguration2.splitValue(this.statuses)
+                .map(MCRJobStatus::valueOf).collect(Collectors.toSet());
             Mode statusMode = Mode.valueOf(this.statusMode);
 
             int ageDays = Integer.parseInt(this.ageDays);
