@@ -771,7 +771,6 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * <li>password hash type
      * <li>password hash value
      * <li>password salt
-     * <li>attributes
      * </ul>
      * @return a clone copy of this instance
      */
@@ -819,9 +818,6 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
             other.validUntil = validUntil;
             other.systemRoles = new HashSet<>(systemRoles);
             other.externalRoles = new HashSet<>(externalRoles);
-        }
-
-        if (mode == CopyMode.FULL) {
             other.attributes = attributes.stream().map(MCRUserAttribute::clone)
                 .collect(Collectors.toCollection(TreeSet::new));
         }

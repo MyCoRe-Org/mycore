@@ -7,7 +7,7 @@
   <roles>
     <role name="editor">
       <label xml:lang="de" text="Bearbeiter" />
-      <label xml:lang="en" text="editors" />
+      <label xml:lang="en" text="Editors" />
     </role>
     <role name="admin">
       <label xml:lang="de" text="Administratoren" />
