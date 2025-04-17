@@ -36,6 +36,7 @@ public class MCRMetsIIIFModsMetadataExtractor implements MCRMetsIIIFMetadataExtr
 
     @Override
     public List<MCRIIIFMetadata> extractModsMetadata(Element xmlData) {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String> elementLabelMap = new HashMap<>();
 
         elementLabelMap.put("title", "mods:mods/mods:titleInfo/mods:title/text()");

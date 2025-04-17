@@ -32,11 +32,11 @@ import java.net.URI;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.SortedSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -79,7 +79,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     private static final String NAMED_QUERY_NAMESPACE = "MCRCategory.";
 
-    private static final Map<String, Long> LAST_MODIFIED_MAP = new HashMap<>();
+    private static final Map<String, Long> LAST_MODIFIED_MAP = new ConcurrentHashMap<>();
 
     @Override
     public MCRCategory addCategory(MCRCategoryID parentID, MCRCategory category) {

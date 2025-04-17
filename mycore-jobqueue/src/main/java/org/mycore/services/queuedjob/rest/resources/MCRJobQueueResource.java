@@ -109,6 +109,7 @@ public class MCRJobQueueResource {
         @QueryParam("offset") Integer offset,
         @QueryParam("limit") Integer limit) {
 
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String> parameterMap = new HashMap<>();
 
         parameters.forEach(p -> {

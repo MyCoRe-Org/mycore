@@ -90,6 +90,7 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
     }
 
     private Collection<MCRFactComputable<MCRFact<?>>> buildComputersFromRules() {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, MCRFactComputable<MCRFact<?>>> collectedComputers = new HashMap<>();
         collectComputers(rules, collectedComputers);
         return collectedComputers.values();

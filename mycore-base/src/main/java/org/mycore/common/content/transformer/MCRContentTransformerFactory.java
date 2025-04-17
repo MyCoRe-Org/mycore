@@ -18,8 +18,8 @@
 
 package org.mycore.common.content.transformer;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.mycore.common.config.MCRConfiguration2;
 
@@ -31,7 +31,7 @@ import org.mycore.common.config.MCRConfiguration2;
 public class MCRContentTransformerFactory {
 
     /** Map of transformer instances by ID */
-    private static Map<String, MCRContentTransformer> transformers = new HashMap<>();
+    private static Map<String, MCRContentTransformer> transformers = new ConcurrentHashMap<>();
 
     /**
      * Returns the transformer with the given ID. If the transformer is not instantiated yet,

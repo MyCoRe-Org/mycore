@@ -19,6 +19,7 @@
 package org.mycore.backend.hibernate;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -173,6 +174,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
      */
     @Override
     public Map<String, Number> getCountedMapOfMCRTO(String mcrtoPrefix) {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, Number> map = new HashMap<>();
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         TypedQuery<Object[]> groupQuery = em.createNamedQuery("MCRLINKHREF.group", Object[].class);
@@ -180,7 +182,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         groupQuery.getResultList()
             .stream()
             .forEach(row -> map.put((String) row[1], (Number) row[0]));
-        return map;
+        return Collections.unmodifiableMap(map);
     }
 
     /**

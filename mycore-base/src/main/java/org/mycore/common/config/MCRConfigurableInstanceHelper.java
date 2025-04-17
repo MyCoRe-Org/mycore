@@ -26,7 +26,6 @@ import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -58,9 +57,9 @@ import jakarta.inject.Singleton;
  *
  * @author Sebastian Hofmann
  */
-@SuppressWarnings({"PMD.SingleMethodSingleton", "PMD.MCR.Singleton.MethodModifiers",
+@SuppressWarnings({ "PMD.SingleMethodSingleton", "PMD.MCR.Singleton.MethodModifiers",
     "PMD.MCR.Singleton.MethodReturnType", "PMD.MCR.Singleton.ClassModifiers",
-    "PMD.MCR.Singleton.PrivateConstructor", "PMD.MCR.Singleton.NonPrivateConstructors"})
+    "PMD.MCR.Singleton.PrivateConstructor", "PMD.MCR.Singleton.NonPrivateConstructors" })
 class MCRConfigurableInstanceHelper {
 
     private static final ConcurrentMap<Class<?>, ClassInfo<?>> INFOS = new ConcurrentHashMap<>();
@@ -837,10 +836,10 @@ class MCRConfigurableInstanceHelper {
         @Override
         public Map<String, String> get(MCRInstanceConfiguration configuration, Target<?> target) {
 
-            Map<String, String> properties = annotation.absolute() ?
-                configuration.fullProperties() : configuration.properties();
+            Map<String, String> properties
+                = annotation.absolute() ? configuration.fullProperties() : configuration.properties();
 
-            Map<String, String> filteredProperties = new HashMap<>();
+            Map<String, String> filteredProperties = new ConcurrentHashMap<>();
             properties.forEach((key, value) -> {
                 if (key.startsWith(prefix)) {
                     filteredProperties.put(key.substring(prefix.length()), value);

@@ -28,13 +28,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -119,8 +119,8 @@ import jakarta.persistence.TypedQuery;
 @MCRCommandGroup(name = "Object Commands")
 public class MCRObjectCommands extends MCRAbstractCommands {
 
-    private static final String EXPORT_OBJECT_TO_DIRECTORY_WITH_STYLESHEET_COMMAND =
-        "export object {0} to directory {1} with stylesheet {2}";
+    private static final String EXPORT_OBJECT_TO_DIRECTORY_WITH_STYLESHEET_COMMAND
+        = "export object {0} to directory {1} with stylesheet {2}";
 
     /** The logger */
     private static final Logger LOGGER = LogManager.getLogger();
@@ -129,7 +129,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     public static final String DEFAULT_STYLE = "save-object.xsl";
 
     /** Static compiled transformer stylesheets */
-    private static final Map<String, Transformer> TRANSFORMER_CACHE = new HashMap<>();
+    private static final Map<String, Transformer> TRANSFORMER_CACHE = new ConcurrentHashMap<>();
 
     public static void setSelectedObjectIDs(List<String> selected) {
         LOGGER.info("{} objects selected", selected::size);
