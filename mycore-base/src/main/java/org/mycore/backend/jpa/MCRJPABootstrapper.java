@@ -27,6 +27,7 @@ import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.mycore.backend.hibernate.MCRHibernateConfigHelper;
+import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
@@ -58,16 +59,17 @@ public class MCRJPABootstrapper implements AutoExecutable {
     public void startUp(ServletContext servletContext) {
         try {
             initializeJPA();
-        } catch (PersistenceException e) {
-            //fix for MCR-1236
-            if (MCRConfiguration2.getBoolean("MCR.Persistence.Database.Enable").orElse(true)) {
-                LogManager.getLogger()
-                    .error(() -> "Could not initialize JPA. Database access is disabled in this session.", e);
-                MCRConfiguration2.set("MCR.Persistence.Database.Enable", String.valueOf(false));
-            }
-            MCREntityManagerProvider.init(e);
+        } catch (PersistenceException pe) {
+            disableDatabaseAccess(pe);
             return;
+        } catch (MCRException mcre) {
+            if (mcre.getCause() instanceof PersistenceException pe) {
+                disableDatabaseAccess(pe);
+                return;
+            }
+            throw mcre;
         }
+
         Metamodel metamodel = MCREntityManagerProvider.getEntityManagerFactory().getMetamodel();
         checkHibernateMappingConfig(metamodel);
         LogManager.getLogger()
@@ -77,6 +79,16 @@ public class MCRJPABootstrapper implements AutoExecutable {
                 .map(Class::getName)
                 .collect(Collectors.toList()));
         MCRShutdownHandler.getInstance().addCloseable(new MCRJPAShutdownProcessor());
+    }
+
+    private static void disableDatabaseAccess(PersistenceException ex) {
+        //fix for MCR-1236
+        if (MCRConfiguration2.getBoolean("MCR.Persistence.Database.Enable").orElse(true)) {
+            LogManager.getLogger()
+                .error(() -> "Could not initialize JPA. Database access is disabled in this session.", ex);
+            MCRConfiguration2.set("MCR.Persistence.Database.Enable", String.valueOf(false));
+        }
+        MCREntityManagerProvider.init(ex);
     }
 
     public static void initializeJPA() {
