@@ -64,7 +64,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
         HashMap<String, Object> attributes = new HashMap<>();
         attributes.put("eduPersonPrincipalName", mcrUser.getUserName() + "@" + realmId);
         attributes.put("displayName", mcrUser.getRealName());
-        attributes.put("mail", mcrUser.getEMailAddress());
+        attributes.put("mail", mcrUser.getEMail());
         attributes.put("eduPersonAffiliation", roles);
 
         MCRUser user = new MCRUser(null, realmId);
@@ -72,7 +72,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
 
         assertEquals(mcrUser.getUserName(), user.getUserName());
         assertEquals(mcrUser.getRealName(), user.getRealName());
-        assertEquals(mcrUser.getEMailAddress(), user.getEMailAddress());
+        assertEquals(mcrUser.getEMail(), user.getEMail());
         assertTrue(user.isUserInRole("editor"));
     }
 
@@ -81,7 +81,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("eduPersonPrincipalName", mcrUser.getUserName() + "@" + realmId);
         attributes.put("displayName", mcrUser.getRealName());
-        attributes.put("mail", mcrUser.getEMailAddress());
+        attributes.put("mail", mcrUser.getEMail());
         attributes.put("eduPersonAffiliation", roles);
 
         MCRUserInformation userInfo = new MCRShibbolethUserInformation(mcrUser.getUserName(), realmId, attributes);
@@ -90,7 +90,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
 
         assertEquals(mcrUser.getUserName(), user.getUserName());
         assertEquals(mcrUser.getRealName(), user.getRealName());
-        assertEquals(mcrUser.getEMailAddress(), user.getEMailAddress());
+        assertEquals(mcrUser.getEMail(), user.getEMail());
         assertTrue(user.isUserInRole("editor"));
     }
 
@@ -99,7 +99,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("eduPersonPrincipalName", mcrUser.getUserName() + "@" + realmId);
         attributes.put("displayName", mcrUser.getRealName());
-        attributes.put("mail", mcrUser.getEMailAddress());
+        attributes.put("mail", mcrUser.getEMail());
         attributes.put("eduPersonAffiliation", roles);
 
         MCRUserInformation userInfo = new MCRShibbolethUserInformation(mcrUser.getUserName(), realmId, attributes);
@@ -121,7 +121,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
 
         MCRUser storedUser = MCRUserManager.getUser(user.getUserName(), realmId);
 
-        assertEquals(mcrUser.getEMailAddress(), storedUser.getEMailAddress());
+        assertEquals(mcrUser.getEMail(), storedUser.getEMail());
 
         assertEquals(extraAttribs.get("attrib1"), storedUser.getUserAttribute("attrib1"));
         assertEquals(extraAttribs.get("attrib2"), storedUser.getUserAttribute("attrib2"));
@@ -135,7 +135,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("eduPersonPrincipalName", mcrUser.getUserName() + "@" + realmId);
         attributes.put("displayName", mcrUser.getRealName());
-        attributes.put("mail", mcrUser.getEMailAddress());
+        attributes.put("mail", mcrUser.getEMail());
         attributes.put("eduPersonAffiliation", roles);
 
         MCRUserInformation userInfo = new MCRShibbolethUserInformation(mcrUser.getUserName(), realmId, attributes);
@@ -167,7 +167,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
         boolean changed = attributeMapper.mapAttributes(storedUser, attributes);
 
         assertTrue("should changed", changed);
-        assertNotEquals(user.getEMailAddress(), storedUser.getEMailAddress());
+        assertNotEquals(user.getEMail(), storedUser.getEMail());
 
         Document exportableXML = MCRUserTransformer.buildExportableXML(storedUser);
         new XMLOutputter(Format.getPrettyFormat()).output(exportableXML, System.out);

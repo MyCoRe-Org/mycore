@@ -156,7 +156,7 @@ public final class MCROAuthClient {
      */
     private void preFillRegistrationForm(List<MCRURLQueryParameter> parameters) {
         MCRUser user = MCRUserManager.getCurrentUser();
-        String eMail = user.getEMailAddress();
+        String eMail = user.getEMail();
         if (eMail != null) {
             parameters.add(new MCRURLQueryParameter("email", eMail));
         }

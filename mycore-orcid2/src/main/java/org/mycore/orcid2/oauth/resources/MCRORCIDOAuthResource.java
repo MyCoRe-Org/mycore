@@ -166,7 +166,7 @@ public class MCRORCIDOAuthResource {
 
     /**
      * Adds the current user's email address, first name, and last name as query parameters
-     * to the given {@link URIBuilder}. The email, first name, and last name are extracted
+     * to the given {@link UriBuilder}. The email, first name, and last name are extracted
      * from the provided {@link MCRUser}.
      *
      * @param builder the builder
@@ -175,7 +175,7 @@ public class MCRORCIDOAuthResource {
      * @see <a href="https://members.orcid.org/api/resources/customize">ORCID documentation</a>
      */
     private static void preFillRegistrationForm(UriBuilder builder, MCRUser user) {
-        String email = user.getEMailAddress();
+        String email = user.getEMail();
         if (email != null) {
             builder.queryParam("email", email);
         }

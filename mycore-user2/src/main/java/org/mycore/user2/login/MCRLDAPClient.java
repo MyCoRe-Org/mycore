@@ -181,8 +181,8 @@ public final class MCRLDAPClient {
                             user.setRealName(formattedName);
                             userChanged = true;
                         }
-                        if (user.getEMailAddress() == null && attributeId.equals(searchSettings.emailAttributeId)) {
-                            LOGGER.info("Updating e-mail of {} to {}", userName, attributeValue);
+                        if (user.getEMail() == null && attributeId.equals(searchSettings.emailAttributeId)) {
+                            LOGGER.info("Updating email of {} to {}", userName, attributeValue);
                             user.setEMail(attributeValue);
                             userChanged = true;
                         }
