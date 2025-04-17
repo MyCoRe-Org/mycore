@@ -81,23 +81,23 @@ function connect() {
 
 function handleMessage(data: RegistryMessage | AddCollectionMessage | UpdateProcessableMessage | UpdateCollectionPropertyMessage | ErrorMessage) {
   switch (data.type) {
-    case "error":
+    case "ERROR":
       const serverMessage = <ErrorMessage>data;
       errorCode = parseInt(serverMessage.error);
       errorMessage.value = "A server error occurred: " + errorCode;
       break;
-    case "registry":
+    case "REGISTRY":
       errorCode = undefined;
       errorMessage.value = undefined;
       registry.value = new Registry();
       break;
-    case "addCollection":
+    case "ADD_COLLECTION":
       registry.value.addCollection(<AddCollectionMessage>data);
       break;
-    case "updateProcessable":
+    case "UPDATE_PROCESSABLE":
       registry.value.updateProcessable(<UpdateProcessableMessage>data);
       break;
-    case "updateCollectionProperty":
+    case "UPDATE_COLLECTION_PROPERTY":
       let updatePropertyMessage = <UpdateCollectionPropertyMessage>data;
       const collection = registry.value.getCollection(updatePropertyMessage.id);
       if (collection == null) {
