@@ -179,6 +179,10 @@ public final class MCRScopedSession extends MCRSession {
      * @return The result of the executed operation
      */
     private <T> T withScopedValues(Function<ScopedValues, T> scopedAction, Supplier<T> defaultAction) {
+        if (scopedValues == null) {
+            // still in super‑constructor
+            return defaultAction.get();
+        }
         ScopedValues values = scopedValues.get();
         return values == null ? defaultAction.get() : scopedAction.apply(values);
     }
