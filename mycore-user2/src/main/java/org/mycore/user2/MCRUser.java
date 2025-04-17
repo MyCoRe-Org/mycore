@@ -771,7 +771,6 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      * <li>password hash type
      * <li>password hash value
      * <li>password salt
-     * <li>attributes
      * </ul>
      * @return a clone copy of this instance
      */
