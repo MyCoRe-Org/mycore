@@ -44,39 +44,35 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
 /**
- * A {@link MCRSimpleJobSelector} is a {@link MCRJobSelector} that combines multiple simple but commonly required
- * selection criteria.
- * <p>
+ * A {@link MCRSimpleJobSelector} is a {@link MCRJobSelector} that combines multiple simple
+ * but commonly required selection criteria.
  * <ul>
- * <li> It can be used to select jobs that have an action that is one of or none of a given list of actions.
- * <li> It can be used to select jobs that have a status that is one of or none of a given list of statuses.
- * <li> It can be used to select jobs that were added at least a given number of days ago.
+ * <li> Jobs that have an action that is one of or none of a given set of actions.
+ * <li> Jobs that have a status that is one of or none of a given set of statuses.
+ * <li> Jobs that were added at least a given number of days ago.
  * </ul>
- * All of the above criteria are always considered. To decide whether the action or the state of a job has to be one
- * of or none of a given list, {@link Mode} values are used.
- * <p>
- * If automatically configured:
+ * The following configuration options are available:
  * <ul>
- * <li> The list of actions to be considered is configured as a comma separated list using the property suffix
- * {@link MCRSimpleJobSelector#ACTIONS_KEY}.
- * <li> The mode for the list of actions is configured using the property suffix
- * {@link MCRSimpleJobSelector#ACTION_MODE_KEY}.
- * <li> The list of statuses to be considered is configured as a comma separated list using the property suffix
- * {@link MCRSimpleJobSelector#STATUSES_KEY}.
- * <li> The mode for the list of statuses is configured using the property suffix
- * {@link MCRSimpleJobSelector#STATUS_MODE_KEY}.
- * <li> The number of days con be configured using the configuration property
- * {@link MCRSimpleJobSelector#AGE_DAYS_KEY}.
+ * <li> The property suffix {@link MCRSimpleJobSelector#ACTIONS_KEY} can be used to
+ * specify the set of fully qualified action class names to be considered, as a comma-separated list.
+ * <li> The property suffix {@link MCRSimpleJobSelector#ACTION_MODE_KEY} can be used to
+ * specify the set {@link Mode} to be used in conjunction with the set of action class names.
+ * <li> The property suffix {@link MCRSimpleJobSelector#STATUSES_KEY} can be used to
+ * specify the set of {@link MCRJobStatus} names to be considered, as a comma-separated list.
+ * <li> The property suffix {@link MCRSimpleJobSelector#STATUS_MODE_KEY} can be used to
+ * specify the set {@link Mode} to be used in conjunction with the set of statuses.
+ * <li> The property suffix {@link MCRSimpleJobSelector#AGE_DAYS_KEY} can be used to
+ * specify the number of days to be used (where `0` disables the criteria).
  * </ul>
  * Example:
- * <pre>
+ * <pre><code>
  * [...].Class=org.mycore.services.queuedjob.MCRSimpleJobSelector
  * [...].Actions=foo.bar.FooAction,foo.bar.BarAction
  * [...].ActionMode=INCLUDE
  * [...].Statuses=NEW,PROCESSING
  * [...].StatusMode=EXCLUDE
  * [...].AgeDays=42
- * </pre>
+ * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRSimpleJobSelector.Factory.class)
 public final class MCRSimpleJobSelector implements MCRJobSelector {
