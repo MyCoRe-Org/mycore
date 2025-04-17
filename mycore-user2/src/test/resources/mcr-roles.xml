@@ -9,7 +9,7 @@
     </category>
     <category ID="editor">
       <label xml:lang="de" text="Bearbeiter" />
-      <label xml:lang="en" text="editors" />
+      <label xml:lang="en" text="Editors" />
     </category>
   </categories>
 </mycoreclass>

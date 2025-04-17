@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mycoreclass ID="ext-roles" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="MCRClassification.xsd">
+  <label xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="en" text="External user roles" />
+  <label xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="de" text="Externe Nutzerrollen" />
+  <categories>
+    <category ID="foo">
+      <label xml:lang="de" text="Foo" />
+      <label xml:lang="en" text="Foo" />
+    </category>
+    <category ID="bar">
+      <label xml:lang="de" text="Bar" />
+      <label xml:lang="en" text="Bar" />
+    </category>
+  </categories>
+</mycoreclass>
