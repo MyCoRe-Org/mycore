@@ -34,6 +34,8 @@ import org.mycore.common.log.MCRTreeMessage;
  **/
 public abstract class MCRUrlPrefixResourceFilterBase extends MCRResourceFilterBase {
 
+    public static final String MODE_KEY = "Mode";
+
     private final MCRResourceFilterMode mode;
 
     public MCRUrlPrefixResourceFilterBase(MCRResourceFilterMode mode) {

@@ -30,11 +30,14 @@ import org.mycore.common.MCRTestCase;
 
 public class MCRHintsTest extends MCRTestCase {
 
-    private static final MCRHintKey<Foo> FOO_HINT = new MCRHintKey<>(Foo.class, "FOO", Foo::toString);
+    private static final MCRHintKey<Foo> FOO_HINT =
+        new MCRHintKey<>(Foo.class, MCRHintsTest.class, "FOO", Foo::toString);
 
-    private static final MCRHintKey<Foo> OTHER_FOO_HINT = new MCRHintKey<>(Foo.class, "OTHER_FOO", Foo::toString);
+    private static final MCRHintKey<Foo> OTHER_FOO_HINT =
+        new MCRHintKey<>(Foo.class, MCRHintsTest.class, "OTHER_FOO", Foo::toString);
 
-    private static final MCRHintKey<Bar> BAR_HINT = new MCRHintKey<>(Bar.class, "BAR", Bar::toString);
+    private static final MCRHintKey<Bar> BAR_HINT =
+        new MCRHintKey<>(Bar.class, MCRHintsTest.class, "BAR", Bar::toString);
 
     @Test
     public void emptyHints() {

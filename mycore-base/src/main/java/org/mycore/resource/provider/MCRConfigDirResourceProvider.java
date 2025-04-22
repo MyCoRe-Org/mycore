@@ -28,34 +28,32 @@ import org.mycore.common.hint.MCRHints;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 
 /**
- * {@link MCRConfigDirResourceProvider} is an implementation of {@link MCRResourceProvider} that searches resources
- * in the file system. It uses the <code>/resources</code> directory in the config directory as a base directory
- * for the lookup.
+ * A {@link MCRConfigDirResourceProvider} is a {@link MCRResourceProvider} that looks up resources
+ * in the file system. It uses the <code>/resources</code> directory in the config directory
+ * as a base directory for the lookup.
  * <p>
  * It uses the config directory hinted at by {@link MCRResourceHintKeys#CONFIG_DIR}, if present.
  * <p>
- * The following configuration options are available, if configured automatically:
+ * The following configuration options are available:
  * <ul>
- * <li> The property suffix {@link MCRConfigDirResourceProvider#COVERAGE_KEY} can be used to provide short
- * description for human beings in order to better understand the providers use case.
+ * <li> The property suffix {@link MCRResourceProviderBase#COVERAGE_KEY} can be used to
+ * provide a short description of the providers purpose; used in log messages.
  * </ul>
  * Example:
- * <pre>
+ * <pre><code>
  * [...].Class=org.mycore.resource.provider.MCRConfigDirResourceProvider
  * [...].Coverage=Lorem ipsum dolor sit amet
- * </pre>
+ * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRConfigDirResourceProvider.Factory.class)
-public class MCRConfigDirResourceProvider extends MCRFileSystemResourceProviderBase {
-
-    public static final String COVERAGE_KEY = "Coverage";
+public final class MCRConfigDirResourceProvider extends MCRFileSystemResourceProviderBase {
 
     public MCRConfigDirResourceProvider(String coverage) {
         super(coverage, MCRResourceProviderMode.RESOURCES);
     }
 
     @Override
-    protected final Stream<File> getBaseDirs(MCRHints hints) {
+    protected Stream<File> getBaseDirs(MCRHints hints) {
         return hints.get(MCRResourceHintKeys.CONFIG_DIR).map(this::getResourcesDir).stream();
     }
 
