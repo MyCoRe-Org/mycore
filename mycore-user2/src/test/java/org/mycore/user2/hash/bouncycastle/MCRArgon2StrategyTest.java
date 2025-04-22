@@ -18,19 +18,18 @@
 
 package org.mycore.user2.hash.bouncycastle;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.security.SecureRandom;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 import org.mycore.user2.hash.MCRPasswordCheckData;
 import org.mycore.user2.hash.MCRPasswordCheckResult;
 import org.mycore.user2.hash.MCRPasswordCheckStrategy;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-public class MCRArgon2StrategyTest extends MCRTestCase {
+public class MCRArgon2StrategyTest {
 
     public static final String TYPE = "type";
 
@@ -90,7 +89,7 @@ public class MCRArgon2StrategyTest extends MCRTestCase {
     }
 
     @Test
-    public final void testIterationsChange() {
+    public final void testParallelismChange() {
 
         MCRPasswordCheckStrategy strategyOld = new MCRArgon2Strategy(8, 8, 1, 1024, 1);
         MCRPasswordCheckStrategy strategyNew = new MCRArgon2Strategy(8, 8, 2, 1024, 1);
@@ -124,7 +123,7 @@ public class MCRArgon2StrategyTest extends MCRTestCase {
     }
 
     @Test
-    public final void testParallelismChange() {
+    public final void testIterationsChange() {
 
         MCRPasswordCheckStrategy strategyOld = new MCRArgon2Strategy(8, 8, 1, 1024, 1);
         MCRPasswordCheckStrategy strategyNew = new MCRArgon2Strategy(8, 8, 1, 1024, 2);

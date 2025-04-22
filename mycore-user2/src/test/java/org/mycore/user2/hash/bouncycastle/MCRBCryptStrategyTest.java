@@ -18,19 +18,18 @@
 
 package org.mycore.user2.hash.bouncycastle;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.security.SecureRandom;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 import org.mycore.user2.hash.MCRPasswordCheckData;
 import org.mycore.user2.hash.MCRPasswordCheckResult;
 import org.mycore.user2.hash.MCRPasswordCheckStrategy;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-public class MCRBCryptStrategyTest extends MCRTestCase {
+public class MCRBCryptStrategyTest {
 
     public static final String TYPE = "type";
 
