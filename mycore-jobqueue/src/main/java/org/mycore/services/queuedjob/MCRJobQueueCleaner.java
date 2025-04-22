@@ -21,6 +21,7 @@ package org.mycore.services.queuedjob;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
@@ -88,8 +89,8 @@ public final class MCRJobQueueCleaner {
     public MCRJobQueueCleaner(Map<String, MCRJobSelector> selectors, boolean enabled) {
 
         this.selectors = new HashMap<>(Objects.requireNonNull(selectors, "Selectors must not be null"));
-        this.selectors.forEach((name, selector) ->
-            Objects.requireNonNull(selector, "Selector " + name + " must not be null"));
+        this.selectors
+            .forEach((name, selector) -> Objects.requireNonNull(selector, "Selector " + name + " must not be null"));
         this.enabled = enabled;
 
         LOGGER.info(() -> "Working with selectors: " + String.join(", ", selectors.keySet()));
@@ -115,7 +116,14 @@ public final class MCRJobQueueCleaner {
      * @return The total amount of removed jobs.
      */
     public int clean() {
-        return doClean(null);
+
+        return checkStateAndObtainEntityManager().map(
+            manager -> selectors.entrySet()
+                .stream()
+                .map(entry -> doClean(manager, entry.getKey(), entry.getValue()))
+                .reduce(0, Integer::sum))
+            .orElse(0);
+
     }
 
     /**
@@ -126,48 +134,33 @@ public final class MCRJobQueueCleaner {
      */
     public int clean(String selectorName) {
 
-        if (!selectors.containsKey(selectorName)) {
-            throw new MCRUsageException("Selector " + selectorName + " unavailable, got " +
-                String.join(", ", this.selectors.keySet()));
-        }
-
-        return doClean(selectorName);
+        return Optional.ofNullable(selectors.get(selectorName))
+            .map(selector -> checkStateAndObtainEntityManager()
+                .map(manager -> doClean(manager, selectorName, selector))
+                .orElse(0))
+            .orElseThrow(() -> new MCRUsageException("Selector " + selectorName + " unavailable, got " +
+                String.join(", ", this.selectors.keySet())));
 
     }
 
-    private int doClean(String selectorName) {
+    private Optional<EntityManager> checkStateAndObtainEntityManager() {
 
         if (!enabled) {
             LOGGER.info("Aborting, because cleaner is not enabled");
-            return 0;
+            return Optional.empty();
         }
 
         if (!MCRConfiguration2.getBoolean("MCR.Persistence.Database.Enable").orElse(true)) {
             LOGGER.info("Aborting, because database is not enabled");
-            return 0;
+            return Optional.empty();
         }
 
         if (MCREntityManagerProvider.getEntityManagerFactory() == null) {
             LOGGER.info("Aborting, because database is not available");
-            return 0;
+            return Optional.empty();
         }
 
-        return doClean(MCREntityManagerProvider.getCurrentEntityManager(), selectorName);
-
-    }
-
-    private int doClean(EntityManager manager, String selectorName) {
-
-        int numberOfJobs = 0;
-        for (Map.Entry<String, MCRJobSelector> entry : selectors.entrySet()) {
-            MCRJobSelector selector = entry.getValue();
-            String name = entry.getKey();
-            if (selectorName == null || selectorName.equals(name)) {
-                numberOfJobs += doClean(manager, name, selector);
-            }
-        }
-
-        return numberOfJobs;
+        return Optional.of(MCREntityManagerProvider.getCurrentEntityManager());
 
     }
 
