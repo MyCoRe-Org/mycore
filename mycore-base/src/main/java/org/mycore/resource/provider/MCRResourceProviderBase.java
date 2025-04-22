@@ -38,6 +38,8 @@ import org.mycore.resource.MCRResourcePath;
  */
 public abstract class MCRResourceProviderBase implements MCRResourceProvider {
 
+    public static final String COVERAGE_KEY = "Coverage";
+
     protected final Logger logger = LogManager.getLogger(getClass());
 
     private final String coverage;
@@ -74,14 +76,14 @@ public abstract class MCRResourceProviderBase implements MCRResourceProvider {
     }
 
     private void logResourceUrls(List<ProvidedUrl> resourceUrl) {
-        resourceUrl.forEach(url -> logger.debug("Providing resource URL {} [{}]", url.url, coverage));
+        resourceUrl.forEach(url -> logger.debug("Providing resource URL {} [{}]", url.url(), coverage));
     }
 
     protected abstract Optional<URL> doProvide(MCRResourcePath path, MCRHints hints);
 
     protected abstract List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints);
 
-    protected final ProvidedUrl providedURL(URL url) {
+    protected final ProvidedUrl providedUrl(URL url) {
         return new ProvidedUrl(url, coverage());
     }
 

@@ -32,32 +32,31 @@ import org.mycore.resource.filter.MCRResourceFilterMode;
 import org.mycore.resource.filter.MCRWebappLibraryResourceFilter;
 import org.mycore.resource.locator.MCRClassLoaderResourceLocator;
 import org.mycore.resource.selector.MCRCombinedResourceSelector;
-import org.mycore.resource.selector.MCRFirstLibraryJarResourceSelector;
+import org.mycore.resource.selector.MCRFirstServletLibraryResourceSelector;
 import org.mycore.resource.selector.MCRHighestComponentPriorityResourceSelector;
 
 /**
- * {@link MCRWebappLibraryResourceProvider} is an implementation of {@link MCRResourceProvider} that looks up,
- * depending on the given {@link MCRResourceProviderMode} value, resources or web resources in JAR files placed
- * in the WAR file, prioritized by {@link MCRComponent#getPriority()} and the order in which the libraries are
- * present in the classpath.
+ * A {@link MCRWebappLibraryResourceProvider} is a {@link MCRResourceProvider} that looks up resources
+ * in JAR files, prioritized by {@link MCRComponent#getPriority()} and the order in which the libraries
+ * are present in the classpath. Depending on a {@link MCRResourceFilterMode} value, it either includes
+ * only resources from JAR files placed in the WAR file or only resource from other JAR files.
  * <p>
- * The following configuration options are available, if configured automatically:
+ * The following configuration options are available:
  * <ul>
- * <li> The mode is configures using the property suffix {@link MCRWebappLibraryResourceProvider#MODE_KEY}.
- * <li> The property suffix {@link MCRWebappLibraryResourceProvider#COVERAGE_KEY} can be used to provide short
- * description for human beings in order to better understand the providers use case.
+ * <li> The property suffix {@link MCRResourceProviderBase#COVERAGE_KEY} can be used to
+ * provide a short description of the providers purpose; used in log messages.
+ * <li> The property suffix {@link MCRWebappLibraryResourceProvider#MODE_KEY} can be used to
+ * specify the mode to be used.
  * </ul>
  * Example:
- * <pre>
+ * <pre><code>
  * [...].Class=org.mycore.resource.provider.MCRWebappLibraryResourceProvider
  * [...].Coverage=Lorem ipsum dolor sit amet
- * [...].MODE=RESOURCES
- * </pre>
+ * [...].MODE=MUST_MATCH
+ * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRWebappLibraryResourceProvider.Factory.class)
 public final class MCRWebappLibraryResourceProvider extends MCRLFSResourceProvider {
-
-    public static final String COVERAGE_KEY = "Coverage";
 
     public static final String MODE_KEY = "Mode";
 
@@ -72,7 +71,7 @@ public final class MCRWebappLibraryResourceProvider extends MCRLFSResourceProvid
                 new MCRWebappLibraryResourceFilter(mode)),
             new MCRCombinedResourceSelector(
                 new MCRHighestComponentPriorityResourceSelector(),
-                new MCRFirstLibraryJarResourceSelector()));
+                new MCRFirstServletLibraryResourceSelector()));
         this.mode = Objects.requireNonNull(mode, "Mode must not be null");
     }
 
