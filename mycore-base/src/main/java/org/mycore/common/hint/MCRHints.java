@@ -45,6 +45,8 @@ import org.mycore.resource.provider.MCRResourceProvider;
  */
 public interface MCRHints {
 
+    MCRHints EMPTY = new MCRHintsBuilder().build();
+
     /**
      * Returns the value for the given {@link MCRHintKey} as an {@link Optional}.
      */

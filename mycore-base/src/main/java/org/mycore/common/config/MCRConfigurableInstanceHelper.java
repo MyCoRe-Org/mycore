@@ -62,7 +62,7 @@ import jakarta.inject.Singleton;
  *
  * @author Sebastian Hofmann
  */
-@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.SingleMethodSingleton",
+@SuppressWarnings({ "PMD.AvoidDuplicateLiterals", "PMD.SingleMethodSingleton",
     "PMD.MCR.Singleton.MethodModifiers", "PMD.MCR.Singleton.MethodReturnType",
     "PMD.MCR.Singleton.ClassModifiers", "PMD.MCR.Singleton.PrivateConstructor",
     "PMD.MCR.Singleton.NonPrivateConstructors",
@@ -73,8 +73,8 @@ class MCRConfigurableInstanceHelper {
 
     public static final Set<Option> NO_OPTIONS = Collections.emptySet();
 
-    public static final Set<Option> ADD_IMPLICIT_CLASS_PROPERTIES
-        = Collections.singleton(Option.ADD_IMPLICIT_CLASS_PROPERTIES);
+    public static final Set<Option> ADD_IMPLICIT_CLASS_PROPERTIES =
+        Collections.singleton(Option.ADD_IMPLICIT_CLASS_PROPERTIES);
 
     private static final ConcurrentMap<Class<?>, ClassInfo<?>> INFOS = new ConcurrentHashMap<>();
 
@@ -191,8 +191,7 @@ class MCRConfigurableInstanceHelper {
         } else {
             throw new MCRConfigurationException("Configured instance of class " + instance.getClass().getName()
                 + " is incompatible with intended super class " + superClass.getName() + "'"
-                + (name != null ? " in configured class " + name : "")
-            );
+                + (name != null ? " in configured class " + name : ""));
         }
     }
 
@@ -341,23 +340,21 @@ class MCRConfigurableInstanceHelper {
 
             List<Method> declaredFactoryMethods = findFactoryMethods(targetClass, targetClass.getDeclaredMethods());
             Optional<Supplier<T>> factory = Stream.<Supplier<Optional<Supplier<T>>>>of(
-                    () -> findSingletonFactoryMethod(declaredFactoryMethods),
-                    () -> findAnnotatedFactoryMethod(declaredFactoryMethods),
-                    () -> findDefaultConstructor(targetClass),
-                    () -> findLegacyFactoryMethod(findFactoryMethods(targetClass, targetClass.getMethods())))
+                () -> findSingletonFactoryMethod(declaredFactoryMethods),
+                () -> findAnnotatedFactoryMethod(declaredFactoryMethods),
+                () -> findDefaultConstructor(targetClass),
+                () -> findLegacyFactoryMethod(findFactoryMethods(targetClass, targetClass.getMethods())))
                 .map(Supplier::get)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .findFirst();
 
-            return factory.orElseThrow(() ->
-                new MCRConfigurationException("Class " + targetClass.getName() + " has "
-                    + " has no singleton factory method (public, static, matching return type, parameterless, name"
-                    + " equals 'getInstance'), no annotated factory method (public, static, matching return type,"
-                    + " parameterless, annotated with @MCRFactory), no public parameterless constructor and no legacy"
-                    + " factory method (public, static, matching return type, parameterless, name containing"
-                    + " 'instance')")
-            );
+            return factory.orElseThrow(() -> new MCRConfigurationException("Class " + targetClass.getName() + " has "
+                + " has no singleton factory method (public, static, matching return type, parameterless, name"
+                + " equals 'getInstance'), no annotated factory method (public, static, matching return type,"
+                + " parameterless, annotated with @MCRFactory), no public parameterless constructor and no legacy"
+                + " factory method (public, static, matching return type, parameterless, name containing"
+                + " 'instance')"));
 
         }
 
@@ -426,7 +423,7 @@ class MCRConfigurableInstanceHelper {
             return legacyFactoryMethods.stream().findFirst().map(method -> {
                 if (LOGGER.isWarnEnabled()) {
                     LOGGER.warn("Instantiation of {} relies on legacy factory method (public, static,"
-                            + " matching return type, parameterless, name containing 'instance') {}.",
+                        + " matching return type, parameterless, name containing 'instance') {}.",
                         targetClass.getName(), method.getName());
                 }
                 return createFactoryMethodFactory(method);
@@ -766,7 +763,7 @@ class MCRConfigurableInstanceHelper {
 
             @Override
             public Source<MCRRawProperties, ?> annotationToSource(MCRRawProperties annotation) {
-              return new RawPropertiesSource(annotation);
+                return new RawPropertiesSource(annotation);
             }
 
         }),
@@ -986,8 +983,8 @@ class MCRConfigurableInstanceHelper {
         @Override
         public Map<String, String> get(MCRInstanceConfiguration configuration, Target<?> target) {
 
-            Map<String, String> properties = annotation.absolute() ?
-                configuration.fullProperties() : configuration.properties();
+            Map<String, String> properties =
+                annotation.absolute() ? configuration.fullProperties() : configuration.properties();
 
             Map<String, String> filteredProperties = new HashMap<>();
             properties.forEach((key, value) -> {
@@ -1053,8 +1050,8 @@ class MCRConfigurableInstanceHelper {
         @Override
         public Map<String, String> get(MCRInstanceConfiguration configuration, Target<?> target) {
 
-            Map<String, String> properties = annotation.absolute() ?
-                configuration.fullProperties() : configuration.properties();
+            Map<String, String> properties =
+                annotation.absolute() ? configuration.fullProperties() : configuration.properties();
 
             Map<String, String> filteredProperties = new HashMap<>();
             properties.forEach((key, value) -> {
@@ -1216,8 +1213,8 @@ class MCRConfigurableInstanceHelper {
 
             Set<Option> options = createOptions(annotation.valueClass(), annotation.required());
             Map<String, Object> instanceMap = nestedConfigurationMap.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry ->
-                    getInstance(annotation.valueClass(), entry.getValue(), options)));
+                .collect(Collectors.toMap(Map.Entry::getKey,
+                    entry -> getInstance(annotation.valueClass(), entry.getValue(), options)));
 
             instanceMap.values().forEach(instance -> {
                 if (!annotation.valueClass().isAssignableFrom(instance.getClass())) {
@@ -1311,8 +1308,9 @@ class MCRConfigurableInstanceHelper {
             }
 
             Set<Option> options = createOptions(annotation.valueClass(), annotation.required());
-            List<Object> instanceList = nestedConfigurationList.stream().map(c ->
-                (Object) getInstance(annotation.valueClass(), c, options)).toList();
+
+            List<Object> instanceList = nestedConfigurationList.stream()
+                .map(c -> (Object) getInstance(annotation.valueClass(), c, options)).toList();
 
             instanceList.forEach(instance -> {
                 if (!annotation.valueClass().isAssignableFrom(instance.getClass())) {
@@ -1432,6 +1430,5 @@ class MCRConfigurableInstanceHelper {
         ADD_IMPLICIT_CLASS_PROPERTIES;
 
     }
-
 
 }

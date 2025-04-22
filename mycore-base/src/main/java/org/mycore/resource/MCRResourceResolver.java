@@ -53,7 +53,7 @@ import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
  * {@link MCRResourceResolver#RESOLVER_PROPERTY} and should be used wherever resources need to be resolved.
  * This ensures an application-wide consistent behaviour, although custom instances can be created when necessary.
  * <p>
- * The following configuration options are available, if configured automatically:
+ * The following configuration options are available:
  * <ul>
  * <li> Hints are configured as a map using the property suffix {@link MCRResourceResolver#HINTS_KEY}.
  * <li> Providers are configured as a map using the property suffix {@link MCRResourceResolver#PROVIDERS_KEY}.
@@ -61,7 +61,7 @@ import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
  * <li> The selected provider is configured using the property suffix {@link MCRResourceResolver#SELECTED_PROVIDER_KEY}.
  * </ul>
  * Example:
- * <pre>
+ * <pre><code>
  * MCR.Resource.Resolver.Class=org.mycore.resource.MCRResourceResolver
  * MCR.Resource.Resolver.Hints.foo.Class=foo.bar.FooHint
  * MCR.Resource.Resolver.Hints.foo.Key1=Value1
@@ -78,7 +78,7 @@ import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
  * MCR.Resource.Resolver.Providers.bar.Key1=Value1
  * MCR.Resource.Resolver.Providers.bar.Key2=Value2
  * MCR.Resource.Resolver.SelectedProvider=foo
- * </pre>
+ * </code></pre>
  * Although only one provider is ever in use, multiple providers can be prepared. This configuration mechanism greatly
  * simplifies the configuration changes necessary in order to switch to another provider. It also ensures that all
  * prepared providers are properly configured.
@@ -181,7 +181,7 @@ public final class MCRResourceResolver {
      * overrides a resource that is also provided by another module). Intended for introspective purposes only.
      */
     public List<ProvidedUrl> resolveAll(Optional<MCRResourcePath> path) {
-        return path.map(this::resolveAll).orElse(Collections.emptyList());
+        return path.map(this::resolveAll).orElse(List.of());
     }
 
     /**
@@ -189,7 +189,7 @@ public final class MCRResourceResolver {
      * overrides a resource that is also provided by another module). Intended for introspective purposes only.
      */
     public List<ProvidedUrl> resolveAll(Optional<MCRResourcePath> path, MCRHints hints) {
-        return path.map(p -> resolveAll(p, hints)).orElse(Collections.emptyList());
+        return path.map(p -> resolveAll(p, hints)).orElse(List.of());
     }
 
     /**
@@ -223,7 +223,7 @@ public final class MCRResourceResolver {
     public List<ProvidedUrl> resolveAllResource(String path, MCRHints hints) {
         return MCRResourcePath.ofPath(path)
             .map(resourcePath -> allResources(resourcePath, hints))
-            .orElse(Collections.emptyList());
+            .orElse(List.of());
     }
 
     /**
@@ -257,7 +257,7 @@ public final class MCRResourceResolver {
     public List<ProvidedUrl> resolveAllWebResource(String path, MCRHints hints) {
         return MCRResourcePath.ofWebPath(path)
             .map(resourcePath -> allResources(resourcePath, hints))
-            .orElse(Collections.emptyList());
+            .orElse(List.of());
     }
 
     private Optional<URL> resource(MCRResourcePath path, MCRHints hints) {
@@ -279,7 +279,7 @@ public final class MCRResourceResolver {
                 LOGGER.debug("Unable to resolve resource URL for path {}", path);
             } else {
                 resourceUrls.forEach(
-                    url -> LOGGER.debug("Resolved resource URL for path {} as {}", path, url.url));
+                    url -> LOGGER.debug("Resolved resource URL for path {} as {}", path, url.url()));
             }
         }
         return resourceUrls;
