@@ -19,6 +19,7 @@
 package org.mycore.test;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -27,12 +28,14 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRComponent;
@@ -101,37 +104,58 @@ public class MCRTestExtensionConfigurationHelper {
             .flatMap(conf -> Stream.of(conf.properties()))
             .collect(Collectors.toMap(
                 MCRTestProperty::key,
-                p -> {
-                    if (p.empty()) {
-                        return "";
-                    }
-                    if (!p.classNameOf().equals(Void.class)) {
-                        return p.classNameOf().getName();
-                    }
-                    return p.string();
-                },
+                p -> getAnnotatedValue(p, extensionContext),
                 (sub, sup) -> sub));
     }
 
+    private static String getAnnotatedValue(MCRTestProperty property, ExtensionContext context) {
+
+        boolean empty = property.empty();
+
+        String stringValue = property.string();
+        boolean customString = !Objects.equals(stringValue, "");
+
+        Class<?> classNameOfValue = property.classNameOf();
+        boolean customClassNameOf = classNameOfValue != Void.class;
+
+        if ((empty && (customString || customClassNameOf)) || (customString && customClassNameOf)) {
+            throw new MCRException("@" + MCRTestProperty.class.getSimpleName()
+                + " of " + context.getElement().map(Object::toString).orElse("unknown")
+                + " can either be empty or have either a string- or a classNameOf-value,"
+                + " got empty=" + empty + ",  stringValue=" + stringValue
+                + ", classNameOf=" + classNameOfValue);
+        }
+
+        if (empty) {
+            return "";
+        } else if (customString) {
+            return stringValue;
+        } else if (customClassNameOf) {
+            return classNameOfValue.getName();
+        }
+
+        throw new MCRException("@" + MCRTestProperty.class.getSimpleName()
+            + " of " + context.getElement().map(Object::toString).orElse("unknown")
+            + " must either be empty or have either a string- or a classNameOf-value");
+
+    }
+
     private static List<MCRTestConfiguration> findTestConfiguration(ExtensionContext context) {
-        return context.getElement()
-            .map(element -> {
-                // If the element is a method, first check the method itself
-                if (element instanceof java.lang.reflect.Method method) {
-                    return Optional.ofNullable(method.getAnnotation(MCRTestConfiguration.class))
-                        .map(List::of)
-                        .orElseGet(List::of);
-                } else if (element instanceof Class<?>) {
-                    // If the element is a class, traverse its hierarchy
-                    return findTestConfigurationInHierarchy((Class<?>) element);
-                }
-                return List.<MCRTestConfiguration>of();
-            })
+        return context.getElement().map(element -> switch (element) {
+            case Method method -> findMethodTestConfiguration(method);
+            case Class<?> testClass -> findClassHierarchyTestConfigurations(testClass);
+            default -> List.<MCRTestConfiguration>of();
+        }).orElseGet(List::of);
+    }
+
+    private static List<MCRTestConfiguration> findMethodTestConfiguration(Method method) {
+        return Optional.ofNullable(method.getAnnotation(MCRTestConfiguration.class))
+            .map(List::of)
             .orElseGet(List::of);
     }
 
     // Traverse the class hierarchy to find @MyAnnotation on the class or any of its superclasses.
-    private static List<MCRTestConfiguration> findTestConfigurationInHierarchy(Class<?> clazz) {
+    private static List<MCRTestConfiguration> findClassHierarchyTestConfigurations(Class<?> clazz) {
         List<MCRTestConfiguration> annotations = new ArrayList<>();
         for (Class<?> current = clazz; current != null; current = current.getSuperclass()) {
             MCRTestConfiguration annotation = current.getAnnotation(MCRTestConfiguration.class);
@@ -152,8 +176,7 @@ public class MCRTestExtensionConfigurationHelper {
             .collect(Collectors.joining(", "));
         System.out.printf("MyCoRe components detected: %s\nApplications modules detected: %s\n",
             mcrComp.isEmpty() ? "'none'" : mcrComp, appMod.isEmpty() ? "'none'" : appMod);
-        MCRConfigurationLoader configurationLoader = MCRConfigurationLoaderFactory.getConfigurationLoader();
-        return configurationLoader;
+        return MCRConfigurationLoaderFactory.getConfigurationLoader();
     }
 
     static String detectCurrentComponentName() {
