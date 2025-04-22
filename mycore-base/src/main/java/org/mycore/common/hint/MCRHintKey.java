@@ -18,7 +18,10 @@
 
 package org.mycore.common.hint;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -26,19 +29,37 @@ import java.util.function.Function;
  *
  * @param <T> The type for values used in conjunction with this key.
  */
-public final class MCRHintKey<T> implements Comparable<MCRHintKey<?>> {
+public class MCRHintKey<T> implements Comparable<MCRHintKey<?>> {
 
     private final String name;
 
     private final Function<T, String> formatter;
 
-    public MCRHintKey(Class<T> hintClass, String name, Function<T, String> formatter) {
-        Objects.requireNonNull(hintClass);
-        this.name = Objects.requireNonNull(name);
-        this.formatter = Objects.requireNonNull(formatter);
+    private final List<Consumer<T>> checks;
+
+    /**
+     * @deprecated Use {@link #MCRHintKey(Class, Class, String, Function)} instead
+     */
+    @Deprecated
+    public MCRHintKey(Class<?> hintClass, String name, Function<T, String> formatter) {
+        this(hintClass, Object.class, name, formatter, List.of());
     }
 
-    public String format(T value) {
+    public MCRHintKey(Class<?> hintClass, Class<?> namespaceClass, String name, Function<T, String> formatter) {
+        this(hintClass, namespaceClass, name, formatter, List.of());
+    }
+
+    public MCRHintKey(Class<?> hintClass, Class<?> namespaceClass, String name, Function<T, String> formatter,
+        List<Consumer<T>> checks) {
+        Objects.requireNonNull(hintClass);
+        Objects.requireNonNull(namespaceClass);
+        this.name = Objects.requireNonNull(name) + "@" + namespaceClass.getName();
+        this.formatter = Objects.requireNonNull(formatter, "Formatter must not be null");
+        this.checks = new ArrayList<>(Objects.requireNonNull(checks, "Checks must not be null"));
+        this.checks.forEach(check -> Objects.requireNonNull(checks, "Check must not be null"));
+    }
+
+    public final String format(T value) {
         if (value == null) {
             return "null";
         }
@@ -49,13 +70,18 @@ public final class MCRHintKey<T> implements Comparable<MCRHintKey<?>> {
         return formattedValue;
     }
 
+    public final T check(T value) {
+        checks.forEach(check -> check.accept(value));
+        return value;
+    }
+
     @Override
-    public String toString() {
+    public final String toString() {
         return name;
     }
 
     @Override
-    public int compareTo(MCRHintKey<?> other) {
+    public final int compareTo(MCRHintKey<?> other) {
         return name.compareTo(other.name);
     }
 
