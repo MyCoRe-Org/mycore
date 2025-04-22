@@ -273,7 +273,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
             throw new MCRException("These data do not correspond to a user.");
         }
 
-        MCRUserManager.setUserPassword(mcrUser, mcrUser.getPassword());
+        MCRUserManager.setUserPassword(mcrUser, mcrUser.getHash());
 
         try (OutputStream fileOutputStream = Files.newOutputStream(Path.of(newFile))) {
             saveToXMLFile(mcrUser, fileOutputStream);

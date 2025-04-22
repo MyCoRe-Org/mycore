@@ -40,8 +40,6 @@ import java.util.Optional;
  */
 public final class MCRSystemUserInformationProvider implements MCRUserInformationProvider {
 
-    private static final MCRSystemUserInformationProvider INSTANCE = new MCRSystemUserInformationProvider();
-
     /**
      * @deprecated Use {@code name()} of {@link MCRSystemUserInformation#GUEST} instead
      */
@@ -65,13 +63,6 @@ public final class MCRSystemUserInformationProvider implements MCRUserInformatio
      */
     @Deprecated
     public static final String SUPER_USER = "SUPER_USER";
-
-    private MCRSystemUserInformationProvider(){
-    }
-
-    public static MCRSystemUserInformationProvider getInstance() {
-        return INSTANCE;
-    }
 
     @Override
     public Optional<MCRUserInformation> get(String userId) {

@@ -52,7 +52,6 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         super.setUp();
         user = new MCRUser("junit");
         user.setRealName("Test Case");
-        user.setPassword("test");
         user.setUserAttribute("junit", "test");
         MCRUserManager.createUser(user);
     }
@@ -65,7 +64,8 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         assertNull("Should not load user.", MCRUserManager.getUser(this.user.getUserName(), ""));
         MCRUser user = MCRUserManager.getUser(this.user.getUserName(), MCRRealmFactory.getLocalRealm());
         assertNotNull("Could not load user.", user);
-        assertEquals("Password hash is not as expected", "test", user.getPassword());
+        assertEquals("User name is not as expected", "junit", user.getUserName());
+        assertEquals("Real name is not as expected", "Test Case", user.getRealName());
     }
 
     @Test
@@ -130,7 +130,7 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         MCRUserManager.updateUser(this.user);
         startNewTransaction();
         MCRUser user = MCRUserManager.getUser(this.user.getUserName(), this.user.getRealm());
-        assertEquals("User information was not updated", eMail, user.getEMailAddress());
+        assertEquals("User information was not updated", eMail, user.getEMail());
         assertEquals("User was created not updated", 1, MCRUserManager.countUsers(null, null, null, null));
         assertTrue("User is not in group " + groupName, user.getSystemRoleIDs().contains(groupName));
 
@@ -165,7 +165,7 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         //MCR-2912
         MCRUser user2Created = new MCRUser("junit2");
         user2Created.setRealName("Test Case 2");
-        user2Created.setPassword("test2");
+        user2Created.setHash("test2");
         user2Created.setUserAttribute("junit2", "test2");
         MCRUserManager.createUser(user2Created);
 
@@ -254,7 +254,7 @@ public class MCRUserManagerTest extends MCRUserTestCase {
      */
     @Test
     public final void testLogin() {
-        String clearPasswd = user.getPassword();
+        String clearPasswd = "passwd123";
         Date curTime = new Date();
         MCRUser user = MCRUserManager.login(this.user.getUserName(), clearPasswd);
         assertNull("Should not login user", user);
@@ -263,7 +263,8 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         startNewTransaction();
         user = MCRUserManager.login(this.user.getUserName(), clearPasswd);
         assertNotNull("Could not login user", user);
-        assertNotNull("Hash value was not updated", user.getHashType());
+        assertNotNull("Hash type was not updated", user.getHashType());
+        assertNotNull("Hash value was not updated", user.getHash());
         user = MCRUserManager.login(this.user.getUserName(), clearPasswd);
         assertNotNull("No date set for last login.", user.getLastLogin());
         assertTrue("Date was not updated", curTime.before(user.getLastLogin()));
@@ -282,7 +283,7 @@ public class MCRUserManagerTest extends MCRUserTestCase {
 
     @Test
     public final void toXML() throws IOException {
-        MCRUserManager.setUserPassword(this.user, this.user.getPassword());
+        MCRUserManager.setUserPassword(this.user, "passwd123");
         this.user.setEMail("info@mycore.de");
         this.user.setHint("JUnit Test");
         this.user.getSystemRoleIDs().add("admin");
