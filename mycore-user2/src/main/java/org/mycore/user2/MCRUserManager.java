@@ -632,7 +632,7 @@ public class MCRUserManager {
             return null;
         }
 
-        MCRPasswordCheckData hash = new MCRPasswordCheckData(user.getHashType(), user.getSalt(), user.getPassword());
+        MCRPasswordCheckData hash = new MCRPasswordCheckData(user.getHashType(), user.getSalt(), user.getHash());
         MCRPasswordCheckResult result = MCRPasswordCheckManager.obtainInstance().verify(hash, password);
 
         if (!result.valid()) {
@@ -687,8 +687,8 @@ public class MCRUserManager {
     private static void setUserPassword(MCRPasswordCheckManager passwordCheckManager, MCRUser user, String password) {
         MCRPasswordCheckData data = passwordCheckManager.create(password);
         user.setHashType(data.type());
+        user.setHash(data.hash());
         user.setSalt(data.salt());
-        user.setPassword(data.hash());
     }
 
     private static Optional<MCRUser> getByNaturalID(EntityManager em, String userName, String realmId) {
