@@ -38,8 +38,8 @@ public interface MCRResourceSelector {
 
     /**
      * Selects prioritized resources from the result of the <em>filter</em>-phase, dropping unprioritized
-     * resources. Returns a subset of the given resources that must not be empty. If no prioritization
-     * can be made, an unmodified list of resources must be returned.
+     * resources. Returns a non-empty subset of the given resources. If no prioritization can be made,
+     * the whole set of resources must be returned.
      */
     List<URL> select(List<URL> resourceUrls, MCRHints hints);
 
