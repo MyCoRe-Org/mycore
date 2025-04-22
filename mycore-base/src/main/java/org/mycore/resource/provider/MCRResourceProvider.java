@@ -21,7 +21,6 @@ package org.mycore.resource.provider;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -72,16 +71,7 @@ public interface MCRResourceProvider {
      */
     MCRTreeMessage compileDescription(Level level);
 
-    final class ProvidedUrl {
-
-        public final URL url;
-
-        public final String origin;
-
-        public ProvidedUrl(URL url, String origin) {
-            this.url = url;
-            this.origin = origin;
-        }
+    record ProvidedUrl(URL url, String origin) {
 
         @Override
         public String toString() {
@@ -111,25 +101,33 @@ public interface MCRResourceProvider {
 
     }
 
-    final class BaseDirPrefixStripper extends PrefixStripperBase {
+    class PrefixPrefixStripper extends PrefixStripperBase {
 
         private final String prefix;
 
-        public BaseDirPrefixStripper(File baseDir) {
-            this.prefix = Objects.requireNonNull(baseDir).toURI().toString();
+        public PrefixPrefixStripper(String prefix) {
+            this.prefix = Objects.requireNonNull(prefix, "Prefix must not be null");
         }
 
         @Override
-        public List<String> getStrippedPaths(String value) {
+        public final List<String> getStrippedPaths(String value) {
             if (value.startsWith(prefix)) {
                 return List.of(value.substring(prefix.length()));
             }
-            return Collections.emptyList();
+            return List.of();
         }
 
         @Override
-        public String toString() {
+        public final String toString() {
             return prefix;
+        }
+
+    }
+
+    final class BaseDirPrefixStripper extends PrefixPrefixStripper {
+
+        public BaseDirPrefixStripper(File baseDir) {
+            super(Objects.requireNonNull(baseDir, "Base dir must not be null").toURI().toString());
         }
 
     }
@@ -148,7 +146,7 @@ public interface MCRResourceProvider {
         private final ClassLoader classLoader;
 
         public ClassLoaderPrefixStripper(ClassLoader classLoader) {
-            this.classLoader = Objects.requireNonNull(classLoader);
+            this.classLoader = Objects.requireNonNull(classLoader, "Class loader must not be null");
         }
 
         @Override
@@ -195,7 +193,7 @@ public interface MCRResourceProvider {
                     return List.of(value.substring(index + 1));
                 }
             }
-            return Collections.emptyList();
+            return List.of();
         }
 
         @Override
