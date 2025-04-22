@@ -40,12 +40,12 @@ import jakarta.servlet.http.HttpServletResponse;
  * of the incoming request using an internally instantiated {@link MCRResourceServlet}.
  * <p>
  * Intended to be mapped to the servlet name <code>default</code>, i.e.:
- * <pre>
+ * <pre><code>
  * &lt;filter-mapping&gt;
  *   &lt;filter-name&gt;MCRDefaultResourceInterceptFilter&lt;/filter-name&gt;
  *   &lt;servlet-name&gt;default&lt;/servlet-name&gt;
  * &lt;/filter-mapping&gt;
- * </pre>
+ * </code></pre>
  * <p>
  * This will intercept request that aren't handled by any registered servlet and would normally be handed over to the
  * default servlet of the web container, i.e. <em>Tomcat</em> or <em>Jetty</em>, which serve the content of the
