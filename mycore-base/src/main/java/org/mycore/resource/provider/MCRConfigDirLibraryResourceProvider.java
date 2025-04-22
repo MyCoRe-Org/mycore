@@ -33,18 +33,36 @@ import org.mycore.resource.filter.MCRResourceFilterMode;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 import org.mycore.resource.locator.MCRClassLoaderResourceLocator;
 import org.mycore.resource.selector.MCRCombinedResourceSelector;
-import org.mycore.resource.selector.MCRFirstLibraryJarResourceSelector;
+import org.mycore.resource.selector.MCRFirstServletLibraryResourceSelector;
 import org.mycore.resource.selector.MCRHighestComponentPriorityResourceSelector;
 
 /**
- * A {@link MCRConfigDirLibraryResourceProvider} is a {@link MCRResourceProvider} that looks up web resources
- * in JAR files placed in the <code>/lib</code> directory in the config directory, prioritized by
- * {@link MCRComponent#getPriority()} and the order in which the libraries are present in the classpath.
+ * A {@link MCRConfigDirLibraryResourceProvider} is a {@link MCRResourceProvider} that looks up resources
+ * in JAR files, prioritized by {@link MCRComponent#getPriority()} and the order in which the libraries
+ * are present in the classpath. Depending on a {@link MCRResourceFilterMode} value, it either includes
+ * only resources from JAR files placed in the <code>/lib</code> directory in the config directory
+ * or only resource from other JAR files.
  * <p>
  * It uses the config directory hinted at by {@link MCRResourceHintKeys#CONFIG_DIR}, if present.
+ * <p>
+ * The following configuration options are available:
+ * <ul>
+ * <li> The property suffix {@link MCRResourceProviderBase#COVERAGE_KEY} can be used to
+ * provide a short description of the providers purpose; used in log messages.
+ * <li> The property suffix {@link MCRConfigDirLibraryResourceProvider#MODE_KEY} can be used to
+ * specify the mode to be used.
+ * </ul>
+ * Example:
+ * <pre><code>
+ * [...].Class=org.mycore.resource.provider.MCRConfigDirLibraryResourceProvider
+ * [...].Coverage=Lorem ipsum dolor sit amet
+ * [...].Mode=MUST_MATCH
+ * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRConfigDirLibraryResourceProvider.Factory.class)
 public final class MCRConfigDirLibraryResourceProvider extends MCRLFSResourceProvider {
+
+    public static final String MODE_KEY = "Mode";
 
     private final MCRResourceFilterMode mode;
 
@@ -57,7 +75,7 @@ public final class MCRConfigDirLibraryResourceProvider extends MCRLFSResourcePro
                 new MCRConfigDirLibraryResourceFilter(mode)),
             new MCRCombinedResourceSelector(
                 new MCRHighestComponentPriorityResourceSelector(),
-                new MCRFirstLibraryJarResourceSelector()));
+                new MCRFirstServletLibraryResourceSelector()));
         this.mode = Objects.requireNonNull(mode, "Mode must not be null");
     }
 
@@ -75,10 +93,10 @@ public final class MCRConfigDirLibraryResourceProvider extends MCRLFSResourcePro
 
     public static class Factory implements Supplier<MCRConfigDirLibraryResourceProvider> {
 
-        @MCRProperty(name = "Coverage", defaultName = "MCR.Resource.Provider.Default.ConfigDirLibrary.Coverage")
+        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.ConfigDirLibrary.Coverage")
         public String coverage;
 
-        @MCRProperty(name = "Mode", defaultName = "MCR.Resource.Provider.Default.ConfigDirLibrary.Mode")
+        @MCRProperty(name = MODE_KEY, defaultName = "MCR.Resource.Provider.Default.ConfigDirLibrary.Mode")
         public String mode;
 
         @Override

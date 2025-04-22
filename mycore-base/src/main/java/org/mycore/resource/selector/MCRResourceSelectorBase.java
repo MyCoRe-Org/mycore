@@ -45,7 +45,7 @@ public abstract class MCRResourceSelectorBase implements MCRResourceSelector {
         }
         if (logger.isDebugEnabled()) {
             logResourceUrls(selectedResourceUrls);
-        } 
+        }
         return selectedResourceUrls;
     }
 
@@ -57,13 +57,15 @@ public abstract class MCRResourceSelectorBase implements MCRResourceSelector {
 
     /**
      * Selects prioritized resources from the result of the <em>filter</em>-phase, dropping unprioritized
-     * resources. Returns a subset of the given resources. If no prioritization can be made, an unmodified list of
-     * resources or an empty list can be returned.
+     * resources. Returns a subset of the given resources.
      * <p>
-     * This method has slightly different semantics from the public method
-     * {@link MCRResourceSelector#select(List, MCRHints)}. The public method requires to return an unmodified list of
-     * resources, if no prioritization can be made, whereas this method also allows returning an empty list to signal 
-     * that condition. This is to allow simplified implementations that just filter the given list of resource.  
+     * This method has slightly different semantics compared to {@link MCRResourceSelector#select(List, MCRHints)}.
+     * That method requires to return a non-empty subset of the given resources. If no prioritization can be made,
+     * the whole set of resources must be returned.
+     * <p>
+     * This method, however, allows an empty list to be returned instead, to signal that no prioritization could
+     * be made. This allows simple filter-style implementations, where filtering out all resources means that no
+     * prioritized resource could be found.
      */
     protected abstract List<URL> doSelect(List<URL> resourceUrls, MCRHints hints);
 

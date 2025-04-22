@@ -19,7 +19,6 @@
 package org.mycore.resource;
 
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -49,37 +48,45 @@ import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
  * To inject variable values into the resolving mechanism, several {@link MCRHint} instances can be provided as a
  * {@link MCRHints} instance. A default set of hints can be provided.
  * <p>
- * A singular, globally available and centrally configured instance can be obtained with
- * {@link MCRResourceResolver#obtainInstance()}. This instance is configured using the property prefix
- * {@link MCRResourceResolver#RESOLVER_PROPERTY} and should be used wherever resources need to be resolved.
- * This ensures an application-wide consistent behaviour, although custom instances can be created when necessary.
- * <p>
- * The following configuration options are available, if configured automatically:
+ * An automatically configured shared instance can be obtained with
+ * {@link MCRResourceResolver#obtainInstance()}. This instance should generally be used,
+ * although custom instances can be created when necessary. It is configured using the property prefix
+ * {@link MCRResourceResolver#RESOLVER_PROPERTY}.
+ * <pre><code>
+ * MCR.Resource.Resolver.Class=org.mycore.resource.MCRResourceResolver
+ * </code></pre>
+ * The following configuration options are available:
  * <ul>
- * <li> Hints are configured as a map using the property suffix {@link MCRResourceResolver#HINTS_KEY}.
- * <li> Providers are configured as a map using the property suffix {@link MCRResourceResolver#PROVIDERS_KEY}.
- * <li> Each provider can be excluded from the configuration using the property {@link MCRSentinel#ENABLED_KEY}.
- * <li> The selected provider is configured using the property suffix {@link MCRResourceResolver#SELECTED_PROVIDER_KEY}.
+ * <li> The property suffix {@link MCRResourceResolver#HINTS_KEY} can be used to
+ * specify the map of hints to be used by default.
+ * <li> For each hint, the property suffix {@link MCRSentinel#ENABLED_KEY} can be used to
+ * excluded that hint from the configuration.
+ * <li> The property suffix {@link MCRResourceResolver#PROVIDERS_KEY} can be used to
+ * specify the map of available providers.
+ * <li> For each provider, the property suffix {@link MCRSentinel#ENABLED_KEY} can be used to
+ * excluded that provider from the configuration.
+ * <li> Te property suffix {@link MCRResourceResolver#SELECTED_PROVIDER_KEY} can be used to
+ * specify the provider to be used.
  * </ul>
  * Example:
- * <pre>
- * MCR.Resource.Resolver.Class=org.mycore.resource.MCRResourceResolver
- * MCR.Resource.Resolver.Hints.foo.Class=foo.bar.FooHint
- * MCR.Resource.Resolver.Hints.foo.Key1=Value1
- * MCR.Resource.Resolver.Hints.foo.Key2=Value2
- * MCR.Resource.Resolver.Hints.bar.Class=foo.bar.BarHint
- * MCR.Resource.Resolver.Hints.bar.Key1=Value1
- * MCR.Resource.Resolver.Hints.bar.Key2=Value2
- * MCR.Resource.Resolver.Providers.foo.Class=foo.bar.FooProvider
- * MCR.Resource.Resolver.Providers.foo.Enabled=true
- * MCR.Resource.Resolver.Providers.foo.Key1=Value1
- * MCR.Resource.Resolver.Providers.foo.Key2=Value2
- * MCR.Resource.Resolver.Providers.bar.Class=foo.bar.BarProvider
- * MCR.Resource.Resolver.Providers.bar.Enabled=false
- * MCR.Resource.Resolver.Providers.bar.Key1=Value1
- * MCR.Resource.Resolver.Providers.bar.Key2=Value2
- * MCR.Resource.Resolver.SelectedProvider=foo
- * </pre>
+ * <pre><code>
+ * [...].Class=org.mycore.resource.MCRResourceResolver
+ * [...].Hints.foo.Class=foo.bar.FooHint
+ * [...].Hints.foo.Key1=Value1
+ * [...].Hints.foo.Key2=Value2
+ * [...].Hints.bar.Class=foo.bar.BarHint
+ * [...].Hints.bar.Key1=Value1
+ * [...].Hints.bar.Key2=Value2
+ * [...].Providers.foo.Class=foo.bar.FooProvider
+ * [...].Providers.foo.Enabled=true
+ * [...].Providers.foo.Key1=Value1
+ * [...].Providers.foo.Key2=Value2
+ * [...].Providers.bar.Class=foo.bar.BarProvider
+ * [...].Providers.bar.Enabled=false
+ * [...].Providers.bar.Key1=Value1
+ * [...].Providers.bar.Key2=Value2
+ * [...].SelectedProvider=foo
+ * </code></pre>
  * Although only one provider is ever in use, multiple providers can be prepared. This configuration mechanism greatly
  * simplifies the configuration changes necessary in order to switch to another provider. It also ensures that all
  * prepared providers are properly configured.
@@ -166,7 +173,7 @@ public final class MCRResourceResolver {
      * overrides a resource that is also provided by another module). Intended for introspective purposes only.
      */
     public List<ProvidedUrl> resolveAll(Optional<MCRResourcePath> path) {
-        return path.map(this::resolveAll).orElse(Collections.emptyList());
+        return path.map(this::resolveAll).orElse(List.of());
     }
 
     /**
@@ -174,7 +181,7 @@ public final class MCRResourceResolver {
      * overrides a resource that is also provided by another module). Intended for introspective purposes only.
      */
     public List<ProvidedUrl> resolveAll(Optional<MCRResourcePath> path, MCRHints hints) {
-        return path.map(p -> resolveAll(p, hints)).orElse(Collections.emptyList());
+        return path.map(p -> resolveAll(p, hints)).orElse(List.of());
     }
 
     /**
@@ -208,7 +215,7 @@ public final class MCRResourceResolver {
     public List<ProvidedUrl> resolveAllResource(String path, MCRHints hints) {
         return MCRResourcePath.ofPath(path)
             .map(resourcePath -> allResources(resourcePath, hints))
-            .orElse(Collections.emptyList());
+            .orElse(List.of());
     }
 
     /**
@@ -242,7 +249,7 @@ public final class MCRResourceResolver {
     public List<ProvidedUrl> resolveAllWebResource(String path, MCRHints hints) {
         return MCRResourcePath.ofWebPath(path)
             .map(resourcePath -> allResources(resourcePath, hints))
-            .orElse(Collections.emptyList());
+            .orElse(List.of());
     }
 
     private Optional<URL> resource(MCRResourcePath path, MCRHints hints) {
@@ -264,7 +271,7 @@ public final class MCRResourceResolver {
                 LOGGER.debug("Unable to resolve resource URL for path {}", path);
             } else {
                 resourceUrls.forEach(
-                    url -> LOGGER.debug("Resolved resource URL for path {} as {}", path, url.url));
+                    url -> LOGGER.debug("Resolved resource URL for path {} as {}", path, url.url()));
             }
         }
         return resourceUrls;
@@ -336,7 +343,7 @@ public final class MCRResourceResolver {
     @SuppressWarnings("PMD.SystemPrintln")
     public static class Factory implements Supplier<MCRResourceResolver> {
 
-        @MCRInstanceMap(name = HINTS_KEY, valueClass = MCRHint.class)
+        @MCRInstanceMap(name = HINTS_KEY, valueClass = MCRHint.class, sentinel = @MCRSentinel)
         public Map<String, MCRHint<?>> hints;
 
         @MCRInstanceMap(name = PROVIDERS_KEY, valueClass = MCRResourceProvider.class, sentinel = @MCRSentinel)
