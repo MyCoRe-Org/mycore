@@ -18,8 +18,10 @@
 
 package org.mycore.user2.hash;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.security.SecureRandom;
 import java.util.Collections;
@@ -27,16 +29,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRTestCase;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.test.MyCoReTest;
 
+@MyCoReTest
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.User.PasswordCheck.ConfigurationChecks", empty = true)
 })
-public class MCRPasswordCheckManagerTest extends MCRTestCase {
+public class MCRPasswordCheckManagerTest {
 
     protected static final Set<MCRPasswordCheckManager.ConfigurationCheck> NO_CHECKS = Collections.emptySet();
 
@@ -142,18 +146,22 @@ public class MCRPasswordCheckManagerTest extends MCRTestCase {
 
     }
 
-    @Test(expected = MCRException.class)
+    @Test
     public final void testUnknownType() {
 
-        SecureRandom random = new SecureRandom();
-        Map<String, MCRPasswordCheckStrategy> strategies = new HashMap<>();
-        strategies.put("foo", new MCRMD5Strategy(0, 1));
+        assertThrows(MCRException.class, () -> {
 
-        MCRPasswordCheckManager manager = new MCRPasswordCheckManager(random, strategies, "foo", NO_CHECKS);
+            SecureRandom random = new SecureRandom();
+            Map<String, MCRPasswordCheckStrategy> strategies = new HashMap<>();
+            strategies.put("foo", new MCRMD5Strategy(0, 1));
 
-        MCRPasswordCheckData data = manager.create(PASSWORD);
-        MCRPasswordCheckData data2 = new MCRPasswordCheckData("bar", data.salt(), data.hash());
-        manager.verify(data2, PASSWORD);
+            MCRPasswordCheckManager manager = new MCRPasswordCheckManager(random, strategies, "foo", NO_CHECKS);
+
+            MCRPasswordCheckData data = manager.create(PASSWORD);
+            MCRPasswordCheckData data2 = new MCRPasswordCheckData("bar", data.salt(), data.hash());
+            manager.verify(data2, PASSWORD);
+
+        });
 
     }
 
@@ -172,6 +180,45 @@ public class MCRPasswordCheckManagerTest extends MCRTestCase {
 
         assertTrue(result.valid());
         assertTrue(result.deprecated());
+
+    }
+
+    @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.SelectedStrategy", string = "md5"),
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.ConfigurationChecks", string = "OUTDATED_STRATEGY")
+    })
+    public final void testOutdatedCheck() {
+
+        // Exception might be ExceptionInInitializerError if MCRPasswordCheckManager
+        // hasn't been initialized before in another test
+        Throwable e = assertThrows(Throwable.class, MCRPasswordCheckManager::createInstance);
+        while (e.getCause() != null) {
+            e = e.getCause();
+        }
+
+        assertInstanceOf(MCRConfigurationException.class, e);
+        assertTrue(e.getMessage().contains("Detected outdated password check strategy"));
+
+    }
+
+    @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.SelectedStrategy", string = "md5"),
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.Strategies.md5.Iterations", string = "2"),
+        @MCRTestProperty(key = "MCR.User.PasswordCheck.ConfigurationChecks", string = "INCOMPATIBLE_CHANGE")
+    })
+    public final void testIncompatibleChangeCheck() {
+
+        // Exception might be ExceptionInInitializerError if MCRPasswordCheckManager
+        // hasn't been initialized before in another test
+        Throwable e = assertThrows(Throwable.class, MCRPasswordCheckManager::createInstance);
+        while (e.getCause() != null) {
+            e = e.getCause();
+        }
+
+        assertInstanceOf(MCRConfigurationException.class, e);
+        assertTrue(e.getMessage().contains("Detected incompatible value change"));
 
     }
 

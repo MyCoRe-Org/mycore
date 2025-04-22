@@ -18,22 +18,23 @@
 
 package org.mycore.user2.hash;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 
-public class MCRPasswordCheckUtilsTest extends MCRTestCase {
+@SuppressWarnings("ConstantValue")
+public class MCRPasswordCheckUtilsTest {
 
     @Test
     public final void testStringEquals() {
 
-        assertTrue(MCRPasswordCheckUtils.fixedEffortEquals((String) null, (String) null));
-        assertFalse(MCRPasswordCheckUtils.fixedEffortEquals("foo", null));
-        assertFalse(MCRPasswordCheckUtils.fixedEffortEquals(null, "bar"));
-        assertFalse(MCRPasswordCheckUtils.fixedEffortEquals("foo", "bar"));
-        assertTrue(MCRPasswordCheckUtils.fixedEffortEquals("foo", "foo"));
+        assertTrue(fixedEffortEquals((String) null, null));
+        assertFalse(fixedEffortEquals("foo", null));
+        assertFalse(fixedEffortEquals(null, "bar"));
+        assertFalse(fixedEffortEquals("foo", "bar"));
+        assertTrue(fixedEffortEquals("foo", "foo"));
 
     }
 
@@ -43,11 +44,11 @@ public class MCRPasswordCheckUtilsTest extends MCRTestCase {
         char[] foo = "foo".toCharArray();
         char[] bar = "bar".toCharArray();
 
-        assertTrue(MCRPasswordCheckUtils.fixedEffortEquals((char[]) null, (char[]) null));
-        assertFalse(MCRPasswordCheckUtils.fixedEffortEquals(foo, null));
-        assertFalse(MCRPasswordCheckUtils.fixedEffortEquals(null, bar));
-        assertFalse(MCRPasswordCheckUtils.fixedEffortEquals(foo, bar));
-        assertTrue(MCRPasswordCheckUtils.fixedEffortEquals(foo, foo));
+        assertTrue(fixedEffortEquals((char[]) null, null));
+        assertFalse(fixedEffortEquals(foo, null));
+        assertFalse(fixedEffortEquals(null, bar));
+        assertFalse(fixedEffortEquals(foo, bar));
+        assertTrue(fixedEffortEquals(foo, foo));
 
     }
 
@@ -57,11 +58,11 @@ public class MCRPasswordCheckUtilsTest extends MCRTestCase {
         byte[] foo = { 0, 1, 2 };
         byte[] bar = { 2, 1, 1 };
 
-        assertTrue(MCRPasswordCheckUtils.fixedEffortEquals((byte[]) null, (byte[]) null));
-        assertFalse(MCRPasswordCheckUtils.fixedEffortEquals(foo, null));
-        assertFalse(MCRPasswordCheckUtils.fixedEffortEquals(null, bar));
-        assertFalse(MCRPasswordCheckUtils.fixedEffortEquals(foo, bar));
-        assertTrue(MCRPasswordCheckUtils.fixedEffortEquals(foo, foo));
+        assertTrue(fixedEffortEquals((byte[]) null, null));
+        assertFalse(fixedEffortEquals(foo, null));
+        assertFalse(fixedEffortEquals(null, bar));
+        assertFalse(fixedEffortEquals(foo, bar));
+        assertTrue(fixedEffortEquals(foo, foo));
 
     }
 
