@@ -192,7 +192,7 @@ public class MCROCFLXMLUserManager {
     }
 
     private String buildEmail(MCRUser currentUser) {
-        return Optional.ofNullable(currentUser.getEMailAddress()).map(email -> "mailto:" + email).orElse(null);
+        return Optional.ofNullable(currentUser.getEMail()).map(email -> "mailto:" + email).orElse(null);
     }
 
     /**

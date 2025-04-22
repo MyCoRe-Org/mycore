@@ -36,7 +36,6 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDirSetup;
 import org.mycore.common.config.MCRRuntimeComponentDetector;
 import org.mycore.common.log.MCRTableMessage;
-import org.mycore.common.xml.MCRURIResolver;
 
 import jakarta.servlet.ServletContext;
 
@@ -97,8 +96,6 @@ public class MCRStartupHandler {
         LOGGER.info(() -> executableTable.logMessage("Detected auto executables:"));
         executables.forEach(autoExecutable -> startExecutable(servletContext, autoExecutable));
 
-        //initialize MCRURIResolver
-        MCRURIResolver.init(servletContext);
     }
 
     private static String toType(MCRComponent component) {
