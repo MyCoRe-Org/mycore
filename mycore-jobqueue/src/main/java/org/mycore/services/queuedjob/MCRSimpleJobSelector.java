@@ -18,19 +18,22 @@
 
 package org.mycore.services.queuedjob;
 
-import static org.mycore.common.config.MCRConfiguration2.splitValue;
+import static org.mycore.common.MCRUtils.enumSetOf;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.mycore.common.MCRClassTools;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRPostConstruction;
@@ -88,22 +91,22 @@ public final class MCRSimpleJobSelector implements MCRJobSelector {
 
     public static final String AGE_DAYS_KEY = "AgeDays";
 
-    private final List<Class<? extends MCRJobAction>> actions;
+    private final Set<Class<? extends MCRJobAction>> actions;
 
     private final Mode actionMode;
 
-    private final List<MCRJobStatus> statuses;
+    private final Set<MCRJobStatus> statuses;
 
     private final Mode statusMode;
 
     private final int ageDays;
 
-    public MCRSimpleJobSelector(List<Class<? extends MCRJobAction>> actions, Mode actionMode,
-        List<MCRJobStatus> statuses, Mode statusMode, int ageDays) {
-        this.actions = new ArrayList<>(Objects.requireNonNull(actions, "Actions must not be null"));
+    public MCRSimpleJobSelector(Collection<Class<? extends MCRJobAction>> actions, Mode actionMode,
+        Collection<MCRJobStatus> statuses, Mode statusMode, int ageDays) {
+        this.actions = new HashSet<>(Objects.requireNonNull(actions, "Actions must not be null"));
         this.actions.forEach(obj -> Objects.requireNonNull(obj, "Action must not be null"));
         this.actionMode = Objects.requireNonNull(actionMode, "Action mode must not be null");
-        this.statuses = new ArrayList<>(Objects.requireNonNull(statuses, "Statuses must not be null"));
+        this.statuses = enumSetOf(MCRJobStatus.class, Objects.requireNonNull(statuses, "Statuses must not be null"));
         this.statuses.forEach(obj -> Objects.requireNonNull(obj, "Status must not be null"));
         this.statusMode = Objects.requireNonNull(statusMode, "Status mode must not be null");
         if (ageDays < 0) {
@@ -181,12 +184,12 @@ public final class MCRSimpleJobSelector implements MCRJobSelector {
         @Override
         public MCRSimpleJobSelector get() {
 
-            List<Class<? extends MCRJobAction>> actions = splitValue(this.actions)
-                .map(this::toActionJobClass).collect(Collectors.toList());
+            Set<Class<? extends MCRJobAction>> actions = MCRConfiguration2.splitValue(this.actions)
+                .map(this::toActionJobClass).collect(Collectors.toSet());
             Mode actionMode = Mode.valueOf(this.actionMode);
 
-            List<MCRJobStatus> statuses = splitValue(this.statuses)
-                .map(MCRJobStatus::valueOf).toList();
+            Set<MCRJobStatus> statuses = MCRConfiguration2.splitValue(this.statuses)
+                .map(MCRJobStatus::valueOf).collect(Collectors.toSet());
             Mode statusMode = Mode.valueOf(this.statusMode);
 
             int ageDays = Integer.parseInt(this.ageDays);
