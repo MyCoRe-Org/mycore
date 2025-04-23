@@ -18,38 +18,46 @@
 
 package org.mycore.user2;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MCRJPATestHelper;
+import org.mycore.test.MyCoReTest;
 import org.mycore.user2.utils.MCRUserTransformer;
 
 /**
  * @author Thomas Scheffler (yagee)
- *
  */
-public class MCRUserManagerTest extends MCRUserTestCase {
+@MyCoReTest
+@ExtendWith({ MCRJPAExtension.class, MCRUserExtension.class })
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.URIResolver.CachingResolver.Capacity", string = "0"),
+    @MCRTestProperty(key = "MCR.URIResolver.CachingResolver.MaxAge", string = "0")
+})
+public class MCRUserManagerTest {
     MCRUser user;
 
-    @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         user = new MCRUser("junit");
         user.setRealName("Test Case");
         user.setUserAttribute("junit", "test");
@@ -61,11 +69,11 @@ public class MCRUserManagerTest extends MCRUserTestCase {
      */
     @Test
     public final void testGetUserStringMCRRealm() {
-        assertNull("Should not load user.", MCRUserManager.getUser(this.user.getUserName(), ""));
+        assertNull(MCRUserManager.getUser(this.user.getUserName(), ""), "Should not load user.");
         MCRUser user = MCRUserManager.getUser(this.user.getUserName(), MCRRealmFactory.getLocalRealm());
-        assertNotNull("Could not load user.", user);
-        assertEquals("User name is not as expected", "junit", user.getUserName());
-        assertEquals("Real name is not as expected", "Test Case", user.getRealName());
+        assertNotNull(user, "Could not load user.");
+        assertEquals("junit", user.getUserName(), "User name is not as expected");
+        assertEquals("Test Case", user.getRealName(), "Real name is not as expected");
     }
 
     @Test
@@ -81,7 +89,7 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         user3.getAttributes().add(new MCRUserAttribute("junit", "test"));
         user3.setUserAttribute("bar", "test failed");
         MCRUserManager.createUser(user3);
-        startNewTransaction();
+        MCRJPATestHelper.startNewTransaction();
         assertEquals(2, MCRUserManager.getUsers("junit", "test").count());
         assertEquals(0, MCRUserManager.getUsers("junit", "test failed").count());
     }
@@ -98,7 +106,7 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         MCRUserManager.createUser(user);
         assertEquals(2, user.getAttributes().size());
 
-        startNewTransaction();
+        MCRJPATestHelper.startNewTransaction();
         MCRUser user2 = MCRUserManager.getUsers("id_orcid", "1234-5678-1234-0000").findFirst().get();
         assertEquals("john", user2.getUserName());
 
@@ -111,8 +119,8 @@ public class MCRUserManagerTest extends MCRUserTestCase {
      */
     @Test
     public final void testExistsStringMCRRealm() {
-        assertFalse("Should not find user", MCRUserManager.exists(this.user.getUserName(), ""));
-        assertTrue("Could not find user", MCRUserManager.exists(this.user.getUserName(), this.user.getRealm()));
+        assertFalse(MCRUserManager.exists(this.user.getUserName(), ""), "Should not find user");
+        assertTrue(MCRUserManager.exists(this.user.getUserName(), this.user.getRealm()), "Could not find user");
     }
 
     /**
@@ -128,18 +136,18 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         this.user.getAttributes().add(new MCRUserAttribute("id_key1", "value2"));
 
         MCRUserManager.updateUser(this.user);
-        startNewTransaction();
+        MCRJPATestHelper.startNewTransaction();
         MCRUser user = MCRUserManager.getUser(this.user.getUserName(), this.user.getRealm());
-        assertEquals("User information was not updated", eMail, user.getEMail());
-        assertEquals("User was created not updated", 1, MCRUserManager.countUsers(null, null, null, null));
-        assertTrue("User is not in group " + groupName, user.getSystemRoleIDs().contains(groupName));
+        assertEquals( eMail, user.getEMail(), "User information was not updated");
+        assertEquals(1, MCRUserManager.countUsers(null, null, null, null), "User was created not updated");
+        assertTrue(user.getSystemRoleIDs().contains(groupName), "User is not in group " + groupName);
 
         final List<MCRUserAttribute> attributes = user.getAttributes()
             .stream()
             .filter(attr -> attr.getName().equals("id_key1"))
-            .collect(Collectors.toList());
+            .toList();
 
-        assertEquals("There should be two (id_key1) attributes", 2, attributes.size());
+        assertEquals(2, attributes.size(), "There should be two (id_key1) attributes");
 
         final MCRUserAttribute value2Attr = attributes
             .stream()
@@ -149,7 +157,7 @@ public class MCRUserManagerTest extends MCRUserTestCase {
 
         user.getAttributes().retainAll(List.of(value2Attr));
         MCRUserManager.updateUser(user);
-        startNewTransaction();
+        MCRJPATestHelper.startNewTransaction();
         user = MCRUserManager.getUser(this.user.getUserName(), this.user.getRealm());
 
         /*
@@ -157,7 +165,7 @@ public class MCRUserManagerTest extends MCRUserTestCase {
          * Hibernate: delete from MCRUserAttr where id=? and name=? // this is the default attribute junit=test
          * Hibernate: delete from MCRUserAttr where id=? and name=? // this is the id_key1 attribute(s)
          */
-        assertEquals("There should be one attribute", 1, user.getAttributes().size());
+        assertEquals(1, user.getAttributes().size(), "There should be one attribute");
     }
 
     @Test
@@ -175,7 +183,7 @@ public class MCRUserManagerTest extends MCRUserTestCase {
 
         MCRUser junit2 = MCRUserManager.getUser("junit2", MCRRealmFactory.getLocalRealm());
         assertEquals(3, junit2.getAttributes().size());
-        startNewTransaction();
+        MCRJPATestHelper.startNewTransaction();
 
         junit2 = MCRUserManager.getUser("junit2", MCRRealmFactory.getLocalRealm());
         System.out.println(junit2.getAttributes().stream().map(attr -> attr.getName() + "=" + attr.getValue())
@@ -189,7 +197,7 @@ public class MCRUserManagerTest extends MCRUserTestCase {
     @Test
     public final void testDeleteUserStringMCRRealm() {
         MCRUserManager.deleteUser(this.user.getUserName(), this.user.getRealm());
-        assertNull("Should not find user", MCRUserManager.getUser(this.user.getUserName(), this.user.getRealm()));
+        assertNull(MCRUserManager.getUser(this.user.getUserName(), this.user.getRealm()), "Should not find user");
     }
 
     /**
@@ -198,7 +206,7 @@ public class MCRUserManagerTest extends MCRUserTestCase {
     @Test
     public final void testDeleteUserMCRUser() {
         MCRUserManager.deleteUser(user);
-        assertNull("Should not find user", MCRUserManager.getUser(this.user.getUserName(), this.user.getRealm()));
+        assertNull(MCRUserManager.getUser(this.user.getUserName(), this.user.getRealm()), "Should not find user");
     }
 
     /**
@@ -207,12 +215,12 @@ public class MCRUserManagerTest extends MCRUserTestCase {
     @Test
     public final void testListUsersMCRUser() {
         List<MCRUser> listUsers = MCRUserManager.listUsers(null);
-        assertEquals("Should not find a user", 0, listUsers.size());
+        assertEquals(0, listUsers.size(), "Should not find a user");
         user.setOwner(user);
         MCRUserManager.updateUser(user);
-        startNewTransaction();
+        MCRJPATestHelper.startNewTransaction();
         listUsers = MCRUserManager.listUsers(user);
-        assertEquals("Could not find a user", 1, listUsers.size());
+        assertEquals(1, listUsers.size(), "Could not find a user");
     }
 
     /**
@@ -221,7 +229,7 @@ public class MCRUserManagerTest extends MCRUserTestCase {
     @Test
     public final void testListUsersStringStringString() {
         List<MCRUser> listUsers = MCRUserManager.listUsers(null, null, "Test*", null);
-        assertEquals("Could not find a user", 1, listUsers.size());
+        assertEquals(1, listUsers.size(), "Could not find a user");
     }
 
     /**
@@ -229,16 +237,16 @@ public class MCRUserManagerTest extends MCRUserTestCase {
      */
     @Test
     public final void testConditionWithUserAttributeNamePattern() {
-        assertEquals("Attribute name search failed", 0, MCRUserManager.countUsers(null, null, null, null,
-            "bar", null));
+        assertEquals(0, MCRUserManager.countUsers(null, null, null, null,
+            "bar", null), "Attribute name search failed");
 
         MCRUser user2 = new MCRUser("junit2");
         user2.setRealName("Test Case II");
         user2.setUserAttribute("junit2", "foo");
         user2.setUserAttribute("bar", "test");
         MCRUserManager.createUser(user2);
-        assertEquals("Attribute name search failed", 1, MCRUserManager.countUsers(null, null, null, null,
-            "bar", null));
+        assertEquals(1, MCRUserManager.countUsers(null, null, null, null,
+            "bar", null), "Attribute name search failed");
     }
 
     /**
@@ -246,7 +254,7 @@ public class MCRUserManagerTest extends MCRUserTestCase {
      */
     @Test
     public final void testCountUsers() {
-        assertEquals("Could not find a user", 1, MCRUserManager.countUsers(null, null, "*Case*", null));
+        assertEquals(1, MCRUserManager.countUsers(null, null, "*Case*", null), "Could not find a user");
     }
 
     /**
@@ -257,28 +265,28 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         String clearPasswd = "passwd123";
         Date curTime = new Date();
         MCRUser user = MCRUserManager.login(this.user.getUserName(), clearPasswd);
-        assertNull("Should not login user", user);
+        assertNull(user, "Should not login user");
         MCRUserManager.setUserPassword(this.user, clearPasswd);
         MCRUserManager.updateUser(this.user);
-        startNewTransaction();
+        MCRJPATestHelper.startNewTransaction();
         user = MCRUserManager.login(this.user.getUserName(), clearPasswd);
-        assertNotNull("Could not login user", user);
-        assertNotNull("Hash type was not updated", user.getHashType());
+        assertNotNull(user, "Could not login user");
+        assertNotNull(user.getHashType(), "Hash type was not updated");
         assertNotNull("Hash value was not updated", user.getHash());
         user = MCRUserManager.login(this.user.getUserName(), clearPasswd);
-        assertNotNull("No date set for last login.", user.getLastLogin());
-        assertTrue("Date was not updated", curTime.before(user.getLastLogin()));
+        assertNotNull(user.getLastLogin(), "No date set for last login.");
+        assertTrue(curTime.before(user.getLastLogin()), "Date was not updated");
         user.disableLogin();
         MCRUserManager.updateUser(user);
-        startNewTransaction();
-        assertNull("Should not login user when account is disabled",
-            MCRUserManager.login(this.user.getUserName(), clearPasswd));
+        MCRJPATestHelper.startNewTransaction();
+        assertNull(MCRUserManager.login(this.user.getUserName(), clearPasswd),
+                "Should not login user when account is disabled");
         user.enableLogin();
         user.setValidUntil(new Date());
         MCRUserManager.updateUser(user);
-        startNewTransaction();
-        assertNull("Should not login user when password is expired",
-            MCRUserManager.login(this.user.getUserName(), clearPasswd));
+        MCRJPATestHelper.startNewTransaction();
+        assertNull(MCRUserManager.login(this.user.getUserName(), clearPasswd),
+                "Should not login user when password is expired");
     }
 
     @Test
@@ -295,9 +303,9 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         this.user.getAttributes().add(new MCRUserAttribute("tel", "555 4711"));
         this.user.setOwner(this.user);
         MCRUserManager.updateUser(this.user);
-        startNewTransaction();
-        assertEquals("Too many users", 1, MCRUserManager.countUsers(null, null, null, null));
-        assertEquals("Too many users", 1, MCRUserManager.listUsers(this.user).size());
+        MCRJPATestHelper.startNewTransaction();
+        assertEquals(1, MCRUserManager.countUsers(null, null, null, null), "Too many users");
+        assertEquals(1, MCRUserManager.listUsers(this.user).size(), "Too many users");
         Document exportableXML = MCRUserTransformer.buildExportableXML(this.user);
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
         xout.output(exportableXML, System.out);
@@ -311,11 +319,4 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         MCRUserManager.createUser(mcrUser);
     }
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.URIResolver.CachingResolver.Capacity", "0");
-        testProperties.put("MCR.URIResolver.CachingResolver.MaxAge", "0");
-        return testProperties;
-    }
 }

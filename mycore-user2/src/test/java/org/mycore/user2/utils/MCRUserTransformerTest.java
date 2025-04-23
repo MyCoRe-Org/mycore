@@ -18,7 +18,7 @@
 
 package org.mycore.user2.utils;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -34,11 +34,14 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MyCoReTest;
 import org.mycore.user2.MCRUser;
-import org.mycore.user2.MCRUserTestCase;
+import org.mycore.user2.MCRUserExtension;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.Marshaller;
@@ -52,9 +55,10 @@ import jakarta.xml.bind.annotation.XmlValue;
 
 /**
  * @author Thomas Scheffler (yagee)
- *
  */
-public class MCRUserTransformerTest extends MCRUserTestCase {
+@MyCoReTest
+@ExtendWith({MCRJPAExtension.class, MCRUserExtension.class})
+public class MCRUserTransformerTest {
 
     /**
      * Test method for {@link org.mycore.user2.utils.MCRUserTransformer#buildMCRUser(org.jdom2.Element)}.
@@ -69,8 +73,8 @@ public class MCRUserTransformerTest extends MCRUserTestCase {
         xout.output(input, System.out);
         System.out.println();
         xout.output(output, System.out);
-        assertTrue("Input element is not the same as outputElement",
-            MCRXMLHelper.deepEqual(input, output.getRootElement()));
+        assertTrue(MCRXMLHelper.deepEqual(input, output.getRootElement()),
+            "Input element is not the same as outputElement");
     }
 
     @XmlRootElement(name = "root")
