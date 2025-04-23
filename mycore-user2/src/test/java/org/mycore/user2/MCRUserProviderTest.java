@@ -31,7 +31,7 @@ import org.mycore.test.MCRJPAExtension;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
-@ExtendWith({ MCRJPAExtension.class })
+@ExtendWith(MCRJPAExtension.class)
 public class MCRUserProviderTest {
 
     private MCRUser userWithoutRealm;
