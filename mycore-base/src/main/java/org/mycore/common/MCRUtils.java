@@ -44,7 +44,9 @@ import java.text.Normalizer;
 import java.text.Normalizer.Form;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HexFormat;
 import java.util.List;
@@ -52,6 +54,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -628,4 +631,21 @@ public class MCRUtils {
         final Path resolvePath = basePath.getFileSystem().getPath(resolve[0], more);
         return safeResolve(basePath, resolvePath);
     }
+
+    /**
+     * Creates a new {@link EnumSet} from a collection of enum values.
+     * <p>
+     * Intended as an alternative to {@link EnumSet#copyOf(Collection)} which can't handle an empty collection.
+     * 
+     * @param enumClass The enum class
+     * @param values The collection of enum values.
+     * @return A {@link EnumSet} containing all given enum values.
+     * @param <T> The enum type.
+     */
+    public static <T extends Enum<T>> Set<T> enumSetOf(Class<T> enumClass, Collection<T> values) {
+        Set<T> enumSet = EnumSet.noneOf(enumClass);
+        enumSet.addAll(values);
+        return enumSet;
+    }
+
 }
