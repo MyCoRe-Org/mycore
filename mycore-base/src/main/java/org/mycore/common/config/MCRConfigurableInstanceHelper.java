@@ -375,6 +375,7 @@ class MCRConfigurableInstanceHelper {
 
             List<Method> singletonFactoryMethods = factoryMethods.stream()
                 .filter(method -> method.getName().equals("getInstance"))
+                .filter(method -> method.getAnnotation(Deprecated.class) == null)
                 .toList();
 
             if (singletonFactoryMethods.size() > 1) {
