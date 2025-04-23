@@ -17,10 +17,10 @@
  */
 package org.mycore.user2;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,18 +28,23 @@ import java.util.Map;
 import org.jdom2.Document;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MCRJPATestHelper;
+import org.mycore.test.MyCoReTest;
 import org.mycore.user2.login.MCRShibbolethUserInformation;
 import org.mycore.user2.utils.MCRUserTransformer;
 
 /**
  * @author René Adler (eagle)
- *
  */
-public class MCRUserAttributeMapperTest extends MCRUserTestCase {
+@MyCoReTest
+@ExtendWith({ MCRJPAExtension.class, MCRUserExtension.class })
+public class MCRUserAttributeMapperTest {
 
     private static String realmId = "mycore.de";
 
@@ -47,11 +52,8 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
 
     private MCRUser mcrUser;
 
-    @Before
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
-
         mcrUser = MCRUserTransformer.buildMCRUser(MCRURIResolver.obtainInstance().resolve("resource:test-user.xml"));
     }
 
@@ -59,7 +61,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
     public void testUserMapping() throws Exception {
         MCRUserAttributeMapper attributeMapper = MCRRealmFactory.getAttributeMapper(realmId);
 
-        assertNotNull("no attribute mapping defined", attributeMapper);
+        assertNotNull(attributeMapper, "no attribute mapping defined");
 
         HashMap<String, Object> attributes = new HashMap<>();
         attributes.put("eduPersonPrincipalName", mcrUser.getUserName() + "@" + realmId);
@@ -117,7 +119,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
 
         MCRUserManager.createUser(user);
 
-        startNewTransaction();
+        MCRJPATestHelper.startNewTransaction();
 
         MCRUser storedUser = MCRUserManager.getUser(user.getUserName(), realmId);
 
@@ -153,7 +155,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
 
         MCRUserManager.createUser(user);
 
-        startNewTransaction();
+        MCRJPATestHelper.startNewTransaction();
 
         attributes = new HashMap<>();
         attributes.put("eduPersonPrincipalName", mcrUser.getUserName() + "@" + realmId);
@@ -166,7 +168,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
         MCRUserAttributeMapper attributeMapper = MCRRealmFactory.getAttributeMapper(realmId);
         boolean changed = attributeMapper.mapAttributes(storedUser, attributes);
 
-        assertTrue("should changed", changed);
+        assertTrue(changed, "should changed");
         assertNotEquals(user.getEMail(), storedUser.getEMail());
 
         Document exportableXML = MCRUserTransformer.buildExportableXML(storedUser);
