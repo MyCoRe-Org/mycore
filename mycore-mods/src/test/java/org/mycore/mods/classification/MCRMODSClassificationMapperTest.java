@@ -325,8 +325,8 @@ public class MCRMODSClassificationMapperTest extends MCRJPATestCase {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 8);
 
-        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
-        mapper.handleObjectUpdated(null, mcro);
+        MCRMODSClassificationMapper mapper = new MCRMODSClassificationMapper();
+        mapper.createMapping(mcro);
 
         Document xml = mcro.createXML();
 
@@ -361,8 +361,8 @@ public class MCRMODSClassificationMapperTest extends MCRJPATestCase {
         mw.setMODS(document1.getRootElement().detach());
         mw.setID("junit", 9);
 
-        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
-        mapper.handleObjectUpdated(null, mcro);
+        MCRMODSClassificationMapper mapper = new MCRMODSClassificationMapper();
+        mapper.createMapping(mcro);
 
         Document xml = mcro.createXML();
 
@@ -385,7 +385,7 @@ public class MCRMODSClassificationMapperTest extends MCRJPATestCase {
         mw.setMODS(document2.getRootElement().detach());
         mw.setID("junit", 10);
 
-        mapper.handleObjectUpdated(null, mcro);
+        mapper.createMapping(mcro);
 
         xml = mcro.createXML();
 
