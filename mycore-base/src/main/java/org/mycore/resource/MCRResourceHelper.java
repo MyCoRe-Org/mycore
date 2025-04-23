@@ -115,7 +115,7 @@ public final class MCRResourceHelper {
         try {
             return MCRResourceResolver.obtainInstance().reverse(new URI(resourceUrl).toURL()).orElse(null);
         } catch (URISyntaxException | MalformedURLException e) {
-            throw new MCRException("Unable to convert string tu URL", e);
+            throw new MCRException("Unable to convert string to URL: " + resourceUrl, e);
         }
     }
 
@@ -129,7 +129,7 @@ public final class MCRResourceHelper {
         try {
             return resourceUrl == null ? null : resourceUrl.openStream();
         } catch (IOException e) {
-            throw new MCRException(e);
+            throw new MCRException("Failed to open input stream for resource URL " + resourceUrl, e);
         }
     }
 
