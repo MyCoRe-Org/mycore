@@ -174,8 +174,8 @@ public class MCRDefaultClassificationMapperTest extends MCRJPATestCase {
         Document document = saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + "testMcrObject3.xml"));
         MCRObject mcro = new MCRObject(document);
 
-        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
-        mapper.handleObjectUpdated(null, mcro);
+        MCRDefaultClassificationMapper mapper = new MCRDefaultClassificationMapper();
+        mapper.createMapping(mcro);
         Document xml = mcro.createXML();
 
         String expression = "//mappings[@class='MCRMetaClassification']/mapping[@classid='dummyClassification' "
