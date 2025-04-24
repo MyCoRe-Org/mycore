@@ -65,7 +65,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <hibernate.core.version>${hibernate.version}</hibernate.core.version>
     <hibernate.version>${hibernate.base.version}.3.Final</hibernate.version>
     <hk2.version>3.1.1</hk2.version>
-    <httpclient.version>5.4</httpclient.version>
+    <httpclient.version>5.4.3</httpclient.version>
     <httpclient4.version>4.5.14</httpclient4.version>
     <httpcore.version>5.3.1</httpcore.version>
     <jackson.version>2.18.0</jackson.version>
