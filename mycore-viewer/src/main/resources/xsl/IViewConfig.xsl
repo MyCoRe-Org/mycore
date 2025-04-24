@@ -44,17 +44,18 @@
     <xsl:param name="integrity"/>
 
     <xsl:if test="$src and string-length($src) &gt; 0">
-    <xsl:element name="script">
-      <xsl:attribute name="src">
-        <xsl:value-of select="$src"/>
-      </xsl:attribute>
-      <xsl:if test="$integrity and string-length($integrity) &gt; 0">
-        <xsl:attribute name="integrity">
-          <xsl:value-of select="$integrity"/>
+      <xsl:element name="script">
+        <xsl:attribute name="src">
+          <xsl:value-of select="$src"/>
         </xsl:attribute>
-      </xsl:if>
-      <xsl:attribute name="crossorigin">anonymous</xsl:attribute>
-    </xsl:element>
+        <xsl:if test="$integrity and string-length($integrity) &gt; 0">
+          <xsl:attribute name="integrity">
+            <xsl:value-of select="$integrity"/>
+          </xsl:attribute>
+        </xsl:if>
+        <xsl:attribute name="crossorigin">anonymous</xsl:attribute>
+      </xsl:element>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="/IViewConfig">
