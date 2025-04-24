@@ -58,6 +58,7 @@
         </xsl:if>
         <xsl:attribute name="crossorigin">anonymous</xsl:attribute>
       </xsl:element>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="/IViewConfig">
