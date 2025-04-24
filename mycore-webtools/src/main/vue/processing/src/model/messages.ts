@@ -27,13 +27,13 @@ export interface ConnectMessage extends ProcessingMessage {
 
 export interface RegistryMessage extends ProcessingMessage {
 
-    type: "registry";
+    type: "REGISTRY";
 
 }
 
 export interface AddCollectionMessage extends ProcessingMessage {
 
-    type: "addCollection";
+    type: "ADD_COLLECTION";
 
     id: number;
 
@@ -45,7 +45,7 @@ export interface AddCollectionMessage extends ProcessingMessage {
 
 export interface UpdateProcessableMessage extends ProcessingMessage {
 
-    type: "updateProcessable";
+    type: "UPDATE_PROCESSABLE";
 
     id: number;
 
@@ -69,7 +69,7 @@ export interface UpdateProcessableMessage extends ProcessingMessage {
 
 export interface UpdateCollectionPropertyMessage extends ProcessingMessage {
 
-    type: "updateCollectionProperty";
+    type: "UPDATE_COLLECTION_PROPERTY";
 
     id: number;
 
@@ -81,7 +81,7 @@ export interface UpdateCollectionPropertyMessage extends ProcessingMessage {
 
 export interface ErrorMessage extends ProcessingMessage {
 
-    type: "error";
+    type: "ERROR";
 
     error: string;
 

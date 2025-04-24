@@ -25,6 +25,7 @@ import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Stream;
 
@@ -65,6 +66,8 @@ public final class MCRShutdownHandler {
     volatile boolean shuttingDown;
 
     private volatile boolean shutDown;
+    
+    private final AtomicBoolean isShutdownHookRegistered = new AtomicBoolean(false);
 
     boolean isWebAppRunning;
     
@@ -75,7 +78,7 @@ public final class MCRShutdownHandler {
     }
 
     private void init() {
-        if (!isWebAppRunning) {
+        if (!isWebAppRunning && isShutdownHookRegistered.compareAndSet(false,  true)) {
             LOGGER.info("adding MyCoRe ShutdownHook");
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 MCRShutdownHandler sh = getInstance();

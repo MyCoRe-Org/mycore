@@ -44,6 +44,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
@@ -58,6 +59,7 @@ import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
+import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
 import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
 import org.mycore.solr.index.handlers.MCRSolrOptimizeIndexHandler;
 import org.mycore.solr.index.handlers.stream.MCRSolrFilesIndexHandler;
@@ -385,6 +387,12 @@ public class MCRSolrIndexer {
                 if (i % BULK_SIZE == 0 || totalCount == i) {
                     MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.obtainInstance()
                         .getIndexHandler(contentMap);
+                    if (indexHandler instanceof MCRSolrAbstractIndexHandler aie) {
+                        aie.setDestinationCores(solrCores);
+                    } else {
+                        throw new MCRException("indexHandler " + indexHandler.getClass().getName()
+                            + " does not support indexing with cores");
+                    }
                     indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
                     statistic = indexHandler.getStatistic();
                     submitIndexHandler(indexHandler);

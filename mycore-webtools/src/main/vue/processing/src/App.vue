@@ -76,22 +76,22 @@ function connect() {
 
 function handleMessage(data: IncomingMessage) {
   switch (data.type) {
-    case "error":
+    case "ERROR":
       errorCode = parseInt(data.error);
       errorMessage.value = "A server error occurred: " + errorCode;
       break;
-    case "registry":
+    case "REGISTRY":
       errorCode = undefined;
       errorMessage.value = undefined;
       registry.value = new Registry();
       break;
-    case "addCollection":
+    case "ADD_COLLECTION":
       registry.value.addCollection(data);
       break;
-    case "updateProcessable":
+    case "UPDATE_PROCESSABLE":
       registry.value.updateProcessable(data);
       break;
-    case "updateCollectionProperty":
+    case "UPDATE_COLLECTION_PROPERTY":
       const collection = registry.value.getCollection(data.id);
       if (collection == null) {
         console.warn("Unable to find collection with id " + data.id);
