@@ -36,39 +36,6 @@
         <artifactId>frontend-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>yarn-install-access-key-manager</id>
-            <goals>
-              <goal>yarn</goal>
-            </goals>
-            <phase>generate-resources</phase>
-            <configuration>
-              <arguments>install</arguments>
-              <workingDirectory>src/main/vue/access-key-manager/</workingDirectory>
-            </configuration>
-          </execution>
-          <execution>
-            <id>yarn-build-access-key-manager</id>
-            <goals>
-              <goal>yarn</goal>
-            </goals>
-            <phase>generate-resources</phase>
-            <configuration>
-              <arguments>build</arguments>
-              <workingDirectory>src/main/vue/access-key-manager/</workingDirectory>
-            </configuration>
-          </execution>
-          <execution>
-            <id>yarn-copy-vue</id>
-            <goals>
-              <goal>yarn</goal>
-            </goals>
-            <phase>generate-resources</phase>
-            <configuration>
-              <arguments>copy</arguments>
-              <workingDirectory>src/main/vue/access-key-manager/</workingDirectory>
-            </configuration>
-          </execution>
-          <execution>
             <id>yarn-install_access-key-manager2</id>
             <goals>
               <goal>yarn</goal>
