@@ -12,6 +12,7 @@
   <xsl:include href="resource:xslt/functions/stringutils.xsl"/>
 
   <xsl:param name="MCR.ORCID2.Work.SourceURL" />
+  <xsl:param name="MCR.ORCID2.Mods.DateIssued.XPath" />
   <xsl:variable name="short-description-max-length" select="5000"/>
   <xsl:variable name="string-150-max-length" select="150"/>
 
@@ -26,7 +27,10 @@
       <xsl:apply-templates select="mods:abstract" />
       <xsl:call-template name="workCitation" />
       <xsl:call-template name="workType" />
-      <xsl:apply-templates select="(mods:originInfo/mods:dateIssued[@encoding='w3cdtf'][@keyDate='yes'],mods:originInfo/mods:dateIssued[@encoding='w3cdtf'],descendant::mods:relatedItem/mods:originInfo/mods:dateIssued[@encoding='w3cdtf'])[1]" />
+      <xsl:variable name="modsDateIssuedXpath">
+        <xsl:evaluate xpath="$MCR.ORCID2.Mods.DateIssued.XPath" context-item="." />
+      </xsl:variable>
+      <xsl:apply-templates select="$modsDateIssuedXpath" />
       <xsl:call-template name="externalIDs" />
       <xsl:apply-templates select="(mods:location/mods:url)[1]" />
       <xsl:call-template name="workContributors" />

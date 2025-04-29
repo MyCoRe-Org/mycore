@@ -678,6 +678,31 @@ public class MCRXMLFunctions {
         }
     }
 
+    /**
+     * Get the display name for the given category in the desired language.
+     *
+     * @param classificationId the id of the classification
+     * @param categoryId the category id
+     * @param lang the desired language for which to get the display name
+     *
+     * @return the display name in the desired language, if the label for the desired language cannot be found the
+     *         method trys to deliver the default label. If this fails an empty string is returned.
+     */
+    public static String getDisplayName(String classificationId, String categoryId, String lang) {
+        try {
+            MCRCategoryID categID = new MCRCategoryID(classificationId, categoryId);
+            MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
+            MCRCategory category = dao.getCategory(categID, 0);
+            Optional<MCRLabel> label = category.getLabel(lang);
+            return label.isEmpty() ? getDisplayName(classificationId, categoryId)
+                                   : label.get().getText();
+        } catch (MCRException e) {
+            LOGGER.error("Could not determine display name for classification id {} and category id {}",
+                classificationId, categoryId, e);
+            return "";
+        }
+    }
+
     public static boolean isCategoryID(String classificationId, String categoryId) {
         if (classificationId == null || classificationId.isEmpty()) {
             LOGGER.debug("Classification identifier is null or empty");
