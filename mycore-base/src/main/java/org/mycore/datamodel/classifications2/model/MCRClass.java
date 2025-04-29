@@ -134,7 +134,11 @@ public class MCRClass {
         category.getLabels()
             .addAll(getLabel().stream()
                 .map(MCRLabel::clone)
-                .collect(Collectors.toList()));
+                .toList());
+        category.setChildren(new ArrayList<>());
+        this.getCategories()
+                .forEach((c) -> buildCategory(getID(), c, category));
+
         return category;
     }
 
