@@ -18,8 +18,8 @@
 
 package org.mycore.access.mcrimpl;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Maps object ids to rules
@@ -30,7 +30,7 @@ public class MCRAccessDefinition {
 
     private String objid;
 
-    private Map<String, String> pools = new HashMap<>();
+    private Map<String, String> pools = new ConcurrentHashMap<>();
 
     public MCRAccessDefinition() {
         pools.clear();

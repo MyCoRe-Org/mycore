@@ -19,9 +19,9 @@
 package org.mycore.common.config;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -134,7 +134,7 @@ public final class MCRInstanceConfiguration {
     //The latter two checks only make sense in the case, where the first condition is met.
     private static Map<String, String> reduceProperties(MCRInstanceName name, String prefix,
         Map<String, String> properties) {
-        Map<String, String> reducedProperties = new HashMap<>();
+        Map<String, String> reducedProperties = new ConcurrentHashMap<>();
         for (Map.Entry<String, String> entry : properties.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
@@ -319,7 +319,7 @@ public final class MCRInstanceConfiguration {
      * @return the nested configuration map
      */
     public Map<String, MCRInstanceConfiguration> nestedConfigurationMap() {
-        Map<String, MCRInstanceConfiguration> nestedConfigurationMap = new HashMap<>();
+        Map<String, MCRInstanceConfiguration> nestedConfigurationMap = new ConcurrentHashMap<>();
         for (Map.Entry<String, String> entry : properties().entrySet()) {
             String key = entry.getKey();
             int index = key.indexOf('.');
@@ -390,7 +390,7 @@ public final class MCRInstanceConfiguration {
      */
     public Map<String, MCRInstanceConfiguration> nestedConfigurationMap(String commonPrefix) {
         String commonSuffixWithDelimiter = commonPrefix + ".";
-        Map<String, MCRInstanceConfiguration> nestedConfigurationMap = new HashMap<>();
+        Map<String, MCRInstanceConfiguration> nestedConfigurationMap = new ConcurrentHashMap<>();
         for (Map.Entry<String, String> entry : properties().entrySet()) {
             String key = entry.getKey();
             if (key.startsWith(commonSuffixWithDelimiter)) {

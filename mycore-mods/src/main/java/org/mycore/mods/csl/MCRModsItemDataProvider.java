@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -462,7 +463,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
 
     protected void processNames(CSLItemDataBuilder idb) {
         final List<Element> modsNameElements = wrapper.getElements("mods:name");
-        Map<String, List<CSLName>> roleNameMap = new HashMap<>();
+        Map<String, List<CSLName>> roleNameMap = new ConcurrentHashMap<>();
         for (Element modsName : modsNameElements) {
             final CSLName cslName = buildName(modsName);
             if (isNameEmpty(cslName)) {
@@ -473,7 +474,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
 
         mapRolesToCSLNames(idb, roleNameMap);
 
-        Map<String, List<CSLName>> parentRoleMap = new HashMap<>();
+        Map<String, List<CSLName>> parentRoleMap = new ConcurrentHashMap<>();
         final List<Element> parentModsNameElements = wrapper.getElements("mods:relatedItem/mods:name");
 
         for (Element modsName : parentModsNameElements) {
@@ -546,7 +547,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         nameBuilder.isInstitution(isInstitution);
 
         if (!isInstitution) {
-            Map<String, List<String>> typeContentsMap = new HashMap<>();
+            Map<String, List<String>> typeContentsMap = new ConcurrentHashMap<>();
             modsName.getChildren("namePart", MODS_NAMESPACE).forEach(namePart -> {
                 final String type = namePart.getAttributeValue(ATTRIBUTE_TYPE);
                 final String content = namePart.getTextNormalize();

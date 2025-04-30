@@ -23,7 +23,6 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,6 +30,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
+import org.mycore.common.config.MCRConfiguration2.ConfigSingletonKey;
 import org.mycore.common.config.MCRConfiguration2.SingletonKey;
 
 /**
@@ -46,7 +46,7 @@ class MCRConcurrentHashMap<K extends SingletonKey, V> extends ConcurrentHashMap<
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private Map<K, RemappedKey> keyMap = new HashMap<>();
+    private Map<K, RemappedKey> keyMap = new ConcurrentHashMap<>();
 
     // Disable serialization
     @SuppressWarnings("unused")

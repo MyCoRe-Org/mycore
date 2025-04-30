@@ -29,13 +29,13 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
@@ -72,7 +72,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final Map<String, Stylesheet> stylesheets = new HashMap<>();
+    private final Map<String, Stylesheet> stylesheets = new ConcurrentHashMap<>();
 
     private final Set<String> unknown = new HashSet<>();
     private final String xslFolder =

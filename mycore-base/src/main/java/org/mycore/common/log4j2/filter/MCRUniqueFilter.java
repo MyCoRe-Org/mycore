@@ -20,11 +20,11 @@ package org.mycore.common.log4j2.filter;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.LogEvent;
@@ -48,7 +48,7 @@ public final class MCRUniqueFilter extends AbstractFilter {
 
     private final int cacheSizePerFormat;
 
-    private final Map<String, Set<List<Object>>> cacheByFormat = new HashMap<>();
+    private final Map<String, Set<List<Object>>> cacheByFormat = new ConcurrentHashMap<>();
 
     private MCRUniqueFilter(int cacheSizePerFormat, Result onMatch, Result onMismatch) {
         super(onMatch, onMismatch);

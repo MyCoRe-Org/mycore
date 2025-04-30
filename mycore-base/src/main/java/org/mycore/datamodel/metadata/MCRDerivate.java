@@ -20,6 +20,7 @@ package org.mycore.datamodel.metadata;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -149,6 +150,7 @@ public final class MCRDerivate extends MCRBase {
      * If no URN assigned the map will be empty.
      */
     public Map<String, String> getUrnMap() {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String> fileUrnMap = new HashMap<>();
 
         XPathExpression<Element> filesetPath = XPathFactory.instance().compile("./mycorederivate/derivate/fileset",
@@ -172,7 +174,7 @@ public final class MCRDerivate extends MCRBase {
                 fileUrnMap.put(currentFile, currentUrn);
             }
         }
-        return fileUrnMap;
+        return Collections.unmodifiableMap(fileUrnMap);
     }
 
     /**
