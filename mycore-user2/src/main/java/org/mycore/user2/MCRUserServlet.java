@@ -359,7 +359,7 @@ public class MCRUserServlet extends MCRServlet {
         return outputFormat.format(d);
     }
 
-    private void updateBasicUserInfo(Element u, MCRUser user) {
+    protected void updateBasicUserInfo(Element u, MCRUser user) {
         String name = u.getChildText("realName");
         if ((name != null) && (name.trim().length() == 0)) {
             name = null;
