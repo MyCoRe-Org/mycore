@@ -26,17 +26,17 @@ import org.mycore.frontend.xeditor.MCRRepeatBinding;
  */
 public class MCRSwapTarget extends MCRSwapInsertTarget {
 
-    public static final boolean MOVE_DOWN = true;
+    public static final String TOKEN_UP = "up";
 
-    public static final boolean MOVE_UP = false;
+    public static final String TOKEN_DOWN = "down";
 
     @Override
     protected void handle(int pos, MCRRepeatBinding repeatBinding) {
         repeatBinding.swap(pos);
     }
 
-    public static String getSwapParameter(MCRRepeatBinding repeatBinding, boolean direction) throws JaxenException {
-        int pos = repeatBinding.getRepeatPosition() + (direction == MOVE_UP ? -1 : 0);
+    public static String getSwapParameter(MCRRepeatBinding repeatBinding, String direction) throws JaxenException {
+        int pos = repeatBinding.getRepeatPosition() + (TOKEN_UP.equals(direction) ? -1 : 0);
         return buildParameter(repeatBinding, pos);
     }
 }
