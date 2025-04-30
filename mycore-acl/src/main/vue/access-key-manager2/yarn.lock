@@ -277,13 +277,10 @@
   resolved "https://npm.jsr.io/~/11/@jsr/mycore__js-common/0.0.7.tgz#E1456BC84C85FA0126BABEAB8D36E22B25B5152C"
   integrity sha512-hMIvjf1aGqzNo/B9aFbdfO3C40h7DLbz+4zBfck27ct+ZgJGjMbUgeDPJLqw6T3d5Vx5Je4K2AaLn7qvjmkdJQ==
 
-"@mycore-org/vue-access-key-manager@^0.1.8":
-  version "0.1.8"
-  resolved "https://registry.yarnpkg.com/@mycore-org/vue-access-key-manager/-/vue-access-key-manager-0.1.8.tgz#735f36aba98c7d9c2cd4800765a28e6c00a8902d"
-  integrity sha512-BrQfAVq45kKgjTFvjSYPnEycDlj2ak4aOF/IcErJsXbVkv2+Mz341S9kTLOLTwnW+VjXtiv4CxVX11L+tWsdOg==
-  dependencies:
-    "@vuelidate/core" "^2.0.3"
-    "@vuelidate/validators" "^2.0.4"
+"@mycore-org/vue-access-key-manager@^0.1.10":
+  version "0.1.10"
+  resolved "https://registry.yarnpkg.com/@mycore-org/vue-access-key-manager/-/vue-access-key-manager-0.1.10.tgz#5ce148d2c8baf6265bddc5905e7ca0fb5294701e"
+  integrity sha512-Ja+lpDKWYmS+IoAT7Q2+d2BpdXh/3fQ9DCFqsSavkKKR/D6sUjfReqEoANV9HzSE4D4hQqWRahO3hv8DI4Cx9g==
 
 "@mycore-org/vue-components@^0.1.5":
   version "0.1.5"
@@ -681,20 +678,6 @@
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/@vue/tsconfig/-/tsconfig-0.7.0.tgz#67044c847b7a137b8cbfd6b23104c36dbaf80d1d"
   integrity sha512-ku2uNz5MaZ9IerPPUyOHzyjhXoX2kVJaVf7hL315DC17vS6IiZRmmCPfggNbU16QTvM80+uYYy3eYJB59WCtvg==
-
-"@vuelidate/core@^2.0.3":
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/@vuelidate/core/-/core-2.0.3.tgz#40468c5ed15b72bde880a026b0699c2f0f1ecede"
-  integrity sha512-AN6l7KF7+mEfyWG0doT96z+47ljwPpZfi9/JrNMkOGLFv27XVZvKzRLXlmDPQjPl/wOB1GNnHuc54jlCLRNqGA==
-  dependencies:
-    vue-demi "^0.13.11"
-
-"@vuelidate/validators@^2.0.4":
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/@vuelidate/validators/-/validators-2.0.4.tgz#0a88a7b2b18f15fd9c384095593f369a6f7384e9"
-  integrity sha512-odTxtUZ2JpwwiQ10t0QWYJkkYrfd0SyFYhdHH44QQ1jDatlZgTh/KRzrWVmn/ib9Gq7H4hFD4e8ahoo5YlUlDw==
-  dependencies:
-    vue-demi "^0.13.11"
 
 acorn-jsx@^5.3.2:
   version "5.3.2"
@@ -1623,11 +1606,6 @@ vscode-uri@^3.0.8:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/vscode-uri/-/vscode-uri-3.1.0.tgz#dd09ec5a66a38b5c3fffc774015713496d14e09c"
   integrity sha512-/BpdSx+yCQGnCvecbyXdxHDkuk55/G3xwnC0GqY4gmQ3j+A+g8kzzgB4Nk/SINjqn6+waqw3EgbVF2QKExkRxQ==
-
-vue-demi@^0.13.11:
-  version "0.13.11"
-  resolved "https://registry.yarnpkg.com/vue-demi/-/vue-demi-0.13.11.tgz#7d90369bdae8974d87b1973564ad390182410d99"
-  integrity sha512-IR8HoEEGM65YY3ZJYAjMlKygDQn25D5ajNFNoKh9RSDMQtlzCxtfQjdQgv9jjK+m3377SsJXY8ysq8kLCZL25A==
 
 vue-eslint-parser@^9.4.3:
   version "9.4.3"

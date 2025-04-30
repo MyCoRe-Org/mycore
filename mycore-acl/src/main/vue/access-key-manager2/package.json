@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@jsr/mycore__js-common": "^0.0.7",
-    "@mycore-org/vue-access-key-manager": "^0.1.8",
+    "@mycore-org/vue-access-key-manager": "^0.1.10",
     "@mycore-org/vue-components": "^0.1.5",
     "vue": "^3.5.13",
     "vue-i18n": "^11.1.0",
