@@ -233,11 +233,14 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
     }
 
     @Override
-    @ManyToOne(targetEntity = MCRCategoryImpl.class)
+    @ManyToOne
     @JoinColumn(name = "parentID")
-    @Access(AccessType.FIELD)
-    public MCRCategory getParent() {
-        return super.getParent();
+    public MCRCategoryImpl getParent() {
+        return (MCRCategoryImpl) super.parent;
+    }
+
+    public void setParent(MCRCategoryImpl parent) {
+        super.parent = parent;
     }
 
     //End of Mapping
@@ -393,7 +396,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
     @Transient
     MCRCategoryImpl getLeftSiblingOrOfAncestor() {
         int index = getPositionInParent();
-        MCRCategoryImpl parent = (MCRCategoryImpl) getParent();
+        MCRCategoryImpl parent = getParent();
         if (index > 0) {
             // has left sibling
             return (MCRCategoryImpl) parent.getChildren().get(index - 1);
@@ -408,7 +411,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
     @Transient
     MCRCategoryImpl getLeftSiblingOrParent() {
         int index = getPositionInParent();
-        MCRCategoryImpl parent = (MCRCategoryImpl) getParent();
+        MCRCategoryImpl parent = getParent();
         if (index == 0) {
             return parent;
         }
@@ -418,7 +421,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
     @Transient
     MCRCategoryImpl getRightSiblingOrOfAncestor() {
         int index = getPositionInParent();
-        MCRCategoryImpl parent = (MCRCategoryImpl) getParent();
+        MCRCategoryImpl parent = getParent();
         if (index + 1 < parent.getChildren().size()) {
             // has right sibling
             return (MCRCategoryImpl) parent.getChildren().get(index + 1);
@@ -433,7 +436,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
     @Transient
     MCRCategoryImpl getRightSiblingOrParent() {
         int index = getPositionInParent();
-        MCRCategoryImpl parent = (MCRCategoryImpl) getParent();
+        MCRCategoryImpl parent = getParent();
         if (index + 1 == parent.getChildren().size()) {
             return parent;
         }
