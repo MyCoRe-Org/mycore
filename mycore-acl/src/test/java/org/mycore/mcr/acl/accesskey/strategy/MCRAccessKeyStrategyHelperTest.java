@@ -34,6 +34,7 @@ import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 
+@Deprecated
 public class MCRAccessKeyStrategyHelperTest extends MCRTestCase {
 
     private static MCRAccessKey accessKey;

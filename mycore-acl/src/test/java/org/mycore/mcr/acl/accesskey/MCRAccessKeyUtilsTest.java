@@ -39,6 +39,7 @@ import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
+@Deprecated
 public class MCRAccessKeyUtilsTest extends MCRAccessKeyTestCase {
 
     private static final String READ_KEY = "blah";
