@@ -21,8 +21,7 @@ package org.mycore.common.config;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
-import java.text.NumberFormat;
-import java.util.Locale;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.jar.Manifest;
 
@@ -44,11 +43,13 @@ import org.mycore.common.MCRException;
 @SuppressWarnings("PMD.MCR.ResourceResolver")
 public class MCRComponent implements Comparable<MCRComponent> {
 
+    private static final Comparator<MCRComponent> COMPARATOR = Comparator
+        .comparing(MCRComponent::getPriority)
+        .thenComparing(MCRComponent::getName);
+
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String ATT_PRIORITY = "Priority";
-
-    private static final NumberFormat PRIORITY_FORMAT = getPriorityFormat();
 
     private static final String DEFAULT_PRIORITY = "99";
 
@@ -60,21 +61,12 @@ public class MCRComponent implements Comparable<MCRComponent> {
 
     private final int priority;
 
-    private final String sortCriteria;
-
     private final String artifactId;
 
     private final Manifest manifest;
 
     private enum Type {
         BASE, COMPONENT, MODULE
-    }
-
-    private static NumberFormat getPriorityFormat() {
-        NumberFormat format = NumberFormat.getIntegerInstance(Locale.ROOT);
-        format.setGroupingUsed(false);
-        format.setMinimumIntegerDigits(3);
-        return format;
     }
 
     public MCRComponent(String artifactId, Manifest manifest) {
@@ -98,9 +90,6 @@ public class MCRComponent implements Comparable<MCRComponent> {
         this.artifactId = artifactId;
         this.manifest = manifest;
         this.priority = calculatePriority(artifactId, manifest, this.type);
-        synchronized (PRIORITY_FORMAT) {
-            this.sortCriteria = PRIORITY_FORMAT.format(this.priority) + this.name;
-        }
         LOGGER.debug("{} is of type {} and named {}: {}", artifactId, this.type, this.name, jarFile);
     }
 
@@ -242,7 +231,7 @@ public class MCRComponent implements Comparable<MCRComponent> {
      */
     @Override
     public int compareTo(MCRComponent o) {
-        return this.sortCriteria.compareTo(o.sortCriteria);
+        return COMPARATOR.compare(this, o);
     }
 
     @Override
