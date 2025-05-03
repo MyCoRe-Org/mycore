@@ -28,26 +28,28 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 
 /**
- * {@link MCRMD5Strategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the MD5 algorithm.
+ * A {@link MCRMD5Strategy} is a {@link MCRPasswordCheckStrategy} that uses the MD5 algorithm.
  * <p>
  * The salt is returned as a base 64 encoded string. The hash is returned as a hex encoded string.
  * <p>
- * The following configuration options are available, if configured automatically:
+ * The following configuration options are available:
  * <ul>
- * <li> The configuration suffix {@link MCRMD5Strategy#SALT_SIZE_BYTES_KEY} can be used to specify the size of
- * generated salt values in bytes.
- * <li> The configuration suffix {@link MCRMD5Strategy#ITERATIONS_KEY} can be used to specify the number of
- * iterations to be performed.
+ * <li> The property suffix {@link MCRMD5Strategy#SALT_SIZE_BYTES_KEY} can be used to
+ * specify the size of generated salt values in bytes.
+ * <li> The property suffix {@link MCRMD5Strategy#ITERATIONS_KEY} can be used to
+ * specify the number of iterations to be performed.
  * </ul>
  * Example:
- * <pre>
+ * <pre><code>
  * [...].Class=org.mycore.user2.hash.MCRMD5Strategy
  * [...].SaltSizeBytes=0
  * [...].Iterations=1
- * </pre>
- * Changes to the number of iterations will result in deviating hashes and therefore prevent the successful
- * verification of existing hashes, even if the correct password is supplied. Changes to the salt size will not prevent
- * verification, but successful verification results will be marked as outdated.
+ * </code></pre>
+ * Changes to the number of iterations will result in deviating hashes and therefore prevent
+ * the successful verification of existing hashes, even if the correct password is supplied.
+ * <p>
+ * Changes to the salt size will not prevent verification, but successful verification results
+ * will be marked as outdated.
  */
 @MCROutdated
 @MCRConfigurationProxy(proxyClass = MCRMD5Strategy.Factory.class)

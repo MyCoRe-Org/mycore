@@ -33,37 +33,40 @@ import org.mycore.user2.hash.MCRPasswordCheckStrategy;
 import org.mycore.user2.hash.MCRPasswordCheckStrategyBase;
 
 /**
- * {@link MCRArgon2Strategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the Argon2 algorithm.
+ * A {@link MCRArgon2Strategy} is a {@link MCRPasswordCheckStrategy} that uses the Argon2 algorithm.
  * <p>
- * The version and salt are encoded in the hash using the Modular Crypt Format (MCF) for Argon2. No explicit salt
- * values are generated.
+ * The version and salt are encoded in the hash using the Modular Crypt Format (MCF) for Argon2.
+ * No explicit salt values are generated.
  * <p>
  * The salt is returned as a hex encoded string. The hash is returned as a hex encoded string.
+ * <p>
+ * The following configuration options are available:
  * <ul>
- * <li> The configuration suffix {@link MCRArgon2Strategy#SALT_SIZE_BYTES_KEY} can be used to specify the size of
- * generated salt values in bytes.
- * <li> The configuration suffix {@link MCRArgon2Strategy#HASH_SIZE_BYTES_KEY} can be used to specify the size of
- * generated hash values in bytes.
- * <li> The configuration suffix {@link MCRArgon2Strategy#PARALLELISM_KEY} can be used to specify the parallelization
- * value.
- * <li> The configuration suffix {@link MCRArgon2Strategy#MEMORY_LIMIT_KILOBYTES_KEY} can be used to influences the
- * amount of memory to be used in kilobytes.
- * <li> The configuration suffix {@link MCRArgon2Strategy#ITERATIONS_KEY} can be used to specify the number of
- * iterations to be performed.
+ * <li> The property suffix {@link MCRArgon2Strategy#SALT_SIZE_BYTES_KEY} can be used to
+ * specify the size of generated salt values in bytes.
+ * <li> The property suffix {@link MCRArgon2Strategy#HASH_SIZE_BYTES_KEY} can be used to
+ * specify the size of generated hash values in bytes.
+ * <li> The property suffix {@link MCRArgon2Strategy#PARALLELISM_KEY} can be used to
+ * specify the parallelization value.
+ * <li> The property suffix {@link MCRArgon2Strategy#MEMORY_LIMIT_KILOBYTES_KEY} can be used to
+ * influence the amount of memory to be used in kilobytes.
+ * <li> The property suffix {@link MCRArgon2Strategy#ITERATIONS_KEY} can be used to
+ * specify the number of iterations to be performed.
  * </ul>
  * Example:
- * <pre>
+ * <pre><code>
  * [...].Class=org.mycore.user2.hash.bouncycastle.MCRArgon2Strategy
  * [...].SaltSizeBytes=32
  * [...].HashSizeBytes=64
  * [...].Parallelism=1
  * [...].MemoryLimitKilobytes=66536
  * [...].Iterations=8
- * </pre>
- * Changes to the parallelism value, memory limit or number of iterations will result in deviating hashes and therefore
- * prevent the successful verification of existing hashes, even if the correct password is supplied. Changes to the
- * salt size or the hash size will not prevent verification, but successful verification results will be marked as
- * outdated.
+ * </code></pre>
+ * Changes to the parallelism value, memory limit or number of iterations will result in deviating hashes and
+ * therefore prevent the successful verification of existing hashes, even if the correct password is supplied.
+ * <p>
+ * Changes to the salt size or the hash size will not prevent verification, but successful verification results
+ * will be marked as outdated.
  */
 @MCRConfigurationProxy(proxyClass = MCRArgon2Strategy.Factory.class)
 public class MCRArgon2Strategy extends MCRPasswordCheckStrategyBase {

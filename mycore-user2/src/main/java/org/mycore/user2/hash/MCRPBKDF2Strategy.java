@@ -33,32 +33,34 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 
 /**
- * {@link MCRPBKDF2Strategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the PBKDF2 algorithm.
+ * A {@link MCRPBKDF2Strategy} is a {@link MCRPasswordCheckStrategy} that uses the PBKDF2 algorithm.
  * <p>
  * The salt is returned as a hex encoded string. The hash is returned as a hex encoded string.
  * <p>
- * The following configuration options are available, if configured automatically:
+ * The following configuration options are available:
  * <ul>
- * <li> The configuration suffix {@link MCRPBKDF2Strategy#SALT_SIZE_BYTES_KEY} can be used to specify the size of
- * generated salt values in bytes.
- * <li> The configuration suffix {@link MCRPBKDF2Strategy#HASH_SIZE_BYTES_KEY} can be used to specify the size of
- * generated hash values in bytes.
- * <li> The configuration suffix {@link MCRPBKDF2Strategy#HASH_ALGORITHM_KEY} can be used to specify the hash algorithm
- * to be used.
- * <li> The configuration suffix {@link MCRPBKDF2Strategy#ITERATIONS_KEY} can be used to specify the number of
- * iterations to be performed.
+ * <li> The property suffix {@link MCRPBKDF2Strategy#SALT_SIZE_BYTES_KEY} can be used to
+ * specify the size of generated salt values in bytes.
+ * <li> The property suffix {@link MCRPBKDF2Strategy#HASH_SIZE_BYTES_KEY} can be used to
+ * specify the size of generated hash values in bytes.
+ * <li> The property suffix {@link MCRPBKDF2Strategy#HASH_ALGORITHM_KEY} can be used to
+ * specify the hash algorithm to be used.
+ * <li> The property suffix {@link MCRPBKDF2Strategy#ITERATIONS_KEY} can be used to
+ * specify the number of iterations to be performed.
  * </ul>
  * Example:
- * <pre>
+ * <pre><code>
  * [...].Class=org.mycore.user2.hash.MCRPBKDF2Strategy
  * [...].SaltSizeBytes=16
  * [...].HashSizeBytes=32
  * [...].HashAlgorithm=SHA256
  * [...].Iterations=1000000
- * </pre>
- * Changes to the hash algorithm or the number of iterations will result in deviating hashes and therefore prevent the
- * successful verification of existing hashes, even if the correct password is supplied. Changes to the salt size or
- * the hash size will not prevent verification, but successful verification results will be marked as outdated.
+ * </code></pre>
+ * Changes to the hash algorithm or the number of iterations will result in deviating hashes and therefore prevent
+ * the successful verification of existing hashes, even if the correct password is supplied.
+ * <p>
+ * Changes to the salt size or the hash size will not prevent verification, but successful verification results
+ * will be marked as outdated.
  */
 @MCRConfigurationProxy(proxyClass = MCRPBKDF2Strategy.Factory.class)
 public class MCRPBKDF2Strategy extends MCRPasswordCheckStrategyBase {

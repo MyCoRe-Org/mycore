@@ -32,36 +32,40 @@ import org.mycore.user2.hash.MCRPasswordCheckStrategy;
 import org.mycore.user2.hash.MCRPasswordCheckStrategyBase;
 
 /**
- * {@link MCRSCryptStrategy} is an implementation of {@link MCRPasswordCheckStrategy} that uses the SCrypt algorithm.
+ * A {@link MCRSCryptStrategy} is a {@link MCRPasswordCheckStrategy} that uses the SCrypt algorithm.
  * <p>
- * The version and salt are encoded in the hash using the Modular Crypt Format (MCF) for SCrypt. No explicit salt
- * values are generated.
+ * The version and salt are encoded in the hash using the Modular Crypt Format (MCF) for SCrypt.
+ * No explicit salt values are generated.
  * <p>
  * The salt is returned as a hex encoded string. The hash is returned as a hex encoded string.
+ * <p>
+ * The following configuration options are available:
  * <ul>
- * <li> The configuration suffix {@link MCRSCryptStrategy#SALT_SIZE_BYTES_KEY} can be used to specify the size of
- * generated salt values in bytes.
- * <li> The configuration suffix {@link MCRSCryptStrategy#HASH_SIZE_BYTES_KEY} can be used to specify the size of
- * generated hash values in bytes.
- * <li> The configuration suffix {@link MCRSCryptStrategy#PARALLELISM_KEY} can be used to specify the parallelization
- * value.
- * <li> The configuration suffix {@link MCRSCryptStrategy#BLOCK_SIZE_KEY} can be used to influences the amount of
- * memory to be used.
- * <li> The configuration suffix {@link MCRSCryptStrategy#COST_KEY} can be used to specify the cost parameter the
- * CPU/memory cost parameter.
+ * <li> The property suffix {@link MCRSCryptStrategy#SALT_SIZE_BYTES_KEY} can be used to
+ * specify the size of generated salt values in bytes.
+ * <li> The property suffix {@link MCRSCryptStrategy#HASH_SIZE_BYTES_KEY} can be used to
+ * specify the size of generated hash values in bytes.
+ * <li> The property suffix {@link MCRSCryptStrategy#PARALLELISM_KEY} can be used to
+ * specify the parallelization value.
+ * <li> The property suffix {@link MCRSCryptStrategy#BLOCK_SIZE_KEY} can be used to
+ * influence the amount of memory to be used.
+ * <li> The property suffix {@link MCRSCryptStrategy#COST_KEY} can be used to
+ * specify the CPU/memory cost parameter.
  * </ul>
  * Example:
- * <pre>
+ * <pre><code>
  * [...].Class=org.mycore.user2.hash.bouncycastle.MCRSCryptStrategy
  * [...].SaltSizeBytes=32
  * [...].HashSizeBytes=64
  * [...].Parallelism=1
  * [...].BlockSize=8
  * [...].Cost=17
- * </pre>
- * Changes to the parallelism value, block size or cost parameter will result in deviating hashes and therefore prevent
- * the successful verification of existing hashes, even if the correct password is supplied. Changes to the salt size
- * or the hash size will not prevent verification, but successful verification results will be marked as outdated.
+ * </code></pre>
+ * Changes to the parallelism value, block size or cost parameter will result in deviating hashes and therefore
+ * prevent the successful verification of existing hashes, even if the correct password is supplied.
+ * <p>
+ * Changes to the salt size or the hash size will not prevent verification, but successful verification results
+ * will be marked as outdated.
  */
 @MCRConfigurationProxy(proxyClass = MCRSCryptStrategy.Factory.class)
 public class MCRSCryptStrategy extends MCRPasswordCheckStrategyBase {
