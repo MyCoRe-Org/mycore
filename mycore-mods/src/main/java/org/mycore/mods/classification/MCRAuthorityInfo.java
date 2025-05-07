@@ -27,12 +27,14 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * MCRAuthorityInfo holds a combination of either authority ID and value code, or authorityURI and valueURI. In MODS,
  * this combination typically represents a value from a normed vocabulary like a classification. The AuthorityInfo can
  * be mapped to a MCRCategory in MyCoRe.
- * 
+ *
  * @see <a href="http://www.loc.gov/standards/mods/userguide/classification.html">MODS classification guidelines</a>
  * @author Frank Lützenkirchen
  */
@@ -63,7 +65,7 @@ abstract class MCRAuthorityInfo {
 
     /**
      * Returns the category ID that is represented by this authority information.
-     * 
+     *
      * @return the category ID that maps this authority information, or null if no matching category exists.
      */
     public MCRCategoryID getCategoryID() {
@@ -81,6 +83,20 @@ abstract class MCRAuthorityInfo {
         }
         return categoryID instanceof MCRCategoryID ? (MCRCategoryID) categoryID : null;
     }
+
+    protected static String getText(final Element element) {
+        final StringBuilder sb = new StringBuilder();
+        final NodeList nodeList = element.getChildNodes();
+        final int length = nodeList.getLength();
+        for (int i = 0; i < length; i++) {
+            final Node node = nodeList.item(i);
+            if (node.getNodeType() == Node.TEXT_NODE) {
+                sb.append(node.getNodeValue());
+            }
+        }
+        return sb.toString();
+    }
+
 
     /**
      * Looks up the category ID for this authority information in the classification database.

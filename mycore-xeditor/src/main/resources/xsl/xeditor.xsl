@@ -8,7 +8,6 @@
 
   <xsl:strip-space elements="xed:*" />
 
-  <xsl:include href="resource:xsl/copynodes.xsl" />
   <xsl:include href="xslInclude:xeditor" />
 
   <xsl:param name="ServletsBaseURL" />
@@ -17,6 +16,13 @@
   <xsl:param name="transformer" />
 
   <xsl:variable name="includer" select="includer:new()" />
+
+  <xsl:template match='@*|node()'>
+    <!-- default template: just copy -->
+    <xsl:copy>
+      <xsl:apply-templates select='@*|node()' />
+    </xsl:copy>
+  </xsl:template>
 
   <!-- ========== <xed:form /> output-only ========== -->
 
@@ -144,7 +150,7 @@
 
   <xsl:template match="xed:bind" mode="xeditor">
     <xsl:call-template name="registerAdditionalNamespaces" />
-    
+
     <xsl:variable name="initialValue" select="transformer:replaceXPaths($transformer,@initially)" />
     <xsl:value-of select="transformer:bind($transformer,@xpath,$initialValue,@name)" />
     <xsl:apply-templates select="@set|@default" mode="xeditor" />

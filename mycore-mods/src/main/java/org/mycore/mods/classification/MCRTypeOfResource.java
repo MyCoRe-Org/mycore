@@ -25,7 +25,7 @@ import org.w3c.dom.Element;
 /**
  * Authority information that is a static mapping for mods:typeOfResource. This element is always mapped to a
  * classification with the ID typeOfResource.
- * 
+ *
  * @author Frank Lützenkirchen
  */
 class MCRTypeOfResource extends MCRAuthorityInfo {
@@ -53,7 +53,7 @@ class MCRTypeOfResource extends MCRAuthorityInfo {
             return null;
         }
         String name = modsElement.getLocalName();
-        String code = MCRMODSClassificationSupport.getText(modsElement).trim();
+        String code = getText(modsElement).trim();
         return getTypeOfResource(name, code);
     }
 
