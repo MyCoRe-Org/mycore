@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="3" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+<xsl:stylesheet version="1" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:xed="http://www.mycore.de/xeditor"
                 xmlns:mcrsolr="http://www.mycore.de/components/solr">
 
