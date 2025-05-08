@@ -28,7 +28,6 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRXlink;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
-import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -114,20 +113,11 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
                     || !object.getStructure().getParentID().equals(relatedID)) {
                     LOGGER.info("Setting {} as parent of {}", href, oid);
                     object.getStructure().setParent(relatedID);
-                    insertChildElement(object, relatedID);
                 }
             }
         }
     }
 
-    private void insertChildElement(MCRObject object, MCRObjectID relatedID) {
-        MCRObject newParent = MCRMetadataManager.retrieveMCRObject(relatedID);
-        if (newParent.getStructure().getChildren().stream().map(MCRMetaLinkID::getXLinkHrefID)
-            .noneMatch(object.getId()::equals)) {
-            newParent.getStructure().addChild(new MCRMetaLinkID("child", object.getId(), null, object.getLabel()));
-            MCRMetadataManager.fireUpdateEvent(newParent);
-        }
-    }
 
     private boolean isHost(Element relatedItem) {
         return "host".equals(relatedItem.getAttributeValue("type"));
@@ -142,10 +132,6 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
             oid = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(childID.getBase());
         }
         object.setId(oid);
-
-        if (isHost(relatedItem)) {
-            object.getStructure().addChild(new MCRMetaLinkID("child", childID, childID.toString(), childID.toString()));
-        }
 
         Element mods = cloneRelatedItem(relatedItem);
         wrapper.setMODS(mods);
