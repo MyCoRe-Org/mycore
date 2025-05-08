@@ -19,6 +19,7 @@
 package org.mycore.ocfl.niofs;
 
 import java.io.IOException;
+import java.net.URLConnection;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
@@ -112,8 +113,8 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
         this.localStorage.createDirectories(path.getParent());
         Path cacheFilePath = this.localStorage.toPhysicalPath(path);
         MCROCFLReadableByteChannel readableByteChannel = new MCROCFLReadableByteChannel(ocflFile);
-        MCROCFLCachingSeekableByteChannel cachingByteChannel
-            = new MCROCFLCachingSeekableByteChannel(readableByteChannel, cacheFilePath);
+        MCROCFLCachingSeekableByteChannel cachingByteChannel =
+            new MCROCFLCachingSeekableByteChannel(readableByteChannel, cacheFilePath);
         return new MCROCFLClosableCallbackChannel(cachingByteChannel, () -> {
             // delete partial files from cache
             if (!cachingByteChannel.isFileComplete()) {
@@ -214,19 +215,39 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
     protected Path toPhysicalPath(MCRVersionedPath path) throws IOException {
         MCRVersionedPath lockedPath = lockVersion(path);
         checkExists(lockedPath);
-        localCopy(lockedPath);
-        return this.localStorage.toPhysicalPath(lockedPath);
+        try {
+            return this.localStorage.toPhysicalPath(lockedPath);
+        } catch (Exception e) {
+            throw new CannotDeterminePhysicalPathException("Unable to create physical path for " + path, e);
+        }
     }
 
     /**
      * {@inheritDoc}
-     * This implementation always creates a copy before returning the physical path, guaranteeing
-     * that the file exists in the local temporary storage.
      */
     @Override
-    public Object getFileKey(MCRVersionedPath path) throws IOException {
-        Path physicalPath = toPhysicalPath(path);
-        return Files.readAttributes(physicalPath, BasicFileAttributes.class).fileKey();
+    public Object getFileKey(MCRVersionedPath path) {
+        return null;
+    }
+
+    /**
+     * Probes the content type of a file.
+     * <p>
+     * If the file exists in the local storage the content is probed from the underlying file system. If the file only
+     * exists remote, we use {@link URLConnection#guessContentTypeFromName(String)} to avoid downloading the file.
+     *
+     * @param path versioned path
+     * @return the mime type
+     * @throws IOException  if an I/O error occurs.
+     */
+    @Override
+    public String probeContentType(MCRVersionedPath path) throws IOException {
+        MCRVersionedPath lockedPath = lockVersion(path);
+        checkExists(lockedPath);
+        if (this.localStorage.exists(lockedPath)) {
+            return Files.probeContentType(toPhysicalPath(lockedPath));
+        }
+        return URLConnection.guessContentTypeFromName(lockedPath.getFileName().toString());
     }
 
     /**

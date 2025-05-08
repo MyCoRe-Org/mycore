@@ -152,7 +152,7 @@ public class MCROCFLReadableByteChannel implements SeekableByteChannel {
      * {@inheritDoc}
      */
     @Override
-    public SeekableByteChannel truncate(long l) throws IOException {
+    public SeekableByteChannel truncate(long l) {
         throw new UnsupportedOperationException("truncate not supported");
     }
 

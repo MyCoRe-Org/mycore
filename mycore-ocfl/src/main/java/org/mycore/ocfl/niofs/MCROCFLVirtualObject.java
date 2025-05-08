@@ -24,6 +24,7 @@ import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_UPDATED;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serial;
 import java.io.UncheckedIOException;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.CopyOption;
@@ -63,6 +64,7 @@ import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.MCRReadOnlyIOException;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
+import org.mycore.ocfl.MCROCFLException;
 import org.mycore.ocfl.niofs.channels.MCROCFLClosableCallbackChannel;
 import org.mycore.ocfl.niofs.storage.MCROCFLTempFileStorage;
 import org.mycore.ocfl.repository.MCROCFLRepository;
@@ -688,20 +690,8 @@ public abstract class MCROCFLVirtualObject {
     /**
      * Returns the `filekey` of the given path.
      * <p>
-     * Because OCFL is a version file system and the mycore implementation uses transactions this `filekey`
-     * implementation differs from a Unix like system.
-     * <p>
-     * The Unix `filekey` is typically derived from the inode and device ID, ensuring uniqueness within the
-     * filesystem. When a file is modified (written, moved...), the Unix `filekey` remains unchanged as long as the
-     * inode remains the same.
-     * <p>
-     * In contrast, this implementation returns a new `filekey` as soon as a file is written or moved. The `filekey`
-     * then remains constant as long as the transaction is open. After the transaction is committed the `filekey`
-     * may change again.
-     * <p>
-     * Implementation detail: Be aware that for remote virtual objects the whole file is copied to the local
-     * storage. Because the fileKey is not accessed frequently this should be acceptable. If this assumption proves
-     * to be wrong a special implementation for remote virtual objects is required!
+     * For local repositories the returns the file key of the underlying file system. For remote repositories this will
+     * return null.
      *
      * @param path versioned path
      * @return fileKey
@@ -710,11 +700,7 @@ public abstract class MCROCFLVirtualObject {
     public abstract Object getFileKey(MCRVersionedPath path) throws IOException;
 
     /**
-     * Identifies the MIME type of a give path.
-     * <p>
-     * Implementation detail: Be aware that for remote virtual objects the whole file is copied to the local
-     * storage. Because the MIME type is not accessed frequently this should be acceptable. If this assumption proves
-     * to be wrong a special implementation for remote virtual objects is required! 
+     * Probes the content type of a file.
      *
      * @param path versioned path
      * @return the mime type
@@ -730,14 +716,16 @@ public abstract class MCROCFLVirtualObject {
      * Converts the specified versioned path to a local file system path. The path can either point at the local
      * temporary storage (if it exists) or at the original OCFL file or directory.
      * <p>
-    *     Use the returned path ONLY for read operations. It's not allowed to write/move or remove the returned path.
+    *  Use the returned path ONLY for read operations. It's not allowed to write/move or remove the returned path.
      * Because this would create inconsistencies in the OCFL repository or the local storage.
      *
      * @param path the virtual path.
      * @return the physical path.
      * @throws IOException if an I/O error occurs.
+     * @throws CannotDeterminePhysicalPathException the local path can't be created
      */
-    protected abstract Path toPhysicalPath(MCRVersionedPath path) throws IOException;
+    protected abstract Path toPhysicalPath(MCRVersionedPath path)
+        throws IOException, CannotDeterminePhysicalPathException;
 
     /**
      * Returns the change history of a path.
@@ -1204,4 +1192,24 @@ public abstract class MCROCFLVirtualObject {
             throw new UncheckedIOException("Unable to calculate digest for path '" + path + "'.", ioException);
         }
     }
+
+    /**
+     * Exception thrown when a requested {@code MCRVersionedPath} cannot be resolved to a physical path
+     * <p>
+     * This typically occurs when attempting to access content that is only available remotely and has not
+     * been cached or materialized locally.
+     * <p>
+     * Note that this exception indicates a repository-level constraint, not a general I/O failure.
+     */
+    protected static class CannotDeterminePhysicalPathException extends MCROCFLException {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
+
+        public CannotDeterminePhysicalPathException(String message, Throwable cause) {
+            super(message, cause);
+        }
+
+    }
+
 }
