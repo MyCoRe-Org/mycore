@@ -3,6 +3,7 @@ package org.mycore.ocfl.niofs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mycore.ocfl.niofs.MCROCFLVirtualObject.FILES_DIRECTORY;
@@ -307,8 +308,13 @@ public class MCROCFLVirtualObjectTest {
         Object v1WhitePngFileKey = getFileKey(v1WhitePng);
         Object v1BlackPngFileKey = getFileKey(v1BlackPng);
 
-        assertNotNull(v1WhitePngFileKey, "fileKey of original white.png should not be null");
-        assertNotNull(v1BlackPngFileKey, "fileKey of original black.png should not be null");
+        if (remote) {
+            assertNull(v1WhitePngFileKey, "fileKey of original white.png should be null on remote repositories");
+            assertNull(v1BlackPngFileKey, "fileKey of original black.png should be null on remote repositories");
+        } else {
+            assertNotNull(v1WhitePngFileKey, "fileKey of original white.png should not be null");
+            assertNotNull(v1BlackPngFileKey, "fileKey of original black.png should not be null");
+        }
         assertThrows(NoSuchFileException.class, () -> getFileKey(notFoundPng),
             "fileKey of notFound.png should not exist yet");
     }
