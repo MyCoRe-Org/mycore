@@ -112,8 +112,10 @@
 
   viewerLoader.addConstructorExecution(function(){
     import("<xsl:value-of select="$WebApplicationBaseURL" />modules/iview2/js/iview-client-base.es.js").then((imp) => {
-      let container = jQuery("[data-viewer='"+configuration.properties.derivate+":"+CSS.escape(configuration.properties.filePath)+"']");
-      new imp.MyCoReViewer(container, configuration.properties);
+      let containerElements = document.querySelectorAll("[data-viewer='"+configuration.properties.derivate+":"+CSS.escape(configuration.properties.filePath)+"']");
+      containerElements.forEach((containerElement)=> {
+        new imp.MyCoReViewer(containerElement, configuration.properties);
+      })
     });
   });
 

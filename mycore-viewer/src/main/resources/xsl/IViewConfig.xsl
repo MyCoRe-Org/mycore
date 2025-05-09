@@ -83,7 +83,7 @@
           import { MyCoReViewer } from '<xsl:value-of select="$WebApplicationBaseURL" />modules/iview2/js/iview-client-base.es.js';
           window.onload = function() {
             var json = <xsl:value-of select="json" />;
-            new MyCoReViewer(jQuery("body"), json.properties);
+            new MyCoReViewer(document.body, json.properties);
           };
         </script>
       </head>
