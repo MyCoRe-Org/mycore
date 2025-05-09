@@ -160,7 +160,7 @@ public class MCRTileServlet extends HttpServlet {
                     }
                 } while(pos > 0 && cnt < 3);
             }
-            tile = imagePath.substring(pos+1);
+            tile = imagePath.substring(pos + 1);
             imagePath = imagePath.substring(0, pos);
         }
         return new MCRTileInfo(derivate, imagePath, tile);
