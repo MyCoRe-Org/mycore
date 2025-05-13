@@ -94,21 +94,30 @@ public class MCROCFLCachingSeekableByteChannel implements SeekableByteChannel {
 
         // Record the current position in the delegate channel.
         long currentPosition = delegate.position();
-        int bytesRead = delegate.read(byteBuffer);
+        if (currentPosition >= delegateSize) {
+            return -1;
+        }
+
+        int maxBytes = (int) Math.min(byteBuffer.remaining(), delegateSize - currentPosition);
+        ByteBuffer limitedBuffer = byteBuffer.duplicate();
+        limitedBuffer.limit(limitedBuffer.position() + maxBytes);
+
+        int bytesRead = delegate.read(limitedBuffer);
 
         if (bytesRead > 0) {
             // Prepare for reading from the buffer.
-            byteBuffer.flip();
+            limitedBuffer.flip();
 
             // Write the data into the cache file.
             cacheFileChannel.position(currentPosition);
-            cacheFileChannel.write(byteBuffer);
+            cacheFileChannel.write(limitedBuffer);
 
             // Add the new cached byte range in a thread-safe way.
             addCachedRange(currentPosition, currentPosition + bytesRead - 1);
 
-            // Clear the buffer for further operations.
-            byteBuffer.clear();
+            // Clear the
+            // buffer for further operations.
+            byteBuffer.position(byteBuffer.position() + bytesRead);
         }
 
         return bytesRead;
@@ -179,8 +188,8 @@ public class MCROCFLCachingSeekableByteChannel implements SeekableByteChannel {
             if (cachedRanges.size() != 1) {
                 return false;
             }
-            Range completeRange = cachedRanges.firstEntry().getValue();
-            return completeRange.start == 0 && completeRange.end == this.delegateSize - 1;
+            Range range = cachedRanges.firstEntry().getValue();
+            return range.start == 0 && range.end == delegateSize - 1;
         }
     }
 
@@ -204,7 +213,7 @@ public class MCROCFLCachingSeekableByteChannel implements SeekableByteChannel {
      */
     @Override
     public long position() throws IOException {
-        return this.delegate.position();
+        return delegate.position();
     }
 
     /**
@@ -216,7 +225,7 @@ public class MCROCFLCachingSeekableByteChannel implements SeekableByteChannel {
      */
     @Override
     public SeekableByteChannel position(long newPosition) throws IOException {
-        this.delegate.position(newPosition);
+        delegate.position(newPosition);
         return this;
     }
 
