@@ -119,8 +119,8 @@ public final class MCRGoogleSitemapCommon {
     private static final NumberFormat NUMBER_FORMAT = getNumberFormat();
 
     /** date formatter */
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        .withLocale(SITEMAP_LOCALE).withZone(ZoneOffset.UTC);
+    private static final DateTimeFormatter DATE_FORMATTER
+        = DateTimeFormatter.ofPattern("yyyy-MM-dd", SITEMAP_LOCALE).withZone(ZoneOffset.UTC);
 
     /** The webapps directory path from configuration */
     private final File webappBaseDir;
