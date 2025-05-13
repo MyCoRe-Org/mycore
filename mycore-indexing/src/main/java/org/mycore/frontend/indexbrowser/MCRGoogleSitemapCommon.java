@@ -23,14 +23,13 @@ import java.io.IOException;
 import java.nio.file.NotDirectoryException;
 import java.text.NumberFormat;
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -75,10 +74,8 @@ import org.mycore.solr.auth.MCRSolrAuthenticationManager;
  */
 public final class MCRGoogleSitemapCommon {
 
-    /** Zone information **/
+    /** Locale information **/
     private static final Locale SITEMAP_LOCALE = Locale.ROOT;
-
-    private static final TimeZone SITEMAP_TIMEZONE = TimeZone.getTimeZone("UTC");
 
     /** The namespaces */
     private static final Namespace NS = Namespace.getNamespace("http://www.sitemaps.org/schemas/sitemap/0.9");
@@ -122,7 +119,8 @@ public final class MCRGoogleSitemapCommon {
     private static final NumberFormat NUMBER_FORMAT = getNumberFormat();
 
     /** date formatter */
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd", SITEMAP_LOCALE);
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        .withLocale(SITEMAP_LOCALE).withZone(ZoneOffset.UTC);
 
     /** The webapps directory path from configuration */
     private final File webappBaseDir;
@@ -309,8 +307,7 @@ public final class MCRGoogleSitemapCommon {
             Element sitemap = new Element("sitemap", NS);
             index.addContent(sitemap);
             sitemap.addContent(new Element("loc", NS).addContent((baseurl + getFileName(i + 2, false)).trim()));
-            Instant instant = (new GregorianCalendar(SITEMAP_TIMEZONE, SITEMAP_LOCALE)).getTime().toInstant();
-            String date = DATE_FORMATTER.format(instant);
+            String date = DATE_FORMATTER.format(Instant.now());
             sitemap.addContent(new Element("lastmod", NS).addContent(date.trim()));
         }
         return jdom;
