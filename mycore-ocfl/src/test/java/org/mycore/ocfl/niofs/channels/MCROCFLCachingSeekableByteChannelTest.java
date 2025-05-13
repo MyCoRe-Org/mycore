@@ -125,4 +125,35 @@ public class MCROCFLCachingSeekableByteChannelTest {
         }
     }
 
+    @Test
+    public void testReadDoesNotExceedDelegateSize() throws IOException {
+        String testData = "1234567890";
+        Path originalFilePath = tempFolder.resolve("tiny.txt");
+        Files.write(originalFilePath, testData.getBytes());
+
+        Path cacheFilePath = tempFolder.resolve("cached_tiny.txt");
+
+        try (SeekableByteChannel originalChannel = Files.newByteChannel(originalFilePath, StandardOpenOption.READ);
+            MCROCFLCachingSeekableByteChannel cachingChannel =
+                new MCROCFLCachingSeekableByteChannel(originalChannel, cacheFilePath)) {
+
+            // Seek near end
+            cachingChannel.position(9); // only one byte left
+            ByteBuffer buffer = ByteBuffer.allocate(20); // intentionally too large
+
+            int bytesRead = cachingChannel.read(buffer);
+            assertEquals(1, bytesRead, "Should only read the last byte, not more.");
+
+            // Seek beyond EOF
+            cachingChannel.position(10);
+            bytesRead = cachingChannel.read(buffer);
+            assertEquals(-1, bytesRead, "Reading beyond EOF should return -1.");
+
+            // Seek far beyond EOF
+            cachingChannel.position(100);
+            bytesRead = cachingChannel.read(buffer);
+            assertEquals(-1, bytesRead, "Reading way beyond EOF should still return -1.");
+        }
+    }
+
 }
