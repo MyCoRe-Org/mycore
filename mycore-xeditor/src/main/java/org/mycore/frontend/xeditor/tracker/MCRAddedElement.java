@@ -19,14 +19,23 @@
 package org.mycore.frontend.xeditor.tracker;
 
 import org.jdom2.Element;
+import org.mycore.common.xml.MCRXPathBuilder;
 
-public class MCRAddedElement implements MCRChange {
+/**
+ * Tracks that a new element was added.  
+ * 
+ * @author Frank L\u00FCtzenkirchen
+ */
+public class MCRAddedElement extends MCRChange {
 
-    public static MCRChangeData added(Element element) {
-        return new MCRChangeData("added-this-element", "", 0, element);
+    private Element addedElement;
+
+    public MCRAddedElement(Element element) {
+        this.message = "Added element " + MCRXPathBuilder.buildXPath(element);
+        this.addedElement = element;
     }
 
-    public void undo(MCRChangeData data) {
-        data.getContext().detach();
+    public void undo() {
+        addedElement.detach();
     }
 }

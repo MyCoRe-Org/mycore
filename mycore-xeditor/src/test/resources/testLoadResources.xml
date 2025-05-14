@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<test label="Testing xed:load-resource">
+
+  <xed>
+    <xed:form xmlns:xed="http://www.mycore.de/xeditor">
+      <xed:load-resource name="genres" uri="resource:testLoadResources-genres.xml" />
+      
+      <xed:bind xpath="mods:mods">
+        <h1>
+          <xed:output value="$genres//category[@ID=$genre]/label[lang($CurrentLang)]" /> in           
+          <xed:output value="$genres//category[@ID=$host]/label[lang($CurrentLang)]" />
+        </h1>
+      </xed:bind>
+    </xed:form>
+  </xed>
+  
+  <param name="genre">article</param>
+  <param name="host">journal</param>
+
+  <transform />
+  
+  <html>
+    <form action="http://localhost:8291/servlets/XEditor" method="post">
+      <h1>Artikel in Zeitschrift</h1>
+      <div style="visibility:hidden">
+        <input value="article" name="genre" type="hidden" />
+        <input value="journal" name="host" type="hidden" />
+        <input value="1-2" name="_xed_session" type="hidden" />
+      </div>
+    </form>
+  </html>
+
+</test>
