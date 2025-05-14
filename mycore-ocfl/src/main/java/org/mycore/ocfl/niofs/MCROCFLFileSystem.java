@@ -18,16 +18,21 @@
 
 package org.mycore.ocfl.niofs;
 
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_UPDATED;
+
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileStore;
 import java.nio.file.FileSystemException;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+import io.ocfl.api.model.ObjectVersionId;
+import io.ocfl.api.model.VersionInfo;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRVersionedFileSystem;
 import org.mycore.ocfl.repository.MCROCFLRepository;
@@ -79,8 +84,8 @@ public class MCROCFLFileSystem extends MCRVersionedFileSystem {
         try {
             virtualObject.create();
         } catch (IOException ioException) {
-            FileSystemException fileSystemException
-                = new FileSystemException(null, null, "Cannot create root of '" + owner + "'.");
+            FileSystemException fileSystemException =
+                new FileSystemException(null, null, "Cannot create root of '" + owner + "'.");
             fileSystemException.initCause(ioException);
             throw fileSystemException;
         }
@@ -102,9 +107,33 @@ public class MCROCFLFileSystem extends MCRVersionedFileSystem {
         try {
             virtualObject.purge();
         } catch (IOException ioException) {
-            FileSystemException fileSystemException
-                = new FileSystemException(null, null, "Cannot remove root of '" + owner + "'.");
+            FileSystemException fileSystemException =
+                new FileSystemException(null, null, "Cannot remove root of '" + owner + "'.");
             fileSystemException.initCause(ioException);
+            throw fileSystemException;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Be aware that this OCFL implementation works outside the {@link MCROCFLFileSystemTransaction}.
+     */
+    @Override
+    public void restoreRoot(String owner, String version) throws FileSystemException {
+        MCROCFLVirtualObjectProvider virtualObjectProvider = provider().virtualObjectProvider();
+        if (!virtualObjectProvider.exists(owner, version)) {
+            throw new NoSuchFileException(null, null, "No such version '" + version + "' for root '" + owner + "'.");
+        }
+        try {
+            MCROCFLRepository repository = provider().getRepository();
+            String ocflObjectId = MCROCFLObjectIDPrefixHelper.toDerivateObjectId(owner);
+            repository.replicateVersionAsHead(ObjectVersionId.version(ocflObjectId, version),
+                new VersionInfo().setMessage(MESSAGE_UPDATED));
+        } catch (Exception exc) {
+            FileSystemException fileSystemException =
+                new FileSystemException(null, null, "Unable to restore '" + owner + "' to version '" + version + "'.");
+            fileSystemException.initCause(exc);
             throw fileSystemException;
         }
     }

@@ -28,6 +28,11 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetaIFS;
+import org.mycore.datamodel.metadata.MCRMetaLinkID;
+import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
@@ -72,6 +77,25 @@ public abstract class MCROCFLTestCaseHelper {
         final Path sourcePath = Path.of(derivateURL.toURI());
         final MCRVersionedPath targetPath = MCRVersionedPath.head(derivateId, "/");
         Files.walkFileTree(sourcePath, new CopyFileVisitor(targetPath));
+    }
+
+    public static MCRObject createObject(String objectId) {
+        MCRObject object = new MCRObject();
+        object.setId(MCRObjectID.getInstance(objectId));
+        object.setSchema("noSchema");
+        return object;
+    }
+
+    public static MCRDerivate createDerivate(String objectId, String derivateId) {
+        MCRDerivate derivate = new MCRDerivate();
+        derivate.setId(MCRObjectID.getInstance(derivateId));
+        derivate.setSchema("datamodel-derivate.xsd");
+        MCRMetaIFS ifs = new MCRMetaIFS("internal", null);
+        derivate.getDerivate().setInternals(ifs);
+        MCRMetaLinkID mcrMetaLinkID = new MCRMetaLinkID("linkmeta", 0);
+        mcrMetaLinkID.setReference(objectId, null, null);
+        derivate.getDerivate().setLinkMeta(mcrMetaLinkID);
+        return derivate;
     }
 
     private static class CopyFileVisitor extends SimpleFileVisitor<Path> {

@@ -1,6 +1,9 @@
 package org.mycore.ocfl.niofs;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mycore.ocfl.MCROCFLTestCaseHelper.DERIVATE_1;
 import static org.mycore.ocfl.MCROCFLTestCaseHelper.DERIVATE_2;
 
@@ -11,15 +14,14 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.repository.MCROCFLRepository;
-import org.mycore.ocfl.test.PermutedParam;
-import org.mycore.ocfl.test.MCRPermutationExtension;
 import org.mycore.ocfl.test.MCROCFLSetupExtension;
+import org.mycore.ocfl.test.MCRPermutationExtension;
+import org.mycore.ocfl.test.PermutedParam;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
@@ -47,11 +49,11 @@ public class MCROCFLFileSystemTest {
         // begin transaction
         MCRTransactionManager.beginTransactions();
         fs.createRoot(DERIVATE_2);
-        Assertions.assertTrue(Files.exists(MCRVersionedPath.head(DERIVATE_2, "/")), DERIVATE_2 + " should exist");
+        assertTrue(Files.exists(MCRVersionedPath.head(DERIVATE_2, "/")), DERIVATE_2 + " should exist");
         assertThrows(FileAlreadyExistsException.class, () -> fs.createRoot(DERIVATE_2),
             "root should already exists " + DERIVATE_2);
         MCRTransactionManager.commitTransactions();
-        Assertions.assertTrue(Files.exists(MCRVersionedPath.head(DERIVATE_2, "/")),
+        assertTrue(Files.exists(MCRVersionedPath.head(DERIVATE_2, "/")),
             DERIVATE_2 + " should exist after commiting");
     }
 
@@ -65,35 +67,35 @@ public class MCROCFLFileSystemTest {
 
         MCRTransactionManager.beginTransactions();
         fs.removeRoot(DERIVATE_1);
-        Assertions.assertFalse(Files.exists(MCRVersionedPath.head(DERIVATE_1, "/")), "root path should not exist");
+        assertFalse(Files.exists(MCRVersionedPath.head(DERIVATE_1, "/")), "root path should not exist");
         MCRTransactionManager.commitTransactions();
-        Assertions.assertFalse(Files.exists(MCRVersionedPath.head(DERIVATE_1, "/")), "root path should not exist");
+        assertFalse(Files.exists(MCRVersionedPath.head(DERIVATE_1, "/")), "root path should not exist");
     }
 
     @TestTemplate
     public void getRootDirectories() throws FileSystemException {
         MCROCFLFileSystem fs = MCROCFLFileSystemProvider.getMCROCFLFileSystem();
-        Assertions.assertEquals(1, getRootDirectoryList(fs).size());
+        assertEquals(1, getRootDirectoryList(fs).size());
 
         // add
         MCRTransactionManager.beginTransactions();
         fs.createRoot(DERIVATE_2);
-        Assertions.assertEquals(2, getRootDirectoryList(fs).size());
+        assertEquals(2, getRootDirectoryList(fs).size());
         MCRTransactionManager.commitTransactions();
-        Assertions.assertEquals(2, getRootDirectoryList(fs).size());
+        assertEquals(2, getRootDirectoryList(fs).size());
 
         // rm
         MCRTransactionManager.beginTransactions();
         fs.removeRoot(DERIVATE_2);
-        Assertions.assertEquals(1, getRootDirectoryList(fs).size());
+        assertEquals(1, getRootDirectoryList(fs).size());
         MCRTransactionManager.commitTransactions();
-        Assertions.assertEquals(1, getRootDirectoryList(fs).size());
+        assertEquals(1, getRootDirectoryList(fs).size());
 
         MCRTransactionManager.beginTransactions();
         fs.removeRoot(DERIVATE_1);
-        Assertions.assertEquals(0, getRootDirectoryList(fs).size());
+        assertEquals(0, getRootDirectoryList(fs).size());
         MCRTransactionManager.commitTransactions();
-        Assertions.assertEquals(0, getRootDirectoryList(fs).size());
+        assertEquals(0, getRootDirectoryList(fs).size());
     }
 
     private static List<Path> getRootDirectoryList(MCROCFLFileSystem ocflFileSystem) {
