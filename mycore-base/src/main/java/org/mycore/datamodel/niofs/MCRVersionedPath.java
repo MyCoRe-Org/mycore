@@ -76,10 +76,27 @@ public abstract class MCRVersionedPath extends MCRPath {
         return ownerVersion.version();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MCRVersionedPath getParent() {
         MCRPath parent = super.getParent();
         return parent != null ? ofPath(parent) : null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MCRPath getRoot() {
+        if (!isAbsolute()) {
+            return null;
+        }
+        if (getNameCount() == 0) {
+            return this;
+        }
+        return getFileSystem().provider().getPath(this.getOwner(), this.getVersion(), SEPARATOR_STRING);
     }
 
     @Override
@@ -99,7 +116,12 @@ public abstract class MCRVersionedPath extends MCRPath {
 
     @Override
     protected MCRVersionedPath getPath(String owner, String path, MCRAbstractFileSystem fs) {
-        return ofPath(super.getPath(owner, path, fs));
+        MCRVersionedFileSystemProvider provider = getFileSystem().provider();
+        if (owner == null) {
+            return provider.getPath(null, path);
+        } else {
+            return provider.getPath(owner, this.getVersion(), path);
+        }
     }
 
     public String toRelativePath() {

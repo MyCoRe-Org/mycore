@@ -182,25 +182,44 @@ public class MCROCFLVirtualObjectProvider {
      * @return {@code true} if the owner exists, {@code false} otherwise.
      */
     public boolean exists(String owner) {
-        ObjectVersionId head = toObjectVersionId(owner, null);
-        if (this.readMap.containsKey(head)) {
+        return exists(owner, null);
+    }
+
+    /**
+     * Checks if the specified owner and version exists in the repository.
+     * <p>
+     * This also will return true if the owner was marked for purge or was deleted (and not purged),
+     * because the object still exists in the OCFL repository.
+     *
+     * @param owner the owner of the object.
+     * @param version the version of the object
+     * @return {@code true} if the owner and version exists, {@code false} otherwise.
+     */
+    public boolean exists(String owner, String version) {
+        ObjectVersionId objectVersionId = toObjectVersionId(owner, version);
+        if (this.readMap.containsKey(objectVersionId)) {
             return true;
         }
         boolean isActive = MCROCFLFileSystemTransaction.isActive();
         Long transactionId = MCROCFLFileSystemTransaction.getTransactionId();
         if (isActive && this.writeMap.containsKey(transactionId)) {
-            MCROCFLVirtualObject headVirtualObject = this.writeMap.get(transactionId).get(head);
+            MCROCFLVirtualObject headVirtualObject = this.writeMap.get(transactionId).get(objectVersionId);
             if (headVirtualObject != null) {
                 return headVirtualObject.isMarkedForCreate();
+
             }
         }
-        if (!repository.containsObject(head.getObjectId())) {
+        if (!repository.containsObject(objectVersionId.getObjectId())) {
             return false;
         }
-        OcflObjectVersion object = repository.getObject(head);
-        return object.getFiles().stream()
-            .map(OcflObjectVersionFile::getPath)
-            .anyMatch(path -> path.startsWith(MCROCFLVirtualObject.FILES_DIRECTORY));
+        try {
+            OcflObjectVersion object = repository.getObject(objectVersionId);
+            return object.getFiles().stream()
+                .map(OcflObjectVersionFile::getPath)
+                .anyMatch(path -> path.startsWith(MCROCFLVirtualObject.FILES_DIRECTORY));
+        } catch(NotFoundException ignore) {
+            return false;
+        }
     }
 
     /**

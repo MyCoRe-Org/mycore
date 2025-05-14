@@ -44,7 +44,9 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jdom2.Document;
 import org.jdom2.JDOMException;
+import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
@@ -59,6 +61,8 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -72,6 +76,7 @@ import org.mycore.ocfl.metadata.MCROCFLXMLMetadataManagerAdapter;
 import org.mycore.ocfl.metadata.migration.MCROCFLMigration;
 import org.mycore.ocfl.metadata.migration.MCROCFLRevisionPruner;
 import org.mycore.ocfl.niofs.MCROCFLFileSystemProvider;
+import org.mycore.ocfl.repository.MCROCFLRepository;
 import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
 import org.mycore.ocfl.user.MCROCFLXMLUserManager;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
@@ -79,10 +84,14 @@ import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 import org.xml.sax.SAXException;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.collect.MapDifference;
 import com.google.common.collect.Maps;
 
 import io.ocfl.api.OcflRepository;
+import io.ocfl.api.model.ObjectDetails;
 
 @SuppressWarnings("JavaUtilDate")
 @MCRCommandGroup(name = "OCFL Commands")
@@ -151,6 +160,27 @@ public class MCROCFLCommands {
             FAILED + ": " + failed.size() + ls +
             FAILED_AND_NOW_INVALID_STATE + ": " + invalidState.size() + ls +
             SUCCESS_BUT_WITHOUT_HISTORY + ": " + withoutHistory.size() + ls);
+    }
+
+    @MCRCommand(syntax = "describe ocfl object {0} of repository {1}",
+        help = "Prints all of the details about an object and all of its versions."
+            + "  It is required to add the ocfl prefix like 'mcrobject:' or 'mcracl:' to the object id.")
+    public static void describeObject(String objectId, String repositoryId) {
+        repositoryId = (repositoryId == null || repositoryId.isBlank()) ? "Main" : repositoryId;
+        MCROCFLRepositoryProvider provider = MCROCFLRepositoryProvider.getProvider(repositoryId);
+        MCROCFLRepository repository = provider.getRepository();
+        ObjectDetails objectDetails = repository.describeObject(objectId);
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        try {
+            String pretty = mapper.writeValueAsString(objectDetails);
+            LOGGER.info("\n{}", pretty);
+        } catch (Exception e) {
+            LOGGER.error("Failed to pretty-print ObjectDetails", e);
+        }
     }
 
     @MCRCommand(syntax = "migrate metadata to metadatamanager {1} and pruners {2} ",
@@ -302,6 +332,21 @@ public class MCROCFLCommands {
         } catch (MCRUsageException e) {
             MCRXMLMetadataManager.getInstance().create(mcrid, content, new Date(content.lastModified()));
         }
+    }
+
+    @MCRCommand(syntax = "restore derivate {0} from ocfl with version {1}",
+        help = "restore derivate {0} with version {1} to current store from ocfl history")
+    public static List<String> restoreDerivateFromOCFL(String derivateId, String revision)
+        throws IOException, JDOMException, MCRAccessException {
+        // restore ocfl content
+        MCROCFLFileSystemProvider.get().getFileSystem().restoreRoot(derivateId, revision);
+        // update metadata
+        MCRObjectID mcrDerivateId = MCRObjectID.getInstance(derivateId);
+        Document derivateXml = MCRXMLMetadataManager.getInstance().retrieveXML(mcrDerivateId);
+        MCRDerivate mcrDerivate = new MCRDerivate(derivateXml);
+        MCRMetadataManager.update(mcrDerivate);
+        // tile
+        return List.of("tile images of derivate " + derivateId);
     }
 
     @MCRCommand(syntax = "restore object {0} from ocfl",
@@ -498,7 +543,7 @@ public class MCROCFLCommands {
 
     private static void logConfirm(String type) {
         LOGGER.info(() -> String.format(Locale.ROOT, """
-            
+
             \u001B[93mEnter the command again to confirm \u001B[4mPERMANENTLY\u001B[24m deleting ALL\
              hidden/archived OCFL %s.\u001B[0m
             \u001B[41mTHIS ACTION CANNOT BE UNDONE!\u001B[0m""", type));
