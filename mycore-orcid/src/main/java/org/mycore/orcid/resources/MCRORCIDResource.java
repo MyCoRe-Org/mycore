@@ -111,6 +111,7 @@ public class MCRORCIDResource {
     @GET
     @Path("publish/{objectID}")
     @Produces(MediaType.APPLICATION_JSON)
+    @SuppressWarnings("PMD.ExceptionAsFlowControl")
     public String publish(@PathParam("objectID") String objectID) {
         MCRObjectID oid = checkID(objectID);
         MCRORCIDUser user = MCRORCIDSession.getCurrentUser();

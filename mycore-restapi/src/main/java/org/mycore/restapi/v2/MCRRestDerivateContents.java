@@ -480,6 +480,7 @@ public class MCRRestDerivateContents {
             && (headers.containsKey(HttpHeaders.CONTENT_LENGTH) || headers.containsKey("Transfer-Encoding"));
     }
 
+    @SuppressWarnings("PMD.ExceptionAsFlowControl")
     private Response serveDirectory(MCRPath mcrPath, MCRFileAttributes dirAttrs) {
         Directory dir = new Directory(mcrPath, dirAttrs);
         try (DirectoryStream ds = Files.newDirectoryStream(mcrPath)) {

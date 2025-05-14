@@ -57,6 +57,7 @@ import org.mycore.datamodel.niofs.MCRPath;
 /**
  * @author Thomas Scheffler
  */
+@SuppressWarnings("PMD.ExceptionAsFlowControl")
 final class MCRFileSystemUtils {
 
     private static final Logger LOGGER = LogManager.getLogger();

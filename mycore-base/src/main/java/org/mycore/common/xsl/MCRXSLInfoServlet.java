@@ -113,6 +113,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
                 configDir.toPath().relativize(file).toString()));
     }
 
+    @SuppressWarnings("PMD.ExceptionAsFlowControl")
     private void findInConfigLibDir(File configDir) throws IOException {
         final Path lib = configDir.toPath().resolve("lib");
         try {
