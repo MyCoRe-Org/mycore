@@ -49,7 +49,7 @@ import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
 import org.mycore.datamodel.niofs.MCRReadOnlyIOException;
 import org.mycore.datamodel.niofs.MCRVersionedFileSystemProvider;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
-import org.mycore.ocfl.niofs.storage.MCROCFLTransactionalTempFileStorage;
+import org.mycore.ocfl.niofs.storage.MCROCFLTransactionalFileStorage;
 import org.mycore.ocfl.repository.MCROCFLLocalRepositoryProvider;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
@@ -75,7 +75,7 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
 
     private static volatile MCROCFLFileSystem fileSystem;
 
-    private MCROCFLTransactionalTempFileStorage localStorage;
+    private MCROCFLTransactionalFileStorage localStorage;
 
     private MCROCFLVirtualObjectProvider virtualObjectProvider;
 
@@ -97,7 +97,7 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
         try {
             String tempStorageProperty = "MCR.Content.TempStorage";
             this.localStorage = MCRConfiguration2
-                .getSingleInstanceOfOrThrow(MCROCFLTransactionalTempFileStorage.class, tempStorageProperty);
+                .getSingleInstanceOfOrThrow(MCROCFLTransactionalFileStorage.class, tempStorageProperty);
             Files.createDirectories(this.localStorage.getRoot());
             this.localStorage.clearTransactional();
             this.virtualObjectProvider = new MCROCFLVirtualObjectProvider(getRepository(), localStorage);
@@ -489,9 +489,9 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
     /**
      * Returns the local storage.
      *
-     * @return the {@link MCROCFLTransactionalTempFileStorage}.
+     * @return the {@link MCROCFLTransactionalFileStorage}.
      */
-    public MCROCFLTransactionalTempFileStorage localStorage() {
+    public MCROCFLTransactionalFileStorage localStorage() {
         return this.localStorage;
     }
 
