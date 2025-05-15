@@ -1,5 +1,9 @@
 package org.mycore.ocfl.niofs;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mycore.ocfl.MCROCFLTestCaseHelper.DERIVATE_1;
@@ -25,16 +29,15 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.repository.MCROCFLRepository;
-import org.mycore.ocfl.test.PermutedParam;
-import org.mycore.ocfl.test.MCRPermutationExtension;
 import org.mycore.ocfl.test.MCROCFLSetupExtension;
+import org.mycore.ocfl.test.MCRPermutationExtension;
+import org.mycore.ocfl.test.PermutedParam;
 import org.mycore.test.MyCoReTest;
 
 import io.ocfl.api.model.ObjectVersionId;
@@ -62,13 +65,13 @@ public class MCROCFLFileSystemProviderTest {
         assertTrue(Files.exists(whitePngPath), "'white.png' should exist");
         assertTrue(Files.exists(blackPngPath), "'black.png' should exist");
         assertTrue(Files.exists(emptyDirectoryPath), "'empty' directory should exists");
-        Assertions.assertFalse(Files.exists(purplePngPath), "'purple.png' should not exist");
-        Assertions.assertFalse(Files.exists(keepFile), "'empty/.keep' file should not exists");
+        assertFalse(Files.exists(purplePngPath), "'purple.png' should not exist");
+        assertFalse(Files.exists(keepFile), "'empty/.keep' file should not exists");
 
         // check writable
-        Assertions.assertFalse(Files.exists(MCRPath.getPath(DERIVATE_2, "")), "'" + DERIVATE_2 + "' should not exists");
+        assertFalse(Files.exists(MCRPath.getPath(DERIVATE_2, "")), "'" + DERIVATE_2 + "' should not exists");
         MCRTransactionManager.beginTransactions();
-        Assertions.assertFalse(Files.exists(MCRPath.getPath(DERIVATE_2, "")), "'" + DERIVATE_2 + "' should not exists");
+        assertFalse(Files.exists(MCRPath.getPath(DERIVATE_2, "")), "'" + DERIVATE_2 + "' should not exists");
         MCRTransactionManager.commitTransactions();
     }
 
@@ -76,7 +79,7 @@ public class MCROCFLFileSystemProviderTest {
     public void createDirectory() throws IOException {
         // create directory in existing ocfl object
         final MCRPath path1 = MCRPath.getPath(DERIVATE_1, "test");
-        Assertions.assertFalse(Files.exists(path1), "'test' directory should not exists");
+        assertFalse(Files.exists(path1), "'test' directory should not exists");
         MCRTransactionManager.beginTransactions();
         Files.createDirectory(path1);
         assertTrue(Files.exists(path1), "'test' directory should exist before committing");
@@ -90,7 +93,7 @@ public class MCROCFLFileSystemProviderTest {
 
         // create directory in non-existing ocfl object
         final MCRPath path2 = MCRPath.getPath(DERIVATE_2, "test");
-        Assertions.assertFalse(Files.exists(path2), "'test' directory should not exists");
+        assertFalse(Files.exists(path2), "'test' directory should not exists");
         MCRTransactionManager.beginTransactions();
         Files.createDirectory(path2);
         assertTrue(Files.exists(path2), "'test' directory should exist after create");
@@ -107,7 +110,7 @@ public class MCROCFLFileSystemProviderTest {
         byte[] expectedWhitePngData = Files.readAllBytes(whitePng);
 
         // write
-        Assertions.assertFalse(Files.exists(testFile), "'testFile' should not exists");
+        assertFalse(Files.exists(testFile), "'testFile' should not exists");
         MCRTransactionManager.beginTransactions();
         Files.write(testFile, expectedTestFileData);
         assertTrue(Files.exists(testFile), "'testFile' should exists after writing");
@@ -116,12 +119,12 @@ public class MCROCFLFileSystemProviderTest {
 
         // read
         byte[] testFileData = Files.readAllBytes(testFile);
-        Assertions.assertArrayEquals(expectedTestFileData, testFileData, "byte array should be equal");
+        assertArrayEquals(expectedTestFileData, testFileData, "byte array should be equal");
         try (SeekableByteChannel byteChannel = Files.newByteChannel(testFile)) {
             byte[] seekBytes = new byte[4];
             ByteBuffer byteBuffer = ByteBuffer.wrap(seekBytes);
             byteChannel.read(byteBuffer);
-            Assertions.assertArrayEquals(expectedTestFileData, seekBytes, "byte array should be equal");
+            assertArrayEquals(expectedTestFileData, seekBytes, "byte array should be equal");
         }
 
         // read range
@@ -130,7 +133,7 @@ public class MCROCFLFileSystemProviderTest {
             ByteBuffer byteBuffer = ByteBuffer.wrap(seekBytes);
             byteChannel.position(1);
             byteChannel.read(byteBuffer);
-            Assertions.assertArrayEquals(new byte[] { 3, 3 }, seekBytes, "byte array should be equal");
+            assertArrayEquals(new byte[] { 3, 3 }, seekBytes, "byte array should be equal");
         }
 
         // read v1
@@ -138,7 +141,7 @@ public class MCROCFLFileSystemProviderTest {
         MCRVersionedPath whitePngV1 = MCRVersionedPath.getPath(
             versionId.getObjectId(), versionId.getVersionNum().toString(), "white.png");
         byte[] whitePngData = Files.readAllBytes(whitePngV1);
-        Assertions.assertArrayEquals(expectedWhitePngData, whitePngData, "byte array should be equal");
+        assertArrayEquals(expectedWhitePngData, whitePngData, "byte array should be equal");
     }
 
     @TestTemplate
@@ -148,21 +151,26 @@ public class MCROCFLFileSystemProviderTest {
         // simple write
         MCRTransactionManager.beginTransactions();
         Files.write(testFile, new byte[] { 1, 2 });
+        assertArrayEquals(new byte[] { 1, 2 }, Files.readAllBytes(testFile), "byte array should be equal");
         MCRTransactionManager.commitTransactions();
-        Assertions.assertArrayEquals(new byte[] { 1, 2 }, Files.readAllBytes(testFile), "byte array should be equal");
+        assertArrayEquals(new byte[] { 1, 2 }, Files.readAllBytes(testFile), "byte array should be equal");
 
         // append
         MCRTransactionManager.beginTransactions();
         Files.write(testFile, new byte[] { 3, 4 }, StandardOpenOption.APPEND);
+        assertArrayEquals(new byte[] { 1, 2, 3, 4 }, Files.readAllBytes(testFile),
+            "byte array should be equal");
         MCRTransactionManager.commitTransactions();
-        Assertions.assertArrayEquals(new byte[] { 1, 2, 3, 4 }, Files.readAllBytes(testFile),
+        assertArrayEquals(new byte[] { 1, 2, 3, 4 }, Files.readAllBytes(testFile),
             "byte array should be equal");
 
         // truncate
         MCRTransactionManager.beginTransactions();
         Files.write(testFile, new byte[] { 4, 3, 2, 1 }, StandardOpenOption.TRUNCATE_EXISTING);
+        assertArrayEquals(new byte[] { 4, 3, 2, 1 }, Files.readAllBytes(testFile),
+            "byte array should be equal");
         MCRTransactionManager.commitTransactions();
-        Assertions.assertArrayEquals(new byte[] { 4, 3, 2, 1 }, Files.readAllBytes(testFile),
+        assertArrayEquals(new byte[] { 4, 3, 2, 1 }, Files.readAllBytes(testFile),
             "byte array should be equal");
     }
 
@@ -172,10 +180,10 @@ public class MCROCFLFileSystemProviderTest {
         Path source = MCRPath.getPath(DERIVATE_1, "white.png");
         Path target = MCRPath.getPath(DERIVATE_1, "moved.png");
         Files.move(source, target);
-        Assertions.assertFalse(Files.exists(source), "'white.png' should not exist");
+        assertFalse(Files.exists(source), "'white.png' should not exist");
         assertTrue(Files.exists(target), "'moved.png' should exist");
         MCRTransactionManager.commitTransactions();
-        Assertions.assertFalse(Files.exists(source), "'white.png' should not exist after committing");
+        assertFalse(Files.exists(source), "'white.png' should not exist after committing");
         assertTrue(Files.exists(target), "'moved.png' should exist after committing");
 
         // move from different derivate
@@ -184,7 +192,7 @@ public class MCROCFLFileSystemProviderTest {
         MCRTransactionManager.beginTransactions();
         Files.move(newSource, newTarget);
         MCRTransactionManager.commitTransactions();
-        Assertions.assertFalse(Files.exists(newSource), "'moved.png' should not exist after committing");
+        assertFalse(Files.exists(newSource), "'moved.png' should not exist after committing");
         assertTrue(Files.exists(newTarget), "'white.png' should exist after committing");
     }
 
@@ -229,7 +237,7 @@ public class MCROCFLFileSystemProviderTest {
         // copy foreign source file
         MCRTransactionManager.beginTransactions();
         URL whitePngFromDerivate2URL = getClass().getClassLoader().getResource(DERIVATE_2 + "/white.png");
-        Assertions.assertNotNull(whitePngFromDerivate2URL);
+        assertNotNull(whitePngFromDerivate2URL);
         Path foreignSource = Path.of(whitePngFromDerivate2URL.toURI());
         MCRPath ocflTarget = MCRPath.getPath(DERIVATE_1, "copied3.png");
         Files.copy(foreignSource, ocflTarget, StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING);
@@ -264,9 +272,9 @@ public class MCROCFLFileSystemProviderTest {
         assertTrue(Files.exists(whitePng), "'white.png' should exist");
         MCRTransactionManager.beginTransactions();
         Files.delete(whitePng);
-        Assertions.assertFalse(Files.exists(whitePng), "'white.png' should not exist");
+        assertFalse(Files.exists(whitePng), "'white.png' should not exist");
         MCRTransactionManager.commitTransactions();
-        Assertions.assertFalse(Files.exists(whitePng), "'white.png' should not exist");
+        assertFalse(Files.exists(whitePng), "'white.png' should not exist");
     }
 
     @TestTemplate
@@ -287,7 +295,7 @@ public class MCROCFLFileSystemProviderTest {
                 assertTrue(rootContent.contains(path), "'" + path + "' should be in root '/'");
             });
         }
-        Assertions.assertEquals(targetPaths, numPaths.get(),
+        assertEquals(targetPaths, numPaths.get(),
             "There should be '" + targetPaths + "' paths in directory stream.");
         MCRTransactionManager.commitTransactions();
 
@@ -307,12 +315,12 @@ public class MCROCFLFileSystemProviderTest {
         Path empty2Directory = MCRPath.getPath(DERIVATE_1, "/empty2");
         MCRTransactionManager.beginTransactions();
         assertTrue(Files.exists(emptyDirectory), "'empty' directory should exist");
-        Assertions.assertFalse(Files.exists(empty2Directory), "'empty2' directory should exist");
+        assertFalse(Files.exists(empty2Directory), "'empty2' directory should exist");
         Files.move(emptyDirectory, empty2Directory);
-        Assertions.assertFalse(Files.exists(emptyDirectory), "'empty' directory should not exist");
+        assertFalse(Files.exists(emptyDirectory), "'empty' directory should not exist");
         assertTrue(Files.exists(empty2Directory), "'empty2' directory should exist");
         MCRTransactionManager.commitTransactions();
-        Assertions.assertFalse(Files.exists(emptyDirectory), "'empty' directory should not exist after committing");
+        assertFalse(Files.exists(emptyDirectory), "'empty' directory should not exist after committing");
         assertTrue(Files.exists(empty2Directory), "'empty2' directory should exist after committing");
     }
 
@@ -320,16 +328,16 @@ public class MCROCFLFileSystemProviderTest {
     public void fileAttributes() throws IOException, InterruptedException {
         MCRPath whitePng = MCRPath.getPath(DERIVATE_1, "white.png");
         BasicFileAttributes whitePngAttributes = Files.readAttributes(whitePng, BasicFileAttributes.class);
-        Assertions.assertNotNull(whitePngAttributes, "attributes of 'white.png' shouldn't be null");
+        assertNotNull(whitePngAttributes, "attributes of 'white.png' shouldn't be null");
         assertTrue(whitePngAttributes.isRegularFile(), "'white.png' should be a regular file");
-        Assertions.assertFalse(whitePngAttributes.isDirectory(), "'white.png' shouldn't be a directory");
+        assertFalse(whitePngAttributes.isDirectory(), "'white.png' shouldn't be a directory");
 
         FileTime creationTime = whitePngAttributes.creationTime();
         FileTime modifyTime = whitePngAttributes.lastModifiedTime();
         FileTime accessTime = whitePngAttributes.lastAccessTime();
-        Assertions.assertNotNull(creationTime, "creationTime() of 'white.png' should not be null");
-        Assertions.assertNotNull(modifyTime, "lastModifiedTime() of 'white.png' should not be null");
-        Assertions.assertNotNull(accessTime, "lastAccessTime() of 'white.png' should not be null");
+        assertNotNull(creationTime, "creationTime() of 'white.png' should not be null");
+        assertNotNull(modifyTime, "lastModifiedTime() of 'white.png' should not be null");
+        assertNotNull(accessTime, "lastAccessTime() of 'white.png' should not be null");
 
         // WRITE
         MCRTransactionManager.beginTransactions();
@@ -338,7 +346,7 @@ public class MCROCFLFileSystemProviderTest {
         MCRTransactionManager.commitTransactions();
 
         whitePngAttributes = Files.readAttributes(whitePng, BasicFileAttributes.class);
-        Assertions.assertEquals(creationTime, whitePngAttributes.creationTime(),
+        assertEquals(creationTime, whitePngAttributes.creationTime(),
             "creationTime() of 'white.png' should be same as before");
         assertTrue(whitePngAttributes.lastModifiedTime().toInstant().isAfter(modifyTime.toInstant()),
             "lastModifiedTime() of 'white.png' should be later");
@@ -371,7 +379,7 @@ public class MCROCFLFileSystemProviderTest {
     public void readMultipleAttributes() throws IOException {
         MCRPath whitePng = MCRPath.getPath(DERIVATE_1, "white.png");
         Map<String, Object> attributeMap = Files.readAttributes(whitePng, "basic:size,lastModifiedTime,lastAccessTime");
-        Assertions.assertEquals(3, attributeMap.size(), "There should be 3 attributes.");
+        assertEquals(3, attributeMap.size(), "There should be 3 attributes.");
         assertTrue(attributeMap.containsKey("size"));
         assertTrue(attributeMap.containsKey("lastModifiedTime"));
         assertTrue(attributeMap.containsKey("lastAccessTime"));
