@@ -27,6 +27,7 @@ import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -116,13 +117,38 @@ public class MCROCFLHybridStorage implements MCROCFLTransactionalTempFileStorage
     @Override
     public SeekableByteChannel newByteChannel(MCRVersionedPath path, Set<? extends OpenOption> options,
         FileAttribute<?>... fileAttributes) throws IOException {
-        boolean transactionNotActive = !MCROCFLFileSystemTransaction.isActive();
+        boolean existsInTransactionalStore = this.transactionalStorage.exists(path);
+        // always serve from transactional store if it exists
+        if (existsInTransactionalStore) {
+            return this.transactionalStorage.newByteChannel(path, options, fileAttributes);
+        }
+        // it does not exist in transactional store, so we check for read access, if read then we can safely
+        // return the rolling store
         boolean read = options.isEmpty() || options.contains(StandardOpenOption.READ);
-        boolean doesNotExistInTransactionalStore = !this.transactionalStorage.exists(path);
-        if (transactionNotActive || (doesNotExistInTransactionalStore && read)) {
+        if (read) {
             return this.rollingStorage.newByteChannel(path, options, fileAttributes);
         }
-        return this.transactionalStorage.newByteChannel(path, options, fileAttributes);
+        // we are writing to the file and it does not exists in transactional store
+        boolean existsInRollingStore = this.rollingStorage.exists(path);
+        boolean transactionActive = MCROCFLFileSystemTransaction.isActive();
+        Set<OpenOption> transactionalOptions = new HashSet<>(options);
+        if (existsInRollingStore && transactionActive) {
+            Path transactionalStoragePhysicalPath = this.transactionalStorage.toPhysicalPath(path);
+            Files.createDirectories(transactionalStoragePhysicalPath.getParent());
+            boolean append = options.contains(StandardOpenOption.APPEND);
+            boolean truncate = options.contains(StandardOpenOption.TRUNCATE_EXISTING);
+            if (append) {
+                // we are appending -> need to do a copy first
+                Path rollingStoragePhysicalPath = this.rollingStorage.toPhysicalPath(path);
+                Files.copy(rollingStoragePhysicalPath, transactionalStoragePhysicalPath);
+            } else if (truncate) {
+                // we are truncating, but the file does only exist in rolling store -> no truncate required
+                transactionalOptions.remove(StandardOpenOption.TRUNCATE_EXISTING);
+                transactionalOptions.add(StandardOpenOption.CREATE);
+            }
+        }
+        return transactionActive ? this.transactionalStorage.newByteChannel(path, transactionalOptions, fileAttributes)
+            : this.rollingStorage.newByteChannel(path, options, fileAttributes);
     }
 
     /**

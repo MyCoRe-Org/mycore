@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SeekableByteChannel;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.NavigableMap;
@@ -46,15 +45,13 @@ import java.util.TreeMap;
  */
 public class MCROCFLCachingSeekableByteChannel implements SeekableByteChannel {
 
-    private final SeekableByteChannel delegate;
+    private final SeekableByteChannel source;
 
-    private final Path cacheFilePath;
-
-    private final FileChannel cacheFileChannel;
+    private final SeekableByteChannel target;
 
     private final NavigableMap<Long, Range> cachedRanges;
 
-    private final long delegateSize;
+    private final long sourceSize;
 
     private boolean isOpen;
 
@@ -64,16 +61,24 @@ public class MCROCFLCachingSeekableByteChannel implements SeekableByteChannel {
      * Constructs a new {@code CachingSeekableByteChannel} with the given delegate channel and path.
      * Each time data is read, it is also written to the file at the provided path.
      *
-     * @param delegate the underlying {@link SeekableByteChannel} to delegate read operations
+     * @param source the underlying {@link SeekableByteChannel} to delegate read operations
      * @param cacheFilePath the {@link Path} where the read data will be stored
      * @throws IOException if an I/O error occurs during initialization
      */
-    public MCROCFLCachingSeekableByteChannel(SeekableByteChannel delegate, Path cacheFilePath) throws IOException {
-        this.delegate = delegate;
-        this.cacheFilePath = cacheFilePath;
-        this.cacheFileChannel = FileChannel.open(cacheFilePath, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+    public MCROCFLCachingSeekableByteChannel(SeekableByteChannel source, Path cacheFilePath) throws IOException {
+        this.source = source;
+        this.target = FileChannel.open(cacheFilePath, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
         this.cachedRanges = new TreeMap<>();
-        this.delegateSize = delegate.size();
+        this.sourceSize = source.size();
+        this.isOpen = true;
+    }
+
+    public MCROCFLCachingSeekableByteChannel(SeekableByteChannel source, SeekableByteChannel target)
+        throws IOException {
+        this.source = source;
+        this.target = target;
+        this.cachedRanges = new TreeMap<>();
+        this.sourceSize = source.size();
         this.isOpen = true;
     }
 
@@ -93,24 +98,24 @@ public class MCROCFLCachingSeekableByteChannel implements SeekableByteChannel {
         }
 
         // Record the current position in the delegate channel.
-        long currentPosition = delegate.position();
-        if (currentPosition >= delegateSize) {
+        long currentPosition = source.position();
+        if (currentPosition >= sourceSize) {
             return -1;
         }
 
-        int maxBytes = (int) Math.min(byteBuffer.remaining(), delegateSize - currentPosition);
+        int maxBytes = (int) Math.min(byteBuffer.remaining(), sourceSize - currentPosition);
         ByteBuffer limitedBuffer = byteBuffer.duplicate();
         limitedBuffer.limit(limitedBuffer.position() + maxBytes);
 
-        int bytesRead = delegate.read(limitedBuffer);
+        int bytesRead = source.read(limitedBuffer);
 
         if (bytesRead > 0) {
             // Prepare for reading from the buffer.
             limitedBuffer.flip();
 
             // Write the data into the cache file.
-            cacheFileChannel.position(currentPosition);
-            cacheFileChannel.write(limitedBuffer);
+            target.position(currentPosition);
+            target.write(limitedBuffer);
 
             // Add the new cached byte range in a thread-safe way.
             addCachedRange(currentPosition, currentPosition + bytesRead - 1);
@@ -178,18 +183,13 @@ public class MCROCFLCachingSeekableByteChannel implements SeekableByteChannel {
      * @throws IOException if an I/O error occurs while checking file sizes
      */
     public boolean isFileComplete() throws IOException {
-        // Compare the physical cache file size with the delegate's size.
-        if (Files.size(this.cacheFilePath) != this.delegateSize) {
-            return false;
-        }
-
         // Check if there is a single cached range covering the full file in a thread-safe manner.
         synchronized (lock) {
             if (cachedRanges.size() != 1) {
                 return false;
             }
             Range range = cachedRanges.firstEntry().getValue();
-            return range.start == 0 && range.end == delegateSize - 1;
+            return range.start == 0 && range.end == sourceSize - 1;
         }
     }
 
@@ -213,7 +213,7 @@ public class MCROCFLCachingSeekableByteChannel implements SeekableByteChannel {
      */
     @Override
     public long position() throws IOException {
-        return delegate.position();
+        return source.position();
     }
 
     /**
@@ -225,7 +225,7 @@ public class MCROCFLCachingSeekableByteChannel implements SeekableByteChannel {
      */
     @Override
     public SeekableByteChannel position(long newPosition) throws IOException {
-        delegate.position(newPosition);
+        source.position(newPosition);
         return this;
     }
 
@@ -237,7 +237,7 @@ public class MCROCFLCachingSeekableByteChannel implements SeekableByteChannel {
      */
     @Override
     public long size() throws IOException {
-        return this.delegateSize;
+        return this.sourceSize;
     }
 
     /**
@@ -271,8 +271,8 @@ public class MCROCFLCachingSeekableByteChannel implements SeekableByteChannel {
     @Override
     public void close() throws IOException {
         if (isOpen) {
-            delegate.close();
-            cacheFileChannel.close();
+            source.close();
+            target.close();
             isOpen = false;
         }
     }
