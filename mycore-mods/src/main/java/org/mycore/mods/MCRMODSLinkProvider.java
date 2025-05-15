@@ -61,7 +61,7 @@ public class MCRMODSLinkProvider extends MCRDefaultLinkProvider {
     }
 
     private static void checkObjectType(MCRObject obj) throws OperationNotSupportedException {
-        if (!obj.getId().getTypeId().equals("mods")) {
+        if (!MCRMODSWrapper.isSupported(obj)) {
             throw new OperationNotSupportedException("MCRMODSLinkProvider only supports mods types");
         }
     }
