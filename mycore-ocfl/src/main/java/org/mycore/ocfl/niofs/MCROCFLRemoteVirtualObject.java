@@ -111,14 +111,16 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
         // read from remote ocfl repository
         OcflObjectVersionFile ocflFile = fromOcfl(path);
         this.localStorage.createDirectories(path.getParent());
-        Path cacheFilePath = this.localStorage.toPhysicalPath(path);
+        SeekableByteChannel cachingChannel =
+            this.localStorage.newByteChannel(path, Set.of(StandardOpenOption.CREATE, StandardOpenOption.WRITE),
+                fileAttributes);
         MCROCFLReadableByteChannel readableByteChannel = new MCROCFLReadableByteChannel(ocflFile);
         MCROCFLCachingSeekableByteChannel cachingByteChannel =
-            new MCROCFLCachingSeekableByteChannel(readableByteChannel, cacheFilePath);
+            new MCROCFLCachingSeekableByteChannel(readableByteChannel, cachingChannel);
         return new MCROCFLClosableCallbackChannel(cachingByteChannel, () -> {
             // delete partial files from cache
             if (!cachingByteChannel.isFileComplete()) {
-                Files.delete(cacheFilePath);
+                this.localStorage.deleteIfExists(path);
             }
         });
     }
