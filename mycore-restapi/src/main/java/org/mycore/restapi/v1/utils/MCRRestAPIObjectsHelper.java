@@ -29,6 +29,7 @@ import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -111,7 +112,8 @@ public class MCRRestAPIObjectsHelper {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final DateTimeFormatter SDF_UTC = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+    private static final DateTimeFormatter SDF_UTC
+        = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US).withZone(ZoneOffset.UTC);
 
     private static final MCRIDMapper ID_MAPPER = MCRConfiguration2
         .getInstanceOf(MCRIDMapper.class, MCRIDMapper.MCR_PROPERTY_CLASS).get();
