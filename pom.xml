@@ -7,7 +7,7 @@
     <version>45</version>
   </parent>
   <artifactId>mycore</artifactId>
-  <version>2020.06.4-SNAPSHOT</version>
+  <version>2020.06.3-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>MyCoRe</name>
   <description xml:space="preserve">
