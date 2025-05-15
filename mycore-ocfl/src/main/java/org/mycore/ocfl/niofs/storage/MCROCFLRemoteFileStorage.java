@@ -38,17 +38,19 @@ import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.niofs.MCROCFLFileSystemTransaction;
 
 /**
- * Hybrid storage implementation that combines transactional and rolling cache storage.
+ * This class should be used for a remote OCFL system.
+ * <p>
+ * Storage implementation that combines transactional and rolling cache storage.
  * This class supports transactional operations while maintaining a rolling cache for non-transactional access.
  * Transactional storage always takes precedence over rolling storage when both are available.
  */
-public class MCROCFLHybridStorage implements MCROCFLTransactionalTempFileStorage {
+public class MCROCFLRemoteFileStorage implements MCROCFLTransactionalFileStorage {
 
     public final static String TRANSACTION_DIRECTORY = "transaction";
 
     public final static String ROLLING_DIRECTORY = "rolling";
 
-    private MCROCFLDefaultTransactionalTempFileStorage transactionalStorage;
+    private MCROCFLLocalFileStorage transactionalStorage;
 
     private MCROCFLRollingCacheStorage rollingStorage;
 
@@ -64,23 +66,23 @@ public class MCROCFLHybridStorage implements MCROCFLTransactionalTempFileStorage
      * Default constructor for MCRConfiguration2 instantiation.
      */
     @SuppressWarnings("unused")
-    public MCROCFLHybridStorage() {
+    public MCROCFLRemoteFileStorage() {
     }
 
     /**
-     * Constructs a new {@code MCROCFLHybridStorage} with the specified root path and eviction strategy.
+     * Constructs a new {@code MCROCFLRemoteFileStorage} with the specified root path and eviction strategy.
      *
      * @param root the root directory for the storage.
      * @param evictionStrategy the strategy to use for evicting items from the rolling cache.
      */
-    public MCROCFLHybridStorage(Path root, MCROCFLEvictionStrategy evictionStrategy) {
+    public MCROCFLRemoteFileStorage(Path root, MCROCFLEvictionStrategy evictionStrategy) {
         this.root = root;
         this.evictionStrategy = evictionStrategy;
         initialize();
     }
 
     /**
-     * Initializes the hybrid storage, setting up transactional and rolling storage paths.
+     * Initializes the remote storage, setting up transactional and rolling storage paths.
      */
     @MCRPostConstruction
     public void postConstruct() {
@@ -91,7 +93,7 @@ public class MCROCFLHybridStorage implements MCROCFLTransactionalTempFileStorage
     private void initialize() {
         Path transactionPath = root.resolve(TRANSACTION_DIRECTORY);
         Path rollingPath = root.resolve(ROLLING_DIRECTORY);
-        this.transactionalStorage = new MCROCFLDefaultTransactionalTempFileStorage(transactionPath);
+        this.transactionalStorage = new MCROCFLLocalFileStorage(transactionPath);
         this.rollingStorage = new MCROCFLRollingCacheStorage(rollingPath, evictionStrategy);
     }
 
@@ -279,7 +281,7 @@ public class MCROCFLHybridStorage implements MCROCFLTransactionalTempFileStorage
         return this.rollingStorage.toPhysicalPath(owner, version);
     }
 
-    private MCROCFLTempFileStorage getStore(MCRVersionedPath path) {
+    private MCROCFLFileStorage getStore(MCRVersionedPath path) {
         boolean activeTransaction = MCROCFLFileSystemTransaction.isActive();
         if (!activeTransaction) {
             return this.rollingStorage;

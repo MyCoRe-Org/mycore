@@ -38,6 +38,9 @@ import org.mycore.ocfl.MCROCFLException;
 import org.mycore.ocfl.MCROCFLTestCaseHelper;
 import org.mycore.ocfl.niofs.MCROCFLFileSystemProvider;
 import org.mycore.ocfl.niofs.MCROCFLFileSystemTransaction;
+import org.mycore.ocfl.niofs.storage.MCROCFLLocalFileStorage;
+import org.mycore.ocfl.niofs.storage.MCROCFLNeverEvictStrategy;
+import org.mycore.ocfl.niofs.storage.MCROCFLRemoteFileStorage;
 import org.mycore.ocfl.repository.MCROCFLHashRepositoryProvider;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 import org.mycore.ocfl.repository.MCROCFLRepositoryBuilder;
@@ -85,6 +88,16 @@ public class MCROCFLSetupExtension implements BeforeEachCallback, AfterEachCallb
             MCROCFLDeleteUtils.PROPERTY_PREFIX +
                 MCROCFLObjectIDPrefixHelper.MCRDERIVATE.replace(":", "");
         MCRConfiguration2.set(purgePropertyName, Boolean.toString(purge != null ? purge : false));
+
+        // Configure Local Storage
+        if (remote != null && remote) {
+            MCRConfiguration2.set("MCR.Content.TempStorage", MCROCFLRemoteFileStorage.class.getName());
+            MCRConfiguration2.set("MCR.Content.TempStorage.EvictionStrategy",
+                MCROCFLNeverEvictStrategy.class.getName());
+            MCRConfiguration2.set("MCR.Content.TempStorage.Path", "%MCR.datadir%/ocfl-temp-storage");
+        } else {
+            MCRConfiguration2.set("MCR.Content.TempStorage", MCROCFLLocalFileStorage.class.getName());
+        }
 
         // Execute common initialization
         MCROCFLFileSystemProvider.get().init();
