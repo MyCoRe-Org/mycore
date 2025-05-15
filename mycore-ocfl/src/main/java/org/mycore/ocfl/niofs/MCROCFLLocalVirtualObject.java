@@ -37,7 +37,7 @@ import org.mycore.common.digest.MCRDigest;
 import org.mycore.common.events.MCREvent;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.niofs.channels.MCROCFLClosableCallbackChannel;
-import org.mycore.ocfl.niofs.storage.MCROCFLTempFileStorage;
+import org.mycore.ocfl.niofs.storage.MCROCFLFileStorage;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 
 import io.ocfl.api.model.FileChangeHistory;
@@ -65,7 +65,7 @@ public class MCROCFLLocalVirtualObject extends MCROCFLVirtualObject {
      * @param readonly whether the object is read-only.
      */
     public MCROCFLLocalVirtualObject(MCROCFLRepository repository, ObjectVersionId objectVersionId,
-        MCROCFLTempFileStorage localStorage, boolean readonly) {
+        MCROCFLFileStorage localStorage, boolean readonly) {
         super(repository, objectVersionId, localStorage, readonly);
     }
 
@@ -78,7 +78,7 @@ public class MCROCFLLocalVirtualObject extends MCROCFLVirtualObject {
      * @param readonly whether the object is read-only.
      */
     public MCROCFLLocalVirtualObject(MCROCFLRepository repository, OcflObjectVersion objectVersion,
-        MCROCFLTempFileStorage localStorage, boolean readonly) {
+        MCROCFLFileStorage localStorage, boolean readonly) {
         super(repository, objectVersion, localStorage, readonly);
     }
 
@@ -94,7 +94,7 @@ public class MCROCFLLocalVirtualObject extends MCROCFLVirtualObject {
      * @param directoryTracker the directory tracker.
      */
     protected MCROCFLLocalVirtualObject(MCROCFLRepository repository, ObjectVersionId versionId,
-        OcflObjectVersion objectVersion, MCROCFLTempFileStorage localStorage,
+        OcflObjectVersion objectVersion, MCROCFLFileStorage localStorage,
         boolean readonly,
         MCROCFLFileTracker<MCRVersionedPath, MCRDigest> fileTracker,
         MCROCFLDirectoryTracker directoryTracker) {

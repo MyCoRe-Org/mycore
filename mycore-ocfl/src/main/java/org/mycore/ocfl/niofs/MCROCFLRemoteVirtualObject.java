@@ -38,7 +38,7 @@ import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.niofs.channels.MCROCFLCachingSeekableByteChannel;
 import org.mycore.ocfl.niofs.channels.MCROCFLClosableCallbackChannel;
 import org.mycore.ocfl.niofs.channels.MCROCFLReadableByteChannel;
-import org.mycore.ocfl.niofs.storage.MCROCFLTempFileStorage;
+import org.mycore.ocfl.niofs.storage.MCROCFLFileStorage;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 
 import io.ocfl.api.model.FileChangeHistory;
@@ -66,7 +66,7 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
      * @param readonly whether the object is read-only.
      */
     public MCROCFLRemoteVirtualObject(MCROCFLRepository repository, ObjectVersionId objectVersionId,
-        MCROCFLTempFileStorage localStorage, boolean readonly) {
+        MCROCFLFileStorage localStorage, boolean readonly) {
         super(repository, objectVersionId, localStorage, readonly);
     }
 
@@ -79,7 +79,7 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
      * @param readonly whether the object is read-only.
      */
     public MCROCFLRemoteVirtualObject(MCROCFLRepository repository, OcflObjectVersion objectVersion,
-        MCROCFLTempFileStorage localStorage, boolean readonly) {
+        MCROCFLFileStorage localStorage, boolean readonly) {
         super(repository, objectVersion, localStorage, readonly);
     }
 
@@ -95,7 +95,7 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
      * @param directoryTracker the directory tracker.
      */
     protected MCROCFLRemoteVirtualObject(MCROCFLRepository repository, ObjectVersionId versionId,
-        OcflObjectVersion objectVersion, MCROCFLTempFileStorage localStorage, boolean readonly,
+        OcflObjectVersion objectVersion, MCROCFLFileStorage localStorage, boolean readonly,
         MCROCFLFileTracker<MCRVersionedPath, MCRDigest> fileTracker,
         MCROCFLDirectoryTracker directoryTracker) {
         super(repository, versionId, objectVersion, localStorage, readonly, fileTracker, directoryTracker);

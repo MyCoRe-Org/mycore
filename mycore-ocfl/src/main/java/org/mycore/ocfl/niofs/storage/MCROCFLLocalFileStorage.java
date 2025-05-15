@@ -28,10 +28,12 @@ import org.mycore.ocfl.niofs.MCROCFLFileSystemTransaction;
 import org.mycore.ocfl.niofs.MCROCFLInactiveTransactionException;
 
 /**
- * Implementation of {@link MCROCFLTransactionalTempFileStorage} that provides default
- * transactional temporary file storage functionality.
+ * This class should be used for a local OCFL system.
+ * <p>
+ * Implementation of {@link MCROCFLTransactionalFileStorage} that provides transactional temporary file storage
+ * functionality.
  */
-public class MCROCFLDefaultTransactionalTempFileStorage implements MCROCFLTransactionalTempFileStorage {
+public class MCROCFLLocalFileStorage implements MCROCFLTransactionalFileStorage {
 
     private Path root;
 
@@ -39,11 +41,11 @@ public class MCROCFLDefaultTransactionalTempFileStorage implements MCROCFLTransa
     public String rootPathProperty;
 
     @SuppressWarnings("unused")
-    public MCROCFLDefaultTransactionalTempFileStorage() {
+    public MCROCFLLocalFileStorage() {
         // default constructor for MCRConfiguration2 instantiation
     }
 
-    public MCROCFLDefaultTransactionalTempFileStorage(Path root) {
+    public MCROCFLLocalFileStorage(Path root) {
         this.root = root;
     }
 
@@ -66,7 +68,7 @@ public class MCROCFLDefaultTransactionalTempFileStorage implements MCROCFLTransa
     @Override
     public boolean exists(MCRVersionedPath path) {
         try {
-            return MCROCFLTransactionalTempFileStorage.super.exists(path);
+            return MCROCFLTransactionalFileStorage.super.exists(path);
         } catch (MCROCFLInactiveTransactionException inactiveTransactionException) {
             return false;
         }

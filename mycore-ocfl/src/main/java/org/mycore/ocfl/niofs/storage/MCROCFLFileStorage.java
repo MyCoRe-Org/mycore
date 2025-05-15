@@ -39,7 +39,7 @@ import org.mycore.datamodel.niofs.MCRVersionedPath;
  * Provides default methods for common file operations such as checking existence,
  * creating byte channels, copying, moving, deleting files, and more.
  */
-public interface MCROCFLTempFileStorage {
+public interface MCROCFLFileStorage {
 
     /**
      * Gets the root path of the storage.

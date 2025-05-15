@@ -32,7 +32,7 @@ public abstract class MCROCFLStorageTestCase {
         path3 = MCRVersionedPath.head("owner1", "file3");
     }
 
-    protected abstract MCROCFLTempFileStorage getStorage();
+    protected abstract MCROCFLFileStorage getStorage();
 
     protected void write(MCRVersionedPath path) throws IOException {
         write(path, new byte[] { 1 });

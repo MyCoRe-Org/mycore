@@ -45,10 +45,10 @@ import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.niofs.channels.MCROCFLClosableCallbackChannel;
 
 /**
- * Implementation of {@link MCROCFLTempFileStorage} that provides a rolling cache storage mechanism.
+ * Implementation of {@link MCROCFLFileStorage} that provides a rolling cache storage mechanism.
  * This class maintains a cache of files and employs an eviction strategy to manage the cache size.
  */
-public class MCROCFLRollingCacheStorage implements MCROCFLTempFileStorage {
+public class MCROCFLRollingCacheStorage implements MCROCFLFileStorage {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -140,7 +140,7 @@ public class MCROCFLRollingCacheStorage implements MCROCFLTempFileStorage {
         FileAttribute<?>... fileAttributes) throws IOException {
         final AtomicReference<Exception> exceptionReference = new AtomicReference<>(null);
         try {
-            SeekableByteChannel channel = MCROCFLTempFileStorage.super.newByteChannel(path, options, fileAttributes);
+            SeekableByteChannel channel = MCROCFLFileStorage.super.newByteChannel(path, options, fileAttributes);
             return new MCROCFLClosableCallbackChannel(channel, () -> {
                 if (exceptionReference.get() != null) {
                     return;
@@ -163,7 +163,7 @@ public class MCROCFLRollingCacheStorage implements MCROCFLTempFileStorage {
      */
     @Override
     public void copy(InputStream is, MCRVersionedPath target, CopyOption... options) throws IOException {
-        MCROCFLTempFileStorage.super.copy(is, target, options);
+        MCROCFLFileStorage.super.copy(is, target, options);
         cacheUpdate(toPhysicalPath(target), true);
         rollOver();
     }
@@ -173,7 +173,7 @@ public class MCROCFLRollingCacheStorage implements MCROCFLTempFileStorage {
      */
     @Override
     public void copy(MCRVersionedPath source, MCRVersionedPath target, CopyOption... options) throws IOException {
-        MCROCFLTempFileStorage.super.copy(source, target, options);
+        MCROCFLFileStorage.super.copy(source, target, options);
         cacheUpdate(toPhysicalPath(source), false);
         cacheUpdate(toPhysicalPath(target), true);
         rollOver();
@@ -184,7 +184,7 @@ public class MCROCFLRollingCacheStorage implements MCROCFLTempFileStorage {
      */
     @Override
     public void move(MCRVersionedPath source, MCRVersionedPath target, CopyOption... options) throws IOException {
-        MCROCFLTempFileStorage.super.move(source, target, options);
+        MCROCFLFileStorage.super.move(source, target, options);
         cacheRemove(toPhysicalPath(source));
         cacheUpdate(toPhysicalPath(target), true);
         rollOver();
@@ -196,7 +196,7 @@ public class MCROCFLRollingCacheStorage implements MCROCFLTempFileStorage {
     @Override
     public void deleteIfExists(MCRVersionedPath path) throws IOException {
         try {
-            MCROCFLTempFileStorage.super.deleteIfExists(path);
+            MCROCFLFileStorage.super.deleteIfExists(path);
         } finally {
             cacheRemove(toPhysicalPath(path));
         }
@@ -210,7 +210,7 @@ public class MCROCFLRollingCacheStorage implements MCROCFLTempFileStorage {
         this.cache.clear();
         this.queue.clear();
         this.totalAllocation.set(0);
-        MCROCFLTempFileStorage.super.clear();
+        MCROCFLFileStorage.super.clear();
     }
 
     /**

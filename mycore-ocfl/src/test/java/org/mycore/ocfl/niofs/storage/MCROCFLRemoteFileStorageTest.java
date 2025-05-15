@@ -15,9 +15,9 @@ import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
 @ExtendWith({ MCRPermutationExtension.class })
-public class MCROCFLHybridStorageTest extends MCROCFLStorageTestCase {
+public class MCROCFLRemoteFileStorageTest extends MCROCFLStorageTestCase {
 
-    private MCROCFLHybridStorage storage;
+    private MCROCFLRemoteFileStorage storage;
 
     @PermutedParam
     private boolean remote;
@@ -29,11 +29,11 @@ public class MCROCFLHybridStorageTest extends MCROCFLStorageTestCase {
     public void setUp() throws Exception {
         super.setUp();
         FileCountEvictionStrategy evictionStrategy = new FileCountEvictionStrategy(2);
-        storage = new MCROCFLHybridStorage(rootPath, evictionStrategy);
+        storage = new MCROCFLRemoteFileStorage(rootPath, evictionStrategy);
     }
 
     @Override
-    public MCROCFLHybridStorage getStorage() {
+    public MCROCFLRemoteFileStorage getStorage() {
         return storage;
     }
 
@@ -49,8 +49,8 @@ public class MCROCFLHybridStorageTest extends MCROCFLStorageTestCase {
 
     @TestTemplate
     public void toPhysicalPath() throws IOException {
-        String rollingDirectory = "/" + MCROCFLHybridStorage.ROLLING_DIRECTORY + "/";
-        String transactionDirectory = "/" + MCROCFLHybridStorage.TRANSACTION_DIRECTORY + "/";
+        String rollingDirectory = "/" + MCROCFLRemoteFileStorage.ROLLING_DIRECTORY + "/";
+        String transactionDirectory = "/" + MCROCFLRemoteFileStorage.TRANSACTION_DIRECTORY + "/";
         Assertions.assertTrue(storage.toPhysicalPath(path1).toString().contains(rollingDirectory),
             "should access rolling store");
         MCRTransactionManager.beginTransactions();

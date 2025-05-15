@@ -26,10 +26,10 @@ import org.apache.commons.io.FileUtils;
 
 /**
  * Interface for temporary file storage with transaction support, extending the
- * {@link MCROCFLTempFileStorage} interface. Provides additional methods for handling
+ * {@link MCROCFLFileStorage} interface. Provides additional methods for handling
  * transactional file operations.
  */
-public interface MCROCFLTransactionalTempFileStorage extends MCROCFLTempFileStorage {
+public interface MCROCFLTransactionalFileStorage extends MCROCFLFileStorage {
 
     /**
      * Purges all files associated with the specified transaction.
