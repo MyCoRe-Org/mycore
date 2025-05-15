@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.mycore.datamodel.niofs.MCRVersionedPath;
-import org.mycore.ocfl.niofs.storage.MCROCFLTransactionalTempFileStorage;
+import org.mycore.ocfl.niofs.storage.MCROCFLTransactionalFileStorage;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 import org.mycore.ocfl.util.MCROCFLMetadataVersion;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
@@ -62,7 +62,7 @@ public class MCROCFLVirtualObjectProvider {
 
     private final MCROCFLRepository repository;
 
-    private final MCROCFLTransactionalTempFileStorage localStorage;
+    private final MCROCFLTransactionalFileStorage localStorage;
 
     /**
      * Constructs a new {@code MCROCFLVirtualObjectProvider}.
@@ -71,7 +71,7 @@ public class MCROCFLVirtualObjectProvider {
      * @param localStorage the local temporary file storage.
      */
     public MCROCFLVirtualObjectProvider(MCROCFLRepository repository,
-        MCROCFLTransactionalTempFileStorage localStorage) {
+        MCROCFLTransactionalFileStorage localStorage) {
         this.repository = repository;
         this.localStorage = localStorage;
         this.readMap = new ConcurrentHashMap<>();
