@@ -187,7 +187,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
               <link>https://docs.oracle.com/en/java/javase/11/docs/api/</link>
               <link>https://javaee.github.io/javaee-spec/javadocs/</link>
               <link>http://www.jdom.org/docs/apidocs/</link>
-              <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
               <link>http://docs.jboss.org/hibernate/orm/5.4/javadocs/</link>
               <link>http://docs.jboss.org/hibernate/jpa/2.2/api/</link>
               <!--
@@ -711,7 +710,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
                 <link>https://docs.oracle.com/en/java/javase/11/docs/api/</link>
                 <link>https://javaee.github.io/javaee-spec/javadocs/</link>
                 <link>http://www.jdom.org/docs/apidocs/</link>
-                <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
                 <link>http://docs.jboss.org/hibernate/orm/5.4/javadocs/</link>
                 <link>http://docs.jboss.org/hibernate/jpa/2.2/api/</link>
                 <!--
