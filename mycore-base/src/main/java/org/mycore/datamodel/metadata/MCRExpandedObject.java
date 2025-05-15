@@ -1,6 +1,10 @@
 package org.mycore.datamodel.metadata;
 
+import java.io.IOException;
+import java.net.URI;
+
 import org.jdom2.Document;
+import org.jdom2.JDOMException;
 import org.mycore.common.MCRException;
 
 
@@ -20,6 +24,10 @@ public class MCRExpandedObject extends MCRObject {
         setFromJDOM(objXML);
     }
     
+    public MCRExpandedObject(URI uri) throws IOException, JDOMException {
+        this();
+        setFromURI(uri);
+    }
 
     public MCRExpandedObject(MCRExpandedObjectStructure structure, MCRObjectMetadata metadata, MCRObjectService service,
                              String label) {
