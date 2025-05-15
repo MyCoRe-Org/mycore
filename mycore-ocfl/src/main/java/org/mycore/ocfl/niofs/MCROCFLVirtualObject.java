@@ -66,7 +66,7 @@ import org.mycore.datamodel.niofs.MCRReadOnlyIOException;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.MCROCFLException;
 import org.mycore.ocfl.niofs.channels.MCROCFLClosableCallbackChannel;
-import org.mycore.ocfl.niofs.storage.MCROCFLTempFileStorage;
+import org.mycore.ocfl.niofs.storage.MCROCFLFileStorage;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 import org.mycore.ocfl.util.MCROCFLDeleteUtils;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
@@ -105,7 +105,7 @@ public abstract class MCROCFLVirtualObject {
 
     protected OcflObjectVersion objectVersion;
 
-    protected final MCROCFLTempFileStorage localStorage;
+    protected final MCROCFLFileStorage localStorage;
 
     protected final boolean readonly;
 
@@ -128,7 +128,7 @@ public abstract class MCROCFLVirtualObject {
      * @param readonly whether the object is read-only.
      */
     public MCROCFLVirtualObject(MCROCFLRepository repository, ObjectVersionId objectVersionId,
-        MCROCFLTempFileStorage localStorage, boolean readonly) {
+        MCROCFLFileStorage localStorage, boolean readonly) {
         this(repository, objectVersionId, null, localStorage, readonly);
     }
 
@@ -141,7 +141,7 @@ public abstract class MCROCFLVirtualObject {
      * @param readonly whether the object is read-only.
      */
     public MCROCFLVirtualObject(MCROCFLRepository repository, OcflObjectVersion objectVersion,
-        MCROCFLTempFileStorage localStorage, boolean readonly) {
+        MCROCFLFileStorage localStorage, boolean readonly) {
         this(repository, objectVersion.getObjectVersionId(), objectVersion, localStorage, readonly);
     }
 
@@ -155,7 +155,7 @@ public abstract class MCROCFLVirtualObject {
      * @param readonly whether the object is read-only.
      */
     protected MCROCFLVirtualObject(MCROCFLRepository repository, ObjectVersionId versionId,
-        OcflObjectVersion objectVersion, MCROCFLTempFileStorage localStorage,
+        OcflObjectVersion objectVersion, MCROCFLFileStorage localStorage,
         boolean readonly) {
         this(repository, versionId, objectVersion, localStorage, readonly, null, null);
         initTrackers();
@@ -173,7 +173,7 @@ public abstract class MCROCFLVirtualObject {
      * @param directoryTracker the directory tracker.
      */
     protected MCROCFLVirtualObject(MCROCFLRepository repository, ObjectVersionId versionId,
-        OcflObjectVersion objectVersion, MCROCFLTempFileStorage localStorage,
+        OcflObjectVersion objectVersion, MCROCFLFileStorage localStorage,
         boolean readonly, MCROCFLFileTracker<MCRVersionedPath, MCRDigest> fileTracker,
         MCROCFLDirectoryTracker directoryTracker) {
         Objects.requireNonNull(repository);
