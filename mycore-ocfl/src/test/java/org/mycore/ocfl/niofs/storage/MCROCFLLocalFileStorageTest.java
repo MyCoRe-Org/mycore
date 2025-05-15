@@ -17,9 +17,9 @@ import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
 @ExtendWith({ MCRPermutationExtension.class, MCROCFLSetupExtension.class })
-public class MCROCFLDefaultTransactionalTempFileStorageTest extends MCROCFLStorageTestCase {
+public class MCROCFLLocalFileStorageTest extends MCROCFLStorageTestCase {
 
-    private MCROCFLDefaultTransactionalTempFileStorage storage;
+    private MCROCFLLocalFileStorage storage;
 
     // TODO why do i need the repo here?
     protected MCROCFLRepository repository;
@@ -33,11 +33,11 @@ public class MCROCFLDefaultTransactionalTempFileStorageTest extends MCROCFLStora
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-        storage = new MCROCFLDefaultTransactionalTempFileStorage(rootPath);
+        storage = new MCROCFLLocalFileStorage(rootPath);
     }
 
     @Override
-    public MCROCFLDefaultTransactionalTempFileStorage getStorage() {
+    public MCROCFLLocalFileStorage getStorage() {
         return storage;
     }
 
