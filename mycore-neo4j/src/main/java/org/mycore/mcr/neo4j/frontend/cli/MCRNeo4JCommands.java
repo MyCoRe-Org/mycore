@@ -104,7 +104,7 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
         List<String> selectedObjectIds = MCRXMLMetadataManager
             .getInstance().listIDsForBase(baseId);
         for (String objectId : selectedObjectIds) {
-            MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(objectId));
+            MCRObject mcrObject = MCRMetadataManager.retrieveMCRExpandedObject(MCRObjectID.getInstance(objectId));
             clazz.updateNodeByMCRObject(mcrObject);
         }
     }
@@ -119,7 +119,7 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
         List<String> selectedObjectIds = MCRXMLMetadataManager
             .getInstance().listIDsOfType(type);
         for (String objectId : selectedObjectIds) {
-            MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(objectId));
+            MCRObject mcrObject = MCRMetadataManager.retrieveMCRExpandedObject(MCRObjectID.getInstance(objectId));
             clazz.updateNodeByMCRObject(mcrObject);
         }
     }
@@ -133,7 +133,7 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
             .getInstance()
             .listIDs();
         for (String objectId : selectedObjectIds) {
-            MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(objectId));
+            MCRObject mcrObject = MCRMetadataManager.retrieveMCRExpandedObject(MCRObjectID.getInstance(objectId));
             clazz.updateNodeByMCRObject(mcrObject);
         }
     }
@@ -152,7 +152,7 @@ public class MCRNeo4JCommands extends MCRAbstractCommands {
     public static void test(final String id) {
         LOGGER.info("Test Query for Neo4J with metadata for MCRID");
 
-        MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(id));
+        MCRObject mcrObject = MCRMetadataManager.retrieveMCRExpandedObject(MCRObjectID.getInstance(id));
         MCRNeo4JParser parser = new MCRNeo4JParser();
         String neo4JQuery = parser.createNeo4JQuery(mcrObject);
 
