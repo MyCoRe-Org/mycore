@@ -34,7 +34,6 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jtojson.Neo4JMetaData;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jtojson.Neo4JNodeJsonRecord;
 import org.neo4j.driver.Driver;
-import org.neo4j.driver.Query;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Result;
 import org.neo4j.driver.Session;
@@ -68,10 +67,7 @@ public class MCRNeo4JQueryRunner {
             return;
         }
         try (Session session = driver.session()) {
-            session.executeWrite(tx -> {
-                Query query = new Query(queryString);
-                return tx.run(query);
-            });
+            session.executeWriteWithoutResult(tx -> tx.run(queryString));
         }
     }
 
