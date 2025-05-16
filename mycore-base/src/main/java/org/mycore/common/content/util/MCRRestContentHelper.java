@@ -153,6 +153,7 @@ public final class MCRRestContentHelper {
         MediaType contentType = MediaType.valueOf(mimeType);
         String enc = content.getEncoding();
         if (enc != null) {
+            @SuppressWarnings("PMD.UseConcurrentHashMap")
             Map<String, String> param = new HashMap<>(contentType.getParameters());
             param.put(MediaType.CHARSET_PARAMETER, enc);
             contentType = new MediaType(contentType.getType(), contentType.getSubtype(), param);

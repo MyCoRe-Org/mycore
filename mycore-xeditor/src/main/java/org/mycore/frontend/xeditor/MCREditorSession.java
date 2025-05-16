@@ -20,10 +20,10 @@ package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -57,7 +57,7 @@ public class MCREditorSession {
 
     private String url;
 
-    private Map<String, String[]> requestParameters = new HashMap<>();
+    private Map<String, String[]> requestParameters = new ConcurrentHashMap<>();
 
     private Map<String, Object> variables;
 
@@ -82,7 +82,7 @@ public class MCREditorSession {
     public MCREditorSession(Map<String, String[]> requestParameters, MCRParameterCollector collector) {
         // make a copy, the original may be re-used by servlet container
         this.requestParameters.putAll(requestParameters);
-        this.variables = new HashMap<>(collector.getParameterMap());
+        this.variables = new ConcurrentHashMap<>(collector.getParameterMap());
         removeIllegalVariables();
     }
 

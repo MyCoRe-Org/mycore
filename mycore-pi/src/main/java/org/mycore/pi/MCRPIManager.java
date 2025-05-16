@@ -81,6 +81,7 @@ public final class MCRPIManager {
      *     It is intended to be called from the constructor and test classes only.
      */
     void applyConfiguration() {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, Class<? extends MCRPIParser<? extends MCRPersistentIdentifier>>> parserMap = new HashMap<>();
         MCRConfiguration2.getSubPropertiesMap(PARSER_CONFIGURATION)
             .forEach((type, className) -> {

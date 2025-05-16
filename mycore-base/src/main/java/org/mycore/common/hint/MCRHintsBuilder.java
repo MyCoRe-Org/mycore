@@ -18,11 +18,11 @@
 
 package org.mycore.common.hint;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -96,7 +96,7 @@ public final class MCRHintsBuilder {
 
     private static final class Hints implements MCRHints {
 
-        private final Map<MCRHintKey<?>, Object> hints = new HashMap<>();
+        private final Map<MCRHintKey<?>, Object> hints = new ConcurrentHashMap<>();
 
         private Hints(Set<Entry<?>> entries) {
             entries.forEach(hint -> hints.put(hint.key, hint.value));

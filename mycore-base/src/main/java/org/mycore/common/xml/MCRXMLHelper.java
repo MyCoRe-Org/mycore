@@ -451,6 +451,7 @@ public class MCRXMLHelper {
 
             // children
             // - build child map of <name,namespace> pair with their respective elements
+            @SuppressWarnings("PMD.UseConcurrentHashMap")
             Map<Pair<String, Namespace>, List<Element>> childContentMap = new HashMap<>();
             for (Element child : element.getChildren()) {
                 Pair<String, Namespace> key = new Pair<>(child.getName(), child.getNamespace());

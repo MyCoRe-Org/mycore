@@ -20,8 +20,8 @@ package org.mycore.iiif.presentation.impl;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
@@ -32,7 +32,7 @@ public abstract class MCRIIIFPresentationImpl {
 
     private static final String MCR_IIIF_PRESENTATION_CONFIG_PREFIX = "MCR.IIIFPresentation.";
 
-    private static final Map<String, MCRIIIFPresentationImpl> IMPLHOLDER = new HashMap<>();
+    private static final Map<String, MCRIIIFPresentationImpl> IMPLHOLDER = new ConcurrentHashMap<>();
 
     private final String implName;
 

@@ -24,8 +24,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -51,7 +51,7 @@ public class MCRDerivateUtil {
         throws IOException {
         MCRPath derivateRoot = MCRPath.getPath(derivate, "/");
         Pattern patternObj = Pattern.compile(pattern);
-        Map<String, String> resultMap = new HashMap<>();
+        Map<String, String> resultMap = new ConcurrentHashMap<>();
         Files.walkFileTree(derivateRoot, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)

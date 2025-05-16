@@ -23,9 +23,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
@@ -64,9 +64,9 @@ public class MCRRealmFactory {
     private static long lastModified;
 
     /** Map of defined realms, key is the ID of the realm */
-    private static Map<String, MCRRealm> realmsMap = new HashMap<>();
+    private static Map<String, MCRRealm> realmsMap = new ConcurrentHashMap<>();
 
-    private static Map<String, MCRUserAttributeMapper> attributeMapper = new HashMap<>();
+    private static Map<String, MCRUserAttributeMapper> attributeMapper = new ConcurrentHashMap<>();
 
     /** List of defined realms */
     private static List<MCRRealm> realmsList = new ArrayList<>();
@@ -120,9 +120,9 @@ public class MCRRealmFactory {
             throw new MCRException("Could not load realms from URI: " + realmsURI, e);
         }
         String localRealmID = root.getAttributeValue("local");
-        Map<String, MCRRealm> realmsMap = new HashMap<>();
+        Map<String, MCRRealm> realmsMap = new ConcurrentHashMap<>();
 
-        Map<String, MCRUserAttributeMapper> attributeMapper = new HashMap<>();
+        Map<String, MCRUserAttributeMapper> attributeMapper = new ConcurrentHashMap<>();
 
         List<MCRRealm> realmsList = new ArrayList<>();
 

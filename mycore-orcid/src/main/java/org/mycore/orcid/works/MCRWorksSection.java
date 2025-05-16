@@ -20,12 +20,12 @@ package org.mycore.orcid.works;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import org.jdom2.Element;
@@ -55,7 +55,7 @@ public class MCRWorksSection {
     private List<MCRWork> works = new ArrayList<>();
 
     /** Lookup table to get work by it's put code */
-    private Map<String, MCRWork> putCode2Work = new HashMap<>();
+    private Map<String, MCRWork> putCode2Work = new ConcurrentHashMap<>();
 
     /**
      * Creates a representation of the ORCID's works section and
