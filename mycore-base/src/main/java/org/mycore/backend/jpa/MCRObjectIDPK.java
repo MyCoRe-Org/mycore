@@ -60,16 +60,13 @@ import jakarta.persistence.Convert;
  *
  * @see MCRObjectInfoEntity
  */
-@Access(AccessType.FIELD)
+@Access(AccessType.PROPERTY)
 public class MCRObjectIDPK implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Convert(converter = MCRObjectIDConverter.class)
-    @Basic
-    @Column(length = MCRObjectID.MAX_LENGTH)
-    public MCRObjectID id;
+    private MCRObjectID id;
 
     /**
      * Use this constructor for quick queries.
@@ -87,6 +84,17 @@ public class MCRObjectIDPK implements Serializable {
 
     public MCRObjectIDPK() {
         //empty for JPA implementations
+    }
+
+    @Convert(converter = MCRObjectIDConverter.class)
+    @Basic
+    @Column(length = MCRObjectID.MAX_LENGTH)
+    public MCRObjectID getId() {
+        return id;
+    }
+
+    public void setId(MCRObjectID id) {
+        this.id = id;
     }
 
     @Override
