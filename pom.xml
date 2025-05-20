@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore-parent</artifactId>
-    <version>53</version>
+    <version>57-SNAPSHOT</version>
   </parent>
   <artifactId>mycore</artifactId>
   <version>2023.06.3-SNAPSHOT</version>
@@ -69,7 +69,10 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <manifest.priority>99</manifest.priority>
     <maven.compiler.arg>-Werror</maven.compiler.arg>
     <maven.compiler.target>${java.target.version}</maven.compiler.target>
+    <maven-pmd-plugin.version>3.21.2</maven-pmd-plugin.version>
+    <node.version>v16.19.1</node.version>
     <pmd.failOnViolation>true</pmd.failOnViolation>
+    <pmd.version>6.55.0</pmd.version>
     <site.suffix />
     <swagger.version>2.2.16</swagger.version>
     <uniqueVersion>false</uniqueVersion>
@@ -336,8 +339,9 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <snapshots>
         <enabled>true</enabled>
       </snapshots>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <id>central-portal-snapshots</id>
+      <name>Central Portal Snapshots</name>
+      <url>https://central.sonatype.com/repository/maven-snapshots/</url>
     </repository>
     <repository>
       <snapshots>
