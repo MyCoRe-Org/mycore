@@ -33,6 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * Methods for transforming {@link MCRAccessKey} between JSON.
  */
+@Deprecated
 public class MCRAccessKeyTransformer {
 
     /**

@@ -35,6 +35,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyCollisionException;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 
+@Deprecated
 public class MCRAccessKeyManagerTest extends MCRJPATestCase {
 
     private static final String OBJECT_ID = "mcr_test_00000001";
