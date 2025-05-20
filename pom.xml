@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore-parent</artifactId>
-    <version>56</version>
+    <version>57-SNAPSHOT</version>
   </parent>
   <artifactId>mycore</artifactId>
   <version>2024.06.1-SNAPSHOT</version>
@@ -169,8 +169,9 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <snapshots>
         <enabled>true</enabled>
       </snapshots>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <id>central-portal-snapshots</id>
+      <name>Central Portal Snapshots</name>
+      <url>https://central.sonatype.com/repository/maven-snapshots/</url>
     </repository>
     <repository>
       <snapshots>
