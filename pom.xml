@@ -67,9 +67,9 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <log4j.version>2.19.0</log4j.version>
     <!-- lowest is 99, highest is 0 -->
     <manifest.priority>99</manifest.priority>
+    <maven-pmd-plugin.version>3.21.2</maven-pmd-plugin.version>
     <maven.compiler.arg>-Werror</maven.compiler.arg>
     <maven.compiler.target>${java.target.version}</maven.compiler.target>
-    <maven-pmd-plugin.version>3.21.2</maven-pmd-plugin.version>
     <node.version>v16.19.1</node.version>
     <pmd.failOnViolation>true</pmd.failOnViolation>
     <pmd.version>6.55.0</pmd.version>
