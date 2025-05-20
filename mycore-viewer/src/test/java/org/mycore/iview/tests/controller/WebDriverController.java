@@ -21,6 +21,7 @@ package org.mycore.iview.tests.controller;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -56,7 +57,7 @@ public class WebDriverController {
 
     /**
      * clicks the first element specified by <b>xPath</b>
-     * 
+     *
      * @param xpath
      */
     public void clickElementByXpath(String xpath) {
@@ -72,7 +73,7 @@ public class WebDriverController {
 
     /**
      * clicks on the first element specified by the <b>xPath</b> and drags it <b>offestX</b> pixels horizontal and <b>offsetY</b> pixels vertical
-     * 
+     *
      * @param xPath
      * @param offsetX
      * @param offsetY
@@ -91,11 +92,11 @@ public class WebDriverController {
 
     /**
      * compares the Elements <b>attribute</b>-value to the <b>assertion</b>
-     * 
+     *
      * @param attribute
      * @param assertion
      * @param xPath
-     * 
+     *
      * @return true if the <b>attribute</b> has <b>assertion</b> as value
      */
     public boolean assertAttributeByXpath(String xPath, String attribute, boolean assertion) {
@@ -104,11 +105,11 @@ public class WebDriverController {
 
     /**
      * compares the Elements <b>attribute</b>-value to the <b>assertion</b>
-     * 
+     *
      * @param attribute
      * @param assertion
      * @param xPath
-     * 
+     *
      * @return true if the <b>attribute</b> has <b>assertion</b> as value
      */
     public boolean assertAttributeByXpath(String xPath, String attribute, String assertion) {
@@ -118,8 +119,10 @@ public class WebDriverController {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Found ''{}'' with selector :''{}''", webElement.toString(), selector.toString());
             }
-            if (webElement.getAttribute(attribute) != null) {
-                return webElement.getAttribute(attribute).contains(assertion);
+            Optional<String> attValue = Optional.ofNullable(webElement.getDomProperty(attribute))
+                .or(() -> Optional.ofNullable(webElement.getDomAttribute(attribute)));
+            if (attValue.isPresent()) {
+                return attValue.get().contains(assertion);
             }
         }
         LOGGER.error("Element {} or Attribute '{}' not fot found!", xPath, attribute);
@@ -128,7 +131,7 @@ public class WebDriverController {
 
     /**
      * checks if there is any Element in the dom got with the <b>attribute</b> that contains the <b>value</b>
-     * 
+     *
      * @param attribute
      * @param value
      * @return true if an element is found

@@ -406,7 +406,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     public void moveCategory(MCRCategoryID id, MCRCategoryID newParentID, int index) {
         withoutFlush(MCREntityManagerProvider.getCurrentEntityManager(), true, e -> {
             MCRCategoryImpl subTree = getByNaturalID(MCREntityManagerProvider.getCurrentEntityManager(), id);
-            MCRCategoryImpl oldParent = (MCRCategoryImpl) subTree.getParent();
+            MCRCategoryImpl oldParent = subTree.getParent();
             MCRCategoryImpl newParent = getByNaturalID(MCREntityManagerProvider.getCurrentEntityManager(), newParentID);
             MCRCategoryImpl commonAncestor = getCommonAncestor(MCREntityManagerProvider.getCurrentEntityManager(),
                 oldParent, newParent);
@@ -520,7 +520,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     private static void remove(MCRCategoryImpl category) {
         if (category.hasChildren()) {
             int parentPos = category.getPositionInParent();
-            MCRCategoryImpl parent = (MCRCategoryImpl) category.getParent();
+            MCRCategoryImpl parent = category.getParent();
             List<MCRCategoryImpl> copy = new ArrayList(category.children);
             copy.forEach(MCRCategoryImpl::detachFromParent);
             parent.children.addAll(parentPos, copy);
