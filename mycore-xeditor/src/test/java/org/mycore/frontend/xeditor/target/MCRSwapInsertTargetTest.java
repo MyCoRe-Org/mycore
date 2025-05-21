@@ -48,9 +48,9 @@ public class MCRSwapInsertTargetTest extends MCRTestCase {
         repeat.bindRepeatPosition();
         repeat.bindRepeatPosition();
         assertEquals("/parent|1|build|name[contains(text(), \"a\")]",
-            MCRSwapTarget.getSwapParameter(repeat, MCRSwapTarget.MOVE_UP));
+            MCRSwapTarget.getSwapParameter(repeat, MCRSwapTarget.TOKEN_UP));
         assertEquals("/parent|2|build|name[contains(text(), \"a\")]",
-            MCRSwapTarget.getSwapParameter(repeat, MCRSwapTarget.MOVE_DOWN));
+            MCRSwapTarget.getSwapParameter(repeat, MCRSwapTarget.TOKEN_DOWN));
     }
 
     @Test
@@ -70,7 +70,7 @@ public class MCRSwapInsertTargetTest extends MCRTestCase {
         assertEquals("b", ((Element) (repeat.getBoundNodes().get(1))).getText());
 
         repeat.bindRepeatPosition();
-        String swapParam = MCRSwapTarget.getSwapParameter(repeat, MCRSwapTarget.MOVE_DOWN);
+        String swapParam = MCRSwapTarget.getSwapParameter(repeat, MCRSwapTarget.TOKEN_DOWN);
         new MCRSwapTarget().handle(swapParam, root);
 
         assertEquals("b", doc.getRootElement().getChildren().get(0).getText());
