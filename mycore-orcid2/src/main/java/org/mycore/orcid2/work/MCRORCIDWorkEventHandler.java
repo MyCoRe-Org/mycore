@@ -148,13 +148,14 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
         final Map<String, MCRORCIDUser> toPublish = new HashMap<>(userOrcidPairFromFlag);
         toPublish.putAll(userOrcidPairFromObject);
         toPublish.keySet().removeAll(toDelete.keySet());
+        final T work = transformObject(new MCRJDOMContent(filteredObject.createXML()));
+        toPublish.keySet().removeAll(listRelatedOrcidIdentifiers(work));
         if (toDelete.isEmpty() && toPublish.isEmpty()) {
             LOGGER.info("Nothing to delete or publish. Skipping {}...", objectID);
             tryCollectAndSaveExternalPutCodes(filteredObject);
             return;
         }
         try {
-            final T work = transformObject(new MCRJDOMContent(filteredObject.createXML()));
             final Set<MCRIdentifier> identifiers = listTrustedIdentifiers(work);
             if (!toDelete.isEmpty()) {
                 deleteWorks(toDelete, identifiers, flagContent);
@@ -376,7 +377,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     /**
      * Lists trusted identifiers as Set of MCRIdentifier.
-     * 
+     *
      * @param work the Work
      * @return Set of MCRIdentifier
      */
@@ -384,7 +385,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     /**
      * Lists matching ORCID iDs based on search via MCRIdentifier
-     * 
+     *
      * @param identifiers the MCRIdentifiers
      * @return Set of ORCID iDs as String
      * @throws MCRORCIDException if request fails
@@ -393,7 +394,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     /**
      * Removes Work in ORCID profile and updates MCRORCIDPutCodeInfo.
-     * 
+     *
      * @param workInfo the MCRORCIDPutCodeInfo
      * @param orcid the ORCID iD
      * @param credential the MCRORCIDCredential
@@ -405,7 +406,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     /**
      * Updates Work in ORCID profile.
-     * 
+     *
      * @param putCode the put code
      * @param work the Work
      * @param orcid the ORCID iD
@@ -418,7 +419,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     /**
      * Creates Work in ORCID profile and updates MCRORCIDPutCodeInfo.
-     * 
+     *
      * @param work the Work
      * @param workInfo the MCRORCIDPutCodeInfo
      * @param orcid the ORCID iD
@@ -431,7 +432,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     /**
      * Updates work info based on MCRIdentifier.
-     * 
+     *
      * @param identifiers the MCRIdentifier
      * @param workInfo the MCRORCIDPutCodeInfo
      * @param orcid the ORCID iD
@@ -443,7 +444,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     /**
      * Updates work info based on MCRIdentifier.
-     * 
+     *
      * @param identifiers the MCRIdentifier
      * @param workInfo the MCRORCIDPutCodeInfo
      * @param orcid the ORCID iD
@@ -453,10 +454,18 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
 
     /**
      * Transforms MCRObject as MCRJDOMContent to Work.
-     * 
+     *
      * @param object the MCRObject
      * @return the Work
      */
     @SuppressWarnings("TypeParameterUnusedInFormals")
     abstract protected <T> T transformObject(MCRJDOMContent object);
+
+    /**
+     * Returns all ORCID iDs of related persons for work.
+     *
+     * @param work the work
+     * @return list over ORCID iD elements
+     */
+    abstract protected List<String> listRelatedOrcidIdentifiers(T work);
 }
