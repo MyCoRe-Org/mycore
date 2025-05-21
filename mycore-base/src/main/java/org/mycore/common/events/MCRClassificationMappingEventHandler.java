@@ -303,6 +303,7 @@ public class MCRClassificationMappingEventHandler extends MCREventHandlerBase {
             if (placeholderText != null) {
                 if (!matcher.group(2).isEmpty()) { // if there are values to substitute
                     String[] placeholderValues = matcher.group(2).split(",");
+                    @SuppressWarnings("PMD.UseConcurrentHashMap")
                     Map<String, String> placeholderValuesMap = new HashMap<>();
                     for (int i = 0; i < placeholderValues.length; i++) {
                         placeholderValuesMap.put(String.valueOf(i), placeholderValues[i]);

@@ -411,6 +411,7 @@ public class MCRUtils {
         try (TarArchiveInputStream tain = new TarArchiveInputStream(Files.newInputStream(source))) {
             TarArchiveEntry tarEntry;
             FileSystem targetFS = expandToDirectory.getFileSystem();
+            @SuppressWarnings("PMD.UseConcurrentHashMap")
             Map<Path, FileTime> directoryTimes = new HashMap<>();
             while ((tarEntry = tain.getNextEntry()) != null) {
                 Path target = MCRPathUtils.getPath(targetFS, tarEntry.getName());

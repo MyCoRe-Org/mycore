@@ -19,6 +19,7 @@
 package org.mycore.mods;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -232,7 +233,7 @@ class PagesPattern {
     private final Pattern pattern;
 
     /** Mapping from MODS Element name to group number in the pattern */
-    private final Map<String, Integer> mods2group = new LinkedHashMap<>();
+    private final Map<String, Integer> mods2group = Collections.synchronizedMap(new LinkedHashMap<>());
 
     PagesPattern(String regularExpression) {
         pattern = Pattern.compile(regularExpression);

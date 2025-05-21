@@ -23,6 +23,7 @@ import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -135,6 +136,7 @@ public class MCRBasicFileAttributeViewProperties<V extends BasicFileAttributeVie
      * @throws IOException if an I/O error occurs.
      */
     protected Map<String, Object> buildMap(Set<String> requested) throws IOException {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, Object> map = new HashMap<>();
         BasicFileAttributes attrs = view.readAttributes();
         for (String attributeName : requested) {
@@ -153,7 +155,7 @@ public class MCRBasicFileAttributeViewProperties<V extends BasicFileAttributeVie
                 }
             }
         }
-        return map;
+        return Collections.unmodifiableMap(map);
     }
 
     /**

@@ -18,7 +18,6 @@
 
 package org.mycore.orcid2.client;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -71,10 +70,10 @@ public class MCRORCIDReadClientImpl extends MCRORCIDBaseClient implements MCRORC
         if (offset < 0 || limit < 0) {
             throw new IllegalArgumentException("Offset or limit must be positive.");
         }
-        final Map<String, Object> queryMap = new HashMap<>();
-        queryMap.put("q", query);
-        queryMap.put("start", offset);
-        queryMap.put("rows", limit);
+        final Map<String, Object> queryMap = Map.ofEntries(
+            Map.entry("q", query),
+            Map.entry("start", offset),
+            Map.entry("rows", limit));
         final Response response = fetch(path + "/", queryMap);
         if (!Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.SUCCESSFUL)) {
             handleError(response);

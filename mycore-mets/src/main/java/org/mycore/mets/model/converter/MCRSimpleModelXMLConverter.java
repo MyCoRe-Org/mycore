@@ -64,10 +64,14 @@ public class MCRSimpleModelXMLConverter {
     public static Document toXML(MCRMetsSimpleModel msm) {
         Mets mets = new Mets();
 
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<MCRMetsPage, String> pageIdMap = new HashMap<>();
+        
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String> idToNewIDMap = new HashMap<>();
         buildPhysicalPages(msm, mets, pageIdMap, idToNewIDMap);
 
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<MCRMetsSection, String> sectionIdMap = new HashMap<>();
         buildLogicalPages(msm, mets, sectionIdMap, idToNewIDMap);
 
