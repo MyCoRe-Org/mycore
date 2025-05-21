@@ -270,6 +270,7 @@ class MCRSassCompiler implements Closeable {
         connection.sendMessage(compilationId, ProtocolUtil.inboundMessage(canonicalizeResponse.build()));
     }
 
+    @SuppressWarnings("PMD.ExceptionAsFlowControl")
     private void handleFunctionCallRequest(int compilationId, FunctionCallRequest functionCallRequest)
         throws IOException {
         FunctionCallResponse.Builder response = FunctionCallResponse.newBuilder()
