@@ -22,6 +22,8 @@ import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 import static org.mycore.solr.MCRSolrUtils.USE_HTTP_1_1_PROPERTY;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -167,12 +169,32 @@ public class MCRSolrCore {
                 baseBuilder.useHttp1_1(true);
             });
 
-        return baseBuilder
+        HttpSolrClientBase client = baseBuilder
             .withConnectionTimeout(connectionTimeout, TimeUnit.MILLISECONDS)
             .withIdleTimeout(socketTimeout, TimeUnit.MILLISECONDS)
             .withRequestTimeout(socketTimeout, TimeUnit.MILLISECONDS)
             .withRequestWriter(new BinaryRequestWriter())
             .build();
+
+        // MCR-3445 use Java Reflection to increase the size of the RequestBuffer of the internal HTTP client.
+        // This is necessary to send word coordinates for alto files via MCRSolrFileIndexHandler.
+        if (client instanceof Http2SolrClient solrclient) {
+            try {
+                Method mGetHttpClient = solrclient.getClass().getDeclaredMethod("getHttpClient");
+                mGetHttpClient.setAccessible(true);
+
+                // https://github.com/jetty/jetty.project/blob/jetty-11.0.x/jetty-client/src/main/java/org/eclipse/jetty/client/HttpClient.java
+                Object jettyHttpClient = mGetHttpClient.invoke(solrclient);
+                
+                Method mSetRequestBufferSize = jettyHttpClient.getClass()
+                    .getDeclaredMethod("setRequestBufferSize", int.class);
+                mSetRequestBufferSize.invoke(jettyHttpClient, 511 * 1024);
+            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                LOGGER.error("Error increasing RequestBufferSize for Http2SolrClient", e);
+            }
+        }
+
+        return client;
     }
 
     private static boolean useJettyHttpClient() {
