@@ -563,12 +563,18 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
     public List<String> listIDs() {
         try (Stream<Path> streamBasePath = list(basePath)) {
             return streamBasePath.flatMap(projectPath -> {
-                final String project = projectPath.getFileName().toString();
-                return list(projectPath).flatMap(typePath -> {
-                    final String type = typePath.getFileName().toString();
-                    final String base = getStoryKey(project, type);
-                    return listIDsForBase(base).stream();
-                });
+            	if (isProjectDirSane(projectPath)) {
+                    final String project = projectPath.getFileName().toString();
+                    return list(projectPath).flatMap(typePath -> {
+                    	if (isTypeDirSane(typePath)) {
+	                        final String type = typePath.getFileName().toString();
+	                        final String base = getStoryKey(project, type);
+	                        return listIDsForBase(base).stream();
+                    	}
+                    	return Stream.empty();
+                    });
+            	}
+            	return Stream.empty();
             }).collect(Collectors.toList());
         }
     }
@@ -592,7 +598,43 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
                 .collect(Collectors.toSet());
         }
     }
-
+    
+    /**
+     * check if we can enter the project directory
+     * @param path
+     * @return true when usable project directory
+     */
+    private boolean isProjectDirSane(Path path) {
+    	return projectDirStatus(path) != ProjectDirState.UNUSABLE;
+    }
+    
+    /**
+     * check if we can enter the project-type directory
+     * @param path
+     * @return true when usable type directory (inside project)
+     */
+    private boolean isTypeDirSane(Path path) {
+    	//currently just the same simple check as project-dir...
+    	return isProjectDirSane(path);
+    }
+    
+    /**
+     * 
+     * @param path
+     * @return: CLEAN or UNUSABLE
+     */
+    //TODO: consider sanity checks like getObjectTypes() does. (performance penalty?)
+    private ProjectDirState projectDirStatus(Path path) {
+    	if (Files.isDirectory(path)) {
+       		LOGGER.warn(
+    			"File '{}' spotted in data-directory where only subdirectories are expected.",
+    			path.toAbsolutePath()
+    		);
+    		return ProjectDirState.UNUSABLE;
+    	}
+    	return ProjectDirState.CLEAN;
+    }
+    
     /**
      * Returns the entries of the given path. Throws a MCRException if an I/O-Exceptions occur.
      *
