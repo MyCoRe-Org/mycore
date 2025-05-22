@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.mycore.access.MCRAccessCacheHelper;
@@ -135,7 +134,7 @@ public class MCRAccessKeyUtils {
             } catch (MCRAccessKeyException e) {
                 //
             }
-            final List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(objectId, 0, TimeUnit.SECONDS);
+            final List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(objectId);
             for (final MCRObjectID derivateId : derivateIds) {
                 try {
                     addAccessKeySecretForObject(session, derivateId, value);
@@ -197,7 +196,7 @@ public class MCRAccessKeyUtils {
             } catch (MCRAccessKeyException e) {
                 //
             }
-            final List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(objectId, 0, TimeUnit.SECONDS);
+            final List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(objectId);
             for (final MCRObjectID derivateId : derivateIds) {
                 try {
                     addAccessKeySecretForObject(user, derivateId, value);

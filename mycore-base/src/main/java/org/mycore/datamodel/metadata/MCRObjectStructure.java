@@ -19,20 +19,17 @@
 package org.mycore.datamodel.metadata;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import org.mycore.common.MCRXlink;
 
 /**
  * This class implements code for the inheritance of metadata of linked objects
@@ -65,45 +62,22 @@ public class MCRObjectStructure {
     public static final String XML_NAME = "structure";
 
     public static final String ELEMENT_DERIVATE_OBJECTS = "derobjects";
+    public static final String PARENTS_ELEMENT_NAME = "parents";
+    public static final String PARENT_ELEMENT_NAME = "parent";
+    public static final String CHILDREN_ORDER_ELEMENT_NAME = "childrenOrder";
+    public static final String CHILD_ELEMENT_NAME = "child";
 
-    private MCRMetaLinkID parent;
+    private MCRMetaParentID parent;
 
-    private final List<MCRMetaLinkID> children;
-
-    private final List<MCRMetaEnrichedLinkID> derivates;
-
-    /**
-     * The constructor initializes NL (non-static, in order to enable different
-     * NL's for different objects) and the link vectors the elements of which
-     * are MCRMetaLink's.
-     */
-    public MCRObjectStructure() {
-        children = new ArrayList<>();
-        derivates = new ArrayList<>();
-    }
+    private List<MCRObjectID> childrenOrder = new ArrayList<>();
 
     /**
      * This method clean the data lists parent, children and derivates of this
      * class.
      */
-    public final void clear() {
+    public void clear() {
         parent = null;
-        children.clear();
-        derivates.clear();
-    }
-
-    /**
-     * This method clean the data lists children of this class.
-     */
-    public final void clearChildren() {
-        children.clear();
-    }
-
-    /**
-     * This method clean the data lists derivate of this class.
-     */
-    public final void clearDerivates() {
-        derivates.clear();
+        childrenOrder.clear();
     }
 
     /**
@@ -111,7 +85,7 @@ public class MCRObjectStructure {
      *
      * @return MCRMetaLinkID the corresponding link
      */
-    public final MCRMetaLinkID getParent() {
+    public final MCRMetaParentID getParent() {
         return parent;
     }
 
@@ -134,7 +108,7 @@ public class MCRObjectStructure {
      *            the MCRMetaLinkID to set
      *
      */
-    public final void setParent(MCRMetaLinkID parent) {
+    public final void setParent(MCRMetaParentID parent) {
         this.parent = parent;
     }
 
@@ -143,9 +117,7 @@ public class MCRObjectStructure {
     }
 
     public final void setParent(String parentID) {
-        parent = new MCRMetaLinkID();
-        parent.setSubTag("parent");
-        parent.setReference(parentID, null, null);
+        parent = new MCRMetaParentID(MCRObjectID.getInstance(parentID));
     }
 
     /**
@@ -155,152 +127,7 @@ public class MCRObjectStructure {
         parent = null;
     }
 
-    /**
-     * The method appends a child ID to the child link list if and only if it is
-     * not already contained in the list, preventing from doubly-linked objects.
-     * If the link could be added a "true" will be returned, otherwise "false".
-     *
-     * @param child
-     *            the MCRMetaLinkID of the child
-     * @return boolean true, if successfully done
-     */
-    public final boolean addChild(MCRMetaLinkID child) {
-        for (MCRMetaLinkID c : children) {
-            if (c.getXLinkHrefID().equals(child.getXLinkHrefID())) {
-                return false;
-            }
-        }
-        children.add(child);
 
-        return true;
-    }
-
-    /**
-     * removes a child link to another object.
-     *  If the link was found a "true" will be returned, otherwise
-     * "false".
-     *
-     * @param href
-     *            the MCRObjectID of the child
-     * @return boolean true, if successfully completed
-     */
-    public final boolean removeChild(MCRObjectID href) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Remove child ID {}", href);
-        }
-        return removeMetaLink(getChildren(), href);
-    }
-
-    /**
-     * Checks if the child is in the children vector.
-     *
-     * @param childId child to check
-     */
-    public final boolean containsChild(MCRObjectID childId) {
-        return getChildren().stream().map(MCRMetaLinkID::getXLinkHrefID).anyMatch(childId::equals);
-    }
-
-    /**
-     * removes a derivate link.
-     * If the link was found a "true" will be returned, otherwise
-     * "false".
-     *
-     * @param href
-     *            the MCRObjectID of the child
-     * @return boolean true, if successfully completed
-     */
-    public final boolean removeDerivate(MCRObjectID href) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Remove derivate ID {}", href);
-        }
-        return removeMetaLink(getDerivates(), href);
-    }
-
-    /**
-     * Removes a MCRMetaLinkID instance by it MCRObjectID.
-     */
-    private boolean removeMetaLink(List<? extends MCRMetaLinkID> list, MCRObjectID href) {
-        final List<MCRMetaLink> toRemove = list.stream()
-            .filter(ml -> ml.getXLinkHrefID().equals(href))
-            .collect(Collectors.toList());
-        return list.removeAll(toRemove);
-    }
-
-    /**
-     * Returns all children in this structure
-     * */
-    public final List<MCRMetaLinkID> getChildren() {
-        return children;
-    }
-
-    /**
-     * <em>addDerivate</em> methode append the given derivate link data to the
-     * derivate vector. If the link could be added a "true" will be returned,
-     * otherwise "false".
-     *
-     * @param derivate
-     *            the link to be added as MCRMetaLinkID
-     */
-    public final boolean addDerivate(MCRMetaEnrichedLinkID derivate) {
-        MCRObjectID href = derivate.getXLinkHrefID();
-        if (containsDerivate(href)) {
-            return false;
-        }
-        if (!MCRMetadataManager.exists(href)) {
-            LOGGER.warn("Cannot find derivate {}, will add it anyway.", href);
-        }
-        derivates.add(derivate);
-        derivates.sort(Comparator.comparingInt(MCRMetaEnrichedLinkID::getOrder));
-        return true;
-    }
-
-    /**
-     * Adds or updates the derivate link. Returns true if the derivate is added
-     * or updated. Returns false when nothing is done.
-     *
-     * @param derivateLink the link to add or update
-     * @return true when the structure is changed
-     */
-    public final boolean addOrUpdateDerivate(MCRMetaEnrichedLinkID derivateLink) {
-        if (derivateLink == null) {
-            return false;
-        }
-        MCRObjectID derivateId = derivateLink.getXLinkHrefID();
-        MCRMetaLinkID oldLink = getDerivateLink(derivateId);
-        if (derivateLink.equals(oldLink)) {
-            return false;
-        }
-        if (oldLink != null) {
-            removeDerivate(oldLink.getXLinkHrefID());
-        }
-        return addDerivate(derivateLink);
-    }
-
-    /**
-     * Checks if the derivate is in the derivate vector.
-     *
-     * @param derivateId derivate to check
-     */
-    public final boolean containsDerivate(MCRObjectID derivateId) {
-        return getDerivateLink(derivateId) != null;
-    }
-
-    /**
-     * Returns the derivate link by id or null.
-     */
-    public final MCRMetaEnrichedLinkID getDerivateLink(MCRObjectID derivateId) {
-        return getDerivates().stream()
-            .filter(derivate -> derivate.getXLinkHrefID().equals(derivateId))
-            .findAny()
-            .orElse(null);
-    }
-
-    /**
-     * @return a list with all related derivate ids encapsulated within a {@link MCRMetaLinkID}
-     * */
-    public List<MCRMetaEnrichedLinkID> getDerivates() {
-        return this.derivates;
-    }
 
     /**
      * While the preceding methods dealt with the structure's copy in memory
@@ -308,39 +135,26 @@ public class MCRObjectStructure {
      * too. Thereby <em>setFromDOM</em> will read the structure data from an
      * XML input stream (the "structure" entry).
      *
-     * @param element
-     *            the structure node list
+     * @param element the structure node list
      */
-    public final void setFromDOM(Element element) {
+    public void setFromDOM(Element element) {
         clear();
-        Element subElement = element.getChild("children");
-
-        if (subElement != null) {
-            List<Element> childList = subElement.getChildren();
-
-            for (Element linkElement : childList) {
-                MCRMetaLinkID link = new MCRMetaLinkID();
-                link.setFromDOM(linkElement);
-                children.add(link);
-            }
-        }
 
         // Stricture parent part
-        subElement = element.getChild("parents");
+        Element subElement = element.getChild(PARENTS_ELEMENT_NAME);
 
         if (subElement != null) {
-            parent = new MCRMetaLinkID();
-            parent.setFromDOM(subElement.getChild("parent"));
+            parent = new MCRMetaParentID();
+            parent.setFromDOM(subElement.getChild(PARENT_ELEMENT_NAME));
         }
 
-        // Structure derivate part
-        subElement = element.getChild(ELEMENT_DERIVATE_OBJECTS);
-
-        if (subElement != null) {
-            List<Element> derobjectList = subElement.getChildren();
-
-            for (Element derElement : derobjectList) {
-                addDerivate(MCRMetaEnrichedLinkIDFactory.obtainInstance().fromDom(derElement));
+        Element childrenOrderElement = element.getChild(CHILDREN_ORDER_ELEMENT_NAME);
+        if (childrenOrderElement != null) {
+            for (Element child : childrenOrderElement.getChildren(CHILD_ELEMENT_NAME)) {
+                String childID = child.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
+                if (childID != null) {
+                    childrenOrder.add(MCRObjectID.getInstance(childID));
+                }
             }
         }
     }
@@ -353,7 +167,7 @@ public class MCRObjectStructure {
      *                if the content of this class is not valid
      * @return the structure XML
      */
-    public final Element createXML() throws MCRException {
+    public Element createXML() throws MCRException {
         try {
             validate();
         } catch (MCRException exc) {
@@ -363,28 +177,21 @@ public class MCRObjectStructure {
         Element elm = new Element(XML_NAME);
 
         if (parent != null) {
-            Element elmm = new Element("parents");
+            Element elmm = new Element(PARENTS_ELEMENT_NAME);
             elmm.setAttribute("class", "MCRMetaLinkID");
             elmm.addContent(parent.createXML());
             elm.addContent(elmm);
         }
 
-        if (!children.isEmpty()) {
-            Element elmm = new Element("children");
-            elmm.setAttribute("class", "MCRMetaLinkID");
-            for (MCRMetaLinkID child : getChildren()) {
-                elmm.addContent(child.createXML());
+        if (!childrenOrder.isEmpty()) {
+            Element childrenOrderElement = new Element(CHILDREN_ORDER_ELEMENT_NAME);
+            for (MCRObjectID child : childrenOrder) {
+                Element childElement = new Element(CHILD_ELEMENT_NAME);
+                childElement.setAttribute("href", child.toString(), MCRConstants.XLINK_NAMESPACE);
+                childElement.setAttribute("type", "locator", MCRConstants.XLINK_NAMESPACE);
+                childrenOrderElement.addContent(childElement);
             }
-            elm.addContent(elmm);
-        }
-
-        if (!derivates.isEmpty()) {
-            Element elmm = new Element(ELEMENT_DERIVATE_OBJECTS);
-            elmm.setAttribute("class", "MCRMetaEnrichedLinkID");
-            for (MCRMetaLinkID derivate : getDerivates()) {
-                elmm.addContent(derivate.createXML());
-            }
-            elm.addContent(elmm);
+            elm.addContent(childrenOrderElement);
         }
 
         return elm;
@@ -395,15 +202,7 @@ public class MCRObjectStructure {
      *
      * <pre>
      *   {
-     *     parent: {@link MCRMetaLinkID#createJSON()},
-     *     children: [
-     *      {@link MCRMetaLinkID#createJSON()}
-     *      ...
-     *     ],
-     *     derivates: [
-     *       {@link MCRMetaLinkID#createJSON()}
-     *        ...
-     *     ]
+     *     parent: {@link MCRMetaLinkID#createJSON()}
      *   }
      * </pre>
      *
@@ -412,31 +211,17 @@ public class MCRObjectStructure {
     public JsonObject createJSON() {
         JsonObject structure = new JsonObject();
         // parent
-        Optional.ofNullable(getParent()).ifPresent(link -> structure.add("parent", link.createJSON()));
-        // children
-        JsonArray children = new JsonArray();
-        getChildren().forEach(child -> children.add(child.createJSON()));
-        structure.add("children", children);
-        // derivates
-        JsonArray derivates = new JsonArray();
-        getDerivates().forEach(derivate -> derivates.add(derivate.createJSON()));
-        structure.add("derivates", derivates);
+        Optional.ofNullable(getParent()).ifPresent(link -> structure.add(PARENT_ELEMENT_NAME, link.createJSON()));
         return structure;
     }
 
     /**
      * The method print all informations about this MCRObjectStructure.
      */
-    public final void debug() {
+    public void debug() {
         if (LOGGER.isDebugEnabled()) {
-            for (MCRMetaLinkID linkID : derivates) {
-                linkID.debug();
-            }
             if (parent != null) {
                 parent.debug();
-            }
-            for (MCRMetaLinkID linkID : children) {
-                linkID.debug();
             }
         }
     }
@@ -461,21 +246,11 @@ public class MCRObjectStructure {
      * Validates this MCRObjectStructure. This method throws an exception if:
      *  <ul>
      *  <li>the parent is not null but invalid</li>
-     *  <li>one of the children is invalid</li>
-     *  <li>one of the derivates is invalid</li>
      *  </ul>
      *
      * @throws MCRException the MCRObjectStructure is invalid
      */
     public void validate() throws MCRException {
-        for (MCRMetaLinkID child : getChildren()) {
-            try {
-                child.validate();
-            } catch (Exception exc) {
-                throw new MCRException("The link to the children '" + child.getXLinkHref() + "' is invalid.", exc);
-            }
-        }
-
         if (parent != null) {
             try {
                 parent.validate();
@@ -483,29 +258,30 @@ public class MCRObjectStructure {
                 throw new MCRException("The link to the parent '" + parent.getXLinkHref() + "' is invalid.", exc);
             }
         }
+    }
 
-        for (MCRMetaLinkID derivate : getDerivates()) {
-            try {
-                derivate.validate();
-            } catch (Exception exc) {
-                throw new MCRException("The link to the derivate '" + derivate.getXLinkHref() + "' is invalid.", exc);
-            }
-            if (!derivate.getXLinkType().equals(MCRXlink.TYPE_LOCATOR)) {
-                throw new MCRException("The xlink:type of the derivate link '" + derivate.getXLinkHref()
-                    + "' has to be 'locator' and not '" + derivate.getXLinkType() + "'.");
-            }
+    /**
+     * Returns the list of children order. This list is used to store the order of the children. The list can contain
+     * ObjectIDs which are not children anymore or can miss children which are not in the list. This is because the
+     * children order is not updated when the children are changed. The list is used to store the order which was
+     * set by the user.
+     * @return the list of children order
+     */
+    public List<MCRObjectID> getChildrenOrder() {
+        return childrenOrder;
+    }
 
-            String typeId = derivate.getXLinkHrefID().getTypeId();
-            if (!typeId.equals(MCRDerivate.OBJECT_TYPE)) {
-                throw new MCRException("The derivate link '" + derivate.getXLinkHref()
-                    + "' is invalid. The _type_ has to be 'derivate' and not '" + typeId + "'.");
-            }
-        }
+    /**
+     * Sets the list of children order. This list is used to store the order of the children.
+     * @param childrenOrder the list of children order
+     */
+    public void setChildrenOrder(List<MCRObjectID> childrenOrder) {
+        this.childrenOrder = childrenOrder;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(children, derivates, parent);
+        return Objects.hash(childrenOrder, parent);
     }
 
     @Override
@@ -520,9 +296,7 @@ public class MCRObjectStructure {
             return false;
         }
         final MCRObjectStructure other = (MCRObjectStructure) obj;
-        return Objects.equals(children, other.children)
-            && Objects.equals(derivates, other.derivates)
-            && Objects.equals(parent, other.parent);
+        return Objects.equals(childrenOrder, other.childrenOrder)
+                && Objects.equals(parent, other.parent);
     }
-
 }

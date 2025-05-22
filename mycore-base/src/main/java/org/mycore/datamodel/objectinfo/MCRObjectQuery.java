@@ -67,6 +67,8 @@ public class MCRObjectQuery {
 
     private String deletedBy;
 
+    private MCRObjectID parentId;
+
     private final List<String> includeCategories = new ArrayList<>();
 
     /**
@@ -390,6 +392,21 @@ public class MCRObjectQuery {
      */
     public List<String> getIncludeCategories() {
         return includeCategories;
+    }
+
+    /**
+     * @return the filter for the parent id
+     */
+    public MCRObjectID getParentId() {
+        return parentId;
+    }
+
+    /**
+     * modifies this query to restrict the parent id of the parent object
+     * @param parentId the parent id
+     */
+    public void setParentId(MCRObjectID parentId) {
+        this.parentId = parentId;
     }
 
     public enum SortBy {

@@ -178,3 +178,4 @@ bower_components/
 typings/
 .tscache/
 package-lock.json
+.aider*
