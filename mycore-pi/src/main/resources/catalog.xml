@@ -104,6 +104,52 @@
   <system systemId="http://schema.datacite.org/meta/kernel-4.3/include/datacite-funderIdentifierType-v4.xsd"
           uri="xsd/datacite/v4.3/datacite-funderIdentifierType-v4.3.xsd" />
 
+  <!-- Datacite 4.4 -->
+  <system systemId="http://schema.datacite.org/meta/kernel-4.4/metadata.xsd" uri="xsd/datacite/v4.4/metadata.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.4/include/datacite-titleType-v4.xsd"
+          uri="xsd/datacite/v4.4/datacite-titleType-v4.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.4/include/datacite-contributorType-v4.xsd"
+          uri="xsd/datacite/v4.4/datacite-contributorType-v4.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.4/include/datacite-dateType-v4.xsd"
+          uri="xsd/datacite/v4.4/datacite-dataType-v4.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.4/include/datacite-resourceType-v4.xsd"
+          uri="xsd/datacite/v4.4/datacite-resourceType-v4.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.4/include/datacite-relationType-v4.xsd"
+          uri="xsd/datacite/v4.4/datacite-relationType-v4.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.4/include/datacite-relatedIdentifierType-v4.xsd"
+          uri="xsd/datacite/v4.4/datacite-relatedIdentifierType-v4.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.4/include/datacite-funderIdentifierType-v4.xsd"
+          uri="xsd/datacite/v4.4/datacite-funderIdentifierType-v4.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.4/include/datacite-descriptionType-v4.xsd"
+          uri="xsd/datacite/v4.4/datacite-descriptionType-v4.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.4/include/datacite-nameType-v4.xsd"
+          uri="xsd/datacite/v4.4/datacite-nameType-v4.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.4/include/datacite-numberType-v4.xsd"
+          uri="xsd/datacite/v4.4/datacite-numberType-v4.xsd" />
+
+  <!-- Datacite 4.5 -->
+  <system systemId="http://schema.datacite.org/meta/kernel-4.5/metadata.xsd" uri="xsd/datacite/v4.5/metadata.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.5/include/datacite-titleType-v4.xsd"
+          uri="xsd/datacite/v4.5/datacite-titleType-v4.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.5/include/datacite-contributorType-v4.xsd"
+          uri="xsd/datacite/v4.5/datacite-contributorType-v4.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.5/include/datacite-dateType-v4.xsd"
+          uri="xsd/datacite/v4.5/datacite-dataType-v4.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.5/include/datacite-resourceType-v4.xsd"
+          uri="xsd/datacite/v4.5/datacite-resourceType-v4.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.5/include/datacite-relationType-v4.xsd"
+          uri="xsd/datacite/v4.5/datacite-relationType-v4.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.5/include/datacite-relatedIdentifierType-v4.xsd"
+          uri="xsd/datacite/v4.5/datacite-relatedIdentifierType-v4.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.5/include/datacite-funderIdentifierType-v4.xsd"
+          uri="xsd/datacite/v4.5/datacite-funderIdentifierType-v4.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.5/include/datacite-descriptionType-v4.xsd"
+          uri="xsd/datacite/v4.5/datacite-descriptionType-v4.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.5/include/datacite-nameType-v4.xsd"
+          uri="xsd/datacite/v4.5/datacite-nameType-v4.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.5/include/datacite-numberType-v4.xsd"
+          uri="xsd/datacite/v4.5/datacite-numberType-v4.xsd" />
+
   <!-- Crossref 4.4.1 -->
   <system systemId="http://data.crossref.org/schemas/crossref4.4.1.xsd" uri="xsd/crossref/4.4.1/crossref4.4.1.xsd" />
   <system systemId="http://data.crossref.org/schemas/common4.4.1.xsd" uri="xsd/crossref/4.4.1/common4.4.1.xsd" />
