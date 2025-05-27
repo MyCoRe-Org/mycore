@@ -27,7 +27,7 @@
     <version>57-SNAPSHOT</version>
   </parent>
   <artifactId>mycore</artifactId>
-  <version>2025.02-SNAPSHOT</version>
+  <version>2025.06.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>MyCoRe</name>
   <description xml:space="preserve">
