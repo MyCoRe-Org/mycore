@@ -42,7 +42,7 @@ import com.google.gson.JsonObject;
  * @author Mathias Hegner
  * @author Thomas Scheffler (yagee)
  */
-public final class MCRObject extends MCRBase {
+public class MCRObject extends MCRBase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -74,10 +74,15 @@ public final class MCRObject extends MCRBase {
      *                general Exception of MyCoRe
      */
     public MCRObject() throws MCRException {
-        super();
-        structure = new MCRObjectStructure();
-        metadata = new MCRObjectMetadata();
-        mcrLabel = "";
+        this(new MCRObjectStructure(), new MCRObjectMetadata(), new MCRObjectService(), "");
+    }
+
+    protected MCRObject(MCRObjectStructure structure, MCRObjectMetadata metadata, MCRObjectService service,
+        String label) {
+        super(service);
+        this.structure = structure;
+        this.metadata = metadata;
+        mcrLabel = label;
     }
 
     public MCRObject(byte[] bytes, boolean valid) throws JDOMException {

@@ -19,8 +19,8 @@
 package org.mycore.sword.application;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
+
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.sword.MCRSwordContainerHandler;
@@ -78,8 +78,7 @@ public abstract class MCRSwordCollectionProvider implements MCRSwordLifecycle {
     public abstract MCRSwordAuthHandler getAuthHandler();
 
     public Stream<String> getDerivateIDsofObject(final String mcrObjectId) {
-        final List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(MCRObjectID.getInstance(mcrObjectId),
-            10, TimeUnit.SECONDS);
+        final List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(MCRObjectID.getInstance(mcrObjectId));
         return derivateIds.stream().map(MCRObjectID::toString);
     }
 

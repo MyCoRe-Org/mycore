@@ -30,7 +30,6 @@ import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -70,7 +69,7 @@ public class MCRDerivateURNUtils {
             // the base urn, links to frontpage (metadata + viewer)
             if (piInfo.getAdditional() == null || piInfo.getAdditional().isBlank()) {
                 MCRObjectID derID = MCRObjectID.getInstance(derivateID);
-                final MCRObjectID objectId = MCRMetadataManager.getObjectId(derID, 0, TimeUnit.SECONDS);
+                final MCRObjectID objectId = MCRMetadataManager.getObjectId(derID);
                 if (objectId == null) {
                     LOGGER.warn("Object for {} could NOT be found", derivateID);
                     return null;

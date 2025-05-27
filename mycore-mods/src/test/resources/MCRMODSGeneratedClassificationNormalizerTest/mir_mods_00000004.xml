@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mycoreobject xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="datamodel-mods.xsd" ID="test_mods_00000004" version="2024.06.1-SNAPSHOT" label="mir_mods_00000004">
+  <structure />
+  <metadata>
+    <def.modsContainer class="MCRMetaXML" heritable="false" notinherit="true">
+      <modsContainer inherited="0">
+        <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+          <mods:typeOfResource>text</mods:typeOfResource>
+          <mods:genre type="intern" authorityURI="http://www.mycore.org/classifications/mir_genres" valueURI="http://www.mycore.org/classifications/mir_genres#article" />
+          <mods:classification generator="mir_genres2marcgt-mycore" authority="marcgt">article</mods:classification>
+          <mods:classification generator="mir_genres2diniPublType-mycore" authorityURI="http://www.mycore.org/classifications/diniPublType" valueURI="http://www.mycore.org/classifications/diniPublType#article" />
+          <mods:classification generator="mir_genres2diniPublType2022-mycore" authorityURI="http://www.mycore.org/classifications/diniPublType2022" valueURI="http://www.mycore.org/classifications/diniPublType2022#Article" />
+          <mods:classification generator="mir_genres2schemaOrg-mycore" authorityURI="http://schema.org/" valueURI="http://schema.org/ScholarlyArticle" />
+          <mods:titleInfo xml:lang="de" xlink:type="simple">
+            <mods:title>Artikel 1</mods:title>
+          </mods:titleInfo>
+          <mods:language>
+            <mods:languageTerm authority="rfc5646" type="code">de</mods:languageTerm>
+          </mods:language>
+          <mods:classification displayLabel="sdnb" authority="sdnb">320</mods:classification>
+          <mods:accessCondition type="use and reproduction" xlink:href="http://www.mycore.org/classifications/mir_licenses#rights_reserved" xlink:type="simple" />
+        </mods:mods>
+      </modsContainer>
+    </def.modsContainer>
+  </metadata>
+  <service>
+    <servdates class="MCRMetaISO8601Date">
+      <servdate type="createdate" inherited="0">2025-04-02T13:24:03.745Z</servdate>
+      <servdate type="modifydate" inherited="0">2025-04-02T13:26:23.992Z</servdate>
+    </servdates>
+    <servflags class="MCRMetaLangText">
+      <servflag type="createdby" inherited="0" form="plain">administrator</servflag>
+      <servflag type="modifiedby" inherited="0" form="plain">administrator</servflag>
+    </servflags>
+    <servstates class="MCRMetaClassification">
+      <servstate inherited="0" classid="state" categid="submitted" />
+    </servstates>
+  </service>
+</mycoreobject>

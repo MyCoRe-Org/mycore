@@ -62,7 +62,7 @@ public class MCRAccessCacheHelper {
     private static void collectDescendants(List<String> idsToClear, String parent) {
         // get derivates
         final MCRLinkTableManager ltManager = MCRLinkTableManager.getInstance();
-        idsToClear.addAll(ltManager.getDestinationOf(parent, MCRLinkTableManager.ENTRY_TYPE_DERIVATE));
+        idsToClear.addAll(ltManager.getSourceOf(parent, MCRLinkTableManager.ENTRY_TYPE_DERIVATE));
 
         // get children
         final Collection<String> children = ltManager.getSourceOf(parent, MCRLinkTableManager.ENTRY_TYPE_PARENT);
