@@ -48,8 +48,9 @@ public final class MCRHintsBuilder {
         return this;
     }
 
-    public <T> MCRHintsBuilder add(MCRHint<T> supplier) {
-        return add(supplier.key(), supplier.value());
+    public <T> MCRHintsBuilder add(MCRHint<T> hint) {
+        add(hint.key(), hint.value());
+        return this;
     }
 
     public MCRHints build() {
@@ -72,6 +73,12 @@ public final class MCRHintsBuilder {
         @SuppressWarnings("unchecked")
         public <T> Optional<T> get(MCRHintKey<T> hintKey) {
             return Optional.ofNullable((T) hints.get(hintKey));
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public <T> T getOrElse(MCRHintKey<T> hintKey, T fallback) {
+            return (T) hints.getOrDefault(hintKey, fallback);
         }
 
         @Override

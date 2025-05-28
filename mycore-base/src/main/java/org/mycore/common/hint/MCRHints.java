@@ -53,6 +53,11 @@ public interface MCRHints {
     <T> Optional<T> get(MCRHintKey<T> hintKey);
 
     /**
+     * Returns the value for the given {@link MCRHintKey} or the given fallback.
+     */
+    <T> T getOrElse(MCRHintKey<T> hintKey, T fallback);
+
+    /**
      * Returns a {@link MCRHintsBuilder} that contains all entries stored in this {@link MCRHints}.
      * Intended to allow creation of modified {@link MCRHints}.
      */

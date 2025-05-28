@@ -18,6 +18,8 @@
 
 package org.mycore.resource.filter;
 
+import static org.mycore.resource.common.MCRTraceLoggingHelper.update;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,7 +74,7 @@ public class MCRCombinedResourceFilter extends MCRResourceFilterBase {
     protected Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints) {
         Stream<URL> filteredResourceUrls = resourceUrls;
         for (MCRResourceFilter filter : filters) {
-            filteredResourceUrls = filter.filter(filteredResourceUrls, hints);
+            filteredResourceUrls = filter.filter(filteredResourceUrls, update(hints, filter, null));
         }
         return filteredResourceUrls;
     }

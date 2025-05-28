@@ -18,6 +18,8 @@
 
 package org.mycore.resource.provider;
 
+import static org.mycore.resource.common.MCRTraceLoggingHelper.update;
+
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
@@ -98,12 +100,10 @@ public class MCRLFSResourceProvider extends MCRResourceProviderBase {
 
     @Override
     protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints) {
-        return doProvide(filter.filter(locator.locate(path, hints), hints).toList(), hints);
-    }
-
-    private Optional<URL> doProvide(List<URL> resourceUrls, MCRHints hints) {
-        if (!resourceUrls.isEmpty()) {
-            return selector.select(resourceUrls, hints).stream().findFirst();
+        Stream<URL> locatedResourceUrls = locator.locate(path, update(hints, locator, null));
+        List<URL> filteredResourceUrls = filter.filter(locatedResourceUrls, update(hints, filter, null)).toList();
+        if (!filteredResourceUrls.isEmpty()) {
+            return selector.select(filteredResourceUrls, update(hints, selector, null)).stream().findFirst();
         } else {
             return Optional.empty();
         }
@@ -111,7 +111,9 @@ public class MCRLFSResourceProvider extends MCRResourceProviderBase {
 
     @Override
     protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints) {
-        return filter.filter(locator.locate(path, hints), hints).map(this::providedUrl).toList();
+        Stream<URL> locatedResourceUrls = locator.locate(path, update(hints, locator, null));
+        Stream<URL> filteredResourceUrls = filter.filter(locatedResourceUrls, update(hints, filter, null));
+        return filteredResourceUrls.map(this::providedUrl).toList();
     }
 
     @Override

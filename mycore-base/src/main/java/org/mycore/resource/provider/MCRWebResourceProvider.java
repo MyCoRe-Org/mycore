@@ -18,6 +18,8 @@
 
 package org.mycore.resource.provider;
 
+import static org.mycore.resource.common.MCRTraceLoggingHelper.update;
+
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
@@ -68,12 +70,14 @@ public class MCRWebResourceProvider extends MCRResourceProviderBase {
 
     @Override
     protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints) {
-        return path.isWebPath() ? provider.provide(path, hints) : Optional.empty();
+        return path.isWebPath() ? provider.provide(path, update(hints, provider, provider.coverage()))
+            : Optional.empty();
     }
 
     @Override
     protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints) {
-        return path.isWebPath() ? provider.provideAll(path, hints) : Collections.emptyList();
+        return path.isWebPath() ? provider.provideAll(path, update(hints, provider, provider.coverage()))
+            : Collections.emptyList();
     }
 
     @Override
