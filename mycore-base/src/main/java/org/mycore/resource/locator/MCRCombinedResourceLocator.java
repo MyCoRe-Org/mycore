@@ -18,6 +18,8 @@
 
 package org.mycore.resource.locator;
 
+import static org.mycore.resource.common.MCRTraceLoggingHelper.update;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -74,7 +76,7 @@ public class MCRCombinedResourceLocator extends MCRResourceLocatorBase {
     protected Stream<URL> doLocate(MCRResourcePath path, MCRHints hints) {
         Stream<URL> resourceUrls = Stream.empty();
         for (MCRResourceLocator locator : locators) {
-            resourceUrls = Stream.concat(locator.locate(path, hints), resourceUrls);
+            resourceUrls = Stream.concat(locator.locate(path, update(hints, locator, null)), resourceUrls);
         }
         return resourceUrls;
     }

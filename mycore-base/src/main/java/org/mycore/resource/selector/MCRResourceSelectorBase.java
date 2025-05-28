@@ -18,12 +18,12 @@
 
 package org.mycore.resource.selector;
 
+import static org.mycore.resource.common.MCRTraceLoggingHelper.trace;
+
 import java.net.URL;
 import java.util.List;
 
 import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 
@@ -34,25 +34,19 @@ import org.mycore.common.log.MCRTreeMessage;
  */
 public abstract class MCRResourceSelectorBase implements MCRResourceSelector {
 
-    protected final Logger logger = LogManager.getLogger(getClass());
-
     @Override
     public List<URL> select(List<URL> resourceUrls, MCRHints hints) {
-        logger.debug("Selecting resource URLs");
+        return trace(hints, doSelectOrRestore(resourceUrls, hints), (message, selectedResourceUrls) -> {
+            selectedResourceUrls.forEach(url -> message.add("Selecting resource URL " + url));
+        });
+    }
+
+    private List<URL> doSelectOrRestore(List<URL> resourceUrls, MCRHints hints) {
         List<URL> selectedResourceUrls = doSelect(resourceUrls, hints);
         if (selectedResourceUrls.isEmpty()) {
             selectedResourceUrls = resourceUrls;
         }
-        if (logger.isDebugEnabled()) {
-            logResourceUrls(selectedResourceUrls);
-        }
         return selectedResourceUrls;
-    }
-
-    private void logResourceUrls(List<URL> resourceUrls) {
-        for (URL resourceUrl : resourceUrls) {
-            logger.debug("Selected resource URL {}", resourceUrl);
-        }
     }
 
     /**

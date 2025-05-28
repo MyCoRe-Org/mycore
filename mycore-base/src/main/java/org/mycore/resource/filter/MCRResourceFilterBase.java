@@ -18,13 +18,12 @@
 
 package org.mycore.resource.filter;
 
+import static org.mycore.resource.common.MCRTraceLoggingHelper.traceStream;
+
 import java.net.URL;
-import java.util.List;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 
@@ -35,27 +34,15 @@ import org.mycore.common.log.MCRTreeMessage;
  */
 public abstract class MCRResourceFilterBase implements MCRResourceFilter {
 
-    protected final Logger logger = LogManager.getLogger(getClass());
-
     @Override
     public Stream<URL> filter(Stream<URL> resourceUrls, MCRHints hints) {
-        logger.debug("Filtering resource URLs");
-        Stream<URL> filteredResourceUrls = doFilter(resourceUrls, hints);
-        if (logger.isDebugEnabled()) {
-            filteredResourceUrls = logResourceUrls(filteredResourceUrls);
-        }
-        return filteredResourceUrls;
-    }
-
-    private Stream<URL> logResourceUrls(Stream<URL> resourceUrls) {
-        return logResourceUrls(resourceUrls.toList()).stream();
-    }
-
-    private List<URL> logResourceUrls(List<URL> resourceUrls) {
-        for (URL resourceUrl : resourceUrls) {
-            logger.debug("Keeping resource URL {}", resourceUrl);
-        }
-        return resourceUrls;
+        return traceStream(hints, doFilter(resourceUrls, hints), (message, filteredResourceUrls) -> {
+            if (!filteredResourceUrls.isEmpty()) {
+                filteredResourceUrls.forEach(url -> message.add("Keeping resource URL " + url));
+            } else {
+                message.add("Keeping no resource URL");
+            }
+        });
     }
 
     protected abstract Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints);

@@ -18,6 +18,8 @@
 
 package org.mycore.resource.filter;
 
+import static org.mycore.resource.common.MCRTraceLoggingHelper.trace;
+
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -50,7 +52,9 @@ public final class MCRLibraryResourceFilter extends MCRUrlPrefixResourceFilterBa
 
     @Override
     protected Optional<String> getPrefix(MCRHints hints) {
-        return Optional.of("jar:");
+        String prefix = "jar:";
+        trace(hints, () -> "Looking for library prefix: " + prefix);
+        return Optional.of(prefix);
     }
 
     public static class Factory implements Supplier<MCRLibraryResourceFilter> {

@@ -18,6 +18,8 @@
 
 package org.mycore.resource.selector;
 
+import static org.mycore.resource.common.MCRTraceLoggingHelper.trace;
+
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
@@ -50,11 +52,11 @@ public final class MCRFirstServletLibraryResourceSelector extends MCRResourceSel
     @Override
     protected List<URL> doSelect(List<URL> resourceUrls, MCRHints hints) {
         for (String libraryJarName : librariesJarNames(hints)) {
-            logger.debug("Matching library {} ...", libraryJarName);
+            trace(hints, () -> "Looking for library JAR infix /WEB-INF/lib/" + libraryJarName + "! ...");
             for (URL resourceUrl : resourceUrls) {
-                logger.debug("... with resource URL {}", resourceUrl);
+                trace(hints, () -> "... in resource URL " + resourceUrl);
                 if (matches(resourceUrl.toString(), libraryJarName)) {
-                    logger.debug("Found match, using library {}", libraryJarName);
+                    trace(hints, () -> "Found match, using library JAR " + libraryJarName);
                     return List.of(resourceUrl);
                 }
             }

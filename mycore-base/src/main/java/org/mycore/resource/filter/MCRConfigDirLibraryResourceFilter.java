@@ -18,6 +18,8 @@
 
 package org.mycore.resource.filter;
 
+import static org.mycore.resource.common.MCRTraceLoggingHelper.trace;
+
 import java.io.File;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -54,12 +56,12 @@ public final class MCRConfigDirLibraryResourceFilter extends MCRUrlPrefixResourc
 
     @Override
     protected Optional<String> getPrefix(MCRHints hints) {
-        return hints.get(MCRResourceHintKeys.CONFIG_DIR).map(this::getPrefix);
+        return hints.get(MCRResourceHintKeys.CONFIG_DIR).map(configDir -> getPrefix(configDir, hints));
     }
 
-    private String getPrefix(File configDir) {
+    private String getPrefix(File configDir, MCRHints hints) {
         String prefix = "jar:" + configDir.toURI() + "lib/";
-        logger.debug("Working with config dir library prefix: {}", prefix);
+        trace(hints, () -> "Looking for config dir library prefix: " + prefix);
         return prefix;
     }
 
