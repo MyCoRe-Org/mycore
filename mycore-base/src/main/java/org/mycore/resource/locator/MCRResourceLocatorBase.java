@@ -18,13 +18,12 @@
 
 package org.mycore.resource.locator;
 
+import static org.mycore.resource.common.MCRTraceLoggingHelper.traceStream;
+
 import java.net.URL;
-import java.util.List;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
@@ -36,27 +35,15 @@ import org.mycore.resource.MCRResourcePath;
  */
 public abstract class MCRResourceLocatorBase implements MCRResourceLocator {
 
-    protected final Logger logger = LogManager.getLogger(getClass());
-
     @Override
     public final Stream<URL> locate(MCRResourcePath path, MCRHints hints) {
-        logger.debug("Locating resource URLs for path {}", path);
-        Stream<URL> locatedResourceUrls = doLocate(path, hints);
-        if (logger.isDebugEnabled()) {
-            locatedResourceUrls = logResourceUrls(locatedResourceUrls);
-        }
-        return locatedResourceUrls;
-    }
-
-    private Stream<URL> logResourceUrls(Stream<URL> resourceUrls) {
-        return logResourceUrls(resourceUrls.toList()).stream();
-    }
-
-    private List<URL> logResourceUrls(List<URL> resourceUrls) {
-        for (URL resourceUrl : resourceUrls) {
-            logger.debug("Located resource URL {}", resourceUrl);
-        }
-        return resourceUrls;
+        return traceStream(hints, doLocate(path, hints), (message, locatedResourceUrls) -> {
+            if (!locatedResourceUrls.isEmpty()) {
+                locatedResourceUrls.forEach(url -> message.add("Located resource URL " + url));
+            } else {
+                message.add("Located no resource URL");
+            }
+        });
     }
 
     protected abstract Stream<URL> doLocate(MCRResourcePath path, MCRHints hints);

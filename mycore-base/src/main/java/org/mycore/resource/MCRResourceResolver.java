@@ -39,6 +39,7 @@ import org.mycore.common.hint.MCRHints;
 import org.mycore.common.hint.MCRHintsBuilder;
 import org.mycore.common.log.MCRListMessage;
 import org.mycore.common.log.MCRTreeMessage;
+import org.mycore.resource.common.MCRTraceLoggingHelper;
 import org.mycore.resource.provider.MCRResourceProvider;
 import org.mycore.resource.provider.MCRResourceProvider.PrefixStripper;
 import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
@@ -253,8 +254,16 @@ public final class MCRResourceResolver {
     }
 
     private Optional<URL> resource(MCRResourcePath path, MCRHints hints) {
-        LOGGER.debug("Resolving resource {}", path);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Resolving resource {}", path);
+        }
+        if (LOGGER.isTraceEnabled()) {
+            hints = MCRTraceLoggingHelper.init(hints);
+        }
         Optional<URL> resourceUrl = provider.provide(path, hints);
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(MCRTraceLoggingHelper.get(hints).logMessage("Resolving resource URL for path " + path));
+        }
         if (LOGGER.isDebugEnabled()) {
             resourceUrl.ifPresentOrElse(
                 url -> LOGGER.debug("Resolved resource URL for path {} as {}", path, url),
@@ -264,14 +273,21 @@ public final class MCRResourceResolver {
     }
 
     private List<ProvidedUrl> allResources(MCRResourcePath path, MCRHints hints) {
-        LOGGER.debug("Resolving all resource {}", path);
-        List<ProvidedUrl> resourceUrls = provider.provideAll(path, hints);
         if (LOGGER.isDebugEnabled()) {
-            if (resourceUrls.isEmpty()) {
-                LOGGER.debug("Unable to resolve resource URL for path {}", path);
+            LOGGER.debug("Resolving all resource {}", path);
+        }
+        if (LOGGER.isTraceEnabled()) {
+            hints = MCRTraceLoggingHelper.init(hints);
+        }
+        List<ProvidedUrl> resourceUrls = provider.provideAll(path, hints);
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(MCRTraceLoggingHelper.get(hints).logMessage("Resolving all resource URLs for path " + path));
+        }
+        if (LOGGER.isDebugEnabled()) {
+            if (!resourceUrls.isEmpty()) {
+                resourceUrls.forEach(url -> LOGGER.debug("Resolved resource URL for path {} as {}", path, url.url()));
             } else {
-                resourceUrls.forEach(
-                    url -> LOGGER.debug("Resolved resource URL for path {} as {}", path, url.url()));
+                LOGGER.debug("Unable to resolve resource URL for path {}", path);
             }
         }
         return resourceUrls;
@@ -307,8 +323,7 @@ public final class MCRResourceResolver {
                     }
                 }
                 return Stream.empty();
-            }
-        ).findFirst();
+            }).findFirst();
     }
 
     private boolean isConsistent(URL resourceUrl, MCRResourcePath potentialPath, MCRHints hints) {
