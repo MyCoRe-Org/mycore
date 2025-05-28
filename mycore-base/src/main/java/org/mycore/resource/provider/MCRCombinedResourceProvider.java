@@ -18,6 +18,9 @@
 
 package org.mycore.resource.provider;
 
+import static org.mycore.resource.common.MCRTraceLoggingHelper.trace;
+import static org.mycore.resource.common.MCRTraceLoggingHelper.update;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,8 +83,9 @@ public class MCRCombinedResourceProvider extends MCRResourceProviderBase {
     @Override
     protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints) {
         for (MCRResourceProvider provider : providers) {
-            Optional<URL> resourceUrl = provider.provide(path, hints);
+            Optional<URL> resourceUrl = provider.provide(path, update(hints, provider, provider.coverage()));
             if (resourceUrl.isPresent()) {
+                trace(hints, () -> "Got one resource URL, no need for further providers");
                 return resourceUrl;
             }
         }
@@ -92,7 +96,7 @@ public class MCRCombinedResourceProvider extends MCRResourceProviderBase {
     protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints) {
         List<ProvidedUrl> resourceUrls = new LinkedList<>();
         for (MCRResourceProvider provider : providers) {
-            for (ProvidedUrl providedURL : provider.provideAll(path, hints)) {
+            for (ProvidedUrl providedURL : provider.provideAll(path, update(hints, provider, provider.coverage()))) {
                 String origin = coverage() + " / " + providedURL.origin();
                 resourceUrls.add(new ProvidedUrl(providedURL.url(), origin));
             }

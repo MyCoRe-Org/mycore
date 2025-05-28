@@ -18,6 +18,9 @@
 
 package org.mycore.resource.selector;
 
+import static org.mycore.resource.common.MCRTraceLoggingHelper.trace;
+import static org.mycore.resource.common.MCRTraceLoggingHelper.update;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,8 +75,11 @@ public class MCRCombinedResourceSelector extends MCRResourceSelectorBase {
         List<URL> selectedResourceUrls = resourceUrls;
         for (MCRResourceSelector selector : selectors) {
             if (selectedResourceUrls.size() > 1) {
-                selectedResourceUrls = selector.select(selectedResourceUrls, hints);
+                selectedResourceUrls = selector.select(selectedResourceUrls, update(hints, selector, null));
             } else {
+                List<URL> urls = selectedResourceUrls;
+                trace(hints, () -> "Got " + (urls.isEmpty() ? "no" : "one")
+                    + " resource URL, no need for further selectors");
                 break;
             }
         }

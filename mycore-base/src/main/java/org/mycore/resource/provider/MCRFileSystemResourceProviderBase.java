@@ -18,6 +18,8 @@
 
 package org.mycore.resource.provider;
 
+import static org.mycore.resource.common.MCRTraceLoggingHelper.trace;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -108,32 +110,32 @@ public abstract class MCRFileSystemResourceProviderBase extends MCRResourceProvi
 
     private Stream<URL> getResourceUrls(MCRResourcePath path, MCRHints hints) {
         return getBaseDirs(hints)
-            .filter(this::isUsableBaseDir)
+            .filter(baseDir -> isUsableBaseDir(baseDir, hints))
             .map(baseDir -> toSafeFile(baseDir, path))
             .flatMap(Optional::stream)
-            .filter(this::isUsableFile)
+            .filter(file -> isUsableFile(file, hints))
             .map(this::toUrl);
     }
 
     protected abstract Stream<File> getBaseDirs(MCRHints hints);
 
-    private boolean isUsableBaseDir(File baseDir) {
+    private boolean isUsableBaseDir(File baseDir, MCRHints hints) {
         String dirPath = baseDir.getAbsolutePath();
-        logger.debug("Looking for directory {}", dirPath);
+        trace(hints, () -> "Looking for directory " + dirPath);
         if (!baseDir.exists()) {
-            logger.debug("{} doesn't exist", dirPath);
+            trace(hints, () -> dirPath + " doesn't exist");
             return false;
         }
         if (!baseDir.isDirectory()) {
-            logger.debug("{} isn't a directory", dirPath);
+            trace(hints, () -> dirPath + " isn't a directory");
             return false;
         }
         if (!baseDir.canRead()) {
-            logger.debug("{} can't be read", dirPath);
+            trace(hints, () -> dirPath + " can't be read");
             return false;
         }
         if (!baseDir.canExecute()) {
-            logger.debug("{} can't be opened", dirPath);
+            trace(hints, () -> dirPath + " can't be opened");
             return false;
         }
         return true;
@@ -154,19 +156,19 @@ public abstract class MCRFileSystemResourceProviderBase extends MCRResourceProvi
         };
     }
 
-    private boolean isUsableFile(File file) {
+    private boolean isUsableFile(File file, MCRHints hints) {
         String filePath = file.getAbsolutePath();
-        logger.debug("Looking for file {}", filePath);
+        trace(hints, () -> "Looking for file " + filePath);
         if (!file.exists()) {
-            logger.debug("{} doesn't exist", filePath);
+            trace(hints, () -> filePath + " doesn't exist");
             return false;
         }
         if (!file.isFile()) {
-            logger.debug("{} isn't a file", filePath);
+            trace(hints, () -> filePath + " isn't a file");
             return false;
         }
         if (!file.canRead()) {
-            logger.debug("{} can't be read", filePath);
+            trace(hints, () -> filePath + " can't be read");
             return false;
         }
         return true;

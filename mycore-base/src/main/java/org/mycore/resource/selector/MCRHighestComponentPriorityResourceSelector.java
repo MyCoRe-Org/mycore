@@ -18,6 +18,8 @@
 
 package org.mycore.resource.selector;
 
+import static org.mycore.resource.common.MCRTraceLoggingHelper.trace;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -50,6 +52,7 @@ import org.mycore.resource.hint.MCRResourceHintKeys;
  * [...].Class=org.mycore.resource.selector.MCRHighestComponentPriorityResourceSelector
  * </code></pre>
  */
+@SuppressWarnings("PMD.GuardLogStatement")
 public final class MCRHighestComponentPriorityResourceSelector extends MCRResourceSelectorBase {
 
     @Override
@@ -59,21 +62,24 @@ public final class MCRHighestComponentPriorityResourceSelector extends MCRResour
         List<URL> highestPriorityModuleResourceUrls = new LinkedList<>();
         for (MCRComponent component : componentsByComponentPriority(hints)) {
             int priority = component.getPriority();
-            logger.debug(() -> "Testing component " + component.getName() + " with priority " + priority);
+            trace(hints, () -> "Testing component " + component.getName() + " with priority " + priority);
             if (highestPriority != -1 && highestPriority != priority) {
-                logger.debug("Found component with priority lower than {}, stop looking", highestPriority);
+                int highestPrioritySoFar = highestPriority;
+                trace(hints, () -> "Found component with priority lower than "
+                    + highestPrioritySoFar + ", stop looking");
                 break;
             }
             String componentUrl = "jar:" + component.getJarFile().toURI();
-            logger.debug("Comparing component URL {} ... ", componentUrl);
+            trace(hints, () -> "Looking for component URL prefix " + componentUrl + " ...");
             for (URL resourceUrl : unmatchedResourceUrls) {
-                logger.debug(" ... with resource URL {}", resourceUrl);
+                trace(hints, () -> "... in resource URL " + resourceUrl);
                 if (matches(resourceUrl.toString(), componentUrl)) {
-                    logger.debug("Found match, using component URL {}", componentUrl);
+                    trace(hints, () -> "Found match, using component URL " + componentUrl);
                     highestPriorityModuleResourceUrls.add(resourceUrl);
                     unmatchedResourceUrls.remove(resourceUrl);
                     if (highestPriority != priority) {
-                        logger.debug("Selected priority {}, keep looking for components with same priority", priority);
+                        trace(hints, () -> "Selected priority " + priority
+                            + ", keep looking for components with same priority");
                         highestPriority = priority;
                     }
                     break;
