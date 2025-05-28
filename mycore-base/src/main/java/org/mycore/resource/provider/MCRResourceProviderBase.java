@@ -18,14 +18,14 @@
 
 package org.mycore.resource.provider;
 
+import static org.mycore.resource.common.MCRTraceLoggingHelper.trace;
+
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
@@ -40,8 +40,6 @@ public abstract class MCRResourceProviderBase implements MCRResourceProvider {
 
     public static final String COVERAGE_KEY = "Coverage";
 
-    protected final Logger logger = LogManager.getLogger(getClass());
-
     private final String coverage;
 
     public MCRResourceProviderBase(String coverage) {
@@ -50,33 +48,21 @@ public abstract class MCRResourceProviderBase implements MCRResourceProvider {
 
     @Override
     public final Optional<URL> provide(MCRResourcePath path, MCRHints hints) {
-        logger.debug("Providing resource URLs for path {} [{}]", path, coverage);
-        Optional<URL> resourceUrl = doProvide(path, hints);
-        if (logger.isDebugEnabled()) {
-            return logResourceUrl(resourceUrl);
-        } else {
-            return resourceUrl;
-        }
-    }
-
-    private Optional<URL> logResourceUrl(Optional<URL> resourceUrl) {
-        resourceUrl.ifPresent(url -> logger.debug("Providing resource URL {} [{}]", url, coverage));
-        return resourceUrl;
+        return trace(hints, doProvide(path, hints), (message, providedResourceUrl) -> {
+            providedResourceUrl.ifPresentOrElse(url -> message.add("Providing resource URL " + url),
+                () -> message.add("Providing no resource URL"));
+        });
     }
 
     @Override
     public final List<ProvidedUrl> provideAll(MCRResourcePath path, MCRHints hints) {
-        logger.debug("Providing all resource URLs for path {} [{}]", path, coverage);
-        List<ProvidedUrl> resourceUrls = doProvideAll(path, hints);
-        if (logger.isDebugEnabled()) {
-            logResourceUrls(resourceUrls);
-        }
-        return resourceUrls;
-
-    }
-
-    private void logResourceUrls(List<ProvidedUrl> resourceUrl) {
-        resourceUrl.forEach(url -> logger.debug("Providing resource URL {} [{}]", url.url(), coverage));
+        return trace(hints, doProvideAll(path, hints), (message, providedResourceUrls) -> {
+            if (!providedResourceUrls.isEmpty()) {
+                providedResourceUrls.forEach(url -> message.add("Providing resource URL " + url));
+            } else {
+                message.add("Providing no resource URLs");
+            }
+        });
     }
 
     protected abstract Optional<URL> doProvide(MCRResourcePath path, MCRHints hints);
@@ -87,6 +73,7 @@ public abstract class MCRResourceProviderBase implements MCRResourceProvider {
         return new ProvidedUrl(url, coverage());
     }
 
+    @Override
     public String coverage() {
         return coverage;
     }

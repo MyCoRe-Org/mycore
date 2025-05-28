@@ -18,6 +18,8 @@
 
 package org.mycore.resource.filter;
 
+import static org.mycore.resource.common.MCRTraceLoggingHelper.trace;
+
 import java.io.File;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -58,12 +60,12 @@ public final class MCRWebappClassesDirResourceFilter extends MCRUrlPrefixResourc
 
     @Override
     protected Optional<String> getPrefix(MCRHints hints) {
-        return hints.get(MCRResourceHintKeys.WEBAPP_DIR).map(this::getPrefix);
+        return hints.get(MCRResourceHintKeys.WEBAPP_DIR).map(webappDir -> getPrefix(webappDir, hints));
     }
 
-    private String getPrefix(File webappDir) {
+    private String getPrefix(File webappDir, MCRHints hints) {
         String prefix = webappDir.toURI() + "WEB-INF/classes/";
-        logger.debug("Working with webapp resource prefix: {}", prefix);
+        trace(hints, () -> "Looking for webapp resource prefix: " + prefix);
         return prefix;
     }
 

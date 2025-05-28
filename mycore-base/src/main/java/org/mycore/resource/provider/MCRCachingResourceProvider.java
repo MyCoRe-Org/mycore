@@ -18,6 +18,9 @@
 
 package org.mycore.resource.provider;
 
+import static org.mycore.resource.common.MCRTraceLoggingHelper.trace;
+import static org.mycore.resource.common.MCRTraceLoggingHelper.update;
+
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
@@ -85,18 +88,18 @@ public class MCRCachingResourceProvider extends MCRResourceProviderBase {
     protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints) {
         Optional<URL> resourceUrl = cache.get(path);
         if (resourceUrl == null) {
-            logger.debug("Cache miss for {}", path);
-            resourceUrl = provider.provide(path, hints);
+            trace(hints, () -> "Cache miss for " + path);
+            resourceUrl = provider.provide(path, update(hints, provider, provider.coverage()));
             cache.put(path, resourceUrl);
         } else {
-            logger.debug("Cache hit for {}", path);
+            trace(hints, () -> "Cache hit for " + path);
         }
         return resourceUrl;
     }
 
     @Override
     protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints) {
-        return provider.provideAll(path, hints);
+        return provider.provideAll(path, update(hints, provider, provider.coverage()));
     }
 
     @Override

@@ -71,6 +71,8 @@ public interface MCRResourceProvider {
      */
     MCRTreeMessage compileDescription(Level level);
 
+    String coverage();
+
     record ProvidedUrl(URL url, String origin) {
 
         @Override
