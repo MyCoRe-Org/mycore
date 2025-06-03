@@ -18,6 +18,8 @@
 
 package org.mycore.resource.filter;
 
+import static org.mycore.resource.common.MCRTraceLoggingHelper.trace;
+
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -26,24 +28,23 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.hint.MCRHints;
 
 /**
- * {@link MCRLibraryResourceFilter} is an implementation of {@link MCRResourceFilter} that checks if a resource
- * candidate is a resource from a JAR file. To decide weather such resources are retained or ignored, a
- * {@link MCRResourceFilterMode} value is used.
+ * A {@link MCRLibraryResourceFilter} is a {@link MCRResourceFilter} that checks if a resource candidate
+ * is a resource from a JAR file.
+ * To decide weather such resources are retained or ignored, a {@link MCRResourceFilterMode} value is used.
  * <p>
- * The following configuration options are available, if configured automatically:
+ * The following configuration options are available:
  * <ul>
- * <li> The mode is configured using the property suffix {@link MCRLibraryResourceFilter#MODE_KEY}.
+ * <li> The property suffix {@link MCRUrlPrefixResourceFilterBase#MODE_KEY} can be used to
+ * specify the mode to be used.
  * </ul>
  * Example:
- * <pre>
+ * <pre><code>
  * [...].Class=org.mycore.resource.filter.MCRLibraryResourceFilter
  * [...].Mode=MUST_MATCH
- * </pre>
+ * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRLibraryResourceFilter.Factory.class)
-public class MCRLibraryResourceFilter extends MCRUrlPrefixResourceFilterBase {
-
-    public static final String MODE_KEY = "Mode";
+public final class MCRLibraryResourceFilter extends MCRUrlPrefixResourceFilterBase {
 
     public MCRLibraryResourceFilter(MCRResourceFilterMode mode) {
         super(mode);
@@ -51,7 +52,9 @@ public class MCRLibraryResourceFilter extends MCRUrlPrefixResourceFilterBase {
 
     @Override
     protected Optional<String> getPrefix(MCRHints hints) {
-        return Optional.of("jar:");
+        String prefix = "jar:";
+        trace(hints, () -> "Looking for library prefix: " + prefix);
+        return Optional.of(prefix);
     }
 
     public static class Factory implements Supplier<MCRLibraryResourceFilter> {

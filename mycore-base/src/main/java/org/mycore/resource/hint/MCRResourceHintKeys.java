@@ -19,8 +19,13 @@
 package org.mycore.resource.hint;
 
 import java.io.File;
+import java.util.List;
+import java.util.SortedSet;
 
+import org.mycore.common.config.MCRComponent;
+import org.mycore.common.hint.MCRCollectionHintKey;
 import org.mycore.common.hint.MCRHintKey;
+import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourceResolver;
 
 import jakarta.servlet.ServletContext;
@@ -32,21 +37,42 @@ public final class MCRResourceHintKeys {
 
     public static final MCRHintKey<File> CONFIG_DIR = new MCRHintKey<>(
         File.class,
+        MCRResourceHintKeys.class,
         "CONFIG_DIR",
         File::getAbsolutePath);
 
     public static final MCRHintKey<ClassLoader> CLASS_LOADER = new MCRHintKey<>(
         ClassLoader.class,
+        MCRResourceHintKeys.class,
         "CLASS_LOADER",
         ClassLoader::getName);
 
+    public static final MCRHintKey<SortedSet<MCRComponent>> COMPONENTS = new MCRCollectionHintKey<>(
+        MCRComponent.class,
+        MCRResourceHintKeys.class,
+        "COMPONENTS",
+        Object::toString,
+        List.of(collection -> {
+            if (collection.getLast().getPriority() > collection.getFirst().getPriority()) {
+                throw new IllegalArgumentException("Components must be ordered from highest to lowest priority");
+            }
+        }));
+
     public static final MCRHintKey<ServletContext> SERVLET_CONTEXT = new MCRHintKey<>(
         ServletContext.class,
+        MCRResourceHintKeys.class,
         "SERVLET_CONTEXT",
         ServletContext::getServletContextName);
 
+    public static final MCRHintKey<MCRTreeMessage> TRACE_TREE_MESSAGE = new MCRHintKey<>(
+            MCRTreeMessage.class,
+            MCRResourceHintKeys.class,
+            "TRACE_TREE_MESSAGE",
+            Object::toString);
+
     public static final MCRHintKey<File> WEBAPP_DIR = new MCRHintKey<>(
         File.class,
+        MCRResourceHintKeys.class,
         "WEBAPP_DIR",
         File::getAbsolutePath);
 

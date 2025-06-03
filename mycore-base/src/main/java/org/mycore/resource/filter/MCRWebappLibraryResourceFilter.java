@@ -18,6 +18,8 @@
 
 package org.mycore.resource.filter;
 
+import static org.mycore.resource.common.MCRTraceLoggingHelper.trace;
+
 import java.io.File;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -28,26 +30,25 @@ import org.mycore.common.hint.MCRHints;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 
 /**
- * {@link MCRWebappLibraryResourceFilter} is an implementation of {@link MCRResourceFilter} that checks if a resource
- * candidate is a resource from a JAR file placed in the WAR file. To decide weather such resources are retained or
- * ignored, a {@link MCRResourceFilterMode} value is used.
+ * {@link MCRWebappLibraryResourceFilter} is a {@link MCRResourceFilter} that checks if a resource candidate
+ * is a resource from a JAR file placed in the WAR file.
+ * To decide weather such resources are retained or ignored, a {@link MCRResourceFilterMode} value is used.
  * <p>
  * It uses the webapp directory hinted at by {@link MCRResourceHintKeys#WEBAPP_DIR}, if present.
  * <p>
- * The following configuration options are available, if configured automatically:
+ * The following configuration options are available:
  * <ul>
- * <li> The mode is configured using the property suffix {@link MCRWebappLibraryResourceFilter#MODE_KEY}.
+ * <li> The property suffix {@link MCRUrlPrefixResourceFilterBase#MODE_KEY} can be used to
+ * specify the mode to be used.
  * </ul>
  * Example:
- * <pre>
+ * <pre><code>
  * [...].Class=org.mycore.resource.filter.MCRWebappLibraryResourceFilter
  * [...].Mode=MUST_MATCH
- * </pre>
+ * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRWebappLibraryResourceFilter.Factory.class)
-public class MCRWebappLibraryResourceFilter extends MCRUrlPrefixResourceFilterBase {
-
-    public static final String MODE_KEY = "Mode";
+public final class MCRWebappLibraryResourceFilter extends MCRUrlPrefixResourceFilterBase {
 
     public MCRWebappLibraryResourceFilter(MCRResourceFilterMode mode) {
         super(mode);
@@ -55,12 +56,12 @@ public class MCRWebappLibraryResourceFilter extends MCRUrlPrefixResourceFilterBa
 
     @Override
     protected Optional<String> getPrefix(MCRHints hints) {
-        return hints.get(MCRResourceHintKeys.WEBAPP_DIR).map(this::getPrefix);
+        return hints.get(MCRResourceHintKeys.WEBAPP_DIR).map(webappDir -> getPrefix(webappDir, hints));
     }
 
-    private String getPrefix(File webappDir) {
+    private String getPrefix(File webappDir, MCRHints hints) {
         String prefix = "jar:" + webappDir.toURI() + "WEB-INF/lib/";
-        logger.debug("Working with webapp library prefix: {}", prefix);
+        trace(hints, () -> "Looking for webapp library prefix: " + prefix);
         return prefix;
     }
 

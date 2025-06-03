@@ -18,6 +18,8 @@
 
 package org.mycore.resource.provider;
 
+import static org.mycore.resource.common.MCRTraceLoggingHelper.trace;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -41,56 +43,53 @@ import org.mycore.resource.MCRResourcePath;
  * <p>
  * Two modes are supported:
  * <ul>
- *     <li>In mode {@link MCRResourceProviderMode#RESOURCES}, the content of the base directories is provided
- *     as resources. The resource path to be looked up is directly matched against the content of a directory.</li>
- *     <li>In mode {@link MCRResourceProviderMode#WEB_RESOURCES}, the content of the base directories is provided
- *     as web resources. The resource path to be looked up is matched against the content of a directory, but
- *     without its <code>/META-INF/resources</code> prefix.</li>
+ * <li>In mode {@link MCRResourceProviderMode#RESOURCES}, the content of the base directories is provided
+ * as resources. Resource paths are appended to base directory paths to find possible resources.
+ * <li>In mode {@link MCRResourceProviderMode#WEB_RESOURCES}, the content of the base directories is provided
+ * as web resources. Web resource paths, without the leading <code>META-INF/resources</code> are appended
+ * to base directory paths to find possible web resources.
  * </ul>
  * <p>
  * Say, the directory <code>/foo</code> is used as a base directory and has the following content:
- * <pre>
+ * <pre><code>
  * foo
  * ├─ META-INF
  * │  └─ resources
  * │     ├─ nested
- * │     │  └─ resources.txt
- * │     └─ resources.txt
+ * │     │  └─ resource.txt
+ * │     └─ resource.txt
  * ├─ nested
  * │  └─ resource.txt
  * └─ resource.txt
- * </pre>
+ * </code></pre>
  * <ul>
- *     <li>In mode {@link MCRResourceProviderMode#RESOURCES}
- *       <ul>
- *           <li>resource path <code>/resource.txt</code>
- *           would be resolved as <code>/foo/resource.txt</code>,</li>
- *           <li>resource path <code>/nested/resource.txt</code>
- *           would be resolved as <code>/foo/nested/resource.txt</code>,</li>
- *           <li>resource path <code>/META-INF/resources/resource.txt</code>
- *           (i.e. web resource path <code>/resource.txt</code>)
- *           would be resolved as <code>/foo/META-INF/resources/resource.txt</code> and</li>
- *           <li>resource path <code>/META-INF/resources/nested/resource.txt</code>
- *           (i.e. web resource path <code>/nested/resource.txt</code>)
- *           would be resolved as <code>/foo/META-INF/resources/nested/resource.txt</code></li>
- *       </ul>
- *     <li>In mode {@link MCRResourceProviderMode#WEB_RESOURCES}
- *       <ul>
- *           <li>resource path <code>/resource.txt</code>
- *           would not be resolved because this path doesn't represent a web resource,</li>
- *           <li>resource path <code>/nested/resource.txt</code>
- *           would not be resolved because this path doesn't represent a web resource,</li>
- *           <li>resource path <code>/META-INF/resources/resource.txt</code>
- *           (i.e. web resource path <code>/resource.txt</code>)
- *           would be resolved as <code>/foo/resource.txt</code> and</li>
- *           <li>resource path <code>/META-INF/resources/nested/resource.txt</code>
- *           (i.e. web resource path <code>/nested/resource.txt</code>)
- *           would be resolved as <code>/foo/nested/resource.txt</code></li>
- *       </ul>
- *     </li>
+ * <li>In mode {@link MCRResourceProviderMode#RESOURCES}
+ * <ul>
+ * <li>resource path <code>/resource.txt</code> resolves to
+ * <br>file path <code>/foo/resource.txt</code>,
+ * <li>resource path <code>/nested/resource.txt</code> resolves to
+ * <br>file path <code>/foo/nested/resource.txt</code>,
+ * <li>web resource path <code>/META-INF/resources/resource.txt</code> resolves to
+ * <br>file path <code>/foo/META-INF/resources/resource.txt</code> and
+ * <li>web resource path <code>/META-INF/resources/nested/resource.txt</code> resolves to
+ * <br>file path <code>/foo/META-INF/resources/nested/resource.txt</code>
+ * </ul>
+ * <li>In mode {@link MCRResourceProviderMode#WEB_RESOURCES}
+ * <ul>
+ * <li>resource path <code>/resource.txt</code>
+ * <br>does not resolve to a file path,
+ * <li>resource path <code>/nested/resource.txt</code>
+ * <br>does not resolve to a file path,
+ * <li>web resource path <code>/META-INF/resources/resource.txt</code>
+ * <br>resolves to file path <code>/foo/resource.txt</code> and
+ * <li>web resource path <code>/META-INF/resources/nested/resource.txt</code>
+ * <br>resolves to file path <code>/foo/nested/resource.txt</code>
+ * </ul>
  * </ul>
  */
 public abstract class MCRFileSystemResourceProviderBase extends MCRResourceProviderBase {
+
+    public static final String MODE_KEY = "Mode";
 
     private final MCRResourceProviderMode mode;
 
@@ -106,37 +105,37 @@ public abstract class MCRFileSystemResourceProviderBase extends MCRResourceProvi
 
     @Override
     protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints) {
-        return getResourceUrls(path, hints).map(this::providedURL).toList();
+        return getResourceUrls(path, hints).map(this::providedUrl).toList();
     }
 
     private Stream<URL> getResourceUrls(MCRResourcePath path, MCRHints hints) {
         return getBaseDirs(hints)
-            .filter(this::isUsableBaseDir)
+            .filter(baseDir -> isUsableBaseDir(baseDir, hints))
             .map(baseDir -> toSafeFile(baseDir, path))
             .flatMap(Optional::stream)
-            .filter(this::isUsableFile)
+            .filter(file -> isUsableFile(file, hints))
             .map(this::toUrl);
     }
 
     protected abstract Stream<File> getBaseDirs(MCRHints hints);
 
-    private boolean isUsableBaseDir(File baseDir) {
+    private boolean isUsableBaseDir(File baseDir, MCRHints hints) {
         String dirPath = baseDir.getAbsolutePath();
-        logger.debug("Looking for directory {}", dirPath);
+        trace(hints, () -> "Looking for directory " + dirPath);
         if (!baseDir.exists()) {
-            logger.debug("{} doesn't exist", dirPath);
+            trace(hints, () -> dirPath + " doesn't exist");
             return false;
         }
         if (!baseDir.isDirectory()) {
-            logger.debug("{} isn't a directory", dirPath);
+            trace(hints, () -> dirPath + " isn't a directory");
             return false;
         }
         if (!baseDir.canRead()) {
-            logger.debug("{} can't be read", dirPath);
+            trace(hints, () -> dirPath + " can't be read");
             return false;
         }
         if (!baseDir.canExecute()) {
-            logger.debug("{} can't be opened", dirPath);
+            trace(hints, () -> dirPath + " can't be opened");
             return false;
         }
         return true;
@@ -157,19 +156,19 @@ public abstract class MCRFileSystemResourceProviderBase extends MCRResourceProvi
         };
     }
 
-    private boolean isUsableFile(File file) {
+    private boolean isUsableFile(File file, MCRHints hints) {
         String filePath = file.getAbsolutePath();
-        logger.debug("Looking for file {}", filePath);
+        trace(hints, () -> "Looking for file " + filePath);
         if (!file.exists()) {
-            logger.debug("{} doesn't exist", filePath);
+            trace(hints, () -> filePath + " doesn't exist");
             return false;
         }
         if (!file.isFile()) {
-            logger.debug("{} isn't a file", filePath);
+            trace(hints, () -> filePath + " isn't a file");
             return false;
         }
         if (!file.canRead()) {
-            logger.debug("{} can't be read", filePath);
+            trace(hints, () -> filePath + " can't be read");
             return false;
         }
         return true;
