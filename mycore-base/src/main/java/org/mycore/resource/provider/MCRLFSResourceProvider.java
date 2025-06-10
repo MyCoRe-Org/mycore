@@ -18,8 +18,6 @@
 
 package org.mycore.resource.provider;
 
-import static org.mycore.resource.common.MCRTraceLoggingHelper.update;
-
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
@@ -34,6 +32,7 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRResourceTracer;
 import org.mycore.resource.filter.MCRResourceFilter;
 import org.mycore.resource.locator.MCRResourceLocator;
 import org.mycore.resource.selector.MCRResourceSelector;
@@ -99,20 +98,20 @@ public class MCRLFSResourceProvider extends MCRResourceProviderBase {
     }
 
     @Override
-    protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints) {
-        Stream<URL> locatedResourceUrls = locator.locate(path, update(hints, locator, null));
-        List<URL> filteredResourceUrls = filter.filter(locatedResourceUrls, update(hints, filter, null)).toList();
+    protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
+        Stream<URL> locatedResourceUrls = locator.locate(path, hints, tracer.update(locator));
+        List<URL> filteredResourceUrls = filter.filter(locatedResourceUrls, hints, tracer.update(filter)).toList();
         if (!filteredResourceUrls.isEmpty()) {
-            return selector.select(filteredResourceUrls, update(hints, selector, null)).stream().findFirst();
+            return selector.select(filteredResourceUrls, hints, tracer.update(selector)).stream().findFirst();
         } else {
             return Optional.empty();
         }
     }
 
     @Override
-    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints) {
-        Stream<URL> locatedResourceUrls = locator.locate(path, update(hints, locator, null));
-        Stream<URL> filteredResourceUrls = filter.filter(locatedResourceUrls, update(hints, filter, null));
+    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
+        Stream<URL> locatedResourceUrls = locator.locate(path, hints, tracer.update(locator));
+        Stream<URL> filteredResourceUrls = filter.filter(locatedResourceUrls, hints, tracer.update(filter));
         return filteredResourceUrls.map(this::providedUrl).toList();
     }
 

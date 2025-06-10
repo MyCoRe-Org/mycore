@@ -24,6 +24,7 @@ import java.util.function.Supplier;
 
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.hint.MCRHints;
+import org.mycore.resource.common.MCRResourceTracer;
 
 /**
  * A {@link MCRNoOpResourceSelector} is a {@link MCRResourceSelector} that doesn't select resources.
@@ -38,7 +39,7 @@ import org.mycore.common.hint.MCRHints;
 public class MCRNoOpResourceSelector extends MCRResourceSelectorBase {
 
     @Override
-    protected List<URL> doSelect(List<URL> resourceUrls, MCRHints hints) {
+    protected List<URL> doSelect(List<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
         return resourceUrls;
     }
 

@@ -29,6 +29,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRResourceTracer;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 import org.mycore.resource.provider.MCRResourceProvider.JarUrlPrefixStripper;
 import org.mycore.resource.provider.MCRResourceProvider.PrefixStripper;
@@ -53,7 +54,7 @@ import jakarta.servlet.ServletContext;
 public final class MCRServletContextWebResourceLocator extends MCRResourceLocatorBase {
 
     @Override
-    protected Stream<URL> doLocate(MCRResourcePath path, MCRHints hints) {
+    protected Stream<URL> doLocate(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
         return combine(getServletContext(hints), getWebResourcePath(path), this::getResourceUrl).stream();
     }
 

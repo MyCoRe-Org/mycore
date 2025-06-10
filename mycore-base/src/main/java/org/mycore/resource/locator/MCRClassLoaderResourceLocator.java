@@ -29,6 +29,7 @@ import org.mycore.common.MCRStreamUtils;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRResourceTracer;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 import org.mycore.resource.provider.MCRResourceProvider.ClassLoaderPrefixStripper;
 import org.mycore.resource.provider.MCRResourceProvider.JarUrlPrefixStripper;
@@ -52,7 +53,7 @@ import org.mycore.resource.provider.MCRResourceProvider.PrefixStripper;
 public final class MCRClassLoaderResourceLocator extends MCRResourceLocatorBase {
 
     @Override
-    protected Stream<URL> doLocate(MCRResourcePath path, MCRHints hints) {
+    protected Stream<URL> doLocate(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
         return getClassloader(hints)
             .map(classLoader -> getResources(path, classLoader))
             .orElse(Stream.empty());

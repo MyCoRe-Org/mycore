@@ -18,14 +18,13 @@
 
 package org.mycore.resource.filter;
 
-import static org.mycore.resource.common.MCRTraceLoggingHelper.trace;
-
 import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.hint.MCRHints;
+import org.mycore.resource.common.MCRResourceTracer;
 
 /**
  * A {@link MCRLibraryResourceFilter} is a {@link MCRResourceFilter} that checks if a resource candidate
@@ -51,9 +50,9 @@ public final class MCRLibraryResourceFilter extends MCRUrlPrefixResourceFilterBa
     }
 
     @Override
-    protected Optional<String> getPrefix(MCRHints hints) {
+    protected Optional<String> getPrefix(MCRHints hints, MCRResourceTracer tracer) {
         String prefix = "jar:";
-        trace(hints, () -> "Looking for library prefix: " + prefix);
+        tracer.trace(() -> "Looking for library prefix: " + prefix);
         return Optional.of(prefix);
     }
 
