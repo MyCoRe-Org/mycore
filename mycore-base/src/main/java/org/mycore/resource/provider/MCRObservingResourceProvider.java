@@ -32,6 +32,7 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRResourceTracer;
 
 /**
  * A {@link MCRObservingResourceProvider} is a {@link MCRResourceProvider} that delegates to another
@@ -76,17 +77,17 @@ public class MCRObservingResourceProvider extends MCRResourceProviderBase {
     }
 
     @Override
-    protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints) {
+    protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
         observer.onProvide(path, hints);
-        Optional<URL> resourceUrl = provider.provide(path, hints);
+        Optional<URL> resourceUrl = provider.provide(path, hints, tracer.update(provider, provider.coverage()));
         observer.onProvided(path, hints, resourceUrl);
         return resourceUrl;
     }
 
     @Override
-    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints) {
+    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
         observer.onProvideAll(path, hints);
-        List<ProvidedUrl> providedUrls = provider.provideAll(path, hints);
+        List<ProvidedUrl> providedUrls = provider.provideAll(path, hints, tracer.update(provider, provider.coverage()));
         observer.onProvidedAll(path, hints, providedUrls);
         return providedUrls;
     }

@@ -37,6 +37,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.hint.MCRHintsBuilder;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRResourceTracer;
 import org.mycore.resource.common.MCRSyntheticResourceSpec;
 import org.mycore.resource.filter.MCRNoOpResourceFilter;
 import org.mycore.resource.filter.MCRResourceFilterBase;
@@ -141,7 +142,7 @@ public class MCRLFSResourceProviderTest {
         }
 
         @Override
-        protected Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints) {
+        protected Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
             return resourceUrls.filter(u -> u.toString().contains("/" + dirName + "/"));
         }
 
@@ -156,7 +157,7 @@ public class MCRLFSResourceProviderTest {
         }
 
         @Override
-        protected final List<URL> doSelect(List<URL> resourceUrls, MCRHints hints) {
+        protected final List<URL> doSelect(List<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
             return resourceUrls.stream().filter(u -> u.toString().contains("/" + dirName + "/")).toList();
         }
 
