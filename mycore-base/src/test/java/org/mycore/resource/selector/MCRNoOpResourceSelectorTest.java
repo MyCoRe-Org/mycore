@@ -32,10 +32,13 @@ import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
 public class MCRNoOpResourceSelectorTest {
+
+    public static final MCRNoOpResourceTracer NO_OP_TRACER = new MCRNoOpResourceTracer();
 
     private static URL fooBarResourceUrl;
 
@@ -58,7 +61,7 @@ public class MCRNoOpResourceSelectorTest {
 
         MCRResourceSelector selector = noOpSelector();
 
-        List<URL> resourceUrls = selector.select(allResourceUrls, MCRHints.EMPTY);
+        List<URL> resourceUrls = selector.select(allResourceUrls, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertEquals(2, resourceUrls.size());
         assertTrue(resourceUrls.contains(fooBarResourceUrl));
@@ -75,7 +78,7 @@ public class MCRNoOpResourceSelectorTest {
         MCRResourceSelector selector = MCRConfiguration2.getInstanceOfOrThrow(
             MCRNoOpResourceSelector.class, "Test.Class");
 
-        List<URL> resourceUrls = selector.select(allResourceUrls, MCRHints.EMPTY);
+        List<URL> resourceUrls = selector.select(allResourceUrls, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertEquals(2, resourceUrls.size());
         assertTrue(resourceUrls.contains(fooBarResourceUrl));

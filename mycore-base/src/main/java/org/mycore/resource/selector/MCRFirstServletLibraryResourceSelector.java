@@ -18,13 +18,12 @@
 
 package org.mycore.resource.selector;
 
-import static org.mycore.resource.common.MCRTraceLoggingHelper.trace;
-
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
 import org.mycore.common.hint.MCRHints;
+import org.mycore.resource.common.MCRResourceTracer;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 
 import jakarta.servlet.ServletContext;
@@ -50,13 +49,13 @@ import jakarta.servlet.ServletContext;
 public final class MCRFirstServletLibraryResourceSelector extends MCRResourceSelectorBase {
 
     @Override
-    protected List<URL> doSelect(List<URL> resourceUrls, MCRHints hints) {
+    protected List<URL> doSelect(List<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
         for (String libraryJarName : librariesJarNames(hints)) {
-            trace(hints, () -> "Looking for library JAR infix /WEB-INF/lib/" + libraryJarName + "! ...");
+            tracer.trace(() -> "Looking for library JAR infix /WEB-INF/lib/" + libraryJarName + "! ...");
             for (URL resourceUrl : resourceUrls) {
-                trace(hints, () -> "... in resource URL " + resourceUrl);
+                tracer.trace(() -> "... in resource URL " + resourceUrl);
                 if (matches(resourceUrl.toString(), libraryJarName)) {
-                    trace(hints, () -> "Found match, using library JAR " + libraryJarName);
+                    tracer.trace(() -> "Found match, using library JAR " + libraryJarName);
                     return List.of(resourceUrl);
                 }
             }

@@ -40,11 +40,14 @@ import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
 import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
 public class MCRFileSystemResourceProviderTest {
+
+    public static final MCRNoOpResourceTracer NO_OP_TRACER = new MCRNoOpResourceTracer();
 
     private static final MCRResourcePath FOO_PATH = MCRResourcePath.ofPath("foo").orElseThrow();
 
@@ -89,7 +92,7 @@ public class MCRFileSystemResourceProviderTest {
 
         MCRResourceProvider provider = fileSystemProvider(emptyBaseDir, empty2BaseDir);
 
-        Optional<URL> resourceUrl = provider.provide(FOO_PATH, MCRHints.EMPTY);
+        Optional<URL> resourceUrl = provider.provide(FOO_PATH, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isEmpty());
 
@@ -100,7 +103,7 @@ public class MCRFileSystemResourceProviderTest {
 
         MCRResourceProvider provider = fileSystemProvider(emptyBaseDir, fooBaseDir);
 
-        Optional<URL> resourceUrl = provider.provide(FOO_PATH, MCRHints.EMPTY);
+        Optional<URL> resourceUrl = provider.provide(FOO_PATH, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isPresent());
         assertEquals(toUrl(fooBaseDir, "foo"), resourceUrl.get());
@@ -112,7 +115,7 @@ public class MCRFileSystemResourceProviderTest {
 
         MCRResourceProvider provider = fileSystemProvider(fooBaseDir, emptyBaseDir);
 
-        Optional<URL> resourceUrl = provider.provide(FOO_PATH, MCRHints.EMPTY);
+        Optional<URL> resourceUrl = provider.provide(FOO_PATH, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isPresent());
         assertEquals(toUrl(fooBaseDir, "foo"), resourceUrl.get());
@@ -124,7 +127,7 @@ public class MCRFileSystemResourceProviderTest {
 
         MCRResourceProvider provider = fileSystemProvider(fooBaseDir, foo2BaseDir);
 
-        Optional<URL> resourceUrl = provider.provide(FOO_PATH, MCRHints.EMPTY);
+        Optional<URL> resourceUrl = provider.provide(FOO_PATH, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isPresent());
         assertEquals(toUrl(fooBaseDir, "foo"), resourceUrl.get());
@@ -136,7 +139,7 @@ public class MCRFileSystemResourceProviderTest {
 
         MCRResourceProvider provider = fileSystemProvider(fooBaseDir, barBaseDir);
 
-        Optional<URL> resourceUrl = provider.provide(BAR_PATH, MCRHints.EMPTY);
+        Optional<URL> resourceUrl = provider.provide(BAR_PATH, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isPresent());
         assertEquals(toUrl(barBaseDir, "bar"), resourceUrl.get());
@@ -148,7 +151,7 @@ public class MCRFileSystemResourceProviderTest {
 
         MCRResourceProvider provider = fileSystemProvider(emptyBaseDir, emptyBaseDir);
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, MCRHints.EMPTY);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, MCRHints.EMPTY, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertTrue(resourceUrls.isEmpty());
@@ -160,7 +163,7 @@ public class MCRFileSystemResourceProviderTest {
 
         MCRResourceProvider provider = fileSystemProvider(emptyBaseDir, fooBaseDir);
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, MCRHints.EMPTY);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, MCRHints.EMPTY, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertEquals(1, resourceUrls.size());
@@ -173,7 +176,7 @@ public class MCRFileSystemResourceProviderTest {
 
         MCRResourceProvider provider = fileSystemProvider(fooBaseDir, emptyBaseDir);
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, MCRHints.EMPTY);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, MCRHints.EMPTY, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertEquals(1, resourceUrls.size());
@@ -186,7 +189,7 @@ public class MCRFileSystemResourceProviderTest {
 
         MCRResourceProvider provider = fileSystemProvider(fooBaseDir, foo2BaseDir);
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, MCRHints.EMPTY);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, MCRHints.EMPTY, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertEquals(2, resourceUrls.size());
@@ -200,7 +203,7 @@ public class MCRFileSystemResourceProviderTest {
 
         MCRResourceProvider provider = fileSystemProvider(fooBaseDir, barBaseDir);
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(BAR_PATH, MCRHints.EMPTY);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(BAR_PATH, MCRHints.EMPTY, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertEquals(1, resourceUrls.size());
@@ -213,7 +216,7 @@ public class MCRFileSystemResourceProviderTest {
 
         MCRResourceProvider provider = fileSystemProvider(MCRResourceProviderMode.RESOURCES, fooBaseDir);
 
-        Optional<URL> resourceUrl = provider.provide(FOO_PATH, MCRHints.EMPTY);
+        Optional<URL> resourceUrl = provider.provide(FOO_PATH, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isPresent());
         assertEquals(toUrl(fooBaseDir, "foo"), resourceUrl.get());
@@ -225,7 +228,7 @@ public class MCRFileSystemResourceProviderTest {
 
         MCRResourceProvider provider = fileSystemProvider(MCRResourceProviderMode.RESOURCES, webFooBaseDir);
 
-        Optional<URL> resourceUrl = provider.provide(WEB_FOO_PATH, MCRHints.EMPTY);
+        Optional<URL> resourceUrl = provider.provide(WEB_FOO_PATH, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isPresent());
         assertEquals(toUrl(webFooBaseDir, "META-INF/resources/foo"), resourceUrl.get());
@@ -237,7 +240,7 @@ public class MCRFileSystemResourceProviderTest {
 
         MCRResourceProvider provider = fileSystemProvider(MCRResourceProviderMode.WEB_RESOURCES, fooBaseDir);
 
-        Optional<URL> resourceUrl = provider.provide(WEB_FOO_PATH, MCRHints.EMPTY);
+        Optional<URL> resourceUrl = provider.provide(WEB_FOO_PATH, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isPresent());
         assertEquals(toUrl(fooBaseDir, "foo"), resourceUrl.get());
@@ -256,9 +259,9 @@ public class MCRFileSystemResourceProviderTest {
         MCRResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(
             MCRFileSystemResourceProvider.class, "Test.Class");
 
-        Optional<URL> fooResourceUrl = provider.provide(FOO_PATH, MCRHints.EMPTY);
-        Optional<URL> barResourceUrl = provider.provide(BAR_PATH, MCRHints.EMPTY);
-        Optional<URL> bazResourceUrl = provider.provide(BAZ_PATH, MCRHints.EMPTY);
+        Optional<URL> fooResourceUrl = provider.provide(FOO_PATH, MCRHints.EMPTY, NO_OP_TRACER);
+        Optional<URL> barResourceUrl = provider.provide(BAR_PATH, MCRHints.EMPTY, NO_OP_TRACER);
+        Optional<URL> bazResourceUrl = provider.provide(BAZ_PATH, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertTrue(fooResourceUrl.isPresent());
         assertTrue(barResourceUrl.isPresent());

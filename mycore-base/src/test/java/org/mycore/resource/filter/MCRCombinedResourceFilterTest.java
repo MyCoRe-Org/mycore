@@ -35,10 +35,14 @@ import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
+import org.mycore.resource.common.MCRResourceTracer;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
 public class MCRCombinedResourceFilterTest {
+
+    public static final MCRNoOpResourceTracer NO_OP_TRACER = new MCRNoOpResourceTracer();
 
     private static URL fileUrlFoo;
 
@@ -64,7 +68,7 @@ public class MCRCombinedResourceFilterTest {
 
         MCRResourceFilter filter = configDirLibraryFilter();
 
-        List<URL> resourceUrls = filter.filter(allResourceUrls.stream(), MCRHints.EMPTY).toList();
+        List<URL> resourceUrls = filter.filter(allResourceUrls.stream(), MCRHints.EMPTY, NO_OP_TRACER).toList();
 
         assertEquals(3, resourceUrls.size());
         assertTrue(resourceUrls.contains(fileUrlFoo));
@@ -78,7 +82,7 @@ public class MCRCombinedResourceFilterTest {
 
         MCRResourceFilter filter = configDirLibraryFilter(URI.create("file:/something/completely/different").toURL());
 
-        List<URL> resourceUrls = filter.filter(allResourceUrls.stream(), MCRHints.EMPTY).toList();
+        List<URL> resourceUrls = filter.filter(allResourceUrls.stream(), MCRHints.EMPTY, NO_OP_TRACER).toList();
 
         assertEquals(3, resourceUrls.size());
         assertTrue(resourceUrls.contains(fileUrlFoo));
@@ -92,7 +96,7 @@ public class MCRCombinedResourceFilterTest {
 
         MCRResourceFilter filter = configDirLibraryFilter(fileUrlFoo);
 
-        List<URL> resourceUrls = filter.filter(allResourceUrls.stream(), MCRHints.EMPTY).toList();
+        List<URL> resourceUrls = filter.filter(allResourceUrls.stream(), MCRHints.EMPTY, NO_OP_TRACER).toList();
 
         assertEquals(2, resourceUrls.size());
         assertTrue(resourceUrls.contains(fileUrlBar));
@@ -105,7 +109,7 @@ public class MCRCombinedResourceFilterTest {
 
         MCRResourceFilter filter = configDirLibraryFilter(fileUrlFoo, fileUrlBaz);
 
-        List<URL> resourceUrls = filter.filter(allResourceUrls.stream(), MCRHints.EMPTY).toList();
+        List<URL> resourceUrls = filter.filter(allResourceUrls.stream(), MCRHints.EMPTY, NO_OP_TRACER).toList();
 
         assertEquals(1, resourceUrls.size());
         assertTrue(resourceUrls.contains(fileUrlBar));
@@ -123,7 +127,7 @@ public class MCRCombinedResourceFilterTest {
         MCRResourceFilter filter = MCRConfiguration2.getInstanceOfOrThrow(
             MCRCombinedResourceFilter.class, "Test.Class");
 
-        List<URL> resourceUrls = filter.filter(allResourceUrls.stream(), MCRHints.EMPTY).toList();
+        List<URL> resourceUrls = filter.filter(allResourceUrls.stream(), MCRHints.EMPTY, NO_OP_TRACER).toList();
 
         assertEquals(1, resourceUrls.size());
         assertTrue(resourceUrls.contains(fileUrlBaz));
@@ -140,7 +144,7 @@ public class MCRCombinedResourceFilterTest {
         return new MCRResourceFilterBase() {
 
             @Override
-            protected Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints) {
+            protected Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
                 return resourceUrls.filter(u -> u != url);
             }
 
@@ -151,7 +155,7 @@ public class MCRCombinedResourceFilterTest {
     public static class NoFooFilter extends MCRResourceFilterBase {
 
         @Override
-        protected Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints) {
+        protected Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
             return resourceUrls.filter(u -> !u.toString().endsWith("/foo"));
         }
 
@@ -160,7 +164,7 @@ public class MCRCombinedResourceFilterTest {
     public static class NoBarFilter extends MCRResourceFilterBase {
 
         @Override
-        protected Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints) {
+        protected Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
             return resourceUrls.filter(u -> !u.toString().endsWith("/bar"));
         }
 

@@ -18,7 +18,6 @@
 
 package org.mycore.resource.provider;
 
-import static org.mycore.resource.common.MCRTraceLoggingHelper.trace;
 
 import java.net.URL;
 import java.util.List;
@@ -29,12 +28,13 @@ import org.apache.logging.log4j.Level;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRResourceTracer;
 
 /**
  * {@link MCRResourceProviderBase} is a base implementation of {@link MCRResourceProvider} that
  * facilitates consistent logging. Implementors must provide the actual lookup strategy
- * ({@link MCRResourceProviderBase#doProvide(MCRResourcePath, MCRHints)},
- * {@link MCRResourceProviderBase#doProvideAll(MCRResourcePath, MCRHints)}).
+ * ({@link MCRResourceProviderBase#doProvide(MCRResourcePath, MCRHints, MCRResourceTracer)},
+ * {@link MCRResourceProviderBase#doProvideAll(MCRResourcePath, MCRHints, MCRResourceTracer)}).
  */
 public abstract class MCRResourceProviderBase implements MCRResourceProvider {
 
@@ -47,27 +47,27 @@ public abstract class MCRResourceProviderBase implements MCRResourceProvider {
     }
 
     @Override
-    public final Optional<URL> provide(MCRResourcePath path, MCRHints hints) {
-        return trace(hints, doProvide(path, hints), (message, providedResourceUrl) -> {
-            providedResourceUrl.ifPresentOrElse(url -> message.add("Providing resource URL " + url),
-                () -> message.add("Providing no resource URL"));
+    public final Optional<URL> provide(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
+        return tracer.trace(hints, doProvide(path, hints, tracer), (appender, providedResourceUrl) -> {
+            providedResourceUrl.ifPresentOrElse(url -> appender.append("Providing resource URL " + url),
+                () -> appender.append("Providing no resource URL"));
         });
     }
 
     @Override
-    public final List<ProvidedUrl> provideAll(MCRResourcePath path, MCRHints hints) {
-        return trace(hints, doProvideAll(path, hints), (message, providedResourceUrls) -> {
+    public final List<ProvidedUrl> provideAll(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
+        return tracer.trace(hints, doProvideAll(path, hints, tracer), (appender, providedResourceUrls) -> {
             if (!providedResourceUrls.isEmpty()) {
-                providedResourceUrls.forEach(url -> message.add("Providing resource URL " + url));
+                providedResourceUrls.forEach(url -> appender.append("Providing resource URL " + url));
             } else {
-                message.add("Providing no resource URLs");
+                appender.append("Providing no resource URLs");
             }
         });
     }
 
-    protected abstract Optional<URL> doProvide(MCRResourcePath path, MCRHints hints);
+    protected abstract Optional<URL> doProvide(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer);
 
-    protected abstract List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints);
+    protected abstract List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer);
 
     protected final ProvidedUrl providedUrl(URL url) {
         return new ProvidedUrl(url, coverage());

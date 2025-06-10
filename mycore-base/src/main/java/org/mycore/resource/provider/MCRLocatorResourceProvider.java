@@ -18,8 +18,6 @@
 
 package org.mycore.resource.provider;
 
-import static org.mycore.resource.common.MCRTraceLoggingHelper.update;
-
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
@@ -34,6 +32,7 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRResourceTracer;
 import org.mycore.resource.locator.MCRResourceLocator;
 
 /**
@@ -70,13 +69,13 @@ public class MCRLocatorResourceProvider extends MCRResourceProviderBase {
     }
 
     @Override
-    protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints) {
-        return locator.locate(path, update(hints, locator, null)).findFirst();
+    protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
+        return locator.locate(path, hints, tracer.update(locator)).findFirst();
     }
 
     @Override
-    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints) {
-        return locator.locate(path, update(hints, locator, null)).map(this::providedUrl).toList();
+    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
+        return locator.locate(path, hints, tracer.update(locator)).map(this::providedUrl).toList();
     }
 
     @Override

@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.Level;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
+import org.mycore.resource.common.MCRResourceTracer;
 
 /**
  * {@link MCRUrlPrefixResourceFilterBase} is a base implementation of a {@link MCRResourceFilter} that
@@ -43,11 +44,11 @@ public abstract class MCRUrlPrefixResourceFilterBase extends MCRResourceFilterBa
     }
 
     @Override
-    protected final Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints) {
-        return getPrefix(hints).stream().flatMap(prefix -> filter(resourceUrls, prefix));
+    protected final Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
+        return getPrefix(hints, tracer).stream().flatMap(prefix -> filter(resourceUrls, prefix));
     }
 
-    protected abstract Optional<String> getPrefix(MCRHints hints);
+    protected abstract Optional<String> getPrefix(MCRHints hints, MCRResourceTracer tracer);
 
     private Stream<URL> filter(Stream<URL> resourceUrls, String prefix) {
         return resourceUrls.filter(url -> filter(prefix, url));

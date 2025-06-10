@@ -35,6 +35,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.hint.MCRHintsBuilder;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
 import org.mycore.resource.common.MCRSyntheticResourceSpec;
 import org.mycore.test.MCRTestUrlExtension;
 import org.mycore.test.MyCoReTest;
@@ -43,6 +44,8 @@ import org.mycore.test.MyCoReTest;
 @ExtendWith(MCRTestUrlExtension.class)
 @MCRTestUrlConfiguration(protocols = "test2")
 public class MCRCombinedResourceLocatorTest {
+
+    public static final MCRNoOpResourceTracer NO_OP_TRACER = new MCRNoOpResourceTracer();
 
     private static final MCRResourcePath FOO_PATH = MCRResourcePath.ofPath("foo").orElseThrow();
 
@@ -62,7 +65,7 @@ public class MCRCombinedResourceLocatorTest {
         MCRHints hints = toHints(factory);
         MCRResourceLocator locator = combinedLocator(Collections.emptyList(), Collections.emptyList());
 
-        List<URL> resourceUrls = locator.locate(FOO_PATH, hints).toList();
+        List<URL> resourceUrls = locator.locate(FOO_PATH, hints, NO_OP_TRACER).toList();
 
         assertTrue(resourceUrls.isEmpty());
 
@@ -75,7 +78,7 @@ public class MCRCombinedResourceLocatorTest {
         List<MCRSyntheticResourceSpec> specs = List.of(FOO_SPEC);
         MCRResourceLocator locator = combinedLocator(Collections.emptyList(), specs);
 
-        List<URL> resourceUrls = locator.locate(FOO_PATH, hints).toList();
+        List<URL> resourceUrls = locator.locate(FOO_PATH, hints, NO_OP_TRACER).toList();
 
         assertEquals(1, resourceUrls.size());
         assertTrue(resourceUrls.contains(FOO_SPEC.toUrl(factory)));
@@ -89,7 +92,7 @@ public class MCRCombinedResourceLocatorTest {
         List<MCRSyntheticResourceSpec> specs = List.of(FOO_SPEC);
         MCRResourceLocator locator = combinedLocator(specs, Collections.emptyList());
 
-        List<URL> resourceUrls = locator.locate(FOO_PATH, hints).toList();
+        List<URL> resourceUrls = locator.locate(FOO_PATH, hints, NO_OP_TRACER).toList();
 
         assertEquals(1, resourceUrls.size());
         assertTrue(resourceUrls.contains(FOO_SPEC.toUrl(factory)));
@@ -104,7 +107,7 @@ public class MCRCombinedResourceLocatorTest {
         List<MCRSyntheticResourceSpec> specs2 = List.of(FOO2_SPEC);
         MCRResourceLocator locator = combinedLocator(specs1, specs2);
 
-        List<URL> resourceUrls = locator.locate(FOO_PATH, hints).toList();
+        List<URL> resourceUrls = locator.locate(FOO_PATH, hints, NO_OP_TRACER).toList();
 
         assertEquals(2, resourceUrls.size());
         assertTrue(resourceUrls.contains(FOO_SPEC.toUrl(factory)));
@@ -120,7 +123,7 @@ public class MCRCombinedResourceLocatorTest {
         List<MCRSyntheticResourceSpec> specs2 = List.of(BAR_SPEC);
         MCRResourceLocator locator = combinedLocator(specs1, specs2);
 
-        List<URL> resourceUrls = locator.locate(BAR_PATH, hints).toList();
+        List<URL> resourceUrls = locator.locate(BAR_PATH, hints, NO_OP_TRACER).toList();
 
         assertEquals(1, resourceUrls.size());
         assertTrue(resourceUrls.contains(BAR_SPEC.toUrl(factory)));
@@ -143,9 +146,9 @@ public class MCRCombinedResourceLocatorTest {
         MCRResourceLocator locator = MCRConfiguration2.getInstanceOfOrThrow(
             MCRCombinedResourceLocator.class, "Test.Class");
 
-        List<URL> fooResourceUrl = locator.locate(FOO_PATH, hints).toList();
-        List<URL> barResourceUrl = locator.locate(BAR_PATH, hints).toList();
-        List<URL> bazResourceUrl = locator.locate(BAZ_PATH, hints).toList();
+        List<URL> fooResourceUrl = locator.locate(FOO_PATH, hints, NO_OP_TRACER).toList();
+        List<URL> barResourceUrl = locator.locate(BAR_PATH, hints, NO_OP_TRACER).toList();
+        List<URL> bazResourceUrl = locator.locate(BAZ_PATH, hints, NO_OP_TRACER).toList();
 
         assertEquals(1, fooResourceUrl.size());
         assertEquals(1, barResourceUrl.size());

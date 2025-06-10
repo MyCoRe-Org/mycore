@@ -42,12 +42,15 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.hint.MCRHintsBuilder;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
 public class MCRClassLoaderResourceProviderTest {
+
+    public static final MCRNoOpResourceTracer NO_OP_TRACER = new MCRNoOpResourceTracer();
 
     public static final ClassLoader PARENT_CLASS_LOADER = MCRClassTools.getClassLoader();
 
@@ -89,7 +92,7 @@ public class MCRClassLoaderResourceProviderTest {
         MCRHints hints = toHints(emptyBaseDir, empty2BaseDir);
         MCRResourceProvider provider = classLoaderProvider();
 
-        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints);
+        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isEmpty());
 
@@ -101,7 +104,7 @@ public class MCRClassLoaderResourceProviderTest {
         MCRHints hints = toHints(emptyBaseDir, fooBaseDir);
         MCRResourceProvider provider = classLoaderProvider();
 
-        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints);
+        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isPresent());
         assertEquals(toUrl(fooBaseDir, "foo"), resourceUrl.get());
@@ -114,7 +117,7 @@ public class MCRClassLoaderResourceProviderTest {
         MCRHints hints = toHints(fooBaseDir, emptyBaseDir);
         MCRResourceProvider provider = classLoaderProvider();
 
-        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints);
+        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isPresent());
         assertEquals(toUrl(fooBaseDir, "foo"), resourceUrl.get());
@@ -127,7 +130,7 @@ public class MCRClassLoaderResourceProviderTest {
         MCRHints hints = toHints(fooBaseDir, foo2BaseDir);
         MCRResourceProvider provider = classLoaderProvider();
 
-        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints);
+        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isPresent());
         assertEquals(toUrl(fooBaseDir, "foo"), resourceUrl.get());
@@ -140,7 +143,7 @@ public class MCRClassLoaderResourceProviderTest {
         MCRHints hints = toHints(fooBaseDir, barBaseDir);
         MCRResourceProvider provider = classLoaderProvider();
 
-        Optional<URL> resourceUrl = provider.provide(BAR_PATH, hints);
+        Optional<URL> resourceUrl = provider.provide(BAR_PATH, hints, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isPresent());
         assertEquals(toUrl(barBaseDir, "bar"), resourceUrl.get());
@@ -153,7 +156,7 @@ public class MCRClassLoaderResourceProviderTest {
         MCRHints hints = toHints(emptyBaseDir, empty2BaseDir);
         MCRResourceProvider provider = classLoaderProvider();
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertTrue(resourceUrls.isEmpty());
@@ -166,7 +169,7 @@ public class MCRClassLoaderResourceProviderTest {
         MCRHints hints = toHints(emptyBaseDir, fooBaseDir);
         MCRResourceProvider provider = classLoaderProvider();
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertEquals(1, resourceUrls.size());
@@ -180,7 +183,7 @@ public class MCRClassLoaderResourceProviderTest {
         MCRHints hints = toHints(fooBaseDir, emptyBaseDir);
         MCRResourceProvider provider = classLoaderProvider();
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertEquals(1, resourceUrls.size());
@@ -194,7 +197,7 @@ public class MCRClassLoaderResourceProviderTest {
         MCRHints hints = toHints(fooBaseDir, foo2BaseDir);
         MCRResourceProvider provider = classLoaderProvider();
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertEquals(2, resourceUrls.size());
@@ -209,7 +212,7 @@ public class MCRClassLoaderResourceProviderTest {
         MCRHints hints = toHints(fooBaseDir, barBaseDir);
         MCRResourceProvider provider = classLoaderProvider();
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(BAR_PATH, hints);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(BAR_PATH, hints, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertEquals(1, resourceUrls.size());
@@ -229,9 +232,9 @@ public class MCRClassLoaderResourceProviderTest {
         MCRResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(
             MCRClassLoaderResourceProvider.class, "Test.Class");
 
-        Optional<URL> fooResourceUrl = provider.provide(FOO_PATH, hints);
-        Optional<URL> barResourceUrl = provider.provide(BAR_PATH, hints);
-        Optional<URL> bazResourceUrl = provider.provide(BAZ_PATH, hints);
+        Optional<URL> fooResourceUrl = provider.provide(FOO_PATH, hints, NO_OP_TRACER);
+        Optional<URL> barResourceUrl = provider.provide(BAR_PATH, hints, NO_OP_TRACER);
+        Optional<URL> bazResourceUrl = provider.provide(BAZ_PATH, hints, NO_OP_TRACER);
 
         assertTrue(fooResourceUrl.isPresent());
         assertTrue(barResourceUrl.isPresent());

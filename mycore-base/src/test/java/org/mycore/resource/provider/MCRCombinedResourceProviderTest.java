@@ -36,6 +36,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.hint.MCRHintsBuilder;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
 import org.mycore.resource.common.MCRSyntheticResourceSpec;
 import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
 import org.mycore.test.MCRTestUrlExtension;
@@ -45,6 +46,8 @@ import org.mycore.test.MyCoReTest;
 @ExtendWith(MCRTestUrlExtension.class)
 @MCRTestUrlConfiguration(protocols = "test2")
 public class MCRCombinedResourceProviderTest {
+
+    public static final MCRNoOpResourceTracer NO_OP_TRACER = new MCRNoOpResourceTracer();
 
     private static final MCRResourcePath FOO_PATH = MCRResourcePath.ofPath("foo").orElseThrow();
 
@@ -64,7 +67,7 @@ public class MCRCombinedResourceProviderTest {
         MCRHints hints = toHints(factory);
         MCRResourceProvider provider = combinedProvider(Collections.emptyList(), Collections.emptyList());
 
-        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints);
+        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isEmpty());
 
@@ -77,7 +80,7 @@ public class MCRCombinedResourceProviderTest {
         List<MCRSyntheticResourceSpec> specs = List.of(FOO_SPEC);
         MCRResourceProvider provider = combinedProvider(Collections.emptyList(), specs);
 
-        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints);
+        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isPresent());
         assertEquals(FOO_SPEC.toUrl(factory), resourceUrl.get());
@@ -91,7 +94,7 @@ public class MCRCombinedResourceProviderTest {
         List<MCRSyntheticResourceSpec> specs = List.of(FOO_SPEC);
         MCRResourceProvider provider = combinedProvider(specs, Collections.emptyList());
 
-        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints);
+        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isPresent());
         assertEquals(FOO_SPEC.toUrl(factory), resourceUrl.get());
@@ -106,7 +109,7 @@ public class MCRCombinedResourceProviderTest {
         List<MCRSyntheticResourceSpec> specs2 = List.of(FOO2_SPEC);
         MCRResourceProvider provider = combinedProvider(specs1, specs2);
 
-        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints);
+        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isPresent());
         assertEquals(FOO_SPEC.toUrl(factory), resourceUrl.get());
@@ -121,7 +124,7 @@ public class MCRCombinedResourceProviderTest {
         List<MCRSyntheticResourceSpec> specs2 = List.of(BAR_SPEC);
         MCRResourceProvider provider = combinedProvider(specs1, specs2);
 
-        Optional<URL> resourceUrl = provider.provide(BAR_PATH, hints);
+        Optional<URL> resourceUrl = provider.provide(BAR_PATH, hints, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isPresent());
         assertEquals(BAR_SPEC.toUrl(factory), resourceUrl.get());
@@ -134,7 +137,7 @@ public class MCRCombinedResourceProviderTest {
         MCRHints hints = toHints(factory);
         MCRResourceProvider provider = combinedProvider(Collections.emptyList(), Collections.emptyList());
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertTrue(resourceUrls.isEmpty());
@@ -148,7 +151,7 @@ public class MCRCombinedResourceProviderTest {
         List<MCRSyntheticResourceSpec> specs = List.of(FOO_SPEC);
         MCRResourceProvider provider = combinedProvider(Collections.emptyList(), specs);
 
-        List<MCRResourceProvider.ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints);
+        List<MCRResourceProvider.ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertEquals(1, resourceUrls.size());
@@ -163,7 +166,7 @@ public class MCRCombinedResourceProviderTest {
         List<MCRSyntheticResourceSpec> specs = List.of(FOO_SPEC);
         MCRResourceProvider provider = combinedProvider(specs, Collections.emptyList());
 
-        List<MCRResourceProvider.ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints);
+        List<MCRResourceProvider.ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertEquals(1, resourceUrls.size());
@@ -179,7 +182,7 @@ public class MCRCombinedResourceProviderTest {
         List<MCRSyntheticResourceSpec> specs2 = List.of(FOO2_SPEC);
         MCRResourceProvider provider = combinedProvider(specs1, specs2);
 
-        List<MCRResourceProvider.ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints);
+        List<MCRResourceProvider.ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertEquals(2, resourceUrls.size());
@@ -196,7 +199,7 @@ public class MCRCombinedResourceProviderTest {
         List<MCRSyntheticResourceSpec> specs2 = List.of(BAR_SPEC);
         MCRResourceProvider provider = combinedProvider(specs1, specs2);
 
-        List<MCRResourceProvider.ProvidedUrl> providedResourceUrls = provider.provideAll(BAR_PATH, hints);
+        List<MCRResourceProvider.ProvidedUrl> providedResourceUrls = provider.provideAll(BAR_PATH, hints, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertEquals(1, resourceUrls.size());
@@ -220,9 +223,9 @@ public class MCRCombinedResourceProviderTest {
         MCRResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(
             MCRCombinedResourceProvider.class, "Test.Class");
 
-        Optional<URL> fooResourceUrl = provider.provide(FOO_PATH, hints);
-        Optional<URL> barResourceUrl = provider.provide(BAR_PATH, hints);
-        Optional<URL> bazResourceUrl = provider.provide(BAZ_PATH, hints);
+        Optional<URL> fooResourceUrl = provider.provide(FOO_PATH, hints, NO_OP_TRACER);
+        Optional<URL> barResourceUrl = provider.provide(BAR_PATH, hints, NO_OP_TRACER);
+        Optional<URL> bazResourceUrl = provider.provide(BAZ_PATH, hints, NO_OP_TRACER);
 
         assertTrue(fooResourceUrl.isPresent());
         assertTrue(barResourceUrl.isPresent());

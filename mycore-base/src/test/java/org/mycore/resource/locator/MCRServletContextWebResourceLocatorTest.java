@@ -38,6 +38,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.hint.MCRHintsBuilder;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 import org.mycore.test.MCRTestUrlExtension;
 import org.mycore.test.MyCoReTest;
@@ -47,6 +48,8 @@ import jakarta.servlet.ServletContext;
 @MyCoReTest
 @ExtendWith(MCRTestUrlExtension.class)
 public class MCRServletContextWebResourceLocatorTest {
+
+    public static final MCRNoOpResourceTracer NO_OP_TRACER = new MCRNoOpResourceTracer();
 
     private static final MCRResourcePath FOO_PATH = MCRResourcePath.ofPath("foo").orElseThrow();
 
@@ -62,7 +65,7 @@ public class MCRServletContextWebResourceLocatorTest {
         MCRHints hints = toHints("foo");
         MCRResourceLocator locator = servletContextLocator();
 
-        List<URL> resourceUrls = locator.locate(BAR_PATH, hints).toList();
+        List<URL> resourceUrls = locator.locate(BAR_PATH, hints, NO_OP_TRACER).toList();
 
         assertTrue(resourceUrls.isEmpty());
 
@@ -74,7 +77,7 @@ public class MCRServletContextWebResourceLocatorTest {
         MCRHints hints = toHints("foo");
         MCRResourceLocator locator = servletContextLocator();
 
-        List<URL> resourceUrls = locator.locate(WEB_BAR_PATH, hints).toList();
+        List<URL> resourceUrls = locator.locate(WEB_BAR_PATH, hints, NO_OP_TRACER).toList();
 
         assertTrue(resourceUrls.isEmpty());
 
@@ -86,7 +89,7 @@ public class MCRServletContextWebResourceLocatorTest {
         MCRHints hints = toHints("foo");
         MCRResourceLocator locator = servletContextLocator();
 
-        List<URL> resourceUrls = locator.locate(FOO_PATH, hints).toList();
+        List<URL> resourceUrls = locator.locate(FOO_PATH, hints, NO_OP_TRACER).toList();
 
         assertTrue(resourceUrls.isEmpty());
     }
@@ -97,7 +100,7 @@ public class MCRServletContextWebResourceLocatorTest {
         MCRHints hints = toHints("foo");
         MCRResourceLocator locator = servletContextLocator();
 
-        List<URL> resourceUrls = locator.locate(WEB_FOO_PATH, hints).toList();
+        List<URL> resourceUrls = locator.locate(WEB_FOO_PATH, hints, NO_OP_TRACER).toList();
 
         assertEquals(1, resourceUrls.size());
         assertTrue(resourceUrls.contains(toMockJarUrl("foo")));
@@ -114,8 +117,8 @@ public class MCRServletContextWebResourceLocatorTest {
         MCRResourceLocator locator = MCRConfiguration2.getInstanceOfOrThrow(
             MCRServletContextWebResourceLocator.class, "Test.Class");
 
-        List<URL> fooResourceUrl = locator.locate(WEB_FOO_PATH, hints).toList();
-        List<URL> barResourceUrl = locator.locate(WEB_BAR_PATH, hints).toList();
+        List<URL> fooResourceUrl = locator.locate(WEB_FOO_PATH, hints, NO_OP_TRACER).toList();
+        List<URL> barResourceUrl = locator.locate(WEB_BAR_PATH, hints, NO_OP_TRACER).toList();
 
         assertEquals(1, fooResourceUrl.size());
         assertEquals(0, barResourceUrl.size());

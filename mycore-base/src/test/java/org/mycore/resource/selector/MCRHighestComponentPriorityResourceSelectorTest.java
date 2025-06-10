@@ -38,11 +38,14 @@ import org.mycore.common.config.MCRComponent;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.hint.MCRHintsBuilder;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
 public class MCRHighestComponentPriorityResourceSelectorTest {
+
+    public static final MCRNoOpResourceTracer NO_OP_TRACER = new MCRNoOpResourceTracer();
 
     private static final ComponentInfo COMPONENT_25_1 =
         new ComponentInfo("component-25-1", 50, new File("/foo/component-25-1.jar"));
@@ -102,7 +105,7 @@ public class MCRHighestComponentPriorityResourceSelectorTest {
         MCRResourceSelector selector = highestComponentPriority();
 
         // no selection can be made (resource URL not part of the libraries) ...
-        List<URL> resourceUrls = selector.select(List.of(fileResourceUrl), hints);
+        List<URL> resourceUrls = selector.select(List.of(fileResourceUrl), hints, NO_OP_TRACER);
 
         // ... expect all resource URLs
         assertEquals(1, resourceUrls.size());
@@ -117,7 +120,7 @@ public class MCRHighestComponentPriorityResourceSelectorTest {
         MCRResourceSelector selector = highestComponentPriority();
 
         // no selection can be made (resource URLs not part of the libraries) ...
-        List<URL> resourceUrls = selector.select(List.of(fileResourceUrl, otherLibraryResourceUrl), hints);
+        List<URL> resourceUrls = selector.select(List.of(fileResourceUrl, otherLibraryResourceUrl), hints, NO_OP_TRACER);
 
         // ... expect all resource URLs
         assertEquals(2, resourceUrls.size());
@@ -133,7 +136,7 @@ public class MCRHighestComponentPriorityResourceSelectorTest {
         MCRResourceSelector selector = highestComponentPriority();
 
         // no selection can be made (resource URL not part of the libraries) ...
-        List<URL> resourceUrls = selector.select(List.of(otherCompoenent751ResourceUrl), hints);
+        List<URL> resourceUrls = selector.select(List.of(otherCompoenent751ResourceUrl), hints, NO_OP_TRACER);
 
         // ... expect all resource URLs
         assertEquals(1, resourceUrls.size());
@@ -148,7 +151,7 @@ public class MCRHighestComponentPriorityResourceSelectorTest {
         MCRResourceSelector selector = highestComponentPriority();
 
         // selection can be made (first resource URL part of first library) ...
-        List<URL> resourceUrls = selector.select(List.of(component751ResourceUrl, otherLibraryResourceUrl), hints);
+        List<URL> resourceUrls = selector.select(List.of(component751ResourceUrl, otherLibraryResourceUrl), hints, NO_OP_TRACER);
 
         // ... expect specific resource URLs
         assertEquals(1, resourceUrls.size());
@@ -163,7 +166,7 @@ public class MCRHighestComponentPriorityResourceSelectorTest {
         MCRResourceSelector selector = highestComponentPriority();
 
         // selection can be made (second resource URL part of second library) ...
-        List<URL> resourceUrls = selector.select(List.of(otherLibraryResourceUrl, component501ResourceUrl), hints);
+        List<URL> resourceUrls = selector.select(List.of(otherLibraryResourceUrl, component501ResourceUrl), hints, NO_OP_TRACER);
 
         // ... expect specific resource URLs
         assertEquals(1, resourceUrls.size());
@@ -178,7 +181,7 @@ public class MCRHighestComponentPriorityResourceSelectorTest {
         MCRResourceSelector selector = highestComponentPriority();
 
         // selection can be made (both resource URLs part of libraries) ...
-        List<URL> resourceUrls = selector.select(List.of(component751ResourceUrl, component501ResourceUrl), hints);
+        List<URL> resourceUrls = selector.select(List.of(component751ResourceUrl, component501ResourceUrl), hints, NO_OP_TRACER);
 
         // ... expect specific resource URLs
         assertEquals(1, resourceUrls.size());
@@ -193,7 +196,7 @@ public class MCRHighestComponentPriorityResourceSelectorTest {
         MCRResourceSelector selector = highestComponentPriority();
 
         // selection can be made (both resource URLs part of libraries) ...
-        List<URL> resourceUrls = selector.select(List.of(component251ResourceUrl, component501ResourceUrl), hints);
+        List<URL> resourceUrls = selector.select(List.of(component251ResourceUrl, component501ResourceUrl), hints, NO_OP_TRACER);
 
         // ... expect specific resource URLs
         assertEquals(1, resourceUrls.size());
@@ -210,7 +213,7 @@ public class MCRHighestComponentPriorityResourceSelectorTest {
 
         // selection can be made (both resource URLs part of libraries) ...
         List<URL> resourceUrls = selector.select(List.of(component751ResourceUrl, component752ResourceUrl,
-            component501ResourceUrl, component502ResourceUrl), hints);
+            component501ResourceUrl, component502ResourceUrl), hints, NO_OP_TRACER);
 
         // ... expect specific resource URLs
         assertEquals(2, resourceUrls.size());
@@ -228,7 +231,7 @@ public class MCRHighestComponentPriorityResourceSelectorTest {
 
         // selection can be made (both resource URLs part of libraries) ...
         List<URL> resourceUrls = selector.select(List.of(component252ResourceUrl, component251ResourceUrl,
-            component502ResourceUrl, component501ResourceUrl), hints);
+            component502ResourceUrl, component501ResourceUrl), hints, NO_OP_TRACER);
 
         // ... expect specific resource URLs
         assertEquals(2, resourceUrls.size());
@@ -247,7 +250,7 @@ public class MCRHighestComponentPriorityResourceSelectorTest {
         MCRResourceSelector selector = MCRConfiguration2.getInstanceOfOrThrow(
             MCRHighestComponentPriorityResourceSelector.class, "Test.Class");
 
-        List<URL> resourceUrls = selector.select(List.of(component501ResourceUrl), hints);
+        List<URL> resourceUrls = selector.select(List.of(component501ResourceUrl), hints, NO_OP_TRACER);
 
         assertEquals(1, resourceUrls.size());
         assertTrue(resourceUrls.contains(component501ResourceUrl));

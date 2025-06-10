@@ -42,11 +42,14 @@ import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
 import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
 public class MCRDeveloperOverrideResourceProviderTest {
+
+    public static final MCRNoOpResourceTracer NO_OP_TRACER = new MCRNoOpResourceTracer();
 
     private static final MCRResourcePath FOO_PATH = MCRResourcePath.ofPath("foo").orElseThrow();
 
@@ -85,7 +88,7 @@ public class MCRDeveloperOverrideResourceProviderTest {
 
         MCRResourceProvider provider = developerOverrideProvider(emptyBaseDir, empty2BaseDir);
 
-        Optional<URL> resourceUrl = provider.provide(FOO_PATH, MCRHints.EMPTY);
+        Optional<URL> resourceUrl = provider.provide(FOO_PATH, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isEmpty());
 
@@ -96,7 +99,7 @@ public class MCRDeveloperOverrideResourceProviderTest {
 
         MCRResourceProvider provider = developerOverrideProvider(emptyBaseDir, fooBaseDir);
 
-        Optional<URL> resourceUrl = provider.provide(FOO_PATH, MCRHints.EMPTY);
+        Optional<URL> resourceUrl = provider.provide(FOO_PATH, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isPresent());
         assertEquals(toUrl(fooBaseDir, "foo"), resourceUrl.get());
@@ -108,7 +111,7 @@ public class MCRDeveloperOverrideResourceProviderTest {
 
         MCRResourceProvider provider = developerOverrideProvider(fooBaseDir, emptyBaseDir);
 
-        Optional<URL> resourceUrl = provider.provide(FOO_PATH, MCRHints.EMPTY);
+        Optional<URL> resourceUrl = provider.provide(FOO_PATH, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isPresent());
         assertEquals(toUrl(fooBaseDir, "foo"), resourceUrl.get());
@@ -120,7 +123,7 @@ public class MCRDeveloperOverrideResourceProviderTest {
 
         MCRResourceProvider provider = developerOverrideProvider(fooBaseDir, foo2BaseDir);
 
-        Optional<URL> resourceUrl = provider.provide(FOO_PATH, MCRHints.EMPTY);
+        Optional<URL> resourceUrl = provider.provide(FOO_PATH, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isPresent());
         assertEquals(toUrl(fooBaseDir, "foo"), resourceUrl.get());
@@ -132,7 +135,7 @@ public class MCRDeveloperOverrideResourceProviderTest {
 
         MCRResourceProvider provider = developerOverrideProvider(fooBaseDir, barBaseDir);
 
-        Optional<URL> resourceUrl = provider.provide(BAR_PATH, MCRHints.EMPTY);
+        Optional<URL> resourceUrl = provider.provide(BAR_PATH, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isPresent());
         assertEquals(toUrl(barBaseDir, "bar"), resourceUrl.get());
@@ -144,7 +147,7 @@ public class MCRDeveloperOverrideResourceProviderTest {
 
         MCRResourceProvider provider = developerOverrideProvider(emptyBaseDir, emptyBaseDir);
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, MCRHints.EMPTY);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, MCRHints.EMPTY, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertTrue(resourceUrls.isEmpty());
@@ -156,7 +159,7 @@ public class MCRDeveloperOverrideResourceProviderTest {
 
         MCRResourceProvider provider = developerOverrideProvider(emptyBaseDir, fooBaseDir);
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, MCRHints.EMPTY);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, MCRHints.EMPTY, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertEquals(1, resourceUrls.size());
@@ -169,7 +172,7 @@ public class MCRDeveloperOverrideResourceProviderTest {
 
         MCRResourceProvider provider = developerOverrideProvider(fooBaseDir, emptyBaseDir);
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, MCRHints.EMPTY);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, MCRHints.EMPTY, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertEquals(1, resourceUrls.size());
@@ -182,7 +185,7 @@ public class MCRDeveloperOverrideResourceProviderTest {
 
         MCRResourceProvider provider = developerOverrideProvider(fooBaseDir, foo2BaseDir);
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, MCRHints.EMPTY);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, MCRHints.EMPTY, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertEquals(2, resourceUrls.size());
@@ -196,7 +199,7 @@ public class MCRDeveloperOverrideResourceProviderTest {
 
         MCRResourceProvider provider = developerOverrideProvider(fooBaseDir, barBaseDir);
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(BAR_PATH, MCRHints.EMPTY);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(BAR_PATH, MCRHints.EMPTY, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertEquals(1, resourceUrls.size());
@@ -217,9 +220,9 @@ public class MCRDeveloperOverrideResourceProviderTest {
         MCRResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(
             MCRDeveloperOverrideResourceProvider.class, "Test.Class");
 
-        Optional<URL> fooResourceUrl = provider.provide(FOO_PATH, MCRHints.EMPTY);
-        Optional<URL> barResourceUrl = provider.provide(BAR_PATH, MCRHints.EMPTY);
-        Optional<URL> bazResourceUrl = provider.provide(BAZ_PATH, MCRHints.EMPTY);
+        Optional<URL> fooResourceUrl = provider.provide(FOO_PATH, MCRHints.EMPTY, NO_OP_TRACER);
+        Optional<URL> barResourceUrl = provider.provide(BAR_PATH, MCRHints.EMPTY, NO_OP_TRACER);
+        Optional<URL> bazResourceUrl = provider.provide(BAZ_PATH, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertTrue(fooResourceUrl.isPresent());
         assertTrue(barResourceUrl.isPresent());

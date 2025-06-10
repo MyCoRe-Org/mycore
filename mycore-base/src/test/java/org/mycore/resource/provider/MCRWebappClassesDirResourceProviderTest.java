@@ -42,11 +42,14 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.hint.MCRHintsBuilder;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
 public class MCRWebappClassesDirResourceProviderTest {
+
+    public static final MCRNoOpResourceTracer NO_OP_TRACER = new MCRNoOpResourceTracer();
 
     private static final MCRResourcePath FOO_BAR_PATH = MCRResourcePath.ofPath("foo/bar").orElseThrow();
 
@@ -81,7 +84,7 @@ public class MCRWebappClassesDirResourceProviderTest {
         MCRHints hints = toHints(fooWebappDir, allResourceUrls);
         MCRResourceProvider provider = webappClassesDirProvider();
 
-        Optional<URL> resourceUrl = provider.provide(FOO_BAR_PATH, hints);
+        Optional<URL> resourceUrl = provider.provide(FOO_BAR_PATH, hints, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isPresent());
         assertEquals(webappClassesDirFileUrl, resourceUrl.get());
@@ -94,7 +97,7 @@ public class MCRWebappClassesDirResourceProviderTest {
         MCRHints hints = toHints(fooWebappDir, allResourceUrls);
         MCRResourceProvider provider = webappClassesDirProvider();
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_BAR_PATH, hints);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_BAR_PATH, hints, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertEquals(1, resourceUrls.size());
@@ -112,8 +115,8 @@ public class MCRWebappClassesDirResourceProviderTest {
         MCRResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(
             MCRWebappClassesDirResourceProvider.class, "Test.Class");
 
-        Optional<URL> fooResourceUrl = provider.provide(FOO_BAR_PATH, hints);
-        Optional<URL> barResourceUrl = provider.provide(BAR_FOO_PATH, hints);
+        Optional<URL> fooResourceUrl = provider.provide(FOO_BAR_PATH, hints, NO_OP_TRACER);
+        Optional<URL> barResourceUrl = provider.provide(BAR_FOO_PATH, hints, NO_OP_TRACER);
 
         assertTrue(fooResourceUrl.isPresent());
         assertTrue(barResourceUrl.isEmpty());

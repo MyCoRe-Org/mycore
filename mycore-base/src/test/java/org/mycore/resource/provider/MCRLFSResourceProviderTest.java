@@ -37,6 +37,8 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.hint.MCRHintsBuilder;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
+import org.mycore.resource.common.MCRResourceTracer;
 import org.mycore.resource.common.MCRSyntheticResourceSpec;
 import org.mycore.resource.filter.MCRNoOpResourceFilter;
 import org.mycore.resource.filter.MCRResourceFilterBase;
@@ -50,6 +52,8 @@ import org.mycore.test.MyCoReTest;
 @ExtendWith(MCRTestUrlExtension.class)
 @MCRTestUrlConfiguration(protocols = "test2")
 public class MCRLFSResourceProviderTest {
+
+    public static final MCRNoOpResourceTracer NO_OP_TRACER = new MCRNoOpResourceTracer();
 
     private static final MCRResourcePath FOO_PATH = MCRResourcePath.ofPath("foo").orElseThrow();
 
@@ -72,7 +76,7 @@ public class MCRLFSResourceProviderTest {
         MCRHints hints = toHints(factory);
         MCRResourceProvider provider = lfsProvider(ALL_SPECS, "foo", "1");
 
-        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints);
+        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isPresent());
         assertEquals(FOO_SPEC1.toUrl(factory), resourceUrl.get());
@@ -85,7 +89,7 @@ public class MCRLFSResourceProviderTest {
         MCRHints hints = toHints(factory);
         MCRResourceProvider provider = lfsProvider(ALL_SPECS, "foo", "1");
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         // expect all matching resource URLs, no selection
@@ -110,8 +114,8 @@ public class MCRLFSResourceProviderTest {
         MCRResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(
             MCRLFSResourceProvider.class, "Test.Class");
 
-        Optional<URL> fooResourceUrl = provider.provide(FOO_PATH, hints);
-        Optional<URL> barResourceUrl = provider.provide(BAR_PATH, hints);
+        Optional<URL> fooResourceUrl = provider.provide(FOO_PATH, hints, NO_OP_TRACER);
+        Optional<URL> barResourceUrl = provider.provide(BAR_PATH, hints, NO_OP_TRACER);
 
         assertTrue(fooResourceUrl.isPresent());
         assertTrue(barResourceUrl.isEmpty());
@@ -141,7 +145,7 @@ public class MCRLFSResourceProviderTest {
         }
 
         @Override
-        protected Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints) {
+        protected Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
             return resourceUrls.filter(u -> u.toString().contains("/" + dirName + "/"));
         }
 
@@ -156,7 +160,7 @@ public class MCRLFSResourceProviderTest {
         }
 
         @Override
-        protected final List<URL> doSelect(List<URL> resourceUrls, MCRHints hints) {
+        protected final List<URL> doSelect(List<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
             return resourceUrls.stream().filter(u -> u.toString().contains("/" + dirName + "/")).toList();
         }
 

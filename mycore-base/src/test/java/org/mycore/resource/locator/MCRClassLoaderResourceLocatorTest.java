@@ -32,6 +32,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import org.checkerframework.checker.units.qual.N;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRClassTools;
@@ -41,11 +42,14 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.hint.MCRHintsBuilder;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
 public class MCRClassLoaderResourceLocatorTest {
+
+    public static final MCRNoOpResourceTracer NO_OP_TRACER = new MCRNoOpResourceTracer();
 
     public static final ClassLoader PARENT_CLASS_LOADER = MCRClassTools.getClassLoader();
 
@@ -85,7 +89,7 @@ public class MCRClassLoaderResourceLocatorTest {
         MCRHints hints = toHints(emptyBaseDir, empty2BaseDir);
         MCRResourceLocator locator = classLoaderLocator();
 
-        List<URL> resourceUrls = locator.locate(FOO_PATH, hints).toList();
+        List<URL> resourceUrls = locator.locate(FOO_PATH, hints, NO_OP_TRACER).toList();
 
         assertTrue(resourceUrls.isEmpty());
 
@@ -97,7 +101,7 @@ public class MCRClassLoaderResourceLocatorTest {
         MCRHints hints = toHints(emptyBaseDir, fooBaseDir);
         MCRResourceLocator locator = classLoaderLocator();
 
-        List<URL> resourceUrls = locator.locate(FOO_PATH, hints).toList();
+        List<URL> resourceUrls = locator.locate(FOO_PATH, hints, NO_OP_TRACER).toList();
 
         assertEquals(1, resourceUrls.size());
         assertEquals(toUrl(fooBaseDir, "foo"), resourceUrls.get(0));
@@ -110,7 +114,7 @@ public class MCRClassLoaderResourceLocatorTest {
         MCRHints hints = toHints(fooBaseDir, emptyBaseDir);
         MCRResourceLocator locator = classLoaderLocator();
 
-        List<URL> resourceUrls = locator.locate(FOO_PATH, hints).toList();
+        List<URL> resourceUrls = locator.locate(FOO_PATH, hints, NO_OP_TRACER).toList();
 
         assertEquals(1, resourceUrls.size());
         assertEquals(toUrl(fooBaseDir, "foo"), resourceUrls.get(0));
@@ -123,7 +127,7 @@ public class MCRClassLoaderResourceLocatorTest {
         MCRHints hints = toHints(fooBaseDir, foo2BaseDir);
         MCRResourceLocator locator = classLoaderLocator();
 
-        List<URL> resourceUrls = locator.locate(FOO_PATH, hints).toList();
+        List<URL> resourceUrls = locator.locate(FOO_PATH, hints, NO_OP_TRACER).toList();
 
         assertEquals(2, resourceUrls.size());
         assertEquals(toUrl(fooBaseDir, "foo"), resourceUrls.get(0));
@@ -137,7 +141,7 @@ public class MCRClassLoaderResourceLocatorTest {
         MCRHints hints = toHints(fooBaseDir, barBaseDir);
         MCRResourceLocator locator = classLoaderLocator();
 
-        List<URL> resourceUrls = locator.locate(BAR_PATH, hints).toList();
+        List<URL> resourceUrls = locator.locate(BAR_PATH, hints, NO_OP_TRACER).toList();
 
         assertEquals(1, resourceUrls.size());
         assertEquals(toUrl(barBaseDir, "bar"), resourceUrls.get(0));
@@ -154,8 +158,8 @@ public class MCRClassLoaderResourceLocatorTest {
         MCRResourceLocator locator = MCRConfiguration2.getInstanceOfOrThrow(
             MCRClassLoaderResourceLocator.class, "Test.Class");
 
-        List<URL> fooResourceUrl = locator.locate(FOO_PATH, hints).toList();
-        List<URL> barResourceUrl = locator.locate(BAR_PATH, hints).toList();
+        List<URL> fooResourceUrl = locator.locate(FOO_PATH, hints, NO_OP_TRACER).toList();
+        List<URL> barResourceUrl = locator.locate(BAR_PATH, hints, NO_OP_TRACER).toList();
 
         assertEquals(1, fooResourceUrl.size());
         assertEquals(0, barResourceUrl.size());

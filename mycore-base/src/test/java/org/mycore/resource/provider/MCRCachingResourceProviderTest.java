@@ -38,6 +38,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.hint.MCRHintsBuilder;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
 import org.mycore.resource.common.MCRSyntheticResourceSpec;
 import org.mycore.resource.provider.MCRObservingResourceProvider.Observer;
 import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
@@ -48,6 +49,8 @@ import org.mycore.test.MyCoReTest;
 @ExtendWith(MCRTestUrlExtension.class)
 @MCRTestUrlConfiguration(protocols = "test2")
 public class MCRCachingResourceProviderTest {
+
+    public static final MCRNoOpResourceTracer NO_OP_TRACER = new MCRNoOpResourceTracer();
 
     private static final MCRResourcePath FOO_PATH = MCRResourcePath.ofPath("foo").orElseThrow();
 
@@ -65,8 +68,8 @@ public class MCRCachingResourceProviderTest {
         MCRResourceProvider provider = cachingProvider(Collections.emptyList(), observer);
 
         // hit twice
-        Optional<URL> resourceUrl1 = provider.provide(FOO_PATH, hints);
-        Optional<URL> resourceUrl2 = provider.provide(FOO_PATH, hints);
+        Optional<URL> resourceUrl1 = provider.provide(FOO_PATH, hints, NO_OP_TRACER);
+        Optional<URL> resourceUrl2 = provider.provide(FOO_PATH, hints, NO_OP_TRACER);
 
         // observe once: provide(...) is cached
         assertTrue(resourceUrl1.isEmpty());
@@ -85,8 +88,8 @@ public class MCRCachingResourceProviderTest {
         MCRResourceProvider provider = cachingProvider(specs, observer);
 
         // hit twice
-        Optional<URL> resourceUrl1 = provider.provide(FOO_PATH, hints);
-        Optional<URL> resourceUrl2 = provider.provide(FOO_PATH, hints);
+        Optional<URL> resourceUrl1 = provider.provide(FOO_PATH, hints, NO_OP_TRACER);
+        Optional<URL> resourceUrl2 = provider.provide(FOO_PATH, hints, NO_OP_TRACER);
 
         // observe once: provide(...) is cached
         assertTrue(resourceUrl1.isPresent());
@@ -106,8 +109,8 @@ public class MCRCachingResourceProviderTest {
         MCRResourceProvider provider = cachingProvider(specs, observer);
 
         // hit twice
-        Optional<URL> resourceUrl1 = provider.provide(FOO_PATH, hints);
-        Optional<URL> resourceUrl2 = provider.provide(FOO_PATH, hints);
+        Optional<URL> resourceUrl1 = provider.provide(FOO_PATH, hints, NO_OP_TRACER);
+        Optional<URL> resourceUrl2 = provider.provide(FOO_PATH, hints, NO_OP_TRACER);
 
         // observe once: provide(...) is cached
         assertTrue(resourceUrl1.isPresent());
@@ -126,8 +129,8 @@ public class MCRCachingResourceProviderTest {
         MCRResourceProvider provider = cachingProvider(Collections.emptyList(), observer);
 
         // hit twice
-        List<ProvidedUrl> providedResourceUrls1 = provider.provideAll(FOO_PATH, hints);
-        List<ProvidedUrl> providedResourceUrls2 = provider.provideAll(FOO_PATH, hints);
+        List<ProvidedUrl> providedResourceUrls1 = provider.provideAll(FOO_PATH, hints, NO_OP_TRACER);
+        List<ProvidedUrl> providedResourceUrls2 = provider.provideAll(FOO_PATH, hints, NO_OP_TRACER);
 
         // observe twice: provideAll(...) is not cached
         assertTrue(providedResourceUrls1.isEmpty());
@@ -146,8 +149,8 @@ public class MCRCachingResourceProviderTest {
         MCRResourceProvider provider = cachingProvider(specs, observer);
 
         // hit twice
-        List<ProvidedUrl> providedResourceUrls1 = provider.provideAll(FOO_PATH, hints);
-        List<ProvidedUrl> providedResourceUrls2 = provider.provideAll(FOO_PATH, hints);
+        List<ProvidedUrl> providedResourceUrls1 = provider.provideAll(FOO_PATH, hints, NO_OP_TRACER);
+        List<ProvidedUrl> providedResourceUrls2 = provider.provideAll(FOO_PATH, hints, NO_OP_TRACER);
 
         // observe twice: provideAll(...) is not cached
         assertEquals(1, providedResourceUrls1.size());
@@ -168,8 +171,8 @@ public class MCRCachingResourceProviderTest {
         MCRResourceProvider provider = cachingProvider(specs, observer);
 
         // hit twice
-        List<ProvidedUrl> providedResourceUrls1 = provider.provideAll(FOO_PATH, hints);
-        List<ProvidedUrl> providedResourceUrls2 = provider.provideAll(FOO_PATH, hints);
+        List<ProvidedUrl> providedResourceUrls1 = provider.provideAll(FOO_PATH, hints, NO_OP_TRACER);
+        List<ProvidedUrl> providedResourceUrls2 = provider.provideAll(FOO_PATH, hints, NO_OP_TRACER);
 
         // observe twice: provideAll(...) is not cached
         assertEquals(2, providedResourceUrls1.size());
@@ -196,8 +199,8 @@ public class MCRCachingResourceProviderTest {
         MCRCachingResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(
             MCRCachingResourceProvider.class, "Test.Class");
 
-        Optional<URL> fooResourceUrl = provider.provide(FOO_PATH, hints);
-        Optional<URL> barResourceUrl = provider.provide(BAR_PATH, hints);
+        Optional<URL> fooResourceUrl = provider.provide(FOO_PATH, hints, NO_OP_TRACER);
+        Optional<URL> barResourceUrl = provider.provide(BAR_PATH, hints, NO_OP_TRACER);
 
         assertTrue(fooResourceUrl.isPresent());
         assertTrue(barResourceUrl.isEmpty());

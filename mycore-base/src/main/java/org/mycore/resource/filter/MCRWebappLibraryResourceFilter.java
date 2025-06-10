@@ -18,8 +18,6 @@
 
 package org.mycore.resource.filter;
 
-import static org.mycore.resource.common.MCRTraceLoggingHelper.trace;
-
 import java.io.File;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -27,6 +25,7 @@ import java.util.function.Supplier;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.hint.MCRHints;
+import org.mycore.resource.common.MCRResourceTracer;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 
 /**
@@ -55,13 +54,13 @@ public final class MCRWebappLibraryResourceFilter extends MCRUrlPrefixResourceFi
     }
 
     @Override
-    protected Optional<String> getPrefix(MCRHints hints) {
-        return hints.get(MCRResourceHintKeys.WEBAPP_DIR).map(webappDir -> getPrefix(webappDir, hints));
+    protected Optional<String> getPrefix(MCRHints hints, MCRResourceTracer tracer) {
+        return hints.get(MCRResourceHintKeys.WEBAPP_DIR).map(webappDir -> getPrefix(webappDir, tracer));
     }
 
-    private String getPrefix(File webappDir, MCRHints hints) {
+    private String getPrefix(File webappDir, MCRResourceTracer tracer) {
         String prefix = "jar:" + webappDir.toURI() + "WEB-INF/lib/";
-        trace(hints, () -> "Looking for webapp library prefix: " + prefix);
+        tracer.trace(() -> "Looking for webapp library prefix: " + prefix);
         return prefix;
     }
 

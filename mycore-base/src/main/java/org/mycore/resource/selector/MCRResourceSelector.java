@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.logging.log4j.Level;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
+import org.mycore.resource.common.MCRResourceTracer;
 import org.mycore.resource.filter.MCRResourceFilter;
 import org.mycore.resource.provider.MCRLFSResourceProvider;
 
@@ -41,7 +42,7 @@ public interface MCRResourceSelector {
      * resources. Returns a non-empty subset of the given resources. If no prioritization can be made,
      * the whole set of resources must be returned.
      */
-    List<URL> select(List<URL> resourceUrls, MCRHints hints);
+    List<URL> select(List<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer);
 
     /**
      * Returns a description of this {@link MCRCombinedResourceSelector}.

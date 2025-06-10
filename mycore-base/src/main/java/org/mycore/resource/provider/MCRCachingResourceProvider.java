@@ -18,9 +18,6 @@
 
 package org.mycore.resource.provider;
 
-import static org.mycore.resource.common.MCRTraceLoggingHelper.trace;
-import static org.mycore.resource.common.MCRTraceLoggingHelper.update;
-
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
@@ -36,6 +33,7 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRResourceTracer;
 
 /**
  * A {@link MCRCachingResourceProvider} is a {@link MCRResourceProvider} that delegates to another
@@ -85,21 +83,21 @@ public class MCRCachingResourceProvider extends MCRResourceProviderBase {
 
     @Override
     @SuppressWarnings("OptionalAssignedToNull")
-    protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints) {
+    protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
         Optional<URL> resourceUrl = cache.get(path);
         if (resourceUrl == null) {
-            trace(hints, () -> "Cache miss for " + path);
-            resourceUrl = provider.provide(path, update(hints, provider, provider.coverage()));
+            tracer.trace(() -> "Cache miss for " + path);
+            resourceUrl = provider.provide(path, hints, tracer.update(provider, provider.coverage()));
             cache.put(path, resourceUrl);
         } else {
-            trace(hints, () -> "Cache hit for " + path);
+            tracer.trace(() -> "Cache hit for " + path);
         }
         return resourceUrl;
     }
 
     @Override
-    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints) {
-        return provider.provideAll(path, update(hints, provider, provider.coverage()));
+    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
+        return provider.provideAll(path, hints, tracer.update(provider, provider.coverage()));
     }
 
     @Override

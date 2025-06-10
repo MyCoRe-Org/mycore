@@ -34,6 +34,7 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceList;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRResourceTracer;
 import org.mycore.resource.common.MCRSyntheticResourceSpec;
 import org.mycore.resource.provider.MCRResourceProvider.PrefixPrefixStripper;
 import org.mycore.resource.provider.MCRResourceProvider.PrefixStripper;
@@ -87,7 +88,7 @@ public class MCRSyntheticResourceLocator extends MCRResourceLocatorBase {
     }
 
     @Override
-    protected Stream<URL> doLocate(MCRResourcePath path, MCRHints hints) {
+    protected Stream<URL> doLocate(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
         URLStreamHandlerFactory factory = hints.get(MCRSyntheticResourceSpec.URL_STREAM_HANDLER_FACTORY).orElse(null);
         return specs.getOrDefault(path, List.of()).stream()
             .map(entry -> entry.toUrl(factory));

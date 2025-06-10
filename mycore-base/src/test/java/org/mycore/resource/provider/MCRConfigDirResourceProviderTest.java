@@ -40,12 +40,15 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.hint.MCRHintsBuilder;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
 public class MCRConfigDirResourceProviderTest {
+
+    public static final MCRNoOpResourceTracer NO_OP_TRACER = new MCRNoOpResourceTracer();
 
     private static final MCRResourcePath FOO_PATH = MCRResourcePath.ofPath("foo").orElseThrow();
 
@@ -70,7 +73,7 @@ public class MCRConfigDirResourceProviderTest {
         MCRHints hints = toHints(fooConfigDir);
         MCRResourceProvider provider = configDirProvider();
 
-        Optional<URL> resourceUrl = provider.provide(BAR_PATH, hints);
+        Optional<URL> resourceUrl = provider.provide(BAR_PATH, hints, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isEmpty());
 
@@ -82,7 +85,7 @@ public class MCRConfigDirResourceProviderTest {
         MCRHints hints = toHints(fooConfigDir);
         MCRResourceProvider provider = configDirProvider();
 
-        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints);
+        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isPresent());
         assertEquals(toResourcesUrl(fooConfigDir, "foo"), resourceUrl.get());
@@ -95,7 +98,7 @@ public class MCRConfigDirResourceProviderTest {
         MCRHints hints = toHints(fooConfigDir);
         MCRResourceProvider provider = configDirProvider();
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(BAR_PATH, hints);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(BAR_PATH, hints, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertTrue(resourceUrls.isEmpty());
@@ -108,7 +111,7 @@ public class MCRConfigDirResourceProviderTest {
         MCRHints hints = toHints(fooConfigDir);
         MCRResourceProvider provider = configDirProvider();
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertEquals(1, resourceUrls.size());
@@ -126,8 +129,8 @@ public class MCRConfigDirResourceProviderTest {
         MCRResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(
             MCRConfigDirResourceProvider.class, "Test.Class");
 
-        Optional<URL> fooResourceUrl = provider.provide(FOO_PATH, hints);
-        Optional<URL> barResourceUrl = provider.provide(BAR_PATH, hints);
+        Optional<URL> fooResourceUrl = provider.provide(FOO_PATH, hints, NO_OP_TRACER);
+        Optional<URL> barResourceUrl = provider.provide(BAR_PATH, hints, NO_OP_TRACER);
 
         assertTrue(fooResourceUrl.isPresent());
         assertTrue(barResourceUrl.isEmpty());

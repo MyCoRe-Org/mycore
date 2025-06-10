@@ -35,6 +35,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.hint.MCRHintsBuilder;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
 import org.mycore.resource.common.MCRSyntheticResourceSpec;
 import org.mycore.resource.locator.MCRResourceLocator;
 import org.mycore.resource.locator.MCRSyntheticResourceLocator;
@@ -45,6 +46,8 @@ import org.mycore.test.MyCoReTest;
 @MyCoReTest
 @ExtendWith(MCRTestUrlExtension.class)
 public class MCRLocatorResourceProviderTest {
+
+    public static final MCRNoOpResourceTracer NO_OP_TRACER = new MCRNoOpResourceTracer();
 
     private static final MCRResourcePath FOO_PATH = MCRResourcePath.ofPath("foo").orElseThrow();
 
@@ -58,7 +61,7 @@ public class MCRLocatorResourceProviderTest {
         MCRHints hints = toHints(factory);
         MCRResourceProvider provider = locatorProvider(Collections.emptyList());
 
-        Optional<URL> resourceUrl = provider.provide(BAR_PATH, hints);
+        Optional<URL> resourceUrl = provider.provide(BAR_PATH, hints, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isEmpty());
 
@@ -71,7 +74,7 @@ public class MCRLocatorResourceProviderTest {
         List<MCRSyntheticResourceSpec> specs = List.of(FOO_SPEC);
         MCRResourceProvider provider = locatorProvider(specs);
 
-        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints);
+        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isPresent());
         assertEquals(FOO_SPEC.toUrl(factory), resourceUrl.get());
@@ -84,7 +87,7 @@ public class MCRLocatorResourceProviderTest {
         MCRHints hints = toHints(factory);
         MCRResourceProvider provider = locatorProvider(Collections.emptyList());
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(BAR_PATH, hints);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(BAR_PATH, hints, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertEquals(0, resourceUrls.size());
@@ -98,7 +101,7 @@ public class MCRLocatorResourceProviderTest {
         List<MCRSyntheticResourceSpec> specs = List.of(FOO_SPEC);
         MCRResourceProvider provider = locatorProvider(specs);
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertEquals(1, resourceUrls.size());
@@ -119,8 +122,8 @@ public class MCRLocatorResourceProviderTest {
         MCRResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(
             MCRLocatorResourceProvider.class, "Test.Class");
 
-        Optional<URL> fooResourceUrl = provider.provide(FOO_PATH, hints);
-        Optional<URL> barResourceUrl = provider.provide(BAR_PATH, hints);
+        Optional<URL> fooResourceUrl = provider.provide(FOO_PATH, hints, NO_OP_TRACER);
+        Optional<URL> barResourceUrl = provider.provide(BAR_PATH, hints, NO_OP_TRACER);
 
         assertTrue(fooResourceUrl.isPresent());
         assertTrue(barResourceUrl.isEmpty());

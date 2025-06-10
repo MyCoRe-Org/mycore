@@ -40,6 +40,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.hint.MCRHintsBuilder;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 import org.mycore.resource.provider.MCRResourceProvider;
 import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
@@ -47,6 +48,8 @@ import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
 public class MCRWCMSWebResourceProviderTest {
+
+    public static final MCRNoOpResourceTracer NO_OP_TRACER = new MCRNoOpResourceTracer();
 
     private static final MCRResourcePath FOO_PATH = MCRResourcePath.ofPath("foo").orElseThrow();
 
@@ -74,7 +77,7 @@ public class MCRWCMSWebResourceProviderTest {
 
         MCRResourceProvider provider = wcmsWebProvider(fooWcmsDataDir);
 
-        Optional<URL> resourceUrl = provider.provide(BAR_PATH, MCRHints.EMPTY);
+        Optional<URL> resourceUrl = provider.provide(BAR_PATH, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isEmpty());
 
@@ -85,7 +88,7 @@ public class MCRWCMSWebResourceProviderTest {
 
         MCRResourceProvider provider = wcmsWebProvider(fooWcmsDataDir);
 
-        Optional<URL> resourceUrl = provider.provide(WEB_BAR_PATH, MCRHints.EMPTY);
+        Optional<URL> resourceUrl = provider.provide(WEB_BAR_PATH, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isEmpty());
 
@@ -96,7 +99,7 @@ public class MCRWCMSWebResourceProviderTest {
 
         MCRResourceProvider provider = wcmsWebProvider(fooWcmsDataDir);
 
-        Optional<URL> resourceUrl = provider.provide(FOO_PATH, MCRHints.EMPTY);
+        Optional<URL> resourceUrl = provider.provide(FOO_PATH, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isEmpty());
 
@@ -107,7 +110,7 @@ public class MCRWCMSWebResourceProviderTest {
 
         MCRResourceProvider provider = wcmsWebProvider(fooWcmsDataDir);
 
-        Optional<URL> resourceUrl = provider.provide(WEB_FOO_PATH, MCRHints.EMPTY);
+        Optional<URL> resourceUrl = provider.provide(WEB_FOO_PATH, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isPresent());
         assertEquals(toUrl(fooWcmsDataDir, "foo"), resourceUrl.get());
@@ -119,7 +122,7 @@ public class MCRWCMSWebResourceProviderTest {
 
         MCRResourceProvider provider = wcmsWebProvider(fooWcmsDataDir);
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(BAR_PATH, MCRHints.EMPTY);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(BAR_PATH, MCRHints.EMPTY, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertTrue(resourceUrls.isEmpty());
@@ -131,7 +134,7 @@ public class MCRWCMSWebResourceProviderTest {
 
         MCRResourceProvider provider = wcmsWebProvider(fooWcmsDataDir);
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(WEB_BAR_PATH, MCRHints.EMPTY);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(WEB_BAR_PATH, MCRHints.EMPTY, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertTrue(resourceUrls.isEmpty());
@@ -143,7 +146,7 @@ public class MCRWCMSWebResourceProviderTest {
 
         MCRResourceProvider provider = wcmsWebProvider(fooWcmsDataDir);
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, MCRHints.EMPTY);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, MCRHints.EMPTY, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertTrue(resourceUrls.isEmpty());
@@ -155,7 +158,7 @@ public class MCRWCMSWebResourceProviderTest {
 
         MCRResourceProvider provider = wcmsWebProvider(fooWcmsDataDir);
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(WEB_FOO_PATH, MCRHints.EMPTY);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(WEB_FOO_PATH, MCRHints.EMPTY, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertEquals(1, resourceUrls.size());
@@ -173,8 +176,8 @@ public class MCRWCMSWebResourceProviderTest {
         MCRResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(
             MCRWCMSWebResourceProvider.class, "Test.Class");
 
-        Optional<URL> fooResourceUrl = provider.provide(WEB_FOO_PATH, MCRHints.EMPTY);
-        Optional<URL> barResourceUrl = provider.provide(WEB_BAR_PATH, MCRHints.EMPTY);
+        Optional<URL> fooResourceUrl = provider.provide(WEB_FOO_PATH, MCRHints.EMPTY, NO_OP_TRACER);
+        Optional<URL> barResourceUrl = provider.provide(WEB_BAR_PATH, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertTrue(fooResourceUrl.isPresent());
         assertTrue(barResourceUrl.isEmpty());

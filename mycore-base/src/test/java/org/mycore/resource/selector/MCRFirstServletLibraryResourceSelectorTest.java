@@ -35,6 +35,7 @@ import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.hint.MCRHintsBuilder;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 import org.mycore.test.MyCoReTest;
 
@@ -42,6 +43,8 @@ import jakarta.servlet.ServletContext;
 
 @MyCoReTest
 public class MCRFirstServletLibraryResourceSelectorTest {
+
+    public static final MCRNoOpResourceTracer NO_OP_TRACER = new MCRNoOpResourceTracer();
 
     private static URL fileResourceUrl;
 
@@ -71,7 +74,7 @@ public class MCRFirstServletLibraryResourceSelectorTest {
         MCRResourceSelector selector = firstServletLibrarySelector();
 
         // no selection can be made (resource URL not part of the libraries) ...
-        List<URL> resourceUrls = selector.select(List.of(fileResourceUrl), hints);
+        List<URL> resourceUrls = selector.select(List.of(fileResourceUrl), hints, NO_OP_TRACER);
 
         // ... expect all resource URLs
         assertEquals(1, resourceUrls.size());
@@ -86,7 +89,7 @@ public class MCRFirstServletLibraryResourceSelectorTest {
         MCRResourceSelector selector = firstServletLibrarySelector();
 
         // no selection can be made (resource URLs not part of the libraries) ...
-        List<URL> resourceUrls = selector.select(List.of(fileResourceUrl, otherLibraryResourceUrl), hints);
+        List<URL> resourceUrls = selector.select(List.of(fileResourceUrl, otherLibraryResourceUrl), hints, NO_OP_TRACER);
 
         // ... expect all resource URLs
         assertEquals(2, resourceUrls.size());
@@ -102,7 +105,7 @@ public class MCRFirstServletLibraryResourceSelectorTest {
         MCRResourceSelector selector = firstServletLibrarySelector();
 
         // no selection can be made (resource URL not part of the libraries) ...
-        List<URL> resourceUrls = selector.select(List.of(otherLibrary1ResourceUrl), hints);
+        List<URL> resourceUrls = selector.select(List.of(otherLibrary1ResourceUrl), hints, NO_OP_TRACER);
 
         // ... expect all resource URLs
         assertEquals(1, resourceUrls.size());
@@ -117,7 +120,7 @@ public class MCRFirstServletLibraryResourceSelectorTest {
         MCRResourceSelector selector = firstServletLibrarySelector();
 
         // selection can be made (first resource URL part of first library) ...
-        List<URL> resourceUrls = selector.select(List.of(library1ResourceUrl, otherLibraryResourceUrl), hints);
+        List<URL> resourceUrls = selector.select(List.of(library1ResourceUrl, otherLibraryResourceUrl), hints, NO_OP_TRACER);
 
         // ... expect specific resource URLs
         assertEquals(1, resourceUrls.size());
@@ -132,7 +135,7 @@ public class MCRFirstServletLibraryResourceSelectorTest {
         MCRResourceSelector selector = firstServletLibrarySelector();
 
         // selection can be made (second resource URL part of second library) ...
-        List<URL> resourceUrls = selector.select(List.of(otherLibraryResourceUrl, library2ResourceUrl), hints);
+        List<URL> resourceUrls = selector.select(List.of(otherLibraryResourceUrl, library2ResourceUrl), hints, NO_OP_TRACER);
 
         // ... expect specific resource URLs
         assertEquals(1, resourceUrls.size());
@@ -147,7 +150,7 @@ public class MCRFirstServletLibraryResourceSelectorTest {
         MCRResourceSelector selector = firstServletLibrarySelector();
 
         // selection can be made (both resource URLs part of libraries) ...
-        List<URL> resourceUrls = selector.select(List.of(library1ResourceUrl, library2ResourceUrl), hints);
+        List<URL> resourceUrls = selector.select(List.of(library1ResourceUrl, library2ResourceUrl), hints, NO_OP_TRACER);
 
         // ... expect specific resource URLs
         assertEquals(1, resourceUrls.size());
@@ -162,7 +165,7 @@ public class MCRFirstServletLibraryResourceSelectorTest {
         MCRResourceSelector selector = firstServletLibrarySelector();
 
         // selection can be made (both resource URLs part of libraries) ...
-        List<URL> resourceUrls = selector.select(List.of(library2ResourceUrl, library1ResourceUrl), hints);
+        List<URL> resourceUrls = selector.select(List.of(library2ResourceUrl, library1ResourceUrl), hints, NO_OP_TRACER);
 
         // ... expect specific resource URLs
         assertEquals(1, resourceUrls.size());
@@ -177,7 +180,7 @@ public class MCRFirstServletLibraryResourceSelectorTest {
         MCRResourceSelector selector = firstServletLibrarySelector();
 
         // selection can be made (both resource URLs part of libraries) ...
-        List<URL> resourceUrls = selector.select(List.of(library1ResourceUrl, library2ResourceUrl), hints);
+        List<URL> resourceUrls = selector.select(List.of(library1ResourceUrl, library2ResourceUrl), hints, NO_OP_TRACER);
 
         // ... expect specific resource URLs
         assertEquals(1, resourceUrls.size());
@@ -192,7 +195,7 @@ public class MCRFirstServletLibraryResourceSelectorTest {
         MCRResourceSelector selector = firstServletLibrarySelector();
 
         // selection can be made (both resource URLs part of libraries) ...
-        List<URL> resourceUrls = selector.select(List.of(library2ResourceUrl, library1ResourceUrl), hints);
+        List<URL> resourceUrls = selector.select(List.of(library2ResourceUrl, library1ResourceUrl), hints, NO_OP_TRACER);
 
         // ... expect specific resource URLs
         assertEquals(1, resourceUrls.size());
@@ -210,7 +213,7 @@ public class MCRFirstServletLibraryResourceSelectorTest {
         MCRResourceSelector selector = MCRConfiguration2.getInstanceOfOrThrow(
             MCRFirstServletLibraryResourceSelector.class, "Test.Class");
 
-        List<URL> resourceUrls = selector.select(List.of(library1ResourceUrl), hints);
+        List<URL> resourceUrls = selector.select(List.of(library1ResourceUrl), hints, NO_OP_TRACER);
 
         assertEquals(1, resourceUrls.size());
         assertTrue(resourceUrls.contains(library1ResourceUrl));

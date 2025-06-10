@@ -37,6 +37,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.hint.MCRHintsBuilder;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
 import org.mycore.resource.common.MCRSyntheticResourceSpec;
 import org.mycore.resource.provider.MCRObservingResourceProvider.Observer;
 import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
@@ -47,6 +48,8 @@ import org.mycore.test.MyCoReTest;
 @ExtendWith(MCRTestUrlExtension.class)
 @MCRTestUrlConfiguration(protocols = "test2")
 public class MCRObservingResourceProviderTest {
+
+    public static final MCRNoOpResourceTracer NO_OP_TRACER = new MCRNoOpResourceTracer();
 
     private static final MCRResourcePath FOO_PATH = MCRResourcePath.ofPath("foo").orElseThrow();
 
@@ -63,7 +66,7 @@ public class MCRObservingResourceProviderTest {
         Observer observer = Mockito.mock(Observer.class);
         MCRResourceProvider provider = observingProvider(Collections.emptyList(), observer);
 
-        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints);
+        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isEmpty());
         Mockito.verify(observer, Mockito.times(1)).onProvide(FOO_PATH, hints);
@@ -79,7 +82,7 @@ public class MCRObservingResourceProviderTest {
         Observer observer = Mockito.mock(Observer.class);
         MCRResourceProvider provider = observingProvider(specs, observer);
 
-        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints);
+        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isPresent());
         assertEquals(FOO_SPEC.toUrl(factory), resourceUrl.get());
@@ -96,7 +99,7 @@ public class MCRObservingResourceProviderTest {
         Observer observer = Mockito.mock(Observer.class);
         MCRResourceProvider provider = observingProvider(specs, observer);
 
-        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints);
+        Optional<URL> resourceUrl = provider.provide(FOO_PATH, hints, NO_OP_TRACER);
 
         assertTrue(resourceUrl.isPresent());
         assertEquals(FOO_SPEC.toUrl(factory), resourceUrl.get());
@@ -112,7 +115,7 @@ public class MCRObservingResourceProviderTest {
         Observer observer = Mockito.mock(Observer.class);
         MCRResourceProvider provider = observingProvider(Collections.emptyList(), observer);
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertTrue(resourceUrls.isEmpty());
@@ -129,7 +132,7 @@ public class MCRObservingResourceProviderTest {
         Observer observer = Mockito.mock(Observer.class);
         MCRResourceProvider provider = observingProvider(specs, observer);
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertEquals(1, resourceUrls.size());
@@ -147,7 +150,7 @@ public class MCRObservingResourceProviderTest {
         Observer observer = Mockito.mock(Observer.class);
         MCRResourceProvider provider = observingProvider(specs, observer);
 
-        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints);
+        List<ProvidedUrl> providedResourceUrls = provider.provideAll(FOO_PATH, hints, NO_OP_TRACER);
         List<URL> resourceUrls = toUrlList(providedResourceUrls);
 
         assertEquals(2, resourceUrls.size());
@@ -172,8 +175,8 @@ public class MCRObservingResourceProviderTest {
         MCRResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(
             MCRObservingResourceProvider.class, "Test.Class");
 
-        Optional<URL> fooResourceUrl = provider.provide(FOO_PATH, hints);
-        Optional<URL> barResourceUrl = provider.provide(BAR_PATH, hints);
+        Optional<URL> fooResourceUrl = provider.provide(FOO_PATH, hints, NO_OP_TRACER);
+        Optional<URL> barResourceUrl = provider.provide(BAR_PATH, hints, NO_OP_TRACER);
 
         assertTrue(fooResourceUrl.isPresent());
         assertTrue(barResourceUrl.isEmpty());

@@ -37,11 +37,14 @@ import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.hint.MCRHintsBuilder;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
 public class MCRWebappClassesDirResourceFilterTest {
+
+    public static final MCRNoOpResourceTracer NO_OP_TRACER = new MCRNoOpResourceTracer();
 
     private static File fooWebappDir;
 
@@ -74,7 +77,7 @@ public class MCRWebappClassesDirResourceFilterTest {
         MCRHints hints = toHints(fooWebappDir);
         MCRResourceFilter filter = webappClassesDirFilter(MCRResourceFilterMode.MUST_MATCH);
 
-        List<URL> resourceUrls = filter.filter(allResourceUrls.stream(), hints).toList();
+        List<URL> resourceUrls = filter.filter(allResourceUrls.stream(), hints, NO_OP_TRACER).toList();
 
         assertEquals(1, resourceUrls.size());
         assertTrue(resourceUrls.contains(webappClassesDirFileUrl));
@@ -87,7 +90,7 @@ public class MCRWebappClassesDirResourceFilterTest {
         MCRHints hints = toHints(fooWebappDir);
         MCRResourceFilter filter = webappClassesDirFilter(MCRResourceFilterMode.MUST_NOT_MATCH);
 
-        List<URL> resourceUrls = filter.filter(allResourceUrls.stream(), hints).toList();
+        List<URL> resourceUrls = filter.filter(allResourceUrls.stream(), hints, NO_OP_TRACER).toList();
 
         assertEquals(2, resourceUrls.size());
         assertTrue(resourceUrls.contains(nonWebappClassesDirFileUrl));
@@ -106,7 +109,7 @@ public class MCRWebappClassesDirResourceFilterTest {
         MCRResourceFilter filter = MCRConfiguration2.getInstanceOfOrThrow(
             MCRWebappClassesDirResourceFilter.class, "Test.Class");
 
-        List<URL> resourceUrls = filter.filter(allResourceUrls.stream(), hints).toList();
+        List<URL> resourceUrls = filter.filter(allResourceUrls.stream(), hints, NO_OP_TRACER).toList();
 
         assertEquals(1, resourceUrls.size());
         assertTrue(resourceUrls.contains(webappClassesDirFileUrl));

@@ -32,10 +32,14 @@ import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
+import org.mycore.resource.common.MCRResourceTracer;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
 public class MCRCombinedResourceSelectorTest {
+
+    public static final MCRNoOpResourceTracer NO_OP_TRACER = new MCRNoOpResourceTracer();
 
     private static URL fooFooResourceUrl;
 
@@ -64,7 +68,7 @@ public class MCRCombinedResourceSelectorTest {
 
         MCRResourceSelector selector = combinedSelector();
 
-        List<URL> resourceUrls = selector.select(allResourceUrls, MCRHints.EMPTY);
+        List<URL> resourceUrls = selector.select(allResourceUrls, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertEquals(4, resourceUrls.size());
         assertTrue(resourceUrls.contains(fooFooResourceUrl));
@@ -79,7 +83,7 @@ public class MCRCombinedResourceSelectorTest {
 
         MCRResourceSelector selector = combinedSelector(new FilenameResourceSelector("baz"));
 
-        List<URL> resourceUrls = selector.select(allResourceUrls, MCRHints.EMPTY);
+        List<URL> resourceUrls = selector.select(allResourceUrls, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertEquals(4, resourceUrls.size());
         assertTrue(resourceUrls.contains(fooFooResourceUrl));
@@ -95,7 +99,7 @@ public class MCRCombinedResourceSelectorTest {
         MCRResourceSelector selector = combinedSelector(new FilenameResourceSelector("baz"),
             new DirectoryNameResourceSelector("baz"));
 
-        List<URL> resourceUrls = selector.select(allResourceUrls, MCRHints.EMPTY);
+        List<URL> resourceUrls = selector.select(allResourceUrls, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertEquals(4, resourceUrls.size());
         assertTrue(resourceUrls.contains(fooFooResourceUrl));
@@ -111,7 +115,7 @@ public class MCRCombinedResourceSelectorTest {
         MCRResourceSelector selector = combinedSelector(new DirectoryNameResourceSelector("foo"),
             new FilenameResourceSelector("baz"));
 
-        List<URL> resourceUrls = selector.select(allResourceUrls, MCRHints.EMPTY);
+        List<URL> resourceUrls = selector.select(allResourceUrls, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertEquals(2, resourceUrls.size());
         assertTrue(resourceUrls.contains(fooFooResourceUrl));
@@ -125,7 +129,7 @@ public class MCRCombinedResourceSelectorTest {
         MCRResourceSelector selector = combinedSelector(new DirectoryNameResourceSelector("baz"),
             new FilenameResourceSelector("bar"));
 
-        List<URL> resourceUrls = selector.select(allResourceUrls, MCRHints.EMPTY);
+        List<URL> resourceUrls = selector.select(allResourceUrls, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertEquals(2, resourceUrls.size());
         assertTrue(resourceUrls.contains(fooBarResourceUrl));
@@ -139,7 +143,7 @@ public class MCRCombinedResourceSelectorTest {
         MCRResourceSelector selector = combinedSelector(new DirectoryNameResourceSelector("foo"),
             new FilenameResourceSelector("bar"));
 
-        List<URL> resourceUrls = selector.select(allResourceUrls, MCRHints.EMPTY);
+        List<URL> resourceUrls = selector.select(allResourceUrls, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertEquals(1, resourceUrls.size());
         assertTrue(resourceUrls.contains(fooBarResourceUrl));
@@ -152,7 +156,7 @@ public class MCRCombinedResourceSelectorTest {
         MCRResourceSelector selector = combinedSelector(new DirectoryNameResourceSelector("bar"),
             new FilenameResourceSelector("foo"));
 
-        List<URL> resourceUrls = selector.select(allResourceUrls, MCRHints.EMPTY);
+        List<URL> resourceUrls = selector.select(allResourceUrls, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertEquals(1, resourceUrls.size());
         assertTrue(resourceUrls.contains(barFooResourceUrl));
@@ -170,7 +174,7 @@ public class MCRCombinedResourceSelectorTest {
         MCRResourceSelector selector = MCRConfiguration2.getInstanceOfOrThrow(
             MCRCombinedResourceSelector.class, "Test.Class");
 
-        List<URL> resourceUrls = selector.select(allResourceUrls, MCRHints.EMPTY);
+        List<URL> resourceUrls = selector.select(allResourceUrls, MCRHints.EMPTY, NO_OP_TRACER);
 
         assertEquals(1, resourceUrls.size());
         assertTrue(resourceUrls.contains(fooBarResourceUrl));
@@ -190,7 +194,7 @@ public class MCRCombinedResourceSelectorTest {
         }
 
         @Override
-        protected final List<URL> doSelect(List<URL> resourceUrls, MCRHints hints) {
+        protected final List<URL> doSelect(List<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
             return resourceUrls.stream().filter(u -> u.toString().contains("/" + dirName + "/")).toList();
         }
 
@@ -213,7 +217,7 @@ public class MCRCombinedResourceSelectorTest {
         }
 
         @Override
-        protected final List<URL> doSelect(List<URL> resourceUrls, MCRHints hints) {
+        protected final List<URL> doSelect(List<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
             return resourceUrls.stream().filter(u -> u.toString().endsWith("/" + filename)).toList();
         }
 

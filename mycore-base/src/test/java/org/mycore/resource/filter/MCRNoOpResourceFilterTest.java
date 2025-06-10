@@ -32,10 +32,13 @@ import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
 public class MCRNoOpResourceFilterTest {
+
+    public static final MCRNoOpResourceTracer NO_OP_TRACER = new MCRNoOpResourceTracer();
 
     private static URL fileUrlFoo;
 
@@ -58,7 +61,7 @@ public class MCRNoOpResourceFilterTest {
 
         MCRResourceFilter filter = noOpFilter();
 
-        List<URL> resourceUrls = filter.filter(allResourceUrls.stream(), MCRHints.EMPTY).toList();
+        List<URL> resourceUrls = filter.filter(allResourceUrls.stream(), MCRHints.EMPTY, NO_OP_TRACER).toList();
 
         assertEquals(2, resourceUrls.size());
         assertTrue(resourceUrls.contains(fileUrlFoo));
@@ -75,7 +78,7 @@ public class MCRNoOpResourceFilterTest {
         MCRResourceFilter filter = MCRConfiguration2.getInstanceOfOrThrow(
             MCRNoOpResourceFilter.class, "Test.Class");
 
-        List<URL> resourceUrls = filter.filter(allResourceUrls.stream(), MCRHints.EMPTY).toList();
+        List<URL> resourceUrls = filter.filter(allResourceUrls.stream(), MCRHints.EMPTY, NO_OP_TRACER).toList();
 
         assertEquals(2, resourceUrls.size());
         assertTrue(resourceUrls.contains(fileUrlFoo));
