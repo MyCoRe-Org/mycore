@@ -35,6 +35,7 @@ import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
+import org.mycore.resource.common.MCRResourceTracer;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
@@ -140,7 +141,7 @@ public class MCRCombinedResourceFilterTest {
         return new MCRResourceFilterBase() {
 
             @Override
-            protected Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints) {
+            protected Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
                 return resourceUrls.filter(u -> u != url);
             }
 
@@ -151,7 +152,7 @@ public class MCRCombinedResourceFilterTest {
     public static class NoFooFilter extends MCRResourceFilterBase {
 
         @Override
-        protected Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints) {
+        protected Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
             return resourceUrls.filter(u -> !u.toString().endsWith("/foo"));
         }
 
@@ -160,7 +161,7 @@ public class MCRCombinedResourceFilterTest {
     public static class NoBarFilter extends MCRResourceFilterBase {
 
         @Override
-        protected Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints) {
+        protected Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
             return resourceUrls.filter(u -> !u.toString().endsWith("/bar"));
         }
 

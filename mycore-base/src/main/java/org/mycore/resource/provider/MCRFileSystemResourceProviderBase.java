@@ -18,8 +18,6 @@
 
 package org.mycore.resource.provider;
 
-import static org.mycore.resource.common.MCRTraceLoggingHelper.trace;
-
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -34,6 +32,7 @@ import org.mycore.common.MCRUtils;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRResourceTracer;
 
 /**
  * {@link MCRFileSystemResourceProviderBase} is a base implementation of a {@link MCRResourceProvider} that
@@ -99,43 +98,43 @@ public abstract class MCRFileSystemResourceProviderBase extends MCRResourceProvi
     }
 
     @Override
-    protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints) {
-        return getResourceUrls(path, hints).findFirst();
+    protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
+        return getResourceUrls(path, hints, tracer).findFirst();
     }
 
     @Override
-    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints) {
-        return getResourceUrls(path, hints).map(this::providedUrl).toList();
+    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
+        return getResourceUrls(path, hints, tracer).map(this::providedUrl).toList();
     }
 
-    private Stream<URL> getResourceUrls(MCRResourcePath path, MCRHints hints) {
+    private Stream<URL> getResourceUrls(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
         return getBaseDirs(hints)
-            .filter(baseDir -> isUsableBaseDir(baseDir, hints))
+            .filter(baseDir -> isUsableBaseDir(baseDir, tracer))
             .map(baseDir -> toSafeFile(baseDir, path))
             .flatMap(Optional::stream)
-            .filter(file -> isUsableFile(file, hints))
+            .filter(file -> isUsableFile(file, tracer))
             .map(this::toUrl);
     }
 
     protected abstract Stream<File> getBaseDirs(MCRHints hints);
 
-    private boolean isUsableBaseDir(File baseDir, MCRHints hints) {
+    private boolean isUsableBaseDir(File baseDir, MCRResourceTracer tracer) {
         String dirPath = baseDir.getAbsolutePath();
-        trace(hints, () -> "Looking for directory " + dirPath);
+        tracer.trace(() -> "Looking for directory " + dirPath);
         if (!baseDir.exists()) {
-            trace(hints, () -> dirPath + " doesn't exist");
+            tracer.trace(() -> dirPath + " doesn't exist");
             return false;
         }
         if (!baseDir.isDirectory()) {
-            trace(hints, () -> dirPath + " isn't a directory");
+            tracer.trace(() -> dirPath + " isn't a directory");
             return false;
         }
         if (!baseDir.canRead()) {
-            trace(hints, () -> dirPath + " can't be read");
+            tracer.trace(() -> dirPath + " can't be read");
             return false;
         }
         if (!baseDir.canExecute()) {
-            trace(hints, () -> dirPath + " can't be opened");
+            tracer.trace(() -> dirPath + " can't be opened");
             return false;
         }
         return true;
@@ -156,19 +155,19 @@ public abstract class MCRFileSystemResourceProviderBase extends MCRResourceProvi
         };
     }
 
-    private boolean isUsableFile(File file, MCRHints hints) {
+    private boolean isUsableFile(File file, MCRResourceTracer tracer) {
         String filePath = file.getAbsolutePath();
-        trace(hints, () -> "Looking for file " + filePath);
+        tracer.trace(() -> "Looking for file " + filePath);
         if (!file.exists()) {
-            trace(hints, () -> filePath + " doesn't exist");
+            tracer.trace(() -> filePath + " doesn't exist");
             return false;
         }
         if (!file.isFile()) {
-            trace(hints, () -> filePath + " isn't a file");
+            tracer.trace(() -> filePath + " isn't a file");
             return false;
         }
         if (!file.canRead()) {
-            trace(hints, () -> filePath + " can't be read");
+            tracer.trace(() -> filePath + " can't be read");
             return false;
         }
         return true;

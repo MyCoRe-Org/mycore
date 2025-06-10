@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.hint.MCRHints;
+import org.mycore.resource.common.MCRResourceTracer;
 
 /**
  * A {@link MCRNoOpResourceFilter} is a {@link MCRResourceFilter} that doesn't filter resource candidates.
@@ -38,7 +39,7 @@ import org.mycore.common.hint.MCRHints;
 public class MCRNoOpResourceFilter extends MCRResourceFilterBase {
 
     @Override
-    protected Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints) {
+    protected Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
         return resourceUrls;
     }
 

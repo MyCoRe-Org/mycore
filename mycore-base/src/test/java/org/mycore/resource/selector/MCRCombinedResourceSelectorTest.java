@@ -32,6 +32,7 @@ import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
+import org.mycore.resource.common.MCRResourceTracer;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
@@ -190,7 +191,7 @@ public class MCRCombinedResourceSelectorTest {
         }
 
         @Override
-        protected final List<URL> doSelect(List<URL> resourceUrls, MCRHints hints) {
+        protected final List<URL> doSelect(List<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
             return resourceUrls.stream().filter(u -> u.toString().contains("/" + dirName + "/")).toList();
         }
 
@@ -213,7 +214,7 @@ public class MCRCombinedResourceSelectorTest {
         }
 
         @Override
-        protected final List<URL> doSelect(List<URL> resourceUrls, MCRHints hints) {
+        protected final List<URL> doSelect(List<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
             return resourceUrls.stream().filter(u -> u.toString().endsWith("/" + filename)).toList();
         }
 

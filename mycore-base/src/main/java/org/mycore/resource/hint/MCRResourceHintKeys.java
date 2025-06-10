@@ -25,7 +25,6 @@ import java.util.SortedSet;
 import org.mycore.common.config.MCRComponent;
 import org.mycore.common.hint.MCRCollectionHintKey;
 import org.mycore.common.hint.MCRHintKey;
-import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourceResolver;
 
 import jakarta.servlet.ServletContext;
@@ -63,12 +62,6 @@ public final class MCRResourceHintKeys {
         MCRResourceHintKeys.class,
         "SERVLET_CONTEXT",
         ServletContext::getServletContextName);
-
-    public static final MCRHintKey<MCRTreeMessage> TRACE_TREE_MESSAGE = new MCRHintKey<>(
-            MCRTreeMessage.class,
-            MCRResourceHintKeys.class,
-            "TRACE_TREE_MESSAGE",
-            Object::toString);
 
     public static final MCRHintKey<File> WEBAPP_DIR = new MCRHintKey<>(
         File.class,

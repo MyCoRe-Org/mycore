@@ -18,34 +18,33 @@
 
 package org.mycore.resource.filter;
 
-import static org.mycore.resource.common.MCRTraceLoggingHelper.traceStream;
-
 import java.net.URL;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.Level;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
+import org.mycore.resource.common.MCRResourceTracer;
 
 /**
  * {@link MCRResourceFilterBase} is a base implementation of {@link MCRResourceFilter} that
  * facilitates consistent logging. Implementors must provide the actual filtering strategy
- * ({@link MCRResourceFilterBase#doFilter(Stream, MCRHints)}).
+ * ({@link MCRResourceFilterBase#doFilter(Stream, MCRHints, MCRResourceTracer)}).
  */
 public abstract class MCRResourceFilterBase implements MCRResourceFilter {
 
     @Override
-    public Stream<URL> filter(Stream<URL> resourceUrls, MCRHints hints) {
-        return traceStream(hints, doFilter(resourceUrls, hints), (message, filteredResourceUrls) -> {
+    public Stream<URL> filter(Stream<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
+        return tracer.traceStream(hints, doFilter(resourceUrls, hints, tracer), (appender, filteredResourceUrls) -> {
             if (!filteredResourceUrls.isEmpty()) {
-                filteredResourceUrls.forEach(url -> message.add("Keeping resource URL " + url));
+                filteredResourceUrls.forEach(url -> appender.append("Keeping resource URL " + url));
             } else {
-                message.add("Keeping no resource URL");
+                appender.append("Keeping no resource URL");
             }
         });
     }
 
-    protected abstract Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints);
+    protected abstract Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer);
 
     @Override
     public MCRTreeMessage compileDescription(Level level) {

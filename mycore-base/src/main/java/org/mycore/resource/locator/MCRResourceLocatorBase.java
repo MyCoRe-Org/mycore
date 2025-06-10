@@ -18,8 +18,6 @@
 
 package org.mycore.resource.locator;
 
-import static org.mycore.resource.common.MCRTraceLoggingHelper.traceStream;
-
 import java.net.URL;
 import java.util.stream.Stream;
 
@@ -27,26 +25,27 @@ import org.apache.logging.log4j.Level;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRResourceTracer;
 
 /**
  * {@link MCRResourceLocatorBase} is a base implementation of {@link MCRResourceLocator} that
  * facilitates consistent logging. Implementors must provide the actual locating strategy
- * ({@link MCRResourceLocatorBase#doLocate(MCRResourcePath, MCRHints)}).
+ * ({@link MCRResourceLocatorBase#doLocate(MCRResourcePath, MCRHints, MCRResourceTracer)}).
  */
 public abstract class MCRResourceLocatorBase implements MCRResourceLocator {
 
     @Override
-    public final Stream<URL> locate(MCRResourcePath path, MCRHints hints) {
-        return traceStream(hints, doLocate(path, hints), (message, locatedResourceUrls) -> {
+    public final Stream<URL> locate(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
+        return tracer.traceStream(hints, doLocate(path, hints, tracer), (appender, locatedResourceUrls) -> {
             if (!locatedResourceUrls.isEmpty()) {
-                locatedResourceUrls.forEach(url -> message.add("Located resource URL " + url));
+                locatedResourceUrls.forEach(url -> appender.append("Located resource URL " + url));
             } else {
-                message.add("Located no resource URL");
+                appender.append("Located no resource URL");
             }
         });
     }
 
-    protected abstract Stream<URL> doLocate(MCRResourcePath path, MCRHints hints);
+    protected abstract Stream<URL> doLocate(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer);
 
     @Override
     public MCRTreeMessage compileDescription(Level level) {

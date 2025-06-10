@@ -39,7 +39,9 @@ import org.mycore.common.hint.MCRHints;
 import org.mycore.common.hint.MCRHintsBuilder;
 import org.mycore.common.log.MCRListMessage;
 import org.mycore.common.log.MCRTreeMessage;
-import org.mycore.resource.common.MCRTraceLoggingHelper;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
+import org.mycore.resource.common.MCRResourceTracer;
+import org.mycore.resource.common.MCRTreeMessageResourceTracer;
 import org.mycore.resource.provider.MCRResourceProvider;
 import org.mycore.resource.provider.MCRResourceProvider.PrefixStripper;
 import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
@@ -98,6 +100,8 @@ public final class MCRResourceResolver {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCRResourceResolver SHARED_INSTANCE = createInstance();
+
+    public static final MCRNoOpResourceTracer NO_OP_TRACER = new MCRNoOpResourceTracer();
 
     public static final String RESOLVER_PROPERTY = "MCR.Resource.Resolver";
 
@@ -257,12 +261,10 @@ public final class MCRResourceResolver {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Resolving resource {}", path);
         }
+        MCRResourceTracer tracer = LOGGER.isTraceEnabled() ? new MCRTreeMessageResourceTracer() : NO_OP_TRACER;
+        Optional<URL> resourceUrl = provider.provide(path, hints, tracer);
         if (LOGGER.isTraceEnabled()) {
-            hints = MCRTraceLoggingHelper.init(hints);
-        }
-        Optional<URL> resourceUrl = provider.provide(path, hints);
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace(MCRTraceLoggingHelper.get(hints).logMessage("Resolving resource URL for path " + path));
+            LOGGER.trace(tracer.logMessage("Resolving resource URL for path " + path));
         }
         if (LOGGER.isDebugEnabled()) {
             resourceUrl.ifPresentOrElse(
@@ -276,12 +278,10 @@ public final class MCRResourceResolver {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Resolving all resource {}", path);
         }
+        MCRResourceTracer tracer = LOGGER.isTraceEnabled() ? new MCRTreeMessageResourceTracer() : NO_OP_TRACER;
+        List<ProvidedUrl> resourceUrls = provider.provideAll(path, hints, tracer);
         if (LOGGER.isTraceEnabled()) {
-            hints = MCRTraceLoggingHelper.init(hints);
-        }
-        List<ProvidedUrl> resourceUrls = provider.provideAll(path, hints);
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace(MCRTraceLoggingHelper.get(hints).logMessage("Resolving all resource URLs for path " + path));
+            LOGGER.trace(tracer.logMessage("Resolving all resource URLs for path " + path));
         }
         if (LOGGER.isDebugEnabled()) {
             if (!resourceUrls.isEmpty()) {
