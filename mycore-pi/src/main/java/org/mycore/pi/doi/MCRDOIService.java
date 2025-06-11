@@ -24,7 +24,6 @@ import java.net.URISyntaxException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -304,9 +303,10 @@ public class MCRDOIService extends MCRDOIBaseService {
             LOGGER.warn("Object {} with registered doi {} got deleted. Try to set DOI inactive.", obj::getId,
                 doi::asString);
             if (this.isRegistered(obj.getId(), additional)) {
-                Map<String, String> contextParameters = new HashMap<>();
-                contextParameters.put(CONTEXT_DOI, doi.asString());
-                contextParameters.put(CONTEXT_OBJ, obj.getId().toString());
+
+                Map<String, String> contextParameters = Map.ofEntries(
+                    Map.entry(CONTEXT_DOI, doi.asString()),
+                    Map.entry(CONTEXT_OBJ, obj.getId().toString()));
                 this.addJob(PiJobAction.DELETE, contextParameters);
             }
         }

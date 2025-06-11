@@ -25,13 +25,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.logging.log4j.LogManager;
@@ -75,7 +75,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
 
     private static final List<String> EXCLUDED_ROOT_FOLDERS = Arrays.asList("alto", "tei");
 
-    private final Map<String, String> hrefIdMap = new HashMap<>();
+    private final Map<String, String> hrefIdMap = new ConcurrentHashMap<>();
 
     @Override
     public Mets generate() throws MCRException {

@@ -20,6 +20,7 @@ package org.mycore.mods;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -93,11 +94,12 @@ public enum MCRMODSDateFormat {
     }
 
     private static void initMap() {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, MCRMODSDateFormat> encodingToFormatMap = new HashMap<>();
         for (MCRMODSDateFormat f : values()) {
             encodingToFormatMap.put(f.encoding, f);
         }
-        MCRMODSDateFormat.encodingToFormatMap = encodingToFormatMap;
+        MCRMODSDateFormat.encodingToFormatMap = Collections.unmodifiableMap(encodingToFormatMap);
     }
 
     public String getEncoding() {

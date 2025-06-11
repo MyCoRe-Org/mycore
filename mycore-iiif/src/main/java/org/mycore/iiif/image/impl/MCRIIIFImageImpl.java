@@ -21,8 +21,8 @@ package org.mycore.iiif.image.impl;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
@@ -39,7 +39,7 @@ public abstract class MCRIIIFImageImpl {
 
     private static final String MCR_IIIF_IMAGE_CONFIG_PREFIX = "MCR.IIIFImage.";
 
-    private static final Map<String, MCRIIIFImageImpl> IMPLHOLDER = new HashMap<>();
+    private static final Map<String, MCRIIIFImageImpl> IMPLHOLDER = new ConcurrentHashMap<>();
 
     private final String implName;
 

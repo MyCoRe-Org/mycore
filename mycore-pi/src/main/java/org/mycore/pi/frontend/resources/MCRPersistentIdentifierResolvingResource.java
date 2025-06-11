@@ -41,6 +41,7 @@ public class MCRPersistentIdentifierResolvingResource {
     @Path("{identifier:.+}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response resolve(@PathParam("identifier") String identifier) {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, List<String>> resolveMap = new HashMap<>();
         MCRPIManager.getInstance().getResolvers().forEach(resolver -> MCRPIManager
             .getInstance().get(identifier)

@@ -20,6 +20,7 @@ package org.mycore.mets.model.converter;
 
 import static java.util.stream.Collectors.toList;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,11 +53,13 @@ public class MCRJSONSimpleModelConverter {
 
         MCRMetsSimpleModel metsSimpleModel = gsonBuilder.create().fromJson(model, MCRMetsSimpleModel.class);
 
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, MCRMetsPage> idPageMap = new HashMap<>();
         metsSimpleModel.getMetsPageList().stream().forEach(page -> idPageMap.put(page.getId(), page));
 
         final Map<String, MCRMetsFile> idMCRMetsFileMap = extractIdFileMap(metsSimpleModel.getMetsPageList());
 
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, MCRMetsSection> idSectionMap = new HashMap<>();
         processSections(metsSimpleModel.getRootSection(), idSectionMap, idMCRMetsFileMap);
 
@@ -80,12 +83,13 @@ public class MCRJSONSimpleModelConverter {
     }
 
     private static Map<String, MCRMetsFile> extractIdFileMap(List<MCRMetsPage> pages) {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         final Map<String, MCRMetsFile> idFileMap = new HashMap<>();
         pages.forEach(p -> p.getFileList().stream()
             .filter(file -> file.getUse().equals(MCRMetsModelHelper.ALTO_USE))
             .forEach(file -> idFileMap.put(file.getId(), file)));
 
-        return idFileMap;
+        return Collections.unmodifiableMap(idFileMap) ;
     }
 
     private static void processSections(MCRMetsSection current, Map<String, MCRMetsSection> idSectionTable,
