@@ -21,6 +21,7 @@ package org.mycore.frontend.basket;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -30,6 +31,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -89,8 +91,6 @@ public class MCRBasketServlet extends MCRServlet {
         String action = req.getParameter("action");
         String[] uris = req.getParameterValues("uri");
         String[] ids = req.getParameterValues("id");
-        String redirect = getProperty(req, "redirect");
-        URI referer = getReferer(req);
         boolean resolveContent = "true".equals(req.getParameter("resolve"));
 
         LOGGER.info("{} {} {}", action, type, ids == null ? "" : ids);
@@ -149,12 +149,22 @@ public class MCRBasketServlet extends MCRServlet {
             getLayoutService().doLayout(req, res, new MCRJDOMContent(xml));
             return;
         }
-        if (referer != null && Objects.equals(redirect, "referer")) {
-            res.sendRedirect(res.encodeRedirectURL(referer.toString()));
-        } else if (redirect != null) {
-            res.sendRedirect(res.encodeRedirectURL(redirect));
-        } else {
-            res.sendRedirect(res.encodeRedirectURL(getServletBaseURL() + "MCRBasketServlet?action=show&type=" + type));
+        res.sendRedirect(res.encodeRedirectURL(resolveRedirect(req, res, type)));
+    }
+
+    private String resolveRedirect(HttpServletRequest req, HttpServletResponse res, String type) {
+        return Optional.ofNullable(getRedirect(req)).filter(MCRFrontendUtil::isSafeRedirect)
+            .orElseGet(() -> getServletBaseURL() + "MCRBasketServlet?action=show&type=" + type);
+    }
+
+    private String getRedirect(HttpServletRequest req) {
+        final String redirect = getProperty(req, "redirect");
+        if ("referer".equalsIgnoreCase(redirect)) {
+            final URI referer = getReferer(req);
+            if (referer != null) {
+                return referer.toString();
+            }
         }
+        return redirect;
     }
 }
