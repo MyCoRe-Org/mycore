@@ -626,7 +626,7 @@ public class MCRServlet extends HttpServlet {
      */
     protected void toReferrer(HttpServletRequest request, HttpServletResponse response) throws IOException {
         URI referrer = getReferer(request);
-        if (referrer != null) {
+        if (referrer != null && MCRFrontendUtil.isSafeRedirect(referrer.toString())) {
             response.sendRedirect(response.encodeRedirectURL(referrer.toString()));
         } else {
             LOGGER.warn("Could not get referrer, returning to the application's base url");
@@ -641,7 +641,7 @@ public class MCRServlet extends HttpServlet {
     protected void toReferrer(HttpServletRequest request, HttpServletResponse response, String altURL)
         throws IOException {
         URI referrer = getReferer(request);
-        if (referrer != null) {
+        if (referrer != null && MCRFrontendUtil.isSafeRedirect(referrer.toString())) {
             response.sendRedirect(response.encodeRedirectURL(referrer.toString()));
         } else {
             LOGGER.warn("Could not get referrer, returning to {}", altURL);
