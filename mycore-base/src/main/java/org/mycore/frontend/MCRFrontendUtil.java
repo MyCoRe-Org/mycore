@@ -258,6 +258,39 @@ public class MCRFrontendUtil {
     }
 
     /**
+     * Checks whether the given redirect URL is considered safe.
+     * <p>
+     * A URL is considered safe if it meets one of the following conditions:
+     * <ul>
+     *   <li>It is a relative path within the application (starts with a single {@code /})</li>
+     *   <li>It is an absolute URL that starts with the application's base URL ({@code getBaseURL()})</li>
+     * </ul>
+     * Protocol-relative URLs (e.g., {@code //evil.com}) or external URLs are considered unsafe.
+     *
+     * @param url the redirect target URL to validate
+     * @return {@code true} if the URL is safe for redirecting, {@code false} otherwise
+     */
+    public static boolean isSafeRedirect(String url) {
+        try {
+            URI uri = new URI(url).normalize();
+
+            if (uri.isAbsolute()) {
+                return uri.toString().startsWith(getBaseURL());
+            }
+
+            String path = uri.getPath();
+
+            return path != null
+                   && path.startsWith("/")
+                   && !path.startsWith("//")
+                   && !path.contains("..");
+
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
      * Get header to check if request comes in via a proxy. There are two possible header names
      */
     private static String getXForwardedFor(HttpServletRequest req) {

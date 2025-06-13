@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
@@ -156,12 +157,11 @@ public class MCRLoginServlet extends MCRServlet {
     }
 
     protected static String getReturnURL(HttpServletRequest req) {
-        String returnURL = req.getParameter(LOGIN_REDIRECT_URL_PARAMETER);
-        if (returnURL == null) {
-            String referer = req.getHeader("Referer");
-            returnURL = (referer != null) ? referer : req.getContextPath() + "/";
-        }
-        return returnURL;
+        return Optional.ofNullable(req.getParameter(LOGIN_REDIRECT_URL_PARAMETER))
+                .filter(MCRFrontendUtil::isSafeRedirect)
+                .or(() -> Optional.ofNullable(req.getHeader("Referer"))
+                                  .filter(MCRFrontendUtil::isSafeRedirect))
+                .orElse(req.getContextPath() + "/");
     }
 
     private void redirectToUniqueRealm(HttpServletRequest req, HttpServletResponse res) throws Exception {

@@ -35,6 +35,7 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.fileupload.MCRUploadHelper;
 import org.mycore.services.i18n.MCRTranslation;
 
@@ -66,7 +67,7 @@ public class MCRDerivateServlet extends MCRServlet {
                 response.sendError(HttpServletResponse.SC_NO_CONTENT, "Parameter 'url' is set but empty!");
                 return;
             }
-            if (url != null) {
+            if (url != null && MCRFrontendUtil.isSafeRedirect(url)) {
                 response.sendRedirect(response.encodeRedirectURL(url));
                 return;
             }
