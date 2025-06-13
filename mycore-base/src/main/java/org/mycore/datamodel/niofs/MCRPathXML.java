@@ -132,18 +132,15 @@ public final class MCRPathXML {
         //store current directory statistics
         addString(here, "directories", Integer.toString(directories.size()), false);
         addString(here, "files", Integer.toString(files.size()), false);
-        directories = mapItemsToElementAndType(nodes, "directory");
-        files = mapItemsToElementAndType(nodes, "file");
+        mapItemsToElementAndType(nodes, "directory", directories);
+        mapItemsToElementAndType(nodes, "file", files);
 
         LOGGER.debug("MCRDirectoryXML: end listing of directory {}", path);
-
         return doc;
-
     }
 
-    private static SortedMap<MCRPath, MCRFileAttributes<?>> mapItemsToElementAndType(Element nodes, String type)
-        throws IOException {
-        SortedMap<MCRPath, MCRFileAttributes<?>> itemMap = new TreeMap<>();
+    private static void mapItemsToElementAndType(Element nodes, String type, SortedMap<MCRPath,
+        MCRFileAttributes<?>> itemMap) throws IOException {
         for (Map.Entry<MCRPath, MCRFileAttributes<?>> fileEntry : itemMap.entrySet()) {
             Element child = new Element("child");
             child.setAttribute("type", type);
@@ -152,7 +149,6 @@ public final class MCRPathXML {
             nodes.addContent(child);
             addAttributes(child, fileEntry.getValue(), fileEntry.getKey());
         }
-        return itemMap;
     }
 
     /**
