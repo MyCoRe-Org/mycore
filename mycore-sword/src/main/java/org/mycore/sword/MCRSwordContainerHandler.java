@@ -108,6 +108,7 @@ public class MCRSwordContainerHandler implements MCRSwordLifecycle {
         return MCRSword.getCollection(collectionString).getMetadataProvider().provideMetadata(object);
     }
 
+    @SuppressWarnings("PMD.ExceptionAsFlowControl")
     public void deleteObject(MCRObject object) throws SwordServerException {
         try {
             object
