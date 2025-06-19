@@ -53,6 +53,9 @@ public abstract class MCRResourcePath {
 
     private static final String WEB_RESOURCE_PREFIX_WITH_TRAILING_SLASH = WEB_RESOURCE_PREFIX + "/";
 
+    /** Returns weather this path is a web resource path. */
+    public abstract boolean isWebPath();
+
     /**
      * Returns the complete path as a {@link String} with a leading slash.
      */
@@ -169,6 +172,11 @@ public abstract class MCRResourcePath {
         }
 
         @Override
+        public boolean isWebPath() {
+            return false;
+        }
+
+        @Override
         public String asAbsolutePath() {
             return path;
         }
@@ -189,6 +197,11 @@ public abstract class MCRResourcePath {
         private WebResourcePath(String path) {
             this.path = WEB_RESOURCE_PREFIX + path;
             this.webResourcePath = Optional.of(path);
+        }
+
+        @Override
+        public boolean isWebPath() {
+            return true;
         }
 
         @Override
