@@ -30,7 +30,7 @@ import org.mycore.datamodel.classifications2.MCRClassificationUpdateType;
 
 /**
  * Eventhandler that stores classification and their modifications in a Solr collection
- *
+ * <p>
  * The implementation is based on MCRSolrCategoryDAO and MCREventedCategoryDAO.
  *
  * @author Robert Stephan

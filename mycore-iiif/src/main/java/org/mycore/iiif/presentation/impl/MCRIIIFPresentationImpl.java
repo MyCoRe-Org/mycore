@@ -91,7 +91,7 @@ public abstract class MCRIIIFPresentationImpl {
     /**
      * For consistency and security reasons it may become necessary to
      * to cleanup the identifier, which is an otherwise unchecked URL path parameter.
-     *
+     * <p>
      * Subclasses may override.
      *
      * @param identifier - the IIIF manifest identifier, which should be normalized

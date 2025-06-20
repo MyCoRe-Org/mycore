@@ -70,7 +70,7 @@ public class MCRObjectIDPK implements Serializable {
 
     /**
      * Use this constructor for quick queries.
-     *
+     * <p>
      * Sample-Code:<br>
      * <pre>{@code
      *     EntityManager em = […];

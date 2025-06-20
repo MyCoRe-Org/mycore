@@ -27,7 +27,7 @@ import org.mycore.access.MCRAccessManager;
 
 /**
  * Use this class if you want to have a fallback to some default access rules.
- *
+ * <p>
  * These are the rules that will be checked against if available
  * <ol>
  *  <li><code>{id}</code>, e.g. "MyCoRe_mods_12345678"</li>

@@ -111,9 +111,9 @@ public final class MCROAuthClient {
     /**
      * Builds the URL where to redirect the user's browser to initiate a three-way authorization
      * and request permission to access the given scopes. If
-     *
+     * <p>
      * MCR.ORCID.PreFillRegistrationForm=true
-     *
+     * <p>
      * submits the current user's E-Mail address, first and last name to the ORCID registration form
      * to simplify registration. May be disabled for more data privacy.
      *
@@ -146,12 +146,12 @@ public final class MCROAuthClient {
 
     /**
      * If
-     *
+     * <p>
      * MCR.ORCID.PreFillRegistrationForm=true
-     *
+     * <p>
      * submits the current user's E-Mail address, first and last name to the ORCID registration form
      * to simplify registration. May be disabled for more data privacy.
-     *
+     * <p>
      * See https://members.orcid.org/api/resources/customize
      */
     private void preFillRegistrationForm(List<MCRURLQueryParameter> parameters) {

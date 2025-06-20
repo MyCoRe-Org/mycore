@@ -34,7 +34,7 @@ import com.google.gson.JsonObject;
 /**
  * provides support for a restricted range of formats, all of which are valid
  * ISO 8601 dates and times.
- *
+ * <p>
  * The range of supported formats is exactly the same range that is suggested by
  * the W3C <a href="http://www.w3.org/TR/NOTE-datetime">datetime profile</a> in
  * its version from 1997-09-15.
@@ -173,7 +173,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
 
     /**
      * sets the input and output format.
-     *
+     * <p>
      * please use only the formats defined on the <a
      * href="http://www.w3.org/TR/NOTE-datetime">W3C Page</a>, which are also
      * exported as static fields by this class.

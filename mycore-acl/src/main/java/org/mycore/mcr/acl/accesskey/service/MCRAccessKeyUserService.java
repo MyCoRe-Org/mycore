@@ -81,7 +81,7 @@ public class MCRAccessKeyUserService extends MCRAccessKeyContextService<MCRUser>
 
     /**
      * Cleans up user attributes related to access keys by checking their validity.
-     *
+     * <p>
      * This method iterates over all users who have access key attributes and ensures that only valid access key
      * attributes are retained. It removes access key attributes if they are invalid or have been deleted.
      */

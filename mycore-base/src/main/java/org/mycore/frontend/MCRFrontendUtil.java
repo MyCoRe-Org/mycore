@@ -232,7 +232,7 @@ public class MCRFrontendUtil {
 
     /**
      * Saves this instance as the 'current' servlet job.
-     *
+     * <p>
      * Can be retrieved afterwards by {@link #getCurrentServletJob()}.
      * @throws IllegalStateException if {@link MCRSessionMgr#hasCurrentSession()} returns false
      */
@@ -415,7 +415,7 @@ public class MCRFrontendUtil {
 
     /**
      * Checks if the <code>newIP</code> address matches the session of <code>lastIP</code> address.
-     *
+     * <p>
      * Usually this is only <code>true</code> if both addresses are equal by {@link InetAddress#equals(Object)}.
      * This method is called to detect if a session is stolen by a 3rd party.
      * There are two properties (with their default value) to modify this behavior and specify netmasks:

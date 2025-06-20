@@ -41,15 +41,15 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * and review, are checked). If not it will be tried to check the permission against the rule ID
  * <code>default_&lt;ObjectType&gt;</code> if it exists. If not the last
  * fallback is done against <code>default</code>.
- *
+ * <p>
  * Specify classification and category for submitted and review states:
  * MCR.Access.Strategy.SubmittedCategories=state:submitted
  * MCR.Access.Strategy.ReviewCategories=state:review
- *
+ * <p>
  * Specify permissions for submitted and review states:
  * MCR.Access.Strategy.CreatorSubmittedPermissions=writedb,deletedb
  * MCR.Access.Strategy.CreatorReviewPermissions=read
- *
+ * <p>
  * You can also specify a comma separated list of categories like: <code>state:submitted,state:new</code>
  *
  * @author Thomas Scheffler (yagee)

@@ -1821,11 +1821,11 @@ public final class MCRURIResolver implements URIResolver {
 
         /**
          * Resolves XML content from a given URI and caches it for re-use.
-         *
+         * <p>
          * If the URI was already resolved within the last
          * MCR.URIResolver.CachingResolver.MaxAge milliseconds, the cached version is returned.
          * The default max age is one hour.
-         *
+         * <p>
          * The cache capacity is configured via MCR.URIResolver.CachingResolver.Capacity
          * The default capacity is 100.
          */

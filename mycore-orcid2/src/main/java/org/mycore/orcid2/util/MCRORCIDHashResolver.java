@@ -37,9 +37,9 @@ public class MCRORCIDHashResolver implements URIResolver {
 
     /**
      * Hashes given input with given algoritm.
-     *
+     * <p>
      * Syntax: <code>hash:{input}:{algorithm}:{?salt}:{?iterations}</code>
-     *
+     * <p>
      * input and salt will be url decoded
      *
      * @param href

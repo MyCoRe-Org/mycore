@@ -34,7 +34,7 @@ import org.mycore.datamodel.common.MCRMetadataVersionType;
  * A pruner that combines and compares revisions to decide which to keep and which to discard.
  * The method {@link #getMergeDecider()} should return a {@link RevisionMergeDecider} that decides if two
  * revisions should be merged.
- *
+ * <p>
  * The method {@link #buildMergedRevision(MCROCFLRevision, MCROCFLRevision, Document, Document)} should return a new
  * revision that is the result of merging the two given revisions.
  */

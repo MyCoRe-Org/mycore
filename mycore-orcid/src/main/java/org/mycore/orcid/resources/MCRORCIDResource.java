@@ -99,11 +99,11 @@ public class MCRORCIDResource {
     /**
      * Publishes a work in the current user's ORCID profile, or
      * updates an existing work there, given the object ID of the local MODS object.
-     *
+     * <p>
      * The request path must contain the MCRObjectID to publish.
      * The current user must have an ORCID profile and must have authorized this application
      * to add or updated works.
-     *
+     * <p>
      * Returns the new publication status as by {@link #getPublicationStatus(String)}
      *
      * @author Frank Lützenkirchen

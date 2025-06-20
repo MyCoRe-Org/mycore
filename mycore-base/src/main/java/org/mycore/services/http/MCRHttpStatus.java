@@ -24,7 +24,7 @@ import java.util.Optional;
  * Enumeration of HTTP status codes.
  *
  * <p>The HTTP status code series can be retrieved via {@link #series()}.
- *
+ * <p>
  * This is a modified copy of <a href="https://github.com/spring-projects/spring-framework/blob/2fe75c1a24f87392f626acb1ce64714a99292349/spring-web/src/main/java/org/springframework/http/HttpStatus.java">HttpStatus.java</a> of the Spring framework.
  *
  * @author Arjen Poutsma

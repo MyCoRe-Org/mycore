@@ -23,7 +23,7 @@ import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 
 /**
  * Utility class for mapping between {@link MCRAccessKeyDto} and {@link MCRAccessKey} entities.
- *
+ * <p>
  * The {@code AccessKeyMapper} provides static methods to convert between the DTO
  * representation and the entity representation of access keys.
  */

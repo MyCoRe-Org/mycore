@@ -36,7 +36,7 @@ import jakarta.ws.rs.core.Response;
 
 /**
  * Filter all methods and classes marked by {@link MCRApiDraft} and return {@link Response.Status#NOT_FOUND}.
- *
+ * <p>
  * Use Property <code>MCR.RestApi.Draft.{@link MCRApiDraft#value()}=true</code> to enable a group of endpoints
  * marked with the same <code>value</code>, e.g.<br>
  * "<code>MCR.RestApi.Draft.Proposed=true</code>" to include all endpoints marked with

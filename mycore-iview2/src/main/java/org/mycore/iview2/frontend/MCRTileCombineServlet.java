@@ -87,7 +87,7 @@ public class MCRTileCombineServlet extends MCRServlet {
 
     /**
      * Initializes this instance.
-     *
+     * <p>
      * Use parameter <code>org.mycore.iview2.frontend.MCRFooterInterface</code> to specify implementation of
      * {@link MCRFooterInterface} (can be omitted).
      */

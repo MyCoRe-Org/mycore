@@ -38,7 +38,7 @@ import org.mycore.solr.index.file.MCRSolrFileIndexAccumulator;
 
 /**
  * Class indexes label attributes in mets files.
- *
+ * <p>
  * By default, the labels are indexed in solr field <code>mets_label</code>. Configure your own by providing a proper
  * name in property <code>MCR.Solr.Mets.Label.Field</code>.
  *

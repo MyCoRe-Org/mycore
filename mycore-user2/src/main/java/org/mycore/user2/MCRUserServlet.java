@@ -500,7 +500,7 @@ public class MCRUserServlet extends MCRServlet {
      * wildcard characters. The property MCR.user2.Users.MaxResults (default 100) specifies
      * the maximum number of users to return. When there are more hits, just the
      * number of results is returned.
-     *
+     * <p>
      * When current user is not admin, the search pattern will be ignored and only all
      * the users the current user is owner of will be listed.
      */

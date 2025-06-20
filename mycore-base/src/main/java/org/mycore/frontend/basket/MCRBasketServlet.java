@@ -42,7 +42,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * Provides the web front end to manage baskets and their contents.
  * Required parameter is the type of basket and the action to perform.
  * For a basket of objects, possible requests would be:
- *
+ * <p>
  * BasketServlet?type=objects&amp;action=showmycore-base/src/main/java/org/mycore/frontend/basket/MCRBasketServlet.java
  *   to output the contents of the objects basket using basket-{type}.xsl
  * BasketServlet?type=objects&amp;action=clear

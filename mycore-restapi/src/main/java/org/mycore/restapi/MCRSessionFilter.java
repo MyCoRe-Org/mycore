@@ -96,7 +96,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
     /**
      * If request was authenticated via JSON Web Token add a new token if <code>aud</code> was
      * {@link MCRRestAPIAuthentication#AUDIENCE}.
-     *
+     * <p>
      * If the response has a status code that represents a client error (4xx), the JSON Web Token is ommited.
      * If the response already has a JSON Web Token no changes are made.
      */

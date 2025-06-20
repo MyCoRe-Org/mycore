@@ -119,7 +119,7 @@ public class MCRCreateObjectServlet extends MCRPersistenceServlet {
 
     /**
      * redirects to new mcrobject form.
-     *
+     * <p>
      * At least "type" HTTP parameter is required to succeed.
      * <dl>
      *   <dt>type</dt>

@@ -315,7 +315,7 @@ public class MCRMetaLink extends MCRMetaDefault {
     /**
      * Creates the JSON representation. Extends the {@link MCRMetaDefault#createJSON()} method
      * with the following data.
-     *
+     * <p>
      * For linktype equals 'locator':
      * <pre>
      *   {

@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * DTO representing an access key.
- *
+ * <p>
  * The {@code AccessKeyDto} class represents the data structure used to transfer access key information.
  */
 public class MCRAccessKeyDto {

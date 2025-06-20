@@ -25,7 +25,7 @@ import org.mycore.common.config.MCRConfiguration2;
  * Builds appropriate MCRMerger instances for a given MODS XML element.
  * Since MODS elements need to be compared and merged differently, the factory returns
  * different merger implementations for different element types.
- *
+ * <p>
  * MCR.MODS.Merger.default=[Default class to merge MODS, typically MCRMerger]
  * MCR.MODS.Merger.[elementName]=[Specific implementation by element name]
  *

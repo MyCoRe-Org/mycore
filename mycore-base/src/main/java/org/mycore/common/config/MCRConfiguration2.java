@@ -73,7 +73,7 @@ import org.mycore.common.function.MCRTriConsumer;
  *
  * As you see, the class provides methods to get configuration properties as different data types and allows you to
  * specify defaults. All MyCoRe configuration properties should start with "<CODE>MCR.</CODE>"
- *
+ * <p>
  * Using the <CODE>set</CODE> methods allows client code to set new configuration properties or
  * overwrite existing ones with new values.
  *
@@ -250,7 +250,7 @@ public class MCRConfiguration2 {
 
     /**
      * Splits a String value in a Stream of trimmed non-empty Strings.
-     *
+     * <p>
      * This method can be used to split a property value delimited by ',' into values.
      *
      * <p>

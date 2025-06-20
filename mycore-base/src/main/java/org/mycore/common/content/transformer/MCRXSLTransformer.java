@@ -125,7 +125,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     /**
      * Sets the class name for {@link TransformerFactory} used by this transformer.
-     *
+     * <p>
      * Must be called for thread safety before this instance is shared to other threads.
      */
     private void setTransformerFactory(String factoryClass) throws TransformerFactoryConfigurationError {

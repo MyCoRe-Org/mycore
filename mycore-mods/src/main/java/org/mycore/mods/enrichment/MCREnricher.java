@@ -43,17 +43,17 @@ import org.mycore.util.concurrent.MCRTransactionableCallable;
  * Enriches a given MODS publication
  * by retrieving publication data from external data sources
  * and merging that data into the existing data.
- *
+ * <p>
  * There may be different configurations for the enrichment process.
  * Each configuration has a unique ID and determines
  * the selection of data sources to query and the order and priority of merging.
- *
+ * <p>
  * MCR.MODS.EnrichmentResolver.DataSources.[ConfigID]=[DataSourceID] [DataSourceID] [DataSourceID]...
  * e.g.
  * MCR.MODS.EnrichmentResolver.DataSources.import=(Scopus PubMed IEEE CrossRef DataCite) OADOI (LOBID GBV SWB) ZDB
- *
+ * <p>
  * All data sources that support one of the identifiers present in the publication are queried.
- *
+ * <p>
  * Depending on the configuration properties
  * MCR.MODS.EnrichmentResolver.DefaultStopOnFirstResult=true|false
  * and
@@ -61,20 +61,20 @@ import org.mycore.util.concurrent.MCRTransactionableCallable;
  * the data source will stop trying to resolve publication data after
  * the first successful call with a given identifier and skip others,
  * or will try to retrieve data for all given identifiers.
- *
+ * <p>
  * Should a data source return new, additional identifiers,
  * other data sources that support these identifiers will be tried again.
- *
+ * <p>
  * The enrichment takes place on each publication level,
  * that means also the host (e.g. journal or book the article is published in)
  * and series level is enriched with external data.
- *
+ * <p>
  * The order of the data source IDs in configuration determines the order of merging the publication data.
  * If some data sources are grouped using braces, merging is skipped after the first successful data source.
  * For example, when
- *
+ * <p>
  * MCR.MODS.EnrichmentResolver.DataSources.sample=A (B C) D
- *
+ * <p>
  * all four data sources are queried until all returned data or all identifiers have been tried.
  * Afterwards, the data returned from A is merged into the original data.
  * Next, if B returned data, the data of B is merged and the data of C will be ignored.

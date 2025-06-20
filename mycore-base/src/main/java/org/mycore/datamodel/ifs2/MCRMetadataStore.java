@@ -33,9 +33,9 @@ import org.mycore.common.content.MCRContent;
 /**
  * Stores XML metadata documents (or optionally any other BLOB data) in a
  * persistent filesystem structure
- *
+ * <p>
  * For each object type, a store must be defined as follows:
- *
+ * <p>
  * MCR.IFS2.Store.DocPortal_document.Class=org.mycore.datamodel.ifs2.MCRMetadataStore
  * MCR.IFS2.Store.DocPortal_document.BaseDir=/foo/bar
  * MCR.IFS2.Store.DocPortal_document.SlotLayout=4-2-2

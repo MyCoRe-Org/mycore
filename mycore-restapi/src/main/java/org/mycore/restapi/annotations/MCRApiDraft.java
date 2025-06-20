@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
 
 /**
  * Used to mark REST methods that are not stable for production.
- *
+ * <p>
  * Those endpoints maybe changed or removed at a later date.
  * @author Thomas Scheffler (yagee)
  * @see org.mycore.restapi.MCRApiDraftFilter
@@ -37,7 +37,7 @@ public @interface MCRApiDraft {
 
     /**
      * A simple value to mark a group of endpoints.
-     *
+     * <p>
      * Endpoints belong to the same group if this value is the same.
      */
     String value();

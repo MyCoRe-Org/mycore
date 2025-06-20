@@ -78,7 +78,7 @@ public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
 
     /**
      * Builds a MyCoRe Object ID from the given IIIF image id parameter.
-     * 
+     * <p>
      * Subclasses may override it.
      *
      * @param id the IIIF image id parameter

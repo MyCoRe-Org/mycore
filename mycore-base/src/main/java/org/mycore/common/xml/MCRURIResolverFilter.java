@@ -58,7 +58,7 @@ public class MCRURIResolverFilter implements Filter {
 
     /**
      * adds debug information from MCRURIResolver to Servlet output.
-     *
+     * <p>
      * The information includes all URIs resolved by MCRURIResolver by the
      * current request. The filter is triggered by the log4j statement of the
      * MCRURIResolver. To switch it on set the logger to DEBUG level.

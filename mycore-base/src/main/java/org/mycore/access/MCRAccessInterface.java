@@ -24,7 +24,7 @@ public interface MCRAccessInterface {
     /**
      * determines whether the current user has the permission to perform a
      * certain action.
-     *
+     * <p>
      * All information regarding the current user is capsulated by a
      * <code>MCRSession</code> instance which can be retrieved by
      *
@@ -52,7 +52,7 @@ public interface MCRAccessInterface {
     /**
      * determines whether a given user has the permission to perform a
      * certain action. no session data will be checked here.
-     *
+     * <p>
      * This method is used for checking "a priori permissions" like "create-document"
      *     where a String ID does not exist yet
      *
@@ -68,7 +68,7 @@ public interface MCRAccessInterface {
     /**
      * determines whether a given user has the permission to perform a
      * certain action. no session data will be checked here.
-     *
+     * <p>
      *
      * The parameter <code>id</code> serves as an identifier for the concrete
      * underlying rule, e.g. a MCRObjectID.

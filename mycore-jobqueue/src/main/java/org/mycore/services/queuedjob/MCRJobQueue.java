@@ -219,7 +219,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements EventListener 
 
     /**
      * iterates over jobs of status {@link MCRJobStatus#NEW}
-     *
+     * <p>
      * does not change the status.
      */
     @Override

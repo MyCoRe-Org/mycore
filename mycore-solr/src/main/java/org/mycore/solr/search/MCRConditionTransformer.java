@@ -299,7 +299,7 @@ public class MCRConditionTransformer {
 
     /**
      * Builds SOLR query.
-     *
+     * <p>
      * Automatically builds JOIN-Query if content search fields are used in query.
      * @param sortBy sort criteria
      * @param not true, if all conditions should be negated

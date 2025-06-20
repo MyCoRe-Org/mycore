@@ -240,7 +240,7 @@ public class MCRORCIDUser {
     /**
      * Returns all trusted identifiers.
      * Trusted name identifier type  can be defined as follows:
-     *
+     * <p>
      * MCR.ORCID2.User.TrustedNameIdentifierTypes=
      *
      * @return Set of trusted MCRIdentifier

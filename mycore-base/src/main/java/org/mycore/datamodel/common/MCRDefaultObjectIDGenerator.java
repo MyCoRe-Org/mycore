@@ -48,16 +48,16 @@ public class MCRDefaultObjectIDGenerator implements MCRObjectIDGenerator {
      * Returns a MCRObjectID from a given base ID string
      * The additional parameter acts as a
      * lower limit for integer part of the ID.
-     *
+     * <p>
      * Otherwise it is the next free number of an item in the database for the
      * given project ID and type ID, with the following additional restriction:
      * The ID returned can be divided by the configured numberDistance without remainder.
      * The ID returned minus the last ID returned is at least the configured numberDistance.
-     *
+     * <p>
      * Example for number distance of 1 (default):
      *   last ID = 7, next ID = 8
      *   last ID = 8, next ID = 9
-     *
+     * <p>
      * Example for number distance of 2:
      *   last ID = 7, next ID = 10
      *   last ID = 8, next ID = 10

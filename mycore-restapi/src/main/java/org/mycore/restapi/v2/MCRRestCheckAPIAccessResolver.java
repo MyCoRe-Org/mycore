@@ -31,7 +31,7 @@ public class MCRRestCheckAPIAccessResolver implements URIResolver {
 
     /**
      * Checks permission for a given rest api path.
-     *
+     * <p>
      * Syntax: <code>checkRestAPIAccess:{path}:{permission}</code>
      *
      * @param href

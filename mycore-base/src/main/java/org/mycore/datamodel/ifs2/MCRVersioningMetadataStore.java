@@ -53,7 +53,7 @@ import org.tmatesoft.svn.core.wc.admin.SVNAdminEvent;
  * Stores metadata objects both in a local filesystem structure and in a
  * Subversion repository. Changes can be tracked and restored. To enable
  * versioning, configure the repository URL, for example
- *
+ * <p>
  * MCR.IFS2.Store.DocPortal_document.SVNRepositoryURL=file:///foo/svnroot/
  *
  * @author Frank Lützenkirchen

@@ -20,7 +20,7 @@ package org.mycore.services.queuedjob;
 
 /**
  * Interface one must implement to get notified about when an {@link MCRJob} has started, finished or failed.
- *
+ * <p>
  * Add property
  * "<code>MCR.QueuedJob.&lt;MCRJobAction.getClass().getSimpleName()&gt;.Listeners</code>"
  * to your mycore.properties and provide an appropriate class implementing the interface.

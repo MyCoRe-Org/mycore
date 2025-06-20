@@ -168,11 +168,11 @@ public class MCRLoginServlet extends MCRServlet {
 
     /**
      * MCRLoginServlet handles four actions:
-     *
+     * <p>
      * MCRLoginServlet?url=foo
      * stores foo as redirect url and displays
      * a list of login method options.
-     *
+     * <p>
      * MCRLoginServlet?url=foo&amp;realm=ID
      * stores foo as redirect url and redirects
      * to the login URL of the given realm.
@@ -181,7 +181,7 @@ public class MCRLoginServlet extends MCRServlet {
      * checks input from editor login form and
      * changes the current login user and redirects
      * to the stored url.
-     *
+     * <p>
      * MCRLoginServlet?action=cancel
      * does not change login user, just
      * redirects to the target url

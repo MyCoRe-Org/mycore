@@ -62,7 +62,7 @@ public final class MCRContentTypes {
 
     /**
      * Probes the content type of a file.
-     *
+     * <p>
      * Same as {@link Files#probeContentType(Path)} but uses context class loader.
      * @param path
      *              the path to the file to probe

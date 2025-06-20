@@ -68,29 +68,29 @@ import com.rometools.rome.io.XmlReader;
 
 /**
  * Reads an RSS feed referencing new publications and imports those publications that are not stored yet.
- *
+ * <p>
  * Usage:
  *   MCRRSSFeedImporter.importFromFeed( [sourceSystemID], [targetProjectID] );
  *   where targetProjectID is the target project ID to import mods objects to, e.g. "mir".
- *
+ * <p>
  * Reads the RSS feed configured via
  * MCR.MODS.RSSFeedImporter.[sourceSystemID].FeedURL=[http(s) URL of remote RSS feed to read]
- *
+ * <p>
  * For each entry,
- *
+ * <p>
  * 1. Gets the link given in that entry (assuming it points to the publications) and
  * extracts the publication ID from the link, using a regular expression configured via
  * MCR.MODS.RSSFeedImporter.[sourceSystemID].Pattern2FindID=
- *
+ * <p>
  * 2. Queries the SOLR index to check if this publication isn't already stored. The field to query is
  * MCR.MODS.RSSFeedImporter.[sourceSystemID].Field2QueryID=[SOLR field name]
- *
+ * <p>
  * 3. Retrieves the publication metadata from the remote system and converts it to &lt;mycoreobject /&gt; XML.
  * MCR.MODS.RSSFeedImporter.[sourceSystemID].PublicationURI=xslStyle:...:http://...{0}...
  * where the remote publication ID will be replaced in Java message format syntax as {0}.
- *
+ * <p>
  * 4. Saves the publication in persistent store, with the given projectID and object type "mods".
- *
+ * <p>
  * When the total number of publications imported is &gt; 0 AND the property
  * MCR.MODS.RSSFeedImporter.[sourceSystemID].XSL2BuildNotificationMail=foo.xsl
  * is set, builds and sends a notification mail via MCRMailer.

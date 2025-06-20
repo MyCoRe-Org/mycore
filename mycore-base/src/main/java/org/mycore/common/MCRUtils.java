@@ -525,7 +525,7 @@ public class MCRUtils {
 
     /**
      * Helps to implement {@link Comparable#compareTo(Object)}
-     *
+     * <p>
      * For every <code>part</code> a check is performed in the specified order.
      * The first check that does not return <code>0</code> the result is returned
      * by this method. So when this method returns <code>0</code> <code>first</code>
@@ -539,7 +539,7 @@ public class MCRUtils {
      *          is less than, equal to, or greater than the specified object.
      *
      * @throws NullPointerException if either <code>first</code> or <code>other</code> is null
-     *
+     * <p>
      * deprecated in June 2023, because it was only used to compare MCRObjectID objects
      * which is no handled differently
      *

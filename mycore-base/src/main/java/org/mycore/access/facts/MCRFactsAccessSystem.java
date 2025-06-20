@@ -59,7 +59,7 @@ import jakarta.inject.Singleton;
 
 /**
  * base class for XML fact based access system
- *
+ * <p>
  * enabled it with the 2 properties:
  * MCR.Access.Class=org.mycore.access.facts.MCRFactsAccessSystem
  * MCR.Access.Strategy.Class=org.mycore.access.facts.MCRFactsAccessSystem

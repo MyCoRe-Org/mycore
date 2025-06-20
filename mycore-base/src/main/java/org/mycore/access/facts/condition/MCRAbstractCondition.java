@@ -23,7 +23,7 @@ import org.mycore.access.facts.model.MCRCondition;
 
 /**
  * This is the base implementation for a condition.
- *
+ * <p>
  * It is the super class for MCRCombinedCondition and MCRFactCondition.
  *
  * @author Robert Stephan

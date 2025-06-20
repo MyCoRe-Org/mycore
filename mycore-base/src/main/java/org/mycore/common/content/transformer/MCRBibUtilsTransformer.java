@@ -34,7 +34,7 @@ import org.mycore.frontend.cli.MCRExternalProcess;
  * RIS, Endnote, BibTeX, ISI web of science, Word 2007 bibliography format
  * and MODS. For each transformer instance, the command must be specified,
  * for example
- *
+ * <p>
  * MCR.ContentTransformer.{ID}.Command=cmd.exe /c C:\\Java\\bibutils_4.12\\xml2bib.exe -b -w 
  *
  * @author Frank Lützenkirchen

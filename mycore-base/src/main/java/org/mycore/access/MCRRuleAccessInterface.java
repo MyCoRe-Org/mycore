@@ -160,7 +160,7 @@ public interface MCRRuleAccessInterface extends MCRAccessInterface {
 
     /**
      * returns a MCRAccessRule which could be validated
-     *
+     * <p>
      * All information regarding the current user is capsulated by a
      * <code>MCRSession</code> instance which can be retrieved by
      *
@@ -184,7 +184,7 @@ public interface MCRRuleAccessInterface extends MCRAccessInterface {
     /**
      * determines whether a given user has the permission to perform a
      * certain action. no session data will be checked here.
-     *
+     * <p>
      * This method is used for checking "a priori permissions" like "create-document"
      *     where a String ID does not exist yet
      *
@@ -202,7 +202,7 @@ public interface MCRRuleAccessInterface extends MCRAccessInterface {
     /**
      * determines whether the current user has the permission to perform a
      * certain action.
-     *
+     * <p>
      * All information regarding the current user is capsulated by a
      * <code>MCRSession</code> instance which can be retrieved by
      *
@@ -262,7 +262,7 @@ public interface MCRRuleAccessInterface extends MCRAccessInterface {
 
     /**
      * lists all permissions defined for the <code>id</code>.
-     *
+     * <p>
      * The parameter <code>id</code> serves as an identifier for the concrete
      * underlying rule, e.g. a MCRObjectID.
      *
@@ -288,7 +288,7 @@ public interface MCRRuleAccessInterface extends MCRAccessInterface {
 
     /**
      * lists all String IDs, a permission is assigned to.
-     *
+     * <p>
      * The parameter <code>id</code> serves as an identifier for the concrete
      * underlying rule, e.g. a MCRObjectID.
      *

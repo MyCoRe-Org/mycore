@@ -207,7 +207,7 @@ public class MCRUserManager {
 
     /**
      * Checks whether the user is invalid.
-     *
+     * <p>
      * MCRUser is not allowed to overwrite information returned by {@link MCRSystemUserInformation#GUEST}
      * or {@link MCRSystemUserInformation#SYSTEM_USER}.
      * @return true if {@link #createUser(MCRUser)} or {@link #updateUser(MCRUser)} would reject the given user
@@ -378,7 +378,7 @@ public class MCRUserManager {
      * Searches for users in the database and returns a list of matching users.
      * Wildcards containing * and ? for single character may be used for searching
      * by login user name or real name.
-     *
+     * <p>
      * Pay attention that no role information is attached to user data. If you need
      * this information call {@link MCRUserManager#getUser(String, String)}.
      *
@@ -397,7 +397,7 @@ public class MCRUserManager {
      * Searches for users in the database and returns a list of all matching users.
      * Wildcards containing * and ? for single character may be used for searching
      * by login user name or real name.
-     *
+     * <p>
      * Pay attention that no role information is attached to user data. If you need
      * this information call {@link MCRUserManager#getUser(String, String)}.
      *
@@ -415,7 +415,7 @@ public class MCRUserManager {
      * Searches for users in the database and returns a list of matching users.
      * Wildcards containing * and ? for single character may be used for searching
      * by login user name or real name.
-     *
+     * <p>
      * Pay attention that no role information is attached to user data. If you need
      * this information call {@link MCRUserManager#getUser(String, String)}.
      *
@@ -437,7 +437,7 @@ public class MCRUserManager {
      * Searches for users in the database and returns a list of matching users.
      * Wildcards containing * and ? for single character may be used for searching
      * by login user name or real name.
-     *
+     * <p>
      * Pay attention that no role information is attached to user data. If you need
      * this information call {@link MCRUserManager#getUser(String, String)}.
      *
@@ -658,7 +658,7 @@ public class MCRUserManager {
 
     /**
      * Sets password of 'user' to 'password'.
-     *
+     * <p>
      * Automatically updates the user in database.
      */
     public static void setPassword(MCRUser user, String password) {

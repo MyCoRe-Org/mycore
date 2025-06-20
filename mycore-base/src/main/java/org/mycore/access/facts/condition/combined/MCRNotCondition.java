@@ -22,7 +22,7 @@ import org.mycore.access.facts.MCRFactsHolder;
 /**
  * This condition negates its child condition
  * (boolean NOT)
- *
+ * <p>
  * Only the first child condition will be evaluated.
  * Further child conditions will be ignored.
  *

@@ -49,12 +49,12 @@ import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 /**
  * Stores metadata files or file collections containing files and directories in
  * a persistent store implemented using a local filesystem.
- *
+ * <p>
  * For better filesystem performance, the store can build slot subdirectories
  * (containing other subdirectories and so on) so that not all objects are
  * stored in the same filesystem directory. Directories containing a very large
  * number of files typically show bad performance.
- *
+ * <p>
  * The slot layout of the store defines the usage of subdirectories within the
  * base directory. A layout of "8" would mean no subdirectories will be used,
  * the maximum ID size is 8 digits, and therefore up to 99999999 objects can be
@@ -66,12 +66,12 @@ import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
  * the data of ID 10485 would be stored in the file object "/00/01/00010485",
  * for example. Using layout "4-2-2", data would be stored in
  * "/0001/04/00010485", and so on.
- *
+ * <p>
  * The slot file name itself may optionally have a prefix and suffix. With
  * prefix "derivate-", the slot name would be "derivate-00010485". With prefix
  * "DocPortal_document_" and suffix ".xml", the slot name would be
  * "DocPortal_document_00010485.xml" for example.
- *
+ * <p>
  * MCR.IFS2.Store.ID.Class=org.mycore.datamodel.ifs2.MCRFileStore
  * MCR.IFS2.Store.ID.BaseDir=/foo/bar
  * MCR.IFS2.Store.ID.SlotLayout=4-2-2

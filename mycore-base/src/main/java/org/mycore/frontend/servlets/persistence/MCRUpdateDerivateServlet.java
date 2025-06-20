@@ -113,7 +113,7 @@ public class MCRUpdateDerivateServlet extends MCRPersistenceServlet {
 
     /**
      * Redirects to either add files to derivate upload form or change derivate title form.
-     *
+     * <p>
      * At least "id" HTTP parameter is required to succeed.
      * <dl>
      *   <dt>id</dt>

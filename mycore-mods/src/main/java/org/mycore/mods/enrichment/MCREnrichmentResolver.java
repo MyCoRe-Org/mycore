@@ -28,16 +28,16 @@ import org.mycore.common.xml.MCRURIResolver;
 /**
  * Retrieves a publication as MODS XML from a given URI and
  * enriches publication data using external data sources.
- *
+ * <p>
  * There may be different configurations for the enrichment process.
  * Syntax:
  * enrich:[ConfigID]:[URIReturningExistingMODS]
- *
+ * <p>
  * To start with just an identifier, use the "buildxml" resolver, e.g.
  * enrich:import:buildxml:_rootName_=mods:mods&amp;mods:identifier=10.123/456&amp;mods:identifier/@type=doi
  * This first builds an empty MODS document with just a DOI identifier,
  * then enriches it using the "import" configuration of MCREnricher.
- *
+ * <p>
  * For further details,
  * @see MCREnricher
  *

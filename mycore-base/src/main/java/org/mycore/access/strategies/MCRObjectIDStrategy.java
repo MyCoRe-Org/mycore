@@ -22,7 +22,7 @@ import org.mycore.access.MCRAccessManager;
 
 /**
  * Use this class if you want to check against a MCRObjectID.
- *
+ * <p>
  * Be aware that you must provide a access rule - for each permission - for
  * every MCRObject.
  *

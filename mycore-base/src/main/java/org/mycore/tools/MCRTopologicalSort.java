@@ -142,7 +142,7 @@ public class MCRTopologicalSort<T> {
     /**
      * reads MCRObjectIDs as Strings, retrieves parent links from MCRLinkTableManager
      * and creates the graph
-     *
+     * <p>
      * uses StAX cursor API (higher performance)
      */
     public static void prepareMCRObjects(MCRTopologicalSort<String> ts, String[] mcrids) {
@@ -250,7 +250,7 @@ public class MCRTopologicalSort<T> {
     /**
      * based upon first pseudo code in
      * http://en.wikipedia.org/w/index.php?title=Topological_sorting&amp;oldid=611829125
-     *
+     * <p>
      * The algorithm will destroy the input data -&gt; the method can only be called once
      *
      * @return an array of ids which define the order

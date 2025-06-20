@@ -29,7 +29,7 @@ import org.jdom2.Element;
 /**
  * Used to request publication data from a given data source,
  * trying the identifiers supported by this data source one by one.
- *
+ * <p>
  * Depending on the configuration properties
  * MCR.MODS.EnrichmentResolver.DefaultStopOnFirstResult=true|false
  * and

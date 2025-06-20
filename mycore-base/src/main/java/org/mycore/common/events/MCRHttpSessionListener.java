@@ -32,7 +32,7 @@ import jakarta.servlet.http.HttpSessionListener;
 
 /**
  * Handles different HttpSession events.
- *
+ * <p>
  * This class is used to free up MCRSessions when their associated HttpSession
  * is destroyed or a new MCRSession replaces an old one.
  *
