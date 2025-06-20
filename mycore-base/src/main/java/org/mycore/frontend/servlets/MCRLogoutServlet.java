@@ -20,9 +20,11 @@ package org.mycore.frontend.servlets;
 
 import java.io.IOException;
 import java.io.Serial;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.frontend.MCRFrontendUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -59,16 +61,15 @@ public class MCRLogoutServlet extends HttpServlet {
         }
         String returnURL = getReturnURL(req);
         LOGGER.debug("Redirect to: {}", returnURL);
-        resp.sendRedirect(returnURL);
+        resp.sendRedirect(resp.encodeRedirectURL(returnURL));
     }
 
     static String getReturnURL(HttpServletRequest req) {
-        String returnURL = req.getParameter(LOGOUT_REDIRECT_URL_PARAMETER);
-        if (returnURL == null) {
-            String referer = req.getHeader("Referer");
-            returnURL = (referer != null) ? referer : req.getContextPath() + "/";
-        }
-        return returnURL;
+        return Optional.ofNullable(req.getParameter(LOGOUT_REDIRECT_URL_PARAMETER))
+                .filter(MCRFrontendUtil::isSafeRedirect)
+                .or(() -> Optional.ofNullable(req.getHeader("Referer"))
+                                  .filter(MCRFrontendUtil::isSafeRedirect))
+                .orElse(req.getContextPath() + "/");
     }
 
 }
