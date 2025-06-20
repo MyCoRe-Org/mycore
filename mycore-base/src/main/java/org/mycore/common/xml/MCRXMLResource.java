@@ -53,14 +53,6 @@ public final class MCRXMLResource {
     }
 
     /**
-     * @deprecated Use {@link #getInstance()} instead
-     */
-    @Deprecated
-    public static MCRXMLResource instance() {
-        return getInstance();
-    }
-
-    /**
      * @return singleton instance
      */
     public static MCRXMLResource getInstance() {

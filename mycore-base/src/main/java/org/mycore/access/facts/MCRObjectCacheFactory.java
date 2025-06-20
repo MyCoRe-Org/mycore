@@ -51,14 +51,6 @@ public final class MCRObjectCacheFactory extends MCREventHandlerBase {
         MCREventManager.getInstance().addEventHandler(MCREvent.ObjectType.OBJECT, this);
     }
 
-    /**
-     * @deprecated Use {@link #getInstance()} instead
-     */
-    @Deprecated
-    public static MCRObjectCacheFactory instance() {
-        return getInstance();
-    }
-
     public static MCRObjectCacheFactory getInstance() {
         return SINGLETON_INSTANCE;
     }

@@ -63,14 +63,6 @@ class MCRAuthorityWithURI extends MCRAuthorityInfo {
      * The value URI
      */
     private final String valueURI;
-    
-    /**
-     * @deprecated Use {@link #parseXML(Element)} instead
-     */
-    @Deprecated
-    public static MCRAuthorityWithURI getAuthorityInfo(Element element) {
-        return parseXML(element);
-    }
 
     /**
      * Inspects the attributes in the given MODS XML element and returns the AuthorityInfo given there.
@@ -79,14 +71,6 @@ class MCRAuthorityWithURI extends MCRAuthorityInfo {
         String authorityURI = element.getAttribute(ATTRIBUTE_AUTHORITY_URI);
         String valueURI = element.getAttribute(ATTRIBUTE_VALUE_URI);
         return getAuthorityInfo(authorityURI, valueURI);
-    }
-
-    /**
-     * @deprecated Use {@link #parseXML(org.jdom2.Element)} instead
-     */
-    @Deprecated
-    public static MCRAuthorityWithURI getAuthorityInfo(org.jdom2.Element element) {
-        return parseXML(element);
     }
 
     /**

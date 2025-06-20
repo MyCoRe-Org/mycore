@@ -93,14 +93,6 @@ public class MCRObjectStaticContentGenerator {
             + "/" + configId);
     }
 
-    /**
-     * @deprecated Use {@link #obtainInstance(String)} instead
-     */
-    @Deprecated
-    static MCRObjectStaticContentGenerator get(String id) {
-        return obtainInstance(id);
-    }
-
     static MCRObjectStaticContentGenerator obtainInstance(String id) {
         return MCRConfiguration2.getInstanceOfOrThrow(MCRObjectStaticContentGenerator.class,
             CONFIG_ID_PREFIX + id + CLASS_SUFFIX);

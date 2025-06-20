@@ -92,17 +92,6 @@ public final class MCRMetaIFS extends MCRMetaDefault {
     }
 
     /**
-     * The method return the derivate IFS ID.
-     *
-     * @return the IFS ID.
-     * @deprecated will always return empty String
-     */
-    @Deprecated
-    public String getIFSID() {
-        return "";
-    }
-
-    /**
      * This method set the value of derivate source path.
      *
      * @param sourcePath

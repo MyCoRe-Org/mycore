@@ -1095,24 +1095,6 @@ public final class MCRMetadataManager {
      * @return True if the link is added or updated, false if nothing changed.
      * @throws MCRPersistenceException
      *             if a persistence problem is occurred
-     * @deprecated in 2023.06
-     */
-    @Deprecated
-    public static boolean addOrUpdateDerivateToObject(final MCRObjectID id, final MCRMetaEnrichedLinkID link) {
-        return addOrUpdateDerivateToObject(id, link, false);
-    }
-
-    /**
-     * Adds or updates a derivate MCRMetaLinkID to the structure part and updates the object with the ID in the data
-     * store.
-     *
-     * @param id
-     *            the object ID
-     * @param link
-     *            a link to a derivate as MCRMetaLinkID
-     * @return True if the link is added or updated, false if nothing changed.
-     * @throws MCRPersistenceException
-     *             if a persistence problem is occurred
      */
     public static boolean addOrUpdateDerivateToObject(final MCRObjectID id, final MCRMetaEnrichedLinkID link,
         boolean isImportMode)

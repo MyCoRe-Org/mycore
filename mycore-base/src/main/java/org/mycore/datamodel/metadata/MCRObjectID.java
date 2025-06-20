@@ -119,28 +119,6 @@ public final class MCRObjectID implements Comparable<MCRObjectID>, Serializable 
         this.combinedId = formatID(projectId, objectType, numberPart);
     }
 
-    //ID generation methods move to MCRObjectIDGenerator
-    //deprecated in 2023.06
-    @Deprecated
-    public static MCRObjectID getNextFreeId(String baseId) {
-        return MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(baseId);
-    }
-
-    @Deprecated
-    public static MCRObjectID getNextFreeId(String projectId, String type) {
-        return MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(projectId, type);
-    }
-
-    @Deprecated
-    public static MCRObjectID getNextFreeId(String baseId, int maxInWorkflow) {
-        return MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(baseId, maxInWorkflow);
-    }
-
-    @Deprecated
-    public static MCRObjectID getLastID(String baseId) {
-        return MCRMetadataManager.getMCRObjectIDGenerator().getLastID(baseId);
-    }
-
     /**
      * This method instantiate this class with a given identifier in MyCoRe schema.
      *

@@ -61,16 +61,6 @@ sealed public abstract class MCRAbstractCombinedCondition extends MCRAbstractCon
         return conditions;
     }
 
-    @Deprecated
-    public void debugInfoForMatchingChildElement(MCRCondition c, boolean matches) {
-        if (isDebug()) {
-            Element el = c.getBoundElement();
-            if (el != null) {
-                el.setAttribute("_matches", Boolean.toString(matches));
-            }
-        }
-    }
-
     boolean addDebugInfoIfRequested(MCRCondition c, MCRFactsHolder facts) {
         if (!isDebug()) {
             return c.matches(facts);

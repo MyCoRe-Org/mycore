@@ -304,12 +304,6 @@ public class MCRCommandLineInterface {
             .forEach(l -> System.out.printf(Locale.ROOT, "%04d: %s", ln.incrementAndGet(), l));
         System.out.println();
     }
-
-    @Deprecated
-    @SuppressWarnings("PMD.LinguisticNaming")
-    public static void getURI(String uri, String file) throws Exception {
-        uriToFile(uri, file);
-    }
     
     /**
      * Reads XML content from URIResolver and sends output to a local file.

@@ -31,14 +31,6 @@ public final class MCRStoreCenter {
     private MCRStoreCenter() {
     }
 
-    /**
-     * @deprecated use {@link #getInstance()} instead
-     */
-    @Deprecated
-    public static MCRStoreCenter instance() {
-        return getInstance();
-    }
-
     public static MCRStoreCenter getInstance() {
         return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
@@ -66,20 +58,6 @@ public final class MCRStoreCenter {
     @SuppressWarnings("unchecked")
     public <T extends MCRStore> T computeStoreIfAbsent(String id, Supplier<T> storeSupplier) {
         return (T) storeHeap.computeIfAbsent(id, k -> storeSupplier.get());
-    }
-
-    /**
-     * Get the MyCoRe Store with the given ID from store center.
-     *
-     * @param id - The id of the to retrieved store
-     * @param storeClass - The class type of the retrieved store
-     * @return The retrieved store or null if not exists
-     * @deprecated use {@link #getStore(String)} instead
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public <T extends MCRStore> T getStore(String id, Class<T> storeClass) {
-        return (T) storeHeap.get(id);
     }
 
     /**

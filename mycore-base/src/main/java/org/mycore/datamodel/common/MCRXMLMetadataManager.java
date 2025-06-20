@@ -49,14 +49,6 @@ public final class MCRXMLMetadataManager {
     }
 
     /**
-     * @deprecated use {@link #getInstance()} instead
-     */
-    @Deprecated
-    public static synchronized MCRXMLMetadataManager instance() {
-        return getInstance();
-    }
-
-    /**
      * Returns the singleton instance of {@link MCRXMLMetadataManager}. Reads the property
      * MCR.Metadata.Manager.Class to instantiate the configured XML metadata manager adapter to be used
      * to perform the metadata operations.

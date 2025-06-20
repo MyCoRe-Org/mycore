@@ -91,22 +91,6 @@ public class MCRCategoryID implements Serializable {
     }
 
     /**
-     * @deprecated Use {@link #MCRCategoryID(String)}} instead
-     */
-    @Deprecated
-    public static MCRCategoryID rootID(String rootID) {
-        return new MCRCategoryID(rootID);
-    }
-
-    /**
-     * @deprecated Use {@link #ofString(String)} instead
-     */
-    @Deprecated
-    public static MCRCategoryID fromString(String categoryId) {
-        return ofString(categoryId);
-    }
-
-    /**
      * @param categoryId must be in format classificationId:categoryId
      * @return the {@link MCRCategoryID} if any
      * @throws IllegalArgumentException if the given categoryId is invalid
@@ -173,15 +157,6 @@ public class MCRCategoryID implements Serializable {
         } else {
             return rootID.equals(other.rootID);
         }
-    }
-
-    /**
-     * @deprecated Use {@link #getId()} instead.
-     */
-    @Deprecated
-    @Transient
-    public String getID() {
-        return getId();
     }
 
     /**

@@ -106,22 +106,6 @@ public class MCRMetaHistoryItem implements Serializable {
 
     private String userIP;
 
-    /**
-     * @deprecated Use {@link #now(MCRObjectID, MCRMetadataHistoryEventType)} instead
-     */
-    @Deprecated
-    static MCRMetaHistoryItem createdNow(MCRObjectID id) {
-        return now(id, MCRMetadataHistoryEventType.CREATE);
-    }
-
-    /**
-     * @deprecated Use {@link #now(MCRObjectID, MCRMetadataHistoryEventType)} instead
-     */
-    @Deprecated
-    static MCRMetaHistoryItem deletedNow(MCRObjectID id) {
-        return now(id, MCRMetadataHistoryEventType.DELETE);
-    }
-
     static MCRMetaHistoryItem now(MCRObjectID id, MCRMetadataHistoryEventType type) {
         MCRMetaHistoryItem historyItem = new MCRMetaHistoryItem();
         historyItem.setId(id);
@@ -135,24 +119,8 @@ public class MCRMetaHistoryItem implements Serializable {
         return historyItem;
     }
 
-    /**
-     * @deprecated Use {@link #getInternalId()} instead
-     */
-    @Deprecated
-    public long getInternalid() {
-        return getInternalId();
-    }
-
     public long getInternalId() {
         return this.internalId;
-    }
-
-    /**
-     * @deprecated Use {@link #setInternalId(long)} instead 
-     */
-    @Deprecated
-    public void setInternalid(long internalId) {
-      setInternalId(internalId);
     }
 
     public void setInternalId(long internalId) {
