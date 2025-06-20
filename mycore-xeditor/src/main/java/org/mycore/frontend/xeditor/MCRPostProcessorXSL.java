@@ -35,6 +35,7 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
+import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.xml.MCRXMLFunctions;
 
 /**
@@ -75,15 +76,12 @@ public class MCRPostProcessorXSL implements MCRXEditorPostProcessor {
             //do nothing, use default
         }
 
-        if (factoryClass == null) {
-            factoryClass = MCRConfiguration2
-                .<TransformerFactory>getClass("MCR.LayoutService.TransformerFactoryClass").orElseThrow();
-        }
-
         final String xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
         MCRContent source = new MCRJDOMContent(xml);
-        MCRContent transformed = MCRXSL2XMLTransformer.obtainInstance(factoryClass, xslFolder + "/" + stylesheet)
-            .transform(source);
+        MCRXSLTransformer transformer =
+            factoryClass == null ? MCRXSL2XMLTransformer.obtainInstance(xslFolder + "/" + stylesheet)
+                : MCRXSL2XMLTransformer.obtainInstance(factoryClass, xslFolder + "/" + stylesheet);
+        MCRContent transformed = transformer.transform(source);
         MCRContent normalized = new MCRNormalizeUnicodeTransformer().transform(transformed);
         return normalized.asXML();
     }

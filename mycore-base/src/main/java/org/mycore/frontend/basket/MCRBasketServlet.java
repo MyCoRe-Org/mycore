@@ -18,11 +18,10 @@
 
 package org.mycore.frontend.basket;
 
-import java.io.IOException;
 import java.io.Serial;
 import java.net.URI;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -32,6 +31,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -43,7 +43,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * Required parameter is the type of basket and the action to perform.
  * For a basket of objects, possible requests would be:
  *
- * BasketServlet?type=objects&amp;action=show
+ * BasketServlet?type=objects&amp;action=showmycore-base/src/main/java/org/mycore/frontend/basket/MCRBasketServlet.java
  *   to output the contents of the objects basket using basket-{type}.xsl
  * BasketServlet?type=objects&amp;action=clear
  *   to remove all entries in the objects basket.
@@ -86,13 +86,20 @@ public class MCRBasketServlet extends MCRServlet {
         .collect(Collectors.toList());
 
     @Override
+    @SuppressWarnings("PMD.NcssCount")
     public void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest req = job.getRequest();
+        HttpServletResponse res = job.getResponse();
+
         String type = req.getParameter("type");
         String action = req.getParameter("action");
         String[] uris = req.getParameterValues("uri");
         String[] ids = req.getParameterValues("id");
+
+        boolean resolveContent = "true".equals(req.getParameter("resolve"));
+
         LOGGER.info(() -> action + " " + req.getParameter("type") + " " + (ids == null ? "" : ids));
+
         MCRBasket basket = MCRBasketManager.getOrCreateBasketInSession(type);
         switch (action) {
             case "add":
@@ -105,7 +112,7 @@ public class MCRBasketServlet extends MCRServlet {
                     }
                     MCRBasketEntry entry = new MCRBasketEntry(ids[i], uris[i]);
                     basket.add(entry);
-                    if ("true".equals(req.getParameter("resolve"))) {
+                    if (resolveContent) {
                         entry.resolveContent();
                     }
                 }
@@ -155,18 +162,22 @@ public class MCRBasketServlet extends MCRServlet {
             default:
                 throw new MCRException("Invalid action: " + action);
         }
-        extracted(req, job.getResponse(), type);
+        res.sendRedirect(res.encodeRedirectURL(resolveRedirect(req, type)));
     }
 
-    private void extracted(HttpServletRequest req, HttpServletResponse res, String type) throws IOException {
-        String redirect = getProperty(req, "redirect");
-        URI referer = getReferer(req);
-        if (referer != null && Objects.equals(redirect, "referer")) {
-            res.sendRedirect(res.encodeRedirectURL(referer.toString()));
-        } else {
-            res.sendRedirect(res.encodeRedirectURL(Objects.requireNonNullElseGet(redirect, () -> getServletBaseURL() +
-                "MCRBasketServlet?action=show&type=" + type)));
+    private String resolveRedirect(HttpServletRequest req, String type) {
+        return Optional.ofNullable(getRedirect(req)).filter(MCRFrontendUtil::isSafeRedirect)
+                .orElseGet(() -> getServletBaseURL() + "MCRBasketServlet?action=show&type=" + type);
+    }
+
+    private String getRedirect(HttpServletRequest req) {
+        final String redirect = getProperty(req, "redirect");
+        if ("referer".equalsIgnoreCase(redirect)) {
+            final URI referer = getReferer(req);
+            if (referer != null) {
+                return referer.toString();
+            }
         }
+        return redirect;
     }
-
 }
