@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xed="http://www.mycore.de/xeditor"
-                xmlns:xalan="http://xml.apache.org/xalan" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
+                xmlns:xalan="http://xml.apache.org/xalan"
                 xmlns:transformer="xalan://org.mycore.frontend.xeditor.MCRXEditorTransformer"
-                xmlns:includer="xalan://org.mycore.frontend.xeditor.MCRIncludeHandler"
-                exclude-result-prefixes="xsl xed xalan transformer includer i18n">
+                exclude-result-prefixes="xsl xed xalan transformer">
 
   <xsl:strip-space elements="xed:*" />
 
@@ -15,8 +14,7 @@
   <xsl:param name="CurrentLang" />
   <xsl:param name="DefaultLang" />
   <xsl:param name="transformer" />
-
-  <xsl:variable name="includer" select="includer:new()" />
+  <xsl:param name="sessionID" />
 
   <!-- ========== <xed:form /> output-only ========== -->
 
@@ -59,9 +57,7 @@
 
   <xsl:template name="passAdditionalParameters">
     <div style="visibility:hidden">
-      <xsl:for-each select="transformer:getAdditionalParameters($transformer)">
-        <input type="hidden" name="{@name}" value="{text()}" />
-      </xsl:for-each>
+      <xsl:copy-of select="transformer:getAdditionalParameters($transformer)" />
     </div>
   </xsl:template>
 
@@ -86,29 +82,36 @@
     <xsl:value-of select="transformer:initializePostprocessor($transformer,.)" />
   </xsl:template>
 
-  <!-- ========== <xed:preload uri="" static="true|false" /> ========== -->
+  <!-- ========== <xed:preload uri="" /> ========== -->
 
   <xsl:template match="xed:preload" mode="xeditor">
-    <xsl:variable name="uri" select="transformer:replaceParameters($transformer,@uri)" />
-    <xsl:value-of select="includer:preloadFromURIs($includer,$uri,@static)" />
+    <xsl:variable name="attrURI" select="transformer:replaceParameters($transformer,@uri)" />
+    <xsl:variable name="inclURI" select="concat('xedInclude:',$sessionID,':preload:',$attrURI)" />
+    <xsl:value-of select="document($inclURI)" />
   </xsl:template>
 
-  <!-- ========== <xed:include uri="" ref="" static="true|false" /> ========== -->
+  <!-- ========== <xed:include uri="" ref="" /> ========== -->
 
-  <xsl:template match="xed:include[@uri and @ref]" mode="xeditor">
-    <xsl:variable name="uri" select="transformer:replaceParameters($transformer,@uri)" />
+  <xsl:template match="xed:include[@uri]" mode="xeditor">
+    <xsl:variable name="attrURI" select="transformer:replaceParameters($transformer,@uri)" />
+    <xsl:variable name="inclURI" select="concat('xedInclude:',$sessionID,':resolveURI:',$attrURI)" />
+    <xsl:variable name="resolved" select="document($inclURI)" />
+    
+    <xsl:choose>
+      <xsl:when test="@ref">
+        <xsl:variable name="ref" select="transformer:replaceParameters($transformer,@ref)" />
+        <xsl:apply-templates select="$resolved/descendant-or-self::*[@id=$ref]" mode="included" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="$resolved" mode="included" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template match="xed:include[not(@uri)]" mode="xeditor">
     <xsl:variable name="ref" select="transformer:replaceParameters($transformer,@ref)" />
-    <xsl:apply-templates select="includer:resolve($includer,$uri,@static)/descendant::*[@id=$ref]" mode="included" />
-  </xsl:template>
-
-  <xsl:template match="xed:include[@uri and not(@ref)]" mode="xeditor">
-    <xsl:variable name="uri" select="transformer:replaceParameters($transformer,@uri)" />
-    <xsl:apply-templates select="includer:resolve($includer,$uri,@static)" mode="included" />
-  </xsl:template>
-
-  <xsl:template match="xed:include[@ref and not(@uri)]" mode="xeditor">
-    <xsl:variable name="ref" select="transformer:replaceParameters($transformer,@ref)" />
-    <xsl:variable name="resolved" select="includer:resolve($includer,$ref)" />
+    <xsl:variable name="inclURI" select="concat('xedInclude:',$sessionID,':resolveID:',$ref)" />
+    <xsl:variable name="resolved" select="document($inclURI)" />
     <xsl:choose>
       <xsl:when test="count($resolved) &gt; 0">
         <xsl:apply-templates select="$resolved" mode="included" />
@@ -145,21 +148,9 @@
   <xsl:template match="xed:bind" mode="xeditor">
     <xsl:call-template name="registerAdditionalNamespaces" />
     
-    <xsl:variable name="initialValue" select="transformer:replaceXPaths($transformer,@initially)" />
-    <xsl:value-of select="transformer:bind($transformer,@xpath,$initialValue,@name)" />
-    <xsl:apply-templates select="@set|@default" mode="xeditor" />
+    <xsl:value-of select="transformer:bind($transformer,.)" />
     <xsl:apply-templates select="*" mode="xeditor" />
     <xsl:value-of select="transformer:unbind($transformer)" />
-  </xsl:template>
-
-  <xsl:template match="xed:bind/@set" mode="xeditor">
-    <xsl:variable name="value" select="transformer:replaceXPaths($transformer,.)" />
-    <xsl:value-of select="transformer:setValues($transformer,$value)" />
-  </xsl:template>
-
-  <xsl:template match="xed:bind/@default" mode="xeditor">
-    <xsl:variable name="value" select="transformer:replaceXPaths($transformer,.)" />
-    <xsl:value-of select="transformer:setDefault($transformer,$value)" />
   </xsl:template>
 
   <!-- ========== Default templates ========== -->
@@ -286,8 +277,8 @@
     <xsl:variable name="xed_repeat" select="." />
 
     <xsl:for-each select="xalan:tokenize(transformer:repeat($transformer,@xpath,@min,@max,@method))">
-      <a id="rep-{transformer:nextAnchorID($transformer)}" />
-      <xsl:value-of select="transformer:bindRepeatPosition($transformer)" />
+      <xsl:variable name="anchorID" select="transformer:bindRepeatPosition($transformer)" />
+      <a id="rep-{$anchorID}" />
       <xsl:apply-templates select="$xed_repeat/node()" mode="xeditor" />
       <xsl:value-of select="transformer:unbind($transformer)" />
     </xsl:for-each>
@@ -297,56 +288,10 @@
   <!-- ========== <xed:controls /> ========== -->
 
   <xsl:template match="xed:controls" mode="xeditor">
-    <xsl:variable name="pos" select="transformer:getRepeatPosition($transformer)" />
-    <xsl:variable name="num" select="transformer:getNumRepeats($transformer)" />
-    <xsl:variable name="max" select="transformer:getMaxRepeats($transformer)" />
-
-    <xsl:variable name="controls">
-      <xsl:if test="string-length(.) = 0">
-        insert remove up down
-      </xsl:if>
-      <xsl:value-of select="." />
-    </xsl:variable>
-
-    <xsl:for-each select="xalan:tokenize($controls)">
-      <xsl:choose>
-        <xsl:when test="(. = 'append') and ($pos &lt; $num)" />
-        <xsl:when test="(. = 'up') and ($pos = 1)" />
-        <xsl:when test="(. = 'down') and ($pos = $num)" />
-        <xsl:when test="(. = 'insert') and ($max = $num)" />
-        <xsl:when test="(. = 'append') and ($max = $num)" />
-        <xsl:otherwise>
-          <xsl:apply-templates select="." mode="xed.control">
-            <xsl:with-param name="name">
-              <xsl:value-of select="concat('_xed_submit_',.,':')" />
-              <xsl:choose>
-                <xsl:when test="(. = 'append') or (. = 'insert')">
-                  <xsl:value-of select="transformer:getInsertParameter($transformer)" />
-                </xsl:when>
-                <xsl:when test="(. = 'remove')">
-                  <xsl:value-of select="transformer:getAbsoluteXPath($transformer)" />
-                </xsl:when>
-                <xsl:when test="(. = 'up')">
-                  <xsl:value-of select="transformer:getSwapParameter($transformer,'up')" />
-                </xsl:when>
-                <xsl:when test="(. = 'down')">
-                  <xsl:value-of select="transformer:getSwapParameter($transformer,'down')" />
-                </xsl:when>
-              </xsl:choose>
-              <xsl:text>|rep-</xsl:text>
-              <xsl:choose>
-                <xsl:when
-                  test="(. = 'remove') and ($pos &gt; 1)"> <!-- redirect to anchor of preceding, since this one will be removed -->
-                  <xsl:value-of select="transformer:previousAnchorID($transformer)" />
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="transformer:getAnchorID($transformer)" />
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:with-param>
-          </xsl:apply-templates>
-        </xsl:otherwise>
-      </xsl:choose>
+    <xsl:for-each select="transformer:buildControls($transformer,.)">
+      <xsl:apply-templates select="text()" mode="xed.control">
+        <xsl:with-param name="name" select="@name" />
+      </xsl:apply-templates>
     </xsl:for-each>
   </xsl:template>
 
@@ -406,9 +351,10 @@
   <!-- ========== <xed:choose> <xed:when test=""/> <xed:otherwise /> </xed:choose> ========== -->
 
   <xsl:template match="xed:choose" mode="xeditor">
+    <xsl:variable name="matchingWhens" select="xed:when[transformer:test($transformer,@test)]" />
     <xsl:choose>
-      <xsl:when test="xed:when[transformer:test($transformer,@test)]">
-        <xsl:apply-templates select="xed:when[transformer:test($transformer,@test)][1]/node()" mode="xeditor" />
+      <xsl:when test="count($matchingWhens) &gt; 0">
+        <xsl:apply-templates select="$matchingWhens[1]/node()" mode="xeditor" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:apply-templates select="xed:otherwise/node()" mode="xeditor" />
@@ -418,22 +364,12 @@
 
   <!-- ========== <xed:output i18n="" value="" /> ========== -->
 
-  <xsl:template match="xed:output[not(@value) and not(@i18n)]" mode="xeditor">
-    <xsl:value-of select="transformer:getValue($transformer)" />
-  </xsl:template>
-
-  <xsl:template match="xed:output[@value and not(@i18n)]" mode="xeditor">
-    <xsl:value-of select="transformer:replaceXPathOrI18n($transformer,@value)" />
-  </xsl:template>
-
   <xsl:template match="xed:output[@i18n and not(@value)]" mode="xeditor">
-    <xsl:variable name="i18n" select="transformer:replaceParameters($transformer,@i18n)" />
-    <xsl:value-of select="i18n:translate($i18n)" disable-output-escaping="yes" />
+    <xsl:value-of select="transformer:output($transformer,@value,@i18n)" disable-output-escaping="yes" />
   </xsl:template>
 
-  <xsl:template match="xed:output[@i18n and @value]" mode="xeditor">
-    <xsl:variable name="i18n" select="transformer:replaceParameters($transformer,@i18n)" />
-    <xsl:value-of select="i18n:translate($i18n,transformer:evaluateXPath($transformer,@value))" />
+  <xsl:template match="xed:output" mode="xeditor">
+    <xsl:value-of select="transformer:output($transformer,@value,@i18n)" />
   </xsl:template>
 
   <!-- ========== <xed:multi-lang> <xed:lang xml:lang="" /> </xed:multi-lang> ========== -->
@@ -455,8 +391,7 @@
   <!-- ========== <xed:load-resource name="" uri="" ========== -->
 
   <xsl:template match="xed:load-resource" mode="xeditor">
-    <xsl:variable name="uri" select="transformer:replaceXPaths($transformer,@uri)" />
-    <xsl:value-of select="transformer:loadResource($transformer,$uri,@name)" />
+    <xsl:value-of select="transformer:loadResource($transformer,@uri,@name)" />
   </xsl:template>
 
   <!-- ========== <xed:cleanup-rule xpath="" relevant-if="" ========== -->

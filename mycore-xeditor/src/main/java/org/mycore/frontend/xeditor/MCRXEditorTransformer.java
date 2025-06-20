@@ -52,9 +52,11 @@ import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXPathEvaluator;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.xeditor.target.MCRInsertTarget;
+import org.mycore.frontend.xeditor.target.MCRRemoveTarget;
 import org.mycore.frontend.xeditor.target.MCRSubselectTarget;
 import org.mycore.frontend.xeditor.target.MCRSwapTarget;
 import org.mycore.frontend.xeditor.validation.MCRValidator;
+import org.mycore.services.i18n.MCRTranslation;
 import org.w3c.dom.Attr;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -85,10 +87,13 @@ public class MCRXEditorTransformer {
     public MCRContent transform(MCRContent editorSource) throws IOException {
         editorSession.getValidator().clearRules();
         editorSession.getSubmission().clear();
+        editorSession.resetElementLookupMap();
 
         MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer("xeditor");
         if (transformer instanceof MCRParameterizedTransformer parameterizedTransformer) {
             transformationParameters.setParameter("transformer", this);
+            transformationParameters.setParameter("sessionID", editorSession.getID());
+            
             MCRContent result = parameterizedTransformer.transform(editorSource, transformationParameters);
             if (result instanceof MCRWrappedContent wrappedContent
                 && result.getClass().getName().contains(MCRXSLTransformer.class.getName())) {
@@ -96,6 +101,7 @@ public class MCRXEditorTransformer {
                 result = wrappedContent.getBaseContent();
             }
             editorSession.getValidator().clearValidationResults();
+            editorSession.resetElementLookupMap();
             return result;
         } else {
             throw new MCRException("Xeditor needs parameterized MCRContentTransformer: " + transformer);
@@ -143,6 +149,24 @@ public class MCRXEditorTransformer {
         return getXPathEvaluator().replaceXPaths(uri, false);
     }
 
+    public void bind(Node bindNode) throws JaxenException {
+        org.w3c.dom.Element bindElement = (org.w3c.dom.Element)bindNode;
+        String xPath = bindElement.getAttribute("xpath");
+        String initialValue = bindElement.getAttribute("initially");
+        String name = bindElement.getAttribute("name");
+        bind(xPath, initialValue, name);
+        
+        Attr setAttr = bindElement.getAttributeNode("set");
+        if (setAttr != null) {
+            setValues(setAttr.getValue());
+        }
+
+        Attr setDefault = bindElement.getAttributeNode("default");
+        if (setDefault != null) {
+            setDefault(setDefault.getValue());
+        }
+    }
+    
     public void bind(String xPath, String initialValue, String name) throws JaxenException {
         if (editorSession.getEditedXML() == null) {
             createEmptyDocumentFromXPath(xPath);
@@ -152,7 +176,7 @@ public class MCRXEditorTransformer {
             currentBinding = editorSession.getRootBinding();
         }
 
-        setCurrentBinding(new MCRBinding(xPath, initialValue, name, currentBinding));
+        setCurrentBinding(new MCRBinding(xPath, replaceXPaths(initialValue), name, currentBinding));
     }
 
     private void setCurrentBinding(MCRBinding binding) {
@@ -175,12 +199,12 @@ public class MCRXEditorTransformer {
         return new Element(nameStep.getLocalName(), ns);
     }
 
-    public void setValues(String value) {
-        currentBinding.setValues(value);
+    private void setValues(String value) {
+        currentBinding.setValues(replaceXPaths(value));
     }
 
-    public void setDefault(String value) {
-        currentBinding.setDefault(value);
+    private void setDefault(String value) {
+        currentBinding.setDefault(replaceXPaths(value));
         editorSession.getSubmission().markDefaultValue(currentBinding.getAbsoluteXPath(), value);
     }
 
@@ -226,6 +250,27 @@ public class MCRXEditorTransformer {
         return getXPathEvaluator().evaluateXPath(xPathExpression);
     }
 
+    /**
+     * Handles the xed:output element
+     */
+    public String output(String attrValue, String attrI18N) {
+        if (!StringUtils.isEmpty(attrI18N)) {
+            String key = replaceParameters(attrI18N);
+
+            if (StringUtils.isEmpty(attrValue)) {
+                return MCRTranslation.translate(key);
+            } else {
+                String value = evaluateXPath(attrValue);
+                return MCRTranslation.translate(key, value);
+            }
+
+        } else if (!StringUtils.isEmpty(attrValue)) {
+            return replaceXPathOrI18n(attrValue);
+        } else {
+            return getValue();
+        }
+    }
+
     public boolean test(String xPathExpression) {
         return getXPathEvaluator().test(xPathExpression);
     }
@@ -253,46 +298,90 @@ public class MCRXEditorTransformer {
         return (MCRRepeatBinding) binding;
     }
 
-    public int getNumRepeats() {
+    private int getNumRepeats() {
         return getCurrentRepeat().getBoundNodes().size();
     }
 
-    public int getMaxRepeats() {
+    private int getMaxRepeats() {
         return getCurrentRepeat().getMaxRepeats();
     }
 
-    public int getRepeatPosition() {
+    private int getRepeatPosition() {
         return getCurrentRepeat().getRepeatPosition();
     }
 
-    public void bindRepeatPosition() {
+    public int bindRepeatPosition() {
         setCurrentBinding(getCurrentRepeat().bindRepeatPosition());
         editorSession.getValidator().setValidationMarker(currentBinding);
+        return nextAnchorID();
+    }
+    public NodeSet buildControls(String controlTokens) throws JaxenException, ParserConfigurationException {
+        if (StringUtils.isEmpty(controlTokens)) {
+            controlTokens = "insert remove up down";
+        }
+
+        org.w3c.dom.Document dom = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        NodeSet nodeSet = new NodeSet();
+
+        for (String controlToken : controlTokens.split("\\s")) {
+            String name = buildControlNameAttribute(controlToken);
+            if (name != null) {
+                org.w3c.dom.Element element = dom.createElement("control");
+                element.setAttribute("name", name);
+                element.setTextContent(controlToken);
+                nodeSet.addElement(element);
+            }
+        }
+
+        return nodeSet;
     }
 
-    public String getSwapParameter(String action) throws JaxenException {
-        boolean direction = Objects.equals(action, "down") ? MCRSwapTarget.MOVE_DOWN : MCRSwapTarget.MOVE_UP;
-        return MCRSwapTarget.getSwapParameter(getCurrentRepeat(), direction);
-    }
+    private String buildControlNameAttribute(String controlToken) throws JaxenException {
+        int pos = getRepeatPosition();
+        int num = getNumRepeats();
+        int max = getMaxRepeats();
+        
+        if ((MCRSwapTarget.TOKEN_UP.equals(controlToken) && (pos == 1)) ||
+            (MCRSwapTarget.TOKEN_DOWN.equals(controlToken) && (pos == num)) ||
+            (MCRInsertTarget.isAppendToken(controlToken) && ((pos < num) || (num == max))) ||
+            (MCRInsertTarget.isInsertToken(controlToken) && (max == num))) {
+            return null;
+        }
+        
+        StringBuilder sb = new StringBuilder("_xed_submit_").append(controlToken).append(':');
 
-    public String getInsertParameter() throws JaxenException {
-        return MCRInsertTarget.getInsertParameter(getCurrentRepeat());
-    }
+        if (MCRInsertTarget.isAppendToken(controlToken) || MCRInsertTarget.isInsertToken(controlToken)) {
+            sb.append(MCRInsertTarget.getInsertParameter(getCurrentRepeat()));
+        } else if (MCRRemoveTarget.isRemoveToken(controlToken)) {
+            sb.append(getAbsoluteXPath());
+        } else if (MCRSwapTarget.TOKEN_UP.equals(controlToken)) {
+            sb.append(MCRSwapTarget.getSwapParameter(getCurrentRepeat(), MCRSwapTarget.TOKEN_UP));
+        } else if (MCRSwapTarget.TOKEN_DOWN.equals(controlToken)) {
+            sb.append(MCRSwapTarget.getSwapParameter(getCurrentRepeat(), MCRSwapTarget.TOKEN_DOWN));
+        }
 
-    public int nextAnchorID() {
+        sb.append("|rep-");
+
+        if (MCRRemoveTarget.isRemoveToken(controlToken) && (getRepeatPosition() > 1)) {
+            /* redirect to anchor of preceding, since this one will be removed */
+            sb.append(previousAnchorID());
+        } else {
+            sb.append(anchorID);
+        }
+
+        return sb.toString();
+    }
+    
+    private int nextAnchorID() {
         return ++anchorID;
     }
 
-    public int getAnchorID() {
-        return anchorID;
-    }
-
-    public int previousAnchorID() {
+    private int previousAnchorID() {
         return (anchorID == 0 ? 1 : anchorID - 1);
     }
 
     public void loadResource(String uri, String name) {
-        Element resource = MCRURIResolver.obtainInstance().resolve(uri);
+        Element resource = MCRURIResolver.obtainInstance().resolve(replaceXPaths(uri));
         editorSession.getVariables().put(name, resource);
     }
 
@@ -353,9 +442,10 @@ public class MCRXEditorTransformer {
     }
 
     private org.w3c.dom.Element buildAdditionalParameterElement(org.w3c.dom.Document doc, String name, String value) {
-        org.w3c.dom.Element element = doc.createElement("param");
+        org.w3c.dom.Element element = doc.createElement("input");
+        element.setAttribute("type", "hidden");
         element.setAttribute("name", name);
-        element.setTextContent(value);
+        element.setAttribute("value", value);
         return element;
     }
 
