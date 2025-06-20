@@ -80,22 +80,6 @@ public class MCRSolrCore {
 
     /**
      * Creates a new solr server core instance.
-     * 
-     * @param serverURL
-     *            base url of the solr server e.g. http://localhost:8296
-     * @param name
-     *            name of the core e.g. docportal
-     * @deprecated use {@link #MCRSolrCore(String, String, String, Integer, Set)} instead
-     */
-    @Deprecated
-    public MCRSolrCore(String serverURL, String name) {
-
-        setup(serverURL, name, null, DEFAULT_SHARD_COUNT,
-            name.equals("classification") ? Set.of(MCRSolrCoreType.CLASSIFICATION) : Set.of(MCRSolrCoreType.MAIN));
-    }
-
-    /**
-     * Creates a new solr server core instance.
      *
      * @param serverURL
      *            base url of the solr server e.g. http://localhost:8296

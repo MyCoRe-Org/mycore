@@ -51,14 +51,6 @@ public abstract class MCRRuleStore {
 
     public abstract int getNextFreeRuleID(String prefix);
 
-    /**
-     * @deprecated Use {@link #obtainInstance()} instead
-     */
-    @Deprecated
-    public static MCRRuleStore getInstance() {
-        return obtainInstance();
-    }
-
     public static MCRRuleStore obtainInstance() {
         return LazyInstanceHolder.SHARED_INSTANCE;
     }

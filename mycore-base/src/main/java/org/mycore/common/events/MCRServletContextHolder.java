@@ -32,14 +32,6 @@ public final class MCRServletContextHolder implements ServletContextListener {
     private MCRServletContextHolder() {
     }
 
-    /**
-     * @deprecated Use {@link #getInstance()} instead
-     */
-    @Deprecated
-    public static MCRServletContextHolder instance() {
-        return SINGLETON_INSTANCE;
-    }
-
     public static MCRServletContextHolder getInstance() {
         return SINGLETON_INSTANCE;
     }

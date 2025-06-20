@@ -47,14 +47,6 @@ public final class MCRURNJsonBundle {
         this.url = url;
     }
 
-    /**
-     * @deprecated Use {@link #MCRURNJsonBundle(MCRPIRegistrationInfo, URL)} instead
-     */
-    @Deprecated
-    public static MCRURNJsonBundle instance(MCRPIRegistrationInfo urn, URL url) {
-        return new MCRURNJsonBundle(urn, url);
-    }
-
     public MCRPIRegistrationInfo getUrn() {
         return this.urn;
     }

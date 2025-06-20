@@ -28,15 +28,6 @@ import java.util.stream.Stream;
  */
 public interface MCRProcessableRegistry {
 
-
-    /**
-     * @deprecated Use {@link MCRProcessableManager#getRegistry()} instead
-     */
-    @Deprecated
-    static MCRProcessableRegistry getSingleInstance() {
-        return MCRProcessableManager.getInstance().getRegistry();
-    }
-
     /**
      * Registers a new collection to the registry.
      * 

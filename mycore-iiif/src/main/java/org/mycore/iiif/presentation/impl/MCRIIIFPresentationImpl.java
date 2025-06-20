@@ -40,14 +40,6 @@ public abstract class MCRIIIFPresentationImpl {
         this.implName = implName;
     }
 
-    /**
-     * @deprecated Use {@link #obtainInstance(String)} instead
-     */
-    @Deprecated
-    public static synchronized MCRIIIFPresentationImpl getInstance(String implNameParameter) {
-        return obtainInstance(implNameParameter);
-    }
-
     public static synchronized MCRIIIFPresentationImpl obtainInstance(String implNameParameter) {
         String implName = (implNameParameter == null || implNameParameter.isBlank())
             ? MCRConfiguration2.getStringOrThrow("MCR.IIIFPresentation.Default")

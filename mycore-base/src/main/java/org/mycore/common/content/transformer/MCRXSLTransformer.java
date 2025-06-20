@@ -143,25 +143,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         }
     }
 
-    /**
-     * @deprecated Use {@link #obtainInstance(String...)} instead
-     */
-    @Deprecated
-    public static MCRXSLTransformer getInstance(String... stylesheets) {
-        return obtainInstance(stylesheets);
-    }
-
    public static MCRXSLTransformer obtainInstance(String... stylesheets) {
         return obtainInstance(DEFAULT_FACTORY_CLASS, stylesheets);
-    }
-
-    /**
-     * @deprecated Use {@link #obtainInstance(Class, String...)} instead
-     */
-    @Deprecated
-    public static MCRXSLTransformer getInstance(Class<? extends TransformerFactory> factoryClass,
-        String... stylesheets) {
-        return obtainInstance(factoryClass, stylesheets);
     }
 
     public static MCRXSLTransformer obtainInstance(Class<? extends TransformerFactory> factoryClass,

@@ -36,15 +36,6 @@ import java.nio.file.attribute.BasicFileAttributes;
  */
 public final class MCRRecursiveDeleter extends SimpleFileVisitor<Path> {
 
-
-    /**
-     * @deprecated Use {@code new MCRMCRRecursiveDeleter()} instead
-     */
-    @Deprecated
-    public static MCRRecursiveDeleter instance() {
-        return new MCRRecursiveDeleter();
-    }
-
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         Files.delete(file);

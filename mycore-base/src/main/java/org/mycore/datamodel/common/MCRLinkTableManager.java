@@ -81,14 +81,6 @@ public final class MCRLinkTableManager {
     }
 
     /**
-     * @deprecated use {@link #getInstance()} instead
-     */
-    @Deprecated
-    public static synchronized MCRLinkTableManager instance() {
-        return getInstance();
-    }
-
-    /**
      * Returns the link table manager singleton.
      *
      * @return Returns a MCRLinkTableManager instance.

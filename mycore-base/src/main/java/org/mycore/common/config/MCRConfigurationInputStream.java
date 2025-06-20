@@ -87,14 +87,6 @@ public class MCRConfigurationInputStream extends InputStream {
         }
     }
 
-    /**
-     * @deprecated Use {@link #ofMyCoReProperties()} instead
-     */
-    @Deprecated
-    public static MCRConfigurationInputStream getMyCoRePropertiesInstance() throws IOException {
-        return ofMyCoReProperties();
-    }
-
         /**
          * {@link InputStream} that includes all properties from {@link MCRRuntimeComponentDetector#getAllComponents()}
          * and <strong>mycore.properties</strong>. Use system property <code>MCR.Configuration.File</code> to configure

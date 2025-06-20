@@ -23,7 +23,6 @@ import org.apache.solr.common.SolrInputDocument;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Locale;
-import java.util.Optional;
 
 import com.fasterxml.jackson.core.TreeNode;
 
@@ -43,27 +42,6 @@ public interface MCRTikaMapper {
     static String simplifyKeyName(String key) {
         // replace every character that is not a letter or a digit with an underscore
         return key.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "_");
-    }
-
-    /**
-     * Returns the default Tika mapper. This mapper is used if no mapper is defined for a key.
-     * @return The default Tika mapper
-     * @deprecated Use {@link MCRTikaManager#getDefaultMapper()} instead
-     */
-    @Deprecated
-    static MCRTikaMapper getDefaultMapper() {
-        return MCRTikaManager.getInstance().getDefaultMapper();
-    }
-
-    /**
-     * Returns the Tika mapper for the given key. If no mapper is defined for the key, the default mapper is returned.
-     * @param key The key for which the mapper should be returned
-     * @return The Tika mapper for the given key
-     * @deprecated Use {@link MCRTikaManager#getMapper(String)} instead
-     */
-    @Deprecated
-    static Optional<MCRTikaMapper> getMapper(String key) {
-        return MCRTikaManager.getInstance().getMapper(key);
     }
 
     /**

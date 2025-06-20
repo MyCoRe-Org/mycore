@@ -52,14 +52,6 @@ public abstract class MCRSolrIndexHandlerFactory {
     private static final MCRSolrIndexHandlerFactory SHARED_INSTANCE = MCRConfiguration2
         .getInstanceOfOrThrow(MCRSolrIndexHandlerFactory.class, SOLR_CONFIG_PREFIX + "IndexHandler.Factory");
 
-    /**
-     * @deprecated Use {@link #obtainInstance()} instead
-     */
-    @Deprecated
-    public static MCRSolrIndexHandlerFactory getSharedInstance() {
-        return obtainInstance();
-    }
-
     public static MCRSolrIndexHandlerFactory obtainInstance() {
         return SHARED_INSTANCE;
     }

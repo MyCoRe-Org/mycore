@@ -167,12 +167,6 @@ public final class MCRAccessControlSystem extends MCRAccessBaseImpl {
     }
 
     @Override
-    @Deprecated
-    public boolean checkPermissionForUser(String permission, String userID) {
-        return checkAccess(POOL_PRIVILEGE_ID, permission, userID, null);
-    }
-
-    @Override
     public boolean checkPermissionForUser(String permission, MCRUserInformation userInfo) {
         return checkAccess(POOL_PRIVILEGE_ID, permission, userInfo, null);
     }
@@ -269,31 +263,6 @@ public final class MCRAccessControlSystem extends MCRAccessBaseImpl {
             LOGGER.debug("accessStore.getRuleID() done with {}", ruleID);
         }
         return ruleStore.getRule(ruleID);
-    }
-
-    /**
-     * Validator methods to validate access definition for given object and pool
-     *
-     * @param permission
-     *            poolname as string
-     * @param objID
-     *            MCRObjectID as string
-     * @param userID
-     *            MCRUser
-     * @param ip
-     *            ip-Address
-     * @return true if access is granted according to defined access rules
-     */
-    @Deprecated
-    public boolean checkAccess(String objID, String permission, String userID, MCRIPAddress ip) {
-        Date date = new Date();
-        LOGGER.debug("getAccess()");
-        MCRAccessRule rule = getAccessRule(objID, permission);
-        LOGGER.debug("getAccess() is done");
-        if (rule == null) {
-            return userID.equals(MCRSystemUserInformation.SUPER_USER.getUserID());
-        }
-        return rule.checkAccess(userID, date, ip);
     }
 
     /**

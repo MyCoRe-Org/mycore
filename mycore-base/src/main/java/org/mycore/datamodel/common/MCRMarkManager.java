@@ -85,14 +85,6 @@ public final class MCRMarkManager {
     }
 
     /**
-     * @deprecated use {@link #getInstance()} instead
-     */
-    @Deprecated
-    public static MCRMarkManager instance() {
-        return getInstance();
-    }
-
-    /**
      * Returns the instance to the singleton {@link MCRMarkManager}.
      *
      * @return instance of {@link MCRMarkManager}

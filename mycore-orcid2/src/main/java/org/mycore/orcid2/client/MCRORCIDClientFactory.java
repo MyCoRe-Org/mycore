@@ -69,14 +69,6 @@ public final class MCRORCIDClientFactory {
     }
 
     /**
-     * @deprecated Use {@link #obtainInstance(String)} instead
-     */
-    @Deprecated
-    public static MCRORCIDClientFactory getInstance(String version) {
-        return obtainInstance(version);
-    }
-
-    /**
      * Returns an instance of a factory for a version.
      *
      * @param version the version

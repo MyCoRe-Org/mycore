@@ -70,27 +70,6 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements EventListener 
     }
 
     /**
-     * @deprecated Use {@link #obtainInstance(Class)} instead
-     */
-    @Deprecated
-    public static MCRJobQueue getInstance(Class<? extends MCRJobAction> action) {
-        return obtainInstance(action);
-    }
-
-    /**
-     * Returns a singleton instance of this class.
-     *
-     * @param action the {@link MCRJobAction} or <code>null</code>
-     * @return singleton instance of this class
-     * @deprecated use {@link MCRJobQueueManager#getInstance()} and {@link MCRJobQueueManager#getJobQueue(Class)}
-     * instead
-     */
-    @Deprecated
-    public static MCRJobQueue obtainInstance(Class<? extends MCRJobAction> action) {
-        return MCRJobQueueManager.getInstance().getJobQueue(action);
-    }
-
-    /**
      * @return next available job instance
      */
     @Override
@@ -252,54 +231,6 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements EventListener 
             return 0;
         }
         return dao.getRemainingJobCount(action);
-    }
-
-    /**
-     * Returns a specific job from given parameters or null if not found.
-     *
-     * @param params the parameters
-     * @return the job
-     * @deprecated use {@link MCRJobDAO#getJobs(Class, Map, List, Integer, Integer)} instead.
-     *      * The job queue should only be used for {@link MCRJobStatus#NEW} jobs, but this method returns all jobs.
-     */
-    @Deprecated
-    public MCRJob getJob(Map<String, String> params) {
-        if (!running) {
-            return null;
-        }
-
-        return dao.getJob(action, params, Collections.emptyList());
-    }
-
-    /**
-     * Returns specific jobs by the given parameters or an empty list.
-     *
-     * @param params the parameters
-     * @return a list of jobs matching the given parameters
-     * @deprecated use {@link MCRJobDAO#getJobs(Class, Map, List, Integer, Integer)} instead.
-     * The job queue should only be used for {@link MCRJobStatus#NEW} jobs, but this method returns all jobs.
-     */
-    @Deprecated
-    public List<MCRJob> getJobs(Map<String, String> params) {
-        return getJobs(action, params);
-    }
-
-    /**
-     * Returns specific jobs by the given parameters or an empty list.
-     *
-     * @param action the action class
-     * @param params the parameters
-     *
-     * @return a list of jobs matching the given parameters
-     * @deprecated use {@link MCRJobDAO#getJobs(Class, Map, List, Integer, Integer)} instead
-     * The job queue should only be used for {@link MCRJobStatus#NEW} jobs, but this method returns all jobs.
-     */
-    @Deprecated
-    private List<MCRJob> getJobs(Class<? extends MCRJobAction> action, Map<String, String> params) {
-        if (!running) {
-            return null;
-        }
-        return dao.getJobs(action, params, Collections.emptyList(), null, null);
     }
 
     /**

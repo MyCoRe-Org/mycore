@@ -90,14 +90,6 @@ public final class MCREventManager {
     }
 
     /**
-     * @deprecated Use {@link #getInstance()} instead
-     */
-    @Deprecated
-    public static MCREventManager instance() {
-        return getInstance();
-    }
-
-    /**
      * The singleton manager instance
      *
      * @return the single event manager
