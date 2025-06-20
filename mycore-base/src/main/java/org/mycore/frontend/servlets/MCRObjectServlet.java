@@ -23,20 +23,24 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 
 import java.io.IOException;
 import java.io.Serial;
+import java.util.Optional;
 
 import javax.xml.transform.TransformerException;
 
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRExpandedObjectManager;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.xml.sax.SAXException;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -53,17 +57,13 @@ public class MCRObjectServlet extends MCRContentServlet {
 
     private static final String I18N_ERROR_PREFIX = "component.base.error";
 
-    private transient MCRXMLMetadataManager metadataManager;
-
-    @Override
-    public void init() throws ServletException {
-        super.init();
-        metadataManager = MCRXMLMetadataManager.getInstance();
-    }
-
     @Override
     public MCRContent getContent(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         final MCRObjectID mcrid = getMCRObjectID(req, resp);
+        boolean expanded = Optional.ofNullable(req.getParameter("expanded"))
+            .map(Boolean::parseBoolean)
+            .orElse(true);
+
         if (mcrid == null) {
             return null;
         }
@@ -80,8 +80,8 @@ public class MCRObjectServlet extends MCRContentServlet {
         if (revision != null) {
             rev = revision;
         }
-        MCRContent localObject = (rev == null) ? requestLocalObject(mcrid, resp) : requestVersionedObject(mcrid,
-            resp, rev);
+        MCRContent localObject =
+            (rev == null) ? requestLocalObject(mcrid, resp, expanded) : requestVersionedObject(mcrid, resp, rev);
         if (localObject == null) {
             return null;
         }
@@ -92,9 +92,15 @@ public class MCRObjectServlet extends MCRContentServlet {
         }
     }
 
-    private MCRContent requestLocalObject(MCRObjectID mcrid, final HttpServletResponse resp) throws IOException {
+    private MCRContent requestLocalObject(MCRObjectID mcrid, final HttpServletResponse resp, boolean expanded)
+        throws IOException {
         if (MCRMetadataManager.exists(mcrid)) {
-            return metadataManager.retrieveContent(mcrid);
+            MCRBase base = MCRMetadataManager.retrieve(mcrid);
+            if (expanded && base instanceof MCRObject object) {
+                base = MCRExpandedObjectManager.getInstance().getExpandedObject(object);
+            }
+
+            return new MCRBaseContent(base);
         }
         resp.sendError(HttpServletResponse.SC_NOT_FOUND, getErrorI18N(I18N_ERROR_PREFIX, "notFound", mcrid));
         return null;

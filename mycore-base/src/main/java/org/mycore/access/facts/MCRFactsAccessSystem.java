@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -200,7 +199,7 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
         }
         if (MCRDerivate.OBJECT_TYPE.equals(mcrId.getTypeId())) {
             facts.add(new MCRObjectIDFact("derid", checkID, mcrId));
-            MCRObjectID mcrobjID = MCRMetadataManager.getObjectId(mcrId, 10, TimeUnit.MINUTES);
+            MCRObjectID mcrobjID = MCRMetadataManager.getObjectId(mcrId);
             if (mcrobjID != null) {
                 facts.add(new MCRObjectIDFact("objid", checkID, mcrobjID));
             }

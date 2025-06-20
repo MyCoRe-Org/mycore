@@ -26,7 +26,6 @@ import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -105,12 +104,9 @@ public class MCRServiceFlagEventHandler extends MCREventHandlerBase {
 
     protected static void updateDerivateState(MCRObject obj) {
         MCRCategoryID state = obj.getService().getState();
-        obj
-            .getStructure()
-            .getDerivates()
-            .stream()
-            .map(MCRMetaLinkID::getXLinkHrefID)
-            .forEach(id -> updateDerivateState(id, state));
+        for (MCRObjectID derivateId : MCRMetadataManager.getDerivateIds(obj.getId())) {
+            updateDerivateState(derivateId, state);
+        }
     }
 
     protected static void updateDerivateState(MCRObjectID derID, MCRCategoryID state) {
