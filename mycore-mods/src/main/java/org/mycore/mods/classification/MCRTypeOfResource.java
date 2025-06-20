@@ -46,14 +46,6 @@ class MCRTypeOfResource extends MCRAuthorityInfo {
     }
 
     /**
-     * @deprecated Use {@link #parseXML(Element)} instead
-     */
-    @Deprecated
-    public static MCRTypeOfResource getAuthorityInfo(Element modsElement) {
-        return parseXML(modsElement);
-    }
-
-    /**
      * If the given element is mods:typeOfResource, returns the MCRTypeOfResource mapping.
      */
     public static MCRTypeOfResource parseXML(Element modsElement) {
@@ -63,14 +55,6 @@ class MCRTypeOfResource extends MCRAuthorityInfo {
         String name = modsElement.getLocalName();
         String code = MCRMODSClassificationSupport.getText(modsElement).trim();
         return getTypeOfResource(name, code);
-    }
-
-    /**
-     * @deprecated Use {@link #parseXML(org.jdom2.Element)} instead
-     */
-    @Deprecated
-    public static MCRTypeOfResource getAuthorityInfo(org.jdom2.Element modsElement) {
-        return parseXML(modsElement);
     }
 
     /**

@@ -42,14 +42,6 @@ public abstract class MCRSolrInputDocumentFactory {
     private static final MCRSolrInputDocumentFactory SHARED_INSTANCE = MCRConfiguration2
         .getInstanceOfOrThrow(MCRSolrInputDocumentFactory.class, SOLR_CONFIG_PREFIX + "SolrInputDocument.Factory");
 
-    /**
-     * @deprecated Use {@link #obtainInstance()} instead
-     */
-    @Deprecated
-    public static MCRSolrInputDocumentFactory getInstance() {
-        return obtainInstance();
-    }
-
     public static MCRSolrInputDocumentFactory obtainInstance() {
         return SHARED_INSTANCE;
     }

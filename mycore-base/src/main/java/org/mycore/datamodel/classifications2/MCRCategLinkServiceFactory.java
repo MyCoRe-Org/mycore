@@ -31,14 +31,6 @@ public class MCRCategLinkServiceFactory {
         MCRCategLinkService.class, "MCR.Category.LinkService");
 
     /**
-     * @deprecated use {@link #obtainInstance()} instead
-     */
-    @Deprecated
-    public static MCRCategLinkService getInstance() {
-        return obtainInstance();
-    }
-
-    /**
      * Returns an instance of a MCRCategoryDAO implementator.
      */
     public static MCRCategLinkService obtainInstance() {

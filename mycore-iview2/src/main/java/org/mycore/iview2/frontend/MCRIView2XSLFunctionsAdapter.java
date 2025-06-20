@@ -43,14 +43,6 @@ public class MCRIView2XSLFunctionsAdapter {
 
     private static final MCRLinkTableManager LINK_TABLE_MANAGER = MCRLinkTableManager.getInstance();
 
-    /**
-     * @deprecated Use {@link #obtainInstance()} instead
-     */
-    @Deprecated
-    public static MCRIView2XSLFunctionsAdapter getInstance() {
-        return obtainInstance();
-    }
-
     public static MCRIView2XSLFunctionsAdapter obtainInstance() {
         return LazyInstanceHolder.SHARED_INSTANCE;
     }

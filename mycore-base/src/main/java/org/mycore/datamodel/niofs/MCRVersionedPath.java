@@ -180,14 +180,6 @@ public abstract class MCRVersionedPath extends MCRPath {
     }
 
     /**
-     * @deprecated Use {@link #ofPath(Path)} instead
-     */
-    @Deprecated
-    public static MCRVersionedPath toVersionedPath(final Path other) {
-        return ofPath(other);
-    }
-
-    /**
      * Cast the other path to a {@link MCRVersionedPath}, ensuring that the path is not null.
      *
      * @param other The path to convert.

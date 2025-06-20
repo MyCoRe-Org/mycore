@@ -44,14 +44,6 @@ public enum MCRISO8601Format {
     public String toString() {
         return format;
     }
-
-    /**
-     * @deprecated use {@link #fromString(String)} instead
-     */
-    @Deprecated
-    public static MCRISO8601Format getFormat(String format) {
-        return fromString(format);
-    }
     
     public static MCRISO8601Format fromString(String format) {
         return Stream.of(values())

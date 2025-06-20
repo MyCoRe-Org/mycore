@@ -26,10 +26,10 @@ import java.util.Optional;
  * <p>
  * Possible user IDs are:
  * <ul>
- * <li> {@link MCRSystemUserInformationProvider#GUEST}
- * <li> {@link MCRSystemUserInformationProvider#JANITOR}
- * <li> {@link MCRSystemUserInformationProvider#SYSTEM_USER}
- * <li> {@link MCRSystemUserInformationProvider#SUPER_USER}
+ * <li> {@link MCRSystemUserInformation#GUEST}
+ * <li> {@link MCRSystemUserInformation#JANITOR}
+ * <li> {@link MCRSystemUserInformation#SYSTEM_USER}
+ * <li> {@link MCRSystemUserInformation#SUPER_USER}
  * </ul>
  * No configuration options are available.
  * <p>
@@ -39,30 +39,6 @@ import java.util.Optional;
  * </code></pre>
  */
 public final class MCRSystemUserInformationProvider implements MCRUserInformationProvider {
-
-    /**
-     * @deprecated Use {@code name()} of {@link MCRSystemUserInformation#GUEST} instead
-     */
-    @Deprecated 
-    public static final String GUEST = "GUEST";
-
-    /**
-     * @deprecated Use {@code name()} of {@link MCRSystemUserInformation#JANITOR} instead
-     */
-    @Deprecated
-    public static final String JANITOR = "JANITOR";
-
-    /**
-     * @deprecated Use {@code name()} of {@link MCRSystemUserInformation#SYSTEM_USER} instead
-     */
-    @Deprecated
-    public static final String SYSTEM_USER = "SYSTEM_USER";
-
-    /**
-     * @deprecated Use {@code name()} of {@link MCRSystemUserInformation#SUPER_USER} instead
-     */
-    @Deprecated
-    public static final String SUPER_USER = "SUPER_USER";
 
     @Override
     public Optional<MCRUserInformation> get(String userId) {

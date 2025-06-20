@@ -37,24 +37,6 @@ public sealed abstract class MCRAccessException extends MCRCatchException
 
     private final String permission;
 
-    /**
-     * @deprecated Use {@link MCRMissingPrivilegeException#MCRMissingPrivilegeException(String, String[])}
-     * instead
-     */
-    @Deprecated
-    public static MCRAccessException missingPrivilege(String action, String... privileges) {
-        return new MCRMissingPrivilegeException(action, privileges);
-    }
-
-    /**
-     * @deprecated Use {@link MCRMissingPermissionException#MCRMissingPermissionException(String, String, String)}
-     * instead
-     */
-    @Deprecated
-    public static MCRAccessException missingPermission(String action, String id, String permission) {
-        return new MCRMissingPermissionException(action, id, permission);
-    }
-
     protected MCRAccessException(String action, String id, String permission, String... privilege) {
         super(getMessage(action, id, permission, privilege));
         this.action = action;

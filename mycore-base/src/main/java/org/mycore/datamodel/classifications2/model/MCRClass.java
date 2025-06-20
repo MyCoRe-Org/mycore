@@ -105,14 +105,6 @@ public class MCRClass {
         this.id = value;
     }
 
-    /**
-     * @deprecated Use {@link #ofCategory(MCRCategory)} instead
-     */
-    @Deprecated
-    public static MCRClass getClassification(MCRCategory rootCategory) {
-        return ofCategory(rootCategory);
-    }
-
     public static MCRClass ofCategory(MCRCategory rootCategory) {
         if (!rootCategory.getId().isRootID()) {
             throw new IllegalArgumentException("Not a root category");

@@ -18,7 +18,6 @@
 
 package org.mycore.datamodel.ifs2;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -90,18 +89,6 @@ public abstract class MCRStoredNode extends MCRNode {
         additionalData = new Element(type);
         additionalData.setAttribute(NAME_ATT, name);
         parent.writeData(e -> e.addContent(additionalData));
-    }
-
-    /**
-     * Returns the local {@link File} representing this stored file or directory. Be careful
-     * to use this only for reading data, do never modify directly!
-     *
-     * @return the file in the local filesystem representing this file
-     * @deprecated use {@link #getLocalPath()} instead
-     */
-    @Deprecated
-    public File getLocalFile() {
-        return path.toFile();
     }
 
     /**

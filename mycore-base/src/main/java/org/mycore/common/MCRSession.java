@@ -425,50 +425,6 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
         return createTime;
     }
 
-    /**
-     * starts a new database transaction.
-     */
-    @Deprecated
-    public void beginTransaction() {
-        MCRTransactionManager.beginTransactions();
-    }
-
-    /**
-     * Determine whether the current resource transaction has been marked for rollback.
-     * @return boolean indicating whether the transaction has been marked for rollback
-     */
-    @Deprecated
-    public boolean transactionRequiresRollback() {
-        return MCRTransactionManager.hasRollbackOnlyTransactions();
-    }
-
-    /**
-     * commits the database transaction. Commit is only done if {@link #isTransactionActive()} returns true.
-     */
-    @Deprecated
-    public void commitTransaction() {
-        MCRTransactionManager.commitTransactions();
-    }
-
-    /**
-     * forces the database transaction to roll back. Roll back is only performed if {@link #isTransactionActive()}
-     * returns true.
-     */
-    @Deprecated
-    public void rollbackTransaction() {
-        MCRTransactionManager.rollbackTransactions();
-    }
-
-    /**
-     * Is the transaction still alive?
-     *
-     * @return true if the transaction is still alive
-     */
-    @Deprecated
-    public boolean isTransactionActive() {
-        return MCRTransactionManager.hasActiveTransactions();
-    }
-
     public StackTraceElement[] getConstructingStackTrace() {
         return constructingStackTrace.clone();
     }
@@ -510,7 +466,7 @@ sealed public class MCRSession implements Cloneable permits MCRScopedSession {
     }
 
     /**
-     * Add a task which will be executed after {@link #commitTransaction()} was called.
+     * Add a task which will be executed after {@link MCRTransactionManager#commitTransactions()} was called.
      *
      * @param task thread witch will be executed after an commit
      */

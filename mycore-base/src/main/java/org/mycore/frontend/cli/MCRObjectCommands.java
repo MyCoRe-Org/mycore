@@ -852,18 +852,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         return true;
     }
 
-    @SuppressWarnings("PMD.LinguisticNaming")
-    @Deprecated
-    public static void getNextID(String base) {
-        showNextID(base);
-    }
-
-    @SuppressWarnings("PMD.LinguisticNaming")
-    @Deprecated
-    public static void getLastID(String base) {
-        showLastID(base);
-    }
-
     /**
      * List all selected MCRObjects.
      */

@@ -323,32 +323,6 @@ public class MCRAccessManager {
     }
 
     /**
-     * checks whether the current user has the permission to read/see a derivate check is also against the mcrobject,
-     * the derivate belongs to both checks must return true <br>
-     * it is needed in MCRFileNodeServlet and MCRZipServlet
-     *
-     * @param derID
-     *            String ID of a MyCoRe-Derivate
-     * @return true if the access is allowed otherwise it return false
-     * @deprecated use {@link #checkDerivateContentPermission(MCRObjectID, String)} or
-     *  {@link #checkDerivateMetadataPermission(MCRObjectID, String)} instead with Strategy
-     *  that also checks for the object.
-     */
-    @Deprecated
-    public static boolean checkPermissionForReadingDerivate(String derID) {
-        // derID must be a derivate ID
-        boolean accessAllowed;
-        MCRObjectID objectId = MCRMetadataManager.getObjectId(MCRObjectID.getInstance(derID), 10, TimeUnit.MINUTES);
-        if (objectId != null) {
-            accessAllowed = checkPermission(objectId, PERMISSION_READ) && checkPermission(derID, PERMISSION_READ);
-        } else {
-            accessAllowed = checkPermission(derID, PERMISSION_READ);
-            LogManager.getLogger("MCRAccessManager.class").warn("no mcrobject could be found for derivate: {}", derID);
-        }
-        return accessAllowed;
-    }
-
-    /**
      * lists all permissions defined for the <code>id</code>.
      *
      * @param id

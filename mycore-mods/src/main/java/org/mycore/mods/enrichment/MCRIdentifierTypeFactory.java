@@ -45,14 +45,6 @@ final class MCRIdentifierTypeFactory {
     private MCRIdentifierTypeFactory() {
     }
 
-    /**
-     * @deprecated Use {@link #getInstance()} instead
-     */
-    @Deprecated
-    static MCRIdentifierTypeFactory instance() {
-        return getInstance();
-    }
-
     static MCRIdentifierTypeFactory getInstance() {
         return LazyInstanceHolder.SINGLETON_INSTANCE;
     }

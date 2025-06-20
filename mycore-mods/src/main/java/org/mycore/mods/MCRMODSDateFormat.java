@@ -76,11 +76,6 @@ public enum MCRMODSDateFormat {
         this.dateOnly = dateFormat != null && !dateFormat.endsWith("ss"); //see above
     }
 
-    @Deprecated
-    public static MCRMODSDateFormat getFormat(String encoding) {
-        return obtainInstance(encoding);
-    }
-
     public static MCRMODSDateFormat obtainInstance(String encoding) {
         if (encodingToFormatMap == null) {
             synchronized (MCRMODSDateFormat.class) {

@@ -89,24 +89,8 @@ public final class MCRUserInformationResolver {
 
     }
 
-    /**
-     * @deprecated Use {@link #obtainInstance()} instead
-     */
-    @Deprecated
-    public static MCRUserInformationResolver instance() {
-        return obtainInstance();
-    }
-
     public static MCRUserInformationResolver obtainInstance() {
         return SHARED_INSTANCE;
-    }
-
-    /**
-     * @deprecated Use {@link #createInstance()} instead
-     */
-    @Deprecated
-    public static MCRUserInformationResolver instantiate() {
-        return createInstance();
     }
 
     public static MCRUserInformationResolver createInstance() {

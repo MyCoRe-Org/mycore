@@ -348,14 +348,6 @@ public class MCRParameterCollector {
         }
     }
 
-    /**
-     * @deprecated Use {@link #ofCurrentSession()} instead
-     */
-    @Deprecated
-    public static MCRParameterCollector getInstanceFromUserSession() {
-        return ofCurrentSession();
-    }
-
     public static MCRParameterCollector ofCurrentSession() {
         return ofSession(MCRSessionMgr.getCurrentSession());
     }

@@ -107,9 +107,6 @@ public class MCRDefaultXMLMetadataManagerAdapter implements MCRXMLMetadataManage
 
     private static final String DEFAULT_SVN_DIRECTORY_NAME = "versions-metadata";
 
-    /** The singleton */
-    private static MCRDefaultXMLMetadataManagerAdapter singleton;
-
     private final Set<String> createdStores;
 
     /**
@@ -143,17 +140,6 @@ public class MCRDefaultXMLMetadataManagerAdapter implements MCRXMLMetadataManage
     public MCRDefaultXMLMetadataManagerAdapter() {
         this.createdStores = new HashSet<>();
         reload();
-    }
-
-    /**
-     * @deprecated Use {@link #MCRDefaultXMLMetadataManagerAdapter()} instead 
-     */
-    @Deprecated
-    public static MCRDefaultXMLMetadataManagerAdapter instance() {
-        if (singleton == null) {
-            return new MCRDefaultXMLMetadataManagerAdapter();
-        }
-        return singleton;
     }
 
     @Override

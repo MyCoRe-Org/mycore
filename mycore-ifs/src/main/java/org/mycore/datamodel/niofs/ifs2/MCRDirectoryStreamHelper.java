@@ -66,12 +66,6 @@ class MCRDirectoryStreamHelper {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @Deprecated
-    @SuppressWarnings("PMD.SingletonClassReturningNewInstance")
-    static DirectoryStream<Path> getInstance(MCRDirectory dir, MCRPath path) throws IOException {
-        return createInstance(dir, path);
-    }
-
     static DirectoryStream<Path> createInstance(MCRDirectory dir, MCRPath path) throws IOException {
         DirectoryStream.Filter<Path> filter = (dir instanceof MCRFileCollection) ? MCRFileCollectionFilter.FILTER
             : AcceptAllFilter.FILTER;
