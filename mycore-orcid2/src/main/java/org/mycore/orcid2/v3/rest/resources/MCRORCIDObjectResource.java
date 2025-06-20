@@ -133,7 +133,7 @@ public class MCRORCIDObjectResource {
 
     /**
      * Creates a new object (work) in the ORCID profile of the specified user using the ORCID Member API.
-     *
+     * <p>
      * This method allows a logged-in user to create a new work entry
      * in their ORCID profile, provided that the user has authorized access to their
      * ORCID account.

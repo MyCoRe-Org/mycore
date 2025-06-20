@@ -41,10 +41,10 @@ import org.mycore.common.xml.MCRXMLFunctions;
 /**
  * PostProcessor for MyCoRe editor framework
  * that allows execution of XSLT stylesheets after an editor is closed
- *
+ * <p>
  * &lt;xed:post-processor class="org.mycore.frontend.xeditor.MCRPostProcessorXSL"
  *      xsl="editor/ir_xeditor2mods.xsl" transformer="saxon" /&gt;
- *
+ * <p>
  * You can specify with param xsl the stylesheet, which should be processed and
  * you can specify with parm transformer the XSLStylesheetProcessor ('xalan' or 'saxon').
  * If no transformer is specified the default transformer will be used

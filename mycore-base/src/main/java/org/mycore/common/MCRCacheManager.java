@@ -21,7 +21,7 @@ package org.mycore.common;
 /**
  *
  * @author Thomas Scheffler (yagee)
- *
+ * <p>
  * Need to insert some things here
  * jmx.mbean
  */

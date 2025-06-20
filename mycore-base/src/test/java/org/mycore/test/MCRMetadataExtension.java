@@ -36,7 +36,7 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
  * JUnit 5 extension for setting up and tearing down the MCR metadata store and SVN directories.
  * This extension creates temporary directories for the metadata store and SVN base directory,
  * and cleans them up after each test.
- *
+ * <p>
  * Sets the following properties in the class properties:
  * <dl>
  * <dt><code>MCR.Metadata.Store.BaseDir</code></dt><dd>Path to the metadata store base directory</dd>

@@ -27,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * DTO for partial updates of access keys.
- *
+ * <p>
  * This class allows for the partial updating of various fields of an access key,
  * with each field wrapped in a {@link MCRNullable} to indicate if the field should be updated.
  */

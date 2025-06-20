@@ -41,24 +41,24 @@ import java.io.Serial;
  * Login user with JA-SIG Central Authentication Service (CAS).
  * The servlet validates the ticket returned from CAS and
  * builds a User object to login to the current session.
- *
+ * <p>
  * For /servlets/MCRCASServlet, a authentication filter must be defined
  * in web.xml. The following properties must be configured in
  * mycore.properties:
- *
+ * <p>
  *  The URL of the CAS Client Servlet:
  * MCR.user2.CAS.ClientURL=http://localhost:8291/servlets/MCRCASServlet
- *
+ * <p>
  * The Base URL of the CAS Server
  * MCR.user2.CAS.ServerURL=https://cas.uni-duisburg-essen.de/cas
- *
+ * <p>
  * The realm the CAS Server authenticates for, as in realms.xml
  * MCR.user2.CAS.RealmID=ude
- *
+ * <p>
  * Configure store of trusted SSL (https) server certificates
  * MCR.user2.CAS.SSL.TrustStore=/path/to/java/lib/security/cacerts
  * MCR.user2.CAS.SSL.TrustStore.Password=changeit
- *
+ * <p>
  * After successful login, MCRCASServlet queries an LDAP server for
  * the user's properties.
  *

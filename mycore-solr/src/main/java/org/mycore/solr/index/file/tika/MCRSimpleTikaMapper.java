@@ -31,7 +31,7 @@ import com.fasterxml.jackson.databind.node.ValueNode;
 /**
  * A simple implementation of the MCRTikaMapper interface. This implementation maps the JSON key to a Solr field name
  * all characters that are not letters or digits are replaced by an underscore and the key is converted to lower case.
- *
+ * <p>
  * If the property "StripNamespace" is set to true, the namespace of the key is removed before mapping.
  * If the property "MultiValueField" is set to true, the values are added as multi value fields, otherwise the values
  * will be concatenated to a single string with newlines.

@@ -60,7 +60,7 @@ public class MCRTileServlet extends HttpServlet {
 
     /**
      * Extracts tile or image properties from iview2 file and transmits it.
-     *
+     * <p>
      * Uses {@link HttpServletRequest#getPathInfo()} (see {@link #getTileInfo(String)}) to get tile attributes.
      * Also uses {@link #MAX_AGE} to tell the client how long it could cache the information.
      */

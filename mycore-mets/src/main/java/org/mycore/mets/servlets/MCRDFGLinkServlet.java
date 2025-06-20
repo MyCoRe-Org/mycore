@@ -59,7 +59,7 @@ import jakarta.servlet.http.HttpServletResponse;
 /**
  * This servlet redirects to the DFG-viewer and
  * sets all parameters for specific images automatically if needed
- *
+ * <p>
  * parameters:
  * deriv = the MyCoReID of the derivate (needed)
  * file = the Filename of the image that had to be shown in the DFG-Viewer (optional)

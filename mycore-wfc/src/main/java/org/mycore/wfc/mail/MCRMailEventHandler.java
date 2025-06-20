@@ -40,7 +40,7 @@ import org.mycore.datamodel.niofs.MCRPathXML;
 
 /**
  * Uses "e-mail-events.xsl" to transform derivate, object and files to emails.
- *
+ * <p>
  * See {@link MCRMailer} for email xml format.
  *
  * @author Thomas Scheffler (yagee)

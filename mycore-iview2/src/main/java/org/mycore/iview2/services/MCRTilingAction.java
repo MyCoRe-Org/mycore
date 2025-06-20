@@ -40,7 +40,7 @@ import jakarta.persistence.EntityTransaction;
 
 /**
  * A slave thread of {@link MCRImageTiler}
- *
+ * <p>
  * This class can be extended. Any extending class should provide and implementation for {@link #getMCRImage()}.
  * To get the extending class invoked, one need to define a MyCoRe property, which defaults to:
  * <code>MCR.Module-iview2.MCRTilingActionImpl=org.mycore.iview2.services.MCRTilingAction</code>
@@ -58,7 +58,7 @@ public class MCRTilingAction implements Runnable {
 
     /**
      * takes a {@link MCRTileJob} and tiles the referenced {@link MCRImage} instance.
-     *
+     * <p>
      * Also this updates tileJob properties of {@link MCRTileJob} in the database.
      */
     @Override

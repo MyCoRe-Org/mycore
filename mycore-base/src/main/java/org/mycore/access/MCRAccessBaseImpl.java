@@ -35,7 +35,7 @@ import jakarta.inject.Singleton;
 
 /**
  * This class is a base implementation of the <code>MCRAccessInterface</code>.
- *
+ * <p>
  * It will simply allow everything and will do nothing on persistent operations.
  * Feel free to extend this class if your implementation can only support parts
  * of the Interface definition.

@@ -31,10 +31,10 @@ import org.mycore.common.MCRConstants;
  * Represents a type of publication identifier, like DOI or ISBN.
  * Each type has a corresponding XPath expression
  * used to locate or build identifiers of this type within MODS.
- *
+ * <p>
  * If the corresponding XPath representation is
  * mods:identifier[@type='TYPE'], no explicit configuration is needed.
- *
+ * <p>
  * Otherwise, the XPath must be configured, e.g.
  * MCR.MODS.EnrichmentResolver.IdentifierType.shelfmark=mods:location/mods:shelfLocator
  *

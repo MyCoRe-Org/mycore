@@ -132,7 +132,7 @@ public class MCRFile extends MCRStoredNode {
 
     /**
      * updates the MD5 sum of this file to the given value.
-     *
+     * <p>
      * Use only if you modified the content outside of {@link #setContent(MCRContent)}.
      */
     public void setMD5(String md5) throws IOException {

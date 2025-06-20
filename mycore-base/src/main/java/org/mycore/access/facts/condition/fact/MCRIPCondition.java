@@ -33,10 +33,10 @@ import org.mycore.common.config.annotation.MCRProperty;
 
 /**
  * This condition checks if the current user has an IP of the specified IP range.
- *
+ * <p>
  * Example:
  * &lt;ip&gt;192.168.0.0/255.255.0.0&lt;/ip&gt;
- *
+ * <p>
  * Please specify IP ranges with the full netmask.
  *
  * @author Robert Stephan

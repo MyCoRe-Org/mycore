@@ -81,7 +81,7 @@ public class MCRXMLHelper {
 
     /**
      * Protects XMLReader instance to XML External Entity (XXE) attacks.
-     *
+     * <p>
      * Try to set featues is this order
      * <ol>
      *     <li>{@link XMLConstants#FEATURE_SECURE_PROCESSING}</li>
@@ -216,7 +216,7 @@ public class MCRXMLHelper {
 
     /**
      * checks whether two documents are equal.
-     *
+     * <p>
      * This test performs a deep check across all child components of a
      * Document.
      *
@@ -238,7 +238,7 @@ public class MCRXMLHelper {
 
     /**
      * checks whether two elements are equal.
-     *
+     * <p>
      * This test performs a deep check across all child components of a
      * element.
      *
