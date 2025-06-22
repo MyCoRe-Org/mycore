@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
@@ -188,11 +189,12 @@ public abstract class MCRStoredNode extends MCRNode {
      * is the label for that language.
      */
     public Map<String, String> getLabels() {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String> labels = new TreeMap<>();
         for (Element label : readData(e -> e.getChildren(LABEL_ELEMENT))) {
             labels.put(label.getAttributeValue(LANG_ATT, Namespace.XML_NAMESPACE), label.getText());
         }
-        return labels;
+        return Collections.unmodifiableMap(labels);
     }
 
     /**

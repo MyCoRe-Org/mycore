@@ -31,11 +31,13 @@ import java.io.Serial;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -143,7 +145,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     }
 
     private Map<MCRCategoryID, Number> initializeCountLinkMap(boolean childrenOnly, MCRCategory parent) {
-        Map<MCRCategoryID, Number> countLinks = new HashMap<>();
+        Map<MCRCategoryID, Number> countLinks = new ConcurrentHashMap<>();
         Collection<MCRCategoryID> ids = childrenOnly ? getAllChildIDs(parent) : getAllCategIDs(parent);
         for (MCRCategoryID id : ids) {
             // initialize all categIDs with link count of zero
@@ -177,6 +179,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         if (ids.isEmpty()) {
             return;
         }
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, Collection<String>> typeMap = new HashMap<>();
         //prepare
         Collection<String> objectIds = new ArrayList<>();
@@ -286,13 +289,15 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             //Category does not exist, so it has no links
             return getNoLinksMap(category);
         }
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<MCRCategoryID, Boolean> boolMap = new HashMap<>();
         final BitSet linkedInternalIds = getLinkedInternalIds();
         storeHasLinkValues(boolMap, linkedInternalIds, rootImpl);
-        return boolMap;
+        return Collections.unmodifiableMap(boolMap);
     }
 
     private Map<MCRCategoryID, Boolean> hasLinksForClassifications() {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<MCRCategoryID, Boolean> boolMap = new HashMap<>() {
             @Serial
             private static final long serialVersionUID = 1L;
@@ -309,15 +314,16 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         linkedClassifications.getResultList()
             .stream().map(MCRCategoryID::new)
             .forEach(id -> boolMap.put(id, true));
-        return boolMap;
+        return Collections.unmodifiableMap(boolMap);
     }
 
     private Map<MCRCategoryID, Boolean> getNoLinksMap(MCRCategory category) {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<MCRCategoryID, Boolean> boolMap = new HashMap<>();
         for (MCRCategoryID categID : getAllCategIDs(category)) {
             boolMap.put(categID, false);
         }
-        return boolMap;
+        return Collections.unmodifiableMap(boolMap);
     }
 
     private void storeHasLinkValues(Map<MCRCategoryID, Boolean> boolMap, BitSet internalIds,

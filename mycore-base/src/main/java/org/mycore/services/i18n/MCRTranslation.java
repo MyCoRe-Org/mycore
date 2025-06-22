@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -217,6 +218,7 @@ public class MCRTranslation {
      */
     public static Map<String, String> translatePrefixToLocale(String prefix, Locale locale) {
         LOGGER.debug("Translation for locale: {}", locale::getLanguage);
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String> map = new HashMap<>();
         ResourceBundle message = getResourceBundle(MESSAGES_BUNDLE, locale);
         Enumeration<String> keys = message.getKeys();
@@ -226,7 +228,7 @@ public class MCRTranslation {
                 map.put(key, message.getString(key));
             }
         }
-        return map;
+        return Collections.unmodifiableMap(map);
     }
 
     /**

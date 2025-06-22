@@ -34,7 +34,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.text.MessageFormat;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -43,6 +42,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import javax.xml.transform.TransformerException;
@@ -89,7 +89,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
 
     @Serial
     private static final long serialVersionUID = 1L;
-    
+
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**
@@ -114,6 +114,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
     private static final Map<String, String> NEW_HTTP_RESPONSE_HEADER;
 
     static {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String> newRespHeader = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         newRespHeader.putAll(MCRConfiguration2.getSubPropertiesMap(SOLR_CONFIG_PREFIX + "HTTPResponseHeader."));
         NEW_HTTP_RESPONSE_HEADER = Collections.unmodifiableMap(newRespHeader);
@@ -181,7 +182,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
         NamedList<Object> namedList = solrQueryParameter.toNamedList();
         //disabled for MCR-953 and https://issues.apache.org/jira/browse/SOLR-7508
         //Map<String, String[]> parameters = ModifiableSolrParams.toMultiMap(namedList);
-        Map<String, String[]> parameters = new HashMap<>();
+        Map<String, String[]> parameters = new ConcurrentHashMap<>();
         for (int i = 0; i < namedList.size(); i++) {
             String name = namedList.getName(i);
             Object val = namedList.getVal(i);
@@ -200,6 +201,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
      */
     private static void redirectToQueryHandler(Document input, HttpServletResponse resp)
         throws IOException {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String[]> parameters = new LinkedHashMap<>();
         List<Element> children = input.getRootElement().getChildren();
         for (Element param : children) {
@@ -344,6 +346,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
 
     private static ModifiableSolrParams toSolrParams(Map<String, String[]> parameters) {
         // to maintain order
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String[]> copy = new LinkedHashMap<>(parameters);
         ModifiableSolrParams solrParams = new ModifiableSolrParams(copy);
         if (!parameters.containsKey("version") && !parameters.containsKey("wt")) {

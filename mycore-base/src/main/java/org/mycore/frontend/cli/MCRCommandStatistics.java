@@ -18,9 +18,9 @@
 
 package org.mycore.frontend.cli;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Collects statistics on number of invocations and total time needed for each command invoked.
@@ -31,7 +31,7 @@ import java.util.Map.Entry;
  */
 public class MCRCommandStatistics {
 
-    private static Map<MCRCommand, StatisticsEntry> entries = new HashMap<>();
+    private static Map<MCRCommand, StatisticsEntry> entries = new ConcurrentHashMap<>();
 
     private static StatisticsEntry getEntry(MCRCommand command) {
         return entries.computeIfAbsent(command, k -> new StatisticsEntry());

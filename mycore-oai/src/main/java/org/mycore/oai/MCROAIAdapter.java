@@ -19,6 +19,7 @@ package org.mycore.oai;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -217,6 +218,7 @@ public class MCROAIAdapter implements OAIAdapter {
     }
 
     protected Map<String, MetadataFormat> getMetadataFormatMap() {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, MetadataFormat> metdataFormatMap = new HashMap<>();
         String formats = MCRConfiguration2.getString(getConfigPrefix() + "MetadataFormats").orElse("");
         StringTokenizer st = new StringTokenizer(formats, ", ");
@@ -227,7 +229,7 @@ public class MCROAIAdapter implements OAIAdapter {
             String schema = MCRConfiguration2.getStringOrThrow(PREFIX + "MetadataFormat." + format + ".Schema");
             metdataFormatMap.put(format, new MetadataFormat(format, namespaceURI, schema));
         }
-        return metdataFormatMap;
+        return Collections.unmodifiableMap(metdataFormatMap);
     }
 
     /*

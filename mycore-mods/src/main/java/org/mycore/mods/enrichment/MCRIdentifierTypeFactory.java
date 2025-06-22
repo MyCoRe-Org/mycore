@@ -19,9 +19,9 @@
 package org.mycore.mods.enrichment;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.mycore.common.config.MCRConfiguration2;
 
@@ -40,7 +40,7 @@ final class MCRIdentifierTypeFactory {
 
     private static final String DEFAULT_XPATH = "mods:identifier[@type=\"%s\"]";
 
-    private final Map<String, MCRIdentifierType> id2type = new HashMap<>();
+    private final Map<String, MCRIdentifierType> id2type = new ConcurrentHashMap<>();
 
     private MCRIdentifierTypeFactory() {
     }

@@ -139,6 +139,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
      *            <code>getParameterGroup.equals(TypeParameter)</code>
      * @return a map which can be forwarded to {@link MCRSolrProxyServlet}
      */
+    @SuppressWarnings("PMD.UseConcurrentHashMap")
     protected Map<String, String[]> buildSelectParameterMap(Map<String, String[]> queryParameters,
         Map<String, String[]> typeParameters,
         Map<String, String[]> sortParameters, Set<String> phraseQuery) throws ServletException {
@@ -175,9 +176,10 @@ public class MCRSolrSearchServlet extends MCRServlet {
 
         queryParameterMap.put(SORT, new String[] { buildSolrSortParameter(sortParameters) });
 
-        return queryParameterMap;
+        return Collections.unmodifiableMap(queryParameterMap);
     }
 
+    @SuppressWarnings("PMD.UseConcurrentHashMap")
     private String buildSolrSortParameter(Map<String, String[]> sortParameters) {
         Set<Entry<String, String[]>> sortParameterEntrys = sortParameters.entrySet();
         Map<Integer, String> positionOrderMap = new HashMap<>();
@@ -227,6 +229,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
      * the type of the field as value.
      */
     private Map<String, String> createFieldTypeMap(Map<String, String[]> typeParameters) {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String> fieldTypeMap = new HashMap<>();
 
         for (Entry<String, String[]> currentType : typeParameters.entrySet()) {
@@ -238,6 +241,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
     }
 
     @Override
+    @SuppressWarnings("PMD.UseConcurrentHashMap")
     protected void doGetPost(MCRServletJob job) throws Exception {
         Map<String, String[]> solrParameters = new HashMap<>();
         Map<String, String[]> queryParameters = new HashMap<>();

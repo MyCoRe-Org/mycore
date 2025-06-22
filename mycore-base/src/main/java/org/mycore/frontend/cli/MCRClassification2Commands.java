@@ -28,9 +28,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import javax.xml.transform.Transformer;
@@ -79,7 +79,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     public static final String DEFAULT_STYLE = "save-classification.xsl";
 
     /** Static compiled transformer stylesheets */
-    private static final Map<String, Transformer> TRANSFORMER_CACHE = new HashMap<>();
+    private static final Map<String, Transformer> TRANSFORMER_CACHE = new ConcurrentHashMap<>();
 
     /**
      * Deletes a classification
@@ -275,7 +275,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         Transformer trans = getTransformer(style != null ? style + "-classification" : null);
         String extension = MCRXSLTransformerUtils.getFileExtension(trans, "xml");
         File xmlOutput = new File(dir, id + "." + extension);
-        try(OutputStream fileOutputStream = Files.newOutputStream(xmlOutput.toPath())) {
+        try (OutputStream fileOutputStream = Files.newOutputStream(xmlOutput.toPath())) {
             StreamResult streamResult = new StreamResult(fileOutputStream);
             trans.transform(new JDOMSource(classDoc), streamResult);
         }

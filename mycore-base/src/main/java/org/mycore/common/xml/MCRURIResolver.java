@@ -40,6 +40,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -156,7 +157,7 @@ public final class MCRURIResolver implements URIResolver {
             LOGGER.error("Unable to initialize MCRURIResolver", exc);
         }
     }
-    
+
     /**
      * @deprecated Use {@link MCRURIResolver#reinitialize()} instead
      */
@@ -198,7 +199,7 @@ public final class MCRURIResolver implements URIResolver {
     public static MCRURIResolver obtainInstance() {
         return SHARED_INSTANCE;
     }
-    
+
     /**
      * Initializes the MCRURIResolver for servlet applications.
      *
@@ -211,6 +212,7 @@ public final class MCRURIResolver implements URIResolver {
     public static Map<String, String> getParameterMap(String key) {
         String[] param;
         StringTokenizer tok = new StringTokenizer(key, "&");
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String> params = new HashMap<>();
 
         while (tok.hasMoreTokens()) {
@@ -218,7 +220,7 @@ public final class MCRURIResolver implements URIResolver {
             params.put(URLDecoder.decode(param[0], StandardCharsets.UTF_8),
                 param.length >= 2 ? URLDecoder.decode(param[1], StandardCharsets.UTF_8) : "");
         }
-        return params;
+        return Collections.unmodifiableMap(params);
     }
 
     static URI resolveURI(String href, String base) {
@@ -233,7 +235,7 @@ public final class MCRURIResolver implements URIResolver {
         final Map<String, URIResolver> extResolverMapping = extResolver.getURIResolverMapping();
         extResolverMapping.putAll(new MCRModuleResolverProvider().getURIResolverMapping());
         // set Map to final size with loadfactor: full
-        Map<String, URIResolver> supportedSchemes = new HashMap<>(10 + extResolverMapping.size(), 1);
+        Map<String, URIResolver> supportedSchemes = new ConcurrentHashMap<>(10 + extResolverMapping.size(), 1);
         // don't let interal mapping be overwritten
         supportedSchemes.putAll(extResolverMapping);
         supportedSchemes.put("webapp", new MCRWebAppResolver());
@@ -465,7 +467,7 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     private static class MCRModuleResolverProvider implements MCRResolverProvider {
-        private final Map<String, URIResolver> resolverMap = new HashMap<>();
+        private final Map<String, URIResolver> resolverMap = new ConcurrentHashMap<>();
 
         MCRModuleResolverProvider() {
             MCRConfiguration2.getSubPropertiesMap(CONFIG_PREFIX + "ModuleResolver.")
@@ -742,6 +744,7 @@ public final class MCRURIResolver implements URIResolver {
 
             String[] param;
             StringTokenizer tok = new StringTokenizer(key, "&");
+            @SuppressWarnings("PMD.UseConcurrentHashMap")
             Map<String, String> params = new HashMap<>();
 
             while (tok.hasMoreTokens()) {
@@ -1726,6 +1729,7 @@ public final class MCRURIResolver implements URIResolver {
             final String[] translationKeys = target.split(",");
 
             // Combine translations to prevent duplicates
+            @SuppressWarnings("PMD.UseConcurrentHashMap")
             Map<String, String> translations = new HashMap<>();
             for (String translationKey : translationKeys) {
                 if (translationKey.endsWith("*")) {

@@ -21,6 +21,7 @@ package org.mycore.impex;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -97,6 +98,7 @@ public class MCRTransferPackage {
      * @throws MCRUsageException is thrown if some of the referenced objects or derivates couldn't be retrieved
      */
     public void build() throws MCRUsageException {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<MCRObjectID, MCRObject> objectMap = new LinkedHashMap<>();
         Set<MCRCategoryID> categories = new HashSet<>();
         resolveChildrenAndLinks(source, objectMap, categories);
@@ -191,6 +193,7 @@ public class MCRTransferPackage {
      * @return a map where key = filename; value = MCRContent
      */
     public Map<String, MCRContent> getContent() throws IOException {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, MCRContent> content = new HashMap<>();
         // config
         content.put(IMPORT_CONFIG_FILENAME, new MCRJDOMContent(buildImportConfiguration()));
@@ -229,7 +232,7 @@ public class MCRTransferPackage {
             String path = CLASS_PATH + classId + ".xml";
             content.put(path, new MCRJDOMContent(classification));
         }
-        return content;
+        return Collections.unmodifiableMap(content);
     }
 
     /**

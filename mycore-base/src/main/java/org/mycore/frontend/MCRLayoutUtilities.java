@@ -27,10 +27,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -107,7 +107,7 @@ public class MCRLayoutUtilities {
     private static final boolean ACCESS_CONTROLL_ON = MCRConfiguration2
         .getOrThrow("MCR.Website.ReadAccessVerification", Boolean::parseBoolean);
 
-    private static Map<String, Element> itemStore = new HashMap<>();
+    private static Map<String, Element> itemStore = new ConcurrentHashMap<>();
 
     private static final LoadingCache<String, DocumentHolder> NAV_DOCUMENT_CACHE = CacheBuilder.newBuilder()
         .refreshAfterWrite(STANDARD_CACHE_SECONDS, TimeUnit.SECONDS).build(new CacheLoader<>() {

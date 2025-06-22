@@ -25,12 +25,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -124,7 +124,7 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
 
     private static final String PROPERTY_KEY_TYPE = "Type";
 
-    private static final Map<String, AtomicInteger> PATTERN_COUNT_MAP = new HashMap<>();
+    private static final Map<String, AtomicInteger> PATTERN_COUNT_MAP = new ConcurrentHashMap<>();
 
     private static final Pattern XPATH_PATTERN = Pattern.compile("\\$([0-9]+)", Pattern.DOTALL);
 

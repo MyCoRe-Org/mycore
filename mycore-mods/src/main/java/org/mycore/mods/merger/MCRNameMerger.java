@@ -20,13 +20,13 @@ package org.mycore.mods.merger;
 
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
@@ -46,7 +46,7 @@ public class MCRNameMerger extends MCRMerger {
 
     private Set<String> allNames = new HashSet<>();
 
-    private Map<String, Set<String>> nameIds = new HashMap<>();
+    private Map<String, Set<String>> nameIds = new ConcurrentHashMap<>();
 
     @Override
     public void setElement(Element element) {

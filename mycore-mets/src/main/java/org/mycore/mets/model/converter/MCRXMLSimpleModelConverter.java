@@ -57,11 +57,14 @@ public class MCRXMLSimpleModelConverter {
 
         MCRMetsSimpleModel msm = new MCRMetsSimpleModel();
 
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, MCRMetsPage> idPageMap = new HashMap<>();
+
         Map<String, MCRMetsFile> idFileMap = buildidFileMap(mets);
         List<MCRMetsPage> metsPageList = buildPageList(mets, idPageMap, idFileMap);
         msm.getMetsPageList().addAll(metsPageList);
 
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, MCRMetsSection> idSectionMap = new HashMap<>();
         MCRMetsSection rootMetsSection = buidRootSection(mets, idSectionMap, idFileMap);
         msm.setRootSection(rootMetsSection);
@@ -164,6 +167,7 @@ public class MCRXMLSimpleModelConverter {
     }
 
     private static Map<String, MCRMetsFile> buildidFileMap(Mets mets) {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, MCRMetsFile> idMetsFileMap = new HashMap<>();
         mets.getFileSec().getFileGroups().forEach(
             fileGroup -> addFilesFromGroup(idMetsFileMap, fileGroup));

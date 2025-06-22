@@ -19,10 +19,10 @@
 package org.mycore.frontend.xeditor;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -44,7 +44,7 @@ public class MCRXMLCleaner {
 
     private List<MCRCleaningRule> rules = new ArrayList<>();
 
-    private Map<Object, MCRCleaningRule> nodes2rules = new HashMap<>();
+    private Map<Object, MCRCleaningRule> nodes2rules = new ConcurrentHashMap<>();
 
     public MCRXMLCleaner() {
         addRule(REMOVE_EMPTY_ATTRIBUTES);

@@ -22,7 +22,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -136,10 +135,9 @@ public class MCRPURLService extends MCRPIJobService<MCRPURL> {
     @Override
     protected Map<String, String> createJobContextParams(PiJobAction action, MCRBase obj, MCRPURL purl,
         String additional) {
-        Map<String, String> params = new HashMap<>();
-        params.put(CONTEXT_PURL, purl.asString());
-        params.put(CONTEXT_OBJECT, obj.getId().toString());
-        return params;
+        return Map.ofEntries(
+            Map.entry(CONTEXT_PURL, purl.asString()),
+            Map.entry(CONTEXT_OBJECT, obj.getId().toString()));
     }
 
     protected void doWithPURLManager(Consumer<MCRPURLManager> action) {

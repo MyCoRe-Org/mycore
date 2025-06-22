@@ -20,6 +20,7 @@ package org.mycore.common.xml;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -137,6 +138,7 @@ public abstract class MCRDynamicURIResolver implements URIResolver {
      * @return a hashtable with all variables from the uri
      */
     protected Map<String, String> createVariablesMap(String uri) {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String> variablesMap = new HashMap<>();
         String uriValue = uri.substring(uri.indexOf(':') + 1);
         String[] variablesArr = uriValue.split(":");
@@ -152,7 +154,7 @@ public abstract class MCRDynamicURIResolver implements URIResolver {
                 variablesMap.put(varName, varValue);
             }
         }
-        return variablesMap;
+        return Collections.unmodifiableMap(variablesMap);
     }
 
     /**

@@ -27,11 +27,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -90,7 +90,7 @@ public class MCREditorOutValidator {
 
     private static final Map<String, MCREditorMetadataValidator> VALIDATOR_MAP = getValidatorMap();
 
-    private static final Map<String, Class<? extends MCRMetaInterface>> CLASS_MAP = new HashMap<>();
+    private static final Map<String, Class<? extends MCRMetaInterface>> CLASS_MAP = new ConcurrentHashMap<>();
 
     private Document input;
 
@@ -121,7 +121,7 @@ public class MCREditorOutValidator {
     }
 
     private static Map<String, MCREditorMetadataValidator> getValidatorMap() {
-        Map<String, MCREditorMetadataValidator> map = new HashMap<>();
+        Map<String, MCREditorMetadataValidator> map = new ConcurrentHashMap<>();
         map.put(MCRMetaBoolean.class.getSimpleName(), getObjectCheckInstance(MCRMetaBoolean.class));
         map.put(MCRMetaPersonName.class.getSimpleName(), getObjectCheckWithLangInstance(MCRMetaPersonName.class));
         map.put(MCRMetaInstitutionName.class.getSimpleName(),

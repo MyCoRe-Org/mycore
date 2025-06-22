@@ -18,11 +18,13 @@
 
 package org.mycore.solr.index.handlers;
 
+import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,8 +40,6 @@ import org.mycore.solr.index.file.MCRSolrPathDocumentFactory;
 import org.mycore.solr.index.handlers.document.MCRSolrInputDocumentHandler;
 import org.mycore.solr.index.handlers.stream.MCRSolrFileIndexHandler;
 import org.mycore.solr.index.strategy.MCRSolrIndexStrategyManager;
-
-import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -73,7 +73,7 @@ public abstract class MCRSolrIndexHandlerFactory {
             MCRContent content = MCRXMLMetadataManager.getInstance().retrieveContent(ids[0]);
             return getIndexHandler(content, ids[0]);
         }
-        Map<MCRObjectID, MCRContent> contentMap = new HashMap<>();
+        Map<MCRObjectID, MCRContent> contentMap = new ConcurrentHashMap<>();
         for (MCRObjectID id : ids) {
             MCRContent content = MCRXMLMetadataManager.getInstance().retrieveContent(id);
             contentMap.put(id, content);
@@ -86,7 +86,7 @@ public abstract class MCRSolrIndexHandlerFactory {
             MCRBaseContent content = new MCRBaseContent(derOrObjs[0]);
             return getIndexHandler(content, derOrObjs[0].getId());
         }
-        Map<MCRObjectID, MCRContent> contentMap = new HashMap<>();
+        Map<MCRObjectID, MCRContent> contentMap = new ConcurrentHashMap<>();
         for (MCRBase derOrObj : derOrObjs) {
             MCRBaseContent content = new MCRBaseContent(derOrObj);
             contentMap.put(derOrObj.getId(), content);

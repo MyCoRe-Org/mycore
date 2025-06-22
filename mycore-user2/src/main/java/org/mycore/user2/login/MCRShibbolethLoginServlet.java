@@ -19,6 +19,7 @@
 package org.mycore.user2.login;
 
 import java.io.Serial;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -62,6 +63,7 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
             if (realmId != null && MCRRealmFactory.getRealm(realmId) != null) {
                 userId = realmId != null ? userId.replace("@" + realmId, "") : userId;
 
+                @SuppressWarnings("PMD.UseConcurrentHashMap")
                 final Map<String, Object> attributes = new HashMap<>();
 
                 final MCRUserAttributeMapper attributeMapper = MCRRealmFactory.getAttributeMapper(realmId);
@@ -85,7 +87,8 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
 
                     userinfo = user;
                 } else {
-                    userinfo = new MCRShibbolethUserInformation(userId, realmId, attributes);
+                    userinfo = new MCRShibbolethUserInformation(userId, realmId,
+                        Collections.unmodifiableMap(attributes));
                 }
 
                 MCRSessionMgr.getCurrentSession().setUserInformation(userinfo);

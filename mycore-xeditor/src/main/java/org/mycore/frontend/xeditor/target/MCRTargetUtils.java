@@ -18,6 +18,7 @@
 
 package org.mycore.frontend.xeditor.target;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,6 +26,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
 
 public class MCRTargetUtils {
     static Map<String, String[]> getSubmittedValues(MCRServletJob job, String baseXPath) {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String[]> valuesToSet = new HashMap<>();
 
         for (String paramName : job.getRequest().getParameterMap().keySet()) {
@@ -34,6 +36,6 @@ public class MCRTargetUtils {
                 valuesToSet.put(xPath, values);
             }
         }
-        return valuesToSet;
+        return Collections.unmodifiableMap(valuesToSet);
     }
 }

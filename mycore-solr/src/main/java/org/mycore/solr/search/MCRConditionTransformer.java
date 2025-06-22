@@ -21,6 +21,7 @@ package org.mycore.solr.search;
 import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -347,6 +348,7 @@ public class MCRConditionTransformer {
      */
     @SuppressWarnings("rawtypes")
     public static Map<String, List<MCRCondition>> groupConditionsByIndex(MCRSetCondition cond) {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, List<MCRCondition>> table = new HashMap<>();
         List<MCRCondition> children = cond.getChildren();
 
@@ -354,7 +356,7 @@ public class MCRConditionTransformer {
             String index = getIndex(child);
             table.computeIfAbsent(index, k -> new ArrayList<>()).add(child);
         }
-        return table;
+        return Collections.unmodifiableMap(table);
     }
 
     /**

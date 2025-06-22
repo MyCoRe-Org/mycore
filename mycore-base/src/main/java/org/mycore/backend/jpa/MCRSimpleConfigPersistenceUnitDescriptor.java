@@ -18,10 +18,10 @@
 
 package org.mycore.backend.jpa;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.mycore.common.config.MCRConfiguration2;
 
@@ -30,7 +30,7 @@ import org.mycore.common.config.MCRConfiguration2;
  */
 public class MCRSimpleConfigPersistenceUnitDescriptor extends MCRPersistenceUnitDescriptor {
 
-    private static final Map<String, String> MAP = new HashMap<>();
+    private static final Map<String, String> MAP = new ConcurrentHashMap<>();
 
     public MCRSimpleConfigPersistenceUnitDescriptor() {
         super();

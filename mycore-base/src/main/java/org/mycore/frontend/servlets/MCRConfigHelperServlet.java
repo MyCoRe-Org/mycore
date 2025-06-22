@@ -94,6 +94,7 @@ public class MCRConfigHelperServlet extends HttpServlet {
     }
 
     private String createResultJson() throws IOException {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, String> propertiesMap = new LinkedHashMap<>();
         String properties = getPropertiesParameter();
         for (String property : properties.split(",")) {

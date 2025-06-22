@@ -21,7 +21,6 @@ package org.mycore.access.mcrimpl;
 import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -48,7 +47,7 @@ public final class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
     private static MCRAccessControlSystem singleton;
 
-    private static final Map<String, Integer> NEXT_FREE_RULE_ID = new HashMap<>();
+    private static final Map<String, Integer> NEXT_FREE_RULE_ID = new ConcurrentHashMap<>();
 
     public static final String SYSTEM_RULE_PREFIX = "SYSTEMRULE";
 

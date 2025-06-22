@@ -126,6 +126,7 @@ public class MCROAIDataProvider extends MCRServlet {
      */
     @SuppressWarnings("rawtypes")
     private Map<String, List<String>> fixParameterMap(Map pMap) {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, List<String>> rMap = new HashMap<>();
         for (Object o : pMap.entrySet()) {
             Map.Entry entry = (Map.Entry) o;
@@ -133,7 +134,7 @@ public class MCROAIDataProvider extends MCRServlet {
             Collections.addAll(valueList, (String[]) entry.getValue());
             rMap.put((String) entry.getKey(), valueList);
         }
-        return rMap;
+        return Collections.unmodifiableMap(rMap);
     }
 
     protected void logRequest(HttpServletRequest req) {
@@ -156,9 +157,9 @@ public class MCROAIDataProvider extends MCRServlet {
         String styleSheet = MCROAIAdapter.PREFIX + getServletName() + ".ResponseStylesheet";
         String xsl = MCRConfiguration2.getString(styleSheet).orElse("oai/oai2.xsl");
         if (!xsl.isEmpty()) {
-            Map<String, String> pairs = new HashMap<>();
-            pairs.put("type", "text/xsl");
-            pairs.put("href", MCRFrontendUtil.getBaseURL() + xsl);
+            Map<String, String> pairs = Map.ofEntries(
+                Map.entry("type", "text/xsl"),
+                Map.entry("href", MCRFrontendUtil.getBaseURL() + xsl));
             doc.addContent(0, new ProcessingInstruction("xml-stylesheet", pairs));
         }
         return doc;
@@ -186,6 +187,7 @@ public class MCROAIDataProvider extends MCRServlet {
      */
     private void moveNamespacesUp(Element target) {
         Map<String, Namespace> existingNamespaces = getNamespaceMap(target);
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<String, Namespace> newNamespaces = new HashMap<>();
         target.getDescendants(new ElementFilter()).forEach(child -> {
             Map<String, Namespace> childNamespaces = getNamespaceMap(child);
@@ -200,8 +202,8 @@ public class MCROAIDataProvider extends MCRServlet {
     }
 
     private Map<String, Namespace> getNamespaceMap(Element element) {
-        Map<String, Namespace> map = new HashMap<>();
-        map.put(element.getNamespace().getPrefix(), element.getNamespace());
+        Map<String, Namespace> map = Map.ofEntries(
+            Map.entry(element.getNamespace().getPrefix(), element.getNamespace()));
         element.getAdditionalNamespaces().forEach(ns -> map.put(ns.getPrefix(), ns));
         return map;
     }

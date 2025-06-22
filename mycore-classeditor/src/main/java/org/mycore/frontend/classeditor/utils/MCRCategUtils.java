@@ -18,6 +18,7 @@
 
 package org.mycore.frontend.classeditor.utils;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
@@ -49,6 +50,7 @@ public class MCRCategUtils {
     }
 
     public static Map<MCRCategoryID, String> getCategoryIDMap(String json) {
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<MCRCategoryID, String> categories = new HashMap<>();
         JsonStreamParser jsonStreamParser = new JsonStreamParser(json);
         if (jsonStreamParser.hasNext()) {
@@ -71,7 +73,7 @@ public class MCRCategUtils {
         } else {
             return null;
         }
-        return categories;
+        return Collections.unmodifiableMap(categories);
     }
 
 }

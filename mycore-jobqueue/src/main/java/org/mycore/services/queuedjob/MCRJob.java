@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -256,7 +257,7 @@ public class MCRJob implements Cloneable {
      * @param parameters - the job parameters
      */
     public void setParameters(Map<String, String> parameters) {
-        this.parameters = parameters;
+        this.parameters = new ConcurrentHashMap<>(parameters);
     }
 
     /**
@@ -302,9 +303,7 @@ public class MCRJob implements Cloneable {
         clone.setStatus(getStatus());
         clone.setTries(getTries());
         clone.setException(getException());
-
-        Map<String, String> map = new HashMap<>(getParameters());
-        clone.setParameters(map);
+        clone.setParameters(getParameters());
 
         return clone;
     }

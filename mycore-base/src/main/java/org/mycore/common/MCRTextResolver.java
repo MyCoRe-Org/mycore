@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -641,7 +642,7 @@ public class MCRTextResolver {
      */
     protected static class TermContainer {
 
-        protected Map<String, Class<? extends Term>> termMap = new HashMap<>();
+        protected Map<String, Class<? extends Term>> termMap = new ConcurrentHashMap<>();
 
         protected MCRTextResolver textResolver;
 

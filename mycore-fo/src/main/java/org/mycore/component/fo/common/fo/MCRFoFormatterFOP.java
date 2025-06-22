@@ -26,10 +26,10 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.text.MessageFormat;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -120,7 +120,7 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
                 // FOP should use "hyphenation-base" to get base URI for patterns
                 Optional<Configuration[]> hyphPat = Optional.ofNullable(cfg.getChildren("hyphenation-pattern"));
                 hyphPat.ifPresent(configurations -> {
-                    Map<String, String> hyphPatMap = new HashMap<>();
+                    Map<String, String> hyphPatMap = new ConcurrentHashMap<>();
                     Arrays.stream(configurations).forEach(c -> {
                         try {
                             String lang = c.getAttribute("lang");

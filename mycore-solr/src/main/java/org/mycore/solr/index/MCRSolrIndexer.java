@@ -375,6 +375,7 @@ public class MCRSolrIndexer {
 
         MCRXMLMetadataManager metadataMgr = MCRXMLMetadataManager.getInstance();
         MCRSolrIndexStatistic statistic = null;
+        @SuppressWarnings("PMD.UseConcurrentHashMap")
         Map<MCRObjectID, MCRContent> contentMap = new HashMap<>((int) (BULK_SIZE * 1.4));
         int i = 0;
         for (String id : list) {

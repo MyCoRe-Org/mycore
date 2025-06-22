@@ -101,6 +101,7 @@ public abstract class MCRAccessStore {
      */
     public Collection<MCRAccessDefinition> getDefinition(String type) {
         try {
+            @SuppressWarnings("PMD.UseConcurrentHashMap")
             Map<String, Collection<String>> sqlDefinition = new HashMap<>();
             Collection<String> pools = obtainInstance().getDatabasePools();
             //merge pools
