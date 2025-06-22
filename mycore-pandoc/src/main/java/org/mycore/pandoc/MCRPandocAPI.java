@@ -131,6 +131,7 @@ public class MCRPandocAPI {
         }
     }
 
+    @SuppressWarnings("PMD.ExceptionAsFlowControl")
     private static byte[] callPandoc(String[] args, byte[] input) {
         class ThreadWrapper implements Runnable {
 
