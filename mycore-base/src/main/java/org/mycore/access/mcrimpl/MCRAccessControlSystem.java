@@ -46,8 +46,6 @@ import org.mycore.common.config.MCRConfiguration2;
  */
 public final class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
-    private static MCRAccessControlSystem singleton;
-
     private static final Map<String, Integer> NEXT_FREE_RULE_ID = new HashMap<>();
 
     public static final String SYSTEM_RULE_PREFIX = "SYSTEMRULE";
@@ -80,12 +78,16 @@ public final class MCRAccessControlSystem extends MCRAccessBaseImpl {
         dummyRule = new MCRAccessRule(null, null, null, null, "dummy rule, always true");
     }
 
-    // extended methods
-    public static synchronized MCRRuleAccessInterface instance() {
-        if (singleton == null) {
-            singleton = new MCRAccessControlSystem();
-        }
-        return singleton;
+    /**
+     * @deprecated use {@link #getInstance()} instead.
+     */
+    @Deprecated(forRemoval = true)
+    public static MCRRuleAccessInterface instance() {
+        return getInstance();
+    }
+
+    public static MCRAccessControlSystem getInstance() {
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     @Override
@@ -416,4 +418,7 @@ public final class MCRAccessControlSystem extends MCRAccessBaseImpl {
         return 0;
     }
 
+    private static final class LazyInstanceHolder {
+        private static final MCRAccessControlSystem SINGLETON_INSTANCE = new MCRAccessControlSystem();
+    }
 }
