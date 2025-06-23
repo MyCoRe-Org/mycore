@@ -102,14 +102,6 @@ public final class MCRJobQueueCleaner {
 
     }
 
-    /**
-     * @deprecated Use {@link #createInstance()} instead
-     */
-    @Deprecated
-    public static MCRJobQueueCleaner instantiate() {
-        return createInstance();
-    }
-
     public static MCRJobQueueCleaner createInstance() {
         String classProperty = CLEANER_PROPERTY + ".Class";
         return MCRConfiguration2.getInstanceOfOrThrow(MCRJobQueueCleaner.class, classProperty);

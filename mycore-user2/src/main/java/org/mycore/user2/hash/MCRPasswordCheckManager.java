@@ -141,24 +141,8 @@ public final class MCRPasswordCheckManager {
 
     }
 
-    /**
-     * @deprecated Use {@link #obtainInstance()} instead
-     */
-    @Deprecated
-    public static MCRPasswordCheckManager instance() {
-        return obtainInstance();
-    }
-
     public static MCRPasswordCheckManager obtainInstance() {
         return INSTANCE;
-    }
-
-    /**
-     * @deprecated Use {@link #createInstance()} instead
-     */
-    @Deprecated
-    public static MCRPasswordCheckManager instantiate() {
-        return createInstance();
     }
 
     public static MCRPasswordCheckManager createInstance() {

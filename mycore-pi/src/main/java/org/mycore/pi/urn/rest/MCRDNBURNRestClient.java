@@ -84,16 +84,6 @@ public class MCRDNBURNRestClient {
     /**
      * Returns the base url of the urn registration service.
      *
-     * @deprecated see {@link MCRDNBURNRestClient#getBaseServiceURL()}
-     * */
-    @Deprecated
-    protected String getBaseServiceURL(MCRPIRegistrationInfo urn) {
-        return getBaseServiceURL();
-    }
-
-    /**
-     * Returns the base url of the urn registration service.
-     *
      * @return the base url as set in mycore property MCR.PI.URNGranular.API.BaseURL
      * */
     public static String getBaseServiceURL() {

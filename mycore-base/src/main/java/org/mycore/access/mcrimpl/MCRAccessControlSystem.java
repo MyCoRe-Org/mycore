@@ -46,8 +46,6 @@ import org.mycore.common.config.MCRConfiguration2;
  */
 public final class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
-    private static MCRAccessControlSystem singleton;
-
     private static final Map<String, Integer> NEXT_FREE_RULE_ID = new HashMap<>();
 
     public static final String SYSTEM_RULE_PREFIX = "SYSTEMRULE";
@@ -80,12 +78,16 @@ public final class MCRAccessControlSystem extends MCRAccessBaseImpl {
         dummyRule = new MCRAccessRule(null, null, null, null, "dummy rule, always true");
     }
 
-    // extended methods
-    public static synchronized MCRRuleAccessInterface instance() {
-        if (singleton == null) {
-            singleton = new MCRAccessControlSystem();
-        }
-        return singleton;
+    /**
+     * @deprecated use {@link #getInstance()} instead.
+     */
+    @Deprecated
+    public static MCRRuleAccessInterface instance() {
+        return getInstance();
+    }
+
+    public static MCRAccessControlSystem getInstance() {
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     @Override
@@ -164,12 +166,6 @@ public final class MCRAccessControlSystem extends MCRAccessBaseImpl {
         boolean ret = checkPermission(POOL_PRIVILEGE_ID, permission);
         LOGGER.debug("Execute MCRAccessControlSystem checkPermission result: {}", () -> String.valueOf(ret));
         return ret;
-    }
-
-    @Override
-    @Deprecated
-    public boolean checkPermissionForUser(String permission, String userID) {
-        return checkAccess(POOL_PRIVILEGE_ID, permission, userID, null);
     }
 
     @Override
@@ -269,31 +265,6 @@ public final class MCRAccessControlSystem extends MCRAccessBaseImpl {
             LOGGER.debug("accessStore.getRuleID() done with {}", ruleID);
         }
         return ruleStore.getRule(ruleID);
-    }
-
-    /**
-     * Validator methods to validate access definition for given object and pool
-     *
-     * @param permission
-     *            poolname as string
-     * @param objID
-     *            MCRObjectID as string
-     * @param userID
-     *            MCRUser
-     * @param ip
-     *            ip-Address
-     * @return true if access is granted according to defined access rules
-     */
-    @Deprecated
-    public boolean checkAccess(String objID, String permission, String userID, MCRIPAddress ip) {
-        Date date = new Date();
-        LOGGER.debug("getAccess()");
-        MCRAccessRule rule = getAccessRule(objID, permission);
-        LOGGER.debug("getAccess() is done");
-        if (rule == null) {
-            return userID.equals(MCRSystemUserInformation.SUPER_USER.getUserID());
-        }
-        return rule.checkAccess(userID, date, ip);
     }
 
     /**
@@ -447,4 +418,7 @@ public final class MCRAccessControlSystem extends MCRAccessBaseImpl {
         return 0;
     }
 
+    private static final class LazyInstanceHolder {
+        private static final MCRAccessControlSystem SINGLETON_INSTANCE = new MCRAccessControlSystem();
+    }
 }

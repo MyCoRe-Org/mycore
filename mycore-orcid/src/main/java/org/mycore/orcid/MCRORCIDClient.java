@@ -41,14 +41,6 @@ public final class MCRORCIDClient {
         baseTarget = client.target(baseUrl);
     }
 
-    /**
-     * @deprecated Use {@link #obtainInstance()} instead
-     */
-    @Deprecated
-    public static MCRORCIDClient instance() {
-        return obtainInstance();
-    }
-
     @MCRFactory
     public static MCRORCIDClient obtainInstance() {
         return LazyInstanceHolder.SHARED_INSTANCE;

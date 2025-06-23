@@ -80,14 +80,6 @@ public final class MCRFileStore extends MCRAbstractFileStore {
         return Files.exists(baseDir) ? Files.getFileStore(baseDir) : getFileStore(baseDir.getParent());
     }
 
-    /**
-     * @deprecated Use {@link #obtainInstance(String)} instead
-     */
-    @Deprecated
-    static MCRFileStore getInstance(String storeId) throws IOException {
-        return obtainInstance(storeId);
-    }
-
     static MCRFileStore obtainInstance(String storeId) throws IOException {
         try {
             return INSTANCE_HOLDER.get(storeId);
@@ -98,14 +90,6 @@ public final class MCRFileStore extends MCRAbstractFileStore {
             }
             throw new IOException("Error while getting instance of " + MCRFileStore.class.getSimpleName(), cause);
         }
-    }
-
-    /**
-     * @deprecated Use {@link #obtainInstance(MCRStoredNode)} instead
-     */
-    @Deprecated
-    public static MCRFileStore getInstance(MCRStoredNode node) throws IOException {
-        return obtainInstance(node);
     }
 
     /**

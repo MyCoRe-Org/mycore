@@ -280,14 +280,6 @@ public class MCRClassificationBrowser2 extends MCRServlet {
 
         private String style;
 
-        /**
-         * @deprecated Use {@link #ofRequest(HttpServletRequest)} instead
-         */
-        @Deprecated
-        static Settings fromRequest(HttpServletRequest req) {
-            return ofRequest(req);
-        }
-
         static Settings ofRequest(HttpServletRequest req) {
             Settings s = new Settings();
             s.classifID = req.getParameter("classification");

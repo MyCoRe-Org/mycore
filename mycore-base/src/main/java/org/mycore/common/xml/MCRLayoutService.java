@@ -63,14 +63,6 @@ public class MCRLayoutService {
 
     private static final String TRANSFORMER_FACTORY_PROPERTY = "MCR.Layout.Transformer.Factory";
 
-    /**
-     * @deprecated Use {@link #obtainInstance()} instead
-     */
-    @Deprecated
-    public static MCRLayoutService instance() {
-        return obtainInstance();
-    }
-
     public static MCRLayoutService obtainInstance() {
         return SHARED_INSTANCE;
     }

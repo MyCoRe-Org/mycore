@@ -30,13 +30,6 @@ public class MCRResourceAccessCheckerFactory {
     private static final Map<Class<? extends MCRResourceAccessChecker>, MCRResourceAccessChecker> IMPLEMENTATION_MAP
         = new ConcurrentHashMap<>();
 
-    @Deprecated
-    @SuppressWarnings("PMD.SingletonClassReturningNewInstance")
-    public static <T extends MCRResourceAccessChecker> T getInstance(Class<T> clazz)
-        throws ReflectiveOperationException {
-        return obtainInstance(clazz);
-    }
-
     public static <T extends MCRResourceAccessChecker> T obtainInstance(Class<T> clazz)
         throws ReflectiveOperationException {
         @SuppressWarnings("unchecked")

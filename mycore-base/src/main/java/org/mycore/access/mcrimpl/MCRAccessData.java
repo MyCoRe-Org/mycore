@@ -31,13 +31,6 @@ public class MCRAccessData {
 
     private MCRIPAddress ip;
 
-    @Deprecated
-    MCRAccessData(String userID, Date date, MCRIPAddress ip) {
-        this.userID = userID;
-        this.date = date;
-        this.ip = ip;
-    }
-
     MCRAccessData(MCRUserInformation userInfo, Date date, MCRIPAddress ip) {
         this.userInformation = userInfo;
         this.date = date;

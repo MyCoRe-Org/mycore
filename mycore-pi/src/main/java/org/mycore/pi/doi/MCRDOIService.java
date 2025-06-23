@@ -194,11 +194,6 @@ public class MCRDOIService extends MCRDOIBaseService {
         }
     }
 
-    @Deprecated
-    public boolean usesTestPrefix() {
-        return usesTestServer();
-    }
-
     public boolean usesTestServer() {
         return useTestServer;
     }

@@ -118,14 +118,6 @@ public final class MCRLDAPClient {
         this.searchSettings = Objects.requireNonNull(searchSettings, "Search settings must not be null");
     }
 
-    /**
-     * @deprecated Use {@link #obtainInstance()} instead
-     */
-    @Deprecated
-    public static MCRLDAPClient instance() {
-        return obtainInstance();
-    }
-
     public static MCRLDAPClient obtainInstance() {
         return LazyInstanceHolder.SHARED_INSTANCE;
     }

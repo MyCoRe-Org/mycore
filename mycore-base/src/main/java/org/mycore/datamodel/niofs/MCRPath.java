@@ -85,14 +85,6 @@ public abstract class MCRPath implements Path {
         initNameComponents();
     }
 
-    /**
-     * @deprecated Use {@link #ofPath(Path)} instead
-     */
-    @Deprecated
-    public static MCRPath toMCRPath(final Path other) {
-        return ofPath(other);
-    }
-
     public static MCRPath ofPath(final Path other) {
         Objects.requireNonNull(other);
         if (!(other instanceof MCRPath)) {
