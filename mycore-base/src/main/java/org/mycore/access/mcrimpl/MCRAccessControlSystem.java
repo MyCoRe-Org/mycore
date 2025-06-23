@@ -85,7 +85,7 @@ public final class MCRAccessControlSystem extends MCRAccessBaseImpl {
     public static MCRRuleAccessInterface instance() {
         return getInstance();
     }
-    
+
     public static MCRAccessControlSystem getInstance() {
         return LazyInstanceHolder.SINGLETON_INSTANCE;
     }

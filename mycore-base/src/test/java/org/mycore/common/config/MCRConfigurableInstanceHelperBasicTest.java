@@ -88,33 +88,6 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
 
     }
 
-    @Test
-    @MCRTestConfiguration(
-        properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWitLegacyFactory.class)
-        })
-    public void legacyFactory() {
-
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        TestClassWitLegacyFactory instance = MCRConfigurableInstanceHelper
-            .getInstance(TestClassWitLegacyFactory.class, configuration);
-
-        assertNotNull(instance);
-
-    }
-
-    @Test(expected = MCRConfigurationException.class)
-    @MCRTestConfiguration(
-        properties = {
-            @MCRTestProperty(key = "Foo", classNameOf = TestClassWitLegacyFactories.class)
-        })
-    public void legacyFactories() {
-
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurableInstanceHelper.getInstance(TestClassWitLegacyFactories.class, configuration);
-
-    }
-
     @Test(expected = MCRConfigurationException.class)
     @MCRTestConfiguration(
         properties = {
@@ -218,35 +191,6 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
 
     public static class TestClassWithConstructor {
     }
-
-    @SuppressWarnings("InstantiationOfUtilityClass")
-    public static class TestClassWitLegacyFactory {
-
-        private TestClassWitLegacyFactory() {
-        }
-
-        public static TestClassWitLegacyFactory instance() {
-            return new TestClassWitLegacyFactory();
-        }
-
-    }
-
-    @SuppressWarnings("InstantiationOfUtilityClass")
-    public static class TestClassWitLegacyFactories {
-
-        private TestClassWitLegacyFactories() {
-        }
-
-        public static TestClassWitLegacyFactories instance() {
-            return createInstance();
-        }
-
-        public static TestClassWitLegacyFactories createInstance() {
-            return new TestClassWitLegacyFactories();
-        }
-
-    }
-
 
     public static class TestClassWithoutConstructorOrFactory {
 
