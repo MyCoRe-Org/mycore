@@ -28,6 +28,7 @@ import org.mycore.common.hint.MCRHintKey;
 import org.mycore.resource.MCRResourceResolver;
 
 import jakarta.servlet.ServletContext;
+import org.mycore.resource.common.ClasspathSupplier;
 
 /**
  * A utility class that provides {@link MCRHintKey} used by {@link MCRResourceResolver#defaultHints()}.
@@ -45,6 +46,12 @@ public final class MCRResourceHintKeys {
         MCRResourceHintKeys.class,
         "CLASS_LOADER",
         ClassLoader::getName);
+
+    public static final MCRHintKey<ClasspathSupplier> CLASSPATH = new MCRHintKey<>(
+        ClassLoader.class,
+        MCRResourceHintKeys.class,
+        "CLASSPATH",
+        ClasspathSupplier::name);
 
     public static final MCRHintKey<SortedSet<MCRComponent>> COMPONENTS = new MCRCollectionHintKey<>(
         MCRComponent.class,
