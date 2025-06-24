@@ -18,12 +18,11 @@
 
 package org.mycore.frontend.indexbrowser;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
@@ -56,30 +55,26 @@ public final class MCRGoogleSitemapCommands extends MCRAbstractCommands {
         LOGGER.debug("Build Google sitemap start.");
         final long start = System.currentTimeMillis();
         // init
-        File webappBaseDir = new File(MCRConfiguration2.getStringOrThrow("MCR.WebApplication.basedir"));
-        MCRGoogleSitemapCommon common = new MCRGoogleSitemapCommon(webappBaseDir);
+        MCRGoogleSitemapCommon common = new MCRGoogleSitemapCommon();
         // remove old files
         common.removeSitemapFiles();
         // compute number of files
         int number = common.checkSitemapFile();
         LOGGER.debug("Build Google number of URL files {}.", number);
         if (number == 1) {
-            String fn = common.getFileName(1, true);
-            File xml = new File(fn);
+            Path xml = common.getFile(0);
             Document jdom = common.buildSingleSitemap();
-            LOGGER.info("Write Google sitemap file {}.", fn);
+            LOGGER.info("Write Google sitemap file {}.", xml);
             new MCRJDOMContent(jdom).sendTo(xml);
         } else {
-            String fn = common.getFileName(1, true);
-            File xml = new File(fn);
+            Path xml = common.getFile(0);
             Document jdom = common.buildSitemapIndex(number);
-            LOGGER.info("Write Google sitemap file {}.", fn);
+            LOGGER.info("Write Google sitemap file {}.", xml);
             new MCRJDOMContent(jdom).sendTo(xml);
-            for (int i = 0; i < number; i++) {
-                fn = common.getFileName(i + 2, true);
-                xml = new File(fn);
+            for (int i = 1; i <= number; i++) {
+                xml = common.getFile(i);
                 jdom = common.buildPartSitemap(i);
-                LOGGER.info("Write Google sitemap file {}.", fn);
+                LOGGER.info("Write Google sitemap file {}.", xml);
                 new MCRJDOMContent(jdom).sendTo(xml);
             }
         }
