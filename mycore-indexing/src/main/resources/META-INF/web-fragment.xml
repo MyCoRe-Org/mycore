@@ -22,6 +22,7 @@
   <servlet-mapping>
     <servlet-name>MCRGoogleSitemapServlet</servlet-name>
     <url-pattern>/sitemap_google.xml</url-pattern>
+    <url-pattern>/sitemap_google/*</url-pattern>
   </servlet-mapping>
   <filter-mapping>
     <filter-name>MCRUserAgentFilter</filter-name>
