@@ -33,30 +33,30 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRResourceTracer;
 
 /**
- * {@link MCRWebResourceProvider} is an implementation of {@link MCRResourceProvider} that delegates to another
+ * A {@link MCRWebResourceProvider} is a {@link MCRResourceProvider} that delegates to another
  * {@link MCRResourceProvider} but only allows web resources to be resolved.
  * <p>
- * The following configuration options are available, if configured automatically:
+ * The following configuration options are available:
  * <ul>
- * <li> The provider is configured using the property suffix {@link MCRWebResourceProvider#PROVIDER_KEY}.
- * <li> The property suffix {@link MCRWebResourceProvider#COVERAGE_KEY} can be used to provide short
- * description for human beings in order to better understand the providers use case.
+ * <li> The property suffix {@link MCRResourceProviderBase#COVERAGE_KEY} can be used to
+ * provide a short description of the providers purpose; used in log messages.
+ * <li> The property suffix {@link MCRWebResourceProvider#PROVIDER_KEY} can be used to
+ * specify the provider to be used.
  * </ul>
  * Example:
- * <pre>
+ * <pre><code>
  * [...].Class=org.mycore.resource.provider.MCRWebResourceProvider
  * [...].Coverage=Lorem ipsum dolor sit amet
  * [...].Provider.Class=foo.bar.FooProvider
  * [...].Provider.Key1=Value1
  * [...].Provider.Key2=Value2
- * </pre>
+ * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRWebResourceProvider.Factory.class)
 public class MCRWebResourceProvider extends MCRResourceProviderBase {
-
-    public static final String COVERAGE_KEY = "Coverage";
 
     public static final String PROVIDER_KEY = "Provider";
 
@@ -68,13 +68,21 @@ public class MCRWebResourceProvider extends MCRResourceProviderBase {
     }
 
     @Override
-    protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints) {
-        return path.isWebPath() ? provider.provide(path, hints) : Optional.empty();
+    protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
+        if (path.isWebPath()) {
+            return provider.provide(path, hints, tracer.update(provider, provider.coverage()));
+        } else {
+            return Optional.empty();
+        }
     }
 
     @Override
-    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints) {
-        return path.isWebPath() ? provider.provideAll(path, hints) : Collections.emptyList();
+    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
+        if (path.isWebPath()) {
+            return provider.provideAll(path, hints, tracer.update(provider, provider.coverage()));
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     @Override

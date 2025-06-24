@@ -21,28 +21,20 @@ package org.mycore.resource.provider;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.Level;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
-
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
-import io.github.classgraph.ClassGraph;
-import io.github.classgraph.ScanResult;
+import org.mycore.resource.common.ClasspathSupplier;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
+import org.mycore.resource.common.MCRResourceTracer;
 
 /**
  * A {@link MCRResourceProvider} implements a resource lookup strategy.
@@ -52,13 +44,28 @@ public interface MCRResourceProvider {
     /**
      * Resolves a {@link MCRResourcePath} using the given hints.
      */
-    Optional<URL> provide(MCRResourcePath path, MCRHints hints);
+    default Optional<URL> provide(MCRResourcePath path, MCRHints hints) {
+        return provide(path, hints, new MCRNoOpResourceTracer());
+    }
+
+    /**
+     * Resolves a {@link MCRResourcePath} using the given hints.
+     */
+    Optional<URL> provide(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer);
 
     /**
      * Resolves a {@link MCRResourcePath}, returning all alternatives (i.e. because one module
      * overrides a resource that is also provided by another module). Intended for introspective purposes only.
      */
-    List<ProvidedUrl> provideAll(MCRResourcePath path, MCRHints hints);
+    default List<ProvidedUrl> provideAll(MCRResourcePath path, MCRHints hints) {
+        return provideAll(path, hints, new MCRNoOpResourceTracer());
+    }
+
+    /**
+     * Resolves a {@link MCRResourcePath}, returning all alternatives (i.e. because one module
+     * overrides a resource that is also provided by another module). Intended for introspective purposes only.
+     */
+    List<ProvidedUrl> provideAll(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer);
 
     /**
      * Returns a stream of {@link PrefixStripper} using the given hints, each of which can remove multiple prefixes
@@ -72,16 +79,9 @@ public interface MCRResourceProvider {
      */
     MCRTreeMessage compileDescription(Level level);
 
-    final class ProvidedUrl {
+    String coverage();
 
-        public final URL url;
-
-        public final String origin;
-
-        public ProvidedUrl(URL url, String origin) {
-            this.url = url;
-            this.origin = origin;
-        }
+    record ProvidedUrl(URL url, String origin) {
 
         @Override
         public String toString() {
@@ -111,61 +111,55 @@ public interface MCRResourceProvider {
 
     }
 
-    final class BaseDirPrefixStripper extends PrefixStripperBase {
+    class PrefixPrefixStripper extends PrefixStripperBase {
 
         private final String prefix;
 
-        public BaseDirPrefixStripper(File baseDir) {
-            this.prefix = Objects.requireNonNull(baseDir).toURI().toString();
+        public PrefixPrefixStripper(String prefix) {
+            this.prefix = Objects.requireNonNull(prefix, "Prefix must not be null");
         }
 
         @Override
-        public List<String> getStrippedPaths(String value) {
+        public final List<String> getStrippedPaths(String value) {
             if (value.startsWith(prefix)) {
                 return List.of(value.substring(prefix.length()));
             }
-            return Collections.emptyList();
+            return List.of();
         }
 
         @Override
-        public String toString() {
+        public final String toString() {
             return prefix;
         }
 
     }
 
-    final class ClassLoaderPrefixStripper extends PrefixStripperBase {
+    final class BaseDirPrefixStripper extends PrefixPrefixStripper {
 
-        private static final String CLASS_GRAPH_THREAD_COUNT_NAME = "MCR.Resource.Provider.ClassGraph.ThreadCount";
+        public BaseDirPrefixStripper(File baseDir) {
+            super(Objects.requireNonNull(baseDir, "Base dir must not be null").toURI().toString());
+        }
 
-        private static final int CLASS_GRAPH_THREAD_COUNT = MCRConfiguration2.getInt(CLASS_GRAPH_THREAD_COUNT_NAME)
-            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(CLASS_GRAPH_THREAD_COUNT_NAME));
+    }
 
-        private static final ExecutorService EXECUTOR_SERVICE = new ThreadPoolExecutor(CLASS_GRAPH_THREAD_COUNT,
-            CLASS_GRAPH_THREAD_COUNT, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
-            new ThreadFactoryBuilder().setNameFormat("ClassLoaderPrefixStripper-worker-%d").setDaemon(true).build());
+    final class ClasspathPrefixStripper extends PrefixStripperBase {
 
-        private final ClassLoader classLoader;
+        private final ClasspathSupplier classpath;
 
-        public ClassLoaderPrefixStripper(ClassLoader classLoader) {
-            this.classLoader = Objects.requireNonNull(classLoader);
+        public ClasspathPrefixStripper(ClasspathSupplier classpath) {
+            this.classpath = Objects.requireNonNull(classpath, "Classpath must not be null");
         }
 
         @Override
         public List<String> getStrippedPaths(String value) {
             List<String> potentialPaths = new LinkedList<>();
-            ClassGraph classGraph = new ClassGraph();
-            classGraph.overrideClassLoaders(classLoader);
-            try (ScanResult scanResult = classGraph.scan(EXECUTOR_SERVICE, CLASS_GRAPH_THREAD_COUNT)) {
-                List<URI> classpath = scanResult.getClasspathURIs();
-                for (URI uri : classpath) {
-                    if (uri.getScheme().equals("file")) {
-                        File file = new File(uri.getPath());
-                        if (file.isDirectory()) {
-                            String prefix = file.toURI().toString();
-                            if (value.startsWith(prefix)) {
-                                potentialPaths.add(value.substring(prefix.length()));
-                            }
+            for (URI uri : classpath.supplier().get()) {
+                if (uri.getScheme().equals("file")) {
+                    File file = new File(uri.getPath());
+                    if (file.isDirectory()) {
+                        String prefix = file.toURI().toString();
+                        if (value.startsWith(prefix)) {
+                            potentialPaths.add(value.substring(prefix.length()));
                         }
                     }
                 }
@@ -175,7 +169,7 @@ public interface MCRResourceProvider {
 
         @Override
         public String toString() {
-            return classLoader.getName();
+            return classpath.name();
         }
 
     }
@@ -195,7 +189,7 @@ public interface MCRResourceProvider {
                     return List.of(value.substring(index + 1));
                 }
             }
-            return Collections.emptyList();
+            return List.of();
         }
 
         @Override
