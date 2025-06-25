@@ -65,7 +65,8 @@ import org.mycore.test.MyCoReTest;
     })
 public class MCROCFLCommandsTest {
 
-    public static final String JUNIT_DERIVATE_00000001 = "junit_derivate_00000001";
+    public static final String JUNIT_DERIVATE_1 = "junit_derivate_00000001";
+    public static final String JUNIT_OBJECT_1 = "junit_object_00000001";
 
     protected MCROCFLRepository repository;
 
@@ -77,17 +78,17 @@ public class MCROCFLCommandsTest {
     @TestTemplate
     public void restoreDerivate() throws Exception {
         // prepare
-        MCRDerivate derivate = createDerivate();
+        MCRDerivate derivate = MCROCFLTestCaseHelper.loadObjectAndDerivate(JUNIT_OBJECT_1, JUNIT_DERIVATE_1);
         deleteDerivate(derivate);
-        MCRObjectID derivateId = MCRObjectID.getInstance(JUNIT_DERIVATE_00000001);
+        MCRObjectID derivateId = MCRObjectID.getInstance(JUNIT_DERIVATE_1);
         assertFalse(MCRMetadataManager.exists(derivateId), "derivate should not exist");
 
         // restore
-        MCROCFLCommands.restoreDerivateFromOCFL(JUNIT_DERIVATE_00000001, "v2");
+        MCROCFLCommands.restoreDerivateFromOCFL(JUNIT_DERIVATE_1, "v2");
 
         // test
         assertTrue(MCRMetadataManager.exists(derivateId), "derivate should exist");
-        try(Stream<Path> directoryStream = Files.list(MCRVersionedPath.head(JUNIT_DERIVATE_00000001, "/"))) {
+        try(Stream<Path> directoryStream = Files.list(MCRVersionedPath.head(JUNIT_DERIVATE_1, "/"))) {
             assertEquals(3, directoryStream.toList().size());
         }
         MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(derivate.getOwnerID());
@@ -96,23 +97,9 @@ public class MCROCFLCommandsTest {
 
     @TestTemplate
     public void describeObject() throws MCRAccessException, URISyntaxException, IOException {
-        MCRDerivate derivate = createDerivate();
+        MCRDerivate derivate = MCROCFLTestCaseHelper.loadObjectAndDerivate(JUNIT_OBJECT_1, JUNIT_DERIVATE_1);
         MCROCFLCommands.describeObject(MCROCFLObjectIDPrefixHelper.toDerivateObjectId(derivate.getId().toString()),
             repository.getId());
-    }
-
-    private static MCRDerivate createDerivate() throws MCRAccessException, URISyntaxException, IOException {
-        MCRObject object = MCROCFLTestCaseHelper.createObject("junit_object_00000001");
-        MCRDerivate derivate =
-            MCROCFLTestCaseHelper.createDerivate(object.getId().toString(), JUNIT_DERIVATE_00000001);
-        MCRMetadataManager.create(object);
-
-        MCRTransactionManager.requireTransactions(MCROCFLFileSystemTransaction.class);
-        MCRMetadataManager.create(derivate);
-        MCROCFLTestCaseHelper.loadDerivate(derivate.getId().toString());
-        MCRTransactionManager.commitTransactions(MCROCFLFileSystemTransaction.class);
-
-        return derivate;
     }
 
     private static void deleteDerivate(MCRDerivate derivate) throws MCRAccessException {
