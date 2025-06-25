@@ -23,11 +23,14 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.mycore.common.config.MCRComponent;
 import org.mycore.common.config.MCRRuntimeComponentDetector;
 import org.mycore.common.config.MCRRuntimeComponentDetector.ComponentOrder;
 import org.mycore.common.hint.MCRHints;
+import org.mycore.resource.common.MCRResourceTracer;
+import org.mycore.resource.hint.MCRResourceHintKeys;
 
 /**
  * A {@link MCRHighestComponentPriorityResourceSelector} is a {@link MCRResourceSelector} that prioritizes
@@ -38,33 +41,44 @@ import org.mycore.common.hint.MCRHints;
  * until it finds a component that contains one of the resource candidates, which is selected. After that,
  * it only continues with components of the same priority, to check if they also contain a resource candidate.
  * Such candidates are also selected. If no component contains a resource candidate, no candidate is selected.
+ * <p>
+ * It uses the set of {@link MCRComponent} instances hinted at by {@link MCRResourceHintKeys#COMPONENTS}, if present.
+ * <p>
+ * No configuration options are available.
+ * <p>
+ * Example:
+ * <pre><code>
+ * [...].Class=org.mycore.resource.selector.MCRHighestComponentPriorityResourceSelector
+ * </code></pre>
  */
-public class MCRHighestComponentPriorityResourceSelector extends MCRResourceSelectorBase {
+@SuppressWarnings("PMD.GuardLogStatement")
+public final class MCRHighestComponentPriorityResourceSelector extends MCRResourceSelectorBase {
 
     @Override
-    protected List<URL> doSelect(List<URL> resourceUrls, MCRHints hints) {
+    protected List<URL> doSelect(List<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
         int highestPriority = -1;
         List<URL> unmatchedResourceUrls = new ArrayList<>(resourceUrls);
         List<URL> highestPriorityModuleResourceUrls = new LinkedList<>();
-        for (MCRComponent component : componentsByComponentPriority()) {
+        for (MCRComponent component : componentsByComponentPriority(hints)) {
             int priority = component.getPriority();
-            logger.debug(() -> "Testing component " + component.getName() + " with priority " + priority);
+            tracer.trace(() -> "Testing component " + component.getName() + " with priority " + priority);
             if (highestPriority != -1 && highestPriority != priority) {
-                logger.debug("Found component with priority lower than selected priority {}, stop looking",
-                    highestPriority);
+                int highestPrioritySoFar = highestPriority;
+                tracer.trace(() -> "Found component with priority lower than "
+                    + highestPrioritySoFar + ", stop looking");
                 break;
             }
             String componentUrl = "jar:" + component.getJarFile().toURI();
-            logger.debug("Comparing component URL {} ... ", componentUrl);
+            tracer.trace(() -> "Looking for component URL prefix " + componentUrl + " ...");
             for (URL resourceUrl : unmatchedResourceUrls) {
-                logger.debug(" ... with resource URL {}", resourceUrl);
-                if (resourceUrl.toString().startsWith(componentUrl)) {
-                    logger.debug("Found match, using component URL {}", componentUrl);
+                tracer.trace(() -> "... in resource URL " + resourceUrl);
+                if (matches(resourceUrl.toString(), componentUrl)) {
+                    tracer.trace(() -> "Found match, using component URL " + componentUrl);
                     highestPriorityModuleResourceUrls.add(resourceUrl);
                     unmatchedResourceUrls.remove(resourceUrl);
                     if (highestPriority != priority) {
-                        logger.debug("Selected priority {}, keep looking for components with same priority",
-                            priority);
+                        tracer.trace(() -> "Selected priority " + priority
+                            + ", keep looking for components with same priority");
                         highestPriority = priority;
                     }
                     break;
@@ -74,8 +88,12 @@ public class MCRHighestComponentPriorityResourceSelector extends MCRResourceSele
         return highestPriorityModuleResourceUrls;
     }
 
-    private SortedSet<MCRComponent> componentsByComponentPriority() {
-        return MCRRuntimeComponentDetector.getAllComponents(ComponentOrder.HIGHEST_PRIORITY_FIRST);
+    private static boolean matches(String resourceUrl, String componentUrl) {
+        return resourceUrl.startsWith(componentUrl) && resourceUrl.charAt(componentUrl.length()) == '!';
+    }
+
+    private SortedSet<MCRComponent> componentsByComponentPriority(MCRHints hints) {
+        return hints.get(MCRResourceHintKeys.COMPONENTS).orElseGet(TreeSet::new);
     }
 
 }
