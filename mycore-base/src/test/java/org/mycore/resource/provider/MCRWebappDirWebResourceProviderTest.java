@@ -23,12 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mycore.resource.MCRFileSystemResourceHelper.getConfigDirTestBasePath;
 import static org.mycore.resource.MCRFileSystemResourceHelper.touchFiles;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,6 +37,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.hint.MCRHintsBuilder;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRResourceUtils;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
 import org.mycore.test.MyCoReTest;
@@ -55,16 +53,16 @@ public class MCRWebappDirWebResourceProviderTest {
 
     private static final MCRResourcePath WEB_BAR_PATH = MCRResourcePath.ofWebPath("bar").orElseThrow();
 
-    private static File fooWebappDir;
+    private static Path fooWebappDir;
 
     @BeforeAll
     public static void prepare() throws IOException {
 
         Path basePath = getConfigDirTestBasePath(MCRWebappDirWebResourceProviderTest.class);
 
-        Path fooPath = Paths.get("foo");
+        Path fooPath = Path.of("foo");
 
-        fooWebappDir = touchFiles(basePath.resolve("foo"), fooPath).toFile();
+        fooWebappDir = touchFiles(basePath.resolve("foo"), fooPath);
 
     }
 
@@ -105,7 +103,7 @@ public class MCRWebappDirWebResourceProviderTest {
     }
 
     @Test
-    public void provideWebPresent() throws MalformedURLException {
+    public void provideWebPresent() {
 
         MCRHints hints = toHints(fooWebappDir);
         MCRResourceProvider provider = webAppDirWebProvider();
@@ -157,7 +155,7 @@ public class MCRWebappDirWebResourceProviderTest {
     }
 
     @Test
-    public void provideAllWebPresent() throws MalformedURLException {
+    public void provideAllWebPresent() {
 
         MCRHints hints = toHints(fooWebappDir);
         MCRResourceProvider provider = webAppDirWebProvider();
@@ -174,7 +172,7 @@ public class MCRWebappDirWebResourceProviderTest {
     @MCRTestConfiguration(properties = {
         @MCRTestProperty(key = "Test.Class", classNameOf = MCRWebappDirWebResourceProvider.class)
     })
-    public void configuration() throws MalformedURLException {
+    public void configuration() {
 
         MCRHints hints = toHints(fooWebappDir);
         MCRResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(
@@ -192,15 +190,15 @@ public class MCRWebappDirWebResourceProviderTest {
         return new MCRWebappDirWebResourceProvider("web app dir test");
     }
 
-    private URL toUrl(File webappDir, String fileName) throws MalformedURLException {
-        return new File(webappDir, fileName).toURI().toURL();
+    private URL toUrl(Path webappDir, String fileName) {
+        return MCRResourceUtils.toFileUrl(webappDir.resolve(fileName));
     }
 
     private static List<URL> toUrlList(List<ProvidedUrl> providedUrls) {
         return providedUrls.stream().map(ProvidedUrl::url).toList();
     }
 
-    private static MCRHints toHints(File webappDir) {
+    private static MCRHints toHints(Path webappDir) {
         return new MCRHintsBuilder().add(MCRResourceHintKeys.WEBAPP_DIR, webappDir).build();
     }
 

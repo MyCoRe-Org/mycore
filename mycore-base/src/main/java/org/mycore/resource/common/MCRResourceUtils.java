@@ -16,25 +16,25 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.resource.hint;
+package org.mycore.resource.common;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Path;
-import java.util.Optional;
 
-import org.mycore.common.events.MCRServletContextHolder;
-import org.mycore.common.hint.MCRHint;
-import org.mycore.common.hint.MCRHintKey;
+import org.mycore.common.MCRException;
 
-public final class MCRWebappDirResourceHint implements MCRHint<Path> {
+public final class MCRResourceUtils {
 
-    @Override
-    public MCRHintKey<Path> key() {
-        return MCRResourceHintKeys.WEBAPP_DIR;
+    private MCRResourceUtils() {
     }
 
-    @Override
-    public Optional<Path> value() {
-        return MCRServletContextHolder.getInstance().get().map(context -> context.getRealPath("/")).map(Path::of);
+    public static URL toFileUrl(Path path) {
+        try {
+            return path.toUri().toURL();
+        } catch (MalformedURLException e) {
+            throw new MCRException("Failed to convert path to file URL: " + path, e);
+        }
     }
 
 }

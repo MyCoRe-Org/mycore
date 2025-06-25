@@ -18,9 +18,11 @@
 
 package org.mycore.resource.provider;
 
-import java.io.File;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -38,6 +40,7 @@ import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
 import org.mycore.resource.common.MCRNoOpResourceTracer;
+import org.mycore.resource.common.MCRResourceUtils;
 import org.mycore.resource.common.MCRResourceTracer;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -143,14 +146,6 @@ public interface MCRResourceProvider {
 
     }
 
-    final class BaseDirPrefixStripper extends PrefixPrefixStripper {
-
-        public BaseDirPrefixStripper(File baseDir) {
-            super(Objects.requireNonNull(baseDir, "Base dir must not be null").toURI().toString());
-        }
-
-    }
-
     final class ClassLoaderPrefixStripper extends PrefixStripperBase {
 
         private static final String CLASS_GRAPH_THREAD_COUNT_NAME = "MCR.Resource.Provider.ClassGraph.ThreadCount";
@@ -177,9 +172,9 @@ public interface MCRResourceProvider {
                 List<URI> classpath = scanResult.getClasspathURIs();
                 for (URI uri : classpath) {
                     if (uri.getScheme().equals("file")) {
-                        File file = new File(uri.getPath());
-                        if (file.isDirectory()) {
-                            String prefix = file.toURI().toString();
+                        Path path = Path.of(uri.getPath());
+                        if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
+                            String prefix = MCRResourceUtils.toFileUrl(path).toString();
                             if (value.startsWith(prefix)) {
                                 potentialPaths.add(value.substring(prefix.length()));
                             }

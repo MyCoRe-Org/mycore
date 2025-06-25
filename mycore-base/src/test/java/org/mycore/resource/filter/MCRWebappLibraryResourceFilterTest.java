@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mycore.resource.MCRFileSystemResourceHelper.getConfigDirResourcesTestBasePath;
 import static org.mycore.resource.MCRFileSystemResourceHelper.touchFiles;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
@@ -43,7 +42,7 @@ import org.mycore.test.MyCoReTest;
 @MyCoReTest
 public class MCRWebappLibraryResourceFilterTest {
 
-    private static File fooWebappDir;
+    private static Path fooWebappDir;
 
     private static URL fileUrl;
 
@@ -58,7 +57,7 @@ public class MCRWebappLibraryResourceFilterTest {
 
         Path basePath = getConfigDirResourcesTestBasePath(MCRWebappLibraryResourceFilterTest.class);
 
-        fooWebappDir = touchFiles(basePath.resolve("foo")).toFile();
+        fooWebappDir = touchFiles(basePath.resolve("foo"));
 
         fileUrl = URI.create("file:/foo/bar").toURL();
         nonWebappLibraryUrl = URI.create("jar:file:/foo/library.jar!/foo/bar").toURL();
@@ -117,7 +116,7 @@ public class MCRWebappLibraryResourceFilterTest {
         return new MCRWebappLibraryResourceFilter(mode);
     }
 
-    private static MCRHints toHints(File webappDir) {
+    private static MCRHints toHints(Path webappDir) {
         return new MCRHintsBuilder().add(MCRResourceHintKeys.WEBAPP_DIR, webappDir).build();
     }
 

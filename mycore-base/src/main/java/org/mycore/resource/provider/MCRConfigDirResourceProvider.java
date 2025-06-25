@@ -18,7 +18,7 @@
 
 package org.mycore.resource.provider;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -53,12 +53,12 @@ public final class MCRConfigDirResourceProvider extends MCRFileSystemResourcePro
     }
 
     @Override
-    protected Stream<File> getBaseDirs(MCRHints hints) {
+    protected Stream<Path> getBaseDirs(MCRHints hints) {
         return hints.get(MCRResourceHintKeys.CONFIG_DIR).map(this::getResourcesDir).stream();
     }
 
-    private File getResourcesDir(File configDir) {
-        return new File(configDir, "resources");
+    private Path getResourcesDir(Path configDir) {
+        return configDir.resolve("resources");
     }
 
     @Override

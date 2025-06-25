@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mycore.resource.MCRFileSystemResourceHelper.getConfigDirResourcesTestBasePath;
 import static org.mycore.resource.MCRFileSystemResourceHelper.touchFiles;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
@@ -43,7 +42,7 @@ import org.mycore.test.MyCoReTest;
 @MyCoReTest
 public class MCRLibraryResourceFilterTest {
 
-    private static File fooConfigDir;
+    private static Path fooConfigDir;
 
     private static URL fileUrl;
 
@@ -56,7 +55,7 @@ public class MCRLibraryResourceFilterTest {
 
         Path basePath = getConfigDirResourcesTestBasePath(MCRLibraryResourceFilterTest.class);
 
-        fooConfigDir = touchFiles(basePath.resolve("foo")).toFile();
+        fooConfigDir = touchFiles(basePath.resolve("foo"));
 
         fileUrl = URI.create("file:/foo/bar").toURL();
         libraryUrl = URI.create("jar:file:/foo/library.jar!/foo/bar").toURL();
@@ -113,7 +112,7 @@ public class MCRLibraryResourceFilterTest {
         return new MCRLibraryResourceFilter(mode);
     }
 
-    private static MCRHints toHints(File configDir) {
+    private static MCRHints toHints(Path configDir) {
         return new MCRHintsBuilder().add(MCRResourceHintKeys.CONFIG_DIR, configDir).build();
     }
 
