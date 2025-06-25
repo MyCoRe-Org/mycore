@@ -2,6 +2,7 @@ package org.mycore.ocfl.niofs;
 
 import static org.mycore.ocfl.MCROCFLTestCaseHelper.DERIVATE_1;
 import static org.mycore.ocfl.MCROCFLTestCaseHelper.DERIVATE_1_OBJECT_ID;
+import static org.mycore.ocfl.MCROCFLTestCaseHelper.WHITE_PNG;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -37,7 +38,6 @@ public class MCROCFLFileSystemTransactionTest {
 
     @TestTemplate
     public void commit() throws IOException {
-        MCRVersionedPath whitePng = MCRVersionedPath.head(DERIVATE_1, "white.png");
         MCRVersionedPath other = MCRVersionedPath.head(DERIVATE_1, "other");
 
         // no write operation: version should stay the same
@@ -51,7 +51,7 @@ public class MCROCFLFileSystemTransactionTest {
         // delete operation: version should increase
         MCRTransactionManager.beginTransactions();
         MCROCFLVirtualObject virtualObject = getWritable();
-        virtualObject.delete(whitePng);
+        virtualObject.delete(WHITE_PNG);
         checkVersion(1);
         MCRTransactionManager.commitTransactions();
         checkVersion(2);

@@ -49,6 +49,8 @@ import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
 import org.mycore.datamodel.niofs.MCRReadOnlyIOException;
 import org.mycore.datamodel.niofs.MCRVersionedFileSystemProvider;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
+import org.mycore.ocfl.niofs.storage.MCROCFLFileStorage;
+import org.mycore.ocfl.niofs.storage.MCROCFLRollingCacheStorage;
 import org.mycore.ocfl.niofs.storage.MCROCFLTransactionalFileStorage;
 import org.mycore.ocfl.repository.MCROCFLLocalRepositoryProvider;
 import org.mycore.ocfl.repository.MCROCFLRepository;
@@ -75,7 +77,9 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
 
     private static volatile MCROCFLFileSystem fileSystem;
 
-    private MCROCFLTransactionalFileStorage localStorage;
+    private MCROCFLTransactionalFileStorage transactionalStorage;
+
+    private MCROCFLRollingCacheStorage tempStorage;
 
     private MCROCFLVirtualObjectProvider virtualObjectProvider;
 
@@ -95,12 +99,22 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
      */
     public void init() throws IOException {
         try {
+            // transactional storage
+            String transactionalStorageProperty = "MCR.Content.TransactionalStorage";
+            this.transactionalStorage = MCRConfiguration2
+                .getSingleInstanceOfOrThrow(MCROCFLTransactionalFileStorage.class, transactionalStorageProperty);
+            Files.createDirectories(this.transactionalStorage.getRoot());
+            this.transactionalStorage.clearTransactional();
+            // temporary storage
             String tempStorageProperty = "MCR.Content.TempStorage";
-            this.localStorage = MCRConfiguration2
-                .getSingleInstanceOfOrThrow(MCROCFLTransactionalFileStorage.class, tempStorageProperty);
-            Files.createDirectories(this.localStorage.getRoot());
-            this.localStorage.clearTransactional();
-            this.virtualObjectProvider = new MCROCFLVirtualObjectProvider(getRepository(), localStorage);
+            this.tempStorage = MCRConfiguration2
+                .getSingleInstanceOf(MCROCFLRollingCacheStorage.class, tempStorageProperty).orElse(null);
+            if (this.tempStorage != null) {
+                Files.createDirectories(this.tempStorage.getRoot());
+            }
+            // create virtual object provider
+            this.virtualObjectProvider =
+                new MCROCFLVirtualObjectProvider(getRepository(), transactionalStorage, tempStorage);
         } catch (Exception exception) {
             throw new IOException("Unable to create MCROCFLFileSystem.", exception);
         }
@@ -108,12 +122,16 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
 
     /**
      * Clears the cache of the local storage and the virtual object provider.
-     * <p>Be careful to call this. This is usually not required except for unit testing.</p>
+     * <p>
+     * Be careful to call this. This is usually not required except for unit testing.
      *
      * @throws IOException if an I/O error occurs during the cache clearing.
      */
     public void clearCache() throws IOException {
-        this.localStorage.clear();
+        this.transactionalStorage.clear();
+        if (this.tempStorage != null) {
+            this.tempStorage.clear();
+        }
         this.virtualObjectProvider.clear();
     }
 
@@ -186,8 +204,8 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
                     + path.getVersion() + "' but head is '" + this.getHeadVersion(path.getOwner())
                     + "'.");
         }
-        MCROCFLVirtualObject virtualObject
-            = read ? virtualObjectProvider().get(path) : virtualObjectProvider().getWritable(path);
+        MCROCFLVirtualObject virtualObject =
+            read ? virtualObjectProvider().get(path) : virtualObjectProvider().getWritable(path);
         return virtualObject.newByteChannel(path, options, fileAttributes);
     }
 
@@ -346,7 +364,7 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
     public void checkAccess(MCRVersionedPath path, AccessMode... accessModes) throws IOException {
         try {
             String owner = path.getOwner();
-            if(virtualObjectProvider().isDeleted(owner)) {
+            if (virtualObjectProvider().isDeleted(owner)) {
                 throw new NoSuchFileException(path.toString());
             }
             MCROCFLVirtualObject virtualObject = virtualObjectProvider().get(path);
@@ -487,12 +505,25 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
     }
 
     /**
-     * Returns the local storage.
+     * Returns the transactional storage.
      *
      * @return the {@link MCROCFLTransactionalFileStorage}.
      */
-    public MCROCFLTransactionalFileStorage localStorage() {
-        return this.localStorage;
+    public MCROCFLTransactionalFileStorage transactionalStorage() {
+        return this.transactionalStorage;
+    }
+
+    /**
+     * Returns the temporary storage.
+     *
+     * @return the {@link MCROCFLTransactionalFileStorage}.
+     */
+    public MCROCFLRollingCacheStorage tempStorage() {
+        return this.tempStorage;
+    }
+
+    public MCROCFLFileStorage getFileStorage() {
+        return null;
     }
 
     /**

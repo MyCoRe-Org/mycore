@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See https://www.mycore.de/ for details.
+ * See http://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,23 +16,19 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.ocfl.niofs;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+package org.mycore.ocfl.niofs.storage;
 
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.stream.Stream;
 
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.MCROCFLTestCaseHelper;
+import org.mycore.ocfl.niofs.MCROCFLFileSystemTransaction;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 import org.mycore.ocfl.test.MCROCFLSetupExtension;
 import org.mycore.ocfl.test.MCRPermutationExtension;
@@ -54,12 +50,11 @@ import org.mycore.test.MyCoReTest;
         @MCRTestProperty(key = "MCR.Access.Class", string = "org.mycore.access.MCRAccessBaseImpl"),
         @MCRTestProperty(key = "MCR.Access.Strategy.Class", string = "org.mycore.ocfl.test.AlwaysTrueStrategy")
     })
-public class MCROCFLDerivateTest {
+public class MCROCFLComplexRemoteFileStorageTest {
 
     protected MCROCFLRepository repository;
 
-    @PermutedParam
-    private boolean remote;
+    private final boolean remote = true;
 
     @PermutedParam
     private boolean purge;
@@ -68,11 +63,17 @@ public class MCROCFLDerivateTest {
     public void create() throws Exception {
         MCRDerivate derivate =
             MCROCFLTestCaseHelper.loadObjectAndDerivate("junit_object_00000001", "junit_derivate_00000001");
-        assertTrue(MCRMetadataManager.exists(derivate.getOwnerID()), "object should exist");
-        assertTrue(MCRMetadataManager.exists(derivate.getId()), "derivate should exist");
-        try (Stream<Path> list = Files.list(MCRVersionedPath.head(derivate.getId().toString(), "/"))) {
-            assertEquals(3, list.count(), "there should be 3 directory entries");
-        }
+        MCRVersionedPath testFile = MCRVersionedPath.head(derivate.getId().toString(), "test.txt");
+
+        // write to OCFL
+        MCRTransactionManager.requireTransactions(MCROCFLFileSystemTransaction.class);
+        Files.write(testFile, new byte[] { 1, 2, 3, 4 });
+        MCRTransactionManager.commitTransactions(MCROCFLFileSystemTransaction.class);
+
+        // read from OCFL -> stores into Rolling Cache
+        Files.readAllBytes(testFile);
+
+        // TODO use Digest in Rolling Cache to avoid duplicate entries of the same file
     }
 
 }

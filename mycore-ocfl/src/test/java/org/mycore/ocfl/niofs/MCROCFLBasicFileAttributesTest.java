@@ -2,6 +2,7 @@ package org.mycore.ocfl.niofs;
 
 import static org.mycore.ocfl.MCROCFLTestCaseHelper.DERIVATE_1;
 import static org.mycore.ocfl.MCROCFLTestCaseHelper.DERIVATE_2;
+import static org.mycore.ocfl.MCROCFLTestCaseHelper.WHITE_PNG;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -55,8 +56,7 @@ public class MCROCFLBasicFileAttributesTest {
 
     @TestTemplate
     public void testFileAttributes() throws IOException {
-        Path whitePng = MCRPath.getPath(DERIVATE_1, "white.png");
-        MCRFileAttributes<?> sourceAttributes = Files.readAttributes(whitePng, MCRFileAttributes.class);
+        MCRFileAttributes<?> sourceAttributes = Files.readAttributes(WHITE_PNG, MCRFileAttributes.class);
         Assertions.assertFalse(sourceAttributes.isDirectory(), "'white.png' should not be a directory");
         Assertions.assertTrue(sourceAttributes.isRegularFile(), "'white.png' should not be a regular file");
         Assertions.assertNotNull(sourceAttributes.digest(), "'white.png' should have a digest");
@@ -79,15 +79,14 @@ public class MCROCFLBasicFileAttributesTest {
 
     @TestTemplate
     public void moveAndCheckAttributes() throws IOException {
-        Path source = MCRPath.getPath(DERIVATE_1, "white.png");
         Path target = MCRPath.getPath(DERIVATE_2, "moved.png");
         MCRTransactionManager.beginTransactions();
-        Files.move(source, target);
+        Files.move(WHITE_PNG, target);
         BasicFileAttributes targetFileAttributes = Files.readAttributes(target, BasicFileAttributes.class);
         Assertions.assertNotNull(targetFileAttributes, "'moved.png' should have basic file attributes");
         Assertions.assertTrue(targetFileAttributes.isRegularFile(), "'moved.png' should be a regular file");
         Assertions.assertThrows(NoSuchFileException.class,
-            () -> Files.readAttributes(source, BasicFileAttributes.class));
+            () -> Files.readAttributes(WHITE_PNG, BasicFileAttributes.class));
         MCRTransactionManager.commitTransactions();
     }
 
