@@ -89,8 +89,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <neo4j.version>5.28.5</neo4j.version>
     <oaipmh.version>3.0</oaipmh.version>
     <ocfl-java.version>2.2.2</ocfl-java.version>
-    <!-- same as ocfl aws sdk version -->
-    <aws-sdk.version>2.26.21</aws-sdk.version>
     <pmd.failOnViolation>true</pmd.failOnViolation>
     <pmd.version>7.13.0</pmd.version>
     <rdf4j.version>5.1.3</rdf4j.version>

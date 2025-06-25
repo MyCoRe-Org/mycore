@@ -106,7 +106,7 @@ public class MCROCFLBasicFileAttributeView implements BasicFileAttributeView {
         if (!virtualObject.exists(path)) {
             throw new NoSuchFileException(path.toString());
         }
-        MCROCFLFileStorage localStorage = MCROCFLFileSystemProvider.get().localStorage();
+        MCROCFLFileStorage localStorage = MCROCFLFileSystemProvider.get().transactionalStorage();
         boolean exists = localStorage.exists(path);
         if (!exists) {
             throw new IOException("Setting times directly to ocfl repository is not allowed!");

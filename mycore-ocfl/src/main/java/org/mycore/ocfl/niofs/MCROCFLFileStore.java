@@ -19,16 +19,12 @@
 package org.mycore.ocfl.niofs;
 
 import java.io.IOException;
-import java.nio.file.FileStore;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileAttributeView;
 import java.nio.file.attribute.FileStoreAttributeView;
 
-import org.mycore.common.MCRException;
 import org.mycore.datamodel.niofs.MCRAbstractFileStore;
 import org.mycore.datamodel.niofs.MCRPath;
-import org.mycore.datamodel.niofs.MCRVersionedPath;
 
 /**
  * The base FileStore implementation for the OCFL file system.
@@ -72,6 +68,8 @@ public class MCROCFLFileStore extends MCRAbstractFileStore {
 
     /**
      * {@inheritDoc}
+     * <p>
+     * An OCFL repository is never read-only.
      */
     @Override
     public boolean isReadOnly() {
@@ -80,6 +78,8 @@ public class MCROCFLFileStore extends MCRAbstractFileStore {
 
     /**
      * {@inheritDoc}
+     * <p>
+     * This method is not supported in an OCFL repository.
      */
     @Override
     public long getUsableSpace() throws IOException {
@@ -88,6 +88,8 @@ public class MCROCFLFileStore extends MCRAbstractFileStore {
 
     /**
      * {@inheritDoc}
+     * <p>
+     * This method is not supported in an OCFL repository.
      */
     @Override
     public long getUnallocatedSpace() throws IOException {
@@ -96,6 +98,8 @@ public class MCROCFLFileStore extends MCRAbstractFileStore {
 
     /**
      * {@inheritDoc}
+     * <p>
+     * This method is not supported in an OCFL repository.
      */
     @Override
     public long getTotalSpace() throws IOException {
@@ -104,72 +108,62 @@ public class MCROCFLFileStore extends MCRAbstractFileStore {
 
     /**
      * {@inheritDoc}
+     * <p>
+     * This method is not supported in an OCFL repository.
      */
     @Override
     public boolean supportsFileAttributeView(Class<? extends FileAttributeView> type) {
-        try {
-            return localStorageFileStore().supportsFileAttributeView(type);
-        } catch (IOException ioException) {
-            return false;
-        }
+        throw new UnsupportedOperationException();
     }
 
     /**
      * {@inheritDoc}
+     * <p>
+     * This method is not supported in an OCFL repository.
      */
     @Override
     public boolean supportsFileAttributeView(String name) {
-        try {
-            return localStorageFileStore().supportsFileAttributeView(name);
-        } catch (IOException ioException) {
-            return false;
-        }
+        throw new UnsupportedOperationException();
     }
 
     /**
      * {@inheritDoc}
+     * <p>
+     * This method is not supported in an OCFL repository.
      */
     @Override
     public <V extends FileStoreAttributeView> V getFileStoreAttributeView(Class<V> type) {
-        try {
-            return localStorageFileStore().getFileStoreAttributeView(type);
-        } catch (IOException ioException) {
-            throw new MCRException("Unable to get fileStoreAttributeView for class type '" + type + "'", ioException);
-        }
+        throw new UnsupportedOperationException();
     }
 
     /**
      * {@inheritDoc}
+     * <p>
+     * This method is not supported in an OCFL repository.
      */
     @Override
-    public Object getAttribute(String attribute) throws IOException {
-        return localStorageFileStore().getAttribute(attribute);
+    public Object getAttribute(String attribute) {
+        throw new UnsupportedOperationException();
     }
 
     /**
      * {@inheritDoc}
+     * <p>
+     * This method is not supported in an OCFL repository.
      */
     @Override
     public Path getBaseDirectory() {
-        return this.fileSystemProvider.localStorage().getRoot();
+        throw new UnsupportedOperationException();
     }
 
     /**
      * {@inheritDoc}
+     * <p>
+     * This method is not supported in an OCFL repository.
      */
     @Override
     public Path getPhysicalPath(MCRPath path) {
-        return this.fileSystemProvider.localStorage().toPhysicalPath(MCRVersionedPath.ofPath(path));
-    }
-
-    /**
-     * Returns the file store for the local storage root.
-     *
-     * @return the file store for the local storage root.
-     * @throws IOException if an I/O error occurs.
-     */
-    protected FileStore localStorageFileStore() throws IOException {
-        return Files.getFileStore(this.fileSystemProvider.localStorage().getRoot());
+        throw new UnsupportedOperationException();
     }
 
 }
