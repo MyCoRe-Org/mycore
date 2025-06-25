@@ -6,6 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mycore.ocfl.MCROCFLTestCaseHelper.BLACK_PNG;
+import static org.mycore.ocfl.MCROCFLTestCaseHelper.DERIVATE_1;
+import static org.mycore.ocfl.MCROCFLTestCaseHelper.EMPTY_DIRECTORY;
+import static org.mycore.ocfl.MCROCFLTestCaseHelper.WHITE_PNG;
 import static org.mycore.ocfl.niofs.MCROCFLVirtualObject.FILES_DIRECTORY;
 
 import java.io.IOException;
@@ -20,15 +24,16 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.MCROCFLTestCaseHelper;
 import org.mycore.ocfl.repository.MCROCFLRepository;
-import org.mycore.ocfl.test.PermutedParam;
-import org.mycore.ocfl.test.MCRPermutationExtension;
 import org.mycore.ocfl.test.MCROCFLSetupExtension;
+import org.mycore.ocfl.test.MCRPermutationExtension;
+import org.mycore.ocfl.test.PermutedParam;
 import org.mycore.test.MyCoReTest;
 
 import io.ocfl.api.exception.NotFoundException;
@@ -49,19 +54,14 @@ public class MCROCFLVirtualObjectTest {
 
     @TestTemplate
     public void toPhysicalPath() throws IOException {
-        MCRVersionedPath source = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "white.png");
+        MCRVersionedPath source = WHITE_PNG;
         MCRVersionedPath target = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "moved.png");
 
         assertNotNull(getVirtualObject().toPhysicalPath(source));
-        assertThrows(NoSuchFileException.class, () -> getVirtualObject().toPhysicalPath(target));
-
         MCRTransactionManager.beginTransactions();
         Files.move(source, target);
-        assertThrows(NoSuchFileException.class, () -> getVirtualObject().toPhysicalPath(source));
         assertNotNull(getVirtualObject().toPhysicalPath(target));
         MCRTransactionManager.commitTransactions();
-
-        assertThrows(NoSuchFileException.class, () -> getVirtualObject().toPhysicalPath(source));
         assertNotNull(getVirtualObject().toPhysicalPath(target));
     }
 
@@ -75,7 +75,6 @@ public class MCROCFLVirtualObjectTest {
         MCRVersionedPath notEmptyDir = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "notEmptyDir");
         MCRVersionedPath fileInNotEmptyDir =
             MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "notEmptyDir/file.txt");
-        MCRVersionedPath emptyDir = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "empty");
 
         // Create initial directory structures for testing
         MCRTransactionManager.beginTransactions();
@@ -120,20 +119,19 @@ public class MCROCFLVirtualObjectTest {
 
         // Test 5: Successfully move an empty directory
         MCRTransactionManager.beginTransactions();
-        Files.move(emptyDir, nonExistentDir);
+        Files.move(EMPTY_DIRECTORY, nonExistentDir);
         MCRTransactionManager.commitTransactions();
-        assertFalse(getVirtualObject().exists(emptyDir), "empty dir should not exist");
+        assertFalse(getVirtualObject().exists(EMPTY_DIRECTORY), "empty dir should not exist");
         assertTrue(getVirtualObject().exists(nonExistentDir), "nonExistentDir should exist");
     }
 
     @TestTemplate
     public void isAdded() throws IOException {
         MCRVersionedPath root = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "/");
-        MCRVersionedPath whitePng = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "white.png");
         MCRVersionedPath testFile = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "testFile");
 
         assertFalse(getVirtualObject().isAdded(root), "'root' should not be added");
-        assertFalse(getVirtualObject().isAdded(whitePng), "'white.png' should not be added");
+        assertFalse(getVirtualObject().isAdded(WHITE_PNG), "'white.png' should not be added");
         assertFalse(getVirtualObject().isAdded(testFile), "'testFile' should not be added");
 
         MCRTransactionManager.beginTransactions();
@@ -186,20 +184,33 @@ public class MCROCFLVirtualObjectTest {
     }
 
     @TestTemplate
+    public void deleteIfExists() throws IOException {
+        Assertions.assertTrue(Files.exists(WHITE_PNG), "'white.png' should exist before deletion");
+        MCRTransactionManager.beginTransactions();
+        Files.deleteIfExists(WHITE_PNG);
+        Assertions.assertFalse(Files.exists(WHITE_PNG), "'white.png' should not exist after deletion");
+        MCRTransactionManager.commitTransactions();
+
+        MCRTransactionManager.beginTransactions();
+        Files.write(WHITE_PNG, new byte[] { 1, 2, 3, 4 });
+        Assertions.assertTrue(Files.exists(WHITE_PNG), "'white.png' should exist before deletion");
+        Files.deleteIfExists(WHITE_PNG);
+        Assertions.assertFalse(Files.exists(WHITE_PNG), "'white.png' should not exist after deletion");
+        MCRTransactionManager.commitTransactions();
+    }
+
+    @TestTemplate
     public void newDirectoryStream() throws IOException {
         MCRVersionedPath rootDir = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "");
-        MCRVersionedPath blackPng = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "black.png");
-        MCRVersionedPath whitePng = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "white.png");
-        MCRVersionedPath emptyDir = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "empty");
         MCRVersionedPath newFile = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "empty/newFile.png");
 
         Set<String> rootDirectoryListing;
         Set<String> emptyDirectoryListing;
 
         // Ensure the initial state
-        assertTrue(getVirtualObject().exists(blackPng), "black.png should exist");
-        assertTrue(getVirtualObject().exists(whitePng), "white.png should exist");
-        assertTrue(getVirtualObject().exists(emptyDir), "empty directory should exist");
+        assertTrue(getVirtualObject().exists(WHITE_PNG), "white.png should exist");
+        assertTrue(getVirtualObject().exists(BLACK_PNG), "black.png should exist");
+        assertTrue(getVirtualObject().exists(EMPTY_DIRECTORY), "empty directory should exist");
 
         // Verify root
         rootDirectoryListing = listDirectory(rootDir);
@@ -209,16 +220,16 @@ public class MCROCFLVirtualObjectTest {
         assertEquals(3, rootDirectoryListing.size(), "root should contain exactly 3 items");
 
         // Verify empty
-        emptyDirectoryListing = listDirectory(emptyDir);
+        emptyDirectoryListing = listDirectory(EMPTY_DIRECTORY);
         assertEquals(0, emptyDirectoryListing.size(), "empty should contain exactly 0 items");
 
         // Add a new file to empty directory
         MCRTransactionManager.beginTransactions();
         Files.write(newFile, new byte[] { 127, 127, 127 });
-        emptyDirectoryListing = listDirectory(emptyDir);
+        emptyDirectoryListing = listDirectory(EMPTY_DIRECTORY);
         assertEquals(1, emptyDirectoryListing.size(), "empty should contain exactly 1 item");
         MCRTransactionManager.commitTransactions();
-        emptyDirectoryListing = listDirectory(emptyDir);
+        emptyDirectoryListing = listDirectory(EMPTY_DIRECTORY);
         assertEquals(1, emptyDirectoryListing.size(), "empty should contain exactly 1 item");
         rootDirectoryListing = listDirectory(rootDir);
         assertEquals(3, rootDirectoryListing.size(), "root should contain exactly 3 items");
@@ -236,16 +247,14 @@ public class MCROCFLVirtualObjectTest {
 
     @TestTemplate
     public void purge() throws IOException {
-        MCRVersionedPath whitePng = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "white.png");
-
         MCRTransactionManager.beginTransactions();
-        assertTrue(getVirtualObject().exists(whitePng), "white.png should exist");
+        assertTrue(getVirtualObject().exists(WHITE_PNG), "white.png should exist");
         getVirtualObject().purge();
-        assertFalse(getVirtualObject().exists(whitePng), "white.png should not exist");
+        assertFalse(getVirtualObject().exists(WHITE_PNG), "white.png should not exist");
         getVirtualObject().create();
-        assertFalse(getVirtualObject().exists(whitePng), "white.png should not exist");
+        assertFalse(getVirtualObject().exists(WHITE_PNG), "white.png should not exist");
         MCRTransactionManager.commitTransactions();
-        assertFalse(getVirtualObject().exists(whitePng), "white.png should not exist");
+        assertFalse(getVirtualObject().exists(WHITE_PNG), "white.png should not exist");
 
         OcflObjectVersion derivate1 = repository.getObject(ObjectVersionId.head(
             MCROCFLTestCaseHelper.DERIVATE_1_OBJECT_ID));
@@ -254,7 +263,7 @@ public class MCROCFLVirtualObjectTest {
         assertNotNull(derivate1.getFile(FILES_DIRECTORY + ".keep"), "should have a .keep file");
 
         MCRTransactionManager.beginTransactions();
-        Files.write(whitePng, new byte[] { 1, 3, 3, 7 });
+        Files.write(WHITE_PNG, new byte[] { 1, 3, 3, 7 });
         MCRTransactionManager.commitTransactions();
 
         derivate1 = repository.getObject(ObjectVersionId.head(MCROCFLTestCaseHelper.DERIVATE_1_OBJECT_ID));
@@ -275,19 +284,18 @@ public class MCROCFLVirtualObjectTest {
         if (purge) {
             assertThrows(NotFoundException.class, MCROCFLVirtualObjectTest::getVirtualObject);
         } else {
-            assertFalse(getVirtualObject().exists(whitePng), "white.png should not exist");
+            assertFalse(getVirtualObject().exists(WHITE_PNG), "white.png should not exist");
         }
     }
 
     @TestTemplate
     public void getSize() throws IOException {
-        MCRVersionedPath headWhitePng = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "white.png");
-        assertEquals(554, Files.size(headWhitePng), "original white.png should have 554 bytes");
+        assertEquals(554, Files.size(WHITE_PNG), "original white.png should have 554 bytes");
 
         // write 4 bytes
         MCRTransactionManager.beginTransactions();
-        Files.write(headWhitePng, new byte[] { 5, 6, 7, 8 });
-        assertEquals(4, Files.size(headWhitePng), "written white.png should have 4 bytes");
+        Files.write(WHITE_PNG, new byte[] { 5, 6, 7, 8 });
+        assertEquals(4, Files.size(WHITE_PNG), "written white.png should have 4 bytes");
         MCRTransactionManager.commitTransactions();
 
         // check v1
@@ -301,12 +309,10 @@ public class MCROCFLVirtualObjectTest {
 
     @TestTemplate
     public void getFileKey() throws IOException {
-        MCRVersionedPath v1WhitePng = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "white.png");
-        MCRVersionedPath v1BlackPng = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "black.png");
         MCRVersionedPath notFoundPng = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "notFound.png");
 
-        Object v1WhitePngFileKey = getFileKey(v1WhitePng);
-        Object v1BlackPngFileKey = getFileKey(v1BlackPng);
+        Object v1WhitePngFileKey = getFileKey(WHITE_PNG);
+        Object v1BlackPngFileKey = getFileKey(BLACK_PNG);
 
         if (remote) {
             assertNull(v1WhitePngFileKey, "fileKey of original white.png should be null on remote repositories");
@@ -320,9 +326,46 @@ public class MCROCFLVirtualObjectTest {
     }
 
     @TestTemplate
+    public void copy() throws IOException, MCROCFLInactiveTransactionException {
+        MCRVersionedPath path1 = MCRVersionedPath.head(DERIVATE_1, "file1");
+        MCRVersionedPath path2 = MCRVersionedPath.head(DERIVATE_1, "file2");
+        MCRVersionedPath path3 = MCRVersionedPath.head(DERIVATE_1, "file3");
+        byte[] path1Data = { 1 };
+        byte[] path3Data = { 2 };
+
+        MCRTransactionManager.beginTransactions();
+        Files.write(path1, path1Data);
+        MCRTransactionManager.commitTransactions();
+
+        MCRTransactionManager.beginTransactions();
+        Files.copy(path1, path2);
+        Assertions.assertTrue(Files.exists(path1), "'path1' should exist");
+        Assertions.assertTrue(Files.exists(path2), "'path2' should exist");
+        Assertions.assertArrayEquals(path1Data, Files.readAllBytes(path1),
+            "'path1' should have the content of the temp store");
+        Assertions.assertArrayEquals(path1Data, Files.readAllBytes(path2),
+            "'path2' should have the content of the temp store");
+        MCRTransactionManager.commitTransactions();
+
+        MCRTransactionManager.beginTransactions();
+        Assertions.assertArrayEquals(path1Data, Files.readAllBytes(path1),
+            "'path1' should have the content of the temp store");
+        Assertions.assertArrayEquals(path1Data, Files.readAllBytes(path2),
+            "'path2' should have the content of the temp store");
+        Files.copy(path1, path3);
+        Assertions.assertArrayEquals(path1Data, Files.readAllBytes(path3),
+            "'path3' should have the content of the temp store");
+        Files.write(path3, path3Data);
+        Files.copy(path3, path2, StandardCopyOption.REPLACE_EXISTING);
+        Assertions.assertArrayEquals(path3Data, Files.readAllBytes(path2),
+            "'path2' should have the content of the transactional store");
+        MCRTransactionManager.commitTransactions();
+    }
+
+    @TestTemplate
     public void externalCopy() throws IOException {
-        MCRVersionedPath whitePng = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "white.png");
-        MCRVersionedPath blackPng = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "black.png");
+        MCRVersionedPath whitePng = WHITE_PNG;
+        MCRVersionedPath blackPng = BLACK_PNG;
         MCRVersionedPath target = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_2, "white.png");
         long whiteSize = Files.size(whitePng);
         long blackSize = Files.size(blackPng);

@@ -20,6 +20,7 @@ package org.mycore.ocfl.niofs;
 
 import static org.mycore.ocfl.util.MCROCFLVersionHelper.convertMessageToType;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,7 +30,10 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
+import org.mycore.ocfl.niofs.storage.MCROCFLRollingCacheStorage;
 import org.mycore.ocfl.niofs.storage.MCROCFLTransactionalFileStorage;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 import org.mycore.ocfl.util.MCROCFLMetadataVersion;
@@ -52,6 +56,8 @@ import io.ocfl.api.model.VersionDetails;
  */
 public class MCROCFLVirtualObjectProvider {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
     private static final int READ_MAP_MAX_SIZE = 1000;
 
     private final Map<ObjectVersionId, MCROCFLVirtualObject> readMap;
@@ -62,18 +68,21 @@ public class MCROCFLVirtualObjectProvider {
 
     private final MCROCFLRepository repository;
 
-    private final MCROCFLTransactionalFileStorage localStorage;
+    private final MCROCFLTransactionalFileStorage transactionalStorage;
+
+    private final MCROCFLRollingCacheStorage rollingStorage;
 
     /**
      * Constructs a new {@code MCROCFLVirtualObjectProvider}.
      *
      * @param repository the OCFL repository.
-     * @param localStorage the local temporary file storage.
+     * @param transactionalStorage the local temporary file storage.
      */
     public MCROCFLVirtualObjectProvider(MCROCFLRepository repository,
-        MCROCFLTransactionalFileStorage localStorage) {
+        MCROCFLTransactionalFileStorage transactionalStorage, MCROCFLRollingCacheStorage rollingStorage) {
         this.repository = repository;
-        this.localStorage = localStorage;
+        this.transactionalStorage = transactionalStorage;
+        this.rollingStorage = rollingStorage;
         this.readMap = new ConcurrentHashMap<>();
         this.readQueue = new ConcurrentLinkedDeque<>();
         this.writeMap = new ConcurrentHashMap<>();
@@ -166,8 +175,9 @@ public class MCROCFLVirtualObjectProvider {
                     MCROCFLVirtualObject readableVirtualObject = getOrCreateReadable(id);
                     return readableVirtualObject.deepClone(false);
                 } catch (NotFoundException ignore) {
-                    return repository.isRemote() ? new MCROCFLRemoteVirtualObject(repository, id, localStorage, false)
-                        : new MCROCFLLocalVirtualObject(repository, id, localStorage, false);
+                    return repository.isRemote() ? new MCROCFLRemoteVirtualObject(repository, id,
+                        transactionalStorage, rollingStorage, false)
+                        : new MCROCFLLocalVirtualObject(repository, id, transactionalStorage, false);
                 }
             });
     }
@@ -217,7 +227,7 @@ public class MCROCFLVirtualObjectProvider {
             return object.getFiles().stream()
                 .map(OcflObjectVersionFile::getPath)
                 .anyMatch(path -> path.startsWith(MCROCFLVirtualObject.FILES_DIRECTORY));
-        } catch(NotFoundException ignore) {
+        } catch (NotFoundException ignore) {
             return false;
         }
     }
@@ -264,6 +274,11 @@ public class MCROCFLVirtualObjectProvider {
      */
     public void remove(Long transactionId) {
         this.writeMap.remove(transactionId);
+        try {
+            this.transactionalStorage.purge(transactionId);
+        } catch (IOException ioExc) {
+            LOGGER.error(() -> "Unable to clean local storage for transaction '" + transactionId + "'.", ioExc);
+        }
     }
 
     /**
@@ -300,8 +315,9 @@ public class MCROCFLVirtualObjectProvider {
         return this.readMap.computeIfAbsent(id, (key) -> {
             updateReadCache(id);
             OcflObjectVersion object = repository.getObject(id);
-            return repository.isRemote() ? new MCROCFLRemoteVirtualObject(repository, object, localStorage, true)
-                : new MCROCFLLocalVirtualObject(repository, object, localStorage, true);
+            return repository.isRemote()
+                ? new MCROCFLRemoteVirtualObject(repository, object, transactionalStorage, rollingStorage, true)
+                : new MCROCFLLocalVirtualObject(repository, object, transactionalStorage, true);
         });
     }
 

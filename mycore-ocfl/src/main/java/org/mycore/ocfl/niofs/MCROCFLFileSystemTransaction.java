@@ -30,7 +30,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRPersistenceTransaction;
 import org.mycore.common.MCRTransactionManager;
-import org.mycore.ocfl.niofs.storage.MCROCFLTransactionalFileStorage;
 
 /**
  * Manages transactions for the OCFL (Oxford Common File Layout) file system within MyCoRe,
@@ -132,13 +131,7 @@ public class MCROCFLFileSystemTransaction implements MCRPersistenceTransaction {
         Long transactionId = getTransactionId();
 
         MCROCFLVirtualObjectProvider virtualObjectProvider = MCROCFLFileSystemProvider.get().virtualObjectProvider();
-        MCROCFLTransactionalFileStorage localStorage = MCROCFLFileSystemProvider.get().localStorage();
         virtualObjectProvider.remove(transactionId);
-        try {
-            localStorage.purge(transactionId);
-        } catch (IOException ioExc) {
-            LOGGER.error("Unable to clean local storage for transaction '{}'.", transactionId, ioExc);
-        }
         TRANSACTION_ID.remove();
     }
 
