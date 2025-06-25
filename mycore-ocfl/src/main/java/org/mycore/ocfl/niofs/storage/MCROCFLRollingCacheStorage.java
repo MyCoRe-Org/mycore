@@ -41,6 +41,10 @@ import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.config.annotation.MCRInstance;
+import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.digest.MCRDigest;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.niofs.channels.MCROCFLClosableCallbackChannel;
 
@@ -52,44 +56,68 @@ public class MCROCFLRollingCacheStorage implements MCROCFLFileStorage {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final Path root;
+    private Path root;
 
-    private final Map<Path, Long> cache;
+    private Map<Path, Long> cache;
 
-    private final Queue<Path> queue;
+    private Queue<Path> queue;
 
-    private final MCROCFLEvictionStrategy evictionStrategy;
+    private AtomicLong totalAllocation;
 
-    private final AtomicLong totalAllocation;
+    @MCRProperty(name = "Path")
+    public String rootPathProperty;
+
+    @MCRInstance(name = "EvictionStrategy", valueClass = MCROCFLEvictionStrategy.class)
+    public MCROCFLEvictionStrategy evictionStrategy;
 
     /**
-     * Constructs a new {@code MCROCFLRollingCacheStorage} instance.
+     * Default constructor for MCRConfiguration2 instantiation.
+     */
+    @SuppressWarnings("unused")
+    public MCROCFLRollingCacheStorage() {
+    }
+
+    /**
+     * Constructs a new {@code MCROCFLRollingCacheStorage} with the specified root path and eviction strategy.
      *
-     * @param root The root directory for the cache storage.
-     * @param evictionStrategy The strategy to use for evicting items from the cache.
+     * @param root the root directory for the storage.
+     * @param evictionStrategy the strategy to use for evicting items from the rolling cache.
      */
     public MCROCFLRollingCacheStorage(Path root, MCROCFLEvictionStrategy evictionStrategy) {
         this.root = root;
         this.evictionStrategy = evictionStrategy;
+        init();
+    }
+
+    /**
+     * Initializes the remote storage, setting up transactional and rolling storage paths.
+     */
+    @MCRPostConstruction
+    public void postConstruct() {
+        this.root = Path.of(rootPathProperty);
+        init();
+    }
+
+    private void init() {
         this.cache = new ConcurrentHashMap<>();
         this.queue = new ConcurrentLinkedDeque<>();
         this.totalAllocation = new AtomicLong(0);
         try {
-            init();
+            initCache();
         } catch (IOException initException) {
             try {
                 clear();
-                LOGGER.error(() -> "Unable to initialize the rolling cache storage. Cleared it.", initException);
+                LOGGER.error(() -> "Unable to initialize the cache storage. Cleared it.", initException);
             } catch (IOException clearException) {
                 clearException.initCause(initException);
                 LOGGER.error(
-                    () -> "Unable to initialize the rolling cache storage. Tried to clear but this also didn't work.",
+                    () -> "Unable to initialize the cache storage. Tried to clear but this also didn't work.",
                     clearException);
             }
         }
     }
 
-    private void init() throws IOException {
+    private void initCache() throws IOException {
         final List<Path> toRemoveList = new ArrayList<>();
         if (!Files.exists(root)) {
             return;
@@ -267,6 +295,9 @@ public class MCROCFLRollingCacheStorage implements MCROCFLFileStorage {
             Path headPath = this.queue.poll();
             cacheRemove(headPath);
         }
+    }
+
+    private record FileInfo(Path physicalPath, Long size, MCRDigest digest) {
     }
 
 }

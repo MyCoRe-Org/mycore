@@ -28,12 +28,16 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
+import org.mycore.access.MCRAccessException;
+import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
+import org.mycore.ocfl.niofs.MCROCFLFileSystemTransaction;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 
@@ -49,6 +53,14 @@ public abstract class MCROCFLTestCaseHelper {
     public static final String DERIVATE_1 = "junit_derivate_00000001";
 
     public static final String DERIVATE_1_OBJECT_ID = MCROCFLObjectIDPrefixHelper.MCRDERIVATE + DERIVATE_1;
+
+    public static final MCRVersionedPath WHITE_PNG = MCRVersionedPath.head(DERIVATE_1, "white.png");
+
+    public static final MCRVersionedPath BLACK_PNG = MCRVersionedPath.head(DERIVATE_1, "black.png");
+
+    public static final MCRVersionedPath EMPTY_DIRECTORY = MCRVersionedPath.head(DERIVATE_1, "empty");
+
+    public static final MCRVersionedPath KEEP_FILE = MCRVersionedPath.head(DERIVATE_1, "empty/.keep");
 
     /**
      * This ocfl object is NOT created on test startup.
@@ -95,6 +107,19 @@ public abstract class MCROCFLTestCaseHelper {
         MCRMetaLinkID mcrMetaLinkID = new MCRMetaLinkID("linkmeta", 0);
         mcrMetaLinkID.setReference(objectId, null, null);
         derivate.getDerivate().setLinkMeta(mcrMetaLinkID);
+        return derivate;
+    }
+
+    public static MCRDerivate loadObjectAndDerivate(String objectId, String derivateId)
+        throws MCRAccessException, URISyntaxException, IOException {
+        MCRObject object = MCROCFLTestCaseHelper.createObject(objectId);
+        MCRDerivate derivate =
+            MCROCFLTestCaseHelper.createDerivate(object.getId().toString(), derivateId);
+        MCRMetadataManager.create(object);
+        MCRTransactionManager.requireTransactions(MCROCFLFileSystemTransaction.class);
+        MCRMetadataManager.create(derivate);
+        MCROCFLTestCaseHelper.loadDerivate(derivate.getId().toString());
+        MCRTransactionManager.commitTransactions(MCROCFLFileSystemTransaction.class);
         return derivate;
     }
 

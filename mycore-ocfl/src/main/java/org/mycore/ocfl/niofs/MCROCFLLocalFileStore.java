@@ -49,9 +49,7 @@ public class MCROCFLLocalFileStore extends MCROCFLFileStore {
      */
     @Override
     public long getTotalSpace() throws IOException {
-        return Math.min(
-            repositoryFileStore().getTotalSpace(),
-            localStorageFileStore().getTotalSpace());
+        return repositoryFileStore().getTotalSpace();
     }
 
     /**
@@ -59,9 +57,7 @@ public class MCROCFLLocalFileStore extends MCROCFLFileStore {
      */
     @Override
     public long getUsableSpace() throws IOException {
-        return Math.min(
-            repositoryFileStore().getUsableSpace(),
-            localStorageFileStore().getUsableSpace());
+        return repositoryFileStore().getUsableSpace();
     }
 
     /**

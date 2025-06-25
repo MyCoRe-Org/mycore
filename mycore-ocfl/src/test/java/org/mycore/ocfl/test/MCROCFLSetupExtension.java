@@ -40,7 +40,7 @@ import org.mycore.ocfl.niofs.MCROCFLFileSystemProvider;
 import org.mycore.ocfl.niofs.MCROCFLFileSystemTransaction;
 import org.mycore.ocfl.niofs.storage.MCROCFLLocalFileStorage;
 import org.mycore.ocfl.niofs.storage.MCROCFLNeverEvictStrategy;
-import org.mycore.ocfl.niofs.storage.MCROCFLRemoteFileStorage;
+import org.mycore.ocfl.niofs.storage.MCROCFLRollingCacheStorage;
 import org.mycore.ocfl.repository.MCROCFLHashRepositoryProvider;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 import org.mycore.ocfl.repository.MCROCFLRepositoryBuilder;
@@ -89,14 +89,15 @@ public class MCROCFLSetupExtension implements BeforeEachCallback, AfterEachCallb
                 MCROCFLObjectIDPrefixHelper.MCRDERIVATE.replace(":", "");
         MCRConfiguration2.set(purgePropertyName, Boolean.toString(purge != null ? purge : false));
 
-        // Configure Local Storage
+        // Set transactional storage
+        MCRConfiguration2.set("MCR.Content.TransactionalStorage", MCROCFLLocalFileStorage.class.getName());
+
+        // Set remote configuration
         if (remote != null && remote) {
-            MCRConfiguration2.set("MCR.Content.TempStorage", MCROCFLRemoteFileStorage.class.getName());
+            MCRConfiguration2.set("MCR.Content.TempStorage", MCROCFLRollingCacheStorage.class.getName());
             MCRConfiguration2.set("MCR.Content.TempStorage.EvictionStrategy",
                 MCROCFLNeverEvictStrategy.class.getName());
-            MCRConfiguration2.set("MCR.Content.TempStorage.Path", "%MCR.datadir%/ocfl-temp-storage");
-        } else {
-            MCRConfiguration2.set("MCR.Content.TempStorage", MCROCFLLocalFileStorage.class.getName());
+            MCRConfiguration2.set("MCR.Content.TempStorage.Path", "%MCR.datadir%/ocfl/temp-storage");
         }
 
         // Execute common initialization
