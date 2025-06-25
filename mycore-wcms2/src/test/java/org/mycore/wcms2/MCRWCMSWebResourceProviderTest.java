@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mycore.resource.MCRFileSystemResourceHelper.getConfigDirTestBasePath;
 import static org.mycore.resource.MCRFileSystemResourceHelper.touchFiles;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -40,6 +39,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.hint.MCRHintsBuilder;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRResourceUtils;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 import org.mycore.resource.provider.MCRResourceProvider;
 import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
@@ -56,7 +56,7 @@ public class MCRWCMSWebResourceProviderTest {
 
     private static final MCRResourcePath WEB_BAR_PATH = MCRResourcePath.ofWebPath("bar").orElseThrow();
 
-    private static File fooWcmsDataDir;
+    private static Path fooWcmsDataDir;
 
     @BeforeAll
     public static void prepare() throws IOException {
@@ -65,7 +65,7 @@ public class MCRWCMSWebResourceProviderTest {
 
         Path fooPath = Paths.get("foo");
 
-        fooWcmsDataDir = touchFiles(basePath.resolve("foo"), fooPath).toFile();
+        fooWcmsDataDir = touchFiles(basePath.resolve("foo"), fooPath);
 
     }
 
@@ -151,7 +151,7 @@ public class MCRWCMSWebResourceProviderTest {
     }
 
     @Test
-    public void provideAllWebPresent() throws MalformedURLException {
+    public void provideAllWebPresent() {
 
         MCRResourceProvider provider = wcmsWebProvider(fooWcmsDataDir);
 
@@ -169,7 +169,7 @@ public class MCRWCMSWebResourceProviderTest {
     })
     public void configuration() {
 
-        MCRConfiguration2.set("MCR.WCMS2.DataDir", fooWcmsDataDir.getAbsolutePath());
+        MCRConfiguration2.set("MCR.WCMS2.DataDir", fooWcmsDataDir.toAbsolutePath().toString());
         MCRResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(
             MCRWCMSWebResourceProvider.class, "Test.Class");
 
@@ -181,20 +181,20 @@ public class MCRWCMSWebResourceProviderTest {
 
     }
 
-    private static MCRResourceProvider wcmsWebProvider(File wcmsDataDir) {
-        MCRConfiguration2.set("MCR.WCMS2.DataDir", wcmsDataDir.getAbsolutePath());
+    private static MCRResourceProvider wcmsWebProvider(Path wcmsDataDir) {
+        MCRConfiguration2.set("MCR.WCMS2.DataDir", wcmsDataDir.toAbsolutePath().toString());
         return new MCRWCMSWebResourceProvider("wcms test");
     }
 
-    private URL toUrl(File webappDir, String fileName) throws MalformedURLException {
-        return new File(webappDir, fileName).toURI().toURL();
+    private URL toUrl(Path webappDir, String fileName) {
+        return MCRResourceUtils.toFileUrl(webappDir.resolve(fileName));
     }
 
     private static List<URL> toUrlList(List<ProvidedUrl> providedUrls) {
         return providedUrls.stream().map(ProvidedUrl::url).toList();
     }
 
-    private static MCRHints toHints(File webappDir) {
+    private static MCRHints toHints(Path webappDir) {
         return new MCRHintsBuilder().add(MCRResourceHintKeys.WEBAPP_DIR, webappDir).build();
     }
 

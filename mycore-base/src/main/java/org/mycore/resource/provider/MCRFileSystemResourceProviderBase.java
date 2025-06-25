@@ -18,20 +18,21 @@
 
 package org.mycore.resource.provider;
 
-import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.Level;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRResourceUtils;
 import org.mycore.resource.common.MCRResourceTracer;
 
 /**
@@ -109,43 +110,39 @@ public abstract class MCRFileSystemResourceProviderBase extends MCRResourceProvi
 
     private Stream<URL> getResourceUrls(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
         return getBaseDirs(hints)
+            .map(Path::toAbsolutePath)
             .filter(baseDir -> isUsableBaseDir(baseDir, tracer))
-            .map(baseDir -> toSafeFile(baseDir, path))
+            .map(baseDir -> resolveSafeFile(baseDir, path))
             .flatMap(Optional::stream)
             .filter(file -> isUsableFile(file, tracer))
-            .map(this::toUrl);
+            .map(MCRResourceUtils::toFileUrl);
     }
 
-    protected abstract Stream<File> getBaseDirs(MCRHints hints);
+    protected abstract Stream<Path> getBaseDirs(MCRHints hints);
 
-    private boolean isUsableBaseDir(File baseDir, MCRResourceTracer tracer) {
-        String dirPath = baseDir.getAbsolutePath();
-        tracer.trace(() -> "Looking for directory " + dirPath);
-        if (!baseDir.exists()) {
-            tracer.trace(() -> dirPath + " doesn't exist");
+    private boolean isUsableBaseDir(Path baseDir, MCRResourceTracer tracer) {
+        tracer.trace(() -> "Looking for directory " + baseDir);
+        if (!Files.exists(baseDir, LinkOption.NOFOLLOW_LINKS)) {
+            tracer.trace(() -> baseDir + " doesn't exist");
             return false;
         }
-        if (!baseDir.isDirectory()) {
-            tracer.trace(() -> dirPath + " isn't a directory");
+        if (!Files.isDirectory(baseDir, LinkOption.NOFOLLOW_LINKS)) {
+            tracer.trace(() -> baseDir + " isn't a directory");
             return false;
         }
-        if (!baseDir.canRead()) {
-            tracer.trace(() -> dirPath + " can't be read");
+        if (!Files.isReadable(baseDir)) {
+            tracer.trace(() -> baseDir + " can't be read");
             return false;
         }
-        if (!baseDir.canExecute()) {
-            tracer.trace(() -> dirPath + " can't be opened");
+        if (!Files.isExecutable(baseDir)) {
+            tracer.trace(() -> baseDir + " can't be opened");
             return false;
         }
         return true;
     }
 
-    private Optional<File> toSafeFile(File baseDir, MCRResourcePath path) {
-        return getRelativePath(path).map(relativePath -> toSafeFile(baseDir, relativePath));
-    }
-
-    private static File toSafeFile(File baseDir, String relativePath) {
-        return MCRUtils.safeResolve(baseDir.toPath(), relativePath).toFile();
+    private Optional<Path> resolveSafeFile(Path baseDir, MCRResourcePath path) {
+        return getRelativePath(path).map(relativePath -> MCRUtils.safeResolve(baseDir, relativePath));
     }
 
     private Optional<String> getRelativePath(MCRResourcePath path) {
@@ -155,35 +152,26 @@ public abstract class MCRFileSystemResourceProviderBase extends MCRResourceProvi
         };
     }
 
-    private boolean isUsableFile(File file, MCRResourceTracer tracer) {
-        String filePath = file.getAbsolutePath();
-        tracer.trace(() -> "Looking for file " + filePath);
-        if (!file.exists()) {
-            tracer.trace(() -> filePath + " doesn't exist");
+    private boolean isUsableFile(Path file, MCRResourceTracer tracer) {
+        tracer.trace(() -> "Looking for file " + file);
+        if (!Files.exists(file, LinkOption.NOFOLLOW_LINKS)) {
+            tracer.trace(() -> file + " doesn't exist");
             return false;
         }
-        if (!file.isFile()) {
-            tracer.trace(() -> filePath + " isn't a file");
+        if (!Files.isRegularFile(file, LinkOption.NOFOLLOW_LINKS)) {
+            tracer.trace(() -> file + " isn't a file");
             return false;
         }
-        if (!file.canRead()) {
-            tracer.trace(() -> filePath + " can't be read");
+        if (!Files.isReadable(file)) {
+            tracer.trace(() -> file + " can't be read");
             return false;
         }
         return true;
     }
 
-    private URL toUrl(File file) {
-        try {
-            return file.toURI().toURL();
-        } catch (MalformedURLException e) {
-            throw new MCRException("Failed to convert file to URL: " + file.getAbsolutePath(), e);
-        }
-    }
-
     @Override
     public final Stream<PrefixStripper> prefixStrippers(MCRHints hints) {
-        return getBaseDirs(hints).map(BaseDirPrefixStripper::new);
+        return getBaseDirs(hints).map(MCRResourceUtils::toFileUrl).map(URL::toString).map(PrefixPrefixStripper::new);
     }
 
     @Override

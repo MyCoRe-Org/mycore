@@ -18,7 +18,7 @@
 
 package org.mycore.resource.hint;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.SortedSet;
 
@@ -34,11 +34,11 @@ import jakarta.servlet.ServletContext;
  */
 public final class MCRResourceHintKeys {
 
-    public static final MCRHintKey<File> CONFIG_DIR = new MCRHintKey<>(
-        File.class,
+    public static final MCRHintKey<Path> CONFIG_DIR = new MCRHintKey<>(
+        Path.class,
         MCRResourceHintKeys.class,
         "CONFIG_DIR",
-        File::getAbsolutePath);
+        path -> path.toAbsolutePath().toString());
 
     public static final MCRHintKey<ClassLoader> CLASS_LOADER = new MCRHintKey<>(
         ClassLoader.class,
@@ -63,11 +63,11 @@ public final class MCRResourceHintKeys {
         "SERVLET_CONTEXT",
         ServletContext::getServletContextName);
 
-    public static final MCRHintKey<File> WEBAPP_DIR = new MCRHintKey<>(
-        File.class,
+    public static final MCRHintKey<Path> WEBAPP_DIR = new MCRHintKey<>(
+        Path.class,
         MCRResourceHintKeys.class,
         "WEBAPP_DIR",
-        File::getAbsolutePath);
+        path -> path.toAbsolutePath().toString());
 
     private MCRResourceHintKeys() {
     }

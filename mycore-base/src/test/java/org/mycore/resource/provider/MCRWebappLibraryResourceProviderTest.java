@@ -24,7 +24,6 @@ import static org.mycore.resource.MCRFileSystemResourceHelper.getConfigDirResour
 import static org.mycore.resource.MCRFileSystemResourceHelper.touchFiles;
 import static org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
@@ -53,7 +52,7 @@ public class MCRWebappLibraryResourceProviderTest {
 
     private static final MCRResourcePath BAR_FOO_PATH = MCRResourcePath.ofPath("bar/foo").orElseThrow();
 
-    private static File fooWebappDir;
+    private static Path fooWebappDir;
 
     private static URL nonWebappLibraryUrl;
 
@@ -66,7 +65,7 @@ public class MCRWebappLibraryResourceProviderTest {
 
         Path basePath = getConfigDirResourcesTestBasePath(MCRWebappLibraryResourceProviderTest.class);
 
-        fooWebappDir = touchFiles(basePath.resolve("foo")).toFile();
+        fooWebappDir = touchFiles(basePath.resolve("foo"));
 
         URL fileUrl = URI.create("file:/foo/bar").toURL();
         nonWebappLibraryUrl = URI.create("jar:file:/foo/library.jar!/foo/bar").toURL();
@@ -153,7 +152,7 @@ public class MCRWebappLibraryResourceProviderTest {
         return new MCRWebappLibraryResourceProvider("webapp library test", mode);
     }
 
-    private static MCRHints toHints(File webappDir, List<URL> resourceUrls) throws IOException {
+    private static MCRHints toHints(Path webappDir, List<URL> resourceUrls) throws IOException {
         ClassLoader classLoader = Mockito.mock(ClassLoader.class);
         Mockito.when(classLoader.getResources(Mockito.anyString())).thenReturn(Collections.enumeration(resourceUrls));
         return new MCRHintsBuilder().add(MCRResourceHintKeys.WEBAPP_DIR, webappDir)

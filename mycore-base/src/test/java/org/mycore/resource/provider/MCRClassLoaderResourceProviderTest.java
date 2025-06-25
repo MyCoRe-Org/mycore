@@ -23,13 +23,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mycore.resource.MCRFileSystemResourceHelper.getConfigDirTestBasePath;
 import static org.mycore.resource.MCRFileSystemResourceHelper.touchFiles;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,6 +39,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.hint.MCRHintsBuilder;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRResourceUtils;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
 import org.mycore.test.MyCoReTest;
@@ -57,34 +55,34 @@ public class MCRClassLoaderResourceProviderTest {
 
     private static final MCRResourcePath BAZ_PATH = MCRResourcePath.ofPath("baz").orElseThrow();
 
-    private static File emptyBaseDir;
+    private static Path emptyBaseDir;
 
-    private static File empty2BaseDir;
+    private static Path empty2BaseDir;
 
-    private static File fooBaseDir;
+    private static Path fooBaseDir;
 
-    private static File foo2BaseDir;
+    private static Path foo2BaseDir;
 
-    private static File barBaseDir;
+    private static Path barBaseDir;
 
     @BeforeAll
     public static void prepare() throws IOException {
 
         Path basePath = getConfigDirTestBasePath(MCRClassLoaderResourceProviderTest.class);
 
-        Path fooPath = Paths.get("foo");
-        Path barPath = Paths.get("bar");
+        Path fooPath = Path.of("foo");
+        Path barPath = Path.of("bar");
 
-        emptyBaseDir = touchFiles(basePath.resolve("empty")).toFile();
-        empty2BaseDir = touchFiles(basePath.resolve("empty2")).toFile();
-        fooBaseDir = touchFiles(basePath.resolve("foo"), fooPath).toFile();
-        foo2BaseDir = touchFiles(basePath.resolve("foo2"), fooPath).toFile();
-        barBaseDir = touchFiles(basePath.resolve("bar"), barPath).toFile();
+        emptyBaseDir = touchFiles(basePath.resolve("empty"));
+        empty2BaseDir = touchFiles(basePath.resolve("empty2"));
+        fooBaseDir = touchFiles(basePath.resolve("foo"), fooPath);
+        foo2BaseDir = touchFiles(basePath.resolve("foo2"), fooPath);
+        barBaseDir = touchFiles(basePath.resolve("bar"), barPath);
 
     }
 
     @Test
-    public void provideAbsentAbsent() throws MalformedURLException {
+    public void provideAbsentAbsent() {
 
         MCRHints hints = toHints(emptyBaseDir, empty2BaseDir);
         MCRResourceProvider provider = classLoaderProvider();
@@ -96,7 +94,7 @@ public class MCRClassLoaderResourceProviderTest {
     }
 
     @Test
-    public void provideAbsentPresent() throws MalformedURLException {
+    public void provideAbsentPresent() {
 
         MCRHints hints = toHints(emptyBaseDir, fooBaseDir);
         MCRResourceProvider provider = classLoaderProvider();
@@ -109,7 +107,7 @@ public class MCRClassLoaderResourceProviderTest {
     }
 
     @Test
-    public void providePresentAbsent() throws MalformedURLException {
+    public void providePresentAbsent() {
 
         MCRHints hints = toHints(fooBaseDir, emptyBaseDir);
         MCRResourceProvider provider = classLoaderProvider();
@@ -122,7 +120,7 @@ public class MCRClassLoaderResourceProviderTest {
     }
 
     @Test
-    public void providePresentPresent() throws MalformedURLException {
+    public void providePresentPresent() {
 
         MCRHints hints = toHints(fooBaseDir, foo2BaseDir);
         MCRResourceProvider provider = classLoaderProvider();
@@ -135,7 +133,7 @@ public class MCRClassLoaderResourceProviderTest {
     }
 
     @Test
-    public void provideAbsentButNotEmptyPresent() throws MalformedURLException {
+    public void provideAbsentButNotEmptyPresent() {
 
         MCRHints hints = toHints(fooBaseDir, barBaseDir);
         MCRResourceProvider provider = classLoaderProvider();
@@ -148,7 +146,7 @@ public class MCRClassLoaderResourceProviderTest {
     }
 
     @Test
-    public void provideAllAbsentAbsent() throws MalformedURLException {
+    public void provideAllAbsentAbsent() {
 
         MCRHints hints = toHints(emptyBaseDir, empty2BaseDir);
         MCRResourceProvider provider = classLoaderProvider();
@@ -161,7 +159,7 @@ public class MCRClassLoaderResourceProviderTest {
     }
 
     @Test
-    public void provideAllAbsentPresent() throws MalformedURLException {
+    public void provideAllAbsentPresent() {
 
         MCRHints hints = toHints(emptyBaseDir, fooBaseDir);
         MCRResourceProvider provider = classLoaderProvider();
@@ -175,7 +173,7 @@ public class MCRClassLoaderResourceProviderTest {
     }
 
     @Test
-    public void provideAllPresentAbsent() throws MalformedURLException {
+    public void provideAllPresentAbsent() {
 
         MCRHints hints = toHints(fooBaseDir, emptyBaseDir);
         MCRResourceProvider provider = classLoaderProvider();
@@ -189,7 +187,7 @@ public class MCRClassLoaderResourceProviderTest {
     }
 
     @Test
-    public void provideAllPresentPresent() throws MalformedURLException {
+    public void provideAllPresentPresent() {
 
         MCRHints hints = toHints(fooBaseDir, foo2BaseDir);
         MCRResourceProvider provider = classLoaderProvider();
@@ -204,7 +202,7 @@ public class MCRClassLoaderResourceProviderTest {
     }
 
     @Test
-    public void provideAllAbsentButNotEmptyPresent() throws MalformedURLException {
+    public void provideAllAbsentButNotEmptyPresent() {
 
         MCRHints hints = toHints(fooBaseDir, barBaseDir);
         MCRResourceProvider provider = classLoaderProvider();
@@ -221,10 +219,10 @@ public class MCRClassLoaderResourceProviderTest {
     @MCRTestConfiguration(properties = {
         @MCRTestProperty(key = "Test.Class", classNameOf = MCRClassLoaderResourceProvider.class)
     })
-    public void configuration() throws MalformedURLException {
+    public void configuration() {
 
         MCRHints hints = toHints(fooBaseDir, barBaseDir);
-        MCRConfiguration2.set("Test.BaseDirs", fooBaseDir.getAbsolutePath() + "," + barBaseDir.getAbsolutePath());
+        MCRConfiguration2.set("Test.BaseDirs", fooBaseDir.toAbsolutePath() + "," + barBaseDir.toAbsolutePath());
 
         MCRResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(
             MCRClassLoaderResourceProvider.class, "Test.Class");
@@ -243,21 +241,21 @@ public class MCRClassLoaderResourceProviderTest {
         return new MCRClassLoaderResourceProvider("class loader test");
     }
 
-    private static MCRHints toHints(File... baseDirs) throws MalformedURLException {
+    private static MCRHints toHints(Path... baseDirs) {
         ClassLoader classLoader = new URLClassLoader("test", toUrls(baseDirs), PARENT_CLASS_LOADER);
         return new MCRHintsBuilder().add(MCRResourceHintKeys.CLASS_LOADER, classLoader).build();
     }
 
-    private static URL[] toUrls(File[] baseDirs) throws MalformedURLException {
+    private static URL[] toUrls(Path[] baseDirs) {
         URL[] urls = new URL[baseDirs.length];
         for (int i = 0; i < baseDirs.length; i++) {
-            urls[i] = baseDirs[i].toURI().toURL();
+            urls[i] = MCRResourceUtils.toFileUrl(baseDirs[i]);
         }
         return urls;
     }
 
-    private URL toUrl(File baseDir, String fileName) throws MalformedURLException {
-        return new File(baseDir, fileName).toURI().toURL();
+    private URL toUrl(Path baseDir, String fileName) {
+        return MCRResourceUtils.toFileUrl(baseDir.resolve(fileName));
     }
 
     private static List<URL> toUrlList(List<ProvidedUrl> providedUrls) {

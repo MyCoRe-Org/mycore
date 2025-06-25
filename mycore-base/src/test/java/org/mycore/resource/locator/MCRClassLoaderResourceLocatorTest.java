@@ -23,13 +23,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mycore.resource.MCRFileSystemResourceHelper.getConfigDirTestBasePath;
 import static org.mycore.resource.MCRFileSystemResourceHelper.touchFiles;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -41,6 +38,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.hint.MCRHintsBuilder;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRResourceUtils;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 import org.mycore.test.MyCoReTest;
 
@@ -53,34 +51,34 @@ public class MCRClassLoaderResourceLocatorTest {
 
     private static final MCRResourcePath BAR_PATH = MCRResourcePath.ofPath("bar").orElseThrow();
 
-    private static File emptyBaseDir;
+    private static Path emptyBaseDir;
 
-    private static File empty2BaseDir;
+    private static Path empty2BaseDir;
 
-    private static File fooBaseDir;
+    private static Path fooBaseDir;
 
-    private static File foo2BaseDir;
+    private static Path foo2BaseDir;
 
-    private static File barBaseDir;
+    private static Path barBaseDir;
 
     @BeforeAll
     public static void prepare() throws IOException {
 
         Path basePath = getConfigDirTestBasePath(MCRClassLoaderResourceLocatorTest.class);
 
-        Path fooPath = Paths.get("foo");
-        Path barPath = Paths.get("bar");
+        Path fooPath = Path.of("foo");
+        Path barPath = Path.of("bar");
 
-        emptyBaseDir = touchFiles(basePath.resolve("empty")).toFile();
-        empty2BaseDir = touchFiles(basePath.resolve("empty2")).toFile();
-        fooBaseDir = touchFiles(basePath.resolve("foo"), fooPath).toFile();
-        foo2BaseDir = touchFiles(basePath.resolve("foo2"), fooPath).toFile();
-        barBaseDir = touchFiles(basePath.resolve("bar"), barPath).toFile();
+        emptyBaseDir = touchFiles(basePath.resolve("empty"));
+        empty2BaseDir = touchFiles(basePath.resolve("empty2"));
+        fooBaseDir = touchFiles(basePath.resolve("foo"), fooPath);
+        foo2BaseDir = touchFiles(basePath.resolve("foo2"), fooPath);
+        barBaseDir = touchFiles(basePath.resolve("bar"), barPath);
 
     }
 
     @Test
-    public void locateAbsentAbsent() throws MalformedURLException {
+    public void locateAbsentAbsent() {
 
         MCRHints hints = toHints(emptyBaseDir, empty2BaseDir);
         MCRResourceLocator locator = classLoaderLocator();
@@ -92,7 +90,7 @@ public class MCRClassLoaderResourceLocatorTest {
     }
 
     @Test
-    public void locateAbsentPresent() throws MalformedURLException {
+    public void locateAbsentPresent() {
 
         MCRHints hints = toHints(emptyBaseDir, fooBaseDir);
         MCRResourceLocator locator = classLoaderLocator();
@@ -105,7 +103,7 @@ public class MCRClassLoaderResourceLocatorTest {
     }
 
     @Test
-    public void locatePresentAbsent() throws MalformedURLException {
+    public void locatePresentAbsent() {
 
         MCRHints hints = toHints(fooBaseDir, emptyBaseDir);
         MCRResourceLocator locator = classLoaderLocator();
@@ -118,7 +116,7 @@ public class MCRClassLoaderResourceLocatorTest {
     }
 
     @Test
-    public void locatePresentPresent() throws MalformedURLException {
+    public void locatePresentPresent() {
 
         MCRHints hints = toHints(fooBaseDir, foo2BaseDir);
         MCRResourceLocator locator = classLoaderLocator();
@@ -132,7 +130,7 @@ public class MCRClassLoaderResourceLocatorTest {
     }
 
     @Test
-    public void locateAbsentButNotEmptyPresent() throws MalformedURLException {
+    public void locateAbsentButNotEmptyPresent() {
 
         MCRHints hints = toHints(fooBaseDir, barBaseDir);
         MCRResourceLocator locator = classLoaderLocator();
@@ -148,7 +146,7 @@ public class MCRClassLoaderResourceLocatorTest {
     @MCRTestConfiguration(properties = {
         @MCRTestProperty(key = "Test.Class", classNameOf = MCRClassLoaderResourceLocator.class)
     })
-    public void configuration() throws MalformedURLException {
+    public void configuration() {
 
         MCRHints hints = toHints(fooBaseDir);
         MCRResourceLocator locator = MCRConfiguration2.getInstanceOfOrThrow(
@@ -166,21 +164,21 @@ public class MCRClassLoaderResourceLocatorTest {
         return new MCRClassLoaderResourceLocator();
     }
 
-    private static MCRHints toHints(File... baseDirs) throws MalformedURLException {
+    private static MCRHints toHints(Path... baseDirs) {
         ClassLoader classLoader = new URLClassLoader("test", toUrls(baseDirs), PARENT_CLASS_LOADER);
         return new MCRHintsBuilder().add(MCRResourceHintKeys.CLASS_LOADER, classLoader).build();
     }
 
-    private static URL[] toUrls(File[] baseDirs) throws MalformedURLException {
+    private static URL[] toUrls(Path[] baseDirs) {
         URL[] urls = new URL[baseDirs.length];
         for (int i = 0; i < baseDirs.length; i++) {
-            urls[i] = baseDirs[i].toURI().toURL();
+            urls[i] = MCRResourceUtils.toFileUrl(baseDirs[i]);
         }
         return urls;
     }
 
-    private URL toUrl(File baseDir, String fileName) throws MalformedURLException {
-        return new File(baseDir, fileName).toURI().toURL();
+    private URL toUrl(Path baseDir, String fileName) {
+        return MCRResourceUtils.toFileUrl(baseDir.resolve(fileName));
     }
 
 }
