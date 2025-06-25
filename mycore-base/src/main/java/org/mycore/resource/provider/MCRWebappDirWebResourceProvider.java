@@ -19,6 +19,7 @@
 package org.mycore.resource.provider;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -58,12 +59,12 @@ public final class MCRWebappDirWebResourceProvider extends MCRFileSystemResource
     }
 
     @Override
-    protected Stream<File> getBaseDirs(MCRHints hints) {
+    protected Stream<Path> getBaseDirs(MCRHints hints) {
         return getWebResourcesDir(hints).stream();
     }
 
-    private Optional<File> getWebResourcesDir(MCRHints hints) {
-        return hints.get(MCRResourceHintKeys.WEBAPP_DIR);
+    private Optional<Path> getWebResourcesDir(MCRHints hints) {
+        return hints.get(MCRResourceHintKeys.WEBAPP_DIR).map(File::toPath);
     }
 
     @Override

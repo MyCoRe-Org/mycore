@@ -18,8 +18,7 @@
 
 package org.mycore.wcms2;
 
-import java.io.File;
-import java.util.Collections;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -56,8 +55,8 @@ public final class MCRWCMSWebResourceProvider extends MCRFileSystemResourceProvi
         super(coverage, MCRResourceProviderMode.WEB_RESOURCES, getBaseDirs());
     }
 
-    private static List<File> getBaseDirs() {
-        return Collections.singletonList(MCRWCMSUtil.getWCMSDataDir());
+    private static List<Path> getBaseDirs() {
+        return List.of(MCRWCMSUtil.getWCMSDataDir().toPath());
     }
 
     @Override

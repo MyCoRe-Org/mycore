@@ -18,9 +18,8 @@
 
 package org.mycore.resource.provider;
 
-import static org.mycore.common.config.MCRConfiguration2.splitValue;
-
-import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -56,9 +55,9 @@ public final class MCRDeveloperOverrideResourceProvider extends MCRFileSystemRes
         super(coverage, MCRResourceProviderMode.RESOURCES, getBaseDirs());
     }
 
-    private static List<File> getBaseDirs() {
+    private static List<Path> getBaseDirs() {
         String paths = MCRConfiguration2.getString(DEVELOPER_RESOURCE_OVERRIDE_PROPERTY).orElse("");
-        return splitValue(paths).map(File::new).toList();
+        return MCRConfiguration2.splitValue(paths).map(Paths::get).toList();
     }
 
     @Override
