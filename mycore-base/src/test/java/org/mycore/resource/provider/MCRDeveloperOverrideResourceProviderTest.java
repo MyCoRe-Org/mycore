@@ -24,12 +24,9 @@ import static org.mycore.resource.MCRFileSystemResourceHelper.getConfigDirTestBa
 import static org.mycore.resource.MCRFileSystemResourceHelper.touchFiles;
 import static org.mycore.resource.provider.MCRDeveloperOverrideResourceProvider.DEVELOPER_RESOURCE_OVERRIDE_PROPERTY;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -42,6 +39,7 @@ import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRResourceUtils;
 import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
 import org.mycore.test.MyCoReTest;
 
@@ -54,29 +52,29 @@ public class MCRDeveloperOverrideResourceProviderTest {
 
     private static final MCRResourcePath BAZ_PATH = MCRResourcePath.ofPath("baz").orElseThrow();
 
-    private static File emptyBaseDir;
+    private static Path emptyBaseDir;
 
-    private static File empty2BaseDir;
+    private static Path empty2BaseDir;
 
-    private static File fooBaseDir;
+    private static Path fooBaseDir;
 
-    private static File foo2BaseDir;
+    private static Path foo2BaseDir;
 
-    private static File barBaseDir;
+    private static Path barBaseDir;
 
     @BeforeAll
     public static void prepare() throws IOException {
 
         Path basePath = getConfigDirTestBasePath(MCRDeveloperOverrideResourceProviderTest.class);
 
-        Path fooPath = Paths.get("foo");
-        Path barPath = Paths.get("bar");
+        Path fooPath = Path.of("foo");
+        Path barPath = Path.of("bar");
 
-        emptyBaseDir = touchFiles(basePath.resolve("empty")).toFile();
-        empty2BaseDir = touchFiles(basePath.resolve("empty2")).toFile();
-        fooBaseDir = touchFiles(basePath.resolve("foo"), fooPath).toFile();
-        foo2BaseDir = touchFiles(basePath.resolve("foo2"), fooPath).toFile();
-        barBaseDir = touchFiles(basePath.resolve("bar"), barPath).toFile();
+        emptyBaseDir = touchFiles(basePath.resolve("empty"));
+        empty2BaseDir = touchFiles(basePath.resolve("empty2"));
+        fooBaseDir = touchFiles(basePath.resolve("foo"), fooPath);
+        foo2BaseDir = touchFiles(basePath.resolve("foo2"), fooPath);
+        barBaseDir = touchFiles(basePath.resolve("bar"), barPath);
 
     }
 
@@ -92,7 +90,7 @@ public class MCRDeveloperOverrideResourceProviderTest {
     }
 
     @Test
-    public void provideAbsentPresent() throws MalformedURLException {
+    public void provideAbsentPresent() {
 
         MCRResourceProvider provider = developerOverrideProvider(emptyBaseDir, fooBaseDir);
 
@@ -104,7 +102,7 @@ public class MCRDeveloperOverrideResourceProviderTest {
     }
 
     @Test
-    public void providePresentAbsent() throws MalformedURLException {
+    public void providePresentAbsent() {
 
         MCRResourceProvider provider = developerOverrideProvider(fooBaseDir, emptyBaseDir);
 
@@ -116,7 +114,7 @@ public class MCRDeveloperOverrideResourceProviderTest {
     }
 
     @Test
-    public void providePresentPresent() throws MalformedURLException {
+    public void providePresentPresent() {
 
         MCRResourceProvider provider = developerOverrideProvider(fooBaseDir, foo2BaseDir);
 
@@ -128,7 +126,7 @@ public class MCRDeveloperOverrideResourceProviderTest {
     }
 
     @Test
-    public void provideAbsentButNotEmptyPresent() throws MalformedURLException {
+    public void provideAbsentButNotEmptyPresent() {
 
         MCRResourceProvider provider = developerOverrideProvider(fooBaseDir, barBaseDir);
 
@@ -152,7 +150,7 @@ public class MCRDeveloperOverrideResourceProviderTest {
     }
 
     @Test
-    public void provideAllAbsentPresent() throws MalformedURLException {
+    public void provideAllAbsentPresent() {
 
         MCRResourceProvider provider = developerOverrideProvider(emptyBaseDir, fooBaseDir);
 
@@ -165,7 +163,7 @@ public class MCRDeveloperOverrideResourceProviderTest {
     }
 
     @Test
-    public void provideAllPresentAbsent() throws MalformedURLException {
+    public void provideAllPresentAbsent() {
 
         MCRResourceProvider provider = developerOverrideProvider(fooBaseDir, emptyBaseDir);
 
@@ -178,7 +176,7 @@ public class MCRDeveloperOverrideResourceProviderTest {
     }
 
     @Test
-    public void provideAllPresentPresent() throws MalformedURLException {
+    public void provideAllPresentPresent() {
 
         MCRResourceProvider provider = developerOverrideProvider(fooBaseDir, foo2BaseDir);
 
@@ -192,7 +190,7 @@ public class MCRDeveloperOverrideResourceProviderTest {
     }
 
     @Test
-    public void provideAllAbsentButNotEmptyPresent() throws MalformedURLException {
+    public void provideAllAbsentButNotEmptyPresent() {
 
         MCRResourceProvider provider = developerOverrideProvider(fooBaseDir, barBaseDir);
 
@@ -212,7 +210,7 @@ public class MCRDeveloperOverrideResourceProviderTest {
     public void configuration() {
 
         MCRConfiguration2.set(DEVELOPER_RESOURCE_OVERRIDE_PROPERTY,
-            fooBaseDir.getAbsolutePath() + "," + barBaseDir.getAbsolutePath());
+            fooBaseDir.toAbsolutePath() + "," + barBaseDir.toAbsolutePath());
 
         MCRResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(
             MCRDeveloperOverrideResourceProvider.class, "Test.Class");
@@ -227,14 +225,15 @@ public class MCRDeveloperOverrideResourceProviderTest {
 
     }
 
-    private static MCRResourceProvider developerOverrideProvider(File... baseDirs) {
+    private static MCRResourceProvider developerOverrideProvider(Path... baseDirs) {
         MCRConfiguration2.set(DEVELOPER_RESOURCE_OVERRIDE_PROPERTY,
-            Arrays.stream(baseDirs).map(File::getAbsolutePath).collect(Collectors.joining(",")));
+            Arrays.stream(baseDirs).map(path -> path.toAbsolutePath().toString())
+                .collect(Collectors.joining(",")));
         return new MCRDeveloperOverrideResourceProvider("developer override test");
     }
 
-    private URL toUrl(File baseDir, String fileName) throws MalformedURLException {
-        return new File(baseDir, fileName).toURI().toURL();
+    private URL toUrl(Path baseDir, String fileName) {
+        return MCRResourceUtils.toFileUrl(baseDir.resolve(fileName));
     }
 
     private static List<URL> toUrlList(List<ProvidedUrl> providedUrls) {

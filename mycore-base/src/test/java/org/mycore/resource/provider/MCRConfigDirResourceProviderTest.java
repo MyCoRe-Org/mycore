@@ -23,12 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mycore.resource.MCRFileSystemResourceHelper.getConfigDirResourcesTestBasePath;
 import static org.mycore.resource.MCRFileSystemResourceHelper.touchFiles;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,6 +37,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.hint.MCRHintsBuilder;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRResourceUtils;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
 import org.mycore.test.MyCoReTest;
@@ -51,16 +49,16 @@ public class MCRConfigDirResourceProviderTest {
 
     private static final MCRResourcePath BAR_PATH = MCRResourcePath.ofPath("bar").orElseThrow();
 
-    private static File fooConfigDir;
+    private static Path fooConfigDir;
 
     @BeforeAll
     public static void prepare() throws IOException {
 
         Path basePath = getConfigDirResourcesTestBasePath(MCRConfigDirResourceProviderTest.class);
 
-        Path fooPath = Paths.get("resources/foo");
+        Path fooPath = Path.of("resources/foo");
 
-        fooConfigDir = touchFiles(basePath.resolve("foo"), fooPath).toFile();
+        fooConfigDir = touchFiles(basePath.resolve("foo"), fooPath);
 
     }
 
@@ -77,7 +75,7 @@ public class MCRConfigDirResourceProviderTest {
     }
 
     @Test
-    public void providePresent() throws MalformedURLException {
+    public void providePresent() {
 
         MCRHints hints = toHints(fooConfigDir);
         MCRResourceProvider provider = configDirProvider();
@@ -103,7 +101,7 @@ public class MCRConfigDirResourceProviderTest {
     }
 
     @Test
-    public void provideAllPresent() throws MalformedURLException {
+    public void provideAllPresent() {
 
         MCRHints hints = toHints(fooConfigDir);
         MCRResourceProvider provider = configDirProvider();
@@ -138,15 +136,15 @@ public class MCRConfigDirResourceProviderTest {
         return new MCRConfigDirResourceProvider("config dir test");
     }
 
-    private URL toResourcesUrl(File configDir, String fileName) throws MalformedURLException {
-        return new File(new File(configDir, "resources"), fileName).toURI().toURL();
+    private URL toResourcesUrl(Path configDir, String fileName) {
+        return MCRResourceUtils.toFileUrl(configDir.resolve("resources").resolve(fileName));
     }
 
     private static List<URL> toUrlList(List<ProvidedUrl> providedUrls) {
         return providedUrls.stream().map(ProvidedUrl::url).toList();
     }
 
-    private static MCRHints toHints(File configDir) {
+    private static MCRHints toHints(Path configDir) {
         return new MCRHintsBuilder().add(MCRResourceHintKeys.CONFIG_DIR, configDir).build();
     }
 

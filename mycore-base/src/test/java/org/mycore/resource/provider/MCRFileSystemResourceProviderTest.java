@@ -23,13 +23,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mycore.resource.MCRFileSystemResourceHelper.getConfigDirTestBasePath;
 import static org.mycore.resource.MCRFileSystemResourceHelper.touchFiles;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,33 +51,33 @@ public class MCRFileSystemResourceProviderTest {
 
     private static final MCRResourcePath BAZ_PATH = MCRResourcePath.ofPath("baz").orElseThrow();
 
-    private static File emptyBaseDir;
+    private static Path emptyBaseDir;
 
-    private static File empty2BaseDir;
+    private static Path empty2BaseDir;
 
-    private static File fooBaseDir;
+    private static Path fooBaseDir;
 
-    private static File foo2BaseDir;
+    private static Path foo2BaseDir;
 
-    private static File webFooBaseDir;
+    private static Path webFooBaseDir;
 
-    private static File barBaseDir;
+    private static Path barBaseDir;
 
     @BeforeAll
     public static void prepare() throws IOException {
 
         Path basePath = getConfigDirTestBasePath(MCRFileSystemResourceProviderTest.class);
 
-        Path fooPath = Paths.get("foo");
-        Path webFooPath = Paths.get("META-INF/resources/foo");
-        Path barPath = Paths.get("bar");
+        Path fooPath = Path.of("foo");
+        Path webFooPath = Path.of("META-INF/resources/foo");
+        Path barPath = Path.of("bar");
 
-        emptyBaseDir = touchFiles(basePath.resolve("empty")).toFile();
-        empty2BaseDir = touchFiles(basePath.resolve("empty2")).toFile();
-        fooBaseDir = touchFiles(basePath.resolve("foo"), fooPath).toFile();
-        foo2BaseDir = touchFiles(basePath.resolve("foo2"), fooPath).toFile();
-        webFooBaseDir = touchFiles(basePath.resolve("webFoo"), webFooPath).toFile();
-        barBaseDir = touchFiles(basePath.resolve("bar"), barPath).toFile();
+        emptyBaseDir = touchFiles(basePath.resolve("empty"));
+        empty2BaseDir = touchFiles(basePath.resolve("empty2"));
+        fooBaseDir = touchFiles(basePath.resolve("foo"), fooPath);
+        foo2BaseDir = touchFiles(basePath.resolve("foo2"), fooPath);
+        webFooBaseDir = touchFiles(basePath.resolve("webFoo"), webFooPath);
+        barBaseDir = touchFiles(basePath.resolve("bar"), barPath);
 
     }
 
@@ -251,7 +248,7 @@ public class MCRFileSystemResourceProviderTest {
     })
     public void configuration() {
 
-        MCRConfiguration2.set("Test.BaseDirs", fooBaseDir.getAbsolutePath() + "," + barBaseDir.getAbsolutePath());
+        MCRConfiguration2.set("Test.BaseDirs", fooBaseDir.toAbsolutePath() + "," + barBaseDir.toAbsolutePath());
 
         MCRResourceProvider provider = MCRConfiguration2.getInstanceOfOrThrow(
             MCRFileSystemResourceProvider.class, "Test.Class");
@@ -266,16 +263,16 @@ public class MCRFileSystemResourceProviderTest {
 
     }
 
-    private static MCRResourceProvider fileSystemProvider(MCRResourceProviderMode mode, File baseDir) {
-        return new MCRFileSystemResourceProvider("file system test", mode, Collections.singletonList(baseDir));
+    private static MCRResourceProvider fileSystemProvider(MCRResourceProviderMode mode, Path baseDir) {
+        return new MCRFileSystemResourceProvider("file system test", mode, List.of(baseDir));
     }
 
-    private static MCRResourceProvider fileSystemProvider(File... baseDirs) {
+    private static MCRResourceProvider fileSystemProvider(Path... baseDirs) {
         return new MCRFileSystemResourceProvider("file system test", MCRResourceProviderMode.RESOURCES, baseDirs);
     }
 
-    private URL toUrl(File baseDir, String fileName) throws MalformedURLException {
-        return new File(baseDir, fileName).toURI().toURL();
+    private URL toUrl(Path baseDir, String fileName) throws MalformedURLException {
+        return baseDir.resolve(fileName).toUri().toURL();
     }
 
     private static List<URL> toUrlList(List<ProvidedUrl> providedUrls) {

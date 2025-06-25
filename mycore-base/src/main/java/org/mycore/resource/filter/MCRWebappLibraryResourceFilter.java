@@ -18,13 +18,14 @@
 
 package org.mycore.resource.filter;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.hint.MCRHints;
+import org.mycore.resource.common.MCRResourceUtils;
 import org.mycore.resource.common.MCRResourceTracer;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 
@@ -58,8 +59,8 @@ public final class MCRWebappLibraryResourceFilter extends MCRUrlPrefixResourceFi
         return hints.get(MCRResourceHintKeys.WEBAPP_DIR).map(webappDir -> getPrefix(webappDir, tracer));
     }
 
-    private String getPrefix(File webappDir, MCRResourceTracer tracer) {
-        String prefix = "jar:" + webappDir.toURI() + "WEB-INF/lib/";
+    private String getPrefix(Path webappDir, MCRResourceTracer tracer) {
+        String prefix = "jar:" + MCRResourceUtils.toFileUrl(webappDir) + "WEB-INF/lib/";
         tracer.trace(() -> "Looking for webapp library prefix: " + prefix);
         return prefix;
     }
