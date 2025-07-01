@@ -39,7 +39,7 @@ import java.io.Serial;
  * root element name can be specified.
  * The content is then transformed using an MCRContentTransformer instance
  * and forwarded to the requesting client.
- *
+ * <p>
  * Request Parameters:
  *   uri=...
  *     can be repeated to include content from one or more URIs to read XML from

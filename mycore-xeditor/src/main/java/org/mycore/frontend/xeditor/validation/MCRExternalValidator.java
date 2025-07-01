@@ -31,7 +31,7 @@ import org.mycore.frontend.xeditor.MCRBinding;
  * Validates edited xml using an external method.
  * The method must be "public static boolean ..."
  * and should accept a String, Element, Attribute or Object as argument.
- *
+ * <p>
  * Example: &lt;xed:validate class="foo.bar.MyValidator" method="validateISBN" ... /&gt;
  *
  * @author Frank Lützenkirchen

@@ -190,9 +190,9 @@ public class MCRORCIDUtils {
     /**
      * Checks if identifier name is trusted.
      * Trusted identifier types can be defined as follows:
-     *
+     * <p>
      * MCR.ORCID2.Object.TrustedIdentifierTypes=
-     *
+     * <p>
      * If empty, identifier is trusted
      *
      * @param name identifier name

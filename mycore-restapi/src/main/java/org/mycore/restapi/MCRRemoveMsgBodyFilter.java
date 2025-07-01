@@ -31,7 +31,7 @@ import jakarta.ws.rs.ext.Provider;
 
 /**
  * Removed request message body if {@link #IGNORE_MESSAGE_BODY_HEADER} is set.
- *
+ * <p>
  * Some user agent may set a {@link HttpHeaders#CONTENT_LENGTH} header, even if no message body was send.
  * This filter removes Entity and the <code>Content-Length</code> and <code>Transfer-Encoding</code> header.
  */

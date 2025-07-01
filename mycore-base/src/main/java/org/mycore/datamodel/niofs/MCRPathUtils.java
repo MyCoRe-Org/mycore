@@ -45,7 +45,7 @@ public final class MCRPathUtils {
 
     /**
      * Returns requested {@link BasicFileAttributes} or null if file does not exist.
-     *
+     * <p>
      * Same as {@link Files#readAttributes(Path, Class, LinkOption...)} without throwing {@link IOException}.
      *
      * @param   path
@@ -82,7 +82,7 @@ public final class MCRPathUtils {
 
     /**
      * Returns the size of the path.
-     *
+     * <p>
      * If the path is a directory the size returned is the sum of all files found recursivly
      * in this directory.
      * @param p path of a file or directory

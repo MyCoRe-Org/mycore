@@ -375,7 +375,7 @@ public class MCRXMLFunctions {
 
     /**
      * Checks if the given object has derivates that are all accessible to guest user.
-     *
+     * <p>
      * Normally this implies that all derivates are readable by everyone. Only non-hidden
      * derivates are taken into account. So if an object only contains hidden
      * @param objId MCRObjectID as String

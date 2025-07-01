@@ -31,7 +31,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 
 /**
  * Use this class if you want to have a fallback to some default access rules.
- *
+ * <p>
  * First a check is done for the MCRObjectID. If no rule for the ID is specified
  * it will be tried to check the permission agains the rule ID
  * <code>default_&lt;ObjectType&gt;</code> if it exists. If not the last

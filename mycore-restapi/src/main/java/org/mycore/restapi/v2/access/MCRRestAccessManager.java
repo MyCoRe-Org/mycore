@@ -31,7 +31,7 @@ public class MCRRestAccessManager {
 
     /**
      * Checks access to the REST API based on general and specific permissions and rules.
-     *
+     * <p>
      * This method evaluates both general permissions and specific permissions for a given
      * object identified by its path. First, it evaluates the rules for general and specific permissions.
      * If no specific rule for the object exists, only the general permission is considered.

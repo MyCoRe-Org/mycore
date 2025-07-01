@@ -29,7 +29,7 @@ import org.mycore.common.config.MCRConfigurationException;
  * Returns the read-public access token to read public data from ORCID.org.
  * A token is needed for access to the public API, see
  * https://members.orcid.org/api/tutorial/read-orcid-records#readpub
- *
+ * <p>
  * The token can be configured via MCR.ORCID.OAuth.ReadPublicToken.
  * In case that is not set, the token is directly requested from the OAuth2 API and logged.
  *

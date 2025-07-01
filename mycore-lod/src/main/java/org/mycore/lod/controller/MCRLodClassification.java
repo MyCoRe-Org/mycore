@@ -84,7 +84,7 @@ public class MCRLodClassification {
 
     /**
      * return the list of available classifications as Linked Open Data
-     *
+     * <p>
      * TODO Is there a reasonable response on the base path of an LOD URI,
      * or remove this endpoint completely?
      *

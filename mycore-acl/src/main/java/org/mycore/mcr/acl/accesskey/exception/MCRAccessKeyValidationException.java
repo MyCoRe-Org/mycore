@@ -22,7 +22,7 @@ import java.io.Serial;
 
 /**
  * Exception thrown when an access key validation fails.
- *
+ * <p>
  * The {@code AccessKeyValidationException} is a specialized {@link MCRAccessKeyException} that
  * indicates an issue with the validation of an access key. This exception is typically used
  * to signal that the provided data for an access key does not meet the required constraints or rules.

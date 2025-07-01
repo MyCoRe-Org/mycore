@@ -188,7 +188,7 @@ public final class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements C
 
     /**
      * iterates of jobs of status {@link MCRJobState#NEW}
-     *
+     * <p>
      * does not change the status.
      */
     @Override

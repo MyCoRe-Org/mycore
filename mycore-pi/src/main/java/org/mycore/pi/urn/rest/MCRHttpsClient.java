@@ -47,7 +47,7 @@ import org.mycore.pi.util.MCRHttpUtils;
 
 /**
  * Convinience class for sending http requests to the DNB urn service api.
- *
+ * <p>
  * Created by chi on 08.05.17.
  *
  * @author Huu Chi Vu
@@ -138,7 +138,7 @@ public class MCRHttpsClient {
 
     /**
      * Sets the authorization header to the provided http request object.
-     *
+     * <p>
      * Unfortunately the procedure with {@link org.apache.http.client.CredentialsProvider} is not working with the
      * DNB urn service api.
      * */

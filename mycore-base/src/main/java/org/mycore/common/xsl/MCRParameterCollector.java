@@ -74,12 +74,12 @@ public class MCRParameterCollector {
     /**
      * Collects parameters The collecting of parameters is done in steps,
      * each step may overwrite parameters that already have been set.
-     *
+     * <p>
      * First, all configuration properties from MCRConfiguration are copied.
      * Second, those variables stored in the HTTP session, that start with "XSL." are copied.
      * Next, variables stored in the MCRSession are copied.
      * Next, HTTP request parameters are copied.
-     *
+     * <p>
      * Only those parameters starting with "XSL." are copied from session and request,
      *
      * @param request the HttpRequest causing the XSL transformation, must NOT be null
@@ -91,7 +91,7 @@ public class MCRParameterCollector {
     /**
      * Collects parameters The collecting of parameters is done in steps,
      * each step may overwrite parameters that already have been set.
-     *
+     * <p>
      * First, all configuration properties from MCRConfiguration are copied.
      * Second, those variables stored in the HTTP session, that start with "XSL." are copied.
      * Next, variables stored in the MCRSession are copied.
@@ -127,7 +127,7 @@ public class MCRParameterCollector {
     /**
      * Collects parameters The collecting of parameters is done in steps,
      * each step may overwrite parameters that already have been set.
-     *
+     * <p>
      * First, all configuration properties from MCRConfiguration are copied.
      * Next, those variables stored in the MCRSession that start with "XSL." are copied.
      */
@@ -138,7 +138,7 @@ public class MCRParameterCollector {
     /**
      * Collects parameters The collecting of parameters is done in steps,
      * each step may overwrite parameters that already have been set.
-     *
+     * <p>
      * First, all configuration properties from MCRConfiguration are copied.
      * Next, those variables stored in the MCRSession are copied.
      *

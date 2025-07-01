@@ -42,11 +42,11 @@ import jakarta.xml.bind.util.JAXBResult;
 /**
  * Transforms XML content using a static XSL stylesheet.
  * The stylesheet is configured via
- * 
+ * <p>
  * MCR.ContentTransformer.{ID}.Stylesheet
- *
+ * <p>
  * JAXBContext contextPath is configured via
- * 
+ * <p>
  * MCR.ContentTransformer.{ID}.Context
  *
  * @author Thomas Scheffler (yagee)

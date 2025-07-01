@@ -25,18 +25,18 @@ import java.util.List;
  * A data source is able to return publication data in MODS format
  * for a given publication identifier. A data source may support more than
  * one identifier, e.g. DOI and PubMed ID for PubMed as a data source:
- *
+ * <p>
  * MCR.MODS.EnrichmentResolver.DataSource.PubMed.IdentifierTypes=doi pubmed
- *
+ * <p>
  * For each supported identifier type, the data source has a resolver URI
  * that returns MODS data for that identifier type.
- *
+ * <p>
  * Depending on the global configuration property
  * MCR.MODS.EnrichmentResolver.DefaultStopOnFirstResult=true|false
  * a data source will stop retrieving data after any first identifier
  * returned valid data, or will continue to retrieve data for all identifiers
  * it is configured for.
- *
+ * <p>
  * This global configuration can be overwritten per data source, e.g.
  * MCR.MODS.EnrichmentResolver.DataSource.ZDB.StopOnFirstResult=false
  *

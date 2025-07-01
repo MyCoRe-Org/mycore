@@ -27,9 +27,9 @@ import org.mycore.access.facts.model.MCRFactCondition;
 
 /**
  * This is the base implementation for a condition which evaluates or produces facts
- *
+ * <p>
  * Subclasses should call super.parse(xml) to bind the XML element to the condition.
- *
+ * <p>
  * If you specify the attribute 'fact' on the condition XML. It will be used as name for
  * the newly created fact. Otherwise the name of the condition will be used as name for the fact.
  *

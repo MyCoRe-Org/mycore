@@ -38,14 +38,14 @@ import jakarta.servlet.http.HttpSession;
 
 /**
  * Automatically closes HttpSession of certain user agents.
- *
+ * <p>
  * If the <code>User-Agent</code> header matches a regular expression
  * defined by the property <code>MCR.Filter.UserAgent.Pattern</code> the
  * HTTP session is closed after the request.
- *
+ * <p>
  * If the <code>User-Agent</code> header is invalid a 403 FORBIDDEN response
  * is sent to client if not <code>MCR.Filter.UserAgent.AcceptInvalid = true</code>.
- *
+ * <p>
  * A <code>User-Agent</code> header is considered invalid if it is not sent at all or
  * its value has not at least <code>MCR.Filter.UserAgent.MinLength</code> characters.
  *

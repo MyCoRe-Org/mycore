@@ -52,7 +52,7 @@ public class MCRCreateDerivateServlet extends MCRPersistenceServlet {
 
     /**
      * redirects to new derivate upload form.
-     *
+     * <p>
      * At least "id" HTTP parameter is required to succeed.
      * <dl>
      *   <dt>id</dt>

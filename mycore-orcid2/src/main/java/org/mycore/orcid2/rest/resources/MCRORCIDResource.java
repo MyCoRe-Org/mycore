@@ -52,7 +52,7 @@ public class MCRORCIDResource {
 
     /**
      * Retrieves the user status for the currently logged-in ORCID user.
-     *
+     * <p>
      * This method returns a {@link MCRORCIDUserStatus} object that contains the
      * list of ORCIDs associated with the user and a list of trusted ORCIDs.
      * The trusted ORCIDs are derived from the user's credentials.

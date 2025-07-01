@@ -37,7 +37,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Implements ORCID OAuth2 authorization.
- *
+ * <p>
  * User should invoke MCROAuthServlet without any parameters.
  * The servlet will redirect the user to orcid.org authorization.
  * The user will login at orcid.org and accept or deny this application as trusted party
@@ -45,7 +45,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * orcid.org then redirects the user's browser to this servlet again.
  * If the scopes were accepted by user, the response contains a code parameter.
  * This code is exchanged for an access token and stored in the user's attributes here.
- *
+ * <p>
  * See https://members.orcid.org/api/oauth/3legged-oauth
  *
  * @author Frank Lützenkirchen

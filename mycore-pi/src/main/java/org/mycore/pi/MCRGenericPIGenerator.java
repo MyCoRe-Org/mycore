@@ -58,37 +58,37 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 /**
  *
  * MCR.PI.Generator.myGenerator=org.mycore.pi.urn.MCRGenericPIGenerator
- *
+ * <p>
  * Set a generic pattern.
- *
+ * <p>
  * MCR.PI.Generator.myGenerator.GeneralPattern=urn:nbn:de:gbv:$CurrentDate-$1-$2-$ObjectType-$ObjectProject-$ObjectNumber-$Count-
  * MCR.PI.Generator.myGenerator.GeneralPattern=urn:nbn:de:gbv:$ObjectDate-$ObjectType-$Count
  * MCR.PI.Generator.myGenerator.GeneralPattern=urn:nbn:de:gbv:$ObjectDate-$Count
  * MCR.PI.Generator.myGenerator.GeneralPattern=urn:nbn:de:gbv:$ObjectType-$Count
  * MCR.PI.Generator.myGenerator.GeneralPattern=urn:nbn:de:gbv:$0-$1-$Count
- *
+ * <p>
  * Set a optional DateFormat, if not set the ddMMyyyy is just used as value. (SimpleDateFormat)
- *
+ * <p>
  * MCR.PI.Generator.myGenerator.DateFormat=ddMMyyyy
- *
+ * <p>
  * Set a optional ObjectType mapping, if not set the ObjectType is just used as value
- *
+ * <p>
  * MCR.PI.Generator.myGenerator.TypeMapping=document:doc,disshab:diss,Thesis:Thesis,bundle:doc,mods:test
- *
+ * <p>
  * You can also map the projectid
- *
+ * <p>
  * Set a optional Count precision, if not set or set to -1 the pure number is used (1,2,.., 999).
  * Count always relativ to type and date.
- *
+ * <p>
  * MCR.PI.Generator.myGenerator.CountPrecision=3 # will produce 001, 002, ... , 999
- *
+ * <p>
  * Set the Type of the generated pi.
- *
+ * <p>
  * MCR.PI.Generator.myGenerator.Type=dnbURN
- *
+ * <p>
  *
  * Set the Xpaths
- *
+ * <p>
  * MCR.PI.Generator.myGenerator.XPath.1=/mycoreobject/metadata/def.shelf/shelf/
  * MCR.PI.Generator.myGenerator.XPath.2=/mycoreobject/metadata/def.path2/path2/
  *

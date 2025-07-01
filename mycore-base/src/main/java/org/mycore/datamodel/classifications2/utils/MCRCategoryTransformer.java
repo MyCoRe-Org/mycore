@@ -50,7 +50,7 @@ public class MCRCategoryTransformer {
 
     /**
      * transforms a <code>MCRCategory</code> into a JDOM Document.
-     *
+     * <p>
      * The Document will have a root tag with name "mycoreclass".
      *
      * @param cl
@@ -66,7 +66,7 @@ public class MCRCategoryTransformer {
 
     /**
      * transforms a <code>MCRCategory</code> into a JDOM Element.
-     *
+     * <p>
      * The element will have the tag name "category".
      *
      * @param category
@@ -99,7 +99,7 @@ public class MCRCategoryTransformer {
 
     /**
      * transforms a <code>Classification</code> into a MCR Editor definition (<code>&lt;items&gt;</code>).
-     *
+     * <p>
      * This method allows you to specify how the labels will look like.
      * <code>labelFormat</code> is simply a String that is parsed for a few
      * key words, that will be replaced by a dynamic value. The following

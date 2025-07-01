@@ -41,7 +41,7 @@ import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
 /**
  * implementation of an MCRIDMapper
- *
+ * <p>
  * It uses Solr to retrieve the real id from the given input string
  *
  * @author Robert Stephan

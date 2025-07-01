@@ -177,7 +177,7 @@ public class MCRSolrCoreAdminCommands {
      * schema definitions, except for some MyCoRe default types and fields. Second it parses the available
      * MyCoRe modules and components and adds / updates / deletes the schema definition.
      * Finally it does the same for the solrconfig.xml definition.
-     *
+     * <p>
      * see https://github.com/MyCoRe-Org/mycore_solr_configset_main
      *
      * @param coreID the core type of the core that should be reloaded; the MyCoRe default application

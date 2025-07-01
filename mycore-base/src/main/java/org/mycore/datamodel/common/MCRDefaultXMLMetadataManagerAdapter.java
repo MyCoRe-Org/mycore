@@ -71,30 +71,30 @@ import org.mycore.datamodel.metadata.history.MCRMetadataHistoryManager;
  * Manages persistence of MCRObject and MCRDerivate xml metadata.
  * Provides methods to create, retrieve, update and delete object metadata
  * using IFS2 MCRMetadataStore instances.
- *
+ * <p>
  * For configuration, at least the following properties must be set:
- *
+ * <p>
  * MCR.Metadata.Store.BaseDir=/path/to/metadata/dir
  * MCR.Metadata.Store.SVNBase=file:///path/to/local/svndir/
- *
+ * <p>
  * Both directories will be created if they do not exist yet.
  * For each project and type, a subdirectory will be created,
  * for example %MCR.Metadata.Store.BaseDir%/DocPortal/document/.
- *
+ * <p>
  * The default IFS2 store is MCRVersioningMetadataStore, which
  * versions metadata using SVN in local repositories below SVNBase.
  * If you do not want versioning and would like to have better
  * performance, change the following property to
- *
+ * <p>
  * MCR.Metadata.Store.DefaultClass=org.mycore.datamodel.ifs2.MCRMetadataStore
- *
+ * <p>
  * It is also possible to change individual properties per project and object type
  * and overwrite the defaults, for example
- *
+ * <p>
  * MCR.IFS2.Store.Class=org.mycore.datamodel.ifs2.MCRVersioningMetadataStore
  * MCR.IFS2.Store.SVNRepositoryURL=file:///use/other/location/for/document/versions/
  * MCR.IFS2.Store.SlotLayout=2-2-2-2
- *
+ * <p>
  * See documentation of MCRStore and MCRMetadataStore for details.
  *
  * @author Frank Lützenkirchen

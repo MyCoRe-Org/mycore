@@ -37,14 +37,14 @@ import org.xml.sax.SAXException;
  * Returns publication data in MODS format for a given identifier.
  * Each resolver belongs to a certain data source, e.g. the data source
  * "PubMed" may have two resolves to get publication data by DOI or PubMed artice ID.
- *
+ * <p>
  * The resolver will use an URI to get the publication data.
  * MCR.MODS.EnrichmentResolver.DataSource.[SourceID].[TypeID].URI=[URI]
- *
+ * <p>
  * This is typically a HTTP URL followed by a XSL stylesheet to transform the
  * source format to MODS, e.g.
  * MCR.MODS.EnrichmentResolver.DataSource.DataCite.doi.URI=xslStyle:datacite2mods:https://data.datacite.org/application/vnd.datacite.datacite+xml/{0}
- *
+ * <p>
  * Within the URI, the pattern {0} will be replaced by the given identifier value,
  * optionally the pattern {1} will be replaced by the value uri-encoded as http request parameter
  *

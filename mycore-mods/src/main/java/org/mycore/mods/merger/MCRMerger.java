@@ -97,7 +97,7 @@ public class MCRMerger {
      * Merges the contents of the element wrapped by the other merger into the contents of the element wrapped
      * by this merger.
      * Should only be called if this.isProbablySameAs(other).
-     *
+     * <p>
      * The default implementation copies all attributes from the other into this if they do not exist in this element.
      * Afterwards it recursively builds mergers for all child elements and compares and eventually merges them too.
      */
