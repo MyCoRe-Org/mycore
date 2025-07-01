@@ -20,7 +20,6 @@ package org.mycore.datamodel.classifications2.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -51,7 +50,6 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlRootElement(name = "category")
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonPropertyOrder({ "ID", "url", "labels", "categories" })
-@SuppressWarnings("PMD.SingleMethodSingleton")
 public class MCRClassCategory {
 
     @XmlElement(required = true)
@@ -98,14 +96,6 @@ public class MCRClassCategory {
         this.id = value;
     }
 
-    /**
-     * @deprecated Use {@link #ofCategory(MCRCategory)} instead
-     */
-    @Deprecated
-    public static MCRClassCategory getInstance(MCRCategory from) {
-        return ofCategory(from);
-    }
-
     public static MCRClassCategory ofCategory(MCRCategory from) {
         MCRClassCategory categ = new MCRClassCategory();
         MCRCategoryID categoryID = from.getId();
@@ -122,14 +112,6 @@ public class MCRClassCategory {
                 .map(MCRLabel::clone)
                 .toList());
         return categ;
-    }
-
-    @Deprecated
-    public static List<MCRClassCategory> getInstance(List<MCRCategory> children) {
-        return children
-            .stream()
-            .map(MCRClassCategory::ofCategory)
-            .collect(Collectors.toList());
     }
 
 }

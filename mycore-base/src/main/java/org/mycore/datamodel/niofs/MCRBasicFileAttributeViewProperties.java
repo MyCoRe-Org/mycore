@@ -61,14 +61,6 @@ public class MCRBasicFileAttributeViewProperties<V extends BasicFileAttributeVie
             return name;
         }
 
-        /**
-         * @deprecated use {@link #fromName(String)} instead
-         */
-        @Deprecated
-        public static Attribute ofName(String name) {
-            return fromName(name);
-        }
-
         public static Attribute fromName(String name) {
             return Arrays.stream(values())
                 .filter(attribute -> attribute.getName().equals(name))

@@ -182,24 +182,6 @@ public interface MCRRuleAccessInterface extends MCRAccessInterface {
     MCRAccessRule getAccessRule(String id, String permission);
 
     /**
-     * determines whether a given user has the permission to perform a
-     * certain action. no session data will be checked here.
-     * <p>
-     * This method is used for checking "a priori permissions" like "create-document"
-     *     where a String ID does not exist yet
-     *
-     * @param permission
-     *            the permission/action to be granted, e.g. "create-document"
-     * @param userID
-     *            the MCRUser, whose permissions are checked
-     * @return true if the permission is granted, else false
-     * @see org.mycore.common.MCRSessionMgr#getCurrentSession()
-     * @see org.mycore.common.MCRSession
-     */
-    @Deprecated
-    boolean checkPermissionForUser(String permission, String userID);
-
-    /**
      * determines whether the current user has the permission to perform a
      * certain action.
      * <p>

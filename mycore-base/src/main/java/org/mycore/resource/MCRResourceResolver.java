@@ -108,24 +108,8 @@ public final class MCRResourceResolver {
         this.provider = Objects.requireNonNull(provider, "Provider must not be null");
     }
 
-    /**
-     * @deprecated Use {@link #obtainInstance()} instead
-     */
-    @Deprecated
-    public static MCRResourceResolver instance() {
-        return obtainInstance();
-    }
-
     public static MCRResourceResolver obtainInstance() {
         return SHARED_INSTANCE;
-    }
-
-    /**
-     * @deprecated Use {@link #createInstance()} instead
-     */
-    @Deprecated
-    public static MCRResourceResolver instantiate() {
-        return createInstance();
     }
 
     public static MCRResourceResolver createInstance() {

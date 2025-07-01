@@ -154,14 +154,6 @@ public final class MCRURIResolver implements URIResolver {
             LOGGER.error("Unable to initialize MCRURIResolver", exc);
         }
     }
-    
-    /**
-     * @deprecated Use {@link MCRURIResolver#reinitialize()} instead
-     */
-    @Deprecated
-    public static void reInit() {
-        obtainInstance().reinitialize();
-    }
 
     private static MCRResolverProvider getExternalResolverProvider() {
         return MCRConfiguration2
@@ -177,14 +169,6 @@ public final class MCRURIResolver implements URIResolver {
             }
             cause = cause.getCause();
         }
-    }
-
-    /**
-     * @deprecated Use {@link #obtainInstance()} instead
-     */
-    @Deprecated
-    public static MCRURIResolver instance() {
-        return obtainInstance();
     }
 
     public static MCRURIResolver obtainInstance() {
@@ -416,15 +400,6 @@ public final class MCRURIResolver implements URIResolver {
         return null;
     }
 
-    @Deprecated
-    URIResolver getResolver(String scheme) {
-        if (supportedSchemes.containsKey(scheme)) {
-            return supportedSchemes.get(scheme);
-        }
-        String msg = "Unsupported scheme type: " + scheme;
-        throw new MCRUsageException(msg);
-    }
-
     /**
      * provides a URI -- Resolver Mapping One can implement this interface to provide additional URI schemes this
      * MCRURIResolver should handle, too. To add your mapping you have to set the
@@ -595,7 +570,7 @@ public final class MCRURIResolver implements URIResolver {
                     LOGGER.debug("include stylesheet: {}", saxSource::getSystemId);
                     return saxSource;
                 } else {
-                    return instance().resolve(resource.toString(), base);
+                    return obtainInstance().resolve(resource.toString(), base);
                 }
             }
             return null;
@@ -945,7 +920,7 @@ public final class MCRURIResolver implements URIResolver {
             String target = href.substring(href.indexOf(':') + 1);
 
             try {
-                return instance().resolve(target, base);
+                return obtainInstance().resolve(target, base);
             } catch (Exception ex) {
                 LOGGER.debug("Caught {}. Put it into XML to process in XSL!", () -> ex.getClass().getName());
                 Element exception = new Element("exception");
@@ -990,7 +965,7 @@ public final class MCRURIResolver implements URIResolver {
             // end fix
             LOGGER.debug("Ensuring xml is not null: {}", target);
             try {
-                Source result = instance().resolve(target, base);
+                Source result = obtainInstance().resolve(target, base);
                 if (result != null) {
                     // perform actual construction of xml document, as in MCRURIResolver#resolve(String),
                     // by performing the same actions as MCRSourceContent#asXml(),
@@ -1109,7 +1084,7 @@ public final class MCRURIResolver implements URIResolver {
             String stylesheetPaths = help.substring(0, configurationEnd);
 
             // resolve target URI
-            Source resolved = instance().resolve(targetUri, base);
+            Source resolved = obtainInstance().resolve(targetUri, base);
             assert resolved != null;
 
             try {
@@ -1178,7 +1153,7 @@ public final class MCRURIResolver implements URIResolver {
             } else {
                 params = Collections.emptyMap();
             }
-            Source resolved = instance().resolve(target, base);
+            Source resolved = obtainInstance().resolve(target, base);
 
             try {
                 if (resolved != null) {
@@ -1768,7 +1743,7 @@ public final class MCRURIResolver implements URIResolver {
                 throw new TransformerException("No Access to " + uri + " (" + href + " )");
             }
 
-            return instance().resolve(uri, base);
+            return obtainInstance().resolve(uri, base);
         }
     }
 
@@ -1839,7 +1814,7 @@ public final class MCRURIResolver implements URIResolver {
 
             if (resolvedXML == null) {
                 LOGGER.debug(() -> hrefToCache + " not in cache, must resolve");
-                resolvedXML = instance().resolve(hrefToCache);
+                resolvedXML = obtainInstance().resolve(hrefToCache);
                 cache.put(hrefToCache, resolvedXML);
             } else {
                 LOGGER.debug(() -> hrefToCache + " already in cache");

@@ -121,14 +121,6 @@ public class MCRSourceContent extends MCRWrappedContent {
     }
 
     /**
-     * @deprecated Use {@link #createInstance(String)} instead
-     */
-    @Deprecated
-    public static MCRSourceContent getInstance(String uri) throws TransformerException {
-        return createInstance(uri);
-    }
-
-    /**
      * Build instance of MCRSourceContent by resolving via {@link MCRURIResolver}
      * 
      * @throws TransformerException

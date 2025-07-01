@@ -53,15 +53,6 @@ class MCRAuthorityAndCode extends MCRAuthorityInfo {
     /** The value code */
     private final String code;
 
-
-    /**
-     * @deprecated Use {@link #parseXML(Element)} instead
-     */
-    @Deprecated
-    public static MCRAuthorityAndCode getAuthorityInfo(Element modsElement) {
-        return parseXML(modsElement);
-    }
-
     /**
      * Inspects the attributes in the given MODS XML element and returns the AuthorityInfo given there.
      */
@@ -70,14 +61,6 @@ class MCRAuthorityAndCode extends MCRAuthorityInfo {
         String type = modsElement.getAttribute("type");
         String code = MCRMODSClassificationSupport.getText(modsElement).trim();
         return getAuthorityInfo(authority, type, code);
-    }
-
-    /**
-     * @deprecated Use {@link #parseXML(org.jdom2.Element)} instead
-     */
-    @Deprecated
-    public static MCRAuthorityAndCode getAuthorityInfo(org.jdom2.Element modsElement) {
-        return parseXML(modsElement);
     }
 
     /**

@@ -299,18 +299,6 @@ public class MCRConfiguration2 {
      * Gets a list of properties which represent a configurable class and turns them in to a map.
      * @return a map where the key is a String describing the configurable instance value
      */
-    @Deprecated
-    public static <T> Map<String, Callable<T>> getInstances(String prefix) {
-        return getInstantiatablePropertyKeys(prefix)
-            .collect(Collectors.toMap(
-                k -> MCRInstanceName.of(k).canonical().substring(prefix.length()),
-                v -> () -> (T) getInstanceOf(Object.class, v).orElse(null)));
-    }
-
-    /**
-     * Gets a list of properties which represent a configurable class and turns them in to a map.
-     * @return a map where the key is a String describing the configurable instance value
-     */
     public static <S> Map<String, Callable<S>> getInstances(Class<S> superClass, String prefix) {
         return getInstantiatablePropertyKeys(prefix)
             .collect(Collectors.toMap(
@@ -434,12 +422,6 @@ public class MCRConfiguration2 {
 
     public static boolean removePropertyChangeEventListener(UUID uuid) {
         return LISTENERS.remove(uuid) != null;
-    }
-
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public static <T> T instantiateClass(String className) {
-        return (T) instantiateClass(Object.class, className);
     }
 
     public static <S> S instantiateClass(Class<S> superClass, String className) {

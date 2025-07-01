@@ -43,7 +43,6 @@ import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 import org.mycore.common.processing.MCRProcessableDefaultCollection;
 import org.mycore.common.processing.MCRProcessableManager;
-import org.mycore.iview2.events.MCRIView2TilingThreadStarter;
 import org.mycore.util.concurrent.processing.MCRProcessableExecutor;
 import org.mycore.util.concurrent.processing.MCRProcessableFactory;
 
@@ -84,15 +83,6 @@ public final class MCRImageTiler implements Runnable, Closeable {
             LOGGER.error("Error while initializing", e);
             throw new MCRException(e);
         }
-    }
-
-    /**
-     * @return true if image tiler thread is running.
-     * @deprecated Use {@link MCRIView2TilingThreadStarter#isStarted()} instead
-     */
-    @Deprecated
-    public static boolean isRunning() {
-        return MCRIView2TilingThreadStarter.getInstance().isStarted();
     }
 
     /**

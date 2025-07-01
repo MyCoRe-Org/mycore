@@ -55,14 +55,6 @@ final class MCRDataSourceFactory {
         defaultStopOnFirstResult = MCRConfiguration2.getBoolean(cfgProperty).orElse(Boolean.TRUE);
     }
 
-    /**
-     * @deprecated Use {@link #getInstance()} instead
-     */
-    @Deprecated
-    static MCRDataSourceFactory instance() {
-        return getInstance();
-    }
-
     static MCRDataSourceFactory getInstance() {
         return LazyInstanceHolder.SINGLETON_INSTANCE;
     }

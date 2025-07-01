@@ -35,14 +35,6 @@ public final class MCRWorkSource {
 
     private final String sourceID;
 
-    /**
-     * @deprecated Use {@link #obtainInstance(String)} instead
-     */
-    @Deprecated
-    static MCRWorkSource getInstance(String sourceID) {
-        return obtainInstance(sourceID);
-    }
-
     static MCRWorkSource obtainInstance(String sourceID) {
         return SOURCES.computeIfAbsent(sourceID, MCRWorkSource::new);
     }

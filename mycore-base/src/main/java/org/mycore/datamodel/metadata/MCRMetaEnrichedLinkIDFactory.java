@@ -27,14 +27,6 @@ import org.mycore.common.config.MCRConfiguration2;
  */
 public abstract class MCRMetaEnrichedLinkIDFactory {
 
-    /**
-     * @deprecated use {@link #obtainInstance()} instead
-     */
-    @Deprecated
-    public static MCRMetaEnrichedLinkIDFactory getInstance() {
-        return obtainInstance();
-    }
-
     public static MCRMetaEnrichedLinkIDFactory obtainInstance() {
         return LazyInstanceHolder.SHARED_INSTANCE;
     }

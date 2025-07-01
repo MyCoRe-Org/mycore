@@ -117,14 +117,6 @@ public class MCRStoreManager {
         return MCRStoreCenter.getInstance().getStore(id);
     }
 
-    /**
-     * @deprecated use {@link #getStore(String)} instead
-     */
-    @Deprecated
-    public static <T extends MCRStore> T getStore(String id, Class<T> storeClass) {
-        return MCRStoreCenter.getInstance().getStore(id, storeClass);
-    }
-
     public static void removeStore(String id) {
         LOGGER.info("Remove MCRStore '{}'.", id);
         MCRStoreCenter.getInstance().removeStore(id);

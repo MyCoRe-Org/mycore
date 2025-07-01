@@ -173,18 +173,6 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
         return true;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mycore.access.MCRAccessInterface#checkAccess(java.lang.String, MCRUser)
-     */
-    @Deprecated
-    @Override
-    public boolean checkPermissionForUser(String permission, String userID) {
-        LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for permission {} for user {}", permission, userID);
-        return true;
-    }
-
     @Override
     public boolean checkPermissionForUser(String permission, MCRUserInformation userInfo) {
         LOGGER.debug(() ->

@@ -87,22 +87,6 @@ public final class MCRJSONManager {
 
     }
 
-    /**
-     * @deprecated Provide adapters to the constructor or define them in properties.
-     */
-    @Deprecated
-    public void registerAdapter(MCRJSONTypeAdapter<?> typeAdapter) {
-        gsonBuilder.registerTypeAdapter(typeAdapter.bindTo(), typeAdapter);
-    }
-
-    /**
-     * @deprecated Use {@link #obtainInstance()} instead
-     */
-    @Deprecated
-    public static MCRJSONManager instance() {
-        return obtainInstance();
-    }
-
     public static MCRJSONManager obtainInstance() {
         return LazyInstanceHolder.SHARED_INSTANCE;
     }
@@ -110,14 +94,6 @@ public final class MCRJSONManager {
     public static MCRJSONManager createInstance() {
         String classProperty = MANAGER_PROPERTY + ".Class";
         return MCRConfiguration2.getInstanceOfOrThrow(MCRJSONManager.class, classProperty);
-    }
-
-    /**
-     * @deprecated Use {@link #createGsonBuilder()} instead
-     */
-    @Deprecated
-    public GsonBuilder getGsonBuilder() {
-        return gsonBuilder.create().newBuilder();
     }
 
     public Gson createGson() {

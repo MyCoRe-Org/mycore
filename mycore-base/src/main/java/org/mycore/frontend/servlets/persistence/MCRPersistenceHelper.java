@@ -38,7 +38,6 @@ import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.resource.MCRResourceHelper;
 
-import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -128,11 +127,6 @@ class MCRPersistenceHelper {
             LOGGER.debug("Results in \n{}", swClean);
         }
         return new MCRObject(validMyCoReObject);
-    }
-
-    @Deprecated
-    protected static String getWebPage(ServletContext context, String modernPage, String deprecatedPage) {
-        return getWebPage(modernPage, deprecatedPage);
     }
 
     protected static String getWebPage(String modernPage, String deprecatedPage) {

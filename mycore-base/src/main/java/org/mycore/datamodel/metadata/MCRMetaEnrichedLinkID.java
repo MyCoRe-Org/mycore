@@ -67,23 +67,6 @@ public class MCRMetaEnrichedLinkID extends MCRMetaLinkID {
         setContentList(new ArrayList<>());
     }
 
-
-    /**
-     * @deprecated use {@link #parseXML(Element)} instead
-     */
-    @Deprecated
-    public static MCRMetaEnrichedLinkID fromDom(Element element) {
-        return parseXML(element);
-    }
-
-    /**
-     * deprecated in 2023.06, use {@link MCRMetaEnrichedLinkIDFactory} instead
-     */
-    @Deprecated
-    public static MCRMetaEnrichedLinkID parseXML(Element element) {
-        return MCRMetaEnrichedLinkIDFactory.obtainInstance().fromDom(element);
-    }
-
     private static int getElementPosition(Element e) {
         final int index = ORDER.indexOf(e.getName());
         return index < 0 ? ORDER.size() : index;

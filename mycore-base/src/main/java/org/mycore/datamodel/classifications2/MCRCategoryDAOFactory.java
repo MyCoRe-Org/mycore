@@ -30,14 +30,6 @@ import org.mycore.common.config.MCRConfiguration2;
 public class MCRCategoryDAOFactory {
 
     /**
-     * @deprecated Use {@link #obtainInstance()} instaed
-     */
-    @Deprecated
-    public static MCRCategoryDAO getInstance() {
-        return obtainInstance();
-    }
-
-    /**
      * Returns an instance of a MCRCategoryDAO implementation.
      */
     public static MCRCategoryDAO obtainInstance() {

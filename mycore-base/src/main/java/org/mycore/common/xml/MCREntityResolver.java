@@ -86,14 +86,6 @@ public final class MCREntityResolver implements EntityResolver2, LSResourceResol
         bytesCache = new MCRCache<>(cacheSize, "EntityResolver Resources");
     }
 
-    /**
-     * @deprecated Use {@link #getInstance()} instead
-     */
-    @Deprecated
-    public static MCREntityResolver instance() {
-        return getInstance();
-    }
-
     public static MCREntityResolver getInstance() {
         return LazyInstanceHolder.SINGLETON_INSTANCE;
     }

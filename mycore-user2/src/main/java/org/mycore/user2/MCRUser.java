@@ -293,25 +293,6 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     /**
      * @return the hash
-     * @deprecated Use {@link #getHash()} instead
-     */
-    @Transient
-    @Deprecated
-    public String getPassword() {
-        return password == null ? null : password.hash;
-    }
-
-    /**
-     * @param password the hash value to set
-     * @deprecated Use {@link #setHash(String)} instead
-     */
-    @Deprecated
-    public void setPassword(String password) {
-        this.password.hash = password;
-    }
-
-    /**
-     * @return the hash
      */
     @Column(name = "password")
     public String getHash() {
@@ -406,18 +387,6 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      */
     public void setRealName(String realName) {
         this.realName = realName;
-    }
-
-    /**
-     * Returns the E-Mail address of the person this login user represents.
-     *
-     * @return the E-Mail address of the person this login user represents.
-     * @deprecated Use {@link #getEMail()} instead
-     */
-    @Transient
-    @Deprecated
-    public String getEMailAddress() {
-        return eMail;
     }
 
     /**
