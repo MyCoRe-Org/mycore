@@ -318,15 +318,13 @@ class MCRConfigurableInstanceHelper {
             this.injectors = findInjectors(targetClass);
         }
 
-        // TODO: remove legacy factory method option after release of 2025.06 LTS and adjust error message
         private Supplier<T> getFactory(Class<T> targetClass) {
 
             List<Method> declaredFactoryMethods = findFactoryMethods(targetClass, targetClass.getDeclaredMethods());
             Optional<Supplier<T>> factory = Stream.<Supplier<Optional<Supplier<T>>>>of(
                     () -> findSingletonFactoryMethod(declaredFactoryMethods),
                     () -> findAnnotatedFactoryMethod(declaredFactoryMethods),
-                    () -> findDefaultConstructor(targetClass),
-                    () -> findLegacyFactoryMethod(findFactoryMethods(targetClass, targetClass.getMethods())))
+                    () -> findDefaultConstructor(targetClass))
                 .map(Supplier::get)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -336,9 +334,7 @@ class MCRConfigurableInstanceHelper {
                 new MCRConfigurationException("Class " + targetClass.getName() + " has "
                     + " has no singleton factory method (public, static, matching return type, parameterless, name"
                     + " equals 'getInstance'), no annotated factory method (public, static, matching return type,"
-                    + " parameterless, annotated with @MCRFactory), no public parameterless constructor and no legacy"
-                    + " factory method (public, static, matching return type, parameterless, name containing"
-                    + " 'instance')")
+                    + " parameterless, annotated with @MCRFactory) and no public parameterless constructor")
             );
 
         }
@@ -357,7 +353,6 @@ class MCRConfigurableInstanceHelper {
 
             List<Method> singletonFactoryMethods = factoryMethods.stream()
                 .filter(method -> method.getName().equals("getInstance"))
-                .filter(method -> method.getAnnotation(Deprecated.class) == null)
                 .toList();
 
             if (singletonFactoryMethods.size() > 1) {
@@ -392,29 +387,6 @@ class MCRConfigurableInstanceHelper {
             } catch (NoSuchMethodException e) {
                 return Optional.empty();
             }
-        }
-
-        private Optional<Supplier<T>> findLegacyFactoryMethod(List<Method> factoryMethods) {
-
-            List<Method> legacyFactoryMethods = factoryMethods.stream()
-                .filter(method -> method.getName().toLowerCase(Locale.ROOT).contains("instance"))
-                .toList();
-
-            if (legacyFactoryMethods.size() > 1) {
-                throw new MCRConfigurationException("Class " + targetClass.getName()
-                    + " has multiple legacy factory methods (public, static, matching return type, parameterless, name"
-                    + " contains 'instance'): " + methodNames(legacyFactoryMethods));
-            }
-
-            return legacyFactoryMethods.stream().findFirst().map(method -> {
-                if (LOGGER.isWarnEnabled()) {
-                    LOGGER.warn("Instantiation of {} relies on legacy factory method (public, static,"
-                            + " matching return type, parameterless, name containing 'instance') {}.",
-                        targetClass.getName(), method.getName());
-                }
-                return createFactoryMethodFactory(method);
-            });
-
         }
 
         @SuppressWarnings("unchecked")
@@ -719,23 +691,7 @@ class MCRConfigurableInstanceHelper {
 
             @Override
             public Source<MCRProperty, ?> annotationToSource(MCRProperty annotation) {
-                String annotationName = annotation.name();
-                if (annotationName.equals("*")) {
-                    warnAboutDeprecatedNamePattern(annotationName);
-                    return new AllPropertiesSource(annotation, "");
-                } else if (annotationName.endsWith(".*")) {
-                    warnAboutDeprecatedNamePattern(annotationName);
-                    return new AllPropertiesSource(annotation, annotationName
-                        .substring(0, annotationName.length() - 1));
-                } else {
-                    return new PropertySource(annotation);
-                }
-            }
-
-            private void warnAboutDeprecatedNamePattern(String annotationName) {
-                LOGGER.warn("Injection property map with @MCRProperty amd name pattern {}."
-                    + " You should migrate to @MCRRawProperties, as this feature will be removed"
-                    + " in a future release of MyCoRe.", annotationName);
+                return new PropertySource(annotation);
             }
 
         }),
