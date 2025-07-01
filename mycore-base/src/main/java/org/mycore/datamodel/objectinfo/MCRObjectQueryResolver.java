@@ -57,14 +57,6 @@ public interface MCRObjectQueryResolver {
      */
     int count(MCRObjectQuery objectQuery);
 
-    /**
-     * @deprecated Use {@link #obtainInstance()} instead
-     */
-    @Deprecated
-    static MCRObjectQueryResolver getInstance() {
-        return obtainInstance();
-    }
-
     static MCRObjectQueryResolver obtainInstance() {
         return InstanceHolder.SHARED_INSTANCE;
     }

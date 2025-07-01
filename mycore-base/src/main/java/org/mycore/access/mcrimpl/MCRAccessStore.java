@@ -75,14 +75,6 @@ public abstract class MCRAccessStore {
      */
     public abstract Collection<String> getDistinctStringIDs();
 
-    /**
-     * @deprecated Use {@link #obtainInstance()} instead
-     */
-    @Deprecated
-    public static MCRAccessStore getInstance() {
-        return obtainInstance();
-    }
-
     public static MCRAccessStore obtainInstance() {
         return LazyInstanceHolder.SHARED_INSTANCE;
     }

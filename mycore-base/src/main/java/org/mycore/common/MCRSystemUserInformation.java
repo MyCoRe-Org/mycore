@@ -59,42 +59,6 @@ public enum MCRSystemUserInformation implements MCRUserInformation {
         return null;
     }
 
-    /**
-     * @return the guestInstance
-     * @deprecated Use {@link #GUEST} instead
-     */
-    @Deprecated
-    public static MCRSystemUserInformation getGuestInstance() {
-        return GUEST;
-    }
-
-    /**
-     * @return the janitor Instance
-     * @deprecated Use {@link #JANITOR} instead
-     */
-    @Deprecated
-    public static MCRSystemUserInformation getJanitorInstance() {
-        return JANITOR;
-    }
-
-    /**
-     * @return the systemInstance
-     * @deprecated Use {@link #SYSTEM_USER} instead
-     */
-    @Deprecated
-    public static MCRSystemUserInformation getSystemUserInstance() {
-        return SYSTEM_USER;
-    }
-
-    /**
-     * @return the superUserInstance
-     * @deprecated Use {@link #SUPER_USER} instead
-     */
-    @Deprecated
-    public static MCRSystemUserInformation getSuperUserInstance() {
-        return SUPER_USER;
-    }
-
     private record UserIdResolver(String userId, String property) {
 
         @Override

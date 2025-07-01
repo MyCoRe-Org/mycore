@@ -74,15 +74,6 @@ public class MCROAISimpleResult implements MCROAIResult {
         return this;
     }
 
-
-    /**
-     * @deprecated Use {@link #ofResult(MCROAIResult)} instead
-     */
-    @Deprecated
-    public static MCROAISimpleResult from(MCROAIResult result) {
-        return ofResult(result);
-    }
-
     public static MCROAISimpleResult ofResult(MCROAIResult result) {
         MCROAISimpleResult newResult = new MCROAISimpleResult();
         newResult.setHeaderList(result.list());

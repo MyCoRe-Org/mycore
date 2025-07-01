@@ -75,14 +75,6 @@ public abstract class MCRAbstractFileSystem extends FileSystem {
     }
 
     /**
-     * @deprecated use {@link #obtainInstance(String)} instead
-     */
-    @Deprecated
-    public static MCRAbstractFileSystem getInstance(String scheme) throws FileSystemNotFoundException {
-        return obtainInstance(scheme);
-    }
-
-    /**
      * Returns any subclass that implements and handles the given scheme.
      * @param scheme a valid {@link URI} scheme
      * @see FileSystemProvider#getScheme()

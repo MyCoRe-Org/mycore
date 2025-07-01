@@ -100,15 +100,6 @@ class MCRConfigurableInstanceHelper {
     }
 
     /**
-     * @deprecated Use {@link #getInstance(Class, String)} instead
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public static <T> Optional<T> getInstance(String name) throws MCRConfigurationException {
-        return (Optional<T>) getInstance(Object.class, name);
-    }
-
-    /**
      * Shorthand for {@link #getInstance(Class, String, Set)} that uses no options.
      */
     public static <S> Optional<S> getInstance(Class<S> superClass, String name) throws MCRConfigurationException {
@@ -136,15 +127,6 @@ class MCRConfigurableInstanceHelper {
 
     private static boolean isAbsent(String className) {
         return className == null || className.isBlank();
-    }
-
-    /**
-     * @deprecated Use {@link #getInstance(Class, MCRInstanceConfiguration)} instead
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public static <T> T getInstance(MCRInstanceConfiguration configuration) throws MCRConfigurationException {
-        return (T) getInstance(Objects.class, configuration, null, NO_OPTIONS);
     }
 
     /**

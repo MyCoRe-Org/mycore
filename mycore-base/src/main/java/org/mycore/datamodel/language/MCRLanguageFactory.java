@@ -85,14 +85,6 @@ public final class MCRLanguageFactory {
         initDefaultLanguages();
     }
 
-    /**
-     * @deprecated use {@link #obtainInstance()} instead
-     */
-    @Deprecated
-    public static MCRLanguageFactory instance() {
-        return obtainInstance();
-    }
-
     public static MCRLanguageFactory obtainInstance() {
         return LazyInstanceHolder.SHARED_INSTANCE;
     }

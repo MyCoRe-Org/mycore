@@ -104,18 +104,6 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     }
 
     /**
-     * This method set the text field for the default language. If data exists,
-     * it overwrites the value of text.
-     *
-     * @param text
-     *            the text string for a date or range
-     */
-    @Deprecated
-    public final void setText(String text) {
-        setText(text, lang);
-    }
-
-    /**
      * This method set the text field for the given language. If data exists, it
      * overwrites the value of text.
      *
@@ -415,17 +403,17 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
             if (lang != null) {
                 setText(text, lang);
             } else {
-                setText(text);
+                setText(text, this.lang);
             }
         }
         setCalendar(element.getChildTextTrim("calendar"));
         setVonDate(element.getChildTextTrim("von"), calendar);
         setBisDate(element.getChildTextTrim("bis"), calendar);
-        /**
+        /*
          * If dates higher than 1582 and calendar is Julian the calendar must switch to
          * Gregorian cause the date transforming is implicit in the calendar methods. In
          * other cases before 1582 both calendar are equal.
-         * */
+         */
         if (calendar.equals(MCRCalendar.TAG_JULIAN)) {
             calendar = MCRCalendar.TAG_GREGORIAN;
         }
@@ -602,36 +590,6 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         }
 
         /**
-         * This method set the text element.
-         *
-         * @param text
-         *            the text String of a date value
-         */
-        @Deprecated
-        public void setText(String text) {
-            if (text == null || text.isEmpty()) {
-                this.text = "";
-            } else {
-                this.text = text;
-            }
-        }
-
-        /**
-         * This method set the lang element.
-         *
-         * @param lang
-         *            the language String of a date value
-         */
-        @Deprecated
-        public void setLang(String lang) {
-            if (lang == null || lang.isEmpty()) {
-                this.lang = DEFAULT_LANGUAGE;
-            } else {
-                this.lang = lang;
-            }
-        }
-
-        /**
          * This method validate the content. If lang and text are not empty, it return true otherwise it return false.
          *
          * @return true if the content is valid.
@@ -658,18 +616,6 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
             }
             final MCRMetaHistoryDateText other = (MCRMetaHistoryDateText) obj;
             return Objects.equals(lang, other.lang) && Objects.equals(text, other.text);
-        }
-
-        /**
-         * This method check the equivalence of lang and text between this object
-         * and a given MCRMetaHistoryDateText object.
-         *
-         * @param other a MCRMetaHistoryDateText instance
-         * @return true if both parts are equal
-         */
-        @Deprecated //use equals()
-        public boolean equalLangAndText(MCRMetaHistoryDateText other) {
-            return lang.equals(other.getLang()) && text.equals(other.getText());
         }
 
         @Override

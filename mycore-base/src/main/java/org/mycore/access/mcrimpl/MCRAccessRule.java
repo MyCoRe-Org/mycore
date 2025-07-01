@@ -59,25 +59,6 @@ public class MCRAccessRule implements org.mycore.access.MCRAccessRule {
 
     }
 
-    @Deprecated
-    public boolean checkAccess(String userID, Date date, MCRIPAddress ip) {
-        if (parsedRule == null) {
-            if (userID.equals(MCRSystemUserInformation.SUPER_USER.getUserID())) {
-                LogManager.getLogger(MCRAccessRule.class).debug("No rule defined, grant access to super user.");
-                return true;
-            }
-            return false;
-        }
-        LogManager.getLogger(this.getClass()).debug("new MCRAccessData");
-        MCRAccessData data = new MCRAccessData(userID, date, ip);
-        LogManager.getLogger(this.getClass()).debug("new MCRAccessData done.");
-
-        LogManager.getLogger(this.getClass()).debug("evaluate MCRAccessData");
-        boolean returns = parsedRule.evaluate(data);
-        LogManager.getLogger(this.getClass()).debug("evaluate MCRAccessData done.");
-        return returns;
-    }
-
     public boolean checkAccess(MCRUserInformation userInfo, Date date, MCRIPAddress ip) {
         if (parsedRule == null) {
             if (userInfo.getUserID().equals(MCRSystemUserInformation.SUPER_USER.getUserID())) {

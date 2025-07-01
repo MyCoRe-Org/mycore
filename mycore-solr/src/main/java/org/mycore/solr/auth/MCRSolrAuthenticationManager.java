@@ -96,14 +96,6 @@ public final class MCRSolrAuthenticationManager {
         authenticators.get(level).applyAuthentication(request);
     }
 
-    /**
-     * @deprecated Use {@link #obtainInstance()} instead
-     */
-    @Deprecated
-    static MCRSolrAuthenticationManager getInstance() {
-        return obtainInstance();
-    }
-
     public static MCRSolrAuthenticationManager obtainInstance() {
         return LazyInstanceHolder.SINGLETON_INSTANCE;
     }

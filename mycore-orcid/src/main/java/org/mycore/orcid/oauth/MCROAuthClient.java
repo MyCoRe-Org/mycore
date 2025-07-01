@@ -68,14 +68,6 @@ public final class MCROAuthClient {
         this.client = ClientBuilder.newClient();
     }
 
-    /**
-     * @deprecated Use {@link #obtainInstance()} instead
-     */
-    @Deprecated
-    public static MCROAuthClient instance() {
-        return obtainInstance();
-    }
-
     @MCRFactory
     public static MCROAuthClient obtainInstance() {
         return LazyInstanceHolder.SHARED_INSTANCE;

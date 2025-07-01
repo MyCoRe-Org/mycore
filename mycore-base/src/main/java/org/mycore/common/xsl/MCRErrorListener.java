@@ -37,15 +37,6 @@ public final class MCRErrorListener implements ErrorListener {
 
     private String lastMessage;
 
-    /**
-     * @deprecated Use {@code new MCRErrorListener()} instead
-     */
-    @Deprecated
-    @SuppressWarnings("PMD.SingletonClassReturningNewInstance")
-    public static MCRErrorListener getInstance() {
-        return new MCRErrorListener();
-    }
-
     public TransformerException getExceptionThrown() {
         return exceptionThrown;
     }
