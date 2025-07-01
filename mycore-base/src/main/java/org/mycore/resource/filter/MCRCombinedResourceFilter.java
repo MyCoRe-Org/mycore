@@ -31,30 +31,37 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceList;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
+import org.mycore.resource.common.MCRResourceTracer;
 
 /**
- * {@link MCRCombinedResourceFilter} is an implementation of {@link MCRResourceFilter} that delegates to multiple
+ * A {@link MCRCombinedResourceFilter} is a {@link MCRResourceFilter} that delegates to multiple
  * other {@link MCRResourceFilter} instances, one after another.
  * <p>
- * The following configuration options are available, if configured automatically:
+ * The following configuration options are available:
  * <ul>
- * <li> Filters are configured as a list using the property suffix {@link MCRCombinedResourceFilter#FILTERS_KEY}.
+ * <li> The property suffix {@link MCRCombinedResourceFilter#FILTERS_KEY} can be used to
+ * specify the list of filers to be used.
  * </ul>
  * Example:
- * <pre>
+ * <pre><code>
  * [...].Class=org.mycore.resource.filter.MCRCombinedResourceFilter
- * [...].Filters.10.Class=MUST_MATCH
- * </pre>
+ * [...].Filters.10.Class=foo.bar.FooFilter
+ * [...].Filters.10.Key1=Value1
+ * [...].Filters.10.Key2=Value2
+ * [...].Filters.20.Class=foo.bar.BarFilter
+ * [...].Filters.20.Key1=Value1
+ * [...].Filters.20.Key2=Value2
+ * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRCombinedResourceFilter.Factory.class)
-public final class MCRCombinedResourceFilter extends MCRResourceFilterBase {
+public class MCRCombinedResourceFilter extends MCRResourceFilterBase {
 
     public static final String FILTERS_KEY = "Filters";
 
     private final List<MCRResourceFilter> filters;
 
     public MCRCombinedResourceFilter(MCRResourceFilter... filters) {
-        this(Arrays.asList(filters));
+        this(Arrays.asList(Objects.requireNonNull(filters, "Filters must not be null")));
     }
 
     public MCRCombinedResourceFilter(List<MCRResourceFilter> filters) {
@@ -63,10 +70,10 @@ public final class MCRCombinedResourceFilter extends MCRResourceFilterBase {
     }
 
     @Override
-    protected Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints) {
+    protected Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
         Stream<URL> filteredResourceUrls = resourceUrls;
         for (MCRResourceFilter filter : filters) {
-            filteredResourceUrls = filter.filter(filteredResourceUrls, hints);
+            filteredResourceUrls = filter.filter(filteredResourceUrls, hints, tracer.update(filter));
         }
         return filteredResourceUrls;
     }
@@ -80,7 +87,7 @@ public final class MCRCombinedResourceFilter extends MCRResourceFilterBase {
 
     public static class Factory implements Supplier<MCRCombinedResourceFilter> {
 
-        @MCRInstanceList(name = FILTERS_KEY, valueClass = MCRResourceFilter.class)
+        @MCRInstanceList(name = FILTERS_KEY, valueClass = MCRResourceFilter.class, required = false)
         public List<MCRResourceFilter> filters;
 
         @Override

@@ -21,6 +21,7 @@ package org.mycore.resource.provider;
 import static org.mycore.common.config.MCRConfiguration2.splitValue;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -33,33 +34,38 @@ import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 
 /**
- * {@link MCRFileSystemResourceProvider} is an implementation of {@link MCRResourceProvider} that looks up,
- * depending on the given {@link MCRResourceProviderMode} value, resources or web resources in the file system.
+ * A {@link MCRFileSystemResourceProvider} is a {@link MCRResourceProvider} that looks up
+ * (depending on the given {@link MCRResourceProviderMode} value) resources or web resources, in the file system.
  * It uses a fixed list of base directories for the lookup.
  * <p>
- * The following configuration options are available, if configured automatically:
+ * The following configuration options are available:
  * <ul>
- * <li> The mode is configures using the property suffix {@link MCRFileSystemResourceProvider#MODE_KEY}.
- * <li> The property suffix {@link MCRFileSystemResourceProvider#COVERAGE_KEY} can be used to provide short
- * description for human beings in order to better understand the providers use case.
+ * <li> The property suffix {@link MCRResourceProviderBase#COVERAGE_KEY} can be used to
+ * provide a short description of the providers purpose; used in log messages.
+ * <li> The property suffix  {@link MCRFileSystemResourceProviderBase#MODE_KEY} can be used to
+ * specify the mode to be used.
+ * <li> The property suffix {@link MCRFileSystemResourceProvider#BASE_DIRS_KEY} can be used to
+ * specify the list of base directories to be used.
  * </ul>
  * Example:
- * <pre>
+ * <pre><code>
  * [...].Class=org.mycore.resource.provider.MCRFileSystemResourceProvider
  * [...].Coverage=Lorem ipsum dolor sit amet
- * [...].MODE=RESOURCES
- * </pre>
+ * [...].Mode=RESOURCES
+ * [...].BaseDirs.10=/base/dir/foo
+ * [...].BaseDirs.20=/base/dir/bar
+ * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRFileSystemResourceProvider.Factory.class)
 public class MCRFileSystemResourceProvider extends MCRFileSystemResourceProviderBase {
 
-    public static final String COVERAGE_KEY = "Coverage";
-
-    public static final String MODE_KEY = "Mode";
-
     public static final String BASE_DIRS_KEY = "BaseDirs";
 
     private final List<File> baseDirs;
+
+    public MCRFileSystemResourceProvider(String coverage, MCRResourceProviderMode mode, File... baseDirs) {
+        this(coverage, mode, Arrays.asList(baseDirs));
+    }
 
     public MCRFileSystemResourceProvider(String coverage, MCRResourceProviderMode mode, List<File> baseDirs) {
         super(coverage, mode);
