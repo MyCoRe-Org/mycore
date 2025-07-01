@@ -30,17 +30,19 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceList;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
+import org.mycore.resource.common.MCRResourceTracer;
 
 /**
- * {@link MCRCombinedResourceSelector} is an implementation of {@link MCRResourceSelector} that delegates to multiple
+ * A {@link MCRCombinedResourceSelector} is a {@link MCRResourceSelector} that delegates to multiple
  * other {@link MCRResourceSelector} instances, one after another.
  * <p>
- * The following configuration options are available, if configured automatically:
+ * The following configuration options are available:
  * <ul>
- * <li> Selectors are configured as a list using the property suffix {@link MCRCombinedResourceSelector#SELECTORS_KEY}.
+ * <li> The property suffix {@link MCRCombinedResourceSelector#SELECTORS_KEY} can be used to
+ * specify the list of selectors to be used.
  * </ul>
  * Example:
- * <pre>
+ * <pre><code>
  * [...].Class=org.mycore.resource.selector.MCRCombinedResourceSelector
  * [...].Providers.10.Class=foo.bar.FooSelector
  * [...].Providers.10.Key1=Value1
@@ -48,17 +50,17 @@ import org.mycore.common.log.MCRTreeMessage;
  * [...].Providers.20.Class=foo.bar.BarSelector
  * [...].Providers.20.Key1=Value1
  * [...].Providers.20.Key2=Value2
- * </pre>
+ * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRCombinedResourceSelector.Factory.class)
-public final class MCRCombinedResourceSelector extends MCRResourceSelectorBase {
+public class MCRCombinedResourceSelector extends MCRResourceSelectorBase {
 
     public static final String SELECTORS_KEY = "Selectors";
 
     private final List<MCRResourceSelector> selectors;
 
     public MCRCombinedResourceSelector(MCRResourceSelector... selectors) {
-        this(Arrays.asList(selectors));
+        this(Arrays.asList(Objects.requireNonNull(selectors, "Selectors must not be null")));
     }
 
     public MCRCombinedResourceSelector(List<MCRResourceSelector> selectors) {
@@ -67,12 +69,15 @@ public final class MCRCombinedResourceSelector extends MCRResourceSelectorBase {
     }
 
     @Override
-    protected List<URL> doSelect(List<URL> resourceUrls, MCRHints hints) {
+    protected List<URL> doSelect(List<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
         List<URL> selectedResourceUrls = resourceUrls;
         for (MCRResourceSelector selector : selectors) {
             if (selectedResourceUrls.size() > 1) {
-                selectedResourceUrls = selector.select(selectedResourceUrls, hints);
+                selectedResourceUrls = selector.select(selectedResourceUrls, hints, tracer.update(selector));
             } else {
+                List<URL> urls = selectedResourceUrls;
+                tracer.trace(() -> "Got " + (urls.isEmpty() ? "no" : "one")
+                    + " resource URL, no need for further selectors");
                 break;
             }
         }
@@ -88,7 +93,7 @@ public final class MCRCombinedResourceSelector extends MCRResourceSelectorBase {
 
     public static class Factory implements Supplier<MCRCombinedResourceSelector> {
 
-        @MCRInstanceList(name = SELECTORS_KEY, valueClass = MCRResourceSelector.class)
+        @MCRInstanceList(name = SELECTORS_KEY, valueClass = MCRResourceSelector.class, required = false)
         public List<MCRResourceSelector> selectors;
 
         @Override
