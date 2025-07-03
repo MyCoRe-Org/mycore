@@ -18,9 +18,8 @@
 
 package org.mycore.resource.provider;
 
-import static org.mycore.common.config.MCRConfiguration2.splitValue;
-
-import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -29,37 +28,36 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 
 /**
- * {@link MCRDeveloperOverrideResourceProvider} is an implementation of {@link MCRResourceProvider} that looks up
- * resources in the file system. It uses a fixed list of base directories configured as a comma-separated-list in
- * {@link MCRDeveloperOverrideResourceProvider#DEVELOPER_RESOURCE_OVERRIDE_PROPERTY} as base directories for the lookup.
+ * A {@link MCRDeveloperOverrideResourceProvider} is a {@link MCRResourceProvider} that looks up resources
+ * in the file system. It uses a fixed list of base directories configured as a comma-separated-list in
+ * {@link MCRDeveloperOverrideResourceProvider#DEVELOPER_RESOURCE_OVERRIDE_PROPERTY}
+ * as base directories for the lookup.
  * <p>
- * This provider replaces the previously used <code>MCRDeveloperTools</code>.
+ * <em>This provider replaces the previously used <code>MCRDeveloperTools</code>.</em>
  * <p>
- * The following configuration options are available, if configured automatically:
+ * The following configuration options are available:
  * <ul>
- * <li> The property suffix {@link MCRDeveloperOverrideResourceProvider#COVERAGE_KEY} can be used to provide short
- * description for human beings in order to better understand the providers use case.
+ * <li> The property suffix {@link MCRResourceProviderBase#COVERAGE_KEY} can be used to
+ * provide a short description of the providers purpose; used in log messages.
  * </ul>
  * Example:
- * <pre>
+ * <pre><code>
  * [...].Class=org.mycore.resource.provider.MCRDeveloperOverrideResourceProvider
  * [...].Coverage=Lorem ipsum dolor sit amet
- * </pre>
+ * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRDeveloperOverrideResourceProvider.Factory.class)
-public class MCRDeveloperOverrideResourceProvider extends MCRFileSystemResourceProvider {
+public final class MCRDeveloperOverrideResourceProvider extends MCRFileSystemResourceProvider {
 
     public static final String DEVELOPER_RESOURCE_OVERRIDE_PROPERTY = "MCR.Developer.Resource.Override";
-
-    public static final String COVERAGE_KEY = "Coverage";
 
     public MCRDeveloperOverrideResourceProvider(String coverage) {
         super(coverage, MCRResourceProviderMode.RESOURCES, getBaseDirs());
     }
 
-    private static List<File> getBaseDirs() {
+    private static List<Path> getBaseDirs() {
         String paths = MCRConfiguration2.getString(DEVELOPER_RESOURCE_OVERRIDE_PROPERTY).orElse("");
-        return splitValue(paths).map(File::new).toList();
+        return MCRConfiguration2.splitValue(paths).map(Paths::get).toList();
     }
 
     @Override
