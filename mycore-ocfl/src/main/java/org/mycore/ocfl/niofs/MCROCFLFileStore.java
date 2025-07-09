@@ -20,8 +20,10 @@ package org.mycore.ocfl.niofs;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.FileAttributeView;
 import java.nio.file.attribute.FileStoreAttributeView;
+import java.util.Objects;
 
 import org.mycore.datamodel.niofs.MCRAbstractFileStore;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -108,42 +110,38 @@ public class MCROCFLFileStore extends MCRAbstractFileStore {
 
     /**
      * {@inheritDoc}
-     * <p>
-     * This method is not supported in an OCFL repository.
      */
     @Override
     public boolean supportsFileAttributeView(Class<? extends FileAttributeView> type) {
-        throw new UnsupportedOperationException();
+        return BasicFileAttributeView.class.isAssignableFrom(type);
     }
 
     /**
      * {@inheritDoc}
-     * <p>
-     * This method is not supported in an OCFL repository.
      */
     @Override
     public boolean supportsFileAttributeView(String name) {
-        throw new UnsupportedOperationException();
+        return name.equals(MCROCFLFileSystemProvider.BASIC_ATTRIBUTE_VIEW)
+            || name.equals(MCROCFLFileSystemProvider.OCFL_ATTRIBUTE_VIEW);
     }
 
     /**
      * {@inheritDoc}
-     * <p>
-     * This method is not supported in an OCFL repository.
      */
     @Override
     public <V extends FileStoreAttributeView> V getFileStoreAttributeView(Class<V> type) {
-        throw new UnsupportedOperationException();
+        Objects.requireNonNull(type, "type");
+        return null;
     }
 
     /**
      * {@inheritDoc}
      * <p>
-     * This method is not supported in an OCFL repository.
+     * OCFL repository does not support any attributes.
      */
     @Override
     public Object getAttribute(String attribute) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("'" + attribute + "' not supported!");
     }
 
     /**
