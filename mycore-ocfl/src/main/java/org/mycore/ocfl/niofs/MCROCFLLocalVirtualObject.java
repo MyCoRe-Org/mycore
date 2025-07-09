@@ -46,7 +46,7 @@ import io.ocfl.api.model.OcflObjectVersion;
  * This class optimizes file operations by leveraging direct access to the files within the OCFL storage root.
  * Unlike its remote counterpart, it can read files directly from their persisted location in the OCFL repository
  * without needing to copy them to a separate cache first.
- * <h3>Key Optimizations:</h3>
+ * <h2>Key Optimizations:</h2>
  * <ul>
  *   <li>
  *       <b>Direct Read Access:</b> For read operations on unmodified files, this class returns a

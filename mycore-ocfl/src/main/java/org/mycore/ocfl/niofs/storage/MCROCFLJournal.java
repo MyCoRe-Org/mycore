@@ -41,7 +41,7 @@ import java.util.stream.Stream;
  * to be provided by the client, allowing it to be used for any kind of event or state object that can be
  * represented as a single line of text.
  * </p>
- * <h3>Lifecycle and Usage:</h3>
+ * <h2>Lifecycle and Usage:</h2>
  * <ol>
  *   <li>
  *       <b>Instantiation:</b> Create an instance with a path to the journal file and serializer/deserializer functions.

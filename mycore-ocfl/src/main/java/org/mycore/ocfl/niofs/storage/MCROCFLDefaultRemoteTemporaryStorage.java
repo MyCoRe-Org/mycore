@@ -62,7 +62,7 @@ import org.mycore.ocfl.niofs.MCROCFLDigestCalculator;
  * It functions as a <b>content-addressable storage</b>, where files are identified by their cryptographic digest
  * ({@link MCRDigest}). This design provides automatic deduplication of content.
  * </p>
- * <h3>Key Features:</h3>
+ * <h2>Key Features:</h2>
  * <ul>
  *   <li><b>LRU Eviction:</b> Uses a pluggable {@link MCROCFLEvictionStrategy} to manage its size, with a
  *   Least Recently Used (LRU) policy managed by an internal queue.</li>
@@ -70,13 +70,13 @@ import org.mycore.ocfl.niofs.MCROCFLDigestCalculator;
  *   This ensures that the cache state can be fully restored after an application restart, preventing the need to
  *   re-verify all cached files.</li>
  *   <li>
- *       <b>Concurrency:</b>
- *       Designed for safe use in a multithreaded environment, using concurrent data structures.
+ *     <b>Concurrency:</b>
+ *     Designed for safe use in a multithreaded environment, using concurrent data structures.
  *   </li>
  *   <li>
- *       <b>Transactional Writes:</b>
- *       The {@link #newCacheEntry(MCRVersionedPath, FileAttribute...)} method provides a safe way to stream large
- *       files into the cache.</li>
+ *     <b>Transactional Writes:</b>
+ *     The {@link #newCacheEntry(MCRVersionedPath, FileAttribute...)} method provides a safe way to stream large
+ *     files into the cache.</li>
  * </ul>
  *
  * @see MCROCFLRemoteTemporaryStorage
