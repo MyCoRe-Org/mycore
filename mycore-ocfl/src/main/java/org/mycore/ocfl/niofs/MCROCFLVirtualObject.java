@@ -38,12 +38,14 @@ import java.nio.file.NotDirectoryException;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +55,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.mycore.common.MCRUtils;
 import org.mycore.common.digest.MCRDigest;
 import org.mycore.common.digest.MCRSHA512Digest;
 import org.mycore.common.events.MCREvent;
@@ -65,7 +66,7 @@ import org.mycore.datamodel.niofs.MCRReadOnlyIOException;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.MCROCFLException;
 import org.mycore.ocfl.niofs.channels.MCROCFLClosableCallbackChannel;
-import org.mycore.ocfl.niofs.storage.MCROCFLTransactionalFileStorage;
+import org.mycore.ocfl.niofs.storage.MCROCFLTransactionalStorage;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 import org.mycore.ocfl.util.MCROCFLDeleteUtils;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
@@ -73,6 +74,7 @@ import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 import io.ocfl.api.DigestAlgorithmRegistry;
 import io.ocfl.api.OcflObjectUpdater;
 import io.ocfl.api.OcflOption;
+import io.ocfl.api.io.FixityCheckInputStream;
 import io.ocfl.api.model.FileChangeHistory;
 import io.ocfl.api.model.ObjectVersionId;
 import io.ocfl.api.model.OcflObjectVersion;
@@ -82,19 +84,43 @@ import io.ocfl.api.model.VersionInfo;
 import io.ocfl.api.model.VersionNum;
 
 /**
- * Represents a virtual object in an OCFL repository.
+ * Represents an in-memory view of a single OCFL object, which functions as a virtual file system.
  * <p>
- * This abstract class provides the core functionality for managing OCFL virtual objects within a repository.
- * It handles various file system operations such as creating directories, reading and writing files, renaming,
- * and deleting files, while ensuring consistency between the local storage and the OCFL repository.
+ * This abstract class provides the core functionality for managing the state of an OCFL object
+ * (e.g., a MyCoRe derivate) as if it were a file system. It handles file and directory operations such as creation,
+ * reading, writing, renaming, and deleting.
+ * <h3>State Management:</h3>
+ * The class maintains the state of the object's files and directories using two key trackers:
+ * <ul>
+ *   <li>
+ *       <b>{@link MCROCFLFileTracker}:</b> Tracks the state of all files, including their paths and digests. It
+ *       identifies additions, deletions, modifications, and renames.
+ *   </li>
+ *   <li>
+ *       <b>{@link MCROCFLDirectoryTracker}:</b> Tracks all directories and whether they are "empty" in the OCFL
+ *       sense (i.e., whether they require a {@code .keep} file).
+ *   </li>
+ * </ul>
+ * <h3>Transactional Behavior:</h3>
  * <p>
- * The class also tracks changes to files and directories, supports local modifications, and facilitates
- * synchronization with the repository.
+ * All modifications are performed on a {@link MCROCFLTransactionalStorage}, which is a local staging area.
+ * The changes are only written back to the persistent OCFL repository when the {@link #persist()} method is called,
+ * typically at the end of a successful {@link MCROCFLFileSystemTransaction}.
+ *
+ * @see MCROCFLFileSystemProvider
+ * @see MCROCFLFileTracker
+ * @see MCROCFLDirectoryTracker
  */
 public abstract class MCROCFLVirtualObject {
 
+    /**
+     * The standard directory within an OCFL object's content where all files for this file system are stored.
+     */
     public static final String FILES_DIRECTORY = "files/";
 
+    /**
+     * The name of the special file used to ensure empty directories are preserved in OCFL.
+     */
     public static final String KEEP_FILE = ".keep";
 
     protected final MCROCFLRepository repository;
@@ -103,7 +129,9 @@ public abstract class MCROCFLVirtualObject {
 
     protected OcflObjectVersion objectVersion;
 
-    protected final MCROCFLTransactionalFileStorage transactionalStorage;
+    protected final MCROCFLTransactionalStorage transactionalStorage;
+
+    protected final MCROCFLDigestCalculator<Path, MCRDigest> digestCalculator;
 
     protected final boolean readonly;
 
@@ -118,69 +146,79 @@ public abstract class MCROCFLVirtualObject {
     protected Map<MCRVersionedPath, FileChangeHistory> changeHistoryCache;
 
     /**
-     * Constructs a new {@code MCROCFLVirtualObject}.
+     * Constructs a new {@code MCROCFLVirtualObject} for an object not yet loaded from the repository.
      *
-     * @param repository the OCFL repository.
-     * @param objectVersionId the versioned ID of the object.
-     * @param transactionalStorage the local temporary file storage.
-     * @param readonly whether the object is read-only.
+     * @param repository           the OCFL repository.
+     * @param objectVersionId      the versioned ID of the object.
+     * @param transactionalStorage the local transactional file storage.
+     * @param digestCalculator     the calculator for generating file digests.
+     * @param readonly             whether the object is read-only.
      */
     public MCROCFLVirtualObject(MCROCFLRepository repository, ObjectVersionId objectVersionId,
-        MCROCFLTransactionalFileStorage transactionalStorage, boolean readonly) {
-        this(repository, objectVersionId, null, transactionalStorage, readonly);
+        MCROCFLTransactionalStorage transactionalStorage, MCROCFLDigestCalculator<Path, MCRDigest> digestCalculator,
+        boolean readonly) {
+        this(repository, objectVersionId, null, transactionalStorage, digestCalculator, readonly);
     }
 
     /**
-     * Constructs a new {@code MCROCFLVirtualObject}.
+     * Constructs a new {@code MCROCFLVirtualObject} with a preloaded OCFL object version.
      *
-     * @param repository the OCFL repository.
-     * @param objectVersion the OCFL object version.
-     * @param transactionalStorage the local temporary file storage.
-     * @param readonly whether the object is read-only.
+     * @param repository           the OCFL repository.
+     * @param objectVersion        the OCFL object version.
+     * @param transactionalStorage the local transactional file storage.
+     * @param digestCalculator     the calculator for generating file digests.
+     * @param readonly             whether the object is read-only.
      */
     public MCROCFLVirtualObject(MCROCFLRepository repository, OcflObjectVersion objectVersion,
-        MCROCFLTransactionalFileStorage transactionalStorage, boolean readonly) {
-        this(repository, objectVersion.getObjectVersionId(), objectVersion, transactionalStorage, readonly);
+        MCROCFLTransactionalStorage transactionalStorage, MCROCFLDigestCalculator<Path, MCRDigest> digestCalculator,
+        boolean readonly) {
+        this(repository, objectVersion.getObjectVersionId(), objectVersion, transactionalStorage, digestCalculator,
+            readonly);
     }
 
     /**
-     * Constructs a new {@code MCROCFLVirtualObject}.
+     * Base constructor for a new {@code MCROCFLVirtualObject}, initializing its state.
      *
-     * @param repository the OCFL repository.
-     * @param versionId the versioned ID of the object.
-     * @param objectVersion the OCFL object version.
-     * @param transactionalStorage the local temporary file storage.
-     * @param readonly whether the object is read-only.
+     * @param repository           the OCFL repository.
+     * @param versionId            the versioned ID of the object.
+     * @param objectVersion        the OCFL object version (can be null if not loaded).
+     * @param transactionalStorage the local transactional file storage.
+     * @param digestCalculator     the calculator for generating file digests.
+     * @param readonly             whether the object is read-only.
      */
     protected MCROCFLVirtualObject(MCROCFLRepository repository, ObjectVersionId versionId,
-        OcflObjectVersion objectVersion, MCROCFLTransactionalFileStorage transactionalStorage,
-        boolean readonly) {
-        this(repository, versionId, objectVersion, transactionalStorage, readonly, null, null);
+        OcflObjectVersion objectVersion, MCROCFLTransactionalStorage transactionalStorage,
+        MCROCFLDigestCalculator<Path, MCRDigest> digestCalculator, boolean readonly) {
+        this(repository, versionId, objectVersion, transactionalStorage, digestCalculator, readonly, null, null);
         initTrackers();
     }
 
     /**
-     * Constructs a new {@code MCROCFLVirtualObject}.
+     * Internal constructor used for cloning the virtual object.
      *
-     * @param repository the OCFL repository.
-     * @param versionId the versioned ID of the object.
-     * @param objectVersion the OCFL object version.
-     * @param transactionalStorage the local temporary file storage.
-     * @param readonly whether the object is read-only.
-     * @param fileTracker the file tracker.
-     * @param directoryTracker the directory tracker.
+     * @param repository           the OCFL repository.
+     * @param versionId            the versioned ID of the object.
+     * @param objectVersion        the OCFL object version.
+     * @param transactionalStorage the local transactional file storage.
+     * @param readonly             whether the object is read-only.
+     * @param digestCalculator     the calculator for generating file digests.
+     * @param fileTracker          the file tracker.
+     * @param directoryTracker     the directory tracker.
      */
     protected MCROCFLVirtualObject(MCROCFLRepository repository, ObjectVersionId versionId,
-        OcflObjectVersion objectVersion, MCROCFLTransactionalFileStorage transactionalStorage,
-        boolean readonly, MCROCFLFileTracker<MCRVersionedPath, MCRDigest> fileTracker,
+        OcflObjectVersion objectVersion, MCROCFLTransactionalStorage transactionalStorage,
+        MCROCFLDigestCalculator<Path, MCRDigest> digestCalculator, boolean readonly,
+        MCROCFLFileTracker<MCRVersionedPath, MCRDigest> fileTracker,
         MCROCFLDirectoryTracker directoryTracker) {
         Objects.requireNonNull(repository);
         Objects.requireNonNull(versionId);
         Objects.requireNonNull(transactionalStorage);
+        Objects.requireNonNull(digestCalculator);
         this.repository = repository;
         this.objectVersionId = versionId;
         this.objectVersion = objectVersion;
         this.transactionalStorage = transactionalStorage;
+        this.digestCalculator = digestCalculator;
         this.readonly = readonly;
         this.markForCreate = false;
         this.markForPurge = false;
@@ -190,7 +228,8 @@ public abstract class MCROCFLVirtualObject {
     }
 
     /**
-     * Initializes the file and directory trackers.
+     * Initializes the file and directory trackers based on the loaded {@code objectVersion}.
+     * If no version is loaded, empty trackers are created.
      */
     protected void initTrackers() {
         if (this.objectVersion == null) {
@@ -224,7 +263,16 @@ public abstract class MCROCFLVirtualObject {
      * @param directoryPath the path of the directory to create.
      * @throws IOException if an I/O error occurs.
      */
-    public abstract void createDirectory(MCRVersionedPath directoryPath) throws IOException;
+    public void createDirectory(MCRVersionedPath directoryPath) throws IOException {
+        MCRVersionedPath lockedDirectory = lockVersion(directoryPath);
+        checkPurged(lockedDirectory);
+        checkReadOnly();
+        if (exists(lockedDirectory)) {
+            throw new FileAlreadyExistsException(lockedDirectory.toString());
+        }
+        this.transactionalStorage.createDirectories(lockedDirectory);
+        this.directoryTracker.update(lockedDirectory, true);
+    }
 
     /**
      * Returns a list of all paths in this virtual object.
@@ -261,7 +309,11 @@ public abstract class MCROCFLVirtualObject {
      * @return {@code true} if the path is stored locally, {@code false} otherwise.
      * @throws NoSuchFileException if the path does not exist.
      */
-    public abstract boolean isLocal(MCRVersionedPath path) throws NoSuchFileException;
+    public boolean existInTransactionalStorage(MCRVersionedPath path) throws NoSuchFileException {
+        MCRVersionedPath lockedPath = lockVersion(path);
+        checkExists(lockedPath);
+        return !this.markForPurge && this.transactionalStorage.exists(lockedPath);
+    }
 
     /**
      * Checks if the specified path is a directory.
@@ -330,30 +382,58 @@ public abstract class MCROCFLVirtualObject {
             throw new NoSuchFileException(lockedPath.toString());
         }
         if (create || createNew) {
-            return createByteChannel(lockedPath, options, fileAttributes, createNew);
+            return createByteChannel(lockedPath, options, fileAttributes);
         } else if (read) {
-            return readByteChannel(lockedPath, options, fileAttributes);
+            return readByteChannel(lockedPath, options);
         } else {
-            return writeByteChannel(lockedPath, options, fileAttributes);
+            return writeByteChannel(lockedPath, options);
         }
     }
 
-    protected abstract MCROCFLClosableCallbackChannel createByteChannel(MCRVersionedPath path,
-        Set<? extends OpenOption> options, FileAttribute<?>[] fileAttributes, boolean createNew)
-        throws IOException;
+    protected MCROCFLClosableCallbackChannel createByteChannel(MCRVersionedPath path, Set<? extends OpenOption> options,
+        FileAttribute<?>... fileAttributes)
+        throws IOException {
+        boolean createNew = options.contains(StandardOpenOption.CREATE_NEW);
+        boolean isKeepFile = path.getFileName().toString().equals(KEEP_FILE);
+        boolean fireCreateEvent = createNew || Files.notExists(path);
+        SeekableByteChannel seekableByteChannel =
+            this.transactionalStorage.newByteChannel(path, options, fileAttributes);
+        return new MCROCFLClosableCallbackChannel(seekableByteChannel, () -> {
+            if (!isKeepFile) {
+                trackFileWrite(path, fireCreateEvent ? MCREvent.EventType.CREATE : MCREvent.EventType.UPDATE);
+            } else {
+                trackEmptyDirectory(path.getParent());
+            }
+        });
+    }
 
     protected abstract SeekableByteChannel readByteChannel(MCRVersionedPath path,
-        Set<? extends OpenOption> options,
-        FileAttribute<?>... fileAttributes) throws IOException;
+        Set<? extends OpenOption> options) throws IOException;
 
-    protected abstract SeekableByteChannel writeByteChannel(MCRVersionedPath path,
-        Set<? extends OpenOption> options,
-        FileAttribute<?>... fileAttributes) throws IOException;
+    protected SeekableByteChannel writeByteChannel(MCRVersionedPath path, Set<? extends OpenOption> options)
+        throws IOException {
+        Set<OpenOption> writeOptions = new HashSet<>(options);
+        if (!options.contains(StandardOpenOption.TRUNCATE_EXISTING)) {
+            // need a copy if we do not truncate
+            localTransactionalCopy(path);
+        } else {
+            // need to add CREATE if it exists in virtual object but not in transactional storage
+            boolean existsInVirtualObject = exists(path);
+            boolean existsInTransactionalStorage = this.transactionalStorage.exists(path);
+            if (existsInVirtualObject && !existsInTransactionalStorage) {
+                writeOptions.add(StandardOpenOption.CREATE);
+            }
+        }
+        SeekableByteChannel seekableByteChannel = this.transactionalStorage.newByteChannel(path, writeOptions);
+        return new MCROCFLClosableCallbackChannel(seekableByteChannel, () -> {
+            trackFileWrite(path, MCREvent.EventType.UPDATE);
+        });
+    }
 
     /**
      * <p>
-     * Copies a file from the OCFL repository to the local storage. This should be called whenever it is necessary to
-     * work on a copy rather than the OCFL file directly.
+     * Copies a file from the OCFL repository to the transactional storage.
+     * This should be called whenever it is necessary to work on a copy rather than the OCFL file directly.
      * <p>
      * If the requested path is a directory and it does not exist yet, an empty directory is created in the local
      * storage. This guarantees that the given path is always accessible.
@@ -361,7 +441,20 @@ public abstract class MCROCFLVirtualObject {
      * @param path the path to the file.
      * @throws IOException if an I/O error occurs.
      */
-    public abstract void localCopy(MCRVersionedPath path) throws IOException;
+    public void localTransactionalCopy(MCRVersionedPath path) throws IOException {
+        MCRVersionedPath lockedPath = lockVersion(path);
+        if (this.transactionalStorage.exists(lockedPath)) {
+            return;
+        }
+        if (!isFile(lockedPath)) {
+            this.transactionalStorage.createDirectories(lockedPath);
+            return;
+        }
+        OcflObjectVersionFile ocflFile = fromOcfl(lockedPath);
+        try (FixityCheckInputStream stream = ocflFile.getStream()) {
+            this.transactionalStorage.copy(stream, lockedPath);
+        }
+    }
 
     /**
      * Returns the OCFL object version file corresponding to the specified path.
@@ -397,7 +490,26 @@ public abstract class MCROCFLVirtualObject {
      * @param path the path to delete.
      * @throws IOException if an I/O error occurs.
      */
-    public abstract void delete(MCRVersionedPath path) throws IOException;
+    public void delete(MCRVersionedPath path) throws IOException {
+        MCRVersionedPath lockedPath = lockVersion(path);
+        checkPurged(lockedPath);
+        checkReadOnly();
+        if (!exists(lockedPath)) {
+            throw new NoSuchFileException(lockedPath.toString());
+        }
+        if (isDirectory(lockedPath)) {
+            if (!isDirectoryEmpty(lockedPath)) {
+                throw new DirectoryNotEmptyException(lockedPath.toString());
+            }
+            this.transactionalStorage.deleteIfExists(lockedPath);
+            this.directoryTracker.remove(lockedPath);
+        } else {
+            this.transactionalStorage.deleteIfExists(lockedPath);
+            this.fileTracker.delete(lockedPath);
+        }
+        trackEmptyDirectory(lockedPath.getParent());
+        MCRPathEventHelper.fireFileDeleteEvent(releaseVersion(lockedPath));
+    }
 
     /**
      * Copies a file from the source path to the target path.
@@ -434,8 +546,22 @@ public abstract class MCROCFLVirtualObject {
      * @param options the options specifying how the rename is performed.
      * @throws IOException if an I/O error occurs.
      */
-    public abstract void rename(MCRVersionedPath source, MCRVersionedPath target, CopyOption... options)
-        throws IOException;
+    public void rename(MCRVersionedPath source, MCRVersionedPath target, CopyOption... options) throws IOException {
+        MCRVersionedPath lockedSource = lockVersion(source);
+        MCRVersionedPath lockedTarget = lockVersion(target);
+        checkPurged(lockedSource);
+        checkReadOnly();
+        if (this.transactionalStorage.exists(lockedSource)) {
+            this.transactionalStorage.move(lockedSource, lockedTarget, options);
+        } else if (this.transactionalStorage.exists(lockedTarget)) {
+            this.transactionalStorage.deleteIfExists(lockedTarget);
+        }
+        if (this.isDirectory(lockedSource)) {
+            this.renameDirectory(lockedSource, lockedTarget);
+        } else {
+            this.renameFile(source, lockedTarget);
+        }
+    }
 
     protected void renameDirectory(MCRVersionedPath source, MCRVersionedPath target) throws IOException {
         if (!this.directoryTracker.isEmpty(source)) {
@@ -561,7 +687,18 @@ public abstract class MCROCFLVirtualObject {
      * @return time of file creation
      * @throws IOException if an I/O exception occurs
      */
-    public abstract FileTime getCreationTime(MCRVersionedPath path) throws IOException;
+    public FileTime getCreationTime(MCRVersionedPath path) throws IOException {
+        MCRVersionedPath lockedPath = lockVersion(path);
+        checkExists(lockedPath);
+        boolean activeTransaction = MCROCFLFileSystemTransaction.isActive();
+        boolean added = this.isAdded(lockedPath);
+        boolean inLocalStorage = this.existInTransactionalStorage(lockedPath);
+        if (activeTransaction && added && inLocalStorage) {
+            return this.transactionalStorage.readAttributes(lockedPath, BasicFileAttributes.class).creationTime();
+        }
+        FileChangeHistory changeHistory = getChangeHistory(lockedPath);
+        return FileTime.from(changeHistory.getOldest().getTimestamp().toInstant());
+    }
 
     /**
      * Returns a file's last modified time.
@@ -570,7 +707,15 @@ public abstract class MCROCFLVirtualObject {
      * @return last modified time
      * @throws IOException if an I/O exception occurs
      */
-    public abstract FileTime getModifiedTime(MCRVersionedPath path) throws IOException;
+    public FileTime getModifiedTime(MCRVersionedPath path) throws IOException {
+        MCRVersionedPath lockedPath = lockVersion(path);
+        checkExists(lockedPath);
+        if (MCROCFLFileSystemTransaction.isActive() && transactionalStorage.exists(path)) {
+            return transactionalStorage.readAttributes(lockedPath, BasicFileAttributes.class).lastModifiedTime();
+        }
+        FileChangeHistory changeHistory = getChangeHistory(lockedPath);
+        return FileTime.from(changeHistory.getMostRecent().getTimestamp().toInstant());
+    }
 
     /**
      * Returns a file's last access time.
@@ -579,7 +724,15 @@ public abstract class MCROCFLVirtualObject {
      * @return last access time
      * @throws IOException if an I/O exception occurs
      */
-    public abstract FileTime getAccessTime(MCRVersionedPath path) throws IOException;
+    public FileTime getAccessTime(MCRVersionedPath path) throws IOException {
+        MCRVersionedPath lockedPath = lockVersion(path);
+        checkExists(lockedPath);
+        if (MCROCFLFileSystemTransaction.isActive() && transactionalStorage.exists(path)) {
+            return transactionalStorage.readAttributes(lockedPath, BasicFileAttributes.class).lastAccessTime();
+        }
+        FileChangeHistory changeHistory = getChangeHistory(lockedPath);
+        return FileTime.from(changeHistory.getMostRecent().getTimestamp().toInstant());
+    }
 
     /**
      * Returns the size of the file (in bytes). The size may differ from the actual size on the file system due to
@@ -589,7 +742,22 @@ public abstract class MCROCFLVirtualObject {
      * @return size in bytes
      * @throws IOException if an I/O exception occurs
      */
-    public abstract long getSize(MCRVersionedPath path) throws IOException;
+    public long getSize(MCRVersionedPath path) throws IOException {
+        MCRVersionedPath lockedPath = lockVersion(path);
+        checkExists(lockedPath);
+        // check directory
+        if (isDirectory(lockedPath)) {
+            return 0;
+        }
+        // read from transactional storage
+        if (MCROCFLFileSystemTransaction.isActive() && transactionalStorage.exists(path)) {
+            return transactionalStorage.size(lockedPath);
+        }
+        // read from ocfl
+        OcflObjectVersionFile ocflObjectVersionFile = fromOcfl(lockedPath);
+        String sizeAsString = ocflObjectVersionFile.getFixity().get(new SizeDigestAlgorithm());
+        return Long.parseLong(sizeAsString);
+    }
 
     /**
      * Returns the `filekey` of the given path.
@@ -664,16 +832,30 @@ public abstract class MCROCFLVirtualObject {
      * if it does not exist yet in the repository or if it was marked for purge (removes the purge status).
      * <p>
      * The purge status can only be removed in the same transaction the purge was applied. If a purge was
-     * done and the transaction was committed the object cannot be created anymore!
+     * done and the transaction was committed, the object cannot be created anymore!
      * <p>
      * Implementation detail: A virtual object instance can exist without having an ocfl repository version and
      * without being created.
      *
      * @throws MCRReadOnlyIOException if the object is read-only.
-     * @throws FileAlreadyExistsException if the object already exist
+     * @throws FileAlreadyExistsException if the object already exists
      * @throws IOException if an I/O error occurs
      */
-    public abstract void create() throws IOException;
+    public void create() throws IOException {
+        if (this.readonly) {
+            throw new MCRReadOnlyIOException("Cannot create read-only object: " + this);
+        }
+        boolean hasFiles = !this.fileTracker.paths().isEmpty();
+        boolean hasDirectories = !this.directoryTracker.paths().isEmpty();
+        if (hasFiles || hasDirectories) {
+            throw new FileAlreadyExistsException("Cannot create already existing object: " + this);
+        }
+        this.markForPurge = false;
+        this.markForCreate = true;
+        MCRVersionedPath rootDirectory = this.toMCRPath("/");
+        this.transactionalStorage.createDirectories(rootDirectory);
+        this.directoryTracker.update(rootDirectory, true);
+    }
 
     /**
      * Marks this virtual object for purging.
@@ -695,7 +877,7 @@ public abstract class MCROCFLVirtualObject {
      *
      * @return {@code true} if the object is modified, {@code false} otherwise.
      */
-    public boolean isModified() {
+    public boolean isModified() throws IOException {
         if (this.readonly) {
             return false;
         }
@@ -723,15 +905,17 @@ public abstract class MCROCFLVirtualObject {
             return false;
         }
     }
-
     /**
-     * Persists changes to this virtual object by updating the corresponding OCFL object in the repository.
+     * Persists all tracked changes (additions, modifications, deletions, renames) to the OCFL repository.
      * <p>
-     * If the object is marked for purge, it is either permanently removed from the repository or marked as deleted,
-     * depending on the repository's configuration.
-     * Otherwise, the method updates the object by writing any modified or newly added files and directories.
+     * This method orchestrates the update of the underlying OCFL object. It checks if the object is marked for
+     * purge and handles that case first. Otherwise, it constructs a new version in the OCFL repository by applying
+     * all file and directory changes recorded by the trackers.
+     * <p>
+     * This method should only be called by the {@link MCROCFLFileSystemTransaction} during a commit.
      *
-     * @return {@code true} if changes were successfully persisted, {@code false} if no changes were made.
+     * @return {@code true} if any changes were successfully persisted, creating a new OCFL version.
+     *         {@code false} if there were no changes to persist.
      * @throws IOException if an I/O error occurs during the persistence operation.
      */
     public boolean persist() throws IOException {
@@ -924,7 +1108,7 @@ public abstract class MCROCFLVirtualObject {
      * Releases the version on a given {@link MCRVersionedPath}, returning the path
      * that points to the latest (head) version of the virtual object.
      * <p>
-     * This is necessary for the mycore event system. Due to the fact that the metadata is not yet
+     * This is necessary for the mycore event system. Because the metadata is not yet
      * included in the transaction system. Therefore, another version of the ocfl object could have
      * been created, leaving to paths in {@link org.mycore.common.MCRSession#onCommit(Runnable)} pointing to
      * the wrong version.
@@ -1049,18 +1233,12 @@ public abstract class MCROCFLVirtualObject {
     }
 
     /**
-     * Creates a deep clone of this virtual object.
+     * Returns a deep clone of this virtual object. The clone shares the same repository and storage
+     * configurations but has its own independent state trackers. This allows it to be modified
+     * without affecting the original object from which it was cloned.
      *
-     * @return a newly generated virtual object.
-     */
-    public MCROCFLVirtualObject deepClone() {
-        return deepClone(this.readonly);
-    }
-
-    /**
-     * Creates a deep clone of this virtual object.
-     *
-     * @return a newly generated virtual object.
+     * @param readonly If {@code true}, the cloned object will be in read-only mode.
+     * @return A new, independent instance of the virtual object.
      */
     public abstract MCROCFLVirtualObject deepClone(boolean readonly);
 
@@ -1070,17 +1248,12 @@ public abstract class MCROCFLVirtualObject {
         return this.getOwner() + "@" + (version == null ? "head" : version);
     }
 
-    protected MCRDigest calculateDigest(MCRVersionedPath path) {
-        try {
-            if (isDirectory(path)) {
-                return null;
-            }
-            Path physicalPath = toPhysicalPath(path);
-            String digestValue = MCRUtils.getDigest(MCRSHA512Digest.ALGORITHM, Files.newInputStream(physicalPath));
-            return new MCRSHA512Digest(digestValue);
-        } catch (IOException ioException) {
-            throw new UncheckedIOException("Unable to calculate digest for path '" + path + "'.", ioException);
+    protected MCRDigest calculateDigest(MCRVersionedPath path) throws IOException {
+        if (isDirectory(path)) {
+            return null;
         }
+        Path physicalPath = toPhysicalPath(path);
+        return this.digestCalculator.calculate(physicalPath);
     }
 
     /**

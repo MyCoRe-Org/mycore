@@ -35,11 +35,11 @@ import org.apache.commons.io.FileUtils;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 
 /**
- * Interface for temporary file storage with support for versioned paths.
+ * Interface for transactional file storage with support for versioned paths.
  * Provides default methods for common file operations such as checking existence,
  * creating byte channels, copying, moving, deleting files, and more.
  */
-public interface MCROCFLFileStorage {
+public interface MCROCFLTransactionalStorage {
 
     /**
      * Gets the root path of the storage.
@@ -143,7 +143,7 @@ public interface MCROCFLFileStorage {
 
     /**
      * Returns the size of a file (in bytes).
-     * 
+     *
      * @param path the path to the file
      * @return the size of a file in bytes
      * @throws IOException if an I/O error occurs.
@@ -187,6 +187,27 @@ public interface MCROCFLFileStorage {
     }
 
     /**
+     * Probes the content type of a file.
+     *
+     * @param path the path to the file to probe
+     * @return The content type of the file, or null if the content type cannot be determined
+     * @throws IOException if an I/O error occurs
+     */
+    default String probeContentType(MCRVersionedPath path) throws IOException {
+        return Files.probeContentType(toPhysicalPath(path));
+    }
+
+    /**
+     * Purges all files associated with the specified transaction.
+     *
+     * @param transactionId the transaction id
+     * @throws IOException if an I/O error occurs during the purge.
+     */
+    default void purge(Long transactionId) throws IOException {
+        FileUtils.deleteDirectory(toPhysicalPath(transactionId).toFile());
+    }
+
+    /**
      * Converts the specified owner and version to a physical path.
      * <p>
      * If called externally, use the returned path only for READ operations!
@@ -220,6 +241,28 @@ public interface MCROCFLFileStorage {
 
     default String firstVersionFolder() {
         return "v0";
+    }
+
+    /**
+     * Converts the specified transaction to a physical path.
+     *
+     * @param transactionId the transaction id
+     * @return the physical path corresponding to the transaction.
+     */
+    default Path toPhysicalPath(Long transactionId) {
+        return this.getRoot().resolve(transactionId.toString());
+    }
+
+    /**
+     * Clears the transactional directory.
+     *
+     * @throws IOException if an I/O error occurs during the purge.
+     */
+    default void clearTransactional() throws IOException {
+        Path root = getRoot();
+        if (Files.isDirectory(root)) {
+            FileUtils.cleanDirectory(root.toFile());
+        }
     }
 
 }

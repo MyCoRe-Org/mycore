@@ -45,13 +45,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.digest.MCRDigest;
 import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
 import org.mycore.datamodel.niofs.MCRReadOnlyIOException;
 import org.mycore.datamodel.niofs.MCRVersionedFileSystemProvider;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
-import org.mycore.ocfl.niofs.storage.MCROCFLFileStorage;
-import org.mycore.ocfl.niofs.storage.MCROCFLRollingCacheStorage;
-import org.mycore.ocfl.niofs.storage.MCROCFLTransactionalFileStorage;
+import org.mycore.ocfl.niofs.storage.MCROCFLRemoteTemporaryStorage;
+import org.mycore.ocfl.niofs.storage.MCROCFLTransactionalStorage;
 import org.mycore.ocfl.repository.MCROCFLLocalRepositoryProvider;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
@@ -59,6 +59,7 @@ import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 
 import io.ocfl.api.exception.NotFoundException;
 import io.ocfl.api.model.ObjectVersionId;
+
 import jakarta.inject.Singleton;
 
 /**
@@ -77,9 +78,11 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
 
     private static volatile MCROCFLFileSystem fileSystem;
 
-    private MCROCFLTransactionalFileStorage transactionalStorage;
+    private MCROCFLDigestCalculator<Path, MCRDigest> digestCalculator;
 
-    private MCROCFLRollingCacheStorage tempStorage;
+    private MCROCFLTransactionalStorage transactionalStorage;
+
+    private MCROCFLRemoteTemporaryStorage remoteStorage;
 
     private MCROCFLVirtualObjectProvider virtualObjectProvider;
 
@@ -97,24 +100,29 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
      *
      * @throws IOException if an I/O error occurs during initialization.
      */
+    @SuppressWarnings("unchecked")
     public void init() throws IOException {
         try {
+            // digest calculator
+            String digestCalculatorProperty = "MCR.Content.DigestCalculator";
+            this.digestCalculator = MCRConfiguration2
+                .getSingleInstanceOfOrThrow(MCROCFLDigestCalculator.class, digestCalculatorProperty);
+
             // transactional storage
             String transactionalStorageProperty = "MCR.Content.TransactionalStorage";
             this.transactionalStorage = MCRConfiguration2
-                .getSingleInstanceOfOrThrow(MCROCFLTransactionalFileStorage.class, transactionalStorageProperty);
+                .getSingleInstanceOfOrThrow(MCROCFLTransactionalStorage.class, transactionalStorageProperty);
             Files.createDirectories(this.transactionalStorage.getRoot());
             this.transactionalStorage.clearTransactional();
-            // temporary storage
-            String tempStorageProperty = "MCR.Content.TempStorage";
-            this.tempStorage = MCRConfiguration2
-                .getSingleInstanceOf(MCROCFLRollingCacheStorage.class, tempStorageProperty).orElse(null);
-            if (this.tempStorage != null) {
-                Files.createDirectories(this.tempStorage.getRoot());
-            }
+
+            // remote storage
+            String remoteStorageProperty = "MCR.Content.RemoteStorage";
+            this.remoteStorage = MCRConfiguration2
+                .getSingleInstanceOf(MCROCFLRemoteTemporaryStorage.class, remoteStorageProperty).orElse(null);
+
             // create virtual object provider
-            this.virtualObjectProvider =
-                new MCROCFLVirtualObjectProvider(getRepository(), transactionalStorage, tempStorage);
+            this.virtualObjectProvider = new MCROCFLVirtualObjectProvider(getRepository(), transactionalStorage,
+                remoteStorage, digestCalculator);
         } catch (Exception exception) {
             throw new IOException("Unable to create MCROCFLFileSystem.", exception);
         }
@@ -129,8 +137,8 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
      */
     public void clearCache() throws IOException {
         this.transactionalStorage.clear();
-        if (this.tempStorage != null) {
-            this.tempStorage.clear();
+        if (this.remoteStorage != null) {
+            this.remoteStorage.clear();
         }
         this.virtualObjectProvider.clear();
     }
@@ -504,26 +512,26 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
         return virtualObjectProvider;
     }
 
+    public MCROCFLDigestCalculator<Path, MCRDigest> getDigestCalculator() {
+        return digestCalculator;
+    }
+
     /**
      * Returns the transactional storage.
      *
-     * @return the {@link MCROCFLTransactionalFileStorage}.
+     * @return the {@link MCROCFLTransactionalStorage}.
      */
-    public MCROCFLTransactionalFileStorage transactionalStorage() {
+    public MCROCFLTransactionalStorage transactionalStorage() {
         return this.transactionalStorage;
     }
 
     /**
-     * Returns the temporary storage.
+     * Returns the remote temporary storage.
      *
-     * @return the {@link MCROCFLTransactionalFileStorage}.
+     * @return the {@link MCROCFLRemoteTemporaryStorage}.
      */
-    public MCROCFLRollingCacheStorage tempStorage() {
-        return this.tempStorage;
-    }
-
-    public MCROCFLFileStorage getFileStorage() {
-        return null;
+    public MCROCFLRemoteTemporaryStorage remoteStorage() {
+        return this.remoteStorage;
     }
 
     /**

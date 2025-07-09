@@ -28,9 +28,9 @@ import java.util.Map;
 
 import org.mycore.datamodel.niofs.MCRBasicFileAttributeViewProperties;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
-import org.mycore.ocfl.niofs.storage.MCROCFLFileStorage;
 
 import io.ocfl.api.exception.NotFoundException;
+import org.mycore.ocfl.niofs.storage.MCROCFLTransactionalStorage;
 
 /**
  * Implementation of {@link BasicFileAttributeView} for OCFL-managed files.
@@ -106,7 +106,7 @@ public class MCROCFLBasicFileAttributeView implements BasicFileAttributeView {
         if (!virtualObject.exists(path)) {
             throw new NoSuchFileException(path.toString());
         }
-        MCROCFLFileStorage localStorage = MCROCFLFileSystemProvider.get().transactionalStorage();
+        MCROCFLTransactionalStorage localStorage = MCROCFLFileSystemProvider.get().transactionalStorage();
         boolean exists = localStorage.exists(path);
         if (!exists) {
             throw new IOException("Setting times directly to ocfl repository is not allowed!");

@@ -21,6 +21,7 @@ package org.mycore.ocfl.niofs;
 import static org.mycore.ocfl.util.MCROCFLVersionHelper.convertMessageToType;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,9 +33,10 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.digest.MCRDigest;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
-import org.mycore.ocfl.niofs.storage.MCROCFLRollingCacheStorage;
-import org.mycore.ocfl.niofs.storage.MCROCFLTransactionalFileStorage;
+import org.mycore.ocfl.niofs.storage.MCROCFLRemoteTemporaryStorage;
+import org.mycore.ocfl.niofs.storage.MCROCFLTransactionalStorage;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 import org.mycore.ocfl.util.MCROCFLMetadataVersion;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
@@ -68,9 +70,11 @@ public class MCROCFLVirtualObjectProvider {
 
     private final MCROCFLRepository repository;
 
-    private final MCROCFLTransactionalFileStorage transactionalStorage;
+    private final MCROCFLTransactionalStorage transactionalStorage;
 
-    private final MCROCFLRollingCacheStorage rollingStorage;
+    private final MCROCFLRemoteTemporaryStorage remoteStorage;
+
+    private final MCROCFLDigestCalculator<Path, MCRDigest> digestCalculator;
 
     /**
      * Constructs a new {@code MCROCFLVirtualObjectProvider}.
@@ -79,13 +83,15 @@ public class MCROCFLVirtualObjectProvider {
      * @param transactionalStorage the local temporary file storage.
      */
     public MCROCFLVirtualObjectProvider(MCROCFLRepository repository,
-        MCROCFLTransactionalFileStorage transactionalStorage, MCROCFLRollingCacheStorage rollingStorage) {
+        MCROCFLTransactionalStorage transactionalStorage, MCROCFLRemoteTemporaryStorage remoteStorage,
+        MCROCFLDigestCalculator<Path, MCRDigest> digestCalculator) {
         this.repository = repository;
         this.transactionalStorage = transactionalStorage;
-        this.rollingStorage = rollingStorage;
+        this.remoteStorage = remoteStorage;
         this.readMap = new ConcurrentHashMap<>();
         this.readQueue = new ConcurrentLinkedDeque<>();
         this.writeMap = new ConcurrentHashMap<>();
+        this.digestCalculator = digestCalculator;
     }
 
     /**
@@ -176,8 +182,8 @@ public class MCROCFLVirtualObjectProvider {
                     return readableVirtualObject.deepClone(false);
                 } catch (NotFoundException ignore) {
                     return repository.isRemote() ? new MCROCFLRemoteVirtualObject(repository, id,
-                        transactionalStorage, rollingStorage, false)
-                        : new MCROCFLLocalVirtualObject(repository, id, transactionalStorage, false);
+                        transactionalStorage, remoteStorage, digestCalculator, false)
+                        : new MCROCFLLocalVirtualObject(repository, id, transactionalStorage, digestCalculator, false);
                 }
             });
     }
@@ -316,8 +322,9 @@ public class MCROCFLVirtualObjectProvider {
             updateReadCache(id);
             OcflObjectVersion object = repository.getObject(id);
             return repository.isRemote()
-                ? new MCROCFLRemoteVirtualObject(repository, object, transactionalStorage, rollingStorage, true)
-                : new MCROCFLLocalVirtualObject(repository, object, transactionalStorage, true);
+                ? new MCROCFLRemoteVirtualObject(repository, object, transactionalStorage, remoteStorage,
+                    digestCalculator, true)
+                : new MCROCFLLocalVirtualObject(repository, object, transactionalStorage, digestCalculator, true);
         });
     }
 

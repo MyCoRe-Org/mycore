@@ -41,7 +41,7 @@ import java.util.TreeMap;
  * been cached.
  *
  * <p>Be aware that reading from the end of the delegated channel will result in a cache file of the same size.
- * E.g. reading the last 10 Bytes of a 10 GB file will result in 10 GB cache file.
+ * E.g., reading the last 10 Bytes of a 10 GB file will result in a 10 GB cache file.
  */
 public class MCROCFLCachingSeekableByteChannel implements SeekableByteChannel {
 

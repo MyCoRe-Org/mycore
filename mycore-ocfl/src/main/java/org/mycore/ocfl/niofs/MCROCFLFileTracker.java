@@ -18,6 +18,7 @@
 
 package org.mycore.ocfl.niofs;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * Tracks the state of files within an OCFL virtual object.
@@ -44,7 +44,7 @@ public class MCROCFLFileTracker<P, D> {
 
     private final Map<P, PathNode<P, D>> trackMap;
 
-    private Function<P, D> digestCalculator;
+    private MCROCFLDigestCalculator<P, D> digestCalculator;
 
     /**
      * Constructs a new {@code MCROCFLFileTracker} with the specified original paths and digest calculator.
@@ -52,7 +52,7 @@ public class MCROCFLFileTracker<P, D> {
      * @param originalPaths a map of original paths and their digests.
      * @param digestCalculator a function to calculate the digest of a path.
      */
-    public MCROCFLFileTracker(Map<P, D> originalPaths, Function<P, D> digestCalculator) {
+    public MCROCFLFileTracker(Map<P, D> originalPaths, MCROCFLDigestCalculator<P, D> digestCalculator) {
         this.originalPaths = Collections.unmodifiableMap(originalPaths);
         this.trackMap = new HashMap<>();
         this.digestCalculator = digestCalculator;
@@ -68,7 +68,7 @@ public class MCROCFLFileTracker<P, D> {
         this.digestCalculator = null;
     }
 
-    public void setDigestCalculator(Function<P, D> digestCalculator) {
+    public void setDigestCalculator(MCROCFLDigestCalculator<P, D> digestCalculator) {
         this.digestCalculator = digestCalculator;
     }
 
@@ -207,7 +207,7 @@ public class MCROCFLFileTracker<P, D> {
      * @param path the path to check.
      * @return {@code true} if the path is added or modified, {@code false} otherwise.
      */
-    public boolean isAddedOrModified(P path) {
+    public boolean isAddedOrModified(P path) throws IOException {
         PathNode<P, D> node = findPathNode(path);
         if (node == null) {
             return false;
@@ -220,7 +220,7 @@ public class MCROCFLFileTracker<P, D> {
         return !Objects.equals(origDigest, node.digest);
     }
 
-    public D getDigest(P path) {
+    public D getDigest(P path) throws IOException {
         PathNode<P, D> node = findPathNode(path);
         if (node == null) {
             return null;
@@ -247,7 +247,6 @@ public class MCROCFLFileTracker<P, D> {
      * <p>
      * This method identifies and categorizes the changes that have occurred to the tracked paths
      * since the initial state. The changes are categorized into three types:
-     * </p>
      * <ul>
      *     <li><b>DELETED</b> - Paths that were present in the original state but are no longer present.</li>
      *     <li><b>ADDED_OR_MODIFIED</b> - Paths that have been newly added or have been modified (determined by digest
@@ -257,7 +256,7 @@ public class MCROCFLFileTracker<P, D> {
      *
      * @return a list of {@link Change} objects representing the changes.
      */
-    public List<Change<P>> changes() {
+    public List<Change<P>> changes() throws IOException {
         List<Change<P>> changes = new ArrayList<>();
 
         // Process original files by checking the stored original identity.
@@ -328,9 +327,9 @@ public class MCROCFLFileTracker<P, D> {
             .findFirst();
     }
 
-    private D calculateDigestIfNecessary(PathNode<P, D> node) {
+    private D calculateDigestIfNecessary(PathNode<P, D> node) throws IOException {
         if (node.digest == null) {
-            node.digest = this.digestCalculator.apply(node.currentPath);
+            node.digest = this.digestCalculator.calculate(node.currentPath);
         }
         return node.digest;
     }

@@ -175,6 +175,25 @@ public class MCROCFLFileSystemProviderTest {
         MCRTransactionManager.commitTransactions();
         assertArrayEquals(new byte[] { 4, 3, 2, 1 }, Files.readAllBytes(testFile),
             "byte array should be equal");
+
+        // write without truncate or append
+        MCRTransactionManager.beginTransactions();
+        Files.write(testFile, new byte[] { 1, 2 }, StandardOpenOption.WRITE);
+        assertArrayEquals(new byte[] { 1, 2, 2, 1 }, Files.readAllBytes(testFile),
+            "byte array should be equal");
+        MCRTransactionManager.commitTransactions();
+        assertArrayEquals(new byte[] { 1, 2, 2, 1 }, Files.readAllBytes(testFile),
+            "byte array should be equal");
+
+        // truncate + write
+        MCRTransactionManager.beginTransactions();
+        Files.write(testFile, new byte[] { 9, 9 }, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+        assertArrayEquals(new byte[] { 9, 9 }, Files.readAllBytes(testFile),
+            "byte array should be equal");
+        MCRTransactionManager.commitTransactions();
+        assertArrayEquals(new byte[] { 9, 9 }, Files.readAllBytes(testFile),
+            "byte array should be equal");
+
     }
 
     @TestTemplate
@@ -373,7 +392,8 @@ public class MCROCFLFileSystemProviderTest {
 
     @TestTemplate
     public void readMultipleAttributes() throws IOException {
-        Map<String, Object> attributeMap = Files.readAttributes(WHITE_PNG, "basic:size,lastModifiedTime,lastAccessTime");
+        Map<String, Object> attributeMap =
+            Files.readAttributes(WHITE_PNG, "basic:size,lastModifiedTime,lastAccessTime");
         assertEquals(3, attributeMap.size(), "There should be 3 attributes.");
         assertTrue(attributeMap.containsKey("size"));
         assertTrue(attributeMap.containsKey("lastModifiedTime"));
