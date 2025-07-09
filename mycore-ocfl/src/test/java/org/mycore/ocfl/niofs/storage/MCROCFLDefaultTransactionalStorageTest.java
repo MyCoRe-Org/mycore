@@ -2,27 +2,34 @@ package org.mycore.ocfl.niofs.storage;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
+import java.util.HashSet;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mycore.common.MCRTransactionManager;
+import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.niofs.MCROCFLInactiveTransactionException;
-import org.mycore.ocfl.repository.MCROCFLRepository;
-import org.mycore.ocfl.test.PermutedParam;
-import org.mycore.ocfl.test.MCRPermutationExtension;
 import org.mycore.ocfl.test.MCROCFLSetupExtension;
+import org.mycore.ocfl.test.MCRPermutationExtension;
+import org.mycore.ocfl.test.PermutedParam;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
 @ExtendWith({ MCRPermutationExtension.class, MCROCFLSetupExtension.class })
-public class MCROCFLLocalFileStorageTest extends MCROCFLStorageTestCase {
+public class MCROCFLDefaultTransactionalStorageTest extends MCROCFLStorageTestCase {
 
-    private MCROCFLLocalFileStorage storage;
+    @TempDir
+    public Path folder;
 
-    // TODO why do i need the repo here?
-    protected MCROCFLRepository repository;
+    private MCROCFLDefaultTransactionalStorage storage;
 
     @PermutedParam
     private boolean remote;
@@ -33,12 +40,8 @@ public class MCROCFLLocalFileStorageTest extends MCROCFLStorageTestCase {
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-        storage = new MCROCFLLocalFileStorage(rootPath);
-    }
-
-    @Override
-    public MCROCFLLocalFileStorage getStorage() {
-        return storage;
+        Path rootPath = folder.resolve("ocfl-cache");
+        this.storage = new MCROCFLDefaultTransactionalStorage(rootPath);
     }
 
     @TestTemplate
@@ -53,10 +56,10 @@ public class MCROCFLLocalFileStorageTest extends MCROCFLStorageTestCase {
     @TestTemplate
     public void toPhysicalPath() {
         MCRTransactionManager.beginTransactions();
-        Assertions.assertTrue(storage.toPhysicalPath(path1).endsWith("1/owner1/v0/file1"));
+        Assertions.assertTrue(storage.toPhysicalPath(path1).endsWith("1/" + DERIVATE_3 + "/v0/file1"));
         MCRTransactionManager.commitTransactions();
         MCRTransactionManager.beginTransactions();
-        Assertions.assertTrue(storage.toPhysicalPath(path1).endsWith("2/owner1/v0/file1"));
+        Assertions.assertTrue(storage.toPhysicalPath(path1).endsWith("2/" + DERIVATE_3 + "/v0/file1"));
         MCRTransactionManager.commitTransactions();
     }
 
@@ -115,6 +118,17 @@ public class MCROCFLLocalFileStorageTest extends MCROCFLStorageTestCase {
         write(path3);
         Assertions.assertTrue(storage.exists(path3), "'path3' should exist after write operation");
         MCRTransactionManager.commitTransactions();
+    }
+
+    protected void write(MCRVersionedPath path) throws IOException {
+        write(path, new byte[] { 1 });
+    }
+
+    protected void write(MCRVersionedPath path, byte[] data) throws IOException {
+        try (SeekableByteChannel channel = storage.newByteChannel(path, new HashSet<>(
+            Arrays.asList(StandardOpenOption.CREATE, StandardOpenOption.WRITE)))) {
+            channel.write(ByteBuffer.wrap(data));
+        }
     }
 
 }

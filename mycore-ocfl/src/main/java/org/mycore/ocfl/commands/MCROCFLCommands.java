@@ -76,6 +76,8 @@ import org.mycore.ocfl.metadata.MCROCFLXMLMetadataManagerAdapter;
 import org.mycore.ocfl.metadata.migration.MCROCFLMigration;
 import org.mycore.ocfl.metadata.migration.MCROCFLRevisionPruner;
 import org.mycore.ocfl.niofs.MCROCFLFileSystemProvider;
+import org.mycore.ocfl.niofs.storage.MCROCFLDefaultRemoteTemporaryStorage;
+import org.mycore.ocfl.niofs.storage.MCROCFLRemoteTemporaryStorage;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
 import org.mycore.ocfl.user.MCROCFLXMLUserManager;
@@ -538,6 +540,21 @@ public class MCROCFLCommands {
             Files.write(errorFilePath, errorLines, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
             LOGGER.info(() -> "Validation error in '" + derivateId + "'. See '" + errorFilePath.getFileName()
                 + "' for details.");
+        }
+    }
+
+    @MCRCommand(syntax = "compact ocfl remote storage journal",
+        help = "Compacts the journal for the remote temporary storage to improve startup performance.")
+    public static void compactRemoteCacheJournal() throws IOException {
+        MCROCFLFileSystemProvider provider = MCROCFLFileSystemProvider.get();
+        MCROCFLRemoteTemporaryStorage remoteStorage = provider.remoteStorage();
+
+        if (remoteStorage instanceof MCROCFLDefaultRemoteTemporaryStorage defaultStorage) {
+            defaultStorage.compactJournal();
+            LOGGER.info("Remote cache compaction complete.");
+        } else {
+            LOGGER.warn(() -> "The configured remote temporary storage does not support compaction. Type: " +
+                (remoteStorage != null ? remoteStorage.getClass().getName() : "null"));
         }
     }
 
