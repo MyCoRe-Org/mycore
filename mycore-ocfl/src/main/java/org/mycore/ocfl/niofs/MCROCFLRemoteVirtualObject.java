@@ -140,14 +140,14 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
      * The implementation prioritizes data sources as follows:
      * <ol>
      *   <li>
-     *       If the file is modified in the current transaction, it is read from {@link MCROCFLTransactionalStorage}.
+     *     If the file is modified in the current transaction, it is read from {@link MCROCFLTransactionalStorage}.
      *   </li>
      *   <li>
-     *       If the file exists in the {@link MCROCFLRemoteTemporaryStorage} (local cache), it is read from there.
+     *     If the file exists in the {@link MCROCFLRemoteTemporaryStorage} (local cache), it is read from there.
      *   </li>
      *   <li>
-     *       Otherwise, it is streamed from the remote OCFL repository. As it is streamed, the content is simultaneously
-     *      written to the remote temporary cache for subsequent reads.<
+     *     Otherwise, it is streamed from the remote OCFL repository. As it is streamed, the content is simultaneously
+     *     written to the remote temporary cache for later reads.
      *   /li>
      * </ol>
      *
@@ -312,9 +312,9 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
 
     /**
      * {@inheritDoc}
+     * <p>
      * If the file is not available locally in either the transactional or remote cache, this implementation
      * falls back to guessing the content type from the file name to avoid downloading the entire file.
-     * </p>
      */
     @Override
     public String probeContentType(MCRVersionedPath path) throws IOException {

@@ -89,19 +89,19 @@ import io.ocfl.api.model.VersionNum;
  * This abstract class provides the core functionality for managing the state of an OCFL object
  * (e.g., a MyCoRe derivate) as if it were a file system. It handles file and directory operations such as creation,
  * reading, writing, renaming, and deleting.
- * <h3>State Management:</h3>
+ * <h2>State Management:</h2>
  * The class maintains the state of the object's files and directories using two key trackers:
  * <ul>
  *   <li>
- *       <b>{@link MCROCFLFileTracker}:</b> Tracks the state of all files, including their paths and digests. It
- *       identifies additions, deletions, modifications, and renames.
+ *     <b>{@link MCROCFLFileTracker}:</b> Tracks the state of all files, including their paths and digests. It
+ *     identifies additions, deletions, modifications, and renames.
  *   </li>
  *   <li>
- *       <b>{@link MCROCFLDirectoryTracker}:</b> Tracks all directories and whether they are "empty" in the OCFL
- *       sense (i.e., whether they require a {@code .keep} file).
+ *     <b>{@link MCROCFLDirectoryTracker}:</b> Tracks all directories and whether they are "empty" in the OCFL
+ *     sense (i.e., whether they require a {@code .keep} file).
  *   </li>
  * </ul>
- * <h3>Transactional Behavior:</h3>
+ * <h2>Transactional Behavior:</h2>
  * <p>
  * All modifications are performed on a {@link MCROCFLTransactionalStorage}, which is a local staging area.
  * The changes are only written back to the persistent OCFL repository when the {@link #persist()} method is called,
@@ -905,6 +905,7 @@ public abstract class MCROCFLVirtualObject {
             return false;
         }
     }
+
     /**
      * Persists all tracked changes (additions, modifications, deletions, renames) to the OCFL repository.
      * <p>
