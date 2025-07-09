@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -194,8 +195,18 @@ public class MCRMetsMods2IIIFConverter {
         processDivContainer(complete, divContainer);
         manifest.structures.addAll(complete);
 
-        manifest.setLabel(
-            metadata.stream().filter(m -> m.getLabel().equals("title")).findFirst().get().getStringValue().get());
+        Optional<MCRIIIFMetadata> titleOpt = metadata.stream()
+            .filter(m -> m.getLabel().equals("title"))
+            .findFirst();
+        if (titleOpt.isEmpty()) {
+            manifest.setLabel("Missing title, this is the default text");
+            LOGGER.warn("Can not find title information in Mets/MODS to use in IIIF manifest, default text is set!");
+        } else {
+            manifest.setLabel(
+                titleOpt.get()
+                    .getStringValue()
+                    .get());
+        }
 
         return manifest;
     }
