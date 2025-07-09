@@ -25,7 +25,7 @@ package org.mycore.ocfl.niofs.storage;
 public class MCROCFLNeverEvictStrategy implements MCROCFLEvictionStrategy {
 
     @Override
-    public boolean shouldEvict(long totalFiles, long totalAllocation) {
+    public boolean shouldEvict(MCROCFLRemoteTemporaryStorage storage) {
         return false;
     }
 

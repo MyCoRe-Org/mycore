@@ -56,7 +56,6 @@ public class MCROCFLFileTypeDetector extends FileTypeDetector {
             throw new NoSuchFileException(path.toString());
         }
         MCRVersionedPath versionedPath = MCRVersionedPath.ofPath(path);
-        MCROCFLFileSystemProvider.get().virtualObjectProvider();
         MCROCFLVirtualObject virtualObject = MCROCFLFileSystemProvider.get().virtualObjectProvider().get(versionedPath);
         if (virtualObject == null) {
             throw new NoSuchFileException(path.toString());

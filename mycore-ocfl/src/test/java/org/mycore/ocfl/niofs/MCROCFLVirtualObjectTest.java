@@ -56,13 +56,22 @@ public class MCROCFLVirtualObjectTest {
     public void toPhysicalPath() throws IOException {
         MCRVersionedPath source = WHITE_PNG;
         MCRVersionedPath target = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_1, "moved.png");
-
-        assertNotNull(getVirtualObject().toPhysicalPath(source));
+        if (remote) {
+            assertThrows(MCROCFLVirtualObject.CannotDeterminePhysicalPathException.class,
+                () -> getVirtualObject().toPhysicalPath(source));
+        } else {
+            assertNotNull(getVirtualObject().toPhysicalPath(source));
+        }
         MCRTransactionManager.beginTransactions();
         Files.move(source, target);
         assertNotNull(getVirtualObject().toPhysicalPath(target));
         MCRTransactionManager.commitTransactions();
-        assertNotNull(getVirtualObject().toPhysicalPath(target));
+        if (remote) {
+            assertThrows(MCROCFLVirtualObject.CannotDeterminePhysicalPathException.class,
+                () -> getVirtualObject().toPhysicalPath(target));
+        } else {
+            assertNotNull(getVirtualObject().toPhysicalPath(target));
+        }
     }
 
     @TestTemplate
