@@ -76,6 +76,10 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
 
     public static final URI FS_URI = URI.create(SCHEME + ":///");
 
+    public static final String BASIC_ATTRIBUTE_VIEW = "basic";
+
+    public static final String OCFL_ATTRIBUTE_VIEW = "ocfl";
+
     private static volatile MCROCFLFileSystem fileSystem;
 
     private MCROCFLDigestCalculator<Path, MCRDigest> digestCalculator;
@@ -429,7 +433,7 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
         if (s[0].isEmpty()) {
             throw new IllegalArgumentException(attributes);
         }
-        if (!"basic".equals(s[0])) {
+        if (!(BASIC_ATTRIBUTE_VIEW.equals(s[0]) || OCFL_ATTRIBUTE_VIEW.equals(s[0]))) {
             throw new UnsupportedOperationException("View '" + s[0] + "' not available");
         }
         MCRVersionedPath versionedPath = MCRVersionedPath.ofPath(path);
