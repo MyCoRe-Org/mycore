@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -42,7 +43,7 @@ public class MCROCFLFileTrackerTest {
     }
 
     @Test
-    public void testWrite() {
+    public void testWrite() throws IOException {
         fileTracker.write("path4");
         assertChanges(1);
         assertChange("path4", ChangeType.ADDED_OR_MODIFIED);
@@ -53,26 +54,26 @@ public class MCROCFLFileTrackerTest {
     }
 
     @Test
-    public void testDelete() {
+    public void testDelete() throws IOException {
         fileTracker.delete("path2");
         assertChanges(1);
         assertChange("path2", ChangeType.DELETED);
     }
 
     @Test
-    public void testRename() {
+    public void testRename() throws IOException {
         fileTracker.rename("path3", "path33");
         assertChanges(1);
         assertChangeRename("path3", "path33");
     }
 
     @Test
-    public void testChanges() {
+    public void testChanges() throws IOException {
         assertChanges(0);
     }
 
     @Test
-    public void testNotFound() {
+    public void testNotFound() throws IOException {
         fileTracker.rename("path4", "path5");
         assertChanges(0);
         fileTracker.delete("path4");
@@ -80,7 +81,7 @@ public class MCROCFLFileTrackerTest {
     }
 
     @Test
-    public void testRenameDelete() {
+    public void testRenameDelete() throws IOException {
         fileTracker.rename("path1", "path2");
         fileTracker.delete("path1");
         assertChanges(1);
@@ -93,7 +94,7 @@ public class MCROCFLFileTrackerTest {
     }
 
     @Test
-    public void testRenameSameTarget() {
+    public void testRenameSameTarget() throws IOException {
         fileTracker.rename("path1", "path2");
         fileTracker.rename("path3", "path2");
         assertChanges(2);
@@ -102,7 +103,7 @@ public class MCROCFLFileTrackerTest {
     }
 
     @Test
-    public void testRenameSame() {
+    public void testRenameSame() throws IOException {
         fileTracker.rename("path1", "new_path1");
         fileTracker.rename("new_path1", "new_path2");
         fileTracker.rename("new_path2", "path1");
@@ -110,7 +111,7 @@ public class MCROCFLFileTrackerTest {
     }
 
     @Test
-    public void testRenameMultipleTimes() {
+    public void testRenameMultipleTimes() throws IOException {
         fileTracker.rename("path1", "new_path1");
         fileTracker.rename("new_path1", "new_path2");
         fileTracker.rename("new_path2", "new_path3");
@@ -119,7 +120,7 @@ public class MCROCFLFileTrackerTest {
     }
 
     @Test
-    public void testRenameWrite() {
+    public void testRenameWrite() throws IOException {
         // writing same content to renamed file
         fileTracker.rename("path1", "new_path1");
         fileTracker.write("new_path1", DATA.get("path1"));
@@ -138,7 +139,7 @@ public class MCROCFLFileTrackerTest {
     }
 
     @Test
-    public void testCombine() {
+    public void testCombine() throws IOException {
         fileTracker.write("path4", "4");
         fileTracker.write("path5", "5");
         assertChanges(2);
@@ -158,7 +159,7 @@ public class MCROCFLFileTrackerTest {
     }
 
     @Test
-    public void testIsModified() {
+    public void testIsModified() throws IOException {
         fileTracker.write("path1", "other_digest");
         assertTrue(fileTracker.isAddedOrModified("path1"));
         assertChanges(1);
@@ -184,7 +185,7 @@ public class MCROCFLFileTrackerTest {
     }
 
     @Test
-    public void testIsAddedOrModified() {
+    public void testIsAddedOrModified() throws IOException {
         // Test for added path
         fileTracker.write("path5");
         assertTrue(fileTracker.isAddedOrModified("path5"));
@@ -202,7 +203,7 @@ public class MCROCFLFileTrackerTest {
     }
 
     @Test
-    public void testDigest() {
+    public void testDigest() throws IOException {
         // existing path
         assertEquals(DATA.get("path1"), fileTracker.getDigest("path1"));
         fileTracker.write("path1", "other_digest");
@@ -217,7 +218,7 @@ public class MCROCFLFileTrackerTest {
     }
 
     @Test
-    public void testDeepClone() {
+    public void testDeepClone() throws IOException {
         // Modify the tracker
         fileTracker.rename("path1", "new_path1");
         fileTracker.delete("path2");
@@ -246,7 +247,7 @@ public class MCROCFLFileTrackerTest {
     }
 
     @Test
-    public void testLazyDigestCalculation() {
+    public void testLazyDigestCalculation() throws IOException {
         // Write a new file with no digest provided.
         fileTracker.write("path5");
         // At this point, the node should be created with a null digest.
@@ -257,7 +258,7 @@ public class MCROCFLFileTrackerTest {
     }
 
     @Test
-    public void testNonExistentRenameAndDelete() {
+    public void testNonExistentRenameAndDelete() throws IOException {
         // Calling rename on a non-existent file should do nothing.
         fileTracker.rename("non_existent", "some_target");
         assertEquals(0, fileTracker.changes().size());
@@ -268,7 +269,7 @@ public class MCROCFLFileTrackerTest {
     }
 
     @Test
-    public void testConflictRename() {
+    public void testConflictRename() throws IOException {
         // First, add a new file with path "conflict".
         fileTracker.write("conflict", "conflict_digest");
         // Now, rename an existing file ("path1") to "conflict".
@@ -284,7 +285,7 @@ public class MCROCFLFileTrackerTest {
     }
 
     @Test
-    public void testReAddAfterDeletion() {
+    public void testReAddAfterDeletion() throws IOException {
         // Delete an original file.
         fileTracker.delete("path2");
         assertTrue(fileTracker.changes().stream().anyMatch(
@@ -295,11 +296,11 @@ public class MCROCFLFileTrackerTest {
         assertEquals(0, fileTracker.changes().size());
     }
 
-    private void assertChanges(int numberOfChanges) {
+    private void assertChanges(int numberOfChanges) throws IOException {
         assertEquals(numberOfChanges, fileTracker.changes().size());
     }
 
-    private void assertChange(String path, ChangeType changeType) {
+    private void assertChange(String path, ChangeType changeType) throws IOException {
         List<Change<String>> changes = fileTracker.changes();
         for (Change<String> change : changes) {
             if (change.source().equals(path) && changeType.equals(change.type())) {
@@ -309,7 +310,7 @@ public class MCROCFLFileTrackerTest {
         throw new AssertionError("Change of type " + changeType + " for path " + path + " not found");
     }
 
-    private void assertChangeRename(String source, String target) {
+    private void assertChangeRename(String source, String target) throws IOException {
         List<Change<String>> changes = fileTracker.changes();
         for (Change<String> change : changes) {
             if (change.source().equals(source) && change.target().equals(target)

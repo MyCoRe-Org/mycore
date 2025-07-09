@@ -38,9 +38,9 @@ import org.mycore.ocfl.MCROCFLException;
 import org.mycore.ocfl.MCROCFLTestCaseHelper;
 import org.mycore.ocfl.niofs.MCROCFLFileSystemProvider;
 import org.mycore.ocfl.niofs.MCROCFLFileSystemTransaction;
-import org.mycore.ocfl.niofs.storage.MCROCFLLocalFileStorage;
+import org.mycore.ocfl.niofs.storage.MCROCFLDefaultRemoteTemporaryStorage;
+import org.mycore.ocfl.niofs.storage.MCROCFLDefaultTransactionalStorage;
 import org.mycore.ocfl.niofs.storage.MCROCFLNeverEvictStrategy;
-import org.mycore.ocfl.niofs.storage.MCROCFLRollingCacheStorage;
 import org.mycore.ocfl.repository.MCROCFLHashRepositoryProvider;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 import org.mycore.ocfl.repository.MCROCFLRepositoryBuilder;
@@ -70,6 +70,8 @@ public class MCROCFLSetupExtension implements BeforeEachCallback, AfterEachCallb
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private static MCROCFLRepository repository;
+
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
         Object testInstance = context.getRequiredTestInstance();
@@ -80,7 +82,7 @@ public class MCROCFLSetupExtension implements BeforeEachCallback, AfterEachCallb
         Boolean purge = getBooleanFieldValue(clazz, testInstance, "purge");
 
         // Set up the repository
-        MCROCFLRepository repository = createRepository(remote != null ? remote : false);
+        repository = createRepository(remote != null ? remote : false);
         setField(clazz, testInstance, "repository", repository);
 
         // Configure purge property
@@ -90,14 +92,14 @@ public class MCROCFLSetupExtension implements BeforeEachCallback, AfterEachCallb
         MCRConfiguration2.set(purgePropertyName, Boolean.toString(purge != null ? purge : false));
 
         // Set transactional storage
-        MCRConfiguration2.set("MCR.Content.TransactionalStorage", MCROCFLLocalFileStorage.class.getName());
+        MCRConfiguration2.set("MCR.Content.TransactionalStorage", MCROCFLDefaultTransactionalStorage.class.getName());
 
         // Set remote configuration
         if (remote != null && remote) {
-            MCRConfiguration2.set("MCR.Content.TempStorage", MCROCFLRollingCacheStorage.class.getName());
-            MCRConfiguration2.set("MCR.Content.TempStorage.EvictionStrategy",
+            MCRConfiguration2.set("MCR.Content.RemoteStorage", MCROCFLDefaultRemoteTemporaryStorage.class.getName());
+            MCRConfiguration2.set("MCR.Content.RemoteStorage.EvictionStrategy",
                 MCROCFLNeverEvictStrategy.class.getName());
-            MCRConfiguration2.set("MCR.Content.TempStorage.Path", "%MCR.datadir%/ocfl/temp-storage");
+            MCRConfiguration2.set("MCR.Content.RemoteStorage.Path", "%MCR.datadir%/ocfl-storage/remote");
         }
 
         // Execute common initialization
@@ -150,11 +152,6 @@ public class MCROCFLSetupExtension implements BeforeEachCallback, AfterEachCallb
 
     @Override
     public void afterEach(ExtensionContext context) throws Exception {
-        Object testInstance = context.getRequiredTestInstance();
-        Class<?> clazz = testInstance.getClass();
-
-        // Clean up repository
-        MCROCFLRepository repository = (MCROCFLRepository) getField(clazz, testInstance, "repository");
         tearDownRepository(repository);
         MCROCFLFileSystemProvider.get().clearCache();
         MCRTransactionManager.rollbackTransactions();
@@ -171,16 +168,14 @@ public class MCROCFLSetupExtension implements BeforeEachCallback, AfterEachCallb
         }
     }
 
-    private Object getField(Class<?> clazz, Object instance, String fieldName) throws Exception {
-        Field field = clazz.getDeclaredField(fieldName);
-        field.setAccessible(true);
-        return field.get(instance);
-    }
-
     private void setField(Class<?> clazz, Object instance, String fieldName, Object value) throws Exception {
-        Field field = clazz.getDeclaredField(fieldName);
-        field.setAccessible(true);
-        field.set(instance, value);
+        try {
+            Field field = clazz.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(instance, value);
+        } catch (NoSuchFieldException noSuchFieldException) {
+            LOGGER.warn("field '{}' not found", fieldName);
+        }
     }
 
     /**

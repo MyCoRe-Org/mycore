@@ -46,14 +46,10 @@ public class MCROCFLMaxSizeEvictionStrategy implements MCROCFLEvictionStrategy {
 
     /**
      * Determines whether files should be evicted based on the total allocation size.
-     *
-     * @param totalFiles the total number of files currently in the cache.
-     * @param totalAllocation the total size of all files currently in the cache, in bytes.
-     * @return {@code true} if the total allocation exceeds the maximum size, {@code false} otherwise.
      */
     @Override
-    public boolean shouldEvict(long totalFiles, long totalAllocation) {
-        return totalAllocation > maxSize;
+    public boolean shouldEvict(MCROCFLRemoteTemporaryStorage storage) {
+        return storage.allocated() > maxSize;
     }
 
     /**
