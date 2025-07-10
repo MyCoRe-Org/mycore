@@ -102,7 +102,7 @@ public class MCROCFLFileSystemProviderTest {
     }
 
     @TestTemplate
-    public void newByteChannel() throws IOException, URISyntaxException {
+    public void newByteChannel() throws IOException {
         final MCRPath testFile = MCRPath.getPath(DERIVATE_1, "testFile");
         // prepare
         byte[] expectedTestFileData = { 1, 3, 3, 7 };

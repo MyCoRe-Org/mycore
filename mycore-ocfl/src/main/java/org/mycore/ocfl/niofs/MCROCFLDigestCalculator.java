@@ -21,17 +21,25 @@ package org.mycore.ocfl.niofs;
 import java.io.IOException;
 
 /**
- * A functional interface for a component that calculates a digest for a given path.
- * Implementations may throw an {@link IOException} if the path cannot be read.
+ * An interface for a component that calculates a digest for a given path or byte array.
  *
  * @param <P> The type of the path object.
  * @param <D> The type of the digest object.
  */
-@FunctionalInterface
 public interface MCROCFLDigestCalculator<P, D> {
 
     /**
-     * Calculates the digest for the given path.
+     * Calculates the digest for the given byte array.
+     * This is the preferred method when the content is already in memory.
+     *
+     * @param bytes The content to be digested.
+     * @return The calculated digest.
+     * @throws IOException If an I/O error occurs (though less likely for byte arrays).
+     */
+    D calculate(byte[] bytes) throws IOException;
+
+    /**
+     * Calculates the digest for the given path by reading its content.
      *
      * @param path the path to the content to be digested.
      * @return the calculated digest.

@@ -23,6 +23,7 @@ import java.net.URLConnection;
 import java.nio.channels.Channels;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.CopyOption;
+import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -173,7 +174,8 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
 
         // read from remote ocfl repository
         OcflObjectVersionFile ocflFile = fromOcfl(path);
-        MCROCFLDefaultRemoteTemporaryStorage.CacheEntryWriter cacheEntry = this.remoteStorage.newCacheEntry(path);
+        MCROCFLDefaultRemoteTemporaryStorage.CacheEntryWriter cacheEntry =
+            this.remoteStorage.newCacheEntry(path.getFileName().toString());
         MCROCFLReadableByteChannel readableByteChannel = new MCROCFLReadableByteChannel(ocflFile);
         MCROCFLCachingSeekableByteChannel cachingByteChannel =
             new MCROCFLCachingSeekableByteChannel(readableByteChannel, cacheEntry.getChannel());
@@ -238,7 +240,7 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
         // copy from temporary storage
         MCRDigest digest = getDigest(source);
         if (this.remoteStorage.exists(digest)) {
-            this.remoteStorage.copy(digest, lockedTarget, options);
+            this.remoteStorage.exportFile(digest, lockedTarget, options);
             trackFileWrite(lockedTarget, event);
             return;
         }
@@ -271,7 +273,7 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
         // copy from temporary storage
         MCRDigest digest = getDigest(source);
         if (this.remoteStorage.exists(digest)) {
-            this.remoteStorage.copy(digest, target, options);
+            this.remoteStorage.exportFile(digest, target, options);
             virtualTarget.trackFileWrite(target, event);
             return;
         }
@@ -337,6 +339,25 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean persist() throws IOException {
+        boolean persist = super.persist();
+        // copy data from transactional storage to remote storage
+        for (MCROCFLFileTracker.Change<MCRVersionedPath> change : this.fileTracker.changes()) {
+            if (MCROCFLFileTracker.ChangeType.ADDED_OR_MODIFIED.equals(change.type())) {
+                MCRVersionedPath source = change.source();
+                Path physicalPath = this.transactionalStorage.toPhysicalPath(source);
+                if (Files.exists(physicalPath)) {
+                    this.remoteStorage.importFile(physicalPath);
+                }
+            }
+        }
+        return persist;
+    }
+
+    /**
      * Creates a deep clone of this remote virtual object. The clone will share the same storage
      * instances but will have its own independent tracking state.
      *
@@ -355,7 +376,7 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
             readonly,
             this.fileTracker.deepClone(),
             this.directoryTracker.deepClone());
-        clonedVirtualObject.fileTracker.setDigestCalculator(clonedVirtualObject::calculateDigest);
+        clonedVirtualObject.fileTracker.setDigestCalculator(new DigestCalculator(clonedVirtualObject));
         return clonedVirtualObject;
     }
 

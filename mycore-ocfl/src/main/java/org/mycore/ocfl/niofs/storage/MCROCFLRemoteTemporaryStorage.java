@@ -21,13 +21,13 @@ package org.mycore.ocfl.niofs.storage;
 import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.CopyOption;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
 
 import org.mycore.common.digest.MCRDigest;
-import org.mycore.datamodel.niofs.MCRVersionedPath;
 
 /**
  * A temporary storage for remote OCFL repositories.
@@ -66,13 +66,13 @@ public interface MCROCFLRemoteTemporaryStorage {
     /**
      * Writes a complete byte array to the cache as a new entry.
      *
-     * @param path    A path suggestion used to generate the temporary file's name.
-     * @param bytes   The content to write.
-     * @param options The options specifying how the file is opened.
+     * @param originalFileName The original file name used to probe the content type.
+     * @param bytes            The content to write.
+     * @param options          The options specifying how the file is opened.
      * @return The calculated {@link MCRDigest} of the written content.
      * @throws IOException if an I/O error occurs during writing.
      */
-    MCRDigest write(MCRVersionedPath path, byte[] bytes, OpenOption... options) throws IOException;
+    MCRDigest write(String originalFileName, byte[] bytes, OpenOption... options) throws IOException;
 
     /**
      * Opens a {@link SeekableByteChannel} for reading the content associated with the given digest.
@@ -85,15 +85,26 @@ public interface MCROCFLRemoteTemporaryStorage {
     SeekableByteChannel readByteChannel(MCRDigest digest) throws IOException;
 
     /**
+     * Imports a file from an external path into the cache.
+     *
+     * @param source The source file which should be copied into the cache.
+     * @return The digest of the imported file's content, which serves as its key in the cache.
+     * @throws FileAlreadyExistsException if the digest already exists in the cache.
+     * @throws IOException                if an I/O error occurs.
+     */
+    MCRDigest importFile(Path source)
+        throws FileAlreadyExistsException, IOException;
+
+    /**
      * Copies a cached file to a target path.
      *
-     * @param source  The digest of the source file in the cache.
+     * @param sourceDigest  The digest of the source file in the cache.
      * @param target  The destination path for the copy.
      * @param options Options specifying how the copy should be done.
      * @throws NoSuchFileException if the source digest is not found in the cache.
      * @throws IOException         if an I/O error occurs during the copy operation.
      */
-    void copy(MCRDigest source, MCRVersionedPath target, CopyOption... options) throws IOException;
+    void exportFile(MCRDigest sourceDigest, Path target, CopyOption... options) throws IOException;
 
     /**
      * Probes the content type (MIME type) of a file stored in the cache.
@@ -115,12 +126,12 @@ public interface MCROCFLRemoteTemporaryStorage {
      * <p>
      * <b>Be aware that the caller of this method is responsible for closing the channel!</b>
      *
-     * @param path  A name suggestion for the cached file.
+     * @param originalFileName  The original file name. Used for probing the content type.
      * @param attrs Optional file attributes for the temporary file.
      * @return A writer object to manage the caching operation.
      * @throws IOException if an I/O error occurs creating the temporary file.
      */
-    CacheEntryWriter newCacheEntry(MCRVersionedPath path, FileAttribute<?>... attrs) throws IOException;
+    CacheEntryWriter newCacheEntry(String originalFileName, FileAttribute<?>... attrs) throws IOException;
 
     /**
      * Represents an in-progress write operation to the cache.

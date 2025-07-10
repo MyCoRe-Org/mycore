@@ -53,8 +53,8 @@ public class MCROCFLDefaultRemoteTemporaryStorageTest extends MCROCFLStorageTest
         storage = (MCROCFLDefaultRemoteTemporaryStorage) MCROCFLFileSystemProvider.get().remoteStorage();
         storage.setEvictionStrategy(new FileCountEvictionStrategy(2));
 
-        digest1 = storage.write(path1, new byte[] { 1 });
-        digest2 = storage.write(path2, new byte[] { 2 });
+        digest1 = storage.write(path1.getFileName().toString(), new byte[] { 1 });
+        digest2 = storage.write(path2.getFileName().toString(), new byte[] { 2 });
         randomDigest = new MCRMD5Digest("698d7aec27728941d9dfae9bf5ab969c");
     }
 
@@ -67,15 +67,15 @@ public class MCROCFLDefaultRemoteTemporaryStorageTest extends MCROCFLStorageTest
 
     @TestTemplate
     public void write() throws IOException {
-        MCRDigest digest3 = storage.write(path3, new byte[] { 3 });
+        MCRDigest digest3 = storage.write(path3.getFileName().toString(), new byte[] { 3 });
 
-        // writing to path3 should rollover path1
+        // writing to path3 should roll over path1
         assertFalse(storage.exists(digest1), "'digest1' should not exist.");
         assertTrue(storage.exists(digest2), "'digest2' should exist.");
         assertTrue(storage.exists(digest3), "'digest3' should exist.");
 
-        // writing to path1 should rollover path2
-        digest1 = storage.write(path1, new byte[] { 4 });
+        // writing to path1 should roll over path2
+        digest1 = storage.write(path1.getFileName().toString(), new byte[] { 4 });
         assertTrue(storage.exists(digest1), "'digest1' should exist.");
         assertFalse(storage.exists(digest2), "'digest2' should not exist.");
         assertTrue(storage.exists(digest3), "'digest3' should exist.");
@@ -103,24 +103,23 @@ public class MCROCFLDefaultRemoteTemporaryStorageTest extends MCROCFLStorageTest
     @TestTemplate
     public void probeContentType() throws IOException {
         assertNull(storage.probeContentType(digest1));
-        MCRDigest digest3 =
-            storage.write(MCRVersionedPath.head(DERIVATE_3, "text.txt"), new byte[] { 3 });
+        MCRDigest digest3 = storage.write("text.txt", new byte[] { 3 });
         assertEquals("text/plain", storage.probeContentType(digest3));
     }
 
     @TestTemplate
-    public void copy() throws IOException {
+    public void exportFile() throws IOException {
         // copy from path1 to path3
         MCRTransactionManager.beginTransactions();
-        storage.copy(digest1, path3);
+        storage.exportFile(digest1, path3);
         assertTrue(Files.exists(path3), "'path3' should exist");
         assertArrayEquals(new byte[] { 1 }, Files.readAllBytes(path3), "'path3' bytes should be equal to path1");
         MCRTransactionManager.commitTransactions();
 
         // copy from path2 to path3 -> overwrite
         MCRTransactionManager.beginTransactions();
-        assertThrows(FileAlreadyExistsException.class, () -> storage.copy(digest2, path3));
-        storage.copy(digest2, path3, StandardCopyOption.REPLACE_EXISTING);
+        assertThrows(FileAlreadyExistsException.class, () -> storage.exportFile(digest2, path3));
+        storage.exportFile(digest2, path3, StandardCopyOption.REPLACE_EXISTING);
         assertTrue(Files.exists(path3), "'path3' should exist");
         assertArrayEquals(new byte[] { 2 }, Files.readAllBytes(path3), "'path3' bytes should be equal to path2");
         MCRTransactionManager.commitTransactions();
@@ -137,7 +136,8 @@ public class MCROCFLDefaultRemoteTemporaryStorageTest extends MCROCFLStorageTest
 
         MCRDigest committedDigest;
         // Use the writer within a try-with-resources block and commit it
-        MCROCFLDefaultRemoteTemporaryStorage.CacheEntryWriter writer = storage.newCacheEntry(path3);
+        MCROCFLDefaultRemoteTemporaryStorage.CacheEntryWriter writer =
+            storage.newCacheEntry(path3.getFileName().toString());
         try {
             writer.getChannel().write(ByteBuffer.wrap(commitContent));
             committedDigest = writer.commit();
@@ -165,7 +165,8 @@ public class MCROCFLDefaultRemoteTemporaryStorageTest extends MCROCFLStorageTest
         MCRVersionedPath pathForAbort = MCRVersionedPath.head(DERIVATE_3, "abort.txt");
         Path tempFilePath;
 
-        MCROCFLDefaultRemoteTemporaryStorage.CacheEntryWriter abortWriter = storage.newCacheEntry(pathForAbort);
+        MCROCFLDefaultRemoteTemporaryStorage.CacheEntryWriter abortWriter =
+            storage.newCacheEntry(pathForAbort.getFileName().toString());
         tempFilePath = abortWriter.getPath();
 
         try {
@@ -183,7 +184,7 @@ public class MCROCFLDefaultRemoteTemporaryStorageTest extends MCROCFLStorageTest
         // 1. Perform more actions to create a more complex journal
         // Add a third file, which should trigger the eviction of digest1 (the oldest)
         byte[] content3 = new byte[] { 3 };
-        MCRDigest digest3 = storage.write(path3, content3);
+        MCRDigest digest3 = storage.write(path3.getFileName().toString(), content3);
 
         // State check 1: digest1 evicted
         assertFalse(storage.exists(digest1), "Digest1 should be evicted by the write of digest3.");
@@ -221,7 +222,7 @@ public class MCROCFLDefaultRemoteTemporaryStorageTest extends MCROCFLStorageTest
         // Adding a new file should evict digest3, because digest2 was "touched" and is newer.
         byte[] content4 = new byte[] { 4 };
         MCRVersionedPath path4 = MCRVersionedPath.head(DERIVATE_3, "file4");
-        MCRDigest digest4 = newStorage.write(path4, content4);
+        MCRDigest digest4 = newStorage.write(path4.getFileName().toString(), content4);
 
         // Assert that the correct item was evicted.
         assertTrue(newStorage.exists(digest4), "Digest4 should exist after write.");
@@ -243,7 +244,7 @@ public class MCROCFLDefaultRemoteTemporaryStorageTest extends MCROCFLStorageTest
         // The setUp method already added digest1 and digest2. The LRU queue is [digest1, digest2].
 
         // Add a third file, which will evict digest1 (the oldest).
-        MCRDigest digest3 = storage.write(path3, new byte[] { 3 });
+        MCRDigest digest3 = storage.write(path3.getFileName().toString(), new byte[] { 3 });
         // Journal now contains: ADD(1), ADD(2), ADD(3), REMOVE(1).
         // In-memory queue: [digest2, digest3]
 
@@ -254,7 +255,7 @@ public class MCROCFLDefaultRemoteTemporaryStorageTest extends MCROCFLStorageTest
 
         // Add a fourth file, which will evict digest3.
         MCRVersionedPath path4 = MCRVersionedPath.head(DERIVATE_3, "file4");
-        MCRDigest digest4 = storage.write(path4, new byte[] { 4 });
+        MCRDigest digest4 = storage.write(path4.getFileName().toString(), new byte[] { 4 });
         // Journal now contains: ..., ADD(4), REMOVE(3).
         // Final in-memory state: cache has {digest2, digest4}, queue is [digest2, digest4].
 
@@ -298,7 +299,7 @@ public class MCROCFLDefaultRemoteTemporaryStorageTest extends MCROCFLStorageTest
         // The recovered queue order should be [digest2, digest4].
         // Adding a new item should evict digest2.
         MCRVersionedPath path5 = MCRVersionedPath.head(DERIVATE_3, "file5");
-        MCRDigest digest5 = newStorage.write(path5, new byte[] { 5 });
+        MCRDigest digest5 = newStorage.write(path5.getFileName().toString(), new byte[] { 5 });
 
         assertFalse(newStorage.exists(digest2), "Digest2 should have been evicted, as it was the LRU item.");
         assertTrue(newStorage.exists(digest4), "Digest4 should remain.");

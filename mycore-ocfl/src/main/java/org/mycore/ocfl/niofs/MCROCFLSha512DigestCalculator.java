@@ -18,6 +18,7 @@
 
 package org.mycore.ocfl.niofs;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,6 +33,12 @@ import org.mycore.common.digest.MCRSHA512Digest;
  * This class is designed to be injected by the MCR configuration system.
  */
 public class MCROCFLSha512DigestCalculator implements MCROCFLDigestCalculator<Path, MCRDigest> {
+
+    @Override
+    public MCRDigest calculate(byte[] bytes) throws IOException {
+        String hexDigest = MCRUtils.getDigest(MCRSHA512Digest.ALGORITHM, new ByteArrayInputStream(bytes));
+        return new MCRSHA512Digest(hexDigest);
+    }
 
     @Override
     public MCRDigest calculate(Path path) throws IOException {
