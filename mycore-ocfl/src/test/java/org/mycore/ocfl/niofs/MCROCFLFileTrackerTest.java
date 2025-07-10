@@ -39,7 +39,17 @@ public class MCROCFLFileTrackerTest {
         original.put("path1", DATA.get("path1"));
         original.put("path2", DATA.get("path2"));
         original.put("path3", DATA.get("path3"));
-        fileTracker = new MCROCFLFileTracker<>(original, DATA::get);
+        fileTracker = new MCROCFLFileTracker<>(original, new MCROCFLDigestCalculator<>() {
+            @Override
+            public String calculate(byte[] bytes) {
+                return "";
+            }
+
+            @Override
+            public String calculate(String path) {
+                return DATA.get(path);
+            }
+        });
     }
 
     @Test
