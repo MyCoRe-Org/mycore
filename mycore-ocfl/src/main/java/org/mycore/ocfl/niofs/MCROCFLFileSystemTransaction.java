@@ -129,7 +129,6 @@ public class MCROCFLFileSystemTransaction implements MCRPersistenceTransaction {
      */
     private void clean() {
         Long transactionId = getTransactionId();
-
         MCROCFLVirtualObjectProvider virtualObjectProvider = MCROCFLFileSystemProvider.get().virtualObjectProvider();
         virtualObjectProvider.remove(transactionId);
         TRANSACTION_ID.remove();

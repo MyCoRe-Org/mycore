@@ -233,7 +233,7 @@ public abstract class MCROCFLVirtualObject {
      */
     protected void initTrackers() {
         if (this.objectVersion == null) {
-            this.fileTracker = new MCROCFLFileTracker<>(new HashMap<>(), this::calculateDigest);
+            this.fileTracker = new MCROCFLFileTracker<>(new HashMap<>(), new DigestCalculator(this));
             this.directoryTracker = new MCROCFLDirectoryTracker(new HashMap<>());
             return;
         }
@@ -253,7 +253,7 @@ public abstract class MCROCFLVirtualObject {
             }
             directoryPaths.put(filePath.getParent(), hasKeepFile);
         }
-        this.fileTracker = new MCROCFLFileTracker<>(filePaths, this::calculateDigest);
+        this.fileTracker = new MCROCFLFileTracker<>(filePaths, new DigestCalculator(this));
         this.directoryTracker = new MCROCFLDirectoryTracker(directoryPaths);
     }
 
@@ -1089,15 +1089,17 @@ public abstract class MCROCFLVirtualObject {
         String version = getVersion();
         String pathOwner = versionedPath.getOwner();
         String pathVersion = versionedPath.getVersion();
-        if (Objects.equals(owner, pathOwner) && Objects.equals(version, pathVersion)) {
+        boolean sameOwner = Objects.equals(pathOwner, owner);
+        boolean sameVersion = Objects.equals(pathVersion, version);
+        if (sameOwner && sameVersion) {
             return versionedPath;
         }
-        if (!Objects.equals(pathOwner, owner)) {
+        if (!sameOwner) {
             throw new MCROCFLVersionMismatchException(
                 "Expected owner '" + owner + "' but got '" + pathOwner + "'. Cannot use path '"
                     + versionedPath + "' in virtual object '" + this + "'");
         }
-        if (pathVersion != null && !Objects.equals(pathVersion, version)) {
+        if (pathVersion != null) {
             throw new MCROCFLVersionMismatchException(
                 "Expected version '" + version + "' but got '" + pathVersion + "'. Cannot use path '"
                     + versionedPath + "' in virtual object '" + this + "'");
@@ -1249,12 +1251,27 @@ public abstract class MCROCFLVirtualObject {
         return this.getOwner() + "@" + (version == null ? "head" : version);
     }
 
-    protected MCRDigest calculateDigest(MCRVersionedPath path) throws IOException {
-        if (isDirectory(path)) {
-            return null;
+    protected static class DigestCalculator implements MCROCFLDigestCalculator<MCRVersionedPath, MCRDigest> {
+
+        private final MCROCFLVirtualObject virtualObject;
+
+        public DigestCalculator(MCROCFLVirtualObject virtualObject) {
+            this.virtualObject = virtualObject;
         }
-        Path physicalPath = toPhysicalPath(path);
-        return this.digestCalculator.calculate(physicalPath);
+
+        @Override
+        public MCRDigest calculate(byte[] bytes) throws IOException {
+            return virtualObject.digestCalculator.calculate(bytes);
+        }
+
+        @Override
+        public MCRDigest calculate(MCRVersionedPath path) throws IOException {
+            if (virtualObject.isDirectory(path)) {
+                return null;
+            }
+            Path physicalPath = virtualObject.toPhysicalPath(path);
+            return virtualObject.digestCalculator.calculate(physicalPath);
+        }
     }
 
     /**
