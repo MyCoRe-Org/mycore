@@ -21,6 +21,7 @@ package org.mycore.ocfl.niofs.channels;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A {@link SeekableByteChannel} that executes a callback on close.
@@ -30,6 +31,8 @@ public class MCROCFLClosableCallbackChannel implements SeekableByteChannel {
     private final SeekableByteChannel delegate;
 
     private final AfterCloseCallback afterCloseCallback;
+
+    private final AtomicBoolean callbackExecuted = new AtomicBoolean(false);
 
     /**
      * Constructs a new {@code ClosableCallbackChannel}.
@@ -81,7 +84,9 @@ public class MCROCFLClosableCallbackChannel implements SeekableByteChannel {
     @Override
     public void close() throws IOException {
         delegate.close();
-        afterCloseCallback.afterClose();
+        if (callbackExecuted.compareAndSet(false, true)) {
+            afterCloseCallback.afterClose();
+        }
     }
 
     @FunctionalInterface

@@ -20,6 +20,7 @@ package org.mycore.ocfl.niofs.storage;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.net.URLConnection;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
@@ -52,7 +53,6 @@ import org.mycore.common.digest.MCRDigestValidationException;
 import org.mycore.common.digest.MCRMD5Digest;
 import org.mycore.common.digest.MCRSHA512Digest;
 import org.mycore.common.events.MCRShutdownHandler;
-import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.niofs.MCROCFLDigestCalculator;
 
 /**
@@ -75,7 +75,7 @@ import org.mycore.ocfl.niofs.MCROCFLDigestCalculator;
  *   </li>
  *   <li>
  *     <b>Transactional Writes:</b>
- *     The {@link #newCacheEntry(MCRVersionedPath, FileAttribute...)} method provides a safe way to stream large
+ *     The {@link #newCacheEntry(String, FileAttribute...)} method provides a safe way to stream large
  *     files into the cache.</li>
  * </ul>
  *
@@ -239,15 +239,25 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
      * {@inheritDoc}
      * <p>
      * Note: This method loads the entire content into memory. For large files, it is recommended to
-     * use the streaming API provided by {@link #newCacheEntry(MCRVersionedPath, FileAttribute...)}.
+     * use the streaming API provided by {@link #newCacheEntry(String, FileAttribute...)}.
      */
     @Override
-    public MCRDigest write(MCRVersionedPath path, byte[] bytes, OpenOption... options) throws IOException {
-        Path target = randomizeTarget(path);
+    public MCRDigest write(String originalFileName, byte[] bytes, OpenOption... options) throws IOException {
+        MCRDigest digest = this.digestCalculator.calculate(bytes);
+
+        // check if already in cache
+        if (this.cache.containsKey(digest)) {
+            cacheTouch(digest);
+            return digest;
+        }
+
+        // cache-miss: new content -> write to cache
+        Path target = toCachePath(digest);
         Files.createDirectories(target.getParent());
         Files.write(target, bytes, options);
-        MCRDigest digest = this.digestCalculator.calculate(target);
-        cacheUpdate(digest, target, true);
+
+        // update cache
+        cacheUpdate(digest, target, originalFileName);
         rollOver();
         return digest;
     }
@@ -268,8 +278,35 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
         try {
             return Files.newByteChannel(fileInfo.path, StandardOpenOption.READ);
         } finally {
-            cacheUpdate(digest, fileInfo.path, false);
+            cacheTouch(digest);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MCRDigest importFile(Path source) throws IOException {
+        MCRDigest digest = this.digestCalculator.calculate(source);
+        FileInfo fileInfo = this.cache.get(digest);
+
+        // cache hit -> nothing to do
+        if (fileInfo != null) {
+            cacheTouch(digest);
+            return digest;
+        }
+
+        //  cache miss -> create
+        Path target = toCachePath(digest);
+        Files.createDirectories(target.getParent());
+
+        // actual copy
+        Files.copy(source, target);
+
+        // update cache
+        cacheUpdate(digest, target, source.getFileName().toString());
+        rollOver();
+        return digest;
     }
 
     /**
@@ -278,13 +315,13 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
      * This operation also "touches" the cached item, updating its position in the LRU eviction queue.
      */
     @Override
-    public void copy(MCRDigest source, MCRVersionedPath target, CopyOption... options) throws IOException {
-        FileInfo fileInfo = this.cache.get(source);
+    public void exportFile(MCRDigest sourceDigest, Path target, CopyOption... options) throws IOException {
+        FileInfo fileInfo = this.cache.get(sourceDigest);
         if (fileInfo == null) {
-            throw new NoSuchFileException(source + " is not cached.");
+            throw new NoSuchFileException(sourceDigest + " is not cached.");
         }
         Files.copy(fileInfo.path, target, options);
-        cacheUpdate(source, fileInfo.path, false);
+        cacheTouch(sourceDigest);
     }
 
     /**
@@ -297,9 +334,15 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
             throw new NoSuchFileException(digest + " is not cached.");
         }
         try {
+            // probe content type by original file name
+            String probedType = URLConnection.guessContentTypeFromName(fileInfo.originalFileName());
+            if (probedType != null) {
+                return probedType;
+            }
+            // fallback: probe content type with physical path
             return Files.probeContentType(fileInfo.path);
         } finally {
-            cacheUpdate(digest, fileInfo.path, false);
+            cacheTouch(digest);
         }
     }
 
@@ -307,32 +350,73 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
      * {@inheritDoc}
      */
     @Override
-    public CacheEntryWriter newCacheEntry(MCRVersionedPath path, FileAttribute<?>... attrs) throws IOException {
-        Path target = randomizeTarget(path);
-        Files.createDirectories(target.getParent());
+    public CacheEntryWriter newCacheEntry(String originalFileName, FileAttribute<?>... attrs) throws IOException {
+        // write to a temporary file because we don't know the final destination yet (depends on the digest)
+        Path tempFile = root.resolve("tmp-" + UUID.randomUUID());
+        Files.createDirectories(tempFile.getParent());
         Set<StandardOpenOption> createOptions = Set.of(StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-        SeekableByteChannel channel = Files.newByteChannel(target, createOptions, attrs);
-        return new CacheEntryWriter(channel, target, () -> {
-            MCRDigest digest = this.digestCalculator.calculate(target);
-            cacheUpdate(digest, target, true);
+        SeekableByteChannel channel = Files.newByteChannel(tempFile, createOptions, attrs);
+
+        // return entry writer
+        return new CacheEntryWriter(channel, tempFile, () -> {
+            // calculate the digest
+            MCRDigest digest = this.digestCalculator.calculate(tempFile);
+
+            // check if already exist
+            if (this.cache.containsKey(digest)) {
+                Files.delete(tempFile);
+                cacheTouch(digest);
+                return digest;
+            }
+
+            // move to the final path
+            Path finalPath = toCachePath(digest);
+            Files.createDirectories(finalPath.getParent());
+            Files.move(tempFile, finalPath);
+
+            // update cache
+            cacheUpdate(digest, finalPath, originalFileName);
             rollOver();
             return digest;
-        }, () -> Files.deleteIfExists(target));
+        }, () -> Files.deleteIfExists(tempFile));
     }
 
-    private Path randomizeTarget(MCRVersionedPath path) {
-        String owner = path.getOwner();
-        String fileName = path.getFileName().toString();
-        String rnd = UUID.randomUUID().toString().substring(8, 13);
-        if (fileName.contains(".")) {
-            int extensionIndex = fileName.lastIndexOf('.');
-            String name = fileName.substring(0, extensionIndex);
-            String extension = fileName.substring(extensionIndex + 1);
-            fileName = name + rnd + "." + extension;
-        } else {
-            fileName = fileName + rnd;
+    /**
+     * Converts a digest into a physical path within the cache.
+     * Uses the first three characters of the digest hex string as a subdirectory
+     * to avoid having too many files in a single directory.
+     *
+     * @param digest The digest of the content.
+     * @return The physical path for storing the content in the cache.
+     */
+    private Path toCachePath(MCRDigest digest) {
+        String hex = digest.toHexString();
+        String dir = hex.substring(0, 3);
+        return this.root.resolve(dir).resolve(hex);
+    }
+
+    /**
+     * Updates the cache with new file information and logs the event to the journal.
+     *
+     * @param digest The digest of the content.
+     * @param path The physical path where the content is stored.
+     * @param originalFileName The original file name, used for content type detection.
+     * @throws IOException If an I/O error occurs.
+     */
+    private void cacheUpdate(MCRDigest digest, Path path, String originalFileName) throws IOException {
+        try {
+            this.queue.remove(digest);
+            this.queue.offer(digest);
+            FileInfo fileInfo = this.cache.get(digest);
+            boolean newFile = fileInfo == null;
+            long size = Files.size(path);
+            this.totalAllocation.addAndGet(newFile ? size : size - fileInfo.size);
+            this.cache.put(digest, new FileInfo(digest, path, size, originalFileName));
+            journal.append(new CacheEvent.Add(digest, root.relativize(path).toString(), size, originalFileName));
+        } catch (IOException ioException) {
+            this.queue.remove(digest);
+            throw ioException;
         }
-        return root.resolve(owner).resolve(fileName);
     }
 
     /**
@@ -354,36 +438,20 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
     }
 
     /**
-     * Updates the cache with the specified digest and recalculates the size if necessary.
+     * "Touches" a cache entry by moving it to the end of the LRU queue and logging the event.
      *
-     * @param digest The digest to update in the cache.
-     * @param path The file path.
-     * @param updateSize Whether to update the size in the cache.
-     * @throws IOException If an I/O error occurs.
+     * @param digest The digest of the entry to touch.
+     * @throws IOException If a journal write fails.
      */
-    private void cacheUpdate(MCRDigest digest, Path path, boolean updateSize) throws IOException {
-        try {
-            this.queue.remove(digest);
-            this.queue.offer(digest);
-            FileInfo fileInfo = this.cache.get(digest);
-            boolean newFile = fileInfo == null;
-            boolean recalculate = newFile || updateSize;
-            if (recalculate) {
-                long size = Files.size(path);
-                this.totalAllocation.addAndGet(newFile ? size : size - fileInfo.size);
-                this.cache.put(digest, new FileInfo(digest, path, size));
-                journal.append(new CacheEvent.Add(digest, root.relativize(path).toString(), size));
-            } else {
-                journal.append(new CacheEvent.Touch(digest));
-            }
-        } catch (IOException ioException) {
-            this.queue.remove(digest);
-            throw ioException;
-        }
+    private void cacheTouch(MCRDigest digest) throws IOException {
+        this.queue.remove(digest);
+        this.queue.offer(digest);
+        journal.append(new CacheEvent.Touch(digest));
     }
 
     /**
-     * Performs cache rollover based on the eviction strategy.
+     * Performs cache rollover based on the eviction strategy. If the strategy indicates eviction is needed,
+     * the least recently used items are removed from the cache and filesystem until the condition is met.
      */
     private void rollOver() {
         while (!this.queue.isEmpty() && evictionStrategy.shouldEvict(this)) {
@@ -405,7 +473,7 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
         return switch (event) {
             case CacheEvent.Add add
                 -> String.join("|", JOURNAL_ADD, digestStr, add.relativePath(),
-                    String.valueOf(add.size()));
+                    String.valueOf(add.size()), add.originalFileName());
             case CacheEvent.Remove ignored -> String.join("|", JOURNAL_REMOVE, digestStr);
             case CacheEvent.Touch ignored -> String.join("|", JOURNAL_TOUCH, digestStr);
         };
@@ -417,7 +485,7 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
             String command = parts[0];
             MCRDigest digest = MCRDigestCodec.fromString(parts[1]);
             return switch (command) {
-                case JOURNAL_ADD -> new CacheEvent.Add(digest, parts[2], Long.parseLong(parts[3]));
+                case JOURNAL_ADD -> new CacheEvent.Add(digest, parts[2], Long.parseLong(parts[3]), parts[4]);
                 case JOURNAL_REMOVE -> new CacheEvent.Remove(digest);
                 case JOURNAL_TOUCH -> new CacheEvent.Touch(digest);
                 default -> throw new IllegalArgumentException("Unknown journal command: " + command);
@@ -432,7 +500,7 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
             case CacheEvent.Add add -> {
                 this.queue.remove(add.digest());
                 Path filePath = root.resolve(add.relativePath());
-                this.cache.put(add.digest(), new FileInfo(add.digest(), filePath, add.size()));
+                this.cache.put(add.digest(), new FileInfo(add.digest(), filePath, add.size(), add.originalFileName()));
                 this.queue.offer(add.digest());
                 this.totalAllocation.addAndGet(add.size());
             }
@@ -471,7 +539,8 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
                 FileInfo fileInfo = this.cache.get(digest);
                 if (fileInfo != null) {
                     String relativePath = this.root.relativize(fileInfo.path()).toString();
-                    snapshot.add(new CacheEvent.Add(digest, relativePath, fileInfo.size()));
+                    snapshot.add(
+                        new CacheEvent.Add(digest, relativePath, fileInfo.size(), fileInfo.originalFileName()));
                 } else {
                     LOGGER.warn("Inconsistency detected during compaction: Digest {} is in the queue but not"
                         + " in the cache. Skipping.", digest);
@@ -526,11 +595,12 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
      * A record holding metadata about a single file in the cache, including its digest,
      * physical path on disk, and size in bytes.
      *
-     * @param digest The cryptographic digest that uniquely identifies the content.
-     * @param path   The absolute path to the file on the local filesystem.
-     * @param size   The size of the file in bytes.
+     * @param digest           The cryptographic digest that uniquely identifies the content.
+     * @param path             The absolute path to the file on the local filesystem.
+     * @param size             The size of the file in bytes.
+     * @param originalFileName The original file name.
      */
-    public record FileInfo(MCRDigest digest, Path path, Long size) {
+    public record FileInfo(MCRDigest digest, Path path, Long size, String originalFileName) {
     }
 
     /**
@@ -544,11 +614,12 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
          * Represents a file being added to the cache. Contains all information needed to reconstruct the
          * {@link FileInfo} on replay.
          *
-         * @param digest       The digest of the added file.
-         * @param relativePath The path of the file relative to the cache root.
-         * @param size         The size of the file in bytes.
+         * @param digest           The digest of the added file.
+         * @param relativePath     The path of the file relative to the cache root.
+         * @param size             The size of the file in bytes.
+         * @param originalFileName The original file name.
          */
-        record Add(MCRDigest digest, String relativePath, long size) implements CacheEvent {
+        record Add(MCRDigest digest, String relativePath, long size, String originalFileName) implements CacheEvent {
         }
 
         /**
