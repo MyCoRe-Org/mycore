@@ -176,19 +176,23 @@ public class MCRSolrCore {
             .withRequestWriter(new BinaryRequestWriter())
             .build();
 
-        // MCR-3445 use Java Reflection to increase the size of the RequestBuffer of the internal HTTP client.
-        // This is necessary to send word coordinates for alto files via MCRSolrFileIndexHandler.
-        if (client instanceof Http2SolrClient solrclient) {
+        // (MCR-3445) use Java Reflection to increase the size of the RequestBuffer of the internal HTTP client.
+        // This is necessary to send word coordinates for Alto files via MCRSolrFileIndexHandler.
+        // The value should be lesser than the matching Solr server option e.g. solr.jetty.request.header.size=524288
+        // If the property MCR.Solr.SolrClient.RequestBufferSizeInBytes is not set or '0', the default value is used.
+        int requestBufferSize = MCRConfiguration2
+            .getInt(SOLR_CONFIG_PREFIX + "SolrClient.RequestBufferSizeInBytes").orElse(0);
+        if (requestBufferSize > 0 && client instanceof Http2SolrClient solrclient) {
             try {
                 Method mGetHttpClient = solrclient.getClass().getDeclaredMethod("getHttpClient");
                 mGetHttpClient.setAccessible(true);
 
                 // https://github.com/jetty/jetty.project/blob/jetty-11.0.x/jetty-client/src/main/java/org/eclipse/jetty/client/HttpClient.java
                 Object jettyHttpClient = mGetHttpClient.invoke(solrclient);
-                
+
                 Method mSetRequestBufferSize = jettyHttpClient.getClass()
                     .getDeclaredMethod("setRequestBufferSize", int.class);
-                mSetRequestBufferSize.invoke(jettyHttpClient, 511 * 1024);
+                mSetRequestBufferSize.invoke(jettyHttpClient);
             } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
                 LOGGER.error("Error increasing RequestBufferSize for Http2SolrClient", e);
             }
