@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Locale;
@@ -218,10 +219,9 @@ public class MCRSolrCoreAdminCommands {
         }
 
         MCRSolrConfigSetProvider configSetProvider = configSets.get(configSet);
-        InputStream zipStream = configSetProvider.getStreamSupplier().get();
         Path zipFile = exportFolder.resolve(configSet + ".zip");
-        try {
-            Files.copy(zipStream, zipFile);
+        try (InputStream zipStream = configSetProvider.getStreamSupplier().get()) {
+            Files.copy(zipStream, zipFile, StandardCopyOption.REPLACE_EXISTING);
             LOGGER.info("ConfigSet {} exported to {}", configSet, zipFile);
         } catch (Exception e) {
             LOGGER.error("Error exporting configset", e);
