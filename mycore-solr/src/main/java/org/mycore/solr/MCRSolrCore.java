@@ -192,7 +192,7 @@ public class MCRSolrCore {
 
                 Method mSetRequestBufferSize = jettyHttpClient.getClass()
                     .getDeclaredMethod("setRequestBufferSize", int.class);
-                mSetRequestBufferSize.invoke(jettyHttpClient);
+                mSetRequestBufferSize.invoke(jettyHttpClient, requestBufferSize);
             } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
                 LOGGER.error("Error increasing RequestBufferSize for Http2SolrClient", e);
             }
