@@ -53,10 +53,9 @@ public abstract class MCRDigest {
      * @throws MCRDigestValidationException If the digest value is invalid.
      */
     protected MCRDigest(byte[] value) throws MCRDigestValidationException {
-        this.value = Arrays.copyOf(value, value.length); //as we validate the value
+        this.value = Arrays.copyOf(value, value.length);
         validate();
     }
-
 
     /**
      * Returns the value of the digest as a byte array.
@@ -86,7 +85,7 @@ public abstract class MCRDigest {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(value);
+        return Arrays.hashCode(value);
     }
 
     /**
@@ -108,7 +107,7 @@ public abstract class MCRDigest {
     /**
      * Digest Algorithm
      */
-    public static class Algorithm {
+    public abstract static class Algorithm {
 
         final String name;
 
@@ -123,6 +122,15 @@ public abstract class MCRDigest {
         public String toUpperCase() {
             return name.toUpperCase(Locale.ROOT);
         }
+
+        /**
+         * Returns a normalized version of the algorithm as string.
+         * <p>
+         * Lowercase, no dashes, for JSON keys etc.
+         *
+         * @return a normalized version
+         */
+        public abstract String normalize();
 
         @Override
         public final boolean equals(Object o) {
