@@ -102,8 +102,15 @@ public final class MCREventManager {
      *
      * @return the single event manager
      */
+
+    private static MCREventManager instance = null;
+
     public static MCREventManager getInstance() {
-        return LazyInstanceHolder.SINGLETON_INSTANCE;
+        if (instance == null) {
+            instance = new MCREventManager();
+        }
+
+        return instance;
     }
 
     private boolean propKeyIsSet(String propertyKey) {
