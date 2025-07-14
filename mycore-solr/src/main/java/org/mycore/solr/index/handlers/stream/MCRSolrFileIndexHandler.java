@@ -55,7 +55,8 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final String TEMPLATE_XML_FIELD = "\n  <field name=\"${name}\" update=\"set\">${value}</field>";
+    private static final String TMPL_XML_FIELD = "\n  <field name=\"${name}\">${value}</field>";
+    private static final String TMPL_XML_UPDATE_FIELD = "\n  <field name=\"${name}\" update=\"set\">${value}</field>";
 
     protected Path file;
 
@@ -169,7 +170,7 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
 
     /**
      * This method creates a Solr update document as atomic update for the given list of fields.
-     * Each field (besides 'id') has an update operation attribute. 
+     * Each field (other than 'id') has an update operation attribute. 
      * This means, that the fields are added to an existing Solr object 
      * otherwise the document would be replaced and old fields are lost.
      */
@@ -178,10 +179,10 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
         xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         xml.append("\n<add>");
         xml.append("\n <doc>");
-        xml.append(StringSubstitutor.replace(TEMPLATE_XML_FIELD, Map.of("name", "id", "value", docId)));
+        xml.append(StringSubstitutor.replace(TMPL_XML_FIELD, Map.of("name", "id", "value", docId)));
         for (Entry<String, String[]> entry : fields) {
             for (String v : entry.getValue()) {
-                xml.append(StringSubstitutor.replace(TEMPLATE_XML_FIELD, Map.of(
+                xml.append(StringSubstitutor.replace(TMPL_XML_UPDATE_FIELD, Map.of(
                     "name", StringUtils.removeStart(entry.getKey(), "literal."),
                     "value", StringEscapeUtils.escapeXml10(v))));
             }
