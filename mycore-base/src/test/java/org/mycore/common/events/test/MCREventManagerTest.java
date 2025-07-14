@@ -66,5 +66,9 @@ public class MCREventManagerTest extends MCRTestCase {
         } catch (MCRConfigurationException e) {
             assertEquals("Configuration property MCR.EventHandler.Mode.Foo is not set.", e.getMessage());
         }
+        MCRConfiguration2.set("MCR.EventHandler.MCRObject.1.Class", "");
+        MCRConfiguration2.set("MCR.EventHandler.MCRObject.4.Indexer", "");
+        MCRConfiguration2.set("MCR.EventHandler.MCRObject.4.Foo", "");
+        MCRConfiguration2.set("MCR.EventHandler.MCRDerivate.2.Class", "");
     }
 }
