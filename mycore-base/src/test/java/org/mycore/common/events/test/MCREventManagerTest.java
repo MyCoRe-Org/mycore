@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.After;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.config.MCRConfigurationException;
@@ -51,6 +52,16 @@ public class MCREventManagerTest extends MCRTestCase {
         testProperties.put("MCR.Searcher.lucene-metadata.IndexDir", "%MCR.datadir%/lucene-index4metadata");
         testProperties.put("MCR.Searcher.lucene-metadata.StoreQueryFields", "true");
         return testProperties;
+    }
+    
+    @After
+    private void cleanup() {
+        Map<String, String> testProperties = super.getTestProperties();
+        testProperties.remove("MCR.EventHandler.MCRObject.1.Class");
+        testProperties.remove("MCR.EventHandler.MCRObject.4.Indexer");
+        testProperties.remove("MCR.EventHandler.MCRObject.4.Foo");
+        testProperties.remove("MCR.EventHandler.MCRDerivate.2.Class");
+        
     }
 
     @Test
