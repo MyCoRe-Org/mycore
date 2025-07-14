@@ -54,7 +54,7 @@ public class MCREventManagerTest extends MCRTestCase {
     }
 
     @Test
-    public void instance() {
+    public void testInstanceMethod() {
         try {
             MCREventManager.getInstance();
         } catch (MCRConfigurationException e) {
@@ -64,7 +64,7 @@ public class MCREventManagerTest extends MCRTestCase {
         }
         catch (ExceptionInInitializerError e) {
             LOGGER.error(e);
-            assertEquals("ExceptionInInitializerError: Configuration property MCR.EventHandler.Mode.Foo is not set.", e.getCause().getMessage());
+            assertEquals("Check ExceptionInInitializerError", "Configuration property MCR.EventHandler.Mode.Foo is not set.", e.getCause().getMessage());
         }
     }
 }
