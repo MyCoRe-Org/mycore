@@ -27,6 +27,7 @@ import org.apache.logging.log4j.Logger;
 import org.junit.After;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.events.MCREventManager;
 
@@ -34,7 +35,7 @@ public class MCREventManagerTest extends MCRTestCase {
     static String defaultProperties;
     
     private static Logger LOGGER = LogManager.getLogger();
-/*
+
     @Override
     protected Map<String, String> getTestProperties() {
         Map<String, String> testProperties = super.getTestProperties();
@@ -53,19 +54,17 @@ public class MCREventManagerTest extends MCRTestCase {
         testProperties.put("MCR.Searcher.lucene-metadata.StoreQueryFields", "true");
         return testProperties;
     }
-  */  
+  
     @After
     public void cleanup() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.remove("MCR.EventHandler.MCRObject.1.Class");
-        testProperties.remove("MCR.EventHandler.MCRObject.4.Indexer");
-        testProperties.remove("MCR.EventHandler.MCRObject.4.Foo");
-        testProperties.remove("MCR.EventHandler.MCRDerivate.2.Class");
-        
+        MCRConfiguration2.set("MCR.EventHandler.MCRObject.1.Class", "");
+        MCRConfiguration2.set("MCR.EventHandler.MCRObject.4.Indexer", "");
+        MCRConfiguration2.set("MCR.EventHandler.MCRObject.4.Foo", "");
+        MCRConfiguration2.set("MCR.EventHandler.MCRDerivate.2.Class", "");
     }
 
     //@Test
-    public void testInstanceMethod() {
+    public void instance() {
         try {
             MCREventManager.getInstance();
         } catch (MCRConfigurationException e) {
