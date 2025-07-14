@@ -34,6 +34,7 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
+import org.apache.commons.text.StringSubstitutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -54,6 +55,8 @@ import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
 public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    private static final String TEMPLATE_XML_FIELD = "\n  <field name=\"${name}\" update=\"set\">${value}</field>";
 
     protected Path file;
 
@@ -178,13 +181,12 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
         xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         xml.append("\n<add>");
         xml.append("\n <doc>");
-        xml.append("\n  <field name=\"id\">").append(docId).append("</field>");
-
+        xml.append(StringSubstitutor.replace(TEMPLATE_XML_FIELD, Map.of("name", "id", "value", docId)));
         for (Entry<String, String[]> entry : altoParams) {
-            for(String v: entry.getValue()) {
-            xml.append("\n  <field name=\"%s\" update=\"set\">%s</field>".formatted(
-                StringUtils.removeStart(entry.getKey(), "literal."),
-                StringEscapeUtils.escapeXml10(v)));
+            for (String v : entry.getValue()) {
+                xml.append(StringSubstitutor.replace(TEMPLATE_XML_FIELD, Map.of(
+                    "name", StringUtils.removeStart(entry.getKey(), "literal."),
+                    "value", StringEscapeUtils.escapeXml10(v))));
             }
         }
         xml.append("\n </doc>");
