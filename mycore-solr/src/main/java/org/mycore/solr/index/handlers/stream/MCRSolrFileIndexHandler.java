@@ -30,7 +30,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
@@ -90,9 +89,9 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
                 /* set the additional parameters */
                 ModifiableSolrParams solrParams = getSolrParams(file, attrs);
 
-                // create a Solr atomic update doc from Alto parameters and remove those from the given solrParams
-                // then send this update doc with a 2nd request if applicable
-                Optional<String> altoSolrDocXml = extractSolrDocWithAltoParams(solrParams);
+                // collect Alto specific parameters and remove those from the given solrParams
+                // then send them as atomic update doc with a 2nd request if applicable
+                List<Entry<String, String[]>> altoParams = extractAltoParams(solrParams);
 
                 updateRequest.setParams(solrParams);
                 updateRequest.setCommitWithin(getCommitWithin());
@@ -106,10 +105,11 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
                 /* actually send the request */
                 updateRequest.process(client);
 
-                if (altoSolrDocXml.isPresent()) {
+                if (!altoParams.isEmpty()) {
+                    String altoSolrDocXml = buildSolrAtomicUpdateDocXML(solrID, altoParams);
                     ContentStreamUpdateRequest updateAltoReq = new ContentStreamUpdateRequest(SOLR_UPDATE_PATH);
                     updateAltoReq.addContentStream(
-                        new ContentStreamBase.StringStream(altoSolrDocXml.get(), "application/xml"));
+                        new ContentStreamBase.StringStream(altoSolrDocXml, "application/xml"));
                     updateAltoReq.setCommitWithin(getCommitWithin());
                     updateAltoReq.process(client);
                 }
@@ -146,20 +146,15 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
     }
 
     /**
-     * This method extracts Alto word and content parameter into a separate Solr document
+     * This method extracts Alto word and content parameter into a new list of key-value entries
      * and removes them from the given ModifiableSolrParams object. 
      * e.g. &amp;literal.alto_words=alles%7C781%7C1086%7C148%7C32
      *      &amp;literal.alto_content=alles+wird+gut
      * 
-     * The Solr update document defines an atomic update.
-     * Each field (besides 'id') has an update operation attribute. 
-     * This means, that the fields are added to an existing Solr object 
-     * otherwise the document would be replaced and old fields are lost.
-     *  
      * @param solrParams the SolrParameterMap
      * @return Optional, containing the generated Solr update document as XML String
      */
-    private Optional<String> extractSolrDocWithAltoParams(ModifiableSolrParams solrParams) {
+    private List<Entry<String, String[]>> extractAltoParams(ModifiableSolrParams solrParams) {
         List<Entry<String, String[]>> altoParams = new ArrayList<>();
         Iterator<Entry<String, String[]>> it = solrParams.iterator();
         while (it.hasNext()) {
@@ -169,20 +164,22 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
                 it.remove();
             }
         }
-        if (altoParams.isEmpty()) {
-            return Optional.empty();
-        } else {
-            return Optional.of(buildSolrUpdateDocXML(solrParams.get("literal.id"), altoParams));
-        }
+        return altoParams;
     }
 
-    private String buildSolrUpdateDocXML(String docId, List<Entry<String, String[]>> altoParams) {
+    /**
+     * This method creates a Solr update document as atomic update for the given list of fields.
+     * Each field (besides 'id') has an update operation attribute. 
+     * This means, that the fields are added to an existing Solr object 
+     * otherwise the document would be replaced and old fields are lost.
+     */
+    private String buildSolrAtomicUpdateDocXML(String docId, List<Entry<String, String[]>> fields) {
         StringBuilder xml = new StringBuilder();
         xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         xml.append("\n<add>");
         xml.append("\n <doc>");
         xml.append(StringSubstitutor.replace(TEMPLATE_XML_FIELD, Map.of("name", "id", "value", docId)));
-        for (Entry<String, String[]> entry : altoParams) {
+        for (Entry<String, String[]> entry : fields) {
             for (String v : entry.getValue()) {
                 xml.append(StringSubstitutor.replace(TEMPLATE_XML_FIELD, Map.of(
                     "name", StringUtils.removeStart(entry.getKey(), "literal."),
