@@ -55,7 +55,7 @@ public class MCREventManagerTest extends MCRTestCase {
     }
     
     @After
-    private void cleanup() {
+    public void cleanup() {
         Map<String, String> testProperties = super.getTestProperties();
         testProperties.remove("MCR.EventHandler.MCRObject.1.Class");
         testProperties.remove("MCR.EventHandler.MCRObject.4.Indexer");
