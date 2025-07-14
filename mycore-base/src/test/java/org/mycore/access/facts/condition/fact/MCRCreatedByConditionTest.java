@@ -40,6 +40,8 @@ public class MCRCreatedByConditionTest extends MCRTestCase {
     protected Map<String, String> getTestProperties() {
         Map<String, String> testProperties = super.getTestProperties();
         testProperties.put("MCR.Metadata.Type.test", Boolean.TRUE.toString());
+        testProperties.put("MCR.EventHandler.MCRObject.1.Class",
+            "org.mycore.datamodel.common.MCRXMLMetadataEventHandler");
         return testProperties;
     }
 

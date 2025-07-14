@@ -22,6 +22,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.config.MCRConfigurationException;
@@ -29,6 +31,8 @@ import org.mycore.common.events.MCREventManager;
 
 public class MCREventManagerTest extends MCRTestCase {
     static String defaultProperties;
+    
+    private static Logger LOGGER = LogManager.getLogger();
 
     @Override
     protected Map<String, String> getTestProperties() {
@@ -54,10 +58,13 @@ public class MCREventManagerTest extends MCRTestCase {
         try {
             MCREventManager.getInstance();
         } catch (MCRConfigurationException e) {
+            LOGGER.error(e);
             assertEquals("Configuration property MCR.EventHandler.Mode.Foo is not set.", e.getMessage());
+            
         }
         catch (ExceptionInInitializerError e) {
-            assertEquals("Configuration property MCR.EventHandler.Mode.Foo is not set.", e.getCause().getMessage());
+            LOGGER.error(e);
+            assertEquals("ExceptionInInitializerError: Configuration property MCR.EventHandler.Mode.Foo is not set.", e.getCause().getMessage());
         }
     }
 }
