@@ -83,6 +83,10 @@
       <artifactId>commons-lang3</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-text</artifactId>
+    </dependency>
+    <dependency>
       <!-- required until org.apache.solr.common.util.Utils does not import classes from this artifact -->
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
