@@ -366,7 +366,13 @@ public class MCRRestAPIClassifications {
             Document doc = MCRCategoryTransformer.getMetaDataDocument(category, false);
             Element rootElement = getRootElement(doc, filter);
             if (filter.contains("nonempty")) {
-                filterNonEmpty(doc.getRootElement().getAttributeValue(ATTRIBUTE_ID), rootElement);
+                final Element root;
+                if (rootElement.getName().equals("mycoreclass")) {
+                    root = rootElement.getChild("categories");
+                } else {
+                    root = rootElement;
+                }
+                filterNonEmpty(doc.getRootElement().getAttributeValue(ATTRIBUTE_ID), root);
             }
             if (filter.contains("nochildren")) {
                 rootElement.removeChildren(ELEMENT_CATEGORY);
