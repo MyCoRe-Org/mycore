@@ -54,6 +54,8 @@ public final class MCREventManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private static final MCREventManager SINGLETON_INSTANCE = new MCREventManager();
+
     /** Table of all configured event handlers * */
     private final Map<String, List<MCREventHandler>> handlers;
 
@@ -102,15 +104,8 @@ public final class MCREventManager {
      *
      * @return the single event manager
      */
-
-    private static MCREventManager instance = null;
-
     public static MCREventManager getInstance() {
-        if (instance == null) {
-            instance = new MCREventManager();
-        }
-
-        return instance;
+        return SINGLETON_INSTANCE;
     }
 
     private boolean propKeyIsSet(String propertyKey) {
@@ -370,10 +365,6 @@ public final class MCREventManager {
             this.mode = mode;
         }
 
-    }
-
-    private static final class LazyInstanceHolder {
-        public static final MCREventManager SINGLETON_INSTANCE = new MCREventManager();
     }
 
 }
