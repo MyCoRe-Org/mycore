@@ -22,8 +22,10 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
 
+import org.junit.After;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.events.MCREventManager;
 
@@ -47,6 +49,14 @@ public class MCREventManagerTest extends MCRTestCase {
         testProperties.put("MCR.Searcher.lucene-metadata.IndexDir", "%MCR.datadir%/lucene-index4metadata");
         testProperties.put("MCR.Searcher.lucene-metadata.StoreQueryFields", "true");
         return testProperties;
+    }
+    
+    @After
+    public void cleanup() {
+        MCRConfiguration2.set("MCR.EventHandler.MCRObject.1.Class", "");
+        MCRConfiguration2.set("MCR.EventHandler.MCRObject.4.Indexer", "");
+        MCRConfiguration2.set("MCR.EventHandler.MCRObject.4.Foo", "");
+        MCRConfiguration2.set("MCR.EventHandler.MCRDerivate.2.Class", "");
     }
 
     @Test
