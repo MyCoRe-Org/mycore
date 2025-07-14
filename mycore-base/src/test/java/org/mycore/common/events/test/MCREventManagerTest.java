@@ -53,10 +53,11 @@ public class MCREventManagerTest extends MCRTestCase {
     
     @After
     public void cleanup() {
-        MCRConfiguration2.set("MCR.EventHandler.MCRObject.1.Class", null);
-        MCRConfiguration2.set("MCR.EventHandler.MCRObject.4.Indexer", null);
-        MCRConfiguration2.set("MCR.EventHandler.MCRObject.4.Foo", null);
-        MCRConfiguration2.set("MCR.EventHandler.MCRDerivate.2.Class", null);
+        String x = null;
+        MCRConfiguration2.set("MCR.EventHandler.MCRObject.1.Class", x);
+        MCRConfiguration2.set("MCR.EventHandler.MCRObject.4.Indexer", x);
+        MCRConfiguration2.set("MCR.EventHandler.MCRObject.4.Foo", x);
+        MCRConfiguration2.set("MCR.EventHandler.MCRDerivate.2.Class", x);
     }
 
     @Test
@@ -66,9 +67,10 @@ public class MCREventManagerTest extends MCRTestCase {
         } catch (MCRConfigurationException e) {
             assertEquals("Configuration property MCR.EventHandler.Mode.Foo is not set.", e.getMessage());
         }
-        MCRConfiguration2.set("MCR.EventHandler.MCRObject.1.Class", null);
-        MCRConfiguration2.set("MCR.EventHandler.MCRObject.4.Indexer", null);
-        MCRConfiguration2.set("MCR.EventHandler.MCRObject.4.Foo", null);
-        MCRConfiguration2.set("MCR.EventHandler.MCRDerivate.2.Class", null);
+        String x = null;
+        MCRConfiguration2.set("MCR.EventHandler.MCRObject.1.Class", x);
+        MCRConfiguration2.set("MCR.EventHandler.MCRObject.4.Indexer", x);
+        MCRConfiguration2.set("MCR.EventHandler.MCRObject.4.Foo", x);
+        MCRConfiguration2.set("MCR.EventHandler.MCRDerivate.2.Class", x);
     }
 }
