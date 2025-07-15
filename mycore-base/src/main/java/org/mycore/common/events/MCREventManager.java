@@ -44,6 +44,8 @@ import org.mycore.common.config.MCRConfigurationException;
  */
 public final class MCREventManager {
 
+    private static volatile MCREventManager instance;
+
     public static final String CONFIG_PREFIX = "MCR.EventHandler.";
 
     /** Call event handlers in forward direction (create, update) */
@@ -102,8 +104,15 @@ public final class MCREventManager {
      *
      * @return the single event manager
      */
-    public static MCREventManager getInstance() {
-        return LazyInstanceHolder.SINGLETON_INSTANCE;
+    public static MCREventManager getInstance() throws MCRConfigurationException {
+        if (instance == null) {
+            synchronized (MCREventManager.class) {
+                if (instance == null) {
+                    instance = new MCREventManager();
+                }
+            }
+        }
+        return instance;
     }
 
     private boolean propKeyIsSet(String propertyKey) {
@@ -363,10 +372,6 @@ public final class MCREventManager {
             this.mode = mode;
         }
 
-    }
-
-    private static final class LazyInstanceHolder {
-        public static final MCREventManager SINGLETON_INSTANCE = new MCREventManager();
     }
 
 }

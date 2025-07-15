@@ -60,8 +60,7 @@ public class MCREventManagerTest extends MCRTestCase {
         MCRConfiguration2.set("MCR.EventHandler.MCRDerivate.2.Class", x);
     }
 
-//  disabled - see MCR-3472 for details
-//  @Test
+    @Test
     public void instance() {
         try {
             MCREventManager.getInstance();
