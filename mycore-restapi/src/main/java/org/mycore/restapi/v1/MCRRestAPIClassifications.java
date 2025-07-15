@@ -89,6 +89,8 @@ public class MCRRestAPIClassifications {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private static final String ELEMENT_CATEGORIES = "categories";
+
     private static final String ELEMENT_CATEGORY = "category";
 
     private static final String ELEMENT_LABEL = "label";
@@ -143,11 +145,11 @@ public class MCRRestAPIClassifications {
         if (eParent.getChildren(ELEMENT_CATEGORY).isEmpty()) {
             return;
         }
-        writer.name("categories");
+        writer.name(ELEMENT_CATEGORIES);
         writer.beginArray();
         for (Element e : eParent.getChildren(ELEMENT_CATEGORY)) {
             writer.beginObject();
-            writer.name("ID").value(e.getAttributeValue(ATTRIBUTE_ID));
+            writer.name(ATTRIBUTE_ID).value(e.getAttributeValue(ATTRIBUTE_ID));
             writer.name("labels").beginArray();
             for (Element eLabel : e.getChildren(ELEMENT_LABEL)) {
                 if (lang == null || lang.equals(eLabel.getAttributeValue(ATTRIBUTE_LANG, Namespace.XML_NAMESPACE))) {
@@ -187,7 +189,7 @@ public class MCRRestAPIClassifications {
         writer.beginArray();
         for (Element e : eParent.getChildren(ELEMENT_CATEGORY)) {
             writer.beginObject();
-            writer.name("ID").value(e.getAttributeValue(ATTRIBUTE_ID));
+            writer.name(ATTRIBUTE_ID).value(e.getAttributeValue(ATTRIBUTE_ID));
             for (Element eLabel : e.getChildren(ELEMENT_LABEL)) {
                 if (lang == null || lang.equals(eLabel.getAttributeValue(ATTRIBUTE_LANG, Namespace.XML_NAMESPACE))) {
                     writer.name(JSON_PROPERTY_TEXT).value(eLabel.getAttributeValue(ATTRIBUTE_TEXT));
@@ -303,7 +305,7 @@ public class MCRRestAPIClassifications {
                 writer.beginArray();
                 for (MCRCategory cat : DAO.getRootCategories()) {
                     writer.beginObject();
-                    writer.name("ID").value(cat.getId().getRootID());
+                    writer.name(ATTRIBUTE_ID).value(cat.getId().getRootID());
                     writer.name("href")
                         .value(info.getAbsolutePathBuilder().path(cat.getId().getRootID()).build().toString());
                     writer.endObject();
@@ -366,7 +368,13 @@ public class MCRRestAPIClassifications {
             Document doc = MCRCategoryTransformer.getMetaDataDocument(category, false);
             Element rootElement = getRootElement(doc, filter);
             if (filter.contains("nonempty")) {
-                filterNonEmpty(doc.getRootElement().getAttributeValue(ATTRIBUTE_ID), rootElement);
+                final Element root;
+                if (rootElement.getName().equals("mycoreclass")) {
+                    root = rootElement.getChild(ELEMENT_CATEGORIES);
+                } else {
+                    root = rootElement;
+                }
+                filterNonEmpty(doc.getRootElement().getAttributeValue(ATTRIBUTE_ID), root);
             }
             if (filter.contains("nochildren")) {
                 rootElement.removeChildren(ELEMENT_CATEGORY);
@@ -476,7 +484,7 @@ public class MCRRestAPIClassifications {
 
         writer.setIndent("  ");
 
-        Element categoriesElement = eRoot.getChild("categories");
+        Element categoriesElement = eRoot.getChild(ELEMENT_CATEGORIES);
         if (style.contains("checkboxtree")) {
             String finalLang = (lang != null) ? lang : "de";
             writer.beginObject();
@@ -495,7 +503,7 @@ public class MCRRestAPIClassifications {
                 style.contains("disabled"), style.contains("selected"));
         } else {
             writer.beginObject(); // {
-            writer.name("ID").value(eRoot.getAttributeValue(ATTRIBUTE_ID));
+            writer.name(ATTRIBUTE_ID).value(eRoot.getAttributeValue(ATTRIBUTE_ID));
             writer.name("label");
             writer.beginArray();
             for (Element eLabel : eRoot.getChildren(ELEMENT_LABEL)) {
@@ -505,7 +513,7 @@ public class MCRRestAPIClassifications {
             }
             writer.endArray();
             if (eRoot.equals(eRoot.getDocument().getRootElement())) {
-                writeChildrenAsJSON(eRoot.getChild("categories"), writer, lang);
+                writeChildrenAsJSON(eRoot.getChild(ELEMENT_CATEGORIES), writer, lang);
             } else {
                 writeChildrenAsJSON(eRoot, writer, lang);
             }
