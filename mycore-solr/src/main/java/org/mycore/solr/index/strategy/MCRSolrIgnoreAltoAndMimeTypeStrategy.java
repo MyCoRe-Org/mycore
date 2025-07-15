@@ -53,7 +53,7 @@ public class MCRSolrIgnoreAltoAndMimeTypeStrategy extends MCRSolrMimeTypeStrateg
     @Override
     public boolean check(Path file, BasicFileAttributes attrs) {
         String fileName = file.getFileName().toString();
-        if (fileName.endsWith(".alto.xml")) {
+        if (fileName.endsWith(".alto.xml") || fileName.endsWith(".alto")) {
             return false;
         }
         String mimeType = MCRXMLFunctions.getMimeType(fileName);
