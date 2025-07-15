@@ -89,13 +89,8 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
 
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                boolean sendContent = ihf.checkFile(file, attrs);
                 try {
-                    if (sendContent) {
-                        subHandlerList.add(ihf.getIndexHandler(file, attrs, true));
-                    } else {
-                        subHandlerList.add(ihf.getIndexHandler(file, attrs, false));
-                    }
+                    subHandlerList.add(ihf.getIndexHandler(file, attrs));
                 } catch (Exception ex) {
                     LOGGER.error("Error creating transfer thread", ex);
                 }
