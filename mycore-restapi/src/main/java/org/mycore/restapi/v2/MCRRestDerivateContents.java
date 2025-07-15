@@ -57,6 +57,8 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.content.util.MCRRestContentHelper;
 import org.mycore.common.digest.MCRDigest;
+import org.mycore.common.digest.MCRMD5Digest;
+import org.mycore.common.digest.MCRSHA512Digest;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRDigestAttributeView;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
@@ -577,7 +579,7 @@ public class MCRRestDerivateContents {
 
         private String mimeType;
 
-        private String md5;
+        private MCRDigest digest;
 
         private long size;
 
@@ -587,21 +589,27 @@ public class MCRRestDerivateContents {
 
         File(MCRPath p, MCRFileAttributes attr, String mimeType) {
             super(p, attr);
-            this.md5 = attr.digest().toHexString();
+            this.digest = attr.digest();
             this.size = attr.size();
             this.mimeType = mimeType;
-        }
-
-        @XmlAttribute
-        @JsonProperty(index = 3)
-        public String getMd5() {
-            return md5;
         }
 
         @XmlAttribute
         @JsonProperty(index = 1)
         public long getSize() {
             return size;
+        }
+
+        @XmlAttribute(name = MCRSHA512Digest.ALGORITHM_NAME_NORMALIZED)
+        @JsonProperty(index = 2)
+        public String getSha512() {
+            return (digest instanceof MCRSHA512Digest) ? digest.toHexString() : null;
+        }
+
+        @XmlAttribute(name = MCRMD5Digest.ALGORITHM_NAME_NORMALIZED)
+        @JsonProperty(index = 3)
+        public String getMd5() {
+            return (digest instanceof MCRMD5Digest) ? digest.toHexString() : null;
         }
 
         @XmlAttribute
