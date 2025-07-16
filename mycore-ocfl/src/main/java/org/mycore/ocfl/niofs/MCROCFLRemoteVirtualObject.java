@@ -343,7 +343,9 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
      */
     @Override
     public boolean persist() throws IOException {
-        boolean persist = super.persist();
+        if (!isModified()) {
+            return false;
+        }
         // copy data from transactional storage to remote storage
         for (MCROCFLFileTracker.Change<MCRVersionedPath> change : this.fileTracker.changes()) {
             if (MCROCFLFileTracker.ChangeType.ADDED_OR_MODIFIED.equals(change.type())) {
@@ -354,7 +356,7 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
                 }
             }
         }
-        return persist;
+        return super.persist();
     }
 
     /**
