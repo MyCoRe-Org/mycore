@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Set;
 
+import io.ocfl.api.io.FixityCheckInputStream;
 import org.mycore.common.digest.MCRDigest;
 import org.mycore.common.events.MCREvent;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
@@ -245,9 +246,11 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
             return;
         }
 
-        // create a local copy from ocfl -> TODO should we stream this instead of making a local copy?
-        localTransactionalCopy(lockedSource);
-        this.transactionalStorage.copy(lockedSource, lockedTarget, options);
+        // stream to target
+        OcflObjectVersionFile ocflFile = fromOcfl(lockedSource);
+        try (FixityCheckInputStream stream = ocflFile.getStream()) {
+            this.transactionalStorage.copy(stream, lockedTarget, options);
+        }
         trackFileWrite(lockedTarget, event);
     }
 
@@ -278,9 +281,11 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
             return;
         }
 
-        // create a local copy from ocfl -> TODO should we stream this instead of making a local copy?
-        localTransactionalCopy(lockedSource);
-        this.transactionalStorage.copy(lockedSource, target, options);
+        // stream to target
+        OcflObjectVersionFile ocflFile = fromOcfl(lockedSource);
+        try (FixityCheckInputStream stream = ocflFile.getStream()) {
+            this.transactionalStorage.copy(stream, target, options);
+        }
         virtualTarget.trackFileWrite(target, event);
     }
 
