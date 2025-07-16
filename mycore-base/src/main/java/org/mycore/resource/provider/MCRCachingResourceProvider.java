@@ -33,33 +33,33 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRResourceTracer;
 
 /**
- * {@link MCRCachingResourceProvider} is an implementation of {@link MCRResourceProvider} that delegates to another
- * {@link MCRResourceProvider} and uses a {@link MCRCache} to cache the results.
+ * A {@link MCRCachingResourceProvider} is a {@link MCRResourceProvider} that delegates to another
+ * {@link MCRResourceProvider} and uses a {@link MCRCache} to cache the results indefinitely.
  * <p>
- * The following configuration options are available, if configured automatically:
+ * The following configuration options are available:
  * <ul>
- * <li> The provider is configured using the property suffix {@link MCRCachingResourceProvider#PROVIDER_KEY}.
- * <li> The property suffix {@link MCRCachingResourceProvider#CAPACITY_KEY} can be used to configure tha capacity
- * of the underlying cache.
- * <li> The property suffix {@link MCRCachingResourceProvider#COVERAGE_KEY} can be used to provide short
- * description for human beings in order to better understand the providers use case.
+ * <li> The property suffix {@link MCRResourceProviderBase#COVERAGE_KEY} can be used to
+ * provide a short description of the providers purpose; used in log messages.
+ * <li> The property suffix {@link MCRCachingResourceProvider#PROVIDER_KEY} can be used to
+ * specify the provider to be used.
+ * <li> The property suffix {@link MCRCachingResourceProvider#CAPACITY_KEY} can be used to
+ * configure the capacity of the underlying cache.
  * </ul>
  * Example:
- * <pre>
+ * <pre><code>
  * [...].Class=org.mycore.resource.provider.MCRCachingResourceProvider
  * [...].Coverage=Lorem ipsum dolor sit amet
  * [...].Capacity=1000
  * [...].Provider.Class=foo.bar.FooProvider
  * [...].Provider.Key1=Value1
  * [...].Provider.Key2=Value2
- * </pre>
+ * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRCachingResourceProvider.Factory.class)
 public class MCRCachingResourceProvider extends MCRResourceProviderBase {
-
-    public static final String COVERAGE_KEY = "Coverage";
 
     public static final String CAPACITY_KEY = "Capacity";
 
@@ -83,21 +83,21 @@ public class MCRCachingResourceProvider extends MCRResourceProviderBase {
 
     @Override
     @SuppressWarnings("OptionalAssignedToNull")
-    protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints) {
+    protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
         Optional<URL> resourceUrl = cache.get(path);
         if (resourceUrl == null) {
-            logger.debug("Cache miss for {}", path);
-            resourceUrl = provider.provide(path, hints);
+            tracer.trace(() -> "Cache miss for " + path);
+            resourceUrl = provider.provide(path, hints, tracer.update(provider, provider.coverage()));
             cache.put(path, resourceUrl);
         } else {
-            logger.debug("Cache hit for {}", path);
+            tracer.trace(() -> "Cache hit for " + path);
         }
         return resourceUrl;
     }
 
     @Override
-    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints) {
-        return provider.provideAll(path, hints);
+    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
+        return provider.provideAll(path, hints, tracer.update(provider, provider.coverage()));
     }
 
     @Override

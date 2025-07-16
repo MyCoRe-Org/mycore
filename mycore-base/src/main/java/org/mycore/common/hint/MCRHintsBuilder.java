@@ -37,11 +37,9 @@ public final class MCRHintsBuilder {
     private final Set<Entry<?>> entries = new HashSet<>();
 
     public <T> MCRHintsBuilder add(MCRHintKey<T> hintKey, T hintValue) {
-        Entry<T> entry = new Entry<>(hintKey, hintValue);
-        if (!entries.add(entry)) {
-            entries.remove(entry);
-            entries.add(entry);
-        }
+        Entry<T> entry = new Entry<>(hintKey, hintKey.check(hintValue));
+        entries.remove(entry);
+        entries.add(entry);
         return this;
     }
 
@@ -50,8 +48,9 @@ public final class MCRHintsBuilder {
         return this;
     }
 
-    public <T> MCRHintsBuilder add(MCRHint<T> supplier) {
-        return add(supplier.key(), supplier.value());
+    public <T> MCRHintsBuilder add(MCRHint<T> hint) {
+        add(hint.key(), hint.value());
+        return this;
     }
 
     public MCRHints build() {
@@ -60,6 +59,36 @@ public final class MCRHintsBuilder {
             entries.forEach(entry -> LOGGER.debug(" … with entry {}: {}", entry.key, entry.formattedValue()));
         }
         return new Hints(entries);
+    }
+
+    private static final class Hints implements MCRHints {
+
+        private final Map<MCRHintKey<?>, Object> hints = new HashMap<>();
+
+        private Hints(Set<Entry<?>> entries) {
+            entries.forEach(hint -> hints.put(hint.key, hint.value));
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public <T> Optional<T> get(MCRHintKey<T> hintKey) {
+            return Optional.ofNullable((T) hints.get(hintKey));
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public <T> T getOrElse(MCRHintKey<T> hintKey, T fallback) {
+            return (T) hints.getOrDefault(hintKey, fallback);
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public MCRHintsBuilder builder() {
+            MCRHintsBuilder builder = new MCRHintsBuilder();
+            hints.forEach((key, value) -> builder.add((MCRHintKey<Object>) key, value));
+            return builder;
+        }
+
     }
 
     private static final class Entry<T> {
@@ -90,30 +119,6 @@ public final class MCRHintsBuilder {
         @Override
         public int hashCode() {
             return key.hashCode();
-        }
-
-    }
-
-    private static final class Hints implements MCRHints {
-
-        private final Map<MCRHintKey<?>, Object> hints = new HashMap<>();
-
-        private Hints(Set<Entry<?>> entries) {
-            entries.forEach(hint -> hints.put(hint.key, hint.value));
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public <T> Optional<T> get(MCRHintKey<T> hintKey) {
-            return Optional.ofNullable((T) hints.get(hintKey));
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public MCRHintsBuilder builder() {
-            MCRHintsBuilder builder = new MCRHintsBuilder();
-            hints.forEach((key, value) -> builder.add((MCRHintKey<Object>) key, value));
-            return builder;
         }
 
     }

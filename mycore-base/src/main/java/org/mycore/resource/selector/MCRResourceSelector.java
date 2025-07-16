@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.logging.log4j.Level;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
+import org.mycore.resource.common.MCRResourceTracer;
 import org.mycore.resource.filter.MCRResourceFilter;
 import org.mycore.resource.provider.MCRLFSResourceProvider;
 
@@ -38,10 +40,19 @@ public interface MCRResourceSelector {
 
     /**
      * Selects prioritized resources from the result of the <em>filter</em>-phase, dropping unprioritized
-     * resources. Returns a subset of the given resources that must not be empty. If no prioritization
-     * can be made, an unmodified list of resources must be returned.
+     * resources. Returns a non-empty subset of the given resources. If no prioritization can be made,
+     * the whole set of resources must be returned.
      */
-    List<URL> select(List<URL> resourceUrls, MCRHints hints);
+    default List<URL> select(List<URL> resourceUrls, MCRHints hints) {
+        return select(resourceUrls, hints, new MCRNoOpResourceTracer());
+    }
+
+    /**
+     * Selects prioritized resources from the result of the <em>filter</em>-phase, dropping unprioritized
+     * resources. Returns a non-empty subset of the given resources. If no prioritization can be made,
+     * the whole set of resources must be returned.
+     */
+    List<URL> select(List<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer);
 
     /**
      * Returns a description of this {@link MCRCombinedResourceSelector}.
