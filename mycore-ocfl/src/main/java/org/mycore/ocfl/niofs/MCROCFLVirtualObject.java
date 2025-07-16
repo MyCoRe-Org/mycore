@@ -431,7 +431,6 @@ public abstract class MCROCFLVirtualObject {
     }
 
     /**
-     * <p>
      * Copies a file from the OCFL repository to the transactional storage.
      * This should be called whenever it is necessary to work on a copy rather than the OCFL file directly.
      * <p>

@@ -353,7 +353,7 @@ public class MCROCFLVirtualObjectTest {
         Assertions.assertArrayEquals(path1Data, Files.readAllBytes(path1),
             "'path1' should have the content of the temp store");
         Assertions.assertArrayEquals(path1Data, Files.readAllBytes(path2),
-            "'path2' should have the content of the temp store");
+            "'path2' should have the content of 'path1'");
         MCRTransactionManager.commitTransactions();
 
         MCRTransactionManager.beginTransactions();
@@ -369,6 +369,19 @@ public class MCROCFLVirtualObjectTest {
         Assertions.assertArrayEquals(path3Data, Files.readAllBytes(path2),
             "'path2' should have the content of the transactional store");
         MCRTransactionManager.commitTransactions();
+
+        // check remote streaming
+        if(remote) {
+            // clear remote storage to not copy from there but stream from the OCFL repo
+            MCROCFLFileSystemProvider.get().remoteStorage().clear();
+            MCRTransactionManager.beginTransactions();
+            Files.copy(path1, path3, StandardCopyOption.REPLACE_EXISTING);
+            Assertions.assertArrayEquals(path1Data, Files.readAllBytes(path3),
+                "'path3' should have the content of 'path1");
+            MCRTransactionManager.commitTransactions();
+            Assertions.assertArrayEquals(path1Data, Files.readAllBytes(path3),
+                "'path3' should have the content of 'path1");
+        }
     }
 
     @TestTemplate
@@ -376,6 +389,7 @@ public class MCROCFLVirtualObjectTest {
         MCRVersionedPath whitePng = WHITE_PNG;
         MCRVersionedPath blackPng = BLACK_PNG;
         MCRVersionedPath target = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_2, "white.png");
+        MCRVersionedPath target2 = MCRVersionedPath.head(MCROCFLTestCaseHelper.DERIVATE_2, "white2.png");
         long whiteSize = Files.size(whitePng);
         long blackSize = Files.size(blackPng);
 
@@ -396,6 +410,17 @@ public class MCROCFLVirtualObjectTest {
         assertEquals(blackSize, Files.size(target), "white.png should have the same size");
         MCRTransactionManager.commitTransactions();
         assertEquals(blackSize, Files.size(target), "white.png should have the same size");
+
+        // check remote streaming
+        if(remote) {
+            // clear remote storage to not copy from there but stream from the OCFL repo
+            MCROCFLFileSystemProvider.get().remoteStorage().clear();
+            MCRTransactionManager.beginTransactions();
+            Files.copy(whitePng, target2);
+            assertEquals(whiteSize, Files.size(target2), "white2.png should have the same size");
+            MCRTransactionManager.commitTransactions();
+            assertEquals(whiteSize, Files.size(target2), "white2.png should have the same size");
+        }
     }
 
     private static Object getFileKey(MCRVersionedPath path) throws IOException {
