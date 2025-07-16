@@ -18,12 +18,8 @@
 
 package org.mycore.resource.hint;
 
-import java.nio.file.Path;
-import java.util.List;
-import java.util.SortedSet;
+import java.io.File;
 
-import org.mycore.common.config.MCRComponent;
-import org.mycore.common.hint.MCRCollectionHintKey;
 import org.mycore.common.hint.MCRHintKey;
 import org.mycore.resource.MCRResourceResolver;
 
@@ -34,40 +30,25 @@ import jakarta.servlet.ServletContext;
  */
 public final class MCRResourceHintKeys {
 
-    public static final MCRHintKey<Path> CONFIG_DIR = new MCRHintKey<>(
-        Path.class,
-        MCRResourceHintKeys.class,
+    public static final MCRHintKey<File> CONFIG_DIR = new MCRHintKey<>(
+        File.class,
         "CONFIG_DIR",
-        path -> path.toAbsolutePath().toString());
+        File::getAbsolutePath);
 
     public static final MCRHintKey<ClassLoader> CLASS_LOADER = new MCRHintKey<>(
         ClassLoader.class,
-        MCRResourceHintKeys.class,
         "CLASS_LOADER",
         ClassLoader::getName);
 
-    public static final MCRHintKey<SortedSet<MCRComponent>> COMPONENTS = new MCRCollectionHintKey<>(
-        MCRComponent.class,
-        MCRResourceHintKeys.class,
-        "COMPONENTS",
-        Object::toString,
-        List.of(collection -> {
-            if (collection.size() > 1 && collection.getFirst().getPriority() < collection.getLast().getPriority()) {
-                throw new IllegalArgumentException("Components must be ordered from highest to lowest priority");
-            }
-        }));
-
     public static final MCRHintKey<ServletContext> SERVLET_CONTEXT = new MCRHintKey<>(
         ServletContext.class,
-        MCRResourceHintKeys.class,
         "SERVLET_CONTEXT",
         ServletContext::getServletContextName);
 
-    public static final MCRHintKey<Path> WEBAPP_DIR = new MCRHintKey<>(
-        Path.class,
-        MCRResourceHintKeys.class,
+    public static final MCRHintKey<File> WEBAPP_DIR = new MCRHintKey<>(
+        File.class,
         "WEBAPP_DIR",
-        path -> path.toAbsolutePath().toString());
+        File::getAbsolutePath);
 
     private MCRResourceHintKeys() {
     }

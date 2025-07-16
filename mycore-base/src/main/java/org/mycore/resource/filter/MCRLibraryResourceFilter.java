@@ -24,36 +24,34 @@ import java.util.function.Supplier;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.hint.MCRHints;
-import org.mycore.resource.common.MCRResourceTracer;
 
 /**
- * A {@link MCRLibraryResourceFilter} is a {@link MCRResourceFilter} that checks if a resource candidate
- * is a resource from a JAR file.
- * To decide weather such resources are retained or ignored, a {@link MCRResourceFilterMode} value is used.
+ * {@link MCRLibraryResourceFilter} is an implementation of {@link MCRResourceFilter} that checks if a resource
+ * candidate is a resource from a JAR file. To decide weather such resources are retained or ignored, a
+ * {@link MCRResourceFilterMode} value is used.
  * <p>
- * The following configuration options are available:
+ * The following configuration options are available, if configured automatically:
  * <ul>
- * <li> The property suffix {@link MCRUrlPrefixResourceFilterBase#MODE_KEY} can be used to
- * specify the mode to be used.
+ * <li> The mode is configured using the property suffix {@link MCRLibraryResourceFilter#MODE_KEY}.
  * </ul>
  * Example:
- * <pre><code>
+ * <pre>
  * [...].Class=org.mycore.resource.filter.MCRLibraryResourceFilter
  * [...].Mode=MUST_MATCH
- * </code></pre>
+ * </pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRLibraryResourceFilter.Factory.class)
-public final class MCRLibraryResourceFilter extends MCRUrlPrefixResourceFilterBase {
+public class MCRLibraryResourceFilter extends MCRUrlPrefixResourceFilterBase {
+
+    public static final String MODE_KEY = "Mode";
 
     public MCRLibraryResourceFilter(MCRResourceFilterMode mode) {
         super(mode);
     }
 
     @Override
-    protected Optional<String> getPrefix(MCRHints hints, MCRResourceTracer tracer) {
-        String prefix = "jar:";
-        tracer.trace(() -> "Looking for library prefix: " + prefix);
-        return Optional.of(prefix);
+    protected Optional<String> getPrefix(MCRHints hints) {
+        return Optional.of("jar:");
     }
 
     public static class Factory implements Supplier<MCRLibraryResourceFilter> {

@@ -31,20 +31,18 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceList;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.resource.MCRResourcePath;
-import org.mycore.resource.common.MCRResourceTracer;
 import org.mycore.resource.provider.MCRResourceProvider.PrefixStripper;
 
 /**
- * A {@link MCRCombinedResourceLocator} is a {@link MCRResourceLocator} that delegates to multiple
+ * {@link MCRCombinedResourceLocator} is an implementation of {@link MCRResourceLocator} that delegates to multiple
  * other {@link MCRResourceLocator} instances, one after another.
  * <p>
- * The following configuration options are available:
+ * The following configuration options are available, if configured automatically:
  * <ul>
- * <li> The property suffix {@link MCRCombinedResourceLocator#LOCATORS_KEY} can be used to
- * specify the list of locators to be used.
+ * <li> Locators are configured as a list using the property suffix {@link MCRCombinedResourceLocator#LOCATORS_KEY}.
  * </ul>
  * Example:
- * <pre><code>
+ * <pre>
  * [...].Class=org.mycore.resource.locator.MCRCombinedResourceLocator
  * [...].Locators.10.Class=foo.bar.FooLocator
  * [...].Locators.10.Key1=Value1
@@ -52,7 +50,7 @@ import org.mycore.resource.provider.MCRResourceProvider.PrefixStripper;
  * [...].Locators.20.Class=foo.bar.BarLocator
  * [...].Locators.20.Key1=Value1
  * [...].Locators.20.Key2=Value2
- * </code></pre>
+ * </pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRCombinedResourceLocator.Factory.class)
 public class MCRCombinedResourceLocator extends MCRResourceLocatorBase {
@@ -65,17 +63,17 @@ public class MCRCombinedResourceLocator extends MCRResourceLocatorBase {
         this(Arrays.asList(locators));
     }
 
-    public MCRCombinedResourceLocator(List<MCRResourceLocator> locators) {
+    public <T> MCRCombinedResourceLocator(List<MCRResourceLocator> locators) {
         this.locators = new ArrayList<>(Objects.requireNonNull(locators, "Locators must not be null"));
         this.locators.forEach(locator -> Objects.requireNonNull(locator, "Locator must not be null"));
         Collections.reverse(this.locators);
     }
 
     @Override
-    protected Stream<URL> doLocate(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
+    protected Stream<URL> doLocate(MCRResourcePath path, MCRHints hints) {
         Stream<URL> resourceUrls = Stream.empty();
         for (MCRResourceLocator locator : locators) {
-            resourceUrls = Stream.concat(locator.locate(path, hints, tracer.update(locator)), resourceUrls);
+            resourceUrls = Stream.concat(locator.locate(path, hints), resourceUrls);
         }
         return resourceUrls;
     }
@@ -87,7 +85,7 @@ public class MCRCombinedResourceLocator extends MCRResourceLocatorBase {
 
     public static class Factory implements Supplier<MCRCombinedResourceLocator> {
 
-        @MCRInstanceList(name = LOCATORS_KEY, valueClass = MCRResourceLocator.class, required = false)
+        @MCRInstanceList(name = LOCATORS_KEY, valueClass = MCRResourceLocator.class)
         public List<MCRResourceLocator> locators;
 
         @Override

@@ -35,22 +35,20 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
-import org.mycore.resource.common.MCRResourceTracer;
 
 /**
- * A {@link MCRCombinedResourceProvider} is a {@link MCRResourceProvider} that delegates to multiple
+ * {@link MCRCombinedResourceProvider} is an implementation of {@link MCRResourceProvider} that delegates to multiple
  * other {@link MCRResourceProvider} instances. If multiple providers return a result when looking up a resource,
  * only the first result is considered.
  * <p>
- * The following configuration options are available:
+ * The following configuration options are available, if configured automatically:
  * <ul>
- * <li> The property suffix {@link MCRResourceProviderBase#COVERAGE_KEY} can be used to
- * provide a short description of the providers purpose; used in log messages.
- * <li> The property suffix {@link MCRCombinedResourceProvider#PROVIDERS_KEY} can be used to
- * specify the list of providers to be used.
+ * <li> Providers are configured as a list using the property suffix {@link MCRCombinedResourceProvider#PROVIDERS_KEY}.
+ * <li> The property suffix {@link MCRCombinedResourceProvider#COVERAGE_KEY} can be used to provide short
+ * description for human beings in order to better understand the providers use case.
  * </ul>
  * Example:
- * <pre><code>
+ * <pre>
  * [...].Class=org.mycore.resource.provider.MCRCombinedResourceProvider
  * [...].Coverage=Lorem ipsum dolor sit amet
  * [...].Providers.10.Class=foo.bar.FooProvider
@@ -59,10 +57,12 @@ import org.mycore.resource.common.MCRResourceTracer;
  * [...].Providers.20.Class=foo.bar.BarProvider
  * [...].Providers.20.Key1=Value1
  * [...].Providers.20.Key2=Value2
- * </code></pre>
+ * </pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRCombinedResourceProvider.Factory.class)
 public class MCRCombinedResourceProvider extends MCRResourceProviderBase {
+
+    public static final String COVERAGE_KEY = "Coverage";
 
     public static final String PROVIDERS_KEY = "Providers";
 
@@ -79,11 +79,10 @@ public class MCRCombinedResourceProvider extends MCRResourceProviderBase {
     }
 
     @Override
-    protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
+    protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints) {
         for (MCRResourceProvider provider : providers) {
-            Optional<URL> resourceUrl = provider.provide(path, hints, tracer.update(provider, provider.coverage()));
+            Optional<URL> resourceUrl = provider.provide(path, hints);
             if (resourceUrl.isPresent()) {
-                tracer.trace(() -> "Got one resource URL, no need for further providers");
                 return resourceUrl;
             }
         }
@@ -91,14 +90,12 @@ public class MCRCombinedResourceProvider extends MCRResourceProviderBase {
     }
 
     @Override
-    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
+    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints) {
         List<ProvidedUrl> resourceUrls = new LinkedList<>();
         for (MCRResourceProvider provider : providers) {
-            List<ProvidedUrl> providedUrls = provider.provideAll(path, hints,
-                tracer.update(provider, provider.coverage()));
-            for (ProvidedUrl providedURL : providedUrls) {
-                String origin = coverage() + " / " + providedURL.origin();
-                resourceUrls.add(new ProvidedUrl(providedURL.url(), origin));
+            for (ProvidedUrl providedURL : provider.provideAll(path, hints)) {
+                String origin = coverage() + " / " + providedURL.origin;
+                resourceUrls.add(new ProvidedUrl(providedURL.url, origin));
             }
         }
         return resourceUrls;
@@ -121,7 +118,7 @@ public class MCRCombinedResourceProvider extends MCRResourceProviderBase {
         @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.Combined.Coverage")
         public String coverage;
 
-        @MCRInstanceList(name = PROVIDERS_KEY, valueClass = MCRResourceProvider.class, required = false)
+        @MCRInstanceList(name = PROVIDERS_KEY, valueClass = MCRResourceProvider.class)
         public List<MCRResourceProvider> providers;
 
         @Override

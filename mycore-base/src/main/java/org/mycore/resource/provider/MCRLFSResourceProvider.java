@@ -32,7 +32,6 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
-import org.mycore.resource.common.MCRResourceTracer;
 import org.mycore.resource.filter.MCRResourceFilter;
 import org.mycore.resource.locator.MCRResourceLocator;
 import org.mycore.resource.selector.MCRResourceSelector;
@@ -46,21 +45,30 @@ import org.mycore.resource.selector.MCRResourceSelector;
  * to the set of allowed resources.
  * In the <em>select</em>-phase, a {@link MCRResourceSelector} is used to select prioritized resources from
  * the result of the <em>filter</em>-phase. If, after the <em>select</em>-phase, multiple candidates are
- * still available, the first candidate is chosen.
+ * till available, the first candidate is chosen.
+ */
+
+/**
+ * {@link MCRLFSResourceProvider} is an implementation of {@link MCRResourceProvider} that splits the lookup
+ * strategy in three phases: <em>locate</em>, <em>filter</em>, <em>select</em> (LFS).
  * <p>
- * The following configuration options are available:
+ * In the <em>locate</em>-phase, a {@link MCRResourceLocator} instance is used to locate a set of possible candidates.
+ * In the <em>filter</em>-phase, a {@link MCRResourceFilter} instance is used to reduce the result of the
+ * <em>locate</em>-phase to the set of allowed resources.
+ * In the <em>select</em>-phase, a {@link MCRResourceSelector} instance is used to select prioritized resources from
+ * the result of the <em>filter</em>-phase. If, after the <em>select</em>-phase, multiple candidates are
+ * till available, the first candidate is chosen.
+ * <p>
+ * The following configuration options are available, if configured automatically:
  * <ul>
- * <li> The property suffix {@link MCRResourceProviderBase#COVERAGE_KEY} can be used to
- * provide a short description of the providers purpose; used in log messages.
- * <li> The property suffix {@link MCRLFSResourceProvider#LOCATOR_KEY} can be used to
- * specify the locator to be used.
- * <li> The property suffix {@link MCRLFSResourceProvider#FILTER_KEY} can be used to
- * specify the filter to be used.
- * <li> The property suffix {@link MCRLFSResourceProvider#SELECTOR_KEY} can be used to
- * specify the selector to be used.
+ * <li> The locator is configures using the property suffix {@link MCRLFSResourceProvider#LOCATOR_KEY}.
+ * <li> The filter is configures using the property suffix {@link MCRLFSResourceProvider#FILTER_KEY}.
+ * <li> The selector is configures using the property suffix {@link MCRLFSResourceProvider#SELECTOR_KEY}.
+ * <li> The property suffix {@link MCRLFSResourceProvider#COVERAGE_KEY} can be used to provide short
+ * description for human beings in order to better understand the providers use case.
  * </ul>
  * Example:
- * <pre><code>
+ * <pre>
  * [...].Class=org.mycore.resource.provider.MCRFileSystemResourceProvider
  * [...].Coverage=Lorem ipsum dolor sit amet
  * [...].Locator.Class=foo.bar.FooLocator
@@ -72,10 +80,12 @@ import org.mycore.resource.selector.MCRResourceSelector;
  * [...].Selector.Class=foo.bar.FooSelector
  * [...].Selector.Key1=Value1
  * [...].Selector.Key2=Value2
- * </code></pre>
+ * </pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRLFSResourceProvider.Factory.class)
 public class MCRLFSResourceProvider extends MCRResourceProviderBase {
+
+    public static final String COVERAGE_KEY = "Coverage";
 
     public static final String LOCATOR_KEY = "Locator";
 
@@ -98,21 +108,25 @@ public class MCRLFSResourceProvider extends MCRResourceProviderBase {
     }
 
     @Override
-    protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
-        Stream<URL> locatedResourceUrls = locator.locate(path, hints, tracer.update(locator));
-        List<URL> filteredResourceUrls = filter.filter(locatedResourceUrls, hints, tracer.update(filter)).toList();
-        if (!filteredResourceUrls.isEmpty()) {
-            return selector.select(filteredResourceUrls, hints, tracer.update(selector)).stream().findFirst();
-        } else {
-            return Optional.empty();
-        }
+    protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints) {
+        return doProvide(filter.filter(locator.locate(path, hints), hints), hints);
     }
 
     @Override
-    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
-        Stream<URL> locatedResourceUrls = locator.locate(path, hints, tracer.update(locator));
-        Stream<URL> filteredResourceUrls = filter.filter(locatedResourceUrls, hints, tracer.update(filter));
-        return filteredResourceUrls.map(this::providedUrl).toList();
+    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints) {
+        return filter.filter(locator.locate(path, hints), hints).map(this::providedURL).toList();
+    }
+
+    private Optional<URL> doProvide(Stream<URL> resourceUrls, MCRHints hints) {
+        return doProvide(resourceUrls.toList(), hints);
+    }
+
+    private Optional<URL> doProvide(List<URL> resourceUrls, MCRHints hints) {
+        if (!resourceUrls.isEmpty()) {
+            return selector.select(resourceUrls, hints).stream().findFirst();
+        } else {
+            return Optional.empty();
+        }
     }
 
     @Override

@@ -29,7 +29,6 @@ import org.mycore.common.MCRException;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.resource.MCRResourcePath;
-import org.mycore.resource.common.MCRResourceTracer;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 import org.mycore.resource.provider.MCRResourceProvider.JarUrlPrefixStripper;
 import org.mycore.resource.provider.MCRResourceProvider.PrefixStripper;
@@ -37,24 +36,24 @@ import org.mycore.resource.provider.MCRResourceProvider.PrefixStripper;
 import jakarta.servlet.ServletContext;
 
 /**
- * A {@link MCRClassLoaderResourceLocator} is a {@link MCRResourceLocator} that uses
- * {@link ServletContext#getResource(String)} to locate a web resources.
+ * {@link MCRClassLoaderResourceLocator} is an implementation of {@link MCRResourceLocator} that uses
+ * {@link ServletContext#getResource(String)} to locate a resources.
  * <p>
  * It uses the {@link ServletContext} hinted at by {@link MCRResourceHintKeys#SERVLET_CONTEXT}, if present.
  * <p>
- * No configuration options are available.
+ * No configuration options are available, if configured automatically.
  * <p>
  * Example:
- * <pre><code>
+ * <pre>
  * [...].Class=org.mycore.resource.locator.MCRServletContextResourceLocator
- * </code></pre>
+ * </pre>
  */
 @SuppressWarnings("PMD.MCR.ResourceResolver")
-@MCRConfigurationProxy(proxyClass = MCRServletContextWebResourceLocator.Factory.class)
-public final class MCRServletContextWebResourceLocator extends MCRResourceLocatorBase {
+@MCRConfigurationProxy(proxyClass = MCRServletContextResourceLocator.Factory.class)
+public class MCRServletContextResourceLocator extends MCRResourceLocatorBase {
 
     @Override
-    protected Stream<URL> doLocate(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
+    protected Stream<URL> doLocate(MCRResourcePath path, MCRHints hints) {
         return combine(getServletContext(hints), getWebResourcePath(path), this::getResourceUrl).stream();
     }
 
@@ -83,11 +82,11 @@ public final class MCRServletContextWebResourceLocator extends MCRResourceLocato
         return Stream.of(JarUrlPrefixStripper.INSTANCE);
     }
 
-    public static class Factory implements Supplier<MCRServletContextWebResourceLocator> {
+    public static class Factory implements Supplier<MCRServletContextResourceLocator> {
 
         @Override
-        public MCRServletContextWebResourceLocator get() {
-            return new MCRServletContextWebResourceLocator();
+        public MCRServletContextResourceLocator get() {
+            return new MCRServletContextResourceLocator();
         }
 
     }

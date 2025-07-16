@@ -19,33 +19,47 @@
 package org.mycore.resource.locator;
 
 import java.net.URL;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
-import org.mycore.resource.common.MCRResourceTracer;
 
 /**
  * {@link MCRResourceLocatorBase} is a base implementation of {@link MCRResourceLocator} that
  * facilitates consistent logging. Implementors must provide the actual locating strategy
- * ({@link MCRResourceLocatorBase#doLocate(MCRResourcePath, MCRHints, MCRResourceTracer)}).
+ * ({@link MCRResourceLocatorBase#doLocate(MCRResourcePath, MCRHints)}).
  */
 public abstract class MCRResourceLocatorBase implements MCRResourceLocator {
 
+    protected final Logger logger = LogManager.getLogger(getClass());
+
     @Override
-    public final Stream<URL> locate(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
-        return tracer.traceStream(hints, doLocate(path, hints, tracer), (appender, locatedResourceUrls) -> {
-            if (!locatedResourceUrls.isEmpty()) {
-                locatedResourceUrls.forEach(url -> appender.append("Located resource URL " + url));
-            } else {
-                appender.append("Located no resource URL");
-            }
-        });
+    public final Stream<URL> locate(MCRResourcePath path, MCRHints hints) {
+        logger.debug("Locating resource URLs for path {}", path);
+        Stream<URL> locatedResourceUrls = doLocate(path, hints);
+        if (logger.isDebugEnabled()) {
+            locatedResourceUrls = logResourceUrls(locatedResourceUrls);
+        }
+        return locatedResourceUrls;
     }
 
-    protected abstract Stream<URL> doLocate(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer);
+    private Stream<URL> logResourceUrls(Stream<URL> resourceUrls) {
+        return logResourceUrls(resourceUrls.toList()).stream();
+    }
+
+    private List<URL> logResourceUrls(List<URL> resourceUrls) {
+        for (URL resourceUrl : resourceUrls) {
+            logger.debug("Located resource URL {}", resourceUrl);
+        }
+        return resourceUrls;
+    }
+
+    protected abstract Stream<URL> doLocate(MCRResourcePath path, MCRHints hints);
 
     @Override
     public MCRTreeMessage compileDescription(Level level) {

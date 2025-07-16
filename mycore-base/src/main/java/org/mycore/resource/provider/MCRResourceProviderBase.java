@@ -18,27 +18,27 @@
 
 package org.mycore.resource.provider;
 
-
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
-import org.mycore.resource.common.MCRResourceTracer;
 
 /**
  * {@link MCRResourceProviderBase} is a base implementation of {@link MCRResourceProvider} that
  * facilitates consistent logging. Implementors must provide the actual lookup strategy
- * ({@link MCRResourceProviderBase#doProvide(MCRResourcePath, MCRHints, MCRResourceTracer)},
- * {@link MCRResourceProviderBase#doProvideAll(MCRResourcePath, MCRHints, MCRResourceTracer)}).
+ * ({@link MCRResourceProviderBase#doProvide(MCRResourcePath, MCRHints)},
+ * {@link MCRResourceProviderBase#doProvideAll(MCRResourcePath, MCRHints)}).
  */
 public abstract class MCRResourceProviderBase implements MCRResourceProvider {
 
-    public static final String COVERAGE_KEY = "Coverage";
+    protected final Logger logger = LogManager.getLogger(getClass());
 
     private final String coverage;
 
@@ -47,33 +47,44 @@ public abstract class MCRResourceProviderBase implements MCRResourceProvider {
     }
 
     @Override
-    public final Optional<URL> provide(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
-        return tracer.trace(hints, doProvide(path, hints, tracer), (appender, providedResourceUrl) -> {
-            providedResourceUrl.ifPresentOrElse(url -> appender.append("Providing resource URL " + url),
-                () -> appender.append("Providing no resource URL"));
-        });
+    public final Optional<URL> provide(MCRResourcePath path, MCRHints hints) {
+        logger.debug("Providing resource URLs for path {} [{}]", path, coverage);
+        Optional<URL> resourceUrl = doProvide(path, hints);
+        if (logger.isDebugEnabled()) {
+            return logResourceUrl(resourceUrl);
+        } else {
+            return resourceUrl;
+        }
+    }
+
+    private Optional<URL> logResourceUrl(Optional<URL> resourceUrl) {
+        resourceUrl.ifPresent(url -> logger.debug("Providing resource URL {} [{}]", url, coverage));
+        return resourceUrl;
     }
 
     @Override
-    public final List<ProvidedUrl> provideAll(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
-        return tracer.trace(hints, doProvideAll(path, hints, tracer), (appender, providedResourceUrls) -> {
-            if (!providedResourceUrls.isEmpty()) {
-                providedResourceUrls.forEach(url -> appender.append("Providing resource URL " + url));
-            } else {
-                appender.append("Providing no resource URLs");
-            }
-        });
+    public final List<ProvidedUrl> provideAll(MCRResourcePath path, MCRHints hints) {
+        logger.debug("Providing all resource URLs for path {} [{}]", path, coverage);
+        List<ProvidedUrl> resourceUrls = doProvideAll(path, hints);
+        if (logger.isDebugEnabled()) {
+            logResourceUrls(resourceUrls);
+        }
+        return resourceUrls;
+
     }
 
-    protected abstract Optional<URL> doProvide(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer);
+    private void logResourceUrls(List<ProvidedUrl> resourceUrl) {
+        resourceUrl.forEach(url -> logger.debug("Providing resource URL {} [{}]", url.url, coverage));
+    }
 
-    protected abstract List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer);
+    protected abstract Optional<URL> doProvide(MCRResourcePath path, MCRHints hints);
 
-    protected final ProvidedUrl providedUrl(URL url) {
+    protected abstract List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints);
+
+    protected final ProvidedUrl providedURL(URL url) {
         return new ProvidedUrl(url, coverage());
     }
 
-    @Override
     public String coverage() {
         return coverage;
     }

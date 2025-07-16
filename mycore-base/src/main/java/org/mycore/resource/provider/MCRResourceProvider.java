@@ -18,11 +18,10 @@
 
 package org.mycore.resource.provider;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -39,9 +38,6 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
-import org.mycore.resource.common.MCRNoOpResourceTracer;
-import org.mycore.resource.common.MCRResourceUtils;
-import org.mycore.resource.common.MCRResourceTracer;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
@@ -56,28 +52,13 @@ public interface MCRResourceProvider {
     /**
      * Resolves a {@link MCRResourcePath} using the given hints.
      */
-    default Optional<URL> provide(MCRResourcePath path, MCRHints hints) {
-        return provide(path, hints, new MCRNoOpResourceTracer());
-    }
-
-    /**
-     * Resolves a {@link MCRResourcePath} using the given hints.
-     */
-    Optional<URL> provide(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer);
+    Optional<URL> provide(MCRResourcePath path, MCRHints hints);
 
     /**
      * Resolves a {@link MCRResourcePath}, returning all alternatives (i.e. because one module
      * overrides a resource that is also provided by another module). Intended for introspective purposes only.
      */
-    default List<ProvidedUrl> provideAll(MCRResourcePath path, MCRHints hints) {
-        return provideAll(path, hints, new MCRNoOpResourceTracer());
-    }
-
-    /**
-     * Resolves a {@link MCRResourcePath}, returning all alternatives (i.e. because one module
-     * overrides a resource that is also provided by another module). Intended for introspective purposes only.
-     */
-    List<ProvidedUrl> provideAll(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer);
+    List<ProvidedUrl> provideAll(MCRResourcePath path, MCRHints hints);
 
     /**
      * Returns a stream of {@link PrefixStripper} using the given hints, each of which can remove multiple prefixes
@@ -91,9 +72,16 @@ public interface MCRResourceProvider {
      */
     MCRTreeMessage compileDescription(Level level);
 
-    String coverage();
+    final class ProvidedUrl {
 
-    record ProvidedUrl(URL url, String origin) {
+        public final URL url;
+
+        public final String origin;
+
+        public ProvidedUrl(URL url, String origin) {
+            this.url = url;
+            this.origin = origin;
+        }
 
         @Override
         public String toString() {
@@ -123,24 +111,24 @@ public interface MCRResourceProvider {
 
     }
 
-    class PrefixPrefixStripper extends PrefixStripperBase {
+    final class BaseDirPrefixStripper extends PrefixStripperBase {
 
         private final String prefix;
 
-        public PrefixPrefixStripper(String prefix) {
-            this.prefix = Objects.requireNonNull(prefix, "Prefix must not be null");
+        public BaseDirPrefixStripper(File baseDir) {
+            this.prefix = Objects.requireNonNull(baseDir).toURI().toString();
         }
 
         @Override
-        public final List<String> getStrippedPaths(String value) {
+        public List<String> getStrippedPaths(String value) {
             if (value.startsWith(prefix)) {
                 return List.of(value.substring(prefix.length()));
             }
-            return List.of();
+            return Collections.emptyList();
         }
 
         @Override
-        public final String toString() {
+        public String toString() {
             return prefix;
         }
 
@@ -160,7 +148,7 @@ public interface MCRResourceProvider {
         private final ClassLoader classLoader;
 
         public ClassLoaderPrefixStripper(ClassLoader classLoader) {
-            this.classLoader = Objects.requireNonNull(classLoader, "Class loader must not be null");
+            this.classLoader = Objects.requireNonNull(classLoader);
         }
 
         @Override
@@ -172,9 +160,9 @@ public interface MCRResourceProvider {
                 List<URI> classpath = scanResult.getClasspathURIs();
                 for (URI uri : classpath) {
                     if (uri.getScheme().equals("file")) {
-                        Path path = Path.of(uri.getPath());
-                        if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
-                            String prefix = MCRResourceUtils.toFileUrl(path).toString();
+                        File file = new File(uri.getPath());
+                        if (file.isDirectory()) {
+                            String prefix = file.toURI().toString();
                             if (value.startsWith(prefix)) {
                                 potentialPaths.add(value.substring(prefix.length()));
                             }
@@ -207,7 +195,7 @@ public interface MCRResourceProvider {
                     return List.of(value.substring(index + 1));
                 }
             }
-            return List.of();
+            return Collections.emptyList();
         }
 
         @Override

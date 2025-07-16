@@ -18,7 +18,8 @@
 
 package org.mycore.wcms2;
 
-import java.nio.file.Path;
+import java.io.File;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -26,21 +27,20 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.resource.provider.MCRFileSystemResourceProvider;
 import org.mycore.resource.provider.MCRResourceProvider;
-import org.mycore.resource.provider.MCRResourceProviderBase;
 import org.mycore.resource.provider.MCRResourceProviderMode;
 
 /**
- * A {@link MCRWCMSWebResourceProvider} is a {@link MCRResourceProvider} that looks up web resources
+ * {@link MCRWCMSWebResourceProvider} is an implementation of {@link MCRResourceProvider} that looks up web resources
  * in the file system. It uses the directory configured in as {@link MCRWCMSUtil#getWCMSDataDir()} (which is the
  * directory that the WCMS writes into) as a base directory for the lookup.
  * <p>
- * <em>This provider replaces the previously used <code>MCRWebPagesSynchronizer</code> that copied the content
- * of the above-mentioned directory in the webapp directory used by the web container.</em>
+ * This provider replaces the previously used <code>MCRWebPagesSynchronizer</code> that copied the content
+ * of the above-mentioned directory in the webapp directory used by the web container.
  * <p>
- * The following configuration options are available:
+ * The following configuration options are available, if configured automatically:
  * <ul>
- * <li> The property suffix {@link MCRResourceProviderBase#COVERAGE_KEY} can be used to
- * provide a short description of the providers purpose; used in log messages.
+ * <li> The property suffix {@link MCRWCMSWebResourceProvider#COVERAGE_KEY} can be used to provide short
+ * description for human beings in order to better understand the providers use case.
  * </ul>
  * Example:
  * <pre>
@@ -49,14 +49,16 @@ import org.mycore.resource.provider.MCRResourceProviderMode;
  * </pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRWCMSWebResourceProvider.Factory.class)
-public final class MCRWCMSWebResourceProvider extends MCRFileSystemResourceProvider {
+public class MCRWCMSWebResourceProvider extends MCRFileSystemResourceProvider {
+
+    public static final String COVERAGE_KEY = "Coverage";
 
     public MCRWCMSWebResourceProvider(String coverage) {
         super(coverage, MCRResourceProviderMode.WEB_RESOURCES, getBaseDirs());
     }
 
-    private static List<Path> getBaseDirs() {
-        return List.of(MCRWCMSUtil.getWCMSDataDir().toPath());
+    private static List<File> getBaseDirs() {
+        return Collections.singletonList(MCRWCMSUtil.getWCMSDataDir());
     }
 
     @Override

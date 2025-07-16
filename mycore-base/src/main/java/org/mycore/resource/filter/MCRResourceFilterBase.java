@@ -19,32 +19,46 @@
 package org.mycore.resource.filter;
 
 import java.net.URL;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
-import org.mycore.resource.common.MCRResourceTracer;
 
 /**
  * {@link MCRResourceFilterBase} is a base implementation of {@link MCRResourceFilter} that
  * facilitates consistent logging. Implementors must provide the actual filtering strategy
- * ({@link MCRResourceFilterBase#doFilter(Stream, MCRHints, MCRResourceTracer)}).
+ * ({@link MCRResourceFilterBase#doFilter(Stream, MCRHints)}).
  */
 public abstract class MCRResourceFilterBase implements MCRResourceFilter {
 
+    protected final Logger logger = LogManager.getLogger(getClass());
+
     @Override
-    public Stream<URL> filter(Stream<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
-        return tracer.traceStream(hints, doFilter(resourceUrls, hints, tracer), (appender, filteredResourceUrls) -> {
-            if (!filteredResourceUrls.isEmpty()) {
-                filteredResourceUrls.forEach(url -> appender.append("Keeping resource URL " + url));
-            } else {
-                appender.append("Keeping no resource URL");
-            }
-        });
+    public Stream<URL> filter(Stream<URL> resourceUrls, MCRHints hints) {
+        logger.debug("Filtering resource URLs");
+        Stream<URL> filteredResourceUrls = doFilter(resourceUrls, hints);
+        if (logger.isDebugEnabled()) {
+            filteredResourceUrls = logResourceUrls(filteredResourceUrls);
+        }
+        return filteredResourceUrls;
     }
 
-    protected abstract Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer);
+    private Stream<URL> logResourceUrls(Stream<URL> resourceUrls) {
+        return logResourceUrls(resourceUrls.toList()).stream();
+    }
+
+    private List<URL> logResourceUrls(List<URL> resourceUrls) {
+        for (URL resourceUrl : resourceUrls) {
+            logger.debug("Keeping resource URL {}", resourceUrl);
+        }
+        return resourceUrls;
+    }
+
+    protected abstract Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints);
 
     @Override
     public MCRTreeMessage compileDescription(Level level) {

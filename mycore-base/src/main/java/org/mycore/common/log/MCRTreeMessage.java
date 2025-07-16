@@ -45,16 +45,12 @@ public final class MCRTreeMessage {
 
     private final List<Entry> entries = new LinkedList<>();
 
-    public void add(String line) {
-        entries.add(new LineEntry(line));
-    }
-
     public void add(String key, String value) {
         entries.add(new LineEntry(key, value));
     }
 
-    public void add(String key, MCRTreeMessage message) {
-        entries.add(new NestedEntry(key, message));
+    public void add(String key, MCRTreeMessage description) {
+        entries.add(new NestedEntry(key, description));
     }
 
     public String logMessage(String introduction) {
@@ -119,19 +115,18 @@ public final class MCRTreeMessage {
 
     private static final class LineEntry extends Entry {
 
-        private final String line;
+        private final String key;
 
-        private LineEntry(String line) {
-            this.line = Objects.requireNonNull(line);
-        }
+        private final String value;
 
         private LineEntry(String key, String value) {
-            this(Objects.requireNonNull(key) + ": " + Objects.requireNonNull(value));
+            this.key = Objects.requireNonNull(key);
+            this.value = Objects.requireNonNull(value);
         }
 
         @Override
         public void treeLines(List<Indent> prefix, List<String> lines) {
-            lines.add(prefixString(prefix) + line);
+            lines.add(prefixString(prefix) + key + ": " + value);
         }
 
     }

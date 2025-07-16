@@ -18,54 +18,53 @@
 
 package org.mycore.resource.filter;
 
-import java.nio.file.Path;
+import java.io.File;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.hint.MCRHints;
-import org.mycore.resource.common.MCRResourceUtils;
-import org.mycore.resource.common.MCRResourceTracer;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 
 /**
- * {@link MCRWebappClassesDirResourceFilter} is a {@link MCRResourceFilter} that checks if a resource candidate
- * is a resource from the <code>/WEB-INF/classes</code> directory inside the webapp directory.
- * To decide weather such resources are retained or ignored, a {@link MCRResourceFilterMode} value is used.
+ * {@link MCRWebappClassesDirResourceFilter} is an implementation of {@link MCRResourceFilter} that checks if a resource
+ * candidate is a resource from the <code>/WEB-INF/classes</code> directory inside the webapp directory. To decide
+ * weather such resources are retained or ignored, a {@link MCRResourceFilterMode} value is used.
  * <p>
- * <em>Unless placed there manually, such resources originate from the <code>/WEB-INF/classes</code> directory inside
- * the WAR file. In a usual build, such resources originate from the <code>/src/main/resources</code> directory inside
- * the Maven project that creates the WAR file.</em>
+ * Unless placed there manually, such resources originate from the <code>/WEB-INF/classes</code> directory inside the
+ * WAR file. In a usual build, such resources originate from the <code>/src/main/resources</code> directory inside the
+ * Maven project that creates the WAR file.
  * <p>
  * It uses the webapp directory hinted at by {@link MCRResourceHintKeys#WEBAPP_DIR}, if present.
  * <p>
- * The following configuration options are available:
+ * The following configuration options are available, if configured automatically:
  * <ul>
- * <li> The property suffix {@link MCRUrlPrefixResourceFilterBase#MODE_KEY} can be used to
- * specify the mode to be used.
+ * <li> The mode is configured using the property suffix {@link MCRWebappClassesDirResourceFilter#MODE_KEY}.
  * </ul>
  * Example:
- * <pre><code>
+ * <pre>
  * [...].Class=org.mycore.resource.filter.MCRWebappClassesDirResourceFilter
  * [...].Mode=MUST_MATCH
- * </code></pre>
+ * </pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRWebappClassesDirResourceFilter.Factory.class)
-public final class MCRWebappClassesDirResourceFilter extends MCRUrlPrefixResourceFilterBase {
+public class MCRWebappClassesDirResourceFilter extends MCRUrlPrefixResourceFilterBase {
+
+    public static final String MODE_KEY = "Mode";
 
     public MCRWebappClassesDirResourceFilter(MCRResourceFilterMode mode) {
         super(mode);
     }
 
     @Override
-    protected Optional<String> getPrefix(MCRHints hints, MCRResourceTracer tracer) {
-        return hints.get(MCRResourceHintKeys.WEBAPP_DIR).map(webappDir -> getPrefix(webappDir, tracer));
+    protected Optional<String> getPrefix(MCRHints hints) {
+        return hints.get(MCRResourceHintKeys.WEBAPP_DIR).map(this::getPrefix);
     }
 
-    private String getPrefix(Path webappDir, MCRResourceTracer tracer) {
-        String prefix = MCRResourceUtils.toFileUrl(webappDir) + "WEB-INF/classes/";
-        tracer.trace(() -> "Looking for webapp resource prefix: " + prefix);
+    private String getPrefix(File webappDir) {
+        String prefix = webappDir.toURI() + "WEB-INF/classes/";
+        logger.debug("Working with webapp resource prefix: {}", prefix);
         return prefix;
     }
 

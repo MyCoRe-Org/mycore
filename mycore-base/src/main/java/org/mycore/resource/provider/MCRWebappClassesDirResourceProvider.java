@@ -26,39 +26,41 @@ import org.mycore.resource.filter.MCRResourceFilterMode;
 import org.mycore.resource.filter.MCRWebappClassesDirResourceFilter;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 import org.mycore.resource.locator.MCRClassLoaderResourceLocator;
-import org.mycore.resource.selector.MCRNoOpResourceSelector;
+import org.mycore.resource.selector.MCRCombinedResourceSelector;
 
 /**
- * A {@link MCRWebappClassesDirResourceProvider} is a {@link MCRResourceProvider} that looks up resources
- * in the <code>/WEB-INF/classes</code> directory inside the webapp directory used by the web container
- * as the base directory for the lookup.
+ * {@link MCRWebappClassesDirResourceProvider} is an implementation of {@link MCRResourceProvider} that looks up
+ * resources in the <code>/WEB-INF/classes</code> directory inside the webapp directory used by the web container as
+ * the base directory for the lookup.
  * <p>
- * <em>Unless placed there manually, such resources originate from the <code>/WEB-INF/classes</code> directory inside
+ * Unless placed there manually, such resources originate from the <code>/WEB-INF/classes</code> directory inside
  * the WAR file. In a usual build, such resources originate from the <code>/src/main/resources</code> directory inside
- * the Maven project that creates the WAR file.</em>
+ * the Maven project that creates the WAR file.
  * <p>
  * It uses the webapp directory hinted at by {@link MCRResourceHintKeys#WEBAPP_DIR}, if present
  * <p>
- * The following configuration options are available:
+ * The following configuration options are available, if configured automatically:
  * <ul>
- * <li> The property suffix {@link MCRResourceProviderBase#COVERAGE_KEY} can be used to
- * provide a short description of the providers purpose; used in log messages.
+ * <li> The property suffix {@link MCRWebappClassesDirResourceProvider#COVERAGE_KEY} can be used to provide short
+ * description for human beings in order to better understand the providers use case.
  * </ul>
  * Example:
- * <pre><code>
+ * <pre>
  * [...].Class=org.mycore.resource.provider.MCRWebappClassesDirResourceProvider
  * [...].Coverage=Lorem ipsum dolor sit amet
- * </code></pre>
+ * </pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRWebappClassesDirResourceProvider.Factory.class)
 public final class MCRWebappClassesDirResourceProvider extends MCRLFSResourceProvider {
+
+    public static final String COVERAGE_KEY = "Coverage";
 
     public MCRWebappClassesDirResourceProvider(String coverage) {
         super(
             coverage,
             new MCRClassLoaderResourceLocator(),
             new MCRWebappClassesDirResourceFilter(MCRResourceFilterMode.MUST_MATCH),
-            new MCRNoOpResourceSelector());
+            new MCRCombinedResourceSelector());
     }
 
     @Override

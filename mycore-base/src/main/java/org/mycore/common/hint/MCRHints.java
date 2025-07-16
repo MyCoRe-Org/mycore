@@ -45,17 +45,10 @@ import org.mycore.resource.provider.MCRResourceProvider;
  */
 public interface MCRHints {
 
-    MCRHints EMPTY = new MCRHintsBuilder().build();
-
     /**
      * Returns the value for the given {@link MCRHintKey} as an {@link Optional}.
      */
     <T> Optional<T> get(MCRHintKey<T> hintKey);
-
-    /**
-     * Returns the value for the given {@link MCRHintKey} or the given fallback.
-     */
-    <T> T getOrElse(MCRHintKey<T> hintKey, T fallback);
 
     /**
      * Returns a {@link MCRHintsBuilder} that contains all entries stored in this {@link MCRHints}.

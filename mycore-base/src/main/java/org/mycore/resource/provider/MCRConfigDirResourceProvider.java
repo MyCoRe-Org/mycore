@@ -18,7 +18,7 @@
 
 package org.mycore.resource.provider;
 
-import java.nio.file.Path;
+import java.io.File;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -28,37 +28,39 @@ import org.mycore.common.hint.MCRHints;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 
 /**
- * A {@link MCRConfigDirResourceProvider} is a {@link MCRResourceProvider} that looks up resources
- * in the file system. It uses the <code>/resources</code> directory in the config directory
- * as a base directory for the lookup.
+ * {@link MCRConfigDirResourceProvider} is an implementation of {@link MCRResourceProvider} that searches resources
+ * in the file system. It uses the <code>/resources</code> directory in the config directory as a base directory
+ * for the lookup.
  * <p>
  * It uses the config directory hinted at by {@link MCRResourceHintKeys#CONFIG_DIR}, if present.
  * <p>
- * The following configuration options are available:
+ * The following configuration options are available, if configured automatically:
  * <ul>
- * <li> The property suffix {@link MCRResourceProviderBase#COVERAGE_KEY} can be used to
- * provide a short description of the providers purpose; used in log messages.
+ * <li> The property suffix {@link MCRConfigDirResourceProvider#COVERAGE_KEY} can be used to provide short
+ * description for human beings in order to better understand the providers use case.
  * </ul>
  * Example:
- * <pre><code>
+ * <pre>
  * [...].Class=org.mycore.resource.provider.MCRConfigDirResourceProvider
  * [...].Coverage=Lorem ipsum dolor sit amet
- * </code></pre>
+ * </pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRConfigDirResourceProvider.Factory.class)
-public final class MCRConfigDirResourceProvider extends MCRFileSystemResourceProviderBase {
+public class MCRConfigDirResourceProvider extends MCRFileSystemResourceProviderBase {
+
+    public static final String COVERAGE_KEY = "Coverage";
 
     public MCRConfigDirResourceProvider(String coverage) {
         super(coverage, MCRResourceProviderMode.RESOURCES);
     }
 
     @Override
-    protected Stream<Path> getBaseDirs(MCRHints hints) {
+    protected final Stream<File> getBaseDirs(MCRHints hints) {
         return hints.get(MCRResourceHintKeys.CONFIG_DIR).map(this::getResourcesDir).stream();
     }
 
-    private Path getResourcesDir(Path configDir) {
-        return configDir.resolve("resources");
+    private File getResourcesDir(File configDir) {
+        return new File(configDir, "resources");
     }
 
     @Override

@@ -18,35 +18,64 @@
 
 package org.mycore.resource.provider;
 
+import java.net.URL;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.hint.MCRHints;
+import org.mycore.resource.MCRResourcePath;
 import org.mycore.resource.hint.MCRResourceHintKeys;
-import org.mycore.resource.locator.MCRClassLoaderResourceLocator;
 
 /**
- * A {@link MCRClassLoaderResourceProvider} is a {@link MCRResourceProvider} that uses
+ * {@link MCRClassLoaderResourceProvider} is an implementation of {@link MCRResourceProvider} hat uses
  * {@link ClassLoader#getResource(String)} to look up a resource.
  * <p>
  * It uses the {@link ClassLoader} hinted at by {@link MCRResourceHintKeys#CLASS_LOADER}, if present.
  * <p>
- * The following configuration options are available:
+ * The following configuration options are available, if configured automatically:
  * <ul>
- * <li> The property suffix {@link MCRResourceProviderBase#COVERAGE_KEY} can be used to
- * provide a short description of the providers purpose; used in log messages.
+ * <li> The property suffix {@link MCRClassLoaderResourceProvider#COVERAGE_KEY} can be used to provide short
+ * description for human beings in order to better understand the providers use case.
  * </ul>
  * Example:
- * <pre><code>
+ * <pre>
  * [...].Class=org.mycore.resource.provider.MCRClassLoaderResourceProvider
  * [...].Coverage=Lorem ipsum dolor sit amet
- * </code></pre>
+ * </pre>
  */
+@SuppressWarnings("PMD.MCR.ResourceResolver")
 @MCRConfigurationProxy(proxyClass = MCRClassLoaderResourceProvider.Factory.class)
-public final class MCRClassLoaderResourceProvider extends MCRLocatorResourceProvider {
+public class MCRClassLoaderResourceProvider extends MCRResourceProviderBase {
+
+    public static final String COVERAGE_KEY = "Coverage";
 
     public MCRClassLoaderResourceProvider(String coverage) {
-        super(coverage, new MCRClassLoaderResourceLocator());
+        super(coverage);
+    }
+
+    @Override
+    protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints) {
+        return getClassloader(hints).map(classLoader -> classLoader.getResource(path.asRelativePath()));
+    }
+
+    @Override
+    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints) {
+        return doProvide(path, hints).stream().map(this::providedURL).toList();
+    }
+
+    private Optional<ClassLoader> getClassloader(MCRHints hints) {
+        return hints.get(MCRResourceHintKeys.CLASS_LOADER);
+    }
+
+    @Override
+    public Stream<PrefixStripper> prefixStrippers(MCRHints hints) {
+        return Stream.concat(
+            Stream.of(JarUrlPrefixStripper.INSTANCE),
+            hints.get(MCRResourceHintKeys.CLASS_LOADER).map(ClassLoaderPrefixStripper::new).stream());
     }
 
     public static class Factory implements Supplier<MCRClassLoaderResourceProvider> {

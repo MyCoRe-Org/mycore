@@ -268,7 +268,7 @@ public class MCRDeveloperCommands {
             if (urls.isEmpty()) {
                 LOGGER.info("Resource {} not found", path);
             } else {
-                urls.forEach(url -> LOGGER.info("Resolved resource {} as {} [{}]", path, url.url(), url.origin()));
+                urls.forEach(url -> LOGGER.info("Resolved resource {} as {} [{}]", path, url.url, url.origin));
             }
         } catch (Exception e) {
             LOGGER.info(() -> "Failed to resolve resource " + path, e);

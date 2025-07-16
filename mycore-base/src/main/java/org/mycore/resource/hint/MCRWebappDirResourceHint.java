@@ -18,23 +18,23 @@
 
 package org.mycore.resource.hint;
 
-import java.nio.file.Path;
+import java.io.File;
 import java.util.Optional;
 
 import org.mycore.common.events.MCRServletContextHolder;
 import org.mycore.common.hint.MCRHint;
 import org.mycore.common.hint.MCRHintKey;
 
-public final class MCRWebappDirResourceHint implements MCRHint<Path> {
+public final class MCRWebappDirResourceHint implements MCRHint<File> {
 
     @Override
-    public MCRHintKey<Path> key() {
+    public MCRHintKey<File> key() {
         return MCRResourceHintKeys.WEBAPP_DIR;
     }
 
     @Override
-    public Optional<Path> value() {
-        return MCRServletContextHolder.getInstance().get().map(context -> context.getRealPath("/")).map(Path::of);
+    public Optional<File> value() {
+        return MCRServletContextHolder.getInstance().get().map(context -> context.getRealPath("/")).map(File::new);
     }
 
 }
