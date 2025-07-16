@@ -22,52 +22,46 @@ import java.net.URL;
 import java.util.List;
 
 import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
+import org.mycore.resource.common.MCRResourceTracer;
 
 /**
  * {@link MCRResourceSelectorBase} is a base implementation of {@link MCRResourceSelector} that
  * facilitates consistent logging. Implementors must provide the actual selection strategy
- * ({@link MCRResourceSelectorBase#doSelect(List, MCRHints)}).
+ * ({@link MCRResourceSelectorBase#doSelect(List, MCRHints, MCRResourceTracer)}).
  */
 public abstract class MCRResourceSelectorBase implements MCRResourceSelector {
 
-    protected final Logger logger = LogManager.getLogger(getClass());
-
     @Override
-    public List<URL> select(List<URL> resourceUrls, MCRHints hints) {
-        logger.debug("Selecting resource URLs");
-        List<URL> selectedResourceUrls = doSelect(resourceUrls, hints);
+    public List<URL> select(List<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
+        return tracer.trace(hints, doSelectOrRestore(resourceUrls, hints, tracer), (appender, selectedResourceUrls) -> {
+            selectedResourceUrls.forEach(url -> appender.append("Selecting resource URL " + url));
+        });
+    }
+
+    private List<URL> doSelectOrRestore(List<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
+        List<URL> selectedResourceUrls = doSelect(resourceUrls, hints, tracer);
         if (selectedResourceUrls.isEmpty()) {
             selectedResourceUrls = resourceUrls;
         }
-        if (logger.isDebugEnabled()) {
-            logResourceUrls(selectedResourceUrls);
-        }
         return selectedResourceUrls;
-    }
-
-    private void logResourceUrls(List<URL> resourceUrls) {
-        for (URL resourceUrl : resourceUrls) {
-            logger.debug("Selected resource URL {}", resourceUrl);
-        }
     }
 
     /**
      * Selects prioritized resources from the result of the <em>filter</em>-phase, dropping unprioritized
      * resources. Returns a subset of the given resources.
      * <p>
-     * This method has slightly different semantics compared to {@link MCRResourceSelector#select(List, MCRHints)}.
-     * That method requires to return a non-empty subset of the given resources. If no prioritization can be made,
-     * the whole set of resources must be returned.
+     * This method has slightly different semantics compared to
+     * {@link MCRResourceSelector#select(List, MCRHints, MCRResourceTracer)}. That method requires to return a
+     * non-empty subset of the given resources. If no prioritization can be made, the whole set of resources must
+     * be returned.
      * <p>
      * This method, however, allows an empty list to be returned instead, to signal that no prioritization could
      * be made. This allows simple filter-style implementations, where filtering out all resources means that no
      * prioritized resource could be found.
      */
-    protected abstract List<URL> doSelect(List<URL> resourceUrls, MCRHints hints);
+    protected abstract List<URL> doSelect(List<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer);
 
     @Override
     public MCRTreeMessage compileDescription(Level level) {

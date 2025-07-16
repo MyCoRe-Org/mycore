@@ -33,6 +33,7 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRResourceTracer;
 
 /**
  * A {@link MCRCachingResourceProvider} is a {@link MCRResourceProvider} that delegates to another
@@ -82,21 +83,21 @@ public class MCRCachingResourceProvider extends MCRResourceProviderBase {
 
     @Override
     @SuppressWarnings("OptionalAssignedToNull")
-    protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints) {
+    protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
         Optional<URL> resourceUrl = cache.get(path);
         if (resourceUrl == null) {
-            logger.debug("Cache miss for {}", path);
-            resourceUrl = provider.provide(path, hints);
+            tracer.trace(() -> "Cache miss for " + path);
+            resourceUrl = provider.provide(path, hints, tracer.update(provider, provider.coverage()));
             cache.put(path, resourceUrl);
         } else {
-            logger.debug("Cache hit for {}", path);
+            tracer.trace(() -> "Cache hit for " + path);
         }
         return resourceUrl;
     }
 
     @Override
-    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints) {
-        return provider.provideAll(path, hints);
+    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
+        return provider.provideAll(path, hints, tracer.update(provider, provider.coverage()));
     }
 
     @Override

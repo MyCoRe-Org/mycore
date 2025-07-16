@@ -31,6 +31,7 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceList;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
+import org.mycore.resource.common.MCRResourceTracer;
 
 /**
  * A {@link MCRCombinedResourceFilter} is a {@link MCRResourceFilter} that delegates to multiple
@@ -69,10 +70,10 @@ public class MCRCombinedResourceFilter extends MCRResourceFilterBase {
     }
 
     @Override
-    protected Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints) {
+    protected Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
         Stream<URL> filteredResourceUrls = resourceUrls;
         for (MCRResourceFilter filter : filters) {
-            filteredResourceUrls = filter.filter(filteredResourceUrls, hints);
+            filteredResourceUrls = filter.filter(filteredResourceUrls, hints, tracer.update(filter));
         }
         return filteredResourceUrls;
     }

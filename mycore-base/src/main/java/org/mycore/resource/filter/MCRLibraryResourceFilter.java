@@ -24,6 +24,7 @@ import java.util.function.Supplier;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.hint.MCRHints;
+import org.mycore.resource.common.MCRResourceTracer;
 
 /**
  * A {@link MCRLibraryResourceFilter} is a {@link MCRResourceFilter} that checks if a resource candidate
@@ -49,8 +50,10 @@ public final class MCRLibraryResourceFilter extends MCRUrlPrefixResourceFilterBa
     }
 
     @Override
-    protected Optional<String> getPrefix(MCRHints hints) {
-        return Optional.of("jar:");
+    protected Optional<String> getPrefix(MCRHints hints, MCRResourceTracer tracer) {
+        String prefix = "jar:";
+        tracer.trace(() -> "Looking for library prefix: " + prefix);
+        return Optional.of(prefix);
     }
 
     public static class Factory implements Supplier<MCRLibraryResourceFilter> {

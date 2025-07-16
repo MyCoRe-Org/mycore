@@ -30,6 +30,7 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceList;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
+import org.mycore.resource.common.MCRResourceTracer;
 
 /**
  * A {@link MCRCombinedResourceSelector} is a {@link MCRResourceSelector} that delegates to multiple
@@ -68,12 +69,15 @@ public class MCRCombinedResourceSelector extends MCRResourceSelectorBase {
     }
 
     @Override
-    protected List<URL> doSelect(List<URL> resourceUrls, MCRHints hints) {
+    protected List<URL> doSelect(List<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
         List<URL> selectedResourceUrls = resourceUrls;
         for (MCRResourceSelector selector : selectors) {
             if (selectedResourceUrls.size() > 1) {
-                selectedResourceUrls = selector.select(selectedResourceUrls, hints);
+                selectedResourceUrls = selector.select(selectedResourceUrls, hints, tracer.update(selector));
             } else {
+                List<URL> urls = selectedResourceUrls;
+                tracer.trace(() -> "Got " + (urls.isEmpty() ? "no" : "one")
+                    + " resource URL, no need for further selectors");
                 break;
             }
         }

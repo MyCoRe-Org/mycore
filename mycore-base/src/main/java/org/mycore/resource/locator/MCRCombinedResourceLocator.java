@@ -31,6 +31,7 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceList;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRResourceTracer;
 import org.mycore.resource.provider.MCRResourceProvider.PrefixStripper;
 
 /**
@@ -71,10 +72,10 @@ public class MCRCombinedResourceLocator extends MCRResourceLocatorBase {
     }
 
     @Override
-    protected Stream<URL> doLocate(MCRResourcePath path, MCRHints hints) {
+    protected Stream<URL> doLocate(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
         Stream<URL> resourceUrls = Stream.empty();
         for (MCRResourceLocator locator : locators) {
-            resourceUrls = Stream.concat(locator.locate(path, hints), resourceUrls);
+            resourceUrls = Stream.concat(locator.locate(path, hints, tracer.update(locator)), resourceUrls);
         }
         return resourceUrls;
     }

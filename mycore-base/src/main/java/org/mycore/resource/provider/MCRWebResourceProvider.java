@@ -33,6 +33,7 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRResourceTracer;
 
 /**
  * A {@link MCRWebResourceProvider} is a {@link MCRResourceProvider} that delegates to another
@@ -67,13 +68,21 @@ public class MCRWebResourceProvider extends MCRResourceProviderBase {
     }
 
     @Override
-    protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints) {
-        return path.isWebPath() ? provider.provide(path, hints) : Optional.empty();
+    protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
+        if (path.isWebPath()) {
+            return provider.provide(path, hints, tracer.update(provider, provider.coverage()));
+        } else {
+            return Optional.empty();
+        }
     }
 
     @Override
-    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints) {
-        return path.isWebPath() ? provider.provideAll(path, hints) : Collections.emptyList();
+    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
+        if (path.isWebPath()) {
+            return provider.provideAll(path, hints, tracer.update(provider, provider.coverage()));
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     @Override

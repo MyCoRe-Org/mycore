@@ -32,6 +32,7 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRResourceTracer;
 import org.mycore.resource.locator.MCRResourceLocator;
 
 /**
@@ -68,13 +69,13 @@ public class MCRLocatorResourceProvider extends MCRResourceProviderBase {
     }
 
     @Override
-    protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints) {
-        return locator.locate(path, hints).findFirst();
+    protected final Optional<URL> doProvide(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
+        return locator.locate(path, hints, tracer.update(locator)).findFirst();
     }
 
     @Override
-    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints) {
-        return locator.locate(path, hints).map(this::providedUrl).toList();
+    protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
+        return locator.locate(path, hints, tracer.update(locator)).map(this::providedUrl).toList();
     }
 
     @Override
