@@ -18,6 +18,8 @@
 
 package org.mycore.solr.index.handlers;
 
+import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -38,8 +40,6 @@ import org.mycore.solr.index.file.MCRSolrPathDocumentFactory;
 import org.mycore.solr.index.handlers.document.MCRSolrInputDocumentHandler;
 import org.mycore.solr.index.handlers.stream.MCRSolrFileIndexHandler;
 import org.mycore.solr.index.strategy.MCRSolrIndexStrategyManager;
-
-import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -98,20 +98,28 @@ public abstract class MCRSolrIndexHandlerFactory {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Solr: submitting file \"{} for indexing", file);
         }
-        MCRSolrIndexHandler indexHandler;
         long start = System.currentTimeMillis();
-        if (sendContent) {
-            /* extract metadata with tika */
-            indexHandler = new MCRSolrFileIndexHandler(file, attrs);
-        } else {
-            indexHandler = new MCRSolrInputDocumentHandler(
-                () -> MCRSolrPathDocumentFactory.obtainInstance().getDocument(file, attrs), file.toString(),
-                MCRSolrCoreType.MAIN);
-            indexHandler.setCoreType(MCRSolrCoreType.MAIN);
-        }
+        MCRSolrIndexHandler indexHandler = createFileIndexHandler(file, attrs, sendContent);
         long end = System.currentTimeMillis();
         indexHandler.getStatistic().addTime(end - start);
         return indexHandler;
+    }
+
+    private MCRSolrIndexHandler createFileIndexHandler(Path file, BasicFileAttributes attrs, boolean sendContent) {
+        if (sendContent) {
+            /* extract metadata with tika */
+            MCRSolrFileIndexHandler fih = MCRConfiguration2.getInstanceOf(MCRSolrFileIndexHandler.class,
+                SOLR_CONFIG_PREFIX + "IndexHandler.FileIndexHandler").orElseThrow();
+            fih.init(file, attrs);
+            return fih;
+        } else {
+            MCRSolrIndexHandler indexHandler = new MCRSolrInputDocumentHandler(
+                () -> MCRSolrPathDocumentFactory.obtainInstance().getDocument(file, attrs), file.toString(),
+                MCRSolrCoreType.MAIN);
+            indexHandler.setCoreType(MCRSolrCoreType.MAIN);
+            return indexHandler;
+        }
+
     }
 
 }
