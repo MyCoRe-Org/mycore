@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.mycore.solr.index.handlers.stream;
 
 import java.nio.file.Path;
@@ -23,5 +24,5 @@ import java.nio.file.attribute.BasicFileAttributes;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 
 public interface MCRSolrFileIndexHandler extends MCRSolrIndexHandler {
-    public void init(Path file, BasicFileAttributes attrs);
+    void init(Path file, BasicFileAttributes attrs);
 }
