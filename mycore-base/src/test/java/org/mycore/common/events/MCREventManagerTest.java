@@ -16,16 +16,16 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common.events.test;
+package org.mycore.common.events;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.util.Map;
 
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.events.MCREventManager;
 
 public class MCREventManagerTest extends MCRTestCase {
     static String defaultProperties;
@@ -52,7 +52,7 @@ public class MCREventManagerTest extends MCRTestCase {
     @Test
     public void instance() {
         try {
-            MCREventManager.getInstance();
+            assertNull("Instance should be null before initialization", MCREventManager.obtainTestInstance());
         } catch (MCRConfigurationException e) {
             assertEquals("Configuration property MCR.EventHandler.Mode.Foo is not set.", e.getMessage());
         }

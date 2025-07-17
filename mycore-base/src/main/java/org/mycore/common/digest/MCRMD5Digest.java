@@ -23,6 +23,10 @@ package org.mycore.common.digest;
  */
 public final class MCRMD5Digest extends MCRDigest {
 
+    public static final String ALGORITHM_NAME = "MD5";
+
+    public static final String ALGORITHM_NAME_NORMALIZED = "md5";
+
     public static final MD5Algorithm ALGORITHM;
 
     static {
@@ -54,7 +58,12 @@ public final class MCRMD5Digest extends MCRDigest {
     public static class MD5Algorithm extends Algorithm {
 
         public MD5Algorithm() {
-            super("md5");
+            super(ALGORITHM_NAME);
+        }
+
+        @Override
+        public String normalize() {
+            return ALGORITHM_NAME_NORMALIZED;
         }
 
     }

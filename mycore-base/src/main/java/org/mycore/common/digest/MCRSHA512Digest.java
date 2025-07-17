@@ -23,6 +23,10 @@ package org.mycore.common.digest;
  */
 public final class MCRSHA512Digest extends MCRDigest {
 
+    public static final String ALGORITHM_NAME = "SHA-512";
+
+    public static final String ALGORITHM_NAME_NORMALIZED = "sha512";
+
     public static final SHA512Algorithm ALGORITHM;
 
     static {
@@ -47,9 +51,13 @@ public final class MCRSHA512Digest extends MCRDigest {
     public static class SHA512Algorithm extends Algorithm {
 
         public SHA512Algorithm() {
-            super("sha-512");
+            super(ALGORITHM_NAME);
         }
 
+        @Override
+        public String normalize() {
+            return ALGORITHM_NAME_NORMALIZED;
+        }
     }
 
 }
