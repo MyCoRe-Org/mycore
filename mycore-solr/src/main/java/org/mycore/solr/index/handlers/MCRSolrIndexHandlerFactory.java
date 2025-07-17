@@ -109,7 +109,7 @@ public abstract class MCRSolrIndexHandlerFactory {
         if (sendContent) {
             /* extract metadata with tika */
             MCRSolrFileIndexHandler fih = MCRConfiguration2.getInstanceOf(MCRSolrFileIndexHandler.class,
-                SOLR_CONFIG_PREFIX + "IndexHandler.FileIndexHandler").orElseThrow();
+                SOLR_CONFIG_PREFIX + "IndexHandler.FileIndexHandler.Class").orElseThrow();
             fih.init(file, attrs);
             return fih;
         } else {
