@@ -33,7 +33,7 @@ import jakarta.inject.Singleton;
  * @author Tobias Lenhardt [Hammer1279]
  */
 @Singleton
-public class MCROCFLMCRRepositoryProvider extends MCROCFLHashRepositoryProvider {
+public class MCROCFLMCRRepositoryProvider extends MCROCFLLocalRepositoryProvider {
 
     @Override
     @MCRPostConstruction
@@ -46,4 +46,5 @@ public class MCROCFLMCRRepositoryProvider extends MCROCFLHashRepositoryProvider 
     public OcflExtensionConfig getExtensionConfig() {
         return new MCRStorageLayoutConfig();
     }
+
 }
