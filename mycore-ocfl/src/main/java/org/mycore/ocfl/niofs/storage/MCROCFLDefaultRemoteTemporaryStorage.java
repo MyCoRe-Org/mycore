@@ -652,7 +652,7 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
             if (digest == null) {
                 return null;
             }
-            return digest.getAlgorithm().toLowerCase() + ":" + digest.toHexString();
+            return digest.getAlgorithm().normalize() + ":" + digest.toHexString();
         }
 
         /**
@@ -670,8 +670,8 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
             final String value = parts[1];
             try {
                 return switch (algorithm) {
-                    case MCRMD5Digest.ALGORITHM_NAME -> new MCRMD5Digest(value);
-                    case MCRSHA512Digest.ALGORITHM_NAME -> new MCRSHA512Digest(value);
+                    case MCRMD5Digest.ALGORITHM_NAME_NORMALIZED -> new MCRMD5Digest(value);
+                    case MCRSHA512Digest.ALGORITHM_NAME_NORMALIZED -> new MCRSHA512Digest(value);
                     default -> throw new IllegalArgumentException("Unsupported digest algorithm: " + algorithm);
                 };
             } catch (MCRDigestValidationException e) {
