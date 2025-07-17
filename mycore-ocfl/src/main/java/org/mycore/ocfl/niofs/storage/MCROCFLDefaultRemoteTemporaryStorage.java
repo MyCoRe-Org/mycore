@@ -276,7 +276,8 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
             throw new NoSuchFileException(digest + " is not cached.");
         }
         try {
-            return Files.newByteChannel(fileInfo.path, StandardOpenOption.READ);
+            Path path = toCachePath(fileInfo.digest);
+            return Files.newByteChannel(path, StandardOpenOption.READ);
         } finally {
             cacheTouch(digest);
         }
@@ -320,7 +321,8 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
         if (fileInfo == null) {
             throw new NoSuchFileException(sourceDigest + " is not cached.");
         }
-        Files.copy(fileInfo.path, target, options);
+        Path path = toCachePath(fileInfo.digest);
+        Files.copy(path, target, options);
         cacheTouch(sourceDigest);
     }
 
@@ -340,7 +342,7 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
                 return probedType;
             }
             // fallback: probe content type with physical path
-            return Files.probeContentType(fileInfo.path);
+            return Files.probeContentType(toCachePath(fileInfo.digest));
         } finally {
             cacheTouch(digest);
         }
@@ -411,8 +413,8 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
             boolean newFile = fileInfo == null;
             long size = Files.size(path);
             this.totalAllocation.addAndGet(newFile ? size : size - fileInfo.size);
-            this.cache.put(digest, new FileInfo(digest, path, size, originalFileName));
-            journal.append(new CacheEvent.Add(digest, root.relativize(path).toString(), size, originalFileName));
+            this.cache.put(digest, new FileInfo(digest, size, originalFileName));
+            journal.append(new CacheEvent.Add(digest, size, originalFileName));
         } catch (IOException ioException) {
             this.queue.remove(digest);
             throw ioException;
@@ -460,10 +462,11 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
             // remove from cache
             cacheRemove(digest);
             // remove from filesystem
+            Path path = toCachePath(fileInfo.digest);
             try {
-                Files.deleteIfExists(fileInfo.path);
+                Files.deleteIfExists(path);
             } catch (IOException ioException) {
-                LOGGER.error(() -> "Unable to remove " + fileInfo.path + " from remote cache.", ioException);
+                LOGGER.error(() -> "Unable to remove " + path + " from remote cache.", ioException);
             }
         }
     }
@@ -472,8 +475,7 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
         String digestStr = MCRDigestCodec.toString(event.digest());
         return switch (event) {
             case CacheEvent.Add add
-                -> String.join("|", JOURNAL_ADD, digestStr, add.relativePath(),
-                    String.valueOf(add.size()), add.originalFileName());
+                -> String.join("|", JOURNAL_ADD, digestStr, String.valueOf(add.size()), add.originalFileName());
             case CacheEvent.Remove ignored -> String.join("|", JOURNAL_REMOVE, digestStr);
             case CacheEvent.Touch ignored -> String.join("|", JOURNAL_TOUCH, digestStr);
         };
@@ -485,7 +487,7 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
             String command = parts[0];
             MCRDigest digest = MCRDigestCodec.fromString(parts[1]);
             return switch (command) {
-                case JOURNAL_ADD -> new CacheEvent.Add(digest, parts[2], Long.parseLong(parts[3]), parts[4]);
+                case JOURNAL_ADD -> new CacheEvent.Add(digest, Long.parseLong(parts[2]), parts[3]);
                 case JOURNAL_REMOVE -> new CacheEvent.Remove(digest);
                 case JOURNAL_TOUCH -> new CacheEvent.Touch(digest);
                 default -> throw new IllegalArgumentException("Unknown journal command: " + command);
@@ -499,8 +501,7 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
         switch (event) {
             case CacheEvent.Add add -> {
                 this.queue.remove(add.digest());
-                Path filePath = root.resolve(add.relativePath());
-                this.cache.put(add.digest(), new FileInfo(add.digest(), filePath, add.size(), add.originalFileName()));
+                this.cache.put(add.digest(), new FileInfo(add.digest(), add.size(), add.originalFileName()));
                 this.queue.offer(add.digest());
                 this.totalAllocation.addAndGet(add.size());
             }
@@ -538,9 +539,8 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
             for (MCRDigest digest : orderedDigests) {
                 FileInfo fileInfo = this.cache.get(digest);
                 if (fileInfo != null) {
-                    String relativePath = this.root.relativize(fileInfo.path()).toString();
                     snapshot.add(
-                        new CacheEvent.Add(digest, relativePath, fileInfo.size(), fileInfo.originalFileName()));
+                        new CacheEvent.Add(digest, fileInfo.size(), fileInfo.originalFileName()));
                 } else {
                     LOGGER.warn("Inconsistency detected during compaction: Digest {} is in the queue but not"
                         + " in the cache. Skipping.", digest);
@@ -596,11 +596,10 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
      * physical path on disk, and size in bytes.
      *
      * @param digest           The cryptographic digest that uniquely identifies the content.
-     * @param path             The absolute path to the file on the local filesystem.
      * @param size             The size of the file in bytes.
      * @param originalFileName The original file name.
      */
-    public record FileInfo(MCRDigest digest, Path path, Long size, String originalFileName) {
+    public record FileInfo(MCRDigest digest, Long size, String originalFileName) {
     }
 
     /**
@@ -615,11 +614,10 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
          * {@link FileInfo} on replay.
          *
          * @param digest           The digest of the added file.
-         * @param relativePath     The path of the file relative to the cache root.
          * @param size             The size of the file in bytes.
          * @param originalFileName The original file name.
          */
-        record Add(MCRDigest digest, String relativePath, long size, String originalFileName) implements CacheEvent {
+        record Add(MCRDigest digest, long size, String originalFileName) implements CacheEvent {
         }
 
         /**
