@@ -66,7 +66,7 @@ import org.mycore.ocfl.niofs.MCROCFLDigestCalculator;
  * <ul>
  *   <li><b>LRU Eviction:</b> Uses a pluggable {@link MCROCFLEvictionStrategy} to manage its size, with a
  *   Least Recently Used (LRU) policy managed by an internal queue.</li>
- *   <li><b>Journaling for Persistence:</b> All cache operations (add, remove, touch) are logged to a journal file.
+ *   <li><b>Journaling for Persistence:</b> All cache operations (add, remove) are logged to a journal file.
  *   This ensures that the cache state can be fully restored after an application restart, preventing the need to
  *   re-verify all cached files.</li>
  *   <li>
@@ -440,15 +440,13 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
     }
 
     /**
-     * "Touches" a cache entry by moving it to the end of the LRU queue and logging the event.
+     * "Touches" a cache entry by moving it to the end of the LRU queue.
      *
      * @param digest The digest of the entry to touch.
-     * @throws IOException If a journal write fails.
      */
-    private void cacheTouch(MCRDigest digest) throws IOException {
+    private void cacheTouch(MCRDigest digest) {
         this.queue.remove(digest);
         this.queue.offer(digest);
-        journal.append(new CacheEvent.Touch(digest));
     }
 
     /**
@@ -477,7 +475,6 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
             case CacheEvent.Add add
                 -> String.join("|", JOURNAL_ADD, digestStr, String.valueOf(add.size()), add.originalFileName());
             case CacheEvent.Remove ignored -> String.join("|", JOURNAL_REMOVE, digestStr);
-            case CacheEvent.Touch ignored -> String.join("|", JOURNAL_TOUCH, digestStr);
         };
     }
 
@@ -489,7 +486,6 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
             return switch (command) {
                 case JOURNAL_ADD -> new CacheEvent.Add(digest, Long.parseLong(parts[2]), parts[3]);
                 case JOURNAL_REMOVE -> new CacheEvent.Remove(digest);
-                case JOURNAL_TOUCH -> new CacheEvent.Touch(digest);
                 default -> throw new IllegalArgumentException("Unknown journal command: " + command);
             };
         } catch (Exception e) {
@@ -512,11 +508,6 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
                     this.totalAllocation.addAndGet(-info.size());
                 }
             }
-            case CacheEvent.Touch touch -> {
-                if (this.queue.remove(touch.digest())) {
-                    this.queue.offer(touch.digest());
-                }
-            }
         }
     }
 
@@ -526,13 +517,13 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
      * <p>
      * Compaction is useful to prevent the journal from growing indefinitely and to speed up
      * the cache recovery process on startup.
+     * <p>
+     * The snapshot is created from the queue to preserve the LRU order.
      *
      * @throws IOException if an I/O error occurs during compaction.
      */
     public synchronized void compactJournal() throws IOException {
         journal.compact(() -> {
-            // The snapshot must be created from the queue to preserve the LRU order.
-            // We create a new list to avoid concurrent modification issues while iterating.
             List<MCRDigest> orderedDigests = new ArrayList<>(this.queue);
             List<CacheEvent> snapshot = new ArrayList<>(orderedDigests.size());
 
@@ -559,6 +550,7 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
      */
     @Override
     public void close() throws IOException {
+        compactJournal();
         if (this.journal != null) {
             this.journal.close();
         }
@@ -628,13 +620,6 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
         record Remove(MCRDigest digest) implements CacheEvent {
         }
 
-        /**
-         * Represents a file being accessed ("touched"), which updates its position in the LRU queue.
-         *
-         * @param digest The digest of the accessed file.
-         */
-        record Touch(MCRDigest digest) implements CacheEvent {
-        }
     }
 
     /**

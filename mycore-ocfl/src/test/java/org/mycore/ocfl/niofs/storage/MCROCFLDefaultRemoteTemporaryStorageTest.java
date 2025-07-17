@@ -212,7 +212,7 @@ public class MCROCFLDefaultRemoteTemporaryStorageTest extends MCROCFLStorageTest
             new FileCountEvictionStrategy(2),
             MCROCFLFileSystemProvider.get().getDigestCalculator());
 
-        // 4. Verify existence of items first (this is a non-destructive check).
+        // 4. Verify the existence of items first (this is a non-destructive check).
         // The state should be perfectly recovered from the journal at this point.
         assertFalse(newStorage.exists(digest1), "After recovery, digest1 should still not exist.");
         assertTrue(newStorage.exists(digest2), "After recovery, digest2 should exist.");
