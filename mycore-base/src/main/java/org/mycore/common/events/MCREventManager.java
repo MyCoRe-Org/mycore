@@ -98,6 +98,13 @@ public final class MCREventManager {
         return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
+    /**
+     * Returns a new instance of the event manager for testing purposes.
+     */
+    static MCREventManager obtainTestInstance() {
+        return new MCREventManager();
+    }
+
     private boolean propKeyIsSet(String propertyKey) {
         return MCRConfiguration2.getString(propertyKey).isPresent();
     }
