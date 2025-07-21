@@ -399,13 +399,12 @@
   <!-- * Derivate Link * -->
   <!-- ******************************************************** -->
   <xsl:template name="derivateLink">
-    <xsl:param name="staticURL" />
-
     <xsl:for-each select="derivateLink">
-      <xsl:variable select="substring-before(@xlink:href, '/')" name="deriv" />
-      <xsl:variable name="derivateWithURN" select="mcrurn:hasURNDefined(@xlink:href)" />
+      <xsl:variable name="derivateId" select="substring-before(@xlink:href, '/')" />
+      <xsl:variable name="isDisplayedEnabled" select="mcrxsl:isDisplayedEnabledDerivate($derivateId)" />
+      <xsl:variable name="mayWriteDerivate" select="acl:checkPermission($derivateId,'writedb')" />
       <xsl:choose>
-        <xsl:when test="acl:checkPermissionForReadingDerivate($deriv)">
+        <xsl:when test="acl:checkDerivateDisplayPermission($derivateId) and $isDisplayedEnabled = 'true' or $mayWriteDerivate">
           <xsl:variable name="firstSupportedFile" select="concat('/', substring-after(@xlink:href, '/'))" />
           <table cellpadding="0" cellspacing="0" border="0" width="100%">
             <tr>
@@ -418,7 +417,7 @@
               <td valign="top" align="left">
                 <!-- MCR-IView ..start -->
                 <xsl:call-template name="derivateLinkView">
-                  <xsl:with-param name="derivateID" select="$deriv" />
+                  <xsl:with-param name="derivateID" select="$derivateId" />
                   <xsl:with-param name="file" select="$firstSupportedFile" />
                 </xsl:call-template>
                 <!-- MCR - IView ..end -->
