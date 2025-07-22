@@ -45,7 +45,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Sebastian Hofmann
  * @author Robert Stephan
  */
-public class MCRSolrIgnoreAltoAndMimeTypeStrategy extends MCRSolrMimeTypeStrategy {
+public class MCRSolrAltoExclusionMimeTypeStrategy extends MCRSolrMimeTypeStrategy {
     private final static List<String> XML_MIME_TYPES = Arrays.asList("application/xml", "text/xml");
 
     public static final String ALTO_ROOT = "alto";
