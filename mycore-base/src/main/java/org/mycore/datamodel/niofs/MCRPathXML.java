@@ -226,7 +226,9 @@ public final class MCRPathXML {
 
     private static void addAttributes(Element root, MCRFileAttributes<?> attr, MCRPath path) throws IOException {
         addBasicAttributes(root, attr, path);
-        addString(root, attr.digest().getAlgorithm().toLowerCase(), attr.digest().toHexString(), false);
+        if (attr.digest() != null) {
+            addString(root, attr.digest().getAlgorithm().toLowerCase(), attr.digest().toHexString(), false);
+        }
     }
 
     private static void addDate(Element parent, String type, FileTime date) {
