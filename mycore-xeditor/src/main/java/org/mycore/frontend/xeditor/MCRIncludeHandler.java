@@ -101,18 +101,13 @@ public class MCRIncludeHandler {
         }
 
         Map<String, Element> cache = chooseCacheLevel(uri, sStatic);
-        try {
-            handlePreloadedComponents(xml, cache);
-        } catch (TransformerException | JDOMException e) {
-            throw new TransformerFactoryConfigurationError(e);
-        }
+        handlePreloadedComponents(xml, cache);
     }
 
     /**
      * Cache all descendant components that have an @id, handle xed:modify|xed:extend afterwards
      */
-    private void handlePreloadedComponents(Element xml, Map<String, Element> cache)
-        throws TransformerException, JDOMException {
+    private void handlePreloadedComponents(Element xml, Map<String, Element> cache) {
         for (Element component : getChildren(xml)) {
             cacheComponent(cache, component);
             handlePreloadedComponents(component, cache);
@@ -120,8 +115,7 @@ public class MCRIncludeHandler {
         }
     }
 
-    private void cacheComponent(Map<String, Element> cache, Element element)
-        throws TransformerException {
+    private void cacheComponent(Map<String, Element> cache, Element element) {
         String id = getAttributeIfPresent(element, ATTR_ID);
         if ((id != null) && !id.isEmpty()) {
             LOGGER.debug(() -> "preloaded component " + id);
@@ -129,8 +123,7 @@ public class MCRIncludeHandler {
         }
     }
 
-    private void handleModify(Map<String, Element> cache, Element element)
-        throws JDOMException, TransformerException {
+    private void handleModify(Map<String, Element> cache, Element element) {
         if ("modify".equals(element.getLocalName())) {
             String refID = getAttributeIfPresent(element, ATTR_REF);
             if (refID == null) {
@@ -194,7 +187,7 @@ public class MCRIncludeHandler {
             || "include".equals(e.getLocalName()) && id.equals(getAttributeIfPresent(e, ATTR_REF));
     }
 
-    private void handleInclude(Element container, Element includeRule) throws JDOMException {
+    private void handleInclude(Element container, Element includeRule) {
         boolean modified = handleBeforeAfter(container, includeRule, ATTR_BEFORE, 0, 0);
         if (!modified) {
             if (!includeRule.hasAttribute(ATTR_AFTER)) {
@@ -205,7 +198,7 @@ public class MCRIncludeHandler {
     }
 
     private boolean handleBeforeAfter(Element container, Element includeRule, String attributeName, int offset,
-        int defaultPos) throws JDOMException {
+        int defaultPos) {
         String refID = getAttributeIfPresent(includeRule, attributeName);
         if (refID != null) {
             includeRule.removeAttribute(attributeName);
