@@ -214,9 +214,9 @@ public class MCROCFLDefaultRemoteTemporaryStorageTest extends MCROCFLStorageTest
 
         // 4. Verify the existence of items first (this is a non-destructive check).
         // The state should be perfectly recovered from the journal at this point.
-        assertFalse(newStorage.exists(digest1), "After recovery, digest1 should still not exist.");
-        assertTrue(newStorage.exists(digest2), "After recovery, digest2 should exist.");
         assertTrue(newStorage.exists(digest3), "After recovery, digest3 should exist.");
+        assertTrue(newStorage.exists(digest2), "After recovery, digest2 should exist.");
+        assertFalse(newStorage.exists(digest1), "After recovery, digest1 should still not exist.");
 
         // This MUST be done before reading content, as reading alters the LRU queue.
         // Adding a new file should evict digest3, because digest2 was "touched" and is newer.

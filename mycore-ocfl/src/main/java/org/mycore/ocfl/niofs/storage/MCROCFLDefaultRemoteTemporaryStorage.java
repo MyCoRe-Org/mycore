@@ -92,8 +92,6 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
 
     private static final String JOURNAL_REMOVE = "REMOVE";
 
-    private static final String JOURNAL_TOUCH = "TOUCH";
-
     public static final String JOURNAL_CACHE_FILE = "cache.journal";
 
     private final Path root;
@@ -172,6 +170,48 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
         this.journal.open(this::applyCacheEvent);
     }
 
+    private String serializeCacheEvent(CacheEvent event) {
+        String digestStr = MCRDigestCodec.toString(event.digest());
+        return switch (event) {
+            case CacheEvent.Add add
+                -> String.join("|", JOURNAL_ADD, digestStr, String.valueOf(add.size()), add.originalFileName());
+            case CacheEvent.Remove ignored -> String.join("|", JOURNAL_REMOVE, digestStr);
+        };
+    }
+
+    private CacheEvent deserializeCacheEvent(String line) throws MCROCFLJournal.JournalEntry.DeserializationException {
+        try {
+            String[] parts = line.split("\\|", -1);
+            String command = parts[0];
+            MCRDigest digest = MCRDigestCodec.fromString(parts[1]);
+            return switch (command) {
+                case JOURNAL_ADD -> new CacheEvent.Add(digest, Long.parseLong(parts[2]), parts[3]);
+                case JOURNAL_REMOVE -> new CacheEvent.Remove(digest);
+                default -> throw new IllegalArgumentException("Unknown journal command: " + command);
+            };
+        } catch (Exception e) {
+            throw new MCROCFLJournal.JournalEntry.DeserializationException("Failed to deserialize line: " + line, e);
+        }
+    }
+
+    private void applyCacheEvent(CacheEvent event) {
+        switch (event) {
+            case CacheEvent.Add add -> {
+                this.queue.remove(add.digest());
+                this.cache.put(add.digest(), new FileInfo(add.digest(), add.size(), add.originalFileName()));
+                this.queue.offer(add.digest());
+                this.totalAllocation.addAndGet(add.size());
+            }
+            case CacheEvent.Remove remove -> {
+                this.queue.remove(remove.digest());
+                FileInfo info = this.cache.remove(remove.digest());
+                if (info != null) {
+                    this.totalAllocation.addAndGet(-info.size());
+                }
+            }
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -211,7 +251,13 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
      */
     @Override
     public boolean exists(MCRDigest digest) {
-        return cache.containsKey(digest);
+        synchronizeCache(digest);
+        cacheTouch(digest);
+        boolean isInCache = this.cache.containsKey(digest);
+        if (isInCache) {
+            cacheTouch(digest);
+        }
+        return isInCache;
     }
 
     /**
@@ -219,15 +265,15 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
      */
     @Override
     public void clear() throws IOException {
-        // clear
-        this.cache.clear();
-        this.queue.clear();
-        this.totalAllocation.set(0);
         this.journal.close();
         clearAndReset();
     }
 
     private void clearAndReset() throws IOException {
+        // reset cache
+        this.cache.clear();
+        this.queue.clear();
+        this.totalAllocation.set(0);
         // delete everything
         FileUtils.deleteDirectory(getRoot().toFile());
         // reset
@@ -244,6 +290,8 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
     @Override
     public MCRDigest write(String originalFileName, byte[] bytes, OpenOption... options) throws IOException {
         MCRDigest digest = this.digestCalculator.calculate(bytes);
+
+        synchronizeCache(digest);
 
         // check if already in cache
         if (this.cache.containsKey(digest)) {
@@ -271,6 +319,9 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
     @Override
     public SeekableByteChannel readByteChannel(MCRDigest digest) throws IOException {
         Objects.requireNonNull(digest, "Digest should not be null.");
+
+        synchronizeCache(digest);
+
         FileInfo fileInfo = cache.get(digest);
         if (fileInfo == null) {
             throw new NoSuchFileException(digest + " is not cached.");
@@ -289,6 +340,9 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
     @Override
     public MCRDigest importFile(Path source) throws IOException {
         MCRDigest digest = this.digestCalculator.calculate(source);
+
+        synchronizeCache(digest);
+
         FileInfo fileInfo = this.cache.get(digest);
 
         // cache hit -> nothing to do
@@ -317,6 +371,8 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
      */
     @Override
     public void exportFile(MCRDigest sourceDigest, Path target, CopyOption... options) throws IOException {
+        synchronizeCache(sourceDigest);
+
         FileInfo fileInfo = this.cache.get(sourceDigest);
         if (fileInfo == null) {
             throw new NoSuchFileException(sourceDigest + " is not cached.");
@@ -331,6 +387,7 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
      */
     @Override
     public String probeContentType(MCRDigest digest) throws IOException {
+        synchronizeCache(digest);
         FileInfo fileInfo = this.cache.get(digest);
         if (fileInfo == null) {
             throw new NoSuchFileException(digest + " is not cached.");
@@ -364,6 +421,8 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
             // calculate the digest
             MCRDigest digest = this.digestCalculator.calculate(tempFile);
 
+            synchronizeCache(digest);
+
             // check if already exist
             if (this.cache.containsKey(digest)) {
                 Files.delete(tempFile);
@@ -381,6 +440,17 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
             rollOver();
             return digest;
         }, () -> Files.deleteIfExists(tempFile));
+    }
+
+    private void synchronizeCache(MCRDigest digest) {
+        Path physicalPath = toCachePath(digest);
+        boolean existsInCache = cache.containsKey(digest);
+        boolean existsOnDisk = Files.exists(physicalPath);
+        if (existsInCache != existsOnDisk) {
+            LOGGER.warn(() -> "Cache state mismatch for digest " + digest + ". Cache: " + existsInCache + ", Disk: "
+                + existsOnDisk);
+            delete(digest);
+        }
     }
 
     /**
@@ -456,58 +526,23 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
     private void rollOver() {
         while (!this.queue.isEmpty() && evictionStrategy.shouldEvict(this)) {
             MCRDigest digest = this.queue.poll();
-            FileInfo fileInfo = this.cache.get(digest);
-            // remove from cache
-            cacheRemove(digest);
-            // remove from filesystem
-            Path path = toCachePath(fileInfo.digest);
-            try {
-                Files.deleteIfExists(path);
-            } catch (IOException ioException) {
-                LOGGER.error(() -> "Unable to remove " + path + " from remote cache.", ioException);
-            }
+            delete(digest);
         }
     }
 
-    private String serializeCacheEvent(CacheEvent event) {
-        String digestStr = MCRDigestCodec.toString(event.digest());
-        return switch (event) {
-            case CacheEvent.Add add
-                -> String.join("|", JOURNAL_ADD, digestStr, String.valueOf(add.size()), add.originalFileName());
-            case CacheEvent.Remove ignored -> String.join("|", JOURNAL_REMOVE, digestStr);
-        };
-    }
-
-    private CacheEvent deserializeCacheEvent(String line) throws MCROCFLJournal.JournalEntry.DeserializationException {
+    private void delete(MCRDigest digest) {
+        FileInfo fileInfo = this.cache.get(digest);
+        if(fileInfo == null) {
+            return;
+        }
+        // remove from cache
+        cacheRemove(digest);
+        // remove from filesystem
+        Path path = toCachePath(fileInfo.digest);
         try {
-            String[] parts = line.split("\\|", -1);
-            String command = parts[0];
-            MCRDigest digest = MCRDigestCodec.fromString(parts[1]);
-            return switch (command) {
-                case JOURNAL_ADD -> new CacheEvent.Add(digest, Long.parseLong(parts[2]), parts[3]);
-                case JOURNAL_REMOVE -> new CacheEvent.Remove(digest);
-                default -> throw new IllegalArgumentException("Unknown journal command: " + command);
-            };
-        } catch (Exception e) {
-            throw new MCROCFLJournal.JournalEntry.DeserializationException("Failed to deserialize line: " + line, e);
-        }
-    }
-
-    private void applyCacheEvent(CacheEvent event) {
-        switch (event) {
-            case CacheEvent.Add add -> {
-                this.queue.remove(add.digest());
-                this.cache.put(add.digest(), new FileInfo(add.digest(), add.size(), add.originalFileName()));
-                this.queue.offer(add.digest());
-                this.totalAllocation.addAndGet(add.size());
-            }
-            case CacheEvent.Remove remove -> {
-                this.queue.remove(remove.digest());
-                FileInfo info = this.cache.remove(remove.digest());
-                if (info != null) {
-                    this.totalAllocation.addAndGet(-info.size());
-                }
-            }
+            Files.deleteIfExists(path);
+        } catch (IOException ioException) {
+            LOGGER.error(() -> "Unable to remove " + path + " from remote cache.", ioException);
         }
     }
 
@@ -526,12 +561,10 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
         journal.compact(() -> {
             List<MCRDigest> orderedDigests = new ArrayList<>(this.queue);
             List<CacheEvent> snapshot = new ArrayList<>(orderedDigests.size());
-
             for (MCRDigest digest : orderedDigests) {
                 FileInfo fileInfo = this.cache.get(digest);
                 if (fileInfo != null) {
-                    snapshot.add(
-                        new CacheEvent.Add(digest, fileInfo.size(), fileInfo.originalFileName()));
+                    snapshot.add(new CacheEvent.Add(digest, fileInfo.size(), fileInfo.originalFileName()));
                 } else {
                     LOGGER.warn("Inconsistency detected during compaction: Digest {} is in the queue but not"
                         + " in the cache. Skipping.", digest);
@@ -584,8 +617,8 @@ public class MCROCFLDefaultRemoteTemporaryStorage implements MCROCFLRemoteTempor
     }
 
     /**
-     * A record holding metadata about a single file in the cache, including its digest,
-     * physical path on disk, and size in bytes.
+     * A record holding metadata about a single file in the cache, including its digest, it's size in bytes
+     * and the original file name.
      *
      * @param digest           The cryptographic digest that uniquely identifies the content.
      * @param size             The size of the file in bytes.
