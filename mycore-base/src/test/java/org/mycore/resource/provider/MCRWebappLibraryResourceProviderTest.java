@@ -69,7 +69,7 @@ public class MCRWebappLibraryResourceProviderTest {
 
         URL fileUrl = URI.create("file:/foo/bar").toURL();
         nonWebappLibraryUrl = URI.create("jar:file:/foo/library.jar!/foo/bar").toURL();
-        webappLibraryUrl = URI.create("jar:file:" + fooWebappDir + "/WEB-INF/lib/library.jar!/foo/bar").toURL();
+        webappLibraryUrl = URI.create("jar:"+ fooWebappDir.toUri() + "WEB-INF/lib/library.jar!/foo/bar").toURL();
 
         allResourceUrls = List.of(fileUrl, nonWebappLibraryUrl, webappLibraryUrl);
 

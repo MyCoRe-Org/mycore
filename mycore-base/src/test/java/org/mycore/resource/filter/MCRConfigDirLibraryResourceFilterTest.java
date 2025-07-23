@@ -61,7 +61,7 @@ public class MCRConfigDirLibraryResourceFilterTest {
 
         fileUrl = URI.create("file:/foo/bar").toURL();
         nonConfigDirLibraryUrl = URI.create("jar:file:/foo/library.jar!/foo/bar").toURL();
-        configDirLibraryUrl = URI.create("jar:file:" + fooConfigDir + "/lib/library.jar!/foo/bar").toURL();
+        configDirLibraryUrl = URI.create("jar:" + fooConfigDir.toUri() + "lib/library.jar!/foo/bar").toURL();
 
         allResourceUrls = List.of(fileUrl, nonConfigDirLibraryUrl, configDirLibraryUrl);
 

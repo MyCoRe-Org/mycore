@@ -67,7 +67,7 @@ public class MCRWebappClassesDirResourceProviderTest {
         fooWebappDir = touchFiles(basePath.resolve("foo"));
 
         nonWebappClassesDirFileUrl = URI.create("file:/foo/bar").toURL();
-        webappClassesDirFileUrl = URI.create("file:" + fooWebappDir + "/WEB-INF/classes/foo/bar").toURL();
+        webappClassesDirFileUrl = URI.create(fooWebappDir.toUri() + "WEB-INF/classes/foo/bar").toURL();
         URL libraryUrl = URI.create("jar:file:/foo/library.jar!/foo/bar").toURL();
 
         allResourceUrls = List.of(nonWebappClassesDirFileUrl, webappClassesDirFileUrl, libraryUrl);
