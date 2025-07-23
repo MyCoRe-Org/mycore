@@ -41,6 +41,7 @@ import org.jdom2.JDOMException;
 import org.jdom2.output.DOMOutputter;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.xml.MCRURIResolver;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -141,6 +142,8 @@ public class MCRIncludeHandler {
                 LOGGER.warn(() -> "Ignoring xed:modify of " + refID + ", no component with that @id found");
                 return;
             }
+
+            container = (Element) container.cloneNode(true);
 
             String newID = getAttributeIfPresent(element, ATTR_ID);
             if (newID != null) {
@@ -289,9 +292,17 @@ public class MCRIncludeHandler {
             return cache.get(uri);
         } else {
             org.jdom2.Element xml = MCRURIResolver.obtainInstance().resolve(uri);
-            Element domElement = jdom2dom(xml);
-            cache.put(uri, domElement);
-            return domElement;
+            Document domElement = jdom2dom(wrapIfNeeded(xml));
+            cache.put(uri, domElement.getDocumentElement());
+            return domElement.getDocumentElement();
+        }
+    }
+
+    private org.jdom2.Document wrapIfNeeded(org.jdom2.Element rootElement) {
+        if (rootElement.getDocument() == null) {
+            return new org.jdom2.Document(rootElement);
+        } else {
+            return rootElement.getDocument();
         }
     }
 
@@ -303,7 +314,7 @@ public class MCRIncludeHandler {
         }
     }
 
-    private Element jdom2dom(org.jdom2.Element element) throws TransformerException {
+    private Document jdom2dom(org.jdom2.Document element) throws TransformerException {
         DOMOutputter outputter = new DOMOutputter();
         try {
             return outputter.output(element);
