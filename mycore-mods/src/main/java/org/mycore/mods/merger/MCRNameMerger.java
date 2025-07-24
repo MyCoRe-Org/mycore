@@ -38,6 +38,10 @@ import org.mycore.common.MCRConstants;
  */
 public class MCRNameMerger extends MCRMerger {
 
+    private static final String ALTERNATIVE_NAME = "alternativeName";
+
+    private static final String TYPE = "type";
+
     private String familyName;
 
     private Set<String> givenNames = new HashSet<>();
@@ -70,7 +74,7 @@ public class MCRNameMerger extends MCRMerger {
 
     private void setFromNameParts(Element modsName) {
         for (Element namePart : modsName.getChildren("namePart", MCRConstants.MODS_NAMESPACE)) {
-            String type = namePart.getAttributeValue("type");
+            String type = namePart.getAttributeValue(TYPE);
             String nameFragment = namePart.getText().replaceAll("\\p{Zs}+", " ");
 
             if (Objects.equals(type, "family")) {
@@ -83,7 +87,7 @@ public class MCRNameMerger extends MCRMerger {
                 continue;
             } else if (Objects.equals(type, "termsOfAddress")) {
                 continue;
-            } else if ("personal".equals(modsName.getAttributeValue("type"))) {
+            } else if ("personal".equals(modsName.getAttributeValue(TYPE))) {
                 setFromCombinedName(nameFragment);
             } else {
                 setFamilyName(nameFragment);
@@ -173,10 +177,7 @@ public class MCRNameMerger extends MCRMerger {
         if (!(other instanceof MCRNameMerger)) {
             return false;
         }
-
-        List test = this.element.getChildren("alternativeName", MCRConstants.MODS_NAMESPACE);
-
-        return this.element.getChildren("alternativeName", MCRConstants.MODS_NAMESPACE)
+        return this.element.getChildren(ALTERNATIVE_NAME, MCRConstants.MODS_NAMESPACE)
             .stream()
             .map(MCRMergerFactory::buildFrom)
             .anyMatch(altMerger -> altMerger.isProbablySameAs(other));
@@ -202,10 +203,11 @@ public class MCRNameMerger extends MCRMerger {
             } else {
                 return haveAtLeastOneCommon(this.givenNames, other.givenNames);
             }
-        } else
+        } else {
             // compound name with same given names assumes same
             return this.givenNames.equals(other.givenNames) &&
                 (this.familyName.contains(other.familyName) || other.familyName.contains(this.familyName));
+        }
     }
 
     private boolean haveAtLeastOneCommon(Set<String> a, Set<String> b) {
@@ -233,7 +235,7 @@ public class MCRNameMerger extends MCRMerger {
 
     private void collectNameIds(Element modsName) {
         for (Element nameId : modsName.getChildren("nameIdentifier", MCRConstants.MODS_NAMESPACE)) {
-            String type = nameId.getAttributeValue("type");
+            String type = nameId.getAttributeValue(TYPE);
             String id = nameId.getText();
 
             Set<String> ids;
@@ -288,22 +290,22 @@ public class MCRNameMerger extends MCRMerger {
         if (this.hasAlternativeNameSameAs(e)) {
             return;
         }
-        Element alternativeName = new Element("alternativeName", MCRConstants.MODS_NAMESPACE);
+        Element alternativeName = new Element(ALTERNATIVE_NAME, MCRConstants.MODS_NAMESPACE);
 
         other.element.getChildren("namePart", MCRConstants.MODS_NAMESPACE)
             .stream()
-            .filter(namePart -> "given".equals(namePart.getAttributeValue("type")))
+            .filter(namePart -> "given".equals(namePart.getAttributeValue(TYPE)))
             .forEach(namePart -> {
                 Element altGivenName = new Element("namePart", MCRConstants.MODS_NAMESPACE)
-                    .setAttribute("type", "given");
+                    .setAttribute(TYPE, "given");
                 altGivenName.addContent(namePart.getText());
                 alternativeName.addContent(altGivenName);
             });
 
         Element altFamilyName = new Element("namePart", MCRConstants.MODS_NAMESPACE)
-            .setAttribute("type", "family");
+            .setAttribute(TYPE, "family");
         Element familyName = other.element.getChildren("namePart", MCRConstants.MODS_NAMESPACE).stream()
-            .filter(namePart -> "family".equals(namePart.getAttributeValue("type")))
+            .filter(namePart -> "family".equals(namePart.getAttributeValue(TYPE)))
             .findFirst()
             .orElse(null);
         altFamilyName.addContent(familyName != null ? familyName.getText() : null);
