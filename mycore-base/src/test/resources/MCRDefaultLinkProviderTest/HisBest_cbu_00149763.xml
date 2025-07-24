@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mycoreobject xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="noSchema" ID="HisBest_cbu_00149763" version="2021.06.1" label="HisBest_cbu_00118488">
+    <structure>
+        <parents class="MCRMetaLinkID">
+            <parent inherited="0" xlink:type="locator" xlink:title="Briefe Maria Pawlowna" xlink:href="HisBest_cbu_00116987" />
+        </parents>
+    </structure>
+    <metadata>
+        <def.entitylink class="MCRMetaLinkID" heritable="false" notinherit="true">
+            <entitylink type="corporation" inherited="0" xlink:type="locator" xlink:title="Thüringisches Hauptstaatsarchiv &lt;Weimar&gt;" xlink:href="HisBest_corporation_00000415" />
+        </def.entitylink>
+        <def.entitylink.gnd class="MCRMetaLink" heritable="false" notinherit="true">
+            <entitylink.gnd type="scr" inherited="0" xlink:type="locator" xlink:title="Maria, Sachsen-Weimar, Großherzogin" xlink:href="104304219" />
+            <entitylink.gnd type="crp" inherited="0" xlink:type="locator" xlink:title="Maria, Russland, Zarin" xlink:href="11933075X" />
+        </def.entitylink.gnd>
+        <def.title class="MCRMetaLangText" heritable="false" notinherit="true">
+            <title type="main_title" inherited="0" form="plain">Maria Pavlovna an Maria Fedorovna, Nr. 281 TEST</title>
+        </def.title>
+        <def.component class="MCRMetaClassification" heritable="true" notinherit="true">
+            <component inherited="0" classid="ArchFile_class_001" categid="eb78cfc6-eca3-47a6-baae-205f0943448d" />
+        </def.component>
+        <def.genre class="MCRMetaClassification" heritable="false" notinherit="true">
+            <genre inherited="0" classid="genre" categid="letter" />
+        </def.genre>
+    </metadata>
+    <service>
+        <servdates class="MCRMetaISO8601Date">
+            <servdate type="createdate" inherited="0">2022-12-08T08:59:01.764Z</servdate>
+            <servdate type="modifydate" inherited="0">2025-03-21T10:58:02.693Z</servdate>
+        </servdates>
+        <servflags class="MCRMetaLangText">
+            <servflag type="createdby" inherited="0" form="plain">anonymous</servflag>
+            <servflag type="modifiedby" inherited="0" form="plain">anonymous</servflag>
+        </servflags>
+        <servstates class="MCRMetaClassification">
+            <servstate inherited="0" classid="state" categid="published" />
+        </servstates>
+    </service>
+</mycoreobject>

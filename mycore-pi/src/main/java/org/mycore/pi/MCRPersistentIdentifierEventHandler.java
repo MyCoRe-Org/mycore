@@ -26,7 +26,10 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCRJanitorEventHandlerBase;
+import org.mycore.datamodel.common.MCRLinkType;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 public class MCRPersistentIdentifierEventHandler extends MCRJanitorEventHandlerBase {
@@ -101,4 +104,31 @@ public class MCRPersistentIdentifierEventHandler extends MCRJanitorEventHandlerB
         });
     }
 
+    @Override
+    protected void handleAncestorUpdated(MCREvent evt, MCRObject obj) {
+        detectServices(obj, (service, registrationInfo) -> {
+            try {
+                service.onAncestorUpdated(getIdentifier(registrationInfo), obj, registrationInfo.getAdditional());
+            } catch (MCRPersistentIdentifierException e) {
+                throw new MCRException(e);
+            }
+        });
+    }
+
+    @Override
+    protected void handleObjectLinkUpdated(MCREvent evt, MCRObject updatedObject, MCRLinkType relation,
+        MCRObjectID linked) {
+        MCRObject obj = MCRMetadataManager.retrieveMCRObject(linked);
+        detectServices(obj, (service, registrationInfo) -> {
+            try {
+                if (relation == MCRLinkType.CHILD && service.isAncestorUpdateTriggerUpdate()) {
+                    // skip this, because the ancestor update will be triggered anyway
+                    return;
+                }
+                service.onLinkedObjectUpdated(getIdentifier(registrationInfo), obj, registrationInfo.getAdditional());
+            } catch (MCRPersistentIdentifierException e) {
+                throw new MCRException(e);
+            }
+        });
+    }
 }
