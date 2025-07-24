@@ -20,9 +20,10 @@ package org.mycore.resource.selector;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mycore.resource.common.MCRResourceUtils.toFileUrl;
+import static org.mycore.resource.common.MCRResourceUtils.toJarFileUrl;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -56,11 +57,11 @@ public class MCRFirstServletLibraryResourceSelectorTest {
     @BeforeAll
     public static void prepare() throws IOException {
 
-        fileResourceUrl = URI.create("file:/foo/bar").toURL();
-        library1ResourceUrl = URI.create("jar:file:/foo/WEB-INF/lib/library1.jar!/foo/bar").toURL();
-        library2ResourceUrl = URI.create("jar:file:/foo/WEB-INF/lib/library2.jar!/foo/bar").toURL();
-        otherLibrary1ResourceUrl = URI.create("jar:file:/foo/library1.jar!/foo/bar").toURL();
-        otherLibraryResourceUrl = URI.create("jar:file:/foo/library.jar!/foo/bar").toURL();
+        fileResourceUrl = toFileUrl("/foo/bar");
+        library1ResourceUrl = toJarFileUrl("/foo/WEB-INF/lib/library1.jar", "/foo/bar");
+        library2ResourceUrl = toJarFileUrl("/foo/WEB-INF/lib/library2.jar", "/foo/bar");
+        otherLibrary1ResourceUrl = toJarFileUrl("/foo/library1.jar", "/foo/bar");
+        otherLibraryResourceUrl = toJarFileUrl("/foo/library.jar", "/foo/bar");
 
     }
 

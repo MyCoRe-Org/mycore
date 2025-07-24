@@ -20,11 +20,12 @@ package org.mycore.resource.filter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mycore.resource.MCRFileSystemResourceHelper.getConfigDirResourcesTestBasePath;
+import static org.mycore.resource.MCRFileSystemResourceHelper.getConfigDirTestBasePath;
 import static org.mycore.resource.MCRFileSystemResourceHelper.touchFiles;
+import static org.mycore.resource.common.MCRResourceUtils.toFileUrl;
+import static org.mycore.resource.common.MCRResourceUtils.toJarFileUrl;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
@@ -53,12 +54,12 @@ public class MCRLibraryResourceFilterTest {
     @BeforeAll
     public static void prepare() throws IOException {
 
-        Path basePath = getConfigDirResourcesTestBasePath(MCRLibraryResourceFilterTest.class);
+        Path basePath = getConfigDirTestBasePath(MCRLibraryResourceFilterTest.class);
 
         fooConfigDir = touchFiles(basePath.resolve("foo"));
 
-        fileUrl = URI.create("file:/foo/bar").toURL();
-        libraryUrl = URI.create("jar:file:/foo/library.jar!/foo/bar").toURL();
+        fileUrl = toFileUrl("/foo/bar");
+        libraryUrl = toJarFileUrl("/foo/library.jar", "/foo/bar");
 
         allResourceUrls = List.of(fileUrl, libraryUrl);
 

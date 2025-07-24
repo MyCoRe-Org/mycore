@@ -20,10 +20,11 @@ package org.mycore.resource.selector;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mycore.resource.common.MCRResourceUtils.toFileUrl;
+import static org.mycore.resource.common.MCRResourceUtils.toJarFileUrl;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.util.Comparator;
 import java.util.List;
@@ -76,22 +77,22 @@ public class MCRHighestComponentPriorityResourceSelectorTest {
 
     private static URL component752ResourceUrl;
 
-    private static URL otherCompoenent751ResourceUrl;
+    private static URL otherComponent751ResourceUrl;
 
     private static URL otherLibraryResourceUrl;
 
     @BeforeAll
     public static void prepare() throws IOException {
 
-        fileResourceUrl = URI.create("file:/foo/bar").toURL();
-        component251ResourceUrl = URI.create("jar:file:/foo/component-50-1.jar!/foo/bar").toURL();
-        component252ResourceUrl = URI.create("jar:file:/foo/component-50-2.jar!/foo/bar").toURL();
-        component501ResourceUrl = URI.create("jar:file:/foo/component-50-1.jar!/foo/bar").toURL();
-        component502ResourceUrl = URI.create("jar:file:/foo/component-50-2.jar!/foo/bar").toURL();
-        component751ResourceUrl = URI.create("jar:file:/foo/component-50-1.jar!/foo/bar").toURL();
-        component752ResourceUrl = URI.create("jar:file:/foo/component-50-2.jar!/foo/bar").toURL();
-        otherCompoenent751ResourceUrl = URI.create("jar:file:/bar/component-75-1.jar!/foo/bar").toURL();
-        otherLibraryResourceUrl = URI.create("jar:file:/foo/library.jar!/foo/bar").toURL();
+        fileResourceUrl = toFileUrl("/foo/bar");
+        component251ResourceUrl = toJarFileUrl("/foo/component-50-1.jar", "/foo/bar");
+        component252ResourceUrl = toJarFileUrl("/foo/component-50-2.jar", "/foo/bar");
+        component501ResourceUrl = toJarFileUrl("/foo/component-50-1.jar", "/foo/bar");
+        component502ResourceUrl = toJarFileUrl("/foo/component-50-2.jar", "/foo/bar");
+        component751ResourceUrl = toJarFileUrl("/foo/component-50-1.jar", "/foo/bar");
+        component752ResourceUrl = toJarFileUrl("/foo/component-50-2.jar", "/foo/bar");
+        otherComponent751ResourceUrl = toJarFileUrl("/bar/component-75-1.jar", "/foo/bar");
+        otherLibraryResourceUrl = toJarFileUrl("/foo/library.jar", "/foo/bar");
 
     }
 
@@ -133,11 +134,11 @@ public class MCRHighestComponentPriorityResourceSelectorTest {
         MCRResourceSelector selector = highestComponentPriority();
 
         // no selection can be made (resource URL not part of the libraries) ...
-        List<URL> resourceUrls = selector.select(List.of(otherCompoenent751ResourceUrl), hints);
+        List<URL> resourceUrls = selector.select(List.of(otherComponent751ResourceUrl), hints);
 
         // ... expect all resource URLs
         assertEquals(1, resourceUrls.size());
-        assertTrue(resourceUrls.contains(otherCompoenent751ResourceUrl));
+        assertTrue(resourceUrls.contains(otherComponent751ResourceUrl));
 
     }
 

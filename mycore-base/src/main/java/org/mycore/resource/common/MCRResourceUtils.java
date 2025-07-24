@@ -18,7 +18,10 @@
 
 package org.mycore.resource.common;
 
+import static org.mycore.resource.MCRResourcePath.ofPathOrThrow;
+
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
 
@@ -29,11 +32,27 @@ public final class MCRResourceUtils {
     private MCRResourceUtils() {
     }
 
+    public static URL toFileUrl(String path) {
+        return toFileUrl(Path.of(path));
+    }
+
     public static URL toFileUrl(Path path) {
         try {
             return path.toUri().toURL();
         } catch (MalformedURLException e) {
             throw new MCRException("Failed to convert path to file URL: " + path, e);
+        }
+    }
+
+    public static URL toJarFileUrl(String jarPath, String path) {
+        return toJarFileUrl(Path.of(jarPath), path);
+    }
+
+    public static URL toJarFileUrl(Path jarPath, String path) {
+        try {
+            return URI.create("jar:" + toFileUrl(jarPath) + "!" + ofPathOrThrow(path).asAbsolutePath()).toURL();
+        } catch (MalformedURLException e) {
+            throw new MCRException("Failed to convert paths to JAR file URL: " + jarPath + " / " + path, e);
         }
     }
 
