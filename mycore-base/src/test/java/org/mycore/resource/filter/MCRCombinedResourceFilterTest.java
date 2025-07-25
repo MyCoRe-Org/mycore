@@ -20,10 +20,9 @@ package org.mycore.resource.filter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mycore.resource.common.MCRResourceUtils.toFileUrl;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -52,9 +51,9 @@ public class MCRCombinedResourceFilterTest {
     @BeforeAll
     public static void prepare() throws IOException {
 
-        fileUrlFoo = URI.create("file:/foo/bar/foo").toURL();
-        fileUrlBar = URI.create("file:/foo/bar/bar").toURL();
-        fileUrlBaz = URI.create("file:/foo/bar/baz").toURL();
+        fileUrlFoo = toFileUrl("/foo/bar/foo");
+        fileUrlBar = toFileUrl("/foo/bar/bar");
+        fileUrlBaz = toFileUrl("/foo/bar/baz");
 
         allResourceUrls = List.of(fileUrlFoo, fileUrlBar, fileUrlBaz);
 
@@ -75,9 +74,9 @@ public class MCRCombinedResourceFilterTest {
     }
 
     @Test
-    public void noMatchingFilters() throws MalformedURLException {
+    public void noMatchingFilters() {
 
-        MCRResourceFilter filter = configDirLibraryFilter(URI.create("file:/something/completely/different").toURL());
+        MCRResourceFilter filter = configDirLibraryFilter(toFileUrl("/something/completely/different"));
 
         List<URL> resourceUrls = filter.filter(allResourceUrls.stream(), MCRHints.EMPTY).toList();
 

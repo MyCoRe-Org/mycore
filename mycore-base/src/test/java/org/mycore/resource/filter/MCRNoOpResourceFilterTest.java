@@ -20,9 +20,9 @@ package org.mycore.resource.filter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mycore.resource.common.MCRResourceUtils.toFileUrl;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
@@ -46,8 +46,8 @@ public class MCRNoOpResourceFilterTest {
     @BeforeAll
     public static void prepare() throws IOException {
 
-        fileUrlFoo = URI.create("file:/foo/bar/foo").toURL();
-        fileUrlBar = URI.create("file:/foo/bar/bar").toURL();
+        fileUrlFoo = toFileUrl("/foo/bar/foo");
+        fileUrlBar = toFileUrl("/foo/bar/bar");
 
         allResourceUrls = List.of(fileUrlFoo, fileUrlBar);
 

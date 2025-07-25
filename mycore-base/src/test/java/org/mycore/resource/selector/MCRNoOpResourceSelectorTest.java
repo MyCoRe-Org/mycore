@@ -20,9 +20,9 @@ package org.mycore.resource.selector;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mycore.resource.common.MCRResourceUtils.toFileUrl;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
@@ -46,8 +46,8 @@ public class MCRNoOpResourceSelectorTest {
     @BeforeAll
     public static void prepare() throws IOException {
 
-        fooBarResourceUrl = URI.create("file:/foo/bar").toURL();
-        barFooResourceUrl = URI.create("file:/bar/foo").toURL();
+        fooBarResourceUrl = toFileUrl("/foo/bar");
+        barFooResourceUrl = toFileUrl("/bar/foo");
 
         allResourceUrls = List.of(fooBarResourceUrl, barFooResourceUrl);
 

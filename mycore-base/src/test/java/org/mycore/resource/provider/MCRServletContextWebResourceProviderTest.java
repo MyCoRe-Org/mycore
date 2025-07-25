@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -38,6 +37,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.hint.MCRHintsBuilder;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRResourceUtils;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 import org.mycore.resource.provider.MCRResourceProvider.ProvidedUrl;
 import org.mycore.test.MyCoReTest;
@@ -199,8 +199,8 @@ public class MCRServletContextWebResourceProviderTest {
         return new MCRHintsBuilder().add(MCRResourceHintKeys.SERVLET_CONTEXT, servletContext).build();
     }
 
-    private static URL toMockJarUrl(String path) throws MalformedURLException {
-        return URI.create("jar:file:/foo/library.jar!/" + path).toURL();
+    private static URL toMockJarUrl(String path) {
+        return MCRResourceUtils.toJarFileUrl("/foo/library.jar", path);
     }
 
 }

@@ -20,9 +20,9 @@ package org.mycore.resource.selector;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mycore.resource.common.MCRResourceUtils.toFileUrl;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
@@ -51,10 +51,10 @@ public class MCRCombinedResourceSelectorTest {
     @BeforeAll
     public static void prepare() throws IOException {
 
-        fooFooResourceUrl = URI.create("file:/foo/foo").toURL();
-        fooBarResourceUrl = URI.create("file:/foo/bar").toURL();
-        barFooResourceUrl = URI.create("file:/bar/foo").toURL();
-        barBarResourceUrl = URI.create("file:/bar/bar").toURL();
+        fooFooResourceUrl = toFileUrl("/foo/foo");
+        fooBarResourceUrl = toFileUrl("/foo/bar");
+        barFooResourceUrl = toFileUrl("/bar/foo");
+        barBarResourceUrl = toFileUrl("/bar/bar");
 
         allResourceUrls = List.of(fooFooResourceUrl, fooBarResourceUrl, barFooResourceUrl, barBarResourceUrl);
 

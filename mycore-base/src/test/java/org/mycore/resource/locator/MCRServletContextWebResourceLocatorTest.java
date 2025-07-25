@@ -20,9 +20,9 @@ package org.mycore.resource.locator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mycore.resource.common.MCRResourceUtils.toJarFileUrl;
 
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -142,8 +142,8 @@ public class MCRServletContextWebResourceLocatorTest {
         return new MCRHintsBuilder().add(MCRResourceHintKeys.SERVLET_CONTEXT, servletContext).build();
     }
 
-    private static URL toMockJarUrl(String path) throws MalformedURLException {
-        return URI.create("jar:file:/foo/library.jar!/" + path).toURL();
+    private static URL toMockJarUrl(String path) {
+        return toJarFileUrl("/foo/library.jar", path);
     }
 
 }
