@@ -42,6 +42,8 @@ public class MCRNameMerger extends MCRMerger {
 
     private static final String TYPE = "type";
 
+    private static final String NAME_PART = "namePart";
+
     private String familyName;
 
     private Set<String> givenNames = new HashSet<>();
@@ -73,7 +75,7 @@ public class MCRNameMerger extends MCRMerger {
     }
 
     private void setFromNameParts(Element modsName) {
-        for (Element namePart : modsName.getChildren("namePart", MCRConstants.MODS_NAMESPACE)) {
+        for (Element namePart : modsName.getChildren(NAME_PART, MCRConstants.MODS_NAMESPACE)) {
             String type = namePart.getAttributeValue(TYPE);
             String nameFragment = namePart.getText().replaceAll("\\p{Zs}+", " ");
 
@@ -292,19 +294,19 @@ public class MCRNameMerger extends MCRMerger {
         }
         Element alternativeName = new Element(ALTERNATIVE_NAME, MCRConstants.MODS_NAMESPACE);
 
-        other.element.getChildren("namePart", MCRConstants.MODS_NAMESPACE)
+        other.element.getChildren(NAME_PART, MCRConstants.MODS_NAMESPACE)
             .stream()
             .filter(namePart -> "given".equals(namePart.getAttributeValue(TYPE)))
             .forEach(namePart -> {
-                Element altGivenName = new Element("namePart", MCRConstants.MODS_NAMESPACE)
+                Element altGivenName = new Element(NAME_PART, MCRConstants.MODS_NAMESPACE)
                     .setAttribute(TYPE, "given");
                 altGivenName.addContent(namePart.getText());
                 alternativeName.addContent(altGivenName);
             });
 
-        Element altFamilyName = new Element("namePart", MCRConstants.MODS_NAMESPACE)
+        Element altFamilyName = new Element(NAME_PART, MCRConstants.MODS_NAMESPACE)
             .setAttribute(TYPE, "family");
-        Element familyName = other.element.getChildren("namePart", MCRConstants.MODS_NAMESPACE).stream()
+        Element familyName = other.element.getChildren(NAME_PART, MCRConstants.MODS_NAMESPACE).stream()
             .filter(namePart -> "family".equals(namePart.getAttributeValue(TYPE)))
             .findFirst()
             .orElse(null);
