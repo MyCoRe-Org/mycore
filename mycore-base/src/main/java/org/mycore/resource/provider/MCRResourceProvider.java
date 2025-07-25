@@ -172,7 +172,7 @@ public interface MCRResourceProvider {
                 List<URI> classpath = scanResult.getClasspathURIs();
                 for (URI uri : classpath) {
                     if (uri.getScheme().equals("file")) {
-                        Path path = Path.of(uri.getPath());
+                        Path path = Path.of(uri);
                         if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
                             String prefix = MCRResourceUtils.toFileUrl(path).toString();
                             if (value.startsWith(prefix)) {
