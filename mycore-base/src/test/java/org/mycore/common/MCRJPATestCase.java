@@ -133,7 +133,7 @@ public class MCRJPATestCase extends MCRTestCase {
     }
 
     public void exportSchema() throws IOException {
-        doSchemaOperation(schema -> "create schema " + schema);
+        doSchemaOperation(schema -> "create schema if not exists " + schema);
         exportSchema("create");
     }
 
