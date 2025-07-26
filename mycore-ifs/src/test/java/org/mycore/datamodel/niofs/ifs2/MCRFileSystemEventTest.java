@@ -123,6 +123,10 @@ public class MCRFileSystemEventTest {
         assertEquals(1, register.getEntries().size());
         assertEquals(1, countEvents(MCREvent.EventType.UPDATE));
         register.clear();
+
+        // Force garbage collection 
+        // (may close some open Windows file handles when calling finalize() and avoid AccessDeniedExceptions)
+        System.gc();
         Files.delete(file);
         assertEquals(1, register.getEntries().size());
         assertEquals(1, countEvents(MCREvent.EventType.DELETE));
@@ -131,6 +135,7 @@ public class MCRFileSystemEventTest {
         assertEquals(1, register.getEntries().size());
         assertEquals(1, countEvents(MCREvent.EventType.CREATE));
         register.clear();
+        System.gc();
         final Path newFile = file.getParent().resolve("File.old");
         Files.move(file, newFile);
         //register.getEntries().forEach(System.out::println);
@@ -157,6 +162,7 @@ public class MCRFileSystemEventTest {
         assertEquals(1, register.getEntries().size());
         assertEquals(1, countEvents(MCREvent.EventType.CREATE));
         register.clear();
+        System.gc();
         try (DirectoryStream<Path> dir1Stream = Files.newDirectoryStream(dir1);
             DirectoryStream<Path> dir2Stream = Files.newDirectoryStream(dir2)) {
             if (!(dir1Stream instanceof SecureDirectoryStream<Path> sDir1Stream)) {
