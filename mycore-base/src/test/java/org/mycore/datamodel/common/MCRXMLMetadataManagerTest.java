@@ -47,6 +47,7 @@ import org.mycore.common.content.MCRByteContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectIDTest;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
+import org.tmatesoft.svn.core.internal.wc.SVNFileUtil;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import org.xml.sax.SAXException;
 
@@ -89,7 +90,9 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
         }
         for (File projectDir : getSvnBaseDir().toFile().listFiles()) {
             for (File typeDir : projectDir.listFiles()) {
-                Files.walkFileTree(typeDir.toPath(), new MCRRecursiveDeleter());
+                //does not work on Windows (AccessdeniedExceptions):
+                //Files.walkFileTree(typeDir.toPath(), new MCRRecursiveDeleter());
+                SVNFileUtil.deleteAll(typeDir, true);
                 typeDir.mkdir();
                 SVNRepositoryFactory.createLocalRepository(typeDir, true, false);
             }
