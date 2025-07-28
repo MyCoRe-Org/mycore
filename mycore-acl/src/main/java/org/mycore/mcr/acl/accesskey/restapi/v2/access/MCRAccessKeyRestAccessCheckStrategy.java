@@ -100,7 +100,7 @@ public class MCRAccessKeyRestAccessCheckStrategy implements MCRRestAccessCheckSt
         } else {
             final MultivaluedMap<String, String> queryParameters = requestContext.getUriInfo().getQueryParameters();
             final String permissionsParam = queryParameters.getFirst(MCRAccessKeyRestConstants.QUERY_PARAM_PERMISSIONS);
-            if (permissionsParam == null || permissionsParam.trim().isEmpty()) {
+            if (permissionsParam == null || permissionsParam.isBlank()) {
                 throw new ForbiddenException();
             }
             final List<String> permissions = Arrays.stream(permissionsParam.split(",")).map(String::trim)
