@@ -122,7 +122,7 @@
 
   <rule name="MCR.Logger.CorrectDynamicInitialisation"
         language="java"
-        message="A field with type 'Logger' and name 'logger' should be initialized as 'protected final Logger LOGGER = LogManager.getLogger(getClass());'"
+        message="A field with type 'Logger' and name 'logger' should be initialized as 'protected final Logger logger = LogManager.getLogger(getClass());'"
         class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
     <priority>4</priority>
     <properties>
@@ -180,7 +180,7 @@
 
   <!--rule name="MCR.Logger.AbstractClassesShouldHaveDynamic"
         language="java"
-        message="An abstract class should have a Logger initialized as 'protected final Logger LOGGER = LogManager.getLogger(getClass());' "
+        message="An abstract class should have a Logger initialized as 'protected final Logger logger = LogManager.getLogger(getClass());' "
         class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
     <priority>5</priority>
     <properties>
