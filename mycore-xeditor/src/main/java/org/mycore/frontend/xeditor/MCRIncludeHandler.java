@@ -307,10 +307,10 @@ public class MCRIncludeHandler {
         }
     }
 
-    private Document jdom2dom(org.jdom2.Document element) throws TransformerException {
+    private Document jdom2dom(org.jdom2.Document document) throws TransformerException {
         DOMOutputter outputter = new DOMOutputter();
         try {
-            return outputter.output(element);
+            return outputter.output(document);
         } catch (JDOMException e) {
             throw new TransformerException(e);
         }
