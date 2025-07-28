@@ -17,14 +17,8 @@
  */
 package org.mycore.common.events;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.filter.Filters;
@@ -59,11 +53,9 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
  * [...].Class=org.mycore.common.events.MCRXMappingClassificationMapper
  * </code></pre>
  */
-public class MCRXMappingClassificationMapper implements Mapper {
-
-    private static final Logger LOGGER = LogManager.getLogger();
-
-    public static final String LABEL_LANG_X_MAPPING = "x-mapping";
+public class MCRXMappingClassificationMapper
+    extends MCRXMappingClassificationMapperBase<Document, MCRCategoryID>
+    implements Mapper {
 
     private static final XPathExpression<Element> CLASSIFICATION_ELEMENT_XPATH;
 
@@ -72,17 +64,9 @@ public class MCRXMappingClassificationMapper implements Mapper {
     }
 
     @Override
-    public List<MCRCategoryID> findMappings(MCRCategoryDAO dao, Document intermediateRepresentation) {
-        List<Element> classificationElements = CLASSIFICATION_ELEMENT_XPATH.evaluate(intermediateRepresentation);
-        return classificationElements.stream()
-            .map(classificationElement -> loadClassification(dao, classificationElement))
-            .filter(Objects::nonNull)
-            .map(category -> findMappings(dao, category))
-            .flatMap(Collection::stream)
-            .distinct()
-            .peek(XMapping::logInfo)
-            .map(XMapping::toCategoryId)
-            .toList();
+    protected Stream<MCRCategory> getCategories(MCRCategoryDAO dao, Document metadataDocument) {
+        return CLASSIFICATION_ELEMENT_XPATH.evaluate(metadataDocument).stream()
+            .map(classificationElement -> loadClassification(dao, classificationElement));
     }
 
     private MCRCategory loadClassification(MCRCategoryDAO dao, Element classificationElement) {
@@ -90,31 +74,9 @@ public class MCRXMappingClassificationMapper implements Mapper {
             classificationElement.getAttributeValue("categid")), 0);
     }
 
-    private List<XMapping> findMappings(MCRCategoryDAO dao, MCRCategory sourceCategory) {
-        MCRCategoryID sourceCategoryId = sourceCategory.getId();
-        return sourceCategory.getLabel(LABEL_LANG_X_MAPPING)
-            .map(label -> Stream.of(label.getText().split("\\s"))
-                .map(MCRCategoryID::ofString)
-                .filter(id -> !id.isRootID())
-                .filter(dao::exist)
-                .map(targetCategoryId -> new XMapping(sourceCategoryId, targetCategoryId))
-                .collect(Collectors.toList()))
-            .orElse(List.of());
-    }
-
-    private record XMapping(MCRCategoryID sourceCategoryId, MCRCategoryID targetCategoryId) {
-
-        private void logInfo() {
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("found mapping from {} to {}", sourceCategoryId.toString(),
-                    targetCategoryId.toString());
-            }
-        }
-
-        private MCRCategoryID toCategoryId() {
-            return targetCategoryId;
-        }
-
+    @Override
+    protected MCRCategoryID toMappedValue(XMapping mapping) {
+        return mapping.targetCategoryId();
     }
 
 }

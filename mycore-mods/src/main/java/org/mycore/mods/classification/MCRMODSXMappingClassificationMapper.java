@@ -17,15 +17,10 @@
  */
 package org.mycore.mods.classification;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.mycore.common.events.MCRXMappingClassificationMapperBase;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -58,55 +53,23 @@ import org.mycore.mods.classification.MCRMODSClassificationMappingEventHandler.M
  * [...].Class=org.mycore.mods.classification.MCRMODSXMappingClassificationMapper
  * </code></pre>
  */
-public class MCRMODSXMappingClassificationMapper implements Mapper {
-
-    private static final Logger LOGGER = LogManager.getLogger();
-
-    public static final String LABEL_LANG_X_MAPPING = "x-mapping";
+public class MCRMODSXMappingClassificationMapper
+    extends MCRXMappingClassificationMapperBase<MCRMODSWrapper, Mapping>
+    implements Mapper {
 
     @Override
-    public List<Mapping> findMappings(MCRCategoryDAO dao, MCRMODSWrapper intermediateRepresentation) {
-        return intermediateRepresentation.getMcrCategoryIDs().stream()
-            .map(categoryId -> dao.getCategory(categoryId, 0))
-            .filter(Objects::nonNull)
-            .map(category -> findMappings(dao, category))
-            .flatMap(Collection::stream)
-            .distinct()
-            .peek(XMapping::logInfo)
-            .map(XMapping::toMapping)
-            .toList();
+    protected Stream<MCRCategory> getCategories(MCRCategoryDAO dao, MCRMODSWrapper modsWrapper) {
+        return modsWrapper.getMcrCategoryIDs().stream().map(categoryId -> dao.getCategory(categoryId, 0));
     }
 
-    private List<XMapping> findMappings(MCRCategoryDAO dao, MCRCategory sourceCategory) {
-        MCRCategoryID sourceCategoryId = sourceCategory.getId();
-        return sourceCategory.getLabel(LABEL_LANG_X_MAPPING)
-            .map(label -> Stream.of(label.getText().split("\\s"))
-                .map(MCRCategoryID::ofString)
-                .filter(id -> !id.isRootID())
-                .filter(dao::exist)
-                .map(targetCategoryId -> new XMapping(sourceCategoryId, targetCategoryId))
-                .collect(Collectors.toList()))
-            .orElse(List.of());
+    @Override
+    protected Mapping toMappedValue(XMapping mapping) {
+        String generator = getGenerator(mapping.sourceCategoryId(), mapping.targetCategoryId());
+        return new Mapping(generator, mapping.targetCategoryId());
     }
 
-    private record XMapping(MCRCategoryID sourceCategoryId, MCRCategoryID targetCategoryId) {
-
-        private void logInfo() {
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("found mapping from {} to {}", sourceCategoryId.toString(),
-                    targetCategoryId.toString());
-            }
-        }
-
-        private Mapping toMapping() {
-            return new Mapping(getGenerator(), targetCategoryId);
-        }
-
-        private String getGenerator() {
-            return String.format(Locale.ROOT, "%s2%s", sourceCategoryId.getRootID(),
-                targetCategoryId.getRootID());
-        }
-
+    private String getGenerator(MCRCategoryID sourceCategoryId, MCRCategoryID targetCategoryId) {
+        return String.format(Locale.ROOT, "%s2%s", sourceCategoryId.getRootID(), targetCategoryId.getRootID());
     }
 
 }
