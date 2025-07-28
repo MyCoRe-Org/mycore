@@ -30,9 +30,11 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.mods.MCRMODSWrapper;
+import org.mycore.mods.classification.MCRMODSClassificationMappingEventHandler.Mapper;
+import org.mycore.mods.classification.MCRMODSClassificationMappingEventHandler.Mapping;
 
 /**
- * A {@link MCRMODSXMappingClassificationMapper} is a {@link MCRMODSClassificationMapper} that looks for mapping
+ * A {@link MCRMODSXMappingClassificationMapper} is a {@link Mapper} that looks for mapping
  * information in all classification values already present in the MODS document.
  * <p>
  * For each classification value, if the corresponding classification category contains a <code>x-mapping</code>
@@ -56,15 +58,15 @@ import org.mycore.mods.MCRMODSWrapper;
  * [...].Class=org.mycore.mods.classification.MCRMODSXMappingClassificationMapper
  * </code></pre>
  */
-public class MCRMODSXMappingClassificationMapper implements MCRMODSClassificationMapper {
+public class MCRMODSXMappingClassificationMapper implements Mapper {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     public static final String LABEL_LANG_X_MAPPING = "x-mapping";
 
     @Override
-    public List<Mapping> findMappings(MCRCategoryDAO dao, MCRMODSWrapper wrapper) {
-        return wrapper.getMcrCategoryIDs().stream()
+    public List<Mapping> findMappings(MCRCategoryDAO dao, MCRMODSWrapper intermediateRepresentation) {
+        return intermediateRepresentation.getMcrCategoryIDs().stream()
             .map(categoryId -> dao.getCategory(categoryId, 0))
             .filter(Objects::nonNull)
             .map(category -> findMappings(dao, category))
@@ -97,7 +99,7 @@ public class MCRMODSXMappingClassificationMapper implements MCRMODSClassificatio
         }
 
         private Mapping toMapping() {
-            return new MCRMODSClassificationMapper.Mapping(getGenerator(), targetCategoryId);
+            return new Mapping(getGenerator(), targetCategoryId);
         }
 
         private String getGenerator() {

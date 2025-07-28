@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.text.StringSubstitutor;
 import org.mycore.common.config.MCRConfiguration2;
 
-public abstract class MCRClassificationMappingUtil extends MCREventHandlerBase {
+public final class MCRClassificationMappingUtil extends MCREventHandlerBase {
 
     private MCRClassificationMappingUtil() {
     }

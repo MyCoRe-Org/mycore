@@ -32,13 +32,16 @@ import org.jdom2.Element;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.events.MCRClassificationMappingUtil;
 import org.mycore.common.xml.MCRXPathEvaluator;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.mods.MCRMODSWrapper;
+import org.mycore.mods.classification.MCRMODSClassificationMappingEventHandler.Mapper;
+import org.mycore.mods.classification.MCRMODSClassificationMappingEventHandler.Mapping;
 
 /**
- * A {@link MCRMODSXMappingClassificationMapper} is a {@link MCRMODSClassificationMapper} that looks for mapping
+ * A {@link MCRMODSXMappingClassificationMapper} is a {@link Mapper} that looks for mapping
  * information for a given list of classifications, by checking if XPaths configured for categories of such
  * classifications match the MODS document.
  * <p>
@@ -72,7 +75,7 @@ import org.mycore.mods.MCRMODSWrapper;
  * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRMODSXPathClassificationMapper.Factory.class)
-public class MCRMODSXPathClassificationMapper implements MCRMODSClassificationMapper {
+public class MCRMODSXPathClassificationMapper implements Mapper {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -90,19 +93,19 @@ public class MCRMODSXPathClassificationMapper implements MCRMODSClassificationMa
 
     public MCRMODSXPathClassificationMapper(List<String> classificationsIds) {
         this.classificationsIds = new ArrayList<>(Objects
-            .requireNonNull(classificationsIds, "Classification IDs must not be null"));
+                .requireNonNull(classificationsIds, "Classification IDs must not be null"));
         this.classificationsIds.forEach(filter -> Objects
-            .requireNonNull(filter, "Classification ID must not be null"));
+                .requireNonNull(filter, "Classification ID must not be null"));
     }
 
     @Override
     public List<Mapping> findMappings(MCRCategoryDAO dao, MCRMODSWrapper wrapper) {
         Element modsElement = wrapper.getMODS();
         return classificationsIds.stream()
-            .flatMap(xPathClassificationId -> findMappings(dao, modsElement, xPathClassificationId))
-            .peek(XPathMapping::logInfo)
-            .map(XPathMapping::toMapping)
-            .toList();
+                .flatMap(xPathClassificationId -> findMappings(dao, modsElement, xPathClassificationId))
+                .peek(XPathMapping::logInfo)
+                .map(XPathMapping::toMapping)
+                .toList();
     }
 
     private Stream<XPathMapping> findMappings(MCRCategoryDAO dao, Element modsElement, String classificationId) {
@@ -114,12 +117,12 @@ public class MCRMODSXPathClassificationMapper implements MCRMODSClassificationMa
     }
 
     private List<XPathMapping> findMappings(MCRCategoryDAO dao, Element modsElement,
-        String xPathClassificationId, String xLanguage) {
+                                            String xPathClassificationId, String xLanguage) {
         List<XPathMapping> mappings = new ArrayList<>();
         dao.getCategoriesByClassAndLang(xPathClassificationId, xLanguage).forEach(category -> {
             assert category.getLabel(xLanguage).isPresent();
             String xPath = category.getLabel(xLanguage).get().getText();
-            xPath = org.mycore.common.events.MCRClassificationMappingUtil.replacePattern(xPath);
+            xPath = MCRClassificationMappingUtil.replacePattern(xPath);
             MCRXPathEvaluator evaluator = new MCRXPathEvaluator(new HashMap<>(), modsElement);
             if (evaluator.test(xPath)) {
                 mappings.add(new XPathMapping(xLanguage, category.getId()));

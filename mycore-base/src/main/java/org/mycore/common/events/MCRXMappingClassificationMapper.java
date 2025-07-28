@@ -17,7 +17,6 @@
  */
 package org.mycore.common.events;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -29,16 +28,15 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.filter.Filters;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+import org.mycore.common.events.MCRClassificationMappingEventHandler.Mapper;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 
 /**
- * A {@link MCRXMappingClassificationMapper} is a {@link MCRClassificationMapper} that looks for mapping
+ * A {@link MCRXMappingClassificationMapper} is a {@link Mapper} that looks for mapping
  * information in all classification values already present in the metadata document.
  * <p>
  * For each classification value, if the corresponding classification category contains a <code>x-mapping</code>
@@ -61,7 +59,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
  * [...].Class=org.mycore.common.events.MCRXMappingClassificationMapper
  * </code></pre>
  */
-public class MCRXMappingClassificationMapper implements MCRClassificationMapper {
+public class MCRXMappingClassificationMapper implements Mapper {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -74,8 +72,8 @@ public class MCRXMappingClassificationMapper implements MCRClassificationMapper 
     }
 
     @Override
-    public List<MCRCategoryID> findMappings(MCRCategoryDAO dao, Document metadataDocument) {
-        List<Element> classificationElements = CLASSIFICATION_ELEMENT_XPATH.evaluate(metadataDocument);
+    public List<MCRCategoryID> findMappings(MCRCategoryDAO dao, Document intermediateRepresentation) {
+        List<Element> classificationElements = CLASSIFICATION_ELEMENT_XPATH.evaluate(intermediateRepresentation);
         return classificationElements.stream()
             .map(classificationElement -> loadClassification(dao, classificationElement))
             .filter(Objects::nonNull)

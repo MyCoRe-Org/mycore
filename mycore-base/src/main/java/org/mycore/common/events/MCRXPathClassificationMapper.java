@@ -31,12 +31,13 @@ import org.jdom2.Document;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.events.MCRClassificationMappingEventHandler.Mapper;
 import org.mycore.common.xml.MCRXPathEvaluator;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 
 /**
- * A {@link MCRXMappingClassificationMapper} is a {@link MCRClassificationMapper} that looks for mapping
+ * A {@link MCRXMappingClassificationMapper} is a {@link Mapper} that looks for mapping
  * information for a given list of classifications, by checking if XPaths configured for categories of such
  * classifications match the metadata document.
  * <p>
@@ -70,7 +71,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
  * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRXPathClassificationMapper.Factory.class)
-public class MCRXPathClassificationMapper implements MCRClassificationMapper {
+public class MCRXPathClassificationMapper implements Mapper {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -88,18 +89,18 @@ public class MCRXPathClassificationMapper implements MCRClassificationMapper {
 
     public MCRXPathClassificationMapper(List<String> classificationsIds) {
         this.classificationsIds = new ArrayList<>(Objects
-            .requireNonNull(classificationsIds, "Classification IDs must not be null"));
+                .requireNonNull(classificationsIds, "Classification IDs must not be null"));
         this.classificationsIds.forEach(filter -> Objects
-            .requireNonNull(filter, "Classification ID must not be null"));
+                .requireNonNull(filter, "Classification ID must not be null"));
     }
 
     @Override
     public List<MCRCategoryID> findMappings(MCRCategoryDAO dao, Document metadataDocument) {
         return classificationsIds.stream()
-            .flatMap(xPathClassificationId -> findMappings(dao, metadataDocument, xPathClassificationId))
-            .peek(XPathMapping::logInfo)
-            .map(XPathMapping::toCategoryId)
-            .toList();
+                .flatMap(xPathClassificationId -> findMappings(dao, metadataDocument, xPathClassificationId))
+                .peek(XPathMapping::logInfo)
+                .map(XPathMapping::toCategoryId)
+                .toList();
     }
 
     private Stream<XPathMapping> findMappings(MCRCategoryDAO dao, Document metadataDocument, String classificationId) {
@@ -111,7 +112,7 @@ public class MCRXPathClassificationMapper implements MCRClassificationMapper {
     }
 
     private List<XPathMapping> findMappings(MCRCategoryDAO dao, Document metadataDocument,
-        String xPathClassificationId, String xLanguage) {
+                                            String xPathClassificationId, String xLanguage) {
         List<XPathMapping> mappings = new ArrayList<>();
         dao.getCategoriesByClassAndLang(xPathClassificationId, xLanguage).forEach(category -> {
             assert category.getLabel(xLanguage).isPresent();
