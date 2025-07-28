@@ -118,7 +118,8 @@ public class MCRORCIDUser {
         try {
             accessImpl.addORCID(orcid, user);
         } catch (MCRAccessException e) {
-            LOGGER.error("Failed to add ORCID to user {}: ", user.getUserID(), e);
+            final String userId = user.getUserID();
+            LOGGER.error("Failed to add ORCID to user {}: ", userId, e);
         }
     }
 

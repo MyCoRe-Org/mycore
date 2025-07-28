@@ -65,7 +65,7 @@ public class MCRORCIDAccessModspersonImpl implements MCRORCIDAccess {
         String modspersonId = user.getUserAttribute("id_modsperson");
         if (modspersonId == null) {
             LOGGER.warn("For the user {} no modsperson could be found!",
-                user.getUserID());
+                user::getUserID);
             return null;
         }
         return MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(modspersonId));

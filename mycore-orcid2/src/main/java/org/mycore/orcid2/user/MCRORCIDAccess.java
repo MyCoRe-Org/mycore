@@ -11,9 +11,9 @@ import java.util.Set;
  */
 public interface MCRORCIDAccess {
 
-    public void addORCID(String orcid, MCRUser user) throws MCRAccessException;
+    void addORCID(String orcid, MCRUser user) throws MCRAccessException;
 
-    public Set<String> getORCIDs(MCRUser user);
+    Set<String> getORCIDs(MCRUser user);
 
-    public Set<MCRIdentifier> getIdentifiers(MCRUser user);
+    Set<MCRIdentifier> getIdentifiers(MCRUser user);
 }
