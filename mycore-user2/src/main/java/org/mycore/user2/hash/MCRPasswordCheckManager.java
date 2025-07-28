@@ -83,7 +83,7 @@ import org.mycore.common.config.annotation.MCRSentinel;
  * [...].Strategies.foo.Enabled=true
  * [...].Strategies.foo.Key1=Value1
  * [...].Strategies.foo.Key2=Value2
- * [...].Strategies.bar.Class=foo.bar.FooStrategy
+ * [...].Strategies.bar.Class=foo.bar.BarStrategy
  * [...].Strategies.bar.Enabled=false
  * [...].Strategies.bar.Key1=Value1
  * [...].Strategies.bar.Key2=Value2
