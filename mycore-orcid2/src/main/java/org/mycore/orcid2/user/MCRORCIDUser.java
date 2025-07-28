@@ -27,6 +27,9 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.access.MCRAccessException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.orcid2.MCRORCIDConstants;
 import org.mycore.orcid2.client.MCRORCIDCredential;
@@ -42,6 +45,8 @@ import org.mycore.user2.MCRUserAttribute;
  * Handles the updating of user.
  */
 public class MCRORCIDUser {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * List of trusted name identifier types.
@@ -72,6 +77,9 @@ public class MCRORCIDUser {
 
     private final MCRUser user;
 
+    private MCRORCIDAccess accessImpl = MCRConfiguration2.getInstanceOfOrThrow(
+        MCRORCIDAccess.class, MCRORCIDConstants.CONFIG_PREFIX + "Access.Class");
+
     /**
      * Wraps MCRUser to MCRORCIDUser.
      *
@@ -91,6 +99,13 @@ public class MCRORCIDUser {
     }
 
     /**
+     * Used for testing.
+     */
+    public void setAccessImpl(MCRORCIDAccess accessImpl) {
+        this.accessImpl = accessImpl;
+    }
+
+    /**
      * Adds ORCID iD to user's user attributes.
      *
      * @param orcid the ORCID iD
@@ -100,10 +115,10 @@ public class MCRORCIDUser {
         if (!MCRORCIDValidationHelper.validateORCID(orcid)) {
             throw new MCRORCIDException("Invalid ORCID iD");
         }
-        final MCRUserAttribute attribute = new MCRUserAttribute(ATTR_ORCID_ID, orcid);
-        // allow more than one ORCID iD per user
-        if (!user.getAttributes().contains(attribute)) {
-            user.getAttributes().add(new MCRUserAttribute(ATTR_ORCID_ID, orcid));
+        try {
+            accessImpl.addORCID(orcid, user);
+        } catch (MCRAccessException e) {
+            LOGGER.error("Failed to add ORCID to user {}: ", user.getUserID(), e);
         }
     }
 
@@ -112,9 +127,7 @@ public class MCRORCIDUser {
      * @return ORCID iDs as set
      */
     public Set<String> getORCIDs() {
-        return user.getAttributes().stream()
-            .filter(a -> Objects.equals(a.getName(), ATTR_ORCID_ID))
-            .map(MCRUserAttribute::getValue).collect(Collectors.toSet());
+        return accessImpl.getORCIDs(user);
     }
 
     /**
@@ -228,13 +241,10 @@ public class MCRORCIDUser {
 
     /**
      * Returns users identifiers.
-     *
      * @return Set of MCRIdentifier
      */
     public Set<MCRIdentifier> getIdentifiers() {
-        return user.getAttributes().stream().filter(a -> a.getName().startsWith(ATTR_ID_PREFIX))
-            .map(a -> new MCRIdentifier(a.getName().substring(ATTR_ID_PREFIX.length()), a.getValue()))
-            .collect(Collectors.toSet());
+        return accessImpl.getIdentifiers(user);
     }
 
     /**
