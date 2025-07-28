@@ -20,6 +20,7 @@ package org.mycore.datamodel.ifs2;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -137,12 +138,16 @@ public class MCRFileCollection extends MCRDirectory {
             readData(e -> {
                 try {
                     boolean needsUpdate = true;
+                    long tryUntil = System.currentTimeMillis() + 60_000;
                     while (needsUpdate) {
                         try {
                             new MCRJDOMContent(e.getDocument()).sendTo(target, StandardCopyOption.REPLACE_EXISTING);
                             needsUpdate = false;
-                        } catch (FileAlreadyExistsException ex) {
-                            //other process writes to the same file, let us win
+                        } catch (FileAlreadyExistsException | AccessDeniedException ex) {
+                            //other process writes to the same file, try again for 60s and let us win
+                            if(System.currentTimeMillis() > tryUntil){
+                                throw ex;
+                            }
                         } catch (IOException | RuntimeException ex) {
                             throw ex;
                         }
