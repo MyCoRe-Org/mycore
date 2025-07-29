@@ -541,7 +541,7 @@ public final class MCRLinkTableManager {
 
     private MCRBaseLinkProvider getLinkProvider(MCRBase der) {
         String type = der.getId().getTypeId();
-        return linkProviders.containsKey(type) ? linkProviders.get(type) : linkProviders.get("*");
+        return linkProviders.containsKey(type) ? linkProviders.get(type) : linkProviders.get("Default");
     }
 
     public record MCRLinkReference(MCRObjectID from, MCRObjectID to, MCRLinkType type, String attr) {
