@@ -18,6 +18,7 @@
 
 import { MyCoReViewer } from "./MyCoReViewer";
 import { addViewerComponent } from "./Utils";
+import { ViewerComponent } from "./components/ViewerComponent";
 import { MyCoReViewerContainerComponent } from "./components/MyCoReViewerContainerComponent";
 import { MyCoReI18NComponent } from "./components/MyCoReI18NComponent";
 import { MyCoReImageOverviewComponent } from "./components/MyCoReImageOverviewComponent";
@@ -40,4 +41,4 @@ addViewerComponent(MyCoRePermalinkComponent);
 addViewerComponent(MyCoReLayerComponent);
 addViewerComponent(MyCoReButtonChangeComponent);
 
-export { MyCoReViewer }
+export { MyCoReViewer, addViewerComponent, ViewerComponent }
