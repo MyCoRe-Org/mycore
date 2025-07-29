@@ -145,7 +145,7 @@ public class MCRFileCollection extends MCRDirectory {
                             needsUpdate = false;
                         } catch (FileAlreadyExistsException | AccessDeniedException ex) {
                             //other process writes to the same file, try again for 60s and let us win
-                            if(System.currentTimeMillis() > tryUntil){
+                            if (System.currentTimeMillis() > tryUntil) {
                                 throw ex;
                             }
                         } catch (IOException | RuntimeException ex) {
