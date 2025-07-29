@@ -140,7 +140,7 @@ public class MCRIncludeHandler {
 
             String newID = getAttributeIfPresent(element, ATTR_ID);
             if (newID != null) {
-                container.setAttribute(ATTR_ID, newID); // extend rather that modify
+                container.setAttribute(ATTR_ID, newID); // extend rather than modify
                 LOGGER.debug(() -> "extending " + refID + " to " + newID);
             } else {
                 LOGGER.debug(() -> "modifying " + refID);
@@ -172,7 +172,7 @@ public class MCRIncludeHandler {
                 if (hasOrIncludesID(element, id)) {
                     return Optional.of(element);
                 }
-                // Rekursive Suche in den Unterelementen
+                // Recursive search in child elements
                 Optional<Element> descendant = findDescendant(element, id);
                 if (descendant.isPresent()) {
                     return descendant;
@@ -238,14 +238,16 @@ public class MCRIncludeHandler {
     }
 
     private List<Element> getChildren(Element parent) {
-        NodeList childNodes = parent.getChildNodes();
-        List<Element> childElements = new ArrayList<>(childNodes.getLength());
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            if (childNodes.item(i) instanceof Element) {
-                childElements.add((Element) childNodes.item(i));
+        return childrenCache.computeIfAbsent(parent, key -> {
+            NodeList childNodes = key.getChildNodes();
+            List<Element> childElements = new ArrayList<>(childNodes.getLength());
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                if (childNodes.item(i) instanceof Element) {
+                    childElements.add((Element) childNodes.item(i));
+                }
             }
-        }
-        return childElements;
+            return childElements;
+        });
     }
 
     private String getAttributeIfPresent(Element element, String attributeName) {
