@@ -67,11 +67,15 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         loadCategory("genre.xml");
         loadCategory("orcidWorkType.xml");
         loadCategory("dummyClassification.xml");
-
+        loadCategory("diniPublType.xml");
+        loadCategory("schemaOrg.xml");
+        
         Document document = saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + "testMcrObject.xml"));
         MCRObject mcro = new MCRObject(document);
 
-        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
+        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler(
+            Map.of("xMapping", new MCRXMappingClassificationMapper(),
+                "xPath", new MCRXPathClassificationMapper("orcidWorkType", "dummyClassification")));
         mapper.handleObjectUpdated(null, mcro);
         Document xml = mcro.createXML();
 
@@ -133,7 +137,8 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         Document document = saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + "testMcrObject2.xml"));
         MCRObject mcro = new MCRObject(document);
 
-        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
+        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler(
+            Map.of("xPath", new MCRXPathClassificationMapper("orcidWorkType", "dummyClassification")));
         mapper.handleObjectUpdated(null, mcro);
         Document xml = mcro.createXML();
 
@@ -170,8 +175,9 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
 
         Document document = saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + "testMcrObject3.xml"));
         MCRObject mcro = new MCRObject(document);
-
-        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
+        
+        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler(
+            Map.of("xPath", new MCRXPathClassificationMapper("dummyClassification")));
         mapper.handleObjectUpdated(null, mcro);
         Document xml = mcro.createXML();
 

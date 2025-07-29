@@ -20,6 +20,7 @@ package org.mycore.mods.classification;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Map;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -41,7 +42,7 @@ import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 
-public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
+public class MCRMODSClassificationMappingEventHandlerTest extends MCRJPATestCase {
 
     public static final String TEST_DIRECTORY = "MCRClassificationMappingEventHandlerTest/";
 
@@ -66,7 +67,8 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 1);
 
-        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
+        MCRMODSClassificationMappingEventHandler mapper = new MCRMODSClassificationMappingEventHandler(
+           Map.of("xMapping", new MCRMODSXMappingClassificationMapper()));
         mapper.handleObjectUpdated(null, mcro);
 
         String expression =
@@ -112,7 +114,8 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 2);
 
-        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
+        MCRMODSClassificationMappingEventHandler mapper = new MCRMODSClassificationMappingEventHandler(
+            Map.of("xPath", new MCRMODSXPathClassificationMapper("orcidWorkType", "dummyClassification")));
         mapper.handleObjectUpdated(null, mcro);
 
         Document xml = mcro.createXML();
@@ -168,7 +171,8 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 3);
 
-        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
+        MCRMODSClassificationMappingEventHandler mapper = new MCRMODSClassificationMappingEventHandler(
+            Map.of("xPath", new MCRMODSXPathClassificationMapper("orcidWorkType", "dummyClassification")));
         mapper.handleObjectUpdated(null, mcro);
 
         Document xml = mcro.createXML();
@@ -226,7 +230,8 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 4);
 
-        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
+        MCRMODSClassificationMappingEventHandler mapper = new MCRMODSClassificationMappingEventHandler(
+            Map.of("xPath", new MCRMODSXPathClassificationMapper("placeholderClassification")));
         mapper.handleObjectUpdated(null, mcro);
 
         Document xml = mcro.createXML();
@@ -325,7 +330,8 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 8);
 
-        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
+        MCRMODSClassificationMappingEventHandler mapper = new MCRMODSClassificationMappingEventHandler(
+            Map.of("xPath", new MCRMODSXPathClassificationMapper("placeholderOrCondition")));
         mapper.handleObjectUpdated(null, mcro);
 
         Document xml = mcro.createXML();
@@ -361,7 +367,8 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         mw.setMODS(document1.getRootElement().detach());
         mw.setID("junit", 9);
 
-        MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
+        MCRMODSClassificationMappingEventHandler mapper = new MCRMODSClassificationMappingEventHandler(
+            Map.of("xPath", new MCRMODSXPathClassificationMapper("placeholderOrCondition")));
         mapper.handleObjectUpdated(null, mcro);
 
         Document xml = mcro.createXML();

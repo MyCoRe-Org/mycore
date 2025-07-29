@@ -60,28 +60,60 @@ public final class MCREventManager {
     private MCREventManager() {
         handlers = new ConcurrentHashMap<>();
 
-        Map<String, String> props = MCRConfiguration2.getPropertiesMap()
+        // collect all properties like 'MCR.EventHandler.{type}.{number}.{suffix}' where the type is not 'Mode',
+        // which have a special meaning (properties like 'MCR.EventHandler.Mode.{modeName}' are used for handlers
+        // configured as 'MCR.EventHandler.{type}.{number}.{modeName}'), but without the leading 'MCR.EventHandler.' 
+        Map<String, String> properties = MCRConfiguration2.getSubPropertiesMap(CONFIG_PREFIX)
             .entrySet()
             .stream()
-            .filter(p -> p.getKey().startsWith(CONFIG_PREFIX))
+            .filter(property -> !property.getKey().startsWith("Mode."))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        List<String> propertyKeyList = new ArrayList<>(props.size());
-        for (Object name : props.keySet()) {
-            String key = name.toString();
-            if (!key.startsWith(CONFIG_PREFIX + "Mode.")) {
-                propertyKeyList.add(key);
-            }
-        }
+        // collect all properties like 'MCR.EventHandler.{type}.{number}.Class,' which will be directly instantiated,
+        // but still without the leading 'MCR.EventHandler.' 
+        Map<String, String> classBasedProperties = properties
+            .entrySet()
+            .stream()
+            .filter(property -> {
+                String key = property.getKey();
+                int indexAfterTypeAndNumber = key.indexOf('.', key.indexOf('.') + 1);
+                String modeSuffix = key.substring(indexAfterTypeAndNumber);
+                return ".Class".equals(modeSuffix);
+            })
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        // collect all properties like 'MCR.EventHandler.{type}.{number}.{suffix}' where the suffix is not 'Class'
+        // and no property like 'MCR.EventHandler.{type}.{number}.Class' with the same type and number exist,
+        // (because such properties are configuration values for the directly instantiated handler, not a 
+        // property where the suffix is a mode name), but still without the leading 'MCR.EventHandler.' 
+        Map<String, String> modeBasedProperties = properties
+            .entrySet()
+            .stream()
+            .filter(property -> {
+                String key = property.getKey();
+                int indexAfterTypeAndNumber = key.indexOf('.', key.indexOf('.') + 1);
+                String modeSuffix = key.substring(indexAfterTypeAndNumber);
+                String classBasedKey = key.substring(0, indexAfterTypeAndNumber) + ".Class";
+                return !".Class".equals(modeSuffix) && !classBasedProperties.containsKey(classBasedKey);
+            })
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        // combine both sets of properties, in order
+        List<String> propertyKeyList = new ArrayList<>(classBasedProperties.size() + modeBasedProperties.size());
+        propertyKeyList.addAll(classBasedProperties.keySet());
+        propertyKeyList.addAll(modeBasedProperties.keySet());
         Collections.sort(propertyKeyList);
 
-        for (String propertyKey : propertyKeyList) {
-            EventHandlerProperty eventHandlerProperty = new EventHandlerProperty(propertyKey);
+        // process properties, add leading 'MCR.EventHandler.' again
+        for (String propertyKeySuffix : propertyKeyList) {
+            String propertyKey = CONFIG_PREFIX + propertyKeySuffix;
 
+            EventHandlerProperty eventHandlerProperty = new EventHandlerProperty(propertyKey);
             String type = eventHandlerProperty.getType();
             String mode = eventHandlerProperty.getMode();
 
-            LOGGER.debug("EventManager instantiating handler {} for type {}", () -> props.get(propertyKey), () -> type);
+            LOGGER.debug("EventManager instantiating handler {} for type {}",
+                () -> properties.get(propertyKey), () -> type);
 
             if (propKeyIsSet(propertyKey)) {
                 addEventHandler(type, getEventHandler(mode, propertyKey));

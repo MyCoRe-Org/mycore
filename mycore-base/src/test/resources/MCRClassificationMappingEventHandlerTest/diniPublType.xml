@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mycoreclass xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="MCRClassification.xsd" ID="diniPublType">
+  <label xml:lang="en" text="DINI publication- and document types" description="general vocabulary for publication and document types" />
+  <label xml:lang="de" text="DINI Publikations- und Dokumenttypen" description="Gemeinsames Vokabular für Publikations- und Dokumenttypen" />
+  <categories>
+    <category ID="article" counter="0">
+      <label xml:lang="en" text="article" description="Article or an editorial published in a journal." />
+      <label xml:lang="de" text="Wissenschaftlicher Artikel" description="Ein Artikel oder ein redaktioneller Teil veröffentlicht in einer wissenschaftlichen Zeitschrift." />
+    </category>
+  </categories>
+</mycoreclass>
