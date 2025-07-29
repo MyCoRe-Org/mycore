@@ -87,7 +87,7 @@ public class MCRObjectService {
     /**
      * constant for effective modified date
      */
-    public static final String DATE_TYPE_EFFECTIVE_MODIFIED_DATE = "effectivemodifieddate";
+    public static final String DATE_TYPE_EFFECTIVE_MODIFIED_DATE = "effectivemodifydate";
 
     /**
      * constant for modify date
