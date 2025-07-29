@@ -37,7 +37,7 @@ public class MCRBasicObjectExpander implements MCRObjectExpander {
 
     /**
      * Expands the given MCRObject by resolving its structure (parent, children, derivates)
-     * and potentially handling classification mappings. It also stores a effectiveModifiedDate in
+     * and potentially handling classification mappings. It also stores an effectivemodifydate in
      * the Service Element of the MCRExpandedObject.
      *
      * @param mcrObject The MCRObject to expand.

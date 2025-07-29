@@ -234,6 +234,7 @@
     <xs:restriction base="xs:normalizedString">
       <xs:enumeration value="createdate" />
       <xs:enumeration value="modifydate" />
+      <xs:enumeration value="effectivemodifydate" />
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="servdateTypeMCRType">
