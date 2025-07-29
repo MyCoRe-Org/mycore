@@ -686,7 +686,9 @@ public final class MCRMetadataManager {
      *        object is marked for deletion
      */
     public static MCRObject update(final MCRObject mcrObject) throws MCRPersistenceException, MCRAccessException {
-        MCRObjectID id = mcrObject.getId();
+        MCRObject objectCopy = copyObject(mcrObject);
+
+        MCRObjectID id = objectCopy.getId();
 
         if (isMarkedForDeletion(id)) {
             return null;
@@ -697,16 +699,29 @@ public final class MCRMetadataManager {
         }
 
         checkUpdatePermission(id);
-        normalizeObject(mcrObject);
-        validateObject(mcrObject);
+        normalizeObject(objectCopy);
+        validateObject(objectCopy);
 
         MCRObject old = retrieveMCRObject(id);
 
-        checkModificationDates(mcrObject, old);
-        retainCreatedDateAndFlags(mcrObject, old);
+        checkModificationDates(objectCopy, old);
+        retainCreatedDateAndFlags(objectCopy, old);
 
-        fireUpdateEvent(mcrObject);
-        return mcrObject;
+        fireUpdateEvent(objectCopy);
+        return objectCopy;
+    }
+
+    /**
+     * Creates a copy of the given MCRObject.
+     * @param mcrObject the object to copy
+     * @return a copy of the MCRObject
+     */
+    private static MCRObject copyObject(MCRObject mcrObject) {
+        Document document = mcrObject.createXML();
+        Document documentCopy = document.clone();
+        MCRObject objectCopy = new MCRObject();
+        objectCopy.setFromJDOM(documentCopy);
+        return objectCopy;
     }
 
     /**
