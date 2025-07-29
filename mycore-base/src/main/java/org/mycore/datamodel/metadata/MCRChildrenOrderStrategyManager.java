@@ -6,21 +6,16 @@ public final class MCRChildrenOrderStrategyManager {
 
     private static volatile MCRChildrenOrderStrategy childOrderStrategy;
 
+    private MCRChildrenOrderStrategyManager() {
+    }
 
-  private MCRChildrenOrderStrategyManager() {
-  }
+    public static MCRChildrenOrderStrategy getChildOrderStrategy() {
+        return ChildrenOrderStrategyHolder.INSTANCE;
+    }
 
-  public static MCRChildrenOrderStrategy getChildOrderStrategy() {
-    if (childOrderStrategy == null) {
-            synchronized (MCRChildrenOrderStrategyManager.class) {
-                if (childOrderStrategy == null) {
-                    childOrderStrategy = MCRConfiguration2.getSingleInstanceOfOrThrow(
-                        MCRChildrenOrderStrategy.class,
-                        "MCR.ChildrenOrderStrategy");
-                }
-            }
-        }
-        return childOrderStrategy;
+    private static final class ChildrenOrderStrategyHolder {
+        private static final MCRChildrenOrderStrategy INSTANCE = MCRConfiguration2.getSingleInstanceOfOrThrow(
+            MCRChildrenOrderStrategy.class, "MCR.ChildrenOrderStrategy");
     }
 
 }
