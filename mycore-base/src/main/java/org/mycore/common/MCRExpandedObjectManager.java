@@ -27,9 +27,7 @@ public final class MCRExpandedObjectManager {
     public static final String DEFAULT_IMPLEMENTATION_KEY = "Default";
     public static final String MCR_OBJECT_EXPANDER_PROPERTY_PREFIX = "MCR.ObjectExpander.Impl.";
 
-    private static volatile MCRExpandedObjectManager instance;
-
-    private Map<String, Callable<MCRObjectExpander>> expanderMap;
+    private final Map<String, Callable<MCRObjectExpander>> expanderMap;
 
     private MCRExpandedObjectManager() {
         expanderMap = MCRConfiguration2.getInstances(MCRObjectExpander.class, MCR_OBJECT_EXPANDER_PROPERTY_PREFIX);
@@ -42,14 +40,7 @@ public final class MCRExpandedObjectManager {
      * @return The singleton instance.
      */
     public static MCRExpandedObjectManager getInstance() {
-        if (instance == null) {
-            synchronized (MCRExpandedObjectManager.class) {
-                if (instance == null) {
-                    instance = new MCRExpandedObjectManager();
-                }
-            }
-        }
-        return instance;
+        return InstanceHolder.INSTANCE;
     }
 
     /**
@@ -84,6 +75,10 @@ public final class MCRExpandedObjectManager {
         } catch (Exception e) {
             throw new MCRException("Error while expanding object " + object.getId(), e);
         }
+    }
+
+    private static final class InstanceHolder {
+        private static final MCRExpandedObjectManager INSTANCE = new MCRExpandedObjectManager();
     }
 
 }
