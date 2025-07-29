@@ -9,7 +9,7 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.classifications2.MCRClassificationMapper;
 import org.mycore.datamodel.classifications2.MCRDefaultClassificationMapper;
-import org.mycore.datamodel.metadata.MCRChildOrderStrategyManager;
+import org.mycore.datamodel.metadata.MCRChildrenOrderStrategyManager;
 import org.mycore.datamodel.metadata.MCRExpandedObject;
 import org.mycore.datamodel.metadata.MCRExpandedObjectStructure;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkIDFactory;
@@ -51,7 +51,8 @@ public class MCRBasicObjectExpander implements MCRObjectExpander {
             newStructure.setParent(mcrObject.getParent());
         }
 
-        for (MCRObjectID mcrObjectID : MCRChildOrderStrategyManager.getChildOrderStrategy().getChildOrder(mcrObject)) {
+        for (MCRObjectID mcrObjectID : MCRChildrenOrderStrategyManager.getChildOrderStrategy()
+            .getChildOrder(mcrObject)) {
             newStructure.addChild(new MCRMetaLinkID("child", mcrObjectID, null, mcrObjectID.toString()));
         }
 

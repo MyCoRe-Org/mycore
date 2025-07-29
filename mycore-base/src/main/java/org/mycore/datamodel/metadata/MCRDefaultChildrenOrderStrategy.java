@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.mycore.access.MCRAccessException;
 
-public class MCRDefaultChildOrderStrategy implements MCRChildOrderStrategy {
+public class MCRDefaultChildrenOrderStrategy implements MCRChildrenOrderStrategy {
 
     @Override
     public List<MCRObjectID> getChildOrder(MCRObject parent) {
