@@ -8,7 +8,7 @@ import java.util.List;
  * Interface to define a strategy to store the order of child objects of a parent object.
  *
  */
-public interface MCRChildOrderStrategy {
+public interface MCRChildrenOrderStrategy {
 
     /**
      * The strategy should return the order of the child objects of the parent object.
