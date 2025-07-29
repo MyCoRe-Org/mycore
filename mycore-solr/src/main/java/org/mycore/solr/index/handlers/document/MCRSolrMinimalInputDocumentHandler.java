@@ -96,7 +96,12 @@ public class MCRSolrMinimalInputDocumentHandler extends MCRSolrAbstractErrorInde
 
     @Override
     public void index() throws IOException, SolrServerException {
-        String failedId = original.get("id").toString();
+        // delete old
+        String failedId = original.get("id").getValue().toString();
+        if (MCRSolrUtils.useNestedDocuments()) {
+            MCRSolrIndexer.deleteById(client, failedId);
+        }
+        // create a new error document
         SolrInputDocument minimalDoc = buildDocument(failedId, cause);
         minimalFields.forEach(fieldKey -> {
             SolrInputField field = original.get(fieldKey);
@@ -106,9 +111,6 @@ public class MCRSolrMinimalInputDocumentHandler extends MCRSolrAbstractErrorInde
         });
         UpdateRequest updateRequest = getUpdateRequest(MCRSolrConstants.SOLR_UPDATE_PATH);
         updateRequest.add(minimalDoc);
-        if (MCRSolrUtils.useNestedDocuments()) {
-            MCRSolrIndexer.deleteById(client, failedId);
-        }
         try {
             updateRequest.process(client);
         } catch (Exception e) {
