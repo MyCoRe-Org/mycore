@@ -21,10 +21,12 @@ package org.mycore.mcr.acl.accesskey.restapi.v2.access;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.mycore.mcr.acl.accesskey.access.MCRAccessKeyPermissionChecker;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
@@ -97,13 +99,18 @@ public class MCRAccessKeyRestAccessCheckStrategy implements MCRRestAccessCheckSt
             ensureHasManagePermission(accessKeyDto);
         } else {
             final MultivaluedMap<String, String> queryParameters = requestContext.getUriInfo().getQueryParameters();
-            final List<String> permissions = queryParameters.get(MCRAccessKeyRestConstants.QUERY_PARAM_PERMISSIONS);
-            if (permissions == null || permissions.isEmpty()) {
-                throw new ForbiddenException("permission is required");
+            final String permissionsParam = queryParameters.getFirst(MCRAccessKeyRestConstants.QUERY_PARAM_PERMISSIONS);
+            if (permissionsParam == null || permissionsParam.isBlank()) {
+                throw new ForbiddenException();
+            }
+            final List<String> permissions = Arrays.stream(permissionsParam.split(",")).map(String::trim)
+                .filter(s -> !s.isEmpty()).collect(Collectors.toList());
+            if (permissions.isEmpty()) {
+                throw new ForbiddenException();
             }
             final String reference
                 = Optional.ofNullable(queryParameters.getFirst(MCRAccessKeyRestConstants.QUERY_PARAM_REFERENCE))
-                    .orElseThrow(() -> new ForbiddenException("reference is required"));
+                    .orElseThrow(() -> new ForbiddenException());
             for (String permission : permissions) {
                 ensureHasManagePermission(reference, permission);
             }
