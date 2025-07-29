@@ -238,16 +238,14 @@ public class MCRIncludeHandler {
     }
 
     private List<Element> getChildren(Element parent) {
-        return childrenCache.computeIfAbsent(parent, key -> {
-            NodeList childNodes = key.getChildNodes();
-            List<Element> childElements = new ArrayList<>(childNodes.getLength());
-            for (int i = 0; i < childNodes.getLength(); i++) {
-                if (childNodes.item(i) instanceof Element) {
-                    childElements.add((Element) childNodes.item(i));
-                }
+        NodeList childNodes = parent.getChildNodes();
+        List<Element> childElements = new ArrayList<>(childNodes.getLength());
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            if (childNodes.item(i) instanceof Element) {
+                childElements.add((Element) childNodes.item(i));
             }
-            return childElements;
-        });
+        }
+        return childElements;
     }
 
     private String getAttributeIfPresent(Element element, String attributeName) {
