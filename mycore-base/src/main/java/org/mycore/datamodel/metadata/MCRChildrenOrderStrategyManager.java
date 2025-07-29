@@ -4,8 +4,6 @@ import org.mycore.common.config.MCRConfiguration2;
 
 public final class MCRChildrenOrderStrategyManager {
 
-    private static volatile MCRChildrenOrderStrategy childOrderStrategy;
-
     private MCRChildrenOrderStrategyManager() {
     }
 
@@ -14,8 +12,8 @@ public final class MCRChildrenOrderStrategyManager {
     }
 
     private static final class ChildrenOrderStrategyHolder {
-        private static final MCRChildrenOrderStrategy INSTANCE = MCRConfiguration2.getSingleInstanceOfOrThrow(
-            MCRChildrenOrderStrategy.class, "MCR.ChildrenOrderStrategy");
+        private static final MCRChildrenOrderStrategy INSTANCE = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRChildrenOrderStrategy.class, "MCR.ChildrenOrderStrategy.Class");
     }
 
 }
