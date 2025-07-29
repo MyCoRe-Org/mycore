@@ -88,7 +88,7 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
             MCRPath path = MCRPath.getPath(derivate.getId().toString(), fileName);
             fileList.add(path);
             if (!Files.exists(path)) {
-                Files.createFile(path);
+                Files.writeString(path, "test_file");
                 derivate.getDerivate().getOrCreateFileMetadata(path);
             }
         }
@@ -167,7 +167,7 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
         derivate.setSchema("datamodel-derivate.xsd");
         MCRMetaIFS ifs = new MCRMetaIFS();
         ifs.setSubTag("internal");
-        ifs.setSourcePath(MCRPath.getPath(derivate.getId().toString(), "/").toAbsolutePath().toString());
+        ifs.setSourcePath("");
         derivate.getDerivate().setInternals(ifs);
         MCRMetaLinkID mcrMetaLinkID = new MCRMetaLinkID();
         mcrMetaLinkID.setReference(objectHrefId.toString(), null, null);
@@ -185,6 +185,9 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
     @Override
     @After
     public void tearDown() throws Exception {
+        // Force garbage collection 
+        // (may close some open Windows file handles when calling finalize() and avoid AccessDeniedExceptions)
+        System.gc();
         MCRMetadataManager.delete(derivate);
         MCRMetadataManager.delete(object);
         super.tearDown();
