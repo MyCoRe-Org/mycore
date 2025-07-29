@@ -1,5 +1,8 @@
 package org.mycore.common;
 
+import static org.mycore.datamodel.metadata.MCRObjectService.DATE_TYPE_EFFECTIVE_MODIFIED_DATE;
+
+import java.util.Date;
 import java.util.function.Supplier;
 
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
@@ -34,7 +37,8 @@ public class MCRBasicObjectExpander implements MCRObjectExpander {
 
     /**
      * Expands the given MCRObject by resolving its structure (parent, children, derivates)
-     * and potentially handling classification mappings.
+     * and potentially handling classification mappings. It also stores a effectiveModifiedDate in
+     * the Service Element of the MCRExpandedObject.
      *
      * @param mcrObject The MCRObject to expand.
      * @return An MCRExpandedObject containing the expanded structure and metadata.
@@ -67,6 +71,8 @@ public class MCRBasicObjectExpander implements MCRObjectExpander {
         expandedObject.setSchema(mcrObject.getSchema());
 
         expandClassifications(mcrObject);
+
+        expandedObject.getService().setDate(DATE_TYPE_EFFECTIVE_MODIFIED_DATE, new Date());
 
         return expandedObject;
     }
