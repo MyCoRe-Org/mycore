@@ -41,7 +41,7 @@ public abstract class MCRSaltedHashPasswordCheckStrategyBase extends MCRHashPass
 
     @Override
     protected final PasswordCheckData doCreate(SecureRandom random, String password) throws Exception {
-        byte[] salt = random.generateSeed(saltSizeBytes);
+        byte[] salt = saltSizeBytes == 0 ? new byte[0] : random.generateSeed(saltSizeBytes);
         String encodedSalt = Base64.getEncoder().encodeToString(salt);
         return new PasswordCheckData(encodedSalt, doCreateSaltedHash(salt, password));
     }
