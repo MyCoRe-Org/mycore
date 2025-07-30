@@ -439,6 +439,12 @@
   },
   {
     "add-field": {
+      "name": "effectiveModified",
+      "type": "pdate"
+    }
+  },
+  {
+    "add-field": {
       "name": "modifiedby",
       "type": "string",
       "multiValued": false,
