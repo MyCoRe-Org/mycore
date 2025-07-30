@@ -92,6 +92,9 @@ public class MCRIFSCopyTest extends MCRIFSTest {
 
     @AfterEach
     public void tearDown() throws Exception {
+        // Force garbage collection 
+        // (may close some open Windows file handles when calling finalize() and avoid AccessDeniedExceptions)
+        System.gc();
         MCRMetadataManager.delete(derivate);
         MCRMetadataManager.delete(root);
     }

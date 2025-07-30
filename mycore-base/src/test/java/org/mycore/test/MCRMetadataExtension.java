@@ -31,6 +31,7 @@ import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.tmatesoft.svn.core.internal.wc.SVNFileUtil;
 
 /**
  * JUnit 5 extension for setting up and tearing down the MCR metadata store and SVN directories.
@@ -84,9 +85,10 @@ public class MCRMetadataExtension implements Extension, BeforeAllCallback, Befor
     public void afterEach(ExtensionContext context) throws Exception {
         // Clean up temp directories
         Path storeBaseDir = getStoreBaseDir(context);
-        Path svnBaseDir = getSvnBaseDir(context);
+        MCRTestHelper.deleteRecursively(storeBaseDir);
 
-        MCRTestHelper.deleteRecursively(storeBaseDir, svnBaseDir);
+        Path svnBaseDir = getSvnBaseDir(context);
+        SVNFileUtil.deleteAll(svnBaseDir.toFile(), true);
     }
 
     /**
