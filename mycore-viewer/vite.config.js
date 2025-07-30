@@ -20,17 +20,17 @@ import { defineConfig } from 'vite';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 const inputs = {
-  base: 'src/main/typescript/modules/base/module.ts',
-  desktop: 'src/main/typescript/modules/desktop/module.ts',
-  mets: 'src/main/typescript/modules/mets/module.ts',
-  pdf: 'src/main/typescript/modules/pdf/module.ts',
-  frame: 'src/main/typescript/modules/frame/module.ts',
-  logo: 'src/main/typescript/modules/logo/module.ts',
-  metadata: 'src/main/typescript/modules/metadata/module.ts',
-  piwik: 'src/main/typescript/modules/piwik/module.ts',
-  "toolbar-extender": 'src/main/typescript/modules/toolbar-extender/module.ts',
-  epub: 'src/main/typescript/modules/epub/module.ts',
-  iiif: 'src/main/typescript/modules/iiif/module.ts',
+  base: 'src/main/typescript/modules/base/index.ts',
+  desktop: 'src/main/typescript/modules/desktop/index.ts',
+  mets: 'src/main/typescript/modules/mets/index.ts',
+  pdf: 'src/main/typescript/modules/pdf/index.ts',
+  frame: 'src/main/typescript/modules/frame/index.ts',
+  logo: 'src/main/typescript/modules/logo/index.ts',
+  metadata: 'src/main/typescript/modules/metadata/index.ts',
+  piwik: 'src/main/typescript/modules/piwik/index.ts',
+  "toolbar-extender": 'src/main/typescript/modules/toolbar-extender/index.ts',
+  epub: 'src/main/typescript/modules/epub/index.ts',
+  iiif: 'src/main/typescript/modules/iiif/index.ts',
   style_default: 'src/main/less/templates/default/Iview.less',
   style_tei: 'src/main/less/tei.less',
 };
