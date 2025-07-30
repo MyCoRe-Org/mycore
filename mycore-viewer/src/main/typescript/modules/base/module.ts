@@ -16,9 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { MyCoReViewer } from "./MyCoReViewer";
 import { addViewerComponent } from "./Utils";
-import { ViewerComponent } from "./components/ViewerComponent";
 import { MyCoReViewerContainerComponent } from "./components/MyCoReViewerContainerComponent";
 import { MyCoReI18NComponent } from "./components/MyCoReI18NComponent";
 import { MyCoReImageOverviewComponent } from "./components/MyCoReImageOverviewComponent";
@@ -36,9 +34,5 @@ addViewerComponent(MyCoReToolbarComponent);
 addViewerComponent(MyCoReImageScrollComponent);
 addViewerComponent(MyCoReChapterComponent);
 addViewerComponent(MyCoRePermalinkComponent);
-
-
 addViewerComponent(MyCoReLayerComponent);
 addViewerComponent(MyCoReButtonChangeComponent);
-
-export { MyCoReViewer, addViewerComponent, ViewerComponent }
