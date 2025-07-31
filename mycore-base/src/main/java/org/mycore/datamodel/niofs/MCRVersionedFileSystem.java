@@ -18,6 +18,9 @@
 
 package org.mycore.datamodel.niofs;
 
+import java.nio.file.FileSystemException;
+import java.nio.file.NoSuchFileException;
+
 /**
  * Represents a file system with versioning capabilities. This class extends {@link MCRAbstractFileSystem}
  * to work with {@link MCRVersionedFileSystemProvider}, thereby enabling handling of paths that
@@ -44,5 +47,17 @@ public abstract class MCRVersionedFileSystem extends MCRAbstractFileSystem {
     public MCRVersionedFileSystemProvider provider() {
         return (MCRVersionedFileSystemProvider) super.provider();
     }
+
+    /**
+     * Restores the root with the given version.
+     * <p>
+     * After calling this method, the implementing FileSystem should be ready to accept data for this root.
+     *
+     * @param owner ,e.g. derivate ID
+     * @param version the version
+     * @throws FileSystemException if restoring the root directory fails
+     * @throws NoSuchFileException more specific, if the owner or version never existed
+     */
+    public abstract void restoreRoot(String owner, String version) throws FileSystemException, NoSuchFileException;
 
 }
