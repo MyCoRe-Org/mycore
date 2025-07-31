@@ -16,31 +16,43 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.resource.hint;
+package org.mycore.resource.common;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Pattern;
 
-import org.mycore.common.hint.MCRHint;
-import org.mycore.common.hint.MCRHintKey;
+import org.mycore.common.hint.MCRHints;
 
-public final class MCRClasspathDirsResourceHint implements MCRHint<List<Path>> {
+/**
+ * A {@link MCRSystemPropertyClasspathDirsProvider} is a {@link MCRClasspathDirsProvider} that returns the list of
+ * filesystem directories that are listed in the system property <code>java.class.path</code>.
+ * <p>
+ * No configuration options are available.
+ * <p>
+ * Example:
+ * <pre><code>
+ * [...].Class=org.mycore.resource.common.MCRSystemPropertyClasspathDirsProvider
+ * </code></pre>
+ */
+public final class MCRSystemPropertyClasspathDirsProvider implements MCRClasspathDirsProvider {
 
     private final List<Path> classpathDirs;
 
-    public MCRClasspathDirsResourceHint() {
-        this.classpathDirs = getClassPathDirs();
+    public MCRSystemPropertyClasspathDirsProvider() {
+        this.classpathDirs = getClassPathDirsFromSystemProperty();
     }
 
-    private static List<Path> getClassPathDirs() {
+    @Override
+    public List<Path> getClasspathDirs(MCRHints hints) {
+        return classpathDirs;
+    }
+
+    private static List<Path> getClassPathDirsFromSystemProperty() {
 
         List<Path> classPathDirs = new LinkedList<>();
 
@@ -55,16 +67,6 @@ public final class MCRClasspathDirsResourceHint implements MCRHint<List<Path>> {
 
         return List.copyOf(classPathDirs);
 
-    }
-
-    @Override
-    public MCRHintKey<List<Path>> key() {
-        return MCRResourceHintKeys.CLASSPATH_DIRS;
-    }
-
-    @Override
-    public Optional<List<Path>> value() {
-        return Optional.of(classpathDirs);
     }
 
 }
