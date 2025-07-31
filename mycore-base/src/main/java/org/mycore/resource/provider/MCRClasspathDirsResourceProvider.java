@@ -19,13 +19,14 @@
 package org.mycore.resource.provider;
 
 import java.nio.file.Path;
-import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.hint.MCRHints;
+import org.mycore.resource.common.MCRClasspathDirsProvider;
+import org.mycore.resource.common.MCRNoOpClasspathDirsProvider;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 
 /**
@@ -33,7 +34,8 @@ import org.mycore.resource.hint.MCRResourceHintKeys;
  * in the file system. It uses a fixed list of base directories taken from the system property
  * <code>java.class.path</code> as base directories for the lookup.
  * <p>
- * It uses the set of {@link Path} instances hinted at by {@link MCRResourceHintKeys#CLASSPATH_DIRS}, if present.
+ * It uses the {@link MCRClasspathDirsProvider} hinted at by {@link MCRResourceHintKeys#CLASSPATH_DIRS_PROVIDER},
+ * if present.
  * <p>
  * The following configuration options are available:
  * <ul>
@@ -55,7 +57,10 @@ public final class MCRClasspathDirsResourceProvider extends MCRFileSystemResourc
 
     @Override
     protected Stream<Path> getBaseDirs(MCRHints hints) {
-        return hints.get(MCRResourceHintKeys.CLASSPATH_DIRS).stream().flatMap(List::stream);
+        return hints.get(MCRResourceHintKeys.CLASSPATH_DIRS_PROVIDER)
+            .orElseGet(MCRNoOpClasspathDirsProvider::new)
+            .getClasspathDirs(hints)
+            .stream();
     }
 
     @Override
@@ -65,7 +70,7 @@ public final class MCRClasspathDirsResourceProvider extends MCRFileSystemResourc
 
     public static class Factory implements Supplier<MCRClasspathDirsResourceProvider> {
 
-        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.DeveloperOverride.Coverage")
+        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.ClasspathDirs.Coverage")
         public String coverage;
 
         @Override

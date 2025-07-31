@@ -235,8 +235,10 @@ public class MCRClasspathDirsResourceProviderTest {
         return new MCRClasspathDirsResourceProvider("classpath dirs");
     }
 
-    private MCRHints toHints(Path... classpathDirs) {
-        return new MCRHintsBuilder().add(MCRResourceHintKeys.CLASSPATH_DIRS, List.of(classpathDirs)).build();
+    private MCRHints toHints(Path... baseDirs) {
+        return new MCRHintsBuilder()
+            .add(MCRResourceHintKeys.CLASSPATH_DIRS_PROVIDER, hints -> List.of(baseDirs))
+            .build();
     }
 
     private URL toUrl(Path baseDir, String fileName) {
