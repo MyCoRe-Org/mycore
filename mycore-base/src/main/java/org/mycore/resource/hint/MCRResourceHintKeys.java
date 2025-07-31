@@ -20,13 +20,13 @@ package org.mycore.resource.hint;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.SequencedSet;
 import java.util.SortedSet;
 
 import org.mycore.common.config.MCRComponent;
 import org.mycore.common.hint.MCRCollectionHintKey;
 import org.mycore.common.hint.MCRHintKey;
 import org.mycore.resource.MCRResourceResolver;
+import org.mycore.resource.common.MCRClasspathDirsProvider;
 
 import jakarta.servlet.ServletContext;
 
@@ -47,12 +47,11 @@ public final class MCRResourceHintKeys {
         "CLASS_LOADER",
         ClassLoader::getName);
 
-    public static final MCRHintKey<List<Path>> CLASSPATH_DIRS = new MCRCollectionHintKey<>(
-            Path.class,
-            MCRResourceHintKeys.class,
-            "CLASSPATH_DIRS",
-            Object::toString,
-            List.of());
+    public static final MCRHintKey<MCRClasspathDirsProvider> CLASSPATH_DIRS_PROVIDER = new MCRHintKey<>(
+        MCRClasspathDirsProvider.class,
+        MCRResourceHintKeys.class,
+        "CLASSPATH_DIRS_PROVIDER",
+        mcrClasspathDirsProvider -> mcrClasspathDirsProvider.getClass().getSimpleName());
 
     public static final MCRHintKey<SortedSet<MCRComponent>> COMPONENTS = new MCRCollectionHintKey<>(
         MCRComponent.class,
@@ -63,7 +62,8 @@ public final class MCRResourceHintKeys {
             if (collection.size() > 1 && collection.getFirst().getPriority() < collection.getLast().getPriority()) {
                 throw new IllegalArgumentException("Components must be ordered from highest to lowest priority");
             }
-        }));
+        }),
+        List.of());
 
     public static final MCRHintKey<ServletContext> SERVLET_CONTEXT = new MCRHintKey<>(
         ServletContext.class,

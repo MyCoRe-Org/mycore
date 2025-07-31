@@ -29,9 +29,10 @@ import org.mycore.common.MCRStreamUtils;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRClasspathDirsProvider;
 import org.mycore.resource.common.MCRResourceTracer;
 import org.mycore.resource.hint.MCRResourceHintKeys;
-import org.mycore.resource.provider.MCRResourceProvider.ClassLoaderPrefixStripper;
+import org.mycore.resource.provider.MCRResourceProvider.ClasspathDirsPrefixStripper;
 import org.mycore.resource.provider.MCRResourceProvider.JarUrlPrefixStripper;
 import org.mycore.resource.provider.MCRResourceProvider.PrefixStripper;
 
@@ -39,7 +40,8 @@ import org.mycore.resource.provider.MCRResourceProvider.PrefixStripper;
  * A {@link MCRClassLoaderResourceLocator} is a {@link MCRResourceLocator} that uses
  * {@link ClassLoader#getResources(String)} to locate resources.
  * <p>
- * It uses the {@link ClassLoader} hinted at by {@link MCRResourceHintKeys#CLASS_LOADER}, if present.
+ * It uses the {@link ClassLoader} hinted at by {@link MCRResourceHintKeys#CLASS_LOADER} and the 
+ * {@link MCRClasspathDirsProvider} hinted at by {@link MCRResourceHintKeys#CLASSPATH_DIRS_PROVIDER}, if present.
  * <p>
  * No configuration options are available.
  * <p>
@@ -73,9 +75,7 @@ public final class MCRClassLoaderResourceLocator extends MCRResourceLocatorBase 
 
     @Override
     public Stream<PrefixStripper> prefixStrippers(MCRHints hints) {
-        return Stream.concat(
-            Stream.of(JarUrlPrefixStripper.INSTANCE),
-            hints.get(MCRResourceHintKeys.CLASS_LOADER).map(ClassLoaderPrefixStripper::new).stream());
+        return Stream.of(JarUrlPrefixStripper.INSTANCE, new ClasspathDirsPrefixStripper(hints));
     }
 
     public static class Factory implements Supplier<MCRClassLoaderResourceLocator> {
