@@ -47,6 +47,7 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
@@ -54,6 +55,8 @@ import org.mycore.common.processing.MCRProcessableDefaultCollection;
 import org.mycore.common.processing.MCRProcessableManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRExpandedObject;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.MCRSolrUtils;
@@ -373,7 +376,6 @@ public class MCRSolrIndexer {
         int totalCount = list.size();
         LOGGER.info("Sending {} objects to solr for reindexing", totalCount);
 
-        MCRXMLMetadataManager metadataMgr = MCRXMLMetadataManager.getInstance();
         MCRSolrIndexStatistic statistic = null;
         Map<MCRObjectID, MCRContent> contentMap = new HashMap<>((int) (BULK_SIZE * 1.4));
         int i = 0;
@@ -382,7 +384,9 @@ public class MCRSolrIndexer {
             try {
                 LOGGER.debug("Preparing \"{}\" for indexing", id);
                 MCRObjectID objId = MCRObjectID.getInstance(id);
-                MCRContent content = metadataMgr.retrieveContent(objId);
+
+                MCRExpandedObject mcrObject = MCRMetadataManager.retrieveMCRExpandedObject(objId);
+                MCRContent content = new MCRBaseContent(mcrObject);
                 contentMap.put(objId, content);
                 if (i % BULK_SIZE == 0 || totalCount == i) {
                     MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.obtainInstance()
