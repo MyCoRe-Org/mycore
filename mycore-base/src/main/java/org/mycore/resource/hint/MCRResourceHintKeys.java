@@ -20,6 +20,7 @@ package org.mycore.resource.hint;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.SequencedSet;
 import java.util.SortedSet;
 
 import org.mycore.common.config.MCRComponent;
@@ -45,6 +46,13 @@ public final class MCRResourceHintKeys {
         MCRResourceHintKeys.class,
         "CLASS_LOADER",
         ClassLoader::getName);
+
+    public static final MCRHintKey<List<Path>> CLASSPATH_DIRS = new MCRCollectionHintKey<>(
+            Path.class,
+            MCRResourceHintKeys.class,
+            "CLASSPATH_DIRS",
+            Object::toString,
+            List.of());
 
     public static final MCRHintKey<SortedSet<MCRComponent>> COMPONENTS = new MCRCollectionHintKey<>(
         MCRComponent.class,

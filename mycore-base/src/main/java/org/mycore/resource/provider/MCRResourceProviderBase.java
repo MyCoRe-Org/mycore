@@ -74,7 +74,7 @@ public abstract class MCRResourceProviderBase implements MCRResourceProvider {
     }
 
     @Override
-    public String coverage() {
+    public final String coverage() {
         return coverage;
     }
 
