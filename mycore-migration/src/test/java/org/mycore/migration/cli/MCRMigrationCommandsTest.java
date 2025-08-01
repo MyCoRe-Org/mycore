@@ -51,7 +51,7 @@ public class MCRMigrationCommandsTest extends MCRStoreTestCase {
                 .getChild("children"));
     }
 
-    private static void checkChildOrder(Document migratedObject1, MCRObjectID testID5, MCRObjectID testID2,
+    private static void checkChildrenOrder(Document migratedObject1, MCRObjectID testID5, MCRObjectID testID2,
         MCRObjectID testID4) {
         List<String> hrefs = migratedObject1.getRootElement()
             .getChild(MCRObjectStructure.XML_NAME)
@@ -102,7 +102,7 @@ public class MCRMigrationCommandsTest extends MCRStoreTestCase {
         MCRMigrationCommands.migrateNormalizedObject(testID1.toString());
 
         Document migratedObject1 = MCRXMLMetadataManager.getInstance().retrieveXML(testID1);
-        checkChildOrder(migratedObject1, testID5, testID2, testID4);
+        checkChildrenOrder(migratedObject1, testID5, testID2, testID4);
         verifyNoChildrenElementLeft(migratedObject1);
         checkNoGeneratedClassifications(migratedObject1);
 
@@ -113,7 +113,7 @@ public class MCRMigrationCommandsTest extends MCRStoreTestCase {
 
         MCRMigrationCommands.migrateNormalizedObject(testID2.toString());
         Document migratedObject2 = MCRXMLMetadataManager.getInstance().retrieveXML(testID2);
-        checkChildOrder(migratedObject2, testID7, testID3, testID6);
+        checkChildrenOrder(migratedObject2, testID7, testID3, testID6);
         verifyNoChildrenElementLeft(migratedObject2);
         checkNoGeneratedClassifications(migratedObject2);
         checkRelatedItemIsEmpty(migratedObject2);

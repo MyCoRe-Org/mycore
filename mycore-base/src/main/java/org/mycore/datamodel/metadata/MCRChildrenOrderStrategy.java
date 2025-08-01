@@ -15,7 +15,7 @@ public interface MCRChildrenOrderStrategy {
      * @param parentId the id of the parent object
      * @return the order of the child objects
      */
-    List<MCRObjectID> getChildOrder(MCRObject parentId);
+    List<MCRObjectID> getChildrenOrder(MCRObject parentId);
 
     /**
      * This method should set the order of the child objects of the parent object. The order is given as a list of
@@ -23,6 +23,6 @@ public interface MCRChildrenOrderStrategy {
      * @param parentId the id of the parent object
      * @param newOrder the new order of the child objects
      */
-    void setChildOrder(MCRObject parentId, List<MCRObjectID> newOrder) throws MCRAccessException;
+    void setChildrenOrder(MCRObject parentId, List<MCRObjectID> newOrder) throws MCRAccessException;
 
 }
