@@ -682,8 +682,6 @@ public final class MCRMetadataManager {
      *                if a persistence problem is occurred
      * @throws MCRAccessException
      *                if write permission is missing or see {@link #create(MCRObject)}
-     * @return the normalized version of the object or the object itself if no normalization is applied or null if the
-     *        object is marked for deletion
      */
     public static void update(final MCRObject mcrObject) throws MCRPersistenceException, MCRAccessException {
         MCRObjectID id = mcrObject.getId();
