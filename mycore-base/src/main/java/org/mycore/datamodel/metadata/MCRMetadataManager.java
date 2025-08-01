@@ -262,10 +262,8 @@ public final class MCRMetadataManager {
      *                if a persistence problem is occured
      * @throws MCRAccessException if "create-{objectType}" privilege is missing
      */
-    public static MCRObject create(final MCRObject mcrObject) throws MCRPersistenceException, MCRAccessException {
-        MCRObject copy = copyObject(mcrObject);
-
-        MCRObjectID objectId = Objects.requireNonNull(copy.getId(), "ObjectID must not be null");
+    public static void create(final MCRObject mcrObject) throws MCRPersistenceException, MCRAccessException {
+        MCRObjectID objectId = Objects.requireNonNull(mcrObject.getId(), "ObjectID must not be null");
 
         checkCreatePrivilege(objectId);
         // exist the object?
@@ -273,14 +271,12 @@ public final class MCRMetadataManager {
             throw new MCRPersistenceException("The object " + objectId + " already exists, nothing done.");
         }
 
-        normalizeObject(copy);
+        normalizeObject(mcrObject);
 
-        validateObject(copy);
+        validateObject(mcrObject);
 
         // handle events
-        fireEvent(copy, null, MCREvent.EventType.CREATE);
-
-        return copy;
+        fireEvent(mcrObject, null, MCREvent.EventType.CREATE);
     }
 
     public static void checkCreatePrivilege(MCRObjectID objectId) throws MCRAccessException {
@@ -689,43 +685,28 @@ public final class MCRMetadataManager {
      * @return the normalized version of the object or the object itself if no normalization is applied or null if the
      *        object is marked for deletion
      */
-    public static MCRObject update(final MCRObject mcrObject) throws MCRPersistenceException, MCRAccessException {
-        MCRObject objectCopy = copyObject(mcrObject);
-
-        MCRObjectID id = objectCopy.getId();
+    public static void update(final MCRObject mcrObject) throws MCRPersistenceException, MCRAccessException {
+        MCRObjectID id = mcrObject.getId();
 
         if (isMarkedForDeletion(id)) {
-            return null;
+            return;
         }
 
         if (!exists(id)) {
             create(mcrObject);
+            return;
         }
 
         checkUpdatePermission(id);
-        normalizeObject(objectCopy);
-        validateObject(objectCopy);
+        normalizeObject(mcrObject);
+        validateObject(mcrObject);
 
         MCRObject old = retrieveMCRObject(id);
 
-        checkModificationDates(objectCopy, old);
-        retainCreatedDateAndFlags(objectCopy, old);
+        checkModificationDates(mcrObject, old);
+        retainCreatedDateAndFlags(mcrObject, old);
 
-        fireUpdateEvent(objectCopy);
-        return objectCopy;
-    }
-
-    /**
-     * Creates a copy of the given MCRObject.
-     * @param mcrObject the object to copy
-     * @return a copy of the MCRObject
-     */
-    private static MCRObject copyObject(MCRObject mcrObject) {
-        Document document = mcrObject.createXML();
-        Document documentCopy = document.clone();
-        MCRObject objectCopy = new MCRObject();
-        objectCopy.setFromJDOM(documentCopy);
-        return objectCopy;
+        fireUpdateEvent(mcrObject);
     }
 
     /**
