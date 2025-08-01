@@ -7,7 +7,7 @@ public final class MCRChildrenOrderStrategyManager {
     private MCRChildrenOrderStrategyManager() {
     }
 
-    public static MCRChildrenOrderStrategy getChildOrderStrategy() {
+    public static MCRChildrenOrderStrategy getChildrenOrderStrategy() {
         return ChildrenOrderStrategyHolder.INSTANCE;
     }
 
