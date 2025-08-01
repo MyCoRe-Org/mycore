@@ -113,6 +113,11 @@
         <xsl:value-of select="." />
       </field>
     </xsl:for-each>
+    <xsl:for-each select="service/servdates/servdate[@type='effectivemodifydate']">
+      <field name="effectiveModified">
+        <xsl:value-of select="." />
+      </field>
+    </xsl:for-each>
     <xsl:for-each select="service/servflags/servflag[@type='modifiedby']">
       <field name="modifiedby">
         <xsl:value-of select="." />
