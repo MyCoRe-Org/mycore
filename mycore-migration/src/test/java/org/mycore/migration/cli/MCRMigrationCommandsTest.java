@@ -83,7 +83,7 @@ public class MCRMigrationCommandsTest extends MCRStoreTestCase {
             @MCRTestProperty(key = CHILDREN_ORDER_STRATEGY_PROPERTY,
                     classNameOf = MCRAlwaysAddChildrenOrderStrategy.class),
         })
-    public void migrateChildOrder() throws IOException, JDOMException {
+    public void migrateChildrenOrder() throws IOException, JDOMException {
         MCRObjectID testID1 = createTestData(TEST_FILE_DIRECTORY + TEST_FILE_1);
         MCRObjectID testID2 = createTestData(TEST_FILE_DIRECTORY + TEST_FILE_2);
         MCRObjectID testID3 = createTestData(TEST_FILE_DIRECTORY + TEST_FILE_3);
