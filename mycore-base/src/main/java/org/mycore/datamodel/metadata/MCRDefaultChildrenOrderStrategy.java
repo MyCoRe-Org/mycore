@@ -10,7 +10,7 @@ import org.mycore.access.MCRAccessException;
 public class MCRDefaultChildrenOrderStrategy implements MCRChildrenOrderStrategy {
 
     @Override
-    public List<MCRObjectID> getChildOrder(MCRObject parent) {
+    public List<MCRObjectID> getChildrenOrder(MCRObject parent) {
         List<MCRObjectID> childrenOrder = parent.getStructure().getChildrenOrder();
         Map<MCRObjectID, Integer> childrenOrderMap = new HashMap<>();
 
@@ -26,7 +26,7 @@ public class MCRDefaultChildrenOrderStrategy implements MCRChildrenOrderStrategy
     }
 
     @Override
-    public void setChildOrder(MCRObject parent, List<MCRObjectID> newOrder) throws MCRAccessException {
+    public void setChildrenOrder(MCRObject parent, List<MCRObjectID> newOrder) throws MCRAccessException {
         parent.getStructure().setChildrenOrder(newOrder);
         MCRMetadataManager.update(parent);
     }

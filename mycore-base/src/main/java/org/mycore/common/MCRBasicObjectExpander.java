@@ -52,7 +52,7 @@ public class MCRBasicObjectExpander implements MCRObjectExpander {
         }
 
         for (MCRObjectID mcrObjectID : MCRChildrenOrderStrategyManager.getChildOrderStrategy()
-            .getChildOrder(mcrObject)) {
+            .getChildrenOrder(mcrObject)) {
             newStructure.addChild(new MCRMetaLinkID("child", mcrObjectID, null, mcrObjectID.toString()));
         }
 
