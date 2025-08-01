@@ -262,8 +262,10 @@ public final class MCRMetadataManager {
      *                if a persistence problem is occured
      * @throws MCRAccessException if "create-{objectType}" privilege is missing
      */
-    public static void create(final MCRObject mcrObject) throws MCRPersistenceException, MCRAccessException {
-        MCRObjectID objectId = Objects.requireNonNull(mcrObject.getId(), "ObjectID must not be null");
+    public static MCRObject create(final MCRObject mcrObject) throws MCRPersistenceException, MCRAccessException {
+        MCRObject copy = copyObject(mcrObject);
+
+        MCRObjectID objectId = Objects.requireNonNull(copy.getId(), "ObjectID must not be null");
 
         checkCreatePrivilege(objectId);
         // exist the object?
@@ -271,12 +273,14 @@ public final class MCRMetadataManager {
             throw new MCRPersistenceException("The object " + objectId + " already exists, nothing done.");
         }
 
-        normalizeObject(mcrObject);
+        normalizeObject(copy);
 
-        validateObject(mcrObject);
+        validateObject(copy);
 
         // handle events
-        fireEvent(mcrObject, null, MCREvent.EventType.CREATE);
+        fireEvent(copy, null, MCREvent.EventType.CREATE);
+
+        return copy;
     }
 
     public static void checkCreatePrivilege(MCRObjectID objectId) throws MCRAccessException {
