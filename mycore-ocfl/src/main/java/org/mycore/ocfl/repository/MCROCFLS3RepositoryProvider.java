@@ -156,6 +156,10 @@ public class MCROCFLS3RepositoryProvider implements MCROCFLRepositoryProvider {
             .remote(true)
             .defaultLayoutConfig(new HashedNTupleIdEncapsulationLayoutConfig())
             .contentPathConstraints(ContentPathConstraints.cloud())
+            // TODO
+            // - check if object lock is required
+            // - check if we should store inventory details in DB
+            // - ocfl-java uses JDBC
             //.objectLock(lock -> lock.dataSource(dataSource))
             //.objectDetailsDb(db -> db.dataSource(dataSource))
             .storage(storage -> storage
