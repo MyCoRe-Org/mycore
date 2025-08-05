@@ -43,8 +43,7 @@ public class MCRActiveLinkCheckEventHandler extends MCREventHandlerBase {
             LOGGER.debug("Sources size:{}", sources.size());
         }
         if (!sources.isEmpty()) {
-            final MCRActiveLinkException activeLinks =
-                new MCRActiveLinkException("Error while deleting object " + obj.mcrId
+            final MCRActiveLinkException activeLinks = new MCRActiveLinkException("Error while deleting object " + obj.mcrId
                 + ". This object is still referenced by other objects and "
                 + "can not be removed until all links are released.");
             for (final String curSource : sources) {
