@@ -38,8 +38,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRCache;
@@ -87,8 +85,6 @@ import io.ocfl.core.extension.storage.layout.config.HashedNTupleIdEncapsulationL
  * methods to create, retrieve, update and delete object metadata using OCFL
  */
 public class MCROCFLXMLMetadataManagerAdapter implements MCRXMLMetadataManagerAdapter {
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String MESSAGE_CREATED = "Created";
 
