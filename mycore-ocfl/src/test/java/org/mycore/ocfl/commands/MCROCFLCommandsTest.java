@@ -35,8 +35,8 @@ import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRExpandedObject;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.MCROCFLTestCaseHelper;
@@ -91,7 +91,7 @@ public class MCROCFLCommandsTest {
         try(Stream<Path> directoryStream = Files.list(MCRVersionedPath.head(JUNIT_DERIVATE_1, "/"))) {
             assertEquals(3, directoryStream.toList().size());
         }
-        MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(derivate.getOwnerID());
+        MCRExpandedObject mcrObject = MCRMetadataManager.retrieveMCRExpandedObject(derivate.getOwnerID());
         assertTrue(mcrObject.getStructure().containsDerivate(derivateId));
     }
 
