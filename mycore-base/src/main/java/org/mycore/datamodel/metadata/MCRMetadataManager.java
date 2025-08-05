@@ -48,6 +48,7 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
+import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRMarkManager;
 import org.mycore.datamodel.common.MCRMarkManager.Operation;
@@ -471,13 +472,15 @@ public final class MCRMetadataManager {
      *
      * @param mcrObject
      *            to be deleted
+     * @throws MCRActiveLinkException
+     *            cannot be deleted cause its still linked
      * @throws MCRPersistenceException
      *            if persistence problem occurs
      * @throws MCRAccessException
      *            if delete permission is missing
      */
     public static void delete(final MCRObject mcrObject)
-        throws MCRPersistenceException, MCRAccessException {
+        throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
         delete(mcrObject, MCRMetadataManager::removeChildObject);
     }
 
@@ -490,17 +493,21 @@ public final class MCRMetadataManager {
      *            function to handle the parent of the object @see {@link #removeChildObject(MCRObject, MCRObjectID)}
      * @throws MCRPersistenceException
      *            if persistence problem occurs
+     * @throws MCRActiveLinkException
+     *            object couldn't  be deleted because its linked somewhere
      * @throws MCRAccessException
      *            if delete permission is missing
      */
     private static void delete(final MCRObject mcrObject, BiConsumer<MCRObject, MCRObjectID> parentOperation)
-        throws MCRPersistenceException, MCRAccessException {
+        throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
         MCRObjectID id = mcrObject.getId();
         if (id == null) {
             throw new MCRPersistenceException("The MCRObjectID is null.");
         }
 
         checkDeletePermission(id);
+
+        checkForActiveLinks(mcrObject, id);
 
         markForDeletion(id);
 
@@ -521,6 +528,23 @@ public final class MCRMetadataManager {
         }
     }
 
+    private static void checkForActiveLinks(MCRObject mcrObject, MCRObjectID id) throws MCRActiveLinkException {
+        final Collection<String> sources = MCRLinkTableManager.getInstance().getSourceOf(mcrObject.mcrId,
+            MCRLinkTableManager.ENTRY_TYPE_REFERENCE);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Sources size:{}", sources.size());
+        }
+        if (!sources.isEmpty()) {
+            final MCRActiveLinkException activeLinks = new MCRActiveLinkException("Error while deleting object " + id
+                + ". This object is still referenced by other objects and "
+                + "can not be removed until all links are released.");
+            for (final String curSource : sources) {
+                activeLinks.addLink(curSource, id.toString());
+            }
+            throw activeLinks;
+        }
+    }
+
     private static void markForDeletion(MCRObjectID id) {
         MCRMarkManager.getInstance().mark(id, Operation.DELETE);
     }
@@ -534,7 +558,7 @@ public final class MCRMetadataManager {
     }
 
     private static void removeAllChildren(MCRObject mcrObject)
-        throws MCRPersistenceException, MCRAccessException {
+        throws MCRPersistenceException, MCRAccessException, MCRActiveLinkException {
         for (MCRMetaLinkID child : mcrObject.getStructure().getChildren()) {
             MCRObjectID childId = child.getXLinkHrefID();
             if (!exists(childId)) {
@@ -619,10 +643,12 @@ public final class MCRMetadataManager {
      *
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
+     * @throws MCRActiveLinkException
+     *             if object is referenced by other objects
      * @throws MCRAccessException if delete permission is missing
      */
     public static void deleteMCRObject(final MCRObjectID id)
-        throws MCRPersistenceException, MCRAccessException {
+        throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
         deleteMCRObject(id, MCRMetadataManager::removeChildObject);
     }
 
@@ -635,10 +661,12 @@ public final class MCRMetadataManager {
      *            function to handle the parent of the object @see {@link #removeChildObject(MCRObject, MCRObjectID)}
      * @throws MCRPersistenceException
      *            if persistence problem occurs
+     * @throws MCRActiveLinkException
+     *            object couldn't  be deleted because its linked somewhere
      * @throws MCRAccessException if delete permission is missing
      */
     private static void deleteMCRObject(final MCRObjectID id, BiConsumer<MCRObject, MCRObjectID> parentOperation)
-        throws MCRPersistenceException, MCRAccessException {
+        throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
         final MCRObject object = retrieveMCRObject(id);
         delete(object, parentOperation);
     }
