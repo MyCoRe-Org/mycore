@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -89,8 +88,7 @@ import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
-import org.mycore.datamodel.metadata.MCRMetaLinkID;
+import org.mycore.datamodel.metadata.MCRMetaParentID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -267,34 +265,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         MCRObjectID mcrId = MCRObjectID.getInstance(id);
         MCRMetadataManager.deleteMCRObject(mcrId);
         LOGGER.info("{} deleted.", mcrId);
-    }
-
-    /**
-     * Runs though all mycore objects which are linked with the given object and removes its link. This includes
-     * parent/child relations and all {@link MCRMetaLinkID} in the metadata section.
-     *
-     * @param id
-     *            the id of the MCRObject that should be deleted
-     * @throws MCRPersistenceException  if a persistence problem is occurred
-     */
-    @MCRCommand(
-        syntax = "clear links of object {0}",
-        help = "removes all links of this object, including parent/child relations"
-            + " and all MetaLinkID's in the metadata section",
-        order = 45)
-    public static void clearLinks(String id) throws MCRPersistenceException {
-        final MCRObjectID mcrId = MCRObjectID.getInstance(id);
-        AtomicInteger counter = new AtomicInteger(0);
-        MCRObjectUtils.removeLinks(mcrId).forEach(linkedObject -> {
-            try {
-                LOGGER.info("removing link '{}' of '{}'.", () -> mcrId, linkedObject::getId);
-                MCRMetadataManager.update(linkedObject);
-                counter.incrementAndGet();
-            } catch (Exception exc) {
-                LOGGER.error(() -> String.format(Locale.ROOT, "Unable to update object '%s'", linkedObject), exc);
-            }
-        });
-        LOGGER.info("{} link(s) removed of {}.", counter::get, () -> mcrId);
     }
 
     /**
@@ -1107,30 +1077,16 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             return;
         }
 
-        MCRObject oldParentMCRObject = null;
-
-        if (oldParentId != null) {
-            try {
-                oldParentMCRObject = MCRMetadataManager.retrieveMCRObject(oldParentId);
-            } catch (Exception exc) {
-                LOGGER.error("Unable to get old parent object {}, its probably deleted.", oldParentId, exc);
-            }
+        if (!MCRMetadataManager.exists(newParentObjectID)) {
+            LOGGER.error("Parent object {} does not exist!", newParentId);
+            return;
         }
 
         // change href to new parent
         LOGGER.info("Setting link in \"{}\" to parent \"{}\"", sourceId, newParentObjectID);
-        MCRMetaLinkID parentLinkId = new MCRMetaLinkID("parent", 0);
-        parentLinkId.setReference(newParentObjectID, null, null);
+        MCRMetaParentID parentLinkId = new MCRMetaParentID(newParentObjectID);
         sourceMCRObject.getStructure().setParent(parentLinkId);
 
-        if (oldParentMCRObject != null) {
-            // remove Child in old parent
-            LOGGER.info("Remove child \"{}\" in old parent \"{}\"", sourceId, oldParentId);
-            oldParentMCRObject.getStructure().removeChild(sourceMCRObject.getId());
-
-            LOGGER.info("Update old parent \"{}\n", oldParentId);
-            MCRMetadataManager.update(oldParentMCRObject);
-        }
 
         LOGGER.info("Update \"{}\" in datastore (saving new link)", sourceId);
         MCRMetadataManager.update(sourceMCRObject);
@@ -1138,43 +1094,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             LOGGER.debug("Structure: {}", sourceMCRObject.getStructure().isValid());
             LOGGER.debug("Object: {}", sourceMCRObject.isValid());
         }
-    }
-
-    /**
-     * Check the derivate links in objects of MCR base ID for existing. It looks to the XML store on the disk to get all
-     * object IDs.
-     *
-     * @param baseId
-     *            the base part of a MCRObjectID e.g. DocPortal_document
-     */
-    @MCRCommand(
-        syntax = "check derivate entries in objects for base {0}",
-        help = "check in all objects with MCR base ID {0} for existing linked derivates",
-        order = 400)
-    public static void checkDerivatesInObjects(String baseId) {
-        if (baseId == null || baseId.isEmpty()) {
-            LOGGER.error("Base ID missed for check derivate entries in objects for base {0}");
-            return;
-        }
-        MCRXMLMetadataManager mgr = MCRXMLMetadataManager.getInstance();
-        List<String> idList = mgr.listIDsForBase(baseId);
-        int counter = 0;
-        int maxresults = idList.size();
-        for (String objid : idList) {
-            counter++;
-            LOGGER.info("Processing dataset {} from {} with ID: {}", counter, maxresults, objid);
-            // get from data
-            MCRObjectID mcrobjid = MCRObjectID.getInstance(objid);
-            MCRObject obj = MCRMetadataManager.retrieveMCRObject(mcrobjid);
-            List<MCRMetaEnrichedLinkID> derivateEntries = obj.getStructure().getDerivates();
-            for (MCRMetaLinkID derivateEntry : derivateEntries) {
-                String derid = derivateEntry.getXLinkHref();
-                if (!mgr.exists(MCRObjectID.getInstance(derid))) {
-                    LOGGER.error("   !!! Missing derivate {} in database for base ID {}", derid, baseId);
-                }
-            }
-        }
-        LOGGER.info("Check done for {} entries", counter);
     }
 
     /**
@@ -1350,20 +1269,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         return MCRCommandUtils.getIdsForBaseId(baseID)
             .map(id -> "repair metadata search of ID " + id)
             .collect(Collectors.toList());
-    }
-
-    @MCRCommand(
-        syntax = "repair shared metadata for the ID {0}",
-        help = "Retrieves the MCRObject with the MCRObjectID {0} and repairs the shared metadata.",
-        order = 172)
-    public static void repairSharedMetadata(String id) throws MCRAccessException {
-        if (!MCRObjectID.isValid(id)) {
-            LOGGER.error("The String {} is not a MCRObjectID.", id);
-            return;
-        }
-        MCRObjectID mid = MCRObjectID.getInstance(id);
-        MCRObject obj = MCRMetadataManager.retrieveMCRObject(mid);
-        MCRMetadataManager.repairSharedMetadata(obj);
     }
 
     @MCRCommand(

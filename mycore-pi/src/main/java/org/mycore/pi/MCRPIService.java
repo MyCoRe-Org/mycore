@@ -47,6 +47,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.config.annotation.MCRRawProperties;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -74,6 +75,12 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
     public static final String METADATA_SERVICE_CONFIG_PREFIX = "MCR.PI.MetadataService.";
 
+    protected static final String ANCESTOR_UPDATED_TRIGGER_UPDATE = "AncestorUpdatedTriggerUpdate";
+
+    protected static final String LINKED_UPDATED_TRIGGER_UPDATE = "LinkedUpdatedTriggerUpdate";
+
+    protected static final String DEFAULT_PROPERTY_PREFIX = "MCR.PI.Default.Service.";
+
     public static final String PI_FLAG = "MyCoRe-PI";
 
     public static final String GENERATOR_PROPERTY_KEY = "Generator";
@@ -96,6 +103,8 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     private final String type;
     private String registrationServiceID;
     private Map<String, String> properties;
+    private boolean ancestorUpdateTriggerUpdate;
+    private boolean linkedUpdatedTriggerUpdate;
 
     public MCRPIService(String identifierType) {
         this.type = identifierType;
@@ -388,6 +397,20 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         update(identifier, obj, additional);
     }
 
+    public void onAncestorUpdated(T identifier, MCRObject obj, String additional)
+        throws MCRPersistentIdentifierException {
+        if (isAncestorUpdateTriggerUpdate()) {
+            update(identifier, obj, additional);
+        }
+    }
+
+    public void onLinkedObjectUpdated(T identifier, MCRObject obj, String additional)
+        throws MCRPersistentIdentifierException {
+        if (isLinkedUpdatedTriggerUpdate()) {
+            update(identifier, obj, additional);
+        }
+    }
+
     /**
      * Should handle deletion of a Object with the PI.
      * E.g. The {@link MCRDOIService} sets the active flag in Datacite datacentre to false.
@@ -423,6 +446,40 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     public boolean hasRegistrationStarted(MCRObjectID id, String additional) {
         return MCRPIManager.getInstance()
             .hasRegistrationStarted(id, additional, type, registrationServiceID);
+    }
+
+    /**
+     * @return a boolean which indicates if the update method should be called when a parent object is updated
+     */
+    public boolean isAncestorUpdateTriggerUpdate() {
+        return ancestorUpdateTriggerUpdate;
+    }
+
+    public void setAncestorUpdateTriggerUpdate(boolean ancestorUpdateTriggerUpdate) {
+        this.ancestorUpdateTriggerUpdate = ancestorUpdateTriggerUpdate;
+    }
+
+    @MCRProperty(name = ANCESTOR_UPDATED_TRIGGER_UPDATE, required = false,
+        defaultName = DEFAULT_PROPERTY_PREFIX + ANCESTOR_UPDATED_TRIGGER_UPDATE)
+    public void setAncestorUpdateTriggerUpdate(String ancestorUpdateTriggerUpdate) {
+        this.ancestorUpdateTriggerUpdate = Boolean.parseBoolean(ancestorUpdateTriggerUpdate);
+    }
+
+    /**
+     * @return a boolean which indicates if the update method should be called when a linked object is updated
+     */
+    public boolean isLinkedUpdatedTriggerUpdate() {
+        return linkedUpdatedTriggerUpdate;
+    }
+
+    public void setLinkedUpdatedTriggerUpdate(boolean linkedUpdatedTriggerUpdate) {
+        this.linkedUpdatedTriggerUpdate = linkedUpdatedTriggerUpdate;
+    }
+
+    @MCRProperty(name = LINKED_UPDATED_TRIGGER_UPDATE, required = false,
+        defaultName = DEFAULT_PROPERTY_PREFIX + LINKED_UPDATED_TRIGGER_UPDATE)
+    public void setLinkedUpdatedTriggerUpdate(String linkedUpdatedTriggerUpdate) {
+        this.linkedUpdatedTriggerUpdate = Boolean.parseBoolean(linkedUpdatedTriggerUpdate);
     }
 
     protected final Map<String, String> getProperties() {

@@ -18,6 +18,9 @@
 
 package org.mycore.mcr.acl.accesskey;
 
+import static org.mycore.datamodel.metadata.MCRObjectDerivate.ELEMENT_INTERNAL;
+import static org.mycore.datamodel.metadata.MCRObjectDerivate.ELEMENT_LINKMETA;
+
 import java.util.Map;
 
 import org.mycore.access.MCRAccessBaseImpl;
@@ -56,9 +59,9 @@ public class MCRAccessKeyTestCase extends MCRStoreTestCase {
         MCRDerivate derivate = new MCRDerivate();
         derivate.setId(MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId("mycore_derivate"));
         derivate.setSchema("datamodel-derivate.xsd");
-        final MCRMetaIFS ifs = new MCRMetaIFS("internal", null);
+        final MCRMetaIFS ifs = new MCRMetaIFS(ELEMENT_INTERNAL, null);
         derivate.getDerivate().setInternals(ifs);
-        MCRMetaLinkID metaLinkID = new MCRMetaLinkID("internal", 0);
+        MCRMetaLinkID metaLinkID = new MCRMetaLinkID(ELEMENT_LINKMETA, 0);
         metaLinkID.setReference(objectHrefId.toString(), null, null);
         derivate.getDerivate().setLinkMeta(metaLinkID);
         return derivate;

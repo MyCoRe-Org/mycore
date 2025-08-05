@@ -26,8 +26,7 @@ import java.util.stream.Collectors;
  * Represents all supported relatedItem type supported for metadata sharing and linking.
  *
  * @author Thomas Scheffler
- * @see MCRMODSMetadataShareAgent
- * @see MCRMODSLinksEventHandler
+ * @see MCRMODSLinkProvider
  * @since 2015.03
  */
 public enum MCRMODSRelationshipType {

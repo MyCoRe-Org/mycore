@@ -27,8 +27,10 @@ import java.nio.file.attribute.BasicFileAttributes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.classifications2.MCRCategory;
+import org.mycore.datamodel.common.MCRLinkType;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * Abstract helper class that can be subclassed to implement event handlers more
@@ -162,6 +164,15 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
         doNothing(evt, obj);
     }
 
+    protected void handleObjectLinkUpdated(MCREvent evt, MCRObject updatedObject, MCRLinkType relation,
+        MCRObjectID linked) {
+        doNothing(evt, updatedObject);
+    }
+
+    protected void handleAncestorUpdated(MCREvent evt, MCRObject obj) {
+        doNothing(evt, obj);
+    }
+
     /**
      * Handles object deleted events. This implementation does nothing and
      * should be overwritted by subclasses.
@@ -216,6 +227,10 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      */
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
         doNothing(evt, der);
+    }
+
+    protected void handleDerivateLinkUpdated(MCREvent evt, MCRDerivate updatedDerivate, MCRObjectID linkedID) {
+        doNothing(evt, updatedDerivate);
     }
 
     /**
@@ -450,13 +465,17 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      */
     @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private void handleMCRObjectEvent(MCREvent evt) {
-        MCRObject obj = (MCRObject) evt.get("object");
+        MCRObject obj = evt.get("object", MCRObject.class);
         if (obj != null) {
             LOGGER.debug("{} handling {} {}", () -> getClass().getName(), obj::getId, evt::getEventType);
             switch (evt.getEventType()) {
                 case CREATE -> handleObjectCreated(evt, obj);
                 case UPDATE -> handleObjectUpdated(evt, obj);
                 case DELETE -> handleObjectDeleted(evt, obj);
+                case LINKED_UPDATED
+                    -> handleObjectLinkUpdated(evt, obj, evt.get(MCREvent.LINK_TYPE_KEY, MCRLinkType.class),
+                        evt.get(MCREvent.RELATED_OBJECT_KEY, MCRObjectID.class));
+                case ANCESTOR_UPDATED -> handleAncestorUpdated(evt, obj);
                 case REPAIR -> handleObjectRepaired(evt, obj);
                 case INDEX -> handleObjectIndex(evt, obj);
                 default -> LOGGER
@@ -481,6 +500,8 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 case CREATE -> handleDerivateCreated(evt, der);
                 case UPDATE -> handleDerivateUpdated(evt, der);
                 case DELETE -> handleDerivateDeleted(evt, der);
+                case LINKED_UPDATED
+                    -> handleDerivateLinkUpdated(evt, der, evt.get(MCREvent.RELATED_OBJECT_KEY, MCRObjectID.class));
                 case REPAIR -> handleDerivateRepaired(evt, der);
                 case INDEX -> updateDerivateFileIndex(evt, der);
                 default -> LOGGER

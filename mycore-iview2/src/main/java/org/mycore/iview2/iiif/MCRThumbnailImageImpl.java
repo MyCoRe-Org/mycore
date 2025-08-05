@@ -28,9 +28,9 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRExpandedObject;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.iiif.image.impl.MCRIIIFImageNotFoundException;
 import org.mycore.iview2.backend.MCRTileInfo;
@@ -89,7 +89,7 @@ public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
     }
 
     private Optional<MCRTileInfo> createTileInfoForMCRObject(MCRObjectID mcrID) {
-        MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(mcrID);
+        MCRExpandedObject mcrObj = MCRMetadataManager.retrieveMCRExpandedObject(mcrID);
         for (String derType : derivateTypes) {
             for (MCRMetaEnrichedLinkID derLink : mcrObj.getStructure().getDerivates()) {
                 if (derLink.getClassifications().stream()

@@ -131,6 +131,8 @@ public final class MCREventManager {
      */
 
     public void handleEvent(MCREvent evt, boolean direction) {
+        LOGGER.info("Handling event {}", evt);
+
         final String objectType = evt.getObjectType() == MCREvent.ObjectType.CUSTOM ? evt.getCustomObjectType()
             : evt.getObjectType().getClassName();
         List<MCREventHandler> list = handlers.get(objectType);

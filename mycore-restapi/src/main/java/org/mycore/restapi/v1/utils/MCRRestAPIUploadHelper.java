@@ -51,6 +51,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.MCRExpandedObjectManager;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
@@ -60,7 +61,6 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
-import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkIDFactory;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLangText;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -190,7 +190,8 @@ public class MCRRestAPIUploadHelper {
         throws MCRRestAPIException {
         MCRObjectID derID = null;
         final MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
-        final List<MCRMetaEnrichedLinkID> currentDerivates = mcrObj.getStructure().getDerivates();
+        final List<MCRMetaEnrichedLinkID> currentDerivates =
+            MCRExpandedObjectManager.getInstance().getExpandedObject(mcrObj).getStructure().getDerivates();
         if (label != null && !label.isEmpty()) {
             derID = findDerIDByLabel(currentDerivates, label);
         }
@@ -258,10 +259,6 @@ public class MCRRestAPIUploadHelper {
             addClassificationsToDerivate(mcrDerivate, classifications);
         }
         MCRMetadataManager.create(mcrDerivate);
-        MCRMetadataManager.addOrUpdateDerivateToObject(mcrObjIDObj,
-            MCRMetaEnrichedLinkIDFactory.obtainInstance().getDerivateLink(mcrDerivate),
-            mcrDerivate.isImportMode());
-
         return mcrDerivate.getId();
     }
 

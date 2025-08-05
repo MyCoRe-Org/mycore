@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import javax.xml.validation.Schema;
 
@@ -44,6 +43,7 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRExpandedObjectManager;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
@@ -231,7 +231,7 @@ public class MCRDOIService extends MCRDOIBaseService {
      */
     public List<Map.Entry<String, URI>> getMediaList(MCRObject obj) {
         List<Map.Entry<String, URI>> entryList = new ArrayList<>();
-        Optional<MCRObjectID> derivateIdOptional = MCRMetadataManager.getDerivateIds(obj.getId(), 1, TimeUnit.MINUTES)
+        Optional<MCRObjectID> derivateIdOptional = MCRMetadataManager.getDerivateIds(obj.getId())
             .stream().findFirst();
         derivateIdOptional.ifPresent(derivateId -> {
             MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateId);
@@ -256,8 +256,12 @@ public class MCRDOIService extends MCRDOIBaseService {
     @Override
     protected boolean validateRegistrationDocument(MCRBase obj, MCRDigitalObjectIdentifier identifier,
         String additional) {
+        MCRBase objectToCheck = obj;
+        if(obj instanceof MCRObject mcrobject) {
+            objectToCheck = MCRExpandedObjectManager.getInstance().getExpandedObject(mcrobject);
+        }
         try {
-            transform(obj, identifier.asString());
+            transform(objectToCheck, identifier.asString());
             return true;
         } catch (MCRPersistentIdentifierException e) {
             LOGGER.error("Error while validating Datacite document!", e);
@@ -329,7 +333,7 @@ public class MCRDOIService extends MCRDOIBaseService {
 
         MCRObjectID objectID = MCRObjectID.getInstance(idString);
         this.validateJobUserRights(objectID);
-        MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
+        MCRObject object = MCRMetadataManager.retrieveMCRExpandedObject(objectID);
 
         Document newDataciteMetadata = transform(object, doi.asString());
         MCRDataciteClient dataciteClient = getDataciteClient();
@@ -368,10 +372,9 @@ public class MCRDOIService extends MCRDOIBaseService {
 
         MCRObjectID objectID = MCRObjectID.getInstance(idString);
         this.validateJobUserRights(objectID);
-        MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
 
-        MCRObject mcrBase = MCRMetadataManager.retrieveMCRObject(objectID);
-        Document dataciteDocument = transform(mcrBase, doi.asString());
+        MCRObject object = MCRMetadataManager.retrieveMCRExpandedObject(objectID);
+        Document dataciteDocument = transform(object, doi.asString());
 
         MCRDataciteClient dataciteClient = getDataciteClient();
         dataciteClient.storeMetadata(dataciteDocument);

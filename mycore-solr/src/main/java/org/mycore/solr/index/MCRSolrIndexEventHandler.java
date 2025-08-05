@@ -32,16 +32,20 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.mycore.common.MCRExpandedObjectManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.common.events.MCRShutdownHandler;
+import org.mycore.datamodel.common.MCRLinkType;
 import org.mycore.datamodel.common.MCRMarkManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRExpandedObject;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -135,6 +139,29 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     @Override
     protected synchronized void handleObjectUpdated(MCREvent evt, MCRObject obj) {
         addObject(evt, obj);
+    }
+
+    @Override
+    protected void handleObjectLinkUpdated(MCREvent evt, MCRObject updatedObject, MCRLinkType relation,
+        MCRObjectID linkedID) {
+        if (relation == MCRLinkType.CHILD) {
+            // this is handled by handleAncestorUpdated
+            return;
+        }
+        MCRObject linkedObject = MCRMetadataManager.retrieveMCRExpandedObject(linkedID);
+        addObject(evt, linkedObject);
+    }
+
+    @Override
+    protected void handleAncestorUpdated(MCREvent evt, MCRObject obj) {
+        MCRExpandedObject expandedObject = MCRExpandedObjectManager.getInstance().getExpandedObject(obj);
+        addObject(evt, expandedObject);
+    }
+
+    @Override
+    protected void handleDerivateLinkUpdated(MCREvent evt, MCRDerivate updatedDerivate, MCRObjectID linkedID) {
+        MCRObject linkedObject = MCRMetadataManager.retrieveMCRExpandedObject(linkedID);
+        addObject(evt, linkedObject);
     }
 
     @Override

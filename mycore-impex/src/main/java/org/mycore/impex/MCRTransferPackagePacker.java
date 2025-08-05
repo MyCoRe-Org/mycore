@@ -33,12 +33,13 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRExpandedObjectManager;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
+import org.mycore.datamodel.metadata.MCRExpandedObject;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.packaging.MCRPacker;
 
@@ -75,7 +76,7 @@ public class MCRTransferPackagePacker extends MCRPacker {
      * @return the transfer package
      */
     private MCRTransferPackage build() {
-        MCRObject source = getSource();
+        MCRExpandedObject source = getSource();
         MCRTransferPackage transferPackage = new MCRTransferPackage(source);
         transferPackage.build();
         return transferPackage;
@@ -87,14 +88,14 @@ public class MCRTransferPackagePacker extends MCRPacker {
      * @return mycore object which should be packed
      * @throws MCRUsageException something went wrong
      */
-    protected MCRObject getSource() throws MCRUsageException {
+    protected MCRExpandedObject getSource() throws MCRUsageException {
         String sourceId = getSourceId();
         MCRObjectID mcrId = MCRObjectID.getInstance(sourceId);
         if (!MCRMetadataManager.exists(mcrId)) {
             throw new MCRUsageException(
                 "Requested object '" + sourceId + "' does not exist. Thus a transfer package cannot be created.");
         }
-        return MCRMetadataManager.retrieveMCRObject(mcrId);
+        return MCRExpandedObjectManager.getInstance().getExpandedObject(MCRMetadataManager.retrieveMCRObject(mcrId));
     }
 
     /**
