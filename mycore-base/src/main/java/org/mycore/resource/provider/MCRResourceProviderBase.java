@@ -18,7 +18,6 @@
 
 package org.mycore.resource.provider;
 
-
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
@@ -28,6 +27,7 @@ import org.apache.logging.log4j.Level;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
 import org.mycore.resource.common.MCRResourceTracer;
 
 /**
@@ -47,11 +47,21 @@ public abstract class MCRResourceProviderBase implements MCRResourceProvider {
     }
 
     @Override
+    public final Optional<URL> provide(MCRResourcePath path, MCRHints hints) {
+        return provide(path, hints, new MCRNoOpResourceTracer());
+    }
+
+    @Override
     public final Optional<URL> provide(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
         return tracer.trace(hints, doProvide(path, hints, tracer), (appender, providedResourceUrl) -> {
             providedResourceUrl.ifPresentOrElse(url -> appender.append("Providing resource URL " + url),
                 () -> appender.append("Providing no resource URL"));
         });
+    }
+
+    @Override
+    public final List<ProvidedUrl> provideAll(MCRResourcePath path, MCRHints hints) {
+        return provideAll(path, hints, new MCRNoOpResourceTracer());
     }
 
     @Override

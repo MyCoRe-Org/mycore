@@ -36,7 +36,7 @@ import org.mycore.resource.common.MCRResourceTracer;
  * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRNoOpResourceFilter.Factory.class)
-public class MCRNoOpResourceFilter extends MCRResourceFilterBase {
+public final class MCRNoOpResourceFilter extends MCRResourceFilterBase {
 
     @Override
     protected Stream<URL> doFilter(Stream<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {

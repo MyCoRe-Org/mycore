@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 
-public class MCRTreeMessageResourceTracer implements MCRResourceTracer {
+public final class MCRTreeMessageResourceTracer implements MCRResourceTracer {
 
     private final MCRTreeMessage message;
 

@@ -19,8 +19,6 @@
 package org.mycore.resource.provider;
 
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,7 +32,6 @@ import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
 import org.mycore.resource.common.MCRNoOpClasspathDirsProvider;
-import org.mycore.resource.common.MCRNoOpResourceTracer;
 import org.mycore.resource.common.MCRResourceTracer;
 import org.mycore.resource.common.MCRResourceUtils;
 import org.mycore.resource.hint.MCRResourceHintKeys;
@@ -47,9 +44,7 @@ public interface MCRResourceProvider {
     /**
      * Resolves a {@link MCRResourcePath} using the given hints.
      */
-    default Optional<URL> provide(MCRResourcePath path, MCRHints hints) {
-        return provide(path, hints, new MCRNoOpResourceTracer());
-    }
+    Optional<URL> provide(MCRResourcePath path, MCRHints hints);
 
     /**
      * Resolves a {@link MCRResourcePath} using the given hints.
@@ -60,9 +55,7 @@ public interface MCRResourceProvider {
      * Resolves a {@link MCRResourcePath}, returning all alternatives (i.e. because one module
      * overrides a resource that is also provided by another module). Intended for introspective purposes only.
      */
-    default List<ProvidedUrl> provideAll(MCRResourcePath path, MCRHints hints) {
-        return provideAll(path, hints, new MCRNoOpResourceTracer());
-    }
+    List<ProvidedUrl> provideAll(MCRResourcePath path, MCRHints hints);
 
     /**
      * Resolves a {@link MCRResourcePath}, returning all alternatives (i.e. because one module
@@ -114,7 +107,7 @@ public interface MCRResourceProvider {
 
     }
 
-    class PrefixPrefixStripper extends PrefixStripperBase {
+    final class PrefixPrefixStripper extends PrefixStripperBase {
 
         private final String prefix;
 
@@ -123,7 +116,7 @@ public interface MCRResourceProvider {
         }
 
         @Override
-        public final List<String> getStrippedPaths(String value) {
+        public List<String> getStrippedPaths(String value) {
             if (value.startsWith(prefix)) {
                 return List.of(value.substring(prefix.length()));
             }
@@ -131,8 +124,8 @@ public interface MCRResourceProvider {
         }
 
         @Override
-        public final String toString() {
-            return prefix;
+        public String toString() {
+            return prefix + ".*";
         }
 
     }
@@ -151,11 +144,9 @@ public interface MCRResourceProvider {
         public List<String> getStrippedPaths(String value) {
             List<String> potentialPaths = new LinkedList<>();
             for (Path classpathDir : classpathDirsSupplier.get()) {
-                if (Files.isDirectory(classpathDir, LinkOption.NOFOLLOW_LINKS)) {
-                    String prefix = MCRResourceUtils.toFileUrl(classpathDir).toString();
-                    if (value.startsWith(prefix)) {
-                        potentialPaths.add(value.substring(prefix.length()));
-                    }
+                String prefix = MCRResourceUtils.toFileUrl(classpathDir).toString();
+                if (value.startsWith(prefix)) {
+                    potentialPaths.add(value.substring(prefix.length()));
                 }
             }
             return potentialPaths;
