@@ -19,20 +19,21 @@
 package org.mycore.wcms2;
 
 import java.nio.file.Path;
-import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
-import org.mycore.resource.provider.MCRFileSystemResourceProvider;
+import org.mycore.common.hint.MCRHints;
+import org.mycore.resource.provider.MCRFileSystemResourceProviderBase;
 import org.mycore.resource.provider.MCRResourceProvider;
 import org.mycore.resource.provider.MCRResourceProviderBase;
 import org.mycore.resource.provider.MCRResourceProviderMode;
 
 /**
  * A {@link MCRWCMSWebResourceProvider} is a {@link MCRResourceProvider} that looks up web resources
- * in the file system. It uses the directory configured in as {@link MCRWCMSUtil#getWCMSDataDir()} (which is the
- * directory that the WCMS writes into) as a base directory for the lookup.
+ * in the file system. It uses the directory configured in as {@link MCRWCMSUtil#getWCMSDataDirPath()}
+ * (which is the directory that the WCMS writes into) as a base directory for the lookup.
  * <p>
  * <em>This provider replaces the previously used <code>MCRWebPagesSynchronizer</code> that copied the content
  * of the above-mentioned directory in the webapp directory used by the web container.</em>
@@ -49,14 +50,15 @@ import org.mycore.resource.provider.MCRResourceProviderMode;
  * </pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRWCMSWebResourceProvider.Factory.class)
-public final class MCRWCMSWebResourceProvider extends MCRFileSystemResourceProvider {
+public final class MCRWCMSWebResourceProvider extends MCRFileSystemResourceProviderBase {
 
     public MCRWCMSWebResourceProvider(String coverage) {
-        super(coverage, MCRResourceProviderMode.WEB_RESOURCES, getBaseDirs());
+        super(coverage, MCRResourceProviderMode.WEB_RESOURCES);
     }
 
-    private static List<Path> getBaseDirs() {
-        return List.of(MCRWCMSUtil.getWCMSDataDir().toPath());
+    @Override
+    protected Stream<Path> getBaseDirs(MCRHints hints) {
+        return Stream.of(MCRWCMSUtil.getWCMSDataDirPath());
     }
 
     @Override
