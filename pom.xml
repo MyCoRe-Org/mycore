@@ -1544,7 +1544,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-classifications</artifactId>
-        <version>1.1</version>
+        <version>1.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
