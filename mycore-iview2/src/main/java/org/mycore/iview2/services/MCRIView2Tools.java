@@ -126,6 +126,7 @@ public class MCRIView2Tools {
      * @return if content type is in property <code>MCR.Module-iview2.SupportedContentTypes</code>
      * @see MCRContentTypes#probeContentType(Path)
      */
+    @SuppressWarnings("PMD.ExceptionAsFlowControl")
     public static boolean isFileSupported(Path file) throws IOException {
         try {
             return Optional.ofNullable(file)

@@ -496,6 +496,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
     }
 
     @Override
+    @SuppressWarnings("PMD.ExceptionAsFlowControl")
     public List<MCRObjectIDDate> retrieveObjectDates(List<String> ids) throws IOException {
         try {
             return ids.stream()
