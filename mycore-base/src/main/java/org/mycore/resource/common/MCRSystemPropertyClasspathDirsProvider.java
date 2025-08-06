@@ -44,7 +44,7 @@ public final class MCRSystemPropertyClasspathDirsProvider implements MCRClasspat
     private final List<Path> classpathDirs;
 
     public MCRSystemPropertyClasspathDirsProvider() {
-        this.classpathDirs = getClassPathDirsFromSystemProperty();
+        this.classpathDirs = getClasspathDirsFromSystemProperty();
     }
 
     @Override
@@ -52,20 +52,20 @@ public final class MCRSystemPropertyClasspathDirsProvider implements MCRClasspat
         return classpathDirs;
     }
 
-    private static List<Path> getClassPathDirsFromSystemProperty() {
+    private static List<Path> getClasspathDirsFromSystemProperty() {
 
-        List<Path> classPathDirs = new LinkedList<>();
+        List<Path> classpathDirs = new LinkedList<>();
 
-        String classPath = System.getProperty("java.class.path");
-        String[] classPathEntries = classPath.split(Pattern.quote(File.pathSeparator));
-        for (String classPathEntry : classPathEntries) {
-            Path path = Path.of(classPathEntry);
+        String classpath = System.getProperty("java.class.path");
+        String[] classpathEntries = classpath.split(Pattern.quote(File.pathSeparator));
+        for (String classpathEntry : classpathEntries) {
+            Path path = Path.of(classpathEntry);
             if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
-                classPathDirs.add(path);
+                classpathDirs.add(path);
             }
         }
 
-        return List.copyOf(classPathDirs);
+        return List.copyOf(classpathDirs);
 
     }
 

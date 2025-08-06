@@ -24,7 +24,6 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.Level;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
-import org.mycore.resource.common.MCRNoOpResourceTracer;
 import org.mycore.resource.common.MCRResourceTracer;
 import org.mycore.resource.provider.MCRLFSResourceProvider;
 
@@ -36,9 +35,7 @@ public interface MCRResourceFilter {
     /**
      * Reduces the set of possible candidates to the set of allowed candidates.
      */
-    default Stream<URL> filter(Stream<URL> resourceUrls, MCRHints hints) {
-        return filter(resourceUrls, hints, new MCRNoOpResourceTracer());
-    }
+    Stream<URL> filter(Stream<URL> resourceUrls, MCRHints hints);
 
     /**
      * Reduces the set of possible candidates to the set of allowed candidates.
