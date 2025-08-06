@@ -44,29 +44,30 @@ public final class MCRSystemPropertyClasspathDirsProvider implements MCRClasspat
     private final List<Path> classpathDirs;
 
     public MCRSystemPropertyClasspathDirsProvider() {
-        this.classpathDirs = getClasspathDirsFromSystemProperty();
+        this.classpathDirs = getClasspathDirsFromSystemProperties();
     }
 
-    @Override
-    public List<Path> getClasspathDirs(MCRHints hints) {
-        return classpathDirs;
-    }
-
-    private static List<Path> getClasspathDirsFromSystemProperty() {
+    private static List<Path> getClasspathDirsFromSystemProperties() {
 
         List<Path> classpathDirs = new LinkedList<>();
 
         String classpath = System.getProperty("java.class.path");
+        LinkOption[] linkOptions = MCRResourceUtils.linkOptions();
         String[] classpathEntries = classpath.split(Pattern.quote(File.pathSeparator));
         for (String classpathEntry : classpathEntries) {
             Path path = Path.of(classpathEntry);
-            if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
+            if (Files.isDirectory(path, linkOptions)) {
                 classpathDirs.add(path);
             }
         }
 
         return List.copyOf(classpathDirs);
 
+    }
+
+    @Override
+    public List<Path> getClasspathDirs(MCRHints hints) {
+        return classpathDirs;
     }
 
 }

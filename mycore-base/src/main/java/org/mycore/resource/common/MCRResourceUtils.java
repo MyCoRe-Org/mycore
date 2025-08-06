@@ -21,9 +21,12 @@ package org.mycore.resource.common;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.resource.MCRResourcePath;
 import org.mycore.resource.MCRResourceResolver;
 
@@ -32,7 +35,18 @@ import org.mycore.resource.MCRResourceResolver;
  */
 public final class MCRResourceUtils {
 
+    private static final LinkOption[] LINK_OPTIONS = MCRConfiguration2
+        .getString("MCR.Resource.Common.LinkOptions")
+        .stream()
+        .flatMap(MCRConfiguration2::splitValue)
+        .map(LinkOption::valueOf)
+        .toArray(LinkOption[]::new);
+
     private MCRResourceUtils() {
+    }
+
+    public static LinkOption[] linkOptions() {
+        return Arrays.copyOf(LINK_OPTIONS, LINK_OPTIONS.length);
     }
 
     public static URL toFileUrl(String path) {
