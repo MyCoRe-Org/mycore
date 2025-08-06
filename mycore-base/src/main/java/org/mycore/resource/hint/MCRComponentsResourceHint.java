@@ -28,6 +28,18 @@ import org.mycore.common.config.MCRRuntimeComponentDetector;
 import org.mycore.common.hint.MCRHint;
 import org.mycore.common.hint.MCRHintKey;
 
+/**
+ * A {@link MCRComponentsResourceHint} is a {@link MCRHint} for {@link MCRResourceHintKeys#COMPONENTS}
+ * that uses {@link MCRRuntimeComponentDetector#getAllComponents(MCRRuntimeComponentDetector.ComponentOrder)}
+ * to obtain a sorted list of components.
+ * <p>
+ * No configuration options are available.
+ * <p>
+ * Example:
+ * <pre><code>
+ * [...].Class=org.mycore.resource.hint.MCRComponentsResourceHint
+ * </code></pre>
+ */
 public final class MCRComponentsResourceHint implements MCRHint<SortedSet<MCRComponent>> {
 
     @Override

@@ -25,8 +25,13 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.mycore.common.hint.MCRHints;
+import org.mycore.resource.MCRResourceResolver;
 
-public class MCRNoOpResourceTracer implements MCRResourceTracer {
+/**
+ * A {@link MCRNoOpResourceTracer} is a {@link MCRResourceTracer} that discards all information about the process
+ * of resolving a resource in {@link MCRResourceResolver}.
+ */
+public final class MCRNoOpResourceTracer implements MCRResourceTracer {
 
     @Override
     public MCRResourceTracer update(Object context) {
