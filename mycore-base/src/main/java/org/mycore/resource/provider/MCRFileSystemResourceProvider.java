@@ -57,7 +57,7 @@ import org.mycore.common.log.MCRTreeMessage;
  * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRFileSystemResourceProvider.Factory.class)
-public class MCRFileSystemResourceProvider extends MCRFileSystemResourceProviderBase {
+public final class MCRFileSystemResourceProvider extends MCRFileSystemResourceProviderBase {
 
     public static final String BASE_DIRS_KEY = "BaseDirs";
 
@@ -74,7 +74,7 @@ public class MCRFileSystemResourceProvider extends MCRFileSystemResourceProvider
     }
 
     @Override
-    protected final Stream<Path> getBaseDirs(MCRHints hints) {
+    protected Stream<Path> getBaseDirs(MCRHints hints) {
         return baseDirs.stream();
     }
 

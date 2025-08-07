@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 
 import org.mycore.common.hint.MCRHints;
 
-public class MCRNoOpResourceTracer implements MCRResourceTracer {
+public final class MCRNoOpResourceTracer implements MCRResourceTracer {
 
     @Override
     public MCRResourceTracer update(Object context) {

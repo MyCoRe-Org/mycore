@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.wcms2;
+package org.mycore.resource.provider;
 
 import java.nio.file.Path;
 import java.util.function.Supplier;
@@ -25,18 +25,17 @@ import java.util.stream.Stream;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.hint.MCRHints;
-import org.mycore.resource.provider.MCRFileSystemResourceProviderBase;
-import org.mycore.resource.provider.MCRResourceProvider;
-import org.mycore.resource.provider.MCRResourceProviderBase;
-import org.mycore.resource.provider.MCRResourceProviderMode;
+import org.mycore.resource.common.MCRClasspathDirsProvider;
+import org.mycore.resource.common.MCRNoOpClasspathDirsProvider;
+import org.mycore.resource.hint.MCRResourceHintKeys;
 
 /**
- * A {@link MCRWCMSWebResourceProvider} is a {@link MCRResourceProvider} that looks up web resources
- * in the file system. It uses the directory configured in as {@link MCRWCMSUtil#getWCMSDataDirPath()}
- * (which is the directory that the WCMS writes into) as a base directory for the lookup.
+ * A {@link MCRClasspathDirsResourceProvider} is a {@link MCRResourceProvider} that looks up resources
+ * in the file system. It uses a fixed list of base directories taken from the system property
+ * <code>java.class.path</code> as base directories for the lookup.
  * <p>
- * <em>This provider replaces the previously used <code>MCRWebPagesSynchronizer</code> that copied the content
- * of the above-mentioned directory in the webapp directory used by the web container.</em>
+ * It uses the {@link MCRClasspathDirsProvider} hinted at by {@link MCRResourceHintKeys#CLASSPATH_DIRS_PROVIDER},
+ * if present.
  * <p>
  * The following configuration options are available:
  * <ul>
@@ -44,21 +43,24 @@ import org.mycore.resource.provider.MCRResourceProviderMode;
  * provide a short description of the providers purpose; used in log messages.
  * </ul>
  * Example:
- * <pre>
- * [...].Class=org.mycore.wcms2.MCRWCMSWebResourceProvider
+ * <pre><code>
+ * [...].Class=org.mycore.resource.provider.MCRClasspathDirsResourceProvider
  * [...].Coverage=Lorem ipsum dolor sit amet
- * </pre>
+ * </code></pre>
  */
-@MCRConfigurationProxy(proxyClass = MCRWCMSWebResourceProvider.Factory.class)
-public final class MCRWCMSWebResourceProvider extends MCRFileSystemResourceProviderBase {
+@MCRConfigurationProxy(proxyClass = MCRClasspathDirsResourceProvider.Factory.class)
+public final class MCRClasspathDirsResourceProvider extends MCRFileSystemResourceProviderBase {
 
-    public MCRWCMSWebResourceProvider(String coverage) {
-        super(coverage, MCRResourceProviderMode.WEB_RESOURCES);
+    public MCRClasspathDirsResourceProvider(String coverage) {
+        super(coverage, MCRResourceProviderMode.RESOURCES);
     }
 
     @Override
     protected Stream<Path> getBaseDirs(MCRHints hints) {
-        return Stream.of(MCRWCMSUtil.getWCMSDataDirPath());
+        return hints.get(MCRResourceHintKeys.CLASSPATH_DIRS_PROVIDER)
+            .orElseGet(MCRNoOpClasspathDirsProvider::new)
+            .getClasspathDirs(hints)
+            .stream();
     }
 
     @Override
@@ -66,14 +68,14 @@ public final class MCRWCMSWebResourceProvider extends MCRFileSystemResourceProvi
         return true;
     }
 
-    public static class Factory implements Supplier<MCRWCMSWebResourceProvider> {
+    public static class Factory implements Supplier<MCRClasspathDirsResourceProvider> {
 
-        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.WCMS.Coverage")
+        @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.ClasspathDirs.Coverage")
         public String coverage;
 
         @Override
-        public MCRWCMSWebResourceProvider get() {
-            return new MCRWCMSWebResourceProvider(coverage);
+        public MCRClasspathDirsResourceProvider get() {
+            return new MCRClasspathDirsResourceProvider(coverage);
         }
 
     }
