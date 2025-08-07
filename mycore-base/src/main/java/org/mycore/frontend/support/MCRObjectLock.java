@@ -19,8 +19,6 @@
 package org.mycore.frontend.support;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 import org.mycore.common.xml.adapters.MCRInstantXMLAdapter;
 
@@ -31,7 +29,6 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
-import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
@@ -271,27 +268,6 @@ public class MCRObjectLock {
             .setCreated(now)
             .setUpdated(now)
             .setTimeout(timeout);
-    }
-
-    /**
-     * A private JAXB adapter to handle the serialization and deserialization of {@link LocalDateTime} objects.
-     * <p>
-     * It converts {@link LocalDateTime} to and from a String using the {@link DateTimeFormatter#ISO_LOCAL_DATE_TIME}
-     * format (e.g., "2024-05-21T10:15:30.400").
-     */
-    private final static class LocalDateTimeXMLAdapter extends XmlAdapter<String, LocalDateTime> {
-
-        @Override
-        public LocalDateTime unmarshal(String inputDate) {
-            return inputDate != null ? LocalDateTime.parse(inputDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME) : null;
-        }
-
-        @Override
-        public String marshal(LocalDateTime inputDate) {
-            LocalDateTime truncatedDate = inputDate.truncatedTo(java.time.temporal.ChronoUnit.MILLIS);
-            return DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(truncatedDate);
-        }
-
     }
 
 }
