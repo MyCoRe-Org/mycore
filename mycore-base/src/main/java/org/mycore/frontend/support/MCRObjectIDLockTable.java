@@ -18,7 +18,7 @@
 
 package org.mycore.frontend.support;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -167,7 +167,7 @@ public final class MCRObjectIDLockTable implements MCRSessionListener {
         if (objectLock == null) {
             return null;
         }
-        objectLock.setUpdated(LocalDateTime.now());
+        objectLock.setUpdated(Instant.now());
         if (timeout != null) {
             objectLock.setTimeout(timeout);
         }
@@ -236,8 +236,8 @@ public final class MCRObjectIDLockTable implements MCRSessionListener {
                 return;
             }
             // Check if expiration time is reached
-            LocalDateTime now = LocalDateTime.now();
-            LocalDateTime unlockTime = currentLock.getExpirationTime();
+            Instant now = Instant.now();
+            Instant unlockTime = currentLock.getExpirationTime();
             if (now.isBefore(unlockTime)) {
                 return;
             }
