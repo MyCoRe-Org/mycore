@@ -44,6 +44,10 @@ final class MCRErrorCodeConstants {
 
     public static final String MCROBJECT_INVALID_STATE = "MCROBJECT_INVALID_STATE";
 
+    public static final String MCROBJECT_ALREADY_LOCKED = "MCROBJECT_ALREADY_LOCKED";
+
+    public static final String MCROBJECT_MISSING_LOCK_TOKEN = "MCROBJECT_MISSING_LOCK_TOKEN";
+
     //MCRDerivate
     public static final String MCRDERIVATE_NO_PERMISSION = "MCRDERIVATE_NO_PERMISSION";
 
