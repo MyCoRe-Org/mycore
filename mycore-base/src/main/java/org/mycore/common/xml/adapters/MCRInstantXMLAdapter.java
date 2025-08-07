@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.restapi.converter;
+package org.mycore.common.xml.adapters;
 
 import java.time.Instant;
 import java.time.LocalDate;
