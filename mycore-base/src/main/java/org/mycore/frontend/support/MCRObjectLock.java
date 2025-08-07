@@ -18,9 +18,11 @@
 
 package org.mycore.frontend.support;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.concurrent.TimeUnit;
+
+import org.mycore.common.xml.adapters.MCRInstantXMLAdapter;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -78,16 +80,16 @@ public class MCRObjectLock {
      * The timestamp when the lock was initially created.
      */
     @XmlAttribute
-    @XmlJavaTypeAdapter(LocalDateTimeXMLAdapter.class)
-    protected LocalDateTime created;
+    @XmlJavaTypeAdapter(MCRInstantXMLAdapter.class)
+    protected Instant created;
 
     /**
      * The timestamp when the lock was last updated. Upon creation, this value is the same as
      * {@link #created}. It is refreshed when the lock's timeout is extended.
      */
     @XmlAttribute
-    @XmlJavaTypeAdapter(LocalDateTimeXMLAdapter.class)
-    protected LocalDateTime updated;
+    @XmlJavaTypeAdapter(MCRInstantXMLAdapter.class)
+    protected Instant updated;
 
     /**
      * The duration of the lock in milliseconds, starting from the {@link #updated} timestamp.
@@ -146,7 +148,7 @@ public class MCRObjectLock {
      * @param created the creation timestamp
      * @return this {@code MCRObjectLock} instance
      */
-    public MCRObjectLock setCreated(LocalDateTime created) {
+    public MCRObjectLock setCreated(Instant created) {
         this.created = created;
         return this;
     }
@@ -157,7 +159,7 @@ public class MCRObjectLock {
      * @param updated the last updated timestamp
      * @return this {@code MCRObjectLock} instance
      */
-    public MCRObjectLock setUpdated(LocalDateTime updated) {
+    public MCRObjectLock setUpdated(Instant updated) {
         this.updated = updated;
         return this;
     }
@@ -214,7 +216,7 @@ public class MCRObjectLock {
      *
      * @return the creation timestamp
      */
-    public LocalDateTime getCreated() {
+    public Instant getCreated() {
         return created;
     }
 
@@ -223,7 +225,7 @@ public class MCRObjectLock {
      *
      * @return the last updated timestamp
      */
-    public LocalDateTime getUpdated() {
+    public Instant getUpdated() {
         return updated;
     }
 
@@ -242,12 +244,12 @@ public class MCRObjectLock {
      * @return the expiration timestamp.
      */
     @XmlAttribute(name = "expires")
-    @XmlJavaTypeAdapter(LocalDateTimeXMLAdapter.class)
-    public LocalDateTime getExpirationTime() {
+    @XmlJavaTypeAdapter(MCRInstantXMLAdapter.class)
+    public Instant getExpirationTime() {
         if (timeout == null) {
             return null;
         }
-        return updated.plusNanos(TimeUnit.MILLISECONDS.toNanos(timeout));
+        return updated.plusMillis(timeout);
     }
 
     /**
@@ -260,7 +262,7 @@ public class MCRObjectLock {
      * @return A new {@code MCRObjectLock} instance, initialized with the current time for created/updated timestamps.
      */
     public static MCRObjectLock createLock(String id, String user, Integer timeout) {
-        LocalDateTime now = LocalDateTime.now();
+        Instant now = Instant.now();
         return new MCRObjectLock()
             .setId(id)
             .setToken(id)

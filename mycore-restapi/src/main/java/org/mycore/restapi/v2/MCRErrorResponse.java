@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
-import org.mycore.restapi.converter.MCRInstantXMLAdapter;
+import org.mycore.common.xml.adapters.MCRInstantXMLAdapter;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
