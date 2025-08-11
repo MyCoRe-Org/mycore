@@ -39,6 +39,9 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRDefaultClassificationMapper;
+import org.mycore.datamodel.classifications2.MCRDefaultXMappingClassificationGenerator;
+import org.mycore.datamodel.classifications2.MCRDefaultXPathClassificationGenerator;
+import org.mycore.datamodel.classifications2.MCRXMappingClassificationGeneratorBase;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.metadata.MCRObject;
 
@@ -68,11 +71,17 @@ public class MCRDefaultClassificationMapperTest extends MCRJPATestCase {
         loadCategory("genre.xml");
         loadCategory("orcidWorkType.xml");
         loadCategory("dummyClassification.xml");
-
+        loadCategory("diniPublType.xml");
+        loadCategory("schemaOrg.xml");
+        
         Document document = saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + "testMcrObject.xml"));
         MCRObject mcro = new MCRObject(document);
 
-        MCRDefaultClassificationMapper mapper = new MCRDefaultClassificationMapper();
+        MCRDefaultClassificationMapper mapper =
+            new MCRDefaultClassificationMapper(Map.of(
+                "xMapping", new MCRDefaultXMappingClassificationGenerator(
+                    MCRXMappingClassificationGeneratorBase.OnMissingMappedCategory.IGNORE),
+                "xPath", new MCRDefaultXPathClassificationGenerator("orcidWorkType", "dummyClassification")));
         mapper.clearMappings(mcro);
         mapper.createMapping(mcro);
         Document xml = mcro.createXML();
@@ -135,7 +144,8 @@ public class MCRDefaultClassificationMapperTest extends MCRJPATestCase {
         Document document = saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + "testMcrObject2.xml"));
         MCRObject mcro = new MCRObject(document);
 
-        MCRDefaultClassificationMapper mapper = new MCRDefaultClassificationMapper();
+        MCRDefaultClassificationMapper mapper = new MCRDefaultClassificationMapper(
+            Map.of("xPath", new MCRDefaultXPathClassificationGenerator("orcidWorkType", "dummyClassification")));
         mapper.clearMappings(mcro);
         mapper.createMapping(mcro);
         Document xml = mcro.createXML();
@@ -174,7 +184,8 @@ public class MCRDefaultClassificationMapperTest extends MCRJPATestCase {
         Document document = saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + "testMcrObject3.xml"));
         MCRObject mcro = new MCRObject(document);
 
-        MCRDefaultClassificationMapper mapper = new MCRDefaultClassificationMapper();
+        MCRDefaultClassificationMapper mapper = new MCRDefaultClassificationMapper(
+            Map.of("xPath", new MCRDefaultXPathClassificationGenerator("dummyClassification")));
         mapper.createMapping(mcro);
         Document xml = mcro.createXML();
 

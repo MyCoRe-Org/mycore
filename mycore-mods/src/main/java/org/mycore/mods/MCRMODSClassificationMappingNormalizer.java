@@ -4,16 +4,17 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.normalization.MCRObjectNormalizer;
 import org.mycore.mods.classification.MCRMODSClassificationMapper;
 
+import java.util.Collections;
+
 /**
  * Removes all classification elements with the generator attribute set to *-mycore.
  */
-public class MCRMODSGeneratedClassificationNormalizer extends MCRObjectNormalizer {
+public class MCRMODSClassificationMappingNormalizer extends MCRObjectNormalizer {
 
     private final MCRMODSClassificationMapper mapper;
 
-
-    public MCRMODSGeneratedClassificationNormalizer() {
-        mapper = new MCRMODSClassificationMapper();
+    public MCRMODSClassificationMappingNormalizer() {
+        mapper = new MCRMODSClassificationMapper(Collections.emptyMap());
     }
 
     @Override

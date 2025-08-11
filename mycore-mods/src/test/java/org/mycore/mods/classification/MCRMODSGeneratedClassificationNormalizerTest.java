@@ -13,7 +13,7 @@ import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.mods.MCRMODSGeneratedClassificationNormalizer;
+import org.mycore.mods.MCRMODSClassificationMappingNormalizer;
 import org.mycore.mods.MCRMODSWrapper;
 
 public class MCRMODSGeneratedClassificationNormalizerTest extends MCRJPATestCase {
@@ -40,7 +40,7 @@ public class MCRMODSGeneratedClassificationNormalizerTest extends MCRJPATestCase
                 + MCRMODSClassificationMapper.GENERATOR_SUFFIX + "')]");
         assertEquals("Initial number of generated classifications should be 4", 4, initialGenerated.size());
 
-        MCRMODSGeneratedClassificationNormalizer normalizer = new MCRMODSGeneratedClassificationNormalizer();
+        MCRMODSClassificationMappingNormalizer normalizer = new MCRMODSClassificationMappingNormalizer();
 
         normalizer.normalize(mcrObject);
 

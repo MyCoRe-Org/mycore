@@ -1,6 +1,7 @@
 package org.mycore.mods;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
@@ -12,13 +13,14 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRExpandedObjectManager;
 import org.mycore.common.MCRXlink;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
-import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRInstance;
+import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.datamodel.classifications2.MCRClassificationMapper;
+import org.mycore.datamodel.classifications2.MCRNoOpClassificationMapper;
 import org.mycore.datamodel.metadata.MCRExpandedObject;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.mods.classification.MCRMODSClassificationMapper;
 
 /**
  * This class is used to expand the content of mods:relatedItems by inheriting metadata from the parent object and
@@ -57,9 +59,10 @@ public class MCRMODSExpander extends MCRBasicObjectExpander {
 
     /**
      * Inherits the metadata linked from the current to other objects
+     *
      * @param modsWrapper the current object
-     * @param parentID the id of the parent object. Used to determine if the metadata is already inherited from
-     *                the parent.
+     * @param parentID    the id of the parent object. Used to determine if the metadata is already inherited from the
+     *                    parent.
      */
     protected void inheritLinkedMetadata(MCRMODSWrapper modsWrapper, MCRObjectID parentID) {
         for (Element relatedItem : modsWrapper.getLinkedRelatedItems()) {
@@ -106,7 +109,9 @@ public class MCRMODSExpander extends MCRBasicObjectExpander {
         hostContainer.addContent(parentWrapper.getMODS().cloneContent());
     }
 
-    /** Determines if the content of the relatedItem should be removed, when it is inserted as related item
+    /**
+     * Determines if the content of the relatedItem should be removed, when it is inserted as related item
+     *
      * @param relatedItem the relatedItem element
      * @return true if the content should be removed
      */
@@ -114,22 +119,21 @@ public class MCRMODSExpander extends MCRBasicObjectExpander {
         return relatedItem.getAttributeValue(MCRXlink.HREF, MCRConstants.XLINK_NAMESPACE) != null;
     }
 
-
-
     public static class Factory implements Supplier<MCRMODSExpander> {
 
-        public static final String CLASSIFICATION_MAPPING_ENABLED_PROPERTY = "ClassificationMappingEnabled";
-
-        @MCRProperty(name = CLASSIFICATION_MAPPING_ENABLED_PROPERTY)
-        public String classificationMappingEnabled;
+        @MCRInstance(name = CLASSIFICATION_MAPPER_KEY, valueClass = MCRClassificationMapper.class, required = false,
+            sentinel = @MCRSentinel)
+        public MCRClassificationMapper classificationMapper;
 
         @Override
         public MCRMODSExpander get() {
-            if(Boolean.parseBoolean(classificationMappingEnabled)) {
-                return new MCRMODSExpander(new MCRMODSClassificationMapper());
-            } else {
-                return new MCRMODSExpander(null);
-            }
+            return new MCRMODSExpander(getClassificationMapper());
         }
+
+        private MCRClassificationMapper getClassificationMapper() {
+            return Objects.requireNonNullElseGet(classificationMapper, MCRNoOpClassificationMapper::new);
+        }
+
     }
+
 }
