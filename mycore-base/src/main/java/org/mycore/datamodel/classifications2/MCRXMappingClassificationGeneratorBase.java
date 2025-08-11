@@ -1,0 +1,130 @@
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See https://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.mycore.datamodel.classifications2;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRException;
+import org.mycore.datamodel.classifications2.MCRClassificationMapperBase.Generator;
+
+/**
+ * {@link MCRXMappingClassificationGeneratorBase} is a base implementation for data model specific implementations of
+ * {@link Generator} that that looks for mapping information in all classification values already present in the
+ * intermediate representation of a MyCoRe object.
+ * <p>
+ * For each classification value, if the corresponding classification category contains a <code>x-mapping</code>
+ * label, the content of that label is used as a space separated list of classification category IDs.
+ *
+ * @param <I> The intermediate representation used by the corresponding implementation of
+ * {@link MCRXPathClassificationGeneratorBase}
+ * @param <V> The value type used by the corresponding implementation of
+ * {@link MCRXPathClassificationGeneratorBase}
+ */
+public abstract class MCRXMappingClassificationGeneratorBase<I, V> implements Generator<I, V> {
+
+    protected final Logger logger = LogManager.getLogger(getClass());
+
+    public static final String ON_MISSING_MAPPED_CATEGORY_KEY = "OnMissingMappedCategory";
+
+    public static final String LABEL_LANG_X_MAPPING = "x-mapping";
+
+    private final OnMissingMappedCategory onMissingMappedCategory;
+
+    public MCRXMappingClassificationGeneratorBase(OnMissingMappedCategory onMissingMappedCategory) {
+        this.onMissingMappedCategory = Objects.requireNonNull(onMissingMappedCategory);
+    }
+
+    @Override
+    public final List<V> generateMappings(MCRCategoryDAO dao, I intermediateRepresentation) {
+        return getCategories(dao, intermediateRepresentation)
+            .filter(Objects::nonNull)
+            .map(category -> findMappings(dao, category))
+            .flatMap(Collection::stream)
+            .distinct()
+            .peek(mapping -> mapping.logInfo(logger))
+            .map(this::toMappedValue)
+            .toList();
+    }
+
+    protected abstract Stream<MCRCategory> getCategories(MCRCategoryDAO dao, I intermediateRepresentation);
+
+    protected abstract V toMappedValue(XMapping xPathMapping);
+
+    private List<XMapping> findMappings(MCRCategoryDAO dao, MCRCategory sourceCategory) {
+        MCRCategoryID sourceCategoryId = sourceCategory.getId();
+        return sourceCategory.getLabel(LABEL_LANG_X_MAPPING)
+            .map(label -> Stream.of(label.getText().split("\\s"))
+                .map(MCRCategoryID::ofString)
+                .filter(categoryId -> !categoryId.isRootID())
+                .filter(categoryId -> dao.exist(categoryId) || handleMissingCategory(categoryId, sourceCategoryId))
+                .map(targetCategoryId -> new XMapping(sourceCategoryId, targetCategoryId))
+                .collect(Collectors.toList()))
+            .orElse(List.of());
+    }
+
+    private boolean handleMissingCategory(MCRCategoryID categoryID, MCRCategoryID sourceCategoryId) {
+        if (onMissingMappedCategory == OnMissingMappedCategory.THROW_EXCEPTION) {
+            throw new MCRException("Mapped missing classification value " + categoryID + " for " + sourceCategoryId);
+        }
+        if (onMissingMappedCategory.warnAboutMissingCategory && logger.isWarnEnabled()) {
+            logger.warn("Mapped missing classification value {} for {}", categoryID, sourceCategoryId);
+        }
+        return onMissingMappedCategory.addMissingCategory;
+    }
+
+    public enum OnMissingMappedCategory {
+
+        THROW_EXCEPTION(true, false),
+
+        WARN_AND_IGNORE(true, false),
+
+        WARN_AND_ADD(true, true),
+
+        IGNORE(false, false),
+
+        ADD(false, true);
+
+        private final boolean warnAboutMissingCategory;
+
+        private final boolean addMissingCategory;
+
+        OnMissingMappedCategory(boolean warn, boolean add) {
+            this.warnAboutMissingCategory = warn;
+            this.addMissingCategory = add;
+        }
+
+    }
+
+    protected record XMapping(MCRCategoryID sourceCategoryId, MCRCategoryID targetCategoryId) {
+
+        private void logInfo(Logger logger) {
+            if (logger.isInfoEnabled()) {
+                logger.info("found mapping from {} to {}", sourceCategoryId.toString(),
+                    targetCategoryId.toString());
+            }
+        }
+
+    }
+
+}

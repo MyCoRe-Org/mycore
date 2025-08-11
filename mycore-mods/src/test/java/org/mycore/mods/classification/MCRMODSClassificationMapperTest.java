@@ -20,6 +20,7 @@ package org.mycore.mods.classification;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Map;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -37,6 +38,7 @@ import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRXMappingClassificationGeneratorBase;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
@@ -66,7 +68,9 @@ public class MCRMODSClassificationMapperTest extends MCRJPATestCase {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 1);
 
-        MCRMODSClassificationMapper mapper = new MCRMODSClassificationMapper();
+        MCRMODSClassificationMapper mapper = new MCRMODSClassificationMapper(Map.of(
+            "xMapping", new MCRMODSXMappingClassificationGenerator(
+                MCRXMappingClassificationGeneratorBase.OnMissingMappedCategory.IGNORE)));
         mapper.createMapping(mcro);
 
         String expression =
@@ -112,7 +116,8 @@ public class MCRMODSClassificationMapperTest extends MCRJPATestCase {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 2);
 
-        MCRMODSClassificationMapper mapper = new MCRMODSClassificationMapper();
+        MCRMODSClassificationMapper mapper = new MCRMODSClassificationMapper(Map.of(
+            "xPath", new MCRMODSXPathClassificationGenerator("orcidWorkType", "dummyClassification")));
         mapper.createMapping(mcro);
 
         Document xml = mcro.createXML();
@@ -168,7 +173,8 @@ public class MCRMODSClassificationMapperTest extends MCRJPATestCase {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 3);
 
-        MCRMODSClassificationMapper mapper = new MCRMODSClassificationMapper();
+        MCRMODSClassificationMapper mapper = new MCRMODSClassificationMapper(Map.of(
+            "xPath", new MCRMODSXPathClassificationGenerator("orcidWorkType", "dummyClassification")));
         mapper.createMapping(mcro);
 
         Document xml = mcro.createXML();
@@ -226,7 +232,8 @@ public class MCRMODSClassificationMapperTest extends MCRJPATestCase {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 4);
 
-        MCRMODSClassificationMapper mapper = new MCRMODSClassificationMapper();
+        MCRMODSClassificationMapper mapper = new MCRMODSClassificationMapper(Map.of(
+            "xPath", new MCRMODSXPathClassificationGenerator("placeholderClassification")));
         mapper.createMapping(mcro);
 
         Document xml = mcro.createXML();
@@ -325,7 +332,8 @@ public class MCRMODSClassificationMapperTest extends MCRJPATestCase {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 8);
 
-        MCRMODSClassificationMapper mapper = new MCRMODSClassificationMapper();
+        MCRMODSClassificationMapper mapper = new MCRMODSClassificationMapper(Map.of(
+            "xPath", new MCRMODSXPathClassificationGenerator("placeholderOrCondition")));
         mapper.createMapping(mcro);
 
         Document xml = mcro.createXML();
@@ -361,7 +369,8 @@ public class MCRMODSClassificationMapperTest extends MCRJPATestCase {
         mw.setMODS(document1.getRootElement().detach());
         mw.setID("junit", 9);
 
-        MCRMODSClassificationMapper mapper = new MCRMODSClassificationMapper();
+        MCRMODSClassificationMapper mapper = new MCRMODSClassificationMapper(Map.of(
+            "xPath", new MCRMODSXPathClassificationGenerator("placeholderOrCondition")));
         mapper.createMapping(mcro);
 
         Document xml = mcro.createXML();

@@ -3,12 +3,14 @@ package org.mycore.datamodel.metadata.normalization;
 import org.mycore.datamodel.classifications2.MCRDefaultClassificationMapper;
 import org.mycore.datamodel.metadata.MCRObject;
 
-public class MCRClassificationMapperNormalizer extends MCRObjectNormalizer {
+import java.util.Collections;
+
+public class MCRDefaultClassificationMappingNormalizer extends MCRObjectNormalizer {
 
     private final MCRDefaultClassificationMapper mapper;
 
-    public MCRClassificationMapperNormalizer() {
-        this.mapper = new MCRDefaultClassificationMapper();
+    public MCRDefaultClassificationMappingNormalizer() {
+        this.mapper = new MCRDefaultClassificationMapper(Collections.emptyMap());
     }
 
     @Override

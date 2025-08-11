@@ -3,12 +3,14 @@ package org.mycore.common;
 import static org.mycore.datamodel.metadata.MCRObjectService.DATE_TYPE_EFFECTIVE_MODIFIED_DATE;
 
 import java.util.Date;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
-import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRInstance;
+import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.datamodel.classifications2.MCRClassificationMapper;
-import org.mycore.datamodel.classifications2.MCRDefaultClassificationMapper;
+import org.mycore.datamodel.classifications2.MCRNoOpClassificationMapper;
 import org.mycore.datamodel.metadata.MCRChildrenOrderStrategyManager;
 import org.mycore.datamodel.metadata.MCRExpandedObject;
 import org.mycore.datamodel.metadata.MCRExpandedObjectStructure;
@@ -24,6 +26,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 @MCRConfigurationProxy(proxyClass = MCRBasicObjectExpander.Factory.class)
 public class MCRBasicObjectExpander implements MCRObjectExpander {
 
+    public static final String CLASSIFICATION_MAPPER_KEY = "ClassificationMapper";
+
     private final MCRClassificationMapper mapper;
 
     /**
@@ -32,7 +36,7 @@ public class MCRBasicObjectExpander implements MCRObjectExpander {
      * @param mapper The classification mapper to use, or null if classification mapping is disabled.
      */
     public MCRBasicObjectExpander(MCRClassificationMapper mapper) {
-        this.mapper = mapper;
+        this.mapper = Objects.requireNonNull(mapper, "Mapper must not be null");
     }
 
     /**
@@ -79,29 +83,30 @@ public class MCRBasicObjectExpander implements MCRObjectExpander {
     }
 
     /**
-     * Handles the expansion of classifications for the given MCRObject,
-     * if a classification mapper is configured.
+     * Handles the expansion of classifications for the given MCRObject.
      *
      * @param mcrObject The MCRObject whose classifications should be expanded.
      */
-    void expandClassifications(MCRObject mcrObject) {
-        if (mapper != null) {
-            mapper.clearMappings(mcrObject);
-            mapper.createMapping(mcrObject);
-        }
+    private void expandClassifications(MCRObject mcrObject) {
+        mapper.clearMappings(mcrObject);
+        mapper.createMapping(mcrObject);
     }
 
     public static final class Factory implements Supplier<MCRBasicObjectExpander> {
 
-        @MCRProperty(name = "ClassificationMappingEnabled")
-        public String classificationMappingEnabled;
+        @MCRInstance(name = CLASSIFICATION_MAPPER_KEY, valueClass = MCRClassificationMapper.class, required = false,
+                sentinel = @MCRSentinel)
+        public MCRClassificationMapper classificationMapper;
 
         @Override
         public MCRBasicObjectExpander get() {
-            MCRDefaultClassificationMapper mapper =
-                Boolean.parseBoolean(classificationMappingEnabled) ? new MCRDefaultClassificationMapper() : null;
-            return new MCRBasicObjectExpander(mapper);
+            return new MCRBasicObjectExpander(getClassificationMapper());
         }
+
+        private MCRClassificationMapper getClassificationMapper() {
+            return Objects.requireNonNullElseGet(classificationMapper, MCRNoOpClassificationMapper::new);
+        }
+
     }
 
 }
