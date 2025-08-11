@@ -32,6 +32,7 @@ import org.apache.logging.log4j.Level;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceList;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
@@ -121,7 +122,8 @@ public class MCRCombinedResourceProvider extends MCRResourceProviderBase {
         @MCRProperty(name = COVERAGE_KEY, defaultName = "MCR.Resource.Provider.Default.Combined.Coverage")
         public String coverage;
 
-        @MCRInstanceList(name = PROVIDERS_KEY, valueClass = MCRResourceProvider.class, required = false)
+        @MCRInstanceList(name = PROVIDERS_KEY, valueClass = MCRResourceProvider.class, required = false,
+            sentinel = @MCRSentinel)
         public List<MCRResourceProvider> providers;
 
         @Override

@@ -359,10 +359,12 @@ public final class MCRResourceResolver {
     @SuppressWarnings("PMD.SystemPrintln")
     public static class Factory implements Supplier<MCRResourceResolver> {
 
-        @MCRInstanceMap(name = HINTS_KEY, valueClass = MCRHint.class, sentinel = @MCRSentinel)
+        @MCRInstanceMap(name = HINTS_KEY, valueClass = MCRHint.class, required = false,
+            sentinel = @MCRSentinel)
         public Map<String, MCRHint<?>> hints;
 
-        @MCRInstanceMap(name = PROVIDERS_KEY, valueClass = MCRResourceProvider.class, sentinel = @MCRSentinel)
+        @MCRInstanceMap(name = PROVIDERS_KEY, valueClass = MCRResourceProvider.class, required = false,
+            sentinel = @MCRSentinel)
         public Map<String, MCRResourceProvider> providers;
 
         @MCRProperty(name = SELECTED_PROVIDER_KEY)
