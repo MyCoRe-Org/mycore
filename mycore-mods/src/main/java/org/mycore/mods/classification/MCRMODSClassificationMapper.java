@@ -28,7 +28,6 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRClassificationMapperBase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
@@ -66,7 +65,7 @@ import org.mycore.mods.MCRMODSWrapper;
  */
 @MCRConfigurationProxy(proxyClass = MCRMODSClassificationMapper.Factory.class)
 public final class MCRMODSClassificationMapper extends MCRClassificationMapperBase<MCRMODSWrapper, MCRMODSWrapper,
-    MCRMODSClassificationMapper.Mapping, MCRMODSClassificationMapper.Generator> {
+    MCRMODSClassificationMapper.Generator> {
 
     public static final String GENERATOR_SUFFIX = "-mycore";
 
@@ -102,10 +101,7 @@ public final class MCRMODSClassificationMapper extends MCRClassificationMapperBa
         });
     }
 
-    public record Mapping(String generatorName, MCRCategoryID categoryId) {
-    }
-
-    public interface Generator extends MCRClassificationMapperBase.Generator<MCRMODSWrapper, Mapping> {
+    public interface Generator extends MCRClassificationMapperBase.Generator<MCRMODSWrapper> {
 
         @Override
         List<Mapping> generateMappings(MCRCategoryDAO dao, MCRMODSWrapper intermediateRepresentation);

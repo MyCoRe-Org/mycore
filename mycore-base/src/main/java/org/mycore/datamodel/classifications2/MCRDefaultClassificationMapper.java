@@ -63,7 +63,7 @@ import org.mycore.datamodel.metadata.MCRObjectMetadata;
  */
 @MCRConfigurationProxy(proxyClass = MCRDefaultClassificationMapper.Factory.class)
 public final class MCRDefaultClassificationMapper extends MCRClassificationMapperBase<MCRObjectMetadata, Document,
-    MCRCategoryID, MCRDefaultClassificationMapper.Generator> {
+    MCRDefaultClassificationMapper.Generator> {
 
     public static final String ELEMENT_MAPPINGS = "mappings";
 
@@ -87,9 +87,9 @@ public final class MCRDefaultClassificationMapper extends MCRClassificationMappe
     }
 
     @Override
-    protected void addNewMappings(MCRObjectMetadata metadata, Set<MCRCategoryID> mappedIds) {
+    protected void addNewMappings(MCRObjectMetadata metadata, Set<Mapping> mappedIds) {
         MCRMetaElement newMappings = createEmptyMappingsElement();
-        mappedIds.forEach(categoryId -> newMappings.addMetaObject(toMetaClassification(categoryId)));
+        mappedIds.forEach(mapping -> newMappings.addMetaObject(toMetaClassification(mapping.categoryId())));
         metadata.setMetadataElement(newMappings);
     }
 
@@ -106,10 +106,10 @@ public final class MCRDefaultClassificationMapper extends MCRClassificationMappe
         return new MCRMetaClassification("mapping", 0, null, categoryId.getRootID(), categoryId.getId());
     }
 
-    public interface Generator extends MCRClassificationMapperBase.Generator<Document, MCRCategoryID> {
+    public interface Generator extends MCRClassificationMapperBase.Generator<Document> {
 
         @Override
-        List<MCRCategoryID> generateMappings(MCRCategoryDAO dao, Document intermediateRepresentation);
+        List<Mapping> generateMappings(MCRCategoryDAO dao, Document intermediateRepresentation);
 
     }
 

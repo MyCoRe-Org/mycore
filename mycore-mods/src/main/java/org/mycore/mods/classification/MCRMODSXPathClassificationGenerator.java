@@ -19,7 +19,6 @@ package org.mycore.mods.classification;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Supplier;
 
@@ -28,7 +27,6 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRXPathClassificationGeneratorBase;
 import org.mycore.mods.MCRMODSWrapper;
 
@@ -67,8 +65,8 @@ import org.mycore.mods.MCRMODSWrapper;
  * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRMODSXPathClassificationGenerator.Factory.class)
-public final class MCRMODSXPathClassificationGenerator extends MCRXPathClassificationGeneratorBase<MCRMODSWrapper,
-    MCRMODSClassificationMapper.Mapping> implements MCRMODSClassificationMapper.Generator {
+public final class MCRMODSXPathClassificationGenerator extends MCRXPathClassificationGeneratorBase<MCRMODSWrapper>
+    implements MCRMODSClassificationMapper.Generator {
 
     public MCRMODSXPathClassificationGenerator(String... classificationsIds) {
         this(Arrays.asList(Objects.requireNonNull(classificationsIds, "Classification IDs must not be null")));
@@ -81,13 +79,6 @@ public final class MCRMODSXPathClassificationGenerator extends MCRXPathClassific
     @Override
     protected Parent toParent(MCRCategoryDAO dao, MCRMODSWrapper modsWrapper) {
         return modsWrapper.getMODS();
-    }
-
-    @Override
-    protected MCRMODSClassificationMapper.Mapping toMappedValue(XPathMapping mapping) {
-        MCRCategoryID targetCategoryId = mapping.targetCategoryId();
-        String generator = String.format(Locale.ROOT, "xpathmapping2%s", targetCategoryId.getRootID());
-        return new MCRMODSClassificationMapper.Mapping(generator, targetCategoryId);
     }
 
     public static class Factory implements Supplier<MCRMODSXPathClassificationGenerator> {

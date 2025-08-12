@@ -20,6 +20,7 @@ package org.mycore.datamodel.classifications2;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -42,10 +43,8 @@ import org.mycore.datamodel.classifications2.MCRClassificationMapperBase.Generat
  * 
  * @param <I> The intermediate representation used by the corresponding implementation of 
  * {@link MCRXPathClassificationGeneratorBase}
- * @param <V> The value type used by the corresponding implementation of 
- * {@link MCRXPathClassificationGeneratorBase}
  */
-public abstract class MCRXPathClassificationGeneratorBase<I, V> implements Generator<I, V> {
+public abstract class MCRXPathClassificationGeneratorBase<I> implements Generator<I> {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 
@@ -65,18 +64,17 @@ public abstract class MCRXPathClassificationGeneratorBase<I, V> implements Gener
     }
 
     @Override
-    public final List<V> generateMappings(MCRCategoryDAO dao, I intermediateRepresentation) {
+    public final List<MCRClassificationMapperBase.Mapping> generateMappings(MCRCategoryDAO dao,
+        I intermediateRepresentation) {
         Parent parent = toParent(dao, intermediateRepresentation);
         return classificationsIds.stream()
             .flatMap(classificationId -> findMappings(dao, parent, classificationId))
             .peek(xPathMapping -> xPathMapping.logInfo(logger))
-            .map(this::toMappedValue)
+            .map(XPathMapping::toMapping)
             .toList();
     }
 
     protected abstract Parent toParent(MCRCategoryDAO dao, I intermediateRepresentation);
-
-    protected abstract V toMappedValue(XPathMapping xPathMapping);
 
     private Stream<XPathMapping> findMappings(MCRCategoryDAO dao, Parent parent, String classificationId) {
         List<XPathMapping> mappings = findMappings(dao, parent, classificationId, LABEL_LANG_XPATH_MAPPING);
@@ -106,6 +104,11 @@ public abstract class MCRXPathClassificationGeneratorBase<I, V> implements Gener
             if (logger.isInfoEnabled()) {
                 logger.info("found x-path-mapping to {} for {}", targetCategoryId.toString(), xLanguage);
             }
+        }
+
+        private MCRClassificationMapperBase.Mapping toMapping() {
+            String generator = String.format(Locale.ROOT, "xpathmapping2%s", targetCategoryId.getRootID());
+            return new MCRClassificationMapperBase.Mapping(generator, targetCategoryId);
         }
 
     }

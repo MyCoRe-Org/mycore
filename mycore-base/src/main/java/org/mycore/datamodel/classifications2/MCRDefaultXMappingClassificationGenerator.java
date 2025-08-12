@@ -57,8 +57,8 @@ import org.mycore.common.config.annotation.MCRProperty;
  * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRDefaultXMappingClassificationGenerator.Factory.class)
-public final class MCRDefaultXMappingClassificationGenerator extends MCRXMappingClassificationGeneratorBase<Document,
-    MCRCategoryID> implements MCRDefaultClassificationMapper.Generator {
+public final class MCRDefaultXMappingClassificationGenerator extends MCRXMappingClassificationGeneratorBase<Document>
+    implements MCRDefaultClassificationMapper.Generator {
 
     private static final XPathExpression<Element> CLASSIFICATION_ELEMENT_XPATH;
 
@@ -79,11 +79,6 @@ public final class MCRDefaultXMappingClassificationGenerator extends MCRXMapping
     private MCRCategory loadClassification(MCRCategoryDAO dao, Element classificationElement) {
         return dao.getCategory(new MCRCategoryID(classificationElement.getAttributeValue("classid"),
             classificationElement.getAttributeValue("categid")), 0);
-    }
-
-    @Override
-    protected MCRCategoryID toMappedValue(XMapping mapping) {
-        return mapping.targetCategoryId();
     }
 
     public static class Factory implements Supplier<MCRDefaultXMappingClassificationGenerator> {

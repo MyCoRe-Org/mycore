@@ -19,6 +19,7 @@ package org.mycore.datamodel.classifications2;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -38,10 +39,8 @@ import org.mycore.datamodel.classifications2.MCRClassificationMapperBase.Generat
  *
  * @param <I> The intermediate representation used by the corresponding implementation of
  * {@link MCRXPathClassificationGeneratorBase}
- * @param <V> The value type used by the corresponding implementation of
- * {@link MCRXPathClassificationGeneratorBase}
  */
-public abstract class MCRXMappingClassificationGeneratorBase<I, V> implements Generator<I, V> {
+public abstract class MCRXMappingClassificationGeneratorBase<I> implements Generator<I> {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 
@@ -56,20 +55,19 @@ public abstract class MCRXMappingClassificationGeneratorBase<I, V> implements Ge
     }
 
     @Override
-    public final List<V> generateMappings(MCRCategoryDAO dao, I intermediateRepresentation) {
+    public final List<MCRClassificationMapperBase.Mapping> generateMappings(MCRCategoryDAO dao,
+        I intermediateRepresentation) {
         return getCategories(dao, intermediateRepresentation)
             .filter(Objects::nonNull)
             .map(category -> findMappings(dao, category))
             .flatMap(Collection::stream)
             .distinct()
             .peek(mapping -> mapping.logInfo(logger))
-            .map(this::toMappedValue)
+            .map(XMapping::toMapping)
             .toList();
     }
 
     protected abstract Stream<MCRCategory> getCategories(MCRCategoryDAO dao, I intermediateRepresentation);
-
-    protected abstract V toMappedValue(XMapping xPathMapping);
 
     private List<XMapping> findMappings(MCRCategoryDAO dao, MCRCategory sourceCategory) {
         MCRCategoryID sourceCategoryId = sourceCategory.getId();
@@ -123,6 +121,15 @@ public abstract class MCRXMappingClassificationGeneratorBase<I, V> implements Ge
                 logger.info("found mapping from {} to {}", sourceCategoryId.toString(),
                     targetCategoryId.toString());
             }
+        }
+
+        private MCRClassificationMapperBase.Mapping toMapping() {
+            String generator = getGenerator(sourceCategoryId, targetCategoryId);
+            return new MCRClassificationMapperBase.Mapping(generator, targetCategoryId);
+        }
+
+        private String getGenerator(MCRCategoryID sourceCategoryId, MCRCategoryID targetCategoryId) {
+            return String.format(Locale.ROOT, "%s2%s", sourceCategoryId.getRootID(), targetCategoryId.getRootID());
         }
 
     }
