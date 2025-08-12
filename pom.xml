@@ -348,9 +348,13 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
-      <id>dev.bibsonomy.org</id>
+      <!-- The official bibsonomy repo is off-line, now hosted on mycore.de -->
+      <!-- <id>dev.bibsonomy.org</id>
       <name>Official Source Code Releases of selected BibSonomy Modules</name>
-      <url>https://dev.bibsonomy.org/maven2/</url>
+      <url>https://dev.bibsonomy.org/maven2/</url> -->
+      <id>bibsonomy-from-mycore.de</id>
+      <name>Bibsonomy Modules in Maven repo on mycore.de</name>
+      <url>https://www.mycore.de/maven-repo/</url>
     </repository>
   </repositories>
   <pluginRepositories>
