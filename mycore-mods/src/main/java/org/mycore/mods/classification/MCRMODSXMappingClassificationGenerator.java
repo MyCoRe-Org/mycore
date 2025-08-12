@@ -17,7 +17,6 @@
  */
 package org.mycore.mods.classification;
 
-import java.util.Locale;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -25,7 +24,6 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRXMappingClassificationGeneratorBase;
 import org.mycore.mods.MCRMODSWrapper;
 
@@ -59,8 +57,8 @@ import org.mycore.mods.MCRMODSWrapper;
  * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRMODSXMappingClassificationGenerator.Factory.class)
-public final class MCRMODSXMappingClassificationGenerator extends MCRXMappingClassificationGeneratorBase<MCRMODSWrapper,
-    MCRMODSClassificationMapper.Mapping> implements MCRMODSClassificationMapper.Generator {
+public final class MCRMODSXMappingClassificationGenerator extends MCRXMappingClassificationGeneratorBase<MCRMODSWrapper>
+    implements MCRMODSClassificationMapper.Generator {
 
     public MCRMODSXMappingClassificationGenerator(OnMissingMappedCategory onMissingMappedCategory) {
         super(onMissingMappedCategory);
@@ -69,16 +67,6 @@ public final class MCRMODSXMappingClassificationGenerator extends MCRXMappingCla
     @Override
     protected Stream<MCRCategory> getCategories(MCRCategoryDAO dao, MCRMODSWrapper modsWrapper) {
         return modsWrapper.getMcrCategoryIDs().stream().map(categoryId -> dao.getCategory(categoryId, 0));
-    }
-
-    @Override
-    protected MCRMODSClassificationMapper.Mapping toMappedValue(XMapping mapping) {
-        String generator = getGenerator(mapping.sourceCategoryId(), mapping.targetCategoryId());
-        return new MCRMODSClassificationMapper.Mapping(generator, mapping.targetCategoryId());
-    }
-
-    private String getGenerator(MCRCategoryID sourceCategoryId, MCRCategoryID targetCategoryId) {
-        return String.format(Locale.ROOT, "%s2%s", sourceCategoryId.getRootID(), targetCategoryId.getRootID());
     }
 
     public static class Factory implements Supplier<MCRMODSXMappingClassificationGenerator> {

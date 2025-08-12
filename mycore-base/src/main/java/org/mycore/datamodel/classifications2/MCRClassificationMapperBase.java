@@ -40,17 +40,16 @@ import org.mycore.datamodel.metadata.MCRObject;
  * mappings, (b) obtain an intermediate representation and (c) add as set of mappings.
  * @param <I> An intermediate representation of the MyCoRe object that is passed to the {@link Generator} instances
  * in order to obtain classifications.
- * @param <V> The type of value that is returned by the {@link Generator} instances.
  * @param <G> The actual {@link Generator} type used by an implementation.
  */
-public abstract class MCRClassificationMapperBase<B, I, V, G extends MCRClassificationMapperBase.Generator<I, V>>
+public abstract class MCRClassificationMapperBase<B, I, G extends MCRClassificationMapperBase.Generator<I>>
     implements MCRClassificationMapper {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 
     public static final String GENERATORS_KEY = "Generators";
 
-    private final Map<String, Generator<I, V>> generators;
+    private final Map<String, Generator<I>> generators;
 
     public MCRClassificationMapperBase(Map<String, G> generators) {
         this.generators = new HashMap<>(Objects
@@ -78,7 +77,7 @@ public abstract class MCRClassificationMapperBase<B, I, V, G extends MCRClassifi
         MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
 
         I intermediateRepresentation = getIntermediateRepresentation(baseRepresentation);
-        Set<V> mappedValues = new LinkedHashSet<>();
+        Set<Mapping> mappedValues = new LinkedHashSet<>();
         generators.forEach((name, generator) -> {
             if (logger.isInfoEnabled()) {
                 logger.info("generate mappings with {} / {}", name, generator.getClass().getName());
@@ -100,11 +99,14 @@ public abstract class MCRClassificationMapperBase<B, I, V, G extends MCRClassifi
 
     protected abstract I getIntermediateRepresentation(B baseRepresentation);
 
-    protected abstract void addNewMappings(B baseRepresentation, Set<V> mappedValues);
+    protected abstract void addNewMappings(B baseRepresentation, Set<Mapping> mappedValues);
 
-    public interface Generator<I, V> {
+    public record Mapping(String generatorName, MCRCategoryID categoryId) {
+    }
+    
+    public interface Generator<I> {
 
-        List<V> generateMappings(MCRCategoryDAO dao, I intermediateRepresentation);
+        List<Mapping> generateMappings(MCRCategoryDAO dao, I intermediateRepresentation);
 
     }
 

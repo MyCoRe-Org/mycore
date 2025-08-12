@@ -63,8 +63,8 @@ import org.mycore.common.config.annotation.MCRProperty;
  * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRDefaultXPathClassificationGenerator.Factory.class)
-public final class MCRDefaultXPathClassificationGenerator extends MCRXPathClassificationGeneratorBase<Document,
-    MCRCategoryID> implements MCRDefaultClassificationMapper.Generator {
+public final class MCRDefaultXPathClassificationGenerator extends MCRXPathClassificationGeneratorBase<Document>
+    implements MCRDefaultClassificationMapper.Generator {
 
     public MCRDefaultXPathClassificationGenerator(String... classificationsIds) {
         this(Arrays.asList(Objects.requireNonNull(classificationsIds, "Classification IDs must not be null")));
@@ -77,11 +77,6 @@ public final class MCRDefaultXPathClassificationGenerator extends MCRXPathClassi
     @Override
     protected Parent toParent(MCRCategoryDAO dao, Document metadataDocument) {
         return metadataDocument;
-    }
-
-    @Override
-    protected MCRCategoryID toMappedValue(XPathMapping mapping) {
-        return mapping.targetCategoryId();
     }
 
     public static class Factory implements Supplier<MCRDefaultXPathClassificationGenerator> {
