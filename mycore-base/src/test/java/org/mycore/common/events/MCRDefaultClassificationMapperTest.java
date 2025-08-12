@@ -44,7 +44,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 
 public class MCRDefaultClassificationMapperTest extends MCRJPATestCase {
 
-    public static final String TEST_DIRECTORY = "MCRClassificationMappingEventHandlerTest/";
+    public static final String TEST_DIRECTORY = MCRDefaultClassificationMapperTest.class.getSimpleName() + "/";
 
     public MCRCategoryDAO getDAO() {
         return MCRCategoryDAOFactory.obtainInstance();

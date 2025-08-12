@@ -43,7 +43,7 @@ import org.mycore.mods.MCRMODSWrapper;
 
 public class MCRMODSClassificationMapperTest extends MCRJPATestCase {
 
-    public static final String TEST_DIRECTORY = "MCRClassificationMappingEventHandlerTest/";
+    public static final String TEST_DIRECTORY = MCRMODSClassificationMapperTest.class.getSimpleName() + "/";
 
     public MCRCategoryDAO getDAO() {
         return MCRCategoryDAOFactory.obtainInstance();
