@@ -38,6 +38,10 @@ jobs:
         export FIREFOX_BIN=$(which firefox)
         export SELENIUM_BROWSER=firefox
 
+        mvn org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile=.github/bibsonomy-model-3.9.4.jar
+        mvn org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile=.github/bibsonomy-common-3.9.4.jar
+        mvn org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile=.github/bibsonomy-bibtex-parser-3.9.4.jar
+
         mvn -B -Plocal-testing,!standard-with-extra-repos install -Dlog4j.configurationFile=$PWD/ci/log4j2.xml -T2
         mvn -P!standard-with-extra-repos -B javadoc:javadoc -T1C
 
