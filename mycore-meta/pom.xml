@@ -211,5 +211,9 @@
       <artifactId>mycore-ifs</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-dedup</artifactId>
+    </dependency>
   </dependencies>
 </project>
