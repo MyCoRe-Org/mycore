@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.jdom2.Document;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
@@ -30,11 +31,10 @@ import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.datamodel.metadata.MCRObjectMetadata;
 
 /**
  * A {@link MCRDefaultClassificationMapper} maps classifications in default metadata documents.
- * To do so, it uses {@link Generator} instances that each implement a strategy
+ * To do so, it uses {@link MCRDefaultClassificationMapper.Generator} instances that each implement a strategy
  * to obtain classifications based on the information present in the default metadata document.
  * <p>
  * Obtained classification values are added to the default metadata document as a <code>mappings</code>
@@ -62,7 +62,7 @@ import org.mycore.datamodel.metadata.MCRObjectMetadata;
  * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRDefaultClassificationMapper.Factory.class)
-public final class MCRDefaultClassificationMapper extends MCRClassificationMapperBase<MCRObjectMetadata, Document,
+public final class MCRDefaultClassificationMapper extends MCRClassificationMapperBase<Document,
     MCRDefaultClassificationMapper.Generator> {
 
     public static final String ELEMENT_MAPPINGS = "mappings";
@@ -72,25 +72,21 @@ public final class MCRDefaultClassificationMapper extends MCRClassificationMappe
     }
 
     @Override
-    protected Optional<MCRObjectMetadata> getBaseRepresentation(MCRObject object) {
-        return Optional.ofNullable(object.getMetadata());
+    protected Optional<Document> getRepresentation(MCRObject object) {
+        return Optional.of(new Document(object.getMetadata().createXML().detach()));
     }
 
     @Override
-    protected void removeExistingMappings(MCRObjectMetadata metadata) {
-        metadata.removeMetadataElement(ELEMENT_MAPPINGS);
+    protected void removeExistingMappings(MCRObject object, Document document) {
+        object.getMetadata().removeMetadataElement(ELEMENT_MAPPINGS);
     }
 
     @Override
-    protected Document getIntermediateRepresentation(MCRObjectMetadata metadata) {
-        return new Document(metadata.createXML().detach());
-    }
-
-    @Override
-    protected void addNewMappings(MCRObjectMetadata metadata, Set<Mapping> mappedIds) {
+    protected void addNewMappings(MCRObject object, Document document, Set<Mapping> mappings) {
         MCRMetaElement newMappings = createEmptyMappingsElement();
-        mappedIds.forEach(mapping -> newMappings.addMetaObject(toMetaClassification(mapping.categoryId())));
-        metadata.setMetadataElement(newMappings);
+        Set<MCRCategoryID> categoryIds = mappings.stream().map(Mapping::categoryId).collect(Collectors.toSet());
+        categoryIds.forEach(categoryId -> newMappings.addMetaObject(toMetaClassification(categoryId)));
+        object.getMetadata().setMetadataElement(newMappings);
     }
 
     private MCRMetaElement createEmptyMappingsElement() {
@@ -109,7 +105,7 @@ public final class MCRDefaultClassificationMapper extends MCRClassificationMappe
     public interface Generator extends MCRClassificationMapperBase.Generator<Document> {
 
         @Override
-        List<Mapping> generateMappings(MCRCategoryDAO dao, Document intermediateRepresentation);
+        List<Mapping> generateMappings(MCRCategoryDAO dao, Document metadataDocument);
 
     }
 
