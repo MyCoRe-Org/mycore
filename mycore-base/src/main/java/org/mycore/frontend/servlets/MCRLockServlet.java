@@ -25,7 +25,6 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -130,7 +129,6 @@ public class MCRLockServlet extends MCRServlet {
         HttpServletRequest req = job.getRequest();
         MCRObjectID objectId = (MCRObjectID) job.getRequest().getAttribute(OBJECT_ID_KEY);
         Action action = (Action) job.getRequest().getAttribute(ACTION_KEY);
-        MCRSession lockingSession = MCRObjectIDLockTable.getLocker(objectId);
         if (MCRObjectIDLockTable.isLockedByCurrentSession(objectId) || action == Action.UNLOCK) {
             String url = getProperty(job.getRequest(), PARAM_REDIRECT);
             if (url.startsWith("/")) {
@@ -139,8 +137,8 @@ public class MCRLockServlet extends MCRServlet {
             url = addQueryParameter(url, req);
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(url));
         } else {
-            String errorI18N = getErrorI18N("error", "lockedBy", objectId.toString(), lockingSession
-                .getUserInformation().getUserID());
+            String user = MCRObjectIDLockTable.getLockingUserName(objectId.toString());
+            String errorI18N = getErrorI18N("error", "lockedBy", objectId.toString(), user);
             job.getResponse().sendError(HttpServletResponse.SC_CONFLICT, errorI18N);
         }
     }
