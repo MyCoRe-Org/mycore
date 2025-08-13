@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.mycore.datamodel.classifications2;
+package org.mycore.datamodel.classifications2.mapping;
 
 import org.mycore.datamodel.metadata.MCRObject;
 
@@ -26,7 +26,7 @@ import org.mycore.datamodel.metadata.MCRObject;
  * No configuration options are available.
  * Example:
  * <pre><code>
- * [...].Class=org.mycore.datamodel.classifications2.MCRNoOpClassificationMapper
+ * [...].Class=org.mycore.datamodel.classifications2.mapping.MCRNoOpClassificationMapper
  * </code></pre>
  */
 public final class MCRNoOpClassificationMapper implements MCRClassificationMapper {

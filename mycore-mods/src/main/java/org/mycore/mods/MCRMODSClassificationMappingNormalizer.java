@@ -2,7 +2,7 @@ package org.mycore.mods;
 
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.normalization.MCRObjectNormalizer;
-import org.mycore.mods.classification.MCRMODSClassificationMapper;
+import org.mycore.mods.classification.mapping.MCRMODSGeneratorClassificationMapper;
 
 import java.util.Collections;
 
@@ -11,10 +11,10 @@ import java.util.Collections;
  */
 public class MCRMODSClassificationMappingNormalizer extends MCRObjectNormalizer {
 
-    private final MCRMODSClassificationMapper mapper;
+    private final MCRMODSGeneratorClassificationMapper mapper;
 
     public MCRMODSClassificationMappingNormalizer() {
-        mapper = new MCRMODSClassificationMapper(Collections.emptyMap());
+        mapper = new MCRMODSGeneratorClassificationMapper(Collections.emptyMap());
     }
 
     @Override

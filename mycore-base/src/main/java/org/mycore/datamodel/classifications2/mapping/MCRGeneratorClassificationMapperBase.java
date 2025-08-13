@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.mycore.datamodel.classifications2;
+package org.mycore.datamodel.classifications2.mapping;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -28,20 +28,23 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRObject;
 
 /**
- * {@link MCRClassificationMapperBase} is a base implementation for data model specific event handlers
- * that map classifications in MyCoRe objects. To do so it uses {@link MCRClassificationMapperBase.Generator}
+ * {@link MCRGeneratorClassificationMapperBase} is a base implementation for data model specific event handlers
+ * that map classifications in MyCoRe objects. To do so it uses {@link MCRGeneratorClassificationMapperBase.Generator}
  * instances that each implement a strategy to obtain classifications based on the information present in an
  * alternate representation of the MyCoRe object.
 *
  * @param <R> An alternate representation of a MyCoRe object that, if available, can be used to
  * (a) remove all existing mappings, (b) obtain new mappings and (c) add the set of mappings.
- * @param <G> The actual {@link MCRClassificationMapperBase.Generator} type used by an implementation.
+ * @param <G> The actual {@link MCRGeneratorClassificationMapperBase.Generator} type used by an implementation.
  */
-public abstract class MCRClassificationMapperBase<R, G extends MCRClassificationMapperBase.Generator<R>>
-    implements MCRClassificationMapper {
+public abstract class MCRGeneratorClassificationMapperBase<R,
+    G extends MCRGeneratorClassificationMapperBase.Generator<R>> implements MCRClassificationMapper {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 
@@ -49,7 +52,7 @@ public abstract class MCRClassificationMapperBase<R, G extends MCRClassification
 
     private final Map<String, Generator<R>> generators;
 
-    public MCRClassificationMapperBase(Map<String, G> generators) {
+    public MCRGeneratorClassificationMapperBase(Map<String, G> generators) {
         this.generators = new HashMap<>(Objects
             .requireNonNull(generators, "Generators must not be null"));
         this.generators.forEach((name, generator) -> Objects

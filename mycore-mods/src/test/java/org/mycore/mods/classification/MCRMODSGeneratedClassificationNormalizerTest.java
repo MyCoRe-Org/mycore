@@ -15,6 +15,7 @@ import org.mycore.common.MCRJPATestCase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSClassificationMappingNormalizer;
 import org.mycore.mods.MCRMODSWrapper;
+import org.mycore.mods.classification.mapping.MCRMODSGeneratorClassificationMapper;
 
 public class MCRMODSGeneratedClassificationNormalizerTest extends MCRJPATestCase {
 
@@ -37,7 +38,7 @@ public class MCRMODSGeneratedClassificationNormalizerTest extends MCRJPATestCase
         assertEquals("Initial number of classifications should be 5", 5, initialClassifications.size());
         List<Element> initialGenerated = modsWrapper
             .getElements("mods:classification[contains(@generator, '"
-                + MCRMODSClassificationMapper.GENERATOR_SUFFIX + "')]");
+                + MCRMODSGeneratorClassificationMapper.GENERATOR_SUFFIX + "')]");
         assertEquals("Initial number of generated classifications should be 4", 4, initialGenerated.size());
 
         MCRMODSClassificationMappingNormalizer normalizer = new MCRMODSClassificationMappingNormalizer();
@@ -46,9 +47,9 @@ public class MCRMODSGeneratedClassificationNormalizerTest extends MCRJPATestCase
 
         List<Element> remainingGenerated = modsWrapper
             .getElements("mods:classification[contains(@generator, '"
-                + MCRMODSClassificationMapper.GENERATOR_SUFFIX + "')]");
+                + MCRMODSGeneratorClassificationMapper.GENERATOR_SUFFIX + "')]");
         assertTrue(
-            "Classifications with generator suffix '" + MCRMODSClassificationMapper.GENERATOR_SUFFIX
+            "Classifications with generator suffix '" + MCRMODSGeneratorClassificationMapper.GENERATOR_SUFFIX
                 + "' should be removed",
             remainingGenerated.isEmpty());
 

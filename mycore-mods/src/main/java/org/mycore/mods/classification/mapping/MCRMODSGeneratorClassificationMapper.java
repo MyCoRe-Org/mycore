@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.mycore.mods.classification;
+package org.mycore.mods.classification.mapping;
 
 import java.util.List;
 import java.util.Map;
@@ -28,24 +28,25 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRClassificationMapperBase;
+import org.mycore.datamodel.classifications2.mapping.MCRGeneratorClassificationMapperBase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
+import org.mycore.mods.classification.MCRClassMapper;
 
 /**
- * A {@link MCRMODSClassificationMapper} maps classifications in MODS documents.
- * To do so, it uses {@link MCRMODSClassificationMapper.Generator} instances that each implement a strategy
- * to obtain classifications based on the information present in the MODS document.
+ * A {@link MCRMODSGeneratorClassificationMapper} maps classifications in MODS documents.
+ * To do so, it uses {@link MCRMODSGeneratorClassificationMapper.Generator} instances that each
+ * implement a strategy to obtain classifications based on the information present in the MODS document.
  * <p>
  * Obtained classification values are added to the MODS document as <code>classification</code> elements
  * with <code>authorityURI</code> and <code>valueURI</code> attributes corresponding to that value and a
  * descriptive <code>generator</code> attribute whose name is returned alongside the classification value
  * (and expanded by suffix <code>-mycore</code>) by 
- * {@link MCRMODSClassificationMapper.Generator#generateMappings(MCRCategoryDAO, MCRMODSWrapper)}.
+ * {@link MCRMODSGeneratorClassificationMapper.Generator#generateMappings(MCRCategoryDAO, MCRMODSWrapper)}.
  * <p>
  * The following configuration options are available:
  * <ul>
- * <li> The property suffix {@link MCRMODSClassificationMapper#GENERATORS_KEY} can be used to
+ * <li> The property suffix {@link MCRMODSGeneratorClassificationMapper#GENERATORS_KEY} can be used to
  * specify the map of generators to be used.
  * <li> For each generator, the property suffix {@link MCRSentinel#ENABLED_KEY} can be used to
  * excluded that generator from the configuration.
@@ -63,16 +64,16 @@ import org.mycore.mods.MCRMODSWrapper;
  * [...].Generators.bar.Key2=Value2
  * </code></pre>
  */
-@MCRConfigurationProxy(proxyClass = MCRMODSClassificationMapper.Factory.class)
-public final class MCRMODSClassificationMapper extends MCRClassificationMapperBase<MCRMODSWrapper,
-    MCRMODSClassificationMapper.Generator> {
+@MCRConfigurationProxy(proxyClass = MCRMODSGeneratorClassificationMapper.Factory.class)
+public final class MCRMODSGeneratorClassificationMapper extends MCRGeneratorClassificationMapperBase<MCRMODSWrapper,
+    MCRMODSGeneratorClassificationMapper.Generator> {
 
     public static final String GENERATOR_SUFFIX = "-mycore";
 
     public static final String EXISTING_MAPPINGS_XPATH = "mods:classification[contains(@generator, '"
         + GENERATOR_SUFFIX + "')]";
 
-    public MCRMODSClassificationMapper(Map<String, Generator> generators) {
+    public MCRMODSGeneratorClassificationMapper(Map<String, Generator> generators) {
         super(generators);
     }
 
@@ -96,21 +97,21 @@ public final class MCRMODSClassificationMapper extends MCRClassificationMapperBa
         });
     }
 
-    public interface Generator extends MCRClassificationMapperBase.Generator<MCRMODSWrapper> {
+    public interface Generator extends MCRGeneratorClassificationMapperBase.Generator<MCRMODSWrapper> {
 
         @Override
         List<Mapping> generateMappings(MCRCategoryDAO dao, MCRMODSWrapper modsWrapper);
 
     }
 
-    public static class Factory implements Supplier<MCRMODSClassificationMapper> {
+    public static class Factory implements Supplier<MCRMODSGeneratorClassificationMapper> {
 
         @MCRInstanceMap(name = GENERATORS_KEY, valueClass = Generator.class, sentinel = @MCRSentinel)
         public Map<String, Generator> generators;
 
         @Override
-        public MCRMODSClassificationMapper get() {
-            return new MCRMODSClassificationMapper(generators);
+        public MCRMODSGeneratorClassificationMapper get() {
+            return new MCRMODSGeneratorClassificationMapper(generators);
         }
 
     }

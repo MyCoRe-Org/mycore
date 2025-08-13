@@ -1,4 +1,4 @@
-package org.mycore.datamodel.classifications2;
+package org.mycore.datamodel.classifications2.mapping;
 
 import org.mycore.datamodel.metadata.MCRObject;
 

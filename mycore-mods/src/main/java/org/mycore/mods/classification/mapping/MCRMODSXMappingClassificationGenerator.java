@@ -15,22 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.mycore.datamodel.classifications2;
+package org.mycore.mods.classification.mapping;
 
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.filter.Filters;
-import org.jdom2.xpath.XPathExpression;
-import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.datamodel.classifications2.MCRCategory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
+import org.mycore.datamodel.classifications2.mapping.MCRXMappingClassificationGeneratorBase;
+import org.mycore.mods.MCRMODSWrapper;
 
 /**
- * A {@link MCRDefaultXMappingClassificationGenerator} is a {@link MCRDefaultClassificationMapper.Generator}
- * that looks for mapping information in all classification values already present in the default metadata document.
+ * A {@link MCRMODSXMappingClassificationGenerator} is a {@link MCRMODSGeneratorClassificationMapper.Generator}
+ * that looks for mapping information in all classification values already present in the MODS document.
  * <p>
  * For each classification value, if the corresponding classification category contains a <code>x-mapping</code>
  * label, the content of that label is used as a space separated list of classification category IDs.
@@ -42,8 +41,9 @@ import org.mycore.common.config.annotation.MCRProperty;
  * &nbsp;&lt;label xml:lang=&quot;x-mapping&quot; text=&quot;foo_baz:Article&quot; /&gt;
  * &lt;/category&gt;
  * </code></pre>
- * If a metadata document contains the classification category <code>foo_bar:article</code>, the
- * classification category <code>foo_baz:ScolarlyArticle</code> will be provided.
+ * If a MODS document contains the classification category <code>foo_bar:article</code>, the
+ * classification category <code>foo_baz:ScolarlyArticle</code> will be provided. The corresponding generator
+ * will be named <code>foo_bar2foo_baz</code>.
  * <p>
  * The following configuration options are available:
  * <ul>
@@ -52,47 +52,35 @@ import org.mycore.common.config.annotation.MCRProperty;
  * </ul>
  * Example:
  * <pre><code>
- * [...].Class=org.mycore.datamodel.classifications2.MCRDefaultXMappingClassificationGenerator
+ * [...].Class=org.mycore.mods.classification.mapping.MCRMODSXMappingClassificationGenerator
  * [...].OnMissingMappedCategory=WARN_AND_IGNORE
  * </code></pre>
  */
-@MCRConfigurationProxy(proxyClass = MCRDefaultXMappingClassificationGenerator.Factory.class)
-public final class MCRDefaultXMappingClassificationGenerator extends MCRXMappingClassificationGeneratorBase<Document>
-    implements MCRDefaultClassificationMapper.Generator {
+@MCRConfigurationProxy(proxyClass = MCRMODSXMappingClassificationGenerator.Factory.class)
+public final class MCRMODSXMappingClassificationGenerator extends MCRXMappingClassificationGeneratorBase<MCRMODSWrapper>
+    implements MCRMODSGeneratorClassificationMapper.Generator {
 
-    private static final XPathExpression<Element> CLASSIFICATION_ELEMENT_XPATH;
-
-    static {
-        CLASSIFICATION_ELEMENT_XPATH = XPathFactory.instance().compile("//*[@categid]", Filters.element());
-    }
-
-    public MCRDefaultXMappingClassificationGenerator(OnMissingMappedCategory onMissingMappedCategory) {
+    public MCRMODSXMappingClassificationGenerator(OnMissingMappedCategory onMissingMappedCategory) {
         super(onMissingMappedCategory);
     }
 
     @Override
-    protected Stream<MCRCategory> getCategories(MCRCategoryDAO dao, Document metadataDocument) {
-        return CLASSIFICATION_ELEMENT_XPATH.evaluate(metadataDocument).stream()
-            .map(classificationElement -> loadClassification(dao, classificationElement));
+    protected Stream<MCRCategory> getCategories(MCRCategoryDAO dao, MCRMODSWrapper modsWrapper) {
+        return modsWrapper.getMcrCategoryIDs().stream().map(categoryId -> dao.getCategory(categoryId, 0));
     }
 
-    private MCRCategory loadClassification(MCRCategoryDAO dao, Element classificationElement) {
-        return dao.getCategory(new MCRCategoryID(classificationElement.getAttributeValue("classid"),
-            classificationElement.getAttributeValue("categid")), 0);
-    }
-
-    public static class Factory implements Supplier<MCRDefaultXMappingClassificationGenerator> {
+    public static class Factory implements Supplier<MCRMODSXMappingClassificationGenerator> {
 
         @MCRProperty(name = ON_MISSING_MAPPED_CATEGORY_KEY)
         public String onMissingMappedCategory;
 
         @Override
-        public MCRDefaultXMappingClassificationGenerator get() {
+        public MCRMODSXMappingClassificationGenerator get() {
 
             OnMissingMappedCategory onMissingMappedCategory = OnMissingMappedCategory
                 .valueOf(this.onMissingMappedCategory);
 
-            return new MCRDefaultXMappingClassificationGenerator(onMissingMappedCategory);
+            return new MCRMODSXMappingClassificationGenerator(onMissingMappedCategory);
 
         }
 
