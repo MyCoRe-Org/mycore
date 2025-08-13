@@ -22,6 +22,7 @@ import java.net.URI;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.glassfish.jersey.internal.inject.AbstractBinder;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
@@ -45,6 +46,8 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.servers.Server;
+import org.mycore.restapi.v2.service.MCRRestObjectLockService;
+
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.InternalServerErrorException;
 
@@ -63,12 +66,25 @@ public class MCRRestV2App extends MCRJerseyRestApp {
         register(MCRApiDraftFilter.class);
         //after removing the following line, test if json output from MCRRestClassification is still OK
         register(JacksonXmlBindJsonProvider.class); //jetty >= 2.31, do not use DefaultJacksonJaxbJsonProvider
+        registerServices();
         setupOAS();
     }
 
     @Override
     protected String getVersion() {
         return "v2";
+    }
+
+    private void registerServices() {
+        // MCRRestObjectLockService
+        register(new AbstractBinder() {
+            @Override
+            protected void configure() {
+                bind(MCRRestObjectLockService.class)
+                    .to(MCRRestObjectLockService.class)
+                    .in(jakarta.inject.Singleton.class);
+            }
+        });
     }
 
     @Override

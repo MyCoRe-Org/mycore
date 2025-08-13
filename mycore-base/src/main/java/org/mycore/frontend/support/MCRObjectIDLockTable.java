@@ -25,8 +25,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.events.MCRSessionEvent;
@@ -48,8 +46,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * </ul>
  */
 public final class MCRObjectIDLockTable implements MCRSessionListener {
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     private final ConcurrentMap<MCRObjectID, MCRObjectLock> lockMap;
 
@@ -111,8 +107,8 @@ public final class MCRObjectIDLockTable implements MCRSessionListener {
     public static MCRObjectLock lock(MCRObjectID objectId) {
         MCRSession session = MCRSessionMgr.getCurrentSession();
         String sessionId = session.getID();
-        String userName = session.getUserInformation().getUserID();
-        return lock(objectId, sessionId, userName, null);
+        String userId = session.getUserInformation().getUserID();
+        return lock(objectId, sessionId, userId, null);
     }
 
     /**
@@ -122,15 +118,15 @@ public final class MCRObjectIDLockTable implements MCRSessionListener {
      * and a delayed unlock task is scheduled.
      *
      * @param objectId The ID of the object to lock.
-     * @param lockId   The internal ID for the lock (e.g., a session ID).
-     * @param userName The user acquiring the lock.
+     * @param lockId   The internal ID for the lock (e.g., a session ID or user ID).
+     * @param userId   The user acquiring the lock.
      * @param timeout  The lock duration in milliseconds. If null, the lock may be infinite.
      * @return         The new {@link MCRObjectLock} if the lock was acquired, or the existing lock if the object was
      *                 already locked.
      */
-    public static MCRObjectLock lock(MCRObjectID objectId, String lockId, String userName, Integer timeout) {
+    public static MCRObjectLock lock(MCRObjectID objectId, String lockId, String userId, Integer timeout) {
         return getInstance().lockMap.computeIfAbsent(objectId, (id) -> {
-            MCRObjectLock objectLock = MCRObjectLock.createLock(lockId, userName, timeout);
+            MCRObjectLock objectLock = MCRObjectLock.createLock(lockId, userId, timeout);
             delayedUnlock(objectId, objectLock);
             return objectLock;
         });
@@ -227,12 +223,12 @@ public final class MCRObjectIDLockTable implements MCRSessionListener {
             // Re-fetch the lock from the map to ensure we have the most current state.
             MCRObjectLock currentLock = getLock(objectId);
             if (currentLock == null) {
-                // Lock was already removed by some other means.
+                // The lock was already removed by some other means.
                 return;
             }
-            // A lock is only unlocked if its original token matches the one we are checking.
+            // A lock is only unlocked if its original id matches the one we are checking.
             // This prevents a new, unrelated lock on the same objectId from being prematurely removed.
-            if (!currentLock.getToken().equals(objectLock.getToken())) {
+            if (!currentLock.getId().equals(objectLock.getId())) {
                 return;
             }
             // Check if expiration time is reached
@@ -247,21 +243,6 @@ public final class MCRObjectIDLockTable implements MCRSessionListener {
     }
 
     /**
-     * Retrieves the session of the user who is holding the lock on the object.
-     *
-     * @param objectId The ID of the locked object.
-     * @return The {@link MCRSession} of the lock owner, or {@code null} if the object is not locked
-     * or the session is no longer active.
-     */
-    public static MCRSession getLocker(MCRObjectID objectId) {
-        MCRObjectLock objectLock = getInstance().lockMap.get(objectId);
-        if (objectLock == null) {
-            return null;
-        }
-        return MCRSessionMgr.getSession(objectLock.id);
-    }
-
-    /**
      * Handles session events. When a session is destroyed, it triggers {@link #clearTable(MCRSession)}
      * to release all locks held by that session.
      *
@@ -269,22 +250,9 @@ public final class MCRObjectIDLockTable implements MCRSessionListener {
      */
     @Override
     public void sessionEvent(MCRSessionEvent event) {
-        switch (event.getType()) {
-            case DESTROYED -> clearTable(event.getSession());
-            default -> LOGGER.debug("Skipping event: {}", event.getType());
+        if (event.getType() == MCRSessionEvent.Type.DESTROYED) {
+            clearTable(event.getSession());
         }
-    }
-
-    /**
-     * Convenience method to check if an object is locked by the current session, using a String object ID.
-     *
-     * @param objectId The string representation of the object ID.
-     * @return {@code true} if the object is locked by the current session.
-     * @see #isLockedByCurrentSession(MCRObjectID)
-     */
-    public static boolean isLockedByCurrentSession(String objectId) {
-        MCRObjectID objId = MCRObjectID.getInstance(objectId);
-        return isLockedByCurrentSession(objId);
     }
 
     /**

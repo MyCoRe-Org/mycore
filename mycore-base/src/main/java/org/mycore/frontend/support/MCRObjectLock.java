@@ -54,14 +54,6 @@ public class MCRObjectLock {
     protected String id;
 
     /**
-     * The public-facing token for this lock. A client must provide this token to prove ownership
-     * when attempting to update or release the lock. This provides a secure way to manage the lock
-     * without exposing the internal {@link #id}.
-     */
-    @XmlAttribute
-    protected String token;
-
-    /**
      * Flag indicating whether the object is currently considered locked.
      */
     @XmlAttribute
@@ -103,17 +95,6 @@ public class MCRObjectLock {
      */
     public MCRObjectLock setId(String id) {
         this.id = id;
-        return this;
-    }
-
-    /**
-     * Sets the public-facing security token for the lock.
-     *
-     * @param token the security token
-     * @return this {@code MCRObjectLock} instance
-     */
-    public MCRObjectLock setToken(String token) {
-        this.token = token;
         return this;
     }
 
@@ -179,15 +160,6 @@ public class MCRObjectLock {
      */
     public String getId() {
         return id;
-    }
-
-    /**
-     * Gets the public-facing security token.
-     *
-     * @return the security token
-     */
-    public String getToken() {
-        return token;
     }
 
     /**
@@ -262,7 +234,6 @@ public class MCRObjectLock {
         Instant now = Instant.now();
         return new MCRObjectLock()
             .setId(id)
-            .setToken(id)
             .setLocked(true)
             .setCreatedBy(user)
             .setCreated(now)
