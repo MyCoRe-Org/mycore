@@ -28,6 +28,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
+import org.mycore.datamodel.metadata.MCRObject;
 
 /**
  * A {@link MCRDefaultXMappingClassificationGenerator} is a {@link MCRDefaultGeneratorClassificationMapper.Generator}
@@ -76,7 +77,7 @@ public final class MCRDefaultXPathClassificationGenerator extends MCRXPathClassi
     }
 
     @Override
-    protected Parent toJdomParent(MCRCategoryDAO dao, Document metadataDocument) {
+    protected Parent toJdomParent(MCRCategoryDAO dao, MCRObject object, Document metadataDocument) {
         return metadataDocument;
     }
 

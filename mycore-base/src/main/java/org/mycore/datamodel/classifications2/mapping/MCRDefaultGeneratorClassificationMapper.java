@@ -84,7 +84,7 @@ public final class MCRDefaultGeneratorClassificationMapper extends MCRGeneratorC
     }
 
     @Override
-    protected void addNewMappings(MCRObject object, Document document, Set<Mapping> mappings) {
+    protected void insertNewMappings(MCRObject object, Document document, Set<Mapping> mappings) {
         MCRMetaElement newMappings = createEmptyMappingsElement();
         Set<MCRCategoryID> categoryIds = mappings.stream().map(Mapping::categoryId).collect(Collectors.toSet());
         categoryIds.forEach(categoryId -> newMappings.addMetaObject(toMetaClassification(categoryId)));
@@ -107,7 +107,7 @@ public final class MCRDefaultGeneratorClassificationMapper extends MCRGeneratorC
     public interface Generator extends MCRGeneratorClassificationMapperBase.Generator<Document> {
 
         @Override
-        List<Mapping> generateMappings(MCRCategoryDAO dao, Document metadataDocument);
+        List<Mapping> generate(MCRCategoryDAO dao, MCRObject object, Document metadataDocument);
 
     }
 

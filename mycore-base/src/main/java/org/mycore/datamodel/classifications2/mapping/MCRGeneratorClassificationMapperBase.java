@@ -60,9 +60,9 @@ public abstract class MCRGeneratorClassificationMapperBase<D,
     }
 
     @Override
-    public final void createMapping(MCRObject object) {
+    public final void createMappings(MCRObject object) {
         logger.info("creating mappings for {}", object::getId);
-        getDataModel(object).ifPresent(dataModel -> createMapping(object, dataModel));
+        getDataModel(object).ifPresent(dataModel -> createMappings(object, dataModel));
     }
 
     @Override
@@ -71,7 +71,7 @@ public abstract class MCRGeneratorClassificationMapperBase<D,
         getDataModel(object).ifPresent(dataModel -> removeExistingMappings(object, dataModel));
     }
 
-    private void createMapping(MCRObject object, D dataModel) {
+    private void createMappings(MCRObject object, D dataModel) {
 
         removeExistingMappings(object, dataModel);
 
@@ -82,11 +82,11 @@ public abstract class MCRGeneratorClassificationMapperBase<D,
             if (logger.isInfoEnabled()) {
                 logger.info("generate mappings with {} / {}", name, generator.getClass().getName());
             }
-            mappings.addAll(generator.generateMappings(dao, dataModel));
+            mappings.addAll(generator.generate(dao, object, dataModel));
         });
 
         if (!mappings.isEmpty()) {
-            addNewMappings(object, dataModel, mappings);
+            insertNewMappings(object, dataModel, mappings);
         }
 
         logger.info("checked for mappings");
@@ -97,14 +97,14 @@ public abstract class MCRGeneratorClassificationMapperBase<D,
 
     protected abstract void removeExistingMappings(MCRObject object, D dataModel);
 
-    protected abstract void addNewMappings(MCRObject object, D dataModel, Set<Mapping> mappings);
+    protected abstract void insertNewMappings(MCRObject object, D dataModel, Set<Mapping> mappings);
 
     public record Mapping(String generatorName, MCRCategoryID categoryId) {
     }
 
     public interface Generator<D> {
 
-        List<Mapping> generateMappings(MCRCategoryDAO dao, D dataModel);
+        List<Mapping> generate(MCRCategoryDAO dao, MCRObject object, D dataModel);
         
     }
 

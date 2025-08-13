@@ -8,7 +8,7 @@ public interface MCRClassificationMapper {
      * Creates classifications which are derived from the given object and adds them to the object.
      * @param object the object to create the mappings for
      */
-    void createMapping(MCRObject object);
+    void createMappings(MCRObject object);
 
     /**
      * Removes all mappings from the given object.

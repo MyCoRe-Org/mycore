@@ -83,7 +83,7 @@ public class MCRDefaultGeneratorClassificationMapperTest extends MCRJPATestCase 
                     MCRXMappingClassificationGeneratorBase.OnMissingMappedCategory.IGNORE),
                 "xPath", new MCRDefaultXPathClassificationGenerator("orcidWorkType", "dummyClassification")));
         mapper.clearMappings(mcro);
-        mapper.createMapping(mcro);
+        mapper.createMappings(mcro);
         Document xml = mcro.createXML();
 
         String expression1 =
@@ -147,7 +147,7 @@ public class MCRDefaultGeneratorClassificationMapperTest extends MCRJPATestCase 
         MCRDefaultGeneratorClassificationMapper mapper = new MCRDefaultGeneratorClassificationMapper(
             Map.of("xPath", new MCRDefaultXPathClassificationGenerator("orcidWorkType", "dummyClassification")));
         mapper.clearMappings(mcro);
-        mapper.createMapping(mcro);
+        mapper.createMappings(mcro);
         Document xml = mcro.createXML();
 
         String expression1 = "//mappings[@class='MCRMetaClassification']/mapping[@classid='orcidWorkType' "
@@ -186,7 +186,7 @@ public class MCRDefaultGeneratorClassificationMapperTest extends MCRJPATestCase 
 
         MCRDefaultGeneratorClassificationMapper mapper = new MCRDefaultGeneratorClassificationMapper(
             Map.of("xPath", new MCRDefaultXPathClassificationGenerator("dummyClassification")));
-        mapper.createMapping(mcro);
+        mapper.createMappings(mcro);
         Document xml = mcro.createXML();
 
         String expression = "//mappings[@class='MCRMetaClassification']/mapping[@classid='dummyClassification' "

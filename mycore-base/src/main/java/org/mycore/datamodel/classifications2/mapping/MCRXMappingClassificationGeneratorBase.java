@@ -30,6 +30,7 @@ import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.metadata.MCRObject;
 
 /**
  * {@link MCRXMappingClassificationGeneratorBase} is a base implementation for data model specific implementations
@@ -59,8 +60,9 @@ public abstract class MCRXMappingClassificationGeneratorBase<D>
     }
 
     @Override
-    public final List<MCRGeneratorClassificationMapperBase.Mapping> generateMappings(MCRCategoryDAO dao, D dataMode) {
-        return getCategories(dao, dataMode)
+    public final List<MCRGeneratorClassificationMapperBase.Mapping> generate(MCRCategoryDAO dao,
+        MCRObject object, D dataMode) {
+        return getCategories(dao, object, dataMode)
             .filter(Objects::nonNull)
             .map(category -> findMappings(dao, category))
             .flatMap(Collection::stream)
@@ -70,7 +72,7 @@ public abstract class MCRXMappingClassificationGeneratorBase<D>
             .toList();
     }
 
-    protected abstract Stream<MCRCategory> getCategories(MCRCategoryDAO dao, D dataModel);
+    protected abstract Stream<MCRCategory> getCategories(MCRCategoryDAO dao, MCRObject object, D dataModel);
 
     private List<XMapping> findMappings(MCRCategoryDAO dao, MCRCategory sourceCategory) {
         MCRCategoryID sourceCategoryId = sourceCategory.getId();

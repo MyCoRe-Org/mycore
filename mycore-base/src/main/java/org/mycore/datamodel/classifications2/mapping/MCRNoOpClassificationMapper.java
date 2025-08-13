@@ -32,7 +32,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 public final class MCRNoOpClassificationMapper implements MCRClassificationMapper {
 
     @Override
-    public void createMapping(MCRObject object) {
+    public void createMappings(MCRObject object) {
     }
 
     @Override
