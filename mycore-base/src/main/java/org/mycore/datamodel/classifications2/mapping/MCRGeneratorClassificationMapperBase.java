@@ -23,7 +23,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
@@ -38,21 +37,16 @@ import org.mycore.datamodel.metadata.MCRObject;
  * that map classifications in MyCoRe objects. To do so it uses {@link MCRGeneratorClassificationMapperBase.Generator}
  * instances that each implement a strategy to obtain classifications based on the information present in a
  * data model representation of the MyCoRe object.
-*
- * @param <D> A data mode representation of a MyCoRe object that, if available, can be used to
- * (a) remove all existing mappings, (b) obtain new mappings and (c) add the set of mappings.
- * @param <G> The actual {@link MCRGeneratorClassificationMapperBase.Generator} type used by an implementation.
  */
-public abstract class MCRGeneratorClassificationMapperBase<D,
-    G extends MCRGeneratorClassificationMapperBase.Generator<D>> implements MCRClassificationMapper {
+public abstract class MCRGeneratorClassificationMapperBase implements MCRClassificationMapper {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 
     public static final String GENERATORS_KEY = "Generators";
 
-    private final Map<String, Generator<D>> generators;
+    private final Map<String, Generator> generators;
 
-    public MCRGeneratorClassificationMapperBase(Map<String, G> generators) {
+    public MCRGeneratorClassificationMapperBase(Map<String, Generator> generators) {
         this.generators = new HashMap<>(Objects
             .requireNonNull(generators, "Generators must not be null"));
         this.generators.forEach((name, generator) -> Objects
@@ -62,18 +56,26 @@ public abstract class MCRGeneratorClassificationMapperBase<D,
     @Override
     public final void createMappings(MCRObject object) {
         logger.info("creating mappings for {}", object::getId);
-        getDataModel(object).ifPresent(dataModel -> createMappings(object, dataModel));
+        if (isSupported(object)) {
+            replaceMappings(object);
+        } else {
+            logger.info("object not supported");
+        }
     }
 
     @Override
     public final void clearMappings(MCRObject object) {
         logger.info("clearing mappings in {}", object::getId);
-        getDataModel(object).ifPresent(dataModel -> removeExistingMappings(object, dataModel));
+        if (isSupported(object)) {
+            removeExistingMappings(object);
+        } else {
+            logger.info("object not supported");
+        }
     }
 
-    private void createMappings(MCRObject object, D dataModel) {
+    private void replaceMappings(MCRObject object) {
 
-        removeExistingMappings(object, dataModel);
+        removeExistingMappings(object);
 
         MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
 
@@ -82,30 +84,30 @@ public abstract class MCRGeneratorClassificationMapperBase<D,
             if (logger.isInfoEnabled()) {
                 logger.info("generate mappings with {} / {}", name, generator.getClass().getName());
             }
-            mappings.addAll(generator.generate(dao, object, dataModel));
+            mappings.addAll(generator.generate(dao, object));
         });
 
         if (!mappings.isEmpty()) {
-            insertNewMappings(object, dataModel, mappings);
+            insertNewMappings(object, mappings);
         }
 
         logger.info("checked for mappings");
 
     }
 
-    protected abstract Optional<D> getDataModel(MCRObject object);
+    protected abstract boolean isSupported(MCRObject object);
 
-    protected abstract void removeExistingMappings(MCRObject object, D dataModel);
+    protected abstract void removeExistingMappings(MCRObject object);
 
-    protected abstract void insertNewMappings(MCRObject object, D dataModel, Set<Mapping> mappings);
+    protected abstract void insertNewMappings(MCRObject object, Set<Mapping> mappings);
 
     public record Mapping(String generatorName, MCRCategoryID categoryId) {
     }
 
-    public interface Generator<D> {
+    public interface Generator {
 
-        List<Mapping> generate(MCRCategoryDAO dao, MCRObject object, D dataModel);
-        
+        List<Mapping> generate(MCRCategoryDAO dao, MCRObject object);
+
     }
 
 }

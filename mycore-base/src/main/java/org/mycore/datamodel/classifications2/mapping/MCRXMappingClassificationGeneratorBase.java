@@ -39,12 +39,8 @@ import org.mycore.datamodel.metadata.MCRObject;
  * <p>
  * For each classification value, if the corresponding classification category contains a <code>x-mapping</code>
  * label, the content of that label is used as a space separated list of classification category IDs.
- *
- * @param <D> The data mode representation used by the corresponding implementation of
- * {@link MCRGeneratorClassificationMapperBase}
  */
-public abstract class MCRXMappingClassificationGeneratorBase<D>
-    implements MCRGeneratorClassificationMapperBase.Generator<D> {
+public abstract class MCRXMappingClassificationGeneratorBase implements MCRGeneratorClassificationMapperBase.Generator {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 
@@ -60,9 +56,8 @@ public abstract class MCRXMappingClassificationGeneratorBase<D>
     }
 
     @Override
-    public final List<MCRGeneratorClassificationMapperBase.Mapping> generate(MCRCategoryDAO dao,
-        MCRObject object, D dataMode) {
-        return getCategories(dao, object, dataMode)
+    public final List<MCRGeneratorClassificationMapperBase.Mapping> generate(MCRCategoryDAO dao, MCRObject object) {
+        return getCategories(dao, object)
             .filter(Objects::nonNull)
             .map(category -> findMappings(dao, category))
             .flatMap(Collection::stream)
@@ -72,7 +67,7 @@ public abstract class MCRXMappingClassificationGeneratorBase<D>
             .toList();
     }
 
-    protected abstract Stream<MCRCategory> getCategories(MCRCategoryDAO dao, MCRObject object, D dataModel);
+    protected abstract Stream<MCRCategory> getCategories(MCRCategoryDAO dao, MCRObject object);
 
     private List<XMapping> findMappings(MCRCategoryDAO dao, MCRCategory sourceCategory) {
         MCRCategoryID sourceCategoryId = sourceCategory.getId();

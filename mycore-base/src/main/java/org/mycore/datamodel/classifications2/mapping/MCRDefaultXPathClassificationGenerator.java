@@ -65,8 +65,7 @@ import org.mycore.datamodel.metadata.MCRObject;
  * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRDefaultXPathClassificationGenerator.Factory.class)
-public final class MCRDefaultXPathClassificationGenerator extends MCRXPathClassificationGeneratorBase<Document>
-    implements MCRDefaultGeneratorClassificationMapper.Generator {
+public final class MCRDefaultXPathClassificationGenerator extends MCRXPathClassificationGeneratorBase {
 
     public MCRDefaultXPathClassificationGenerator(String... classificationsIds) {
         this(Arrays.asList(Objects.requireNonNull(classificationsIds, "Classification IDs must not be null")));
@@ -77,8 +76,8 @@ public final class MCRDefaultXPathClassificationGenerator extends MCRXPathClassi
     }
 
     @Override
-    protected Parent toJdomParent(MCRCategoryDAO dao, MCRObject object, Document metadataDocument) {
-        return metadataDocument;
+    protected Parent toJdomParent(MCRCategoryDAO dao, MCRObject object) {
+        return new Document(object.getMetadata().createXML());
     }
 
     public static class Factory implements Supplier<MCRDefaultXPathClassificationGenerator> {
