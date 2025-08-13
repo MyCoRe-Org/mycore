@@ -34,16 +34,16 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 /**
  * {@link MCRXMappingClassificationGeneratorBase} is a base implementation for data model specific implementations
  * of {@link MCRGeneratorClassificationMapperBase.Generator} that that looks for mapping information in
- * all classification values already present in the alternate representation of a MyCoRe object.
+ * all classification values already present in the data model representation of a MyCoRe object.
  * <p>
  * For each classification value, if the corresponding classification category contains a <code>x-mapping</code>
  * label, the content of that label is used as a space separated list of classification category IDs.
  *
- * @param <R> The alternate representation used by the corresponding implementation of
+ * @param <D> The data mode representation used by the corresponding implementation of
  * {@link MCRGeneratorClassificationMapperBase}
  */
-public abstract class MCRXMappingClassificationGeneratorBase<R>
-    implements MCRGeneratorClassificationMapperBase.Generator<R> {
+public abstract class MCRXMappingClassificationGeneratorBase<D>
+    implements MCRGeneratorClassificationMapperBase.Generator<D> {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 
@@ -59,9 +59,8 @@ public abstract class MCRXMappingClassificationGeneratorBase<R>
     }
 
     @Override
-    public final List<MCRGeneratorClassificationMapperBase.Mapping> generateMappings(MCRCategoryDAO dao,
-        R representation) {
-        return getCategories(dao, representation)
+    public final List<MCRGeneratorClassificationMapperBase.Mapping> generateMappings(MCRCategoryDAO dao, D dataMode) {
+        return getCategories(dao, dataMode)
             .filter(Objects::nonNull)
             .map(category -> findMappings(dao, category))
             .flatMap(Collection::stream)
@@ -71,7 +70,7 @@ public abstract class MCRXMappingClassificationGeneratorBase<R>
             .toList();
     }
 
-    protected abstract Stream<MCRCategory> getCategories(MCRCategoryDAO dao, R representation);
+    protected abstract Stream<MCRCategory> getCategories(MCRCategoryDAO dao, D dataModel);
 
     private List<XMapping> findMappings(MCRCategoryDAO dao, MCRCategory sourceCategory) {
         MCRCategoryID sourceCategoryId = sourceCategory.getId();

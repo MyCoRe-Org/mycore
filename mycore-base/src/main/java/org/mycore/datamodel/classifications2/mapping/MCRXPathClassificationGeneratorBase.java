@@ -35,18 +35,18 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
  * {@link MCRDefaultXMappingClassificationGenerator} is a base implementation for data model specific implementations
  * of {@link MCRGeneratorClassificationMapperBase.Generator} that looks for mapping information for a given list
  * of classifications, by checking if XPaths configured for categories of such classifications match an XML value
- * obtained from the alternate representation of a MyCoRe object.
+ * obtained from the data model representation of a MyCoRe object.
  * <p>
  * For each classification, the set of classification categories containing a <code>x-mapping-xpath</code> label is
  * obtained. For all such classification categories, the corresponding XPath is evaluated and if the XML value
  * matches, the classification category is provided. If no classification is provided for a given classification,
  * the same procedure is performed for the <code>x-mapping-xpathfb</code> labes as a fallback.
  * 
- * @param <R> The alternate representation used by the corresponding implementation of 
+ * @param <D> The data mode representation used by the corresponding implementation of 
  * {@link MCRGeneratorClassificationMapperBase}
  */
-public abstract class MCRXPathClassificationGeneratorBase<R>
-    implements MCRGeneratorClassificationMapperBase.Generator<R> {
+public abstract class MCRXPathClassificationGeneratorBase<D>
+    implements MCRGeneratorClassificationMapperBase.Generator<D> {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 
@@ -67,7 +67,7 @@ public abstract class MCRXPathClassificationGeneratorBase<R>
 
     @Override
     public final List<MCRGeneratorClassificationMapperBase.Mapping> generateMappings(MCRCategoryDAO dao,
-        R metadataDocument) {
+        D metadataDocument) {
         Parent parent = toJdomParent(dao, metadataDocument);
         return classificationsIds.stream()
             .flatMap(classificationId -> findMappings(dao, parent, classificationId))
@@ -76,7 +76,7 @@ public abstract class MCRXPathClassificationGeneratorBase<R>
             .toList();
     }
 
-    protected abstract Parent toJdomParent(MCRCategoryDAO dao, R representation);
+    protected abstract Parent toJdomParent(MCRCategoryDAO dao, D dataModel);
 
     private Stream<XPathMapping> findMappings(MCRCategoryDAO dao, Parent parent, String classificationId) {
         List<XPathMapping> mappings = findMappings(dao, parent, classificationId, LABEL_LANG_XPATH_MAPPING);

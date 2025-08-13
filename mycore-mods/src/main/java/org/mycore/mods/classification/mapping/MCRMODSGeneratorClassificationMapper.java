@@ -78,7 +78,7 @@ public final class MCRMODSGeneratorClassificationMapper extends MCRGeneratorClas
     }
 
     @Override
-    protected Optional<MCRMODSWrapper> getRepresentation(MCRObject object) {
+    protected Optional<MCRMODSWrapper> getDataModel(MCRObject object) {
         MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
         return wrapper.getMODS() == null ? Optional.empty() : Optional.of(wrapper);
     }
