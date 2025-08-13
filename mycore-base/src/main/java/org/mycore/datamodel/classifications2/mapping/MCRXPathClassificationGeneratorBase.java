@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.mycore.datamodel.classifications2;
+package org.mycore.datamodel.classifications2.mapping;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,12 +28,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Parent;
 import org.mycore.common.xml.MCRXPathEvaluator;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 
 /**
- * {@link MCRDefaultXMappingClassificationGenerator} is a base implementation for data model specific implementations of
- * {@link MCRClassificationMapperBase.Generator} that looks for mapping information for a given list of classifications,
- * by checking if XPaths configured for categories of such classifications match an XML value obtained from the
- * alternate representation of a MyCoRe object.
+ * {@link MCRDefaultXMappingClassificationGenerator} is a base implementation for data model specific implementations
+ * of {@link MCRGeneratorClassificationMapperBase.Generator} that looks for mapping information for a given list
+ * of classifications, by checking if XPaths configured for categories of such classifications match an XML value
+ * obtained from the alternate representation of a MyCoRe object.
  * <p>
  * For each classification, the set of classification categories containing a <code>x-mapping-xpath</code> label is
  * obtained. For all such classification categories, the corresponding XPath is evaluated and if the XML value
@@ -41,9 +43,10 @@ import org.mycore.common.xml.MCRXPathEvaluator;
  * the same procedure is performed for the <code>x-mapping-xpathfb</code> labes as a fallback.
  * 
  * @param <R> The alternate representation used by the corresponding implementation of 
- * {@link MCRClassificationMapperBase}
+ * {@link MCRGeneratorClassificationMapperBase}
  */
-public abstract class MCRXPathClassificationGeneratorBase<R> implements MCRClassificationMapperBase.Generator<R> {
+public abstract class MCRXPathClassificationGeneratorBase<R>
+    implements MCRGeneratorClassificationMapperBase.Generator<R> {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 
@@ -63,7 +66,7 @@ public abstract class MCRXPathClassificationGeneratorBase<R> implements MCRClass
     }
 
     @Override
-    public final List<MCRClassificationMapperBase.Mapping> generateMappings(MCRCategoryDAO dao,
+    public final List<MCRGeneratorClassificationMapperBase.Mapping> generateMappings(MCRCategoryDAO dao,
         R metadataDocument) {
         Parent parent = toJdomParent(dao, metadataDocument);
         return classificationsIds.stream()
@@ -105,9 +108,9 @@ public abstract class MCRXPathClassificationGeneratorBase<R> implements MCRClass
             }
         }
 
-        private MCRClassificationMapperBase.Mapping toMapping() {
+        private MCRGeneratorClassificationMapperBase.Mapping toMapping() {
             String generator = String.format(Locale.ROOT, "xpathmapping2%s", targetCategoryId.getRootID());
-            return new MCRClassificationMapperBase.Mapping(generator, targetCategoryId);
+            return new MCRGeneratorClassificationMapperBase.Mapping(generator, targetCategoryId);
         }
 
     }

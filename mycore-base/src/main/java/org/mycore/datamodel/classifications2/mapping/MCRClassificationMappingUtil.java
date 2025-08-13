@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.mycore.datamodel.classifications2;
+package org.mycore.datamodel.classifications2.mapping;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -128,4 +128,3 @@ public final class MCRClassificationMappingUtil {
     }
 
 }
-

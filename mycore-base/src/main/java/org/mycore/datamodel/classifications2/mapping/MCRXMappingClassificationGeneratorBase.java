@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.mycore.datamodel.classifications2;
+package org.mycore.datamodel.classifications2.mapping;
 
 import java.util.Collection;
 import java.util.List;
@@ -27,19 +27,23 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
+import org.mycore.datamodel.classifications2.MCRCategory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 
 /**
- * {@link MCRXMappingClassificationGeneratorBase} is a base implementation for data model specific implementations of
- * {@link MCRClassificationMapperBase.Generator} that that looks for mapping information in all classification values
- * already present in the alternate representation of a MyCoRe object.
+ * {@link MCRXMappingClassificationGeneratorBase} is a base implementation for data model specific implementations
+ * of {@link MCRGeneratorClassificationMapperBase.Generator} that that looks for mapping information in
+ * all classification values already present in the alternate representation of a MyCoRe object.
  * <p>
  * For each classification value, if the corresponding classification category contains a <code>x-mapping</code>
  * label, the content of that label is used as a space separated list of classification category IDs.
  *
  * @param <R> The alternate representation used by the corresponding implementation of
- * {@link MCRClassificationMapperBase}
+ * {@link MCRGeneratorClassificationMapperBase}
  */
-public abstract class MCRXMappingClassificationGeneratorBase<R> implements MCRClassificationMapperBase.Generator<R> {
+public abstract class MCRXMappingClassificationGeneratorBase<R>
+    implements MCRGeneratorClassificationMapperBase.Generator<R> {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 
@@ -55,7 +59,7 @@ public abstract class MCRXMappingClassificationGeneratorBase<R> implements MCRCl
     }
 
     @Override
-    public final List<MCRClassificationMapperBase.Mapping> generateMappings(MCRCategoryDAO dao,
+    public final List<MCRGeneratorClassificationMapperBase.Mapping> generateMappings(MCRCategoryDAO dao,
         R representation) {
         return getCategories(dao, representation)
             .filter(Objects::nonNull)
@@ -123,9 +127,9 @@ public abstract class MCRXMappingClassificationGeneratorBase<R> implements MCRCl
             }
         }
 
-        private MCRClassificationMapperBase.Mapping toMapping() {
+        private MCRGeneratorClassificationMapperBase.Mapping toMapping() {
             String generator = getGenerator(sourceCategoryId, targetCategoryId);
-            return new MCRClassificationMapperBase.Mapping(generator, targetCategoryId);
+            return new MCRGeneratorClassificationMapperBase.Mapping(generator, targetCategoryId);
         }
 
         private String getGenerator(MCRCategoryID sourceCategoryId, MCRCategoryID targetCategoryId) {
