@@ -42,12 +42,8 @@ import org.mycore.datamodel.metadata.MCRObject;
  * obtained. For all such classification categories, the corresponding XPath is evaluated and if the XML value
  * matches, the classification category is provided. If no classification is provided for a given classification,
  * the same procedure is performed for the <code>x-mapping-xpathfb</code> labes as a fallback.
- * 
- * @param <D> The data mode representation used by the corresponding implementation of 
- * {@link MCRGeneratorClassificationMapperBase}
  */
-public abstract class MCRXPathClassificationGeneratorBase<D>
-    implements MCRGeneratorClassificationMapperBase.Generator<D> {
+public abstract class MCRXPathClassificationGeneratorBase implements MCRGeneratorClassificationMapperBase.Generator {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 
@@ -67,9 +63,8 @@ public abstract class MCRXPathClassificationGeneratorBase<D>
     }
 
     @Override
-    public final List<MCRGeneratorClassificationMapperBase.Mapping> generate(MCRCategoryDAO dao,
-        MCRObject object, D metadataDocument) {
-        Parent parent = toJdomParent(dao, object, metadataDocument);
+    public final List<MCRGeneratorClassificationMapperBase.Mapping> generate(MCRCategoryDAO dao, MCRObject object) {
+        Parent parent = toJdomParent(dao, object);
         return classificationsIds.stream()
             .flatMap(classificationId -> findMappings(dao, parent, classificationId))
             .peek(xPathMapping -> xPathMapping.logInfo(logger))
@@ -77,7 +72,7 @@ public abstract class MCRXPathClassificationGeneratorBase<D>
             .toList();
     }
 
-    protected abstract Parent toJdomParent(MCRCategoryDAO dao, MCRObject object, D dataModel);
+    protected abstract Parent toJdomParent(MCRCategoryDAO dao, MCRObject object);
 
     private Stream<XPathMapping> findMappings(MCRCategoryDAO dao, Parent parent, String classificationId) {
         List<XPathMapping> mappings = findMappings(dao, parent, classificationId, LABEL_LANG_XPATH_MAPPING);

@@ -17,9 +17,7 @@
  */
 package org.mycore.mods.classification.mapping;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -35,14 +33,14 @@ import org.mycore.mods.classification.MCRClassMapper;
 
 /**
  * A {@link MCRMODSGeneratorClassificationMapper} maps classifications in MODS documents.
- * To do so, it uses {@link MCRMODSGeneratorClassificationMapper.Generator} instances that each
+ * To do so, it uses {@link MCRGeneratorClassificationMapperBase.Generator} instances that each
  * implement a strategy to obtain classifications based on the information present in the MODS document.
  * <p>
  * Obtained classification values are added to the MODS document as <code>classification</code> elements
  * with <code>authorityURI</code> and <code>valueURI</code> attributes corresponding to that value and a
  * descriptive <code>generator</code> attribute whose name is returned alongside the classification value
  * (and expanded by suffix <code>-mycore</code>) by 
- * {@link MCRGeneratorClassificationMapperBase.Generator#generate(MCRCategoryDAO, MCRObject, Object)}.
+ * {@link MCRGeneratorClassificationMapperBase.Generator#generate(MCRCategoryDAO, MCRObject)}.
  * <p>
  * The following configuration options are available:
  * <ul>
@@ -65,8 +63,7 @@ import org.mycore.mods.classification.MCRClassMapper;
  * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRMODSGeneratorClassificationMapper.Factory.class)
-public final class MCRMODSGeneratorClassificationMapper extends MCRGeneratorClassificationMapperBase<MCRMODSWrapper,
-    MCRMODSGeneratorClassificationMapper.Generator> {
+public final class MCRMODSGeneratorClassificationMapper extends MCRGeneratorClassificationMapperBase {
 
     public static final String GENERATOR_SUFFIX = "-mycore";
 
@@ -78,30 +75,23 @@ public final class MCRMODSGeneratorClassificationMapper extends MCRGeneratorClas
     }
 
     @Override
-    protected Optional<MCRMODSWrapper> getDataModel(MCRObject object) {
-        MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
-        return wrapper.getMODS() == null ? Optional.empty() : Optional.of(wrapper);
+    protected boolean isSupported(MCRObject object) {
+        return MCRMODSWrapper.isSupported(object);
     }
 
     @Override
-    protected void removeExistingMappings(MCRObject object, MCRMODSWrapper wrapper) {
-        wrapper.getElements(EXISTING_MAPPINGS_XPATH).forEach(Element::detach);
+    protected void removeExistingMappings(MCRObject object) {
+        new MCRMODSWrapper(object).getElements(EXISTING_MAPPINGS_XPATH).forEach(Element::detach);
     }
 
     @Override
-    protected void insertNewMappings(MCRObject object, MCRMODSWrapper modsWrapper, Set<Mapping> mappings) {
+    protected void insertNewMappings(MCRObject object, Set<Mapping> mappings) {
+        MCRMODSWrapper modsWrapper = new MCRMODSWrapper(object);
         mappings.forEach(mapping -> {
             Element mappedClassification = modsWrapper.addElement("classification");
             mappedClassification.setAttribute("generator", mapping.generatorName() + GENERATOR_SUFFIX);
             MCRClassMapper.assignCategory(mappedClassification, mapping.categoryId());
         });
-    }
-
-    public interface Generator extends MCRGeneratorClassificationMapperBase.Generator<MCRMODSWrapper> {
-
-        @Override
-        List<Mapping> generate(MCRCategoryDAO dao, MCRObject object, MCRMODSWrapper modsWrapper);
-
     }
 
     public static class Factory implements Supplier<MCRMODSGeneratorClassificationMapper> {

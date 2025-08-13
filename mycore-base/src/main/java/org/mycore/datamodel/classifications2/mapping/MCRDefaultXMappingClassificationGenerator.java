@@ -61,8 +61,7 @@ import org.mycore.datamodel.metadata.MCRObject;
  * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRDefaultXMappingClassificationGenerator.Factory.class)
-public final class MCRDefaultXMappingClassificationGenerator extends MCRXMappingClassificationGeneratorBase<Document>
-    implements MCRDefaultGeneratorClassificationMapper.Generator {
+public final class MCRDefaultXMappingClassificationGenerator extends MCRXMappingClassificationGeneratorBase {
 
     private static final XPathExpression<Element> CLASSIFICATION_ELEMENT_XPATH;
 
@@ -75,9 +74,14 @@ public final class MCRDefaultXMappingClassificationGenerator extends MCRXMapping
     }
 
     @Override
-    protected Stream<MCRCategory> getCategories(MCRCategoryDAO dao, MCRObject object, Document metadataDocument) {
+    protected Stream<MCRCategory> getCategories(MCRCategoryDAO dao, MCRObject object) {
+        Document metadataDocument = getContext(object);
         return CLASSIFICATION_ELEMENT_XPATH.evaluate(metadataDocument).stream()
             .map(classificationElement -> loadClassification(dao, classificationElement));
+    }
+
+    private static Document getContext(MCRObject object) {
+        return new Document(object.getMetadata().createXML());
     }
 
     private MCRCategory loadClassification(MCRCategoryDAO dao, Element classificationElement) {

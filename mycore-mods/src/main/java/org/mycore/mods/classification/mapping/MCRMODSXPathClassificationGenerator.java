@@ -66,8 +66,7 @@ import org.mycore.mods.MCRMODSWrapper;
  * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRMODSXPathClassificationGenerator.Factory.class)
-public final class MCRMODSXPathClassificationGenerator extends MCRXPathClassificationGeneratorBase<MCRMODSWrapper>
-    implements MCRMODSGeneratorClassificationMapper.Generator {
+public final class MCRMODSXPathClassificationGenerator extends MCRXPathClassificationGeneratorBase {
 
     public MCRMODSXPathClassificationGenerator(String... classificationsIds) {
         this(Arrays.asList(Objects.requireNonNull(classificationsIds, "Classification IDs must not be null")));
@@ -78,8 +77,8 @@ public final class MCRMODSXPathClassificationGenerator extends MCRXPathClassific
     }
 
     @Override
-    protected Parent toJdomParent(MCRCategoryDAO dao, MCRObject object, MCRMODSWrapper modsWrapper) {
-        return modsWrapper.getMODS();
+    protected Parent toJdomParent(MCRCategoryDAO dao, MCRObject object) {
+        return new MCRMODSWrapper(object).getMODS();
     }
 
     public static class Factory implements Supplier<MCRMODSXPathClassificationGenerator> {

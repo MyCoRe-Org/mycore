@@ -58,16 +58,16 @@ import org.mycore.mods.MCRMODSWrapper;
  * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRMODSXMappingClassificationGenerator.Factory.class)
-public final class MCRMODSXMappingClassificationGenerator extends MCRXMappingClassificationGeneratorBase<MCRMODSWrapper>
-    implements MCRMODSGeneratorClassificationMapper.Generator {
+public final class MCRMODSXMappingClassificationGenerator extends MCRXMappingClassificationGeneratorBase {
 
     public MCRMODSXMappingClassificationGenerator(OnMissingMappedCategory onMissingMappedCategory) {
         super(onMissingMappedCategory);
     }
 
     @Override
-    protected Stream<MCRCategory> getCategories(MCRCategoryDAO dao, MCRObject object, MCRMODSWrapper modsWrapper) {
-        return modsWrapper.getMcrCategoryIDs().stream().map(categoryId -> dao.getCategory(categoryId, 0));
+    protected Stream<MCRCategory> getCategories(MCRCategoryDAO dao, MCRObject object) {
+        return new MCRMODSWrapper(object).getMcrCategoryIDs().stream()
+            .map(categoryId -> dao.getCategory(categoryId, 0));
     }
 
     public static class Factory implements Supplier<MCRMODSXMappingClassificationGenerator> {
