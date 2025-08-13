@@ -30,17 +30,18 @@ import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.mapping.MCRGeneratorClassificationMapperBase.Generator;
 import org.mycore.datamodel.metadata.MCRObject;
 
 /**
- * {@link MCRXMappingClassificationGeneratorBase} is a base implementation for data model specific implementations
- * of {@link MCRGeneratorClassificationMapperBase.Generator} that that looks for mapping information in
- * all classification values already present in the data model representation of a MyCoRe object.
+ * {@link MCRXMappingClassificationGeneratorBase} is a base implementation for data model specific
+ * implementations of {@link Generator} that that looks for mapping information in all
+ * classification values already present in the data model representation of a MyCoRe object.
  * <p>
  * For each classification value, if the corresponding classification category contains a <code>x-mapping</code>
  * label, the content of that label is used as a space separated list of classification category IDs.
  */
-public abstract class MCRXMappingClassificationGeneratorBase implements MCRGeneratorClassificationMapperBase.Generator {
+public abstract class MCRXMappingClassificationGeneratorBase implements Generator {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 

@@ -28,12 +28,13 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
+import org.mycore.datamodel.classifications2.mapping.MCRGeneratorClassificationMapperBase.Generator;
 import org.mycore.datamodel.metadata.MCRObject;
 
 /**
- * A {@link MCRDefaultXMappingClassificationGenerator} is a {@link MCRDefaultGeneratorClassificationMapper.Generator}
- * that looks for mapping information for a given list of classifications, by checking if XPaths configured
- * for categories of such classifications match the default metadata document.
+ * A {@link MCRDefaultXMappingClassificationGenerator} is a {@link Generator} that looks for mapping information
+ * for a given list of classifications, by checking if XPaths configured for categories of such classifications
+ * match the default metadata document.
  * <p>
  * For each classification, the set of classification categories containing a <code>x-mapping-xpath</code> label is
  * obtained. For all such classification categories, the corresponding XPath is evaluated and if the default metadata
@@ -42,16 +43,15 @@ import org.mycore.datamodel.metadata.MCRObject;
  * </p>
  * Example form <code>foo_bar</code>:
  * <pre><code>
- * &lt;category ID=&quot;article&quot;&gt;
- * &nbsp;&lt;label xml:lang=&quot;en&quot; text=&quot;Article&quot; /&gt;
- * &nbsp;&lt;label xml:lang=&quot;x-mapping-xpath&quot; text=&quot;genre[text()='article']&quot; /&gt;
- * &nbsp;&lt;label xml:lang=&quot;x-mapping-xpathfb&quot; text=&quot;genre[text()='other']&quot; /&gt;
+ * &lt;category ID="article"&gt;
+ *  &lt;label xml:lang="en" text="Article" /&gt;
+ *  &lt;label xml:lang="x-mapping-xpath" text="genre[text()='article']" /&gt;
+ *  &lt;label xml:lang="x-mapping-xpathfb" text="genre[text()='other']" /&gt;
  * &lt;/category&gt;
  * </code></pre>
  * If <code>foo_bar</code> is in the list of classifications, the classification category
- * <code>foo_bar:article</code> will be provided, if the XPath <code>genre[text()='article']</code> is matching
- * (or if no other classification category has a matching XPath and <code>genre[text()='other']</code> is
- * matching).
+ * <code>foo_bar:article</code> will be provided, if the XPath <code>genre[text()='article']</code> matches
+ * (or if no other classification category has a matching XPath and <code>genre[text()='other']</code> matches).
  * <p>
  * The following configuration options are available:
  * <ul>
@@ -73,6 +73,11 @@ public final class MCRDefaultXPathClassificationGenerator extends MCRXPathClassi
 
     public MCRDefaultXPathClassificationGenerator(List<String> classificationsIds) {
         super(classificationsIds);
+    }
+
+    @Override
+    public boolean isSupported(MCRObject object) {
+        return true;
     }
 
     @Override

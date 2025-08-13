@@ -24,13 +24,14 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
+import org.mycore.datamodel.classifications2.mapping.MCRGeneratorClassificationMapperBase.Generator;
 import org.mycore.datamodel.classifications2.mapping.MCRXMappingClassificationGeneratorBase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 
 /**
- * A {@link MCRMODSXMappingClassificationGenerator} is a {@link MCRMODSGeneratorClassificationMapper.Generator}
- * that looks for mapping information in all classification values already present in the MODS document.
+ * A {@link MCRMODSXMappingClassificationGenerator} is a {@link Generator} that looks for mapping information
+ * in all classification values already present in the MODS document.
  * <p>
  * For each classification value, if the corresponding classification category contains a <code>x-mapping</code>
  * label, the content of that label is used as a space separated list of classification category IDs.
@@ -38,13 +39,13 @@ import org.mycore.mods.MCRMODSWrapper;
  * Example form <code>foo_bar</code>:
  * <pre><code>
  * &lt;category ID=&quot;article&quot;&gt;
- * &nbsp;&lt;label xml:lang=&quot;en&quot; text=&quot;ScolarlyArticle&quot; /&gt;
- * &nbsp;&lt;label xml:lang=&quot;x-mapping&quot; text=&quot;foo_baz:Article&quot; /&gt;
+ *  &lt;label xml:lang=&quot;en&quot; text=&quot;ScolarlyArticle&quot; /&gt;
+ *  &lt;label xml:lang=&quot;x-mapping&quot; text=&quot;foo_baz:Article&quot; /&gt;
  * &lt;/category&gt;
  * </code></pre>
  * If a MODS document contains the classification category <code>foo_bar:article</code>, the
- * classification category <code>foo_baz:ScolarlyArticle</code> will be provided. The corresponding generator
- * will be named <code>foo_bar2foo_baz</code>.
+ * classification category <code>foo_baz:ScolarlyArticle</code> will be provided.
+ * The corresponding generator will be named <code>foo_bar2foo_baz</code>.
  * <p>
  * The following configuration options are available:
  * <ul>
@@ -65,6 +66,11 @@ public final class MCRMODSXMappingClassificationGenerator extends MCRXMappingCla
     }
 
     @Override
+    public boolean isSupported(MCRObject object) {
+        return MCRMODSWrapper.isSupported(object);
+    }
+
+    @Override
     protected Stream<MCRCategory> getCategories(MCRCategoryDAO dao, MCRObject object) {
         return new MCRMODSWrapper(object).getMcrCategoryIDs().stream()
             .map(categoryId -> dao.getCategory(categoryId, 0));
@@ -77,12 +83,11 @@ public final class MCRMODSXMappingClassificationGenerator extends MCRXMappingCla
 
         @Override
         public MCRMODSXMappingClassificationGenerator get() {
+            return new MCRMODSXMappingClassificationGenerator(getOnMissingMappedCategory());
+        }
 
-            OnMissingMappedCategory onMissingMappedCategory = OnMissingMappedCategory
-                .valueOf(this.onMissingMappedCategory);
-
-            return new MCRMODSXMappingClassificationGenerator(onMissingMappedCategory);
-
+        private OnMissingMappedCategory getOnMissingMappedCategory() {
+            return OnMissingMappedCategory.valueOf(this.onMissingMappedCategory);
         }
 
     }

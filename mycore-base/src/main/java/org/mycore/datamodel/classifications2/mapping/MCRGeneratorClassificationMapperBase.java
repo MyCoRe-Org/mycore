@@ -33,10 +33,10 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRObject;
 
 /**
- * {@link MCRGeneratorClassificationMapperBase} is a base implementation for data model specific event handlers
- * that map classifications in MyCoRe objects. To do so it uses {@link MCRGeneratorClassificationMapperBase.Generator}
- * instances that each implement a strategy to obtain classifications based on the information present in a
- * data model representation of the MyCoRe object.
+ * {@link MCRGeneratorClassificationMapperBase} is a base implementation for data model specific
+ * implementations of {@link MCRClassificationMapper} that uses multiple {@link Generator}
+ * instances that each implement a strategy to obtain classifications based on the information
+ * present in a data model representation of the MyCoRe object.
  */
 public abstract class MCRGeneratorClassificationMapperBase implements MCRClassificationMapper {
 
@@ -81,17 +81,17 @@ public abstract class MCRGeneratorClassificationMapperBase implements MCRClassif
 
         Set<Mapping> mappings = new LinkedHashSet<>();
         generators.forEach((name, generator) -> {
-            if (logger.isInfoEnabled()) {
-                logger.info("generate mappings with {} / {}", name, generator.getClass().getName());
+            logger.info("generating mappings with {}", name);
+            if (generator.isSupported(object)) {
+                mappings.addAll(generator.generate(dao, object));
+            } else {
+                logger.info("object not supported by generator {}", name);
             }
-            mappings.addAll(generator.generate(dao, object));
         });
 
         if (!mappings.isEmpty()) {
             insertNewMappings(object, mappings);
         }
-
-        logger.info("checked for mappings");
 
     }
 
@@ -105,6 +105,8 @@ public abstract class MCRGeneratorClassificationMapperBase implements MCRClassif
     }
 
     public interface Generator {
+
+        boolean isSupported(MCRObject object);
 
         List<Mapping> generate(MCRCategoryDAO dao, MCRObject object);
 

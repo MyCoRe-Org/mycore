@@ -33,18 +33,17 @@ import org.mycore.mods.classification.MCRClassMapper;
 
 /**
  * A {@link MCRMODSGeneratorClassificationMapper} maps classifications in MODS documents.
- * To do so, it uses {@link MCRGeneratorClassificationMapperBase.Generator} instances that each
- * implement a strategy to obtain classifications based on the information present in the MODS document.
+ * To do so, it uses {@link Generator} instances that each implement a strategy to obtain classifications
+ * based on the information present in the MODS document.
  * <p>
  * Obtained classification values are added to the MODS document as <code>classification</code> elements
  * with <code>authorityURI</code> and <code>valueURI</code> attributes corresponding to that value and a
  * descriptive <code>generator</code> attribute whose name is returned alongside the classification value
- * (and expanded by suffix <code>-mycore</code>) by 
- * {@link MCRGeneratorClassificationMapperBase.Generator#generate(MCRCategoryDAO, MCRObject)}.
+ * (and expanded by suffix <code>-mycore</code>) by  {@link Generator#generate(MCRCategoryDAO, MCRObject)}.
  * <p>
  * The following configuration options are available:
  * <ul>
- * <li> The property suffix {@link MCRMODSGeneratorClassificationMapper#GENERATORS_KEY} can be used to
+ * <li> The property suffix {@link MCRGeneratorClassificationMapperBase#GENERATORS_KEY} can be used to
  * specify the map of generators to be used.
  * <li> For each generator, the property suffix {@link MCRSentinel#ENABLED_KEY} can be used to
  * excluded that generator from the configuration.

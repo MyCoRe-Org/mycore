@@ -30,11 +30,12 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.mapping.MCRGeneratorClassificationMapperBase.Generator;
 import org.mycore.datamodel.metadata.MCRObject;
 
 /**
- * A {@link MCRDefaultXMappingClassificationGenerator} is a {@link MCRDefaultGeneratorClassificationMapper.Generator}
- * that looks for mapping information in all classification values already present in the default metadata document.
+ * A {@link MCRDefaultXMappingClassificationGenerator} is a {@link Generator} that looks for mapping information
+ * in all classification values already present in the default metadata document.
  * <p>
  * For each classification value, if the corresponding classification category contains a <code>x-mapping</code>
  * label, the content of that label is used as a space separated list of classification category IDs.
@@ -42,11 +43,11 @@ import org.mycore.datamodel.metadata.MCRObject;
  * Example form <code>foo_bar</code>:
  * <pre><code>
  * &lt;category ID=&quot;article&quot;&gt;
- * &nbsp;&lt;label xml:lang=&quot;en&quot; text=&quot;ScolarlyArticle&quot; /&gt;
- * &nbsp;&lt;label xml:lang=&quot;x-mapping&quot; text=&quot;foo_baz:Article&quot; /&gt;
+ *  &lt;label xml:lang=&quot;en&quot; text=&quot;ScolarlyArticle&quot; /&gt;
+ *  &lt;label xml:lang=&quot;x-mapping&quot; text=&quot;foo_baz:Article&quot; /&gt;
  * &lt;/category&gt;
  * </code></pre>
- * If a metadata document contains the classification category <code>foo_bar:article</code>, the
+ * If a default metadata document contains the classification category <code>foo_bar:article</code>, the
  * classification category <code>foo_baz:ScolarlyArticle</code> will be provided.
  * <p>
  * The following configuration options are available:
@@ -74,6 +75,11 @@ public final class MCRDefaultXMappingClassificationGenerator extends MCRXMapping
     }
 
     @Override
+    public boolean isSupported(MCRObject object) {
+        return true;
+    }
+
+    @Override
     protected Stream<MCRCategory> getCategories(MCRCategoryDAO dao, MCRObject object) {
         Document metadataDocument = getContext(object);
         return CLASSIFICATION_ELEMENT_XPATH.evaluate(metadataDocument).stream()
@@ -96,12 +102,11 @@ public final class MCRDefaultXMappingClassificationGenerator extends MCRXMapping
 
         @Override
         public MCRDefaultXMappingClassificationGenerator get() {
+            return new MCRDefaultXMappingClassificationGenerator(getOnMissingMappedCategory());
+        }
 
-            OnMissingMappedCategory onMissingMappedCategory = OnMissingMappedCategory
-                .valueOf(this.onMissingMappedCategory);
-
-            return new MCRDefaultXMappingClassificationGenerator(onMissingMappedCategory);
-
+        private OnMissingMappedCategory getOnMissingMappedCategory() {
+            return OnMissingMappedCategory.valueOf(this.onMissingMappedCategory);
         }
 
     }

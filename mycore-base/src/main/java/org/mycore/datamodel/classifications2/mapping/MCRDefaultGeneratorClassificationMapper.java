@@ -32,8 +32,8 @@ import org.mycore.datamodel.metadata.MCRObject;
 
 /**
  * A {@link MCRDefaultGeneratorClassificationMapper} maps classifications in default metadata documents.
- * To do so, it uses {@link MCRGeneratorClassificationMapperBase.Generator} instances that each
- * implement a strategy to obtain classifications based on the information present in the default metadata document.
+ * To do so, it uses {@link Generator} instances that each implement a strategy to obtain classifications
+ * based on the information present in the default metadata document.
  * <p>
  * Obtained classification values are added to the default metadata document as a <code>mappings</code>
  * element containing <code>mapping</code> elements with <code>categid</code> and <code>classid</code>
@@ -53,7 +53,7 @@ import org.mycore.datamodel.metadata.MCRObject;
  * [...].Generators.foo.Enabled=true
  * [...].Generators.foo.Key1=Value1
  * [...].Generators.foo.Key2=Value2
- * [...].Generators.bar.Class=foo.bar.BarClassificationGenerators
+ * [...].Generators.bar.Class=foo.bar.BarClassificationGenerator
  * [...].Generators.bar.Enabled=false
  * [...].Generators.bar.Key1=Value1
  * [...].Generators.bar.Key2=Value2
@@ -62,7 +62,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 @MCRConfigurationProxy(proxyClass = MCRDefaultGeneratorClassificationMapper.Factory.class)
 public final class MCRDefaultGeneratorClassificationMapper extends MCRGeneratorClassificationMapperBase {
 
-    public static final String ELEMENT_MAPPINGS = "mappings";
+    public static final String MAPPINGS_ELEMENT_TAG = "mappings";
 
     public MCRDefaultGeneratorClassificationMapper(Map<String, Generator> generators) {
         super(generators);
@@ -75,7 +75,7 @@ public final class MCRDefaultGeneratorClassificationMapper extends MCRGeneratorC
 
     @Override
     protected void removeExistingMappings(MCRObject object) {
-        object.getMetadata().removeMetadataElement(ELEMENT_MAPPINGS);
+        object.getMetadata().removeMetadataElement(MAPPINGS_ELEMENT_TAG);
     }
 
     @Override
@@ -88,7 +88,7 @@ public final class MCRDefaultGeneratorClassificationMapper extends MCRGeneratorC
 
     private MCRMetaElement createEmptyMappingsElement() {
         MCRMetaElement mappings = new MCRMetaElement();
-        mappings.setTag(ELEMENT_MAPPINGS);
+        mappings.setTag(MAPPINGS_ELEMENT_TAG);
         mappings.setClass(MCRMetaClassification.class);
         mappings.setHeritable(false);
         mappings.setNotInherit(true);
