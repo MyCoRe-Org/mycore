@@ -32,8 +32,8 @@ import org.mycore.common.MCRUtils;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
-import org.mycore.resource.common.MCRResourceUtils;
 import org.mycore.resource.common.MCRResourceTracer;
+import org.mycore.resource.common.MCRResourceUtils;
 
 /**
  * {@link MCRFileSystemResourceProviderBase} is a base implementation of a {@link MCRResourceProvider} that

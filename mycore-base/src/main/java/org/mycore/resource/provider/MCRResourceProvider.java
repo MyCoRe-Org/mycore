@@ -18,35 +18,24 @@
 
 package org.mycore.resource.provider;
 
-import java.net.URI;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.Level;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRNoOpClasspathDirsProvider;
 import org.mycore.resource.common.MCRNoOpResourceTracer;
-import org.mycore.resource.common.MCRResourceUtils;
 import org.mycore.resource.common.MCRResourceTracer;
-
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
-import io.github.classgraph.ClassGraph;
-import io.github.classgraph.ScanResult;
+import org.mycore.resource.common.MCRResourceUtils;
+import org.mycore.resource.hint.MCRResourceHintKeys;
 
 /**
  * A {@link MCRResourceProvider} implements a resource lookup strategy.
@@ -146,40 +135,23 @@ public interface MCRResourceProvider {
 
     }
 
-    final class ClassLoaderPrefixStripper extends PrefixStripperBase {
+    final class ClasspathDirsPrefixStripper extends PrefixStripperBase {
 
-        private static final String CLASS_GRAPH_THREAD_COUNT_NAME = "MCR.Resource.Provider.ClassGraph.ThreadCount";
+        private final Supplier<List<Path>> classpathDirsSupplier;
 
-        private static final int CLASS_GRAPH_THREAD_COUNT = MCRConfiguration2.getInt(CLASS_GRAPH_THREAD_COUNT_NAME)
-            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(CLASS_GRAPH_THREAD_COUNT_NAME));
-
-        private static final ExecutorService EXECUTOR_SERVICE = new ThreadPoolExecutor(CLASS_GRAPH_THREAD_COUNT,
-            CLASS_GRAPH_THREAD_COUNT, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
-            new ThreadFactoryBuilder().setNameFormat("ClassLoaderPrefixStripper-worker-%d").setDaemon(true).build());
-
-        private final ClassLoader classLoader;
-
-        public ClassLoaderPrefixStripper(ClassLoader classLoader) {
-            this.classLoader = Objects.requireNonNull(classLoader, "Class loader must not be null");
+        public ClasspathDirsPrefixStripper(MCRHints hints) {
+            // only analyze hints for classpath dirs once getStrippedPaths
+            // is called and store the result for subsequent calls
+            classpathDirsSupplier = new CachingClasspathDirsSupplier(hints);
         }
 
         @Override
         public List<String> getStrippedPaths(String value) {
             List<String> potentialPaths = new LinkedList<>();
-            ClassGraph classGraph = new ClassGraph();
-            classGraph.overrideClassLoaders(classLoader);
-            try (ScanResult scanResult = classGraph.scan(EXECUTOR_SERVICE, CLASS_GRAPH_THREAD_COUNT)) {
-                List<URI> classpath = scanResult.getClasspathURIs();
-                for (URI uri : classpath) {
-                    if (uri.getScheme().equals("file")) {
-                        Path path = Path.of(uri);
-                        if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
-                            String prefix = MCRResourceUtils.toFileUrl(path).toString();
-                            if (value.startsWith(prefix)) {
-                                potentialPaths.add(value.substring(prefix.length()));
-                            }
-                        }
-                    }
+            for (Path classpathDir : classpathDirsSupplier.get()) {
+                String prefix = MCRResourceUtils.toFileUrl(classpathDir).toString();
+                if (value.startsWith(prefix)) {
+                    potentialPaths.add(value.substring(prefix.length()));
                 }
             }
             return potentialPaths;
@@ -187,7 +159,32 @@ public interface MCRResourceProvider {
 
         @Override
         public String toString() {
-            return classLoader.getName();
+            return "java.class.path";
+        }
+
+        private static final class CachingClasspathDirsSupplier implements Supplier<List<Path>> {
+
+            private final MCRHints hints;
+
+            private List<Path> classpathDirs;
+
+            private CachingClasspathDirsSupplier(MCRHints hints) {
+                this.hints = hints;
+            }
+
+            @Override
+            public List<Path> get() {
+                if (classpathDirs == null) {
+                    classpathDirs = getClasspathDirsFromHints();
+                }
+                return classpathDirs;
+            }
+
+            private List<Path> getClasspathDirsFromHints() {
+                return hints.get(MCRResourceHintKeys.CLASSPATH_DIRS_PROVIDER)
+                    .orElseGet(MCRNoOpClasspathDirsProvider::new).getClasspathDirs(hints);
+            }
+
         }
 
     }
