@@ -75,7 +75,7 @@ public final class MCRDefaultXPathClassificationGenerator extends MCRXPathClassi
     }
 
     @Override
-    protected Parent toParent(MCRCategoryDAO dao, Document metadataDocument) {
+    protected Parent toJdomParent(MCRCategoryDAO dao, Document metadataDocument) {
         return metadataDocument;
     }
 

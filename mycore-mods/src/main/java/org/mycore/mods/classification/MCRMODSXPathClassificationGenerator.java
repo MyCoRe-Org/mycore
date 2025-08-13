@@ -77,7 +77,7 @@ public final class MCRMODSXPathClassificationGenerator extends MCRXPathClassific
     }
 
     @Override
-    protected Parent toParent(MCRCategoryDAO dao, MCRMODSWrapper modsWrapper) {
+    protected Parent toJdomParent(MCRCategoryDAO dao, MCRMODSWrapper modsWrapper) {
         return modsWrapper.getMODS();
     }
 

@@ -27,20 +27,19 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.classifications2.MCRClassificationMapperBase.Generator;
 
 /**
  * {@link MCRXMappingClassificationGeneratorBase} is a base implementation for data model specific implementations of
- * {@link Generator} that that looks for mapping information in all classification values already present in the
- * intermediate representation of a MyCoRe object.
+ * {@link MCRClassificationMapperBase.Generator} that that looks for mapping information in all classification values
+ * already present in the alternate representation of a MyCoRe object.
  * <p>
  * For each classification value, if the corresponding classification category contains a <code>x-mapping</code>
  * label, the content of that label is used as a space separated list of classification category IDs.
  *
- * @param <I> The intermediate representation used by the corresponding implementation of
- * {@link MCRXPathClassificationGeneratorBase}
+ * @param <R> The alternate representation used by the corresponding implementation of
+ * {@link MCRClassificationMapperBase}
  */
-public abstract class MCRXMappingClassificationGeneratorBase<I> implements Generator<I> {
+public abstract class MCRXMappingClassificationGeneratorBase<R> implements MCRClassificationMapperBase.Generator<R> {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 
@@ -51,13 +50,14 @@ public abstract class MCRXMappingClassificationGeneratorBase<I> implements Gener
     private final OnMissingMappedCategory onMissingMappedCategory;
 
     public MCRXMappingClassificationGeneratorBase(OnMissingMappedCategory onMissingMappedCategory) {
-        this.onMissingMappedCategory = Objects.requireNonNull(onMissingMappedCategory);
+        this.onMissingMappedCategory = Objects.requireNonNull(onMissingMappedCategory,
+            "On-Missing-Mapped-Category must not be null");
     }
 
     @Override
     public final List<MCRClassificationMapperBase.Mapping> generateMappings(MCRCategoryDAO dao,
-        I intermediateRepresentation) {
-        return getCategories(dao, intermediateRepresentation)
+        R representation) {
+        return getCategories(dao, representation)
             .filter(Objects::nonNull)
             .map(category -> findMappings(dao, category))
             .flatMap(Collection::stream)
@@ -67,7 +67,7 @@ public abstract class MCRXMappingClassificationGeneratorBase<I> implements Gener
             .toList();
     }
 
-    protected abstract Stream<MCRCategory> getCategories(MCRCategoryDAO dao, I intermediateRepresentation);
+    protected abstract Stream<MCRCategory> getCategories(MCRCategoryDAO dao, R representation);
 
     private List<XMapping> findMappings(MCRCategoryDAO dao, MCRCategory sourceCategory) {
         MCRCategoryID sourceCategoryId = sourceCategory.getId();

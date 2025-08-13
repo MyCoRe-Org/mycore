@@ -36,7 +36,7 @@ public class MCRBasicObjectExpander implements MCRObjectExpander {
      * @param mapper The classification mapper to use, or null if classification mapping is disabled.
      */
     public MCRBasicObjectExpander(MCRClassificationMapper mapper) {
-        this.mapper = Objects.requireNonNull(mapper, "Mapper must not be null");
+        this.mapper = Objects.requireNonNull(mapper, "Classification mapper must not be null");
     }
 
     /**
