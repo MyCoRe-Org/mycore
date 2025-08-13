@@ -74,7 +74,7 @@ public final class MCRDefaultGeneratorClassificationMapper extends MCRGeneratorC
     }
 
     @Override
-    protected Optional<Document> getRepresentation(MCRObject object) {
+    protected Optional<Document> getDataModel(MCRObject object) {
         return Optional.of(new Document(object.getMetadata().createXML().detach()));
     }
 
