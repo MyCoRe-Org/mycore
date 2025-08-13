@@ -822,8 +822,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         File xmlOutput = new File(dir, nid + "." + extension);
 
         if (trans != null) {
-            FileOutputStream out = new FileOutputStream(xmlOutput);
-            try {
+            try(FileOutputStream out = new FileOutputStream(xmlOutput)) {
                 trans.accept(content, out);
             } catch (UncheckedIOException e) {
                 throw e.getCause();
