@@ -74,7 +74,7 @@ public class MCRMODSGeneratorClassificationMapperTest extends MCRJPATestCase {
         MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(Map.of(
             "xMapping", new MCRMODSXMappingClassificationGenerator(
                 MCRXMappingClassificationGeneratorBase.OnMissingMappedCategory.IGNORE)));
-        mapper.createMapping(mcro);
+        mapper.createMappings(mcro);
 
         String expression =
             "//mods:classification[contains(@generator,'-mycore') and contains(@valueURI, 'StudyThesis')]";
@@ -121,7 +121,7 @@ public class MCRMODSGeneratorClassificationMapperTest extends MCRJPATestCase {
 
         MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(Map.of(
             "xPath", new MCRMODSXPathClassificationGenerator("orcidWorkType", "dummyClassification")));
-        mapper.createMapping(mcro);
+        mapper.createMappings(mcro);
 
         Document xml = mcro.createXML();
 
@@ -178,7 +178,7 @@ public class MCRMODSGeneratorClassificationMapperTest extends MCRJPATestCase {
 
         MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(Map.of(
             "xPath", new MCRMODSXPathClassificationGenerator("orcidWorkType", "dummyClassification")));
-        mapper.createMapping(mcro);
+        mapper.createMappings(mcro);
 
         Document xml = mcro.createXML();
 
@@ -237,7 +237,7 @@ public class MCRMODSGeneratorClassificationMapperTest extends MCRJPATestCase {
 
         MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(Map.of(
             "xPath", new MCRMODSXPathClassificationGenerator("placeholderClassification")));
-        mapper.createMapping(mcro);
+        mapper.createMappings(mcro);
 
         Document xml = mcro.createXML();
 
@@ -259,7 +259,7 @@ public class MCRMODSGeneratorClassificationMapperTest extends MCRJPATestCase {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 5);
 
-        mapper.createMapping(mcro);
+        mapper.createMappings(mcro);
         xml = mcro.createXML();
 
         expression = "//mods:classification[contains(@generator,'-mycore') and "
@@ -279,7 +279,7 @@ public class MCRMODSGeneratorClassificationMapperTest extends MCRJPATestCase {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 6);
 
-        mapper.createMapping(mcro);
+        mapper.createMappings(mcro);
         xml = mcro.createXML();
 
         expression = "//mods:classification[contains(@generator,'-mycore') and "
@@ -299,7 +299,7 @@ public class MCRMODSGeneratorClassificationMapperTest extends MCRJPATestCase {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 7);
 
-        mapper.createMapping(mcro);
+        mapper.createMappings(mcro);
         xml = mcro.createXML();
 
         expression = "//mods:classification[contains(@generator,'-mycore') and "
@@ -337,7 +337,7 @@ public class MCRMODSGeneratorClassificationMapperTest extends MCRJPATestCase {
 
         MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(Map.of(
             "xPath", new MCRMODSXPathClassificationGenerator("placeholderOrCondition")));
-        mapper.createMapping(mcro);
+        mapper.createMappings(mcro);
 
         Document xml = mcro.createXML();
 
@@ -374,7 +374,7 @@ public class MCRMODSGeneratorClassificationMapperTest extends MCRJPATestCase {
 
         MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(Map.of(
             "xPath", new MCRMODSXPathClassificationGenerator("placeholderOrCondition")));
-        mapper.createMapping(mcro);
+        mapper.createMappings(mcro);
 
         Document xml = mcro.createXML();
 
@@ -397,7 +397,7 @@ public class MCRMODSGeneratorClassificationMapperTest extends MCRJPATestCase {
         mw.setMODS(document2.getRootElement().detach());
         mw.setID("junit", 10);
 
-        mapper.createMapping(mcro);
+        mapper.createMappings(mcro);
 
         xml = mcro.createXML();
 

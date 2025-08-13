@@ -30,6 +30,7 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.metadata.MCRObject;
 
 /**
  * A {@link MCRDefaultXMappingClassificationGenerator} is a {@link MCRDefaultGeneratorClassificationMapper.Generator}
@@ -74,7 +75,7 @@ public final class MCRDefaultXMappingClassificationGenerator extends MCRXMapping
     }
 
     @Override
-    protected Stream<MCRCategory> getCategories(MCRCategoryDAO dao, Document metadataDocument) {
+    protected Stream<MCRCategory> getCategories(MCRCategoryDAO dao, MCRObject object, Document metadataDocument) {
         return CLASSIFICATION_ELEMENT_XPATH.evaluate(metadataDocument).stream()
             .map(classificationElement -> loadClassification(dao, classificationElement));
     }

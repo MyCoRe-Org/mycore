@@ -25,6 +25,7 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.mapping.MCRXMappingClassificationGeneratorBase;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 
 /**
@@ -65,7 +66,7 @@ public final class MCRMODSXMappingClassificationGenerator extends MCRXMappingCla
     }
 
     @Override
-    protected Stream<MCRCategory> getCategories(MCRCategoryDAO dao, MCRMODSWrapper modsWrapper) {
+    protected Stream<MCRCategory> getCategories(MCRCategoryDAO dao, MCRObject object, MCRMODSWrapper modsWrapper) {
         return modsWrapper.getMcrCategoryIDs().stream().map(categoryId -> dao.getCategory(categoryId, 0));
     }
 

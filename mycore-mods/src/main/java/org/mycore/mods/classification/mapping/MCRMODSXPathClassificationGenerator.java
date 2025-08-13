@@ -28,6 +28,7 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.mapping.MCRXPathClassificationGeneratorBase;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 
 /**
@@ -77,7 +78,7 @@ public final class MCRMODSXPathClassificationGenerator extends MCRXPathClassific
     }
 
     @Override
-    protected Parent toJdomParent(MCRCategoryDAO dao, MCRMODSWrapper modsWrapper) {
+    protected Parent toJdomParent(MCRCategoryDAO dao, MCRObject object, MCRMODSWrapper modsWrapper) {
         return modsWrapper.getMODS();
     }
 

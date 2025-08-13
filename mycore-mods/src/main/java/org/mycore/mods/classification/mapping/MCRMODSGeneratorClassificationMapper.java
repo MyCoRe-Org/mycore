@@ -42,7 +42,7 @@ import org.mycore.mods.classification.MCRClassMapper;
  * with <code>authorityURI</code> and <code>valueURI</code> attributes corresponding to that value and a
  * descriptive <code>generator</code> attribute whose name is returned alongside the classification value
  * (and expanded by suffix <code>-mycore</code>) by 
- * {@link MCRMODSGeneratorClassificationMapper.Generator#generateMappings(MCRCategoryDAO, MCRMODSWrapper)}.
+ * {@link MCRGeneratorClassificationMapperBase.Generator#generate(MCRCategoryDAO, MCRObject, Object)}.
  * <p>
  * The following configuration options are available:
  * <ul>
@@ -89,7 +89,7 @@ public final class MCRMODSGeneratorClassificationMapper extends MCRGeneratorClas
     }
 
     @Override
-    protected void addNewMappings(MCRObject object, MCRMODSWrapper modsWrapper, Set<Mapping> mappings) {
+    protected void insertNewMappings(MCRObject object, MCRMODSWrapper modsWrapper, Set<Mapping> mappings) {
         mappings.forEach(mapping -> {
             Element mappedClassification = modsWrapper.addElement("classification");
             mappedClassification.setAttribute("generator", mapping.generatorName() + GENERATOR_SUFFIX);
@@ -100,7 +100,7 @@ public final class MCRMODSGeneratorClassificationMapper extends MCRGeneratorClas
     public interface Generator extends MCRGeneratorClassificationMapperBase.Generator<MCRMODSWrapper> {
 
         @Override
-        List<Mapping> generateMappings(MCRCategoryDAO dao, MCRMODSWrapper modsWrapper);
+        List<Mapping> generate(MCRCategoryDAO dao, MCRObject object, MCRMODSWrapper modsWrapper);
 
     }
 

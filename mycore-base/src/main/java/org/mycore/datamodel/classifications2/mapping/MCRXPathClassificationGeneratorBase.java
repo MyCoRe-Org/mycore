@@ -30,6 +30,7 @@ import org.jdom2.Parent;
 import org.mycore.common.xml.MCRXPathEvaluator;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.metadata.MCRObject;
 
 /**
  * {@link MCRDefaultXMappingClassificationGenerator} is a base implementation for data model specific implementations
@@ -66,9 +67,9 @@ public abstract class MCRXPathClassificationGeneratorBase<D>
     }
 
     @Override
-    public final List<MCRGeneratorClassificationMapperBase.Mapping> generateMappings(MCRCategoryDAO dao,
-        D metadataDocument) {
-        Parent parent = toJdomParent(dao, metadataDocument);
+    public final List<MCRGeneratorClassificationMapperBase.Mapping> generate(MCRCategoryDAO dao,
+        MCRObject object, D metadataDocument) {
+        Parent parent = toJdomParent(dao, object, metadataDocument);
         return classificationsIds.stream()
             .flatMap(classificationId -> findMappings(dao, parent, classificationId))
             .peek(xPathMapping -> xPathMapping.logInfo(logger))
@@ -76,7 +77,7 @@ public abstract class MCRXPathClassificationGeneratorBase<D>
             .toList();
     }
 
-    protected abstract Parent toJdomParent(MCRCategoryDAO dao, D dataModel);
+    protected abstract Parent toJdomParent(MCRCategoryDAO dao, MCRObject object, D dataModel);
 
     private Stream<XPathMapping> findMappings(MCRCategoryDAO dao, Parent parent, String classificationId) {
         List<XPathMapping> mappings = findMappings(dao, parent, classificationId, LABEL_LANG_XPATH_MAPPING);

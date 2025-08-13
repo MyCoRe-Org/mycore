@@ -89,7 +89,7 @@ public class MCRBasicObjectExpander implements MCRObjectExpander {
      */
     private void expandClassifications(MCRObject mcrObject) {
         mapper.clearMappings(mcrObject);
-        mapper.createMapping(mcrObject);
+        mapper.createMappings(mcrObject);
     }
 
     public static final class Factory implements Supplier<MCRBasicObjectExpander> {
