@@ -21,6 +21,7 @@ const lockResult = ref<LockResult | undefined>(undefined);
 
 let undoKeyPressed = false;
 let originalModel: string = "";
+let refreshInterval: number | undefined;
 
 onMounted(() => {
   window.addEventListener("beforeunload", handleBeforeUnload);
@@ -151,6 +152,20 @@ const unlockIfPossible = () => {
   }
 };
 
+const startLockRefresh = () => {
+  stopLockRefresh();
+  refreshInterval = window.setInterval(async () => {
+    await lockIfPossible();
+  }, 30000);
+}
+
+const stopLockRefresh = () => {
+  if (refreshInterval) {
+    clearInterval(refreshInterval);
+    refreshInterval = undefined;
+  }
+}
+
 const onKeyDown = async (evt: any) => {
   undoKeyPressed = evt.ctrlKey && (evt.key === "z" || evt.key === "Z");
   // fix undo is not triggered on empty textarea
@@ -164,6 +179,9 @@ Promise.all(
     [load(), hasWriteAccess()]
 ).then(async () => {
   await lockIfPossible();
+  if(isLockingPossible()) {
+    startLockRefresh();
+  }
 });
 
 </script>
