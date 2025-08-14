@@ -26,6 +26,17 @@ import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.hint.MCRHint;
 import org.mycore.common.hint.MCRHintKey;
 
+/**
+ * A {@link MCRConfigDirResourceHint} is a {@link MCRHint} for {@link MCRResourceHintKeys#CONFIG_DIR}
+ * that uses {@link MCRConfigurationDir#getConfigurationDirectory()} to obtain the config directory.
+ * <p>
+ * No configuration options are available.
+ * <p>
+ * Example:
+ * <pre><code>
+ * [...].Class=org.mycore.resource.hint.MCRConfigDirResourceHint
+ * </code></pre>
+ */
 public final class MCRConfigDirResourceHint implements MCRHint<Path> {
 
     @Override

@@ -18,18 +18,35 @@
 
 package org.mycore.resource.common;
 
-import static org.mycore.resource.MCRResourcePath.ofPathOrThrow;
-
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.MCRResourceResolver;
 
+/**
+ * A utility class with helper methods  for the process of resolving a resource in {@link MCRResourceResolver}.
+ */
 public final class MCRResourceUtils {
 
+    private static final LinkOption[] LINK_OPTIONS = MCRConfiguration2
+        .getString("MCR.Resource.Common.LinkOptions")
+        .stream()
+        .flatMap(MCRConfiguration2::splitValue)
+        .map(LinkOption::valueOf)
+        .toArray(LinkOption[]::new);
+
     private MCRResourceUtils() {
+    }
+
+    public static LinkOption[] linkOptions() {
+        return Arrays.copyOf(LINK_OPTIONS, LINK_OPTIONS.length);
     }
 
     public static URL toFileUrl(String path) {
@@ -50,7 +67,9 @@ public final class MCRResourceUtils {
 
     public static URL toJarFileUrl(Path jarPath, String path) {
         try {
-            return URI.create("jar:" + toFileUrl(jarPath) + "!" + ofPathOrThrow(path).asAbsolutePath()).toURL();
+            String absoluteResourcePath = MCRResourcePath.ofPathOrThrow(path).asAbsolutePath();
+            String urlString = "jar:" + toFileUrl(jarPath) + "!" + absoluteResourcePath;
+            return URI.create(urlString).toURL();
         } catch (MalformedURLException e) {
             throw new MCRException("Failed to convert paths to JAR file URL: " + jarPath + " / " + path, e);
         }

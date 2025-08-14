@@ -25,8 +25,8 @@ import java.util.function.Supplier;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.hint.MCRHints;
-import org.mycore.resource.common.MCRResourceUtils;
 import org.mycore.resource.common.MCRResourceTracer;
+import org.mycore.resource.common.MCRResourceUtils;
 import org.mycore.resource.hint.MCRResourceHintKeys;
 
 /**

@@ -18,15 +18,15 @@
 
 package org.mycore.resource.provider;
 
+import java.nio.file.Path;
+import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
-import org.mycore.resource.filter.MCRResourceFilterMode;
-import org.mycore.resource.filter.MCRWebappClassesDirResourceFilter;
+import org.mycore.common.hint.MCRHints;
 import org.mycore.resource.hint.MCRResourceHintKeys;
-import org.mycore.resource.locator.MCRClassLoaderResourceLocator;
-import org.mycore.resource.selector.MCRNoOpResourceSelector;
 
 /**
  * A {@link MCRWebappClassesDirResourceProvider} is a {@link MCRResourceProvider} that looks up resources
@@ -51,14 +51,19 @@ import org.mycore.resource.selector.MCRNoOpResourceSelector;
  * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRWebappClassesDirResourceProvider.Factory.class)
-public final class MCRWebappClassesDirResourceProvider extends MCRLFSResourceProvider {
+public final class MCRWebappClassesDirResourceProvider extends MCRFileSystemResourceProviderBase {
 
     public MCRWebappClassesDirResourceProvider(String coverage) {
-        super(
-            coverage,
-            new MCRClassLoaderResourceLocator(),
-            new MCRWebappClassesDirResourceFilter(MCRResourceFilterMode.MUST_MATCH),
-            new MCRNoOpResourceSelector());
+        super(coverage, MCRResourceProviderMode.RESOURCES);
+    }
+
+    @Override
+    protected Stream<Path> getBaseDirs(MCRHints hints) {
+        return getWebappClassesDir(hints).stream();
+    }
+
+    private Optional<Path> getWebappClassesDir(MCRHints hints) {
+        return hints.get(MCRResourceHintKeys.WEBAPP_DIR).map(webappDir -> webappDir.resolve("WEB-INF/classes"));
     }
 
     @Override
