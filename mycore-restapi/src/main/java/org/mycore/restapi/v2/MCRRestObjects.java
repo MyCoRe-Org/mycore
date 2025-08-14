@@ -51,6 +51,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.jakarta.rs.annotation.JacksonFeatures;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -82,6 +95,7 @@ import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.objectinfo.MCRObjectQuery;
 import org.mycore.datamodel.objectinfo.MCRObjectQueryResolver;
 import org.mycore.frontend.jersey.MCRCacheControl;
+import org.mycore.frontend.support.MCRObjectLock;
 import org.mycore.media.services.MCRThumbnailGenerator;
 import org.mycore.restapi.annotations.MCRAccessControlExposeHeaders;
 import org.mycore.restapi.annotations.MCRApiDraft;
@@ -91,21 +105,9 @@ import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRContentAbstractWriter;
 import org.mycore.restapi.v2.annotation.MCRRestRequiredPermission;
 import org.mycore.restapi.v2.model.MCRRestObjectIDDate;
+import org.mycore.restapi.v2.service.MCRRestObjectLockService;
 
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.jakarta.rs.annotation.JacksonFeatures;
-
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.headers.Header;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
 import jakarta.servlet.ServletContext;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
@@ -115,6 +117,7 @@ import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -138,6 +141,7 @@ import jakarta.xml.bind.annotation.XmlElementWrapper;
         description = "Operations on derivates belonging to metadata objects"),
     @Tag(name = MCRRestUtils.TAG_MYCORE_FILE, description = "Operations on files in derivates"),
 })
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class MCRRestObjects {
 
     public static final String PARAM_AFTER_ID = "after_id";
@@ -201,6 +205,9 @@ public class MCRRestObjects {
 
     @Context
     UriInfo uriInfo;
+
+    @Inject
+    MCRRestObjectLockService lockService;
 
     @GET
     @Produces({ MediaType.APPLICATION_XML, APPLICATION_JSON_UTF_8 })
@@ -413,7 +420,7 @@ public class MCRRestObjects {
             throw MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
                 .withCause(io)
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND)
-                .withMessage(buildNotFoundMessage(id))
+                .withMessage("MCRObject " + id + " not found")
                 .toException();
         }
         Date lastModified = new Date(modified);
@@ -443,7 +450,7 @@ public class MCRRestObjects {
         throws IOException {
         long modified = MCRXMLMetadataManager.getInstance().getLastModified(id);
         if (modified < 0) {
-            throw new NotFoundException(buildNotFoundMessage(id));
+            throw new NotFoundException("MCRObject " + id + " not found");
         }
         Date lastModified = new Date(modified);
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lastModified);
@@ -564,7 +571,7 @@ public class MCRRestObjects {
         if (modified < 0) {
             throw MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND)
-                .withMessage(buildNotFoundMessage(id))
+                .withMessage("MCRObject " + id + " not found")
                 .toException();
         }
         Date lastModified = new Date(modified);
@@ -747,12 +754,7 @@ public class MCRRestObjects {
     @MCRRequireTransaction
     public Response deleteObject(@PathParam(PARAM_MCRID) MCRObjectID id) {
         //check preconditions
-        if (!MCRMetadataManager.exists(id)) {
-            throw MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
-                .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND)
-                .withMessage(buildNotFoundMessage(id))
-                .toException();
-        }
+        MCRRestUtils.checkExists(id);
         try {
             MCRMetadataManager.deleteMCRObject(id);
         } catch (MCRActiveLinkException e) {
@@ -818,12 +820,7 @@ public class MCRRestObjects {
     @MCRApiDraft("MCRObjectState")
     public Response setState(@PathParam(PARAM_MCRID) MCRObjectID id, String state) {
         //check preconditions
-        if (!MCRMetadataManager.exists(id)) {
-            throw MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
-                .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND)
-                .withMessage(buildNotFoundMessage(id))
-                .toException();
-        }
+        MCRRestUtils.checkExists(id);
         if (!state.isEmpty()) {
             MCRCategoryID categState = new MCRCategoryID(
                 MCRConfiguration2.getString("MCR.Metadata.Service.State.Classification.ID").orElse("state"), state);
@@ -866,12 +863,7 @@ public class MCRRestObjects {
     @MCRApiDraft("MCRObjectState")
     public Response getState(@PathParam(PARAM_MCRID) MCRObjectID id) {
         //check preconditions
-        if (!MCRMetadataManager.exists(id)) {
-            throw MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
-                .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND)
-                .withMessage(buildNotFoundMessage(id))
-                .toException();
-        }
+        MCRRestUtils.checkExists(id);
         final MCRCategoryID state = MCRMetadataManager.retrieveMCRObject(id).getService().getState();
         if (state == null) {
             return Response.noContent().build();
@@ -881,8 +873,78 @@ public class MCRRestObjects {
             .build();
     }
 
-    private static String buildNotFoundMessage(MCRObjectID id) {
-        return "MCRObject " + id + " not found";
+    @GET
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    @Path("/{" + PARAM_MCRID + "}/lock")
+    @Operation(
+        summary = "Returns lock information about an object {" + PARAM_MCRID + "}.",
+        tags = MCRRestUtils.TAG_MYCORE_OBJECT,
+        responses = {
+            @ApiResponse(responseCode = NOT_FOUND, description = "object is not found"),
+            @ApiResponse(
+                description = "Lock information about an object",
+                content = @Content(
+                    schema = @Schema(implementation = MCRObjectLock.class)))
+        })
+    public MCRObjectLock getLock(@PathParam(PARAM_MCRID) MCRObjectID id) {
+        return lockService.getLock(id);
+    }
+
+    @POST
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    @Path("/{" + PARAM_MCRID + "}/lock")
+    @Operation(summary = "Lock object {" + PARAM_MCRID + "}.",
+        tags = MCRRestUtils.TAG_MYCORE_OBJECT,
+        requestBody = @RequestBody(content = @Content(schema = @Schema(implementation = MCRObjectLock.class))),
+        responses = {
+            @ApiResponse(responseCode = NOT_FOUND, description = "object is not found"),
+            @ApiResponse(responseCode = CONFLICT, description = "object is already locked"),
+            @ApiResponse(
+                description = "Lock information about an object",
+                content = @Content(
+                    schema = @Schema(implementation = MCRObjectLock.class)))
+        })
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
+    public MCRObjectLock setLock(@PathParam(PARAM_MCRID) MCRObjectID id, MCRObjectLock requestBody) {
+        return lockService.setLock(id, requestBody);
+    }
+
+    @PATCH
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    @Path("/{" + PARAM_MCRID + "}/lock")
+    @Operation(summary = "Update lock on object {" + PARAM_MCRID + "}.",
+        tags = MCRRestUtils.TAG_MYCORE_OBJECT,
+        requestBody = @RequestBody(content = @Content(schema = @Schema(implementation = MCRObjectLock.class))),
+        responses = {
+            @ApiResponse(responseCode = NOT_FOUND, description = "object is not found"),
+            @ApiResponse(responseCode = CONFLICT, description = "object lock is from another user"),
+            @ApiResponse(
+                description = "Lock information about an object",
+                content = @Content(
+                    schema = @Schema(implementation = MCRObjectLock.class)))
+        })
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
+    public MCRObjectLock updateLock(@PathParam(PARAM_MCRID) MCRObjectID id, MCRObjectLock requestBody) {
+        return lockService.updateLock(id, requestBody);
+    }
+
+    @DELETE
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    @Path("/{" + PARAM_MCRID + "}/lock")
+    @Operation(summary = "Unlock object {" + PARAM_MCRID + "}.",
+        tags = MCRRestUtils.TAG_MYCORE_OBJECT,
+        responses = {
+            @ApiResponse(responseCode = NOT_FOUND, description = "object or lock is not found"),
+            @ApiResponse(responseCode = CONFLICT,
+                description = "object is already unlocked or is locked by another user"),
+            @ApiResponse(
+                description = "Lock information about an object",
+                content = @Content(
+                    schema = @Schema(implementation = MCRObjectLock.class)))
+        })
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
+    public MCRObjectLock deleteLock(@PathParam(PARAM_MCRID) MCRObjectID id) {
+        return lockService.deleteLock(id);
     }
 
 }
