@@ -105,7 +105,7 @@ public class MCRRestObjectLockService {
         String lockId = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
         checkLockIdsAreEqual(lockId, lock.getId());
         // update the lock object
-        return MCRObjectIDLockTable.updateLock(id, requestBody.getTimeout());
+        return MCRObjectIDLockTable.updateLock(id, requestBody != null ? requestBody.getTimeout() : null);
     }
 
     /**
