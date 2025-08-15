@@ -1,3 +1,20 @@
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See https://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.mycore.mods.classification;
 
 import static junit.framework.TestCase.assertNotNull;
@@ -13,8 +30,9 @@ import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.mods.MCRMODSGeneratedClassificationNormalizer;
+import org.mycore.mods.MCRMODSClassificationMappingNormalizer;
 import org.mycore.mods.MCRMODSWrapper;
+import org.mycore.mods.classification.mapping.MCRMODSGeneratorClassificationMapper;
 
 public class MCRMODSGeneratedClassificationNormalizerTest extends MCRJPATestCase {
 
@@ -37,18 +55,18 @@ public class MCRMODSGeneratedClassificationNormalizerTest extends MCRJPATestCase
         assertEquals("Initial number of classifications should be 5", 5, initialClassifications.size());
         List<Element> initialGenerated = modsWrapper
             .getElements("mods:classification[contains(@generator, '"
-                + MCRMODSClassificationMapper.GENERATOR_SUFFIX + "')]");
+                + MCRMODSGeneratorClassificationMapper.GENERATOR_SUFFIX + "')]");
         assertEquals("Initial number of generated classifications should be 4", 4, initialGenerated.size());
 
-        MCRMODSGeneratedClassificationNormalizer normalizer = new MCRMODSGeneratedClassificationNormalizer();
+        MCRMODSClassificationMappingNormalizer normalizer = new MCRMODSClassificationMappingNormalizer();
 
         normalizer.normalize(mcrObject);
 
         List<Element> remainingGenerated = modsWrapper
             .getElements("mods:classification[contains(@generator, '"
-                + MCRMODSClassificationMapper.GENERATOR_SUFFIX + "')]");
+                + MCRMODSGeneratorClassificationMapper.GENERATOR_SUFFIX + "')]");
         assertTrue(
-            "Classifications with generator suffix '" + MCRMODSClassificationMapper.GENERATOR_SUFFIX
+            "Classifications with generator suffix '" + MCRMODSGeneratorClassificationMapper.GENERATOR_SUFFIX
                 + "' should be removed",
             remainingGenerated.isEmpty());
 

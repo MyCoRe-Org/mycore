@@ -23,7 +23,7 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.migration.strategy.MCRAlwaysAddChildrenOrderStrategy;
-import org.mycore.mods.classification.MCRMODSClassificationMapper;
+import org.mycore.mods.classification.mapping.MCRMODSGeneratorClassificationMapper;
 
 public class MCRMigrationCommandsTest extends MCRStoreTestCase {
 
@@ -70,7 +70,7 @@ public class MCRMigrationCommandsTest extends MCRStoreTestCase {
     private static void checkNoGeneratedClassifications(Document migratedObject1) {
         List<Element> list = XPathFactory.instance()
             .compile(".//mods:classification[contains(@generator, '"
-                + MCRMODSClassificationMapper.GENERATOR_SUFFIX +
+                + MCRMODSGeneratorClassificationMapper.GENERATOR_SUFFIX +
                 "')]", Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE)
             .evaluate(migratedObject1);
         Assert.assertEquals("There should be no generated classifications anymore!", 0, list.size());

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mycoreclass xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="MCRClassification.xsd" ID="mir_genres">
+  <label xml:lang="en" text="genre" description="A list of publication types" />
+  <label xml:lang="x-uri" text="http://www.mycore.org/classifications/mir_genres" />
+  <label xml:lang="de" text="Genre" description="Liste der Publikationsarten" />
+  <categories>
+    <category ID="article" counter="1">
+      <label xml:lang="en" text="Article / Chapter" />
+      <label xml:lang="x-mapping" text="diniPublType:article" />
+      <label xml:lang="de" text="Artikel / Aufsatz" />
+      <label xml:lang="x-hosts" text="journal newspaper collection festschrift proceedings standalone" />
+    </category>
+    <category ID="thesis" counter="2">
+      <label xml:lang="en" text="Thesis" />
+      <label xml:lang="de" text="Hochschulschriften" />
+      <label xml:lang="x-hosts" text="series standalone" />
+      <label xml:lang="x-editor" text="false" />
+      <category ID="bachelor_thesis" counter="2">
+        <label xml:lang="x-mapping" text="diniPublType:StudyThesis" />
+        <label xml:lang="de" text="Abschlussarbeit (Bachelor)" />
+        <label xml:lang="en" text="Bachelor thesis" />
+        <label xml:lang="x-hosts" text="series standalone" />
+      </category>
+    </category>
+  </categories>
+</mycoreclass>
