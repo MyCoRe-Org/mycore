@@ -35,7 +35,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 
 /**
  * {@link MCRXMappingClassificationGeneratorBase} is a base implementation for data model specific
- * implementations of {@link Generator} that that looks for mapping information in all
+ * implementations of {@link Generator} that looks for mapping information in all
  * classification values already present in the data model representation of a MyCoRe object.
  * <p>
  * For each classification value, if the corresponding classification category contains a <code>x-mapping</code>
