@@ -37,7 +37,7 @@ import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
-import org.mycore.datamodel.classifications2.mapping.MCRXMappingClassificationGeneratorBase;
+import org.mycore.datamodel.classifications2.mapping.MCRXMappingClassificationGeneratorBase.OnMissingMappedCategory;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
@@ -74,9 +74,11 @@ class MCRMODSGeneratorClassificationMapperTest {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 1);
 
-        MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(Map.of(
-            "xMapping", new MCRMODSXMappingClassificationGenerator(
-                MCRXMappingClassificationGeneratorBase.OnMissingMappedCategory.IGNORE)));
+        MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(
+            Map.of(
+                "xMapping",
+                new MCRMODSXMappingClassificationGenerator(
+                    OnMissingMappedCategory.IGNORE)));
         mapper.createMappings(mcro);
 
         String expression =
@@ -121,8 +123,12 @@ class MCRMODSGeneratorClassificationMapperTest {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 2);
 
-        MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(Map.of(
-            "xPath", new MCRMODSXPathClassificationGenerator("orcidWorkType", "dummyClassification")));
+        MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(
+            Map.of(
+                "xPath",
+                new MCRMODSXPathClassificationGenerator(
+                    "orcidWorkType",
+                    "dummyClassification")));
         mapper.createMappings(mcro);
 
         Document xml = mcro.createXML();
@@ -177,8 +183,12 @@ class MCRMODSGeneratorClassificationMapperTest {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 3);
 
-        MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(Map.of(
-            "xPath", new MCRMODSXPathClassificationGenerator("orcidWorkType", "dummyClassification")));
+        MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(
+            Map.of(
+                "xPath",
+                new MCRMODSXPathClassificationGenerator(
+                    "orcidWorkType",
+                    "dummyClassification")));
         mapper.createMappings(mcro);
 
         Document xml = mcro.createXML();
@@ -235,8 +245,11 @@ class MCRMODSGeneratorClassificationMapperTest {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 4);
 
-        MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(Map.of(
-            "xPath", new MCRMODSXPathClassificationGenerator("placeholderClassification")));
+        MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(
+            Map.of(
+                "xPath",
+                new MCRMODSXPathClassificationGenerator(
+                    "placeholderClassification")));
         mapper.createMappings(mcro);
 
         Document xml = mcro.createXML();
@@ -330,8 +343,11 @@ class MCRMODSGeneratorClassificationMapperTest {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 8);
 
-        MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(Map.of(
-            "xPath", new MCRMODSXPathClassificationGenerator("placeholderOrCondition")));
+        MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(
+            Map.of(
+                "xPath",
+                new MCRMODSXPathClassificationGenerator(
+                    "placeholderOrCondition")));
         mapper.createMappings(mcro);
 
         Document xml = mcro.createXML();
@@ -365,8 +381,11 @@ class MCRMODSGeneratorClassificationMapperTest {
         mw.setMODS(document1.getRootElement().detach());
         mw.setID("junit", 9);
 
-        MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(Map.of(
-            "xPath", new MCRMODSXPathClassificationGenerator("placeholderOrCondition")));
+        MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(
+            Map.of(
+                "xPath",
+                new MCRMODSXPathClassificationGenerator(
+                    "placeholderOrCondition")));
         mapper.createMappings(mcro);
 
         Document xml = mcro.createXML();

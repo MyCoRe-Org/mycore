@@ -34,7 +34,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 /**
  * {@link MCRGeneratorClassificationMapperBase} is a base implementation for data model specific
  * implementations of {@link MCRClassificationMapper} that uses multiple {@link Generator}
- * instances that each implement a strategy to obtain classifications based on the information
+ * instances that each implement a strategy to obtain category IDs based on the information
  * present in a data model representation of the MyCoRe object.
  */
 public abstract class MCRGeneratorClassificationMapperBase implements MCRClassificationMapper {

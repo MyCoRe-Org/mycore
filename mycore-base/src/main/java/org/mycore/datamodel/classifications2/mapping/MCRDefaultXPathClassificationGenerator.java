@@ -34,12 +34,13 @@ import org.mycore.datamodel.metadata.MCRObject;
 /**
  * A {@link MCRDefaultXMappingClassificationGenerator} is a {@link Generator} that looks for mapping information
  * for a given list of classifications, by checking if XPaths configured for categories of such classifications
- * match the default metadata document.
+ * matches against the XML version of the default metadata document.
  * <p>
- * For each classification, the set of classification categories containing a <code>x-mapping-xpath</code> label is
- * obtained. For all such classification categories, the corresponding XPath is evaluated and if the default metadata
- * document matches, the classification category is provided. If no classification is provided for a given
- * classification, the same procedure is performed for the <code>x-mapping-xpathfb</code> labes as a fallback.
+ * For each classification, the set of categories containing a <code>x-mapping-xpath</code>-label is
+ * obtained. For all such categories, the corresponding XPath is evaluated and if it matches against the
+ * XML version of the default metadata document, the category ID is provided.
+ * If, for a given classification, no category ID is provided with this procedure,
+ * the same procedure is performed again, but based on the <code>x-mapping-xpathfb</code>-label, if present.
  * </p>
  * Example form <code>foo_bar</code>:
  * <pre><code>

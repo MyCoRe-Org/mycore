@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.mycore.datamodel.classifications2.mapping;
 
 import java.io.IOException;
@@ -147,8 +146,11 @@ class MCRDefaultGeneratorClassificationMapperTest {
         MCRObject mcro = new MCRObject(document);
 
         MCRDefaultGeneratorClassificationMapper mapper = new MCRDefaultGeneratorClassificationMapper(
-            Map.of("xPath", new MCRDefaultXPathClassificationGenerator("orcidWorkType", "dummyClassification")));
-        mapper.clearMappings(mcro);
+            Map.of(
+                "xPath",
+                new MCRDefaultXPathClassificationGenerator(
+                    "orcidWorkType",
+                    "dummyClassification")));
         mapper.createMappings(mcro);
         Document xml = mcro.createXML();
 
@@ -185,7 +187,10 @@ class MCRDefaultGeneratorClassificationMapperTest {
         MCRObject mcro = new MCRObject(document);
 
         MCRDefaultGeneratorClassificationMapper mapper = new MCRDefaultGeneratorClassificationMapper(
-            Map.of("xPath", new MCRDefaultXPathClassificationGenerator("dummyClassification")));
+            Map.of(
+                "xPath",
+                new MCRDefaultXPathClassificationGenerator(
+                    "dummyClassification")));
         mapper.createMappings(mcro);
         Document xml = mcro.createXML();
 

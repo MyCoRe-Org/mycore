@@ -32,10 +32,10 @@ import org.mycore.datamodel.metadata.MCRObject;
 
 /**
  * A {@link MCRDefaultGeneratorClassificationMapper} maps classifications in default metadata documents.
- * To do so, it uses {@link Generator} instances that each implement a strategy to obtain classifications
+ * To do so, it uses {@link Generator} instances that each implement a strategy to obtain category IDs
  * based on the information present in the default metadata document.
  * <p>
- * Obtained classification values are added to the default metadata document as a <code>mappings</code>
+ * Obtained category IDs are added to the default metadata document as a <code>mappings</code>
  * element containing <code>mapping</code> elements with <code>categid</code> and <code>classid</code>
  * attributes corresponding to that value.
  * <p>
@@ -49,11 +49,11 @@ import org.mycore.datamodel.metadata.MCRObject;
  * Example:
  * <pre><code>
  * [...].Class=org.mycore.datamodel.classifications2.mapping.MCRDefaultClassificationMapper
- * [...].Generators.foo.Class=foo.bar.FooClassificationGenerator
+ * [...].Generators.foo.Class=foo.bar.FooGenerator
  * [...].Generators.foo.Enabled=true
  * [...].Generators.foo.Key1=Value1
  * [...].Generators.foo.Key2=Value2
- * [...].Generators.bar.Class=foo.bar.BarClassificationGenerator
+ * [...].Generators.bar.Class=foo.bar.BarGenerator
  * [...].Generators.bar.Enabled=false
  * [...].Generators.bar.Key1=Value1
  * [...].Generators.bar.Key2=Value2
