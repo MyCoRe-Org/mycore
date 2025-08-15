@@ -37,7 +37,7 @@ import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
-import org.mycore.datamodel.classifications2.mapping.MCRXMappingClassificationGeneratorBase;
+import org.mycore.datamodel.classifications2.mapping.MCRXMappingClassificationGeneratorBase.OnMissingMappedCategory;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
@@ -78,8 +78,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
             Map.of(
                 "xMapping",
                 new MCRMODSXMappingClassificationGenerator(
-                    MCRXMappingClassificationGeneratorBase.OnMissingMappedCategory.IGNORE)));
-
+                    OnMissingMappedCategory.IGNORE)));
         mapper.createMappings(mcro);
         Document xml = mcro.createXML();
 
@@ -107,7 +106,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
      * @throws URISyntaxException in case of error
      */
     @Test
-    void testXPathMapping() throws IOException, JDOMException, URISyntaxException {
+    public void testXPathMapping() throws IOException, JDOMException, URISyntaxException {
         MCRSessionMgr.getCurrentSession();
         MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();
@@ -130,7 +129,6 @@ public class MCRMODSGeneratorClassificationMapperTest {
                 new MCRMODSXPathClassificationGenerator(
                     "orcidWorkType",
                     "dummyClassification")));
-
         mapper.createMappings(mcro);
         Document xml = mcro.createXML();
 
@@ -167,7 +165,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
      * @throws URISyntaxException in case of error
      */
     @Test
-    void testXPathMappingFallback() throws IOException, JDOMException, URISyntaxException {
+    public void testXPathMappingFallback() throws IOException, JDOMException, URISyntaxException {
         MCRSessionMgr.getCurrentSession();
         MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();
@@ -190,7 +188,6 @@ public class MCRMODSGeneratorClassificationMapperTest {
                 new MCRMODSXPathClassificationGenerator(
                     "orcidWorkType",
                     "dummyClassification")));
-
         mapper.createMappings(mcro);
         Document xml = mcro.createXML();
 
@@ -230,7 +227,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
      * </ol>
      */
     @Test
-    void testXPathMappingPlaceholders() throws URISyntaxException, IOException, JDOMException {
+    public void testXPathMappingPlaceholders() throws URISyntaxException, IOException, JDOMException {
         MCRSessionMgr.getCurrentSession();
         MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();
@@ -251,7 +248,6 @@ public class MCRMODSGeneratorClassificationMapperTest {
                 "xPath",
                 new MCRMODSXPathClassificationGenerator(
                     "placeholderClassification")));
-
         mapper.createMappings(mcro);
         Document xml = mcro.createXML();
 
@@ -329,7 +325,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
      * Tests if placeholder patterns containing OR-conditions are properly evaluated.
      */
     @Test
-    void testXPathMappingPlaceholdersOROperator() throws URISyntaxException, IOException, JDOMException {
+    public void testXPathMappingPlaceholdersOROperator() throws URISyntaxException, IOException, JDOMException {
         MCRSessionMgr.getCurrentSession();
         MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();
@@ -349,7 +345,6 @@ public class MCRMODSGeneratorClassificationMapperTest {
                 "xPath",
                 new MCRMODSXPathClassificationGenerator(
                     "placeholderOrCondition")));
-
         mapper.createMappings(mcro);
         Document xml = mcro.createXML();
 
@@ -367,7 +362,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
      * Tests if placeholder patterns containing OR-conditions are properly evaluated in the fallback mechanism.
      */
     @Test
-    void testXPathMappingFallbackAndORCondition() throws IOException, JDOMException, URISyntaxException {
+    public void testXPathMappingFallbackAndORCondition() throws IOException, JDOMException, URISyntaxException {
         MCRSessionMgr.getCurrentSession();
         MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();
@@ -387,7 +382,6 @@ public class MCRMODSGeneratorClassificationMapperTest {
                 "xPath",
                 new MCRMODSXPathClassificationGenerator(
                     "placeholderOrCondition")));
-
         mapper.createMappings(mcro);
         Document xml = mcro.createXML();
 

@@ -1064,7 +1064,7 @@ class MCRConfigurableInstanceHelper {
                 if (configurationValue != null) {
                     sentinelValue = Boolean.parseBoolean(configurationValue);
                 }
-                if (!sentinelValue) {
+                if (sentinelValue == sentinel.rejectionValue()) {
                     nestedConfiguration = MCRInstanceConfiguration.ofName("", Collections.emptyMap());
                 }
             }
@@ -1141,7 +1141,7 @@ class MCRConfigurableInstanceHelper {
                     if (configurationValue != null) {
                         sentinelValue = Boolean.parseBoolean(configurationValue);
                     }
-                    if (!sentinelValue) {
+                    if (sentinelValue == sentinel.rejectionValue()) {
                         nestedConfigurationMap.remove(key);
                     }
                 }
@@ -1237,7 +1237,7 @@ class MCRConfigurableInstanceHelper {
                     if (configurationValue != null) {
                         sentinelValue = Boolean.parseBoolean(configurationValue);
                     }
-                    if (!sentinelValue) {
+                    if (sentinelValue == sentinel.rejectionValue()) {
                         nestedConfigurationList.remove(i);
                     }
                 }
