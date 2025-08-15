@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -40,19 +41,26 @@ import org.mycore.datamodel.metadata.MCRObject;
  * <p>
  * For each category ID in the data model representation, if the corresponding category
  * has a <code>x-mapping</code>-label, the content of that label is used
- * as a space separated list of category IDs.
+ * to obtain additional category IDs using an {@link Evaluator}.
  */
 public abstract class MCRXMappingClassificationGeneratorBase implements Generator {
 
     protected final Logger logger = LogManager.getLogger(getClass());
 
+    public static final String EVALUATOR_KEY = "Evaluator";
+
     public static final String ON_MISSING_MAPPED_CATEGORY_KEY = "OnMissingMappedCategory";
 
     public static final String LABEL_LANG_X_MAPPING = "x-mapping";
 
+    private final Evaluator evaluator;
+
     private final OnMissingMappedCategory onMissingMappedCategory;
 
-    public MCRXMappingClassificationGeneratorBase(OnMissingMappedCategory onMissingMappedCategory) {
+    public MCRXMappingClassificationGeneratorBase(Evaluator evaluator,
+        OnMissingMappedCategory onMissingMappedCategory) {
+        this.evaluator = Objects.requireNonNull(evaluator,
+            "Evaluator must not be null");
         this.onMissingMappedCategory = Objects.requireNonNull(onMissingMappedCategory,
             "On-Missing-Mapped-Category must not be null");
     }
@@ -61,7 +69,7 @@ public abstract class MCRXMappingClassificationGeneratorBase implements Generato
     public final List<MCRGeneratorClassificationMapperBase.Mapping> generate(MCRCategoryDAO dao, MCRObject object) {
         return getCategories(dao, object)
             .filter(Objects::nonNull)
-            .map(category -> findMappings(dao, category))
+            .map(category -> findMappings(dao, object, category))
             .flatMap(Collection::stream)
             .distinct()
             .peek(mapping -> mapping.logInfo(logger))
@@ -71,11 +79,11 @@ public abstract class MCRXMappingClassificationGeneratorBase implements Generato
 
     protected abstract Stream<MCRCategory> getCategories(MCRCategoryDAO dao, MCRObject object);
 
-    private List<XMapping> findMappings(MCRCategoryDAO dao, MCRCategory sourceCategory) {
+    private List<XMapping> findMappings(MCRCategoryDAO dao, MCRObject object, MCRCategory sourceCategory) {
         MCRCategoryID sourceCategoryId = sourceCategory.getId();
         return sourceCategory.getLabel(LABEL_LANG_X_MAPPING)
-            .map(label -> Stream.of(label.getText().split("\\s"))
-                .map(MCRCategoryID::ofString)
+            .map(label -> evaluator.getCategoryIds(label.getText(), object)
+                .stream()
                 .filter(categoryId -> !categoryId.isRootID())
                 .filter(categoryId -> dao.exist(categoryId) || handleMissingCategory(categoryId, sourceCategoryId))
                 .map(targetCategoryId -> new XMapping(sourceCategoryId, targetCategoryId))
@@ -85,12 +93,18 @@ public abstract class MCRXMappingClassificationGeneratorBase implements Generato
 
     private boolean handleMissingCategory(MCRCategoryID categoryID, MCRCategoryID sourceCategoryId) {
         if (onMissingMappedCategory == OnMissingMappedCategory.THROW_EXCEPTION) {
-            throw new MCRException("Mapped missing classification value " + categoryID + " for " + sourceCategoryId);
+            throw new MCRException("Mapped category ID " + categoryID + " for " + sourceCategoryId + " is missing");
         }
         if (onMissingMappedCategory.warnAboutMissingCategory && logger.isWarnEnabled()) {
-            logger.warn("Mapped missing classification value {} for {}", categoryID, sourceCategoryId);
+            logger.warn("Mapped category ID {} for {} is missing", categoryID, sourceCategoryId);
         }
         return onMissingMappedCategory.addMissingCategory;
+    }
+
+    public interface Evaluator {
+
+        Set<MCRCategoryID> getCategoryIds(String mapping, MCRObject object);
+
     }
 
     public enum OnMissingMappedCategory {
