@@ -33,12 +33,12 @@ import org.mycore.mods.classification.MCRClassMapper;
 
 /**
  * A {@link MCRMODSGeneratorClassificationMapper} maps classifications in MODS documents.
- * To do so, it uses {@link Generator} instances that each implement a strategy to obtain classifications
+ * To do so, it uses {@link Generator} instances that each implement a strategy to obtain category IDs
  * based on the information present in the MODS document.
  * <p>
- * Obtained classification values are added to the MODS document as <code>classification</code> elements
- * with <code>authorityURI</code> and <code>valueURI</code> attributes corresponding to that value and a
- * descriptive <code>generator</code> attribute whose name is returned alongside the classification value
+ * Obtained category IDs are added to the MODS document as <code>classification</code> elements
+ * with <code>authorityURI</code> and <code>valueURI</code> attributes corresponding to that category ID and a
+ * descriptive <code>generator</code> attribute whose name is returned alongside the category ID
  * (and expanded by suffix <code>-mycore</code>) by  {@link Generator#generate(MCRCategoryDAO, MCRObject)}.
  * <p>
  * The following configuration options are available:
@@ -51,11 +51,11 @@ import org.mycore.mods.classification.MCRClassMapper;
  * Example:
  * <pre><code>
  * [...].Class=org.mycore.mods.classification.MCRMODSClassificationMapper
- * [...].Generators.foo.Class=foo.bar.FooClassificationGenerator
+ * [...].Generators.foo.Class=foo.bar.FooGenerator
  * [...].Generators.foo.Enabled=true
  * [...].Generators.foo.Key1=Value1
  * [...].Generators.foo.Key2=Value2
- * [...].Generators.bar.Class=foo.bar.BarClassificationGenerator
+ * [...].Generators.bar.Class=foo.bar.BarGenerator
  * [...].Generators.bar.Enabled=false
  * [...].Generators.bar.Key1=Value1
  * [...].Generators.bar.Key2=Value2

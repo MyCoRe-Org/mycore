@@ -35,11 +35,12 @@ import org.mycore.datamodel.metadata.MCRObject;
 
 /**
  * {@link MCRXMappingClassificationGeneratorBase} is a base implementation for data model specific
- * implementations of {@link Generator} that that looks for mapping information in all
- * classification values already present in the data model representation of a MyCoRe object.
+ * implementations of {@link Generator} that looks for mapping information in all
+ * categories already present in the data model representation of a MyCoRe object.
  * <p>
- * For each classification value, if the corresponding classification category contains a <code>x-mapping</code>
- * label, the content of that label is used as a space separated list of classification category IDs.
+ * For each category ID in the data model representation, if the corresponding category
+ * has a <code>x-mapping</code>-label, the content of that label is used
+ * as a space separated list of category IDs.
  */
 public abstract class MCRXMappingClassificationGeneratorBase implements Generator {
 

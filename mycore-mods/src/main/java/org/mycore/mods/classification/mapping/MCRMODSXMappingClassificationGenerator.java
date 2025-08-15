@@ -30,11 +30,12 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 
 /**
- * A {@link MCRMODSXMappingClassificationGenerator} is a {@link Generator} that looks for mapping information
- * in all classification values already present in the MODS document.
+ * A {@link MCRMODSXMappingClassificationGenerator} is a {@link Generator} that looks for
+ * mapping information in all categories already present in the MODS document.
  * <p>
- * For each classification value, if the corresponding classification category contains a <code>x-mapping</code>
- * label, the content of that label is used as a space separated list of classification category IDs.
+ * For each category ID in MODS document, if the corresponding category
+ * has a <code>x-mapping</code>-label, the content of that label is used
+ * as a space separated list of category IDs.
  * </p>
  * Example form <code>foo_bar</code>:
  * <pre><code>

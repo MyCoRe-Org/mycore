@@ -1,4 +1,3 @@
-
 /*
  * This file is part of ***  M y C o R e  ***
  * See https://www.mycore.de/ for details.
@@ -35,7 +34,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 /**
  * {@link MCRGeneratorClassificationMapperBase} is a base implementation for data model specific
  * implementations of {@link MCRClassificationMapper} that uses multiple {@link Generator}
- * instances that each implement a strategy to obtain classifications based on the information
+ * instances that each implement a strategy to obtain category IDs based on the information
  * present in a data model representation of the MyCoRe object.
  */
 public abstract class MCRGeneratorClassificationMapperBase implements MCRClassificationMapper {

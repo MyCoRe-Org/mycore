@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.mycore.mods.classification;
 
 import java.io.IOException;
@@ -75,16 +74,19 @@ class MCRMODSGeneratorClassificationMapperTest {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 1);
 
-        MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(Map.of(
-            "xMapping", new MCRMODSXMappingClassificationGenerator(
-                MCRXMappingClassificationGeneratorBase.OnMissingMappedCategory.IGNORE)));
+        MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(
+            Map.of(
+                "xMapping",
+                new MCRMODSXMappingClassificationGenerator(
+                    MCRXMappingClassificationGeneratorBase.OnMissingMappedCategory.IGNORE)));
+
         mapper.createMappings(mcro);
+        Document xml = mcro.createXML();
 
         String expression =
             "//mods:classification[contains(@generator,'-mycore') and contains(@valueURI, 'StudyThesis')]";
         XPathExpression<Element> expressionObject = XPathFactory.instance()
             .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
-        Document xml = mcro.createXML();
         Assertions.assertNotNull(expressionObject.evaluateFirst(
             xml), "The mapped classification should be in the MyCoReObject now!");
 
@@ -122,10 +124,14 @@ class MCRMODSGeneratorClassificationMapperTest {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 2);
 
-        MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(Map.of(
-            "xPath", new MCRMODSXPathClassificationGenerator("orcidWorkType", "dummyClassification")));
-        mapper.createMappings(mcro);
+        MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(
+            Map.of(
+                "xPath",
+                new MCRMODSXPathClassificationGenerator(
+                    "orcidWorkType",
+                    "dummyClassification")));
 
+        mapper.createMappings(mcro);
         Document xml = mcro.createXML();
 
         String expression = "//mods:classification[contains(@generator,'-mycore') and "
@@ -178,10 +184,14 @@ class MCRMODSGeneratorClassificationMapperTest {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 3);
 
-        MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(Map.of(
-            "xPath", new MCRMODSXPathClassificationGenerator("orcidWorkType", "dummyClassification")));
-        mapper.createMappings(mcro);
+        MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(
+            Map.of(
+                "xPath",
+                new MCRMODSXPathClassificationGenerator(
+                    "orcidWorkType",
+                    "dummyClassification")));
 
+        mapper.createMappings(mcro);
         Document xml = mcro.createXML();
 
         String expression = "//mods:classification[contains(@generator,'-mycore') and "
@@ -236,10 +246,13 @@ class MCRMODSGeneratorClassificationMapperTest {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 4);
 
-        MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(Map.of(
-            "xPath", new MCRMODSXPathClassificationGenerator("placeholderClassification")));
-        mapper.createMappings(mcro);
+        MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(
+            Map.of(
+                "xPath",
+                new MCRMODSXPathClassificationGenerator(
+                    "placeholderClassification")));
 
+        mapper.createMappings(mcro);
         Document xml = mcro.createXML();
 
         String expression = "//mods:classification[contains(@generator,'-mycore') and "
@@ -331,10 +344,13 @@ class MCRMODSGeneratorClassificationMapperTest {
         mw.setMODS(document.getRootElement().detach());
         mw.setID("junit", 8);
 
-        MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(Map.of(
-            "xPath", new MCRMODSXPathClassificationGenerator("placeholderOrCondition")));
-        mapper.createMappings(mcro);
+        MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(
+            Map.of(
+                "xPath",
+                new MCRMODSXPathClassificationGenerator(
+                    "placeholderOrCondition")));
 
+        mapper.createMappings(mcro);
         Document xml = mcro.createXML();
 
         String expression = "//mods:classification[contains(@generator,'-mycore') and "
@@ -366,10 +382,13 @@ class MCRMODSGeneratorClassificationMapperTest {
         mw.setMODS(document1.getRootElement().detach());
         mw.setID("junit", 9);
 
-        MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(Map.of(
-            "xPath", new MCRMODSXPathClassificationGenerator("placeholderOrCondition")));
-        mapper.createMappings(mcro);
+        MCRMODSGeneratorClassificationMapper mapper = new MCRMODSGeneratorClassificationMapper(
+            Map.of(
+                "xPath",
+                new MCRMODSXPathClassificationGenerator(
+                    "placeholderOrCondition")));
 
+        mapper.createMappings(mcro);
         Document xml = mcro.createXML();
 
         String expression = "//mods:classification[contains(@generator,'-mycore') and "

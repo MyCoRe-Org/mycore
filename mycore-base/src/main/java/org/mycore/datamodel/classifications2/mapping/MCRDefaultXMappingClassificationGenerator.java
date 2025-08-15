@@ -34,11 +34,12 @@ import org.mycore.datamodel.classifications2.mapping.MCRGeneratorClassificationM
 import org.mycore.datamodel.metadata.MCRObject;
 
 /**
- * A {@link MCRDefaultXMappingClassificationGenerator} is a {@link Generator} that looks for mapping information
- * in all classification values already present in the default metadata document.
+ * A {@link MCRDefaultXMappingClassificationGenerator} is a {@link Generator} that looks for
+ * mapping information in all categories already present in the default metadata document.
  * <p>
- * For each classification value, if the corresponding classification category contains a <code>x-mapping</code>
- * label, the content of that label is used as a space separated list of classification category IDs.
+ * For each category ID in the metadata document, if the corresponding category
+ * has a <code>x-mapping</code>-label, the content of that label is used
+ * as a space separated list of category IDs.
  * </p>
  * Example form <code>foo_bar</code>:
  * <pre><code>
@@ -53,7 +54,7 @@ import org.mycore.datamodel.metadata.MCRObject;
  * The following configuration options are available:
  * <ul>
  * <li> The property suffix {@link MCRXMappingClassificationGeneratorBase#ON_MISSING_MAPPED_CATEGORY_KEY} can be used to
- * specify the behaviour, when a mapped classification value is missing.
+ * specify the behaviour, when a mapped category ID is missing.
  * </ul>
  * Example:
  * <pre><code>
