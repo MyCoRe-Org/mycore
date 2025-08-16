@@ -15,20 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
+package org.mycore.datamodel.classifications2.mapping;
 
-package org.mycore.resource.common;
+import org.mycore.datamodel.metadata.MCRObject;
 
-import java.nio.file.Path;
-import java.util.List;
+public interface MCRClassificationMapper {
 
-import org.mycore.common.hint.MCRHints;
+    /**
+     * Creates classifications which are derived from the given object and adds them to the object.
+     * @param object the object to create the mappings for
+     */
+    void createMappings(MCRObject object);
 
-/**
- * A {@link MCRClasspathDirsProvider} implements a strategy to obtain the list of filesystem directories
- * that are part of the classpath.
- */
-public interface MCRClasspathDirsProvider {
-
-    List<Path> getClasspathDirs(MCRHints hints);
+    /**
+     * Removes all mappings from the given object.
+     * @param object the object to remove the mappings from
+     */
+    void clearMappings(MCRObject object);
 
 }

@@ -15,20 +15,23 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
+package org.mycore.datamodel.metadata.normalization;
 
-package org.mycore.resource.common;
+import org.mycore.datamodel.classifications2.mapping.MCRDefaultGeneratorClassificationMapper;
+import org.mycore.datamodel.metadata.MCRObject;
 
-import java.nio.file.Path;
-import java.util.List;
+import java.util.Collections;
 
-import org.mycore.common.hint.MCRHints;
+public class MCRDefaultClassificationMappingNormalizer extends MCRObjectNormalizer {
 
-/**
- * A {@link MCRClasspathDirsProvider} implements a strategy to obtain the list of filesystem directories
- * that are part of the classpath.
- */
-public interface MCRClasspathDirsProvider {
+    private final MCRDefaultGeneratorClassificationMapper mapper;
 
-    List<Path> getClasspathDirs(MCRHints hints);
+    public MCRDefaultClassificationMappingNormalizer() {
+        this.mapper = new MCRDefaultGeneratorClassificationMapper(Collections.emptyMap());
+    }
 
+    @Override
+    public void normalize(MCRObject mcrObject) {
+        this.mapper.clearMappings(mcrObject);
+    }
 }
