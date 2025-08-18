@@ -18,28 +18,42 @@
 
 package org.mycore.frontend.xeditor.tracker;
 
-import java.util.Iterator;
+import java.util.List;
 
-import org.jdom2.Attribute;
+import org.jdom2.Content;
+import org.jdom2.Document;
 import org.jdom2.Element;
 
-public class MCRSetElementText implements MCRChange {
+/**
+ * Sets an element's text in the edited xml, and tracks that change.  
+ * 
+ * @author Frank L\u00FCtzenkirchen
+ */
+public class MCRSetElementText extends MCRChange {
 
-    public static MCRChangeData setText(Element element, String text) {
-        Element clone = element.clone();
+    public String encodedOldContent;
 
-        for (Iterator<Attribute> attributes = clone.getAttributes().iterator(); attributes.hasNext();) {
-            attributes.next();
-            attributes.remove();
-        }
+    public MCRSetElementText(Element element, String newValue) {
+        super(element);
+        setMessage(String.format("Set %s=\"%s\"", getXPath(), newValue));
+        this.encodedOldContent = encodeContent(element);
+        element.setText(newValue);
+    }
 
-        MCRChangeData data = new MCRChangeData("set-text", clone, 0, element);
-        element.setText(text);
-        return data;
+    private String encodeContent(Element element) {
+        List<Content> content = element.cloneContent();
+        Element x = new Element("x").setContent(content);
+        return MCRElementEncoder.element2text(x);
     }
 
     @Override
-    public void undo(MCRChangeData data) {
-        data.getContext().setContent(data.getElement().cloneContent());
+    protected void undo(Document doc) {
+        Element element = (Element) (getNodeByXPath(doc));
+        element.setContent(decodeContent());
+    }
+
+    private List<Content> decodeContent() {
+        Element x = MCRElementEncoder.text2element(encodedOldContent);
+        return x.removeContent();
     }
 }

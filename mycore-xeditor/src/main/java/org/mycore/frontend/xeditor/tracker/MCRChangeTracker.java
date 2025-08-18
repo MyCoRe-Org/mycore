@@ -18,98 +18,94 @@
 
 package org.mycore.frontend.xeditor.tracker;
 
-import java.util.Iterator;
+import java.util.Stack;
 
 import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.ProcessingInstruction;
-import org.jdom2.filter.Filters;
-import org.mycore.common.MCRClassTools;
-import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration2;
 
-public class MCRChangeTracker implements Cloneable {
+/**
+ * Tracks changes to the edited xml, allowing to undo them step by step.  
+ * 
+ * @author Frank L\u00FCtzenkirchen
+ */
+public class MCRChangeTracker {
 
-    private static final String CONFIG_PREFIX = "MCR.XEditor.ChangeTracker.";
+    private Document editedXML;
 
-    public static final String PREFIX = "xed-tracker-";
+    /** A stack of performed changes **/
+    @SuppressWarnings("PMD.LooseCoupling")
+    private Stack<MCRTrackedAction> changes = new Stack<>();
 
-    private int counter;
-
-    public void track(MCRChangeData data) {
-        ProcessingInstruction pi = data.getProcessingInstruction();
-        pi.setTarget(PREFIX + (++counter) + "-" + pi.getTarget());
-        data.getContext().addContent(data.getPosition(), pi);
+    public void track(MCRTrackedAction change) {
+        this.changes.push(change);
     }
 
-    public int getChangeCounter() {
-        return counter;
+    /**
+     * Returns the number of changes tracked 
+     */
+    public int getChangeCount() {
+        return changes.size();
     }
 
-    public void undoChanges(Document doc) {
-        undoChanges(doc, 0);
+    public void setEditedXML(Document editedXML) {
+        this.editedXML = editedXML;
     }
 
-    public void undoChanges(Document doc, int stepNumber) {
-        while (counter > stepNumber) {
-            undoLastChange(doc);
+    public MCRChangeTracker copy() {
+        MCRChangeTracker copy = new MCRChangeTracker();
+        copy.editedXML = this.editedXML;
+        copy.changes = (Stack<MCRTrackedAction>) this.changes.clone();
+        return copy;
+    }
+
+    /**
+     * Undo all changes tracked so far
+     */
+    public void undoChanges() {
+        while (!changes.isEmpty()) {
+            undoLastChange();
         }
     }
 
-    public String undoLastBreakpoint(Document doc) {
-        while (counter > 0) {
-            MCRChangeData change = undoLastChange(doc);
-            if ("breakpoint".equals(change.getType())) {
-                return change.getText();
+    /**
+     * Undo all changes back to a given change count.
+     * This allows traveling back in time of the XML's change history.
+     * 
+     * @param stepNumber the number of the change that should be gone back to
+     */
+    public void undoChanges(int stepNumber) {
+        while (getChangeCount() > stepNumber) {
+            undoLastChange();
+        }
+    }
+
+    /**
+     * Undo all changes back to before the last breakpoint 
+     */
+    public String undoLastBreakpoint() {
+        while (getChangeCount() > 0) {
+            MCRTrackedAction change = undoLastChange();
+            if (change instanceof MCRBreakpoint) {
+                return change.getMessage();
             }
         }
         return null;
     }
 
-    public MCRChangeData undoLastChange(Document doc) {
-        MCRChangeData data = findLastChange(doc);
-        data.getProcessingInstruction().detach();
-        counter--;
-
-        String property = CONFIG_PREFIX + data.getType() + ".Class";
-        MCRChange change = MCRConfiguration2.getSingleInstanceOfOrThrow(MCRChange.class, property);
-        change.undo(data);
-        return data;
-    }
-
-    public MCRChangeData findLastChange(Document doc) {
-        String typePrefix = PREFIX + counter + "-";
-        for (ProcessingInstruction instruction : doc.getDescendants(Filters.processinginstruction())) {
-            String target = instruction.getTarget();
-
-            if (target.startsWith(typePrefix)) {
-                return new MCRChangeData(instruction, typePrefix);
-            }
+    /**
+     * Undo the last change
+     */
+    public MCRTrackedAction undoLastChange() {
+        MCRTrackedAction ta = changes.pop();
+        if (ta instanceof MCRChange change) {
+            change.undo(editedXML);
         }
-        throw new MCRException("Lost processing instruction for undo, not found: " + typePrefix);
+        return ta;
     }
 
-    public static Document removeChangeTracking(Document doc) {
-        Document clone = doc.clone();
-        removeChangeTracking(clone.getRootElement());
-        return clone;
-    }
-
-    public static void removeChangeTracking(Element element) {
-        for (Iterator<ProcessingInstruction> iter = element.getDescendants(Filters.processinginstruction())
-            .iterator(); iter.hasNext();) {
-            if (iter.next().getTarget().startsWith(PREFIX)) {
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public MCRChangeTracker clone()  {
-        MCRChangeTracker clone = MCRClassTools.clone(getClass(), super::clone);
-
-        clone.counter = this.counter;
-
-        return clone;
+    /**
+     * Returns the last change that has been tracked
+     */
+    public MCRTrackedAction getLastChange() {
+        return changes.peek();
     }
 }

@@ -18,7 +18,43 @@
 
 package org.mycore.frontend.xeditor.tracker;
 
-public interface MCRChange {
+import org.jdom2.Document;
+import org.jdom2.filter.Filters;
+import org.jdom2.xpath.XPathFactory;
+import org.mycore.common.MCRConstants;
+import org.mycore.common.xml.MCRXPathBuilder;
 
-    void undo(MCRChangeData data);
+/**
+ * Represents a change in the edited xml, which can be undone.
+ * 
+ * @author Frank L\u00FCtzenkirchen
+ */
+public abstract class MCRChange extends MCRTrackedAction {
+
+    /** The xPath of the changed node (or it's parent) */
+    private String xPath;
+
+    /**
+     * Creates a new object representing a change in XML.
+     * 
+     * @param node the node the change is performed on
+     * @param action the action
+     */
+    protected MCRChange(Object node) {
+        this.xPath = MCRXPathBuilder.buildXPath(node);
+    }
+
+    protected String getXPath() {
+        return xPath;
+    }
+
+    /** Returns the node represented by the stored XPath */
+    protected Object getNodeByXPath(Document doc) {
+        return XPathFactory.instance()
+            .compile(xPath, Filters.fpassthrough(), null, MCRConstants.getStandardNamespaces())
+            .evaluateFirst(doc);
+    }
+
+    /** Performs an undo of this change in the edited xml **/
+    protected abstract void undo(Document doc);
 }

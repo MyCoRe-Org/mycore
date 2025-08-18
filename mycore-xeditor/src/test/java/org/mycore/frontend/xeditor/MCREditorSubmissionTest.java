@@ -57,7 +57,6 @@ public class MCREditorSubmissionTest {
         template = "document[title='Title'][author[@firstName='Jim'][@lastName='']]";
         Document expected = new Document(new MCRNodeBuilder().buildElement(template, null, null));
         Document result = session.getEditedXML();
-        result = MCRChangeTracker.removeChangeTracking(result);
         assertTrue(MCRXMLHelper.deepEqual(expected, result));
     }
 

@@ -24,13 +24,12 @@ import java.util.Objects;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jaxen.JaxenException;
-import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
-import org.mycore.frontend.xeditor.tracker.MCRChangeData;
+import org.mycore.frontend.xeditor.tracker.MCRTrackedAction;
 
 import jakarta.servlet.ServletContext;
 
@@ -56,9 +55,8 @@ public class MCRSubselectReturnTarget implements MCREditorTarget {
     }
 
     private String getBaseXPathForSubselect(MCREditorSession session) throws JaxenException, JDOMException {
-        Document doc = session.getEditedXML();
-        MCRChangeData change = session.getChangeTracker().findLastChange(doc);
-        String text = change.getText();
+        MCRTrackedAction change = session.getChangeTracker().getLastChange();
+        String text = change.getMessage();
         String xPath = text.substring(text.lastIndexOf(' ') + 1).trim();
         return bindsFirstOrMoreThanOneElement(xPath, session) ? xPath + "[1]" : xPath;
     }

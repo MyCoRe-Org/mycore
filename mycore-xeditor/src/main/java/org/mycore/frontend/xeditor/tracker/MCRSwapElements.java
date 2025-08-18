@@ -18,40 +18,68 @@
 
 package org.mycore.frontend.xeditor.tracker;
 
-import org.jdom2.Content;
+import java.util.List;
+
+import org.jdom2.Document;
 import org.jdom2.Element;
 
-public class MCRSwapElements implements MCRChange {
+/**
+ * Swaps two elements in the edited xml, and tracks that change.  
+ * 
+ * @author Frank L\u00FCtzenkirchen
+ */
+public class MCRSwapElements extends MCRChange {
 
-    public static MCRChangeData swap(Element parent, Element a, Element b) {
-        int posA = parent.indexOf(a);
-        int posB = parent.indexOf(b);
-        return swap(parent, posA, a, posB, b);
+    /** The position of the first element swapped */
+    private int posA;
+
+    /** The position of the other element swapped */
+    private int posB;
+
+    /**
+     * Swaps the position of two elements within their parent
+     * 
+     * @param parent the common parent of the elements
+     * @param a the first element to swap
+     * @param b the other element to swap
+     */
+    public MCRSwapElements(Element parent, Element a, Element b) {
+        this(parent, parent.getChildren().indexOf(a), parent.getChildren().indexOf(b));
     }
 
-    public static MCRChangeData swap(Element parent, int posA, int posB) {
-        Content a = parent.getContent().get(posA);
-        Content b = parent.getContent().get(posB);
-        return swap(parent, posA, a, posB, b);
+    /**
+     * Swaps the position of two elements within their parent
+     * 
+     * @param parent the common parent of the elements
+     * @param posA the position of first element to swap
+     * @param posB the position of the other element to swap
+     */
+    public MCRSwapElements(Element parent, int posA, int posB) {
+        super(parent);
+        this.posA = posA;
+        this.posB = posB;
+        swap(parent, posA, posB);
+        setMessage(String.format("Swapped %s children %s and %s", getXPath(), posA, posB));
     }
 
-    public static MCRChangeData swap(Element parent, int posA, Content a, int posB, Content b) {
+    /** 
+     * Custom swap() method, as Collections.swap() does not work with JDOM2 children. 
+     **/
+    private void swap(Element parent, int posA, int posB) {
         if (posA > posB) {
-            return swap(parent, posB, b, posA, a);
+            swap(parent, posB, posA);
+        } else {
+            List<Element> children = parent.getChildren(); // => x a x x b x
+            Element b = children.remove(posB); // => x a x x x  
+            Element a = children.remove(posA); // => x x x x 
+            children.add(posA, b); // => x b x x x 
+            children.add(posB, a); // => x b x x a x
         }
-
-        b.detach(); // x a x x x
-        parent.addContent(posA, b); // x b a x x x
-        a.detach(); // x b x x x
-        parent.addContent(posB, a); // x b x x a x
-
-        return new MCRChangeData("swapped-elements", posA + " " + posB, posB, parent);
     }
 
     @Override
-    public void undo(MCRChangeData data) {
-        int posA = Integer.parseInt(data.getText().split(" ")[0]);
-        int posB = Integer.parseInt(data.getText().split(" ")[1]);
-        swap(data.getContext(), posA, posB);
+    protected void undo(Document doc) {
+        Element parent = (Element) (getNodeByXPath(doc));
+        swap(parent, posA, posB);
     }
 }

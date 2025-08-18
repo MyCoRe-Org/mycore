@@ -18,24 +18,20 @@
 
 package org.mycore.frontend.xeditor.tracker;
 
-import org.jdom2.Attribute;
-import org.jdom2.Document;
-
 /**
- * Tracks that a new attribute was added.  
+ * Represents an action tracked while the edited xml is changed, which can be undone.
  * 
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRAddedAttribute extends MCRChange {
+public class MCRTrackedAction {
 
-    public MCRAddedAttribute(Attribute attr) {
-        super(attr);
-        setMessage(String.format("Added %s/@%s=\"%s\"", getXPath(), attr.getQualifiedName(), attr.getValue()));
+    private String message;
+
+    protected void setMessage(String message) {
+        this.message = message;
     }
 
-    @Override
-    protected void undo(Document doc) {
-        Attribute attr = (Attribute) (getNodeByXPath(doc));
-        attr.detach();
+    public String getMessage() {
+        return message;
     }
 }
