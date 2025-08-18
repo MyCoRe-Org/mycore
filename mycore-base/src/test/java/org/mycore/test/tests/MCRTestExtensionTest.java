@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
@@ -30,10 +31,16 @@ import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
 public class MCRTestExtensionTest {
+
+    @BeforeAll
+    public static void prepare() {
+        new MCRObject(); // relies on configuration to be initialized
+    }
 
     @Test
     public void testPropertyFromFile() {
