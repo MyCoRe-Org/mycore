@@ -95,6 +95,7 @@ public class MCRTestExtension implements Extension, BeforeEachCallback, AfterEac
                     .orElse(""));
                 configProperties.putAll(classProperties);
             });
+        MCRConfigurationBase.initialize(configurationLoader.loadDeprecated(), mycoreProperties, true);
     }
 
     private Map<String, String> getConfigProperties(ExtensionContext context) {
