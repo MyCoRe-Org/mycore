@@ -18,33 +18,36 @@
 
 package org.mycore.coma.model.validation;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.net.URL;
 
 import javax.xml.transform.stream.StreamSource;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 import org.mycore.tei.MCRTEIValidator;
+import org.mycore.test.MyCoReTest;
 import org.xml.sax.SAXException;
 
-public class MCRTEIValidatorTest extends MCRTestCase {
+@MyCoReTest
+public class MCRTEIValidatorTest {
 
     @Test
-    public void validate() throws IOException, SAXException {
+    void validate() throws IOException, SAXException {
         MCRTEIValidator teiValidator = getTeiValidator("xml/validTei.xml");
         teiValidator.validate();
 
-        Assert.assertTrue(teiValidator.getErrors().size() + teiValidator.getFatals().size() == 0);
+        assertEquals(0, teiValidator.getErrors().size() + teiValidator.getFatals().size());
     }
 
     @Test
-    public void validateFail() throws IOException, SAXException {
+    void validateFail() throws IOException, SAXException {
         MCRTEIValidator teiValidator = getTeiValidator("xml/invalidTei.xml");
         teiValidator.validate();
 
-        Assert.assertTrue(teiValidator.getErrors().size() + teiValidator.getFatals().size() > 0);
+        assertTrue(teiValidator.getErrors().size() + teiValidator.getFatals().size() > 0);
     }
 
     private MCRTEIValidator getTeiValidator(String path) throws IOException {
