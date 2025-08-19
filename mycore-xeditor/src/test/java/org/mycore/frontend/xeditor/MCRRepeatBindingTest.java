@@ -18,23 +18,23 @@
 
 package org.mycore.frontend.xeditor;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.jaxen.JaxenException;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.xml.MCRNodeBuilder;
+import org.mycore.test.MyCoReTest;
 
 /**
  * @author Frank Lützenkirchen
  */
-public class MCRRepeatBindingTest extends MCRTestCase {
+@MyCoReTest
+public class MCRRepeatBindingTest {
 
     @Test
-    public void testRepeatBindingWithComplexPredicate() throws JaxenException, JDOMException {
+    public void testRepeatBindingWithComplexPredicate() throws JaxenException {
         Element template = new MCRNodeBuilder()
             .buildElement("conditions[condition/@type='bingo'][condition[2]/@type='bongo']", null, null);
         Document doc = new Document(template);

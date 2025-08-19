@@ -18,26 +18,27 @@
 
 package org.mycore.frontend.xeditor.tracker;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.jaxen.JaxenException;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.filter.Filters;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRTestCase;
 import org.mycore.common.MCRXlink;
 import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.frontend.xeditor.MCRBinding;
+import org.mycore.test.MyCoReTest;
 
-public class MCRChangeTrackerTest extends MCRTestCase {
+@MyCoReTest
+public class MCRChangeTrackerTest {
 
     @Test
     public void testAddElement() throws JaxenException {

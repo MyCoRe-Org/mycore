@@ -18,23 +18,23 @@
 
 package org.mycore.frontend.xeditor;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.jaxen.JaxenException;
 import org.jdom2.Document;
-import org.jdom2.JDOMException;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.test.MyCoReTest;
 
 /**
  * @author Frank Lützenkirchen
  */
-public class MCRXMLCleanerTest extends MCRTestCase {
+@MyCoReTest
+public class MCRXMLCleanerTest {
 
     @Test
-    public void testUnmodified() throws JDOMException, JaxenException {
+    public void testUnmodified() throws JaxenException {
         String xPath1 = "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau']]";
         cleanAndCompareTo(xPath1, xPath1);
 
@@ -44,7 +44,7 @@ public class MCRXMLCleanerTest extends MCRTestCase {
     }
 
     @Test
-    public void testRemoveEmptyNodes() throws JDOMException, JaxenException {
+    public void testRemoveEmptyNodes() throws JaxenException {
         String xPath1i = "root[child]";
         String xPath1o = "root";
         cleanAndCompareTo(xPath1i, xPath1o);
@@ -67,21 +67,21 @@ public class MCRXMLCleanerTest extends MCRTestCase {
     }
 
     @Test
-    public void testRootAlwaysRemains() throws JDOMException, JaxenException {
+    public void testRootAlwaysRemains() throws JaxenException {
         String xPath5i = "mods:mods[mods:name[@type][mods:namePart[@type]][mods:namePart]]";
         String xPath5o = "mods:mods";
         cleanAndCompareTo(xPath5i, xPath5o);
     }
 
     @Test
-    public void testPreserveStructureAndService() throws JDOMException, JaxenException {
+    public void testPreserveStructureAndService() throws JaxenException {
         String xPathInput = "mycoreobject[structure][metadata/field.title/title][service]";
         String xPathExpected = "mycoreobject[structure][service]";
         cleanAndCompareTo(xPathInput, xPathExpected);
     }
 
     @Test
-    public void testOverwriteDefaultRules() throws JDOMException, JaxenException {
+    public void testOverwriteDefaultRules() throws JaxenException {
         String xPath2i =
             "mods:mods[mods:name[@type='personal'][mods:namePart[@type='family']='Musterfrau'][mods:namePart[@type='given']][mods:relatedItem/@xlink:href='test']]";
         String xPath2o =
