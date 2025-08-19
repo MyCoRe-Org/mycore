@@ -18,6 +18,8 @@
 
 package org.mycore.solr.index.file.tika;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -27,17 +29,18 @@ import java.util.Objects;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
+import org.mycore.test.MyCoReTest;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import junit.framework.TestCase;
-
-public class MCRSimpleTikaMapperTest extends TestCase {
+@MyCoReTest
+public class MCRSimpleTikaMapperTest {
 
     public static final String X_TIKA_PARSED_BY = "X-TIKA:Parsed-By";
     public String testJson;
@@ -52,6 +55,7 @@ public class MCRSimpleTikaMapperTest extends TestCase {
         }
     }
 
+    @Test
     public void testMap() throws MCRTikaMappingException, IOException {
         MCRSimpleTikaMapper simpleTikaMapper = new MCRSimpleTikaMapper();
         TreeNode root;
@@ -69,13 +73,13 @@ public class MCRSimpleTikaMapperTest extends TestCase {
         String skName = MCRTikaMapper.simplifyKeyName(X_TIKA_PARSED_BY);
         simpleTikaMapper.map(X_TIKA_PARSED_BY, root.get(X_TIKA_PARSED_BY), doc, null, null);
         SolrInputField field = doc.getField(skName);
-        Assert.assertNotNull("There should be a " + skName + " entry", field);
-        Assert.assertEquals("There should be two " + skName + " entries", 2, field.getValueCount());
+        Assertions.assertNotNull(field, "There should be a " + skName + " entry");
+        assertEquals(2, field.getValueCount(), "There should be two " + skName + " entries");
         ArrayList<Object> values = new ArrayList<>(field.getValues());
-        Assert.assertEquals("First " + skName + " entry should be 'org.apache.tika.parser.DefaultParser'",
-            "org.apache.tika.parser.DefaultParser", values.get(0));
-        Assert.assertEquals("Second " + skName + " entry should be 'org.apache.tika.parser.pdf.PDFParser'",
-            "org.apache.tika.parser.pdf.PDFParser", values.get(1));
+        assertEquals("org.apache.tika.parser.DefaultParser",
+            values.get(0), "First " + skName + " entry should be 'org.apache.tika.parser.DefaultParser'");
+        assertEquals("org.apache.tika.parser.pdf.PDFParser",
+            values.get(1), "Second " + skName + " entry should be 'org.apache.tika.parser.pdf.PDFParser'");
 
         // Test with stripNamespace = true and multiValue = true
         doc = new SolrInputDocument();
@@ -84,13 +88,13 @@ public class MCRSimpleTikaMapperTest extends TestCase {
         skName = MCRTikaMapper.simplifyKeyName(X_TIKA_PARSED_BY);
         simpleTikaMapper.map(X_TIKA_PARSED_BY, root.get(X_TIKA_PARSED_BY), doc, null, null);
         field = doc.getField("parsed_by");
-        Assert.assertNotNull("There should be a \"parsed_by\" entry", field);
-        Assert.assertEquals("There should be two \"parsed_by\" entries", 2, field.getValueCount());
+        Assertions.assertNotNull(field, "There should be a \"parsed_by\" entry");
+        assertEquals(2, field.getValueCount(), "There should be two \"parsed_by\" entries");
         values = new ArrayList<>(field.getValues());
-        Assert.assertEquals("First \"parsed_by\" entry should be 'org.apache.tika.parser.DefaultParser'",
-            "org.apache.tika.parser.DefaultParser", values.get(0));
-        Assert.assertEquals("Second \"parsed_by\" entry should be 'org.apache.tika.parser.pdf.PDFParser'",
-            "org.apache.tika.parser.pdf.PDFParser", values.get(1));
+        assertEquals("org.apache.tika.parser.DefaultParser",
+            values.get(0), "First \"parsed_by\" entry should be 'org.apache.tika.parser.DefaultParser'");
+        assertEquals("org.apache.tika.parser.pdf.PDFParser",
+            values.get(1), "Second \"parsed_by\" entry should be 'org.apache.tika.parser.pdf.PDFParser'");
 
         // Test with stripNamespace = true and multiValue = false
         doc = new SolrInputDocument();
@@ -99,13 +103,11 @@ public class MCRSimpleTikaMapperTest extends TestCase {
         skName = MCRTikaMapper.simplifyKeyName(X_TIKA_PARSED_BY);
         simpleTikaMapper.map(X_TIKA_PARSED_BY, root.get(X_TIKA_PARSED_BY), doc, null, null);
         field = doc.getField("parsed_by");
-        Assert.assertNotNull("There should be a \"parsed_by\" entry", field);
-        Assert.assertEquals("There should be just one \"parsed_by\" entries", 1, field.getValueCount());
-        Assert.assertEquals(
-
-            "The \"parsed_by\" entry should be 'org.apache.tika.parser.DefaultParser\n" +
-                "org.apache.tika.parser.pdf.PDFParser'",
-            "org.apache.tika.parser.DefaultParser\norg.apache.tika.parser.pdf.PDFParser", field.getValue());
+        Assertions.assertNotNull(field, "There should be a \"parsed_by\" entry");
+        assertEquals(1, field.getValueCount(), "There should be just one \"parsed_by\" entries");
+        assertEquals("org.apache.tika.parser.DefaultParser\norg.apache.tika.parser.pdf.PDFParser",
+            field.getValue(), "The \"parsed_by\" entry should be 'org.apache.tika.parser.DefaultParser\n"
+                +   "org.apache.tika.parser.pdf.PDFParser'");
 
         // Test with stripNamespace = false and multiValue = false
         doc = new SolrInputDocument();
@@ -114,11 +116,10 @@ public class MCRSimpleTikaMapperTest extends TestCase {
         skName = MCRTikaMapper.simplifyKeyName(X_TIKA_PARSED_BY);
         simpleTikaMapper.map(X_TIKA_PARSED_BY, root.get(X_TIKA_PARSED_BY), doc, null, null);
         field = doc.getField(skName);
-        Assert.assertNotNull("There should be a " + skName + " entry", field);
-        Assert.assertEquals("There should be just one " + skName + " entries", 1, field.getValueCount());
-        Assert.assertEquals(
-            "The " + skName
-                + " entry should be 'org.apache.tika.parser.DefaultParser\norg.apache.tika.parser.pdf.PDFParser'",
-            "org.apache.tika.parser.DefaultParser\norg.apache.tika.parser.pdf.PDFParser", field.getValue());
+        Assertions.assertNotNull(field, "There should be a " + skName + " entry");
+        assertEquals(1, field.getValueCount(), "There should be just one " + skName + " entries");
+        assertEquals("org.apache.tika.parser.DefaultParser\norg.apache.tika.parser.pdf.PDFParser",
+            field.getValue(), "The " + skName + " entry should be 'org.apache.tika.parser.DefaultParser\n"
+                +"org.apache.tika.parser.pdf.PDFParser'");
     }
 }

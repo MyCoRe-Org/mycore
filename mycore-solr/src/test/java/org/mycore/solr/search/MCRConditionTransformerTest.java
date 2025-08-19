@@ -18,40 +18,41 @@
 
 package org.mycore.solr.search;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashSet;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRNotCondition;
 import org.mycore.parsers.bool.MCROrCondition;
 import org.mycore.services.fieldquery.MCRQueryCondition;
+import org.mycore.test.MyCoReTest;
 
-public class MCRConditionTransformerTest extends MCRTestCase {
+@MyCoReTest
+public class MCRConditionTransformerTest {
 
     @Test
-    public final void testToSolrQueryString() {
+    final void testToSolrQueryString() {
         HashSet<String> usedFields = new HashSet<>();
         MCRQueryCondition inner1 = new MCRQueryCondition("objectType", "=", "mods");
         assertEquals("+objectType:\"mods\"", MCRConditionTransformer.toSolrQueryString(inner1, usedFields));
-        assertTrue("usedFields did not contain 'objectType'", usedFields.contains("objectType"));
+        assertTrue(usedFields.contains("objectType"), "usedFields did not contain 'objectType'");
         MCRQueryCondition inner2 = new MCRQueryCondition("objectType", "=", "cbu");
         MCROrCondition<Void> orCond = new MCROrCondition<>(inner1, inner2);
         usedFields.clear();
         //MCR-973 check for surrounding brackets on single OR query 
         assertEquals("+(objectType:\"mods\" objectType:\"cbu\")",
             MCRConditionTransformer.toSolrQueryString(orCond, usedFields));
-        assertTrue("usedFields did not contain 'objectType'", usedFields.contains("objectType"));
+        assertTrue(usedFields.contains("objectType"), "usedFields did not contain 'objectType'");
         MCRQueryCondition inner3 = new MCRQueryCondition("derCount", ">", "0");
         MCRAndCondition<Void> andCondition = new MCRAndCondition<>(orCond, inner3);
         usedFields.clear();
         assertEquals("+(objectType:\"mods\" objectType:\"cbu\") +derCount:{0 TO *]",
             MCRConditionTransformer.toSolrQueryString(andCondition, usedFields));
-        assertTrue("usedFields did not contain 'objectType'", usedFields.contains("objectType"));
-        assertTrue("usedFields did not contain 'derCount'", usedFields.contains("derCount"));
+        assertTrue(usedFields.contains("objectType"), "usedFields did not contain 'objectType'");
+        assertTrue(usedFields.contains("derCount"), "usedFields did not contain 'derCount'");
         inner3.setOperator(">=");
         assertEquals("+(objectType:\"mods\" objectType:\"cbu\") +derCount:[0 TO *]",
             MCRConditionTransformer.toSolrQueryString(andCondition, usedFields));
