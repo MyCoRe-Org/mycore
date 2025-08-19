@@ -18,42 +18,38 @@
 
 package org.mycore.services.packaging;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.Hashtable;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mycore.common.MCRJPATestCase;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.processing.impl.MCRCentralProcessableRegistry;
 import org.mycore.services.queuedjob.MCRJob;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MCRJPATestHelper;
+import org.mycore.test.MyCoReTest;
 
-public class MCRPackerManagerTest extends MCRJPATestCase {
+@MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = MCRPacker.PACKER_CONFIGURATION_PREFIX + MCRPackerManagerTest.TEST_PACKER_ID + ".Class",
+        classNameOf = MCRPackerMock.class),
+    @MCRTestProperty(key = MCRPacker.PACKER_CONFIGURATION_PREFIX + MCRPackerManagerTest.TEST_PACKER_ID + "."
+        + MCRPackerMock.TEST_CONFIGURATION_KEY, string = MCRPackerMock.TEST_VALUE),
+    @MCRTestProperty(key = "MCR.QueuedJob.activated", string = "true"),
+    @MCRTestProperty(key = "MCR.QueuedJob.JobThreads", string = "2"),
+    @MCRTestProperty(key = "MCR.QueuedJob.TimeTillReset", string = "10"),
+    @MCRTestProperty(key = "MCR.Processable.Registry.Class", classNameOf = MCRCentralProcessableRegistry.class)
+})
+public class MCRPackerManagerTest {
 
     public static final String TEST_PACKER_ID = "testPacker";
-
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    protected Map<String, String> getTestProperties() {
-        // Set up example configuration
-        Map<String, String> testProperties = super.getTestProperties();
-
-        String testPackerPrefix = MCRPacker.PACKER_CONFIGURATION_PREFIX + TEST_PACKER_ID + ".";
-
-        testProperties.put(testPackerPrefix + "Class", MCRPackerMock.class.getName());
-        testProperties.put(testPackerPrefix + MCRPackerMock.TEST_CONFIGURATION_KEY, MCRPackerMock.TEST_VALUE);
-        testProperties.put("MCR.QueuedJob.activated", "true");
-        testProperties.put("MCR.QueuedJob.JobThreads", "2");
-        testProperties.put("MCR.QueuedJob.TimeTillReset", "10");
-        testProperties.put("MCR.Processable.Registry.Class", MCRCentralProcessableRegistry.class.getName());
-        return testProperties;
-    }
 
     @Test
     public void testPackerConfigurationStart() throws Exception {
@@ -67,11 +63,11 @@ public class MCRPackerManagerTest extends MCRJPATestCase {
 
         MCRJob packerJob = MCRPackerManager.startPacking(parameterMap);
 
-        Assert.assertNotNull("The Packer job is not present!", packerJob);
+        assertNotNull(packerJob, "The Packer job is not present!");
 
-        endTransaction();
+        MCRJPATestHelper.endTransaction();
         Thread.sleep(1000);
-        startNewTransaction();
+        MCRJPATestHelper.startNewTransaction();
 
         int waitTime = 10;
         while (waitTime > 0 && !MCRConfiguration2.getBoolean(MCRPackerMock.FINISHED_PROPERTY).orElse(false)
@@ -79,7 +75,7 @@ public class MCRPackerManagerTest extends MCRJPATestCase {
             Thread.sleep(1000);
             waitTime -= 1;
         }
-        Assert.assertTrue("PackerJob did not finish in time!", waitTime > 0);
+        assertTrue(waitTime > 0, "PackerJob did not finish in time!");
     }
 
 }
