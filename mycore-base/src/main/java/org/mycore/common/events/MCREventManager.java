@@ -66,6 +66,7 @@ public final class MCREventManager {
         Map<String, String> properties = MCRConfiguration2.getSubPropertiesMap(CONFIG_PREFIX)
             .entrySet()
             .stream()
+            .filter(property -> !property.getValue().isBlank())
             .filter(property -> !property.getKey().startsWith("Mode."))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
