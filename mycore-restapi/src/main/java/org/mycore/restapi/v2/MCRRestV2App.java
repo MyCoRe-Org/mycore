@@ -22,6 +22,15 @@ import java.net.URI;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.jakarta.rs.json.JacksonXmlBindJsonProvider;
+import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
+import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
+import io.swagger.v3.oas.integration.OpenApiConfigurationException;
+import io.swagger.v3.oas.integration.SwaggerConfiguration;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.servers.Server;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.config.MCRConfiguration2;
@@ -37,17 +46,6 @@ import org.mycore.restapi.converter.MCRWrappedXMLWriter;
 import org.mycore.restapi.v1.MCRRestAPIAuthentication;
 import org.mycore.restapi.v2.service.MCRRestObjectLockService;
 import org.mycore.restapi.v2.service.MCRRestObjectLockServiceImpl;
-
-import com.fasterxml.jackson.jakarta.rs.json.JacksonXmlBindJsonProvider;
-
-import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
-import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
-import io.swagger.v3.oas.integration.OpenApiConfigurationException;
-import io.swagger.v3.oas.integration.SwaggerConfiguration;
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.info.License;
-import io.swagger.v3.oas.models.servers.Server;
 
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.InternalServerErrorException;
@@ -81,8 +79,8 @@ public class MCRRestV2App extends MCRJerseyRestApp {
         register(new AbstractBinder() {
             @Override
             protected void configure() {
-                bind(MCRRestObjectLockService.class)
-                    .to(MCRRestObjectLockServiceImpl.class);
+                bind(MCRRestObjectLockServiceImpl.class)
+                    .to(MCRRestObjectLockService.class);
             }
         });
     }
