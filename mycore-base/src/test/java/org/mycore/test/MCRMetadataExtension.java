@@ -29,6 +29,8 @@ import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.ParameterContext;
+import org.junit.jupiter.api.extension.ParameterResolver;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.tmatesoft.svn.core.internal.wc.SVNFileUtil;
@@ -46,7 +48,7 @@ import org.tmatesoft.svn.core.internal.wc.SVNFileUtil;
  *
  */
 public class MCRMetadataExtension implements Extension, BeforeAllCallback, BeforeEachCallback,
-    AfterEachCallback {
+    AfterEachCallback, ParameterResolver {
 
     private static final String STORE_BASE_DIR_KEY = "MCRMetadataExtension.storeBaseDir";
     private static final String SVN_BASE_DIR_KEY = "MCRMetadataExtension.svnBaseDir";
@@ -81,6 +83,25 @@ public class MCRMetadataExtension implements Extension, BeforeAllCallback, Befor
         MCRXMLMetadataManager.getInstance().reload();
     }
 
+
+    @Override
+    public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
+        Class<?> parameterClass = parameterContext.getParameter().getType();
+        return parameterClass == BaseDirs.class;
+    }
+
+    @Override
+    public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
+        return switch (parameterContext.getParameter().getType()) {
+            case Class<?> c when c == BaseDirs.class -> getBaseDirs(extensionContext);
+            default -> null;
+        };
+    }
+
+    private static BaseDirs getBaseDirs(ExtensionContext extensionContext) {
+        return new BaseDirs(getStoreBaseDir(extensionContext), getSvnBaseDir(extensionContext));
+    }
+
     @Override
     public void afterEach(ExtensionContext context) throws Exception {
         // Clean up temp directories
@@ -107,6 +128,9 @@ public class MCRMetadataExtension implements Extension, BeforeAllCallback, Befor
      */
     public static Path getSvnBaseDir(ExtensionContext context) {
         return context.getStore(MCRTestExtension.NAMESPACE).get(SVN_BASE_DIR_KEY, Path.class);
+    }
+
+    public record BaseDirs(Path storeBaseDir, Path svnBaseDir) {
     }
 
 }

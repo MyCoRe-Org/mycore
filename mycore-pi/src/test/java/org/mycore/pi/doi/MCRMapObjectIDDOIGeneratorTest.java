@@ -18,28 +18,36 @@
 
 package org.mycore.pi.doi;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mycore.pi.doi.MCRDigitalObjectIdentifier.TEST_DOI_PREFIX;
 
-import java.util.Map;
-
-import org.junit.After;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+import org.mycore.test.MyCoReTest;
 
 /**
  * @author Thomas Scheffler (yagee)
  */
-public class MCRMapObjectIDDOIGeneratorTest extends MCRTestCase {
+@MyCoReTest
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true"),
+    @MCRTestProperty(key = "MCR.PI.Generator.MapObjectIDDOI", classNameOf = MCRMapObjectIDDOIGenerator.class),
+    @MCRTestProperty(key = "MCR.PI.Generator.MapObjectIDDOI.Prefix.junit_test", string = TEST_DOI_PREFIX),
+    @MCRTestProperty(key = "MCR.PI.Generator.MapObjectIDDOI.Prefix.my_test", string = TEST_DOI_PREFIX + "/my.")
+})
+public class MCRMapObjectIDDOIGeneratorTest {
+
     MCRMapObjectIDDOIGenerator doiGenerator;
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         doiGenerator = MCRConfiguration2.getInstanceOfOrThrow(
             MCRMapObjectIDDOIGenerator.class, "MCR.PI.Generator.MapObjectIDDOI");
     }
@@ -56,27 +64,16 @@ public class MCRMapObjectIDDOIGeneratorTest extends MCRTestCase {
         assertEquals(TEST_DOI_PREFIX + "/my.815", doiGenerator.generate(mcrObject2, null).asString());
     }
 
-    @Test(expected = MCRPersistentIdentifierException.class)
-    public void missingMappingTest() throws Exception {
-        MCRObjectID testID = MCRObjectID.getInstance("brandNew_test_00000001");
-        MCRObject mcrObject = new MCRObject();
-        mcrObject.setId(testID);
-        doiGenerator.generate(mcrObject, null);
+    @Test
+    public void missingMappingTest() {
+        assertThrows(
+            MCRPersistentIdentifierException.class,
+            () -> {
+                MCRObjectID testID = MCRObjectID.getInstance("brandNew_test_00000001");
+                MCRObject mcrObject = new MCRObject();
+                mcrObject.setId(testID);
+                doiGenerator.generate(mcrObject, null);
+            });
     }
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.Metadata.Type.test", Boolean.TRUE.toString());
-        testProperties.put("MCR.PI.Generator.MapObjectIDDOI", MCRMapObjectIDDOIGenerator.class.getName());
-        testProperties.put("MCR.PI.Generator.MapObjectIDDOI.Prefix.junit_test", TEST_DOI_PREFIX);
-        testProperties.put("MCR.PI.Generator.MapObjectIDDOI.Prefix.my_test", TEST_DOI_PREFIX + "/my.");
-        return testProperties;
-    }
-
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
 }

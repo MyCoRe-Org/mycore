@@ -18,42 +18,44 @@
 
 package org.mycore.pi.doi;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import javax.xml.validation.Schema;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.test.MyCoReTest;
 
-public class MCRDOIServiceTest extends MCRTestCase {
+@MyCoReTest
+public class MCRDOIServiceTest {
 
     @Test
     public void testSchemaV3() {
-        Assert.assertNotNull(loadSchema("xsd/datacite/v3/metadata.xsd"));
-        Assert.assertNotNull(loadSchema(MCRDOIService.DATACITE_SCHEMA_V3));
+        assertNotNull(loadSchema("xsd/datacite/v3/metadata.xsd"));
+        assertNotNull(loadSchema(MCRDOIService.DATACITE_SCHEMA_V3));
     }
 
     @Test
     public void testSchemaV4() {
-        Assert.assertNotNull(loadSchema("xsd/datacite/v4/metadata.xsd"));
-        Assert.assertNotNull(loadSchema(MCRDOIService.DATACITE_SCHEMA_V4));
+        assertNotNull(loadSchema("xsd/datacite/v4/metadata.xsd"));
+        assertNotNull(loadSchema(MCRDOIService.DATACITE_SCHEMA_V4));
     }
 
     @Test
     public void testSchemaV41() {
-        Assert.assertNotNull(loadSchema("xsd/datacite/v4.1/metadata.xsd"));
-        Assert.assertNotNull(loadSchema(MCRDOIService.DATACITE_SCHEMA_V41));
+        assertNotNull(loadSchema("xsd/datacite/v4.1/metadata.xsd"));
+        assertNotNull(loadSchema(MCRDOIService.DATACITE_SCHEMA_V41));
     }
 
     @Test
     public void testSchemaV43() {
-        Assert.assertNotNull(loadSchema("xsd/datacite/v4.3/metadata.xsd"));
-        Assert.assertNotNull(loadSchema(MCRDOIService.DATACITE_SCHEMA_V43));
+        assertNotNull(loadSchema("xsd/datacite/v4.3/metadata.xsd"));
+        assertNotNull(loadSchema(MCRDOIService.DATACITE_SCHEMA_V43));
     }
 
     @Test
     public void testCrossrefSchema() {
-        Assert.assertNotNull(loadSchema("xsd/crossref/4.4.1/crossref4.4.1.xsd"));
-        Assert.assertNotNull(loadSchema(MCRCrossrefService.DEFAULT_SCHEMA));
+        assertNotNull(loadSchema("xsd/crossref/4.4.1/crossref4.4.1.xsd"));
+        assertNotNull(loadSchema(MCRCrossrefService.DEFAULT_SCHEMA));
     }
 
     private Schema loadSchema(String schemaURL) {

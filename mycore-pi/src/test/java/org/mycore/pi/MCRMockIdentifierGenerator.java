@@ -18,7 +18,8 @@
 
 package org.mycore.pi;
 
-import org.junit.Assert;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.mycore.datamodel.metadata.MCRBase;
 
 public class MCRMockIdentifierGenerator extends MCRPIGenerator<MCRMockIdentifier> {
@@ -29,7 +30,7 @@ public class MCRMockIdentifierGenerator extends MCRPIGenerator<MCRMockIdentifier
 
     @Override
     public MCRMockIdentifier generate(MCRBase mcrBase, String additional) {
-        Assert.assertEquals("Test propterties should be set!", getProperties().get(TEST_PROPERTY), TEST_PROPERTY_VALUE);
+        assertEquals(TEST_PROPERTY_VALUE, getProperties().get(TEST_PROPERTY), "Test properties should be set!");
 
         return (MCRMockIdentifier) new MCRMockIdentifierParser()
             .parse(MCRMockIdentifier.MOCK_SCHEME + mcrBase.getId() + ":" + additional).get();
