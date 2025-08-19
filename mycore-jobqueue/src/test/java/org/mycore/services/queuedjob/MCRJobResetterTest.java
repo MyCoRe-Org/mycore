@@ -18,20 +18,23 @@
 
 package org.mycore.services.queuedjob;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.ArrayDeque;
 import java.util.Date;
 import java.util.Queue;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mycore.common.MCRJPATestCase;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.services.queuedjob.action.MCRTestJobAction1;
 import org.mycore.services.queuedjob.action.MCRTestJobAction2;
 import org.mycore.services.queuedjob.config2.MCRConfiguration2JobConfig;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MyCoReTest;
 
-public class MCRJobResetterTest extends MCRJPATestCase {
+@MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
+public class MCRJobResetterTest {
 
     @Test
     public void testResetJobsWithAction() {
@@ -109,33 +112,20 @@ public class MCRJobResetterTest extends MCRJPATestCase {
         job6.setStart(new Date(elevenMinutesAgo));
         mockDAO.daoOfferedJobs.add(job5);
 
-        Assert.assertEquals("offered jobs should be 6", 6, mockDAO.daoOfferedJobs.size());
-        Assert.assertEquals("resetted jobs in queue1 should be 0", 0, reset1.size());
-        Assert.assertEquals("resetted jobs in queue2 should be 0", 0, reset2.size());
+        assertEquals(6, mockDAO.daoOfferedJobs.size(), "offered jobs should be 6");
+        assertEquals(0, reset1.size(), "resetted jobs in queue1 should be 0");
+        assertEquals(0, reset2.size(), "resetted jobs in queue2 should be 0");
 
         resetter.resetJobsWithAction(MCRTestJobAction1.class);
-        Assert.assertEquals("resetted jobs in queue1 should be 1", 1, reset1.size());
-        Assert.assertEquals("resetted jobs in queue2 should be 0", 0, reset2.size());
-        Assert.assertEquals("reseted job should have count 1", "1",
-            reset1.poll().getParameter("count"));
+        assertEquals(1, reset1.size(), "resetted jobs in queue1 should be 1");
+        assertEquals(0, reset2.size(), "resetted jobs in queue2 should be 0");
+        assertEquals("1", reset1.poll().getParameter("count"), "reseted job should have count 1");
 
         resetter.resetJobsWithAction(MCRTestJobAction2.class);
-        Assert.assertEquals("resetted jobs in queue1 should be 0 (poll called)", 0, reset1.size());
-        Assert.assertEquals("resetted jobs in queue2 should be 1", 1, reset2.size());
-        Assert.assertEquals("reseted job should have count 2", "2",
-            reset2.poll().getParameter("count"));
+        assertEquals(0, reset1.size(), "resetted jobs in queue1 should be 0 (poll called)");
+        assertEquals(1, reset2.size(), "resetted jobs in queue2 should be 1");
+        assertEquals("2", reset2.poll().getParameter("count"), "reseted job should have count 2");
 
     }
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
 }

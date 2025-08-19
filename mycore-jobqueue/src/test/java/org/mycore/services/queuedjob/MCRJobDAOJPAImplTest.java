@@ -18,6 +18,11 @@
 
 package org.mycore.services.queuedjob;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -26,16 +31,22 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mycore.common.MCRJPATestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.services.queuedjob.action.MCRTestJobAction1;
 import org.mycore.services.queuedjob.action.MCRTestJobAction2;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MCRJPATestHelper;
+import org.mycore.test.MyCoReTest;
 
 import jakarta.persistence.EntityManager;
 
-public class MCRJobDAOJPAImplTest extends MCRJPATestCase {
+@MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
+public class MCRJobDAOJPAImplTest {
+
     public static final String NEW_COUNT = "13";
     MCRJobDAOJPAImpl dao;
     MCRJob job1;
@@ -54,19 +65,17 @@ public class MCRJobDAOJPAImplTest extends MCRJPATestCase {
     List<MCRJob> xJobs;
 
     private static void assertAllPresent(List<MCRJob> expected, List<MCRJob> jobs) {
-        Assert.assertEquals("There should be " + expected.size() + " jobs", expected.size(), jobs.size());
+        assertEquals(expected.size(), jobs.size(), "There should be " + expected.size() + " jobs");
         for (int i = 0; i < expected.size(); i++) {
-            Assert.assertTrue(
+            assertTrue(jobs.contains(expected.get(i)),
                 "Job " + expected.get(i).toString() + " should be in the list "
-                    + jobs.stream().map(MCRJob::toString).collect(Collectors.joining(", ")),
-                jobs.contains(expected.get(i)));
+                    + jobs.stream().map(MCRJob::toString).collect(Collectors.joining(", ")));
         }
     }
 
-    @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
+
         dao = new MCRJobDAOJPAImpl();
 
         Date baseTime = new Date();
@@ -131,7 +140,7 @@ public class MCRJobDAOJPAImplTest extends MCRJPATestCase {
 
     @Test
     public void getJobs() {
-        EntityManager em = getEntityManager().get();
+        EntityManager em = getEntityManager();
 
         allJobs.forEach(em::persist);
 
@@ -190,78 +199,89 @@ public class MCRJobDAOJPAImplTest extends MCRJPATestCase {
     }
 
     @Test
-    public void removeJobs() throws Exception {
-        EntityManager em = getEntityManager().get();
+    public void removeJobs() {
+        EntityManager em = getEntityManager();
         allJobs.forEach(em::persist);
 
         dao.removeJobs(MCRTestJobAction1.class, null, null);
-
         List<MCRJob> resultList = em.createQuery("SELECT j FROM MCRJob j", MCRJob.class).getResultList();
         assertAllPresent(Arrays.asList(job4, job5), resultList);
 
         dao.removeJobs(MCRTestJobAction2.class, null, null);
         resultList = em.createQuery("SELECT j FROM MCRJob j", MCRJob.class).getResultList();
         assertAllPresent(Collections.emptyList(), resultList);
+    }
 
-        em = reset();
+    @Test
+    public void removeJobs2() {
+        EntityManager em = getEntityManager();
         allJobs.forEach(em::persist);
 
         dao.removeJobs(null, errorTrueParam, null);
-        resultList = em.createQuery("SELECT j FROM MCRJob j", MCRJob.class).getResultList();
+        List<MCRJob> resultList = em.createQuery("SELECT j FROM MCRJob j", MCRJob.class).getResultList();
         assertAllPresent(Arrays.asList(job1, job2), resultList);
+    }
 
-        em = reset();
+    @Test
+    public void removeJobs3() {
+        EntityManager em = getEntityManager();
         allJobs.forEach(em::persist);
 
         dao.removeJobs(null, errorFalseParam, null);
-        resultList = em.createQuery("SELECT j FROM MCRJob j", MCRJob.class).getResultList();
+        List<MCRJob> resultList = em.createQuery("SELECT j FROM MCRJob j", MCRJob.class).getResultList();
         assertAllPresent(Arrays.asList(job3, job4, job5), resultList);
+    }
 
-        em = reset();
+    @Test
+    public void removeJobs4() {
+        EntityManager em = getEntityManager();
         allJobs.forEach(em::persist);
 
         dao.removeJobs(null, null, List.of(MCRJobStatus.NEW, MCRJobStatus.PROCESSING));
-        resultList = em.createQuery("SELECT j FROM MCRJob j", MCRJob.class).getResultList();
+        List<MCRJob> resultList = em.createQuery("SELECT j FROM MCRJob j", MCRJob.class).getResultList();
         assertAllPresent(Arrays.asList(job3, job4, job5), resultList);
+    }
 
-        em = reset();
+    @Test
+    public void removeJobs5() {
+        EntityManager em = getEntityManager();
         allJobs.forEach(em::persist);
 
         dao.removeJobs(null, null, List.of(MCRJobStatus.ERROR, MCRJobStatus.MAX_TRIES));
-        resultList = em.createQuery("SELECT j FROM MCRJob j", MCRJob.class).getResultList();
+        List<MCRJob> resultList = em.createQuery("SELECT j FROM MCRJob j", MCRJob.class).getResultList();
         assertAllPresent(Arrays.asList(job1, job2, job3), resultList);
     }
 
     @Test
     public void getJob() {
-        EntityManager em = getEntityManager().get();
+        EntityManager em = getEntityManager();
         allJobs.forEach(em::persist);
 
         MCRJob job = dao.getJob(MCRTestJobAction1.class, job1.getParameters(), List.of(MCRJobStatus.NEW));
-        Assert.assertEquals("Job 1 should be equal", job1, job);
+        assertEquals(job1, job, "Job 1 should be equal");
 
         job = dao.getJob(MCRTestJobAction1.class, job1.getParameters(), List.of(MCRJobStatus.PROCESSING));
-        Assert.assertNull("Job 1 should be null", job);
+        assertNull(job, "Job 1 should be null");
 
         job = dao.getJob(MCRTestJobAction1.class, job1.getParameters(),
             List.of(MCRJobStatus.NEW, MCRJobStatus.PROCESSING));
-        Assert.assertEquals("Job 1 should be equal", job1, job);
+        assertEquals(job1, job, "Job 1 should be equal");
 
         job = dao.getJob(MCRTestJobAction1.class, job1.getParameters(), null);
-        Assert.assertEquals("Job 1 should be equal", job1, job);
+        assertEquals(job1, job, "Job 1 should be equal");
 
         job = dao.getJob(MCRTestJobAction1.class, job1.getParameters(), Collections.emptyList());
-        Assert.assertEquals("Job 1 should be equal", job1, job);
+        assertEquals(job1, job, "Job 1 should be equal");
 
         job = dao.getJob(null, job1.getParameters(), null);
-        Assert.assertEquals("Job 1 should be equal", job1, job);
+        assertEquals(job1, job, "Job 1 should be equal");
 
         job = dao.getJob(MCRTestJobAction1.class, job2.getParameters(), null);
-        Assert.assertEquals("Job 2 should be equal", job2, job);
+        assertEquals(job2, job, "Job 2 should be equal");
 
         try {
             job = dao.getJob(MCRTestJobAction1.class, null, null);
-            Assert.fail("There should be an IllegalArgumentException");
+            fail("There should be an IllegalArgumentException");
         } catch (IllegalArgumentException e) {
             // expected
         }
@@ -269,7 +289,7 @@ public class MCRJobDAOJPAImplTest extends MCRJPATestCase {
 
     @Test
     public void getNextJobs() {
-        EntityManager em = getEntityManager().get();
+        EntityManager em = getEntityManager();
 
         allJobs.forEach(em::persist);
         xJobs.forEach(em::persist);
@@ -294,19 +314,19 @@ public class MCRJobDAOJPAImplTest extends MCRJPATestCase {
 
     @Test
     public void remainingJobCount() {
-        EntityManager em = getEntityManager().get();
+        EntityManager em = getEntityManager();
 
         allJobs.forEach(em::persist);
         xJobs.forEach(em::persist);
 
         int jobs = dao.getRemainingJobCount(MCRTestJobAction1.class);
-        Assert.assertEquals("There should be 4 remaining jobs", 4, jobs);
+        assertEquals(4, jobs, "There should be 4 remaining jobs");
 
         MCRJob j1 = em.merge(job1);
         em.remove(j1);
 
         jobs = dao.getRemainingJobCount(MCRTestJobAction1.class);
-        Assert.assertEquals("There should be 2 remaining jobs", 3, jobs);
+        assertEquals(3, jobs, "There should be 2 remaining jobs");
 
         MCRJob j6 = em.merge(xJob6);
         MCRJob j7 = em.merge(xJob7);
@@ -314,40 +334,44 @@ public class MCRJobDAOJPAImplTest extends MCRJPATestCase {
         em.remove(j7);
 
         jobs = dao.getRemainingJobCount(MCRTestJobAction1.class);
-        Assert.assertEquals("There should be 1 remaining jobs", 1, jobs);
+        assertEquals(1, jobs, "There should be 1 remaining jobs");
     }
 
     @Test
     public void updateJob() {
-        EntityManager em = getEntityManager().get();
+        EntityManager em = getEntityManager();
         allJobs.forEach(em::persist);
 
         MCRJob job1 = dao.getJob(MCRTestJobAction1.class, this.job1.getParameters(), null);
-        Assert.assertEquals("Job 1 should be equal", this.job1, job1);
+        assertEquals(this.job1, job1, "Job 1 should be equal");
         job1.setStatus(MCRJobStatus.ERROR);
         dao.updateJob(job1);
 
         job1 = dao.getJob(MCRTestJobAction1.class, this.job1.getParameters(), null);
-        Assert.assertEquals("Job 1 Status should be ERROR", MCRJobStatus.ERROR, job1.getStatus());
+        assertEquals(MCRJobStatus.ERROR, job1.getStatus(), "Job 1 Status should be ERROR");
 
         job1.setParameter("count", NEW_COUNT);
         dao.updateJob(job1);
         job1 = dao.getJob(MCRTestJobAction1.class, this.job1.getParameters(), null);
-        Assert.assertEquals("Job 1 Count should be 13", NEW_COUNT, job1.getParameter("count"));
+        assertEquals(NEW_COUNT, job1.getParameter("count"), "Job 1 Count should be 13");
     }
 
     @Test
     public void addJob() {
-        EntityManager em = getEntityManager().get();
+        EntityManager em = getEntityManager();
         allJobs.forEach(job -> dao.addJob(job));
 
         List<MCRJob> resultList = em.createQuery("SELECT j FROM MCRJob j", MCRJob.class).getResultList();
         assertAllPresent(allJobs, resultList);
     }
 
-    private EntityManager reset() throws Exception {
-        tearDown();
-        setUp();
-        return getEntityManager().get();
+    private EntityManager reset() {
+        MCRJPATestHelper.startNewTransaction();
+        return getEntityManager();
     }
+
+    private EntityManager getEntityManager() {
+        return MCREntityManagerProvider.getCurrentEntityManager();
+    }
+
 }
