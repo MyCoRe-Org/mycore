@@ -25,8 +25,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.jaxen.JaxenException;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessManager;
@@ -45,11 +47,17 @@ import jakarta.servlet.ServletContext;
  */
 public class MCRDebugTarget implements MCREditorTarget {
 
+    private List<Object> outputSteps = new ArrayList<>();
+
+    private PrintWriter writer;
+
+    private MCREditorSession session;
+
     private static final Format XML_OUTPUT_FORMAT =
         Format.getPrettyFormat().setLineSeparator("\n").setOmitDeclaration(true);
 
     private static final XMLOutputter XML_OUTPUTTER = new XMLOutputter(XML_OUTPUT_FORMAT);
-    
+
     private static final String USE_DEBUG_PERMISSION = "use-xeditor-debug";
 
     @Override
@@ -59,72 +67,115 @@ public class MCRDebugTarget implements MCREditorTarget {
             throw new MCRMissingPrivilegeException("use xeditor debug target", USE_DEBUG_PERMISSION);
         }
 
-        Map<String, String[]> parameters = job.getRequest().getParameterMap();
-        session.getSubmission().setSubmittedValues(parameters);
-
         job.getResponse().setContentType("text/html; charset=UTF-8");
-        PrintWriter out = job.getResponse().getWriter();
-        out.println("<html><body>");
+        this.writer = job.getResponse().getWriter();
+        this.session = session;
 
+        handleSubmittedParameters(job);
         Document result = session.getEditedXML().clone();
-        MCRChangeTracker tracker = session.getChangeTracker();
+        reportChangeTracking();
+        result = doXMLCleanup(result);
+        doPostProcessing(result);
 
-        List<Object> steps = new ArrayList<>();
+        sendDebugOutput();
+    }
+
+    private void handleSubmittedParameters(MCRServletJob job)
+        throws JaxenException, JDOMException {
+        Map<String, String[]> parameters = job.getRequest().getParameterMap();
+
+        addStepToOutput(new MCRBreakpoint("Submitted parameters"));
+        addStepToOutput(parameters);
+
+        session.getSubmission().setSubmittedValues(parameters);
+    }
+
+    private void doPostProcessing(Document result)
+        throws IOException, JDOMException {
+        result = session.getPostProcessor().process(result);
+        addStepToOutput(new MCRBreakpoint("After postprocessing"));
+        addStepToOutput(result.clone());
+    }
+
+    private Document doXMLCleanup(Document result) {
+        result = session.getXMLCleaner().clean(result);
+        addStepToOutput(new MCRBreakpoint("After cleaning"));
+        addStepToOutput(result.clone());
+        return result;
+    }
+
+    private void reportChangeTracking() {
+        MCRChangeTracker tracker = session.getChangeTracker();
         while (tracker.getChangeCount() > 0) {
             MCRTrackedAction change = tracker.undoLastChange();
             if (change instanceof MCRBreakpoint) {
-                steps.add(0, result.clone());
+                addAsFirstStepToOutput(session.getEditedXML().clone());
             }
-            steps.add(0, change);
+            addAsFirstStepToOutput(change);
         }
-
-        result = session.getXMLCleaner().clean(result);
-        steps.add(new MCRBreakpoint("After cleaning"));
-        steps.add(result.clone());
-
-        result = session.getPostProcessor().process(result);
-        steps.add(new MCRBreakpoint("After postprocessing"));
-        steps.add(result.clone());
-
-        for (int i = 0; i < steps.size(); i++) {
-            if (i == steps.size() - 6) {
-                outputParameters(parameters, out);
-            }
-
-            output(steps.get(i), out);
-        }
-
-        out.println("</body></html>");
-        out.close();
     }
 
-    private void outputParameters(Map<String, String[]> values, PrintWriter out) throws IOException {
-        output(new MCRBreakpoint("Submitted parameters"), out);
-        out.println("<ul>");
+    private void addStepToOutput(Object step) {
+        outputSteps.add(step);
+    }
 
-        List<String> names = new ArrayList<>(values.keySet());
+    private void addAsFirstStepToOutput(Object step) {
+        outputSteps.add(0, step);
+    }
+
+    private void sendDebugOutput() throws IOException {
+        writer.println("<html><body>");
+
+        for (Object step : outputSteps) {
+            sendDebugOutput(step);
+        }
+
+        writer.println("</body></html>");
+        writer.close();
+    }
+
+    private void sendDebugOutput(Object step) throws IOException {
+        if (step instanceof MCRBreakpoint bp) {
+            outputBreakpoint(bp);
+        } else if (step instanceof MCRChange c) {
+            outputChange(c);
+        } else if (step instanceof Document doc) {
+            outputXML(doc);
+        } else if (step instanceof Map map) {
+            @SuppressWarnings("unchecked")
+            Map<String, String[]> parameters = (Map<String, String[]>) map;
+            outputParameters(parameters);
+        }
+    }
+
+    private void outputBreakpoint(MCRBreakpoint bp) {
+        writer.println("<h3>" + bp.getMessage() + ":</h3>");
+    }
+
+    private void outputChange(MCRChange c) {
+        writer.println("<p>" + c.getMessage() + "</p>");
+    }
+
+    private void outputXML(Document doc) {
+        Element pre = new Element("pre").setAttribute("lang", "xml");
+        pre.setText(XML_OUTPUTTER.outputString(doc));
+        writer.println("<p>" + XML_OUTPUTTER.outputString(pre) + "</p>");
+    }
+
+    private void outputParameters(Map<String, String[]> parameters) {
+        writer.println("<ul>");
+
+        List<String> names = new ArrayList<>(parameters.keySet());
         Collections.sort(names);
 
         for (String name : names) {
-            for (String value : values.get(name)) {
-                out.print("<li>");
-                out.println(name + " = " + value);
-                out.println("</li>");
+            for (String value : parameters.get(name)) {
+                writer.print("<li>");
+                writer.println(name + " = " + value);
+                writer.println("</li>");
             }
         }
 
-        out.println("</ul>");
-    }
-
-    private void output(Object o, PrintWriter out) throws IOException {
-        if (o instanceof MCRBreakpoint bp) {
-            out.println("<h3>" + bp.getMessage() + ":</h3>");
-        } else if (o instanceof MCRChange c) {
-            out.println("<p>" + c.getMessage() + "</p>");
-        } else if (o instanceof Document doc) {
-            Element pre = new Element("pre").setAttribute("lang", "xml");
-            pre.setText(XML_OUTPUTTER.outputString(doc));
-            out.println("<p>" + XML_OUTPUTTER.outputString(pre) + "</p>");
-        }
+        writer.println("</ul>");
     }
 }
