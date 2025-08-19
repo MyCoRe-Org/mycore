@@ -153,7 +153,7 @@ public class MCRDebugTarget implements MCREditorTarget {
     }
 
     private void outputChange(MCRChange c) {
-        writer.println("<p>" + c.getMessage() + "</p>");
+        writer.println( c.getMessage() + "<br/>");
     }
 
     private void outputXML(Document doc) {
@@ -163,19 +163,13 @@ public class MCRDebugTarget implements MCREditorTarget {
     }
 
     private void outputParameters(Map<String, String[]> parameters) {
-        writer.println("<ul>");
-
         List<String> names = new ArrayList<>(parameters.keySet());
         Collections.sort(names);
 
         for (String name : names) {
             for (String value : parameters.get(name)) {
-                writer.print("<li>");
-                writer.println(name + " = " + value);
-                writer.println("</li>");
+                writer.println(name + " = " + value + "<br/>");
             }
         }
-
-        writer.println("</ul>");
     }
 }
