@@ -35,6 +35,8 @@ import org.mycore.restapi.MCRNormalizeMCRObjectIDsFilter;
 import org.mycore.restapi.MCRRemoveMsgBodyFilter;
 import org.mycore.restapi.converter.MCRWrappedXMLWriter;
 import org.mycore.restapi.v1.MCRRestAPIAuthentication;
+import org.mycore.restapi.v2.service.MCRRestObjectLockService;
+import org.mycore.restapi.v2.service.MCRRestObjectLockServiceImpl;
 
 import com.fasterxml.jackson.jakarta.rs.json.JacksonXmlBindJsonProvider;
 
@@ -46,7 +48,6 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.servers.Server;
-import org.mycore.restapi.v2.service.MCRRestObjectLockService;
 
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.InternalServerErrorException;
@@ -81,8 +82,7 @@ public class MCRRestV2App extends MCRJerseyRestApp {
             @Override
             protected void configure() {
                 bind(MCRRestObjectLockService.class)
-                    .to(MCRRestObjectLockService.class)
-                    .in(jakarta.inject.Singleton.class);
+                    .to(MCRRestObjectLockServiceImpl.class);
             }
         });
     }
