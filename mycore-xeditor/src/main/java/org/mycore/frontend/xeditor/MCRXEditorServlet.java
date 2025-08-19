@@ -57,7 +57,6 @@ public class MCRXEditorServlet extends MCRServlet {
         }
 
         int stepNr = Integer.parseInt(xEditorStepID.split("-")[1]);
-        session.getChangeTracker().setEditedXML(session.getEditedXML());
         session.getChangeTracker().undoChanges(stepNr);
 
         sendToTarget(job, session);

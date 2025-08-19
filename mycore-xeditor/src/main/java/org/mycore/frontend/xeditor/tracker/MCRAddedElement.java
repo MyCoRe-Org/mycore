@@ -18,8 +18,8 @@
 
 package org.mycore.frontend.xeditor.tracker;
 
-import org.jdom2.Document;
 import org.jdom2.Element;
+import org.mycore.common.xml.MCRXPathBuilder;
 
 /**
  * Tracks that a new element was added.  
@@ -28,14 +28,15 @@ import org.jdom2.Element;
  */
 public class MCRAddedElement extends MCRChange {
 
+    private Element element;
+
     public MCRAddedElement(Element element) {
-        super(element);
-        setMessage("Added " + getXPath());
+        this.element = element;
+        setMessage("Added " + MCRXPathBuilder.buildXPath(element));
     }
 
     @Override
-    protected void undo(Document doc) {
-        Element element = (Element) (getNodeByXPath(doc));
+    protected void undo() {
         element.detach();
     }
 }

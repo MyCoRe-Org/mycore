@@ -19,9 +19,7 @@
 package org.mycore.frontend.xeditor.tracker;
 
 import org.jdom2.Attribute;
-import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.Namespace;
 import org.mycore.common.xml.MCRXPathBuilder;
 
 /**
@@ -31,26 +29,20 @@ import org.mycore.common.xml.MCRXPathBuilder;
  */
 public class MCRRemoveAttribute extends MCRChange {
 
-    private String name;
+    private Element parent;
 
-    private Namespace namespace;
-
-    private String value;
+    private Attribute attribute;
 
     public MCRRemoveAttribute(Attribute attribute) {
-        super(attribute.getParent());
+        this.parent = attribute.getParent();
+        this.attribute = attribute;
+
         setMessage("Removed " + MCRXPathBuilder.buildXPath(attribute));
-
-        this.name = attribute.getName();
-        this.value = attribute.getValue();
-        this.namespace = attribute.getNamespace();
-
         attribute.detach();
     }
 
     @Override
-    protected void undo(Document doc) {
-        Element parent = (Element) (getNodeByXPath(doc));
-        parent.setAttribute(name, value, namespace);
+    protected void undo() {
+        parent.setAttribute(attribute);
     }
 }

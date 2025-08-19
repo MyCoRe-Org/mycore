@@ -18,7 +18,6 @@
 
 package org.mycore.frontend.xeditor.tracker;
 
-import org.jdom2.Document;
 import org.jdom2.Element;
 import org.mycore.common.xml.MCRXPathBuilder;
 
@@ -29,26 +28,25 @@ import org.mycore.common.xml.MCRXPathBuilder;
  */
 public class MCRRemoveElement extends MCRChange {
 
+    /** The removed element */
+    private Element element;
+
+    private Element parent;
+
     /** The position in the parent's content before removing */
     private int positionInParent;
 
-    /** Encoded string representation of the removed element */ 
-    private String encodedRemovedElement;
-
     public MCRRemoveElement(Element element) {
-        super(element.getParentElement());
-        setMessage("Removed " + MCRXPathBuilder.buildXPath(element));
-
-        this.positionInParent = element.getParentElement().indexOf(element);
-        this.encodedRemovedElement = MCRElementEncoder.element2text(element);
+        this.element = element;
+        this.parent = element.getParentElement();
+        this.positionInParent = parent.indexOf(element);
         
+        setMessage("Removed " + MCRXPathBuilder.buildXPath(element));
         element.detach();
     }
 
     @Override
-    protected void undo(Document doc) {
-        Element parent = (Element) (getNodeByXPath(doc));
-        Element removedElement = MCRElementEncoder.text2element(encodedRemovedElement);
-        parent.addContent(positionInParent, removedElement);
+    protected void undo() {
+        parent.addContent(positionInParent, element);
     }
 }

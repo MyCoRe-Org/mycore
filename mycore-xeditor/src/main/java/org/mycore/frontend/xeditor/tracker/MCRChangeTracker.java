@@ -20,7 +20,6 @@ package org.mycore.frontend.xeditor.tracker;
 
 import java.util.Stack;
 
-import org.jdom2.Document;
 
 /**
  * Tracks changes to the edited xml, allowing to undo them step by step.  
@@ -29,7 +28,6 @@ import org.jdom2.Document;
  */
 public class MCRChangeTracker {
 
-    private Document editedXML;
 
     /** A stack of performed changes **/
     @SuppressWarnings("PMD.LooseCoupling")
@@ -44,17 +42,6 @@ public class MCRChangeTracker {
      */
     public int getChangeCount() {
         return changes.size();
-    }
-
-    public void setEditedXML(Document editedXML) {
-        this.editedXML = editedXML;
-    }
-
-    public MCRChangeTracker copy() {
-        MCRChangeTracker copy = new MCRChangeTracker();
-        copy.editedXML = this.editedXML;
-        copy.changes = (Stack<MCRTrackedAction>) this.changes.clone();
-        return copy;
     }
 
     /**
@@ -97,7 +84,7 @@ public class MCRChangeTracker {
     public MCRTrackedAction undoLastChange() {
         MCRTrackedAction ta = changes.pop();
         if (ta instanceof MCRChange change) {
-            change.undo(editedXML);
+            change.undo();
         }
         return ta;
     }

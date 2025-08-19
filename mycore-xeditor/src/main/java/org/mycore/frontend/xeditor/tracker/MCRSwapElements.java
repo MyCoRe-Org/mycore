@@ -20,8 +20,8 @@ package org.mycore.frontend.xeditor.tracker;
 
 import java.util.List;
 
-import org.jdom2.Document;
 import org.jdom2.Element;
+import org.mycore.common.xml.MCRXPathBuilder;
 
 /**
  * Swaps two elements in the edited xml, and tracks that change.  
@@ -29,6 +29,8 @@ import org.jdom2.Element;
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRSwapElements extends MCRChange {
+
+    private Element parent;
 
     /** The position of the first element swapped */
     private int posA;
@@ -55,11 +57,10 @@ public class MCRSwapElements extends MCRChange {
      * @param posB the position of the other element to swap
      */
     public MCRSwapElements(Element parent, int posA, int posB) {
-        super(parent);
+        this.parent = parent;
         this.posA = posA;
         this.posB = posB;
         swap(parent, posA, posB);
-        setMessage(String.format("Swapped %s children %s and %s", getXPath(), posA, posB));
     }
 
     /** 
@@ -70,6 +71,13 @@ public class MCRSwapElements extends MCRChange {
             swap(parent, posB, posA);
         } else {
             List<Element> children = parent.getChildren(); // => x a x x b x
+
+            String xPathParent = MCRXPathBuilder.buildXPath(parent);
+            String xPathOfA = MCRXPathBuilder.buildChildPath(children.get(posA));
+            String xPathOfB = MCRXPathBuilder.buildChildPath(children.get(posB));
+
+            setMessage("Swapped " + xPathParent + " children " + xPathOfA + " and " + xPathOfB);
+
             Element b = children.remove(posB); // => x a x x x  
             Element a = children.remove(posA); // => x x x x 
             children.add(posA, b); // => x b x x x 
@@ -78,8 +86,7 @@ public class MCRSwapElements extends MCRChange {
     }
 
     @Override
-    protected void undo(Document doc) {
-        Element parent = (Element) (getNodeByXPath(doc));
+    protected void undo() {
         swap(parent, posA, posB);
     }
 }

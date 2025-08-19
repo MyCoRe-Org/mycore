@@ -21,8 +21,8 @@ package org.mycore.frontend.xeditor.tracker;
 import java.util.List;
 
 import org.jdom2.Content;
-import org.jdom2.Document;
 import org.jdom2.Element;
+import org.mycore.common.xml.MCRXPathBuilder;
 
 /**
  * Sets an element's text in the edited xml, and tracks that change.  
@@ -31,29 +31,20 @@ import org.jdom2.Element;
  */
 public class MCRSetElementText extends MCRChange {
 
-    public String encodedOldContent;
+    public Element element;
+
+    public List<Content> oldContent;
 
     public MCRSetElementText(Element element, String newValue) {
-        super(element);
-        setMessage(String.format("Set %s=\"%s\"", getXPath(), newValue));
-        this.encodedOldContent = encodeContent(element);
-        element.setText(newValue);
-    }
+        this.element = element;
+        this.oldContent = element.removeContent();
 
-    private String encodeContent(Element element) {
-        List<Content> content = element.cloneContent();
-        Element x = new Element("x").setContent(content);
-        return MCRElementEncoder.element2text(x);
+        element.setText(newValue);
+        setMessage("Set " + MCRXPathBuilder.buildXPath(element) + "=\"" + newValue + "\"");
     }
 
     @Override
-    protected void undo(Document doc) {
-        Element element = (Element) (getNodeByXPath(doc));
-        element.setContent(decodeContent());
-    }
-
-    private List<Content> decodeContent() {
-        Element x = MCRElementEncoder.text2element(encodedOldContent);
-        return x.removeContent();
+    protected void undo() {
+        element.setContent(oldContent);
     }
 }

@@ -19,7 +19,7 @@
 package org.mycore.frontend.xeditor.tracker;
 
 import org.jdom2.Attribute;
-import org.jdom2.Document;
+import org.mycore.common.xml.MCRXPathBuilder;
 
 /**
  * Sets an attribute value in the edited xml, and tracks that change.  
@@ -28,19 +28,20 @@ import org.jdom2.Document;
  */
 public class MCRSetAttributeValue extends MCRChange {
 
+    private Attribute attribute;
+
     private String oldValue;
 
     public MCRSetAttributeValue(Attribute attr, String newValue) {
-        super(attr);
-        setMessage(String.format("Set %s=\"%s\"", getXPath(), attr.getValue()));
-
+        this.attribute = attr;
         this.oldValue = attr.getValue();
+
         attr.setValue(newValue);
+        setMessage("Set " + MCRXPathBuilder.buildXPath(attr) + "=\"" + newValue + "\"");
     }
 
     @Override
-    protected void undo(Document doc) {
-        Attribute attr = (Attribute) (getNodeByXPath(doc));
-        attr.setValue(oldValue);
+    protected void undo() {
+        attribute.setValue(oldValue);
     }
 }

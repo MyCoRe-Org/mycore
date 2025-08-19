@@ -19,7 +19,7 @@
 package org.mycore.frontend.xeditor.tracker;
 
 import org.jdom2.Attribute;
-import org.jdom2.Document;
+import org.mycore.common.xml.MCRXPathBuilder;
 
 /**
  * Tracks that a new attribute was added.  
@@ -28,14 +28,15 @@ import org.jdom2.Document;
  */
 public class MCRAddedAttribute extends MCRChange {
 
-    public MCRAddedAttribute(Attribute attr) {
-        super(attr);
-        setMessage(String.format("Added %s/@%s=\"%s\"", getXPath(), attr.getQualifiedName(), attr.getValue()));
+    private Attribute attribute;
+
+    public MCRAddedAttribute(Attribute attribute) {
+        this.attribute = attribute;
+        setMessage("Added " + MCRXPathBuilder.buildXPath(attribute) + " = \"" + attribute.getValue() + "\"");
     }
 
     @Override
-    protected void undo(Document doc) {
-        Attribute attr = (Attribute) (getNodeByXPath(doc));
-        attr.detach();
+    protected void undo() {
+        attribute.detach();
     }
 }

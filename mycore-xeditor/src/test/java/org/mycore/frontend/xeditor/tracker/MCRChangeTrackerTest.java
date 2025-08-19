@@ -220,6 +220,5 @@ public class MCRChangeTrackerTest {
     private void buildTestElement(String template) throws JaxenException {
         this.root = new MCRNodeBuilder().buildElement(template, null, null);
         this.tracker = new MCRChangeTracker();
-        this.tracker.setEditedXML(new Document(root));
     }
 }

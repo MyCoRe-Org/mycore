@@ -67,8 +67,7 @@ public class MCRDebugTarget implements MCREditorTarget {
         out.println("<html><body>");
 
         Document result = session.getEditedXML().clone();
-        MCRChangeTracker tracker = session.getChangeTracker().copy();
-        tracker.setEditedXML(result);
+        MCRChangeTracker tracker = session.getChangeTracker();
 
         List<Object> steps = new ArrayList<>();
         while (tracker.getChangeCount() > 0) {
@@ -78,8 +77,6 @@ public class MCRDebugTarget implements MCREditorTarget {
             }
             steps.add(0, change);
         }
-
-        result = session.getEditedXML().clone();
 
         result = session.getXMLCleaner().clean(result);
         steps.add(new MCRBreakpoint("After cleaning"));
