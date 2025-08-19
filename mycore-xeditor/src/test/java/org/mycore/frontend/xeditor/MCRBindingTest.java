@@ -18,9 +18,9 @@
 
 package org.mycore.frontend.xeditor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,22 +28,21 @@ import java.util.Map;
 import org.jaxen.JaxenException;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.junit.Before;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.xml.MCRNodeBuilder;
+import org.mycore.test.MyCoReTest;
 
 /**
  * @author Frank Lützenkirchen
  */
-public class MCRBindingTest extends MCRTestCase {
+@MyCoReTest
+public class MCRBindingTest {
 
     private MCRBinding binding;
 
-    @Before
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
+    @BeforeEach
+    public void setUp() {
         Element root = new Element("document");
         root.addContent(new Element("title").setAttribute("type", "main").setText("title1"));
         root.addContent(new Element("title").setAttribute("type", "alternative").setText("title2"));
