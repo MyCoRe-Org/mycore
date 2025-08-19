@@ -18,11 +18,12 @@
 
 package org.mycore.pi;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.junit.Assert;
 import org.mycore.datamodel.metadata.MCRBase;
 
 public class MCRMockMetadataService extends MCRPIMetadataService<MCRMockIdentifier> {
@@ -35,13 +36,13 @@ public class MCRMockMetadataService extends MCRPIMetadataService<MCRMockIdentifi
 
     @Override
     public void insertIdentifier(MCRMockIdentifier identifier, MCRBase obj, String additional) {
-        Assert.assertEquals("Test propterties should be set!", getProperties().get(TEST_PROPERTY), TEST_PROPERTY_VALUE);
+        assertEquals(TEST_PROPERTY_VALUE, getProperties().get(TEST_PROPERTY), "Test properties should be set!");
         map.put(obj + additional, identifier);
     }
 
     @Override
     public void removeIdentifier(MCRMockIdentifier identifier, MCRBase obj, String additional) {
-        Assert.assertEquals("Test properties should be set!", getProperties().get(TEST_PROPERTY), TEST_PROPERTY_VALUE);
+        assertEquals(TEST_PROPERTY_VALUE, getProperties().get(TEST_PROPERTY), "Test properties should be set!");
         map.remove(obj + additional);
     }
 

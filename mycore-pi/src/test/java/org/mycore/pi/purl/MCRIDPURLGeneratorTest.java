@@ -18,27 +18,39 @@
 
 package org.mycore.pi.purl;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mycore.pi.MCRPIService.GENERATOR_CONFIG_PREFIX;
 
-import java.util.Map;
-
-import org.junit.Assert;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+import org.mycore.test.MyCoReTest;
 
-public class MCRIDPURLGeneratorTest extends MCRTestCase {
+@MyCoReTest
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true"),
+    @MCRTestProperty(key = GENERATOR_CONFIG_PREFIX + MCRIDPURLGeneratorTest.GENERATOR_1,
+        classNameOf = MCRIDPURLGenerator.class),
+    @MCRTestProperty(key = GENERATOR_CONFIG_PREFIX + MCRIDPURLGeneratorTest.GENERATOR_1 + ".BaseURLTemplate",
+        string = MCRIDPURLGeneratorTest.TEST_BASE_1),
+    @MCRTestProperty(key = GENERATOR_CONFIG_PREFIX + MCRIDPURLGeneratorTest.GENERATOR_2,
+        classNameOf = MCRIDPURLGenerator.class),
+    @MCRTestProperty(key = GENERATOR_CONFIG_PREFIX + MCRIDPURLGeneratorTest.GENERATOR_2 + ".BaseURLTemplate",
+        string = MCRIDPURLGeneratorTest.TEST_BASE_2)
+})
+public class MCRIDPURLGeneratorTest {
 
-    private static final String TEST_BASE_1 = "http://purl.myurl.de/$ID";
+    public static final String TEST_BASE_1 = "http://purl.myurl.de/$ID";
 
-    private static final String TEST_BASE_2 = "http://purl.myurl.de/$ID/$ID/$ID";
+    public static final String TEST_BASE_2 = "http://purl.myurl.de/$ID/$ID/$ID";
 
-    private static final String GENERATOR_1 = "IDPURLGenerator";
+    public static final String GENERATOR_1 = "IDPURLGenerator";
 
-    private static final String GENERATOR_2 = GENERATOR_1 + "2";
+    public static final String GENERATOR_2 = GENERATOR_1 + "2";
 
     @Test
     public void generate() throws MCRPersistentIdentifierException {
@@ -48,27 +60,14 @@ public class MCRIDPURLGeneratorTest extends MCRTestCase {
 
         MCRIDPURLGenerator generator1 = MCRConfiguration2.getInstanceOfOrThrow(
             MCRIDPURLGenerator.class, GENERATOR_CONFIG_PREFIX + GENERATOR_1);
-        Assert.assertEquals("", generator1.generate(mcrObject, "").asString(),
-            "http://purl.myurl.de/my_test_00000001");
+        assertEquals("http://purl.myurl.de/my_test_00000001",
+                generator1.generate(mcrObject, "").asString(), "");
 
         MCRIDPURLGenerator generator2 = MCRConfiguration2.getInstanceOfOrThrow(
             MCRIDPURLGenerator.class, GENERATOR_CONFIG_PREFIX + GENERATOR_2);
-        Assert.assertEquals("", generator2.generate(mcrObject, "").asString(),
-            "http://purl.myurl.de/my_test_00000001/my_test_00000001/my_test_00000001");
+        assertEquals("http://purl.myurl.de/my_test_00000001/my_test_00000001/my_test_00000001",
+                generator2.generate(mcrObject, "").asString(), "");
 
     }
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.Metadata.Type.test", Boolean.TRUE.toString());
-
-        testProperties.put(GENERATOR_CONFIG_PREFIX + GENERATOR_1, MCRIDPURLGenerator.class.getName());
-        testProperties.put(GENERATOR_CONFIG_PREFIX + GENERATOR_1 + ".BaseURLTemplate", TEST_BASE_1);
-
-        testProperties.put(GENERATOR_CONFIG_PREFIX + GENERATOR_2, MCRIDPURLGenerator.class.getName());
-        testProperties.put(GENERATOR_CONFIG_PREFIX + GENERATOR_2 + ".BaseURLTemplate", TEST_BASE_2);
-
-        return testProperties;
-    }
 }
