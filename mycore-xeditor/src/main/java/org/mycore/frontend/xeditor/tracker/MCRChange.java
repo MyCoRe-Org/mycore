@@ -38,7 +38,6 @@ public abstract class MCRChange extends MCRTrackedAction {
      * Creates a new object representing a change in XML.
      * 
      * @param node the node the change is performed on
-     * @param action the action
      */
     protected MCRChange(Object node) {
         this.xPath = MCRXPathBuilder.buildXPath(node);
