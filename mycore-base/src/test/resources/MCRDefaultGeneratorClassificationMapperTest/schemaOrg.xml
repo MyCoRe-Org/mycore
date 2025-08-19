@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<mycoreclass xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ID="schemaOrg" xsi:noNamespaceSchemaLocation="MCRClassification.xsd">
+    <label xml:lang="de" text="schema.org"/>
+    <label xml:lang="en" text="schema.org"/>
+    <label xml:lang="x-source" text="https://github.com/MyCoRe-Org/schemaorg2classification"/>
+    <label xml:lang="x-uri" text="http://schema.org/"/>
+    <categories>
+        <category ID="Thing">
+            <label xml:lang="de" text="Thing"/>
+            <label xml:lang="en" text="Thing" description="The most generic type of item."/>
+            <label xml:lang="x-uri" text="http://schema.org/Thing"/>
+            <category ID="CreativeWork">
+                <label xml:lang="de" text="CreativeWork"/>
+                <label xml:lang="en" text="CreativeWork" description="The most generic kind of creative work, including books, movies, photographs, software programs, etc."/>
+                <label xml:lang="x-uri" text="http://schema.org/CreativeWork"/>
+                <!-- The category with ID AmpStory could also be placed here. -->
+                <category ID="Article">
+                    <label xml:lang="de" text="Article"/>
+                    <label xml:lang="en" text="Article" description="An article, such as a news article or piece of investigative report. Newspapers and magazines have articles of many different types and this is intended to cover them all.\n\nSee also [blog post](http://blog.schema.org/2014/09/schemaorg-support-for-bibliographic_2.html)."/>
+                    <label xml:lang="x-uri" text="http://schema.org/Article"/>
+                </category>
+            </category>
+        </category>
+    </categories>
+</mycoreclass>
