@@ -18,14 +18,14 @@
 
 package org.mycore.wcms2.datamodel;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMResult;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mycore.wcms2.datamodel.MCRNavigationItem.Target;
 import org.mycore.wcms2.datamodel.MCRNavigationItem.Type;
 
@@ -40,7 +40,7 @@ public class ItemTest {
 
     private MCRNavigationItem item;
 
-    @Before
+    @BeforeEach
     public void setup() {
         this.item = new MCRNavigationItem();
         this.item.setHref("/content/main/search.xml");
