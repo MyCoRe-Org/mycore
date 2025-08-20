@@ -20,7 +20,7 @@ package org.mycore.frontend.classeditor.json;
 
 import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRJSONManager;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationBase;
