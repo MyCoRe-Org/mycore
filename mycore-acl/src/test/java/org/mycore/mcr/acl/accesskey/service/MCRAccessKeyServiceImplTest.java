@@ -18,12 +18,12 @@
 
 package org.mycore.mcr.acl.accesskey.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,13 +31,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.mycore.access.MCRAccessException;
-import org.mycore.common.MCRTestCase;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyPartialUpdateDto;
 import org.mycore.mcr.acl.accesskey.dto.util.MCRNullable;
@@ -49,8 +48,10 @@ import org.mycore.mcr.acl.accesskey.persistence.MCRAccessKeyRepository;
 import org.mycore.mcr.acl.accesskey.service.processor.MCRAccessKeyHashSecretProcessor;
 import org.mycore.mcr.acl.accesskey.service.processor.MCRAccessKeySecretProcessor;
 import org.mycore.mcr.acl.accesskey.validation.MCRAccessKeyValidatorImpl;
+import org.mycore.test.MyCoReTest;
 
-public class MCRAccessKeyServiceImplTest extends MCRTestCase {
+@MyCoReTest
+public class MCRAccessKeyServiceImplTest {
 
     private MCRAccessKeyRepository accessKeyRepositoryMock;
 
@@ -78,10 +79,8 @@ public class MCRAccessKeyServiceImplTest extends MCRTestCase {
 
     private static String testEncodedSecretWrite;
 
-    @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         accessKeyRepositoryMock = Mockito.mock(MCRAccessKeyRepository.class);
         accessKeySecretProcessor = new MCRAccessKeyHashSecretProcessor(1);
         Mockito.when(accessKeyRepositoryMock.existsByReferenceAndSecret(TEST_REFERENCE_READ, testEncodedSecretWrite))
