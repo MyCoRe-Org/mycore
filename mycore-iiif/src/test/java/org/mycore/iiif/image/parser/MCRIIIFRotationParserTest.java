@@ -18,11 +18,12 @@
 
 package org.mycore.iiif.image.parser;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.Hashtable;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.iiif.image.model.MCRIIIFImageTargetRotation;
 
 public class MCRIIIFRotationParserTest {
@@ -40,7 +41,7 @@ public class MCRIIIFRotationParserTest {
         testValues.put("270", new MCRIIIFImageTargetRotation(false, 270));
         testValues.put("!270", new MCRIIIFImageTargetRotation(true, 270));
 
-        testValues.forEach((rotationString, expectedResult) -> Assert
-            .assertEquals(new MCRIIIFRotationParser(rotationString).parse(), expectedResult));
+        testValues.forEach((rotationString, expectedResult) -> assertEquals(
+                new MCRIIIFRotationParser(rotationString).parse(), expectedResult));
     }
 }

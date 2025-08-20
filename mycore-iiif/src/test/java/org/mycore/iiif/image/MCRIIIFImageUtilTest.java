@@ -18,22 +18,23 @@
 
 package org.mycore.iiif.image;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 public class MCRIIIFImageUtilTest {
 
     @Test
     public void encodeImageIdentifier() {
         //examples from https://iiif.io/api/image/2.1/#uri-encoding-and-decoding
-        Assert.assertEquals("id1", MCRIIIFImageUtil.encodeImageIdentifier("id1"));
-        Assert.assertEquals("bb157hs6068", MCRIIIFImageUtil.encodeImageIdentifier("bb157hs6068"));
-        Assert.assertEquals("ark:%2F12025%2F654xz321", MCRIIIFImageUtil.encodeImageIdentifier("ark:/12025/654xz321"));
-        Assert.assertEquals("urn:foo:a123,456", MCRIIIFImageUtil.encodeImageIdentifier("urn:foo:a123,456"));
-        Assert.assertEquals("http:%2F%2Fexample.com%2F%3F54%23a",
+        assertEquals("id1", MCRIIIFImageUtil.encodeImageIdentifier("id1"));
+        assertEquals("bb157hs6068", MCRIIIFImageUtil.encodeImageIdentifier("bb157hs6068"));
+        assertEquals("ark:%2F12025%2F654xz321", MCRIIIFImageUtil.encodeImageIdentifier("ark:/12025/654xz321"));
+        assertEquals("urn:foo:a123,456", MCRIIIFImageUtil.encodeImageIdentifier("urn:foo:a123,456"));
+        assertEquals("http:%2F%2Fexample.com%2F%3F54%23a",
             MCRIIIFImageUtil.encodeImageIdentifier("http://example.com/?54#a"));
-        Assert.assertEquals("Mot%C3%B6rhead", MCRIIIFImageUtil.encodeImageIdentifier("Motörhead"));
-        Assert.assertEquals("mycore_derivate_00000001:%2Ftest.tiff",
+        assertEquals("Mot%C3%B6rhead", MCRIIIFImageUtil.encodeImageIdentifier("Motörhead"));
+        assertEquals("mycore_derivate_00000001:%2Ftest.tiff",
             MCRIIIFImageUtil.encodeImageIdentifier("mycore_derivate_00000001:/test.tiff"));
     }
 
