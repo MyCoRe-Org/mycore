@@ -18,11 +18,6 @@
 
 package org.mycore.mods;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
@@ -34,20 +29,31 @@ import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRTestCase;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.common.MCRXlink;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.test.MyCoReTest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Thomas Scheffler (yagee)
  */
-public class MCRMODSWrapperTest extends MCRTestCase {
+@MyCoReTest
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true")
+})
+public class MCRMODSWrapperTest {
 
     /**
      * Test method for {@link org.mycore.mods.MCRMODSWrapper#wrapMODSDocument(org.jdom2.Element, java.lang.String)}.
@@ -56,14 +62,14 @@ public class MCRMODSWrapperTest extends MCRTestCase {
     public void testWrapMODSDocument() throws Exception {
         Document modsDoc = loadMODSDocument();
         MCRObject mcrObj = MCRMODSWrapper.wrapMODSDocument(modsDoc.getRootElement(), "JUnit");
-        assertTrue("Generated MCRObject is not valid.", mcrObj.isValid());
+        assertTrue(mcrObj.isValid(), "Generated MCRObject is not valid.");
         Document mcrObjXml = mcrObj.createXML();
         //check load from XML throws no exception
         MCRObject mcrObj2 = new MCRObject(mcrObjXml);
         mcrObjXml = mcrObj2.createXML();
         XPathExpression<Element> xpathCheck = XPathFactory.instance().compile("//mods:mods", Filters.element(), null,
             MCRConstants.MODS_NAMESPACE);
-        assertEquals("Did not find mods data", 1, xpathCheck.evaluate(mcrObjXml).size());
+        assertEquals(1, xpathCheck.evaluate(mcrObjXml).size(), "Did not find mods data");
     }
 
     private Document loadMODSDocument() throws IOException, JDOMException {
@@ -80,13 +86,13 @@ public class MCRMODSWrapperTest extends MCRTestCase {
         Document mcrObjXml = wrapper.getMCRObject().createXML();
         XPathExpression<Element> xpathCheck = XPathFactory.instance().compile("//mods:mods", Filters.element(), null,
             MCRConstants.MODS_NAMESPACE);
-        assertEquals("Did not find mods data", 1, xpathCheck.evaluate(mcrObjXml).size());
+        assertEquals(1, xpathCheck.evaluate(mcrObjXml).size(), "Did not find mods data");
     }
 
     @Test
     public void testServiceFlags() {
         MCRMODSWrapper wrapper = new MCRMODSWrapper();
-        assertNull(wrapper.getServiceFlag("name"));
+        Assertions.assertNull(wrapper.getServiceFlag("name"));
         wrapper.setServiceFlag("name", "value");
         assertEquals("value", wrapper.getServiceFlag("name"));
     }
@@ -117,7 +123,7 @@ public class MCRMODSWrapperTest extends MCRTestCase {
         XPathExpression<Element> xpathCheck = XPathFactory.instance().compile(checkXpathString, Filters.element(),
             null, MCRConstants.MODS_NAMESPACE);
 
-        assertTrue(xpathCheck.evaluate(mcrObjXml).size() > 0);
+        assertFalse(xpathCheck.evaluate(mcrObjXml).isEmpty());
     }
 
     @Test
@@ -126,8 +132,8 @@ public class MCRMODSWrapperTest extends MCRTestCase {
         MCRObjectID mycoreMods = MCRObjectID.getInstance("mycore_mods_00000011");
         MCRObjectID mycoreSthelse = MCRObjectID.getInstance("mycore_sthelse_00000011");
 
-        assertTrue("Mods type should be supported.", MCRMODSWrapper.isSupported(mycoreMods));
-        assertFalse("sthesle type should not be supported.", MCRMODSWrapper.isSupported(mycoreSthelse));
+        assertTrue(MCRMODSWrapper.isSupported(mycoreMods), "Mods type should be supported.");
+        assertFalse(MCRMODSWrapper.isSupported(mycoreSthelse), "sthesle type should not be supported.");
     }
 
     @Test
@@ -140,22 +146,16 @@ public class MCRMODSWrapperTest extends MCRTestCase {
         mods.addContent(relatedItem);
         wrapper.setID("JUnit", 4711);
         wrapper.setMODS(mods);
-        assertEquals("There should be no related item!", 0, wrapper.getLinkedRelatedItems().size());
+        assertEquals(0, wrapper.getLinkedRelatedItems().size(), "There should be no related item!");
 
         relatedItem.setAttribute("type", "");
-        assertEquals("There should be no related item!", 0, wrapper.getLinkedRelatedItems().size());
+        assertEquals(0, wrapper.getLinkedRelatedItems().size(), "There should be no related item!");
 
         relatedItem.setAttribute("type", "series");
-        assertEquals("There should be one related item!", 1, wrapper.getLinkedRelatedItems().size());
+        assertEquals(1, wrapper.getLinkedRelatedItems().size(), "There should be one related item!");
 
         relatedItem.removeAttribute(MCRXlink.HREF, MCRConstants.XLINK_NAMESPACE);
-        assertEquals("There should be no related item!", 0, wrapper.getLinkedRelatedItems().size());
+        assertEquals(0, wrapper.getLinkedRelatedItems().size(), "There should be no related item!");
     }
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.Metadata.Type.mods", "true");
-        return testProperties;
-    }
 }

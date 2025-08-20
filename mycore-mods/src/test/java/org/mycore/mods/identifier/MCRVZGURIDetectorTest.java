@@ -18,21 +18,23 @@
 
 package org.mycore.mods.identifier;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Optional;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class MCRVZGURIDetectorTest {
 
     private Hashtable<URI, String> testData;
 
-    @Before
+    @BeforeEach
     public void prepareTest() throws URISyntaxException {
         testData = new Hashtable<>();
 
@@ -47,12 +49,12 @@ public class MCRVZGURIDetectorTest {
         testData.forEach((key, value) -> {
             Optional<Map.Entry<String, String>> maybeDetectedGND = detector.detect(key);
 
-            Assert.assertTrue("Should have a detected PPN", maybeDetectedGND.isPresent());
+            assertTrue(maybeDetectedGND.isPresent(), "Should have a detected PPN");
 
             maybeDetectedGND.ifPresent(
-                gnd -> Assert.assertEquals("Should have detected the right type!", gnd.getKey(), "ppn"));
+                gnd -> assertEquals("ppn", gnd.getKey(), "Should have detected the right type!"));
             maybeDetectedGND.ifPresent(
-                gnd -> Assert.assertEquals("Should have detected the right value!", gnd.getValue(), value));
+                gnd -> assertEquals(gnd.getValue(), value, "Should have detected the right value!"));
         });
     }
 }

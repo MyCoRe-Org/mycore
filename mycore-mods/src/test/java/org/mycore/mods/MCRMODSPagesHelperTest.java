@@ -18,14 +18,15 @@
 
 package org.mycore.mods;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.jdom2.Element;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRTestCase;
+import org.mycore.test.MyCoReTest;
 
-public class MCRMODSPagesHelperTest extends MCRTestCase {
+@MyCoReTest
+public class MCRMODSPagesHelperTest {
 
     @Test
     public void testPages2Extent() {

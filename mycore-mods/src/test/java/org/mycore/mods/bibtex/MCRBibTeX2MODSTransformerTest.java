@@ -18,24 +18,24 @@
 
 package org.mycore.mods.bibtex;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
 
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRTestCase;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.content.MCRJDOMContent;
-import org.xml.sax.SAXException;
+import org.mycore.test.MyCoReTest;
 
-public class MCRBibTeX2MODSTransformerTest extends MCRTestCase {
+@MyCoReTest
+public class MCRBibTeX2MODSTransformerTest {
 
     @Test
-    public void testTransformation() throws IOException, JDOMException, SAXException {
+    public void testTransformation() throws IOException, JDOMException {
         ClassLoader classLoader = getClass().getClassLoader();
         File baseDir = new File(classLoader.getResource("BibTeX2MODSTransformerTest").getFile());
         int numTests = baseDir.list().length / 2;
@@ -59,7 +59,7 @@ public class MCRBibTeX2MODSTransformerTest extends MCRTestCase {
             String result = new MCRJDOMContent(resultingMODS).asString();
 
             String message = "transformation of " + bibTeXFile.getName();
-            assertEquals(message, expected, result);
+            assertEquals(expected, result, message);
         }
     }
 

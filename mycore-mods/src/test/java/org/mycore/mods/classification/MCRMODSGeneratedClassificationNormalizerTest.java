@@ -17,24 +17,28 @@
  */
 package org.mycore.mods.classification;
 
-import static junit.framework.TestCase.assertNotNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.io.InputStream;
 import java.util.List;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
-import org.junit.Test;
-import org.mycore.common.MCRJPATestCase;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSClassificationMappingNormalizer;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.mods.classification.mapping.MCRMODSGeneratorClassificationMapper;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MyCoReTest;
 
-public class MCRMODSGeneratedClassificationNormalizerTest extends MCRJPATestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
+public class MCRMODSGeneratedClassificationNormalizerTest {
 
     private static final String TEST_RESOURCE_PATH =
         "MCRMODSGeneratedClassificationNormalizerTest/mir_mods_00000004.xml";
@@ -48,15 +52,15 @@ public class MCRMODSGeneratedClassificationNormalizerTest extends MCRJPATestCase
             Document document = builder.build(inputStream);
             mcrObject = new MCRObject(document);
         }
-        assertNotNull("MCRObject should be parsed successfully from resource", mcrObject);
+        assertNotNull(mcrObject, "MCRObject should be parsed successfully from resource");
 
         MCRMODSWrapper modsWrapper = new MCRMODSWrapper(mcrObject);
         List<Element> initialClassifications = modsWrapper.getElements("mods:classification");
-        assertEquals("Initial number of classifications should be 5", 5, initialClassifications.size());
+        assertEquals(5, initialClassifications.size(), "Initial number of classifications should be 5");
         List<Element> initialGenerated = modsWrapper
             .getElements("mods:classification[contains(@generator, '"
                 + MCRMODSGeneratorClassificationMapper.GENERATOR_SUFFIX + "')]");
-        assertEquals("Initial number of generated classifications should be 4", 4, initialGenerated.size());
+        assertEquals(4, initialGenerated.size(), "Initial number of generated classifications should be 4");
 
         MCRMODSClassificationMappingNormalizer normalizer = new MCRMODSClassificationMappingNormalizer();
 
@@ -65,19 +69,17 @@ public class MCRMODSGeneratedClassificationNormalizerTest extends MCRJPATestCase
         List<Element> remainingGenerated = modsWrapper
             .getElements("mods:classification[contains(@generator, '"
                 + MCRMODSGeneratorClassificationMapper.GENERATOR_SUFFIX + "')]");
-        assertTrue(
-            "Classifications with generator suffix '" + MCRMODSGeneratorClassificationMapper.GENERATOR_SUFFIX
-                + "' should be removed",
-            remainingGenerated.isEmpty());
+        assertTrue(remainingGenerated.isEmpty(), "Classifications with generator suffix '"
+            + MCRMODSGeneratorClassificationMapper.GENERATOR_SUFFIX + "' should be removed");
 
         List<Element> remainingClassifications = modsWrapper.getElements("mods:classification");
-        assertEquals("Only one classification (sdnb) should remain", 1, remainingClassifications.size());
+        assertEquals(1, remainingClassifications.size(), "Only one classification (sdnb) should remain");
 
         Element remainingElement = remainingClassifications.getFirst();
-        assertNotNull("Remaining element should not be null", remainingElement); // Added null check
-        assertEquals("The remaining classification should have authority 'sdnb'", "sdnb",
-            remainingElement.getAttributeValue("authority"));
-        assertEquals("The remaining classification should have value '320'", "320", remainingElement.getTextTrim());
+        assertNotNull(remainingElement, "Remaining element should not be null"); // Added null check
+        assertEquals("sdnb", remainingElement.getAttributeValue("authority"),
+                "The remaining classification should have authority 'sdnb'");
+        assertEquals("320", remainingElement.getTextTrim(), "The remaining classification should have value '320'");
     }
 
 }

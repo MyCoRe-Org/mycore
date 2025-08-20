@@ -49,7 +49,7 @@ import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
 @ExtendWith(MCRJPAExtension.class)
-class MCRMODSGeneratorClassificationMapperTest {
+public class MCRMODSGeneratorClassificationMapperTest {
 
     public static final String TEST_DIRECTORY = MCRMODSGeneratorClassificationMapperTest.class.getSimpleName() + "/";
 
@@ -58,7 +58,7 @@ class MCRMODSGeneratorClassificationMapperTest {
     }
 
     @Test
-    void testMapping() throws IOException, JDOMException, URISyntaxException {
+    public void testMapping() throws IOException, JDOMException, URISyntaxException {
         MCRSessionMgr.getCurrentSession();
         MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();

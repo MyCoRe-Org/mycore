@@ -18,8 +18,8 @@
 
 package org.mycore.mods.merger;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,8 +27,10 @@ import java.net.URISyntaxException;
 
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
-import org.junit.Test;
-import org.mycore.common.MCRJPATestCase;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.config.MCRConfiguration2;
@@ -36,15 +38,17 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MyCoReTest;
 
-public class MCRCategoryMergerTest extends MCRJPATestCase {
+@MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
+public class MCRCategoryMergerTest {
 
     private static final String TEST_DIRECTORY = "MCRCategoryMergerTest/";
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
-
         MCRSessionMgr.getCurrentSession();
         MCRTransactionManager.hasActiveTransactions();
         loadCategory("institutes.xml");
@@ -52,8 +56,8 @@ public class MCRCategoryMergerTest extends MCRJPATestCase {
         loadCategory("oa.xml");
     }
 
-    private void loadCategory(String categoryFileName) throws URISyntaxException, JDOMException, IOException {
-        ClassLoader classLoader = getClass().getClassLoader();
+    private static void loadCategory(String categoryFileName) throws URISyntaxException, JDOMException, IOException {
+        ClassLoader classLoader = MCRCategoryMergerTest.class.getClassLoader();
         SAXBuilder saxBuilder = new SAXBuilder();
         InputStream categoryStream = classLoader.getResourceAsStream(TEST_DIRECTORY + categoryFileName);
         MCRCategory category = MCRXMLTransformer.getCategory(saxBuilder.build(categoryStream));
