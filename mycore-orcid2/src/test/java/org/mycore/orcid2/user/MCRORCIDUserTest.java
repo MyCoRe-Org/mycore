@@ -18,16 +18,20 @@
 
 package org.mycore.orcid2.user;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.Test;
-import org.mycore.common.MCRJPATestCase;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.orcid2.client.MCRORCIDCredential;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MyCoReTest;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
-public class MCRORCIDUserTest extends MCRJPATestCase {
+@MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
+public class MCRORCIDUserTest {
 
     private static final String ORCID = "0000-0001-2345-6789";
 
@@ -49,7 +53,7 @@ public class MCRORCIDUserTest extends MCRJPATestCase {
     }
 
     @Test
-    public void testRemoveAllCredentials() {
+    void testRemoveAllCredentials() {
         MCRUser user = new MCRUser("junit");
         MCRUserManager.createUser(user);
         MCRORCIDUser orcidUser = new MCRORCIDUser(user);
