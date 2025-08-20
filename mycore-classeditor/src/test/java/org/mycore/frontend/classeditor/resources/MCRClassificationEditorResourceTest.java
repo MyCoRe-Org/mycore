@@ -18,14 +18,13 @@
 
 package org.mycore.frontend.classeditor.resources;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
@@ -33,15 +32,17 @@ import org.apache.logging.log4j.Logger;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.common.MCRJSONManager;
-import org.mycore.common.MCRTestCase;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.common.MCRXMLMetadataEventHandler;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRStoreManager;
 import org.mycore.frontend.classeditor.json.MCRJSONCategory;
@@ -51,12 +52,26 @@ import org.mycore.frontend.classeditor.mocks.LinkTableStoreMock;
 import org.mycore.frontend.classeditor.wrapper.MCRCategoryListWrapper;
 import org.mycore.frontend.jersey.filter.MCRSessionHookFilter;
 import org.mycore.frontend.jersey.resources.MCRJerseyTestFeature;
+import org.mycore.test.MyCoReTest;
 
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
-public class MCRClassificationEditorResourceTest extends MCRTestCase {
+@MyCoReTest
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Metadata.Store.BaseDir", string = "/tmp"),
+    @MCRTestProperty(key = "MCR.Metadata.Store.SVNBase", string = "/tmp/versions"),
+    @MCRTestProperty(key = "MCR.IFS2.Store.ClasseditorTempStore.BaseDir", string = "jimfs:"),
+    @MCRTestProperty(key = "MCR.IFS2.Store.ClasseditorTempStore.SlotLayout", string = "4-2-2"),
+    @MCRTestProperty(key = "MCR.EventHandler.MCRObject.2.Class", classNameOf = MCRXMLMetadataEventHandler.class),
+    @MCRTestProperty(key = "MCR.Persistence.LinkTable.Store.Class", classNameOf = LinkTableStoreMock.class),
+    @MCRTestProperty(key = "MCR.Category.DAO", classNameOf = CategoryDAOMock.class),
+    @MCRTestProperty(key = "MCR.Category.LinkService", classNameOf = CategoryLinkServiceMock.class),
+    @MCRTestProperty(key = "MCR.Access.Class", classNameOf = MCRAccessBaseImpl.class),
+    @MCRTestProperty(key = "MCR.Access.Cache.Size", string = "200")
+})
+public class MCRClassificationEditorResourceTest {
 
     private MCRJerseyTestFeature jersey;
 
@@ -64,24 +79,7 @@ public class MCRClassificationEditorResourceTest extends MCRTestCase {
 
     static Logger LOGGER = LogManager.getLogger(MCRClassificationEditorResourceTest.class);
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> map = super.getTestProperties();
-        map.put("MCR.Metadata.Store.BaseDir", "/tmp");
-        map.put("MCR.Metadata.Store.SVNBase", "/tmp/versions");
-        map.put("MCR.IFS2.Store.ClasseditorTempStore.BaseDir", "jimfs:");
-        map.put("MCR.IFS2.Store.ClasseditorTempStore.SlotLayout", "4-2-2");
-        map.put("MCR.EventHandler.MCRObject.2.Class",
-            "org.mycore.datamodel.common.MCRXMLMetadataEventHandler");
-        map.put("MCR.Persistence.LinkTable.Store.Class", LinkTableStoreMock.class.getName());
-        map.put("MCR.Category.DAO", CategoryDAOMock.class.getName());
-        map.put("MCR.Category.LinkService", CategoryLinkServiceMock.class.getName());
-        map.put("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
-        map.put("MCR.Access.Cache.Size", "200");
-        return map;
-    }
-
-    @Before
+    @BeforeEach
     public void init() throws Exception {
         jersey = new MCRJerseyTestFeature();
         jersey.setUp(Set.of(
@@ -107,7 +105,7 @@ public class MCRClassificationEditorResourceTest extends MCRTestCase {
         }
     }
 
-    @After
+    @AfterEach
     public void cleanUp() throws Exception {
         MCRStoreManager.removeStore("ClasseditorTempStore");
         this.jersey.tearDown();
@@ -119,7 +117,7 @@ public class MCRClassificationEditorResourceTest extends MCRTestCase {
         MCRCategoryListWrapper categListWrapper = MCRJSONManager.obtainInstance().createGson().fromJson(categoryJsonStr,
             MCRCategoryListWrapper.class);
         List<MCRCategory> categList = categListWrapper.getList();
-        assertEquals("Wrong number of root categories.", 2, categList.size());
+        assertEquals(2, categList.size(), "Wrong number of root categories.");
     }
 
     @Test
@@ -137,7 +135,7 @@ public class MCRClassificationEditorResourceTest extends MCRTestCase {
                 MCRJSONCategory.class);
             String errorMsg = new MessageFormat("We want to retrieve the category {0} but it was {1}", Locale.ROOT)
                 .format(new Object[] { id, retrievedCateg.getId() });
-            assertEquals(errorMsg, id, retrievedCateg.getId());
+            assertEquals(id, retrievedCateg.getId(), errorMsg);
         }
     }
 
