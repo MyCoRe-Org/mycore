@@ -18,6 +18,8 @@
 
 package org.mycore.mods.csl;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,13 +27,17 @@ import java.util.List;
 
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MyCoReTest;
 import org.xml.sax.SAXException;
 
-public class MCRListModsItemDataProviderTest extends MCRMODSCSLTest {
+@MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
+class MCRListModsItemDataProviderTest extends MCRMODSCSLTest {
 
     @Test
     public void testSorting() throws IOException, JDOMException, SAXException {
@@ -47,11 +53,11 @@ public class MCRListModsItemDataProviderTest extends MCRMODSCSLTest {
             mcrListModsItemDataProvider.addContent(new MCRJDOMContent(root));
 
             List<String> ids = mcrListModsItemDataProvider.getIds().stream().toList();
-            Assert.assertEquals("The number of ids should match the number of input", testContent.size(), ids.size());
+            assertEquals(testContent.size(), ids.size(), "The number of ids should match the number of input");
             for (int j = 0; j < ids.size(); j++) {
                 String id = ids.get(j);
                 String idFromContent = testContent.get(j).asXML().getRootElement().getAttributeValue("ID");
-                Assert.assertEquals("The order of output should match input", idFromContent, id);
+                assertEquals(idFromContent, id, "The order of output should match input");
             }
             mcrListModsItemDataProvider.reset();
         }

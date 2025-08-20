@@ -27,17 +27,17 @@ import java.util.stream.Stream;
 
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRStoreTestCase;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.test.MyCoReTest;
 
-public class MCRMODSCSLTest extends MCRStoreTestCase {
+public abstract class MCRMODSCSLTest {
 
     private static final String TEST_ID_1 = "junit_mods_00002050";
     private static final String TEST_ID_2 = "junit_mods_00002056";
@@ -57,10 +57,8 @@ public class MCRMODSCSLTest extends MCRStoreTestCase {
             .collect(Collectors.toList());
     }
 
-    @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.SUPER_USER);
         List<MCRContent> testContent = getTestContent();
         for (MCRContent content : testContent) {

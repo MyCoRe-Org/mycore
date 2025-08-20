@@ -18,21 +18,21 @@
 
 package org.mycore.mods.merger;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 
 import org.jaxen.JaxenException;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.test.MyCoReTest;
 
-public class MCRMergerTest extends MCRTestCase {
+@MyCoReTest
+public class MCRMergerTest {
 
     @Test
     public void testAddingNew() throws Exception {
@@ -49,12 +49,12 @@ public class MCRMergerTest extends MCRTestCase {
         test(a, b, e);
     }
 
-    @Ignore
+    @Disabled
     static void test(String xPathA, String xPathB, String xPathExpected) throws JaxenException, IOException {
         test(new String[] { xPathA, xPathB }, xPathExpected);
     }
 
-    @Ignore
+    @Disabled
     static void test(String[] xPaths, String xPathExpected) throws JaxenException, IOException {
         Element[] elements = new Element[xPaths.length];
         for (int i = 0, n = xPaths.length; i < n; i++) {
@@ -75,10 +75,10 @@ public class MCRMergerTest extends MCRTestCase {
             logXML(e);
         }
 
-        assertTrue(asExpected);
+        Assertions.assertTrue(asExpected);
     }
 
-    @Ignore
+    @Disabled
     private static void logXML(Element r) throws IOException {
         System.out.println();
         new XMLOutputter(Format.getPrettyFormat()).output(r, System.out);

@@ -18,16 +18,16 @@
 
 package org.mycore.mods.identifier;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Map;
 
 import org.jdom2.JDOMException;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.pi.MCRPIService;
@@ -35,18 +35,30 @@ import org.mycore.pi.MCRPersistentIdentifier;
 import org.mycore.pi.doi.MCRDOIParser;
 import org.mycore.pi.doi.MCRDigitalObjectIdentifier;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+import org.mycore.test.MyCoReTest;
 
-public class MCRMODSDOIMetadataServiceTest extends MCRTestCase {
+@MyCoReTest
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = MCRPIService.METADATA_SERVICE_CONFIG_PREFIX
+        + MCRMODSDOIMetadataServiceTest.TEST_DOI_METADATA_SERVICE_1 + ".Type", string = "doi"),
+    @MCRTestProperty(key = MCRPIService.METADATA_SERVICE_CONFIG_PREFIX
+        + MCRMODSDOIMetadataServiceTest.TEST_DOI_METADATA_SERVICE_1,
+        classNameOf = MCRMODSDOIMetadataService.class),
+    @MCRTestProperty(key = MCRPIService.METADATA_SERVICE_CONFIG_PREFIX
+        + MCRMODSDOIMetadataServiceTest.TEST_DOI_METADATA_SERVICE_1 + ".Prefix", string = "10.1"),
+    @MCRTestProperty(key = MCRPIService.METADATA_SERVICE_CONFIG_PREFIX
+        + MCRMODSDOIMetadataServiceTest.TEST_DOI_METADATA_SERVICE_2,
+        classNameOf = MCRMODSDOIMetadataService.class),
+    @MCRTestProperty(key = MCRPIService.METADATA_SERVICE_CONFIG_PREFIX
+        + MCRMODSDOIMetadataServiceTest.TEST_DOI_METADATA_SERVICE_2 + ".Type", string = "doi"),
+    @MCRTestProperty(key = MCRPIService.METADATA_SERVICE_CONFIG_PREFIX
+        + MCRMODSDOIMetadataServiceTest.TEST_DOI_METADATA_SERVICE_2 + ".Prefix", string = "10.2")
+})
+public class MCRMODSDOIMetadataServiceTest {
 
     public static final String TEST_DOI_METADATA_SERVICE_1 = "TestDOI_1";
 
     public static final String TEST_DOI_METADATA_SERVICE_2 = "TestDOI_2";
-
-    @Before
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-    }
 
     @Test
     public void testInsert() throws URISyntaxException, IOException, MCRPersistentIdentifierException, JDOMException {
@@ -69,36 +81,14 @@ public class MCRMODSDOIMetadataServiceTest extends MCRTestCase {
 
         service1.insertIdentifier(doi1, object, "");
         final MCRPersistentIdentifier doi1_read = service1.getIdentifier(object, "").get();
-        Assert.assertEquals("The dois should match!", doi1.asString(), doi1_read.asString());
+        assertEquals(doi1.asString(), doi1_read.asString(), "The dois should match!");
 
         service2.insertIdentifier(doi2, object, "");
         final MCRPersistentIdentifier doi2_read = service2.getIdentifier(object, "").get();
-        Assert.assertEquals("The dois should match!", doi2.asString(), doi2_read.asString());
+        assertEquals(doi2.asString(), doi2_read.asString(), "The dois should match!");
 
         final MCRPersistentIdentifier doi1_read_2 = service1.getIdentifier(object, "").get();
-        Assert.assertEquals("The dois should match!", doi1.asString(), doi1_read_2.asString());
+        assertEquals(doi1.asString(), doi1_read_2.asString(), "The dois should match!");
     }
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        final Map<String, String> testProperties = super.getTestProperties();
-
-        testProperties
-            .put(MCRPIService.METADATA_SERVICE_CONFIG_PREFIX + TEST_DOI_METADATA_SERVICE_1 + ".Type", "doi");
-        testProperties
-            .put(MCRPIService.METADATA_SERVICE_CONFIG_PREFIX + TEST_DOI_METADATA_SERVICE_1,
-                MCRMODSDOIMetadataService.class.getName());
-        testProperties
-            .put(MCRPIService.METADATA_SERVICE_CONFIG_PREFIX + TEST_DOI_METADATA_SERVICE_1 + ".Prefix", "10.1");
-
-        testProperties
-            .put(MCRPIService.METADATA_SERVICE_CONFIG_PREFIX + TEST_DOI_METADATA_SERVICE_2,
-                MCRMODSDOIMetadataService.class.getName());
-        testProperties
-            .put(MCRPIService.METADATA_SERVICE_CONFIG_PREFIX + TEST_DOI_METADATA_SERVICE_2 + ".Type", "doi");
-        testProperties
-            .put(MCRPIService.METADATA_SERVICE_CONFIG_PREFIX + TEST_DOI_METADATA_SERVICE_2 + ".Prefix", "10.2");
-
-        return testProperties;
-    }
 }
