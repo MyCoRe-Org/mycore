@@ -25,7 +25,10 @@ import java.util.Map;
 
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.access.strategies.MCRAccessCheckStrategy;
+import org.mycore.backend.hibernate.MCRHIBLinkTableStore;
 import org.mycore.common.MCRStoreTestCase;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -33,20 +36,15 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
-public class MCRAccessKeyTestCase extends MCRStoreTestCase {
-
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.datadir", "%MCR.basedir%/data");
-        testProperties
-            .put("MCR.Persistence.LinkTable.Store.Class", "org.mycore.backend.hibernate.MCRHIBLinkTableStore");
-        testProperties.put("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
-        testProperties.put("MCR.Access.Strategy.Class", AlwaysTrueStrategy.class.getName());
-        testProperties.put("MCR.Metadata.Type.object", "true");
-        testProperties.put("MCR.Metadata.Type.derivate", "true");
-        return testProperties;
-    }
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.datadir", string = "%MCR.basedir%/data"),
+    @MCRTestProperty(key = "MCR.Persistence.LinkTable.Store.Class", classNameOf = MCRHIBLinkTableStore.class),
+    @MCRTestProperty(key = "MCR.Access.Class", classNameOf = MCRAccessBaseImpl.class),
+    @MCRTestProperty(key = "MCR.Access.Strategy.Class", classNameOf = MCRAccessKeyTestCase.AlwaysTrueStrategy.class),
+    @MCRTestProperty(key = "MCR.Metadata.Type.object", string = "true"),
+    @MCRTestProperty(key = "MCR.Metadata.Type.derivate", string = "true")
+})
+public abstract class MCRAccessKeyTestCase {
 
     public static MCRObject createObject() {
         MCRObject object = new MCRObject();

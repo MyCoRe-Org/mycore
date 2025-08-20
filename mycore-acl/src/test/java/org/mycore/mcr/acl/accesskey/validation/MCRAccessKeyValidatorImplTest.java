@@ -18,7 +18,8 @@
 
 package org.mycore.mcr.acl.accesskey.validation;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyPartialUpdateDto;
 import org.mycore.mcr.acl.accesskey.dto.util.MCRNullable;
@@ -42,31 +43,43 @@ public class MCRAccessKeyValidatorImplTest {
         validator.validateAccessKeyDto(accessKeyDto);
     }
 
-    @Test(expected = MCRAccessKeyValidationException.class)
+    @Test
     public void testValidateAccessKeyDto_noReference() {
-        final MCRAccessKeyValidatorImpl validator = new MCRAccessKeyValidatorImpl();
-        final MCRAccessKeyDto accessKeyDto = new MCRAccessKeyDto();
-        accessKeyDto.setPermission(TEST_PERMISSION);
-        accessKeyDto.setSecret(TEST_SECRET);
-        validator.validateAccessKeyDto(accessKeyDto);
+        Assertions.assertThrows(
+            MCRAccessKeyValidationException.class,
+            () -> {
+                final MCRAccessKeyValidatorImpl validator = new MCRAccessKeyValidatorImpl();
+                final MCRAccessKeyDto accessKeyDto = new MCRAccessKeyDto();
+                accessKeyDto.setPermission(TEST_PERMISSION);
+                accessKeyDto.setSecret(TEST_SECRET);
+                validator.validateAccessKeyDto(accessKeyDto);
+            });
     }
 
-    @Test(expected = MCRAccessKeyValidationException.class)
+    @Test
     public void testValidateAccessKeyDto_noPermission() {
-        final MCRAccessKeyValidatorImpl validator = new MCRAccessKeyValidatorImpl();
-        final MCRAccessKeyDto accessKeyDto = new MCRAccessKeyDto();
-        accessKeyDto.setReference(TEST_REFERENCE);
-        accessKeyDto.setSecret(TEST_SECRET);
-        validator.validateAccessKeyDto(accessKeyDto);
+        Assertions.assertThrows(
+            MCRAccessKeyValidationException.class,
+            () -> {
+                final MCRAccessKeyValidatorImpl validator = new MCRAccessKeyValidatorImpl();
+                final MCRAccessKeyDto accessKeyDto = new MCRAccessKeyDto();
+                accessKeyDto.setReference(TEST_REFERENCE);
+                accessKeyDto.setSecret(TEST_SECRET);
+                validator.validateAccessKeyDto(accessKeyDto);
+            });
     }
 
-    @Test(expected = MCRAccessKeyValidationException.class)
+    @Test
     public void testValidateAccessKeyDto_noValue() {
-        final MCRAccessKeyValidatorImpl validator = new MCRAccessKeyValidatorImpl();
-        final MCRAccessKeyDto accessKeyDto = new MCRAccessKeyDto();
-        accessKeyDto.setPermission(TEST_PERMISSION);
-        accessKeyDto.setReference(TEST_REFERENCE);
-        validator.validateAccessKeyDto(accessKeyDto);
+        Assertions.assertThrows(
+            MCRAccessKeyValidationException.class,
+            () -> {
+                final MCRAccessKeyValidatorImpl validator = new MCRAccessKeyValidatorImpl();
+                final MCRAccessKeyDto accessKeyDto = new MCRAccessKeyDto();
+                accessKeyDto.setPermission(TEST_PERMISSION);
+                accessKeyDto.setReference(TEST_REFERENCE);
+                validator.validateAccessKeyDto(accessKeyDto);
+            });
     }
 
     @Test
@@ -79,34 +92,46 @@ public class MCRAccessKeyValidatorImplTest {
         validator.validateAccessKeyPartialUpdateDto(accessKeyDto);
     }
 
-    @Test(expected = MCRAccessKeyValidationException.class)
+    @Test
     public void testValidateAccessKeyPartialUpdateDto_valueNull() {
-        final MCRAccessKeyValidatorImpl validator = new MCRAccessKeyValidatorImpl();
-        final MCRAccessKeyPartialUpdateDto accessKeyDto = new MCRAccessKeyPartialUpdateDto();
-        accessKeyDto.setSecret(new MCRNullable<>(null));
-        accessKeyDto.setReference(new MCRNullable<>(TEST_REFERENCE));
-        accessKeyDto.setPermission(new MCRNullable<>(TEST_PERMISSION));
-        validator.validateAccessKeyPartialUpdateDto(accessKeyDto);
+        Assertions.assertThrows(
+            MCRAccessKeyValidationException.class,
+            () -> {
+                final MCRAccessKeyValidatorImpl validator = new MCRAccessKeyValidatorImpl();
+                final MCRAccessKeyPartialUpdateDto accessKeyDto = new MCRAccessKeyPartialUpdateDto();
+                accessKeyDto.setSecret(new MCRNullable<>(null));
+                accessKeyDto.setReference(new MCRNullable<>(TEST_REFERENCE));
+                accessKeyDto.setPermission(new MCRNullable<>(TEST_PERMISSION));
+                validator.validateAccessKeyPartialUpdateDto(accessKeyDto);
+            });
     }
 
-    @Test(expected = MCRAccessKeyValidationException.class)
+    @Test
     public void testValidateAccessKeyPartialUpdateDto_permissionNull() {
-        final MCRAccessKeyValidatorImpl validator = new MCRAccessKeyValidatorImpl();
-        final MCRAccessKeyPartialUpdateDto accessKeyDto = new MCRAccessKeyPartialUpdateDto();
-        accessKeyDto.setSecret(new MCRNullable<>(TEST_SECRET));
-        accessKeyDto.setReference(new MCRNullable<>(TEST_REFERENCE));
-        accessKeyDto.setPermission(new MCRNullable<>(null));
-        validator.validateAccessKeyPartialUpdateDto(accessKeyDto);
+        Assertions.assertThrows(
+            MCRAccessKeyValidationException.class,
+            () -> {
+                final MCRAccessKeyValidatorImpl validator = new MCRAccessKeyValidatorImpl();
+                final MCRAccessKeyPartialUpdateDto accessKeyDto = new MCRAccessKeyPartialUpdateDto();
+                accessKeyDto.setSecret(new MCRNullable<>(TEST_SECRET));
+                accessKeyDto.setReference(new MCRNullable<>(TEST_REFERENCE));
+                accessKeyDto.setPermission(new MCRNullable<>(null));
+                validator.validateAccessKeyPartialUpdateDto(accessKeyDto);
+            });
     }
 
-    @Test(expected = MCRAccessKeyValidationException.class)
+    @Test
     public void testValidateAccessKeyPartialUpdateDto_referenceNull() {
-        final MCRAccessKeyValidatorImpl validator = new MCRAccessKeyValidatorImpl();
-        final MCRAccessKeyPartialUpdateDto accessKeyDto = new MCRAccessKeyPartialUpdateDto();
-        accessKeyDto.setSecret(new MCRNullable<>(TEST_SECRET));
-        accessKeyDto.setReference(new MCRNullable<>(null));
-        accessKeyDto.setPermission(new MCRNullable<>(TEST_PERMISSION));
-        validator.validateAccessKeyPartialUpdateDto(accessKeyDto);
+        Assertions.assertThrows(
+            MCRAccessKeyValidationException.class,
+            () -> {
+                final MCRAccessKeyValidatorImpl validator = new MCRAccessKeyValidatorImpl();
+                final MCRAccessKeyPartialUpdateDto accessKeyDto = new MCRAccessKeyPartialUpdateDto();
+                accessKeyDto.setSecret(new MCRNullable<>(TEST_SECRET));
+                accessKeyDto.setReference(new MCRNullable<>(null));
+                accessKeyDto.setPermission(new MCRNullable<>(TEST_PERMISSION));
+                validator.validateAccessKeyPartialUpdateDto(accessKeyDto);
+            });
     }
 
     @Test
@@ -114,9 +139,11 @@ public class MCRAccessKeyValidatorImplTest {
         MCRAccessKeyValidatorImpl.validatePermission("read");
     }
 
-    @Test(expected = MCRAccessKeyValidationException.class)
+    @Test
     public void testValidatePermission_blank() {
-        MCRAccessKeyValidatorImpl.validatePermission("");
+        Assertions.assertThrows(
+            MCRAccessKeyValidationException.class,
+            () -> MCRAccessKeyValidatorImpl.validatePermission(""));
     }
 
     @Test
@@ -124,9 +151,11 @@ public class MCRAccessKeyValidatorImplTest {
         MCRAccessKeyValidatorImpl.validateSecret(TEST_SECRET);
     }
 
-    @Test(expected = MCRAccessKeyValidationException.class)
+    @Test
     public void testValidateSecret_blank() {
-        MCRAccessKeyValidatorImpl.validateSecret("");
+        Assertions.assertThrows(
+            MCRAccessKeyValidationException.class,
+            () -> MCRAccessKeyValidatorImpl.validateSecret(""));
     }
 
     @Test
@@ -134,9 +163,11 @@ public class MCRAccessKeyValidatorImplTest {
         MCRAccessKeyValidatorImpl.validateReference(TEST_REFERENCE);
     }
 
-    @Test(expected = MCRAccessKeyValidationException.class)
+    @Test
     public void testValidateReference_blank() {
-        MCRAccessKeyValidatorImpl.validateReference("");
+        Assertions.assertThrows(
+            MCRAccessKeyValidationException.class,
+            () -> MCRAccessKeyValidatorImpl.validateReference(""));
     }
 
 }
