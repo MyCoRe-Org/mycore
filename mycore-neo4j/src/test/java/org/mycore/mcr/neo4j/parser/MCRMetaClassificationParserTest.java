@@ -18,17 +18,24 @@
 
 package org.mycore.mcr.neo4j.parser;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jparser.MCRNeo4JMetaClassificationParser;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JNode;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JRelation;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MCRMetadataExtension;
+import org.mycore.test.MyCoReTest;
 
+@MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
+@ExtendWith(MCRMetadataExtension.class)
 public class MCRMetaClassificationParserTest extends AbstractNeo4JParserTest {
     @Test
     public void testCreateClassificationNodes() {

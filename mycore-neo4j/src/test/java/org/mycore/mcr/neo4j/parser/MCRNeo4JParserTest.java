@@ -18,22 +18,28 @@
 
 package org.mycore.mcr.neo4j.parser;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.language.MCRLanguageFactory;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jparser.MCRNeo4JParser;
+import org.mycore.test.MCRMetadataExtension;
+import org.mycore.test.MyCoReTest;
 
+@MyCoReTest
+@ExtendWith(MCRMetadataExtension.class)
 public class MCRNeo4JParserTest extends AbstractNeo4JParserTest {
-    @BeforeClass
+
+    @BeforeAll
     public static void beforeClass() {
         System.setProperty("log4j.configurationFile", "log4j2-test.xml");
     }

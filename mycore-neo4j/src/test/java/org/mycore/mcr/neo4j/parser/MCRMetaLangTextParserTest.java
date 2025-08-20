@@ -18,19 +18,24 @@
 
 package org.mycore.mcr.neo4j.parser;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
 import java.util.List;
 
 import org.jdom2.Element;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jparser.MCRNeo4JMetaLangTextParser;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jutil.Neo4JNode;
+import org.mycore.test.MCRMetadataExtension;
+import org.mycore.test.MyCoReTest;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+@MyCoReTest
+@ExtendWith(MCRMetadataExtension.class)
 public class MCRMetaLangTextParserTest extends AbstractNeo4JParserTest {
     @Test
-    public void testParseWithoutLang() {
+    void testParseWithoutLang() {
         final Element mss01 = metadata.getChild("def.mss01");
 
         final List<Neo4JNode> result = new MCRNeo4JMetaLangTextParser().parse(mss01);
@@ -41,7 +46,7 @@ public class MCRMetaLangTextParserTest extends AbstractNeo4JParserTest {
     }
 
     @Test
-    public void testParseWithLang() {
+    void testParseWithLang() {
         final Element mss82 = metadata.getChild("def.mss82");
 
         final List<Neo4JNode> result = new MCRNeo4JMetaLangTextParser().parse(mss82);
