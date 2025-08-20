@@ -28,30 +28,23 @@
   </xsl:template>
 
   <xsl:template match="/IViewConfig">
+    <xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html></xsl:text>
     <html>
       <head>
         <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/js/lib/jquery.min.js"></script>
-        <xsl:choose>
-          <xsl:when test="xml/properties/property[@name='mobile'] = 'true'">
-            <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-            <link href="{$MCR.Viewer.FontaweSomeURL}" rel="stylesheet"
-                  type="text/css" />
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:if test="string-length($MCR.Viewer.BootstrapURL)&gt;0">
+          <xsl:if test="string-length($MCR.Viewer.BootstrapURL)&gt;0">
               <script type="text/javascript" src="{$MCR.Viewer.BootstrapURL}js/bootstrap.min.js"></script>
               <link href="{$MCR.Viewer.BootstrapURL}css/bootstrap.css" type="text/css" rel="stylesheet"></link>
-            </xsl:if>
-            <xsl:if test="string-length($MCR.Viewer.FontaweSomeURL)&gt;0">
+          </xsl:if>
+          <xsl:if test="string-length($MCR.Viewer.FontaweSomeURL)&gt;0">
               <link href="{$MCR.Viewer.FontaweSomeURL}" type="text/css" rel="stylesheet"></link>
-            </xsl:if>
-          </xsl:otherwise>
-        </xsl:choose>
+          </xsl:if>
         <xsl:apply-templates select="xml/resources/resource" mode="iview.resource" />
-        <script>
+        <script type="module">
+          import { MyCoReViewer } from '<xsl:value-of select="$WebApplicationBaseURL" />modules/iview2/js/iview-client-base.es.js';
           window.onload = function() {
             var json = <xsl:value-of select="json" />;
-            new mycore.viewer.MyCoReViewer(jQuery("body"), json.properties);
+            new MyCoReViewer(jQuery("body"), json.properties);
           };
         </script>
       </head>
@@ -64,6 +57,9 @@
     <xsl:choose>
       <xsl:when test="@type='script'">
         <script src="{text()}" type="text/javascript" />
+      </xsl:when>
+      <xsl:when test="@type='module'">
+          <script src="{text()}" type="module" />
       </xsl:when>
       <xsl:when test="@type='css'">
         <link href="{text()}" type="text/css" rel="stylesheet"></link>
