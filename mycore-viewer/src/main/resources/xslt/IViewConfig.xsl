@@ -58,6 +58,9 @@
       <xsl:when test="@type='script'">
         <script src="{text()}" type="text/javascript" />
       </xsl:when>
+      <xsl:when test="@type='module'">
+          <script src="{text()}" type="module" />
+      </xsl:when>
       <xsl:when test="@type='css'">
         <link href="{text()}" type="text/css" rel="stylesheet"></link>
       </xsl:when>
