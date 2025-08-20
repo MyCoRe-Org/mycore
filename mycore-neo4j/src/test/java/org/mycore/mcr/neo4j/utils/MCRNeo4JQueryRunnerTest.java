@@ -1,17 +1,24 @@
 package org.mycore.mcr.neo4j.utils;
 
-import org.junit.Test;
-import org.mycore.common.MCRStoreTestCase;
-import org.mycore.common.util.MCRTestCaseClassificationUtil;
-import org.mycore.mcr.neo4j.datamodel.metadata.neo4jtojson.Neo4JMetaData;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mycore.common.util.MCRTestCaseClassificationUtil;
+import org.mycore.mcr.neo4j.datamodel.metadata.neo4jtojson.Neo4JMetaData;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MCRMetadataExtension;
+import org.mycore.test.MyCoReTest;
 
-public class MCRNeo4JQueryRunnerTest extends MCRStoreTestCase {
+@MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
+@ExtendWith(MCRMetadataExtension.class)
+public class MCRNeo4JQueryRunnerTest {
     @Test
     public void testTranslateAndMapProperties() {
         final List<Neo4JMetaData> metaDataList = new ArrayList<>();
@@ -66,10 +73,9 @@ public class MCRNeo4JQueryRunnerTest extends MCRStoreTestCase {
         assertEquals(2, metaDataList.get(0).content().size());
     }
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
 
+    @BeforeEach
+    public void setUp() throws Exception {
         MCRTestCaseClassificationUtil.addClassification("/classification/TestClassification.xml");
     }
 }

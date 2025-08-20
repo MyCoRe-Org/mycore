@@ -27,13 +27,20 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRStoreTestCase;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.metadata.MCRObjectMetadata;
 
-public abstract class AbstractNeo4JParserTest extends MCRStoreTestCase {
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Metadata.Type.mcrobject", string = "true"),
+    @MCRTestProperty(key = "MCR.Metadata.Type.derivate", string = "true"),
+    @MCRTestProperty(key = "MCR.Metadata.ObjectID.NumberPattern", string = "00000000")
+})
+public abstract class AbstractNeo4JParserTest {
     protected final Document doc;
 
     protected final Element metadata;
@@ -45,16 +52,6 @@ public abstract class AbstractNeo4JParserTest extends MCRStoreTestCase {
             throw new MCRException("Error while loading Resource:", e);
         }
         metadata = doc.getRootElement().getChild(MCRObjectMetadata.XML_NAME);
-    }
-
-    @Override
-    protected Map<String, String> getTestProperties() {
-        final Map<String, String> properties = super.getTestProperties();
-        properties.put("MCR.Metadata.Type.mcrobject", "true");
-        properties.put("MCR.Metadata.Type.derivate", "true");
-        properties.put("MCR.Metadata.ObjectID.NumberPattern", "00000000");
-
-        return properties;
     }
 
     protected void addClassification(String file) throws Exception {
