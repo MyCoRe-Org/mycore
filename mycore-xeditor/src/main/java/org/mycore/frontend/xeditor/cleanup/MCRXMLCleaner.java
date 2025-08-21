@@ -35,7 +35,7 @@ import org.jdom2.Element;
  * </p>
  * 
  * <code>
- *   <xed:cleanup-rule xpath="//@*" relevant-if="string-length(.) &gt; 0" />
+ *   &lt;xed:cleanup-rule xpath="//@*" relevant-if="string-length(.) &amp;gt; 0" /&gt;
  * </code>
  * 
  * @see MCRDefaultRules
