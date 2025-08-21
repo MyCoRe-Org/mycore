@@ -35,7 +35,7 @@ class MCRCleaningRule {
      * Creates a new cleaning rule.
      * 
      * @param xPathExprNodesToInspect the XPath to select the nodes to inspect for this rule
-     * @param xPathExprRelevancyTest the XPath expression to decide if this node is relevant (or should be removed otherwise)
+     * @param xPathExprRelevancyTest the XPath expression to decide if this node is relevant (or otherwise be removed)
      */
     MCRCleaningRule(String xPathExprNodesToInspect, String xPathExprRelevancyTest) {
         this.xPathExprNodesToInspect = xPathExprNodesToInspect;
