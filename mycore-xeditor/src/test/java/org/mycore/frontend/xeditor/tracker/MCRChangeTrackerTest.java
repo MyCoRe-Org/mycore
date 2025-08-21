@@ -26,15 +26,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.jaxen.JaxenException;
 import org.jdom2.Attribute;
-import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.filter.Filters;
 import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRXlink;
 import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest

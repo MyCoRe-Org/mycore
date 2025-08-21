@@ -32,7 +32,6 @@ import org.jdom2.JDOMException;
 import org.junit.jupiter.api.Test;
 import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 import org.mycore.test.MyCoReTest;
 
 /**
