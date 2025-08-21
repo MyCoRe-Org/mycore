@@ -206,7 +206,7 @@ public class MCRNameMerger extends MCRMerger {
                 return haveAtLeastOneCommon(this.givenNames, other.givenNames);
             }
         } else {
-            // compound name with same given names assumes same
+            // double-barreled name with same given names assumes same
             return this.givenNames.equals(other.givenNames) &&
                 (this.familyName.contains(other.familyName) || other.familyName.contains(this.familyName));
         }
