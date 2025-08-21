@@ -38,12 +38,6 @@ import org.mycore.common.MCRConstants;
  */
 public class MCRNameMerger extends MCRMerger {
 
-    private static final String ALTERNATIVE_NAME = "alternativeName";
-
-    private static final String TYPE = "type";
-
-    private static final String NAME_PART = "namePart";
-
     private String familyName;
 
     private Set<String> givenNames = new HashSet<>();
@@ -75,8 +69,8 @@ public class MCRNameMerger extends MCRMerger {
     }
 
     private void setFromNameParts(Element modsName) {
-        for (Element namePart : modsName.getChildren(NAME_PART, MCRConstants.MODS_NAMESPACE)) {
-            String type = namePart.getAttributeValue(TYPE);
+        for (Element namePart : modsName.getChildren("namePart", MCRConstants.MODS_NAMESPACE)) {
+            String type = namePart.getAttributeValue("type");
             String nameFragment = namePart.getText().replaceAll("\\p{Zs}+", " ");
 
             if (Objects.equals(type, "family")) {
@@ -89,7 +83,7 @@ public class MCRNameMerger extends MCRMerger {
                 continue;
             } else if (Objects.equals(type, "termsOfAddress")) {
                 continue;
-            } else if ("personal".equals(modsName.getAttributeValue(TYPE))) {
+            } else if ("personal".equals(modsName.getAttributeValue("type"))) {
                 setFromCombinedName(nameFragment);
             } else {
                 setFamilyName(nameFragment);
@@ -216,7 +210,7 @@ public class MCRNameMerger extends MCRMerger {
 
     private void collectNameIds(Element modsName) {
         for (Element nameId : modsName.getChildren("nameIdentifier", MCRConstants.MODS_NAMESPACE)) {
-            String type = nameId.getAttributeValue(TYPE);
+            String type = nameId.getAttributeValue("type");
             String id = nameId.getText();
 
             Set<String> ids;
