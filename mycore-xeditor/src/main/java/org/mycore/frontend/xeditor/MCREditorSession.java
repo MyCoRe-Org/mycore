@@ -217,9 +217,7 @@ public class MCREditorSession {
     }
 
     public void setBreakpoint(String msg) {
-        if (editedXML != null) {
-            tracker.track(new MCRBreakpoint(msg));
-        }
+        tracker.track(new MCRBreakpoint(msg));
     }
 
     public MCRChangeTracker getChangeTracker() {
