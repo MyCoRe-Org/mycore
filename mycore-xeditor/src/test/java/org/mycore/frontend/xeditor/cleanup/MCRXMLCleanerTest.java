@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.frontend.xeditor;
+package org.mycore.frontend.xeditor.cleanup;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
