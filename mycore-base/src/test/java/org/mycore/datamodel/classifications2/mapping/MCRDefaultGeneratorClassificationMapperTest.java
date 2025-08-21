@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.mycore.datamodel.classifications2.mapping;
 
 import java.io.IOException;
@@ -56,7 +55,7 @@ import org.mycore.test.MyCoReTest;
     @MCRTestProperty(key = "MCR.Category.XPathMapping.Pattern.host",
         string = "//element/publishedin[@type='{0}']"),
 })
-class MCRDefaultGeneratorClassificationMapperTest {
+public class MCRDefaultGeneratorClassificationMapperTest {
 
     public static final String TEST_DIRECTORY = MCRDefaultGeneratorClassificationMapperTest.class.getSimpleName() + "/";
 
@@ -68,7 +67,7 @@ class MCRDefaultGeneratorClassificationMapperTest {
      * Tests if x-mappings and XPath-mappings are properly added into a Document.
      */
     @Test
-    void testXMapping() throws IOException, JDOMException, URISyntaxException {
+    public void testXMapping() throws IOException, JDOMException, URISyntaxException {
         MCRSessionMgr.getCurrentSession();
         MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();
@@ -138,7 +137,7 @@ class MCRDefaultGeneratorClassificationMapperTest {
      * evaluated per classification.
      */
     @Test
-    void testXPathMappingFallback() throws IOException, JDOMException, URISyntaxException {
+    public void testXPathMappingFallback() throws IOException, JDOMException, URISyntaxException {
         MCRSessionMgr.getCurrentSession();
         MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();
@@ -180,7 +179,7 @@ class MCRDefaultGeneratorClassificationMapperTest {
      * Tests that XPath-mappings with OR-condition are properly added into a Document.
      */
     @Test
-    void testXPathMappingPatternORCondition() throws IOException, JDOMException, URISyntaxException {
+    public void testXPathMappingPatternORCondition() throws IOException, JDOMException, URISyntaxException {
 
         MCRSessionMgr.getCurrentSession();
         MCRTransactionManager.hasActiveTransactions();
