@@ -211,7 +211,8 @@ public class MCRNameMergerTest {
     @Test
     public void testHasAlternativeNameSameAs() throws JaxenException {
         Element modsNameElement = new MCRNodeBuilder()
-            .buildElement("mods:name[@type='personal'][mods:namePart[@type='given']='Thomas'][mods:namePart[@type='family']='Müller']", null, null);
+            .buildElement("mods:name[@type='personal'][mods:namePart[@type='given']='Thomas']"
+                + "[mods:namePart[@type='family']='Müller']", null, null);
 
         Element altNameElement = buildAlternativeNameElement("Thomas", "Meyer");
         modsNameElement.addContent(altNameElement);
