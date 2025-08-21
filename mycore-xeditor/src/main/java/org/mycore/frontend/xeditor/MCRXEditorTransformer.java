@@ -143,7 +143,26 @@ public class MCRXEditorTransformer {
         return getXPathEvaluator().replaceXPaths(uri, false);
     }
 
-    public void bind(String xPath, String initialValue, String name) throws JaxenException {
+    public void bind(Node bindNode) throws JaxenException {
+        org.w3c.dom.Element bindElement = (org.w3c.dom.Element)bindNode;
+        String xPath = bindElement.getAttribute("xpath");
+        String initialValue = bindElement.getAttribute("initially");
+        String name = bindElement.getAttribute("name");
+        bind(xPath, initialValue, name);
+
+        Attr setAttr = bindElement.getAttributeNode("set");
+        if (setAttr != null) {
+            setValues(setAttr.getValue());
+        }
+
+        Attr setDefault = bindElement.getAttributeNode("default");
+        if (setDefault != null) {
+            setDefault(setDefault.getValue());
+        }
+    }
+
+    private void bind(String xPath, String initialValue, String name)
+        throws JaxenException {
         if (editorSession.getEditedXML() == null) {
             createEmptyDocumentFromXPath(xPath);
         }
@@ -152,6 +171,7 @@ public class MCRXEditorTransformer {
             currentBinding = editorSession.getRootBinding();
         }
 
+        initialValue = replaceXPaths(initialValue);
         setCurrentBinding(new MCRBinding(xPath, initialValue, name, currentBinding));
     }
 
@@ -175,15 +195,16 @@ public class MCRXEditorTransformer {
         return new Element(nameStep.getLocalName(), ns);
     }
 
-    public void setValues(String value) {
-        currentBinding.setValues(value);
+    private void setValues(String value) {
+        currentBinding.setValues(replaceXPaths(value));
     }
-
-    public void setDefault(String value) {
+    
+    private void setDefault(String value) {
+        value = replaceXPaths(value);
         currentBinding.setDefault(value);
         editorSession.getSubmission().markDefaultValue(currentBinding.getAbsoluteXPath(), value);
     }
-
+    
     public void unbind() {
         setCurrentBinding(currentBinding.getParent());
     }
@@ -292,7 +313,7 @@ public class MCRXEditorTransformer {
     }
 
     public void loadResource(String uri, String name) {
-        Element resource = MCRURIResolver.obtainInstance().resolve(uri);
+        Element resource = MCRURIResolver.obtainInstance().resolve(replaceXPaths(uri));
         editorSession.getVariables().put(name, resource);
     }
 
