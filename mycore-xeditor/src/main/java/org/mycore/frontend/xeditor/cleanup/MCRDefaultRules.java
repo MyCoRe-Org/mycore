@@ -6,6 +6,30 @@ import java.util.Map;
 
 import org.mycore.common.config.MCRConfiguration2;
 
+/**
+ * <p>
+ * Reads default rules for XML cleaning from configuration.
+ * Each rule has a common prefix and two properties:
+ * </p>
+ * 
+ * <ul>
+ *   <li>The XPath to select the nodes to inspect
+ *   <li>The XPath to decide if this node is relevant or should be removed from xml.
+ * </ul>
+ * 
+ * Rules are read in alphabetical order of their prefix.  
+ * 
+ * <p>
+ * Example:
+ * <code>
+ * MCR.XEditor.XMLCleaner.DefaultRule.01.RemoveEmptyAttributes.NodesToInspect=//@*<br/>
+ * MCR.XEditor.XMLCleaner.DefaultRule.01.RemoveEmptyAttributes.RelevantIf=string-length(.) > 0
+ * </code>
+ * </p>
+ * 
+ * 
+ * @author Frank L\u00FCtzenkirchen
+ */
 class MCRDefaultRules {
 
     private static final String CONFIG_PREFIX = "MCR.XEditor.XMLCleaner.DefaultRule.";
