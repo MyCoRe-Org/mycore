@@ -207,7 +207,7 @@ public class MCREditorSession {
         LOGGER.info("Reading edited XML from {}", uriRe);
         Document xml = MCRSourceContent.createInstance(uriRe).asXML();
         setEditedXML(xml);
-        setBreakpoint("Reading XML from " + uriRe);
+        getChangeTracker().setBreakpoint("Reading XML from " + uriRe);
     }
 
     public MCRBinding getRootBinding() {

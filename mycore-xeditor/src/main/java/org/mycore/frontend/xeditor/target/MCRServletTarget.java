@@ -48,7 +48,7 @@ public class MCRServletTarget implements MCREditorTarget {
 
             job.getRequest().setAttribute("MCRXEditorSubmission", result);
 
-            session.setBreakpoint("After handling target servlet " + servletNameOrPath);
+            session.getChangeTracker().setBreakpoint("After handling target servlet " + servletNameOrPath);
 
             dispatcher.forward(job.getRequest(), job.getResponse());
         } else {

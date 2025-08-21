@@ -37,6 +37,11 @@ public class MCRChangeTracker {
         this.changes.push(change);
     }
 
+    /** Convenience method to track progress **/
+    public void setBreakpoint(String msg) {
+        track(new MCRBreakpoint(msg));
+    }
+
     /**
      * Returns the number of changes tracked 
      */

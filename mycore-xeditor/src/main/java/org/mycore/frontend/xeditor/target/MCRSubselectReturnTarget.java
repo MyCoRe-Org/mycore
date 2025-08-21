@@ -44,11 +44,11 @@ public class MCRSubselectReturnTarget implements MCREditorTarget {
         LOGGER.info("Returning from subselect for {}", baseXPath);
 
         if (Objects.equals(parameter, "cancel")) {
-            session.setBreakpoint("After canceling subselect for " + baseXPath);
+            session.getChangeTracker().setBreakpoint("After canceling subselect for " + baseXPath);
         } else {
             Map<String, String[]> submittedValues = MCRTargetUtils.getSubmittedValues(job, baseXPath);
             session.getSubmission().setSubmittedValues(submittedValues);
-            session.setBreakpoint("After returning from subselect for " + baseXPath);
+            session.getChangeTracker().setBreakpoint("After returning from subselect for " + baseXPath);
         }
 
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(session.getRedirectURL(null)));

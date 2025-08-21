@@ -54,7 +54,7 @@ public class MCRSubselectTarget implements MCREditorTarget {
         href = binding.getXPathEvaluator().replaceXPaths(href, true);
         binding.detach();
 
-        session.setBreakpoint("After starting subselect at " + href + " for " + xPath);
+        session.getChangeTracker().setBreakpoint("After starting subselect at " + href + " for " + xPath);
 
         href += (href.contains("?") ? "&" : "?") + PARAM_SUBSELECT_SESSION + "=" + session.getCombinedSessionStepID();
 
