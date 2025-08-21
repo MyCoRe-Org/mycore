@@ -36,26 +36,23 @@ class MCRDefaultRules {
     private static final String CONFIG_KEY_NODES_TO_INSPECT = "NodesToInspect";
     private static final String CONFIG_KEY_RELEVANT_IF = "RelevantIf";
 
-    private static final List<MCRCleaningRule> defaultRules = new ArrayList<>();
+    private static final List<MCRCleaningRule> DEFAULT_RULES = new ArrayList<>();
 
     static {
         Map<String, String> config = MCRConfiguration2.getSubPropertiesMap(CONFIG_PREFIX);
         
         config.keySet().stream().sorted().filter(key -> key.endsWith(CONFIG_KEY_NODES_TO_INSPECT)).forEach(key -> {
             String rulePrefix = key.substring(0, key.indexOf(CONFIG_KEY_NODES_TO_INSPECT));
-            System.out.println(rulePrefix);
 
             String nodesToInspect = config.get(key);
-            System.out.println(nodesToInspect);
             String relevantIf = config.get(rulePrefix + CONFIG_KEY_RELEVANT_IF);
-            System.out.println(relevantIf);
 
             MCRCleaningRule rule = new MCRCleaningRule(nodesToInspect, relevantIf);
-            defaultRules.add(rule);
+            DEFAULT_RULES.add(rule);
         });
     }
 
     static List<MCRCleaningRule> getDefaultRules() {
-        return defaultRules;
+        return DEFAULT_RULES;
     }
 }
