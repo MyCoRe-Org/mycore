@@ -30,22 +30,12 @@ import org.jdom2.Element;
 
 public class MCRXMLCleaner {
 
-    private static final MCRCleaningRule REMOVE_EMPTY_ATTRIBUTES = new MCRCleaningRule("//@*", "string-length(.) > 0");
-
-    private static final MCRCleaningRule REMOVE_EMPTY_ELEMENTS = new MCRCleaningRule("//*",
-        "@* or * or (string-length(text()) > 0)");
-
-    private static final MCRCleaningRule PRESERVE_STRUCTURE_AND_SERVICE = new MCRCleaningRule(
-        "/mycoreobject/structure|/mycoreobject/service", "true()");
-
     private List<MCRCleaningRule> rules = new ArrayList<>();
 
     private Map<Object, MCRCleaningRule> nodes2rules = new HashMap<>();
 
     public MCRXMLCleaner() {
-        addRule(REMOVE_EMPTY_ATTRIBUTES);
-        addRule(REMOVE_EMPTY_ELEMENTS);
-        addRule(PRESERVE_STRUCTURE_AND_SERVICE);
+        rules.addAll(MCRDefaultRules.getDefaultRules());
     }
 
     public void addRule(String xPathExprNodesToInspect, String xPathExprRelevancyTest) {
