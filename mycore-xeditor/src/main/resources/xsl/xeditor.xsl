@@ -145,21 +145,9 @@
   <xsl:template match="xed:bind" mode="xeditor">
     <xsl:call-template name="registerAdditionalNamespaces" />
     
-    <xsl:variable name="initialValue" select="transformer:replaceXPaths($transformer,@initially)" />
-    <xsl:value-of select="transformer:bind($transformer,@xpath,$initialValue,@name)" />
-    <xsl:apply-templates select="@set|@default" mode="xeditor" />
+    <xsl:value-of select="transformer:bind($transformer,.)" />
     <xsl:apply-templates select="*" mode="xeditor" />
     <xsl:value-of select="transformer:unbind($transformer)" />
-  </xsl:template>
-
-  <xsl:template match="xed:bind/@set" mode="xeditor">
-    <xsl:variable name="value" select="transformer:replaceXPaths($transformer,.)" />
-    <xsl:value-of select="transformer:setValues($transformer,$value)" />
-  </xsl:template>
-
-  <xsl:template match="xed:bind/@default" mode="xeditor">
-    <xsl:variable name="value" select="transformer:replaceXPaths($transformer,.)" />
-    <xsl:value-of select="transformer:setDefault($transformer,$value)" />
   </xsl:template>
 
   <!-- ========== Default templates ========== -->
@@ -455,8 +443,7 @@
   <!-- ========== <xed:load-resource name="" uri="" ========== -->
 
   <xsl:template match="xed:load-resource" mode="xeditor">
-    <xsl:variable name="uri" select="transformer:replaceXPaths($transformer,@uri)" />
-    <xsl:value-of select="transformer:loadResource($transformer,$uri,@name)" />
+    <xsl:value-of select="transformer:loadResource($transformer,@uri,@name)" />
   </xsl:template>
 
   <!-- ========== <xed:cleanup-rule xpath="" relevant-if="" ========== -->
