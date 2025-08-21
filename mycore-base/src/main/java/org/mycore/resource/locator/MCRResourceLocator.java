@@ -25,7 +25,6 @@ import org.apache.logging.log4j.Level;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
-import org.mycore.resource.common.MCRNoOpResourceTracer;
 import org.mycore.resource.common.MCRResourceTracer;
 import org.mycore.resource.filter.MCRResourceFilter;
 import org.mycore.resource.provider.MCRLFSResourceProvider;
@@ -39,9 +38,7 @@ public interface MCRResourceLocator {
     /**
      * Resolves a {@link MCRResourcePath}, locating possible candidates.
      */
-    default Stream<URL> locate(MCRResourcePath path, MCRHints hints) {
-        return locate(path, hints, new MCRNoOpResourceTracer());
-    }
+    Stream<URL> locate(MCRResourcePath path, MCRHints hints);
 
     /**
      * Resolves a {@link MCRResourcePath}, locating possible candidates.

@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.Level;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
 import org.mycore.resource.common.MCRResourceTracer;
 
 /**
@@ -32,6 +33,11 @@ import org.mycore.resource.common.MCRResourceTracer;
  * ({@link MCRResourceFilterBase#doFilter(Stream, MCRHints, MCRResourceTracer)}).
  */
 public abstract class MCRResourceFilterBase implements MCRResourceFilter {
+
+    @Override
+    public final Stream<URL> filter(Stream<URL> resourceUrls, MCRHints hints) {
+        return filter(resourceUrls, hints, new MCRNoOpResourceTracer());
+    }
 
     @Override
     public Stream<URL> filter(Stream<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {

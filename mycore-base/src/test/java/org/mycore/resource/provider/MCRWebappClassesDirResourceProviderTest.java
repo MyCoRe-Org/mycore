@@ -64,9 +64,10 @@ public class MCRWebappClassesDirResourceProviderTest {
         Path basePath = getConfigDirTestBasePath(MCRWebappClassesDirResourceProviderTest.class);
 
         fooWebappDir = touchFiles(basePath.resolve("foo"));
+        Path webappClassesDir = touchFiles(fooWebappDir.resolve("WEB-INF/classes"), Path.of("foo/bar"));
 
         URL nonWebappClassesDirFileUrl = toFileUrl("/foo/bar");
-        webappClassesDirFileUrl = toFileUrl(fooWebappDir.resolve("WEB-INF/classes/foo/bar"));
+        webappClassesDirFileUrl = toFileUrl(webappClassesDir.resolve("foo/bar"));
         URL libraryUrl = toJarFileUrl("/foo/library.jar", "/foo/bar");
 
         allResourceUrls = List.of(nonWebappClassesDirFileUrl, webappClassesDirFileUrl, libraryUrl);

@@ -36,7 +36,7 @@ import org.mycore.resource.common.MCRResourceTracer;
  * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRNoOpResourceSelector.Factory.class)
-public class MCRNoOpResourceSelector extends MCRResourceSelectorBase {
+public final class MCRNoOpResourceSelector extends MCRResourceSelectorBase {
 
     @Override
     protected List<URL> doSelect(List<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {
