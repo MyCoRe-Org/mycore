@@ -32,7 +32,6 @@ import org.jdom2.JDOMException;
 import org.junit.jupiter.api.Test;
 import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 import org.mycore.test.MyCoReTest;
 
 /**
@@ -57,7 +56,6 @@ public class MCREditorSubmissionTest {
         template = "document[title='Title'][author[@firstName='Jim'][@lastName='']]";
         Document expected = new Document(new MCRNodeBuilder().buildElement(template, null, null));
         Document result = session.getEditedXML();
-        result = MCRChangeTracker.removeChangeTracking(result);
         assertTrue(MCRXMLHelper.deepEqual(expected, result));
     }
 

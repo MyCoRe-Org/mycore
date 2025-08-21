@@ -87,7 +87,7 @@ public class MCRXEditorTransformerTest {
 
         MCRBinding binding = new MCRBinding("//input[@type='hidden'][@name='_xed_session']/@value", true,
             new MCRBinding(expected));
-        binding.setValue(session.getID() + "-" + session.getChangeTracker().getChangeCounter());
+        binding.setValue(session.getID() + "-" + session.getChangeTracker().getChangeCount());
 
         binding = new MCRBinding("//form/@action", true, new MCRBinding(expected));
         binding.setValue(MCRFrontendUtil.getBaseURL() + "servlets/XEditor");

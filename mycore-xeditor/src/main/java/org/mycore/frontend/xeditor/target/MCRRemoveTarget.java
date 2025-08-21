@@ -36,6 +36,6 @@ public class MCRRemoveTarget extends MCRRepeaterControl {
         binding.removeBoundNode(0);
         binding.detach();
 
-        session.setBreakpoint("After handling target remove " + xPath);
+        session.getChangeTracker().setBreakpoint("After handling target remove " + xPath);
     }
 }
