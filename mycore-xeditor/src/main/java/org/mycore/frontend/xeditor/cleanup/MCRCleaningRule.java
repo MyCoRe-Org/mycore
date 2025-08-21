@@ -8,14 +8,35 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 
+/**
+ * <p>
+ *   Represents a rule that decides if a node should be removed from XML.
+ *   Each rule consists of two XPath expressions:
+ * </p>
+ * <ul>
+ *   <li>The XPath to select the nodes to inspect for this rule
+ *   <li>The XPath expression to decide if this node is relevant or should be removed
+ * </ul>
+ * 
+ * @author Frank L\u00FCtzenkirchen
+ */
 class MCRCleaningRule {
 
+    /** The XPath to select the nodes to inspect for this rule */
     private String xPathExprNodesToInspect;
 
+    /** The XPath to select the nodes to inspect for this rule */
     private XPathExpression<Object> xPathNodesToInspect;
 
+    /** The XPath expression to decide if this node is relevant (or should be removed otherwise) */
     private XPathExpression<Object> xPathRelevancyTest;
 
+    /**
+     * Creates a new cleaning rule.
+     * 
+     * @param xPathExprNodesToInspect the XPath to select the nodes to inspect for this rule
+     * @param xPathExprRelevancyTest the XPath expression to decide if this node is relevant (or should be removed otherwise)
+     */
     MCRCleaningRule(String xPathExprNodesToInspect, String xPathExprRelevancyTest) {
         this.xPathExprNodesToInspect = xPathExprNodesToInspect;
         this.xPathNodesToInspect = XPathFactory.instance().compile(xPathExprNodesToInspect, Filters.fpassthrough(),

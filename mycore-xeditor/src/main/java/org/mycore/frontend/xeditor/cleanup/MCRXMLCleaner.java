@@ -28,6 +28,20 @@ import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 
+/**
+ * <p>
+ *   Removes irrelevant nodes from XML, for cleanup purposes after form submission.
+ *   Rules can be configured as default rules or defined in the *.xed code.
+ * </p>
+ * 
+ * <code>
+ *   <xed:cleanup-rule xpath="//@*" relevant-if="string-length(.) &gt; 0" />
+ * </code>
+ * 
+ * @see MCRDefaultRules
+ * 
+ * @author Frank Lu00FCtzenkirchen
+ */
 public class MCRXMLCleaner {
 
     private List<MCRCleaningRule> rules = new ArrayList<>();
