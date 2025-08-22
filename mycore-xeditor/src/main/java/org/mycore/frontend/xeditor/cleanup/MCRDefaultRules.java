@@ -19,6 +19,7 @@
 package org.mycore.frontend.xeditor.cleanup;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -54,11 +55,13 @@ class MCRDefaultRules {
     private static final String CONFIG_KEY_NODES_TO_INSPECT = "NodesToInspect";
     private static final String CONFIG_KEY_RELEVANT_IF = "RelevantIf";
 
-    private static final List<MCRCleaningRule> DEFAULT_RULES = new ArrayList<>();
+    private static final List<MCRCleaningRule> DEFAULT_RULES;
 
     static {
+        List<MCRCleaningRule> defaultRules = new ArrayList<>();
+
         Map<String, String> config = MCRConfiguration2.getSubPropertiesMap(CONFIG_PREFIX);
-        
+
         config.keySet().stream().sorted().filter(key -> key.endsWith(CONFIG_KEY_NODES_TO_INSPECT)).forEach(key -> {
             String rulePrefix = key.substring(0, key.indexOf(CONFIG_KEY_NODES_TO_INSPECT));
 
@@ -66,8 +69,10 @@ class MCRDefaultRules {
             String relevantIf = config.get(rulePrefix + CONFIG_KEY_RELEVANT_IF);
 
             MCRCleaningRule rule = new MCRCleaningRule(nodesToInspect, relevantIf);
-            DEFAULT_RULES.add(rule);
+            defaultRules.add(rule);
         });
+
+        DEFAULT_RULES = Collections.unmodifiableList(defaultRules);
     }
 
     static List<MCRCleaningRule> getDefaultRules() {
