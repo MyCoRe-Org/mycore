@@ -18,32 +18,36 @@
 
 package org.mycore.datamodel.ifs2;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Date;
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.test.MyCoReTest;
 
 /**
  * JUnit test for MCRDirectory
  * 
  * @author Frank Lützenkirchen
  */
+@MyCoReTest
 public class MCRDirectoryTest extends MCRIFS2TestCase {
 
     private MCRFileCollection col;
 
     @Override
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-
         col = getStore().create();
     }
 
@@ -117,7 +121,7 @@ public class MCRDirectoryTest extends MCRIFS2TestCase {
         assertEquals(1, parent.getChildren().count());
         assertNotNull(parent.getChild("bar"));
         MCRNode fromList = parent.getChildren().findFirst().get();
-        assertTrue(fromList instanceof MCRDirectory);
+        assertInstanceOf(MCRDirectory.class, fromList);
         assertEquals("bar", fromList.getName());
 
         parent.createFile("readme.txt");

@@ -18,16 +18,15 @@
 
 package org.mycore.common;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MCRStreamUtilsTest {
 
@@ -50,11 +49,11 @@ public class MCRStreamUtilsTest {
         String[] nodesPreOrder = MCRStreamUtils
             .flatten("F", ((Function<String, String[]>) children::get).andThen(Arrays::asList),
                 Collection::parallelStream)
-            .collect(Collectors.toList())
+            .toList()
             .toArray(new String[nodes.length]);
-        assertEquals("Node count differs", nodes.length, nodesPreOrder.length);
+        assertEquals(nodes.length, nodesPreOrder.length, "Node count differs");
         for (int i = 0; i < nodes.length; i++) {
-            assertEquals("unexpected node", nodes[i], nodesPreOrder[i]);
+            assertEquals(nodes[i], nodesPreOrder[i], "unexpected node");
         }
     }
 

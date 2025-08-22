@@ -17,11 +17,12 @@
  */
 package org.mycore.datamodel.common;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -33,8 +34,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.test.MyCoReTest;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -43,7 +44,8 @@ import org.xml.sax.SAXException;
  * @author René Adler (eagle)
  *
  */
-public class MCRDataURLTest extends MCRTestCase {
+@MyCoReTest
+public class MCRDataURLTest {
 
     private static final String[] VALID = {
         "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEUAAAD///+l2Z/dAAAAM0lEQVR4nGP4/5/h/1+G/58ZDrAz3D/McH8yw83NDDeNGe4Ug9C9zwz3gVLMDA/A6P9/AFGGFyjOXZtQAAAAAElFTkSuQmCC",
@@ -85,7 +87,7 @@ public class MCRDataURLTest extends MCRTestCase {
             boolean thrown = false;
             try {
                 MCRDataURL dataURL = MCRDataURL.parse(url);
-                assertNull(url + " is not null.", dataURL);
+                assertNull(dataURL, url + " is not null.");
             } catch (IllegalCharsetNameException | MalformedURLException e) {
                 thrown = true;
             }
@@ -128,17 +130,22 @@ public class MCRDataURLTest extends MCRTestCase {
         assertNotNull(du);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testException() throws ParserConfigurationException, SAXException, IOException, TransformerException {
-        DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+    @Test
+    public void testException() {
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> {
+                DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 
-        InputSource is = new InputSource();
-        is.setCharacterStream(new StringReader(TEST_EXCEPTION_XML));
-        Document doc = db.parse(is);
+                InputSource is = new InputSource();
+                is.setCharacterStream(new StringReader(TEST_EXCEPTION_XML));
+                Document doc = db.parse(is);
 
-        MCRDataURL.build(doc.getChildNodes().item(0).getChildNodes(), MCRDataURLEncoding.BASE64.value(),
-            "TEXT/xml",
-            "utf-8");
+                MCRDataURL.build(doc.getChildNodes().item(0).getChildNodes(), MCRDataURLEncoding.BASE64.value(),
+                    "TEXT/xml",
+                    "utf-8");
+
+            });
     }
 
 }

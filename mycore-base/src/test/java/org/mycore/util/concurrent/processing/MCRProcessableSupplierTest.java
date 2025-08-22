@@ -18,8 +18,9 @@
 
 package org.mycore.util.concurrent.processing;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,14 +28,15 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.processing.MCRAbstractProgressable;
 import org.mycore.common.processing.MCRProcessableStatus;
 import org.mycore.common.processing.MCRProgressable;
 import org.mycore.common.processing.MCRProgressableListener;
+import org.mycore.test.MyCoReTest;
 
-public class MCRProcessableSupplierTest extends MCRTestCase {
+@MyCoReTest
+public class MCRProcessableSupplierTest {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -71,17 +73,17 @@ public class MCRProcessableSupplierTest extends MCRTestCase {
         supplier.getFuture().get();
 
         // TESTS
-        assertEquals("the processable should be finished successful", MCRProcessableStatus.SUCCESSFUL,
-            supplier.getStatus());
-        assertEquals("the progressable should be at 100", Integer.valueOf(100), supplier.getProgress());
+        assertEquals(MCRProcessableStatus.SUCCESSFUL, supplier.getStatus(),
+            "the processable should be finished successful");
+        assertEquals(Integer.valueOf(100), supplier.getProgress(), "the progressable should be at 100");
         assertEquals("end", supplier.getProgressText());
-        assertEquals("there shouldn't be any error", null, supplier.getError());
-        assertNotEquals("there should be a start time", null, supplier.getStartTime());
-        assertNotEquals("there should be an end time", null, supplier.getEndTime());
+        assertNull(supplier.getError(), "there shouldn't be any error");
+        assertNotEquals(null, supplier.getStartTime(), "there should be a start time");
+        assertNotEquals(null, supplier.getEndTime(), "there should be an end time");
         assertNotEquals(null, supplier.took());
 
-        assertNotEquals("the status listener wasn't called", 0, STATUS_LISTENER_COUNTER);
-        assertNotEquals("the progressable listener wasn't called", 0, PROGRESS_LISTENER_COUNTER);
+        assertNotEquals(0, STATUS_LISTENER_COUNTER, "the status listener wasn't called");
+        assertNotEquals(0, PROGRESS_LISTENER_COUNTER, "the progressable listener wasn't called");
 
         es.shutdown();
         es.awaitTermination(10, TimeUnit.SECONDS);

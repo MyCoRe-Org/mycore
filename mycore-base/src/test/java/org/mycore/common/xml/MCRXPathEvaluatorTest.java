@@ -18,28 +18,27 @@
 
 package org.mycore.common.xml;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.junit.Before;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mycore.test.MyCoReTest;
 
 /**
  * @author Frank Lützenkirchen
  */
-public class MCRXPathEvaluatorTest extends MCRTestCase {
+@MyCoReTest
+public class MCRXPathEvaluatorTest {
 
     private MCRXPathEvaluator evaluator;
 
-    @Before
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         String builder =
             "document[name/@id='n1'][note/@href='#n1'][location/@href='#n1'][name[@id='n2']][location[@href='#n2']]";
         Element document = new MCRNodeBuilder().buildElement(builder, null, null);

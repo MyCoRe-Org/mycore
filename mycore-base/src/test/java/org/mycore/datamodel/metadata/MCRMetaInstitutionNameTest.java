@@ -18,11 +18,11 @@
 
 package org.mycore.datamodel.metadata;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.jdom2.Element;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.test.MyCoReTest;
 
 /**
  * This class is a JUnit test case for org.mycore.datamodel.metadata.MCRMetaInstitutionName.
@@ -30,7 +30,8 @@ import org.mycore.common.MCRTestCase;
  * @author Jens Kupferschmidt
  *
  */
-public class MCRMetaInstitutionNameTest extends MCRTestCase {
+@MyCoReTest
+public class MCRMetaInstitutionNameTest {
 
     /**
      * check createXML, setFromDom, equals and clone
@@ -43,9 +44,9 @@ public class MCRMetaInstitutionNameTest extends MCRTestCase {
         Element langtext_xml = instname.createXML();
         MCRMetaInstitutionName langtext_read = new MCRMetaInstitutionName();
         langtext_read.setFromDOM(langtext_xml);
-        assertEquals("read objects from XML should be equal", instname, langtext_read);
+        assertEquals(instname, langtext_read, "read objects from XML should be equal");
 
         MCRMetaInstitutionName langtext_clone = langtext_read.clone();
-        assertEquals("cloned object should be equal with original", langtext_read, langtext_clone);
+        assertEquals(langtext_read, langtext_clone, "cloned object should be equal with original");
     }
 }

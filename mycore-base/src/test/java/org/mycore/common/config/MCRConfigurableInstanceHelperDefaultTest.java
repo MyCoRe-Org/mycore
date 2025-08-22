@@ -18,21 +18,22 @@
 
 package org.mycore.common.config;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import java.util.List;
+import java.util.Map;
+
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRInstanceList;
 import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.test.MyCoReTest;
 
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
+@MyCoReTest
 @MCRTestConfiguration(
     properties = {
         @MCRTestProperty(key = "Default.Property1", string = "Value1"),
@@ -40,7 +41,7 @@ import static org.junit.Assert.assertNotNull;
         @MCRTestProperty(key = "Default.OneProperty", string = "OneValue"),
         @MCRTestProperty(key = "Default.OtherProperty", string = "OtherValue")
     })
-public class MCRConfigurableInstanceHelperDefaultTest extends MCRTestCase {
+public class MCRConfigurableInstanceHelperDefaultTest {
 
     @Test
     @MCRTestConfiguration(

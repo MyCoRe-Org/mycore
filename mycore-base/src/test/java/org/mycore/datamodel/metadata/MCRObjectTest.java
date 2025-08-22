@@ -18,38 +18,38 @@
 
 package org.mycore.datamodel.metadata;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Map;
 
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRTestCase;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
+import org.mycore.test.MyCoReTest;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
-public class MCRObjectTest extends MCRTestCase {
+@MyCoReTest
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true")
+})
+public class MCRObjectTest {
 
     private static final String TEST_OBJECT_RESOURCE_NAME = "/mcr_test_01.xml";
 
     private MCRObject testObject;
 
-    /* (non-Javadoc)
-     * @see org.mycore.common.MCRTestCase#setUp()
-     */
-    @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         String testId = "junit_test_00000001";
         if (MCRObjectID.getInstance(testId).toString().length() != testId.length()) {
             MCRObjectIDTest.resetObjectIDFormat();
@@ -60,21 +60,14 @@ public class MCRObjectTest extends MCRTestCase {
         testObject.setFromJDOM(testObjectDocument);
     }
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.Metadata.Type.test", Boolean.TRUE.toString());
-        return testProperties;
-    }
-
     @Test
     public void createJSON() {
         JsonObject json = testObject.createJSON();
-        assertEquals("Invalid id", "mcr_test_00000001", json.getAsJsonPrimitive("id").getAsString());
+        assertEquals("mcr_test_00000001", json.getAsJsonPrimitive("id").getAsString(), "Invalid id");
         JsonObject textfield = json.getAsJsonObject("metadata").getAsJsonObject("def.textfield");
         String text = textfield.getAsJsonArray("data").get(0).getAsJsonObject().getAsJsonPrimitive("text")
             .getAsString();
-        assertEquals("Invalid text metadata", "JUnit Test object 1", text);
+        assertEquals("JUnit Test object 1", text, "Invalid text metadata");
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         System.out.println(gson.toJson(json));
     }

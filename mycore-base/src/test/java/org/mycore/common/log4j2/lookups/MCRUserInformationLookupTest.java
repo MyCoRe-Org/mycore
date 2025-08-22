@@ -18,29 +18,27 @@
 
 package org.mycore.common.log4j2.lookups;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.MCRTestCase;
 import org.mycore.common.MCRUserInformation;
+import org.mycore.test.MyCoReTest;
 
-public class MCRUserInformationLookupTest extends MCRTestCase {
+@MyCoReTest
+public class MCRUserInformationLookupTest {
 
     @Test
-    public final void testLookupString() {
+    final void testLookupString() {
         MCRUserInformationLookup lookup = new MCRUserInformationLookup();
-        assertNull("User information should not be available", lookup.lookup("id"));
+        assertNull(lookup.lookup("id"), "User information should not be available");
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         assertEquals(MCRSystemUserInformation.GUEST.getUserID(), lookup.lookup("id"));
-        assertNull("Guest user should have no role", lookup.lookup("role:admin:editor:submitter"));
+        assertNull(lookup.lookup("role:admin:editor:submitter"), "Guest user should have no role");
         mcrSession.setUserInformation(new MCRUserInformation() {
 
             @Override
@@ -60,9 +58,8 @@ public class MCRUserInformationLookupTest extends MCRTestCase {
         });
         String[] testRoles = { "admin", "editor", "submitter" };
         String expRole = testRoles[1];
-        assertTrue("Current user should be in role " + expRole, mcrSession.getUserInformation().isUserInRole(expRole));
-        assertEquals(expRole,
-            lookup.lookup("role:" + Arrays.asList(testRoles).stream().collect(Collectors.joining(","))));
+        assertTrue(mcrSession.getUserInformation().isUserInRole(expRole), "Current user should be in role " + expRole);
+        assertEquals(expRole, lookup.lookup("role:" + String.join(",", testRoles)));
     }
 
 }

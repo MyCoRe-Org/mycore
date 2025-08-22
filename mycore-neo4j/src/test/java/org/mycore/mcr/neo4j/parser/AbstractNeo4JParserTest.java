@@ -19,14 +19,12 @@
 package org.mycore.mcr.neo4j.parser;
 
 import java.io.IOException;
-import java.util.Map;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRStoreTestCase;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.classifications2.MCRCategory;

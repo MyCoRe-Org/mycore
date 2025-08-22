@@ -18,24 +18,22 @@
 
 package org.mycore.services.i18n;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
+import org.mycore.test.MyCoReTest;
 
-public class MCRTranslationTest extends MCRTestCase {
-
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.Metadata.Languages", "de,en,fr,pl");
-        return testProperties;
-    }
+@MyCoReTest
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Metadata.Languages", string = "de,en,fr,pl")
+})
+public class MCRTranslationTest {
 
     /**
      * use with care: only required for Junit tests if properties changes.
@@ -48,7 +46,7 @@ public class MCRTranslationTest extends MCRTestCase {
         MCRTranslation.reInit();
     }
 
-    @Before
+    @BeforeEach
     public void cleanUp() {
         reInit();
     }
@@ -78,13 +76,13 @@ public class MCRTranslationTest extends MCRTestCase {
     @Test
     public void getAvailableLanguages() {
         Set<String> availableLanguages = MCRTranslation.getAvailableLanguages();
-        assertEquals("Expected 4 languages, but got: " + availableLanguages, 4, availableLanguages.size());
+        assertEquals(4, availableLanguages.size(), "Expected 4 languages, but got: " + availableLanguages);
     }
 
     @Test
     public void getDeprecatedMessageKeys() {
-        assertEquals("Depreacted I18N keys do not work", "MyCoRe ID",
-            MCRTranslation.translateToLocale("oldLabel", Locale.ENGLISH));
+        assertEquals("MyCoRe ID", MCRTranslation.translateToLocale("oldLabel", Locale.ENGLISH),
+            "Depreacted I18N keys do not work");
     }
 
 }

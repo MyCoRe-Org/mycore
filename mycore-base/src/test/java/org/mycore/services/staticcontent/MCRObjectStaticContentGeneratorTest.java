@@ -18,19 +18,21 @@
 
 package org.mycore.services.staticcontent;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.IOException;
 import java.nio.file.Paths;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectIDTest;
+import org.mycore.test.MyCoReTest;
 
-public class MCRObjectStaticContentGeneratorTest extends MCRTestCase {
+@MyCoReTest
+public class MCRObjectStaticContentGeneratorTest {
 
     public static final MCRContentTransformer NOOP_TRANSFORMER = new MCRContentTransformer() {
         @Override
@@ -47,7 +49,7 @@ public class MCRObjectStaticContentGeneratorTest extends MCRTestCase {
         MCRConfiguration2.set("MCR.Metadata.ObjectID.NumberPattern", "00000");
         MCRObjectIDTest.resetObjectIDFormat();
         MCRObjectID derivate = MCRObjectID.getInstance("mcr_derivate_00001");
-        Assert.assertEquals("Paths should match", Paths.get("/000/01"), generator.getSlotDirPath(derivate));
+        assertEquals(Paths.get("/000/01"), generator.getSlotDirPath(derivate), "Paths should match");
     }
 
     @Test
@@ -57,7 +59,7 @@ public class MCRObjectStaticContentGeneratorTest extends MCRTestCase {
         MCRConfiguration2.set("MCR.Metadata.ObjectID.NumberPattern", "000000");
         MCRObjectIDTest.resetObjectIDFormat();
         MCRObjectID derivate = MCRObjectID.getInstance("mcr_derivate_000001");
-        Assert.assertEquals("Paths should match", Paths.get("/000/001"), generator.getSlotDirPath(derivate));
+        assertEquals(Paths.get("/000/001"), generator.getSlotDirPath(derivate), "Paths should match");
     }
 
     @Test
@@ -67,7 +69,7 @@ public class MCRObjectStaticContentGeneratorTest extends MCRTestCase {
         MCRConfiguration2.set("MCR.Metadata.ObjectID.NumberPattern", "0000000");
         MCRObjectIDTest.resetObjectIDFormat();
         MCRObjectID derivate = MCRObjectID.getInstance("mcr_derivate_0000001");
-        Assert.assertEquals("Paths should match", Paths.get("/000/000/1"), generator.getSlotDirPath(derivate));
+        assertEquals(Paths.get("/000/000/1"), generator.getSlotDirPath(derivate), "Paths should match");
     }
 
 }

@@ -18,11 +18,11 @@
 
 package org.mycore.frontend.support;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.net.URISyntaxException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Thomas Scheffler(yagee)
@@ -33,7 +33,7 @@ public class MCRSecureTokenV2Test {
      * Test method for {@link org.mycore.frontend.support.MCRSecureTokenV2#getHash()}.
      */
     @Test
-    public final void testGetHash() {
+    final void testGetHash() {
         MCRSecureTokenV2 token = getWowzaSample();
         assertEquals("TgJft5hsjKyC5Rem_EoUNP7xZvxbqVPhhd0GxIcA2oo=", token.getHash());
         token = getWowzaSample2();
@@ -44,7 +44,7 @@ public class MCRSecureTokenV2Test {
      * Test method for {@link org.mycore.frontend.support.MCRSecureTokenV2#toURI(java.lang.String, java.lang.String)}.
      */
     @Test
-    public final void testToURL() throws URISyntaxException {
+    final void testToURL() throws URISyntaxException {
         MCRSecureTokenV2 token = getWowzaSample();
         String baseURL = "http://192.168.1.1:1935/";
         String suffix = "/playlist.m3u8";

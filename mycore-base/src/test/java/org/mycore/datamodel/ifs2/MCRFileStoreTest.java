@@ -18,11 +18,11 @@
 
 package org.mycore.datamodel.ifs2;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -37,18 +37,26 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRStringContent;
+import org.mycore.test.MyCoReTest;
 
 /**
  * JUnit test for MCRFileStore
  * 
  * @author Frank Lützenkirchen
  */
+@MyCoReTest
 public class MCRFileStoreTest extends MCRIFS2TestCase {
+
+    @BeforeEach
+    public void setUp() throws Exception {
+        super.setUp();
+    }
 
     @Test
     public void create() throws Exception {
@@ -131,7 +139,7 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
 
         ArrayList<Integer> l1 = new ArrayList<>();
         IDs = getStore().listIDs(true);
-        assertTrue("IDs iterator has no next element? ", IDs.hasNext());
+        assertTrue(IDs.hasNext(), "IDs iterator has no next element? ");
         while (IDs.hasNext()) {
             int id = IDs.next();
             if (!l1.isEmpty()) {
@@ -139,7 +147,7 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
             }
             l1.add(id);
         }
-        assertEquals("ID list size", expectedNumOfFileCollections, l1.size());
+        assertEquals(expectedNumOfFileCollections, l1.size(), "ID list size");
         ArrayList<Integer> l2 = new ArrayList<>();
         IDs = getStore().listIDs(false);
         while (IDs.hasNext()) {
@@ -158,8 +166,8 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
         for (int i = 0; i < numOfCollections; i++) {
             MCRFileCollection fileCollection = getStore().create();
             int collectionID = fileCollection.getID();
-            assertTrue("File collection with ID " + collectionID + " does not exists.",
-                getStore().exists(collectionID));
+            assertTrue(getStore().exists(collectionID),
+                "File collection with ID " + collectionID + " does not exists.");
         }
     }
 

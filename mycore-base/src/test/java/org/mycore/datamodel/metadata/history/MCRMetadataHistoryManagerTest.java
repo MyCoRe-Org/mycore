@@ -18,21 +18,31 @@
 
 package org.mycore.datamodel.metadata.history;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.common.MCRJPATestCase;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MCRJPATestHelper;
+import org.mycore.test.MyCoReTest;
 
 import jakarta.persistence.EntityManager;
 
-public class MCRMetadataHistoryManagerTest extends MCRJPATestCase {
+@MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Metadata.Type.mods", string = "true")
+})
+public class MCRMetadataHistoryManagerTest {
 
     private static final Instant HISTORY_START = Instant.parse("2017-06-19T10:28:36.565Z");
 
@@ -40,22 +50,10 @@ public class MCRMetadataHistoryManagerTest extends MCRJPATestCase {
 
     private Instant lastDelete;
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.Metadata.Type.mods", Boolean.TRUE.toString());
-        return testProperties;
-    }
-
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
     @Test
     public void testGetEmptyHistoryStart() {
         //MCR-1979
-        assertFalse("No earliest timestamp should be present", MCRMetadataHistoryManager.getHistoryStart().isPresent());
+        assertFalse(MCRMetadataHistoryManager.getHistoryStart().isPresent(), "No earliest timestamp should be present");
     }
 
     @Test
@@ -76,7 +74,7 @@ public class MCRMetadataHistoryManagerTest extends MCRJPATestCase {
         addTestData();
         Map<MCRObjectID, Instant> deletedItems = MCRMetadataHistoryManager.getDeletedItems(Instant.ofEpochMilli(0),
             Optional.empty());
-        assertEquals("Expected a single deletion event.", 1, deletedItems.size());
+        assertEquals(1, deletedItems.size(), "Expected a single deletion event.");
     }
 
     @Test
@@ -92,7 +90,7 @@ public class MCRMetadataHistoryManagerTest extends MCRJPATestCase {
         create(testObject, Instant.parse("2017-06-19T10:52:59.711Z"));
         lastDelete = Instant.parse("2017-06-19T10:52:59.718Z");
         delete(testObject, lastDelete);
-        startNewTransaction();
+        MCRJPATestHelper.startNewTransaction();
     }
 
     private void create(MCRObjectID id, Instant time) {

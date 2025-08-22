@@ -18,13 +18,14 @@
 
 package org.mycore.mods.merger;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 
 import org.jaxen.JaxenException;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mycore.common.xml.MCRNodeBuilder;
@@ -75,7 +76,7 @@ public class MCRMergerTest {
             logXML(e);
         }
 
-        Assertions.assertTrue(asExpected);
+        assertTrue(asExpected);
     }
 
     @Disabled

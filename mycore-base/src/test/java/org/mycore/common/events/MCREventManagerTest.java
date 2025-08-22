@@ -18,34 +18,30 @@
 
 package org.mycore.common.events;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-import java.util.Map;
-
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.datamodel.common.MCRXMLMetadataEventHandler;
+import org.mycore.test.MyCoReTest;
 
-public class MCREventManagerTest extends MCRTestCase {
-
-    public static final String XML_METADATA_EVENT_HANDLER = "org.mycore.datamodel.common.MCRXMLMetadataEventHandler";
-
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.Metadata.Store.BaseDir", "tmp");
-        testProperties.put("MCR.Metadata.Store.SVNBase", "/tmp/versions");
-        testProperties.put("MCR.EventHandler.MCRObject.1.Class", XML_METADATA_EVENT_HANDLER);
-        testProperties.put("MCR.EventHandler.MCRObject.4.Foo", "fooProp");
-        testProperties.put("MCR.EventHandler.MCRDerivate.2.Class", XML_METADATA_EVENT_HANDLER);
-        return testProperties;
-    }
+@MyCoReTest
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Metadata.Store.BaseDir", string = "tmp"),
+    @MCRTestProperty(key = "MCR.Metadata.Store.SVNBase", string = "/tmp/versions"),
+    @MCRTestProperty(key = "MCR.EventHandler.MCRObject.1.Class", classNameOf = MCRXMLMetadataEventHandler.class),
+    @MCRTestProperty(key = "MCR.EventHandler.MCRObject.4.Foo", string = "fooProp"),
+    @MCRTestProperty(key = "MCR.EventHandler.MCRDerivate.2.Class", classNameOf = MCRXMLMetadataEventHandler.class)
+})
+public class MCREventManagerTest {
 
     @Test
     public void instance() {
         try {
-            assertNull("Instance should be null before initialization", MCREventManager.obtainTestInstance());
+            assertNull(MCREventManager.obtainTestInstance(), "Instance should be null before initialization");
         } catch (MCRConfigurationException e) {
             assertEquals("Configuration property MCR.EventHandler.Mode.Foo is not set.", e.getMessage());
         }

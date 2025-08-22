@@ -18,30 +18,29 @@
 
 package org.mycore.access.facts.condition.fact;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mycore.access.facts.condition.fact.MCRFactsTestUtil.hackObjectIntoCache;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 import org.jdom2.Element;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.access.facts.MCRFactsHolder;
 import org.mycore.access.facts.fact.MCRObjectIDFact;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.MCRTestCase;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.test.MyCoReTest;
 
-public class MCRCreatedByConditionTest extends MCRTestCase {
-
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.Metadata.Type.test", Boolean.TRUE.toString());
-        return testProperties;
-    }
+@MyCoReTest
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true")
+})
+public class MCRCreatedByConditionTest {
 
     @Test
     public void testConditionMatch() throws NoSuchFieldException, IllegalAccessException {
@@ -58,7 +57,7 @@ public class MCRCreatedByConditionTest extends MCRTestCase {
         MCRCreatedByCondition createdByCondition = new MCRCreatedByCondition();
         createdByCondition.parse(new Element("createdby"));
 
-        Assert.assertTrue("current user should be creator", createdByCondition.matches(holder));
+        assertTrue(createdByCondition.matches(holder), "current user should be creator");
     }
 
     @Test
@@ -75,7 +74,7 @@ public class MCRCreatedByConditionTest extends MCRTestCase {
         MCRCreatedByCondition createdByCondition = new MCRCreatedByCondition();
         createdByCondition.parse(new Element("createdby"));
 
-        Assert.assertFalse("current user should not be the creator", createdByCondition.matches(holder));
+        assertFalse(createdByCondition.matches(holder), "current user should not be the creator");
     }
 
 }

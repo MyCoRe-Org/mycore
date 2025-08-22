@@ -18,10 +18,10 @@
 
 package org.mycore.datamodel.common;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -31,22 +31,25 @@ import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Date;
-import java.util.Map;
 
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.MCRStoreTestCase;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectIDTest;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
+import org.mycore.test.MCRMetadataExtension;
+import org.mycore.test.MyCoReTest;
 import org.tmatesoft.svn.core.internal.wc.SVNFileUtil;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import org.xml.sax.SAXException;
@@ -55,7 +58,14 @@ import org.xml.sax.SAXException;
  * @author Thomas Scheffler (yagee)
  * @author Frank Lützenkirchen
  */
-public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
+@MyCoReTest
+@ExtendWith(MCRMetadataExtension.class)
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Metadata.Manager.Class", classNameOf = MCRDefaultXMLMetadataManagerAdapter.class),
+    @MCRTestProperty(key = "MCR.Metadata.Type.document", string = "true"),
+    @MCRTestProperty(key = "MCR.Metadata.ObjectID.NumberPattern", string = "00000000")
+})
+public class MCRXMLMetadataManagerTest {
 
     private XMLInfo mycoreDocument;
     private XMLInfo mycoreDocumentNew;
@@ -63,10 +73,8 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
 
     private static final SAXBuilder SAX_BUILDER = new SAXBuilder();
 
-    @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         String testId = "junit_document_00000001";
         if (MCRObjectID.getInstance(testId).toString().length() != testId.length()) {
             MCRObjectIDTest.resetObjectIDFormat();
@@ -79,16 +87,15 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
             "<object id=\"MCR_document_00000001\"/>".getBytes(StandardCharsets.UTF_8), new Date());
     }
 
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        for (File projectDir : getStoreBaseDir().toFile().listFiles()) {
+    @AfterEach
+    public void tearDown(MCRMetadataExtension.BaseDirs baseDirs) throws Exception {
+        for (File projectDir : baseDirs.storeBaseDir().toFile().listFiles()) {
             for (File typeDir : projectDir.listFiles()) {
                 Files.walkFileTree(typeDir.toPath(), new MCRRecursiveDeleter());
                 typeDir.mkdir();
             }
         }
-        for (File projectDir : getSvnBaseDir().toFile().listFiles()) {
+        for (File projectDir : baseDirs.storeBaseDir().toFile().listFiles()) {
             for (File typeDir : projectDir.listFiles()) {
                 //does not work on Windows (AccessdeniedExceptions):
                 //Files.walkFileTree(typeDir.toPath(), new MCRRecursiveDeleter());
@@ -97,7 +104,6 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
                 SVNRepositoryFactory.createLocalRepository(typeDir, true, false);
             }
         }
-        super.tearDown();
     }
 
     static Document getDocument(InputStream in) throws JDOMException, IOException {
@@ -117,14 +123,14 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
     public void delete() {
         getStore().create(mycoreDocument.id, mycoreDocument.blob,
             mycoreDocument.lastModified);
-        assertTrue(mycoreDocument.id + " should exist", getStore().exists(mycoreDocument.id));
+        assertTrue(getStore().exists(mycoreDocument.id), mycoreDocument.id + " should exist");
         try {
             getStore().delete(mcrDocument.id);
         } catch (MCRPersistenceException e) {
             //is expected as MCR_document_00000001 does not exist
         }
-        assertTrue(mycoreDocument.id + " should not have been deleted",
-            getStore().exists(mycoreDocument.id));
+        assertTrue(getStore().exists(mycoreDocument.id),
+            mycoreDocument.id + " should not have been deleted");
     }
 
     @Test
@@ -143,16 +149,17 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
 
     @Test
     public void retrieve() throws JDOMException, IOException, SAXException {
-        assertEquals("Stored document ID do not match:", mycoreDocument.id.toString(),
+        assertEquals(mycoreDocument.id.toString(),
             SAX_BUILDER.build(new ByteArrayInputStream(mycoreDocument.blob)).getRootElement()
-                .getAttributeValue("id"));
+                .getAttributeValue("id"),
+            "Stored document ID do not match:");
         getStore().create(mycoreDocument.id,
             new MCRByteContent(mycoreDocument.blob, mcrDocument.lastModified.getTime()),
             mycoreDocument.lastModified);
         assertTrue(getStore().exists(mycoreDocument.id));
         Document doc = getStore().retrieveXML(mycoreDocument.id);
-        assertEquals("Stored document ID do not match:", mycoreDocument.id.toString(), doc.getRootElement()
-            .getAttributeValue("id"));
+        assertEquals(mycoreDocument.id.toString(), doc.getRootElement()
+            .getAttributeValue("id"), "Stored document ID do not match:");
         try {
             doc = getStore().retrieveXML(mcrDocument.id);
             if (doc != null) {
@@ -169,30 +176,28 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
         Method[] methods = getStore().getClass().getMethods();
         for (Method method : methods) {
             if (method.getName().equals("getHighestStoredID") && method.getParameterTypes().length == 0) {
-                fail(
-                    "org.mycore.datamodel.ifs2.MCRObjectMetadataStoreIFS2.getHighestStoredID()" +
-                        " does not respect ProjectID");
+                fail("org.mycore.datamodel.ifs2.MCRObjectMetadataStoreIFS2.getHighestStoredID()" +
+                    " does not respect ProjectID");
             }
         }
     }
 
     @Test
     public void exists() {
-        assertFalse("Object " + mycoreDocument.id + " should not exist.",
-            getStore().exists(mycoreDocument.id));
+        assertFalse(getStore().exists(mycoreDocument.id),
+            "Object " + mycoreDocument.id + " should not exist.");
         getStore().create(mycoreDocument.id, mycoreDocument.blob,
             mycoreDocument.lastModified);
-        assertTrue("Object " + mycoreDocument.id + " should exist.",
-            getStore().exists(mycoreDocument.id));
+        assertTrue(getStore().exists(mycoreDocument.id), "Object " + mycoreDocument.id + " should exist.");
     }
 
     @Test
     public void retrieveAllIDs() {
-        assertEquals("Store should not contain any objects.", 0, getStore().listIDs().size());
+        assertEquals(0, getStore().listIDs().size(), "Store should not contain any objects.");
         getStore().create(mycoreDocument.id, mycoreDocument.blob,
             mycoreDocument.lastModified);
-        assertTrue("Store does not contain object " + mycoreDocument.id,
-            getStore().listIDs().contains(mycoreDocument.id.toString()));
+        assertTrue(getStore().listIDs().contains(mycoreDocument.id.toString()),
+            "Store does not contain object " + mycoreDocument.id);
     }
 
     @Test
@@ -202,13 +207,8 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
         assertTrue(getStore().listIDs().isEmpty());
     }
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.Metadata.Manager.Class", MCRDefaultXMLMetadataManagerAdapter.class.getCanonicalName());
-        testProperties.put("MCR.Metadata.Type.document", "true");
-        testProperties.put("MCR.Metadata.ObjectID.NumberPattern", "00000000");
-        return testProperties;
+    private MCRXMLMetadataManager getStore() {
+        return MCRXMLMetadataManager.getInstance();
     }
 
     private static class XMLInfo {

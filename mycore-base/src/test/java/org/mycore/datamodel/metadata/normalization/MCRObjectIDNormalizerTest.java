@@ -1,14 +1,15 @@
 package org.mycore.datamodel.metadata.normalization;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.test.MyCoReTest;
 
-public class MCRObjectIDNormalizerTest extends MCRTestCase {
+@MyCoReTest
+public class MCRObjectIDNormalizerTest {
 
     @Test
     public void testNormalize() {

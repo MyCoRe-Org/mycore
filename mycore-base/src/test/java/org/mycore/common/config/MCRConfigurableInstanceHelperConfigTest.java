@@ -18,9 +18,9 @@
 
 package org.mycore.common.config;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,13 +30,15 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.config.annotation.MCRRawProperties;
+import org.mycore.test.MyCoReTest;
 
-public class MCRConfigurableInstanceHelperConfigTest extends MCRTestCase {
+@MyCoReTest
+public class MCRConfigurableInstanceHelperConfigTest {
 
     public static final String INSTANCE_NAME_PREFIX = "MCR.CIH.";
 
@@ -144,9 +146,9 @@ public class MCRConfigurableInstanceHelperConfigTest extends MCRTestCase {
     public void test() {
 
         Map<String, Callable<Object>> instances = MCRConfiguration2.getInstances(Object.class, INSTANCE_NAME_PREFIX);
-        assertEquals("Except two instances", 2, instances.size());
-        assertTrue("Expected key " + INSTANCE_1_KEY + " to be present", instances.containsKey(INSTANCE_1_KEY));
-        assertTrue("Expected key " + INSTANCE_2_KEY + " to be present", instances.containsKey(INSTANCE_2_KEY));
+        assertEquals(2, instances.size(), "Except two instances");
+        assertTrue(instances.containsKey(INSTANCE_1_KEY), "Expected key " + INSTANCE_1_KEY + " to be present");
+        assertTrue(instances.containsKey(INSTANCE_2_KEY), "Expected key " + INSTANCE_2_KEY + " to be present");
 
         testInstance(INSTANCE_1_NAME, false);
         testInstance(INSTANCE_2_NAME, true);
@@ -158,11 +160,11 @@ public class MCRConfigurableInstanceHelperConfigTest extends MCRTestCase {
         String fullInstanceName = withClassSuffix(instanceName, withClassSuffix);
 
         List<String> list = MCRConfiguration2.getInstantiatablePropertyKeys(fullInstanceName).toList();
-        assertTrue("Properties should contain " + instanceName, list.contains(fullInstanceName));
+        assertTrue(list.contains(fullInstanceName), "Properties should contain " + instanceName);
 
         Optional<ConfigurableTestInstance> instance = MCRConfigurableInstanceHelper
             .getInstance(ConfigurableTestInstance.class, fullInstanceName);
-        assertTrue("Test " + fullInstanceName + " should be present", instance.isPresent());
+        assertTrue(instance.isPresent(), "Test " + fullInstanceName + " should be present");
 
         validateFields(instance.get());
         validateMethods(instance.get());
@@ -170,152 +172,137 @@ public class MCRConfigurableInstanceHelperConfigTest extends MCRTestCase {
 
     }
 
-    void validateFields(ConfigurableTestInstance instance) {
+    public void validateFields(ConfigurableTestInstance instance) {
 
-        assertTrue("The map field should contain the assigned test key",
-            instance.map.containsKey(ASSIGNED_KEY));
+        assertTrue(instance.map.containsKey(ASSIGNED_KEY), "The map field should contain the assigned test key");
 
-        assertTrue("The map field should contain the assigned test key with prefix",
-            instance.map.containsKey(PREFIX_ASSIGNED_KEY));
+        assertTrue(instance.map.containsKey(PREFIX_ASSIGNED_KEY),
+            "The map field should contain the assigned test key with prefix");
 
-        assertEquals("The assigned test key should have the assigned value",
-            ASSIGNED_VALUE, instance.map.get(ASSIGNED_KEY));
+        assertEquals(ASSIGNED_VALUE, instance.map.get(ASSIGNED_KEY),
+            "The assigned test key should have the assigned value");
 
-        assertEquals("The assigned test key with prefix should have the assigned value",
-            PREFIX_ASSIGNED_VALUE, instance.map.get(PREFIX_ASSIGNED_KEY));
+        assertEquals(PREFIX_ASSIGNED_VALUE, instance.map.get(PREFIX_ASSIGNED_KEY),
+            "The assigned test key with prefix should have the assigned value");
 
-        assertTrue("The prefix map field should contain the assigned test key",
-            instance.prefixMap.containsKey(ASSIGNED_KEY));
+        assertTrue(instance.prefixMap.containsKey(ASSIGNED_KEY),
+            "The prefix map field should contain the assigned test key");
 
-        assertEquals("The map field should have exactly one entry",
-            1, instance.prefixMap.size());
+        assertEquals(1, instance.prefixMap.size(), "The map field should have exactly one entry");
 
-        assertEquals("The assigned test key should have the assigned value",
-            PREFIX_ASSIGNED_VALUE, instance.prefixMap.get(ASSIGNED_KEY));
+        assertEquals(PREFIX_ASSIGNED_VALUE, instance.prefixMap.get(ASSIGNED_KEY),
+            "The assigned test key should have the assigned value");
 
-        assertEquals("The required field should match",
-            VALUE_REQUIRED_FIELD, instance.required);
+        assertEquals(VALUE_REQUIRED_FIELD, instance.required, "The required field should match");
 
-        assertEquals("The required field with default should match",
-            DEFAULT_VALUE, instance.requiredWithDefault);
+        assertEquals(DEFAULT_VALUE, instance.requiredWithDefault, "The required field with default should match");
 
-        assertNull("The absent optional field should be null",
-            instance.absentOptional);
+        assertNull(instance.absentOptional, "The absent optional field should be null");
 
-        assertEquals("The present optional field should match",
-            VALUE_PRESENT_OPTIONAL_FIELD, instance.presentOptional);
+        assertEquals(VALUE_PRESENT_OPTIONAL_FIELD, instance.presentOptional, "The present optional field should match");
 
-        assertEquals("The absent optional field with default should match",
-            DEFAULT_VALUE, instance.absentOptionalWithDefault);
+        assertEquals(DEFAULT_VALUE, instance.absentOptionalWithDefault,
+            "The absent optional field with default should match");
 
-        assertEquals("The present optional field with default should match",
-            VALUE_PRESENT_OPTIONAL_FIELD_WITH_DEFAULT, instance.presentOptionalWithDefault);
+        assertEquals(VALUE_PRESENT_OPTIONAL_FIELD_WITH_DEFAULT, instance.presentOptionalWithDefault,
+            "The present optional field with default should match");
 
-        assertEquals("The absolute field should match",
-            VALUE_ABSOLUTE_FIELD, instance.absolute);
+        assertEquals(VALUE_ABSOLUTE_FIELD, instance.absolute, "The absolute field should match");
 
     }
 
-    void validateMethods(ConfigurableTestInstance instance) {
+    public void validateMethods(ConfigurableTestInstance instance) {
 
-        assertTrue("The map method value should contain the assigned test key",
-            instance.getMap().containsKey(ASSIGNED_KEY));
+        assertTrue(instance.getMap().containsKey(ASSIGNED_KEY),
+            "The map method value should contain the assigned test key");
 
-        assertTrue("The map method value should contain the assigned test key with prefix",
-            instance.getMap().containsKey(PREFIX_ASSIGNED_KEY));
+        assertTrue(instance.getMap().containsKey(PREFIX_ASSIGNED_KEY),
+            "The map method value should contain the assigned test key with prefix");
 
-        assertEquals("The assigned test key should have the assigned value",
-            ASSIGNED_VALUE, instance.getMap().get(ASSIGNED_KEY));
+        assertEquals(ASSIGNED_VALUE, instance.getMap().get(ASSIGNED_KEY),
+            "The assigned test key should have the assigned value");
 
-        assertEquals("The assigned test key with prefix should have the assigned value",
-            PREFIX_ASSIGNED_VALUE, instance.getMap().get(PREFIX_ASSIGNED_KEY));
+        assertEquals(PREFIX_ASSIGNED_VALUE, instance.getMap().get(PREFIX_ASSIGNED_KEY),
+            "The assigned test key with prefix should have the assigned value");
 
-        assertTrue("The prefix map method value should contain the assigned test key",
-            instance.getPrefixMap().containsKey(ASSIGNED_KEY));
+        assertTrue(instance.getPrefixMap().containsKey(ASSIGNED_KEY),
+            "The prefix map method value should contain the assigned test key");
 
-        assertEquals("The map field should have exactly one entry",
-            1, instance.getPrefixMap().size());
+        assertEquals(1, instance.getPrefixMap().size(), "The map field should have exactly one entry");
 
-        assertEquals("The assigned test key should have the assigned value",
-            PREFIX_ASSIGNED_VALUE, instance.getPrefixMap().get(ASSIGNED_KEY));
+        assertEquals(PREFIX_ASSIGNED_VALUE, instance.getPrefixMap().get(ASSIGNED_KEY),
+            "The assigned test key should have the assigned value");
 
-        assertEquals("The required method value should match",
-            VALUE_REQUIRED_METHOD, instance.getRequired());
+        assertEquals(VALUE_REQUIRED_METHOD, instance.getRequired(), "The required method value should match");
 
-        assertEquals("The required method value with default should match",
-            DEFAULT_VALUE, instance.getRequiredWithDefault());
+        assertEquals(DEFAULT_VALUE, instance.getRequiredWithDefault(),
+            "The required method value with default should match");
 
-        assertNull("The absent optional method value should be null",
-            instance.getAbsentOptional());
+        assertNull(instance.getAbsentOptional(), "The absent optional method value should be null");
 
-        assertEquals("The present optional method value should match",
-            VALUE_PRESENT_OPTIONAL_METHOD, instance.getPresentOptional());
+        assertEquals(VALUE_PRESENT_OPTIONAL_METHOD, instance.getPresentOptional(),
+            "The present optional method value should match");
 
-        assertEquals("The absent optional method value with default should match",
-            DEFAULT_VALUE, instance.getAbsentOptionalWithDefault());
+        assertEquals(DEFAULT_VALUE, instance.getAbsentOptionalWithDefault(),
+            "The absent optional method value with default should match");
 
-        assertEquals("The present optional method value with default should match",
-            VALUE_PRESENT_OPTIONAL_METHOD_DEFAULT, instance.getPresentOptionalWithDefault());
+        assertEquals(VALUE_PRESENT_OPTIONAL_METHOD_DEFAULT, instance.getPresentOptionalWithDefault(),
+            "The present optional method value with default should match");
 
-        assertEquals("The absolute method value should match",
-            VALUE_ABSOLUTE_METHOD, instance.getAbsolute());
+        assertEquals(VALUE_ABSOLUTE_METHOD, instance.getAbsolute(), "The absolute method value should match");
 
-        assertEquals("The converting method value should match",
-            VALUE_CONVERTING_METHOD.length(), instance.getConverting());
+        assertEquals(VALUE_CONVERTING_METHOD.length(), instance.getConverting(),
+            "The converting method value should match");
 
-        assertEquals("The ordered method values should match",
-            VALUES_ORDERED_METHOD, instance.getOrderedMethodValues());
+        assertEquals(VALUES_ORDERED_METHOD, instance.getOrderedMethodValues(),
+            "The ordered method values should match");
 
     }
 
-    void validatePostConstruction(ConfigurableTestInstance instance, String fullInstanceName) {
+    public void validatePostConstruction(ConfigurableTestInstance instance, String fullInstanceName) {
 
-        assertEquals("Post construction value should match",
-            fullInstanceName, instance.postConstructionProperty);
+        assertEquals(fullInstanceName, instance.postConstructionProperty, "Post construction value should match");
 
-        assertEquals("The ordered post construction values should match",
-            VALUES_ORDERED_POST_CONSTRUCTION, instance.getOrderedPostConstructionValues());
+        assertEquals(VALUES_ORDERED_POST_CONSTRUCTION, instance.getOrderedPostConstructionValues(),
+            "The ordered post construction values should match");
 
-        assertEquals("The ordered method and post construction values should match",
-            VALUES_ORDERED_OVERALL, instance.getOrderedOverallValues());
+        assertEquals(VALUES_ORDERED_OVERALL, instance.getOrderedOverallValues(),
+            "The ordered method and post construction values should match");
 
     }
 
-    @Override
-    protected Map<String, String> getTestProperties() {
+    @BeforeEach
+    public void setTestProperties() {
 
-        final Map<String, String> testProperties = super.getTestProperties();
+        MCRConfiguration2.set(DEFAULT_KEY, DEFAULT_VALUE);
+        MCRConfiguration2.set(KEY_ABSOLUTE_FIELD, VALUE_ABSOLUTE_FIELD);
+        MCRConfiguration2.set(KEY_ABSOLUTE_METHOD, VALUE_ABSOLUTE_METHOD);
 
-        testProperties.put(DEFAULT_KEY, DEFAULT_VALUE);
-        testProperties.put(KEY_ABSOLUTE_FIELD, VALUE_ABSOLUTE_FIELD);
-        testProperties.put(KEY_ABSOLUTE_METHOD, VALUE_ABSOLUTE_METHOD);
+        configureInstance(INSTANCE_1_NAME, false);
+        configureInstance(INSTANCE_2_NAME, true);
 
-        configureInstance(testProperties, INSTANCE_1_NAME, false);
-        configureInstance(testProperties, INSTANCE_2_NAME, true);
-
-        return testProperties;
     }
 
-    private void configureInstance(Map<String, String> testProperties, String instanceName, boolean withClassSuffix) {
+    private static void configureInstance(String instanceName, boolean withClassSuffix) {
         String fullInstanceName = withClassSuffix(instanceName, withClassSuffix);
-        testProperties.put(fullInstanceName, ConfigurableTestInstance.class.getName());
-        testProperties.put(instanceName + "." + ASSIGNED_KEY, ASSIGNED_VALUE);
-        testProperties.put(instanceName + "." + PREFIX_ASSIGNED_KEY, PREFIX_ASSIGNED_VALUE);
-        testProperties.put(instanceName + "." + KEY_REQUIRED_FIELD, VALUE_REQUIRED_FIELD);
-        testProperties.put(instanceName + "." + KEY_PRESENT_OPTIONAL_FIELD, VALUE_PRESENT_OPTIONAL_FIELD);
-        testProperties.put(instanceName + "." + KEY_PRESENT_OPTIONAL_FIELD_WITH_DEFAULT,
+        MCRConfiguration2.set(fullInstanceName, ConfigurableTestInstance.class.getName());
+        MCRConfiguration2.set(instanceName + "." + ASSIGNED_KEY, ASSIGNED_VALUE);
+        MCRConfiguration2.set(instanceName + "." + PREFIX_ASSIGNED_KEY, PREFIX_ASSIGNED_VALUE);
+        MCRConfiguration2.set(instanceName + "." + KEY_REQUIRED_FIELD, VALUE_REQUIRED_FIELD);
+        MCRConfiguration2.set(instanceName + "." + KEY_PRESENT_OPTIONAL_FIELD, VALUE_PRESENT_OPTIONAL_FIELD);
+        MCRConfiguration2.set(instanceName + "." + KEY_PRESENT_OPTIONAL_FIELD_WITH_DEFAULT,
             VALUE_PRESENT_OPTIONAL_FIELD_WITH_DEFAULT);
-        testProperties.put(instanceName + "." + KEY_REQUIRED_METHOD, VALUE_REQUIRED_METHOD);
-        testProperties.put(instanceName + "." + KEY_PRESENT_OPTIONAL_METHOD, VALUE_PRESENT_OPTIONAL_METHOD);
-        testProperties.put(instanceName + "." + KEY_PRESENT_OPTIONAL_METHOD_DEFAULT,
+        MCRConfiguration2.set(instanceName + "." + KEY_REQUIRED_METHOD, VALUE_REQUIRED_METHOD);
+        MCRConfiguration2.set(instanceName + "." + KEY_PRESENT_OPTIONAL_METHOD, VALUE_PRESENT_OPTIONAL_METHOD);
+        MCRConfiguration2.set(instanceName + "." + KEY_PRESENT_OPTIONAL_METHOD_DEFAULT,
             VALUE_PRESENT_OPTIONAL_METHOD_DEFAULT);
-        testProperties.put(instanceName + "." + KEY_CONVERTING_METHOD, VALUE_CONVERTING_METHOD);
-        testProperties.put(instanceName + "." + KEY_ORDERED_METHOD, VALUE_ORDERED_METHOD);
-        testProperties.put(instanceName + "." + KEY_ORDERED_METHOD_1, VALUE_ORDERED_METHOD_1);
-        testProperties.put(instanceName + "." + KEY_ORDERED_METHOD_2, VALUE_ORDERED_METHOD_2);
+        MCRConfiguration2.set(instanceName + "." + KEY_CONVERTING_METHOD, VALUE_CONVERTING_METHOD);
+        MCRConfiguration2.set(instanceName + "." + KEY_ORDERED_METHOD, VALUE_ORDERED_METHOD);
+        MCRConfiguration2.set(instanceName + "." + KEY_ORDERED_METHOD_1, VALUE_ORDERED_METHOD_1);
+        MCRConfiguration2.set(instanceName + "." + KEY_ORDERED_METHOD_2, VALUE_ORDERED_METHOD_2);
     }
 
-    private String withClassSuffix(String instanceName, boolean withClassSuffix) {
+    private static String withClassSuffix(String instanceName, boolean withClassSuffix) {
         return instanceName + (withClassSuffix ? ".Class" : "");
     }
 
