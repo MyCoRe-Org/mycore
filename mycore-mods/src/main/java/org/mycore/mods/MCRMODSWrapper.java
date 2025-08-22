@@ -60,7 +60,7 @@ public class MCRMODSWrapper {
         + " string-length(substring-after(substring-after(@xlink:href,'_'), '_')) > 0 and"
         + " number(substring-after(substring-after(@xlink:href,'_'),'_')) > 0 and"
         + " (" + xPathRelationshipTypeTest() + ")]";
-    static final String LINKED_RELATED_MODSPERSON = "mods:name[@type='personal' and"
+    static final String LINKED_PERSONS = "mods:name[@type='personal' and"
         + " string-length(substring-after(@xlink:href,'_')) > 0 and"
         + " string-length(substring-after(substring-after(@xlink:href,'_'), '_')) > 0 and"
         + " number(substring-after(substring-after(@xlink:href,'_'),'_')) > 0]";
@@ -204,8 +204,8 @@ public class MCRMODSWrapper {
         return getElements(LINKED_RELATED_ITEMS);
     }
 
-    public List<Element> getLinkedRelatedModsperson() {
-        return getElements(LINKED_RELATED_MODSPERSON);
+    public List<Element> getLinkedPersons() {
+        return getElements(LINKED_PERSONS);
     }
 
     public String getElementValue(String xPath) {

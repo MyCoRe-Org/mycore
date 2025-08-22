@@ -57,8 +57,8 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
             MCRCategLinkServiceFactory.obtainInstance().setLinks(objectReference, categories);
         }
         List<Element> linkingNodes = modsWrapper.getLinkedRelatedItems();
-        List<Element> linkingModsperson = modsWrapper.getLinkedRelatedModsperson();
-        List<Element> joinedNodes = Stream.concat(linkingNodes.stream(), linkingModsperson.stream()).toList();
+        List<Element> linkingPersons = modsWrapper.getLinkedPersons();
+        List<Element> joinedNodes = Stream.concat(linkingNodes.stream(), linkingPersons.stream()).toList();
         if (!joinedNodes.isEmpty()) {
             MCRLinkTableManager linkTableManager = MCRLinkTableManager.getInstance();
             for (Element linkingNode : joinedNodes) {
