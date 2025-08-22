@@ -18,19 +18,23 @@
 
 package org.mycore.mets.resource;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.test.MyCoReTest;
 
-public class MCRAltoHighlightResourceTest extends MCRTestCase {
+@MyCoReTest
+public class MCRAltoHighlightResourceTest {
 
     @Test
     public void buildQuery() {
         MCRAltoHighlightResource r = new MCRAltoHighlightResource();
-        assertEquals("alto_content:Jena", r.buildQuery("Jena"));
-        assertEquals("alto_content:Jena alto_content:Stadt", r.buildQuery("Jena Stadt"));
-        assertEquals("alto_content:\"Jena Stadt\"", r.buildQuery("\"Jena Stadt\""));
+        assertEquals("alto_content:Jena",
+            r.buildQuery("Jena"));
+        assertEquals("alto_content:Jena alto_content:Stadt",
+            r.buildQuery("Jena Stadt"));
+        assertEquals("alto_content:\"Jena Stadt\"",
+            r.buildQuery("\"Jena Stadt\""));
         assertEquals("alto_content:Berlin alto_content:\"Jena Stadt\" alto_content:Hamburg",
             r.buildQuery("Berlin \"Jena Stadt\" Hamburg"));
         assertEquals("alto_content:\"Berlin Hamburg\" alto_content:\"Jena Stadt\"",
