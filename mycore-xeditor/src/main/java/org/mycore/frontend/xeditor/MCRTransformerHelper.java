@@ -275,9 +275,10 @@ public class MCRTransformerHelper {
         return getCurrentRepeat().getRepeatPosition();
     }
 
-    public void bindRepeatPosition() {
+    public int bindRepeatPosition() {
         setCurrentBinding(getCurrentRepeat().bindRepeatPosition());
         editorSession.getValidator().setValidationMarker(currentBinding);
+        return nextAnchorID();
     }
 
     public String getSwapParameter(String action) throws JaxenException {
@@ -289,7 +290,7 @@ public class MCRTransformerHelper {
         return MCRInsertTarget.getInsertParameter(getCurrentRepeat());
     }
 
-    public int nextAnchorID() {
+    private int nextAnchorID() {
         return ++anchorID;
     }
 

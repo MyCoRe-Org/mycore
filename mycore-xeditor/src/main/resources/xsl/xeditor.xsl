@@ -274,8 +274,8 @@
     <xsl:variable name="xed_repeat" select="." />
 
     <xsl:for-each select="xalan:tokenize(helper:repeat($helper,@xpath,@min,@max,@method))">
-      <a id="rep-{helper:nextAnchorID($helper)}" />
-      <xsl:value-of select="helper:bindRepeatPosition($helper)" />
+      <xsl:variable name="anchorID" select="helper:bindRepeatPosition($helper)" />
+      <a id="rep-{$anchorID}" />
       <xsl:apply-templates select="$xed_repeat/node()" mode="xeditor" />
       <xsl:value-of select="helper:unbind($helper)" />
     </xsl:for-each>
