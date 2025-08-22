@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.frontend.xeditor;
+package org.mycore.frontend.xeditor.cleanup;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,29 +27,29 @@ import java.util.Map;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.filter.Filters;
-import org.jdom2.xpath.XPathExpression;
-import org.jdom2.xpath.XPathFactory;
-import org.mycore.common.MCRConstants;
 
+/**
+ * <p>
+ *   Removes irrelevant nodes from XML, for cleanup purposes after form submission.
+ *   Rules can be configured as default rules or defined in the *.xed code.
+ * </p>
+ * 
+ * <code>
+ *   &lt;xed:cleanup-rule xpath="//@*" relevant-if="string-length(.) &amp;gt; 0" /&gt;
+ * </code>
+ * 
+ * @see MCRDefaultRules
+ * 
+ * @author Frank Lu00FCtzenkirchen
+ */
 public class MCRXMLCleaner {
-
-    private static final MCRCleaningRule REMOVE_EMPTY_ATTRIBUTES = new MCRCleaningRule("//@*", "string-length(.) > 0");
-
-    private static final MCRCleaningRule REMOVE_EMPTY_ELEMENTS = new MCRCleaningRule("//*",
-        "@* or * or (string-length(text()) > 0)");
-
-    private static final MCRCleaningRule PRESERVE_STRUCTURE_AND_SERVICE = new MCRCleaningRule(
-        "/mycoreobject/structure|/mycoreobject/service", "true()");
 
     private List<MCRCleaningRule> rules = new ArrayList<>();
 
     private Map<Object, MCRCleaningRule> nodes2rules = new HashMap<>();
 
     public MCRXMLCleaner() {
-        addRule(REMOVE_EMPTY_ATTRIBUTES);
-        addRule(REMOVE_EMPTY_ELEMENTS);
-        addRule(PRESERVE_STRUCTURE_AND_SERVICE);
+        rules.addAll(MCRDefaultRules.getDefaultRules());
     }
 
     public void addRule(String xPathExprNodesToInspect, String xPathExprRelevancyTest) {
@@ -106,49 +106,5 @@ public class MCRXMLCleaner {
     private boolean isRelevant(Object node) {
         MCRCleaningRule rule = nodes2rules.get(node);
         return (rule == null || rule.isRelevant(node));
-    }
-}
-
-class MCRCleaningRule {
-
-    private String xPathExprNodesToInspect;
-
-    private XPathExpression<Object> xPathNodesToInspect;
-
-    private XPathExpression<Object> xPathRelevancyTest;
-
-    MCRCleaningRule(String xPathExprNodesToInspect, String xPathExprRelevancyTest) {
-        this.xPathExprNodesToInspect = xPathExprNodesToInspect;
-        this.xPathNodesToInspect = XPathFactory.instance().compile(xPathExprNodesToInspect, Filters.fpassthrough(),
-            null,
-            MCRConstants.getStandardNamespaces());
-        this.xPathRelevancyTest = XPathFactory.instance().compile(xPathExprRelevancyTest, Filters.fpassthrough(), null,
-            MCRConstants.getStandardNamespaces());
-    }
-
-    public List<Object> getNodesToInspect(Document xml) {
-        return xPathNodesToInspect.evaluate(xml);
-    }
-
-    public boolean isRelevant(Object node) {
-        Object found = xPathRelevancyTest.evaluateFirst(node);
-        if (found == null) {
-            return false;
-        } else if (found instanceof Boolean b) {
-            return b;
-        } else {
-            return true; // something matching found
-        }
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return obj instanceof MCRCleaningRule cleaningRule
-            && xPathExprNodesToInspect.equals(cleaningRule.xPathExprNodesToInspect);
-    }
-
-    @Override
-    public int hashCode() {
-        return xPathExprNodesToInspect.hashCode();
     }
 }
