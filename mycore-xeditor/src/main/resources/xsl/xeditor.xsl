@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xed="http://www.mycore.de/xeditor"
-                xmlns:xalan="http://xml.apache.org/xalan" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
+                xmlns:xalan="http://xml.apache.org/xalan"
                 xmlns:helper="xalan://org.mycore.frontend.xeditor.MCRTransformerHelper"
                 xmlns:includer="xalan://org.mycore.frontend.xeditor.MCRIncludeHandler"
-                exclude-result-prefixes="xsl xed xalan helper includer i18n">
+                exclude-result-prefixes="xsl xed xalan helper includer">
 
   <xsl:strip-space elements="xed:*" />
 
@@ -406,22 +406,12 @@
 
   <!-- ========== <xed:output i18n="" value="" /> ========== -->
 
-  <xsl:template match="xed:output[not(@value) and not(@i18n)]" mode="xeditor">
-    <xsl:value-of select="helper:getValue($helper)" />
-  </xsl:template>
-
-  <xsl:template match="xed:output[@value and not(@i18n)]" mode="xeditor">
-    <xsl:value-of select="helper:replaceXPathOrI18n($helper,@value)" />
-  </xsl:template>
-
   <xsl:template match="xed:output[@i18n and not(@value)]" mode="xeditor">
-    <xsl:variable name="i18n" select="helper:replaceParameters($helper,@i18n)" />
-    <xsl:value-of select="i18n:translate($i18n)" disable-output-escaping="yes" />
+    <xsl:value-of select="helper:output($helper,@value,@i18n)" />
   </xsl:template>
 
-  <xsl:template match="xed:output[@i18n and @value]" mode="xeditor">
-    <xsl:variable name="i18n" select="helper:replaceParameters($helper,@i18n)" />
-    <xsl:value-of select="i18n:translate($i18n,helper:evaluateXPath($helper,@value))" />
+  <xsl:template match="xed:output" mode="xeditor">
+    <xsl:value-of select="helper:output($helper,@value,@i18n)" />
   </xsl:template>
 
   <!-- ========== <xed:multi-lang> <xed:lang xml:lang="" /> </xed:multi-lang> ========== -->
