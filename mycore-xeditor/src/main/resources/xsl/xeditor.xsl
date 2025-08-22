@@ -394,9 +394,11 @@
   <!-- ========== <xed:choose> <xed:when test=""/> <xed:otherwise /> </xed:choose> ========== -->
 
   <xsl:template match="xed:choose" mode="xeditor">
+    <xsl:variable name="firstMatchingTest" select="xed:when[helper:test($helper,@test)][1]/@test" />
+
     <xsl:choose>
-      <xsl:when test="xed:when[helper:test($helper,@test)]">
-        <xsl:apply-templates select="xed:when[helper:test($helper,@test)][1]/node()" mode="xeditor" />
+      <xsl:when test="string-length($firstMatchingTest) &gt; 0">
+        <xsl:apply-templates select="xed:when[@test=$firstMatchingTest]/node()" mode="xeditor" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:apply-templates select="xed:otherwise/node()" mode="xeditor" />
