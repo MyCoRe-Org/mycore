@@ -18,30 +18,24 @@
 
 package org.mycore.mets.model;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
+import org.mycore.test.MyCoReTest;
 
-@RunWith(Parameterized.class)
-public class MCRMetsModelHelperTest extends MCRTestCase {
+@MyCoReTest
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = MCRMetsModelHelper.ALLOWED_TRANSLATION_PROPERTY, string = "de,en")
+})
+public class MCRMetsModelHelperTest {
 
-    private final String path;
-
-    private final Optional<String> expected;
-
-    public MCRMetsModelHelperTest(String path, Optional<String> expected) {
-        this.path = path;
-        this.expected = expected;
-    }
-
-    @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][] {
             { "bild.jpg", Optional.of(MCRMetsModelHelper.MASTER_USE) },
@@ -56,17 +50,10 @@ public class MCRMetsModelHelperTest extends MCRTestCase {
         });
     }
 
-    @Test
-    public void getUseForHref() {
-        Assert.assertEquals(expected, MCRMetsModelHelper.getUseForHref(path));
+    @ParameterizedTest
+    @MethodSource("data")
+    public void getUseForHref(String path, Optional<String> expected) {
+        assertEquals(expected, MCRMetsModelHelper.getUseForHref(path));
     }
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        final Map<String, String> testProperties = super.getTestProperties();
-
-        testProperties.put(MCRMetsModelHelper.ALLOWED_TRANSLATION_PROPERTY, "de,en");
-
-        return testProperties;
-    }
 }
