@@ -18,8 +18,8 @@
 
 package org.mycore.util.concurrent;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -29,7 +29,7 @@ import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRException;
 import org.mycore.util.concurrent.processing.MCRProcessableFactory;
 
@@ -55,9 +55,10 @@ public class MCRPrioritySupplierTest {
 
         es.awaitTermination(1, TimeUnit.SECONDS);
 
-        assertEquals("all threads should be executed after termination", 6, TaskConsumer.COUNTER);
-        assertArrayEquals("threads should be executed in order: " + Arrays.toString(EXCPECTED), EXCPECTED,
-            TaskConsumer.ORDER);
+        assertEquals(6, TaskConsumer.COUNTER,
+            "all threads should be executed after termination");
+        assertArrayEquals(EXCPECTED, TaskConsumer.ORDER,
+            "threads should be executed in order: " + Arrays.toString(EXCPECTED));
     }
 
     private static class TaskConsumer implements Consumer<Integer> {
@@ -73,7 +74,7 @@ public class MCRPrioritySupplierTest {
     }
 
     private static class Task implements Supplier<Integer> {
-        private int id;
+        private final int id;
 
         Task(Integer id) {
             this.id = id;

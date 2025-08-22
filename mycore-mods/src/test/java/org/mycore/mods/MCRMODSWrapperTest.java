@@ -18,6 +18,11 @@
 
 package org.mycore.mods;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
@@ -29,7 +34,6 @@ import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRTestConfiguration;
@@ -41,10 +45,6 @@ import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.test.MyCoReTest;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -92,7 +92,7 @@ public class MCRMODSWrapperTest {
     @Test
     public void testServiceFlags() {
         MCRMODSWrapper wrapper = new MCRMODSWrapper();
-        Assertions.assertNull(wrapper.getServiceFlag("name"));
+        assertNull(wrapper.getServiceFlag("name"));
         wrapper.setServiceFlag("name", "value");
         assertEquals("value", wrapper.getServiceFlag("name"));
     }

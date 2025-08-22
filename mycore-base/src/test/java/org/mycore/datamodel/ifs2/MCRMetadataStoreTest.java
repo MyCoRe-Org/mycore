@@ -18,12 +18,12 @@
 
 package org.mycore.datamodel.ifs2;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,16 +32,24 @@ import java.util.Iterator;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.test.MyCoReTest;
 
 /**
  * JUnit test for MCRMetadataStore
  * 
  * @author Frank Lützenkirchen
  */
+@MyCoReTest
 public class MCRMetadataStoreTest extends MCRIFS2MetadataTestCase {
+
+    @BeforeEach
+    public void setUp() throws Exception {
+        super.setUp();
+    }
 
     @Test
     public void createDocument() throws Exception {

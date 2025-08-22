@@ -18,7 +18,8 @@
 
 package org.mycore.test.tests;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,7 +33,7 @@ public class MCRJPAExtensionTest {
 
     @Test
     public void testEntityManagerAvailable() {
-        Assertions.assertNotNull(MCREntityManagerProvider.getCurrentEntityManager(),
+        assertNotNull(MCREntityManagerProvider.getCurrentEntityManager(),
             "EntityManager should be available");
     }
 
@@ -40,7 +41,7 @@ public class MCRJPAExtensionTest {
     class MCRJPAExtensionTest1 {
         @Test
         public void testEntityManagerAvailableInNested() {
-            Assertions.assertNotNull(MCREntityManagerProvider.getCurrentEntityManager(),
+            assertNotNull(MCREntityManagerProvider.getCurrentEntityManager(),
                 "EntityManager should be available");
         }
     }

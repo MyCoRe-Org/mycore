@@ -108,7 +108,7 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
-    void testLicenses() throws Exception {
+    public void testLicenses() throws Exception {
         MCRCategory licenses = loadClassificationResource("/mycore-classifications/mir_licenses.xml");
         DAO.addCategory(null, licenses);
         MCRCategoryID cc_30 = new MCRCategoryID(licenses.getId().getRootID(), "cc_3.0");
@@ -117,7 +117,7 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
-    void testClassEditorBatch() throws Exception {
+    public void testClassEditorBatch() throws Exception {
         EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         MCRCategory nameIdentifier = loadClassificationResource("/mycore-classifications/nameIdentifier.xml");
         MCRCategory secondCateg = nameIdentifier.getChildren().get(1);
@@ -137,7 +137,7 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
-    void addCategory() throws MCRException {
+    public void addCategory() throws MCRException {
         addWorldClassification();
         assertTrue(DAO.exist(category.getId()), "Exist check failed for Category " + category.getId());
         MCRCategoryImpl india = new MCRCategoryImpl();
@@ -171,7 +171,7 @@ public class MCRCategoryDAOImplTest {
      * Test case for https://sourceforge.net/p/mycore/bugs/612/
      */
     @Test
-    void addCategorySingleSteps() {
+    public void addCategorySingleSteps() {
         MCRCategory root = new MCRCategoryImpl();
         MCRCategoryID rootID = new MCRCategoryID("junit");
         root.setId(rootID);
@@ -209,7 +209,7 @@ public class MCRCategoryDAOImplTest {
      * Test case for https://sourceforge.net/p/mycore/bugs/664/
      */
     @Test
-    void addCategoryToPosition() {
+    public void addCategoryToPosition() {
         addWorldClassification();
         MCRCategoryImpl america = new MCRCategoryImpl();
         MCRCategoryID categoryID = new MCRCategoryID(category.getId().getRootID(), "America");
@@ -226,13 +226,13 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
-    void deleteRootCategory() {
+    public void deleteRootCategory() {
         addWorldClassification();
         testDelete(category);
     }
 
     @Test
-    void deleteSubCategory() {
+    public void deleteSubCategory() {
         addWorldClassification();
         MCRCategory deleteCategory = category.getChildren().getFirst();
         assertTrue(DAO.exist(deleteCategory.getId()), "Sub category does not exist.");
@@ -240,7 +240,7 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
-    void deleteMultipleCategories() {
+    public void deleteMultipleCategories() {
         //check for MCR-1863
         addWorldClassification();
         List<MCRCategoryID> europeChildrenIds = category.getChildren()
@@ -265,7 +265,7 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
-    void getCategoriesByLabel() {
+    public void getCategoriesByLabel() {
         addWorldClassification();
         MCRCategory find = category.getChildren().get(0).getChildren().getFirst();
         MCRCategory dontFind = category.getChildren().get(1);
@@ -281,7 +281,7 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
-    void getCategory() {
+    public void getCategory() {
         addWorldClassification();
         MCRCategory rootCategory = DAO.getCategory(category.getId(), 0);
         assertTrue(rootCategory.getChildren().isEmpty(), "Children present with child Level 0.");
@@ -315,7 +315,7 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
-    void getChildren() {
+    public void getChildren() {
         addWorldClassification();
         List<MCRCategory> children = DAO.getChildren(category.getId());
         assertEquals(category.getChildren().size(), children.size(),
@@ -327,7 +327,7 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
-    void getParents() {
+    public void getParents() {
         addWorldClassification();
         MCRCategory find = category.getChildren().getFirst().getChildren().getFirst();
         List<MCRCategory> parents = DAO.getParents(find.getId());
@@ -340,7 +340,7 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
-    void getRootCategoryIDs() {
+    public void getRootCategoryIDs() {
         addWorldClassification();
         MCRCategoryID find = category.getId();
         List<MCRCategoryID> classIds = DAO.getRootCategoryIDs();
@@ -349,7 +349,7 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
-    void getRootCategories() {
+    public void getRootCategories() {
         addWorldClassification();
         MCRCategoryID find = category.getId();
         List<MCRCategory> classes = DAO.getRootCategories();
@@ -358,7 +358,7 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
-    void getRootCategory() {
+    public void getRootCategory() {
         addWorldClassification();
         // Europe
         MCRCategory find = category.getChildren().getFirst();
@@ -370,7 +370,7 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
-    void children() {
+    public void children() {
         addWorldClassification();
         assertTrue(DAO.hasChildren(category.getId()), "Category '" + category.getId() + "' should have children.");
         assertFalse(DAO.hasChildren(category.getChildren().get(1).getId()),
@@ -378,7 +378,7 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
-    void moveCategoryWithoutIndex() {
+    public void moveCategoryWithoutIndex() {
         addWorldClassification();
         checkLeftRightLevelValue(getRootCategoryFromSession(), 0, 0);
         startNewTransaction();
@@ -391,7 +391,7 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
-    void moveCategoryInParent() {
+    public void moveCategoryInParent() {
         addWorldClassification();
         MCRCategory moveNode = category.getChildren().get(1);
         DAO.moveCategory(moveNode.getId(), moveNode.getParent().getId(), 0);
@@ -403,7 +403,7 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
-    void moveRightCategory() {
+    public void moveRightCategory() {
         String rootIDStr = "rootID";
         MCRCategoryID rootID = new MCRCategoryID(rootIDStr);
         MCRCategoryID child1ID = new MCRCategoryID(rootIDStr, "child1");
@@ -438,7 +438,7 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
-    void moveCategoryUp() {
+    public void moveCategoryUp() {
         String rootIDStr = "rootID";
         MCRCategoryID rootID = new MCRCategoryID(rootIDStr);
         MCRCategoryID child1ID = new MCRCategoryID(rootIDStr, "child1");
@@ -467,7 +467,7 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
-    void moveCategoryDeep() {
+    public void moveCategoryDeep() {
         String rootIDStr = "rootID";
         MCRCategoryID rootID = new MCRCategoryID(rootIDStr);
         MCRCategoryID child1ID = new MCRCategoryID(rootIDStr, "child1");
@@ -523,7 +523,7 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
-    void removeLabel() {
+    public void removeLabel() {
         addWorldClassification();
         final MCRCategory labelNode = category.getChildren().getFirst();
         int labelCount = labelNode.getLabels().size();
@@ -534,7 +534,7 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
-    void replaceCategory() throws URISyntaxException, MCRException, IOException, JDOMException {
+    public void replaceCategory() throws URISyntaxException, MCRException, IOException, JDOMException {
         loadWorldClassification2();
         addWorldClassification();
         DAO.replaceCategory(category2);
@@ -550,7 +550,7 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
-    void replaceCategoryWithAdoption() throws URISyntaxException, MCRException, IOException, JDOMException {
+    public void replaceCategoryWithAdoption() throws URISyntaxException, MCRException, IOException, JDOMException {
         MCRCategory gc1 = loadClassificationResource("/grandchild.xml");
         MCRCategory gc2 = loadClassificationResource("/grandchild2.xml");
         DAO.addCategory(null, gc1);
@@ -563,7 +563,7 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
-    void replaceSameCategory() throws Exception {
+    public void replaceSameCategory() throws Exception {
         loadWorldClassification2();
         addWorldClassification();
         MCRCategory oldCategory = DAO.getCategory(new MCRCategoryID("World", "Europe"), -1);
@@ -571,7 +571,7 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
-    void replaceMarcRelator() throws Exception {
+    public void replaceMarcRelator() throws Exception {
         MCRCategory marcrelator = loadClassificationResource("/marcrelator-test.xml");
         DAO.addCategory(null, marcrelator);
         startNewTransaction();
@@ -580,7 +580,7 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
-    void setLabel() {
+    public void setLabel() {
         addWorldClassification();
         startNewTransaction();
         // test add
@@ -601,7 +601,7 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
-    void setLabels() {
+    public void setLabels() {
         addWorldClassification();
         startNewTransaction();
         MCRCategory germany = DAO.getCategory(MCRCategoryID.ofString("World:Germany"), 0);
@@ -627,7 +627,7 @@ public class MCRCategoryDAOImplTest {
      *
      */
     @Test
-    void replaceCategoryShiftCase() {
+    public void replaceCategoryShiftCase() {
         addWorldClassification();
         MCRCategory europe = category.getChildren().getFirst();
         MCRCategory germany = europe.getChildren().getFirst();
@@ -647,7 +647,7 @@ public class MCRCategoryDAOImplTest {
     }
 
     @Test
-    void replaceCategoryWithItself() {
+    public void replaceCategoryWithItself() {
         addWorldClassification();
         MCRCategory europe = category.getChildren().getFirst();
         MCRCategory germany = europe.getChildren().getFirst();

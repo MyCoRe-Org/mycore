@@ -18,14 +18,16 @@
 
 package org.mycore.datamodel.metadata;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.List;
 
 import org.jdom2.Element;
-import org.junit.Assert;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.test.MyCoReTest;
 
-public class MCRMetaEnrichedLinkIDTest extends MCRTestCase {
+@MyCoReTest
+public class MCRMetaEnrichedLinkIDTest {
 
     protected static final String TEST_ELEMENT_NAME = "atest";
 
@@ -46,12 +48,12 @@ public class MCRMetaEnrichedLinkIDTest extends MCRTestCase {
 
         final List<Element> children = xml.getChildren();
 
-        Assert.assertEquals("First Element should be order", MCRMetaEnrichedLinkID.ORDER_ELEMENT_NAME,
-            children.get(0).getName());
-        Assert.assertEquals("Second Element should be maindoc", MCRMetaEnrichedLinkID.MAIN_DOC_ELEMENT_NAME,
-            children.get(1).getName());
-        Assert.assertEquals("Third Element should be " + TEST_ELEMENT_NAME, TEST_ELEMENT_NAME,
-            children.get(2).getName());
+        assertEquals(MCRMetaEnrichedLinkID.ORDER_ELEMENT_NAME, children.get(0).getName(),
+            "First Element should be order");
+        assertEquals(MCRMetaEnrichedLinkID.MAIN_DOC_ELEMENT_NAME, children.get(1).getName(),
+            "Second Element should be maindoc");
+        assertEquals(TEST_ELEMENT_NAME, children.get(2).getName(),
+            "Third Element should be " + TEST_ELEMENT_NAME);
 
     }
 

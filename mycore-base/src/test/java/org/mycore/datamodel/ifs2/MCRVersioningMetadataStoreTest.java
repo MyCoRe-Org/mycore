@@ -18,12 +18,12 @@
 
 package org.mycore.datamodel.ifs2;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -32,19 +32,27 @@ import java.util.List;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.test.MyCoReTest;
 
 /**
  * JUnit test for MCRVersioningMetadataStore
  *
  * @author Frank Lützenkirchen
  */
+@MyCoReTest
 public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
+
+    @BeforeEach
+    public void setUp() throws Exception {
+        super.setUp();
+    }
 
     @Test
     public void createDocument() throws Exception {
@@ -235,7 +243,7 @@ public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
         getVersStore().verify();
         File baseDIR = new File(URI.create(getVersStore().repURL.toString()));
         File revProp = new File(baseDIR.toURI().resolve("db/revprops/0/2"));
-        assertTrue("is not a file " + revProp, revProp.isFile());
+        assertTrue(revProp.isFile(), "is not a file " + revProp);
         revProp.setWritable(true);
         new PrintWriter(revProp).close();
         revProp.setWritable(false);
@@ -254,7 +262,7 @@ public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
         getVersStore().verify();
         File baseDIR = new File(URI.create(getVersStore().repURL.toString()));
         File revProp = new File(baseDIR.toURI().resolve("db/revs/0/2"));
-        assertTrue("is not a file " + revProp, revProp.isFile());
+        assertTrue(revProp.isFile(), "is not a file " + revProp);
         new PrintWriter(revProp).close();
         try {
             getVersStore().verify();

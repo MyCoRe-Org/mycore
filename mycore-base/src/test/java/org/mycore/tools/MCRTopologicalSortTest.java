@@ -18,16 +18,20 @@
 
 package org.mycore.tools;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
+import org.mycore.test.MyCoReTest;
 
 /**
  * TestCase for Topological Sort
  * from: Cormen et.all "Introduction to Algorithms Section 22.4"
  *       Topological Sort, S. 550
  */
-public class MCRTopologicalSortTest extends MCRTestCase {
+@MyCoReTest
+public class MCRTopologicalSortTest {
 
     @Test
     public void dressOK() {
@@ -52,7 +56,7 @@ public class MCRTopologicalSortTest extends MCRTestCase {
         ts.addEdge(ts.getNodeID("tie"), ts.getNodeID("jacket"));
 
         int[] order = ts.doTopoSort();
-        Assert.assertNotNull("Possible Dress Order created", order);
+        assertNotNull(order, "Possible Dress Order created");
     }
 
     /**
@@ -84,8 +88,8 @@ public class MCRTopologicalSortTest extends MCRTestCase {
         ts.addEdge(ts.getNodeID("shoes"), ts.getNodeID("socks"));
 
         int[] order = ts.doTopoSort();
-        Assert.assertNull("Dress Order was wrong", order);
-        Assert.assertTrue("Circle list contains [socks->shoes]", ts.toString().contains("[socks->shoes]"));
-        Assert.assertTrue("Circle list contains [shoes->socks]", ts.toString().contains("[shoes->socks]"));
+        assertNull(order, "Dress Order was wrong");
+        assertTrue(ts.toString().contains("[socks->shoes]"), "Circle list contains [socks->shoes]");
+        assertTrue(ts.toString().contains("[shoes->socks]"), "Circle list contains [shoes->socks]");
     }
 }

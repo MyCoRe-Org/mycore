@@ -27,8 +27,8 @@ import javax.xml.transform.URIResolver;
 
 /**
  * Can be used to write test against the {@link MCRURIResolver}.
- * Just add MCR.URIResolver.ModuleResolver.YOUR_PREFIX with MCRMockResolver.class.getName() to the overwritten
- * {@link org.mycore.common.MCRTestCase} getTestProperties()
+ * Just add MCR.URIResolver.ModuleResolver.YOUR_PREFIX with MCRMockResolver.class.getName() to the
+ * test-properties.
  */
 public class MCRMockResolver implements URIResolver {
 

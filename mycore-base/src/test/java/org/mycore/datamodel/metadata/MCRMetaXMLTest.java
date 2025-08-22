@@ -18,11 +18,10 @@
 
 package org.mycore.datamodel.metadata;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,9 +31,11 @@ import org.jdom2.Namespace;
 import org.jdom2.Text;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.test.MyCoReTest;
 
 /**
  * This class is a JUnit test case for org.mycore.datamodel.metadata.MCRMetaXML.
@@ -42,7 +43,11 @@ import org.mycore.common.xml.MCRXMLHelper;
  * @author Thomas Scheffler
  *
  */
-public class MCRMetaXMLTest extends MCRTestCase {
+@MyCoReTest
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "log4j.logger.org.mycore.datamodel.metadata", string = "INFO")
+})
+public class MCRMetaXMLTest {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Test
@@ -78,13 +83,6 @@ public class MCRMetaXMLTest extends MCRTestCase {
             out.output(exported, System.err);
             throw e;
         }
-    }
-
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("log4j.logger.org.mycore.datamodel.metadata", "INFO");
-        return testProperties;
     }
 
 }

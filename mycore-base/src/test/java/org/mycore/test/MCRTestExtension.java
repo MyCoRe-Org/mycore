@@ -56,11 +56,11 @@ public class MCRTestExtension implements Extension, BeforeEachCallback, AfterEac
     public static final ExtensionContext.Namespace NAMESPACE =
         ExtensionContext.Namespace.create(MCRTestExtension.class);
 
-    private Path testFolder;
+    private final Path testFolder;
 
-    private MCRConfigurationLoader configurationLoader;
+    private final MCRConfigurationLoader configurationLoader;
 
-    private Map<String, String> mycoreProperties;
+    private final Map<String, String> mycoreProperties;
 
     MCRTestExtension() throws IOException {
         testFolder = createTempDirectory();

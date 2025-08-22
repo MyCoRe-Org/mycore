@@ -18,28 +18,38 @@
 
 package org.mycore.datamodel.metadata;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.access.MCRAccessException;
-import org.mycore.common.MCRStoreTestCase;
+import org.mycore.backend.hibernate.MCRHIBLinkTableStore;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.common.events.MCREvent.ObjectType;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.common.MCRLinkTableEventHandler;
 import org.mycore.datamodel.common.MCRXMLMetadataEventHandler;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MCRMetadataExtension;
+import org.mycore.test.MyCoReTest;
 
-public class MCRObjectUtilsTest extends MCRStoreTestCase {
+@MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
+@ExtendWith(MCRMetadataExtension.class)
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Persistence.LinkTable.Store.Class", classNameOf = MCRHIBLinkTableStore.class),
+    @MCRTestProperty(key = "MCR.Access.Class", classNameOf = MCRAccessBaseImpl.class),
+    @MCRTestProperty(key = "MCR.Metadata.Type.document", string = "true")
+})
+public class MCRObjectUtilsTest {
 
     private MCRObject root;
 
@@ -55,10 +65,8 @@ public class MCRObjectUtilsTest extends MCRStoreTestCase {
 
     private MCRObject l31;
 
-    @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         MCREventManager.getInstance().clear();
         MCREventManager.getInstance().addEventHandler(ObjectType.OBJECT, new MCRXMLMetadataEventHandler());
         MCREventManager.getInstance().addEventHandler(ObjectType.OBJECT, new MCRLinkTableEventHandler());
@@ -150,7 +158,7 @@ public class MCRObjectUtilsTest extends MCRStoreTestCase {
         l22 = MCRMetadataManager.retrieveMCRObject(l22.getId());
     }
 
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
         MCRMetadataManager.delete(l31);
         MCRMetadataManager.delete(l22);
@@ -159,17 +167,6 @@ public class MCRObjectUtilsTest extends MCRStoreTestCase {
         MCRMetadataManager.delete(l12);
         MCRMetadataManager.delete(l11);
         MCRMetadataManager.delete(root);
-        super.tearDown();
-    }
-
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties
-            .put("MCR.Persistence.LinkTable.Store.Class", "org.mycore.backend.hibernate.MCRHIBLinkTableStore");
-        testProperties.put("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
-        testProperties.put("MCR.Metadata.Type.document", "true");
-        return testProperties;
     }
 
 }

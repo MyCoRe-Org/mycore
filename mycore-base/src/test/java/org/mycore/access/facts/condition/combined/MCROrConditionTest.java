@@ -23,10 +23,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-class MCROrConditionTest {
+public class MCROrConditionTest {
 
     @Test
-    void matches() {
+    public void matches() {
         MCROrCondition xor = new MCROrCondition();
         xor.add(new MCRTestCondition(() -> false));
         assertFalse(xor.matches(null));

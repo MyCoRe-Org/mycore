@@ -18,15 +18,16 @@
 
 package org.mycore.tools;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.jdom2.Element;
 import org.jdom2.Namespace;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.test.MyCoReTest;
 
-public class MyCoReWebPageProviderTest extends MCRTestCase {
+@MyCoReTest
+public class MyCoReWebPageProviderTest {
 
     @Test
     public void addSection() throws Exception {

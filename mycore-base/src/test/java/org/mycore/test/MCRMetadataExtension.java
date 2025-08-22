@@ -83,7 +83,6 @@ public class MCRMetadataExtension implements Extension, BeforeAllCallback, Befor
         MCRXMLMetadataManager.getInstance().reload();
     }
 
-
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
         Class<?> parameterClass = parameterContext.getParameter().getType();
