@@ -19,6 +19,7 @@
 package org.mycore.frontend.xeditor.cleanup;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.jdom2.Document;
 import org.jdom2.filter.Filters;
@@ -41,35 +42,32 @@ import org.mycore.common.MCRConstants;
 class MCRCleaningRule {
 
     /** The XPath to select the nodes to inspect for this rule */
-    private String xPathExprNodesToInspect;
-
-    /** The XPath to select the nodes to inspect for this rule */
-    private XPathExpression<Object> xPathNodesToInspect;
+    private XPathExpression<Object> xPathExprOfNodesToInspect;
 
     /** The XPath expression to decide if this node is relevant (or should be removed otherwise) */
-    private XPathExpression<Object> xPathRelevancyTest;
+    private XPathExpression<Object> xPathExprOfRelevancyTest;
 
     /**
      * Creates a new cleaning rule.
      * 
-     * @param xPathExprNodesToInspect the XPath to select the nodes to inspect for this rule
-     * @param xPathExprRelevancyTest the XPath expression to decide if this node is relevant (or otherwise be removed)
+     * @param xPathOfNodesToInspect the XPath to select the nodes to inspect for this rule
+     * @param xPathOfRelevancyTest the XPath expression to decide if this node is relevant (or otherwise be removed)
      */
-    MCRCleaningRule(String xPathExprNodesToInspect, String xPathExprRelevancyTest) {
-        this.xPathExprNodesToInspect = xPathExprNodesToInspect;
-        this.xPathNodesToInspect = XPathFactory.instance().compile(xPathExprNodesToInspect, Filters.fpassthrough(),
-            null,
-            MCRConstants.getStandardNamespaces());
-        this.xPathRelevancyTest = XPathFactory.instance().compile(xPathExprRelevancyTest, Filters.fpassthrough(), null,
-            MCRConstants.getStandardNamespaces());
+    MCRCleaningRule(String xPathOfNodesToInspect, String xPathOfRelevancyTest) {
+        this.xPathExprOfNodesToInspect =
+            XPathFactory.instance().compile(xPathOfNodesToInspect, Filters.fpassthrough(), null,
+                MCRConstants.getStandardNamespaces());
+        this.xPathExprOfRelevancyTest =
+            XPathFactory.instance().compile(xPathOfRelevancyTest, Filters.fpassthrough(), null,
+                MCRConstants.getStandardNamespaces());
     }
 
     public List<Object> getNodesToInspect(Document xml) {
-        return xPathNodesToInspect.evaluate(xml);
+        return xPathExprOfNodesToInspect.evaluate(xml);
     }
 
     public boolean isRelevant(Object node) {
-        Object found = xPathRelevancyTest.evaluateFirst(node);
+        Object found = xPathExprOfRelevancyTest.evaluateFirst(node);
         if (found == null) {
             return false;
         } else if (found instanceof Boolean b) {
@@ -81,12 +79,13 @@ class MCRCleaningRule {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof MCRCleaningRule cleaningRule
-            && xPathExprNodesToInspect.equals(cleaningRule.xPathExprNodesToInspect);
+        return obj instanceof MCRCleaningRule other
+            && this.xPathExprOfNodesToInspect.getExpression().equals(other.xPathExprOfNodesToInspect.getExpression())
+            && this.xPathExprOfRelevancyTest.getExpression().equals(other.xPathExprOfRelevancyTest.getExpression());
     }
 
     @Override
     public int hashCode() {
-        return xPathExprNodesToInspect.hashCode();
+        return Objects.hash(xPathExprOfNodesToInspect.getExpression(), xPathExprOfRelevancyTest.getExpression());
     }
 }
