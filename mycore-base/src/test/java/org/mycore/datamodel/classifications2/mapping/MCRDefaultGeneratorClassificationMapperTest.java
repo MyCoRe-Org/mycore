@@ -18,6 +18,8 @@
 
 package org.mycore.datamodel.classifications2.mapping;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Map;
@@ -29,7 +31,6 @@ import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRConstants;
@@ -56,7 +57,7 @@ import org.mycore.test.MyCoReTest;
     @MCRTestProperty(key = "MCR.Category.XPathMapping.Pattern.host",
         string = "//element/publishedin[@type='{0}']"),
 })
-class MCRDefaultGeneratorClassificationMapperTest {
+public class MCRDefaultGeneratorClassificationMapperTest {
 
     public static final String TEST_DIRECTORY = MCRDefaultGeneratorClassificationMapperTest.class.getSimpleName() + "/";
 
@@ -68,7 +69,7 @@ class MCRDefaultGeneratorClassificationMapperTest {
      * Tests if x-mappings and XPath-mappings are properly added into a Document.
      */
     @Test
-    void testXMapping() throws IOException, JDOMException, URISyntaxException {
+    public void testXMapping() throws IOException, JDOMException, URISyntaxException {
         MCRSessionMgr.getCurrentSession();
         MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();
@@ -101,35 +102,35 @@ class MCRDefaultGeneratorClassificationMapperTest {
             "//mappings[@class='MCRMetaClassification']/mapping[@classid='diniPublType' and @categid='article']";
         XPathExpression<Element> expressionObject = XPathFactory.instance()
             .compile(expression1, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
-        Assertions.assertNotNull(expressionObject.evaluateFirst(
+        assertNotNull(expressionObject.evaluateFirst(
             xml), "The mapped classification for diniPublType should be in the MyCoReObject now!");
 
         String expression2 = "//mappings[@class='MCRMetaClassification']/mapping[@classid='schemaOrg' "
             + "and @categid='Article']";
         expressionObject = XPathFactory.instance()
             .compile(expression2, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
-        Assertions.assertNotNull(expressionObject.evaluateFirst(
+        assertNotNull(expressionObject.evaluateFirst(
             xml), "The mapped classification for schemaOrg should be in the MyCoReObject now!");
 
         String expression3 = "//mappings[@class='MCRMetaClassification']/mapping[@classid='orcidWorkType' "
             + "and @categid='journal-article']";
         expressionObject = XPathFactory.instance()
             .compile(expression3, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
-        Assertions.assertNotNull(expressionObject.evaluateFirst(
+        assertNotNull(expressionObject.evaluateFirst(
             xml), "The mapped classification for orcidWorkType should be in the MyCoReObject now!");
 
         String expression4 = "//mappings[@class='MCRMetaClassification']/mapping[@classid='dummyClassification' "
             + "and @categid='dummy-article']";
         expressionObject = XPathFactory.instance()
             .compile(expression4, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
-        Assertions.assertNotNull(expressionObject.evaluateFirst(
+        assertNotNull(expressionObject.evaluateFirst(
             xml), "The mapped dummy classification should be in the MyCoReObject now!");
 
         String expression5 = "//mappings[@class='MCRMetaClassification']/mapping[@classid='dummyClassification' "
             + "and @categid='dummy-placeholder']";
         expressionObject = XPathFactory.instance()
             .compile(expression5, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
-        Assertions.assertNotNull(expressionObject.evaluateFirst(
+        assertNotNull(expressionObject.evaluateFirst(
             xml), "The mapped placeholder classification should be in the MyCoReObject now!");
     }
 
@@ -138,7 +139,7 @@ class MCRDefaultGeneratorClassificationMapperTest {
      * evaluated per classification.
      */
     @Test
-    void testXPathMappingFallback() throws IOException, JDOMException, URISyntaxException {
+    public void testXPathMappingFallback() throws IOException, JDOMException, URISyntaxException {
         MCRSessionMgr.getCurrentSession();
         MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();
@@ -164,14 +165,14 @@ class MCRDefaultGeneratorClassificationMapperTest {
             + "and @categid='journal-article']";
         XPathExpression<Element> expressionObject = XPathFactory.instance()
             .compile(expression1, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
-        Assertions.assertNotNull(expressionObject.evaluateFirst(
+        assertNotNull(expressionObject.evaluateFirst(
             xml), "The mapped classification for orcidWorkType should be in the MyCoReObject now!");
 
         String expression2 = "//mappings[@class='MCRMetaClassification']/mapping[@classid='dummyClassification' "
             + "and @categid='dummy-article']";
         expressionObject = XPathFactory.instance()
             .compile(expression2, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
-        Assertions.assertNotNull(expressionObject.evaluateFirst(
+        assertNotNull(expressionObject.evaluateFirst(
             xml), "The mapped dummy classification should be in the MyCoReObject now!");
 
     }
@@ -180,7 +181,7 @@ class MCRDefaultGeneratorClassificationMapperTest {
      * Tests that XPath-mappings with OR-condition are properly added into a Document.
      */
     @Test
-    void testXPathMappingPatternORCondition() throws IOException, JDOMException, URISyntaxException {
+    public void testXPathMappingPatternORCondition() throws IOException, JDOMException, URISyntaxException {
 
         MCRSessionMgr.getCurrentSession();
         MCRTransactionManager.hasActiveTransactions();
@@ -197,7 +198,7 @@ class MCRDefaultGeneratorClassificationMapperTest {
                 "xPath",
                 new MCRDefaultXPathClassificationGenerator(
                     "dummyClassification")));
-        
+
         mapper.createMappings(mcro);
         Document xml = mcro.createXML();
 
@@ -205,7 +206,7 @@ class MCRDefaultGeneratorClassificationMapperTest {
             + "and @categid='dummy-or-condition']";
         XPathExpression<Element> expressionObject = XPathFactory.instance()
             .compile(expression, Filters.element(), null, MCRConstants.XLINK_NAMESPACE);
-        Assertions.assertNotNull(expressionObject.evaluateFirst(
+        assertNotNull(expressionObject.evaluateFirst(
             xml), "The mapped or-condition dummy classification should be in the MyCoReObject now!");
     }
 

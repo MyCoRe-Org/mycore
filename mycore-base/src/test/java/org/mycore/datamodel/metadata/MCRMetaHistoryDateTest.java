@@ -18,12 +18,12 @@
 
 package org.mycore.datamodel.metadata;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.jdom2.Element;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRCalendar;
-import org.mycore.common.MCRTestCase;
+import org.mycore.test.MyCoReTest;
 
 import com.ibm.icu.util.GregorianCalendar;
 
@@ -33,7 +33,8 @@ import com.ibm.icu.util.GregorianCalendar;
  * @author Jens Kupferschmidt
  *
  */
-public class MCRMetaHistoryDateTest extends MCRTestCase {
+@MyCoReTest
+public class MCRMetaHistoryDateTest {
 
     /**
      * check set date methods
@@ -42,19 +43,19 @@ public class MCRMetaHistoryDateTest extends MCRTestCase {
     public void checkSetDateMethods() {
         MCRMetaHistoryDate hd = new MCRMetaHistoryDate();
         hd.setVonDate(new GregorianCalendar(1964, 1, 23));
-        assertEquals("Von value is not 1964-02-23 AD", "1964-02-23 AD", hd.getVonToString());
+        assertEquals("1964-02-23 AD", hd.getVonToString(), "Von value is not 1964-02-23 AD");
 
         hd = new MCRMetaHistoryDate();
         hd.setVonDate("23.02.1964", MCRCalendar.TAG_GREGORIAN);
-        assertEquals("Von value is not 1964-02-23 AD", "1964-02-23 AD", hd.getVonToString());
+        assertEquals("1964-02-23 AD", hd.getVonToString(), "Von value is not 1964-02-23 AD");
 
         hd = new MCRMetaHistoryDate();
         hd.setBisDate(new GregorianCalendar(1964, 1, 23));
-        assertEquals("Bis value is not 1964-02-23 AD", "1964-02-23 AD", hd.getBisToString());
+        assertEquals("1964-02-23 AD", hd.getBisToString(), "Bis value is not 1964-02-23 AD");
 
         hd = new MCRMetaHistoryDate();
         hd.setBisDate("23.02.1964", MCRCalendar.TAG_GREGORIAN);
-        assertEquals("Bis value is not 1964-02-23 AD", "1964-02-23 AD", hd.getBisToString());
+        assertEquals("1964-02-23 AD", hd.getBisToString(), "Bis value is not 1964-02-23 AD");
     }
 
     /**
@@ -94,10 +95,10 @@ public class MCRMetaHistoryDateTest extends MCRTestCase {
         julian_date_read.setFromDOM(julian_date_xml);
         MCRMetaHistoryDate gregorian_date_read = new MCRMetaHistoryDate();
         gregorian_date_read.setFromDOM(gregorian_date_xml);
-        assertEquals("read objects from XML should be equal", julian_date_read, gregorian_date_read);
+        assertEquals(julian_date_read, gregorian_date_read, "read objects from XML should be equal");
 
         MCRMetaHistoryDate gregorian_date_clone = gregorian_date_read.clone();
-        assertEquals("cloned object should be equal with original", gregorian_date_read, gregorian_date_clone);
+        assertEquals(gregorian_date_read, gregorian_date_clone, "cloned object should be equal with original");
     }
 
 }

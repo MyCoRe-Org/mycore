@@ -18,6 +18,8 @@
 
 package org.mycore.mets.model.converter;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -27,9 +29,8 @@ import org.jdom2.filter.Filters;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathFactory;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mycore.mets.model.simple.MCRMetsSimpleModel;
 
 public class MCRSimpleModelXMLConverterTest {
@@ -47,7 +48,7 @@ public class MCRSimpleModelXMLConverterTest {
 
     private MCRMetsSimpleModel metsSimpleModel;
 
-    @Before
+    @BeforeEach
     public void createModel() {
         metsSimpleModel = MCRMetsTestUtil.buildMetsSimpleModel();
     }
@@ -64,9 +65,8 @@ public class MCRSimpleModelXMLConverterTest {
                 Namespace.getNamespace("mets", "http://www.loc.gov/METS/")))
             .forEachOrdered(xPath -> {
                 Boolean evaluate = xPath.evaluateFirst(document);
-                Assert.assertTrue(
-                    String.format("The xpath : %s is not true! %s %s", xPath, System.lineSeparator(), documentAsString),
-                    evaluate);
+                assertTrue(evaluate, String.format("The xpath : %s is not true! %s %s", xPath,
+                    System.lineSeparator(), documentAsString));
             });
     }
 }

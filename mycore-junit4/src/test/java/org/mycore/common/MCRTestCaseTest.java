@@ -28,6 +28,7 @@ import org.mycore.common.config.MCRConfiguration2;
     //overwrite property of config/mycore.properties
     @MCRTestProperty(key = "MCR.NameOfProject", string = MCRTestCaseTest.PROJECT_NAME)
 })
+@Deprecated(forRemoval = true)
 public final class MCRTestCaseTest extends MCRTestCase {
 
     final static String PROJECT_NAME = "MyCoRe Test";

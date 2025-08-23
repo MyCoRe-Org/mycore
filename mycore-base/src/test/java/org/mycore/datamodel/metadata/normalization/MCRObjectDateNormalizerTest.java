@@ -1,16 +1,17 @@
 package org.mycore.datamodel.metadata.normalization;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Date;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectService;
+import org.mycore.test.MyCoReTest;
 
-public class MCRObjectDateNormalizerTest extends MCRTestCase {
+@MyCoReTest
+public class MCRObjectDateNormalizerTest {
 
     @Test
     public void testNormalize() throws Exception {

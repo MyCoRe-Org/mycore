@@ -1,21 +1,23 @@
 package org.mycore.datamodel.metadata.normalization;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.jdom2.Element;
-import org.junit.Assert;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 import org.mycore.datamodel.metadata.MCREditableMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRExpandedObject;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkIDFactory;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.test.MyCoReTest;
 
-public class MCRObjectStructureNormalizerTest extends MCRTestCase {
-
+@MyCoReTest
+public class MCRObjectStructureNormalizerTest {
 
     // TODO: test parent still exists
 
-    @org.junit.Test
+    @Test
     public void testNormalize() {
         MCRExpandedObject object = new MCRExpandedObject();
 
@@ -36,14 +38,14 @@ public class MCRObjectStructureNormalizerTest extends MCRTestCase {
         object.getStructure().addChild(new MCRMetaLinkID("child", childID1, null, childID1.toString()));
         object.getStructure().addChild(new MCRMetaLinkID("child", childID2, null, childID2.toString()));
 
-        Assert.assertEquals(1, derivateCount(object));
-        Assert.assertEquals(2, getChildCount(object));
+        assertEquals(1, derivateCount(object));
+        assertEquals(2, getChildCount(object));
 
         MCRObjectStructureNormalizer normalizer = new MCRObjectStructureNormalizer();
         normalizer.normalize(object);
 
-        Assert.assertEquals(0, derivateCount(object));
-        Assert.assertEquals(0, getChildCount(object));
+        assertEquals(0, derivateCount(object));
+        assertEquals(0, getChildCount(object));
 
     }
 

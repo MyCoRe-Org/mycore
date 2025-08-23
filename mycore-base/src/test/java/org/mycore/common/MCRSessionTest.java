@@ -18,40 +18,39 @@
 
 package org.mycore.common;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mycore.common.MCRSystemUserInformation.GUEST;
 import static org.mycore.common.MCRSystemUserInformation.SUPER_USER;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mycore.test.MyCoReTest;
 
 /**
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRSessionTest extends MCRTestCase {
+@MyCoReTest
+public class MCRSessionTest {
 
     private MCRSession session;
 
     /**
      * @throws java.lang.Exception
      */
-    @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         this.session = new MCRSession();
     }
 
     /**
      * @throws java.lang.Exception
      */
-    @Override
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         this.session.close();
-        super.tearDown();
     }
 
     @Test
@@ -75,11 +74,14 @@ public class MCRSessionTest extends MCRTestCase {
         assertEquals(GUEST, session.getUserInformation());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void upgradeFail() {
-        MCRUserInformation otherUser = getSimpleUserInformation("JUnit");
-        session.setUserInformation(otherUser);
-        session.setUserInformation(SUPER_USER);
+        assertThrows(IllegalArgumentException.class,
+            () -> {
+                MCRUserInformation otherUser = getSimpleUserInformation("JUnit");
+                session.setUserInformation(otherUser);
+                session.setUserInformation(SUPER_USER);
+            });
     }
 
     private static MCRUserInformation getSimpleUserInformation(String userID) {

@@ -18,7 +18,7 @@
 
 package org.mycore.datamodel.ifs2.test;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 import java.net.URI;
@@ -28,7 +28,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.datamodel.ifs2.MCRFileStore;
 import org.mycore.datamodel.ifs2.MCRStore.MCRStoreConfig;
 import org.mycore.datamodel.ifs2.MCRStoreManager;
@@ -42,7 +42,7 @@ public class MCRStoreManagerTest {
         StoreConfig config = new StoreConfig();
         MCRFileStore fileStore = MCRStoreManager.createStore(config, MCRFileStore.class);
 
-        assertNotNull("MCRStoreManager could not create Filestore.", fileStore);
+        assertNotNull(fileStore, "MCRStoreManager could not create Filestore.");
     }
 
     class StoreConfig implements MCRStoreConfig {

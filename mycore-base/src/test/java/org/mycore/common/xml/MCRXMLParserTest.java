@@ -18,7 +18,7 @@
 
 package org.mycore.common.xml;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,20 +26,25 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.Map;
 
 import org.jdom2.JDOMException;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.common.content.MCRURLContent;
+import org.mycore.test.MyCoReTest;
 
 /**
  * @author Thomas Scheffler (yagee)
  */
-public class MCRXMLParserTest extends MCRTestCase {
+@MyCoReTest
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.XMLParser.ValidateSchema", string = "true"),
+    @MCRTestProperty(key = "log4j.logger.org.mycore.common.xml.MCRParserXerces", string = "FATAL")
+})
+public class MCRXMLParserTest {
 
     private URL xmlResource;
 
@@ -49,19 +54,17 @@ public class MCRXMLParserTest extends MCRTestCase {
 
     private Path xmlFileInvalid;
 
-    @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
+    @TempDir
+    public File testFolder;
 
-    @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         xmlResource = MCRXMLParserTest.class.getResource("/MCRParserXercesTest-valid.xml");
         xmlResourceInvalid = MCRXMLParserTest.class.getResource("/MCRParserXercesTest-invalid.xml");
         //MCR-1069: create */../* URI
-        testFolder.newFolder("foo");
-        xmlFile = new File(testFolder.getRoot(), "foo/../MCRParserXercesTest-valid.xml").toPath();
-        xmlFileInvalid = new File(testFolder.getRoot(), "foo/../MCRParserXercesTest-invalid.xml").toPath();
+        new File(testFolder, "foo").mkdir();
+        xmlFile = new File(testFolder, "foo/../MCRParserXercesTest-valid.xml").toPath();
+        xmlFileInvalid = new File(testFolder, "foo/../MCRParserXercesTest-invalid.xml").toPath();
         Files.copy(xmlResource.openStream(), xmlFile, StandardCopyOption.REPLACE_EXISTING);
         Files.copy(xmlResourceInvalid.openStream(), xmlFileInvalid, StandardCopyOption.REPLACE_EXISTING);
         System.out.println(xmlFile.toUri());
@@ -82,14 +85,6 @@ public class MCRXMLParserTest extends MCRTestCase {
     public void testValidXML() throws IOException, JDOMException {
         MCRXMLParserFactory.getValidatingParser().parseXML(new MCRURLContent(xmlResource));
         MCRXMLParserFactory.getValidatingParser().parseXML(new MCRURLContent(xmlFile.toUri().toURL()));
-    }
-
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.XMLParser.ValidateSchema", "true");
-        testProperties.put("log4j.logger.org.mycore.common.xml.MCRParserXerces", "FATAL");
-        return testProperties;
     }
 
 }

@@ -18,11 +18,11 @@
 
 package org.mycore.datamodel.metadata;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.jdom2.Element;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.test.MyCoReTest;
 
 /**
  * This class is a JUnit test case for org.mycore.datamodel.metadata.MCRMetaBoolean.
@@ -30,7 +30,8 @@ import org.mycore.common.MCRTestCase;
  * @author Jens Kupferschmidt
  *
  */
-public class MCRMetaBooleanTest extends MCRTestCase {
+@MyCoReTest
+public class MCRMetaBooleanTest {
 
     /**
      * check createXML, setFromDom, equals and clone
@@ -42,9 +43,9 @@ public class MCRMetaBooleanTest extends MCRTestCase {
         Element boolean_xml = bool.createXML();
         MCRMetaBoolean boolean_read = new MCRMetaBoolean();
         boolean_read.setFromDOM(boolean_xml);
-        assertEquals("read objects from XML should be equal", bool, boolean_read);
+        assertEquals(bool, boolean_read, "read objects from XML should be equal");
 
         MCRMetaBoolean boolean_clone = boolean_read.clone();
-        assertEquals("cloned object should be equal with original", boolean_read, boolean_clone);
+        assertEquals(boolean_read, boolean_clone, "cloned object should be equal with original");
     }
 }

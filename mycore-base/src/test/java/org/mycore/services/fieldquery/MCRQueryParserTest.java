@@ -18,12 +18,12 @@
 
 package org.mycore.services.fieldquery;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.jdom2.Element;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 import org.mycore.parsers.bool.MCRCondition;
+import org.mycore.test.MyCoReTest;
 
 /**
  * This class is a JUnit test case for org.mycore.MCRBooleanClausParser.
@@ -31,7 +31,8 @@ import org.mycore.parsers.bool.MCRCondition;
  * @author Jens Kupferschmidt
  * @author Christoph Neidahl (OPNA2608)
  */
-public class MCRQueryParserTest extends MCRTestCase {
+@MyCoReTest
+public class MCRQueryParserTest {
 
     private final MCRQueryParser queryParser = new MCRQueryParser();
 
@@ -48,9 +49,8 @@ public class MCRQueryParserTest extends MCRTestCase {
         c1.setAttribute("value", "Amt und Würde");
         MCRCondition<Void> queryStringParsed = queryParser.parse(c1);
         System.out.println("XML query parser test 1 :" + queryStringParsed);
-        assertEquals("Returned value is not",
-            "(title contains \"Amt\") AND (title contains \"und\") AND (title contains \"Würde\")",
-            queryStringParsed.toString());
+        assertEquals("(title contains \"Amt\") AND (title contains \"und\") AND (title contains \"Würde\")",
+            queryStringParsed.toString(), "Returned value is not");
 
         Element c2 = new Element("condition");
         c2.setAttribute("field", "title");
@@ -58,8 +58,8 @@ public class MCRQueryParserTest extends MCRTestCase {
         c2.setAttribute("value", "Amt 'und Würde'");
         queryStringParsed = queryParser.parse(c2);
         System.out.println("XML query parser test 2 :" + queryStringParsed);
-        assertEquals("Returned value is not", "(title contains \"Amt\") AND (title phrase \"und Würde\")",
-            queryStringParsed.toString());
+        assertEquals("(title contains \"Amt\") AND (title phrase \"und Würde\")", queryStringParsed.toString(),
+            "Returned value is not");
 
         Element c3 = new Element("condition");
         c3.setAttribute("field", "title");
@@ -67,9 +67,8 @@ public class MCRQueryParserTest extends MCRTestCase {
         c3.setAttribute("value", "Amt und (Würde)");
         queryStringParsed = queryParser.parse(c3);
         System.out.println("XML query parser test 3 :" + queryStringParsed);
-        assertEquals("Returned value is not",
-            "(title contains \"Amt\") AND (title contains \"und\") AND (title contains \"(Würde)\")",
-            queryStringParsed.toString());
+        assertEquals("(title contains \"Amt\") AND (title contains \"und\") AND (title contains \"(Würde)\")",
+            queryStringParsed.toString(), "Returned value is not");
 
         Element bool = new Element("boolean");
         bool.setAttribute("operator", "oR");
@@ -78,11 +77,10 @@ public class MCRQueryParserTest extends MCRTestCase {
         bool.addContent(c3);
         queryStringParsed = queryParser.parse(bool);
         System.out.println("XML query parser test 4 :" + queryStringParsed);
-        assertEquals("Returned value is not",
-            "((title contains \"Amt\") AND (title contains \"und\") AND (title contains \"Würde\")) OR "
-                + "((title contains \"Amt\") AND (title phrase \"und Würde\")) OR ((title contains \"Amt\") AND "
-                + "(title contains \"und\") AND (title contains \"(Würde)\"))",
-            queryStringParsed.toString());
+        assertEquals("((title contains \"Amt\") AND (title contains \"und\") AND (title contains \"Würde\")) OR "
+            + "((title contains \"Amt\") AND (title phrase \"und Würde\")) OR ((title contains \"Amt\") AND "
+            + "(title contains \"und\") AND (title contains \"(Würde)\"))", queryStringParsed.toString(),
+            "Returned value is not");
     }
 
     /**
@@ -96,49 +94,46 @@ public class MCRQueryParserTest extends MCRTestCase {
         String query_string = "()";
         MCRCondition<Void> queryStringParsed = queryParser.parse(query_string);
         System.out.println("String query parser test 1 :" + queryStringParsed);
-        assertEquals("Returned value is not", "true", queryStringParsed.toString());
+        assertEquals("true", queryStringParsed.toString(), "Returned value is not");
 
         query_string = "((true) or (false))";
         queryStringParsed = queryParser.parse(query_string);
         System.out.println("String query parser test 2 :" + queryStringParsed);
-        assertEquals("Returned value is not", "(true) OR (false)", queryStringParsed.toString());
+        assertEquals("(true) OR (false)", queryStringParsed.toString(), "Returned value is not");
 
         query_string = " ( (true)) ";
         queryStringParsed = queryParser.parse(query_string);
         System.out.println("String query parser test 3 :" + queryStringParsed);
-        assertEquals("Returned value is not", "true", queryStringParsed.toString());
+        assertEquals("true", queryStringParsed.toString(), "Returned value is not");
 
         query_string = "(group = admin ) OR (group = authorgroup ) OR (group = readergroup )";
         queryStringParsed = queryParser.parse(query_string);
         System.out.println("String query parser test 4 :" + queryStringParsed);
-        assertEquals("Returned value is not",
-            "(group = \"admin\") OR (group = \"authorgroup\") OR (group = \"readergroup\")",
-            queryStringParsed.toString());
+        assertEquals("(group = \"admin\") OR (group = \"authorgroup\") OR (group = \"readergroup\")",
+            queryStringParsed.toString(), "Returned value is not");
 
         query_string = "title contains \"Amt\"";
         queryStringParsed = queryParser.parse(query_string);
         System.out.println("String query parser test 5 :" + queryStringParsed);
-        assertEquals("Returned value is not", "title contains \"Amt\"", queryStringParsed.toString());
+        assertEquals("title contains \"Amt\"", queryStringParsed.toString(), "Returned value is not");
 
         query_string = "title contains \"Amt und Würde\"";
         queryStringParsed = queryParser.parse(query_string);
         System.out.println("String query parser test 6 :" + queryStringParsed);
-        assertEquals("Returned value is not",
-            "(title contains \"Amt\") AND (title contains \"und\") AND (title contains \"Würde\")",
-            queryStringParsed.toString());
+        assertEquals("(title contains \"Amt\") AND (title contains \"und\") AND (title contains \"Würde\")",
+            queryStringParsed.toString(), "Returned value is not");
 
-        query_string = "title contains \"Amt \'und Würde\'\"";
+        query_string = "title contains \"Amt 'und Würde'\"";
         queryStringParsed = queryParser.parse(query_string);
         System.out.println("String query parser test 7 :" + queryStringParsed);
-        assertEquals("Returned value is not", "(title contains \"Amt\") AND (title phrase \"und Würde\")",
-            queryStringParsed.toString());
+        assertEquals("(title contains \"Amt\") AND (title phrase \"und Würde\")", queryStringParsed.toString(),
+            "Returned value is not");
 
         query_string = "title contains \"Amt (und Würde)\"";
         queryStringParsed = queryParser.parse(query_string);
         System.out.println("String query parser test 8 :" + queryStringParsed);
-        assertEquals("Returned value is not",
-            "(title contains \"Amt\") AND (title contains \"(und\") AND (title contains \"Würde)\")",
-            queryStringParsed.toString());
+        assertEquals("(title contains \"Amt\") AND (title contains \"(und\") AND (title contains \"Würde)\")",
+            queryStringParsed.toString(), "Returned value is not");
     }
 
 }

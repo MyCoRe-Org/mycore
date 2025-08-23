@@ -18,12 +18,12 @@
 
 package org.mycore.common;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.ibm.icu.util.BuddhistCalendar;
 import com.ibm.icu.util.Calendar;
@@ -39,7 +39,7 @@ import com.ibm.icu.util.JapaneseCalendar;
  *
  * @author Jens Kupferschmidt
  */
-public class MCRCalendarTest extends MCRTestCase {
+public class MCRCalendarTest {
 
     /*
      * Test method for 'org.mycore.datamodel.metadata.MCRCalendar.getDateToFormattedString()'
@@ -53,15 +53,15 @@ public class MCRCalendarTest extends MCRTestCase {
         // gregorian without format
         cal = (GregorianCalendar) gregorianCalendar.clone();
         dstring = MCRCalendar.getCalendarDateToFormattedString(cal);
-        assertEquals("calendar without format", "1964-02-24 AD", dstring);
+        assertEquals("1964-02-24 AD", dstring, "calendar without format");
         // gregorian with format
         cal = (GregorianCalendar) gregorianCalendar.clone();
         dstring = MCRCalendar.getCalendarDateToFormattedString(cal, "dd.MM.yyyy G");
-        assertEquals("calendar with format dd.MM.yyyy G", "24.02.1964 AD", dstring);
+        assertEquals("24.02.1964 AD", dstring, "calendar with format dd.MM.yyyy G");
         // gregorian with format
         cal = (GregorianCalendar) gregorianCalendar.clone();
         dstring = MCRCalendar.getCalendarDateToFormattedString(cal, "yyyy-MM-dd");
-        assertEquals("gregorian with format yyyy-MM-dd", "1964-02-24", dstring);
+        assertEquals("1964-02-24", dstring, "gregorian with format yyyy-MM-dd");
     }
 
     @Test
@@ -71,71 +71,71 @@ public class MCRCalendarTest extends MCRTestCase {
         // 04.10.1582 AD (gregorian)
         cal = MCRCalendar.getHistoryDateAsCalendar("04.10.1582", false, MCRCalendar.TAG_GREGORIAN);
         assertCalEqualWithActual(cal, 4, Calendar.OCTOBER, 1582, GregorianCalendar.AD);
-        assertEquals(MCRCalendar.getJulianDayNumber(cal), 2299160);
-        assertEquals(MCRCalendar.getJulianDayNumberAsString(cal), "2299160");
+        assertEquals(2299160, MCRCalendar.getJulianDayNumber(cal));
+        assertEquals("2299160", MCRCalendar.getJulianDayNumberAsString(cal));
 
         // 05.10.1582 AD (gregorian) -> 15.10.1582 (https://en.wikipedia.org/wiki/Inter_gravissimas)
         cal = MCRCalendar.getHistoryDateAsCalendar("05.10.1582", false, MCRCalendar.TAG_GREGORIAN);
         assertCalEqualWithActual(cal, 15, Calendar.OCTOBER, 1582, GregorianCalendar.AD);
 
-        assertEquals(MCRCalendar.getJulianDayNumber(cal), 2299161);
-        assertEquals(MCRCalendar.getJulianDayNumberAsString(cal), "2299161");
+        assertEquals(2299161, MCRCalendar.getJulianDayNumber(cal));
+        assertEquals("2299161", MCRCalendar.getJulianDayNumberAsString(cal));
 
         // 06.10.1582 AD (gregorian) -> 16.10.1582 in the ICU implementation
         cal = MCRCalendar.getHistoryDateAsCalendar("06.10.1582", false, MCRCalendar.TAG_GREGORIAN);
         assertCalEqualWithActual(cal, 16, Calendar.OCTOBER, 1582, GregorianCalendar.AD);
 
-        assertEquals(MCRCalendar.getJulianDayNumber(cal), 2299162);
-        assertEquals(MCRCalendar.getJulianDayNumberAsString(cal), "2299162");
+        assertEquals(2299162, MCRCalendar.getJulianDayNumber(cal));
+        assertEquals("2299162", MCRCalendar.getJulianDayNumberAsString(cal));
 
         // 15.10.1582 AD (gregorian)
         cal = MCRCalendar.getHistoryDateAsCalendar("15.10.1582", false, MCRCalendar.TAG_GREGORIAN);
         assertCalEqualWithActual(cal, 15, Calendar.OCTOBER, 1582, GregorianCalendar.AD);
 
-        assertEquals(MCRCalendar.getJulianDayNumber(cal), 2299161);
-        assertEquals(MCRCalendar.getJulianDayNumberAsString(cal), "2299161");
+        assertEquals(2299161, MCRCalendar.getJulianDayNumber(cal));
+        assertEquals("2299161", MCRCalendar.getJulianDayNumberAsString(cal));
 
         // 16.10.1582 AD (gregorian)
         cal = MCRCalendar.getHistoryDateAsCalendar("16.10.1582", false, MCRCalendar.TAG_GREGORIAN);
         assertCalEqualWithActual(cal, 16, Calendar.OCTOBER, 1582, GregorianCalendar.AD);
 
-        assertEquals(MCRCalendar.getJulianDayNumber(cal), 2299162);
-        assertEquals(MCRCalendar.getJulianDayNumberAsString(cal), "2299162");
+        assertEquals(2299162, MCRCalendar.getJulianDayNumber(cal));
+        assertEquals("2299162", MCRCalendar.getJulianDayNumberAsString(cal));
 
         // 01.01.1800 AD (gregorian) with missing day and last=false
         cal = MCRCalendar.getHistoryDateAsCalendar("1.1800", false, MCRCalendar.TAG_GREGORIAN);
         assertCalEqualWithActual(cal, 1, Calendar.JANUARY, 1800, GregorianCalendar.AD);
 
-        assertEquals(MCRCalendar.getJulianDayNumber(cal), 2378497);
-        assertEquals(MCRCalendar.getJulianDayNumberAsString(cal), "2378497");
+        assertEquals(2378497, MCRCalendar.getJulianDayNumber(cal));
+        assertEquals("2378497", MCRCalendar.getJulianDayNumberAsString(cal));
 
         // 31.01.1800 AD (gregorian) with missing day and last=true
         cal = MCRCalendar.getHistoryDateAsCalendar("1/1800", true, MCRCalendar.TAG_GREGORIAN);
         assertCalEqualWithActual(cal, 31, Calendar.JANUARY, 1800, GregorianCalendar.AD);
 
-        assertEquals(MCRCalendar.getJulianDayNumber(cal), 2378527);
-        assertEquals(MCRCalendar.getJulianDayNumberAsString(cal), "2378527");
+        assertEquals(2378527, MCRCalendar.getJulianDayNumber(cal));
+        assertEquals("2378527", MCRCalendar.getJulianDayNumberAsString(cal));
 
         // 09.01.1800 AD (gregorian)
         cal = MCRCalendar.getHistoryDateAsCalendar("9/1/1800", true, MCRCalendar.TAG_GREGORIAN);
         assertCalEqualWithActual(cal, 9, Calendar.JANUARY, 1800, GregorianCalendar.AD);
 
-        assertEquals(MCRCalendar.getJulianDayNumber(cal), 2378505);
-        assertEquals(MCRCalendar.getJulianDayNumberAsString(cal), "2378505");
+        assertEquals(2378505, MCRCalendar.getJulianDayNumber(cal));
+        assertEquals("2378505", MCRCalendar.getJulianDayNumberAsString(cal));
 
         // 24.02.1964 AD (gregorian)
         cal = MCRCalendar.getHistoryDateAsCalendar("1964-02-24", true, MCRCalendar.TAG_GREGORIAN);
         assertCalEqualWithActual(cal, 24, Calendar.FEBRUARY, 1964, GregorianCalendar.AD);
 
-        assertEquals(MCRCalendar.getJulianDayNumber(cal), 2438450);
-        assertEquals(MCRCalendar.getJulianDayNumberAsString(cal), "2438450");
+        assertEquals(2438450, MCRCalendar.getJulianDayNumber(cal));
+        assertEquals("2438450", MCRCalendar.getJulianDayNumberAsString(cal));
 
         // 1 BC with last=true (gregorian)
         cal = MCRCalendar.getHistoryDateAsCalendar("1 BC", true, MCRCalendar.TAG_GREGORIAN);
         assertCalEqualWithActual(cal, 31, Calendar.DECEMBER, 1, GregorianCalendar.BC);
 
-        assertEquals(MCRCalendar.getJulianDayNumber(cal), 1721423);
-        assertEquals(MCRCalendar.getJulianDayNumberAsString(cal), "1721423");
+        assertEquals(1721423, MCRCalendar.getJulianDayNumber(cal));
+        assertEquals("1721423", MCRCalendar.getJulianDayNumberAsString(cal));
     }
 
     @Test
@@ -232,21 +232,21 @@ public class MCRCalendarTest extends MCRTestCase {
 
         // 01.01.0001 h. (islamic)
         cal = MCRCalendar.getHistoryDateAsCalendar("01.01.0001 h.", false, MCRCalendar.TAG_ISLAMIC);
-        assertEquals(cal.get(Calendar.DAY_OF_MONTH), 1);
-        assertEquals(cal.get(Calendar.MONTH), IslamicCalendar.MUHARRAM);
-        assertEquals(cal.get(Calendar.YEAR), 1);
+        assertEquals(1, cal.get(Calendar.DAY_OF_MONTH));
+        assertEquals(IslamicCalendar.MUHARRAM, cal.get(Calendar.MONTH));
+        assertEquals(1, cal.get(Calendar.YEAR));
 
         // first day of Islamic calendar is 16.7.622 in Gregorian/Julian calendar
         Calendar greg = MCRCalendar.getHistoryDateAsCalendar("16.7.622", false, MCRCalendar.TAG_GREGORIAN);
         assertEquals(MCRCalendar.getJulianDayNumber(greg), MCRCalendar.getJulianDayNumber(cal));
-        assertEquals(MCRCalendar.getJulianDayNumber(cal), 1948440);
-        assertEquals(MCRCalendar.getJulianDayNumberAsString(cal), "1948440");
+        assertEquals(1948440, MCRCalendar.getJulianDayNumber(cal));
+        assertEquals("1948440", MCRCalendar.getJulianDayNumberAsString(cal));
 
         // 01.01.800 H. (islamic) -> 24.09.1397 (greg)
         cal = MCRCalendar.getHistoryDateAsCalendar("1.800 H.", false, MCRCalendar.TAG_ISLAMIC);
-        assertEquals(cal.get(Calendar.DAY_OF_MONTH), 1);
-        assertEquals(cal.get(Calendar.MONTH), IslamicCalendar.MUHARRAM);
-        assertEquals(cal.get(Calendar.YEAR), 800);
+        assertEquals(1, cal.get(Calendar.DAY_OF_MONTH));
+        assertEquals(IslamicCalendar.MUHARRAM, cal.get(Calendar.MONTH));
+        assertEquals(800, cal.get(Calendar.YEAR));
 
         greg = MCRCalendar.getHistoryDateAsCalendar("24.09.1397", false, MCRCalendar.TAG_GREGORIAN);
         assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(greg));
@@ -254,9 +254,9 @@ public class MCRCalendarTest extends MCRTestCase {
 
         // 30.01.800 H. (islamic) -> 23.10.1397 (greg)
         cal = MCRCalendar.getHistoryDateAsCalendar("1.800 H.", true, MCRCalendar.TAG_ISLAMIC);
-        assertEquals(cal.get(Calendar.DAY_OF_MONTH), 30);
-        assertEquals(cal.get(Calendar.MONTH), IslamicCalendar.MUHARRAM);
-        assertEquals(cal.get(Calendar.YEAR), 800);
+        assertEquals(30, cal.get(Calendar.DAY_OF_MONTH));
+        assertEquals(IslamicCalendar.MUHARRAM, cal.get(Calendar.MONTH));
+        assertEquals(800, cal.get(Calendar.YEAR));
 
         greg = MCRCalendar.getHistoryDateAsCalendar("23.10.1397", false, MCRCalendar.TAG_GREGORIAN);
         assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(greg));
@@ -264,9 +264,9 @@ public class MCRCalendarTest extends MCRTestCase {
 
         // 29.12.800 H. (islamic) -> 12.09.1398 (greg)
         cal = MCRCalendar.getHistoryDateAsCalendar("800", true, MCRCalendar.TAG_ISLAMIC);
-        assertEquals(cal.get(Calendar.DAY_OF_MONTH), 29);
-        assertEquals(cal.get(Calendar.MONTH), IslamicCalendar.DHU_AL_HIJJAH);
-        assertEquals(cal.get(Calendar.YEAR), 800);
+        assertEquals(29, cal.get(Calendar.DAY_OF_MONTH));
+        assertEquals(IslamicCalendar.DHU_AL_HIJJAH, cal.get(Calendar.MONTH));
+        assertEquals(800, cal.get(Calendar.YEAR));
 
         greg = MCRCalendar.getHistoryDateAsCalendar("12.09.1398", false, MCRCalendar.TAG_GREGORIAN);
         assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(greg));
@@ -274,9 +274,9 @@ public class MCRCalendarTest extends MCRTestCase {
 
         // -1 (isl) -> 15.07.622 (greg)
         cal = MCRCalendar.getHistoryDateAsCalendar("-1", true, MCRCalendar.TAG_ISLAMIC);
-        assertEquals(cal.get(Calendar.DAY_OF_MONTH), 29);
-        assertEquals(cal.get(Calendar.MONTH), IslamicCalendar.DHU_AL_HIJJAH);
-        assertEquals(cal.get(Calendar.YEAR), 0);
+        assertEquals(29, cal.get(Calendar.DAY_OF_MONTH));
+        assertEquals(IslamicCalendar.DHU_AL_HIJJAH, cal.get(Calendar.MONTH));
+        assertEquals(0, cal.get(Calendar.YEAR));
 
         greg = MCRCalendar.getHistoryDateAsCalendar("15.7.622", false, MCRCalendar.TAG_GREGORIAN);
         assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(greg));
@@ -290,21 +290,21 @@ public class MCRCalendarTest extends MCRTestCase {
 
         // 01.01.0001 A.M. (coptic)
         cal = MCRCalendar.getHistoryDateAsCalendar("1.1.1 a.M.", false, MCRCalendar.TAG_COPTIC);
-        assertEquals(cal.get(Calendar.DAY_OF_MONTH), 1);
-        assertEquals(cal.get(Calendar.MONTH), CopticCalendar.TOUT);
-        assertEquals(cal.get(Calendar.YEAR), 1);
+        assertEquals(1, cal.get(Calendar.DAY_OF_MONTH));
+        assertEquals(CopticCalendar.TOUT, cal.get(Calendar.MONTH));
+        assertEquals(1, cal.get(Calendar.YEAR));
 
         // first day of Coptic calendar is 29.8.284 in Gregorian/Julian calendar
         Calendar greg = MCRCalendar.getHistoryDateAsCalendar("29.8.284", false, MCRCalendar.TAG_GREGORIAN);
         assertEquals(MCRCalendar.getJulianDayNumber(greg), MCRCalendar.getJulianDayNumber(cal));
-        assertEquals(MCRCalendar.getJulianDayNumber(cal), 1825030);
-        assertEquals(MCRCalendar.getJulianDayNumberAsString(cal), "1825030");
+        assertEquals(1825030, MCRCalendar.getJulianDayNumber(cal));
+        assertEquals("1825030", MCRCalendar.getJulianDayNumberAsString(cal));
 
         // 01.01.1724 A.M. (coptic) -> 12.09.2007
         cal = MCRCalendar.getHistoryDateAsCalendar("1.1.1724 A.M.", false, MCRCalendar.TAG_COPTIC);
-        assertEquals(cal.get(Calendar.DAY_OF_MONTH), 1);
-        assertEquals(cal.get(Calendar.MONTH), CopticCalendar.TOUT);
-        assertEquals(cal.get(Calendar.YEAR), 1724);
+        assertEquals(1, cal.get(Calendar.DAY_OF_MONTH));
+        assertEquals(CopticCalendar.TOUT, cal.get(Calendar.MONTH));
+        assertEquals(1724, cal.get(Calendar.YEAR));
 
         greg = MCRCalendar.getHistoryDateAsCalendar("12.09.2007", false, MCRCalendar.TAG_GREGORIAN);
         assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(greg));
@@ -312,9 +312,9 @@ public class MCRCalendarTest extends MCRTestCase {
 
         // 05.13.1724 E.E. (coptic) -> 10.09.2008
         cal = MCRCalendar.getHistoryDateAsCalendar("1724 a.M.", true, MCRCalendar.TAG_COPTIC);
-        assertEquals(cal.get(Calendar.DAY_OF_MONTH), 5);
-        assertEquals(cal.get(Calendar.MONTH), CopticCalendar.NASIE);
-        assertEquals(cal.get(Calendar.YEAR), 1724);
+        assertEquals(5, cal.get(Calendar.DAY_OF_MONTH));
+        assertEquals(CopticCalendar.NASIE, cal.get(Calendar.MONTH));
+        assertEquals(1724, cal.get(Calendar.YEAR));
 
         greg = MCRCalendar.getHistoryDateAsCalendar("10.09.2008", false, MCRCalendar.TAG_GREGORIAN);
         assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(greg));
@@ -322,10 +322,10 @@ public class MCRCalendarTest extends MCRTestCase {
 
         // -5.13.1 (cop) -> 28.8.284
         cal = MCRCalendar.getHistoryDateAsCalendar("-1", true, MCRCalendar.TAG_COPTIC);
-        assertEquals(cal.get(Calendar.DAY_OF_MONTH), 5);
-        assertEquals(cal.get(Calendar.MONTH), CopticCalendar.NASIE);
-        assertEquals(cal.get(Calendar.YEAR), 1);
-        assertEquals(cal.get(Calendar.ERA), GregorianCalendar.BC);
+        assertEquals(5, cal.get(Calendar.DAY_OF_MONTH));
+        assertEquals(CopticCalendar.NASIE, cal.get(Calendar.MONTH));
+        assertEquals(1, cal.get(Calendar.YEAR));
+        assertEquals(GregorianCalendar.BC, cal.get(Calendar.ERA));
 
         greg = MCRCalendar.getHistoryDateAsCalendar("28.8.284", false, MCRCalendar.TAG_GREGORIAN);
         assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(greg));
@@ -338,22 +338,22 @@ public class MCRCalendarTest extends MCRTestCase {
 
         // 01.01.0001 E.E. (ethiopic)
         cal = MCRCalendar.getHistoryDateAsCalendar("1 E.E.", false, MCRCalendar.TAG_ETHIOPIC);
-        assertEquals(cal.get(Calendar.DAY_OF_MONTH), 1);
-        assertEquals(cal.get(Calendar.MONTH), EthiopicCalendar.MESKEREM);
-        assertEquals(cal.get(Calendar.YEAR), 1);
+        assertEquals(1, cal.get(Calendar.DAY_OF_MONTH));
+        assertEquals(EthiopicCalendar.MESKEREM, cal.get(Calendar.MONTH));
+        assertEquals(1, cal.get(Calendar.YEAR));
 
         // first day of Ehtiopian calendar is 29.8.8 in Gregorian/Julian calendar
         Calendar greg = MCRCalendar.getHistoryDateAsCalendar("29.8.8", false, MCRCalendar.TAG_GREGORIAN);
         assertEquals(MCRCalendar.getJulianDayNumber(greg), MCRCalendar.getJulianDayNumber(cal));
-        assertEquals(MCRCalendar.getJulianDayNumber(cal), 1724221);
-        assertEquals(MCRCalendar.getJulianDayNumberAsString(cal), "1724221");
+        assertEquals(1724221, MCRCalendar.getJulianDayNumber(cal));
+        assertEquals("1724221", MCRCalendar.getJulianDayNumberAsString(cal));
 
         // 05.13.2000 E.E. (ethiopic) -> 10.09.2008 (greg)
         cal = MCRCalendar.getHistoryDateAsCalendar("2000 E.E.", true, MCRCalendar.TAG_ETHIOPIC);
-        assertEquals(cal.get(Calendar.DAY_OF_MONTH), 5);
-        assertEquals(cal.get(Calendar.MONTH), EthiopicCalendar.PAGUMEN);
-        assertEquals(cal.get(Calendar.YEAR), 2000);
-        assertEquals(cal.get(Calendar.ERA), 1);
+        assertEquals(5, cal.get(Calendar.DAY_OF_MONTH));
+        assertEquals(EthiopicCalendar.PAGUMEN, cal.get(Calendar.MONTH));
+        assertEquals(2000, cal.get(Calendar.YEAR));
+        assertEquals(1, cal.get(Calendar.ERA));
 
         greg = MCRCalendar.getHistoryDateAsCalendar("10.09.2008", false, MCRCalendar.TAG_GREGORIAN);
         assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(greg));
@@ -361,10 +361,10 @@ public class MCRCalendarTest extends MCRTestCase {
 
         // years before 0 are represented in Amete Alem format (starting with count from 5500 BC)
         cal = MCRCalendar.getHistoryDateAsCalendar("-1", true, MCRCalendar.TAG_ETHIOPIC);
-        assertEquals(cal.get(Calendar.DAY_OF_MONTH), 5);
-        assertEquals(cal.get(Calendar.MONTH), EthiopicCalendar.PAGUMEN);
-        assertEquals(cal.get(Calendar.YEAR), 5500);
-        assertEquals(cal.get(Calendar.ERA), 0);
+        assertEquals(5, cal.get(Calendar.DAY_OF_MONTH));
+        assertEquals(EthiopicCalendar.PAGUMEN, cal.get(Calendar.MONTH));
+        assertEquals(5500, cal.get(Calendar.YEAR));
+        assertEquals(0, cal.get(Calendar.ERA));
 
         greg = MCRCalendar.getHistoryDateAsCalendar("28.8.8", false, MCRCalendar.TAG_GREGORIAN);
         assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(greg));
@@ -377,21 +377,21 @@ public class MCRCalendarTest extends MCRTestCase {
 
         // 1.1.1 (hebrew)
         cal = MCRCalendar.getHistoryDateAsCalendar("1", false, MCRCalendar.TAG_HEBREW);
-        assertEquals(cal.get(Calendar.DAY_OF_MONTH), 1);
-        assertEquals(cal.get(Calendar.MONTH), HebrewCalendar.TISHRI);
-        assertEquals(cal.get(Calendar.YEAR), 1);
+        assertEquals(1, cal.get(Calendar.DAY_OF_MONTH));
+        assertEquals(HebrewCalendar.TISHRI, cal.get(Calendar.MONTH));
+        assertEquals(1, cal.get(Calendar.YEAR));
 
         // first day of Hebrew calendar is 7.10.3761 BC in Gregorian/Julian calendar
         Calendar greg = MCRCalendar.getHistoryDateAsCalendar("7.10.3761 BC", false, MCRCalendar.TAG_GREGORIAN);
         assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(greg));
-        assertEquals(MCRCalendar.getJulianDayNumber(cal), 347998);
-        assertEquals(MCRCalendar.getJulianDayNumberAsString(cal), "347998");
+        assertEquals(347998, MCRCalendar.getJulianDayNumber(cal));
+        assertEquals("347998", MCRCalendar.getJulianDayNumberAsString(cal));
 
         // 04.10.1582 (hebrew) - 29.04.2178 BC
         cal = MCRCalendar.getHistoryDateAsCalendar("04.10.1582", false, MCRCalendar.TAG_HEBREW);
-        assertEquals(cal.get(Calendar.DAY_OF_MONTH), 4);
-        assertEquals(cal.get(Calendar.MONTH), HebrewCalendar.SIVAN);
-        assertEquals(cal.get(Calendar.YEAR), 1582);
+        assertEquals(4, cal.get(Calendar.DAY_OF_MONTH));
+        assertEquals(HebrewCalendar.SIVAN, cal.get(Calendar.MONTH));
+        assertEquals(1582, cal.get(Calendar.YEAR));
 
         greg = MCRCalendar.getHistoryDateAsCalendar("17.05.2179 BC", false, MCRCalendar.TAG_GREGORIAN);
         assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(greg));
@@ -399,9 +399,9 @@ public class MCRCalendarTest extends MCRTestCase {
 
         // 18.01.5343 (hebrew) -> 04.10.1582 (greg)
         cal = MCRCalendar.getHistoryDateAsCalendar("18.01.5343", false, MCRCalendar.TAG_HEBREW);
-        assertEquals(cal.get(Calendar.DAY_OF_MONTH), 18);
-        assertEquals(cal.get(Calendar.MONTH), HebrewCalendar.TISHRI);
-        assertEquals(cal.get(Calendar.YEAR), 5343);
+        assertEquals(18, cal.get(Calendar.DAY_OF_MONTH));
+        assertEquals(HebrewCalendar.TISHRI, cal.get(Calendar.MONTH));
+        assertEquals(5343, cal.get(Calendar.YEAR));
 
         greg = MCRCalendar.getHistoryDateAsCalendar("04.10.1582", false, MCRCalendar.TAG_GREGORIAN);
         assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(greg));
@@ -409,9 +409,9 @@ public class MCRCalendarTest extends MCRTestCase {
 
         // 19.01.5343 (hebrew) -> 15.10.1582 (greg)
         cal = MCRCalendar.getHistoryDateAsCalendar("19.01.5343", false, MCRCalendar.TAG_HEBREW);
-        assertEquals(cal.get(Calendar.DAY_OF_MONTH), 19);
-        assertEquals(cal.get(Calendar.MONTH), HebrewCalendar.TISHRI);
-        assertEquals(cal.get(Calendar.YEAR), 5343);
+        assertEquals(19, cal.get(Calendar.DAY_OF_MONTH));
+        assertEquals(HebrewCalendar.TISHRI, cal.get(Calendar.MONTH));
+        assertEquals(5343, cal.get(Calendar.YEAR));
 
         greg = MCRCalendar.getHistoryDateAsCalendar("15.10.1582", false, MCRCalendar.TAG_GREGORIAN);
         assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(greg));
@@ -419,9 +419,9 @@ public class MCRCalendarTest extends MCRTestCase {
 
         // 19.01.5343 (hebrew) -> 16.10.1582 (greg)
         cal = MCRCalendar.getHistoryDateAsCalendar("20.01.5343", false, MCRCalendar.TAG_HEBREW);
-        assertEquals(cal.get(Calendar.DAY_OF_MONTH), 20);
-        assertEquals(cal.get(Calendar.MONTH), HebrewCalendar.TISHRI);
-        assertEquals(cal.get(Calendar.YEAR), 5343);
+        assertEquals(20, cal.get(Calendar.DAY_OF_MONTH));
+        assertEquals(HebrewCalendar.TISHRI, cal.get(Calendar.MONTH));
+        assertEquals(5343, cal.get(Calendar.YEAR));
 
         greg = MCRCalendar.getHistoryDateAsCalendar("16.10.1582", false, MCRCalendar.TAG_GREGORIAN);
         assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(greg));
@@ -429,9 +429,9 @@ public class MCRCalendarTest extends MCRTestCase {
 
         // 01.01.1800 (hebrew) with missing day and last=false
         cal = MCRCalendar.getHistoryDateAsCalendar("1.1800", false, MCRCalendar.TAG_HEBREW);
-        assertEquals(cal.get(Calendar.DAY_OF_MONTH), 1);
-        assertEquals(cal.get(Calendar.MONTH), HebrewCalendar.TISHRI);
-        assertEquals(cal.get(Calendar.YEAR), 1800);
+        assertEquals(1, cal.get(Calendar.DAY_OF_MONTH));
+        assertEquals(HebrewCalendar.TISHRI, cal.get(Calendar.MONTH));
+        assertEquals(1800, cal.get(Calendar.YEAR));
 
         greg = MCRCalendar.getHistoryDateAsCalendar("09.09.1962 BC", false, MCRCalendar.TAG_GREGORIAN);
         assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(greg));
@@ -453,8 +453,8 @@ public class MCRCalendarTest extends MCRTestCase {
         // first day of Buddhist calendar is 1.1.543 BC in Gregorian/Julian calendar
         Calendar greg = MCRCalendar.getHistoryDateAsCalendar("1.1.543 BC", false, MCRCalendar.TAG_GREGORIAN);
         assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(greg));
-        assertEquals(MCRCalendar.getJulianDayNumber(cal), 1523093);
-        assertEquals(MCRCalendar.getJulianDayNumberAsString(cal), "1523093");
+        assertEquals(1523093, MCRCalendar.getJulianDayNumber(cal));
+        assertEquals("1523093", MCRCalendar.getJulianDayNumberAsString(cal));
 
         // year 0
         cal = MCRCalendar.getHistoryDateAsCalendar("0", false, MCRCalendar.TAG_BUDDHIST);
@@ -539,8 +539,8 @@ public class MCRCalendarTest extends MCRTestCase {
         // first day of Persian calendar is 21.3.622 in Gregorian/Julian calendar
         Calendar greg = MCRCalendar.getHistoryDateAsCalendar("21.3.622", false, MCRCalendar.TAG_GREGORIAN);
         assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(greg));
-        assertEquals(MCRCalendar.getJulianDayNumber(cal), 1948323);
-        assertEquals(MCRCalendar.getJulianDayNumberAsString(cal), "1948323");
+        assertEquals(1948323, MCRCalendar.getJulianDayNumber(cal));
+        assertEquals("1948323", MCRCalendar.getJulianDayNumberAsString(cal));
 
         // 01.01.800 (persian)
         cal = MCRCalendar.getHistoryDateAsCalendar("1.800", false, MCRCalendar.TAG_PERSIC);
@@ -627,8 +627,8 @@ public class MCRCalendarTest extends MCRTestCase {
         // first day of Egyptian calendar is 18.2.747 BC in Gregorian/Julian calendar
         Calendar greg = MCRCalendar.getHistoryDateAsCalendar("18.2.747 BC", false, MCRCalendar.TAG_GREGORIAN);
         assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(greg));
-        assertEquals(MCRCalendar.getJulianDayNumber(cal), 1448630);
-        assertEquals(MCRCalendar.getJulianDayNumberAsString(cal), "1448630");
+        assertEquals(1448630, MCRCalendar.getJulianDayNumber(cal));
+        assertEquals("1448630", MCRCalendar.getJulianDayNumberAsString(cal));
 
         // 1.1 -> 30.1.1 in Gregorian date: 19.3.747 BC
         cal = MCRCalendar.getHistoryDateAsCalendar("1.1 A.N.", true, MCRCalendar.TAG_EGYPTIAN);
@@ -681,105 +681,91 @@ public class MCRCalendarTest extends MCRTestCase {
         cal = MCRCalendar.getHistoryDateAsCalendar("8.9.M1", true, MCRCalendar.TAG_JAPANESE);
         assertCalEqualWithActual(cal, 8, JapaneseCalendar.SEPTEMBER, 1, JapaneseCalendar.MEIJI);
 
-        assertEquals(MCRCalendar.getJulianDayNumber(cal),
-            MCRCalendar.getJulianDayNumber(
-                MCRCalendar.getHistoryDateAsCalendar("8.9.1868", false, MCRCalendar.TAG_GREGORIAN)));
+        assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(
+            MCRCalendar.getHistoryDateAsCalendar("8.9.1868", false, MCRCalendar.TAG_GREGORIAN)));
 
         cal = MCRCalendar.getHistoryDateAsCalendar("29.7.M45", true, MCRCalendar.TAG_JAPANESE);
         assertCalEqualWithActual(cal, 29, JapaneseCalendar.JULY, 45, JapaneseCalendar.MEIJI);
 
-        assertEquals(MCRCalendar.getJulianDayNumber(cal),
-            MCRCalendar.getJulianDayNumber(
-                MCRCalendar.getHistoryDateAsCalendar("29.7.1912", false, MCRCalendar.TAG_GREGORIAN)));
+        assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(
+            MCRCalendar.getHistoryDateAsCalendar("29.7.1912", false, MCRCalendar.TAG_GREGORIAN)));
 
         cal = MCRCalendar.getHistoryDateAsCalendar("30.7.M45", true, MCRCalendar.TAG_JAPANESE);
         assertCalEqualWithActual(cal, 30, JapaneseCalendar.JULY, 1, JapaneseCalendar.TAISHO);
 
-        assertEquals(MCRCalendar.getJulianDayNumber(cal),
-            MCRCalendar.getJulianDayNumber(
-                MCRCalendar.getHistoryDateAsCalendar("30.7.1912", false, MCRCalendar.TAG_GREGORIAN)));
+        assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(
+            MCRCalendar.getHistoryDateAsCalendar("30.7.1912", false, MCRCalendar.TAG_GREGORIAN)));
 
         // Taisho era: 30.7.1912-24.12.1926
         cal = MCRCalendar.getHistoryDateAsCalendar("30.7.T1", true, MCRCalendar.TAG_JAPANESE);
         assertCalEqualWithActual(cal, 30, JapaneseCalendar.JULY, 1, JapaneseCalendar.TAISHO);
 
-        assertEquals(MCRCalendar.getJulianDayNumber(cal),
-            MCRCalendar.getJulianDayNumber(
-                MCRCalendar.getHistoryDateAsCalendar("30.7.1912", false, MCRCalendar.TAG_GREGORIAN)));
+        assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(
+            MCRCalendar.getHistoryDateAsCalendar("30.7.1912", false, MCRCalendar.TAG_GREGORIAN)));
 
         cal = MCRCalendar.getHistoryDateAsCalendar("24.12.T15", true, MCRCalendar.TAG_JAPANESE);
         assertCalEqualWithActual(cal, 24, JapaneseCalendar.DECEMBER, 15, JapaneseCalendar.TAISHO);
 
-        assertEquals(MCRCalendar.getJulianDayNumber(cal),
-            MCRCalendar.getJulianDayNumber(
-                MCRCalendar.getHistoryDateAsCalendar("24.12.1926", false, MCRCalendar.TAG_GREGORIAN)));
+        assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(
+            MCRCalendar.getHistoryDateAsCalendar("24.12.1926", false, MCRCalendar.TAG_GREGORIAN)));
 
         cal = MCRCalendar.getHistoryDateAsCalendar("25.12.T15", true, MCRCalendar.TAG_JAPANESE);
         assertCalEqualWithActual(cal, 25, JapaneseCalendar.DECEMBER, 1, JapaneseCalendar.SHOWA);
 
-        assertEquals(MCRCalendar.getJulianDayNumber(cal),
-            MCRCalendar.getJulianDayNumber(
-                MCRCalendar.getHistoryDateAsCalendar("25.12.1926", false, MCRCalendar.TAG_GREGORIAN)));
+        assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(
+            MCRCalendar.getHistoryDateAsCalendar("25.12.1926", false, MCRCalendar.TAG_GREGORIAN)));
 
         // Showa era: 25.12.1926-07.01.1989
         cal = MCRCalendar.getHistoryDateAsCalendar("25.12.S1", true, MCRCalendar.TAG_JAPANESE);
         assertCalEqualWithActual(cal, 25, JapaneseCalendar.DECEMBER, 1, JapaneseCalendar.SHOWA);
 
-        assertEquals(MCRCalendar.getJulianDayNumber(cal),
-            MCRCalendar.getJulianDayNumber(
-                MCRCalendar.getHistoryDateAsCalendar("25.12.1926", false, MCRCalendar.TAG_GREGORIAN)));
+        assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(
+            MCRCalendar.getHistoryDateAsCalendar("25.12.1926", false, MCRCalendar.TAG_GREGORIAN)));
 
         cal = MCRCalendar.getHistoryDateAsCalendar("7.1.S64", true, MCRCalendar.TAG_JAPANESE);
         assertCalEqualWithActual(cal, 7, JapaneseCalendar.JANUARY, 64, JapaneseCalendar.SHOWA);
 
-        assertEquals(MCRCalendar.getJulianDayNumber(cal),
-            MCRCalendar.getJulianDayNumber(
-                MCRCalendar.getHistoryDateAsCalendar("7.1.1989", false, MCRCalendar.TAG_GREGORIAN)));
+        assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(
+            MCRCalendar.getHistoryDateAsCalendar("7.1.1989", false, MCRCalendar.TAG_GREGORIAN)));
 
         cal = MCRCalendar.getHistoryDateAsCalendar("8.1.S64", true, MCRCalendar.TAG_JAPANESE);
         assertCalEqualWithActual(cal, 8, JapaneseCalendar.JANUARY, 1, JapaneseCalendar.HEISEI);
 
-        assertEquals(MCRCalendar.getJulianDayNumber(cal),
-            MCRCalendar.getJulianDayNumber(
-                MCRCalendar.getHistoryDateAsCalendar("8.1.1989", false, MCRCalendar.TAG_GREGORIAN)));
+        assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(
+            MCRCalendar.getHistoryDateAsCalendar("8.1.1989", false, MCRCalendar.TAG_GREGORIAN)));
 
         // Heisei era: 08.01.1989-30.04.2019
         cal = MCRCalendar.getHistoryDateAsCalendar("8.1.H1", true, MCRCalendar.TAG_JAPANESE);
         assertCalEqualWithActual(cal, 8, JapaneseCalendar.JANUARY, 1, JapaneseCalendar.HEISEI);
 
-        assertEquals(MCRCalendar.getJulianDayNumber(cal),
-            MCRCalendar.getJulianDayNumber(
-                MCRCalendar.getHistoryDateAsCalendar("8.1.1989", false, MCRCalendar.TAG_GREGORIAN)));
+        assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(
+            MCRCalendar.getHistoryDateAsCalendar("8.1.1989", false, MCRCalendar.TAG_GREGORIAN)));
 
         cal = MCRCalendar.getHistoryDateAsCalendar("30.4.H31", true, MCRCalendar.TAG_JAPANESE);
         assertCalEqualWithActual(cal, 30, JapaneseCalendar.APRIL, 31, JapaneseCalendar.HEISEI);
 
-        assertEquals(MCRCalendar.getJulianDayNumber(cal),
-            MCRCalendar.getJulianDayNumber(
-                MCRCalendar.getHistoryDateAsCalendar("30.4.2019", false, MCRCalendar.TAG_GREGORIAN)));
+        assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(
+            MCRCalendar.getHistoryDateAsCalendar("30.4.2019", false, MCRCalendar.TAG_GREGORIAN)));
 
         cal = MCRCalendar.getHistoryDateAsCalendar("1.5.H31", true, MCRCalendar.TAG_JAPANESE);
         assertCalEqualWithActual(cal, 1, JapaneseCalendar.MAY, 1, JapaneseCalendar.REIWA);
 
-        assertEquals(MCRCalendar.getJulianDayNumber(cal),
-            MCRCalendar.getJulianDayNumber(
-                MCRCalendar.getHistoryDateAsCalendar("1.5.2019", false, MCRCalendar.TAG_GREGORIAN)));
+        assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(
+            MCRCalendar.getHistoryDateAsCalendar("1.5.2019", false, MCRCalendar.TAG_GREGORIAN)));
 
         // Reiwa era: 01.05.2019 - present
         cal = MCRCalendar.getHistoryDateAsCalendar("1.5.R1", true, MCRCalendar.TAG_JAPANESE);
         assertCalEqualWithActual(cal, 1, JapaneseCalendar.MAY, 1, JapaneseCalendar.REIWA);
 
-        assertEquals(MCRCalendar.getJulianDayNumber(cal),
-            MCRCalendar.getJulianDayNumber(
-                MCRCalendar.getHistoryDateAsCalendar("1.5.2019", false, MCRCalendar.TAG_GREGORIAN)));
+        assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(
+            MCRCalendar.getHistoryDateAsCalendar("1.5.2019", false, MCRCalendar.TAG_GREGORIAN)));
 
         // check ISO format
         cal = MCRCalendar.getHistoryDateAsCalendar("R1-5-1", true, MCRCalendar.TAG_JAPANESE);
         assertCalEqualWithActual(cal, 1, JapaneseCalendar.MAY, 1, JapaneseCalendar.REIWA);
 
-        assertEquals(MCRCalendar.getJulianDayNumber(cal),
-            MCRCalendar.getJulianDayNumber(
-                MCRCalendar.getHistoryDateAsCalendar("1.5.2019", false, MCRCalendar.TAG_GREGORIAN)));
+        assertEquals(MCRCalendar.getJulianDayNumber(cal), MCRCalendar.getJulianDayNumber(
+            MCRCalendar.getHistoryDateAsCalendar("1.5.2019", false, MCRCalendar.TAG_GREGORIAN)));
     }
 
     /*
@@ -800,7 +786,7 @@ public class MCRCalendarTest extends MCRTestCase {
             cal = new GregorianCalendar();
         }
         dstring = MCRCalendar.getCalendarDateToFormattedString(cal);
-        assertEquals("Date is not the current date.", cstring, dstring);
+        assertEquals(cstring, dstring, "Date is not the current date.");
         // 0A.01.0001 BC (wrong gregorian)
         try {
             cal = MCRCalendar.getHistoryDateAsCalendar("-0A.01.0001", false, MCRCalendar.TAG_JULIAN);
@@ -808,21 +794,21 @@ public class MCRCalendarTest extends MCRTestCase {
             cal = new GregorianCalendar();
         }
         dstring = MCRCalendar.getCalendarDateToFormattedString(cal);
-        assertEquals("common", cstring, dstring);
+        assertEquals(cstring, dstring, "common");
 
         /* syntax expanding check */
         // 1 (gregorian)
         cal = MCRCalendar.getHistoryDateAsCalendar("1", false, MCRCalendar.TAG_JULIAN);
         dstring = MCRCalendar.getJulianDayNumberAsString(cal);
-        assertEquals("common", "1721424", dstring);
+        assertEquals("1721424", dstring, "common");
         // 1.1 (gregorian)
         cal = MCRCalendar.getHistoryDateAsCalendar("1.1", true, MCRCalendar.TAG_JULIAN);
         dstring = MCRCalendar.getJulianDayNumberAsString(cal);
-        assertEquals("common", "1721454", dstring);
+        assertEquals("1721454", dstring, "common");
         // 1.1.1 (gregorian)
         cal = MCRCalendar.getHistoryDateAsCalendar("1.1.1", false, MCRCalendar.TAG_JULIAN);
         dstring = MCRCalendar.getJulianDayNumberAsString(cal);
-        assertEquals("common", "1721424", dstring);
+        assertEquals("1721424", dstring, "common");
         // 1.1.1 QU(gregorian)
         try {
             cal = MCRCalendar.getHistoryDateAsCalendar("1.1.1 QU", false, MCRCalendar.TAG_JULIAN);
@@ -830,15 +816,15 @@ public class MCRCalendarTest extends MCRTestCase {
             cal = new GregorianCalendar();
         }
         dstring = MCRCalendar.getCalendarDateToFormattedString(cal);
-        assertEquals("common", cstring, dstring);
+        assertEquals(cstring, dstring, "common");
         // - infinity (julian)
         cal.set(Calendar.JULIAN_DAY, MCRCalendar.MIN_JULIAN_DAY_NUMBER);
         dstring = MCRCalendar.getJulianDayNumberAsString(cal);
-        assertEquals("julian: 01.01.4713 BC", "0", dstring);
+        assertEquals("0", dstring, "julian: 01.01.4713 BC");
         // + infinity (julian)
         cal.set(Calendar.JULIAN_DAY, MCRCalendar.MAX_JULIAN_DAY_NUMBER);
         dstring = MCRCalendar.getJulianDayNumberAsString(cal);
-        assertEquals("julian: 28.01.4000 AD", "3182057", dstring);
+        assertEquals("3182057", dstring, "julian: 28.01.4000 AD");
     }
 
     /*
@@ -852,68 +838,68 @@ public class MCRCalendarTest extends MCRTestCase {
         // 15.03.44 BC (julian)
         calendar = MCRCalendar.getHistoryDateAsCalendar("-15.3.44", true, MCRCalendar.TAG_JULIAN);
         dstring = MCRCalendar.getCalendarDateToFormattedString(calendar, "dd.MM.yyyy G");
-        assertEquals("is not julian date 15.03.44 BC", "15.03.0044 BC", dstring);
+        assertEquals("15.03.0044 BC", dstring, "is not julian date 15.03.44 BC");
         // 15.03.44 BC (gregorian)
         calendar = MCRCalendar.getHistoryDateAsCalendar("-15.3.44", true, MCRCalendar.TAG_GREGORIAN);
         dstring = MCRCalendar.getCalendarDateToFormattedString(calendar, "dd.MM.yyyy G");
-        assertEquals("is not gregorian date 15.03.44 BC", "15.03.0044 BC", dstring);
+        assertEquals("15.03.0044 BC", dstring, "is not gregorian date 15.03.44 BC");
         // 29.02.1700 (julian)
         calendar = MCRCalendar.getHistoryDateAsCalendar("29.02.1700", true, MCRCalendar.TAG_JULIAN);
         dstring = MCRCalendar.getCalendarDateToFormattedString(calendar, "dd.MM.yyyy G");
-        assertEquals("is not julian date 29.02.1700 AD", "29.02.1700 AD", dstring);
+        assertEquals("29.02.1700 AD", dstring, "is not julian date 29.02.1700 AD");
         // 29.02.1700 (gregorian) -> no leap year in gregorian calendar
         assertThrows(MCRException.class,
             () -> MCRCalendar.getHistoryDateAsCalendar("29.02.1700", true, MCRCalendar.TAG_GREGORIAN));
         // 30.01.800 H. (islamic)
         calendar = MCRCalendar.getHistoryDateAsCalendar("30.1.800 H.", true, MCRCalendar.TAG_ISLAMIC);
         dstring = MCRCalendar.getCalendarDateToFormattedString(calendar, "dd.MM.yyy");
-        assertEquals("is not islamic date 30.01.0800 H.", "30.01.800 h.", dstring);
+        assertEquals("30.01.800 h.", dstring, "is not islamic date 30.01.0800 H.");
         // 01.01.800 H. (islamic)
         calendar = MCRCalendar.getHistoryDateAsCalendar("1.800 H.", false, MCRCalendar.TAG_ISLAMIC);
         dstring = MCRCalendar.getCalendarDateToFormattedString(calendar, "dd.MM.yyy");
-        assertEquals("is not islamic date 01.01.0800 H.", "01.01.800 h.", dstring);
+        assertEquals("01.01.800 h.", dstring, "is not islamic date 01.01.0800 H.");
         // 30.01.800 H. (islamic)
         calendar = MCRCalendar.getHistoryDateAsCalendar("1.800 H.", true, MCRCalendar.TAG_ISLAMIC);
         dstring = MCRCalendar.getCalendarDateToFormattedString(calendar, "dd.MM.yyy");
-        assertEquals("is not islamic date 30.01.0800 H.", "30.01.800 h.", dstring);
+        assertEquals("30.01.800 h.", dstring, "is not islamic date 30.01.0800 H.");
         // 01.01.800 H. (islamic)
         calendar = MCRCalendar.getHistoryDateAsCalendar("800", false, MCRCalendar.TAG_ISLAMIC);
         dstring = MCRCalendar.getCalendarDateToFormattedString(calendar, "dd.MM.yyy");
-        assertEquals("is not islamic date 01.01.0800 H.", "01.01.800 h.", dstring);
+        assertEquals("01.01.800 h.", dstring, "is not islamic date 01.01.0800 H.");
         // 29.12.800 H. (islamic)
         calendar = MCRCalendar.getHistoryDateAsCalendar("800", true, MCRCalendar.TAG_ISLAMIC);
         dstring = MCRCalendar.getCalendarDateToFormattedString(calendar, "dd.MM.yyy");
-        assertEquals("is not islamic date 29.12.0800 H.", "29.12.800 h.", dstring);
+        assertEquals("29.12.800 h.", dstring, "is not islamic date 29.12.0800 H.");
         // 29.12.800 H. (islamic)
         calendar = MCRCalendar.getHistoryDateAsCalendar("800 H.", true, MCRCalendar.TAG_ISLAMIC);
         dstring = MCRCalendar.getCalendarDateToFormattedString(calendar, "dd.MM.yyy");
-        assertEquals("is not islamic date 29.12.0800 H.", "29.12.800 h.", dstring);
+        assertEquals("29.12.800 h.", dstring, "is not islamic date 29.12.0800 H.");
 
         // 01.01.1724 A.M. (coptic)
         calendar = MCRCalendar.getHistoryDateAsCalendar("1724", false, MCRCalendar.TAG_COPTIC);
         dstring = MCRCalendar.getCalendarDateToFormattedString(calendar, "dd.MM.yyyy");
-        assertEquals("is not coptic date 01.01.1724 A.M.", "01.01.1724 A.M.", dstring);
+        assertEquals("01.01.1724 A.M.", dstring, "is not coptic date 01.01.1724 A.M.");
 
         // 01.01.2000 A.M. (ethiopic)
         calendar = MCRCalendar.getHistoryDateAsCalendar("2000", true, MCRCalendar.TAG_ETHIOPIC);
         dstring = MCRCalendar.getCalendarDateToFormattedString(calendar, "dd.MM.yyyy");
-        assertEquals("is not ethiopic date 05.13.2000 E.E.", "05.13.2000 E.E.", dstring);
+        assertEquals("05.13.2000 E.E.", dstring, "is not ethiopic date 05.13.2000 E.E.");
 
         calendar = MCRCalendar.getHistoryDateAsCalendar("1.1.500", false, MCRCalendar.TAG_ARMENIAN);
         dstring = MCRCalendar.getCalendarDateToFormattedString(calendar, "dd.MM.yyyy");
-        assertEquals("is not armenian date 11.03.1051", "11.03.1051", dstring);
+        assertEquals("11.03.1051", dstring, "is not armenian date 11.03.1051");
 
         calendar = MCRCalendar.getHistoryDateAsCalendar("5.7.H2", false, MCRCalendar.TAG_JAPANESE);
         dstring = MCRCalendar.getCalendarDateToFormattedString(calendar, "dd.MM.Y");
-        assertEquals("is not japanese date 05.07.1990", "05.07.1990", dstring);
+        assertEquals("05.07.1990", dstring, "is not japanese date 05.07.1990");
 
         calendar = MCRCalendar.getHistoryDateAsCalendar("2.7.20", false, MCRCalendar.TAG_BUDDHIST);
         dstring = MCRCalendar.getCalendarDateToFormattedString(calendar, "dd.MM.yy");
-        assertEquals("is not japanese date 02.07.20", "02.07.20", dstring);
+        assertEquals("02.07.20", dstring, "is not japanese date 02.07.20");
 
         calendar = MCRCalendar.getHistoryDateAsCalendar("2.7.20", false, MCRCalendar.TAG_BUDDHIST);
         dstring = MCRCalendar.getCalendarDateToFormattedString(calendar, "dd.MM.Y");
-        assertEquals("is not buddhist date 02.07.-523", "02.07.-523", dstring);
+        assertEquals("02.07.-523", dstring, "is not buddhist date 02.07.-523");
     }
 
     @Test
@@ -930,14 +916,14 @@ public class MCRCalendarTest extends MCRTestCase {
 
     @Test
     public void testDelimiter() {
-        assertEquals(MCRCalendar.delimiter("23.03.2022"), ".");
-        assertEquals(MCRCalendar.delimiter("23/03/2022"), "/");
-        assertEquals(MCRCalendar.delimiter("23-03-2022"), "-");
-        assertEquals(MCRCalendar.delimiter("-23.03.2022"), ".");
-        assertEquals(MCRCalendar.delimiter("-23/03/2022"), "/");
-        assertEquals(MCRCalendar.delimiter("-23-03-2022"), "-");
+        assertEquals(".", MCRCalendar.delimiter("23.03.2022"));
+        assertEquals("/", MCRCalendar.delimiter("23/03/2022"));
+        assertEquals("-", MCRCalendar.delimiter("23-03-2022"));
+        assertEquals(".", MCRCalendar.delimiter("-23.03.2022"));
+        assertEquals("/", MCRCalendar.delimiter("-23/03/2022"));
+        assertEquals("-", MCRCalendar.delimiter("-23-03-2022"));
 
-        assertEquals(MCRCalendar.delimiter("800"), ".");
+        assertEquals(".", MCRCalendar.delimiter("800"));
     }
 
     @Test
@@ -957,37 +943,29 @@ public class MCRCalendarTest extends MCRTestCase {
 
     @Test
     public void testGetLastDayOfMonth() {
-        assertEquals(MCRCalendar.getLastDayOfMonth(GregorianCalendar.JANUARY, 2000, MCRCalendar.CalendarType.GREGORIAN),
-            31);
-        assertEquals(
-            MCRCalendar.getLastDayOfMonth(GregorianCalendar.FEBRUARY, 2000, MCRCalendar.CalendarType.GREGORIAN),
-            29);
-        assertEquals(
-            MCRCalendar.getLastDayOfMonth(GregorianCalendar.FEBRUARY, 2001, MCRCalendar.CalendarType.GREGORIAN),
-            28);
-        assertEquals(MCRCalendar.getLastDayOfMonth(GregorianCalendar.MARCH, 2000, MCRCalendar.CalendarType.GREGORIAN),
-            31);
-        assertEquals(MCRCalendar.getLastDayOfMonth(GregorianCalendar.APRIL, 2000, MCRCalendar.CalendarType.GREGORIAN),
-            30);
+        assertEquals(31,
+            MCRCalendar.getLastDayOfMonth(GregorianCalendar.JANUARY, 2000, MCRCalendar.CalendarType.GREGORIAN));
+        assertEquals(29,
+            MCRCalendar.getLastDayOfMonth(GregorianCalendar.FEBRUARY, 2000, MCRCalendar.CalendarType.GREGORIAN));
+        assertEquals(28,
+            MCRCalendar.getLastDayOfMonth(GregorianCalendar.FEBRUARY, 2001, MCRCalendar.CalendarType.GREGORIAN));
+        assertEquals(31,
+            MCRCalendar.getLastDayOfMonth(GregorianCalendar.MARCH, 2000, MCRCalendar.CalendarType.GREGORIAN));
+        assertEquals(30,
+            MCRCalendar.getLastDayOfMonth(GregorianCalendar.APRIL, 2000, MCRCalendar.CalendarType.GREGORIAN));
 
-        assertEquals(
-            MCRCalendar.getLastDayOfMonth(GregorianCalendar.FEBRUARY, 1700, MCRCalendar.CalendarType.GREGORIAN),
-            28);
-        assertEquals(MCRCalendar.getLastDayOfMonth(GregorianCalendar.FEBRUARY, 1700, MCRCalendar.CalendarType.JULIAN),
-            29);
+        assertEquals(28,
+            MCRCalendar.getLastDayOfMonth(GregorianCalendar.FEBRUARY, 1700, MCRCalendar.CalendarType.GREGORIAN));
+        assertEquals(29,
+            MCRCalendar.getLastDayOfMonth(GregorianCalendar.FEBRUARY, 1700, MCRCalendar.CalendarType.JULIAN));
 
-        assertEquals(MCRCalendar.getLastDayOfMonth(CopticCalendar.NASIE, 2000, MCRCalendar.CalendarType.COPTIC),
-            5);
+        assertEquals(5, MCRCalendar.getLastDayOfMonth(CopticCalendar.NASIE, 2000, MCRCalendar.CalendarType.COPTIC));
 
-        assertEquals(MCRCalendar.getLastDayOfMonth(11, 2000, MCRCalendar.CalendarType.EGYPTIAN),
-            30);
-        assertEquals(MCRCalendar.getLastDayOfMonth(12, 2000, MCRCalendar.CalendarType.EGYPTIAN),
-            5);
+        assertEquals(30, MCRCalendar.getLastDayOfMonth(11, 2000, MCRCalendar.CalendarType.EGYPTIAN));
+        assertEquals(5, MCRCalendar.getLastDayOfMonth(12, 2000, MCRCalendar.CalendarType.EGYPTIAN));
 
-        assertEquals(MCRCalendar.getLastDayOfMonth(11, 2000, MCRCalendar.CalendarType.ARMENIAN),
-            30);
-        assertEquals(MCRCalendar.getLastDayOfMonth(12, 2000, MCRCalendar.CalendarType.ARMENIAN),
-            5);
+        assertEquals(30, MCRCalendar.getLastDayOfMonth(11, 2000, MCRCalendar.CalendarType.ARMENIAN));
+        assertEquals(5, MCRCalendar.getLastDayOfMonth(12, 2000, MCRCalendar.CalendarType.ARMENIAN));
     }
 
     @Test
@@ -1001,39 +979,28 @@ public class MCRCalendarTest extends MCRTestCase {
 
     @Test
     public void testGetCalendarTypeString() {
-        assertEquals(MCRCalendar.getCalendarTypeString(
-            MCRCalendar.getHistoryDateAsCalendar("1.1.1", false, MCRCalendar.TAG_ARMENIAN)),
-            MCRCalendar.TAG_GREGORIAN);
-        assertEquals(MCRCalendar.getCalendarTypeString(
-            MCRCalendar.getHistoryDateAsCalendar("1.1.1", false, MCRCalendar.TAG_BUDDHIST)),
-            MCRCalendar.TAG_BUDDHIST);
-        assertEquals(MCRCalendar.getCalendarTypeString(
-            MCRCalendar.getHistoryDateAsCalendar("1.1.1", false, MCRCalendar.TAG_COPTIC)),
-            MCRCalendar.TAG_COPTIC);
-        assertEquals(MCRCalendar.getCalendarTypeString(
-            MCRCalendar.getHistoryDateAsCalendar("1.1.1", false, MCRCalendar.TAG_ETHIOPIC)),
-            MCRCalendar.TAG_ETHIOPIC);
-        assertEquals(MCRCalendar.getCalendarTypeString(
-            MCRCalendar.getHistoryDateAsCalendar("1.1.1", false, MCRCalendar.TAG_GREGORIAN)),
-            MCRCalendar.TAG_GREGORIAN);
-        assertEquals(MCRCalendar.getCalendarTypeString(
-            MCRCalendar.getHistoryDateAsCalendar("1.1.1", false, MCRCalendar.TAG_JULIAN)),
-            MCRCalendar.TAG_GREGORIAN);
-        assertEquals(MCRCalendar.getCalendarTypeString(
-            MCRCalendar.getHistoryDateAsCalendar("1.1.1", false, MCRCalendar.TAG_HEBREW)),
-            MCRCalendar.TAG_HEBREW);
-        assertEquals(MCRCalendar.getCalendarTypeString(
-            MCRCalendar.getHistoryDateAsCalendar("1.1.1", false, MCRCalendar.TAG_ISLAMIC)),
-            MCRCalendar.TAG_ISLAMIC);
-        assertEquals(MCRCalendar.getCalendarTypeString(
-            MCRCalendar.getHistoryDateAsCalendar("1.1.1H1", false, MCRCalendar.TAG_JAPANESE)),
-            MCRCalendar.TAG_JAPANESE);
-        assertEquals(MCRCalendar.getCalendarTypeString(
-            MCRCalendar.getHistoryDateAsCalendar("1.1.1", false, MCRCalendar.TAG_PERSIC)),
-            MCRCalendar.TAG_GREGORIAN);
-        assertEquals(MCRCalendar.getCalendarTypeString(
-            MCRCalendar.getHistoryDateAsCalendar("1.1.1", false, MCRCalendar.TAG_EGYPTIAN)),
-            MCRCalendar.TAG_GREGORIAN);
+        assertEquals(MCRCalendar.TAG_GREGORIAN, MCRCalendar.getCalendarTypeString(
+            MCRCalendar.getHistoryDateAsCalendar("1.1.1", false, MCRCalendar.TAG_ARMENIAN)));
+        assertEquals(MCRCalendar.TAG_BUDDHIST, MCRCalendar.getCalendarTypeString(
+            MCRCalendar.getHistoryDateAsCalendar("1.1.1", false, MCRCalendar.TAG_BUDDHIST)));
+        assertEquals(MCRCalendar.TAG_COPTIC, MCRCalendar.getCalendarTypeString(
+            MCRCalendar.getHistoryDateAsCalendar("1.1.1", false, MCRCalendar.TAG_COPTIC)));
+        assertEquals(MCRCalendar.TAG_ETHIOPIC, MCRCalendar.getCalendarTypeString(
+            MCRCalendar.getHistoryDateAsCalendar("1.1.1", false, MCRCalendar.TAG_ETHIOPIC)));
+        assertEquals(MCRCalendar.TAG_GREGORIAN, MCRCalendar.getCalendarTypeString(
+            MCRCalendar.getHistoryDateAsCalendar("1.1.1", false, MCRCalendar.TAG_GREGORIAN)));
+        assertEquals(MCRCalendar.TAG_GREGORIAN, MCRCalendar.getCalendarTypeString(
+            MCRCalendar.getHistoryDateAsCalendar("1.1.1", false, MCRCalendar.TAG_JULIAN)));
+        assertEquals(MCRCalendar.TAG_HEBREW, MCRCalendar.getCalendarTypeString(
+            MCRCalendar.getHistoryDateAsCalendar("1.1.1", false, MCRCalendar.TAG_HEBREW)));
+        assertEquals(MCRCalendar.TAG_ISLAMIC, MCRCalendar.getCalendarTypeString(
+            MCRCalendar.getHistoryDateAsCalendar("1.1.1", false, MCRCalendar.TAG_ISLAMIC)));
+        assertEquals(MCRCalendar.TAG_JAPANESE, MCRCalendar.getCalendarTypeString(
+            MCRCalendar.getHistoryDateAsCalendar("1.1.1H1", false, MCRCalendar.TAG_JAPANESE)));
+        assertEquals(MCRCalendar.TAG_GREGORIAN, MCRCalendar.getCalendarTypeString(
+            MCRCalendar.getHistoryDateAsCalendar("1.1.1", false, MCRCalendar.TAG_PERSIC)));
+        assertEquals(MCRCalendar.TAG_GREGORIAN, MCRCalendar.getCalendarTypeString(
+            MCRCalendar.getHistoryDateAsCalendar("1.1.1", false, MCRCalendar.TAG_EGYPTIAN)));
     }
 
     @Test

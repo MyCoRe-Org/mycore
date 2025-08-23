@@ -26,6 +26,7 @@ import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 
+@Deprecated(forRemoval = true)
 public abstract class MCRStoreTestCase extends MCRJPATestCase {
 
     private static MCRXMLMetadataManager store;

@@ -18,11 +18,11 @@
 
 package org.mycore.datamodel.ifs2;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -34,24 +34,26 @@ import java.util.Date;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.test.MyCoReTest;
 
 /**
  * JUnit test for MCRFile
  * 
  * @author Frank Lützenkirchen
  */
+@MyCoReTest
 public class MCRFileTest extends MCRIFS2TestCase {
     private MCRFileCollection col;
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-
         col = getStore().create();
     }
 
@@ -65,7 +67,8 @@ public class MCRFileTest extends MCRIFS2TestCase {
         file.renameTo("readme");
         assertEquals("readme", file.getName());
         assertEquals("", file.getExtension());
-        assertTrue(file.getLastModified() + " is not after " + created, file.getLastModified().after(created));
+        assertTrue(file.getLastModified().after(created),
+            file.getLastModified() + " is not after " + created);
     }
 
     @SuppressWarnings("deprecation")

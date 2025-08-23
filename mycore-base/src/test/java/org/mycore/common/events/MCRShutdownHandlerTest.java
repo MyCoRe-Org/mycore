@@ -18,17 +18,17 @@
 
 package org.mycore.common.events;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.NavigableSet;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class MCRShutdownHandlerTest {
     private MCRShutdownHandlerState mark;
@@ -39,7 +39,7 @@ public class MCRShutdownHandlerTest {
      * <p>
      * <b>Warning:</b> It should be used only in unit tests to test this class while keeping a clean state.
      */
-    @Before
+    @BeforeEach
     public void saveClosables() {
         this.mark = new MCRShutdownHandlerState(MCRShutdownHandler.getInstance().shuttingDown,
             MCRShutdownHandler.getInstance().requests);
@@ -53,7 +53,7 @@ public class MCRShutdownHandlerTest {
      * <p>
      * <b>Warning:</b> It should be used only in unit tests to test this class while keeping a clean state.
      */
-    @After
+    @AfterEach
     public void resetCloseables() {
         Optional.ofNullable(mark)
             .ifPresent(state -> {
@@ -84,8 +84,8 @@ public class MCRShutdownHandlerTest {
             @Override
             public void close() {
                 System.out.println("Closing very hi prio");
-                assertFalse("Low priority closeable was closed to early.", lowClosed.get());
-                assertFalse("High priority closeable was closed to early.", hiClosed.get());
+                assertFalse(lowClosed.get(), "Low priority closeable was closed to early.");
+                assertFalse(hiClosed.get(), "High priority closeable was closed to early.");
                 vHiClosed.set(true);
             }
 
@@ -103,8 +103,8 @@ public class MCRShutdownHandlerTest {
             @Override
             public void close() {
                 System.out.println("Closing low prio");
-                assertTrue("High priority closeable is not closed.", hiClosed.get());
-                assertTrue("Very high priority closeable is not closed.", vHiClosed.get());
+                assertTrue(hiClosed.get(), "High priority closeable is not closed.");
+                assertTrue(vHiClosed.get(), "Very high priority closeable is not closed.");
                 lowClosed.set(true);
             }
 
@@ -122,8 +122,8 @@ public class MCRShutdownHandlerTest {
             @Override
             public void close() {
                 System.out.println("Closing hi prio");
-                assertTrue("Very high priority closeable is not closed.", vHiClosed.get());
-                assertFalse("Low priority closeable was closed to early.", lowClosed.get());
+                assertTrue(vHiClosed.get(), "Very high priority closeable is not closed.");
+                assertFalse(lowClosed.get(), "Low priority closeable was closed to early.");
                 hiClosed.set(true);
             }
 

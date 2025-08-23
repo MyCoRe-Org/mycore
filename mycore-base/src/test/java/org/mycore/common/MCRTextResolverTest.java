@@ -18,19 +18,21 @@
 
 package org.mycore.common;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Hashtable;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTextResolver.CircularDependencyExecption;
 import org.mycore.common.MCRTextResolver.ResolveDepth;
 import org.mycore.common.MCRTextResolver.Term;
+import org.mycore.test.MyCoReTest;
 
-public class MCRTextResolverTest extends MCRTestCase {
+@MyCoReTest
+public class MCRTextResolverTest {
 
     @Test
     public void variables() {

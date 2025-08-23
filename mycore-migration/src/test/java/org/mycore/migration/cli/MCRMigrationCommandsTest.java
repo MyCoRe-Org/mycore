@@ -1,5 +1,7 @@
 package org.mycore.migration.cli;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mycore.migration.cli.MCRMigrationCommands.CHILDREN_ORDER_STRATEGY_PROPERTY;
 
 import java.io.IOException;
@@ -13,10 +15,9 @@ import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.xpath.XPathFactory;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRStoreTestCase;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -24,8 +25,14 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.migration.strategy.MCRAlwaysAddChildrenOrderStrategy;
 import org.mycore.mods.classification.mapping.MCRMODSGeneratorClassificationMapper;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MCRMetadataExtension;
+import org.mycore.test.MyCoReTest;
 
-public class MCRMigrationCommandsTest extends MCRStoreTestCase {
+@MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
+@ExtendWith(MCRMetadataExtension.class)
+public class MCRMigrationCommandsTest {
 
     public static final String TEST_FILE_DIRECTORY = "MCRMigrationCommandsTest/";
     public static final String TEST_FILE_1 = "mir_mods_00000001.xml";
@@ -45,10 +52,9 @@ public class MCRMigrationCommandsTest extends MCRStoreTestCase {
 
     private static void verifyNoChildrenElementLeft(Document migratedObject1) {
         // check if there are no children elements anymore in structure
-        Assert.assertNull("There should be no children elements anymore",
-            migratedObject1.getRootElement()
-                .getChild(MCRObjectStructure.XML_NAME)
-                .getChild("children"));
+        assertNull(migratedObject1.getRootElement()
+            .getChild(MCRObjectStructure.XML_NAME)
+            .getChild("children"), "There should be no children elements anymore");
     }
 
     private static void checkChildrenOrder(Document migratedObject1, MCRObjectID testID5, MCRObjectID testID2,
@@ -61,10 +67,10 @@ public class MCRMigrationCommandsTest extends MCRStoreTestCase {
             .map(el -> el.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE))
             .toList();
 
-        Assert.assertEquals("The should be 3 children", 3, hrefs.size());
-        Assert.assertEquals("The first child should be " + testID5, testID5.toString(), hrefs.get(0));
-        Assert.assertEquals("The second child should be " + testID2, testID2.toString(), hrefs.get(1));
-        Assert.assertEquals("The third child should be " + testID4, testID4.toString(), hrefs.get(2));
+        assertEquals(3, hrefs.size(), "The should be 3 children");
+        assertEquals(testID5.toString(), hrefs.get(0), "The first child should be " + testID5);
+        assertEquals(testID2.toString(), hrefs.get(1), "The second child should be " + testID2);
+        assertEquals(testID4.toString(), hrefs.get(2), "The third child should be " + testID4);
     }
 
     private static void checkNoGeneratedClassifications(Document migratedObject1) {
@@ -73,7 +79,7 @@ public class MCRMigrationCommandsTest extends MCRStoreTestCase {
                 + MCRMODSGeneratorClassificationMapper.GENERATOR_SUFFIX +
                 "')]", Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE)
             .evaluate(migratedObject1);
-        Assert.assertEquals("There should be no generated classifications anymore!", 0, list.size());
+        assertEquals(0, list.size(), "There should be no generated classifications anymore!");
     }
 
     @Test
@@ -81,7 +87,7 @@ public class MCRMigrationCommandsTest extends MCRStoreTestCase {
         properties = {
             @MCRTestProperty(key = "MCR.Metadata.Type.mods", string = "true"),
             @MCRTestProperty(key = CHILDREN_ORDER_STRATEGY_PROPERTY,
-                    classNameOf = MCRAlwaysAddChildrenOrderStrategy.class),
+                classNameOf = MCRAlwaysAddChildrenOrderStrategy.class),
         })
     public void migrateChildrenOrder() throws IOException, JDOMException {
         MCRObjectID testID1 = createTestData(TEST_FILE_DIRECTORY + TEST_FILE_1);
@@ -107,9 +113,9 @@ public class MCRMigrationCommandsTest extends MCRStoreTestCase {
         checkNoGeneratedClassifications(migratedObject1);
 
         // check if the derivates will be removed
-        Assert.assertNull("The derobjects should be removed", migratedObject1.getRootElement()
+        assertNull(migratedObject1.getRootElement()
             .getChild(MCRObjectStructure.XML_NAME)
-            .getChild(MCRObjectStructure.ELEMENT_DERIVATE_OBJECTS));
+            .getChild(MCRObjectStructure.ELEMENT_DERIVATE_OBJECTS), "The derobjects should be removed");
 
         MCRMigrationCommands.migrateNormalizedObject(testID2.toString());
         Document migratedObject2 = MCRXMLMetadataManager.getInstance().retrieveXML(testID2);
@@ -130,9 +136,9 @@ public class MCRMigrationCommandsTest extends MCRStoreTestCase {
             .compile(".//mods:relatedItem", Filters.element(), null,
                 MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE)
             .evaluate(migratedObject1);
-        Assert.assertEquals("There should be one relatedItem", 1, relatedItems.size());
+        assertEquals(1, relatedItems.size(), "There should be one relatedItem");
 
-        Assert.assertEquals("It should have no children", 0, relatedItems.get(0).getChildren().size());
+        assertEquals(0, relatedItems.get(0).getChildren().size(), "It should have no children");
     }
 
     private MCRObjectID createTestData(String file) throws IOException, JDOMException {

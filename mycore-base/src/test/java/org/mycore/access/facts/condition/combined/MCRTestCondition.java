@@ -23,7 +23,7 @@ import java.util.function.Supplier;
 import org.mycore.access.facts.MCRFactsHolder;
 import org.mycore.access.facts.condition.MCRAbstractCondition;
 
-class MCRTestCondition extends MCRAbstractCondition {
+public class MCRTestCondition extends MCRAbstractCondition {
     Supplier<Boolean> match;
 
     MCRTestCondition(Supplier<Boolean> match) {

@@ -18,17 +18,20 @@
 
 package org.mycore.access.facts.condition.fact;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.ArrayList;
 
 import org.jdom2.Element;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.access.facts.MCRFactsHolder;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.MCRTestCase;
+import org.mycore.test.MyCoReTest;
 
-public class MCRUserConditionTest extends MCRTestCase {
+@MyCoReTest
+public class MCRUserConditionTest {
 
     @Test
     public void testConditionMatch() {
@@ -36,7 +39,7 @@ public class MCRUserConditionTest extends MCRTestCase {
         MCRFactsHolder holder = new MCRFactsHolder(new ArrayList<>());
         MCRUserCondition userCondition = new MCRUserCondition();
         userCondition.parse(new Element("user").setText("administrator"));
-        Assert.assertTrue("User should be administrator", userCondition.matches(holder));
+        assertTrue(userCondition.matches(holder), "User should be administrator");
     }
 
     @Test
@@ -45,7 +48,7 @@ public class MCRUserConditionTest extends MCRTestCase {
         MCRFactsHolder holder = new MCRFactsHolder(new ArrayList<>());
         MCRUserCondition userCondition = new MCRUserCondition();
         userCondition.parse(new Element("user").setText("guest"));
-        Assert.assertFalse("User should not be administrator", userCondition.matches(holder));
+        assertFalse(userCondition.matches(holder), "User should not be administrator");
     }
 
 }

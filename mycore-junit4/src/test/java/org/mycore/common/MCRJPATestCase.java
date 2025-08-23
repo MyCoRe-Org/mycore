@@ -46,6 +46,7 @@ import jakarta.persistence.Persistence;
 import jakarta.persistence.Query;
 import jakarta.persistence.RollbackException;
 
+@Deprecated(forRemoval = true)
 public class MCRJPATestCase extends MCRTestCase {
 
     private EntityManager entityManager;

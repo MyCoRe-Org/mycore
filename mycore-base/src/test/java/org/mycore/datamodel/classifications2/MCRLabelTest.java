@@ -18,12 +18,13 @@
 
 package org.mycore.datamodel.classifications2;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.test.MyCoReTest;
 
-public class MCRLabelTest extends MCRTestCase {
+@MyCoReTest
+public class MCRLabelTest {
 
     @Test
     public final void testMCRLabelStringStringString() {

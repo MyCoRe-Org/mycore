@@ -18,27 +18,32 @@
 
 package org.mycore.backend.jpa.access;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.common.MCRJPATestCase;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MCRJPATestHelper;
+import org.mycore.test.MyCoReTest;
 
 /**
  * @author Thomas Scheffler (yagee)
  * 
  */
-public class MCRJPAAccessStoreTest extends MCRJPATestCase {
+@MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
+public class MCRJPAAccessStoreTest {
 
     private static final MCRACCESSRULE TRUE_RULE = getTrueRule();
 
@@ -46,16 +51,14 @@ public class MCRJPAAccessStoreTest extends MCRJPATestCase {
 
     private static MCRJPAAccessStore ACCESS_STORE;
 
-    @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         if (ACCESS_STORE == null) {
             ACCESS_STORE = new MCRJPAAccessStore();
         }
         MCREntityManagerProvider.getCurrentEntityManager().persist(TRUE_RULE);
         MCREntityManagerProvider.getCurrentEntityManager().persist(FALSE_RULE);
-        startNewTransaction();
+        MCRJPATestHelper.startNewTransaction();
 
     }
 
@@ -88,10 +91,9 @@ public class MCRJPAAccessStoreTest extends MCRJPATestCase {
         final String objID = "test";
         final String permission = "maytest";
         addRuleMapping(objID, permission, TRUE_RULE.getRid());
-        startNewTransaction();
-        assertNotNull(
-            MCREntityManagerProvider.getCurrentEntityManager().find(MCRACCESS.class,
-                new MCRACCESSPK(permission, objID)));
+        MCRJPATestHelper.startNewTransaction();
+        assertNotNull(MCREntityManagerProvider.getCurrentEntityManager().find(MCRACCESS.class,
+            new MCRACCESSPK(permission, objID)));
     }
 
     private MCRRuleMapping addRuleMapping(final String objID, final String permission, final String rid) {
@@ -114,11 +116,11 @@ public class MCRJPAAccessStoreTest extends MCRJPATestCase {
         final String objID = "test";
         final String permission = "maytest";
         addRuleMapping(objID, permission, TRUE_RULE.getRid());
-        startNewTransaction();
+        MCRJPATestHelper.startNewTransaction();
         String rid = ACCESS_STORE.getRuleID(objID, permission);
         assertEquals(TRUE_RULE.getRid(), rid);
         rid = ACCESS_STORE.getRuleID(objID, "notdefined");
-        assertEquals(null, rid);
+        assertNull(rid);
     }
 
     /**
@@ -130,12 +132,11 @@ public class MCRJPAAccessStoreTest extends MCRJPATestCase {
         final String objID = "test";
         final String permission = "maytest";
         MCRRuleMapping ruleMapping = addRuleMapping(objID, permission, TRUE_RULE.getRid());
-        startNewTransaction();
+        MCRJPATestHelper.startNewTransaction();
         ACCESS_STORE.deleteAccessDefinition(ruleMapping);
-        startNewTransaction();
-        assertNull(
-            MCREntityManagerProvider.getCurrentEntityManager().find(MCRACCESS.class,
-                new MCRACCESSPK(permission, objID)));
+        MCRJPATestHelper.startNewTransaction();
+        assertNull(MCREntityManagerProvider.getCurrentEntityManager().find(MCRACCESS.class,
+            new MCRACCESSPK(permission, objID)));
     }
 
     /**
@@ -147,10 +148,10 @@ public class MCRJPAAccessStoreTest extends MCRJPATestCase {
         final String objID = "test";
         final String permission = "maytest";
         MCRRuleMapping ruleMapping = addRuleMapping(objID, permission, TRUE_RULE.getRid());
-        startNewTransaction();
+        MCRJPATestHelper.startNewTransaction();
         ruleMapping.setRuleId(FALSE_RULE.getRid());
         ACCESS_STORE.updateAccessDefinition(ruleMapping);
-        startNewTransaction();
+        MCRJPATestHelper.startNewTransaction();
         MCRACCESS access = MCREntityManagerProvider.getCurrentEntityManager().find(MCRACCESS.class,
             new MCRACCESSPK(permission, objID));
         assertEquals(FALSE_RULE, access.getRule());
@@ -165,7 +166,7 @@ public class MCRJPAAccessStoreTest extends MCRJPATestCase {
         final String objID = "test";
         final String permission = "maytest";
         MCRRuleMapping ruleMapping = addRuleMapping(objID, permission, TRUE_RULE.getRid());
-        startNewTransaction();
+        MCRJPATestHelper.startNewTransaction();
         MCRRuleMapping ruleMapping2 = ACCESS_STORE.getAccessDefinition(permission, objID);
         // We will remove milliseconds as they don't need to be saved
         assertEquals((long) Math.floor(ruleMapping.getCreationdate().getTime() / 1000), ruleMapping2.getCreationdate()
@@ -185,7 +186,7 @@ public class MCRJPAAccessStoreTest extends MCRJPATestCase {
         final String objID = "test";
         final String permission = "maytest";
         addRuleMapping(objID, permission, TRUE_RULE.getRid());
-        startNewTransaction();
+        MCRJPATestHelper.startNewTransaction();
         List<String> results = ACCESS_STORE.getMappedObjectId(permission);
         assertEquals(1, results.size());
         assertEquals(objID, results.getFirst());
@@ -200,7 +201,7 @@ public class MCRJPAAccessStoreTest extends MCRJPATestCase {
         final String objID = "test";
         final String permission = "maytest";
         addRuleMapping(objID, permission, TRUE_RULE.getRid());
-        startNewTransaction();
+        MCRJPATestHelper.startNewTransaction();
         List<String> results = ACCESS_STORE.getPoolsForObject(objID);
         assertEquals(1, results.size());
         assertEquals(permission, results.getFirst());
@@ -215,7 +216,7 @@ public class MCRJPAAccessStoreTest extends MCRJPATestCase {
         final String objID = "test";
         final String permission = "maytest";
         addRuleMapping(objID, permission, TRUE_RULE.getRid());
-        startNewTransaction();
+        MCRJPATestHelper.startNewTransaction();
         List<String> results = ACCESS_STORE.getDatabasePools();
         assertEquals(1, results.size());
         assertEquals(permission, results.getFirst());
@@ -231,7 +232,7 @@ public class MCRJPAAccessStoreTest extends MCRJPATestCase {
         final String permission = "maytest";
         assertFalse(ACCESS_STORE.existsRule(objID, permission));
         addRuleMapping(objID, permission, TRUE_RULE.getRid());
-        startNewTransaction();
+        MCRJPATestHelper.startNewTransaction();
         assertTrue(ACCESS_STORE.existsRule(objID, permission));
     }
 
@@ -246,7 +247,7 @@ public class MCRJPAAccessStoreTest extends MCRJPATestCase {
         final String permission2 = "maytesttoo";
         addRuleMapping(objID, permission, TRUE_RULE.getRid());
         addRuleMapping(objID, permission2, FALSE_RULE.getRid());
-        startNewTransaction();
+        MCRJPATestHelper.startNewTransaction();
         List<String> results = ACCESS_STORE.getDistinctStringIDs();
         assertEquals(1, results.size());
         assertEquals(objID, results.getFirst());

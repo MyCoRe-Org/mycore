@@ -18,11 +18,13 @@
 
 package org.mycore.test.tests;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,11 +50,10 @@ public class MCRMetadataExtensionTest {
     public void testXMLMetadataManagerAvailable() {
         Path storeBaseDir = MCRConfiguration2.getOrThrow("MCR.Metadata.Store.BaseDir", Paths::get);
         System.out.println("Store BaseDir=" + storeBaseDir.toAbsolutePath());
-        Assertions.assertTrue(Files.isDirectory(storeBaseDir), "Store base dir should be a directory");
-        Assertions.assertTrue(storeBaseDir.getFileName().toString().startsWith("mcr-store"),
+        assertTrue(Files.isDirectory(storeBaseDir), "Store base dir should be a directory");
+        assertTrue(storeBaseDir.getFileName().toString().startsWith("mcr-store"),
             "Store base dir should start with 'mcr-store'");
-        Assertions.assertFalse(
-            MCRXMLMetadataManager.getInstance().exists(MCRObjectID.getInstance("MyCoRe_test_00004711")),
+        assertFalse(MCRXMLMetadataManager.getInstance().exists(MCRObjectID.getInstance("MyCoRe_test_00004711")),
             "MCRXMLMetadataManager should be available but the object should not exist");
     }
 

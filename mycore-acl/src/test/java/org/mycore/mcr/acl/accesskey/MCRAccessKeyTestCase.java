@@ -21,12 +21,9 @@ package org.mycore.mcr.acl.accesskey;
 import static org.mycore.datamodel.metadata.MCRObjectDerivate.ELEMENT_INTERNAL;
 import static org.mycore.datamodel.metadata.MCRObjectDerivate.ELEMENT_LINKMETA;
 
-import java.util.Map;
-
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.access.strategies.MCRAccessCheckStrategy;
 import org.mycore.backend.hibernate.MCRHIBLinkTableStore;
-import org.mycore.common.MCRStoreTestCase;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.metadata.MCRDerivate;

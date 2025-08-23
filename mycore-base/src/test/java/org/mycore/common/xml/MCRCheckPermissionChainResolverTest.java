@@ -18,7 +18,10 @@
 
 package org.mycore.common.xml;
 
-import java.util.Map;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
@@ -26,13 +29,23 @@ import javax.xml.transform.TransformerException;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.access.MCRAccessMock;
-import org.mycore.common.MCRTestCase;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
+import org.mycore.test.MyCoReTest;
 
-public class MCRCheckPermissionChainResolverTest extends MCRTestCase {
+@MyCoReTest
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Access.Class", classNameOf = MCRAccessMock.class),
+    @MCRTestProperty(key = "MCR.URIResolver.ModuleResolver." + MCRCheckPermissionChainResolverTest.MOCK_RESOLVER_PREFIX,
+        classNameOf = MCRMockResolver.class),
+    @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true")
+})
+public class MCRCheckPermissionChainResolverTest {
 
     private static final String RESOLVER_PREFIX = "checkPermissionChain";
 
@@ -51,9 +64,8 @@ public class MCRCheckPermissionChainResolverTest extends MCRTestCase {
 
     final JDOMSource resultSource = new JDOMSource(new Document(new Element("result")));
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         MCRMockResolver.setResultSource(resultSource);
         MCRURIResolver.obtainInstance().reinitialize();
     }
@@ -62,9 +74,9 @@ public class MCRCheckPermissionChainResolverTest extends MCRTestCase {
     public void resolveReadObjectForbidden() {
         MCRAccessMock.setMethodResult(false);
 
-        Assert.assertThrows(TransformerException.class, () -> MCRURIResolver.obtainInstance().resolve(READ_CALL, null));
+        assertThrows(TransformerException.class, () -> MCRURIResolver.obtainInstance().resolve(READ_CALL, null));
         assertReadCall();
-        Assert.assertEquals("The resolver should not have been called", 0, MCRMockResolver.getCalls().size());
+        assertEquals(0, MCRMockResolver.getCalls().size(), "The resolver should not have been called");
     }
 
     @Test
@@ -75,13 +87,13 @@ public class MCRCheckPermissionChainResolverTest extends MCRTestCase {
         try {
             result = MCRURIResolver.obtainInstance().resolve(READ_CALL, null);
         } catch (TransformerException e) {
-            Assert.fail("Exception thrown!");
+            fail("Exception thrown!");
         }
         assertReadCall();
-        Assert.assertEquals("The result source should be returned", resultSource, result);
-        Assert.assertEquals("The resolver should have been called", 1, MCRMockResolver.getCalls().size());
-        Assert.assertEquals("The Mock resolver should have been called with the right uri", MOCK_CALL,
-            MCRMockResolver.getCalls().getFirst().getHref());
+        assertEquals(resultSource, result, "The result source should be returned");
+        assertEquals(1, MCRMockResolver.getCalls().size(), "The resolver should have been called");
+        assertEquals(MOCK_CALL, MCRMockResolver.getCalls().getFirst().getHref(),
+            "The Mock resolver should have been called with the right uri");
     }
 
     @Test
@@ -92,13 +104,13 @@ public class MCRCheckPermissionChainResolverTest extends MCRTestCase {
         try {
             result = MCRURIResolver.obtainInstance().resolve(USE_STUFF_CALL, null);
         } catch (TransformerException e) {
-            Assert.fail("Exception thrown!");
+            fail("Exception thrown!");
         }
         assertPermissionCall();
-        Assert.assertEquals("The result source should be returned", resultSource, result);
-        Assert.assertEquals("The resolver should have been called", 1, MCRMockResolver.getCalls().size());
-        Assert.assertEquals("The Mock resolver should have been called with the right uri", MOCK_CALL,
-            MCRMockResolver.getCalls().getFirst().getHref());
+        assertEquals(resultSource, result, "The result source should be returned");
+        assertEquals(1, MCRMockResolver.getCalls().size(), "The resolver should have been called");
+        assertEquals(MOCK_CALL, MCRMockResolver.getCalls().getFirst().getHref(),
+            "The Mock resolver should have been called with the right uri");
 
     }
 
@@ -106,44 +118,35 @@ public class MCRCheckPermissionChainResolverTest extends MCRTestCase {
     public void resolvePermissionForbidden() {
         MCRAccessMock.setMethodResult(false);
 
-        Assert.assertThrows(TransformerException.class, () -> MCRURIResolver.obtainInstance()
+        assertThrows(TransformerException.class, () -> MCRURIResolver.obtainInstance()
             .resolve(USE_STUFF_CALL, null));
         assertPermissionCall();
-        Assert.assertEquals("The resolver should not have been called", 0, MCRMockResolver.getCalls().size());
+        assertEquals(0, MCRMockResolver.getCalls().size(), "The resolver should not have been called");
     }
 
     private void assertPermissionCall() {
-        Assert.assertEquals("There should be a call to the access strategy", 1,
-            MCRAccessMock.getCheckPermissionCalls().size());
-        Assert.assertEquals("The call should be made with permission " + PERMISSION_USE_STUFF, PERMISSION_USE_STUFF,
-            MCRAccessMock.getCheckPermissionCalls().getFirst().getPermission());
-        Assert.assertNull("The call should be made with null as id ",
-            MCRAccessMock.getCheckPermissionCalls().getFirst().getId());
+        assertEquals(1, MCRAccessMock.getCheckPermissionCalls().size(),
+            "There should be a call to the access strategy");
+        assertEquals(PERMISSION_USE_STUFF, MCRAccessMock.getCheckPermissionCalls().getFirst().getPermission(),
+            "The call should be made with permission " + PERMISSION_USE_STUFF);
+        assertNull(MCRAccessMock.getCheckPermissionCalls().getFirst().getId(),
+            "The call should be made with null as id ");
     }
 
     private void assertReadCall() {
-        Assert.assertEquals("There should be a call to the access strategy", 1,
-            MCRAccessMock.getCheckPermissionCalls().size());
-        Assert.assertEquals("The call should be made with permission read", MCRAccessManager.PERMISSION_READ,
-            MCRAccessMock.getCheckPermissionCalls().getFirst().getPermission());
-        Assert.assertEquals("The call should be made with the id " + MOCK_ID, MOCK_ID,
-            MCRAccessMock.getCheckPermissionCalls().getFirst().getId());
+        assertEquals(1, MCRAccessMock.getCheckPermissionCalls().size(),
+            "There should be a call to the access strategy");
+        assertEquals(MCRAccessManager.PERMISSION_READ,
+            MCRAccessMock.getCheckPermissionCalls().getFirst().getPermission(),
+            "The call should be made with permission read");
+        assertEquals(MOCK_ID, MCRAccessMock.getCheckPermissionCalls().getFirst().getId(),
+            "The call should be made with the id " + MOCK_ID);
     }
 
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
-        super.tearDown();
         MCRAccessMock.clearCheckPermissionCallsList();
         MCRMockResolver.clearCalls();
     }
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        final Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.Access.Class", MCRAccessMock.class.getName());
-        testProperties.put("MCR.URIResolver.ModuleResolver." + MOCK_RESOLVER_PREFIX, MCRMockResolver.class.getName());
-        testProperties.put("MCR.Metadata.Type.test", Boolean.TRUE.toString());
-
-        return testProperties;
-    }
 }

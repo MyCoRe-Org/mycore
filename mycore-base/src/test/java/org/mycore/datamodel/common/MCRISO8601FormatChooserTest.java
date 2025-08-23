@@ -18,7 +18,7 @@
 
 package org.mycore.datamodel.common;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,7 +27,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAccessor;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MCRISO8601FormatChooserTest {
 
@@ -39,58 +39,52 @@ public class MCRISO8601FormatChooserTest {
 
         String duration = "-16";
 
-        assertEquals(duration + " test failed", MCRISO8601FormatChooser.YEAR_FORMAT.format(localDate),
-            getFormat(localDate, duration));
+        assertEquals(MCRISO8601FormatChooser.YEAR_FORMAT.format(localDate), getFormat(localDate, duration),
+            duration + " test failed");
         duration = "2006";
-        assertEquals(duration + " test failed", MCRISO8601FormatChooser.YEAR_FORMAT.format(localDate),
-            getFormat(localDate, duration));
+        assertEquals(MCRISO8601FormatChooser.YEAR_FORMAT.format(localDate), getFormat(localDate, duration),
+            duration + " test failed");
         // test year-month
         duration = "2006-01";
-        assertEquals(duration + " test failed", MCRISO8601FormatChooser.YEAR_MONTH_FORMAT.format(localDate),
-            getFormat(localDate, duration));
+        assertEquals(MCRISO8601FormatChooser.YEAR_MONTH_FORMAT.format(localDate),
+            getFormat(localDate, duration), duration + " test failed");
         // test complete
         duration = "2006-01-18";
-        assertEquals(duration + " test failed", MCRISO8601FormatChooser.COMPLETE_FORMAT.format(localDate),
-            getFormat(localDate, duration));
+        assertEquals(MCRISO8601FormatChooser.COMPLETE_FORMAT.format(localDate),
+            getFormat(localDate, duration), duration + " test failed");
         // test complete with hour and minutes
         duration = "2006-01-18T11:08Z";
-        assertEquals(duration + " test failed", MCRISO8601FormatChooser.COMPLETE_HH_MM_FORMAT.format(zonedDateTime),
-            getFormat(zonedDateTime, duration));
+        assertEquals(MCRISO8601FormatChooser.COMPLETE_HH_MM_FORMAT.format(zonedDateTime),
+            getFormat(zonedDateTime, duration), duration + " test failed");
         duration = "2006-01-18T11:08+02:00";
-        assertEquals(duration + " test failed", MCRISO8601FormatChooser.COMPLETE_HH_MM_FORMAT.format(zonedDateTime),
-            getFormat(zonedDateTime, duration));
+        assertEquals(MCRISO8601FormatChooser.COMPLETE_HH_MM_FORMAT.format(zonedDateTime),
+            getFormat(zonedDateTime, duration), duration + " test failed");
         // test complete with hour, minutes and seconds
         duration = "2006-01-18T11:08:20Z";
-        assertEquals(duration + " test failed", MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_FORMAT.format(zonedDateTime),
-            getFormat(zonedDateTime, duration));
+        assertEquals(MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_FORMAT.format(zonedDateTime),
+            getFormat(zonedDateTime, duration), duration + " test failed");
         duration = "2006-01-18T11:08:20+02:00";
-        assertEquals(duration + " test failed", MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_FORMAT.format(zonedDateTime),
-            getFormat(zonedDateTime, duration));
+        assertEquals(MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_FORMAT.format(zonedDateTime),
+            getFormat(zonedDateTime, duration), duration + " test failed");
         // test complete with hour, minutes, seconds and fractions of a second
         duration = "2006-01-18T11:08:20.1Z";
-        assertEquals(duration + " test failed",
-            MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_SSS_FORMAT.format(zonedDateTime),
-            getFormat(zonedDateTime, duration));
+        assertEquals(MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_SSS_FORMAT.format(zonedDateTime),
+            getFormat(zonedDateTime, duration), duration + " test failed");
         duration = "2006-01-18T11:08:20.12Z";
-        assertEquals(duration + " test failed",
-            MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_SSS_FORMAT.format(zonedDateTime),
-            getFormat(zonedDateTime, duration));
+        assertEquals(MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_SSS_FORMAT.format(zonedDateTime),
+            getFormat(zonedDateTime, duration), duration + " test failed");
         duration = "2006-01-18T11:08:20.123Z";
-        assertEquals(duration + " test failed",
-            MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_SSS_FORMAT.format(zonedDateTime),
-            getFormat(zonedDateTime, duration));
+        assertEquals(MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_SSS_FORMAT.format(zonedDateTime),
+            getFormat(zonedDateTime, duration), duration + " test failed");
         duration = "2006-01-18T11:08:20.1+02:00";
-        assertEquals(duration + " test failed",
-            MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_SSS_FORMAT.format(zonedDateTime),
-            getFormat(zonedDateTime, duration));
+        assertEquals(MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_SSS_FORMAT.format(zonedDateTime),
+            getFormat(zonedDateTime, duration), duration + " test failed");
         duration = "2006-01-18T11:08:20.12+02:00";
-        assertEquals(duration + " test failed",
-            MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_SSS_FORMAT.format(zonedDateTime),
-            getFormat(zonedDateTime, duration));
+        assertEquals(MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_SSS_FORMAT.format(zonedDateTime),
+            getFormat(zonedDateTime, duration), duration + " test failed");
         duration = "2006-01-18T11:08:20.123+02:00";
-        assertEquals(duration + " test failed",
-            MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_SSS_FORMAT.format(zonedDateTime),
-            getFormat(zonedDateTime, duration));
+        assertEquals(MCRISO8601FormatChooser.COMPLETE_HH_MM_SS_SSS_FORMAT.format(zonedDateTime),
+            getFormat(zonedDateTime, duration), duration + " test failed");
     }
 
     private String getFormat(TemporalAccessor compareDate, String duration) {

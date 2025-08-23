@@ -18,22 +18,25 @@
 
 package org.mycore.access.facts.condition.fact;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mycore.access.facts.condition.fact.MCRFactsTestUtil.hackObjectIntoCache;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jdom2.Element;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.access.facts.MCRFactsHolder;
 import org.mycore.access.facts.fact.MCRObjectIDFact;
-import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
@@ -42,22 +45,21 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MyCoReTest;
 
-public class MCRCategoryConditionTest extends MCRJPATestCase {
+@MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true")
+})
+public class MCRCategoryConditionTest {
 
     MCRCategoryImpl clazz2;
     MCRCategoryImpl clazz1;
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.Metadata.Type.test", Boolean.TRUE.toString());
-        return testProperties;
-    }
-
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
 
         MCRCategoryDAO instance = MCRCategoryDAOFactory.obtainInstance();
         MCRCategoryImpl clazz = new MCRCategoryImpl();
@@ -95,8 +97,7 @@ public class MCRCategoryConditionTest extends MCRJPATestCase {
         MCRCategoryCondition categoryCondition = new MCRCategoryCondition();
 
         categoryCondition.parse(new Element("classification").setText("clazz:clazz1"));
-        Assert.assertTrue("Object should be linked with clazz1",
-            categoryCondition.matches(holder));
+        assertTrue(categoryCondition.matches(holder), "Object should be linked with clazz1");
 
     }
 
@@ -117,8 +118,7 @@ public class MCRCategoryConditionTest extends MCRJPATestCase {
         MCRCategoryCondition categoryCondition = new MCRCategoryCondition();
 
         categoryCondition.parse(new Element("classification").setText("clazz:clazz2"));
-        Assert.assertFalse("Object not should be linked with clazz2",
-            categoryCondition.matches(holder));
+        assertFalse(categoryCondition.matches(holder), "Object not should be linked with clazz2");
 
     }
 

@@ -18,17 +18,21 @@
 
 package org.mycore.datamodel.ifs2;
 
+import java.io.File;
 import java.net.MalformedURLException;
-import java.util.Map;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.io.TempDir;
+import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.test.MyCoReTest;
 
+@MyCoReTest
 public class MCRIFS2VersioningTestCase extends MCRIFS2TestCase {
-    @Rule
-    public TemporaryFolder versionBaseDir = new TemporaryFolder();
+
+    @TempDir
+    public File versionBaseDir;
 
     private MCRVersioningMetadataStore versStore;
 
@@ -37,8 +41,19 @@ public class MCRIFS2VersioningTestCase extends MCRIFS2TestCase {
         setVersStore(MCRStoreManager.createStore(STORE_ID, MCRVersioningMetadataStore.class));
     }
 
+    @BeforeEach
+    public void setUp() throws Exception {
+        try {
+            String url = versionBaseDir.toURI().toURL().toString();
+            MCRConfiguration2.set("MCR.IFS2.Store.TEST.SVNRepositoryURL", url);
+        } catch (MalformedURLException e) {
+            throw new MCRException(e);
+        }
+        super.setUp();
+    }
+
     @Override
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         super.tearDown();
         System.out.println("teardown: " + getVersStore().repURL);
@@ -59,15 +74,4 @@ public class MCRIFS2VersioningTestCase extends MCRIFS2TestCase {
         return getVersStore();
     }
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        try {
-            String url = versionBaseDir.getRoot().toURI().toURL().toString();
-            testProperties.put("MCR.IFS2.Store.TEST.SVNRepositoryURL", url);
-        } catch (MalformedURLException e) {
-            Assert.fail(e.getMessage());
-        }
-        return testProperties;
-    }
 }

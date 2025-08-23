@@ -24,9 +24,9 @@ import java.util.Vector;
 public class Table {
     private int currentCol;
 
-    private int[] colSize;
+    private final int[] colSize;
 
-    private int columns;
+    private final int columns;
 
     Vector<String> values;
 

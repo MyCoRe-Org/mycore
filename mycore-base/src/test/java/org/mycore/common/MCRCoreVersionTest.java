@@ -18,22 +18,25 @@
 
 package org.mycore.common;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.mycore.test.MyCoReTest;
 
 /**
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRCoreVersionTest extends MCRTestCase {
+@MyCoReTest
+public class MCRCoreVersionTest {
 
     /**
      * Test method for {@link org.mycore.common.MCRCoreVersion#getVersion()}.
      */
     @Test
     public void getVersion() {
-        assertTrue("Length of version string is zero.", MCRCoreVersion.getVersion().length() > 0);
+        assertFalse(MCRCoreVersion.getVersion().isEmpty(), "Length of version string is zero.");
     }
 
     /**
@@ -41,8 +44,8 @@ public class MCRCoreVersionTest extends MCRTestCase {
      */
     @Test
     public void getRevision() {
-        assertTrue("Revision is not a SHA1 hash: " + MCRCoreVersion.getRevision(),
-            MCRCoreVersion.getRevision().matches("[a-fA-F0-9]{40}"));
+        assertTrue(MCRCoreVersion.getRevision().matches("[a-fA-F0-9]{40}"),
+            "Revision is not a SHA1 hash: " + MCRCoreVersion.getRevision());
     }
 
 }

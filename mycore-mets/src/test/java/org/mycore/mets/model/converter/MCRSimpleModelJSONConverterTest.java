@@ -18,15 +18,15 @@
 
 package org.mycore.mets.model.converter;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mycore.mets.model.simple.MCRMetsSimpleModel;
 
 public class MCRSimpleModelJSONConverterTest {
 
     private MCRMetsSimpleModel metsSimpleModel;
 
-    @Before
+    @BeforeEach
     public void buildModel() {
         metsSimpleModel = MCRMetsTestUtil.buildMetsSimpleModel();
     }

@@ -18,21 +18,24 @@
 
 package org.mycore.common;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 
 import org.apache.logging.log4j.LogManager;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.mycore.test.MyCoReTest;
 
 /**
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRUtilsTest extends MCRTestCase {
+@MyCoReTest
+public class MCRUtilsTest {
 
     private static final String TEST = "Hello World!";
 
@@ -45,11 +48,11 @@ public class MCRUtilsTest extends MCRTestCase {
 
     private static final String TEST_MD5 = "ed076287532e86365e841e92bfc50d8c";
 
-    @Rule
-    public TemporaryFolder baseDir = new TemporaryFolder();
+    @TempDir
+    public File baseDir;
 
-    @Rule
-    public TemporaryFolder evilDir = new TemporaryFolder();
+    @TempDir
+    public File evilDir;
 
     /**
      * Test method for {@link org.mycore.common.MCRUtils#asSHA1String(int, byte[], String)}.
@@ -58,8 +61,8 @@ public class MCRUtilsTest extends MCRTestCase {
     public final void testAsSHA1String() {
         try {
             String sha1String = MCRUtils.asSHA1String(1, null, TEST);
-            assertEquals("SHA-1 string has not the right length", TEST_SHA1.length(), sha1String.length());
-            assertEquals("SHA-1 string does not match", TEST_SHA1, sha1String);
+            assertEquals(TEST_SHA1.length(), sha1String.length(), "SHA-1 string has not the right length");
+            assertEquals(TEST_SHA1, sha1String, "SHA-1 string does not match");
         } catch (NoSuchAlgorithmException e) {
             LogManager.getLogger(this.getClass()).warn("SHA-1 algorithm not available");
         }
@@ -72,8 +75,8 @@ public class MCRUtilsTest extends MCRTestCase {
     public final void testAsSHA256String() {
         try {
             String sha256String = MCRUtils.asSHA256String(1, null, TEST);
-            assertEquals("SHA-256 string has not the right length", TEST_SHA256.length(), sha256String.length());
-            assertEquals("SHA-256 string does not match", TEST_SHA256, sha256String);
+            assertEquals(TEST_SHA256.length(), sha256String.length(), "SHA-256 string has not the right length");
+            assertEquals(TEST_SHA256, sha256String, "SHA-256 string does not match");
         } catch (NoSuchAlgorithmException e) {
             LogManager.getLogger(this.getClass()).warn("SHA-256 algorithm not available");
         }
@@ -86,8 +89,8 @@ public class MCRUtilsTest extends MCRTestCase {
     public final void testAsSHA512String() {
         try {
             String sha512String = MCRUtils.asSHA512String(1, null, TEST);
-            assertEquals("SHA-512 string has not the right length", TEST_SHA512.length(), sha512String.length());
-            assertEquals("SHA-512 string does not match", TEST_SHA512, sha512String);
+            assertEquals(TEST_SHA512.length(), sha512String.length(), "SHA-512 string has not the right length");
+            assertEquals(TEST_SHA512, sha512String, "SHA-512 string does not match");
         } catch (NoSuchAlgorithmException e) {
             LogManager.getLogger(this.getClass()).warn("SHA-512 algorithm not available");
         }
@@ -100,21 +103,25 @@ public class MCRUtilsTest extends MCRTestCase {
     public final void testAsMD5String() {
         try {
             String md5String = MCRUtils.asMD5String(1, null, TEST);
-            assertEquals("MD5 string has not the right length", TEST_MD5.length(), md5String.length());
-            assertEquals("MD5 string does not match", TEST_MD5, md5String);
+            assertEquals(TEST_MD5.length(), md5String.length(), "MD5 string has not the right length");
+            assertEquals(TEST_MD5, md5String, "MD5 string does not match");
         } catch (NoSuchAlgorithmException e) {
             LogManager.getLogger(this.getClass()).warn("MD5 algorithm not available");
         }
     }
 
-    @Test(expected = MCRException.class)
+    @Test
     public final void testResolveEvil() {
-        MCRUtils.safeResolve(baseDir.getRoot().toPath(), evilDir.getRoot().toPath());
+        assertThrows(
+            MCRException.class,
+            () -> {
+                MCRUtils.safeResolve(baseDir.toPath(), evilDir.toPath());
+            });
     }
 
     @Test
     public final void testResolve() {
-        Path path = baseDir.getRoot().toPath();
+        Path path = baseDir.toPath();
         Path resolve = MCRUtils.safeResolve(path, "foo", "bar");
         assertEquals(path.resolve("foo").resolve("bar"), resolve);
     }

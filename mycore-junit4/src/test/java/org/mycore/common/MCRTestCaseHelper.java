@@ -33,6 +33,7 @@ import org.mycore.common.config.MCRConfigurationLoaderFactory;
 import org.mycore.common.config.MCRRuntimeComponentDetector;
 import org.mycore.common.xsl.MCRParameterCollector;
 
+@Deprecated(forRemoval = true)
 public class MCRTestCaseHelper {
 
     public static void beforeClass(TemporaryFolder junitFolder) throws IOException {

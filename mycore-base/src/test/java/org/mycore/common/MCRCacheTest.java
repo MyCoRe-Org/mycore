@@ -20,9 +20,11 @@ package org.mycore.common;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.mycore.test.MyCoReTest;
 
-public class MCRCacheTest extends MCRTestCase {
+@MyCoReTest
+public class MCRCacheTest {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
