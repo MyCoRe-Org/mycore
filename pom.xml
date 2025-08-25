@@ -177,9 +177,20 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
+      <!-- Bibsonomy is not hosted on Maven Central -->
       <id>dev.bibsonomy.org</id>
       <name>Official Source Code Releases of selected BibSonomy Modules</name>
       <url>https://dev.bibsonomy.org/maven2/</url>
+    </repository>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <!-- a simple, Maven-compliant download area on mycore.de 
+           mainly used for libraries that are not (no longer) available elsewhere -->
+      <id>mycore-maven-repo</id>
+      <name>Maven repository on mycore.de</name>
+      <url>https://www.mycore.de/maven-repo/</url>
     </repository>
   </repositories>
   <pluginRepositories>
