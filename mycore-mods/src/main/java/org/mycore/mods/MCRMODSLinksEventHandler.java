@@ -21,6 +21,7 @@ package org.mycore.mods;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
@@ -56,9 +57,11 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
             MCRCategLinkServiceFactory.obtainInstance().setLinks(objectReference, categories);
         }
         List<Element> linkingNodes = modsWrapper.getLinkedRelatedItems();
-        if (!linkingNodes.isEmpty()) {
+        List<Element> linkingPersons = modsWrapper.getLinkedPersons();
+        List<Element> joinedNodes = Stream.concat(linkingNodes.stream(), linkingPersons.stream()).toList();
+        if (!joinedNodes.isEmpty()) {
             MCRLinkTableManager linkTableManager = MCRLinkTableManager.getInstance();
-            for (Element linkingNode : linkingNodes) {
+            for (Element linkingNode : joinedNodes) {
                 String targetID = linkingNode.getAttributeValue(MCRXlink.HREF, MCRConstants.XLINK_NAMESPACE);
                 if (targetID == null) {
                     continue;
