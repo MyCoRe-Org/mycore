@@ -22,6 +22,7 @@ import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
 import org.mycore.common.MCRJSONManager;
+import org.mycore.common.MCRTestCase;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationLoader;
@@ -31,7 +32,7 @@ import org.mycore.frontend.classeditor.mocks.CategoryDAOMock;
 
 import com.google.gson.Gson;
 
-public class MCRCategoryJsonTest {
+public class MCRCategoryJsonTest extends MCRTestCase {
     @Test
     public void deserialize() throws Exception {
         final MCRConfigurationLoader configurationLoader = MCRConfigurationLoaderFactory.getConfigurationLoader();
