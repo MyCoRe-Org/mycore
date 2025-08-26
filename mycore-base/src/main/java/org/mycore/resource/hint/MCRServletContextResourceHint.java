@@ -26,6 +26,17 @@ import org.mycore.common.hint.MCRHintKey;
 
 import jakarta.servlet.ServletContext;
 
+/**
+ * A {@link MCRServletContextResourceHint} is a {@link MCRHint} for {@link MCRResourceHintKeys#SERVLET_CONTEXT}
+ * that uses {@link MCRServletContextHolder} to obtain a {@link ServletContext}.
+ * <p>
+ * No configuration options are available.
+ * <p>
+ * Example:
+ * <pre><code>
+ * [...].Class=org.mycore.resource.hint.MCRServletContextResourceHint
+ * </code></pre>
+ */
 public final class MCRServletContextResourceHint implements MCRHint<ServletContext> {
 
     @Override

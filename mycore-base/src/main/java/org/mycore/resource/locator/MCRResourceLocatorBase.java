@@ -25,6 +25,7 @@ import org.apache.logging.log4j.Level;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.MCRResourcePath;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
 import org.mycore.resource.common.MCRResourceTracer;
 
 /**
@@ -33,6 +34,11 @@ import org.mycore.resource.common.MCRResourceTracer;
  * ({@link MCRResourceLocatorBase#doLocate(MCRResourcePath, MCRHints, MCRResourceTracer)}).
  */
 public abstract class MCRResourceLocatorBase implements MCRResourceLocator {
+
+    @Override
+    public final Stream<URL> locate(MCRResourcePath path, MCRHints hints) {
+        return locate(path, hints, new MCRNoOpResourceTracer());
+    }
 
     @Override
     public final Stream<URL> locate(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {

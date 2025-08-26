@@ -24,7 +24,7 @@ import java.util.List;
 import org.mycore.common.hint.MCRHints;
 
 /**
- * A {@link MCRNoOpClasspathDirsProvider} implements a strategy to obtain the list of filesystem directories
+ * A {@link MCRClasspathDirsProvider} implements a strategy to obtain the list of filesystem directories
  * that are part of the classpath.
  */
 public interface MCRClasspathDirsProvider {

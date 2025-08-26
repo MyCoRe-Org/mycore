@@ -18,6 +18,7 @@
 
 package org.mycore.resource.provider;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
@@ -26,14 +27,8 @@ import org.mycore.common.config.MCRComponent;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.log.MCRTreeMessage;
-import org.mycore.resource.filter.MCRCombinedResourceFilter;
-import org.mycore.resource.filter.MCRLibraryResourceFilter;
 import org.mycore.resource.filter.MCRResourceFilterMode;
 import org.mycore.resource.filter.MCRWebappLibraryResourceFilter;
-import org.mycore.resource.locator.MCRClassLoaderResourceLocator;
-import org.mycore.resource.selector.MCRCombinedResourceSelector;
-import org.mycore.resource.selector.MCRFirstServletLibraryResourceSelector;
-import org.mycore.resource.selector.MCRHighestComponentPriorityResourceSelector;
 
 /**
  * A {@link MCRWebappLibraryResourceProvider} is a {@link MCRResourceProvider} that looks up resources
@@ -56,22 +51,14 @@ import org.mycore.resource.selector.MCRHighestComponentPriorityResourceSelector;
  * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRWebappLibraryResourceProvider.Factory.class)
-public final class MCRWebappLibraryResourceProvider extends MCRLFSResourceProvider {
+public final class MCRWebappLibraryResourceProvider extends MCRLibraryResourceProviderBase {
 
     public static final String MODE_KEY = "Mode";
 
     private final MCRResourceFilterMode mode;
 
     public MCRWebappLibraryResourceProvider(String coverage, MCRResourceFilterMode mode) {
-        super(
-            coverage,
-            new MCRClassLoaderResourceLocator(),
-            new MCRCombinedResourceFilter(
-                new MCRLibraryResourceFilter(MCRResourceFilterMode.MUST_MATCH),
-                new MCRWebappLibraryResourceFilter(mode)),
-            new MCRCombinedResourceSelector(
-                new MCRHighestComponentPriorityResourceSelector(),
-                new MCRFirstServletLibraryResourceSelector()));
+        super(coverage, List.of(new MCRWebappLibraryResourceFilter(mode)));
         this.mode = Objects.requireNonNull(mode, "Mode must not be null");
     }
 
