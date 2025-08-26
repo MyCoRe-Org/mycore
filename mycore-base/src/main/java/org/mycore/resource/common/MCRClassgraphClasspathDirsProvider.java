@@ -52,11 +52,12 @@ public final class MCRClassgraphClasspathDirsProvider implements MCRClasspathDir
 
         List<Path> classpathDirs = new LinkedList<>();
 
+        LinkOption[] linkOptions = MCRResourceUtils.linkOptions();
         List<URI> classpathEntries = MCRClassgraphUtil.scanClasspath(classLoader);
         for (URI classpathEntry : classpathEntries) {
             if (classpathEntry.getScheme().equals("file")) {
                 Path classpathDirOrJarFile = Path.of(classpathEntry);
-                if (Files.isDirectory(classpathDirOrJarFile, LinkOption.NOFOLLOW_LINKS)) {
+                if (Files.isDirectory(classpathDirOrJarFile, linkOptions)) {
                     classpathDirs.add(classpathDirOrJarFile);
                 }
             }

@@ -18,17 +18,12 @@
 
 package org.mycore.resource.provider;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 import org.mycore.common.config.MCRComponent;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
-import org.mycore.resource.filter.MCRLibraryResourceFilter;
-import org.mycore.resource.filter.MCRResourceFilterMode;
-import org.mycore.resource.locator.MCRClassLoaderResourceLocator;
-import org.mycore.resource.selector.MCRCombinedResourceSelector;
-import org.mycore.resource.selector.MCRFirstServletLibraryResourceSelector;
-import org.mycore.resource.selector.MCRHighestComponentPriorityResourceSelector;
 
 /**
  * A {@link MCRLibraryResourceProvider} is a {@link MCRResourceProvider} that looks up resources
@@ -47,16 +42,10 @@ import org.mycore.resource.selector.MCRHighestComponentPriorityResourceSelector;
  * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRLibraryResourceProvider.Factory.class)
-public final class MCRLibraryResourceProvider extends MCRLFSResourceProvider {
+public final class MCRLibraryResourceProvider extends MCRLibraryResourceProviderBase {
 
     public MCRLibraryResourceProvider(String coverage) {
-        super(
-            coverage,
-            new MCRClassLoaderResourceLocator(),
-            new MCRLibraryResourceFilter(MCRResourceFilterMode.MUST_MATCH),
-            new MCRCombinedResourceSelector(
-                new MCRHighestComponentPriorityResourceSelector(),
-                new MCRFirstServletLibraryResourceSelector()));
+        super(coverage, List.of());
     }
 
     @Override

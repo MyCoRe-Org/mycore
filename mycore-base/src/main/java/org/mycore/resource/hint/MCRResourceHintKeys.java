@@ -35,12 +35,6 @@ import jakarta.servlet.ServletContext;
  */
 public final class MCRResourceHintKeys {
 
-    public static final MCRHintKey<Path> CONFIG_DIR = new MCRHintKey<>(
-        Path.class,
-        MCRResourceHintKeys.class,
-        "CONFIG_DIR",
-        path -> path.toAbsolutePath().toString());
-
     public static final MCRHintKey<ClassLoader> CLASS_LOADER = new MCRHintKey<>(
         ClassLoader.class,
         MCRResourceHintKeys.class,
@@ -64,6 +58,12 @@ public final class MCRResourceHintKeys {
             }
         }),
         List.of());
+
+    public static final MCRHintKey<Path> CONFIG_DIR = new MCRHintKey<>(
+        Path.class,
+        MCRResourceHintKeys.class,
+        "CONFIG_DIR",
+        path -> path.toAbsolutePath().toString());
 
     public static final MCRHintKey<ServletContext> SERVLET_CONTEXT = new MCRHintKey<>(
         ServletContext.class,

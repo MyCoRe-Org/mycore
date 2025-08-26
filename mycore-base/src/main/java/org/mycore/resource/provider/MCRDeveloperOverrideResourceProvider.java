@@ -22,10 +22,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.hint.MCRHints;
 
 /**
  * A {@link MCRDeveloperOverrideResourceProvider} is a {@link MCRResourceProvider} that looks up resources
@@ -47,17 +49,21 @@ import org.mycore.common.config.annotation.MCRProperty;
  * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRDeveloperOverrideResourceProvider.Factory.class)
-public final class MCRDeveloperOverrideResourceProvider extends MCRFileSystemResourceProvider {
+public final class MCRDeveloperOverrideResourceProvider extends MCRFileSystemResourceProviderBase {
 
     public static final String DEVELOPER_RESOURCE_OVERRIDE_PROPERTY = "MCR.Developer.Resource.Override";
 
+    private final List<Path> paths;
+
     public MCRDeveloperOverrideResourceProvider(String coverage) {
-        super(coverage, MCRResourceProviderMode.RESOURCES, getBaseDirs());
+        super(coverage, MCRResourceProviderMode.RESOURCES);
+        String paths = MCRConfiguration2.getString(DEVELOPER_RESOURCE_OVERRIDE_PROPERTY).orElse("");
+        this.paths = MCRConfiguration2.splitValue(paths).map(Paths::get).toList();
     }
 
-    private static List<Path> getBaseDirs() {
-        String paths = MCRConfiguration2.getString(DEVELOPER_RESOURCE_OVERRIDE_PROPERTY).orElse("");
-        return MCRConfiguration2.splitValue(paths).map(Paths::get).toList();
+    @Override
+    protected Stream<Path> getBaseDirs(MCRHints hints) {
+        return paths.stream();
     }
 
     @Override

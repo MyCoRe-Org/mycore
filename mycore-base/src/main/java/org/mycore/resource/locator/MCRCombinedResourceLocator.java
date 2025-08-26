@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceList;
+import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.resource.MCRResourcePath;
 import org.mycore.resource.common.MCRResourceTracer;
@@ -87,7 +88,8 @@ public class MCRCombinedResourceLocator extends MCRResourceLocatorBase {
 
     public static class Factory implements Supplier<MCRCombinedResourceLocator> {
 
-        @MCRInstanceList(name = LOCATORS_KEY, valueClass = MCRResourceLocator.class, required = false)
+        @MCRInstanceList(name = LOCATORS_KEY, valueClass = MCRResourceLocator.class, required = false,
+            sentinel = @MCRSentinel)
         public List<MCRResourceLocator> locators;
 
         @Override

@@ -25,6 +25,19 @@ import org.mycore.common.events.MCRServletContextHolder;
 import org.mycore.common.hint.MCRHint;
 import org.mycore.common.hint.MCRHintKey;
 
+import jakarta.servlet.ServletContext;
+
+/**
+ * A {@link MCRWebappDirResourceHint} is a {@link MCRHint} for {@link MCRResourceHintKeys#WEBAPP_DIR}
+ * that uses {@link MCRServletContextHolder} to obtain a {@link ServletContext} and resolve the webapp directory.
+ * <p>
+ * No configuration options are available.
+ * <p>
+ * Example:
+ * <pre><code>
+ * [...].Class=org.mycore.resource.hint.MCRWebappDirResourceHint
+ * </code></pre>
+ */
 public final class MCRWebappDirResourceHint implements MCRHint<Path> {
 
     @Override

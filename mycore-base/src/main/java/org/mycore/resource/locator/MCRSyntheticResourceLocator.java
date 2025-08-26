@@ -63,7 +63,7 @@ import org.mycore.resource.provider.MCRResourceProvider.PrefixStripper;
  * </code></pre>
  */
 @MCRConfigurationProxy(proxyClass = MCRSyntheticResourceLocator.Factory.class)
-public class MCRSyntheticResourceLocator extends MCRResourceLocatorBase {
+public final class MCRSyntheticResourceLocator extends MCRResourceLocatorBase {
 
     public static final String SPECS_KEY = "Specs";
 
