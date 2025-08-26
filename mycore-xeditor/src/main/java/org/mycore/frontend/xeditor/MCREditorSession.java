@@ -60,6 +60,8 @@ public class MCREditorSession {
     private Map<String, String[]> requestParameters = new HashMap<>();
 
     private Map<String, Object> variables;
+    
+    private MCRTransformerHelper transformerHelper; 
 
     private String cancelURL;
 
@@ -142,6 +144,14 @@ public class MCREditorSession {
 
     public Map<String, String[]> getRequestParameters() {
         return requestParameters;
+    }
+
+    public MCRTransformerHelper getTransformerHelper() {
+        return transformerHelper;
+    }
+
+    public void setTransformerHelper(MCRTransformerHelper transformerHelper) {
+        this.transformerHelper = transformerHelper;
     }
 
     public String getCancelURL() {

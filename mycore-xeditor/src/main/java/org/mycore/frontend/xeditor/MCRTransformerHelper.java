@@ -19,7 +19,8 @@
 package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -49,8 +50,6 @@ import org.mycore.frontend.xeditor.target.MCRSubselectTarget;
 import org.mycore.frontend.xeditor.target.MCRSwapTarget;
 import org.mycore.frontend.xeditor.validation.MCRValidator;
 import org.mycore.services.i18n.MCRTranslation;
-import org.w3c.dom.Attr;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -77,29 +76,19 @@ public class MCRTransformerHelper {
         MCRConstants.registerNamespace(Namespace.getNamespace(prefix, uri));
     }
 
-    public void readSourceXML(String uri) throws JDOMException, IOException, SAXException, TransformerException {
+    void readSourceXML(String uri) throws JDOMException, IOException, SAXException, TransformerException {
         editorSession.setEditedXML(uri);
     }
 
-    public void setCancelURL(String cancelURL) {
+    void setCancelURL(String cancelURL) {
         editorSession.setCancelURL(cancelURL);
     }
 
-    public void initializePostprocessor(Node postProcessorNode) {
-        NamedNodeMap attributes = postProcessorNode.getAttributes();
-        int attributesLength = attributes.getLength();
-        Map<String, String> attributeMap = new HashMap<>();
-        for (int i = 0; i < attributesLength; i++) {
-            Attr item = (Attr) attributes.item(i); // this should be save because we called getAttributes earlier
-            String attrName = item.getName();
-            String attrValue = item.getValue();
-            attributeMap.put(attrName, attrValue);
-        }
-
+    void initializePostprocessor(Map<String, String> attributeMap) {
         editorSession.getPostProcessor().setAttributes(attributeMap);
     }
 
-    public void setPostProcessor(String clazz) {
+    void setPostProcessor(String clazz) {
         try {
             MCRXEditorPostProcessor instance = ((MCRXEditorPostProcessor) MCRClassTools.forName(clazz)
                 .getDeclaredConstructor()
@@ -114,21 +103,21 @@ public class MCRTransformerHelper {
         return getXPathEvaluator().replaceXPaths(uri, false);
     }
 
-    public void bind(Node bindNode) throws JaxenException {
-        org.w3c.dom.Element bindElement = (org.w3c.dom.Element)bindNode;
-        String xPath = bindElement.getAttribute("xpath");
-        String initialValue = bindElement.getAttribute("initially");
-        String name = bindElement.getAttribute("name");
+    void bind(Map<String, String> attributes) throws JaxenException {
+        String xPath = attributes.get("xpath");
+        String initialValue = attributes.getOrDefault("initially", null);
+        String name = attributes.getOrDefault("name", null);
+
         bind(xPath, initialValue, name);
 
-        Attr setAttr = bindElement.getAttributeNode("set");
+        String setAttr = attributes.getOrDefault("set", null);
         if (setAttr != null) {
-            setValues(setAttr.getValue());
+            setValues(setAttr);
         }
 
-        Attr setDefault = bindElement.getAttributeNode("default");
+        String setDefault = attributes.getOrDefault("default", null);
         if (setDefault != null) {
-            setDefault(setDefault.getValue());
+            setDefault(setDefault);
         }
     }
 
@@ -142,7 +131,9 @@ public class MCRTransformerHelper {
             currentBinding = editorSession.getRootBinding();
         }
 
-        initialValue = replaceXPaths(initialValue);
+        if (initialValue != null) {
+            initialValue = replaceXPaths(initialValue);
+        }
         setCurrentBinding(new MCRBinding(xPath, initialValue, name, currentBinding));
     }
 
@@ -169,14 +160,14 @@ public class MCRTransformerHelper {
     private void setValues(String value) {
         currentBinding.setValues(replaceXPaths(value));
     }
-    
+
     private void setDefault(String value) {
         value = replaceXPaths(value);
         currentBinding.setDefault(value);
         editorSession.getSubmission().markDefaultValue(currentBinding.getAbsoluteXPath(), value);
     }
-    
-    public void unbind() {
+
+    void unbind() {
         setCurrentBinding(currentBinding.getParent());
     }
 
@@ -193,7 +184,7 @@ public class MCRTransformerHelper {
         return currentBinding.hasValue(value);
     }
 
-    public void toggleWithinSelectElement(String attrMultiple) {
+    void toggleWithinSelectElement(String attrMultiple) {
         withinSelectElement = !withinSelectElement;
         withinSelectMultiple = Objects.equals(attrMultiple, "multiple");
     }
@@ -218,7 +209,7 @@ public class MCRTransformerHelper {
         return getXPathEvaluator().evaluateXPath(xPathExpression);
     }
 
-    public String output(String attrValue, String attrI18N) {
+    String output(String attrValue, String attrI18N) {
         if (!StringUtils.isEmpty(attrI18N)) {
             String key = replaceParameters(attrI18N);
 
@@ -235,7 +226,7 @@ public class MCRTransformerHelper {
             return getValue();
         }
     }
-    
+
     public boolean test(String xPathExpression) {
         return getXPathEvaluator().test(xPathExpression);
     }
@@ -248,11 +239,14 @@ public class MCRTransformerHelper {
         }
     }
 
-    public String repeat(String xPath, int minRepeats, int maxRepeats, String method)
+    List<Element> repeat(String xPath, int minRepeats, int maxRepeats, String method)
         throws JaxenException {
         MCRRepeatBinding repeat = new MCRRepeatBinding(xPath, currentBinding, minRepeats, maxRepeats, method);
         setCurrentBinding(repeat);
-        return StringUtils.repeat("a ", repeat.getBoundNodes().size());
+
+        List<Element> repeats = new ArrayList<Element>();
+        repeat.getBoundNodes().forEach(node -> repeats.add(new Element("repeat")));
+        return repeats;
     }
 
     private MCRRepeatBinding getCurrentRepeat() {
@@ -263,11 +257,11 @@ public class MCRTransformerHelper {
         return (MCRRepeatBinding) binding;
     }
 
-    public int getNumRepeats() {
+    int getNumRepeats() {
         return getCurrentRepeat().getBoundNodes().size();
     }
 
-    public int getMaxRepeats() {
+    int getMaxRepeats() {
         return getCurrentRepeat().getMaxRepeats();
     }
 
@@ -302,7 +296,7 @@ public class MCRTransformerHelper {
         return (anchorID == 0 ? 1 : anchorID - 1);
     }
 
-    public void loadResource(String uri, String name) {
+    void loadResource(String uri, String name) {
         Element resource = MCRURIResolver.obtainInstance().resolve(replaceXPaths(uri));
         editorSession.getVariables().put(name, resource);
     }
@@ -370,11 +364,11 @@ public class MCRTransformerHelper {
         return element;
     }
 
-    public void addCleanupRule(String xPath, String relevantIf) {
+    void addCleanupRule(String xPath, String relevantIf) {
         editorSession.getXMLCleaner().addRule(xPath, relevantIf);
     }
 
-    public void declareParameter(String name, String defaultValue) {
+    void declareParameter(String name, String defaultValue) {
         Object currentValue = editorSession.getVariables().get(name);
 
         if ((currentValue == null) || Objects.equals(currentValue, "")) {

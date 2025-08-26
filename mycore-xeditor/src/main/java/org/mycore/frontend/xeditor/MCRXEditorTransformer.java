@@ -50,7 +50,9 @@ public class MCRXEditorTransformer {
         MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer("xeditor");
         if (transformer instanceof MCRParameterizedTransformer parameterizedTransformer) {
             MCRTransformerHelper helper = new MCRTransformerHelper(editorSession);
+            editorSession.setTransformerHelper(helper);
             transformationParameters.setParameter("helper", helper);
+            transformationParameters.setParameter("SessionID", editorSession.getID());
 
             MCRContent result = parameterizedTransformer.transform(editorSource, transformationParameters);
             if (result instanceof MCRWrappedContent wrappedContent
@@ -59,6 +61,7 @@ public class MCRXEditorTransformer {
                 result = wrappedContent.getBaseContent();
             }
             
+            editorSession.setTransformerHelper(null);
             editorSession.getValidator().clearValidationResults();
             return result;
         } else {
