@@ -175,9 +175,8 @@
   </xsl:template>
 
   <xsl:template match="select" mode="xeditor">
-    <xsl:call-template name="callTransformerHelper" />
     <xsl:copy>
-      <xsl:apply-templates select="." mode="add-attributes" />
+      <xsl:call-template name="callTransformerHelper" />
       <xsl:apply-templates select="@*|text()|*" mode="xeditor" />
     </xsl:copy>
     <xsl:call-template name="callTransformerHelper" />
@@ -189,25 +188,8 @@
     </xsl:call-template>
   </xsl:template>
 
-  <xsl:template match="select[helper:isWithinSelectMultiple($helper)]" mode="add-attributes">
-    <xsl:attribute name="name">
-      <xsl:variable name="xPath" select="helper:getAbsoluteXPath($helper)" />
-      <xsl:choose>
-        <!-- If we are bound to the first element, it means we are bound to all elements -->
-        <xsl:when test="substring($xPath,string-length($xPath)-2)='[1]'">
-          <xsl:value-of select="substring($xPath,0,string-length($xPath)-2)" />
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="$xPath" />
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:attribute>
-  </xsl:template>
-
-  <xsl:template match="textarea|select" mode="add-attributes">
-    <xsl:attribute name="name">
-      <xsl:value-of select="helper:getAbsoluteXPath($helper)" />
-    </xsl:attribute>
+  <xsl:template match="textarea" mode="add-attributes">
+    <xsl:call-template name="callTransformerHelper" />
   </xsl:template>
 
   <xsl:template match="textarea" mode="add-content">

@@ -132,15 +132,7 @@ public class MCRTransformerHelperResolver implements URIResolver {
                 case "input": {
                     String type = attributes.get("type");
 
-                    String xPath = tfhelper.getAbsoluteXPath();
-                    if ("checkbox".equals(type)) {
-                        if (xPath.endsWith("[1]")) {
-                            xPath = xPath.substring(0, xPath.length() - 3);
-                        }
-                        result.setAttribute("name", xPath);
-                    } else {
-                        result.setAttribute("name", xPath);
-                    }
+                    setXPath(tfhelper, result, "checkbox".equals(type));
 
                     if ("radio".equals(type) || "checkbox".equals(type)) {
                         String value = attributes.get("value");
@@ -150,6 +142,10 @@ public class MCRTransformerHelperResolver implements URIResolver {
                     } else {
                         result.setAttribute("value", tfhelper.getValue());
                     }
+                    break;
+                }
+                case "textarea": {
+                    result.setAttribute("name", tfhelper.getAbsoluteXPath());
                     break;
                 }
                 case "if": {
@@ -185,6 +181,11 @@ public class MCRTransformerHelperResolver implements URIResolver {
                 case "select": {
                     String multiple = attributes.getOrDefault("multiple", null);
                     tfhelper.toggleWithinSelectElement(multiple);
+
+                    if (tfhelper.isWithinSelectElement()) {
+                        setXPath(tfhelper, result, tfhelper.isWithinSelectMultiple());
+                    }
+
                     break;
                 }
                 case "option": {
@@ -224,6 +225,14 @@ public class MCRTransformerHelperResolver implements URIResolver {
         return new JDOMSource(result);
     }
 
+    private void setXPath(MCRTransformerHelper tfhelper, Element result, boolean fixPathForMultiple) {
+        String xPath = tfhelper.getAbsoluteXPath();
+        if (fixPathForMultiple && xPath.endsWith("[1]")) {
+            xPath = xPath.substring(0, xPath.length() - 3);
+        }
+        result.setAttribute("name", xPath);
+    }
+
     private void registerAdditionalNamespaces(MCRTransformerHelper tfhelper, Map<String, String> attributes) {
         attributes.forEach((key, value) -> {
             if (key.startsWith("xmlns:")) {
@@ -231,6 +240,7 @@ public class MCRTransformerHelperResolver implements URIResolver {
                 tfhelper.addNamespace(prefix, attributes.get(key));
             }
         });
+        attributes.keySet().removeIf(key -> key.startsWith("xmlns:"));
     }
 
     private Map<String, String> parseAttributes(StringTokenizer st) {
