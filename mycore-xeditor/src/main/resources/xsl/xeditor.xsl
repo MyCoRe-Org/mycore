@@ -1,10 +1,12 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xed="http://www.mycore.de/xeditor"
                 xmlns:xalan="http://xml.apache.org/xalan"
+                xmlns:encoder="xalan://java.net.URLEncoder"
+                xmlns:math="xalan://java.lang.Math" 
                 xmlns:helper="xalan://org.mycore.frontend.xeditor.MCRTransformerHelper"
                 xmlns:includer="xalan://org.mycore.frontend.xeditor.MCRIncludeHandler"
-                exclude-result-prefixes="xsl xed xalan helper includer">
+                exclude-result-prefixes="xsl xed xalan encoder math helper includer">
 
   <xsl:strip-space elements="xed:*" />
 
@@ -21,14 +23,14 @@
   <!-- ========== <xed:form /> output-only ========== -->
 
   <xsl:template match="xed:form[@method='output']">
-    <xsl:call-template name="registerAdditionalNamespaces" />
+    <xsl:call-template name="callTransformerHelper" />
     <xsl:apply-templates select="@*|node()" mode="xeditor" />
   </xsl:template>
 
   <!-- ========== <xed:form /> ========== -->
 
   <xsl:template match="xed:form">
-    <xsl:call-template name="registerAdditionalNamespaces" />
+    <xsl:call-template name="callTransformerHelper" />
     <form>
       <xsl:apply-templates select="@*" mode="xeditor" />
       <xsl:attribute name="action">
@@ -47,14 +49,6 @@
     </form>
   </xsl:template>
 
-  <!-- ========== register additional namespaces ========== -->
-
-  <xsl:template name="registerAdditionalNamespaces">
-    <xsl:for-each select="namespace::*">
-      <xsl:value-of select="helper:addNamespace($helper,name(),.)" />
-    </xsl:for-each>
-  </xsl:template>
-
   <!-- ========== pass request parameters ========== -->
 
   <xsl:template name="passAdditionalParameters">
@@ -65,25 +59,10 @@
     </div>
   </xsl:template>
 
-  <!-- ========== <xed:source uri="" /> ========== -->
+  <!-- ========== xed:source et al ========== -->
 
-  <xsl:template match="xed:source" mode="xeditor">
-    <xsl:value-of select="helper:readSourceXML($helper,@uri)" />
-  </xsl:template>
-
-  <!-- ========== <xed:cancel url="" /> ========== -->
-
-  <xsl:template match="xed:cancel" mode="xeditor">
-    <xsl:value-of select="helper:setCancelURL($helper,@url)" />
-  </xsl:template>
-
-  <!-- ========== <xed:post-processor xsl="" /> ========== -->
-
-  <xsl:template match="xed:post-processor" mode="xeditor">
-    <xsl:if test="@class">
-      <xsl:value-of select="helper:setPostProcessor($helper,@class)" />
-    </xsl:if>
-    <xsl:value-of select="helper:initializePostprocessor($helper,.)" />
+  <xsl:template match="xed:source|xed:cancel|xed:param|xed:cleanup-rule|xed:load-resource|xed:output|xed:post-processor" mode="xeditor">
+    <xsl:call-template name="callTransformerHelper" />
   </xsl:template>
 
   <!-- ========== <xed:preload uri="" static="true|false" /> ========== -->
@@ -143,11 +122,15 @@
   <!-- ========== <xed:bind xpath="" initially="value"|default="value"|set="value" name="" /> ========== -->
 
   <xsl:template match="xed:bind" mode="xeditor">
-    <xsl:call-template name="registerAdditionalNamespaces" />
-    
-    <xsl:value-of select="helper:bind($helper,.)" />
+    <xsl:call-template name="callTransformerHelper" />
     <xsl:apply-templates select="*" mode="xeditor" />
-    <xsl:value-of select="helper:unbind($helper)" />
+    <xsl:call-template name="unbind" />
+  </xsl:template>
+  
+  <xsl:template name="unbind">
+    <xsl:call-template name="callTransformerHelper">
+      <xsl:with-param name="method" select="'unbind'" />
+    </xsl:call-template>
   </xsl:template>
 
   <!-- ========== Default templates ========== -->
@@ -186,25 +169,27 @@
   <!-- ========== <input /> ========== -->
 
   <xsl:template
-    match="input[contains(',,text,password,hidden,file,color,date,datetime,datetime-local,email,month,number,range,search,tel,time,url,week,',concat(',',@type,','))]"
+    match="input[contains(',,text,password,radio,checkbox,hidden,file,color,date,datetime,datetime-local,email,month,number,range,search,tel,time,url,week,',concat(',',@type,','))]"
     mode="add-attributes">
-    <xsl:attribute name="name">
-      <xsl:value-of select="helper:getAbsoluteXPath($helper)" />
-    </xsl:attribute>
-    <xsl:attribute name="value">
-      <xsl:value-of select="helper:getValue($helper)" />
-    </xsl:attribute>
+    <xsl:call-template name="callTransformerHelper" />
   </xsl:template>
 
-  <xsl:template match="input[@type='checkbox']" mode="add-attributes">
-    <xsl:call-template name="setXPathOneAsName" />
-    <xsl:if test="helper:hasValue($helper,@value)">
-      <xsl:attribute name="checked">checked</xsl:attribute>
-    </xsl:if>
+  <xsl:template match="select" mode="xeditor">
+    <xsl:call-template name="callTransformerHelper" />
+    <xsl:copy>
+      <xsl:apply-templates select="." mode="add-attributes" />
+      <xsl:apply-templates select="@*|text()|*" mode="xeditor" />
+    </xsl:copy>
+    <xsl:call-template name="callTransformerHelper" />
   </xsl:template>
 
-  <!-- There may be multiple checkboxes or a select multiple bound to 1-n elements: MCR-2140 -->
-  <xsl:template name="setXPathOneAsName">
+  <xsl:template match="option" mode="add-attributes">
+    <xsl:call-template name="callTransformerHelper">
+      <xsl:with-param name="addText" select="true()" />
+    </xsl:call-template>
+  </xsl:template>
+
+  <xsl:template match="select[helper:isWithinSelectMultiple($helper)]" mode="add-attributes">
     <xsl:attribute name="name">
       <xsl:variable name="xPath" select="helper:getAbsoluteXPath($helper)" />
       <xsl:choose>
@@ -217,43 +202,6 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
-  </xsl:template>
-
-  <xsl:template match="input[@type='radio']" mode="add-attributes">
-    <xsl:attribute name="name">
-      <xsl:value-of select="helper:getAbsoluteXPath($helper)" />
-    </xsl:attribute>
-    <xsl:if test="helper:hasValue($helper,@value)">
-      <xsl:attribute name="checked">checked</xsl:attribute>
-    </xsl:if>
-  </xsl:template>
-
-  <xsl:template match="select" mode="xeditor">
-    <xsl:value-of select="helper:toggleWithinSelectElement($helper,@multiple)" />
-    <xsl:copy>
-      <xsl:apply-templates select="." mode="add-attributes" />
-      <xsl:apply-templates select="@*|text()|*" mode="xeditor" />
-    </xsl:copy>
-    <xsl:value-of select="helper:toggleWithinSelectElement($helper,@multiple)" />
-  </xsl:template>
-
-  <xsl:template match="option[helper:isWithinSelectElement($helper)]" mode="add-attributes">
-    <xsl:choose>
-      <xsl:when test="@value and (string-length(@value) &gt; 0)">
-        <xsl:if test="helper:hasValue($helper,@value)">
-          <xsl:attribute name="selected">selected</xsl:attribute>
-        </xsl:if>
-      </xsl:when>
-      <xsl:when test="string-length(text()) &gt; 0">
-        <xsl:if test="helper:hasValue($helper,text())">
-          <xsl:attribute name="selected">selected</xsl:attribute>
-        </xsl:if>
-      </xsl:when>
-    </xsl:choose>
-  </xsl:template>
-
-  <xsl:template match="select[helper:isWithinSelectMultiple($helper)]" mode="add-attributes">
-    <xsl:call-template name="setXPathOneAsName" />
   </xsl:template>
 
   <xsl:template match="textarea|select" mode="add-attributes">
@@ -269,72 +217,33 @@
   <!-- ========== <xed:repeat xpath="" min="" max="" method="build|clone" /> ========== -->
 
   <xsl:template match="xed:repeat" mode="xeditor">
-    <xsl:call-template name="registerAdditionalNamespaces" />
-
     <xsl:variable name="xed_repeat" select="." />
 
-    <xsl:for-each select="xalan:tokenize(helper:repeat($helper,@xpath,@min,@max,@method))">
+    <xsl:variable name="uri">
+      <xsl:call-template name="callTransformerHelperURI" />
+    </xsl:variable>
+
+    <xsl:for-each select="document($uri)/result/repeat">
       <xsl:variable name="anchorID" select="helper:bindRepeatPosition($helper)" />
       <a id="rep-{$anchorID}" />
       <xsl:apply-templates select="$xed_repeat/node()" mode="xeditor" />
-      <xsl:value-of select="helper:unbind($helper)" />
+      <xsl:call-template name="unbind" />
     </xsl:for-each>
-    <xsl:value-of select="helper:unbind($helper)" />
+    <xsl:call-template name="unbind" />
   </xsl:template>
 
   <!-- ========== <xed:controls /> ========== -->
 
   <xsl:template match="xed:controls" mode="xeditor">
-    <xsl:variable name="pos" select="helper:getRepeatPosition($helper)" />
-    <xsl:variable name="num" select="helper:getNumRepeats($helper)" />
-    <xsl:variable name="max" select="helper:getMaxRepeats($helper)" />
-
-    <xsl:variable name="controls">
-      <xsl:if test="string-length(.) = 0">
-        insert remove up down
-      </xsl:if>
-      <xsl:value-of select="." />
+    <xsl:variable name="uri">
+      <xsl:call-template name="callTransformerHelperURI">
+        <xsl:with-param name="addText" select="true()" />
+      </xsl:call-template>
     </xsl:variable>
-
-    <xsl:for-each select="xalan:tokenize($controls)">
-      <xsl:choose>
-        <xsl:when test="(. = 'append') and ($pos &lt; $num)" />
-        <xsl:when test="(. = 'up') and ($pos = 1)" />
-        <xsl:when test="(. = 'down') and ($pos = $num)" />
-        <xsl:when test="(. = 'insert') and ($max = $num)" />
-        <xsl:when test="(. = 'append') and ($max = $num)" />
-        <xsl:otherwise>
-          <xsl:apply-templates select="." mode="xed.control">
-            <xsl:with-param name="name">
-              <xsl:value-of select="concat('_xed_submit_',.,':')" />
-              <xsl:choose>
-                <xsl:when test="(. = 'append') or (. = 'insert')">
-                  <xsl:value-of select="helper:getInsertParameter($helper)" />
-                </xsl:when>
-                <xsl:when test="(. = 'remove')">
-                  <xsl:value-of select="helper:getAbsoluteXPath($helper)" />
-                </xsl:when>
-                <xsl:when test="(. = 'up')">
-                  <xsl:value-of select="helper:getSwapParameter($helper,'up')" />
-                </xsl:when>
-                <xsl:when test="(. = 'down')">
-                  <xsl:value-of select="helper:getSwapParameter($helper,'down')" />
-                </xsl:when>
-              </xsl:choose>
-              <xsl:text>|rep-</xsl:text>
-              <xsl:choose>
-                <xsl:when
-                  test="(. = 'remove') and ($pos &gt; 1)"> <!-- redirect to anchor of preceding, since this one will be removed -->
-                  <xsl:value-of select="helper:previousAnchorID($helper)" />
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="helper:getAnchorID($helper)" />
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:with-param>
-          </xsl:apply-templates>
-        </xsl:otherwise>
-      </xsl:choose>
+    <xsl:for-each select="document($uri)/result/control">
+      <xsl:apply-templates select="text()" mode="xed.control">
+        <xsl:with-param name="name" select="@name" />
+      </xsl:apply-templates>
     </xsl:for-each>
   </xsl:template>
 
@@ -342,6 +251,7 @@
 
   <xsl:template match="xed:validate" mode="xeditor">
     <xsl:value-of select="helper:addValidationRule($helper,.)" />
+    
     <xsl:if test="contains(@display,'here')">
       <xsl:if test="@xpath">
         <xsl:value-of select="helper:bind($helper,@xpath,@null,@null)" />
@@ -350,7 +260,7 @@
         <xsl:apply-templates select="." mode="message" />
       </xsl:if>
       <xsl:if test="@xpath">
-        <xsl:value-of select="helper:unbind($helper)" />
+        <xsl:call-template name="unbind" />
       </xsl:if>
     </xsl:if>
   </xsl:template>
@@ -377,7 +287,7 @@
         </xsl:if>
         <xsl:apply-templates select="." mode="message" />
         <xsl:if test="@xpath">
-          <xsl:value-of select="helper:unbind($helper)" />
+          <xsl:call-template name="unbind" />
         </xsl:if>
       </xsl:if>
     </xsl:for-each>
@@ -386,7 +296,10 @@
   <!-- ========== <xed:if test="" /> ========== -->
 
   <xsl:template match="xed:if" mode="xeditor">
-    <xsl:if test="helper:test($helper,@test)">
+    <xsl:variable name="uri">
+      <xsl:call-template name="callTransformerHelperURI" />
+    </xsl:variable>
+    <xsl:if test="document($uri)/result='true'">
       <xsl:apply-templates select="node()" mode="xeditor" />
     </xsl:if>
   </xsl:template>
@@ -406,16 +319,6 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- ========== <xed:output i18n="" value="" /> ========== -->
-
-  <xsl:template match="xed:output[@i18n and not(@value)]" mode="xeditor">
-    <xsl:value-of select="helper:output($helper,@value,@i18n)" />
-  </xsl:template>
-
-  <xsl:template match="xed:output" mode="xeditor">
-    <xsl:value-of select="helper:output($helper,@value,@i18n)" />
-  </xsl:template>
-
   <!-- ========== <xed:multi-lang> <xed:lang xml:lang="" /> </xed:multi-lang> ========== -->
 
   <xsl:template match="xed:multi-lang" mode="xeditor">
@@ -432,21 +335,43 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- ========== <xed:load-resource name="" uri="" ========== -->
-
-  <xsl:template match="xed:load-resource" mode="xeditor">
-    <xsl:value-of select="helper:loadResource($helper,@uri,@name)" />
+  <!-- ========== call transformer helper ========== -->
+  
+  <xsl:param name="SessionID" />
+  
+  <xsl:template name="callTransformerHelperURI">
+    <xsl:param name="method" select="local-name()" />
+    <xsl:param name="addText" select="false()" />
+  
+    <xsl:value-of select="concat('xedTransformerHelper:',$SessionID,':',$method,':')" />
+    
+    <!-- Workaround to prevent URI Caching -->
+    <xsl:value-of select="concat('random=',math:random(),'&amp;')" />
+    
+    <xsl:for-each select="@*">
+      <xsl:value-of select="concat(local-name(),'=',encoder:encode(.,'UTF-8'),'&amp;')" />
+    </xsl:for-each>
+    <xsl:for-each select="namespace::*">
+      <xsl:value-of select="concat('xmlns:',name(),'=',encoder:encode(.,'UTF-8'),'&amp;')" />
+    </xsl:for-each>
+    <xsl:if test="$addText">
+      <xsl:value-of select="concat('text=',text(),'&amp;')" />
+    </xsl:if>
   </xsl:template>
-
-  <!-- ========== <xed:cleanup-rule xpath="" relevant-if="" ========== -->
-
-  <xsl:template match="xed:cleanup-rule" mode="xeditor">
-    <xsl:value-of select="helper:addCleanupRule($helper,@xpath,@relevant-if)" />
-  </xsl:template>
-
-  <!-- ========== <xed:param name="" default="" ========== -->
-  <xsl:template match="xed:param" mode="xeditor">
-    <xsl:value-of select="helper:declareParameter($helper,@name,@default)" />
+  
+  <xsl:template name="callTransformerHelper">
+    <xsl:param name="method" select="local-name()" />
+    <xsl:param name="addText" select="false()" />
+  
+    <xsl:variable name="uri">
+      <xsl:call-template name="callTransformerHelperURI">
+        <xsl:with-param name="method" select="$method" />
+        <xsl:with-param name="addText" select="$addText" />
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:for-each select="document($uri)/result">
+      <xsl:copy-of select="@*|node()" />
+    </xsl:for-each>
   </xsl:template>
 
 </xsl:stylesheet>
