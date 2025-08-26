@@ -53,9 +53,7 @@
 
   <xsl:template name="passAdditionalParameters">
     <div style="visibility:hidden">
-      <xsl:for-each select="helper:getAdditionalParameters($helper)">
-        <input type="hidden" name="{@name}" value="{text()}" />
-      </xsl:for-each>
+      <xsl:copy-of select="helper:getAdditionalParameters($helper)" />
     </div>
   </xsl:template>
 

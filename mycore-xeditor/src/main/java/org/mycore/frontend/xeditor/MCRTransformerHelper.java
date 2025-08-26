@@ -358,9 +358,10 @@ public class MCRTransformerHelper {
     }
 
     private org.w3c.dom.Element buildAdditionalParameterElement(org.w3c.dom.Document doc, String name, String value) {
-        org.w3c.dom.Element element = doc.createElement("param");
+        org.w3c.dom.Element element = doc.createElement("input");
+        element.setAttribute("type", "hidden");
         element.setAttribute("name", name);
-        element.setTextContent(value);
+        element.setAttribute("value", value);
         return element;
     }
 
