@@ -31,11 +31,8 @@
 
   <xsl:template match="xed:form">
     <xsl:call-template name="callTransformerHelper" />
-    <form>
+    <form action="{$ServletsBaseURL}XEditor">
       <xsl:apply-templates select="@*" mode="xeditor" />
-      <xsl:attribute name="action">
-        <xsl:value-of select="concat($ServletsBaseURL,'XEditor')" />
-      </xsl:attribute>
 
       <!-- method="post" is default, may be overwritten by xed:form/@method -->
       <xsl:if test="not(@method)">
