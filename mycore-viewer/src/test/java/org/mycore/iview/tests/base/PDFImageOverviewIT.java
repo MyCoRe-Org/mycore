@@ -18,15 +18,18 @@
 
 package org.mycore.iview.tests.base;
 
-import org.junit.experimental.categories.Category;
 import org.mycore.iview.tests.model.TestDerivate;
+import org.openqa.selenium.WebDriver;
 
 /**
  * @author Sebastian Röher (basti890)
  *
  */
-@Category(org.mycore.iview.tests.groups.ImageViewerTests.class)
 public class PDFImageOverviewIT extends ImageOverviewIT {
+
+    PDFImageOverviewIT(WebDriver driver) {
+        super(driver);
+    }
 
     @Override
     public TestDerivate getTestDerivate() {

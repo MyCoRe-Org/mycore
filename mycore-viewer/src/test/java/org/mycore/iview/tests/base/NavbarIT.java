@@ -25,9 +25,8 @@ import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mycore.iview.tests.ViewerTestBase;
 import org.mycore.iview.tests.controller.ControllerUtil;
 import org.mycore.iview.tests.controller.ImageViewerController;
@@ -40,7 +39,6 @@ import org.mycore.iview.tests.model.TestDerivate;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-@Category(org.mycore.iview.tests.groups.ImageViewerTests.class)
 public class NavbarIT extends ViewerTestBase {
 
     private static final String RGB_LABEL = "[4] - rgb.tiff";
@@ -55,64 +53,61 @@ public class NavbarIT extends ViewerTestBase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    protected NavbarIT(WebDriver webDriver) {
+        super(webDriver);
+    }
+
     @Test
     public void testBasicElementsPresent() {
-        this.setTestName(getClassname() + "-testBasicElementsPresent");
         this.getAppController().openViewer(this.getDriver(), getBaseURL(), this.getTestDerivate());
         WebDriver driver = this.getDriver();
 
-        Assert.assertTrue("Sidebar button should be present",
-            driver.findElement(By.xpath("//*[@data-id='SidebarControllGroup']")).isDisplayed());
+        Assertions.assertTrue(driver.findElement(By.xpath("//*[@data-id='SidebarControllGroup']")).isDisplayed(),
+            "Sidebar button should be present");
     }
 
     @Test
     public void testActionGroup() {
-        this.setTestName(getClassname() + "-testActionElementsPresent");
         this.getAppController().openViewer(this.getDriver(), getBaseURL(), this.getTestDerivate());
         WebDriver driver = this.getDriver();
-        Assert.assertTrue("Share button should be present", driver.findElement(By.xpath("//*[@data-id='ShareButton']"))
-            .isDisplayed());
+        Assertions.assertTrue(driver.findElement(By.xpath("//*[@data-id='ShareButton']")).isDisplayed(),
+            "Share button should be present");
     }
 
     @Test
     public void testModificationGroup() {
-        this.setTestName(getClassname() + "-testModifactionElementsPresent");
         this.getAppController().openViewer(this.getDriver(), getBaseURL(), this.getTestDerivate());
         WebDriver driver = this.getDriver();
-        Assert.assertTrue("RotateButton should be present", driver
-            .findElement(By.xpath("//*[@data-id='RotateButton']")).isDisplayed());
+        Assertions.assertTrue(driver.findElement(By.xpath("//*[@data-id='RotateButton']")).isDisplayed(),
+            "RotateButton should be present");
     }
 
     @Test
     public void testImageChangeGroup() {
-        this.setTestName(getClassname() + "-testImageChangePresent");
         this.getAppController().openViewer(this.getDriver(), getBaseURL(), this.getTestDerivate());
         WebDriver driver = this.getDriver();
-        Assert.assertTrue("PreviousImageButton should be present",
-            driver.findElement(By.xpath("//*[@data-id='PreviousImageButton']")).isDisplayed());
-        Assert.assertTrue("NextImageButton should be present",
-            driver.findElement(By.xpath("//*[@data-id='NextImageButton']")).isDisplayed());
+        Assertions.assertTrue(driver.findElement(By.xpath("//*[@data-id='PreviousImageButton']")).isDisplayed(),
+            "PreviousImageButton should be present");
+        Assertions.assertTrue(driver.findElement(By.xpath("//*[@data-id='NextImageButton']")).isDisplayed(),
+            "NextImageButton should be present");
     }
 
     @Test
     public void testZoomGroup() {
-        this.setTestName(getClassname() + "-testZoomElementsPresent");
         this.getAppController().openViewer(this.getDriver(), getBaseURL(), this.getTestDerivate());
         WebDriver driver = this.getDriver();
-        Assert.assertTrue("ZoomIn button should be present",
-            driver.findElement(By.xpath("//*[@data-id='ZoomInButton']")).isDisplayed());
-        Assert.assertTrue("ZoomOut button should be present",
-            driver.findElement(By.xpath("//*[@data-id='ZoomOutButton']")).isDisplayed());
-        Assert.assertTrue("ZoomWidth button should be present",
-            driver.findElement(By.xpath("//*[@data-id='ZoomWidthButton']")).isDisplayed());
-        Assert.assertTrue("ZoomFit button should be present",
-            driver.findElement(By.xpath("//*[@data-id='ZoomFitButton']")).isDisplayed());
+        Assertions.assertTrue(driver.findElement(By.xpath("//*[@data-id='ZoomInButton']")).isDisplayed(),
+            "ZoomIn button should be present");
+        Assertions.assertTrue(driver.findElement(By.xpath("//*[@data-id='ZoomOutButton']")).isDisplayed(),
+            "ZoomOut button should be present");
+        Assertions.assertTrue(driver.findElement(By.xpath("//*[@data-id='ZoomWidthButton']")).isDisplayed(),
+            "ZoomWidth button should be present");
+        Assertions.assertTrue(driver.findElement(By.xpath("//*[@data-id='ZoomFitButton']")).isDisplayed(),
+            "ZoomFit button should be present");
     }
 
     @Test
     public void testNavigationPrev() throws InterruptedException {
-        this.setTestName(getClassname() + "-testStructureOverview");
-        this.getDriver();
         this.getAppController().openViewer(this.getDriver(), getBaseURL(), getTestDerivate());
 
         ImageViewerController controller = this.getViewerController();
@@ -138,8 +133,6 @@ public class NavbarIT extends ViewerTestBase {
 
     @Test
     public void testNavigationNext() throws InterruptedException {
-        this.setTestName(getClassname() + "-testStructureOverview");
-        this.getDriver();
         this.getAppController().openViewer(this.getDriver(), getBaseURL(), getTestDerivate());
 
         ImageViewerController controller = this.getViewerController();
@@ -181,7 +174,7 @@ public class NavbarIT extends ViewerTestBase {
 
     private int countColor(ToolBarController tbController, String label, Color color) {
         String message = label + " should be selected!";
-        Assert.assertTrue(message, tbController.isImageSelected(label));
+        Assertions.assertTrue(tbController.isImageSelected(label), message);
         String fileName = String.format("%s-%s-%s-%s-%s", this.getClassname(), label, color.getRed(), color.getBlue(),
             color.getGreen());
         BufferedImage bImage = ControllerUtil.getScreenshot(getDriver(), fileName);
@@ -210,7 +203,7 @@ public class NavbarIT extends ViewerTestBase {
     private void assertLess(int moreValue, int lessValue, String messagePattern) {
         String message = new MessageFormat(messagePattern, Locale.ROOT).format(new Object[] { lessValue, moreValue });
         LOGGER.debug(message);
-        Assert.assertTrue(message, lessValue < moreValue);
+        Assertions.assertTrue(lessValue < moreValue, message);
     }
 
     @Override

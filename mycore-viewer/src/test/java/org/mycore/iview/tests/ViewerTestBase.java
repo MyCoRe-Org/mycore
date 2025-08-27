@@ -24,18 +24,21 @@ import java.time.Duration;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.logging.log4j.LogManager;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.mycore.common.selenium.MCRSeleniumTestBase;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mycore.common.selenium.MCRSeleniumExtension;
 import org.mycore.iview.tests.controller.ApplicationController;
 import org.mycore.iview.tests.controller.ImageViewerController;
 import org.mycore.iview.tests.model.TestDerivate;
+import org.openqa.selenium.WebDriver;
 
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.SimpleFileServer;
 
-public abstract class ViewerTestBase extends MCRSeleniumTestBase {
+@ExtendWith(MCRSeleniumExtension.class)
+public abstract class ViewerTestBase {
 
     private static final String APPLICATION_CONTROLLER_PROPERTY_NAME = "test.viewer.applicationController";
 
@@ -49,9 +52,15 @@ public abstract class ViewerTestBase extends MCRSeleniumTestBase {
 
     HttpServer httpServer;
 
+    WebDriver webDriver;
+
+    protected ViewerTestBase(WebDriver webDriver) {
+        this.webDriver = webDriver;
+    }
+
     private static final ThreadLocal<AtomicLong> WAIT_TIME = ThreadLocal.withInitial(AtomicLong::new);
 
-    @AfterClass
+    @AfterAll
     public static void printWaitTime() {
         LogManager.getLogger().info("Total wait time: {}", Duration.ofMillis(WAIT_TIME.get().get()));
         WAIT_TIME.remove();
@@ -62,7 +71,7 @@ public abstract class ViewerTestBase extends MCRSeleniumTestBase {
         Thread.sleep(millis);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws InterruptedException {
         InetSocketAddress serverAddress = new InetSocketAddress(0);
         Path baseDir = Path.of("target").toAbsolutePath();
@@ -73,25 +82,23 @@ public abstract class ViewerTestBase extends MCRSeleniumTestBase {
         LogManager.getLogger().info("Server online: " + baseURL);
 
         initController();
-        getAppController().setUpDerivate(this.getDriver(), getBaseURL(), getTestDerivate());
+        getAppController().setUpDerivate(webDriver, getBaseURL(), getTestDerivate());
     }
 
     protected String getBaseURL() {
         return "http://localhost:" + httpServer.getAddress().getPort();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         if (httpServer != null) {
             httpServer.stop(0);
         }
-        this.takeScreenshot();
     }
 
-    @AfterClass
-    public static void tearDownClass() {
-        appController.shutDownDerivate(driver, null);
-        driver.quit();
+    @AfterAll
+    public static void tearDownClass(WebDriver webDriver) {
+        appController.shutDownDerivate(webDriver, null);
     }
 
     public String getClassname() {
@@ -99,7 +106,7 @@ public abstract class ViewerTestBase extends MCRSeleniumTestBase {
     }
 
     public void initController() {
-        this.setViewerController(new ImageViewerController(this.getDriver()));
+        this.setViewerController(new ImageViewerController(webDriver));
 
         if (appController == null) {
             ApplicationController applicationController = getApplicationControllerInstance();
@@ -135,5 +142,9 @@ public abstract class ViewerTestBase extends MCRSeleniumTestBase {
 
     private void setViewerController(ImageViewerController viewerController) {
         this.viewerController = viewerController;
+    }
+
+    protected WebDriver getDriver() {
+        return webDriver;
     }
 }
