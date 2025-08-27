@@ -19,6 +19,7 @@
 package org.mycore.ocfl.util;
 
 // actually increases readability
+
 import static org.mycore.common.config.MCRConfiguration2.getBoolean;
 import static org.mycore.common.config.MCRConfiguration2.getString;
 

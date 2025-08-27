@@ -18,6 +18,10 @@
 
 package org.mycore.ocfl.user;
 
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_CREATED;
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_DELETED;
+import static org.mycore.ocfl.util.MCROCFLVersionHelper.MESSAGE_UPDATED;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.OffsetDateTime;
@@ -56,12 +60,6 @@ import io.ocfl.api.model.VersionInfo;
 public class MCROCFLXMLUserManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
-
-    public static final String MESSAGE_CREATED = "Created";
-
-    public static final String MESSAGE_UPDATED = "Updated";
-
-    public static final String MESSAGE_DELETED = "Deleted";
 
     private static final String IGNORING_TRANSIENT_USER = "Got TransientUser, ignoring...";
 
