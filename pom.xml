@@ -2582,6 +2582,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <module>mycore-coma</module>
     <module>mycore-cronjob</module>
     <module>mycore-ocfl</module>
+    <module>mycore-ocfl-s3</module>
     <module>mycore-validation</module>
   </modules>
 </project>
