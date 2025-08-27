@@ -494,7 +494,7 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
      * @return the {@link MCROCFLLocalRepositoryProvider}.
      */
     public MCROCFLRepositoryProvider getRepositoryProvider() {
-        return MCROCFLRepositoryProvider.getProvider(getRepositoryId());
+        return MCROCFLRepositoryProvider.obtainInstance(getRepositoryId());
     }
 
     /**

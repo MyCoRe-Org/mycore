@@ -169,7 +169,7 @@ public class MCROCFLCommands {
             + "  It is required to add the ocfl prefix like 'mcrobject:' or 'mcracl:' to the object id.")
     public static void describeObject(String objectId, String repositoryId) {
         repositoryId = (repositoryId == null || repositoryId.isBlank()) ? "Main" : repositoryId;
-        MCROCFLRepositoryProvider provider = MCROCFLRepositoryProvider.getProvider(repositoryId);
+        MCROCFLRepositoryProvider provider = MCROCFLRepositoryProvider.obtainInstance(repositoryId);
         MCROCFLRepository repository = provider.getRepository();
         ObjectDetails objectDetails = repository.describeObject(objectId);
 

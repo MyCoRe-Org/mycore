@@ -115,7 +115,7 @@ public class MCROCFLSetupExtension implements BeforeEachCallback, AfterEachCallb
 
     private MCROCFLRepository createRepository(boolean remote) throws IOException {
         String repositoryId = MCRConfiguration2.getString("MCR.Content.Manager.Repository").orElseThrow();
-        MCROCFLRepositoryProvider repositoryProvider = MCROCFLRepositoryProvider.getProvider(repositoryId);
+        MCROCFLRepositoryProvider repositoryProvider = MCROCFLRepositoryProvider.obtainInstance(repositoryId);
         if (!(repositoryProvider instanceof RepositoryProviderMock repositoryProviderMock)) {
             throw new MCROCFLException("Invalid provider. Should be RepositoryProviderMock, but is "
                 + repositoryProvider.getClass().getSimpleName());

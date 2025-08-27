@@ -342,7 +342,7 @@ public class MCROCFLXMLMetadataManagerAdapter implements MCRXMLMetadataManagerAd
 
     @Override
     public int getHighestStoredID(String project, String type) {
-        MCROCFLRepositoryProvider ocflRepoProvider = MCROCFLRepositoryProvider.getProvider(repositoryKey);
+        MCROCFLRepositoryProvider ocflRepoProvider = MCROCFLRepositoryProvider.obtainInstance(repositoryKey);
         if (!(ocflRepoProvider instanceof MCROCFLLocalRepositoryProvider localRepositoryProvider)) {
             return calculateHighestStoreIDForRemoteRepositories(project, type);
         }

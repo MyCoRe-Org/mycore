@@ -26,12 +26,10 @@ import org.mycore.common.config.MCRConfigurationException;
  * <p>
  * This interface defines methods to obtain and configure {@link MCROCFLRepository} instances,
  * enabling interaction with OCFL-compliant storage backends.
- * </p>
  * <p>
  * The {@code MCROCFLRepositoryProvider} interface also offers static utility methods to retrieve
  * repository providers based on unique repository identifiers, facilitating centralized access
  * to different repositories configured within the application.
- * </p>
  *
  * <h2>Configuration</h2>
  * Each repository provider is associated with a configuration prefix, {@code REPOSITORY_PROPERTY_PREFIX},
@@ -56,13 +54,12 @@ public interface MCROCFLRepositoryProvider {
      * <p>
      * This method retrieves the provider configured for the specified repository ID, then
      * returns the OCFL repository instance managed by that provider.
-     * </p>
      *
      * @param id the unique identifier for the desired repository.
      * @return the {@link MCROCFLRepository} instance associated with the given ID.
      */
     static MCROCFLRepository getRepository(String id) {
-        return getProvider(id).getRepository();
+        return obtainInstance(id).getRepository();
     }
 
     /**
@@ -70,13 +67,12 @@ public interface MCROCFLRepositoryProvider {
      * <p>
      * This method uses MyCoRe's configuration system to dynamically locate and return the provider
      * instance matching the given repository ID.
-     * </p>
      *
      * @param id the unique identifier for the desired repository provider.
      * @return the {@link MCROCFLRepositoryProvider} instance for the specified ID.
      * @throws MCRConfigurationException if no provider is configured for the specified ID.
      */
-    static MCROCFLRepositoryProvider getProvider(String id) {
+    static MCROCFLRepositoryProvider obtainInstance(String id) {
         return MCRConfiguration2.getSingleInstanceOfOrThrow(
             MCROCFLRepositoryProvider.class, REPOSITORY_PROPERTY_PREFIX + id);
     }
