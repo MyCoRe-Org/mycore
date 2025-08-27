@@ -92,7 +92,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <pmd.failOnViolation>true</pmd.failOnViolation>
     <pmd.version>7.13.0</pmd.version>
     <rdf4j.version>5.1.3</rdf4j.version>
-    <selenium.version>4.31.0</selenium.version>
+    <selenium.version>4.35.0</selenium.version>
     <site.suffix />
     <swagger.version>2.2.30</swagger.version>
     <uniqueVersion>false</uniqueVersion>
@@ -2122,7 +2122,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>selenium-utils</artifactId>
-        <version>0.10</version>
+        <version>0.11-SNAPSHOT</version>
         <scope>test</scope>
         <exclusions>
           <exclusion>
