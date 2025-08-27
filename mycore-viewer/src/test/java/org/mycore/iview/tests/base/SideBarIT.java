@@ -23,9 +23,8 @@ import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mycore.iview.tests.ViewerTestBase;
 import org.mycore.iview.tests.controller.ImageOverviewController;
 import org.mycore.iview.tests.controller.ImageViewerController;
@@ -33,15 +32,18 @@ import org.mycore.iview.tests.controller.SideBarController;
 import org.mycore.iview.tests.controller.ToolBarController;
 import org.mycore.iview.tests.model.TestDerivate;
 import org.openqa.selenium.UnsupportedCommandException;
+import org.openqa.selenium.WebDriver;
 
-@Category(org.mycore.iview.tests.groups.ImageViewerTests.class)
 public class SideBarIT extends ViewerTestBase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    protected SideBarIT(WebDriver webDriver) {
+        super(webDriver);
+    }
+
     @Test
     public void testSideBarPresent() {
-        this.setTestName(getClassname() + "-testSideBarPresent");
         this.getDriver();
         this.getAppController().openViewer(this.getDriver(), getBaseURL(), getTestDerivate());
 
@@ -52,10 +54,10 @@ public class SideBarIT extends ViewerTestBase {
 
         tbController.pressButton(ToolBarController.BUTTON_ID_SIDEBAR_CONTROLL);
         tbController.clickElementById(ImageOverviewController.IMAGE_OVERVIEW_SELECTOR);
-        Assert.assertTrue("SideBar should be present!", sbController.assertSideBarPresent());
+        Assertions.assertTrue(sbController.assertSideBarPresent(), "SideBar should be present!");
 
         tbController.clickElementByXpath(SideBarController.SIDEBAR_CLOSE_SELECTOR);
-        Assert.assertFalse("SideBar should not be present!", sbController.assertSideBarPresent());
+        Assertions.assertFalse(sbController.assertSideBarPresent(), "SideBar should not be present!");
     }
 
     @Test
@@ -63,7 +65,6 @@ public class SideBarIT extends ViewerTestBase {
      * Ignored because https://github.com/mozilla/geckodriver/issues/233
      */
     public void testSideBarResize() {
-        this.setTestName(getClassname() + "-testSideBarResize");
         this.getDriver();
         this.getAppController().openViewer(this.getDriver(), getBaseURL(), getTestDerivate());
 
@@ -91,7 +92,6 @@ public class SideBarIT extends ViewerTestBase {
 
     @Test
     public void testOverviewLayout() throws InterruptedException {
-        this.setTestName(getClassname() + "-testOvervieLayout");
         this.getDriver();
         this.getAppController().openViewer(this.getDriver(), getBaseURL(), getTestDerivate());
 
@@ -116,13 +116,13 @@ public class SideBarIT extends ViewerTestBase {
         int after = sbController.countThumbnails();
 
         // this test does not really work, because there are only 4 thumbnails left
-        Assert.assertEquals(before, after);
+        Assertions.assertEquals(before, after);
     }
 
     private void assertLess(int moreValue, int lessValue, String messagePattern) {
         String message = new MessageFormat(messagePattern, Locale.ROOT).format(new Object[] { lessValue, moreValue });
         LOGGER.debug(message);
-        Assert.assertTrue(message, lessValue < moreValue);
+        Assertions.assertTrue(lessValue < moreValue, message);
     }
 
     @Override

@@ -18,16 +18,18 @@
 
 package org.mycore.iview.tests.base;
 
-import org.junit.experimental.categories.Category;
-import org.mycore.iview.tests.groups.ImageViewerTests;
 import org.mycore.iview.tests.model.TestDerivate;
+import org.openqa.selenium.WebDriver;
 
 /**
  * @author Sebastian Röher (basti890)
  *
  */
-@Category(ImageViewerTests.class)
 public class PDFSideBarIT extends SideBarIT {
+
+    protected PDFSideBarIT(WebDriver webDriver) {
+        super(webDriver);
+    }
 
     @Override
     public TestDerivate getTestDerivate() {
