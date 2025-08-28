@@ -150,18 +150,19 @@ public class MCRConfigurationDir {
     }
 
     private static String buildAppNameFromContext() {
-        String servletAppName = servletContext.getInitParameter("appName");
-        String contextPath = servletContext.getContextPath();
-        String servletContextName = servletContext.getServletContextName();
-        String updatedAppname;
-        if (servletAppName != null && !servletAppName.isEmpty()) {
-            updatedAppname = servletAppName;
-        } else if (!contextPath.isEmpty()) {
-            updatedAppname = contextPath.substring(1);//remove leading '/'
-        } else if (servletContextName != null && !(servletContextName.isBlank() || servletContextName.contains("/"))) {
-            updatedAppname = servletContextName.replaceAll("\\s", "");
-        } else {
-            updatedAppname = null;
+        String updatedAppname = null;
+        if (servletContext != null) {
+            String servletAppName = servletContext.getInitParameter("appName");
+            String contextPath = servletContext.getContextPath();
+            String servletContextName = servletContext.getServletContextName();
+            if (servletAppName != null && !servletAppName.isEmpty()) {
+                updatedAppname = servletAppName;
+            } else if (!contextPath.isEmpty()) {
+                updatedAppname = contextPath.substring(1); //remove leading '/'
+            } else if (servletContextName != null
+                && !(servletContextName.isBlank() || servletContextName.contains("/"))) {
+                updatedAppname = servletContextName.replaceAll("\\s", "");
+            } 
         }
         return updatedAppname;
     }

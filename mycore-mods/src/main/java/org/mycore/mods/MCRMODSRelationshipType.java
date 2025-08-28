@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
  */
 public enum MCRMODSRelationshipType {
     HOST("host"), PRECEDING("preceding"), ORIGINAL("original"), SERIES("series"), OTHER_VERSION("otherVersion"),
-    OTHER_FORMAT("otherFormat"), REFERENCES("references"), REVIEW_OF("reviewOf");
+    OTHER_FORMAT("otherFormat"), REFERENCES("references"), REVIEW_OF("reviewOf"), PERSONAL("personal");
 
     private final String value;
 
