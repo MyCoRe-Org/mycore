@@ -18,20 +18,20 @@
 
 package org.mycore.frontend.xeditor.tracker;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 
 /**
  * Tracks changes to the edited xml, allowing to undo them step by step.  
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRChangeTracker {
 
 
     /** A stack of performed changes **/
-    @SuppressWarnings("PMD.LooseCoupling")
-    private Stack<MCRTrackedAction> changes = new Stack<>();
+    private Deque<MCRTrackedAction> changes = new ArrayDeque<>();
 
     public void track(MCRTrackedAction change) {
         this.changes.push(change);
