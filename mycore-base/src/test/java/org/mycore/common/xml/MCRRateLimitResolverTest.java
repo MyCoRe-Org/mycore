@@ -18,7 +18,11 @@
 
 package org.mycore.common.xml;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
@@ -26,33 +30,33 @@ import javax.xml.transform.TransformerException;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRRateLimitBuckets;
-import org.mycore.common.MCRTestCase;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.test.MyCoReTest;
 
 import io.github.bucket4j.Bucket;
 
-public class MCRRateLimitResolverTest extends MCRTestCase {
+@MyCoReTest
+public class MCRRateLimitResolverTest {
 
     final JDOMSource resultSource = new JDOMSource(new Document(new Element("result")));
 
     public static final String RATE_LIMIT_CALL = "ratelimit:Test:Mock:nothing";
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         MCRConfiguration2.set("MCR.URIResolver.ModuleResolver.ratelimit", "org.mycore.common.xml.MCRRateLimitResolver");
         MCRMockResolver.setResultSource(resultSource);
         MCRRateLimitBuckets.clearAllBuckets();
     }
 
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
-        super.tearDown();
         MCRMockResolver.clearCalls();
     }
 
@@ -65,7 +69,7 @@ public class MCRRateLimitResolverTest extends MCRTestCase {
         MCRConfiguration2.set("MCR.RateLimitResolver.Test.Limits", "100/D, 12/h, 6/min");
         final Bucket bucket = MCRRateLimitBuckets.getOrCreateBucket("Test");
         bucket.tryConsumeAsMuchAsPossible();
-        Assert.assertThrows(MCRException.class, () -> MCRURIResolver.obtainInstance().resolve(RATE_LIMIT_CALL, null));
+        assertThrows(MCRException.class, () -> MCRURIResolver.obtainInstance().resolve(RATE_LIMIT_CALL, null));
     }
 
     /**
@@ -91,9 +95,9 @@ public class MCRRateLimitResolverTest extends MCRTestCase {
         final Bucket bucket = MCRRateLimitBuckets.getOrCreateBucket("Test");
         bucket.tryConsumeAsMuchAsPossible();
         Source emptySource = MCRURIResolver.obtainInstance().resolve(RATE_LIMIT_CALL, null);
-        Assert.assertNotNull(emptySource);
-        Assert.assertFalse(emptySource.isEmpty());
-        Assert.assertEquals("", emptySource.getSystemId());
+        assertNotNull(emptySource);
+        assertFalse(emptySource.isEmpty());
+        assertEquals("", emptySource.getSystemId());
     }
 
     /**
@@ -106,7 +110,7 @@ public class MCRRateLimitResolverTest extends MCRTestCase {
         MCRConfiguration2.set("MCR.RateLimitResolver.Test.Behavior", "blocking");
         MCRConfiguration2.set("MCR.RateLimitResolver.Test.Limits", "10/s");
 
-        MCRConfigurationException mcrConfigurationException = Assert.assertThrows(MCRConfigurationException.class,
+        MCRConfigurationException mcrConfigurationException = assertThrows(MCRConfigurationException.class,
             () -> MCRURIResolver.obtainInstance().resolve(RATE_LIMIT_CALL, null));
 
         assertTrue(mcrConfigurationException.getMessage()
@@ -117,7 +121,7 @@ public class MCRRateLimitResolverTest extends MCRTestCase {
         // Test wrong value for time unit
         MCRConfiguration2.set("MCR.RateLimitResolver.Test1.Behavior", "block");
         MCRConfiguration2.set("MCR.RateLimitResolver.Test1.Limits", "10/second");
-        MCRConfigurationException mcrConfigurationException1 = Assert.assertThrows(MCRConfigurationException.class,
+        MCRConfigurationException mcrConfigurationException1 = assertThrows(MCRConfigurationException.class,
             () -> MCRRateLimitBuckets.getOrCreateBucket("Test1"));
         assertTrue(mcrConfigurationException1.getMessage().contains("10 tokens per second"));
         assertTrue(mcrConfigurationException1.getMessage().contains("Test1"));
@@ -126,7 +130,7 @@ public class MCRRateLimitResolverTest extends MCRTestCase {
         MCRConfiguration2.set("MCR.RateLimitResolver.Test2.Behavior", "block");
         MCRConfiguration2.set("MCR.RateLimitResolver.Test2.Limits", "-10/s");
         IllegalArgumentException illegalArgumentException =
-            Assert.assertThrows(IllegalArgumentException.class, () -> MCRRateLimitBuckets.getOrCreateBucket("Test2"));
+            assertThrows(IllegalArgumentException.class, () -> MCRRateLimitBuckets.getOrCreateBucket("Test2"));
         assertTrue(illegalArgumentException.getMessage().contains("-10"));
         assertTrue(illegalArgumentException.getMessage().contains("capacity should be positive"));
 
@@ -134,11 +138,11 @@ public class MCRRateLimitResolverTest extends MCRTestCase {
         MCRConfiguration2.set("MCR.RateLimitResolver.Test3.Behavior", "block");
         MCRConfiguration2.set("MCR.RateLimitResolver.Test3.Limits", "abc/s");
         NumberFormatException numberFormatException =
-            Assert.assertThrows(NumberFormatException.class, () -> MCRRateLimitBuckets.getOrCreateBucket("Test3"));
+            assertThrows(NumberFormatException.class, () -> MCRRateLimitBuckets.getOrCreateBucket("Test3"));
         assertTrue(numberFormatException.getMessage().contains("abc"));
 
         // Test missing config
-        MCRConfigurationException mcrConfigurationException2 = Assert.assertThrows(MCRConfigurationException.class,
+        MCRConfigurationException mcrConfigurationException2 = assertThrows(MCRConfigurationException.class,
             () -> MCRRateLimitBuckets.getOrCreateBucket("Test4"));
         assertTrue(mcrConfigurationException2.getMessage()
             .contains("Configuration property MCR.RateLimitResolver.Test4."));

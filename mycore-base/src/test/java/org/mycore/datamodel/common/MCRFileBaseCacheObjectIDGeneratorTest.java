@@ -18,7 +18,7 @@
 
 package org.mycore.datamodel.common;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,11 +28,12 @@ import java.util.stream.IntStream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.test.MyCoReTest;
 
-public class MCRFileBaseCacheObjectIDGeneratorTest extends MCRTestCase {
+@MyCoReTest
+public class MCRFileBaseCacheObjectIDGeneratorTest {
 
     public static final int GENERATOR_COUNT = 10;
     public static final int TEST_IDS = 100;

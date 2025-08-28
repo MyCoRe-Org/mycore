@@ -18,12 +18,13 @@
 
 package org.mycore.common.config;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.test.MyCoReTest;
 
-public class MCRInstanceNameTest extends MCRTestCase {
+@MyCoReTest
+public class MCRInstanceNameTest {
 
     @Test
     public void nameWithoutSuffix() {

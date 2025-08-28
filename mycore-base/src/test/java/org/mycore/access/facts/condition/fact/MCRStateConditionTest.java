@@ -18,37 +18,39 @@
 
 package org.mycore.access.facts.condition.fact;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mycore.access.facts.condition.fact.MCRFactsTestUtil.hackObjectIntoCache;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 import org.jdom2.Element;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.access.facts.MCRFactsHolder;
 import org.mycore.access.facts.fact.MCRObjectIDFact;
-import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MyCoReTest;
 
-public class MCRStateConditionTest extends MCRJPATestCase {
+@MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true")
+})
+public class MCRStateConditionTest {
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.Metadata.Type.test", Boolean.TRUE.toString());
-        return testProperties;
-    }
-
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
 
         MCRCategoryDAO instance = MCRCategoryDAOFactory.obtainInstance();
         MCRCategoryImpl state = new MCRCategoryImpl();
@@ -82,7 +84,7 @@ public class MCRStateConditionTest extends MCRJPATestCase {
 
         MCRStateCondition mcrStateCondition = new MCRStateCondition();
         mcrStateCondition.parse(new Element("state").setText("published"));
-        Assert.assertTrue("State should be 'published'!", mcrStateCondition.matches(holder));
+        assertTrue(mcrStateCondition.matches(holder), "State should be 'published'!");
     }
 
     @Test
@@ -99,6 +101,6 @@ public class MCRStateConditionTest extends MCRJPATestCase {
 
         MCRStateCondition mcrStateCondition = new MCRStateCondition();
         mcrStateCondition.parse(new Element("state").setText("new"));
-        Assert.assertFalse("State should not be 'published'!", mcrStateCondition.matches(holder));
+        assertFalse(mcrStateCondition.matches(holder), "State should not be 'published'!");
     }
 }

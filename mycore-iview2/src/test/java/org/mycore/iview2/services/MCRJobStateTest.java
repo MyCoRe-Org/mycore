@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 public class MCRJobStateTest {
 
     @Test
-    final void testJobStates() {
+    public void testJobStates() {
 
         Set<MCRJobState> allStates = Stream.of(MCRJobState.values()).collect(Collectors.toSet());
         Set<MCRJobState> notCompleteStates = MCRJobState.notCompleteStates();

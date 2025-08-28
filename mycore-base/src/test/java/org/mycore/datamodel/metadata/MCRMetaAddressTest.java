@@ -18,11 +18,11 @@
 
 package org.mycore.datamodel.metadata;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.jdom2.Element;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.test.MyCoReTest;
 
 /**
  * This class is a JUnit test case for org.mycore.datamodel.metadata.MCRMetaAddress.
@@ -30,7 +30,8 @@ import org.mycore.common.MCRTestCase;
  * @author Jens Kupferschmidt
  *
  */
-public class MCRMetaAddressTest extends MCRTestCase {
+@MyCoReTest
+public class MCRMetaAddressTest {
 
     /**
      * check createXML, setFromDom, equals and clone
@@ -43,9 +44,9 @@ public class MCRMetaAddressTest extends MCRTestCase {
         Element address_xml = address.createXML();
         MCRMetaAddress address_read = new MCRMetaAddress();
         address_read.setFromDOM(address_xml);
-        assertEquals("read objects from XML should be equal", address, address_read);
+        assertEquals(address, address_read, "read objects from XML should be equal");
 
         MCRMetaAddress address_clone = address_read.clone();
-        assertEquals("cloned object should be equal with original", address_read, address_clone);
+        assertEquals(address_read, address_clone, "cloned object should be equal with original");
     }
 }

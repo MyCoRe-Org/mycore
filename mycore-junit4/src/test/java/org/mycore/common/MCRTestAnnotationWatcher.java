@@ -24,6 +24,7 @@ import java.util.Optional;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
+@Deprecated(forRemoval = true)
 public class MCRTestAnnotationWatcher<A extends Annotation> extends TestWatcher {
 
     private final Class<A> annotationType;

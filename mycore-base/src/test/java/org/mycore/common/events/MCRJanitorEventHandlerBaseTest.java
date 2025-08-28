@@ -18,18 +18,21 @@
 
 package org.mycore.common.events;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.MCRTestCase;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.test.MyCoReTest;
 
-public class MCRJanitorEventHandlerBaseTest extends MCRTestCase {
+@MyCoReTest
+public class MCRJanitorEventHandlerBaseTest {
 
     @Test
     public void testUserSwitchBack() {
@@ -58,9 +61,10 @@ public class MCRJanitorEventHandlerBaseTest extends MCRTestCase {
 
         MCRUserInformation userInformation = MCRSessionMgr.getCurrentSession().getUserInformation();
 
-        Assert.assertTrue("The EventHandler should have been called", eventHandlerCalled.get());
-        Assert.assertTrue("A Exception should have been thrown", exceptionCatched);
-        Assert.assertEquals("The UserInformation should be the same as before. (" + oldUserInformation.getUserID() + "/"
-            + userInformation.getUserID() + ")", oldUserInformation, userInformation);
+        assertTrue(eventHandlerCalled.get(), "The EventHandler should have been called");
+        assertTrue(exceptionCatched, "A Exception should have been thrown");
+        assertEquals(oldUserInformation, userInformation,
+            "The UserInformation should be the same as before. (" + oldUserInformation.getUserID() + "/"
+                + userInformation.getUserID() + ")");
     }
 }

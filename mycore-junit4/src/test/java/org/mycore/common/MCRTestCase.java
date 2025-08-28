@@ -43,6 +43,7 @@ import org.mycore.common.config.MCRConfigurationException;
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true")
 })
+@Deprecated(forRemoval = true)
 public class MCRTestCase {
 
     @ClassRule

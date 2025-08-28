@@ -18,7 +18,8 @@
 
 package org.mycore.mcr.acl.accesskey.validation;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.Test;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyPartialUpdateDto;
@@ -45,7 +46,7 @@ public class MCRAccessKeyValidatorImplTest {
 
     @Test
     public void testValidateAccessKeyDto_noReference() {
-        Assertions.assertThrows(
+        assertThrows(
             MCRAccessKeyValidationException.class,
             () -> {
                 final MCRAccessKeyValidatorImpl validator = new MCRAccessKeyValidatorImpl();
@@ -58,7 +59,7 @@ public class MCRAccessKeyValidatorImplTest {
 
     @Test
     public void testValidateAccessKeyDto_noPermission() {
-        Assertions.assertThrows(
+        assertThrows(
             MCRAccessKeyValidationException.class,
             () -> {
                 final MCRAccessKeyValidatorImpl validator = new MCRAccessKeyValidatorImpl();
@@ -71,7 +72,7 @@ public class MCRAccessKeyValidatorImplTest {
 
     @Test
     public void testValidateAccessKeyDto_noValue() {
-        Assertions.assertThrows(
+        assertThrows(
             MCRAccessKeyValidationException.class,
             () -> {
                 final MCRAccessKeyValidatorImpl validator = new MCRAccessKeyValidatorImpl();
@@ -94,7 +95,7 @@ public class MCRAccessKeyValidatorImplTest {
 
     @Test
     public void testValidateAccessKeyPartialUpdateDto_valueNull() {
-        Assertions.assertThrows(
+        assertThrows(
             MCRAccessKeyValidationException.class,
             () -> {
                 final MCRAccessKeyValidatorImpl validator = new MCRAccessKeyValidatorImpl();
@@ -108,7 +109,7 @@ public class MCRAccessKeyValidatorImplTest {
 
     @Test
     public void testValidateAccessKeyPartialUpdateDto_permissionNull() {
-        Assertions.assertThrows(
+        assertThrows(
             MCRAccessKeyValidationException.class,
             () -> {
                 final MCRAccessKeyValidatorImpl validator = new MCRAccessKeyValidatorImpl();
@@ -122,7 +123,7 @@ public class MCRAccessKeyValidatorImplTest {
 
     @Test
     public void testValidateAccessKeyPartialUpdateDto_referenceNull() {
-        Assertions.assertThrows(
+        assertThrows(
             MCRAccessKeyValidationException.class,
             () -> {
                 final MCRAccessKeyValidatorImpl validator = new MCRAccessKeyValidatorImpl();
@@ -141,7 +142,7 @@ public class MCRAccessKeyValidatorImplTest {
 
     @Test
     public void testValidatePermission_blank() {
-        Assertions.assertThrows(
+        assertThrows(
             MCRAccessKeyValidationException.class,
             () -> MCRAccessKeyValidatorImpl.validatePermission(""));
     }
@@ -153,7 +154,7 @@ public class MCRAccessKeyValidatorImplTest {
 
     @Test
     public void testValidateSecret_blank() {
-        Assertions.assertThrows(
+        assertThrows(
             MCRAccessKeyValidationException.class,
             () -> MCRAccessKeyValidatorImpl.validateSecret(""));
     }
@@ -165,7 +166,7 @@ public class MCRAccessKeyValidatorImplTest {
 
     @Test
     public void testValidateReference_blank() {
-        Assertions.assertThrows(
+        assertThrows(
             MCRAccessKeyValidationException.class,
             () -> MCRAccessKeyValidatorImpl.validateReference(""));
     }
