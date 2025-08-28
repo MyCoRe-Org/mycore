@@ -7,6 +7,39 @@
     This ruleset contains custom MyCoRe rules
   </description>
 
+  <rule name="MCR.Configuration.PublicFieldsAndMethods"
+        language="java"
+        message="A field or method annotated with a configuration annotation (like @MCRProperty) needs to be public"
+        class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+    <priority>4</priority>
+    <properties>
+      <property name="xpath">
+        <value>
+          //ClassBody/(FieldDeclaration|MethodDeclaration)
+            [
+                ModifierList/Annotation/ClassType[pmd-java:typeIs('org.mycore.common.config.annotation.MCRFactory')]
+              or
+                ModifierList/Annotation/ClassType[pmd-java:typeIs('org.mycore.common.config.annotation.MCRInstance')]
+              or
+                ModifierList/Annotation/ClassType[pmd-java:typeIs('org.mycore.common.config.annotation.MCRInstanceList')]
+              or
+                ModifierList/Annotation/ClassType[pmd-java:typeIs('org.mycore.common.config.annotation.MCRInstanceMap')]
+              or
+                ModifierList/Annotation/ClassType[pmd-java:typeIs('org.mycore.common.config.annotation.MCRPostConstruction')]
+              or
+                ModifierList/Annotation/ClassType[pmd-java:typeIs('org.mycore.common.config.annotation.MCRProperty')]
+              or
+                ModifierList/Annotation/ClassType[pmd-java:typeIs('org.mycore.common.config.annotation.MCRRawProperties')]
+            ]
+            [
+              not(@Visibility='public')
+            ]
+        </value>
+      </property>
+    </properties>
+  </rule>
+  
+  
   <rule name="MCR.Logger.MaxOneField"
         language="java"
         message="There should only be one field with name 'logger' or 'LOGGER' and type 'Logger'"
