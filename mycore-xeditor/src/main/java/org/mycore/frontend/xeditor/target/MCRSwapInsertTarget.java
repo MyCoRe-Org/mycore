@@ -37,7 +37,7 @@ public abstract class MCRSwapInsertTarget extends MCRRepeaterControl {
         String param)
         throws Exception {
         handle(param, session.getRootBinding());
-        session.setBreakpoint("After handling target " + getClass().getName() + " " + param);
+        session.getChangeTracker().setBreakpoint("After handling target " + getClass().getName() + " " + param);
     }
 
     public void handle(String swapParameter, MCRBinding root) throws JaxenException {
