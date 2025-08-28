@@ -27,7 +27,7 @@ import org.mycore.common.xml.MCRXPathBuilder;
 /**
  * Sets an element's text in the edited xml, and tracks that change.  
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRSetElementText extends MCRChange {
 

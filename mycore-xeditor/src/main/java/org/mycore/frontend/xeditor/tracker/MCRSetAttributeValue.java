@@ -24,7 +24,7 @@ import org.mycore.common.xml.MCRXPathBuilder;
 /**
  * Sets an attribute value in the edited xml, and tracks that change.  
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRSetAttributeValue extends MCRChange {
 

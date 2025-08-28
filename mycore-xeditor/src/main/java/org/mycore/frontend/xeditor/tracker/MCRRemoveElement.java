@@ -24,7 +24,7 @@ import org.mycore.common.xml.MCRXPathBuilder;
 /**
  * Removes an element from the edited xml, and tracks that change.  
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRRemoveElement extends MCRChange {
 

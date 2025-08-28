@@ -21,7 +21,7 @@ package org.mycore.frontend.xeditor.tracker;
 /**
  * Represents a change in the edited xml, which can be undone.
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public abstract class MCRChange extends MCRTrackedAction {
 

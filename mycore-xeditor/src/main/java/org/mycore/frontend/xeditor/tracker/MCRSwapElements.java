@@ -26,7 +26,7 @@ import org.mycore.common.xml.MCRXPathBuilder;
 /**
  * Swaps two elements in the edited xml, and tracks that change.  
  * 
- * @author Frank L\u00FCtzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRSwapElements extends MCRChange {
 
