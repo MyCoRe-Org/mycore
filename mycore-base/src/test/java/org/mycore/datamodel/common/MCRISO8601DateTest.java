@@ -18,43 +18,43 @@
 
 package org.mycore.datamodel.common;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MCRISO8601DateTest {
 
     @Test
     public void getDate() {
         MCRISO8601Date ts = new MCRISO8601Date();
-        assertNull("Date is not Null", ts.getDate());
+        assertNull(ts.getDate(), "Date is not Null");
         Date dt = new Date();
         ts.setDate(dt);
-        assertNotNull("Date is Null", ts.getDate());
-        assertEquals("Set date differs from get date", dt, ts.getDate());
+        assertNotNull(ts.getDate(), "Date is Null");
+        assertEquals(dt, ts.getDate(), "Set date differs from get date");
     }
 
     @Test
     public void getFormat() {
         MCRISO8601Date ts = new MCRISO8601Date();
-        assertNull("Format used is not Null", ts.getIsoFormat());
+        assertNull(ts.getIsoFormat(), "Format used is not Null");
         ts.setFormat(MCRISO8601Format.COMPLETE);
-        assertEquals("Set format differs from get format", MCRISO8601Format.COMPLETE, ts.getIsoFormat());
+        assertEquals(MCRISO8601Format.COMPLETE, ts.getIsoFormat(), "Set format differs from get format");
     }
 
     @Test
     public void getISOString() {
         MCRISO8601Date ts = new MCRISO8601Date();
-        assertNull("Date is not Null", ts.getISOString());
+        assertNull(ts.getISOString(), "Date is not Null");
         Date dt = new Date();
         ts.setDate(dt);
-        assertNotNull("Date is Null", ts.getISOString());
+        assertNotNull(ts.getISOString(), "Date is Null");
     }
 
     @Test
@@ -81,7 +81,7 @@ public class MCRISO8601DateTest {
         String timeString = "1997-07-16T19:20:30.452300+01:00";
         System.out.println(timeString);
         ts.setDate(timeString);
-        assertNotNull("Date is null", ts.getDate());
+        assertNotNull(ts.getDate(), "Date is null");
         // this can be a different String, but point in time should be the same
         System.out.println(ts.getISOString());
         ts.setFormat(MCRISO8601Format.COMPLETE_HH_MM);
@@ -91,20 +91,20 @@ public class MCRISO8601DateTest {
         timeString = "1997-07-16T19:20:30+01:00";
         System.out.println(timeString);
         ts.setDate(timeString);
-        assertNull("Date is not null", ts.getDate());
+        assertNull(ts.getDate(), "Date is not null");
         ts.setFormat((String) null); // check auto format determination
         ts.setDate(timeString);
-        assertNotNull("Date is null", ts.getDate());
+        assertNotNull(ts.getDate(), "Date is null");
         // check if shorter format declarations fail if String is longer
         ts.setFormat(MCRISO8601Format.YEAR);
         timeString = "1997-07";
         ts.setDate(timeString);
-        assertNull("Date is not null", ts.getDate());
+        assertNull(ts.getDate(), "Date is not null");
         System.out.println(ts.getISOString());
         timeString = "01.12.1986";
         ts.setFormat((String) null);
         ts.setDate(timeString);
-        assertNull("Date is not null", ts.getDate());
+        assertNull(ts.getDate(), "Date is not null");
 
     }
 }

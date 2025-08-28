@@ -18,15 +18,15 @@
 
 package org.mycore.common.config;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.annotation.MCRInstance;
@@ -34,8 +34,10 @@ import org.mycore.common.config.annotation.MCRInstanceList;
 import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.config.annotation.MCRSentinel;
+import org.mycore.test.MyCoReTest;
 
-public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
+@MyCoReTest
+public class MCRConfigurableInstanceHelperNestedTest {
 
     @Test
     @MCRTestConfiguration(
@@ -58,15 +60,19 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
 
     }
 
-    @Test(expected = MCRConfigurationException.class)
+    @Test
     @MCRTestConfiguration(
         properties = {
             @MCRTestProperty(key = "Foo", classNameOf = TestClassWithNestedClass.class),
         })
     public void nestedNotPresent() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurableInstanceHelper.getInstance(Object.class, configuration);
+        assertThrows(
+            MCRConfigurationException.class,
+            () -> {
+                MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
+                MCRConfigurableInstanceHelper.getInstance(Object.class, configuration);
+            });
 
     }
 
@@ -89,7 +95,6 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
         assertEquals("Value2", instance.nested.string2);
 
     }
-
 
     @Test
     @MCRTestConfiguration(
@@ -224,15 +229,19 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
 
     }
 
-    @Test(expected = MCRConfigurationException.class)
+    @Test
     @MCRTestConfiguration(
         properties = {
             @MCRTestProperty(key = "Foo", classNameOf = TestClassWithNestedMap.class),
         })
     public void nestedMapNotPresent() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurableInstanceHelper.getInstance(Object.class, configuration);
+        assertThrows(
+            MCRConfigurationException.class,
+            () -> {
+                MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
+                MCRConfigurableInstanceHelper.getInstance(Object.class, configuration);
+            });
 
     }
 
@@ -441,15 +450,19 @@ public class MCRConfigurableInstanceHelperNestedTest extends MCRTestCase {
 
     }
 
-    @Test(expected = MCRConfigurationException.class)
+    @Test
     @MCRTestConfiguration(
         properties = {
             @MCRTestProperty(key = "Foo", classNameOf = TestClassWithNestedList.class),
         })
     public void nestedListNotPresent() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurableInstanceHelper.getInstance(Object.class, configuration);
+        assertThrows(
+            MCRConfigurationException.class,
+            () -> {
+                MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
+                MCRConfigurableInstanceHelper.getInstance(Object.class, configuration);
+            });
 
     }
 

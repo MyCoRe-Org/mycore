@@ -18,30 +18,38 @@
 
 package org.mycore.common.config;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.mycore.common.config.singletoncollision.MCRConfigurationSingletonCollisionClassA;
 import org.mycore.common.config.singletoncollision.MCRConfigurationSingletonCollisionClassB;
+import org.mycore.test.MyCoReTest;
 
 /**
  * @author Thomas Scheffler (yagee)
  * @author Tobias Lenhardt [Hammer1279]
  */
-public class MCRConfigurationTest extends MCRTestCase {
+@MyCoReTest
+public class MCRConfigurationTest {
 
     public static final String COLLISION_PROPERTY_NAME = "MCR.Configuration.SingletonCollision.PropertyName";
 
-    @Test(expected = MCRConfigurationException.class)
-    public final void testDeprecatedProperties() {
-        String deprecatedProperty = "MCR.Editor.FileUpload.MaxSize";
-        MCRConfiguration2.getString(deprecatedProperty);
+    @Test
+    final void testDeprecatedProperties() {
+        assertThrows(
+            MCRConfigurationException.class,
+            () -> {
+                String deprecatedProperty = "MCR.Editor.FileUpload.MaxSize";
+                MCRConfiguration2.getString(deprecatedProperty);
+            });
     }
 
     /**
@@ -51,16 +59,17 @@ public class MCRConfigurationTest extends MCRTestCase {
      *
      * @author Tobias Lenhardt [Hammer1279]
      */
-    @Test(timeout = 3600) // 1 minute
-    public final void testSingletonCollision() {
+    @Test
+    @Timeout(value = 1, unit = TimeUnit.MINUTES)
+    final void testSingletonCollision() {
 
         Pair<String, String> properties = createConflictConfiguration();
 
         Object objectA = MCRConfiguration2.getSingleInstanceOfOrThrow(Object.class, properties.getLeft());
         Object objectB = MCRConfigurationSingletonCollisionClassA.COLLISION_CLASS_B;
 
-        assertTrue("Wrong or no class loaded!", objectA instanceof MCRConfigurationSingletonCollisionClassA);
-        assertTrue("Wrong or no class loaded!", objectB instanceof MCRConfigurationSingletonCollisionClassB);
+        assertInstanceOf(MCRConfigurationSingletonCollisionClassA.class, objectA, "Wrong or no class loaded!");
+        assertInstanceOf(MCRConfigurationSingletonCollisionClassB.class, objectB, "Wrong or no class loaded!");
 
     }
 
@@ -72,7 +81,7 @@ public class MCRConfigurationTest extends MCRTestCase {
      * @author Tobias Lenhardt [Hammer1279]
      */
     @Test
-    public final void testSingletonMapGet() {
+    final void testSingletonMapGet() {
 
         Pair<String, String> properties = createConflictConfiguration();
         String propertyA = properties.getLeft();

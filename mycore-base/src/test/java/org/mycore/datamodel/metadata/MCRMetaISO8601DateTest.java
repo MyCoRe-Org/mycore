@@ -18,25 +18,27 @@
 
 package org.mycore.datamodel.metadata;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.time.temporal.ChronoField;
 import java.util.Date;
-import java.util.Map;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRISO8601Format;
+import org.mycore.test.MyCoReTest;
 
 /**
  * This class is a JUnit test case for org.mycore.datamodel.metadata.MCRMeta8601Date.
@@ -44,7 +46,12 @@ import org.mycore.datamodel.common.MCRISO8601Format;
  * @author Thomas Scheffler
  *
  */
-public class MCRMetaISO8601DateTest extends MCRTestCase {
+@MyCoReTest
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = MCRISO8601Date.PROPERTY_STRICT_PARSING, string = "true"),
+    @MCRTestProperty(key = "log4j.logger.org.mycore.datamodel.metadata.MCRMetaISO8601Date", string = "INFO")
+})
+public class MCRMetaISO8601DateTest {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -58,7 +65,7 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         String timeString = "1997-07-16T19:20:30.452300+01:00";
         LOGGER.debug(timeString);
         ts.setDate(timeString);
-        assertNotNull("Date is null", ts.getDate());
+        assertNotNull(ts.getDate(), "Date is null");
         // this can be a different String, but point in time should be the same
         LOGGER.debug(ts.getISOString());
         ts.setFormat(MCRISO8601Format.COMPLETE_HH_MM.toString());
@@ -68,20 +75,20 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         timeString = "1997-07-16T19:20:30+01:00";
         LOGGER.debug(timeString);
         ts.setDate(timeString);
-        assertNull("Date is not null", ts.getDate());
+        assertNull(ts.getDate(), "Date is not null");
         ts.setFormat(null); // check auto format determination
         ts.setDate(timeString);
-        assertNotNull("Date is null", ts.getDate());
+        assertNotNull(ts.getDate(), "Date is null");
         // check if shorter format declarations fail if String is longer
         ts.setFormat(MCRISO8601Format.YEAR.toString());
         timeString = "1997-07";
         ts.setDate(timeString);
-        assertNull("Date is not null", ts.getDate());
+        assertNull(ts.getDate(), "Date is not null");
         LOGGER.debug(ts.getISOString());
         timeString = "01.12.1986";
         ts.setFormat(null);
         ts.setDate(timeString);
-        assertNull("Date is not null", ts.getDate());
+        assertNull(ts.getDate(), "Date is not null");
         MCRConfiguration2.set("MCR.Metadata.SimpleDateFormat.StrictParsing", "false");
         MCRConfiguration2.set("MCR.Metadata.SimpleDateFormat.Locales", "de_DE,en_US");
         ts.setFormat(null);
@@ -115,7 +122,7 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         MCRMetaISO8601Date ts = new MCRMetaISO8601Date("servdate", MCRObjectService.DATE_TYPE_CREATEDATE, 0);
         String timeString = "1997-07-16T19:20:30.452300+01:00";
         ts.setDate(timeString);
-        assertNotNull("Date is null", ts.getDate());
+        assertNotNull(ts.getDate(), "Date is null");
         Element export = ts.createXML();
         if (LOGGER.isDebugEnabled()) {
             XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
@@ -132,28 +139,28 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
     @Test
     public void getFormat() {
         MCRMetaISO8601Date ts = new MCRMetaISO8601Date();
-        assertNull("Format used is not Null", ts.getFormat());
+        assertNull(ts.getFormat(), "Format used is not Null");
         ts.setFormat(MCRISO8601Format.COMPLETE.toString());
-        assertEquals("Set format differs from get format", MCRISO8601Format.COMPLETE.toString(), ts.getFormat());
+        assertEquals(MCRISO8601Format.COMPLETE.toString(), ts.getFormat(), "Set format differs from get format");
     }
 
     @Test
     public void getDate() {
         MCRMetaISO8601Date ts = new MCRMetaISO8601Date();
-        assertNull("Date is not Null", ts.getDate());
+        assertNull(ts.getDate(), "Date is not Null");
         Date dt = new Date();
         ts.setDate(dt);
-        assertNotNull("Date is Null", ts.getDate());
-        assertEquals("Set date differs from get date", dt, ts.getDate());
+        assertNotNull(ts.getDate(), "Date is Null");
+        assertEquals(dt, ts.getDate(), "Set date differs from get date");
     }
 
     @Test
     public void getISOString() {
         MCRMetaISO8601Date ts = new MCRMetaISO8601Date();
-        assertNull("Date is not Null", ts.getISOString());
+        assertNull(ts.getISOString(), "Date is not Null");
         Date dt = new Date();
         ts.setDate(dt);
-        assertNotNull("Date is Null", ts.getISOString());
+        assertNotNull(ts.getISOString(), "Date is Null");
     }
 
     @Test
@@ -162,20 +169,11 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         Element datum = new Element("datum");
         datum.setAttribute("inherited", "0").setText("2006-01-23");
         ts.setFromDOM(datum);
-        assertEquals("Dates not equal", "2006-01-23", ts.getISOString());
+        assertEquals("2006-01-23", ts.getISOString(), "Dates not equal");
         datum.setAttribute("format", MCRISO8601Format.COMPLETE_HH_MM.toString());
         ts.setFromDOM(datum);
-        assertNull("Date should be null", ts.getDate());
-        assertEquals("Format should be set by jdom", MCRISO8601Format.COMPLETE_HH_MM.toString(), ts.getFormat());
-    }
-
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put(MCRISO8601Date.PROPERTY_STRICT_PARSING, "true");
-        testProperties.put("log4j.logger.org.mycore.datamodel.metadata.MCRMetaISO8601Date", "INFO");
-
-        return testProperties;
+        assertNull(ts.getDate(), "Date should be null");
+        assertEquals(MCRISO8601Format.COMPLETE_HH_MM.toString(), ts.getFormat(), "Format should be set by jdom");
     }
 
 }

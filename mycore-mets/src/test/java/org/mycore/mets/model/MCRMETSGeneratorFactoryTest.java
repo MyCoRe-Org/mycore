@@ -18,9 +18,9 @@
 
 package org.mycore.mets.model;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.config.MCRConfiguration2;
 
 public class MCRMETSGeneratorFactoryTest {
@@ -31,7 +31,7 @@ public class MCRMETSGeneratorFactoryTest {
         MCRConfiguration2.set("MCR.Component.MetsMods.Generator", TestGenerator.class.getName());
         // check getGenerator
         MCRMETSGenerator generator = MCRMETSGeneratorFactory.create(null);
-        assertTrue(generator instanceof TestGenerator);
+        assertInstanceOf(TestGenerator.class, generator);
     }
 
     public static class TestGenerator implements MCRMETSGenerator {

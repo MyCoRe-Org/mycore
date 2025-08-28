@@ -18,12 +18,14 @@
 
 package org.mycore.common.xml;
 
-import org.jdom2.Element;
-import org.junit.Assert;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class MCRURIResolverFlavorTest extends MCRTestCase {
+import org.jdom2.Element;
+import org.junit.jupiter.api.Test;
+import org.mycore.test.MyCoReTest;
+
+@MyCoReTest
+public class MCRURIResolverFlavorTest {
 
     @Test
     public void testSaxonFlavor() {
@@ -36,10 +38,10 @@ public class MCRURIResolverFlavorTest extends MCRTestCase {
         String vendor = resolved.getAttributeValue("vendor");
         String vendorUrl = resolved.getAttributeValue("vendor-url");
 
-        Assert.assertEquals("xslt", id);
-        Assert.assertEquals("3.0", version);
-        Assert.assertEquals("Saxonica", vendor);
-        Assert.assertEquals("http://www.saxonica.com/", vendorUrl);
+        assertEquals("xslt", id);
+        assertEquals("3.0", version);
+        assertEquals("Saxonica", vendor);
+        assertEquals("http://www.saxonica.com/", vendorUrl);
 
     }
 
@@ -54,10 +56,10 @@ public class MCRURIResolverFlavorTest extends MCRTestCase {
         String vendor = resolved.getAttributeValue("vendor");
         String vendorUrl = resolved.getAttributeValue("vendor-url");
 
-        Assert.assertEquals("xsl", id);
-        Assert.assertEquals("1.0", version);
-        Assert.assertEquals("Apache Software Foundation", vendor);
-        Assert.assertEquals("http://xml.apache.org/xalan-j", vendorUrl);
+        assertEquals("xsl", id);
+        assertEquals("1.0", version);
+        assertEquals("Apache Software Foundation", vendor);
+        assertEquals("http://xml.apache.org/xalan-j", vendorUrl);
 
     }
 

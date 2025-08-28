@@ -18,6 +18,10 @@
 
 package org.mycore.common.xml;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -27,15 +31,15 @@ import java.nio.file.Path;
 import javax.xml.transform.Source;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.resource.MCRResourceHelper;
+import org.mycore.test.MyCoReTest;
 
-public class MCRURIResolverTest extends MCRTestCase {
+@MyCoReTest
+public class MCRURIResolverTest {
 
     @Test
     public void testGetParentDirectoryResourceURI() throws IOException {
@@ -75,7 +79,7 @@ public class MCRURIResolverTest extends MCRTestCase {
 
     private void checkParentDirectoryResourceUri(String uri, String expectedParentDirectoryResourceUri) {
         String actualParentDirectoryResourceURI = MCRURIResolver.getParentDirectoryResourceURI(uri);
-        Assert.assertEquals(expectedParentDirectoryResourceUri, actualParentDirectoryResourceURI);
+        assertEquals(expectedParentDirectoryResourceUri, actualParentDirectoryResourceURI);
     }
 
     private static Path getConfigurationXslDirectory() {
@@ -94,14 +98,14 @@ public class MCRURIResolverTest extends MCRTestCase {
         String xslResourceUrl = MCRResourceHelper.getResourceUrl("/xsl/functions/xsl-2.xsl").toString();
         Source xslSource = MCRURIResolver.obtainInstance()
             .resolve("xslImport:xsl-import:functions/xsl-2.xsl", xslResourceUrl);
-        Assert.assertNotNull(xslSource);
-        Assert.assertTrue(StringUtils.endsWith(xslSource.getSystemId(), "/xsl/functions/xsl-1.xsl"));
+        assertNotNull(xslSource);
+        assertTrue(StringUtils.endsWith(xslSource.getSystemId(), "/xsl/functions/xsl-1.xsl"));
 
         String xsltResourceUrl = MCRResourceHelper.getResourceUrl("/xslt/functions/xsl-2.xsl").toString();
         Source xsltSource = MCRURIResolver.obtainInstance()
             .resolve("xslImport:xsl-import:functions/xsl-2.xsl", xsltResourceUrl);
-        Assert.assertNotNull(xsltSource);
-        Assert.assertTrue(StringUtils.endsWith(xsltSource.getSystemId(), "/xslt/functions/xsl-1.xsl"));
+        assertNotNull(xsltSource);
+        assertTrue(StringUtils.endsWith(xsltSource.getSystemId(), "/xslt/functions/xsl-1.xsl"));
 
     }
 

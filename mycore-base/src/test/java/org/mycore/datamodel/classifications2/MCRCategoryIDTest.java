@@ -18,8 +18,8 @@
 
 package org.mycore.datamodel.classifications2;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -50,13 +50,13 @@ public class MCRCategoryIDTest {
     public void testMCRCategoryIDStringString() {
         MCRCategoryID categID;
         categID = new MCRCategoryID(validRootID, validCategID);
-        assertEquals("RootIDs do not match", validRootID, categID.getRootID());
-        assertEquals("CategIDs do not match", validCategID, categID.getId());
+        assertEquals(validRootID, categID.getRootID(), "RootIDs do not match");
+        assertEquals(validCategID, categID.getId(), "CategIDs do not match");
     }
 
     @Test
     public void testRootID() {
-        assertEquals("RootIds do not match", validRootID, new MCRCategoryID(validRootID).getRootID());
+        assertEquals(validRootID, new MCRCategoryID(validRootID).getRootID(), "RootIds do not match");
     }
 
     @Test

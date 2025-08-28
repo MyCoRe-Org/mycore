@@ -18,25 +18,25 @@
 
 package org.mycore.common.xml;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.jdom2.Element;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.test.MyCoReTest;
 
+@MyCoReTest
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.Layout.Transformer.Factory.XSLFolder", string = "xsl-test"),
     @MCRTestProperty(key = "MCR.LayoutService.TransformerFactoryClass", string = "%XALAN%")
 })
-public class MCRURIResolverXalanTest extends MCRTestCase {
+public class MCRURIResolverXalanTest {
 
-    @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         MCRURIResolver.obtainInstance().reinitialize();
     }
 
@@ -51,17 +51,15 @@ public class MCRURIResolverXalanTest extends MCRTestCase {
         String vendor = resolved.getAttributeValue("vendor");
         String vendorUrl = resolved.getAttributeValue("vendor-url");
 
-        Assert.assertEquals("xsl-test", id);
-        Assert.assertEquals("1.0", version);
-        Assert.assertEquals("Apache Software Foundation", vendor);
-        Assert.assertEquals("http://xml.apache.org/xalan-j", vendorUrl);
+        assertEquals("xsl-test", id);
+        assertEquals("1.0", version);
+        assertEquals("Apache Software Foundation", vendor);
+        assertEquals("http://xml.apache.org/xalan-j", vendorUrl);
 
     }
 
-    @Override
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
-        super.tearDown();
         MCRURIResolver.obtainInstance().reinitialize();
     }
 

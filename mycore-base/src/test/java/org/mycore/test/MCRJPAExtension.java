@@ -63,7 +63,7 @@ public class MCRJPAExtension
     private static final String SCHEMA_INITIALIZED = "schemaInitialized";
     private static final Logger LOGGER = LogManager.getLogger();
     //name of current component or application module under test
-    private String componentName;
+    private final String componentName;
     private EntityManager entityManager;
 
     public MCRJPAExtension() {

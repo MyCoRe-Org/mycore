@@ -18,27 +18,29 @@
 
 package org.mycore.common.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.test.MyCoReTest;
 
-public class MCRXMLFunctionsTest extends MCRTestCase {
+@MyCoReTest
+public class MCRXMLFunctionsTest {
 
     private static final String[] HTML_STRINGS = { "<h1>Hello World!</h1>",
         "<h1>Hell<i>o</i> World!<br /></h1>", "<h1>Hell<i>o</i> World!<br></h1>",
         "<h1>Hell<i>o</i> World!&lt;br&gt;</h1>", "<h1>Hell<i>&ouml;</i> World!&lt;br&gt;</h1>",
         "<h1>Hello</h1> <h2>World!</h2><br/>", "Hello <a href=\"http://www.mycore.de\">MyCoRe</a>!",
         "Hello <a href='http://www.mycore.de'>MyCoRe</a>!",
-        "Gläser und Glaskeramiken im MgO-Al<sub>2</sub>O<sub>3</sub>-SiO<sub>2</sub>-System mit hoher Mikrohärte und hohem Elastizitätsmodul" };
+        "Gläser und Glaskeramiken im MgO-Al<sub>2</sub>O<sub>3</sub>-SiO<sub>2</sub>" +
+            "-System mit hoher Mikrohärte und hohem Elastizitätsmodul", };
 
     private static final String[] NON_HTML_STRINGS = { "Hello MyCoRe!", "a < b > c" };
 
@@ -57,8 +59,8 @@ public class MCRXMLFunctionsTest extends MCRTestCase {
     @Test
     public void getISODate() throws ParseException {
         assertEquals("1964-02-24", MCRXMLFunctions.getISODate("24.02.1964", "dd.MM.yyyy", "YYYY-MM-DD"));
-        assertEquals("Timezone was not correctly detected", "1964-02-23T22:00:00Z", MCRXMLFunctions
-            .getISODate("24.02.1964 00:00:00 +0200", "dd.MM.yyyy HH:mm:ss Z", "YYYY-MM-DDThh:mm:ssTZD"));
+        assertEquals("1964-02-23T22:00:00Z", MCRXMLFunctions.getISODate("24.02.1964 00:00:00 +0200",
+            "dd.MM.yyyy HH:mm:ss Z", "YYYY-MM-DDThh:mm:ssTZD"), "Timezone was not correctly detected");
     }
 
     /*
@@ -80,47 +82,47 @@ public class MCRXMLFunctionsTest extends MCRTestCase {
     public void normalizeAbsoluteURL() throws MalformedURLException, URISyntaxException {
         String source = "http://www.mycore.de/Space Character.test";
         String result = "http://www.mycore.de/Space%20Character.test";
-        assertEquals("Result URL is not correct", result, MCRXMLFunctions.normalizeAbsoluteURL(source));
-        assertEquals("URL differs,  but was already RFC 2396 conform.", result,
-            MCRXMLFunctions.normalizeAbsoluteURL(result));
+        assertEquals(result, MCRXMLFunctions.normalizeAbsoluteURL(source), "Result URL is not correct");
+        assertEquals(result, MCRXMLFunctions.normalizeAbsoluteURL(result),
+            "URL differs, but was already RFC 2396 conform.");
         source = "http://www.mycore.de/Hühnerstall.pdf";
         result = "http://www.mycore.de/H%C3%BChnerstall.pdf";
-        assertEquals("Result URL is not correct", result, MCRXMLFunctions.normalizeAbsoluteURL(source));
-        assertEquals("URL differs,  but was already RFC 2396 conform.", result,
-            MCRXMLFunctions.normalizeAbsoluteURL(result));
+        assertEquals(result, MCRXMLFunctions.normalizeAbsoluteURL(source), "Result URL is not correct");
+        assertEquals(result, MCRXMLFunctions.normalizeAbsoluteURL(result),
+            "URL differs, but was already RFC 2396 conform.");
     }
 
     @Test
     public void endodeURIPath() throws URISyntaxException {
         String source = "Space Character.test";
         String result = "Space%20Character.test";
-        assertEquals("Result URI path is not correct", result, MCRXMLFunctions.encodeURIPath(source));
+        assertEquals(result, MCRXMLFunctions.encodeURIPath(source), "Result URI path is not correct");
         source = "Hühnerstall.pdf";
         result = "H%C3%BChnerstall.pdf";
-        assertEquals("Result URI path is not correct", source, MCRXMLFunctions.encodeURIPath(source));
-        assertEquals("Result URI path is not correct", result, MCRXMLFunctions.encodeURIPath(source, true));
+        assertEquals(source, MCRXMLFunctions.encodeURIPath(source), "Result URI path is not correct");
+        assertEquals(result, MCRXMLFunctions.encodeURIPath(source, true), "Result URI path is not correct");
     }
 
     @Test
     public void decodeURIPath() throws URISyntaxException {
         String source = "Space%20Character.test";
         String result = "Space Character.test";
-        assertEquals("Result URI path is not correct", result, MCRXMLFunctions.decodeURIPath(source));
+        assertEquals(result, MCRXMLFunctions.decodeURIPath(source), "Result URI path is not correct");
         source = "H%C3%BChnerstall.pdf";
         result = "Hühnerstall.pdf";
-        assertEquals("Result URI path is not correct", result, MCRXMLFunctions.decodeURIPath(source));
+        assertEquals(result, MCRXMLFunctions.decodeURIPath(source), "Result URI path is not correct");
         source = "/New%20Folder";
         result = "/New Folder";
-        assertEquals("Result URI path is not correct", result, MCRXMLFunctions.decodeURIPath(source));
+        assertEquals(result, MCRXMLFunctions.decodeURIPath(source), "Result URI path is not correct");
     }
 
     @Test
     public void shortenText() {
         String test = "Foo bar";
         String result = "Foo…";
-        assertEquals("Shortened text did not match", result, MCRXMLFunctions.shortenText(test, 3));
-        assertEquals("Shortened text did not match", result, MCRXMLFunctions.shortenText(test, 0));
-        assertEquals("Shortened text did not match", test, MCRXMLFunctions.shortenText(test, test.length()));
+        assertEquals(result, MCRXMLFunctions.shortenText(test, 3), "Shortened text did not match");
+        assertEquals(result, MCRXMLFunctions.shortenText(test, 0), "Shortened text did not match");
+        assertEquals(test, MCRXMLFunctions.shortenText(test, test.length()), "Shortened text did not match");
     }
 
     /*
@@ -129,10 +131,10 @@ public class MCRXMLFunctionsTest extends MCRTestCase {
     @Test
     public void isHtml() {
         for (final String s : HTML_STRINGS) {
-            assertTrue("Should be html: " + s, MCRXMLFunctions.isHtml(s));
+            assertTrue(MCRXMLFunctions.isHtml(s), "Should be html: " + s);
         }
         for (final String s : NON_HTML_STRINGS) {
-            assertFalse("Should not be html: " + s, MCRXMLFunctions.isHtml(s));
+            assertFalse(MCRXMLFunctions.isHtml(s), "Should not be html: " + s);
         }
     }
 
@@ -143,7 +145,7 @@ public class MCRXMLFunctionsTest extends MCRTestCase {
     public void stripHtml() {
         for (final String s : HTML_STRINGS) {
             final String stripped = MCRXMLFunctions.stripHtml(s);
-            assertFalse("Should not contains html: " + stripped, MCRXMLFunctions.isHtml(stripped));
+            assertFalse(MCRXMLFunctions.isHtml(stripped), "Should not contains html: " + stripped);
         }
     }
 

@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 
 /**
@@ -30,9 +30,9 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
  */
 public class MCRTestCategoryMapper extends MCRCategoryMapperBase {
 
-    private Map<MCRCategoryID, MCRCategoryID> parents = new HashMap<>();
+    private final Map<MCRCategoryID, MCRCategoryID> parents = new HashMap<>();
 
-    private Map<MCRCategoryID, String> mappingRules = new HashMap<>();
+    private final Map<MCRCategoryID, String> mappingRules = new HashMap<>();
 
     public void setParent(MCRCategoryID childID, MCRCategoryID parentID) {
         parents.put(childID, parentID);

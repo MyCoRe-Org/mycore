@@ -27,12 +27,15 @@ import java.lang.annotation.Target;
 /**
  * This annotation is used to configure which sub-property acts as a sentinel, i.e. which property should be used to
  * decide if a component, otherwise included in a field annotated with {@link MCRInstance}, {@link MCRInstanceMap}
- * or {@link MCRInstanceList}, should actually be instantiated and configured.
+ * or {@link MCRInstanceList}, should actually be instantiated and configured, or if it should be rejected and treated
+ * as if it is not part of the configuration.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Inherited
 public @interface MCRSentinel {
+
+    String DEFAULT_KEY = "Default";
 
     String ENABLED_KEY = "Enabled";
 
@@ -45,6 +48,11 @@ public @interface MCRSentinel {
      * @return The default value to be used if the configured sub-property is not present.
      */
     boolean defaultValue() default true;
+
+    /**
+     * @return The value of the sub-property that causes the component to be rejected.
+     */
+    boolean rejectionValue() default false;
 
     /**
      * @return Weather or not the sentinel is enabled.

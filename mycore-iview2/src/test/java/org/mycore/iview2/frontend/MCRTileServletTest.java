@@ -9,7 +9,7 @@ import org.mycore.test.MyCoReTest;
 
 @Deprecated
 @MyCoReTest
-class MCRTileServletTest {
+public class MCRTileServletTest {
 
     @ParameterizedTest
     @CsvSource({
@@ -18,7 +18,7 @@ class MCRTileServletTest {
         "/mir_derivate_00000001/dt_zs_155_jg1762_002.tif/4/3/0.jpg, mir_derivate_00000001, " +
                 "/dt_zs_155_jg1762_002.tif, 4/3/0.jpg"
     })
-    void getTileInfoParameterized(String pathInfo, String expectedDerivate, String expectedImagePath,
+    public void getTileInfoParameterized(String pathInfo, String expectedDerivate, String expectedImagePath,
         String expectedTile) {
         MCRTileInfo tileInfo = MCRTileServlet.getTileInfo(pathInfo);
         assertEquals(expectedDerivate, tileInfo.derivate());

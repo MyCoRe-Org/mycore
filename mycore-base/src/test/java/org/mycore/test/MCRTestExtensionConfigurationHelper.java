@@ -57,7 +57,7 @@ public class MCRTestExtensionConfigurationHelper {
         if (System.getProperties().getProperty(MCR_HOME_PROPERTY) == null) {
             Path baseDir = junitFolder.resolve("mcrhome");
             Files.createDirectories(baseDir);
-            System.out.println("Setting MCR.Home=" + baseDir.toAbsolutePath().toString());
+            System.out.println("Setting MCR.Home=" + baseDir.toAbsolutePath());
             System.getProperties().setProperty(MCR_HOME_PROPERTY, baseDir.toAbsolutePath().toString());
         }
         if (System.getProperties().getProperty(MCR_APP_NAME_PROPERTY) == null) {

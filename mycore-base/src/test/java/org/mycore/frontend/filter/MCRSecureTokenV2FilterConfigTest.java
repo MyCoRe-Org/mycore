@@ -18,21 +18,22 @@
 
 package org.mycore.frontend.filter;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.regex.Pattern;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.test.MyCoReTest;
 
 /**
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRSecureTokenV2FilterConfigTest extends MCRTestCase {
+@MyCoReTest
+public class MCRSecureTokenV2FilterConfigTest {
 
     /**
      * Test method for {@link org.mycore.frontend.filter.MCRSecureTokenV2FilterConfig#getExtensionPattern(java.util.Collection)}.
@@ -53,9 +54,9 @@ public class MCRSecureTokenV2FilterConfigTest extends MCRTestCase {
 
     private void testPattern(Pattern p, String filename, boolean result) {
         if (result) {
-            assertTrue("Filename " + filename + " should match " + p, p.matcher(filename).matches());
+            assertTrue(p.matcher(filename).matches(), "Filename " + filename + " should match " + p);
         } else {
-            assertFalse("Filename " + filename + " should not match " + p, p.matcher(filename).matches());
+            assertFalse(p.matcher(filename).matches(), "Filename " + filename + " should not match " + p);
         }
     }
 

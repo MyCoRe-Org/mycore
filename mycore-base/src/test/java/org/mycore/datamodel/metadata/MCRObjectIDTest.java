@@ -18,17 +18,17 @@
 
 package org.mycore.datamodel.metadata;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -36,12 +36,23 @@ import java.util.stream.Stream;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mycore.common.MCRStoreTestCase;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MCRMetadataExtension;
+import org.mycore.test.MyCoReTest;
 
-public class MCRObjectIDTest extends MCRStoreTestCase {
+@MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
+@ExtendWith(MCRMetadataExtension.class)
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true"),
+    @MCRTestProperty(key = "MCR.Metadata.Type.junit", string = "true")
+})
+public class MCRObjectIDTest {
 
     private static final String BASE_ID = "MyCoRe_test";
 
@@ -57,38 +68,35 @@ public class MCRObjectIDTest extends MCRStoreTestCase {
             Object oNumberFormat = mInitNumberformat.invoke(null);
             fNumberformat.set(null, oNumberFormat);
         } catch (Exception e) {
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         }
-    }
-
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
     }
 
     @Test
     public void setNextFreeIdString() {
         MCRObjectID id1 = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(BASE_ID);
-        assertEquals("First id should be int 1", 1, id1.getNumberAsInteger());
+        assertEquals(1, id1.getNumberAsInteger(), "First id should be int 1");
         MCRObjectID id2 = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(BASE_ID);
-        assertEquals("Second id should be int 2", 2, id2.getNumberAsInteger());
-        getStore().create(id2, new Document(new Element("test")), new Date());
+        assertEquals(2, id2.getNumberAsInteger(), "Second id should be int 2");
+        MCRXMLMetadataManager.getInstance().create(id2, new Document(new Element("test")), new Date());
         MCRObjectID id3 = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(BASE_ID);
-        assertEquals("Second id should be int 3", 3, id3.getNumberAsInteger());
+        assertEquals(3, id3.getNumberAsInteger(), "Second id should be int 3");
     }
 
     @Test
     public void validateID() {
-        assertTrue("The mcrid 'JUnit_test_123' is valid", MCRObjectID.isValid("JUnit_test_123"));
-        assertFalse("The mcrid 'JUnit_xxx_123' is invalid (unknown type)", MCRObjectID.isValid("JUnit_xxx_123"));
-        assertFalse("The mcrid 'JUnit_test__123' is invalid (to many underscores)",
-            MCRObjectID.isValid("JUnit_test__123"));
-        assertFalse("The mcrid 'JUnit_test_123 ' is invalid (space at end)", MCRObjectID.isValid("JUnit_test_123 "));
-        assertFalse("The mcrid 'JUnit_test_-123' is invalid (negative number)", MCRObjectID.isValid("JUnit_test_-123"));
+        assertTrue(MCRObjectID.isValid("JUnit_test_123"), "The mcrid 'JUnit_test_123' is valid");
+        assertFalse(MCRObjectID.isValid("JUnit_xxx_123"),
+            "The mcrid 'JUnit_xxx_123' is invalid (unknown type)");
+        assertFalse(MCRObjectID.isValid("JUnit_test__123"),
+            "The mcrid 'JUnit_test__123' is invalid (to many underscores)");
+        assertFalse(MCRObjectID.isValid("JUnit_test_123 "),
+            "The mcrid 'JUnit_test_123 ' is invalid (space at end)");
+        assertFalse(MCRObjectID.isValid("JUnit_test_-123"),
+            "The mcrid 'JUnit_test_-123' is invalid (negative number)");
         assertFalse(
-            "The mcrid 'aaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeeeffffffffff_test_123' is invalid (length)",
-            MCRObjectID.isValid("aaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeeeffffffffff_test_123"));
+            MCRObjectID.isValid("aaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeeeffffffffff_test_123"),
+            "The mcrid 'aaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeeeffffffffff_test_123' is invalid (length)");
     }
 
     @Test
@@ -105,20 +113,13 @@ public class MCRObjectIDTest extends MCRStoreTestCase {
                                 projectId,
                                 o.getTypeId(),
                                 o.getNumberAsInteger())))))
+            .sequential()
             .collect(Collectors.toSet());
         ArrayList<MCRObjectID> first = new ArrayList<>(testIds);
         ArrayList<MCRObjectID> test = new ArrayList<>(testIds);
         first.sort(Comparator.comparing(MCRObjectID::toString));
         test.sort(MCRObjectID::compareTo);
-        assertArrayEquals("Order should be the same.", first.toArray(), test.toArray());
-    }
-
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.Metadata.Type.test", Boolean.TRUE.toString());
-        testProperties.put("MCR.Metadata.Type.junit", Boolean.TRUE.toString());
-        return testProperties;
+        assertArrayEquals(first.toArray(), test.toArray(), "Order should be the same.");
     }
 
 }

@@ -18,12 +18,12 @@
 
 package org.mycore.common.content.streams;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.io.ByteArrayInputStream;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.digest.MCRMD5Digest;
 import org.mycore.datamodel.ifs2.MCRFile;

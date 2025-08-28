@@ -53,6 +53,8 @@ Applications based on MyCoRe use a common core, which provides the functionality
   </scm>
   <properties>
     <argLine />
+    <!-- same as ocfl aws sdk version -->
+    <aws-sdk.version>2.29.52</aws-sdk.version>
     <changelog.since>2024-12-18</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
     <changes.version>2025.02</changes.version>
@@ -177,9 +179,20 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
+      <!-- Bibsonomy is not hosted on Maven Central -->
       <id>dev.bibsonomy.org</id>
       <name>Official Source Code Releases of selected BibSonomy Modules</name>
       <url>https://dev.bibsonomy.org/maven2/</url>
+    </repository>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <!-- a simple, Maven-compliant download area on mycore.de 
+           mainly used for libraries that are not (no longer) available elsewhere -->
+      <id>mycore-maven-repo</id>
+      <name>Maven repository on mycore.de</name>
+      <url>https://www.mycore.de/maven-repo/</url>
     </repository>
   </repositories>
   <pluginRepositories>
@@ -914,6 +927,13 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <scope>import</scope>
       </dependency>
       <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>bom</artifactId>
+        <version>${aws-sdk.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
         <groupId>at.favre.lib</groupId>
         <artifactId>bcrypt</artifactId>
         <version>0.10.2</version>
@@ -1103,6 +1123,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>io.ocfl</groupId>
         <artifactId>ocfl-java-api</artifactId>
+        <version>${ocfl-java.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.ocfl</groupId>
+        <artifactId>ocfl-java-aws</artifactId>
         <version>${ocfl-java.version}</version>
       </dependency>
       <dependency>
@@ -1635,6 +1660,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-ocfl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-ocfl-s3</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -2540,6 +2570,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <module>mycore-impex</module>
     <module>mycore-iview2</module>
     <module>mycore-jobqueue</module>
+    <module>mycore-junit4</module>
     <module>mycore-packer</module>
     <module>mycore-lod</module>
     <module>mycore-media</module>
@@ -2568,6 +2599,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <module>mycore-coma</module>
     <module>mycore-cronjob</module>
     <module>mycore-ocfl</module>
+    <module>mycore-ocfl-s3</module>
     <module>mycore-validation</module>
   </modules>
 </project>
