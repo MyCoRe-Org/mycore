@@ -18,12 +18,10 @@
 
 package org.mycore.datamodel.metadata;
 
-import java.util.function.BiConsumer;
-
 /**
  * Plugin point for custom actions that need to occur before first deletion steps
  * in the process of deleting an {@link MCRObject}.
- * Compare {@link MCRMetadataManager#delete(MCRObject, BiConsumer)}.
+ * Compare {@link MCRMetadataManager#delete(MCRObject)}.
  */
 public interface MCRPreDeleteAction {
 
