@@ -22,25 +22,19 @@ import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRJSONManager;
-import org.mycore.common.MCRTestCase;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationBase;
-import org.mycore.common.config.MCRConfigurationLoader;
-import org.mycore.common.config.MCRConfigurationLoaderFactory;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 import org.mycore.frontend.classeditor.mocks.CategoryDAOMock;
+import org.mycore.test.MyCoReTest;
 
 import com.google.gson.Gson;
-import org.mycore.test.MyCoReTest;
 
 @MCRTestConfiguration(
     properties = {
         @MCRTestProperty(key = "MCR.Metadata.DefaultLang", string = "de"),
         @MCRTestProperty(key = "MCR.Category.DAO", classNameOf = CategoryDAOMock.class)
-    }
-)
+    })
 @MyCoReTest
 public class MCRCategoryJsonTest {
     @Test
