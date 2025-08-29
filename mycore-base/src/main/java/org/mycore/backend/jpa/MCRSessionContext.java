@@ -18,6 +18,7 @@
 
 package org.mycore.backend.jpa;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
@@ -64,12 +65,16 @@ class MCRSessionContext implements MCRSessionListener {
                 }
                 break;
             case PASSIVATED:
-                currentEntityManager = unbind();
-                autoCloseSession(currentEntityManager);
+                if (Objects.equals(event.getSession().getID(), MCRSessionMgr.getCurrentSessionID())) {
+                    currentEntityManager = unbind();
+                    autoCloseSession(currentEntityManager);
+                }
                 break;
             case DESTROYED:
-                currentEntityManager = unbind();
-                autoCloseSession(currentEntityManager);
+                if (Objects.equals(event.getSession().getID(), MCRSessionMgr.getCurrentSessionID())) {
+                    currentEntityManager = unbind();
+                    autoCloseSession(currentEntityManager);
+                }
                 break;
             case CREATED:
                 break;
