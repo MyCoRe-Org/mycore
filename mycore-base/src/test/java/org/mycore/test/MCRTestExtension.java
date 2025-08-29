@@ -81,6 +81,7 @@ public class MCRTestExtension implements Extension, BeforeEachCallback, AfterEac
     @Override
     public void beforeAll(ExtensionContext context) throws Exception {
         Map<String, String> configProperties = getConfigProperties(context);
+        configProperties.clear(); //clear properties from previous test classes
         configProperties.putAll(mycoreProperties);
         configProperties.putAll(MCRTestExtensionConfigurationHelper.getAnnotatedProperties(context));
         context.getStore(ExtensionContext.Namespace.create(context.getRequiredTestClass()))
@@ -110,6 +111,7 @@ public class MCRTestExtension implements Extension, BeforeEachCallback, AfterEac
         try {
             MCRTestHelper.deleteRecursively(testFolder);
             LogManager.getLogger().debug(() -> "Deleted test folder: " + testFolder);
+            MCRConfigurationBase.initialize(configurationLoader.loadDeprecated(), mycoreProperties, true);
         } finally {
             context.getRoot().getStore(NAMESPACE).put(PROPERTIES_LOADED_PROPERTY, Boolean.FALSE);
         }
