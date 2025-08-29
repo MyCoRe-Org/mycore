@@ -26,9 +26,8 @@ import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mycore.iview.tests.ViewerTestBase;
 import org.mycore.iview.tests.controller.ControllerUtil;
 import org.mycore.iview.tests.controller.ImageOverviewController;
@@ -38,12 +37,12 @@ import org.mycore.iview.tests.image.api.ColorFilter;
 import org.mycore.iview.tests.image.api.FilterSelection;
 import org.mycore.iview.tests.image.api.Selection;
 import org.mycore.iview.tests.model.TestDerivate;
+import org.openqa.selenium.WebDriver;
 
 /**
  * @author Sebastian Röher (basti890)
  *
  */
-@Category(org.mycore.iview.tests.groups.ImageViewerTests.class)
 public class ImageOverviewIT extends ViewerTestBase {
 
     private static final String RGB_LABEL = "rgb.tiff";
@@ -58,6 +57,9 @@ public class ImageOverviewIT extends ViewerTestBase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    ImageOverviewIT(WebDriver driver) {
+        super(driver);
+    }
     @Test
     /**
      * Checks if the image overview works
@@ -65,7 +67,6 @@ public class ImageOverviewIT extends ViewerTestBase {
      * @throws InterruptedException
      */
     public void testImageOverview() throws InterruptedException {
-        this.setTestName(getClassname() + "-testImageOverview");
         this.getDriver();
         this.getAppController().openViewer(this.getDriver(), getBaseURL(), getTestDerivate());
 
@@ -119,7 +120,7 @@ public class ImageOverviewIT extends ViewerTestBase {
         sleep(500);
 
         String message = label + " should be selected (class-attribut 'selected' should be set)!";
-        Assert.assertTrue(message, ioController.isImageSelected(label));
+        Assertions.assertTrue(ioController.isImageSelected(label), message);
         String fileName = String.format("%s-%s-%s-%s-%s", this.getClassname(), label, color.getRed(), color.getBlue(),
             color.getGreen());
         BufferedImage bImage = ControllerUtil.getScreenshot(getDriver(), fileName);
@@ -140,7 +141,7 @@ public class ImageOverviewIT extends ViewerTestBase {
     private void assertLess(int moreValue, int lessValue, String messagePattern) {
         String message = new MessageFormat(messagePattern, Locale.ROOT).format(new Object[] { lessValue, moreValue });
         LOGGER.debug(message);
-        Assert.assertTrue(message, lessValue < moreValue);
+        Assertions.assertTrue(lessValue < moreValue, message);
     }
 
     @Override

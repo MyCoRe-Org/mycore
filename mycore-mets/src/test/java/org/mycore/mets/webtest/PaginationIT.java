@@ -18,12 +18,11 @@
 
 package org.mycore.mets.webtest;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.selenium.drivers.MCRWebdriverWrapper;
 import org.mycore.common.selenium.util.MCRBy;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
@@ -34,32 +33,36 @@ import org.openqa.selenium.support.ui.Select;
 public class PaginationIT extends MetsEditorTestBase {
 
     private static final String TEST_STRING = "test123";
+    MCRWebdriverWrapper webDriver;
+
+    PaginationIT(MCRWebdriverWrapper webDriver) {
+        super(webDriver);
+        this.webDriver = webDriver;
+    }
 
     @Test
     public void setPagination() {
-        WebDriver webDriver = getDriver();
         WebElement row = webDriver.findElement(MCRBy.partialText("perthes_1855_0001.jpg")).findElement(
             By.xpath("ancestor::tr"));
         row.findElement(By.xpath("//button[@title=\"???editPagination???\"]")).click();
         row.findElement(By.xpath("//input")).sendKeys(TEST_STRING);
         row.findElement(By.xpath("//button[@title=\"???paginationChange???\"]")).click();
-        Assert.assertNotNull(row.findElement(MCRBy.partialText(TEST_STRING)));
+        Assertions.assertNotNull(row.findElement(MCRBy.partialText(TEST_STRING)));
     }
 
     @Test
     public void abortPagination() {
-        MCRWebdriverWrapper webDriver = getDriver();
         WebElement row = webDriver.waitAndFindElement(MCRBy.partialText("perthes_1855_0001.jpg")).findElement(
             By.xpath("ancestor::tr"));
         row.findElement(By.xpath("//button[@title=\"???editPagination???\"]")).click();
         row.findElement(By.xpath("//input")).sendKeys(TEST_STRING);
         row.findElement(By.xpath("//button[@title=\"???paginationAbort???\"]")).click();
-        Assert.assertTrue("Pagination should not be set!", row.findElements(MCRBy.partialText(TEST_STRING)).isEmpty());
+        Assertions.assertTrue(row.findElements(MCRBy.partialText(TEST_STRING)).isEmpty(),
+            "Pagination should not be set!");
     }
 
     @Test
     public void autoPaginationAll() throws InterruptedException {
-        MCRWebdriverWrapper webDriver = getDriver();
         webDriver.waitAndFindElement(By.xpath("//button[@title=\"autoPagination\"]")).click();
 
         // wait for the Pagination-Dialog
@@ -70,8 +73,8 @@ public class PaginationIT extends MetsEditorTestBase {
         Select select = new Select(webDriver.findElement(By.tagName("select")));
         select.selectByVisibleText("???rectoVerso_lowercase???");
         webDriver.waitAndFindElement(By.xpath("//button[contains(text(),\"???paginationChange???\")]")).click();
-        Assert.assertNotNull(webDriver.waitAndFindElement(MCRBy.partialText("1v")));
-        Assert.assertNotNull(webDriver.waitAndFindElement(MCRBy.partialText("18r")));
+        Assertions.assertNotNull(webDriver.waitAndFindElement(MCRBy.partialText("1v")));
+        Assertions.assertNotNull(webDriver.waitAndFindElement(MCRBy.partialText("18r")));
     }
 
     /* @Test
