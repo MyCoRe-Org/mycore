@@ -29,10 +29,17 @@ import java.util.stream.IntStream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
+@MCRTestConfiguration(
+    properties = {
+        @MCRTestProperty(key="MCR.Metadata.Type.test", string = "true")
+    }
+)
 public class MCRFileBaseCacheObjectIDGeneratorTest {
 
     public static final int GENERATOR_COUNT = 10;
