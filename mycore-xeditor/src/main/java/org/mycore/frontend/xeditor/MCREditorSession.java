@@ -122,7 +122,7 @@ public class MCREditorSession {
     }
 
     public String getCombinedSessionStepID() {
-        return id + "-" + tracker.getChangeCounter();
+        return id + "-" + tracker.getChangeCount();
     }
 
     public void setPageURL(String pageURL) {
@@ -208,7 +208,7 @@ public class MCREditorSession {
         LOGGER.info("Reading edited XML from {}", uriRe);
         Document xml = MCRSourceContent.createInstance(uriRe).asXML();
         setEditedXML(xml);
-        setBreakpoint("Reading XML from " + uriRe);
+        getChangeTracker().setBreakpoint("Reading XML from " + uriRe);
     }
 
     public MCRBinding getRootBinding() {
@@ -218,9 +218,7 @@ public class MCREditorSession {
     }
 
     public void setBreakpoint(String msg) {
-        if (editedXML != null) {
-            tracker.track(MCRBreakpoint.setBreakpoint(editedXML.getRootElement(), msg));
-        }
+        tracker.track(new MCRBreakpoint(msg));
     }
 
     public MCRChangeTracker getChangeTracker() {

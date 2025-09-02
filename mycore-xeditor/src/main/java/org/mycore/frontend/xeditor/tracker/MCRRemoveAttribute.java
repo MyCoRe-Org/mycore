@@ -19,17 +19,30 @@
 package org.mycore.frontend.xeditor.tracker;
 
 import org.jdom2.Attribute;
+import org.jdom2.Element;
+import org.mycore.common.xml.MCRXPathBuilder;
 
-public class MCRRemoveAttribute implements MCRChange {
+/**
+ * Removes an attribute from the edited xml, and tracks that change.  
+ * 
+ * @author Frank Lützenkirchen
+ */
+public class MCRRemoveAttribute extends MCRChange {
 
-    public static MCRChangeData remove(Attribute attribute) {
-        MCRChangeData data = new MCRChangeData("removed-attribute", attribute);
+    private Element parent;
+
+    private Attribute attribute;
+
+    public MCRRemoveAttribute(Attribute attribute) {
+        this.parent = attribute.getParent();
+        this.attribute = attribute;
+
+        setMessage("Removed " + MCRXPathBuilder.buildXPath(attribute));
         attribute.detach();
-        return data;
     }
 
     @Override
-    public void undo(MCRChangeData data) {
-        data.getContext().setAttribute(data.getAttribute());
+    protected void undo() {
+        parent.setAttribute(attribute);
     }
 }

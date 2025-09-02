@@ -18,35 +18,20 @@
 
 package org.mycore.frontend.xeditor.tracker;
 
-import org.jdom2.Element;
-import org.mycore.common.xml.MCRXPathBuilder;
-
 /**
- * Removes an element from the edited xml, and tracks that change.  
+ * Represents an action tracked while the edited xml is changed, which can be undone.
  * 
  * @author Frank Lützenkirchen
  */
-public class MCRRemoveElement extends MCRChange {
+public class MCRTrackedAction {
 
-    /** The removed element */
-    private Element element;
+    private String message;
 
-    private Element parent;
-
-    /** The position in the parent's content before removing */
-    private int positionInParent;
-
-    public MCRRemoveElement(Element element) {
-        this.element = element;
-        this.parent = element.getParentElement();
-        this.positionInParent = parent.indexOf(element);
-        
-        setMessage("Removed " + MCRXPathBuilder.buildXPath(element));
-        element.detach();
+    protected void setMessage(String message) {
+        this.message = message;
     }
 
-    @Override
-    protected void undo() {
-        parent.addContent(positionInParent, element);
+    public String getMessage() {
+        return message;
     }
 }
