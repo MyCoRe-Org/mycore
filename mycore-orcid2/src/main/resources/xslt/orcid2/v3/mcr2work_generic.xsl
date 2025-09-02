@@ -24,8 +24,8 @@
     <work:work xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.orcid.org/ns/work record_3.0/work-3.0.xsd">
       <xsl:call-template name="workTitle" />
       <xsl:call-template name="journal-title" />
-      <xsl:call-template name="workCitation" />
       <xsl:apply-templates select="mods:abstract" />
+      <xsl:call-template name="workCitation" />
       <xsl:variable name="modsDateIssuedXpath">
         <xsl:evaluate xpath="$MCR.ORCID2.Mods.DateIssued.XPath" context-item="." />
       </xsl:variable>
