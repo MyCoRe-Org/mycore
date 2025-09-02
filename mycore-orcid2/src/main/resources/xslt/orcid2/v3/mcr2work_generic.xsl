@@ -24,12 +24,12 @@
     <work:work xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.orcid.org/ns/work record_3.0/work-3.0.xsd">
       <xsl:call-template name="workTitle" />
       <xsl:call-template name="journal-title" />
-      <xsl:apply-templates select="mods:abstract" />
       <xsl:call-template name="workCitation" />
-      <xsl:call-template name="workType" />
+      <xsl:apply-templates select="mods:abstract" />
       <xsl:variable name="modsDateIssuedXpath">
         <xsl:evaluate xpath="$MCR.ORCID2.Mods.DateIssued.XPath" context-item="." />
       </xsl:variable>
+      <xsl:call-template name="workType" />
       <xsl:apply-templates select="$modsDateIssuedXpath" />
       <xsl:call-template name="externalIDs" />
       <xsl:apply-templates select="(mods:location/mods:url)[1]" />
