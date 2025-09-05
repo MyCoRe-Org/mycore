@@ -18,6 +18,8 @@
 
 package org.mycore.user2.hash;
 
+import static org.mycore.user2.hash.MCRPasswordCheckUtils.generateSeed;
+
 import java.security.SecureRandom;
 import java.util.Base64;
 
@@ -41,7 +43,7 @@ public abstract class MCRSaltedHashPasswordCheckStrategyBase extends MCRHashPass
 
     @Override
     protected final PasswordCheckData doCreate(SecureRandom random, String password) throws Exception {
-        byte[] salt = saltSizeBytes == 0 ? new byte[0] : random.generateSeed(saltSizeBytes);
+        byte[] salt = generateSeed(random, saltSizeBytes);
         String encodedSalt = Base64.getEncoder().encodeToString(salt);
         return new PasswordCheckData(encodedSalt, doCreateSaltedHash(salt, password));
     }
