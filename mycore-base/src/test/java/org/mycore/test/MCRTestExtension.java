@@ -111,7 +111,9 @@ public class MCRTestExtension implements Extension, BeforeEachCallback, AfterEac
         try {
             MCRTestHelper.deleteRecursively(testFolder);
             LogManager.getLogger().debug(() -> "Deleted test folder: " + testFolder);
-            MCRConfigurationBase.initialize(configurationLoader.loadDeprecated(), mycoreProperties, true);
+            if (!MCRJunit5ExtensionHelper.isNestedTestClass(context)) {
+                MCRTestExtensionConfigurationHelper.resetConfiguration(configurationLoader, mycoreProperties);
+            }
         } finally {
             context.getRoot().getStore(NAMESPACE).put(PROPERTIES_LOADED_PROPERTY, Boolean.FALSE);
         }
