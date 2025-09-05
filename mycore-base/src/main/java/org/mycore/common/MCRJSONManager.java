@@ -49,7 +49,7 @@ import com.google.gson.GsonBuilder;
  * <ul>
  * <li> The property suffix {@link MCRJSONManager#TYPE_ADAPTERS_KEY} can be used to
  * specify the list of type adapters to be used.
- * <li> Each type adapter, the property suffix {@link MCRSentinel#ENABLED_KEY} can be used to
+ * <li> For each type adapter, the property suffix {@link MCRSentinel#ENABLED_KEY} can be used to
  * excluded that adapter from the configuration.
  * </ul>
  * Example:
