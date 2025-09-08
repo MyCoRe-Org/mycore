@@ -25,9 +25,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
-import org.junit.After;
-import org.junit.Before;
-import org.mycore.common.selenium.MCRSeleniumTestBase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mycore.common.selenium.MCRSeleniumExtension;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -35,7 +36,8 @@ import org.openqa.selenium.WebElement;
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.SimpleFileServer;
 
-public class MetsEditorTestBase extends MCRSeleniumTestBase {
+@ExtendWith(MCRSeleniumExtension.class)
+public class MetsEditorTestBase {
 
     private static final int MAX_ITERATIONS_TO_WAIT_FOR_A_ELEMENT = 100;
 
@@ -43,7 +45,13 @@ public class MetsEditorTestBase extends MCRSeleniumTestBase {
 
     HttpServer httpServer;
 
-    @Before
+    WebDriver webDriver;
+
+    MetsEditorTestBase(WebDriver webDriver) {
+        this.webDriver = webDriver;
+    }
+
+    @BeforeEach
     public void setUp() throws InterruptedException, IOException {
         InetSocketAddress serverAddress = new InetSocketAddress(0);
         Path baseDir = Path.of("target", "classes", "META-INF", "resources").toAbsolutePath();
@@ -51,24 +59,22 @@ public class MetsEditorTestBase extends MCRSeleniumTestBase {
         httpServer.start();
         String baseURL = getBaseURL();
         LogManager.getLogger().info("Server online: " + baseURL);
-        this.getDriver().get(baseURL + "/module/mets/example/mets-editor.html");
+        webDriver.get(baseURL + "/module/mets/example/mets-editor.html");
     }
 
     protected String getBaseURL() {
         return "http://localhost:" + httpServer.getAddress().getPort();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         if (httpServer != null) {
             httpServer.stop(0);
         }
-        this.takeScreenshot();
     }
 
     protected void waitForElement(By byTextIgnoreCSS) throws InterruptedException {
         int maxWait = MAX_ITERATIONS_TO_WAIT_FOR_A_ELEMENT;
-        WebDriver webDriver = this.getDriver();
         List<WebElement> elements = new ArrayList<>(webDriver.findElements(byTextIgnoreCSS));
         while (elements.isEmpty() && maxWait-- > 0) {
             Thread.sleep(WAIT_FOR_ELEMENT_ITERATION_IN_MS);

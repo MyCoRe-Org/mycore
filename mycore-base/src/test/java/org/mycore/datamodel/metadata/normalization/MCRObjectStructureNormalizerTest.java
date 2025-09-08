@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.jdom2.Element;
 import org.junit.jupiter.api.Test;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.metadata.MCREditableMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRExpandedObject;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkIDFactory;
@@ -13,6 +15,11 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
+@MCRTestConfiguration(
+    properties = {
+        @MCRTestProperty(key="MCR.Metadata.Type.test", string = "true")
+    }
+)
 public class MCRObjectStructureNormalizerTest {
 
     // TODO: test parent still exists
