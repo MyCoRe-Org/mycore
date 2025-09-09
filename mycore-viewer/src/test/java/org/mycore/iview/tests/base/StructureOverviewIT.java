@@ -18,15 +18,16 @@
 
 package org.mycore.iview.tests.base;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mycore.iview.tests.ViewerTestBase;
 import org.mycore.iview.tests.controller.ControllerUtil;
@@ -61,12 +62,11 @@ public class StructureOverviewIT extends ViewerTestBase {
         super(webDriver);
     }
 
-    @Test
     /**
      * Checks if the structure Overview loaded from mets.xml works!
-     * @throws IOException
      * @throws InterruptedException
      */
+    @Test
     public void testStructureOverview() throws InterruptedException {
         this.getDriver();
         this.getAppController().openViewer(this.getDriver(), getBaseURL(), getTestDerivate());
@@ -96,7 +96,7 @@ public class StructureOverviewIT extends ViewerTestBase {
         messagePattern = "There should be less blue pixels in the rgb screenshot than in the red ({0} > {1})";
         assertLess(bluePixelCount, bluePixelCountRGB, messagePattern);
 
-        Assertions.assertFalse(soController.hasUndefinedPageLabels(),
+        assertFalse(soController.hasUndefinedPageLabels(),
             "There should´nt be any 'undefined' page labels.");
     }
 
@@ -115,7 +115,7 @@ public class StructureOverviewIT extends ViewerTestBase {
         sleep(500);
 
         String message = color + " schould be selected (class-attribut 'selected' should be set)!";
-        Assertions.assertTrue(soController.isImageSelected(label), message);
+        assertTrue(soController.isImageSelected(label), message);
         String fileName = String.format("%s-%s-%s", this.getClassname(), label, color);
         BufferedImage bImage = ControllerUtil.getScreenshot(getDriver(), fileName);
         return getColorCount(bImage, color);
@@ -135,7 +135,7 @@ public class StructureOverviewIT extends ViewerTestBase {
     private void assertLess(int moreValue, int lessValue, String messagePattern) {
         String message = new MessageFormat(messagePattern, Locale.ROOT).format(new Object[] { lessValue, moreValue });
         LOGGER.debug(message);
-        Assertions.assertTrue(lessValue < moreValue, message);
+        assertTrue(lessValue < moreValue, message);
     }
 
     @Override

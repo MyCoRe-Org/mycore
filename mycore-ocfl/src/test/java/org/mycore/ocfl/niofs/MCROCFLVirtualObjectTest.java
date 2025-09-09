@@ -1,5 +1,6 @@
 package org.mycore.ocfl.niofs;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -24,7 +25,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRTransactionManager;
@@ -194,17 +194,17 @@ public class MCROCFLVirtualObjectTest {
 
     @TestTemplate
     public void deleteIfExists() throws IOException {
-        Assertions.assertTrue(Files.exists(WHITE_PNG), "'white.png' should exist before deletion");
+        assertTrue(Files.exists(WHITE_PNG), "'white.png' should exist before deletion");
         MCRTransactionManager.beginTransactions();
         Files.deleteIfExists(WHITE_PNG);
-        Assertions.assertFalse(Files.exists(WHITE_PNG), "'white.png' should not exist after deletion");
+        assertFalse(Files.exists(WHITE_PNG), "'white.png' should not exist after deletion");
         MCRTransactionManager.commitTransactions();
 
         MCRTransactionManager.beginTransactions();
         Files.write(WHITE_PNG, new byte[] { 1, 2, 3, 4 });
-        Assertions.assertTrue(Files.exists(WHITE_PNG), "'white.png' should exist before deletion");
+        assertTrue(Files.exists(WHITE_PNG), "'white.png' should exist before deletion");
         Files.deleteIfExists(WHITE_PNG);
-        Assertions.assertFalse(Files.exists(WHITE_PNG), "'white.png' should not exist after deletion");
+        assertFalse(Files.exists(WHITE_PNG), "'white.png' should not exist after deletion");
         MCRTransactionManager.commitTransactions();
     }
 
@@ -348,25 +348,25 @@ public class MCROCFLVirtualObjectTest {
 
         MCRTransactionManager.beginTransactions();
         Files.copy(path1, path2);
-        Assertions.assertTrue(Files.exists(path1), "'path1' should exist");
-        Assertions.assertTrue(Files.exists(path2), "'path2' should exist");
-        Assertions.assertArrayEquals(path1Data, Files.readAllBytes(path1),
+        assertTrue(Files.exists(path1), "'path1' should exist");
+        assertTrue(Files.exists(path2), "'path2' should exist");
+        assertArrayEquals(path1Data, Files.readAllBytes(path1),
             "'path1' should have the content of the temp store");
-        Assertions.assertArrayEquals(path1Data, Files.readAllBytes(path2),
+        assertArrayEquals(path1Data, Files.readAllBytes(path2),
             "'path2' should have the content of 'path1'");
         MCRTransactionManager.commitTransactions();
 
         MCRTransactionManager.beginTransactions();
-        Assertions.assertArrayEquals(path1Data, Files.readAllBytes(path1),
+        assertArrayEquals(path1Data, Files.readAllBytes(path1),
             "'path1' should have the content of the temp store");
-        Assertions.assertArrayEquals(path1Data, Files.readAllBytes(path2),
+        assertArrayEquals(path1Data, Files.readAllBytes(path2),
             "'path2' should have the content of the temp store");
         Files.copy(path1, path3);
-        Assertions.assertArrayEquals(path1Data, Files.readAllBytes(path3),
+        assertArrayEquals(path1Data, Files.readAllBytes(path3),
             "'path3' should have the content of the temp store");
         Files.write(path3, path3Data);
         Files.copy(path3, path2, StandardCopyOption.REPLACE_EXISTING);
-        Assertions.assertArrayEquals(path3Data, Files.readAllBytes(path2),
+        assertArrayEquals(path3Data, Files.readAllBytes(path2),
             "'path2' should have the content of the transactional store");
         MCRTransactionManager.commitTransactions();
 
@@ -376,10 +376,10 @@ public class MCROCFLVirtualObjectTest {
             MCROCFLFileSystemProvider.get().remoteStorage().clear();
             MCRTransactionManager.beginTransactions();
             Files.copy(path1, path3, StandardCopyOption.REPLACE_EXISTING);
-            Assertions.assertArrayEquals(path1Data, Files.readAllBytes(path3),
+            assertArrayEquals(path1Data, Files.readAllBytes(path3),
                 "'path3' should have the content of 'path1");
             MCRTransactionManager.commitTransactions();
-            Assertions.assertArrayEquals(path1Data, Files.readAllBytes(path3),
+            assertArrayEquals(path1Data, Files.readAllBytes(path3),
                 "'path3' should have the content of 'path1");
         }
     }

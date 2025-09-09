@@ -18,12 +18,15 @@
 
 package org.mycore.iview.tests.base;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.text.MessageFormat;
 import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mycore.iview.tests.ViewerTestBase;
 import org.mycore.iview.tests.controller.ImageOverviewController;
@@ -54,16 +57,16 @@ public class SideBarIT extends ViewerTestBase {
 
         tbController.pressButton(ToolBarController.BUTTON_ID_SIDEBAR_CONTROLL);
         tbController.clickElementById(ImageOverviewController.IMAGE_OVERVIEW_SELECTOR);
-        Assertions.assertTrue(sbController.assertSideBarPresent(), "SideBar should be present!");
+        assertTrue(sbController.assertSideBarPresent(), "SideBar should be present!");
 
         tbController.clickElementByXpath(SideBarController.SIDEBAR_CLOSE_SELECTOR);
-        Assertions.assertFalse(sbController.assertSideBarPresent(), "SideBar should not be present!");
+        assertFalse(sbController.assertSideBarPresent(), "SideBar should not be present!");
     }
 
-    @Test
     /**
      * Ignored because https://github.com/mozilla/geckodriver/issues/233
      */
+    @Test
     public void testSideBarResize() {
         this.getDriver();
         this.getAppController().openViewer(this.getDriver(), getBaseURL(), getTestDerivate());
@@ -116,13 +119,13 @@ public class SideBarIT extends ViewerTestBase {
         int after = sbController.countThumbnails();
 
         // this test does not really work, because there are only 4 thumbnails left
-        Assertions.assertEquals(before, after);
+        assertEquals(before, after);
     }
 
     private void assertLess(int moreValue, int lessValue, String messagePattern) {
         String message = new MessageFormat(messagePattern, Locale.ROOT).format(new Object[] { lessValue, moreValue });
         LOGGER.debug(message);
-        Assertions.assertTrue(lessValue < moreValue, message);
+        assertTrue(lessValue < moreValue, message);
     }
 
     @Override

@@ -47,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class MCRMODSLinkProviderTest {
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.SUPER_USER);
     }
 

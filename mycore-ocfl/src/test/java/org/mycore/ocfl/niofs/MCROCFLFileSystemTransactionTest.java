@@ -1,5 +1,6 @@
 package org.mycore.ocfl.niofs;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mycore.ocfl.MCROCFLTestCaseHelper.DERIVATE_1;
 import static org.mycore.ocfl.MCROCFLTestCaseHelper.DERIVATE_1_OBJECT_ID;
 import static org.mycore.ocfl.MCROCFLTestCaseHelper.WHITE_PNG;
@@ -10,15 +11,14 @@ import java.nio.channels.ByteChannel;
 import java.nio.file.StandardOpenOption;
 import java.util.Set;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.repository.MCROCFLRepository;
-import org.mycore.ocfl.test.PermutedParam;
-import org.mycore.ocfl.test.MCRPermutationExtension;
 import org.mycore.ocfl.test.MCROCFLSetupExtension;
+import org.mycore.ocfl.test.MCRPermutationExtension;
+import org.mycore.ocfl.test.PermutedParam;
 import org.mycore.test.MyCoReTest;
 
 import io.ocfl.api.model.ObjectVersionId;
@@ -84,7 +84,7 @@ public class MCROCFLFileSystemTransactionTest {
 
     private void checkVersion(int version) {
         OcflObjectVersion derivate1 = repository.getObject(ObjectVersionId.head(DERIVATE_1_OBJECT_ID));
-        Assertions.assertEquals(version, derivate1.getVersionNum().getVersionNum(), "derivate version is wrong");
+        assertEquals(version, derivate1.getVersionNum().getVersionNum(), "derivate version is wrong");
     }
 
 }

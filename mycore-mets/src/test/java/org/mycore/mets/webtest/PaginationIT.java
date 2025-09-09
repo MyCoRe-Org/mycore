@@ -18,7 +18,9 @@
 
 package org.mycore.mets.webtest;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.Test;
 import org.mycore.common.selenium.drivers.MCRWebdriverWrapper;
 import org.mycore.common.selenium.util.MCRBy;
@@ -47,7 +49,7 @@ public class PaginationIT extends MetsEditorTestBase {
         row.findElement(By.xpath("//button[@title=\"???editPagination???\"]")).click();
         row.findElement(By.xpath("//input")).sendKeys(TEST_STRING);
         row.findElement(By.xpath("//button[@title=\"???paginationChange???\"]")).click();
-        Assertions.assertNotNull(row.findElement(MCRBy.partialText(TEST_STRING)));
+        assertNotNull(row.findElement(MCRBy.partialText(TEST_STRING)));
     }
 
     @Test
@@ -57,7 +59,7 @@ public class PaginationIT extends MetsEditorTestBase {
         row.findElement(By.xpath("//button[@title=\"???editPagination???\"]")).click();
         row.findElement(By.xpath("//input")).sendKeys(TEST_STRING);
         row.findElement(By.xpath("//button[@title=\"???paginationAbort???\"]")).click();
-        Assertions.assertTrue(row.findElements(MCRBy.partialText(TEST_STRING)).isEmpty(),
+        assertTrue(row.findElements(MCRBy.partialText(TEST_STRING)).isEmpty(),
             "Pagination should not be set!");
     }
 
@@ -73,8 +75,8 @@ public class PaginationIT extends MetsEditorTestBase {
         Select select = new Select(webDriver.findElement(By.tagName("select")));
         select.selectByVisibleText("???rectoVerso_lowercase???");
         webDriver.waitAndFindElement(By.xpath("//button[contains(text(),\"???paginationChange???\")]")).click();
-        Assertions.assertNotNull(webDriver.waitAndFindElement(MCRBy.partialText("1v")));
-        Assertions.assertNotNull(webDriver.waitAndFindElement(MCRBy.partialText("18r")));
+        assertNotNull(webDriver.waitAndFindElement(MCRBy.partialText("1v")));
+        assertNotNull(webDriver.waitAndFindElement(MCRBy.partialText("18r")));
     }
 
     /* @Test
