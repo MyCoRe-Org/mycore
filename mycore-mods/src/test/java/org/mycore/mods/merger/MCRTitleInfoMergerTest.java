@@ -21,10 +21,11 @@ package org.mycore.mods.merger;
 import java.io.IOException;
 
 import org.jaxen.JaxenException;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.test.MyCoReTest;
 
-public class MCRTitleInfoMergerTest extends MCRTestCase {
+@MyCoReTest
+public class MCRTitleInfoMergerTest {
 
     @Test
     public void testLongerWins() throws Exception {

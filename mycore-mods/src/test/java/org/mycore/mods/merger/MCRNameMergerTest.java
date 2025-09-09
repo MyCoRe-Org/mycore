@@ -18,21 +18,22 @@
 
 package org.mycore.mods.merger;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 
 import org.jaxen.JaxenException;
 import org.jdom2.Element;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRTestCase;
 import org.mycore.common.xml.MCRNodeBuilder;
+import org.mycore.test.MyCoReTest;
 
-public class MCRNameMergerTest extends MCRTestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
+@MyCoReTest
+public class MCRNameMergerTest {
 
     @Test
     public void testIsProbablySameAs() throws Exception {
@@ -70,7 +71,7 @@ public class MCRNameMergerTest extends MCRTestCase {
 
         try {
             new MCRNameMerger().setElement(null);
-            Assert.fail("No name should result in NPE while creating a MCRNameMerger");
+            fail("No name should result in NPE while creating a MCRNameMerger");
         } catch (NullPointerException ex) {
             // exception excepted
         }
@@ -85,11 +86,11 @@ public class MCRNameMergerTest extends MCRTestCase {
         Element b = new MCRNodeBuilder()
             .buildElement("mods:mods[mods:name[@type='personal'][mods:namePart[@type='given']='T.']]", null, null);
         MCRMergeTool.merge(a, b);
-        assertEquals("Exactly two mods:name element expected", 2,
-            a.getChildren("name", MCRConstants.MODS_NAMESPACE).size());
+        assertEquals(2, a.getChildren("name", MCRConstants.MODS_NAMESPACE).size(),
+                "Exactly two mods:name element expected");
         MCRMergeTool.merge(b, a2);
-        assertEquals("Exactly two mods:name element expected", 2,
-            b.getChildren("name", MCRConstants.MODS_NAMESPACE).size());
+        assertEquals(2, b.getChildren("name", MCRConstants.MODS_NAMESPACE).size(),
+                "Exactly two mods:name element expected");
     }
 
     @Test

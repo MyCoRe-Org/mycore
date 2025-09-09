@@ -18,20 +18,25 @@
 
 package org.mycore.mcr.acl.accesskey.persistence;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.junit.Test;
-import org.mycore.common.MCRJPATestCase;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MCRJPATestHelper;
+import org.mycore.test.MyCoReTest;
 
-public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
+@MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
+public class MCRAccessKeyRepositoryImplTest {
 
     private static final UUID TEST_ID_READ = UUID.randomUUID();
 
@@ -53,7 +58,7 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
     public void testFindAll() {
         insertAccessKey(TEST_ID_READ, getReadAccessKey());
         insertAccessKey(TEST_ID_WRITE, getWriteAccessKey());
-        endTransaction();
+        MCRJPATestHelper.endTransaction();
         final Collection<MCRAccessKey> accessKeys = new MCRAccessKeyRepositoryImpl().findAll();
         assertEquals(2, accessKeys.size());
     }
@@ -69,7 +74,7 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
     public void testFindByReference() {
         insertAccessKey(TEST_ID_READ, getReadAccessKey());
         insertAccessKey(TEST_ID_WRITE, getWriteAccessKey());
-        endTransaction();
+        MCRJPATestHelper.endTransaction();
         final Collection<MCRAccessKey> accessKeys
             = new MCRAccessKeyRepositoryImpl().findByReference(TEST_REFERENCE_READ);
         assertEquals(1, accessKeys.size());
@@ -92,7 +97,7 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
     public void testFindByReferenceAndType() {
         insertAccessKey(TEST_ID_READ, getReadAccessKey());
         insertAccessKey(TEST_ID_WRITE, getWriteAccessKey());
-        endTransaction();
+        MCRJPATestHelper.endTransaction();
         final Collection<MCRAccessKey> accessKeys
             = new MCRAccessKeyRepositoryImpl().findByReferenceAndType(TEST_REFERENCE_READ, TEST_TYPE_READ);
         assertEquals(1, accessKeys.size());
@@ -115,7 +120,7 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
     public void testFindByUuid() {
         insertAccessKey(TEST_ID_READ, getReadAccessKey());
         insertAccessKey(TEST_ID_WRITE, getWriteAccessKey());
-        endTransaction();
+        MCRJPATestHelper.endTransaction();
         final Optional<MCRAccessKey> optAccessKey = new MCRAccessKeyRepositoryImpl().findByUuid(TEST_ID_READ);
         assertNotNull(optAccessKey);
         assertTrue(optAccessKey.isPresent());
@@ -128,7 +133,7 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
     @Test
     public void testFindByUuid_noMatch() {
         insertAccessKey(TEST_ID_READ, getReadAccessKey());
-        endTransaction();
+        MCRJPATestHelper.endTransaction();
         final Optional<MCRAccessKey> optAccessKey = new MCRAccessKeyRepositoryImpl().findByUuid(TEST_ID_WRITE);
         assertNotNull(optAccessKey);
         assertTrue(optAccessKey.isEmpty());
@@ -138,7 +143,7 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
     public void testFindByReferenceAndSecret() {
         insertAccessKey(TEST_ID_READ, getReadAccessKey());
         insertAccessKey(TEST_ID_WRITE, getWriteAccessKey());
-        endTransaction();
+        MCRJPATestHelper.endTransaction();
         final Optional<MCRAccessKey> optAccessKey
             = new MCRAccessKeyRepositoryImpl().findByReferenceAndSecret(TEST_REFERENCE_READ, TEST_SECRET_READ);
         assertNotNull(optAccessKey);
@@ -165,7 +170,7 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
         accessKey.setSecret(TEST_SECRET_READ);
         accessKey.setIsActive(true);
         final MCRAccessKey createdAccessKey = new MCRAccessKeyRepositoryImpl().save(accessKey);
-        endTransaction();
+        MCRJPATestHelper.endTransaction();
         assertNotNull(createdAccessKey);
         assertNotNull(createdAccessKey.getUuid());
         assertEquals(TEST_REFERENCE_READ, createdAccessKey.getReference());
@@ -176,7 +181,7 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
     @Test
     public void testSave_update() {
         insertAccessKey(TEST_ID_READ, getReadAccessKey());
-        startNewTransaction();
+        MCRJPATestHelper.startNewTransaction();
         final MCRAccessKey accessKey = new MCRAccessKey();
         accessKey.setUuid(TEST_ID_READ);
         accessKey.setReference(TEST_REFERENCE_READ);
@@ -184,7 +189,7 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
         accessKey.setSecret(TEST_SECRET_READ);
         accessKey.setIsActive(true);
         final MCRAccessKey createdAccessKey = new MCRAccessKeyRepositoryImpl().save(accessKey);
-        endTransaction();
+        MCRJPATestHelper.endTransaction();
         assertNotNull(createdAccessKey);
         assertEquals(TEST_ID_READ, createdAccessKey.getUuid());
         assertEquals(TEST_REFERENCE_READ, createdAccessKey.getReference());
@@ -217,7 +222,7 @@ public class MCRAccessKeyRepositoryImplTest extends MCRJPATestCase {
     }
 
     private void insertAccessKey(UUID id, MCRAccessKey accessKey) {
-        MCRJPATestCase.executeUpdate(
+        MCRJPATestHelper.executeUpdate(
             "INSERT INTO \"junit\".\"MCRAccessKey\" (\"uuid\",\"type\",\"object_id\","
                 + "\"secret\",\"isActive\") VALUES ('" + id + "','" + accessKey.getType() + "','"
                 + accessKey.getReference() + "','" + accessKey.getSecret() + "',true)");

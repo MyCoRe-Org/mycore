@@ -18,13 +18,13 @@
 
 package org.mycore.wcms2;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 
 import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.wcms2.navigation.MCRWCMSDefaultSectionProvider;
 
 import com.google.gson.JsonArray;

@@ -18,13 +18,13 @@
 
 package org.mycore.util.concurrent;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MCRDecoratorTest {
 
@@ -33,8 +33,8 @@ public class MCRDecoratorTest {
         Container container = new Container("base");
         TestDecorator a = new TestDecorator(container, "a");
 
-        assertTrue("a should be decorated", MCRDecorator.isDecorated(a));
-        assertFalse("container does not implement the MCRDecorator interface", MCRDecorator.isDecorated(container));
+        assertTrue(MCRDecorator.isDecorated(a), "a should be decorated");
+        assertFalse(MCRDecorator.isDecorated(container), "container does not implement the MCRDecorator interface");
     }
 
     @Test
@@ -63,7 +63,7 @@ public class MCRDecoratorTest {
 
     private static class TestDecorator extends Container implements MCRDecorator<Container> {
 
-        private Container container;
+        private final Container container;
 
         TestDecorator(Container container, String value) {
             super(value);
@@ -79,7 +79,7 @@ public class MCRDecoratorTest {
 
     private static class Container {
 
-        private String value;
+        private final String value;
 
         Container(String value) {
             this.value = value;

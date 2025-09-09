@@ -18,8 +18,11 @@
 
 package org.mycore.mods.merger;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mycore.common.MCRConstants.MODS_NAMESPACE;
+
+import java.io.IOException;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,8 +30,10 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
-import org.junit.Test;
-import org.mycore.common.MCRJPATestCase;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -36,20 +41,19 @@ import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.resource.MCRResourceHelper;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MyCoReTest;
 
-import java.io.IOException;
-import java.util.List;
-
-public class MCRRedundantModsClassificationEventHandlerTest extends MCRJPATestCase {
+@MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
+public class MCRRedundantModsClassificationEventHandlerTest  {
 
     public static final String TEST_DIRECTORY = "MCRRedundantModsClassificationEventHandlerTest/";
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
-
         MCRCategoryDAO categoryDao = MCRCategoryDAOFactory.obtainInstance();
         categoryDao.addCategory(null, MCRXMLTransformer.getCategory(loadXml("sdnb.xml")));
         categoryDao.addCategory(null, MCRXMLTransformer.getCategory(loadXml("sdnb2.xml")));

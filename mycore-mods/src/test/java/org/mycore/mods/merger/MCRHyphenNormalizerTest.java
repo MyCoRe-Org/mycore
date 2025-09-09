@@ -18,12 +18,13 @@
 
 package org.mycore.mods.merger;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.test.MyCoReTest;
 
-public class MCRHyphenNormalizerTest extends MCRTestCase {
+@MyCoReTest
+public class MCRHyphenNormalizerTest {
 
     private static final char HYPHEN_MINUS = '\u002D';
 

@@ -18,8 +18,8 @@
 
 package org.mycore.util.concurrent.processing;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -29,15 +29,16 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.processing.MCRProcessableCollection;
 import org.mycore.common.processing.MCRProcessableDefaultCollection;
 import org.mycore.common.processing.MCRProcessableRegistry;
 import org.mycore.common.processing.MCRProcessableStatus;
 import org.mycore.common.processing.impl.MCRCentralProcessableRegistry;
+import org.mycore.test.MyCoReTest;
 
-public class MCRProcessableFactoryTest extends MCRTestCase {
+@MyCoReTest
+public class MCRProcessableFactoryTest {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -51,8 +52,8 @@ public class MCRProcessableFactoryTest extends MCRTestCase {
         ExecutorService es = Executors.newFixedThreadPool(nThreads);
         MCRProcessableExecutor pes = MCRProcessableFactory.newPool(es, collection);
 
-        assertEquals("No runnables should be queued right now.", 0, collection.stream().count());
-        assertEquals("Only the 'test' collection should be registered.", 1, registry.stream().count());
+        assertEquals(0, collection.stream().count(), "No runnables should be queued right now.");
+        assertEquals(1, registry.stream().count(), "Only the 'test' collection should be registered.");
 
         Semaphore semaphore = new Semaphore(nThreads);
         semaphore.acquire(nThreads); //lock threads until ready
@@ -65,9 +66,9 @@ public class MCRProcessableFactoryTest extends MCRTestCase {
         MCRProcessableStatus s2 = sup2.getStatus();
         MCRProcessableStatus s3 = sup3.getStatus();
         String msgPrefix = "Job should be created or in processing: ";
-        assertTrue(msgPrefix + s1, MCRProcessableStatus.PROCESSING == s1 || MCRProcessableStatus.CREATED == s1);
-        assertTrue(msgPrefix + s2, MCRProcessableStatus.PROCESSING == s2 || MCRProcessableStatus.CREATED == s2);
-        assertTrue(msgPrefix + s3, MCRProcessableStatus.PROCESSING == s3 || MCRProcessableStatus.CREATED == s3);
+        assertTrue(MCRProcessableStatus.PROCESSING == s1 || MCRProcessableStatus.CREATED == s1, msgPrefix + s1);
+        assertTrue(MCRProcessableStatus.PROCESSING == s2 || MCRProcessableStatus.CREATED == s2, msgPrefix + s2);
+        assertTrue(MCRProcessableStatus.PROCESSING == s3 || MCRProcessableStatus.CREATED == s3, msgPrefix + s3);
 
         assertEquals(3, collection.stream().count());
         semaphore.release(nThreads); //go

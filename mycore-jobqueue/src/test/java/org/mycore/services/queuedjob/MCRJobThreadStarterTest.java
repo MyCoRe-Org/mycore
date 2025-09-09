@@ -18,42 +18,36 @@
 
 package org.mycore.services.queuedjob;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRJPATestCase;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.common.processing.impl.MCRCentralProcessableRegistry;
 import org.mycore.services.queuedjob.action.MCRTestJobAction1;
 import org.mycore.services.queuedjob.config2.MCRConfiguration2JobConfig;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MCRJPATestHelper;
+import org.mycore.test.MyCoReTest;
 
-import jakarta.persistence.EntityTransaction;
-
-public class MCRJobThreadStarterTest extends MCRJPATestCase {
+@MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Processable.Registry.Class", classNameOf = MCRCentralProcessableRegistry.class)
+})
+public class MCRJobThreadStarterTest {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static List<MCRJob> getAllJobs(MCRJobDAOJPAImpl dao, Class<? extends MCRJobAction> action) {
         return dao.getJobs(action, null, null, null, null);
-    }
-
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        super.tearDown();
     }
 
     @Test
@@ -86,10 +80,8 @@ public class MCRJobThreadStarterTest extends MCRJPATestCase {
         job3.setAdded(new Date(baseTime.getTime() + 60));
         queue.offer(job3);
 
-        EntityTransaction transaction = getEntityManager().get().getTransaction();
-        transaction.commit();
-        transaction.begin();
-
+        MCRJPATestHelper.startNewTransaction();
+        
         Thread thread = new Thread(starter);
         thread.start();
 
@@ -104,8 +96,7 @@ public class MCRJobThreadStarterTest extends MCRJPATestCase {
                 Thread.sleep(stepTime);
                 LOGGER.info("Waiting for jobs to finish. Time left: {}",
                     maxWait - System.currentTimeMillis() + startTime);
-                transaction.rollback(); // rollback to get new data in the next iteration
-                transaction.begin();
+                MCRJPATestHelper.startNewTransaction();
             }
         } catch (InterruptedException e) {
             throw new MCRException(e);
@@ -119,15 +110,9 @@ public class MCRJobThreadStarterTest extends MCRJPATestCase {
 
         getAllJobs(dao, job1.getAction())
             .forEach(j -> LOGGER.info("Job in queue: {}", j));
-        Assert.assertEquals("There should be 3 jobs", 3, allJobCount);
-        Assert.assertEquals("Finished Job count should be 2", 2, finishedJobCount);
-        Assert.assertEquals("Error Job count should be 1", 1, errorJobCount);
+        assertEquals(3, allJobCount, "There should be 3 jobs");
+        assertEquals(2, finishedJobCount, "Finished Job count should be 2");
+        assertEquals(1, errorJobCount, "Error Job count should be 1");
     }
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> props = super.getTestProperties();
-        props.put("MCR.Processable.Registry.Class", MCRCentralProcessableRegistry.class.getName());
-        return props;
-    }
-}
+   }

@@ -18,34 +18,42 @@
 
 package org.mycore.pi.urn.rest;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mycore.pi.MCRPIUtils.generateMCRPI;
 import static org.mycore.pi.MCRPIUtils.randomFilename;
 
 import java.util.Date;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.common.MCRStoreTestCase;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.MCRPIUtils;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.urn.MCRDNBURN;
+import org.mycore.test.MCRMetadataExtension;
+import org.mycore.test.MyCoReTest;
 
 /**
  * Created by chi on 23.02.17.
  *
  * @author Huu Chi Vu
  */
-public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
+@MyCoReTest
+@ExtendWith(MCRMetadataExtension.class)
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true"),
+    @MCRTestProperty(key = "MCR.PI.Generator.testGenerator.Namespace", string = "frontend-")
+})
+public class MCRURNGranularRESTRegistrationTaskTest {
     private static final String countRegistered = "select count(u) from MCRPI u "
         + "where u.type = :type "
         + "and u.registered is not null";
@@ -54,19 +62,14 @@ public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Ignore
+    @Disabled
     @Test
-    public void run() throws Exception {
+    public void run()  {
         MCRPI urn1 = generateMCRPI(randomFilename(), countRegistered);
         MCREntityManagerProvider.getCurrentEntityManager()
             .persist(urn1);
 
-        Assert.assertNull("Registered date should be null.", urn1.getRegistered());
+        assertNull(urn1.getRegistered(), "Registered date should be null.");
 
         MCRPIManager.getInstance()
             .getUnregisteredIdentifiers(urn1.getType())
@@ -102,17 +105,4 @@ public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
         LOGGER.info("end.");
     }
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.Metadata.Type.test", Boolean.TRUE.toString());
-        testProperties.put("MCR.PI.Generator.testGenerator.Namespace", "frontend-");
-        return testProperties;
-    }
-
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
 }

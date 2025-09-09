@@ -18,17 +18,20 @@
 
 package org.mycore.access.facts.condition.fact;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.ArrayList;
 
 import org.jdom2.Element;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.access.facts.MCRFactsHolder;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.MCRTestCase;
+import org.mycore.test.MyCoReTest;
 
-public class MCRRoleConditionTest extends MCRTestCase {
+@MyCoReTest
+public class MCRRoleConditionTest {
 
     @Test
     public void testConditionMatch() {
@@ -36,7 +39,7 @@ public class MCRRoleConditionTest extends MCRTestCase {
         MCRFactsHolder holder = new MCRFactsHolder(new ArrayList<>());
         MCRRoleCondition userCondition = new MCRRoleCondition();
         userCondition.parse(new Element("role").setText("editor"));
-        Assert.assertTrue("User should have editor role", userCondition.matches(holder));
+        assertTrue(userCondition.matches(holder), "User should have editor role");
     }
 
     @Test
@@ -45,6 +48,6 @@ public class MCRRoleConditionTest extends MCRTestCase {
         MCRFactsHolder holder = new MCRFactsHolder(new ArrayList<>());
         MCRRoleCondition userCondition = new MCRRoleCondition();
         userCondition.parse(new Element("role").setText("editor"));
-        Assert.assertFalse("User should not have editor role", userCondition.matches(holder));
+        assertFalse(userCondition.matches(holder), "User should not have editor role");
     }
 }

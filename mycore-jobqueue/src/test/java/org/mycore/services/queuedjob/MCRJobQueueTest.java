@@ -18,25 +18,28 @@
 
 package org.mycore.services.queuedjob;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mycore.services.queuedjob.action.MCRTestJobAction1;
 import org.mycore.services.queuedjob.action.MCRTestJobAction2;
 import org.mycore.services.queuedjob.config2.MCRConfiguration2JobConfig;
+import org.mycore.test.MyCoReTest;
 
-public class MCRJobQueueTest extends MCRTestCase {
+@MyCoReTest
+public class MCRJobQueueTest {
 
     private MCRMockJobDAO mockDAO;
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
+    @BeforeEach
+    public void setUp() {
         mockDAO = new MCRMockJobDAO();
     }
 
@@ -59,33 +62,33 @@ public class MCRJobQueueTest extends MCRTestCase {
 
             job = new MCRJob();
             job.setParameter("count", Integer.toString(c));
-            Assert.assertTrue("job should be offered", queue.offer(job));
+            assertTrue(queue.offer(job), "job should be offered");
             Thread.sleep(2); // sleep to get different timestamps
             offeredJobs.add(job);
         }
 
-        Assert.assertEquals("offered jobs should be 10", offeredJobs.size(), mockDAO.daoOfferedJobs.size());
+        assertEquals(offeredJobs.size(), mockDAO.daoOfferedJobs.size(), "offered jobs should be 10");
         for (int c = 0; c < offeredJobs.size(); c++) {
-            Assert.assertEquals("offered jobs should be equal", offeredJobs.get(c), mockDAO.daoOfferedJobs.get(c));
+            assertEquals(offeredJobs.get(c), mockDAO.daoOfferedJobs.get(c), "offered jobs should be equal");
         }
 
-        Assert.assertEquals("notified jobs should be 5", 5, notifiedJobs.size());
+        assertEquals(5, notifiedJobs.size(), "notified jobs should be 5");
         for (int c = 0; c < notifiedJobs.size(); c++) {
-            Assert.assertEquals("notified jobs should be equal", offeredJobs.get(c), notifiedJobs.get(c));
+            assertEquals(offeredJobs.get(c), notifiedJobs.get(c), "notified jobs should be equal");
         }
 
         // reading the same jobs should work, but the count needs to stay the same
         for (MCRJob j : offeredJobs) {
-            Assert.assertTrue("job should not be offered", queue.offer(j));
+            assertTrue(queue.offer(j), "job should not be offered");
         }
 
-        Assert.assertEquals("offered jobs should be 10", offeredJobs.size(), mockDAO.daoOfferedJobs.size());
+        assertEquals(offeredJobs.size(), mockDAO.daoOfferedJobs.size(), "offered jobs should be 10");
 
         // the offered jobs should have the right action, the right status and a timestamp
         for (MCRJob j : offeredJobs) {
-            Assert.assertEquals("job action should be MCRTestJobAction", MCRTestJobAction1.class, j.getAction());
-            Assert.assertEquals("job status should be new", MCRJobStatus.NEW, j.getStatus());
-            Assert.assertTrue("job added timestamp should be set", j.getAdded().getTime() > 0);
+            assertEquals(MCRTestJobAction1.class, j.getAction(), "job action should be MCRTestJobAction");
+            assertEquals(MCRJobStatus.NEW, j.getStatus(), "job status should be new");
+            assertTrue(j.getAdded().getTime() > 0, "job added timestamp should be set");
         }
 
         // offer a job with different action should trigger an exception
@@ -93,7 +96,7 @@ public class MCRJobQueueTest extends MCRTestCase {
         job.setParameter("count", Integer.toString(1));
         try {
             queue.offer(job);
-            Assert.fail("IllegalArgumentException expected");
+            fail("IllegalArgumentException expected");
         } catch (IllegalArgumentException e) {
             // expected
         }
@@ -125,9 +128,9 @@ public class MCRJobQueueTest extends MCRTestCase {
 
         // compare offered and polled jobs order
         offeredJobs.sort(Comparator.comparing(MCRJob::getAdded));
-        Assert.assertEquals("polled jobs should be 10", offeredJobs.size(), polledJobs.size());
+        assertEquals(offeredJobs.size(), polledJobs.size(), "polled jobs should be 10");
         for (int c = 0; c < offeredJobs.size(); c++) {
-            Assert.assertEquals("polled jobs should be equal", offeredJobs.get(c), polledJobs.get(c));
+            assertEquals(offeredJobs.get(c), polledJobs.get(c), "polled jobs should be equal");
         }
     }
 
@@ -148,23 +151,18 @@ public class MCRJobQueueTest extends MCRTestCase {
         }
 
         MCRJob peek = queue.peek();
-        Assert.assertEquals("peek should return the last added job", offeredJobs.get(9), peek);
+        assertEquals(offeredJobs.get(9), peek, "peek should return the last added job");
 
         MCRJob peek2 = queue.peek();
-        Assert.assertEquals("peek should return the same job", peek, peek2);
+        assertEquals(peek, peek2, "peek should return the same job");
 
         mockDAO.daoOfferedJobs.remove(peek);
 
         MCRJob peek3 = queue.peek();
-        Assert.assertEquals("peek should return the next job", offeredJobs.get(8), peek3);
+        assertEquals(offeredJobs.get(8), peek3, "peek should return the next job");
 
         MCRJob peek4 = queue.peek();
-        Assert.assertEquals("peek should return the same job", peek3, peek4);
-    }
-
-    @Override
-    protected Map<String, String> getTestProperties() {
-        return super.getTestProperties();
+        assertEquals(peek3, peek4, "peek should return the same job");
     }
 
 }

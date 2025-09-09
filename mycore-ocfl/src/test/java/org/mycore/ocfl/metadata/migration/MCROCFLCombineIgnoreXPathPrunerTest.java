@@ -18,6 +18,9 @@
 
 package org.mycore.ocfl.metadata.migration;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
@@ -28,16 +31,21 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.junit.Assert;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.common.MCRMetadataVersionType;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.ocfl.metadata.migration.MCROCFLMigration.ContentSupplier;
+import org.mycore.test.MyCoReTest;
 
-public class MCROCFLCombineIgnoreXPathPrunerTest extends MCRTestCase {
+@MyCoReTest
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true")
+})
+public class MCROCFLCombineIgnoreXPathPrunerTest {
 
     public static final String JUNIT_TEST_00000001 = "junit_test_00000001";
     public static final String AUTOR_1 = "Sebastian";
@@ -104,33 +112,30 @@ public class MCROCFLCombineIgnoreXPathPrunerTest extends MCRTestCase {
 
         List<MCROCFLRevision> prune = xPathPruner.prune(List.of(r1, r2, r3, r4, r5, r6, r7));
 
-        Assert.assertEquals("r2, r6 and r7 should be pruned away", 4, prune.size());
-        Assert.assertEquals("r1 autor should be original r1 autor", AUTOR_1, prune.get(0).user());
-        Assert.assertEquals("r2 autor should be original r3 autor", AUTOR_3, prune.get(1).user());
-        Assert.assertEquals("r1 date should be original r1 date", baseDate, prune.get(0).date());
-        Assert.assertEquals("r2 date should be original r3 date", new Date(baseDate.getTime() + 2000),
-            prune.get(1).date());
-        Assert.assertTrue("r1 content should be original r2 content",
-            MCRXMLHelper.deepEqual(prune.get(0).contentSupplier().get().asXML(), CONTENT_2.get().asXML()));
-        Assert.assertTrue("r2 content should be original r3 content",
-            MCRXMLHelper.deepEqual(prune.get(1).contentSupplier().get().asXML(), CONTENT_3.get().asXML()));
+        assertEquals(4, prune.size(), "r2, r6 and r7 should be pruned away");
+        assertEquals(AUTOR_1, prune.get(0).user(), "r1 autor should be original r1 autor");
+        assertEquals(AUTOR_3, prune.get(1).user(), "r2 autor should be original r3 autor");
+        assertEquals(baseDate, prune.get(0).date(), "r1 date should be original r1 date");
+        assertEquals(new Date(baseDate.getTime() + 2000), prune.get(1).date(), "r2 date should be original r3 date");
+        assertTrue(MCRXMLHelper.deepEqual(prune.get(0).contentSupplier().get().asXML(), CONTENT_2.get().asXML()),
+                "r1 content should be original r2 content");
+        assertTrue(MCRXMLHelper.deepEqual(prune.get(1).contentSupplier().get().asXML(), CONTENT_3.get().asXML()),
+                "r2 content should be original r3 content");
 
         LOGGER.info("First Result: " + prune.stream().map(MCROCFLRevision::toString).collect(Collectors.joining("\n")));
 
         xPathPruner.setFirstDateWins(false);
         xPathPruner.setFirstAuthorWins(false);
         prune = xPathPruner.prune(List.of(r1, r2, r3, r4, r5, r6, r7));
-        Assert.assertEquals("r2, r6 and r7 should be pruned away", 4, prune.size());
-        Assert.assertEquals("r1 autor should be original r2 autor", AUTOR_2, prune.get(0).user());
-        Assert.assertEquals("r2 autor should be original r3 autor", AUTOR_3, prune.get(1).user());
-        Assert.assertEquals("r1 date should be original r2 date", new Date(baseDate.getTime() + 1000),
-            prune.get(0).date());
-        Assert.assertEquals("r2 date should be original r3 date", new Date(baseDate.getTime() + 2000),
-            prune.get(1).date());
-        Assert.assertTrue("r1 content should be original r2 content",
-            MCRXMLHelper.deepEqual(prune.get(0).contentSupplier().get().asXML(), CONTENT_2.get().asXML()));
-        Assert.assertTrue("r2 content should be original r3 content",
-            MCRXMLHelper.deepEqual(prune.get(1).contentSupplier().get().asXML(), CONTENT_3.get().asXML()));
+        assertEquals(4, prune.size(), "r2, r6 and r7 should be pruned away");
+        assertEquals(AUTOR_2, prune.get(0).user(), "r1 autor should be original r2 autor");
+        assertEquals(AUTOR_3, prune.get(1).user(), "r2 autor should be original r3 autor");
+        assertEquals(new Date(baseDate.getTime() + 1000), prune.get(0).date(), "r1 date should be original r2 date");
+        assertEquals(new Date(baseDate.getTime() + 2000), prune.get(1).date(), "r2 date should be original r3 date");
+        assertTrue(MCRXMLHelper.deepEqual(prune.get(0).contentSupplier().get().asXML(), CONTENT_2.get().asXML()),
+                "r1 content should be original r2 content");
+        assertTrue(MCRXMLHelper.deepEqual(prune.get(1).contentSupplier().get().asXML(), CONTENT_3.get().asXML()),
+                "r2 content should be original r3 content");
 
         LOGGER
             .info("Second Result: " + prune.stream().map(MCROCFLRevision::toString).collect(Collectors.joining("\n")));

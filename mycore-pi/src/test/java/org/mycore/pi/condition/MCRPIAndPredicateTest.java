@@ -18,19 +18,22 @@
 
 package org.mycore.pi.condition;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.MCRPIJobService;
+import org.mycore.test.MyCoReTest;
 
+@MyCoReTest
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true")
 })
-public class MCRPIAndPredicateTest extends MCRTestCase {
+public class MCRPIAndPredicateTest {
 
     private static final String KEY_CREATION_PREDICATE = "MCR.PI.Service.Mock.CreationPredicate";
 
@@ -48,8 +51,8 @@ public class MCRPIAndPredicateTest extends MCRTestCase {
         @MCRTestProperty(key = KEY_CREATION_PREDICATE_1, classNameOf = MCRTruePredicate.class),
         @MCRTestProperty(key = KEY_CREATION_PREDICATE_2, classNameOf = MCRTruePredicate.class)
     })
-    public void testTrueAndTrue() {
-        Assert.assertTrue(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
+    void testTrueAndTrue() {
+        assertTrue(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
     }
 
     @Test
@@ -58,8 +61,8 @@ public class MCRPIAndPredicateTest extends MCRTestCase {
         @MCRTestProperty(key = KEY_CREATION_PREDICATE_1, classNameOf = MCRTruePredicate.class),
         @MCRTestProperty(key = KEY_CREATION_PREDICATE_2, classNameOf = MCRFalsePredicate.class)
     })
-    public void testTrueAndFalse() {
-        Assert.assertFalse(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
+    void testTrueAndFalse() {
+        assertFalse(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
     }
 
     @Test
@@ -70,8 +73,8 @@ public class MCRPIAndPredicateTest extends MCRTestCase {
         @MCRTestProperty(key = KEY_CREATION_PREDICATE_1_2, classNameOf = MCRTruePredicate.class),
         @MCRTestProperty(key = KEY_CREATION_PREDICATE_2, classNameOf = MCRTruePredicate.class)
     })
-    public void testNestedTrueAndTrue() {
-        Assert.assertTrue(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
+    void testNestedTrueAndTrue() {
+        assertTrue(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
     }
 
     @Test
@@ -82,8 +85,8 @@ public class MCRPIAndPredicateTest extends MCRTestCase {
         @MCRTestProperty(key = KEY_CREATION_PREDICATE_1_2, classNameOf = MCRFalsePredicate.class),
         @MCRTestProperty(key = KEY_CREATION_PREDICATE_2, classNameOf = MCRFalsePredicate.class)
     })
-    public void testNestedTrueAndFalse() {
-        Assert.assertFalse(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
+    void testNestedTrueAndFalse() {
+        assertFalse(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
     }
 
     private static MCRObject getTestObject() {

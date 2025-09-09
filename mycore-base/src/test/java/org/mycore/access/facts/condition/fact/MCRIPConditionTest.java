@@ -18,16 +18,19 @@
 
 package org.mycore.access.facts.condition.fact;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.Collections;
 
 import org.jdom2.Element;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.access.facts.MCRFactsHolder;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTestCase;
+import org.mycore.test.MyCoReTest;
 
-public class MCRIPConditionTest extends MCRTestCase {
+@MyCoReTest
+public class MCRIPConditionTest {
 
     @Test
     public void testConditionMatch() {
@@ -35,7 +38,7 @@ public class MCRIPConditionTest extends MCRTestCase {
         MCRIPCondition condition = new MCRIPCondition();
         condition.parse(new Element("ip").setText("111.111.111.111"));
         MCRFactsHolder facts = new MCRFactsHolder(Collections.emptyList());
-        Assert.assertTrue("The ip should match", condition.matches(facts));
+        assertTrue(condition.matches(facts), "The ip should match");
     }
 
     @Test
@@ -44,7 +47,7 @@ public class MCRIPConditionTest extends MCRTestCase {
         MCRIPCondition condition = new MCRIPCondition();
         condition.parse(new Element("ip").setText("111.111.0.0/255.255.0.0"));
         MCRFactsHolder facts = new MCRFactsHolder(Collections.emptyList());
-        Assert.assertTrue("The ip should match", condition.matches(facts));
+        assertTrue(condition.matches(facts), "The ip should match");
     }
 
     @Test
@@ -53,7 +56,7 @@ public class MCRIPConditionTest extends MCRTestCase {
         MCRIPCondition condition = new MCRIPCondition();
         condition.parse(new Element("ip").setText("111.111.111.111"));
         MCRFactsHolder facts = new MCRFactsHolder(Collections.emptyList());
-        Assert.assertFalse("The ip should not match", condition.matches(facts));
+        assertFalse(condition.matches(facts), "The ip should not match");
     }
 
 }

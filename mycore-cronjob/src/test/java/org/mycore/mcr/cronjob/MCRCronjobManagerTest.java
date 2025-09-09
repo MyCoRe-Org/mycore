@@ -18,39 +18,36 @@
 
 package org.mycore.mcr.cronjob;
 
-import java.util.Map;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRTestCase;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.common.processing.impl.MCRCentralProcessableRegistry;
+import org.mycore.test.MyCoReTest;
 
-public class MCRCronjobManagerTest extends MCRTestCase {
+@MyCoReTest
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Processable.Registry.Class", classNameOf = MCRCentralProcessableRegistry.class),
+    @MCRTestProperty(key = MCRCronjobManager.JOBS_CONFIG_PREFIX + "Test2", classNameOf = MCRTestCronJob.class),
+    @MCRTestProperty(key = MCRCronjobManager.JOBS_CONFIG_PREFIX + "Test2.Contexts", string = "CLI"),
+    @MCRTestProperty(key = MCRCronjobManager.JOBS_CONFIG_PREFIX + "Test2.CronType", string = "QUARTZ"),
+    @MCRTestProperty(key = MCRCronjobManager.JOBS_CONFIG_PREFIX + "Test2.Cron", string = "* * * * * ? *"),
+    @MCRTestProperty(key = MCRCronjobManager.JOBS_CONFIG_PREFIX + "Test2.N", string = "1")
+})
+public class MCRCronjobManagerTest {
 
     @Test
     public void startUp() {
-        Assert.assertEquals("Count should be 0", MCRTestCronJob.count, 0);
+        assertEquals(0, MCRTestCronJob.count, "Count should be 0");
         MCRCronjobManager.getInstance().startUp(null);
         try {
             Thread.sleep(2500);
         } catch (InterruptedException e) {
             throw new MCRException(e);
         }
-        Assert.assertEquals("Count should be 2", MCRTestCronJob.count, 2);
+        assertEquals(2, MCRTestCronJob.count, "Count should be 2");
     }
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-
-        testProperties.put("MCR.Processable.Registry.Class", MCRCentralProcessableRegistry.class.getName());
-        testProperties.put(MCRCronjobManager.JOBS_CONFIG_PREFIX + "Test2", MCRTestCronJob.class.getName());
-        testProperties.put(MCRCronjobManager.JOBS_CONFIG_PREFIX + "Test2.Contexts", "CLI");
-        testProperties.put(MCRCronjobManager.JOBS_CONFIG_PREFIX + "Test2.CronType", "QUARTZ");
-        testProperties.put(MCRCronjobManager.JOBS_CONFIG_PREFIX + "Test2.Cron", "* * * * * ? *");
-        testProperties.put(MCRCronjobManager.JOBS_CONFIG_PREFIX + "Test2.N", "1");
-
-        return testProperties;
-    }
 }

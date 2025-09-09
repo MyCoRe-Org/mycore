@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.logging.log4j.Level;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
+import org.mycore.resource.common.MCRNoOpResourceTracer;
 import org.mycore.resource.common.MCRResourceTracer;
 
 /**
@@ -32,6 +33,11 @@ import org.mycore.resource.common.MCRResourceTracer;
  * ({@link MCRResourceSelectorBase#doSelect(List, MCRHints, MCRResourceTracer)}).
  */
 public abstract class MCRResourceSelectorBase implements MCRResourceSelector {
+
+    @Override
+    public final List<URL> select(List<URL> resourceUrls, MCRHints hints) {
+        return select(resourceUrls, hints, new MCRNoOpResourceTracer());
+    }
 
     @Override
     public List<URL> select(List<URL> resourceUrls, MCRHints hints, MCRResourceTracer tracer) {

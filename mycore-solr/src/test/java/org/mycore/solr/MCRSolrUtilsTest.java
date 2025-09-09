@@ -18,9 +18,9 @@
 
 package org.mycore.solr;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -32,7 +32,7 @@ public class MCRSolrUtilsTest {
      * Test method for {@link org.mycore.solr.MCRSolrUtils#escapeSearchValue(java.lang.String)}.
      */
     @Test
-    public final void testEscapeSearchValue() {
+    final void testEscapeSearchValue() {
         String restrictedChars = "+-&|!(){}[]^\"~:\\/";
         StringBuilder sb = new StringBuilder();
         for (char c : restrictedChars.toCharArray()) {
@@ -40,8 +40,8 @@ public class MCRSolrUtilsTest {
             sb.append(c);
         }
         String escapedChars = sb.toString();
-        assertEquals("Not all required characters where escaped.", escapedChars,
-            MCRSolrUtils.escapeSearchValue(restrictedChars));
+        assertEquals(escapedChars, MCRSolrUtils.escapeSearchValue(restrictedChars),
+                "Not all required characters where escaped.");
     }
 
 }

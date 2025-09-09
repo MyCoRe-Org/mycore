@@ -18,13 +18,13 @@
 
 package org.mycore.datamodel.metadata;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Map;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.jdom2.Element;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
+import org.mycore.test.MyCoReTest;
 
 /**
  * This class is a JUnit test case for org.mycore.datamodel.metadata.MCRMetaLinkID and MCRMetaLinkID.
@@ -32,15 +32,12 @@ import org.mycore.common.MCRTestCase;
  * @author Jens Kupferschmidt
  *
  */
-public class MCRMetaLinkTest extends MCRTestCase {
-
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.Metadata.Type.mods", "true");
-        testProperties.put("MCR.Metadata.Type.derivate", "true");
-        return testProperties;
-    }
+@MyCoReTest
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Metadata.Type.mods", string = "true"),
+    @MCRTestProperty(key = "MCR.Metadata.Type.derivate", string = "true")
+})
+public class MCRMetaLinkTest {
 
     /**
      * check createXML, setFromDom, equals and clone
@@ -53,10 +50,10 @@ public class MCRMetaLinkTest extends MCRTestCase {
         Element link1_xml = link1.createXML();
         MCRMetaLink link1_read = new MCRMetaLink();
         link1_read.setFromDOM(link1_xml);
-        assertEquals("read objects from XML should be equal", link1, link1_read);
+        assertEquals(link1, link1_read, "read objects from XML should be equal");
 
         MCRMetaLink link1_clone = link1_read.clone();
-        assertEquals("cloned object should be equal with original", link1_read, link1_clone);
+        assertEquals(link1_read, link1_clone, "cloned object should be equal with original");
 
         MCRMetaLink link2 = new MCRMetaLink("subtag", 0);
         link2.setBiLink("ZOJE", "SOEG", "Partner Zittauer Schmalspurbahnen");
@@ -64,10 +61,10 @@ public class MCRMetaLinkTest extends MCRTestCase {
         Element link2_xml = link2.createXML();
         MCRMetaLink link2_read = new MCRMetaLink();
         link2_read.setFromDOM(link2_xml);
-        assertEquals("read objects from XML should be equal", link2, link2_read);
+        assertEquals(link2, link2_read, "read objects from XML should be equal");
 
         MCRMetaLink link2_clone = link2_read.clone();
-        assertEquals("cloned object should be equal with original", link2_read, link2_clone);
+        assertEquals(link2_read, link2_clone, "cloned object should be equal with original");
     }
 
     /**
@@ -82,15 +79,15 @@ public class MCRMetaLinkTest extends MCRTestCase {
         Element link1_xml = link1.createXML();
         MCRMetaLinkID link1_read = new MCRMetaLinkID();
         link1_read.setFromDOM(link1_xml);
-        assertEquals("read objects from XML should be equal", link1, link1_read);
+        assertEquals(link1, link1_read, "read objects from XML should be equal");
 
         MCRMetaLinkID link1_clone = link1_read.clone();
-        assertEquals("cloned object should be equal with original", link1_read, link1_clone);
+        assertEquals(link1_read, link1_clone, "cloned object should be equal with original");
 
         MCRMetaLinkID link2 = new MCRMetaLinkID("subtag", 0);
         link2.setReference(MCRObjectID.getInstance("MIR_mods_00000001"), "MODS", "MODS-Objekt 1");
         link2.setType("mytype");
-        assertEquals("MCRID object should be equal with original", link1, link2);
+        assertEquals(link1, link2, "MCRID object should be equal with original");
 
         MCRMetaLinkID link3 = new MCRMetaLinkID("subtag", 0);
         link3.setBiLink("MIR_mods_00000001", "MIR_derivate_00000001", "Derivate link");
@@ -98,15 +95,15 @@ public class MCRMetaLinkTest extends MCRTestCase {
         Element link3_xml = link3.createXML();
         MCRMetaLinkID link3_read = new MCRMetaLinkID();
         link3_read.setFromDOM(link3_xml);
-        assertEquals("read objects from XML should be equal", link3, link3_read);
+        assertEquals(link3, link3_read, "read objects from XML should be equal");
 
         MCRMetaLinkID link3_clone = link3_read.clone();
-        assertEquals("cloned object should be equal with original", link3_read, link3_clone);
+        assertEquals(link3_read, link3_clone, "cloned object should be equal with original");
 
         MCRMetaLinkID link4 = new MCRMetaLinkID("subtag", 0);
         link4.setBiLink(MCRObjectID.getInstance("MIR_mods_00000001"),
             MCRObjectID.getInstance("MIR_derivate_00000001"), "Derivate link");
-        assertEquals("MCRID object should be equal with original", link3, link4);
+        assertEquals(link3, link4, "MCRID object should be equal with original");
 
     }
 }

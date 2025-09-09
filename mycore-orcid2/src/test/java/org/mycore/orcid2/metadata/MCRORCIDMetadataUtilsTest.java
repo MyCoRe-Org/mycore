@@ -18,34 +18,35 @@
 
 package org.mycore.orcid2.metadata;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
-import java.util.Map;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.orcid2.exception.MCRORCIDTransformationException;
+import org.mycore.test.MyCoReTest;
 
-public class MCRORCIDMetadataUtilsTest extends MCRTestCase {
-
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.ORCID2.Metadata.SaveOtherPutCodes", Boolean.TRUE.toString());
-        return testProperties;
-    }
+@MyCoReTest
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.ORCID2.Metadata.SaveOtherPutCodes", string = "true")
+})
+public class MCRORCIDMetadataUtilsTest {
 
     @Test
     public void testGetORCIDFlagContentNull() {
         assertNull(MCRORCIDMetadataUtils.getORCIDFlagContent(new MCRObject()));
     }
 
-    @Test(expected = MCRORCIDTransformationException.class)
+    @Test
     public void testTransformFlagContentStringException() {
-        MCRORCIDMetadataUtils.transformFlagContentString("invalid json");
+        assertThrows(
+            MCRORCIDTransformationException.class,
+            () -> MCRORCIDMetadataUtils.transformFlagContentString("invalid json"));
     }
 
     @Test
@@ -53,24 +54,24 @@ public class MCRORCIDMetadataUtilsTest extends MCRTestCase {
         final MCRORCIDFlagContent flagContent = new MCRORCIDFlagContent();
         String result = MCRORCIDMetadataUtils.transformFlagContent(flagContent);
         String expectedResult = "{\"userInfos\":[]}";
-        assertEquals(result, expectedResult);
+        assertEquals(expectedResult, result);
 
         final MCRORCIDUserInfo userInfo = new MCRORCIDUserInfo("ORCID");
         flagContent.getUserInfos().add(userInfo);
         result = MCRORCIDMetadataUtils.transformFlagContent(flagContent);
         expectedResult = "{\"userInfos\":[{\"orcid\":\"ORCID\"}]}";
-        assertEquals(result, expectedResult);
+        assertEquals(expectedResult, result);
 
         final MCRORCIDPutCodeInfo putCodeInfo = new MCRORCIDPutCodeInfo();
         userInfo.setWorkInfo(putCodeInfo);
         result = MCRORCIDMetadataUtils.transformFlagContent(flagContent);
         expectedResult = "{\"userInfos\":[{\"orcid\":\"ORCID\",\"works\":{}}]}";
-        assertEquals(result, expectedResult);
+        assertEquals(expectedResult, result);
 
         putCodeInfo.setOwnPutCode(1);
         result = MCRORCIDMetadataUtils.transformFlagContent(flagContent);
         expectedResult = "{\"userInfos\":[{\"orcid\":\"ORCID\",\"works\":{\"own\":1}}]}";
-        assertEquals(result, expectedResult);
+        assertEquals(expectedResult, result);
     }
 
     @Test
@@ -79,13 +80,13 @@ public class MCRORCIDMetadataUtilsTest extends MCRTestCase {
         final MCRORCIDFlagContent flagContent = new MCRORCIDFlagContent();
         MCRORCIDMetadataUtils.doSetORCIDFlagContent(object, flagContent);
         List<String> flags = object.getService().getFlags("MyCoRe-ORCID");
-        assertEquals(flags.size(), 1);
+        assertEquals(1, flags.size());
 
         final MCRORCIDUserInfo userInfo = new MCRORCIDUserInfo("ORCID");
         flagContent.getUserInfos().add(userInfo);
         MCRORCIDMetadataUtils.doSetORCIDFlagContent(object, flagContent);
         flags = object.getService().getFlags("MyCoRe-ORCID");
-        assertEquals(flags.size(), 1);
+        assertEquals(1, flags.size());
         final MCRORCIDFlagContent result = MCRORCIDMetadataUtils.transformFlagContentString(flags.getFirst());
         assertEquals(flagContent, result);
     }
@@ -96,6 +97,6 @@ public class MCRORCIDMetadataUtilsTest extends MCRTestCase {
         final MCRORCIDFlagContent flagContent = new MCRORCIDFlagContent();
         MCRORCIDMetadataUtils.doSetORCIDFlagContent(object, flagContent);
         MCRORCIDMetadataUtils.removeORCIDFlag(object);
-        assertEquals(object.getService().getFlags("MyCoRe-ORCID").size(), 0);
+        assertEquals(0, object.getService().getFlags("MyCoRe-ORCID").size());
     }
 }

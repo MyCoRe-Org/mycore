@@ -18,15 +18,14 @@
 
 package org.mycore.common.log;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Optional;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.log.MCRTableMessage.Column;
 
-public class MCRTableMessageTest extends MCRTestCase {
+public class MCRTableMessageTest {
 
     private static final String SEPARATOR = System.lineSeparator();
 

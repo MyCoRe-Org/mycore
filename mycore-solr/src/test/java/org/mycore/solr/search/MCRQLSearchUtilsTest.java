@@ -18,28 +18,29 @@
 
 package org.mycore.solr.search;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.apache.logging.log4j.LogManager;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryParser;
+import org.mycore.test.MyCoReTest;
 
 /**
  * @author Thomas Scheffler (yagee)
  */
-public class MCRQLSearchUtilsTest extends MCRTestCase {
+@MyCoReTest
+public class MCRQLSearchUtilsTest {
     /**
      * Test method for
      * {@link MCRSolrSearchUtils#getSolrQuery(MCRQuery, Document, jakarta.servlet.http.HttpServletRequest)}
      * .
      */
     @Test
-    public final void testGetSolrQuery() {
+    final void testGetSolrQuery() {
         MCRQuery andQuery = getMCRQuery("(state = \"submitted\") AND (state = \"published\")");
         assertEquals("+state:\"submitted\" +state:\"published\"",
             MCRSolrSearchUtils.getSolrQuery(andQuery, andQuery.buildXML(), null).getQuery());

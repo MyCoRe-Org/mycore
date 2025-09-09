@@ -18,30 +18,29 @@
 
 package org.mycore.mods.access.facts.condition;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mycore.access.facts.condition.fact.MCRFactsTestUtil.hackObjectIntoCache;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 import org.jdom2.Element;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.access.facts.MCRFactsHolder;
 import org.mycore.access.facts.fact.MCRObjectIDFact;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRTestCase;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mods.MCRMODSWrapper;
+import org.mycore.test.MyCoReTest;
 
-public class MCRMODSGenreConditionTest extends MCRTestCase {
-
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.Metadata.Type.mods", Boolean.TRUE.toString());
-        return testProperties;
-    }
+@MyCoReTest
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Metadata.Type.mods", string = "true")
+})
+public class MCRMODSGenreConditionTest {
 
     @Test
     public void testConditionMatch() throws NoSuchFieldException, IllegalAccessException {
@@ -60,7 +59,7 @@ public class MCRMODSGenreConditionTest extends MCRTestCase {
 
         MCRMODSGenreCondition genreCondition = new MCRMODSGenreCondition();
         genreCondition.parse(new Element("genre").setText("article"));
-        Assert.assertTrue("object should be in genre article", genreCondition.matches(holder));
+        assertTrue(genreCondition.matches(holder), "object should be in genre article");
     }
 
     @Test
@@ -80,7 +79,7 @@ public class MCRMODSGenreConditionTest extends MCRTestCase {
 
         MCRMODSGenreCondition genreCondition = new MCRMODSGenreCondition();
         genreCondition.parse(new Element("genre").setText("article"));
-        Assert.assertFalse("object should not be in genre article", genreCondition.matches(holder));
+        assertFalse(genreCondition.matches(holder), "object should not be in genre article");
     }
 
 }

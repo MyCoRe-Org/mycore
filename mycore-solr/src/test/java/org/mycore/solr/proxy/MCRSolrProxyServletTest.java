@@ -18,33 +18,34 @@
 
 package org.mycore.solr.proxy;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 import java.util.Map;
 
 import org.apache.solr.common.params.ModifiableSolrParams;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.test.MyCoReTest;
 
 /**
  * @author Thomas Scheffler (yagee)
  */
-public class MCRSolrProxyServletTest extends MCRTestCase {
+@MyCoReTest
+public class MCRSolrProxyServletTest {
 
     /**
      * Test method for
      * {@link org.mycore.solr.proxy.MCRSolrProxyServlet#toMultiMap(org.apache.solr.common.params.ModifiableSolrParams)}.
      */
     @Test
-    public final void testToMultiMap() {
+    final void testToMultiMap() {
         ModifiableSolrParams params = new ModifiableSolrParams();
         String[] paramValues = { "title:junit", "author:john" };
         String paramName = "fq";
         params.add(paramName, paramValues);
         Map<String, String[]> multiMap = MCRSolrProxyServlet.toMultiMap(params);
         System.out.println(Arrays.toString(multiMap.get(paramName)));
-        assertEquals("Expected " + paramValues.length + " values", paramValues.length, multiMap.get(paramName).length);
+        assertEquals(paramValues.length, multiMap.get(paramName).length, "Expected " + paramValues.length + " values");
     }
 
 }

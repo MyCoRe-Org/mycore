@@ -21,7 +21,7 @@ package org.mycore.frontend.classeditor.json;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationLoader;
@@ -32,7 +32,7 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 import org.mycore.frontend.classeditor.mocks.CategoryDAOMock;
 
 public class GsonSerializationTest {
-    @Before
+    @BeforeEach
     public void init() {
         final MCRConfigurationLoader configurationLoader = MCRConfigurationLoaderFactory.getConfigurationLoader();
         MCRConfigurationBase.initialize(configurationLoader.loadDeprecated(), configurationLoader.load(), true);

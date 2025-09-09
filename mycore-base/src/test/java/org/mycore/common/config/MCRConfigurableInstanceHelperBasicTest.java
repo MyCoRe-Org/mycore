@@ -18,18 +18,20 @@
 
 package org.mycore.common.config;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.function.Supplier;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRFactory;
+import org.mycore.test.MyCoReTest;
 
-public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
+@MyCoReTest
+public class MCRConfigurableInstanceHelperBasicTest {
 
     @Test
     @MCRTestConfiguration(
@@ -61,15 +63,19 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
 
     }
 
-    @Test(expected = MCRConfigurationException.class)
+    @Test
     @MCRTestConfiguration(
         properties = {
             @MCRTestProperty(key = "Foo", classNameOf = TestClassWitAnnotatedFactories.class)
         })
     public void annotatedFactories() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurableInstanceHelper.getInstance(TestClassWitAnnotatedFactories.class, configuration);
+        assertThrows(
+            MCRConfigurationException.class,
+            () -> {
+                MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
+                MCRConfigurableInstanceHelper.getInstance(TestClassWitAnnotatedFactories.class, configuration);
+            });
 
     }
 
@@ -88,27 +94,35 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
 
     }
 
-    @Test(expected = MCRConfigurationException.class)
+    @Test
     @MCRTestConfiguration(
         properties = {
             @MCRTestProperty(key = "Foo", classNameOf = TestClassWithoutConstructorOrFactory.class)
         })
     public void noConstructorOrFactory() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurableInstanceHelper.getInstance(Object.class, configuration);
+        assertThrows(
+            MCRConfigurationException.class,
+            () -> {
+                MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
+                MCRConfigurableInstanceHelper.getInstance(Object.class, configuration);
+            });
 
     }
 
-    @Test(expected = MCRConfigurationException.class)
+    @Test
     @MCRTestConfiguration(
         properties = {
             @MCRTestProperty(key = "Foo", classNameOf = TestClassWithMultipleFactories.class)
         })
     public void multipleFactories() {
 
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurableInstanceHelper.getInstance(Object.class, configuration);
+        assertThrows(
+            MCRConfigurationException.class,
+            () -> {
+                MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
+                MCRConfigurableInstanceHelper.getInstance(Object.class, configuration);
+            });
 
     }
 
@@ -142,7 +156,6 @@ public class MCRConfigurableInstanceHelperBasicTest extends MCRTestCase {
         assertNotNull(instance);
 
     }
-
 
     @SuppressWarnings("InstantiationOfUtilityClass")
     public static class TestClassWithSingletonFactory {

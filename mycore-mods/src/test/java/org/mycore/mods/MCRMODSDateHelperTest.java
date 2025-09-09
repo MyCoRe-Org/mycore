@@ -18,8 +18,8 @@
 
 package org.mycore.mods;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.Year;
 import java.time.ZoneId;
@@ -29,13 +29,14 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.jdom2.Element;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.test.MyCoReTest;
 
 /**
  * @author Frank Lützenkirchen
  */
-public class MCRMODSDateHelperTest extends MCRTestCase {
+@MyCoReTest
+public class MCRMODSDateHelperTest {
 
     @Test
     public void testNull() {

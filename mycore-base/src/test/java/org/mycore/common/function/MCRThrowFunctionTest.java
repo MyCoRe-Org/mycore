@@ -18,13 +18,14 @@
 
 package org.mycore.common.function;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MCRThrowFunctionTest {
 
@@ -37,18 +38,23 @@ public class MCRThrowFunctionTest {
         assertEquals("Junit test:passed", findFirst.get());
     }
 
-    @Test(expected = IOException.class)
+    @Test
     public void testToFunction() throws IOException {
-        try {
-            Stream.of("passed").map(
-                ((MCRThrowFunction<String, String, IOException>) MCRThrowFunctionTest::failExceptionally).toFunction())
-                .findFirst();
-        } catch (RuntimeException e) {
-            if (e.getCause() instanceof IOException ioe) {
-                throw ioe;
-            }
-            throw e;
-        }
+        assertThrows(
+            IOException.class,
+            () -> {
+                try {
+                    Stream.of("passed").map(
+                        ((MCRThrowFunction<String, String, IOException>) MCRThrowFunctionTest::failExceptionally)
+                            .toFunction())
+                        .findFirst();
+                } catch (RuntimeException e) {
+                    if (e.getCause() instanceof IOException ioe) {
+                        throw ioe;
+                    }
+                    throw e;
+                }
+            });
     }
 
     public static String failExceptionally(String input) throws IOException {

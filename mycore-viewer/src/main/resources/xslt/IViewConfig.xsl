@@ -62,30 +62,31 @@
   </xsl:template>
 
   <xsl:template match="/IViewConfig">
+    <xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html></xsl:text>
     <html>
       <head>
         <xsl:call-template name="createViewerLinkElement">
-            <xsl:with-param name="href" select="$MCR.Viewer.Bootstrap.Css.URL"/>
-            <xsl:with-param name="integrity" select="$MCR.Viewer.Bootstrap.Css.Integrity"/>
+          <xsl:with-param name="href" select="$MCR.Viewer.Bootstrap.Css.URL"/>
+          <xsl:with-param name="integrity" select="$MCR.Viewer.Bootstrap.Css.Integrity"/>
         </xsl:call-template>
         <xsl:call-template name="createViewerScriptElement">
-            <xsl:with-param name="src" select="$MCR.Viewer.Bootstrap.Js.URL"/>
-            <xsl:with-param name="integrity" select="$MCR.Viewer.Bootstrap.Js.Integrity"/>
+          <xsl:with-param name="src" select="$MCR.Viewer.Bootstrap.Js.URL"/>
+          <xsl:with-param name="integrity" select="$MCR.Viewer.Bootstrap.Js.Integrity"/>
         </xsl:call-template>
         <xsl:call-template name="createViewerScriptElement">
-            <xsl:with-param name="src" select="$MCR.Viewer.Popper.Js.URL"/>
-            <xsl:with-param name="integrity" select="$MCR.Viewer.Popper.Js.Integrity"/>
+          <xsl:with-param name="src" select="$MCR.Viewer.Popper.Js.URL"/>
+          <xsl:with-param name="integrity" select="$MCR.Viewer.Popper.Js.Integrity"/>
         </xsl:call-template>
         <xsl:call-template name="createViewerLinkElement">
-            <xsl:with-param name="href" select="$MCR.Viewer.Fontawesome.Css.URL"/>
-            <xsl:with-param name="integrity" select="$MCR.Viewer.Fontawesome.Css.Integrity"/>
+          <xsl:with-param name="href" select="$MCR.Viewer.Fontawesome.Css.URL"/>
+          <xsl:with-param name="integrity" select="$MCR.Viewer.Fontawesome.Css.Integrity"/>
         </xsl:call-template>
-
         <xsl:apply-templates select="xml/resources/resource" mode="iview.resource" />
-        <script>
+        <script type="module">
+          import { MyCoReViewer } from '<xsl:value-of select="$WebApplicationBaseURL" />modules/iview2/js/iview-client-base.es.js';
           window.onload = function() {
             var json = <xsl:value-of select="json" />;
-            new mycore.viewer.MyCoReViewer(jQuery("body"), json.properties);
+            new MyCoReViewer(document.body, json.properties);
           };
         </script>
       </head>
@@ -98,6 +99,9 @@
     <xsl:choose>
       <xsl:when test="@type='script'">
         <script src="{text()}" type="text/javascript" />
+      </xsl:when>
+      <xsl:when test="@type='module'">
+          <script src="{text()}" type="module" />
       </xsl:when>
       <xsl:when test="@type='css'">
         <link href="{text()}" type="text/css" rel="stylesheet"></link>

@@ -18,7 +18,7 @@
 
 package org.mycore.services.fieldquery;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 
@@ -26,18 +26,12 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.junit.Before;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.test.MyCoReTest;
 
-public class MCRQueryTest extends MCRTestCase {
-
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
+@MyCoReTest
+public class MCRQueryTest {
 
     @Test
     public final void testQueryAsXML() {
@@ -96,7 +90,7 @@ public class MCRQueryTest extends MCRTestCase {
             System.out.println(e.getMessage());
         }
         System.out.println();
-        assertTrue("Elements should be equal", MCRXMLHelper.deepEqual(doc, mcrquerydoc));
+        assertTrue(MCRXMLHelper.deepEqual(doc, mcrquerydoc), "Elements should be equal");
 
     }
 

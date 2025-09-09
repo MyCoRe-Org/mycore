@@ -38,10 +38,11 @@
         }
         return existingScripts;
       },
-      addRequiredScripts: function (scripts, mobile) {
-        if(!mobile &amp;&amp; !loader.isBootstrapPresent()){
+      addRequiredScripts: function (scripts, module) {
+        if(!scripts) return;
+        if(!loader.isBootstrapPresent()){
             notLoadedCount++;
-            interval = window.setInterval(function(){
+            let interval = window.setInterval(function(){
                 if(loader.isBootstrapPresent()){
                     notLoadedCount--;
                     window.clearInterval(interval);
@@ -54,6 +55,7 @@
         }).forEach(function (scriptSrc) {
           let script = document.createElement('script');
           script.async = false;
+          script.type = module ? 'module' : 'text/javascript';
           notLoadedCount++;
 
         script.onload = function() {
@@ -103,10 +105,16 @@
   let configuration =<xsl:value-of select="IViewConfig/json"/>;
 
   viewerLoader.addRequiredCss(configuration.resources.css);
-  viewerLoader.addRequiredScripts(configuration.resources.script, configuration.properties.mobile);
+  viewerLoader.addRequiredScripts(configuration.resources.script, false);
+  viewerLoader.addRequiredScripts(configuration.resources.module, true);
+
   viewerLoader.addConstructorExecution(function(){
-          let container = jQuery("[data-viewer='"+configuration.properties.derivate+":"+CSS.escape(configuration.properties.filePath)+"']");
-          new mycore.viewer.MyCoReViewer(container, configuration.properties);
+    import("<xsl:value-of select="$WebApplicationBaseURL" />modules/iview2/js/iview-client-base.es.js").then((imp) => {
+      let containerElements = document.querySelectorAll("[data-viewer='"+configuration.properties.derivate+":"+CSS.escape(configuration.properties.filePath)+"']");
+      containerElements.forEach((containerElement)=> {
+        new imp.MyCoReViewer(containerElement, configuration.properties);
+      })
+    });
   });
 
 })

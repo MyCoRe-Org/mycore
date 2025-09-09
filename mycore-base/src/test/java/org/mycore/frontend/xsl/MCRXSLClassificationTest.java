@@ -18,8 +18,8 @@
 
 package org.mycore.frontend.xsl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mycore.common.util.MCRTestCaseXSLTUtil.prepareTestDocument;
 import static org.mycore.common.util.MCRTestCaseXSLTUtil.transform;
 
@@ -28,11 +28,16 @@ import java.util.Map;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
-import org.junit.Test;
-import org.mycore.common.MCRJPATestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.util.MCRTestCaseClassificationUtil;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MyCoReTest;
 
-public class MCRXSLClassificationTest extends MCRJPATestCase {
+@MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
+public class MCRXSLClassificationTest {
     private static final String XSL = "/xslt/functions/classificationTest.xsl";
 
     @Test
@@ -48,16 +53,13 @@ public class MCRXSLClassificationTest extends MCRJPATestCase {
         assertEquals(3, result.getChild("category").getChildren("label").size());
         assertEquals("de",
             result.getChild("category").getChildren("label").get(0).getAttributeValue("lang", Namespace.XML_NAMESPACE));
-        assertEquals("junit_1 (de)",
-            result.getChild("category").getChildren("label").get(0).getAttributeValue("text"));
+        assertEquals("junit_1 (de)", result.getChild("category").getChildren("label").get(0).getAttributeValue("text"));
         assertEquals("en",
             result.getChild("category").getChildren("label").get(1).getAttributeValue("lang", Namespace.XML_NAMESPACE));
-        assertEquals("junit_1 (en)",
-            result.getChild("category").getChildren("label").get(1).getAttributeValue("text"));
+        assertEquals("junit_1 (en)", result.getChild("category").getChildren("label").get(1).getAttributeValue("text"));
         assertEquals("x-xxx",
             result.getChild("category").getChildren("label").get(2).getAttributeValue("lang", Namespace.XML_NAMESPACE));
-        assertEquals("abc",
-            result.getChild("category").getChildren("label").get(2).getAttributeValue("text"));
+        assertEquals("abc", result.getChild("category").getChildren("label").get(2).getAttributeValue("text"));
 
         // non-existing classification/category: empty result
         result = transform(testDoc, XSL, Map.of("classid", "TestClassification", "categid", "xxx")).getRootElement();
@@ -217,10 +219,8 @@ public class MCRXSLClassificationTest extends MCRJPATestCase {
         assertEquals("junit_2 (en)", result.getText());
     }
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
-
         MCRTestCaseClassificationUtil.addClassification("/classification/TestClassification.xml");
     }
 }

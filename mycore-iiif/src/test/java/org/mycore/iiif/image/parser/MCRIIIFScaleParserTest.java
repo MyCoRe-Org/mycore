@@ -21,15 +21,17 @@ package org.mycore.iiif.image.parser;
 import java.util.Hashtable;
 import java.util.Map;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.mycore.iiif.image.model.MCRIIIFImageTargetSize;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MCRIIIFScaleParserTest {
     public static final int IMAGE_WIDTH = 500;
 
     public static final int IMAGE_HEIGHT = 400;
 
-    @org.junit.Test
+    @Test
     public void testParseTargetScale() {
 
         Map<String, MCRIIIFImageTargetSize> testValues = new Hashtable<>();
@@ -42,8 +44,8 @@ public class MCRIIIFScaleParserTest {
         testValues.put("pct:200", new MCRIIIFImageTargetSize(1000, 800));
         testValues.put("pct:50", new MCRIIIFImageTargetSize(250, 200));
 
-        testValues.forEach((scale, expectedResult) -> Assert.assertEquals(expectedResult,
-            new MCRIIIFScaleParser(scale, IMAGE_WIDTH, IMAGE_HEIGHT).parseTargetScale()));
+        testValues.forEach((scale, expectedResult) -> assertEquals(
+                expectedResult, new MCRIIIFScaleParser(scale, IMAGE_WIDTH, IMAGE_HEIGHT).parseTargetScale()));
 
     }
 }

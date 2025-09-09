@@ -18,6 +18,9 @@
 
 package org.mycore.common.xsl;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.List;
@@ -44,18 +47,19 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMResult;
 import org.jdom2.transform.JDOMSource;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRTestCase;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.test.MyCoReTest;
 import org.xml.sax.SAXException;
 
-public class MCRParameterCollectorTest extends MCRTestCase {
+@MyCoReTest
+public class MCRParameterCollectorTest {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -156,9 +160,8 @@ public class MCRParameterCollectorTest extends MCRTestCase {
         }
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         this.randomParameters10 = RandomHashMapFiller.fillWithRandomStrings(10, 8, 8);
         this.randomParameters100 = RandomHashMapFiller.fillWithRandomStrings(100, 8, 8);
         this.randomParameters1000 = RandomHashMapFiller.fillWithRandomStrings(1000, 8, 8);
@@ -205,16 +208,16 @@ public class MCRParameterCollectorTest extends MCRTestCase {
         Element root = result.getRootElement();
 
         List<Element> paramElement = root.getChildren("parameter");
-        Assert.assertTrue("There should be at least 10 parameters", paramElement.size() >= 10);
+        assertTrue(paramElement.size() >= 10, "There should be at least 10 parameters");
 
         paramElement.forEach(param -> {
             String name = param.getAttributeValue("name");
             String value = param.getTextNormalize();
-            Assert.assertEquals(combinedParameters.get(name), value);
+            assertEquals(combinedParameters.get(name), value);
         });
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void setParametersToSpeed() throws TransformerException, ParserConfigurationException, SAXException {
         SAXTransformerFactory xalanFactory = getTransformerFactory(XALAN_FACTORY_CLASS);
@@ -250,13 +253,9 @@ public class MCRParameterCollectorTest extends MCRTestCase {
         speedTest(randomParameters10000, saxonTransformer);
     }
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> superProperties = super.getTestProperties();
-
-        superProperties.putAll(INITIAL_PROPERTIES);
-
-        return superProperties;
+    @BeforeEach
+    protected void setTestProperties() {
+        INITIAL_PROPERTIES.forEach(MCRConfiguration2::set);
     }
 
     private static class RandomHashMapFiller {

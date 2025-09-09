@@ -18,10 +18,12 @@
 
 package org.mycore.iiif.image.parser;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.Hashtable;
 import java.util.Map;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.mycore.iiif.image.model.MCRIIIFImageSourceRegion;
 
 public class MCRIIIFRegionParserTest {
@@ -30,7 +32,7 @@ public class MCRIIIFRegionParserTest {
 
     public static final int IMAGE_HEIGHT = 400;
 
-    @org.junit.Test
+    @Test
     public void testParseImageRegion() {
         Map<String, MCRIIIFImageSourceRegion> validCoords = new Hashtable<>();
 
@@ -44,7 +46,7 @@ public class MCRIIIFRegionParserTest {
         for (Map.Entry<String, MCRIIIFImageSourceRegion> entry : validCoords.entrySet()) {
             MCRIIIFImageSourceRegion result = new MCRIIIFRegionParser(entry.getKey(), IMAGE_WIDTH, IMAGE_HEIGHT)
                 .parseImageRegion();
-            Assert.assertEquals(entry.getValue(), result);
+            assertEquals(entry.getValue(), result);
         }
 
     }

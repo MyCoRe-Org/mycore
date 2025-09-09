@@ -18,10 +18,11 @@
 
 package org.mycore.mods.merger;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.test.MyCoReTest;
 
-public class MCROriginInfoMergerTest extends MCRTestCase {
+@MyCoReTest
+public class MCROriginInfoMergerTest {
 
     @Test
     public void testMerge() throws Exception {

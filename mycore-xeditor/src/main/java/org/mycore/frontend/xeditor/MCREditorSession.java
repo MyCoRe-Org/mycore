@@ -40,6 +40,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.xsl.MCRParameterCollector;
+import org.mycore.frontend.xeditor.cleanup.MCRXMLCleaner;
 import org.mycore.frontend.xeditor.tracker.MCRBreakpoint;
 import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 import org.mycore.frontend.xeditor.validation.MCRXEditorValidator;

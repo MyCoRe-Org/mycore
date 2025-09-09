@@ -23,7 +23,6 @@ import { MyCoRePageDesktopLayoutProviderComponent } from "../desktop/components/
 import { MyCoReSearchComponent } from "../desktop/components/MyCoReSearchComponent";
 import { MyCoReLocalViewerIndexSearcherProvider } from "../desktop/components/MyCoReLocalViewerIndexSearcherProvider";
 import { register as registerToolbarFactory } from "../desktop/widgets/toolbar/view/BootstrapToolbarViewFactory";
-import { MyCoReDesktopToolbarProviderComponent } from "../desktop/components/MyCoReDesktopToolbarProviderComponent";
 
 addViewerComponent(MyCoReFrameToolbarProviderComponent);
 addViewerComponent(MyCoReImageInformationComponent);

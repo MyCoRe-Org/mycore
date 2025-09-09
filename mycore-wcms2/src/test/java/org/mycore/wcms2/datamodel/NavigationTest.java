@@ -18,8 +18,8 @@
 
 package org.mycore.wcms2.datamodel;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 import java.io.File;
 
@@ -27,8 +27,8 @@ import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMResult;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -42,7 +42,7 @@ public class NavigationTest {
 
     private MCRNavigation navigation;
 
-    @Before
+    @BeforeEach
     public void setup() {
         this.navigation = new MCRNavigation();
         this.navigation.setTemplate("template_mysample");
@@ -90,7 +90,7 @@ public class NavigationTest {
         JAXBContext jc = JAXBContext.newInstance(MCRNavigation.class);
         Unmarshaller m = jc.createUnmarshaller();
         Object o = m.unmarshal(new File("src/test/resources/navigation/navigation.xml"));
-        assertTrue(o instanceof MCRNavigation);
+        assertInstanceOf(MCRNavigation.class, o);
         MCRNavigation navigation = (MCRNavigation) o;
 
         // test navigation

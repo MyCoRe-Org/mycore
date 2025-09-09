@@ -3,6 +3,7 @@ package org.mycore.mods;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.naming.OperationNotSupportedException;
 
@@ -29,8 +30,10 @@ public class MCRMODSLinkProvider extends MCRDefaultLinkProvider {
         MCRMODSWrapper modsWrapper = new MCRMODSWrapper(obj);
 
         List<Element> linkingNodes = modsWrapper.getLinkedRelatedItems();
-        if (!linkingNodes.isEmpty()) {
-            for (Element linkingNode : linkingNodes) {
+        List<Element> linkingPersons = modsWrapper.getLinkedPersons();
+        List<Element> joinedNodes = Stream.concat(linkingNodes.stream(), linkingPersons.stream()).toList();
+        if (!joinedNodes.isEmpty()) {
+            for (Element linkingNode : joinedNodes) {
                 String targetID = linkingNode.getAttributeValue(MCRXlink.HREF, MCRConstants.XLINK_NAMESPACE);
                 if (targetID == null) {
                     continue;

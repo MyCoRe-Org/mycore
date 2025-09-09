@@ -1,12 +1,11 @@
 package org.mycore.datamodel.common;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -14,24 +13,33 @@ import java.util.stream.Stream;
 import javax.naming.OperationNotSupportedException;
 
 import org.jdom2.JDOMException;
-import org.junit.Test;
-import org.mycore.common.MCRStoreTestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.resource.MCRResourceHelper;
+import org.mycore.test.MCRMetadataExtension;
+import org.mycore.test.MyCoReTest;
 
-public class MCRDefaultLinkProviderTest extends MCRStoreTestCase {
+@MyCoReTest
+@ExtendWith(MCRMetadataExtension.class)
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Metadata.Type.cbu", string = "true"),
+    @MCRTestProperty(key = "MCR.Metadata.Type.corporation", string = "true")
+})
+public class MCRDefaultLinkProviderTest {
 
     MCRDefaultLinkProvider provider;
     private MCRObject object;
     private MCRDerivate derivate;
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
-
         provider = new MCRDefaultLinkProvider();
         setUpTestObject();
         setUpTestDerivate();
@@ -63,11 +71,11 @@ public class MCRDefaultLinkProviderTest extends MCRStoreTestCase {
                 .collect(Collectors.toSet());
 
         for (MCRCategoryID expectedCategory : expectedCategories) {
-            assertTrue("Expected category not found: " + expectedCategory,
-                categoriesOfObject.contains(expectedCategory));
+            assertTrue(categoriesOfObject.contains(expectedCategory),
+                "Expected category not found: " + expectedCategory);
         }
 
-        assertEquals("Unexpected category found", categoriesOfObject.size(), expectedCategories.size());
+        assertEquals(categoriesOfObject.size(), expectedCategories.size(), "Unexpected category found");
     }
 
     @Test
@@ -79,7 +87,7 @@ public class MCRDefaultLinkProviderTest extends MCRStoreTestCase {
                 .map(MCRCategoryID::ofString)
                 .collect(Collectors.toSet());
 
-        assertEquals("Unexpected category found", categoriesOfDerivate.size(), expectedCategories.size());
+        assertEquals(categoriesOfDerivate.size(), expectedCategories.size(), "Unexpected category found");
     }
 
     @Test
@@ -93,9 +101,9 @@ public class MCRDefaultLinkProviderTest extends MCRStoreTestCase {
             && lo.to().equals(MCRObjectID.getInstance("HisBest_corporation_00000415"))
             && lo.type().equals(MCRLinkType.REFERENCE));
 
-        assertTrue("Expected link not found: Parent", containsParent);
-        assertTrue("Expected link not found: Corporation", containsCorporation);
-        assertEquals("Unexpected number of links", 2, linksOfObject.size());
+        assertTrue(containsParent, "Expected link not found: Parent");
+        assertTrue(containsCorporation, "Expected link not found: Corporation");
+        assertEquals(2, linksOfObject.size(), "Unexpected number of links");
 
     }
 
@@ -107,17 +115,8 @@ public class MCRDefaultLinkProviderTest extends MCRStoreTestCase {
             && lo.to().equals(MCRObjectID.getInstance("HisBest_cbu_00149763"))
             && lo.type().equals(MCRLinkType.DERIVATE));
 
-        assertTrue("Expected link not found: Parent", containsDerivateLink);
-        assertEquals("Unexpected number of links", 1, linksOfDerivate.size());
+        assertTrue(containsDerivateLink, "Expected link not found: Parent");
+        assertEquals(1, linksOfDerivate.size(), "Unexpected number of links");
     }
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-
-        testProperties.put("MCR.Metadata.Type.cbu", "true");
-        testProperties.put("MCR.Metadata.Type.corporation", "true");
-
-        return testProperties;
-    }
 }

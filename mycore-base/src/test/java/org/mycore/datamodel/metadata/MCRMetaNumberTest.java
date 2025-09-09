@@ -18,12 +18,12 @@
 
 package org.mycore.datamodel.metadata;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Map;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -31,10 +31,12 @@ import org.jdom2.Element;
 import org.jdom2.Text;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.test.MyCoReTest;
 
 /**
  * This class is a JUnit test case for org.mycore.datamodel.metadata.MCRMetaNumber.
@@ -43,29 +45,33 @@ import org.mycore.common.xml.MCRXMLHelper;
  * @author Jens Kupferschmidt
  *
  */
-public class MCRMetaNumberTest extends MCRTestCase {
+@MyCoReTest
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "log4j.logger.org.mycore.datamodel.metadata", string = "INFO")
+})
+public class MCRMetaNumberTest {
 
-    private static final Logger LOGGER = LogManager.getLogger();;
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Test
     public void numberTransformation() {
         MCRMetaNumber meta_number = new MCRMetaNumber("number", 0, null, null, "0,1");
         String number_string = meta_number.getNumberAsString();
-        assertEquals("datamodel", "0.100", number_string);
+        assertEquals("0.100", number_string, "datamodel");
         meta_number = new MCRMetaNumber("number", 0, null, null, "0.10");
         number_string = meta_number.getNumberAsString();
-        assertEquals("datamodel", "0.100", number_string);
+        assertEquals("0.100", number_string, "datamodel");
         meta_number = new MCRMetaNumber("number", 0, null, null, "12345,6789");
         number_string = meta_number.getNumberAsString();
-        assertEquals("datamodel", "12345.679", number_string);
+        assertEquals("12345.679", number_string, "datamodel");
         // geo data
         MCRConfiguration2.set("MCR.Metadata.MetaNumber.FractionDigits", String.valueOf(8));
         meta_number = new MCRMetaNumber("number", 0, null, null, "123.45678999");
         number_string = meta_number.getNumberAsString();
-        assertEquals("datamodel", "123.45678999", number_string);
+        assertEquals("123.45678999", number_string, "datamodel");
         meta_number = new MCRMetaNumber("number", 0, null, null, "-123,45678999");
         number_string = meta_number.getNumberAsString();
-        assertEquals("datamodel", "-123.45678999", number_string);
+        assertEquals("-123.45678999", number_string, "datamodel");
     }
 
     @Test
@@ -81,13 +87,6 @@ public class MCRMetaNumberTest extends MCRTestCase {
         Element exported = meta_number.createXML();
         printData(imported, exported);
         checkData(imported, exported);
-    }
-
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("log4j.logger.org.mycore.datamodel.metadata", "INFO");
-        return testProperties;
     }
 
     private void printData(Element imported, Element exported) {

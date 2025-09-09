@@ -18,15 +18,17 @@
 
 package org.mycore.pi.doi;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.Optional;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mycore.test.MyCoReTest;
 
-public class MCRDOIParserTest extends MCRTestCase {
+@MyCoReTest
+public class MCRDOIParserTest {
 
     public static final String EXAMPLE_DOI2_PREFIX = "10.22032.0";
 
@@ -45,21 +47,17 @@ public class MCRDOIParserTest extends MCRTestCase {
     private static void testDOI(String doi, String expectedPrefix, String expectedSuffix) {
         Optional<MCRDigitalObjectIdentifier> parsedDOIOptional = parser.parse(doi);
 
-        Assert.assertTrue("DOI should be parsable!", parsedDOIOptional.isPresent());
+        assertTrue(parsedDOIOptional.isPresent(), "DOI should be parsable!");
 
         MCRDigitalObjectIdentifier parsedDOI = parsedDOIOptional.get();
 
-        Assert.assertEquals("DOI Prefix should match!", expectedPrefix,
-            parsedDOI.getPrefix());
+        assertEquals(expectedPrefix, parsedDOI.getPrefix(), "DOI Prefix should match!");
 
-        Assert.assertEquals("DOI Suffix should match", expectedSuffix,
-            parsedDOI.getSuffix());
+        assertEquals(expectedSuffix, parsedDOI.getSuffix(), "DOI Suffix should match");
     }
 
-    @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         parser = new MCRDOIParser();
     }
 
@@ -74,9 +72,4 @@ public class MCRDOIParserTest extends MCRTestCase {
         testDOI(EXAMPLE_DOI2, EXAMPLE_DOI2_PREFIX, EXAMPLE_DOI2_SUFFIX);
     }
 
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
 }

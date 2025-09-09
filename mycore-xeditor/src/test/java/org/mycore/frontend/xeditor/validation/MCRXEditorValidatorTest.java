@@ -18,27 +18,28 @@
 
 package org.mycore.frontend.xeditor.validation;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.jaxen.JaxenException;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.output.DOMOutputter;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
+import org.mycore.test.MyCoReTest;
 
 /**
  * @author Frank Lützenkirchen
  */
-public class MCRXEditorValidatorTest extends MCRTestCase {
+@MyCoReTest
+public class MCRXEditorValidatorTest {
 
     private MCREditorSession buildSession(String template) throws JaxenException {
         MCREditorSession session = new MCREditorSession();
@@ -383,7 +384,7 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
         @MCRTestProperty(key = "MCR.Pattern.Alphabetic", string = "[a-z]+"),
         @MCRTestProperty(key = "MCR.Pattern.Numeric", string = "[0-9]+")
     })
-    public void testEnableReplacementsRule() throws JDOMException, JaxenException {
+    void testEnableReplacementsRule() throws JDOMException, JaxenException {
 
         MCREditorSession session;
 
@@ -433,7 +434,7 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
     @MCRTestConfiguration(properties = {
         @MCRTestProperty(key = "MCR.Pattern.Dollar", string = "\\$")
     })
-    public void testReplacementProcessor() throws JDOMException, JaxenException {
+    void testReplacementProcessor() throws JDOMException, JaxenException {
 
         MCREditorSession session;
 

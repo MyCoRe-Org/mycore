@@ -18,15 +18,16 @@
 
 package org.mycore.mcr.acl.accesskey.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
@@ -38,9 +39,15 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.MCRAccessKeyTestCase;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyException;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MCRMetadataExtension;
+import org.mycore.test.MyCoReTest;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
+@MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
+@ExtendWith(MCRMetadataExtension.class)
 public class MCRAccessKeyUserServiceImplTest extends MCRAccessKeyTestCase {
 
     private static final String READ_KEY = "blah";
@@ -61,10 +68,8 @@ public class MCRAccessKeyUserServiceImplTest extends MCRAccessKeyTestCase {
 
     private MCRAccessKeyUserService userService;
 
-    @Before
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         object = createObject();
         MCRMetadataManager.create(object);
         derivate = createDerivate(object.getId());
@@ -198,10 +203,9 @@ public class MCRAccessKeyUserServiceImplTest extends MCRAccessKeyTestCase {
             Mockito.anyString());
     }
 
-    @After
+    @AfterEach
     public void teardown() throws Exception {
         MCRMetadataManager.delete(derivate);
         MCRMetadataManager.delete(object);
-        super.tearDown();
     }
 }

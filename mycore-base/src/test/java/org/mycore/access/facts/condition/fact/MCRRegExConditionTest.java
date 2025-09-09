@@ -18,16 +18,19 @@
 
 package org.mycore.access.facts.condition.fact;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.ArrayList;
 
 import org.jdom2.Element;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.access.facts.MCRFactsHolder;
 import org.mycore.access.facts.fact.MCRStringFact;
-import org.mycore.common.MCRTestCase;
+import org.mycore.test.MyCoReTest;
 
-public class MCRRegExConditionTest extends MCRTestCase {
+@MyCoReTest
+public class MCRRegExConditionTest {
 
     @Test
     public void testConditionMatch() {
@@ -35,7 +38,7 @@ public class MCRRegExConditionTest extends MCRTestCase {
         holder.add(new MCRStringFact("fact1", "a_nice_sample"));
         MCRRegExCondition regExCondition = new MCRRegExCondition();
         regExCondition.parse(new Element("regex").setAttribute("basefact", "fact1").setText("a_.*_sample"));
-        Assert.assertTrue("regex should match", regExCondition.matches(holder));
+        assertTrue(regExCondition.matches(holder), "regex should match");
     }
 
     @Test
@@ -44,6 +47,6 @@ public class MCRRegExConditionTest extends MCRTestCase {
         holder.add(new MCRStringFact("fact1", "no_nice_sample"));
         MCRRegExCondition regExCondition = new MCRRegExCondition();
         regExCondition.parse(new Element("regex").setAttribute("basefact", "fact1").setText("a_.*_sample"));
-        Assert.assertFalse("regex should not match", regExCondition.matches(holder));
+        assertFalse(regExCondition.matches(holder), "regex should not match");
     }
 }

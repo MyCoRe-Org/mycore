@@ -18,20 +18,23 @@
 
 package org.mycore.pi.condition;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.jdom2.Element;
-import org.junit.Assert;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.MCRPIJobService;
+import org.mycore.test.MyCoReTest;
 
+@MyCoReTest
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true")
 })
-public class MCRPIXPathPredicateTest extends MCRTestCase {
+public class MCRPIXPathPredicateTest {
 
     private static final String KEY_CREATION_PREDICATE = "MCR.PI.Service.Mock.CreationPredicate";
 
@@ -42,8 +45,8 @@ public class MCRPIXPathPredicateTest extends MCRTestCase {
         @MCRTestProperty(key = KEY_CREATION_PREDICATE, classNameOf = MCRPIXPathPredicate.class),
         @MCRTestProperty(key = KEY_CREATION_PREDICATE_XPATH, string = "/mycoreobject/metadata/test")
     })
-    public void testMetadataRootElement() {
-        Assert.assertTrue(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
+    void testMetadataRootElement() {
+        assertTrue(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
     }
 
     @Test
@@ -51,8 +54,8 @@ public class MCRPIXPathPredicateTest extends MCRTestCase {
         @MCRTestProperty(key = KEY_CREATION_PREDICATE, classNameOf = MCRPIXPathPredicate.class),
         @MCRTestProperty(key = KEY_CREATION_PREDICATE_XPATH, string = "/mycoreobject/metadata/foo")
     })
-    public void testMetadataWrongRootElement() {
-        Assert.assertFalse(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
+    void testMetadataWrongRootElement() {
+        assertFalse(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
     }
 
     @Test
@@ -60,8 +63,8 @@ public class MCRPIXPathPredicateTest extends MCRTestCase {
         @MCRTestProperty(key = KEY_CREATION_PREDICATE, classNameOf = MCRPIXPathPredicate.class),
         @MCRTestProperty(key = KEY_CREATION_PREDICATE_XPATH, string = "/mycoreobject/metadata/test/foo")
     })
-    public void testMetadataNestedElement() {
-        Assert.assertTrue(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
+    void testMetadataNestedElement() {
+        assertTrue(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
     }
 
     @Test
@@ -69,8 +72,8 @@ public class MCRPIXPathPredicateTest extends MCRTestCase {
         @MCRTestProperty(key = KEY_CREATION_PREDICATE, classNameOf = MCRPIXPathPredicate.class),
         @MCRTestProperty(key = KEY_CREATION_PREDICATE_XPATH, string = "false()")
     })
-    public void testFasle() {
-        Assert.assertFalse(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
+    void testFasle() {
+        assertFalse(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
     }
 
     @Test
@@ -78,8 +81,8 @@ public class MCRPIXPathPredicateTest extends MCRTestCase {
         @MCRTestProperty(key = KEY_CREATION_PREDICATE, classNameOf = MCRPIXPathPredicate.class),
         @MCRTestProperty(key = KEY_CREATION_PREDICATE_XPATH, string = "true()")
     })
-    public void testTrue() {
-        Assert.assertTrue(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
+    void testTrue() {
+        assertTrue(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
     }
 
     private static MCRObject getTestObject() {

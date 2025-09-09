@@ -18,8 +18,8 @@
 
 package org.mycore.datamodel.metadata;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.lang.ref.WeakReference;
 import java.time.Duration;
@@ -27,28 +27,23 @@ import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.ArrayDeque;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
-import org.junit.Before;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
+import org.mycore.test.MyCoReTest;
 
 /**
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRObjectIDPoolTest extends MCRTestCase {
-
-    /**
-     * @throws java.lang.Exception
-     */
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
+@MyCoReTest
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true")
+})
+public class MCRObjectIDPoolTest {
 
     @Test
     public void getInstance() {
@@ -59,12 +54,12 @@ public class MCRObjectIDPoolTest extends MCRTestCase {
         String id = MCRObjectID.formatID("MyCoRe_test", intPart);
         MCRObjectID mcrId = MCRObjectIDPool.getMCRObjectID(id);
         WeakReference<MCRObjectID> objRef = new WeakReference<>(mcrId);
-        assertEquals("ObjectIDPool size is different", before + 1, MCRObjectIDPool.getSize());
+        assertEquals(before + 1, MCRObjectIDPool.getSize(), "ObjectIDPool size is different");
         mcrId = null;
         runGarbageCollection(() -> objRef.get() == null, maxGCTime);
         id = MCRObjectID.formatID("MyCoRe_test", intPart);
-        assertNull("ObjectIDPool should not contain ID anymore.", MCRObjectIDPool.getIfPresent(id));
-        assertEquals("ObjectIDPool size is different", before, MCRObjectIDPool.getSize());
+        assertNull(MCRObjectIDPool.getIfPresent(id), "ObjectIDPool should not contain ID anymore.");
+        assertEquals(before, MCRObjectIDPool.getSize(), "ObjectIDPool size is different");
     }
 
     private void runGarbageCollection(Supplier<Boolean> test, Duration maxTime) {
@@ -85,10 +80,4 @@ public class MCRObjectIDPoolTest extends MCRTestCase {
         LogManager.getLogger().info("Garbage collector ran {} times.", runs);
     }
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.Metadata.Type.test", Boolean.TRUE.toString());
-        return testProperties;
-    }
 }

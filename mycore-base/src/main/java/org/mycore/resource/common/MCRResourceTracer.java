@@ -25,7 +25,12 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.mycore.common.hint.MCRHints;
+import org.mycore.resource.MCRResourceResolver;
 
+/**
+ * A {@link MCRResourceTracer} implements a strategy to compile information about the process
+ * of resolving a resource in {@link MCRResourceResolver}.
+ */
 public interface MCRResourceTracer {
 
     MCRResourceTracer update(Object context);

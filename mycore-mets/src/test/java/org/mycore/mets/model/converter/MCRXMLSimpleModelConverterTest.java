@@ -18,23 +18,21 @@
 
 package org.mycore.mets.model.converter;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
-import org.junit.Assert;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mycore.mets.model.MCRMetsModelHelper;
 import org.mycore.mets.model.simple.MCRMetsFile;
 import org.mycore.mets.model.simple.MCRMetsSection;
 import org.mycore.mets.model.simple.MCRMetsSimpleModel;
 
 public class MCRXMLSimpleModelConverterTest {
-
-    public static final Logger LOGGER = LogManager.getLogger(MCRXMLSimpleModelConverterTest.class);
 
     public static final String FILE_NAME_MATCH_PATTERN = "file%d.jpg";
 
@@ -58,13 +56,13 @@ public class MCRXMLSimpleModelConverterTest {
 
     private MCRMetsSimpleModel metsSimpleModel;
 
-    @Before
+    @BeforeEach
     public void readMetsSimpleModel() throws Exception {
         Document document = MCRMetsTestUtil.readXMLFile("test-mets-1.xml");
         metsSimpleModel = MCRXMLSimpleModelConverter.fromXML(document);
     }
 
-    @org.junit.Test
+    @Test
     public void testFromXMLMetsFiles() {
         Iterator<MCRMetsFile> hrefIterator = metsSimpleModel.getMetsPageList()
             .stream()
@@ -80,44 +78,44 @@ public class MCRXMLSimpleModelConverterTest {
             String expectedFileName = String.format(FILE_NAME_MATCH_PATTERN, i);
 
             String message = String.format("href %s should match %s", mcrMetsFile.getHref(), expectedFileName);
-            Assert.assertEquals(message, mcrMetsFile.getHref(), expectedFileName);
+            assertEquals(mcrMetsFile.getHref(), expectedFileName, message);
 
             message = String.format("MimeType %s should match %s", mcrMetsFile.getMimeType(), ALL_FILE_MIMETYPE);
-            Assert.assertEquals(message, mcrMetsFile.getMimeType(), ALL_FILE_MIMETYPE);
+            assertEquals(ALL_FILE_MIMETYPE, mcrMetsFile.getMimeType(), message);
 
             message = String.format("File-Use %s should match %s", mcrMetsFile.getUse(), MCRMetsModelHelper.MASTER_USE);
-            Assert.assertEquals(message, mcrMetsFile.getUse(), MCRMetsModelHelper.MASTER_USE);
+            assertEquals(MCRMetsModelHelper.MASTER_USE, mcrMetsFile.getUse(), message);
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testFromXMLMetsSection() {
         MCRMetsSection rootSection = metsSimpleModel.getRootSection();
-        Assert.assertEquals("The rootSection label should be " + ROOT_SECTION_LABEL, rootSection.getLabel(),
-            ROOT_SECTION_LABEL);
+        assertEquals(ROOT_SECTION_LABEL, rootSection.getLabel(),
+            "The rootSection label should be " + ROOT_SECTION_LABEL);
 
-        Assert.assertEquals("log_ArchNachl_derivate_00000011", rootSection.getId());
+        assertEquals("log_ArchNachl_derivate_00000011", rootSection.getId());
 
         List<MCRMetsSection> metsSectionList = rootSection.getMetsSectionList();
 
         String message = String.format(SECTION_ASSERT_MESSAGE_PATTERN, "first", ROOT_SECTION_FIRST_CHILD_LABEL,
             "label");
-        Assert.assertEquals(message, metsSectionList.getFirst().getLabel(), ROOT_SECTION_FIRST_CHILD_LABEL);
+        assertEquals(ROOT_SECTION_FIRST_CHILD_LABEL, metsSectionList.getFirst().getLabel(), message);
 
         message = String.format(SECTION_ASSERT_MESSAGE_PATTERN, "first", COVER_FRONT_TYPE, "type");
-        Assert.assertEquals(message, metsSectionList.get(0).getType(), COVER_FRONT_TYPE);
+        assertEquals(COVER_FRONT_TYPE, metsSectionList.get(0).getType(), message);
 
         message = String.format(SECTION_ASSERT_MESSAGE_PATTERN, "second", ROOT_SECTION_FIRST_CHILD_LABEL, "label");
-        Assert.assertEquals(message, metsSectionList.get(1).getLabel(), ROOT_SECTION_SECOND_CHILD_LABEL);
+        assertEquals(ROOT_SECTION_SECOND_CHILD_LABEL, metsSectionList.get(1).getLabel(), message);
 
         message = String.format(SECTION_ASSERT_MESSAGE_PATTERN, "second", CONTAINED_WORK_TYPE, "type");
-        Assert.assertEquals(message, metsSectionList.get(1).getType(), CONTAINED_WORK_TYPE);
+        assertEquals(CONTAINED_WORK_TYPE, metsSectionList.get(1).getType(), message);
 
         message = String.format(SECTION_ASSERT_MESSAGE_PATTERN, "third", ROOT_SECTION_THIRD_CHILD_LABEL, "label");
-        Assert.assertEquals(message, metsSectionList.get(2).getLabel(), ROOT_SECTION_THIRD_CHILD_LABEL);
+        assertEquals(ROOT_SECTION_THIRD_CHILD_LABEL, metsSectionList.get(2).getLabel(), message);
 
         message = String.format(SECTION_ASSERT_MESSAGE_PATTERN, "third", CHAPTER_TYPE, "type");
-        Assert.assertEquals(message, metsSectionList.get(2).getType(), CHAPTER_TYPE);
+        assertEquals(CHAPTER_TYPE, metsSectionList.get(2).getType(), message);
     }
 
 }

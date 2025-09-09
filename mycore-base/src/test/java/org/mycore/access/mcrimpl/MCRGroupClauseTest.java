@@ -18,22 +18,21 @@
 
 package org.mycore.access.mcrimpl;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTestCase;
 import org.mycore.common.MCRUserInformation;
+import org.mycore.test.MyCoReTest;
 
-public class MCRGroupClauseTest extends MCRTestCase {
+@MyCoReTest
+public class MCRGroupClauseTest {
 
     private static final String INGROUP_NAME = "ingroup";
 
-    @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         MCRUserInformation userInfo = new MCRUserInformation() {
 
             @Override
@@ -56,12 +55,12 @@ public class MCRGroupClauseTest extends MCRTestCase {
     }
 
     @Test
-    public final void testEvaluate() {
+    final void testEvaluate() {
         String outGroup = "outgroup";
         MCRGroupClause groupClause = new MCRGroupClause(INGROUP_NAME, false);
-        assertTrue("Did not accept " + INGROUP_NAME, groupClause.evaluate(null));
+        assertTrue(groupClause.evaluate(null), "Did not accept " + INGROUP_NAME);
         groupClause = new MCRGroupClause(outGroup, true);
-        assertTrue("Did not accept " + outGroup, groupClause.evaluate(null));
+        assertTrue(groupClause.evaluate(null), "Did not accept " + outGroup);
     }
 
 }

@@ -18,7 +18,7 @@
 
 package org.mycore.datamodel.ifs2;
 
-public class MCRIFS2MetadataTestCase extends MCRIFS2TestCase {
+public abstract class MCRIFS2MetadataTestCase extends MCRIFS2TestCase {
     private MCRMetadataStore metaDataStore;
 
     @Override

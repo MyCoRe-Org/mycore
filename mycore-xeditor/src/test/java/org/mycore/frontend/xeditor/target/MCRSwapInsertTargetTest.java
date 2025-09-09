@@ -18,22 +18,23 @@
 
 package org.mycore.frontend.xeditor.target;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.jaxen.JaxenException;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCRRepeatBinding;
+import org.mycore.test.MyCoReTest;
 
 /**
  * @author Frank Lützenkirchen
  */
-public class MCRSwapInsertTargetTest extends MCRTestCase {
+@MyCoReTest
+public class MCRSwapInsertTargetTest {
 
     @Test
     public void testSwapParameter() throws JaxenException, JDOMException {

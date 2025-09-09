@@ -18,25 +18,25 @@
 
 package org.mycore.common.xml;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.jdom2.Element;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.test.MyCoReTest;
 
+@MyCoReTest
 @MCRTestConfiguration(properties = {
     @MCRTestProperty(key = "MCR.Layout.Transformer.Factory.XSLFolder", string = "xslt-test"),
     @MCRTestProperty(key = "MCR.LayoutService.TransformerFactoryClass", string = "%SAXON%")
 })
-public class MCRURIResolverSaxonTest extends MCRTestCase {
+public class MCRURIResolverSaxonTest {
 
-    @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         MCRURIResolver.obtainInstance().reinitialize();
     }
 
@@ -51,17 +51,15 @@ public class MCRURIResolverSaxonTest extends MCRTestCase {
         String vendor = resolved.getAttributeValue("vendor");
         String vendorUrl = resolved.getAttributeValue("vendor-url");
 
-        Assert.assertEquals("xslt-test", id);
-        Assert.assertEquals("3.0", version);
-        Assert.assertEquals("Saxonica", vendor);
-        Assert.assertEquals("http://www.saxonica.com/", vendorUrl);
+        assertEquals("xslt-test", id);
+        assertEquals("3.0", version);
+        assertEquals("Saxonica", vendor);
+        assertEquals("http://www.saxonica.com/", vendorUrl);
 
     }
 
-    @Override
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
-        super.tearDown();
         MCRURIResolver.obtainInstance().reinitialize();
     }
 

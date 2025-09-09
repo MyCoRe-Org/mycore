@@ -18,15 +18,16 @@
 
 package org.mycore.mcr.acl.accesskey.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
@@ -41,7 +42,13 @@ import org.mycore.mcr.acl.accesskey.MCRAccessKeyTestCase;
 import org.mycore.mcr.acl.accesskey.config.MCRAccessKeyConfig;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyException;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MCRMetadataExtension;
+import org.mycore.test.MyCoReTest;
 
+@MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
+@ExtendWith(MCRMetadataExtension.class)
 public class MCRAccessKeySessionServiceImplTest extends MCRAccessKeyTestCase {
 
     private static final String READ_KEY = "blah";
@@ -62,10 +69,8 @@ public class MCRAccessKeySessionServiceImplTest extends MCRAccessKeyTestCase {
 
     private MCRAccessKeySessionService sessionService;
 
-    @Before
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         object = createObject();
         MCRMetadataManager.create(object);
         derivate = createDerivate(object.getId());
@@ -189,10 +194,9 @@ public class MCRAccessKeySessionServiceImplTest extends MCRAccessKeyTestCase {
             .get(MCRAccessKeySessionService.ACCESS_KEY_SESSION_ATTRIBUTE_PREFIX + object.getId().toString()));
     }
 
-    @After
+    @AfterEach
     public void teardown() throws Exception {
         MCRMetadataManager.delete(derivate);
         MCRMetadataManager.delete(object);
-        super.tearDown();
     }
 }

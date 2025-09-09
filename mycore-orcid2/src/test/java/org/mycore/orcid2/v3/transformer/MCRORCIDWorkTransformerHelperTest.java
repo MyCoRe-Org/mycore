@@ -18,7 +18,7 @@
 
 package org.mycore.orcid2.v3.transformer;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.net.URL;
 
@@ -26,19 +26,20 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.output.XMLOutputter;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.test.MyCoReTest;
 import org.orcid.jaxb.model.v3.release.record.Work;
 
 import jakarta.xml.bind.JAXBContext;
 
-public class MCRORCIDWorkTransformerHelperTest extends MCRTestCase {
+@MyCoReTest
+public class MCRORCIDWorkTransformerHelperTest {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Test
-    public void testTransformContent() throws Exception {
+    void testTransformContent() throws Exception {
         final JAXBContext jaxbContext = JAXBContext.newInstance(Work.class);
         final URL inputUrl = MCRORCIDWorkTransformerHelperTest.class.getResource("/work_example.xml");
         final Work work = (Work) jaxbContext.createUnmarshaller().unmarshal(inputUrl);

@@ -18,12 +18,13 @@
 
 package org.mycore.orcid2;
 
-import static org.junit.Assert.assertEquals;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalDate;
 
 import org.apache.logging.log4j.LogManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.util.MCRORCIDJSONMapper;
 

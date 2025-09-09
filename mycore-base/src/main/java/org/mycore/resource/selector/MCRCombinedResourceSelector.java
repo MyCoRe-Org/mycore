@@ -28,6 +28,7 @@ import java.util.function.Supplier;
 import org.apache.logging.log4j.Level;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceList;
+import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.common.MCRResourceTracer;
@@ -93,7 +94,8 @@ public class MCRCombinedResourceSelector extends MCRResourceSelectorBase {
 
     public static class Factory implements Supplier<MCRCombinedResourceSelector> {
 
-        @MCRInstanceList(name = SELECTORS_KEY, valueClass = MCRResourceSelector.class, required = false)
+        @MCRInstanceList(name = SELECTORS_KEY, valueClass = MCRResourceSelector.class, required = false,
+            sentinel = @MCRSentinel)
         public List<MCRResourceSelector> selectors;
 
         @Override

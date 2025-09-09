@@ -18,32 +18,43 @@
 
 package org.mycore.pi.urn;
 
-import java.util.Map;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.access.MCRAccessBaseImpl;
-import org.mycore.common.MCRStoreTestCase;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MCRMetadataExtension;
+import org.mycore.test.MyCoReTest;
 
-public class MCRDNBURNGeneratorTest extends MCRStoreTestCase {
+@MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
+@ExtendWith(MCRMetadataExtension.class)
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Access.Class", classNameOf = MCRAccessBaseImpl.class),
+    @MCRTestProperty(key = "MCR.Metadata.Type.mock", string = "true"),
+    @MCRTestProperty(key = "MCR.Metadata.Type.unregisterd", string = "true"),
+    @MCRTestProperty(key = "MCR.PI.Generator." + MCRDNBURNGeneratorTest.GENERATOR_ID,
+        classNameOf = MCRFLURNGenerator.class),
+    @MCRTestProperty(key = "MCR.PI.Generator." + MCRDNBURNGeneratorTest.GENERATOR_ID + ".Namespace",
+        string = "urn:nbn:de:gbv")
+})
+public class MCRDNBURNGeneratorTest {
 
-    private static final String GENERATOR_ID = "TESTDNBURN1";
+    public static final String GENERATOR_ID = "TESTDNBURN1";
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @Rule
-    public TemporaryFolder baseDir = new TemporaryFolder();
-
     @Test
-    public void generate() throws Exception {
+    public void generate()  {
         MCRObjectID getID = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId("test", "mock");
         MCRObject mcrObject1 = new MCRObject();
         mcrObject1.setId(getID);
@@ -54,20 +65,7 @@ public class MCRDNBURNGeneratorTest extends MCRStoreTestCase {
         String urn = generated.asString();
         LOGGER.info("THE URN IS: {}", urn);
 
-        Assert.assertFalse(urn.startsWith("urn:nbn:de:urn:nbn:de"));
+        assertFalse(urn.startsWith("urn:nbn:de:urn:nbn:de"));
     }
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-
-        testProperties.put("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
-        testProperties.put("MCR.Metadata.Type.mock", "true");
-        testProperties.put("MCR.Metadata.Type.unregisterd", "true");
-
-        testProperties.put("MCR.PI.Generator." + GENERATOR_ID, MCRFLURNGenerator.class.getName());
-        testProperties.put("MCR.PI.Generator." + GENERATOR_ID + ".Namespace", "urn:nbn:de:gbv");
-
-        return testProperties;
-    }
 }

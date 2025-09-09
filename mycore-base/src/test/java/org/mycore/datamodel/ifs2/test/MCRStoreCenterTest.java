@@ -18,10 +18,11 @@
 
 package org.mycore.datamodel.ifs2.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.URI;
 import java.nio.file.FileSystem;
@@ -29,8 +30,8 @@ import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mycore.datamodel.ifs2.MCRStore;
 import org.mycore.datamodel.ifs2.MCRStore.MCRStoreConfig;
 import org.mycore.datamodel.ifs2.MCRStoreAlreadyExistsException;
@@ -40,7 +41,7 @@ import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
 
 public class MCRStoreCenterTest {
-    @Before
+    @BeforeEach
     public void init() {
         MCRStoreCenter.getInstance().clear();
     }
@@ -54,24 +55,29 @@ public class MCRStoreCenterTest {
         String storeID = config.getID();
         FakeStore fakeStore = storeHeap.getStore(storeID);
 
-        assertNotNull("The store should be not null.", fakeStore);
+        assertNotNull(fakeStore, "The store should be not null.");
         assertEquals("Fake Store", fakeStore.getMsg());
 
-        assertTrue("Could not find store with ID: " + storeID, storeHeap.getCurrentStores(FakeStore.class)
+        assertTrue(storeHeap.getCurrentStores(FakeStore.class)
             .filter(s -> storeID.equals(s.getID()))
-            .findAny().isPresent());
+            .findAny().isPresent(), "Could not find store with ID: " + storeID);
 
-        assertTrue("Could not remove store with ID: " + storeID, storeHeap.removeStore(storeID));
-        assertNull("There should be no store with ID: " + storeID, storeHeap.<FakeStore>getStore(storeID));
+        assertTrue(storeHeap.removeStore(storeID), "Could not remove store with ID: " + storeID);
+        assertNull(storeHeap.<FakeStore>getStore(storeID), "There should be no store with ID: " + storeID);
     }
 
-    @Test(expected = MCRStoreAlreadyExistsException.class)
-    public void addStoreTwice() throws Exception {
-        MCRStoreCenter storeHeap = MCRStoreCenter.getInstance();
-        FakeStoreConfig config = new FakeStoreConfig("addStoreTwice");
-        FakeStore fakeStore = new FakeStore(config);
-        storeHeap.addStore(config.getID(), fakeStore);
-        storeHeap.addStore(config.getID(), fakeStore);
+    @Test
+    public void addStoreTwice() {
+        assertThrows(
+            MCRStoreAlreadyExistsException.class,
+            () -> {
+                MCRStoreCenter storeHeap = MCRStoreCenter.getInstance();
+                FakeStoreConfig config = new FakeStoreConfig("addStoreTwice");
+                FakeStore fakeStore = new FakeStore(config);
+                storeHeap.addStore(config.getID(), fakeStore);
+                storeHeap.addStore(config.getID(), fakeStore);
+
+            });
     }
 
     class FakeStoreConfig implements MCRStoreConfig {

@@ -24,14 +24,16 @@ import java.io.StringReader;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
-import org.junit.Assert;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.test.MyCoReTest;
 
 import de.undercouch.citeproc.csl.CSLItemData;
 import de.undercouch.citeproc.csl.CSLItemDataBuilder;
 
-public class MCRModsItemDataProviderTest extends MCRTestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@MyCoReTest
+public class MCRModsItemDataProviderTest {
 
     @Test
     public void testProcessModsPart() throws IOException, JDOMException {
@@ -114,10 +116,10 @@ public class MCRModsItemDataProviderTest extends MCRTestCase {
         CSLItemData build2 = testModsPart(testData2);
         CSLItemData build3 = testModsPart(testData3);
 
-        Assert.assertEquals("Volumes should equal", "80", build1.getVolume());
-        Assert.assertEquals("Page intervall should equal", "711–718", build1.getPage());
-        Assert.assertEquals("Volumes should equal", "11875", build2.getVolume());
-        Assert.assertEquals("Page intervall should equal", "v-vi", build3.getPage());
+        assertEquals("80", build1.getVolume(), "Volumes should equal");
+        assertEquals("711–718", build1.getPage(), "Page intervall should equal");
+        assertEquals("11875", build2.getVolume(), "Volumes should equal");
+        assertEquals("v-vi", build3.getPage(), "Page intervall should equal");
     }
 
     @Test
@@ -140,7 +142,7 @@ public class MCRModsItemDataProviderTest extends MCRTestCase {
             "</mycoreobject>\n";
 
         CSLItemData build1 = testModsNames(testData);
-        Assert.assertEquals("Conference should be equal", conferenceTitle, build1.getEvent());
+        assertEquals(conferenceTitle, build1.getEvent(), "Conference should be equal");
     }
 
     @Test
@@ -166,8 +168,8 @@ public class MCRModsItemDataProviderTest extends MCRTestCase {
             "  </metadata>\n" +
             "</mycoreobject>\n";
         CSLItemData build2 = testModsNames(testData2);
-        Assert.assertEquals("Pantent Inventor should author (family)", familyName, build2.getAuthor()[0].getFamily());
-        Assert.assertEquals("Pantent Inventor should author (given)", givenName, build2.getAuthor()[0].getGiven());
+        assertEquals(familyName, build2.getAuthor()[0].getFamily(), "Pantent Inventor should author (family)");
+        assertEquals(givenName, build2.getAuthor()[0].getGiven(), "Pantent Inventor should author (given)");
     }
 
     @Test
@@ -209,7 +211,7 @@ public class MCRModsItemDataProviderTest extends MCRTestCase {
         midp.addContent(testDataDoc);
         midp.processTitles(dataBuilder);
         CSLItemData build = dataBuilder.build();
-        Assert.assertEquals("The collection title should be", "CEUR Workshop Proceedings", build.getCollectionTitle());
+        assertEquals("CEUR Workshop Proceedings", build.getCollectionTitle(), "The collection title should be");
     }
     
     private CSLItemData testModsPart(String testData) throws JDOMException, IOException {

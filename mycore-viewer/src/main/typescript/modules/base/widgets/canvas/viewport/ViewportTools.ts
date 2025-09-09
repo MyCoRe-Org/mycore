@@ -57,7 +57,7 @@ export class ViewportTools {
 
       const vpSize = vp.size.getRotated(vp.rotation);
       const vpPosition = (vp.rotation == 0 || vp.rotation == 180) ? vp.position : new Position2D(vp.position.y, vp.position.x);
-      const yPosition = Math.max(vpPosition.y, pageAreaInformation.position.y - (pageSize.height / 2) + vp.size.scale(1 / vp.scale).height / 2);
+      let yPosition = Math.max(vpPosition.y, pageAreaInformation.position.y - (pageSize.height / 2) + vp.size.scale(1 / vp.scale).height / 2);
       yPosition = Math.min(yPosition, pageAreaInformation.position.y + (pageSize.height / 2) - vp.size.scale(1 / vp.scale).height / 2);
 
       if (vp.size.height > pageSize.scale(vp.scale).width) {

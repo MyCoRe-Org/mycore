@@ -18,34 +18,40 @@
 
 package org.mycore.frontend.xeditor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 
 import javax.xml.transform.TransformerException;
 
 import org.jaxen.JaxenException;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTestCase;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.MCRFrontendUtil;
+import org.mycore.test.MyCoReTest;
 import org.xml.sax.SAXException;
 
 /**
  * @author Frank Lützenkirchen
  */
-public class MCRXEditorTransformerTest extends MCRTestCase {
+@MyCoReTest
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.URIResolver.CachingResolver.Capacity", string = "100"),
+    @MCRTestProperty(key = "MCR.URIResolver.CachingResolver.MaxAge", string = "3600000")
+})
+public class MCRXEditorTransformerTest {
 
     private MCREditorSession buildEditorSession(String editedXMLFile) {
         HashMap<String, String[]> parameters = new HashMap<>();
@@ -94,7 +100,7 @@ public class MCRXEditorTransformerTest extends MCRTestCase {
             System.out.println("---------- transformed: ----------");
             System.out.println(transformed.asString());
         }
-        assertTrue(msg, isEqual);
+        assertTrue(isEqual, msg);
     }
 
     @Test
@@ -192,13 +198,4 @@ public class MCRXEditorTransformerTest extends MCRTestCase {
         testTransformation("testSelect-editor.xml", "testSelect-source.xml", "testSelect-transformed.xml");
     }
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        final Map<String, String> properties = super.getTestProperties();
-
-        properties.put("MCR.URIResolver.CachingResolver.Capacity", "100");
-        properties.put("MCR.URIResolver.CachingResolver.MaxAge", "3600000");
-
-        return properties;
-    }
 }

@@ -17,40 +17,40 @@
  */
 package org.mycore.datamodel.metadata;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.Date;
-import java.util.Map;
 
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRTestCase;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
+import org.mycore.test.MyCoReTest;
 
 /**
  * @author Thomas Scheffler
  *
  */
-public class MCRObjectMetadataTest extends MCRTestCase {
+@MyCoReTest
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Metadata.DefaultLang", string = "de")
+})
+public class MCRObjectMetadataTest {
     private static final String TEST_OBJECT_RESOURCE_NAME = "/mcr_test_01.xml";
 
     private MCRObjectMetadata testMetadata;
 
-    /* (non-Javadoc)
-     * @see org.mycore.common.MCRTestCase#setUp()
-     */
-    @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         Document testObjectDocument = loadResourceDocument(TEST_OBJECT_RESOURCE_NAME);
         testMetadata = new MCRObjectMetadata();
         testMetadata.setFromDOM(testObjectDocument.getRootElement().getChild(MCRObjectMetadata.XML_NAME));
@@ -61,7 +61,7 @@ public class MCRObjectMetadataTest extends MCRTestCase {
      */
     @Test
     public void size() {
-        assertEquals("Expected just one metadata entry", 1, testMetadata.size());
+        assertEquals(1, testMetadata.size(), "Expected just one metadata entry");
     }
 
     /**
@@ -69,8 +69,8 @@ public class MCRObjectMetadataTest extends MCRTestCase {
      */
     @Test
     public void getMetadataTagName() {
-        assertEquals("Metadata tag is not 'def.textfield'", "def.textfield", testMetadata.getMetadataElement(0)
-            .getTag());
+        assertEquals("def.textfield", testMetadata.getMetadataElement(0)
+            .getTag(), "Metadata tag is not 'def.textfield'");
     }
 
     /**
@@ -78,7 +78,7 @@ public class MCRObjectMetadataTest extends MCRTestCase {
      */
     @Test
     public void getHeritableMetadata() {
-        assertEquals("Did not find any heritable metadata", 1, testMetadata.getHeritableMetadata().size());
+        assertEquals(1, testMetadata.getHeritableMetadata().size(), "Did not find any heritable metadata");
     }
 
     /**
@@ -87,12 +87,12 @@ public class MCRObjectMetadataTest extends MCRTestCase {
     @Test
     public void removeInheritedMetadata() {
         testMetadata.removeInheritedMetadata();
-        assertEquals("Did not expect removal of any metadata", 1, testMetadata.size());
+        assertEquals(1, testMetadata.size(), "Did not expect removal of any metadata");
         testMetadata.setMetadataElement(getInheritedMetadata());
         testMetadata.removeInheritedMetadata();
-        assertEquals("Did not expect removal of any metadata element", 2, testMetadata.size());
+        assertEquals(2, testMetadata.size(), "Did not expect removal of any metadata element");
         MCRMetaElement defJunit = testMetadata.getMetadataElement("def.junit");
-        assertEquals("Not all inherited metadata was removed", 1, defJunit.size());
+        assertEquals(1, defJunit.size(), "Not all inherited metadata was removed");
         defJunit = getInheritedMetadata();
         for (MCRMetaInterface i : defJunit) {
             if (i.getInherited() == 0) {
@@ -101,7 +101,7 @@ public class MCRObjectMetadataTest extends MCRTestCase {
         }
         testMetadata.setMetadataElement(defJunit);
         testMetadata.removeInheritedMetadata();
-        assertEquals("Did expect removal of \"def.junit\" metadata element", 1, testMetadata.size());
+        assertEquals(1, testMetadata.size(), "Did expect removal of \"def.junit\" metadata element");
     }
 
     private MCRMetaElement getInheritedMetadata() {
@@ -122,7 +122,7 @@ public class MCRObjectMetadataTest extends MCRTestCase {
     public void appendMetadata() {
         MCRObjectMetadata meta2 = getDateObjectMetadata();
         testMetadata.appendMetadata(meta2);
-        assertEquals("Expected 2 metadates", 2, testMetadata.size());
+        assertEquals(2, testMetadata.size(), "Expected 2 metadates");
     }
 
     private MCRObjectMetadata getDateObjectMetadata() {
@@ -143,8 +143,8 @@ public class MCRObjectMetadataTest extends MCRTestCase {
      */
     @Test
     public void getMetadataElementString() {
-        assertEquals("did not get correct MCRMetaElement instance", testMetadata.getMetadataElement(0),
-            testMetadata.getMetadataElement("def.textfield"));
+        assertEquals(testMetadata.getMetadataElement(0), testMetadata.getMetadataElement("def.textfield"),
+            "did not get correct MCRMetaElement instance");
     }
 
     /**
@@ -152,15 +152,15 @@ public class MCRObjectMetadataTest extends MCRTestCase {
      */
     @Test
     public void getMetadataElementInt() {
-        assertEquals("did not get correct MCRMetaElement instance", testMetadata.getMetadataElement("def.textfield"),
-            testMetadata.getMetadataElement(0));
+        assertEquals(testMetadata.getMetadataElement("def.textfield"), testMetadata.getMetadataElement(0),
+            "did not get correct MCRMetaElement instance");
     }
 
     /**
      * Test method for org.mycore.datamodel.metadata.MCRObjectMetadata#setMetadataElement(org.mycore.datamodel.metadata.MCRMetaElement, java.lang.String) (not implemented yet).
      */
     @Test
-    @Ignore("not implemented")
+    @Disabled("not implemented")
     public void setMetadataElement() {
         fail("Not yet implemented"); // TODO
     }
@@ -169,7 +169,7 @@ public class MCRObjectMetadataTest extends MCRTestCase {
      * Test method for {@link org.mycore.datamodel.metadata.MCRObjectMetadata#removeMetadataElement(java.lang.String)}.
      */
     @Test
-    @Ignore("not implemented")
+    @Disabled("not implemented")
     public void removeMetadataElementString() {
         fail("Not yet implemented"); // TODO
     }
@@ -178,7 +178,7 @@ public class MCRObjectMetadataTest extends MCRTestCase {
      * Test method for {@link org.mycore.datamodel.metadata.MCRObjectMetadata#removeMetadataElement(int)}.
      */
     @Test
-    @Ignore("not implemented")
+    @Disabled("not implemented")
     public void removeMetadataElementInt() {
         fail("Not yet implemented"); // TODO
     }
@@ -187,7 +187,7 @@ public class MCRObjectMetadataTest extends MCRTestCase {
      * Test method for {@link org.mycore.datamodel.metadata.MCRObjectMetadata#createXML()}.
      */
     @Test
-    @Ignore("not implemented")
+    @Disabled("not implemented")
     public void createXML() {
         fail("Not yet implemented"); // TODO
     }
@@ -196,7 +196,7 @@ public class MCRObjectMetadataTest extends MCRTestCase {
      * Test method for {@link org.mycore.datamodel.metadata.MCRObjectMetadata#isValid()}.
      */
     @Test
-    @Ignore("not implemented")
+    @Disabled("not implemented")
     public void isValid() {
         fail("Not yet implemented"); // TODO
     }
@@ -206,10 +206,4 @@ public class MCRObjectMetadataTest extends MCRTestCase {
         return MCRXMLParserFactory.getValidatingParser().parseXML(new MCRURLContent(mcrTestUrl));
     }
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.Metadata.DefaultLang", "de");
-        return testProperties;
-    }
 }

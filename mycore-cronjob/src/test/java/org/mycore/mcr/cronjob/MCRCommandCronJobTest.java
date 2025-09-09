@@ -19,18 +19,35 @@
 package org.mycore.mcr.cronjob;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.mycore.common.MCRJPATestCase;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.common.processing.impl.MCRCentralProcessableRegistry;
 import org.mycore.frontend.cli.MCRCommand;
 import org.mycore.frontend.cli.MCRCommandManager;
+import org.mycore.test.MCRJPAExtension;
+import org.mycore.test.MyCoReTest;
 
-public class MCRCommandCronJobTest extends MCRJPATestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@MyCoReTest
+@ExtendWith(MCRJPAExtension.class)
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Processable.Registry.Class", classNameOf = MCRCentralProcessableRegistry.class),
+    @MCRTestProperty(key = MCRCronjobManager.JOBS_CONFIG_PREFIX + "Command", classNameOf = MCRCommandCronJob.class),
+    @MCRTestProperty(key = MCRCronjobManager.JOBS_CONFIG_PREFIX + "Command.Contexts", string = "CLI"),
+    @MCRTestProperty(key = MCRCronjobManager.JOBS_CONFIG_PREFIX + "Command.CronType", string = "QUARTZ"),
+    @MCRTestProperty(key = MCRCronjobManager.JOBS_CONFIG_PREFIX + "Command.Cron", string = "* * * * * ? *"),
+    @MCRTestProperty(key = MCRCronjobManager.JOBS_CONFIG_PREFIX + "Command.Command", string = "test command Hallo")
+})
+public class MCRCommandCronJobTest {
 
     public static boolean commandRun;
 
@@ -38,7 +55,7 @@ public class MCRCommandCronJobTest extends MCRJPATestCase {
 
     @Test
     public void runJob() throws InterruptedException {
-        Assert.assertFalse("The command should not run yet!", commandRun);
+        assertFalse(commandRun, "The command should not run yet!");
         MCRCommandManager.getKnownCommands().put("test",
             Stream
                 .of(new MCRCommand("test command {0}",
@@ -46,9 +63,9 @@ public class MCRCommandCronJobTest extends MCRJPATestCase {
                 .collect(Collectors.toList()));
         MCRCronjobManager.getInstance().startUp(null);
         Thread.sleep(2000);
-        Assert.assertTrue("The command should have been executed!", commandRun);
-        Assert.assertNotNull("The message should be set", message);
-        Assert.assertEquals("Message should be the same", "Welt", message);
+        assertTrue(commandRun, "The command should have been executed!");
+        assertNotNull(message, "The message should be set");
+        assertEquals("Welt", message, "Message should be the same");
     }
 
     public static List<String> testCommand(String msg) {
@@ -63,17 +80,4 @@ public class MCRCommandCronJobTest extends MCRJPATestCase {
         }
     }
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> properties = super.getTestProperties();
-
-        properties.put("MCR.Processable.Registry.Class", MCRCentralProcessableRegistry.class.getName());
-        properties.put(MCRCronjobManager.JOBS_CONFIG_PREFIX + "Command", MCRCommandCronJob.class.getName());
-        properties.put(MCRCronjobManager.JOBS_CONFIG_PREFIX + "Command.Contexts", "CLI");
-        properties.put(MCRCronjobManager.JOBS_CONFIG_PREFIX + "Command.CronType", "QUARTZ");
-        properties.put(MCRCronjobManager.JOBS_CONFIG_PREFIX + "Command.Cron", "* * * * * ? *");
-        properties.put(MCRCronjobManager.JOBS_CONFIG_PREFIX + "Command.Command", "test command Hallo");
-
-        return properties;
-    }
 }
