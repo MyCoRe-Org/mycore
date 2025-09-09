@@ -222,7 +222,10 @@ public class MCRTransformerHelperResolver implements URIResolver {
             throw new TransformerException(ex);
         }
 
-        return new JDOMSource(result);
+        JDOMSource source = new JDOMSource(result);
+        // Workaround to prevent URI Caching:
+        source.setSystemId(source.getSystemId()+ String.valueOf(Math.random()));
+        return source;
     }
 
     private void setXPath(MCRTransformerHelper tfhelper, Element result, boolean fixPathForMultiple) {

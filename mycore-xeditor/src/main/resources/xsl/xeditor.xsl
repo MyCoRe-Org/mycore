@@ -3,10 +3,9 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xed="http://www.mycore.de/xeditor"
                 xmlns:xalan="http://xml.apache.org/xalan"
                 xmlns:encoder="xalan://java.net.URLEncoder"
-                xmlns:math="xalan://java.lang.Math" 
                 xmlns:helper="xalan://org.mycore.frontend.xeditor.MCRTransformerHelper"
                 xmlns:includer="xalan://org.mycore.frontend.xeditor.MCRIncludeHandler"
-                exclude-result-prefixes="xsl xed xalan encoder math helper includer">
+                exclude-result-prefixes="xsl xed xalan encoder helper includer">
 
   <xsl:strip-space elements="xed:*" />
 
@@ -321,9 +320,6 @@
     <xsl:param name="addText" select="false()" />
   
     <xsl:value-of select="concat('xedTransformerHelper:',$SessionID,':',$method,':')" />
-    
-    <!-- Workaround to prevent URI Caching -->
-    <xsl:value-of select="concat('random=',math:random(),'&amp;')" />
     
     <xsl:for-each select="@*">
       <xsl:value-of select="concat(local-name(),'=',encoder:encode(.,'UTF-8'),'&amp;')" />
