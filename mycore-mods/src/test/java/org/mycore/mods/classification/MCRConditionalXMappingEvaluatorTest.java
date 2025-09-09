@@ -17,6 +17,8 @@
  */
 package org.mycore.mods.classification;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Map;
@@ -32,7 +34,6 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRConstants;
@@ -98,7 +99,7 @@ public class MCRConditionalXMappingEvaluatorTest {
         String expression = "//mods:classification[contains(@generator,'-mycore') and contains(@valueURI, 'article')]";
         XPathExpression<Element> expressionObject = XPathFactory.instance()
             .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
-        Assertions.assertNotNull(expressionObject.evaluateFirst(
+        assertNotNull(expressionObject.evaluateFirst(
             xml), "The mapped classification should be in the MyCoReObject now!");
 
     }
@@ -138,7 +139,7 @@ public class MCRConditionalXMappingEvaluatorTest {
         String expression = "//mods:classification[contains(@generator,'-mycore') and contains(@valueURI, 'bookPart')]";
         XPathExpression<Element> expressionObject = XPathFactory.instance()
             .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
-        Assertions.assertNotNull(expressionObject.evaluateFirst(
+        assertNotNull(expressionObject.evaluateFirst(
             xml), "The mapped classification should be in the MyCoReObject now!");
 
     }

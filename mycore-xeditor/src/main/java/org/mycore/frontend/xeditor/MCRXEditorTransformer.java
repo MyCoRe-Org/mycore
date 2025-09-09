@@ -223,7 +223,7 @@ public class MCRXEditorTransformer {
     }
 
     public String evaluateXPath(String xPathExpression) {
-        return getXPathEvaluator().evaluateXPath(xPathExpression);
+        return getXPathEvaluator().evaluateFirstAsString(xPathExpression);
     }
 
     public boolean test(String xPathExpression) {
