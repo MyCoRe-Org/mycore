@@ -18,7 +18,13 @@
 
 package org.mycore.frontend.xeditor.tracker;
 
-public interface MCRChange {
+/**
+ * Represents a change in the edited xml, which can be undone.
+ * 
+ * @author Frank Lützenkirchen
+ */
+public abstract class MCRChange extends MCRTrackedAction {
 
-    void undo(MCRChangeData data);
+    /** Performs an undo of this change in the edited xml **/
+    protected abstract void undo();
 }

@@ -21,7 +21,6 @@ package org.mycore.frontend.xeditor.target;
 import org.jdom2.Document;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
-import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;
@@ -39,7 +38,6 @@ public class MCRServletTarget implements MCREditorTarget {
         Document result = session.getEditedXML();
 
         if (session.getValidator().isValid()) {
-            result = MCRChangeTracker.removeChangeTracking(result);
             result = session.getXMLCleaner().clean(result);
             result = session.getPostProcessor().process(result);
 
@@ -50,7 +48,7 @@ public class MCRServletTarget implements MCREditorTarget {
 
             job.getRequest().setAttribute("MCRXEditorSubmission", result);
 
-            session.setBreakpoint("After handling target servlet " + servletNameOrPath);
+            session.getChangeTracker().setBreakpoint("After handling target servlet " + servletNameOrPath);
 
             dispatcher.forward(job.getRequest(), job.getResponse());
         } else {

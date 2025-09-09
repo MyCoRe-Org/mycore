@@ -137,7 +137,7 @@ public class MCREditorSubmission {
         emptyNotResubmittedNodes();
         setDefaultValues();
 
-        session.setBreakpoint("After setting submitted values");
+        session.getChangeTracker().setBreakpoint("After setting submitted values");
     }
 
     private void setSubmittedValues(MCRBinding binding, String[] values) {

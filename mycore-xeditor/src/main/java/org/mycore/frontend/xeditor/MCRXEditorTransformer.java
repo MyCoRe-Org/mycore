@@ -163,7 +163,7 @@ public class MCRXEditorTransformer {
     private void createEmptyDocumentFromXPath(String xPath) throws JaxenException {
         Element root = createRootElement(xPath);
         editorSession.setEditedXML(new Document(root));
-        editorSession.setBreakpoint("Starting with empty XML document");
+        editorSession.getChangeTracker().setBreakpoint("Starting with empty XML document");
     }
 
     private Element createRootElement(String xPath) throws JaxenException {
@@ -345,7 +345,7 @@ public class MCRXEditorTransformer {
                 defaultValues.get(xPath)));
         }
 
-        editorSession.setBreakpoint("After transformation to HTML");
+        editorSession.getChangeTracker().setBreakpoint("After transformation to HTML");
         nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSessionStore.XEDITOR_SESSION_PARAM,
             editorSession.getCombinedSessionStepID()));
 
