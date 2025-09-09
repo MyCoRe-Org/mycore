@@ -244,7 +244,7 @@ public class MCRTransformerHelper {
         MCRRepeatBinding repeat = new MCRRepeatBinding(xPath, currentBinding, minRepeats, maxRepeats, method);
         setCurrentBinding(repeat);
 
-        List<Element> repeats = new ArrayList<Element>();
+        List<Element> repeats = new ArrayList<>();
         repeat.getBoundNodes().forEach(node -> repeats.add(new Element("repeat")));
         return repeats;
     }

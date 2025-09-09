@@ -69,79 +69,15 @@ public class MCRTransformerHelperResolver implements URIResolver {
                 }
                 case "repeat": {
                     registerAdditionalNamespaces(tfhelper, attributes);
-
-                    String xPath = attributes.get("xpath");
-                    int minRepeats = Integer.parseInt(attributes.getOrDefault("min", "0"));
-                    int maxRepeats = Integer.parseInt(attributes.getOrDefault("max", "0"));
-                    String method = attributes.get("method");
-                    List<Element> repeats = tfhelper.repeat(xPath, minRepeats, maxRepeats, method);
-                    result.addContent(repeats);
+                    handleRepeat(tfhelper, attributes, result);
                     break;
                 }
                 case "controls": {
-                    int pos = tfhelper.getRepeatPosition();
-                    int num = tfhelper.getNumRepeats();
-                    int max = tfhelper.getMaxRepeats();
-
-                    String text = attributes.getOrDefault("text", "insert remove up down");
-                    for (String token : text.split("\\s+")) {
-                        if ("append".equals(token) && (pos < num)) {
-                            continue;
-                        }
-                        if ("up".equals(token) && (pos == 1)) {
-                            continue;
-                        }
-                        if ("down".equals(token) && (pos == num)) {
-                            continue;
-                        }
-                        if ("insert".equals(token) && (num == max)) {
-                            continue;
-                        }
-                        if ("append".equals(token) && (num == max)) {
-                            continue;
-                        }
-
-                        Element control = new Element("control").setText(token);
-
-                        StringBuilder name = new StringBuilder();
-                        name.append("_xed_submit_");
-                        name.append(token);
-                        name.append(":");
-
-                        if ("append".equals(token) || "insert".equals(token)) {
-                            name.append(tfhelper.getInsertParameter());
-                        } else if ("remove".equals(token)) {
-                            name.append(tfhelper.getAbsoluteXPath());
-                        } else if ("up".equals(token) || "down".equals(token)) {
-                            name.append(tfhelper.getSwapParameter(token));
-                        }
-
-                        name.append("|rep-");
-
-                        if ("remove".equals(token) && (pos > 1)) {
-                            name.append(tfhelper.previousAnchorID());
-                        } else {
-                            name.append(tfhelper.getAnchorID());
-                        }
-
-                        control.setAttribute("name", name.toString());
-                        result.addContent(control);
-                    }
+                    handleControls(tfhelper, attributes, result);
                     break;
                 }
                 case "input": {
-                    String type = attributes.get("type");
-
-                    setXPath(tfhelper, result, "checkbox".equals(type));
-
-                    if ("radio".equals(type) || "checkbox".equals(type)) {
-                        String value = attributes.get("value");
-                        if (tfhelper.hasValue(value)) {
-                            result.setAttribute("checked", "checked");
-                        }
-                    } else {
-                        result.setAttribute("value", tfhelper.getValue());
-                    }
+                    handleInput(tfhelper, attributes, result);
                     break;
                 }
                 case "textarea": {
@@ -149,9 +85,7 @@ public class MCRTransformerHelperResolver implements URIResolver {
                     break;
                 }
                 case "if": {
-                    String test = attributes.get("test");
-                    boolean testResult = tfhelper.test(test);
-                    result.setText(Boolean.toString(testResult));
+                    handleTest(tfhelper, attributes, result);
                     break;
                 }
                 case "source": {
@@ -165,57 +99,34 @@ public class MCRTransformerHelperResolver implements URIResolver {
                     break;
                 }
                 case "post-processor": {
-                    String clazz = attributes.getOrDefault("class", null);
-                    if (clazz != null) {
-                        tfhelper.setPostProcessor(clazz);
-                    }
-                    tfhelper.initializePostprocessor(attributes);
+                    handlePostProcessor(tfhelper, attributes);
                     break;
                 }
                 case "param": {
-                    String name = attributes.get("name");
-                    String def = attributes.getOrDefault("default", null);
-                    tfhelper.declareParameter(name, def);
+                    handleParam(tfhelper, attributes);
                     break;
                 }
                 case "select": {
-                    String multiple = attributes.getOrDefault("multiple", null);
-                    tfhelper.toggleWithinSelectElement(multiple);
-
-                    if (tfhelper.isWithinSelectElement()) {
-                        setXPath(tfhelper, result, tfhelper.isWithinSelectMultiple());
-                    }
-
+                    handleSelect(tfhelper, attributes, result);
                     break;
                 }
                 case "option": {
-                    if (tfhelper.isWithinSelectElement()) {
-                        String value = attributes.getOrDefault("value", attributes.get("text"));
-
-                        if ((!Strings.isEmpty(value)) && tfhelper.hasValue(value)) {
-                            result.setAttribute("selected", "selected");
-                        }
-                    }
+                    handleOption(tfhelper, attributes, result);
                     break;
                 }
                 case "cleanup-rule": {
-                    String xPath = attributes.get("xpath");
-                    String relevantIf = attributes.get("relevant-if");
-                    tfhelper.addCleanupRule(xPath, relevantIf);
+                    handleCleanupRule(tfhelper, attributes);
                     break;
                 }
                 case "load-resource": {
-                    String uri = attributes.get("uri");
-                    String name = attributes.get("name");
-                    tfhelper.loadResource(uri, name);
+                    handleLoadResource(tfhelper, attributes);
                     break;
                 }
                 case "output": {
-                    String value = attributes.getOrDefault("value", null);
-                    String i18n = attributes.getOrDefault("i18n", null);
-                    String output = tfhelper.output(value, i18n);
-                    result.setText(output);
+                    handleOutput(tfhelper, attributes, result);
                     break;
+                }
+                default: {
                 }
             }
         } catch (JDOMException | IOException | SAXException | JaxenException ex) {
@@ -224,8 +135,143 @@ public class MCRTransformerHelperResolver implements URIResolver {
 
         JDOMSource source = new JDOMSource(result);
         // Workaround to prevent URI Caching:
-        source.setSystemId(source.getSystemId()+ String.valueOf(Math.random()));
+        source.setSystemId(source.getSystemId() + Math.random());
         return source;
+    }
+
+    private void handleOutput(MCRTransformerHelper tfhelper, Map<String, String> attributes, Element result) {
+        String value = attributes.getOrDefault("value", null);
+        String i18n = attributes.getOrDefault("i18n", null);
+        String output = tfhelper.output(value, i18n);
+        result.setText(output);
+    }
+
+    private void handleLoadResource(MCRTransformerHelper tfhelper, Map<String, String> attributes) {
+        String uri = attributes.get("uri");
+        String name = attributes.get("name");
+        tfhelper.loadResource(uri, name);
+    }
+
+    private void handleCleanupRule(MCRTransformerHelper tfhelper, Map<String, String> attributes) {
+        String xPath = attributes.get("xpath");
+        String relevantIf = attributes.get("relevant-if");
+        tfhelper.addCleanupRule(xPath, relevantIf);
+    }
+
+    private void handleOption(MCRTransformerHelper tfhelper, Map<String, String> attributes, Element result) {
+        if (tfhelper.isWithinSelectElement()) {
+            String value = attributes.getOrDefault("value", attributes.get("text"));
+
+            if ((!Strings.isEmpty(value)) && tfhelper.hasValue(value)) {
+                result.setAttribute("selected", "selected");
+            }
+        }
+    }
+
+    private void handleSelect(MCRTransformerHelper tfhelper, Map<String, String> attributes, Element result) {
+        String multiple = attributes.getOrDefault("multiple", null);
+        tfhelper.toggleWithinSelectElement(multiple);
+
+        if (tfhelper.isWithinSelectElement()) {
+            setXPath(tfhelper, result, tfhelper.isWithinSelectMultiple());
+        }
+    }
+
+    private void handleParam(MCRTransformerHelper tfhelper, Map<String, String> attributes) {
+        String name = attributes.get("name");
+        String def = attributes.getOrDefault("default", null);
+        tfhelper.declareParameter(name, def);
+    }
+
+    private void handlePostProcessor(MCRTransformerHelper tfhelper, Map<String, String> attributes) {
+        String clazz = attributes.getOrDefault("class", null);
+        if (clazz != null) {
+            tfhelper.setPostProcessor(clazz);
+        }
+        tfhelper.initializePostprocessor(attributes);
+    }
+
+    private void handleTest(MCRTransformerHelper tfhelper, Map<String, String> attributes, Element result) {
+        String test = attributes.get("test");
+        boolean testResult = tfhelper.test(test);
+        result.setText(Boolean.toString(testResult));
+    }
+
+    private void handleInput(MCRTransformerHelper tfhelper, Map<String, String> attributes, Element result) {
+        String type = attributes.get("type");
+
+        setXPath(tfhelper, result, "checkbox".equals(type));
+
+        if ("radio".equals(type) || "checkbox".equals(type)) {
+            String value = attributes.get("value");
+            if (tfhelper.hasValue(value)) {
+                result.setAttribute("checked", "checked");
+            }
+        } else {
+            result.setAttribute("value", tfhelper.getValue());
+        }
+    }
+
+    private void handleControls(MCRTransformerHelper tfhelper, Map<String, String> attributes, Element result)
+        throws JaxenException {
+        int pos = tfhelper.getRepeatPosition();
+        int num = tfhelper.getNumRepeats();
+        int max = tfhelper.getMaxRepeats();
+
+        String text = attributes.getOrDefault("text", "insert remove up down");
+        for (String token : text.split("\\s+")) {
+            if ("append".equals(token) && (pos < num)) {
+                continue;
+            }
+            if ("up".equals(token) && (pos == 1)) {
+                continue;
+            }
+            if ("down".equals(token) && (pos == num)) {
+                continue;
+            }
+            if ("insert".equals(token) && (num == max)) {
+                continue;
+            }
+            if ("append".equals(token) && (num == max)) {
+                continue;
+            }
+
+            Element control = new Element("control").setText(token);
+
+            StringBuilder name = new StringBuilder();
+            name.append("_xed_submit_");
+            name.append(token);
+            name.append(':');
+
+            if ("append".equals(token) || "insert".equals(token)) {
+                name.append(tfhelper.getInsertParameter());
+            } else if ("remove".equals(token)) {
+                name.append(tfhelper.getAbsoluteXPath());
+            } else if ("up".equals(token) || "down".equals(token)) {
+                name.append(tfhelper.getSwapParameter(token));
+            }
+
+            name.append("|rep-");
+
+            if ("remove".equals(token) && (pos > 1)) {
+                name.append(tfhelper.previousAnchorID());
+            } else {
+                name.append(tfhelper.getAnchorID());
+            }
+
+            control.setAttribute("name", name.toString());
+            result.addContent(control);
+        }
+    }
+
+    private void handleRepeat(MCRTransformerHelper tfhelper, Map<String, String> attributes, Element result)
+        throws JaxenException {
+        String xPath = attributes.get("xpath");
+        int minRepeats = Integer.parseInt(attributes.getOrDefault("min", "0"));
+        int maxRepeats = Integer.parseInt(attributes.getOrDefault("max", "0"));
+        String method = attributes.get("method");
+        List<Element> repeats = tfhelper.repeat(xPath, minRepeats, maxRepeats, method);
+        result.addContent(repeats);
     }
 
     private void setXPath(MCRTransformerHelper tfhelper, Element result, boolean fixPathForMultiple) {
@@ -247,7 +293,7 @@ public class MCRTransformerHelperResolver implements URIResolver {
     }
 
     private Map<String, String> parseAttributes(StringTokenizer st) {
-        Map<String, String> attributes = new HashMap<String, String>();
+        Map<String, String> attributes = new HashMap<>();
         while (st.hasMoreTokens()) {
             String name = st.nextToken("=").substring(1);
             String value = st.nextToken("&").substring(1);
