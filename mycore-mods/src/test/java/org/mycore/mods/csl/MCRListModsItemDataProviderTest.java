@@ -51,7 +51,7 @@ import org.xml.sax.SAXException;
 @MyCoReTest
 @ExtendWith(MCRJPAExtension.class)
 @ExtendWith(MCRMetadataExtension.class)
-class MCRListModsItemDataProviderTest {
+public class MCRListModsItemDataProviderTest {
     private static final String TEST_ID_1 = "junit_mods_00002050";
     private static final String TEST_ID_2 = "junit_mods_00002056";
     private static final String TEST_ID_3 = "junit_mods_00002489";

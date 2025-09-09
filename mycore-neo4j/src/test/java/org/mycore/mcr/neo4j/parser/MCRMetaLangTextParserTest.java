@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @ExtendWith(MCRMetadataExtension.class)
 public class MCRMetaLangTextParserTest extends AbstractNeo4JParserTest {
     @Test
-    void testParseWithoutLang() {
+    public void testParseWithoutLang() {
         final Element mss01 = metadata.getChild("def.mss01");
 
         final List<Neo4JNode> result = new MCRNeo4JMetaLangTextParser().parse(mss01);
@@ -46,7 +46,7 @@ public class MCRMetaLangTextParserTest extends AbstractNeo4JParserTest {
     }
 
     @Test
-    void testParseWithLang() {
+    public void testParseWithLang() {
         final Element mss82 = metadata.getChild("def.mss82");
 
         final List<Neo4JNode> result = new MCRNeo4JMetaLangTextParser().parse(mss82);

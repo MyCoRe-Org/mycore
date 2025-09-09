@@ -18,15 +18,15 @@
 
 package org.mycore.iview.tests.base;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mycore.iview.tests.ViewerTestBase;
 import org.mycore.iview.tests.controller.ControllerUtil;
@@ -60,12 +60,12 @@ public class ImageOverviewIT extends ViewerTestBase {
     ImageOverviewIT(WebDriver driver) {
         super(driver);
     }
-    @Test
+
     /**
      * Checks if the image overview works
-     * @throws IOException
      * @throws InterruptedException
      */
+    @Test
     public void testImageOverview() throws InterruptedException {
         this.getDriver();
         this.getAppController().openViewer(this.getDriver(), getBaseURL(), getTestDerivate());
@@ -120,7 +120,7 @@ public class ImageOverviewIT extends ViewerTestBase {
         sleep(500);
 
         String message = label + " should be selected (class-attribut 'selected' should be set)!";
-        Assertions.assertTrue(ioController.isImageSelected(label), message);
+        assertTrue(ioController.isImageSelected(label), message);
         String fileName = String.format("%s-%s-%s-%s-%s", this.getClassname(), label, color.getRed(), color.getBlue(),
             color.getGreen());
         BufferedImage bImage = ControllerUtil.getScreenshot(getDriver(), fileName);
@@ -141,7 +141,7 @@ public class ImageOverviewIT extends ViewerTestBase {
     private void assertLess(int moreValue, int lessValue, String messagePattern) {
         String message = new MessageFormat(messagePattern, Locale.ROOT).format(new Object[] { lessValue, moreValue });
         LOGGER.debug(message);
-        Assertions.assertTrue(lessValue < moreValue, message);
+        assertTrue(lessValue < moreValue, message);
     }
 
     @Override

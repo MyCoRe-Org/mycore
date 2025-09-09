@@ -18,15 +18,15 @@
 
 package org.mycore.iview.tests.base;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mycore.iview.tests.ViewerTestBase;
 import org.mycore.iview.tests.controller.ControllerUtil;
@@ -52,12 +52,11 @@ public class ImageSectionIT extends ViewerTestBase {
         super(webDriver);
     }
 
-    @Test
     /**
      * Checks if the zoom button works!
-     * @throws IOException
      * @throws InterruptedException
      */
+    @Test
     public void testImageZoom() throws InterruptedException {
         this.getDriver();
         this.getAppController().openViewer(this.getDriver(), getBaseURL(), getTestDerivate());
@@ -169,7 +168,7 @@ public class ImageSectionIT extends ViewerTestBase {
     private void assertLess(int moreValue, int lessValue, String messagePattern) {
         String message = new MessageFormat(messagePattern, Locale.ROOT).format(new Object[] { lessValue, moreValue });
         LOGGER.debug(message);
-        Assertions.assertTrue(lessValue < moreValue, message);
+        assertTrue(lessValue < moreValue, message);
     }
 
     @Override

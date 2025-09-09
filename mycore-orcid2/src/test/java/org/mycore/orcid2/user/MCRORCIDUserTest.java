@@ -53,7 +53,7 @@ public class MCRORCIDUserTest {
     }
 
     @Test
-    void testRemoveAllCredentials() {
+    public void testRemoveAllCredentials() {
         MCRUser user = new MCRUser("junit");
         MCRUserManager.createUser(user);
         MCRORCIDUser orcidUser = new MCRORCIDUser(user);
