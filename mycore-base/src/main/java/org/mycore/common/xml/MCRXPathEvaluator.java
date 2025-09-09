@@ -78,7 +78,7 @@ public class MCRXPathEvaluator {
     }
 
     public String replaceXPathOrI18n(String expression) {
-        return evaluateXPath(migrateLegacyI18nSyntaxToExtensionFunction(expression));
+        return evaluateFirstAsString(migrateLegacyI18nSyntaxToExtensionFunction(expression));
     }
 
     private String migrateLegacyI18nSyntaxToExtensionFunction(String expression) {
@@ -97,9 +97,22 @@ public class MCRXPathEvaluator {
         return updatedI18nExpression;
     }
 
+    /**
+     * @deprecated Use {@link #evaluateFirstAsString(String)} instead.
+     */
+    @Deprecated(forRemoval = true)
     public String evaluateXPath(String xPathExpression) {
+        return evaluateFirstAsString(xPathExpression);
+    }
+
+    public String evaluateFirstAsString(String xPathExpression) {
         Object result = evaluateFirst("string(" + xPathExpression + ")");
         return result == null ? "" : (String) result;
+    }
+
+    public List<String> evaluateAllAsString(String xPathExpression) {
+        List<Object> result = evaluateAll("string(" + xPathExpression + ")");
+        return result.stream().map(Object::toString).toList();
     }
 
     public boolean test(String xPathExpression) {
@@ -124,6 +137,20 @@ public class MCRXPathEvaluator {
                 () -> MCRConfiguration2.getString("MCR.XPathFactory.Class").orElse(null));
             LOGGER.warn(ex);
             return null;
+        }
+    }
+
+    public List<Object> evaluateAll(String xPathExpression) {
+        try {
+            XPathExpression<Object> xPath = XPATH_FACTORY.compile(xPathExpression, Filters.fpassthrough(), variables,
+                    MCRConstants.getStandardNamespaces());
+            return xPath.evaluate(context);
+        } catch (Exception ex) {
+            LOGGER.warn("unable to evaluate XPath: {}", xPathExpression);
+            LOGGER.warn("XPath factory used is {} {}", () -> XPATH_FACTORY.getClass().getCanonicalName(),
+                    () -> MCRConfiguration2.getString("MCR.XPathFactory.Class").orElse(null));
+            LOGGER.warn(ex);
+            return List.of();
         }
     }
 
