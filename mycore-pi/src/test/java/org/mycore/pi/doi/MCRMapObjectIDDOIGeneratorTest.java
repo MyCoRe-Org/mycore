@@ -47,7 +47,7 @@ public class MCRMapObjectIDDOIGeneratorTest {
     MCRMapObjectIDDOIGenerator doiGenerator;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         doiGenerator = MCRConfiguration2.getInstanceOfOrThrow(
             MCRMapObjectIDDOIGenerator.class, "MCR.PI.Generator.MapObjectIDDOI");
     }

@@ -108,7 +108,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
      * @throws URISyntaxException in case of error
      */
     @Test
-    void testXPathMapping() throws IOException, JDOMException, URISyntaxException {
+    public void testXPathMapping() throws IOException, JDOMException, URISyntaxException {
         MCRSessionMgr.getCurrentSession();
         MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();
@@ -167,7 +167,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
      * @throws URISyntaxException in case of error
      */
     @Test
-    void testXPathMappingFallback() throws IOException, JDOMException, URISyntaxException {
+    public void testXPathMappingFallback() throws IOException, JDOMException, URISyntaxException {
         MCRSessionMgr.getCurrentSession();
         MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();
@@ -229,7 +229,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
      * </ol>
      */
     @Test
-    void testXPathMappingPlaceholders() throws URISyntaxException, IOException, JDOMException {
+    public void testXPathMappingPlaceholders() throws URISyntaxException, IOException, JDOMException {
         MCRSessionMgr.getCurrentSession();
         MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();
@@ -327,7 +327,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
      * Tests if placeholder patterns containing OR-conditions are properly evaluated.
      */
     @Test
-    void testXPathMappingPlaceholdersOROperator() throws URISyntaxException, IOException, JDOMException {
+    public void testXPathMappingPlaceholdersOROperator() throws URISyntaxException, IOException, JDOMException {
         MCRSessionMgr.getCurrentSession();
         MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();
@@ -364,7 +364,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
      * Tests if placeholder patterns containing OR-conditions are properly evaluated in the fallback mechanism.
      */
     @Test
-    void testXPathMappingFallbackAndORCondition() throws IOException, JDOMException, URISyntaxException {
+    public void testXPathMappingFallbackAndORCondition() throws IOException, JDOMException, URISyntaxException {
         MCRSessionMgr.getCurrentSession();
         MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();

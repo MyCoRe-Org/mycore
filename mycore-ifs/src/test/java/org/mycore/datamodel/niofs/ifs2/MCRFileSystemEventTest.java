@@ -77,7 +77,7 @@ public class MCRFileSystemEventTest {
     private Path derivateRoot;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         register = new EventRegister();
         MCREventManager.getInstance().addEventHandler(MCREvent.ObjectType.PATH, register);
         MCRConfiguration2.set("MCR.IFS2.Store.IFS2_junit_derivate.BaseDir", storeFolder.toAbsolutePath().toString());
@@ -85,7 +85,7 @@ public class MCRFileSystemEventTest {
     }
 
     @AfterEach
-    public void tearDown() throws Exception {
+    public void tearDown() {
         MCREventManager.getInstance().removeEventHandler(MCREvent.ObjectType.PATH, register);
         register.clear();
         MCRStoreManager.removeStore("IFS2_junit_derivate");

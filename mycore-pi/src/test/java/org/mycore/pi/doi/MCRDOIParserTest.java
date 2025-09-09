@@ -57,7 +57,7 @@ public class MCRDOIParserTest {
     }
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         parser = new MCRDOIParser();
     }
 

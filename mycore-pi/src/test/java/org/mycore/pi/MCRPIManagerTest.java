@@ -88,7 +88,7 @@ public class MCRPIManagerTest {
     public static final String MOCK_PID_GENERATOR = "MockIDGenerator";
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         resetManagerInstance();
     }
 
