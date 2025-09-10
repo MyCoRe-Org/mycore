@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.mycore.common.MCRCoreVersion;
-import org.mycore.restapi.converter.MCRInstantXMLAdapter;
+import org.mycore.common.xml.adapters.MCRInstantXMLAdapter;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
