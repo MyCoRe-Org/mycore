@@ -19,6 +19,7 @@
 package org.mycore.user2.hash.bouncycastle;
 
 import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
+import static org.mycore.user2.hash.MCRPasswordCheckUtils.generateSeed;
 
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
@@ -123,7 +124,7 @@ public class MCRSCryptStrategy extends MCRPasswordCheckStrategyBase {
     @Override
     protected PasswordCheckData doCreate(SecureRandom random, String password) {
 
-        byte[] salt = random.generateSeed(saltSizeBytes);
+        byte[] salt = generateSeed(random, saltSizeBytes);
         byte[] hash = getHash(salt, hashSizeBytes, password);
 
         return new PasswordCheckData(HEX_FORMAT.formatHex(salt), HEX_FORMAT.formatHex(hash));
