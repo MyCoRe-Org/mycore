@@ -169,14 +169,13 @@ public class MCRTransformerHelperResolver implements URIResolver {
 
         StringBuilder name = new StringBuilder();
         name.append("_xed_submit_").append(target);
-        
+
         if ("subselect".equals(target)) {
             name.append(':').append(tfhelper.getSubselectParam(href));
-        }
-        else if(Strings.isNotBlank(href)) {
+        } else if (Strings.isNotBlank(href)) {
             name.append(':').append(href);
         }
-        
+
         result.setAttribute("name", name.toString());
     }
 
