@@ -48,9 +48,12 @@
   <!-- ========== pass request parameters ========== -->
 
   <xsl:template name="passAdditionalParameters">
-    <div style="visibility:hidden">
-      <xsl:copy-of select="helper:getAdditionalParameters($helper)" />
-    </div>
+    <xsl:variable name="uri">
+      <xsl:call-template name="callTransformerHelperURI">
+        <xsl:with-param name="method" select="'getAdditionalParameters'" />
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:copy-of select="document($uri)/result/*" />
   </xsl:template>
 
   <!-- ========== xed:source et al ========== -->

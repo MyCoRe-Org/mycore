@@ -92,6 +92,11 @@ public class MCRTransformerHelperResolver implements URIResolver {
             case "form":
                 registerAdditionalNamespaces(tfhelper, attributes);
                 break;
+            case "getAdditionalParameters":
+                Element div = new Element("div").setAttribute("style", "visibility:hidden");
+                div.addContent(tfhelper.getAdditionalParameters());
+                result.addContent(div);
+                break;
             case "bind":
                 handleBind(tfhelper, attributes);
                 break;

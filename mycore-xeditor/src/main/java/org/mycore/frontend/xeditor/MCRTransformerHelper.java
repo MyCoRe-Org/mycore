@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang3.StringUtils;
@@ -325,44 +323,43 @@ public class MCRTransformerHelper {
         return currentBinding.getAbsoluteXPath() + ":" + MCRSubselectTarget.encode(href);
     }
 
-    public NodeSet getAdditionalParameters() throws ParserConfigurationException {
-        org.w3c.dom.Document dom = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-        NodeSet nodeSet = new NodeSet();
+    public List<Element> getAdditionalParameters() {
+        List<Element> hiddenFields = new ArrayList<>();
 
         Map<String, String[]> parameters = editorSession.getRequestParameters();
         for (String name : parameters.keySet()) {
             for (String value : parameters.get(name)) {
                 if ((value != null) && !value.isEmpty()) {
-                    nodeSet.addNode(buildAdditionalParameterElement(dom, name, value));
+                    hiddenFields.add(buildAdditionalParameterElement(name, value));
                 }
             }
         }
 
         String xPaths2CheckResubmission = editorSession.getSubmission().getXPaths2CheckResubmission();
         if (!xPaths2CheckResubmission.isEmpty()) {
-            nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSubmission.PREFIX_CHECK_RESUBMISSION,
+            hiddenFields.add(buildAdditionalParameterElement(MCREditorSubmission.PREFIX_CHECK_RESUBMISSION,
                 xPaths2CheckResubmission));
         }
 
         Map<String, String> defaultValues = editorSession.getSubmission().getDefaultValues();
         for (String xPath : defaultValues.keySet()) {
-            nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSubmission.PREFIX_DEFAULT_VALUE + xPath,
+            hiddenFields.add(buildAdditionalParameterElement(MCREditorSubmission.PREFIX_DEFAULT_VALUE + xPath,
                 defaultValues.get(xPath)));
         }
 
         editorSession.setBreakpoint("After transformation to HTML");
-        nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSessionStore.XEDITOR_SESSION_PARAM,
+        hiddenFields.add(buildAdditionalParameterElement(MCREditorSessionStore.XEDITOR_SESSION_PARAM,
             editorSession.getCombinedSessionStepID()));
 
-        return nodeSet;
+        return hiddenFields;
     }
 
-    private org.w3c.dom.Element buildAdditionalParameterElement(org.w3c.dom.Document doc, String name, String value) {
-        org.w3c.dom.Element element = doc.createElement("input");
-        element.setAttribute("type", "hidden");
-        element.setAttribute("name", name);
-        element.setAttribute("value", value);
-        return element;
+    private Element buildAdditionalParameterElement(String name, String value) {
+        Element input = new Element("input");
+        input.setAttribute("type", "hidden");
+        input.setAttribute("name", name);
+        input.setAttribute("value", value);
+        return input;
     }
 
     void addCleanupRule(String xPath, String relevantIf) {
