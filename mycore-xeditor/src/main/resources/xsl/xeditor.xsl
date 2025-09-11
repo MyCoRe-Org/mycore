@@ -197,8 +197,12 @@
     </xsl:variable>
 
     <xsl:for-each select="document($uri)/result/repeat">
-      <xsl:variable name="anchorID" select="helper:bindRepeatPosition($helper)" />
-      <a id="rep-{$anchorID}" />
+      <a>
+        <xsl:call-template name="callTransformerHelper">
+          <xsl:with-param name="method" select="'bindRepeatPosition'" />
+        </xsl:call-template>
+      </a>
+      
       <xsl:apply-templates select="$xed_repeat/node()" mode="xeditor" />
       <xsl:call-template name="unbind" />
     </xsl:for-each>

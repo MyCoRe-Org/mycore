@@ -111,6 +111,9 @@ public class MCRTransformerHelperResolver implements URIResolver {
             case "repeat":
                 handleRepeat(tfhelper, attributes, result);
                 break;
+            case "bindRepeatPosition":
+                handleBindRepeatPosition(tfhelper, result);
+                break;
             case "controls":
                 handleControls(tfhelper, attributes, result);
                 break;
@@ -154,6 +157,11 @@ public class MCRTransformerHelperResolver implements URIResolver {
             default:
                 ;
         }
+    }
+
+    private void handleBindRepeatPosition(MCRTransformerHelper tfhelper, Element result) {
+        String anchorID = "rep-" + tfhelper.bindRepeatPosition();
+        result.setAttribute("id", anchorID);
     }
 
     private void handlePreload(MCRTransformerHelper tfhelper, Map<String, String> attributes, Element result) {
