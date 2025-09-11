@@ -121,6 +121,7 @@ public class MCRTransformerHelperResolver implements URIResolver {
                 handleTextarea(tfhelper, result);
                 break;
             case "if":
+            case "when":
                 handleTest(tfhelper, attributes, result);
                 break;
             case "source":
