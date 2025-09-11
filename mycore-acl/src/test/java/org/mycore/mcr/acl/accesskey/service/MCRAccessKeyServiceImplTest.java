@@ -80,7 +80,7 @@ public class MCRAccessKeyServiceImplTest {
     private static String testEncodedSecretWrite;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         accessKeyRepositoryMock = Mockito.mock(MCRAccessKeyRepository.class);
         accessKeySecretProcessor = new MCRAccessKeyHashSecretProcessor(1);
         Mockito.when(accessKeyRepositoryMock.existsByReferenceAndSecret(TEST_REFERENCE_READ, testEncodedSecretWrite))

@@ -1,5 +1,8 @@
 package org.mycore.ocfl.niofs.storage;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -9,7 +12,6 @@ import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,19 +49,19 @@ public class MCROCFLDefaultTransactionalStorageTest extends MCROCFLStorageTestCa
     @TestTemplate
     public void exists() throws IOException {
         MCRTransactionManager.beginTransactions();
-        Assertions.assertFalse(storage.exists(path1), "Path should not exist before any operation");
+        assertFalse(storage.exists(path1), "Path should not exist before any operation");
         write(path1);
-        Assertions.assertTrue(storage.exists(path1), "Path should exist after write operation");
+        assertTrue(storage.exists(path1), "Path should exist after write operation");
         MCRTransactionManager.commitTransactions();
     }
 
     @TestTemplate
     public void toPhysicalPath() {
         MCRTransactionManager.beginTransactions();
-        Assertions.assertTrue(storage.toPhysicalPath(path1).endsWith("1/" + DERIVATE_3 + "/v0/file1"));
+        assertTrue(storage.toPhysicalPath(path1).endsWith("1/" + DERIVATE_3 + "/v0/file1"));
         MCRTransactionManager.commitTransactions();
         MCRTransactionManager.beginTransactions();
-        Assertions.assertTrue(storage.toPhysicalPath(path1).endsWith("2/" + DERIVATE_3 + "/v0/file1"));
+        assertTrue(storage.toPhysicalPath(path1).endsWith("2/" + DERIVATE_3 + "/v0/file1"));
         MCRTransactionManager.commitTransactions();
     }
 
@@ -69,9 +71,9 @@ public class MCROCFLDefaultTransactionalStorageTest extends MCROCFLStorageTestCa
         storage.copy(new ByteArrayInputStream(new byte[] { 1 }), path1);
         storage.copy(new ByteArrayInputStream(new byte[] { 2 }), path2);
         storage.copy(new ByteArrayInputStream(new byte[] { 3 }), path3);
-        Assertions.assertTrue(storage.exists(path1), "'path1' should exist");
-        Assertions.assertTrue(storage.exists(path2), "'path2' should exist");
-        Assertions.assertTrue(storage.exists(path3), "'path3' should exist");
+        assertTrue(storage.exists(path1), "'path1' should exist");
+        assertTrue(storage.exists(path2), "'path2' should exist");
+        assertTrue(storage.exists(path3), "'path3' should exist");
         MCRTransactionManager.commitTransactions();
     }
 
@@ -80,11 +82,11 @@ public class MCROCFLDefaultTransactionalStorageTest extends MCROCFLStorageTestCa
         MCRTransactionManager.beginTransactions();
         write(path1);
         storage.copy(path1, path2);
-        Assertions.assertTrue(storage.exists(path1), "'path1' should exist");
-        Assertions.assertTrue(storage.exists(path2), "'path2' should exist");
+        assertTrue(storage.exists(path1), "'path1' should exist");
+        assertTrue(storage.exists(path2), "'path2' should exist");
         storage.copy(path1, path3);
-        Assertions.assertTrue(storage.exists(path1), "'path1' should exist");
-        Assertions.assertTrue(storage.exists(path3), "'path3' should exist");
+        assertTrue(storage.exists(path1), "'path1' should exist");
+        assertTrue(storage.exists(path3), "'path3' should exist");
         MCRTransactionManager.commitTransactions();
     }
 
@@ -93,8 +95,8 @@ public class MCROCFLDefaultTransactionalStorageTest extends MCROCFLStorageTestCa
         MCRTransactionManager.beginTransactions();
         write(path1);
         storage.move(path1, path2);
-        Assertions.assertFalse(storage.exists(path1), "'path1' should not exist after move");
-        Assertions.assertTrue(storage.exists(path2), "'path2' should exist after move");
+        assertFalse(storage.exists(path1), "'path1' should not exist after move");
+        assertTrue(storage.exists(path2), "'path2' should exist after move");
         MCRTransactionManager.commitTransactions();
     }
 
@@ -102,9 +104,9 @@ public class MCROCFLDefaultTransactionalStorageTest extends MCROCFLStorageTestCa
     public void deleteIfExists() throws IOException, MCROCFLInactiveTransactionException {
         MCRTransactionManager.beginTransactions();
         storage.copy(new ByteArrayInputStream(new byte[] { 1 }), path1);
-        Assertions.assertTrue(storage.exists(path1), "'path1' should exist before deletion");
+        assertTrue(storage.exists(path1), "'path1' should exist before deletion");
         storage.deleteIfExists(path1);
-        Assertions.assertFalse(storage.exists(path1), "'path1' should not exist after deletion");
+        assertFalse(storage.exists(path1), "'path1' should not exist after deletion");
         MCRTransactionManager.commitTransactions();
     }
 
@@ -112,11 +114,11 @@ public class MCROCFLDefaultTransactionalStorageTest extends MCROCFLStorageTestCa
     public void newByteChannelWriteOperation() throws IOException, MCROCFLInactiveTransactionException {
         MCRTransactionManager.beginTransactions();
         write(path1);
-        Assertions.assertTrue(storage.exists(path1), "'path1' should exist after write operation");
+        assertTrue(storage.exists(path1), "'path1' should exist after write operation");
         write(path2);
-        Assertions.assertTrue(storage.exists(path2), "'path2' should exist after write operation");
+        assertTrue(storage.exists(path2), "'path2' should exist after write operation");
         write(path3);
-        Assertions.assertTrue(storage.exists(path3), "'path3' should exist after write operation");
+        assertTrue(storage.exists(path3), "'path3' should exist after write operation");
         MCRTransactionManager.commitTransactions();
     }
 
