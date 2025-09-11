@@ -161,8 +161,10 @@ public class MCRTransformerHelperResolver implements URIResolver {
     }
 
     private void handleBindRepeatPosition(MCRTransformerHelper tfhelper, Element result) {
-        String anchorID = "rep-" + tfhelper.bindRepeatPosition();
-        result.setAttribute("id", anchorID);
+        Element anchor = new Element("a");
+        String id = "rep-" + tfhelper.bindRepeatPosition();
+        anchor.setAttribute("id", id);
+        result.addContent(anchor);
     }
 
     private void handlePreload(MCRTransformerHelper tfhelper, Map<String, String> attributes, Element result) {

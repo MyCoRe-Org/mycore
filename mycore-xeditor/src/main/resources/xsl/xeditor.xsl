@@ -187,22 +187,20 @@
   <!-- ========== <xed:repeat xpath="" min="" max="" method="build|clone" /> ========== -->
 
   <xsl:template match="xed:repeat" mode="xeditor">
-    <xsl:variable name="xed_repeat" select="." />
+    <xsl:variable name="repeatedNodes" select="node()" />
 
     <xsl:variable name="uri">
       <xsl:call-template name="callTransformerHelperURI" />
     </xsl:variable>
 
     <xsl:for-each select="document($uri)/result/repeat">
-      <a>
-        <xsl:call-template name="callTransformerHelper">
-          <xsl:with-param name="method" select="'bindRepeatPosition'" />
-        </xsl:call-template>
-      </a>
-      
-      <xsl:apply-templates select="$xed_repeat/node()" mode="xeditor" />
+      <xsl:call-template name="callTransformerHelper">
+        <xsl:with-param name="method" select="'bindRepeatPosition'" />
+      </xsl:call-template>
+      <xsl:apply-templates select="$repeatedNodes" mode="xeditor" />
       <xsl:call-template name="unbind" />
     </xsl:for-each>
+    
     <xsl:call-template name="unbind" />
   </xsl:template>
 
