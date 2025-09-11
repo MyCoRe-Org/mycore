@@ -41,19 +41,11 @@
       </xsl:if>
 
       <xsl:apply-templates select="node()" mode="xeditor" />
-      <xsl:call-template name="passAdditionalParameters" />
-    </form>
-  </xsl:template>
 
-  <!-- ========== pass request parameters ========== -->
-
-  <xsl:template name="passAdditionalParameters">
-    <xsl:variable name="uri">
-      <xsl:call-template name="callTransformerHelperURI">
+      <xsl:call-template name="callTransformerHelper">
         <xsl:with-param name="method" select="'getAdditionalParameters'" />
       </xsl:call-template>
-    </xsl:variable>
-    <xsl:copy-of select="document($uri)/result/*" />
+    </form>
   </xsl:template>
 
   <!-- ========== xed:source et al ========== -->
@@ -82,27 +74,23 @@
     
     <xsl:choose>
       <xsl:when test="@uri and @ref">
-        <xsl:apply-templates select="includer:resolve($includer,$result/@uri,@static)/descendant::*[@id=$result/@ref]" mode="included" />
+        <xsl:apply-templates select="includer:resolve($includer,$result/@uri,@static)/descendant::*[@id=$result/@ref]/node()" mode="xeditor" />
       </xsl:when>
       <xsl:when test="@uri">
-        <xsl:apply-templates select="includer:resolve($includer,$result/@uri,@static)" mode="included" />
+        <xsl:apply-templates select="includer:resolve($includer,$result/@uri,@static)/node()" mode="xeditor" />
       </xsl:when>
       <xsl:when test="@ref">
         <xsl:variable name="resolved" select="includer:resolve($includer,$result/@ref)" />
         <xsl:choose>
           <xsl:when test="count($resolved) &gt; 0">
-            <xsl:apply-templates select="$resolved" mode="included" />
+            <xsl:apply-templates select="$resolved/node()" mode="xeditor" />
           </xsl:when>
           <xsl:otherwise>
-            <xsl:apply-templates select="/*/descendant-or-self::*[@id=$result/@ref]" mode="included" />
+            <xsl:apply-templates select="/*/descendant-or-self::*[@id=$result/@ref]/node()" mode="xeditor" />
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
     </xsl:choose>
-  </xsl:template>
-
-  <xsl:template match="*|text()" mode="included">
-    <xsl:apply-templates mode="xeditor" />
   </xsl:template>
 
   <!-- ========== Ignore <xed:template /> ========== -->
