@@ -332,7 +332,7 @@
     <xsl:value-of select="concat('xedTransformerHelper:',$SessionID,':',$method,':')" />
     
     <xsl:for-each select="@*">
-      <xsl:value-of select="concat(local-name(),'=',encoder:encode(.,'UTF-8'),'&amp;')" />
+      <xsl:value-of select="concat(name(),'=',encoder:encode(.,'UTF-8'),'&amp;')" />
     </xsl:for-each>
     <xsl:for-each select="namespace::*">
       <xsl:value-of select="concat('xmlns:',name(),'=',encoder:encode(.,'UTF-8'),'&amp;')" />
