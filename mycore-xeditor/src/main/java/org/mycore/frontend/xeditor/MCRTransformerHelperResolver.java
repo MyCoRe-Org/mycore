@@ -194,6 +194,11 @@ public class MCRTransformerHelperResolver implements URIResolver {
 
     private void handleTextarea(MCRTransformerHelper tfhelper, Element result) {
         result.setAttribute(ATTR_NAME, tfhelper.getAbsoluteXPath());
+
+        String value = tfhelper.getValue();
+        if (value != null) {
+            result.setText(value);
+        }
     }
 
     private void handleSource(MCRTransformerHelper tfhelper, Map<String, String> attributes)

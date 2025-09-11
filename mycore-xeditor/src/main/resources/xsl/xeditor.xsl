@@ -132,13 +132,10 @@
     <xsl:copy>
       <xsl:apply-templates select="." mode="add-attributes" />
       <xsl:apply-templates select="@*|node()" mode="xeditor" />
-      <xsl:apply-templates select="." mode="add-content" />
     </xsl:copy>
   </xsl:template>
 
   <xsl:template match="*" mode="add-attributes" />
-
-  <xsl:template match="*" mode="add-content" />
 
   <!-- ========== <input|button xed:target="" xed:href="" /> ========== -->
 
@@ -179,12 +176,12 @@
     </xsl:call-template>
   </xsl:template>
 
-  <xsl:template match="textarea" mode="add-attributes">
-    <xsl:call-template name="callTransformerHelper" />
-  </xsl:template>
-
-  <xsl:template match="textarea" mode="add-content">
-    <xsl:value-of select="helper:getValue($helper)" />
+  <xsl:template match="textarea" mode="xeditor">
+    <xsl:copy>
+      <xsl:apply-templates select="@*[name()!='name']" mode="xeditor" />
+      <xsl:call-template name="callTransformerHelper" />
+      <xsl:apply-templates select="node()" mode="xeditor" />
+    </xsl:copy>
   </xsl:template>
 
   <!-- ========== <xed:repeat xpath="" min="" max="" method="build|clone" /> ========== -->
