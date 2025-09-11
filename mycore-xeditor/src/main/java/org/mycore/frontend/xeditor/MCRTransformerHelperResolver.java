@@ -124,6 +124,9 @@ public class MCRTransformerHelperResolver implements URIResolver {
             case "textarea":
                 handleTextarea(tfhelper, result);
                 break;
+            case "button":
+                handleSubmitButton(tfhelper, attributes, result);
+                break;
             case "if":
             case "when":
                 handleTest(tfhelper, attributes, result);
@@ -158,6 +161,23 @@ public class MCRTransformerHelperResolver implements URIResolver {
             default:
                 ;
         }
+    }
+
+    private void handleSubmitButton(MCRTransformerHelper tfhelper, Map<String, String> attributes, Element result) {
+        String target = attributes.get("xed:target");
+        String href = attributes.get("xed:href");
+
+        StringBuilder name = new StringBuilder();
+        name.append("_xed_submit_").append(target);
+        
+        if ("subselect".equals(target)) {
+            name.append(':').append(tfhelper.getSubselectParam(href));
+        }
+        else if(Strings.isNotBlank(href)) {
+            name.append(':').append(href);
+        }
+        
+        result.setAttribute("name", name.toString());
     }
 
     private void handleBindRepeatPosition(MCRTransformerHelper tfhelper, Element result) {

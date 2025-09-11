@@ -139,35 +139,26 @@
 
   <!-- ========== <input|button xed:target="" xed:href="" /> ========== -->
 
-  <xsl:template match="input[contains('submit image',@type)][@xed:target]|button[@type='submit'][@xed:target]"
-                mode="add-attributes">
-    <xsl:attribute name="name">
-      <xsl:value-of select="concat('_xed_submit_',@xed:target)" />
-      <xsl:choose>
-        <xsl:when test="@xed:target='subselect'">
-          <xsl:value-of select="concat(':',helper:getSubselectParam($helper,@xed:href))" />
-        </xsl:when>
-        <xsl:when test="@xed:href">
-          <xsl:value-of select="concat(':',@xed:href)" />
-        </xsl:when>
-      </xsl:choose>
-    </xsl:attribute>
+  <xsl:template match="input[@xed:target]|button[@xed:target]" mode="add-attributes">
+    <xsl:call-template name="callTransformerHelper">
+      <xsl:with-param name="method" select="'button'" />
+    </xsl:call-template>        
   </xsl:template>
 
   <!-- ========== <input /> ========== -->
 
-  <xsl:template
-    match="input[contains(',,text,password,radio,checkbox,hidden,file,color,date,datetime,datetime-local,email,month,number,range,search,tel,time,url,week,',concat(',',@type,','))]"
-    mode="add-attributes">
+  <xsl:template match="input" mode="add-attributes">
     <xsl:call-template name="callTransformerHelper" />
   </xsl:template>
 
+  <!-- ========== <select /> ========== -->
+  
   <xsl:template match="select" mode="xeditor">
     <xsl:copy>
       <xsl:call-template name="callTransformerHelper" />
-      <xsl:apply-templates select="@*|text()|*" mode="xeditor" />
+      <xsl:apply-templates select="@*|node()" mode="xeditor" />
+      <xsl:call-template name="callTransformerHelper" />
     </xsl:copy>
-    <xsl:call-template name="callTransformerHelper" />
   </xsl:template>
 
   <xsl:template match="option" mode="add-attributes">
@@ -175,6 +166,8 @@
       <xsl:with-param name="addText" select="true()" />
     </xsl:call-template>
   </xsl:template>
+
+  <!-- ========== <textarea /> ========== -->
 
   <xsl:template match="textarea" mode="xeditor">
     <xsl:copy>
