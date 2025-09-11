@@ -23,7 +23,7 @@
 
   <xsl:template match="xed:form[@method='output']">
     <xsl:call-template name="callTransformerHelper" />
-    <xsl:apply-templates select="@*|node()" mode="xeditor" />
+    <xsl:apply-templates select="node()" mode="xeditor" />
   </xsl:template>
 
   <!-- ========== <xed:form /> ========== -->
@@ -100,14 +100,14 @@
 
   <!-- ========== Text ========== -->
 
-  <xsl:template match="@*" mode="xeditor">
+  <xsl:template match="@*[contains(.,'{')]" mode="xeditor">
     <xsl:attribute name="{name()}">
       <xsl:value-of select="helper:replaceXPaths($helper,.)" />
     </xsl:attribute>
   </xsl:template>
 
-  <xsl:template match="text()" mode="xeditor">
-    <xsl:value-of select="." />
+  <xsl:template match="@*|text()" mode="xeditor">
+    <xsl:copy-of select="." />
   </xsl:template>
 
   <!-- ========== <xed:bind xpath="" initially="value"|default="value"|set="value" name="" /> ========== -->
