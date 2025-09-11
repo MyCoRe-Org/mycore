@@ -121,9 +121,12 @@ define([
     },
 
     updateToolbar: function() {
-      var disabled = this.data == null || this.start == 0 || this.start == this.data.numFound;
+      const disabled = this.data == null || this.start == 0 || this.start == this.data.numFound;
       this.nextButton.set("disabled", disabled);
       this.allButton.set("disabled", disabled);
+
+      this.nextButton.set("iconClass", "icon16 " + (disabled ? "stepForwardDisabledIcon" : "stepForwardIcon"));
+      this.allButton.set("iconClass", "icon16 " + (disabled ? "forwardDisabledIcon" : "forwardIcon"));
     }
 
   });
