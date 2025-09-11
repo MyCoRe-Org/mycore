@@ -59,6 +59,7 @@ import org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper;
 import org.mycore.frontend.classeditor.wrapper.MCRCategoryListWrapper;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 import org.mycore.solr.MCRSolrCoreManager;
+import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.classification.MCRSolrClassificationUtil;
@@ -264,7 +265,7 @@ public class MCRClassificationEditorResource {
     public Response filter(@PathParam("text") String text) {
         SolrClient solrClient = MCRSolrClassificationUtil.getCore().getClient();
         ModifiableSolrParams p = new ModifiableSolrParams();
-        p.set("q", "*" + text + "*");
+        p.set("q", "allMeta:" + "*" + MCRSolrUtils.escapeSearchValue(text) + "*");
         p.set("fl", "id,ancestors");
 
         JsonArray docList = new JsonArray();
