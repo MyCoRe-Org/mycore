@@ -31,8 +31,7 @@ import org.mycore.resource.hint.MCRResourceHintKeys;
 
 /**
  * A {@link MCRClasspathDirsResourceProvider} is a {@link MCRResourceProvider} that looks up resources
- * in the file system. It uses a fixed list of base directories taken from the system property
- * <code>java.class.path</code> as base directories for the lookup.
+ * in the file system in directories that are part of the classpath.
  * <p>
  * It uses the {@link MCRClasspathDirsProvider} hinted at by {@link MCRResourceHintKeys#CLASSPATH_DIRS_PROVIDER},
  * if present.
