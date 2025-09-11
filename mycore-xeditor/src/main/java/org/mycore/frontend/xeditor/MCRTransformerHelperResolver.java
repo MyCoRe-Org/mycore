@@ -87,6 +87,7 @@ public class MCRTransformerHelperResolver implements URIResolver {
         return source;
     }
 
+    @SuppressWarnings("PMD.NcssCount")
     private void handleXEditorElement(MCRTransformerHelper tfhelper, String elementName, Map<String, String> attributes,
         Element result) throws JaxenException, JDOMException, IOException, SAXException, TransformerException {
         switch (elementName) {
