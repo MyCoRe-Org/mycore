@@ -46,11 +46,12 @@ public class MCRTransformerHelperResolver implements URIResolver {
     private static final String CONTROL_DOWN = "down";
 
     private static final String ATTR_URL = "url";
+    private static final String ATTR_URI = "uri";
+    private static final String ATTR_REF = "ref";
     private static final String ATTR_NAME = "name";
     private static final String ATTR_VALUE = "value";
     private static final String ATTR_XPATH = "xpath";
     private static final String ATTR_TYPE = "type";
-    private static final String ATTR_URI = "uri";
     private static final String ATTR_TEXT = "text";
     private static final String ATTR_I18N = "i18n";
 
@@ -92,10 +93,14 @@ public class MCRTransformerHelperResolver implements URIResolver {
             case "form":
                 registerAdditionalNamespaces(tfhelper, attributes);
                 break;
+            case "preload":
+                handlePreload(tfhelper, attributes, result);
+                break;
+            case "include":
+                handleInclude(tfhelper, attributes, result);
+                break;
             case "getAdditionalParameters":
-                Element div = new Element("div").setAttribute("style", "visibility:hidden");
-                div.addContent(tfhelper.getAdditionalParameters());
-                result.addContent(div);
+                handleGetAdditionalParameters(tfhelper, result);
                 break;
             case "bind":
                 handleBind(tfhelper, attributes);
@@ -148,6 +153,29 @@ public class MCRTransformerHelperResolver implements URIResolver {
             default:
                 ;
         }
+    }
+
+    private void handlePreload(MCRTransformerHelper tfhelper, Map<String, String> attributes, Element result) {
+        replaceParameters(tfhelper, attributes, result, ATTR_URI);
+    }
+
+    private void handleInclude(MCRTransformerHelper tfhelper, Map<String, String> attributes, Element result) {
+        replaceParameters(tfhelper, attributes, result, ATTR_URI, ATTR_REF);
+    }
+
+    private void replaceParameters(MCRTransformerHelper tfhelper, Map<String, String> attributes, Element result,
+        String... attributesToHandle) {
+        for (String attribute : attributesToHandle) {
+            if (attributes.containsKey(attribute)) {
+                result.setAttribute(attribute, tfhelper.replaceParameters(attributes.get(attribute)));
+            }
+        }
+    }
+
+    private void handleGetAdditionalParameters(MCRTransformerHelper tfhelper, Element result) {
+        Element div = new Element("div").setAttribute("style", "visibility:hidden");
+        div.addContent(tfhelper.getAdditionalParameters());
+        result.addContent(div);
     }
 
     private void handleBind(MCRTransformerHelper tfhelper, Map<String, String> attributes) throws JaxenException {

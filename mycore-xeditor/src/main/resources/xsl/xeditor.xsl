@@ -65,33 +65,39 @@
   <!-- ========== <xed:preload uri="" static="true|false" /> ========== -->
 
   <xsl:template match="xed:preload" mode="xeditor">
-    <xsl:variable name="uri" select="helper:replaceParameters($helper,@uri)" />
-    <xsl:value-of select="includer:preloadFromURIs($includer,$uri,@static)" />
+    <xsl:variable name="uri">
+      <xsl:call-template name="callTransformerHelperURI" />
+    </xsl:variable>
+    <xsl:variable name="result" select="document($uri)/result" /> 
+    <xsl:value-of select="includer:preloadFromURIs($includer,$result/@uri,@static)" />
   </xsl:template>
 
   <!-- ========== <xed:include uri="" ref="" static="true|false" /> ========== -->
 
-  <xsl:template match="xed:include[@uri and @ref]" mode="xeditor">
-    <xsl:variable name="uri" select="helper:replaceParameters($helper,@uri)" />
-    <xsl:variable name="ref" select="helper:replaceParameters($helper,@ref)" />
-    <xsl:apply-templates select="includer:resolve($includer,$uri,@static)/descendant::*[@id=$ref]" mode="included" />
-  </xsl:template>
-
-  <xsl:template match="xed:include[@uri and not(@ref)]" mode="xeditor">
-    <xsl:variable name="uri" select="helper:replaceParameters($helper,@uri)" />
-    <xsl:apply-templates select="includer:resolve($includer,$uri,@static)" mode="included" />
-  </xsl:template>
-
-  <xsl:template match="xed:include[@ref and not(@uri)]" mode="xeditor">
-    <xsl:variable name="ref" select="helper:replaceParameters($helper,@ref)" />
-    <xsl:variable name="resolved" select="includer:resolve($includer,$ref)" />
+  <xsl:template match="xed:include" mode="xeditor">
+    <xsl:variable name="uri">
+      <xsl:call-template name="callTransformerHelperURI" />
+    </xsl:variable>
+    <xsl:variable name="result" select="document($uri)/result" />
+    
     <xsl:choose>
-      <xsl:when test="count($resolved) &gt; 0">
-        <xsl:apply-templates select="$resolved" mode="included" />
+      <xsl:when test="@uri and @ref">
+        <xsl:apply-templates select="includer:resolve($includer,$result/@uri,@static)/descendant::*[@id=$result/@ref]" mode="included" />
       </xsl:when>
-      <xsl:otherwise>
-        <xsl:apply-templates select="/*/descendant-or-self::*[@id=$ref]" mode="included" />
-      </xsl:otherwise>
+      <xsl:when test="@uri">
+        <xsl:apply-templates select="includer:resolve($includer,$result/@uri,@static)" mode="included" />
+      </xsl:when>
+      <xsl:when test="@ref">
+        <xsl:variable name="resolved" select="includer:resolve($includer,$result/@ref)" />
+        <xsl:choose>
+          <xsl:when test="count($resolved) &gt; 0">
+            <xsl:apply-templates select="$resolved" mode="included" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates select="/*/descendant-or-self::*[@id=$result/@ref]" mode="included" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
     </xsl:choose>
   </xsl:template>
 
