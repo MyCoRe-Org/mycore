@@ -86,12 +86,15 @@ public class MCRTransformerHelper {
     private static final String ATTR_METHOD = "method";
     private static final String ATTR_MAX = "max";
     private static final String ATTR_MIN = "min";
+    private static final String ATTR_DISPLAY = "display";
 
     private static final String TYPE_CHECKBOX = "checkbox";
     private static final String TYPE_RADIO = "radio";
 
     private static final String VALUE_SELECTED = "selected";
     private static final String VALUE_CHECKED = "checked";
+    private static final String VALUE_LOCAL = "local";
+    private static final String VALUE_GLOBAL = "global";
 
     private static final String PREDICATE_IS_FIRST = "[1]";
 
@@ -224,10 +227,6 @@ public class MCRTransformerHelper {
         setCurrentBinding(currentBinding.getParent());
     }
 
-    public String getAbsoluteXPath() {
-        return currentBinding.getAbsoluteXPath();
-    }
-
     private boolean hasValue(String value) {
         editorSession.getSubmission().mark2checkResubmission(currentBinding);
         return currentBinding.hasValue(value);
@@ -254,7 +253,12 @@ public class MCRTransformerHelper {
         }
     }
 
-    public String replaceXPaths(String text) {
+    void handleReplaceXPaths(Map<String, String> attributes, Element result) {
+        attributes.keySet().removeIf(key -> key.contains(String.valueOf(COLON)));
+        attributes.forEach((name, value) -> result.setAttribute(name, replaceXPaths(value)));
+    }
+
+    private String replaceXPaths(String text) {
         return getXPathEvaluator().replaceXPaths(text, false);
     }
 
@@ -350,7 +354,7 @@ public class MCRTransformerHelper {
             if (CONTROL_APPEND.equals(token) || CONTROL_INSERT.equals(token)) {
                 name.append(MCRInsertTarget.getInsertParameter(getCurrentRepeat()));
             } else if (CONTROL_REMOVE.equals(token)) {
-                name.append(getAbsoluteXPath());
+                name.append(currentBinding.getAbsoluteXPath());
             } else if (CONTROL_UP.equals(token) || CONTROL_DOWN.equals(token)) {
                 name.append(getSwapParameter(token));
             }
@@ -395,16 +399,23 @@ public class MCRTransformerHelper {
         editorSession.getVariables().put(name, resource);
     }
 
+    void handleValidationRule(Map<String, String> attributes, Element result) {
+        result.setAttribute("baseXPath", currentBinding.getAbsoluteXPath());
+    }
+
     void handleDisplayValidationMessages(Element result) {
-        for (MCRValidator failedRule : editorSession.getValidator().getFailedRules()) {
-            result.addContent(failedRule.getRuleElement().clone());
-        }
+        editorSession.getValidator().getFailedRules().stream()
+            .map(MCRValidator::getRuleElement)
+            .filter(rule -> rule.getAttributeValue(ATTR_DISPLAY, "").contains(VALUE_GLOBAL))
+            .forEach(result::addContent);
     }
 
     void handleDisplayValidationMessage(Element result) {
         if (hasValidationError()) {
             Element failedRule = editorSession.getValidator().getFailedRule(currentBinding).getRuleElement();
-            result.addContent(failedRule.clone());
+            if (failedRule.getAttributeValue(ATTR_DISPLAY, "").contains(VALUE_LOCAL)) {
+                result.addContent(failedRule.clone());
+            }
         }
     }
 
@@ -502,8 +513,10 @@ public class MCRTransformerHelper {
         }
     }
 
-    void handleTextarea(Element result) {
-        result.setAttribute(ATTR_NAME, getAbsoluteXPath());
+    void handleTextarea(Map<String, String> attributes, Element result) {
+        handleReplaceXPaths(attributes, result);
+
+        result.setAttribute(ATTR_NAME, currentBinding.getAbsoluteXPath());
 
         String value = currentBinding.getValue();
         if (value != null) {
@@ -527,9 +540,9 @@ public class MCRTransformerHelper {
     }
 
     private void setXPath(Element result, boolean fixPathForMultiple) {
-        String xPath = getAbsoluteXPath();
+        String xPath = currentBinding.getAbsoluteXPath();
         if (fixPathForMultiple && xPath.endsWith(PREDICATE_IS_FIRST)) {
-            xPath = xPath.substring(0, xPath.length() - 3);
+            xPath = xPath.substring(0, xPath.length() - PREDICATE_IS_FIRST.length());
         }
         result.setAttribute(ATTR_NAME, xPath);
     }

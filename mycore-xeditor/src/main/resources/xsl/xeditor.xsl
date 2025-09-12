@@ -31,7 +31,7 @@
   <xsl:template match="xed:form">
     <xsl:call-template name="callTransformerHelper" />
     <form action="{$ServletsBaseURL}XEditor">
-      <xsl:apply-templates select="@*" mode="xeditor" />
+      <xsl:call-template name="replaceXPathsInAttributes" />
 
       <!-- method="post" is default, may be overwritten by xed:form/@method -->
       <xsl:if test="not(@method)">
@@ -100,13 +100,23 @@
 
   <!-- ========== Text ========== -->
 
-  <xsl:template match="@*[contains(.,'{')]" mode="xeditor">
-    <xsl:attribute name="{name()}">
-      <xsl:value-of select="helper:replaceXPaths($helper,.)" />
-    </xsl:attribute>
+  <xsl:template name="replaceXPathsInAttributes">
+    <xsl:choose>
+      <xsl:when test="@*[contains(.,'{')]">
+        <xsl:variable name="uri">
+          <xsl:call-template name="callTransformerHelperURI">
+            <xsl:with-param name="method" select="'replaceXPaths'" />
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:copy-of select="document($uri)/result/@*" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:copy-of select="@*" />
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="@*|text()" mode="xeditor">
+  <xsl:template match="text()" mode="xeditor">
     <xsl:copy-of select="." />
   </xsl:template>
 
@@ -131,7 +141,8 @@
   <xsl:template match="*" mode="xeditor">
     <xsl:copy>
       <xsl:apply-templates select="." mode="add-attributes" />
-      <xsl:apply-templates select="@*|node()" mode="xeditor" />
+      <xsl:call-template name="replaceXPathsInAttributes" />
+      <xsl:apply-templates select="node()" mode="xeditor" />
     </xsl:copy>
   </xsl:template>
 
@@ -156,7 +167,8 @@
   <xsl:template match="select" mode="xeditor">
     <xsl:copy>
       <xsl:call-template name="callTransformerHelper" />
-      <xsl:apply-templates select="@*|node()" mode="xeditor" />
+      <xsl:call-template name="replaceXPathsInAttributes" />
+      <xsl:apply-templates select="node()" mode="xeditor" />
       <xsl:call-template name="callTransformerHelper" />
     </xsl:copy>
   </xsl:template>
@@ -171,7 +183,6 @@
 
   <xsl:template match="textarea" mode="xeditor">
     <xsl:copy>
-      <xsl:apply-templates select="@*[name()!='name']" mode="xeditor" />
       <xsl:call-template name="callTransformerHelper" />
       <xsl:apply-templates select="node()" mode="xeditor" />
     </xsl:copy>
@@ -215,10 +226,11 @@
   <!-- ========== <xed:validate xpath="" display="here|local|global" i18n="key" required="true" matches="regExp" test="xPathExpression" ... /> ========== -->
 
   <xsl:template match="xed:validate" mode="xeditor">
+    <xsl:variable name="uri">
+      <xsl:call-template name="callTransformerHelperURI" />
+    </xsl:variable>
     <xsl:copy>
-      <xsl:attribute name="baseXPath">
-        <xsl:value-of select="helper:getAbsoluteXPath($helper)" />
-      </xsl:attribute>
+      <xsl:copy-of select="document($uri)/result/@baseXPath" />
       <xsl:copy-of select="@*|node()" />
     </xsl:copy>
     
@@ -241,36 +253,26 @@
 
   <xsl:template match="xed:display-validation-message" mode="xeditor">
     <xsl:variable name="uri">
-      <xsl:call-template name="callTransformerHelperURI">
-        <xsl:with-param name="method" select="'displayValidationMessage'" />
-      </xsl:call-template>
+      <xsl:call-template name="callTransformerHelperURI" />
     </xsl:variable>
-    <xsl:for-each select="document($uri)/result/*">
-      <xsl:if test="contains(@display,'local')">
-        <xsl:apply-templates select="." mode="message" />
-      </xsl:if>
-    </xsl:for-each>
+    <xsl:apply-templates select="document($uri)/result/xed:validate" mode="message" />
   </xsl:template>
 
   <!-- ========== <xed:display-validation-messages /> (global) ========== -->
 
   <xsl:template match="xed:display-validation-messages" mode="xeditor">
     <xsl:variable name="uri">
-      <xsl:call-template name="callTransformerHelperURI">
-        <xsl:with-param name="method" select="'displayValidationMessages'" />
-      </xsl:call-template>
+      <xsl:call-template name="callTransformerHelperURI" />
     </xsl:variable>
-    <xsl:for-each select="document($uri)/result/*">
-      <xsl:if test="contains(@display,'global')">
-        <xsl:if test="@xpath">
-          <xsl:call-template name="callTransformerHelper">
-            <xsl:with-param name="method" select="'bind'" />
-          </xsl:call-template>
-        </xsl:if>
-        <xsl:apply-templates select="." mode="message" />
-        <xsl:if test="@xpath">
-          <xsl:call-template name="unbind" />
-        </xsl:if>
+    <xsl:for-each select="document($uri)/result/xed:validate">
+      <xsl:if test="@xpath">
+        <xsl:call-template name="callTransformerHelper">
+          <xsl:with-param name="method" select="'bind'" />
+        </xsl:call-template>
+      </xsl:if>
+      <xsl:apply-templates select="." mode="message" />
+      <xsl:if test="@xpath">
+        <xsl:call-template name="unbind" />
       </xsl:if>
     </xsl:for-each>
   </xsl:template>
@@ -346,7 +348,7 @@
       <xsl:value-of select="concat('xmlns:',name(),'=',encoder:encode(.,'UTF-8'),'&amp;')" />
     </xsl:for-each>
     <xsl:if test="$addText">
-      <xsl:value-of select="concat('text=',text(),'&amp;')" />
+      <xsl:value-of select="concat('text=',.,'&amp;')" />
     </xsl:if>
   </xsl:template>
   

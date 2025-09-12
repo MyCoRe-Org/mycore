@@ -108,7 +108,7 @@ public class MCRTransformerHelperResolver implements URIResolver {
                 tfhelper.handleInput(attributes, result);
                 break;
             case "textarea":
-                tfhelper.handleTextarea(result);
+                tfhelper.handleTextarea(attributes, result);
                 break;
             case "button":
                 tfhelper.handleSubmitButton(attributes, result);
@@ -144,11 +144,17 @@ public class MCRTransformerHelperResolver implements URIResolver {
             case "output":
                 tfhelper.handleOutput(attributes, result);
                 break;
-            case "displayValidationMessage":
+            case "validate":
+                tfhelper.handleValidationRule(attributes, result);
+                break;
+            case "display-validation-message":
                 tfhelper.handleDisplayValidationMessage(result);
                 break;
-            case "displayValidationMessages":
+            case "display-validation-messages":
                 tfhelper.handleDisplayValidationMessages(result);
+                break;
+            case "replaceXPaths":
+                tfhelper.handleReplaceXPaths(attributes, result);
                 break;
             default:
                 ;
