@@ -51,15 +51,6 @@ public class MCRTransformerHelperResolver implements URIResolver {
             case "form":
                 tfhelper.handleForm(call);
                 break;
-            case "preload":
-                tfhelper.handlePreload(call);
-                break;
-            case "include":
-                tfhelper.handleInclude(call);
-                break;
-            case "getAdditionalParameters":
-                tfhelper.handleGetAdditionalParameters(call);
-                break;
             case "input":
                 tfhelper.handleInput(call);
                 break;

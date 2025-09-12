@@ -36,20 +36,11 @@ public class MCRBindTransformerHelper extends MCRTransformerHelperBase {
 
     @Override
     Collection<String> getSupportedMethods() {
-        return Arrays.asList("bind", "unbind");
+        return Arrays.asList("bind");
     }
 
     @Override
     void handle(MCRTransformerHelperCall call) throws Exception {
-        if ("bind".equals(call.getMethod())) {
-            handleBind(call);
-        } else {
-            handleUnbind();
-        }
-
-    }
-
-    void handleBind(MCRTransformerHelperCall call) throws JaxenException {
         call.registerDeclaredNamespaces();
 
         String xPath = call.getAttributeValue("xpath");
@@ -109,9 +100,4 @@ public class MCRBindTransformerHelper extends MCRTransformerHelperBase {
         state.currentBinding.setDefault(value);
         state.editorSession.getSubmission().markDefaultValue(state.currentBinding.getAbsoluteXPath(), value);
     }
-
-    void handleUnbind() {
-        state.setCurrentBinding(state.currentBinding.getParent());
-    }
-
 }

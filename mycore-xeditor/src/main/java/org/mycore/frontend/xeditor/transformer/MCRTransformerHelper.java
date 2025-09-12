@@ -30,8 +30,6 @@ import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXPathEvaluator;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
-import org.mycore.frontend.xeditor.MCREditorSessionStore;
-import org.mycore.frontend.xeditor.MCREditorSubmission;
 import org.mycore.frontend.xeditor.target.MCRSubselectTarget;
 
 /**
@@ -42,14 +40,12 @@ public class MCRTransformerHelper {
     private static final char COLON = ':';
 
     private static final String ATTR_URI = "uri";
-    private static final String ATTR_REF = "ref";
     private static final String ATTR_NAME = "name";
     private static final String ATTR_VALUE = "value";
     private static final String ATTR_XPATH = "xpath";
     private static final String ATTR_TYPE = "type";
     private static final String ATTR_HREF = "xed:href";
     private static final String ATTR_TARGET = "xed:target";
-    private static final String ATTR_STYLE = "style";
     private static final String ATTR_RELEVANT_IF = "relevant-if";
 
     private static final String TYPE_CHECKBOX = "checkbox";
@@ -78,7 +74,11 @@ public class MCRTransformerHelper {
             new MCRSourceTransformerHelper(),
             new MCRCancelTransformerHelper(),
             new MCRParamTransformerHelper(),
-            new MCRBindTransformerHelper());
+            new MCRBindTransformerHelper(),
+            new MCRUnbindTransformerHelper(),
+            new MCRGetAdditionalParamsTransformerHelper(),
+            new MCRPreloadTransformerHelper(),
+            new MCRIncludeTransformerHandler());
 
         helpers.forEach(helper -> {
             helper.init(this);
@@ -151,66 +151,10 @@ public class MCRTransformerHelper {
         call.getReturnElement().setAttribute(ATTR_NAME, name.toString());
     }
 
-    void handleGetAdditionalParameters(MCRTransformerHelperCall call) {
-        Element div = new Element("div").setAttribute(ATTR_STYLE, "visibility:hidden");
-
-        Map<String, String[]> parameters = editorSession.getRequestParameters();
-        for (String name : parameters.keySet()) {
-            for (String value : parameters.get(name)) {
-                if ((value != null) && !value.isEmpty()) {
-                    div.addContent(buildAdditionalParameterElement(name, value));
-                }
-            }
-        }
-
-        String xPaths2CheckResubmission = editorSession.getSubmission().getXPaths2CheckResubmission();
-        if (!xPaths2CheckResubmission.isEmpty()) {
-            div.addContent(buildAdditionalParameterElement(MCREditorSubmission.PREFIX_CHECK_RESUBMISSION,
-                xPaths2CheckResubmission));
-        }
-
-        Map<String, String> defaultValues = editorSession.getSubmission().getDefaultValues();
-        for (String xPath : defaultValues.keySet()) {
-            div.addContent(buildAdditionalParameterElement(MCREditorSubmission.PREFIX_DEFAULT_VALUE + xPath,
-                defaultValues.get(xPath)));
-        }
-
-        editorSession.setBreakpoint("After transformation to HTML");
-        div.addContent(buildAdditionalParameterElement(MCREditorSessionStore.XEDITOR_SESSION_PARAM,
-            editorSession.getCombinedSessionStepID()));
-
-        call.getReturnElement().addContent(div);
-    }
-
-    private Element buildAdditionalParameterElement(String name, String value) {
-        Element input = new Element("input");
-        input.setAttribute("type", "hidden");
-        input.setAttribute("name", name);
-        input.setAttribute("value", value);
-        return input;
-    }
-
     void handleCleanupRule(MCRTransformerHelperCall call) {
         String xPath = call.getAttributeValue(ATTR_XPATH);
         String relevantIf = call.getAttributeValue(ATTR_RELEVANT_IF);
         editorSession.getXMLCleaner().addRule(xPath, relevantIf);
-    }
-
-    void handlePreload(MCRTransformerHelperCall call) {
-        replaceParameters(call, ATTR_URI);
-    }
-
-    void handleInclude(MCRTransformerHelperCall call) {
-        replaceParameters(call, ATTR_URI, ATTR_REF);
-    }
-
-    private void replaceParameters(MCRTransformerHelperCall call, String... attributesToHandle) {
-        for (String attrName : attributesToHandle) {
-            String attrValue = call.getAttributeValue(attrName);
-            if (attrValue != null) {
-                call.getReturnElement().setAttribute(attrName, replaceParameters(attrValue));
-            }
-        }
     }
 
     void handleTextarea(MCRTransformerHelperCall call) {
