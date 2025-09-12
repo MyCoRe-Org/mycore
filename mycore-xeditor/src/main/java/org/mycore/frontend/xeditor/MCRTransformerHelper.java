@@ -27,6 +27,7 @@ import java.util.Objects;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.jaxen.BaseXPath;
 import org.jaxen.JaxenException;
 import org.jaxen.dom.DocumentNavigator;
@@ -54,52 +55,108 @@ import org.xml.sax.SAXException;
  */
 public class MCRTransformerHelper {
 
+    private static final char COLON = ':';
+
+    private static final String CONTROL_INSERT = "insert";
+    private static final String CONTROL_APPEND = "append";
+    private static final String CONTROL_REMOVE = "remove";
+    private static final String CONTROL_UP = "up";
+    private static final String CONTROL_DOWN = "down";
+
+    private static final String DEFAULT_CONTROLS =
+        String.join(" ", CONTROL_INSERT, CONTROL_REMOVE, CONTROL_UP, CONTROL_DOWN);
+
+    private static final String ATTR_URL = "url";
+    private static final String ATTR_URI = "uri";
+    private static final String ATTR_REF = "ref";
+    private static final String ATTR_NAME = "name";
+    private static final String ATTR_VALUE = "value";
+    private static final String ATTR_XPATH = "xpath";
+    private static final String ATTR_TYPE = "type";
+    private static final String ATTR_TEXT = "text";
+    private static final String ATTR_I18N = "i18n";
+    private static final String ATTR_HREF = "xed:href";
+    private static final String ATTR_TARGET = "xed:target";
+    private static final String ATTR_STYLE = "style";
+    private static final String ATTR_RELEVANT_IF = "relevant-if";
+    private static final String ATTR_MULTIPLE = "multiple";
+    private static final String ATTR_DEFAULT = "default";
+    private static final String ATTR_CLASS = "class";
+    private static final String ATTR_TEST = "test";
+    private static final String ATTR_METHOD = "method";
+    private static final String ATTR_MAX = "max";
+    private static final String ATTR_MIN = "min";
+
+    private static final String TYPE_CHECKBOX = "checkbox";
+    private static final String TYPE_RADIO = "radio";
+
+    private static final String VALUE_SELECTED = "selected";
+    private static final String VALUE_CHECKED = "checked";
+
+    private static final String PREDICATE_IS_FIRST = "[1]";
+
+    private static final String PREFIX_XMLNS = "xmlns:";
+
     private final MCREditorSession editorSession;
 
     private MCRBinding currentBinding;
 
-    public int anchorID;
+    private int anchorID;
 
     private boolean withinSelectElement;
-
-    private boolean withinSelectMultiple;
 
     MCRTransformerHelper(MCREditorSession editorSession) {
         this.editorSession = editorSession;
     }
 
-    public void addNamespace(String prefix, String uri) {
-        MCRConstants.registerNamespace(Namespace.getNamespace(prefix, uri));
+    void handleForm(Map<String, String> attributes) {
+        registerAdditionalNamespaces(attributes);
     }
 
-    void readSourceXML(String uri) throws JDOMException, IOException, SAXException, TransformerException {
+    private void registerAdditionalNamespaces(Map<String, String> attributes) {
+        attributes.forEach((key, value) -> {
+            if (key.startsWith(PREFIX_XMLNS)) {
+                String prefix = key.substring(PREFIX_XMLNS.length());
+                String uri = attributes.get(key);
+                MCRConstants.registerNamespace(Namespace.getNamespace(prefix, uri));
+            }
+        });
+        attributes.keySet().removeIf(key -> key.startsWith(PREFIX_XMLNS));
+    }
+
+    void handleSource(Map<String, String> attributes)
+        throws JDOMException, IOException, SAXException, TransformerException {
+        String uri = attributes.get(ATTR_URI);
         editorSession.setEditedXML(uri);
     }
 
-    void setCancelURL(String cancelURL) {
+    void handleCancel(Map<String, String> attributes) {
+        String cancelURL = attributes.get(ATTR_URL);
         editorSession.setCancelURL(cancelURL);
     }
 
-    void initializePostprocessor(Map<String, String> attributeMap) {
-        editorSession.getPostProcessor().setAttributes(attributeMap);
-    }
-
-    void setPostProcessor(String clazz) {
-        try {
-            MCRXEditorPostProcessor instance = ((MCRXEditorPostProcessor) MCRClassTools.forName(clazz)
-                .getDeclaredConstructor()
-                .newInstance());
-            editorSession.setPostProcessor(instance);
-        } catch (ReflectiveOperationException e) {
-            throw new MCRException("Could not initialize Post-Processor with class" + clazz, e);
+    void handlePostProcessor(Map<String, String> attributes) {
+        String clazz = attributes.getOrDefault(ATTR_CLASS, null);
+        if (clazz != null) {
+            try {
+                MCRXEditorPostProcessor instance = ((MCRXEditorPostProcessor) MCRClassTools.forName(clazz)
+                    .getDeclaredConstructor()
+                    .newInstance());
+                editorSession.setPostProcessor(instance);
+            } catch (ReflectiveOperationException e) {
+                throw new MCRException("Could not initialize Post-Processor with class" + clazz, e);
+            }
         }
+        editorSession.getPostProcessor().setAttributes(attributes);
     }
 
-    public String replaceParameters(String uri) {
+    private String replaceParameters(String uri) {
         return getXPathEvaluator().replaceXPaths(uri, false);
     }
 
-    void bind(Map<String, String> attributes) throws JaxenException {
+    void handleBind(Map<String, String> attributes) throws JaxenException {
+        registerAdditionalNamespaces(attributes);
+
         String xPath = attributes.get("xpath");
         String initialValue = attributes.getOrDefault("initially", null);
         String name = attributes.getOrDefault("name", null);
@@ -163,7 +220,7 @@ public class MCRTransformerHelper {
         editorSession.getSubmission().markDefaultValue(currentBinding.getAbsoluteXPath(), value);
     }
 
-    void unbind() {
+    void handleUnbind() {
         setCurrentBinding(currentBinding.getParent());
     }
 
@@ -171,60 +228,65 @@ public class MCRTransformerHelper {
         return currentBinding.getAbsoluteXPath();
     }
 
-    public String getValue() {
-        return currentBinding.getValue();
-    }
-
-    public boolean hasValue(String value) {
+    private boolean hasValue(String value) {
         editorSession.getSubmission().mark2checkResubmission(currentBinding);
         return currentBinding.hasValue(value);
     }
 
-    void toggleWithinSelectElement(String attrMultiple) {
+    void handleSelect(Map<String, String> attributes, Element result) {
         withinSelectElement = !withinSelectElement;
-        withinSelectMultiple = Objects.equals(attrMultiple, "multiple");
+
+        String attrMultiple = attributes.getOrDefault(ATTR_MULTIPLE, null);
+        boolean withinSelectMultiple = Objects.equals(attrMultiple, "multiple");
+
+        if (withinSelectElement) {
+            setXPath(result, withinSelectMultiple);
+        }
     }
 
-    public boolean isWithinSelectElement() {
-        return withinSelectElement;
-    }
+    void handleOption(Map<String, String> attributes, Element result) {
+        if (withinSelectElement) {
+            String value = attributes.getOrDefault(ATTR_VALUE, attributes.get(ATTR_TEXT));
 
-    public boolean isWithinSelectMultiple() {
-        return withinSelectMultiple;
+            if ((!Strings.isEmpty(value)) && hasValue(value)) {
+                result.setAttribute(VALUE_SELECTED, VALUE_SELECTED);
+            }
+        }
     }
 
     public String replaceXPaths(String text) {
         return getXPathEvaluator().replaceXPaths(text, false);
     }
 
-    public String replaceXPathOrI18n(String expression) {
-        return getXPathEvaluator().replaceXPathOrI18n(expression);
+    void handleOutput(Map<String, String> attributes, Element result) {
+        String value = attributes.getOrDefault(ATTR_VALUE, null);
+        String i18n = attributes.getOrDefault(ATTR_I18N, null);
+        String output = output(value, i18n);
+        result.setText(output);
     }
 
-    public String evaluateXPath(String xPathExpression) {
-        return getXPathEvaluator().evaluateXPath(xPathExpression);
-    }
-
-    String output(String attrValue, String attrI18N) {
+    private String output(String attrValue, String attrI18N) {
         if (!StringUtils.isEmpty(attrI18N)) {
             String key = replaceParameters(attrI18N);
 
             if (StringUtils.isEmpty(attrValue)) {
                 return MCRTranslation.translate(key);
             } else {
-                String value = evaluateXPath(attrValue);
+                String value = getXPathEvaluator().evaluateXPath(attrValue);
                 return MCRTranslation.translate(key, value);
             }
 
         } else if (!StringUtils.isEmpty(attrValue)) {
-            return replaceXPathOrI18n(attrValue);
+            return getXPathEvaluator().replaceXPathOrI18n(attrValue);
         } else {
-            return getValue();
+            return currentBinding.getValue();
         }
     }
 
-    public boolean test(String xPathExpression) {
-        return getXPathEvaluator().test(xPathExpression);
+    void handleTest(Map<String, String> attributes, Element result) {
+        String xPathExpression = attributes.get(ATTR_TEST);
+        boolean testResult = getXPathEvaluator().test(xPathExpression);
+        result.setText(Boolean.toString(testResult));
     }
 
     private MCRXPathEvaluator getXPathEvaluator() {
@@ -235,7 +297,19 @@ public class MCRTransformerHelper {
         }
     }
 
-    List<Element> repeat(String xPath, int minRepeats, int maxRepeats, String method)
+    void handleRepeat(Map<String, String> attributes, Element result)
+        throws JaxenException {
+        registerAdditionalNamespaces(attributes);
+
+        String xPath = attributes.get(ATTR_XPATH);
+        int minRepeats = Integer.parseInt(attributes.getOrDefault(ATTR_MIN, "0"));
+        int maxRepeats = Integer.parseInt(attributes.getOrDefault(ATTR_MAX, "0"));
+        String method = attributes.get(ATTR_METHOD);
+        List<Element> repeats = repeat(xPath, minRepeats, maxRepeats, method);
+        result.addContent(repeats);
+    }
+
+    private List<Element> repeat(String xPath, int minRepeats, int maxRepeats, String method)
         throws JaxenException {
         MCRRepeatBinding repeat = new MCRRepeatBinding(xPath, currentBinding, minRepeats, maxRepeats, method);
         setCurrentBinding(repeat);
@@ -253,99 +327,137 @@ public class MCRTransformerHelper {
         return (MCRRepeatBinding) binding;
     }
 
-    int getNumRepeats() {
-        return getCurrentRepeat().getBoundNodes().size();
+    void handleControls(Map<String, String> attributes, Element result)
+        throws JaxenException {
+        int pos = getCurrentRepeat().getRepeatPosition();
+        int num = getCurrentRepeat().getBoundNodes().size();
+        int max = getCurrentRepeat().getMaxRepeats();
+
+        String text = attributes.getOrDefault(ATTR_TEXT, DEFAULT_CONTROLS);
+        for (String token : text.split("\\s+")) {
+            if ((CONTROL_APPEND.equals(token) && (pos < num)) ||
+                (CONTROL_UP.equals(token) && (pos == 1)) ||
+                (CONTROL_DOWN.equals(token) && (pos == num)) ||
+                ((CONTROL_INSERT.equals(token) || CONTROL_APPEND.equals(token)) && (num == max))) {
+                continue;
+            }
+
+            Element control = new Element("control").setText(token);
+
+            StringBuilder name = new StringBuilder();
+            name.append("_xed_submit_").append(token).append(COLON);
+
+            if (CONTROL_APPEND.equals(token) || CONTROL_INSERT.equals(token)) {
+                name.append(MCRInsertTarget.getInsertParameter(getCurrentRepeat()));
+            } else if (CONTROL_REMOVE.equals(token)) {
+                name.append(getAbsoluteXPath());
+            } else if (CONTROL_UP.equals(token) || CONTROL_DOWN.equals(token)) {
+                name.append(getSwapParameter(token));
+            }
+
+            name.append("|rep-");
+
+            if (CONTROL_REMOVE.equals(token) && (pos > 1)) {
+                name.append(previousAnchorID());
+            } else {
+                name.append(anchorID);
+            }
+
+            control.setAttribute(ATTR_NAME, name.toString());
+            result.addContent(control);
+        }
     }
 
-    int getMaxRepeats() {
-        return getCurrentRepeat().getMaxRepeats();
-    }
-
-    public int getRepeatPosition() {
-        return getCurrentRepeat().getRepeatPosition();
-    }
-
-    public int bindRepeatPosition() {
-        setCurrentBinding(getCurrentRepeat().bindRepeatPosition());
-        editorSession.getValidator().setValidationMarker(currentBinding);
-        return nextAnchorID();
-    }
-
-    public String getSwapParameter(String action) throws JaxenException {
-        boolean direction = Objects.equals(action, "down") ? MCRSwapTarget.MOVE_DOWN : MCRSwapTarget.MOVE_UP;
+    private String getSwapParameter(String action) throws JaxenException {
+        boolean direction = Objects.equals(action, CONTROL_DOWN) ? MCRSwapTarget.MOVE_DOWN : MCRSwapTarget.MOVE_UP;
         return MCRSwapTarget.getSwapParameter(getCurrentRepeat(), direction);
     }
 
-    public String getInsertParameter() throws JaxenException {
-        return MCRInsertTarget.getInsertParameter(getCurrentRepeat());
+    void handleBindRepeatPosition(Element result) {
+        setCurrentBinding(getCurrentRepeat().bindRepeatPosition());
+        editorSession.getValidator().setValidationMarker(currentBinding);
+
+        Element anchor = new Element("a");
+        String id = "rep-" + ++anchorID;
+        anchor.setAttribute("id", id);
+        result.addContent(anchor);
     }
 
-    private int nextAnchorID() {
-        return ++anchorID;
-    }
-
-    public int getAnchorID() {
-        return anchorID;
-    }
-
-    public int previousAnchorID() {
+    private int previousAnchorID() {
         return (anchorID == 0 ? 1 : anchorID - 1);
     }
 
-    void loadResource(String uri, String name) {
+    void handleLoadResource(Map<String, String> attributes) {
+        String uri = attributes.get(ATTR_URI);
+        String name = attributes.get(ATTR_NAME);
+
         Element resource = MCRURIResolver.obtainInstance().resolve(replaceXPaths(uri));
         editorSession.getVariables().put(name, resource);
+    }
+
+    void handleDisplayValidationMessages(Element result) {
+        for (MCRValidator failedRule : editorSession.getValidator().getFailedRules()) {
+            result.addContent(failedRule.getRuleElement().clone());
+        }
+    }
+
+    void handleDisplayValidationMessage(Element result) {
+        if (hasValidationError()) {
+            Element failedRule = editorSession.getValidator().getFailedRule(currentBinding).getRuleElement();
+            result.addContent(failedRule.clone());
+        }
     }
 
     public boolean hasValidationError() {
         return editorSession.getValidator().hasError(currentBinding);
     }
 
-    public Element getFailedValidationRule() {
-        return editorSession.getValidator().getFailedRule(currentBinding).getRuleElement();
-    }
+    void handleSubmitButton(Map<String, String> attributes, Element result) {
+        String target = attributes.get(ATTR_TARGET);
+        String href = attributes.get(ATTR_HREF);
 
-    public List<Element> getFailedValidationRules() {
-        List<Element> failedRuleElements = new ArrayList<>();
-        for (MCRValidator failedRule : editorSession.getValidator().getFailedRules()) {
-            failedRuleElements.add(failedRule.getRuleElement());
+        StringBuilder name = new StringBuilder();
+        name.append("_xed_submit_").append(target);
+
+        if ("subselect".equals(target)) {
+            name.append(COLON).append(currentBinding.getAbsoluteXPath()).append(COLON)
+                .append(MCRSubselectTarget.encode(href));
+        } else if (Strings.isNotBlank(href)) {
+            name.append(COLON).append(href);
         }
-        return failedRuleElements;
+
+        result.setAttribute(ATTR_NAME, name.toString());
     }
 
-    public String getSubselectParam(String href) {
-        return currentBinding.getAbsoluteXPath() + ":" + MCRSubselectTarget.encode(href);
-    }
-
-    public List<Element> getAdditionalParameters() {
-        List<Element> hiddenFields = new ArrayList<>();
+    void handleGetAdditionalParameters(Element result) {
+        Element div = new Element("div").setAttribute(ATTR_STYLE, "visibility:hidden");
 
         Map<String, String[]> parameters = editorSession.getRequestParameters();
         for (String name : parameters.keySet()) {
             for (String value : parameters.get(name)) {
                 if ((value != null) && !value.isEmpty()) {
-                    hiddenFields.add(buildAdditionalParameterElement(name, value));
+                    div.addContent(buildAdditionalParameterElement(name, value));
                 }
             }
         }
 
         String xPaths2CheckResubmission = editorSession.getSubmission().getXPaths2CheckResubmission();
         if (!xPaths2CheckResubmission.isEmpty()) {
-            hiddenFields.add(buildAdditionalParameterElement(MCREditorSubmission.PREFIX_CHECK_RESUBMISSION,
+            div.addContent(buildAdditionalParameterElement(MCREditorSubmission.PREFIX_CHECK_RESUBMISSION,
                 xPaths2CheckResubmission));
         }
 
         Map<String, String> defaultValues = editorSession.getSubmission().getDefaultValues();
         for (String xPath : defaultValues.keySet()) {
-            hiddenFields.add(buildAdditionalParameterElement(MCREditorSubmission.PREFIX_DEFAULT_VALUE + xPath,
+            div.addContent(buildAdditionalParameterElement(MCREditorSubmission.PREFIX_DEFAULT_VALUE + xPath,
                 defaultValues.get(xPath)));
         }
 
         editorSession.setBreakpoint("After transformation to HTML");
-        hiddenFields.add(buildAdditionalParameterElement(MCREditorSessionStore.XEDITOR_SESSION_PARAM,
+        div.addContent(buildAdditionalParameterElement(MCREditorSessionStore.XEDITOR_SESSION_PARAM,
             editorSession.getCombinedSessionStepID()));
 
-        return hiddenFields;
+        result.addContent(div);
     }
 
     private Element buildAdditionalParameterElement(String name, String value) {
@@ -356,15 +468,69 @@ public class MCRTransformerHelper {
         return input;
     }
 
-    void addCleanupRule(String xPath, String relevantIf) {
+    void handleCleanupRule(Map<String, String> attributes) {
+        String xPath = attributes.get(ATTR_XPATH);
+        String relevantIf = attributes.get(ATTR_RELEVANT_IF);
         editorSession.getXMLCleaner().addRule(xPath, relevantIf);
     }
 
-    void declareParameter(String name, String defaultValue) {
+    void handleParam(Map<String, String> attributes) {
+        String name = attributes.get(ATTR_NAME);
+        String defaultValue = attributes.getOrDefault(ATTR_DEFAULT, null);
+
         Object currentValue = editorSession.getVariables().get(name);
 
         if ((currentValue == null) || Objects.equals(currentValue, "")) {
             editorSession.getVariables().put(name, defaultValue == null ? "" : defaultValue);
         }
+    }
+
+    void handlePreload(Map<String, String> attributes, Element result) {
+        replaceParameters(attributes, result, ATTR_URI);
+    }
+
+    void handleInclude(Map<String, String> attributes, Element result) {
+        replaceParameters(attributes, result, ATTR_URI, ATTR_REF);
+    }
+
+    private void replaceParameters(Map<String, String> attributes, Element result,
+        String... attributesToHandle) {
+        for (String attribute : attributesToHandle) {
+            if (attributes.containsKey(attribute)) {
+                result.setAttribute(attribute, replaceParameters(attributes.get(attribute)));
+            }
+        }
+    }
+
+    void handleTextarea(Element result) {
+        result.setAttribute(ATTR_NAME, getAbsoluteXPath());
+
+        String value = currentBinding.getValue();
+        if (value != null) {
+            result.setText(value);
+        }
+    }
+
+    void handleInput(Map<String, String> attributes, Element result) {
+        String type = attributes.get(ATTR_TYPE);
+
+        setXPath(result, TYPE_CHECKBOX.equals(type));
+
+        if (TYPE_RADIO.equals(type) || TYPE_CHECKBOX.equals(type)) {
+            String value = attributes.get(ATTR_VALUE);
+            if (hasValue(value)) {
+                result.setAttribute(VALUE_CHECKED, VALUE_CHECKED);
+            }
+        } else {
+            result.setAttribute(ATTR_VALUE, currentBinding.getValue());
+        }
+    }
+
+    private void setXPath(Element result, boolean fixPathForMultiple) {
+        String xPath = getAbsoluteXPath();
+        if (fixPathForMultiple && xPath.endsWith(PREDICATE_IS_FIRST)) {
+            xPath = xPath.substring(0, xPath.length() - 3);
+        }
+        result.setAttribute(ATTR_NAME, xPath);
     }
 }
