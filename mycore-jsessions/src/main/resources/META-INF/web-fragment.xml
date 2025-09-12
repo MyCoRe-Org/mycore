@@ -1,0 +1,17 @@
+<web-fragment version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-fragment_6_0.xsd"
+  metadata-complete="true">
+
+  <name>mycore_jsessions</name>
+  <ordering>
+    <after>
+      <name>mycore</name>
+    </after>
+  </ordering>
+
+  <listener>
+    <listener-class>org.mycore.jsessions.MCRSessionStoreListener</listener-class>
+  </listener>
+
+</web-fragment>
