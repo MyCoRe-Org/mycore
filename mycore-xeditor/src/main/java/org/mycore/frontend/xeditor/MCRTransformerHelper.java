@@ -419,7 +419,12 @@ public class MCRTransformerHelper {
         }
     }
 
-    public boolean hasValidationError() {
+    void handleHasValidationError(Element result) {
+        if (hasValidationError())
+            result.setText(String.valueOf(true));
+    }
+
+    private boolean hasValidationError() {
         return editorSession.getValidator().hasError(currentBinding);
     }
 

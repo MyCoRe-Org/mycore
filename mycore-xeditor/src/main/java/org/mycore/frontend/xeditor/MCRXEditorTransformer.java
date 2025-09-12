@@ -49,30 +49,31 @@ public class MCRXEditorTransformer {
     public MCRContent transform(MCRContent editorSource) throws IOException {
         editorSession.getSubmission().clear();
 
+        MCRTransformerHelper helper = new MCRTransformerHelper(editorSession);
+        editorSession.setTransformerHelper(helper);
+
         MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer("xeditor");
-        if (transformer instanceof MCRParameterizedTransformer parameterizedTransformer) {
-            MCRTransformerHelper helper = new MCRTransformerHelper(editorSession);
-            editorSession.setTransformerHelper(helper);
-            transformationParameters.setParameter("helper", helper);
-            transformationParameters.setParameter("SessionID", editorSession.getID());
-
-            MCRContent result = parameterizedTransformer.transform(editorSource, transformationParameters);
-            if (result instanceof MCRWrappedContent wrappedContent
-                && result.getClass().getName().contains(MCRXSLTransformer.class.getName())) {
-                //lazy transformation make JUnit tests fail
-                result = wrappedContent.getBaseContent();
-            }
-
-            editorSession.setTransformerHelper(null);
-
-            Document xed = content2xml(result);
-
-            editorSession.getValidator().setNewValidationRules(xed);
-
-            return new MCRJDOMContent(xed);
-        } else {
+        if (!(transformer instanceof MCRParameterizedTransformer)) {
             throw new MCRException("Xeditor needs parameterized MCRContentTransformer: " + transformer);
         }
+
+        transformationParameters.setParameter("SessionID", editorSession.getID());
+
+        MCRParameterizedTransformer parameterizedTransformer = (MCRParameterizedTransformer) transformer;
+        MCRContent result = parameterizedTransformer.transform(editorSource, transformationParameters);
+        if (result instanceof MCRWrappedContent wrappedContent
+            && result.getClass().getName().contains(MCRXSLTransformer.class.getName())) {
+            //lazy transformation make JUnit tests fail
+            result = wrappedContent.getBaseContent();
+        }
+
+        editorSession.setTransformerHelper(null);
+
+        Document xed = content2xml(result);
+
+        editorSession.getValidator().setNewValidationRules(xed);
+
+        return new MCRJDOMContent(xed);
     }
 
     private Document content2xml(MCRContent result) throws IOException {

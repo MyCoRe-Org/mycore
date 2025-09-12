@@ -3,9 +3,8 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xed="http://www.mycore.de/xeditor"
                 xmlns:xalan="http://xml.apache.org/xalan"
                 xmlns:encoder="xalan://java.net.URLEncoder"
-                xmlns:helper="xalan://org.mycore.frontend.xeditor.MCRTransformerHelper"
                 xmlns:includer="xalan://org.mycore.frontend.xeditor.MCRIncludeHandler"
-                exclude-result-prefixes="xsl xed xalan encoder helper includer">
+                exclude-result-prefixes="xsl xed xalan encoder includer">
 
   <xsl:strip-space elements="xed:*" />
 
@@ -15,7 +14,6 @@
   <xsl:param name="ServletsBaseURL" />
   <xsl:param name="CurrentLang" />
   <xsl:param name="DefaultLang" />
-  <xsl:param name="helper" />
 
   <xsl:variable name="includer" select="includer:new()" />
 
@@ -240,7 +238,12 @@
           <xsl:with-param name="method" select="'bind'" />
         </xsl:call-template>
       </xsl:if>
-      <xsl:if test="helper:hasValidationError($helper)">
+      <xsl:variable name="uri">
+        <xsl:call-template name="callTransformerHelperURI">
+          <xsl:with-param name="method" select="'hasValidationError'" />
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:if test="document($uri)/result='true'">
         <xsl:apply-templates select="." mode="message" />
       </xsl:if>
       <xsl:if test="@xpath">
@@ -348,7 +351,7 @@
       <xsl:value-of select="concat('xmlns:',name(),'=',encoder:encode(.,'UTF-8'),'&amp;')" />
     </xsl:for-each>
     <xsl:if test="$addText">
-      <xsl:value-of select="concat('text=',.,'&amp;')" />
+      <xsl:value-of select="concat('text=',encoder:encode(.,'UTF-8'),'&amp;')" />
     </xsl:if>
   </xsl:template>
   

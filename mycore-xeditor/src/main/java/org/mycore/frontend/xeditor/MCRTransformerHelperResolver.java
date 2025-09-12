@@ -147,6 +147,9 @@ public class MCRTransformerHelperResolver implements URIResolver {
             case "validate":
                 tfhelper.handleValidationRule(attributes, result);
                 break;
+            case "hasValidationError":
+                tfhelper.handleHasValidationError(result);
+                break;
             case "display-validation-message":
                 tfhelper.handleDisplayValidationMessage(result);
                 break;
