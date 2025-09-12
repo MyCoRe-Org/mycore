@@ -32,7 +32,9 @@ import javax.xml.transform.URIResolver;
 import org.jaxen.JaxenException;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.jdom2.Namespace;
 import org.jdom2.transform.JDOMSource;
+import org.mycore.common.MCRConstants;
 import org.mycore.frontend.xeditor.MCREditorSession;
 import org.mycore.frontend.xeditor.MCREditorSessionStoreUtils;
 import org.xml.sax.SAXException;
@@ -41,128 +43,188 @@ public class MCRTransformerHelperResolver implements URIResolver {
 
     @Override
     public Source resolve(String href, String base) throws TransformerException {
-        StringTokenizer uriTokenizer = new StringTokenizer(href, ":");
-        uriTokenizer.nextToken(); // remove schema
+        MCRTransformerHelperCall call = new MCRTransformerHelperCall(href);
 
-        String sessionID = uriTokenizer.nextToken();
-        MCREditorSession session = MCREditorSessionStoreUtils.getSessionStore().getSession(sessionID);
-        MCRTransformerHelper tfhelper = session.getTransformerHelper();
-
-        String elementName = uriTokenizer.nextToken();
-        Map<String, String> attributes = parseAttributes(uriTokenizer);
-
-        Element result = new Element("result");
         try {
-            handleXEditorElement(tfhelper, elementName, attributes, result);
+            handleXEditorElement(call);
         } catch (JDOMException | IOException | SAXException | JaxenException ex) {
             throw new TransformerException(ex);
         }
 
-        JDOMSource source = new JDOMSource(result);
+        JDOMSource source = new JDOMSource(call.getReturnElement());
         // Workaround to prevent URI Caching:
         source.setSystemId(source.getSystemId() + Math.random());
         return source;
     }
 
-    private Map<String, String> parseAttributes(StringTokenizer st) {
-        Map<String, String> attributes = new HashMap<>();
-        while (st.hasMoreTokens()) {
-            String name = st.nextToken("=").substring(1);
-            String value = st.nextToken("&").substring(1);
-            value = URLDecoder.decode(value, StandardCharsets.UTF_8);
-            attributes.put(name, value);
-        }
-        return attributes;
-    }
-
     @SuppressWarnings("PMD.NcssCount")
-    private void handleXEditorElement(MCRTransformerHelper tfhelper, String elementName, Map<String, String> attributes,
-        Element result) throws JaxenException, JDOMException, IOException, SAXException, TransformerException {
-        switch (elementName) {
+    private void handleXEditorElement(MCRTransformerHelperCall call)
+        throws JaxenException, JDOMException, IOException, SAXException, TransformerException {
+
+        MCRTransformerHelper tfhelper = call.getTransformerHelper();
+
+        switch (call.getMethod()) {
             case "form":
-                tfhelper.handleForm(attributes);
+                tfhelper.handleForm(call);
                 break;
             case "preload":
-                tfhelper.handlePreload(attributes, result);
+                tfhelper.handlePreload(call);
                 break;
             case "include":
-                tfhelper.handleInclude(attributes, result);
+                tfhelper.handleInclude(call);
                 break;
             case "getAdditionalParameters":
-                tfhelper.handleGetAdditionalParameters(result);
+                tfhelper.handleGetAdditionalParameters(call);
                 break;
             case "bind":
-                tfhelper.handleBind(attributes);
+                tfhelper.handleBind(call);
                 break;
             case "unbind":
                 tfhelper.handleUnbind();
                 break;
             case "repeat":
-                tfhelper.handleRepeat(attributes, result);
+                tfhelper.repeatTransformer.handleRepeat(call);
                 break;
             case "bindRepeatPosition":
-                tfhelper.handleBindRepeatPosition(result);
+                tfhelper.repeatTransformer.handleBindRepeatPosition(call);
                 break;
             case "controls":
-                tfhelper.handleControls(attributes, result);
+                tfhelper.repeatTransformer.handleControls(call);
                 break;
             case "input":
-                tfhelper.handleInput(attributes, result);
+                tfhelper.handleInput(call);
                 break;
             case "textarea":
-                tfhelper.handleTextarea(attributes, result);
+                tfhelper.handleTextarea(call);
                 break;
             case "button":
-                tfhelper.handleSubmitButton(attributes, result);
+                tfhelper.handleSubmitButton(call);
                 break;
             case "if":
             case "when":
-                tfhelper.handleTest(attributes, result);
+                tfhelper.handleTest(call);
                 break;
             case "source":
-                tfhelper.handleSource(attributes);
+                tfhelper.handleSource(call);
                 break;
             case "cancel":
-                tfhelper.handleCancel(attributes);
+                tfhelper.handleCancel(call);
                 break;
             case "post-processor":
-                tfhelper.handlePostProcessor(attributes);
+                tfhelper.handlePostProcessor(call);
                 break;
             case "param":
-                tfhelper.handleParam(attributes);
+                tfhelper.handleParam(call);
                 break;
             case "select":
-                tfhelper.handleSelect(attributes, result);
+                tfhelper.selectTransformer.handleSelect(call);
                 break;
             case "option":
-                tfhelper.handleOption(attributes, result);
+                tfhelper.selectTransformer.handleOption(call);
                 break;
             case "cleanup-rule":
-                tfhelper.handleCleanupRule(attributes);
+                tfhelper.handleCleanupRule(call);
                 break;
             case "load-resource":
-                tfhelper.handleLoadResource(attributes);
+                tfhelper.handleLoadResource(call);
                 break;
             case "output":
-                tfhelper.handleOutput(attributes, result);
+                tfhelper.handleOutput(call);
                 break;
             case "validate":
-                tfhelper.handleValidationRule(attributes, result);
+                tfhelper.validationTransformer.handleValidationRule(call);
                 break;
             case "hasValidationError":
-                tfhelper.handleHasValidationError(result);
+                tfhelper.validationTransformer.handleHasValidationError(call);
                 break;
             case "display-validation-message":
-                tfhelper.handleDisplayValidationMessage(result);
+                tfhelper.validationTransformer.handleDisplayValidationMessage(call);
                 break;
             case "display-validation-messages":
-                tfhelper.handleDisplayValidationMessages(result);
+                tfhelper.validationTransformer.handleDisplayValidationMessages(call);
                 break;
             case "replaceXPaths":
-                tfhelper.handleReplaceXPaths(attributes, result);
+                tfhelper.handleReplaceXPaths(call);
                 break;
             default:
                 ;
         }
+    }
+}
+
+class MCRTransformerHelperCall {
+
+    private static final String PREFIX_XMLNS = "xmlns:";
+
+    private MCRTransformerHelper helper;
+
+    private String method;
+
+    private Map<String, String> attributeMap = new HashMap<>();
+
+    private Map<String, String> namespaceMap = new HashMap<>();
+
+    private Element returnElement = new Element("result");
+
+    MCRTransformerHelperCall(String href) {
+        StringTokenizer uriTokenizer = new StringTokenizer(href, ":");
+        uriTokenizer.nextToken(); // remove schema
+
+        String sessionID = uriTokenizer.nextToken();
+        this.helper = lookupTransformerHelper(sessionID);
+
+        this.method = uriTokenizer.nextToken();
+
+        parseParameters(uriTokenizer);
+    }
+
+    private void parseParameters(StringTokenizer uriTokenizer) {
+        while (uriTokenizer.hasMoreTokens()) {
+            String name = uriTokenizer.nextToken("=").substring(1);
+            String value = uriTokenizer.nextToken("&").substring(1);
+            value = URLDecoder.decode(value, StandardCharsets.UTF_8);
+
+            if (name.startsWith(PREFIX_XMLNS)) {
+                String prefix = name.substring(PREFIX_XMLNS.length());
+                namespaceMap.put(prefix, value);
+            } else {
+                attributeMap.put(name, value);
+            }
+        }
+    }
+
+    MCRTransformerHelper lookupTransformerHelper(String sessionID) {
+        MCREditorSession session = MCREditorSessionStoreUtils.getSessionStore().getSession(sessionID);
+        return session.getTransformerHelper();
+    }
+
+    MCRTransformerHelper getTransformerHelper() {
+        return helper;
+    }
+
+    String getMethod() {
+        return method;
+    }
+
+    String getAttributeValue(String name) {
+        return attributeMap.get(name);
+    }
+
+    String getAttributeValueOrDefault(String name, String defaultValue) {
+        return attributeMap.getOrDefault(name, defaultValue);
+    }
+
+    Map<String, String> getAttributeMap() {
+        return attributeMap;
+    }
+
+    void registerDeclaredNamespaces() {
+        namespaceMap.entrySet().stream()
+            .map(entry -> Namespace.getNamespace(entry.getKey(), entry.getValue()))
+            .forEach(MCRConstants::registerNamespace);
+    }
+
+    Element getReturnElement() {
+        return returnElement;
     }
 }

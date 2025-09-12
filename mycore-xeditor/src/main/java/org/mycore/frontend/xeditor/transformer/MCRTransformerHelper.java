@@ -19,8 +19,6 @@
 package org.mycore.frontend.xeditor.transformer;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -47,12 +45,8 @@ import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
 import org.mycore.frontend.xeditor.MCREditorSessionStore;
 import org.mycore.frontend.xeditor.MCREditorSubmission;
-import org.mycore.frontend.xeditor.MCRRepeatBinding;
 import org.mycore.frontend.xeditor.MCRXEditorPostProcessor;
-import org.mycore.frontend.xeditor.target.MCRInsertTarget;
 import org.mycore.frontend.xeditor.target.MCRSubselectTarget;
-import org.mycore.frontend.xeditor.target.MCRSwapTarget;
-import org.mycore.frontend.xeditor.validation.MCRValidator;
 import org.mycore.services.i18n.MCRTranslation;
 import org.xml.sax.SAXException;
 
@@ -63,15 +57,6 @@ public class MCRTransformerHelper {
 
     private static final char COLON = ':';
 
-    private static final String CONTROL_INSERT = "insert";
-    private static final String CONTROL_APPEND = "append";
-    private static final String CONTROL_REMOVE = "remove";
-    private static final String CONTROL_UP = "up";
-    private static final String CONTROL_DOWN = "down";
-
-    private static final String DEFAULT_CONTROLS =
-        String.join(" ", CONTROL_INSERT, CONTROL_REMOVE, CONTROL_UP, CONTROL_DOWN);
-
     private static final String ATTR_URL = "url";
     private static final String ATTR_URI = "uri";
     private static final String ATTR_REF = "ref";
@@ -79,73 +64,53 @@ public class MCRTransformerHelper {
     private static final String ATTR_VALUE = "value";
     private static final String ATTR_XPATH = "xpath";
     private static final String ATTR_TYPE = "type";
-    private static final String ATTR_TEXT = "text";
     private static final String ATTR_I18N = "i18n";
     private static final String ATTR_HREF = "xed:href";
     private static final String ATTR_TARGET = "xed:target";
     private static final String ATTR_STYLE = "style";
     private static final String ATTR_RELEVANT_IF = "relevant-if";
-    private static final String ATTR_MULTIPLE = "multiple";
     private static final String ATTR_DEFAULT = "default";
     private static final String ATTR_CLASS = "class";
     private static final String ATTR_TEST = "test";
-    private static final String ATTR_METHOD = "method";
-    private static final String ATTR_MAX = "max";
-    private static final String ATTR_MIN = "min";
-    private static final String ATTR_DISPLAY = "display";
 
     private static final String TYPE_CHECKBOX = "checkbox";
     private static final String TYPE_RADIO = "radio";
 
-    private static final String VALUE_SELECTED = "selected";
     private static final String VALUE_CHECKED = "checked";
-    private static final String VALUE_LOCAL = "local";
-    private static final String VALUE_GLOBAL = "global";
 
     private static final String PREDICATE_IS_FIRST = "[1]";
 
-    private static final String PREFIX_XMLNS = "xmlns:";
+    final MCREditorSession editorSession;
 
-    private final MCREditorSession editorSession;
+    MCRBinding currentBinding;
 
-    private MCRBinding currentBinding;
+    MCRValidationTransformerHelper validationTransformer = new MCRValidationTransformerHelper(this);
 
-    private int anchorID;
+    MCRSelectTransformerHelper selectTransformer = new MCRSelectTransformerHelper(this);
 
-    private boolean withinSelectElement;
+    MCRRepeatTransformerHelper repeatTransformer = new MCRRepeatTransformerHelper(this);
 
     public MCRTransformerHelper(MCREditorSession editorSession) {
         this.editorSession = editorSession;
     }
 
-    void handleForm(Map<String, String> attributes) {
-        registerAdditionalNamespaces(attributes);
+    void handleForm(MCRTransformerHelperCall call) {
+        call.registerDeclaredNamespaces();
     }
 
-    private void registerAdditionalNamespaces(Map<String, String> attributes) {
-        attributes.forEach((key, value) -> {
-            if (key.startsWith(PREFIX_XMLNS)) {
-                String prefix = key.substring(PREFIX_XMLNS.length());
-                String uri = attributes.get(key);
-                MCRConstants.registerNamespace(Namespace.getNamespace(prefix, uri));
-            }
-        });
-        attributes.keySet().removeIf(key -> key.startsWith(PREFIX_XMLNS));
-    }
-
-    void handleSource(Map<String, String> attributes)
+    void handleSource(MCRTransformerHelperCall call)
         throws JDOMException, IOException, SAXException, TransformerException {
-        String uri = attributes.get(ATTR_URI);
+        String uri = call.getAttributeValue(ATTR_URI);
         editorSession.setEditedXML(uri);
     }
 
-    void handleCancel(Map<String, String> attributes) {
-        String cancelURL = attributes.get(ATTR_URL);
+    void handleCancel(MCRTransformerHelperCall call) {
+        String cancelURL = call.getAttributeValue(ATTR_URL);
         editorSession.setCancelURL(cancelURL);
     }
 
-    void handlePostProcessor(Map<String, String> attributes) {
-        String clazz = attributes.getOrDefault(ATTR_CLASS, null);
+    void handlePostProcessor(MCRTransformerHelperCall call) {
+        String clazz = call.getAttributeValueOrDefault(ATTR_CLASS, null);
         if (clazz != null) {
             try {
                 MCRXEditorPostProcessor instance = ((MCRXEditorPostProcessor) MCRClassTools.forName(clazz)
@@ -156,28 +121,28 @@ public class MCRTransformerHelper {
                 throw new MCRException("Could not initialize Post-Processor with class" + clazz, e);
             }
         }
-        editorSession.getPostProcessor().setAttributes(attributes);
+        editorSession.getPostProcessor().setAttributes(call.getAttributeMap());
     }
 
     private String replaceParameters(String uri) {
         return getXPathEvaluator().replaceXPaths(uri, false);
     }
 
-    void handleBind(Map<String, String> attributes) throws JaxenException {
-        registerAdditionalNamespaces(attributes);
+    void handleBind(MCRTransformerHelperCall call) throws JaxenException {
+        call.registerDeclaredNamespaces();
 
-        String xPath = attributes.get("xpath");
-        String initialValue = attributes.getOrDefault("initially", null);
-        String name = attributes.getOrDefault("name", null);
+        String xPath = call.getAttributeValue("xpath");
+        String initialValue = call.getAttributeValueOrDefault("initially", null);
+        String name = call.getAttributeValueOrDefault("name", null);
 
         bind(xPath, initialValue, name);
 
-        String setAttr = attributes.getOrDefault("set", null);
+        String setAttr = call.getAttributeValueOrDefault("set", null);
         if (setAttr != null) {
             setValues(setAttr);
         }
 
-        String setDefault = attributes.getOrDefault("default", null);
+        String setDefault = call.getAttributeValueOrDefault("default", null);
         if (setDefault != null) {
             setDefault(setDefault);
         }
@@ -199,7 +164,7 @@ public class MCRTransformerHelper {
         setCurrentBinding(new MCRBinding(xPath, initialValue, name, currentBinding));
     }
 
-    private void setCurrentBinding(MCRBinding binding) {
+    void setCurrentBinding(MCRBinding binding) {
         this.currentBinding = binding;
         editorSession.getValidator().setValidationMarker(currentBinding);
     }
@@ -233,46 +198,26 @@ public class MCRTransformerHelper {
         setCurrentBinding(currentBinding.getParent());
     }
 
-    private boolean hasValue(String value) {
+    boolean hasValue(String value) {
         editorSession.getSubmission().mark2checkResubmission(currentBinding);
         return currentBinding.hasValue(value);
     }
 
-    void handleSelect(Map<String, String> attributes, Element result) {
-        withinSelectElement = !withinSelectElement;
-
-        String attrMultiple = attributes.getOrDefault(ATTR_MULTIPLE, null);
-        boolean withinSelectMultiple = Objects.equals(attrMultiple, "multiple");
-
-        if (withinSelectElement) {
-            setXPath(result, withinSelectMultiple);
-        }
-    }
-
-    void handleOption(Map<String, String> attributes, Element result) {
-        if (withinSelectElement) {
-            String value = attributes.getOrDefault(ATTR_VALUE, attributes.get(ATTR_TEXT));
-
-            if ((!Strings.isEmpty(value)) && hasValue(value)) {
-                result.setAttribute(VALUE_SELECTED, VALUE_SELECTED);
-            }
-        }
-    }
-
-    void handleReplaceXPaths(Map<String, String> attributes, Element result) {
-        attributes.keySet().removeIf(key -> key.contains(String.valueOf(COLON)));
-        attributes.forEach((name, value) -> result.setAttribute(name, replaceXPaths(value)));
+    void handleReplaceXPaths(MCRTransformerHelperCall call) {
+        call.getAttributeMap().keySet().removeIf(key -> key.contains(String.valueOf(COLON)));
+        call.getAttributeMap()
+            .forEach((name, value) -> call.getReturnElement().setAttribute(name, replaceXPaths(value)));
     }
 
     private String replaceXPaths(String text) {
         return getXPathEvaluator().replaceXPaths(text, false);
     }
 
-    void handleOutput(Map<String, String> attributes, Element result) {
-        String value = attributes.getOrDefault(ATTR_VALUE, null);
-        String i18n = attributes.getOrDefault(ATTR_I18N, null);
+    void handleOutput(MCRTransformerHelperCall call) {
+        String value = call.getAttributeValueOrDefault(ATTR_VALUE, null);
+        String i18n = call.getAttributeValueOrDefault(ATTR_I18N, null);
         String output = output(value, i18n);
-        result.setText(output);
+        call.getReturnElement().setText(output);
     }
 
     private String output(String attrValue, String attrI18N) {
@@ -293,10 +238,10 @@ public class MCRTransformerHelper {
         }
     }
 
-    void handleTest(Map<String, String> attributes, Element result) {
-        String xPathExpression = attributes.get(ATTR_TEST);
+    void handleTest(MCRTransformerHelperCall call) {
+        String xPathExpression = call.getAttributeValue(ATTR_TEST);
         boolean testResult = getXPathEvaluator().test(xPathExpression);
-        result.setText(Boolean.toString(testResult));
+        call.getReturnElement().setText(Boolean.toString(testResult));
     }
 
     private MCRXPathEvaluator getXPathEvaluator() {
@@ -307,137 +252,17 @@ public class MCRTransformerHelper {
         }
     }
 
-    void handleRepeat(Map<String, String> attributes, Element result)
-        throws JaxenException {
-        registerAdditionalNamespaces(attributes);
-
-        String xPath = attributes.get(ATTR_XPATH);
-        int minRepeats = Integer.parseInt(attributes.getOrDefault(ATTR_MIN, "0"));
-        int maxRepeats = Integer.parseInt(attributes.getOrDefault(ATTR_MAX, "0"));
-        String method = attributes.get(ATTR_METHOD);
-        List<Element> repeats = repeat(xPath, minRepeats, maxRepeats, method);
-        result.addContent(repeats);
-    }
-
-    private List<Element> repeat(String xPath, int minRepeats, int maxRepeats, String method)
-        throws JaxenException {
-        MCRRepeatBinding repeat = new MCRRepeatBinding(xPath, currentBinding, minRepeats, maxRepeats, method);
-        setCurrentBinding(repeat);
-
-        List<Element> repeats = new ArrayList<>();
-        repeat.getBoundNodes().forEach(node -> repeats.add(new Element("repeat")));
-        return repeats;
-    }
-
-    private MCRRepeatBinding getCurrentRepeat() {
-        MCRBinding binding = currentBinding;
-        while (!(binding instanceof MCRRepeatBinding)) {
-            binding = binding.getParent();
-        }
-        return (MCRRepeatBinding) binding;
-    }
-
-    void handleControls(Map<String, String> attributes, Element result)
-        throws JaxenException {
-        int pos = getCurrentRepeat().getRepeatPosition();
-        int num = getCurrentRepeat().getBoundNodes().size();
-        int max = getCurrentRepeat().getMaxRepeats();
-
-        String text = attributes.getOrDefault(ATTR_TEXT, DEFAULT_CONTROLS);
-        for (String token : text.split("\\s+")) {
-            if ((CONTROL_APPEND.equals(token) && (pos < num)) ||
-                (CONTROL_UP.equals(token) && (pos == 1)) ||
-                (CONTROL_DOWN.equals(token) && (pos == num)) ||
-                ((CONTROL_INSERT.equals(token) || CONTROL_APPEND.equals(token)) && (num == max))) {
-                continue;
-            }
-
-            Element control = new Element("control").setText(token);
-
-            StringBuilder name = new StringBuilder();
-            name.append("_xed_submit_").append(token).append(COLON);
-
-            if (CONTROL_APPEND.equals(token) || CONTROL_INSERT.equals(token)) {
-                name.append(MCRInsertTarget.getInsertParameter(getCurrentRepeat()));
-            } else if (CONTROL_REMOVE.equals(token)) {
-                name.append(currentBinding.getAbsoluteXPath());
-            } else if (CONTROL_UP.equals(token) || CONTROL_DOWN.equals(token)) {
-                name.append(getSwapParameter(token));
-            }
-
-            name.append("|rep-");
-
-            if (CONTROL_REMOVE.equals(token) && (pos > 1)) {
-                name.append(previousAnchorID());
-            } else {
-                name.append(anchorID);
-            }
-
-            control.setAttribute(ATTR_NAME, name.toString());
-            result.addContent(control);
-        }
-    }
-
-    private String getSwapParameter(String action) throws JaxenException {
-        boolean direction = Objects.equals(action, CONTROL_DOWN) ? MCRSwapTarget.MOVE_DOWN : MCRSwapTarget.MOVE_UP;
-        return MCRSwapTarget.getSwapParameter(getCurrentRepeat(), direction);
-    }
-
-    void handleBindRepeatPosition(Element result) {
-        setCurrentBinding(getCurrentRepeat().bindRepeatPosition());
-        editorSession.getValidator().setValidationMarker(currentBinding);
-
-        Element anchor = new Element("a");
-        String id = "rep-" + ++anchorID;
-        anchor.setAttribute("id", id);
-        result.addContent(anchor);
-    }
-
-    private int previousAnchorID() {
-        return (anchorID == 0 ? 1 : anchorID - 1);
-    }
-
-    void handleLoadResource(Map<String, String> attributes) {
-        String uri = attributes.get(ATTR_URI);
-        String name = attributes.get(ATTR_NAME);
+    void handleLoadResource(MCRTransformerHelperCall call) {
+        String uri = call.getAttributeValue(ATTR_URI);
+        String name = call.getAttributeValue(ATTR_NAME);
 
         Element resource = MCRURIResolver.obtainInstance().resolve(replaceXPaths(uri));
         editorSession.getVariables().put(name, resource);
     }
 
-    void handleValidationRule(Map<String, String> attributes, Element result) {
-        result.setAttribute("baseXPath", currentBinding.getAbsoluteXPath());
-    }
-
-    void handleDisplayValidationMessages(Element result) {
-        editorSession.getValidator().getFailedRules().stream()
-            .map(MCRValidator::getRuleElement)
-            .filter(rule -> rule.getAttributeValue(ATTR_DISPLAY, "").contains(VALUE_GLOBAL))
-            .forEach(result::addContent);
-    }
-
-    void handleDisplayValidationMessage(Element result) {
-        if (hasValidationError()) {
-            Element failedRule = editorSession.getValidator().getFailedRule(currentBinding).getRuleElement();
-            if (failedRule.getAttributeValue(ATTR_DISPLAY, "").contains(VALUE_LOCAL)) {
-                result.addContent(failedRule.clone());
-            }
-        }
-    }
-
-    void handleHasValidationError(Element result) {
-        if (hasValidationError()) {
-            result.setText(String.valueOf(true));
-        }
-    }
-
-    private boolean hasValidationError() {
-        return editorSession.getValidator().hasError(currentBinding);
-    }
-
-    void handleSubmitButton(Map<String, String> attributes, Element result) {
-        String target = attributes.get(ATTR_TARGET);
-        String href = attributes.get(ATTR_HREF);
+    void handleSubmitButton(MCRTransformerHelperCall call) {
+        String target = call.getAttributeValue(ATTR_TARGET);
+        String href = call.getAttributeValue(ATTR_HREF);
 
         StringBuilder name = new StringBuilder();
         name.append("_xed_submit_").append(target);
@@ -449,10 +274,10 @@ public class MCRTransformerHelper {
             name.append(COLON).append(href);
         }
 
-        result.setAttribute(ATTR_NAME, name.toString());
+        call.getReturnElement().setAttribute(ATTR_NAME, name.toString());
     }
 
-    void handleGetAdditionalParameters(Element result) {
+    void handleGetAdditionalParameters(MCRTransformerHelperCall call) {
         Element div = new Element("div").setAttribute(ATTR_STYLE, "visibility:hidden");
 
         Map<String, String[]> parameters = editorSession.getRequestParameters();
@@ -480,7 +305,7 @@ public class MCRTransformerHelper {
         div.addContent(buildAdditionalParameterElement(MCREditorSessionStore.XEDITOR_SESSION_PARAM,
             editorSession.getCombinedSessionStepID()));
 
-        result.addContent(div);
+        call.getReturnElement().addContent(div);
     }
 
     private Element buildAdditionalParameterElement(String name, String value) {
@@ -491,15 +316,15 @@ public class MCRTransformerHelper {
         return input;
     }
 
-    void handleCleanupRule(Map<String, String> attributes) {
-        String xPath = attributes.get(ATTR_XPATH);
-        String relevantIf = attributes.get(ATTR_RELEVANT_IF);
+    void handleCleanupRule(MCRTransformerHelperCall call) {
+        String xPath = call.getAttributeValue(ATTR_XPATH);
+        String relevantIf = call.getAttributeValue(ATTR_RELEVANT_IF);
         editorSession.getXMLCleaner().addRule(xPath, relevantIf);
     }
 
-    void handleParam(Map<String, String> attributes) {
-        String name = attributes.get(ATTR_NAME);
-        String defaultValue = attributes.getOrDefault(ATTR_DEFAULT, null);
+    void handleParam(MCRTransformerHelperCall call) {
+        String name = call.getAttributeValue(ATTR_NAME);
+        String defaultValue = call.getAttributeValueOrDefault(ATTR_DEFAULT, null);
 
         Object currentValue = editorSession.getVariables().get(name);
 
@@ -508,50 +333,50 @@ public class MCRTransformerHelper {
         }
     }
 
-    void handlePreload(Map<String, String> attributes, Element result) {
-        replaceParameters(attributes, result, ATTR_URI);
+    void handlePreload(MCRTransformerHelperCall call) {
+        replaceParameters(call, ATTR_URI);
     }
 
-    void handleInclude(Map<String, String> attributes, Element result) {
-        replaceParameters(attributes, result, ATTR_URI, ATTR_REF);
+    void handleInclude(MCRTransformerHelperCall call) {
+        replaceParameters(call, ATTR_URI, ATTR_REF);
     }
 
-    private void replaceParameters(Map<String, String> attributes, Element result,
-        String... attributesToHandle) {
-        for (String attribute : attributesToHandle) {
-            if (attributes.containsKey(attribute)) {
-                result.setAttribute(attribute, replaceParameters(attributes.get(attribute)));
+    private void replaceParameters(MCRTransformerHelperCall call, String... attributesToHandle) {
+        for (String attrName : attributesToHandle) {
+            String attrValue = call.getAttributeValue(attrName);
+            if (attrValue != null) {
+                call.getReturnElement().setAttribute(attrName, replaceParameters(attrValue));
             }
         }
     }
 
-    void handleTextarea(Map<String, String> attributes, Element result) {
-        handleReplaceXPaths(attributes, result);
+    void handleTextarea(MCRTransformerHelperCall call) {
+        handleReplaceXPaths(call);
 
-        result.setAttribute(ATTR_NAME, currentBinding.getAbsoluteXPath());
+        call.getReturnElement().setAttribute(ATTR_NAME, currentBinding.getAbsoluteXPath());
 
         String value = currentBinding.getValue();
         if (value != null) {
-            result.setText(value);
+            call.getReturnElement().setText(value);
         }
     }
 
-    void handleInput(Map<String, String> attributes, Element result) {
-        String type = attributes.get(ATTR_TYPE);
+    void handleInput(MCRTransformerHelperCall call) {
+        String type = call.getAttributeValue(ATTR_TYPE);
 
-        setXPath(result, TYPE_CHECKBOX.equals(type));
+        setXPath(call.getReturnElement(), TYPE_CHECKBOX.equals(type));
 
         if (TYPE_RADIO.equals(type) || TYPE_CHECKBOX.equals(type)) {
-            String value = attributes.get(ATTR_VALUE);
+            String value = call.getAttributeValue(ATTR_VALUE);
             if (hasValue(value)) {
-                result.setAttribute(VALUE_CHECKED, VALUE_CHECKED);
+                call.getReturnElement().setAttribute(VALUE_CHECKED, VALUE_CHECKED);
             }
         } else {
-            result.setAttribute(ATTR_VALUE, currentBinding.getValue());
+            call.getReturnElement().setAttribute(ATTR_VALUE, currentBinding.getValue());
         }
     }
 
-    private void setXPath(Element result, boolean fixPathForMultiple) {
+    void setXPath(Element result, boolean fixPathForMultiple) {
         String xPath = currentBinding.getAbsoluteXPath();
         if (fixPathForMultiple && xPath.endsWith(PREDICATE_IS_FIRST)) {
             xPath = xPath.substring(0, xPath.length() - PREDICATE_IS_FIRST.length());
