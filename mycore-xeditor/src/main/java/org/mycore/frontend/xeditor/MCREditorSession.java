@@ -43,6 +43,7 @@ import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.xeditor.cleanup.MCRXMLCleaner;
 import org.mycore.frontend.xeditor.tracker.MCRBreakpoint;
 import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
+import org.mycore.frontend.xeditor.transformer.MCRTransformerHelper;
 import org.mycore.frontend.xeditor.validation.MCRXEditorValidator;
 
 /**
@@ -251,7 +252,7 @@ public class MCREditorSession {
         return postProcessor;
     }
 
-    protected void setPostProcessor(MCRXEditorPostProcessor postProcessor) {
+    public void setPostProcessor(MCRXEditorPostProcessor postProcessor) {
         this.postProcessor = postProcessor;
     }
 

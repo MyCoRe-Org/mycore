@@ -51,7 +51,7 @@ import org.xml.sax.SAXException;
     @MCRTestProperty(key = "MCR.URIResolver.CachingResolver.Capacity", string = "100"),
     @MCRTestProperty(key = "MCR.URIResolver.CachingResolver.MaxAge", string = "3600000"),
     @MCRTestProperty(key = "MCR.URIResolver.ModuleResolver.xedTransformerHelper",
-        string = "org.mycore.frontend.xeditor.MCRTransformerHelperResolver")
+        string = "org.mycore.frontend.xeditor.transformer.MCRTransformerHelperResolver")
 })
 public class MCRXEditorTransformerTest {
 

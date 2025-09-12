@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.frontend.xeditor;
+package org.mycore.frontend.xeditor.transformer;
 
 import java.io.IOException;
 import java.net.URLDecoder;
@@ -33,6 +33,8 @@ import org.jaxen.JaxenException;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.transform.JDOMSource;
+import org.mycore.frontend.xeditor.MCREditorSession;
+import org.mycore.frontend.xeditor.MCREditorSessionStoreUtils;
 import org.xml.sax.SAXException;
 
 public class MCRTransformerHelperResolver implements URIResolver {

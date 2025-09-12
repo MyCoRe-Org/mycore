@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.frontend.xeditor;
+package org.mycore.frontend.xeditor.transformer;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,6 +43,12 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXPathEvaluator;
+import org.mycore.frontend.xeditor.MCRBinding;
+import org.mycore.frontend.xeditor.MCREditorSession;
+import org.mycore.frontend.xeditor.MCREditorSessionStore;
+import org.mycore.frontend.xeditor.MCREditorSubmission;
+import org.mycore.frontend.xeditor.MCRRepeatBinding;
+import org.mycore.frontend.xeditor.MCRXEditorPostProcessor;
 import org.mycore.frontend.xeditor.target.MCRInsertTarget;
 import org.mycore.frontend.xeditor.target.MCRSubselectTarget;
 import org.mycore.frontend.xeditor.target.MCRSwapTarget;
@@ -108,7 +114,7 @@ public class MCRTransformerHelper {
 
     private boolean withinSelectElement;
 
-    MCRTransformerHelper(MCREditorSession editorSession) {
+    public MCRTransformerHelper(MCREditorSession editorSession) {
         this.editorSession = editorSession;
     }
 
