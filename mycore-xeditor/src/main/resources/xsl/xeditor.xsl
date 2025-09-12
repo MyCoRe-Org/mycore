@@ -27,19 +27,9 @@
   <!-- ========== <xed:form /> ========== -->
 
   <xsl:template match="xed:form">
-    <xsl:call-template name="callTransformerHelper" />
-    <form action="{$ServletsBaseURL}XEditor">
-      <xsl:call-template name="replaceXPathsInAttributes" />
-
-      <!-- method="post" is default, may be overwritten by xed:form/@method -->
-      <xsl:if test="not(@method)">
-        <xsl:attribute name="method">
-          <xsl:text>post</xsl:text>
-        </xsl:attribute>
-      </xsl:if>
-
+    <form>
+      <xsl:call-template name="callTransformerHelper" />
       <xsl:apply-templates select="node()" mode="xeditor" />
-
       <xsl:call-template name="callTransformerHelper">
         <xsl:with-param name="method" select="'getAdditionalParameters'" />
       </xsl:call-template>
@@ -165,7 +155,6 @@
   <xsl:template match="select" mode="xeditor">
     <xsl:copy>
       <xsl:call-template name="callTransformerHelper" />
-      <xsl:call-template name="replaceXPathsInAttributes" />
       <xsl:apply-templates select="node()" mode="xeditor" />
       <xsl:call-template name="callTransformerHelper" />
     </xsl:copy>

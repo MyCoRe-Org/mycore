@@ -28,6 +28,7 @@ import org.jdom2.Element;
 import org.jdom2.Parent;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXPathEvaluator;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
 import org.mycore.frontend.xeditor.target.MCRSubselectTarget;
@@ -39,6 +40,8 @@ public class MCRTransformerHelper {
 
     private static final char COLON = ':';
 
+    private static final String ATTR_ACTION = "action";
+    private static final String ATTR_METHOD = "method";
     private static final String ATTR_URI = "uri";
     private static final String ATTR_NAME = "name";
     private static final String ATTR_VALUE = "value";
@@ -52,6 +55,8 @@ public class MCRTransformerHelper {
     private static final String TYPE_RADIO = "radio";
 
     private static final String VALUE_CHECKED = "checked";
+    private static final String VALUE_POST = "post";
+    private static final String VALUE_OUTPUT = "output";
 
     private static final String PREDICATE_IS_FIRST = "[1]";
 
@@ -92,6 +97,14 @@ public class MCRTransformerHelper {
 
     void handleForm(MCRTransformerHelperCall call) {
         call.registerDeclaredNamespaces();
+
+        String method = call.getAttributeValueOrDefault(ATTR_METHOD, VALUE_POST);
+        if (!VALUE_OUTPUT.equals(method)) {
+            handleReplaceXPaths(call);
+            
+            call.getReturnElement().setAttribute(ATTR_ACTION, MCRFrontendUtil.getBaseURL() + "servlets/XEditor");
+            call.getReturnElement().setAttribute(ATTR_METHOD, method);
+        }
     }
 
     String replaceParameters(String uri) {

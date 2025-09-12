@@ -55,6 +55,7 @@ public class MCRSelectTransformerHelper extends MCRTransformerHelperBase {
         boolean withinSelectMultiple = Objects.equals(attrMultiple, "multiple");
 
         if (withinSelectElement) {
+            state.handleReplaceXPaths(call);
             state.setXPath(call.getReturnElement(), withinSelectMultiple);
         }
     }
