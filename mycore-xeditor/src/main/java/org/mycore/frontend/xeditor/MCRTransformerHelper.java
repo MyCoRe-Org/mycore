@@ -420,8 +420,9 @@ public class MCRTransformerHelper {
     }
 
     void handleHasValidationError(Element result) {
-        if (hasValidationError())
+        if (hasValidationError()) {
             result.setText(String.valueOf(true));
+        }
     }
 
     private boolean hasValidationError() {
