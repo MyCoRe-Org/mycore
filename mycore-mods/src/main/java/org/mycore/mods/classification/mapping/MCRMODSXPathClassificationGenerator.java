@@ -35,11 +35,11 @@ import org.mycore.mods.MCRMODSWrapper;
 /**
  * A {@link MCRMODSXPathClassificationGenerator} is a {@link Generator} that looks for mapping information
  * for a given list of classifications, by checking if XPaths configured for categories of such classifications
- * matches against the XML version of the MODS document.
+ * matches against the XML representation of the MODS document.
  * <p>
  * For each classification, the set of categories containing a <code>x-mapping-xpath</code>-label is
  * obtained. For all such categories, the corresponding XPath is evaluated and if it matches against the
- * XML version of the MODS document, the category ID is provided.
+ * XML representation of the MODS document, the category ID is provided.
  * If, for a given classification, no category ID is provided with this procedure,
  * the same procedure is performed again, but based on the <code>x-mapping-xpathfb</code>-label, if present.
  * </p>
