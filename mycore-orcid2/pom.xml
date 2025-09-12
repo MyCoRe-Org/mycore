@@ -32,120 +32,8 @@
   <properties>
     <enforcer.skip>true</enforcer.skip>
     <manifest.priority>54</manifest.priority>
-    <orcidModelVersion>3.0.12</orcidModelVersion>
+    <orcidModelVersion>3.3.0</orcidModelVersion>
   </properties>
-  <build>
-    <plugins>
-      <plugin>
-        <!-- required to use orcid-model -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>unpack-orcid</id>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <phase>generate-resources</phase>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.orcid</groupId>
-                  <artifactId>orcid-model</artifactId>
-                  <version>${orcidModelVersion}</version>
-                  <outputDirectory>${project.build.outputDirectory}</outputDirectory>
-                  <excludes>META-INF/jandex.idx,META-INF/maven/**</excludes>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <!-- required to use orcid-model -->
-        <groupId>org.eclipse.transformer</groupId>
-        <artifactId>transformer-maven-plugin</artifactId>
-        <version>0.5.0</version>
-        <configuration>
-          <rules>
-            <jakartaDefaults>true</jakartaDefaults>
-          </rules>
-        </configuration>
-        <executions>
-          <execution>
-            <id>javax-orcid-model-transform</id>
-            <goals>
-              <goal>transform</goal>
-            </goals>
-            <phase>process-resources</phase>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <!-- skip required because of orcid-model -->
-        <groupId>org.bsc.maven</groupId>
-        <artifactId>maven-processor-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>generate-jpa-model</id>
-            <configuration>
-              <skip>true</skip>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <!-- exclude required because of orcid-model -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-          <additionalDependencies>
-            <additionalDependency>
-              <groupId>org.orcid</groupId>
-              <artifactId>orcid-model</artifactId>
-              <version>${orcidModelVersion}</version>
-            </additionalDependency>
-            <additionalDependency>
-              <groupId>jakarta.xml.bind</groupId>
-              <artifactId>jakarta.xml.bind-api</artifactId>
-              <version>2.3.3</version>
-            </additionalDependency>
-          </additionalDependencies>
-          <sourceFileExcludes>
-            <exclude>**/MCRORCIDSectionImpl.java</exclude>
-            <exclude>**/MCRORCIDSearchImpl.java</exclude>
-          </sourceFileExcludes>
-        </configuration>
-      </plugin>
-      <plugin>
-        <!-- exclude required because of orcid-model -->
-        <groupId>de.thetaphi</groupId>
-        <artifactId>forbiddenapis</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>org/orcid/**/*.class</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.basepom.maven</groupId>
-        <artifactId>duplicate-finder-maven-plugin</artifactId>
-        <configuration>
-          <exceptions>
-            <exception>
-              <currentProject>true</currentProject>
-              <conflictingDependencies>
-                <dependency>
-                  <groupId>org.orcid</groupId>
-                  <artifactId>orcid-model</artifactId>
-                </dependency>
-              </conflictingDependencies>
-            </exception>
-          </exceptions>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
   <dependencies>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -160,24 +48,8 @@
       <artifactId>jackson-databind</artifactId>
     </dependency>
     <dependency>
-      <!-- required by orcid model -->
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-    </dependency>
-    <dependency>
-      <!-- required by orcid model -->
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-lang</groupId>
-      <!-- required by orcid model -->
-      <artifactId>commons-lang</artifactId>
-      <version>2.6</version>
     </dependency>
     <dependency>
       <groupId>jakarta.servlet</groupId>
@@ -198,6 +70,11 @@
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.dspace</groupId>
+      <artifactId>orcid-model-jakarta</artifactId>
+      <version>${orcidModelVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.glassfish.jersey.core</groupId>
@@ -227,31 +104,6 @@
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-user2</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.orcid</groupId>
-      <artifactId>orcid-model</artifactId>
-      <version>${orcidModelVersion}</version>
-      <scope>provided</scope>
-      <optional>true</optional>
-      <exclusions>
-        <exclusion>
-          <groupId>com.fasterxml.jackson.jaxrs</groupId>
-          <artifactId>jackson-jaxrs-json-provider</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.jvnet</groupId>
-          <artifactId>mimepull</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>javax.ws.rs</groupId>
-          <artifactId>jsr311-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>io.swagger</groupId>
-          <artifactId>swagger-annotations</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
