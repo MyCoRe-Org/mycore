@@ -20,14 +20,16 @@ package org.mycore.frontend.xeditor.validation;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.jaxen.JaxenException;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.filter.Filters;
+import org.mycore.common.MCRConstants;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
-import org.w3c.dom.Attr;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 
 /**
  * @author Frank Lützenkirchen
@@ -48,20 +50,28 @@ public class MCRXEditorValidator {
         this.session = session;
     }
 
-    public void addRule(String baseXPath, Node ruleElement) {
+    public void setNewValidationRules(Document xeditor) {
+        clearRules();
+        clearValidationResults();
 
-        NamedNodeMap attributes = ruleElement.getAttributes();
-        Attr enableReplacementNode = (Attr) attributes.getNamedItem("enable-replacements");
-        if (enableReplacementNode != null && enableReplacementNode.getValue().equals("true")) {
-            int attributesLength = attributes.getLength();
-            for (int i = 0; i < attributesLength; i++) {
-                Attr attribute = (Attr) attributes.item(i);
-                String oldValue = attribute.getNodeValue();
-                String newValue = session.replaceParameters(oldValue);
-                attribute.setValue(newValue);
-            }
+        Iterator<Element> rules = xeditor
+            .getDescendants(Filters.element("validate", MCRConstants.getStandardNamespace("xed"))).iterator();
+        while (rules.hasNext()) {
+            Element rule = rules.next();
+            addRule(rule.getAttributeValue("baseXPath"), rule);
+            rules.remove();
         }
+    }
 
+    public void addRule(String baseXPath, Element ruleElement) {
+        if( "true".equals(ruleElement.getAttributeValue("enable-replacements"))) {
+            ruleElement.getAttributes().forEach( attribute -> {
+              String oldValue = attribute.getValue();
+              String newValue = session.replaceParameters(oldValue);    
+              attribute.setValue(newValue);
+          });    
+        }
+        
         addIfConfigured(new MCRRequiredValidator(), baseXPath, ruleElement);
         addIfConfigured(new MCRMinLengthValidator(), baseXPath, ruleElement);
         addIfConfigured(new MCRMaxLengthValidator(), baseXPath, ruleElement);
@@ -82,7 +92,7 @@ public class MCRXEditorValidator {
         addIfConfigured(new MCRExternalValidator(), baseXPath, ruleElement);
     }
 
-    private void addIfConfigured(MCRValidator validator, String baseXPath, Node ruleElement) {
+    private void addIfConfigured(MCRValidator validator, String baseXPath, Element ruleElement) {
         validator.init(baseXPath, ruleElement);
         if (validator.hasRequiredAttributes()) {
             validationRules.add(validator);

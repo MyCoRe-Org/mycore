@@ -26,7 +26,6 @@ import org.jaxen.JaxenException;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.jdom2.output.DOMOutputter;
 import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
@@ -53,9 +52,7 @@ public class MCRXEditorValidatorTest {
         for (int i = 0; i < attributes.length;) {
             rule.setAttribute(attributes[i++], attributes[i++]);
         }
-        new Document(rule);
-        org.w3c.dom.Element ruleAsDOMElement = new DOMOutputter().output(rule);
-        session.getValidator().addRule(baseXPath, ruleAsDOMElement);
+        session.getValidator().addRule(baseXPath, rule);
     }
 
     private void checkResult(MCREditorSession session, String xPath, String marker)

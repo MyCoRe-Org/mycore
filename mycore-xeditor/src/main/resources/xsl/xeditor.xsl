@@ -215,11 +215,18 @@
   <!-- ========== <xed:validate xpath="" display="here|local|global" i18n="key" required="true" matches="regExp" test="xPathExpression" ... /> ========== -->
 
   <xsl:template match="xed:validate" mode="xeditor">
-    <xsl:value-of select="helper:addValidationRule($helper,.)" />
+    <xsl:copy>
+      <xsl:attribute name="baseXPath">
+        <xsl:value-of select="helper:getAbsoluteXPath($helper)" />
+      </xsl:attribute>
+      <xsl:copy-of select="@*|node()" />
+    </xsl:copy>
     
     <xsl:if test="contains(@display,'here')">
       <xsl:if test="@xpath">
-        <xsl:value-of select="helper:bind($helper,@xpath,@null,@null)" />
+        <xsl:call-template name="callTransformerHelper">
+          <xsl:with-param name="method" select="'bind'" />
+        </xsl:call-template>
       </xsl:if>
       <xsl:if test="helper:hasValidationError($helper)">
         <xsl:apply-templates select="." mode="message" />
@@ -233,22 +240,32 @@
   <!-- ========== <xed:display-validation-message /> (local) ========== -->
 
   <xsl:template match="xed:display-validation-message" mode="xeditor">
-    <xsl:if test="helper:hasValidationError($helper)">
-      <xsl:for-each select="helper:getFailedValidationRule($helper)">
-        <xsl:if test="contains(@display,'local')">
-          <xsl:apply-templates select="." mode="message" />
-        </xsl:if>
-      </xsl:for-each>
-    </xsl:if>
+    <xsl:variable name="uri">
+      <xsl:call-template name="callTransformerHelperURI">
+        <xsl:with-param name="method" select="'displayValidationMessage'" />
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:for-each select="document($uri)/result/*">
+      <xsl:if test="contains(@display,'local')">
+        <xsl:apply-templates select="." mode="message" />
+      </xsl:if>
+    </xsl:for-each>
   </xsl:template>
 
   <!-- ========== <xed:display-validation-messages /> (global) ========== -->
 
   <xsl:template match="xed:display-validation-messages" mode="xeditor">
-    <xsl:for-each select="helper:getFailedValidationRules($helper)">
+    <xsl:variable name="uri">
+      <xsl:call-template name="callTransformerHelperURI">
+        <xsl:with-param name="method" select="'displayValidationMessages'" />
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:for-each select="document($uri)/result/*">
       <xsl:if test="contains(@display,'global')">
         <xsl:if test="@xpath">
-          <xsl:value-of select="helper:bind($helper,@xpath,@null,@null)" />
+          <xsl:call-template name="callTransformerHelper">
+            <xsl:with-param name="method" select="'bind'" />
+          </xsl:call-template>
         </xsl:if>
         <xsl:apply-templates select="." mode="message" />
         <xsl:if test="@xpath">

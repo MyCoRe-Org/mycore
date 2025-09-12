@@ -27,7 +27,6 @@ import java.util.Objects;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.xpath.NodeSet;
 import org.jaxen.BaseXPath;
 import org.jaxen.JaxenException;
 import org.jaxen.dom.DocumentNavigator;
@@ -48,7 +47,6 @@ import org.mycore.frontend.xeditor.target.MCRSubselectTarget;
 import org.mycore.frontend.xeditor.target.MCRSwapTarget;
 import org.mycore.frontend.xeditor.validation.MCRValidator;
 import org.mycore.services.i18n.MCRTranslation;
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 /**
@@ -299,24 +297,20 @@ public class MCRTransformerHelper {
         editorSession.getVariables().put(name, resource);
     }
 
-    public void addValidationRule(Node ruleElement) {
-        editorSession.getValidator().addRule(currentBinding.getAbsoluteXPath(), ruleElement);
-    }
-
     public boolean hasValidationError() {
         return editorSession.getValidator().hasError(currentBinding);
     }
 
-    public Node getFailedValidationRule() {
+    public Element getFailedValidationRule() {
         return editorSession.getValidator().getFailedRule(currentBinding).getRuleElement();
     }
 
-    public NodeSet getFailedValidationRules() {
-        NodeSet nodeSet = new NodeSet();
+    public List<Element> getFailedValidationRules() {
+        List<Element> failedRuleElements = new ArrayList<>();
         for (MCRValidator failedRule : editorSession.getValidator().getFailedRules()) {
-            nodeSet.addNode(failedRule.getRuleElement());
+            failedRuleElements.add(failedRule.getRuleElement());
         }
-        return nodeSet;
+        return failedRuleElements;
     }
 
     public String getSubselectParam(String href) {

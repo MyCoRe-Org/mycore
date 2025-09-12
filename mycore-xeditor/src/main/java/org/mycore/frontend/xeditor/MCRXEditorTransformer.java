@@ -20,8 +20,11 @@ package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
 
+import org.jdom2.Document;
+import org.jdom2.JDOMException;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRWrappedContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
@@ -44,7 +47,6 @@ public class MCRXEditorTransformer {
     }
 
     public MCRContent transform(MCRContent editorSource) throws IOException {
-        editorSession.getValidator().clearRules();
         editorSession.getSubmission().clear();
 
         MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer("xeditor");
@@ -60,12 +62,24 @@ public class MCRXEditorTransformer {
                 //lazy transformation make JUnit tests fail
                 result = wrappedContent.getBaseContent();
             }
-            
+
             editorSession.setTransformerHelper(null);
-            editorSession.getValidator().clearValidationResults();
-            return result;
+
+            Document xed = content2xml(result);
+
+            editorSession.getValidator().setNewValidationRules(xed);
+
+            return new MCRJDOMContent(xed);
         } else {
             throw new MCRException("Xeditor needs parameterized MCRContentTransformer: " + transformer);
+        }
+    }
+
+    private Document content2xml(MCRContent result) throws IOException {
+        try {
+            return result.asXML();
+        } catch (JDOMException neverExpected) {
+            throw new IOException(neverExpected);
         }
     }
 }

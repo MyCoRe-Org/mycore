@@ -21,6 +21,7 @@ package org.mycore.frontend.xeditor;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,9 @@ public class MCRTransformerHelperResolver implements URIResolver {
     private static final String CONTROL_UP = "up";
     private static final String CONTROL_DOWN = "down";
 
+    private static final String DEFAULT_CONTROLS =
+        String.join(" ", CONTROL_INSERT, CONTROL_REMOVE, CONTROL_UP, CONTROL_DOWN);
+
     private static final String ATTR_URL = "url";
     private static final String ATTR_URI = "uri";
     private static final String ATTR_REF = "ref";
@@ -54,11 +58,25 @@ public class MCRTransformerHelperResolver implements URIResolver {
     private static final String ATTR_TYPE = "type";
     private static final String ATTR_TEXT = "text";
     private static final String ATTR_I18N = "i18n";
+    private static final String ATTR_HREF = "xed:href";
+    private static final String ATTR_TARGET = "xed:target";
+    private static final String ATTR_STYLE = "style";
+    private static final String ATTR_RELEVANT_IF = "relevant-if";
+    private static final String ATTR_MULTIPLE = "multiple";
+    private static final String ATTR_DEFAULT = "default";
+    private static final String ATTR_CLASS = "class";
+    private static final String ATTR_TEST = "test";
+    private static final String ATTR_METHOD = "method";
+    private static final String ATTR_MAX = "max";
+    private static final String ATTR_MIN = "min";
 
     private static final String TYPE_CHECKBOX = "checkbox";
+    private static final String TYPE_RADIO = "radio";
 
     private static final String VALUE_SELECTED = "selected";
     private static final String VALUE_CHECKED = "checked";
+
+    private static final String PREDICATE_IS_FIRST = "[1]";
 
     private static final String PREFIX_XMLNS = "xmlns:";
 
@@ -92,7 +110,7 @@ public class MCRTransformerHelperResolver implements URIResolver {
         Element result) throws JaxenException, JDOMException, IOException, SAXException, TransformerException {
         switch (elementName) {
             case "form":
-                registerAdditionalNamespaces(tfhelper, attributes);
+                handleForm(tfhelper, attributes);
                 break;
             case "preload":
                 handlePreload(tfhelper, attributes, result);
@@ -107,7 +125,7 @@ public class MCRTransformerHelperResolver implements URIResolver {
                 handleBind(tfhelper, attributes);
                 break;
             case "unbind":
-                tfhelper.unbind();
+                handleUnbind(tfhelper);
                 break;
             case "repeat":
                 handleRepeat(tfhelper, attributes, result);
@@ -158,14 +176,38 @@ public class MCRTransformerHelperResolver implements URIResolver {
             case "output":
                 handleOutput(tfhelper, attributes, result);
                 break;
+            case "displayValidationMessage":
+                handleDisplayValidationMessage(tfhelper, result);
+                break;
+            case "displayValidationMessages":
+                handleDisplayValidationMessages(tfhelper, result);
+                break;
             default:
                 ;
         }
     }
 
+    private void handleDisplayValidationMessages(MCRTransformerHelper tfhelper, Element result) {
+        result.addContent(new ArrayList<>(tfhelper.getFailedValidationRules()));
+    }
+
+    private void handleDisplayValidationMessage(MCRTransformerHelper tfhelper, Element result) {
+        if (tfhelper.hasValidationError()) {
+            result.addContent(tfhelper.getFailedValidationRule().clone());
+        }
+    }
+
+    private void handleUnbind(MCRTransformerHelper tfhelper) {
+        tfhelper.unbind();
+    }
+
+    private void handleForm(MCRTransformerHelper tfhelper, Map<String, String> attributes) {
+        registerAdditionalNamespaces(tfhelper, attributes);
+    }
+
     private void handleSubmitButton(MCRTransformerHelper tfhelper, Map<String, String> attributes, Element result) {
-        String target = attributes.get("xed:target");
-        String href = attributes.get("xed:href");
+        String target = attributes.get(ATTR_TARGET);
+        String href = attributes.get(ATTR_HREF);
 
         StringBuilder name = new StringBuilder();
         name.append("_xed_submit_").append(target);
@@ -176,7 +218,7 @@ public class MCRTransformerHelperResolver implements URIResolver {
             name.append(':').append(href);
         }
 
-        result.setAttribute("name", name.toString());
+        result.setAttribute(ATTR_NAME, name.toString());
     }
 
     private void handleBindRepeatPosition(MCRTransformerHelper tfhelper, Element result) {
@@ -204,13 +246,13 @@ public class MCRTransformerHelperResolver implements URIResolver {
     }
 
     private void handleGetAdditionalParameters(MCRTransformerHelper tfhelper, Element result) {
-        Element div = new Element("div").setAttribute("style", "visibility:hidden");
+        Element div = new Element("div").setAttribute(ATTR_STYLE, "visibility:hidden");
         div.addContent(tfhelper.getAdditionalParameters());
         result.addContent(div);
     }
 
     private void handleBind(MCRTransformerHelper tfhelper, Map<String, String> attributes) throws JaxenException {
-        registerAdditionalNamespaces(tfhelper, attributes);
+        handleForm(tfhelper, attributes);
         tfhelper.bind(attributes);
     }
 
@@ -249,7 +291,7 @@ public class MCRTransformerHelperResolver implements URIResolver {
 
     private void handleCleanupRule(MCRTransformerHelper tfhelper, Map<String, String> attributes) {
         String xPath = attributes.get(ATTR_XPATH);
-        String relevantIf = attributes.get("relevant-if");
+        String relevantIf = attributes.get(ATTR_RELEVANT_IF);
         tfhelper.addCleanupRule(xPath, relevantIf);
     }
 
@@ -264,7 +306,7 @@ public class MCRTransformerHelperResolver implements URIResolver {
     }
 
     private void handleSelect(MCRTransformerHelper tfhelper, Map<String, String> attributes, Element result) {
-        String multiple = attributes.getOrDefault("multiple", null);
+        String multiple = attributes.getOrDefault(ATTR_MULTIPLE, null);
         tfhelper.toggleWithinSelectElement(multiple);
 
         if (tfhelper.isWithinSelectElement()) {
@@ -274,12 +316,12 @@ public class MCRTransformerHelperResolver implements URIResolver {
 
     private void handleParam(MCRTransformerHelper tfhelper, Map<String, String> attributes) {
         String name = attributes.get(ATTR_NAME);
-        String def = attributes.getOrDefault("default", null);
+        String def = attributes.getOrDefault(ATTR_DEFAULT, null);
         tfhelper.declareParameter(name, def);
     }
 
     private void handlePostProcessor(MCRTransformerHelper tfhelper, Map<String, String> attributes) {
-        String clazz = attributes.getOrDefault("class", null);
+        String clazz = attributes.getOrDefault(ATTR_CLASS, null);
         if (clazz != null) {
             tfhelper.setPostProcessor(clazz);
         }
@@ -287,7 +329,7 @@ public class MCRTransformerHelperResolver implements URIResolver {
     }
 
     private void handleTest(MCRTransformerHelper tfhelper, Map<String, String> attributes, Element result) {
-        String test = attributes.get("test");
+        String test = attributes.get(ATTR_TEST);
         boolean testResult = tfhelper.test(test);
         result.setText(Boolean.toString(testResult));
     }
@@ -297,7 +339,7 @@ public class MCRTransformerHelperResolver implements URIResolver {
 
         setXPath(tfhelper, result, TYPE_CHECKBOX.equals(type));
 
-        if ("radio".equals(type) || TYPE_CHECKBOX.equals(type)) {
+        if (TYPE_RADIO.equals(type) || TYPE_CHECKBOX.equals(type)) {
             String value = attributes.get(ATTR_VALUE);
             if (tfhelper.hasValue(value)) {
                 result.setAttribute(VALUE_CHECKED, VALUE_CHECKED);
@@ -313,7 +355,7 @@ public class MCRTransformerHelperResolver implements URIResolver {
         int num = tfhelper.getNumRepeats();
         int max = tfhelper.getMaxRepeats();
 
-        String text = attributes.getOrDefault(ATTR_TEXT, "insert remove up down");
+        String text = attributes.getOrDefault(ATTR_TEXT, DEFAULT_CONTROLS);
         for (String token : text.split("\\s+")) {
             if ((CONTROL_APPEND.equals(token) && (pos < num)) ||
                 (CONTROL_UP.equals(token) && (pos == 1)) ||
@@ -350,19 +392,19 @@ public class MCRTransformerHelperResolver implements URIResolver {
 
     private void handleRepeat(MCRTransformerHelper tfhelper, Map<String, String> attributes, Element result)
         throws JaxenException {
-        registerAdditionalNamespaces(tfhelper, attributes);
+        handleForm(tfhelper, attributes);
 
         String xPath = attributes.get(ATTR_XPATH);
-        int minRepeats = Integer.parseInt(attributes.getOrDefault("min", "0"));
-        int maxRepeats = Integer.parseInt(attributes.getOrDefault("max", "0"));
-        String method = attributes.get("method");
+        int minRepeats = Integer.parseInt(attributes.getOrDefault(ATTR_MIN, "0"));
+        int maxRepeats = Integer.parseInt(attributes.getOrDefault(ATTR_MAX, "0"));
+        String method = attributes.get(ATTR_METHOD);
         List<Element> repeats = tfhelper.repeat(xPath, minRepeats, maxRepeats, method);
         result.addContent(repeats);
     }
 
     private void setXPath(MCRTransformerHelper tfhelper, Element result, boolean fixPathForMultiple) {
         String xPath = tfhelper.getAbsoluteXPath();
-        if (fixPathForMultiple && xPath.endsWith("[1]")) {
+        if (fixPathForMultiple && xPath.endsWith(PREDICATE_IS_FIRST)) {
             xPath = xPath.substring(0, xPath.length() - 3);
         }
         result.setAttribute(ATTR_NAME, xPath);
