@@ -18,36 +18,57 @@
 
 package org.mycore.frontend.xeditor.transformer;
 
-import java.util.Map;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.jdom2.Element;
 import org.mycore.frontend.xeditor.validation.MCRValidator;
 
-public class MCRValidationTransformerHelper {
+public class MCRValidationTransformerHelper extends MCRTransformerHelperBase {
 
     private static final String ATTR_DISPLAY = "display";
 
     private static final String VALUE_LOCAL = "local";
     private static final String VALUE_GLOBAL = "global";
 
-    private MCRTransformerHelper state;
-
-    MCRValidationTransformerHelper(MCRTransformerHelper state) {
-        this.state = state;
+    @Override
+    public Collection<String> getSupportedMethods() {
+        return Arrays.asList("validate", "hasValidationError", "display-validation-message",
+            "display-validation-messages");
     }
 
-    void handleValidationRule(MCRTransformerHelperCall call) {
+    @Override
+    public void handle(MCRTransformerHelperCall call) {
+        switch (call.getMethod()) {
+            case "validate":
+                handleValidationRule(call);
+                break;
+            case "hasValidationError":
+                handleHasValidationError(call);
+                break;
+            case "display-validation-message":
+                handleDisplayValidationMessage(call);
+                break;
+            case "display-validation-messages":
+                handleDisplayValidationMessages(call);
+                break;
+            default:
+                ;
+        }
+    }
+
+    private void handleValidationRule(MCRTransformerHelperCall call) {
         call.getReturnElement().setAttribute("baseXPath", state.currentBinding.getAbsoluteXPath());
     }
 
-    void handleDisplayValidationMessages(MCRTransformerHelperCall call) {
+    private void handleDisplayValidationMessages(MCRTransformerHelperCall call) {
         state.editorSession.getValidator().getFailedRules().stream()
             .map(MCRValidator::getRuleElement)
             .filter(rule -> rule.getAttributeValue(ATTR_DISPLAY, "").contains(VALUE_GLOBAL))
             .forEach(call.getReturnElement()::addContent);
     }
 
-    void handleDisplayValidationMessage(MCRTransformerHelperCall call) {
+    private void handleDisplayValidationMessage(MCRTransformerHelperCall call) {
         if (hasValidationError()) {
             Element failedRule =
                 state.editorSession.getValidator().getFailedRule(state.currentBinding).getRuleElement();
@@ -57,7 +78,7 @@ public class MCRValidationTransformerHelper {
         }
     }
 
-    void handleHasValidationError(MCRTransformerHelperCall call) {
+    private void handleHasValidationError(MCRTransformerHelperCall call) {
         call.getReturnElement().setText(String.valueOf(hasValidationError()));
     }
 

@@ -18,37 +18,21 @@
 
 package org.mycore.frontend.xeditor.transformer;
 
-import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
-import javax.xml.transform.TransformerException;
-
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Strings;
-import org.jaxen.BaseXPath;
-import org.jaxen.JaxenException;
-import org.jaxen.dom.DocumentNavigator;
-import org.jaxen.expr.LocationPath;
-import org.jaxen.expr.NameStep;
-import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.Namespace;
 import org.jdom2.Parent;
-import org.mycore.common.MCRClassTools;
-import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXPathEvaluator;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
 import org.mycore.frontend.xeditor.MCREditorSessionStore;
 import org.mycore.frontend.xeditor.MCREditorSubmission;
-import org.mycore.frontend.xeditor.MCRXEditorPostProcessor;
 import org.mycore.frontend.xeditor.target.MCRSubselectTarget;
-import org.mycore.services.i18n.MCRTranslation;
-import org.xml.sax.SAXException;
 
 /**
  * @author Frank Lützenkirchen
@@ -57,21 +41,16 @@ public class MCRTransformerHelper {
 
     private static final char COLON = ':';
 
-    private static final String ATTR_URL = "url";
     private static final String ATTR_URI = "uri";
     private static final String ATTR_REF = "ref";
     private static final String ATTR_NAME = "name";
     private static final String ATTR_VALUE = "value";
     private static final String ATTR_XPATH = "xpath";
     private static final String ATTR_TYPE = "type";
-    private static final String ATTR_I18N = "i18n";
     private static final String ATTR_HREF = "xed:href";
     private static final String ATTR_TARGET = "xed:target";
     private static final String ATTR_STYLE = "style";
     private static final String ATTR_RELEVANT_IF = "relevant-if";
-    private static final String ATTR_DEFAULT = "default";
-    private static final String ATTR_CLASS = "class";
-    private static final String ATTR_TEST = "test";
 
     private static final String TYPE_CHECKBOX = "checkbox";
     private static final String TYPE_RADIO = "radio";
@@ -84,118 +63,44 @@ public class MCRTransformerHelper {
 
     MCRBinding currentBinding;
 
-    MCRValidationTransformerHelper validationTransformer = new MCRValidationTransformerHelper(this);
-
-    MCRSelectTransformerHelper selectTransformer = new MCRSelectTransformerHelper(this);
-
-    MCRRepeatTransformerHelper repeatTransformer = new MCRRepeatTransformerHelper(this);
+    private Map<String, MCRTransformerHelperBase> method2helper = new HashMap<>();
 
     public MCRTransformerHelper(MCREditorSession editorSession) {
         this.editorSession = editorSession;
+
+        List<MCRTransformerHelperBase> helpers = Arrays.asList(
+            new MCRSelectTransformerHelper(),
+            new MCRValidationTransformerHelper(),
+            new MCRRepeatTransformerHelper(),
+            new MCRConditionTransformerHelper(),
+            new MCROutputTransformerHandler(),
+            new MCRPostProcessorTransformerHelper(),
+            new MCRSourceTransformerHelper(),
+            new MCRCancelTransformerHelper(),
+            new MCRParamTransformerHelper(),
+            new MCRBindTransformerHelper());
+
+        helpers.forEach(helper -> {
+            helper.init(this);
+            helper.getSupportedMethods().forEach(method -> method2helper.put(method, helper));
+        });
+    }
+
+    void handle(MCRTransformerHelperCall call) throws Exception {
+        method2helper.get(call.getMethod()).handle(call);
     }
 
     void handleForm(MCRTransformerHelperCall call) {
         call.registerDeclaredNamespaces();
     }
 
-    void handleSource(MCRTransformerHelperCall call)
-        throws JDOMException, IOException, SAXException, TransformerException {
-        String uri = call.getAttributeValue(ATTR_URI);
-        editorSession.setEditedXML(uri);
-    }
-
-    void handleCancel(MCRTransformerHelperCall call) {
-        String cancelURL = call.getAttributeValue(ATTR_URL);
-        editorSession.setCancelURL(cancelURL);
-    }
-
-    void handlePostProcessor(MCRTransformerHelperCall call) {
-        String clazz = call.getAttributeValueOrDefault(ATTR_CLASS, null);
-        if (clazz != null) {
-            try {
-                MCRXEditorPostProcessor instance = ((MCRXEditorPostProcessor) MCRClassTools.forName(clazz)
-                    .getDeclaredConstructor()
-                    .newInstance());
-                editorSession.setPostProcessor(instance);
-            } catch (ReflectiveOperationException e) {
-                throw new MCRException("Could not initialize Post-Processor with class" + clazz, e);
-            }
-        }
-        editorSession.getPostProcessor().setAttributes(call.getAttributeMap());
-    }
-
-    private String replaceParameters(String uri) {
+    String replaceParameters(String uri) {
         return getXPathEvaluator().replaceXPaths(uri, false);
-    }
-
-    void handleBind(MCRTransformerHelperCall call) throws JaxenException {
-        call.registerDeclaredNamespaces();
-
-        String xPath = call.getAttributeValue("xpath");
-        String initialValue = call.getAttributeValueOrDefault("initially", null);
-        String name = call.getAttributeValueOrDefault("name", null);
-
-        bind(xPath, initialValue, name);
-
-        String setAttr = call.getAttributeValueOrDefault("set", null);
-        if (setAttr != null) {
-            setValues(setAttr);
-        }
-
-        String setDefault = call.getAttributeValueOrDefault("default", null);
-        if (setDefault != null) {
-            setDefault(setDefault);
-        }
-    }
-
-    private void bind(String xPath, String initialValue, String name)
-        throws JaxenException {
-        if (editorSession.getEditedXML() == null) {
-            createEmptyDocumentFromXPath(xPath);
-        }
-
-        if (currentBinding == null) {
-            currentBinding = editorSession.getRootBinding();
-        }
-
-        if (initialValue != null) {
-            initialValue = replaceXPaths(initialValue);
-        }
-        setCurrentBinding(new MCRBinding(xPath, initialValue, name, currentBinding));
     }
 
     void setCurrentBinding(MCRBinding binding) {
         this.currentBinding = binding;
         editorSession.getValidator().setValidationMarker(currentBinding);
-    }
-
-    private void createEmptyDocumentFromXPath(String xPath) throws JaxenException {
-        Element root = createRootElement(xPath);
-        editorSession.setEditedXML(new Document(root));
-        editorSession.setBreakpoint("Starting with empty XML document");
-    }
-
-    private Element createRootElement(String xPath) throws JaxenException {
-        BaseXPath baseXPath = new BaseXPath(xPath, new DocumentNavigator());
-        LocationPath lp = (LocationPath) (baseXPath.getRootExpr());
-        NameStep nameStep = (NameStep) (lp.getSteps().getFirst());
-        String prefix = nameStep.getPrefix();
-        Namespace ns = prefix.isEmpty() ? Namespace.NO_NAMESPACE : MCRConstants.getStandardNamespace(prefix);
-        return new Element(nameStep.getLocalName(), ns);
-    }
-
-    private void setValues(String value) {
-        currentBinding.setValues(replaceXPaths(value));
-    }
-
-    private void setDefault(String value) {
-        value = replaceXPaths(value);
-        currentBinding.setDefault(value);
-        editorSession.getSubmission().markDefaultValue(currentBinding.getAbsoluteXPath(), value);
-    }
-
-    void handleUnbind() {
-        setCurrentBinding(currentBinding.getParent());
     }
 
     boolean hasValue(String value) {
@@ -209,42 +114,11 @@ public class MCRTransformerHelper {
             .forEach((name, value) -> call.getReturnElement().setAttribute(name, replaceXPaths(value)));
     }
 
-    private String replaceXPaths(String text) {
+    String replaceXPaths(String text) {
         return getXPathEvaluator().replaceXPaths(text, false);
     }
 
-    void handleOutput(MCRTransformerHelperCall call) {
-        String value = call.getAttributeValueOrDefault(ATTR_VALUE, null);
-        String i18n = call.getAttributeValueOrDefault(ATTR_I18N, null);
-        String output = output(value, i18n);
-        call.getReturnElement().setText(output);
-    }
-
-    private String output(String attrValue, String attrI18N) {
-        if (!StringUtils.isEmpty(attrI18N)) {
-            String key = replaceParameters(attrI18N);
-
-            if (StringUtils.isEmpty(attrValue)) {
-                return MCRTranslation.translate(key);
-            } else {
-                String value = getXPathEvaluator().evaluateXPath(attrValue);
-                return MCRTranslation.translate(key, value);
-            }
-
-        } else if (!StringUtils.isEmpty(attrValue)) {
-            return getXPathEvaluator().replaceXPathOrI18n(attrValue);
-        } else {
-            return currentBinding.getValue();
-        }
-    }
-
-    void handleTest(MCRTransformerHelperCall call) {
-        String xPathExpression = call.getAttributeValue(ATTR_TEST);
-        boolean testResult = getXPathEvaluator().test(xPathExpression);
-        call.getReturnElement().setText(Boolean.toString(testResult));
-    }
-
-    private MCRXPathEvaluator getXPathEvaluator() {
+    MCRXPathEvaluator getXPathEvaluator() {
         if (currentBinding != null) {
             return currentBinding.getXPathEvaluator();
         } else {
@@ -320,17 +194,6 @@ public class MCRTransformerHelper {
         String xPath = call.getAttributeValue(ATTR_XPATH);
         String relevantIf = call.getAttributeValue(ATTR_RELEVANT_IF);
         editorSession.getXMLCleaner().addRule(xPath, relevantIf);
-    }
-
-    void handleParam(MCRTransformerHelperCall call) {
-        String name = call.getAttributeValue(ATTR_NAME);
-        String defaultValue = call.getAttributeValueOrDefault(ATTR_DEFAULT, null);
-
-        Object currentValue = editorSession.getVariables().get(name);
-
-        if ((currentValue == null) || Objects.equals(currentValue, "")) {
-            editorSession.getVariables().put(name, defaultValue == null ? "" : defaultValue);
-        }
     }
 
     void handlePreload(MCRTransformerHelperCall call) {

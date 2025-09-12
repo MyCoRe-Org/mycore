@@ -18,11 +18,13 @@
 
 package org.mycore.frontend.xeditor.transformer;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Objects;
 
 import org.apache.logging.log4j.util.Strings;
 
-public class MCRSelectTransformerHelper {
+public class MCRSelectTransformerHelper extends MCRTransformerHelperBase {
 
     private static final String ATTR_TEXT = "text";
     private static final String ATTR_MULTIPLE = "multiple";
@@ -30,15 +32,23 @@ public class MCRSelectTransformerHelper {
 
     private static final String VALUE_SELECTED = "selected";
 
-    private MCRTransformerHelper state;
-
     private boolean withinSelectElement;
 
-    MCRSelectTransformerHelper(MCRTransformerHelper state) {
-        this.state = state;
+    @Override
+    public Collection<String> getSupportedMethods() {
+        return Arrays.asList("select", "option");
     }
 
-    void handleSelect(MCRTransformerHelperCall call) {
+    @Override
+    public void handle(MCRTransformerHelperCall call) {
+        if ("select".equals(call.getMethod())) {
+            handleSelect(call);
+        } else if ("option".equals(call.getMethod())) {
+            handleOption(call);
+        }
+    }
+
+    private void handleSelect(MCRTransformerHelperCall call) {
         withinSelectElement = !withinSelectElement;
 
         String attrMultiple = call.getAttributeValueOrDefault(ATTR_MULTIPLE, null);
@@ -49,7 +59,7 @@ public class MCRSelectTransformerHelper {
         }
     }
 
-    void handleOption(MCRTransformerHelperCall call) {
+    private void handleOption(MCRTransformerHelperCall call) {
         if (withinSelectElement) {
             String value = call.getAttributeValueOrDefault(ATTR_VALUE, call.getAttributeValue(ATTR_TEXT));
 

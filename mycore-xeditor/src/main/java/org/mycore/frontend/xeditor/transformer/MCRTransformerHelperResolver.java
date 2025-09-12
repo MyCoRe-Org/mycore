@@ -18,26 +18,11 @@
 
 package org.mycore.frontend.xeditor.transformer;
 
-import java.io.IOException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.StringTokenizer;
-
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
-import org.jaxen.JaxenException;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.Namespace;
 import org.jdom2.transform.JDOMSource;
-import org.mycore.common.MCRConstants;
-import org.mycore.frontend.xeditor.MCREditorSession;
-import org.mycore.frontend.xeditor.MCREditorSessionStoreUtils;
-import org.xml.sax.SAXException;
 
 public class MCRTransformerHelperResolver implements URIResolver {
 
@@ -46,8 +31,10 @@ public class MCRTransformerHelperResolver implements URIResolver {
         MCRTransformerHelperCall call = new MCRTransformerHelperCall(href);
 
         try {
-            handleXEditorElement(call);
-        } catch (JDOMException | IOException | SAXException | JaxenException ex) {
+            handleCall(call);
+        } catch (TransformerException ex) {
+            throw ex;
+        } catch (Exception ex) {
             throw new TransformerException(ex);
         }
 
@@ -57,10 +44,7 @@ public class MCRTransformerHelperResolver implements URIResolver {
         return source;
     }
 
-    @SuppressWarnings("PMD.NcssCount")
-    private void handleXEditorElement(MCRTransformerHelperCall call)
-        throws JaxenException, JDOMException, IOException, SAXException, TransformerException {
-
+    private void handleCall(MCRTransformerHelperCall call) throws Exception {
         MCRTransformerHelper tfhelper = call.getTransformerHelper();
 
         switch (call.getMethod()) {
@@ -76,21 +60,6 @@ public class MCRTransformerHelperResolver implements URIResolver {
             case "getAdditionalParameters":
                 tfhelper.handleGetAdditionalParameters(call);
                 break;
-            case "bind":
-                tfhelper.handleBind(call);
-                break;
-            case "unbind":
-                tfhelper.handleUnbind();
-                break;
-            case "repeat":
-                tfhelper.repeatTransformer.handleRepeat(call);
-                break;
-            case "bindRepeatPosition":
-                tfhelper.repeatTransformer.handleBindRepeatPosition(call);
-                break;
-            case "controls":
-                tfhelper.repeatTransformer.handleControls(call);
-                break;
             case "input":
                 tfhelper.handleInput(call);
                 break;
@@ -100,131 +69,17 @@ public class MCRTransformerHelperResolver implements URIResolver {
             case "button":
                 tfhelper.handleSubmitButton(call);
                 break;
-            case "if":
-            case "when":
-                tfhelper.handleTest(call);
-                break;
-            case "source":
-                tfhelper.handleSource(call);
-                break;
-            case "cancel":
-                tfhelper.handleCancel(call);
-                break;
-            case "post-processor":
-                tfhelper.handlePostProcessor(call);
-                break;
-            case "param":
-                tfhelper.handleParam(call);
-                break;
-            case "select":
-                tfhelper.selectTransformer.handleSelect(call);
-                break;
-            case "option":
-                tfhelper.selectTransformer.handleOption(call);
-                break;
             case "cleanup-rule":
                 tfhelper.handleCleanupRule(call);
                 break;
             case "load-resource":
                 tfhelper.handleLoadResource(call);
                 break;
-            case "output":
-                tfhelper.handleOutput(call);
-                break;
-            case "validate":
-                tfhelper.validationTransformer.handleValidationRule(call);
-                break;
-            case "hasValidationError":
-                tfhelper.validationTransformer.handleHasValidationError(call);
-                break;
-            case "display-validation-message":
-                tfhelper.validationTransformer.handleDisplayValidationMessage(call);
-                break;
-            case "display-validation-messages":
-                tfhelper.validationTransformer.handleDisplayValidationMessages(call);
-                break;
             case "replaceXPaths":
                 tfhelper.handleReplaceXPaths(call);
                 break;
             default:
-                ;
+                tfhelper.handle(call);
         }
-    }
-}
-
-class MCRTransformerHelperCall {
-
-    private static final String PREFIX_XMLNS = "xmlns:";
-
-    private MCRTransformerHelper helper;
-
-    private String method;
-
-    private Map<String, String> attributeMap = new HashMap<>();
-
-    private Map<String, String> namespaceMap = new HashMap<>();
-
-    private Element returnElement = new Element("result");
-
-    MCRTransformerHelperCall(String href) {
-        StringTokenizer uriTokenizer = new StringTokenizer(href, ":");
-        uriTokenizer.nextToken(); // remove schema
-
-        String sessionID = uriTokenizer.nextToken();
-        this.helper = lookupTransformerHelper(sessionID);
-
-        this.method = uriTokenizer.nextToken();
-
-        parseParameters(uriTokenizer);
-    }
-
-    private void parseParameters(StringTokenizer uriTokenizer) {
-        while (uriTokenizer.hasMoreTokens()) {
-            String name = uriTokenizer.nextToken("=").substring(1);
-            String value = uriTokenizer.nextToken("&").substring(1);
-            value = URLDecoder.decode(value, StandardCharsets.UTF_8);
-
-            if (name.startsWith(PREFIX_XMLNS)) {
-                String prefix = name.substring(PREFIX_XMLNS.length());
-                namespaceMap.put(prefix, value);
-            } else {
-                attributeMap.put(name, value);
-            }
-        }
-    }
-
-    MCRTransformerHelper lookupTransformerHelper(String sessionID) {
-        MCREditorSession session = MCREditorSessionStoreUtils.getSessionStore().getSession(sessionID);
-        return session.getTransformerHelper();
-    }
-
-    MCRTransformerHelper getTransformerHelper() {
-        return helper;
-    }
-
-    String getMethod() {
-        return method;
-    }
-
-    String getAttributeValue(String name) {
-        return attributeMap.get(name);
-    }
-
-    String getAttributeValueOrDefault(String name, String defaultValue) {
-        return attributeMap.getOrDefault(name, defaultValue);
-    }
-
-    Map<String, String> getAttributeMap() {
-        return attributeMap;
-    }
-
-    void registerDeclaredNamespaces() {
-        namespaceMap.entrySet().stream()
-            .map(entry -> Namespace.getNamespace(entry.getKey(), entry.getValue()))
-            .forEach(MCRConstants::registerNamespace);
-    }
-
-    Element getReturnElement() {
-        return returnElement;
     }
 }

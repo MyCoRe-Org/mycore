@@ -19,6 +19,8 @@
 package org.mycore.frontend.xeditor.transformer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,7 +31,7 @@ import org.mycore.frontend.xeditor.MCRRepeatBinding;
 import org.mycore.frontend.xeditor.target.MCRInsertTarget;
 import org.mycore.frontend.xeditor.target.MCRSwapTarget;
 
-public class MCRRepeatTransformerHelper {
+public class MCRRepeatTransformerHelper extends MCRTransformerHelperBase {
 
     private static final char COLON = ':';
 
@@ -49,15 +51,31 @@ public class MCRRepeatTransformerHelper {
     private static final String ATTR_TEXT = "text";
     private static final String ATTR_NAME = "name";
 
-    private MCRTransformerHelper state;
+    private int anchorID;
 
-    private int anchorID = 0;
-
-    MCRRepeatTransformerHelper(MCRTransformerHelper state) {
-        this.state = state;
+    @Override
+    public Collection<String> getSupportedMethods() {
+        return Arrays.asList("repeat", "bindRepeatPosition", "controls");
     }
 
-    void handleRepeat(MCRTransformerHelperCall call)
+    @Override
+    public void handle(MCRTransformerHelperCall call) throws JaxenException {
+        switch (call.getMethod()) {
+            case "repeat":
+                handleRepeat(call);
+                break;
+            case "bindRepeatPosition":
+                handleBindRepeatPosition(call);
+                break;
+            case "controls":
+                handleControls(call);
+                break;
+            default:
+                ;
+        }
+    }
+
+    private void handleRepeat(MCRTransformerHelperCall call)
         throws JaxenException {
         call.registerDeclaredNamespaces();
 
@@ -87,7 +105,7 @@ public class MCRRepeatTransformerHelper {
         return (MCRRepeatBinding) binding;
     }
 
-    void handleControls(MCRTransformerHelperCall call)
+    private void handleControls(MCRTransformerHelperCall call)
         throws JaxenException {
         int pos = getCurrentRepeat().getRepeatPosition();
         int num = getCurrentRepeat().getBoundNodes().size();
@@ -133,7 +151,7 @@ public class MCRRepeatTransformerHelper {
         return MCRSwapTarget.getSwapParameter(getCurrentRepeat(), direction);
     }
 
-    void handleBindRepeatPosition(MCRTransformerHelperCall call) {
+    private void handleBindRepeatPosition(MCRTransformerHelperCall call) {
         state.setCurrentBinding(getCurrentRepeat().bindRepeatPosition());
         state.editorSession.getValidator().setValidationMarker(state.currentBinding);
 
