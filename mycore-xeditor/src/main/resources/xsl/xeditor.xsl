@@ -9,6 +9,7 @@
   <xsl:strip-space elements="xed:*" />
 
   <xsl:include href="resource:xsl/copynodes.xsl" />
+  <xsl:include href="resource:xsl/xml-to-string.xsl" />
   <xsl:include href="xslInclude:xeditor" />
 
   <xsl:param name="ServletsBaseURL" />
@@ -178,23 +179,21 @@
   <!-- ========== <xed:repeat xpath="" min="" max="" method="build|clone" /> ========== -->
 
   <xsl:template match="xed:repeat" mode="xeditor">
-    <xsl:variable name="repeatedNodes" select="node()" />
-
     <xsl:variable name="uri">
-      <xsl:call-template name="callTransformerHelperURI" />
-    </xsl:variable>
-
-    <xsl:for-each select="document($uri)/result/repeat">
-      <xsl:call-template name="callTransformerHelper">
-        <xsl:with-param name="method" select="'bindRepeatPosition'" />
+      <xsl:call-template name="callTransformerHelperURI">
+        <xsl:with-param name="addXML" select="true()" />
       </xsl:call-template>
-      <xsl:apply-templates select="$repeatedNodes" mode="xeditor" />
-      <xsl:call-template name="unbind" />
-    </xsl:for-each>
-    
+    </xsl:variable>
+    <xsl:apply-templates select="document($uri)/result/xed:repeated" mode="xeditor" />
     <xsl:call-template name="unbind" />
   </xsl:template>
 
+  <xsl:template match="xed:repeated" mode="xeditor">
+    <xsl:call-template name="callTransformerHelper" />
+    <xsl:apply-templates select="node()" mode="xeditor" />
+    <xsl:call-template name="unbind" />
+  </xsl:template>
+  
   <!-- ========== <xed:controls /> ========== -->
 
   <xsl:template match="xed:controls" mode="xeditor">
@@ -330,6 +329,7 @@
   <xsl:template name="callTransformerHelperURI">
     <xsl:param name="method" select="local-name()" />
     <xsl:param name="addText" select="false()" />
+    <xsl:param name="addXML" select="false()" />
   
     <xsl:value-of select="concat('xedTransformerHelper:',$SessionID,':',$method,':')" />
     
@@ -340,18 +340,26 @@
       <xsl:value-of select="concat('xmlns:',name(),'=',encoder:encode(.,'UTF-8'),'&amp;')" />
     </xsl:for-each>
     <xsl:if test="$addText">
-      <xsl:value-of select="concat('text=',encoder:encode(.,'UTF-8'),'&amp;')" />
+      <xsl:value-of select="concat('xed:text=',encoder:encode(.,'UTF-8'),'&amp;')" />
+    </xsl:if>
+    <xsl:if test="$addXML">
+      <xsl:variable name="xmlAsString">
+        <xsl:apply-templates select="." mode="xml-to-string" />
+      </xsl:variable>
+      <xsl:value-of select="concat('xed:xml=',encoder:encode($xmlAsString,'UTF-8'),'&amp;')" />
     </xsl:if>
   </xsl:template>
   
   <xsl:template name="callTransformerHelper">
     <xsl:param name="method" select="local-name()" />
     <xsl:param name="addText" select="false()" />
+    <xsl:param name="addXML" select="false()" />
   
     <xsl:variable name="uri">
       <xsl:call-template name="callTransformerHelperURI">
         <xsl:with-param name="method" select="$method" />
         <xsl:with-param name="addText" select="$addText" />
+        <xsl:with-param name="addXML" select="$addXML" />
       </xsl:call-template>
     </xsl:variable>
     <xsl:for-each select="document($uri)/result">

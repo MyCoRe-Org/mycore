@@ -18,15 +18,19 @@
 
 package org.mycore.frontend.xeditor.transformer;
 
+import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.content.MCRStringContent;
 import org.mycore.frontend.xeditor.MCREditorSession;
 import org.mycore.frontend.xeditor.MCREditorSessionStoreUtils;
 
@@ -94,6 +98,12 @@ class MCRTransformerHelperCall {
 
     Map<String, String> getAttributeMap() {
         return attributeMap;
+    }
+
+    Element getXML() throws JDOMException, IOException {
+        String xmlBelowAsString = getAttributeValue("xed:xml");
+        Document xmlDoc = new MCRStringContent(xmlBelowAsString).asXML();
+        return xmlDoc.getRootElement().detach();
     }
 
     void registerDeclaredNamespaces() {

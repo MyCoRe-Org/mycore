@@ -26,7 +26,7 @@ import org.apache.logging.log4j.util.Strings;
 
 public class MCRSelectTransformerHelper extends MCRTransformerHelperBase {
 
-    private static final String ATTR_TEXT = "text";
+    private static final String ATTR_TEXT = "xed:text";
     private static final String ATTR_MULTIPLE = "multiple";
     private static final String ATTR_VALUE = "value";
 

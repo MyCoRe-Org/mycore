@@ -18,14 +18,15 @@
 
 package org.mycore.frontend.xeditor.transformer;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 
 import org.jaxen.JaxenException;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.mycore.common.MCRConstants;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCRRepeatBinding;
 import org.mycore.frontend.xeditor.target.MCRInsertTarget;
@@ -48,24 +49,24 @@ public class MCRRepeatTransformerHelper extends MCRTransformerHelperBase {
     private static final String ATTR_METHOD = "method";
     private static final String ATTR_MAX = "max";
     private static final String ATTR_MIN = "min";
-    private static final String ATTR_TEXT = "text";
+    private static final String ATTR_TEXT = "xed:text";
     private static final String ATTR_NAME = "name";
 
     private int anchorID;
 
     @Override
     public Collection<String> getSupportedMethods() {
-        return Arrays.asList("repeat", "bindRepeatPosition", "controls");
+        return Arrays.asList("repeat", "repeated", "controls");
     }
 
     @Override
-    public void handle(MCRTransformerHelperCall call) throws JaxenException {
+    public void handle(MCRTransformerHelperCall call) throws Exception {
         switch (call.getMethod()) {
             case "repeat":
                 handleRepeat(call);
                 break;
-            case "bindRepeatPosition":
-                handleBindRepeatPosition(call);
+            case "repeated":
+                handleRepeated(call);
                 break;
             case "controls":
                 handleControls(call);
@@ -76,25 +77,25 @@ public class MCRRepeatTransformerHelper extends MCRTransformerHelperBase {
     }
 
     private void handleRepeat(MCRTransformerHelperCall call)
-        throws JaxenException {
+        throws Exception {
         call.registerDeclaredNamespaces();
 
         String xPath = call.getAttributeValue(ATTR_XPATH);
         int minRepeats = Integer.parseInt(call.getAttributeValueOrDefault(ATTR_MIN, "0"));
         int maxRepeats = Integer.parseInt(call.getAttributeValueOrDefault(ATTR_MAX, "0"));
         String method = call.getAttributeValue(ATTR_METHOD);
-        List<Element> repeats = repeat(xPath, minRepeats, maxRepeats, method);
-        call.getReturnElement().addContent(repeats);
-    }
 
-    private List<Element> repeat(String xPath, int minRepeats, int maxRepeats, String method)
-        throws JaxenException {
         MCRRepeatBinding repeat = new MCRRepeatBinding(xPath, state.currentBinding, minRepeats, maxRepeats, method);
         state.setCurrentBinding(repeat);
 
-        List<Element> repeats = new ArrayList<>();
-        repeat.getBoundNodes().forEach(node -> repeats.add(new Element("repeat")));
-        return repeats;
+        Element repeated = getRepeatedContent(call);
+        repeat.getBoundNodes().forEach(node -> call.getReturnElement().addContent(repeated.clone()));
+    }
+
+    private Element getRepeatedContent(MCRTransformerHelperCall call) throws JDOMException, IOException {
+        Element repeated = new Element("repeated", MCRConstants.getStandardNamespace("xed"));
+        repeated.setContent(call.getXML().removeContent());
+        return repeated;
     }
 
     private MCRRepeatBinding getCurrentRepeat() {
@@ -107,9 +108,10 @@ public class MCRRepeatTransformerHelper extends MCRTransformerHelperBase {
 
     private void handleControls(MCRTransformerHelperCall call)
         throws JaxenException {
-        int pos = getCurrentRepeat().getRepeatPosition();
-        int num = getCurrentRepeat().getBoundNodes().size();
-        int max = getCurrentRepeat().getMaxRepeats();
+        MCRRepeatBinding currentRepeat = getCurrentRepeat();
+        int pos = currentRepeat.getRepeatPosition();
+        int num = currentRepeat.getBoundNodes().size();
+        int max = currentRepeat.getMaxRepeats();
 
         String text = call.getAttributeValueOrDefault(ATTR_TEXT, DEFAULT_CONTROLS);
         for (String token : text.split("\\s+")) {
@@ -151,7 +153,7 @@ public class MCRRepeatTransformerHelper extends MCRTransformerHelperBase {
         return MCRSwapTarget.getSwapParameter(getCurrentRepeat(), direction);
     }
 
-    private void handleBindRepeatPosition(MCRTransformerHelperCall call) {
+    private void handleRepeated(MCRTransformerHelperCall call) {
         state.setCurrentBinding(getCurrentRepeat().bindRepeatPosition());
         state.editorSession.getValidator().setValidationMarker(state.currentBinding);
 
