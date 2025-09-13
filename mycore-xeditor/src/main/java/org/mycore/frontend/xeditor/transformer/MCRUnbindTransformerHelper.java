@@ -35,6 +35,6 @@ public class MCRUnbindTransformerHelper extends MCRTransformerHelperBase {
 
     @Override
     void handle(MCRTransformerHelperCall call) {
-        setCurrentBinding(getCurrentBinding().getParent());
+        unbind();
     }
 }

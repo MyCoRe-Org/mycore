@@ -58,6 +58,12 @@ public abstract class MCRTransformerHelperBase {
     protected void setCurrentBinding(MCRBinding binding) {
         transformationState.setCurrentBinding(binding);
     }
+    
+    protected void unbind() {
+        MCRBinding parentBinding = getCurrentBinding().getParent();
+        getCurrentBinding().detach();
+        setCurrentBinding(parentBinding);
+    }
 
     protected String replaceXPaths(String text) {
         return transformationState.getXPathEvaluator().replaceXPaths(text, false);
