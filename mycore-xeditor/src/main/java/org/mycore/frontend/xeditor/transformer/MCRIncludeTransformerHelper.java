@@ -19,20 +19,25 @@
 package org.mycore.frontend.xeditor.transformer;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
+/**
+ * Helps preparing xed:include elements by replacing parameters in the attributes.
+ * 
+ * @author Frank Lützenkirchen
+ */
 public class MCRIncludeTransformerHelper extends MCRTransformerHelperBase {
 
     private static final String ATTR_URI = "uri";
     private static final String ATTR_REF = "ref";
 
     @Override
-    Collection<String> getSupportedMethods() {
+    List<String> getSupportedMethods() {
         return Arrays.asList("include");
     }
 
     @Override
-    void handle(MCRTransformerHelperCall call) throws Exception {
+    void handle(MCRTransformerHelperCall call) {
         replaceParameters(call, ATTR_URI);
         replaceParameters(call, ATTR_REF);
     }

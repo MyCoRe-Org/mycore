@@ -19,30 +19,32 @@
 package org.mycore.frontend.xeditor.transformer;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
-import org.jaxen.JaxenException;
-
+/**
+ * Helps transforming xed:param elements. 
+ * 
+ * @author Frank Lützenkirchen
+ */
 public class MCRParamTransformerHelper extends MCRTransformerHelperBase {
 
     private static final String ATTR_NAME = "name";
     private static final String ATTR_DEFAULT = "default";
 
     @Override
-    Collection<String> getSupportedMethods() {
+    List<String> getSupportedMethods() {
         return Arrays.asList("param");
     }
 
     @Override
-    void handle(MCRTransformerHelperCall call) throws JaxenException {
+    void handle(MCRTransformerHelperCall call) {
         String name = call.getAttributeValue(ATTR_NAME);
-        String defaultValue = call.getAttributeValueOrDefault(ATTR_DEFAULT, null);
-
-        Object currentValue = transformationState.editorSession.getVariables().get(name);
+        Object currentValue = getSession().getVariables().get(name);
 
         if ((currentValue == null) || Objects.equals(currentValue, "")) {
-            transformationState.editorSession.getVariables().put(name, defaultValue == null ? "" : defaultValue);
+            String defaultValue = call.getAttributeValueOrDefault(ATTR_DEFAULT, null);
+            getSession().getVariables().put(name, defaultValue == null ? "" : defaultValue);
         }
     }
 }

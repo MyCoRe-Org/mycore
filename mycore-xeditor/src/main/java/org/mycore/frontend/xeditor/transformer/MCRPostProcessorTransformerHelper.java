@@ -19,35 +19,38 @@
 package org.mycore.frontend.xeditor.transformer;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
-import org.jaxen.JaxenException;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.frontend.xeditor.MCRXEditorPostProcessor;
 
+/**
+ * Helps transforming xed:post-processor elements. 
+ * 
+ * @author Frank Lützenkirchen
+ */
 public class MCRPostProcessorTransformerHelper extends MCRTransformerHelperBase {
 
     private static final String ATTR_CLASS = "class";
 
     @Override
-    Collection<String> getSupportedMethods() {
+    List<String> getSupportedMethods() {
         return Arrays.asList("post-processor");
     }
 
     @Override
-    void handle(MCRTransformerHelperCall call) throws JaxenException {
+    void handle(MCRTransformerHelperCall call) {
         String clazz = call.getAttributeValueOrDefault(ATTR_CLASS, null);
         if (clazz != null) {
             try {
                 MCRXEditorPostProcessor instance = ((MCRXEditorPostProcessor) MCRClassTools.forName(clazz)
-                    .getDeclaredConstructor()
-                    .newInstance());
-                transformationState.editorSession.setPostProcessor(instance);
+                    .getDeclaredConstructor().newInstance());
+                getSession().setPostProcessor(instance);
             } catch (ReflectiveOperationException e) {
                 throw new MCRException("Could not initialize Post-Processor with class" + clazz, e);
             }
         }
-        transformationState.editorSession.getPostProcessor().setAttributes(call.getAttributeMap());
+        getSession().getPostProcessor().setAttributes(call.getAttributeMap());
     }
 }

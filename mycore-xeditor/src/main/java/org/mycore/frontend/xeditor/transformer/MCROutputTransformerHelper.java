@@ -19,24 +19,28 @@
 package org.mycore.frontend.xeditor.transformer;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jaxen.JaxenException;
 import org.mycore.services.i18n.MCRTranslation;
 
+/**
+ * Helps transforming xed:output elements. 
+ * 
+ * @author Frank Lützenkirchen
+ */
 public class MCROutputTransformerHelper extends MCRTransformerHelperBase {
 
     private static final String ATTR_VALUE = "value";
     private static final String ATTR_I18N = "i18n";
 
     @Override
-    Collection<String> getSupportedMethods() {
+    List<String> getSupportedMethods() {
         return Arrays.asList("output");
     }
 
     @Override
-    void handle(MCRTransformerHelperCall call) throws JaxenException {
+    void handle(MCRTransformerHelperCall call) {
         String value = call.getAttributeValueOrDefault(ATTR_VALUE, null);
         String i18n = call.getAttributeValueOrDefault(ATTR_I18N, null);
         String output = output(value, i18n);
@@ -57,7 +61,7 @@ public class MCROutputTransformerHelper extends MCRTransformerHelperBase {
         } else if (!StringUtils.isEmpty(attrValue)) {
             return transformationState.getXPathEvaluator().replaceXPathOrI18n(attrValue);
         } else {
-            return transformationState.currentBinding.getValue();
+            return getCurrentBinding().getValue();
         }
     }
 }

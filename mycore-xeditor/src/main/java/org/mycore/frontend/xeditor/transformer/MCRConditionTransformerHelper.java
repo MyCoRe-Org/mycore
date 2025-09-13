@@ -19,14 +19,20 @@
 package org.mycore.frontend.xeditor.transformer;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
+/**
+ * Helps transforming xed:if/xed:choose/xed:when elements
+ * by testing the given condition attribute. 
+ * 
+ * @author Frank Lützenkirchen
+ */
 public class MCRConditionTransformerHelper extends MCRTransformerHelperBase {
 
     private static final String ATTR_TEST = "test";
 
     @Override
-    public Collection<String> getSupportedMethods() {
+    public List<String> getSupportedMethods() {
         return Arrays.asList("if", "when");
     }
 

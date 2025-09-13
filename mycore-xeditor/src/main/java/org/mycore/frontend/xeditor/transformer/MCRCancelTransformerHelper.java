@@ -19,22 +19,25 @@
 package org.mycore.frontend.xeditor.transformer;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
-import org.jaxen.JaxenException;
-
+/**
+ * Helps transforming xed:cancel elements. 
+ * 
+ * @author Frank Lützenkirchen
+ */
 public class MCRCancelTransformerHelper extends MCRTransformerHelperBase {
 
     private static final String ATTR_URL = "url";
 
     @Override
-    Collection<String> getSupportedMethods() {
+    List<String> getSupportedMethods() {
         return Arrays.asList("cancel");
     }
 
     @Override
-    void handle(MCRTransformerHelperCall call) throws JaxenException {
+    void handle(MCRTransformerHelperCall call) {
         String cancelURL = call.getAttributeValue(ATTR_URL);
-        transformationState.editorSession.setCancelURL(cancelURL);
+        getSession().setCancelURL(cancelURL);
     }
 }

@@ -19,14 +19,19 @@
 package org.mycore.frontend.xeditor.transformer;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
+/**
+ * Helps preparing xed:preload elements by replacing parameters in the attributes.
+ * 
+ * @author Frank Lützenkirchen
+ */
 public class MCRPreloadTransformerHelper extends MCRTransformerHelperBase {
 
     protected static final String ATTR_URI = "uri";
 
     @Override
-    Collection<String> getSupportedMethods() {
+    List<String> getSupportedMethods() {
         return Arrays.asList("preload");
     }
 

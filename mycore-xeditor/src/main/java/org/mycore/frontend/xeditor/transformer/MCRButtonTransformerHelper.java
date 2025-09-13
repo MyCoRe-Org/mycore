@@ -19,39 +19,53 @@
 package org.mycore.frontend.xeditor.transformer;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
-import org.apache.logging.log4j.util.Strings;
+import org.apache.commons.lang3.StringUtils;
 import org.mycore.frontend.xeditor.target.MCRSubselectTarget;
 
+/**
+ * Helps transforming form submit button elements. 
+ * 
+ * @author Frank Lützenkirchen
+ */
 public class MCRButtonTransformerHelper extends MCRTransformerHelperBase {
+
+    private static final String ATTR_TARGET = "xed:target";
+    private static final String ATTR_HREF = "xed:href";
+    private static final String ATTR_NAME = "name";
+
+    private static final String PREFIX_SUBMIT = "_xed_submit_";
+
+    private static final String TARGET_SUBSELECT = "subselect";
 
     private static final char COLON = ':';
 
-    private static final String ATTR_NAME = "name";
-    private static final String ATTR_HREF = "xed:href";
-    private static final String ATTR_TARGET = "xed:target";
-
     @Override
-    Collection<String> getSupportedMethods() {
+    List<String> getSupportedMethods() {
         return Arrays.asList("button");
     }
 
     @Override
-    void handle(MCRTransformerHelperCall call) throws Exception {
+    void handle(MCRTransformerHelperCall call) {
         String target = call.getAttributeValue(ATTR_TARGET);
         String href = call.getAttributeValue(ATTR_HREF);
 
         StringBuilder name = new StringBuilder();
-        name.append("_xed_submit_").append(target);
+        name.append(PREFIX_SUBMIT).append(target);
 
-        if ("subselect".equals(target)) {
-            name.append(COLON).append(transformationState.currentBinding.getAbsoluteXPath()).append(COLON)
-                .append(MCRSubselectTarget.encode(href));
-        } else if (Strings.isNotBlank(href)) {
+        if (isButtonToSubselect(target)) {
+            name.append(COLON).append(getCurrentBinding().getAbsoluteXPath())
+                .append(COLON).append(MCRSubselectTarget.encode(href));
+        } else if (StringUtils.isNotBlank(href)) {
             name.append(COLON).append(href);
         }
 
         call.getReturnElement().setAttribute(ATTR_NAME, name.toString());
+    }
+
+    private boolean isButtonToSubselect(String target) {
+        return Objects.equals(target, TARGET_SUBSELECT);
     }
 }

@@ -24,6 +24,12 @@ import javax.xml.transform.URIResolver;
 
 import org.jdom2.transform.JDOMSource;
 
+/**
+ * Implements URIResolver to assist transforming xed to html.
+ * This resolver is be called via xsl document() function from within xeditor.xsl.
+ * 
+ * @author Frank Lützenkirchen
+ */
 public class MCRTransformerHelperResolver implements URIResolver {
 
     @Override
@@ -39,7 +45,7 @@ public class MCRTransformerHelperResolver implements URIResolver {
         }
 
         JDOMSource source = new JDOMSource(call.getReturnElement());
-        // Workaround to prevent URI Caching:
+        // Workaround required to prevent URI Caching within the XSL processor:
         source.setSystemId(source.getSystemId() + Math.random());
         return source;
     }

@@ -19,12 +19,22 @@
 package org.mycore.frontend.xeditor.transformer;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
 import org.jdom2.Element;
 import org.mycore.frontend.xeditor.validation.MCRValidator;
 
+/**
+ * Helps transforming xed:validate and other elements to display validation results. 
+ * 
+ * @author Frank Lützenkirchen
+ */
 public class MCRValidationTransformerHelper extends MCRTransformerHelperBase {
+
+    private static final String METHOD_VALIDATE = "validate";
+    private static final String METHOD_HAS_VALIDATION_ERROR = "hasValidationError";
+    private static final String METHOD_DISPLAY_VALIDATION_MESSAGE = "display-validation-message";
+    private static final String METHOD_DISPLAY_VALIDATION_MESSAGES = "display-validation-messages";
 
     private static final String ATTR_DISPLAY = "display";
 
@@ -32,24 +42,24 @@ public class MCRValidationTransformerHelper extends MCRTransformerHelperBase {
     private static final String VALUE_GLOBAL = "global";
 
     @Override
-    public Collection<String> getSupportedMethods() {
-        return Arrays.asList("validate", "hasValidationError", "display-validation-message",
-            "display-validation-messages");
+    public List<String> getSupportedMethods() {
+        return Arrays.asList(METHOD_VALIDATE, METHOD_HAS_VALIDATION_ERROR, METHOD_DISPLAY_VALIDATION_MESSAGE,
+            METHOD_DISPLAY_VALIDATION_MESSAGES);
     }
 
     @Override
     public void handle(MCRTransformerHelperCall call) {
         switch (call.getMethod()) {
-            case "validate":
+            case METHOD_VALIDATE:
                 handleValidationRule(call);
                 break;
-            case "hasValidationError":
+            case METHOD_HAS_VALIDATION_ERROR:
                 handleHasValidationError(call);
                 break;
-            case "display-validation-message":
+            case METHOD_DISPLAY_VALIDATION_MESSAGE:
                 handleDisplayValidationMessage(call);
                 break;
-            case "display-validation-messages":
+            case METHOD_DISPLAY_VALIDATION_MESSAGES:
                 handleDisplayValidationMessages(call);
                 break;
             default:
@@ -58,11 +68,11 @@ public class MCRValidationTransformerHelper extends MCRTransformerHelperBase {
     }
 
     private void handleValidationRule(MCRTransformerHelperCall call) {
-        call.getReturnElement().setAttribute("baseXPath", transformationState.currentBinding.getAbsoluteXPath());
+        call.getReturnElement().setAttribute("baseXPath", getCurrentBinding().getAbsoluteXPath());
     }
 
     private void handleDisplayValidationMessages(MCRTransformerHelperCall call) {
-        transformationState.editorSession.getValidator().getFailedRules().stream()
+        getSession().getValidator().getFailedRules().stream()
             .map(MCRValidator::getRuleElement)
             .filter(rule -> rule.getAttributeValue(ATTR_DISPLAY, "").contains(VALUE_GLOBAL))
             .forEach(call.getReturnElement()::addContent);
@@ -70,11 +80,10 @@ public class MCRValidationTransformerHelper extends MCRTransformerHelperBase {
 
     private void handleDisplayValidationMessage(MCRTransformerHelperCall call) {
         if (hasValidationError()) {
-            Element failedRule =
-                transformationState.editorSession.getValidator().getFailedRule(transformationState.currentBinding)
-                    .getRuleElement();
-            if (failedRule.getAttributeValue(ATTR_DISPLAY, "").contains(VALUE_LOCAL)) {
-                call.getReturnElement().addContent(failedRule.clone());
+            Element failedRuleElement =
+                getSession().getValidator().getFailedRule(getCurrentBinding()).getRuleElement();
+            if (failedRuleElement.getAttributeValue(ATTR_DISPLAY, "").contains(VALUE_LOCAL)) {
+                call.getReturnElement().addContent(failedRuleElement.clone());
             }
         }
     }
@@ -84,6 +93,6 @@ public class MCRValidationTransformerHelper extends MCRTransformerHelperBase {
     }
 
     private boolean hasValidationError() {
-        return transformationState.editorSession.getValidator().hasError(transformationState.currentBinding);
+        return getSession().getValidator().hasError(getCurrentBinding());
     }
 }

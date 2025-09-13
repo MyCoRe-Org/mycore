@@ -19,11 +19,16 @@
 package org.mycore.frontend.xeditor.transformer;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
-import org.apache.logging.log4j.util.Strings;
+import org.apache.commons.lang3.StringUtils;
 
+/**
+ * Helps transforming html select and option elements. 
+ * 
+ * @author Frank Lützenkirchen
+ */
 public class MCRSelectTransformerHelper extends MCRTransformerHelperBase {
 
     private static final String ATTR_TEXT = "xed:text";
@@ -32,10 +37,11 @@ public class MCRSelectTransformerHelper extends MCRTransformerHelperBase {
 
     private static final String VALUE_SELECTED = "selected";
 
+    /** If true, we are currently somewhere within a HTML select element */
     private boolean withinSelectElement;
 
     @Override
-    public Collection<String> getSupportedMethods() {
+    public List<String> getSupportedMethods() {
         return Arrays.asList("select", "option");
     }
 
@@ -48,23 +54,30 @@ public class MCRSelectTransformerHelper extends MCRTransformerHelperBase {
         }
     }
 
+    /**
+     * Will be called at both the starting and closing html select tag.
+     */
     private void handleSelect(MCRTransformerHelperCall call) {
         withinSelectElement = !withinSelectElement;
 
-        String attrMultiple = call.getAttributeValueOrDefault(ATTR_MULTIPLE, null);
-        boolean withinSelectMultiple = Objects.equals(attrMultiple, "multiple");
+        if (withinSelectElement) { // only do at starting html select tag 
+            String attrMultiple = call.getAttributeValueOrDefault(ATTR_MULTIPLE, null);
+            boolean withinSelectMultiple = Objects.equals(attrMultiple, "multiple");
 
-        if (withinSelectElement) {
             replaceXPaths(call);
             setXPath(call.getReturnElement(), withinSelectMultiple);
         }
     }
 
+    /**
+     * Will only to something if within a html select elements.
+     * There may be option elements outside of select elements that do not bother us.
+     */
     private void handleOption(MCRTransformerHelperCall call) {
         if (withinSelectElement) {
             String value = call.getAttributeValueOrDefault(ATTR_VALUE, call.getAttributeValue(ATTR_TEXT));
 
-            if ((!Strings.isEmpty(value)) && transformationState.hasValue(value)) {
+            if ((!StringUtils.isEmpty(value)) && transformationState.hasValue(value)) {
                 call.getReturnElement().setAttribute(VALUE_SELECTED, VALUE_SELECTED);
             }
         }

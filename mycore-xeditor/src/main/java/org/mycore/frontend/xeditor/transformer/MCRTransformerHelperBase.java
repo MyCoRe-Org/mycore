@@ -18,10 +18,17 @@
 
 package org.mycore.frontend.xeditor.transformer;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.jdom2.Element;
+import org.mycore.frontend.xeditor.MCRBinding;
+import org.mycore.frontend.xeditor.MCREditorSession;
 
+/**
+ * Base class of all classes that help transforming certain html or xed elements.
+ * 
+ * @author Frank Lützenkirchen
+ */
 public abstract class MCRTransformerHelperBase {
 
     private static final char COLON = ':';
@@ -36,9 +43,21 @@ public abstract class MCRTransformerHelperBase {
         this.transformationState = transformationState;
     }
 
-    abstract Collection<String> getSupportedMethods();
+    abstract List<String> getSupportedMethods();
 
     abstract void handle(MCRTransformerHelperCall call) throws Exception;
+
+    protected MCREditorSession getSession() {
+        return transformationState.getSession();
+    }
+
+    protected MCRBinding getCurrentBinding() {
+        return transformationState.getCurrentBinding();
+    }
+
+    protected void setCurrentBinding(MCRBinding binding) {
+        transformationState.setCurrentBinding(binding);
+    }
 
     protected String replaceXPaths(String text) {
         return transformationState.getXPathEvaluator().replaceXPaths(text, false);
@@ -51,7 +70,7 @@ public abstract class MCRTransformerHelperBase {
     }
 
     protected void setXPath(Element result, boolean fixPathForMultiple) {
-        String xPath = transformationState.currentBinding.getAbsoluteXPath();
+        String xPath = getCurrentBinding().getAbsoluteXPath();
         if (fixPathForMultiple && xPath.endsWith(PREDICATE_IS_FIRST)) {
             xPath = xPath.substring(0, xPath.length() - PREDICATE_IS_FIRST.length());
         }

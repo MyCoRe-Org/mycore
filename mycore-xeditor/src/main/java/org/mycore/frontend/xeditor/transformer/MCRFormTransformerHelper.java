@@ -19,10 +19,16 @@
 package org.mycore.frontend.xeditor.transformer;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 import org.mycore.frontend.MCRFrontendUtil;
 
+/**
+ * Helps transforming xed:form elements. 
+ * 
+ * @author Frank Lützenkirchen
+ */
 public class MCRFormTransformerHelper extends MCRTransformerHelperBase {
 
     private static final String ATTR_ACTION = "action";
@@ -32,19 +38,20 @@ public class MCRFormTransformerHelper extends MCRTransformerHelperBase {
     private static final String VALUE_OUTPUT = "output";
 
     @Override
-    Collection<String> getSupportedMethods() {
+    List<String> getSupportedMethods() {
         return Arrays.asList("form");
     }
 
     @Override
-    void handle(MCRTransformerHelperCall call) throws Exception {
+    void handle(MCRTransformerHelperCall call) {
         call.registerDeclaredNamespaces();
 
         String method = call.getAttributeValueOrDefault(ATTR_METHOD, VALUE_POST);
-        if (!VALUE_OUTPUT.equals(method)) {
+        if (!Objects.equals(method, VALUE_OUTPUT)) {
             replaceXPaths(call);
 
-            call.getReturnElement().setAttribute(ATTR_ACTION, MCRFrontendUtil.getBaseURL() + "servlets/XEditor");
+            String actionURL = MCRFrontendUtil.getBaseURL() + "servlets/XEditor";
+            call.getReturnElement().setAttribute(ATTR_ACTION, actionURL);
             call.getReturnElement().setAttribute(ATTR_METHOD, method);
         }
     }

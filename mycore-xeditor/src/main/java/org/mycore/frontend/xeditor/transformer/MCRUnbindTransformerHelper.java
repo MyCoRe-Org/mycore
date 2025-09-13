@@ -19,17 +19,22 @@
 package org.mycore.frontend.xeditor.transformer;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
+/**
+ * Helps transforming xed:bind and xed:repeat elements by implementing the closing unbind call. 
+ * 
+ * @author Frank Lützenkirchen
+ */
 public class MCRUnbindTransformerHelper extends MCRTransformerHelperBase {
 
     @Override
-    Collection<String> getSupportedMethods() {
+    List<String> getSupportedMethods() {
         return Arrays.asList("unbind");
     }
 
     @Override
-    void handle(MCRTransformerHelperCall call) throws Exception {
-        transformationState.setCurrentBinding(transformationState.currentBinding.getParent());
+    void handle(MCRTransformerHelperCall call) {
+        setCurrentBinding(getCurrentBinding().getParent());
     }
 }

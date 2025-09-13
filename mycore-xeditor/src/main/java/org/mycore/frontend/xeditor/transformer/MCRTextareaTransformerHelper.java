@@ -19,14 +19,19 @@
 package org.mycore.frontend.xeditor.transformer;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
+/**
+ * Helps transforming html textarea elements. 
+ * 
+ * @author Frank Lützenkirchen
+ */
 public class MCRTextareaTransformerHelper extends MCRTransformerHelperBase {
 
     private static final String ATTR_NAME = "name";
 
     @Override
-    Collection<String> getSupportedMethods() {
+    List<String> getSupportedMethods() {
         return Arrays.asList("textarea");
     }
 
@@ -34,9 +39,9 @@ public class MCRTextareaTransformerHelper extends MCRTransformerHelperBase {
     void handle(MCRTransformerHelperCall call) throws Exception {
         replaceXPaths(call);
 
-        call.getReturnElement().setAttribute(ATTR_NAME, transformationState.currentBinding.getAbsoluteXPath());
+        call.getReturnElement().setAttribute(ATTR_NAME, getCurrentBinding().getAbsoluteXPath());
 
-        String value = transformationState.currentBinding.getValue();
+        String value = getCurrentBinding().getValue();
         if (value != null) {
             call.getReturnElement().setText(value);
         }

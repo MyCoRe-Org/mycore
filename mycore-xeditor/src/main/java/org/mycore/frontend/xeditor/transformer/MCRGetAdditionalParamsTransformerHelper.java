@@ -19,60 +19,51 @@
 package org.mycore.frontend.xeditor.transformer;
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Element;
 import org.mycore.frontend.xeditor.MCREditorSessionStore;
 import org.mycore.frontend.xeditor.MCREditorSubmission;
 
+/**
+ * Helps outputting additional hidden fields for form submission. 
+ * 
+ * @author Frank Lützenkirchen
+ */
 public class MCRGetAdditionalParamsTransformerHelper extends MCRTransformerHelperBase {
 
-    private static final String ATTR_STYLE = "style";
-
     @Override
-    Collection<String> getSupportedMethods() {
+    List<String> getSupportedMethods() {
         return Arrays.asList("getAdditionalParameters");
     }
 
     @Override
-    void handle(MCRTransformerHelperCall call) throws Exception {
-        Element div = new Element("div").setAttribute(ATTR_STYLE, "visibility:hidden");
-
-        Map<String, String[]> parameters = transformationState.editorSession.getRequestParameters();
-        for (String name : parameters.keySet()) {
-            for (String value : parameters.get(name)) {
-                if ((value != null) && !value.isEmpty()) {
-                    div.addContent(buildAdditionalParameterElement(name, value));
-                }
-            }
-        }
-
-        String xPaths2CheckResubmission =
-            transformationState.editorSession.getSubmission().getXPaths2CheckResubmission();
-        if (!xPaths2CheckResubmission.isEmpty()) {
-            div.addContent(buildAdditionalParameterElement(MCREditorSubmission.PREFIX_CHECK_RESUBMISSION,
-                xPaths2CheckResubmission));
-        }
-
-        Map<String, String> defaultValues = transformationState.editorSession.getSubmission().getDefaultValues();
-        for (String xPath : defaultValues.keySet()) {
-            div.addContent(buildAdditionalParameterElement(MCREditorSubmission.PREFIX_DEFAULT_VALUE + xPath,
-                defaultValues.get(xPath)));
-        }
-
-        transformationState.editorSession.setBreakpoint("After transformation to HTML");
-        div.addContent(buildAdditionalParameterElement(MCREditorSessionStore.XEDITOR_SESSION_PARAM,
-            transformationState.editorSession.getCombinedSessionStepID()));
-
+    void handle(MCRTransformerHelperCall call) {
+        Element div = new Element("div").setAttribute("style", "visibility:hidden");
         call.getReturnElement().addContent(div);
+
+        getSession().getRequestParameters().forEach((name, values) -> {
+            Arrays.stream(values).filter(StringUtils::isNotEmpty).forEach(value -> addField(div, name, value));
+        });
+
+        String xPaths2CheckResubmission = getSession().getSubmission().getXPaths2CheckResubmission();
+        if (!xPaths2CheckResubmission.isEmpty()) {
+            addField(div, MCREditorSubmission.PREFIX_CHECK_RESUBMISSION, xPaths2CheckResubmission);
+        }
+
+        getSession().getSubmission().getDefaultValues().forEach(
+            (xPath, defaultValue) -> addField(div, MCREditorSubmission.PREFIX_DEFAULT_VALUE + xPath, defaultValue));
+
+        getSession().setBreakpoint("After transformation to HTML");
+        addField(div, MCREditorSessionStore.XEDITOR_SESSION_PARAM, getSession().getCombinedSessionStepID());
     }
 
-    private Element buildAdditionalParameterElement(String name, String value) {
+    private void addField(Element parent, String name, String value) {
         Element input = new Element("input");
         input.setAttribute("type", "hidden");
         input.setAttribute("name", name);
         input.setAttribute("value", value);
-        return input;
+        parent.addContent(input);
     }
 }

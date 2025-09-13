@@ -19,27 +19,32 @@
 package org.mycore.frontend.xeditor.transformer;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
 import org.jdom2.Element;
 import org.mycore.common.xml.MCRURIResolver;
 
+/**
+ * Helps transforming xed:load-resource elements. 
+ * 
+ * @author Frank Lützenkirchen
+ */
 public class MCRLoadResourceTransformerHelper extends MCRTransformerHelperBase {
 
     private static final String ATTR_URI = "uri";
     private static final String ATTR_NAME = "name";
 
     @Override
-    Collection<String> getSupportedMethods() {
+    List<String> getSupportedMethods() {
         return Arrays.asList("load-resource");
     }
 
     @Override
-    void handle(MCRTransformerHelperCall call) throws Exception {
-        String uri = call.getAttributeValue(ATTR_URI);
+    void handle(MCRTransformerHelperCall call) {
+        String uri = replaceXPaths(call.getAttributeValue(ATTR_URI));
         String name = call.getAttributeValue(ATTR_NAME);
-    
-        Element resource = MCRURIResolver.obtainInstance().resolve(replaceXPaths(uri));
-        transformationState.editorSession.getVariables().put(name, resource);
+
+        Element resource = MCRURIResolver.obtainInstance().resolve(uri);
+        getSession().getVariables().put(name, resource);
     }
 }

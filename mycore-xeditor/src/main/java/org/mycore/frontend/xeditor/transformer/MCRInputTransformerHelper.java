@@ -19,8 +19,14 @@
 package org.mycore.frontend.xeditor.transformer;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
+/**
+ * Helps transforming html input elements. 
+ * 
+ * @author Frank Lützenkirchen
+ */
 public class MCRInputTransformerHelper extends MCRTransformerHelperBase {
 
     private static final String ATTR_VALUE = "value";
@@ -32,23 +38,24 @@ public class MCRInputTransformerHelper extends MCRTransformerHelperBase {
     private static final String VALUE_CHECKED = "checked";
 
     @Override
-    Collection<String> getSupportedMethods() {
+    List<String> getSupportedMethods() {
         return Arrays.asList("input");
     }
 
     @Override
-    void handle(MCRTransformerHelperCall call) throws Exception {
+    void handle(MCRTransformerHelperCall call) {
         String type = call.getAttributeValue(ATTR_TYPE);
 
-        setXPath(call.getReturnElement(), TYPE_CHECKBOX.equals(type));
+        setXPath(call.getReturnElement(), Objects.equals(type, TYPE_CHECKBOX));
 
-        if (TYPE_RADIO.equals(type) || TYPE_CHECKBOX.equals(type)) {
+        if (Objects.equals(type, TYPE_RADIO) || Objects.equals(type, TYPE_CHECKBOX)) {
             String value = call.getAttributeValue(ATTR_VALUE);
             if (transformationState.hasValue(value)) {
                 call.getReturnElement().setAttribute(VALUE_CHECKED, VALUE_CHECKED);
             }
         } else {
-            call.getReturnElement().setAttribute(ATTR_VALUE, transformationState.currentBinding.getValue());
+            String currentValue = transformationState.getCurrentBinding().getValue();
+            call.getReturnElement().setAttribute(ATTR_VALUE, currentValue);
         }
     }
 }

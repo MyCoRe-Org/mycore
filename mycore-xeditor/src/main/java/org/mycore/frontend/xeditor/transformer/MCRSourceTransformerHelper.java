@@ -18,21 +18,31 @@
 
 package org.mycore.frontend.xeditor.transformer;
 
+import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
+import javax.xml.transform.TransformerException;
+
+import org.jdom2.JDOMException;
+
+/**
+ * Helps transforming xed:source elements. 
+ * 
+ * @author Frank Lützenkirchen
+ */
 public class MCRSourceTransformerHelper extends MCRTransformerHelperBase {
 
     private static final String ATTR_URI = "uri";
 
     @Override
-    Collection<String> getSupportedMethods() {
+    List<String> getSupportedMethods() {
         return Arrays.asList("source");
     }
 
     @Override
-    void handle(MCRTransformerHelperCall call) throws Exception {
+    void handle(MCRTransformerHelperCall call) throws JDOMException, IOException, TransformerException {
         String uri = call.getAttributeValue(ATTR_URI);
-        transformationState.editorSession.setEditedXML(uri);
+        getSession().setEditedXML(uri);
     }
 }

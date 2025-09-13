@@ -19,22 +19,27 @@
 package org.mycore.frontend.xeditor.transformer;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
+/**
+ * Helps transforming xed:cleanup-rule elements. 
+ * 
+ * @author Frank Lützenkirchen
+ */
 public class MCRCleanupRuleTransformerHelper extends MCRTransformerHelperBase {
 
     private static final String ATTR_XPATH = "xpath";
     private static final String ATTR_RELEVANT_IF = "relevant-if";
 
     @Override
-    Collection<String> getSupportedMethods() {
+    List<String> getSupportedMethods() {
         return Arrays.asList("cleanup-rule");
     }
 
     @Override
-    void handle(MCRTransformerHelperCall call) throws Exception {
+    void handle(MCRTransformerHelperCall call) {
         String xPath = call.getAttributeValue(ATTR_XPATH);
         String relevantIf = call.getAttributeValue(ATTR_RELEVANT_IF);
-        transformationState.editorSession.getXMLCleaner().addRule(xPath, relevantIf);
+        getSession().getXMLCleaner().addRule(xPath, relevantIf);
     }
 }

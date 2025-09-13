@@ -19,7 +19,7 @@
 package org.mycore.frontend.xeditor.transformer;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
 import org.jaxen.BaseXPath;
 import org.jaxen.JaxenException;
@@ -32,55 +32,56 @@ import org.jdom2.Namespace;
 import org.mycore.common.MCRConstants;
 import org.mycore.frontend.xeditor.MCRBinding;
 
+/**
+ * Helps transforming xed:bind elements.
+ * 
+ * @author Frank Lützenkirchen
+ */
 public class MCRBindTransformerHelper extends MCRTransformerHelperBase {
 
+    private static final String ATTR_XPATH = "xpath";
+    private static final String ATTR_INITIALLY = "initially";
+    private static final String ATTR_DEFAULT = "default";
+    private static final String ATTR_SET = "set";
+    private static final String ATTR_NAME = "name";
+
     @Override
-    Collection<String> getSupportedMethods() {
+    List<String> getSupportedMethods() {
         return Arrays.asList("bind");
     }
 
     @Override
     void handle(MCRTransformerHelperCall call) throws Exception {
         call.registerDeclaredNamespaces();
-
-        String xPath = call.getAttributeValue("xpath");
-        String initialValue = call.getAttributeValueOrDefault("initially", null);
-        String name = call.getAttributeValueOrDefault("name", null);
-
-        bind(xPath, initialValue, name);
-
-        String setAttr = call.getAttributeValueOrDefault("set", null);
-        if (setAttr != null) {
-            setValues(setAttr);
-        }
-
-        String setDefault = call.getAttributeValueOrDefault("default", null);
-        if (setDefault != null) {
-            setDefault(setDefault);
-        }
+        handleBind(call);
+        handleSetAttribute(call);
+        handleDefaultAttribute(call);
     }
 
-    private void bind(String xPath, String initialValue, String name)
-        throws JaxenException {
-        if (transformationState.editorSession.getEditedXML() == null) {
+    private void handleBind(MCRTransformerHelperCall call) throws JaxenException {
+        String xPath = call.getAttributeValue(ATTR_XPATH);
+        String initialValue = call.getAttributeValueOrDefault(ATTR_INITIALLY, null);
+        String name = call.getAttributeValueOrDefault(ATTR_NAME, null);
+
+        if (getSession().getEditedXML() == null) {
             createEmptyDocumentFromXPath(xPath);
         }
 
-        if (transformationState.currentBinding == null) {
-            transformationState.currentBinding = transformationState.editorSession.getRootBinding();
+        if (getCurrentBinding() == null) {
+            setCurrentBinding(getSession().getRootBinding());
         }
 
         if (initialValue != null) {
             initialValue = replaceXPaths(initialValue);
         }
-        transformationState
-            .setCurrentBinding(new MCRBinding(xPath, initialValue, name, transformationState.currentBinding));
+
+        setCurrentBinding(new MCRBinding(xPath, initialValue, name, getCurrentBinding()));
     }
 
     private void createEmptyDocumentFromXPath(String xPath) throws JaxenException {
         Element root = createRootElement(xPath);
-        transformationState.editorSession.setEditedXML(new Document(root));
-        transformationState.editorSession.setBreakpoint("Starting with empty XML document");
+        getSession().setEditedXML(new Document(root));
+        getSession().setBreakpoint("Starting with empty XML document");
     }
 
     private Element createRootElement(String xPath) throws JaxenException {
@@ -92,14 +93,19 @@ public class MCRBindTransformerHelper extends MCRTransformerHelperBase {
         return new Element(nameStep.getLocalName(), ns);
     }
 
-    private void setValues(String value) {
-        transformationState.currentBinding.setValues(replaceXPaths(value));
+    private void handleSetAttribute(MCRTransformerHelperCall call) {
+        String valueToSet = call.getAttributeValueOrDefault(ATTR_SET, null);
+        if (valueToSet != null) {
+            getCurrentBinding().setValues(replaceXPaths(valueToSet));
+        }
     }
 
-    private void setDefault(String value) {
-        value = replaceXPaths(value);
-        transformationState.currentBinding.setDefault(value);
-        transformationState.editorSession.getSubmission()
-            .markDefaultValue(transformationState.currentBinding.getAbsoluteXPath(), value);
+    private void handleDefaultAttribute(MCRTransformerHelperCall call) {
+        String defaultValueToSet = call.getAttributeValueOrDefault(ATTR_DEFAULT, null);
+        if (defaultValueToSet != null) {
+            defaultValueToSet = replaceXPaths(defaultValueToSet);
+            getCurrentBinding().setDefault(defaultValueToSet);
+            getSession().getSubmission().markDefaultValue(getCurrentBinding().getAbsoluteXPath(), defaultValueToSet);
+        }
     }
 }

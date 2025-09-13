@@ -29,18 +29,21 @@ import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
 
 /**
+ * While transforming xed to html, holds state information 
+ * necessary for implementing the transformation. 
+ * 
  * @author Frank Lützenkirchen
  */
 public class MCRTransformationState {
 
-    final MCREditorSession editorSession;
+    private final MCREditorSession session;
 
-    MCRBinding currentBinding;
+    private MCRBinding currentBinding;
 
     private Map<String, MCRTransformerHelperBase> method2helper = new HashMap<>();
 
-    public MCRTransformationState(MCREditorSession editorSession) {
-        this.editorSession = editorSession;
+    public MCRTransformationState(MCREditorSession session) {
+        this.session = session;
 
         List<MCRTransformerHelperBase> helpers = Arrays.asList(
             new MCRSelectTransformerHelper(),
@@ -75,13 +78,21 @@ public class MCRTransformationState {
         return method2helper;
     }
     
+    MCREditorSession getSession() {
+        return session;
+    }
+
+    MCRBinding getCurrentBinding() {
+        return currentBinding;
+    }
+
     void setCurrentBinding(MCRBinding binding) {
         this.currentBinding = binding;
-        editorSession.getValidator().setValidationMarker(currentBinding);
+        session.getValidator().setValidationMarker(currentBinding);
     }
 
     boolean hasValue(String value) {
-        editorSession.getSubmission().mark2checkResubmission(currentBinding);
+        session.getSubmission().mark2checkResubmission(currentBinding);
         return currentBinding.hasValue(value);
     }
 
@@ -89,7 +100,7 @@ public class MCRTransformationState {
         if (currentBinding != null) {
             return currentBinding.getXPathEvaluator();
         } else {
-            return new MCRXPathEvaluator(editorSession.getVariables(), (Parent) null);
+            return new MCRXPathEvaluator(session.getVariables(), (Parent) null);
         }
     }
 }

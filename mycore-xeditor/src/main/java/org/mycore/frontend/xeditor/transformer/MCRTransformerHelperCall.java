@@ -30,6 +30,12 @@ import org.mycore.common.MCRConstants;
 import org.mycore.frontend.xeditor.MCREditorSession;
 import org.mycore.frontend.xeditor.MCREditorSessionStoreUtils;
 
+/**
+ * Parses the URI of a document() call within xed transformation and 
+ * provides methods to access attributes etc.
+ * 
+ * @author Frank Lützenkirchen
+ */
 class MCRTransformerHelperCall {
 
     private static final String PREFIX_XMLNS = "xmlns:";
