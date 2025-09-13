@@ -50,5 +50,4 @@ public class MCRPostProcessorTransformerHelper extends MCRTransformerHelperBase 
         }
         state.editorSession.getPostProcessor().setAttributes(call.getAttributeMap());
     }
-
 }

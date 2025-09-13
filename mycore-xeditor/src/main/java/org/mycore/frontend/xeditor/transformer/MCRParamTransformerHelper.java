@@ -45,5 +45,4 @@ public class MCRParamTransformerHelper extends MCRTransformerHelperBase {
             state.editorSession.getVariables().put(name, defaultValue == null ? "" : defaultValue);
         }
     }
-
 }

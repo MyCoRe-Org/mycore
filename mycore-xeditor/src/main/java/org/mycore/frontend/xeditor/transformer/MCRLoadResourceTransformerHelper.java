@@ -21,18 +21,25 @@ package org.mycore.frontend.xeditor.transformer;
 import java.util.Arrays;
 import java.util.Collection;
 
-public class MCRSourceTransformerHelper extends MCRTransformerHelperBase {
+import org.jdom2.Element;
+import org.mycore.common.xml.MCRURIResolver;
+
+public class MCRLoadResourceTransformerHelper extends MCRTransformerHelperBase {
 
     private static final String ATTR_URI = "uri";
+    private static final String ATTR_NAME = "name";
 
     @Override
     Collection<String> getSupportedMethods() {
-        return Arrays.asList("source");
+        return Arrays.asList("load-resource");
     }
 
     @Override
     void handle(MCRTransformerHelperCall call) throws Exception {
         String uri = call.getAttributeValue(ATTR_URI);
-        state.editorSession.setEditedXML(uri);
+        String name = call.getAttributeValue(ATTR_NAME);
+    
+        Element resource = MCRURIResolver.obtainInstance().resolve(state.replaceXPaths(uri));
+        state.editorSession.getVariables().put(name, resource);
     }
 }

@@ -21,18 +21,34 @@ package org.mycore.frontend.xeditor.transformer;
 import java.util.Arrays;
 import java.util.Collection;
 
-public class MCRSourceTransformerHelper extends MCRTransformerHelperBase {
+public class MCRInputTransformerHelper extends MCRTransformerHelperBase {
 
-    private static final String ATTR_URI = "uri";
+    private static final String ATTR_VALUE = "value";
+    private static final String ATTR_TYPE = "type";
+
+    private static final String TYPE_CHECKBOX = "checkbox";
+    private static final String TYPE_RADIO = "radio";
+
+    private static final String VALUE_CHECKED = "checked";
 
     @Override
     Collection<String> getSupportedMethods() {
-        return Arrays.asList("source");
+        return Arrays.asList("input");
     }
 
     @Override
     void handle(MCRTransformerHelperCall call) throws Exception {
-        String uri = call.getAttributeValue(ATTR_URI);
-        state.editorSession.setEditedXML(uri);
+        String type = call.getAttributeValue(ATTR_TYPE);
+
+        state.setXPath(call.getReturnElement(), TYPE_CHECKBOX.equals(type));
+
+        if (TYPE_RADIO.equals(type) || TYPE_CHECKBOX.equals(type)) {
+            String value = call.getAttributeValue(ATTR_VALUE);
+            if (state.hasValue(value)) {
+                call.getReturnElement().setAttribute(VALUE_CHECKED, VALUE_CHECKED);
+            }
+        } else {
+            call.getReturnElement().setAttribute(ATTR_VALUE, state.currentBinding.getValue());
+        }
     }
 }

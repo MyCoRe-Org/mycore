@@ -37,5 +37,4 @@ public class MCRCancelTransformerHelper extends MCRTransformerHelperBase {
         String cancelURL = call.getAttributeValue(ATTR_URL);
         state.editorSession.setCancelURL(cancelURL);
     }
-
 }

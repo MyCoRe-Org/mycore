@@ -21,7 +21,7 @@ package org.mycore.frontend.xeditor.transformer;
 import java.util.Arrays;
 import java.util.Collection;
 
-public class MCRIncludeTransformerHandler extends MCRTransformerHelperBase {
+public class MCRIncludeTransformerHelper extends MCRTransformerHelperBase {
 
     private static final String ATTR_URI = "uri";
     private static final String ATTR_REF = "ref";

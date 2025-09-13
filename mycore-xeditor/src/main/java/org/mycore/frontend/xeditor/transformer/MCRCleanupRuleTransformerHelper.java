@@ -21,18 +21,20 @@ package org.mycore.frontend.xeditor.transformer;
 import java.util.Arrays;
 import java.util.Collection;
 
-public class MCRSourceTransformerHelper extends MCRTransformerHelperBase {
+public class MCRCleanupRuleTransformerHelper extends MCRTransformerHelperBase {
 
-    private static final String ATTR_URI = "uri";
+    private static final String ATTR_XPATH = "xpath";
+    private static final String ATTR_RELEVANT_IF = "relevant-if";
 
     @Override
     Collection<String> getSupportedMethods() {
-        return Arrays.asList("source");
+        return Arrays.asList("cleanup-rule");
     }
 
     @Override
     void handle(MCRTransformerHelperCall call) throws Exception {
-        String uri = call.getAttributeValue(ATTR_URI);
-        state.editorSession.setEditedXML(uri);
+        String xPath = call.getAttributeValue(ATTR_XPATH);
+        String relevantIf = call.getAttributeValue(ATTR_RELEVANT_IF);
+        state.editorSession.getXMLCleaner().addRule(xPath, relevantIf);
     }
 }

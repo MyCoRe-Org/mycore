@@ -69,5 +69,4 @@ public class MCRSelectTransformerHelper extends MCRTransformerHelperBase {
             }
         }
     }
-
 }

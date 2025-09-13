@@ -36,5 +36,4 @@ public class MCRConditionTransformerHelper extends MCRTransformerHelperBase {
         boolean testResult = state.getXPathEvaluator().test(xPathExpression);
         call.getReturnElement().setText(Boolean.toString(testResult));
     }
-
 }

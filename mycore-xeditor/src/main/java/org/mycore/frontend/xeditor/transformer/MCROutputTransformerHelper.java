@@ -25,7 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jaxen.JaxenException;
 import org.mycore.services.i18n.MCRTranslation;
 
-public class MCROutputTransformerHandler extends MCRTransformerHelperBase {
+public class MCROutputTransformerHelper extends MCRTransformerHelperBase {
 
     private static final String ATTR_VALUE = "value";
     private static final String ATTR_I18N = "i18n";
@@ -60,5 +60,4 @@ public class MCROutputTransformerHandler extends MCRTransformerHelperBase {
             return state.currentBinding.getValue();
         }
     }
-
 }

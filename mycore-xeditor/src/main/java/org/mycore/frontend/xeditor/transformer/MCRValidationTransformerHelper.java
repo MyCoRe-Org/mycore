@@ -85,5 +85,4 @@ public class MCRValidationTransformerHelper extends MCRTransformerHelperBase {
     private boolean hasValidationError() {
         return state.editorSession.getValidator().hasError(state.currentBinding);
     }
-
 }

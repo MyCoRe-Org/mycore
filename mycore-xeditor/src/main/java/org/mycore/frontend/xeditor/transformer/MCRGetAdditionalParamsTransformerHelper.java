@@ -74,5 +74,4 @@ public class MCRGetAdditionalParamsTransformerHelper extends MCRTransformerHelpe
         input.setAttribute("value", value);
         return input;
     }
-
 }

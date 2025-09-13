@@ -32,5 +32,4 @@ public class MCRUnbindTransformerHelper extends MCRTransformerHelperBase {
     void handle(MCRTransformerHelperCall call) throws Exception {
         state.setCurrentBinding(state.currentBinding.getParent());
     }
-
 }

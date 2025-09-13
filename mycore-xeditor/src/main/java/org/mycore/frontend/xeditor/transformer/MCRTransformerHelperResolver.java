@@ -48,24 +48,6 @@ public class MCRTransformerHelperResolver implements URIResolver {
         MCRTransformerHelper tfhelper = call.getTransformerHelper();
 
         switch (call.getMethod()) {
-            case "form":
-                tfhelper.handleForm(call);
-                break;
-            case "input":
-                tfhelper.handleInput(call);
-                break;
-            case "textarea":
-                tfhelper.handleTextarea(call);
-                break;
-            case "button":
-                tfhelper.handleSubmitButton(call);
-                break;
-            case "cleanup-rule":
-                tfhelper.handleCleanupRule(call);
-                break;
-            case "load-resource":
-                tfhelper.handleLoadResource(call);
-                break;
             case "replaceXPaths":
                 tfhelper.handleReplaceXPaths(call);
                 break;

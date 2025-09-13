@@ -21,18 +21,31 @@ package org.mycore.frontend.xeditor.transformer;
 import java.util.Arrays;
 import java.util.Collection;
 
-public class MCRSourceTransformerHelper extends MCRTransformerHelperBase {
+import org.mycore.frontend.MCRFrontendUtil;
 
-    private static final String ATTR_URI = "uri";
+public class MCRFormTransformerHelper extends MCRTransformerHelperBase {
+
+    private static final String ATTR_ACTION = "action";
+    private static final String ATTR_METHOD = "method";
+
+    private static final String VALUE_POST = "post";
+    private static final String VALUE_OUTPUT = "output";
 
     @Override
     Collection<String> getSupportedMethods() {
-        return Arrays.asList("source");
+        return Arrays.asList("form");
     }
 
     @Override
     void handle(MCRTransformerHelperCall call) throws Exception {
-        String uri = call.getAttributeValue(ATTR_URI);
-        state.editorSession.setEditedXML(uri);
+        call.registerDeclaredNamespaces();
+
+        String method = call.getAttributeValueOrDefault(ATTR_METHOD, VALUE_POST);
+        if (!VALUE_OUTPUT.equals(method)) {
+            state.handleReplaceXPaths(call);
+
+            call.getReturnElement().setAttribute(ATTR_ACTION, MCRFrontendUtil.getBaseURL() + "servlets/XEditor");
+            call.getReturnElement().setAttribute(ATTR_METHOD, method);
+        }
     }
 }
