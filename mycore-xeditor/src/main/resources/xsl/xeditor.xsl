@@ -278,26 +278,22 @@
   <!-- ========== <xed:choose> <xed:when test=""/> <xed:otherwise /> </xed:choose> ========== -->
 
   <xsl:template match="xed:choose" mode="xeditor">
-  
-    <xsl:variable name="matchingIDs">
-      <xsl:for-each select="xed:when">
-        <xsl:variable name="uri">
-          <xsl:call-template name="callTransformerHelperURI" />
-        </xsl:variable>
-        <xsl:if test="document($uri)/result='true'">
-          <xsl:value-of select="generate-id()" />
-          <xsl:text>|</xsl:text>
-        </xsl:if>
-      </xsl:for-each>
+    <xsl:apply-templates select="xed:when[1]" mode="xeditor" />
+  </xsl:template>
+
+  <xsl:template match="xed:when" mode="xeditor">
+    <xsl:variable name="uri">
+      <xsl:call-template name="callTransformerHelperURI" />
     </xsl:variable>
-    <xsl:variable name="matchingID" select="substring-before($matchingIDs,'|')" />
-  
     <xsl:choose>
-      <xsl:when test="string-length($matchingID) &gt; 0">
-        <xsl:apply-templates select="xed:when[generate-id()=$matchingID]/node()" mode="xeditor" />
+      <xsl:when test="document($uri)/result='true'">
+        <xsl:apply-templates select="node()" mode="xeditor" />
+      </xsl:when>
+      <xsl:when test="following-sibling::xed:when">
+        <xsl:apply-templates select="following-sibling::xed:when[1]" mode="xeditor" />
       </xsl:when>
       <xsl:otherwise>
-        <xsl:apply-templates select="xed:otherwise/node()" mode="xeditor" />
+        <xsl:apply-templates select="following-sibling::xed:otherwise/node()" mode="xeditor" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
