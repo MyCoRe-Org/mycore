@@ -35,6 +35,6 @@ public class MCRCancelTransformerHelper extends MCRTransformerHelperBase {
     @Override
     void handle(MCRTransformerHelperCall call) throws JaxenException {
         String cancelURL = call.getAttributeValue(ATTR_URL);
-        state.editorSession.setCancelURL(cancelURL);
+        transformationState.editorSession.setCancelURL(cancelURL);
     }
 }

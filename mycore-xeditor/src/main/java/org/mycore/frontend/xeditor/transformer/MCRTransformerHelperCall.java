@@ -38,7 +38,7 @@ class MCRTransformerHelperCall {
 
     private static final String PREFIX_XMLNS = "xmlns:";
 
-    private MCRTransformerHelper helper;
+    private MCRTransformationState helper;
 
     private String method;
 
@@ -75,12 +75,12 @@ class MCRTransformerHelperCall {
         }
     }
 
-    MCRTransformerHelper lookupTransformerHelper(String sessionID) {
+    MCRTransformationState lookupTransformerHelper(String sessionID) {
         MCREditorSession session = MCREditorSessionStoreUtils.getSessionStore().getSession(sessionID);
-        return session.getTransformerHelper();
+        return session.getTransformationState();
     }
 
-    MCRTransformerHelper getTransformerHelper() {
+    MCRTransformationState getTransformerHelper() {
         return helper;
     }
 

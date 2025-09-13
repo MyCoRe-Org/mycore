@@ -31,7 +31,7 @@ import org.mycore.frontend.xeditor.MCREditorSession;
 /**
  * @author Frank Lützenkirchen
  */
-public class MCRTransformerHelper {
+public class MCRTransformationState {
 
     final MCREditorSession editorSession;
 
@@ -39,7 +39,7 @@ public class MCRTransformerHelper {
 
     private Map<String, MCRTransformerHelperBase> method2helper = new HashMap<>();
 
-    public MCRTransformerHelper(MCREditorSession editorSession) {
+    public MCRTransformationState(MCREditorSession editorSession) {
         this.editorSession = editorSession;
 
         List<MCRTransformerHelperBase> helpers = Arrays.asList(
@@ -71,10 +71,10 @@ public class MCRTransformerHelper {
         });
     }
 
-    void handle(MCRTransformerHelperCall call) throws Exception {
-        method2helper.get(call.getMethod()).handle(call);
+    Map<String, MCRTransformerHelperBase> getMethodHelperMap() {
+        return method2helper;
     }
-
+    
     void setCurrentBinding(MCRBinding binding) {
         this.currentBinding = binding;
         editorSession.getValidator().setValidationMarker(currentBinding);

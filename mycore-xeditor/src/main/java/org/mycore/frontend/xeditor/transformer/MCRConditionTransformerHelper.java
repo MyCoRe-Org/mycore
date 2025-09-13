@@ -33,7 +33,7 @@ public class MCRConditionTransformerHelper extends MCRTransformerHelperBase {
     @Override
     public void handle(MCRTransformerHelperCall call) {
         String xPathExpression = call.getAttributeValue(ATTR_TEST);
-        boolean testResult = state.getXPathEvaluator().test(xPathExpression);
+        boolean testResult = transformationState.getXPathEvaluator().test(xPathExpression);
         call.getReturnElement().setText(Boolean.toString(testResult));
     }
 }

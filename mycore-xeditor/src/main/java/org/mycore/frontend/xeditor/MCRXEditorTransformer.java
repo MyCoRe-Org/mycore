@@ -31,7 +31,7 @@ import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
-import org.mycore.frontend.xeditor.transformer.MCRTransformerHelper;
+import org.mycore.frontend.xeditor.transformer.MCRTransformationState;
 
 /**
  * @author Frank Lützenkirchen
@@ -50,8 +50,8 @@ public class MCRXEditorTransformer {
     public MCRContent transform(MCRContent editorSource) throws IOException {
         editorSession.getSubmission().clear();
 
-        MCRTransformerHelper helper = new MCRTransformerHelper(editorSession);
-        editorSession.setTransformerHelper(helper);
+        MCRTransformationState helper = new MCRTransformationState(editorSession);
+        editorSession.setTransformationState(helper);
 
         MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer("xeditor");
         if (!(transformer instanceof MCRParameterizedTransformer)) {
@@ -68,7 +68,7 @@ public class MCRXEditorTransformer {
             result = wrappedContent.getBaseContent();
         }
 
-        editorSession.setTransformerHelper(null);
+        editorSession.setTransformationState(null);
 
         Document xed = content2xml(result);
 

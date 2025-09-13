@@ -62,24 +62,24 @@ public class MCRBindTransformerHelper extends MCRTransformerHelperBase {
 
     private void bind(String xPath, String initialValue, String name)
         throws JaxenException {
-        if (state.editorSession.getEditedXML() == null) {
+        if (transformationState.editorSession.getEditedXML() == null) {
             createEmptyDocumentFromXPath(xPath);
         }
 
-        if (state.currentBinding == null) {
-            state.currentBinding = state.editorSession.getRootBinding();
+        if (transformationState.currentBinding == null) {
+            transformationState.currentBinding = transformationState.editorSession.getRootBinding();
         }
 
         if (initialValue != null) {
             initialValue = replaceXPaths(initialValue);
         }
-        state.setCurrentBinding(new MCRBinding(xPath, initialValue, name, state.currentBinding));
+        transformationState.setCurrentBinding(new MCRBinding(xPath, initialValue, name, transformationState.currentBinding));
     }
 
     private void createEmptyDocumentFromXPath(String xPath) throws JaxenException {
         Element root = createRootElement(xPath);
-        state.editorSession.setEditedXML(new Document(root));
-        state.editorSession.setBreakpoint("Starting with empty XML document");
+        transformationState.editorSession.setEditedXML(new Document(root));
+        transformationState.editorSession.setBreakpoint("Starting with empty XML document");
     }
 
     private Element createRootElement(String xPath) throws JaxenException {
@@ -92,12 +92,12 @@ public class MCRBindTransformerHelper extends MCRTransformerHelperBase {
     }
 
     private void setValues(String value) {
-        state.currentBinding.setValues(replaceXPaths(value));
+        transformationState.currentBinding.setValues(replaceXPaths(value));
     }
 
     private void setDefault(String value) {
         value = replaceXPaths(value);
-        state.currentBinding.setDefault(value);
-        state.editorSession.getSubmission().markDefaultValue(state.currentBinding.getAbsoluteXPath(), value);
+        transformationState.currentBinding.setDefault(value);
+        transformationState.editorSession.getSubmission().markDefaultValue(transformationState.currentBinding.getAbsoluteXPath(), value);
     }
 }

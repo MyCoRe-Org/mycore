@@ -43,11 +43,11 @@ public class MCRPostProcessorTransformerHelper extends MCRTransformerHelperBase 
                 MCRXEditorPostProcessor instance = ((MCRXEditorPostProcessor) MCRClassTools.forName(clazz)
                     .getDeclaredConstructor()
                     .newInstance());
-                state.editorSession.setPostProcessor(instance);
+                transformationState.editorSession.setPostProcessor(instance);
             } catch (ReflectiveOperationException e) {
                 throw new MCRException("Could not initialize Post-Processor with class" + clazz, e);
             }
         }
-        state.editorSession.getPostProcessor().setAttributes(call.getAttributeMap());
+        transformationState.editorSession.getPostProcessor().setAttributes(call.getAttributeMap());
     }
 }

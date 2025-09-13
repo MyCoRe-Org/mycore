@@ -30,10 +30,10 @@ public abstract class MCRTransformerHelperBase {
 
     private static final String PREDICATE_IS_FIRST = "[1]";
 
-    protected MCRTransformerHelper state;
+    protected MCRTransformationState transformationState;
 
-    void init(MCRTransformerHelper state) {
-        this.state = state;
+    void init(MCRTransformationState transformationState) {
+        this.transformationState = transformationState;
     }
 
     abstract Collection<String> getSupportedMethods();
@@ -41,7 +41,7 @@ public abstract class MCRTransformerHelperBase {
     abstract void handle(MCRTransformerHelperCall call) throws Exception;
 
     protected String replaceXPaths(String text) {
-        return state.getXPathEvaluator().replaceXPaths(text, false);
+        return transformationState.getXPathEvaluator().replaceXPaths(text, false);
     }
 
     protected void replaceXPaths(MCRTransformerHelperCall call) {
@@ -51,7 +51,7 @@ public abstract class MCRTransformerHelperBase {
     }
 
     protected void setXPath(Element result, boolean fixPathForMultiple) {
-        String xPath = state.currentBinding.getAbsoluteXPath();
+        String xPath = transformationState.currentBinding.getAbsoluteXPath();
         if (fixPathForMultiple && xPath.endsWith(PREDICATE_IS_FIRST)) {
             xPath = xPath.substring(0, xPath.length() - PREDICATE_IS_FIRST.length());
         }

@@ -39,7 +39,7 @@ public class MCRGetAdditionalParamsTransformerHelper extends MCRTransformerHelpe
     void handle(MCRTransformerHelperCall call) throws Exception {
         Element div = new Element("div").setAttribute(ATTR_STYLE, "visibility:hidden");
 
-        Map<String, String[]> parameters = state.editorSession.getRequestParameters();
+        Map<String, String[]> parameters = transformationState.editorSession.getRequestParameters();
         for (String name : parameters.keySet()) {
             for (String value : parameters.get(name)) {
                 if ((value != null) && !value.isEmpty()) {
@@ -48,21 +48,21 @@ public class MCRGetAdditionalParamsTransformerHelper extends MCRTransformerHelpe
             }
         }
 
-        String xPaths2CheckResubmission = state.editorSession.getSubmission().getXPaths2CheckResubmission();
+        String xPaths2CheckResubmission = transformationState.editorSession.getSubmission().getXPaths2CheckResubmission();
         if (!xPaths2CheckResubmission.isEmpty()) {
             div.addContent(buildAdditionalParameterElement(MCREditorSubmission.PREFIX_CHECK_RESUBMISSION,
                 xPaths2CheckResubmission));
         }
 
-        Map<String, String> defaultValues = state.editorSession.getSubmission().getDefaultValues();
+        Map<String, String> defaultValues = transformationState.editorSession.getSubmission().getDefaultValues();
         for (String xPath : defaultValues.keySet()) {
             div.addContent(buildAdditionalParameterElement(MCREditorSubmission.PREFIX_DEFAULT_VALUE + xPath,
                 defaultValues.get(xPath)));
         }
 
-        state.editorSession.setBreakpoint("After transformation to HTML");
+        transformationState.editorSession.setBreakpoint("After transformation to HTML");
         div.addContent(buildAdditionalParameterElement(MCREditorSessionStore.XEDITOR_SESSION_PARAM,
-            state.editorSession.getCombinedSessionStepID()));
+            transformationState.editorSession.getCombinedSessionStepID()));
 
         call.getReturnElement().addContent(div);
     }

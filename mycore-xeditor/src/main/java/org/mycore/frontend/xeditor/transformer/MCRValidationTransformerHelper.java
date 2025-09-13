@@ -58,11 +58,11 @@ public class MCRValidationTransformerHelper extends MCRTransformerHelperBase {
     }
 
     private void handleValidationRule(MCRTransformerHelperCall call) {
-        call.getReturnElement().setAttribute("baseXPath", state.currentBinding.getAbsoluteXPath());
+        call.getReturnElement().setAttribute("baseXPath", transformationState.currentBinding.getAbsoluteXPath());
     }
 
     private void handleDisplayValidationMessages(MCRTransformerHelperCall call) {
-        state.editorSession.getValidator().getFailedRules().stream()
+        transformationState.editorSession.getValidator().getFailedRules().stream()
             .map(MCRValidator::getRuleElement)
             .filter(rule -> rule.getAttributeValue(ATTR_DISPLAY, "").contains(VALUE_GLOBAL))
             .forEach(call.getReturnElement()::addContent);
@@ -71,7 +71,7 @@ public class MCRValidationTransformerHelper extends MCRTransformerHelperBase {
     private void handleDisplayValidationMessage(MCRTransformerHelperCall call) {
         if (hasValidationError()) {
             Element failedRule =
-                state.editorSession.getValidator().getFailedRule(state.currentBinding).getRuleElement();
+                transformationState.editorSession.getValidator().getFailedRule(transformationState.currentBinding).getRuleElement();
             if (failedRule.getAttributeValue(ATTR_DISPLAY, "").contains(VALUE_LOCAL)) {
                 call.getReturnElement().addContent(failedRule.clone());
             }
@@ -83,6 +83,6 @@ public class MCRValidationTransformerHelper extends MCRTransformerHelperBase {
     }
 
     private boolean hasValidationError() {
-        return state.editorSession.getValidator().hasError(state.currentBinding);
+        return transformationState.editorSession.getValidator().hasError(transformationState.currentBinding);
     }
 }

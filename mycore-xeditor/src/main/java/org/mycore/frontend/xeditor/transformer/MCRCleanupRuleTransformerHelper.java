@@ -35,6 +35,6 @@ public class MCRCleanupRuleTransformerHelper extends MCRTransformerHelperBase {
     void handle(MCRTransformerHelperCall call) throws Exception {
         String xPath = call.getAttributeValue(ATTR_XPATH);
         String relevantIf = call.getAttributeValue(ATTR_RELEVANT_IF);
-        state.editorSession.getXMLCleaner().addRule(xPath, relevantIf);
+        transformationState.editorSession.getXMLCleaner().addRule(xPath, relevantIf);
     }
 }

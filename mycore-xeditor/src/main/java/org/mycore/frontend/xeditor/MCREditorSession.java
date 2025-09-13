@@ -43,7 +43,7 @@ import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.xeditor.cleanup.MCRXMLCleaner;
 import org.mycore.frontend.xeditor.tracker.MCRBreakpoint;
 import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
-import org.mycore.frontend.xeditor.transformer.MCRTransformerHelper;
+import org.mycore.frontend.xeditor.transformer.MCRTransformationState;
 import org.mycore.frontend.xeditor.validation.MCRXEditorValidator;
 
 /**
@@ -63,7 +63,7 @@ public class MCREditorSession {
 
     private Map<String, Object> variables;
     
-    private MCRTransformerHelper transformerHelper; 
+    private MCRTransformationState transformationState; 
 
     private String cancelURL;
 
@@ -148,12 +148,12 @@ public class MCREditorSession {
         return requestParameters;
     }
 
-    public MCRTransformerHelper getTransformerHelper() {
-        return transformerHelper;
+    public MCRTransformationState getTransformationState() {
+        return transformationState;
     }
 
-    public void setTransformerHelper(MCRTransformerHelper transformerHelper) {
-        this.transformerHelper = transformerHelper;
+    public void setTransformationState(MCRTransformationState transformationState) {
+        this.transformationState = transformationState;
     }
 
     public String getCancelURL() {

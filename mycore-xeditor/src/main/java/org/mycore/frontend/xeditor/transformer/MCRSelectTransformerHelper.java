@@ -64,7 +64,7 @@ public class MCRSelectTransformerHelper extends MCRTransformerHelperBase {
         if (withinSelectElement) {
             String value = call.getAttributeValueOrDefault(ATTR_VALUE, call.getAttributeValue(ATTR_TEXT));
 
-            if ((!Strings.isEmpty(value)) && state.hasValue(value)) {
+            if ((!Strings.isEmpty(value)) && transformationState.hasValue(value)) {
                 call.getReturnElement().setAttribute(VALUE_SELECTED, VALUE_SELECTED);
             }
         }

@@ -39,10 +39,10 @@ public class MCRParamTransformerHelper extends MCRTransformerHelperBase {
         String name = call.getAttributeValue(ATTR_NAME);
         String defaultValue = call.getAttributeValueOrDefault(ATTR_DEFAULT, null);
 
-        Object currentValue = state.editorSession.getVariables().get(name);
+        Object currentValue = transformationState.editorSession.getVariables().get(name);
 
         if ((currentValue == null) || Objects.equals(currentValue, "")) {
-            state.editorSession.getVariables().put(name, defaultValue == null ? "" : defaultValue);
+            transformationState.editorSession.getVariables().put(name, defaultValue == null ? "" : defaultValue);
         }
     }
 }

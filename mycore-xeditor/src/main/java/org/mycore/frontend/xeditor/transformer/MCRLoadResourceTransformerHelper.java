@@ -40,6 +40,6 @@ public class MCRLoadResourceTransformerHelper extends MCRTransformerHelperBase {
         String name = call.getAttributeValue(ATTR_NAME);
     
         Element resource = MCRURIResolver.obtainInstance().resolve(replaceXPaths(uri));
-        state.editorSession.getVariables().put(name, resource);
+        transformationState.editorSession.getVariables().put(name, resource);
     }
 }

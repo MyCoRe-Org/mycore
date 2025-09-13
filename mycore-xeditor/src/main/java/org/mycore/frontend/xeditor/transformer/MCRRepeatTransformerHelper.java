@@ -85,8 +85,8 @@ public class MCRRepeatTransformerHelper extends MCRTransformerHelperBase {
         int maxRepeats = Integer.parseInt(call.getAttributeValueOrDefault(ATTR_MAX, "0"));
         String method = call.getAttributeValue(ATTR_METHOD);
 
-        MCRRepeatBinding repeat = new MCRRepeatBinding(xPath, state.currentBinding, minRepeats, maxRepeats, method);
-        state.setCurrentBinding(repeat);
+        MCRRepeatBinding repeat = new MCRRepeatBinding(xPath, transformationState.currentBinding, minRepeats, maxRepeats, method);
+        transformationState.setCurrentBinding(repeat);
 
         Element repeated = getRepeatedContent(call);
         repeat.getBoundNodes().forEach(node -> call.getReturnElement().addContent(repeated.clone()));
@@ -99,7 +99,7 @@ public class MCRRepeatTransformerHelper extends MCRTransformerHelperBase {
     }
 
     private MCRRepeatBinding getCurrentRepeat() {
-        MCRBinding binding = state.currentBinding;
+        MCRBinding binding = transformationState.currentBinding;
         while (!(binding instanceof MCRRepeatBinding)) {
             binding = binding.getParent();
         }
@@ -130,7 +130,7 @@ public class MCRRepeatTransformerHelper extends MCRTransformerHelperBase {
             if (CONTROL_APPEND.equals(token) || CONTROL_INSERT.equals(token)) {
                 name.append(MCRInsertTarget.getInsertParameter(getCurrentRepeat()));
             } else if (CONTROL_REMOVE.equals(token)) {
-                name.append(state.currentBinding.getAbsoluteXPath());
+                name.append(transformationState.currentBinding.getAbsoluteXPath());
             } else if (CONTROL_UP.equals(token) || CONTROL_DOWN.equals(token)) {
                 name.append(getSwapParameter(token));
             }
@@ -154,8 +154,8 @@ public class MCRRepeatTransformerHelper extends MCRTransformerHelperBase {
     }
 
     private void handleRepeated(MCRTransformerHelperCall call) {
-        state.setCurrentBinding(getCurrentRepeat().bindRepeatPosition());
-        state.editorSession.getValidator().setValidationMarker(state.currentBinding);
+        transformationState.setCurrentBinding(getCurrentRepeat().bindRepeatPosition());
+        transformationState.editorSession.getValidator().setValidationMarker(transformationState.currentBinding);
 
         Element anchor = new Element("a");
         String id = "rep-" + ++anchorID;

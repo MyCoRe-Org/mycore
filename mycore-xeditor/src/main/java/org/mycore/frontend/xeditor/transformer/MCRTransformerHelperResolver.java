@@ -45,7 +45,7 @@ public class MCRTransformerHelperResolver implements URIResolver {
     }
 
     private void handleCall(MCRTransformerHelperCall call) throws Exception {
-        MCRTransformerHelper tfhelper = call.getTransformerHelper();
-        tfhelper.handle(call);
+        MCRTransformationState tfhelper = call.getTransformerHelper();
+        tfhelper.getMethodHelperMap().get(call.getMethod()).handle(call);
     }
 }

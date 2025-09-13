@@ -46,7 +46,7 @@ public class MCRButtonTransformerHelper extends MCRTransformerHelperBase {
         name.append("_xed_submit_").append(target);
 
         if ("subselect".equals(target)) {
-            name.append(COLON).append(state.currentBinding.getAbsoluteXPath()).append(COLON)
+            name.append(COLON).append(transformationState.currentBinding.getAbsoluteXPath()).append(COLON)
                 .append(MCRSubselectTarget.encode(href));
         } else if (Strings.isNotBlank(href)) {
             name.append(COLON).append(href);

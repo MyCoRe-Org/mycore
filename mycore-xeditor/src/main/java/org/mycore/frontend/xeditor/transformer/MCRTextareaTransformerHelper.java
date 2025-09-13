@@ -34,9 +34,9 @@ public class MCRTextareaTransformerHelper extends MCRTransformerHelperBase {
     void handle(MCRTransformerHelperCall call) throws Exception {
         replaceXPaths(call);
 
-        call.getReturnElement().setAttribute(ATTR_NAME, state.currentBinding.getAbsoluteXPath());
+        call.getReturnElement().setAttribute(ATTR_NAME, transformationState.currentBinding.getAbsoluteXPath());
 
-        String value = state.currentBinding.getValue();
+        String value = transformationState.currentBinding.getValue();
         if (value != null) {
             call.getReturnElement().setText(value);
         }

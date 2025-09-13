@@ -33,6 +33,6 @@ public class MCRSourceTransformerHelper extends MCRTransformerHelperBase {
     @Override
     void handle(MCRTransformerHelperCall call) throws Exception {
         String uri = call.getAttributeValue(ATTR_URI);
-        state.editorSession.setEditedXML(uri);
+        transformationState.editorSession.setEditedXML(uri);
     }
 }

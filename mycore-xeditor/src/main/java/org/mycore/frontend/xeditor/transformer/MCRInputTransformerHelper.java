@@ -44,11 +44,11 @@ public class MCRInputTransformerHelper extends MCRTransformerHelperBase {
 
         if (TYPE_RADIO.equals(type) || TYPE_CHECKBOX.equals(type)) {
             String value = call.getAttributeValue(ATTR_VALUE);
-            if (state.hasValue(value)) {
+            if (transformationState.hasValue(value)) {
                 call.getReturnElement().setAttribute(VALUE_CHECKED, VALUE_CHECKED);
             }
         } else {
-            call.getReturnElement().setAttribute(ATTR_VALUE, state.currentBinding.getValue());
+            call.getReturnElement().setAttribute(ATTR_VALUE, transformationState.currentBinding.getValue());
         }
     }
 }

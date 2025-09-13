@@ -50,14 +50,14 @@ public class MCROutputTransformerHelper extends MCRTransformerHelperBase {
             if (StringUtils.isEmpty(attrValue)) {
                 return MCRTranslation.translate(key);
             } else {
-                String value = state.getXPathEvaluator().evaluateXPath(attrValue);
+                String value = transformationState.getXPathEvaluator().evaluateXPath(attrValue);
                 return MCRTranslation.translate(key, value);
             }
 
         } else if (!StringUtils.isEmpty(attrValue)) {
-            return state.getXPathEvaluator().replaceXPathOrI18n(attrValue);
+            return transformationState.getXPathEvaluator().replaceXPathOrI18n(attrValue);
         } else {
-            return state.currentBinding.getValue();
+            return transformationState.currentBinding.getValue();
         }
     }
 }
