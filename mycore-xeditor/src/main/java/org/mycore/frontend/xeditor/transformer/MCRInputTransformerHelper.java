@@ -40,7 +40,7 @@ public class MCRInputTransformerHelper extends MCRTransformerHelperBase {
     void handle(MCRTransformerHelperCall call) throws Exception {
         String type = call.getAttributeValue(ATTR_TYPE);
 
-        state.setXPath(call.getReturnElement(), TYPE_CHECKBOX.equals(type));
+        setXPath(call.getReturnElement(), TYPE_CHECKBOX.equals(type));
 
         if (TYPE_RADIO.equals(type) || TYPE_CHECKBOX.equals(type)) {
             String value = call.getAttributeValue(ATTR_VALUE);

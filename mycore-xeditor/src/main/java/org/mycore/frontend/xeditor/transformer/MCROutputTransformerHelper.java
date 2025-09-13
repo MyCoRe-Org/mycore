@@ -45,7 +45,7 @@ public class MCROutputTransformerHelper extends MCRTransformerHelperBase {
 
     private String output(String attrValue, String attrI18N) {
         if (!StringUtils.isEmpty(attrI18N)) {
-            String key = state.replaceParameters(attrI18N);
+            String key = replaceXPaths(attrI18N);
 
             if (StringUtils.isEmpty(attrValue)) {
                 return MCRTranslation.translate(key);

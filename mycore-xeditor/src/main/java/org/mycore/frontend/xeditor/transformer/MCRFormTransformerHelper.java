@@ -42,7 +42,7 @@ public class MCRFormTransformerHelper extends MCRTransformerHelperBase {
 
         String method = call.getAttributeValueOrDefault(ATTR_METHOD, VALUE_POST);
         if (!VALUE_OUTPUT.equals(method)) {
-            state.handleReplaceXPaths(call);
+            replaceXPaths(call);
 
             call.getReturnElement().setAttribute(ATTR_ACTION, MCRFrontendUtil.getBaseURL() + "servlets/XEditor");
             call.getReturnElement().setAttribute(ATTR_METHOD, method);

@@ -32,7 +32,7 @@ public class MCRPreloadTransformerHelper extends MCRTransformerHelperBase {
 
     @Override
     void handle(MCRTransformerHelperCall call) throws Exception {
-        String newValue = state.replaceParameters(call.getAttributeValue(ATTR_URI));
+        String newValue = replaceXPaths(call.getAttributeValue(ATTR_URI));
         call.getReturnElement().setAttribute(ATTR_URI, newValue);
     }
 }

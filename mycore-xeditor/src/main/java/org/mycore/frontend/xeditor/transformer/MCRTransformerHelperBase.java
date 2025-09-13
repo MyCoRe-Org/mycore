@@ -20,7 +20,15 @@ package org.mycore.frontend.xeditor.transformer;
 
 import java.util.Collection;
 
+import org.jdom2.Element;
+
 public abstract class MCRTransformerHelperBase {
+
+    private static final char COLON = ':';
+
+    private static final String ATTR_NAME = "name";
+
+    private static final String PREDICATE_IS_FIRST = "[1]";
 
     protected MCRTransformerHelper state;
 
@@ -31,4 +39,22 @@ public abstract class MCRTransformerHelperBase {
     abstract Collection<String> getSupportedMethods();
 
     abstract void handle(MCRTransformerHelperCall call) throws Exception;
+
+    protected String replaceXPaths(String text) {
+        return state.getXPathEvaluator().replaceXPaths(text, false);
+    }
+
+    protected void replaceXPaths(MCRTransformerHelperCall call) {
+        call.getAttributeMap().keySet().removeIf(key -> key.contains(String.valueOf(COLON)));
+        call.getAttributeMap()
+            .forEach((name, value) -> call.getReturnElement().setAttribute(name, replaceXPaths(value)));
+    }
+
+    protected void setXPath(Element result, boolean fixPathForMultiple) {
+        String xPath = state.currentBinding.getAbsoluteXPath();
+        if (fixPathForMultiple && xPath.endsWith(PREDICATE_IS_FIRST)) {
+            xPath = xPath.substring(0, xPath.length() - PREDICATE_IS_FIRST.length());
+        }
+        result.setAttribute(ATTR_NAME, xPath);
+    }
 }

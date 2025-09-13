@@ -71,7 +71,7 @@ public class MCRBindTransformerHelper extends MCRTransformerHelperBase {
         }
 
         if (initialValue != null) {
-            initialValue = state.replaceXPaths(initialValue);
+            initialValue = replaceXPaths(initialValue);
         }
         state.setCurrentBinding(new MCRBinding(xPath, initialValue, name, state.currentBinding));
     }
@@ -92,11 +92,11 @@ public class MCRBindTransformerHelper extends MCRTransformerHelperBase {
     }
 
     private void setValues(String value) {
-        state.currentBinding.setValues(state.replaceXPaths(value));
+        state.currentBinding.setValues(replaceXPaths(value));
     }
 
     private void setDefault(String value) {
-        value = state.replaceXPaths(value);
+        value = replaceXPaths(value);
         state.currentBinding.setDefault(value);
         state.editorSession.getSubmission().markDefaultValue(state.currentBinding.getAbsoluteXPath(), value);
     }

@@ -21,28 +21,15 @@ package org.mycore.frontend.xeditor.transformer;
 import java.util.Arrays;
 import java.util.Collection;
 
-public class MCRIncludeTransformerHelper extends MCRTransformerHelperBase {
-
-    private static final String ATTR_URI = "uri";
-    private static final String ATTR_REF = "ref";
+public class MCRReplaceXPathsTransformerHelper extends MCRTransformerHelperBase {
 
     @Override
     Collection<String> getSupportedMethods() {
-        return Arrays.asList("include");
+        return Arrays.asList("replaceXPaths");
     }
 
     @Override
     void handle(MCRTransformerHelperCall call) throws Exception {
-        replaceParameters(call, ATTR_URI);
-        replaceParameters(call, ATTR_REF);
-    }
-
-    private void replaceParameters(MCRTransformerHelperCall call, String attributeName) {
-        String oldValue = call.getAttributeValue(attributeName);
-        if (oldValue != null) {
-            String newValue = replaceXPaths(oldValue);
-            call.getReturnElement().setAttribute(attributeName, newValue);
-
-        }
+        replaceXPaths(call);
     }
 }

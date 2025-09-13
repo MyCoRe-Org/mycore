@@ -32,7 +32,7 @@ public class MCRTextareaTransformerHelper extends MCRTransformerHelperBase {
 
     @Override
     void handle(MCRTransformerHelperCall call) throws Exception {
-        state.handleReplaceXPaths(call);
+        replaceXPaths(call);
 
         call.getReturnElement().setAttribute(ATTR_NAME, state.currentBinding.getAbsoluteXPath());
 

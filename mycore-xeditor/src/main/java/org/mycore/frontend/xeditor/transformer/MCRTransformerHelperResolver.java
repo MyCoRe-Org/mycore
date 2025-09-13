@@ -46,13 +46,6 @@ public class MCRTransformerHelperResolver implements URIResolver {
 
     private void handleCall(MCRTransformerHelperCall call) throws Exception {
         MCRTransformerHelper tfhelper = call.getTransformerHelper();
-
-        switch (call.getMethod()) {
-            case "replaceXPaths":
-                tfhelper.handleReplaceXPaths(call);
-                break;
-            default:
-                tfhelper.handle(call);
-        }
+        tfhelper.handle(call);
     }
 }

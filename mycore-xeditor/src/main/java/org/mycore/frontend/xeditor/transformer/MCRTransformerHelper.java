@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jdom2.Element;
 import org.jdom2.Parent;
 import org.mycore.common.xml.MCRXPathEvaluator;
 import org.mycore.frontend.xeditor.MCRBinding;
@@ -33,12 +32,6 @@ import org.mycore.frontend.xeditor.MCREditorSession;
  * @author Frank Lützenkirchen
  */
 public class MCRTransformerHelper {
-
-    private static final char COLON = ':';
-
-    private static final String ATTR_NAME = "name";
-
-    private static final String PREDICATE_IS_FIRST = "[1]";
 
     final MCREditorSession editorSession;
 
@@ -69,7 +62,8 @@ public class MCRTransformerHelper {
             new MCRInputTransformerHelper(),
             new MCRTextareaTransformerHelper(),
             new MCRFormTransformerHelper(),
-            new MCRButtonTransformerHelper());
+            new MCRButtonTransformerHelper(),
+            new MCRReplaceXPathsTransformerHelper());
 
         helpers.forEach(helper -> {
             helper.init(this);
@@ -79,10 +73,6 @@ public class MCRTransformerHelper {
 
     void handle(MCRTransformerHelperCall call) throws Exception {
         method2helper.get(call.getMethod()).handle(call);
-    }
-
-    String replaceParameters(String uri) {
-        return getXPathEvaluator().replaceXPaths(uri, false);
     }
 
     void setCurrentBinding(MCRBinding binding) {
@@ -95,29 +85,11 @@ public class MCRTransformerHelper {
         return currentBinding.hasValue(value);
     }
 
-    void handleReplaceXPaths(MCRTransformerHelperCall call) {
-        call.getAttributeMap().keySet().removeIf(key -> key.contains(String.valueOf(COLON)));
-        call.getAttributeMap()
-            .forEach((name, value) -> call.getReturnElement().setAttribute(name, replaceXPaths(value)));
-    }
-
-    String replaceXPaths(String text) {
-        return getXPathEvaluator().replaceXPaths(text, false);
-    }
-
     MCRXPathEvaluator getXPathEvaluator() {
         if (currentBinding != null) {
             return currentBinding.getXPathEvaluator();
         } else {
             return new MCRXPathEvaluator(editorSession.getVariables(), (Parent) null);
         }
-    }
-
-    void setXPath(Element result, boolean fixPathForMultiple) {
-        String xPath = currentBinding.getAbsoluteXPath();
-        if (fixPathForMultiple && xPath.endsWith(PREDICATE_IS_FIRST)) {
-            xPath = xPath.substring(0, xPath.length() - PREDICATE_IS_FIRST.length());
-        }
-        result.setAttribute(ATTR_NAME, xPath);
     }
 }
