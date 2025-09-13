@@ -71,7 +71,8 @@ public class MCRValidationTransformerHelper extends MCRTransformerHelperBase {
     private void handleDisplayValidationMessage(MCRTransformerHelperCall call) {
         if (hasValidationError()) {
             Element failedRule =
-                transformationState.editorSession.getValidator().getFailedRule(transformationState.currentBinding).getRuleElement();
+                transformationState.editorSession.getValidator().getFailedRule(transformationState.currentBinding)
+                    .getRuleElement();
             if (failedRule.getAttributeValue(ATTR_DISPLAY, "").contains(VALUE_LOCAL)) {
                 call.getReturnElement().addContent(failedRule.clone());
             }

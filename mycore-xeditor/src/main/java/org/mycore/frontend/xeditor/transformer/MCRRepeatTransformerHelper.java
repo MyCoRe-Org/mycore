@@ -18,14 +18,12 @@
 
 package org.mycore.frontend.xeditor.transformer;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
 
 import org.jaxen.JaxenException;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.mycore.common.MCRConstants;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCRRepeatBinding;
@@ -85,17 +83,12 @@ public class MCRRepeatTransformerHelper extends MCRTransformerHelperBase {
         int maxRepeats = Integer.parseInt(call.getAttributeValueOrDefault(ATTR_MAX, "0"));
         String method = call.getAttributeValue(ATTR_METHOD);
 
-        MCRRepeatBinding repeat = new MCRRepeatBinding(xPath, transformationState.currentBinding, minRepeats, maxRepeats, method);
+        MCRRepeatBinding repeat =
+            new MCRRepeatBinding(xPath, transformationState.currentBinding, minRepeats, maxRepeats, method);
         transformationState.setCurrentBinding(repeat);
 
-        Element repeated = getRepeatedContent(call);
-        repeat.getBoundNodes().forEach(node -> call.getReturnElement().addContent(repeated.clone()));
-    }
-
-    private Element getRepeatedContent(MCRTransformerHelperCall call) throws JDOMException, IOException {
         Element repeated = new Element("repeated", MCRConstants.getStandardNamespace("xed"));
-        repeated.setContent(call.getXML().removeContent());
-        return repeated;
+        repeat.getBoundNodes().forEach(node -> call.getReturnElement().addContent(repeated.clone()));
     }
 
     private MCRRepeatBinding getCurrentRepeat() {

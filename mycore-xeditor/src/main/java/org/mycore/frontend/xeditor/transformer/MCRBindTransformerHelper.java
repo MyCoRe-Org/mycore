@@ -73,7 +73,8 @@ public class MCRBindTransformerHelper extends MCRTransformerHelperBase {
         if (initialValue != null) {
             initialValue = replaceXPaths(initialValue);
         }
-        transformationState.setCurrentBinding(new MCRBinding(xPath, initialValue, name, transformationState.currentBinding));
+        transformationState
+            .setCurrentBinding(new MCRBinding(xPath, initialValue, name, transformationState.currentBinding));
     }
 
     private void createEmptyDocumentFromXPath(String xPath) throws JaxenException {
@@ -98,6 +99,7 @@ public class MCRBindTransformerHelper extends MCRTransformerHelperBase {
     private void setDefault(String value) {
         value = replaceXPaths(value);
         transformationState.currentBinding.setDefault(value);
-        transformationState.editorSession.getSubmission().markDefaultValue(transformationState.currentBinding.getAbsoluteXPath(), value);
+        transformationState.editorSession.getSubmission()
+            .markDefaultValue(transformationState.currentBinding.getAbsoluteXPath(), value);
     }
 }

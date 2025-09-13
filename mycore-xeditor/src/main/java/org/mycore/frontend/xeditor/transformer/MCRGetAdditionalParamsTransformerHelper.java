@@ -48,7 +48,8 @@ public class MCRGetAdditionalParamsTransformerHelper extends MCRTransformerHelpe
             }
         }
 
-        String xPaths2CheckResubmission = transformationState.editorSession.getSubmission().getXPaths2CheckResubmission();
+        String xPaths2CheckResubmission =
+            transformationState.editorSession.getSubmission().getXPaths2CheckResubmission();
         if (!xPaths2CheckResubmission.isEmpty()) {
             div.addContent(buildAdditionalParameterElement(MCREditorSubmission.PREFIX_CHECK_RESUBMISSION,
                 xPaths2CheckResubmission));
