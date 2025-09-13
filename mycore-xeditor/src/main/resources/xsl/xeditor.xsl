@@ -179,15 +179,23 @@
 
   <xsl:template match="xed:repeat" mode="xeditor">
     <xsl:variable name="repeatedNodes" select="node()" />
+    
     <xsl:variable name="uri">
       <xsl:call-template name="callTransformerHelperURI" />
     </xsl:variable>
-    <xsl:for-each select="document($uri)/result/xed:repeated">
-      <xsl:call-template name="callTransformerHelper" />
+    <xsl:variable name="result" select="document($uri)/result" />
+    <xsl:copy-of select="$result/a" />
+
+    <xsl:for-each select="$result/xed:repeated">
+      <xsl:if test="position() &gt; 1">
+        <xsl:call-template name="callTransformerHelper" />
+      </xsl:if>
       <xsl:apply-templates select="$repeatedNodes" mode="xeditor" />
-      <xsl:call-template name="unbind" />
     </xsl:for-each>
-    <xsl:call-template name="unbind" />
+
+    <xsl:call-template name="callTransformerHelper">
+      <xsl:with-param name="method" select="'endRepeat'" />
+    </xsl:call-template>
   </xsl:template>
 
   <!-- ========== <xed:controls /> ========== -->

@@ -37,11 +37,13 @@ import org.mycore.frontend.xeditor.target.MCRSwapTarget;
  */
 public class MCRRepeatTransformerHelper extends MCRTransformerHelperBase {
 
-    private static final String METHOD_CONTROLS = "controls";
+    private static final String METHOD_REPEAT = "repeat";
 
     private static final String METHOD_REPEATED = "repeated";
 
-    private static final String METHOD_REPEAT = "repeat";
+    private static final String METHOD_END_REPEAT = "endRepeat";
+
+    private static final String METHOD_CONTROLS = "controls";
 
     private static final char COLON = ':';
 
@@ -65,7 +67,7 @@ public class MCRRepeatTransformerHelper extends MCRTransformerHelperBase {
 
     @Override
     public List<String> getSupportedMethods() {
-        return Arrays.asList(METHOD_REPEAT, METHOD_REPEATED, METHOD_CONTROLS);
+        return Arrays.asList(METHOD_REPEAT, METHOD_REPEATED, METHOD_CONTROLS, METHOD_END_REPEAT);
     }
 
     @Override
@@ -76,6 +78,9 @@ public class MCRRepeatTransformerHelper extends MCRTransformerHelperBase {
                 break;
             case METHOD_REPEATED:
                 handleRepeated(call);
+                break;
+            case METHOD_END_REPEAT:
+                handleEndRepeat();
                 break;
             case METHOD_CONTROLS:
                 handleControls(call);
@@ -98,14 +103,29 @@ public class MCRRepeatTransformerHelper extends MCRTransformerHelperBase {
 
         Element repeated = new Element(METHOD_REPEATED, MCRConstants.getStandardNamespace("xed"));
         repeat.getBoundNodes().forEach(node -> call.getReturnElement().addContent(repeated.clone()));
+
+        if (!repeat.getBoundNodes().isEmpty()) {
+            handleRepeated(call);
+        }
     }
 
     private void handleRepeated(MCRTransformerHelperCall call) {
-        transformationState.setCurrentBinding(findCurrentRepeatBinding().bindRepeatPosition());
+        MCRRepeatBinding currentRepeat = findCurrentRepeatBinding();
+        int pos = currentRepeat.getRepeatPosition();
+        if (pos > 1) { // unbind previosly repeated position
+            unbind();
+        }
+        setCurrentBinding(currentRepeat.bindRepeatPosition());
+
         getSession().getValidator().setValidationMarker(transformationState.getCurrentBinding());
 
         Element anchor = new Element("a").setAttribute("id", "rep-" + ++anchorID);
         call.getReturnElement().addContent(anchor);
+    }
+
+    private void handleEndRepeat() throws JaxenException {
+        unbind(); // last repeated position
+        unbind(); // complete repeater
     }
 
     private void handleControls(MCRTransformerHelperCall call) throws JaxenException {
