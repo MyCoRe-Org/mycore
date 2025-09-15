@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xed="http://www.mycore.de/xeditor"
+<xsl:stylesheet version="1.0" 
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+                xmlns:xed="http://www.mycore.de/xeditor"
                 xmlns:xalan="http://xml.apache.org/xalan"
                 xmlns:encoder="xalan://java.net.URLEncoder"
-                xmlns:includer="xalan://org.mycore.frontend.xeditor.MCRIncludeHandler"
-                exclude-result-prefixes="xsl xed xalan encoder includer">
+                exclude-result-prefixes="xsl xed xalan encoder">
 
   <xsl:strip-space elements="xed:*" />
 
@@ -14,8 +15,6 @@
   <xsl:param name="ServletsBaseURL" />
   <xsl:param name="CurrentLang" />
   <xsl:param name="DefaultLang" />
-
-  <xsl:variable name="includer" select="includer:new()" />
 
   <!-- ========== <xed:form /> output-only ========== -->
 
@@ -45,40 +44,39 @@
   <!-- ========== <xed:preload uri="" static="true|false" /> ========== -->
 
   <xsl:template match="xed:preload" mode="xeditor">
-    <xsl:variable name="uri">
-      <xsl:call-template name="callTransformerHelperURI" />
-    </xsl:variable>
-    <xsl:variable name="result" select="document($uri)/result" /> 
-    <xsl:value-of select="includer:preloadFromURIs($includer,$result/@uri,@static)" />
+    <xsl:call-template name="callTransformerHelper" />
   </xsl:template>
 
   <!-- ========== <xed:include uri="" ref="" static="true|false" /> ========== -->
 
   <xsl:template match="xed:include" mode="xeditor">
-    <xsl:variable name="uri">
-      <xsl:call-template name="callTransformerHelperURI" />
+  
+    <xsl:variable name="replaceURI">
+      <xsl:call-template name="callTransformerHelperURI">
+        <xsl:with-param name="method" select="'replaceRef'" />
+      </xsl:call-template>
     </xsl:variable>
-    <xsl:variable name="result" select="document($uri)/result" />
+    <xsl:variable name="ref" select="document($replaceURI)/result/@ref" />
     
+    <xsl:variable name="includeURI">
+      <xsl:call-template name="callTransformerHelperURI">
+        <xsl:with-param name="method" select="'include'" />
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="resolved" select="document($includeURI)" />
+
     <xsl:choose>
       <xsl:when test="@uri and @ref">
-        <xsl:apply-templates select="includer:resolve($includer,$result/@uri,@static)/descendant::*[@id=$result/@ref]/node()" mode="xeditor" />
+        <xsl:apply-templates select="$resolved/descendant::*[@id=$ref]/node()" mode="xeditor" />
       </xsl:when>
-      <xsl:when test="@uri">
-        <xsl:apply-templates select="includer:resolve($includer,$result/@uri,@static)/node()" mode="xeditor" />
+      <xsl:when test="@uri or (@ref and (count($resolved) &gt; 0))">
+        <xsl:apply-templates select="$resolved/*/node()" mode="xeditor" />
       </xsl:when>
-      <xsl:when test="@ref">
-        <xsl:variable name="resolved" select="includer:resolve($includer,$result/@ref)" />
-        <xsl:choose>
-          <xsl:when test="count($resolved) &gt; 0">
-            <xsl:apply-templates select="$resolved/node()" mode="xeditor" />
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:apply-templates select="/*/descendant-or-self::*[@id=$result/@ref]/node()" mode="xeditor" />
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="/*/descendant-or-self::*[@id=$ref]/node()" mode="xeditor" />
+      </xsl:otherwise>
     </xsl:choose>
+
   </xsl:template>
 
   <!-- ========== Ignore <xed:template /> ========== -->

@@ -22,6 +22,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
+import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 
 /**
@@ -44,10 +45,14 @@ public class MCRTransformerHelperResolver implements URIResolver {
             throw new TransformerException(ex);
         }
 
-        JDOMSource source = new JDOMSource(call.getReturnElement());
-        // Workaround required to prevent URI Caching within the XSL processor:
-        source.setSystemId(source.getSystemId() + Math.random());
-        return source;
+        Element returnElement = call.getReturnElement();
+        if (returnElement.hasAttributes() || (returnElement.getContentSize() > 0)) {
+            Source source = new JDOMSource(returnElement);
+            source.setSystemId(source.getSystemId() + Math.random());
+            return source;
+        } else {
+            return null;
+        }
     }
 
     private void handleCall(MCRTransformerHelperCall call) throws Exception {

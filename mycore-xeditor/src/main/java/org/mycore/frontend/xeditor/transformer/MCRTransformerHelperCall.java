@@ -108,6 +108,10 @@ class MCRTransformerHelperCall {
             .forEach(MCRConstants::registerNamespace);
     }
 
+    void setReturnElement(Element element) {
+        this.returnElement = element;
+    }
+
     Element getReturnElement() {
         return returnElement;
     }

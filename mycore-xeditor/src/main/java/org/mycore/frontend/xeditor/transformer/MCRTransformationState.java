@@ -27,6 +27,7 @@ import org.jdom2.Parent;
 import org.mycore.common.xml.MCRXPathEvaluator;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
+import org.mycore.frontend.xeditor.MCRIncludeHandler;
 
 /**
  * While transforming xed to html, holds state information 
@@ -39,6 +40,8 @@ public class MCRTransformationState {
     private final MCREditorSession session;
 
     private MCRBinding currentBinding;
+    
+    private MCRIncludeHandler includeHandler = new MCRIncludeHandler();
 
     private Map<String, MCRTransformerHelperBase> method2helper = new HashMap<>();
 
@@ -80,6 +83,10 @@ public class MCRTransformationState {
     
     MCREditorSession getSession() {
         return session;
+    }
+
+    MCRIncludeHandler getIncludeHandler() {
+        return includeHandler;
     }
 
     MCRBinding getCurrentBinding() {

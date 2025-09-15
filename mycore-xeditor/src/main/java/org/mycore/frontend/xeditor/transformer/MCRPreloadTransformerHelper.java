@@ -22,13 +22,14 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Helps preparing xed:preload elements by replacing parameters in the attributes.
+ * Handles xed:preload elements during xed transformation.
  * 
  * @author Frank Lützenkirchen
  */
 public class MCRPreloadTransformerHelper extends MCRTransformerHelperBase {
 
-    protected static final String ATTR_URI = "uri";
+    private static final String ATTR_URI = "uri";
+    private static final String ATTR_STATIC = "static";
 
     @Override
     List<String> getSupportedMethods() {
@@ -37,7 +38,9 @@ public class MCRPreloadTransformerHelper extends MCRTransformerHelperBase {
 
     @Override
     void handle(MCRTransformerHelperCall call) throws Exception {
-        String newValue = replaceXPaths(call.getAttributeValue(ATTR_URI));
-        call.getReturnElement().setAttribute(ATTR_URI, newValue);
+        String uri = replaceXPaths(call.getAttributeValue(ATTR_URI));
+        String sStatic = call.getAttributeValue(ATTR_STATIC);
+
+        transformationState.getIncludeHandler().preloadFromURIs(uri, sStatic);
     }
 }

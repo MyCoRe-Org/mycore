@@ -50,8 +50,8 @@ public class MCRXEditorTransformer {
     public MCRContent transform(MCRContent editorSource) throws IOException {
         editorSession.getSubmission().clear();
 
-        MCRTransformationState helper = new MCRTransformationState(editorSession);
-        editorSession.setTransformationState(helper);
+        MCRTransformationState transformationState = new MCRTransformationState(editorSession);
+        editorSession.setTransformationState(transformationState);
 
         MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer("xeditor");
         if (!(transformer instanceof MCRParameterizedTransformer)) {

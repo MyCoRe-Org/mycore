@@ -18,8 +18,15 @@
 
 package org.mycore.frontend.xeditor.transformer;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+
+import org.jdom2.Element;
 
 /**
  * Helps preparing xed:include elements by replacing parameters in the attributes.
@@ -33,21 +40,45 @@ public class MCRIncludeTransformerHelper extends MCRTransformerHelperBase {
 
     @Override
     List<String> getSupportedMethods() {
-        return Arrays.asList("include");
+        return Arrays.asList("replaceRef", "include");
     }
 
     @Override
-    void handle(MCRTransformerHelperCall call) {
-        replaceParameters(call, ATTR_URI);
-        replaceParameters(call, ATTR_REF);
+    void handle(MCRTransformerHelperCall call) throws TransformerException, IOException, ParserConfigurationException {
+        if (call.getMethod().equals("include")) {
+            handleInclude(call);
+        } else {
+            handleReplaceRef(call);
+        }
     }
 
-    private void replaceParameters(MCRTransformerHelperCall call, String attributeName) {
-        String oldValue = call.getAttributeValue(attributeName);
+    private void handleInclude(MCRTransformerHelperCall call)
+        throws TransformerFactoryConfigurationError, TransformerException {
+        String uri = call.getAttributeValue(ATTR_URI);
+        String ref = call.getAttributeValue(ATTR_REF);
+
+        Element resolved;
+
+        if (uri != null) {
+            uri = replaceXPaths(uri);
+
+            String sStatic = call.getAttributeValue("static");
+            resolved = transformationState.getIncludeHandler().resolve(uri, sStatic);
+        } else {
+            ref = replaceXPaths(ref);
+            resolved = transformationState.getIncludeHandler().resolve(ref);
+        }
+
+        if (resolved != null) {
+            call.setReturnElement(resolved);
+        }
+    }
+
+    private void handleReplaceRef(MCRTransformerHelperCall call) {
+        String oldValue = call.getAttributeValue(ATTR_REF);
         if (oldValue != null) {
             String newValue = replaceXPaths(oldValue);
-            call.getReturnElement().setAttribute(attributeName, newValue);
-
+            call.getReturnElement().setAttribute(ATTR_REF, newValue);
         }
     }
 }
