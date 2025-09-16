@@ -84,8 +84,8 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <manifest.priority>99</manifest.priority>
     <maven.compiler.arg>-Werror</maven.compiler.arg>
     <maven.compiler.target>${java.target.version}</maven.compiler.target>
-    <mockito.version>5.17.0</mockito.version>
     <mockito.jar>${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar</mockito.jar>
+    <mockito.version>5.17.0</mockito.version>
     <!-- defined in parent POM: -->
     <!-- <log4j.version>2.19.0</log4j.version> -->
     <neo4j.version>5.28.5</neo4j.version>
