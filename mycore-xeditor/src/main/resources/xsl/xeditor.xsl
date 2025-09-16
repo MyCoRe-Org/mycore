@@ -69,11 +69,11 @@
       <xsl:when test="@uri and @ref">
         <xsl:apply-templates select="$resolved/descendant::*[@id=$ref]/node()" mode="xeditor" />
       </xsl:when>
-      <xsl:when test="@uri or (@ref and (count($resolved) &gt; 0))">
+      <xsl:when test="@uri or (@ref and (count($resolved/*/node()) &gt; 0))">
         <xsl:apply-templates select="$resolved/*/node()" mode="xeditor" />
       </xsl:when>
       <xsl:otherwise>
-        <xsl:apply-templates select="/*/descendant-or-self::*[@id=$ref]/node()" mode="xeditor" />
+        <xsl:apply-templates select="//descendant::*[@id=$ref]/node()" mode="xeditor" />
       </xsl:otherwise>
     </xsl:choose>
 
@@ -327,8 +327,11 @@
   <xsl:template name="callTransformerHelperURI">
     <xsl:param name="method" select="local-name()" />
     <xsl:param name="addText" select="false()" />
+
+    <!-- Required to prevent URI caching by XSL processor -->    
+    <xsl:variable name="uniqueID" xmlns:math="xalan://java.lang.Math" select="math:random()" />
   
-    <xsl:value-of select="concat('xedTransformerHelper:',$SessionID,':',$method,':')" />
+    <xsl:value-of select="concat('xedTransformerHelper:',$SessionID,':',$uniqueID,':',$method,':')" />
     
     <xsl:for-each select="@*">
       <xsl:value-of select="concat(name(),'=',encoder:encode(.,'UTF-8'),'&amp;')" />

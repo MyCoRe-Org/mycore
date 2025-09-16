@@ -24,8 +24,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import javax.xml.transform.Source;
+
 import org.jdom2.Element;
 import org.jdom2.Namespace;
+import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRConstants;
 import org.mycore.frontend.xeditor.MCREditorSession;
 import org.mycore.frontend.xeditor.MCREditorSessionStoreUtils;
@@ -34,11 +37,15 @@ import org.mycore.frontend.xeditor.MCREditorSessionStoreUtils;
  * Parses the URI of a document() call within xed transformation and 
  * provides methods to access attributes etc.
  * 
+ * schema:sessionID:uniqueID:method:param1=value1&param2=value2&...
+ * 
  * @author Frank Lützenkirchen
  */
 class MCRTransformerHelperCall {
 
     private static final String PREFIX_XMLNS = "xmlns:";
+
+    private static final String NULL_RETURN = "null";
 
     private MCRTransformationState helper;
 
@@ -52,10 +59,12 @@ class MCRTransformerHelperCall {
 
     MCRTransformerHelperCall(String href) {
         StringTokenizer uriTokenizer = new StringTokenizer(href, ":");
-        uriTokenizer.nextToken(); // remove schema
+        uriTokenizer.nextToken(); // remove schema 
 
         String sessionID = uriTokenizer.nextToken();
         this.helper = lookupTransformerHelper(sessionID);
+
+        uriTokenizer.nextToken(); // remove token to make URI unique
 
         this.method = uriTokenizer.nextToken();
 
@@ -114,5 +123,13 @@ class MCRTransformerHelperCall {
 
     Element getReturnElement() {
         return returnElement;
+    }
+
+    Source getSourceToReturn() {
+        if (!returnElement.hasAttributes() && (returnElement.getContentSize() == 0)) {
+            returnElement.setName(NULL_RETURN);
+        }
+
+        return new JDOMSource(returnElement);
     }
 }
