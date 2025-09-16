@@ -81,9 +81,9 @@ public class MCRXEditorTransformer {
         return new MCRJDOMContent(xed);
     }
 
-    private void removeObsoleteXedNamespace(Element element) {
+    private static void removeObsoleteXedNamespace(Element element) {
         element.removeNamespaceDeclaration(MCRConstants.getStandardNamespace("xed"));
-        element.getChildren().forEach(child -> removeObsoleteXedNamespace(child));
+        element.getChildren().forEach(MCRXEditorTransformer::removeObsoleteXedNamespace);
     }
 
     private Document content2xml(MCRContent result) throws IOException {
