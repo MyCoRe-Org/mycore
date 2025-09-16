@@ -106,7 +106,8 @@ class MCRTransformerHelperCall {
     }
 
     String getAttributeValueOrDefault(String name, String defaultValue) {
-        return attributeMap.getOrDefault(name, defaultValue);
+        String value = getAttributeValue(name);
+        return value == null ? defaultValue : value;
     }
 
     Map<String, String> getAttributeMap() {
