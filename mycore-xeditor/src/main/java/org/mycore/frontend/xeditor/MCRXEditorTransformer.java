@@ -21,7 +21,9 @@ package org.mycore.frontend.xeditor;
 import java.io.IOException;
 
 import org.jdom2.Document;
+import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
@@ -74,7 +76,14 @@ public class MCRXEditorTransformer {
 
         editorSession.getValidator().setNewValidationRules(xed);
 
+        removeObsoleteXedNamespace(xed.getRootElement());
+
         return new MCRJDOMContent(xed);
+    }
+
+    private void removeObsoleteXedNamespace(Element element) {
+        element.removeNamespaceDeclaration(MCRConstants.getStandardNamespace("xed"));
+        element.getChildren().forEach(child -> removeObsoleteXedNamespace(child));
     }
 
     private Document content2xml(MCRContent result) throws IOException {
