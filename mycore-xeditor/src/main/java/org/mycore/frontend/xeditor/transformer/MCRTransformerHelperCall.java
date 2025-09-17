@@ -26,7 +26,6 @@ import java.util.StringTokenizer;
 
 import javax.xml.transform.Source;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.transform.JDOMSource;
@@ -101,13 +100,11 @@ class MCRTransformerHelperCall {
     }
 
     String getAttributeValue(String name) {
-        String value = attributeMap.get(name);
-        return StringUtils.isEmpty(value) ? null : value;
+        return attributeMap.get(name);
     }
 
     String getAttributeValueOrDefault(String name, String defaultValue) {
-        String value = getAttributeValue(name);
-        return value == null ? defaultValue : value;
+        return attributeMap.getOrDefault(name, defaultValue);
     }
 
     Map<String, String> getAttributeMap() {

@@ -29,6 +29,7 @@ import java.util.Objects;
  */
 public class MCRInputTransformerHelper extends MCRTransformerHelperBase {
 
+    private static final String ATTR_NAME = "name";
     private static final String ATTR_VALUE = "value";
     private static final String ATTR_TYPE = "type";
 
@@ -46,16 +47,18 @@ public class MCRInputTransformerHelper extends MCRTransformerHelperBase {
     void handle(MCRTransformerHelperCall call) {
         String type = call.getAttributeValue(ATTR_TYPE);
 
-        setXPath(call.getReturnElement(), Objects.equals(type, TYPE_CHECKBOX));
+        if (call.getAttributeValue(ATTR_NAME) == null) {
+            setXPath(call.getReturnElement(), Objects.equals(type, TYPE_CHECKBOX));
 
-        if (Objects.equals(type, TYPE_RADIO) || Objects.equals(type, TYPE_CHECKBOX)) {
-            String value = call.getAttributeValue(ATTR_VALUE);
-            if (transformationState.hasValue(value)) {
-                call.getReturnElement().setAttribute(VALUE_CHECKED, VALUE_CHECKED);
+            if (Objects.equals(type, TYPE_RADIO) || Objects.equals(type, TYPE_CHECKBOX)) {
+                String value = call.getAttributeValue(ATTR_VALUE);
+                if (transformationState.hasValue(value)) {
+                    call.getReturnElement().setAttribute(VALUE_CHECKED, VALUE_CHECKED);
+                }
+            } else {
+                String currentValue = transformationState.getCurrentBinding().getValue();
+                call.getReturnElement().setAttribute(ATTR_VALUE, currentValue);
             }
-        } else {
-            String currentValue = transformationState.getCurrentBinding().getValue();
-            call.getReturnElement().setAttribute(ATTR_VALUE, currentValue);
         }
     }
 }

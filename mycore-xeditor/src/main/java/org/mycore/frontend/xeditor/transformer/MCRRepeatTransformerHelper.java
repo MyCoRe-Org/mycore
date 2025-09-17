@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jaxen.JaxenException;
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
@@ -94,8 +95,8 @@ public class MCRRepeatTransformerHelper extends MCRTransformerHelperBase {
         call.registerDeclaredNamespaces();
 
         String xPath = call.getAttributeValue(ATTR_XPATH);
-        int minRepeats = Integer.parseInt(call.getAttributeValueOrDefault(ATTR_MIN, "0"));
-        int maxRepeats = Integer.parseInt(call.getAttributeValueOrDefault(ATTR_MAX, "0"));
+        int minRepeats = getMinMax(call, ATTR_MIN);
+        int maxRepeats = getMinMax(call, ATTR_MAX);
         String method = call.getAttributeValue(ATTR_METHOD);
 
         MCRRepeatBinding repeat = new MCRRepeatBinding(xPath, getCurrentBinding(), minRepeats, maxRepeats, method);
@@ -107,6 +108,11 @@ public class MCRRepeatTransformerHelper extends MCRTransformerHelperBase {
         if (!repeat.getBoundNodes().isEmpty()) {
             handleRepeated(call);
         }
+    }
+
+    private int getMinMax(MCRTransformerHelperCall call, String attributeName) {
+        String value = call.getAttributeValue(attributeName);
+        return StringUtils.isBlank(value) ? 0 : Integer.parseInt(value.trim());
     }
 
     private void handleRepeated(MCRTransformerHelperCall call) {
