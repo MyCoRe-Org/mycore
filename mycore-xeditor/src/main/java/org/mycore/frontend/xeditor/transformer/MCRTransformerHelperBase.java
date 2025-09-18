@@ -61,7 +61,6 @@ public abstract class MCRTransformerHelperBase {
     
     protected void unbind() {
         MCRBinding parentBinding = getCurrentBinding().getParent();
-        getCurrentBinding().detach();
         setCurrentBinding(parentBinding);
     }
 
