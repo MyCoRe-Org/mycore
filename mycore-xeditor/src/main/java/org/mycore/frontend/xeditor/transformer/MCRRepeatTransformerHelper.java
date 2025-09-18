@@ -111,7 +111,8 @@ public class MCRRepeatTransformerHelper extends MCRTransformerHelperBase {
     }
 
     private int getMinMax(MCRTransformerHelperCall call, String attributeName) {
-        String value = call.getAttributeValue(attributeName);
+        String value = call.getAttributeValueOrDefault(attributeName, "0");
+        value = replaceXPaths(value);
         return StringUtils.isBlank(value) ? 0 : Integer.parseInt(value.trim());
     }
 
