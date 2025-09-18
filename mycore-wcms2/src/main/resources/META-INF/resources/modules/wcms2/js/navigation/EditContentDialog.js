@@ -292,7 +292,13 @@ wcms.navigation.EditContentDialog = function() {
 
     // Serialize the modified document back to a string
     const serializer = new XMLSerializer();
-    return isHeadEmpty(head) ? serializer.serializeToString(body) : serializer.serializeToString(doc.documentElement);
+    if (isHeadEmpty(head)) {
+      return Array.from(body.childNodes)
+      .map(elem => serializer.serializeToString(elem))
+      .join("");
+    } else {
+      return serializer.serializeToString(doc.documentElement);
+    }
   }
 
   function popupWindow(url, windowName, win, w, h) {
