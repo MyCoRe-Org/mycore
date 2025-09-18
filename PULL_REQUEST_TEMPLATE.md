@@ -7,27 +7,29 @@ Please go through the following checklist before assigning the PR for review:
 ## Ticket & Documentation
 - [ ] The issue in the ticket is clearly described and the solution is documented.
 - [ ] Design decisions (if any) are explained.
+- [ ] The ticket references the correct source and target branches.
+- [ ] The `fixed-version` is correctly set in the ticket and matches the PR's target branch (`main`).
+
+## Feature & Improvement Specific Checks
 - [ ] Instructions on how to test or use the feature are included or linked (e.g. to documentation).
 - [ ] For UI changes: before & after screenshots are attached.
 - [ ] New features or migrations are documented.
-
-## Breaking Changes
 - [ ] Does this change affect existing applications, data, or configurations?
   - [ ] Yes: Is a migration required? If yes, describe it.
   - [ ] Breaking change is marked in the **commit message**.
-
-## Versioning
-- [ ] The `fixed-version` is correctly set in the ticket and matches the PR's target branch (`main`).
 
 ## Bugfix-Specific Checks
 - [ ] Affected version is listed in the ticket.
 - [ ] Minimal code changes were made (no refactoring).
 - [ ] This PR truly fixes **only** the reported bug.
+- [ ] No breaking changes are introduced.
 - [ ] A relevant test was added (if feasible).
 
-## Local Testing
+## Testing
 - [ ] I have tested the changes locally.
 - [ ] The feature behaves as described in the ticket.
+- [ ] Were existing tests modified?
+  - [ ] Yes: explain the changes for reviewers.
 
 ## MCR Conventions & Metadata
 - [ ] MCR naming conventions are followed.
@@ -38,10 +40,6 @@ Please go through the following checklist before assigning the PR for review:
 - [ ] Javadoc is written for non-self-explanatory classes/methods (Clean Code).
 - [ ] All configuration options are documented in Javadoc and `mycore.properties`.
 - [ ] No default properties are hardcoded — all set via `mycore.properties`.
-
-## Tests
-- [ ] Were existing tests modified?
-  - [ ] Yes: explain the changes for reviewers.
 
 ## Multi-Repo Considerations
 - [ ] Is an equivalent PR in `MIR` required?
