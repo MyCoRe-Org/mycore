@@ -36,10 +36,6 @@
                     domUtil.loadCSS(classeditor.settings.cssURL + "/classificationEditor.css"),
                     domUtil.loadCSS(classeditor.settings.cssURL + "/mycore.dojo.css")
                   ];
-                  // check if font-awesome is already loaded
-                  if(query("link[href*='font-awesome']").length == 0) {
-                    preloadCSS.push(domUtil.loadCSS(classeditor.settings.webURL + "/node_modules/font-awesome/css/font-awesome.min.css"));
-                  }
                   all(preloadCSS).then(function() {
                     try {
                       var classEditor = new mycore.classification.Editor({settings: classeditor.settings});
