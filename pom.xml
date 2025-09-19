@@ -226,7 +226,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <enabled>true</enabled>
       </snapshots>
       <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <url>https://central.sonatype.com/repository/maven-snapshots</url>
     </pluginRepository>
   </pluginRepositories>
   <distributionManagement>
