@@ -19,15 +19,24 @@
 package org.mycore.frontend.xeditor.tracker;
 
 import org.jdom2.Attribute;
+import org.mycore.common.xml.MCRXPathBuilder;
 
-public class MCRAddedAttribute implements MCRChange {
+/**
+ * Tracks that a new attribute was added.  
+ * 
+ * @author Frank L\u00FCtzenkirchen
+ */
+public class MCRAddedAttribute extends MCRChange {
 
-    public static MCRChangeData added(Attribute attribute) {
-        return new MCRChangeData("added-attribute", attribute);
+    private Attribute addedAttribute;
+
+    public MCRAddedAttribute(Attribute attribute) {
+        this.message = MCRXPathBuilder.buildXPath(attribute) + " = \"" + attribute.getValue() + "\"";
+        this.addedAttribute = attribute;
     }
 
-    public void undo(MCRChangeData data) {
-        Attribute attribute = data.getAttribute();
-        data.getContext().removeAttribute(attribute.getName(), attribute.getNamespace());
+    @Override
+    public void undo() {
+        addedAttribute.detach();
     }
 }
