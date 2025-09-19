@@ -93,6 +93,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <net.bytebuddy.processor>CLASS_FILE_API_FIRST</net.bytebuddy.processor>
     <oaipmh.version>3.0</oaipmh.version>
     <ocfl-java.version>2.2.2</ocfl-java.version>
+    <pmd.analysisCache>true</pmd.analysisCache>
     <pmd.failOnViolation>true</pmd.failOnViolation>
     <pmd.version>7.16.0</pmd.version>
     <rdf4j.version>5.1.3</rdf4j.version>
@@ -442,6 +443,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
                   <processors>
                     <processor>org.hibernate.processor.HibernateProcessor</processor>
                   </processors>
+                  <skipSourcesUnchanged>true</skipSourcesUnchanged>
                 </configuration>
               </execution>
             </executions>
