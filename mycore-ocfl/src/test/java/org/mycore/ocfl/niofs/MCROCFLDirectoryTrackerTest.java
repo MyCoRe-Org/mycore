@@ -1,18 +1,19 @@
 package org.mycore.ocfl.niofs;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.repository.MCROCFLRepository;
-import org.mycore.ocfl.test.PermutedParam;
-import org.mycore.ocfl.test.MCRPermutationExtension;
 import org.mycore.ocfl.test.MCROCFLSetupExtension;
+import org.mycore.ocfl.test.MCRPermutationExtension;
+import org.mycore.ocfl.test.PermutedParam;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
@@ -30,7 +31,7 @@ public class MCROCFLDirectoryTrackerTest {
     private boolean purge;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         // directoryTracker
         Map<MCRVersionedPath, Boolean> paths = new HashMap<>();
         paths.put(MCRVersionedPath.getPath("der_1", "v1", "path1"), false);
@@ -56,7 +57,7 @@ public class MCROCFLDirectoryTrackerTest {
     }
 
     private void assertChanges(int numberOfChanges) {
-        Assertions.assertEquals(numberOfChanges, directoryTracker.changes().size());
+        assertEquals(numberOfChanges, directoryTracker.changes().size());
     }
 
     private void assertChange(MCRVersionedPath path, MCROCFLDirectoryTracker.ChangeType changeType) {

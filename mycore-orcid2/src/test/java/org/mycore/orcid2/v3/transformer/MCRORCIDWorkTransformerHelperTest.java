@@ -39,7 +39,7 @@ public class MCRORCIDWorkTransformerHelperTest {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Test
-    void testTransformContent() throws Exception {
+    public void testTransformContent() throws Exception {
         final JAXBContext jaxbContext = JAXBContext.newInstance(Work.class);
         final URL inputUrl = MCRORCIDWorkTransformerHelperTest.class.getResource("/work_example.xml");
         final Work work = (Work) jaxbContext.createUnmarshaller().unmarshal(inputUrl);
