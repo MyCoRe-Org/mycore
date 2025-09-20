@@ -20,6 +20,7 @@ package org.mycore.user2.hash;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 import javax.crypto.SecretKeyFactory;
 
@@ -31,6 +32,10 @@ import org.mycore.common.config.MCRConfigurationException;
 public final class MCRPasswordCheckUtils {
 
     private MCRPasswordCheckUtils() {
+    }
+
+    public static byte[] generateSeed(SecureRandom random, int saltSizeBytes) {
+        return saltSizeBytes == 0 ? new byte[0] : random.generateSeed(saltSizeBytes);
     }
 
     public static boolean fixedEffortEquals(String a, String b) {
