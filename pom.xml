@@ -1640,6 +1640,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
+        <artifactId>mycore-jsession</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
         <artifactId>mycore-lod</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -2599,6 +2604,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <module>mycore-impex</module>
     <module>mycore-iview2</module>
     <module>mycore-jobqueue</module>
+    <module>mycore-jsessions</module>
     <module>mycore-junit4</module>
     <module>mycore-packer</module>
     <module>mycore-lod</module>
