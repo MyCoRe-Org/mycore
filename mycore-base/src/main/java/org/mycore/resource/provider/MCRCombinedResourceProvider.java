@@ -84,7 +84,8 @@ public class MCRCombinedResourceProvider extends MCRResourceProviderBase {
         for (MCRResourceProvider provider : providers) {
             Optional<URL> resourceUrl = provider.provide(path, hints, tracer.update(provider, provider.coverage()));
             if (resourceUrl.isPresent()) {
-                tracer.trace(() -> "Got one resource URL, no need for further providers");
+                tracer.trace(() -> "Got resource URL from " + provider.getClass().getName()
+                    + ", no need for further providers");
                 return resourceUrl;
             }
         }
