@@ -28,7 +28,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
-import java.text.Normalizer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -363,25 +362,6 @@ public class MCRSolrProxyServlet extends MCRServlet {
         if (!parameters.containsKey("version") && !parameters.containsKey("wt")) {
             solrParams.set("version", SOLR_QUERY_XML_PROTOCOL_VERSION);
         }
-        String[] condQueries = parameters.get("condQuery");
-        if (condQueries != null) {
-            for (int i = 0; i < condQueries.length; i++) {
-                condQueries[i] = cleanQuery(condQueries[i]);
-            }
-        }
-
         return solrParams;
     }
-
-    private static String cleanQuery(String q) {
-        String trimmed = q.trim();
-        if ("*".equals(trimmed) || trimmed.isEmpty()) {
-            return q;
-        }
-        String cleaned = Normalizer.normalize(trimmed.replaceAll("[-–—]", " "), Normalizer.Form.NFKC);
-        cleaned = cleaned.replaceAll("[^\\p{L}\\p{N}\\s*]", "");
-
-        return cleaned;
-    }
-
 }
