@@ -19,7 +19,9 @@
 package org.mycore.resource.provider;
 
 import java.net.URL;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -111,8 +113,21 @@ public class MCRLFSResourceProvider extends MCRResourceProviderBase {
     @Override
     protected final List<ProvidedUrl> doProvideAll(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
         Stream<URL> locatedResourceUrls = locator.locate(path, hints, tracer.update(locator));
-        Stream<URL> filteredResourceUrls = filter.filter(locatedResourceUrls, hints, tracer.update(filter));
-        return filteredResourceUrls.map(this::providedUrl).toList();
+        List<URL> filteredResourceUrls = filter.filter(locatedResourceUrls, hints, tracer.update(filter)).toList();
+        List<URL> selectedResourceUrls = selector.select(filteredResourceUrls, hints, tracer);
+        List<URL> selectedAndUnselectedResourceUrls = moveSubsetToBeginning(filteredResourceUrls, selectedResourceUrls);
+        return selectedAndUnselectedResourceUrls.stream().map(this::providedUrl).toList();
+    }
+
+    private static <T> List<T> moveSubsetToBeginning(List<T> superset, List<T> subset) {
+        List<T> list = new LinkedList<>(superset);
+        ListIterator<T> subsetIterator = subset.listIterator(subset.size());
+        while (subsetIterator.hasPrevious()) {
+            T element = subsetIterator.previous();
+            list.remove(element);
+            list.add(0, element);
+        }
+        return list;
     }
 
     @Override
