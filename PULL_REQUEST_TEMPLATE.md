@@ -32,7 +32,7 @@ Please go through the following checklist before assigning the PR for review:
   - [ ] Yes: explain the changes for reviewers.
 
 ## MCR Conventions & Metadata
-- [ ] MCR naming conventions are followed.
+- [ ] [MCR naming conventions](https://www.mycore.de/documentation/developer/conventions/) are followed
 - [ ] If the **public API** has changed:
   - [ ] Old API is deprecated or a migration is documented.
   - [ ] If not, no action needed.
