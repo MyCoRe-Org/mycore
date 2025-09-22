@@ -14,10 +14,13 @@ import org.mycore.user2.MCRUser;
 
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class MCRORCIDAccessModspersonImpl implements MCRORCIDAccess {
+public class MCRORCIDIDAttributeHandlerModspersonImpl implements MCRORCIDIDAttributeHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    private static final String X_PATH_MODS_NAME = "mods:name[@type='personal']";
 
     @Override
     public void addORCID(String orcid, MCRUser user) throws MCRAccessException {
@@ -26,7 +29,7 @@ public class MCRORCIDAccessModspersonImpl implements MCRORCIDAccess {
         if (modsperson != null) {
             MCRMODSWrapper wrapper = new MCRMODSWrapper(modsperson);
 
-            Element personName = wrapper.getElement("mods:name[@type='personal']");
+            Element personName = wrapper.getElement(X_PATH_MODS_NAME);
             personName.addContent(new Element("nameIdentifier", MCRConstants.MODS_NAMESPACE)
                 .setAttribute("type", "orcid").setText(orcid));
             MCRMetadataManager.update(modsperson);
@@ -35,32 +38,20 @@ public class MCRORCIDAccessModspersonImpl implements MCRORCIDAccess {
 
     @Override
     public Set<String> getORCIDs(MCRUser user) {
-        MCRObject modsperson = getModspersonFromUser(user);
-
-        if (modsperson != null) {
-            MCRMODSWrapper wrapper = new MCRMODSWrapper(modsperson);
-            Element personName = wrapper.getElement("mods:name[@type='personal']");
-            return personName.getChildren("nameIdentifier", MCRConstants.MODS_NAMESPACE)
-                .stream().filter(el -> "orcid".equals(el.getAttributeValue("type")))
+        return getNameIdentifierElements(user).filter(el -> "orcid".equals(el.getAttributeValue("type")))
                 .map(Element::getText).collect(Collectors.toSet());
-        }
-        return Set.of();
     }
 
     @Override
     public Set<MCRIdentifier> getIdentifiers(MCRUser user) {
-        MCRObject modsperson = getModspersonFromUser(user);
-
-        if (modsperson != null) {
-            MCRMODSWrapper wrapper = new MCRMODSWrapper(modsperson);
-            Element personName = wrapper.getElement("mods:name[@type='personal']");
-            return personName.getChildren("nameIdentifier", MCRConstants.MODS_NAMESPACE)
-                .stream().map(a -> new MCRIdentifier(a.getAttributeValue("type"), a.getText()))
-                .collect(Collectors.toSet());
-        }
-        return Set.of();
+        return getNameIdentifierElements(user).map(a -> new MCRIdentifier(a.getAttributeValue("type"),
+                a.getText())).collect(Collectors.toSet());
     }
 
+    /**
+     * @param user the given {@link MCRUser}
+     * @return the modsperson referenced by a user via the "id_modsperson" attribute, or null if no reference found
+     */
     private MCRObject getModspersonFromUser(MCRUser user) {
         String modspersonId = user.getUserAttribute("id_modsperson");
         if (modspersonId == null) {
@@ -69,5 +60,23 @@ public class MCRORCIDAccessModspersonImpl implements MCRORCIDAccess {
             return null;
         }
         return MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(modspersonId));
+    }
+
+    /**
+     * @param user the given {@link MCRUser}
+     * @return a stream of all nameIdentifier {@link Element elements} found in the modsperson referenced by a user,
+     * or an empty stream if no modsperson can be identified.
+     */
+    private Stream<Element> getNameIdentifierElements(MCRUser user) {
+        MCRObject modsperson = getModspersonFromUser(user);
+        if (modsperson == null) {
+            return Stream.empty();
+        }
+        MCRMODSWrapper wrapper = new MCRMODSWrapper(modsperson);
+        Element personName = wrapper.getElement(X_PATH_MODS_NAME);
+        if (personName == null) {
+            return Stream.empty();
+        }
+        return personName.getChildren("nameIdentifier", MCRConstants.MODS_NAMESPACE).stream();
     }
 }

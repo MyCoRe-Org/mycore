@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * Used to encapsulate access to a user's ORCIDs.
  */
-public interface MCRORCIDAccess {
+public interface MCRORCIDIDAttributeHandler {
 
     void addORCID(String orcid, MCRUser user) throws MCRAccessException;
 

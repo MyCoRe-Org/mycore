@@ -77,8 +77,7 @@ public class MCRORCIDUser {
 
     private final MCRUser user;
 
-    private MCRORCIDAccess accessImpl = MCRConfiguration2.getInstanceOfOrThrow(
-        MCRORCIDAccess.class, MCRORCIDConstants.CONFIG_PREFIX + "Access.Class");
+    private final MCRORCIDIDAttributeHandler attributeHandlerImpl;
 
     /**
      * Wraps MCRUser to MCRORCIDUser.
@@ -87,6 +86,8 @@ public class MCRORCIDUser {
      */
     public MCRORCIDUser(MCRUser user) {
         this.user = user;
+        attributeHandlerImpl = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRORCIDIDAttributeHandler.class, MCRORCIDConstants.CONFIG_PREFIX + "AttributeHandler.Class");
     }
 
     /**
@@ -96,13 +97,6 @@ public class MCRORCIDUser {
      */
     public MCRUser getUser() {
         return user;
-    }
-
-    /**
-     * Used for testing.
-     */
-    public void setAccessImpl(MCRORCIDAccess accessImpl) {
-        this.accessImpl = accessImpl;
     }
 
     /**
@@ -116,7 +110,7 @@ public class MCRORCIDUser {
             throw new MCRORCIDException("Invalid ORCID iD");
         }
         try {
-            accessImpl.addORCID(orcid, user);
+            attributeHandlerImpl.addORCID(orcid, user);
         } catch (MCRAccessException e) {
             final String userId = user.getUserID();
             LOGGER.error("Failed to add ORCID to user {}: ", userId, e);
@@ -128,7 +122,7 @@ public class MCRORCIDUser {
      * @return ORCID iDs as set
      */
     public Set<String> getORCIDs() {
-        return accessImpl.getORCIDs(user);
+        return attributeHandlerImpl.getORCIDs(user);
     }
 
     /**
@@ -245,7 +239,7 @@ public class MCRORCIDUser {
      * @return Set of MCRIdentifier
      */
     public Set<MCRIdentifier> getIdentifiers() {
-        return accessImpl.getIdentifiers(user);
+        return attributeHandlerImpl.getIdentifiers(user);
     }
 
     /**
