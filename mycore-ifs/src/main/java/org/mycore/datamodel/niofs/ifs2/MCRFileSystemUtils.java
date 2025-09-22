@@ -191,6 +191,7 @@ final class MCRFileSystemUtils {
         return file;
     }
 
+    @SuppressWarnings("PMD.NPathComplexity")
     private static MCRFile getMCRFile(MCRDirectory baseDir, MCRPath relativePath, boolean create, boolean createNew,
         boolean fireEvent)
         throws IOException {

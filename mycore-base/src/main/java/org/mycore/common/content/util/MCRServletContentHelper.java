@@ -132,6 +132,7 @@ public final class MCRServletContentHelper {
             contentLength);
     }
 
+    @SuppressWarnings("PMD.NPathComplexity")
     private static void prepareAndSetupResponse(MCRContent content, HttpServletRequest request,
         HttpServletResponse httpServletResponse, Config config, boolean serveContent, boolean isError,
         String contentType, long contentLength) throws IOException {
