@@ -217,6 +217,7 @@ public class MCRMODSWrapper {
      * Sets or adds an element with target name and value. The element name and attributes are used as xpath expression
      * to filter for an element. The attributes are used with and operation if present.
      */
+    @SuppressWarnings("PMD.NPathComplexity")
     public Optional<Element> setElement(String elementName, String elementValue, Map<String, String> attributes) {
         boolean isAttributeDataPresent = attributes != null && !attributes.isEmpty();
         boolean isValuePresent = elementValue != null && !elementValue.isEmpty();

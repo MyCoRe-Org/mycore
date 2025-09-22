@@ -28,8 +28,6 @@ import java.io.StringWriter;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import javax.management.modelmbean.XMLParseException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
@@ -59,7 +57,6 @@ import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
-import com.google.gson.JsonIOException;
 import com.google.gson.stream.JsonWriter;
 
 import jakarta.ws.rs.DefaultValue;
@@ -216,6 +213,7 @@ public class MCRRestAPIClassifications {
      * @param selected - true, if all node should be selected
      *
      */
+    @SuppressWarnings("PMD.NPathComplexity")
     private static void writeChildrenAsJSONJSTree(Element eParent, JsonWriter writer, String lang, boolean opened,
         boolean disabled, boolean selected) throws IOException {
         writer.beginArray();
@@ -427,7 +425,7 @@ public class MCRRestAPIClassifications {
     }
 
     private Response createResponse(String format, Element rootElement, String style, String callback, String filter)
-        throws XMLParseException {
+        throws IOException {
         String lang = null;
 
         for (String f : filter.split(";")) {
@@ -436,13 +434,8 @@ public class MCRRestAPIClassifications {
             }
         }
         if (FORMAT_JSON.equals(format)) {
-            String json;
             //eventually: allow Cross Site Requests: .header("Access-Control-Allow-Origin", "*")
-            try {
-                json = writeJSON(rootElement, lang, style);
-            } catch (IOException e) {
-                throw new JsonIOException("failed to create json response", e);
-            }
+            String json = writeJSON(rootElement, lang, style);
             if (!callback.isEmpty()) {
                 return Response.ok(callback + "(" + json + ")")
                     .lastModified(lastModified)
@@ -456,12 +449,7 @@ public class MCRRestAPIClassifications {
         }
 
         if (FORMAT_XML.equals(format)) {
-            String xml;
-            try {
-                xml = writeXML(rootElement, lang);
-            } catch (IOException e) {
-                throw new XMLParseException(e, "failed to create xml response");
-            }
+            String xml = writeXML(rootElement, lang);
             return Response.ok(xml)
                 .lastModified(lastModified)
                 .type(APPLICATION_XML_UTF_8)
