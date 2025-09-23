@@ -95,7 +95,7 @@ public final class MCRGoogleSitemapCommon {
     private static final String SITEMAP_SCHEMA =
         "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd";
 
-    /** The directory path to store sitemaps relative to MCR.WebApplication.basedir */
+    /** The directory path to store sitemaps */
     private static final Path CDIR =
         Paths.get(MCRConfiguration2.getString("MCR.GoogleSitemap.Directory").orElseThrow());
 
