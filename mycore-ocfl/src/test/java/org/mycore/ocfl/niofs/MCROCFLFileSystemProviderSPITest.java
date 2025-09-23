@@ -19,6 +19,7 @@
 package org.mycore.ocfl.niofs;
 
 import java.nio.file.spi.FileSystemProvider;
+import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,12 @@ public class MCROCFLFileSystemProviderSPITest {
     public void testFileSystemProviderSPI() {
         Assertions.assertDoesNotThrow(FileSystemProvider::installedProviders,
             "Listing all providers should not throw an exception");
+
+        List<FileSystemProvider> fileSystemProviders = FileSystemProvider.installedProviders();
+        Assertions.assertTrue(
+            fileSystemProviders.stream()
+                .anyMatch(fileSystemProvider -> fileSystemProvider instanceof MCROCFLFileSystemProvider),
+            "OCFL Provider should be listed");
     }
 
 }
