@@ -19,6 +19,7 @@
 package org.mycore.ocfl.niofs;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.AccessMode;
@@ -91,45 +92,32 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
     private MCROCFLVirtualObjectProvider virtualObjectProvider;
 
     /**
-     * Constructs a new {@code MCROCFLFileSystemProvider} and initializes the file system.
-     *
-     * @throws IOException if an I/O error occurs during initialization.
-     */
-    public MCROCFLFileSystemProvider() throws IOException {
-        init();
-    }
-
-    /**
      * Initializes the OCFL file system provider.
      *
      * @throws IOException if an I/O error occurs during initialization.
      */
     @SuppressWarnings("unchecked")
     public void init() throws IOException {
-        try {
-            // digest calculator
-            String digestCalculatorProperty = "MCR.Content.DigestCalculator";
-            this.digestCalculator = MCRConfiguration2
-                .getSingleInstanceOfOrThrow(MCROCFLDigestCalculator.class, digestCalculatorProperty);
+        // digest calculator
+        String digestCalculatorProperty = "MCR.Content.DigestCalculator";
+        this.digestCalculator = MCRConfiguration2
+            .getSingleInstanceOfOrThrow(MCROCFLDigestCalculator.class, digestCalculatorProperty);
 
-            // transactional storage
-            String transactionalStorageProperty = "MCR.Content.TransactionalStorage";
-            this.transactionalStorage = MCRConfiguration2
-                .getSingleInstanceOfOrThrow(MCROCFLTransactionalStorage.class, transactionalStorageProperty);
-            Files.createDirectories(this.transactionalStorage.getRoot());
-            this.transactionalStorage.clearTransactional();
+        // transactional storage
+        String transactionalStorageProperty = "MCR.Content.TransactionalStorage";
+        this.transactionalStorage = MCRConfiguration2
+            .getSingleInstanceOfOrThrow(MCROCFLTransactionalStorage.class, transactionalStorageProperty);
+        Files.createDirectories(this.transactionalStorage.getRoot());
+        this.transactionalStorage.clearTransactional();
 
-            // remote storage
-            String remoteStorageProperty = "MCR.Content.RemoteStorage";
-            this.remoteStorage = MCRConfiguration2
-                .getSingleInstanceOf(MCROCFLRemoteTemporaryStorage.class, remoteStorageProperty).orElse(null);
+        // remote storage
+        String remoteStorageProperty = "MCR.Content.RemoteStorage";
+        this.remoteStorage = MCRConfiguration2
+            .getSingleInstanceOf(MCROCFLRemoteTemporaryStorage.class, remoteStorageProperty).orElse(null);
 
-            // create virtual object provider
-            this.virtualObjectProvider = new MCROCFLVirtualObjectProvider(getRepository(), transactionalStorage,
-                remoteStorage, digestCalculator);
-        } catch (Exception exception) {
-            throw new IOException("Unable to create MCROCFLFileSystem.", exception);
-        }
+        // create virtual object provider
+        this.virtualObjectProvider = new MCROCFLVirtualObjectProvider(getRepository(), transactionalStorage,
+            remoteStorage, digestCalculator);
     }
 
     /**
@@ -188,6 +176,11 @@ public class MCROCFLFileSystemProvider extends MCRVersionedFileSystemProvider {
         if (fileSystem == null) {
             synchronized (FS_URI) {
                 if (fileSystem == null) {
+                    try {
+                        init();
+                    } catch (IOException exception) {
+                        throw new UncheckedIOException("Unable to initialize ocfl file system.", exception);
+                    }
                     fileSystem = new MCROCFLFileSystem(this);
                 }
             }
