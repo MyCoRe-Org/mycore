@@ -308,12 +308,14 @@ wcms.navigation.EditContentDialog = function() {
 
   function removeNamespacesDeep(node, doc) {
     if (node.nodeType === Node.ELEMENT_NODE) {
-      const newElem = doc.createElement(node.localName);
+      const isXHTML = node.namespaceURI === "http://www.w3.org/1999/xhtml";
+
+      const newElem = isXHTML ?
+          doc.createElement(node.localName) :
+          doc.createElementNS(node.namespaceURI, node.localName);
 
       for (let attr of node.attributes) {
-        if (!attr.name.startsWith("xmlns") && !attr.name.includes(":")) {
-          newElem.setAttribute(attr.name, attr.value);
-        }
+        newElem.setAttribute(attr.name, attr.value);
       }
 
       for (let child of node.childNodes) {
