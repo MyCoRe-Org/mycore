@@ -39,10 +39,12 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.Parent;
+import org.jdom2.filter.ElementFilter;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRWrappedContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
@@ -51,6 +53,9 @@ import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXPathEvaluator;
 import org.mycore.common.xsl.MCRParameterCollector;
+import org.mycore.frontend.xeditor.mapper.MCRField;
+import org.mycore.frontend.xeditor.mapper.MCRFieldMapping;
+import org.mycore.frontend.xeditor.mapper.MCRNameBuilder;
 import org.mycore.frontend.xeditor.target.MCRInsertTarget;
 import org.mycore.frontend.xeditor.target.MCRSubselectTarget;
 import org.mycore.frontend.xeditor.target.MCRSwapTarget;
@@ -65,6 +70,8 @@ import org.xml.sax.SAXException;
  */
 public class MCRXEditorTransformer {
 
+    public static final Namespace NS_XED = Namespace.getNamespace("xed", "http://www.mycore.de/xeditor");
+
     public int anchorID = 0;
 
     private MCREditorSession editorSession;
@@ -73,9 +80,11 @@ public class MCRXEditorTransformer {
 
     private MCRParameterCollector transformationParameters;
 
-    private boolean withinSelectElement = false;
+    private MCRFieldMapping fieldMapping = new MCRFieldMapping();
 
-    private boolean withinSelectMultiple = false;
+    private MCRNameBuilder nameBuilder = new MCRNameBuilder();
+
+    private boolean withinSelectElement = false;
 
     public MCRXEditorTransformer(MCREditorSession editorSession, MCRParameterCollector transformationParameters) {
         this.editorSession = editorSession;
@@ -84,7 +93,6 @@ public class MCRXEditorTransformer {
 
     public MCRContent transform(MCRContent editorSource) throws IOException {
         editorSession.getValidator().clearRules();
-        editorSession.getSubmission().clear();
 
         MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer("xeditor");
         if (transformer instanceof MCRParameterizedTransformer parameterizedTransformer) {
@@ -96,10 +104,26 @@ public class MCRXEditorTransformer {
                 result = wrappedContent.getBaseContent();
             }
             editorSession.getValidator().clearValidationResults();
+
+            try {
+                result = removeObsoleteXEdNamespace(result);
+            } catch (JDOMException | SAXException ex) {
+                throw new IOException(ex);
+            }
+
             return result;
         } else {
             throw new MCRException("Xeditor needs parameterized MCRContentTransformer: " + transformer);
         }
+    }
+
+    private MCRJDOMContent removeObsoleteXEdNamespace(MCRContent resultFromStep2)
+        throws JDOMException, IOException, SAXException {
+        Document doc = resultFromStep2.asXML();
+        doc.getDescendants(new ElementFilter()).forEach(e -> e.removeNamespaceDeclaration(NS_XED));
+
+        MCRJDOMContent resultFromStep3 = new MCRJDOMContent(doc);
+        return resultFromStep3;
     }
 
     public void addNamespace(String prefix, String uri) {
@@ -152,7 +176,9 @@ public class MCRXEditorTransformer {
             currentBinding = editorSession.getRootBinding();
         }
 
-        setCurrentBinding(new MCRBinding(xPath, initialValue, name, currentBinding));
+        MCRBinding newBinding = new MCRBinding(xPath, initialValue, name, currentBinding);
+        setCurrentBinding(newBinding);
+        trackChanges();
     }
 
     private void setCurrentBinding(MCRBinding binding) {
@@ -177,11 +203,19 @@ public class MCRXEditorTransformer {
 
     public void setValues(String value) {
         currentBinding.setValues(value);
+        trackChanges();
     }
 
     public void setDefault(String value) {
-        currentBinding.setDefault(value);
-        editorSession.getSubmission().markDefaultValue(currentBinding.getAbsoluteXPath(), value);
+        if (currentBinding.getValue().isEmpty()) {
+            currentBinding.setValue(value);
+            trackChanges();
+        }
+        fieldMapping.getField(currentBinding).setDefaultValue(value);
+    }
+
+    private void trackChanges() {
+        editorSession.getChangeTracker().track(currentBinding.getChanges());
     }
 
     public void unbind() {
@@ -192,26 +226,32 @@ public class MCRXEditorTransformer {
         return currentBinding.getAbsoluteXPath();
     }
 
+    public String getFieldNameForCurrentBinding(String nameInHTML) {
+        MCRField field = fieldMapping.getField(currentBinding);
+
+        String name = field.getName();
+        if (name == null) {
+            name = nameBuilder.buildNameFor(currentBinding.getBoundNode(), nameInHTML);
+            field.setName(name);
+        }
+
+        return field.getName();
+    }
+
     public String getValue() {
         return currentBinding.getValue();
     }
 
     public boolean hasValue(String value) {
-        editorSession.getSubmission().mark2checkResubmission(currentBinding);
         return currentBinding.hasValue(value);
     }
 
-    public void toggleWithinSelectElement(String attrMultiple) {
+    public void toggleWithinSelectElement() {
         withinSelectElement = !withinSelectElement;
-        withinSelectMultiple = Objects.equals(attrMultiple, "multiple");
     }
 
     public boolean isWithinSelectElement() {
         return withinSelectElement;
-    }
-
-    public boolean isWithinSelectMultiple() {
-        return withinSelectMultiple;
     }
 
     public String replaceXPaths(String text) {
@@ -242,6 +282,7 @@ public class MCRXEditorTransformer {
         throws JaxenException {
         MCRRepeatBinding repeat = new MCRRepeatBinding(xPath, currentBinding, minRepeats, maxRepeats, method);
         setCurrentBinding(repeat);
+        trackChanges();
         return StringUtils.repeat("a ", repeat.getBoundNodes().size());
     }
 
@@ -267,6 +308,7 @@ public class MCRXEditorTransformer {
 
     public void bindRepeatPosition() {
         setCurrentBinding(getCurrentRepeat().bindRepeatPosition());
+        trackChanges();
         editorSession.getValidator().setValidationMarker(currentBinding);
     }
 
@@ -320,7 +362,7 @@ public class MCRXEditorTransformer {
         return currentBinding.getAbsoluteXPath() + ":" + MCRSubselectTarget.encode(href);
     }
 
-    public NodeSet getAdditionalParameters() throws ParserConfigurationException {
+    public NodeSet getAdditionalParameters() throws ParserConfigurationException, JaxenException {
         org.w3c.dom.Document dom = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         NodeSet nodeSet = new NodeSet();
 
@@ -333,19 +375,9 @@ public class MCRXEditorTransformer {
             }
         }
 
-        String xPaths2CheckResubmission = editorSession.getSubmission().getXPaths2CheckResubmission();
-        if (!xPaths2CheckResubmission.isEmpty()) {
-            nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSubmission.PREFIX_CHECK_RESUBMISSION,
-                xPaths2CheckResubmission));
-        }
-
-        Map<String, String> defaultValues = editorSession.getSubmission().getDefaultValues();
-        for (String xPath : defaultValues.keySet()) {
-            nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSubmission.PREFIX_DEFAULT_VALUE + xPath,
-                defaultValues.get(xPath)));
-        }
-
+        fieldMapping.encode();
         editorSession.setBreakpoint("After transformation to HTML");
+
         nodeSet.addNode(buildAdditionalParameterElement(dom, MCREditorSessionStore.XEDITOR_SESSION_PARAM,
             editorSession.getCombinedSessionStepID()));
 

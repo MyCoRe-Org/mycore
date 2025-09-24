@@ -19,18 +19,28 @@
 package org.mycore.frontend.xeditor.tracker;
 
 import org.jdom2.Attribute;
+import org.mycore.common.xml.MCRXPathBuilder;
 
-public class MCRSetAttributeValue implements MCRChange {
+/**
+ * Sets an attribute value in the edited xml, and tracks that change.  
+ * 
+ * @author Frank L\u00FCtzenkirchen
+ */
+public class MCRSetAttributeValue extends MCRChange {
 
-    public static MCRChangeData setValue(Attribute attribute, String value) {
-        MCRChangeData data = new MCRChangeData("set-attribute", attribute);
-        attribute.setValue(value);
-        return data;
+    public Attribute attribute;
+
+    public String oldValue;
+
+    public MCRSetAttributeValue(Attribute attribute, String newValue) {
+        this.message = "Set value of " + MCRXPathBuilder.buildXPath(attribute) + " to " + newValue;
+        this.attribute = attribute;
+        this.oldValue = attribute.getValue();
+        attribute.setValue(newValue);
     }
 
-    public void undo(MCRChangeData data) {
-        Attribute attribute = data.getAttribute();
-        data.getContext().removeAttribute(attribute.getName(), attribute.getNamespace());
-        data.getContext().setAttribute(attribute);
+    @Override
+    public void undo() {
+        attribute.setValue(oldValue);
     }
 }
