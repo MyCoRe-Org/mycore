@@ -79,7 +79,7 @@ public class MCRORCIDUserTest {
     private static MCRUser mcrUserMock;
 
     @BeforeAll
-    public static void prepare() throws Exception {
+    public static void prepare() {
         mcrUserMock = Mockito.mock(MCRUser.class);
         SortedSet<MCRUserAttribute> attrs = new TreeSet<>(
             List.of(
@@ -165,7 +165,7 @@ public class MCRORCIDUserTest {
     }
 
     @Test
-    public void testAddORCIDUserAttributeImpl() {
+    public void testAddORCIDUserAttributeImpl() throws MCRAccessException {
         MCRConfiguration2.set(HANDLER_ATTRIBUTE_NAME,
             "org.mycore.orcid2.user.MCRORCIDIDAttributeHandlerUserAttributeImpl");
 
@@ -245,7 +245,7 @@ public class MCRORCIDUserTest {
     }
 
     @Test
-    public void testGetIdentifiersUserAttributeImpl() {
+    public void testGetIdentifiersUserAttributeImpl() throws MCRAccessException {
         MCRConfiguration2.set(HANDLER_ATTRIBUTE_NAME,
             "org.mycore.orcid2.user.MCRORCIDIDAttributeHandlerUserAttributeImpl");
 
@@ -270,7 +270,6 @@ public class MCRORCIDUserTest {
     public void testGetIdentifiersModspersonImpl()
         throws MCRAccessException, URISyntaxException, IOException, JDOMException {
         MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.SUPER_USER);
-        // getIdentifiers with MCRORCIDAccessModspersonImpl implementation but no reference
         MCRConfiguration2.set(HANDLER_ATTRIBUTE_NAME,
             "org.mycore.orcid2.user.MCRORCIDIDAttributeHandlerModspersonImpl");
 
@@ -282,6 +281,7 @@ public class MCRORCIDUserTest {
         MCRORCIDUser orcidUser = new MCRORCIDUser(user);
         orcidUser.addORCID(ORCID_1);
 
+        // getIdentifiers with MCRORCIDAccessModspersonImpl implementation but no reference
         Set<MCRIdentifier> identifiers = orcidUser.getIdentifiers();
         assertEquals(0, identifiers.size());
 
