@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mycoreclass xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="MCRClassification.xsd" ID="diniPublType">
+  <label xml:lang="en" text="DINI publication- and document types" description="general vocabulary for publication and document types" />
+  <label xml:lang="de" text="DINI Publikations- und Dokumenttypen" description="Gemeinsames Vokabular für Publikations- und Dokumenttypen" />
+  <categories>
+    <category ID="preprint" counter="0">
+      <label xml:lang="de" text="Preprint" description="Wie beim workingPaper liegt ein vorläufiges wissenschaftliches oder technisches Papier vor, das aber nicht in der Reihe einer Institution erscheint. Es soll in einer wissenschaftlichen Zeitschrift oder als Teil eines Buches erscheinen." />
+      <label xml:lang="en" text="preprint" description="Like a workingPaper this is a preliminary scientific or technical paper, but it is not published in an institutional series. The paper is intended to be published in a scientific journal or as a chapter in a book." />
+    </category>
+    <category ID="workingPaper" counter="0">
+      <label xml:lang="de" text="Arbeitspapier" description="Vorläufiges wissenschaftliches oder technisches Papier, das in einer Reihe einer Institution veröffentlicht wird, in der die Forschung stattfindet. Auch bezeichnet als Research Paper, Research Memorandum oder Diskussionspapier." />
+      <label xml:lang="en" text="working paper" description="A preliminary scientific or technical paper that is published in a series of the institution where the research is done. Also known as research paper, research memorandum or discussion paper." />
+    </category>
+    <category ID="article" counter="0">
+      <label xml:lang="en" text="article" description="Article or an editorial published in a journal." />
+      <label xml:lang="de" text="Wissenschaftlicher Artikel" description="Ein Artikel oder ein redaktioneller Teil veröffentlicht in einer wissenschaftlichen Zeitschrift." />
+    </category>
+    <category ID="contributionToPeriodical" counter="0">
+      <label xml:lang="en" text="contribution to periodical" description="Contribution to a newspaper, weekly magazine or another non-academic periodical." />
+      <label xml:lang="de" text="Beitrag zu einem Periodikum" description="Beitrag in einer Zeitung, einem Wochenmagazin oder einem anderen nicht-wissenschaftlichen Periodikum." />
+    </category>
+    <category ID="PeriodicalPart" counter="0">
+      <label xml:lang="de" text="Teil eines Periodikums" description="Teil einer Zeitschrift oder eines Periodikums, enthält im Allgemeinen mehrere Beiträge (Artikel)." />
+      <label xml:lang="en" text="periodical part" description="Part of a journal or periodical, generally contains multiple contributions (articles)." />
+    </category>
+    <category ID="Periodical" counter="0">
+      <label xml:lang="en" text="periodical" description="journal or periodical" />
+      <label xml:lang="de" text="Periodikum" description="Zeitschrift oder Periodikum." />
+    </category>
+    <category ID="book" counter="0">
+      <label xml:lang="de" text="Buch" description="Buch oder Monographie." />
+      <label xml:lang="en" text="book" description="Book or monograph." />
+    </category>
+    <category ID="bookPart" counter="0">
+      <label xml:lang="en" text="book part" description="Part or chapter of a book." />
+      <label xml:lang="de" text="Teil eines Buches oder Monographie" description="Teil oder Kapitel eines Buches." />
+    </category>
+    <category ID="Manuscript" counter="0">
+      <label xml:lang="en" text="manuscript" description="handwriting or manuscript in digitized form" />
+      <label xml:lang="de" text="Handschrift" description="Handschrift oder Manuskript in digitalisierter Form." />
+    </category>
+    <category ID="StudyThesis" counter="1">
+      <label xml:lang="en" text="study thesis" description="Textual compositions, produced in the course of studies. Examples are assignments, term papers, research and project reports, that do not classify as final thesis." />
+      <label xml:lang="de" text="Studienarbeit" description="Textgeprägte Ausarbeitungen, die im Rahmen eines Studiums entstehen. Beispiele sind Haus- und Seminararbeiten, Untersuchungs- und Projektberichte, die nicht als Abschlussarbeit eingestuft sind." />
+    </category>
+    <category ID="bachelorThesis" counter="0">
+      <label xml:lang="de" text="Abschlussarbeit (Bachelor)" description="Niedrigste Stufe einer Abschlussarbeit (normalerweise nach drei Jahren Studium)." />
+      <label xml:lang="en" text="bachelor thesis" description="Lowest level of a thesis (normally after three years of study)." />
+    </category>
+    <category ID="masterThesis" counter="0">
+      <label xml:lang="de" text="Abschlussarbeit (Master)" description="Mittlere Stufe einer Abschlussarbeit (normalerweise nach vier oder fünf Jahren Studium). Dieser Term referiert auch Abschlussarbeiten für akademische Grade aus der Zeit vor Beginn des Bologna-Prozesses auf der Stufe eines Masters." />
+      <label xml:lang="en" text="master thesis" description="Intermediate level of a thesis (normally after four or five years of study). This also refers to theses of the pre-Bologna period for degrees that are at the same level as what now is known as a master degree." />
+    </category>
+    <category ID="doctoralThesis" counter="0">
+      <label xml:lang="de" text="Dissertation oder Habilitation" description="Höchste Stufe einer Abschlussarbeit normalerweise nach mehr als vier oder fünf Jahren Studium. Auch für etwas gleichwertiges oder höheres als eine Dissertation, dass aber nicht der Bologna-Konvention folgt. Enthält auch die Habilitationsschrift." />
+      <label xml:lang="en" text="doctoral thesis" description="Highest level of a thesis normally after more than four or five years of study. Also everything equal and higher then a Doctoral thesis, that does not follow the “Bologna Convention”, will be put in the category." />
+    </category>
+    <category ID="conferenceObject" counter="0">
+      <label xml:lang="de" text="Konferenzveröffentlichung" description="Alle Arten von Dokumenten, die mit einer Konferenz verbunden sind. Unter anderem Konferenz-Papers, Konferenzberichte, Conference-Lectures, Beiträge in Konferenz-Proceedings, Konferenzbeiträge, Abstracts, Bände von Konferenzbeiträgen und Poster." />
+      <label xml:lang="en" text="conference object" description="All kind of documents related to a conference, p. e. conference papers, conference reports, conference lecture, papers published in conference proceedings, conference contributions, reports of abstracts of conference papers and posters." />
+    </category>
+    <category ID="lecture" counter="0">
+      <label xml:lang="en" text="lecture" description="Lecture or presentation presented during an academic event, e. g., inaugural lecture. Excluded is a conference lecture." />
+      <label xml:lang="de" text="Vorlesung" description="Vorlesung oder Präsentation anlässlich einer akademischen Veranstaltung. Auch Antrittsvorlesungen. Ausgeschlossen sind Konferenzvorträge." />
+    </category>
+    <category ID="review" counter="0">
+      <label xml:lang="en" text="review" description="Review of a book or article. This could also be a summary of a publication, which is in contrast to an abstract a self-contained work and not created by the author." />
+      <label xml:lang="de" text="Rezension" description="Rezension eines Buches oder eines Artikels. Dies kann auch eine Zusammenfassung über ein Werk sein, die im Gegensatz zum Abstract nicht vom Autor selbst stammt und ein eigenständiges Werk bildet." />
+    </category>
+    <category ID="annotation" counter="0">
+      <label xml:lang="de" text="Entscheidungs- oder Urteilsanmerkung" description="Entscheidungs- oder Urteilsanmerkung." />
+      <label xml:lang="en" text="annotation" description="Note to a legal judgment." />
+    </category>
+    <category ID="patent" counter="0">
+      <label xml:lang="de" text="Patent, Norm, Standard" description="Patent, Norm, Standard." />
+      <label xml:lang="en" text="patent" description="Patent." />
+    </category>
+    <category ID="report" counter="0">
+      <label xml:lang="de" text="Verschiedenartige Texte" description="Dieser Term ist als Kategorie für textgeprägtes Material, das nicht anderweitig zugeordnet werden kann, zu sehen. Beispiele sind Reports, externe Forschungs-, Projektabschluss-, statistische Berichte, technische Dokumentationen, Anleitungen." />
+      <label xml:lang="en" text="report" description="This is more or less a rest category and covers commission reports, memoranda, external research reports, internal reports, statistical report, reports to funding agency, technical documentation, project deliverables etc." />
+    </category>
+    <category ID="MusicalNotation" counter="0">
+      <label xml:lang="de" text="Noten (Musik)" description="Ressourcen, die in graphischer Form festgehaltene musikalische Parameter wie Tonhöhe, -dauer, -lautstärke und Klangfarbe beschreiben (z. B. Partituren, Klavier- und Orgelauszüge, Stimmen, Liedersammlungen mit Noten, Songbooks und dgl.)." />
+      <label xml:lang="en" text="musical notation" description="A visual analogue of musical sound, either as a record of sound heard or imagined, or as a set of visual instructions for performers." />
+    </category>
+    <category ID="Sound" counter="0">
+      <label xml:lang="en" text="sound" description="A resource primarily intended to be heard." />
+      <label xml:lang="de" text="Ton" description="Eine Ressource, die hauptsächlich dazu bestimmt ist, dass man sie hört. Beispiele sind Musikdateien, Audio-CDs, Sprach- und Tonaufzeichnungen. Keine Unterscheidung von Tönen, Geräuschen und Musik." />
+    </category>
+    <category ID="Image" counter="0">
+      <label xml:lang="en" text="image" description="A visual representation other than text." />
+      <label xml:lang="de" text="Bild" description="Eine nicht textgebundene visuelle Darstellung. Beispiele sind Bilder und Fotografien von Gegenständen, Gemälde, Drucke, Zeichnungen, andere Bilder und Graphiken, Animationen und bewegte Bilder, Filme, Diagramme, Karten, Noten." />
+      <category ID="MovingImage" counter="0">
+        <label xml:lang="en" text="moving image" description="A series of visual representations imparting an impression of motion when shown in succession." />
+        <label xml:lang="de" text="Bewegte Bilder" description="Eine Serie visueller Darstellungen, die den Eindruck von Bewegung vermitteln, wenn sie nacheinander gezeigt werden. Beispiel sind Animationen, Filme, Fernsehprogramme, Videos, Zoetropen oder die visuelle Darstellung einer Simulation." />
+      </category>
+      <category ID="StillImage" counter="0">
+        <label xml:lang="en" text="still image" />
+        <label xml:lang="de" text="Einzelbild" description="Eine statische visuelle Darstellung. Beispiele sind Gemälde, Zeichnungen, grafische Entwürfe, Pläne und Karten. Es wird empfohlen, Bildern von Text-Materialien den Typ ''Text'' zuzuweisen." />
+      </category>
+    </category>
+    <category ID="CourseMaterial" counter="0">
+      <label xml:lang="en" text="course material" description="Course material in a broader sense." />
+      <label xml:lang="de" text="Lehrmaterial" description="Lehrmaterial im weitesten Sinn. Beispiele umfassen Vorlesungsmitschnitte als bewegtes Bilddokument oder als Tondokument, Übungsmaterial, Vorbereitungsmaterial, Prüfungsmaterial. Für den Vorlesungstext selbst wird Lecture verwendet." />
+    </category>
+    <category ID="Website" counter="0">
+      <label xml:lang="de" text="Webseite" description="Eine durch einen URL (Uniform Resource Locator) bezeichnete Präsenz im WWW, unter der Webseiten für Zugriff und Nutzung gespeichert sind. Unter einer Webseite ist eine Seite als Hypertext-Dokument im WWW zu verstehen." />
+      <label xml:lang="en" text="website" description="A web presentation, referred by a URL (Uniform Resource Locator), stored for access and use. A website represents a WWW hypertext document." />
+    </category>
+    <category ID="Software" counter="0">
+      <label xml:lang="de" text="Software" description="Ein Computerprogramm als Quellcode oder in kompilierter Form. Beispiele sind Quellcode in C, unter MS-Windows ausführbare Dateien (.exe) oder Perl-Skripte." />
+      <label xml:lang="en" text="software" description="A computer program in source or compiled form." />
+    </category>
+    <category ID="CarthographicMaterial" counter="0">
+      <label xml:lang="en" text="carthographic material" description="Resources, that display earth or other heavenly bodies in arbitrary scale, partially or entirely." />
+      <label xml:lang="de" text="Kartographisches Material" description="Ressourcen, die die Erde oder einen Himmelskörper in einem beliebigen Maßstab ganz oder teilweise abbilden. Beispiele sind: Karten und Pläne, Luftfahrt-, See- und Himmelskarten; Atlanten, Globen, Satellitenbilder, Luftaufnahmen." />
+    </category>
+    <category ID="ResearchData" counter="0">
+      <label xml:lang="en" text="research data" description="Structured or unstructed data collection. The current form is not intellectually interpreted. Examples are raw or primary data and derived secondary data." />
+      <label xml:lang="de" text="Forschungsdaten" description="Daten, die bei einer Datenerhebung gewonnen wurden, strukturiert bzw. unstrukturiert vorliegen und in der vorliegenden Form nicht intellektuell interpretiert sind. Beispiele umfassen Roh- bzw. Primärdaten sowie daraus abgeleitete Sekundärdaten." />
+    </category>
+    <category ID="Other" counter="0">
+      <label xml:lang="en" text="other resources, not textual" description="Especially meant for non-publication data, that cannot be classified by other terms." />
+      <label xml:lang="de" text="Verschiedenartige Ressourcen, nicht textgeprägt" description="Speziell gedacht für Material, das nicht anderweitig zugeordnet werden kann." />
+    </category>
+    <category ID="Text" counter="0">
+      <label xml:lang="de" text="Text" description="Text" />
+      <label xml:lang="en" text="text" description="text" />
+    </category>
+  </categories>
+</mycoreclass>
