@@ -78,13 +78,13 @@ public class MCRModspersonNameMergerTest {
         Element altNameElement = buildAlternativeNameElement("Thomas", "Meyer");
         modsNameElement.addContent(altNameElement);
 
-        MCRNameMerger a = new MCRNameMerger();
+        MCRModspersonNameMerger a = new MCRModspersonNameMerger();
         a.setElement(modsNameElement);
-        MCRNameMerger b = buildNameEntry(
+        MCRModspersonNameMerger b = buildNameEntry(
             "[mods:namePart[@type='given']='Thomas'][mods:namePart[@type='family']='Meyer']");
-        MCRNameMerger c = buildNameEntry(
+        MCRModspersonNameMerger c = buildNameEntry(
             "[mods:namePart[@type='given']='T'][mods:namePart[@type='family']='Meyer']");
-        MCRNameMerger d = buildNameEntry(
+        MCRModspersonNameMerger d = buildNameEntry(
             "[mods:namePart[@type='given']='Thomas'][mods:namePart[@type='family']='Mayer']");
 
         assertTrue(a.hasAlternativeNameSameAs(b));
@@ -95,9 +95,9 @@ public class MCRModspersonNameMergerTest {
 
     @Test
     public void testMergeAsAlternativeName() throws JaxenException {
-        MCRNameMerger a = buildNameEntry(
+        MCRModspersonNameMerger a = buildNameEntry(
             "[mods:namePart[@type='given']='Thomas'][mods:namePart[@type='family']='Müller']");
-        MCRNameMerger b = buildNameEntry(
+        MCRModspersonNameMerger b = buildNameEntry(
             "[mods:namePart[@type='given']='Thomas'][mods:namePart[@type='family']='Meyer']");
 
         a.mergeAsAlternativeName(b);

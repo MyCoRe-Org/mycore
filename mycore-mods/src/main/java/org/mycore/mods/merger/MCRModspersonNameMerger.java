@@ -108,6 +108,5 @@ public class MCRModspersonNameMerger extends MCRNameMerger {
         alternativeName.addContent(altFamilyName);
 
         this.element.addContent(alternativeName);
-
     }
 }
