@@ -290,6 +290,11 @@ wcms.navigation.EditContentDialog = function() {
       }
     });
 
+    const cleanDocument = document.implementation.createDocument(null, null);
+    const cleanDocumentElement = removeNamespacesDeep(doc.documentElement, cleanDocument);
+    head = cleanDocumentElement.getElementsByTagName("head")[0];
+    body = cleanDocumentElement.getElementsByTagName("body")[0];
+
     // Serialize the modified document back to a string
     const serializer = new XMLSerializer();
     if (isHeadEmpty(head)) {
@@ -297,7 +302,28 @@ wcms.navigation.EditContentDialog = function() {
       .map(elem => serializer.serializeToString(elem))
       .join("");
     } else {
-      return serializer.serializeToString(doc.documentElement);
+      return serializer.serializeToString(cleanDocumentElement);
+    }
+  }
+
+  function removeNamespacesDeep(node, doc) {
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      const isXHTML = node.namespaceURI === "http://www.w3.org/1999/xhtml";
+
+      const newElem = isXHTML ?
+          doc.createElement(node.localName) :
+          doc.createElementNS(node.namespaceURI, node.localName);
+
+      for (let attr of node.attributes) {
+        newElem.setAttribute(attr.name, attr.value);
+      }
+
+      for (let child of node.childNodes) {
+        newElem.appendChild(removeNamespacesDeep(child, doc));
+      }
+      return newElem;
+    } else {
+      return node.cloneNode(true);
     }
   }
 

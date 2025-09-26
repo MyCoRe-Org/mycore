@@ -27,14 +27,6 @@ module.exports = function(grunt) {
           files: [
             {
               expand: true,
-              cwd: './node_modules/font-awesome',
-              dest: './target/classes/META-INF/resources/modules/classeditor/node_modules/font-awesome',
-              src: [
-                '**'
-              ]
-            },
-            {
-              expand: true,
               cwd: './node_modules/dojo',
               dest: './target/classes/META-INF/resources/modules/classeditor/node_modules/dojo',
               src: [
