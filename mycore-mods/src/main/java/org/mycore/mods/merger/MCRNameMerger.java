@@ -44,15 +44,15 @@ public class MCRNameMerger extends MCRMerger {
 
     private static final String NAME_PART = "namePart";
 
-    private String familyName;
+    protected String familyName;
 
-    private Set<String> givenNames = new HashSet<>();
+    protected Set<String> givenNames = new HashSet<>();
 
-    private Set<String> initials = new HashSet<>();
+    protected Set<String> initials = new HashSet<>();
 
-    private Set<String> allNames = new HashSet<>();
+    protected Set<String> allNames = new HashSet<>();
 
-    private Map<String, Set<String>> nameIds = new HashMap<>();
+    protected Map<String, Set<String>> nameIds = new HashMap<>();
 
     @Override
     public void setElement(Element element) {
@@ -195,30 +195,26 @@ public class MCRNameMerger extends MCRMerger {
             return false;
         } else if (this.allNames.equals(other.allNames)) {
             return true;
-        } else if (Objects.equals(familyName, other.familyName)) {
-            if (initials.isEmpty() && other.initials.isEmpty()) {
-                return true; // same family name, no given name, no initals, then assumed same
-            } else if (!haveAtLeastOneCommon(this.initials, other.initials)) {
-                return false;
-            } else if (this.givenNames.isEmpty() || other.givenNames.isEmpty()) {
-                return true;
-            } else {
-                return haveAtLeastOneCommon(this.givenNames, other.givenNames);
-            }
+        } else if (!Objects.equals(familyName, other.familyName)) {
+            return false;
+        } else if (initials.isEmpty() && other.initials.isEmpty()) {
+            return true; // same family name, no given name, no initals, then assumed same
+        } else if (!haveAtLeastOneCommon(this.initials, other.initials)) {
+            return false;
+        } else if (this.givenNames.isEmpty() || other.givenNames.isEmpty()) {
+            return true;
         } else {
-            // double-barreled name with same given names assumes same
-            return this.givenNames.equals(other.givenNames) &&
-                (this.familyName.contains(other.familyName) || other.familyName.contains(this.familyName));
+            return haveAtLeastOneCommon(this.givenNames, other.givenNames);
         }
     }
 
-    private boolean haveAtLeastOneCommon(Set<String> a, Set<String> b) {
+    protected boolean haveAtLeastOneCommon(Set<String> a, Set<String> b) {
         Set<String> intersection = new HashSet<>(a);
         intersection.retainAll(b);
         return !intersection.isEmpty();
     }
 
-    private boolean haveContradictingNameIds(Map<String, Set<String>> a, Map<String, Set<String>> b) {
+    protected boolean haveContradictingNameIds(Map<String, Set<String>> a, Map<String, Set<String>> b) {
         Set<String> intersection;
         boolean foundContradictingNameIds = false;
         for (String type : a.keySet()) {
