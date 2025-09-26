@@ -31,10 +31,6 @@
   <description>SASS on-the-fly compiler resource</description>
   <dependencies>
     <dependency>
-      <groupId>com.google.closure-stylesheets</groupId>
-      <artifactId>closure-stylesheets</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java</artifactId>
     </dependency>

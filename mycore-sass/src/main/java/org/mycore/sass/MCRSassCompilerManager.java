@@ -29,12 +29,6 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 
-import com.google.common.css.SourceCode;
-import com.google.common.css.compiler.ast.GssParser;
-import com.google.common.css.compiler.ast.GssParserException;
-import com.google.common.css.compiler.passes.CompactPrinter;
-import com.google.common.css.compiler.passes.NullGssSourceMapGenerator;
-
 import de.larsgrefer.sass.embedded.SassCompilationFailedException;
 import de.larsgrefer.sass.embedded.connection.ConnectionFactory;
 import de.larsgrefer.sass.embedded.importer.Importer;
@@ -117,18 +111,10 @@ public final class MCRSassCompilerManager {
             css = compileSuccess.getCss();
         }
 
-        boolean compress = name.endsWith(".min.css");
-        if (compress) {
-            try {
-                GssParser parser = new GssParser(new SourceCode(null, css));
-                final CompactPrinter cp = new CompactPrinter(parser.parse(), new NullGssSourceMapGenerator());
-                cp.setPreserveMarkedComments(true);
-                cp.runPass();
-                css = cp.getCompactPrintedString();
-            } catch (GssParserException e) {
-                throw new MCRException("Error while parsing result css with compressor (" + name + ")", e);
-            }
-        }
+        //boolean compress = name.endsWith(".min.css");
+        //if (compress) {
+        // […] // css = MCRSassCompressor.compress(css);
+        //}
 
         this.fileCompiledContentMap.put(name, css);
         this.fileLastCompileDateMap.put(name, new Date());
