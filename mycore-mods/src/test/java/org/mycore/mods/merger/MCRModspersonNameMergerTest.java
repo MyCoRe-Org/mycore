@@ -5,12 +5,17 @@ import org.jdom2.Element;
 import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.xml.MCRNodeBuilder;
+import org.mycore.test.MyCoReTest;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@MyCoReTest
 public class MCRModspersonNameMergerTest {
 
     @Test
@@ -61,12 +66,7 @@ public class MCRModspersonNameMergerTest {
         assertFalse(k.isProbablySameAs(d));
         assertFalse(k.isProbablySameAs(i));
 
-        try {
-            new MCRNameMerger().setElement(null);
-            fail("No name should result in NPE while creating a MCRNameMerger");
-        } catch (NullPointerException ex) {
-            // exception excepted
-        }
+        assertThrows(NullPointerException.class, () -> new MCRModspersonNameMerger().setElement(null));
     }
 
     @Test
@@ -120,9 +120,9 @@ public class MCRModspersonNameMergerTest {
         assertEquals("Meyer", nameParts.get(1).getText());
     }
 
-    private MCRNameMerger buildNameEntry(String predicates) throws JaxenException {
+    private MCRModspersonNameMerger buildNameEntry(String predicates) throws JaxenException {
         Element modsName = new MCRNodeBuilder().buildElement("mods:name[@type='personal']" + predicates, null, null);
-        MCRNameMerger ne = new MCRNameMerger();
+        MCRModspersonNameMerger ne = new MCRModspersonNameMerger();
         ne.setElement(modsName);
         return ne;
     }

@@ -30,7 +30,7 @@ import org.mycore.test.MyCoReTest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @MyCoReTest
 public class MCRNameMergerTest {
@@ -69,12 +69,7 @@ public class MCRNameMergerTest {
         assertTrue(i.isProbablySameAs(a));
         assertTrue(i.isProbablySameAs(d));
 
-        try {
-            new MCRNameMerger().setElement(null);
-            fail("No name should result in NPE while creating a MCRNameMerger");
-        } catch (NullPointerException ex) {
-            // exception excepted
-        }
+        assertThrows(NullPointerException.class, () -> new MCRNameMerger().setElement(null));
     }
 
     @Test
