@@ -18,13 +18,13 @@
 
 package org.mycore.user2.login;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.user2.MCRRealmFactory;
@@ -32,11 +32,11 @@ import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserAttributeMapper;
 import org.mycore.user2.MCRUserManager;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * 
+ *
  * @author René Adler (eagle)
  */
 public class MCRShibbolethLoginServlet extends MCRServlet {
@@ -44,6 +44,10 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     private static Logger LOGGER = LogManager.getLogger(MCRShibbolethLoginServlet.class);
+
+    private static final boolean PERSIST_USER_AFTER_LOGIN = MCRConfiguration2
+        .getBoolean("MCR.user2.Shibboleth.PersistUser")
+        .orElseThrow();
 
     public void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest req = job.getRequest();
@@ -82,7 +86,15 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
 
                     userinfo = user;
                 } else {
-                    userinfo = new MCRShibbolethUserInformation(userId, realmId, attributes);
+                    if (PERSIST_USER_AFTER_LOGIN) {
+                        MCRUser newUser = new MCRUser(userId, realmId);
+                        attributeMapper.mapAttributes(newUser, attributes);
+                        newUser.setLastLogin();
+                        MCRUserManager.updateUser(newUser);
+                        userinfo = newUser;
+                    } else {
+                        userinfo = new MCRShibbolethUserInformation(userId, realmId, attributes);
+                    }
                 }
 
                 MCRSessionMgr.getCurrentSession().setUserInformation(userinfo);
