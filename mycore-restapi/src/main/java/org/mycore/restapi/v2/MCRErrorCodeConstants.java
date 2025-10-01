@@ -46,6 +46,8 @@ public final class MCRErrorCodeConstants {
 
     public static final String MCROBJECT_ALREADY_LOCKED = "MCROBJECT_ALREADY_LOCKED";
 
+    public static final String MCROBJECT_LOCKED_BY_DIFFERENT_USER = "MCROBJECT_LOCKED_BY_DIFFERENT_USER";
+
     //MCRDerivate
     public static final String MCRDERIVATE_NO_PERMISSION = "MCRDERIVATE_NO_PERMISSION";
 

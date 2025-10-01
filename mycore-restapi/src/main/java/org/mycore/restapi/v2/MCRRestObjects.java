@@ -937,8 +937,7 @@ public class MCRRestObjects {
         tags = MCRRestUtils.TAG_MYCORE_OBJECT,
         responses = {
             @ApiResponse(responseCode = NOT_FOUND, description = "object or lock is not found"),
-            @ApiResponse(responseCode = CONFLICT,
-                description = "object is already unlocked or is locked by another user"),
+            @ApiResponse(responseCode = CONFLICT, description = "object lock is from another user"),
             @ApiResponse(
                 description = "Lock information about an object",
                 content = @Content(
