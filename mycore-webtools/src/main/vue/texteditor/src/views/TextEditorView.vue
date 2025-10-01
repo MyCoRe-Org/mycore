@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {nextTick, type Ref, ref, watch} from "vue";
+import {nextTick, type Ref, ref, watch, onBeforeUnmount, onMounted} from "vue";
 import {ContentHandlerSelector} from "@/apis/ContentHandlerSelector";
 import TextEditor from "@/components/TextEditor.vue";
 
@@ -11,13 +11,30 @@ let model: Ref<Content> = ref({
   data: "",
   type: ""
 });
-let loading: any = ref(true);
-let success: any = ref();
-let error: any = ref();
-let updateEnabled = ref(false);
-let writeAccess = ref(false);
+
+const loading: any = ref(true);
+const success: any = ref();
+const error: any = ref();
+const updateEnabled = ref(false);
+const writeAccess = ref(false);
+const lockResult = ref<LockResult | undefined>(undefined);
+
 let undoKeyPressed = false;
 let originalModel: string = "";
+let refreshInterval: number | undefined;
+
+onMounted(() => {
+  window.addEventListener("beforeunload", handleBeforeUnload);
+});
+
+onBeforeUnmount(async () => {
+  unlockIfPossible();
+  window.removeEventListener("beforeunload", handleBeforeUnload);
+});
+
+const handleBeforeUnload = () => {
+  unlockIfPossible();
+};
 
 watch(() => model.value.data, async (newModel) => {
   // prevent ctrl+z clearing the textarea
@@ -85,6 +102,70 @@ const save = async () => {
   loading.value = false;
 }
 
+/**
+ * Checks whether locking is possible.
+ * <ul>
+ *   <li>the content handler supports the locking</li>
+ *   <li>we have write access</li>
+ *   <li>it's a valid document</li>
+ * </ul>
+ */
+const isLockingPossible = () => {
+  const contentHandler: ContentHandler | undefined = ContentHandlerSelector.get(props.type);
+  if (contentHandler === undefined) {
+    return;
+  }
+  const canWrite = writeAccess.value;
+  const supportsLocking = contentHandler.supportsLocking(props.id);
+  const isValidDocument = model.value.type !== "";
+  return isValidDocument && canWrite && supportsLocking;
+}
+
+/**
+ * Locks a resource if possible. This only happens if we have write access and the resource can be locked.
+ */
+const lockIfPossible = async () => {
+  const contentHandler: ContentHandler | undefined = ContentHandlerSelector.get(props.type);
+  if (!contentHandler || !isLockingPossible()) {
+    return;
+  }
+  try {
+    lockResult.value = await contentHandler.lock(props.id);
+  } catch (err: any) {
+    console.log(err);
+    error.value = err;
+  }
+};
+
+/**
+ * Unlocks a resource if possible. This only happens if we have write access and the resource can be locked.
+ */
+const unlockIfPossible = () => {
+  const contentHandler: ContentHandler | undefined = ContentHandlerSelector.get(props.type);
+  if (!contentHandler || !isLockingPossible()) {
+    return;
+  }
+  try {
+    contentHandler.unlock(props.id);
+  } catch (e: any) {
+    console.log("unlock failed", e);
+  }
+};
+
+const startLockRefresh = () => {
+  stopLockRefresh();
+  refreshInterval = window.setInterval(async () => {
+    await lockIfPossible();
+  }, 30000);
+}
+
+const stopLockRefresh = () => {
+  if (refreshInterval) {
+    clearInterval(refreshInterval);
+    refreshInterval = undefined;
+  }
+}
+
 const onKeyDown = async (evt: any) => {
   undoKeyPressed = evt.ctrlKey && (evt.key === "z" || evt.key === "Z");
   // fix undo is not triggered on empty textarea
@@ -94,8 +175,15 @@ const onKeyDown = async (evt: any) => {
   }
 }
 
-load();
-hasWriteAccess();
+Promise.all(
+    [load(), hasWriteAccess()]
+).then(async () => {
+  await lockIfPossible();
+  if(isLockingPossible()) {
+    startLockRefresh();
+  }
+});
+
 </script>
 
 <template>
@@ -107,6 +195,9 @@ hasWriteAccess();
       </div>
       <div v-if="error" class="alert alert-danger">
         {{ error }}
+      </div>
+      <div v-if="lockResult && lockResult.status === 'not_owner'" class="alert alert-warning">
+        Dieses Objekt wird zurzeit von einem anderen Benutzer bearbeitet!
       </div>
     </div>
     <button @click="save" v-if="writeAccess" class="btn btn-sm btn-primary" :disabled="!updateEnabled">Update</button>
