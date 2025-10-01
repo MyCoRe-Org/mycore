@@ -138,7 +138,7 @@ public class MCRRestObjectLockServiceImpl implements MCRRestObjectLockService {
     private static void checkLockIdsAreEqual(String id1, String id2) {
         if (!id1.equals(id2)) {
             throw MCRErrorResponse.ofStatusCode(Response.Status.CONFLICT.getStatusCode())
-                .withErrorCode(MCRErrorCodeConstants.MCROBJECT_ALREADY_LOCKED)
+                .withErrorCode(MCRErrorCodeConstants.MCROBJECT_LOCKED_BY_DIFFERENT_USER)
                 .withMessage("The provided id does not match the active lock.")
                 .toException();
         }
