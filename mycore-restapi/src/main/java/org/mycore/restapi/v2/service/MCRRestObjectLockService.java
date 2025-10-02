@@ -40,27 +40,14 @@ public interface MCRRestObjectLockService {
     MCRObjectLock getLock(@PathParam(PARAM_MCRID) MCRObjectID id);
 
     /**
-     * Creates a new lock for the current user.
+     * Creates a new lock or updates an existing lock.
      *
      * @param id          the object ID
-     * @param requestBody lock request; the timeout is taken from {@code requestBody.getTimeout()},
-     *                    defaulting to 60 seconds if not provided
-     * @return the created lock
-     * @throws jakarta.ws.rs.WebApplicationException 404 if the object does not exist;
-     *                                               409 if the object is already locked
-     */
-    MCRObjectLock setLock(@PathParam(PARAM_MCRID) MCRObjectID id, MCRObjectLock requestBody);
-
-    /**
-     * Updates the existing lock's timeout or creates a new lock if none exists.
-     *
-     * @param id          the object ID
-     * @param requestBody lock request containing the new timeout (must not be {@code null})
+     * @param requestBody lock request object (must not be {@code null})
      * @return the updated or newly created lock
-     * @throws jakarta.ws.rs.WebApplicationException 404 if the object does not exist;
-     *                                               409 if a lock exists but is owned by another user
+     * @throws jakarta.ws.rs.WebApplicationException 409 if a lock exists but is owned by another user
      */
-    MCRObjectLock updateLock(@PathParam(PARAM_MCRID) MCRObjectID id, MCRObjectLock requestBody);
+    MCRObjectLock putLock(@PathParam(PARAM_MCRID) MCRObjectID id, MCRObjectLock requestBody);
 
     /**
      * Removes the lock if it is owned by the current user.
