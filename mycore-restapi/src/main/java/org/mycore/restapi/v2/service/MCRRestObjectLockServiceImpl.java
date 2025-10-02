@@ -63,25 +63,9 @@ public class MCRRestObjectLockServiceImpl implements MCRRestObjectLockService {
      * {@inheritDoc}
      */
     @Override
-    public MCRObjectLock setLock(@PathParam(PARAM_MCRID) MCRObjectID id, MCRObjectLock requestBody) {
-        MCRRestUtils.checkExists(id);
-        if (MCRObjectIDLockTable.isLocked(id)) {
-            throw MCRErrorResponse.ofStatusCode(Response.Status.CONFLICT.getStatusCode())
-                .withErrorCode(MCRErrorCodeConstants.MCROBJECT_ALREADY_LOCKED)
-                .withMessage("The object " + id + " is already locked.")
-                .toException();
-        }
-        return createLock(id, requestBody);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public MCRObjectLock updateLock(@PathParam(PARAM_MCRID) MCRObjectID id, MCRObjectLock requestBody) {
+    public MCRObjectLock putLock(@PathParam(PARAM_MCRID) MCRObjectID id, MCRObjectLock requestBody) {
         MCRRestUtils.checkExists(id);
         MCRObjectLock lock = MCRObjectIDLockTable.getLock(id);
-        // RFC5789: If the Request-URI does not point to an existing resource, the server MAY create a new resource.
         if (lock == null) {
             return createLock(id, requestBody);
         }

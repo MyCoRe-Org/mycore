@@ -51,6 +51,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.jakarta.rs.annotation.JacksonFeatures;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -94,21 +107,6 @@ import org.mycore.restapi.v2.annotation.MCRRestRequiredPermission;
 import org.mycore.restapi.v2.model.MCRRestObjectIDDate;
 import org.mycore.restapi.v2.service.MCRRestObjectLockService;
 
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.jakarta.rs.annotation.JacksonFeatures;
-
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.headers.Header;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletContext;
 import jakarta.ws.rs.BadRequestException;
@@ -119,7 +117,6 @@ import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -879,7 +876,7 @@ public class MCRRestObjects {
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     @Path("/{" + PARAM_MCRID + "}/lock")
     @Operation(
-        summary = "Returns lock information about an object {" + PARAM_MCRID + "}.",
+        summary = "lock information about an object {" + PARAM_MCRID + "}.",
         tags = MCRRestUtils.TAG_MYCORE_OBJECT,
         responses = {
             @ApiResponse(responseCode = NOT_FOUND, description = "object is not found"),
@@ -892,52 +889,32 @@ public class MCRRestObjects {
         return lockService.getLock(id);
     }
 
-    @POST
+    @PUT
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     @Path("/{" + PARAM_MCRID + "}/lock")
-    @Operation(summary = "Lock object {" + PARAM_MCRID + "}.",
+    @Operation(summary = "locks object {" + PARAM_MCRID + "}.",
         tags = MCRRestUtils.TAG_MYCORE_OBJECT,
         requestBody = @RequestBody(content = @Content(schema = @Schema(implementation = MCRObjectLock.class))),
         responses = {
-            @ApiResponse(responseCode = NOT_FOUND, description = "object is not found"),
-            @ApiResponse(responseCode = CONFLICT, description = "object is already locked"),
+            @ApiResponse(responseCode = CONFLICT, description = "object is locked by another user"),
             @ApiResponse(
                 description = "Lock information about an object",
                 content = @Content(
                     schema = @Schema(implementation = MCRObjectLock.class)))
         })
     @SuppressWarnings("PMD.AvoidDuplicateLiterals")
-    public MCRObjectLock setLock(@PathParam(PARAM_MCRID) MCRObjectID id, MCRObjectLock requestBody) {
-        return lockService.setLock(id, requestBody);
-    }
-
-    @PATCH
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    @Path("/{" + PARAM_MCRID + "}/lock")
-    @Operation(summary = "Update lock on object {" + PARAM_MCRID + "}.",
-        tags = MCRRestUtils.TAG_MYCORE_OBJECT,
-        requestBody = @RequestBody(content = @Content(schema = @Schema(implementation = MCRObjectLock.class))),
-        responses = {
-            @ApiResponse(responseCode = NOT_FOUND, description = "object is not found"),
-            @ApiResponse(responseCode = CONFLICT, description = "object lock is from another user"),
-            @ApiResponse(
-                description = "Lock information about an object",
-                content = @Content(
-                    schema = @Schema(implementation = MCRObjectLock.class)))
-        })
-    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
-    public MCRObjectLock updateLock(@PathParam(PARAM_MCRID) MCRObjectID id, MCRObjectLock requestBody) {
-        return lockService.updateLock(id, requestBody);
+    public MCRObjectLock putLock(@PathParam(PARAM_MCRID) MCRObjectID id, MCRObjectLock requestBody) {
+        return lockService.putLock(id, requestBody);
     }
 
     @DELETE
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     @Path("/{" + PARAM_MCRID + "}/lock")
-    @Operation(summary = "Unlock object {" + PARAM_MCRID + "}.",
+    @Operation(summary = "unlocks object {" + PARAM_MCRID + "}.",
         tags = MCRRestUtils.TAG_MYCORE_OBJECT,
         responses = {
             @ApiResponse(responseCode = NOT_FOUND, description = "object or lock is not found"),
-            @ApiResponse(responseCode = CONFLICT, description = "object lock is from another user"),
+            @ApiResponse(responseCode = CONFLICT, description = "object is locked by another user"),
             @ApiResponse(
                 description = "Lock information about an object",
                 content = @Content(
