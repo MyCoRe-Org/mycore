@@ -9,6 +9,7 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mods.MCRMODSWrapper;
+import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.util.MCRIdentifier;
 import org.mycore.user2.MCRUser;
 
@@ -16,7 +17,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class MCRORCIDIDAttributeHandlerModspersonImpl implements MCRORCIDIDAttributeHandler {
+public class MCRModspersonORCIDIDAttributeHandler implements MCRORCIDIDAttributeHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -26,26 +27,26 @@ public class MCRORCIDIDAttributeHandlerModspersonImpl implements MCRORCIDIDAttri
     public void addORCID(String orcid, MCRUser user) throws MCRAccessException {
         MCRObject modsperson = getModspersonFromUser(user);
 
-        if (modsperson != null) {
-            MCRMODSWrapper wrapper = new MCRMODSWrapper(modsperson);
-
-            Element personName = wrapper.getElement(X_PATH_MODS_NAME);
-            personName.addContent(new Element("nameIdentifier", MCRConstants.MODS_NAMESPACE)
-                .setAttribute("type", "orcid").setText(orcid));
-            MCRMetadataManager.update(modsperson);
+        if (modsperson == null) {
+            throw new MCRORCIDException("No modsperson could be found for the user " + user.getUserID() + "!");
         }
+        MCRMODSWrapper wrapper = new MCRMODSWrapper(modsperson);
+        Element personName = wrapper.getElement(X_PATH_MODS_NAME);
+        personName.addContent(new Element("nameIdentifier", MCRConstants.MODS_NAMESPACE)
+            .setAttribute("type", "orcid").setText(orcid));
+        MCRMetadataManager.update(modsperson);
     }
 
     @Override
     public Set<String> getORCIDs(MCRUser user) {
         return getNameIdentifierElements(user).filter(el -> "orcid".equals(el.getAttributeValue("type")))
-                .map(Element::getText).collect(Collectors.toSet());
+            .map(Element::getText).collect(Collectors.toSet());
     }
 
     @Override
     public Set<MCRIdentifier> getIdentifiers(MCRUser user) {
         return getNameIdentifierElements(user).map(a -> new MCRIdentifier(a.getAttributeValue("type"),
-                a.getText())).collect(Collectors.toSet());
+            a.getText())).collect(Collectors.toSet());
     }
 
     /**
@@ -55,7 +56,7 @@ public class MCRORCIDIDAttributeHandlerModspersonImpl implements MCRORCIDIDAttri
     private MCRObject getModspersonFromUser(MCRUser user) {
         String modspersonId = user.getUserAttribute("id_modsperson");
         if (modspersonId == null) {
-            LOGGER.warn("For the user {} no modsperson could be found!",
+            LOGGER.warn("No modsperson could be found for the user {}!",
                 user::getUserID);
             return null;
         }

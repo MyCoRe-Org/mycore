@@ -113,8 +113,7 @@ public class MCRORCIDUser {
             attributeHandlerImpl.addORCID(orcid, user);
         } catch (MCRAccessException e) {
             final String userId = user.getUserID();
-            LOGGER.error("Failed to add ORCID to user {}: ", userId, e);
-            throw e;
+            throw new MCRORCIDException("Failed to add ORCID to user " + userId + ": ", e);
         }
     }
 

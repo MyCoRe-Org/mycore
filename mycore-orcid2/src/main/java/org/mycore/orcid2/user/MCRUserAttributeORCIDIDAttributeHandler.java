@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import static org.mycore.orcid2.user.MCRORCIDUser.ATTR_ID_PREFIX;
 import static org.mycore.orcid2.user.MCRORCIDUser.ATTR_ORCID_ID;
 
-public class MCRORCIDIDAttributeHandlerUserAttributeImpl implements MCRORCIDIDAttributeHandler {
+public class MCRUserAttributeORCIDIDAttributeHandler implements MCRORCIDIDAttributeHandler {
 
     @Override
     public void addORCID(String orcid, MCRUser user) {
