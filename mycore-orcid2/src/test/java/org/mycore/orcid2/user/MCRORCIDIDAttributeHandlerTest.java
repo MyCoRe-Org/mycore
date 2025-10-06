@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static org.mycore.orcid2.user.MCRORCIDUser.ATTR_ORCID_ID;
 import static org.mycore.resource.MCRResourceHelper.getResourceUrl;
