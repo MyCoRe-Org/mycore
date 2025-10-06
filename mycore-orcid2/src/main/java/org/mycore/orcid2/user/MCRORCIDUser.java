@@ -27,8 +27,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.orcid2.MCRORCIDConstants;
@@ -45,8 +43,6 @@ import org.mycore.user2.MCRUserAttribute;
  * Handles the updating of user.
  */
 public class MCRORCIDUser {
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * List of trusted name identifier types.

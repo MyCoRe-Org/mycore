@@ -32,7 +32,6 @@ import org.mycore.user2.MCRUser;
 
 @MyCoReTest
 @ExtendWith(MCRJPAExtension.class)
-//@ExtendWith(MCRMetadataExtension.class)
 public class MCRORCIDUserTest {
 
     private static final String ORCID = "0000-0001-2345-6789";

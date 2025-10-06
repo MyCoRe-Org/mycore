@@ -76,7 +76,7 @@ public class MCRORCIDIDAttributeHandlerTest {
     public void testGetORCIDsUserAttributeImpl() {
 
         MCRConfiguration2.set(HANDLER_ATTRIBUTE_NAME,
-            "org.mycore.orcid2.user.MCRORCIDIDAttributeHandlerUserAttributeImpl");
+            "org.mycore.orcid2.user.MCRUserAttributeORCIDIDAttributeHandler");
 
         MCRORCIDUser orcidUser = new MCRORCIDUser(mcrUserMock);
 
@@ -93,7 +93,7 @@ public class MCRORCIDIDAttributeHandlerTest {
         throws IOException, JDOMException, MCRAccessException, URISyntaxException {
         MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.SUPER_USER);
         MCRConfiguration2.set(HANDLER_ATTRIBUTE_NAME,
-            "org.mycore.orcid2.user.MCRORCIDIDAttributeHandlerModspersonImpl");
+            "org.mycore.orcid2.user.MCRModspersonORCIDIDAttributeHandler");
 
         MCRUser user = new MCRUser("junit");
         user.getAttributes().add(new MCRUserAttribute(ATTR_ORCID_ID, ORCID_1));
@@ -120,7 +120,7 @@ public class MCRORCIDIDAttributeHandlerTest {
     @Test
     public void testAddORCIDUserAttributeImpl() throws MCRAccessException {
         MCRConfiguration2.set(HANDLER_ATTRIBUTE_NAME,
-            "org.mycore.orcid2.user.MCRORCIDIDAttributeHandlerUserAttributeImpl");
+            "org.mycore.orcid2.user.MCRUserAttributeORCIDIDAttributeHandler");
 
         MCRUser user = new MCRUser("junit");
         MCRORCIDUser orcidUser = new MCRORCIDUser(user);
@@ -142,12 +142,14 @@ public class MCRORCIDIDAttributeHandlerTest {
     public void testAddORCIDModspersonImpl() throws MCRAccessException, URISyntaxException, IOException, JDOMException {
         MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.SUPER_USER);
         MCRConfiguration2.set(HANDLER_ATTRIBUTE_NAME,
-            "org.mycore.orcid2.user.MCRORCIDIDAttributeHandlerModspersonImpl");
+            "org.mycore.orcid2.user.MCRModspersonORCIDIDAttributeHandler");
 
         MCRUser user = new MCRUser("junit");
         MCRORCIDUser orcidUser = new MCRORCIDUser(user);
 
-        orcidUser.addORCID(ORCID_1); // check for no error if no reference
+        assertThrows(MCRORCIDException.class,
+            () -> orcidUser.addORCID(ORCID_1));
+
         MCRObject modsperson = new MCRObject(getResourceUrl(
             buildFilePath("junit_modsperson_00000002.xml")).toURI());
         MCRMetadataManager.create(modsperson);
@@ -190,7 +192,7 @@ public class MCRORCIDIDAttributeHandlerTest {
         MCRUser user = new MCRUser("junit");
         MCRORCIDUser orcidUser = new MCRORCIDUser(user);
         MCRConfiguration2.set(HANDLER_ATTRIBUTE_NAME,
-            "org.mycore.orcid2.user.MCRORCIDIDAttributeHandlerUserAttributeImpl");
+            "org.mycore.orcid2.user.MCRUserAttributeORCIDIDAttributeHandler");
         Assertions.assertThrows(MCRORCIDException.class, () -> {
             orcidUser.addORCID("abcd");
         });
@@ -200,7 +202,7 @@ public class MCRORCIDIDAttributeHandlerTest {
     @Test
     public void testGetIdentifiersUserAttributeImpl() throws MCRAccessException {
         MCRConfiguration2.set(HANDLER_ATTRIBUTE_NAME,
-            "org.mycore.orcid2.user.MCRORCIDIDAttributeHandlerUserAttributeImpl");
+            "org.mycore.orcid2.user.MCRUserAttributeORCIDIDAttributeHandler");
 
         MCRUser user = new MCRUser("junit");
         user.getAttributes().add(new MCRUserAttribute("id_scopus", "87654321"));
@@ -224,7 +226,7 @@ public class MCRORCIDIDAttributeHandlerTest {
         throws MCRAccessException, URISyntaxException, IOException, JDOMException {
         MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.SUPER_USER);
         MCRConfiguration2.set(HANDLER_ATTRIBUTE_NAME,
-            "org.mycore.orcid2.user.MCRORCIDIDAttributeHandlerModspersonImpl");
+            "org.mycore.orcid2.user.MCRModspersonORCIDIDAttributeHandler");
 
         MCRUser user = new MCRUser("junit");
         user.getAttributes().add(new MCRUserAttribute("id_scopus", "87654321"));
@@ -232,7 +234,8 @@ public class MCRORCIDIDAttributeHandlerTest {
         user.getAttributes().add(new MCRUserAttribute("just_something", "1234"));
 
         MCRORCIDUser orcidUser = new MCRORCIDUser(user);
-        orcidUser.addORCID(ORCID_1);
+        assertThrows(MCRORCIDException.class,
+            () -> orcidUser.addORCID(ORCID_1));
 
         // getIdentifiers with MCRORCIDAccessModspersonImpl implementation but no reference
         Set<MCRIdentifier> identifiers = orcidUser.getIdentifiers();
