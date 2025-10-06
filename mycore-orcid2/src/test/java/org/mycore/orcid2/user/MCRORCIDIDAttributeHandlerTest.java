@@ -2,7 +2,6 @@ package org.mycore.orcid2.user;
 
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -193,7 +192,7 @@ public class MCRORCIDIDAttributeHandlerTest {
         MCRORCIDUser orcidUser = new MCRORCIDUser(user);
         MCRConfiguration2.set(HANDLER_ATTRIBUTE_NAME,
             "org.mycore.orcid2.user.MCRUserAttributeORCIDIDAttributeHandler");
-        Assertions.assertThrows(MCRORCIDException.class, () -> {
+        assertThrows(MCRORCIDException.class, () -> {
             orcidUser.addORCID("abcd");
         });
 

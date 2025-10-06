@@ -20,13 +20,11 @@ package org.mycore.orcid2.user;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mycore.resource.MCRResourceHelper.getResourceUrl;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.test.MCRJPAExtension;
-import org.mycore.test.MCRMetadataExtension;
 import org.mycore.test.MyCoReTest;
 import org.mycore.user2.MCRUser;
 
