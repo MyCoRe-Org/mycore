@@ -30,7 +30,7 @@ import org.apache.logging.log4j.Logger;
  * Resource path point to resources (generally: files) that may or may not exist.
  * <p>
  * A resource path must be non-empty, must not contain segments <code>.</code> or <code>..</code> and must not end
- * with a slash. A resource path without a leading slash ios equal to the same resource path with a leading slash.
+ * with a slash. A resource path without a leading slash is equal to the same resource path with a leading slash.
  * <p>
  * A resource path starting with <code>/META-INF/resources/</code> is considered to be a web resource path.
  * Resources pointed to by a web resource path are considered to be web resources. Web resource paths
