@@ -18,19 +18,20 @@
 
 package org.mycore.common.config;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.function.Supplier;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.test.MyCoReTest;
 
-public class MCRConfigurableInstanceHelperProxyTest extends MCRTestCase {
+@MyCoReTest
+public class MCRConfigurableInstanceHelperProxyTest {
 
     @Test
     @MCRTestConfiguration(

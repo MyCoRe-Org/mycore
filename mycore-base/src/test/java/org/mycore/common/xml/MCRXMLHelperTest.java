@@ -18,10 +18,10 @@
 
 package org.mycore.common.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.net.URL;
@@ -33,8 +33,8 @@ import org.jdom2.Content;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.test.MyCoReTest;
 
 import com.google.gson.JsonObject;
 
@@ -42,19 +42,20 @@ import com.google.gson.JsonObject;
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRXMLHelperTest extends MCRTestCase {
+@MyCoReTest
+public class MCRXMLHelperTest {
 
     /**
      * Test method for {@link org.mycore.common.xml.MCRXMLHelper#deepEqual(org.jdom2.Element, org.jdom2.Element)}.
      */
     @Test
     public void testDeepEqualElementElement() {
-        assertTrue("Elements should be equal", MCRXMLHelper.deepEqual(getSmallElement(), getSmallElement()));
-        assertTrue("Elements should be equal", MCRXMLHelper.deepEqual(getBigElement(), getBigElement()));
-        assertFalse("Elements should be different", MCRXMLHelper.deepEqual(getSmallElement(), getBigElement()));
-        assertFalse("Elements should be different",
-            MCRXMLHelper.deepEqual(getSmallElement().setAttribute("j", "junit"), getSmallElement()));
-        assertFalse("Elements should be different", MCRXMLHelper.deepEqual(getBigElement(), getSmallElement()));
+        assertTrue(MCRXMLHelper.deepEqual(getSmallElement(), getSmallElement()), "Elements should be equal");
+        assertTrue(MCRXMLHelper.deepEqual(getBigElement(), getBigElement()), "Elements should be equal");
+        assertFalse(MCRXMLHelper.deepEqual(getSmallElement(), getBigElement()), "Elements should be different");
+        assertFalse(MCRXMLHelper.deepEqual(getSmallElement().setAttribute("j", "junit"), getSmallElement()),
+            "Elements should be different");
+        assertFalse(MCRXMLHelper.deepEqual(getBigElement(), getSmallElement()), "Elements should be different");
     }
 
     private static Element getSmallElement() {
@@ -88,7 +89,7 @@ public class MCRXMLHelperTest extends MCRTestCase {
         SAXBuilder b = new SAXBuilder();
         Document doc = b.build(new ByteArrayInputStream(formattedXML.getBytes(StandardCharsets.UTF_8)));
 
-        assertTrue("Elements should be equal", MCRXMLHelper.deepEqual(root, doc.getRootElement()));
+        assertTrue(MCRXMLHelper.deepEqual(root, doc.getRootElement()), "Elements should be equal");
     }
 
     @Test

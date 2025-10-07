@@ -18,10 +18,12 @@
 
 package org.mycore.frontend.fileupload;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mycore.common.MCRException;
@@ -76,9 +78,9 @@ public class MCRUploadHelperTest {
     @MethodSource("testData")
     public void checkPathName(String path, Class<? extends Exception> expectedException) {
         if (expectedException == null) {
-            Assertions.assertDoesNotThrow(() -> MCRUploadHelper.checkPathName(path));
+            assertDoesNotThrow(() -> MCRUploadHelper.checkPathName(path));
         } else {
-            Assertions.assertThrows(expectedException, () -> MCRUploadHelper.checkPathName(path));
+            assertThrows(expectedException, () -> MCRUploadHelper.checkPathName(path));
         }
     }
 }

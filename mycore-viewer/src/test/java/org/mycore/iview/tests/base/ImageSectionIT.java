@@ -18,17 +18,16 @@
 
 package org.mycore.iview.tests.base;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Test;
 import org.mycore.iview.tests.ViewerTestBase;
 import org.mycore.iview.tests.controller.ControllerUtil;
 import org.mycore.iview.tests.controller.ImageViewerController;
@@ -37,8 +36,8 @@ import org.mycore.iview.tests.image.api.ColorFilter;
 import org.mycore.iview.tests.image.api.FilterSelection;
 import org.mycore.iview.tests.image.api.Selection;
 import org.mycore.iview.tests.model.TestDerivate;
+import org.openqa.selenium.WebDriver;
 
-@Category(org.mycore.iview.tests.groups.ImageViewerTests.class)
 public class ImageSectionIT extends ViewerTestBase {
 
     private static final String START_IMAGE = "[4] - rgb.tiff";
@@ -49,14 +48,16 @@ public class ImageSectionIT extends ViewerTestBase {
 
     private static final int DELAY_TIME = 3000;
 
-    @Test
+    protected ImageSectionIT(WebDriver webDriver) {
+        super(webDriver);
+    }
+
     /**
      * Checks if the zoom button works!
-     * @throws IOException
      * @throws InterruptedException
      */
+    @Test
     public void testImageZoom() throws InterruptedException {
-        this.setTestName(getClassname() + "-testImageZoom");
         this.getDriver();
         this.getAppController().openViewer(this.getDriver(), getBaseURL(), getTestDerivate());
 
@@ -167,7 +168,7 @@ public class ImageSectionIT extends ViewerTestBase {
     private void assertLess(int moreValue, int lessValue, String messagePattern) {
         String message = new MessageFormat(messagePattern, Locale.ROOT).format(new Object[] { lessValue, moreValue });
         LOGGER.debug(message);
-        Assert.assertTrue(message, lessValue < moreValue);
+        assertTrue(lessValue < moreValue, message);
     }
 
     @Override

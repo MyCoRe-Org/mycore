@@ -44,7 +44,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * This class holds all informations and methods to handle the MyCoRe Object ID.
+ * This class holds all information and methods to handle the MyCoRe Object ID.
  * The MyCoRe Object ID is a special ID to identify each metadata object with
  * three parts, they are the project identifier, the type identifier and a
  * string with a number. The syntax of the ID is "<em>projectID</em>_
@@ -66,7 +66,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID>, Serializable 
      */
     public static final int MAX_LENGTH = 64;
 
-    private static NumberFormat numberFormat = initNumberFormat();
+    private static NumberFormat numberFormat;
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -89,6 +89,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID>, Serializable 
             .filter(p -> Boolean.parseBoolean(p.getValue()))
             .map(Map.Entry::getKey)
             .collect(Collectors.toCollection(HashSet::new));
+        numberFormat = initNumberFormat();
     }
 
     // parts of the ID
@@ -97,9 +98,6 @@ public final class MCRObjectID implements Comparable<MCRObjectID>, Serializable 
     private final String objectType;
 
     private final int numberPart;
-
-    // complete id as formatted string
-    private final String combinedId;
 
     /**
      * The constructor for MCRObjectID from a given string.
@@ -116,11 +114,10 @@ public final class MCRObjectID implements Comparable<MCRObjectID>, Serializable 
         projectId = idParts[0].intern();
         objectType = idParts[1].toLowerCase(Locale.ROOT).intern();
         numberPart = Integer.parseInt(idParts[2]);
-        this.combinedId = formatID(projectId, objectType, numberPart);
     }
 
     /**
-     * This method instantiate this class with a given identifier in MyCoRe schema.
+     * This method instantiates this class with a given identifier in MyCoRe schema.
      *
      * @param id
      *          the MCRObjectID
@@ -128,13 +125,13 @@ public final class MCRObjectID implements Comparable<MCRObjectID>, Serializable 
      * @exception MCRException if the given identifier is not valid
      */
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-    @SuppressWarnings({"PMD.MCR.Singleton.PrivateConstructor", "PMD.MCR.Singleton.NonPrivateConstructors"})
+    @SuppressWarnings({ "PMD.MCR.Singleton.PrivateConstructor", "PMD.MCR.Singleton.NonPrivateConstructors" })
     public static MCRObjectID getInstance(String id) {
         return MCRObjectIDPool.getMCRObjectID(Objects.requireNonNull(id, "'id' must not be null."));
     }
 
     /**
-     * Normalizes to a object ID of form <em>project_id</em>_ <em>type_id</em>_
+     * Normalizes to an object ID of form <em>project_id</em>_ <em>type_id</em>_
      * <em>number</em>, where number has leading zeros.
      * @return <em>project_id</em>_<em>type_id</em>_<em>number</em>
      */
@@ -154,7 +151,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID>, Serializable 
     }
 
     /**
-     * Normalizes to a object ID of form <em>project_id</em>_ <em>type_id</em>_
+     * Normalizes to an object ID of form <em>project_id</em>_ <em>type_id</em>_
      * <em>number</em>, where number has leading zeros.
      *
      * @param baseID
@@ -280,33 +277,17 @@ public final class MCRObjectID implements Comparable<MCRObjectID>, Serializable 
         return projectId + "_" + objectType;
     }
 
-    /**
-     * This method check this data again the input and retuns the result as
-     * boolean.
-     *
-     * @param in
-     *            the MCRObjectID to check
-     * @return true if all parts are equal, else return false
-     */
-    // ordinary equals method exists and delegates to this methode, which is available
-    // as a more efficient direct entry w/o need for additional type check and cast.
-    @SuppressWarnings("PMD.SuspiciousEqualsMethodName")
-    public boolean equals(MCRObjectID in) {
-        return this == in || (in != null && toString().equals(in.toString()));
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
+        if (!(obj instanceof MCRObjectID other)) {
             return false;
         }
-        if (obj instanceof MCRObjectID objectID) {
-            return equals(objectID);
-        }
-        return false;
+        return numberPart == other.numberPart
+            && projectId.equals(other.projectId)
+            && objectType.equals(other.objectType);
     }
 
     @Override
@@ -314,27 +295,15 @@ public final class MCRObjectID implements Comparable<MCRObjectID>, Serializable 
         return COMPARATOR_FOR_MCR_OBJECT_ID.compare(this, o);
     }
 
-    /**
-     * @see java.lang.Object#toString()
-     * @return {@link #formatID(String, String, int)} with
-     *         {@link #getProjectId()}, {@link #getTypeId()},
-     *         {@link #getNumberAsInteger()}
-     */
     @Override
     @JsonValue
     public String toString() {
-        return combinedId;
+        return formatID(projectId, objectType, numberPart);
     }
 
-    /**
-     * returns toString().hashCode()
-     *
-     * @see #toString()
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
-        return toString().hashCode();
+        return Objects.hash(projectId, objectType, numberPart);
     }
 
     private static NumberFormat initNumberFormat() {

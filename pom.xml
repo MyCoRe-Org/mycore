@@ -53,6 +53,8 @@ Applications based on MyCoRe use a common core, which provides the functionality
   </scm>
   <properties>
     <argLine />
+    <!-- same as ocfl aws sdk version -->
+    <aws-sdk.version>2.29.52</aws-sdk.version>
     <changelog.since>2024-12-18</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
     <changes.version>2025.02</changes.version>
@@ -82,15 +84,20 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <manifest.priority>99</manifest.priority>
     <maven.compiler.arg>-Werror</maven.compiler.arg>
     <maven.compiler.target>${java.target.version}</maven.compiler.target>
+    <mockito.jar>${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar</mockito.jar>
+    <mockito.version>5.20.0</mockito.version>
     <!-- defined in parent POM: -->
     <!-- <log4j.version>2.19.0</log4j.version> -->
     <neo4j.version>5.28.5</neo4j.version>
+    <net.bytebuddy.experimental>true</net.bytebuddy.experimental>
+    <net.bytebuddy.processor>CLASS_FILE_API_FIRST</net.bytebuddy.processor>
     <oaipmh.version>3.0</oaipmh.version>
     <ocfl-java.version>2.2.2</ocfl-java.version>
+    <pmd.analysisCache>true</pmd.analysisCache>
     <pmd.failOnViolation>true</pmd.failOnViolation>
-    <pmd.version>7.13.0</pmd.version>
+    <pmd.version>7.16.0</pmd.version>
     <rdf4j.version>5.1.3</rdf4j.version>
-    <selenium.version>4.31.0</selenium.version>
+    <selenium.version>4.35.0</selenium.version>
     <site.suffix />
     <swagger.version>2.2.30</swagger.version>
     <uniqueVersion>false</uniqueVersion>
@@ -147,6 +154,31 @@ Applications based on MyCoRe use a common core, which provides the functionality
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>properties</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <argLine>@{argLine} -javaagent:${mockito.jar} -Xshare:off</argLine>
+          <systemPropertyVariables>
+            <!-- required for mockito on JDK 25+ -->
+            <net.bytebuddy.experimental>${net.bytebuddy.experimental}</net.bytebuddy.experimental>
+            <net.bytebuddy.processor>${net.bytebuddy.processor}</net.bytebuddy.processor>
+          </systemPropertyVariables>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
   <ciManagement>
     <system>Bamboo</system>
@@ -177,9 +209,20 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
+      <!-- Bibsonomy is not hosted on Maven Central -->
       <id>dev.bibsonomy.org</id>
       <name>Official Source Code Releases of selected BibSonomy Modules</name>
       <url>https://dev.bibsonomy.org/maven2/</url>
+    </repository>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <!-- a simple, Maven-compliant download area on mycore.de 
+           mainly used for libraries that are not (no longer) available elsewhere -->
+      <id>mycore-maven-repo</id>
+      <name>Maven repository on mycore.de</name>
+      <url>https://www.mycore.de/maven-repo/</url>
     </repository>
   </repositories>
   <pluginRepositories>
@@ -191,7 +234,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <enabled>true</enabled>
       </snapshots>
       <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <url>https://central.sonatype.com/repository/maven-snapshots</url>
     </pluginRepository>
   </pluginRepositories>
   <distributionManagement>
@@ -400,6 +443,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
                   <processors>
                     <processor>org.hibernate.processor.HibernateProcessor</processor>
                   </processors>
+                  <skipSourcesUnchanged>true</skipSourcesUnchanged>
                 </configuration>
               </execution>
             </executions>
@@ -914,6 +958,13 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <scope>import</scope>
       </dependency>
       <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>bom</artifactId>
+        <version>${aws-sdk.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
         <groupId>at.favre.lib</groupId>
         <artifactId>bcrypt</artifactId>
         <version>0.10.2</version>
@@ -1103,6 +1154,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>io.ocfl</groupId>
         <artifactId>ocfl-java-api</artifactId>
+        <version>${ocfl-java.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.ocfl</groupId>
+        <artifactId>ocfl-java-aws</artifactId>
         <version>${ocfl-java.version}</version>
       </dependency>
       <dependency>
@@ -1593,6 +1649,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
+        <artifactId>mycore-jsession</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
         <artifactId>mycore-lod</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -1635,6 +1696,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-ocfl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-ocfl-s3</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -2079,7 +2145,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>5.17.0</version>
+        <version>${mockito.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -2091,8 +2157,15 @@ Applications based on MyCoRe use a common core, which provides the functionality
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
+        <artifactId>mycore-junit4</artifactId>
+        <version>${project.version}</version>
+        <type>test-jar</type>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
         <artifactId>selenium-utils</artifactId>
-        <version>0.10</version>
+        <version>0.11-SNAPSHOT</version>
         <scope>test</scope>
         <exclusions>
           <exclusion>
@@ -2540,6 +2613,8 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <module>mycore-impex</module>
     <module>mycore-iview2</module>
     <module>mycore-jobqueue</module>
+    <module>mycore-jsessions</module>
+    <module>mycore-junit4</module>
     <module>mycore-packer</module>
     <module>mycore-lod</module>
     <module>mycore-media</module>
@@ -2568,6 +2643,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <module>mycore-coma</module>
     <module>mycore-cronjob</module>
     <module>mycore-ocfl</module>
+    <module>mycore-ocfl-s3</module>
     <module>mycore-validation</module>
   </modules>
 </project>

@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.Level;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceList;
+import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
 import org.mycore.resource.common.MCRResourceTracer;
@@ -87,7 +88,8 @@ public class MCRCombinedResourceFilter extends MCRResourceFilterBase {
 
     public static class Factory implements Supplier<MCRCombinedResourceFilter> {
 
-        @MCRInstanceList(name = FILTERS_KEY, valueClass = MCRResourceFilter.class, required = false)
+        @MCRInstanceList(name = FILTERS_KEY, valueClass = MCRResourceFilter.class, required = false,
+            sentinel = @MCRSentinel)
         public List<MCRResourceFilter> filters;
 
         @Override

@@ -18,13 +18,16 @@
 
 package org.mycore.util.concurrent;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MCRPoolTest {
 
@@ -34,8 +37,8 @@ public class MCRPoolTest {
         int runs = size * 10;
         MCRPool<ResourceHelper> resourcePool = new MCRPool<>(size, ResourceHelper::new);
         final int beforeCounter = ResourceHelper.counter.get();
-        Assert.assertNotNull(resourcePool.acquire());
-        Assert.assertEquals(beforeCounter + 1, ResourceHelper.counter.get());
+        assertNotNull(resourcePool.acquire());
+        assertEquals(beforeCounter + 1, ResourceHelper.counter.get());
         ResourceHelper.counter.set(0);
         IntStream.range(0, runs)
             .parallel()
@@ -56,7 +59,7 @@ public class MCRPoolTest {
             }))
             .map(f -> f.thenAccept(resourcePool::release))
             .forEach(CompletableFuture::join);
-        Assert.assertTrue(ResourceHelper.counter.get() <= size);
+        assertTrue(ResourceHelper.counter.get() <= size);
     }
 
     private static class ResourceHelper {

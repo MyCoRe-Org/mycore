@@ -18,37 +18,36 @@
 
 package org.mycore.iview2.services;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MCRJobStateTest {
 
     @Test
-    public final void testJobStates() {
+    public void testJobStates() {
 
         Set<MCRJobState> allStates = Stream.of(MCRJobState.values()).collect(Collectors.toSet());
         Set<MCRJobState> notCompleteStates = MCRJobState.notCompleteStates();
         Set<MCRJobState> completeStates = MCRJobState.completeStates();
 
-        boolean notCompleteContainsComplete = notCompleteStates.stream().filter(completeStates::contains).findAny()
-            .isPresent();
+        boolean notCompleteContainsComplete = notCompleteStates.stream().anyMatch(completeStates::contains);
 
-        boolean completeContainsNotComplete = completeStates.stream().filter(notCompleteStates::contains).findAny()
-            .isPresent();
+        boolean completeContainsNotComplete = completeStates.stream().anyMatch(notCompleteStates::contains);
 
         boolean allStatesPresent = Stream.concat(notCompleteStates.stream(), completeStates.stream()).distinct()
             .count() == allStates.size();
 
-        Assert.assertFalse("There is a element in MCRJobState.COMPLETE_STATES and MCRJobState.NOT_COMPLETE_STATES",
-            notCompleteContainsComplete || completeContainsNotComplete);
+        assertFalse(notCompleteContainsComplete || completeContainsNotComplete,
+            "There is a element in MCRJobState.COMPLETE_STATES and MCRJobState.NOT_COMPLETE_STATES");
 
-        Assert.assertTrue(
-            "Not every JobState is present in MCRJobState.NOT_COMPLETE_STATES or MCRJobState.COMPLETE_STATES",
-            allStatesPresent);
+        assertTrue(allStatesPresent,
+            "Not every JobState is present in MCRJobState.NOT_COMPLETE_STATES or MCRJobState.COMPLETE_STATES");
     }
 
 }

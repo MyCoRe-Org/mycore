@@ -17,6 +17,7 @@
  */
 package org.mycore.datamodel.classifications2.mapping;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -26,7 +27,9 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRSentinel;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -39,7 +42,7 @@ import org.mycore.datamodel.metadata.MCRObject;
  * <p>
  * For each category ID in the metadata document, if the corresponding category
  * has a <code>x-mapping</code>-label, the content of that label is used
- * as a space separated list of category IDs.
+ * to obtain additional category IDs using an {@link Evaluator}.
  * </p>
  * Example form <code>foo_bar</code>:
  * <pre><code>
@@ -53,12 +56,20 @@ import org.mycore.datamodel.metadata.MCRObject;
  * <p>
  * The following configuration options are available:
  * <ul>
+ * <li> The property suffix {@link MCRXMappingClassificationGeneratorBase#EVALUATOR_KEY} can be used to
+ * specify the evaluator used to obtain category IDs from.
+ * <li> For the evaluator, the property suffix {@link MCRSentinel#DEFAULT_KEY} can be used to
+ *  exclude the evaluator from the configuration and use a default {@link MCRSimpleXMappingEvaluator} instead.
  * <li> The property suffix {@link MCRXMappingClassificationGeneratorBase#ON_MISSING_MAPPED_CATEGORY_KEY} can be used to
  * specify the behaviour, when a mapped category ID is missing.
  * </ul>
  * Example:
  * <pre><code>
  * [...].Class=org.mycore.datamodel.classifications2.mapping.MCRDefaultXMappingClassificationGenerator
+ * [...].Evaluator.Class=foo.bar.FooEvaluator
+ * [...].Evaluator.Default=false
+ * [...].Evaluator.Key1=Value1
+ * [...].Evaluator.Key2=Value2
  * [...].OnMissingMappedCategory=WARN_AND_IGNORE
  * </code></pre>
  */
@@ -72,7 +83,12 @@ public final class MCRDefaultXMappingClassificationGenerator extends MCRXMapping
     }
 
     public MCRDefaultXMappingClassificationGenerator(OnMissingMappedCategory onMissingMappedCategory) {
-        super(onMissingMappedCategory);
+        super(new MCRSimpleXMappingEvaluator(), onMissingMappedCategory);
+    }
+
+    public MCRDefaultXMappingClassificationGenerator(Evaluator evaluator,
+        OnMissingMappedCategory onMissingMappedCategory) {
+        super(evaluator, onMissingMappedCategory);
     }
 
     @Override
@@ -98,12 +114,20 @@ public final class MCRDefaultXMappingClassificationGenerator extends MCRXMapping
 
     public static class Factory implements Supplier<MCRDefaultXMappingClassificationGenerator> {
 
+        @MCRInstance(name = EVALUATOR_KEY, valueClass = Evaluator.class, required = false,
+            sentinel = @MCRSentinel(name = MCRSentinel.DEFAULT_KEY, rejectionValue = true, defaultValue = false))
+        public Evaluator evaluator;
+
         @MCRProperty(name = ON_MISSING_MAPPED_CATEGORY_KEY)
         public String onMissingMappedCategory;
 
         @Override
         public MCRDefaultXMappingClassificationGenerator get() {
-            return new MCRDefaultXMappingClassificationGenerator(getOnMissingMappedCategory());
+            return new MCRDefaultXMappingClassificationGenerator(getEvaluator(), getOnMissingMappedCategory());
+        }
+
+        private Evaluator getEvaluator() {
+            return Objects.requireNonNullElseGet(evaluator, MCRSimpleXMappingEvaluator::new);
         }
 
         private OnMissingMappedCategory getOnMissingMappedCategory() {

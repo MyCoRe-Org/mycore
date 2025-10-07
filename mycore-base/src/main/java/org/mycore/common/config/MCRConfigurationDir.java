@@ -25,7 +25,6 @@ import java.security.ProtectionDomain;
 import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRUtils;
 
 import jakarta.servlet.ServletContext;
@@ -77,8 +76,6 @@ import jakarta.servlet.ServletContext;
  */
 public class MCRConfigurationDir {
 
-    private static final Logger LOGGER = LogManager.getLogger();
-
     public static final String DISABLE_CONFIG_DIR_PROPERTY = "MCR.DisableConfigDir";
 
     public static final String CONFIGURATION_DIRECTORY_PROPERTY = "MCR.ConfigDir";
@@ -115,7 +112,7 @@ public class MCRConfigurationDir {
         ProtectionDomain protectionDomain = clazz.getProtectionDomain();
         CodeSource codeSource = protectionDomain.getCodeSource();
         if (codeSource == null) {
-            LOGGER.error(() -> "Cannot get CodeSource for class " + clazz.getSimpleName());
+            LogManager.getLogger().error(() -> "Cannot get CodeSource for class " + clazz.getSimpleName());
             return null;
         }
         URL location = codeSource.getLocation();
@@ -150,18 +147,19 @@ public class MCRConfigurationDir {
     }
 
     private static String buildAppNameFromContext() {
-        String servletAppName = servletContext.getInitParameter("appName");
-        String contextPath = servletContext.getContextPath();
-        String servletContextName = servletContext.getServletContextName();
-        String updatedAppname;
-        if (servletAppName != null && !servletAppName.isEmpty()) {
-            updatedAppname = servletAppName;
-        } else if (!contextPath.isEmpty()) {
-            updatedAppname = contextPath.substring(1);//remove leading '/'
-        } else if (servletContextName != null && !(servletContextName.isBlank() || servletContextName.contains("/"))) {
-            updatedAppname = servletContextName.replaceAll("\\s", "");
-        } else {
-            updatedAppname = null;
+        String updatedAppname = null;
+        if (servletContext != null) {
+            String servletAppName = servletContext.getInitParameter("appName");
+            String contextPath = servletContext.getContextPath();
+            String servletContextName = servletContext.getServletContextName();
+            if (servletAppName != null && !servletAppName.isEmpty()) {
+                updatedAppname = servletAppName;
+            } else if (!contextPath.isEmpty()) {
+                updatedAppname = contextPath.substring(1); //remove leading '/'
+            } else if (servletContextName != null
+                && !(servletContextName.isBlank() || servletContextName.contains("/"))) {
+                updatedAppname = servletContextName.replaceAll("\\s", "");
+            } 
         }
         return updatedAppname;
     }

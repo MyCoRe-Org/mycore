@@ -18,20 +18,21 @@
 
 package org.mycore.common.config;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.jar.Manifest;
 
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+import org.junit.jupiter.api.Test;
+import org.mycore.test.MyCoReTest;
 
 /**
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRComponentTest extends MCRTestCase {
+@MyCoReTest
+public class MCRComponentTest {
 
     private static final MCRComponent TEST = new MCRComponent("test", getSimpleManifest());
 
@@ -45,45 +46,48 @@ public class MCRComponentTest extends MCRTestCase {
      * Test method for {@link org.mycore.common.config.MCRComponent#getResourceBase()}.
      */
     @Test
-    public final void testGetResourceBase() {
-        assertEquals("Did not get correct resource base.", "components/acl-editor2/config/",
-            ACL_EDITOR2.getResourceBase());
-        assertEquals("Did not get correct resource base.", "config/", MYCORE_BASE.getResourceBase());
-        assertEquals("Did not get correct resource base.", "config/mir/", MIR_MODULE.getResourceBase());
-        assertEquals("Did not get correct resource base.", "config/test/", TEST.getResourceBase());
+    final void testGetResourceBase() {
+        assertEquals("components/acl-editor2/config/", ACL_EDITOR2.getResourceBase(),
+            "Did not get correct resource base.");
+        assertEquals("config/", MYCORE_BASE.getResourceBase(),
+            "Did not get correct resource base.");
+        assertEquals("config/mir/", MIR_MODULE.getResourceBase(),
+            "Did not get correct resource base.");
+        assertEquals("config/test/", TEST.getResourceBase(),
+            "Did not get correct resource base.");
     }
 
     /**
      * Test method for {@link org.mycore.common.config.MCRComponent#isMyCoReComponent()}.
      */
     @Test
-    public final void testIsMyCoReComponent() {
-        assertTrue("Is mycore component.", ACL_EDITOR2.isMyCoReComponent());
-        assertTrue("Is mycore component.", MYCORE_BASE.isMyCoReComponent());
-        assertFalse("Is not mycore component.", MIR_MODULE.isMyCoReComponent());
-        assertFalse("Is not mycore component.", TEST.isMyCoReComponent());
+    final void testIsMyCoReComponent() {
+        assertTrue(ACL_EDITOR2.isMyCoReComponent(), "Is mycore component.");
+        assertTrue(MYCORE_BASE.isMyCoReComponent(), "Is mycore component.");
+        assertFalse(MIR_MODULE.isMyCoReComponent(), "Is not mycore component.");
+        assertFalse(TEST.isMyCoReComponent(), "Is not mycore component.");
     }
 
     /**
      * Test method for {@link org.mycore.common.config.MCRComponent#isAppModule()}.
      */
     @Test
-    public final void testIsAppModule() {
-        assertFalse("Is not app module.", ACL_EDITOR2.isAppModule());
-        assertFalse("Is not app module.", MYCORE_BASE.isAppModule());
-        assertTrue("Is app module.", MIR_MODULE.isAppModule());
-        assertTrue("Is app module.", TEST.isAppModule());
+    final void testIsAppModule() {
+        assertFalse(ACL_EDITOR2.isAppModule(), "Is not app module.");
+        assertFalse(MYCORE_BASE.isAppModule(), "Is not app module.");
+        assertTrue(MIR_MODULE.isAppModule(), "Is app module.");
+        assertTrue(TEST.isAppModule(), "Is app module.");
     }
 
     /**
      * Test method for {@link org.mycore.common.config.MCRComponent#getName()}.
      */
     @Test
-    public final void testGetName() {
-        assertEquals("Did not name component correctly", "acl-editor2", ACL_EDITOR2.getName());
-        assertEquals("Did not name component correctly", "base", MYCORE_BASE.getName());
-        assertEquals("Did not name app module correctly", "mir", MIR_MODULE.getName());
-        assertEquals("Did not name app module correctly", "test", TEST.getName());
+    final void testGetName() {
+        assertEquals("acl-editor2", ACL_EDITOR2.getName(), "Did not name component correctly");
+        assertEquals("base", MYCORE_BASE.getName(), "Did not name component correctly");
+        assertEquals("mir", MIR_MODULE.getName(), "Did not name app module correctly");
+        assertEquals("test", TEST.getName(), "Did not name app module correctly");
     }
 
     private static Manifest getSimpleManifest() {

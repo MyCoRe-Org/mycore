@@ -18,11 +18,11 @@
 
 package org.mycore.parser.bool;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.jdom2.Element;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRBooleanClauseParser;
 import org.mycore.parsers.bool.MCRCondition;
@@ -46,29 +46,29 @@ public class MCRBooleanClauseParserTest {
         MCROrCondition c01 = new MCROrCondition(new MCRTrueCondition(),
             new MCRFalseCondition(), new MCRTrueCondition());
         System.out.println("Boolean claus test 1 --> " + c01);
-        assertEquals("Returned value is not", c01.toString(), p.parse("true or false or true").toString());
-        assertEquals("Returned value is not", c01.toString(), p.parse("(true) or (false) or (true)").toString());
+        assertEquals(c01.toString(), p.parse("true or false or true").toString(), "Returned value is not");
+        assertEquals(c01.toString(), p.parse("(true) or (false) or (true)").toString(), "Returned value is not");
 
         MCROrCondition c02 = new MCROrCondition(new MCRTrueCondition(),
             new MCROrCondition(new MCRFalseCondition(), new MCRTrueCondition()));
-        assertEquals("Returned value is not", c02.toString(), p.parse("true or (false or true)").toString());
-        assertEquals("Returned value is not", c02.toString(), p.parse("(true ) or  ( ((false) or (true)))").toString());
+        assertEquals(c02.toString(), p.parse("true or (false or true)").toString(), "Returned value is not");
+        assertEquals(c02.toString(), p.parse("(true ) or  ( ((false) or (true)))").toString(), "Returned value is not");
 
-        MCRAndCondition c03 = new MCRAndCondition(new MCRTrueCondition(),
-            new MCRFalseCondition(), new MCRTrueCondition());
+        MCRAndCondition c03 =
+            new MCRAndCondition(new MCRTrueCondition(), new MCRFalseCondition(), new MCRTrueCondition());
         System.out.println("Boolean claus test 3 --> " + c03);
-        assertEquals("Returned value is not", c03.toString(), p.parse("true and false and true").toString());
+        assertEquals(c03.toString(), p.parse("true and false and true").toString(), "Returned value is not");
 
         MCROrCondition c04 = new MCROrCondition(new MCRTrueCondition(), new MCRAndCondition(
             new MCRFalseCondition(), new MCRTrueCondition()));
         System.out.println("Boolean claus test 4 --> " + c04);
-        assertEquals("Returned value is not", c04.toString(), p.parse("true or false and true").toString());
+        assertEquals(c04.toString(), p.parse("true or false and true").toString(), "Returned value is not");
 
         MCRCondition c05 = new MCRTrueCondition();
         System.out.println("Boolean claus test 5 --> " + c05);
-        assertEquals("Returned value is not", c05.toString(), p.parse("true").toString());
-        assertEquals("Returned value is not", c05.toString(), p.parse("(true)").toString());
-        assertEquals("Returned value is not", c05.toString(), p.parse("(true )").toString());
+        assertEquals(c05.toString(), p.parse("true").toString(), "Returned value is not");
+        assertEquals(c05.toString(), p.parse("(true)").toString(), "Returned value is not");
+        assertEquals(c05.toString(), p.parse("(true )").toString(), "Returned value is not");
 
         try {
             p.parse("(true").toString();

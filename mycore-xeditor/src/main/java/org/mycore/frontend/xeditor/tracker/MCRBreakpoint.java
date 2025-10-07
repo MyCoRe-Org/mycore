@@ -18,16 +18,14 @@
 
 package org.mycore.frontend.xeditor.tracker;
 
-import org.jdom2.Element;
+/**
+ * Represents a breakpoint, a marker useful for debugging change history  
+ * 
+ * @author Frank L\u00FCtzenkirchen
+ */
+public class MCRBreakpoint extends MCRTrackedAction {
 
-public class MCRBreakpoint implements MCRChange {
-
-    public static MCRChangeData setBreakpoint(Element context, String label) {
-        return new MCRChangeData("breakpoint", label, context.getContentSize(), context);
-    }
-
-    @Override
-    public void undo(MCRChangeData data) {
-        // Need implementation
+    public MCRBreakpoint(String message) {
+        setMessage(message);
     }
 }

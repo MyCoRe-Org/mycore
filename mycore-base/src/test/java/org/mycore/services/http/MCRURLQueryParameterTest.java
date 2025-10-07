@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-class MCRURLQueryParameterTest {
+public class MCRURLQueryParameterTest {
     @Test
     public void testOfEncodedString() {
         MCRURLQueryParameter parameter = MCRURLQueryParameter.ofEncodedString("name=value");

@@ -18,7 +18,7 @@
 
 package org.mycore.backend.jpa;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
@@ -26,7 +26,7 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MCRZonedDateTimeConverterTest {
 

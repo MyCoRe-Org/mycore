@@ -25,22 +25,38 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.jaxen.JaxenException;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.access.MCRMissingPrivilegeException;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
+import org.mycore.frontend.xeditor.tracker.MCRBreakpoint;
+import org.mycore.frontend.xeditor.tracker.MCRChange;
 import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
+import org.mycore.frontend.xeditor.tracker.MCRTrackedAction;
 
 import jakarta.servlet.ServletContext;
 
 /**
- * @author Frank Lützenkirchen
+ * @author Frank L\u00FCtzenkirchen
  */
 public class MCRDebugTarget implements MCREditorTarget {
+
+    private List<Object> outputSteps = new ArrayList<>();
+
+    private PrintWriter writer;
+
+    private MCREditorSession session;
+
+    private static final Format XML_OUTPUT_FORMAT =
+        Format.getPrettyFormat().setLineSeparator("\n").setOmitDeclaration(true);
+
+    private static final XMLOutputter XML_OUTPUTTER = new XMLOutputter(XML_OUTPUT_FORMAT);
 
     private static final String USE_DEBUG_PERMISSION = "use-xeditor-debug";
 
@@ -50,80 +66,110 @@ public class MCRDebugTarget implements MCREditorTarget {
         if (!MCRAccessManager.checkPermission(USE_DEBUG_PERMISSION)) {
             throw new MCRMissingPrivilegeException("use xeditor debug target", USE_DEBUG_PERMISSION);
         }
+
         job.getResponse().setContentType("text/html; charset=UTF-8");
-        PrintWriter out = job.getResponse().getWriter();
-        out.println("<html><body>");
+        this.writer = job.getResponse().getWriter();
+        this.session = session;
 
-        Map<String, String[]> parameters = job.getRequest().getParameterMap();
-        session.getSubmission().setSubmittedValues(parameters);
-
+        handleSubmittedParameters(job);
         Document result = session.getEditedXML().clone();
-        MCRChangeTracker tracker = session.getChangeTracker().clone();
+        reportChangeTracking();
+        result = doXMLCleanup(result);
+        doPostProcessing(result);
 
-        List<Step> steps = new ArrayList<>();
-        for (String label = tracker.undoLastBreakpoint(result); label != null; label = tracker
-            .undoLastBreakpoint(result)) {
-            steps.addFirst(new Step(label, result.clone()));
-        }
-
-        result = session.getEditedXML().clone();
-        result = MCRChangeTracker.removeChangeTracking(result);
-
-        result = session.getXMLCleaner().clean(result);
-        steps.add(new Step("After cleaning", result));
-
-        result = session.getPostProcessor().process(result);
-        steps.add(new Step("After postprocessing", result));
-
-        for (int i = 0; i < steps.size(); i++) {
-            if (i == steps.size() - 3) {
-                outputParameters(parameters, out);
-            }
-
-            steps.get(i).output(out);
-        }
-
-        out.println("</body></html>");
-        out.close();
+        sendDebugOutput();
     }
 
-    private void outputParameters(Map<String, String[]> values, PrintWriter out) {
-        out.println("<h3>Submitted parameters:</h3>");
-        out.println("<p><pre>");
+    private void handleSubmittedParameters(MCRServletJob job)
+        throws JaxenException, JDOMException {
+        Map<String, String[]> parameters = job.getRequest().getParameterMap();
 
-        List<String> names = new ArrayList<>(values.keySet());
+        addStepToOutput(new MCRBreakpoint("Submitted parameters"));
+        addStepToOutput(parameters);
+
+        session.getSubmission().setSubmittedValues(parameters);
+    }
+
+    private void doPostProcessing(Document result)
+        throws IOException, JDOMException {
+        result = session.getPostProcessor().process(result);
+        addStepToOutput(new MCRBreakpoint("After postprocessing"));
+        addStepToOutput(result.clone());
+    }
+
+    private Document doXMLCleanup(Document result) {
+        result = session.getXMLCleaner().clean(result);
+        addStepToOutput(new MCRBreakpoint("After cleaning"));
+        addStepToOutput(result.clone());
+        return result;
+    }
+
+    private void reportChangeTracking() {
+        MCRChangeTracker tracker = session.getChangeTracker();
+        while (tracker.getChangeCount() > 0) {
+            MCRTrackedAction change = tracker.undoLastChange();
+            if (change instanceof MCRBreakpoint) {
+                addAsFirstStepToOutput(session.getEditedXML().clone());
+            }
+            addAsFirstStepToOutput(change);
+        }
+    }
+
+    private void addStepToOutput(Object step) {
+        outputSteps.add(step);
+    }
+
+    private void addAsFirstStepToOutput(Object step) {
+        outputSteps.add(0, step);
+    }
+
+    private void sendDebugOutput() throws IOException {
+        writer.println("<html><body>");
+
+        for (Object step : outputSteps) {
+            sendDebugOutput(step);
+        }
+
+        writer.println("</body></html>");
+        writer.close();
+    }
+
+    private void sendDebugOutput(Object step) throws IOException {
+        if (step instanceof MCRBreakpoint bp) {
+            outputBreakpoint(bp);
+        } else if (step instanceof MCRChange c) {
+            outputChange(c);
+        } else if (step instanceof Document doc) {
+            outputXML(doc);
+        } else if (step instanceof Map map) {
+            @SuppressWarnings("unchecked")
+            Map<String, String[]> parameters = (Map<String, String[]>) map;
+            outputParameters(parameters);
+        }
+    }
+
+    private void outputBreakpoint(MCRBreakpoint bp) {
+        writer.println("<h3>" + bp.getMessage() + ":</h3>");
+    }
+
+    private void outputChange(MCRChange c) {
+        writer.println( c.getMessage() + "<br/>");
+    }
+
+    private void outputXML(Document doc) {
+        Element pre = new Element("pre").setAttribute("lang", "xml");
+        pre.setText(XML_OUTPUTTER.outputString(doc));
+        writer.println("<p>" + XML_OUTPUTTER.outputString(pre) + "</p>");
+    }
+
+    private void outputParameters(Map<String, String[]> parameters) {
+        List<String> names = new ArrayList<>(parameters.keySet());
         Collections.sort(names);
 
         for (String name : names) {
-            for (String value : values.get(name)) {
-                out.println(name + " = " + value);
+            for (String value : parameters.get(name)) {
+                writer.println(name + " = " + value + "<br/>");
             }
-        }
-
-        out.println("</pre></p>");
-    }
-
-    static class Step {
-
-        private String label;
-
-        private Document xml;
-
-        private Format format = Format.getPrettyFormat().setLineSeparator("\n").setOmitDeclaration(true);
-
-        Step(String label, Document xml) {
-            this.label = label;
-            this.xml = xml;
-        }
-
-        public void output(PrintWriter out) throws IOException {
-            out.println("<h3>" + label + ":</h3>");
-            XMLOutputter outputter = new XMLOutputter(format);
-            out.println("<p>");
-            Element pre = new Element("pre");
-            pre.addContent(outputter.outputString(xml));
-            outputter.output(pre, out);
-            out.println("</p>");
         }
     }
 }

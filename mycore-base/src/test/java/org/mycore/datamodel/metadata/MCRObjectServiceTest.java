@@ -17,40 +17,40 @@
  */
 package org.mycore.datamodel.metadata;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Map;
 
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRTestCase;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRISO8601Date;
+import org.mycore.test.MyCoReTest;
 
 /**
  * @author Robert Stephan
  *
  */
-public class MCRObjectServiceTest extends MCRTestCase {
+@MyCoReTest
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Metadata.DefaultLang", string = "de")
+})
+public class MCRObjectServiceTest {
     private static final String TEST_OBJECT_RESOURCE_NAME = "/mcr_test_01.xml";
 
     private MCRObjectService testService;
 
-    /* (non-Javadoc)
-     * @see org.mycore.common.MCRTestCase#setUp()
-     */
-    @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         Document testObjectDocument = loadResourceDocument(TEST_OBJECT_RESOURCE_NAME);
         testService = new MCRObjectService();
         testService.setFromDOM(testObjectDocument.getRootElement().getChild(MCRObjectService.XML_NAME));
@@ -61,9 +61,9 @@ public class MCRObjectServiceTest extends MCRTestCase {
      */
     @Test
     public void size() {
-        assertEquals("Expected two servdate entries", 2, testService.getDateSize());
-        assertEquals("Expected two servflag entries", 2, testService.getFlagSize());
-        assertNotNull("Expected one servstate entry", testService.getState());
+        assertEquals(2, testService.getDateSize(), "Expected two servdate entries");
+        assertEquals(2, testService.getFlagSize(), "Expected two servflag entries");
+        assertNotNull(testService.getState(), "Expected one servstate entry");
     }
 
     /**
@@ -71,10 +71,10 @@ public class MCRObjectServiceTest extends MCRTestCase {
      */
     @Test
     public void getServFlags() {
-        assertEquals("Servflag of type 'createdby' does not contain 'editorA'",
-            "editorA", testService.getFlags(MCRObjectService.FLAG_TYPE_CREATEDBY).get(0));
-        assertEquals("Servflag of type 'modifiedby' does not contain 'editorB'",
-            "editorB", testService.getFlags(MCRObjectService.FLAG_TYPE_MODIFIEDBY).get(0));
+        assertEquals("editorA", testService.getFlags(MCRObjectService.FLAG_TYPE_CREATEDBY).get(0),
+            "Servflag of type 'createdby' does not contain 'editorA'");
+        assertEquals("editorB", testService.getFlags(MCRObjectService.FLAG_TYPE_MODIFIEDBY).get(0),
+            "Servflag of type 'modifiedby' does not contain 'editorB'");
     }
 
     /**
@@ -83,19 +83,18 @@ public class MCRObjectServiceTest extends MCRTestCase {
     @Test
     public void getServDates() {
         MCRISO8601Date createDate = new MCRISO8601Date("2024-09-24T12:00:00.123Z");
-        assertEquals("Servdate of type 'createdate' does not match input",
-            createDate.getDate(), testService.getDate(MCRObjectService.DATE_TYPE_CREATEDATE));
+        assertEquals(createDate.getDate(), testService.getDate(MCRObjectService.DATE_TYPE_CREATEDATE),
+            "Servdate of type 'createdate' does not match input");
         MCRISO8601Date modifyDate = new MCRISO8601Date("2024-09-24T17:00:00.123Z");
-        assertEquals("Servdate of type 'modifydate' does not match input",
-            modifyDate.getDate(), testService.getDate(MCRObjectService.DATE_TYPE_MODIFYDATE));
+        assertEquals(modifyDate.getDate(), testService.getDate(MCRObjectService.DATE_TYPE_MODIFYDATE),
+            "Servdate of type 'modifydate' does not match input");
     }
 
     @Test
     public void getServState() {
         testService.getState();
         MCRCategoryID categ = new MCRCategoryID("state", "published");
-        assertEquals("Servsate does not match 'state:published'",
-            categ, testService.getState());
+        assertEquals(categ, testService.getState(), "Servsate does not match 'state:published'");
     }
 
     private static Document loadResourceDocument(String resource) throws MCRException, IOException, JDOMException {
@@ -103,10 +102,4 @@ public class MCRObjectServiceTest extends MCRTestCase {
         return MCRXMLParserFactory.getValidatingParser().parseXML(new MCRURLContent(mcrTestUrl));
     }
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.Metadata.DefaultLang", "de");
-        return testProperties;
-    }
 }

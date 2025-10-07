@@ -18,7 +18,13 @@
 
 package org.mycore.test.tests;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
@@ -26,14 +32,40 @@ import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.test.MCRTestExtension;
 import org.mycore.test.MyCoReTest;
 
+/**
+ * This class is a test for {@link MCRTestExtension}.
+ * <p>
+ * It tests that unit tests of actual MyCoRe code, annotated with {@link MyCoReTest}, can use the features
+ * provided by {@link MCRTestExtension} correctly.
+ */
 @MyCoReTest
 public class MCRTestExtensionTest {
 
+    /**
+     * Make sure that tests of actual MyCoRe code can use the MyCoRe-API in
+     * set-up methods, annotated with {@link BeforeAll}.
+     */
+    @BeforeAll
+    public static void testSetUp() {
+        new MCRObject(); // relies on configuration to be initialized
+    }
+
+    /**
+     * Make sure that tests of actual MyCoRe code can use the MyCoRe-API in
+     * tear-down methods, annotated with {@link AfterAll}.
+     */
+    @AfterAll
+    public static void testTearDown() {
+        new MCRObject(); // relies on configuration to be initialized
+    }
+
     @Test
     public void testPropertyFromFile() {
-        Assertions.assertEquals("MyCoRe", MCRConfiguration2.getStringOrThrow("MCR.NameOfProject"));
+        assertEquals("MyCoRe", MCRConfiguration2.getStringOrThrow("MCR.NameOfProject"));
     }
 
     @Test
@@ -42,7 +74,7 @@ public class MCRTestExtensionTest {
             @MCRTestProperty(key = "junit", classNameOf = MCRTestExtensionTest.class)
         })
     public void testClassValue() {
-        Assertions.assertEquals(MCRTestExtensionTest.class.getName(), MCRConfiguration2.getStringOrThrow("junit"));
+        assertEquals(MCRTestExtensionTest.class.getName(), MCRConfiguration2.getStringOrThrow("junit"));
     }
 
     @Test
@@ -51,9 +83,9 @@ public class MCRTestExtensionTest {
             @MCRTestProperty(key = "junit", empty = true)
         })
     public void testEmptyValue() {
-        Assertions.assertTrue(MCRConfigurationBase.getString("junit").isPresent());
-        Assertions.assertTrue(MCRConfigurationBase.getString("junit").get().isEmpty());
-        Assertions.assertThrowsExactly(MCRConfigurationException.class,
+        assertTrue(MCRConfigurationBase.getString("junit").isPresent());
+        assertTrue(MCRConfigurationBase.getString("junit").get().isEmpty());
+        assertThrowsExactly(MCRConfigurationException.class,
             () -> MCRConfiguration2.getStringOrThrow("junit"));
     }
 
@@ -67,7 +99,7 @@ public class MCRTestExtensionTest {
     class MCRTestExtensionTest1 {
         @Test
         public void testClassProperty() {
-            Assertions.assertEquals("foo", MCRConfiguration2.getStringOrThrow("foo"));
+            assertEquals("foo", MCRConfiguration2.getStringOrThrow("foo"));
         }
 
         @Test
@@ -76,7 +108,7 @@ public class MCRTestExtensionTest {
                 @MCRTestProperty(key = "foo2", string = "foo2")
             })
         public void testMethodProperty() {
-            Assertions.assertEquals("foo2", MCRConfiguration2.getStringOrThrow("foo2"));
+            assertEquals("foo2", MCRConfiguration2.getStringOrThrow("foo2"));
         }
 
         @Test
@@ -85,9 +117,9 @@ public class MCRTestExtensionTest {
             MCRConfiguration2.getInstanceOf(SayHello.class, "hello").ifPresent(sayHello -> {
                 String name = "Junit";
                 String helloResponse = sayHello.sayHello(name);
-                Assertions.assertNotNull(helloResponse, "Hello response should not be null");
+                assertNotNull(helloResponse, "Hello response should not be null");
                 System.out.println(helloResponse);
-                Assertions.assertTrue(helloResponse.contains(name),
+                assertTrue(helloResponse.contains(name),
                     "Could not find name '" + name + "' in response: " + helloResponse);
             });
         }
@@ -102,12 +134,12 @@ public class MCRTestExtensionTest {
     class MCRTestExtensionTest2 extends MCRTestExtensionTest1 {
         @Test
         public void testClassProperty() {
-            Assertions.assertEquals("foo", MCRConfiguration2.getStringOrThrow("foo"));
+            assertEquals("foo", MCRConfiguration2.getStringOrThrow("foo"));
         }
 
         @Test
         public void testClassPropertyOverwrite() {
-            Assertions.assertEquals("foo", MCRConfiguration2.getStringOrThrow("bar"));
+            assertEquals("foo", MCRConfiguration2.getStringOrThrow("bar"));
         }
     }
 

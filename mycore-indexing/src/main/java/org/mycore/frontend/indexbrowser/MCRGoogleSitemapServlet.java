@@ -18,19 +18,23 @@
 
 package org.mycore.frontend.indexbrowser;
 
-import java.io.File;
 import java.io.Serial;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This class builds a google sitemap containing links to all documents. The
@@ -48,6 +52,8 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
     /** The logger */
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private static final Pattern PARTSITEMAP_FILENAME_PATTERN = Pattern.compile("sitemap_google_([0-9]+)\\.xml");
+
     /**
      * This method implement the doGetPost method of MCRServlet. It build a XML
      * file for the Google search engine.
@@ -57,20 +63,27 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
      */
     @Override
     public void doGetPost(MCRServletJob job) throws Exception {
-        File baseDir = MCRFrontendUtil
-            .getWebAppBaseDir(getServletContext())
-            .orElseGet(() -> new File(MCRConfiguration2.getStringOrThrow("MCR.WebApplication.basedir")));
-        MCRGoogleSitemapCommon common = new MCRGoogleSitemapCommon(MCRFrontendUtil.getBaseURL(job.getRequest()),
-            baseDir);
+        String uri = job.getRequest().getRequestURI();
+        String filename = uri.substring(uri.lastIndexOf('/') + 1);
+        if (MCRGoogleSitemapCommon.DEFAULT_FILENAME.equals(filename)) {
+            processSingleSitemap(job);
+        } else {
+            processPartSitemap(filename, job);
+        }
+    }
+
+    private void processSingleSitemap(MCRServletJob job) throws Exception {
+        MCRGoogleSitemapCommon common = new MCRGoogleSitemapCommon(MCRFrontendUtil.getBaseURL(job.getRequest()));
         int number = common.checkSitemapFile();
         LOGGER.debug("Build Google number of URL files {}.", number);
         Document jdom;
         // check if sitemap_google.xml exist
-        String fnsm = common.getFileName(1, true);
-        LOGGER.debug("Build Google check file {}", fnsm);
-        File fi = new File(fnsm);
-        if (fi.isFile()) {
-            jdom = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRFileContent(fi));
+        // the file can be pre-generated with MyCoRe CLI:> build google sitemap 
+        // after that it won't be updated anymore until deleted or recreated
+        Path fi = common.getFile(0);
+        LOGGER.debug("Build Google check file {}", fi);
+        if (Files.isRegularFile(fi)) {
+            jdom = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRPathContent(fi));
             if (jdom == null) {
                 if (number == 1) {
                     jdom = common.buildSingleSitemap();
@@ -88,11 +101,10 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
         if (number == 1) {
             jdom = common.buildSingleSitemap();
         } else {
-            for (int i = 0; i < number; i++) {
-                String fn = common.getFileName(i + 2, true);
-                File xml = new File(fn);
+            for (int i = 1; i <= number; i++) {
+                Path xml = common.getFile(i);
                 jdom = common.buildPartSitemap(i);
-                LOGGER.info("Write Google sitemap file {}.", fn);
+                LOGGER.info("Write Google sitemap file {}.", xml);
                 new MCRJDOMContent(jdom).sendTo(xml);
             }
             jdom = common.buildSitemapIndex(number);
@@ -100,4 +112,28 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
         // send XML output
         getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(jdom));
     }
+
+    private void processPartSitemap(String filename, MCRServletJob job) throws Exception {
+        Matcher m = PARTSITEMAP_FILENAME_PATTERN.matcher(filename);
+        if (m.matches()) {
+            int idx = Integer.parseInt(m.group(1));
+            MCRGoogleSitemapCommon common = new MCRGoogleSitemapCommon(MCRFrontendUtil.getBaseURL(job.getRequest()));
+
+            Path xml = common.getFile(idx);
+            if (Files.isRegularFile(xml)) {
+                getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRPathContent(xml));
+            } else {
+                int number = common.checkSitemapFile();
+                if (idx <= number) {
+                    Document jdom = common.buildPartSitemap(idx);
+                    new MCRJDOMContent(jdom).sendTo(xml);
+                    getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(jdom));
+                } else {
+                    job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN,
+                        "Partial Google Sitemap '" + filename + "' not found!");
+                }
+            }
+        }
+    }
+
 }

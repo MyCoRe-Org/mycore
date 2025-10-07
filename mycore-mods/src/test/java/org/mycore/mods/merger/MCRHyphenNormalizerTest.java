@@ -18,7 +18,8 @@
 
 package org.mycore.mods.merger;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 import org.mycore.test.MyCoReTest;
 
@@ -64,14 +65,14 @@ public class MCRHyphenNormalizerTest {
     @Test
     public void testNormalize() {
         for (char variant : ALL_HYPHEN_VARIANTS) {
-            Assertions.assertEquals("A-B-C", MCRHyphenNormalizer.normalizeHyphen(getTestString(variant)));
+            assertEquals("A-B-C", MCRHyphenNormalizer.normalizeHyphen(getTestString(variant)));
         }
     }
 
     @Test
     public void testNormalizeWithReplacement() {
         for (char variant : ALL_HYPHEN_VARIANTS) {
-            Assertions.assertEquals("A~B~C", MCRHyphenNormalizer.normalizeHyphen(getTestString(variant), '~'));
+            assertEquals("A~B~C", MCRHyphenNormalizer.normalizeHyphen(getTestString(variant), '~'));
         }
     }
 

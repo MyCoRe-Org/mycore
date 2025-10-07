@@ -89,7 +89,7 @@
       <plugin>
         <groupId>io.github.git-commit-id</groupId>
         <artifactId>git-commit-id-maven-plugin</artifactId>
-        <version>5.0.0</version>
+        <version>9.0.2</version>
         <configuration>
           <generateGitPropertiesFile>true</generateGitPropertiesFile>
           <generateGitPropertiesFilename>${project.build.outputDirectory}/org/mycore/git.properties</generateGitPropertiesFilename>
@@ -117,17 +117,9 @@
             <include>**/*Test*.java</include>
           </includes>
           <excludes>
-            <exclude>**/MCRTestCase.java</exclude>
-            <exclude>**/MCRHibTestCase.java</exclude>
             <exclude>**/*$*</exclude>
             <exclude>${excludes.test}</exclude>
           </excludes>
-          <properties>
-            <property>
-              <name>known.issues</name>
-              <value>org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImplTest#testHasLinks</value>
-            </property>
-          </properties>
           <systemPropertyVariables>
             <jersey.config.test.container.port>0</jersey.config.test.container.port>
           </systemPropertyVariables>
@@ -168,6 +160,10 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -277,10 +273,6 @@
       <artifactId>jaxen</artifactId>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-    </dependency>
-    <dependency>
       <groupId>net.java.dev.jna</groupId>
       <artifactId>jna</artifactId>
     </dependency>
@@ -360,6 +352,10 @@
     <dependency>
       <groupId>org.hibernate.orm</groupId>
       <artifactId>hibernate-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.hibernate.orm</groupId>
+      <artifactId>hibernate-hikaricp</artifactId>
     </dependency>
     <dependency>
       <groupId>org.javassist</groupId>
@@ -461,11 +457,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.hibernate.orm</groupId>
-      <artifactId>hibernate-hikaricp</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
       <scope>test</scope>
@@ -473,11 +464,6 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-params</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.vintage</groupId>
-      <artifactId>junit-vintage-engine</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

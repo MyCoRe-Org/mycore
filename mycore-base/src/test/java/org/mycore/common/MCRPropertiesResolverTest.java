@@ -18,11 +18,11 @@
 
 package org.mycore.common;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.config.MCRConfiguration2;
 
 public class MCRPropertiesResolverTest {

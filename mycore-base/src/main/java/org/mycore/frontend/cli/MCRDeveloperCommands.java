@@ -164,7 +164,7 @@ public class MCRDeveloperCommands {
         syntax = "resolve uri {0} as {1}",
         help = "Resolve uri {0} as {1}",
         order = 70)
-    public static void resolveUri(String uri, String user) throws InterruptedException {
+    public static void resolveUri(String uri, String user) {
 
         MCRUserInformation userInformation = MCRUserInformationResolver.obtainInstance().getOrThrow(user);
 

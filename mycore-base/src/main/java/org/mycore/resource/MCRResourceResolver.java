@@ -259,12 +259,12 @@ public final class MCRResourceResolver {
 
     private Optional<URL> resource(MCRResourcePath path, MCRHints hints) {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Resolving resource {}", path);
+            LOGGER.debug("Resolving resource URL for path {}", path);
         }
         MCRResourceTracer tracer = LOGGER.isTraceEnabled() ? new MCRTreeMessageResourceTracer() : NO_OP_TRACER;
         Optional<URL> resourceUrl = provider.provide(path, hints, tracer);
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace(tracer.logMessage("Resolving resource URL for path " + path));
+            LOGGER.trace(tracer.logMessage("Tracing resource URL for path " + path));
         }
         if (LOGGER.isDebugEnabled()) {
             resourceUrl.ifPresentOrElse(
@@ -276,18 +276,18 @@ public final class MCRResourceResolver {
 
     private List<ProvidedUrl> allResources(MCRResourcePath path, MCRHints hints) {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Resolving all resource {}", path);
+            LOGGER.debug("Resolving resource URLs for path {}", path);
         }
         MCRResourceTracer tracer = LOGGER.isTraceEnabled() ? new MCRTreeMessageResourceTracer() : NO_OP_TRACER;
         List<ProvidedUrl> resourceUrls = provider.provideAll(path, hints, tracer);
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace(tracer.logMessage("Resolving all resource URLs for path " + path));
+            LOGGER.trace(tracer.logMessage("Tracing resource URLs for path " + path));
         }
         if (LOGGER.isDebugEnabled()) {
             if (!resourceUrls.isEmpty()) {
-                resourceUrls.forEach(url -> LOGGER.debug("Resolved resource URL for path {} as {}", path, url.url()));
+                resourceUrls.forEach(url -> LOGGER.debug("Resolved resource URLs for path {} as {}", path, url.url()));
             } else {
-                LOGGER.debug("Unable to resolve resource URL for path {}", path);
+                LOGGER.debug("Unable to resolve resource URLs for path {}", path);
             }
         }
         return resourceUrls;
@@ -302,23 +302,23 @@ public final class MCRResourceResolver {
 
     /**
      * Tries to revers {@link MCRResourceResolver#resolve(MCRResourcePath)}, using the given hints, i.e. tries to
-     * calculate a {@link MCRResourcePath}, that resolves to the given resource URL.
+     * calculate a {@link MCRResourcePath}, that resolves to the given URL.
      * <p>
-     * This resource path is calculated by removing different prefixes from the given resource URL and checking if
-     * resolving the remaining part of the resource URL as a resource path results in the given resource URL.
+     * This resource path is calculated by removing various prefixes from the given URL and checking if
+     * resolving the remaining part of the that URL (as a resource path) results in the given URL.
      * <p>
-     * For this to happen, the used {@link MCRResourceResolver} provides a stream of {@link PrefixStripper}, each of
-     * which can remove multiple prefixes from the given resource URL. The prefix strippers and the remaining parts
-     * returned by each prefix stripper are checked in order. returns the first such remaining part, that resolves to
-     * the given resource URL, if any.
+     * For this to happen, the used {@link MCRResourceResolver} provides a stream of {@link PrefixStripper} instances,
+     * each of which can remove multiple prefixes from the given URL. The prefix strippers and the remaining parts
+     * returned by each prefix stripper are checked in order. Returns the first remaining part, that resolves to
+     * the given URL, if any.
      */
-    public Optional<MCRResourcePath> reverse(URL resourceUrl, MCRHints hints) {
-        LOGGER.debug("Reversing resource URL {}", resourceUrl);
+    public Optional<MCRResourcePath> reverse(URL url, MCRHints hints) {
+        LOGGER.debug("Searching resource path for URL {}", url);
         return provider.prefixStrippers(hints).sequential().flatMap(
             prefixStripper -> {
-                List<MCRResourcePath> potentialPaths = prefixStripper.strip(resourceUrl).get();
+                List<MCRResourcePath> potentialPaths = prefixStripper.strip(url).get();
                 for (MCRResourcePath potentialPath : potentialPaths) {
-                    if (isConsistent(resourceUrl, potentialPath, hints)) {
+                    if (isConsistent(url, potentialPath, hints)) {
                         return Stream.of(potentialPath);
                     }
                 }
@@ -326,25 +326,26 @@ public final class MCRResourceResolver {
             }).findFirst();
     }
 
-    private boolean isConsistent(URL resourceUrl, MCRResourcePath potentialPath, MCRHints hints) {
+    private boolean isConsistent(URL url, MCRResourcePath potentialPath, MCRHints hints) {
         LOGGER.debug("Trying potential path {}", potentialPath);
-        Optional<URL> resolvedResourceUrl = resolve(potentialPath, hints);
-        if (resolvedResourceUrl.isEmpty()) {
-            LOGGER.debug("Unable to resolve resource URL for potential path {}", potentialPath);
+        Optional<URL> resolvedUrl = resolve(potentialPath, hints);
+        if (resolvedUrl.isEmpty()) {
+            LOGGER.debug("Unable to resolve URL for potential path (potential path is not the correct path)");
             return false;
+        } else {
+            return isConsistent(url, potentialPath, resolvedUrl.get());
         }
-        return isConsistent(resourceUrl, potentialPath, resolvedResourceUrl.get());
-
     }
 
-    private static boolean isConsistent(URL resourceUrl, MCRResourcePath potentialPath, URL resolvedResourceUrl) {
-        LOGGER.debug("Resolved resource URL for possible path {} as {}", potentialPath, resolvedResourceUrl);
-        if (!resolvedResourceUrl.toString().equals(resourceUrl.toString())) {
-            LOGGER.debug("Resolved resource URL doesn't match original resource URL");
+    private static boolean isConsistent(URL url, MCRResourcePath potentialPath, URL resolvedUrl) {
+        LOGGER.debug("Resolved URL {} for potential path {}", resolvedUrl, potentialPath);
+        if (!resolvedUrl.toString().equals(url.toString())) {
+            LOGGER.debug("Resolved URL doesn't match original URL (potential path is not the correct path)");
             return false;
+        } else {
+            LOGGER.debug("Resolved URL matches original URL (potential path is the correct path)");
+            return true;
         }
-        LOGGER.debug("Resolved resource URL matches original resource URL");
-        return true;
     }
 
     /**
@@ -358,10 +359,12 @@ public final class MCRResourceResolver {
     @SuppressWarnings("PMD.SystemPrintln")
     public static class Factory implements Supplier<MCRResourceResolver> {
 
-        @MCRInstanceMap(name = HINTS_KEY, valueClass = MCRHint.class, sentinel = @MCRSentinel)
+        @MCRInstanceMap(name = HINTS_KEY, valueClass = MCRHint.class, required = false,
+            sentinel = @MCRSentinel)
         public Map<String, MCRHint<?>> hints;
 
-        @MCRInstanceMap(name = PROVIDERS_KEY, valueClass = MCRResourceProvider.class, sentinel = @MCRSentinel)
+        @MCRInstanceMap(name = PROVIDERS_KEY, valueClass = MCRResourceProvider.class, required = false,
+            sentinel = @MCRSentinel)
         public Map<String, MCRResourceProvider> providers;
 
         @MCRProperty(name = SELECTED_PROVIDER_KEY)

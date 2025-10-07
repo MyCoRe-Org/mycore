@@ -18,15 +18,18 @@
 
 package org.mycore.iview.tests.base;
 
-import org.junit.experimental.categories.Category;
 import org.mycore.iview.tests.model.TestDerivate;
+import org.openqa.selenium.WebDriver;
 
 /**
  * @author Sebastian Röher (basti890)
  *
  */
-@Category(org.mycore.iview.tests.groups.ImageViewerTests.class)
 public class PDFStructureIT extends StructureOverviewIT {
+
+    protected PDFStructureIT(WebDriver webDriver) {
+        super(webDriver);
+    }
 
     @Override
     public TestDerivate getTestDerivate() {

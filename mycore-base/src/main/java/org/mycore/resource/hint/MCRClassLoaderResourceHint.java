@@ -24,6 +24,17 @@ import org.mycore.common.MCRClassTools;
 import org.mycore.common.hint.MCRHint;
 import org.mycore.common.hint.MCRHintKey;
 
+/**
+ * A {@link MCRClassLoaderResourceHint} is a {@link MCRHint} for {@link MCRResourceHintKeys#CLASS_LOADER}
+ * that uses {@link MCRClassTools#getClassLoader()}to obtain a {@link ClassLoader}.
+ * <p>
+ * No configuration options are available.
+ * <p>
+ * Example:
+ * <pre><code>
+ * [...].Class=org.mycore.resource.hint.MCRClassLoaderResourceHint
+ * </code></pre>
+ */
 public final class MCRClassLoaderResourceHint implements MCRHint<ClassLoader> {
 
     @Override

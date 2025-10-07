@@ -18,17 +18,17 @@
 
 package org.mycore.iview.tests.base;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.Test;
 import org.mycore.iview.tests.ViewerTestBase;
 import org.mycore.iview.tests.controller.ControllerUtil;
 import org.mycore.iview.tests.controller.ImageViewerController;
@@ -38,12 +38,12 @@ import org.mycore.iview.tests.image.api.ColorFilter;
 import org.mycore.iview.tests.image.api.FilterSelection;
 import org.mycore.iview.tests.image.api.Selection;
 import org.mycore.iview.tests.model.TestDerivate;
+import org.openqa.selenium.WebDriver;
 
 /**
  * @author Sebastian Röher (basti890)
  *
  */
-@Category(org.mycore.iview.tests.groups.ImageViewerTests.class)
 public class StructureOverviewIT extends ViewerTestBase {
 
     private static final String RGB_LABEL = "rgb.tiff";
@@ -58,14 +58,16 @@ public class StructureOverviewIT extends ViewerTestBase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @Test
+    protected StructureOverviewIT(WebDriver webDriver) {
+        super(webDriver);
+    }
+
     /**
      * Checks if the structure Overview loaded from mets.xml works!
-     * @throws IOException
      * @throws InterruptedException
      */
+    @Test
     public void testStructureOverview() throws InterruptedException {
-        this.setTestName(getClassname() + "-testStructureOverview");
         this.getDriver();
         this.getAppController().openViewer(this.getDriver(), getBaseURL(), getTestDerivate());
 
@@ -94,7 +96,8 @@ public class StructureOverviewIT extends ViewerTestBase {
         messagePattern = "There should be less blue pixels in the rgb screenshot than in the red ({0} > {1})";
         assertLess(bluePixelCount, bluePixelCountRGB, messagePattern);
 
-        Assert.assertFalse("There should´nt be any 'undefined' page labels.", soController.hasUndefinedPageLabels());
+        assertFalse(soController.hasUndefinedPageLabels(),
+            "There should´nt be any 'undefined' page labels.");
     }
 
     /**
@@ -112,7 +115,7 @@ public class StructureOverviewIT extends ViewerTestBase {
         sleep(500);
 
         String message = color + " schould be selected (class-attribut 'selected' should be set)!";
-        Assert.assertTrue(message, soController.isImageSelected(label));
+        assertTrue(soController.isImageSelected(label), message);
         String fileName = String.format("%s-%s-%s", this.getClassname(), label, color);
         BufferedImage bImage = ControllerUtil.getScreenshot(getDriver(), fileName);
         return getColorCount(bImage, color);
@@ -132,7 +135,7 @@ public class StructureOverviewIT extends ViewerTestBase {
     private void assertLess(int moreValue, int lessValue, String messagePattern) {
         String message = new MessageFormat(messagePattern, Locale.ROOT).format(new Object[] { lessValue, moreValue });
         LOGGER.debug(message);
-        Assert.assertTrue(message, lessValue < moreValue);
+        assertTrue(lessValue < moreValue, message);
     }
 
     @Override

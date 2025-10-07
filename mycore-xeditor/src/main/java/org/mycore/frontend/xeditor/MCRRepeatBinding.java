@@ -103,7 +103,7 @@ public class MCRRepeatBinding extends MCRBinding {
         Element parent = getParentElement();
         Element elementA = (Element) (getBoundNodes().get(pos - 1));
         Element elementB = (Element) (getBoundNodes().get(pos));
-        track(MCRSwapElements.swap(parent, elementA, elementB));
+        track(new MCRSwapElements(parent, elementA, elementB));
     }
 
     public void insert(int pos) throws JaxenException {
@@ -116,7 +116,7 @@ public class MCRRepeatBinding extends MCRBinding {
             Element newElement = (Element) (new MCRNodeBuilder().buildNode(pathToBuild, null, null));
             parentElement.addContent(targetPos, newElement);
             boundNodes.add(pos, newElement);
-            track(MCRAddedElement.added(newElement));
+            track(new MCRAddedElement(newElement));
         } else {
             cloneBoundElement(pos - 1);
         }

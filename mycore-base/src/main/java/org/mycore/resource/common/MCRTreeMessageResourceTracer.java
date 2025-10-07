@@ -26,8 +26,13 @@ import java.util.stream.Stream;
 
 import org.mycore.common.hint.MCRHints;
 import org.mycore.common.log.MCRTreeMessage;
+import org.mycore.resource.MCRResourceResolver;
 
-public class MCRTreeMessageResourceTracer implements MCRResourceTracer {
+/**
+ * A {@link MCRTreeMessageResourceTracer} is a {@link MCRResourceTracer} that information about the process of
+ * resolving a resource in {@link MCRResourceResolver} into a {@link MCRTreeMessage}.
+ */
+public final class MCRTreeMessageResourceTracer implements MCRResourceTracer {
 
     private final MCRTreeMessage message;
 

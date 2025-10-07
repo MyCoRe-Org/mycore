@@ -60,6 +60,10 @@ public class MCRMODSWrapper {
         + " string-length(substring-after(substring-after(@xlink:href,'_'), '_')) > 0 and"
         + " number(substring-after(substring-after(@xlink:href,'_'),'_')) > 0 and"
         + " (" + xPathRelationshipTypeTest() + ")]";
+    static final String LINKED_PERSONS = "mods:name[@type='personal' and"
+        + " string-length(substring-after(@xlink:href,'_')) > 0 and"
+        + " string-length(substring-after(substring-after(@xlink:href,'_'), '_')) > 0 and"
+        + " number(substring-after(substring-after(@xlink:href,'_'),'_')) > 0]";
     private static final String MODS_CONTAINER = "modsContainer";
     private static final String DEF_MODS_CONTAINER = "def.modsContainer";
     private static final String MODS_DATAMODEL = "datamodel-mods.xsd";
@@ -200,6 +204,10 @@ public class MCRMODSWrapper {
         return getElements(LINKED_RELATED_ITEMS);
     }
 
+    public List<Element> getLinkedPersons() {
+        return getElements(LINKED_PERSONS);
+    }
+
     public String getElementValue(String xPath) {
         Element element = getElement(xPath);
         return (element == null ? null : element.getTextTrim());
@@ -209,6 +217,7 @@ public class MCRMODSWrapper {
      * Sets or adds an element with target name and value. The element name and attributes are used as xpath expression
      * to filter for an element. The attributes are used with and operation if present.
      */
+    @SuppressWarnings("PMD.NPathComplexity")
     public Optional<Element> setElement(String elementName, String elementValue, Map<String, String> attributes) {
         boolean isAttributeDataPresent = attributes != null && !attributes.isEmpty();
         boolean isValuePresent = elementValue != null && !elementValue.isEmpty();

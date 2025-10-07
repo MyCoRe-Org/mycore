@@ -109,24 +109,25 @@ public abstract class MCRFileSystemResourceProviderBase extends MCRResourceProvi
     }
 
     private Stream<URL> getResourceUrls(MCRResourcePath path, MCRHints hints, MCRResourceTracer tracer) {
+        LinkOption[] linkOptions = MCRResourceUtils.linkOptions();
         return getBaseDirs(hints)
             .map(Path::toAbsolutePath)
-            .filter(baseDir -> isUsableBaseDir(baseDir, tracer))
+            .filter(baseDir -> isUsableBaseDir(baseDir, linkOptions, tracer))
             .map(baseDir -> resolveSafeFile(baseDir, path))
             .flatMap(Optional::stream)
-            .filter(file -> isUsableFile(file, tracer))
+            .filter(file -> isUsableFile(file, linkOptions, tracer))
             .map(MCRResourceUtils::toFileUrl);
     }
 
     protected abstract Stream<Path> getBaseDirs(MCRHints hints);
 
-    private boolean isUsableBaseDir(Path baseDir, MCRResourceTracer tracer) {
+    private boolean isUsableBaseDir(Path baseDir, LinkOption[] linkOptions, MCRResourceTracer tracer) {
         tracer.trace(() -> "Looking for directory " + baseDir);
-        if (!Files.exists(baseDir, LinkOption.NOFOLLOW_LINKS)) {
+        if (!Files.exists(baseDir, linkOptions)) {
             tracer.trace(() -> baseDir + " doesn't exist");
             return false;
         }
-        if (!Files.isDirectory(baseDir, LinkOption.NOFOLLOW_LINKS)) {
+        if (!Files.isDirectory(baseDir, linkOptions)) {
             tracer.trace(() -> baseDir + " isn't a directory");
             return false;
         }
@@ -152,13 +153,13 @@ public abstract class MCRFileSystemResourceProviderBase extends MCRResourceProvi
         };
     }
 
-    private boolean isUsableFile(Path file, MCRResourceTracer tracer) {
+    private boolean isUsableFile(Path file, LinkOption[] linkOptions, MCRResourceTracer tracer) {
         tracer.trace(() -> "Looking for file " + file);
-        if (!Files.exists(file, LinkOption.NOFOLLOW_LINKS)) {
+        if (!Files.exists(file, linkOptions)) {
             tracer.trace(() -> file + " doesn't exist");
             return false;
         }
-        if (!Files.isRegularFile(file, LinkOption.NOFOLLOW_LINKS)) {
+        if (!Files.isRegularFile(file, linkOptions)) {
             tracer.trace(() -> file + " isn't a file");
             return false;
         }

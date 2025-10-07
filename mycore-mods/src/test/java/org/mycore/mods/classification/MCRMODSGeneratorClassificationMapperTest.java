@@ -17,6 +17,9 @@
  */
 package org.mycore.mods.classification;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Map;
@@ -28,7 +31,6 @@ import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.common.MCRConstants;
@@ -37,7 +39,7 @@ import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
-import org.mycore.datamodel.classifications2.mapping.MCRXMappingClassificationGeneratorBase;
+import org.mycore.datamodel.classifications2.mapping.MCRXMappingClassificationGeneratorBase.OnMissingMappedCategory;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
@@ -78,8 +80,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
             Map.of(
                 "xMapping",
                 new MCRMODSXMappingClassificationGenerator(
-                    MCRXMappingClassificationGeneratorBase.OnMissingMappedCategory.IGNORE)));
-
+                    OnMissingMappedCategory.IGNORE)));
         mapper.createMappings(mcro);
         Document xml = mcro.createXML();
 
@@ -87,14 +88,14 @@ public class MCRMODSGeneratorClassificationMapperTest {
             "//mods:classification[contains(@generator,'-mycore') and contains(@valueURI, 'StudyThesis')]";
         XPathExpression<Element> expressionObject = XPathFactory.instance()
             .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
-        Assertions.assertNotNull(expressionObject.evaluateFirst(
+        assertNotNull(expressionObject.evaluateFirst(
             xml), "The mapped classification should be in the MyCoReObject now!");
 
         expression = "//mods:classification[contains(@generator,'-mycore') and contains(@valueURI, 'masterThesis')]";
         expressionObject = XPathFactory.instance()
             .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
 
-        Assertions.assertNull(expressionObject.evaluateFirst(xml),
+        assertNull(expressionObject.evaluateFirst(xml),
             "The mapped classification of the child should not be contained in the MyCoReObject now!");
 
     }
@@ -107,7 +108,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
      * @throws URISyntaxException in case of error
      */
     @Test
-    void testXPathMapping() throws IOException, JDOMException, URISyntaxException {
+    public void testXPathMapping() throws IOException, JDOMException, URISyntaxException {
         MCRSessionMgr.getCurrentSession();
         MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();
@@ -130,7 +131,6 @@ public class MCRMODSGeneratorClassificationMapperTest {
                 new MCRMODSXPathClassificationGenerator(
                     "orcidWorkType",
                     "dummyClassification")));
-
         mapper.createMappings(mcro);
         Document xml = mcro.createXML();
 
@@ -139,7 +139,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
         XPathExpression<Element> expressionObject = XPathFactory.instance()
             .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
 
-        Assertions.assertNotNull(expressionObject.evaluateFirst(
+        assertNotNull(expressionObject.evaluateFirst(
             xml), "The mapped classification should be in the MyCoReObject now!");
 
         expression = "//mods:classification[contains(@generator,'-mycore') and "
@@ -147,7 +147,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
         expressionObject = XPathFactory.instance()
             .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
 
-        Assertions.assertNotNull(expressionObject.evaluateFirst(xml),
+        assertNotNull(expressionObject.evaluateFirst(xml),
             "The mapped dummy classification should be in the MyCoReObject now!");
 
         expression = "//mods:classification[contains(@generator,'-mycore') and "
@@ -155,7 +155,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
         expressionObject = XPathFactory.instance()
             .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
 
-        Assertions.assertNotNull(expressionObject.evaluateFirst(xml),
+        assertNotNull(expressionObject.evaluateFirst(xml),
             "The mapped dummy classification should be in the MyCoReObject now!");
 
     }
@@ -167,7 +167,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
      * @throws URISyntaxException in case of error
      */
     @Test
-    void testXPathMappingFallback() throws IOException, JDOMException, URISyntaxException {
+    public void testXPathMappingFallback() throws IOException, JDOMException, URISyntaxException {
         MCRSessionMgr.getCurrentSession();
         MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();
@@ -190,7 +190,6 @@ public class MCRMODSGeneratorClassificationMapperTest {
                 new MCRMODSXPathClassificationGenerator(
                     "orcidWorkType",
                     "dummyClassification")));
-
         mapper.createMappings(mcro);
         Document xml = mcro.createXML();
 
@@ -199,7 +198,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
         XPathExpression<Element> expressionObject = XPathFactory.instance()
             .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
 
-        Assertions.assertNotNull(expressionObject.evaluateFirst(
+        assertNotNull(expressionObject.evaluateFirst(
             xml), "The mapped classification should be in the MyCoReObject now!");
 
         expression = "//mods:classification[contains(@generator,'-mycore') and "
@@ -207,7 +206,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
         expressionObject = XPathFactory.instance()
             .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
 
-        Assertions.assertNotNull(expressionObject.evaluateFirst(xml),
+        assertNotNull(expressionObject.evaluateFirst(xml),
             "The mapped dummy classification should be in the MyCoReObject now!");
 
         expression = "//mods:classification[contains(@generator,'-mycore') and "
@@ -215,7 +214,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
         expressionObject = XPathFactory.instance()
             .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
 
-        Assertions.assertNotNull(expressionObject.evaluateFirst(xml),
+        assertNotNull(expressionObject.evaluateFirst(xml),
             "The mapped dummy classification should be in the MyCoReObject now!");
 
     }
@@ -230,7 +229,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
      * </ol>
      */
     @Test
-    void testXPathMappingPlaceholders() throws URISyntaxException, IOException, JDOMException {
+    public void testXPathMappingPlaceholders() throws URISyntaxException, IOException, JDOMException {
         MCRSessionMgr.getCurrentSession();
         MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();
@@ -251,7 +250,6 @@ public class MCRMODSGeneratorClassificationMapperTest {
                 "xPath",
                 new MCRMODSXPathClassificationGenerator(
                     "placeholderClassification")));
-
         mapper.createMappings(mcro);
         Document xml = mcro.createXML();
 
@@ -261,7 +259,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
         XPathExpression<Element> expressionObject = XPathFactory.instance()
             .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
 
-        Assertions.assertNotNull(expressionObject.evaluateFirst(
+        assertNotNull(expressionObject.evaluateFirst(
             xml), "The mapped classification 'dummy-placeholder-language' should be in the MyCoReObject now!");
 
         // test placeholder with genre
@@ -280,7 +278,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
         expressionObject = XPathFactory.instance()
             .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
 
-        Assertions.assertNotNull(expressionObject.evaluateFirst(
+        assertNotNull(expressionObject.evaluateFirst(
             xml), "The mapped classification 'dummy-placeholder-genre' should be in the MyCoReObject now!");
 
         // test fallback placeholder without values
@@ -299,7 +297,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
         expressionObject = XPathFactory.instance()
             .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
 
-        Assertions.assertNotNull(expressionObject.evaluateFirst(
+        assertNotNull(expressionObject.evaluateFirst(
             xml), "The mapped classification 'dummy-placeholder-fb' should be in the MyCoReObject now!");
 
         // test multiple placeholders in one XPath
@@ -318,7 +316,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
         expressionObject = XPathFactory.instance()
             .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
 
-        Assertions.assertNotNull(expressionObject.evaluateFirst(
+        assertNotNull(expressionObject.evaluateFirst(
             xml),
             "The mapped classification 'dummy-placeholder-multiple' "
                 + "should be in the MyCoReObject now!");
@@ -329,7 +327,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
      * Tests if placeholder patterns containing OR-conditions are properly evaluated.
      */
     @Test
-    void testXPathMappingPlaceholdersOROperator() throws URISyntaxException, IOException, JDOMException {
+    public void testXPathMappingPlaceholdersOROperator() throws URISyntaxException, IOException, JDOMException {
         MCRSessionMgr.getCurrentSession();
         MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();
@@ -349,7 +347,6 @@ public class MCRMODSGeneratorClassificationMapperTest {
                 "xPath",
                 new MCRMODSXPathClassificationGenerator(
                     "placeholderOrCondition")));
-
         mapper.createMappings(mcro);
         Document xml = mcro.createXML();
 
@@ -359,7 +356,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
         XPathExpression<Element> expressionObject = XPathFactory.instance()
             .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
 
-        Assertions.assertNotNull(expressionObject.evaluateFirst(
+        assertNotNull(expressionObject.evaluateFirst(
             xml), "The mapped classification 'dummy-placeholder-or-condition' should be in the MyCoReObject now!");
     }
 
@@ -367,7 +364,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
      * Tests if placeholder patterns containing OR-conditions are properly evaluated in the fallback mechanism.
      */
     @Test
-    void testXPathMappingFallbackAndORCondition() throws IOException, JDOMException, URISyntaxException {
+    public void testXPathMappingFallbackAndORCondition() throws IOException, JDOMException, URISyntaxException {
         MCRSessionMgr.getCurrentSession();
         MCRTransactionManager.hasActiveTransactions();
         ClassLoader classLoader = getClass().getClassLoader();
@@ -387,7 +384,6 @@ public class MCRMODSGeneratorClassificationMapperTest {
                 "xPath",
                 new MCRMODSXPathClassificationGenerator(
                     "placeholderOrCondition")));
-
         mapper.createMappings(mcro);
         Document xml = mcro.createXML();
 
@@ -397,7 +393,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
         XPathExpression<Element> expressionObject = XPathFactory.instance()
             .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
 
-        Assertions.assertNotNull(expressionObject.evaluateFirst(
+        assertNotNull(expressionObject.evaluateFirst(
             xml), "The mapped classification 'dummy-placeholder-or-condition-fb' should be in the MyCoReObject now!");
 
         // test fallback with a placeholder with or-condition
@@ -416,7 +412,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
         expressionObject = XPathFactory.instance()
             .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
 
-        Assertions.assertNull(expressionObject.evaluateFirst(
+        assertNull(expressionObject.evaluateFirst(
             xml),
             "The mapped classification 'dummy-placeholder-or-condition-fb' should NOT be in the MyCoReObject now!");
     }

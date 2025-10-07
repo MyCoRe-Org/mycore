@@ -40,6 +40,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.xsl.MCRParameterCollector;
+import org.mycore.frontend.xeditor.cleanup.MCRXMLCleaner;
 import org.mycore.frontend.xeditor.tracker.MCRBreakpoint;
 import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 import org.mycore.frontend.xeditor.validation.MCRXEditorValidator;
@@ -121,7 +122,7 @@ public class MCREditorSession {
     }
 
     public String getCombinedSessionStepID() {
-        return id + "-" + tracker.getChangeCounter();
+        return id + "-" + tracker.getChangeCount();
     }
 
     public void setPageURL(String pageURL) {
@@ -207,7 +208,7 @@ public class MCREditorSession {
         LOGGER.info("Reading edited XML from {}", uriRe);
         Document xml = MCRSourceContent.createInstance(uriRe).asXML();
         setEditedXML(xml);
-        setBreakpoint("Reading XML from " + uriRe);
+        getChangeTracker().setBreakpoint("Reading XML from " + uriRe);
     }
 
     public MCRBinding getRootBinding() {
@@ -217,9 +218,7 @@ public class MCREditorSession {
     }
 
     public void setBreakpoint(String msg) {
-        if (editedXML != null) {
-            tracker.track(MCRBreakpoint.setBreakpoint(editedXML.getRootElement(), msg));
-        }
+        tracker.track(new MCRBreakpoint(msg));
     }
 
     public MCRChangeTracker getChangeTracker() {

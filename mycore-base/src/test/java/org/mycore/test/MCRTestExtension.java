@@ -56,11 +56,11 @@ public class MCRTestExtension implements Extension, BeforeEachCallback, AfterEac
     public static final ExtensionContext.Namespace NAMESPACE =
         ExtensionContext.Namespace.create(MCRTestExtension.class);
 
-    private Path testFolder;
+    private final Path testFolder;
 
-    private MCRConfigurationLoader configurationLoader;
+    private final MCRConfigurationLoader configurationLoader;
 
-    private Map<String, String> mycoreProperties;
+    private final Map<String, String> mycoreProperties;
 
     MCRTestExtension() throws IOException {
         testFolder = createTempDirectory();
@@ -81,6 +81,7 @@ public class MCRTestExtension implements Extension, BeforeEachCallback, AfterEac
     @Override
     public void beforeAll(ExtensionContext context) throws Exception {
         Map<String, String> configProperties = getConfigProperties(context);
+        configProperties.clear(); //clear properties from previous test classes
         configProperties.putAll(mycoreProperties);
         configProperties.putAll(MCRTestExtensionConfigurationHelper.getAnnotatedProperties(context));
         context.getStore(ExtensionContext.Namespace.create(context.getRequiredTestClass()))
@@ -95,6 +96,7 @@ public class MCRTestExtension implements Extension, BeforeEachCallback, AfterEac
                     .orElse(""));
                 configProperties.putAll(classProperties);
             });
+        MCRConfigurationBase.initialize(configurationLoader.loadDeprecated(), mycoreProperties, true);
     }
 
     private Map<String, String> getConfigProperties(ExtensionContext context) {
@@ -110,6 +112,9 @@ public class MCRTestExtension implements Extension, BeforeEachCallback, AfterEac
         try {
             MCRTestHelper.deleteRecursively(testFolder);
             LogManager.getLogger().debug(() -> "Deleted test folder: " + testFolder);
+            if (!MCRJunit5ExtensionHelper.isNestedTestClass(context)) {
+                MCRTestExtensionConfigurationHelper.resetConfiguration(configurationLoader, mycoreProperties);
+            }
         } finally {
             context.getRoot().getStore(NAMESPACE).put(PROPERTIES_LOADED_PROPERTY, Boolean.FALSE);
         }
