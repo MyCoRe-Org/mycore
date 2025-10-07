@@ -23,16 +23,6 @@
   background-position: -21px center;
 }
 
-.classeditor .dijitReset.fa {
-  display: inline-block;
-  font-family: FontAwesome;
-  font-style: normal;
-  font-weight: normal;
-  line-height: 1;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
 /****************************************
 * Overwrite some bootstrap css
 ****************************************/
@@ -332,6 +322,46 @@
 
 .classeditor .settingsDisabledIcon {
   background-position: -256px 0;
+}
+
+.classeditor .downloadIcon {
+    background-position: -272px 0;
+}
+
+.classeditor .downloadDisabledIcon {
+    background-position: -288px 0;
+}
+
+.classeditor .linkIcon {
+    background-position: -304px 0;
+}
+
+.classeditor .linkDisabledIcon {
+    background-position: -320px 0;
+}
+
+.classeditor .linkIcon {
+    background-position: -304px 0;
+}
+
+.classeditor .linkDisabledIcon {
+    background-position: -320px 0;
+}
+
+.classeditor .forwardIcon {
+    background-position: -336px 0;
+}
+
+.classeditor .forwardDisabledIcon {
+    background-position: -352px 0;
+}
+
+.classeditor .stepForwardIcon {
+    background-position: -368px 0;
+}
+
+.classeditor .stepForwardDisabledIcon {
+    background-position: -384px 0;
 }
 
 .classeditor .root {
