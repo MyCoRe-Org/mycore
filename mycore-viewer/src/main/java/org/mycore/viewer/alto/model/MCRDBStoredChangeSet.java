@@ -21,16 +21,14 @@ package org.mycore.viewer.alto.model;
 import java.io.IOException;
 import java.util.Date;
 
-import org.mycore.common.MCRException;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.mycore.common.MCRException;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.Lob;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
@@ -60,10 +58,7 @@ public class MCRDBStoredChangeSet extends MCRStoredChangeSet {
 
     protected static final String ENTITY_NAME = "MCRAltoChangeStore";
 
-    protected static final int MB = 1024 * 1024 * 1024;
-
-    @Column(nullable = false, length = MB)
-    @Lob
+    @Column(nullable = false, columnDefinition = "text")
     @Basic(fetch = FetchType.LAZY)
     private String altoChangeSet;
 
