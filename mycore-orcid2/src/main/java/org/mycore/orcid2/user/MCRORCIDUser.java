@@ -27,6 +27,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import org.mycore.access.MCRAccessException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.orcid2.MCRORCIDConstants;
 import org.mycore.orcid2.client.MCRORCIDCredential;
@@ -72,6 +73,8 @@ public class MCRORCIDUser {
 
     private final MCRUser user;
 
+    private final MCRORCIDIDAttributeHandler attributeHandlerImpl;
+
     /**
      * Wraps MCRUser to MCRORCIDUser.
      *
@@ -79,6 +82,8 @@ public class MCRORCIDUser {
      */
     public MCRORCIDUser(MCRUser user) {
         this.user = user;
+        attributeHandlerImpl = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRORCIDIDAttributeHandler.class, MCRORCIDConstants.CONFIG_PREFIX + "AttributeHandler.Class");
     }
 
     /**
@@ -94,16 +99,17 @@ public class MCRORCIDUser {
      * Adds ORCID iD to user's user attributes.
      *
      * @param orcid the ORCID iD
-     * @throws MCRORCIDException if ORCID iD is invalid
+     * @throws MCRORCIDException if ORCID iD is invalid or ORCID iD couldn't be added successfully
      */
     public void addORCID(String orcid) {
         if (!MCRORCIDValidationHelper.validateORCID(orcid)) {
             throw new MCRORCIDException("Invalid ORCID iD");
         }
-        final MCRUserAttribute attribute = new MCRUserAttribute(ATTR_ORCID_ID, orcid);
-        // allow more than one ORCID iD per user
-        if (!user.getAttributes().contains(attribute)) {
-            user.getAttributes().add(new MCRUserAttribute(ATTR_ORCID_ID, orcid));
+        try {
+            attributeHandlerImpl.addORCID(orcid, user);
+        } catch (MCRAccessException e) {
+            final String userId = user.getUserID();
+            throw new MCRORCIDException("Failed to add ORCID iD to user " + userId + ": ", e);
         }
     }
 
@@ -112,9 +118,7 @@ public class MCRORCIDUser {
      * @return ORCID iDs as set
      */
     public Set<String> getORCIDs() {
-        return user.getAttributes().stream()
-            .filter(a -> Objects.equals(a.getName(), ATTR_ORCID_ID))
-            .map(MCRUserAttribute::getValue).collect(Collectors.toSet());
+        return attributeHandlerImpl.getORCIDs(user);
     }
 
     /**
@@ -228,13 +232,10 @@ public class MCRORCIDUser {
 
     /**
      * Returns users identifiers.
-     *
      * @return Set of MCRIdentifier
      */
     public Set<MCRIdentifier> getIdentifiers() {
-        return user.getAttributes().stream().filter(a -> a.getName().startsWith(ATTR_ID_PREFIX))
-            .map(a -> new MCRIdentifier(a.getName().substring(ATTR_ID_PREFIX.length()), a.getValue()))
-            .collect(Collectors.toSet());
+        return attributeHandlerImpl.getIdentifiers(user);
     }
 
     /**
