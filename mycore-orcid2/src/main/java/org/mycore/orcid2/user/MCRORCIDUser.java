@@ -99,9 +99,9 @@ public class MCRORCIDUser {
      * Adds ORCID iD to user's user attributes.
      *
      * @param orcid the ORCID iD
-     * @throws MCRORCIDException if ORCID iD is invalid
+     * @throws MCRORCIDException if ORCID iD is invalid or ORCID iD couldn't be added successfully
      */
-    public void addORCID(String orcid) throws  MCRAccessException {
+    public void addORCID(String orcid) {
         if (!MCRORCIDValidationHelper.validateORCID(orcid)) {
             throw new MCRORCIDException("Invalid ORCID iD");
         }
@@ -109,7 +109,7 @@ public class MCRORCIDUser {
             attributeHandlerImpl.addORCID(orcid, user);
         } catch (MCRAccessException e) {
             final String userId = user.getUserID();
-            throw new MCRORCIDException("Failed to add ORCID to user " + userId + ": ", e);
+            throw new MCRORCIDException("Failed to add ORCID iD to user " + userId + ": ", e);
         }
     }
 
@@ -131,11 +131,7 @@ public class MCRORCIDUser {
      * @see MCRORCIDUser#addORCID
      */
     public void addCredential(String orcid, MCRORCIDCredential credential) {
-        try {
-            addORCID(orcid);
-        }  catch (MCRAccessException e) {
-            throw new MCRORCIDException("Error adding credential: ", e);
-        }
+        addORCID(orcid);
         if (!MCRORCIDValidationHelper.validateCredential(credential)) {
             throw new MCRORCIDException("Credential is invalid");
         }
