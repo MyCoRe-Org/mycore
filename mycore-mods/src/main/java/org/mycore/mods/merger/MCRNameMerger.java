@@ -37,9 +37,7 @@ import org.mycore.common.MCRConstants;
  * @author Frank Lützenkirchen
  */
 public class MCRNameMerger extends MCRMerger {
-
-    private static final String ALTERNATIVE_NAME = "alternativeName";
-
+    
     private static final String TYPE = "type";
 
     private static final String NAME_PART = "namePart";
