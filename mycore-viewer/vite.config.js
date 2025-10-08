@@ -30,6 +30,7 @@ const inputs = {
   piwik: 'src/main/typescript/modules/piwik/index.ts',
   "toolbar-extender": 'src/main/typescript/modules/toolbar-extender/index.ts',
   epub: 'src/main/typescript/modules/epub/index.ts',
+  tei: 'src/main/typescript/modules/tei/index.ts',
   iiif: 'src/main/typescript/modules/iiif/index.ts',
   style_default: 'src/main/less/templates/default/Iview.less',
   style_tei: 'src/main/less/tei.less',
