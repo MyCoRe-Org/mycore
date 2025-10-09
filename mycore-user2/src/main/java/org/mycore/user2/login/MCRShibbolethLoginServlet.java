@@ -26,6 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.user2.MCRRealmFactory;
@@ -46,6 +47,10 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    private static final boolean PERSIST_USER_AFTER_LOGIN = MCRConfiguration2
+        .getBoolean("MCR.user2.Shibboleth.PersistUser")
+        .orElseThrow();
 
     @Override
     public void doGetPost(MCRServletJob job) throws Exception {
@@ -85,7 +90,15 @@ public class MCRShibbolethLoginServlet extends MCRServlet {
 
                     userinfo = user;
                 } else {
-                    userinfo = new MCRShibbolethUserInformation(userId, realmId, attributes);
+                    if (PERSIST_USER_AFTER_LOGIN) {
+                        MCRUser newUser = new MCRUser(userId, realmId);
+                        attributeMapper.mapAttributes(newUser, attributes);
+                        newUser.setLastLogin();
+                        MCRUserManager.updateUser(newUser);
+                        userinfo = newUser;
+                    } else {
+                        userinfo = new MCRShibbolethUserInformation(userId, realmId, attributes);
+                    }
                 }
 
                 MCRSessionMgr.getCurrentSession().setUserInformation(userinfo);
