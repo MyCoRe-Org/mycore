@@ -51,7 +51,7 @@ namespace mycore.viewer.components {
                 var bpe = <mycore.viewer.widgets.toolbar.events.ButtonPressedEvent>e;
                 if (bpe.button.id == "MaximizeButton") {
                     this.trigger(new events.RequestPermalinkEvent(this, (permalink)=> {
-                        window.top.location = permalink;
+                        window.top.location.href = permalink;
                     }));
                 }
             }
