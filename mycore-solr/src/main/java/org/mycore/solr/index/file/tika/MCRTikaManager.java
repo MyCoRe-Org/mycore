@@ -68,7 +68,9 @@ public final class MCRTikaManager {
                 if (instance == null) {
                     instance = MCRConfiguration2.getInstanceOf(MCRTikaMapper.class,
                         SOLR_CONFIG_PREFIX + "Tika.Mapper." + key + ".Class").orElse(null);
-                    mapperCache.put(key, instance);
+                    if (instance != null) {
+                        mapperCache.put(key, instance);
+                    }
                 }
             }
         }
