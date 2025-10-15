@@ -33,7 +33,7 @@ import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.apache.logging.log4j.core.filter.AbstractFilter;
-import org.apache.logging.log4j.message.ParameterizedMessage;
+import org.apache.logging.log4j.message.Message;
 
 /**
  * Detects duplicate instances of logging events that have the same parameters for a given format.
@@ -56,17 +56,17 @@ public final class MCRUniqueFilter extends AbstractFilter {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public Result filter(LogEvent event) {
-        if (event.getMessage() instanceof ParameterizedMessage message) {
-            List<Object> parameters = Arrays.asList(message.getParameters());
-            Set<List<Object>> cache = getCache(message.getFormat());
-            if (cache.contains(parameters)) {
-                return onMatch;
-            } else {
-                cache.add(parameters);
-            }
+        Message message = event.getMessage();
+        List<Object> parameters = Arrays.asList(message.getParameters());
+        Set<List<Object>> cache = getCache(message.getFormat());
+        if (cache.contains(parameters)) {
+            return onMatch;
+        } else {
+            cache.add(parameters);
+            return onMismatch;
         }
-        return onMismatch;
     }
 
     private Set<List<Object>> getCache(String format) {
