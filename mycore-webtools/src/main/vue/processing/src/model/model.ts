@@ -68,7 +68,7 @@ export class Collection {
   public properties: { [name: string]: any } = {};
 
   /**
-   * Double storage of property keys due to performance reasons.
+   * Double storage of property keys due performance reasons.
    */
   public propertyKeys: string[] = [];
 

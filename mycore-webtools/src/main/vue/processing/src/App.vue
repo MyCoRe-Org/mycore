@@ -1,11 +1,5 @@
 <script setup lang="ts">
-import type {
-  AddCollectionMessage,
-  ErrorMessage,
-  RegistryMessage,
-  UpdateCollectionPropertyMessage,
-  UpdateProcessableMessage
-} from "./model/messages.ts";
+import type {IncomingMessage} from "./model/messages.ts";
 import RegistryComponent from "./components/RegistryComponent.vue";
 import SettingsModal from "./components/SettingsModal.vue";
 import {Registry} from "./model/model.ts";
@@ -79,11 +73,10 @@ function connect() {
   };
 }
 
-function handleMessage(data: RegistryMessage | AddCollectionMessage | UpdateProcessableMessage | UpdateCollectionPropertyMessage | ErrorMessage) {
+function handleMessage(data: IncomingMessage) {
   switch (data.type) {
     case "ERROR":
-      const serverMessage = <ErrorMessage>data;
-      errorCode = parseInt(serverMessage.error);
+      errorCode = parseInt(data.error);
       errorMessage.value = "A server error occurred: " + errorCode;
       break;
     case "REGISTRY":
@@ -92,22 +85,19 @@ function handleMessage(data: RegistryMessage | AddCollectionMessage | UpdateProc
       registry.value = new Registry();
       break;
     case "ADD_COLLECTION":
-      registry.value.addCollection(<AddCollectionMessage>data);
+      registry.value.addCollection(data);
       break;
     case "UPDATE_PROCESSABLE":
-      registry.value.updateProcessable(<UpdateProcessableMessage>data);
+      registry.value.updateProcessable(data);
       break;
     case "UPDATE_COLLECTION_PROPERTY":
-      let updatePropertyMessage = <UpdateCollectionPropertyMessage>data;
-      const collection = registry.value.getCollection(updatePropertyMessage.id);
+      const collection = registry.value.getCollection(data.id);
       if (collection == null) {
-        console.warn("Unable to find collection with id " + updatePropertyMessage.id);
+        console.warn("Unable to find collection with id " + data.id);
         return;
       }
-      collection.setProperty(updatePropertyMessage.propertyName, updatePropertyMessage.propertyValue);
+      collection.setProperty(data.propertyName, data.propertyValue);
       break;
-    default:
-      console.warn("Unable to handle data type: " + data.type);
   }
 }
 
