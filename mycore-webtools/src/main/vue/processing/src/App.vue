@@ -21,8 +21,12 @@ let registry = ref(new Registry());
 connect();
 
 function getSocketURL() {
+  if (import.meta.env.DEV) {
+    // in dev mode connect to a local mir
+    return "ws://localhost:8291/mir/ws/mycore-webtools/processing";
+  }
   const wsProtocol = location.protocol === "https:" ? "wss://" : "ws://";
-  const { pathname } = new URL(mycore.webApplicationBaseURL);
+  const {pathname} = new URL(mycore.webApplicationBaseURL);
   const basePath = pathname === "/" ? "" : pathname.replace(/\/$/, "");
   return `${wsProtocol}${location.host}${basePath}/ws/mycore-webtools/processing`;
 }
