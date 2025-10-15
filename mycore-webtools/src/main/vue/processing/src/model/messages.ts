@@ -18,7 +18,7 @@
 
 export interface ProcessingMessage {
 
-    type: string;
+  type: "ERROR" | "REGISTRY" | "ADD_COLLECTION" | "REMOVE_COLLECTION" | "UPDATE_PROCESSABLE" | "UPDATE_COLLECTION_PROPERTY";
 
 }
 
@@ -30,48 +30,48 @@ export interface RegistryMessage extends ProcessingMessage {
 
 export interface AddCollectionMessage extends ProcessingMessage {
 
-    id: number;
+  id: number;
 
-    name: string;
+  name: string;
 
-    properties: { [name: string]: any };
+  properties: { [name: string]: any };
 
 }
 
 export interface UpdateProcessableMessage extends ProcessingMessage {
 
-    id: number;
+  id: number;
 
-    name: string;
+  name: string;
 
-    collectionId: number;
+  collectionId: number;
 
-    status: string;
+  status: "CREATED" | "PROCESSING" | "CANCELED" | "FAILED" | "SUCCESSFUL";
 
-    user: string;
+  user: string;
 
-    createTime: number;
+  createTime: number;
 
-    startTime: number;
+  startTime: number;
 
-    progressText: string | undefined;
+  progressText: string | undefined;
 
-    properties: { [name: string]: any };
+  properties: { [name: string]: any };
 
 }
 
 export interface UpdateCollectionPropertyMessage extends ProcessingMessage {
 
-    id: number;
+  id: number;
 
-    propertyName: string;
+  propertyName: string;
 
-    propertyValue: any;
+  propertyValue: any;
 
 }
 
 export interface ErrorMessage extends ProcessingMessage {
 
-    error: string;
+  error: string;
 
 }
