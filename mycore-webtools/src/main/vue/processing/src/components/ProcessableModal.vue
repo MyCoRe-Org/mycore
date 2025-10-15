@@ -70,7 +70,7 @@ const emit = defineEmits(['close']);
         </div>
 
         <!-- Error Section -->
-        <div v-if="model.status === 'failed'">
+        <div v-if="model.status === 'FAILED'">
           <div class="property-row">
             <span class="propertyKey">Error:</span>
             <pre class="scrollContainer">{{ model.error }}</pre>
