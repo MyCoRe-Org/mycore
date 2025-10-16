@@ -55,7 +55,7 @@ public final class MCRTikaManager {
     }
 
     /**
-     * Returns the Tika mapper for the given key. If no mapper is defined for the key, the default mapper is returned.
+     * Returns the Tika mapper for the given key. If no mapper is defined for the key, an empty Optional is returned.
      *
      * @param key The key for which the mapper should be returned
      * @return The Tika mapper for the given key
@@ -68,7 +68,9 @@ public final class MCRTikaManager {
                 if (instance == null) {
                     instance = MCRConfiguration2.getInstanceOf(MCRTikaMapper.class,
                         SOLR_CONFIG_PREFIX + "Tika.Mapper." + key + ".Class").orElse(null);
-                    mapperCache.put(key, instance);
+                    if (instance != null) {
+                        mapperCache.put(key, instance);
+                    }
                 }
             }
         }
