@@ -508,13 +508,6 @@ public final class MCRMetadataManager {
 
         checkDeletePermission(id);
 
-        try {
-            MCRConfiguration2.getInstanceOf(MCRPreDeleteAction.class,
-                "MCR.PreDeleteAction.Class").ifPresent(actionImpl -> actionImpl.execute(id));
-        } catch (Exception e) {
-            LOGGER.warn("Failed to execute pre-delete action: ", e);
-        }
-
         checkForActiveLinks(mcrObject, id);
 
         markForDeletion(id);

@@ -60,7 +60,7 @@ export class MyCoReFrameToolbarProviderComponent extends ViewerComponent {
       const bpe = e as ButtonPressedEvent;
       if (bpe.button.id == "MaximizeButton") {
         this.trigger(new RequestPermalinkEvent(this, (permalink) => {
-          window.top.location.assign(permalink);
+          window.top.location.href = permalink;
         }));
       }
     }

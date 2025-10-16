@@ -106,7 +106,7 @@ defineExpose({
         </div>
 
         <!-- Error Section -->
-        <div v-if="model.status === 'failed'">
+        <div v-if="model.status === 'FAILED'">
           <div class="property-row">
             <h4 class="h5">Error</h4>
             <pre class="scrollContainer">{{ model.error }}</pre>

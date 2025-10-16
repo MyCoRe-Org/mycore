@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See https://www.mycore.de/ for details.
+ * See http://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,18 +16,10 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.datamodel.metadata;
+export {};
 
-import java.util.function.BiConsumer;
-
-/**
- * Plugin point for custom actions that need to occur before first deletion steps
- * in the process of deleting an {@link MCRObject}.
- * Compare {@link MCRMetadataManager#delete(MCRObject, BiConsumer)}.
- */
-public interface MCRPreDeleteAction {
-
-    default void execute(MCRObjectID id) {
-        // do nothing
-    }
+declare global {
+  const mycore: {
+    webApplicationBaseURL: string;
+  };
 }
