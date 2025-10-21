@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * Authority information that is represented by authority ID and code value. Such authority info comes from a
  * standardized vocabulary registered at the Library of Congress.
- * 
+ *
  * @author Frank Lützenkirchen
  */
 class MCRAuthorityAndCode extends MCRAuthorityInfo {
@@ -59,7 +59,7 @@ class MCRAuthorityAndCode extends MCRAuthorityInfo {
     public static MCRAuthorityAndCode parseXML(Element modsElement) {
         String authority = modsElement.getAttribute(ELEMENT_AUTHORITY);
         String type = modsElement.getAttribute("type");
-        String code = MCRMODSClassificationSupport.getText(modsElement).trim();
+        String code = getText(modsElement).trim();
         return getAuthorityInfo(authority, type, code);
     }
 
