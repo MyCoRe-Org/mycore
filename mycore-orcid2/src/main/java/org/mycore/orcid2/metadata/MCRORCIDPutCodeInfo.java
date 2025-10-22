@@ -118,6 +118,9 @@ public class MCRORCIDPutCodeInfo {
      * @param putCodes other put codes
      */
     public void setOtherPutCodes(long[] putCodes) {
+        if(putCodes == null) {
+            return;
+        }
         this.otherPutCodes = Arrays.copyOf(putCodes, putCodes.length);
     }
 
