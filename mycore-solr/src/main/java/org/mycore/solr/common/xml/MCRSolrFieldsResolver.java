@@ -33,6 +33,8 @@ import org.mycore.solr.auth.MCRSolrAuthenticationManager;
  * solrfields:main
  *
  * result:
+ * </pre>
+ * <code>
  * &lt;solrFields core="main"&gt;
  *   &lt;fields&gt;
  *     &lt;field name="id" type="string" schema="required:true" docs="1"&gt;
