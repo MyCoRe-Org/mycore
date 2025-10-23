@@ -86,7 +86,7 @@ export class ObjectsContentHandler extends BaseContentHandler {
     const objectId = this.getObjectId(path);
     console.log("lock " + objectId);
     const response = await fetch(`${this.mcrApplicationBaseURL}api/v2/objects/${objectId}/lock`, {
-      method: "PATCH",
+      method: "PUT",
       headers: {
         "Authorization": authorizationHeader
       }
