@@ -115,11 +115,11 @@ public class MCRORCIDPutCodeInfo {
     /**
      * Sets other put codes.
      *
-     * @param putCodes other put codes
+     * @param putCodes other put codes, must not be <code>null</code>
      */
     public void setOtherPutCodes(long[] putCodes) {
         if(putCodes == null) {
-            return;
+            throw new IllegalArgumentException("putCodes must not be null");
         }
         this.otherPutCodes = Arrays.copyOf(putCodes, putCodes.length);
     }
