@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.apache.commons.text.StringSubstitutor;
@@ -147,25 +148,14 @@ public class MCRCommandLineInterface {
     private static void readCommandFromArguments(String[] args) {
         if (args.length > 0) {
             interactiveMode = false;
-
-            String line = readLineFromArguments(args);
-            addCommands(line);
+            addCommands(String.join(" ", args));
         }
     }
 
     private static void addCommands(String line) {
-        Stream.of(line.split(";;"))
-            .map(String::trim)
+        Stream.of(line.split(Pattern.quote(" ;; ")))
             .filter(s -> !s.isEmpty())
             .forEachOrdered(COMMAND_QUEUE::add);
-    }
-
-    private static String readLineFromArguments(String[] args) {
-        StringBuilder sb = new StringBuilder();
-        for (String arg : args) {
-            sb.append(arg).append(' ');
-        }
-        return sb.toString();
     }
 
     private static void initSession() {
