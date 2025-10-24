@@ -150,7 +150,7 @@ public class MCRORCIDMetadataUtils {
         if (!SAVE_OTHER_PUT_CODES) {
             // may rudimentary approach
             flagContent.getUserInfos().stream().map(MCRORCIDUserInfo::getWorkInfo).filter(Objects::nonNull)
-                .forEach(w -> w.setOtherPutCodes(null));
+                .forEach(w -> w.setOtherPutCodes(new long[]{}));
         }
         try {
             String flagContentString = transformFlagContent(flagContent);
