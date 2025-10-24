@@ -81,35 +81,25 @@ public class MCRORCIDWorkService {
      * Creates MCRObject in ORCID profile for given MCRORCIDCredential and updates flag.
      *
      * @param object the MCRObject
-     * @throws MCRORCIDException if cannot create work, transformation fails or cannot update flags
+     * @throws MCRORCIDException if cannot create work or other issue during the process
      */
     public void createWork(MCRObject object) {
-        if (!MCRORCIDUtils.checkPublishState(object)) {
-            throw new MCRORCIDException("Object has wrong state");
-        }
-        final MCRObject filteredObject = MCRORCIDUtils.filterObject(object);
-        if (!MCRORCIDUtils.checkEmptyMODS(filteredObject)) {
-            throw new MCRORCIDException("Filtered MODS is empty.");
-        }
         try {
-            final MCRORCIDUserInfo userInfo = Optional
-                .ofNullable(MCRORCIDMetadataUtils.getUserInfoByORCID(object, orcid))
-                .orElse(new MCRORCIDUserInfo(orcid));
-            if (userInfo.getWorkInfo() == null) {
-                userInfo.setWorkInfo(new MCRORCIDPutCodeInfo());
-            }
+            validateObjectState(object);
+            final MCRObject filteredObject = MCRORCIDUtils.filterObject(object);
+            checkIfFilteredObjectIsEmpty(filteredObject);
+            final MCRORCIDUserInfo userInfo = getUserInfo(object);
+            ensureWorkInfoInitialized(userInfo);
             final Work work = MCRORCIDWorkTransformerHelper
-                .transformContent(new MCRJDOMContent(filteredObject.createXML()));
+                    .transformContent(new MCRJDOMContent(filteredObject.createXML()));
             final Set<MCRIdentifier> trustedIdentifiers = MCRORCIDWorkUtils.listTrustedIdentifiers(work);
             doUpdateWorkInfo(trustedIdentifiers, userInfo.getWorkInfo(), orcid, credential);
             if (userInfo.getWorkInfo().hasOwnPutCode()) {
                 // there is an inconsistent state
                 throw new MCRORCIDWorkAlreadyExistsException();
-            } else {
-                doCreateWork(work, userInfo.getWorkInfo(), orcid, credential);
             }
-            MCRORCIDMetadataUtils.updateUserInfoByORCID(object, orcid, userInfo);
-            MCRMetadataManager.update(object);
+            doCreateWork(work, userInfo.getWorkInfo(), orcid, credential);
+            updateMetadata(object, userInfo);
         } catch (Exception e) {
             throw new MCRORCIDException("Cannot create work", e);
         }
@@ -118,24 +108,19 @@ public class MCRORCIDWorkService {
     /**
      * Updates an existing work (publication) in the ORCID profile of the user using the ORCID Member API.
      *
+     * <p>This method assumes that the user already has exactly one work in their ORCID profile.
+     * Additionally, if necessary, the `workInfo` will be rebuilt and set in the service flags.</p>
+     *
      * @param object the MCRObject that represents the work to be updated
-     * @throws MCRORCIDException if the object has an invalid state or other issue during the process
+     * @throws MCRORCIDException if cannot update work or other issue during the process
      */
     public void updateWork(MCRObject object) {
-        if (!MCRORCIDUtils.checkPublishState(object)) {
-            throw new MCRORCIDException("Object has wrong state");
-        }
-        final MCRObject filteredObject = MCRORCIDUtils.filterObject(object);
-        if (!MCRORCIDUtils.checkEmptyMODS(filteredObject)) {
-            throw new MCRORCIDException("Filtered MODS is empty.");
-        }
         try {
-            final MCRORCIDUserInfo userInfo = Optional
-                    .ofNullable(MCRORCIDMetadataUtils.getUserInfoByORCID(object, orcid))
-                    .orElse(new MCRORCIDUserInfo(orcid));
-            if (userInfo.getWorkInfo() == null) {
-                userInfo.setWorkInfo(new MCRORCIDPutCodeInfo());
-            }
+            validateObjectState(object);
+            final MCRObject filteredObject = MCRORCIDUtils.filterObject(object);
+            checkIfFilteredObjectIsEmpty(filteredObject);
+            final MCRORCIDUserInfo userInfo = getUserInfo(object);
+            ensureWorkInfoInitialized(userInfo);
             final Work work = MCRORCIDWorkTransformerHelper
                     .transformContent(new MCRJDOMContent(filteredObject.createXML()));
             final Set<MCRIdentifier> trustedIdentifiers = MCRORCIDWorkUtils.listTrustedIdentifiers(work);
@@ -145,8 +130,7 @@ public class MCRORCIDWorkService {
                 throw new MCRORCIDException("Work does not exist");
             }
             doUpdateWork(ownPutCode, work, orcid, credential);
-            MCRORCIDMetadataUtils.updateUserInfoByORCID(object, orcid, userInfo);
-            MCRMetadataManager.update(object);
+            updateMetadata(object, userInfo);
         } catch (Exception e) {
             throw new MCRORCIDException("Cannot update work", e);
         }
@@ -193,6 +177,35 @@ public class MCRORCIDWorkService {
         final MCRORCIDPutCodeInfo workInfo = new MCRORCIDPutCodeInfo();
         doUpdateWorkInfo(identifiers, workInfo, orcid, credential);
         return workInfo;
+    }
+
+    private void validateObjectState(MCRObject object) {
+        if (!MCRORCIDUtils.checkPublishState(object)) {
+            throw new MCRORCIDException("Object has wrong state");
+        }
+    }
+
+    private void checkIfFilteredObjectIsEmpty(MCRObject filteredObject) {
+        if (!MCRORCIDUtils.checkEmptyMODS(filteredObject)) {
+            throw new MCRORCIDException("Filtered MODS is empty.");
+        }
+    }
+
+    private MCRORCIDUserInfo getUserInfo(MCRObject object) {
+        return Optional
+                .ofNullable(MCRORCIDMetadataUtils.getUserInfoByORCID(object, orcid))
+                .orElse(new MCRORCIDUserInfo(orcid));
+    }
+
+    private void ensureWorkInfoInitialized(MCRORCIDUserInfo userInfo) {
+        if (userInfo.getWorkInfo() == null) {
+            userInfo.setWorkInfo(new MCRORCIDPutCodeInfo());
+        }
+    }
+
+    private void updateMetadata(MCRObject object, MCRORCIDUserInfo userInfo) throws MCRAccessException {
+        MCRORCIDMetadataUtils.updateUserInfoByORCID(object, orcid, userInfo);
+        MCRMetadataManager.update(object);
     }
 
     /**
