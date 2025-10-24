@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.access.MCRAccessException;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -111,6 +112,43 @@ public class MCRORCIDWorkService {
             MCRMetadataManager.update(object);
         } catch (Exception e) {
             throw new MCRORCIDException("Cannot create work", e);
+        }
+    }
+
+    /**
+     * Updates an existing work (publication) in the ORCID profile of the user using the ORCID Member API.
+     *
+     * @param object the MCRObject that represents the work to be updated
+     * @throws MCRORCIDException if the object has an invalid state or other issue during the process
+     */
+    public void updateWork(MCRObject object) {
+        if (!MCRORCIDUtils.checkPublishState(object)) {
+            throw new MCRORCIDException("Object has wrong state");
+        }
+        final MCRObject filteredObject = MCRORCIDUtils.filterObject(object);
+        if (!MCRORCIDUtils.checkEmptyMODS(filteredObject)) {
+            throw new MCRORCIDException("Filtered MODS is empty.");
+        }
+        try {
+            final MCRORCIDUserInfo userInfo = Optional
+                    .ofNullable(MCRORCIDMetadataUtils.getUserInfoByORCID(object, orcid))
+                    .orElse(new MCRORCIDUserInfo(orcid));
+            if (userInfo.getWorkInfo() == null) {
+                userInfo.setWorkInfo(new MCRORCIDPutCodeInfo());
+            }
+            final Work work = MCRORCIDWorkTransformerHelper
+                    .transformContent(new MCRJDOMContent(filteredObject.createXML()));
+            final Set<MCRIdentifier> trustedIdentifiers = MCRORCIDWorkUtils.listTrustedIdentifiers(work);
+            doUpdateWorkInfo(trustedIdentifiers, userInfo.getWorkInfo(), orcid, credential);
+            final long ownPutCode = userInfo.getWorkInfo().getOwnPutCode();
+            if (ownPutCode == 0) {
+                throw new MCRORCIDException("Work does not exist");
+            }
+            doUpdateWork(ownPutCode, work, orcid, credential);
+            MCRORCIDMetadataUtils.updateUserInfoByORCID(object, orcid, userInfo);
+            MCRMetadataManager.update(object);
+        } catch (Exception e) {
+            throw new MCRORCIDException("Cannot update work", e);
         }
     }
 
