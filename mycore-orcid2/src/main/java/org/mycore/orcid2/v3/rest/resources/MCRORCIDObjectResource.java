@@ -52,6 +52,7 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -91,13 +92,10 @@ public class MCRORCIDObjectResource {
         + MCRORCIDRestConstants.PATH_PARAM_OBJECT_ID + "}")
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRestrictedAccess(MCRRequireLogin.class)
-    public MCRORCIDPutCodeInfo getWorkInfoByMemeberApi(@PathParam(MCRORCIDRestConstants.PATH_PARAM_ORCID) String orcid,
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
+    public MCRORCIDPutCodeInfo getWorkInfoByMemberApi(@PathParam(MCRORCIDRestConstants.PATH_PARAM_ORCID) String orcid,
         @PathParam(MCRORCIDRestConstants.PATH_PARAM_OBJECT_ID) MCRObjectID objectId) {
-        final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
-        final MCRORCIDCredential credential = Optional.ofNullable(orcidUser.getCredentialByORCID(orcid))
-            .filter(c -> c.getAccessToken() != null).orElseThrow(() -> new ForbiddenException());
-        final MCRObject object = getObjectOrThrow(objectId);
-        return getWorkInfo(orcid, credential, object);
+        return getWorkInfo(orcid, getCredentialForUser(orcid), getObjectOrThrow(objectId));
     }
 
     /**
@@ -126,6 +124,7 @@ public class MCRORCIDObjectResource {
         + MCRORCIDRestConstants.PATH_PARAM_OBJECT_ID + "}")
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRestrictedAccess(MCRRequireLogin.class)
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     public MCRORCIDPutCodeInfo getWorkInfoByPublicApi(@PathParam(MCRORCIDRestConstants.PATH_PARAM_ORCID) String orcid,
         @PathParam(MCRORCIDRestConstants.PATH_PARAM_OBJECT_ID) MCRObjectID objectId) {
         return getWorkInfo(orcid, new MCRORCIDCredential(), getObjectOrThrow(objectId));
@@ -153,15 +152,12 @@ public class MCRORCIDObjectResource {
         + MCRORCIDRestConstants.PATH_PARAM_OBJECT_ID + "}")
     @MCRRestrictedAccess(MCRRequireLogin.class)
     @MCRRequireTransaction
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     public Response createObject(@PathParam(MCRORCIDRestConstants.PATH_PARAM_ORCID) String orcid,
         @PathParam(MCRORCIDRestConstants.PATH_PARAM_OBJECT_ID) MCRObjectID objectId) {
-        final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
-        final MCRORCIDCredential credential = Optional.ofNullable(orcidUser.getCredentialByORCID(orcid))
-            .filter(c -> c.getAccessToken() != null).orElseThrow(() -> new ForbiddenException());
-        final MCRObject object = getObjectOrThrow(objectId);
-        if (!MCRORCIDUserUtils.checkUserHasObjectRelation(orcidUser, object)) {
-            throw new BadRequestException("User has no relation to the object.");
-        }
+        final MCRORCIDCredential credential = getCredentialForUser(orcid);
+        final MCRObject object = checkUserRelationAndRetrieveObject(objectId);
+
         final MCRSession session = MCRSessionMgr.getCurrentSession();
         final MCRUserInformation savedUserInformation = session.getUserInformation();
         session.setUserInformation(MCRSystemUserInformation.GUEST);
@@ -196,15 +192,12 @@ public class MCRORCIDObjectResource {
     @MCRRestrictedAccess(MCRRequireLogin.class)
     @MCRRequireTransaction
     @Produces(MediaType.APPLICATION_JSON)
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     public Response updateObject(@PathParam(MCRORCIDRestConstants.PATH_PARAM_ORCID) String orcid,
         @PathParam(MCRORCIDRestConstants.PATH_PARAM_OBJECT_ID) MCRObjectID objectId) {
-        final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
-        final MCRORCIDCredential credential = Optional.ofNullable(orcidUser.getCredentialByORCID(orcid))
-                .filter(c -> c.getAccessToken() != null).orElseThrow(ForbiddenException::new);
-        final MCRObject object = getObjectOrThrow(objectId);
-        if (!MCRORCIDUserUtils.checkUserHasObjectRelation(orcidUser, object)) {
-            throw new BadRequestException("User has no relation to the object.");
-        }
+        final MCRORCIDCredential credential = getCredentialForUser(orcid);
+        final MCRObject object = checkUserRelationAndRetrieveObject(objectId);
+
         final MCRSession session = MCRSessionMgr.getCurrentSession();
         final MCRUserInformation savedUserInformation = session.getUserInformation();
         session.setUserInformation(MCRSystemUserInformation.GUEST);
@@ -218,6 +211,22 @@ public class MCRORCIDObjectResource {
             session.setUserInformation(savedUserInformation);
         }
         return Response.ok().build();
+    }
+
+    private MCRObject checkUserRelationAndRetrieveObject(MCRObjectID objectId) {
+        final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
+        final MCRObject object = getObjectOrThrow(objectId);
+        if (!MCRORCIDUserUtils.checkUserHasObjectRelation(orcidUser, object)) {
+            throw new BadRequestException("User has no relation to the object.");
+        }
+        return object;
+    }
+
+    private MCRORCIDCredential getCredentialForUser(String orcid) {
+        final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
+        return Optional.ofNullable(orcidUser.getCredentialByORCID(orcid))
+                .filter(c -> c.getAccessToken() != null)
+                .orElseThrow(ForbiddenException::new);
     }
 
     private MCRObject getObjectOrThrow(MCRObjectID objectID) {
