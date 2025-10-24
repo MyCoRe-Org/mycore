@@ -225,8 +225,8 @@ public class MCRORCIDObjectResource {
     private MCRORCIDCredential getCredentialForUser(String orcid) {
         final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
         return Optional.ofNullable(orcidUser.getCredentialByORCID(orcid))
-                .filter(c -> c.getAccessToken() != null)
-                .orElseThrow(ForbiddenException::new);
+            .filter(c -> c.getAccessToken() != null)
+            .orElseThrow(ForbiddenException::new);
     }
 
     private MCRObject getObjectOrThrow(MCRObjectID objectID) {

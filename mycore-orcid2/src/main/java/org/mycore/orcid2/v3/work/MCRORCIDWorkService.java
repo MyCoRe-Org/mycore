@@ -91,7 +91,7 @@ public class MCRORCIDWorkService {
             final MCRORCIDUserInfo userInfo = getUserInfo(object);
             ensureWorkInfoInitialized(userInfo);
             final Work work = MCRORCIDWorkTransformerHelper
-                    .transformContent(new MCRJDOMContent(filteredObject.createXML()));
+                .transformContent(new MCRJDOMContent(filteredObject.createXML()));
             final Set<MCRIdentifier> trustedIdentifiers = MCRORCIDWorkUtils.listTrustedIdentifiers(work);
             doUpdateWorkInfo(trustedIdentifiers, userInfo.getWorkInfo(), orcid, credential);
             if (userInfo.getWorkInfo().hasOwnPutCode()) {
@@ -122,7 +122,7 @@ public class MCRORCIDWorkService {
             final MCRORCIDUserInfo userInfo = getUserInfo(object);
             ensureWorkInfoInitialized(userInfo);
             final Work work = MCRORCIDWorkTransformerHelper
-                    .transformContent(new MCRJDOMContent(filteredObject.createXML()));
+                .transformContent(new MCRJDOMContent(filteredObject.createXML()));
             final Set<MCRIdentifier> trustedIdentifiers = MCRORCIDWorkUtils.listTrustedIdentifiers(work);
             doUpdateWorkInfo(trustedIdentifiers, userInfo.getWorkInfo(), orcid, credential);
             final long ownPutCode = userInfo.getWorkInfo().getOwnPutCode();
@@ -193,8 +193,8 @@ public class MCRORCIDWorkService {
 
     private MCRORCIDUserInfo getUserInfo(MCRObject object) {
         return Optional
-                .ofNullable(MCRORCIDMetadataUtils.getUserInfoByORCID(object, orcid))
-                .orElse(new MCRORCIDUserInfo(orcid));
+            .ofNullable(MCRORCIDMetadataUtils.getUserInfoByORCID(object, orcid))
+            .orElse(new MCRORCIDUserInfo(orcid));
     }
 
     private void ensureWorkInfoInitialized(MCRORCIDUserInfo userInfo) {
