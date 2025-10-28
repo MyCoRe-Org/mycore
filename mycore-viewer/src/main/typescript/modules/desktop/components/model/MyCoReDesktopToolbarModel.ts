@@ -32,13 +32,12 @@ export class MyCoReDesktopToolbarModel extends MyCoReBasicToolbarModel {
     super(name);
   }
 
-  public _languageModel: LanguageModel;
-  public _viewSelectGroup: ToolbarGroup;
-  public viewSelectChilds: Array<ToolbarDropdownButtonChild>;
-  public viewSelect: ToolbarDropdownButton;
+  public declare _languageModel: LanguageModel;
+  public declare _viewSelectGroup: ToolbarGroup;
+  public declare viewSelectChilds: Array<ToolbarDropdownButtonChild>;
+  public declare viewSelect: ToolbarDropdownButton;
 
-
-  public selectionSwitchButton: ToolbarButton;
+  public declare selectionSwitchButton: ToolbarButton;
 
   public addComponents(): void {
     this._viewSelectGroup = new ToolbarGroup("viewSelectGroup", 40);

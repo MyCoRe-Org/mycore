@@ -99,7 +99,7 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
     this.trigger(new WaitForEvent(this, ShowContentEvent.TYPE));
     this.trigger(new WaitForEvent(this, ProvideToolbarModelEvent.TYPE));
     this.trigger(new ViewportInitializedEvent(this, this._pageController.viewport));
-    const componentContent = this._componentContent;
+    let componentContent = this._componentContent;
     componentContent.css({
       position: "absolute",
       top: "0px",
@@ -115,9 +115,9 @@ export class MyCoReImageScrollComponent extends ViewerComponent {
         componentContent.append(this._pageController._overview.container);
       }
       this._pageController._overview.initEventHandler();
-      componentContent.add(this._horizontalScrollbar.scrollbarElement);
-      componentContent.add(this._verticalScrollbar.scrollbarElement);
-      componentContent.add(this._toggleButton);
+      componentContent = componentContent.add(this._horizontalScrollbar.scrollbarElement);
+      componentContent = componentContent.add(this._verticalScrollbar.scrollbarElement);
+      componentContent = componentContent.add(this._toggleButton);
       this.initOverview(overviewEnabled);
     }
 
