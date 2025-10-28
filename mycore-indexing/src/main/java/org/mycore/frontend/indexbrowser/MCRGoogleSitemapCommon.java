@@ -18,19 +18,22 @@
 
 package org.mycore.frontend.indexbrowser;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.NotDirectoryException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -55,9 +58,7 @@ import org.mycore.solr.auth.MCRSolrAuthenticationManager;
  * <br>
  * <ul>
  * <li>MCR.baseurl - the application base URL</li>
- * <li>MCR.WebApplication.basedir - the directory where the web application is stored</li>
- * <li>MCR.GoogleSitemap.Directory - the directory where the sitemap should be stored relative to
- *      MCR.WebApplication.basedir (it could be empty)</li>
+ * <li>MCR.GoogleSitemap.Directory - the directory where the sitemap should be stored 
  * <li>MCR.GoogleSitemap.Types - a list of MCRObject types, they should be included</li>
  * <li>MCR.GoogleSitemap.Freq - the frequency of harvesting, 'monthly' is default<li>
  * <li>MCR.GoogleSitemap.Style - a style extension for the URL in form of ?XSL.Style={style}, default is empty</li>
@@ -73,6 +74,10 @@ import org.mycore.solr.auth.MCRSolrAuthenticationManager;
  *
  */
 public final class MCRGoogleSitemapCommon {
+
+    static final String DEFAULT_FILENAME = "sitemap_google.xml";
+
+    static final String DEFAULT_PART_URLPATH = "sitemap_google";
 
     /** Locale information **/
     private static final Locale SITEMAP_LOCALE = Locale.ROOT;
@@ -90,8 +95,9 @@ public final class MCRGoogleSitemapCommon {
     private static final String SITEMAP_SCHEMA =
         "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd";
 
-    /** The directory path to store sitemaps relative to MCR.WebApplication.basedir */
-    private static final String CDIR = MCRConfiguration2.getString("MCR.GoogleSitemap.Directory").orElse("");
+    /** The directory path to store sitemaps */
+    private static final Path CDIR =
+        Paths.get(MCRConfiguration2.getString("MCR.GoogleSitemap.Directory").orElseThrow());
 
     /** The frequence of crawle by Google */
     private static final String FREQ = MCRConfiguration2.getString("MCR.GoogleSitemap.Freq").orElse("monthly");
@@ -116,14 +122,11 @@ public final class MCRGoogleSitemapCommon {
     private int numberOfURLs = MCRConfiguration2.getInt("MCR.GoogleSitemap.NumberOfURLs").orElse(10_000);
 
     /** number format for parts */
-    private static final NumberFormat NUMBER_FORMAT = getNumberFormat();
+    private static final NumberFormat NUMBER_FORMAT = createNumberFormat();
 
     /** date formatter */
-    private static final DateTimeFormatter DATE_FORMATTER
-        = DateTimeFormatter.ofPattern("yyyy-MM-dd", SITEMAP_LOCALE).withZone(ZoneOffset.UTC);
-
-    /** The webapps directory path from configuration */
-    private final File webappBaseDir;
+    private static final DateTimeFormatter DATE_FORMATTER =
+        DateTimeFormatter.ofPattern("yyyy-MM-dd", SITEMAP_LOCALE).withZone(ZoneOffset.UTC);
 
     /** The base URL */
     private String baseurl = MCRConfiguration2.getString("MCR.baseurl").orElse("");
@@ -131,32 +134,29 @@ public final class MCRGoogleSitemapCommon {
     /** local data */
     private List<MCRObjectIDDate> objidlist;
 
-    public MCRGoogleSitemapCommon(File baseDir) throws NotDirectoryException {
-        if (!Objects.requireNonNull(baseDir, "baseDir may not be null.").isDirectory()) {
-            throw new NotDirectoryException(baseDir.getAbsolutePath());
-        }
-        this.webappBaseDir = baseDir;
-        LOGGER.info("Using webappbaseDir: {}", baseDir::getAbsolutePath);
+    public MCRGoogleSitemapCommon() throws IOException {
+        LOGGER.info("Using this directory to store Google Sitemaps: {}", CDIR);
         objidlist = new ArrayList<>();
         if ((numberOfURLs < 1) || (numberOfURLs > 50_000)) {
             numberOfURLs = 50_000;
         }
-        if (CDIR.length() != 0) {
-            File sitemapDirectory = new File(webappBaseDir, CDIR);
-            if (!sitemapDirectory.exists()) {
-                sitemapDirectory.mkdirs();
-            }
+        if (!Files.exists(CDIR)) {
+            Files.createDirectories(CDIR);
+        }
+        if (!Files.isDirectory(CDIR)) {
+            throw new NotDirectoryException(CDIR.toString());
         }
     }
 
-    public MCRGoogleSitemapCommon(String baseURL, File baseDir) throws NotDirectoryException {
-        this(baseDir);
+    public MCRGoogleSitemapCommon(String baseURL) throws IOException {
+        this();
         this.baseurl = baseURL;
     }
 
-    private static NumberFormat getNumberFormat() {
+    private static NumberFormat createNumberFormat() {
         NumberFormat nf = NumberFormat.getIntegerInstance(SITEMAP_LOCALE);
-        nf.setMinimumFractionDigits(5);
+        nf.setMinimumIntegerDigits(4);
+        nf.setGroupingUsed(false);
         return nf;
     }
 
@@ -201,29 +201,31 @@ public final class MCRGoogleSitemapCommon {
     }
 
     /**
+     * The method return the filename of a sitemap_google.xml file.
+     *
+     * @param number
+     *            number of this file - '0' = sitemap_google.xml - '&gt; 0' sitemap_google_xxx.xml
+     * @return the filename of sitemap_google.xml
+     */
+    String getFileName(int number) {
+        String fn = DEFAULT_FILENAME;
+        if (number > 0) {
+            synchronized (NUMBER_FORMAT) {
+                fn = "sitemap_google_" + NUMBER_FORMAT.format(number) + ".xml";
+            }
+        }
+        return fn;
+    }
+
+    /**
      * The method return the path to the sitemap_google.xml file.
      *
      * @param number
-     *            number of this file - '1' = sitemap_google.xml - '&gt; 1' sitemap_google_xxx.xml
-     * @param withPath
-     *            true for the full path, false for the file name
+     *            number of this file - '0' = sitemap_google.xml - '&gt; 0' sitemap_google_xxx.xml
      * @return a path to sitemap_google.xml
      */
-    String getFileName(int number, boolean withPath) {
-        String fn = "sitemap_google.xml";
-        if (number > 1) {
-            synchronized (NUMBER_FORMAT) {
-                fn = "sitemap_google_" + NUMBER_FORMAT.format(number - 1) + ".xml";
-            }
-        }
-        String localPath = fn;
-        if (!CDIR.isEmpty()) {
-            localPath = CDIR + File.separator + fn;
-        }
-        if (withPath) {
-            return webappBaseDir + File.separator + localPath;
-        }
-        return localPath;
+    Path getFile(int number) {
+        return CDIR.resolve(getFileName(number));
     }
 
     /**
@@ -249,7 +251,7 @@ public final class MCRGoogleSitemapCommon {
      * The method call the database and build the sitemap_google.xml JDOM document.
      *
      * @param number
-     *            number of this file - '1' = sitemap_google.xml - '&gt; 1' sitemap_google_xxx.xml
+     *            number of this file - '0' = sitemap_google.xml - '&gt;= 1' sitemap_google_xxx.xml
      * @return The sitemap.xml as JDOM document
      */
     public Document buildPartSitemap(int number) {
@@ -261,8 +263,8 @@ public final class MCRGoogleSitemapCommon {
         Document jdom = new Document(urlset);
 
         // build over all types
-        int start = numberOfURLs * (number);
-        int stop = Math.min(numberOfURLs * (number + 1), objidlist.size());
+        int start = numberOfURLs * (number - 1);
+        int stop = Math.min(numberOfURLs * (number), objidlist.size());
         LOGGER.debug("Build Google URL in range from {} to {}.", () -> start, () -> stop - 1);
         for (int i = start; i < stop; i++) {
             MCRObjectIDDate objectIDDate = objidlist.get(i);
@@ -303,10 +305,11 @@ public final class MCRGoogleSitemapCommon {
         index.setAttribute("schemaLocation", SITEINDEX_SCHEMA, XSI_NAMESPACE);
         Document jdom = new Document(index);
         // build over all files
-        for (int i = 0; i < number; i++) {
+        for (int i = 1; i <= number; i++) {
             Element sitemap = new Element("sitemap", NS);
             index.addContent(sitemap);
-            sitemap.addContent(new Element("loc", NS).addContent((baseurl + getFileName(i + 2, false)).trim()));
+            sitemap.addContent(new Element("loc", NS)
+                .addContent((baseurl + DEFAULT_PART_URLPATH + "/" + getFileName(i)).trim()));
             String date = DATE_FORMATTER.format(Instant.now());
             sitemap.addContent(new Element("lastmod", NS).addContent(date.trim()));
         }
@@ -317,14 +320,21 @@ public final class MCRGoogleSitemapCommon {
      * This method remove all sitemap files from the webapps directory.
      */
     public void removeSitemapFiles() {
-        File dir = new File(webappBaseDir, CDIR);
-        File[] li = dir.listFiles();
-        if (li != null) {
-            for (File fi : li) {
-                if (fi.getName().startsWith("sitemap_google")) {
-                    LOGGER.debug("Remove file {}", fi::getName);
-                    fi.delete();
-                }
+        if (Files.isDirectory(CDIR)) {
+            try (Stream<Path> walk = Files.walk(CDIR)) {
+                walk
+                    .filter(d -> !CDIR.equals(d)) // keep the current directory, only delete children
+                    .sorted(Comparator.reverseOrder())
+                    .forEach(f -> {
+                        try {
+                            LOGGER.debug("Remove file {}", () -> f.getFileName().toString());
+                            Files.delete(f);
+                        } catch (IOException e) {
+                            LOGGER.error("Unable to delete this path : %s%n%s", f, e);
+                        }
+                    });
+            } catch (IOException e) {
+                LOGGER.error("Could not delete Google Sitemap directory", e);
             }
         }
     }

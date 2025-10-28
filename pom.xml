@@ -85,14 +85,17 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <maven.compiler.arg>-Werror</maven.compiler.arg>
     <maven.compiler.target>${java.target.version}</maven.compiler.target>
     <mockito.jar>${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar</mockito.jar>
-    <mockito.version>5.17.0</mockito.version>
+    <mockito.version>5.20.0</mockito.version>
     <!-- defined in parent POM: -->
     <!-- <log4j.version>2.19.0</log4j.version> -->
     <neo4j.version>5.28.5</neo4j.version>
+    <net.bytebuddy.experimental>true</net.bytebuddy.experimental>
+    <net.bytebuddy.processor>CLASS_FILE_API_FIRST</net.bytebuddy.processor>
     <oaipmh.version>3.0</oaipmh.version>
     <ocfl-java.version>2.2.2</ocfl-java.version>
+    <pmd.analysisCache>true</pmd.analysisCache>
     <pmd.failOnViolation>true</pmd.failOnViolation>
-    <pmd.version>7.13.0</pmd.version>
+    <pmd.version>7.16.0</pmd.version>
     <rdf4j.version>5.1.3</rdf4j.version>
     <selenium.version>4.35.0</selenium.version>
     <site.suffix />
@@ -168,6 +171,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <argLine>@{argLine} -javaagent:${mockito.jar} -Xshare:off</argLine>
+          <systemPropertyVariables>
+            <!-- required for mockito on JDK 25+ -->
+            <net.bytebuddy.experimental>${net.bytebuddy.experimental}</net.bytebuddy.experimental>
+            <net.bytebuddy.processor>${net.bytebuddy.processor}</net.bytebuddy.processor>
+          </systemPropertyVariables>
         </configuration>
       </plugin>
     </plugins>
@@ -435,6 +443,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
                   <processors>
                     <processor>org.hibernate.processor.HibernateProcessor</processor>
                   </processors>
+                  <skipSourcesUnchanged>true</skipSourcesUnchanged>
                 </configuration>
               </execution>
             </executions>
@@ -1640,6 +1649,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
+        <artifactId>mycore-jsession</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
         <artifactId>mycore-lod</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -2599,6 +2613,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <module>mycore-impex</module>
     <module>mycore-iview2</module>
     <module>mycore-jobqueue</module>
+    <module>mycore-jsessions</module>
     <module>mycore-junit4</module>
     <module>mycore-packer</module>
     <module>mycore-lod</module>

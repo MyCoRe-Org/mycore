@@ -91,7 +91,7 @@ define([
     },
 
     updateToolbar: function() {
-      var disabled = this.get("disabled") == true;
+      const disabled = this.get("disabled") == true;
 
       // filter
       if (this.filterTextBox != null) {
@@ -117,10 +117,14 @@ define([
       this.addTreeItemButton.set("iconClass", "icon16 " + (disabled ? "addDisabledIcon" : "addIcon"));
 
       // export button
-      this.exportClassificationButton.set("disabled", !(selectedItems != null && selectedItems.length > 0 && classUtil.isClassification(selectedItems[0])));
+      const exportDisabled = !(selectedItems != null && selectedItems.length > 0 && classUtil.isClassification(selectedItems[0]));
+      this.exportClassificationButton.set("disabled", exportDisabled);
+      this.exportClassificationButton.set("iconClass", "icon16 " + (exportDisabled ? "downloadDisabledIcon" : "downloadIcon"));
 
       // link dialog button
-      this.linkDialogButton.set("disabled", !(selectedItems != null && selectedItems.length > 0 && !selectedItems[0].fakeRoot));
+      const linkDisabled = !(selectedItems != null && selectedItems.length > 0 && !selectedItems[0].fakeRoot);
+      this.linkDialogButton.set("disabled", linkDisabled);
+      this.linkDialogButton.set("iconClass", "icon16 " + (linkDisabled ? "linkDisabledIcon" : "linkIcon"));
     },
 
     add: function() {

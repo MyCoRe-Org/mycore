@@ -19,6 +19,7 @@
 package org.mycore.user2.hash;
 
 import static org.mycore.user2.hash.MCRPasswordCheckUtils.fixedEffortEquals;
+import static org.mycore.user2.hash.MCRPasswordCheckUtils.generateSeed;
 import static org.mycore.user2.hash.MCRPasswordCheckUtils.probeSecretKeyAlgorithm;
 
 import java.security.SecureRandom;
@@ -108,7 +109,7 @@ public class MCRPBKDF2Strategy extends MCRPasswordCheckStrategyBase {
     @Override
     protected PasswordCheckData doCreate(SecureRandom random, String password) throws Exception {
 
-        byte[] salt = random.generateSeed(saltSizeBytes);
+        byte[] salt = generateSeed(random, saltSizeBytes);
         byte[] hash = getHash(salt, hashSizeBytes, password);
 
         return new PasswordCheckData(HEX_FORMAT.formatHex(salt), HEX_FORMAT.formatHex(hash));

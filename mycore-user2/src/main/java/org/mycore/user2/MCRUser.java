@@ -498,6 +498,12 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     @Transient
     @Override
+    public String toString() {
+        return getUserID();
+    }
+
+    @Transient
+    @Override
     public String getUserID() {
         String cuid = this.getUserName();
         if (!getRealm().equals(MCRRealmFactory.getLocalRealm())) {

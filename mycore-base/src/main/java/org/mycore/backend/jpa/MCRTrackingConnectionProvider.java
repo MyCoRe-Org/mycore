@@ -33,6 +33,7 @@ import org.apache.logging.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.hikaricp.internal.HikariCPConnectionProvider;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * A {@link MCRTrackingConnectionProvider} is a {@link HikariCPConnectionProvider} that tracks
@@ -46,7 +47,7 @@ import org.mycore.common.MCRException;
  * Accumulating information about connections in the database indicates a problem with the application
  * where connections are obtained, but never closed.
  * <p>
- * <strong>Intended for development and debugging purposes only. It is not intended or recommended 
+ * <strong>Intended for development and debugging purposes only. It is not intended or recommended
  * to use this connection provider in production for an extended time.</strong>
  */
 public class MCRTrackingConnectionProvider extends HikariCPConnectionProvider {
@@ -55,6 +56,12 @@ public class MCRTrackingConnectionProvider extends HikariCPConnectionProvider {
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    public static final String PREFIX = "MCR.JPA.TrackingConnectionProvider.";
+
+    private static final String PERSIST_DATA_ACROSS_RESTARTS_KEY = PREFIX + "PersistDataAcrossRestarts";
+
+    private static final Timestamp STARTUP_TIME = new Timestamp(System.currentTimeMillis());
 
     private final ConcurrentMap<Connection, Integer> connections = new ConcurrentHashMap<>();
 
@@ -74,12 +81,16 @@ public class MCRTrackingConnectionProvider extends HikariCPConnectionProvider {
             connection.setAutoCommit(true);
             try {
                 Statement statement = connection.createStatement();
-                statement.executeUpdate("DROP TABLE IF EXISTS connection_log");
-                statement.executeUpdate("CREATE TABLE connection_log ("
-                    + "id INTEGER PRIMARY KEY, "
+                if (!MCRConfiguration2.getBoolean(PERSIST_DATA_ACROSS_RESTARTS_KEY).orElse(false)) {
+                    statement.executeUpdate("DROP TABLE IF EXISTS connection_log");
+                }
+                statement.executeUpdate("CREATE TABLE IF NOT EXISTS connection_log ("
+                    + "id INTEGER NOT NULL, "
+                    + "startup TIMESTAMP NOT NULL, "
                     + "created TIMESTAMP NOT NULL, "
                     + "thread VARCHAR(256) NOT NULL, "
-                    + "stack TEXT NOT NULL)");
+                    + "stack TEXT NOT NULL,"
+                    + "CONSTRAINT id_startup PRIMARY KEY (id, startup))");
                 initialized = true;
             } catch (Exception e) {
                 LOGGER.warn("Failed to init connection_log table", e);
@@ -106,12 +117,13 @@ public class MCRTrackingConnectionProvider extends HikariCPConnectionProvider {
             boolean autoCommit = connection.getAutoCommit();
             connection.setAutoCommit(true);
             try {
-                PreparedStatement statement = connection
-                    .prepareStatement("INSERT INTO connection_log (id, created, thread, stack) VALUES (?, ?, ?, ?)");
+                PreparedStatement statement = connection.prepareStatement("INSERT INTO connection_log " +
+                    "(id, startup, created, thread, stack) VALUES (?, ?, ?, ?, ?)");
                 statement.setInt(1, connectionId);
-                statement.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
-                statement.setString(3, Thread.currentThread().getName());
-                statement.setString(4, new MCRException("connection " + connectionId).getStackTraceAsString());
+                statement.setTimestamp(2, STARTUP_TIME);
+                statement.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
+                statement.setString(4, Thread.currentThread().getName());
+                statement.setString(5, new MCRException("connection " + connectionId).getStackTraceAsString());
                 statement.executeUpdate();
             } catch (Exception e) {
                 if (LOGGER.isWarnEnabled()) {
@@ -147,8 +159,8 @@ public class MCRTrackingConnectionProvider extends HikariCPConnectionProvider {
                 boolean autoCommit = connection.getAutoCommit();
                 connection.setAutoCommit(true);
                 try {
-                    PreparedStatement statement = connection
-                        .prepareStatement("DELETE FROM connection_log WHERE id = ?");
+                    PreparedStatement statement = connection.prepareStatement("DELETE FROM connection_log " +
+                        "WHERE id = ?");
                     statement.setInt(1, connectionId);
                     statement.executeUpdate();
                 } catch (Exception e) {
