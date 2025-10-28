@@ -150,25 +150,42 @@ public class MCRRepeatTransformerHelper extends MCRTransformerHelperBase {
                 continue;
             }
 
-            Element control = new Element("control").setText(token);
-
-            StringBuilder name = new StringBuilder();
-            name.append("_xed_submit_").append(token).append(COLON);
-
-            if (CONTROL_APPEND.equals(token) || CONTROL_INSERT.equals(token)) {
-                name.append(MCRInsertTarget.getInsertParameter(findCurrentRepeatBinding()));
-            } else if (CONTROL_REMOVE.equals(token)) {
-                name.append(getCurrentBinding().getAbsoluteXPath());
-            } else if (CONTROL_UP.equals(token) || CONTROL_DOWN.equals(token)) {
-                name.append(getSwapParameter(token));
+            Element control = null;
+            switch (token) {
+                case CONTROL_APPEND:
+                case CONTROL_INSERT: {
+                    control =
+                        buildControl(token, MCRInsertTarget.getInsertParameter(findCurrentRepeatBinding()), anchorID);
+                    break;
+                }
+                case CONTROL_REMOVE: {
+                    control = buildControl(token, getCurrentBinding().getAbsoluteXPath(), anchorID - 1);
+                    break;
+                }
+                case CONTROL_UP:
+                case CONTROL_DOWN: {
+                    control = buildControl(token, getSwapParameter(token), anchorID);
+                    break;
+                }
+                default:
+                    ;
             }
 
-            name.append("|rep-");
-            name.append(CONTROL_REMOVE.equals(token) && (pos > 1) ? anchorID - 1 : anchorID);
-
-            control.setAttribute(ATTR_NAME, name.toString());
             call.getReturnElement().addContent(control);
         }
+    }
+
+    private Element buildControl(String token, String param, int anchorIDtoUse) {
+        Element control = new Element("control").setText(token);
+
+        StringBuilder name = new StringBuilder();
+        name.append("_xed_submit_").append(token).append(COLON);
+        name.append(param);
+        name.append("|rep-");
+        name.append(anchorIDtoUse);
+        control.setAttribute(ATTR_NAME, name.toString());
+
+        return control;
     }
 
     private MCRRepeatBinding findCurrentRepeatBinding() {
