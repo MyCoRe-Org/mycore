@@ -270,10 +270,6 @@ wcms.navigation.EditContentDialog = function() {
     const parser = new DOMParser();
     const doc = parser.parseFromString(content, "text/html");
 
-    // Access the head and body elements
-    const head = doc.head;
-    const body = doc.body;
-
     // Function to check if the head is empty
     function isHeadEmpty(headElement) {
       // Check if the head element has any child nodes that are not whitespace
@@ -283,7 +279,7 @@ wcms.navigation.EditContentDialog = function() {
     }
 
     // Modify the image URLs in the body
-    body.querySelectorAll("img").forEach(img => {
+    doc.body.querySelectorAll("img").forEach(img => {
       const src = img.getAttribute("src");
       if (!src.startsWith(context) && !src.startsWith("http")) {
         img.setAttribute("src", imagePrepend + src);
@@ -292,8 +288,8 @@ wcms.navigation.EditContentDialog = function() {
 
     const cleanDocument = document.implementation.createDocument(null, null);
     const cleanDocumentElement = removeNamespacesDeep(doc.documentElement, cleanDocument);
-    head = cleanDocumentElement.getElementsByTagName("head")[0];
-    body = cleanDocumentElement.getElementsByTagName("body")[0];
+    const head = cleanDocumentElement.getElementsByTagName("head")[0];
+    const body = cleanDocumentElement.getElementsByTagName("body")[0];
 
     // Serialize the modified document back to a string
     const serializer = new XMLSerializer();
