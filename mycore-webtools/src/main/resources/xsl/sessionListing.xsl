@@ -28,7 +28,7 @@
             </h3>
           </div>
           <div class="card-body">
-            <div class="form-group row">
+            <div class="mb-3 row">
               <label for="sessionListingFilter" class="col-sm-2 col-form-label">
                 <xsl:value-of select="i18n:translate('component.session-listing.filter')"/>
               </label>
@@ -40,7 +40,7 @@
             <div class="form-check">
               <input id="sessionListingResolveHostname" class="form-check-input" type="checkbox"
                      onchange="mycore.session.listing.onHostnameResolvingChange()"/>
-              <label for="sessionListingFilter" class="form-check-label">
+              <label for="sessionListingResolveHostname" class="form-check-label">
                 <xsl:value-of select="i18n:translate('component.session-listing.resolveHostNames')"/>
               </label>
             </div>
@@ -82,17 +82,19 @@
       </div>
     </div>
 
-    <div class="modal fade" id="stacktraceModal" tabindex="-1" role="dialog">
+    <div class="modal fade" id="stacktraceModal" tabindex="-1"
+         aria-labelledby="stacktraceModalTitle" aria-hidden="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h4 class="modal-title"></h4>
+            <h4 id="stacktraceModalTitle" class="modal-title"></h4>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <pre id="stacktraceModalBody" class="pre-scrollable"></pre>
+            <pre id="stacktraceModalBody" class="overflow-auto" style="max-height:50vh;"></pre>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Schließen</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
           </div>
         </div>
       </div>
@@ -104,9 +106,9 @@
     </xsl:variable>
     <script>
       $(document).ready(function() {
-      <xsl:value-of select="concat('var baseURL = ',$quot,$WebApplicationBaseURL,$quot, ';')"/>
-      mycore.session.listing.init(baseURL);
-      mycore.session.listing.load(false);
+        <xsl:value-of select="concat('var baseURL = ',$quot,$WebApplicationBaseURL,$quot, ';')"/>
+        mycore.session.listing.init(baseURL);
+        mycore.session.listing.load(false);
       });
     </script>
   </xsl:template>
