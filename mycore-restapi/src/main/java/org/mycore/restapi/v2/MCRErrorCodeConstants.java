@@ -18,7 +18,7 @@
 
 package org.mycore.restapi.v2;
 
-final class MCRErrorCodeConstants {
+public final class MCRErrorCodeConstants {
 
     public static final String API_NO_PERMISSION = "API_NO_PERMISSION";
 
@@ -43,6 +43,10 @@ final class MCRErrorCodeConstants {
     public static final String MCROBJECT_STILL_LINKED = "MCROBJECT_STILL_LINKED";
 
     public static final String MCROBJECT_INVALID_STATE = "MCROBJECT_INVALID_STATE";
+
+    public static final String MCROBJECT_ALREADY_LOCKED = "MCROBJECT_ALREADY_LOCKED";
+
+    public static final String MCROBJECT_LOCKED_BY_DIFFERENT_USER = "MCROBJECT_LOCKED_BY_DIFFERENT_USER";
 
     //MCRDerivate
     public static final String MCRDERIVATE_NO_PERMISSION = "MCRDERIVATE_NO_PERMISSION";

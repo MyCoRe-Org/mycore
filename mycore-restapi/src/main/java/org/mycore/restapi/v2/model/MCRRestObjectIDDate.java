@@ -21,7 +21,7 @@ package org.mycore.restapi.v2.model;
 import java.time.Instant;
 
 import org.mycore.datamodel.common.MCRObjectIDDate;
-import org.mycore.restapi.converter.MCRInstantXMLAdapter;
+import org.mycore.common.xml.adapters.MCRInstantXMLAdapter;
 
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlRootElement;

@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.Optional;
 
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 import jakarta.ws.rs.core.EntityTag;
@@ -74,4 +75,14 @@ public final class MCRRestUtils {
             .map(r -> r.evaluatePreconditions(lastModified, eTag))
             .map(Response.ResponseBuilder::build);
     }
+
+    public static void checkExists(MCRObjectID id) {
+        if (!MCRMetadataManager.exists(id)) {
+            throw MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND)
+                .withMessage("MCRObject " + id + " not found")
+                .toException();
+        }
+    }
+
 }
