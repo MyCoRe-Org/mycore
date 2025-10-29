@@ -123,15 +123,17 @@ detect-file@^1.0.0:
   resolved "https://registry.npmjs.org/detect-file/-/detect-file-1.0.0.tgz"
   integrity sha1-8NZtA2cqglyxtzvbP+YjEMjlUrc=
 
-dijit@1.6.5:
-  version "1.6.5"
-  resolved "https://registry.npmjs.org/dijit/-/dijit-1.6.5.tgz"
-  integrity sha1-1BY4lqdQMcvPO4V6U2fao92bReI=
+dijit@1.7.12:
+  version "1.7.12"
+  resolved "https://registry.yarnpkg.com/dijit/-/dijit-1.7.12.tgz#61741b94bd394c5828cab14b6a790f1ddb96f6c1"
+  integrity sha512-dAg20qO9d6TfhzcZYONJJ/iZ2d14B1j9KLV2SO86gKYlfYTML2A/lx43PRXoAzcOSQ8PYsK6s/TTOeG4t+lQIg==
+  dependencies:
+    dojo "1.7.12"
 
-dojo@1.6.5:
-  version "1.6.5"
-  resolved "https://registry.npmjs.org/dojo/-/dojo-1.6.5.tgz"
-  integrity sha1-3yD0E1iloWHcCDr4GDLtb5/iHKQ=
+dojo@1.7.12:
+  version "1.7.12"
+  resolved "https://registry.yarnpkg.com/dojo/-/dojo-1.7.12.tgz#7add8f53aed9e34e5827f0fcac439fa06fc77e65"
+  integrity sha512-MHO88+a5n5tnarEXopsfcix3kSRKXwzVa9ShVcDrEGOp9+pSSg02FXrrjCaGoZzGvPIX+i5j+Ri/whVb9gmP0Q==
 
 escape-string-regexp@^1.0.2:
   version "1.0.5"
@@ -542,7 +544,7 @@ micromatch@^4.0.2:
     braces "^3.0.2"
     picomatch "^2.3.1"
 
-minimatch@^3.0.4, minimatch@~3.0.4, "minimatch@2 || 3":
+"minimatch@2 || 3", minimatch@^3.0.4, minimatch@~3.0.4:
   version "3.0.4"
   resolved "https://registry.npmjs.org/minimatch/-/minimatch-3.0.4.tgz"
   integrity sha512-yJHVQEhyqPLUTgt9B83PXu6W3rx4MvvHvSUvToogpwoGDOUQ+yDrR0HRot+yOCdCO7u4hX3pWft6kWBBcqh0UA==

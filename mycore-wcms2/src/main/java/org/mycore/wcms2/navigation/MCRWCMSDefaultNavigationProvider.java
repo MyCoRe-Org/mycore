@@ -18,6 +18,8 @@
 
 package org.mycore.wcms2.navigation;
 
+import java.util.Locale;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
@@ -108,7 +110,9 @@ public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvid
             }
             case null, default -> LOGGER.warn("Unable to set type for item {}", id);
         }
-        jsonItem.addProperty(JSON_WCMS_TYPE, type.name());
+        if (type != null) {
+            jsonItem.addProperty(JSON_WCMS_TYPE, type.name().toLowerCase(Locale.ROOT));
+        }
         if (href != null) {
             jsonItem.add("access", getAccess(href));
         }
@@ -174,18 +178,15 @@ public class MCRWCMSDefaultNavigationProvider implements MCRWCMSNavigationProvid
                 JsonObject item = e.getAsJsonObject();
                 if (item.has(JSON_WCMS_ID) && item.has(JSON_WCMS_TYPE)
                     && wcmsId.equals(item.get(JSON_WCMS_ID).getAsString())) {
-                    WCMSType wcmsType = WCMSType.valueOf(item.get(JSON_WCMS_TYPE).getAsString());
-                    if (wcmsType.equals(WCMSType.ROOT)) {
-                        return GSON.fromJson(item, MCRNavigation.class);
-                    } else if (wcmsType.equals(WCMSType.MENU)) {
-                        return GSON.fromJson(item, MCRNavigationMenuItem.class);
-                    } else if (wcmsType.equals(WCMSType.ITEM)) {
-                        return GSON.fromJson(item, MCRNavigationItem.class);
-                    } else if (wcmsType.equals(WCMSType.INSERT)) {
-                        return GSON.fromJson(item, MCRNavigationInsertItem.class);
-                    } else if (wcmsType.equals(WCMSType.GROUP)) {
-                        return GSON.fromJson(item, MCRNavigationGroup.class);
-                    }
+                    String wcmsTypeAsString = item.get(JSON_WCMS_TYPE).getAsString().toUpperCase(Locale.ROOT);
+                    WCMSType wcmsType = WCMSType.valueOf(wcmsTypeAsString);
+                    return switch (wcmsType) {
+                        case ROOT -> GSON.fromJson(item, MCRNavigation.class);
+                        case MENU -> GSON.fromJson(item, MCRNavigationMenuItem.class);
+                        case ITEM -> GSON.fromJson(item, MCRNavigationItem.class);
+                        case INSERT -> GSON.fromJson(item, MCRNavigationInsertItem.class);
+                        case GROUP -> GSON.fromJson(item, MCRNavigationGroup.class);
+                    };
                 }
             }
         }
