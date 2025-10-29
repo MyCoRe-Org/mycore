@@ -38,11 +38,11 @@ mycore.session.listing = {
 
   load: function(resolveHostname) {
     resolveHostname = resolveHostname == null ? false : resolveHostname;
-    var container = $("#sessionListingContainer");
+    const container = $("#sessionListingContainer");
     $.get(mycore.session.listing.resourceURL + "list?resolveHostname=" + resolveHostname).done(function(sessions) {
       mycore.session.listing.sessions = sessions;
       mycore.session.listing.filteredSessions = sessions.slice();
-      var sc = mycore.session.listing.sortCriteria;
+      const sc = mycore.session.listing.sortCriteria;
       if (sc.criteria !== null) {
         sc.asc = !sc.asc;
         $("#sessionListingTable th[data-criteria='" + sc.criteria + "']").click();
@@ -51,7 +51,7 @@ mycore.session.listing = {
       }
     }).fail(function(err) {
       console.log(err);
-      if (err.status == 401) {
+      if (err.status === 401) {
         container.html("Insufficient permissions: You don't have the rights to access the session data.");
       } else {
         container.html("Loading error: " + err.statusText);
@@ -60,8 +60,8 @@ mycore.session.listing = {
   },
 
   kill: function(sessionId) {
-    var question = $("#i18n-kill-question").text();
-    var doKilling = confirm(question);
+    const question = $("#i18n-kill-question").text();
+    const doKilling = confirm(question);
     if(!doKilling) {
       return;
     }
@@ -80,7 +80,7 @@ mycore.session.listing = {
   },
 
   sortSessions: function(criteria, sortFunction) {
-    var sc = mycore.session.listing.sortCriteria;
+    const sc = mycore.session.listing.sortCriteria;
     if (criteria === sc.criteria) {
       sc.asc = !sc.asc;
     } else {
@@ -102,17 +102,17 @@ mycore.session.listing = {
       escaperElement.innerText = unsafeText;
       return escaperElement.innerHTML;
     };
-    var spinner = $("#sessionListingLoadingSpinner");
+    const spinner = $("#sessionListingLoadingSpinner");
     spinner.addClass("d-none");
-    var contentDiv = $("#sessionListingContent");
-    var table = $("#sessionListingTable");
+    const contentDiv = $("#sessionListingContent");
+    const table = $("#sessionListingTable");
     contentDiv.removeClass("d-none");
 
-    var dateOptions = {
+    const dateOptions = {
       year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
     };
-    var locale = "de-DE";
-    var sc = mycore.session.listing.sortCriteria;
+    const locale = "de-DE";
+    const sc = mycore.session.listing.sortCriteria;
     $("#sessionListingTable th i")
       .removeClass("fa-sort fa-sort-asc fa-sort-desc")
       .addClass(function() {
@@ -126,16 +126,15 @@ mycore.session.listing = {
     $(".table-session-entry").remove();
 
     // print table
-    for (var session of mycore.session.listing.filteredSessions) {
-      var tr = $("<tr id='" + escapeHtml(session.id) + "' class='table-session-entry'>" +
+    for (const session of mycore.session.listing.filteredSessions) {
+      const tr = $("<tr id='" + escapeHtml(session.id) + "' class='table-session-entry'>" +
         "<td>" + escapeHtml(session.login) + (session.realName != null ? (" (" + escapeHtml(session.realName) + ")") : "") + "</td>" +
         "<td>" + escapeHtml(session.ip) + (session.hostname != null ? ("(" + escapeHtml(session.hostname) + ")") : "") + "</td>" +
         "<td>" + new Date(session.createTime).toLocaleDateString(locale, dateOptions) + "</td>" +
         "<td>" + new Date(session.lastAccessTime).toLocaleDateString(locale, dateOptions) + "</td>" +
         "<td align='center'>" +
         "<div style='height: 15px; width: 15px; background-color: " + session.constructingStacktrace.color + "; border: 1px solid #999; cursor: pointer;'" +
-        " onclick='mycore.session.listing.showStacktrace(\"" + escapeHtml(session.id) + "\");'" +
-        " data-toggle='modal' data-target='#stacktraceModal'></div>" +
+        " onclick='mycore.session.listing.showStacktrace(\"" + escapeHtml(session.id) + "\");'></div>" +
         "</td>" +
         "<td><i href='javascript:void(0)' onclick='mycore.session.listing.kill(`" + escapeHtml(session.id) + "`)' class='fas fa-times' style='cursor: pointer;'></i></td>" +
         "</tr>"
@@ -144,37 +143,43 @@ mycore.session.listing = {
     }
   },
 
-  showStacktrace: function(id) {
+  showStacktrace: function (id) {
+    // build modal
     const escaperElement = document.createElement('div');
-    const escapeHtml = function(unsafeText) {
-      if(!unsafeText) {
+    const escapeHtml = function (unsafeText) {
+      if (!unsafeText) {
         return '';
       }
       escaperElement.innerText = unsafeText;
       return escaperElement.innerHTML;
     };
-    var dialog = $("#stacktraceModalBody");
+    const dialog = $("#stacktraceModalBody");
     dialog.empty();
-    var session = mycore.session.listing.getSession(id);
-    var stacktrace = session.constructingStacktrace.stacktrace;
-    var header = dialog.parents(".modal-dialog").find(".modal-header");
-    var html = "ID: " + escapeHtml(session.id)
-     + "<br/>" + "HTTP ID: " + escapeHtml(session.httpId)
-     + "<br/>" + window["component.session-listing.firstURI"] + ": " + escapeHtml(session.firstURI)
-     + "<br/>" + window["component.session-listing.firstUserAgent"] + ": " + escapeHtml(session.firstUserAgent)
-     + "<br/>" + window["component.session-listing.lastURI"] + ": " + escapeHtml(session.lastURI);
+    const session = mycore.session.listing.getSession(id);
+    const stacktrace = session.constructingStacktrace.stacktrace;
+    const header = dialog.parents(".modal-dialog").find(".modal-header");
+    const html = "ID: " + escapeHtml(session.id)
+      + "<br/>" + "HTTP ID: " + escapeHtml(session.httpId)
+      + "<br/>" + window["component.session-listing.firstURI"] + ": " + escapeHtml(session.firstURI)
+      + "<br/>" + window["component.session-listing.firstUserAgent"] + ": " + escapeHtml(session.firstUserAgent)
+      + "<br/>" + window["component.session-listing.lastURI"] + ": " + escapeHtml(session.lastURI);
     header.find(".modal-title").html(html);
     header.show();
-    var content = "";
-    for (var line of stacktrace) {
+    let content = "";
+    for (const line of stacktrace) {
       content += line.class + "." + line.method + " (" + line.file + ":" + line.line + ")\n";
     }
     dialog.html(content);
+
+    // show modal
+    const modalEl = document.getElementById('stacktraceModal');
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modal.show();
   },
 
-  getSession: function(id) {
-    for (var session of mycore.session.listing.sessions) {
-      if (session.id == id) {
+  getSession: function (id) {
+    for (const session of mycore.session.listing.sessions) {
+      if (session.id === id) {
         return session;
       }
     }
@@ -212,10 +217,10 @@ mycore.session.listing = {
   },
 
   onFilterChange: function() {
-    var filter = $("#sessionListingFilter").val().toLowerCase();
+    const filter = $("#sessionListingFilter").val().toLowerCase();
     mycore.session.listing.filteredSessions = mycore.session.listing.sessions.slice();
-    if (filter == null || filter != "") {
-      for (var session of mycore.session.listing.sessions) {
+    if (filter == null || filter !== "") {
+      for (const session of mycore.session.listing.sessions) {
         if (session.id.toLowerCase().indexOf(filter) > -1 ||
           session.login.toLowerCase().indexOf(filter) > -1 ||
           (session.realName != null && session.realName.toLowerCase().indexOf(filter) > -1) ||
@@ -223,18 +228,18 @@ mycore.session.listing = {
           (session.hostname != null && session.hostname.toLowerCase().indexOf(filter) > -1)) {
           continue;
         }
-        var foundInStracktrace = false;
-        for (var line of session.constructingStacktrace.stacktrace) {
+        let foundInStacktrace = false;
+        for (const line of session.constructingStacktrace.stacktrace) {
           if (line.class.toLowerCase().indexOf(filter) > -1 ||
             line.file.toLowerCase().indexOf(filter) > -1 ||
             line.method.toLowerCase().indexOf(filter) > -1 ||
             line.line.toString().indexOf(filter) > -1) {
-            foundInStracktrace = true;
+            foundInStacktrace = true;
             break;
           }
         }
-        if (!foundInStracktrace) {
-          var index = mycore.session.listing.filteredSessions.indexOf(session);
+        if (!foundInStacktrace) {
+          const index = mycore.session.listing.filteredSessions.indexOf(session);
           mycore.session.listing.filteredSessions.splice(index, 1);
         }
       }
@@ -243,7 +248,7 @@ mycore.session.listing = {
   },
 
   onHostnameResolvingChange: function() {
-    var resolveHostname = $("#sessionListingResolveHostname").is(':checked');
+    const resolveHostname = $("#sessionListingResolveHostname").is(':checked');
     mycore.session.listing.load(resolveHostname);
   }
 
