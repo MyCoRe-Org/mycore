@@ -3,7 +3,6 @@ import type {IncomingMessage} from "./model/messages.ts";
 import RegistryComponent from "./components/RegistryComponent.vue";
 import SettingsModal from "./components/SettingsModal.vue";
 import {Registry} from "./model/model.ts";
-import {Util} from "./common/util.ts";
 import {ref, useTemplateRef} from "vue";
 
 const socketURL: string = getSocketURL();
@@ -20,10 +19,11 @@ function getSocketURL() {
   if (import.meta.env.DEV) {
     // in dev mode connect to a local mir
     return "ws://localhost:8291/mir/ws/mycore-webtools/processing";
-  } else {
-    const protocol = location.protocol === "https:" ? "wss://" : "ws://";
-    return protocol + location.host + Util.getBasePath() + "/ws/mycore-webtools/processing";
   }
+  const wsProtocol = location.protocol === "https:" ? "wss://" : "ws://";
+  const {pathname} = new URL(mycore.webApplicationBaseURL);
+  const basePath = pathname === "/" ? "" : pathname.replace(/\/$/, "");
+  return `${wsProtocol}${location.host}${basePath}/ws/mycore-webtools/processing`;
 }
 
 function send(message: string) {

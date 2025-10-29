@@ -72,18 +72,6 @@ export class Collection {
    */
   public propertyKeys: string[] = [];
 
-  /**
-   * Returns the amount of processables with the status === 'created' of this collection.
-   *
-   * @returns array of processables
-   */
-  public getCreatedProcessables(amount: number): Processable[] {
-    if (amount >= this.createdProcessables.length) {
-      return this.createdProcessables;
-    }
-    return this.createdProcessables.slice(0, amount);
-  }
-
   public updateProcessable(processableMessage: UpdateProcessableMessage): void {
     const oldProcessable = this.processables[processableMessage.id];
     if (oldProcessable == null) {
@@ -91,10 +79,10 @@ export class Collection {
       this.addProcessable(processableMessage);
     } else {
       // update
-      if (oldProcessable.status === 'processing' && processableMessage.status !== 'processing') {
+      if (oldProcessable.status === 'PROCESSING' && processableMessage.status !== 'PROCESSING') {
         Util.remove(this.processingProcessables, oldProcessable);
         this.addProcessable(processableMessage);
-      } else if (oldProcessable.status === 'created' && processableMessage.status !== 'created') {
+      } else if (oldProcessable.status === 'CREATED' && processableMessage.status !== 'CREATED') {
         Util.remove(this.createdProcessables, oldProcessable);
         this.addProcessable(processableMessage);
       } else {
@@ -108,9 +96,9 @@ export class Collection {
     const processable = new Processable();
     Util.mixin(processableMessage, processable);
     this.processables[processableMessage.id] = processable;
-    if (processable.status === 'processing') {
+    if (processable.status === 'PROCESSING') {
       this.processingProcessables.push(processable);
-    } else if (processable.status === 'created') {
+    } else if (processable.status === 'CREATED') {
       this.createdProcessables.push(processable);
     } else {
       const maxNumberOfFinishedProcess = Number.parseInt(Settings.get('maxNumberFinished', 50));
@@ -149,7 +137,7 @@ export class Processable {
 
   public name: string | undefined;
 
-  public status: string | undefined;
+  public status: "CREATED" | "PROCESSING" | "CANCELED" | "FAILED" | "SUCCESSFUL" | undefined;
 
   public user: string | undefined;
 

@@ -16,16 +16,10 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.datamodel.metadata;
+export {};
 
-/**
- * Plugin point for custom actions that need to occur before first deletion steps
- * in the process of deleting an {@link MCRObject}.
- * Compare {@link MCRMetadataManager#delete(MCRObject)}.
- */
-public interface MCRPreDeleteAction {
-
-    default void execute(MCRObjectID id) {
-        // do nothing
-    }
+declare global {
+  const mycore: {
+    webApplicationBaseURL: string;
+  };
 }

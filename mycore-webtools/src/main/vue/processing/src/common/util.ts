@@ -33,12 +33,6 @@ export class Util {
     }
   }
 
-  public static getBasePath() {
-    const pathArray = location.pathname.split('/');
-    pathArray.splice(-3);
-    return pathArray.join('/');
-  }
-
   public static formatDate(timestamp: number | undefined): string {
     if (!timestamp) {
       return "";

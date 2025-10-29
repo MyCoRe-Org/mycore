@@ -29,16 +29,6 @@
       </xsl:for-each>
     </categories>
     <xsl:value-of select="$newline" />
-    <service>
-      <xsl:value-of select="$newline" />
-      <xsl:copy-of select="mycoreclass/service/*" />
-      <xsl:value-of select="$newline" />
-      <!-- include acl if available -->
-      <xsl:variable name="acl" select="document(concat('access:action=all&amp;object=',mycoreclass/@ID))" />
-      <xsl:if test="$acl/*/*">
-        <xsl:copy-of select="$acl" />
-      </xsl:if>
-    </service>
   </mycoreclass>
 </xsl:template>
 
