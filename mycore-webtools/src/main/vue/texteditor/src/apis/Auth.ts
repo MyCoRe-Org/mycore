@@ -22,15 +22,20 @@ export interface JWTResponse {
   token_type: string;
 }
 
+let token: string | undefined = undefined;
+
 export const getAuthorizationHeader = async (mcrApplicationBaseURL: string) => {
+  if (token) {
+    return token;
+  }
   if (import.meta.env.DEV) {
     return "Basic " + btoa('administrator:alleswirdgut');
-  } else {
-    const response = await fetch(`${mcrApplicationBaseURL}rsc/jwt`);
-    const jwt = await response.json() as JWTResponse;
-    if (!jwt.login_success) {
-      throw new Error("Login failed");
-    }
-    return `${jwt.token_type} ${jwt.access_token}`;
   }
+  const response = await fetch(`${mcrApplicationBaseURL}rsc/jwt`);
+  const jwt = await response.json() as JWTResponse;
+  if (!jwt.login_success) {
+    throw new Error("Login failed");
+  }
+  token = `${jwt.token_type} ${jwt.access_token}`;
+  return token;
 }
