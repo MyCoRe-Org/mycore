@@ -25,6 +25,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.SortedSet;
@@ -47,7 +48,6 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRXlink;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
@@ -55,22 +55,25 @@ import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.ifs2.MCRStore;
+import org.mycore.datamodel.ifs2.MCRStoreManager;
+import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRExpandedObjectStructure;
 import org.mycore.datamodel.metadata.MCRMetaDerivateLink;
 import org.mycore.datamodel.metadata.MCRMetaLangText;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
-import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.iview2.services.MCRTileJob;
+import org.mycore.migration.objectversion.MCRObjectMigratorHelper;
+import org.mycore.migration.objectversion.MCRVersioningMetadataStoreMigrator;
 import org.mycore.migration.strategy.MCRChildrenOrderMigrationStrategy;
-import org.mycore.migration.strategy.MCRNeverAddChildrenOrderStrategy;
+import org.tmatesoft.svn.core.SVNException;
 import org.xml.sax.SAXException;
 
 import jakarta.persistence.EntityManager;
@@ -87,6 +90,7 @@ public class MCRMigrationCommands {
     public static final String CHILDREN_ORDER_STRATEGY_PROPERTY = "MCR.Migration.ChildrenOrder.Strategy";
 
     public static final String MIGRATE_NORMALIZED_OBJECT = "migrate to normalized object {0}";
+    public static final String MIGRATE_NORMALIZED_OBJECT_VERSION = "migrate svn store to normalized versioned objects";
 
     @MCRCommand(syntax = MIGRATE_NORMALIZED_OBJECT,
         help = "Migrates an object to a normalized one (MCR-3375). "
@@ -112,71 +116,37 @@ public class MCRMigrationCommands {
         }
 
         // Load the strategy for childrenOrder migration
-        MCRChildrenOrderMigrationStrategy strategy = MCRConfiguration2
-            .getSingleInstanceOf(MCRChildrenOrderMigrationStrategy.class, CHILDREN_ORDER_STRATEGY_PROPERTY)
-            .orElseGet(() -> {
-                LOGGER.info("No strategy configured for '{}', using default: NeverAddChildrenOrderStrategy",
-                    CHILDREN_ORDER_STRATEGY_PROPERTY);
-                return new MCRNeverAddChildrenOrderStrategy();
-            });
+        MCRChildrenOrderMigrationStrategy strategy = MCRObjectMigratorHelper.getChildrenOrderMigrationStrategy();
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Using ChildrenOrderMigrationStrategy: {}", strategy.getClass().getName());
         }
 
         Document oldDocument = document.clone();
-        Element rootElement = document.getRootElement();
-
-        Element structureElement = rootElement.getChild(MCRObjectStructure.XML_NAME);
-        if (structureElement != null) {
-
-            Element derivatesElement = structureElement.getChild(MCRObjectStructure.ELEMENT_DERIVATE_OBJECTS);
-
-            if (derivatesElement != null) {
-                // trigger repair on all derivates to recreate the derivate links in the right direction
-                List<Element> derObjects = derivatesElement.getChildren("derobject");
-                derObjects.stream()
-                        .map(derObject -> derObject.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE))
-                        .map(MCRObjectID::getInstance)
-                        .map(MCRMetadataManager::retrieveMCRDerivate)
-                        .forEach(MCRMetadataManager::fireRepairEvent);
-            }
-
-            Element childrenElement = structureElement.getChild(MCRExpandedObjectStructure.CHILDREN_ELEMENT_NAME);
-            if (childrenElement != null) {
-                if (strategy.shouldAddChildrenOrder(objectID, document)) {
-                    LOGGER.info("Migrating <children> to <childrenOrder> for object {} based on strategy {}",
-                        () -> mcrObjectIDStr, () -> strategy.getClass().getSimpleName());
-                    childrenElement.setName(MCRObjectStructure.CHILDREN_ORDER_ELEMENT_NAME);
-                    List<Element> children = childrenElement.getChildren(MCRObjectStructure.CHILD_ELEMENT_NAME);
-
-                    for (Element child : children) {
-                        child.removeAttribute("title", MCRConstants.XLINK_NAMESPACE);
-                        child.removeAttribute("inherited");
-                    }
-                } else {
-                    LOGGER.info("Skipping <children> migration for object {} based on strategy {}",
-                        () -> mcrObjectIDStr, () -> strategy.getClass().getSimpleName());
-                    // Remove the old <children> element as it's not needed in the normalized structure
-                    // and the strategy decided against migrating it to <childrenOrder>.
-                    // MCRMetadataManager.normalizeObject will handle the structure correctly later.
-                    // However, explicitly removing it here makes the intent clearer for this migration step.
-                    structureElement.removeChild(MCRExpandedObjectStructure.CHILDREN_ELEMENT_NAME);
-                }
-            }
-        }
-
-
-        MCRObject object = new MCRObject(document);
-
-        MCRMetadataManager.validateObject(object);
-        MCRMetadataManager.normalizeObject(object);
-
-        Document afterMigration = object.createXML();
+        Document afterMigration = MCRObjectMigratorHelper.migrateObject(objectID, document, strategy, true, true);
 
         if (!MCRXMLHelper.deepEqual(oldDocument, afterMigration)) {
             LOGGER.info("Object {} has changed after migration... Save it!", mcrObjectIDStr);
             mm.update(objectID, afterMigration, new Date());
+        }
+    }
+
+    @MCRCommand(syntax = MIGRATE_NORMALIZED_OBJECT_VERSION,
+        help = "Migrates all MCRObject metadata (MCR-3375). "
+            + "Uses strategy defined in " + CHILDREN_ORDER_STRATEGY_PROPERTY
+            + " (default: NeverAddChildrenOrderStrategy) to decide if <children> should become <childrenOrder>.",
+        order = 30)
+    public static void migrateNormalizedObjects() throws SVNException, IOException, JDOMException {
+        Collection<String> objectBaseIds = MCRXMLMetadataManager.getInstance().getObjectBaseIds();
+        objectBaseIds.removeIf(id -> id.endsWith("_derivate"));
+        for (String baseId : objectBaseIds) {
+            MCRXMLMetadataManager.getInstance().getHighestStoredID(baseId); //init store
+            MCRStore store = MCRStoreManager.getStore(baseId);
+            LOGGER.info(() -> "MCR store " + baseId + " has been initialized: " + store.getClass().getName());
+            if (store instanceof MCRVersioningMetadataStore versioningStore) {
+                var storeMigrator = new MCRVersioningMetadataStoreMigrator(versioningStore);
+                storeMigrator.migrate();
+            }
         }
     }
 
