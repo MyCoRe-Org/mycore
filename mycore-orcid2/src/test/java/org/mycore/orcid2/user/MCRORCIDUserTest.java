@@ -27,7 +27,6 @@ import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.test.MCRJPAExtension;
 import org.mycore.test.MyCoReTest;
 import org.mycore.user2.MCRUser;
-import org.mycore.user2.MCRUserManager;
 
 @MyCoReTest
 @ExtendWith(MCRJPAExtension.class)
@@ -40,7 +39,6 @@ public class MCRORCIDUserTest {
     @Test
     public void testStoreGetCredentials() {
         MCRUser user = new MCRUser("junit");
-        MCRUserManager.createUser(user);
         MCRORCIDUser orcidUser = new MCRORCIDUser(user);
         assertEquals(0, orcidUser.getCredentials().size());
         final MCRORCIDCredential credential = new MCRORCIDCredential(ACCESS_TOKEN);
@@ -55,7 +53,6 @@ public class MCRORCIDUserTest {
     @Test
     public void testRemoveAllCredentials() {
         MCRUser user = new MCRUser("junit");
-        MCRUserManager.createUser(user);
         MCRORCIDUser orcidUser = new MCRORCIDUser(user);
         final MCRORCIDCredential credential = new MCRORCIDCredential(ACCESS_TOKEN);
         orcidUser.addCredential(ORCID, credential);
@@ -66,5 +63,4 @@ public class MCRORCIDUserTest {
         assertEquals(ORCID, user.getUserAttribute("id_orcid"));
         assertEquals("test", user.getUserAttribute("test"));
     }
-
 }
