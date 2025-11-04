@@ -33,7 +33,7 @@ import org.mycore.test.MyCoReTest;
     @MCRTestProperty(key = "MCR.Metadata.Store.BaseDir", string = "tmp"),
     @MCRTestProperty(key = "MCR.Metadata.Store.SVNBase", string = "/tmp/versions"),
     @MCRTestProperty(key = "MCR.EventHandler.MCRObject.1.Class", classNameOf = MCRXMLMetadataEventHandler.class),
-    @MCRTestProperty(key = "MCR.EventHandler.MCRObject.4.Foo", string = "fooProp"),
+    @MCRTestProperty(key = "MCR.EventHandler.MCRObject.4.Class", string = "class.that.does.not.Exist"),
     @MCRTestProperty(key = "MCR.EventHandler.MCRDerivate.2.Class", classNameOf = MCRXMLMetadataEventHandler.class)
 })
 public class MCREventManagerTest {
@@ -43,7 +43,8 @@ public class MCREventManagerTest {
         try {
             assertNull(MCREventManager.obtainTestInstance(), "Instance should be null before initialization");
         } catch (MCRConfigurationException e) {
-            assertEquals("Configuration property MCR.EventHandler.Mode.Foo is not set.", e.getMessage());
+            assertEquals("Missing class (class.that.does.not.Exist) configured in property: " +
+                "MCR.EventHandler.MCRObject.4.Class", e.getMessage());
         }
     }
 }
