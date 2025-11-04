@@ -131,6 +131,7 @@ public class MCRFileCollection extends MCRDirectory {
         }
     }
 
+    @SuppressWarnings("PMD.ExceptionAsFlowControl")
     protected void saveAdditionalData() throws IOException {
         Path target = path.resolve(DATA_FILE);
         try {
