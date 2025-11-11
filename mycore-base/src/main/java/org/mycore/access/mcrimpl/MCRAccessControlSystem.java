@@ -30,7 +30,6 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.mycore.access.MCRAccessBaseImpl;
-import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -76,14 +75,6 @@ public final class MCRAccessControlSystem extends MCRAccessBaseImpl {
         accessStore = MCRAccessStore.obtainInstance();
         ruleStore = MCRRuleStore.obtainInstance();
         dummyRule = new MCRAccessRule(null, null, null, null, "dummy rule, always true");
-    }
-
-    /**
-     * @deprecated use {@link #getInstance()} instead.
-     */
-    @Deprecated(forRemoval = true)
-    public static MCRRuleAccessInterface instance() {
-        return getInstance();
     }
 
     public static MCRAccessControlSystem getInstance() {
