@@ -43,6 +43,11 @@ public final class MCRSolrCoreManager {
 
     private static Map<String, MCRSolrCore> coreMap;
 
+    // if any of these properties are present for a core, we have to initialize it
+    private static final Set<String> INITIALIZATION_RELEVANT_PROPERTY_SUFFIXES = Set.of(
+        MCRSolrConstants.SOLR_CORE_NAME_SUFFIX,
+        MCRSolrConstants.SOLR_CORE_SERVER_SUFFIX);
+
     static {
         try {
             coreMap = Collections.synchronizedMap(loadCoresFromProperties());
@@ -66,9 +71,18 @@ public final class MCRSolrCoreManager {
             .stream()
             .filter(p -> p.startsWith(MCRSolrConstants.SOLR_CORE_PREFIX))
             .map(cp -> cp.substring(MCRSolrConstants.SOLR_CORE_PREFIX.length()))
+            .filter(prop -> {
+                int indexOfDot = prop.indexOf('.');
+                if (indexOfDot == -1) {
+                    // only the core id without suffix -> skip
+                    return false;
+                }
+                String suffix = prop.substring(indexOfDot);
+                return INITIALIZATION_RELEVANT_PROPERTY_SUFFIXES.contains(suffix);
+            })
             .map(cp -> {
                 int indexOfDot = cp.indexOf('.');
-                return indexOfDot != -1 ? cp.substring(0, indexOfDot) : cp;
+                return cp.substring(0, indexOfDot);
             })
             .distinct()
             .collect(Collectors.toMap(coreID -> coreID, MCRSolrCoreManager::initializeSolrCore));
