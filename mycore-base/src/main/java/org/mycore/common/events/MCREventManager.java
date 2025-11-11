@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -30,7 +29,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationException;
 
 /**
  * Acts as a multiplexer to forward events that are created to all registered
@@ -60,64 +58,33 @@ public final class MCREventManager {
     private MCREventManager() {
         handlers = new ConcurrentHashMap<>();
 
-        // collect all properties like 'MCR.EventHandler.{type}.{number}.{suffix}' where the type is not 'Mode',
-        // which have a special meaning (properties like 'MCR.EventHandler.Mode.{modeName}' are used for handlers
-        // configured as 'MCR.EventHandler.{type}.{number}.{modeName}'), but without the leading 'MCR.EventHandler.'
-        Map<String, String> properties = MCRConfiguration2.getSubPropertiesMap(CONFIG_PREFIX)
-            .entrySet()
-            .stream()
-            .filter(property -> !property.getValue().isBlank())
-            .filter(property -> !property.getKey().startsWith("Mode."))
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        // collect all properties like 'MCR.EventHandler.{type}.{number}.Class,
+        // but without the leading 'MCR.EventHandler.'
+        Map<String, String> propertyKeySuffixes = MCRConfiguration2.getSubPropertiesMap(CONFIG_PREFIX)
+                .entrySet()
+                .stream()
+                .filter(property -> !property.getValue().isBlank())
+                .filter(property -> {
+                    String key = property.getKey();
+                    int indexAfterTypeAndNumber = key.indexOf('.', key.indexOf('.') + 1);
+                    String configPropertySuffix = key.substring(indexAfterTypeAndNumber);
+                    return ".Class".equals(configPropertySuffix);
+                })
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        // collect all properties like 'MCR.EventHandler.{type}.{number}.Class,' which will be directly instantiated,
-        // but still without the leading 'MCR.EventHandler.'
-        Map<String, String> classBasedProperties = properties
-            .entrySet()
-            .stream()
-            .filter(property -> {
-                String key = property.getKey();
-                int indexAfterTypeAndNumber = key.indexOf('.', key.indexOf('.') + 1);
-                String modeOrClassOrConfigPropertySuffix = key.substring(indexAfterTypeAndNumber);
-                return ".Class".equals(modeOrClassOrConfigPropertySuffix);
-            })
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        List<String> propertyKeySuffixList = new ArrayList<>(propertyKeySuffixes.size());
+        propertyKeySuffixList.addAll(propertyKeySuffixes.keySet());
+        Collections.sort(propertyKeySuffixList);
 
-        // collect all properties like 'MCR.EventHandler.{type}.{number}.{suffix}' where the suffix is not 'Class'
-        // and no property like 'MCR.EventHandler.{type}.{number}.Class' with the same type and number exist,
-        // (because such properties are configuration values for the directly instantiated handler, not a
-        // property where the suffix is a mode name), but still without the leading 'MCR.EventHandler.'
-        Map<String, String> modeBasedProperties = properties
-            .entrySet()
-            .stream()
-            .filter(property -> {
-                String key = property.getKey();
-                int indexAfterTypeAndNumber = key.indexOf('.', key.indexOf('.') + 1);
-                String modeOrClassOrConfigPropertySuffix = key.substring(indexAfterTypeAndNumber);
-                String classBasedKey = key.substring(0, indexAfterTypeAndNumber) + ".Class";
-                return !".Class".equals(modeOrClassOrConfigPropertySuffix)
-                    && !classBasedProperties.containsKey(classBasedKey);
-            })
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        for (String propertyKeySuffix : propertyKeySuffixList) {
 
-        // combine both sets of properties, in order
-        List<String> propertyKeyList = new ArrayList<>(classBasedProperties.size() + modeBasedProperties.size());
-        propertyKeyList.addAll(classBasedProperties.keySet());
-        propertyKeyList.addAll(modeBasedProperties.keySet());
-        Collections.sort(propertyKeyList);
-
-        // process properties, add leading 'MCR.EventHandler.' again
-        for (String propertyKeySuffix : propertyKeyList) {
-            String propertyKey = CONFIG_PREFIX + propertyKeySuffix;
-
-            EventHandlerProperty eventHandlerProperty = new EventHandlerProperty(propertyKey);
-            String type = eventHandlerProperty.getType();
-            String mode = eventHandlerProperty.getMode();
+            String fullPropertyKey = CONFIG_PREFIX + propertyKeySuffix;
+            String type = propertyKeySuffix.substring(0, propertyKeySuffix.indexOf('.'));
 
             LOGGER.debug("EventManager instantiating handler {} for type {}",
-                () -> properties.get(propertyKeySuffix), () -> type);
+                () -> propertyKeySuffixes.get(propertyKeySuffix), () -> type);
 
-            addEventHandler(type, getEventHandler(mode, propertyKey));
+            addEventHandler(type, getEventHandler(fullPropertyKey));
 
         }
     }
@@ -339,60 +306,17 @@ public final class MCREventManager {
         return this;
     }
 
-    public MCREventHandler getEventHandler(String mode, String propertyValue) {
-        if (Objects.equals(mode, "Class")) {
-            return MCRConfiguration2.getSingleInstanceOfOrThrow(MCREventHandler.class, propertyValue);
-        }
-        String className = CONFIG_PREFIX + "Mode." + mode;
-        MCREventHandlerInitializer configuredInitializer = MCRConfiguration2.getSingleInstanceOfOrThrow(
-            MCREventHandlerInitializer.class, className);
-        return configuredInitializer.obtainInstance(propertyValue);
-    }
-
-    public interface MCREventHandlerInitializer {
-        MCREventHandler obtainInstance(String propertyValue);
-    }
-
     /**
-     * Parse the property key of event handlers, extract type and mode.
-     *
-     * @see MCREventHandler
-     *
-     * @author Huu Chi Vu
-     *
+     * @deprecated Support for modes other than "Class" has been dropped.
+     * Use {@link #getEventHandler(String)} instead.
      */
-    private static class EventHandlerProperty {
+    @Deprecated(forRemoval = true)
+    public MCREventHandler getEventHandler(String mode, String propertyKey) {
+        return getEventHandler(propertyKey);
+    }
 
-        private String type;
-
-        private String mode;
-
-        EventHandlerProperty(String propertyKey) {
-            String[] splitedKey = propertyKey.split("\\.");
-            if (splitedKey.length != 5) {
-                throw new MCRConfigurationException("Property key " + propertyKey + " for event handler not valid.");
-            }
-
-            this.setType(splitedKey[2]);
-            this.setMode(splitedKey[4]);
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        private void setType(String type) {
-            this.type = type;
-        }
-
-        public String getMode() {
-            return mode;
-        }
-
-        private void setMode(String mode) {
-            this.mode = mode;
-        }
-
+    public MCREventHandler getEventHandler(String propertyKey) {
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCREventHandler.class, propertyKey);
     }
 
     private static final class LazyInstanceHolder {
