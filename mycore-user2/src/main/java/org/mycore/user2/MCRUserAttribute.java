@@ -105,4 +105,9 @@ public class MCRUserAttribute implements Comparable<MCRUserAttribute>, Cloneable
         
         return clone;
     }
+
+    @Override
+    public String toString() {
+        return this.name + ":" + this.value;
+    }
 }
