@@ -97,14 +97,6 @@ public class MCRXPathEvaluator {
         return updatedI18nExpression;
     }
 
-    /**
-     * @deprecated Use {@link #evaluateFirstAsString(String)} instead.
-     */
-    @Deprecated(forRemoval = true)
-    public String evaluateXPath(String xPathExpression) {
-        return evaluateFirstAsString(xPathExpression);
-    }
-
     public String evaluateFirstAsString(String xPathExpression) {
         Object result = evaluateFirst("string(" + xPathExpression + ")");
         return result == null ? "" : (String) result;
