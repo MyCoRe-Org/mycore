@@ -499,7 +499,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     @Transient
     @Override
     public String toString() {
-        return getUserID();
+        return getUserID() + ": " + this.userName + "@" + this.realmID;
     }
 
     @Transient
