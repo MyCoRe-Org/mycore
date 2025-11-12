@@ -12,8 +12,8 @@ import java.util.List;
  */
 public interface MCRLegalEntityService {
 
-    public List<MCRIdentifier> getAllIdentifiers(@NotNull MCRIdentifier identifier);
+    List<MCRIdentifier> getAllIdentifiers(@NotNull MCRIdentifier identifier);
 
-    public void addIdentifier(@NotNull MCRIdentifier primaryIdentifier, @NotNull MCRIdentifier identifierToAdd);
+    void addIdentifier(@NotNull MCRIdentifier primaryIdentifier, @NotNull MCRIdentifier identifierToAdd);
 
 }
