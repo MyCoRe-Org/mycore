@@ -31,7 +31,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.orcid2.MCRORCIDConstants;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.exception.MCRORCIDException;
-import org.mycore.orcid2.util.MCRIdentifier;
+import org.mycore.datamodel.legalentity.MCRIdentifier;
 import org.mycore.orcid2.util.MCRORCIDJSONMapper;
 import org.mycore.orcid2.validation.MCRORCIDValidationHelper;
 import org.mycore.user2.MCRUser;

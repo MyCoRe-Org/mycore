@@ -39,7 +39,7 @@ import org.mycore.orcid2.rest.resources.MCRORCIDRestConstants;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
 import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.orcid2.user.MCRORCIDUserUtils;
-import org.mycore.orcid2.util.MCRIdentifier;
+import org.mycore.datamodel.legalentity.MCRIdentifier;
 import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
 import org.mycore.orcid2.v3.work.MCRORCIDWorkService;
 import org.mycore.orcid2.v3.work.MCRORCIDWorkUtils;
