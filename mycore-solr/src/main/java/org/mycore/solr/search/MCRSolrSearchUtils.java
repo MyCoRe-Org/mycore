@@ -18,13 +18,15 @@
 
 package org.mycore.solr.search;
 
+import static org.mycore.solr.auth.MCRSolrAuthenticationLevel.SEARCH;
 import static org.mycore.solr.search.MCRSolrParameter.FIELD_LIST;
-import static org.mycore.solr.search.MCRSolrParameter.REQUEST_HANDLER;
 import static org.mycore.solr.search.MCRSolrParameter.QUERY;
+import static org.mycore.solr.search.MCRSolrParameter.REQUEST_HANDLER;
 import static org.mycore.solr.search.MCRSolrParameter.ROWS;
 import static org.mycore.solr.search.MCRSolrParameter.START;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,18 +42,19 @@ import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.InputStreamResponseParser;
 import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.SolrParams;
+import org.apache.solr.common.util.NamedList;
 import org.jdom2.Document;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCROrCondition;
 import org.mycore.parsers.bool.MCRSetCondition;
 import org.mycore.services.fieldquery.MCRQuery;
-import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -82,7 +85,7 @@ public final class MCRSolrSearchUtils {
         p.set(ROWS, 1);
         QueryRequest queryRequest = new QueryRequest(p);
         MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
-            MCRSolrAuthenticationLevel.SEARCH);
+            SEARCH);
         QueryResponse response = queryRequest.process(solrClient);
         return response.getResults().isEmpty() ? null : response.getResults().getFirst();
     }
@@ -158,6 +161,25 @@ public final class MCRSolrSearchUtils {
     }
 
     /**
+     * Streams raw xml solr response.
+     *
+     * @param client the client to query
+     * @param params solr parameter
+     * @return stream of the raw xml
+     * @throws SolrServerException Communication with the solr server failed in any way.
+     * @throws IOException If there is a low-level I/O error.
+     */
+    public static InputStream streamRawXML(SolrClient client, SolrParams params)
+        throws SolrServerException, IOException {
+        QueryRequest request = new QueryRequest(params);
+        MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(request, SEARCH);
+        InputStreamResponseParser responseParser = new InputStreamResponseParser("xml");
+        request.setResponseParser(responseParser);
+        NamedList<Object> nl = client.request(request);
+        return (InputStream) nl.get("stream");
+    }
+
+    /**
      * Spliterator for solr documents.
      */
     public static class SolrDocumentSpliterator implements Spliterator<SolrDocument> {
@@ -200,7 +222,7 @@ public final class MCRSolrSearchUtils {
                 try {
                     QueryRequest queryRequest = new QueryRequest(sizeParams);
                     MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
-                        MCRSolrAuthenticationLevel.SEARCH);
+                        SEARCH);
                     QueryResponse response = queryRequest.process(solrClient);
                     this.size = response.getResults().getNumFound();
                 } catch (SolrServerException | IOException e) {
@@ -235,7 +257,7 @@ public final class MCRSolrSearchUtils {
             try {
                 QueryRequest queryRequest = new QueryRequest(params);
                 MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
-                    MCRSolrAuthenticationLevel.SEARCH);
+                    SEARCH);
                 return queryRequest.process(solrClient);
             } catch (SolrServerException | IOException e) {
                 throw new IllegalStateException(e);

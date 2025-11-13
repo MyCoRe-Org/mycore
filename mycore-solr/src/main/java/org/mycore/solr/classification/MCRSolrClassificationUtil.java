@@ -31,7 +31,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClientBase;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.MCRSessionMgr;
@@ -281,7 +280,7 @@ public final class MCRSolrClassificationUtil {
     static void solrDelete(MCRCategoryID id, MCRCategory parent) {
         try {
             // remove all descendants and itself
-            HttpSolrClientBase solrClient = getCore().getClient();
+            SolrClient solrClient = getCore().getClient();
             List<String> toDelete = MCRSolrSearchUtils.listIDs(solrClient,
                 "ancestor:" + encodeCategoryId(id));
             toDelete.add(id.toString());
