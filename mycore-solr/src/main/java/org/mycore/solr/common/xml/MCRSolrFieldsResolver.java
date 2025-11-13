@@ -9,8 +9,8 @@ import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClientBase;
 import org.apache.solr.client.solrj.request.LukeRequest;
 import org.apache.solr.client.solrj.response.LukeResponse;
 import org.apache.solr.common.luke.FieldFlag;
@@ -81,7 +81,7 @@ public class MCRSolrFieldsResolver implements URIResolver {
 
         MCRSolrCore core = mayCore.get();
 
-        HttpSolrClientBase client = core.getClient();
+        SolrClient client = core.getClient();
 
         LukeRequest lukeRequest = new LukeRequest();
         MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(lukeRequest,
