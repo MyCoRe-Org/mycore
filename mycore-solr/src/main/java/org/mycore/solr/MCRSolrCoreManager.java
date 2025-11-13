@@ -21,6 +21,7 @@ package org.mycore.solr;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -71,19 +72,17 @@ public final class MCRSolrCoreManager {
             .stream()
             .filter(p -> p.startsWith(MCRSolrConstants.SOLR_CORE_PREFIX))
             .map(cp -> cp.substring(MCRSolrConstants.SOLR_CORE_PREFIX.length()))
-            .filter(prop -> {
+            .map(prop -> {
                 int indexOfDot = prop.indexOf('.');
                 if (indexOfDot == -1) {
                     // only the core id without suffix -> skip
-                    return false;
+                    return null;
                 }
+                String coreId = prop.substring(0, indexOfDot);
                 String suffix = prop.substring(indexOfDot);
-                return INITIALIZATION_RELEVANT_PROPERTY_SUFFIXES.contains(suffix);
+                return INITIALIZATION_RELEVANT_PROPERTY_SUFFIXES.contains(suffix) ? coreId : null;
             })
-            .map(cp -> {
-                int indexOfDot = cp.indexOf('.');
-                return cp.substring(0, indexOfDot);
-            })
+            .filter(Objects::nonNull)
             .distinct()
             .collect(Collectors.toMap(coreID -> coreID, MCRSolrCoreManager::initializeSolrCore));
     }
