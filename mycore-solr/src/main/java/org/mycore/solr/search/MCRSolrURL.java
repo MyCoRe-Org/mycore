@@ -35,14 +35,19 @@ import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.impl.HttpSolrClientBase;
+import org.apache.solr.common.params.SolrParams;
 
 /**
  * Convenience class for holding the parameters for the solr search url.
  *
+ * @deprecated use {@link MCRSolrSearchUtils#streamRawXML(SolrClient, SolrParams)} instead. <code>MCRSolrURL</code> does
+ *             not use the solrj API and is therefore error-prone and should not be used.
  * @author shermann
  */
+@Deprecated
 public class MCRSolrURL {
     private static final Logger LOGGER = LogManager.getLogger();
 
