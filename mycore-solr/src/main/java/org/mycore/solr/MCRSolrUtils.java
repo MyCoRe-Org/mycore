@@ -100,7 +100,7 @@ public class MCRSolrUtils {
      * Examples:
      * <pre>
      * parseQueryString("q=*:*&rows=10");
-     * parseQueryString("?fq=type:book&fq=lang:de");
+     * parseQueryString("?fq=type&#58;book&fq=lang&#58;de");
      * </pre>
      *
      * @param query the URL-encoded query string, with or without a leading {@code '?'}; may be {@code null}
