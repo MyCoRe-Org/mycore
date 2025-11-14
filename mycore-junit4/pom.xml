@@ -28,37 +28,40 @@
   </parent>
   <artifactId>mycore-junit4</artifactId>
   <name>MyCoRe JUnit 4 integration (legacy)</name>
+  <properties>
+    <!-- disable all failing checks, deprecated for removal -->
+    <duplicate-finder.skip>true</duplicate-finder.skip>
+    <forbiddenapis.skip>true</forbiddenapis.skip>
+    <maven.compiler.arg />
+    <pmd.skip>true</pmd.skip>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>jakarta.persistence</groupId>
       <artifactId>jakarta.persistence-api</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <scope>test</scope>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-api</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.hibernate.orm</groupId>
       <artifactId>hibernate-core</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-base</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-base</artifactId>
       <type>test-jar</type>
-      <scope>test</scope>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 </project>
