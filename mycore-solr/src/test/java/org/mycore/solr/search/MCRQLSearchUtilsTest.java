@@ -21,6 +21,7 @@ package org.mycore.solr.search;
 import static org.junit.Assert.assertEquals;
 
 import org.apache.logging.log4j.LogManager;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.junit.Test;
@@ -41,12 +42,14 @@ public class MCRQLSearchUtilsTest extends MCRTestCase {
     @Test
     public final void testGetSolrQuery() {
         MCRQuery andQuery = getMCRQuery("(state = \"submitted\") AND (state = \"published\")");
-        assertEquals("+state:\"submitted\" +state:\"published\"",
-            MCRSolrSearchUtils.getSolrQuery(andQuery, andQuery.buildXML(), null).getQuery());
-        //MCR-994
+        String expectedAnd = ClientUtils.escapeQueryChars("+state:\"submitted\" +state:\"published\"");
+        assertEquals(expectedAnd,
+                MCRSolrSearchUtils.getSolrQuery(andQuery, andQuery.buildXML(), null).getQuery());
+
         MCRQuery orQuery = getMCRQuery("(state = \"submitted\") OR (state = \"published\")");
-        assertEquals("+(state:\"submitted\" state:\"published\")",
-            MCRSolrSearchUtils.getSolrQuery(orQuery, orQuery.buildXML(), null).getQuery());
+        String expectedOr = ClientUtils.escapeQueryChars("+(state:\"submitted\" state:\"published\")");
+        assertEquals(expectedOr,
+                MCRSolrSearchUtils.getSolrQuery(orQuery, orQuery.buildXML(), null).getQuery());
     }
 
     private MCRQuery getMCRQuery(String mcrql) {

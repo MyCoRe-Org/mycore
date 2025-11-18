@@ -36,6 +36,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.parsers.bool.MCRAndCondition;
@@ -270,6 +271,7 @@ public class MCRConditionTransformer {
     public static SolrQuery getSolrQuery(@SuppressWarnings("rawtypes") MCRCondition condition, List<MCRSortBy> sortBy,
         int maxResults, List<String> returnFields) {
         String queryString = getQueryString(condition);
+        queryString = ClientUtils.escapeQueryChars(queryString);
         SolrQuery q = applySortOptions(new SolrQuery(queryString), sortBy);
         q.setIncludeScore(true);
         q.setRows(maxResults == 0 ? Integer.MAX_VALUE : maxResults);
