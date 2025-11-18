@@ -135,7 +135,7 @@ public class MCRUserServlet extends MCRServlet {
         if (currentUser == null) {
             String uid = userID == null ? MCRSessionMgr.getCurrentSession().getUserInformation().getUserID() : userID;
             String msg = MCRTranslation.translate("component.user2.UserServlet.currentUserUnknown", uid);
-            res.sendError(HttpServletResponse.SC_FORBIDDEN, msg);
+            res.sendError(HttpServletResponse.SC_NOT_FOUND, msg);
             return false;
         }
         return true;
