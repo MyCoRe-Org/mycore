@@ -34,6 +34,7 @@ import javax.naming.OperationNotSupportedException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRExpandedObjectManager;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
@@ -41,7 +42,9 @@ import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.datamodel.metadata.MCRExpandedObject;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
@@ -500,16 +503,24 @@ public final class MCRLinkTableManager {
         create(obj);
     }
 
-    public void create(MCRBase obj) {
-        Collection<MCRCategoryID> categoryList = getCategories(obj);
-
-        MCRCategLinkReference objectReference = new MCRCategLinkReference(obj.getId());
-        MCRCategLinkServiceFactory.obtainInstance().setLinks(objectReference, categoryList);
-
-        Collection<MCRLinkReference> links = getLinks(obj);
+    public void create(MCRBase base) {
+        Collection<MCRLinkReference> links = getLinks(base);
+        // add links so they are in the link table to use them to expand objects
         links.forEach(link -> {
             addReferenceLink(link.from, link.to, link.type, link.attr);
         });
+
+        Collection<MCRCategoryID> categoryList;
+        if (base instanceof MCRObject obj) {
+            MCRExpandedObject expandedObject = MCRExpandedObjectManager.getInstance()
+                .getExpandedObject(obj);
+            categoryList = getCategories(expandedObject);
+        } else {
+            categoryList = getCategories(base);
+        }
+
+        MCRCategLinkReference objectReference = new MCRCategLinkReference(base.getId());
+        MCRCategLinkServiceFactory.obtainInstance().setLinks(objectReference, categoryList);
     }
 
     public Collection<MCRCategoryID> getCategories(MCRBase obj) {

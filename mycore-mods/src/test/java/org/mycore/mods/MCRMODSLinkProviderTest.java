@@ -18,6 +18,12 @@
 
 package org.mycore.mods;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.List;
+
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,12 +41,6 @@ import org.mycore.test.MCRJPAExtension;
 import org.mycore.test.MCRMetadataExtension;
 import org.mycore.test.MyCoReTest;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 @MyCoReTest
 @ExtendWith(MCRJPAExtension.class)
 @ExtendWith(MCRMetadataExtension.class)
@@ -56,6 +56,13 @@ public class MCRMODSLinkProviderTest {
      */
     @Test
     public void testHandleObjectCreatedModsperson() throws IOException, JDOMException, MCRAccessException {
+        URL url =
+            MCRObjectMetadataTest.class.getResource("/MCRMODSLinksEventHandlerTest/junit_modsperson_00000001.xml");
+        Document doc = new MCRURLContent(url).asXML();
+        MCRObject obj = new MCRObject(doc);
+
+        MCRMetadataManager.create(obj);
+
         URL url1 = MCRObjectMetadataTest.class.getResource("/MCRMODSLinksEventHandlerTest/junit_mods_00000001.xml");
         Document doc1 = new MCRURLContent(url1).asXML();
         MCRObject obj1 = new MCRObject(doc1);

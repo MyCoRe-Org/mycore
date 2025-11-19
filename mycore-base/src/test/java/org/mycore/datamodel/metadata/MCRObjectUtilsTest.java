@@ -31,6 +31,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.access.MCRAccessException;
 import org.mycore.backend.hibernate.MCRHIBLinkTableStore;
+import org.mycore.common.MCRExpandedObjectCacheEventHandler;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.events.MCREvent.ObjectType;
@@ -70,6 +71,7 @@ public class MCRObjectUtilsTest {
         MCREventManager.getInstance().clear();
         MCREventManager.getInstance().addEventHandler(ObjectType.OBJECT, new MCRXMLMetadataEventHandler());
         MCREventManager.getInstance().addEventHandler(ObjectType.OBJECT, new MCRLinkTableEventHandler());
+        MCREventManager.getInstance().addEventHandler(ObjectType.OBJECT, new MCRExpandedObjectCacheEventHandler());
         root = createObject("test_document_00000001", null);
         l11 = createObject("test_document_00000002", root.getId());
         l12 = createObject("test_document_00000003", root.getId());

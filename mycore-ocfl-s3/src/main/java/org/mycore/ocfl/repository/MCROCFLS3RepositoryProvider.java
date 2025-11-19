@@ -209,7 +209,7 @@ public class MCROCFLS3RepositoryProvider implements MCROCFLRepositoryProvider {
     /**
      * Holds S3 configuration settings such as credentials, bucket, and repository prefix.
      */
-    public static class S3Settings {
+    public static final class S3Settings {
 
         @MCRProperty(name = "Endpoint")
         public String endpoint;
@@ -231,7 +231,7 @@ public class MCROCFLS3RepositoryProvider implements MCROCFLRepositoryProvider {
     /**
      * Holds AWS credentials for accessing S3 storage.
      */
-    public static class S3CredentialSettings {
+    public static final class S3CredentialSettings {
 
         @MCRProperty(name = "AccessKeyId")
         public String accessKeyId;
@@ -245,7 +245,7 @@ public class MCROCFLS3RepositoryProvider implements MCROCFLRepositoryProvider {
      * Holds S3 client-specific settings such as timeouts and concurrency limits.
      * TODO: should work directly with Integer and without getters -> mycore does not support this yet!
      */
-    public static class S3ClientSettings {
+    public static final class S3ClientSettings {
 
         @MCRProperty(name = "ConnectionAcquisitionTimeout")
         public String connectionAcquisitionTimeout;
