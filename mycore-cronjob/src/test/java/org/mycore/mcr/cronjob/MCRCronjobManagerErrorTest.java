@@ -18,14 +18,14 @@
 
 package org.mycore.mcr.cronjob;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.processing.impl.MCRCentralProcessableRegistry;
 import org.mycore.test.MyCoReTest;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @MyCoReTest
 @MCRTestConfiguration(properties = {
