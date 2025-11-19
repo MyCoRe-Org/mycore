@@ -23,7 +23,7 @@ import java.util.Set;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.metadata.MCRORCIDPutCodeInfo;
-import org.mycore.orcid2.util.MCRIdentifier;
+import org.mycore.datamodel.legalentity.MCRIdentifier;
 import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
 import org.mycore.orcid2.work.MCRORCIDWorkEventHandler;
 import org.orcid.jaxb.model.v3.release.record.Work;
