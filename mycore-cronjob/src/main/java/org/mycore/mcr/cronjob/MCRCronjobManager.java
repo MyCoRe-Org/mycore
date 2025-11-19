@@ -119,12 +119,12 @@ public final class MCRCronjobManager implements MCRShutdownHandler.Closeable {
                     try {
                         LOGGER.info(() -> "Execute job " + job.getID() + " - " + job.getDescription());
                         job.run();
+                    } catch (Exception ex) {
+                        LOGGER.error(() -> "Error while executing job " + job.getID() + " " + job.getDescription(), ex);
+                    } finally {
                         this.processableCollection.remove(job.getProcessable());
                         // schedule next run with a fresh instance of the same job
                         scheduleNextRun(toJob(job.getProperty()));
-                    } catch (Exception ex) {
-                        LOGGER.error(() -> "Error while executing job " + job.getID() + " " + job.getDescription(), ex);
-                        this.processableCollection.remove(job.getProcessable());
                     }
                 }, next, TimeUnit.MILLISECONDS);
             }
