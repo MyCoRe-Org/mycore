@@ -19,8 +19,10 @@
 package org.mycore.csl;
 
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -54,6 +56,22 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
 
     private boolean unsorted;
 
+    public enum Language {
+        en("en-US"),
+        de("de-DE"),
+        defaultLanguage("en-US");
+
+        private String lCode;
+
+        Language(String l) {
+            this.lCode = l;
+        }
+
+        public String toString() {
+            return this.lCode;
+        }
+    }
+
     @Override
     public void init(String id) {
         super.init(id);
@@ -75,29 +93,32 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
         return null;
     }
 
-    private MCRCSLTransformerInstance getTransformerInstance(String style, String format) {
+    private MCRCSLTransformerInstance getTransformerInstance(String style, String format, Language language) {
         synchronized (transformerInstances) {
-            if (!getStyleFormatTransformerStack(style, format).isEmpty()) {
-                return transformerInstances.get(mapKey(style, format)).pop();
+            if (getStyleFormatTransformerStack(style, format, language).isEmpty()) {
+                return transformerInstances.get(mapKey(style, format, language)).pop();
             }
         }
 
         AtomicReference<MCRCSLTransformerInstance> instance = new AtomicReference<>();
         final MCRCSLTransformerInstance newInstance = new MCRCSLTransformerInstance(style, format,
-            () -> returnTransformerInstance(instance.get(), style, format), createItemDataProvider());
+            () -> returnTransformerInstance(instance.get(), style, format, language), createItemDataProvider(),
+            language);
         instance.set(newInstance);
         return newInstance;
     }
 
-    private Deque<MCRCSLTransformerInstance> getStyleFormatTransformerStack(String style, String format) {
-        return transformerInstances.computeIfAbsent(mapKey(style, format), (a) -> new ArrayDeque<>());
+    private Deque<MCRCSLTransformerInstance> getStyleFormatTransformerStack(String style, String format,
+        Language language) {
+        return transformerInstances.computeIfAbsent(mapKey(style, format, language), (a) -> new ArrayDeque<>());
     }
 
-    private String mapKey(String style, String format) {
-        return style + "_" + format;
+    private String mapKey(String style, String format, Language language) {
+        return style + "_" + format + "_" + language;
     }
 
-    private void returnTransformerInstance(MCRCSLTransformerInstance instance, String style, String format) {
+    private void returnTransformerInstance(MCRCSLTransformerInstance instance, String style, String format,
+        Language language) {
         try {
             instance.getCitationProcessor().reset();
             instance.getDataProvider().reset();
@@ -108,7 +129,7 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
         }
         synchronized (transformerInstances) {
             final Deque<MCRCSLTransformerInstance> styleFormatTransformerStack = getStyleFormatTransformerStack(style,
-                format);
+                format, language);
             if (!styleFormatTransformerStack.contains(instance)) {
                 styleFormatTransformerStack.push(instance);
             }
@@ -119,7 +140,16 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
     public MCRContent transform(MCRContent bibtext, MCRParameterCollector parameter) {
         final String format = parameter != null ? parameter.getParameter("format", configuredFormat) : configuredFormat;
         final String style = parameter != null ? parameter.getParameter("style", configuredStyle) : configuredStyle;
-        try (MCRCSLTransformerInstance transformerInstance = getTransformerInstance(style, format)) {
+        final String language = parameter != null ? parameter.getParameter("lang", Language.en.name())
+                                                  : Language.en.name();
+
+        Optional<Language> lang = Arrays
+            .stream(Language.values())
+            .filter(e -> e.name().equals(language))
+            .findFirst();
+
+        try (MCRCSLTransformerInstance transformerInstance = getTransformerInstance(style, format,
+            lang.isPresent() ? lang.get() : Language.defaultLanguage)) {
             final CSL citationProcessor = transformerInstance.getCitationProcessor();
             final MCRItemDataProvider dataProvider = transformerInstance.getDataProvider();
 
