@@ -18,11 +18,11 @@
 
 package org.mycore.csl;
 
-import java.io.IOException;
-
+import de.undercouch.citeproc.CSL;
+import de.undercouch.citeproc.DefaultLocaleProvider;
 import org.mycore.common.config.MCRConfigurationException;
 
-import de.undercouch.citeproc.CSL;
+import java.io.IOException;
 
 public class MCRCSLTransformerInstance implements AutoCloseable {
 
@@ -34,15 +34,21 @@ public class MCRCSLTransformerInstance implements AutoCloseable {
 
     public MCRCSLTransformerInstance(String style, String format, AutoCloseable closeable,
         MCRItemDataProvider dataProvider) {
+        this(style, format, closeable, dataProvider, MCRCSLTransformer.Language.defaultLanguage);
+    }
+
+    public MCRCSLTransformerInstance(String style, String format, AutoCloseable closeable,
+        MCRItemDataProvider dataProvider, MCRCSLTransformer.Language language) {
         this.closeable = closeable;
         this.dataProvider = dataProvider;
+
         try {
-            this.citationProcessor = new CSL(this.dataProvider, style);
+            this.citationProcessor = new CSL(this.dataProvider, new DefaultLocaleProvider(), null, style,
+                language.toString());
         } catch (IOException e) {
             throw new MCRConfigurationException("Error while creating CSL with Style " + style, e);
         }
         this.citationProcessor.setOutputFormat(format);
-
     }
 
     public CSL getCitationProcessor() {
