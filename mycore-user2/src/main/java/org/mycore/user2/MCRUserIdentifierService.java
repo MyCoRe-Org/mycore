@@ -47,11 +47,12 @@ public class MCRUserIdentifierService implements MCRLegalEntityService {
     }
 
     /**
-     * Gets a user's {@link MCRIdentifier MCRIdentifiers} of a specified type by its {@link MCRUser#getUserID() user ID}.
+     * Gets a user's {@link MCRIdentifier MCRIdentifiers} of a specified type by its
+     * {@link MCRUser#getUserID() user ID}.
      * @param userId the user id
      * @param identifierType the type of identifier to filter for, without prefix
-     * @return all identifiers of the specified type containing the prefix {@link MCRUserIdentifierService#ATTR_ID_PREFIX}
-     * or an empty set. prefix is stripped
+     * @return all identifiers of the specified type containing the prefix
+     * {@link MCRUserIdentifierService#ATTR_ID_PREFIX} or an empty set. prefix is stripped
      */
     @Override
     public Set<MCRIdentifier> getTypedIdentifiers(MCRIdentifier userId, String identifierType) {
