@@ -20,6 +20,7 @@ package org.mycore.csl;
 
 import de.undercouch.citeproc.CSL;
 import de.undercouch.citeproc.output.Bibliography;
+import org.apache.logging.log4j.LogManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
@@ -117,7 +118,7 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
     }
 
     private String mapKey(String style, String format, Language language) {
-        return style + "_" + format + "_" + language;
+        return style + "_" + format + "_" + language.toString();
     }
 
     private void returnTransformerInstance(MCRCSLTransformerInstance instance, String style, String format,
@@ -125,8 +126,14 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
         try {
             instance.getCitationProcessor().reset();
             instance.getDataProvider().reset();
+            if ("xml".equals(format)) {
+                instance.getCitationProcessor().setOutputFormat(new MCRCSLXMLOutputFormat());
+            } else {
+                instance.getCitationProcessor().setOutputFormat(format);
+            }
         } catch (RuntimeException e) {
             // if an error happens the instances may be not reset, so we trow away the instance
+            LogManager.getLogger().error("Error while resetting transformer instance", e);
             return;
         }
         synchronized (transformerInstances) {
