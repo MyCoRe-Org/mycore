@@ -24,6 +24,8 @@ import org.mycore.common.config.MCRConfigurationException;
 
 import java.io.IOException;
 
+import static org.mycore.csl.MCRCSLTransformer.DEFAULT_LOCALE;
+
 public class MCRCSLTransformerInstance implements AutoCloseable {
 
     private final AutoCloseable closeable;
@@ -34,7 +36,7 @@ public class MCRCSLTransformerInstance implements AutoCloseable {
 
     public MCRCSLTransformerInstance(String style, String format, AutoCloseable closeable,
         MCRItemDataProvider dataProvider) {
-        this(style, format, closeable, dataProvider, MCRCSLTransformer.Language.defaultLanguage);
+        this(style, format, closeable, dataProvider, MCRCSLTransformer.Language.valueOf(DEFAULT_LOCALE));
     }
 
     public MCRCSLTransformerInstance(String style, String format, AutoCloseable closeable,

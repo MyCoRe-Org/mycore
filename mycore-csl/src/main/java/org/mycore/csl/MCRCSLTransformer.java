@@ -20,7 +20,6 @@ package org.mycore.csl;
 
 import de.undercouch.citeproc.CSL;
 import de.undercouch.citeproc.output.Bibliography;
-import org.apache.logging.log4j.LogManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
@@ -36,6 +35,8 @@ import java.util.Stack;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class MCRCSLTransformer extends MCRParameterizedTransformer {
+
+    static final String DEFAULT_LOCALE = MCRConfiguration2.getStringOrThrow("MCR.CSL.defaultLocale");
 
     public static final String DEFAULT_FORMAT = "text";
 
@@ -59,10 +60,13 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
         transformerInstances = new HashMap<>();
     }
 
+    /**
+     * Language enumeration for setting the default locale/language for the CSL instance. Default can be set
+     * by property MCR.CSL.defaultLocale
+     * */
     public enum Language {
         en("en-US"),
-        de("de-DE"),
-        defaultLanguage("en-US");
+        de("de-DE");
 
         private String lCode;
 
@@ -132,8 +136,7 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
                 instance.getCitationProcessor().setOutputFormat(format);
             }
         } catch (RuntimeException e) {
-            // if an error happens the instances may be not reset, so we trow away the instance
-            LogManager.getLogger().error("Error while resetting transformer instance", e);
+            // if an error happens the instances may be not reset, so we throw away the instance
             return;
         }
         synchronized (transformerInstances) {
@@ -149,8 +152,8 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
     public MCRContent transform(MCRContent bibtext, MCRParameterCollector parameter) {
         final String format = parameter != null ? parameter.getParameter("format", configuredFormat) : configuredFormat;
         final String style = parameter != null ? parameter.getParameter("style", configuredStyle) : configuredStyle;
-        final String language = parameter != null ? parameter.getParameter("lang", Language.en.name())
-                                                  : Language.en.name();
+        final String language = parameter != null ? parameter.getParameter("lang", null) : null;
+
 
         Optional<Language> lang = Arrays
             .stream(Language.values())
@@ -158,7 +161,7 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
             .findFirst();
 
         try (MCRCSLTransformerInstance transformerInstance = getTransformerInstance(style, format,
-            lang.isPresent() ? lang.get() : Language.defaultLanguage)) {
+            lang.isPresent() ? lang.get() : Language.valueOf(DEFAULT_LOCALE))) {
             final CSL citationProcessor = transformerInstance.getCitationProcessor();
             final MCRItemDataProvider dataProvider = transformerInstance.getDataProvider();
 

@@ -20,7 +20,12 @@ public class MCRCSLXMLOutputFormat extends HtmlFormat {
 
     @Override
     protected String escape(String str) {
-        return str.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+        return str
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll("\"", "&quot;")
+            .replaceAll("'", "&apos;");
     }
 
     @Override
