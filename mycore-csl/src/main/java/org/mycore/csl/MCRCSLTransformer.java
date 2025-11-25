@@ -27,6 +27,8 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
+import de.undercouch.citeproc.CSL;
+import de.undercouch.citeproc.output.Bibliography;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
@@ -38,6 +40,8 @@ import de.undercouch.citeproc.CSL;
 import de.undercouch.citeproc.output.Bibliography;
 
 public class MCRCSLTransformer extends MCRParameterizedTransformer {
+
+    static final String DEFAULT_LOCALE = MCRConfiguration2.getStringOrThrow("MCR.CSL.defaultLocale");
 
     public static final String DEFAULT_FORMAT = "text";
 
@@ -59,8 +63,7 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
 
     public enum Language {
         en("en-US"),
-        de("de-DE"),
-        defaultLanguage("en-US");
+        de("de-DE");
 
         private String lCode;
 
@@ -147,8 +150,8 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
     public MCRContent transform(MCRContent bibtext, MCRParameterCollector parameter) {
         final String format = parameter != null ? parameter.getParameter("format", configuredFormat) : configuredFormat;
         final String style = parameter != null ? parameter.getParameter("style", configuredStyle) : configuredStyle;
-        final String language = parameter != null ? parameter.getParameter("lang", Language.en.name())
-                                                  : Language.en.name();
+        final String language = parameter != null ? parameter.getParameter("lang", null) : null;
+
 
         Optional<Language> lang = Arrays
             .stream(Language.values())
@@ -156,7 +159,7 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
             .findFirst();
 
         try (MCRCSLTransformerInstance transformerInstance = getTransformerInstance(style, format,
-            lang.isPresent() ? lang.get() : Language.defaultLanguage)) {
+            lang.isPresent() ? lang.get() : Language.valueOf(DEFAULT_LOCALE))) {
             final CSL citationProcessor = transformerInstance.getCitationProcessor();
             final MCRItemDataProvider dataProvider = transformerInstance.getDataProvider();
 
