@@ -103,6 +103,9 @@ public class MCRSolrQueryResolver implements URIResolver {
     }
 
     private void printMismatchWarning(String href) {
-        LOGGER.warn("The uri {} is probably not encoded correctly. See (MCR-2872)", href);
+        LOGGER.warn(
+            "The uri {} is probably not encoded correctly. See (MCR-2872) or the javadoc of MCRSolrQueryResolver.",
+            href);
     }
+
 }
