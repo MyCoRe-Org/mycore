@@ -99,8 +99,10 @@ public class MCRUser2MODSPersonIdentifierService implements MCRLegalEntityServic
         try {
             MCRMetadataManager.update(modspersonOptional.get());
         } catch (MCRAccessException | MCRPersistenceException e) {
-            LOGGER.warn("Could not update modsperson object for user id {}",
-                userId.getValue(), e);
+            if (LOGGER.isWarnEnabled()) {
+                LOGGER.warn("Could not update modsperson object for user id {}",
+                    userId.getValue(), e);
+            }
         }
     }
 
@@ -152,8 +154,10 @@ public class MCRUser2MODSPersonIdentifierService implements MCRLegalEntityServic
             MCRObject modsperson = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(modspersonId));
             return Optional.of(modsperson);
         } catch (MCRPersistenceException e) {
-            LOGGER.warn("Could not retrieve modsperson object for user id {} (modspersonId={})",
-                userId.getValue(), modspersonId, e);
+            if (LOGGER.isWarnEnabled()) {
+                LOGGER.warn("Could not retrieve modsperson object for user id {} (modspersonId={})",
+                    userId.getValue(), modspersonId, e);
+            }
             return Optional.empty();
         }
     }
