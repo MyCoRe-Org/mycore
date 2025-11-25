@@ -18,13 +18,7 @@
 
 package org.mycore.solr.common.xml;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.Objects;
+import java.io.InputStream;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,16 +28,15 @@ import javax.xml.transform.URIResolver;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.impl.HttpSolrClientBase;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.common.params.CommonParams;
+import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRByteContent;
-import org.mycore.services.http.MCRHttpUtils;
 import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.MCRSolrCoreManager;
 import org.mycore.solr.MCRSolrUtils;
-import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
-import org.mycore.solr.auth.MCRSolrAuthenticationManager;
-import org.mycore.solr.search.MCRSolrURL;
+import org.mycore.solr.search.MCRSolrSearchUtils;
 
 /**
  * <pre>
@@ -75,80 +68,44 @@ public class MCRSolrQueryResolver implements URIResolver {
             + REQUEST_HANDLER_QUALIFIER + ":(?<" + REQUEST_HANDLER_GROUP_NAME + ">[^/:\\\\]+):)?(?<"
             + QUERY_GROUP_NAME + ">.+)\\z");
 
-    // TODO: remove this pattern in 2023.06 release
-    private static final Pattern OLD_URI_PATTERN = Pattern
-        .compile("\\Asolr:((?!" + REQUEST_HANDLER_QUALIFIER + ")(?<" + CORE_GROUP_NAME + ">[a-zA-Z0-9-_]+):)?("
-            + REQUEST_HANDLER_QUALIFIER + ":(?<" + REQUEST_HANDLER_GROUP_NAME + ">[a-zA-Z0-9-_]+):)?(?<"
-            + QUERY_GROUP_NAME + ">.+)\\z");
-
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public Source resolve(String href, String base) {
-        Matcher matcher = OLD_URI_PATTERN.matcher(href);
-        Matcher newMatcher = URI_PATTERN.matcher(href);
+        Matcher matcher = URI_PATTERN.matcher(href);
 
-        if (matcher.matches()) {
-            Optional<String> core = Optional.ofNullable(matcher.group(CORE_GROUP_NAME));
-            Optional<String> requestHandler = Optional.ofNullable(matcher.group(REQUEST_HANDLER_GROUP_NAME));
-            Optional<String> query = Optional.ofNullable(matcher.group(QUERY_GROUP_NAME));
+        if (!matcher.matches()) {
+            printMismatchWarning(href);
+            throw new IllegalArgumentException("Did not understand uri: " + href);
+        }
+        Optional<String> core = Optional.ofNullable(matcher.group(CORE_GROUP_NAME));
+        Optional<String> requestHandler = Optional.ofNullable(matcher.group(REQUEST_HANDLER_GROUP_NAME));
+        Optional<String> query = Optional.ofNullable(matcher.group(QUERY_GROUP_NAME));
 
-            if (!newMatcher.matches()) {
-                printMismatchWarning(href);
-            } else {
-                String newCore = newMatcher.group(CORE_GROUP_NAME);
-                String newRequestHandler = newMatcher.group(REQUEST_HANDLER_GROUP_NAME);
-                String newQuery = newMatcher.group(QUERY_GROUP_NAME);
-                if (!Objects.equals(core.orElse(null), newCore) ||
-                    !Objects.equals(requestHandler.orElse(null), newRequestHandler) ||
-                    !Objects.equals(query.orElse(null), newQuery)) {
-                    printMismatchWarning(href);
-                }
-            }
-
-            HttpSolrClientBase client = core.flatMap(MCRSolrCoreManager::get)
-                .map(MCRSolrCore::getClient)
-                .orElse((HttpSolrClientBase) MCRSolrCoreManager.getMainSolrClient());
-
-            if (query.isPresent()) {
-                MCRSolrURL solrURL = new MCRSolrURL(client, query.get());
-                requestHandler.map("/"::concat).ifPresent(solrURL::setRequestHandler);
-
-                URI solrRequestURI;
-                try {
-                    solrRequestURI = solrURL.getUrl().toURI();
-                } catch (URISyntaxException e) {
-                    throw new IllegalArgumentException("Could not create URI from " + solrURL.getUrl(), e);
-                }
-
-                HttpRequest.Builder solrRequestBuilder = MCRSolrUtils.getRequestBuilder().uri(solrRequestURI);
-
-                MCRSolrAuthenticationManager.obtainInstance()
-                    .applyAuthentication(solrRequestBuilder, MCRSolrAuthenticationLevel.SEARCH);
-
-                try (HttpClient httpClient = MCRHttpUtils.getHttpClient()) {
-                    HttpRequest solrRequest = solrRequestBuilder.build();
-                    HttpResponse<byte[]> response = httpClient.send(solrRequest,
-                        HttpResponse.BodyHandlers.ofByteArray());
-
-                    if (response.statusCode() != 200) {
-                        throw new MCRException(
-                            "Error while executing request: " + response.version() + " " + response.statusCode());
-                    }
-
-                    MCRByteContent result = new MCRByteContent(response.body());
-                    result.setSystemId(solrRequest.uri().toString());
-                    return result.getSource();
-                } catch (InterruptedException | IOException e) {
-                    throw new MCRException("Error while executing request", e);
-                }
-            }
+        if (query.isEmpty()) {
+            throw new IllegalArgumentException("Empty query for: " + href);
         }
 
-        throw new IllegalArgumentException("Did not understand uri: " + href);
+        SolrClient client = core.flatMap(MCRSolrCoreManager::get)
+            .map(MCRSolrCore::getClient)
+            .orElse(MCRSolrCoreManager.getMainSolrClient());
+
+        ModifiableSolrParams params = MCRSolrUtils.parseQueryString(query.get());
+        requestHandler.ifPresent(path -> params.set(CommonParams.QT, path));
+        try {
+            InputStream inputStream = MCRSolrSearchUtils.streamRawXML(client, params);
+            MCRByteContent result = new MCRByteContent(inputStream.readAllBytes());
+            result.setSystemId(href);
+            return result.getSource();
+        } catch (Exception exc) {
+            throw new MCRException("Error while executing solr request for query " + href, exc);
+        }
     }
 
     private void printMismatchWarning(String href) {
-        LOGGER.warn("The uri {} is probably not encoded correctly. See (MCR-2872)", href);
+        LOGGER.warn(
+            "The uri {} is probably not encoded correctly. See (MCR-2872) or the javadoc of MCRSolrQueryResolver.",
+            href);
     }
+
 }

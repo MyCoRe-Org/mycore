@@ -20,10 +20,13 @@ package org.mycore.solr;
 
 import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 
+import java.net.URLDecoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 
+import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.services.http.MCRHttpUtils;
@@ -85,4 +88,50 @@ public class MCRSolrUtils {
 
         return requestBuilder;
     }
+
+    /**
+     * Parses a URL-encoded Solr query string into a {@link ModifiableSolrParams} instance.
+     * <p>
+     * This method accepts query strings in the form of {@code key1=value1&key2=value2...},
+     * optionally prefixed with a {@code '?'} character. Each key–value pair is URL-decoded
+     * using UTF-8 and added to the resulting parameter set. Duplicate keys are preserved
+     * as multivalued parameters (e.g. {@code fq=a&fq=b} becomes two values for {@code fq}).
+     * <p>
+     * Examples:
+     * <pre>
+     * parseQueryString("q=*:*&amp;rows=10");
+     * parseQueryString("?fq=type&#58;book&amp;fq=lang&#58;de");
+     * </pre>
+     *
+     * @param query the URL-encoded query string, with or without a leading {@code '?'}; may be {@code null}
+     * @return a {@link ModifiableSolrParams} object containing all decoded parameters;
+     *         never {@code null}
+     */
+    public static ModifiableSolrParams parseQueryString(String query) {
+        if (query == null) {
+            return new ModifiableSolrParams();
+        }
+        if (query.startsWith("?")) {
+            query = query.substring(1);
+        }
+
+        ModifiableSolrParams params = new ModifiableSolrParams();
+        if (query.isEmpty()) {
+            return params;
+        }
+
+        for (String pair : query.split("&")) {
+            if (pair.isEmpty()) {
+                continue;
+            }
+            int indexOfEqual = pair.indexOf('=');
+            String key = indexOfEqual >= 0 ? pair.substring(0, indexOfEqual) : pair;
+            String value = indexOfEqual >= 0 ? pair.substring(indexOfEqual + 1) : "";
+            String decodedKey = URLDecoder.decode(key, StandardCharsets.UTF_8);
+            String decodedValue = URLDecoder.decode(value, StandardCharsets.UTF_8);
+            params.add(decodedKey, decodedValue);
+        }
+        return params;
+    }
+
 }
