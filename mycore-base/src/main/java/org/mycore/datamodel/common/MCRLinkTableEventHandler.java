@@ -56,6 +56,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
     @Override
     protected final void handleObjectCreated(MCREvent evt, MCRObject obj) {
         getInstance().create(obj);
+        triggerLinkedObjectChanged(evt, obj);
     }
 
     /**
