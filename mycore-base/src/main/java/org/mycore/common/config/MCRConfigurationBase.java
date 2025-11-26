@@ -250,11 +250,20 @@ public final class MCRConfigurationBase {
 
     public static synchronized void initialize(Map<String, String> deprecated, Map<String, String> props,
         boolean clear) {
+        
+        // deprecated properties
         if (clear) {
             deprecatedProperties.clear();
         }
         deprecatedProperties.putAll(deprecated);
         checkForDeprecatedProperties(props);
+
+        // instance helper cache
+        if (clear) {
+            MCRConfigurableInstanceHelper.clearCache();
+        }
+
+        // base properties
         if (clear) {
             getBaseProperties().clear();
         } else {
