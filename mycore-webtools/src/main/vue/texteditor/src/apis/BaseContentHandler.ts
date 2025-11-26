@@ -1,3 +1,5 @@
+import type {Content, ContentHandler, LockResult} from "@/apis/ContentHandler.ts";
+
 export abstract class BaseContentHandler implements ContentHandler {
 
   mcrApplicationBaseURL: string;

@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import {createRouter, createWebHistory} from 'vue-router'
 import NotFoundView from "@/views/NotFoundView.vue";
 import TextEditorView from "@/views/TextEditorView.vue";
 
@@ -36,9 +36,10 @@ const router = createRouter({
       name: 'TextEditor',
       component: TextEditorView,
       props: (route) => {
+        let id = route.params.id;
         return {
           type: route.params.type,
-          id: typeof route.params.id === "string" ? route.params.id : route.params.id.join("/")
+          id: typeof id === "string" ? id : (Array.isArray(id) ? id.join("/") : "")
         }
       }
     },

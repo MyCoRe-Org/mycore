@@ -1,3 +1,5 @@
+import type {ContentHandler} from "@/apis/ContentHandler.ts";
+
 export class ContentHandlerSelector {
 
   private static MAP: Map<string, ContentHandler> = new Map<string, ContentHandler>();
