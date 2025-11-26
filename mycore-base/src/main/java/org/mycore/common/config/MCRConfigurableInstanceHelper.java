@@ -78,6 +78,14 @@ class MCRConfigurableInstanceHelper {
 
     private static final ConcurrentMap<Class<?>, ClassInfo<?>> INFOS = new ConcurrentHashMap<>();
 
+    private static final ConcurrentMap<String, MCRInstanceConfiguration> CONFIG_CACHE = new ConcurrentHashMap<>();
+
+    static {
+        MCRConfiguration2.addPropertyChangeEventLister(
+            key -> true,
+            (name, oldVal, newVal) -> CONFIG_CACHE.clear());
+    }
+
     /**
      * Checks if a class is annotated with {@link Singleton}.
      *
@@ -117,7 +125,7 @@ class MCRConfigurableInstanceHelper {
      */
     public static <S> Optional<S> getInstance(Class<S> superClass, String name, Set<Option> options)
         throws MCRConfigurationException {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName(name);
+        MCRInstanceConfiguration configuration = CONFIG_CACHE.computeIfAbsent(name, MCRInstanceConfiguration::ofName);
         String className = configuration.className();
         if (isAbsent(className) && !options.contains(Option.ADD_IMPLICIT_CLASS_PROPERTIES)) {
             return Optional.empty();
@@ -227,6 +235,11 @@ class MCRConfigurableInstanceHelper {
             + " is incompatible with annotation value class " + annotationValueClass.getName()
             + " for target " + targetTypeName(target) + " '" + target.name()
             + "' in configured class " + target.declaringClass().getName());
+    }
+
+    public static void clearCache() {
+        CONFIG_CACHE.clear();
+        INFOS.clear();
     }
 
     /**
