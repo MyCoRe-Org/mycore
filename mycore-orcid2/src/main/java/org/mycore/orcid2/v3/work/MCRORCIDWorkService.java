@@ -83,6 +83,7 @@ public class MCRORCIDWorkService {
      * @param object the MCRObject
      * @throws MCRORCIDException if cannot create work or other issue during the process
      */
+    @SuppressWarnings("PMD.ExceptionAsFlowControl")
     public void createWork(MCRObject object) {
         try {
             validateObjectState(object);
