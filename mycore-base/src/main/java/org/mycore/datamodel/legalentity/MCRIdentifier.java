@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.orcid2.util;
+package org.mycore.datamodel.legalentity;
 
 import java.util.Locale;
 import java.util.Objects;
