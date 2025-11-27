@@ -96,8 +96,9 @@ public class MCROCFLFileSystemTransaction implements MCRPersistenceTransaction {
             if (virtualObjects.isEmpty()) {
                 return;
             }
+            List<MCROCFLVirtualObject> snapshot = new ArrayList<>(virtualObjects);
             List<MCROCFLVirtualObject> modifiedObjects = new ArrayList<>();
-            for (MCROCFLVirtualObject virtualObject : virtualObjects) {
+            for (MCROCFLVirtualObject virtualObject : snapshot) {
                 try {
                     if (virtualObject.persist()) {
                         modifiedObjects.add(virtualObject);
@@ -129,6 +130,9 @@ public class MCROCFLFileSystemTransaction implements MCRPersistenceTransaction {
      */
     private void clean() {
         Long transactionId = getTransactionId();
+        if (transactionId == null) {
+            return;
+        }
         MCROCFLVirtualObjectProvider virtualObjectProvider = MCROCFLFileSystemProvider.get().virtualObjectProvider();
         virtualObjectProvider.remove(transactionId);
         TRANSACTION_ID.remove();

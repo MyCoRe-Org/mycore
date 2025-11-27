@@ -56,11 +56,11 @@ public class MCROCFLFileTrackerTest {
     public void testWrite() throws IOException {
         fileTracker.write("path4");
         assertChanges(1);
-        assertChange("path4", ChangeType.ADDED_OR_MODIFIED);
+        assertChange("path4", ChangeType.ADDED);
 
         fileTracker.write("path4");
         assertChanges(1);
-        assertChange("path4", ChangeType.ADDED_OR_MODIFIED);
+        assertChange("path4", ChangeType.ADDED);
     }
 
     @Test
@@ -141,7 +141,7 @@ public class MCROCFLFileTrackerTest {
         fileTracker.write("new_path1", "other_digest");
         assertChanges(2);
         assertChange("path1", ChangeType.DELETED);
-        assertChange("new_path1", ChangeType.ADDED_OR_MODIFIED);
+        assertChange("new_path1", ChangeType.ADDED);
 
         fileTracker.write("new_path1", DATA.get("path1"));
         assertChanges(1);
@@ -161,8 +161,8 @@ public class MCROCFLFileTrackerTest {
         fileTracker.delete("path3");
         assertChanges(5);
 
-        assertChange("path4", ChangeType.ADDED_OR_MODIFIED);
-        assertChange("path5", ChangeType.ADDED_OR_MODIFIED);
+        assertChange("path4", ChangeType.ADDED);
+        assertChange("path5", ChangeType.ADDED);
         assertChangeRename("path1", "new_path1");
         assertChangeRename("path2", "new_path2");
         assertChange("path3", ChangeType.DELETED);
@@ -173,7 +173,7 @@ public class MCROCFLFileTrackerTest {
         fileTracker.write("path1", "other_digest");
         assertTrue(fileTracker.isAddedOrModified("path1"));
         assertChanges(1);
-        assertChange("path1", ChangeType.ADDED_OR_MODIFIED);
+        assertChange("path1", ChangeType.MODIFIED);
         fileTracker.write("path1", DATA.get("path1"));
         assertFalse(fileTracker.isAddedOrModified("path1"));
         assertChanges(0);

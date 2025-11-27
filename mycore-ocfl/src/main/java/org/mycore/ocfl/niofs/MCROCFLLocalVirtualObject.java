@@ -31,7 +31,6 @@ import java.util.Set;
 
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.digest.MCRDigest;
-import org.mycore.common.events.MCREvent;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.niofs.storage.MCROCFLTransactionalStorage;
 import org.mycore.ocfl.repository.MCROCFLRepository;
@@ -141,8 +140,7 @@ public class MCROCFLLocalVirtualObject extends MCROCFLVirtualObject {
                 this.transactionalStorage.copy(inputStream, lockedTarget, options);
             }
         }
-        boolean targetExists = exists(lockedTarget);
-        trackFileWrite(lockedTarget, targetExists ? MCREvent.EventType.UPDATE : MCREvent.EventType.CREATE);
+        trackFileWrite(lockedTarget);
     }
 
     /**
@@ -162,8 +160,7 @@ public class MCROCFLLocalVirtualObject extends MCROCFLVirtualObject {
                 this.transactionalStorage.copy(is, target, options);
             }
         }
-        boolean targetExists = virtualTarget.exists(target);
-        virtualTarget.trackFileWrite(target, targetExists ? MCREvent.EventType.UPDATE : MCREvent.EventType.CREATE);
+        virtualTarget.trackFileWrite(target);
     }
 
     /**

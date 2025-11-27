@@ -29,9 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Set;
 
-import io.ocfl.api.io.FixityCheckInputStream;
 import org.mycore.common.digest.MCRDigest;
-import org.mycore.common.events.MCREvent;
 import org.mycore.datamodel.niofs.MCRVersionedPath;
 import org.mycore.ocfl.niofs.channels.MCROCFLCachingSeekableByteChannel;
 import org.mycore.ocfl.niofs.channels.MCROCFLClosableCallbackChannel;
@@ -41,6 +39,7 @@ import org.mycore.ocfl.niofs.storage.MCROCFLRemoteTemporaryStorage;
 import org.mycore.ocfl.niofs.storage.MCROCFLTransactionalStorage;
 import org.mycore.ocfl.repository.MCROCFLRepository;
 
+import io.ocfl.api.io.FixityCheckInputStream;
 import io.ocfl.api.model.ObjectVersionId;
 import io.ocfl.api.model.OcflObjectVersion;
 import io.ocfl.api.model.OcflObjectVersionFile;
@@ -228,13 +227,11 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
         MCRVersionedPath lockedTarget = lockVersion(target);
         checkPurged(lockedSource);
         checkReadOnly();
-        boolean targetExists = exists(lockedTarget);
-        MCREvent.EventType event = targetExists ? MCREvent.EventType.UPDATE : MCREvent.EventType.CREATE;
 
         // copy from transactional storage
         if (transactionalStorage.exists(lockedSource)) {
             this.transactionalStorage.copy(lockedSource, lockedTarget, options);
-            trackFileWrite(lockedTarget, event);
+            trackFileWrite(lockedTarget);
             return;
         }
 
@@ -242,7 +239,7 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
         MCRDigest digest = getDigest(source);
         if (this.remoteStorage.exists(digest)) {
             this.remoteStorage.exportFile(digest, lockedTarget, options);
-            trackFileWrite(lockedTarget, event);
+            trackFileWrite(lockedTarget);
             return;
         }
 
@@ -251,7 +248,7 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
         try (FixityCheckInputStream stream = ocflFile.getStream()) {
             this.transactionalStorage.copy(stream, lockedTarget, options);
         }
-        trackFileWrite(lockedTarget, event);
+        trackFileWrite(lockedTarget);
     }
 
     /**
@@ -263,13 +260,11 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
         MCRVersionedPath lockedSource = lockVersion(source);
         checkPurged(lockedSource);
         virtualTarget.checkReadOnly();
-        boolean targetExists = virtualTarget.exists(target);
-        MCREvent.EventType event = targetExists ? MCREvent.EventType.UPDATE : MCREvent.EventType.CREATE;
 
         // copy from transactional storage
         if (transactionalStorage.exists(lockedSource)) {
             this.transactionalStorage.copy(lockedSource, target, options);
-            virtualTarget.trackFileWrite(target, event);
+            virtualTarget.trackFileWrite(target);
             return;
         }
 
@@ -277,7 +272,7 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
         MCRDigest digest = getDigest(source);
         if (this.remoteStorage.exists(digest)) {
             this.remoteStorage.exportFile(digest, target, options);
-            virtualTarget.trackFileWrite(target, event);
+            virtualTarget.trackFileWrite(target);
             return;
         }
 
@@ -286,7 +281,7 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
         try (FixityCheckInputStream stream = ocflFile.getStream()) {
             this.transactionalStorage.copy(stream, target, options);
         }
-        virtualTarget.trackFileWrite(target, event);
+        virtualTarget.trackFileWrite(target);
     }
 
     /**
@@ -353,7 +348,8 @@ public class MCROCFLRemoteVirtualObject extends MCROCFLVirtualObject {
         }
         // copy data from transactional storage to remote storage
         for (MCROCFLFileTracker.Change<MCRVersionedPath> change : this.fileTracker.changes()) {
-            if (MCROCFLFileTracker.ChangeType.ADDED_OR_MODIFIED.equals(change.type())) {
+            if (MCROCFLFileTracker.ChangeType.ADDED.equals(change.type())
+                || MCROCFLFileTracker.ChangeType.MODIFIED.equals(change.type())) {
                 MCRVersionedPath source = change.source();
                 Path physicalPath = this.transactionalStorage.toPhysicalPath(source);
                 if (Files.exists(physicalPath)) {
