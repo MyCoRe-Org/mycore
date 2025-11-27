@@ -1,5 +1,6 @@
-import { BaseContentHandler } from "@/apis/BaseContentHandler";
-import { getAuthorizationHeader } from "@/apis/Auth";
+import {BaseContentHandler} from "@/apis/BaseContentHandler";
+import {getAuthorizationHeader} from "@/apis/Auth";
+import type {Content} from "@/apis/ContentHandler.ts";
 
 export class ClassificationsContentHandler extends BaseContentHandler {
 
@@ -54,7 +55,7 @@ export class ClassificationsContentHandler extends BaseContentHandler {
     const tab = "  ";
     let formatted = "";
     let indent = "";
-    xml.split(/>\s*</).forEach(function(node) {
+    xml.split(/>\s*</).forEach(function (node) {
       if (node.match(/^\/\w/)) indent = indent.substring(tab.length);
       formatted += `${indent}<${node}>\r\n`;
       if (node.match(/^<?\w[^>]*[^\/]$/)) indent += tab;

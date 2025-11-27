@@ -115,11 +115,6 @@
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
-        <artifactId>mycore-junit4</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mycore</groupId>
         <artifactId>mycore-lod</artifactId>
         <version>${project.version}</version>
       </dependency>

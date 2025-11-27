@@ -35,7 +35,6 @@ import org.apache.solr.client.solrj.impl.BinaryRequestWriter;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateHttp2SolrClient;
 import org.apache.solr.client.solrj.impl.Http2SolrClient;
 import org.apache.solr.client.solrj.impl.HttpJdkSolrClient;
-import org.apache.solr.client.solrj.impl.HttpSolrClientBase;
 import org.apache.solr.client.solrj.impl.HttpSolrClientBuilderBase;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.mycore.common.config.MCRConfiguration2;
@@ -70,9 +69,9 @@ public class MCRSolrCore {
 
     // todo: maybe add support for replicaCount and compositeId if required
 
-    protected HttpSolrClientBase solrClient;
+    protected SolrClient solrClient;
 
-    protected HttpSolrClientBase baseSolrClient;
+    protected SolrClient baseSolrClient;
 
     protected ConcurrentUpdateHttp2SolrClient concurrentClient;
 
@@ -140,7 +139,7 @@ public class MCRSolrCore {
         });
     }
 
-    private static HttpSolrClientBase getSolrClientInstance(String baseSolrUrl, int connectionTimeout,
+    private static SolrClient getSolrClientInstance(String baseSolrUrl, int connectionTimeout,
         int socketTimeout) {
         HttpSolrClientBuilderBase baseBuilder = useJettyHttpClient() ? new Http2SolrClient.Builder(baseSolrUrl)
             : new HttpJdkSolrClient.Builder(baseSolrUrl);
@@ -217,14 +216,14 @@ public class MCRSolrCore {
     /**
      * Returns the default solr client instance. Use this for queries.
      */
-    public HttpSolrClientBase getClient() {
+    public SolrClient getClient() {
         return solrClient;
     }
 
     /**
      * Returns the base solr client instance, without core information. Use this for admin operations.
      */
-    public HttpSolrClientBase getBaseClient() {
+    public SolrClient getBaseClient() {
         return baseSolrClient;
     }
 

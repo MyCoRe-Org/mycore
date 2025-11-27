@@ -16,32 +16,25 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common;
+package org.mycore.mcr.cronjob;
 
-import java.lang.annotation.Annotation;
-import java.util.Optional;
+import org.mycore.common.MCRException;
+import org.mycore.common.processing.MCRProcessableStatus;
 
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
+public class MCRTestErrorCronJob extends MCRCronjob {
 
-@Deprecated(forRemoval = true)
-public class MCRTestAnnotationWatcher<A extends Annotation> extends TestWatcher {
+    public static int count;
 
-    private final Class<A> annotationType;
-
-    private volatile A annotation;
-
-    public MCRTestAnnotationWatcher(Class<A> annotationType) {
-        this.annotationType = annotationType;
+    @Override
+    public void runJob() {
+        getProcessable().setStatus(MCRProcessableStatus.PROCESSING);
+        getProcessable().setProgress(0);
+        count++;
+        throw new MCRException("test error");
     }
 
     @Override
-    protected void starting(Description d) {
-        this.annotation = d.getAnnotation(annotationType);
+    public String getDescription() {
+        return "Will always throw an exception, for testing only";
     }
-
-    public Optional<A> getAnnotation() {
-        return Optional.ofNullable(this.annotation);
-    }
-
 }

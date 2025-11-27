@@ -27,24 +27,22 @@ import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.response.UpdateResponse;
-import org.mycore.common.MCRExpandedObjectManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.datamodel.common.MCRLinkType;
 import org.mycore.datamodel.common.MCRMarkManager;
-import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRExpandedObject;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -133,12 +131,12 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     protected synchronized void handleObjectCreated(MCREvent evt, MCRObject obj) {
-        addObject(evt, obj);
+        addObject(obj);
     }
 
     @Override
     protected synchronized void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-        addObject(evt, obj);
+        addObject(obj);
     }
 
     @Override
@@ -148,25 +146,22 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
             // this is handled by handleAncestorUpdated
             return;
         }
-        MCRObject linkedObject = MCRMetadataManager.retrieveMCRExpandedObject(linkedID);
-        addObject(evt, linkedObject);
+        addContent(linkedID, () -> new MCRBaseContent(MCRMetadataManager.retrieveMCRExpandedObject(linkedID)));
     }
 
     @Override
     protected void handleAncestorUpdated(MCREvent evt, MCRObject obj) {
-        MCRExpandedObject expandedObject = MCRExpandedObjectManager.getInstance().getExpandedObject(obj);
-        addObject(evt, expandedObject);
+        addObject(obj);
     }
 
     @Override
     protected void handleDerivateLinkUpdated(MCREvent evt, MCRDerivate updatedDerivate, MCRObjectID linkedID) {
-        MCRObject linkedObject = MCRMetadataManager.retrieveMCRExpandedObject(linkedID);
-        addObject(evt, linkedObject);
+        addContent(linkedID, () -> new MCRBaseContent(MCRMetadataManager.retrieveMCRExpandedObject(linkedID)));
     }
 
     @Override
     protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
-        addObject(evt, obj);
+        addObject(obj);
     }
 
     @Override
@@ -176,17 +171,27 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleDerivateCreated(MCREvent evt, MCRDerivate derivate) {
-        addObject(evt, derivate);
+        addDerivate(derivate);
     }
 
     @Override
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate derivate) {
-        addObject(evt, derivate);
+        addDerivate(derivate);
     }
 
     @Override
     protected void handleDerivateRepaired(MCREvent evt, MCRDerivate derivate) {
-        addObject(evt, derivate);
+        addDerivate(derivate);
+    }
+
+    private void addObject(MCRObject obj) {
+        MCRObjectID id = obj.getId();
+        addContent(id, () -> new MCRBaseContent(MCRMetadataManager.retrieveMCRExpandedObject(id)));
+    }
+
+    private void addDerivate(MCRDerivate derivate) {
+        final MCRObjectID id = derivate.getId();
+        addContent(id, () -> new MCRBaseContent(MCRMetadataManager.retrieveMCRDerivate(id)));
     }
 
     @Override
@@ -232,41 +237,35 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
         handleObjectUpdated(evt, obj);
     }
 
-    protected synchronized void addObject(MCREvent evt, MCRBase objectOrDerivate) {
+    protected synchronized void addContent(MCRObjectID id, Supplier<MCRContent> indexContentSupplier) {
         // do not add objects which are marked for import or deletion
-        if (MCRMarkManager.getInstance().isMarked(objectOrDerivate)) {
+        if (MCRMarkManager.getInstance().isMarked(id)) {
             return;
         }
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
             long tStart = System.currentTimeMillis();
 
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Solr: submitting data of \"{}\" for indexing", objectOrDerivate.getId());
+                LOGGER.debug("Solr: submitting data of \"{}\" for indexing", id);
             }
 
-            putIntoTaskQueue(new MCRDelayedRunnable(objectOrDerivate.getId().toString(), DELAY_IN_MS,
+            putIntoTaskQueue(new MCRDelayedRunnable(id.toString(), DELAY_IN_MS,
                 new MCRTransactionableRunnable(() -> {
                     try {
-                        /*RS: do not use old stuff, get it fresh ...
-                        MCRContent content = (MCRContent) evt.get("content");
-                        if (content == null) {
-                            content = new MCRBaseContent(objectOrDerivate);
-                        }*/
-                        MCRContent content = MCRXMLMetadataManager.getInstance()
-                            .retrieveContent(objectOrDerivate.getId());
+                        MCRContent content = indexContentSupplier.get();
 
                         MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.obtainInstance()
-                            .getIndexHandler(content, objectOrDerivate.getId());
+                            .getIndexHandler(content, id);
                         indexHandler.setCommitWithin(1000);
                         MCRSolrIndexer.submitIndexHandler(indexHandler, MCRSolrIndexer.HIGH_PRIORITY);
 
                         if (LOGGER.isDebugEnabled()) {
                             LOGGER.debug("Solr: submitting data of \"{}\" for indexing done in {}ms ",
-                                objectOrDerivate.getId(), System.currentTimeMillis() - tStart);
+                                id, System.currentTimeMillis() - tStart);
                         }
 
                     } catch (Exception ex) {
-                        LOGGER.error("Error creating transfer thread for object {}", objectOrDerivate, ex);
+                        LOGGER.error("Error creating transfer thread for object {}", id, ex);
                     }
                 })));
         });

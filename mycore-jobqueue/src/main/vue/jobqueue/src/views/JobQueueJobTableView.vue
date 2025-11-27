@@ -201,7 +201,7 @@ const navigateToPage = (pageNumber: number) => {
 
 const convertParameter = (str: string) => {
   const [name, value] = str.split(":", 2);
-  return {name, value};
+  return {name: name || "", value: value || ""};
 }
 
 const parameter = computed(() => {

@@ -1,5 +1,6 @@
 import {BaseContentHandler} from "@/apis/BaseContentHandler";
 import {getAuthorizationHeader} from "@/apis/Auth";
+import type {Content, LockResult} from "@/apis/ContentHandler.ts";
 
 export class ObjectsContentHandler extends BaseContentHandler {
 
