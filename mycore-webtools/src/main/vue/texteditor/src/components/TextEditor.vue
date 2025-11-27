@@ -7,6 +7,7 @@ import 'prismjs/themes/prism.css';
 import '../modules/prismjs-languages';
 import {getPrismLanguage, type PrismLanguage} from "@/modules/prismjs-languages";
 import {onMounted, ref, type Ref} from "vue";
+import type {Content} from "@/apis/ContentHandler.ts";
 
 const model: Ref = defineModel<Content>();
 const editor: Ref = ref(null);
@@ -27,7 +28,7 @@ onMounted(() => {
 })
 
 function highlighter(text: string) {
-  if (!model.value?.type) {
+  if (!model.value?.type && languages.xml !== undefined) {
     return highlight(text, languages.xml, 'xml');
   }
   let prismLanguage: PrismLanguage | undefined = getPrismLanguage(model.value.type);

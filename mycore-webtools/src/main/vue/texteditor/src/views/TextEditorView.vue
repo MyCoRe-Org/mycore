@@ -2,6 +2,7 @@
 import {nextTick, type Ref, ref, watch, onBeforeUnmount, onMounted} from "vue";
 import {ContentHandlerSelector} from "@/apis/ContentHandlerSelector";
 import TextEditor from "@/components/TextEditor.vue";
+import type {Content, ContentHandler, LockResult} from "@/apis/ContentHandler.ts";
 
 const props = defineProps<{
   type: string,

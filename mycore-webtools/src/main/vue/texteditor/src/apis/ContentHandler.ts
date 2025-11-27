@@ -1,4 +1,4 @@
-interface ContentHandler {
+export interface ContentHandler {
 
   load(path: string): Promise<Content>;
 
@@ -23,7 +23,7 @@ interface ContentHandler {
 
 }
 
-interface Content {
+export interface Content {
 
   data: string;
 
@@ -31,7 +31,7 @@ interface Content {
 
 }
 
-interface LockResult {
+export interface LockResult {
 
   status: "locked" | "unlocked" | "not_owner";
 

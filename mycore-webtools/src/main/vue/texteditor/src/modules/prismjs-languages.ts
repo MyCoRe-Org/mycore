@@ -19,7 +19,7 @@ export function getPrismLanguage(contentType: string): PrismLanguage | undefined
     throw new Error("Invalid contentType " + contentType);
   }
   const language = contentTypeSplit[1];
-  if (languages[language] === undefined) {
+  if (language === undefined || languages[language] === undefined) {
     return undefined;
   }
   return {
