@@ -237,8 +237,8 @@ public class MCRORCIDUser {
      * @return Set of MCRIdentifier
      */
     public Set<MCRIdentifier> getIdentifiers() {
-        final MCRIdentifier userid = new MCRIdentifier("userid", user.getUserID());
-        return legalEntityService.getAllIdentifiers(userid);
+        final MCRIdentifier userId = new MCRIdentifier("userid", user.getUserID());
+        return legalEntityService.getAllIdentifiers(userId);
     }
 
     /**
