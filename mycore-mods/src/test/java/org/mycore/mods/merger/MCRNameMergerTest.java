@@ -192,6 +192,26 @@ public class MCRNameMergerTest {
         MCRMergerTest.test(a, b, e);
     }
 
+    /**
+     * nameIdentifiers should be considered the same if the @type attribute and text value
+     * are the same. Other attributes should be disregarded. Right now, additional
+     * attributes are not added to the element that is merged into.
+     * see MCR-3566
+     */
+    @Test
+    public void testMergeSameAdditionalAttributes() throws JaxenException, IOException {
+        String a = "[mods:name[@type='personal'][mods:namePart='Thomas Müller']"
+            + "[mods:nameIdentifier[@type='scopus']='1']]";
+        String b = "[mods:name[@type='personal'][mods:namePart='Thomas Müller']"
+            + "[mods:nameIdentifier[@type='scopus'][@typeURI='http://orcid.org/']='1']]";
+        String e1 = "[mods:name[@type='personal'][mods:namePart='Thomas Müller']"
+            + "[mods:nameIdentifier[@type='scopus']='1']]";
+        String e2 = "[mods:name[@type='personal'][mods:namePart='Thomas Müller']"
+            + "[mods:nameIdentifier[@type='scopus'][@typeURI='http://orcid.org/']='1']]";
+        MCRMergerTest.test(a, b, e1);
+        MCRMergerTest.test(b, a, e2);
+    }
+
     private MCRNameMerger buildNameEntry(String predicates) throws JaxenException {
         Element modsName = new MCRNodeBuilder().buildElement("mods:name[@type='personal']" + predicates, null, null);
         MCRNameMerger ne = new MCRNameMerger();
