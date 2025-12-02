@@ -31,6 +31,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Locale;
 import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
@@ -97,13 +98,13 @@ public class MCRPathContent extends MCRContent implements MCRSeekableChannelCont
     @Override
     public String getETag() throws IOException {
         if (attrs instanceof MCRFileAttributes fAttrs) {
-            return fAttrs.md5sum();
+            return String.format(Locale.ROOT, "\"%s\"", fAttrs.md5sum());
         }
 
         if (Files.getFileStore(path).supportsFileAttributeView("md5")) {
             Object fileKey = Files.getAttribute(path, "md5:md5");
             if (fileKey instanceof String s) {
-                return s;
+                return String.format(Locale.ROOT, "\"%s\"", s);
             }
         }
 
