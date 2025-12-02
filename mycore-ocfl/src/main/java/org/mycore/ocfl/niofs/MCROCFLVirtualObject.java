@@ -1034,8 +1034,7 @@ public abstract class MCROCFLVirtualObject {
         return !changes.isEmpty();
     }
 
-    protected void fireFileEventsAfterPersist(List<MCROCFLFileTracker.Change<MCRVersionedPath>> fileChanges)
-        throws IOException {
+    protected void fireFileEventsAfterPersist(List<MCROCFLFileTracker.Change<MCRVersionedPath>> fileChanges) {
         Set<MCRVersionedPath> originalPaths = new HashSet<>(this.fileTracker.originalPaths());
         for (MCROCFLFileTracker.Change<MCRVersionedPath> change : fileChanges) {
             try {
