@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
+import java.util.Locale;
 import org.mycore.common.MCRConstants;
 
 /**
@@ -84,7 +85,7 @@ public class MCRStringContent extends MCRContent {
 
     @Override
     public String getETag() {
-        String eTag = getSimpleWeakETag(getSystemId(), length(), lastModified());
-        return eTag == null ? null : eTag.substring(2);
+      int hash = asString().hashCode();
+      return String.format(Locale.ROOT, "\"%s\"", Integer.toHexString(hash));
     }
 }
