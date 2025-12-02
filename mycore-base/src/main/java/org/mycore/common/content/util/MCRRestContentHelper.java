@@ -50,8 +50,7 @@ import jakarta.ws.rs.ext.RuntimeDelegate;
  */
 public abstract class MCRRestContentHelper {
 
-    // make etag regexp object
-    private static final Pattern ETAG_PATTERN = java.util.regex.Pattern.compile("^(?<weak>W/)?\\\"(?<etag>.+)?\\\"$");
+    private static final Pattern ETAG_PATTERN = Pattern.compile("^(?<weak>W/)?\\\"(?<etag>.+)?\\\"$");
 
     public static final RuntimeDelegate.HeaderDelegate<Date> DATE_HEADER_DELEGATE = RuntimeDelegate.getInstance()
         .createHeaderDelegate(Date.class);
