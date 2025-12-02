@@ -87,6 +87,17 @@ public class MCRORCIDUser {
     }
 
     /**
+     * Wraps MCRUser to MCRORCIDUser.
+     *
+     * @param user the MCRUser
+     * @param legalEntityService the {@link MCRLegalEntityService} to use
+     */
+    protected MCRORCIDUser(MCRUser user, MCRLegalEntityService legalEntityService) {
+        this.user = user;
+        this.legalEntityService = legalEntityService;
+    }
+
+    /**
      * Returns MCRUser.
      *
      * @return MCRUser

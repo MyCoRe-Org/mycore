@@ -29,7 +29,6 @@ import org.mycore.test.MyCoReTest;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserAttribute;
 
-import java.lang.reflect.Field;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,8 +45,6 @@ public class MCRORCIDUserTest {
 
     private static final String ACCESS_TOKEN = "accessToken";
 
-    private static MCRLegalEntityServiceMock legalEntityServiceMock;
-
     private static MCRORCIDUser orcidUser;
 
     private static MCRUser userMock;
@@ -55,14 +52,9 @@ public class MCRORCIDUserTest {
     @BeforeEach
     public void prepare() throws NoSuchFieldException, IllegalAccessException {
         userMock = new MCRUser("junit");
-        legalEntityServiceMock = new MCRLegalEntityServiceMock();
+        MCRLegalEntityServiceMock legalEntityServiceMock = new MCRLegalEntityServiceMock();
         legalEntityServiceMock.setUserMock(userMock);
-
-        orcidUser = new MCRORCIDUser(userMock);
-
-        Field legalEntityServiceField = MCRORCIDUser.class.getDeclaredField("legalEntityService");
-        legalEntityServiceField.setAccessible(true);
-        legalEntityServiceField.set(orcidUser, legalEntityServiceMock);
+        orcidUser = new MCRORCIDUser(userMock, legalEntityServiceMock);
     }
 
     @Test
