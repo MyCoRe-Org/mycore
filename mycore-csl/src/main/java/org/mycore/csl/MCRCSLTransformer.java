@@ -100,7 +100,7 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
 
     private MCRCSLTransformerInstance getTransformerInstance(String style, String format, Language language) {
         synchronized (transformerInstances) {
-            if (getStyleFormatTransformerStack(style, format, language).isEmpty()) {
+            if (!getStyleFormatTransformerStack(style, format, language).isEmpty()) {
                 return transformerInstances.get(mapKey(style, format, language)).pop();
             }
         }
