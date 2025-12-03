@@ -34,6 +34,10 @@
       <artifactId>citeproc-java</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.jbibtex</groupId>
       <artifactId>jbibtex</artifactId>
     </dependency>
@@ -44,16 +48,6 @@
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-base</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.citationstyles</groupId>
-      <artifactId>locales</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.citationstyles</groupId>
-      <artifactId>styles</artifactId>
-      <scope>runtime</scope>
     </dependency>
   </dependencies>
 </project>
