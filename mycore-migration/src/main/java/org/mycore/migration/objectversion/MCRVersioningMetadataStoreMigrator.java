@@ -97,7 +97,7 @@ public class MCRVersioningMetadataStoreMigrator {
         long latestRevision = repository.getLatestRevision();
         int highestStoredID = versioningStore.getHighestStoredID();
         PathDateModifiedUpdate[] pathUpdates = new PathDateModifiedUpdate[highestStoredID + 1];
-        try (ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor()) {
+        try (ExecutorService executorService = Executors.newSingleThreadExecutor()) {
             repository.log(new String[] { "" }, 0, latestRevision, true, false, logEntry -> {
                 processRevision(logEntry, latestRevision, newStore, pathUpdates, fileRepository, newRepository,
                     executorService);
