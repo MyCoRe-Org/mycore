@@ -261,6 +261,7 @@ public final class MCRURIResolver implements URIResolver {
         supportedSchemes.put("i18n", new MCRI18NResolver());
         supportedSchemes.put("checkPermissionChain", new MCRCheckPermissionChainResolver());
         supportedSchemes.put("checkPermission", new MCRCheckPermissionResolver());
+        supportedSchemes.put("checkDerivateDisplayEnabled", new MCRCheckDerivateDisplayEnabledResolver());
         MCRRESTResolver restResolver = new MCRRESTResolver();
         supportedSchemes.put("http", restResolver);
         supportedSchemes.put("https", restResolver);
@@ -1841,6 +1842,32 @@ public final class MCRURIResolver implements URIResolver {
                     "Invalid format of uri for retrieval of checkPermission: " + href);
             };
             return createBooleanResponse(permission);
+        }
+    }
+
+    private static final class MCRCheckDerivateDisplayEnabledResolver implements URIResolver {
+        /**
+         * returns the boolean value for the given derivate and intent.
+         * <p>
+         * Syntax: <code>checkDerivateDisplayEnabled:{id}:{intent}</code>
+         *
+         * @param href
+         *            URI in the syntax above
+         * @param base
+         *            not used
+         * @return the root element "boolean" of the XML document with content string true of false
+         * @see javax.xml.transform.URIResolver
+         */
+        @Override
+        public Source resolve(String href, String base) {
+            final String[] split = href.split(":");
+            boolean result = switch (split.length) {
+                case 2 -> true;
+                case 3 -> MCRXMLFunctions.isDerivateDisplayEnabled(split[1], split[2]);
+                default -> throw new IllegalArgumentException(
+                    "Invalid format of uri for retrieval of checkDerivateDisplayEnabled: " + href);
+            };
+            return createBooleanResponse(result);
         }
     }
 
