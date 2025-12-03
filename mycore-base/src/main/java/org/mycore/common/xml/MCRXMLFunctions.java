@@ -107,6 +107,9 @@ import jakarta.ws.rs.core.UriBuilder;
  * @author René Adler (eagle)
  */
 public class MCRXMLFunctions {
+
+    public static final String DERIVATE_DISPLAY_FILTER_PROPERTY = "MCR.Derivate.DisplayFilter.Class";
+
     private static final String TAG_START = "\\<\\w+((\\s+\\w+(\\s*\\=\\s*(?:\".*?\"|'.*?'|[^'\"\\>\\s]+))?)+"
         + "\\s*|\\s*)\\>";
 
@@ -123,7 +126,11 @@ public class MCRXMLFunctions {
         .compile("(" + TAG_START + "((.*?[^\\<]))" + TAG_END + ")|(" + TAG_SELF_CLOSING + ")|(" + HTML_ENTITY + ")",
             Pattern.DOTALL);
 
+    private static final MCRDerivateDisplayFilter DERIVATE_DISPLAY_FILTER = MCRConfiguration2
+        .getInstanceOfOrThrow(MCRDerivateDisplayFilter.class, DERIVATE_DISPLAY_FILTER_PROPERTY);
+
     private static final Logger LOGGER = LogManager.getLogger();
+
     private static volatile MimetypesFileTypeMap mimetypeMap;
 
     public static Node document(String uri) throws JDOMException, IOException, TransformerException {
@@ -375,6 +382,22 @@ public class MCRXMLFunctions {
     @Deprecated(forRemoval = true)
     public static boolean isDisplayedEnabledDerivate(String derivateId) {
         return MCRAccessManager.checkDerivateDisplayPermission(derivateId);
+    }
+
+    /**
+     * Returns, weather the derivate identified by the given derivate ID
+     * should be included when displaying derivates for the given intent
+     * (which is controlled by the configured {@link MCRDerivateDisplayFilter},
+     * set by configuration property {@link MCRXMLFunctions#DERIVATE_DISPLAY_FILTER_PROPERTY}).
+     * <p>
+     * This is independent of weather the derivate is allowed to be accessed,
+     * which can be ascertained, depending on context, by, for example,
+     * {@link MCRAccessManager#checkDerivateDisplayPermission(String)}
+     * {@link MCRAccessManager#checkDerivateContentPermission(MCRObjectID, String)}
+     * or {@link MCRAccessManager#checkPermission(MCRObjectID, String)}.
+     */
+    public static boolean isDerivateDisplayEnabled(String derivateId, String intent) {
+        return DERIVATE_DISPLAY_FILTER.isDerivateDisplayEnabled(derivateId, intent);
     }
 
     /**
@@ -995,4 +1018,5 @@ public class MCRXMLFunctions {
             return objects.length;
         }
     }
+
 }
