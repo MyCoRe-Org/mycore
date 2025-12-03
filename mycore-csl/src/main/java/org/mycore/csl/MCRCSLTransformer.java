@@ -18,10 +18,10 @@
 
 package org.mycore.csl;
 
-import org.apache.logging.log4j.LogManager;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,6 +29,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import de.undercouch.citeproc.CSL;
 import de.undercouch.citeproc.output.Bibliography;
+
+import org.apache.logging.log4j.LogManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
@@ -36,12 +38,11 @@ import org.mycore.common.content.MCRStringContent;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.xsl.MCRParameterCollector;
 
-import de.undercouch.citeproc.CSL;
-import de.undercouch.citeproc.output.Bibliography;
-
 public class MCRCSLTransformer extends MCRParameterizedTransformer {
 
-    static final String DEFAULT_LOCALE = MCRConfiguration2.getStringOrThrow("MCR.CSL.defaultLocale");
+    static final String DEFAULT_LOCALE = MCRConfiguration2
+        .getStringOrThrow("MCR.CSL.defaultLocale")
+        .toUpperCase(Locale.ROOT);
 
     public static final String DEFAULT_FORMAT = "text";
 
@@ -62,15 +63,15 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
     private boolean unsorted;
 
     public enum Language {
-        en("en-US"),
-        de("de-DE");
+        EN("en-US"),
+        DE("de-DE");
 
         private String lCode;
 
         Language(String l) {
             this.lCode = l;
         }
-
+        @Override
         public String toString() {
             return this.lCode;
         }
@@ -152,10 +153,9 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
         final String style = parameter != null ? parameter.getParameter("style", configuredStyle) : configuredStyle;
         final String language = parameter != null ? parameter.getParameter("lang", null) : null;
 
-
         Optional<Language> lang = Arrays
             .stream(Language.values())
-            .filter(e -> e.name().equals(language))
+            .filter(e -> language != null && e.name().equals(language.toUpperCase(Locale.ROOT)))
             .findFirst();
 
         try (MCRCSLTransformerInstance transformerInstance = getTransformerInstance(style, format,
