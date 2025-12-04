@@ -25,15 +25,15 @@
                     <xsl:value-of select="mcri18n:translate('component.properties-analyze.component')" /> -
                     <xsl:value-of select="@name"/> -
                     <button class="btn btn-link"
-                            data-toggle="collapse"
-                            data-target="#{$safe_name}-collapse-overwritten"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#{$safe_name}-collapse-overwritten"
                             aria-expanded="true" aria-controls="{$safe_name}-collapse">
                         <xsl:value-of select="mcri18n:translate('component.properties-analyze.property.overwritten')" />
                     </button>
                     -
                     <button class="btn btn-link"
-                            data-toggle="collapse"
-                            data-target="#{$safe_name}-collapse-all"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#{$safe_name}-collapse-all"
                             aria-expanded="true" aria-controls="{$safe_name}-collapse">
                          <xsl:value-of select="mcri18n:translate('component.properties-analyze.property.others')" />
                     </button>
@@ -57,8 +57,8 @@
                                 <div class="d-flex w-100 justify-content-between">
                                     <b>
                                         <button class="btn btn-link"
-                                                data-toggle="modal"
-                                                data-target="#{$safe_name}-{$savePropName}-modal"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#{$safe_name}-{$savePropName}-modal"
                                                 aria-expanded="true"
                                                 aria-controls="{$safe_name}-{$savePropName}-modal">
                                             <xsl:value-of select="@name"/>
@@ -84,10 +84,8 @@
                                                     <xsl:value-of select="mcri18n:translate('component.properties-analyze.property.history')" />
                                                     <xsl:value-of select="@name"/>
                                                 </h5>
-                                                <button type="button" class="close" data-dismiss="modal"
-                                                        aria-label="Close">
-                                                    <span aria-hidden="true">&#xD7;</span>
-                                                </button>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close" />
                                             </div>
                                             <div class="modal-body">
                                                 <div class="list-group">
@@ -114,7 +112,7 @@
                                             </div>
 
                                             <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                                     Schließen
                                                 </button>
                                             </div>
