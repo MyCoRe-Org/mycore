@@ -88,20 +88,24 @@ public class MCRPathContent extends MCRContent implements MCRSeekableChannelCont
         return (attrs != null ? attrs.lastModifiedTime() : Files.getLastModifiedTime(path)).toMillis();
     }
 
+    private static String getETag(MCRFileAttributes<?> fAttrs) {
+        return '"' + fAttrs.digest().toHexString() + '"';
+    }
+
     @Override
     public String getETag() throws IOException {
         if (attrs instanceof MCRFileAttributes<?> fAttrs) {
-            return fAttrs.digest().toHexString();
-        }
-
-        if (Files.getFileStore(path).supportsFileAttributeView("md5")) {
-            Object fileKey = Files.getAttribute(path, "md5:md5");
-            if (fileKey instanceof String s) {
-                return s;
+            return getETag(fAttrs);
+        } else if (attrs == null) {
+            try {
+                MCRFileAttributes mcrattrs = Files.readAttributes(path, MCRFileAttributes.class);
+                return getETag(mcrattrs);
+            } catch (UnsupportedOperationException ignored) {
+                //no support for MCRFileAttributes
             }
         }
 
-        return super.getETag();
+        return "\"" + length() + '-' + lastModified() + '"';
     }
 
     @Override

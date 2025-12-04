@@ -24,6 +24,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -35,6 +37,7 @@ import com.google.common.collect.Iterables;
 
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.EntityTag;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -46,6 +49,8 @@ import jakarta.ws.rs.ext.RuntimeDelegate;
  * @author Thomas Scheffler (yagee)
  */
 public final class MCRRestContentHelper {
+
+    private static final Pattern ETAG_PATTERN = Pattern.compile("^(?<weak>W/)?\\\"(?<etag>.+)?\\\"$");
 
     public static final RuntimeDelegate.HeaderDelegate<Date> DATE_HEADER_DELEGATE = RuntimeDelegate.getInstance()
         .createHeaderDelegate(Date.class);
@@ -75,7 +80,7 @@ public final class MCRRestContentHelper {
         Response.ResponseBuilder response = Response.ok();
 
         String eTag = content.getETag();
-        response.header(HttpHeaders.ETAG, eTag);
+        response.tag(parseEtag(eTag));
         responseHeader.forEach(e -> response.header(e.getKey(), e.getValue()));
         final long contentLength = content.length();
         if (contentLength == 0) {
@@ -143,6 +148,21 @@ public final class MCRRestContentHelper {
             }
         }
         return response.build();
+    }
+
+    public static EntityTag parseEtag(String eTag) {
+        if (eTag == null) {
+            return null;
+        }
+        Matcher matcher = ETAG_PATTERN.matcher(eTag);
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("Invalid ETag format: " + eTag);
+        }
+
+        boolean isWeak = matcher.group("weak") != null;
+        String etagContent = matcher.group("etag");
+
+        return new EntityTag(etagContent, isWeak);
     }
 
     private static MediaType getMediaType(MCRContent content) throws IOException {

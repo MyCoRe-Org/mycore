@@ -163,7 +163,7 @@
       </xsl:variable>
       <xsl:if test="not($display='global')">
         <xed:if test="contains($xed-validation-marker, $MCR.XEditor.Validation.Marker.error)">
-          <span class="fas fa-exclamation-triangle form-control-feedback" data-toggle="tooltip" data-placement="top" title="{concat('{i18n:', @i18n.error, '}')}"></span>
+          <span class="fas fa-exclamation-triangle form-control-feedback" data-toggle="tooltip" data-bs-placement="top" title="{concat('{i18n:', @i18n.error, '}')}"></span>
         </xed:if>
       </xsl:if>
       <xed:validate display="{$display}" required="{@required}">

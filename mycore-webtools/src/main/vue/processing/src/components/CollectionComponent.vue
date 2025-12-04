@@ -53,7 +53,7 @@ const currentTabCollection = computed(() => {
 
       <h2 class="d-inline h5">{{ collection.name }}</h2>
       <a class="ms-1 text-secondary" href="#" @click.prevent="showModal">
-        <i class="fa-solid fa-gear"></i>
+        <i class="fa-solid fa-circle-info fa-lg"></i>
         <span class="visually-hidden">Properties</span>
       </a>
     </div>

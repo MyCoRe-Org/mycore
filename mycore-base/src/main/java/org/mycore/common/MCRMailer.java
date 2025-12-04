@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -383,76 +384,95 @@ public class MCRMailer extends MCRServlet {
     }
 
     private static void trySending(EMail mail) throws Exception {
-        MimeMessage msg = new MimeMessage(mailSession);
-        msg.setFrom(EMail.buildAddress(mail.from));
+        MimeMessage message = new MimeMessage(mailSession);
+        message.setFrom(EMail.buildAddress(mail.from));
 
-        addRecipientOptionals(msg, mail.to, Message.RecipientType.TO);
-        addRecipientOptionals(msg, mail.replyTo, null);
-        addRecipientOptionals(msg, mail.bcc, Message.RecipientType.BCC);
+        setRecipients(message, Message.RecipientType.TO, mail.to);
+        setRecipients(message, Message.RecipientType.BCC, mail.bcc);
+        setReplyTo(message, mail.replyTo);
 
-        msg.setSentDate(new Date());
-        msg.setSubject(mail.subject, ENCODING);
+        message.setSentDate(new Date());
+        message.setSubject(mail.subject, ENCODING);
 
-        if (mail.parts != null && !mail.parts.isEmpty() || mail.msgParts != null && mail.msgParts.size() > 1) {
+        boolean hasParts = mail.parts != null && !mail.parts.isEmpty();
+        boolean hasMessageParts = mail.msgParts != null && !mail.msgParts.isEmpty();
+        boolean hasMultipleMessageParts = hasMessageParts && mail.msgParts.size() > 1;
+        if (hasParts || hasMultipleMessageParts) {
             Multipart multipart = new MimeMultipart("mixed");
-            // Create the message part
-            MimeBodyPart messagePart = new MimeBodyPart();
-            MimeMultipart alternative = new MimeMultipart("alternative");
-            buildMessageBodyParts(mail, alternative);
-            messagePart.setContent(alternative);
-            multipart.addBodyPart(messagePart);
-
-            if (mail.parts != null && !mail.parts.isEmpty()) {
-                setMessageContent(mail, multipart);
+            if (hasMessageParts) {
+                if (hasMultipleMessageParts) {
+                    multipart.addBodyPart(toAlternativeMimeBodyPart(mail.msgParts));
+                } else {
+                    multipart.addBodyPart(toMimeBodyPart(mail.msgParts.get(0)));
+                }
             }
-            msg.setContent(multipart);
-        } else {
-            Optional<MessagePart> plainMsg = mail.getTextMessage();
-            if (plainMsg.isPresent()) {
-                msg.setText(plainMsg.get().message, ENCODING);
+            if (hasParts) {
+                for (String part : mail.parts) {
+                    multipart.addBodyPart(toMimeBodyPart(part));
+                }
             }
+            message.setContent(multipart);
+        } else if (hasMessageParts) {
+            MessagePart messagePart = mail.msgParts.get(0);
+            message.setText(messagePart.message, ENCODING, messagePart.type.subtype);
         }
+
         LOGGER.info("Sending e-mail to {}", mail.to);
-        Transport.send(msg);
+        Transport.send(message);
     }
 
-    private static void addRecipientOptionals(MimeMessage msg, List<String> foo, Message.RecipientType bar)
+    private static void setRecipients(MimeMessage msg, Message.RecipientType type, List<String> addresses)
         throws MessagingException {
-        Optional<List<InternetAddress>> list = EMail.buildAddressList(foo);
+        Optional<List<InternetAddress>> list = EMail.buildAddressList(addresses);
         if (list.isPresent()) {
-            if (bar == null) {
-                msg.setReplyTo((list.get().toArray(InternetAddress[]::new)));
-            } else {
-                msg.addRecipients(bar, list.get().toArray(InternetAddress[]::new));
-            }
+            msg.setRecipients(type, list.get().toArray(InternetAddress[]::new));
         }
     }
 
-    private static void buildMessageBodyParts(EMail mail, MimeMultipart alternative)
+    private static void setReplyTo(MimeMessage msg, List<String> addresses)
         throws MessagingException {
-        MimeBodyPart messagePart = new MimeBodyPart();
-        for (MessagePart m : mail.msgParts) {
-            messagePart.setText(m.message, ENCODING, m.type.value());
-            alternative.addBodyPart(messagePart);
+        Optional<List<InternetAddress>> list = EMail.buildAddressList(addresses);
+        if (list.isPresent()) {
+            msg.setReplyTo(list.get().toArray(InternetAddress[]::new));
         }
     }
 
-    private static void setMessageContent(EMail mail, Multipart multipart)
-        throws MessagingException, URISyntaxException, MalformedURLException {
-        for (String part : mail.parts) {
-            MimeBodyPart messagePart = new MimeBodyPart();
-            URL url = new URI(part).toURL();
-            DataSource source = new URLDataSource(url);
-            messagePart.setDataHandler(new DataHandler(source));
-            String fileName = url.getPath();
-            if (fileName.contains("\\")) {
-                fileName = fileName.substring(fileName.lastIndexOf('\\') + 1);
-            } else if (fileName.contains("/")) {
-                fileName = fileName.substring(fileName.lastIndexOf('/') + 1);
-            }
-            messagePart.setFileName(fileName);
-            multipart.addBodyPart(messagePart);
+    private static MimeBodyPart toAlternativeMimeBodyPart(List<EMail.MessagePart> messageParts)
+        throws MessagingException {
+        MimeBodyPart alternativeMimeBodyPart = new MimeBodyPart();
+        alternativeMimeBodyPart.setContent(toAlternativeMultipart(messageParts));
+        return alternativeMimeBodyPart;
+    }
+
+    private static MimeMultipart toAlternativeMultipart(List<EMail.MessagePart> messageParts)
+        throws MessagingException {
+        MimeMultipart alternativeMultipart = new MimeMultipart("alternative");
+        for (MessagePart messagePart : messageParts) {
+            alternativeMultipart.addBodyPart(toMimeBodyPart(messagePart));
         }
+        return alternativeMultipart;
+    }
+
+    private static MimeBodyPart toMimeBodyPart(MessagePart messagePart) throws MessagingException {
+        MimeBodyPart mimeBodyPart = new MimeBodyPart();
+        mimeBodyPart.setText(messagePart.message, ENCODING, messagePart.type.subtype());
+        return mimeBodyPart;
+    }
+
+    private static MimeBodyPart toMimeBodyPart(String part)
+        throws MessagingException, URISyntaxException, MalformedURLException {
+        MimeBodyPart mimeBodyPart = new MimeBodyPart();
+        URL url = new URI(part).toURL();
+        DataSource source = new URLDataSource(url);
+        mimeBodyPart.setDataHandler(new DataHandler(source));
+        String fileName = url.getPath();
+        if (fileName.contains("\\")) {
+            fileName = fileName.substring(fileName.lastIndexOf('\\') + 1);
+        } else if (fileName.contains("/")) {
+            fileName = fileName.substring(fileName.lastIndexOf('/') + 1);
+        }
+        mimeBodyPart.setFileName(fileName);
+        return mimeBodyPart;
     }
 
     /**
@@ -745,28 +765,35 @@ public class MCRMailer extends MCRServlet {
         @XmlEnum
         public enum MessageType {
             @XmlEnumValue("text")
-            TEXT("text"),
+            TEXT("plain"),
 
             @XmlEnumValue("html")
             HTML("html");
 
-            private final String value;
+            private final String subtype;
 
-            MessageType(String v) {
-                value = v;
+            MessageType(String subtype) {
+                this.subtype = subtype;
             }
 
+            public String subtype() {
+                return subtype;
+            }
+
+            /**
+             * @deprecated use {@link #toString()} instead.
+             */
+            @Deprecated(forRemoval = true)
             public String value() {
-                return value;
+                return toString().toLowerCase(Locale.ROOT);
             }
 
-            public static MessageType fromValue(String v) {
-                for (MessageType t : values()) {
-                    if (t.value.equals(v)) {
-                        return t;
-                    }
-                }
-                throw new IllegalArgumentException(v);
+            /**
+             * @deprecated use {@link #valueOf(String)} instead.
+             */
+            @Deprecated(forRemoval = true)
+            public static MessageType fromValue(String value) {
+                return MessageType.valueOf(value.toUpperCase(Locale.ROOT));
             }
         }
     }

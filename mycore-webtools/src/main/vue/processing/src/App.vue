@@ -114,7 +114,7 @@ function showSettingsModal() {
   <h1>
     MyCoRe Processing
     <a class="ms-1 text-secondary" href="#" @click.prevent="showSettingsModal">
-      <i class="fa-solid fa-gear"></i>
+      <i class="fa-solid fa-gear fa-xs"></i>
       <span class="visually-hidden">Settings</span>
     </a>
   </h1>
