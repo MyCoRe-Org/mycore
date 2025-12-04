@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import {Settings} from "../common/settings.ts";
 import {onMounted, ref, useTemplateRef} from "vue";
-import type { Modal } from "bootstrap";
+import type {Modal} from "bootstrap";
 
 declare const bootstrap: { Modal: typeof Modal };
 // Props
@@ -38,7 +38,7 @@ const modal = useTemplateRef('modal');
 let bootStrapModel: Modal;
 
 onMounted(() => {
-  if(modal.value) {
+  if (modal.value) {
     bootStrapModel = new bootstrap.Modal(modal.value);
   }
 });
@@ -54,24 +54,27 @@ defineExpose({
 </script>
 
 <template>
-  <div class="modal" ref="modal">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Settings</h4>
-          <button @click="emit('close')" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p>maximum number of finished processes to display (-1 for unlimited)</p>
-          <input
-              type="number"
-              class="form-control"
-              v-model="maxNumberFinished"
-              @input="updateSetting" />
+  <Teleport to="body">
+    <div class="modal" ref="modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Settings</h4>
+            <button @click="emit('close')" type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>maximum number of finished processes to display (-1 for unlimited)</p>
+            <input
+                type="number"
+                class="form-control"
+                v-model="maxNumberFinished"
+                @input="updateSetting"/>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <style scoped>

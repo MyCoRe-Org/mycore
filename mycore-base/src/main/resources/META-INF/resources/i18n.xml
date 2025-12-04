@@ -15,7 +15,7 @@
       </a>
     </p>
     <form>
-      <label class="mr-2">
+      <label class="me-2">
         <i:de>i18n kann auch in Attributen verwendet werden:</i:de>
         <i:en>i18n can also be used in attributes:</i:en>
       </label>
@@ -29,7 +29,7 @@
       <i:code>editor.search.document.esample</i:code>
     </p>
     <form>
-      <label class="mr-2">
+      <label class="me-2">
         <i:code>metaData.createdAt</i:code>:
       </label>
       <input type="text" placeholder="|code:metaData.date|" />

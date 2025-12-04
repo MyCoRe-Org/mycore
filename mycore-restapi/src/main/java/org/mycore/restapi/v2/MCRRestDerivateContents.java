@@ -238,8 +238,15 @@ public class MCRRestDerivateContents {
         return Response.status(Response.Status.CREATED).build();
     }
 
-    private static EntityTag getETag(MCRFileAttributes attrs) {
-        return new EntityTag(attrs.digest().toHexString());
+    private static EntityTag getETag(MCRPath path, MCRFileAttributes attrs) {
+        MCRPathContent content = new MCRPathContent(path, attrs);
+        String eTag;
+        try {
+            eTag = content.getETag();
+        } catch (IOException ignored) {
+            return null;
+        }
+        return MCRRestContentHelper.parseEtag(eTag);
     }
 
     private static long getUploadMaxSize() {
@@ -305,7 +312,7 @@ public class MCRRestDerivateContents {
             .header(HttpHeaders.CONTENT_TYPE, mimeType)
             .lastModified(Date.from(fileAttributes.lastModifiedTime().toInstant()))
             .header(HttpHeaders.CONTENT_LENGTH, fileAttributes.size())
-            .tag(getETag(fileAttributes))
+            .tag(getETag(mcrPath, fileAttributes))
             .header("Repr-Digest", getReprDigestHeaderValue(fileAttributes.digest()))
             .build();
     }
@@ -340,7 +347,7 @@ public class MCRRestDerivateContents {
                 .orElseGet(() -> serveDirectory(mcrPath, fileAttributes));
         }
         return MCRRestUtils
-            .getCachedResponse(request.getRequest(), lastModified, getETag(fileAttributes))
+            .getCachedResponse(request.getRequest(), lastModified, getETag(mcrPath, fileAttributes))
             .orElseGet(() -> {
                 MCRPathContent content = new MCRPathContent(mcrPath, fileAttributes);
                 content.setMimeType(context.getMimeType(mcrPath.getFileName().toString()));
@@ -468,7 +475,7 @@ public class MCRRestDerivateContents {
         }
         //file does already exist
         Date lastModified = new Date(fileAttributes.lastModifiedTime().toMillis());
-        EntityTag eTag = getETag(fileAttributes);
+        EntityTag eTag = getETag(mcrPath, fileAttributes);
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request.getRequest(), lastModified,
             eTag);
         return cachedResponse.orElseGet(() -> updateFile(contents, mcrPath));

@@ -103,7 +103,7 @@ function changeTriggerState(trigger, enabled) {
 }
 
 function setTriggerLoadingState(trigger, loading) {
-  const spinnerCode = "<span class=\"spinner-border spinner-border-sm mr-1\" role=\"status\" aria-hidden=\"true\"></span>";
+  const spinnerCode = "<span class=\"spinner-border spinner-border-sm me-1\" role=\"status\" aria-hidden=\"true\"></span>";
   const spinnerElement = trigger.querySelector("span.spinner-border");
   const isLoading = spinnerElement !== null;
   if (loading && !isLoading) {

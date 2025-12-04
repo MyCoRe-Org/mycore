@@ -75,7 +75,7 @@
                     </input>
                   </div>
                   <div class="col-3">
-                    <span class="float-right">
+                    <span class="float-end">
                       <div class="btn-group">
                         <xed:controls>insert remove</xed:controls>
                       </div>

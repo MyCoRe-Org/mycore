@@ -55,9 +55,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.digest.MCRDigest;
 import org.mycore.common.digest.MCRSHA512Digest;
-import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCRPathEventHelper;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
@@ -112,6 +113,8 @@ import io.ocfl.api.model.VersionNum;
  * @see MCROCFLDirectoryTracker
  */
 public abstract class MCROCFLVirtualObject {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * The standard directory within an OCFL object's content where all files for this file system are stored.
@@ -393,14 +396,12 @@ public abstract class MCROCFLVirtualObject {
     protected MCROCFLClosableCallbackChannel createByteChannel(MCRVersionedPath path, Set<? extends OpenOption> options,
         FileAttribute<?>... fileAttributes)
         throws IOException {
-        boolean createNew = options.contains(StandardOpenOption.CREATE_NEW);
         boolean isKeepFile = path.getFileName().toString().equals(KEEP_FILE);
-        boolean fireCreateEvent = createNew || Files.notExists(path);
         SeekableByteChannel seekableByteChannel =
             this.transactionalStorage.newByteChannel(path, options, fileAttributes);
         return new MCROCFLClosableCallbackChannel(seekableByteChannel, () -> {
             if (!isKeepFile) {
-                trackFileWrite(path, fireCreateEvent ? MCREvent.EventType.CREATE : MCREvent.EventType.UPDATE);
+                trackFileWrite(path);
             } else {
                 trackEmptyDirectory(path.getParent());
             }
@@ -426,7 +427,7 @@ public abstract class MCROCFLVirtualObject {
         }
         SeekableByteChannel seekableByteChannel = this.transactionalStorage.newByteChannel(path, writeOptions);
         return new MCROCFLClosableCallbackChannel(seekableByteChannel, () -> {
-            trackFileWrite(path, MCREvent.EventType.UPDATE);
+            trackFileWrite(path);
         });
     }
 
@@ -507,7 +508,6 @@ public abstract class MCROCFLVirtualObject {
             this.fileTracker.delete(lockedPath);
         }
         trackEmptyDirectory(lockedPath.getParent());
-        MCRPathEventHelper.fireFileDeleteEvent(releaseVersion(lockedPath));
     }
 
     /**
@@ -569,12 +569,8 @@ public abstract class MCROCFLVirtualObject {
         this.directoryTracker.rename(source, target);
     }
 
-    protected void renameFile(MCRVersionedPath source, MCRVersionedPath target) throws IOException {
-        boolean create = !exists(target);
+    protected void renameFile(MCRVersionedPath source, MCRVersionedPath target) {
         this.fileTracker.rename(source, target);
-        MCRVersionedPath releasedSourcePath = releaseVersion(source);
-        MCRVersionedPath releasedTargetPath = releaseVersion(target);
-        MCRPathEventHelper.fireFileMoveEvent(releasedSourcePath, releasedTargetPath, create);
     }
 
     /**
@@ -931,20 +927,25 @@ public abstract class MCROCFLVirtualObject {
         // purge object
         if (this.markForPurge) {
             persistPurge(targetVersionId);
+            fireDeleteEventsForPurge();
             return true;
         }
         // persist
+        List<MCROCFLFileTracker.Change<MCRVersionedPath>> fileChanges = fileTracker.changes();
+        List<MCROCFLDirectoryTracker.Change> dirChanges = directoryTracker.changes();
         String type = this.objectVersion == null ? MESSAGE_CREATED : MESSAGE_UPDATED;
         AtomicBoolean updatedFiles = new AtomicBoolean(false);
         AtomicBoolean updatedDirectories = new AtomicBoolean(false);
         repository.updateObject(targetVersionId, new VersionInfo().setMessage(type), (updater) -> {
             try {
-                updatedFiles.set(persistFileChanges(updater));
-                updatedDirectories.set(persistDirectoryChanges(updater));
+                updatedFiles.set(persistFileChanges(updater, fileChanges));
+                updatedDirectories.set(persistDirectoryChanges(updater, dirChanges));
             } catch (IOException ioException) {
                 throw new UncheckedIOException("Unable to " + type + " " + targetVersionId, ioException);
             }
         });
+        // fire events after OCFL update succeeded
+        fireFileEventsAfterPersist(fileChanges);
         return updatedFiles.get() || updatedDirectories.get();
     }
 
@@ -977,16 +978,17 @@ public abstract class MCROCFLVirtualObject {
     /**
      * Persists file changes to the updater.
      *
-     * @param updater the OCFL object updater.
+     * @param updater     the OCFL object updater.
+     * @param changes     the file changes to persist.
      * @return {@code true} if changes were persisted, {@code false} otherwise.
      */
-    protected boolean persistFileChanges(OcflObjectUpdater updater) throws IOException {
-        List<MCROCFLFileTracker.Change<MCRVersionedPath>> changes = this.fileTracker.changes();
+    protected boolean persistFileChanges(OcflObjectUpdater updater,
+        List<MCROCFLFileTracker.Change<MCRVersionedPath>> changes) throws IOException {
         for (MCROCFLFileTracker.Change<MCRVersionedPath> change : changes) {
             String ocflSourcePath = change.source().toRelativePath();
             String ocflFilesSourcePath = toOcflFilesPath(ocflSourcePath);
             switch (change.type()) {
-                case ADDED_OR_MODIFIED -> {
+                case ADDED, MODIFIED -> {
                     Path localSourcePath = toPhysicalPath(change.source());
                     long size = Files.size(localSourcePath);
                     updater
@@ -1008,11 +1010,12 @@ public abstract class MCROCFLVirtualObject {
     /**
      * Persists directory changes to the updater.
      *
-     * @param updater the OCFL object updater.
+     * @param updater    the OCFL object updater.
+     * @param changes    the directory changes to persist.
      * @return {@code true} if changes were persisted, {@code false} otherwise.
      */
-    protected boolean persistDirectoryChanges(OcflObjectUpdater updater) {
-        List<MCROCFLDirectoryTracker.Change> changes = this.directoryTracker.changes();
+    protected boolean persistDirectoryChanges(OcflObjectUpdater updater,
+        List<MCROCFLDirectoryTracker.Change> changes) {
         for (MCROCFLDirectoryTracker.Change change : changes) {
             String ocflKeepFile = change.keepFile().toRelativePath();
             String ocflFilesKeepFile = toOcflFilesPath(ocflKeepFile);
@@ -1029,6 +1032,54 @@ public abstract class MCROCFLVirtualObject {
             }
         }
         return !changes.isEmpty();
+    }
+
+    protected void fireFileEventsAfterPersist(List<MCROCFLFileTracker.Change<MCRVersionedPath>> fileChanges) {
+        Set<MCRVersionedPath> originalPaths = new HashSet<>(this.fileTracker.originalPaths());
+        for (MCROCFLFileTracker.Change<MCRVersionedPath> change : fileChanges) {
+            try {
+                switch (change.type()) {
+                    case ADDED -> {
+                        MCRVersionedPath path = releaseVersion(change.source());
+                        MCRPathEventHelper.fireFileCreateEvent(path);
+                    }
+                    case MODIFIED -> {
+                        MCRVersionedPath path = releaseVersion(change.source());
+                        MCRPathEventHelper.fireFileUpdateEvent(path);
+                    }
+                    case DELETED -> {
+                        MCRVersionedPath path = releaseVersion(change.source());
+                        MCRPathEventHelper.fireFileDeleteEvent(path);
+                    }
+                    case RENAMED -> {
+                        MCRVersionedPath source = releaseVersion(change.source());
+                        MCRVersionedPath target = releaseVersion(change.target());
+                        boolean create = !originalPaths.contains(change.target());
+                        MCRPathEventHelper.fireFileMoveEvent(source, target, create);
+                    }
+                }
+            } catch (Exception e) {
+                // log error and continue, events should not fail the commit
+                LOGGER.error(() -> "Unable to fire event for file change: " + change, e);
+            }
+        }
+    }
+
+    /**
+     * Fires delete events for all original content files when the whole object is purged.
+     * <p>
+     * Uses the original paths from the file tracker (before purge) to generate events.
+     */
+    protected void fireDeleteEventsForPurge() {
+        for (MCRVersionedPath originalPath : this.fileTracker.originalPaths()) {
+            MCRVersionedPath eventPath = releaseVersion(originalPath);
+            try {
+                MCRPathEventHelper.fireFileDeleteEvent(eventPath);
+            } catch (Exception e) {
+                // log error and continue, events should not fail the commit
+                LOGGER.error(() -> "Unable to fire delete event for path: " + eventPath, e);
+            }
+        }
     }
 
     /**
@@ -1131,21 +1182,10 @@ public abstract class MCROCFLVirtualObject {
      * Tracks a file write operation.
      *
      * @param path the path of the file.
-     * @param event the type of event to fire.
-     * @throws IOException if an I/O error occurs.
      */
-    protected void trackFileWrite(MCRVersionedPath path, MCREvent.EventType event) throws IOException {
+    protected void trackFileWrite(MCRVersionedPath path) {
         this.fileTracker.write(path);
         this.directoryTracker.update(path.getParent(), false);
-        MCRVersionedPath releasedVersionPath = releaseVersion(path);
-        if (event != null) {
-            switch (event) {
-                case CREATE -> MCRPathEventHelper.fireFileCreateEvent(releasedVersionPath);
-                case UPDATE -> MCRPathEventHelper.fireFileUpdateEvent(releasedVersionPath);
-                default -> {
-                }
-            }
-        }
     }
 
     protected void trackEmptyDirectory(MCRVersionedPath path) throws IOException {
