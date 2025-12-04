@@ -55,9 +55,9 @@
                <input type='checkbox' id="acle2-button-select-multi-access" class="acle2-icon"/>
                <button type="button" id="acle2-button-remove-multi-access" class="btn btn-danger"><text i18n="ACLE.buttons.access.delete"/></button>
                <button type="button" id="acle2-button-edit-multi-access" class="btn btn-primary"><text i18n="ACLE.buttons.access.editMulti"/></button>
-               <div id="acle2-page-buttons" class="float-right">
+               <div id="acle2-page-buttons" class="float-end">
                  <div id="acle2-paginator" class="">
-                  <ul class="pagination float-right">
+                  <ul class="pagination float-end">
                   </ul>
                </div>
                <div id="acle2-elem-per-page" class="">
@@ -72,7 +72,7 @@
               <div class="modal-content">
                 <div class="modal-header">
                   <h4 class="modal-title" id="lightbox-label"><text i18n="ACLE.labels.access.newRule"/></h4>
-                  <button type="button" class="close acle2-new-rule-cancel" data-dismiss="modal" aria-hidden="true">X</button>
+                  <button type="button" class="btn-close acle2-new-rule-cancel" data-bs-dismiss="modal" aria-hidden="true"></button>
                 </div>
                 <div class="modal-body">
                   <div id="acle2-lightbox-new-rule-alert-area" class="acle2-lightbox-alert-area alert fade alert-danger"><text i18n="ACLE.alert.rule.noRule"/></div>
@@ -84,7 +84,7 @@
                   </div>
                 </div>
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-default acle2-new-rule-cancel" data-dismiss="modal" aria-hidden="true"><text i18n="ACLE.buttons.access.cancel"/></button>
+                  <button type="button" class="btn btn-secondary acle2-new-rule-cancel" data-bs-dismiss="modal" aria-hidden="true"><text i18n="ACLE.buttons.access.cancel"/></button>
                   <button type="button" id="acle2-new-rule-add" class="btn btn-primary" ><text i18n="ACLE.buttons.access.newRule"/></button>
                 </div>
               </div>
@@ -95,7 +95,7 @@
               <div class="modal-content">
                 <div class="modal-header">
                   <h4 id="acle2-lightbox-multi-edit-label" class="modal-title"><text i18n="ACLE.labels.access.multiEdit"/></h4>
-                  <button type="button" class="close acle2-lightbox-multi-edit-cancel" data-dismiss="modal" aria-hidden="true">X</button>
+                  <button type="button" class="btn-close acle2-lightbox-multi-edit-cancel" data-bs-dismiss="modal" aria-hidden="true">X</button>
                 </div>
                 <div class="modal-body">
                   <div id="acle2-lightbox-multi-edit-alert-area" class="acle2-lightbox-alert-area alert fade alert-danger"><text i18n="ACLE.alert.access.edit.multi.noRule"/></div>
@@ -106,7 +106,7 @@
                   </div>
                 </div>
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-default acle2-lightbox-multi-edit-cancel" data-dismiss="modal" aria-hidden="true"><text i18n="ACLE.buttons.access.cancel"/></button>
+                  <button type="button" class="btn btn-secondary acle2-lightbox-multi-edit-cancel" data-bs-dismiss="modal" aria-hidden="true"><text i18n="ACLE.buttons.access.cancel"/></button>
                   <button type="button" id="acle2-lightbox-multi-edit-edit" class="btn btn-primary" ><text i18n="ACLE.buttons.access.save"/></button>
                 </div>
               </div>
@@ -117,7 +117,7 @@
               <div class="modal-content">
                  <div class="modal-header">
                    <h4 id="acle2-lightbox-multi-delete-label" class="modal-title"><text i18n="ACLE.labels.access.multiDelete"/></h4>
-                   <button type="button" class="close acle2-lightbox-multi-delete-cancel" data-dismiss="modal" aria-hidden="true">X</button>
+                   <button type="button" class="btn-close acle2-lightbox-multi-delete-cancel" data-bs-dismiss="modal" aria-hidden="true">X</button>
                 </div>
                 <div class="modal-body">
                   <div id="acle2-lightbox-multi-delete-main" class="dl-horizontal">
@@ -129,7 +129,7 @@
                   </div>
                 </div>
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-default acle2-lightbox-multi-delete-cancel" data-dismiss="modal" aria-hidden="true"><text i18n="ACLE.buttons.access.cancel"/></button>
+                  <button type="button" class="btn btn-secondary acle2-lightbox-multi-delete-cancel" data-bs-dismiss="modal" aria-hidden="true"><text i18n="ACLE.buttons.access.cancel"/></button>
                   <button type="button" id="acle2-lightbox-multi-delete-delete" class="btn btn-danger" ><text i18n="ACLE.buttons.access.deleteone"/></button>
                 </div>
               </div>

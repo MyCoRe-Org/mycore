@@ -91,7 +91,7 @@
             <pre id="stacktraceModalBody" class="pre-scrollable"></pre>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Schließen</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
           </div>
         </div>
       </div>
