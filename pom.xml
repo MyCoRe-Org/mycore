@@ -27,7 +27,7 @@
     <version>58</version>
   </parent>
   <artifactId>mycore</artifactId>
-  <version>2025.12.0-SNAPSHOT</version>
+  <version>2025.12.0</version>
   <packaging>pom</packaging>
   <name>MyCoRe</name>
   <description xml:space="preserve">
@@ -49,7 +49,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <connection>scm:git:https://github.com/MyCoRe-Org/mycore.git</connection>
     <developerConnection>scm:git:https://github.com/MyCoRe-Org/mycore.git</developerConnection>
     <url>https://github.com/MyCoRe-Org/mycore</url>
-    <tag>2025.12.x</tag>
+    <tag>v2025.12.0</tag>
   </scm>
   <properties>
     <argLine />
@@ -113,7 +113,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <plugin>
           <groupId>org.mycore.plugins</groupId>
           <artifactId>datamodel-plugin</artifactId>
-          <version>0.9-SNAPSHOT</version>
+          <version>0.9</version>
         </plugin>
         <plugin>
           <groupId>com.github.eirslett</groupId>
@@ -1589,7 +1589,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-classifications</artifactId>
-        <version>1.2-SNAPSHOT</version>
+        <version>1.2</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
@@ -2154,7 +2154,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>selenium-utils</artifactId>
-        <version>0.11-SNAPSHOT</version>
+        <version>0.11</version>
         <scope>test</scope>
         <exclusions>
           <exclusion>
