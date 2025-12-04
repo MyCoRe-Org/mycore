@@ -40,6 +40,7 @@ public class MCRLegalEntityServiceMock implements MCRLegalEntityService {
 
     @Override
     public void addIdentifier(MCRIdentifier primaryIdentifier, MCRIdentifier identifierToAdd) {
-        userMock.getAttributes().add(new MCRUserAttribute("id_" + identifierToAdd.getType(), identifierToAdd.getValue()));
+        userMock.getAttributes().add(new MCRUserAttribute(
+            "id_" + identifierToAdd.getType(), identifierToAdd.getValue()));
     }
 }
