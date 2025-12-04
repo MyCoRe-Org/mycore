@@ -101,8 +101,9 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
         try {
             instance.getCitationProcessor().reset();
             instance.getDataProvider().reset();
+            instance.getCitationProcessor().setOutputFormat(format);
         } catch (RuntimeException e) {
-            // if a error happens the instances may be not reset, so we trow away the instance
+            // if an error happens the instances may be not reset, so we throw away the instance
             return;
         }
         synchronized (transformerInstances) {
