@@ -31,7 +31,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Locale;
 import java.util.Objects;
 
 import org.mycore.datamodel.niofs.MCRFileAttributes;
@@ -89,20 +88,24 @@ public class MCRPathContent extends MCRContent implements MCRSeekableChannelCont
         return (attrs != null ? attrs.lastModifiedTime() : Files.getLastModifiedTime(path)).toMillis();
     }
 
+    private static String getETag(MCRFileAttributes<?> fAttrs) {
+        return '"' + fAttrs.digest().toHexString() + '"';
+    }
+
     @Override
     public String getETag() throws IOException {
-        if (attrs instanceof MCRFileAttributes fAttrs) {
-            return String.format(Locale.ROOT, "\"%s\"", fAttrs.digest().toHexString());
-        }
-
-        if (Files.getFileStore(path).supportsFileAttributeView("md5")) {
-            Object fileKey = Files.getAttribute(path, "md5:md5");
-            if (fileKey instanceof String s) {
-                return String.format(Locale.ROOT, "\"%s\"", s);
+        if (attrs instanceof MCRFileAttributes<?> fAttrs) {
+            return getETag(fAttrs);
+        } else if (attrs == null) {
+            try {
+                MCRFileAttributes mcrattrs = Files.readAttributes(path, MCRFileAttributes.class);
+                return getETag(mcrattrs);
+            } catch (UnsupportedOperationException ignored) {
+                //no support for MCRFileAttributes
             }
         }
 
-        return super.getETag();
+        return "\"" + length() + '-' + lastModified() + '"';
     }
 
     @Override

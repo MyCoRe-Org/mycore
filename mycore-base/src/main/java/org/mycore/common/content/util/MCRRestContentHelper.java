@@ -150,7 +150,7 @@ public final class MCRRestContentHelper {
         return response.build();
     }
 
-    private static EntityTag parseEtag(String eTag) {
+    public static EntityTag parseEtag(String eTag) {
         if (eTag == null) {
             return null;
         }
