@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mycoreobject xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="datamodel-modsperson.xsd" ID="junit_modsperson_00000001">
+    <metadata>
+        <def.modsContainer class="MCRMetaXML" heritable="false" notinherit="true">
+            <modsContainer inherited="0">
+                <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+                    <mods:name type="personal">
+                        <mods:namePart type="family">Doe</mods:namePart>
+                        <mods:namePart type="given">John</mods:namePart>
+                        <mods:nameIdentifier type="orcid">0000-0001-2345-6789</mods:nameIdentifier>
+                        <mods:nameIdentifier type="orcid">0000-0002-3456-7895</mods:nameIdentifier>
+                        <mods:nameIdentifier type="orcid">0000-0003-4567-8985</mods:nameIdentifier>
+                        <mods:nameIdentifier type="scopus">87654321</mods:nameIdentifier>
+                        <mods:nameIdentifier type="something">abcd</mods:nameIdentifier>
+                    </mods:name>
+                </mods:mods>
+            </modsContainer>
+        </def.modsContainer>
+    </metadata>
+</mycoreobject>
