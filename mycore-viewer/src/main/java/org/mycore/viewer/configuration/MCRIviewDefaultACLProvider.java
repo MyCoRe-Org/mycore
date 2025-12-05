@@ -27,8 +27,7 @@ public class MCRIviewDefaultACLProvider implements MCRIviewACLProvider {
 
     @Override
     public boolean checkAccess(HttpSession session, MCRObjectID derivateID) {
-        return MCRAccessManager.checkPermission(derivateID, MCRAccessManager.PERMISSION_VIEW) ||
-            MCRAccessManager.checkPermission(derivateID, MCRAccessManager.PERMISSION_READ);
+        return MCRAccessManager.checkDerivateDisplayPermission(derivateID.toString());
     }
 
 }
