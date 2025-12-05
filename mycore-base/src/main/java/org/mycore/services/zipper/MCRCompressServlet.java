@@ -48,7 +48,6 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.xml.MCRLayoutService;
-import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -188,8 +187,7 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
                 String ownerID = el.getAttributeValue(MCRXlink.HREF, XLINK_NAMESPACE);
                 MCRObjectID derId = MCRObjectID.getInstance(ownerID);
                 // here the access check is tested only against the derivate
-                if (MCRAccessManager.checkDerivateContentPermission(derId, PERMISSION_READ)
-                    && MCRXMLFunctions.isDisplayedEnabledDerivate(ownerID)) {
+                if (MCRAccessManager.checkDerivateContentPermission(derId, PERMISSION_READ)) {
                     sendDerivate(derId, null, container);
                 }
             }
