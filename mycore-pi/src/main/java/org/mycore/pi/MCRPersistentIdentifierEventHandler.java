@@ -27,6 +27,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCRJanitorEventHandlerBase;
 import org.mycore.datamodel.common.MCRLinkType;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -118,7 +119,11 @@ public class MCRPersistentIdentifierEventHandler extends MCRJanitorEventHandlerB
     @Override
     protected void handleObjectLinkUpdated(MCREvent evt, MCRObject updatedObject, MCRLinkType relation,
         MCRObjectID linked) {
-        MCRObject obj = MCRMetadataManager.retrieveMCRObject(linked);
+        if(!linked.getTypeId().equals(MCRDerivate.OBJECT_TYPE)){
+          // pi services only handle normal objects, not derivates
+          return;
+        }
+        MCRObject obj = MCRMetadataManager.retrieveMCRExpandedObject(linked);
         detectServices(obj, (service, registrationInfo) -> {
             try {
                 if (relation == MCRLinkType.CHILD && service.isAncestorUpdateTriggerUpdate()) {

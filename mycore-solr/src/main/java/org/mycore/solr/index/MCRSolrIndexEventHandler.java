@@ -146,7 +146,8 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
             // this is handled by handleAncestorUpdated
             return;
         }
-        addContent(linkedID, () -> new MCRBaseContent(MCRMetadataManager.retrieveMCRExpandedObject(linkedID)));
+
+        addById(linkedID);
     }
 
     @Override
@@ -156,7 +157,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleDerivateLinkUpdated(MCREvent evt, MCRDerivate updatedDerivate, MCRObjectID linkedID) {
-        addContent(linkedID, () -> new MCRBaseContent(MCRMetadataManager.retrieveMCRExpandedObject(linkedID)));
+        addById(linkedID);
     }
 
     @Override
@@ -182,6 +183,14 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     @Override
     protected void handleDerivateRepaired(MCREvent evt, MCRDerivate derivate) {
         addDerivate(derivate);
+    }
+
+    private void addById(MCRObjectID id) {
+        if (id.getTypeId().equals(MCRDerivate.OBJECT_TYPE)) {
+            addDerivate(MCRMetadataManager.retrieveMCRDerivate(id));
+        } else {
+            addObject(MCRMetadataManager.retrieveMCRExpandedObject(id));
+        }
     }
 
     private void addObject(MCRObject obj) {
