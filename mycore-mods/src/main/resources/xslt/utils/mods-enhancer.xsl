@@ -11,9 +11,13 @@
 
   <xsl:variable name="ifs">
     <xsl:for-each select="mycoreobject/structure/derobjects/derobject[document(concat('userobjectrights:isWorldReadable:', @xlink:href))/boolean/text() = 'true']">
-      <der id="{@xlink:href}">
-        <xsl:copy-of select="document(concat('xslStyle:mcr_directory-recursive:ifs:',@xlink:href,'/'))" />
-      </der>
+      <xsl:variable name="derivateType" select="classification[@classid='derivate_types']/@categid" />
+      <xsl:variable name="derivateExported" select="not(document(concat('classification:metadata:0:children:derivate_types:',$derivateType))//category/label[lang('x-export')]/@text='false')" />
+      <xsl:if test="$derivateExported">
+        <der id="{@xlink:href}">
+          <xsl:copy-of select="document(concat('xslStyle:mcr_directory-recursive:ifs:',@xlink:href,'/'))" />
+        </der>
+      </xsl:if>
     </xsl:for-each>
   </xsl:variable>
 
