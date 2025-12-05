@@ -187,7 +187,7 @@
         <xsl:for-each select="./structure/derobjects/derobject">
           <derivate>
             <id><xsl:value-of select="@xlink:href" /></id>
-            <display><xsl:value-of select="mcrxsl:isDisplayedEnabledDerivate(@xlink:href)" /></display>
+            <display><xsl:value-of select="acl:checkDerivateDisplayPermission(@xlink:href)" /></display>
           </derivate>
         </xsl:for-each>
         </derivates>
