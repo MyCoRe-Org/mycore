@@ -110,7 +110,7 @@
 
       <xsl:if test="$pageToDisplay != ''">
         <xsl:variable name="object-view-derivate" select="acl:checkPermission($derivate,'view')" />
-        <xsl:variable name="isDisplayedEnabled" select="mcrxsl:isDisplayedEnabledDerivate($derivate)" />
+        <xsl:variable name="isDisplayedEnabled" select="acl:checkDerivateDisplayPermission($derivate)" />
         <xsl:variable name="mayWriteDerivate" select="acl:checkPermission($derivate,'writedb')" />
         <xsl:choose>
           <xsl:when test="($object-view-derivate and $isDisplayedEnabled = 'true') or $mayWriteDerivate">

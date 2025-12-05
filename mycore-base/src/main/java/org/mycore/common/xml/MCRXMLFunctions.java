@@ -369,6 +369,10 @@ public class MCRXMLFunctions {
         return relativeURI.getPath();
     }
 
+    /**
+     * @deprecated Use {@link MCRAccessManager#checkDerivateDisplayPermission(String)} instead.
+     */
+    @Deprecated(forRemoval = true)
     public static boolean isDisplayedEnabledDerivate(String derivateId) {
         return MCRAccessManager.checkDerivateDisplayPermission(derivateId);
     }
@@ -407,7 +411,7 @@ public class MCRXMLFunctions {
         Set<String> displayableDerivates = derivateIds
             .stream()
             .map(MCRObjectID::toString)
-            .filter(MCRXMLFunctions::isDisplayedEnabledDerivate)
+            .filter(MCRAccessManager::checkDerivateDisplayPermission)
             .collect(Collectors.toSet());
         return !displayableDerivates.isEmpty() && displayableDerivates.stream()
             .allMatch(derId -> MCRAccessManager.checkPermission(derId, MCRAccessManager.PERMISSION_READ));
