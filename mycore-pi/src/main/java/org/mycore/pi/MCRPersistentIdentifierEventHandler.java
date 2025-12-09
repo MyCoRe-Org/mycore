@@ -119,9 +119,9 @@ public class MCRPersistentIdentifierEventHandler extends MCRJanitorEventHandlerB
     @Override
     protected void handleObjectLinkUpdated(MCREvent evt, MCRObject updatedObject, MCRLinkType relation,
         MCRObjectID linked) {
-        if(linked.getTypeId().equals(MCRDerivate.OBJECT_TYPE)){
-          // pi services only handle normal objects, not derivates
-          return;
+        if (linked.getTypeId().equals(MCRDerivate.OBJECT_TYPE)) {
+            // pi services only handle normal objects, not derivates
+            return;
         }
         MCRObject obj = MCRMetadataManager.retrieveMCRExpandedObject(linked);
         detectServices(obj, (service, registrationInfo) -> {
