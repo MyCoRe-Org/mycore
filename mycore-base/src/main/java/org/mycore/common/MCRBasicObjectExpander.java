@@ -104,7 +104,7 @@ public class MCRBasicObjectExpander implements MCRObjectExpander {
     protected void inheritLinkedMetadata(MCRObject object) {
         MCRObjectID parentID = object.getStructure().getParentID();
         if (parentID != null) {
-            MCRObject parent = MCRMetadataManager.retrieveMCRObject(parentID);
+            MCRObject parent = MCRMetadataManager.retrieveMCRExpandedObject(parentID);
             // remove already embedded inherited tags
             object.getMetadata().removeInheritedMetadata();
             // insert heritable tags
