@@ -96,7 +96,20 @@ public class MCRBasicObjectExpander implements MCRObjectExpander {
 
         expandedObject.getService().setDate(DATE_TYPE_EFFECTIVE_MODIFIED_DATE, new Date());
 
+        inheritLinkedMetadata(mcrObject);
+
         return expandedObject;
+    }
+
+    protected void inheritLinkedMetadata(MCRObject object) {
+        MCRObjectID parentID = object.getStructure().getParentID();
+        if (parentID != null) {
+            MCRObject parent = MCRMetadataManager.retrieveMCRObject(parentID);
+            // remove already embedded inherited tags
+            object.getMetadata().removeInheritedMetadata();
+            // insert heritable tags
+            object.getMetadata().appendMetadata(parent.getMetadata().getHeritableMetadata());
+        }
     }
 
     /**

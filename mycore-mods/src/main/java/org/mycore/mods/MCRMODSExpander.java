@@ -74,7 +74,13 @@ public class MCRMODSExpander extends MCRBasicObjectExpander {
         return baseExpanded;
     }
 
-    /**
+    @Override
+    protected void inheritLinkedMetadata(MCRObject object) {
+        // handled in expand and expand(MCRObject mcrObject)
+        // inheritLinkedMetadata(MCRMODSWrapper modsWrapper, MCRObjectID parentID)
+    }
+
+  /**
      * Inherits the metadata linked from the current to other objects
      *
      * @param modsWrapper the current object
