@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="3.0" xmlns:mods="http://www.loc.gov/mods/v3" 
   xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:mcracl="http://www.mycore.de/xslt/acl"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   
   <xsl:param name="WebApplicationBaseURL" />
@@ -10,7 +11,7 @@
   <xsl:key name="relacode" match="code" use="@key" />
 
   <xsl:variable name="ifs">
-    <xsl:for-each select="mycoreobject/structure/derobjects/derobject[document(concat('userobjectrights:isWorldReadable:', @xlink:href))/boolean/text() = 'true']">
+    <xsl:for-each select="mycoreobject/structure/derobjects/derobject[mcracl:check-permission(@xlink:href,'read')]">
       <der id="{@xlink:href}">
         <xsl:copy-of select="document(concat('xslStyle:mcr_directory-recursive:ifs:',@xlink:href,'/'))" />
       </der>
