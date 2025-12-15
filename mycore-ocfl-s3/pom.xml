@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore</artifactId>
-    <version>2025.12.1-SNAPSHOT</version>
+    <version>2025.12.1</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>mycore-ocfl-s3</artifactId>
