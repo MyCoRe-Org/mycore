@@ -49,7 +49,7 @@ public abstract class MCRAccessKeyContextService<T> {
     }
 
     /**
-     * Activates a access key for reference by secret to current context.
+     * Activates an access key for reference by secret to current context.
      *
      * @param reference the object or resource reference for which the access key will be activated
      * @param secret the secret to active access key

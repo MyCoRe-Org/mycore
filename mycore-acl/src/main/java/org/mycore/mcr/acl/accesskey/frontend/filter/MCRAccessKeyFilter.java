@@ -29,7 +29,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.mcr.acl.accesskey.config.MCRAccessKeyConfig;
-import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyServiceFactory;
+import org.mycore.mcr.acl.accesskey.service.MCRAccessKeySessionService;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -47,6 +47,25 @@ import jakarta.servlet.http.HttpServletResponse;
 public class MCRAccessKeyFilter implements Filter {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    private MCRAccessKeySessionService sessionService;
+
+    /**
+     * Creates a new {@link MCRAccessKeyFilter} using the default
+     * {@link MCRAccessKeySessionService} instance.
+     */
+    public MCRAccessKeyFilter() {
+        this(MCRAccessKeySessionService.obtainInstance());
+    }
+
+    /**
+     * Creates a new {@link MCRAccessKeyFilter} with the given session service.
+     *
+     * @param sessionService the {@link MCRAccessKeySessionService} used to access and manage access key session
+     */
+    public MCRAccessKeyFilter(MCRAccessKeySessionService sessionService) {
+        this.sessionService = sessionService;
+    }
 
     @Override
     public void init(FilterConfig filterConfig) {
@@ -69,8 +88,7 @@ public class MCRAccessKeyFilter implements Filter {
                         MCRServlet.initializeMCRSession(httpServletRequest, getFilterName());
                         MCRFrontendUtil.configureSession(MCRSessionMgr.getCurrentSession(), httpServletRequest,
                             (HttpServletResponse) response);
-                        MCRAccessKeyServiceFactory.getAccessKeySessionService()
-                            .activateAccessKey(objectId.toString(), secret);
+                        sessionService.activateAccessKey(objectId.toString(), secret);
                     } catch (Exception e) {
                         LOGGER.error("Cannot set access key '{}' for {} to session", secret, objectId, e);
                         MCRTransactionManager.rollbackTransactions();
