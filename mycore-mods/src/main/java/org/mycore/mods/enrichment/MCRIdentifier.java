@@ -18,6 +18,10 @@
 
 package org.mycore.mods.enrichment;
 
+import java.nio.charset.StandardCharsets;
+import java.net.URLDecoder;
+import java.util.Locale;
+
 import org.jaxen.JaxenException;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
@@ -47,14 +51,22 @@ public class MCRIdentifier {
         return value;
     }
 
+    public static String simplifyID(String id) {
+        return URLDecoder.decode(id.toLowerCase(Locale.ENGLISH),StandardCharsets.UTF_8).replace("-","");
+    }
+
+    public String simplifiedID() {
+        return simplifyID(toString());
+    }
+
     @Override
     public boolean equals(Object other) {
-        return (other instanceof MCRIdentifier && this.toString().equals(other.toString()));
+        return (other instanceof MCRIdentifier && this.simplifiedID().equals(((MCRIdentifier)other).simplifiedID()));
     }
 
     @Override
     public int hashCode() {
-        return toString().hashCode();
+        return simplifiedID().hashCode();
     }
 
     @Override
