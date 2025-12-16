@@ -18,8 +18,6 @@
 
 package org.mycore.mcr.acl.accesskey.cli;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,7 +31,11 @@ import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyException;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyNotFoundException;
 import org.mycore.mcr.acl.accesskey.mapper.MCRAccessKeyJsonMapper;
-import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyServiceFactory;
+import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyService;
+import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyServiceProvider;
+import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyUserService;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Command class for managing access keys in the system.
@@ -43,14 +45,16 @@ public class MCRAccessKeyCommands {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private static final MCRAccessKeyService SERVICE = MCRAccessKeyServiceProvider.obtainInstance();
+
     /**
      * Removes all access keys.
      *
-     * @see org.mycore.mcr.acl.accesskey.service.MCRAccessKeyServiceImpl#removeAllAccessKeys()
+     * @see org.mycore.mcr.acl.accesskey.service.MCRAccessKeyService#removeAllAccessKeys()
      */
     @MCRCommand(syntax = "clear all access keys", help = "Clears all access keys")
     public static void removeAllAccessKeys() {
-        MCRAccessKeyServiceFactory.getAccessKeyService().removeAllAccessKeys();
+        SERVICE.removeAllAccessKeys();
         LOGGER.info("Cleared all access keys.");
     }
 
@@ -61,7 +65,7 @@ public class MCRAccessKeyCommands {
      */
     @MCRCommand(syntax = "clear all access keys for {0}", help = "Clears all access keys for reference {0}")
     public static void removeAccessKeysByReference(String reference) {
-        MCRAccessKeyServiceFactory.getAccessKeyService().removeAccessKeysByReference(reference);
+        SERVICE.removeAccessKeysByReference(reference);
         LOGGER.info("Cleared all access keys of {}.", reference);
     }
 
@@ -78,7 +82,7 @@ public class MCRAccessKeyCommands {
     public static void createAccessKey(String reference, String path) throws IOException {
         final MCRAccessKeyDto accessKeyDto = readAccessKeyFromFile(path);
         accessKeyDto.setReference(reference);
-        MCRAccessKeyServiceFactory.getAccessKeyService().addAccessKey(accessKeyDto);
+        SERVICE.addAccessKey(accessKeyDto);
         LOGGER.info("Created access key for {}.", reference);
     }
 
@@ -95,12 +99,11 @@ public class MCRAccessKeyCommands {
         help = "Updates an access key for reference {0} with (hashed) secret {1} from file {2} in JSON format")
     public static void updateAccessKey(String reference, String secret, String path) throws IOException {
         final MCRAccessKeyDto accessKeyDto = readAccessKeyFromFile(path);
-        final MCRAccessKeyDto outdatedAccessKeyDto
-            = MCRAccessKeyServiceFactory.getAccessKeyService().findAccessKeyByReferenceAndSecret(reference, secret);
+        final MCRAccessKeyDto outdatedAccessKeyDto = SERVICE.findAccessKeyByReferenceAndSecret(reference, secret);
         if (outdatedAccessKeyDto == null) {
             throw new MCRAccessKeyNotFoundException("Access key does not exist");
         }
-        MCRAccessKeyServiceFactory.getAccessKeyService().updateAccessKey(outdatedAccessKeyDto.getId(), accessKeyDto);
+        SERVICE.updateAccessKey(outdatedAccessKeyDto.getId(), accessKeyDto);
         LOGGER.info("Updated access key ({}) for {}.", secret, reference);
     }
 
@@ -114,12 +117,11 @@ public class MCRAccessKeyCommands {
     @MCRCommand(syntax = "delete access key for {0} with secret {1}",
         help = "Deletes an access key for reference {0} with (processed) secret {1}")
     public static void removeAccessKey(String reference, String secret) {
-        final MCRAccessKeyDto outdatedAccessKeyDto
-            = MCRAccessKeyServiceFactory.getAccessKeyService().findAccessKeyByReferenceAndSecret(reference, secret);
+        final MCRAccessKeyDto outdatedAccessKeyDto = SERVICE.findAccessKeyByReferenceAndSecret(reference, secret);
         if (outdatedAccessKeyDto == null) {
             throw new MCRAccessKeyNotFoundException("Access key does not exist");
         }
-        MCRAccessKeyServiceFactory.getAccessKeyService().removeAccessKey(outdatedAccessKeyDto.getId());
+        SERVICE.removeAccessKey(outdatedAccessKeyDto.getId());
         LOGGER.info("Deleted access key ({}) for {}.", secret, reference);
     }
 
@@ -138,7 +140,7 @@ public class MCRAccessKeyCommands {
         final List<MCRAccessKeyDto> accessKeyDtos
             = MCRAccessKeyJsonMapper.jsonToAccessKeyDtos(json).stream().peek(a -> a.setReference(reference)).toList();
         for (MCRAccessKeyDto accessKeyDto : accessKeyDtos) {
-            MCRAccessKeyServiceFactory.getAccessKeyService().importAccessKey(accessKeyDto);
+            SERVICE.importAccessKey(accessKeyDto);
         }
         LOGGER.info("Imported access keys for {} from file {}.", reference, path);
     }
@@ -154,8 +156,7 @@ public class MCRAccessKeyCommands {
     @MCRCommand(syntax = "export access keys for {0} to file {1}",
         help = "Exports access keys for reference {0} to file {1} in JSON array format")
     public static void exportAccessKeysToFile(String reference, String path) throws IOException {
-        final List<MCRAccessKeyDto> accessKeyDtos
-            = MCRAccessKeyServiceFactory.getAccessKeyService().findAccessKeysByReference(reference);
+        final List<MCRAccessKeyDto> accessKeyDtos = SERVICE.findAccessKeysByReference(reference);
         final String json = MCRAccessKeyJsonMapper.accessKeyDtosToJson(accessKeyDtos);
         Files.writeString(Path.of(path), json, UTF_8);
         LOGGER.info("Exported access keys for {} to file {}.", reference, path);
@@ -167,7 +168,7 @@ public class MCRAccessKeyCommands {
     @MCRCommand(syntax = "clean up access key user attributes",
         help = "Cleans all access key secret attributes of users if the corresponding key does not exist.")
     public static void cleanUp() {
-        MCRAccessKeyServiceFactory.getAccessKeyUserService().cleanUpUserAttributes();
+        MCRAccessKeyUserService.obtainInstance().cleanUpUserAttributes();
         LOGGER.info("Cleaned up access keys.");
     }
 
@@ -179,7 +180,7 @@ public class MCRAccessKeyCommands {
      */
     @MCRCommand(syntax = "hash access key secret {0} for {1}", help = "Hashes secret {0} for reference {1}")
     public static void processSecret(String secret, String reference) {
-        final String result = MCRAccessKeyServiceFactory.getAccessKeyService().processSecret(reference, secret);
+        final String result = SERVICE.processSecret(reference, secret);
         LOGGER.info("Processed secret for {}: '{}'.", reference, result);
     }
 

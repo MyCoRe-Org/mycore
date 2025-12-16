@@ -28,7 +28,8 @@ import org.jdom2.transform.JDOMSource;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.mapper.MCRAccessKeyJsonMapper;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
-import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyServiceFactory;
+import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyService;
+import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyServiceProvider;
 
 /**
  * Returns a JSON string with all {@link MCRAccessKey} for an given reference.
@@ -41,11 +42,29 @@ public class MCRAccessKeyURIResolver implements URIResolver {
 
     private static final String ELEMENT_NAME = "accesskeys";
 
+    private final MCRAccessKeyService accessKeyService;
+
+    /**
+     * Creates a new {@link MCRAccessKeyURIResolver} using the default
+     * {@link MCRAccessKeyService} instance.
+     */
+    public MCRAccessKeyURIResolver() {
+        this(MCRAccessKeyServiceProvider.obtainInstance());
+    }
+
+    /**
+     * Creates a new {@link MCRAccessKeyURIResolver} with the specified access key service.
+     *
+     * @param accessKeyService the {@link MCRAccessKeyService} used to manage access key events
+     */
+    public MCRAccessKeyURIResolver(MCRAccessKeyService accessKeyService) {
+        this.accessKeyService = accessKeyService;
+    }
+
     @Override
     public Source resolve(String href, String base) {
         final String reference = extractReferenceFromHref(href);
-        final List<MCRAccessKeyDto> accessKeyDtos
-            = MCRAccessKeyServiceFactory.getAccessKeyService().findAccessKeysByReference(reference);
+        final List<MCRAccessKeyDto> accessKeyDtos = accessKeyService.findAccessKeysByReference(reference);
         final String json = MCRAccessKeyJsonMapper.accessKeyDtosToJson(accessKeyDtos);
         return createResultSource(json, accessKeyDtos.size());
     }
