@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xed="http://www.mycore.de/xeditor"
-  xmlns:xalan="http://xml.apache.org/xalan"
-  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
-  xmlns:transformer="xalan://org.mycore.frontend.xeditor.MCRXEditorTransformer"
-  exclude-result-prefixes="xsl xed xalan i18n transformer">
+  xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
+  exclude-result-prefixes="xsl xed mcri18n">
+
+  <xsl:import href="resource:xslt/functions/i18n.xsl" />
 
   <!-- ========== Repeater buttons: <xed:repeat><xed:controls> ========== -->
 
@@ -45,7 +45,7 @@
 
   <xsl:template match="xed:validate[@i18n]" mode="message">
     <span class="help-inline">
-      <xsl:value-of select="i18n:translate(@i18n)" />
+      <xsl:value-of select="mcri18n:translate(@i18n)" />
     </span>
   </xsl:template>
 
