@@ -127,7 +127,7 @@ export class FileTransfer {
         } else {
             uploadPath = this._entry.fullPath[0] == '/' ? this._entry.fullPath.substr(1) : this._entry.fullPath;
         }
-        uploadPath = uploadPath.split('/').map(s=>encodeURI(s)).join('/');
+        uploadPath = uploadPath.split('/').map(s=> encodeURIComponent(s)).join('/');
 
         this.request = new XMLHttpRequest();
 

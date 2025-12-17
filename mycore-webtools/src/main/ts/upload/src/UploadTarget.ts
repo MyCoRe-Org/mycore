@@ -228,7 +228,7 @@ export class UploadTarget {
             } else {
                 uploadPath = fileEntry.name;
             }
-            uploadPath = uploadPath.split('/').map(s=>encodeURI(s)).join('/');
+            uploadPath = uploadPath.split('/').map(s=> encodeURIComponent(s)).join('/');
             const url = Utils.getUploadSettings().webAppBaseURL + "rsc/files/upload/" + this.uploadHandler + "/" + uploadPath + "?size=" + size;
             const request = new XMLHttpRequest();
             request.open('GET', url, true);
