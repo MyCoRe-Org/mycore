@@ -31,6 +31,7 @@ import org.mycore.mcr.acl.accesskey.validation.MCRAccessKeyValidatorImpl;
  * services related to access keys. It ensures thread-safe instantiation
  * of these services.
  */
+@Deprecated(forRemoval = true)
 public final class MCRAccessKeyServiceFactory {
 
     private MCRAccessKeyServiceFactory() {
@@ -38,29 +39,25 @@ public final class MCRAccessKeyServiceFactory {
     }
 
     /**
-     * Returns the singleton instance of {@link MCRAccessKeyService}.
-     * If the instance does not already exist, it will be created in a thread-safe manner.
-     *
-     * @return the singleton instance of {@link MCRAccessKeyService}.
+     * @deprecated Use {@link MCRAccessKeyServiceProvider#obtainInstance()} instead.
      */
+    @Deprecated(forRemoval = true)
     public static MCRAccessKeyService getAccessKeyService() {
         return ServiceHolder.INSTANCE;
     }
 
     /**
-     * Returns single access key user service instance.
-     *
-     * @return the instance
+     * @deprecated Use {@link MCRAccessKeyUserService#obtainInstance()} instead.
      */
+    @Deprecated(forRemoval = true)
     public static MCRAccessKeyUserService getAccessKeyUserService() {
         return UserServiceHolder.INSTANCE;
     }
 
     /**
-     * Returns single access key session service instance.
-     *
-     * @return the instance
+     * @deprecated Use {@link MCRAccessKeySessionService#obtainInstance()} instead.
      */
+    @Deprecated(forRemoval = true)
     public static MCRAccessKeySessionService getAccessKeySessionService() {
         return SessionServiceHolder.INSTANCE;
     }
