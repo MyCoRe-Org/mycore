@@ -18,27 +18,32 @@
 
 package org.mycore.frontend.xeditor.tracker;
 
-import java.util.Iterator;
+import java.util.List;
 
-import org.jdom2.Attribute;
+import org.jdom2.Content;
 import org.jdom2.Element;
+import org.mycore.common.xml.MCRXPathBuilder;
 
-public class MCRSetElementText implements MCRChange {
+/**
+ * Sets an element's text in the edited xml, and tracks that change.  
+ * 
+ * @author Frank L\u00FCtzenkirchen
+ */
+public class MCRSetElementText extends MCRChange {
 
-    public static MCRChangeData setText(Element element, String text) {
-        Element clone = element.clone();
+    public Element element;
 
-        for (Iterator<Attribute> attributes = clone.getAttributes().iterator(); attributes.hasNext();) {
-            attributes.next();
-            attributes.remove();
-        }
+    public List<Content> oldContent;
 
-        MCRChangeData data = new MCRChangeData("set-text", clone, 0, element);
-        element.setText(text);
-        return data;
+    public MCRSetElementText(Element element, String newValue) {
+        this.message = "Set value of " + MCRXPathBuilder.buildXPath(element) + " to " + newValue;
+        this.element = element;
+        this.oldContent = element.cloneContent();
+        element.setText(newValue);
     }
 
-    public void undo(MCRChangeData data) {
-        data.getContext().setContent(data.getElement().cloneContent());
+    @Override
+    public void undo() {
+        element.setContent(oldContent);
     }
 }
