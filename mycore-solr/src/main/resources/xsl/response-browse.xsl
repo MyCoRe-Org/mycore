@@ -3,8 +3,8 @@
   <!ENTITY html-output SYSTEM "xsl/xsl-output-html.fragment">
 ]>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink"
-  xmlns:mcr="http://www.mycore.org/" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:encoder="xalan://java.net.URLEncoder"
-  exclude-result-prefixes="xlink mcr i18n xsl">
+  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:encoder="xalan://java.net.URLEncoder"
+  exclude-result-prefixes="xlink i18n xsl">
   &html-output;
   <xsl:include href="mycoreobject.xsl" />
   <xsl:include href="response-utils.xsl" />

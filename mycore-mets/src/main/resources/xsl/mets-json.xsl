@@ -1,5 +1,5 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xalan="http://xml.apache.org/xalan"
-  xmlns:mcr="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:mets="http://www.loc.gov/METS/" xmlns:decoder="xalan://java.net.URLDecoder"
+  xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:mets="http://www.loc.gov/METS/" xmlns:decoder="xalan://java.net.URLDecoder"
   xmlns:iview2="xalan://org.mycore.iview2.frontend.MCRIView2XSLFunctions" xmlns:str="http://exslt.org/strings" extension-element-prefixes="str" version="1.0">
   <xsl:output method="text" media-type="application/x-json" />
   <xsl:param name="derivateID" />
@@ -158,7 +158,7 @@
       </xsl:call-template>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="$index &lt; count($jsonSearch/mcr:replace)">
+      <xsl:when test="$index &lt; count($jsonSearch/mcrxsl:replace)">
         <xsl:call-template name="encode">
           <xsl:with-param name="input" select="$text" />
           <xsl:with-param name="index" select="$index + 1" />

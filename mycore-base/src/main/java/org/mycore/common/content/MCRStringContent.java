@@ -81,12 +81,11 @@ public class MCRStringContent extends MCRContent {
 
     @Override
     public long lastModified() {
-        return -1;
+        return lastModified;
     }
 
     @Override
     public String getETag() {
-        String eTag = getSimpleWeakETag(getSystemId(), length(), lastModified());
-        return eTag == null ? null : eTag.substring(2);
+        return '"' + Integer.toHexString(text.hashCode()) + '"';
     }
 }

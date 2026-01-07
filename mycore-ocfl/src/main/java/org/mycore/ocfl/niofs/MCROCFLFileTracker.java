@@ -281,7 +281,7 @@ public class MCROCFLFileTracker<P, D> {
                     D origDigest = originalPaths.get(orig);
                     calculateDigestIfNecessary(node);
                     if (!Objects.equals(origDigest, node.digest)) {
-                        changes.add(new Change<>(ChangeType.ADDED_OR_MODIFIED, orig, null));
+                        changes.add(new Change<>(ChangeType.MODIFIED, orig, null));
                     }
                 }
             }
@@ -290,7 +290,7 @@ public class MCROCFLFileTracker<P, D> {
         // Process new files: nodes whose stored original identity isn’t in the original set.
         trackMap.values().stream()
             .filter(n -> !originalPaths.containsKey(n.originalPath()))
-            .forEach(n -> changes.add(new Change<>(ChangeType.ADDED_OR_MODIFIED, n.currentPath(), null)));
+            .forEach(n -> changes.add(new Change<>(ChangeType.ADDED, n.currentPath(), null)));
         return changes;
     }
 
@@ -362,7 +362,7 @@ public class MCROCFLFileTracker<P, D> {
      * Types of changes that can be tracked.
      */
     public enum ChangeType {
-        ADDED_OR_MODIFIED, DELETED, RENAMED
+        ADDED, MODIFIED, DELETED, RENAMED
     }
 
     /**

@@ -44,7 +44,9 @@ function showModal() {
   <!-- row -->
   <tr >
     <td class="col-name">
-      <a href="#" @click.prevent="showModal">(P)</a> {{ model.name }}
+      <a href="#" @click.prevent="showModal">
+        <i class="fa-solid fa-circle-info"></i>
+      </a> {{ model.name }}
     </td>
     <td class="col-user">{{ model.user }}</td>
     <td class="col-create">{{ Util.formatDate(model.createTime) }}</td>

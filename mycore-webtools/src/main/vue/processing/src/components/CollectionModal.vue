@@ -23,6 +23,7 @@ import {Collection} from "../model/model.ts";
 import {Util} from "../common/util.ts";
 import {onMounted, useTemplateRef} from "vue";
 import type {Modal} from "bootstrap";
+
 declare const bootstrap: { Modal: typeof Modal };
 
 defineProps<{
@@ -51,24 +52,25 @@ defineExpose({
 </script>
 
 <template>
-  <div class="modal" ref="modal">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Properties</h4>
-          <button @click="emit('close')" type="button" class="btn-close" data-bs-dismiss="modal"
-                  aria-label="Close"></button>
-        </div>
+  <Teleport to="body">
+    <div class="modal" ref="modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Properties</h4>
+            <button @click="emit('close')" type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+          </div>
 
-        <div class="modal-body">
-          <table class="table">
-            <thead>
+          <div class="modal-body">
+            <table class="table">
+              <thead>
               <tr>
                 <th>Key</th>
                 <th>Value</th>
               </tr>
-            </thead>
-            <tbody>
+              </thead>
+              <tbody>
               <tr v-if="model.propertyKeys.length === 0">
                 <td colspan="2">No properties set</td>
               </tr>
@@ -76,13 +78,14 @@ defineExpose({
                 <td>{{ key }}</td>
                 <td v-html="Util.useJsonString(model.properties[key])"></td>
               </tr>
-            </tbody>
-          </table>
-        </div>
+              </tbody>
+            </table>
+          </div>
 
+        </div>
       </div>
-  </div>
-  </div>
+    </div>
+  </Teleport>
 </template>
 
 <style scoped>

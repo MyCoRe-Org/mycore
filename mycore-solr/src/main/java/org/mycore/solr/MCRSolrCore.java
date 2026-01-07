@@ -36,11 +36,8 @@ import org.apache.solr.client.solrj.impl.ConcurrentUpdateHttp2SolrClient;
 import org.apache.solr.client.solrj.impl.Http2SolrClient;
 import org.apache.solr.client.solrj.impl.HttpJdkSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClientBuilderBase;
-import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
-import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
-import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
 /**
  * Core instance of a solr server.
@@ -168,19 +165,19 @@ public class MCRSolrCore {
 
     public synchronized void shutdown() {
         try {
-            shutdownGracefully(solrClient, true);
+            shutdownGracefully(solrClient);
             solrClient = null;
         } catch (SolrServerException | IOException e) {
             LOGGER.error("Error while shutting down SOLR client.", e);
         }
         try {
-            shutdownGracefully(baseSolrClient, false);
+            shutdownGracefully(baseSolrClient);
             baseSolrClient = null;
         } catch (SolrServerException | IOException e) {
             LOGGER.error("Error while shutting down SOLR client.", e);
         }
         try {
-            shutdownGracefully(concurrentClient, false);
+            shutdownGracefully(concurrentClient);
             concurrentClient = null;
         } catch (SolrServerException | IOException e) {
             LOGGER.error("Error while shutting down SOLR client.", e);
@@ -188,16 +185,9 @@ public class MCRSolrCore {
         LOGGER.info("Solr shutdown process completed.");
     }
 
-    private void shutdownGracefully(SolrClient client, boolean commit) throws SolrServerException, IOException {
+    private void shutdownGracefully(SolrClient client) throws SolrServerException, IOException {
         if (client != null) {
             LOGGER.info("Shutting down solr client: {}", client);
-            if (commit) {
-                UpdateRequest updateRequest = new UpdateRequest();
-                updateRequest.setAction(UpdateRequest.ACTION.COMMIT, false, false);
-                MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(updateRequest,
-                    MCRSolrAuthenticationLevel.INDEX);
-                updateRequest.process(client);
-            }
             client.close();
         }
     }

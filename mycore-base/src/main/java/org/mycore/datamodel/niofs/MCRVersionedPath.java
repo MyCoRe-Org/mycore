@@ -137,6 +137,13 @@ public abstract class MCRVersionedPath extends MCRPath {
             this.hasSameVersion(that);
     }
 
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + Objects.hashCode(ownerVersion);
+        return result;
+    }
+
     /**
      * Checks if the version parts are equal.
      * 

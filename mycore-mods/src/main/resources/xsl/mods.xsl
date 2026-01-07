@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan"
-  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:acl="xalan://org.mycore.access.MCRAccessManager" xmlns:mcr="http://www.mycore.org/"
+  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:acl="xalan://org.mycore.access.MCRAccessManager"
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:encoder="xalan://java.net.URLEncoder"
-  xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:mcrurn="xalan://org.mycore.urn.MCRXMLFunctions" exclude-result-prefixes="xalan xlink mcr i18n acl mods mcrxsl mcrurn encoder" version="1.0">
+  xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:mcrurn="xalan://org.mycore.urn.MCRXMLFunctions" exclude-result-prefixes="xalan xlink i18n acl mods mcrxsl mcrurn encoder" version="1.0">
   <xsl:param name="MCR.Users.Superuser.UserName" />
   <xsl:include href="mods-utils.xsl" />
   <xsl:include href="mods2html.xsl" />
@@ -187,7 +187,7 @@
         <xsl:for-each select="./structure/derobjects/derobject">
           <derivate>
             <id><xsl:value-of select="@xlink:href" /></id>
-            <display><xsl:value-of select="mcrxsl:isDisplayedEnabledDerivate(@xlink:href)" /></display>
+            <display><xsl:value-of select="acl:checkDerivateDisplayPermission(@xlink:href)" /></display>
           </derivate>
         </xsl:for-each>
         </derivates>

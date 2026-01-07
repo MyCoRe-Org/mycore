@@ -20,9 +20,7 @@
   <xsl:template name="print.writeProtectionMessage">
     <xsl:if test="$writeProtectedWebsite">
       <div class="alert alert-warning alert-dismissable">
-        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
-          <xsl:value-of select="'&#215;'" />
-        </button>
+        <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-hidden="true" />
         <strong>
           <xsl:copy-of select="websiteWriteProtection:getMessage()" />
         </strong>
@@ -401,7 +399,7 @@
   <xsl:template name="derivateLink">
     <xsl:for-each select="derivateLink">
       <xsl:variable name="derivateId" select="substring-before(@xlink:href, '/')" />
-      <xsl:variable name="isDisplayedEnabled" select="mcrxsl:isDisplayedEnabledDerivate($derivateId)" />
+      <xsl:variable name="isDisplayedEnabled" select="acl:checkDerivateDisplayPermission($derivateId)" />
       <xsl:variable name="mayWriteDerivate" select="acl:checkPermission($derivateId,'writedb')" />
       <xsl:choose>
         <xsl:when test="acl:checkDerivateDisplayPermission($derivateId) and $isDisplayedEnabled = 'true' or $mayWriteDerivate">

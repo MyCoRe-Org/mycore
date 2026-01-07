@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xalan="http://xml.apache.org/xalan" xmlns:xlink="http://www.w3.org/1999/xlink"
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" exclude-result-prefixes="xalan mcrxsl">
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:acl="xalan://org.mycore.access.MCRAccessManager" exclude-result-prefixes="xalan acl">
   <xsl:param name="WebApplicationBaseURL" />
   <xsl:param name="ServletsBaseURL" select="''" />
   <xsl:variable name="relacode" select="document('resource:relacode.xml')/relacode" />
   <xsl:key name="relacode" match="code" use="@key" />
 
   <xsl:variable name="ifsTemp">
-    <xsl:for-each select="mycoreobject/structure/derobjects/derobject[mcrxsl:isDisplayedEnabledDerivate(@xlink:href)]">
+    <xsl:for-each select="mycoreobject/structure/derobjects/derobject[acl:checkDerivateContentPermission(@xlink:href, 'read')]">
       <der id="{@xlink:href}">
         <xsl:copy-of select="document(concat('xslStyle:mcr_directory-recursive:ifs:',@xlink:href,'/'))" />
       </der>
