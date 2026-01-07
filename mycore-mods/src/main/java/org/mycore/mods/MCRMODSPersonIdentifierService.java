@@ -37,7 +37,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class MCRUser2MODSPersonIdentifierService implements MCRLegalEntityService {
+public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -59,7 +59,7 @@ public class MCRUser2MODSPersonIdentifierService implements MCRLegalEntityServic
      * @return all known identifiers or an empty set
      */
     @Override
-    public Set<MCRIdentifier> getAllIdentifiers(MCRIdentifier userId) {
+    public Set<MCRIdentifier> findAllIdentifiers(MCRIdentifier userId) {
         return getIdentifiers(userId, null);
     }
 
@@ -71,7 +71,7 @@ public class MCRUser2MODSPersonIdentifierService implements MCRLegalEntityServic
      * @return all known identifiers of a specified type or an empty set
      */
     @Override
-    public Set<MCRIdentifier> getTypedIdentifiers(MCRIdentifier userId, String identifierType) {
+    public Set<MCRIdentifier> findTypedIdentifiers(MCRIdentifier userId, String identifierType) {
         return getIdentifiers(userId, identifierType);
     }
 

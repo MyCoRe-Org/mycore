@@ -29,19 +29,19 @@ import java.util.Set;
 public interface MCRLegalEntityService {
 
     /**
-     * Gets all identifiers of a legal entity determined by a specific identifier.
+     * Finds all identifiers of a legal entity determined by a specific identifier.
      * @param identifier unique identifier of legal entity, not null
      * @return a set of identifiers a legal entity owns
      */
-    Set<MCRIdentifier> getAllIdentifiers(MCRIdentifier identifier);
+    Set<MCRIdentifier> findAllIdentifiers(MCRIdentifier identifier);
 
     /**
-     * Gets a legal entity's identifiers of a given type. The legal entity is determined by a specific identifier.
+     * Finds a legal entity's identifiers of a given type. The legal entity is determined by a specific identifier.
      * @param primaryIdentifier unique identifier of legal entity, not null
      * @param identifierType the type of looked up identifiers as a string, not null
      * @return a set of identifiers a legal entity owns
      */
-    Set<MCRIdentifier> getTypedIdentifiers(MCRIdentifier primaryIdentifier, String identifierType);
+    Set<MCRIdentifier> findTypedIdentifiers(MCRIdentifier primaryIdentifier, String identifierType);
 
     /**
      * Adds an identifier to a legal entity. The entity is determined by a specific, given identifier

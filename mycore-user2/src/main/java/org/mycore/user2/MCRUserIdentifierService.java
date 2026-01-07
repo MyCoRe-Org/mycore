@@ -37,7 +37,7 @@ public class MCRUserIdentifierService implements MCRLegalEntityService {
      * or an empty set. prefix is stripped
      */
     @Override
-    public Set<MCRIdentifier> getAllIdentifiers(MCRIdentifier userId) {
+    public Set<MCRIdentifier> findAllIdentifiers(MCRIdentifier userId) {
         return findUserByUserID(userId)
             .map(user -> user.getAttributes().stream()
                 .filter(a -> a.getName().startsWith(ATTR_ID_PREFIX))
@@ -55,7 +55,7 @@ public class MCRUserIdentifierService implements MCRLegalEntityService {
      * {@link MCRUserIdentifierService#ATTR_ID_PREFIX} or an empty set. prefix is stripped
      */
     @Override
-    public Set<MCRIdentifier> getTypedIdentifiers(MCRIdentifier userId, String identifierType) {
+    public Set<MCRIdentifier> findTypedIdentifiers(MCRIdentifier userId, String identifierType) {
         return findUserByUserID(userId)
             .map(user -> user.getAttributes().stream()
                 .filter(a -> stripPrefix(a.getName()).equals(identifierType))

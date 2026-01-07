@@ -52,7 +52,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
     @MCRTestProperty(key = "MCR.MODS.NewObjectType", string = "mods"),
     @MCRTestProperty(key = "MCR.Access.Class", classNameOf = MCRAccessBaseImpl.class)
 })
-public class MCRUser2MODSPersonIdentifierServiceTest {
+public class MCRMODSPersonIdentifierServiceTest {
 
     private static final String ORCID_1 = "0000-0001-2345-6789";
 
@@ -62,14 +62,14 @@ public class MCRUser2MODSPersonIdentifierServiceTest {
 
     private static final String SCOPUS = "87654321";
 
-    MCRUser2MODSPersonIdentifierService service;
+    MCRMODSPersonIdentifierService service;
 
     MCRUser user;
 
     @BeforeEach
     public void setUp() throws Exception {
         URL url1 = MCRObjectMetadataTest.class.getResource(
-            "/MCRUser2MODSPersonIdentifierServiceTest/junit_modsperson_00000001.xml");
+            "/MCRMODSPersonIdentifierServiceTest/junit_modsperson_00000001.xml");
         Document doc1 = new MCRURLContent(url1).asXML();
         MCRObject obj1 = new MCRObject(doc1);
         MCRMetadataManager.create(obj1);
@@ -79,12 +79,12 @@ public class MCRUser2MODSPersonIdentifierServiceTest {
         user.setUserAttribute("id_modsperson", "junit_modsperson_00000001");
         MCRUserManager.createUser(user);
 
-        service = new MCRUser2MODSPersonIdentifierService();
+        service = new MCRMODSPersonIdentifierService();
     }
 
     @Test
-    public final void testGetAllIdentifiers() {
-        Set<MCRIdentifier> allIdentifiers = service.getAllIdentifiers(
+    public final void testFindAllIdentifiers() {
+        Set<MCRIdentifier> allIdentifiers = service.findAllIdentifiers(
             new MCRIdentifier("userid", user.getUserID()));
         Set<MCRIdentifier> expected = Set.of(new MCRIdentifier("orcid", ORCID_1),
             new MCRIdentifier("orcid", ORCID_2),
@@ -95,29 +95,29 @@ public class MCRUser2MODSPersonIdentifierServiceTest {
     }
 
     @Test
-    public final void testGetTypedIdentifiers() {
+    public final void testFindTypedIdentifiers() {
         final MCRIdentifier userid = new MCRIdentifier("userid", user.getUserID());
-        Set<MCRIdentifier> typedIdentifiers = service.getTypedIdentifiers(userid,"orcid");
+        Set<MCRIdentifier> typedIdentifiers = service.findTypedIdentifiers(userid,"orcid");
         Set<MCRIdentifier> expected = Set.of(new MCRIdentifier("orcid", ORCID_1),
             new MCRIdentifier("orcid", ORCID_2),
             new MCRIdentifier("orcid", ORCID_3));
         assertEquals(expected, typedIdentifiers);
 
-        typedIdentifiers = service.getTypedIdentifiers(userid,"id_orcid");
+        typedIdentifiers = service.findTypedIdentifiers(userid,"id_orcid");
         assertEquals(0, typedIdentifiers.size());
 
-        typedIdentifiers = service.getTypedIdentifiers(
+        typedIdentifiers = service.findTypedIdentifiers(
             new MCRIdentifier("userid", user.getUserID()),"scopus");
         assertEquals(Set.of(new MCRIdentifier("scopus", SCOPUS)), typedIdentifiers);
 
-        typedIdentifiers = service.getTypedIdentifiers(userid, "something");
+        typedIdentifiers = service.findTypedIdentifiers(userid, "something");
         assertEquals(Set.of(new MCRIdentifier("something", "abcd")), typedIdentifiers);
     }
 
     @Test
     public final void testAddIdentifier() throws MCRAccessException, IOException, JDOMException {
         URL url2 = MCRObjectMetadataTest.class.getResource(
-            "/MCRUser2MODSPersonIdentifierServiceTest/junit_modsperson_00000002.xml");
+            "/MCRMODSPersonIdentifierServiceTest/junit_modsperson_00000002.xml");
         Document doc2 = new MCRURLContent(url2).asXML();
         MCRObject obj2 = new MCRObject(doc2);
         MCRMetadataManager.create(obj2);
@@ -128,15 +128,15 @@ public class MCRUser2MODSPersonIdentifierServiceTest {
         MCRUserManager.createUser(user2);
 
         final MCRIdentifier userid = new MCRIdentifier("userid", user2.getUserID());
-        Set<MCRIdentifier> allIdentifiers = service.getAllIdentifiers(userid);
+        Set<MCRIdentifier> allIdentifiers = service.findAllIdentifiers(userid);
         assertEquals(2, allIdentifiers.size());
 
         service.addIdentifier(userid, new MCRIdentifier("orcid", ORCID_1)); // don't add id twice
-        allIdentifiers = service.getAllIdentifiers(userid);
+        allIdentifiers = service.findAllIdentifiers(userid);
         assertEquals(2, allIdentifiers.size());
 
         service.addIdentifier(userid, new MCRIdentifier("orcid", ORCID_3));
-        allIdentifiers = service.getAllIdentifiers(userid);
+        allIdentifiers = service.findAllIdentifiers(userid);
         assertEquals(3, allIdentifiers.size());
         Set<MCRIdentifier> expected = Set.of(new MCRIdentifier("orcid", ORCID_1),
             new MCRIdentifier("orcid", ORCID_2),
@@ -146,7 +146,7 @@ public class MCRUser2MODSPersonIdentifierServiceTest {
 
     @Test
     public final void testAddIdentifierNoModsperson() {
-        Set<MCRIdentifier> allIdentifiers = service.getAllIdentifiers(new MCRIdentifier("userid", "noname"));
+        Set<MCRIdentifier> allIdentifiers = service.findAllIdentifiers(new MCRIdentifier("userid", "noname"));
         assertEquals(0, allIdentifiers.size());
 
         MCRUser user3 = new MCRUser("james");
@@ -155,16 +155,16 @@ public class MCRUser2MODSPersonIdentifierServiceTest {
         MCRUserManager.createUser(user3);
 
         final MCRIdentifier userid = new MCRIdentifier("userid", user3.getUserID());
-        allIdentifiers = service.getAllIdentifiers(userid);
+        allIdentifiers = service.findAllIdentifiers(userid);
         assertEquals(0, allIdentifiers.size());
 
         service.addIdentifier(userid, new MCRIdentifier("orcid", ORCID_2));
-        allIdentifiers = service.getAllIdentifiers(userid);
+        allIdentifiers = service.findAllIdentifiers(userid);
         assertEquals(0, allIdentifiers.size());
 
         user3.setUserAttribute("id_modsperson", "junit_modsperson_00000404");
         MCRUserManager.updateUser(user3);
-        allIdentifiers = service.getAllIdentifiers(userid);
+        allIdentifiers = service.findAllIdentifiers(userid);
         assertEquals(0, allIdentifiers.size());
     }
 

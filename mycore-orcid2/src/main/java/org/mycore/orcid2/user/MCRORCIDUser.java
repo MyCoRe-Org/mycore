@@ -28,11 +28,11 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.datamodel.legalentity.MCRIdentifier;
 import org.mycore.datamodel.legalentity.MCRLegalEntityService;
 import org.mycore.orcid2.MCRORCIDConstants;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.exception.MCRORCIDException;
-import org.mycore.datamodel.legalentity.MCRIdentifier;
 import org.mycore.orcid2.util.MCRORCIDJSONMapper;
 import org.mycore.orcid2.validation.MCRORCIDValidationHelper;
 import org.mycore.user2.MCRUser;
@@ -128,7 +128,7 @@ public class MCRORCIDUser {
      */
     public Set<String> getORCIDs() {
         final MCRIdentifier userid = new MCRIdentifier("userid", user.getUserID());
-        Set<MCRIdentifier> orcidIdentifiers =  legalEntityService.getTypedIdentifiers(userid, "orcid");
+        Set<MCRIdentifier> orcidIdentifiers =  legalEntityService.findTypedIdentifiers(userid, "orcid");
         return orcidIdentifiers.stream().map(MCRIdentifier::getValue)
             .collect(Collectors.toSet());
     }
@@ -249,7 +249,7 @@ public class MCRORCIDUser {
      */
     public Set<MCRIdentifier> getIdentifiers() {
         final MCRIdentifier userId = new MCRIdentifier("userid", user.getUserID());
-        return legalEntityService.getAllIdentifiers(userId);
+        return legalEntityService.findAllIdentifiers(userId);
     }
 
     /**
