@@ -28,7 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.function.Function;
@@ -515,8 +514,16 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     /**
      * Returns additional user attributes.
-     * This methods handles {@link MCRUserInformation#ATT_REAL_NAME} and
-     * all attributes defined in {@link #getAttributes()}.
+     *
+     * This method handles {@link MCRUserInformation#ATT_REAL_NAME} and {@link MCRUserInformation#ATT_EMAIL} and all
+     * attributes returned by {@link #getAttributes()}.
+     *
+     * @param attribute the name of the attribute to look up
+     *
+     * @return the value of the desired attribute or <code>null</code>
+     *
+     * @throws MCRException when there are multiple values for a given attribute name an {@link MCRException} will be
+     * thrown
      */
     @Override
     public String getUserAttribute(String attribute) {
@@ -528,15 +535,38 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
                 return getEMail();
             }
             default -> {
-                Set<MCRUserAttribute> attrs = attributes.stream()
-                    .filter(a -> a.getName().equals(attribute))
-                    .collect(Collectors.toSet());
+                List<MCRUserAttribute> attrs = getUserAttributes(attribute);
                 if (attrs.size() > 1) {
                     throw new MCRException(getUserID() + ": user attribute " + attribute + " is not unique");
                 }
                 return attrs.stream()
                     .map(MCRUserAttribute::getValue)
                     .findAny().orElse(null);
+            }
+        }
+    }
+
+    /**
+     * Returns all {@link MCRUserAttribute}s with the given name. In addition {@link MCRUserInformation#ATT_REAL_NAME}
+     * and {@link MCRUserInformation#ATT_EMAIL} will be returned when requested.
+     *
+     * @param attribute the name of the attribute to look up
+     *
+     * @return a list containing all {@link MCRUserAttribute}s or an emptry list
+     * */
+    public List<MCRUserAttribute> getUserAttributes(String attribute) {
+        switch (attribute) {
+            case ATT_REAL_NAME -> {
+                return List.of(new MCRUserAttribute(attribute, getRealName()));
+            }
+            case ATT_EMAIL -> {
+                return List.of(new MCRUserAttribute(attribute, getEMail()));
+            }
+            default -> {
+                return attributes
+                    .stream()
+                    .filter(a -> a.getName().equals(attribute))
+                    .collect(Collectors.toList());
             }
         }
     }
