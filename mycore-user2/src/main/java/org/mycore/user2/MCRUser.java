@@ -515,7 +515,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     /**
      * Returns additional user attributes.
-     * This methods handles {@link MCRUserInformation#ATT_REAL_NAME} and
+     * This method handles {@link MCRUserInformation#ATT_REAL_NAME} and
      * all attributes defined in {@link #getAttributes()}.
      */
     @Override
@@ -528,15 +528,37 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
                 return getEMail();
             }
             default -> {
-                Set<MCRUserAttribute> attrs = attributes.stream()
-                    .filter(a -> a.getName().equals(attribute))
-                    .collect(Collectors.toSet());
+                List<MCRUserAttribute> attrs = getUserAttributes(attribute);
                 if (attrs.size() > 1) {
                     throw new MCRException(getUserID() + ": user attribute " + attribute + " is not unique");
                 }
                 return attrs.stream()
                     .map(MCRUserAttribute::getValue)
                     .findAny().orElse(null);
+            }
+        }
+    }
+
+    /**
+     * Returns all {@link MCRUserAttribute}s with the given name.
+     *
+     * @param attribute the name of the attribute to look up
+     *
+     * @return a list containing all {@link MCRUserAttribute}s or an emptry list
+     * */
+    public List<MCRUserAttribute> getUserAttributes(String attribute) {
+        switch (attribute) {
+            case ATT_REAL_NAME -> {
+                return List.of(new MCRUserAttribute(attribute, getRealName()));
+            }
+            case ATT_EMAIL -> {
+                return List.of(new MCRUserAttribute(attribute, getEMail()));
+            }
+            default -> {
+                return attributes
+                    .stream()
+                    .filter(a -> a.getName().equals(attribute))
+                    .collect(Collectors.toList());
             }
         }
     }
