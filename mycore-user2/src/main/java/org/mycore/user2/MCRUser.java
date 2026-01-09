@@ -515,8 +515,16 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     /**
      * Returns additional user attributes.
-     * This method handles {@link MCRUserInformation#ATT_REAL_NAME} and
-     * all attributes defined in {@link #getAttributes()}.
+     *
+     * This method handles {@link MCRUserInformation#ATT_REAL_NAME} and {@link MCRUserInformation#ATT_EMAIL} and all
+     * attributes returned by {@link #getAttributes()}.
+     *
+     * @param attribute the name of the attribute to look up
+     *
+     * @return the value of the desired attribute or <code>null</code>
+     *
+     * @throws MCRException when there are multiple values for a given attribute name an {@link MCRException} will be
+     * thrown
      */
     @Override
     public String getUserAttribute(String attribute) {
