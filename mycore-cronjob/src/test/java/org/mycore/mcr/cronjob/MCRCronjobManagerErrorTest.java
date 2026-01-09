@@ -40,7 +40,7 @@ public class MCRCronjobManagerErrorTest {
     /** Asserts that jobs will be rescheduled when an error occurs in the job */
     @Test
     public void testScheduleOnError() {
-        assertEquals(0, MCRTestCronJob.count, "job shouldn't have run yet");
+        assertEquals(0, MCRTestErrorCronJob.count, "job shouldn't have run yet");
         MCRCronjobManager.getInstance().startUp(null);
         try {
             Thread.sleep(2500);
