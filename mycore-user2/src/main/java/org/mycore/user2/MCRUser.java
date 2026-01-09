@@ -548,7 +548,8 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     }
 
     /**
-     * Returns all {@link MCRUserAttribute}s with the given name.
+     * Returns all {@link MCRUserAttribute}s with the given name. In addition {@link MCRUserInformation#ATT_REAL_NAME}
+     * and {@link MCRUserInformation#ATT_EMAIL} will be returned when requested.
      *
      * @param attribute the name of the attribute to look up
      *
