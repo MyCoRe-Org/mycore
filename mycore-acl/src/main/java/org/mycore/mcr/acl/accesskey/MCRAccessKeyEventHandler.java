@@ -30,7 +30,7 @@ import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.mapper.MCRAccessKeyJsonMapper;
 import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyService;
-import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyServiceProvider;
+import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyServiceImpl;
 
 /**
  * Event handler for managing access keys in the context of MyCoRe objects and derivates.
@@ -49,7 +49,7 @@ public class MCRAccessKeyEventHandler extends MCREventHandlerBase {
      * {@link MCRAccessKeyService} instance.
      */
     public MCRAccessKeyEventHandler() {
-        this(MCRAccessKeyServiceProvider.obtainInstance());
+        this(MCRAccessKeyServiceImpl.obtainInstance());
     }
 
     /**

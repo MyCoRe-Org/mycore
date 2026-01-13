@@ -62,7 +62,7 @@ public class MCRAccessKeySessionService extends MCRAccessKeyContextService<MCRSe
      * @return a newly created {@link MCRAccessKeySessionService} instance
      */
     public static MCRAccessKeySessionService createInstance() {
-        return new MCRAccessKeySessionService(MCRAccessKeyServiceProvider.obtainInstance());
+        return new MCRAccessKeySessionService(MCRAccessKeyServiceImpl.obtainInstance());
     }
 
     @Override
