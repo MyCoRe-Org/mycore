@@ -33,7 +33,7 @@ import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyPartialUpdateDto;
 import org.mycore.mcr.acl.accesskey.restapi.v2.MCRAccessKeyRestConstants;
 import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyService;
-import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyServiceProvider;
+import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyServiceImpl;
 import org.mycore.restapi.v2.access.MCRRestAccessCheckStrategy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -66,7 +66,7 @@ public class MCRAccessKeyRestAccessCheckStrategy implements MCRRestAccessCheckSt
      * with a default {@link MCRAccessKeyService} and {@link MCRAccessKeyPermissionChecker} instance.
      */
     public MCRAccessKeyRestAccessCheckStrategy() {
-        this(MCRAccessKeyServiceProvider.obtainInstance(), new MCRAccessKeyPermissionChecker());
+        this(MCRAccessKeyServiceImpl.obtainInstance(), new MCRAccessKeyPermissionChecker());
     }
 
     /**
