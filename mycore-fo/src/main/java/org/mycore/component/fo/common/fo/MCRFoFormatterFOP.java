@@ -46,6 +46,7 @@ import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.FopFactoryBuilder;
 import org.apache.fop.apps.MimeConstants;
+import org.apache.fop.apps.io.InternalResourceResolver;
 import org.apache.fop.configuration.Configuration;
 import org.apache.fop.configuration.ConfigurationException;
 import org.apache.fop.configuration.DefaultConfigurationBuilder;
@@ -103,6 +104,7 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
         // use restricted io to prevent issues with font caching on some systems
         fopFactoryBuilder = new FopFactoryBuilder(
             EnvironmentalProfileFactory.createRestrictedIO(URI.create("resource:/"), resolver));
+        final InternalResourceResolver internalResolver = fopFactoryBuilder.getFontManager().getResourceResolver();
         final String foCfg = MCRConfiguration2.getString("MCR.LayoutService.FoFormatter.FOP.config").orElse("");
         if (!foCfg.isEmpty()) {
             try {
@@ -115,6 +117,9 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
                     cfg = cfgBuilder.build(is);
                 }
                 fopFactoryBuilder.setConfiguration(cfg);
+
+                // Workaround to use this class' Resolver inside the FontManager
+                fopFactoryBuilder.getFontManager().setResourceResolver(internalResolver);
 
                 // FIXME Workaround to get hyphenation work in FOP.
                 // FOP should use "hyphenation-base" to get base URI for patterns
