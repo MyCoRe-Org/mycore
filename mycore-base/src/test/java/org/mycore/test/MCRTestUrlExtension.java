@@ -100,7 +100,7 @@ public class MCRTestUrlExtension implements Extension, BeforeAllCallback, Before
     }
 
     private static Data getClassData(ExtensionContext context, Class<?> testClass) {
-        return (Data) context.getRoot().getStore(NAMESPACE).getOrComputeIfAbsent(testClass, unprocessedTestClass -> {
+        return (Data) context.getRoot().getStore(NAMESPACE).computeIfAbsent(testClass, unprocessedTestClass -> {
 
             Data data = Data.DEFAULT;
 

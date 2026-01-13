@@ -40,7 +40,7 @@ public class MCRORCIDJSONMapper {
     private static ObjectMapper initMapper() {
         final ObjectMapper mapper = new ObjectMapper();
         mapper.findAndRegisterModules();
-        mapper.setSerializationInclusion(Include.NON_NULL);
+        mapper.setDefaultPropertyInclusion(Include.NON_NULL);
         return mapper;
     }
 

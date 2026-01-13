@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
@@ -82,11 +83,11 @@ public final class MCRNeo4JUtil {
 
         return category
             .getLabel(lang)
-            .map(label -> StringUtils.replace(label.getText(), "'", ""));
+            .map(label -> Strings.CS.replace(label.getText(), "'", ""));
     }
 
     public static String removeIllegalRelationshipTypeCharacters(String linkType) {
-        String filteredType = StringUtils.replace(linkType, ":", NEO4J_CLASSID_CATEGID_SEPARATOR);
+        String filteredType = Strings.CS.replace(linkType, ":", NEO4J_CLASSID_CATEGID_SEPARATOR);
         filteredType = StringUtils.deleteWhitespace(filteredType);
         filteredType = StringUtils.remove(filteredType, '-');
         filteredType = StringUtils.remove(filteredType, '"');

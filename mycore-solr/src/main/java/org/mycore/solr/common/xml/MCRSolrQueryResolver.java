@@ -29,7 +29,6 @@ import javax.xml.transform.URIResolver;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRByteContent;
@@ -91,9 +90,8 @@ public class MCRSolrQueryResolver implements URIResolver {
             .orElse(MCRSolrCoreManager.getMainSolrClient());
 
         ModifiableSolrParams params = MCRSolrUtils.parseQueryString(query.get());
-        requestHandler.ifPresent(path -> params.set(CommonParams.QT, path));
         try {
-            InputStream inputStream = MCRSolrSearchUtils.streamRawXML(client, params);
+            InputStream inputStream = MCRSolrSearchUtils.streamRawXML(client, requestHandler.orElse("/select"), params);
             MCRByteContent result = new MCRByteContent(inputStream.readAllBytes());
             result.setSystemId(href);
             return result.getSource();
