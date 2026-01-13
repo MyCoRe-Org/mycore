@@ -35,6 +35,7 @@ import jakarta.ws.rs.core.UriInfo;
 /**
  * Provides CRUD methods for REST.
  */
+@Deprecated(forRemoval = true)
 public final class MCRAccessKeyRestHelper {
 
     private static final MCRAccessKeyService SERVICE = MCRAccessKeyServiceImpl.obtainInstance();
