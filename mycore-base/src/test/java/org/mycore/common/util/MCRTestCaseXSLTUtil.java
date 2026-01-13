@@ -28,7 +28,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Content;
@@ -129,7 +129,7 @@ public class MCRTestCaseXSLTUtil {
     private static void log(Message message) {
         // error codes from https://www.w3.org/2005/xqt-errors/:
         // XTMM9000, XTMM9001 are messages; other codes are warnings/errors
-        if (StringUtils.equalsAny(message.getErrorCode().getLocalName(), ERROR_XTMM9000, ERROR_XTMM9001)) {
+        if (Strings.CS.equalsAny(message.getErrorCode().getLocalName(), ERROR_XTMM9000, ERROR_XTMM9001)) {
             LOGGER.info(message.getContent());
         } else {
             LOGGER.error(message.getContent());

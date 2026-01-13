@@ -53,6 +53,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.MultiMapSolrParams;
 import org.apache.solr.common.util.NamedList;
+import org.apache.solr.common.util.SimpleOrderedMap;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.mycore.access.MCRAccessManager;
@@ -178,7 +179,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
     }
 
     static Map<String, String[]> toMultiMap(ModifiableSolrParams solrQueryParameter) {
-        NamedList<Object> namedList = solrQueryParameter.toNamedList();
+        NamedList<Object> namedList = new SimpleOrderedMap<>(solrQueryParameter);
         //disabled for MCR-953 and https://issues.apache.org/jira/browse/SOLR-7508
         //Map<String, String[]> parameters = ModifiableSolrParams.toMultiMap(namedList);
         Map<String, String[]> parameters = new HashMap<>();
