@@ -481,12 +481,20 @@ Applications based on MyCoRe use a common core, which provides the functionality
                 <configuration>
                   <target>
                     <!-- "<" before Param/?,number => {@literal <} -->
-                    <replaceregexp byline="false" encoding="UTF-8" flags="g" match="\s&lt;\s*(?=[:?\d])" replace=" {@literal &lt;} ">
+                    <replaceregexp byline="false"
+                                   encoding="UTF-8"
+                                   flags="g"
+                                   match="\s&lt;\s*(?=[:?\d])"
+                                   replace=" {@literal &lt;} ">
                       <fileset dir="${project.build.directory}/generated-sources/apt" includes="**/*.java" />
                     </replaceregexp>
 
                     <!-- ">" before Param/?,number => {@literal >} -->
-                    <replaceregexp byline="false" encoding="UTF-8" flags="g" match="\s&gt;\s*(?=[:?\d])" replace=" {@literal &gt;} ">
+                    <replaceregexp byline="false"
+                                   encoding="UTF-8"
+                                   flags="g"
+                                   match="\s&gt;\s*(?=[:?\d])"
+                                   replace=" {@literal &gt;} ">
                       <fileset dir="${project.build.directory}/generated-sources/apt" includes="**/*.java" />
                     </replaceregexp>
                   </target>
