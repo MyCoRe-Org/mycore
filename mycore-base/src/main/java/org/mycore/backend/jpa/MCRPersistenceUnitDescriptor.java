@@ -36,9 +36,9 @@ import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.config.annotation.MCRRawProperties;
 
+import jakarta.persistence.PersistenceUnitTransactionType;
 import jakarta.persistence.SharedCacheMode;
 import jakarta.persistence.ValidationMode;
-import jakarta.persistence.spi.PersistenceUnitTransactionType;
 
 public class MCRPersistenceUnitDescriptor implements PersistenceUnitDescriptor {
 
@@ -126,13 +126,23 @@ public class MCRPersistenceUnitDescriptor implements PersistenceUnitDescriptor {
         return excludeUnlistedClasses;
     }
 
+    @Override
+    public PersistenceUnitTransactionType getPersistenceUnitTransactionType() {
+        return transactionType;
+    }
+
     public void setExcludeUnlistedClasses(boolean excludeUnlistedClasses) {
         this.excludeUnlistedClasses = excludeUnlistedClasses;
     }
 
     @Override
-    public PersistenceUnitTransactionType getTransactionType() {
-        return transactionType;
+    @Deprecated(forRemoval = true)
+    @SuppressWarnings({"deprecation","removal"})
+    public jakarta.persistence.spi.PersistenceUnitTransactionType getTransactionType() {
+        return switch (transactionType) {
+            case JTA -> jakarta.persistence.spi.PersistenceUnitTransactionType.JTA;
+            case RESOURCE_LOCAL -> jakarta.persistence.spi.PersistenceUnitTransactionType.RESOURCE_LOCAL;
+        };
     }
 
     public void setTransactionType(PersistenceUnitTransactionType transactionType) {
