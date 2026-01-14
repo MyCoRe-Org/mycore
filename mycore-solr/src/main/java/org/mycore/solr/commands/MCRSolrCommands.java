@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.mycore.frontend.cli.MCRAbstractCommands;
-import org.mycore.frontend.cli.MCRObjectCommands;
+import org.mycore.frontend.cli.MCRBasicCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.solr.MCRSolrCore;
@@ -87,7 +87,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         order = 140)
     public static void rebuildMetadataIndexForSelected(String coreIDs) {
         List<MCRSolrCore> cores = getCoreList(coreIDs);
-        List<String> selectedObjects = MCRObjectCommands.getSelectedObjectIDs();
+        List<String> selectedObjects = MCRBasicCommands.getSelectedValues();
         MCRSolrIndexer.rebuildMetadataIndex(selectedObjects, cores);
     }
 
@@ -116,7 +116,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         order = 170)
     public static void rebuildContentIndexForSelected(String coreIDs) {
         List<MCRSolrCore> cores = getCoreList(coreIDs);
-        List<String> selectedObjects = MCRObjectCommands.getSelectedObjectIDs();
+        List<String> selectedObjects = MCRBasicCommands.getSelectedValues();
         MCRSolrIndexer.rebuildContentIndex(selectedObjects, cores);
     }
 
@@ -180,7 +180,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         order = 310)
     public static void selectObjectsWithSolrQuery(String query, String coreID) {
         MCRSolrCore core = getCore(coreID);
-        MCRObjectCommands.setSelectedObjectIDs(MCRSolrSearchUtils.listIDs(core.getClient(), query));
+        MCRBasicCommands.setSelectedValues(MCRSolrSearchUtils.listIDs(core.getClient(), query));
     }
 
     /**

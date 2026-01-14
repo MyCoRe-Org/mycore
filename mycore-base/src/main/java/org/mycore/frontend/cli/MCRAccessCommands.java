@@ -398,7 +398,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         if (rule == null) {
             return;
         }
-        for (String id : MCRObjectCommands.getSelectedObjectIDs()) {
+        for (String id : MCRBasicCommands.getSelectedValues()) {
             accessImpl.addRule(id, permission, rule, description);
         }
     }
@@ -460,14 +460,14 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      *
      * @param permission
      *            String type of permission like read, writedb, etc.
-     * @see MCRObjectCommands#getSelectedObjectIDs()
+     * @see MCRBasicCommands#getSelectedValues()
      */
     @MCRCommand(syntax = "delete permission {0} for selected",
         help = "The command delete access rule for a query selected set of object ids of a given permission",
         order = 130)
     public static void permissionDeleteForSelected(String permission) {
         MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
-        for (String id : MCRObjectCommands.getSelectedObjectIDs()) {
+        for (String id : MCRBasicCommands.getSelectedValues()) {
             accessImpl.removeRule(id, permission);
         }
     }
@@ -475,7 +475,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
     /**
      * delete all permissions for all selected objects
      *
-     * @see MCRObjectCommands#getSelectedObjectIDs()
+     * @see MCRBasicCommands#getSelectedValues()
      */
 
     @MCRCommand(syntax = "delete all permissions for selected",
@@ -483,7 +483,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         order = 140)
     public static void permissionDeleteAllForSelected() {
         MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
-        for (String id : MCRObjectCommands.getSelectedObjectIDs()) {
+        for (String id : MCRBasicCommands.getSelectedValues()) {
             accessImpl.removeAllRules(id);
         }
     }
