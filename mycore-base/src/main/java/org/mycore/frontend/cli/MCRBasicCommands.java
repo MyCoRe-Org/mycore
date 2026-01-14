@@ -25,6 +25,8 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -44,6 +46,7 @@ import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRComponent;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
@@ -63,11 +66,31 @@ import org.mycore.resource.MCRResourceHelper;
 
 @MCRCommandGroup(name = "Basic Commands")
 public class MCRBasicCommands {
+
     private static final Logger LOGGER = LogManager.getLogger();
 
     // default value as defined in src/main/resources/configdir.template/resources/META-INF/persistence.xml
     private static final String PERSISTENCE_DEFAULT_H2_URL =
         "jdbc:h2:file:/path/to/.mycore/myapp/data/h2/mycore;AUTO_SERVER=TRUE";
+
+    public static void setSelectedValues(List<String> values) {
+        if (values == null) {
+            LOGGER.info("no values selected");
+        } else {
+            LOGGER.info("{} values selected", values::size);
+        }
+        MCRSessionMgr.getCurrentSession().put("mcrSelectedValues", values);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<String> getSelectedValues() {
+        List<String> values = (List<String>) MCRSessionMgr.getCurrentSession().get("mcrSelectedValues");
+        if (values == null) {
+            return Collections.emptyList();
+        } else {
+            return values;
+        }
+    }
 
     /**
      * Shows a list of commands understood by the command line interface and
@@ -131,6 +154,47 @@ public class MCRBasicCommands {
         return MCRCommandLineInterface.readCommandsFile(file);
     }
 
+    @MCRCommand(
+        syntax = "select values {0}",
+        help = "Selects the given values. {0} is interpreted as a space separated list of values.",
+        order = 30)
+    public static void selectValues(String values) {
+        setSelectedValues(Arrays.stream(values.split("\\s")).toList());
+    }
+    
+    @MCRCommand(
+        syntax = "execute for selected {0}",
+        help = "Calls the given command multiple times for all selected values." +
+            " The replacement is defined by an {x}. E.g. 'execute for selected set" +
+            " parent of {x} to myapp_container_00000001'",
+        order = 40)
+    public static List<String> executeForSelected(String command) {
+        if (!command.contains("{x}")) {
+            LOGGER.info("No replacement defined. Use the {x} variable in order to execute your command for all "
+                + "selected values.");
+            return Collections.emptyList();
+        }
+        return getSelectedValues()
+            .stream()
+            .map(value -> command.replaceAll("\\{x}", value))
+            .toList();
+    }
+
+    @MCRCommand(
+        syntax = "list selected",
+        help = "Prints the selected values as a space separated list",
+        order = 50)
+    public static void listSelected() {
+        LOGGER.info("List selected values");
+        if (getSelectedValues().isEmpty()) {
+            LOGGER.info("No Resultset to work with, use a command like \"select values {0}\"," +
+                " \"select objects with solr query {0} in core {1}\" or" +
+                " \"select objects with xpath {0}\" to create one");
+            return;
+        }
+        LOGGER.info(() -> String.join(" ", getSelectedValues()));
+    }
+    
     @MCRCommand(syntax = "exit", help = "Stop and exit the commandline tool.", order = 40)
     public static void exit() {
         MCRCommandLineInterface.exit();

@@ -21,6 +21,8 @@ package org.mycore.frontend.cli;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -31,11 +33,16 @@ import javax.xml.transform.TransformerFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
+import org.jdom2.filter.Filters;
 import org.jdom2.transform.JDOMSource;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
@@ -60,7 +67,7 @@ public class MCRCommandUtils {
      *     Not thrown if type exists but has no values.
      */
     public static Stream<String> getIdsForType(final String type) throws MCRUsageException {
-        if (type == null || type.length() == 0) {
+        if (type == null || type.isEmpty()) {
             throw new MCRUsageException("Type required to enumerate IDs!");
         }
         List<String> idList = MCRXMLMetadataManager.getInstance().listIDsOfType(type);
@@ -84,10 +91,10 @@ public class MCRCommandUtils {
      */
     public static Stream<String> getIdsForProjectAndType(final String project, final String type)
         throws MCRUsageException {
-        if (project == null || project.length() == 0) {
+        if (project == null || project.isEmpty()) {
             throw new MCRUsageException("Project required to enumerate IDs!");
         }
-        if (type == null || type.length() == 0) {
+        if (type == null || type.isEmpty()) {
             throw new MCRUsageException("Type required to enumerate IDs!");
         }
         return getIdsForBaseId(project + "_" + type);
@@ -130,10 +137,10 @@ public class MCRCommandUtils {
      */
     public static Stream<String> getIdsFromIdToId(final String startId, final String endId)
         throws MCRUsageException {
-        if (startId == null || startId.length() == 0) {
+        if (startId == null || startId.isEmpty()) {
             throw new MCRUsageException("Start-ID required to enumerate IDs!");
         }
-        if (endId == null || endId.length() == 0) {
+        if (endId == null || endId.isEmpty()) {
             throw new MCRUsageException("End-ID required to enumerate IDs!");
         }
         MCRObjectID from = MCRObjectID.getInstance(startId);
@@ -148,8 +155,8 @@ public class MCRCommandUtils {
 
         int fromID = from.getNumberAsInteger();
         int toID = to.getNumberAsInteger();
-        int lowerBound = fromID < toID ? fromID : toID;
-        int upperBound = fromID < toID ? toID : fromID;
+        int lowerBound = Math.min(fromID, toID);
+        int upperBound = Math.max(fromID, toID);
         List<String> idList = IntStream.rangeClosed(lowerBound, upperBound).boxed().parallel()
             .map(n -> MCRObjectID.formatID(fromBase, n))
             .filter(id -> MCRMetadataManager.exists(MCRObjectID.getInstance(id)))
@@ -210,4 +217,31 @@ public class MCRCommandUtils {
         }
         return null;
     }
+
+    /**
+     * Select MCRObjectIDs by applying a XPath to the corresponding MCRBase-objects XML representation.
+     * <p>
+     * This method iterates over all available objects IDs, filters them using a given filter and
+     * maps them to a MCRBase-object using the given mapper. For each such object, the corresponding XML
+     * representation is created and the given XPath applied. If the Xpath evaluates to a non-empty result,
+     * the corresponding object ID is selected and included in the result list.
+     */
+    public static List<String> selectWithXpath(String xPath, Predicate<String> filter,
+        Function<MCRObjectID, MCRBase> mapper) {
+
+        XPathExpression<Object> xPathExpression = XPathFactory.instance()
+            .compile(xPath, Filters.fpassthrough(), null, MCRConstants.getStandardNamespaces());
+
+        return MCRXMLMetadataManager
+            .getInstance()
+            .listIDs()
+            .stream()
+            .filter(filter)
+            .map(MCRObjectID::getInstance)
+            .filter(mcrBase -> !xPathExpression.evaluate(mapper.apply(mcrBase).createXML()).isEmpty())
+            .map(MCRObjectID::toString)
+            .toList();
+
+    }
+
 }

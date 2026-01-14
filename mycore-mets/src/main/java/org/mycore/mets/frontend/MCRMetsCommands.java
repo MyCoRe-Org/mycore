@@ -39,8 +39,8 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.cli.MCRAbstractCommands;
+import org.mycore.frontend.cli.MCRBasicCommands;
 import org.mycore.frontend.cli.MCRCommandUtils;
-import org.mycore.frontend.cli.MCRObjectCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.mets.model.MCRMETSGeneratorFactory;
@@ -60,7 +60,7 @@ public class MCRMetsCommands extends MCRAbstractCommands {
 
     @MCRCommand(syntax = "validate selected mets", help = "validates all mets.xml of selected derivates", order = 10)
     public static void validateSelectedMets() {
-        List<String> selectedObjectIDs = MCRObjectCommands.getSelectedObjectIDs();
+        List<String> selectedObjectIDs = MCRBasicCommands.getSelectedValues();
 
         for (String objectID : selectedObjectIDs) {
             LOGGER.info("Validate mets.xml of {}", objectID);
