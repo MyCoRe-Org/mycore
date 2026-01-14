@@ -204,11 +204,7 @@ public class MCRJobDAOJPAImpl implements MCRJobDAO {
             query.setMaxResults(amount);
         }
 
-        return query
-            .getResultList()
-            .stream()
-            .peek(em::detach)
-            .toList();
+        return query.getResultList();
     }
 
     @Override

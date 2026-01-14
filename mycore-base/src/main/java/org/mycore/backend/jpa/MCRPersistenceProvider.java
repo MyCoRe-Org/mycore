@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
+import jakarta.persistence.PersistenceConfiguration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl;
@@ -100,7 +101,7 @@ public class MCRPersistenceProvider implements PersistenceProvider {
         Optional.ofNullable(puDescriptor.getProviderClassName())
             .ifPresent((provider) -> table.add(new Property("ProviderClassName", provider)));
 
-        Optional.ofNullable(puDescriptor.getTransactionType())
+        Optional.ofNullable(puDescriptor.getPersistenceUnitTransactionType())
             .ifPresent((transactionType) -> table.add(new Property("TransactionType", transactionType.name())));
 
         Optional.ofNullable(puDescriptor.getValidationMode())
@@ -161,6 +162,11 @@ public class MCRPersistenceProvider implements PersistenceProvider {
             }
         }
         return false;
+    }
+
+    @Override
+    public EntityManagerFactory createEntityManagerFactory(PersistenceConfiguration persistenceConfiguration) {
+        return null;
     }
 
     @Override
