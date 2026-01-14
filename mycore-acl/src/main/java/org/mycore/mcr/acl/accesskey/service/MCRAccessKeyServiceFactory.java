@@ -39,7 +39,7 @@ public final class MCRAccessKeyServiceFactory {
     }
 
     /**
-     * @deprecated Use {@link MCRAccessKeyServiceProvider#obtainInstance()} instead.
+     * @deprecated Use {@link MCRAccessKeyServiceImpl#obtainInstance()} instead.
      */
     @Deprecated(forRemoval = true)
     public static MCRAccessKeyService getAccessKeyService() {
