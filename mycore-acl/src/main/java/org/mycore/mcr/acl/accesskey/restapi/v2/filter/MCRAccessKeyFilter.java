@@ -24,7 +24,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.config.MCRAccessKeyConfig;
-import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyServiceFactory;
+import org.mycore.mcr.acl.accesskey.service.MCRAccessKeySessionService;
 import org.mycore.restapi.v2.MCRRestAuthorizationFilter;
 
 import jakarta.annotation.Priority;
@@ -42,6 +42,25 @@ import jakarta.ws.rs.ext.Provider;
 public class MCRAccessKeyFilter implements ContainerRequestFilter {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    private final MCRAccessKeySessionService sessionService;
+
+    /**
+     * Creates a new {@link MCRAccessKeyFilter} using the default
+     * {@link MCRAccessKeySessionService} singleton instance.
+     */
+    public MCRAccessKeyFilter() {
+        this(MCRAccessKeySessionService.obtainInstance());
+    }
+
+    /**
+     * Creates a new {@link MCRAccessKeyFilter} with the specified session service.
+     *
+     * @param sessionService the {@link MCRAccessKeySessionService} used to access and manage session information
+     */
+    public MCRAccessKeyFilter(MCRAccessKeySessionService sessionService) {
+        this.sessionService = sessionService;
+    }
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
@@ -63,8 +82,7 @@ public class MCRAccessKeyFilter implements ContainerRequestFilter {
                 try {
                     final MCRObjectID objectId = MCRObjectID.getInstance(objectIdString);
                     if (objectId != null) {
-                        MCRAccessKeyServiceFactory.getAccessKeySessionService()
-                            .activateAccessKey(objectId.toString(), secret);
+                        sessionService.activateAccessKey(objectId.toString(), secret);
                     }
                 } catch (MCRException e) {
                     LOGGER.debug("The access key could not be added to the current session: ", e);
