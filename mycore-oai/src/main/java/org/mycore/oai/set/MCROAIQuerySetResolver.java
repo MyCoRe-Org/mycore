@@ -67,6 +67,7 @@ class MCROAIQuerySetResolver extends MCROAISetResolver<String, SolrDocument> {
         QueryResponse response;
         try {
             QueryRequest queryRequest = new QueryRequest(getQuery());
+            queryRequest.setPath(getRequestHandlerPath());
             MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
                 MCRSolrAuthenticationLevel.SEARCH);
             response = queryRequest.process(solrClient);
@@ -95,10 +96,11 @@ class MCROAIQuerySetResolver extends MCROAISetResolver<String, SolrDocument> {
         solrQuery.setFilterQueries(query);
         solrQuery.setFields("id");
         solrQuery.setRows(getResult().size());
-        // request handler
-        solrQuery.setRequestHandler(
-            MCRConfiguration2.getString(getConfigPrefix() + "Search.RequestHandler").orElse("/select"));
         return solrQuery;
+    }
+
+    private String getRequestHandlerPath() {
+        return MCRConfiguration2.getString(getConfigPrefix() + "Search.RequestHandler").orElse("/select");
     }
 
 }
