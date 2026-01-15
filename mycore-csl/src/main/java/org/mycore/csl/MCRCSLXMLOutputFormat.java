@@ -6,7 +6,7 @@ import de.undercouch.citeproc.output.Bibliography;
 import de.undercouch.citeproc.output.SecondFieldAlign;
 
 /**
- * Class to enable xml output in the {@link de.undercouch.citeproc.CSL} processor.
+ * Class to enable XML output in the {@link de.undercouch.citeproc.CSL} processor.
  * */
 public class MCRCSLXMLOutputFormat extends HtmlFormat {
 
