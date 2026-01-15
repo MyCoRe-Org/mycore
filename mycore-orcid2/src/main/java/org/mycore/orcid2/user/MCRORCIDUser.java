@@ -73,7 +73,7 @@ public class MCRORCIDUser {
 
     private final MCRUser user;
 
-    private final MCRLegalEntityService legalEntityService;
+    private MCRLegalEntityService legalEntityService = MCRLegalEntityService.obtainInstance();
 
     /**
      * Wraps MCRUser to MCRORCIDUser.
@@ -82,8 +82,6 @@ public class MCRORCIDUser {
      */
     public MCRORCIDUser(MCRUser user) {
         this.user = user;
-        legalEntityService = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRLegalEntityService.class, MCRORCIDConstants.CONFIG_PREFIX + "LegalEntityService.Class");
     }
 
     /**

@@ -20,6 +20,8 @@ package org.mycore.datamodel.legalentity;
 
 import java.util.Set;
 
+import org.mycore.common.config.MCRConfiguration2;
+
 /**
  * Services that implement this interface should search for all identifiers of a specific legal entity (e.g. a person)
  * using a specific, identifying {@link MCRIdentifier}, or add an identifier to the legal entity. The identifier
@@ -49,5 +51,17 @@ public interface MCRLegalEntityService {
      * @param identifierToAdd the identifier to add, not null
      */
     void addIdentifier(MCRIdentifier primaryIdentifier, MCRIdentifier identifierToAdd);
+
+    /**
+     * Get configured singleton service implementation.
+     */
+    static MCRLegalEntityService obtainInstance() {
+        return InstanceHolder.SHARED_INSTANCE;
+    }
+
+    class InstanceHolder {
+        private static final MCRLegalEntityService SHARED_INSTANCE = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRLegalEntityService.class, "MCR.LegalEntityService.Class");
+    }
 
 }
