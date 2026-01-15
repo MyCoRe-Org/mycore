@@ -41,7 +41,7 @@ import org.mycore.common.xsl.MCRParameterCollector;
 public class MCRCSLTransformer extends MCRParameterizedTransformer {
 
     static final String DEFAULT_LOCALE = MCRConfiguration2
-        .getStringOrThrow("MCR.CSL.defaultLocale")
+        .getStringOrThrow("MCR.CSL.DefaultLocale")
         .toUpperCase(Locale.ROOT);
 
     public static final String DEFAULT_FORMAT = "text";
