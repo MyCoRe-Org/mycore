@@ -128,11 +128,7 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
             instance.getCitationProcessor().reset();
             instance.getDataProvider().reset();
             instance.getCitationProcessor().setOutputFormat(format);
-            if ("xml".equals(format)) {
-                instance.getCitationProcessor().setOutputFormat(new MCRCSLXMLOutputFormat());
-            } else {
-                instance.getCitationProcessor().setOutputFormat(format);
-            }
+            instance.getCitationProcessor().setOutputFormat(format);
         } catch (RuntimeException e) {
             // if an error happens the instances may be not reset, so we throw away the instance
             LogManager.getLogger().error("Error while resetting transformer instance", e);

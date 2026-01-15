@@ -50,12 +50,7 @@ public class MCRCSLTransformerInstance implements AutoCloseable {
         } catch (IOException e) {
             throw new MCRConfigurationException("Error while creating CSL with Style " + style, e);
         }
-
-        if ("xml".equalsIgnoreCase(format)) {
-            this.citationProcessor.setOutputFormat(new MCRCSLXMLOutputFormat());
-        } else {
-            this.citationProcessor.setOutputFormat(format);
-        }
+        this.citationProcessor.setOutputFormat(format);
     }
 
     public CSL getCitationProcessor() {
