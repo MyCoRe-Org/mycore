@@ -79,7 +79,7 @@ public final class MCRDefaultXMappingClassificationGenerator extends MCRXMapping
     private static final XPathExpression<Element> CLASSIFICATION_ELEMENT_XPATH;
 
     static {
-        CLASSIFICATION_ELEMENT_XPATH = XPathFactory.instance().compile("//*[@categid]", Filters.element());
+        CLASSIFICATION_ELEMENT_XPATH = XPathFactory.instance().compile("//*[@classid and @categid]", Filters.element());
     }
 
     public MCRDefaultXMappingClassificationGenerator(OnMissingMappedCategory onMissingMappedCategory) {
