@@ -56,6 +56,9 @@ export class DesktopChapterTreeView implements ChapterTreeView {
       // Creates ol for children if not exist
       if (!parentElement) {
         parentElement = document.querySelector("li[data-id='" + CSS.escape(parentId) + "']");
+        if (!parentElement?.parentElement) {
+          return this.list;
+        }
         const childrenList = document.createElement("ol");
         childrenList.setAttribute("data-id", parentId);
         childrenList.setAttribute("data-opened", "true");
