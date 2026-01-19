@@ -26,6 +26,11 @@ import java.util.stream.Collectors;
 import org.mycore.datamodel.legalentity.MCRIdentifier;
 import org.mycore.datamodel.legalentity.MCRLegalEntityService;
 
+/**
+ * This class identifies {@link MCRUser users} by their user ID and looks up their identifiers through the
+ * {@link MCRUserAttribute attributes} attached to the user entity. New attributes are also persisted in the user
+ * entity.
+ */
 public class MCRUserIdentifierService implements MCRLegalEntityService {
 
     public static final String ATTR_ID_PREFIX = "id_";

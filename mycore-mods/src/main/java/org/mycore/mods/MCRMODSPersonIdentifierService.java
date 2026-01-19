@@ -35,8 +35,16 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.user2.MCRUser;
+import org.mycore.user2.MCRUserAttribute;
 import org.mycore.user2.MCRUserManager;
 
+/**
+ * This class identifies {@link MCRUser users} by their user ID and looks up their identifiers by loading the
+ * correlating modsperson metadata through the modsperson-{@link MCRUserAttribute attribute}
+ * attached to the user entity.
+ * If this attribute is not present, an empty set is returned.
+ * New attributes are added to the modsperson metadata and are not added to the user entity.
+ */
 public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -95,7 +103,7 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
     }
 
     /**
-     * helper method to search for identifiers in a modsperson by a user-ID
+     * Helper method to search for identifiers in a modsperson by a user-ID.
      * @param userId the user id connected to the modsperson
      * @param identifierType optional type filter, leave null for no filter
      * @return a set of all identifiers found
