@@ -27,8 +27,8 @@ mycore.session.listing = {
   resourceURL: null,
 
   sortCriteria: {
-    criteria: null,
-    asc: true
+    criteria: "lastAccess",
+    asc: false
   },
 
   init: function(baseURL) {
