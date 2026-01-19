@@ -18,14 +18,14 @@
 
 package org.mycore.user2;
 
+import java.util.Set;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mycore.datamodel.legalentity.MCRIdentifier;
 import org.mycore.test.MCRJPAExtension;
 import org.mycore.test.MyCoReTest;
-
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -70,25 +70,6 @@ public class MCRUserIdentifierServiceTest {
     }
 
     @Test
-    public final void testFindTypedIdentifiers() {
-        final MCRIdentifier userid = new MCRIdentifier("userid", user.getUserID());
-        Set<MCRIdentifier> typedIdentifiers = service.findTypedIdentifiers(userid, "orcid");
-        Set<MCRIdentifier> expected = Set.of(new MCRIdentifier("orcid", ORCID_1),
-            new MCRIdentifier("orcid", ORCID_2),
-            new MCRIdentifier("orcid", ORCID_3));
-        assertEquals(expected, typedIdentifiers);
-
-        typedIdentifiers = service.findTypedIdentifiers(userid, "id_orcid");
-        assertEquals(0, typedIdentifiers.size());
-
-        typedIdentifiers = service.findTypedIdentifiers(userid, "scopus");
-        assertEquals(Set.of(new MCRIdentifier("scopus", SCOPUS)), typedIdentifiers);
-
-        typedIdentifiers = service.findTypedIdentifiers(userid, "other");
-        assertEquals(Set.of(new MCRIdentifier("other", "abc")), typedIdentifiers);
-    }
-
-    @Test
     public final void testAddIdentifier() {
         MCRUser user1 = new MCRUser("jane");
         user1.setRealName("Jane Doe");
@@ -119,9 +100,6 @@ public class MCRUserIdentifierServiceTest {
         MCRIdentifier nonameUserid = new MCRIdentifier("userid", "noname");
         Set<MCRIdentifier> allIdentifiers = service.findAllIdentifiers(nonameUserid);
         assertEquals(0, allIdentifiers.size());
-
-        Set<MCRIdentifier> typedIdentifiers = service.findTypedIdentifiers(nonameUserid, "orcid");
-        assertEquals(0, typedIdentifiers.size());
 
         service.addIdentifier(nonameUserid, new MCRIdentifier("orcid", ORCID_1));
         allIdentifiers = service.findAllIdentifiers(nonameUserid);

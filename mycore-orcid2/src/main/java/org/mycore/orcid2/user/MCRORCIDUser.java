@@ -126,9 +126,9 @@ public class MCRORCIDUser {
      */
     public Set<String> getORCIDs() {
         final MCRIdentifier userid = new MCRIdentifier("userid", user.getUserID());
-        Set<MCRIdentifier> orcidIdentifiers =  legalEntityService.findTypedIdentifiers(userid, "orcid");
-        return orcidIdentifiers.stream().map(MCRIdentifier::getValue)
-            .collect(Collectors.toSet());
+        Set<MCRIdentifier> orcidIdentifiers =  legalEntityService.findAllIdentifiers(userid);
+        return orcidIdentifiers.stream().filter(identifiers -> identifiers.getType().equals("orcid"))
+            .map(MCRIdentifier::getValue).collect(Collectors.toSet());
     }
 
     /**

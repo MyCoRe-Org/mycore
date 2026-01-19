@@ -38,14 +38,6 @@ public interface MCRLegalEntityService {
     Set<MCRIdentifier> findAllIdentifiers(MCRIdentifier identifier);
 
     /**
-     * Finds a legal entity's identifiers of a given type. The legal entity is determined by a specific identifier.
-     * @param primaryIdentifier unique identifier of legal entity, not null
-     * @param identifierType the type of looked up identifiers as a string, not null
-     * @return a set of identifiers a legal entity owns
-     */
-    Set<MCRIdentifier> findTypedIdentifiers(MCRIdentifier primaryIdentifier, String identifierType);
-
-    /**
      * Adds an identifier to a legal entity. The entity is determined by a specific, given identifier
      * @param primaryIdentifier unique identifier of legal entity, not null
      * @param identifierToAdd the identifier to add, not null

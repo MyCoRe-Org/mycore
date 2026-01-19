@@ -18,13 +18,13 @@
 
 package org.mycore.user2;
 
-import org.mycore.datamodel.legalentity.MCRIdentifier;
-import org.mycore.datamodel.legalentity.MCRLegalEntityService;
-
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.mycore.datamodel.legalentity.MCRIdentifier;
+import org.mycore.datamodel.legalentity.MCRLegalEntityService;
 
 public class MCRUserIdentifierService implements MCRLegalEntityService {
 
@@ -41,24 +41,6 @@ public class MCRUserIdentifierService implements MCRLegalEntityService {
         return findUserByUserID(userId)
             .map(user -> user.getAttributes().stream()
                 .filter(a -> a.getName().startsWith(ATTR_ID_PREFIX))
-                .map(a -> new MCRIdentifier(stripPrefix(a.getName()), a.getValue()))
-                .collect(Collectors.toSet()))
-            .orElse(Collections.emptySet());
-    }
-
-    /**
-     * Gets a user's {@link MCRIdentifier MCRIdentifiers} of a specified type by its
-     * {@link MCRUser#getUserID() user ID}.
-     * @param userId the user id
-     * @param identifierType the type of identifier to filter for, without prefix
-     * @return all identifiers of the specified type containing the prefix
-     * {@link MCRUserIdentifierService#ATTR_ID_PREFIX} or an empty set. prefix is stripped
-     */
-    @Override
-    public Set<MCRIdentifier> findTypedIdentifiers(MCRIdentifier userId, String identifierType) {
-        return findUserByUserID(userId)
-            .map(user -> user.getAttributes().stream()
-                .filter(a -> stripPrefix(a.getName()).equals(identifierType))
                 .map(a -> new MCRIdentifier(stripPrefix(a.getName()), a.getValue()))
                 .collect(Collectors.toSet()))
             .orElse(Collections.emptySet());

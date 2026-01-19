@@ -18,6 +18,9 @@
 
 package org.mycore.orcid2.user;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,14 +35,10 @@ import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserAttribute;
 import org.mycore.user2.MCRUserIdentifierService;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
@@ -65,18 +64,8 @@ public class MCRORCIDUserTest {
 
         when(legalEntityServiceMock.findAllIdentifiers(any(MCRIdentifier.class))).thenAnswer(
             invocation -> userMock.getAttributes()
-        .stream().map(attr -> new MCRIdentifier(attr.getName(), attr.getValue()))
+        .stream().map(attr -> new MCRIdentifier(stripPrefix(attr.getName()), attr.getValue()))
         .collect(Collectors.toSet()));
-
-        when(legalEntityServiceMock.findTypedIdentifiers(any(MCRIdentifier.class), anyString()))
-            .thenAnswer(
-                invocation -> {
-                    String identifierType = invocation.getArgument(1);
-                    return userMock.getAttributes().stream()
-                        .filter(attr -> attr.getName().substring("_id".length()).equals(identifierType))
-                        .map(attr -> new MCRIdentifier(attr.getName(), attr.getValue()))
-                        .collect(Collectors.toSet());
-                });
 
         doAnswer(invocation -> {
             MCRIdentifier identifierToAdd = invocation.getArgument(1);
@@ -149,7 +138,11 @@ public class MCRORCIDUserTest {
         userMock.getAttributes().add(new MCRUserAttribute("id_orcid", ORCID));
         Set<MCRIdentifier> identifiers = orcidUser.getIdentifiers();
         assertEquals(Set.of(new MCRIdentifier("test", "test"),
-        new MCRIdentifier("id_orcid", ORCID)), identifiers);
+        new MCRIdentifier("orcid", ORCID)), identifiers);
     }
 
+    private String stripPrefix(String name) {
+        return name.startsWith(MCRORCIDUser.ATTR_ID_PREFIX) ?
+               name.substring(MCRORCIDUser.ATTR_ID_PREFIX.length()) : name;
+    }
 }

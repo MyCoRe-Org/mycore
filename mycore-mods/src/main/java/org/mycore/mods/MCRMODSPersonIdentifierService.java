@@ -18,6 +18,11 @@
 
 package org.mycore.mods;
 
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
@@ -31,11 +36,6 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
-
-import java.util.Collections;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
 
@@ -61,18 +61,6 @@ public class MCRMODSPersonIdentifierService implements MCRLegalEntityService {
     @Override
     public Set<MCRIdentifier> findAllIdentifiers(MCRIdentifier userId) {
         return getIdentifiers(userId, null);
-    }
-
-    /**
-     * Gets a modsperson's {@link MCRIdentifier MCRIdentifiers} of a specified type by reference
-     * to a {@link org.mycore.user2.MCRUser} and its modsperson id.
-     * @param userId the user id connected to the modsperson
-     * @param identifierType the type of identifier to filter for
-     * @return all known identifiers of a specified type or an empty set
-     */
-    @Override
-    public Set<MCRIdentifier> findTypedIdentifiers(MCRIdentifier userId, String identifierType) {
-        return getIdentifiers(userId, identifierType);
     }
 
     /**

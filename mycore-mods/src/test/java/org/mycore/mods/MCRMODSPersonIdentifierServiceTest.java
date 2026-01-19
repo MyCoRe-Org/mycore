@@ -18,6 +18,10 @@
 
 package org.mycore.mods;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.Set;
+
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,10 +41,6 @@ import org.mycore.test.MCRMetadataExtension;
 import org.mycore.test.MyCoReTest;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -92,26 +92,6 @@ public class MCRMODSPersonIdentifierServiceTest {
             new MCRIdentifier("scopus", SCOPUS),
             new MCRIdentifier("something", "abcd"));
         assertEquals(expected, allIdentifiers);
-    }
-
-    @Test
-    public final void testFindTypedIdentifiers() {
-        final MCRIdentifier userid = new MCRIdentifier("userid", user.getUserID());
-        Set<MCRIdentifier> typedIdentifiers = service.findTypedIdentifiers(userid,"orcid");
-        Set<MCRIdentifier> expected = Set.of(new MCRIdentifier("orcid", ORCID_1),
-            new MCRIdentifier("orcid", ORCID_2),
-            new MCRIdentifier("orcid", ORCID_3));
-        assertEquals(expected, typedIdentifiers);
-
-        typedIdentifiers = service.findTypedIdentifiers(userid,"id_orcid");
-        assertEquals(0, typedIdentifiers.size());
-
-        typedIdentifiers = service.findTypedIdentifiers(
-            new MCRIdentifier("userid", user.getUserID()),"scopus");
-        assertEquals(Set.of(new MCRIdentifier("scopus", SCOPUS)), typedIdentifiers);
-
-        typedIdentifiers = service.findTypedIdentifiers(userid, "something");
-        assertEquals(Set.of(new MCRIdentifier("something", "abcd")), typedIdentifiers);
     }
 
     @Test
