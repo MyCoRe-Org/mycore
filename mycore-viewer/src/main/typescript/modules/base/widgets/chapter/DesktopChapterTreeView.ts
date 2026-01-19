@@ -50,25 +50,23 @@ export class DesktopChapterTreeView implements ChapterTreeView {
    * Resolves the List of a Parent or creates it.
    */
   public getParent(parentId: string): HTMLElement {
-    let parentElement: HTMLElement;
-    if (parentId != null) {
-      parentElement = document.querySelector("ol[data-id='" + CSS.escape(parentId) + "']");
-      // Creates ol for children if not exist
-      if (!parentElement) {
-        parentElement = document.querySelector("li[data-id='" + CSS.escape(parentId) + "']");
-        if (!parentElement?.parentElement) {
-          return this.list;
-        }
-        const childrenList = document.createElement("ol");
-        childrenList.setAttribute("data-id", parentId);
-        childrenList.setAttribute("data-opened", "true");
-        parentElement.parentElement.insertBefore(childrenList, parentElement.nextSibling);
-        parentElement = childrenList;
-      }
-    } else {
-      parentElement = this.list;
+    if (!parentId) {
+      return this.list;
     }
-    return parentElement;
+    const escapedId = CSS.escape(parentId);
+    let parentElement = document.querySelector<HTMLElement>(`ol[data-id='${escapedId}']`);
+    if (parentElement) {
+      return parentElement;
+    }
+    const liElement = document.querySelector<HTMLElement>(`li[data-id='${escapedId}']`);
+    if (!liElement?.parentElement) {
+      return this.list;
+    }
+    const childrenList = document.createElement("ol");
+    childrenList.dataset.id = parentId;
+    childrenList.dataset.opened = "true";
+    parentElement.parentElement.insertBefore(childrenList, liElement.nextSibling);
+    return childrenList;
   }
 
 
