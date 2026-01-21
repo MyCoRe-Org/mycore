@@ -59,16 +59,15 @@ export class DesktopChapterTreeView implements ChapterTreeView {
       return parentElement;
     }
     const liElement = document.querySelector<HTMLElement>(`li[data-id='${escapedId}']`);
-    if (!liElement?.parentElement) {
+    if (!liElement || liElement.parentElement) {
       return this.list;
     }
     const childrenList = document.createElement("ol");
     childrenList.dataset.id = parentId;
     childrenList.dataset.opened = "true";
-    parentElement.parentElement.insertBefore(childrenList, liElement.nextSibling);
+    liElement.parentElement.insertBefore(childrenList, liElement.nextSibling);
     return childrenList;
   }
-
 
   public createNode(id: string, label: string, childLabel: string, expandable: boolean): HTMLElement {
     const insertedNode = document.createElement("li");
