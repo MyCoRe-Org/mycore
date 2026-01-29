@@ -33,20 +33,51 @@ import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.datamodel.ifs2.MCRMetadataVersion;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
- * Provides an adapter to communicate with the configured {@link MCRXMLMetadataManagerAdapter} implementation.
+ * Provides an interface for persistence managers of MCRObject and MCRDerivate xml
+ * metadata to extend, with methods to perform CRUD operations on object metadata.
+ * <p>
+ * The default xml metadata manager is {@link MCRDefaultXMLMetadataManager}. If you wish to use
+ * another manager implementation instead, change the following property accordingly:
+ * <p>
+ * MCR.Metadata.Manager.Class=org.mycore.datamodel.common.MCRDefaultXMLMetadataManager
+ * <p>
+ * Xml metadata managers have a default class they will instantiate for every store.
+ * If you wish to use a different default class, change the following property
+ * accordingly. For example, when using the MCRDefaultXMLMetadataManager:
+ * <p>
+ * MCR.Metadata.Store.DefaultClass=org.mycore.datamodel.ifs2.MCRVersioningMetadataStore
+ * <p>
+ * The following directory will be used by xml metadata managers to keep up-to-date
+ * store contents in. This directory will be created if it does not exist yet.
+ * <p>
+ * MCR.Metadata.Store.BaseDir=/path/to/metadata/dir
+ * <p>
+ * For each project and type, subdirectories will be created below this path,
+ * for example %MCR.Metadata.Store.BaseDir%/DocPortal/document/.
+ * <p>
+ * If an SVN-based store is configured, then the following property will be used to
+ * store and manage local SVN repositories:
+ * <p>
+ * MCR.Metadata.Store.SVNBase=file:///path/to/local/svndir/
+ * <p>
+ * It is also possible to change individual properties per project and object type
+ * and overwrite the defaults, for example
+ * <p>
+ * MCR.IFS2.Store.Class=org.mycore.datamodel.ifs2.MCRVersioningMetadataStore
+ * MCR.IFS2.Store.SVNRepositoryURL=file:///use/other/location/for/document/versions/
+ * MCR.IFS2.Store.SlotLayout=2-2-2-2
+ * <p>
+ * See documentation of MCRStore, MCRMetadataStore and the MCRXMLMetadataManager
+ * extensions (e.g. MCRDefaultXMLMetadataManager) for details.
  *
  * @author Christoph Neidahl (OPNA2608)
  */
-public final class MCRXMLMetadataManager {
-
-    private final MCRXMLMetadataManagerAdapter adapter = MCRConfiguration2.getInstanceOfOrThrow(
-        MCRXMLMetadataManagerAdapter.class, "MCR.Metadata.Manager.Class");
-
-    private MCRXMLMetadataManager() {
-    }
+public interface MCRXMLMetadataManager {
 
     /**
      * Returns the singleton instance of {@link MCRXMLMetadataManager}. Reads the property
@@ -55,183 +86,176 @@ public final class MCRXMLMetadataManager {
      *
      * @return the XML metadata manager
      */
-    public static synchronized MCRXMLMetadataManager getInstance() {
+    static MCRXMLMetadataManager getInstance() {
         return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
-    /*
-     * Delegations to IMPLEMENTATION
+    /**
+     * Reads configuration properties, checks and creates base directories and builds the singleton.
      */
+    void reload();
 
     /**
-     * Delegation, see linked method for relevant documentation.
+     * Try to validate a store.
      *
-     * @see MCRXMLMetadataManagerAdapter#reload()
+     * @param base The base ID of a to-be-validated store
      */
-    public void reload() {
-        adapter.reload();
-    }
+    void verifyStore(String base);
 
     /**
-     * Delegation, see linked method for relevant documentation.
+     * Stores metadata of a new MCRObject in the persistent store.
      *
-     * @see MCRXMLMetadataManagerAdapter#verifyStore(String)
+     * @param mcrid the MCRObjectID
+     * @param xml the xml metadata of the MCRObject
+     * @param lastModified the date of last modification to set
+     * @throws MCRPersistenceException the object couldn't be created due persistence problems
      */
-    public void verifyStore(String base) {
-        adapter.verifyStore(base);
-    }
+    void create(MCRObjectID mcrid, MCRContent xml, Date lastModified)
+            throws MCRPersistenceException;
 
     /**
-     * Delegation, see linked method for relevant documentation.
+     * Delete metadata in store.
      *
-     * @see MCRXMLMetadataManagerAdapter#create(MCRObjectID, MCRContent, Date)
+     * @param mcrid the MCRObjectID
+     * @throws MCRPersistenceException if an error occurs during the deletion
      */
-    public void create(MCRObjectID mcrid, MCRContent xml, Date lastModified)
-        throws MCRPersistenceException {
-        adapter.create(mcrid, xml, lastModified);
-    }
+    void delete(MCRObjectID mcrid) throws MCRPersistenceException;
 
     /**
-     * Delegation, see linked method for relevant documentation.
+     * Updates metadata of existing MCRObject in the persistent store.
      *
-     * @see MCRXMLMetadataManagerAdapter#delete(MCRObjectID)
+     * @param mcrid the MCRObjectID
+     * @param xml the xml metadata of the MCRObject
+     * @param lastModified the date of last modification to set
      */
-    public void delete(MCRObjectID mcrid) throws MCRPersistenceException {
-        adapter.delete(mcrid);
-    }
+    void update(MCRObjectID mcrid, MCRContent xml, Date lastModified)
+            throws MCRPersistenceException;
 
     /**
-     * Delegation, see linked method for relevant documentation.
+     * Retrieves the (latest) content of a metadata object.
      *
-     * @see MCRXMLMetadataManagerAdapter#update(MCRObjectID, MCRContent, Date)
+     * @param mcrid
+     *            the id of the object to be retrieved
+     * @return a {@link MCRContent} representing the {@link MCRObject} or
+     *         <code>null</code> if there is no such object
      */
-    public void update(MCRObjectID mcrid, MCRContent xml, Date lastModified)
-        throws MCRPersistenceException {
-        adapter.update(mcrid, xml, lastModified);
-    }
+    MCRContent retrieveContent(MCRObjectID mcrid) throws IOException;
 
     /**
-     * Delegation, see linked method for relevant documentation.
+     * Retrieves the content of a specific revision of a metadata object.
      *
-     * @see MCRXMLMetadataManagerAdapter#retrieveContent(MCRObjectID)
+     * @param mcrid
+     *            the id of the object to be retrieved
+     * @param revision
+     *            the revision to be returned, specify -1 if you want to
+     *            retrieve the latest revision (includes deleted objects also)
+     * @return a {@link MCRContent} representing the {@link MCRObject} of the
+     *         given revision or <code>null</code> if there is no such object
+     *         with the given revision
      */
-    public MCRContent retrieveContent(MCRObjectID mcrid) throws IOException {
-        return adapter.retrieveContent(mcrid);
-    }
+    MCRContent retrieveContent(MCRObjectID mcrid, String revision) throws IOException;
 
     /**
-     * Delegation, see linked method for relevant documentation.
+     * Lists all versions of this metadata object available in the
+     * subversion repository.
      *
-     * @see MCRXMLMetadataManagerAdapter#retrieveContent(MCRObjectID, String)
+     * @param id
+     *            the id of the object to be retrieved
+     * @return {@link List} with all {@link MCRMetadataVersion} of
+     *         the given object or null if the id is null or the metadata
+     *         store doesn't support versioning
      */
-    public MCRContent retrieveContent(MCRObjectID mcrid, String revision) throws IOException {
-        return adapter.retrieveContent(mcrid, revision);
-    }
+    List<? extends MCRAbstractMetadataVersion<?>> listRevisions(MCRObjectID id) throws IOException;
 
     /**
-     * Delegation, see linked method for relevant documentation.
+     * This method returns the highest stored ID number for a given MCRObjectID
+     * base, or 0 if no object is stored for this type and project.
      *
-     * @see MCRXMLMetadataManagerAdapter#listRevisions(MCRObjectID)
+     * @param project
+     *            the project ID part of the MCRObjectID base
+     * @param type
+     *            the type ID part of the MCRObjectID base
+     * @exception MCRPersistenceException
+     *                if a persistence problem is occurred
+     * @return the highest stored ID number as a String
      */
-    public List<? extends MCRAbstractMetadataVersion<?>> listRevisions(MCRObjectID id) throws IOException {
-        return adapter.listRevisions(id);
+    int getHighestStoredID(String project, String type);
+
+    default int getHighestStoredID(String base) {
+        return getHighestStoredID(
+                base.substring(0, base.indexOf('_')),
+                base.substring(base.indexOf('_') + 1));
     }
+    
+    /**
+     * Checks if an object with the given MCRObjectID exists in the store.
+     *
+     * @param mcrid
+     *            the MCRObjectID to check
+     * @return true if the ID exists, or false if it doesn't
+     * @throws MCRPersistenceException if an error occurred in the store
+     */
+    boolean exists(MCRObjectID mcrid) throws MCRPersistenceException;
 
     /**
-     * Delegation, see linked method for relevant documentation.
+     * Lists all MCRObjectIDs stored for the given base, which is {project}_{type}
      *
-     * @see MCRXMLMetadataManagerAdapter#getHighestStoredID(String, String)
+     * @param base
+     *            the MCRObjectID base, e.g. DocPortal_document
+     * @return List of Strings with all MyCoRe identifiers found in the metadata stores for the given base
      */
-    public int getHighestStoredID(String project, String type) {
-        return adapter.getHighestStoredID(project, type);
-    }
-
-    public int getHighestStoredID(String base) {
-        return adapter.getHighestStoredID(
-            base.substring(0, base.indexOf('_')),
-            base.substring(base.indexOf('_') + 1));
-    }
+    List<String> listIDsForBase(String base);
 
     /**
-     * Delegation, see linked method for relevant documentation.
+     * Lists all MCRObjectIDs stored for the given object type, for all projects
      *
-     * @see MCRXMLMetadataManagerAdapter#exists(MCRObjectID)
+     * @param type
+     *            the MCRObject type, e.g. document
+     * @return List of Strings with all MyCoRe identifiers found in the metadata store for the given type
      */
-    public boolean exists(MCRObjectID mcrid) throws MCRPersistenceException {
-        return adapter.exists(mcrid);
-    }
+    List<String> listIDsOfType(String type);
 
     /**
-     * Delegation, see linked method for relevant documentation.
+     * Lists all MCRObjectIDs of all types and projects stored in any metadata store
      *
-     * @see MCRXMLMetadataManagerAdapter#listIDsForBase(String)
+     * @return List of Strings with all MyCoRe identifiers found in the metadata store
      */
-    public List<String> listIDsForBase(String base) {
-        return adapter.listIDsForBase(base);
-    }
+    List<String> listIDs();
 
     /**
-     * Delegation, see linked method for relevant documentation.
+     * Returns all stored object types of MCRObjects/MCRDerivates.
      *
-     * @see MCRXMLMetadataManagerAdapter#listIDsOfType(String)
+     * @return Collection of Strings with all object types
+     * @see MCRObjectID#getTypeId()
      */
-    public List<String> listIDsOfType(String type) {
-        return adapter.listIDsOfType(type);
-    }
+    Collection<String> getObjectTypes();
 
     /**
-     * Delegation, see linked method for relevant documentation.
+     * Returns all used base ids of MCRObjects/MCRDerivates.
      *
-     * @see MCRXMLMetadataManagerAdapter#listIDs()
+     * @return Collection of Strings with all object base identifier
+     * @see MCRObjectID#getBase()
      */
-    public List<String> listIDs() {
-        return adapter.listIDs();
-    }
+    Collection<String> getObjectBaseIds();
 
     /**
-     * Delegation, see linked method for relevant documentation.
+     * Returns an enhanced list of object ids and their last modified date
      *
-     * @see MCRXMLMetadataManagerAdapter#getObjectTypes()
+     * @param ids MCRObject ids
      */
-    public Collection<String> getObjectTypes() {
-        return adapter.getObjectTypes();
-    }
+    List<MCRObjectIDDate> retrieveObjectDates(List<String> ids) throws IOException;
 
     /**
-     * Delegation, see linked method for relevant documentation.
+     * Returns the time when the xml data of a MCRObject was last modified.
      *
-     * @see MCRXMLMetadataManagerAdapter#getObjectBaseIds()
+     * @param id
+     *            the MCRObjectID of an object
+     * @return the last modification data of the object
+     * @throws IOException thrown while retrieving the object from the store
      */
-    public Collection<String> getObjectBaseIds() {
-        return adapter.getObjectBaseIds();
-    }
+    long getLastModified(MCRObjectID id) throws IOException;
 
-    /**
-     * Delegation, see linked method for relevant documentation.
-     *
-     * @see MCRXMLMetadataManagerAdapter#retrieveObjectDates(List)
-     */
-    public List<MCRObjectIDDate> retrieveObjectDates(List<String> ids) throws IOException {
-        return adapter.retrieveObjectDates(ids);
-    }
-
-    /**
-     * Delegation, see linked method for relevant documentation.
-     *
-     * @see MCRXMLMetadataManagerAdapter#getLastModified(MCRObjectID)
-     */
-    public long getLastModified(MCRObjectID id) throws IOException {
-        return adapter.getLastModified(id);
-    }
-
-    /**
-     * Delegation, see linked method for relevant documentation.
-     *
-     * @see MCRXMLMetadataManagerAdapter#getLastModifiedHandle(MCRObjectID, long, TimeUnit)
-     */
-    public MCRCache.ModifiedHandle getLastModifiedHandle(MCRObjectID id, long expire, TimeUnit unit) {
-        return adapter.getLastModifiedHandle(id, expire, unit);
-    }
+    MCRCache.ModifiedHandle getLastModifiedHandle(MCRObjectID id, long expire, TimeUnit unit);
 
     /*
      * Redirections/wrappers to delegations
@@ -245,7 +269,7 @@ public final class MCRXMLMetadataManager {
      * @param lastModified the date of last modification to set
      * @throws MCRPersistenceException the object couldn't be created due persistence problems
      */
-    public void create(MCRObjectID mcrid, Document xml, Date lastModified)
+    default void create(MCRObjectID mcrid, Document xml, Date lastModified)
         throws MCRPersistenceException {
         create(mcrid, new MCRJDOMContent(xml), lastModified);
     }
@@ -258,11 +282,11 @@ public final class MCRXMLMetadataManager {
      * @param lastModified the date of last modification to set
      * @throws MCRPersistenceException the object couldn't be created due persistence problems
      */
-    public void create(MCRObjectID mcrid, byte[] xml, Date lastModified) throws MCRPersistenceException {
+    default void create(MCRObjectID mcrid, byte[] xml, Date lastModified) throws MCRPersistenceException {
         create(mcrid, new MCRByteContent(xml, lastModified.getTime()), lastModified);
     }
 
-    public void delete(String mcrid) throws MCRPersistenceException {
+    default void delete(String mcrid) throws MCRPersistenceException {
         delete(MCRObjectID.getInstance(mcrid));
     }
 
@@ -274,7 +298,7 @@ public final class MCRXMLMetadataManager {
      * @param lastModified the date of last modification to set
      * @throws MCRPersistenceException the object couldn't be updated due persistence problems
      */
-    public void update(MCRObjectID mcrid, Document xml, Date lastModified)
+    default void update(MCRObjectID mcrid, Document xml, Date lastModified)
         throws MCRPersistenceException {
         update(mcrid, new MCRJDOMContent(xml), lastModified);
     }
@@ -287,7 +311,7 @@ public final class MCRXMLMetadataManager {
      * @param lastModified the date of last modification to set
      * @throws MCRPersistenceException the object couldn't be created or updated due persistence problems
      */
-    public void createOrUpdate(MCRObjectID mcrid, Document xml, Date lastModified)
+    default void createOrUpdate(MCRObjectID mcrid, Document xml, Date lastModified)
         throws MCRPersistenceException {
         if (exists(mcrid)) {
             update(mcrid, xml, lastModified);
@@ -304,7 +328,7 @@ public final class MCRXMLMetadataManager {
      * @param lastModified the date of last modification to set
      * @throws MCRPersistenceException the object couldn't be updated due persistence problems
      */
-    public void update(MCRObjectID mcrid, byte[] xml, Date lastModified) throws MCRPersistenceException {
+    default void update(MCRObjectID mcrid, byte[] xml, Date lastModified) throws MCRPersistenceException {
         update(mcrid, new MCRByteContent(xml, lastModified.getTime()), lastModified);
     }
 
@@ -314,7 +338,7 @@ public final class MCRXMLMetadataManager {
      * @param mcrid the MCRObjectID
      * @return null if metadata is not present
      */
-    public Document retrieveXML(MCRObjectID mcrid) throws IOException, JDOMException {
+    default Document retrieveXML(MCRObjectID mcrid) throws IOException, JDOMException {
         MCRContent metadata = retrieveContent(mcrid);
         return metadata == null ? null : metadata.asXML();
     }
@@ -325,7 +349,7 @@ public final class MCRXMLMetadataManager {
      * @param mcrid the MCRObjectID
      * @return null if metadata is not present
      */
-    public byte[] retrieveBLOB(MCRObjectID mcrid) throws IOException {
+    default byte[] retrieveBLOB(MCRObjectID mcrid) throws IOException {
         MCRContent metadata = retrieveContent(mcrid);
         return metadata == null ? null : metadata.asByteArray();
     }
@@ -335,7 +359,7 @@ public final class MCRXMLMetadataManager {
      *
      * @return List of {@link MCRObjectIDDate}
      */
-    public List<MCRObjectIDDate> listObjectDates() throws IOException {
+    default List<MCRObjectIDDate> listObjectDates() throws IOException {
         return retrieveObjectDates(this.listIDs());
     }
 
@@ -344,7 +368,7 @@ public final class MCRXMLMetadataManager {
      *
      * @param type type of object
      */
-    public List<MCRObjectIDDate> listObjectDates(String type) throws IOException {
+    default List<MCRObjectIDDate> listObjectDates(String type) throws IOException {
         return retrieveObjectDates(this.listIDsOfType(type));
     }
 
@@ -353,12 +377,13 @@ public final class MCRXMLMetadataManager {
      *
      * @return Last modification date of the MyCoRe system
      */
-    public long getLastModified() {
+    default long getLastModified() {
         return MCRConfigurationBase.getSystemLastModified();
     }
 
-    private static final class LazyInstanceHolder {
-        public static final MCRXMLMetadataManager SINGLETON_INSTANCE = new MCRXMLMetadataManager();
+    final class LazyInstanceHolder {
+        public static final MCRXMLMetadataManager SINGLETON_INSTANCE = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRXMLMetadataManager.class, "MCR.Metadata.Manager.Class");
     }
 
 }
