@@ -80,7 +80,7 @@ public class MCRMetadataExtension implements Extension, BeforeAllCallback, Befor
             (key, value) -> LOGGER.debug("MCR Metadata Store Property: {}={}", key, value));
         Files.createDirectories(getStoreBaseDir(context));
         Files.createDirectories(getSvnBaseDir(context));
-        MCRXMLMetadataManager.getInstance().reload();
+        MCRXMLMetadataManager.obtainInstance().reload();
     }
 
     @Override

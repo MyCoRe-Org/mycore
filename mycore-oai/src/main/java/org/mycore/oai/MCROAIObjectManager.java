@@ -173,7 +173,7 @@ public class MCROAIObjectManager {
         String mcrId = oaiId.substring(getOAIIDPrefix().length());
         try {
             MCRObjectID mcrObjId = MCRObjectID.getInstance(mcrId);
-            return MCRXMLMetadataManager.getInstance().exists(mcrObjId);
+            return MCRXMLMetadataManager.obtainInstance().exists(mcrObjId);
         } catch (Exception ex) {
             return false;
         }

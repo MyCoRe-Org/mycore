@@ -67,7 +67,7 @@ public class MCRMODSEmbargoUtils {
     }
 
     public static String getCachedEmbargo(final MCRObjectID objectId) {
-        MCRCache.ModifiedHandle modifiedHandle = MCRXMLMetadataManager.getInstance().getLastModifiedHandle(objectId, 10,
+        MCRCache.ModifiedHandle modifiedHandle = MCRXMLMetadataManager.obtainInstance().getLastModifiedHandle(objectId, 10,
             TimeUnit.MINUTES);
         String embargo = null;
         try {

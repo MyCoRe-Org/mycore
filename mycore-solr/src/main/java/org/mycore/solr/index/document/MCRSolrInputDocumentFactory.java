@@ -52,7 +52,7 @@ public abstract class MCRSolrInputDocumentFactory {
         throws IOException, SAXException;
 
     public SolrInputDocument getDocument(MCRObjectID id) throws SAXException, IOException {
-        MCRContent content = MCRXMLMetadataManager.getInstance().retrieveContent(id);
+        MCRContent content = MCRXMLMetadataManager.obtainInstance().retrieveContent(id);
         return getDocument(id, content);
     }
 

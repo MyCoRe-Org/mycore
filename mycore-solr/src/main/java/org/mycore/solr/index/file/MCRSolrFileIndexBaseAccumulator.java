@@ -51,7 +51,7 @@ public class MCRSolrFileIndexBaseAccumulator implements MCRSolrFileIndexAccumula
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRXMLMetadataManager XML_MANAGER = MCRXMLMetadataManager.getInstance();
+    private static final MCRXMLMetadataManager XML_MANAGER = MCRXMLMetadataManager.obtainInstance();
 
     private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.obtainInstance();
 

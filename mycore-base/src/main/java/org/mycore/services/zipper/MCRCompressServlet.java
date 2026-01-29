@@ -168,11 +168,11 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
     }
 
     private void sendObject(MCRObjectID id, MCRServletJob job, T container) throws Exception {
-        MCRContent content = MCRXMLMetadataManager.getInstance().retrieveContent(id);
+        MCRContent content = MCRXMLMetadataManager.obtainInstance().retrieveContent(id);
         if (content == null) {
             throw new FileNotFoundException("Could not find object: " + id);
         }
-        long lastModified = MCRXMLMetadataManager.getInstance().getLastModified(id);
+        long lastModified = MCRXMLMetadataManager.obtainInstance().getLastModified(id);
         HttpServletRequest req = job.getRequest();
         byte[] metaDataContent = getMetaDataContent(content, req);
         sendMetadataCompressed("metadata.xml", metaDataContent, lastModified, container);

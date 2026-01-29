@@ -208,7 +208,7 @@ public class MCRXMLMetadataManagerTest {
     }
 
     private MCRXMLMetadataManager getStore() {
-        return MCRXMLMetadataManager.getInstance();
+        return MCRXMLMetadataManager.obtainInstance();
     }
 
     private static class XMLInfo {

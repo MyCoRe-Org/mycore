@@ -107,7 +107,7 @@ public abstract class MCRAccessStore {
             Collection<String> elements;
 
             if (MCRConfiguration2.getOrThrow("MCR.Metadata.Type." + type, Boolean::parseBoolean)) {
-                elements = MCRXMLMetadataManager.getInstance().listIDsOfType(type);
+                elements = MCRXMLMetadataManager.obtainInstance().listIDsOfType(type);
             } else {
                 return Collections.emptySet();
             }
