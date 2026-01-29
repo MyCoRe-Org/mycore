@@ -169,7 +169,7 @@ public class MCROCFLMigration {
             }
         }
 
-        MCRXMLMetadataManager instance = MCRXMLMetadataManager.getInstance();
+        MCRXMLMetadataManager instance = MCRXMLMetadataManager.obtainInstance();
 
         // does it even exist?
         if (instance.exists(objectID)) {
@@ -230,7 +230,7 @@ public class MCROCFLMigration {
 
     private List<? extends MCRAbstractMetadataVersion<?>> readRevisions(MCRObjectID objectID) {
         List<? extends MCRAbstractMetadataVersion<?>> revisions = null;
-        MCRXMLMetadataManager instance = MCRXMLMetadataManager.getInstance();
+        MCRXMLMetadataManager instance = MCRXMLMetadataManager.obtainInstance();
 
         try {
             revisions = instance.listRevisions(objectID);

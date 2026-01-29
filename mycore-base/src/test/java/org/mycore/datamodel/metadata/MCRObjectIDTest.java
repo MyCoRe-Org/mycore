@@ -78,7 +78,7 @@ public class MCRObjectIDTest {
         assertEquals(1, id1.getNumberAsInteger(), "First id should be int 1");
         MCRObjectID id2 = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(BASE_ID);
         assertEquals(2, id2.getNumberAsInteger(), "Second id should be int 2");
-        MCRXMLMetadataManager.getInstance().create(id2, new Document(new Element("test")), new Date());
+        MCRXMLMetadataManager.obtainInstance().create(id2, new Document(new Element("test")), new Date());
         MCRObjectID id3 = MCRMetadataManager.getMCRObjectIDGenerator().getNextFreeId(BASE_ID);
         assertEquals(3, id3.getNumberAsInteger(), "Second id should be int 3");
     }

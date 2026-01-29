@@ -153,7 +153,7 @@ public final class MCRMetadataManager {
     private static byte[] retrieveObjectBackup(MCRObjectID objectId) throws MCRPersistenceException {
         byte[] objectBackup;
         try {
-            objectBackup = MCRXMLMetadataManager.getInstance().retrieveBLOB(objectId);
+            objectBackup = MCRXMLMetadataManager.obtainInstance().retrieveBLOB(objectId);
         } catch (IOException ioExc) {
             throw new MCRPersistenceException("Unable to retrieve xml blob of " + objectId, ioExc);
         }
@@ -457,7 +457,7 @@ public final class MCRMetadataManager {
      *            the xml couldn't be read
      */
     public static boolean exists(final MCRObjectID id) throws MCRPersistenceException {
-        return MCRXMLMetadataManager.getInstance().exists(id);
+        return MCRXMLMetadataManager.obtainInstance().exists(id);
     }
 
     /**
@@ -526,7 +526,7 @@ public final class MCRMetadataManager {
      */
     public static MCRDerivate retrieveMCRDerivate(final MCRObjectID id) throws MCRPersistenceException {
         try {
-            Document xml = MCRXMLMetadataManager.getInstance().retrieveXML(id);
+            Document xml = MCRXMLMetadataManager.obtainInstance().retrieveXML(id);
             if (xml == null) {
                 throw new MCRPersistenceException("Could not retrieve xml of derivate: " + id);
             }
@@ -546,7 +546,7 @@ public final class MCRMetadataManager {
      */
     public static MCRObject retrieveMCRObject(final MCRObjectID id) throws MCRPersistenceException {
         try {
-            Document xml = MCRXMLMetadataManager.getInstance().retrieveXML(id);
+            Document xml = MCRXMLMetadataManager.obtainInstance().retrieveXML(id);
             if (xml == null) {
                 throw new MCRPersistenceException("Could not retrieve xml of object: " + id);
             }
@@ -810,7 +810,7 @@ public final class MCRMetadataManager {
             // before updating it again. Otherwise the exception could be thrown again and
             // the object will be in an invalid state (the not existing derivate will be
             // linked with the object).
-            MCRXMLMetadataManager.getInstance().update(mcrObjectId, obj.createXML(), new Date());
+            MCRXMLMetadataManager.obtainInstance().update(mcrObjectId, obj.createXML(), new Date());
 
             // update and call event handlers
             update(obj);

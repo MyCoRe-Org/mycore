@@ -116,7 +116,7 @@ public class MCRObjectServlet extends MCRContentServlet {
                     currentSession.getUserInformation().getUserID(), currentSession.getCurrentIP()));
             return null;
         }
-        MCRXMLMetadataManager xmlMetadataManager = MCRXMLMetadataManager.getInstance();
+        MCRXMLMetadataManager xmlMetadataManager = MCRXMLMetadataManager.obtainInstance();
         if (xmlMetadataManager.listRevisions(mcrid) != null) {
             MCRContent content = xmlMetadataManager.retrieveContent(mcrid, rev);
             if (content != null) {
