@@ -67,7 +67,7 @@ public class MCRAccessKeyUserService extends MCRAccessKeyContextService<MCRUser>
      * @return a newly created {@link MCRAccessKeyUserService} instance
      */
     public static MCRAccessKeyUserService createInstance() {
-        return new MCRAccessKeyUserService(MCRAccessKeyServiceImpl.obtainInstance());
+        return new MCRAccessKeyUserService(MCRAccessKeyService.obtainInstance());
     }
 
     @Override

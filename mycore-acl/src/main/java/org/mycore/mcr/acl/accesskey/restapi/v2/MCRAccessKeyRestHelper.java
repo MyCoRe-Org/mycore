@@ -26,7 +26,6 @@ import java.util.UUID;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyPartialUpdateDto;
 import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyService;
-import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyServiceImpl;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.core.Response;
@@ -38,7 +37,7 @@ import jakarta.ws.rs.core.UriInfo;
 @Deprecated(forRemoval = true)
 public final class MCRAccessKeyRestHelper {
 
-    private static final MCRAccessKeyService SERVICE = MCRAccessKeyServiceImpl.obtainInstance();
+    private static final MCRAccessKeyService SERVICE = MCRAccessKeyService.obtainInstance();
 
     private MCRAccessKeyRestHelper() {
 

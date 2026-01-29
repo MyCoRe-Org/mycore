@@ -31,9 +31,7 @@ import org.mycore.access.MCRAccessCacheHelper;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTransactionManager;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
-import org.mycore.common.config.annotation.MCRFactory;
 import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyPartialUpdateDto;
@@ -78,28 +76,6 @@ public class MCRAccessKeyServiceImpl implements MCRAccessKeyService {
         this.accessKeyRepository = accessKeyRepository;
         this.accessKeyValidator = accessKeyValidator;
         this.secretProcessor = secretProcessor;
-    }
-
-    /**
-     * Returns the shared singleton instance of {@link MCRAccessKeyService}.
-     *
-     * @return the singleton {@link MCRAccessKeyService} instance
-     */
-    @MCRFactory
-    public static MCRAccessKeyServiceImpl obtainInstance() {
-        return InstanceHolder.INSTANCE;
-    }
-
-    /**
-     * Creates a new instance of {@link MCRAccessKeyService}.
-     * <p>
-     * This method instantiates a new access key service using the default
-     * {@link MCRAccessKeyService} instance.
-     *
-     * @return a newly created {@link MCRAccessKeyService} instance
-     */
-    public static MCRAccessKeyServiceImpl createInstance() {
-        return MCRConfiguration2.getInstanceOfOrThrow(MCRAccessKeyServiceImpl.class, INSTANCE_PROPERTY);
     }
 
     @Override
@@ -311,9 +287,5 @@ public class MCRAccessKeyServiceImpl implements MCRAccessKeyService {
         public MCRAccessKeyServiceImpl get() {
             return new MCRAccessKeyServiceImpl(repository, validator, secretProcessor);
         }
-    }
-
-    private static final class InstanceHolder {
-        static final MCRAccessKeyServiceImpl INSTANCE = createInstance();
     }
 }

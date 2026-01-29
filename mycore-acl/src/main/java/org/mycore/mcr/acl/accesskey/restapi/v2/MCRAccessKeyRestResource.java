@@ -18,13 +18,6 @@
 
 package org.mycore.mcr.acl.accesskey.restapi.v2;
 
-import static org.mycore.restapi.v2.MCRRestStatusCode.BAD_REQUEST;
-import static org.mycore.restapi.v2.MCRRestStatusCode.CREATED;
-import static org.mycore.restapi.v2.MCRRestStatusCode.NOT_FOUND;
-import static org.mycore.restapi.v2.MCRRestStatusCode.NO_CONTENT;
-import static org.mycore.restapi.v2.MCRRestStatusCode.OK;
-import static org.mycore.restapi.v2.MCRRestStatusCode.UNAUTHORIZED;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,7 +27,6 @@ import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyPartialUpdateDto;
 import org.mycore.mcr.acl.accesskey.restapi.v2.access.MCRAccessKeyRestAccessCheckStrategy;
 import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyService;
-import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyServiceImpl;
 import org.mycore.restapi.annotations.MCRApiDraft;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.v2.MCRRestSchemaType;
@@ -51,7 +43,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -70,6 +61,12 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 
+import static org.mycore.restapi.v2.MCRRestStatusCode.BAD_REQUEST;
+import static org.mycore.restapi.v2.MCRRestStatusCode.CREATED;
+import static org.mycore.restapi.v2.MCRRestStatusCode.NOT_FOUND;
+import static org.mycore.restapi.v2.MCRRestStatusCode.NO_CONTENT;
+import static org.mycore.restapi.v2.MCRRestStatusCode.OK;
+import static org.mycore.restapi.v2.MCRRestStatusCode.UNAUTHORIZED;
 
 /**
  * A RESTful API for managing access keys. This API provides methods for creating, retrieving, updating,
@@ -99,7 +96,7 @@ public class MCRAccessKeyRestResource {
      * Constructor for {@code MCRAccessKeyRestResource} with default access key service.
      */
     public MCRAccessKeyRestResource() {
-        this(MCRAccessKeyServiceImpl.obtainInstance());
+        this(MCRAccessKeyService.obtainInstance());
     }
 
     /**

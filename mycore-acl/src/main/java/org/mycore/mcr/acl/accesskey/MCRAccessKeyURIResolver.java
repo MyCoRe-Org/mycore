@@ -29,7 +29,6 @@ import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.mapper.MCRAccessKeyJsonMapper;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyService;
-import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyServiceImpl;
 
 /**
  * Returns a JSON string with all {@link MCRAccessKey} for an given reference.
@@ -49,7 +48,7 @@ public class MCRAccessKeyURIResolver implements URIResolver {
      * {@link MCRAccessKeyService} instance.
      */
     public MCRAccessKeyURIResolver() {
-        this(MCRAccessKeyServiceImpl.obtainInstance());
+        this(MCRAccessKeyService.obtainInstance());
     }
 
     /**

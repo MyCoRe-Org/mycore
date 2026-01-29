@@ -21,6 +21,7 @@ package org.mycore.mcr.acl.accesskey.service;
 import java.util.List;
 import java.util.UUID;
 
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyPartialUpdateDto;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyCollisionException;
@@ -31,6 +32,15 @@ import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyValidationException;
  * Service interface for managing access keys.
  */
 public interface MCRAccessKeyService {
+
+    /**
+     * Returns the singleton instance of {@code MCRAccessKeyService}.
+     *
+     * @return the access key service instance
+     */
+    static MCRAccessKeyService obtainInstance() {
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
+    }
 
     /**
      * Lists all available access keys.
@@ -165,4 +175,8 @@ public interface MCRAccessKeyService {
      */
     String processSecret(String reference, String secret);
 
+    final class LazyInstanceHolder {
+        public static final MCRAccessKeyService SINGLETON_INSTANCE = MCRConfiguration2.getInstanceOfOrThrow(
+            MCRAccessKeyService.class, "MCR.ACL.AccessKey.Service.Class");
+    }
 }

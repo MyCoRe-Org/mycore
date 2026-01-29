@@ -32,7 +32,6 @@ import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyException;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyNotFoundException;
 import org.mycore.mcr.acl.accesskey.mapper.MCRAccessKeyJsonMapper;
 import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyService;
-import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyServiceImpl;
 import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyUserService;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -45,7 +44,7 @@ public class MCRAccessKeyCommands {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRAccessKeyService SERVICE = MCRAccessKeyServiceImpl.obtainInstance();
+    private static final MCRAccessKeyService SERVICE = MCRAccessKeyService.obtainInstance();
 
     /**
      * Removes all access keys.
