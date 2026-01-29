@@ -693,7 +693,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             LOGGER.error("The given base ID {} has not the syntax of project_type", baseId);
             return;
         }
-        MCRXMLMetadataManager mgr = MCRXMLMetadataManager.getInstance();
+        MCRXMLMetadataManager mgr = MCRXMLMetadataManager.obtainInstance();
         String project = baseId.substring(0, projectPartPosition + 1);
         List<String> idList = mgr.listIDsForBase(project + MCRDerivate.OBJECT_TYPE);
         int counter = 0;

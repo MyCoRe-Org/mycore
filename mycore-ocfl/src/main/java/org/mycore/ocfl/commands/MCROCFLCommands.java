@@ -330,9 +330,9 @@ public class MCROCFLCommands {
         manager.setRepositoryKey(MCRConfiguration2.getStringOrThrow("MCR.Metadata.Manager.Repository"));
         MCRContent content = manager.retrieveContent(mcrid, revision);
         try {
-            MCRXMLMetadataManager.getInstance().update(mcrid, content, new Date(content.lastModified()));
+            MCRXMLMetadataManager.obtainInstance().update(mcrid, content, new Date(content.lastModified()));
         } catch (MCRUsageException e) {
-            MCRXMLMetadataManager.getInstance().create(mcrid, content, new Date(content.lastModified()));
+            MCRXMLMetadataManager.obtainInstance().create(mcrid, content, new Date(content.lastModified()));
         }
     }
 
@@ -344,7 +344,7 @@ public class MCROCFLCommands {
         MCROCFLFileSystemProvider.get().getFileSystem().restoreRoot(derivateId, revision);
         // update metadata
         MCRObjectID mcrDerivateId = MCRObjectID.getInstance(derivateId);
-        Document derivateXml = MCRXMLMetadataManager.getInstance().retrieveXML(mcrDerivateId);
+        Document derivateXml = MCRXMLMetadataManager.obtainInstance().retrieveXML(mcrDerivateId);
         MCRDerivate mcrDerivate = new MCRDerivate(derivateXml);
         MCRMetadataManager.update(mcrDerivate);
         // tile
@@ -469,7 +469,7 @@ public class MCROCFLCommands {
 
     @MCRCommand(syntax = "migrate derivates to ocfl", help = "migrates all ifs2 derivates to ocfl")
     public static List<String> migrateDerivates() {
-        List<String> derivateIds = MCRXMLMetadataManager.getInstance().listIDsOfType("derivate");
+        List<String> derivateIds = MCRXMLMetadataManager.obtainInstance().listIDsOfType("derivate");
         return derivateIds.stream().map(derivateId -> {
             return "migrate derivate " + derivateId + " to ocfl";
         }).toList();
@@ -497,7 +497,7 @@ public class MCROCFLCommands {
         Files.deleteIfExists(errorFilePath);
         LOGGER.info("Validation errors will be written to: '{}'. If this file does not exists, all derivates "
             + "are successfully migrated to ocfl and can be removed from ifs2.", errorFilePath);
-        List<String> derivateIds = MCRXMLMetadataManager.getInstance().listIDsOfType("derivate");
+        List<String> derivateIds = MCRXMLMetadataManager.obtainInstance().listIDsOfType("derivate");
         return derivateIds.stream().map(derivateId -> {
             return "validate ocfl derivate " + derivateId;
         }).toList();

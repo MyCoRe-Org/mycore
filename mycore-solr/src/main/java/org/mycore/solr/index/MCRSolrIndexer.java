@@ -331,7 +331,7 @@ public class MCRSolrIndexer {
      * Rebuilds solr's metadata index.
      */
     public static void rebuildMetadataIndex(List<MCRSolrCore> solrCores) {
-        rebuildMetadataIndex(MCRXMLMetadataManager.getInstance().listIDs(), solrCores);
+        rebuildMetadataIndex(MCRXMLMetadataManager.obtainInstance().listIDs(), solrCores);
     }
 
     /**
@@ -341,7 +341,7 @@ public class MCRSolrIndexer {
      *            of the objects to index
      */
     public static void rebuildMetadataIndex(String type, List<MCRSolrCore> solrCores) {
-        List<String> identfiersOfType = MCRXMLMetadataManager.getInstance().listIDsOfType(type);
+        List<String> identfiersOfType = MCRXMLMetadataManager.obtainInstance().listIDsOfType(type);
         rebuildMetadataIndex(identfiersOfType, solrCores);
     }
 
@@ -352,7 +352,7 @@ public class MCRSolrIndexer {
      *            of the objects to index
      */
     public static void rebuildMetadataIndexForObjectBase(String base, List<MCRSolrCore> solrCores) {
-        List<String> identfiersOfBase = MCRXMLMetadataManager.getInstance().listIDsForBase(base);
+        List<String> identfiersOfBase = MCRXMLMetadataManager.obtainInstance().listIDsForBase(base);
         rebuildMetadataIndex(identfiersOfBase, solrCores);
     }
 
@@ -416,7 +416,7 @@ public class MCRSolrIndexer {
      * Rebuilds solr's content index.
      */
     public static void rebuildContentIndex(List<MCRSolrCore> cores) {
-        rebuildContentIndex(MCRXMLMetadataManager.getInstance().listIDsOfType(MCRDerivate.OBJECT_TYPE), cores);
+        rebuildContentIndex(MCRXMLMetadataManager.obtainInstance().listIDsOfType(MCRDerivate.OBJECT_TYPE), cores);
     }
 
     /**
@@ -571,7 +571,7 @@ public class MCRSolrIndexer {
      * database. All solr zombie documents will be removed, and all not indexed mycore objects will be indexed.
      */
     public static void synchronizeMetadataIndex(List<MCRSolrCore> client) throws IOException, SolrServerException {
-        Collection<String> objectTypes = MCRXMLMetadataManager.getInstance().getObjectTypes();
+        Collection<String> objectTypes = MCRXMLMetadataManager.obtainInstance().getObjectTypes();
         for (String objectType : objectTypes) {
             synchronizeMetadataIndex(client, objectType);
         }
@@ -584,14 +584,14 @@ public class MCRSolrIndexer {
      */
     public static void synchronizeMetadataIndex(List<MCRSolrCore> cores, String objectType)
         throws IOException, SolrServerException {
-        synchronizeMetadataIndex(cores, objectType, () -> MCRXMLMetadataManager.getInstance().listIDsOfType(objectType),
+        synchronizeMetadataIndex(cores, objectType, () -> MCRXMLMetadataManager.obtainInstance().listIDsOfType(objectType),
             "objectType:" + objectType);
     }
 
     public static void synchronizeMetadataIndexForObjectBase(List<MCRSolrCore> cores, String objectBase)
         throws IOException, SolrServerException {
         final String solrQuery = "objectType:" + objectBase.split("_")[1] + " _root_:" + objectBase + "_*";
-        synchronizeMetadataIndex(cores, objectBase, () -> MCRXMLMetadataManager.getInstance()
+        synchronizeMetadataIndex(cores, objectBase, () -> MCRXMLMetadataManager.obtainInstance()
                 .listIDsForBase(objectBase), solrQuery);
     }
 

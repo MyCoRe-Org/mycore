@@ -414,7 +414,7 @@ public class MCRRestObjects {
         throws IOException {
         long modified;
         try {
-            modified = MCRXMLMetadataManager.getInstance().getLastModified(id);
+            modified = MCRXMLMetadataManager.obtainInstance().getLastModified(id);
         } catch (IOException io) {
             throw MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
                 .withCause(io)
@@ -447,7 +447,7 @@ public class MCRRestObjects {
         tags = MCRRestUtils.TAG_MYCORE_OBJECT)
     public Response getObjectMetadata(@Parameter(example = "mir_mods_00004712") @PathParam(PARAM_MCRID) MCRObjectID id)
         throws IOException {
-        long modified = MCRXMLMetadataManager.getInstance().getLastModified(id);
+        long modified = MCRXMLMetadataManager.obtainInstance().getLastModified(id);
         if (modified < 0) {
             throw new NotFoundException("MCRObject " + id + " not found");
         }
@@ -566,7 +566,7 @@ public class MCRRestObjects {
     @MCRRestRequiredPermission(MCRAccessManager.PERMISSION_HISTORY_VIEW)
     public Response getObjectVersions(@Parameter(example = "mir_mods_00004713") @PathParam(PARAM_MCRID) MCRObjectID id)
         throws IOException {
-        long modified = MCRXMLMetadataManager.getInstance().getLastModified(id);
+        long modified = MCRXMLMetadataManager.obtainInstance().getLastModified(id);
         if (modified < 0) {
             throw MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND)
@@ -578,7 +578,7 @@ public class MCRRestObjects {
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
-        List<? extends MCRAbstractMetadataVersion<?>> versions = MCRXMLMetadataManager.getInstance().listRevisions(id);
+        List<? extends MCRAbstractMetadataVersion<?>> versions = MCRXMLMetadataManager.obtainInstance().listRevisions(id);
         return Response.ok()
             .entity(new GenericEntity<>(versions, TypeUtils.parameterize(List.class, MCRAbstractMetadataVersion.class)))
             .lastModified(lastModified)
@@ -598,7 +598,7 @@ public class MCRRestObjects {
     public Response getObjectVersion(@Parameter(example = "mir_mods_00004714") @PathParam(PARAM_MCRID) MCRObjectID id,
         @PathParam("revision") String revision)
         throws IOException {
-        MCRContent mcrContent = MCRXMLMetadataManager.getInstance().retrieveContent(id, revision);
+        MCRContent mcrContent = MCRXMLMetadataManager.obtainInstance().retrieveContent(id, revision);
         if (mcrContent == null) {
             throw MCRErrorResponse.ofStatusCode(Response.Status.NOT_FOUND.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_REVISION_NOT_FOUND)
