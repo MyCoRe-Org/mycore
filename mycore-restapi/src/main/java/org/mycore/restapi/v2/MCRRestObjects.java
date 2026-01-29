@@ -578,11 +578,11 @@ public class MCRRestObjects {
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
-        List<? extends MCRAbstractMetadataVersion<?>> versions = MCRXMLMetadataManager.obtainInstance().listRevisions(id);
+        List<? extends MCRAbstractMetadataVersion<?>> versions =
+            MCRXMLMetadataManager.obtainInstance().listRevisions(id);
         return Response.ok()
             .entity(new GenericEntity<>(versions, TypeUtils.parameterize(List.class, MCRAbstractMetadataVersion.class)))
-            .lastModified(lastModified)
-            .build();
+            .lastModified(lastModified).build();
     }
 
     @GET

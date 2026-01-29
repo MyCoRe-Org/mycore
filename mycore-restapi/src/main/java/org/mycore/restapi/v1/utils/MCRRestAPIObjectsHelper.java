@@ -378,8 +378,8 @@ public class MCRRestAPIObjectsHelper {
         Set<String> mcrIDs = new HashSet<>();
         if (params.projectIDs.isEmpty()) {
             if (params.typeIDs.isEmpty()) {
-                mcrIDs = MCRXMLMetadataManager.obtainInstance().listIDs().stream().filter(id -> !id.contains("_derivate_"))
-                    .collect(Collectors.toSet());
+                mcrIDs = MCRXMLMetadataManager.obtainInstance().listIDs().stream()
+                    .filter(id -> !id.contains("_derivate_")).collect(Collectors.toSet());
             } else {
                 for (String type : params.typeIDs) {
                     mcrIDs.addAll(MCRXMLMetadataManager.obtainInstance().listIDsOfType(type));
