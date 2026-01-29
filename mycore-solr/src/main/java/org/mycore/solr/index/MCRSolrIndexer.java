@@ -590,8 +590,8 @@ public class MCRSolrIndexer {
      */
     public static void synchronizeMetadataIndex(List<MCRSolrCore> cores, String objectType)
         throws IOException, SolrServerException {
-        synchronizeMetadataIndex(cores, objectType, () -> MCRXMLMetadataManager.obtainInstance().listIDsOfType(objectType),
-            "objectType:" + objectType);
+        synchronizeMetadataIndex(cores, objectType,
+            () -> MCRXMLMetadataManager.obtainInstance().listIDsOfType(objectType), "objectType:" + objectType);
     }
 
     public static void synchronizeMetadataIndexForObjectBase(List<MCRSolrCore> cores, String objectBase)
