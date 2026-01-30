@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrServerException;
-import org.mycore.solr.MCRSolrCoreType;
+import org.mycore.solr.MCRIndexType;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
 
 /**
@@ -54,7 +54,7 @@ public interface MCRSolrIndexHandler {
 
     int getCommitWithin();
 
-    void setCoreType(MCRSolrCoreType coreType);
+    void setIndexType(MCRIndexType indexType);
 
     MCRSolrIndexStatistic getStatistic();
 

@@ -18,32 +18,17 @@
 
 package org.mycore.solr.commands;
 
-import static org.mycore.solr.MCRSolrConstants.DEFAULT_SOLR_SERVER_URL;
-import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_CONFIGSET_TEMPLATE_SUFFIX;
-import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_NAME_SUFFIX;
-import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_PREFIX;
-import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_SERVER_SUFFIX;
-import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_SHARD_COUNT_SUFFIX;
-import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_TYPE_SUFFIX;
-
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.mycore.solr.MCRSolrCore;
-import org.mycore.solr.MCRSolrCoreManager;
-import org.mycore.solr.MCRSolrCoreType;
 import org.mycore.solr.cloud.configsets.MCRSolrConfigSetHelper;
 import org.mycore.solr.cloud.configsets.MCRSolrConfigSetProvider;
 import org.mycore.solr.schema.MCRSolrConfigReloader;
@@ -55,20 +40,8 @@ public class MCRSolrCoreAdminCommands {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    /**
-     * This command displays the MyCoRe properties,
-     * which have to be set, to reload the current Solr / Solr Core configuration
-     * on the next start of the MyCoRe application.
-     */
-    @MCRCommand(
-        syntax = "show solr configuration",
-        help = "displays MyCoRe properties for the current Solr configuration",
-        order = 10)
-    public static void listConfig() {
-        LOGGER.info("List core configuration: {}", () -> getSolrConfiguration().entrySet().stream()
-            .map(entry -> String.format(Locale.ROOT, "%s=%s", entry.getKey(), entry.getValue()))
-            .collect(Collectors.joining("\n")));
-    }
+    /*
+
 
     @MCRCommand(
         syntax = "register solr core with name {0} as core {1}",
@@ -86,7 +59,7 @@ public class MCRSolrCoreAdminCommands {
         order = 65)
     public static void addTypeToSolrCore(String type, String coreID) {
         MCRSolrCore core = MCRSolrCoreManager.get(coreID).orElseThrow();
-        core.getTypes().add(new MCRSolrCoreType(type));
+        core.getTypes().add(new MCRIndexType(type));
     }
 
     @MCRCommand(
@@ -109,7 +82,7 @@ public class MCRSolrCoreAdminCommands {
         order = 66)
     public static void removeTypeFromSolrCore(String type, String coreID) {
         MCRSolrCore core = MCRSolrCoreManager.get(coreID).orElseThrow();
-        core.getTypes().remove(new MCRSolrCoreType(type));
+        core.getTypes().remove(new MCRIndexType(type));
     }
 
     @MCRCommand(
@@ -141,37 +114,7 @@ public class MCRSolrCoreAdminCommands {
         core.setServerURL(server);
     }
 
-    public static Map<String, String> getSolrConfiguration() {
-        Map<String, String> solrConfiguration = new LinkedHashMap<>();
-
-        MCRSolrCoreManager.getCoreMap().entrySet().stream().forEach(entry -> {
-            String coreID = entry.getKey();
-            MCRSolrCore core = entry.getValue();
-            solrConfiguration.put(SOLR_CORE_PREFIX + coreID + SOLR_CORE_NAME_SUFFIX, core.getName());
-
-            if (!DEFAULT_SOLR_SERVER_URL.equals(core.getServerURL())) {
-                solrConfiguration.put(SOLR_CORE_PREFIX + coreID + SOLR_CORE_SERVER_SUFFIX, core.getServerURL());
-            }
-
-            if (core.getConfigSet() != null) {
-                solrConfiguration.put(SOLR_CORE_PREFIX + coreID + SOLR_CORE_CONFIGSET_TEMPLATE_SUFFIX,
-                    core.getConfigSet());
-            }
-
-            if (core.getShardCount() > 1) {
-                solrConfiguration.put(SOLR_CORE_PREFIX + coreID + SOLR_CORE_SHARD_COUNT_SUFFIX,
-                    Integer.toString(core.getShardCount()));
-            }
-
-            if (!core.getTypes().isEmpty()) {
-                String coreTypes = core.getTypes().stream().map(MCRSolrCoreType::name)
-                    .collect(Collectors.joining(","));
-                solrConfiguration.put(SOLR_CORE_PREFIX + coreID + SOLR_CORE_TYPE_SUFFIX, coreTypes);
-            }
-        });
-
-        return solrConfiguration;
-    }
+    */
 
     /**
      * This command recreates the managed-schema.xml and solrconfig.xml files. First it removes all

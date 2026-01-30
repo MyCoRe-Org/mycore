@@ -58,7 +58,7 @@ import org.mycore.frontend.classeditor.json.MCRJSONCategory;
 import org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper;
 import org.mycore.frontend.classeditor.wrapper.MCRCategoryListWrapper;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
-import org.mycore.solr.MCRSolrCoreManager;
+import org.mycore.solr.MCRSolrIndexManager;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
@@ -263,7 +263,7 @@ public class MCRClassificationEditorResource {
     @Path("filter/{text}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response filter(@PathParam("text") String text) {
-        SolrClient solrClient = MCRSolrClassificationUtil.getCore().getClient();
+        SolrClient solrClient = MCRSolrClassificationUtil.getIndexList().getFirst().getClient();
         ModifiableSolrParams p = new ModifiableSolrParams();
         p.set("q", "allMeta:" + "*" + MCRSolrUtils.escapeSearchValue(text) + "*");
         p.set("fl", "id,ancestors");
@@ -289,7 +289,7 @@ public class MCRClassificationEditorResource {
     public Response retrieveLinkedObjects(@PathParam("id") String id, @QueryParam("start") Integer start,
         @QueryParam("rows") Integer rows) throws SolrServerException, IOException {
         // do solr query
-        SolrClient solrClient = MCRSolrCoreManager.getMainSolrClient();
+        SolrClient solrClient = MCRSolrIndexManager.obtainInstance().requireMainIndex().getClient();
         ModifiableSolrParams params = new ModifiableSolrParams();
         params.set("start", start != null ? start : 0);
         params.set("rows", rows != null ? rows : 50);

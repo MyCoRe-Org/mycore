@@ -24,14 +24,15 @@ import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.QueryRequest;
-import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.mycore.frontend.servlets.MCRClassificationBrowser2.MCRQueryAdapter;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.solr.MCRSolrConstants;
-import org.mycore.solr.MCRSolrCoreManager;
+import org.mycore.solr.MCRSolrIndexManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
@@ -86,7 +87,9 @@ public class MCRSolrQueryAdapter implements MCRQueryAdapter {
             QueryRequest queryRequest = new QueryRequest(solrQuery);
             MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
                 MCRSolrAuthenticationLevel.SEARCH);
-            queryResponse = queryRequest.process(MCRSolrCoreManager.getMainSolrClient());
+            SolrClient client = MCRSolrIndexManager.obtainInstance().requireMainIndex()
+                .getClient();
+            queryResponse = queryRequest.process(client);
         } catch (SolrServerException | IOException e) {
             LOGGER.warn("Could not query SOLR.", e);
             return -1;

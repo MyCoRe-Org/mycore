@@ -30,7 +30,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.solr.MCRSolrConstants;
-import org.mycore.solr.MCRSolrCoreType;
+import org.mycore.solr.MCRIndexType;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.MCRSolrIndexer;
@@ -71,11 +71,11 @@ public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
      * @param coreType The type of Solr core this document should be sent to (e.g., main).
      */
     public MCRSolrInputDocumentHandler(Supplier<SolrInputDocument> documentSupplier, String id,
-        MCRSolrCoreType coreType) {
+        MCRIndexType coreType) {
         this.id = id;
         this.documentSupplier = documentSupplier;
         this.subHandlers = new ArrayList<>();
-        this.setCoreType(coreType);
+        this.setIndexType(coreType);
     }
 
     /**

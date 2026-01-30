@@ -32,8 +32,8 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRByteContent;
-import org.mycore.solr.MCRSolrCore;
-import org.mycore.solr.MCRSolrCoreManager;
+import org.mycore.solr.MCRSolrIndex;
+import org.mycore.solr.MCRSolrIndexManager;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.search.MCRSolrSearchUtils;
 
@@ -85,9 +85,10 @@ public class MCRSolrQueryResolver implements URIResolver {
             throw new IllegalArgumentException("Empty query for: " + href);
         }
 
-        SolrClient client = core.flatMap(MCRSolrCoreManager::get)
-            .map(MCRSolrCore::getClient)
-            .orElse(MCRSolrCoreManager.getMainSolrClient());
+        MCRSolrIndexManager im = MCRSolrIndexManager.obtainInstance();
+        SolrClient client = core.flatMap(im::getIndex)
+            .map(MCRSolrIndex::getClient)
+            .orElseGet(() -> im.requireMainIndex().getClient());
 
         ModifiableSolrParams params = MCRSolrUtils.parseQueryString(query.get());
         try {

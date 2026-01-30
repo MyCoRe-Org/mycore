@@ -53,7 +53,7 @@ import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
-import org.mycore.solr.MCRSolrCoreManager;
+import org.mycore.solr.MCRSolrIndexManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
@@ -513,7 +513,7 @@ public class MCRRestAPIClassifications {
     }
 
     private void filterNonEmpty(String classId, Element e) {
-        SolrClient solrClient = MCRSolrCoreManager.getMainSolrClient();
+        SolrClient solrClient = MCRSolrIndexManager.obtainInstance().requireMainIndex().getClient();
         Element[] categories = e.getChildren(ELEMENT_CATEGORY).toArray(Element[]::new);
         for (Element cat : categories) {
             SolrQuery solrQuery = new SolrQuery();

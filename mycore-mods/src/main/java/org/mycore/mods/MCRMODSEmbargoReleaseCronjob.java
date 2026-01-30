@@ -30,12 +30,11 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.jdom2.Element;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.cronjob.MCRCronjob;
-import org.mycore.solr.MCRSolrCoreManager;
+import org.mycore.solr.MCRSolrIndexManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.util.concurrent.MCRFixedUserFailableRunnable;
@@ -58,7 +57,7 @@ public class MCRMODSEmbargoReleaseCronjob extends MCRCronjob {
     @Override
     public void runJob() {
 
-        if (MCRConfiguration2.getString("MCR.Solr.ServerURL").isEmpty()) {
+        if(MCRSolrIndexManager.obtainInstance().getMainIndex().isPresent()) {
             return;
         }
 
@@ -81,7 +80,8 @@ public class MCRMODSEmbargoReleaseCronjob extends MCRCronjob {
 
                 QueryRequest queryRequest = new QueryRequest(params);
                 SOLR_AUTHENTICATION_MANAGER.applyAuthentication(queryRequest, MCRSolrAuthenticationLevel.SEARCH);
-                QueryResponse solrResponse = queryRequest.process(MCRSolrCoreManager.getMainSolrClient());
+                QueryResponse solrResponse =
+                    queryRequest.process(MCRSolrIndexManager.obtainInstance().requireMainIndex().getClient());
                 solrResponse
                     .getResults()
                     .stream()

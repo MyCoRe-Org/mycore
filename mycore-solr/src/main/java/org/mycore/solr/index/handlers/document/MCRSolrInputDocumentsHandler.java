@@ -30,7 +30,7 @@ import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.solr.MCRSolrConstants;
-import org.mycore.solr.MCRSolrCoreType;
+import org.mycore.solr.MCRIndexType;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
@@ -47,9 +47,9 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public MCRSolrInputDocumentsHandler(Collection<SolrInputDocument> documents, MCRSolrCoreType coreType) {
+    public MCRSolrInputDocumentsHandler(Collection<SolrInputDocument> documents, MCRIndexType coreType) {
         this.documents = documents;
-        setCoreType(coreType);
+        setIndexType(coreType);
     }
 
     /* (non-Javadoc)
@@ -106,7 +106,7 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
         subHandlerList = new ArrayList<>(documents.size());
         for (SolrInputDocument document : documents) {
             MCRSolrInputDocumentHandler subHandler = new MCRSolrInputDocumentHandler(() -> document,
-                String.valueOf(document.getFieldValue("id")), getCoreType());
+                String.valueOf(document.getFieldValue("id")), getIndexType());
             subHandler.setCommitWithin(getCommitWithin());
             this.subHandlerList.add(subHandler);
         }

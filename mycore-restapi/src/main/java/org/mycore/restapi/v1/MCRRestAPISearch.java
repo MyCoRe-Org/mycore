@@ -25,21 +25,21 @@ import static org.mycore.frontend.jersey.MCRJerseyUtil.TEXT_PLAIN_UTF_8;
 import static org.mycore.frontend.jersey.MCRJerseyUtil.TEXT_XML_UTF_8;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
+import java.io.InputStream;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.services.http.MCRHttpUtils;
-import org.mycore.solr.MCRSolrCoreManager;
-import org.mycore.solr.MCRSolrUtils;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.QueryRequest;
+import org.apache.solr.common.params.CommonParams;
+import org.apache.solr.common.params.ModifiableSolrParams;
+import org.mycore.solr.MCRSolrIndex;
+import org.mycore.solr.MCRSolrIndexManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
+import org.mycore.solr.search.MCRSolrSearchUtils;
 
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -83,68 +83,64 @@ public class MCRRestAPISearch {
     @SuppressWarnings("PMD.ExcessiveParameterList")
     @GET
     @Produces({ TEXT_XML_UTF_8, APPLICATION_JSON_UTF_8, TEXT_PLAIN_ISO_8859_1, TEXT_PLAIN_UTF_8 })
-    public Response search(@QueryParam("q") String query,
-        @QueryParam("sort") String sort, @QueryParam("wt") @DefaultValue("xml") String wt,
-        @QueryParam("start") String start, @QueryParam("rows") String rows,
-        @QueryParam("fq") List<String> fq, @QueryParam("fl") List<String> fl,
+    public Response search(@QueryParam(CommonParams.Q) String query,
+        @QueryParam(CommonParams.SORT) String sort, @QueryParam(CommonParams.WT) @DefaultValue("xml") String wt,
+        @QueryParam(CommonParams.START) String start, @QueryParam(CommonParams.ROWS) String rows,
+        @QueryParam(CommonParams.FQ) List<String> fq, @QueryParam(CommonParams.FL) List<String> fl,
         @QueryParam("facet") String facet, @QueryParam("facet.sort") String facetSort,
         @QueryParam("facet.limit") String facetLimit, @QueryParam("facet.field") List<String> facetFields,
         @QueryParam("facet.mincount") String facetMinCount,
         @QueryParam("json.wrf") String jsonWrf) {
-        StringBuilder url = new StringBuilder(MCRSolrCoreManager.getMainSolrCore().getV1CoreURL());
-        url.append("/select?");
+        ModifiableSolrParams params = new ModifiableSolrParams();
+
 
         // Append query parameters using helper methods
-        appendQueryParam(url, "q", query);
-        appendQueryParam(url, "sort", sort);
-        appendQueryParam(url, "wt", wt);
-        appendQueryParam(url, "start", start);
-        appendQueryParam(url, "rows", rows);
+        appendQueryParam(params, CommonParams.Q, query);
+        appendQueryParam(params, CommonParams.SORT, sort);
+        appendQueryParam(params, CommonParams.WT, wt);
+        appendQueryParam(params, CommonParams.START, start);
+        appendQueryParam(params, CommonParams.ROWS, rows);
 
-        appendListQueryParam(url, "fq", fq);
-        appendListQueryParam(url, "fl", fl);
+        appendListQueryParam(params, CommonParams.FQ, fq);
+        appendListQueryParam(params, CommonParams.FL, fl);
 
-        appendQueryParam(url, "facet", facet);
-        appendQueryParam(url, "facet.sort", facetSort);
-        appendQueryParam(url, "facet.limit", facetLimit);
-        appendQueryParam(url, "facet.mincount", facetMinCount);
-        appendListQueryParam(url, "facet.field", facetFields);
-        appendQueryParam(url, "json.wrf", jsonWrf);
+        appendQueryParam(params, "facet", facet);
+        appendQueryParam(params, "facet.sort", facetSort);
+        appendQueryParam(params, "facet.limit", facetLimit);
+        appendQueryParam(params, "facet.mincount", facetMinCount);
+        appendListQueryParam(params, "facet.field", facetFields);
+        appendQueryParam(params, "json.wrf", jsonWrf);
 
-        return executeSolrQuery(url.toString(), wt);
+        return executeSolrQuery(params, wt);
     }
 
     // Helper method to append single query parameters
-    private void appendQueryParam(StringBuilder url, String param, String value) {
+    private void appendQueryParam(ModifiableSolrParams params, String param, String value) {
         if (value != null) {
-            url.append('&').append(param).append('=')
-                .append(URLEncoder.encode(value, StandardCharsets.UTF_8));
+            params.set(param, value);
         }
     }
 
     // Helper method to append list-based query parameters
-    private void appendListQueryParam(StringBuilder url, String param, List<String> values) {
-        if (values != null) {
-            for (String value : values) {
-                appendQueryParam(url, param, value);
-            }
+    private void appendListQueryParam(ModifiableSolrParams params, String param, List<String> values) {
+        if (values != null && !values.isEmpty()) {
+            params.add(param, values.toArray(new String[0]));
         }
     }
 
     // Method to execute the Solr query and handle response
-    private Response executeSolrQuery(String url, String wt) {
-        HttpRequest.Builder reqBuilder = MCRSolrUtils.getRequestBuilder().uri(URI.create(url));
-        MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(reqBuilder,
+    private Response executeSolrQuery(ModifiableSolrParams params, String wt) {
+        MCRSolrIndex solrIndex = MCRSolrIndexManager.obtainInstance().requireMainIndex();
+        SolrClient client = solrIndex.getClient();
+        QueryRequest queryRequest = new QueryRequest(params);
+        MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
             MCRSolrAuthenticationLevel.SEARCH);
-        HttpRequest request = reqBuilder.build();
 
-        try (HttpClient client = MCRHttpUtils.getHttpClient()) {
-            HttpResponse<String> resp =
-                client.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-            return Response.ok(resp.body())
+        try (InputStream is = MCRSolrSearchUtils.streamRequest(client, queryRequest, wt)) {
+            return Response.ok(is.readAllBytes())
                 .type(getContentType(wt))
                 .build();
-        } catch (InterruptedException | IOException e) {
+        } catch (IOException | SolrServerException e) {
             LOGGER.error("Error while executing Solr query", e);
             return Response.status(Response.Status.BAD_REQUEST).build();
         }

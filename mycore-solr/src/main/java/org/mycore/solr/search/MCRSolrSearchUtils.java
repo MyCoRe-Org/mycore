@@ -41,6 +41,8 @@ import java.util.stream.StreamSupport;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
+
+import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.request.SolrQuery;
@@ -192,7 +194,21 @@ public final class MCRSolrSearchUtils {
         QueryRequest request = new QueryRequest(params);
         request.setPath(Objects.requireNonNull(path));
         MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(request, SEARCH);
-        InputStreamResponseParser responseParser = new InputStreamResponseParser("xml");
+        return streamRequest(client, request, "xml");
+    }
+
+    /**
+     * Streams the solr response in the given format.
+     * @param client the client to query
+     * @param request the solr request to execute
+     * @param wt the format to stream the response in (e.g. "xml", "json", "csv")
+     * @return an InputStream of the solr response in the given format
+     * @throws SolrServerException Communication with the solr server failed in any way.
+     * @throws IOException If there is a low-level I/O error.
+     */
+    public static InputStream streamRequest(SolrClient client, SolrRequest request, String wt)
+        throws SolrServerException, IOException {
+        InputStreamResponseParser responseParser = new InputStreamResponseParser(wt);
         request.setResponseParser(responseParser);
         NamedList<Object> nl = client.request(request);
         return (InputStream) nl.get("stream");

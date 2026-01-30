@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.classifications2.utils.MCRClassificationUtils;
@@ -42,8 +43,8 @@ import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.services.packaging.MCRPackerManager;
-import org.mycore.solr.MCRSolrCoreManager;
-import org.mycore.solr.MCRSolrCoreType;
+import org.mycore.solr.MCRIndexType;
+import org.mycore.solr.MCRSolrIndexManager;
 import org.mycore.solr.index.MCRSolrIndexer;
 import org.mycore.solr.search.MCRSolrSearchUtils;
 
@@ -56,7 +57,8 @@ public class MCRTransferPackageCommands {
     @MCRCommand(help = "Creates multiple transfer packages which matches the solr query in {0}.",
         syntax = "create transfer package for objects matching {0}")
     public static void create(String query) throws MCRAccessException {
-        List<String> ids = MCRSolrSearchUtils.listIDs(MCRSolrCoreManager.getMainSolrClient(), query);
+        SolrClient solrClient = MCRSolrIndexManager.obtainInstance().requireMainIndex().getClient();
+        List<String> ids = MCRSolrSearchUtils.listIDs(solrClient, query);
         for (String objectId : ids) {
             Map<String, String> parameters = new HashMap<>();
             parameters.put("packer", "TransferPackage");
@@ -190,7 +192,8 @@ public class MCRTransferPackageCommands {
             markManager.remove(MCRObjectID.getInstance(id));
         }
         // index all objects
-        MCRSolrIndexer.rebuildMetadataIndex(mcrObjects, MCRSolrCoreManager.getCoresForType(MCRSolrCoreType.MAIN));
+        MCRSolrIndexer.rebuildMetadataIndex(mcrObjects, MCRSolrIndexManager.obtainInstance()
+            .getIndexWithType(MCRIndexType.MAIN));
 
         // deleting expanded directory
         LOGGER.info("Deleting expanded tar in {}...", targetDirectoryPath);

@@ -25,7 +25,7 @@ import java.util.List;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.solr.MCRSolrCoreType;
+import org.mycore.solr.MCRIndexType;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.document.MCRSolrInputDocumentFactory;
 import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
@@ -46,10 +46,10 @@ public class MCRSolrMCRContentIndexHandler extends MCRSolrAbstractIndexHandler {
 
     private SolrInputDocument document;
 
-    public MCRSolrMCRContentIndexHandler(MCRObjectID id, MCRContent content, MCRSolrCoreType type) {
+    public MCRSolrMCRContentIndexHandler(MCRObjectID id, MCRContent content, MCRIndexType type) {
         this.id = id;
         this.content = content;
-        this.setCoreType(type);
+        this.setIndexType(type);
     }
 
     @Override
@@ -72,7 +72,7 @@ public class MCRSolrMCRContentIndexHandler extends MCRSolrAbstractIndexHandler {
     @Override
     public List<MCRSolrIndexHandler> getSubHandlers() {
         MCRSolrIndexHandler mcrSolrIndexHandler = new MCRSolrInputDocumentHandler(() -> document, id.toString(),
-            this.getCoreType());
+            this.getIndexType());
         mcrSolrIndexHandler.setCommitWithin(getCommitWithin());
         return Collections.singletonList(mcrSolrIndexHandler);
     }

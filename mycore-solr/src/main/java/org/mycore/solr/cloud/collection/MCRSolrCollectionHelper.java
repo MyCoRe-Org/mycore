@@ -26,47 +26,78 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
 import org.apache.solr.client.solrj.response.CollectionAdminResponse;
 import org.mycore.common.MCRException;
-import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
 /**
- * Provides helper methods for working with Solr collections (cores).
+ * Provides helper methods for working with Solr collections.
  */
 public class MCRSolrCollectionHelper {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public static void createCollection(MCRSolrCore core) throws SolrServerException, IOException {
+    /**
+     * Creates a new collection on the Solr server based on the given collection configuration.
+     * The collection will be created with the name and shard count specified in the collection
+     * configuration, and it will use the remote config set specified in the collection
+     * configuration.
+     *
+     * @param collection The collection configuration based on which the collection should be
+     *                   created.
+     * @throws SolrServerException If an error occurs while communicating with the Solr server.
+     * @throws IOException If an error occurs while communicating with the Solr server.
+     */
+    public static void createCollection(MCRSolrCloudCollection collection) throws SolrServerException, IOException {
         CollectionAdminRequest.Create collectionCreateRequest = CollectionAdminRequest
-            .createCollection(core.getName(), core.buildRemoteConfigSetName(), core.getShardCount(), null, null, null);
+            .createCollection(collection.getName(), buildRemoteConfigSetName(collection), collection.getNumShards(),
+                collection.getNumNrtReplicas(), collection.getNumTlogReplicas(), collection.getNumPullReplicas());
+
         MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(collectionCreateRequest,
             MCRSolrAuthenticationLevel.ADMIN);
         CollectionAdminResponse collectionAdminResponse = collectionCreateRequest
-            .process(core.getBaseClient());
+            .process(collection.getBaseClient());
 
         if (!collectionAdminResponse.isSuccess()) {
-            throw new MCRException("Error creating collection " + core.getName() + ": " +
+            throw new MCRException("Error creating collection " + collection.getName() + ": " +
                 collectionAdminResponse.getErrorMessages());
         }
 
-        LOGGER.info("Collection {} created.", core::getName);
+        LOGGER.info("Collection {} created.", collection::getName);
     }
 
-    public static void removeCollection(MCRSolrCore core) throws SolrServerException,
+    /**
+     * Removes the given collection from the Solr server. This will delete all data in the
+     * collection, so use with caution.
+     * @param collection The collection to be removed.
+     * @throws SolrServerException If an error occurs while communicating with the Solr server.
+     * @throws IOException If an error occurs while communicating with the Solr server.
+     */
+    public static void removeCollection(MCRSolrCloudCollection collection) throws SolrServerException,
         IOException {
-        CollectionAdminRequest.Delete collectionDeleteReq = CollectionAdminRequest.deleteCollection(core.getName());
+        CollectionAdminRequest.Delete collectionDeleteReq =
+            CollectionAdminRequest.deleteCollection(collection.getName());
         MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(collectionDeleteReq,
             MCRSolrAuthenticationLevel.ADMIN);
         CollectionAdminResponse collectionAdminResponse = collectionDeleteReq
-            .process(core.getBaseClient());
+            .process(collection.getBaseClient());
 
         if (!collectionAdminResponse.isSuccess()) {
-            throw new MCRException("Error creating collection " + core.getName() + ": " +
+            throw new MCRException("Error creating collection " + collection.getName() + ": " +
                 collectionAdminResponse.getErrorMessages());
         }
 
-        LOGGER.info("Collection {} deleted.", core::getName);
+        LOGGER.info("Collection {} deleted.", collection::getName);
     }
 
+    /**
+     * Builds the name of the remote config set for the given collection. It is assumed that the
+     * remote config set has the same name as the collection, followed by an underscore and the
+     * config set template name.
+     *
+     * @param collection The collection for which the config set name should be built.
+     * @return The name of the remote config set.
+     */
+    public static String buildRemoteConfigSetName(MCRSolrCloudCollection collection) {
+        return collection.getName() + "_" + collection.getConfigSetTemplate();
+    }
 }

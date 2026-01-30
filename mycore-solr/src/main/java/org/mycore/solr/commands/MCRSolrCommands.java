@@ -26,9 +26,8 @@ import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRBasicCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.mycore.solr.MCRSolrCore;
-import org.mycore.solr.MCRSolrCoreManager;
-import org.mycore.solr.MCRSolrUtils;
+import org.mycore.solr.MCRSolrIndex;
+import org.mycore.solr.MCRSolrIndexManager;
 import org.mycore.solr.classification.MCRSolrClassificationUtil;
 import org.mycore.solr.index.MCRSolrIndexer;
 import org.mycore.solr.search.MCRSolrSearchUtils;
@@ -48,7 +47,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         help = "rebuilds metadata and content index in Solr for core with the id {0}",
         order = 110)
     public static void rebuildMetadataAndContentIndex(String coreIDs) {
-        List<MCRSolrCore> cores = getCoreList(coreIDs);
+        List<MCRSolrIndex> cores = getIndexList(coreIDs);
         MCRSolrIndexer.rebuildMetadataIndex(cores);
         MCRSolrIndexer.rebuildContentIndex(cores);
         MCRSolrIndexer.optimize(cores);
@@ -59,7 +58,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         help = "rebuilds the metadata index in Solr for all objects of type {0} in core with the id {1}",
         order = 130)
     public static void rebuildMetadataIndexType(String type, String coreIDs) {
-        List<MCRSolrCore> cores = getCoreList(coreIDs);
+        List<MCRSolrIndex> cores = getIndexList(coreIDs);
         MCRSolrIndexer.rebuildMetadataIndex(type, cores);
     }
 
@@ -67,8 +66,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         syntax = "rebuild solr metadata index for all objects of base {0} in core {1}",
         help = "rebuilds the metadata index in Solr for all objects of base {0} in core with the id {1}",
         order = 130)
-    public static void rebuildMetadataIndexBase(String base, String coreIDs) throws Exception {
-        List<MCRSolrCore> cores = getCoreList(coreIDs);
+    public static void rebuildMetadataIndexBase(String base, String indexName) throws Exception {
+        List<MCRSolrIndex> cores = getIndexList(indexName);
         MCRSolrIndexer.rebuildMetadataIndexForObjectBase(base, cores);
     }
 
@@ -76,8 +75,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         syntax = "rebuild solr metadata index for object {0} in core {1}",
         help = "rebuilds metadata index in Solr for the given object in core with the id {1}",
         order = 120)
-    public static void rebuildMetadataIndexObject(String object, String coreIDs) {
-        List<MCRSolrCore> cores = getCoreList(coreIDs);
+    public static void rebuildMetadataIndexObject(String object, String indexNames) {
+        List<MCRSolrIndex> cores = getIndexList(indexNames);
         MCRSolrIndexer.rebuildMetadataIndex(Stream.of(object).collect(Collectors.toList()), cores);
     }
 
@@ -85,8 +84,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         syntax = "rebuild solr metadata index for selected in core {0}",
         help = "rebuilds content index in Solr for selected objects and or derivates in core with the id {0}",
         order = 140)
-    public static void rebuildMetadataIndexForSelected(String coreIDs) {
-        List<MCRSolrCore> cores = getCoreList(coreIDs);
+    public static void rebuildMetadataIndexForSelected(String indexName) {
+        List<MCRSolrIndex> cores = getIndexList(indexName);
         List<String> selectedObjects = MCRBasicCommands.getSelectedValues();
         MCRSolrIndexer.rebuildMetadataIndex(selectedObjects, cores);
     }
@@ -95,8 +94,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         syntax = "rebuild solr metadata index in core {0}",
         help = "rebuilds metadata index in Solr in core with the id {0}",
         order = 150)
-    public static void rebuildMetadataIndex(String coreIDs) {
-        List<MCRSolrCore> cores = getCoreList(coreIDs);
+    public static void rebuildMetadataIndex(String indexName) {
+        List<MCRSolrIndex> cores = getIndexList(indexName);
         MCRSolrIndexer.rebuildMetadataIndex(cores);
     }
 
@@ -105,8 +104,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         help = "rebuilds content index in Solr for the all derivates of object with the id {0} "
             + "in core with the id {1}",
         order = 160)
-    public static void rebuildContentIndexObject(String objectID, String coreIDs) {
-        List<MCRSolrCore> cores = getCoreList(coreIDs);
+    public static void rebuildContentIndexObject(String objectID, String indexName) {
+        List<MCRSolrIndex> cores = getIndexList(indexName);
         MCRSolrIndexer.rebuildContentIndex(Stream.of(objectID).collect(Collectors.toList()), cores);
     }
 
@@ -114,8 +113,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         syntax = "rebuild solr content index for selected in core {0}",
         help = "rebuilds content index in Solr for alll derivates of selected objects in core with the id {0}",
         order = 170)
-    public static void rebuildContentIndexForSelected(String coreIDs) {
-        List<MCRSolrCore> cores = getCoreList(coreIDs);
+    public static void rebuildContentIndexForSelected(String indexName) {
+        List<MCRSolrIndex> cores = getIndexList(indexName);
         List<String> selectedObjects = MCRBasicCommands.getSelectedValues();
         MCRSolrIndexer.rebuildContentIndex(selectedObjects, cores);
     }
@@ -124,8 +123,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         syntax = "rebuild solr content index in core {0}",
         help = "rebuilds content index in Solr in core with the id {0}",
         order = 180)
-    public static void rebuildContentIndex(String coreIDs) {
-        List<MCRSolrCore> cores = getCoreList(coreIDs);
+    public static void rebuildContentIndex(String indexName) {
+        List<MCRSolrIndex> cores = getIndexList(indexName);
         MCRSolrIndexer.rebuildContentIndex(cores);
     }
 
@@ -133,17 +132,17 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         syntax = "rebuild solr classification index in core {0}",
         help = "rebuilds classification index in Solr in the core with the id {0}",
         order = 190)
-    public static void rebuildClassificationIndex(String coreIDs) {
-        List<MCRSolrCore> core = getCoreList(coreIDs);
-        MCRSolrClassificationUtil.rebuildIndex(core);
+    public static void rebuildClassificationIndex(String indexName) {
+        MCRSolrIndex index = MCRSolrIndexManager.obtainInstance().requireIndex(indexName);
+        MCRSolrClassificationUtil.rebuildIndex(List.of(index));
     }
 
     @MCRCommand(
         syntax = "clear solr index in core {0}",
         help = "deletes all entries from index in Solr in core with the id {0}",
         order = 210)
-    public static void dropIndex(String coreID) throws Exception {
-        MCRSolrCore core = getCore(coreID);
+    public static void dropIndex(String indexName) throws Exception {
+        MCRSolrIndex core = getIndex(indexName);
         MCRSolrIndexer.dropIndex(core.getClient());
     }
 
@@ -151,8 +150,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         syntax = "delete from solr index all objects of type {0} in core {1}",
         help = "deletes all objects of type {0} from index in Solr in core with the id {1}",
         order = 220)
-    public static void dropIndexByType(String type, String coreID) throws Exception {
-        MCRSolrCore core = getCore(coreID);
+    public static void dropIndexByType(String type, String indexName) throws Exception {
+        MCRSolrIndex core = getIndex(indexName);
         MCRSolrIndexer.dropIndexByType(type, core.getClient());
     }
 
@@ -160,8 +159,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         syntax = "delete from solr index all objects of base {0} in core {1}",
         help = "deletes all objects of base {0} from index in Solr in core with the id {1}",
         order = 220)
-    public static void dropIndexByBase(String base, String coreID) throws Exception {
-        MCRSolrCore core = getCore(coreID);
+    public static void dropIndexByBase(String base, String indexName) throws Exception {
+        MCRSolrIndex core = getIndex(indexName);
         MCRSolrIndexer.dropIndexByBase(base, core.getClient());
     }
 
@@ -169,8 +168,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         syntax = "delete from solr index object {0} in core {1}",
         help = "deletes an object with id {0} from index in Solr in core with the id {1}",
         order = 230)
-    public static void deleteByIdFromSolr(String objectID, String coreID) {
-        MCRSolrCore core = getCore(coreID);
+    public static void deleteByIdFromSolr(String objectID, String indexName) {
+        MCRSolrIndex core = getIndex(indexName);
         MCRSolrIndexer.deleteById(core.getClient(), objectID);
     }
 
@@ -178,8 +177,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         syntax = "select objects with solr query {0} in core {1}",
         help = "selects mcr objects with a solr query {0} in core with the id {1}",
         order = 310)
-    public static void selectObjectsWithSolrQuery(String query, String coreID) {
-        MCRSolrCore core = getCore(coreID);
+    public static void selectObjectsWithSolrQuery(String query, String indexName) {
+        MCRSolrIndex core = getIndex(indexName);
         MCRBasicCommands.setSelectedValues(MCRSolrSearchUtils.listIDs(core.getClient(), query));
     }
 
@@ -199,13 +198,12 @@ public class MCRSolrCommands extends MCRAbstractCommands {
             + "since it is very expensive and involves reading and re-writing the entire index",
         order = 410)
     public static void optimize(String coreID) {
-        List<MCRSolrCore> cores = getCoreList(coreID);
+        List<MCRSolrIndex> cores = getIndexList(coreID);
         MCRSolrIndexer.optimize(cores);
     }
 
-    private static MCRSolrCore getCore(String coreID) {
-        return MCRSolrCoreManager.get(coreID)
-            .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreID));
+    private static MCRSolrIndex getIndex(String indexName) {
+        return MCRSolrIndexManager.obtainInstance().requireIndex(indexName);
     }
 
     @MCRCommand(
@@ -213,7 +211,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         help = "synchronizes the MyCoRe store and index in Solr in core with the id {1} for objects of type {0}",
         order = 420)
     public static void synchronizeMetadataIndex(String objectType, String coreID) throws Exception {
-        List<MCRSolrCore> cores = getCoreList(coreID);
+        List<MCRSolrIndex> cores = getIndexList(coreID);
         MCRSolrIndexer.synchronizeMetadataIndex(cores, objectType);
     }
 
@@ -222,7 +220,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         help = "synchronizes the MyCoRe store and index in Solr in core with the id {1} for objects of base {0}",
         order = 420)
     public static void synchronizeMetadataIndexForObjectBase(String objectBase, String coreIDs) throws Exception {
-        List<MCRSolrCore> core = getCoreList(coreIDs);
+        List<MCRSolrIndex> core = getIndexList(coreIDs);
         MCRSolrIndexer.synchronizeMetadataIndexForObjectBase(core, objectBase);
     }
 
@@ -231,12 +229,12 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         help = "synchronizes the MyCoRe store and index in Solr in core with the id {0}",
         order = 430)
     public static void synchronizeMetadataIndex(String coreIDs) throws Exception {
-        List<MCRSolrCore> cores = getCoreList(coreIDs);
+        List<MCRSolrIndex> cores = getIndexList(coreIDs);
         MCRSolrIndexer.synchronizeMetadataIndex(cores);
     }
 
-    private static List<MCRSolrCore> getCoreList(String coreIDs) {
-        return Stream.of(coreIDs.split("[, ]")).map(MCRSolrCommands::getCore)
+    private static List<MCRSolrIndex> getIndexList(String indexNames) {
+        return Stream.of(indexNames.split("[, ]")).map(MCRSolrCommands::getIndex)
             .toList();
     }
 }

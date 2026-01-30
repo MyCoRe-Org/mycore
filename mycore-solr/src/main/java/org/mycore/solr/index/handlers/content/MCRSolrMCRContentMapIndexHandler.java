@@ -34,8 +34,8 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.solr.MCRSolrCore;
-import org.mycore.solr.MCRSolrCoreType;
+import org.mycore.solr.MCRIndexType;
+import org.mycore.solr.MCRSolrIndex;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.document.MCRSolrInputDocumentFactory;
@@ -57,11 +57,11 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
 
     private Map<MCRObjectID, MCRContent> contentMap;
 
-    public MCRSolrMCRContentMapIndexHandler(Map<MCRObjectID, MCRContent> contentMap, MCRSolrCoreType type) {
+    public MCRSolrMCRContentMapIndexHandler(Map<MCRObjectID, MCRContent> contentMap, MCRIndexType type) {
         super();
         this.contentMap = contentMap;
         this.subhandlers = new ArrayList<>(contentMap.size());
-        this.setCoreType(type);
+        this.setIndexType(type);
     }
 
     @Override
@@ -104,25 +104,25 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
             }
             req.add(docs);
 
-            for (MCRSolrCore destinationCore : getDestinationCores()) {
+            for (MCRSolrIndex destinationIndex : getDestinationIndex()) {
                 try {
-                    UpdateResponse updateResponse = req.process(destinationCore.getClient());
+                    UpdateResponse updateResponse = req.process(destinationIndex.getClient());
                     if (updateResponse != null && updateResponse.getStatus() != 0) {
                         LOGGER.error("Error while indexing document collection. Split and retry: {}",
                             updateResponse::getResponse);
-                        splitup(List.of(destinationCore));
+                        splitup(List.of(destinationIndex));
                     } else {
                         LOGGER.info("Sending {} documents was successful in {} ms.", () -> totalCount,
                             updateResponse::getElapsedTime);
                     }
                 } catch (SolrServerException | IOException e) {
                     LOGGER.warn("Error while indexing document collection. Split and retry.", e);
-                    splitup(List.of(destinationCore));
+                    splitup(List.of(destinationIndex));
                     return;
                 }
             }
         } catch (SAXException | IOException e) {
-            splitup(getDestinationCores());
+            splitup(getDestinationIndex());
         } finally {
             contentMap.clear();
         }
@@ -132,19 +132,19 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
         while (documents.hasNext()) {
             SolrInputDocument nextDocument = documents.next();
             MCRSolrInputDocumentHandler subhandler = new MCRSolrInputDocumentHandler(() -> nextDocument,
-                nextDocument.get("id").toString(), getCoreType());
+                nextDocument.get("id").toString(), getIndexType());
             subhandler.setCommitWithin(getCommitWithin());
             subhandlers.add(subhandler);
         }
         contentMap.clear();
     }
 
-    private void splitup(List<MCRSolrCore> cores) {
+    private void splitup(List<MCRSolrIndex> indexList) {
         for (Map.Entry<MCRObjectID, MCRContent> entry : contentMap.entrySet()) {
             MCRSolrMCRContentIndexHandler subHandler = new MCRSolrMCRContentIndexHandler(entry.getKey(),
-                entry.getValue(), getCoreType());
+                entry.getValue(), getIndexType());
             subHandler.setCommitWithin(getCommitWithin());
-            subHandler.setDestinationCores(cores);
+            subHandler.setDestinationIndex(indexList);
             subhandlers.add(subHandler);
         }
     }

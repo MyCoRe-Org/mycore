@@ -35,10 +35,11 @@ import org.apache.solr.client.solrj.response.ConfigSetAdminResponse;
 import org.apache.solr.common.util.ContentStreamBase;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.solr.cloud.collection.MCRSolrCloudCollection;
 import org.mycore.solr.MCRSolrConstants;
-import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
+import org.mycore.solr.cloud.collection.MCRSolrCollectionHelper;
 
 /**
  * Provides helper methods for working with Solr configuration sets.
@@ -58,7 +59,8 @@ public class MCRSolrConfigSetHelper {
      * @throws URISyntaxException If the URL is invalid.
      * @throws IOException If an error occurs while fetching the config sets.
      */
-    public static List<String> getRemoteConfigSetNames(MCRSolrCore core) throws URISyntaxException, IOException,
+    public static List<String> getRemoteConfigSetNames(MCRSolrCloudCollection core)
+        throws URISyntaxException, IOException,
         SolrServerException {
         ConfigSetAdminRequest.List listRequest = new ConfigSetAdminRequest.List();
         MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(listRequest,
@@ -91,13 +93,13 @@ public class MCRSolrConfigSetHelper {
 
     /**
      * Transfers a config set to the remote Solr server.
-     * @param core The core for which the config set should be transferred.
+     * @param collection The index for which the config set should be transferred.
      */
-    public static void transferConfigSetToRemoteSolrServer(MCRSolrCore core) throws SolrServerException, IOException {
-        String remoteName = core.buildRemoteConfigSetName();
-
+    public static void transferConfigSetToRemoteSolrServer(MCRSolrCloudCollection collection)
+        throws SolrServerException, IOException {
+        String remoteName = MCRSolrCollectionHelper.buildRemoteConfigSetName(collection);
         try {
-            List<String> remoteConfigSetNames = getRemoteConfigSetNames(core);
+            List<String> remoteConfigSetNames = getRemoteConfigSetNames(collection);
             if (remoteConfigSetNames.contains(remoteName)) {
                 throw new MCRConfigurationException("Config set " + remoteName + " already exists on the " +
                     "remote Solr server.");
@@ -111,7 +113,7 @@ public class MCRSolrConfigSetHelper {
         MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(request, MCRSolrAuthenticationLevel.ADMIN);
         request.setConfigSetName(remoteName);
 
-        MCRSolrConfigSetProvider configSetProvider = getLocalConfigSets().get(core.getConfigSet());
+        MCRSolrConfigSetProvider configSetProvider = getLocalConfigSets().get(collection.getConfigSetTemplate());
 
         request.setUploadStream(new ContentStreamBase() {
             @Override
@@ -125,7 +127,7 @@ public class MCRSolrConfigSetHelper {
             }
         });
 
-        ConfigSetAdminResponse uploadResponse = request.process(core.getBaseClient());
+        ConfigSetAdminResponse uploadResponse = request.process(collection.getBaseClient());
 
         if (uploadResponse.getStatus() != 0) {
             throw new MCRConfigurationException("Error while transferring config set to remote Solr server. " +
@@ -138,17 +140,17 @@ public class MCRSolrConfigSetHelper {
 
     /**
      * Deletes a config set from the remote Solr server.
-     * @param core The core for which the config set should be deleted.
+     * @param collection The index for which the config set should be deleted.
      */
-    public static void deleteConfigSetFromRemoteSolrServer(MCRSolrCore core) {
+    public static void deleteConfigSetFromRemoteSolrServer(MCRSolrCloudCollection collection) {
         ConfigSetAdminRequest.Delete request = new ConfigSetAdminRequest.Delete();
         MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(request,
             MCRSolrAuthenticationLevel.ADMIN);
 
-        request.setConfigSetName(core.buildRemoteConfigSetName());
+        request.setConfigSetName(MCRSolrCollectionHelper.buildRemoteConfigSetName(collection));
 
         try {
-            ConfigSetAdminResponse deleteResponse = request.process(core.getBaseClient());
+            ConfigSetAdminResponse deleteResponse = request.process(collection.getBaseClient());
             if (deleteResponse.getStatus() != 0) {
                 throw new MCRConfigurationException("Error while deleting config set from remote Solr server. " +
                     "Status code: " + deleteResponse.getStatus() + "\n  " + deleteResponse.getErrorMessages());
@@ -157,7 +159,7 @@ public class MCRSolrConfigSetHelper {
             throw new MCRConfigurationException("Error while deleting config set from remote Solr server.", e);
         }
 
-        LOGGER.info("Config set {} deleted from remote Solr server.", core::getConfigSet);
+        LOGGER.info("Config set {} deleted from remote Solr server.", collection::getConfigSetTemplate);
     }
 
 }

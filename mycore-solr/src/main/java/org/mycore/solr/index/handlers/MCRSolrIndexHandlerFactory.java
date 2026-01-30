@@ -32,7 +32,7 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.solr.MCRSolrCoreType;
+import org.mycore.solr.MCRIndexType;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.file.MCRSolrPathDocumentFactory;
 import org.mycore.solr.index.handlers.document.MCRSolrInputDocumentHandler;
@@ -106,8 +106,8 @@ public abstract class MCRSolrIndexHandlerFactory {
         } else {
             indexHandler = new MCRSolrInputDocumentHandler(
                 () -> MCRSolrPathDocumentFactory.obtainInstance().getDocument(file, attrs), file.toString(),
-                MCRSolrCoreType.MAIN);
-            indexHandler.setCoreType(MCRSolrCoreType.MAIN);
+                MCRIndexType.MAIN);
+            indexHandler.setIndexType(MCRIndexType.MAIN);
         }
         long end = System.currentTimeMillis();
         indexHandler.getStatistic().addTime(end - start);

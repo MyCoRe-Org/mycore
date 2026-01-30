@@ -33,7 +33,7 @@ import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.oai.MCROAIUtils;
 import org.mycore.oai.classmapping.MCRClassificationAndSetMapper;
-import org.mycore.solr.MCRSolrCoreManager;
+import org.mycore.solr.MCRSolrIndexManager;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
@@ -70,7 +70,7 @@ public class MCROAIClassificationToSetHandler extends MCROAISolrSetHandler {
         if (!filterEmptySets()) {
             return false;
         }
-        SolrClient solrClient = MCRSolrCoreManager.getMainSolrClient();
+        SolrClient solrClient = MCRSolrIndexManager.obtainInstance().requireMainIndex().getClient();
         ModifiableSolrParams p = new ModifiableSolrParams();
         String value = set.getSpec();
         p.set(CommonParams.Q, MCROAIUtils.getDefaultSetQuery(value, getConfigPrefix()));

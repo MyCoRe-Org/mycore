@@ -20,12 +20,16 @@ package org.mycore.solr;
 
 import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 
+import java.io.IOException;
 import java.net.URLDecoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
@@ -36,6 +40,8 @@ import org.mycore.services.http.MCRHttpUtils;
  *
  */
 public class MCRSolrUtils {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static final String USE_HTTP_1_1_PROPERTY = "MCR.Solr.UseHttp_1_1";
 
@@ -132,6 +138,13 @@ public class MCRSolrUtils {
             params.add(decodedKey, decodedValue);
         }
         return params;
+    }
+
+    public static void shutdownSolrClient(SolrClient client) throws IOException {
+        if (client != null) {
+            LOGGER.info("Shutting down solr client: {}", client);
+            client.close();
+        }
     }
 
 }
