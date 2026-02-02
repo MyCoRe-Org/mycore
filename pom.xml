@@ -54,7 +54,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
   <properties>
     <argLine />
     <!-- same as ocfl aws sdk version -->
-    <aws-sdk.version>2.41.14</aws-sdk.version>
+    <aws-sdk.version>2.41.19</aws-sdk.version>
     <changelog.since>2024-12-18</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
     <changes.version>2025.02</changes.version>
@@ -75,7 +75,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <jakarta.mail.version>2.1.5</jakarta.mail.version>
     <java.target.version>21</java.target.version>
     <jaxb.version>4.0.6</jaxb.version>
-    <jersey.version>4.0.1</jersey.version>
+    <jersey.version>4.0.2</jersey.version>
     <!-- jetty 11.x is required for SOLR -->
     <jetty.version>11.0.26</jetty.version>
     <junit.version>6.0.2</junit.version>
@@ -1061,7 +1061,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>com.google.protobuf</groupId>
         <artifactId>protobuf-java</artifactId>
-        <version>4.33.4</version>
+        <version>4.33.5</version>
       </dependency>
       <dependency>
         <groupId>com.google.zxing</groupId>
@@ -1142,7 +1142,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
-        <version>1.20.0</version>
+        <version>1.21.0</version>
       </dependency>
       <dependency>
         <groupId>commons-io</groupId>
