@@ -18,19 +18,15 @@
 
 package org.mycore.mcr.acl.accesskey.restapi.v2;
 
-import static org.mycore.restapi.v2.MCRRestStatusCode.BAD_REQUEST;
-import static org.mycore.restapi.v2.MCRRestStatusCode.CREATED;
-import static org.mycore.restapi.v2.MCRRestStatusCode.NOT_FOUND;
-import static org.mycore.restapi.v2.MCRRestStatusCode.NO_CONTENT;
-import static org.mycore.restapi.v2.MCRRestStatusCode.OK;
-import static org.mycore.restapi.v2.MCRRestStatusCode.UNAUTHORIZED;
-
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyPartialUpdateDto;
 import org.mycore.mcr.acl.accesskey.restapi.v2.access.MCRAccessKeyRestAccessCheckStrategy;
+import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyService;
 import org.mycore.restapi.annotations.MCRApiDraft;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.v2.MCRRestSchemaType;
@@ -47,7 +43,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -66,6 +61,13 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 
+import static org.mycore.restapi.v2.MCRRestStatusCode.BAD_REQUEST;
+import static org.mycore.restapi.v2.MCRRestStatusCode.CREATED;
+import static org.mycore.restapi.v2.MCRRestStatusCode.NOT_FOUND;
+import static org.mycore.restapi.v2.MCRRestStatusCode.NO_CONTENT;
+import static org.mycore.restapi.v2.MCRRestStatusCode.OK;
+import static org.mycore.restapi.v2.MCRRestStatusCode.UNAUTHORIZED;
+
 /**
  * A RESTful API for managing access keys. This API provides methods for creating, retrieving, updating,
  * partially updating, and deleting access keys.
@@ -82,11 +84,29 @@ public class MCRAccessKeyRestResource {
 
     private static final String DESCRIPTION_ACCESS_KEY_ID = "The access key id";
 
+    private final MCRAccessKeyService accessKeyService;
+
     @Context
     private UriInfo uriInfo;
 
     @Context
     private HttpServletResponse response;
+
+    /**
+     * Constructor for {@code MCRAccessKeyRestResource} with default access key service.
+     */
+    public MCRAccessKeyRestResource() {
+        this(MCRAccessKeyService.obtainInstance());
+    }
+
+    /**
+     * Constructor for {@code MCRAccessKeyRestResource} with a specified access key service.
+     *
+     * @param accessKeyService the {@link MCRAccessKeyService} to be used by this resource
+     */
+    public MCRAccessKeyRestResource(MCRAccessKeyService accessKeyService) {
+        this.accessKeyService = accessKeyService;
+    }
 
     /**
      * Retrieves a list of access keys, with optional pagination and filters.
@@ -129,7 +149,22 @@ public class MCRAccessKeyRestResource {
         @Parameter(in = ParameterIn.QUERY, description = "The permissions filter (default is all)", required = false,
             schema = @Schema(defaultValue = ""))
         @DefaultValue("") @QueryParam(MCRAccessKeyRestConstants.QUERY_PARAM_PERMISSIONS) String permissions) {
-        return MCRAccessKeyRestHelper.findAccessKeys(reference, permissions, offset, limit, response);
+        final List<MCRAccessKeyDto> accessKeyDtos = new ArrayList<>();
+        if (!reference.isEmpty() && !permissions.isEmpty()) {
+            Arrays.stream(permissions.split(","))
+                .forEach(
+                    p -> accessKeyDtos.addAll(accessKeyService.findAccessKeysByReferenceAndPermission(reference, p)));
+        } else if (!reference.isEmpty()) {
+            accessKeyDtos.addAll(accessKeyService.findAccessKeysByReference(reference));
+        } else if (!permissions.isEmpty()) {
+            Arrays.stream(permissions.split(","))
+                .forEach(p -> accessKeyDtos.addAll(accessKeyService.findAccessKeysByPermission(p)));
+        } else {
+            accessKeyDtos.addAll(accessKeyService.listAllAccessKeys());
+        }
+        response.setHeader(MCRAccessKeyRestConstants.HEADER_TOTAL_COUNT, Integer.toString(accessKeyDtos.size()));
+        return accessKeyDtos.stream().sorted((a1, a2) -> a1.getCreated().compareTo(a2.getCreated())).skip(offset)
+            .limit(limit).toList();
     }
 
     /**
@@ -159,7 +194,7 @@ public class MCRAccessKeyRestResource {
         @Parameter(in = ParameterIn.PATH, description = DESCRIPTION_ACCESS_KEY_ID, required = true,
             schema = @Schema(type = MCRRestSchemaType.STRING, implementation = UUID.class))
         @PathParam(MCRAccessKeyRestConstants.PATH_PARAM_ACCESS_KEY_ID) UUID id) {
-        return MCRAccessKeyRestHelper.findAccessKey(id);
+        return accessKeyService.findAccessKey(id);
     }
 
     /**
@@ -187,7 +222,9 @@ public class MCRAccessKeyRestResource {
     public Response addAccessKey(
         @RequestBody(content = @Content(mediaType = MediaType.APPLICATION_JSON,
             schema = @Schema(implementation = MCRAccessKeyDto.class))) MCRAccessKeyDto accessKeyDto) {
-        return MCRAccessKeyRestHelper.addAccessKey(accessKeyDto, uriInfo);
+        final MCRAccessKeyDto createdAccessKey = accessKeyService.addAccessKey(accessKeyDto);
+        return Response.created(uriInfo.getAbsolutePathBuilder().path(createdAccessKey.getId().toString()).build())
+            .build();
     }
 
     /**
@@ -219,7 +256,8 @@ public class MCRAccessKeyRestResource {
         @PathParam(MCRAccessKeyRestConstants.PATH_PARAM_ACCESS_KEY_ID) UUID id,
         @RequestBody(content = @Content(mediaType = MediaType.APPLICATION_JSON,
             schema = @Schema(implementation = MCRAccessKeyDto.class))) MCRAccessKeyDto accessKeyDto) {
-        return MCRAccessKeyRestHelper.updateAccessKey(id, accessKeyDto);
+        accessKeyService.updateAccessKey(id, accessKeyDto);
+        return Response.noContent().build();
     }
 
     /**
@@ -252,7 +290,8 @@ public class MCRAccessKeyRestResource {
         @PathParam(MCRAccessKeyRestConstants.PATH_PARAM_ACCESS_KEY_ID) UUID id,
         @RequestBody(content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(
             implementation = MCRAccessKeyPartialUpdateDto.class))) MCRAccessKeyPartialUpdateDto accessKeyDto) {
-        return MCRAccessKeyRestHelper.partialUpdateAccessKey(id, accessKeyDto);
+        accessKeyService.partialUpdateAccessKey(id, accessKeyDto);
+        return Response.noContent().build();
     }
 
     /**
@@ -278,7 +317,8 @@ public class MCRAccessKeyRestResource {
         @Parameter(in = ParameterIn.PATH, description = DESCRIPTION_ACCESS_KEY_ID, required = true,
             schema = @Schema(type = MCRRestSchemaType.STRING, implementation = UUID.class))
         @PathParam(MCRAccessKeyRestConstants.PATH_PARAM_ACCESS_KEY_ID) UUID id) {
-        return MCRAccessKeyRestHelper.removeAccessKey(id);
+        accessKeyService.removeAccessKey(id);
+        return Response.noContent().build();
     }
 
 }

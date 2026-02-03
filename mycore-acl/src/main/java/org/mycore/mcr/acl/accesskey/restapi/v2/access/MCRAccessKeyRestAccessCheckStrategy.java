@@ -32,7 +32,7 @@ import org.mycore.mcr.acl.accesskey.access.MCRAccessKeyPermissionChecker;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyPartialUpdateDto;
 import org.mycore.mcr.acl.accesskey.restapi.v2.MCRAccessKeyRestConstants;
-import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyServiceFactory;
+import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyService;
 import org.mycore.restapi.v2.access.MCRRestAccessCheckStrategy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -54,24 +54,29 @@ import jakarta.ws.rs.core.MultivaluedMap;
  */
 public class MCRAccessKeyRestAccessCheckStrategy implements MCRRestAccessCheckStrategy {
 
+    private final MCRAccessKeyService accessKeyService;
+
     private final MCRAccessKeyPermissionChecker permissionChecker;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * Default constructor that initializes the {@code MCRRestAccessKeyAccessCheckStrategy}
-     * with a default {@link MCRAccessKeyPermissionChecker} instance.
+     * with a default {@link MCRAccessKeyService} and {@link MCRAccessKeyPermissionChecker} instance.
      */
     public MCRAccessKeyRestAccessCheckStrategy() {
-        permissionChecker = new MCRAccessKeyPermissionChecker();
+        this(MCRAccessKeyService.obtainInstance(), new MCRAccessKeyPermissionChecker());
     }
 
     /**
      * Constructor that allows injecting a custom {@code MCRAccessKeyPermissionChecker}.
      *
+     * @param accessKeyService the {@link MCRAccessKeyService} to be used for handling access keys
      * @param permissionChecker the {@link MCRAccessKeyPermissionChecker} to be used for checking access permissions
      */
-    public MCRAccessKeyRestAccessCheckStrategy(MCRAccessKeyPermissionChecker permissionChecker) {
+    public MCRAccessKeyRestAccessCheckStrategy(MCRAccessKeyService accessKeyService,
+        MCRAccessKeyPermissionChecker permissionChecker) {
+        this.accessKeyService = accessKeyService;
         this.permissionChecker = permissionChecker;
     }
 
@@ -108,8 +113,8 @@ public class MCRAccessKeyRestAccessCheckStrategy implements MCRRestAccessCheckSt
             if (permissions.isEmpty()) {
                 throw new ForbiddenException();
             }
-            final String reference
-                = Optional.ofNullable(queryParameters.getFirst(MCRAccessKeyRestConstants.QUERY_PARAM_REFERENCE))
+            final String reference =
+                Optional.ofNullable(queryParameters.getFirst(MCRAccessKeyRestConstants.QUERY_PARAM_REFERENCE))
                     .orElseThrow(() -> new ForbiddenException());
             for (String permission : permissions) {
                 ensureHasManagePermission(reference, permission);
@@ -197,7 +202,7 @@ public class MCRAccessKeyRestAccessCheckStrategy implements MCRRestAccessCheckSt
     private MCRAccessKeyDto getAccessKeyDtoByPath(ContainerRequestContext requestContext) {
         final MultivaluedMap<String, String> pathParameters = requestContext.getUriInfo().getPathParameters();
         return Optional.ofNullable(pathParameters.getFirst(MCRAccessKeyRestConstants.PATH_PARAM_ACCESS_KEY_ID))
-            .map(UUID::fromString).map(MCRAccessKeyServiceFactory.getAccessKeyService()::findAccessKey).get();
+            .map(UUID::fromString).map(accessKeyService::findAccessKey).get();
     }
 
     private byte[] readRequestBody(ContainerRequestContext requestContext) throws IOException {
