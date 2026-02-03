@@ -23,6 +23,7 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -182,7 +183,7 @@ public class MCRDerivateServlet extends MCRServlet {
         updateMainFile = isMainFileUpdateRequired(pathFrom, derivateId);
 
         // this should always be a MCRPath, if not then ClassCastException is okay
-        MCRPath resultingFile = (MCRPath) Files.move(pathFrom, pathTo);
+        MCRPath resultingFile = (MCRPath) Files.move(pathFrom, pathTo, StandardCopyOption.COPY_ATTRIBUTES);
 
         if (updateMainFile) {
             setMainFile(derivateId, resultingFile);
