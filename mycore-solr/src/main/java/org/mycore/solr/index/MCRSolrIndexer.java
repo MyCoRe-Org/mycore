@@ -21,6 +21,7 @@ package org.mycore.solr.index;
 import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,6 +43,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.XMLRequestWriter;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.mycore.common.MCRException;
@@ -256,7 +258,11 @@ public class MCRSolrIndexer {
             //for document without nested
             req.deleteById(Arrays.asList(solrIDs));
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Delete request: {}", req.getXML());
+                StringWriter writer = new StringWriter();
+                XMLRequestWriter requestWriter = new XMLRequestWriter();
+                requestWriter.writeXML(req, writer);
+                writer.flush();
+                LOGGER.debug("Delete request: {}", writer);
             }
             updateResponse = req.process(client);
 

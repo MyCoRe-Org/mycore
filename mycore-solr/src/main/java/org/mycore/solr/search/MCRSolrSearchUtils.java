@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -171,7 +172,25 @@ public final class MCRSolrSearchUtils {
      */
     public static InputStream streamRawXML(SolrClient client, SolrParams params)
         throws SolrServerException, IOException {
+        return streamRawXML(client, "/select", params);
+    }
+
+    /**
+     * Streams raw xml solr response.
+     * <p>
+     * While <code>qt</code> parameter is deprecated, it still overwrites <code>path</code> if it's defined.
+     *
+     * @param client the client to query
+     * @param path the request handler path, e.g. "/select"
+     * @param params solr parameter
+     * @return stream of the raw xml
+     * @throws SolrServerException Communication with the solr server failed in any way.
+     * @throws IOException If there is a low-level I/O error.
+     */
+    public static InputStream streamRawXML(SolrClient client, String path, SolrParams params)
+        throws SolrServerException, IOException {
         QueryRequest request = new QueryRequest(params);
+        request.setPath(Objects.requireNonNull(path));
         MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(request, SEARCH);
         InputStreamResponseParser responseParser = new InputStreamResponseParser("xml");
         request.setResponseParser(responseParser);

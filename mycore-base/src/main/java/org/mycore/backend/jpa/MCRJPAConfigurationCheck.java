@@ -20,19 +20,24 @@ package org.mycore.backend.jpa;
 
 import static org.mycore.backend.jpa.MCRPersistenceProvider.JPA_PERSISTENCE_UNIT_PROPERTY_NAME;
 
+import java.net.URL;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.jpa.boot.internal.ParsedPersistenceXmlDescriptor;
-import org.hibernate.jpa.boot.internal.PersistenceXmlParser;
+import org.hibernate.jpa.boot.spi.PersistenceUnitDescriptor;
+import org.hibernate.jpa.boot.spi.PersistenceXmlParser;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRInstanceName;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
+import org.mycore.resource.MCRResourceResolver;
+import org.mycore.resource.provider.MCRResourceProvider;
 
 import jakarta.servlet.ServletContext;
 
@@ -82,10 +87,7 @@ public class MCRJPAConfigurationCheck implements AutoExecutable {
         LOGGER.trace(() -> "*** Persistence units configured in MyCoRe properties: "
             + String.join(", ", unitsFromMycoreProperties) + " ***");
 
-        Set<String> unitsFromPersistenceXml = PersistenceXmlParser.locatePersistenceUnits(Collections.emptyMap())
-            .stream()
-            .map(ParsedPersistenceXmlDescriptor::getName)
-            .collect(Collectors.toSet());
+        Set<String> unitsFromPersistenceXml = locatePersistenceUnitNamesFromPersistenceXml();
 
         LOGGER.trace(() -> "*** Persistence units configured in persistence.xml: "
             + String.join(", ", unitsFromPersistenceXml) + " ***");
@@ -115,6 +117,29 @@ public class MCRJPAConfigurationCheck implements AutoExecutable {
             }
         });
 
+    }
+
+    private Set<String> locatePersistenceUnitNamesFromPersistenceXml() {
+        List<URL> persistenceXmlUrls = MCRResourceResolver.obtainInstance()
+            .resolveAllResource("META-INF/persistence.xml")
+            .stream()
+            .map(MCRResourceProvider.ProvidedUrl::url)
+            .toList();
+        if (persistenceXmlUrls.isEmpty()) {
+            return Collections.emptySet();
+        }
+
+        try {
+            Map<String, PersistenceUnitDescriptor> descriptors =
+                PersistenceXmlParser.create(Collections.emptyMap()).parse(persistenceXmlUrls);
+
+            return descriptors.values().stream()
+                .map(PersistenceUnitDescriptor::getName)
+                .collect(Collectors.toSet());
+        } catch (RuntimeException e) {
+            LOGGER.warn("Could not parse persistence.xml files for configuration check.", e);
+            return Collections.emptySet();
+        }
     }
 
     private static Set<String> intersect(Set<String> set1, Set<String> set2) {

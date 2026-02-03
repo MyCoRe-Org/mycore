@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -541,19 +542,19 @@ public class MCRCalendar {
         // before parsing we have to remove this
         final String eraToken;
         final int era;
-        if (StringUtils.contains(cleanDate, "M")) {
+        if (Strings.CS.contains(cleanDate, "M")) {
             eraToken = "M";
             era = JapaneseCalendar.MEIJI;
-        } else if (StringUtils.contains(cleanDate, "T")) {
+        } else if (Strings.CS.contains(cleanDate, "T")) {
             eraToken = "T";
             era = JapaneseCalendar.TAISHO;
-        } else if (StringUtils.contains(cleanDate, "S")) {
+        } else if (Strings.CS.contains(cleanDate, "S")) {
             eraToken = "S";
             era = JapaneseCalendar.SHOWA;
-        } else if (StringUtils.contains(cleanDate, "H")) {
+        } else if (Strings.CS.contains(cleanDate, "H")) {
             eraToken = "H";
             era = JapaneseCalendar.HEISEI;
-        } else if (StringUtils.contains(cleanDate, "R")) {
+        } else if (Strings.CS.contains(cleanDate, "R")) {
             eraToken = "R";
             era = JapaneseCalendar.REIWA;
         } else {
@@ -938,8 +939,8 @@ public class MCRCalendar {
         final String delimiter = delimiter(dateString);
 
         // check for positions of year and month delimiters
-        final int firstdot = StringUtils.indexOf(dateString, delimiter, 1);
-        final int secdot = StringUtils.indexOf(dateString, delimiter, firstdot + 1);
+        final int firstdot = Strings.CS.indexOf(dateString, delimiter, 1);
+        final int secdot = Strings.CS.indexOf(dateString, delimiter, firstdot + 1);
 
         final int day;
         final int mon;
@@ -999,7 +1000,7 @@ public class MCRCalendar {
      * @return true if the given input date is in ISO format (xx-xx-xx), otherwise false
      */
     public static boolean isoFormat(String input) {
-        return -1 != StringUtils.indexOf(input, "-", 1);
+        return -1 != Strings.CS.indexOf(input, "-", 1);
     }
 
     /**
@@ -1015,7 +1016,7 @@ public class MCRCalendar {
         final int end;
         final int length = StringUtils.length(date);
 
-        if (StringUtils.startsWith(date, "-")) {
+        if (Strings.CS.startsWith(date, "-")) {
             start = 1;
             end = length;
         } else {
@@ -1050,14 +1051,14 @@ public class MCRCalendar {
         final int ende;
         final int length = StringUtils.length(datestr);
 
-        if (StringUtils.startsWith(datestr, "-")) {
+        if (Strings.CS.startsWith(datestr, "-")) {
             start = 1;
         } else {
             start = 0;
         }
 
-        if (StringUtils.contains(datestr, "A.N.")) {
-            ende = StringUtils.indexOf(datestr, "A.N.");
+        if (Strings.CS.contains(datestr, "A.N.")) {
+            ende = Strings.CS.indexOf(datestr, "A.N.");
         } else {
             ende = length;
         }
@@ -1093,7 +1094,7 @@ public class MCRCalendar {
      */
     public static int[] calculatePersianDateBorders(String dateStr) {
         final int start;
-        if (StringUtils.startsWith(dateStr, "-")) {
+        if (Strings.CS.startsWith(dateStr, "-")) {
             start = 1;
         } else {
             start = 0;
@@ -1113,16 +1114,16 @@ public class MCRCalendar {
         final int end;
         final int length = StringUtils.length(input);
 
-        if (StringUtils.startsWith(input, "-")) {
+        if (Strings.CS.startsWith(input, "-")) {
             start = 1;
             end = length;
         } else {
             start = 0;
 
-            if (StringUtils.contains(input, "A.M")) {
-                end = StringUtils.indexOf(input, "A.M.");
-            } else if (StringUtils.contains(input, "E.E.")) {
-                end = StringUtils.indexOf(input, "E.E.");
+            if (Strings.CS.contains(input, "A.M")) {
+                end = Strings.CS.indexOf(input, "A.M.");
+            } else if (Strings.CS.contains(input, "E.E.")) {
+                end = Strings.CS.indexOf(input, "E.E.");
             } else {
                 end = length;
             }
@@ -1170,68 +1171,37 @@ public class MCRCalendar {
     }
 
     /**
-     * Calculates the date borders for a Gregorian date in the form d.m.y [N. CHR|V.CHR|AD|BC]
+     * Calculates the date borders for a Gregorian date in the form d.m.y [N. CHR|V. CHR|AD|BC]
      *
      * @param dateString the date string to parse
      * @return a field containing the start position of the date string in index 0 and the end position in index 1
      */
     public static int[] calculateGregorianDateBorders(String dateString) {
-        final int start;
-        final int end;
         final int length = StringUtils.length(dateString);
 
-        if (StringUtils.contains(dateString, "N. CHR") || StringUtils.contains(dateString, "V. CHR")) {
-            final int positionNChr = StringUtils.indexOf(dateString, "N. CHR");
-            final int positionVChr = StringUtils.indexOf(dateString, "V. CHR");
-            if (positionNChr != -1) {
-                if (positionNChr == 0) {
-                    start = 7;
-                    end = length;
-                } else {
-                    start = 0;
-                    end = positionNChr - 1;
-                }
-            } else if (positionVChr != -1) {
-                if (positionVChr == 0) {
-                    start = 7;
-                    end = length;
-                } else {
-                    start = 0;
-                    end = positionVChr - 1;
-                }
-            } else {
-                start = 0;
-                end = length;
-            }
-        } else if (StringUtils.contains(dateString, "AD") || StringUtils.contains(dateString, "BC")) {
-            final int positionAD = StringUtils.indexOf(dateString, "AD");
-            final int positionBC = StringUtils.indexOf(dateString, "BC");
-            if (positionAD != -1) {
-                if (positionAD == 0) {
-                    start = 2;
-                    end = length;
-                } else {
-                    start = 0;
-                    end = positionAD - 1;
-                }
-            } else if (positionBC != -1) {
-                if (positionBC == 0) {
-                    start = 2;
-                    end = length;
-                } else {
-                    start = 0;
-                    end = positionBC - 1;
-                }
-            } else {
-                start = 0;
-                end = length;
-            }
-        } else {
-            start = 0;
-            end = length;
+        int[] borders = resolveEraBorders(dateString, length, EraSpec.N_CHR, EraSpec.V_CHR);
+
+        if (borders == null) {
+            borders = resolveEraBorders(dateString, length, EraSpec.AD, EraSpec.BC);
         }
 
-        return new int[] { start, end };
+        if (borders == null) {
+            borders = new int[] { 0, length };
+        }
+
+        return borders;
+    }
+
+    private static int[] resolveEraBorders(String dateString, int length, EraSpec... eras) {
+        for (EraSpec era : eras) {
+            final int position = Strings.CS.indexOf(dateString, era.token());
+            if (position != -1) {
+                final int start = position == 0 ? era.leadingOffset() : 0;
+                final int end = position == 0 ? length : position - 1;
+                return new int[] { start, end };
+            }
+        }
+        return null;
     }
 
     /**
@@ -1245,14 +1215,14 @@ public class MCRCalendar {
         final int end;
         final int length = StringUtils.length(datestr);
 
-        if (StringUtils.startsWith(datestr, "-")) {
+        if (Strings.CS.startsWith(datestr, "-")) {
             start = 1;
             end = length;
         } else {
             start = 0;
 
-            if (StringUtils.contains(datestr, "B.E.")) {
-                end = StringUtils.indexOf(datestr, "B.E.");
+            if (Strings.CS.contains(datestr, "B.E.")) {
+                end = Strings.CS.indexOf(datestr, "B.E.");
             } else {
                 end = length;
             }
@@ -1268,9 +1238,9 @@ public class MCRCalendar {
      * @return the delimiter for the given date input
      */
     public static String delimiter(String input) {
-        if (-1 != StringUtils.indexOf(input, "-", 1)) {
+        if (-1 != Strings.CS.indexOf(input, "-", 1)) {
             return "-";
-        } else if (-1 != StringUtils.indexOf(input, "/", 1)) {
+        } else if (-1 != Strings.CS.indexOf(input, "/", 1)) {
             return "/";
         } else {
             return ".";
@@ -1293,13 +1263,13 @@ public class MCRCalendar {
      * @return true if the given input date is for the calendars zero date
      */
     public static boolean beforeZero(String input, CalendarType calendarType) {
-        if (StringUtils.startsWith(input, "-")) {
+        if (Strings.CS.startsWith(input, "-")) {
             return true;
         }
 
         return switch (calendarType) {
-            case BUDDHIST -> StringUtils.contains(input, "B.E.");
-            case GREGORIAN, JULIAN -> StringUtils.contains(input, "BC") || StringUtils.contains(input, "V. CHR");
+            case BUDDHIST -> Strings.CS.contains(input, "B.E.");
+            case GREGORIAN, JULIAN -> Strings.CS.contains(input, "BC") || Strings.CS.contains(input, "V. CHR");
             // these calendars do not allow for an era statement other than -
             case COPTIC, HEBREW, ETHIOPIC, PERSIC, CHINESE, ISLAMIC, ARMENIAN, EGYPTIAN, JAPANESE -> false;
             default -> throw new MCRException(String.format(Locale.ROOT, MSG_CALENDAR_UNSUPPORTED, calendarType));
@@ -1410,8 +1380,19 @@ public class MCRCalendar {
 
         public static CalendarType of(String type) {
             return Arrays.stream(values())
-                .filter(current -> StringUtils.equals(current.getType(), type))
+                .filter(current -> Strings.CS.equals(current.getType(), type))
                 .findFirst().orElseThrow();
+        }
+    }
+
+    private record EraSpec(String token, int leadingOffset) {
+        final static EraSpec AD = new EraSpec("AD");
+        final static EraSpec BC = new EraSpec("BC");
+        final static EraSpec V_CHR = new EraSpec("V. CHR");
+        final static EraSpec N_CHR = new EraSpec("N. CHR");
+
+        EraSpec(String token) {
+            this(token, token.length());
         }
     }
 }
