@@ -80,10 +80,9 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <log4j.version>2.24.1</log4j.version>
     <!-- lowest is 99, highest is 0 -->
     <manifest.priority>99</manifest.priority>
+    <maven-pmd-plugin.version>3.27.0</maven-pmd-plugin.version>
     <maven.compiler.arg>-Werror</maven.compiler.arg>
     <maven.compiler.target>${java.target.version}</maven.compiler.target>
-    <!-- defined in parent POM: -->
-    <!-- <log4j.version>2.19.0</log4j.version> -->
     <neo4j.version>5.26.0</neo4j.version>
     <oaipmh.version>3.0</oaipmh.version>
     <ocfl-java.version>2.2.1</ocfl-java.version>
@@ -349,7 +348,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
                   <link>http://www.jdom.org/docs/apidocs/</link>
                   -->
                   <link>https://logging.apache.org/log4j/2.x/javadoc/log4j-api/</link>
-                  <link>https://docs.jboss.org/hibernate/orm/${hibernate.base.version}/javadocs/</link>
+                  <link>https://docs.hibernate.org/orm/${hibernate.base.version}/javadocs/</link>
                   <link>https://jakarta.ee/specifications/persistence/3.1/apidocs/</link>
                   <!--
                   <link>https://solr.apache.org/docs/8_11_2/solr-solrj/</link>
@@ -811,7 +810,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
                 <link>https://jakarta.ee/specifications/platform/10/apidocs/</link>
                 <!-- <link>http://www.jdom.org/docs/apidocs/</link> -->
                 <link>https://logging.apache.org/log4j/2.x/javadoc/log4j-api/</link>
-                <link>https://docs.jboss.org/hibernate/orm/${hibernate.base.version}/javadocs/</link>
+                <link>https://docs.hibernate.org/orm/${hibernate.base.version}/javadocs/</link>
                 <link>https://jakarta.ee/specifications/persistence/3.1/apidocs/</link>
                 <!--
                 <link>https://solr.apache.org/docs/8_11_2/solr-solrj/</link>
