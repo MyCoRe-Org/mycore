@@ -7,6 +7,7 @@
 
     <xsl:param name="CurrentLang"/>
     <xsl:param name="WebApplicationBaseURL"/>
+    <xsl:param name="MCR.ORCID2.BaseURL"/>
 
     <xsl:template match="/">
         <html lang="{$CurrentLang}">
@@ -47,7 +48,7 @@
         </ul>
         <p>
             <span><xsl:value-of select="concat(document('i18n:component.orcid2.oauth.message.revoke.pt1'), ' ')"/></span>
-            <a href="https://sandbox.orcid.org/trusted-parties" target="_blank">
+            <a href="{$MCR.ORCID2.BaseURL}/trusted-parties" target="_blank">
                 <xsl:value-of select="document('i18n:component.orcid2.oauth.message.profile')"/>
                 <img src="{$WebApplicationBaseURL}modules/orcid2/images/orcid_icon.svg" style="height:.8em;vertical-align:baseline" alt="ORCID logo"/>
             </a>
