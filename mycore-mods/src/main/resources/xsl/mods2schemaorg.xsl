@@ -362,9 +362,10 @@
       <xsl:value-of select="concat($titleInfo/mods:nonSort, ' ')" />
     </xsl:if>
     <xsl:value-of select="$titleInfo/mods:title" />
-    <xsl:if test="$titleInfo/mods:subTitle">
-      <xsl:value-of select="concat(' : ', $titleInfo/mods:subTitle)" />
-    </xsl:if>
+    <xsl:for-each select="$titleInfo/mods:subTitle">
+      <xsl:text> : </xsl:text>
+      <xsl:value-of select="." />
+    </xsl:for-each>
   </xsl:template>
 
   <!-- creates a person json object without a key -->
