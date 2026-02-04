@@ -107,7 +107,7 @@ public class MCRMigrationCommandsTest {
 
         MCRMigrationCommands.migrateNormalizedObject(testID1.toString());
 
-        Document migratedObject1 = MCRXMLMetadataManager.getInstance().retrieveXML(testID1);
+        Document migratedObject1 = MCRXMLMetadataManager.obtainInstance().retrieveXML(testID1);
         checkChildrenOrder(migratedObject1, testID5, testID2, testID4);
         verifyNoChildrenElementLeft(migratedObject1);
         checkNoGeneratedClassifications(migratedObject1);
@@ -118,14 +118,14 @@ public class MCRMigrationCommandsTest {
             .getChild(MCRObjectStructure.ELEMENT_DERIVATE_OBJECTS), "The derobjects should be removed");
 
         MCRMigrationCommands.migrateNormalizedObject(testID2.toString());
-        Document migratedObject2 = MCRXMLMetadataManager.getInstance().retrieveXML(testID2);
+        Document migratedObject2 = MCRXMLMetadataManager.obtainInstance().retrieveXML(testID2);
         checkChildrenOrder(migratedObject2, testID7, testID3, testID6);
         verifyNoChildrenElementLeft(migratedObject2);
         checkNoGeneratedClassifications(migratedObject2);
         checkRelatedItemIsEmpty(migratedObject2);
 
         MCRMigrationCommands.migrateNormalizedObject(testID7.toString());
-        Document migratedObject7 = MCRXMLMetadataManager.getInstance().retrieveXML(testID7);
+        Document migratedObject7 = MCRXMLMetadataManager.obtainInstance().retrieveXML(testID7);
 
         checkNoGeneratedClassifications(migratedObject7);
         checkRelatedItemIsEmpty(migratedObject7);
@@ -148,7 +148,7 @@ public class MCRMigrationCommandsTest {
             Document build = builder.build(resourceAsStream);
             String id = build.getRootElement().getAttributeValue("ID");
             objectID = MCRObjectID.getInstance(id);
-            MCRXMLMetadataManager.getInstance().create(objectID, build, new Date());
+            MCRXMLMetadataManager.obtainInstance().create(objectID, build, new Date());
         }
         return objectID;
     }

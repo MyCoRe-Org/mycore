@@ -513,7 +513,7 @@ public final class MCRURIResolver implements URIResolver {
 
             MCRObjectID mcrid = MCRObjectID.getInstance(id);
             try {
-                MCRXMLMetadataManager xmlmm = MCRXMLMetadataManager.getInstance();
+                MCRXMLMetadataManager xmlmm = MCRXMLMetadataManager.obtainInstance();
 
                 MCRContent content;
                 if (params.containsKey("r")) {
@@ -795,7 +795,7 @@ public final class MCRURIResolver implements URIResolver {
         }
 
         private static long getSystemLastModified() {
-            long xmlLastModified = MCRXMLMetadataManager.getInstance().getLastModified();
+            long xmlLastModified = MCRXMLMetadataManager.obtainInstance().getLastModified();
             long classLastModified = dao.getLastModified();
             return Math.max(xmlLastModified, classLastModified);
         }
@@ -1509,7 +1509,7 @@ public final class MCRURIResolver implements URIResolver {
             String id = href.substring(href.indexOf(':') + 1);
             LOGGER.debug("Reading version info of MCRObject with ID {}", id);
             MCRObjectID mcrId = MCRObjectID.getInstance(id);
-            MCRXMLMetadataManager metadataManager = MCRXMLMetadataManager.getInstance();
+            MCRXMLMetadataManager metadataManager = MCRXMLMetadataManager.obtainInstance();
             try {
                 List<? extends MCRAbstractMetadataVersion<?>> versions = metadataManager.listRevisions(mcrId);
                 if (versions != null && !versions.isEmpty()) {
@@ -1564,7 +1564,7 @@ public final class MCRURIResolver implements URIResolver {
             MCRObjectID mcrId = MCRObjectID.getInstance(parts[parts.length - 1]);
             LOGGER.info("Resolving deleted object {}", mcrId);
             try {
-                MCRContent lastPresentVersion = MCRXMLMetadataManager.getInstance().retrieveContent(mcrId);
+                MCRContent lastPresentVersion = MCRXMLMetadataManager.obtainInstance().retrieveContent(mcrId);
                 if (lastPresentVersion == null) {
                     LOGGER.warn("Could not resolve deleted object {}", mcrId);
                     return new JDOMSource(MCRObjectFactory.getSampleObject(mcrId));

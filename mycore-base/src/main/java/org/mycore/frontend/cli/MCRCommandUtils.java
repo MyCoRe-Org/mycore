@@ -70,7 +70,7 @@ public class MCRCommandUtils {
         if (type == null || type.isEmpty()) {
             throw new MCRUsageException("Type required to enumerate IDs!");
         }
-        List<String> idList = MCRXMLMetadataManager.getInstance().listIDsOfType(type);
+        List<String> idList = MCRXMLMetadataManager.obtainInstance().listIDsOfType(type);
         if (idList.isEmpty()) {
             LOGGER.warn("No IDs found for type {}.", type);
         }
@@ -114,7 +114,7 @@ public class MCRCommandUtils {
         if (MCRObjectID.getIDParts(base).length != 2) {
             throw new MCRUsageException("Base ID ({project}_{type}) required to enumerate IDs!");
         }
-        List<String> idList = MCRXMLMetadataManager.getInstance().listIDsForBase(base);
+        List<String> idList = MCRXMLMetadataManager.obtainInstance().listIDsForBase(base);
         if (idList.isEmpty()) {
             LOGGER.warn("No IDs found for base {}.", base);
         }
@@ -233,7 +233,7 @@ public class MCRCommandUtils {
             .compile(xPath, Filters.fpassthrough(), null, MCRConstants.getStandardNamespaces());
 
         return MCRXMLMetadataManager
-            .getInstance()
+            .obtainInstance()
             .listIDs()
             .stream()
             .filter(filter)
