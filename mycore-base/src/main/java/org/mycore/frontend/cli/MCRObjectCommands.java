@@ -110,6 +110,7 @@ import jakarta.persistence.TypedQuery;
  * @author Robert Stephan
  */
 @MCRCommandGroup(name = "Object Commands")
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class MCRObjectCommands extends MCRAbstractCommands {
 
     private static final String EXPORT_OBJECT_TO_DIRECTORY_WITH_STYLESHEET_COMMAND =
@@ -144,7 +145,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     @MCRCommand(
         syntax = "select objects with xpath {0}",
-        help = "Selects MCRObjects with XPath {0}, if that XPath evaluates to a non-empty result list" +
+        help = "Selects MCRObjects with XPath {0}," +
+            " if that XPath evaluates to a non-empty result list" +
             " (this command may take a while, use with care in case of a large number of objects)",
         order = 10)
     public static void selectWithXpath(String xPath) {
@@ -153,12 +155,37 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(
+        syntax = "filter object selection with xpath {0}",
+        help = "Filters the selection as MCRObjects with XPath {0}," +
+            " if that XPath evaluates to a non-empty result list" +
+            " (this command may take a while, use with care in case of a large number of objects)",
+        order = 11)
+    public static void filterObjectSelectionWithXpath(String xPath) {
+        MCRBasicCommands.setSelectedValues(MCRCommandUtils.filterWithXpath(
+            MCRBasicCommands.getSelectedValues(),
+            xPath, OBJECT_ID_PREDICATE, MCRMetadataManager::retrieveMCRObject));
+    }
+
+    @MCRCommand(
         syntax = "select expanded objects with xpath {0}",
-        help = "Selects expanded MCRObjects with XPath {0}, if that XPath evaluates to a non-empty result list" +
+        help = "Selects expanded MCRObjects with XPath {0}," +
+            " if that XPath evaluates to a non-empty result list" +
             " (this command may take a while, use with care in case of a large number of objects)",
         order = 10)
     public static void selectExpandedObjectsWithXpath(String xPath) {
         MCRBasicCommands.setSelectedValues(MCRCommandUtils.selectWithXpath(
+            xPath, OBJECT_ID_PREDICATE, MCRMetadataManager::retrieveMCRExpandedObject));
+    }
+
+    @MCRCommand(
+        syntax = "filter expanded object selection with xpath {0}",
+        help = "Filters the selection as expanded MCRObjects with XPath {0}," +
+            " if that XPath evaluates to a non-empty result list"
+            + " (this command may take a while, use with care in case of a large number of objects)",
+        order = 10)
+    public static void filterExpandedObjectSelectionWithXpath(String xPath) {
+        MCRBasicCommands.setSelectedValues(MCRCommandUtils.filterWithXpath(
+            MCRBasicCommands.getSelectedValues(),
             xPath, OBJECT_ID_PREDICATE, MCRMetadataManager::retrieveMCRExpandedObject));
     }
 
