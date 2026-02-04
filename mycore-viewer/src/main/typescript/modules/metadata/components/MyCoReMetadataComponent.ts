@@ -88,8 +88,8 @@ export class MyCoReMetadataComponent extends ViewerComponent {
     /*
     if the container is scrolled we want to restore the scroll position before this._container was inserted
     */
-    const parent = this._container.parentElement;
-    if (parent.scrollTop > 0) {
+    const parent = this._container?.parentElement;
+    if (parent?.scrollTop > 0) {
       const containerHeightDiff = getElementHeight(this._container);
       parent.scrollTop += containerHeightDiff;
     }
