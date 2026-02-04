@@ -223,18 +223,30 @@ public class MCRCommandUtils {
      * <p>
      * This method iterates over all available objects IDs, filters them using a given filter and
      * maps them to a MCRBase-object using the given mapper. For each such object, the corresponding XML
-     * representation is created and the given XPath applied. If the Xpath evaluates to a non-empty result,
+     * representation is created and the given XPath applied. If the XPath evaluates to a non-empty result,
      * the corresponding object ID is selected and included in the result list.
      */
     public static List<String> selectWithXpath(String xPath, Predicate<String> filter,
+        Function<MCRObjectID, MCRBase> mapper) {
+        List<String> objectIds = MCRXMLMetadataManager.getInstance().listIDs();
+        return filterWithXpath(objectIds, xPath, filter, mapper);
+    }
+
+    /**
+     * Select MCRObjectIDs by applying a XPath to the corresponding MCRBase-objects XML representation.
+     * <p>
+     * This method iterates over all given objects IDs, filters them using a given filter and
+     * maps them to a MCRBase-object using the given mapper. For each such object, the corresponding XML
+     * representation is created and the given XPath applied. If the XPath evaluates to a non-empty result,
+     * the corresponding object ID is selected and included in the result list.
+     */
+    public static List<String> filterWithXpath(List<String> objectIds, String xPath, Predicate<String> filter,
         Function<MCRObjectID, MCRBase> mapper) {
 
         XPathExpression<Object> xPathExpression = XPathFactory.instance()
             .compile(xPath, Filters.fpassthrough(), null, MCRConstants.getStandardNamespaces());
 
-        return MCRXMLMetadataManager
-            .getInstance()
-            .listIDs()
+        return objectIds
             .stream()
             .filter(filter)
             .map(MCRObjectID::getInstance)
