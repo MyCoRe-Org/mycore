@@ -133,7 +133,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
         if (getRegistrationPredicate().test(obj)) {
             this.addJob(PiJobAction.REGISTER,
                 createJobContextParams(PiJobAction.REGISTER, obj, identifier, additional));
-            return new MCRPIServiceDates(new Date(), null);
+            return new MCRPIServiceDates(null, new Date());
         }
         return new MCRPIServiceDates(null, null);
     }
