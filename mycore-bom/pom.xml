@@ -47,7 +47,7 @@
     <ocfl-java.version>2.0.0</ocfl-java.version>
     <rdf4j.version>4.3.6</rdf4j.version>
     <selenium.version>3.141.59</selenium.version>
-    <verapdf.version>1.24.2</verapdf.version>
+    <verapdf.version>1.28.2</verapdf.version>
     <vis-network.version>9.1.2</vis-network.version>
     <xalan.version>2.7.3</xalan.version>
     <xsonify.version>1.1.1</xsonify.version>
