@@ -22,6 +22,7 @@ import de.undercouch.citeproc.csl.internal.SBibliography;
 import de.undercouch.citeproc.csl.internal.format.HtmlFormat;
 import de.undercouch.citeproc.output.Bibliography;
 import de.undercouch.citeproc.output.SecondFieldAlign;
+import org.apache.commons.text.StringEscapeUtils;
 
 /**
  * Class to enable XML output in the {@link de.undercouch.citeproc.CSL} processor.
@@ -38,12 +39,7 @@ public class MCRCSLXMLOutputFormat extends HtmlFormat {
 
     @Override
     protected String escape(String str) {
-        return str
-            .replaceAll("&", "&amp;")
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;")
-            .replaceAll("\"", "&quot;")
-            .replaceAll("'", "&apos;");
+        return StringEscapeUtils.escapeXml10(str);
     }
 
     @Override
