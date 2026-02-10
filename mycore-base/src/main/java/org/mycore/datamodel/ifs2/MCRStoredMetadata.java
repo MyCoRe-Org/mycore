@@ -21,7 +21,6 @@ package org.mycore.datamodel.ifs2;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.FileTime;
 import java.util.Date;
 
@@ -104,7 +103,7 @@ public class MCRStoredMetadata {
         if (store.shouldForceXML()) {
             xml = xml.ensureXML();
         }
-        xml.sendTo(path, StandardCopyOption.REPLACE_EXISTING);
+        xml.sendSafeTo(path);
     }
 
     /**
