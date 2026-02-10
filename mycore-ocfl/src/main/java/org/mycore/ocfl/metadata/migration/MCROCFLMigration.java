@@ -36,13 +36,13 @@ import org.mycore.datamodel.common.MCRObjectIDGenerator;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.ocfl.metadata.MCROCFLXMLMetadataManagerAdapter;
+import org.mycore.ocfl.metadata.MCROCFLXMLMetadataManager;
 
 public class MCROCFLMigration {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final MCROCFLXMLMetadataManagerAdapter target;
+    private final MCROCFLXMLMetadataManager target;
 
     private final List<String> invalidState;
 
@@ -59,11 +59,11 @@ public class MCROCFLMigration {
     }
 
     public MCROCFLMigration(String newRepoKey, List<MCROCFLRevisionPruner> pruners) {
-        this(newRepoKey, pruners, new MCROCFLXMLMetadataManagerAdapter());
+        this(newRepoKey, pruners, new MCROCFLXMLMetadataManager());
     }
 
     public MCROCFLMigration(String newRepoKey, List<MCROCFLRevisionPruner> pruners,
-        MCROCFLXMLMetadataManagerAdapter target) {
+        MCROCFLXMLMetadataManager target) {
         this.target = target;
 
         if (newRepoKey != null) {
@@ -169,7 +169,7 @@ public class MCROCFLMigration {
             }
         }
 
-        MCRXMLMetadataManager instance = MCRXMLMetadataManager.getInstance();
+        MCRXMLMetadataManager instance = MCRXMLMetadataManager.obtainInstance();
 
         // does it even exist?
         if (instance.exists(objectID)) {
@@ -230,7 +230,7 @@ public class MCROCFLMigration {
 
     private List<? extends MCRAbstractMetadataVersion<?>> readRevisions(MCRObjectID objectID) {
         List<? extends MCRAbstractMetadataVersion<?>> revisions = null;
-        MCRXMLMetadataManager instance = MCRXMLMetadataManager.getInstance();
+        MCRXMLMetadataManager instance = MCRXMLMetadataManager.obtainInstance();
 
         try {
             revisions = instance.listRevisions(objectID);

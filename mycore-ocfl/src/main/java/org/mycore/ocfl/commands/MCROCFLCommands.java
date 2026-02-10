@@ -72,7 +72,7 @@ import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.ocfl.classification.MCROCFLClassificationTransaction;
 import org.mycore.ocfl.classification.MCROCFLXMLClassificationManager;
-import org.mycore.ocfl.metadata.MCROCFLXMLMetadataManagerAdapter;
+import org.mycore.ocfl.metadata.MCROCFLXMLMetadataManager;
 import org.mycore.ocfl.metadata.migration.MCROCFLMigration;
 import org.mycore.ocfl.metadata.migration.MCROCFLRevisionPruner;
 import org.mycore.ocfl.niofs.MCROCFLFileSystemProvider;
@@ -133,8 +133,8 @@ public class MCROCFLCommands {
 
         MCROCFLMigration migration;
         if (metadataManagerConfigKey != null && !metadataManagerConfigKey.isEmpty()) {
-            MCROCFLXMLMetadataManagerAdapter metadataManager =
-                MCRConfiguration2.getInstanceOf(MCROCFLXMLMetadataManagerAdapter.class, metadataManagerConfigKey)
+            MCROCFLXMLMetadataManager metadataManager =
+                MCRConfiguration2.getInstanceOf(MCROCFLXMLMetadataManager.class, metadataManagerConfigKey)
                     .orElseThrow(() -> MCRConfiguration2.createConfigurationException(metadataManagerConfigKey));
             migration = new MCROCFLMigration(null, prunerList, metadataManager);
         } else if (repository != null && !repository.isEmpty()) {
@@ -326,13 +326,13 @@ public class MCROCFLCommands {
         help = "restore mcrobject {0} with version {1} to current store from ocfl history")
     public static void restoreObjFromOCFLVersioned(String mcridString, String revision) throws IOException {
         MCRObjectID mcrid = MCRObjectID.getInstance(mcridString);
-        MCROCFLXMLMetadataManagerAdapter manager = new MCROCFLXMLMetadataManagerAdapter();
+        MCROCFLXMLMetadataManager manager = new MCROCFLXMLMetadataManager();
         manager.setRepositoryKey(MCRConfiguration2.getStringOrThrow("MCR.Metadata.Manager.Repository"));
         MCRContent content = manager.retrieveContent(mcrid, revision);
         try {
-            MCRXMLMetadataManager.getInstance().update(mcrid, content, new Date(content.lastModified()));
+            MCRXMLMetadataManager.obtainInstance().update(mcrid, content, new Date(content.lastModified()));
         } catch (MCRUsageException e) {
-            MCRXMLMetadataManager.getInstance().create(mcrid, content, new Date(content.lastModified()));
+            MCRXMLMetadataManager.obtainInstance().create(mcrid, content, new Date(content.lastModified()));
         }
     }
 
@@ -344,7 +344,7 @@ public class MCROCFLCommands {
         MCROCFLFileSystemProvider.get().getFileSystem().restoreRoot(derivateId, revision);
         // update metadata
         MCRObjectID mcrDerivateId = MCRObjectID.getInstance(derivateId);
-        Document derivateXml = MCRXMLMetadataManager.getInstance().retrieveXML(mcrDerivateId);
+        Document derivateXml = MCRXMLMetadataManager.obtainInstance().retrieveXML(mcrDerivateId);
         MCRDerivate mcrDerivate = new MCRDerivate(derivateXml);
         MCRMetadataManager.update(mcrDerivate);
         // tile
@@ -361,7 +361,7 @@ public class MCROCFLCommands {
         help = "Permanently delete object {0} and its history from ocfl")
     public static void purgeObject(String mcridString) {
         MCRObjectID mcrid = MCRObjectID.getInstance(mcridString);
-        MCROCFLXMLMetadataManagerAdapter manager = new MCROCFLXMLMetadataManagerAdapter();
+        MCROCFLXMLMetadataManager manager = new MCROCFLXMLMetadataManager();
         manager.setRepositoryKey(MCRConfiguration2.getStringOrThrow("MCR.Metadata.Manager.Repository"));
         manager.purge(mcrid, new Date(), MCRUserManager.getCurrentUser().getUserName());
     }
@@ -410,7 +410,7 @@ public class MCROCFLCommands {
             return;
         }
         String repositoryKey = MCRConfiguration2.getStringOrThrow("MCR.Metadata.Manager.Repository");
-        MCROCFLXMLMetadataManagerAdapter manager = new MCROCFLXMLMetadataManagerAdapter();
+        MCROCFLXMLMetadataManager manager = new MCROCFLXMLMetadataManager();
         manager.setRepositoryKey(repositoryKey);
         OcflRepository repository = manager.getRepository();
         repository.listObjectIds()
@@ -469,7 +469,7 @@ public class MCROCFLCommands {
 
     @MCRCommand(syntax = "migrate derivates to ocfl", help = "migrates all ifs2 derivates to ocfl")
     public static List<String> migrateDerivates() {
-        List<String> derivateIds = MCRXMLMetadataManager.getInstance().listIDsOfType("derivate");
+        List<String> derivateIds = MCRXMLMetadataManager.obtainInstance().listIDsOfType("derivate");
         return derivateIds.stream().map(derivateId -> {
             return "migrate derivate " + derivateId + " to ocfl";
         }).toList();
@@ -497,7 +497,7 @@ public class MCROCFLCommands {
         Files.deleteIfExists(errorFilePath);
         LOGGER.info("Validation errors will be written to: '{}'. If this file does not exists, all derivates "
             + "are successfully migrated to ocfl and can be removed from ifs2.", errorFilePath);
-        List<String> derivateIds = MCRXMLMetadataManager.getInstance().listIDsOfType("derivate");
+        List<String> derivateIds = MCRXMLMetadataManager.obtainInstance().listIDsOfType("derivate");
         return derivateIds.stream().map(derivateId -> {
             return "validate ocfl derivate " + derivateId;
         }).toList();

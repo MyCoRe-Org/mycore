@@ -63,7 +63,7 @@ public class MCRListModsItemDataProviderTest {
         List<MCRContent> testContent = getTestContent();
         for (MCRContent content : testContent) {
             Document jdom = content.asXML();
-            MCRXMLMetadataManager.getInstance().create(MCRObjectID.getInstance(getIDFromContent(content)), jdom,
+            MCRXMLMetadataManager.obtainInstance().create(MCRObjectID.getInstance(getIDFromContent(content)), jdom,
                 new Date());
         }
     }

@@ -224,7 +224,7 @@ public final class MCRObjectUtils {
         T mcrBase = (T) (mcrId.getTypeId().equals(MCRDerivate.OBJECT_TYPE) ? new MCRDerivate() : new MCRObject());
 
         // get content
-        MCRXMLMetadataManager xmlMetadataManager = MCRXMLMetadataManager.getInstance();
+        MCRXMLMetadataManager xmlMetadataManager = MCRXMLMetadataManager.obtainInstance();
         MCRContent content = xmlMetadataManager.retrieveContent(mcrId, revision);
         if (content == null) {
             throw new MCRPersistenceException("No such object " + mcrId + " with revision " + revision + ".");
