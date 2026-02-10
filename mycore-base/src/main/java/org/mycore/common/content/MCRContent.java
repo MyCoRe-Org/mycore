@@ -29,11 +29,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.Base64;
 
 import javax.xml.transform.Source;
@@ -41,6 +44,7 @@ import javax.xml.transform.Source;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRConstants;
@@ -55,11 +59,13 @@ import org.xml.sax.InputSource;
 /**
  * Used to read/write content from any source to any target. Sources and targets can be strings, local files, Apache VFS
  * file objects, XML documents, byte[] arrays and streams. The different sources are implemented by subclasses.
- * 
+ *
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  */
 public abstract class MCRContent {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * Holds the systemID of the current content
@@ -122,7 +128,7 @@ public abstract class MCRContent {
 
     /**
      * Returns content as input stream. Be sure to close this stream properly!
-     * 
+     *
      * @return input stream to read content from
      */
     public abstract InputStream getInputStream() throws IOException;
@@ -137,7 +143,7 @@ public abstract class MCRContent {
 
     /**
      * Returns content as content input stream, which provides MD5 functionality. Be sure to close this stream properly!
-     * 
+     *
      * @return the content input stream
      */
     public MCRContentInputStream getContentInputStream() throws IOException {
@@ -146,7 +152,7 @@ public abstract class MCRContent {
 
     /**
      * Return the content as Source
-     * 
+     *
      * @return content as Source
      */
     public Source getSource() throws IOException {
@@ -155,7 +161,7 @@ public abstract class MCRContent {
 
     /**
      * Sends content to the given OutputStream. The OutputStream is NOT automatically closed afterwards.
-     * 
+     *
      * @param out
      *            the OutputStream to write the content to
      */
@@ -167,7 +173,7 @@ public abstract class MCRContent {
 
     /**
      * Sends content to the given OutputStream.
-     * 
+     *
      * @param out
      *            the OutputStream to write the content to
      * @param close
@@ -185,7 +191,7 @@ public abstract class MCRContent {
 
     /**
      * Returns content as SAX input source.
-     * 
+     *
      * @return input source to read content from
      */
     public InputSource getInputSource() throws IOException {
@@ -196,7 +202,7 @@ public abstract class MCRContent {
 
     /**
      * Sends content to the given local file
-     * 
+     *
      * @param target
      *            the file to write the content to
      */
@@ -216,8 +222,67 @@ public abstract class MCRContent {
     }
 
     /**
+     * Safely writes the data from the {@link #getInputStream()} to the specified target file.
+     * A temporary file is created in the same directory as the target, the data is written
+     * to it, and then the temporary file is moved to the target location.
+     *
+     * <p>This method ensures:
+     * <ul>
+     *     <li>The target file is only replaced if writing completes successfully.</li>
+     *     <li>If supported, the move is performed atomically.</li>
+     *     <li>Temporary files are automatically deleted in case of failure to avoid leftover files.</li>
+     * </ul>
+     *
+     * @param target the path of the target file to write to
+     * @throws IOException if the target path has no parent directory,
+     *                     if an error occurs during writing or moving the file
+     */
+    public void sendSafeTo(Path target) throws IOException {
+        Path dir = target.getParent();
+        if (dir == null || !Files.exists(dir)) {
+            throw new IOException("Target has no parent directory.");
+        }
+        if (!Files.isWritable(dir)) {
+            throw new IOException("Target directory is not writable: " + dir);
+        }
+
+        Path tmp = Files.createTempFile(dir, target.getFileName().toString(), ".tmp");
+
+        boolean tmpMoved = false;
+        try {
+            final int chunkSize = 128 * 1024;
+            try (InputStream in = getInputStream();
+                ReadableByteChannel src = Channels.newChannel(in);
+                FileChannel channel = FileChannel.open(tmp, StandardOpenOption.WRITE)) {
+
+                long position = 0;
+                long count;
+                while ((count = channel.transferFrom(src, position, chunkSize)) > 0) {
+                    position += count;
+                }
+
+                channel.force(true);
+            }
+            try {
+                Files.move(tmp, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            } catch (AtomicMoveNotSupportedException e) {
+                Files.move(tmp, target, StandardCopyOption.REPLACE_EXISTING);
+            }
+            tmpMoved = true;
+        } finally {
+            if (!tmpMoved) {
+                try {
+                    Files.deleteIfExists(tmp);
+                } catch (IOException e) {
+                    LOGGER.error("Failed to delete temporary file at {}", tmp, e);
+                }
+            }
+        }
+    }
+
+    /**
      * Returns the raw content
-     * 
+     *
      * @return the content
      */
     public byte[] asByteArray() throws IOException {
@@ -230,7 +295,7 @@ public abstract class MCRContent {
     /**
      * Returns content as String, assuming encoding from {@link #getEncoding()} or {@link MCRConstants#DEFAULT_ENCODING}
      * .
-     * 
+     *
      * @return content as String
      */
     public String asString() throws IOException {
@@ -251,7 +316,7 @@ public abstract class MCRContent {
 
     /**
      * Parses content, assuming it is XML, and returns the parsed document.
-     * 
+     *
      * @return the XML document parsed from content
      */
     public Document asXML() throws JDOMException, IOException {
@@ -286,7 +351,7 @@ public abstract class MCRContent {
 
     /**
      * Overwrites DocType detection.
-     * 
+     *
      * @see MCRContent#getDocType()
      */
     public void setDocType(String docType) {
@@ -323,7 +388,7 @@ public abstract class MCRContent {
 
     /**
      * Return the length of this content.
-     * 
+     *
      * @return -1 if length is unknown
      */
     public long length() throws IOException {
@@ -332,7 +397,7 @@ public abstract class MCRContent {
 
     /**
      * Returns the last modified time
-     * 
+     *
      * @return -1 if last modified time is unknown
      */
     public long lastModified() throws IOException {
@@ -341,7 +406,7 @@ public abstract class MCRContent {
 
     /**
      * Returns either strong or weak ETag.
-     * 
+     *
      * @return null, if no ETag could be generated
      */
     public String getETag() throws IOException {
@@ -350,7 +415,7 @@ public abstract class MCRContent {
 
     /**
      * Uses provided parameter to compute simple weak ETag.
-     * 
+     *
      * @param systemId
      *            != null, {@link #getSystemId()}
      * @param length
@@ -395,7 +460,7 @@ public abstract class MCRContent {
 
     /**
      * Tells if this content may contain data from the current MCRSession. Use this information to alter cache behavior.
-     * 
+     *
      * @return true if it MAY contain session data
      */
     public boolean isUsingSession() {
