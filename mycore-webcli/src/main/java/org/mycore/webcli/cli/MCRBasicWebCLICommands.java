@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.frontend.cli.MCRBasicCommands;
 import org.mycore.frontend.cli.MCRCommandLineInterface;
 import org.mycore.frontend.cli.MCRCommandStatistics;
 import org.mycore.frontend.cli.annotation.MCRCommand;
@@ -41,6 +42,32 @@ public class MCRBasicWebCLICommands {
     @MCRCommand(syntax = "process {0}", help = "Execute the commands listed in the text file {0}.", order = 20)
     public static List<String> readCommandsFile(String file) throws IOException {
         return MCRCommandLineInterface.readCommandsFile(file);
+    }
+
+    @MCRCommand(
+        syntax = "select values {0}",
+        help = "Selects the given values. {0} is interpreted as a space separated list of values.",
+        order = 30)
+    public static void selectValues(String values) {
+        MCRBasicCommands.selectValues(values);
+    }
+    
+    @MCRCommand(
+        syntax = "execute for selected {0}",
+        help = "Calls the given command multiple times for all selected values." +
+            " The replacement is defined by an {x}. E.g. 'execute for selected set" +
+            " parent of {x} to myapp_container_00000001'",
+        order = 40)
+    public static List<String> executeForSelected(String command) {
+        return MCRBasicCommands.executeForSelected(command);
+    }
+
+    @MCRCommand(
+        syntax = "list selected",
+        help = "Prints the selected values as a space separated list",
+        order = 50)
+    public static void listSelected() {
+        MCRBasicCommands.listSelected();
     }
 
     @MCRCommand(syntax = "show command statistics",

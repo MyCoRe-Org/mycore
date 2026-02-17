@@ -55,17 +55,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
-import org.jdom2.filter.Filters;
 import org.jdom2.transform.JDOMResult;
 import org.jdom2.transform.JDOMSource;
-import org.jdom2.xpath.XPathExpression;
-import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRStreamUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRBaseContent;
@@ -115,6 +110,7 @@ import jakarta.persistence.TypedQuery;
  * @author Robert Stephan
  */
 @MCRCommandGroup(name = "Object Commands")
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class MCRObjectCommands extends MCRAbstractCommands {
 
     private static final String EXPORT_OBJECT_TO_DIRECTORY_WITH_STYLESHEET_COMMAND =
@@ -129,45 +125,68 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     /** Static compiled transformer stylesheets */
     private static final Map<String, Transformer> TRANSFORMER_CACHE = new HashMap<>();
 
+    private static final Predicate<String> OBJECT_ID_PREDICATE = id -> !id.contains("_derivate_");
+
+    /**
+     * @deprecated Use {@link MCRBasicCommands#setSelectedValues(List)} instead.
+     */
+    @Deprecated(forRemoval = true)
     public static void setSelectedObjectIDs(List<String> selected) {
-        LOGGER.info("{} objects selected", selected::size);
-        MCRSessionMgr.getCurrentSession().put("mcrSelectedObjects", selected);
+        MCRBasicCommands.setSelectedValues(selected);
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * @deprecated Use {@link MCRBasicCommands#getSelectedValues()} instead.
+     */
+    @Deprecated(forRemoval = true)
     public static List<String> getSelectedObjectIDs() {
-        final List<String> list = (List<String>) MCRSessionMgr.getCurrentSession().get("mcrSelectedObjects");
-        if (list == null) {
-            return Collections.EMPTY_LIST;
-        }
-        return list;
+        return MCRBasicCommands.getSelectedValues();
     }
 
     @MCRCommand(
         syntax = "select objects with xpath {0}",
-        help = "Selects MCRObjects with XPath {0}, if that XPath evaluates to a non-empty result list" +
+        help = "Selects MCRObjects with XPath {0}," +
+            " if that XPath evaluates to a non-empty result list" +
             " (this command may take a while, use with care in case of a large number of objects)",
         order = 10)
-    public static void selectObjectsWithXpath(String xPath) {
+    public static void selectWithXpath(String xPath) {
+        MCRBasicCommands.setSelectedValues(MCRCommandUtils.selectWithXpath(
+            xPath, OBJECT_ID_PREDICATE, MCRMetadataManager::retrieveMCRObject));
+    }
 
-        XPathExpression<Object> xPathExpression = XPathFactory
-            .instance()
-            .compile(xPath, Filters.fpassthrough(), null, MCRConstants.getStandardNamespaces());
+    @MCRCommand(
+        syntax = "filter object selection with xpath {0}",
+        help = "Filters the selection as MCRObjects with XPath {0}," +
+            " if that XPath evaluates to a non-empty result list" +
+            " (this command may take a while, use with care in case of a large number of objects)",
+        order = 11)
+    public static void filterObjectSelectionWithXpath(String xPath) {
+        MCRBasicCommands.setSelectedValues(MCRCommandUtils.filterWithXpath(
+            MCRBasicCommands.getSelectedValues(),
+            xPath, OBJECT_ID_PREDICATE, MCRMetadataManager::retrieveMCRObject));
+    }
 
-        List<String> selectedObjectIds = MCRXMLMetadataManager
-            .getInstance()
-            .listIDs()
-            .stream()
-            .filter(id -> !id.contains("_derivate_"))
-            .map(MCRObjectID::getInstance)
-            .map(MCRMetadataManager::retrieveMCRObject)
-            .filter(mcrObject -> !xPathExpression.evaluate(mcrObject.createXML()).isEmpty())
-            .map(MCRObject::getId)
-            .map(MCRObjectID::toString)
-            .collect(Collectors.toList());
+    @MCRCommand(
+        syntax = "select expanded objects with xpath {0}",
+        help = "Selects expanded MCRObjects with XPath {0}," +
+            " if that XPath evaluates to a non-empty result list" +
+            " (this command may take a while, use with care in case of a large number of objects)",
+        order = 10)
+    public static void selectExpandedObjectsWithXpath(String xPath) {
+        MCRBasicCommands.setSelectedValues(MCRCommandUtils.selectWithXpath(
+            xPath, OBJECT_ID_PREDICATE, MCRMetadataManager::retrieveMCRExpandedObject));
+    }
 
-        setSelectedObjectIDs(selectedObjectIds);
-
+    @MCRCommand(
+        syntax = "filter expanded object selection with xpath {0}",
+        help = "Filters the selection as expanded MCRObjects with XPath {0}," +
+            " if that XPath evaluates to a non-empty result list"
+            + " (this command may take a while, use with care in case of a large number of objects)",
+        order = 10)
+    public static void filterExpandedObjectSelectionWithXpath(String xPath) {
+        MCRBasicCommands.setSelectedValues(MCRCommandUtils.filterWithXpath(
+            MCRBasicCommands.getSelectedValues(),
+            xPath, OBJECT_ID_PREDICATE, MCRMetadataManager::retrieveMCRExpandedObject));
     }
 
     @MCRCommand(
@@ -179,7 +198,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         if (MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
             fillWithDescendants(id, descendants);
         }
-        setSelectedObjectIDs(descendants);
+        MCRBasicCommands.setSelectedValues(descendants);
     }
 
     private static void fillWithDescendants(String mcrObjID, List<String> descendants) {
@@ -218,7 +237,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         order = 25)
     public static List<String> deleteTopologicalAllObjects() {
         final List<String> objectIds = MCRXMLMetadataManager.getInstance().listIDs();
-        String[] objects = objectIds.stream().filter(id -> !id.contains("_derivate_")).toArray(String[]::new);
+        String[] objects = objectIds.stream().filter(OBJECT_ID_PREDICATE).toArray(String[]::new);
         MCRTopologicalSort<String> ts = new MCRTopologicalSort<>();
         MCRTopologicalSort.prepareMCRObjects(ts, objects);
         int[] order = ts.doTopoSort();
@@ -239,7 +258,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         order = 25)
     public static void checkForCircles() {
         final List<String> objectIds = MCRXMLMetadataManager.getInstance().listIDs();
-        String[] objects = objectIds.stream().filter(id -> !id.contains("_derivate_")).toArray(String[]::new);
+        String[] objects = objectIds.stream().filter(OBJECT_ID_PREDICATE).toArray(String[]::new);
         MCRTopologicalSort<String> ts = new MCRTopologicalSort<>();
         MCRTopologicalSort.prepareMCRObjects(ts, objects);
         int[] order = ts.doTopoSort();
@@ -823,29 +842,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     /**
-     * List all selected MCRObjects.
-     */
-    @MCRCommand(
-        syntax = "list selected",
-        help = "Prints the id of selected objects",
-        order = 190)
-    public static void listSelected() {
-        LOGGER.info("List selected MCRObjects");
-        if (getSelectedObjectIDs().isEmpty()) {
-            LOGGER.info("No Resultset to work with, use command \"select objects with solr query {0} in core {1}\"" +
-                " or \"select objects with xpath {0}\" to build one");
-            return;
-        }
-        LOGGER.info(() -> {
-            StringBuilder out = new StringBuilder();
-            for (String id : getSelectedObjectIDs()) {
-                out.append(id).append(' ');
-            }
-            return out.toString();
-        });
-    }
-
-    /**
      * List revisions of an MyCoRe Object.
      *
      * @param id
@@ -1218,23 +1214,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         } catch (MCRException | JDOMException | IOException e) {
             throw new MCRException(objID.toString() + " failed to parse against its schema!", e);
         }
-    }
-
-    @MCRCommand(
-        syntax = "execute for selected {0}",
-        help = "Calls the given command multiple times for all selected objects." +
-            " The replacement is defined by an {x}.E.g. 'execute for selected set" +
-            " parent of {x} to myapp_container_00000001'",
-        order = 450)
-    public static List<String> executeForSelected(String command) {
-        if (!command.contains("{x}")) {
-            LOGGER.info("No replacement defined. Use the {x} variable in order to execute your command with all "
-                + "selected objects.");
-            return Collections.emptyList();
-        }
-        return getSelectedObjectIDs().stream()
-            .map(objID -> command.replaceAll("\\{x}", objID))
-            .collect(Collectors.toList());
     }
 
     /**

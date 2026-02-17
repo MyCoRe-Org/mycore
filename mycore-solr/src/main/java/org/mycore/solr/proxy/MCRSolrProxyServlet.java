@@ -282,6 +282,10 @@ public class MCRSolrProxyServlet extends MCRServlet {
         MCRConfiguration2.getString("MCR.Solr.Disallowed.Facets")
             .ifPresent(disallowedFacets -> MCRConfiguration2.splitValue(disallowedFacets)
                 .forEach(disallowedFacet -> solrParameter.remove("facet.field", disallowedFacet)));
+
+        MCRConfiguration2.getString("MCR.Solr.Proxy.Disallowed.Parameter")
+            .ifPresent(disallowedParameter -> MCRConfiguration2.splitValue(disallowedParameter)
+                .forEach(solrParameter::remove));
     }
 
     private void updateQueryHandlerMap(HttpServletResponse resp) throws IOException {

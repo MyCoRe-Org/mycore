@@ -29,7 +29,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.mapper.MCRAccessKeyJsonMapper;
-import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyServiceFactory;
+import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyService;
 
 /**
  * Event handler for managing access keys in the context of MyCoRe objects and derivates.
@@ -40,6 +40,25 @@ public class MCRAccessKeyEventHandler extends MCREventHandlerBase {
      * Service flags name for access keys.
      */
     public static final String ACCESS_KEY_FLAG_TYPE = "accesskeys";
+
+    private final MCRAccessKeyService accessKeyService;
+
+    /**
+     * Creates a new {@link MCRAccessKeyEventHandler} using the default
+     * {@link MCRAccessKeyService} instance.
+     */
+    public MCRAccessKeyEventHandler() {
+        this(MCRAccessKeyService.obtainInstance());
+    }
+
+    /**
+     * Creates a new {@link MCRAccessKeyEventHandler} with the specified access key service.
+     *
+     * @param accessKeyService the {@link MCRAccessKeyService} used to manage access key events
+     */
+    public MCRAccessKeyEventHandler(MCRAccessKeyService accessKeyService) {
+        this.accessKeyService = accessKeyService;
+    }
 
     @Override
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
@@ -77,7 +96,7 @@ public class MCRAccessKeyEventHandler extends MCREventHandlerBase {
             .map(MCRAccessKeyJsonMapper::jsonToAccessKeyDtos).flatMap(Collection::stream).toList();
         for (MCRAccessKeyDto accessKeyDto : accessKeyDtos) {
             accessKeyDto.setReference(obj.getId().toString());
-            MCRAccessKeyServiceFactory.getAccessKeyService().importAccessKey(accessKeyDto);
+            accessKeyService.importAccessKey(accessKeyDto);
         }
         service.removeFlags(ACCESS_KEY_FLAG_TYPE);
     }
@@ -87,6 +106,6 @@ public class MCRAccessKeyEventHandler extends MCREventHandlerBase {
     }
 
     private void handleBaseDeleted(MCRBase obj) {
-        MCRAccessKeyServiceFactory.getAccessKeyService().removeAccessKeysByReference(obj.getId().toString());
+        accessKeyService.removeAccessKeysByReference(obj.getId().toString());
     }
 }

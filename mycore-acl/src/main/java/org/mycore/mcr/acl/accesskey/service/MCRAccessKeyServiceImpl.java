@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,6 +31,8 @@ import org.mycore.access.MCRAccessCacheHelper;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTransactionManager;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyPartialUpdateDto;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyCollisionException;
@@ -47,11 +50,13 @@ import org.mycore.util.concurrent.MCRTransactionableCallable;
  * <p>
  * This service provides various methods to manage access keys in the MyCoRe system,
  * including creating, updating, deleting, and querying access keys by different criteria.
- * </p>
  */
+@MCRConfigurationProxy(proxyClass = MCRAccessKeyServiceImpl.Factory.class)
 public class MCRAccessKeyServiceImpl implements MCRAccessKeyService {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    private static final String INSTANCE_PROPERTY = "MCR.ACL.AccessKey.Service.Class";
 
     private final MCRAccessKeyRepository accessKeyRepository;
 
@@ -267,4 +272,20 @@ public class MCRAccessKeyServiceImpl implements MCRAccessKeyService {
         }
     }
 
+    public static class Factory implements Supplier<MCRAccessKeyServiceImpl> {
+
+        @MCRInstance(name = "Repository", valueClass = MCRAccessKeyRepository.class)
+        public MCRAccessKeyRepository repository;
+
+        @MCRInstance(name = "Validator", valueClass = MCRAccessKeyValidator.class)
+        public MCRAccessKeyValidator validator;
+
+        @MCRInstance(name = "SecretProcessor", valueClass = MCRAccessKeySecretProcessor.class)
+        public MCRAccessKeySecretProcessor secretProcessor;
+
+        @Override
+        public MCRAccessKeyServiceImpl get() {
+            return new MCRAccessKeyServiceImpl(repository, validator, secretProcessor);
+        }
+    }
 }

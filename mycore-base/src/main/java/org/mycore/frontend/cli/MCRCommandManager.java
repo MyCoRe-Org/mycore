@@ -167,7 +167,7 @@ public class MCRCommandManager {
             }
         }
 
-        MCRCommandLineInterface.output("Command not understood:" + command);
+        MCRCommandLineInterface.output("Command not understood: " + command);
         MCRCommandLineInterface.output("Enter 'help' to get a list of commands.");
         return new ArrayList<>();
     }

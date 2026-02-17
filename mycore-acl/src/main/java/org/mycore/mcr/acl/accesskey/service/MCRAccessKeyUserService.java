@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.mycore.common.config.annotation.MCRFactory;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserAttribute;
@@ -45,6 +46,28 @@ public class MCRAccessKeyUserService extends MCRAccessKeyContextService<MCRUser>
      */
     public MCRAccessKeyUserService(MCRAccessKeyService accessKeyService) {
         super(accessKeyService);
+    }
+
+    /**
+     * Returns the shared singleton instance of {@link MCRAccessKeyUserService}.
+     *
+     * @return the singleton {@link MCRAccessKeyUserService} instance
+     */
+    @MCRFactory
+    public static MCRAccessKeyUserService obtainInstance() {
+        return InstanceHolder.INSTANCE;
+    }
+
+    /**
+     * Creates a new instance of {@link MCRAccessKeyUserService}.
+     * <p>
+     * This method instantiates a new session service using the default
+     * {@link MCRAccessKeyUserService} instance.
+     *
+     * @return a newly created {@link MCRAccessKeyUserService} instance
+     */
+    public static MCRAccessKeyUserService createInstance() {
+        return new MCRAccessKeyUserService(MCRAccessKeyService.obtainInstance());
     }
 
     @Override
@@ -127,4 +150,7 @@ public class MCRAccessKeyUserService extends MCRAccessKeyContextService<MCRUser>
         }
     }
 
+    private static final class InstanceHolder {
+        static final MCRAccessKeyUserService INSTANCE = createInstance();
+    }
 }

@@ -20,6 +20,7 @@ package org.mycore.mcr.acl.accesskey.service;
 
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.config.annotation.MCRFactory;
 import org.mycore.mcr.acl.accesskey.config.MCRAccessKeyConfig;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 
@@ -40,6 +41,28 @@ public class MCRAccessKeySessionService extends MCRAccessKeyContextService<MCRSe
      */
     public MCRAccessKeySessionService(MCRAccessKeyService accessKeyService) {
         super(accessKeyService);
+    }
+
+    /**
+     * Returns the shared singleton instance of {@link MCRAccessKeySessionService}.
+     *
+     * @return the singleton {@link MCRAccessKeySessionService} instance
+     */
+    @MCRFactory
+    public static MCRAccessKeySessionService obtainInstance() {
+        return InstanceHolder.INSTANCE;
+    }
+
+    /**
+     * Creates a new instance of {@link MCRAccessKeySessionService}.
+     * <p>
+     * This method instantiates a new session service using the default
+     * {@link MCRAccessKeyService} instance.
+     *
+     * @return a newly created {@link MCRAccessKeySessionService} instance
+     */
+    public static MCRAccessKeySessionService createInstance() {
+        return new MCRAccessKeySessionService(MCRAccessKeyService.obtainInstance());
     }
 
     @Override
@@ -72,4 +95,7 @@ public class MCRAccessKeySessionService extends MCRAccessKeyContextService<MCRSe
         return ACCESS_KEY_SESSION_ATTRIBUTE_PREFIX;
     }
 
+    private static final class InstanceHolder {
+        static final MCRAccessKeySessionService INSTANCE = createInstance();
+    }
 }

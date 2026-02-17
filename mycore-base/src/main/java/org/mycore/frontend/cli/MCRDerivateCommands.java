@@ -87,6 +87,7 @@ import org.mycore.frontend.fileupload.MCRUploadHelper;
  * @author Frank Lützenkirchen
  */
 @MCRCommandGroup(name = "Derivate Commands")
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class MCRDerivateCommands extends MCRAbstractCommands {
 
     /** The logger */
@@ -100,6 +101,31 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
     /** Static compiled transformer stylesheets */
     private static final Map<String, Transformer> TRANSFORMER_CACHE = new HashMap<>();
+
+    private static final Predicate<String> DERIVATE_ID_PREDICATE = id -> id.contains("_derivate_");
+
+    @MCRCommand(
+        syntax = "select derivates with xpath {0}",
+        help = "Selects MCRDerivates with XPath {0}," +
+            " if that XPath evaluates to a non-empty result list" +
+            " (this command may take a while, use with care in case of a large number of objects)",
+        order = 10)
+    public static void selectDerivatesWithXpath(String xPath) {
+        MCRBasicCommands.setSelectedValues(MCRCommandUtils.selectWithXpath(
+            xPath, DERIVATE_ID_PREDICATE, MCRMetadataManager::retrieveMCRDerivate));
+    }
+
+    @MCRCommand(
+        syntax = "filter derivate selection with xpath {0}",
+        help = "Filters the selection as MCRDerivates with XPath {0}," +
+            " if that XPath evaluates to a non-empty result list" +
+            " (this command may take a while, use with care in case of a large number of objects)",
+        order = 10)
+    public static void filterDerivateSelectionWithXpath(String xPath) {
+        MCRBasicCommands.setSelectedValues(MCRCommandUtils.filterWithXpath(
+            MCRBasicCommands.getSelectedValues(),
+            xPath, DERIVATE_ID_PREDICATE, MCRMetadataManager::retrieveMCRDerivate));
+    }
 
     /**
      * deletes all MCRDerivate from the datastore.

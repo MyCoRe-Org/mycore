@@ -26,7 +26,6 @@ import java.util.UUID;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyDto;
 import org.mycore.mcr.acl.accesskey.dto.MCRAccessKeyPartialUpdateDto;
 import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyService;
-import org.mycore.mcr.acl.accesskey.service.MCRAccessKeyServiceFactory;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.core.Response;
@@ -35,7 +34,10 @@ import jakarta.ws.rs.core.UriInfo;
 /**
  * Provides CRUD methods for REST.
  */
+@Deprecated(forRemoval = true)
 public final class MCRAccessKeyRestHelper {
+
+    private static final MCRAccessKeyService SERVICE = MCRAccessKeyService.obtainInstance();
 
     private MCRAccessKeyRestHelper() {
 
@@ -53,18 +55,17 @@ public final class MCRAccessKeyRestHelper {
      */
     public static List<MCRAccessKeyDto> findAccessKeys(String reference, String permissions, int offset,
         int limit, HttpServletResponse response) {
-        final MCRAccessKeyService service = MCRAccessKeyServiceFactory.getAccessKeyService();
         final List<MCRAccessKeyDto> accessKeyDtos = new ArrayList<>();
         if (!reference.isEmpty() && !permissions.isEmpty()) {
             Arrays.stream(permissions.split(","))
-                .forEach(p -> accessKeyDtos.addAll(service.findAccessKeysByReferenceAndPermission(reference, p)));
+                .forEach(p -> accessKeyDtos.addAll(SERVICE.findAccessKeysByReferenceAndPermission(reference, p)));
         } else if (!reference.isEmpty()) {
-            accessKeyDtos.addAll(MCRAccessKeyServiceFactory.getAccessKeyService().findAccessKeysByReference(reference));
+            accessKeyDtos.addAll(SERVICE.findAccessKeysByReference(reference));
         } else if (!permissions.isEmpty()) {
             Arrays.stream(permissions.split(","))
-                .forEach(p -> accessKeyDtos.addAll(service.findAccessKeysByPermission(p)));
+                .forEach(p -> accessKeyDtos.addAll(SERVICE.findAccessKeysByPermission(p)));
         } else {
-            accessKeyDtos.addAll(service.listAllAccessKeys());
+            accessKeyDtos.addAll(SERVICE.listAllAccessKeys());
         }
         response.setHeader(MCRAccessKeyRestConstants.HEADER_TOTAL_COUNT, Integer.toString(accessKeyDtos.size()));
         return accessKeyDtos.stream().sorted((a1, a2) -> a1.getCreated().compareTo(a2.getCreated())).skip(offset)
@@ -78,7 +79,7 @@ public final class MCRAccessKeyRestHelper {
      * @return the access key
      */
     public static MCRAccessKeyDto findAccessKey(UUID id) {
-        return MCRAccessKeyServiceFactory.getAccessKeyService().findAccessKey(id);
+        return SERVICE.findAccessKey(id);
     }
 
     /**
@@ -89,8 +90,7 @@ public final class MCRAccessKeyRestHelper {
      * @return the response
      */
     public static Response addAccessKey(MCRAccessKeyDto accessKeyDto, UriInfo uriInfo) {
-        final MCRAccessKeyDto createdAccessKey
-            = MCRAccessKeyServiceFactory.getAccessKeyService().addAccessKey(accessKeyDto);
+        final MCRAccessKeyDto createdAccessKey = SERVICE.addAccessKey(accessKeyDto);
         return Response.created(uriInfo.getAbsolutePathBuilder().path(createdAccessKey.getId().toString()).build())
             .build();
     }
@@ -103,7 +103,7 @@ public final class MCRAccessKeyRestHelper {
      * @return the response
      */
     public static Response updateAccessKey(UUID id, MCRAccessKeyDto accessKeyDto) {
-        MCRAccessKeyServiceFactory.getAccessKeyService().updateAccessKey(id, accessKeyDto);
+        SERVICE.updateAccessKey(id, accessKeyDto);
         return Response.noContent().build();
     }
 
@@ -115,7 +115,7 @@ public final class MCRAccessKeyRestHelper {
      * @return the response
      */
     public static Response partialUpdateAccessKey(UUID id, MCRAccessKeyPartialUpdateDto accessKeyDto) {
-        MCRAccessKeyServiceFactory.getAccessKeyService().partialUpdateAccessKey(id, accessKeyDto);
+        SERVICE.partialUpdateAccessKey(id, accessKeyDto);
         return Response.noContent().build();
     }
 
@@ -126,7 +126,7 @@ public final class MCRAccessKeyRestHelper {
      * @return the response
      */
     public static Response removeAccessKey(UUID id) {
-        MCRAccessKeyServiceFactory.getAccessKeyService().removeAccessKey(id);
+        SERVICE.removeAccessKey(id);
         return Response.noContent().build();
     }
 }
