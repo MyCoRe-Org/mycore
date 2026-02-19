@@ -54,7 +54,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
   <properties>
     <argLine />
     <!-- same as ocfl aws sdk version -->
-    <aws-sdk.version>2.41.19</aws-sdk.version>
+    <aws-sdk.version>2.41.32</aws-sdk.version>
     <changelog.since>2024-12-18</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
     <changes.version>2025.02</changes.version>
@@ -69,7 +69,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <hk2.version>3.1.1</hk2.version>
     <httpclient.version>5.6</httpclient.version>
     <httpclient4.version>4.5.14</httpclient4.version>
-    <httpcore.version>5.4</httpcore.version>
+    <httpcore.version>5.4.1</httpcore.version>
     <jackson.version>2.21.0</jackson.version>
     <jakarta.activation.version>2.1.4</jakarta.activation.version>
     <jakarta.mail.version>2.1.5</jakarta.mail.version>
@@ -78,7 +78,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <jersey.version>4.0.2</jersey.version>
     <!-- jetty 11.x is required for SOLR -->
     <jetty.version>11.0.26</jetty.version>
-    <junit.version>6.0.2</junit.version>
+    <junit.version>6.0.3</junit.version>
     <log4j.version>2.25.3</log4j.version>
     <!-- lowest is 99, highest is 0 -->
     <manifest.priority>99</manifest.priority>
@@ -86,7 +86,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <maven.compiler.target>${java.target.version}</maven.compiler.target>
     <mockito.jar>${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar</mockito.jar>
     <mockito.version>5.21.0</mockito.version>
-    <neo4j.version>6.0.2</neo4j.version>
+    <neo4j.version>6.0.3</neo4j.version>
     <net.bytebuddy.experimental>true</net.bytebuddy.experimental>
     <net.bytebuddy.processor>CLASS_FILE_API_FIRST</net.bytebuddy.processor>
     <oaipmh.version>3.0</oaipmh.version>
@@ -97,7 +97,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <rdf4j.version>5.2.2</rdf4j.version>
     <selenium.version>4.40.0</selenium.version>
     <site.suffix />
-    <swagger.version>2.2.42</swagger.version>
+    <swagger.version>2.2.43</swagger.version>
     <uniqueVersion>false</uniqueVersion>
     <verapdf.version>1.28.2</verapdf.version>
     <vis-network.version>9.1.2</vis-network.version>
@@ -481,20 +481,12 @@ Applications based on MyCoRe use a common core, which provides the functionality
                 <configuration>
                   <target>
                     <!-- "<" before Param/?,number => {@literal <} -->
-                    <replaceregexp byline="false"
-                                   encoding="UTF-8"
-                                   flags="g"
-                                   match="\s&lt;\s*(?=[:?\d])"
-                                   replace=" {@literal &lt;} ">
+                    <replaceregexp byline="false" encoding="UTF-8" flags="g" match="\s&lt;\s*(?=[:?\d])" replace=" {@literal &lt;} ">
                       <fileset dir="${project.build.directory}/generated-sources/apt" includes="**/*.java" />
                     </replaceregexp>
 
                     <!-- ">" before Param/?,number => {@literal >} -->
-                    <replaceregexp byline="false"
-                                   encoding="UTF-8"
-                                   flags="g"
-                                   match="\s&gt;\s*(?=[:?\d])"
-                                   replace=" {@literal &gt;} ">
+                    <replaceregexp byline="false" encoding="UTF-8" flags="g" match="\s&gt;\s*(?=[:?\d])" replace=" {@literal &gt;} ">
                       <fileset dir="${project.build.directory}/generated-sources/apt" includes="**/*.java" />
                     </replaceregexp>
                   </target>
@@ -1006,7 +998,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>com.auth0</groupId>
         <artifactId>java-jwt</artifactId>
-        <version>4.5.0</version>
+        <version>4.5.1</version>
       </dependency>
       <dependency>
         <groupId>com.bucket4j</groupId>
@@ -1162,7 +1154,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>de.undercouch</groupId>
         <artifactId>citeproc-java</artifactId>
-        <version>3.4.1</version>
+        <version>3.5.0</version>
       </dependency>
       <dependency>
         <groupId>io.bit3</groupId>
@@ -1264,7 +1256,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>jakarta.xml.bind</groupId>
         <artifactId>jakarta.xml.bind-api</artifactId>
-        <version>4.0.4</version>
+        <version>4.0.5</version>
       </dependency>
       <dependency>
         <groupId>jaxen</groupId>
@@ -1879,7 +1871,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>42.7.9</version>
+        <version>42.7.10</version>
       </dependency>
       <dependency>
         <groupId>org.tmatesoft.svnkit</groupId>
@@ -2084,13 +2076,13 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.citationstyles</groupId>
         <artifactId>locales</artifactId>
-        <version>26.1.1</version>
+        <version>26.2</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.citationstyles</groupId>
         <artifactId>styles</artifactId>
-        <version>26.1.1</version>
+        <version>26.2</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
