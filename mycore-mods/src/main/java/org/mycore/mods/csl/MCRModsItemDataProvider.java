@@ -605,7 +605,8 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     }
 
     protected String buildShortTitle(Element titleInfoElement) {
-        return titleInfoElement.getChild("title", MODS_NAMESPACE).getText();
+        Element title = titleInfoElement.getChild("title", MODS_NAMESPACE);
+        return title != null ? title.getText() : "";
     }
 
     protected String buildTitle(Element titleInfoElement) {
