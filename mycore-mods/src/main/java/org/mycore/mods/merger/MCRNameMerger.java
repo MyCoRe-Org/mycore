@@ -37,16 +37,20 @@ import org.mycore.common.MCRConstants;
  * @author Frank Lützenkirchen
  */
 public class MCRNameMerger extends MCRMerger {
+    
+    private static final String TYPE = "type";
 
-    private String familyName;
+    private static final String NAME_PART = "namePart";
 
-    private Set<String> givenNames = new HashSet<>();
+    protected String familyName;
 
-    private Set<String> initials = new HashSet<>();
+    protected Set<String> givenNames = new HashSet<>();
 
-    private Set<String> allNames = new HashSet<>();
+    protected Set<String> initials = new HashSet<>();
 
-    private Map<String, Set<String>> nameIds = new HashMap<>();
+    protected Set<String> allNames = new HashSet<>();
+
+    protected Map<String, Set<String>> nameIds = new HashMap<>();
 
     @Override
     public void setElement(Element element) {
@@ -69,8 +73,8 @@ public class MCRNameMerger extends MCRMerger {
     }
 
     private void setFromNameParts(Element modsName) {
-        for (Element namePart : modsName.getChildren("namePart", MCRConstants.MODS_NAMESPACE)) {
-            String type = namePart.getAttributeValue("type");
+        for (Element namePart : modsName.getChildren(NAME_PART, MCRConstants.MODS_NAMESPACE)) {
+            String type = namePart.getAttributeValue(TYPE);
             String nameFragment = namePart.getText().replaceAll("\\p{Zs}+", " ");
 
             if (Objects.equals(type, "family")) {
@@ -83,7 +87,7 @@ public class MCRNameMerger extends MCRMerger {
                 continue;
             } else if (Objects.equals(type, "termsOfAddress")) {
                 continue;
-            } else if ("personal".equals(modsName.getAttributeValue("type"))) {
+            } else if ("personal".equals(modsName.getAttributeValue(TYPE))) {
                 setFromCombinedName(nameFragment);
             } else {
                 setFamilyName(nameFragment);
@@ -185,13 +189,13 @@ public class MCRNameMerger extends MCRMerger {
         }
     }
 
-    private boolean haveAtLeastOneCommon(Set<String> a, Set<String> b) {
+    protected boolean haveAtLeastOneCommon(Set<String> a, Set<String> b) {
         Set<String> intersection = new HashSet<>(a);
         intersection.retainAll(b);
         return !intersection.isEmpty();
     }
 
-    private boolean haveContradictingNameIds(Map<String, Set<String>> a, Map<String, Set<String>> b) {
+    protected boolean haveContradictingNameIds(Map<String, Set<String>> a, Map<String, Set<String>> b) {
         Set<String> intersection;
         boolean foundContradictingNameIds = false;
         for (String type : a.keySet()) {
@@ -210,7 +214,7 @@ public class MCRNameMerger extends MCRMerger {
 
     private void collectNameIds(Element modsName) {
         for (Element nameId : modsName.getChildren("nameIdentifier", MCRConstants.MODS_NAMESPACE)) {
-            String type = nameId.getAttributeValue("type");
+            String type = nameId.getAttributeValue(TYPE);
             String id = nameId.getText();
 
             Set<String> ids;
