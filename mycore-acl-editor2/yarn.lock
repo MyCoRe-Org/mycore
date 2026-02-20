@@ -427,8 +427,8 @@ isobject@^3.0.0, isobject@^3.0.1:
   resolved "https://github.com/eckstueck/Stupid-Table-Plugin.git#c39a672ad39b08e3b7ab9445cae94c05c56f1119"
 
 js-yaml@~3.14.0:
-  version "3.14.1"
-  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.14.1.tgz#dae812fdb3825fa306609a8717383c50c36a0537"
+  version "3.14.2"
+  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.14.2.tgz#77485ce1dd7f33c061fd1b16ecea23b55fcb04b0"
   dependencies:
     argparse "^1.0.7"
     esprima "^4.0.0"
