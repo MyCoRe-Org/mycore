@@ -40,14 +40,20 @@ import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jdom2.Attribute;
 import org.jdom2.Element;
+import org.jdom2.filter.Filters;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRXlink;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.xml.MCRLayoutService;
+import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -182,13 +188,32 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
             .getChild(MCRObjectStructure.ELEMENT_DERIVATE_OBJECTS)
             .getChildren("derobject");
 
+        XPathFactory xpathFactory = XPathFactory.instance();
+        XPathExpression<Attribute> derivateTypeXpath = xpathFactory
+            .compile("classification[@classid='derivate_types']/@categid",
+                Filters.attribute(), null, MCRConstants.XML_NAMESPACE);
+        XPathExpression<Boolean> exportedXpath = xpathFactory
+            .compile(".//category/label[lang('x-export')]/@text='false'",
+                Filters.fboolean(), null, MCRConstants.XML_NAMESPACE);
+        
         for (Element el : li) {
             if (el.getAttributeValue(MCRXMLConstants.INHERITED).equals("0")) {
                 String ownerID = el.getAttributeValue(MCRXlink.HREF, XLINK_NAMESPACE);
                 MCRObjectID derId = MCRObjectID.getInstance(ownerID);
                 // here the access check is tested only against the derivate
                 if (MCRAccessManager.checkDerivateContentPermission(derId, PERMISSION_READ)) {
-                    sendDerivate(derId, null, container);
+
+                    // export derivate if no derivate type has an 'x-export' property of 'false'
+                    boolean exported = derivateTypeXpath.evaluate(el).stream().noneMatch(derivateTypeAttribute -> {
+                        String derivateType = derivateTypeAttribute.getValue();
+                        Element derivateTypeElement = MCRURIResolver.obtainInstance()
+                            .resolve("classification:metadata:0:children:derivate_types:" + derivateType);
+                        return exportedXpath.evaluate(derivateTypeElement).get(0);
+                    });
+
+                    if (exported) {
+                        sendDerivate(derId, null, container);
+                    }
                 }
             }
         }
