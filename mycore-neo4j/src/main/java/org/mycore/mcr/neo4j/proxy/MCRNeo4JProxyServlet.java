@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
@@ -144,7 +144,7 @@ public class MCRNeo4JProxyServlet extends MCRServlet {
                 String key = entry.getKey();
                 String value = entry.getValue();
 
-                if (StringUtils.contains(key, "node_")) {
+                if (Strings.CS.contains(key, "node_")) {
                     try {
                         Neo4JNodeJsonRecord nodeObject = objectMapper.readerFor(Neo4JNodeJsonRecord.class)
                             .withRootName("n").readValue(value);
@@ -152,7 +152,7 @@ public class MCRNeo4JProxyServlet extends MCRServlet {
                     } catch (JsonProcessingException e) {
                         LOGGER.error(e);
                     }
-                } else if (StringUtils.contains(key, "rel_")) {
+                } else if (Strings.CS.contains(key, "rel_")) {
                     try {
                         Neo4JRelationShipJsonRecord relationShipObject = objectMapper
                             .readerFor(Neo4JRelationShipJsonRecord.class).withRootName("r").readValue(value);
@@ -160,7 +160,7 @@ public class MCRNeo4JProxyServlet extends MCRServlet {
                     } catch (JsonProcessingException e) {
                         LOGGER.error(e);
                     }
-                } else if (StringUtils.contains(key, "path_")) {
+                } else if (Strings.CS.contains(key, "path_")) {
                     try {
                         Neo4JPathJsonRecord pathObject = objectMapper.readValue(value, Neo4JPathJsonRecord.class);
                         nodes.addAll(pathObject.nodes());

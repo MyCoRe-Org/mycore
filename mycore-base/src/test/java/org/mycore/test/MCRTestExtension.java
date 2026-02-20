@@ -101,7 +101,7 @@ public class MCRTestExtension implements Extension, BeforeEachCallback, AfterEac
 
     private Map<String, String> getConfigProperties(ExtensionContext context) {
         return context.getRoot().getStore(NAMESPACE)
-            .getOrComputeIfAbsent(MCRTestExtension.PROPERTIES_MAP_PROPERTY, k -> {
+            .computeIfAbsent(MCRTestExtension.PROPERTIES_MAP_PROPERTY, k -> {
                 LOGGER.debug(() -> context.getElement().get() + " creating new properties map");
                 return new HashMap<>();
             }, Map.class);
@@ -173,7 +173,7 @@ public class MCRTestExtension implements Extension, BeforeEachCallback, AfterEac
             throw new IllegalStateException("This method should only be called for class-level extensions.");
         }
         return context.getRoot().getStore(NAMESPACE)
-            .getOrComputeIfAbsent(MCRTestExtension.CLASS_PROPERTIES_MAP_PROPERTY, k -> {
+            .computeIfAbsent(MCRTestExtension.CLASS_PROPERTIES_MAP_PROPERTY, k -> {
                 LOGGER.debug("Creating empty extension properties");
                 return new HashMap<>();
             }, Map.class);

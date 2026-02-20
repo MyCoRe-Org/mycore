@@ -91,19 +91,22 @@ import jakarta.persistence.UniqueConstraint;
         query = "FROM MCRCategoryImpl as cat WHERE "
             + "cat.id.rootID=:classID and (cat.id.id=:categID OR cat.id.id IS NULL AND :categID IS NULL)"),
     @NamedQuery(name = "MCRCategory.byLabelInClass",
-        query = "FROM MCRCategoryImpl as cat "
+        query = "SELECT DISTINCT cat"
+            + " FROM MCRCategoryImpl as cat "
             + "INNER JOIN cat.labels as label "
             + "  WHERE cat.id.rootID=:rootID AND "
             + "    cat.left BETWEEN :left and :right AND "
             + "    label.lang=:lang AND "
             + "    label.text=:text"),
     @NamedQuery(name = "MCRCategory.byLabel",
-        query = "FROM MCRCategoryImpl as cat "
+        query = "SELECT DISTINCT cat"
+            + " FROM MCRCategoryImpl as cat "
             + "  INNER JOIN cat.labels as label "
             + "  WHERE label.lang=:lang AND "
             + "    label.text=:text"),
     @NamedQuery(name = "MCRCategory.byClassAndLang",
-        query = "FROM MCRCategoryImpl as cat "
+        query = "SELECT DISTINCT cat"
+            + " FROM MCRCategoryImpl as cat "
             + "  INNER JOIN cat.labels as label "
             + "  WHERE cat.id.rootID=:classID"
             + "  AND label.lang=:lang"),

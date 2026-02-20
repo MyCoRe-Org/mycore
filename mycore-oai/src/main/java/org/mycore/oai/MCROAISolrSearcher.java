@@ -90,6 +90,8 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         SolrClient solrClient = MCRSolrCoreManager.getMainSolrClient();
         try {
             QueryRequest queryRequest = new QueryRequest(query);
+            queryRequest.setPath(getRequestHandlerPath());
+
             MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
                 MCRSolrAuthenticationLevel.SEARCH);
             QueryResponse response = queryRequest.process(solrClient);
@@ -159,11 +161,17 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         // do the query
         SolrClient solrClient = MCRSolrCoreManager.getMainSolrClient();
         QueryRequest queryRequest = new QueryRequest(query);
+        queryRequest.setPath(getRequestHandlerPath());
         MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
             MCRSolrAuthenticationLevel.SEARCH);
         QueryResponse response = queryRequest.process(solrClient);
         Collection<MCROAISetResolver<String, SolrDocument>> setResolver = getSetResolver(response.getResults());
         return new MCROAISolrResult(response, d -> toHeader(d, setResolver));
+    }
+
+    private String getRequestHandlerPath(){
+        String configPrefix = this.identify.getConfigPrefix();
+        return MCRConfiguration2.getString(configPrefix + "Search.RequestHandler").orElse("/select");
     }
 
     private SolrQuery getBaseQuery(String restrictionField) {
@@ -175,8 +183,6 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         String[] requiredFields = Stream.concat(Stream.of("id", getModifiedField()), getRequiredFieldNames().stream())
             .toArray(String[]::new);
         query.setFields(requiredFields);
-        // request handler
-        query.setRequestHandler(MCRConfiguration2.getString(configPrefix + "Search.RequestHandler").orElse("/select"));
         return query;
     }
 

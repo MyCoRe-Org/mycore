@@ -25,6 +25,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
+import org.mycore.common.MCRClassTools;
+
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -41,10 +43,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.PreRemove;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-
-import org.mycore.common.MCRClassTools;
 
 /**
  * Container class handled by hibernate to store and retrieve job information.
@@ -250,6 +251,17 @@ public class MCRJob implements Cloneable {
     @Column(name = "paramValue", length = 16_384)
     public Map<String, String> getParameters() {
         return parameters;
+    }
+
+    @PreRemove
+    @SuppressWarnings("unused")
+    /**
+     * Delete parameters before removing the job to avoid foreign key constraint violations.
+     */
+    private void preRemove() {
+        if (parameters != null) {
+            parameters.clear();
+        }
     }
 
     /**
