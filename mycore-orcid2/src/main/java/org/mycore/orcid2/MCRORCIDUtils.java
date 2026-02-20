@@ -41,7 +41,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.orcid2.exception.MCRORCIDException;
-import org.mycore.orcid2.util.MCRIdentifier;
+import org.mycore.datamodel.legalentity.MCRIdentifier;
 
 /**
  * Provides utility methods.

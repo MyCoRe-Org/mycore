@@ -28,10 +28,11 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.datamodel.legalentity.MCRIdentifier;
+import org.mycore.datamodel.legalentity.MCRLegalEntityService;
 import org.mycore.orcid2.MCRORCIDConstants;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.exception.MCRORCIDException;
-import org.mycore.orcid2.util.MCRIdentifier;
 import org.mycore.orcid2.util.MCRORCIDJSONMapper;
 import org.mycore.orcid2.validation.MCRORCIDValidationHelper;
 import org.mycore.user2.MCRUser;
@@ -72,6 +73,8 @@ public class MCRORCIDUser {
 
     private final MCRUser user;
 
+    private MCRLegalEntityService legalEntityService = MCRLegalEntityService.obtainInstance();
+
     /**
      * Wraps MCRUser to MCRORCIDUser.
      *
@@ -79,6 +82,17 @@ public class MCRORCIDUser {
      */
     public MCRORCIDUser(MCRUser user) {
         this.user = user;
+    }
+
+    /**
+     * Wraps MCRUser to MCRORCIDUser.
+     *
+     * @param user the MCRUser
+     * @param legalEntityService the {@link MCRLegalEntityService} to use
+     */
+    protected MCRORCIDUser(MCRUser user, MCRLegalEntityService legalEntityService) {
+        this.user = user;
+        this.legalEntityService = legalEntityService;
     }
 
     /**
@@ -100,11 +114,10 @@ public class MCRORCIDUser {
         if (!MCRORCIDValidationHelper.validateORCID(orcid)) {
             throw new MCRORCIDException("Invalid ORCID iD");
         }
-        final MCRUserAttribute attribute = new MCRUserAttribute(ATTR_ORCID_ID, orcid);
-        // allow more than one ORCID iD per user
-        if (!user.getAttributes().contains(attribute)) {
-            user.getAttributes().add(new MCRUserAttribute(ATTR_ORCID_ID, orcid));
-        }
+        final MCRIdentifier newOrcid = new MCRIdentifier("orcid", orcid);
+        final MCRIdentifier userid = new MCRIdentifier("userid", user.getUserID());
+
+        legalEntityService.addIdentifier(userid, newOrcid);
     }
 
     /** Returns user's ORCID iDs.
@@ -112,9 +125,10 @@ public class MCRORCIDUser {
      * @return ORCID iDs as set
      */
     public Set<String> getORCIDs() {
-        return user.getAttributes().stream()
-            .filter(a -> Objects.equals(a.getName(), ATTR_ORCID_ID))
-            .map(MCRUserAttribute::getValue).collect(Collectors.toSet());
+        final MCRIdentifier userid = new MCRIdentifier("userid", user.getUserID());
+        Set<MCRIdentifier> orcidIdentifiers =  legalEntityService.findAllIdentifiers(userid);
+        return orcidIdentifiers.stream().filter(identifiers -> identifiers.getType().equals("orcid"))
+            .map(MCRIdentifier::getValue).collect(Collectors.toSet());
     }
 
     /**
@@ -232,9 +246,8 @@ public class MCRORCIDUser {
      * @return Set of MCRIdentifier
      */
     public Set<MCRIdentifier> getIdentifiers() {
-        return user.getAttributes().stream().filter(a -> a.getName().startsWith(ATTR_ID_PREFIX))
-            .map(a -> new MCRIdentifier(a.getName().substring(ATTR_ID_PREFIX.length()), a.getValue()))
-            .collect(Collectors.toSet());
+        final MCRIdentifier userId = new MCRIdentifier("userid", user.getUserID());
+        return legalEntityService.findAllIdentifiers(userId);
     }
 
     /**
