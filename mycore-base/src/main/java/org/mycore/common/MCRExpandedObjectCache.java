@@ -49,16 +49,9 @@ public final class MCRExpandedObjectCache {
         return instance;
     }
 
-    // false negative: https://github.com/pmd/pmd/issues/4516
-    @SuppressWarnings("PMD.UnusedLocalVariable")
     private static MCRExpandedObject readExpandedObject(Path expandedObjectPath) {
-        try (FileChannel channel =
-            FileChannel.open(expandedObjectPath, StandardOpenOption.READ, StandardOpenOption.WRITE,
-                StandardOpenOption.SYNC);
-            FileLock fl = channel.lock()) {
-            byte[] fileContent = new byte[(int) channel.size()];
-            ByteBuffer buffer = ByteBuffer.wrap(fileContent);
-            channel.read(buffer);
+        try {
+            byte[] fileContent = Files.readAllBytes(expandedObjectPath);
             SAXBuilder saxBuilder = new SAXBuilder();
             Document jdom = saxBuilder.build(new ByteArrayInputStream(fileContent));
             return new MCRExpandedObject(jdom);
