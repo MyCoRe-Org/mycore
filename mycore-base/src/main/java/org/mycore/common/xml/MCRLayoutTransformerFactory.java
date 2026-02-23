@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,6 +40,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.common.content.transformer.MCRIdentityTransformer;
+import org.mycore.common.content.transformer.MCRTransformerPipe;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.xml.sax.SAXException;
 
@@ -90,9 +92,99 @@ public class MCRLayoutTransformerFactory {
             return NOOP_TRANSFORMER;
         }
         String[] stylesheets = getStylesheets(idStripped, stylesheet);
-        MCRContentTransformer transformer = MCRXSLTransformer.obtainInstance(stylesheets);
+        MCRXSLTransformer transformer = MCRXSLTransformer.obtainInstance(stylesheets);
+        suggestProperties(idStripped, stylesheets, transformer);
         LOGGER.debug("Using stylesheet '{}' for {}", () -> Lists.newArrayList(stylesheets), () -> idStripped);
         return transformer;
+    }
+
+    private void suggestProperties(String idStripped, String[] stylesheets, MCRXSLTransformer transformer) {
+        if (!MCRConfiguration2.getBoolean("MCR.LayoutTransformerFactory.SuggestProperties").get()) {
+            return;
+        }
+        Class<? extends TransformerFactory> transformerClass = MCRConfiguration2
+            .<TransformerFactory>getClass("MCR.LayoutService.TransformerFactoryClass")
+            .orElseGet(TransformerFactory.newInstance()::getClass);
+        String classAlias = getTransformerClassValue(transformerClass);
+        StringBuilder properties = new StringBuilder();
+        properties.append("# Configuration for transformer ").append(idStripped).append('\n');
+        String cfgPrefix = "MCR.ContentTransformer.";
+        if (stylesheets.length == 1) {
+            properties.append(cfgPrefix)
+                .append(idStripped)
+                .append(".Class=")
+                .append(transformer.getClass().getName())
+                .append('\n');
+            properties.append(cfgPrefix)
+                    .append(idStripped)
+                    .append(".TransformerFactoryClass=")
+                    .append(classAlias)
+                    .append('\n');
+            properties.append(cfgPrefix)
+                .append(idStripped)
+                .append(".Stylesheet=")
+                .append(stylesheets[0])
+                .append('\n');
+        } else {
+            properties.append(cfgPrefix)
+                .append(idStripped)
+                .append(".Class=")
+                .append(MCRTransformerPipe.class.getName())
+                .append('\n');
+            properties.append(cfgPrefix)
+                .append(idStripped)
+                .append(".TransformerFactoryClass=")
+                .append(classAlias)
+                .append('\n');
+            properties.append(cfgPrefix)
+                .append(idStripped)
+                .append(".Steps=");
+            for (String stylesheet : stylesheets) {
+                properties
+                    .append(getTransformerId(stylesheet))
+                    .append(',');
+            }
+            //delete last comma
+            properties.deleteCharAt(properties.length() - 1);
+            properties.append('\n');
+            for (String stylesheet : stylesheets) {
+                String thisTransformerId = getTransformerId(stylesheet);
+                properties.append(cfgPrefix)
+                    .append(thisTransformerId)
+                    .append(".Class=")
+                    .append(transformer.getClass().getName())
+                    .append('\n');
+                properties.append(cfgPrefix)
+                    .append(thisTransformerId)
+                    .append(".TransformerFactoryClass=")
+                    .append(classAlias)
+                    .append('\n');
+                properties.append(cfgPrefix)
+                    .append(thisTransformerId)
+                    .append(".Stylesheet=")
+                    .append(stylesheet)
+                    .append('\n');
+            }
+        }
+        properties.append("# End of configuration for transformer ").append(idStripped).append('\n');
+        LOGGER.warn("Unconfigured transformer for {}. You can use the following properties to configure it:\n{}",
+            idStripped, properties);
+    }
+
+    //transforms a stylesheet path like "xsl/foo/playlist-simple.xsl" to an ID like "tmp_xsl_foo_playlist-simple"
+    private String getTransformerId(String stylesheet) {
+        String withoutExtension = stylesheet.replaceAll("\\.xsl$", "");
+        return "tmp_" + withoutExtension.replaceAll("[^a-zA-Z0-9]", "_");
+    }
+
+    private String getTransformerClassValue(Class<? extends TransformerFactory> transformerClass) {
+        if (Objects.equals(transformerClass.getName(), MCRConfiguration2.getStringOrThrow("SAXON"))) {
+            return "%SAXON%";
+        } else if (Objects.equals(transformerClass.getName(), MCRConfiguration2.getStringOrThrow("XALAN"))) {
+            return "%XALAN%";
+        } else {
+            return transformerClass.getName();
+        }
     }
 
     protected String[] getStylesheets(String id, String stylesheet)
