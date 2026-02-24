@@ -17,7 +17,7 @@
   ~ along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<xsl:stylesheet version="1.0"
+<xsl:stylesheet version="3.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:xed="http://www.mycore.de/xeditor"
                 xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
@@ -25,7 +25,7 @@
                 exclude-result-prefixes="xsl i18n mcruser"
 >
 
-    <xsl:include href="copynodes.xsl" />
+    <xsl:mode on-no-match="shallow-copy" />
 
     <xsl:param name="MCR.user2.Layout.inputSize" />
     <xsl:param name="MCR.user2.Layout.inputWidth" />
