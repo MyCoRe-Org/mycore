@@ -4,6 +4,8 @@
   xmlns:mcracl="http://www.mycore.de/xslt/acl"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   
+  <xsl:import href="resource:xslt/functions/acl.xsl" />
+
   <xsl:param name="WebApplicationBaseURL" />
   <!-- Duplicate: <xsl:param name="ServletsBaseURL" select="''" /> -->
   
