@@ -206,6 +206,10 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
                 long lastModified = templateSources[i].getLastModified();
                 if (templates[i] == null || modified[i] < lastModified || !useCache) {
                     SAXSource source = templateSources[i].getSource();
+                    if (source == null) {
+                        throw new TransformerConfigurationException(
+                            "XSLT Stylesheet could not be found: " + templateSources[i].getKey());
+                    }
                     templates[i] = tFactory.newTemplates(source);
                     if (templates[i] == null) {
                         throw new TransformerConfigurationException(
