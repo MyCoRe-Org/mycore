@@ -53,7 +53,7 @@ import org.mycore.orcid2.metadata.MCRORCIDUserInfo;
 import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.orcid2.user.MCRORCIDUserProperties;
 import org.mycore.orcid2.user.MCRORCIDUserUtils;
-import org.mycore.orcid2.util.MCRIdentifier;
+import org.mycore.datamodel.legalentity.MCRIdentifier;
 import org.mycore.user2.MCRUser;
 import org.orcid.jaxb.model.message.ScopeConstants;
 
