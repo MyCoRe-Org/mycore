@@ -49,4 +49,44 @@
         </xsl:choose>
     </xsl:function>
 
+    <!--
+      Function: mcri18n:select-lang
+      synopsis: returns $CurrentLang if $elements[lang($CurrentLang)] is not empty, else $DefaultLang
+
+      parameters:
+      - $elements: the elements to check
+    -->
+    <xsl:function name="mcri18n:select-lang" as="xs:string">
+        <xsl:param name="elements" as="element()*"/>
+
+        <xsl:sequence select="
+      if (exists($elements[lang($CurrentLang)])) then
+        $CurrentLang
+      else
+        $DefaultLang
+    "/>
+    </xsl:function>
+
+    <!--
+      Function: mcri18n:select-present-lang
+      synopsis: returns the result of select-lang if elements for that language are present,
+                else returns a language for which elements are present
+
+      parameters:
+      - $elements: the elements to check
+    -->
+    <xsl:function name="mcri18n:select-present-lang" as="xs:string?">
+        <xsl:param name="elements" as="element()*"/>
+
+        <xsl:variable name="check" as="xs:string"
+                      select="mcri18n:select-lang($elements)"/>
+
+        <xsl:sequence select="
+      if (exists($elements[lang($check)])) then
+        $check
+      else
+        ($elements/@xml:lang/string())[1]
+    "/>
+    </xsl:function>
+
 </xsl:stylesheet>
