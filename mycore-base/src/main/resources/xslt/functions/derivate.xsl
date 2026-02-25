@@ -1,10 +1,10 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="3.0"
-                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:fn="http://www.w3.org/2005/xpath-functions"
-                xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                xmlns:mcrderivate="http://www.mycore.de/xslt/derivate"
-                exclude-result-prefixes="fn xs">
+  xmlns:fn="http://www.w3.org/2005/xpath-functions"
+  xmlns:mcrderivate="http://www.mycore.de/xslt/derivate"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
 
     <xsl:function name="mcrderivate:get-main-file" as="xs:string">
         <xsl:param name="derivID" as="xs:string"/>

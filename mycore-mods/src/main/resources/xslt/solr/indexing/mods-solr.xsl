@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="3.0" 
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+<xsl:stylesheet version="3.0"
   xmlns:fn="http://www.w3.org/2005/xpath-functions"
-  xmlns:mods="http://www.loc.gov/mods/v3"
-  xmlns:xlink="http://www.w3.org/1999/xlink" 
   xmlns:mcrmods="http://www.mycore.de/xslt/mods"
-
-  exclude-result-prefixes="xlink mods fn mcrmods">
+  xmlns:mods="http://www.loc.gov/mods/v3"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
   
   <xsl:import href="xslImport:solr-document:solr/indexing/mods-solr.xsl" />
   <!-- already imported earlier in chain -->

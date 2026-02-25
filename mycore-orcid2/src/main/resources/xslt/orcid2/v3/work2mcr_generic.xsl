@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xsl:stylesheet version="3.0"
   xmlns="http://www.w3.org/TR/REC-html40"
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:mods="http://www.loc.gov/mods/v3"
-  xmlns:work="http://www.orcid.org/ns/work"
-  xmlns:common="http://www.orcid.org/ns/common"
+  xmlns:activities="http://www.orcid.org/ns/activities"
   xmlns:bulk="http://www.orcid.org/ns/bulk"
-  xmlns:activities="http://www.orcid.org/ns/activities">
+  xmlns:common="http://www.orcid.org/ns/common"
+  xmlns:mods="http://www.loc.gov/mods/v3"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:work="http://www.orcid.org/ns/work"
+  exclude-result-prefixes="#all">
 
   <xsl:template match="activities:works|activities:group|bulk:bulk">
     <xsl:copy>

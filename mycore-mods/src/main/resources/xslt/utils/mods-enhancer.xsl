@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="3.0" xmlns:mods="http://www.loc.gov/mods/v3" 
-  xmlns:xlink="http://www.w3.org/1999/xlink"
+<xsl:stylesheet version="3.0"
   xmlns:mcracl="http://www.mycore.de/xslt/acl"
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  xmlns:mods="http://www.loc.gov/mods/v3"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
   
   <xsl:import href="resource:xslt/functions/acl.xsl" />
 

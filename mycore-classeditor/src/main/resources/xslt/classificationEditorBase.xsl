@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="3.0"
-                xmlns:mcrproperty="http://www.mycore.de/xslt/property"
-                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                exclude-result-prefixes="mcrproperty">
+  xmlns:mcrproperty="http://www.mycore.de/xslt/property"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
 
   <xsl:include href="default-parameters.xsl" />
   <xsl:include href="xslInclude:functions" />

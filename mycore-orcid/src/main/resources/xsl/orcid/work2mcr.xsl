@@ -2,15 +2,15 @@
 
 <!-- Transforms the response of a HTTP GET request to the ORCID.org works API into MODS -->
 
-<xsl:stylesheet version="1.0" 
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+<xsl:stylesheet version="1.0"
+  xmlns:activities="http://www.orcid.org/ns/activities"
+  xmlns:bulk="http://www.orcid.org/ns/bulk"
+  xmlns:common="http://www.orcid.org/ns/common"
   xmlns:mods="http://www.loc.gov/mods/v3"
   xmlns:xalan="http://xml.apache.org/xalan"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:work="http://www.orcid.org/ns/work"
-  xmlns:common="http://www.orcid.org/ns/common"
-  xmlns:bulk="http://www.orcid.org/ns/bulk"
-  xmlns:activities="http://www.orcid.org/ns/activities"
-  exclude-result-prefixes="xsl xalan">
+  exclude-result-prefixes="xalan xsl">
 
   <xsl:template match="activities:works|activities:group|bulk:bulk">
     <xsl:copy>

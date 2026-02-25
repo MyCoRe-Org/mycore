@@ -1,10 +1,10 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="3.0"
-                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:fn="http://www.w3.org/2005/xpath-functions"
-                xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                xmlns:mcracl="http://www.mycore.de/xslt/acl"
-                exclude-result-prefixes="fn xs">
+  xmlns:fn="http://www.w3.org/2005/xpath-functions"
+  xmlns:mcracl="http://www.mycore.de/xslt/acl"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
 
   <xsl:function name="mcracl:check-permission" as="xs:boolean">
     <xsl:param name="id" as="xs:string?" />

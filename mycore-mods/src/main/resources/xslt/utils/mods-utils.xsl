@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="3.0" 
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+<xsl:stylesheet version="3.0"
   xmlns:fn="http://www.w3.org/2005/xpath-functions"
-  xmlns:mods="http://www.loc.gov/mods/v3"
-  xmlns:xlink="http://www.w3.org/1999/xlink" 
-  xmlns:mcrstring="http://www.mycore.de/xslt/stringutils"
   xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
-  
-  exclude-result-prefixes="xlink mods fn mcri18n">
+  xmlns:mcrstringutils="http://www.mycore.de/xslt/stringutils"
+  xmlns:mods="http://www.loc.gov/mods/v3"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
   
   <xsl:param name="CurrentUser" />
   <xsl:param name="CurrentLang" />
@@ -306,7 +305,7 @@
         <xsl:with-param name="withSubtitle" select="true()"/>
       </xsl:apply-templates>
     </xsl:variable>
-    <xsl:value-of select="mcrstring:shorten($completeTitle, $MCR.MODS.Utils.shortenTitleLength)" />
+    <xsl:value-of select="mcrstringutils:shorten($completeTitle, $MCR.MODS.Utils.shortenTitleLength)" />
   </xsl:template>
 
   <!--Template for access conditions -->

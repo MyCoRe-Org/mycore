@@ -3,11 +3,10 @@
 <!-- XSL to search for users and display the list users found -->
 
 <xsl:stylesheet version="3.0"
-                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
-                xmlns:mcrurl="http://www.mycore.de/xslt/url"
-                exclude-result-prefixes="xsl mcri18n mcrurl"
->
+  xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
+  xmlns:mcrurl="http://www.mycore.de/xslt/url"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
 
   <xsl:include href="users.xsl" />
 

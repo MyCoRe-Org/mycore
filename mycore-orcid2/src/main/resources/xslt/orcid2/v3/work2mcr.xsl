@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xsl:stylesheet version="3.0"
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-  xmlns:mods="http://www.loc.gov/mods/v3"
-  xmlns:work="http://www.orcid.org/ns/work"
   xmlns:common="http://www.orcid.org/ns/common"
-  exclude-result-prefixes="xsl">
+  xmlns:mods="http://www.loc.gov/mods/v3"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:work="http://www.orcid.org/ns/work"
+  exclude-result-prefixes="#all">
 
   <xsl:import href="resource:xslt/orcid2/v3/work2mcr_generic.xsl" />
 

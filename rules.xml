@@ -459,7 +459,6 @@
     </properties>
   </rule>
 
-
   <rule name="MCR.ClassTools.Clone"
         language="java"
         message="MCRClassTools#clone should be called as MCRClassTools.clone(getClass(), super::clone) exactly"
@@ -493,6 +492,34 @@
   </rule>
 
 
-
+  <!-- rule name="MCR.XSLT.ExcludeAllResultPrefixes"
+    language="xml"
+    message="XSLT 2.0 and 3.0 stylesheets should set exclude-result-prefixes='#all' to prevent unused namespaces output."
+    class="net.sourceforge.pmd.lang.xml.rule.DomXPathRule">
+    <description>
+      When using XSLT 2.0 or 3.0, it is a best practice to use exclude-result-prefixes="#all"
+      to ensure that only explicitly required namespaces are included in the result document.
+    </description>
+    <priority>1</priority>
+    <properties>
+      <property name="xpath">
+        <value>
+          <![CDATA[
+            /*
+              [
+                namespace-uri()='http://www.w3.org/1999/XSL/Transform'
+                  and
+                local-name()='stylesheet'
+                  and
+                (@version='2.0' or @version='3.0')
+              ]
+              [
+                not(@exclude-result-prefixes='#all')
+              ]
+          ]]>
+        </value>
+      </property>
+    </properties>
+  </rule -->
 
 </ruleset>

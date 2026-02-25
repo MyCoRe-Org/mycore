@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <xsl:stylesheet version="1.0"
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:xed="http://www.mycore.de/xeditor"
   xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
-  exclude-result-prefixes="xsl xed mcri18n">
+  xmlns:xed="http://www.mycore.de/xeditor"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="mcri18n xed xsl">
 
   <xsl:import href="resource:xslt/functions/i18n.xsl" />
 

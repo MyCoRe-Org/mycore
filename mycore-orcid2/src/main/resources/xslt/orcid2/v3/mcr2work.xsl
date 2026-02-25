@@ -3,10 +3,10 @@
 <!-- Transforms MyCoRe object with MODS to ORCID works XML schema -->
 
 <xsl:stylesheet version="3.0"
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
   xmlns:mods="http://www.loc.gov/mods/v3"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:work="http://www.orcid.org/ns/work"
-  exclude-result-prefixes="xsl mods">
+  exclude-result-prefixes="#all">
 
   <xsl:import href="resource:xslt/orcid2/v3/mcr2work_generic.xsl" />
 
