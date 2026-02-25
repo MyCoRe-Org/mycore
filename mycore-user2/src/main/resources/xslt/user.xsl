@@ -12,7 +12,7 @@
 
   <xsl:variable name="PageID" select="'show-user'"/>
 
-  <xsl:variable name="PageTitle" select="concat(mcri18n:translate('component.user2.admin.userDisplay'),/user/@name)"/>
+  <xsl:variable name="PageTitle" select="concat(mcri18n:translate('component.user2.admin.userDisplay'),' ',/user/@name)"/>
 
   <xsl:param name="step"/>
 
@@ -82,7 +82,7 @@
       </div>
       <div class="clearfix"/>
       <h2>
-        <xsl:value-of select="concat(mcri18n:translate('component.user2.admin.userDisplay'),@name)"/>
+        <xsl:value-of select="concat(mcri18n:translate('component.user2.admin.userDisplay'),' ',@name)"/>
       </h2>
       <xsl:if test="$step = 'confirmDelete'">
         <div class="section alert alert-danger">
