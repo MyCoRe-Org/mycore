@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="3.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  
-  <xsl:key name="maxScore" match="@maxScore" use="../preceding-sibling::str[@name='groupValue']" />
+<xsl:stylesheet version="3.0"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
+
+<xsl:key name="maxScore" match="@maxScore" use="../preceding-sibling::str[@name='groupValue']" />
   <xsl:variable name="maxScore" select="/response/lst[@name='grouped']/lst/arr[@name='groups']/lst/result/@maxScore[not(. &lt; ../../../lst/result/@maxScore)][1]" />
   <xsl:variable name="response" select="/response" />
 	<!-- 

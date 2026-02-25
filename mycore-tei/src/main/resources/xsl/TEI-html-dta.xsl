@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:tei="http://www.tei-c.org/ns/1.0"
-                xmlns:encoder="xalan://java.net.URLEncoder"
-                xmlns:xalan="http://xml.apache.org/xalan"
-                exclude-result-prefixes="tei"
-                version="1.0">
+<xsl:stylesheet version="1.0"
+  xmlns:encoder="xalan://java.net.URLEncoder"
+  xmlns:tei="http://www.tei-c.org/ns/1.0"
+  xmlns:xalan="http://xml.apache.org/xalan"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="tei xsl">
 
   <xsl:output method="html"/>
   <xsl:template match="tei:TEI">

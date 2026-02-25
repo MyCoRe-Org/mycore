@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:xed="http://www.mycore.de/xeditor"
-                xmlns:mcrsolr="http://www.mycore.de/components/solr">
+<xsl:stylesheet version="1.0"
+  xmlns:xed="http://www.mycore.de/xeditor"
+  xmlns:xedsolr="http://www.mycore.de/components/solr"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="xsl">
 
   <xsl:param name="MCR.Solr.ServerURL" />
   <xsl:param name="MCR.Solr.Core.main.Name" />
@@ -9,10 +11,10 @@
   <xsl:param name="MCR.Solr.Core.classification.Name" />
   <xsl:param name="MCR.Solr.Core.classification.ServerURL" />
 
-  <xsl:variable name="mcrsolr:label-width" select="9" />
-  <xsl:variable name="mcrsolr:input-width" select="9" />
+  <xsl:variable name="xedsolr:label-width" select="9" />
+  <xsl:variable name="xedsolr:input-width" select="9" />
 
-  <xsl:template match="mcrsolr:fieldset">
+  <xsl:template match="xedsolr:fieldset">
     <xsl:variable name="paraname">
       <xsl:choose>
         <xsl:when test="@param">
@@ -40,8 +42,8 @@
             <xsl:copy-of select="@title" />
           </input>
           <xsl:choose>
-            <xsl:when test="mcrsolr:label">
-              <xsl:copy-of select="mcrsolr:label/node()" />
+            <xsl:when test="xedsolr:label">
+              <xsl:copy-of select="xedsolr:label/node()" />
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="@name" />
@@ -55,9 +57,9 @@
     </fieldset>
   </xsl:template>
 
-  <xsl:template match="mcrsolr:textfield">
+  <xsl:template match="xedsolr:textfield">
     <xsl:variable name="id">
-      <xsl:call-template name="mcrsolr:getId" />
+      <xsl:call-template name="xedsolr:getId" />
     </xsl:variable>
     <xsl:choose>
       <xsl:when test="@repeatable='true'">
@@ -110,9 +112,9 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="mcrsolr:checkbox">
+  <xsl:template match="xedsolr:checkbox">
     <xsl:variable name="id">
-      <xsl:call-template name="mcrsolr:getId" />
+      <xsl:call-template name="xedsolr:getId" />
     </xsl:variable>
     <xsl:variable name="paraname">
       <xsl:choose>
@@ -162,9 +164,9 @@
     </xed:bind>
   </xsl:template>
 
-  <xsl:template match="mcrsolr:textarea">
+  <xsl:template match="xedsolr:textarea">
     <xsl:variable name="id">
-      <xsl:call-template name="mcrsolr:getId" />
+      <xsl:call-template name="xedsolr:getId" />
     </xsl:variable>
     <xed:bind xpath="param[@name='{@name}']">
       <xsl:copy-of select="@initially" />
@@ -183,7 +185,7 @@
     </xed:bind>
   </xsl:template>
 
-  <xsl:template name="mcrsolr:getId">
+  <xsl:template name="xedsolr:getId">
     <xsl:choose>
       <xsl:when test="@id">
         <xsl:value-of select="@id" />
@@ -194,11 +196,11 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="mcrsolr:label">
+  <xsl:template match="xedsolr:label">
   <!-- Labels are used in head of fieldset only -->
   </xsl:template>
 
-  <xsl:template match="mcrsolr:fieldsHelp">
+  <xsl:template match="xedsolr:fieldsHelp">
     <xsl:apply-templates select="." mode="with-core">
       <xsl:with-param name="core" select="'main'" />
     </xsl:apply-templates>
@@ -207,7 +209,7 @@
     </xsl:apply-templates>
   </xsl:template>
 
-  <xsl:template match="mcrsolr:fieldsHelp" mode="with-core">
+  <xsl:template match="xedsolr:fieldsHelp" mode="with-core">
     <xsl:param name="core" />
     <xsl:if test="string-length($core) &gt; 0">
       <div class="table-responsive">

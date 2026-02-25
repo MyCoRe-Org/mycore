@@ -1,9 +1,9 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="3.0"
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:fn="http://www.w3.org/2005/xpath-functions"
+  xmlns:mcrsolr="http://www.mycore.de/xslt/solr"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:mcrsolr="http://www.mycore.de/xslt/solr">
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
 
   <xsl:function name="mcrsolr:historydate-julian-day-to-date-string" as="xs:string">
     <xsl:param name="jdn" as="xs:integer" />

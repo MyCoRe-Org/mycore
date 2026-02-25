@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ This file is part of ***  M y C o R e  ***
   ~ See https://www.mycore.de/ for details.
@@ -23,10 +24,10 @@
      and attribute node names througout the document.
 -->
 <xsl:stylesheet version="2.0"
-                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                xmlns:nn="http://lenzconsulting.com/namespace-normalizer"
-                exclude-result-prefixes="xs nn">
+  xmlns:nn="http://lenzconsulting.com/namespace-normalizer"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
 
     <!-- Set to true to print debugging info -->
     <xsl:param name="DEBUG" select="false()"/>

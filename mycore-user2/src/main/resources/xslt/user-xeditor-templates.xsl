@@ -18,12 +18,10 @@
   -->
 
 <xsl:stylesheet version="3.0"
-                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:xed="http://www.mycore.de/xeditor"
-                xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
-                xmlns:mcruser="http://www.mycore.de/components/mcruser"
-                exclude-result-prefixes="xsl i18n mcruser"
->
+  xmlns:xed="http://www.mycore.de/xeditor"
+  xmlns:xeduser="http://www.mycore.de/components/mcruser"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
 
     <xsl:mode on-no-match="shallow-copy" />
 
@@ -54,7 +52,7 @@
     </xsl:variable>
     <xsl:variable name="label-width" select="$grid-width - $input-width" />
 
-    <xsl:template match="mcruser:template[contains('textInput|passwordInput|selectInput|checkboxList|radioList|textArea', @name)]">
+    <xsl:template match="xeduser:template[contains('textInput|passwordInput|selectInput|checkboxList|radioList|textArea', @name)]">
         <xed:bind xpath="{@xpath}">
             <xsl:if test="string-length(@default) &gt; 0">
                 <xsl:attribute name="default">
@@ -78,7 +76,7 @@
         </xed:bind>
     </xsl:template>
 
-    <xsl:template match="mcruser:template[@name='submitButton']">
+    <xsl:template match="xeduser:template[@name='submitButton']">
         <xsl:variable name="target">
             <xsl:choose>
                 <xsl:when test="@target">
@@ -100,7 +98,7 @@
         </button>
     </xsl:template>
 
-    <xsl:template match="mcruser:template[@name='cancelButton']">
+    <xsl:template match="xeduser:template[@name='cancelButton']">
         <button type="submit" xed:target="cancel" class="btn btn-secondary btn-{$input-size}">
             <xed:output i18n="{@i18n}" />
         </button>
@@ -108,7 +106,7 @@
 
     <!-- MODE=formline -->
 
-    <xsl:template match="mcruser:template[contains('textInput|passwordInput|selectInput|checkboxList|radioList|textArea', @name)]" mode="formline">
+    <xsl:template match="xeduser:template[contains('textInput|passwordInput|selectInput|checkboxList|radioList|textArea', @name)]" mode="formline">
         <xsl:if test="string-length(@i18n) &gt; 0">
             <xsl:apply-templates select="." mode="label" />
         </xsl:if>
@@ -132,7 +130,7 @@
 
     <!-- MODE=inline -->
 
-    <xsl:template match="mcruser:template[contains('textInput|passwordInput|selectInput', @name)]" mode="inline">
+    <xsl:template match="xeduser:template[contains('textInput|passwordInput|selectInput', @name)]" mode="inline">
         <xsl:variable name="colsize">
             <xsl:choose>
                 <xsl:when test="string-length(@colsize) &gt; 0">
@@ -171,7 +169,7 @@
 
     <!-- MODE=validation -->
 
-    <xsl:template match="mcruser:template[contains('textInput|passwordInput|selectInput|checkboxList|radioList|textArea', @name)]" mode="validation">
+    <xsl:template match="xeduser:template[contains('textInput|passwordInput|selectInput|checkboxList|radioList|textArea', @name)]" mode="validation">
         <xsl:if test="@required = 'true' or @validate = 'true'">
             <xsl:variable name="display">
                 <xsl:choose>
@@ -197,7 +195,7 @@
 
     <!-- MODE=widget -->
 
-    <xsl:template match="mcruser:template[@name='textInput']" mode="widget">
+    <xsl:template match="xeduser:template[@name='textInput']" mode="widget">
         <input type="text" class="form-control input-{$input-size} {@class}" id="{@id}">
             <xsl:if test="string-length(@placeholder) &gt; 0">
                 <xsl:attribute name="placeholder">
@@ -208,7 +206,7 @@
         </input>
     </xsl:template>
 
-    <xsl:template match="mcruser:template[@name='passwordInput']" mode="widget">
+    <xsl:template match="xeduser:template[@name='passwordInput']" mode="widget">
         <input type="password" class="form-control input-{$input-size} {@class}" id="{@id}">
             <xsl:if test="string-length(@placeholder) &gt; 0">
                 <xsl:attribute name="placeholder">
@@ -219,7 +217,7 @@
         </input>
     </xsl:template>
 
-    <xsl:template match="mcruser:template[@name='selectInput']" mode="widget">
+    <xsl:template match="xeduser:template[@name='selectInput']" mode="widget">
         <select class="form-control input-{$input-size} {@class}" id="{@id}">
             <xsl:apply-templates select="." mode="inputOptions" />
             <option value="">
@@ -232,7 +230,7 @@
         </select>
     </xsl:template>
 
-    <xsl:template match="mcruser:template[@name='textArea']" mode="widget">
+    <xsl:template match="xeduser:template[@name='textArea']" mode="widget">
         <textarea class="form-control input-{$input-size} {@class}" id="{@id}">
             <xsl:attribute name="rows">
                 <xsl:choose>
@@ -253,7 +251,7 @@
         </textarea>
     </xsl:template>
 
-    <xsl:template match="mcruser:template[@name='checkboxList' or @name='radioList']" mode="widget">
+    <xsl:template match="xeduser:template[@name='checkboxList' or @name='radioList']" mode="widget">
         <xsl:apply-templates select="option" mode="optionList">
             <xsl:with-param name="inputType">
                 <xsl:if test="@name='radioList'">
@@ -287,7 +285,7 @@
         </div>
     </xsl:template>
 
-    <xsl:template match="mcruser:template" mode="inputOptions">
+    <xsl:template match="xeduser:template" mode="inputOptions">
         <xsl:if test="string(number(@maxlength)) != 'NaN'">
             <xsl:attribute name="maxlength">
                 <xsl:value-of select="@maxlength" />
@@ -300,13 +298,13 @@
         </xsl:if>
     </xsl:template>
 
-    <xsl:template match="mcruser:template" mode="label">
+    <xsl:template match="xeduser:template" mode="label">
         <label for="{@id}" class="col-md-{$label-width} control-label">
             <xed:output i18n="{@i18n}" />
         </label>
     </xsl:template>
 
-    <xsl:template match="mcruser:template" mode="inputTooltip">
+    <xsl:template match="xeduser:template" mode="inputTooltip">
         <xsl:if test="@tooltip">
             <span class="input-group-addon" data-toggle="tooltip">
                 <xsl:attribute name="title">

@@ -4,6 +4,7 @@
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:mcrclass="http://www.mycore.de/xslt/classification"
                 exclude-result-prefixes="#all">
+
   <xsl:include href="resource:xslt/functions/classification.xsl"/>
 
   <xsl:param name="classid" as="xs:string"/>
