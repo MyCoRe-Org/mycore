@@ -1453,6 +1453,7 @@ public final class MCRURIResolver implements URIResolver {
                     case "abbrev" -> MCRCoreVersion.getAbbrev();
                     case "branch" -> MCRCoreVersion.getBranch();
                     case "version" -> MCRCoreVersion.getVersion();
+                    case "completeVersion" -> MCRCoreVersion.getCompleteVersion();
                     case "revision" -> MCRCoreVersion.getRevision();
                     default -> MCRCoreVersion.getCompleteVersion();
                 });
