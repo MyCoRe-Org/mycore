@@ -3,6 +3,7 @@
                 version="3.0"
 >
 
+    <xsl:include href="resource:xslt/default-parameters.xsl" />
     <xsl:include href="resource:xslt/functions/i18n.xsl" />
 
     <xsl:template match="properties-analyze">
