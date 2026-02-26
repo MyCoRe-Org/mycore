@@ -105,6 +105,7 @@ import org.mycore.datamodel.metadata.MCRXMLConstants;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.MCRPathXML;
 import org.mycore.frontend.MCRLayoutUtilities;
+import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.resource.MCRResourceHelper;
 import org.mycore.resource.MCRResourcePath;
 import org.mycore.services.http.MCRURLQueryParameter;
@@ -241,6 +242,7 @@ public final class MCRURIResolver implements URIResolver {
         supportedSchemes.put("https", restResolver);
         supportedSchemes.put("file", new MCRFileResolver());
         supportedSchemes.put("cache", new MCRCachingResolver());
+        supportedSchemes.put("websiteWriteProtection", new MCRWebsiteWriteProtectionResolver());
         return supportedSchemes;
     }
 
@@ -1502,6 +1504,32 @@ public final class MCRURIResolver implements URIResolver {
                 }
             }
             throw new TransformerException("Unknown argument: " + args[2]);
+        }
+    }
+
+    /**
+     * Resolver for MCRWebsiteWriteProtection. Returns an XML with the following format:
+     * <code>
+     *   &lt;message  active="true|false"&gt;Message to display when write protection is active&lt;/message&gt;
+     * </code>
+     */
+    private static final class MCRWebsiteWriteProtectionResolver implements URIResolver {
+
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            boolean active = MCRWebsiteWriteProtection.isActive();
+            org.w3c.dom.Document message;
+            try {
+                message = MCRWebsiteWriteProtection.getMessage();
+            } catch (JDOMException e) {
+                throw new TransformerException(e);
+            }
+            if (message.getDocumentElement() == null) {
+                //fallback to default message if no message is set
+                message.appendChild(message.createElement("message"));
+            }
+            message.getDocumentElement().setAttribute("active", String.valueOf(active));
+            return new DOMSource(message);
         }
     }
 
