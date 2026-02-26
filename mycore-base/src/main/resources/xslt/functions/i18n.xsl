@@ -39,6 +39,12 @@
         </xsl:choose>
     </xsl:function>
 
+    <xsl:function name="mcri18n:exists" as="xs:boolean">
+        <xsl:param name="key" as="xs:string"/>
+        <xsl:variable name="translation" select="mcri18n:translate($key)" as="xs:string" />
+        <xsl:sequence select="$translation != concat('???', $key, '???')"/>
+    </xsl:function>
+
     <xsl:function name="mcri18n:text-direction" as="xs:string">
         <xsl:param name="language" as="xs:string"/>
 
