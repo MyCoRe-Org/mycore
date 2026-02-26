@@ -1,9 +1,12 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!--Transforms output of MCRXSLInfoServlet to build a GraphML graph of all *.xsl stylesheets and their dependencies -->
 
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns="http://graphml.graphdrawing.org/xmlns" exclude-result-prefixes="xsl">
+<xsl:stylesheet version="1.0"
+  xmlns="http://graphml.graphdrawing.org/xmlns"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  exclude-result-prefixes="xsl">
 
   <xsl:param name="mode" />
   <xsl:param name="edge" />

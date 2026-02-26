@@ -2,7 +2,7 @@
 <!DOCTYPE MyCoReWebPage>
 <MyCoReWebPage>
   <section i18n="component.user2.admin.changeCurrent.title" xml:lang="all">
-    <xed:form class="userEditor form-horizontal" role="form" xmlns:xed="http://www.mycore.de/xeditor" xmlns:mcruser="http://www.mycore.de/components/mcruser">
+    <xed:form class="userEditor form-horizontal" role="form" xmlns:xed="http://www.mycore.de/xeditor">
       <xed:preload uri="xslStyle:user-xeditor-templates#xslt:webapp:authorization/user-editor.xed" />
       <xed:preload uri="xslStyle:user-xeditor-templates#xslt:webapp:{$MCR.UserForms.CustomIncludes}" />
       <xed:source uri="user:current" />

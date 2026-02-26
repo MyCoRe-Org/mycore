@@ -1,9 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:mods="http://www.loc.gov/mods/v3" exclude-result-prefixes="mods"
-	xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:srw_dc="info:srw/schema/1/dc-schema"
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet version="1.0"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:mods="http://www.loc.gov/mods/v3"
 	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
-	xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+	xmlns:srw_dc="info:srw/schema/1/dc-schema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+	exclude-result-prefixes="mods xsl">
 
 	<!-- 
 	Version 1.4		2013-12-13 tmee@loc.gov

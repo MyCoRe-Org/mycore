@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<xsl:stylesheet version="1.0" 
-                xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-                xmlns:xed="http://www.mycore.de/xeditor"
-                xmlns:fn="http://www.w3.org/2005/xpath-functions"
-                exclude-result-prefixes="xsl xed fn">
+<xsl:stylesheet version="1.0"
+  xmlns:fn="http://www.w3.org/2005/xpath-functions"
+  xmlns:xed="http://www.mycore.de/xeditor"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="fn xed xsl">
 
   <xsl:strip-space elements="xed:*" />
 

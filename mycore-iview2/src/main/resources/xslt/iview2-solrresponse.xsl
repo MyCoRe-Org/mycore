@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="3.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:mcracl="http://www.mycore.de/xslt/acl"
-                xmlns:mcri18n="http://www.mycore.de/xslt/i18n">
+<xsl:stylesheet version="3.0"
+  xmlns:mcracl="http://www.mycore.de/xslt/acl"
+  xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="$all">
 
   <xsl:param name="MCR.Module-iview2.useNewViewer" />
-
 
   <xsl:template match="doc" mode="fileLink" priority="2">
     <xsl:param name="mcrid" select="str[@name='returnId']" />

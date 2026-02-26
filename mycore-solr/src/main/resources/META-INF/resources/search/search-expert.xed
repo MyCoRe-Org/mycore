@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<MyCoReWebPage xmlns:xed="http://www.mycore.de/xeditor" xmlns:mcrsolr="http://www.mycore.de/components/solr">
+<MyCoReWebPage xmlns:xed="http://www.mycore.de/xeditor" xmlns:xedsolr="http://www.mycore.de/components/solr">
   <section title="SOLR Experten-Suche" xml:lang="de" />
 
   <section title="SOLR expert search" xml:lang="en" />
@@ -90,16 +90,16 @@ form .optional.expanded .fieldset{
                 </h3>
               </div>
               <div class="card-body">
-                <mcrsolr:textfield name="core" title="SOLR core (alias, e.g. 'main' or 'classification')." default="main" />
-                <mcrsolr:textfield name="qt" title="Request handler in solrconfig.xml." default="/select" />
+                <xedsolr:textfield name="core" title="SOLR core (alias, e.g. 'main' or 'classification')." default="main" />
+                <xedsolr:textfield name="qt" title="Request handler in solrconfig.xml." default="/select" />
 
                 <fieldset class="common">
                   <legend>common</legend>
                   <div class="fieldset">
 
-                    <mcrsolr:textarea name="q" default="*:*" title="The query string." />
-                    <mcrsolr:textfield name="fq" repeatable="true" />
-                    <mcrsolr:textfield name="sort" title="Sort field or function with asc|desc." />
+                    <xedsolr:textarea name="q" default="*:*" title="The query string." />
+                    <xedsolr:textfield name="fq" repeatable="true" />
+                    <xedsolr:textfield name="sort" title="Sort field or function with asc|desc." />
 
                     <div class="form-group">
                       <label class="col-{$label-width} control-label" for="start">
@@ -123,8 +123,8 @@ form .optional.expanded .fieldset{
                       </div>
                     </div>
 
-                    <mcrsolr:textfield name="fl" title="Field list, comma separated." />
-                    <mcrsolr:textfield name="df" title="Default search field" />
+                    <xedsolr:textfield name="fl" title="Field list, comma separated." />
+                    <xedsolr:textfield name="df" title="Default search field" />
 
                     <div class="form-group">
                       <label class="col-{$label-width} control-label" for="custom_parameters">
@@ -171,81 +171,81 @@ form .optional.expanded .fieldset{
                       </div>
                     </xed:bind>
 
-                    <mcrsolr:checkbox name="indent" />
-                    <mcrsolr:checkbox name="debugQuery" />
-                    <mcrsolr:checkbox param="XSL.Style" name="xml" label="XSL.Style=xml" title="Do not layout XML output." />
+                    <xedsolr:checkbox name="indent" />
+                    <xedsolr:checkbox name="debugQuery" />
+                    <xedsolr:checkbox param="XSL.Style" name="xml" label="XSL.Style=xml" title="Do not layout XML output." />
 
                   </div>
                 </fieldset>
 
-                <mcrsolr:fieldset name="dismax" param="defType">
-                  <mcrsolr:textfield name="q.alt" title="Alternate query when 'q' is absent." />
-                  <mcrsolr:textfield name="qf" title="Query fields with optional boosts." />
-                  <mcrsolr:textfield name="mm" title="Min-should-match expression." />
-                  <mcrsolr:textfield name="pf" title="Phrase boosted fields." />
-                  <mcrsolr:textfield name="ps" title="Phrase boost slop." />
-                  <mcrsolr:textfield name="qs" title="Query string phrase slop." />
-                  <mcrsolr:textfield name="tie" title="Score tie-breaker. Try 0.1." placeholder="0.1" />
-                  <mcrsolr:textfield name="bq" title="Boost query." />
-                  <mcrsolr:textfield name="bf" title="Boost function (added)." />
-                </mcrsolr:fieldset>
+                <xedsolr:fieldset name="dismax" param="defType">
+                  <xedsolr:textfield name="q.alt" title="Alternate query when 'q' is absent." />
+                  <xedsolr:textfield name="qf" title="Query fields with optional boosts." />
+                  <xedsolr:textfield name="mm" title="Min-should-match expression." />
+                  <xedsolr:textfield name="pf" title="Phrase boosted fields." />
+                  <xedsolr:textfield name="ps" title="Phrase boost slop." />
+                  <xedsolr:textfield name="qs" title="Query string phrase slop." />
+                  <xedsolr:textfield name="tie" title="Score tie-breaker. Try 0.1." placeholder="0.1" />
+                  <xedsolr:textfield name="bq" title="Boost query." />
+                  <xedsolr:textfield name="bf" title="Boost function (added)." />
+                </xedsolr:fieldset>
 
-                <mcrsolr:fieldset name="edismax" param="defType">
-                  <mcrsolr:label>
+                <xedsolr:fieldset name="edismax" param="defType">
+                  <xedsolr:label>
                     <strong> e</strong>dismax
-                  </mcrsolr:label>
-                  <mcrsolr:textfield name="q.alt" id="edismax_q_alt" title="Alternate query when 'q' is absent." />
-                  <mcrsolr:textfield name="qf" id="edismax_qf" title="Query fields with optional boosts." />
-                  <mcrsolr:textfield name="mm" id="edismax_mm" title="Min-should-match expression." />
-                  <mcrsolr:textfield name="pf" id="edismax_pf" title="Phrase boosted fields." />
-                  <mcrsolr:textfield name="ps" id="edismax_ps" title="Phrase boost slop." />
-                  <mcrsolr:textfield name="qs" id="edismax_qs" title="Query string phrase slop." />
-                  <mcrsolr:textfield name="tie" id="edismax_tie" title="Score tie-breaker. Try 0.1." placeholder="0.1" />
-                  <mcrsolr:textfield name="bq" id="edismax_bq" title="Boost query." />
-                  <mcrsolr:textfield name="bf" id="edismax_bf" title="Boost function (added)." />
-                  <mcrsolr:textfield name="uf" id="edismax_uf" title="User Fields" />
-                  <mcrsolr:textfield name="pf2" id="edismax_pf2" title="bigram phrase boost fields" />
-                  <mcrsolr:textfield name="pf3" id="edismax_pf3" title="trigram phrase boost fields" />
-                  <mcrsolr:textfield name="ps2" id="edismax_ps2" title="phrase slop for bigram phrases" />
-                  <mcrsolr:textfield name="ps3" id="edismax_ps3" title="phrase slop for trigram phrases" />
-                  <mcrsolr:textfield name="boost" id="edismax_boost" title="multiplicative boost function" />
-                  <mcrsolr:checkbox name="stopwords" id="edismax_stopwords" title="remove stopwords from mandatory 'matching' component" />
-                  <mcrsolr:checkbox name="lowercaseOperators" id="edismax_lowercaseOperators" title="Enable lower-case 'and' and 'or' as operators" />
-                </mcrsolr:fieldset>
+                  </xedsolr:label>
+                  <xedsolr:textfield name="q.alt" id="edismax_q_alt" title="Alternate query when 'q' is absent." />
+                  <xedsolr:textfield name="qf" id="edismax_qf" title="Query fields with optional boosts." />
+                  <xedsolr:textfield name="mm" id="edismax_mm" title="Min-should-match expression." />
+                  <xedsolr:textfield name="pf" id="edismax_pf" title="Phrase boosted fields." />
+                  <xedsolr:textfield name="ps" id="edismax_ps" title="Phrase boost slop." />
+                  <xedsolr:textfield name="qs" id="edismax_qs" title="Query string phrase slop." />
+                  <xedsolr:textfield name="tie" id="edismax_tie" title="Score tie-breaker. Try 0.1." placeholder="0.1" />
+                  <xedsolr:textfield name="bq" id="edismax_bq" title="Boost query." />
+                  <xedsolr:textfield name="bf" id="edismax_bf" title="Boost function (added)." />
+                  <xedsolr:textfield name="uf" id="edismax_uf" title="User Fields" />
+                  <xedsolr:textfield name="pf2" id="edismax_pf2" title="bigram phrase boost fields" />
+                  <xedsolr:textfield name="pf3" id="edismax_pf3" title="trigram phrase boost fields" />
+                  <xedsolr:textfield name="ps2" id="edismax_ps2" title="phrase slop for bigram phrases" />
+                  <xedsolr:textfield name="ps3" id="edismax_ps3" title="phrase slop for trigram phrases" />
+                  <xedsolr:textfield name="boost" id="edismax_boost" title="multiplicative boost function" />
+                  <xedsolr:checkbox name="stopwords" id="edismax_stopwords" title="remove stopwords from mandatory 'matching' component" />
+                  <xedsolr:checkbox name="lowercaseOperators" id="edismax_lowercaseOperators" title="Enable lower-case 'and' and 'or' as operators" />
+                </xedsolr:fieldset>
 
-                <mcrsolr:fieldset name="hl" title="Enable highlighting.">
-                  <mcrsolr:textfield name="hl.fl" title="Fields to highlight on." />
-                  <mcrsolr:textfield name="hl.simple.pre" initially="&lt;em&gt;" />
-                  <mcrsolr:textfield name="hl.simple.post" initially="&lt;/em&gt;" />
-                  <mcrsolr:checkbox name="hl.requireFieldMatch" />
-                  <mcrsolr:checkbox name="hl.usePhraseHighlighter" />
-                  <mcrsolr:checkbox name="hl.highlightMultiTerm" />
-                </mcrsolr:fieldset>
+                <xedsolr:fieldset name="hl" title="Enable highlighting.">
+                  <xedsolr:textfield name="hl.fl" title="Fields to highlight on." />
+                  <xedsolr:textfield name="hl.simple.pre" initially="&lt;em&gt;" />
+                  <xedsolr:textfield name="hl.simple.post" initially="&lt;/em&gt;" />
+                  <xedsolr:checkbox name="hl.requireFieldMatch" />
+                  <xedsolr:checkbox name="hl.usePhraseHighlighter" />
+                  <xedsolr:checkbox name="hl.highlightMultiTerm" />
+                </xedsolr:fieldset>
 
-                <mcrsolr:fieldset name="facet">
-                  <mcrsolr:textarea name="facet.query" />
-                  <mcrsolr:textfield name="facet.field" />
-                  <mcrsolr:textfield name="facet.prefix" />
-                </mcrsolr:fieldset>
+                <xedsolr:fieldset name="facet">
+                  <xedsolr:textarea name="facet.query" />
+                  <xedsolr:textfield name="facet.field" />
+                  <xedsolr:textfield name="facet.prefix" />
+                </xedsolr:fieldset>
 
-                <mcrsolr:fieldset name="spatial">
-                  <mcrsolr:textfield name="pt" />
-                  <mcrsolr:textfield name="sfield" />
-                  <mcrsolr:textfield name="d" />
-                </mcrsolr:fieldset>
+                <xedsolr:fieldset name="spatial">
+                  <xedsolr:textfield name="pt" />
+                  <xedsolr:textfield name="sfield" />
+                  <xedsolr:textfield name="d" />
+                </xedsolr:fieldset>
 
-                <mcrsolr:fieldset name="spellcheck">
-                  <mcrsolr:checkbox name="spellcheck.build" />
-                  <mcrsolr:checkbox name="spellcheck.reload" />
-                  <mcrsolr:textfield name="spellcheck.dictionary" />
-                  <mcrsolr:textfield name="spellcheck.count" />
-                  <mcrsolr:checkbox name="spellcheck.onlyMorePopular" />
-                  <mcrsolr:checkbox name="spellcheck.extendedResults" />
-                  <mcrsolr:checkbox name="spellcheck.collate" />
-                  <mcrsolr:textfield name="spellcheck.maxCollations" />
-                  <mcrsolr:textfield name="spellcheck.maxCollationTries" />
-                  <mcrsolr:textfield name="spellcheck.accuracy" />
-                </mcrsolr:fieldset>
+                <xedsolr:fieldset name="spellcheck">
+                  <xedsolr:checkbox name="spellcheck.build" />
+                  <xedsolr:checkbox name="spellcheck.reload" />
+                  <xedsolr:textfield name="spellcheck.dictionary" />
+                  <xedsolr:textfield name="spellcheck.count" />
+                  <xedsolr:checkbox name="spellcheck.onlyMorePopular" />
+                  <xedsolr:checkbox name="spellcheck.extendedResults" />
+                  <xedsolr:checkbox name="spellcheck.collate" />
+                  <xedsolr:textfield name="spellcheck.maxCollations" />
+                  <xedsolr:textfield name="spellcheck.maxCollationTries" />
+                  <xedsolr:textfield name="spellcheck.accuracy" />
+                </xedsolr:fieldset>
 
                 <div class="col-{$input-width}">
                   <button type="submit" xed:target="servlet" xed:href="MCRSolrSelectProxyServlet" class="btn btn-primary">
@@ -263,7 +263,7 @@ form .optional.expanded .fieldset{
     </div>
     <div class="row mt-5">
       <div class="col-12">
-        <mcrsolr:fieldsHelp />
+        <xedsolr:fieldsHelp />
     </div>
     </div>
     <div style="display:none" id="formSpace" />

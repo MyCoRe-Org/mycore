@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="3.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:mcracl="http://www.mycore.de/xslt/acl"
-                xmlns:mcrproperty="http://www.mycore.de/xslt/property"
-                xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
-                exclude-result-prefixes="mcracl mcrproperty mcri18n">
+<xsl:stylesheet version="3.0"
+  xmlns:mcracl="http://www.mycore.de/xslt/acl"
+  xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
 
   <xsl:variable name="response" select="/response|/mycoreobject/response" />
   <xsl:variable name="loginURL"

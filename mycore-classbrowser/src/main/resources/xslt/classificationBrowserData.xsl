@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!-- 
   XSL to transform XML output from MCRClassificationBrowser servlet
@@ -7,7 +7,8 @@
  -->
 
 <xsl:stylesheet version="3.0"
-                xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
 
 <xsl:output method="xml" omit-xml-declaration="yes" />
 

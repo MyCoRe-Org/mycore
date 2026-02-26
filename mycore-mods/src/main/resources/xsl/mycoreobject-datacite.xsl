@@ -6,14 +6,13 @@
  ====================================================================== -->
 
 <xsl:stylesheet version="1.0"
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:xalan="http://xml.apache.org/xalan"
-  xmlns:xlink="http://www.w3.org/1999/xlink"
-  xmlns:mods="http://www.loc.gov/mods/v3"
-  xmlns:mcrmods="xalan://org.mycore.mods.classification.MCRMODSClassificationSupport"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns="http://datacite.org/schema/kernel-3"
-  exclude-result-prefixes="xsl xlink mods xalan mcrmods">
+  xmlns:mcrmodsclass="xalan://org.mycore.mods.classification.MCRMODSClassificationSupport"
+  xmlns:mods="http://www.loc.gov/mods/v3"
+  xmlns:xalan="http://xml.apache.org/xalan"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="mods mcrmodsclass mods xalan xsl">
 
   <xsl:include href="coreFunctions.xsl" />
 
@@ -152,7 +151,7 @@
               <xsl:value-of select="mods:displayForm" />
             </xsl:when>
             <xsl:otherwise>
-              <xsl:variable name="classlink" select="mcrmods:getClassCategParentLink(.)" />
+              <xsl:variable name="classlink" select="mcrmodsclass:getClassCategParentLink(.)" />
               <xsl:if test="string-length($classlink) &gt; 0">
                 <xsl:for-each select="document($classlink)/mycoreclass//category[position()=1 or position()=last()]">
                   <xsl:if test="position() > 1">

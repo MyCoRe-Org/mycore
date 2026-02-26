@@ -2,19 +2,20 @@
 
 <!-- Transforms MyCoRe object with MODS to ORCID works XML schema -->
 
-<xsl:stylesheet version="1.0" 
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-  xmlns:mods="http://www.loc.gov/mods/v3"
-  xmlns:work="http://www.orcid.org/ns/work"
+<xsl:stylesheet version="1.0"
   xmlns:common="http://www.orcid.org/ns/common"
-  exclude-result-prefixes="xsl mods">
+  xmlns:mods="http://www.loc.gov/mods/v3"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:work="http://www.orcid.org/ns/work"
+  exclude-result-prefixes="mods xsl">
 
   <xsl:template match="mycoreobject">
     <xsl:apply-templates select="metadata/def.modsContainer/modsContainer/mods:mods" />
   </xsl:template>
 
   <xsl:template match="mods:mods">
-    <work:work visibility="public" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.orcid.org/ns/work /work-2.1.xsd ">
+    <work:work visibility="public" xsi:schemaLocation="http://www.orcid.org/ns/work /work-2.1.xsd ">
       <xsl:call-template name="workTitle" />
       <xsl:apply-templates select="mods:abstract[1]" />
       <xsl:call-template name="workType" />

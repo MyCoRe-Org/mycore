@@ -2,11 +2,11 @@
 
 <!-- XSL to display data of a login user -->
 
-<xsl:stylesheet version="3" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:mcracl="http://www.mycore.de/xslt/acl"
-                xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
-                exclude-result-prefixes="xsl mcri18n mcracl"
->
+<xsl:stylesheet version="3.0"
+  xmlns:mcracl="http://www.mycore.de/xslt/acl"
+  xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
 
   <xsl:include href="MyCoReLayout.xsl"/>
 

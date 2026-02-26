@@ -1,9 +1,9 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="3.0"
-                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                xmlns:mcrclass="http://www.mycore.de/xslt/classification"
-                exclude-result-prefixes="#all">
+  xmlns:mcrclassification="http://www.mycore.de/xslt/classification"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  exclude-result-prefixes="#all">
 
   <!--
     Returns the MCR category entry for the given classification and category ID
@@ -12,7 +12,7 @@
       * classid: the classification ID
       * categid: the category ID
   -->
-  <xsl:function name="mcrclass:category" as="element()?">
+  <xsl:function name="mcrclassification:category" as="element()?">
     <xsl:param name="classid" as="xs:string" />
     <xsl:param name="categid" as="xs:string" />
 
@@ -26,10 +26,10 @@
     Parameters
       * class: the MCR category element
   -->
-  <xsl:function name="mcrclass:current-label" as="element()?">
+  <xsl:function name="mcrclassification:current-label" as="element()?">
     <xsl:param name="class" as="element()?" />
 
-    <xsl:copy-of select="mcrclass:label($CurrentLang, $class)"/>
+    <xsl:copy-of select="mcrclassification:label($CurrentLang, $class)"/>
   </xsl:function>
 
   <!--
@@ -39,13 +39,13 @@
       * lang: the language of the label element
       * class: the MCR category element
   -->
-  <xsl:function name="mcrclass:label" as="element()?">
+  <xsl:function name="mcrclassification:label" as="element()?">
     <xsl:param name="lang" as="xs:string"/>
     <xsl:param name="class" as="element()?"/>
 
     <xsl:choose>
       <xsl:when test="$class[@classid and @categid]">
-        <xsl:sequence select="mcrclass:label($lang, document(concat('classification:metadata:0:children:',$class/@classid,':',$class/@categid))//category)" />
+        <xsl:sequence select="mcrclassification:label($lang, document(concat('classification:metadata:0:children:',$class/@classid,':',$class/@categid))//category)" />
       </xsl:when>
       <xsl:when test="string-length($lang) > 0 and $class/label[lang($lang)]">
         <xsl:sequence select="$class/label[lang($lang)]" />
@@ -68,10 +68,10 @@
     Parameters
       * class: the MCR category element
   -->
-  <xsl:function name="mcrclass:current-label-text" as="xs:string?">
+  <xsl:function name="mcrclassification:current-label-text" as="xs:string?">
     <xsl:param name="class" as="element()?" />
 
-    <xsl:value-of select="mcrclass:label-text($CurrentLang, $class)"/>
+    <xsl:value-of select="mcrclassification:label-text($CurrentLang, $class)"/>
   </xsl:function>
 
   <!--
@@ -81,11 +81,11 @@
       * lang: the language of the label
       * class: the MCR category element
   -->
-  <xsl:function name="mcrclass:label-text" as="xs:string?">
+  <xsl:function name="mcrclassification:label-text" as="xs:string?">
     <xsl:param name="lang" as="xs:string"/>
     <xsl:param name="class" as="element()?"/>
 
-    <xsl:variable name="label" select="mcrclass:label($lang, $class)"/>
+    <xsl:variable name="label" select="mcrclassification:label($lang, $class)"/>
     <xsl:choose>
       <xsl:when test="$label">
         <xsl:sequence select="$label/@text" />
