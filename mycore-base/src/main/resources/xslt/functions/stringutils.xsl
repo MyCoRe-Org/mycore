@@ -73,5 +73,13 @@
     <xsl:param name="input" as="xs:string" />
     <xsl:value-of select="replace($input, '^\s+|\s+$', '')" />
   </xsl:function>
+
+  <xsl:function name="mcrstringutils:capitalize" as="xs:string?">
+    <xsl:param name="s" as="xs:string?"/>
+    <xsl:sequence select="
+    if (empty($s) or $s = '') then $s
+    else concat(upper-case(substring($s, 1, 1)), substring($s, 2))
+  "/>
+  </xsl:function>
     
 </xsl:stylesheet>

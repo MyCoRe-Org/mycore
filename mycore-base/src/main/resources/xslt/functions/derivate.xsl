@@ -32,5 +32,19 @@
         <xsl:value-of select="$contentType" />
     </xsl:function>
 
+    <xsl:function name="mcrderivate:get-file-extension" as="xs:string?">
+        <xsl:param name="path" as="xs:string?"/>
+
+        <xsl:sequence select="
+    if (empty($path)) then ()
+    else
+      let $base := replace($path, '^.*[\\/]', '')          (: last path segment :)
+      return
+        if (matches($base, '\.')) then
+          replace($base, '^.*\.([^.]*)$', '$1')            (: text after last dot, may be empty :)
+        else
+          ''                                               (: no extension, but path is not empty :)
+  "/>
+    </xsl:function>
 
 </xsl:stylesheet>
