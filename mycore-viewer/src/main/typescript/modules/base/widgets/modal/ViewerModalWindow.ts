@@ -36,7 +36,7 @@ export class ViewerModalWindow {
     });
 
     this._box = document.createElement("div");
-    this._box.classList.add("modal-dialog", "modal-sm");
+    this._box.classList.add("modal-dialog", "modal-md");
     this.wrapper.append(this._box);
 
     this._content = document.createElement("div");

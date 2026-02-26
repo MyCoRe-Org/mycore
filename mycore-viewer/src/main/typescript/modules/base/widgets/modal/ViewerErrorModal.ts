@@ -23,7 +23,7 @@ export class ViewerErrorModal extends ViewerModalWindow {
 
   constructor(_mobile: boolean, errorTitle: string, errorText: string, imageUrl?: string, parent: HTMLElement = document.body) {
     super(_mobile, errorTitle, parent);
-    this.modalHeader.querySelectorAll(">h4").forEach(el => el.classList.add("text-danger"));
+    this.modalHeader.querySelectorAll(":scope > h4").forEach(el => el.classList.add("text-danger"));
 
     const errorImageHolder = document.createElement("div");
     errorImageHolder.classList.add("error-image-holder");
@@ -36,9 +36,10 @@ export class ViewerErrorModal extends ViewerModalWindow {
         errorImageHolder.append(img);
     }
 
-    const span = document.createElement("span");
-    span.innerText = errorText;
-    errorImageHolder.append(span);
+    const errorTextDiv = document.createElement("div");
+    errorTextDiv.classList.add("error-text");
+    errorTextDiv.innerText = errorText;
+    errorImageHolder.append(errorTextDiv);
   }
 }
 
