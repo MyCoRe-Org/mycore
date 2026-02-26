@@ -6,7 +6,7 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   exclude-result-prefixes="#all">
 
-    <xsl:function name="mcrversion:get-complete-version" as="xs:string">
+    <xsl:function name="mcrversion:complete-version" as="xs:string">
         <xsl:variable name="versionDoc" select="fn:document('version:completeVersion')"/>
         <xsl:value-of select="$versionDoc/version/text()"/>
     </xsl:function>
