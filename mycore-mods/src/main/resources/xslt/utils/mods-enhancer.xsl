@@ -6,11 +6,6 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   exclude-result-prefixes="#all">
   
-  <xsl:import href="resource:xslt/functions/acl.xsl" />
-
-  <xsl:param name="WebApplicationBaseURL" />
-  <!-- Duplicate: <xsl:param name="ServletsBaseURL" select="''" /> -->
-  
   <xsl:variable name="relacode" select="document('resource:relacode.xml')/relacode" />
   <xsl:key name="relacode" match="code" use="@key" />
 
