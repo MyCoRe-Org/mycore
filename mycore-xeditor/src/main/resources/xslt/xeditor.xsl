@@ -9,9 +9,8 @@
 
   <xsl:include href="xslInclude:xeditor" />
 
-  <xsl:param name="ServletsBaseURL" />
-  <xsl:param name="CurrentLang" />
-  <xsl:param name="DefaultLang" />
+  <xsl:include href="default-parameters.xsl" />
+  <xsl:include href="xslInclude:functions" />
 
   <!-- ========== default: just copy ========== -->
   <xsl:template match='@*|node()'>
