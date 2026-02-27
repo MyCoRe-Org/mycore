@@ -4,7 +4,6 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   exclude-result-prefixes="xsl">
 
-  <xsl:param name="ServletsBaseURL" select="''" />
   <xsl:include href="mods2mods.xsl" />
 
   <xsl:template match="/exportCollection|/list">

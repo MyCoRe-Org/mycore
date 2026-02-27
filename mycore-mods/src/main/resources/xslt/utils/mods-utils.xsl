@@ -8,10 +8,6 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   exclude-result-prefixes="#all">
   
-  <xsl:param name="CurrentUser" />
-  <xsl:param name="CurrentLang" />
-  <xsl:param name="DefaultLang" />
-  <xsl:param name="ServletsBaseURL" />
   <xsl:param name="MCR.MODS.Utils.shortenTitleLength" />
   <xsl:param name="MCR.MODS.Utils.addTermsOfAddressToDisplayForm" />
 
