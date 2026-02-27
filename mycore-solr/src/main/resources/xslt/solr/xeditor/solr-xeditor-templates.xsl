@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0"
+<xsl:stylesheet version="3.0"
   xmlns:xed="http://www.mycore.de/xeditor"
   xmlns:xedsolr="http://www.mycore.de/components/solr"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  exclude-result-prefixes="xsl">
+  exclude-result-prefixes="xedsolr">
 
   <xsl:param name="MCR.Solr.ServerURL" />
   <xsl:param name="MCR.Solr.Core.main.Name" />
@@ -64,10 +64,10 @@
     <xsl:choose>
       <xsl:when test="@repeatable='true'">
         <div class="form-group">
-          <label class="col-{$mcrsolr:label-width} control-label" for="{id}">
+          <label class="col-{$xedsolr:label-width} control-label" for="{id}">
             <xsl:value-of select="@name" />
           </label>
-          <div class="col-{$mcrsolr:input-width}">
+          <div class="col-{$xedsolr:input-width}">
             <div class="multiple">
               <div class="row clearfix">
                 <xed:repeat xpath="param[@name='{@name}']">
@@ -97,10 +97,10 @@
           <xsl:copy-of select="@initially" />
           <xsl:copy-of select="@default" />
           <div class="form-group">
-            <label class="col-{$mcrsolr:label-width} control-label" for="{$id}">
+            <label class="col-{$xedsolr:label-width} control-label" for="{$id}">
               <xsl:value-of select="@name" />
             </label>
-            <div class="col-{$mcrsolr:input-width}">
+            <div class="col-{$xedsolr:input-width}">
               <input class="form-control" type="text" id="{$id}">
                 <xsl:copy-of select="@title" />
                 <xsl:copy-of select="@placeholder" />
@@ -150,7 +150,7 @@
       <xsl:copy-of select="@initially" />
       <xsl:copy-of select="@default" />
       <div class="form-group">
-        <div class="col-{$mcrsolr:input-width}">
+        <div class="col-{$xedsolr:input-width}">
           <div class="checkbox">
             <label for="{$id}">
               <input type="checkbox" value="{$value}" id="{$id}">
@@ -172,10 +172,10 @@
       <xsl:copy-of select="@initially" />
       <xsl:copy-of select="@default" />
       <div class="form-group">
-        <label class="col-{$mcrsolr:label-width} control-label" for="{$id}">
+        <label class="col-{$xedsolr:label-width} control-label" for="{$id}">
           <xsl:value-of select="@name" />
         </label>
-        <div class="col-{$mcrsolr:input-width}">
+        <div class="col-{$xedsolr:input-width}">
           <textarea class="form-control" id="{$id}">
             <xsl:copy-of select="@title" />
             <xsl:copy-of select="@placeholder" />
@@ -197,7 +197,7 @@
   </xsl:template>
 
   <xsl:template match="xedsolr:label">
-  <!-- Labels are used in head of fieldset only -->
+    <!-- Labels are used in head of fieldset only -->
   </xsl:template>
 
   <xsl:template match="xedsolr:fieldsHelp">
@@ -214,41 +214,47 @@
     <xsl:if test="string-length($core) &gt; 0">
       <div class="table-responsive">
         <table class="table table-striped table-hover table-sm">
-          <xsl:variable name="url" select="concat('solrfields:', $core)"/>
+          <xsl:variable name="url" select="concat('solrfields:', $core)" />
           <xsl:variable name="availableFields" select="document($url)" />
-          <thead><tr><th colspan="3"><xsl:value-of select="concat('Fields of core ',$core)" /></th></tr></thead>
+          <thead>
+            <tr>
+              <th colspan="3">
+                <xsl:value-of select="concat('Fields of core ',$core)" />
+              </th>
+            </tr>
+          </thead>
           <tr>
             <th>field</th>
             <th>static/dynamic</th>
             <th>type</th>
           </tr>
           <xsl:for-each select="$availableFields/solrFields/fields/field">
-            <xsl:sort select="@name"/>
+            <xsl:sort select="@name" />
             <tr>
               <td>
-                <xsl:value-of select="@name"/>
+                <xsl:value-of select="@name" />
               </td>
               <td>
-                <xsl:value-of select="'static'"/>
+                <xsl:value-of select="'static'" />
               </td>
               <td>
-                <xsl:value-of select="@type"/>
+                <xsl:value-of select="@type" />
               </td>
             </tr>
 
           </xsl:for-each>
 
           <xsl:for-each select="$availableFields/solrFields/dynamicFields/field">
-            <xsl:sort select="@name"/>
+            <xsl:sort select="@name" />
             <tr>
               <td>
-                <xsl:value-of select="@name"/>
+                <xsl:value-of select="@name" />
               </td>
               <td>
-                <xsl:value-of select="'dynamic'"/>
+                <xsl:value-of select="'dynamic'" />
               </td>
               <td>
-                <xsl:value-of select="@type"/>
+                <xsl:value-of select="@type" />
               </td>
             </tr>
           </xsl:for-each>
