@@ -1455,7 +1455,9 @@ public final class MCRURIResolver implements URIResolver {
                     case "version" -> MCRCoreVersion.getVersion();
                     case "completeVersion" -> MCRCoreVersion.getCompleteVersion();
                     case "revision" -> MCRCoreVersion.getRevision();
-                    default -> MCRCoreVersion.getCompleteVersion();
+                    default -> throw new IllegalArgumentException(
+                        "Invalid parameter for MCRVersionResolver: " + versionType);
+
                 });
             return new JDOMSource(versionElement);
         }
