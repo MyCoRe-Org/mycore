@@ -11,8 +11,8 @@
   <xsl:param name="MCR.Solr.Core.classification.Name" />
   <xsl:param name="MCR.Solr.Core.classification.ServerURL" />
 
-  <xsl:variable name="xedsolr:label-width" select="9" />
-  <xsl:variable name="xedsolr:input-width" select="9" />
+  <xsl:variable name="xedsolr-label-width" select="9" />
+  <xsl:variable name="xedsolr-input-width" select="9" />
 
   <xsl:template match="xedsolr:fieldset">
     <xsl:variable name="paraname">
@@ -64,10 +64,10 @@
     <xsl:choose>
       <xsl:when test="@repeatable='true'">
         <div class="form-group">
-          <label class="col-{$xedsolr:label-width} control-label" for="{id}">
+          <label class="col-{$xedsolr-label-width} control-label" for="{id}">
             <xsl:value-of select="@name" />
           </label>
-          <div class="col-{$xedsolr:input-width}">
+          <div class="col-{$xedsolr-input-width}">
             <div class="multiple">
               <div class="row clearfix">
                 <xed:repeat xpath="param[@name='{@name}']">
@@ -97,10 +97,10 @@
           <xsl:copy-of select="@initially" />
           <xsl:copy-of select="@default" />
           <div class="form-group">
-            <label class="col-{$xedsolr:label-width} control-label" for="{$id}">
+            <label class="col-{$xedsolr-label-width} control-label" for="{$id}">
               <xsl:value-of select="@name" />
             </label>
-            <div class="col-{$xedsolr:input-width}">
+            <div class="col-{$xedsolr-input-width}">
               <input class="form-control" type="text" id="{$id}">
                 <xsl:copy-of select="@title" />
                 <xsl:copy-of select="@placeholder" />
@@ -150,7 +150,7 @@
       <xsl:copy-of select="@initially" />
       <xsl:copy-of select="@default" />
       <div class="form-group">
-        <div class="col-{$xedsolr:input-width}">
+        <div class="col-{$xedsolr-input-width}">
           <div class="checkbox">
             <label for="{$id}">
               <input type="checkbox" value="{$value}" id="{$id}">
@@ -172,10 +172,10 @@
       <xsl:copy-of select="@initially" />
       <xsl:copy-of select="@default" />
       <div class="form-group">
-        <label class="col-{$xedsolr:label-width} control-label" for="{$id}">
+        <label class="col-{$xedsolr-label-width} control-label" for="{$id}">
           <xsl:value-of select="@name" />
         </label>
-        <div class="col-{$xedsolr:input-width}">
+        <div class="col-{$xedsolr-input-width}">
           <textarea class="form-control" id="{$id}">
             <xsl:copy-of select="@title" />
             <xsl:copy-of select="@placeholder" />
