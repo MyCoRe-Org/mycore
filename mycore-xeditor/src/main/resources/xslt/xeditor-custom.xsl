@@ -5,8 +5,6 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   exclude-result-prefixes="mcri18n xed xsl">
 
-  <xsl:import href="resource:xslt/functions/i18n.xsl" />
-
   <!-- ========== Repeater buttons: <xed:repeat><xed:controls> ========== -->
 
   <xsl:template match="text()" mode="xed.control">

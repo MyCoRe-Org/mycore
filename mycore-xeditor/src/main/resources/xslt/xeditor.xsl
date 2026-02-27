@@ -7,10 +7,9 @@
 
   <xsl:strip-space elements="xed:*" />
 
-  <xsl:include href="xslInclude:xeditor" />
-
   <xsl:include href="default-parameters.xsl" />
   <xsl:include href="xslInclude:functions" />
+  <xsl:include href="xslInclude:xeditor" />
 
   <!-- ========== default: just copy ========== -->
   <xsl:template match='@*|node()'>
