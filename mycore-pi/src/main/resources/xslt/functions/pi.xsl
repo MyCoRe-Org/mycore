@@ -13,7 +13,7 @@
     <xsl:param name="id" as="xs:string" />
     <xsl:param name="additional" as="xs:string" />
 
-    <xsl:variable name="result" select="xs:boolean(
+    <xsl:value-of select="xs:boolean(
       document(
         concat($piServiceURIPrefix,
           'hasIdentifierCreated/?service=',
@@ -26,7 +26,6 @@
       )/boolean/text()
     )" />
 
-    <xsl:value-of select="$result" />
   </xsl:function>
 
   <xsl:function name="mcrpi:has-identifier-registration-started" as="xs:boolean">
@@ -34,7 +33,7 @@
     <xsl:param name="id" as="xs:string" />
     <xsl:param name="additional" as="xs:string" />
 
-    <xsl:variable name="result" select="xs:boolean(
+    <xsl:value-of select="xs:boolean(
       document(
         concat($piServiceURIPrefix,
           'hasIdentifierRegistrationStarted/?service=',
@@ -46,8 +45,6 @@
         )
       )/boolean/text()
     )" />
-
-    <xsl:value-of select="$result" />
   </xsl:function>
 
   <xsl:function name="mcrpi:has-identifier-registered" as="xs:boolean">
@@ -55,7 +52,7 @@
     <xsl:param name="id" as="xs:string" />
     <xsl:param name="additional" as="xs:string" />
 
-    <xsl:sequence select="xs:boolean(
+    <xsl:value-of select="xs:boolean(
       document(
         concat($piServiceURIPrefix,
           'hasIdentifierRegistered/?service=',
@@ -73,7 +70,7 @@
   <xsl:function name="mcrpi:has-managed-pi" as="xs:boolean">
     <xsl:param name="objectID" as="xs:string" />
 
-    <xsl:sequence select="xs:boolean(
+    <xsl:value-of select="xs:boolean(
       document(
         concat($piServiceURIPrefix,
           'hasManagedPI/?objectID=',
@@ -87,7 +84,7 @@
     <xsl:param name="pi" as="xs:string" />
     <xsl:param name="id" as="xs:string" />
 
-    <xsl:sequence select="xs:boolean(
+    <xsl:value-of select="xs:boolean(
       document(
         concat($piServiceURIPrefix,
           'isManagedPI/?pi=',
