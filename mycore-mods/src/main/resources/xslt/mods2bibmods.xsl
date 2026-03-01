@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0"
+<xsl:stylesheet version="3.0"
   xmlns:mods="http://www.loc.gov/mods/v3"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  exclude-result-prefixes="xsl">
+  exclude-result-prefixes="#all">
 
-  <xsl:include href="utils/mods-utils.xsl"/>
+  <xsl:include href="resource:xslt/default-parameters.xsl" />
+  <xsl:include href="xslInclude:functions"/>
+  <xsl:include href="resource:xslt/utils/mods-utils.xsl" />
 
   <!-- standard copy template -->
   <xsl:template match="@*|node()">
