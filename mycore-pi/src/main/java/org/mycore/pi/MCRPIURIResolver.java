@@ -56,30 +56,30 @@ public class MCRPIURIResolver implements URIResolver {
     private static final String IS_MANAGED_PI_METHOD = "isManagedPI";
     private static final String GET_PI_SERVICE_INFORMATION_METHOD = "getPIServiceInformation";
 
-    public static boolean hasIdentifierCreated(String service, String id, String additional) {
+    private static boolean hasIdentifierCreated(String service, String id, String additional) {
         MCRPIService<MCRPersistentIdentifier> registrationService = MCRPIServiceManager
             .getInstance().getRegistrationService(service);
         return registrationService.isCreated(MCRObjectID.getInstance(id), additional);
     }
 
-    public static boolean hasIdentifierRegistrationStarted(String service, String id, String additional) {
+    private static boolean hasIdentifierRegistrationStarted(String service, String id, String additional) {
         MCRPIService<MCRPersistentIdentifier> registrationService = MCRPIServiceManager
             .getInstance().getRegistrationService(service);
         return registrationService.hasRegistrationStarted(MCRObjectID.getInstance(id), additional);
     }
 
-    public static boolean hasIdentifierRegistered(String service, String id, String additional) {
+    private static boolean hasIdentifierRegistered(String service, String id, String additional) {
         MCRPIService<MCRPersistentIdentifier> registrationService = MCRPIServiceManager
             .getInstance().getRegistrationService(service);
         return registrationService.isRegistered(MCRObjectID.getInstance(id), additional);
     }
 
-    public static boolean hasManagedPI(String objectID) {
+    private static boolean hasManagedPI(String objectID) {
         return !MCRPIManager.getInstance()
             .getRegistered(MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(objectID))).isEmpty();
     }
 
-    public static boolean isManagedPI(String pi, String id) {
+    private static boolean isManagedPI(String pi, String id) {
         return MCRPIManager.getInstance().getInfo(pi).stream().anyMatch(info -> info.getMycoreID()
             .equals(id));
     }
