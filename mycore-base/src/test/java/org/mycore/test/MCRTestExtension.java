@@ -109,9 +109,10 @@ public class MCRTestExtension implements Extension, BeforeEachCallback, AfterEac
     }
 
     private Map<String, String> getConfigProperties(ExtensionContext context) {
-        return getClassContext(context).getStore(NAMESPACE)
+        ExtensionContext classContext = getClassContext(context);
+        return classContext.getStore(NAMESPACE)
             .getOrComputeIfAbsent(MCRTestExtension.PROPERTIES_MAP_PROPERTY, k -> {
-                LOGGER.debug(() -> getClassContext(context).getRequiredTestClass() + " creating new properties map");
+                LOGGER.debug(() -> classContext.getRequiredTestClass() + " creating new properties map");
                 return new HashMap<>();
             }, Map.class);
     }
