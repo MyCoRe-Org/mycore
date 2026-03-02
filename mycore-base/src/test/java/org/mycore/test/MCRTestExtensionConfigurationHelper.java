@@ -157,11 +157,15 @@ public class MCRTestExtensionConfigurationHelper {
     // Traverse the class hierarchy to find @MyAnnotation on the class or any of its superclasses.
     private static List<MCRTestConfiguration> findClassHierarchyTestConfigurations(Class<?> clazz) {
         List<MCRTestConfiguration> annotations = new ArrayList<>();
-        for (Class<?> current = clazz; current != null; current = current.getSuperclass()) {
-            MCRTestConfiguration annotation = current.getAnnotation(MCRTestConfiguration.class);
-            if (annotation != null) {
-                annotations.add(annotation);
+        Class<?> currentClass = clazz;
+        while (currentClass != null) {
+            for (Class<?> current = currentClass; current != null; current = current.getSuperclass()) {
+                MCRTestConfiguration annotation = current.getAnnotation(MCRTestConfiguration.class);
+                if (annotation != null) {
+                    annotations.add(annotation);
+                }
             }
+            currentClass = currentClass.getEnclosingClass();
         }
         return annotations;
     }

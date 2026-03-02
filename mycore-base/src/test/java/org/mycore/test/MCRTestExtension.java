@@ -99,10 +99,19 @@ public class MCRTestExtension implements Extension, BeforeEachCallback, AfterEac
         MCRConfigurationBase.initialize(configurationLoader.loadDeprecated(), mycoreProperties, true);
     }
 
+    private ExtensionContext getClassContext(ExtensionContext context) {
+        ExtensionContext currentCtx = context;
+        //navigate up to the class context, which can be several levels up for @ParameterizedTest
+        while (currentCtx.getTestMethod().isPresent() && currentCtx.getParent().isPresent()) {
+            currentCtx = currentCtx.getParent().get();
+        }
+        return currentCtx;
+    }
+
     private Map<String, String> getConfigProperties(ExtensionContext context) {
-        return context.getRoot().getStore(NAMESPACE)
+        return getClassContext(context).getStore(NAMESPACE)
             .getOrComputeIfAbsent(MCRTestExtension.PROPERTIES_MAP_PROPERTY, k -> {
-                LOGGER.debug(() -> context.getElement().get() + " creating new properties map");
+                LOGGER.debug(() -> getClassContext(context).getRequiredTestClass() + " creating new properties map");
                 return new HashMap<>();
             }, Map.class);
     }
@@ -172,7 +181,7 @@ public class MCRTestExtension implements Extension, BeforeEachCallback, AfterEac
         if (context.getTestMethod().isPresent()) {
             throw new IllegalStateException("This method should only be called for class-level extensions.");
         }
-        return context.getRoot().getStore(NAMESPACE)
+        return context.getStore(NAMESPACE)
             .getOrComputeIfAbsent(MCRTestExtension.CLASS_PROPERTIES_MAP_PROPERTY, k -> {
                 LOGGER.debug("Creating empty extension properties");
                 return new HashMap<>();
