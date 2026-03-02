@@ -43,8 +43,7 @@ export class MyCoReStructFileComponent extends ViewerComponent {
     new ViewerErrorModal(
       this.settings.mobile,
       context.lm.getTranslation('noStructFileShort'),
-      context.lm.getFormatedTranslation('noStructFile', '<a href="mailto:"'
-        + this.settings.adminMail + '>' + this.settings.adminMail + '</a>'),
+      context.lm.getFormatedTranslation('noStructFile', this.settings.adminMail),
       this.settings.webApplicationBaseURL + '/modules/iview2/img/sad-emotion-egg.jpg',
       this.container).show();
     context.trigger(new ShowContentEvent(this, null, ViewerBorderLayout.DIRECTION_WEST, 0));
