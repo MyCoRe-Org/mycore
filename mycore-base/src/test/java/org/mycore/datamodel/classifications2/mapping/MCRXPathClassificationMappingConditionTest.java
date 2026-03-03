@@ -32,7 +32,6 @@ import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.test.MCRJPAExtension;
 import org.mycore.test.MyCoReTest;
@@ -48,7 +47,7 @@ public class MCRXPathClassificationMappingConditionTest {
         MCRXPathClassificationMappingConditionTest.class.getSimpleName() + "/";
 
     public MCRCategoryDAO getDAO() {
-        return MCRCategoryDAOFactory.obtainInstance();
+        return MCRCategoryDAO.obtainInstance();
     }
 
     @Test

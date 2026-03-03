@@ -29,7 +29,6 @@ import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.MCRFrontendUtil;
@@ -41,7 +40,7 @@ import org.mycore.wfc.MCRConstants;
 public final class MCRURLRetriever {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.obtainInstance();
+    private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAO.obtainInstance();
 
     private static final Map<String, MCRCollection> COLLECTION_MAP = initActionsMappings();
 

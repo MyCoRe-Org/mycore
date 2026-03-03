@@ -48,7 +48,7 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.config.annotation.MCRRawProperties;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRURIResolver;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -227,7 +227,7 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
             return false;
         }
         try {
-            return MCRCategoryDAOFactory.obtainInstance().exist(MCRCategoryID.ofString(checkID));
+            return MCRCategoryDAO.obtainInstance().exist(MCRCategoryID.ofString(checkID));
         } catch (IllegalArgumentException e) {
             return false;
         }

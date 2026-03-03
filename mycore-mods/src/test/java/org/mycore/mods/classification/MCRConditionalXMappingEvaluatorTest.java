@@ -41,7 +41,6 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.mapping.MCRConditionalXMappingEvaluator;
 import org.mycore.datamodel.classifications2.mapping.MCRXMappingClassificationGeneratorBase.OnMissingMappedCategory;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
@@ -62,7 +61,7 @@ public class MCRConditionalXMappingEvaluatorTest {
     private static final Logger LOGGER = LogManager.getLogger();
 
     public MCRCategoryDAO getDAO() {
-        return MCRCategoryDAOFactory.obtainInstance();
+        return MCRCategoryDAO.obtainInstance();
     }
 
     @Test

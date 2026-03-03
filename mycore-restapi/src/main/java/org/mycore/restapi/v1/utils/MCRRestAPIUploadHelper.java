@@ -56,7 +56,6 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
@@ -189,7 +188,7 @@ public class MCRRestAPIUploadHelper {
     private static MCRObjectID findDerivateID(MCRObject mcrObj, String label, String classifications)
         throws MCRRestAPIException {
         MCRObjectID derID = null;
-        final MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
+        final MCRCategoryDAO dao = MCRCategoryDAO.obtainInstance();
         final List<MCRMetaEnrichedLinkID> currentDerivates =
             MCRExpandedObjectManager.getInstance().getExpandedObject(mcrObj).getStructure().getDerivates();
         if (label != null && !label.isEmpty()) {
@@ -263,7 +262,7 @@ public class MCRRestAPIUploadHelper {
     }
 
     private static void addClassificationsToDerivate(MCRDerivate mcrDerivate, String classifications) {
-        final MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
+        final MCRCategoryDAO dao = MCRCategoryDAO.obtainInstance();
         final List<MCRMetaClassification> currentClassifications = mcrDerivate.getDerivate().getClassifications();
 
         Stream.of(classifications.split(" "))

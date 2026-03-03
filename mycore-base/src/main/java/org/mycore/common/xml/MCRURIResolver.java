@@ -88,7 +88,6 @@ import org.mycore.common.xsl.MCRLazyStreamSource;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
@@ -796,7 +795,7 @@ public final class MCRURIResolver implements URIResolver {
 
         static {
             try {
-                dao = MCRCategoryDAOFactory.obtainInstance();
+                dao = MCRCategoryDAO.obtainInstance();
                 categoryCache = new MCRCache<>(
                     MCRConfiguration2.getInt(CONFIG_PREFIX + "Classification.CacheSize").orElse(1000),
                     "URIResolver categories");

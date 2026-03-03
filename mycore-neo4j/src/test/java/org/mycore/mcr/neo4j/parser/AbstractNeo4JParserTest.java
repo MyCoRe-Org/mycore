@@ -28,7 +28,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.classifications2.MCRCategory;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.metadata.MCRObjectMetadata;
@@ -55,6 +55,6 @@ public abstract class AbstractNeo4JParserTest {
     protected void addClassification(String file) throws Exception {
         Document classification = (new SAXBuilder()).build(this.getClass().getResourceAsStream(file));
         MCRCategory category = MCRXMLTransformer.getCategory(classification);
-        MCRCategoryDAOFactory.obtainInstance().addCategory((MCRCategoryID) null, category);
+        MCRCategoryDAO.obtainInstance().addCategory((MCRCategoryID) null, category);
     }
 }

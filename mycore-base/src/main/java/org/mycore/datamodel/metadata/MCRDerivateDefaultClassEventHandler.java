@@ -29,7 +29,6 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 
 public class MCRDerivateDefaultClassEventHandler extends MCREventHandlerBase {
@@ -57,7 +56,7 @@ public class MCRDerivateDefaultClassEventHandler extends MCREventHandlerBase {
         final List<MCRCategoryID> categories = DEFAULT_CATEGORIES.stream()
             .map(MCRCategoryID::ofString) //checks syntax
             .collect(Collectors.toList());
-        final MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
+        final MCRCategoryDAO categoryDAO = MCRCategoryDAO.obtainInstance();
         final List<MCRCategoryID> missingCategories = categories.stream()
             .filter(Predicate.not(categoryDAO::exist))
             .collect(Collectors.toList());

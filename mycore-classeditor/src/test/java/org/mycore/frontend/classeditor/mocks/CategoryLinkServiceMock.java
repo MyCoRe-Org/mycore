@@ -26,7 +26,7 @@ import java.util.Map;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategory;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRCategoryLink;
 
@@ -36,7 +36,7 @@ public class CategoryLinkServiceMock implements MCRCategLinkService {
     public Map<MCRCategoryID, Boolean> checkForLinks(MCRCategory category) {
         List<MCRCategory> categories;
         if (category == null) {
-            categories = MCRCategoryDAOFactory.obtainInstance().getRootCategories();
+            categories = MCRCategoryDAO.obtainInstance().getRootCategories();
         } else {
             categories = category.getChildren();
         }

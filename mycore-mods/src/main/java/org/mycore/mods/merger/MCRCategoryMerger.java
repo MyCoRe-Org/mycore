@@ -27,29 +27,28 @@ import org.jdom2.Element;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.mods.classification.MCRClassMapper;
 
 /**
  * Merges MODS elements that represent a classification category.
- * 
+ *
  * When those elements represent two categories A and B, 
  * and B is a child of A in the classification tree, 
  * B should win and be regarded the more detailed information, 
  * while A should be ignored.
- * 
+ *
  * When property 
  * MCR.MODS.Merger.CategoryMerger.Repeatable.[ClassID]=false
  * is set, there can be only one category for this classification, 
  * so the first element that occurs wins. 
  * Default is "true", meaning the classification is repeatable.
- * 
+ *
  * @author Frank Lützenkirchen
  */
 public class MCRCategoryMerger extends MCRMerger {
 
-    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.obtainInstance();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAO.obtainInstance();
 
     private static final String CONFIG_PREFIX = "MCR.MODS.Merger.CategoryMerger.Repeatable.";
 

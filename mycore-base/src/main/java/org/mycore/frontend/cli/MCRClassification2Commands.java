@@ -51,7 +51,6 @@ import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.common.xml.MCRXSLTransformerUtils;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.classifications2.MCRUnmappedCategoryRemover;
@@ -73,7 +72,7 @@ import jakarta.persistence.EntityManager;
 public class MCRClassification2Commands extends MCRAbstractCommands {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.obtainInstance();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAO.obtainInstance();
 
     /** Default transformer script */
     public static final String DEFAULT_STYLE = "save-classification.xsl";
@@ -388,7 +387,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
 
             MCRCategoryID mcrCategID = new MCRCategoryID(classIDString, categIDString);
             MCRLabel mcrCategLabel = new MCRLabel(MCRConstants.DEFAULT_LANG, categIDString, null);
-            MCRCategoryDAOFactory.obtainInstance().setLabel(mcrCategID, mcrCategLabel);
+            MCRCategoryDAO.obtainInstance().setLabel(mcrCategID, mcrCategLabel);
             LOGGER.info("fixing category with class ID \"{}\" and category ID \"{}\"", classIDString, categIDString);
         }
         LOGGER.info("Fixing category labels completed!");
@@ -488,7 +487,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         help = "checks if all redundant information are stored without conflicts",
         order = 140)
     public static List<String> checkAllClassifications() {
-        List<MCRCategoryID> classifications = MCRCategoryDAOFactory.obtainInstance().getRootCategoryIDs();
+        List<MCRCategoryID> classifications = MCRCategoryDAO.obtainInstance().getRootCategoryIDs();
         List<String> commands = new ArrayList<>(classifications.size());
         for (MCRCategoryID id : classifications) {
             commands.add("check classification " + id.getRootID());
@@ -507,7 +506,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         LOGGER.info("{}: checking for empty labels", id);
         checkEmptyLabels(id, log);
         if (log.isEmpty()) {
-            MCRCategoryImpl category = (MCRCategoryImpl) MCRCategoryDAOFactory.obtainInstance().getCategory(
+            MCRCategoryImpl category = (MCRCategoryImpl) MCRCategoryDAO.obtainInstance().getCategory(
                 new MCRCategoryID(id), -1);
             LOGGER.info("{}: checking left, right and level values and for non-null children", id);
             checkLeftRightAndLevel(category, 0, 0, log);
