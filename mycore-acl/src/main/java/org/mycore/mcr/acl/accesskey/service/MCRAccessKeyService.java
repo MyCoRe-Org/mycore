@@ -39,7 +39,7 @@ public interface MCRAccessKeyService {
      * @return the access key service instance
      */
     static MCRAccessKeyService obtainInstance() {
-        return LazyInstanceHolder.SINGLETON_INSTANCE;
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRAccessKeyService.class, "MCR.ACL.AccessKey.Service.Class");
     }
 
     /**
@@ -175,8 +175,4 @@ public interface MCRAccessKeyService {
      */
     String processSecret(String reference, String secret);
 
-    final class LazyInstanceHolder {
-        public static final MCRAccessKeyService SINGLETON_INSTANCE = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRAccessKeyService.class, "MCR.ACL.AccessKey.Service.Class");
-    }
 }

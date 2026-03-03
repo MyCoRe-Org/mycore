@@ -160,11 +160,7 @@ public interface MCRCategLinkService {
     void setLinks(MCRCategLinkReference objectReference, Collection<MCRCategoryID> categories);
 
     static MCRCategLinkService obtainInstance() {
-        return LazyInstanceHolder.SHARED_INSTANCE;
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRCategLinkService.class, "MCR.Category.LinkService");
     }
-
-    final class LazyInstanceHolder {
-        private static final MCRCategLinkService SHARED_INSTANCE =
-            MCRConfiguration2.getSingleInstanceOfOrThrow(MCRCategLinkService.class, "MCR.Category.LinkService");
-    }
+    
 }

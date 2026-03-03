@@ -74,6 +74,8 @@ public final class MCRJSONManager {
 
     public static final String TYPE_ADAPTERS_KEY = "TypeAdapters";
 
+    private static final String CLASS_PROPERTY = MANAGER_PROPERTY + ".Class";
+
     private final GsonBuilder gsonBuilder = new GsonBuilder();
 
     public MCRJSONManager(List<MCRJSONTypeAdapter<?>> typeAdapters) {
@@ -88,12 +90,11 @@ public final class MCRJSONManager {
     }
 
     public static MCRJSONManager obtainInstance() {
-        return LazyInstanceHolder.SHARED_INSTANCE;
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRJSONManager.class, CLASS_PROPERTY);
     }
-    
+
     public static MCRJSONManager createInstance() {
-        String classProperty = MANAGER_PROPERTY + ".Class";
-        return MCRConfiguration2.getInstanceOfOrThrow(MCRJSONManager.class, classProperty);
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRJSONManager.class, CLASS_PROPERTY);
     }
 
     public Gson createGson() {
@@ -115,10 +116,6 @@ public final class MCRJSONManager {
             return new MCRJSONManager(new ArrayList<>(typeAdapters.values()));
         }
 
-    }
-
-    private static final class LazyInstanceHolder {
-        public static final MCRJSONManager SHARED_INSTANCE = createInstance();
     }
 
 }

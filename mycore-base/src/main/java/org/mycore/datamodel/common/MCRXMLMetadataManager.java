@@ -101,7 +101,7 @@ public interface MCRXMLMetadataManager {
      * @return the XML metadata manager
      */
     static MCRXMLMetadataManager obtainInstance() {
-        return LazyInstanceHolder.SINGLETON_INSTANCE;
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRXMLMetadataManager.class, "MCR.Metadata.Manager.Class");
     }
 
     /**
@@ -197,8 +197,8 @@ public interface MCRXMLMetadataManager {
 
     default int getHighestStoredID(String base) {
         return getHighestStoredID(
-                base.substring(0, base.indexOf('_')),
-                base.substring(base.indexOf('_') + 1));
+            base.substring(0, base.indexOf('_')),
+            base.substring(base.indexOf('_') + 1));
     }
 
     /**
@@ -393,11 +393,6 @@ public interface MCRXMLMetadataManager {
      */
     default long getLastModified() {
         return MCRConfigurationBase.getSystemLastModified();
-    }
-
-    final class LazyInstanceHolder {
-        public static final MCRXMLMetadataManager SINGLETON_INSTANCE = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRXMLMetadataManager.class, "MCR.Metadata.Manager.Class");
     }
 
 }

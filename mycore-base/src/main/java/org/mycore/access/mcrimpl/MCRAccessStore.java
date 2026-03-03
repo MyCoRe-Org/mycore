@@ -76,7 +76,7 @@ public abstract class MCRAccessStore {
     public abstract Collection<String> getDistinctStringIDs();
 
     public static MCRAccessStore obtainInstance() {
-        return LazyInstanceHolder.SHARED_INSTANCE;
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRAccessStore.class, "MCR.Persistence.Access.Store.Class");
     }
 
     public static Collection<String> getPools() {
@@ -150,11 +150,6 @@ public abstract class MCRAccessStore {
             LOGGER.error("definition loading failed: ");
             return null;
         }
-    }
-
-    private static final class LazyInstanceHolder {
-        public static final MCRAccessStore SHARED_INSTANCE = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRAccessStore.class, "MCR.Persistence.Access.Store.Class");
     }
 
 }

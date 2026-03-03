@@ -58,12 +58,8 @@ public interface MCRObjectQueryResolver {
     int count(MCRObjectQuery objectQuery);
 
     static MCRObjectQueryResolver obtainInstance() {
-        return InstanceHolder.SHARED_INSTANCE;
-    }
-
-    class InstanceHolder {
-        private static final MCRObjectQueryResolver SHARED_INSTANCE = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRObjectQueryResolver.class, "MCR.Object.QueryResolver.Class");
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRObjectQueryResolver.class,
+            "MCR.Object.QueryResolver.Class");
     }
 
 }

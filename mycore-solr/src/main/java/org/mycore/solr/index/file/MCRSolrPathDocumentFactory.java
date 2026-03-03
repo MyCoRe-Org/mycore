@@ -48,16 +48,17 @@ public class MCRSolrPathDocumentFactory {
 
     private static final String ACCUMULATOR_LIST_PROPERTY_NAME = SOLR_CONFIG_PREFIX + "Indexer.File.AccumulatorList";
 
+    private static final String CLASS_PROPERTY = SOLR_CONFIG_PREFIX + "SolrInputDocument.Path.Factory";
+
     private static final List<MCRSolrFileIndexAccumulator> ACCUMULATOR_LIST = resolveAccumulators();
 
     @MCRFactory
     public static MCRSolrPathDocumentFactory obtainInstance() {
-        return LazyInstanceHolder.SHARED_INSTANCE;
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRSolrPathDocumentFactory.class, CLASS_PROPERTY);
     }
 
     public static MCRSolrPathDocumentFactory createInstance() {
-        return MCRConfiguration2.getInstanceOfOrThrow(MCRSolrPathDocumentFactory.class,
-            SOLR_CONFIG_PREFIX + "SolrInputDocument.Path.Factory");
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRSolrPathDocumentFactory.class, CLASS_PROPERTY);
     }
 
     /**
@@ -120,7 +121,4 @@ public class MCRSolrPathDocumentFactory {
         return doc;
     }
 
-    private static class LazyInstanceHolder {
-        private static final MCRSolrPathDocumentFactory SHARED_INSTANCE = createInstance();
-    }
 }

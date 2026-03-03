@@ -284,11 +284,7 @@ public interface MCRCategoryDAO {
     long getLastModified(String root);
 
     static MCRCategoryDAO obtainInstance() {
-        return LazyInstanceHolder.INSTANCE;
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRCategoryDAO.class, "MCR.Category.DAO");
     }
 
-    final class LazyInstanceHolder {
-        private static final MCRCategoryDAO INSTANCE =
-            MCRConfiguration2.getInstanceOfOrThrow(MCRCategoryDAO.class, "MCR.Category.DAO");
-    }
 }
