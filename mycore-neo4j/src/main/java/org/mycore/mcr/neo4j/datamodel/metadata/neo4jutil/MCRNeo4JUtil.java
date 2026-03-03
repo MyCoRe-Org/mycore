@@ -31,7 +31,6 @@ import org.apache.commons.lang3.Strings;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.mcr.neo4j.datamodel.metadata.neo4jparser.MCRNeo4JAbstractDataModelParser;
@@ -55,7 +54,7 @@ public final class MCRNeo4JUtil {
     public static String getClassificationLabel(String classidString, String categidString, String language) {
         String label = "";
         MCRCategoryID categid = new MCRCategoryID(classidString, categidString);
-        MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
+        MCRCategoryDAO dao = MCRCategoryDAO.obtainInstance();
         MCRCategory categ = dao.getCategory(categid, 1);
         MCRLabel categLabel = categ.getLabel(language).orElse(null);
         if (categLabel != null) {
@@ -73,7 +72,7 @@ public final class MCRNeo4JUtil {
      * @return the label of the classification
      */
     public static Optional<String> getClassLabel(final String classID, final String categID, final String lang) {
-        final MCRCategory category = MCRCategoryDAOFactory.obtainInstance()
+        final MCRCategory category = MCRCategoryDAO.obtainInstance()
             .getCategory(new MCRCategoryID(classID, categID), 1);
 
         if (null == category) {

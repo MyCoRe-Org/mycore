@@ -18,7 +18,7 @@
 
 package org.mycore.mods.classification;
 
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.w3c.dom.Element;
 
@@ -98,6 +98,6 @@ class MCRTypeOfResource extends MCRAuthorityInfo {
     }
 
     public static boolean isClassificationPresent() {
-        return MCRCategoryDAOFactory.obtainInstance().exist(new MCRCategoryID(TYPE_OF_RESOURCE));
+        return MCRCategoryDAO.obtainInstance().exist(new MCRCategoryID(TYPE_OF_RESOURCE));
     }
 }

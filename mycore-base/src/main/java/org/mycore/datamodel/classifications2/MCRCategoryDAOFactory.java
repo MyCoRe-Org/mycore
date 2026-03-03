@@ -24,14 +24,18 @@ import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * @author Thomas Scheffler (yagee)
- * 
+ *
  * @since 2.0
  */
+@Deprecated(forRemoval = true)
 public class MCRCategoryDAOFactory {
 
     /**
      * Returns an instance of a MCRCategoryDAO implementation.
+     *
+     * @deprecated Use {@link MCRCategoryDAO#obtainInstance()} instead.
      */
+    @Deprecated(forRemoval = true)
     public static MCRCategoryDAO obtainInstance() {
         return Objects.requireNonNull(MCRCategoryDAOHolder.instance,
             "MCRCategoryDAO cannot be NULL - There is a problem with the loading order of classes");
@@ -40,9 +44,10 @@ public class MCRCategoryDAOFactory {
     /**
      * Sets a new category dao implementation for this factory. This could be useful for different test cases
      * with mock objects.
-     * 
+     *
      * @param daoClass new dao class
      */
+    @Deprecated(forRemoval = true)
     public static synchronized void set(Class<? extends MCRCategoryDAO> daoClass) throws ReflectiveOperationException {
         MCRCategoryDAOHolder.instance = daoClass.getDeclaredConstructor().newInstance();
     }

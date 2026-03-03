@@ -36,7 +36,6 @@ import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -53,7 +52,7 @@ public class MCRSolrFileIndexBaseAccumulator implements MCRSolrFileIndexAccumula
 
     private static final MCRXMLMetadataManager XML_MANAGER = MCRXMLMetadataManager.obtainInstance();
 
-    private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.obtainInstance();
+    private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAO.obtainInstance();
 
     private static final MCRCache<String, String> DERIVATE_MODIFIED_CACHE
         = new MCRCache<>(10_000, "derivateID ISODateString cache");

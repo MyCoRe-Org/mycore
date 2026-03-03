@@ -38,7 +38,6 @@ import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.MCRSolrCoreManager;
@@ -78,7 +77,7 @@ public final class MCRSolrClassificationUtil {
     public static void rebuildIndex(List<MCRSolrCore> cores) {
         LOGGER.info("rebuild classification index...");
         // categories
-        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
+        MCRCategoryDAO categoryDAO = MCRCategoryDAO.obtainInstance();
         List<MCRCategoryID> rootCategoryIDs = categoryDAO.getRootCategoryIDs();
         for (MCRCategoryID rootID : rootCategoryIDs) {
             LOGGER.info("rebuild classification '{}'...", rootID);
@@ -251,7 +250,7 @@ public final class MCRSolrClassificationUtil {
 
     public static void reindex(Collection<MCRCategoryID> categoryIds) {
         List<MCRCategory> categoryList = new ArrayList<>(categoryIds.size());
-        MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
+        MCRCategoryDAO dao = MCRCategoryDAO.obtainInstance();
         for (MCRCategoryID categoryId : categoryIds) {
             MCRCategory category = dao.getCategory(categoryId, 0);
             categoryList.add(category);

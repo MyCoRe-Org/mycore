@@ -31,7 +31,6 @@ import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 
@@ -62,7 +61,7 @@ public final class MCRLanguageFactory {
      */
     private final MCRCategoryID classification;
 
-    private final MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
+    private final MCRCategoryDAO categoryDAO = MCRCategoryDAO.obtainInstance();
 
     /**
      * Language classification may change at runtime, so we remember the time we last read the languages in.

@@ -40,7 +40,6 @@ import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -61,7 +60,7 @@ public class MCRCategoryConditionTest {
     @BeforeEach
     public void setUp() throws Exception {
 
-        MCRCategoryDAO instance = MCRCategoryDAOFactory.obtainInstance();
+        MCRCategoryDAO instance = MCRCategoryDAO.obtainInstance();
         MCRCategoryImpl clazz = new MCRCategoryImpl();
         clazz.setRootID("clazz");
         clazz.setRootID("clazz");

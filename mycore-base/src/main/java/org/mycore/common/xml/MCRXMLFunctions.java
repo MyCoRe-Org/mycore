@@ -78,7 +78,6 @@ import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.common.MCRISO8601Date;
@@ -660,13 +659,13 @@ public class MCRXMLFunctions {
     public static boolean hasParentCategory(String classificationId, String categoryId) {
         MCRCategoryID categID = new MCRCategoryID(classificationId, categoryId);
         //root category has level 0
-        return !categID.isRootID() && MCRCategoryDAOFactory.obtainInstance().getCategory(categID, 0).getLevel() > 1;
+        return !categID.isRootID() && MCRCategoryDAO.obtainInstance().getCategory(categID, 0).getLevel() > 1;
     }
 
     public static String getDisplayName(String classificationId, String categoryId) {
         try {
             MCRCategoryID categID = new MCRCategoryID(classificationId, categoryId);
-            MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
+            MCRCategoryDAO dao = MCRCategoryDAO.obtainInstance();
             MCRCategory category = dao.getCategory(categID, 0);
             return Optional.ofNullable(category)
                 .map(MCRCategory::getCurrentLabel)
@@ -694,7 +693,7 @@ public class MCRXMLFunctions {
     public static String getDisplayName(String classificationId, String categoryId, String lang) {
         try {
             MCRCategoryID categID = new MCRCategoryID(classificationId, categoryId);
-            MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
+            MCRCategoryDAO dao = MCRCategoryDAO.obtainInstance();
             MCRCategory category = dao.getCategory(categID, 0);
             Optional<MCRLabel> label = category.getLabel(lang);
             return label.isEmpty() ? getDisplayName(classificationId, categoryId)
@@ -725,7 +724,7 @@ public class MCRXMLFunctions {
         MCRCategory category = null;
         try {
             MCRCategoryID categID = MCRCategoryID.ofString(classificationId + ":" + categoryId);
-            MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
+            MCRCategoryDAO dao = MCRCategoryDAO.obtainInstance();
             category = dao.getCategory(categID, 0);
         } catch (MCRException e) {
             LOGGER.error("Could not determine state for classification id {} and category id {}", classificationId,
