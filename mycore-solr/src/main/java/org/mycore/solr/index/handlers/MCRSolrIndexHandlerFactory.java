@@ -18,6 +18,8 @@
 
 package org.mycore.solr.index.handlers;
 
+import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -39,8 +41,6 @@ import org.mycore.solr.index.handlers.document.MCRSolrInputDocumentHandler;
 import org.mycore.solr.index.handlers.stream.MCRSolrFileIndexHandler;
 import org.mycore.solr.index.strategy.MCRSolrIndexStrategyManager;
 
-import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
-
 /**
  * @author Thomas Scheffler (yagee)
  *
@@ -49,11 +49,8 @@ public abstract class MCRSolrIndexHandlerFactory {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRSolrIndexHandlerFactory SHARED_INSTANCE = MCRConfiguration2
-        .getInstanceOfOrThrow(MCRSolrIndexHandlerFactory.class, SOLR_CONFIG_PREFIX + "IndexHandler.Factory");
-
     public static MCRSolrIndexHandlerFactory obtainInstance() {
-        return SHARED_INSTANCE;
+        return LazyInstanceHolder.SHARED_INSTANCE;
     }
 
     public abstract MCRSolrIndexHandler getIndexHandler(MCRContent content, MCRObjectID id);
@@ -114,4 +111,9 @@ public abstract class MCRSolrIndexHandlerFactory {
         return indexHandler;
     }
 
+    private static class LazyInstanceHolder {
+        private static final MCRSolrIndexHandlerFactory SHARED_INSTANCE =
+            MCRConfiguration2.getInstanceOfOrThrow(MCRSolrIndexHandlerFactory.class,
+                SOLR_CONFIG_PREFIX + "IndexHandler.Factory");
+    }
 }

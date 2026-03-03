@@ -71,8 +71,6 @@ public final class MCRUserInformationResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRUserInformationResolver SHARED_INSTANCE = createInstance();
-
     public static final String RESOLVER_PROPERTY = "MCR.UserInformation.Resolver";
 
     public static final String PROVIDERS_KEY = "Providers";
@@ -90,7 +88,7 @@ public final class MCRUserInformationResolver {
     }
 
     public static MCRUserInformationResolver obtainInstance() {
-        return SHARED_INSTANCE;
+        return LazyInstanceHolder.SHARED_INSTANCE;
     }
 
     public static MCRUserInformationResolver createInstance() {
@@ -153,4 +151,7 @@ public final class MCRUserInformationResolver {
 
     }
 
+    private static class LazyInstanceHolder {
+        public static MCRUserInformationResolver SHARED_INSTANCE = createInstance();
+    }
 }

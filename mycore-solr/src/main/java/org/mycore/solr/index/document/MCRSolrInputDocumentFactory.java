@@ -39,11 +39,8 @@ import org.xml.sax.SAXException;
  */
 public abstract class MCRSolrInputDocumentFactory {
 
-    private static final MCRSolrInputDocumentFactory SHARED_INSTANCE = MCRConfiguration2
-        .getInstanceOfOrThrow(MCRSolrInputDocumentFactory.class, SOLR_CONFIG_PREFIX + "SolrInputDocument.Factory");
-
     public static MCRSolrInputDocumentFactory obtainInstance() {
-        return SHARED_INSTANCE;
+        return LazyInstanceHolder.SHARED_INSTANCE;
     }
 
     public abstract SolrInputDocument getDocument(MCRObjectID id, MCRContent content) throws SAXException, IOException;
@@ -61,4 +58,9 @@ public abstract class MCRSolrInputDocumentFactory {
         return getDocument(derOrObj.getId(), content);
     }
 
+    private static class LazyInstanceHolder {
+        public static final MCRSolrInputDocumentFactory SHARED_INSTANCE =
+            MCRConfiguration2.getInstanceOfOrThrow(MCRSolrInputDocumentFactory.class,
+                SOLR_CONFIG_PREFIX + "SolrInputDocument.Factory");
+    }
 }

@@ -59,12 +59,14 @@ public class MCRLayoutService {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRLayoutService SHARED_INSTANCE = new MCRLayoutService();
-
     private static final String TRANSFORMER_FACTORY_PROPERTY = "MCR.Layout.Transformer.Factory";
 
     public static MCRLayoutService obtainInstance() {
-        return SHARED_INSTANCE;
+        return LazyInstanceHolder.SHARED_INSTANCE;
+    }
+
+    public static MCRLayoutService createInstance() {
+        return new MCRLayoutService();
     }
 
     public void sendXML(HttpServletRequest req, HttpServletResponse res, MCRContent xml) throws IOException {
@@ -262,5 +264,9 @@ public class MCRLayoutService {
     private static void endCurrentTransaction() {
         MCRSessionMgr.getCurrentSession();
         MCRTransactionManager.commitTransactions();
+    }
+
+    private static final class LazyInstanceHolder {
+        private static final MCRLayoutService SHARED_INSTANCE = createInstance();
     }
 }
