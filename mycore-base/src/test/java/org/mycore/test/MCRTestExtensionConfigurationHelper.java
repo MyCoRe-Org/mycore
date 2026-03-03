@@ -26,10 +26,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -154,14 +156,21 @@ public class MCRTestExtensionConfigurationHelper {
             .orElseGet(List::of);
     }
 
-    // Traverse the class hierarchy to find @MyAnnotation on the class or any of its superclasses.
+    // Traverse the class hierarchy (superclasses) and enclosing classes to find @MCRTestConfiguration annotations.
     private static List<MCRTestConfiguration> findClassHierarchyTestConfigurations(Class<?> clazz) {
         List<MCRTestConfiguration> annotations = new ArrayList<>();
-        for (Class<?> current = clazz; current != null; current = current.getSuperclass()) {
-            MCRTestConfiguration annotation = current.getAnnotation(MCRTestConfiguration.class);
-            if (annotation != null) {
-                annotations.add(annotation);
+        Set<Class<?>> visited = new HashSet<>();
+        Class<?> currentClass = clazz;
+        while (currentClass != null) {
+            for (Class<?> current = currentClass; current != null; current = current.getSuperclass()) {
+                if (visited.add(current)) { //only add annotation of a class once
+                    MCRTestConfiguration annotation = current.getAnnotation(MCRTestConfiguration.class);
+                    if (annotation != null) {
+                        annotations.add(annotation);
+                    }
+                }
             }
+            currentClass = currentClass.getEnclosingClass();
         }
         return annotations;
     }
