@@ -29,8 +29,6 @@ import javax.xml.transform.URIResolver;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jdom2.Element;
-import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRClassTools;
 
 /**
@@ -67,11 +65,9 @@ public class MCRFunctionResolver implements URIResolver {
 
             Method method = MCRClassTools.forName(className).getMethod(methodName, types);
             Object result = method.invoke(null, params);
-
-            Element string = new Element("string");
-            string.setText(result == null ? "" : String.valueOf(result));
-
-            return new JDOMSource(string);
+            
+            return MCRURIResolver.createStringResponse(
+                result == null ? "" : String.valueOf(result));
         } catch (Exception e) {
             throw new TransformerException(e);
         }

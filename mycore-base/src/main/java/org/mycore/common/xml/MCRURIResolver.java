@@ -179,7 +179,7 @@ public final class MCRURIResolver implements URIResolver {
     public static MCRURIResolver obtainInstance() {
         return SHARED_INSTANCE;
     }
-    
+
     public static Map<String, String> getParameterMap(String key) {
         String[] param;
         StringTokenizer tok = new StringTokenizer(key, "&");
@@ -191,6 +191,30 @@ public final class MCRURIResolver implements URIResolver {
                 param.length >= 2 ? URLDecoder.decode(param[1], StandardCharsets.UTF_8) : "");
         }
         return params;
+    }
+
+    /**
+     * creates the default boolean response of a MyCoRe URIResolver.
+     * This is an element with text body: &lt;boolean&gt;true|false&lt;boolean&gt;
+     * @param value the boolean value that should be returned
+     * @return a JDOMSource
+     */
+    public static Source createBooleanResponse(boolean value) {
+        Element root = new Element("boolean");
+        root.setText(Boolean.toString(value));
+        return new JDOMSource(root);
+    }
+
+    /**
+     * creates the default String response of a MyCoRe URIResolver.
+     * This is an element with text body: &lt;string&gt;texte&lt;string&gt;
+     * @param text the String text that should be returned
+     * @return a JDOMSource
+     */
+    public static Source createStringResponse(String text) {
+        Element root = new Element("string");
+        root.setText(text);
+        return new JDOMSource(root);
     }
 
     static URI resolveURI(String href, String base) {
@@ -1816,9 +1840,7 @@ public final class MCRURIResolver implements URIResolver {
                 default -> throw new IllegalArgumentException(
                     "Invalid format of uri for retrieval of checkPermission: " + href);
             };
-            Element root = new Element("boolean");
-            root.setText(Boolean.toString(permission));
-            return new JDOMSource(root);
+            return MCRURIResolver.createBooleanResponse(permission);
         }
     }
 

@@ -25,10 +25,9 @@ import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
-import org.jdom2.Element;
-import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.xml.MCRURIResolver;
 
 /**
  * Provides URIResolver to hash string.
@@ -79,8 +78,6 @@ public class MCRORCIDHashResolver implements URIResolver {
         } catch (NumberFormatException e) {
             throw new MCRException("Invalid format of uri for retrieval of hash: " + href, e);
         }
-        final Element root = new Element("string");
-        root.setText(result);
-        return new JDOMSource(root);
+        return MCRURIResolver.createStringResponse(result);
     }
 }
