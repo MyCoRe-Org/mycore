@@ -18,24 +18,11 @@
 
 package org.mycore.datamodel.common;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import org.mycore.common.MCRCache;
-import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.content.MCRContent;
-import org.mycore.datamodel.ifs2.MCRMetadataVersion;
-import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.datamodel.metadata.MCRObjectID;
-
 /**
  * Provides an abstract class for persistence managers of MCRObject and MCRDerivate xml
  * metadata to extend, with methods to perform CRUD operations on object metadata.
  * <p>
- * The default xml metadata manager is {@link MCRDefaultXMLMetadataManagerAdapter}. If you wish to use
+ * The default xml metadata manager is {@link MCRDefaultXMLMetadataManager}. If you wish to use
  * another manager implementation instead, change the following property accordingly:
  * <p>
  * MCR.Metadata.Manager.Class=org.mycore.datamodel.common.MCRDefaultXMLMetadataManager
@@ -70,167 +57,10 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * extensions (e.g. MCRDefaultXMLMetadataManager) for details.
  *
  * @author Christoph Neidahl (OPNA2608)
+ * 
+ * @deprecated Use {@link MCRXMLMetadataManager instead}.
  */
-public interface MCRXMLMetadataManagerAdapter {
+@Deprecated(forRemoval = true)
+public interface MCRXMLMetadataManagerAdapter extends MCRXMLMetadataManager {
 
-    /**
-     * Reads configuration properties, checks and creates base directories and builds the singleton.
-     */
-    void reload();
-
-    /**
-     * Try to validate a store.
-     *
-     * @param base The base ID of a to-be-validated store
-     */
-    void verifyStore(String base);
-
-    /**
-     * Stores metadata of a new MCRObject in the persistent store.
-     *
-     * @param mcrid the MCRObjectID
-     * @param xml the xml metadata of the MCRObject
-     * @param lastModified the date of last modification to set
-     * @throws MCRPersistenceException the object couldn't be created due persistence problems
-     */
-    void create(MCRObjectID mcrid, MCRContent xml, Date lastModified)
-        throws MCRPersistenceException;
-
-    /**
-     * Delete metadata in store.
-     * 
-     * @param mcrid the MCRObjectID
-     * @throws MCRPersistenceException if an error occurs during the deletion
-     */
-    void delete(MCRObjectID mcrid) throws MCRPersistenceException;
-
-    /**
-     * Updates metadata of existing MCRObject in the persistent store.
-     *
-     * @param mcrid the MCRObjectID
-     * @param xml the xml metadata of the MCRObject
-     * @param lastModified the date of last modification to set
-     */
-    void update(MCRObjectID mcrid, MCRContent xml, Date lastModified)
-        throws MCRPersistenceException;
-
-    /**
-     * Retrieves the (latest) content of a metadata object.
-     *
-     * @param mcrid
-     *            the id of the object to be retrieved
-     * @return a {@link MCRContent} representing the {@link MCRObject} or
-     *         <code>null</code> if there is no such object
-     */
-    MCRContent retrieveContent(MCRObjectID mcrid) throws IOException;
-
-    /**
-     * Retrieves the content of a specific revision of a metadata object.
-     *
-     * @param mcrid
-     *            the id of the object to be retrieved
-     * @param revision
-     *            the revision to be returned, specify -1 if you want to
-     *            retrieve the latest revision (includes deleted objects also)
-     * @return a {@link MCRContent} representing the {@link MCRObject} of the
-     *         given revision or <code>null</code> if there is no such object
-     *         with the given revision
-     */
-    MCRContent retrieveContent(MCRObjectID mcrid, String revision) throws IOException;
-
-    /**
-     * Lists all versions of this metadata object available in the
-     * subversion repository.
-     *
-     * @param id
-     *            the id of the object to be retrieved
-     * @return {@link List} with all {@link MCRMetadataVersion} of
-     *         the given object or null if the id is null or the metadata
-     *         store doesn't support versioning
-     */
-    List<? extends MCRAbstractMetadataVersion<?>> listRevisions(MCRObjectID id) throws IOException;
-
-    /**
-     * This method returns the highest stored ID number for a given MCRObjectID
-     * base, or 0 if no object is stored for this type and project.
-     *
-     * @param project
-     *            the project ID part of the MCRObjectID base
-     * @param type
-     *            the type ID part of the MCRObjectID base
-     * @exception MCRPersistenceException
-     *                if a persistence problem is occurred
-     * @return the highest stored ID number as a String
-     */
-    int getHighestStoredID(String project, String type);
-
-    /**
-     * Checks if an object with the given MCRObjectID exists in the store.
-     *
-     * @param mcrid
-     *            the MCRObjectID to check
-     * @return true if the ID exists, or false if it doesn't
-     * @throws MCRPersistenceException if an error occurred in the store
-     */
-    boolean exists(MCRObjectID mcrid) throws MCRPersistenceException;
-
-    /**
-     * Lists all MCRObjectIDs stored for the given base, which is {project}_{type}
-     *
-     * @param base
-     *            the MCRObjectID base, e.g. DocPortal_document
-     * @return List of Strings with all MyCoRe identifiers found in the metadata stores for the given base
-     */
-    List<String> listIDsForBase(String base);
-
-    /**
-     * Lists all MCRObjectIDs stored for the given object type, for all projects
-     *
-     * @param type
-     *            the MCRObject type, e.g. document
-     * @return List of Strings with all MyCoRe identifiers found in the metadata store for the given type
-     */
-    List<String> listIDsOfType(String type);
-
-    /**
-     * Lists all MCRObjectIDs of all types and projects stored in any metadata store
-     *
-     * @return List of Strings with all MyCoRe identifiers found in the metadata store
-     */
-    List<String> listIDs();
-
-    /**
-     * Returns all stored object types of MCRObjects/MCRDerivates.
-     *
-     * @return Collection of Strings with all object types
-     * @see MCRObjectID#getTypeId()
-     */
-    Collection<String> getObjectTypes();
-
-    /**
-     * Returns all used base ids of MCRObjects/MCRDerivates.
-     *
-     * @return Collection of Strings with all object base identifier
-     * @see MCRObjectID#getBase()
-     */
-    Collection<String> getObjectBaseIds();
-
-    /**
-     * Returns an enhanced list of object ids and their last modified date
-     *
-     * @param ids MCRObject ids
-     */
-    List<MCRObjectIDDate> retrieveObjectDates(List<String> ids) throws IOException;
-
-    /**
-     * Returns the time when the xml data of a MCRObject was last modified.
-     *
-     * @param id
-     *            the MCRObjectID of an object
-     * @return the last modification data of the object
-     * @throws IOException thrown while retrieving the object from the store
-     */
-    long getLastModified(MCRObjectID id) throws IOException;
-
-    MCRCache.ModifiedHandle getLastModifiedHandle(MCRObjectID id, long expire, TimeUnit unit);
 }

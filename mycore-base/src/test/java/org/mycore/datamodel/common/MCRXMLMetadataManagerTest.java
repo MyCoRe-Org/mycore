@@ -61,7 +61,7 @@ import org.xml.sax.SAXException;
 @MyCoReTest
 @ExtendWith(MCRMetadataExtension.class)
 @MCRTestConfiguration(properties = {
-    @MCRTestProperty(key = "MCR.Metadata.Manager.Class", classNameOf = MCRDefaultXMLMetadataManagerAdapter.class),
+    @MCRTestProperty(key = "MCR.Metadata.Manager.Class", classNameOf = MCRDefaultXMLMetadataManager.class),
     @MCRTestProperty(key = "MCR.Metadata.Type.document", string = "true"),
     @MCRTestProperty(key = "MCR.Metadata.ObjectID.NumberPattern", string = "00000000")
 })
@@ -208,7 +208,7 @@ public class MCRXMLMetadataManagerTest {
     }
 
     private MCRXMLMetadataManager getStore() {
-        return MCRXMLMetadataManager.getInstance();
+        return MCRXMLMetadataManager.obtainInstance();
     }
 
     private static class XMLInfo {

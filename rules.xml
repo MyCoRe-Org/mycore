@@ -243,6 +243,8 @@
           //MethodDeclaration
             [
               @Name='getInstance'
+                and
+              not(ModifierList/Annotation/ClassType[pmd-java:typeIs('java.lang.Deprecated')])
             ]
             [
               not(pmd-java:modifiers()='static')
@@ -263,6 +265,8 @@
           //MethodDeclaration
             [
               @Name='getInstance'
+                and
+              not(ModifierList/Annotation/ClassType[pmd-java:typeIs('java.lang.Deprecated')])
             ]
             [
               not(ClassType[pmd-java:typeIs(../../../@CanonicalName)])
@@ -283,6 +287,8 @@
           //MethodDeclaration
             [
               @Name='getInstance'
+                and
+              not(ModifierList/Annotation/ClassType[pmd-java:typeIs('java.lang.Deprecated')])
             ]
             [
               not(../..[pmd-java:modifiers()='final'])
@@ -303,6 +309,8 @@
           //MethodDeclaration
             [
               @Name='getInstance'
+                and
+              not(ModifierList/Annotation/ClassType[pmd-java:typeIs('java.lang.Deprecated')])
             ]
             [
               not(../ConstructorDeclaration[pmd-java:modifiers()='private'])
@@ -323,6 +331,8 @@
           //MethodDeclaration
             [
               @Name='getInstance'
+                and
+              not(ModifierList/Annotation/ClassType[pmd-java:typeIs('java.lang.Deprecated')])
             ]
             [
               ../ConstructorDeclaration[not(deep-equal(pmd-java:modifiers(),('private')))]

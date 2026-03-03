@@ -87,7 +87,7 @@ public class MCRIFS2Commands extends MCRAbstractCommands {
     }
 
     private static void initMetadataStores() {
-        final MCRXMLMetadataManager metadataManager = MCRXMLMetadataManager.getInstance();
+        final MCRXMLMetadataManager metadataManager = MCRXMLMetadataManager.obtainInstance();
         metadataManager.getObjectBaseIds().forEach(id -> {
             final String[] parts = id.split("_");
             metadataManager.getHighestStoredID(parts[0], parts[1]);

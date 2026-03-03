@@ -62,12 +62,12 @@ public abstract class MCRSolrIndexHandlerFactory {
 
     public MCRSolrIndexHandler getIndexHandler(MCRObjectID... ids) throws IOException {
         if (ids.length == 1) {
-            MCRContent content = MCRXMLMetadataManager.getInstance().retrieveContent(ids[0]);
+            MCRContent content = MCRXMLMetadataManager.obtainInstance().retrieveContent(ids[0]);
             return getIndexHandler(content, ids[0]);
         }
         Map<MCRObjectID, MCRContent> contentMap = new HashMap<>();
         for (MCRObjectID id : ids) {
-            MCRContent content = MCRXMLMetadataManager.getInstance().retrieveContent(id);
+            MCRContent content = MCRXMLMetadataManager.obtainInstance().retrieveContent(id);
             contentMap.put(id, content);
         }
         return getIndexHandler(contentMap);
