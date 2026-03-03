@@ -80,20 +80,23 @@ public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
         }
 
         try {
-            String mcrid = pathParts[mcrIdPos];
-            String mcridExtension = getExtension(mcrid);
-            final String objectId = DECODE_MCR_OBJECT_IDS ? URLDecoder.decode(mcrid, StandardCharsets.UTF_8) : mcrid;
+            final String mcrid = pathParts[mcrIdPos];
+            String objectId = DECODE_MCR_OBJECT_IDS ? URLDecoder.decode(mcrid, StandardCharsets.UTF_8) : mcrid;
+            String objectIdExtension = getExtension(objectId);
+            objectId = objectId.substring(0, objectId.length() - objectIdExtension.length());
+            
             Optional<MCRObjectID> optObjId = mcrIdMapper.mapMCRObjectID(objectId);
             if (optObjId.isEmpty()) {
                 throw new NotFoundException("No unique MyCoRe Object ID found for query " + objectId);
             }
-            pathParts[mcrIdPos] = optObjId.get().toString() + mcridExtension;
+            pathParts[mcrIdPos] = optObjId.get().toString() + objectIdExtension;
 
             if (optObjId.isPresent() && pathParts.length > derIdPos && pathParts[derIdPos - 1].equals("derivates")) {
-                String derid = pathParts[derIdPos];
-                String deridExtension = getExtension(derid);
-                final String derivateId =
+                final String derid = pathParts[derIdPos];
+                String derivateId =
                     DECODE_MCR_OBJECT_IDS ? URLDecoder.decode(derid, StandardCharsets.UTF_8) : derid;
+                String deridExtension = getExtension(derivateId);
+                derivateId = derivateId.substring(0, derivateId.length() - deridExtension.length());
                 Optional<MCRObjectID> optDerId = mcrIdMapper.mapMCRDerivateID(optObjId.get(), derivateId);
                 if (optDerId.isEmpty()) {
                     throw new NotFoundException("No unique MyCoRe Derivate ID found for query " + derivateId);
