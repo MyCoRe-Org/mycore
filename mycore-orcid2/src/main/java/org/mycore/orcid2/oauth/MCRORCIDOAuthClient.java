@@ -59,7 +59,7 @@ public final class MCRORCIDOAuthClient {
     public static MCRORCIDOAuthClient obtainInstance() {
         return LazyInstanceHelper.SHARED_INSTANCE;
     }
-    
+
     public static MCRORCIDOAuthClient createInstance() {
         return new MCRORCIDOAuthClient(new Settings(
             MCRORCIDConstants.ORCID_BASE_URL,

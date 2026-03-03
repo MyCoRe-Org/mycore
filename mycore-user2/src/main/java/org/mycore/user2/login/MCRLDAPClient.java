@@ -125,7 +125,7 @@ public final class MCRLDAPClient {
     public static MCRLDAPClient obtainInstance() {
         return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRLDAPClient.class, CLASS_PROPERTY);
     }
-    
+
     public static MCRLDAPClient createInstance() {
         return MCRConfiguration2.getInstanceOfOrThrow(MCRLDAPClient.class, CLASS_PROPERTY);
     }

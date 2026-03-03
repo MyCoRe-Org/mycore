@@ -111,5 +111,5 @@ public abstract class MCRSolrIndexHandlerFactory {
         indexHandler.getStatistic().addTime(end - start);
         return indexHandler;
     }
-    
+
 }

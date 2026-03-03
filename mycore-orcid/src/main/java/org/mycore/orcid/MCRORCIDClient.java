@@ -45,7 +45,7 @@ public final class MCRORCIDClient {
     public static MCRORCIDClient obtainInstance() {
         return LazyInstanceHolder.SHARED_INSTANCE;
     }
-    
+
     public static MCRORCIDClient createInstance() {
         return new MCRORCIDClient(MCRConfiguration2.getStringOrThrow("MCR.ORCID.BaseURL"));
     }

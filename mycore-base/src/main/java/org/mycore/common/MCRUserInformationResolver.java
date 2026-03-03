@@ -94,7 +94,7 @@ public final class MCRUserInformationResolver {
     public static MCRUserInformationResolver obtainInstance() {
         return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRUserInformationResolver.class, CLASS_PROPERTY);
     }
-    
+
     public static MCRUserInformationResolver createInstance() {
         return MCRConfiguration2.getInstanceOfOrThrow(MCRUserInformationResolver.class, CLASS_PROPERTY);
     }
@@ -153,5 +153,5 @@ public final class MCRUserInformationResolver {
         }
 
     }
-    
+
 }

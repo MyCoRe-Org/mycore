@@ -146,7 +146,7 @@ public final class MCRPasswordCheckManager {
     public static MCRPasswordCheckManager obtainInstance() {
         return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRPasswordCheckManager.class, CLASS_PROPERTY);
     }
-    
+
     public static MCRPasswordCheckManager createInstance() {
         return MCRConfiguration2.getInstanceOfOrThrow(MCRPasswordCheckManager.class, CLASS_PROPERTY);
     }

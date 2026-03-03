@@ -58,5 +58,5 @@ public abstract class MCRSolrInputDocumentFactory {
         MCRBaseContent content = new MCRBaseContent(derOrObj);
         return getDocument(derOrObj.getId(), content);
     }
-    
+
 }

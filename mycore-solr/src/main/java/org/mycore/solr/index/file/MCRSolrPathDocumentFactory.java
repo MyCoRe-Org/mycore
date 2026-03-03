@@ -120,5 +120,5 @@ public class MCRSolrPathDocumentFactory {
 
         return doc;
     }
-    
+
 }

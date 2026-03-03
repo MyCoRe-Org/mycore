@@ -74,7 +74,7 @@ public final class MCROAuthClient {
     public static MCROAuthClient obtainInstance() {
         return MCRConfiguration2.getSingleInstanceOfOrThrow(MCROAuthClient.class, CLASS_PROPERTY);
     }
-    
+
     public static MCROAuthClient createInstance() {
         return MCRConfiguration2.getInstanceOfOrThrow(MCROAuthClient.class, CLASS_PROPERTY);
     }
