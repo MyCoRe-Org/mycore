@@ -93,7 +93,7 @@ import org.mycore.user2.MCRUser;
  *
  * @author Frank Lützenkirchen
  */
-@SuppressWarnings({"PMD.ReplaceHashtableWithMap"})
+@SuppressWarnings({ "PMD.ReplaceHashtableWithMap" })
 @MCRConfigurationProxy(proxyClass = MCRLDAPClient.Factory.class)
 public final class MCRLDAPClient {
 
@@ -103,7 +103,7 @@ public final class MCRLDAPClient {
 
     private final SearchSettings searchSettings;
 
-    @SuppressWarnings({"PMD.LooseCoupling"})
+    @SuppressWarnings({ "PMD.LooseCoupling" })
     private final Hashtable<String, String> ldapSettings;
 
     public MCRLDAPClient(ConnectionSettings connectionSettings, SearchSettings searchSettings) {

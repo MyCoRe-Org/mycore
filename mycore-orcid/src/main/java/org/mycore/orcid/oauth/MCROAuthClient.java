@@ -33,7 +33,6 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
-import org.mycore.common.config.annotation.MCRFactory;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.digest.MCRMD5Digest;
 import org.mycore.services.http.MCRURLQueryParameter;
@@ -68,7 +67,6 @@ public final class MCROAuthClient {
         this.client = ClientBuilder.newClient();
     }
 
-    @MCRFactory
     public static MCROAuthClient obtainInstance() {
         return LazyInstanceHolder.SHARED_INSTANCE;
     }
@@ -191,7 +189,6 @@ public final class MCROAuthClient {
         byte[] digest = md5Digest.digest();
         return MCRUtils.toHexString(digest);
     }
-
 
     public record Settings(
         String baseUrl,
