@@ -22,9 +22,11 @@ import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * @author Thomas Scheffler (yagee)
- * 
+ *
  * @since 2.0
+ * @deprecated Use {@link MCRCategLinkService#obtainInstance()} instead.
  */
+@Deprecated(forRemoval = true)
 public class MCRCategLinkServiceFactory {
 
     private static final MCRCategLinkService SHARED_INSTANCE = MCRConfiguration2.getInstanceOfOrThrow(
@@ -32,7 +34,10 @@ public class MCRCategLinkServiceFactory {
 
     /**
      * Returns an instance of a MCRCategoryDAO implementator.
+     *
+     * @deprecated Use {@link MCRCategLinkService#obtainInstance()} instead.
      */
+    @Deprecated(forRemoval = true)
     public static MCRCategLinkService obtainInstance() {
         return SHARED_INSTANCE;
     }

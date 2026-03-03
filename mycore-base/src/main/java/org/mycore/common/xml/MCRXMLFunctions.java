@@ -76,7 +76,6 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
-import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -974,7 +973,7 @@ public class MCRXMLFunctions {
     }
 
     private static final class MCRCategLinkServiceHolder {
-        public static final MCRCategLinkService INSTANCE = MCRCategLinkServiceFactory.obtainInstance();
+        public static final MCRCategLinkService INSTANCE = MCRCategLinkService.obtainInstance();
     }
 
     private static final class SetNodeList implements NodeList {

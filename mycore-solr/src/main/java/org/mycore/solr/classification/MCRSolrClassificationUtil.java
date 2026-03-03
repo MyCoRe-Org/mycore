@@ -36,7 +36,6 @@ import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
-import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -91,7 +90,7 @@ public final class MCRSolrClassificationUtil {
             bulkIndex(cores, solrDocumentList);
         }
         // links
-        MCRCategLinkService linkService = MCRCategLinkServiceFactory.obtainInstance();
+        MCRCategLinkService linkService = MCRCategLinkService.obtainInstance();
         Collection<String> linkTypes = linkService.getTypes();
         for (String linkType : linkTypes) {
             LOGGER.info("rebuild '{}' links...", linkType);

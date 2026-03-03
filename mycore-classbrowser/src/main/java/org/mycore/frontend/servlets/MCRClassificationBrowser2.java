@@ -38,7 +38,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
+import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -108,7 +108,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         Optional<MCRQueryAdapter> queryAdapter = configureQueryAdapter(req, settings, xml);
 
         Function<MCRCategoryID, String> toIdSearchValue = settings.addClassId() ? MCRCategoryID::toString
-            : MCRCategoryID::getId;
+                                                                                : MCRCategoryID::getId;
         List<Element> data = new ArrayList<>();
         for (MCRCategory child : category.getChildren()) {
             queryAdapter.ifPresent(qa -> qa.setCategory(toIdSearchValue.apply(child.getId())));
@@ -195,9 +195,9 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         }
 
         String classifID = category.getId().getRootID();
-        Map<MCRCategoryID, Number> count = MCRCategLinkServiceFactory.obtainInstance().countLinksForType(category,
+        Map<MCRCategoryID, Number> count = MCRCategLinkService.obtainInstance().countLinksForType(category,
             objType, true);
-        for (Iterator<Element> it = data.iterator(); it.hasNext();) {
+        for (Iterator<Element> it = data.iterator(); it.hasNext(); ) {
             Element child = it.next();
             MCRCategoryID childID = new MCRCategoryID(classifID, child.getAttributeValue("id"));
             int num = (count.containsKey(childID) ? count.get(childID).intValue() : 0);

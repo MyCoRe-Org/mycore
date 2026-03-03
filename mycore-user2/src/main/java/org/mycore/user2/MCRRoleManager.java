@@ -31,7 +31,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
-import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -59,7 +58,7 @@ public class MCRRoleManager {
 
     private static long lastLoaded;
 
-    private static final MCRCategLinkService CATEG_LINK_SERVICE = MCRCategLinkServiceFactory.obtainInstance();
+    private static final MCRCategLinkService CATEG_LINK_SERVICE = MCRCategLinkService.obtainInstance();
 
     static {
         loadSystemRoles();
@@ -208,8 +207,8 @@ public class MCRRoleManager {
      */
     public static void addRole(MCRRole role) {
         MCRCategoryID categoryID = role.isSystemRole()
-            ? new MCRCategoryID(MCRUser2Constants.ROLE_CLASSID.getRootID(), role.getName())
-            : MCRCategoryID.ofString(role.getName());
+                                   ? new MCRCategoryID(MCRUser2Constants.ROLE_CLASSID.getRootID(), role.getName())
+                                   : MCRCategoryID.ofString(role.getName());
         if (DAO.exist(categoryID)) {
             return;
         }
@@ -241,8 +240,8 @@ public class MCRRoleManager {
             return;
         }
         MCRCategoryID categoryID = role.isSystemRole()
-            ? new MCRCategoryID(MCRUser2Constants.ROLE_CLASSID.getRootID(), role.getName())
-            : MCRCategoryID.ofString(role.getName());
+                                   ? new MCRCategoryID(MCRUser2Constants.ROLE_CLASSID.getRootID(), role.getName())
+                                   : MCRCategoryID.ofString(role.getName());
         DAO.deleteCategory(categoryID);
     }
 

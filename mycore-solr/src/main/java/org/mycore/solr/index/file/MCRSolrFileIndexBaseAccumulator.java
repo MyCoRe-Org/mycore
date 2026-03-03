@@ -33,7 +33,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.MCRCache;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
-import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
+import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -75,7 +75,7 @@ public class MCRSolrFileIndexBaseAccumulator implements MCRSolrFileIndexAccumula
             String ownerID = mcrPath.getOwner();
             doc.setField("derivateID", ownerID);
             doc.setField("derivateModified", getDerivateModified(ownerID));
-            Collection<MCRCategoryID> linksFromReference = MCRCategLinkServiceFactory.obtainInstance()
+            Collection<MCRCategoryID> linksFromReference = MCRCategLinkService.obtainInstance()
                 .getLinksFromReference(new MCRCategLinkReference(mcrPath));
             Set<MCRCategoryID> linkedCategories = new HashSet<>(linksFromReference);
             for (MCRCategoryID category : linksFromReference) {
