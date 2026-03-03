@@ -39,7 +39,7 @@ import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
-import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
+import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRExpandedObject;
@@ -107,7 +107,7 @@ public final class MCRLinkTableManager {
     public static synchronized MCRLinkTableManager getInstance() {
         return SINGLETON_INSTANCE;
     }
-    
+
     /**
      * The method add a reference link pair.
      *
@@ -148,7 +148,6 @@ public final class MCRLinkTableManager {
             LOGGER.warn("The to value of a reference link is false, the link was not added to the link table");
             return;
         }
-
 
         String attrTrimmed = MCRUtils.filterTrimmedNotEmpty(attr).orElse("");
 
@@ -470,7 +469,6 @@ public final class MCRLinkTableManager {
         }
     }
 
-
     /**
      * Removes all references of this object.
      *
@@ -479,7 +477,7 @@ public final class MCRLinkTableManager {
     public void delete(MCRObjectID id) {
         deleteReferenceLink(id);
         MCRCategLinkReference reference = new MCRCategLinkReference(id);
-        MCRCategLinkServiceFactory.obtainInstance().deleteLink(reference);
+        MCRCategLinkService.obtainInstance().deleteLink(reference);
     }
 
     /**
@@ -491,8 +489,6 @@ public final class MCRLinkTableManager {
         delete(id);
         create(MCRMetadataManager.retrieve(id));
     }
-
-
 
     /**
      * Creates all references for the given object. You should call {@link #delete(MCRObjectID)} before using this
@@ -520,7 +516,7 @@ public final class MCRLinkTableManager {
         }
 
         MCRCategLinkReference objectReference = new MCRCategLinkReference(base.getId());
-        MCRCategLinkServiceFactory.obtainInstance().setLinks(objectReference, categoryList);
+        MCRCategLinkService.obtainInstance().setLinks(objectReference, categoryList);
     }
 
     public Collection<MCRCategoryID> getCategories(MCRBase obj) {

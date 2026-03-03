@@ -22,7 +22,6 @@ import java.util.Collection;
 
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
-import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -35,7 +34,7 @@ import org.mycore.wfc.MCRConstants;
  */
 public class MCRClassificationUtils {
 
-    private static final MCRCategLinkService LINK_SERVICE = MCRCategLinkServiceFactory.obtainInstance();
+    private static final MCRCategLinkService LINK_SERVICE = MCRCategLinkService.obtainInstance();
 
     private static final MCRLinkTableManager LINK_TABLE = MCRLinkTableManager.getInstance();
 

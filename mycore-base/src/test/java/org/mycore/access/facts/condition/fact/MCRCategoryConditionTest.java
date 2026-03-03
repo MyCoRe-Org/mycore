@@ -38,7 +38,7 @@ import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
-import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
+import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -92,7 +92,7 @@ public class MCRCategoryConditionTest {
         holder.add(new MCRObjectIDFact("objid", testId.toString(), testId));
 
         Collection<MCRCategoryID> collect = Stream.of(clazz1.getId()).collect(Collectors.toList());
-        MCRCategLinkServiceFactory.obtainInstance().setLinks(new MCRCategLinkReference(testId), collect);
+        MCRCategLinkService.obtainInstance().setLinks(new MCRCategLinkReference(testId), collect);
 
         MCRCategoryCondition categoryCondition = new MCRCategoryCondition();
 
@@ -113,7 +113,7 @@ public class MCRCategoryConditionTest {
         holder.add(new MCRObjectIDFact("objid", testId.toString(), testId));
 
         Collection<MCRCategoryID> collect = Stream.of(clazz1.getId()).collect(Collectors.toList());
-        MCRCategLinkServiceFactory.obtainInstance().setLinks(new MCRCategLinkReference(testId), collect);
+        MCRCategLinkService.obtainInstance().setLinks(new MCRCategLinkReference(testId), collect);
 
         MCRCategoryCondition categoryCondition = new MCRCategoryCondition();
 

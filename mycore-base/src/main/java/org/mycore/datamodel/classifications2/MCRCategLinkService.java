@@ -21,8 +21,10 @@ package org.mycore.datamodel.classifications2;
 import java.util.Collection;
 import java.util.Map;
 
+import org.mycore.common.config.MCRConfiguration2;
+
 /**
- * 
+ *
  * @author Thomas Scheffler (yagee)
  * @since 2.0
  */
@@ -30,7 +32,7 @@ public interface MCRCategLinkService {
 
     /**
      * Checks if a categories id refered by objects.
-     * 
+     *
      * @param category
      *            a subtree rooted at a MCRCategory for which links should be counted
      * @return true if the classification is used
@@ -39,7 +41,7 @@ public interface MCRCategLinkService {
 
     /**
      * Checks if the category with the given id is liked with an object
-     * 
+     *
      * @return
      *      true if is linked otherwise false
      */
@@ -47,7 +49,7 @@ public interface MCRCategLinkService {
 
     /**
      * Counts links to a collection of categories.
-     * 
+     *
      * @param category
      *            a subtree rooted at a MCRCategory for which links should be counted
      * @param childrenOnly
@@ -58,7 +60,7 @@ public interface MCRCategLinkService {
 
     /**
      * Counts links to a collection of categories.
-     * 
+     *
      * @param category
      *            a subtree rooted at a MCRCategory for which links should be counted
      * @param type
@@ -71,7 +73,7 @@ public interface MCRCategLinkService {
 
     /**
      * Delete all links that refer to the given {@link MCRCategLinkReference}.
-     * 
+     *
      * @param id
      *            an Object ID
      * @see #deleteLinks(Collection)
@@ -80,7 +82,7 @@ public interface MCRCategLinkService {
 
     /**
      * Delete all links that refer to the given collection of category links.
-     * 
+     *
      * @param ids
      *            a collection of {@link MCRCategLinkReference}
      * @see #deleteLink(MCRCategLinkReference)
@@ -89,7 +91,7 @@ public interface MCRCategLinkService {
 
     /**
      * Returns a list of linked Object IDs.
-     * 
+     *
      * @param id
      *            ID of the category
      * @return Collection of Object IDs, empty Collection when no links exist
@@ -98,7 +100,7 @@ public interface MCRCategLinkService {
 
     /**
      * Checks if a given reference is in a specific category.
-     * 
+     *
      * @param reference
      *            reference, e.g. to a MCRObject
      * @return true if the reference is in the category
@@ -107,7 +109,7 @@ public interface MCRCategLinkService {
 
     /**
      * Returns a list of linked Object IDs restricted by the specified type.
-     * 
+     *
      * @param id
      *            ID of the category
      * @param type
@@ -118,7 +120,7 @@ public interface MCRCategLinkService {
 
     /**
      * Returns a list of linked categories.
-     * 
+     *
      * @param reference
      *            reference, e.g. to a MCRObject
      * @return list of MCRCategoryID of linked categories
@@ -132,22 +134,22 @@ public interface MCRCategLinkService {
 
     /**
      * Return a collection of all link types.
-     * 
+     *
      */
     Collection<String> getTypes();
 
     /**
      * Returns a collection of all links for the given type.
-     * 
+     *
      */
     Collection<MCRCategoryLink> getLinks(String type);
 
     /**
      * Add links between categories and Objects.
-     * 
+     *
      * Implementors must assure that ancestor (parent) axis categories are
      * implicit linked by this method.
-     * 
+     *
      * @param objectReference
      *            reference to a Object
      * @param categories
@@ -157,4 +159,12 @@ public interface MCRCategLinkService {
      */
     void setLinks(MCRCategLinkReference objectReference, Collection<MCRCategoryID> categories);
 
+    static MCRCategLinkService obtainInstance() {
+        return LazyInstanceHolder.SHARED_INSTANCE;
+    }
+
+    final class LazyInstanceHolder {
+        private static final MCRCategLinkService SHARED_INSTANCE =
+            MCRConfiguration2.getSingleInstanceOfOrThrow(MCRCategLinkService.class, "MCR.Category.LinkService");
+    }
 }

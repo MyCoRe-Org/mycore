@@ -76,7 +76,6 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
-import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -666,7 +665,7 @@ public class MCRXMLFunctions {
             MCRCategoryID categID = MCRCategoryID.ofString(categoryId);
             MCRObjectID mcrObjectID = MCRObjectID.getInstance(objectId);
             MCRCategLinkReference reference = new MCRCategLinkReference(mcrObjectID);
-            return MCRCategLinkServiceHolder.INSTANCE.isInCategory(reference, categID);
+            return MCRCategLinkService.obtainInstance().isInCategory(reference, categID);
         } catch (MCRException e) {
             LOGGER.error("Error while checking if object is in category", e);
             return false;
@@ -994,10 +993,6 @@ public class MCRXMLFunctions {
         }
 
         return new SetNodeList(distinctNodeSet);
-    }
-
-    private static final class MCRCategLinkServiceHolder {
-        public static final MCRCategLinkService INSTANCE = MCRCategLinkServiceFactory.obtainInstance();
     }
 
     private record SetNodeList(Object[] objects) implements NodeList {
