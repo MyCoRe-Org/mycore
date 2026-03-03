@@ -43,8 +43,7 @@ import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 
 public final class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeable {
-    @SuppressWarnings("PMD.LooseCoupling")
-    private static final MCRTilingQueue SINGLETON_INSTANCE = new MCRTilingQueue();
+
     private static final Logger LOGGER = LogManager.getLogger();
 
     private final Queue<MCRTileJob> preFetch;
@@ -72,10 +71,10 @@ public final class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements C
      */
     @SuppressWarnings("PMD.LooseCoupling")
     public static MCRTilingQueue getInstance() {
-        if (!SINGLETON_INSTANCE.running) {
+        if (!LazyInstanceHolder.SINGLETON_INSTANCE.running) {
             return null;
         }
-        return SINGLETON_INSTANCE;
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     /**
@@ -280,7 +279,7 @@ public final class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements C
     private int preFetch(int amount) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         TypedQuery<MCRTileJob> query = em.createQuery(
-            "FROM MCRTileJob WHERE status='" + MCRJobState.NEW.toChar() + "' ORDER BY added ASC", MCRTileJob.class)
+                "FROM MCRTileJob WHERE status='" + MCRJobState.NEW.toChar() + "' ORDER BY added ASC", MCRTileJob.class)
             .setMaxResults(amount);
         Iterator<MCRTileJob> queryResult = query.getResultList().iterator();
         int i = 0;
@@ -396,4 +395,8 @@ public final class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements C
         return "MCRTilingQueue";
     }
 
+    @SuppressWarnings("PMD.LooseCoupling")
+    private static final class LazyInstanceHolder {
+        public static final MCRTilingQueue SINGLETON_INSTANCE = new MCRTilingQueue();
+    }
 }

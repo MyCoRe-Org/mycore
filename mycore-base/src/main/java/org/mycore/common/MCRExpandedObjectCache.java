@@ -31,7 +31,6 @@ public final class MCRExpandedObjectCache {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final String CACHE_ROOT_PATH_PROPERTY = "MCR.ObjectExpander.Cache.Path";
-    private static volatile MCRExpandedObjectCache instance;
     private Map<MCRObjectID, ReentrantReadWriteLock> idLocks = new ConcurrentHashMap<>();
 
     private MCRExpandedObjectCache() {
@@ -39,14 +38,7 @@ public final class MCRExpandedObjectCache {
     }
 
     public static MCRExpandedObjectCache getInstance() {
-        if (instance == null) {
-            synchronized (MCRExpandedObjectCache.class) {
-                if (instance == null) {
-                    instance = new MCRExpandedObjectCache();
-                }
-            }
-        }
-        return instance;
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     private static MCRExpandedObject readExpandedObject(Path expandedObjectPath) {
@@ -144,7 +136,7 @@ public final class MCRExpandedObjectCache {
             boolean last = (i == folders - 1);
             String fileOrFolderName =
                 last ? id + ".xml"
-                    : numberAsString.substring(folderSize * i, Math.min(folderSize * i + 3, numberAsString.length()));
+                     : numberAsString.substring(folderSize * i, Math.min(folderSize * i + 3, numberAsString.length()));
             result = result.resolve(fileOrFolderName);
         }
         return result;
@@ -157,4 +149,7 @@ public final class MCRExpandedObjectCache {
         return MCRConfiguration2.getOrThrow(CACHE_ROOT_PATH_PROPERTY, Paths::get);
     }
 
+    private static final class LazyInstanceHolder {
+        public static final MCRExpandedObjectCache SINGLETON_INSTANCE = new MCRExpandedObjectCache();
+    }
 }
