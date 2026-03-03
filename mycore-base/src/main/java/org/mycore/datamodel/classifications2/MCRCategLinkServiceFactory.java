@@ -29,9 +29,6 @@ import org.mycore.common.config.MCRConfiguration2;
 @Deprecated(forRemoval = true)
 public class MCRCategLinkServiceFactory {
 
-    private static final MCRCategLinkService SHARED_INSTANCE = MCRConfiguration2.getInstanceOfOrThrow(
-        MCRCategLinkService.class, "MCR.Category.LinkService");
-
     /**
      * Returns an instance of a MCRCategoryDAO implementator.
      *
@@ -39,7 +36,7 @@ public class MCRCategLinkServiceFactory {
      */
     @Deprecated(forRemoval = true)
     public static MCRCategLinkService obtainInstance() {
-        return SHARED_INSTANCE;
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRCategLinkService.class, "MCR.Category.LinkService");
     }
 
 }

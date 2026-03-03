@@ -105,6 +105,8 @@ public final class MCRPasswordCheckManager {
 
     public static final String CONFIGURATION_CHECKS_KEY = "ConfigurationChecks";
 
+    private static final String CLASS_PROPERTY = MANAGER_PROPERTY + ".Class";
+
     private final SecureRandom random;
 
     private final Map<String, MCRPasswordCheckStrategy> strategies;
@@ -142,12 +144,11 @@ public final class MCRPasswordCheckManager {
 
     @MCRFactory
     public static MCRPasswordCheckManager obtainInstance() {
-        return LazyInstanceHolder.SHARED_INSTANCE;
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRPasswordCheckManager.class, CLASS_PROPERTY);
     }
     
     public static MCRPasswordCheckManager createInstance() {
-        String classProperty = MANAGER_PROPERTY + ".Class";
-        return MCRConfiguration2.getInstanceOfOrThrow(MCRPasswordCheckManager.class, classProperty);
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRPasswordCheckManager.class, CLASS_PROPERTY);
     }
 
     public MCRPasswordCheckData create(String password) {
@@ -212,7 +213,4 @@ public final class MCRPasswordCheckManager {
 
     }
 
-    private static class LazyInstanceHolder {
-        public static final MCRPasswordCheckManager SHARED_INSTANCE = createInstance();
-    }
 }

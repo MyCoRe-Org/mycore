@@ -100,8 +100,6 @@ public final class MCRResourceResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRResourceResolver SHARED_INSTANCE = createInstance();
-
     public static final MCRNoOpResourceTracer NO_OP_TRACER = new MCRNoOpResourceTracer();
 
     public static final String RESOLVER_PROPERTY = "MCR.Resource.Resolver";
@@ -111,6 +109,8 @@ public final class MCRResourceResolver {
     public static final String PROVIDERS_KEY = "Providers";
 
     public static final String SELECTED_PROVIDER_KEY = "SelectedProvider";
+
+    private static final String CLASS_PROPERTY = RESOLVER_PROPERTY + ".Class";
 
     private final MCRHints hints;
 
@@ -123,12 +123,11 @@ public final class MCRResourceResolver {
 
     @MCRFactory
     public static MCRResourceResolver obtainInstance() {
-        return SHARED_INSTANCE;
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRResourceResolver.class, CLASS_PROPERTY);
     }
     
     public static MCRResourceResolver createInstance() {
-        String classProperty = RESOLVER_PROPERTY + ".Class";
-        return MCRConfiguration2.getInstanceOfOrThrow(MCRResourceResolver.class, classProperty);
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRResourceResolver.class, CLASS_PROPERTY);
     }
 
     /**

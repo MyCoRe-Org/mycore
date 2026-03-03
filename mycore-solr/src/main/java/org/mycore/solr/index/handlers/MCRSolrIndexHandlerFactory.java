@@ -50,7 +50,8 @@ public abstract class MCRSolrIndexHandlerFactory {
     private static final Logger LOGGER = LogManager.getLogger();
 
     public static MCRSolrIndexHandlerFactory obtainInstance() {
-        return LazyInstanceHolder.SHARED_INSTANCE;
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRSolrIndexHandlerFactory.class,
+            SOLR_CONFIG_PREFIX + "IndexHandler.Factory");
     }
 
     public abstract MCRSolrIndexHandler getIndexHandler(MCRContent content, MCRObjectID id);
@@ -110,10 +111,5 @@ public abstract class MCRSolrIndexHandlerFactory {
         indexHandler.getStatistic().addTime(end - start);
         return indexHandler;
     }
-
-    private static class LazyInstanceHolder {
-        private static final MCRSolrIndexHandlerFactory SHARED_INSTANCE =
-            MCRConfiguration2.getInstanceOfOrThrow(MCRSolrIndexHandlerFactory.class,
-                SOLR_CONFIG_PREFIX + "IndexHandler.Factory");
-    }
+    
 }

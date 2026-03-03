@@ -76,6 +76,8 @@ public final class MCRUserInformationResolver {
 
     public static final String PROVIDERS_KEY = "Providers";
 
+    private static final String CLASS_PROPERTY = RESOLVER_PROPERTY + ".Class";
+
     private final Map<String, MCRUserInformationProvider> providers;
 
     public MCRUserInformationResolver(Map<String, MCRUserInformationProvider> providers) {
@@ -90,12 +92,11 @@ public final class MCRUserInformationResolver {
 
     @MCRFactory
     public static MCRUserInformationResolver obtainInstance() {
-        return LazyInstanceHolder.SHARED_INSTANCE;
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRUserInformationResolver.class, CLASS_PROPERTY);
     }
     
     public static MCRUserInformationResolver createInstance() {
-        String classProperty = RESOLVER_PROPERTY + ".Class";
-        return MCRConfiguration2.getInstanceOfOrThrow(MCRUserInformationResolver.class, classProperty);
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRUserInformationResolver.class, CLASS_PROPERTY);
     }
 
     public MCRUserInformation getOrThrow(String schema, String userId) {
@@ -152,8 +153,5 @@ public final class MCRUserInformationResolver {
         }
 
     }
-
-    private static class LazyInstanceHolder {
-        public static MCRUserInformationResolver SHARED_INSTANCE = createInstance();
-    }
+    
 }
