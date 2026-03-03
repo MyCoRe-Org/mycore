@@ -97,8 +97,6 @@ public final class MCRPasswordCheckManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRPasswordCheckManager INSTANCE = createInstance();
-
     public static final String MANAGER_PROPERTY = "MCR.User.PasswordCheck";
 
     public static final String STRATEGIES_KEY = "Strategies";
@@ -143,7 +141,7 @@ public final class MCRPasswordCheckManager {
     }
 
     public static MCRPasswordCheckManager obtainInstance() {
-        return INSTANCE;
+        return LazyInstanceHolder.SHARED_INSTANCE;
     }
 
     public static MCRPasswordCheckManager createInstance() {
@@ -213,4 +211,7 @@ public final class MCRPasswordCheckManager {
 
     }
 
+    private static class LazyInstanceHolder {
+        public static final MCRPasswordCheckManager SHARED_INSTANCE = createInstance();
+    }
 }

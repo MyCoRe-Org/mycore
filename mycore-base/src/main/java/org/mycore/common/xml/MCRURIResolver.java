@@ -76,6 +76,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.annotation.MCRFactory;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
@@ -144,8 +145,6 @@ public final class MCRURIResolver implements URIResolver {
 
     private MCRResolverProvider extResolver;
 
-    private static final MCRURIResolver SHARED_INSTANCE = new MCRURIResolver();
-
     public MCRURIResolver() {
         reinitialize();
     }
@@ -175,8 +174,13 @@ public final class MCRURIResolver implements URIResolver {
         }
     }
 
+    @MCRFactory
     public static MCRURIResolver obtainInstance() {
-        return SHARED_INSTANCE;
+        return LazyInstanceHolder.SHARED_INSTANCE;
+    }
+
+    public static MCRURIResolver createInstance() {
+        return new MCRURIResolver();
     }
 
     public static Map<String, String> getParameterMap(String key) {
@@ -1673,7 +1677,7 @@ public final class MCRURIResolver implements URIResolver {
             String propertyName = "MCR.URIResolver.redirect." + configsuffix;
             String propValue = MCRConfiguration2.getStringOrThrow(propertyName);
             LOGGER.info("Redirect {} to {}", href, propValue);
-            return SHARED_INSTANCE.resolve(propValue, base);
+            return obtainInstance().resolve(propValue, base);
         }
     }
 
@@ -1917,6 +1921,10 @@ public final class MCRURIResolver implements URIResolver {
 
             return new JDOMSource(resolvedXML);
         }
+    }
+
+    private static final class LazyInstanceHolder {
+        public static final MCRURIResolver SHARED_INSTANCE = createInstance();
     }
 
 }
