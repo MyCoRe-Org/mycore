@@ -103,7 +103,7 @@ public class MCRStoredMetadata {
         if (store.shouldForceXML()) {
             xml = xml.ensureXML();
         }
-        xml.sendSafeTo(path);
+        xml.sendSafelyTo(path);
     }
 
     /**

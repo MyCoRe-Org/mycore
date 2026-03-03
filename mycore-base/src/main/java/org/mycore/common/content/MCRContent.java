@@ -237,7 +237,7 @@ public abstract class MCRContent {
      * @throws IOException if the target path has no parent directory,
      *                     if an error occurs during writing or moving the file
      */
-    public void sendSafeTo(Path target) throws IOException {
+    public void sendSafelyTo(Path target) throws IOException {
         Path dir = target.getParent();
         if (dir == null || !Files.exists(dir)) {
             throw new IOException("Target has no parent directory.");
@@ -311,7 +311,7 @@ public abstract class MCRContent {
 
     protected MCRDataURLEncoding getDataURLEncoding() throws IOException {
         return getMimeType().startsWith("text/") ? MCRDataURLEncoding.URL
-            : MCRDataURLEncoding.BASE64;
+                                                 : MCRDataURLEncoding.BASE64;
     }
 
     /**
