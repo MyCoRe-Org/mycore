@@ -57,8 +57,6 @@ public final class MCRShutdownHandler {
 
     private static final String PROPERTY_SYSTEM_NAME = "MCR.CommandLineInterface.SystemName";
 
-    private static final MCRShutdownHandler SINGLETON_INSTANCE = new MCRShutdownHandler();
-
     final NavigableSet<Closeable> requests = new ConcurrentSkipListSet<>();
 
     final ReentrantReadWriteLock shutdownLock = new ReentrantReadWriteLock();
@@ -66,11 +64,11 @@ public final class MCRShutdownHandler {
     volatile boolean shuttingDown;
 
     private volatile boolean shutDown;
-    
+
     private final AtomicBoolean isShutdownHookRegistered = new AtomicBoolean(false);
 
     boolean isWebAppRunning;
-    
+
     ClassLoaderLeakPreventor leakPreventor;
 
     private MCRShutdownHandler() {
@@ -90,10 +88,10 @@ public final class MCRShutdownHandler {
     }
 
     public static MCRShutdownHandler getInstance() {
-        if (SINGLETON_INSTANCE.shutDown) {
+        if (LazyInstanceHolder.SINGLETON_INSTANCE.shutDown) {
             return null;
         }
-        return SINGLETON_INSTANCE;
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     public void addCloseable(MCRShutdownHandler.Closeable c) {
@@ -216,6 +214,10 @@ public final class MCRShutdownHandler {
                 .thenComparingLong(Closeable::hashCode)
                 .compare(other, this);
         }
+    }
+
+    private static final class LazyInstanceHolder {
+        private static final MCRShutdownHandler SINGLETON_INSTANCE = new MCRShutdownHandler();
     }
 
 }

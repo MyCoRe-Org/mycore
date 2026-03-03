@@ -18,19 +18,17 @@
 
 package org.mycore.solr.index.file.tika;
 
-import org.mycore.common.MCRCache;
-import org.mycore.common.config.MCRConfiguration2;
+import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 
 import java.util.Optional;
 
-import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
+import org.mycore.common.MCRCache;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * Manager for mappers, mapping Tika extracted metadata to Solr fields.
  */
 public final class MCRTikaManager {
-
-    private static final MCRTikaManager SINGLETON_INSTANCE = new MCRTikaManager();
 
     private final MCRTikaMapper defaultMapper = MCRConfiguration2.getInstanceOfOrThrow(MCRTikaMapper.class,
         SOLR_CONFIG_PREFIX + "Tika.Mapper.Default.Class");
@@ -42,7 +40,7 @@ public final class MCRTikaManager {
     }
 
     public static MCRTikaManager getInstance() {
-        return SINGLETON_INSTANCE;
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     /**
@@ -75,6 +73,10 @@ public final class MCRTikaManager {
             }
         }
         return Optional.ofNullable(instance);
+    }
+
+    private static final class LazyInstanceHolder {
+        private static final MCRTikaManager SINGLETON_INSTANCE = new MCRTikaManager();
     }
 
 }

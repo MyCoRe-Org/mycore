@@ -67,9 +67,6 @@ public final class MCRLinkTableManager {
 
     public static final String LINK_PROVIDER_CONFIG_PREFIX = "MCR.Persistence.LinkProvider.Impl.";
 
-    /** The link table manager singleton */
-    private static final MCRLinkTableManager SINGLETON_INSTANCE = new MCRLinkTableManager();
-
     private static final Logger LOGGER = LogManager.getLogger();
 
     private final MCRLinkTableInterface linkTableInstance;
@@ -104,8 +101,8 @@ public final class MCRLinkTableManager {
      *
      * @return Returns a MCRLinkTableManager instance.
      */
-    public static synchronized MCRLinkTableManager getInstance() {
-        return SINGLETON_INSTANCE;
+    public static MCRLinkTableManager getInstance() {
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     /**
@@ -553,4 +550,9 @@ public final class MCRLinkTableManager {
 
     public record MCRLinkReference(MCRObjectID from, MCRObjectID to, MCRLinkType type, String attr) {
     }
+
+    private static final class LazyInstanceHolder {
+        private static final MCRLinkTableManager SINGLETON_INSTANCE = new MCRLinkTableManager();
+    }
+
 }

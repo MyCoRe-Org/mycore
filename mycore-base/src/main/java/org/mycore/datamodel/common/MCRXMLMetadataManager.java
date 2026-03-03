@@ -85,7 +85,7 @@ public interface MCRXMLMetadataManager {
      * to perform the metadata operations.
      *
      * @return the XML metadata manager
-     * 
+     *
      * @deprecated Use {@link MCRXMLMetadataManager#obtainInstance()} instead
      */
     @Deprecated(forRemoval = true)
@@ -200,7 +200,7 @@ public interface MCRXMLMetadataManager {
                 base.substring(0, base.indexOf('_')),
                 base.substring(base.indexOf('_') + 1));
     }
-    
+
     /**
      * Checks if an object with the given MCRObjectID exists in the store.
      *
