@@ -72,7 +72,7 @@ public final class MCROAuthClient {
     public static MCROAuthClient obtainInstance() {
         return LazyInstanceHolder.SHARED_INSTANCE;
     }
-
+    
     public static MCROAuthClient createInstance() {
         String classProperty = CLIENT_PROPERTY + ".Class";
         return MCRConfiguration2.getInstanceOfOrThrow(MCROAuthClient.class, classProperty);
@@ -191,7 +191,6 @@ public final class MCROAuthClient {
         byte[] digest = md5Digest.digest();
         return MCRUtils.toHexString(digest);
     }
-
 
     public record Settings(
         String baseUrl,

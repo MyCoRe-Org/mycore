@@ -31,6 +31,7 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRFactory;
 import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.config.annotation.MCRSentinel;
@@ -120,10 +121,11 @@ public final class MCRResourceResolver {
         this.provider = Objects.requireNonNull(provider, "Provider must not be null");
     }
 
+    @MCRFactory
     public static MCRResourceResolver obtainInstance() {
         return SHARED_INSTANCE;
     }
-
+    
     public static MCRResourceResolver createInstance() {
         String classProperty = RESOLVER_PROPERTY + ".Class";
         return MCRConfiguration2.getInstanceOfOrThrow(MCRResourceResolver.class, classProperty);

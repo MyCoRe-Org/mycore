@@ -27,6 +27,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRFactory;
 import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.annotation.MCRSentinel;
 
@@ -87,10 +88,11 @@ public final class MCRUserInformationResolver {
 
     }
 
+    @MCRFactory
     public static MCRUserInformationResolver obtainInstance() {
         return LazyInstanceHolder.SHARED_INSTANCE;
     }
-
+    
     public static MCRUserInformationResolver createInstance() {
         String classProperty = RESOLVER_PROPERTY + ".Class";
         return MCRConfiguration2.getInstanceOfOrThrow(MCRUserInformationResolver.class, classProperty);

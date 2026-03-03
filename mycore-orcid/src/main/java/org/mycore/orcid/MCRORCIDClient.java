@@ -18,12 +18,12 @@
 
 package org.mycore.orcid;
 
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.annotation.MCRFactory;
+
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.WebTarget;
-
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.annotation.MCRFactory;
 
 /**
  * Utility class to work with the REST API of orcid.org.
@@ -45,7 +45,7 @@ public final class MCRORCIDClient {
     public static MCRORCIDClient obtainInstance() {
         return LazyInstanceHolder.SHARED_INSTANCE;
     }
-
+    
     public static MCRORCIDClient createInstance() {
         return new MCRORCIDClient(MCRConfiguration2.getStringOrThrow("MCR.ORCID.BaseURL"));
     }

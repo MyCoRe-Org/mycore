@@ -37,6 +37,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.annotation.MCROutdated;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRFactory;
 import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.config.annotation.MCRSentinel;
@@ -139,10 +140,11 @@ public final class MCRPasswordCheckManager {
 
     }
 
+    @MCRFactory
     public static MCRPasswordCheckManager obtainInstance() {
         return LazyInstanceHolder.SHARED_INSTANCE;
     }
-
+    
     public static MCRPasswordCheckManager createInstance() {
         String classProperty = MANAGER_PROPERTY + ".Class";
         return MCRConfiguration2.getInstanceOfOrThrow(MCRPasswordCheckManager.class, classProperty);

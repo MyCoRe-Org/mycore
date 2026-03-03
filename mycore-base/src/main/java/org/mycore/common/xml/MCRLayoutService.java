@@ -36,6 +36,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.annotation.MCRFactory;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
@@ -61,10 +62,11 @@ public class MCRLayoutService {
 
     private static final String TRANSFORMER_FACTORY_PROPERTY = "MCR.Layout.Transformer.Factory";
 
+    @MCRFactory
     public static MCRLayoutService obtainInstance() {
         return LazyInstanceHolder.SHARED_INSTANCE;
     }
-
+    
     public static MCRLayoutService createInstance() {
         return new MCRLayoutService();
     }

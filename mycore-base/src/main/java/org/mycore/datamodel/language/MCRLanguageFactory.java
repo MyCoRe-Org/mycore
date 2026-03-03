@@ -29,6 +29,7 @@ import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRTransactionManager;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.annotation.MCRFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -84,6 +85,7 @@ public final class MCRLanguageFactory {
         initDefaultLanguages();
     }
 
+    @MCRFactory
     public static MCRLanguageFactory obtainInstance() {
         return LazyInstanceHolder.SHARED_INSTANCE;
     }

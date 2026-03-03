@@ -59,7 +59,7 @@ public final class MCRORCIDOAuthClient {
     public static MCRORCIDOAuthClient obtainInstance() {
         return LazyInstanceHelper.SHARED_INSTANCE;
     }
-
+    
     public static MCRORCIDOAuthClient createInstance() {
         return new MCRORCIDOAuthClient(new Settings(
             MCRORCIDConstants.ORCID_BASE_URL,
@@ -68,7 +68,7 @@ public final class MCRORCIDOAuthClient {
         ));
     }
 
-     /**
+    /**
      * Revokes given bearer access token.
      *
      * @param token revoke token
@@ -87,7 +87,7 @@ public final class MCRORCIDOAuthClient {
 
     /**
      * Exchanges authorization code for an MCRORCIDOAuthAccessTokenResponse.
-     * 
+     *
      * @param code the ORCID auth code
      * @param redirectURI the redirect URI
      * @return the MCRORCIDOAuthAccessTokenResponse
