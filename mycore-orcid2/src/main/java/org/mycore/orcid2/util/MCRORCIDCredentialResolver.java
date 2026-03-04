@@ -24,8 +24,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
-import org.jdom2.Element;
-import org.jdom2.transform.JDOMSource;
+import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.orcid2.client.MCRORCIDCredential;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
 import org.mycore.orcid2.user.MCRORCIDUser;
@@ -70,20 +69,16 @@ public class MCRORCIDCredentialResolver implements URIResolver {
         final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
         final MCRORCIDCredential credential = orcidUser.getCredentialByORCID(orcid);
 
-        Element root;
         if (Objects.equals("exists", method)) {
-            root = new Element("boolean");
-            root.setText(credential == null ? "false" : "true");
+            return MCRURIResolver.createBooleanResponse(credential != null);
         } else if (Objects.equals("scope", method)) {
             if (credential != null) {
-                root = new Element("string");
-                root.setText(credential.getScope());
+                return MCRURIResolver.createStringResponse(credential.getScope());
             } else {
                 throw new IllegalArgumentException("Credential for " + orcid + " does not exist");
             }
         } else {
             throw new IllegalArgumentException("Invalid method: " + method);
         }
-        return new JDOMSource(root);
     }
 }

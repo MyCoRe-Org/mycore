@@ -35,6 +35,7 @@ import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
+import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -107,29 +108,32 @@ public class MCRPIURIResolver implements URIResolver {
         return switch (method) {
             case HAS_IDENTIFIER_CREATED_METHOD -> {
                 requireArguments(argumentMap, HAS_IDENTIFIER_CREATED_METHOD, SERVICE_ARG, ID_ARG, ADDITIONAL_ARG);
-                yield wrapBoolean(
+                yield MCRURIResolver.createBooleanResponse(
                     hasIdentifierCreated(argumentMap.get(SERVICE_ARG), argumentMap.get(ID_ARG), argumentMap.get(
                         ADDITIONAL_ARG)));
             }
             case HAS_IDENTIFIER_REGISTRATION_STARTED_METHOD -> {
                 requireArguments(argumentMap, HAS_IDENTIFIER_REGISTRATION_STARTED_METHOD, SERVICE_ARG, ID_ARG,
                     ADDITIONAL_ARG);
-                yield wrapBoolean(
+                yield MCRURIResolver.createBooleanResponse(
                     hasIdentifierRegistrationStarted(argumentMap.get(SERVICE_ARG), argumentMap.get(ID_ARG),
                         argumentMap.get(ADDITIONAL_ARG)));
             }
             case HAS_IDENTIFIER_REGISTERED_METHOD -> {
                 requireArguments(argumentMap, HAS_IDENTIFIER_REGISTERED_METHOD, SERVICE_ARG, ID_ARG, ADDITIONAL_ARG);
-                yield wrapBoolean(hasIdentifierRegistered(argumentMap.get(SERVICE_ARG), argumentMap.get(ID_ARG),
-                    argumentMap.get(ADDITIONAL_ARG)));
+                yield MCRURIResolver.createBooleanResponse(
+                    hasIdentifierRegistered(argumentMap.get(SERVICE_ARG), argumentMap.get(ID_ARG),
+                        argumentMap.get(ADDITIONAL_ARG)));
             }
             case HAS_MANAGED_PI_METHOD -> {
                 requireArguments(argumentMap, HAS_MANAGED_PI_METHOD, OBJECT_ID_ARG);
-                yield wrapBoolean(hasManagedPI(argumentMap.get(OBJECT_ID_ARG)));
+                yield MCRURIResolver.createBooleanResponse(
+                    hasManagedPI(argumentMap.get(OBJECT_ID_ARG)));
             }
             case IS_MANAGED_PI_METHOD -> {
                 requireArguments(argumentMap, IS_MANAGED_PI_METHOD, PI_ARG, ID_ARG);
-                yield wrapBoolean(isManagedPI(argumentMap.get(PI_ARG), argumentMap.get(ID_ARG)));
+                yield MCRURIResolver.createBooleanResponse(
+                    isManagedPI(argumentMap.get(PI_ARG), argumentMap.get(ID_ARG)));
             }
             case GET_PI_SERVICE_INFORMATION_METHOD -> {
                 requireArguments(argumentMap, GET_PI_SERVICE_INFORMATION_METHOD, OBJECT_ID_ARG);
@@ -168,12 +172,6 @@ public class MCRPIURIResolver implements URIResolver {
                 }
             })
             .collect(Collectors.toMap(pair -> pair[0], pair -> pair[1]));
-    }
-
-    private Source wrapBoolean(boolean value) {
-        Element booleanElement = new Element("boolean");
-        booleanElement.setText(Boolean.toString(value));
-        return new JDOMSource(booleanElement);
     }
 
     private Source wrapElement(Element element) {
