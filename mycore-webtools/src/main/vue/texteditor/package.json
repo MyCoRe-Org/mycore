@@ -19,7 +19,7 @@
   "devDependencies": {
     "@tsconfig/node20": "^20.1.8",
     "@types/node": "^20.19.25",
-    "@types/prismjs": "^1.26.5",
+    "@types/prismjs": "^1.26.6",
     "@vitejs/plugin-vue": "^5.2.4",
     "@vue/tsconfig": "^0.8.1",
     "npm-run-all2": "^7.0.2",
