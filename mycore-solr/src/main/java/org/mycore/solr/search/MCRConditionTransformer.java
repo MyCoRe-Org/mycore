@@ -33,9 +33,9 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrQuery.ORDER;
-import org.apache.solr.client.solrj.SolrQuery.SortClause;
+import org.apache.solr.client.solrj.request.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery.ORDER;
+import org.apache.solr.client.solrj.request.SolrQuery.SortClause;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.parsers.bool.MCRAndCondition;
