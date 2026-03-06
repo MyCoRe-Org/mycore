@@ -85,7 +85,7 @@ public interface MCRXMLMetadataManager {
      * to perform the metadata operations.
      *
      * @return the XML metadata manager
-     * 
+     *
      * @deprecated Use {@link MCRXMLMetadataManager#obtainInstance()} instead
      */
     @Deprecated(forRemoval = true)
@@ -101,7 +101,7 @@ public interface MCRXMLMetadataManager {
      * @return the XML metadata manager
      */
     static MCRXMLMetadataManager obtainInstance() {
-        return LazyInstanceHolder.SINGLETON_INSTANCE;
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRXMLMetadataManager.class, "MCR.Metadata.Manager.Class");
     }
 
     /**
@@ -125,7 +125,7 @@ public interface MCRXMLMetadataManager {
      * @throws MCRPersistenceException the object couldn't be created due persistence problems
      */
     void create(MCRObjectID mcrid, MCRContent xml, Date lastModified)
-            throws MCRPersistenceException;
+        throws MCRPersistenceException;
 
     /**
      * Delete metadata in store.
@@ -143,7 +143,7 @@ public interface MCRXMLMetadataManager {
      * @param lastModified the date of last modification to set
      */
     void update(MCRObjectID mcrid, MCRContent xml, Date lastModified)
-            throws MCRPersistenceException;
+        throws MCRPersistenceException;
 
     /**
      * Retrieves the (latest) content of a metadata object.
@@ -197,10 +197,10 @@ public interface MCRXMLMetadataManager {
 
     default int getHighestStoredID(String base) {
         return getHighestStoredID(
-                base.substring(0, base.indexOf('_')),
-                base.substring(base.indexOf('_') + 1));
+            base.substring(0, base.indexOf('_')),
+            base.substring(base.indexOf('_') + 1));
     }
-    
+
     /**
      * Checks if an object with the given MCRObjectID exists in the store.
      *
@@ -394,10 +394,4 @@ public interface MCRXMLMetadataManager {
     default long getLastModified() {
         return MCRConfigurationBase.getSystemLastModified();
     }
-
-    final class LazyInstanceHolder {
-        public static final MCRXMLMetadataManager SINGLETON_INSTANCE = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRXMLMetadataManager.class, "MCR.Metadata.Manager.Class");
-    }
-
 }

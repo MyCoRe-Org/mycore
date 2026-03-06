@@ -26,21 +26,22 @@ import org.mycore.common.config.MCRConfiguration2;
  */
 public final class MCRProcessableManager {
 
-    private static final MCRProcessableManager SINGLETON_INSTANCE = new MCRProcessableManager();
-
     private final MCRProcessableRegistry registry;
 
     private MCRProcessableManager() {
         registry = MCRConfiguration2.getInstanceOfOrThrow(
             MCRProcessableRegistry.class, "MCR.Processable.Registry.Class");
     }
-    
+
     public static MCRProcessableManager getInstance() {
-        return SINGLETON_INSTANCE;
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     public MCRProcessableRegistry getRegistry() {
         return registry;
     }
 
+    private static final class LazyInstanceHolder {
+        private static final MCRProcessableManager SINGLETON_INSTANCE = new MCRProcessableManager();
+    }
 }

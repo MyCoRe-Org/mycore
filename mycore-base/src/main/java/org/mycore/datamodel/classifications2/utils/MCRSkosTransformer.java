@@ -24,14 +24,13 @@ import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.frontend.MCRFrontendUtil;
 
 /**
  * Transforms MyCoRe classification and category objects into SKOS resources
- * 
+ *
  * @author Robert Stephan
  */
 public class MCRSkosTransformer {
@@ -40,7 +39,7 @@ public class MCRSkosTransformer {
 
     /**
      * return a classification tree as SKOS XML
-     * 
+     *
      * @param categ - an extract of the classification that should be returned via SKOS
      *   currently this is the hierarchy from the requested category to the root category
      * @param current - the MCRCategoryID of the requested category  
@@ -80,10 +79,10 @@ public class MCRSkosTransformer {
     }
 
     /**
-    * creates a rdf element skos:Concept and its XML structure with attributes and child elements
-    * @param categ - the MyCoRe category object
-    * @param eRDF the RDF root elements which collects all concepts
-    */
+     * creates a rdf element skos:Concept and its XML structure with attributes and child elements
+     * @param categ - the MyCoRe category object
+     * @param eRDF the RDF root elements which collects all concepts
+     */
     private static void createSkosConcept(MCRCategory categ, MCRCategoryID current, Element eRDF) {
         if (categ != null) {
             Element eConcept = new Element("Concept", MCRConstants.SKOS_NAMESPACE);
@@ -115,7 +114,7 @@ public class MCRSkosTransformer {
             // on reimplementation / consolidation we could try to integrate this additional query
             // into the main query
             if (categ.getId().equals(current)) {
-                MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
+                MCRCategoryDAO categoryDAO = MCRCategoryDAO.obtainInstance();
                 for (MCRCategory c : categoryDAO.getChildren(current)) {
                     eConcept.addContent(new Element("narrower", MCRConstants.SKOS_NAMESPACE)
                         .setAttribute(ATTRIBUTE_RESOURCE, retrieveURI(c), MCRConstants.RDF_NAMESPACE));
@@ -152,14 +151,14 @@ public class MCRSkosTransformer {
 
     /**
      * retrieves the URI for the SKOS Concept or Concept Scheme
-     * 
+     *
      * There is no consistent use of URI and x-uri attributes in MyCoRe
      * Furthermore we need to define a new endpoint /entities for Linked Data output
-     * 
+     *
      * Details of the implementation needs to be discussed within the community
-     * 
+     *
      * @param categ the MCRCategory object
-     * 
+     *
      * @return the URI as String
      */
     private static String retrieveURI(MCRCategory categ) {

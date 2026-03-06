@@ -34,15 +34,13 @@ public final class MCRIView2TilingThreadStarter implements MCRStartupHandler.Aut
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRIView2TilingThreadStarter SINGLETON_INSTANCE = new MCRIView2TilingThreadStarter();
-
     private boolean started;
 
-    private MCRIView2TilingThreadStarter(){
+    private MCRIView2TilingThreadStarter() {
     }
 
-    public static MCRIView2TilingThreadStarter getInstance(){
-        return SINGLETON_INSTANCE;
+    public static MCRIView2TilingThreadStarter getInstance() {
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     @Override
@@ -76,4 +74,7 @@ public final class MCRIView2TilingThreadStarter implements MCRStartupHandler.Aut
         return started;
     }
 
+    private static final class LazyInstanceHolder {
+        public static final MCRIView2TilingThreadStarter SINGLETON_INSTANCE = new MCRIView2TilingThreadStarter();
+    }
 }

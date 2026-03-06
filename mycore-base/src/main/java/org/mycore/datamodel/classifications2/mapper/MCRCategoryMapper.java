@@ -23,7 +23,6 @@ import java.util.List;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 
@@ -32,7 +31,7 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  */
 public class MCRCategoryMapper extends MCRCategoryMapperBase {
 
-    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.obtainInstance();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAO.obtainInstance();
 
     @Override
     protected String getMappingRule(MCRCategoryID categoryID) {

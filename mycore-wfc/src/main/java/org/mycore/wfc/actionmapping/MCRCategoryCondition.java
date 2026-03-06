@@ -22,7 +22,6 @@ import org.apache.logging.log4j.LogManager;
 import org.jdom2.Element;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
-import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.parsers.bool.MCRCondition;
 
@@ -38,7 +37,7 @@ public class MCRCategoryCondition implements MCRCondition<MCRWorkflowData> {
 
     private final String fieldName;
 
-    private static final MCRCategLinkService LINK_SERVICE = MCRCategLinkServiceFactory.obtainInstance();
+    private static final MCRCategLinkService LINK_SERVICE = MCRCategLinkService.obtainInstance();
 
     public MCRCategoryCondition(String fieldName, MCRCategoryID mcrCategoryID, boolean not) {
         this.fieldName = fieldName;

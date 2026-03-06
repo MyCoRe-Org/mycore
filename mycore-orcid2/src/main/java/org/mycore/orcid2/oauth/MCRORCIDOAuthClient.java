@@ -68,7 +68,7 @@ public final class MCRORCIDOAuthClient {
         ));
     }
 
-     /**
+    /**
      * Revokes given bearer access token.
      *
      * @param token revoke token
@@ -87,7 +87,7 @@ public final class MCRORCIDOAuthClient {
 
     /**
      * Exchanges authorization code for an MCRORCIDOAuthAccessTokenResponse.
-     * 
+     *
      * @param code the ORCID auth code
      * @param redirectURI the redirect URI
      * @return the MCRORCIDOAuthAccessTokenResponse

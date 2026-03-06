@@ -32,7 +32,6 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.model.MCRClass;
 import org.mycore.datamodel.classifications2.model.MCRClassCategory;
@@ -94,7 +93,7 @@ public class MCRLodClassification {
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS))
     public Response outputLODClassificationRoot() {
-        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
+        MCRCategoryDAO categoryDAO = MCRCategoryDAO.obtainInstance();
         Date lastModified = new Date(categoryDAO.getLastModified());
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request.getRequest(), lastModified);
         if (cachedResponse.isPresent()) {
@@ -165,7 +164,7 @@ public class MCRLodClassification {
 
     private Response getClassification(MCRCategoryID categId, Function<MCRCategoryDAO, MCRCategory> categorySupplier,
         List<MediaType> acceptMediaTypes, URI uri) {
-        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
+        MCRCategoryDAO categoryDAO = MCRCategoryDAO.obtainInstance();
         String classId = categId.getRootID();
         Date lastModified = getLastModifiedDate(classId, categoryDAO);
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request.getRequest(), lastModified);
@@ -195,7 +194,7 @@ public class MCRLodClassification {
 
     private Document createClassList() {
         Element eBag = new Element("Bag", MCRConstants.RDF_NAMESPACE);
-        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
+        MCRCategoryDAO categoryDAO = MCRCategoryDAO.obtainInstance();
         for (MCRCategory categ : categoryDAO.getRootCategories()) {
             eBag.addContent(new Element("li", MCRConstants.RDF_NAMESPACE)
                 .setAttribute("resource",

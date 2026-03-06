@@ -26,7 +26,6 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 
 /**
@@ -46,7 +45,7 @@ public class MCRObjectTypeStrategy implements MCRCombineableAccessCheckStrategy 
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.obtainInstance();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAO.obtainInstance();
 
     private static final MCRObjectIDStrategy ID_STRATEGY = new MCRObjectIDStrategy();
 

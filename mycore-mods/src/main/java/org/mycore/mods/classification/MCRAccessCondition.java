@@ -29,18 +29,17 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRXlink;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 
 /**
  * Translates <code>&lt;mods:accessCondition /&gt;</code> into mycore classifications
- * 
+ *
  * @author Thomas Scheffler (yagee)
  */
 public class MCRAccessCondition extends MCRAuthorityInfo {
     public String href;
 
-    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.obtainInstance();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAO.obtainInstance();
 
     private static final Logger LOGGER = LogManager.getLogger();
 

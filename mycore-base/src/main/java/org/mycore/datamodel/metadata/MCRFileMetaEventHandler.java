@@ -37,7 +37,6 @@ import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
-import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.niofs.MCRPath;
 
@@ -48,7 +47,7 @@ import org.mycore.datamodel.niofs.MCRPath;
  */
 public class MCRFileMetaEventHandler extends MCREventHandlerBase {
 
-    private static final MCRCategLinkService CATEGLINK_SERVICE = MCRCategLinkServiceFactory.obtainInstance();
+    private static final MCRCategLinkService CATEGLINK_SERVICE = MCRCategLinkService.obtainInstance();
 
     private static final Logger LOGGER = LogManager.getLogger();
 

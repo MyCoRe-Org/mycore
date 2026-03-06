@@ -24,7 +24,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.w3c.dom.Element;
 
@@ -36,7 +35,7 @@ import org.w3c.dom.Element;
  */
 class MCRAuthorityAndCode extends MCRAuthorityInfo {
 
-    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.obtainInstance();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAO.obtainInstance();
 
     private static final Logger LOGGER = LogManager.getLogger();
 

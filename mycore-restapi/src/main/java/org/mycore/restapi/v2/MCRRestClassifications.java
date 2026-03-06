@@ -39,7 +39,6 @@ import org.jdom2.Document;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.classifications2.model.MCRClass;
@@ -57,7 +56,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
@@ -93,7 +91,7 @@ public class MCRRestClassifications {
         tags = MCRRestUtils.TAG_MYCORE_CLASSIFICATION)
     @XmlElementWrapper(name = "classifications")
     public Response listClassifications() {
-        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
+        MCRCategoryDAO categoryDAO = MCRCategoryDAO.obtainInstance();
         Date lastModified = new Date(categoryDAO.getLastModified());
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request.getRequest(), lastModified);
         if (cachedResponse.isPresent()) {
@@ -171,7 +169,7 @@ public class MCRRestClassifications {
     }
 
     private Response getClassification(String classId, Function<MCRCategoryDAO, MCRCategory> categorySupplier) {
-        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
+        MCRCategoryDAO categoryDAO = MCRCategoryDAO.obtainInstance();
         Date lastModified = getLastModifiedDate(classId, categoryDAO);
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request.getRequest(), lastModified);
         if (cachedResponse.isPresent()) {
@@ -200,7 +198,7 @@ public class MCRRestClassifications {
 
         return Response.ok()
             .entity(classification.isClassification() ? MCRClass.ofCategory(classification)
-                : MCRClassCategory.ofCategory(classification))
+                                                      : MCRClassCategory.ofCategory(classification))
             .lastModified(lastModified)
             .build();
     }
@@ -232,7 +230,7 @@ public class MCRRestClassifications {
                 .withMessage("Classification " + classId + " cannot be overwritten by " + mcrClass.getID() + ".")
                 .toException();
         }
-        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
+        MCRCategoryDAO categoryDAO = MCRCategoryDAO.obtainInstance();
         Response.Status status;
         if (!categoryDAO.exist(new MCRCategoryID(classId))) {
             categoryDAO.addCategory(null, mcrClass.toCategory());
