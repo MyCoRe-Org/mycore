@@ -19,7 +19,7 @@
 package org.mycore.oai.set;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.common.SolrDocument;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;

@@ -31,11 +31,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.BinaryRequestWriter;
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateHttp2SolrClient;
-import org.apache.solr.client.solrj.impl.Http2SolrClient;
+import org.apache.solr.client.solrj.impl.ConcurrentUpdateBaseSolrClient;
 import org.apache.solr.client.solrj.impl.HttpJdkSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClientBuilderBase;
+import org.apache.solr.client.solrj.jetty.ConcurrentUpdateJettySolrClient;
+import org.apache.solr.client.solrj.jetty.HttpJettySolrClient;
+import org.apache.solr.client.solrj.request.JavaBinRequestWriter;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
 
@@ -70,7 +71,7 @@ public class MCRSolrCore {
 
     protected SolrClient baseSolrClient;
 
-    protected ConcurrentUpdateHttp2SolrClient concurrentClient;
+    protected ConcurrentUpdateBaseSolrClient concurrentClient;
 
     private Set<MCRSolrCoreType> types;
 
@@ -116,7 +117,7 @@ public class MCRSolrCore {
                 .getOrThrow(SOLR_CONFIG_PREFIX + "ConcurrentUpdateSolrClient.QueueSize", Integer::parseInt);
             int threadCount = MCRConfiguration2
                 .getOrThrow(SOLR_CONFIG_PREFIX + "ConcurrentUpdateSolrClient.ThreadCount", Integer::parseInt);
-            concurrentClient = new ConcurrentUpdateHttp2SolrClient.Builder(coreURL, (Http2SolrClient) solrClient)
+            concurrentClient = new ConcurrentUpdateJettySolrClient.Builder(coreURL, (HttpJettySolrClient) solrClient)
                 .withQueueSize(queueSize)
                 .withThreadCount(threadCount)
                 .build();
@@ -138,7 +139,7 @@ public class MCRSolrCore {
 
     private static SolrClient getSolrClientInstance(String baseSolrUrl, int connectionTimeout,
         int socketTimeout) {
-        HttpSolrClientBuilderBase baseBuilder = useJettyHttpClient() ? new Http2SolrClient.Builder(baseSolrUrl)
+        HttpSolrClientBuilderBase baseBuilder = useJettyHttpClient() ? new HttpJettySolrClient.Builder(baseSolrUrl)
             : new HttpJdkSolrClient.Builder(baseSolrUrl);
 
         MCRConfiguration2.getBoolean(USE_HTTP_1_1_PROPERTY)
@@ -151,7 +152,7 @@ public class MCRSolrCore {
             .withConnectionTimeout(connectionTimeout, TimeUnit.MILLISECONDS)
             .withIdleTimeout(socketTimeout, TimeUnit.MILLISECONDS)
             .withRequestTimeout(socketTimeout, TimeUnit.MILLISECONDS)
-            .withRequestWriter(new BinaryRequestWriter())
+            .withRequestWriter(new JavaBinRequestWriter())
             .build();
     }
 

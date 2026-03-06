@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.common.SolrDocument;
 
 public abstract class MCROAISolrSetHandler implements MCROAISetHandler<SolrQuery, SolrDocument, String> {

@@ -24,7 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.params.CommonParams;
 import org.mycore.common.config.MCRConfiguration2;
