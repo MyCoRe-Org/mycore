@@ -106,7 +106,7 @@ public class MCRRoleManager {
      */
     public static MCRRole getExternalRole(String name) {
         MCRCategoryID categoryID = MCRCategoryID.ofString(name);
-        if (categoryID.isARootID()) {
+        if (categoryID.isRoot()) {
             LOGGER.debug("External role may not be a rootCategory: {}", categoryID);
             return null;
         }

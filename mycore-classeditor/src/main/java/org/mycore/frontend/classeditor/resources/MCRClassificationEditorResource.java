@@ -460,7 +460,7 @@ public class MCRClassificationEditorResource {
         public void run() {
             MCRCategoryID categoryID = category.getId();
             if (CATEGORY_DAO.exist(categoryID)) {
-                if (categoryID.isARootID()
+                if (categoryID.isRoot()
                     && !MCRAccessManager.checkPermission(categoryID.getRootID(), PERMISSION_DELETE)) {
                     throw new WebApplicationException(Status.UNAUTHORIZED);
                 }

@@ -370,7 +370,7 @@ public class MCROCFLCommands {
         help = "Permanently delete classification {0} and its history from ocfl")
     public static void purgeClass(String mcrCgIdString) {
         MCRCategoryID mcrCgId = MCRCategoryID.ofString(mcrCgIdString);
-        if (!mcrCgId.isARootID()) {
+        if (!mcrCgId.isRoot()) {
             throw new MCRUsageException("You can only purge root classifications!");
         }
         MCRConfiguration2.getSingleInstanceOfOrThrow(

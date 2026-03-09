@@ -113,7 +113,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
 
     @Override
     public MCRCategory getRoot() {
-        if (getId().isARootID()) {
+        if (getId().isRoot()) {
             return this;
         }
         if (root == null && getParent() != null) {
@@ -146,7 +146,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
 
     @Override
     public final boolean isClassification() {
-        return getId().isARootID();
+        return getId().isRoot();
     }
 
     @Override

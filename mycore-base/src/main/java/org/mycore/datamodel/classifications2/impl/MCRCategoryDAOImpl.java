@@ -221,7 +221,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         final boolean fetchAllChildren = childLevel < 0;
         Query q;
-        if (id.isARootID()) {
+        if (id.isRoot()) {
             q = entityManager.createNamedQuery(NAMED_QUERY_NAMESPACE
                 + (fetchAllChildren ? "prefetchClassQuery" : "prefetchClassLevelQuery"));
             if (!fetchAllChildren) {
@@ -345,7 +345,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     public MCRCategory getRootCategory(MCRCategoryID baseID, int childLevel) {
         return Optional.ofNullable(getCategory(baseID, childLevel))
             .map(c -> {
-                if (baseID.isARootID()) {
+                if (baseID.isRoot()) {
                     return c;
                 }
                 List<MCRCategory> parents = getParents(baseID);

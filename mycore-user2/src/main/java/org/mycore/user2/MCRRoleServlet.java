@@ -143,7 +143,7 @@ public class MCRRoleServlet extends MCRServlet {
         }
         Element rootElement = getRootElement(request);
         rootElement.setAttribute("classID", categoryID.getRootID());
-        if (!categoryID.isARootID()) {
+        if (!categoryID.isRoot()) {
             rootElement.setAttribute("categID", categoryID.getId());
         }
         request.setAttribute(LAYOUT_ELEMENT_KEY, new Document(rootElement));
