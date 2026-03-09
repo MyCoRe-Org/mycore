@@ -84,7 +84,7 @@ public abstract class MCRXMappingClassificationGeneratorBase implements Generato
         return sourceCategory.getLabel(LABEL_LANG_X_MAPPING)
             .map(label -> evaluator.getCategoryIds(label.getText(), object)
                 .stream()
-                .filter(categoryId -> !categoryId.isRootID())
+                .filter(categoryId -> !categoryId.isARootID())
                 .filter(categoryId -> dao.exist(categoryId) || handleMissingCategory(categoryId, sourceCategoryId))
                 .map(targetCategoryId -> new XMapping(sourceCategoryId, targetCategoryId))
                 .collect(Collectors.toList()))

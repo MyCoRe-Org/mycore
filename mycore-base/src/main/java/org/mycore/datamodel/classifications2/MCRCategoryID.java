@@ -109,8 +109,25 @@ public class MCRCategoryID implements Serializable {
         }
     }
 
+    /**
+     * @return true, if this category is a root category.
+     * 
+     * @deprecated Use {@link isARootID()} instead.
+     * The method name is in conflict with the JavaBeans Specification 1.01, §8.3.2 
+     * There is also a getter getRootID() which returns a String.
+     * Therefore this method will be renamed to isARootID().
+     */
+    @Deprecated(forRemoval = true)
     @Transient
     public boolean isRootID() {
+        return isARootID();
+    }
+
+    /**
+     * @return true, if this category is a root category.
+     */
+    @Transient
+    public boolean isARootID() {
         return id == null || id.isEmpty();
     }
 

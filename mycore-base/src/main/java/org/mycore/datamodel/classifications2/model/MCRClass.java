@@ -106,7 +106,7 @@ public class MCRClass {
     }
 
     public static MCRClass ofCategory(MCRCategory rootCategory) {
-        if (!rootCategory.getId().isRootID()) {
+        if (!rootCategory.getId().isARootID()) {
             throw new IllegalArgumentException("Not a root category");
         }
         MCRClass mcrClass = new MCRClass();

@@ -126,7 +126,7 @@ public class MCROCFLClassificationTransaction implements MCRPersistenceTransacti
      * @param type 'A' for created, 'M' for modified, 'D' deleted
      */
     public static void addClassificationEvent(MCRCategoryID id, char type) {
-        if (!Objects.requireNonNull(id).isRootID()) {
+        if (!Objects.requireNonNull(id).isARootID()) {
             throw new IllegalArgumentException("Only root category ids are allowed: " + id);
         }
         switch (type) {

@@ -661,7 +661,7 @@ public class MCRXMLFunctions {
     public static boolean hasParentCategory(String classificationId, String categoryId) {
         MCRCategoryID categID = new MCRCategoryID(classificationId, categoryId);
         //root category has level 0
-        return !categID.isRootID() && MCRCategoryDAOFactory.obtainInstance().getCategory(categID, 0).getLevel() > 1;
+        return !categID.isARootID() && MCRCategoryDAOFactory.obtainInstance().getCategory(categID, 0).getLevel() > 1;
     }
 
     public static String getDisplayName(String classificationId, String categoryId) {
