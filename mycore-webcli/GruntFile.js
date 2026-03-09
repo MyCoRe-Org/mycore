@@ -20,6 +20,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-ts');
   grunt.loadNpmTasks('grunt-contrib-copy');
 
+  const path = require('path');
+  const childProcess = require('child_process');
+
   grunt
     .initConfig({
       pkg: grunt.file.readJSON('package.json'),
@@ -40,13 +43,12 @@ module.exports = function(grunt) {
               dest: './target/classes/META-INF/resources/modules/webcli/node_modules',
               flatten: true,
               src: [
-                './bootstrap/dist/js/bootstrap.min.js',
+                './bootstrap/dist/js/bootstrap.bundle.min.js',
                 './bootstrap/dist/css/bootstrap.min.css',
                 './core-js/client/shim.js',
                 './zone.js/dist/zone.js',
                 './reflect-metadata/Reflect.js',
-                './systemjs/dist/system.js',
-                './jquery/dist/jquery.min.js'
+                './systemjs/dist/system.js'
               ]
             },
             {
@@ -67,8 +69,8 @@ module.exports = function(grunt) {
             },
             {
               expand: true,
-              cwd: './node_modules/angular2-in-memory-web-api',
-              dest: './target/classes/META-INF/resources/modules/webcli/node_modules/angular2-in-memory-web-api',
+              cwd: './node_modules/angular-in-memory-web-api',
+              dest: './target/classes/META-INF/resources/modules/webcli/node_modules/angular-in-memory-web-api',
               src: [
                 '**'
               ]
@@ -86,6 +88,18 @@ module.exports = function(grunt) {
       }
     });
 
-  grunt.registerTask('default', ['ts', 'copy']);
+  grunt.registerTask('build', ['ts', 'copy']);
+
+  grunt.registerTask('jasmine-node', function() {
+    const result = childProcess.spawnSync(process.execPath, [path.join(__dirname, 'src/test/js/run-jasmine.js')], {
+      stdio: 'inherit'
+    });
+    if (result.status !== 0) {
+      grunt.fail.fatal('Frontend Jasmine tests failed.');
+    }
+  });
+
+  grunt.registerTask('default', ['build']);
+  grunt.registerTask('test', ['build', 'jasmine-node']);
 
 };

@@ -1,11 +1,9 @@
 <div class="row" id="command-input">
-  <div class="col-xs-12">
+  <div class="col-12">
     <div class="input-group">
       <input type="text" class="form-control" [(ngModel)]="command" placeholder="Command..."
         (keydown)="onKeyPress($event, $event.keyCode)" />
-      <span class="input-group-btn">
-        <button class="btn btn-secondary" type="button" (click)="execute(command)">Execute</button>
-      </span>
+      <button class="btn btn-secondary" type="button" (click)="execute(command)">Execute</button>
     </div>
   </div>
 </div>

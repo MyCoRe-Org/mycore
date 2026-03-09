@@ -3,7 +3,7 @@
   <base href="gui/">
   <title>MyCoRe Web CLI</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="node_modules/bootstrap.min.css">
   <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
   <link href='//fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" href="css/webcli.css">
@@ -13,17 +13,22 @@
   <script src="node_modules/Reflect.js"></script>
   <script src="node_modules/system.js"></script>
 
-  <script src="node_modules/jquery.min.js"></script>
-  <script src="node_modules/bootstrap.min.js"></script>
+  <script src="node_modules/bootstrap.bundle.min.js"></script>
 
   <script src="systemjs.config.js"></script>
   <script>
       System.import('app').catch(function(err){ console.error(err); });
   </script>
   <script>
-    $(document).ready(function() {
-      setInterval(function(){
-         $.get('../../echo/ping');
+    document.addEventListener('DOMContentLoaded', function() {
+      setInterval(function() {
+        if (window.fetch) {
+          window.fetch('../../echo/ping', { credentials: 'same-origin' }).catch(function() {});
+          return;
+        }
+        var request = new XMLHttpRequest();
+        request.open('GET', '../../echo/ping', true);
+        request.send();
       }, 1740000);
     });
   </script>
