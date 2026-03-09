@@ -110,21 +110,35 @@ export class WebCliCommandInputComponent {
     }
     if (keyCode == "9") {
       event.preventDefault();
-      this.selectFirstPlaceHolder();
+      let input = this._elementRef.nativeElement.getElementsByTagName("input")[0];
+      this.selectNextPlaceholder(input.selectionEnd);
     }
   }
 
   ngAfterViewChecked() {
     if (this.commmandChangend) {
-      this.selectFirstPlaceHolder();
+      setTimeout(() => {
+        this.selectNextPlaceholder(0);
+      }, 0);
       this.commmandChangend = false;
     }
   }
 
-  selectFirstPlaceHolder() {
+  selectNextPlaceholder(startFrom: number) {
     let input = this._elementRef.nativeElement.getElementsByTagName("input")[0];
-    let match = /\{[0-9]+\}/.exec(this.command);
-    if (match != null && input != undefined) {
+    if (!input || !this.command) return;
+
+    let regex = /\{[0-9]+\}/g;
+    regex.lastIndex = startFrom;
+    let match = regex.exec(this.command);
+
+    if (!match && startFrom > 0) {
+      // Wrap around
+      regex.lastIndex = 0;
+      match = regex.exec(this.command);
+    }
+
+    if (match != null) {
       input.focus();
       input.setSelectionRange(match.index, match.index + match[0].length);
     }

@@ -25,20 +25,18 @@ import { WebCliSettingsComponent } from './settings/settings.component';
 import { CommunicationService } from './service/communication.service';
 import { RESTService } from './service/rest.service';
 
-declare var $: any;
-
 @Component({
   selector: 'webcli',
-  templateUrl: 'app/app.html',
-  directives: [WebCliCommandsComponent, WebCliCommandInputComponent, WebCliLogComponent, WebCliSettingsComponent, WebCliQueueComponent],
-  providers: [CommunicationService, RESTService]
+  templateUrl: 'app/app.html'
 })
 export class AppComponent {
   title = 'MyCoRe Web CLI2';
   refreshRunning = true;
   currentCommand: String = "";
   currentQueueLength: number = 0;
-  commandHistory: string[];
+  commandHistory: string[] = [];
+  activeTab: string = 'log';
+  commandHistoryVisible: boolean = false;
   @ViewChild(WebCliLogComponent)
   webCliLogComponent: WebCliLogComponent;
 
@@ -53,8 +51,11 @@ export class AppComponent {
       queueLength => {
         this.currentQueueLength = queueLength;
         if (queueLength < 1) {
-          (<HTMLElement>document.getElementsByClassName('logTab')[0]).click();
-          // this.webCliLogComponent.scrollLog();
+          this.selectTab('log');
+          let logTab = <HTMLElement>document.getElementsByClassName('logTab')[0];
+          if (logTab != undefined) {
+            logTab.click();
+          }
         }
       });
     this._communicationService.commandHistory.subscribe(
@@ -91,12 +92,20 @@ export class AppComponent {
     }
   }
 
+  selectTab(tab: string) {
+    this.activeTab = tab;
+  }
+
   showCommandHistory() {
-    $('#comHistoryModal').modal('show');
+    this.commandHistoryVisible = true;
+  }
+
+  hideCommandHistory() {
+    this.commandHistoryVisible = false;
   }
 
   onSelectCommand(com) {
     this._communicationService.setCurrentCommand(com);
-    $('#comHistoryModal').modal('hide');
+    this.hideCommandHistory();
   }
 }

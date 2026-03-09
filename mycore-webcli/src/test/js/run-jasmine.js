@@ -1,6 +1,6 @@
 /*
  * This file is part of ***  M y C o R e  ***
- * See https://www.mycore.de/ for details.
+ * See http://www.mycore.de/ for details.
  *
  * MyCoRe is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,25 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { AppModule } from './app.module';
+require('reflect-metadata');
 
-platformBrowserDynamic().bootstrapModule(AppModule);
+const Jasmine = require('jasmine');
+
+async function run() {
+  const jasmineRunner = new Jasmine();
+  jasmineRunner.loadConfig({
+    spec_dir: 'src/test/js/spec',
+    spec_files: ['**/*Spec.js'],
+    helpers: ['../helpers/**/*.js'],
+    random: false,
+    stopSpecOnExpectationFailure: false
+  });
+
+  const passed = await jasmineRunner.execute();
+  process.exit(passed ? 0 : 1);
+}
+
+run().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});
