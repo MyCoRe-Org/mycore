@@ -39,7 +39,7 @@ import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
-import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
+import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRExpandedObject;
@@ -66,9 +66,6 @@ public final class MCRLinkTableManager {
     public static final MCRLinkType ENTRY_TYPE_REFERENCE = MCRLinkType.REFERENCE;
 
     public static final String LINK_PROVIDER_CONFIG_PREFIX = "MCR.Persistence.LinkProvider.Impl.";
-
-    /** The link table manager singleton */
-    private static final MCRLinkTableManager SINGLETON_INSTANCE = new MCRLinkTableManager();
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -104,10 +101,10 @@ public final class MCRLinkTableManager {
      *
      * @return Returns a MCRLinkTableManager instance.
      */
-    public static synchronized MCRLinkTableManager getInstance() {
-        return SINGLETON_INSTANCE;
+    public static MCRLinkTableManager getInstance() {
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
-    
+
     /**
      * The method add a reference link pair.
      *
@@ -148,7 +145,6 @@ public final class MCRLinkTableManager {
             LOGGER.warn("The to value of a reference link is false, the link was not added to the link table");
             return;
         }
-
 
         String attrTrimmed = MCRUtils.filterTrimmedNotEmpty(attr).orElse("");
 
@@ -470,7 +466,6 @@ public final class MCRLinkTableManager {
         }
     }
 
-
     /**
      * Removes all references of this object.
      *
@@ -479,7 +474,7 @@ public final class MCRLinkTableManager {
     public void delete(MCRObjectID id) {
         deleteReferenceLink(id);
         MCRCategLinkReference reference = new MCRCategLinkReference(id);
-        MCRCategLinkServiceFactory.obtainInstance().deleteLink(reference);
+        MCRCategLinkService.obtainInstance().deleteLink(reference);
     }
 
     /**
@@ -491,8 +486,6 @@ public final class MCRLinkTableManager {
         delete(id);
         create(MCRMetadataManager.retrieve(id));
     }
-
-
 
     /**
      * Creates all references for the given object. You should call {@link #delete(MCRObjectID)} before using this
@@ -520,7 +513,7 @@ public final class MCRLinkTableManager {
         }
 
         MCRCategLinkReference objectReference = new MCRCategLinkReference(base.getId());
-        MCRCategLinkServiceFactory.obtainInstance().setLinks(objectReference, categoryList);
+        MCRCategLinkService.obtainInstance().setLinks(objectReference, categoryList);
     }
 
     public Collection<MCRCategoryID> getCategories(MCRBase obj) {
@@ -556,5 +549,9 @@ public final class MCRLinkTableManager {
     }
 
     public record MCRLinkReference(MCRObjectID from, MCRObjectID to, MCRLinkType type, String attr) {
+    }
+
+    private static final class LazyInstanceHolder {
+        private static final MCRLinkTableManager SINGLETON_INSTANCE = new MCRLinkTableManager();
     }
 }

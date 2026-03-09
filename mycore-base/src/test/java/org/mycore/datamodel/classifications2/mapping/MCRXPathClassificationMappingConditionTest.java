@@ -32,7 +32,6 @@ import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.test.MCRJPAExtension;
 import org.mycore.test.MyCoReTest;
@@ -48,7 +47,7 @@ public class MCRXPathClassificationMappingConditionTest {
         MCRXPathClassificationMappingConditionTest.class.getSimpleName() + "/";
 
     public MCRCategoryDAO getDAO() {
-        return MCRCategoryDAOFactory.obtainInstance();
+        return MCRCategoryDAO.obtainInstance();
     }
 
     @Test
@@ -62,7 +61,7 @@ public class MCRXPathClassificationMappingConditionTest {
         Document document = saxBuilder.build(classLoader.getResourceAsStream(TEST_DIRECTORY + "testMcrObject.xml"));
         MCRObject mcro = new MCRObject(document);
 
-        String xPath = "/mycoreobject/metadata/element[@class='MCRMetaLangText']/publishedin/@type" ;
+        String xPath = "/mycoreobject/metadata/element[@class='MCRMetaLangText']/publishedin/@type";
 
         Set<String> parentGenres = new MCRXPathClassificationMappingCondition(xPath).evaluate(mcro);
 

@@ -43,7 +43,6 @@ import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
-import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
@@ -97,7 +96,7 @@ public class MCRObjectInfoEntityQueryResolverTest {
 
     private static void initClassifications() throws URISyntaxException, IOException, JDOMException {
         DAO = new MCRCategoryDAOImpl();
-        CLS = MCRCategLinkServiceFactory.obtainInstance();
+        CLS = MCRCategLinkService.obtainInstance();
 
         URL classResourceUrl = MCRObjectInfoEntityQueryResolverTest.class
             .getResource("/mycore-classifications/mir_licenses.xml");

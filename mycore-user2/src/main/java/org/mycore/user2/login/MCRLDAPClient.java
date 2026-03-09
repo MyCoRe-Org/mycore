@@ -42,6 +42,7 @@ import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRFactory;
 import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
@@ -93,7 +94,7 @@ import org.mycore.user2.MCRUser;
  *
  * @author Frank Lützenkirchen
  */
-@SuppressWarnings({"PMD.ReplaceHashtableWithMap"})
+@SuppressWarnings({ "PMD.ReplaceHashtableWithMap" })
 @MCRConfigurationProxy(proxyClass = MCRLDAPClient.Factory.class)
 public final class MCRLDAPClient {
 
@@ -101,9 +102,11 @@ public final class MCRLDAPClient {
 
     public static final String CLIENT_PROPERTY = "MCR.user2.LDAP";
 
+    private static final String CLASS_PROPERTY = CLIENT_PROPERTY + ".Class";
+
     private final SearchSettings searchSettings;
 
-    @SuppressWarnings({"PMD.LooseCoupling"})
+    @SuppressWarnings({ "PMD.LooseCoupling" })
     private final Hashtable<String, String> ldapSettings;
 
     public MCRLDAPClient(ConnectionSettings connectionSettings, SearchSettings searchSettings) {
@@ -118,13 +121,13 @@ public final class MCRLDAPClient {
         this.searchSettings = Objects.requireNonNull(searchSettings, "Search settings must not be null");
     }
 
+    @MCRFactory
     public static MCRLDAPClient obtainInstance() {
-        return LazyInstanceHolder.SHARED_INSTANCE;
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRLDAPClient.class, CLASS_PROPERTY);
     }
 
     public static MCRLDAPClient createInstance() {
-        String classProperty = CLIENT_PROPERTY + ".Class";
-        return MCRConfiguration2.getInstanceOfOrThrow(MCRLDAPClient.class, classProperty);
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRLDAPClient.class, CLASS_PROPERTY);
     }
 
     public boolean updateUserProperties(MCRUser user) throws NamingException {
@@ -444,10 +447,6 @@ public final class MCRLDAPClient {
 
         }
 
-    }
-
-    private static final class LazyInstanceHolder {
-        public static final MCRLDAPClient SHARED_INSTANCE = createInstance();
     }
 
 }

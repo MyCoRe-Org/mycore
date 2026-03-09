@@ -52,7 +52,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRStreamUtils;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
-import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
+import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
@@ -123,7 +123,7 @@ public class MCRCategoryDAOImplTest {
         MCRCategory secondCateg = nameIdentifier.getChildren().get(1);
         DAO.addCategory(null, nameIdentifier);
         startNewTransaction();
-        MCRCategLinkServiceFactory.obtainInstance().getLinksFromCategory(secondCateg.getId());
+        MCRCategLinkService.obtainInstance().getLinksFromCategory(secondCateg.getId());
         assertTrue(DAO.exist(secondCateg.getId()), secondCateg.getId() + " should exist.");
         //re-set labels
         DAO.setLabels(secondCateg.getId(), new TreeSet<>(secondCateg.getLabels().stream().collect(Collectors.toSet())));

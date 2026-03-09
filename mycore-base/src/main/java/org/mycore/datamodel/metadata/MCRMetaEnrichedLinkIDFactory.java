@@ -28,7 +28,8 @@ import org.mycore.common.config.MCRConfiguration2;
 public abstract class MCRMetaEnrichedLinkIDFactory {
 
     public static MCRMetaEnrichedLinkIDFactory obtainInstance() {
-        return LazyInstanceHolder.SHARED_INSTANCE;
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRMetaEnrichedLinkIDFactory.class,
+            "MCR.Metadata.EnrichedDerivateLinkIDFactory.Class");
     }
 
     public abstract MCREditableMetaEnrichedLinkID getDerivateLink(MCRDerivate der);
@@ -39,8 +40,4 @@ public abstract class MCRMetaEnrichedLinkIDFactory {
         return new MCREditableMetaEnrichedLinkID();
     }
 
-    private static final class LazyInstanceHolder {
-        public static final MCRMetaEnrichedLinkIDFactory SHARED_INSTANCE = MCRConfiguration2.getInstanceOfOrThrow(
-            MCRMetaEnrichedLinkIDFactory.class, "MCR.Metadata.EnrichedDerivateLinkIDFactory.Class");
-    }
 }

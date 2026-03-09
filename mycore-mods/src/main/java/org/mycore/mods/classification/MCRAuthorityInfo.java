@@ -23,7 +23,6 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRCache;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.w3c.dom.Element;
@@ -42,7 +41,7 @@ abstract class MCRAuthorityInfo {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.obtainInstance();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAO.obtainInstance();
 
     /**
      * A cache that maps authority information to the category ID that is represented by that info.
@@ -96,7 +95,6 @@ abstract class MCRAuthorityInfo {
         }
         return sb.toString();
     }
-
 
     /**
      * Looks up the category ID for this authority information in the classification database.

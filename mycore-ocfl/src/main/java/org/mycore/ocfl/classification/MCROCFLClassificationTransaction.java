@@ -33,7 +33,6 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
@@ -78,8 +77,8 @@ public class MCROCFLClassificationTransaction implements MCRPersistenceTransacti
                 try {
                     switch (eventType) {
                         case MCRAbstractMetadataVersion.CREATED,
-                            MCRAbstractMetadataVersion.UPDATED -> createOrUpdateOCFLClassification(
-                                categoryID, eventType);
+                             MCRAbstractMetadataVersion.UPDATED -> createOrUpdateOCFLClassification(
+                            categoryID, eventType);
                         case MCRAbstractMetadataVersion.DELETED -> MANAGER.delete(categoryID);
                         default -> throw new IllegalStateException(
                             "Unsupported type in classification found: " + eventType + ", " + categoryID);
@@ -94,7 +93,7 @@ public class MCROCFLClassificationTransaction implements MCRPersistenceTransacti
     private static void createOrUpdateOCFLClassification(MCRCategoryID categoryID, Character eventType)
         throws IOException {
         // read classification from just here
-        final MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
+        final MCRCategoryDAO categoryDAO = MCRCategoryDAO.obtainInstance();
         final MCRCategory categoryRoot = categoryDAO
             .getCategory(categoryID, -1);
         if (categoryID == null) {

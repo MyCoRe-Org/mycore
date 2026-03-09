@@ -31,6 +31,7 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRFactory;
 import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.config.annotation.MCRSentinel;
@@ -99,8 +100,6 @@ public final class MCRResourceResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRResourceResolver SHARED_INSTANCE = createInstance();
-
     public static final MCRNoOpResourceTracer NO_OP_TRACER = new MCRNoOpResourceTracer();
 
     public static final String RESOLVER_PROPERTY = "MCR.Resource.Resolver";
@@ -111,6 +110,8 @@ public final class MCRResourceResolver {
 
     public static final String SELECTED_PROVIDER_KEY = "SelectedProvider";
 
+    private static final String CLASS_PROPERTY = RESOLVER_PROPERTY + ".Class";
+
     private final MCRHints hints;
 
     private final MCRResourceProvider provider;
@@ -120,13 +121,13 @@ public final class MCRResourceResolver {
         this.provider = Objects.requireNonNull(provider, "Provider must not be null");
     }
 
+    @MCRFactory
     public static MCRResourceResolver obtainInstance() {
-        return SHARED_INSTANCE;
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRResourceResolver.class, CLASS_PROPERTY);
     }
 
     public static MCRResourceResolver createInstance() {
-        String classProperty = RESOLVER_PROPERTY + ".Class";
-        return MCRConfiguration2.getInstanceOfOrThrow(MCRResourceResolver.class, classProperty);
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRResourceResolver.class, CLASS_PROPERTY);
     }
 
     /**
