@@ -22,6 +22,7 @@ import java.util.Objects;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.dom.DOMSource;
 
@@ -64,56 +65,42 @@ public class MCRUserAndObjectRightsURIResolver implements URIResolver {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
-    public Source resolve(String href, String base) {
+    public Source resolve(String href, String base) throws TransformerException {
         String query = href.substring(href.indexOf(':') + 1);
 
         String key = query.substring(0, query.indexOf(':'));
         String value = query.substring(query.indexOf(':') + 1);
 
         try {
-            Document doc = MCRDOMUtils.getDocumentBuilder().newDocument();
-            Element result = doc.createElement("boolean");
-            doc.appendChild(result);
             if (Objects.equals(key, "isWorldReadable")) {
-                result.appendChild(doc.createTextNode(Boolean.toString(MCRXMLFunctions.isWorldReadable(value))));
-                return new DOMSource(doc);
+                return MCRURIResolver.createBooleanResponse(MCRXMLFunctions.isWorldReadable(value));
             }
             if (Objects.equals(key, "isWorldReadableComplete")) {
-                result.appendChild(
-                    doc.createTextNode(Boolean.toString(MCRXMLFunctions.isWorldReadableComplete(value))));
-                return new DOMSource(doc);
+                return MCRURIResolver.createBooleanResponse(MCRXMLFunctions.isWorldReadableComplete(value));
             }
 
             if (Objects.equals(key, "isDisplayedEnabledDerivate")) {
-                result.appendChild(
-                    doc.createTextNode(Boolean.toString(MCRAccessManager.checkDerivateDisplayPermission(value))));
-                return new DOMSource(doc);
+                return MCRURIResolver.createBooleanResponse(MCRAccessManager.checkDerivateDisplayPermission(value));
             }
 
             if (Objects.equals(key, "isCurrentUserInRole")) {
-                result.appendChild(
-                    doc.createTextNode(
-                        Boolean.toString(MCRSessionMgr.getCurrentSession().getUserInformation().isUserInRole(value))));
-                return new DOMSource(doc);
+                return MCRURIResolver.createBooleanResponse(
+                    MCRSessionMgr.getCurrentSession().getUserInformation().isUserInRole(value));
             }
             if (Objects.equals(key, "isCurrentUserSuperUser")) {
-                result.appendChild(
-                    doc.createTextNode(
-                        Boolean.toString(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
-                            .equals(MCRSystemUserInformation.SUPER_USER.getUserID()))));
-                return new DOMSource(doc);
+                return MCRURIResolver.createBooleanResponse(
+                    MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
+                        .equals(MCRSystemUserInformation.SUPER_USER.getUserID()));
             }
 
             if (Objects.equals(key, "isCurrentUserGuestUser")) {
-                result.appendChild(
-                    doc.createTextNode(
-                        Boolean.toString(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
-                            .equals(MCRSystemUserInformation.GUEST.getUserID()))));
-                return new DOMSource(doc);
+                return MCRURIResolver.createBooleanResponse(
+                    MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
+                        .equals(MCRSystemUserInformation.GUEST.getUserID()));
             }
 
             if (Objects.equals(key, "getCurrentUserAttribute")) {
-                doc = MCRDOMUtils.getDocumentBuilder().newDocument();
+                Document doc = MCRDOMUtils.getDocumentBuilder().newDocument();
                 Element attr = doc.createElement("userattribute");
                 attr.setAttribute("name", key);
                 doc.appendChild(attr);
@@ -121,11 +108,9 @@ public class MCRUserAndObjectRightsURIResolver implements URIResolver {
                     doc.createTextNode(MCRSessionMgr.getCurrentSession().getUserInformation().getUserAttribute(value)));
                 return new DOMSource(doc);
             }
-
-            return new DOMSource(doc);
         } catch (ParserConfigurationException e) {
             LOGGER.error("Could not create DOM document", e);
         }
-        return null;
+        throw new TransformerException("Unknown query for MCRUserAndObjectRightsURIResolver: " + query);
     }
 }
