@@ -44,7 +44,7 @@ public class MCROCFLClassificationEventHandler implements MCREventHandler {
                 case CREATE -> addClassificationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.CREATED);
                 case UPDATE -> addClassificationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.UPDATED);
                 case DELETE -> {
-                    if (mcrCg.getId().isRootID()) {
+                    if (mcrCg.getId().isRoot()) {
                         // delete complete classification
                         addClassificationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.DELETED);
                     } else {

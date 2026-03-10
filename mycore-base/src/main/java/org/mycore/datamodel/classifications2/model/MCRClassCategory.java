@@ -99,7 +99,7 @@ public class MCRClassCategory {
     public static MCRClassCategory ofCategory(MCRCategory from) {
         MCRClassCategory categ = new MCRClassCategory();
         MCRCategoryID categoryID = from.getId();
-        categ.setID(categoryID.isRootID() ? categoryID.getRootID() : categoryID.getId());
+        categ.setID(categoryID.isRoot() ? categoryID.getRootID() : categoryID.getId());
         categ.setUrl(MCRClassURL.ofUri(from.getURI()));
         categ.getCategory().addAll(
             from.getChildren()
