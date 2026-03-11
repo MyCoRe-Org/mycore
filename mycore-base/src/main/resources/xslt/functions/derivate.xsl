@@ -47,4 +47,12 @@
   "/>
     </xsl:function>
 
+    <xsl:function name="mcrderivate:is-display-enabled" as="xs:boolean">
+        <xsl:param name="id" as="xs:string"/>
+        <xsl:param name="intent" as="xs:string"/>
+        <xsl:variable name="uri" select="xs:anyURI(concat('checkDerivateDisplayEnabled:', $id, ':', $intent))"/>
+        <xsl:variable name="resultDocument" select="document($uri)"/>
+        <xsl:sequence select="xs:boolean($resultDocument/boolean/text())"/>
+    </xsl:function>
+
 </xsl:stylesheet>
