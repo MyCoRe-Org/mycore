@@ -129,7 +129,8 @@ export class ObjectsContentHandler extends BaseContentHandler {
       method: "DELETE",
       headers: {
         "Authorization": authorizationHeader
-      }
+      },
+      keepalive: true
     });
     if (response.ok) {
       return {status: "unlocked"};
