@@ -2,6 +2,17 @@ import {BaseContentHandler} from "@/apis/BaseContentHandler";
 import {getAuthorizationHeader} from "@/apis/Auth";
 import type {Content, LockResult} from "@/apis/ContentHandler.ts";
 
+/**
+ * Content handler for MyCoRe objects, derivates and their file contents.
+ *
+ * Supported id formats:
+ * - `jportal_jpjournal_00000599` — a plain MyCoRe object
+ * - `jportal_jpvolume_00118654/derivates/jportal_derivate_00201808` — a derivate
+ * - `jportal_jpvolume_00118654/derivates/jportal_derivate_00201808/contents` — derivate file listing
+ * - `jportal_jpvolume_00118654/derivates/jportal_derivate_00201808/contents/mets.xml` — a specific file
+ *
+ * All requests go through the MyCoRe REST API v2 at `api/v2/objects/{id}`.
+ */
 export class ObjectsContentHandler extends BaseContentHandler {
 
   constructor(webApplicationBaseURL: string) {
@@ -9,25 +20,16 @@ export class ObjectsContentHandler extends BaseContentHandler {
   }
 
   /**
-   * Loads an object resource.
-   * <p>
-   * The path is analog to the REST v2 API. E.g. it can be:
-   * <ul>
-   *     <li>mir_mods_00000001</li>
-   *     <li>mir_mods_00000001/derivates</li>
-   *     <li>mir_mods_00000001/derivates/mir_derivate_00000001</li>
-   *     <li>mir_mods_00000001/derivates/mir_derivate_00000001/contents</li>
-   *     <li>mir_mods_00000001/derivates/mir_derivate_00000001/contents/myFile.xml</li>
-   * </ul>
+   * Loads and prettifies the XML for the given object, derivate or file path.
    *
-   * @param path path to the resource
+   * @param path - The resource path as described in the class documentation.
    */
   async load(path: string): Promise<Content> {
     const response = await fetch(`${this.mcrApplicationBaseURL}api/v2/objects/${path}`);
     if (!response.ok) {
       throw this.buildError(`Unable to load ${path}.`, response);
     }
-    const xml = await response.text();
+    const xml = this.prettifyXml(await response.text());
     const contentType = response.headers.get("Content-Type");
     if (contentType === null) {
       throw new Error(`Unable to load ${path}. Request was successful but the 'Content-Type' is empty.`);
@@ -38,6 +40,12 @@ export class ObjectsContentHandler extends BaseContentHandler {
     };
   }
 
+  /**
+   * Saves the content back to the given object or file via HTTP PUT.
+   *
+   * @param path - The resource path.
+   * @param content - The content to save.
+   */
   async save(path: string, content: Content): Promise<void> {
     const authorizationHeader = await getAuthorizationHeader(this.mcrApplicationBaseURL);
     const response = await fetch(`${this.mcrApplicationBaseURL}api/v2/objects/${path}`, {
@@ -54,6 +62,12 @@ export class ObjectsContentHandler extends BaseContentHandler {
     throw this.buildError(`Unable to save ${path}.`, response);
   }
 
+  /**
+   * Checks write access by attempting a PUT request to the `/try` endpoint of the base object.
+   * File content ids (containing `/contents`) are resolved to their parent object first.
+   *
+   * @param path - The resource path.
+   */
   async hasWriteAccess(path: string): Promise<boolean> {
     const authorizationHeader = await getAuthorizationHeader(this.mcrApplicationBaseURL);
     const baseId = this.getBasePath(path);
@@ -73,6 +87,12 @@ export class ObjectsContentHandler extends BaseContentHandler {
     */
   }
 
+  /**
+   * Objects are marked dirty after save because the server updates fields such as modifyDate.
+   * File content ids are not dirty since the server returns the content as-is.
+   *
+   * @param path - The resource path.
+   */
   dirtyAfterSave(path: string): boolean {
     const isContent = this.containsContent(path);
     return !isContent;
@@ -109,7 +129,8 @@ export class ObjectsContentHandler extends BaseContentHandler {
       method: "DELETE",
       headers: {
         "Authorization": authorizationHeader
-      }
+      },
+      keepalive: true
     });
     if (response.ok) {
       return {status: "unlocked"};

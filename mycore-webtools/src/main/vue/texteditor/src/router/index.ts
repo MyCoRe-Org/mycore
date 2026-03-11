@@ -13,7 +13,7 @@ export function getContext(): string {
 
 export function getMCRApplicationBaseURL(): string {
   if (import.meta.env.DEV) {
-    return "http://localhost:8291/mir/"
+    return "http://localhost:8080/jportal/"
   }
   return getWebApplicationBaseURL();
 }
@@ -25,7 +25,7 @@ export function getWebApplicationBaseURL(): string {
   if ((<any>window).mycore.webApplicationBaseURL) {
     return (<any>window).mycore.webApplicationBaseURL;
   }
-  throw "Fatal error: 'mycore.webApplicationBaseURL' is not set.";
+  throw new Error("Fatal error: 'mycore.webApplicationBaseURL' is not set.");
 }
 
 const router = createRouter({

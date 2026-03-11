@@ -2,12 +2,24 @@ import {BaseContentHandler} from "@/apis/BaseContentHandler";
 import {getAuthorizationHeader} from "@/apis/Auth";
 import type {Content} from "@/apis/ContentHandler.ts";
 
+/**
+ * Content handler for MyCoRe classifications, accessed via the REST API v2
+ * at `api/v2/classifications/{classificationId}`.
+ *
+ * Classifications are always returned as `application/xml` and prettified
+ * before display since the server does not indent the XML itself.
+ */
 export class ClassificationsContentHandler extends BaseContentHandler {
 
   constructor(webApplicationBaseURL: string) {
     super(webApplicationBaseURL);
   }
 
+  /**
+   * Loads and prettifies the XML for the given classification.
+   *
+   * @param classificationId - The classification identifier (e.g. "jportal_class_00000004").
+   */
   async load(classificationId: string): Promise<Content> {
     const response = await fetch(`${this.mcrApplicationBaseURL}api/v2/classifications/${classificationId}`);
     const xml = await response.text();
@@ -21,6 +33,12 @@ export class ClassificationsContentHandler extends BaseContentHandler {
     throw this.buildError(`Unable to load ${classificationId}.`, response);
   }
 
+  /**
+   * Saves the classification XML via HTTP PUT.
+   *
+   * @param classificationId - The classification identifier.
+   * @param content - The content to save.
+   */
   async save(classificationId: string, content: Content): Promise<void> {
     const authorizationHeader = await getAuthorizationHeader(this.mcrApplicationBaseURL);
     const response = await fetch(`${this.mcrApplicationBaseURL}api/v2/classifications/${classificationId}`, {
@@ -37,32 +55,20 @@ export class ClassificationsContentHandler extends BaseContentHandler {
     throw this.buildError(`Unable to save ${classificationId}.`, response);
   }
 
+  /**
+   * Always returns true since the REST API v2 does not provide a way to check
+   * write access for classifications.
+   *
+   * TODO: implement once the API supports it.
+   */
   async hasWriteAccess(classificationId: string): Promise<boolean> {
     // TODO - rest API v2 does not provide support for checking write access
     return true;
   }
 
   /**
-   * Prettifies classification xml. This is a workaround as long as the server does not returns a prettified xml by
-   * itself.
-   * TODO: remove if not necessary anymore
-   *
-   * https://stackoverflow.com/questions/376373/pretty-printing-xml-with-javascript
-   *
-   * @param xml xml to prettify
+   * Classifications are not dirty after save — the server returns the content unchanged.
    */
-  prettifyXml(xml: string) {
-    const tab = "  ";
-    let formatted = "";
-    let indent = "";
-    xml.split(/>\s*</).forEach(function (node) {
-      if (node.match(/^\/\w/)) indent = indent.substring(tab.length);
-      formatted += `${indent}<${node}>\r\n`;
-      if (node.match(/^<?\w[^>]*[^\/]$/)) indent += tab;
-    });
-    return formatted.substring(1, formatted.length - 3);
-  }
-
   dirtyAfterSave(id: string): boolean {
     return false;
   }
