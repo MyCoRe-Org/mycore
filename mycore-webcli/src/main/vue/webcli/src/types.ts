@@ -8,6 +8,12 @@ export interface CommandGroup {
   commands: CommandEntry[];
 }
 
+export interface SearchableCommand {
+  command: string;
+  groupName: string;
+  help: string;
+}
+
 export interface LogEntry {
   exception: string | null;
   logLevel: string;

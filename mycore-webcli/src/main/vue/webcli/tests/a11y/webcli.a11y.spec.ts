@@ -53,11 +53,15 @@ test.beforeEach(async ({ page }) => {
                 return: {
                   commands: [
                     {
-                      name: 'Basic commands',
+                      name: 'Transformations',
                       commands: [
                         {
-                          command: 'process resource {0}',
-                          help: 'Execute the commands listed in the resource file {0}.',
+                          command: 'xslt transform {0}',
+                          help: 'Run an XSLT transformation.',
+                        },
+                        {
+                          command: 'import object',
+                          help: 'Import a resource with optional xslt mapping.',
                         },
                       ],
                     },
@@ -87,6 +91,40 @@ test('has no serious axe violations in the default WebCLI view', async ({ page }
   );
 
   expect(seriousViolations).toEqual([]);
+});
+
+test('has no serious axe violations with the command suggestion popup open', async ({ page }) => {
+  await page.goto('/');
+
+  await page.locator('#webcli-command-input').fill('xslt');
+
+  const accessibilityScanResults = await new AxeBuilder({ page })
+    .include('.webcli-app')
+    .analyze();
+
+  const seriousViolations = accessibilityScanResults.violations.filter(violation =>
+    ['serious', 'critical'].includes(violation.impact ?? '')
+  );
+
+  expect(seriousViolations).toEqual([]);
+});
+
+test('keeps sufficient contrast for the highlighted command suggestion', async ({ page }) => {
+  await page.goto('/');
+
+  await page.locator('#webcli-command-input').fill('xslt');
+  await page.locator('#webcli-command-input').press('ArrowDown');
+
+  const suggestionColors = await page.locator('.webcli-suggestion.is-highlighted').evaluate(element => {
+    const computedStyle = window.getComputedStyle(element);
+    return {
+      color: computedStyle.color,
+      background: computedStyle.backgroundColor,
+    };
+  });
+
+  const ratio = calculateContrastRatio(parseRgb(suggestionColors.color), parseRgb(suggestionColors.background));
+  expect(ratio).toBeGreaterThanOrEqual(4.5);
 });
 
 test('keeps sufficient contrast for toolbar controls on the dark navbar', async ({ page }) => {
