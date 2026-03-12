@@ -13,6 +13,22 @@ Tests live under:
 - `src/main/vue/webcli/src/**/*.spec.ts`
 - `src/main/vue/webcli/tests/a11y/**/*.spec.ts`
 
+The Vitest suite is split by responsibility:
+
+- app-level command input and execution behavior
+- app-level console, queue, and settings behavior
+- app-level history integration
+- component-level menu and dialog behavior
+- service/composable-level protocol and settings logic
+
+Shared Vitest helpers live under:
+
+- `src/main/vue/webcli/src/test/helpers/`
+
+Shared Playwright helpers live under:
+
+- `src/main/vue/webcli/tests/a11y/helpers/`
+
 ## What to test
 
 The backend contract is still the most important seam.
@@ -26,6 +42,8 @@ Priority coverage:
 - `noPermission` handling
 - command-history persistence
 - settings persistence
+- command menu keyboard and flyout behavior
+- command suggestion behavior
 - queue and log rendering behavior
 
 ## What not to mock at integration level
@@ -64,7 +82,7 @@ Locally, Playwright first checks `CHROME_BIN` and `CHROMIUM_BIN`. If those varia
 
 Requirement:
 
-- Chrome or Chromium must be installed locally for browser-less runs
+- Chrome or Chromium must be installed locally for Playwright runs
 - `CHROME_BIN` and `CHROMIUM_BIN` are optional
 
 Playwright artifacts are written under:
