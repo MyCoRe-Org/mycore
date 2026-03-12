@@ -3,7 +3,9 @@ import { computed, nextTick, ref, watch } from 'vue';
 
 import CommandHistoryDialog from '@/components/CommandHistoryDialog.vue';
 import CommandMenu from '@/components/CommandMenu.vue';
+import CommandSuggestions from '@/components/CommandSuggestions.vue';
 import { useCommandHistory } from '@/composables/useCommandHistory';
+import { useCommandSearch } from '@/composables/useCommandSearch';
 import { useWebCliTransport } from '@/composables/useWebCliTransport';
 import { loadSettings, persistSettings } from '@/services/settings';
 
@@ -12,9 +14,11 @@ const command = ref('');
 const activeTab = ref<'log' | 'queue'>('log');
 const isSettingsVisible = ref(false);
 const isCommandHistoryOpen = ref(false);
+const isSuggestionMenuVisible = ref(false);
 const inputElement = ref<HTMLInputElement | null>(null);
 const executeButtonElement = ref<HTMLButtonElement | null>(null);
 const logElement = ref<HTMLElement | null>(null);
+const suggestionListId = 'webcli-command-suggestions';
 
 const {
   addEntry,
@@ -43,6 +47,16 @@ const {
   setRefresh,
   updateContinueIfOneFails,
 } = useWebCliTransport(() => settings.value.continueIfOneFails);
+
+const {
+  hasSuggestions,
+  highlightedIndex,
+  highlightedSuggestion,
+  highlightSuggestion,
+  moveHighlight,
+  resetHighlight,
+  suggestions,
+} = useCommandSearch(commandGroups, command);
 
 const visibleQueue = computed(() => queue.value.slice(0, 99));
 const visibleLogLines = computed(() => {
@@ -80,12 +94,35 @@ function executeCommand(): void {
   runCommand(value);
   addEntry(value);
   command.value = '';
+  isSuggestionMenuVisible.value = false;
+  resetHighlight();
 }
 
 function onCommandKeydown(event: KeyboardEvent): void {
+  if (event.key === 'ArrowDown' && hasSuggestions.value) {
+    event.preventDefault();
+    isSuggestionMenuVisible.value = true;
+    moveHighlight(1);
+    return;
+  }
+  if (event.key === 'ArrowUp' && hasSuggestions.value && isSuggestionMenuVisible.value) {
+    event.preventDefault();
+    moveHighlight(-1);
+    return;
+  }
   if (event.key === 'Enter') {
+    if (isSuggestionMenuVisible.value && highlightedSuggestion.value) {
+      event.preventDefault();
+      selectCommand(highlightedSuggestion.value.command);
+      return;
+    }
     event.preventDefault();
     executeCommand();
+    return;
+  }
+  if (event.key === 'Escape' && isSuggestionMenuVisible.value) {
+    event.preventDefault();
+    isSuggestionMenuVisible.value = false;
     return;
   }
   if (event.key === 'ArrowUp') {
@@ -103,6 +140,11 @@ function onCommandKeydown(event: KeyboardEvent): void {
     return;
   }
   if (event.key === 'Tab' && !event.shiftKey) {
+    if (isSuggestionMenuVisible.value && highlightedSuggestion.value) {
+      event.preventDefault();
+      selectCommand(highlightedSuggestion.value.command);
+      return;
+    }
     const movedToPlaceholder = selectNextPlaceholder(inputElement.value?.selectionEnd ?? 0);
     if (!movedToPlaceholder) {
       return;
@@ -113,12 +155,31 @@ function onCommandKeydown(event: KeyboardEvent): void {
 
 function selectCommand(value: string): void {
   command.value = value;
+  isSuggestionMenuVisible.value = false;
+  resetHighlight();
   nextTick(() => {
     const focusedPlaceholder = selectNextPlaceholder(0);
     if (!focusedPlaceholder) {
       executeButtonElement.value?.focus();
     }
   });
+}
+
+function onCommandInput(): void {
+  isSuggestionMenuVisible.value = hasSuggestions.value;
+  resetHighlight();
+}
+
+function onCommandInputFocus(): void {
+  if (hasSuggestions.value) {
+    isSuggestionMenuVisible.value = true;
+  }
+}
+
+function onCommandInputBlur(): void {
+  window.setTimeout(() => {
+    isSuggestionMenuVisible.value = false;
+  }, 100);
 }
 
 function openCommandHistory(): void {
@@ -163,6 +224,13 @@ watch(visibleLogLines, async () => {
 watch(queueLength, value => {
   if (value < 1) {
     activeTab.value = 'log';
+  }
+});
+
+watch(hasSuggestions, value => {
+  if (!value) {
+    isSuggestionMenuVisible.value = false;
+    resetHighlight();
   }
 });
 </script>
@@ -286,7 +354,7 @@ watch(queueLength, value => {
 
     <div id="command-input" class="row">
       <div class="col-12">
-        <div class="input-group">
+        <div class="input-group webcli-command-combobox">
           <label for="webcli-command-input" class="visually-hidden">Command input</label>
           <input
             id="webcli-command-input"
@@ -295,11 +363,34 @@ watch(queueLength, value => {
             type="text"
             class="form-control"
             placeholder="Command..."
+            role="combobox"
+            autocomplete="off"
             aria-describedby="webcli-command-help"
+            :aria-expanded="isSuggestionMenuVisible && hasSuggestions"
+            :aria-controls="suggestionListId"
+            :aria-activedescendant="isSuggestionMenuVisible && highlightedSuggestion ? `${suggestionListId}-option-${highlightedIndex}` : undefined"
             @keydown="onCommandKeydown"
+            @input="onCommandInput"
+            @focus="onCommandInputFocus"
+            @blur="onCommandInputBlur"
           />
-          <button ref="executeButtonElement" class="btn btn-secondary" type="button" @click="executeCommand">Execute</button>
+          <button
+            ref="executeButtonElement"
+            class="btn btn-secondary webcli-execute-button"
+            type="button"
+            @click="executeCommand"
+          >
+            Execute
+          </button>
         </div>
+        <CommandSuggestions
+          v-if="isSuggestionMenuVisible && hasSuggestions"
+          :id="suggestionListId"
+          :highlighted-index="highlightedIndex"
+          :suggestions="suggestions"
+          @highlight="highlightSuggestion"
+          @select="selectCommand"
+        />
         <div id="webcli-command-help" class="visually-hidden">
           Enter a command, press Tab to jump between placeholders, and press Enter to execute.
         </div>

@@ -21,6 +21,10 @@ body {
   padding: 10px;
 }
 
+.webcli-app .webcli-command-combobox {
+  position: relative;
+}
+
 .webcli-app #command-input input {
   border-top: 0;
   border-left: 0;
@@ -34,13 +38,69 @@ body {
   box-shadow: none;
 }
 
-.webcli-app #command-input button {
+.webcli-app #command-input .webcli-execute-button {
   border-radius: 0;
   border: 0;
   margin-left: 20px;
   box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
   color: var(--bs-light);
   background-color: var(--bs-dark);
+}
+
+.webcli-app .webcli-suggestions {
+  background-color: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-top: 0;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.webcli-app .webcli-suggestion {
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  border-left: 0;
+  border-radius: 0;
+  border-right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.webcli-app .webcli-suggestion-command {
+  font-weight: 600;
+}
+
+.webcli-app .webcli-suggestion-help {
+  color: var(--bs-secondary-color);
+  font-size: 0.9rem;
+}
+
+.webcli-app .webcli-suggestion-group {
+  color: #5b6470;
+  font-size: 0.8rem;
+}
+
+.webcli-app .webcli-suggestion:hover,
+.webcli-app .webcli-suggestion:focus-visible,
+.webcli-app .webcli-suggestion.is-highlighted {
+  background-color: #e9f2ff;
+  border-color: #b9d3ff;
+  color: #0f172a;
+}
+
+.webcli-app .webcli-suggestion.is-highlighted .webcli-suggestion-command {
+  color: #0f172a;
+}
+
+.webcli-app .webcli-suggestion.is-highlighted .webcli-suggestion-help,
+.webcli-app .webcli-suggestion.is-highlighted .webcli-suggestion-group,
+.webcli-app .webcli-suggestion:hover .webcli-suggestion-help,
+.webcli-app .webcli-suggestion:hover .webcli-suggestion-group,
+.webcli-app .webcli-suggestion:focus-visible .webcli-suggestion-help,
+.webcli-app .webcli-suggestion:focus-visible .webcli-suggestion-group {
+  color: #334155;
 }
 
 .webcli-app .navbar {
