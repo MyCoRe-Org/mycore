@@ -200,7 +200,9 @@ describe('WebCLI app command input', () => {
     expect(wrapper.get('label[for="webcli-command-input"]').text()).toContain('Command input');
     expect(wrapper.get('button[aria-controls="webcli-settings-panel"]').attributes('aria-expanded')).toBe('false');
     expect(wrapper.get('input#webcli-history-size').attributes('type')).toBe('number');
+    expect(wrapper.get('input#webcli-history-size').attributes('min')).toBe('1');
     expect(wrapper.get('input#webcli-command-history-size').attributes('type')).toBe('number');
+    expect(wrapper.get('input#webcli-command-history-size').attributes('min')).toBe('0');
     expect(wrapper.get('input#webcli-command-input').attributes('role')).toBe('combobox');
   });
 });

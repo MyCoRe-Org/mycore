@@ -6,7 +6,7 @@
   <name>mycore_webcli</name>
 
   <servlet>
-    <servlet-name>MCRVueRootServlet</servlet-name>
+    <servlet-name>MCRWebCLIVueServlet</servlet-name>
     <servlet-class>org.mycore.webtools.vue.MCRVueRootServlet</servlet-class>
     <init-param>
       <param-name>permission</param-name>
