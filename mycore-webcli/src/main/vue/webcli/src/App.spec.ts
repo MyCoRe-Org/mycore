@@ -77,12 +77,13 @@ function installDialogMock(): void {
 
 vi.mock('@/services/webcliTransport', async () => {
   const actual = await vi.importActual<typeof import('@/services/webcliTransport')>('@/services/webcliTransport');
+  const WebCliTransportMock = vi.fn(function MockedWebCliTransport(this: unknown) {
+    currentTransport = new MockTransport();
+    return currentTransport;
+  });
   return {
     ...actual,
-    WebCliTransport: vi.fn(() => {
-      currentTransport = new MockTransport();
-      return currentTransport;
-    }),
+    WebCliTransport: WebCliTransportMock,
   };
 });
 
