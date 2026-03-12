@@ -1,0 +1,29 @@
+<web-fragment version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-fragment_6_0.xsd"
+  metadata-complete="true">
+
+  <name>mycore_webcli</name>
+
+  <servlet>
+    <servlet-name>MCRWebCLIVueServlet</servlet-name>
+    <servlet-class>org.mycore.webtools.vue.MCRVueRootServlet</servlet-class>
+    <init-param>
+      <param-name>permission</param-name>
+      <param-value>use-webcli</param-value>
+    </init-param>
+    <init-param>
+      <param-name>heading</param-name>
+      <param-value>component.webcli.vue.heading</param-value>
+    </init-param>
+    <init-param>
+      <param-name>wrapWebPage</param-name>
+      <param-value>false</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MCRVueRootServlet</servlet-name>
+    <url-pattern>/modules/webcli/gui/*</url-pattern>
+  </servlet-mapping>
+
+</web-fragment>

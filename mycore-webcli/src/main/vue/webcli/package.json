@@ -1,0 +1,28 @@
+{
+  "name": "mycore-webcli-vue",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "vitest",
+    "test:a11y": "playwright test"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.3",
+    "font-awesome": "^4.7.0",
+    "vue": "^3.5.25"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@playwright/test": "^1.54.2",
+    "@types/node": "^25.4.0",
+    "@vitejs/plugin-vue": "^6.0.4",
+    "@vue/test-utils": "^2.4.6",
+    "jsdom": "^28.1.0",
+    "typescript": "~5.9.3",
+    "vite": "^8.0.0",
+    "vitest": "^4.1.0"
+  }
+}

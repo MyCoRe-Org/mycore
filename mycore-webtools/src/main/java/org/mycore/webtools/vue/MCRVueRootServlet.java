@@ -46,12 +46,15 @@ import org.jdom2.input.SAXBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Entities;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.content.MCRStringContent;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRContentServlet;
@@ -148,6 +151,8 @@ public class MCRVueRootServlet extends MCRContentServlet {
     protected static final String VUE_PASSTHROUGH_PROPERTY_NAME = "MCR.Vue.Properties";
     protected static final String HEADING_INIT_PARAM = "heading";
     protected static final String PROPERTIES_INIT_PARAM = "properties";
+    protected static final String PERMISSION_INIT_PARAM = "permission";
+    protected static final String WRAP_WEBPAGE_INIT_PARAM = "wrapWebPage";
     @Serial
     private static final long serialVersionUID = 1L;
     private static final Set<Integer> PASSTHROUGH_HTTP_STATUS_CODE_LIST = Set.of(
@@ -156,6 +161,8 @@ public class MCRVueRootServlet extends MCRContentServlet {
         HttpServletResponse.SC_FORBIDDEN);
     protected String headingI18nKey;
     protected Set<String> servletInitPropertiesKeys;
+    protected String requiredPermission;
+    protected boolean wrapWebPage;
     private Map<String, String> servletInitProperties;
 
     /**
@@ -174,6 +181,8 @@ public class MCRVueRootServlet extends MCRContentServlet {
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         headingI18nKey = config.getInitParameter(HEADING_INIT_PARAM);
+        requiredPermission = config.getInitParameter(PERMISSION_INIT_PARAM);
+        wrapWebPage = !"false".equalsIgnoreCase(config.getInitParameter(WRAP_WEBPAGE_INIT_PARAM));
 
         String propertiesInitParam = config.getInitParameter(PROPERTIES_INIT_PARAM);
         servletInitPropertiesKeys = propertiesInitParam != null
@@ -194,6 +203,16 @@ public class MCRVueRootServlet extends MCRContentServlet {
 
     @Override
     public MCRContent getContent(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        if (requiredPermission != null && !requiredPermission.isBlank()
+            && !MCRAccessManager.checkPermission(requiredPermission)) {
+            MCRSession currentSession = MCRSessionMgr.getCurrentSession();
+            String mainParam = MCRTranslation.translate(headingI18nKey);
+            resp.sendError(
+                HttpServletResponse.SC_FORBIDDEN,
+                getErrorI18N("component.webtools.error", "accessDenied", mainParam, currentSession.getUserInformation()
+                    .getUserID(), currentSession.getCurrentIP()));
+            return null;
+        }
         String pathInfo = req.getPathInfo();
         String indexHtmlPage = getIndexPage();
         String indexHtmlPath = req.getServletPath() + "/" + indexHtmlPage;
@@ -206,6 +225,9 @@ public class MCRVueRootServlet extends MCRContentServlet {
         }
 
         URL indexResource = MCRResourceHelper.getWebResourceUrl(indexHtmlPath);
+        if (!wrapWebPage) {
+            return getRawIndexContent(indexResource, getAbsoluteServletPath(req));
+        }
         org.jdom2.Document mycoreWebpage = getIndexDocument(indexResource, getAbsoluteServletPath(req));
         if (pathInfo != null) {
             Optional<Integer> matchingPathCode = PASSTHROUGH_HTTP_STATUS_CODE_LIST.stream()
@@ -247,6 +269,39 @@ public class MCRVueRootServlet extends MCRContentServlet {
         } catch (JDOMException e) {
             throw new MCRException(e);
         }
+    }
+
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
+    protected MCRContent getRawIndexContent(URL indexResource, String absoluteServletPath) throws IOException {
+        try (InputStream indexFileStream = indexResource.openStream()) {
+            Document document = Jsoup.parse(indexFileStream, StandardCharsets.UTF_8.toString(), "");
+            org.jsoup.nodes.Element propertiesScript = new org.jsoup.nodes.Element("script")
+                .attr("type", "text/javascript")
+                .text(buildPropertiesScript().getText());
+            document.head().prependChild(propertiesScript);
+            document.head().children().forEach(el -> {
+                if (el.hasAttr("href")) {
+                    String href = el.attr("href");
+                    if (isRelativePath(href)) {
+                        el.attr("href", absoluteServletPath + "/" + href);
+                    }
+                }
+                if (el.hasAttr("src")) {
+                    String src = el.attr("src");
+                    if (isRelativePath(src)) {
+                        el.attr("src", absoluteServletPath + "/" + src);
+                    }
+                }
+            });
+            MCRStringContent content = new MCRStringContent(document.outerHtml());
+            content.setMimeType("text/html");
+            return content;
+        }
+    }
+
+    protected boolean isRelativePath(String path) {
+        return !path.isBlank() && !path.startsWith("http://") && !path.startsWith("https://")
+            && !path.startsWith("//") && !path.startsWith("data:");
     }
 
     /**
