@@ -15,7 +15,7 @@ It complements:
 - `TODO.md` for cleanup and hardening ideas around the protocol implementation
 
 The protocol described here is implemented primarily by:
-- frontend: `src/main/ts/service/rest.service.ts`
+- frontend: `src/main/vue/webcli/src/services/webcliTransport.ts`
 - backend endpoint: `src/main/java/org/mycore/webcli/resources/MCRWebCLIResourceSockets.java`
 - backend message producers: `src/main/java/org/mycore/webcli/container/MCRWebCLIContainer.java`, `src/main/java/org/mycore/webcli/flow/MCRCommandListProcessor.java`, and `src/main/java/org/mycore/webcli/flow/MCRLogEventProcessor.java`
 
@@ -23,15 +23,15 @@ The protocol described here is implemented primarily by:
 
 ### Static HTTP resources
 The browser first loads the GUI shell over HTTP from:
-- `.../rsc/WebCLI/`
+- `.../modules/webcli/gui/`
 
 Static assets are then served from:
-- `.../rsc/WebCLI/gui/{filename}`
+- `.../modules/webcli/gui/{filename}`
 
 Examples:
-- `.../rsc/WebCLI/gui/systemjs.config.js`
-- `.../rsc/WebCLI/gui/build/main.js`
-- `.../rsc/WebCLI/gui/app/app.html`
+- `.../modules/webcli/gui/index.html`
+- `.../modules/webcli/gui/assets/index-*.js`
+- `.../modules/webcli/gui/assets/index-*.css`
 
 ### Keepalive HTTP request
 While the page is open, `index.html` performs a periodic keepalive request:
@@ -45,7 +45,7 @@ The command/control interface is WebSocket-based.
 Server endpoint:
 - `/ws/mycore-webcli/socket`
 
-Frontend URL construction in `RESTService`:
+Frontend URL construction in `WebCliTransport`:
 - use `ws://` when the page is served over HTTP
 - use `wss://` when the page is served over HTTPS
 - prepend the current host
@@ -55,7 +55,7 @@ Frontend URL construction in `RESTService`:
 ## Connection lifecycle
 
 ### Opening
-`RESTService` opens the socket in its constructor.
+`WebCliTransport` opens the socket during frontend initialization.
 
 ### Sending
 All interactive actions send JSON text frames.
@@ -105,7 +105,7 @@ This is a small message protocol rather than a REST API.
 
 ### 1. Request known commands
 Used by:
-- `WebCliCommandsComponent.ngOnInit()` via `RESTService.getCommands()`
+- frontend startup via `WebCliTransport.getKnownCommands()`
 
 Request:
 ```json
@@ -134,7 +134,7 @@ Validation note:
 
 ### 3. Start log streaming
 Used by:
-- `AppComponent.setRefresh(true)` -> `RESTService.startLogging()`
+- the Vue app when refresh is enabled
 
 Request:
 ```json
@@ -146,7 +146,7 @@ Expected effect:
 
 ### 4. Stop log streaming
 Used by:
-- `AppComponent.setRefresh(false)` -> `RESTService.stopLogging()`
+- the Vue app when refresh is disabled
 
 Request:
 ```json
@@ -158,7 +158,7 @@ Expected effect:
 
 ### 5. Clear queued commands
 Used by:
-- `AppComponent.clearCommandList()`
+- the Vue app when the queue-clear action is triggered
 
 Request:
 ```json
@@ -171,7 +171,7 @@ Expected effect:
 
 ### 6. Set failure handling mode
 Used by:
-- `WebCliSettingsComponent`
+- the Vue settings panel
 
 Request:
 ```json
@@ -421,7 +421,7 @@ Frontend behavior:
 - stop retry attempts
 
 ### Socket not currently open
-`RESTService.sendMessage()` retries a small number of times and may reopen the socket if needed.
+`WebCliTransport` retries a small number of times and may reopen the socket if needed.
 
 ### Backend closes socket after work completes
 This is normal for the current implementation.
@@ -454,7 +454,6 @@ These are good protocol-level fixtures for unit and integration-style tests:
 
 ## Source of truth reminder
 If implementation and documentation ever diverge, re-check these first:
-- `src/main/ts/service/rest.service.ts`
+- `src/main/vue/webcli/src/services/webcliTransport.ts`
 - `src/main/java/org/mycore/webcli/resources/MCRWebCLIResourceSockets.java`
 - `src/main/java/org/mycore/webcli/container/MCRWebCLIContainer.java`
-

@@ -39,13 +39,44 @@
         <artifactId>frontend-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>webcli-jasmine-tests</id>
+            <id>yarn-install</id>
+            <phase>none</phase>
+          </execution>
+          <execution>
+            <id>grunt-build</id>
+            <phase>none</phase>
+          </execution>
+          <execution>
+            <id>yarn-install-webcli</id>
             <goals>
-              <goal>grunt</goal>
+              <goal>yarn</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <workingDirectory>${basedir}/src/main/vue/webcli</workingDirectory>
+              <arguments>install</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>yarn-build-webcli</id>
+            <goals>
+              <goal>yarn</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <workingDirectory>${basedir}/src/main/vue/webcli</workingDirectory>
+              <arguments>build</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>yarn-test-webcli</id>
+            <goals>
+              <goal>yarn</goal>
             </goals>
             <phase>test</phase>
             <configuration>
-              <arguments>test</arguments>
+              <workingDirectory>${basedir}/src/main/vue/webcli</workingDirectory>
+              <arguments>test --run</arguments>
             </configuration>
           </execution>
         </executions>
@@ -89,5 +120,36 @@
       <groupId>org.mycore</groupId>
       <artifactId>mycore-base</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-webtools</artifactId>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
+  <profiles>
+    <profile>
+      <id>local-testing</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.github.eirslett</groupId>
+            <artifactId>frontend-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>yarn-test-a11y-webcli</id>
+                <goals>
+                  <goal>yarn</goal>
+                </goals>
+                <phase>integration-test</phase>
+                <configuration>
+                  <workingDirectory>${basedir}/src/main/vue/webcli</workingDirectory>
+                  <arguments>test:a11y</arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
