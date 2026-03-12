@@ -1,0 +1,316 @@
+html,
+body,
+#app {
+  height: 100%;
+}
+
+html,
+body {
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+}
+
+.webcli-app {
+  height: 100%;
+}
+
+.webcli-app #command-input {
+  padding: 10px;
+}
+
+.webcli-app #command-input input {
+  border-top: 0;
+  border-left: 0;
+  border-radius: 0;
+  border-right: 0;
+  line-height: 1.5rem;
+}
+
+.webcli-app #command-input input:focus {
+  border-bottom-color: var(--bs-dark);
+  box-shadow: none;
+}
+
+.webcli-app #command-input button {
+  border-radius: 0;
+  border: 0;
+  margin-left: 20px;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+  color: var(--bs-light);
+  background-color: var(--bs-dark);
+}
+
+.webcli-app .navbar {
+  border-radius: 0;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+}
+
+.webcli-app .navbar-nav {
+  gap: 0.25rem;
+}
+
+.webcli-app .navbar-nav .nav-item {
+  display: flex;
+  align-items: center;
+}
+
+.webcli-app .nav-link.btn {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: var(--bs-nav-link-padding-y) var(--bs-nav-link-padding-x);
+  text-decoration: none;
+}
+
+.webcli-app .navbar-dark .navbar-nav .nav-link.btn {
+  color: rgba(var(--bs-white-rgb), 0.55);
+}
+
+.webcli-app .nav-link.btn:focus-visible,
+.webcli-app .dropdown-item:focus-visible,
+.webcli-app .btn-close:focus-visible,
+.webcli-app .form-control:focus-visible,
+.webcli-app .form-check-input:focus-visible {
+  outline: 2px solid var(--bs-light);
+  outline-offset: 2px;
+}
+
+.webcli-app .nav-link.btn:hover {
+  color: rgba(var(--bs-white-rgb), 0.75);
+}
+
+.webcli-app .navbar-dark .navbar-nav .nav-link.btn:focus-visible,
+.webcli-app .navbar-dark .navbar-nav .nav-link.btn[aria-expanded="true"] {
+  color: var(--bs-white);
+}
+
+.webcli-app #webcli-log-panel {
+  padding-bottom: 0;
+  height: 100%;
+}
+
+.webcli-app .web-cli-log {
+  height: calc(100vh - 232px);
+  overflow: auto;
+  padding-right: 0;
+  padding-bottom: 10px;
+  padding-top: 10px;
+}
+
+.webcli-app .web-cli-log > pre {
+  overflow: visible;
+  margin-bottom: 0;
+}
+
+.webcli-app .web-cli-queue {
+  height: 100%;
+  padding-right: 0;
+}
+
+.webcli-app .web-cli-queue > pre {
+  height: calc(100vh - 232px);
+  overflow: auto;
+  padding-right: 0;
+  padding-top: 10px;
+}
+
+.webcli-app .row {
+  width: 100%;
+  margin: 0;
+}
+
+.webcli-app #webcli-settings-panel .row {
+  padding: 5px;
+}
+
+.webcli-app .loader {
+  height: 4px;
+  width: 100%;
+  margin-top: 5px;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--bs-white);
+}
+
+.webcli-app .loader::before {
+  display: block;
+  position: absolute;
+  content: "";
+  left: -200px;
+  width: 200px;
+  height: 4px;
+  background-color: var(--bs-dark);
+  animation: loading 5s linear infinite;
+}
+
+@keyframes loading {
+  from {
+    left: -30%;
+    width: 30%;
+  }
+  50% {
+    width: 30%;
+  }
+  70% {
+    width: 70%;
+  }
+  80% {
+    left: 50%;
+  }
+  95% {
+    left: 120%;
+  }
+  to {
+    left: 100%;
+  }
+}
+
+.webcli-app .loader-no-animation {
+  height: 4px;
+  width: 100%;
+  margin-top: 5px;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--bs-dark);
+}
+
+.webcli-app #current-command {
+  padding: 20px 10px;
+}
+
+.webcli-app #current-command-running {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.webcli-app .nav-tabs .nav-link:hover,
+.webcli-app .nav-tabs .nav-link.active,
+.webcli-app .nav-tabs .nav-link.active:focus,
+.webcli-app .nav-tabs .nav-link.active:hover,
+.webcli-app .nav-tabs .nav-item.show .nav-link {
+  color: var(--bs-dark);
+  border-bottom: solid 2px var(--bs-dark);
+}
+
+.webcli-app .nav-tabs .nav-link {
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 2px solid transparent;
+  padding-bottom: 0.6em;
+  color: var(--bs-secondary);
+}
+
+.webcli-app .nav-tabs .nav-item + .nav-item {
+  margin: 0;
+}
+
+.webcli-app #current-command .current-command-label {
+  color: var(--bs-secondary);
+}
+
+.webcli-app .webcli-settings-panel label,
+.webcli-app .webcli-settings-panel .col-form-label {
+  color: rgba(var(--bs-white-rgb), 0.75);
+}
+
+.webcli-app .webcli-settings-panel .form-check-label {
+  color: rgba(var(--bs-white-rgb), 0.9);
+}
+
+.webcli-app .webcli-settings-panel .form-check-input {
+  cursor: pointer;
+}
+
+.webcli-app .dropdown-menu {
+  max-height: 90vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.webcli-app .nav-item.dropdown {
+  position: relative;
+}
+
+.webcli-app .nav-item.dropdown > .dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0.125rem;
+}
+
+.webcli-app .dropdown-submenu {
+  position: relative;
+}
+
+.webcli-app .dropdown-submenu.show > .dropdown-menu,
+.webcli-app .dropdown-submenu:hover > .dropdown-menu {
+  display: block;
+}
+
+.webcli-app .dropdown-submenu .dropdown-menu {
+  top: 0;
+  left: 0;
+  margin-top: -6px;
+  position: fixed !important;
+  max-width: none;
+  z-index: 3000 !important;
+}
+
+.webcli-app .dropdown-item {
+  text-align: left;
+}
+
+.webcli-app .comHistoryDeleteButton {
+  color: rgba(var(--bs-white-rgb), 0.5);
+  font-size: 20px;
+  cursor: pointer;
+  padding-top: 7px;
+}
+
+.webcli-app .comHistoryDeleteButton:hover,
+.webcli-app .comHistoryDeleteButton:focus-visible {
+  color: rgba(var(--bs-white-rgb), 0.9);
+}
+
+.webcli-app .comHistoryList {
+  height: 500px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 10px;
+}
+
+.webcli-dialog {
+  display: none;
+  width: min(100%, 500px);
+  max-width: 500px;
+  border: 0;
+  border-radius: var(--bs-modal-border-radius);
+  box-shadow: var(--bs-box-shadow-lg);
+  padding: 0;
+  position: fixed;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+}
+
+.webcli-dialog[open] {
+  display: block;
+}
+
+.webcli-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.webcli-dialog .modal-content {
+  border: 0;
+  border-radius: inherit;
+}
+
+.webcli-dialog .modal-header,
+.webcli-dialog .modal-body {
+  padding: var(--bs-modal-padding);
+}
