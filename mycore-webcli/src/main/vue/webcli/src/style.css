@@ -307,8 +307,7 @@ body {
   position: relative;
 }
 
-.webcli-app .dropdown-submenu.show > .dropdown-menu,
-.webcli-app .dropdown-submenu:hover > .dropdown-menu {
+.webcli-app .dropdown-submenu.show > .dropdown-menu {
   display: block;
 }
 
