@@ -10,14 +10,14 @@
 This document is the canonical reference for the browser/backend contract used by `mycore-webcli`.
 
 It complements:
-- `README.md` for module architecture and build context
-- `TESTING.md` for unit and integration-style mocking strategies
-- `TODO.md` for cleanup and hardening ideas around the protocol implementation
+- [`README.md`](README.md) for module architecture and build context
+- [`TESTING.md`](TESTING.md) for unit and integration-style mocking strategies
+- [`TODO.md`](TODO.md) for cleanup and hardening ideas around the protocol implementation
 
 The protocol described here is implemented primarily by:
-- frontend: `src/main/vue/webcli/src/services/webcliTransport.ts`
-- backend endpoint: `src/main/java/org/mycore/webcli/resources/MCRWebCLIResourceSockets.java`
-- backend message producers: `src/main/java/org/mycore/webcli/container/MCRWebCLIContainer.java`, `src/main/java/org/mycore/webcli/flow/MCRCommandListProcessor.java`, and `src/main/java/org/mycore/webcli/flow/MCRLogEventProcessor.java`
+- frontend: [`src/main/vue/webcli/src/services/webcliTransport.ts`](src/main/vue/webcli/src/services/webcliTransport.ts)
+- backend endpoint: [`src/main/java/org/mycore/webcli/resources/MCRWebCLIResourceSockets.java`](src/main/java/org/mycore/webcli/resources/MCRWebCLIResourceSockets.java)
+- backend message producers: [`src/main/java/org/mycore/webcli/container/MCRWebCLIContainer.java`](src/main/java/org/mycore/webcli/container/MCRWebCLIContainer.java), [`src/main/java/org/mycore/webcli/flow/MCRCommandListProcessor.java`](src/main/java/org/mycore/webcli/flow/MCRCommandListProcessor.java), and [`src/main/java/org/mycore/webcli/flow/MCRLogEventProcessor.java`](src/main/java/org/mycore/webcli/flow/MCRLogEventProcessor.java)
 
 ## Transport model
 
@@ -45,7 +45,7 @@ The command/control interface is WebSocket-based.
 Server endpoint:
 - `/ws/mycore-webcli/socket`
 
-Frontend URL construction in `WebCliTransport`:
+Frontend URL construction in [`WebCliTransport`](src/main/vue/webcli/src/services/webcliTransport.ts):
 - use `ws://` when the page is served over HTTP
 - use `wss://` when the page is served over HTTPS
 - prepend the current host
@@ -55,7 +55,7 @@ Frontend URL construction in `WebCliTransport`:
 ## Connection lifecycle
 
 ### Opening
-`WebCliTransport` opens the socket during frontend initialization.
+[`WebCliTransport`](src/main/vue/webcli/src/services/webcliTransport.ts) opens the socket during frontend initialization.
 
 ### Sending
 All interactive actions send JSON text frames.
@@ -84,8 +84,8 @@ The required permission is:
 - `use-webcli`
 
 Relevant checks:
-- HTTP access to `WebCLI` is guarded by `MCRWebCLIPermission`
-- WebSocket messages are checked in `MCRWebCLIResourceSockets.message(...)`
+- HTTP access to `WebCLI` is guarded by [`MCRWebCLIPermission`](src/main/java/org/mycore/webcli/resources/MCRWebCLIPermission.java)
+- WebSocket messages are checked in [`MCRWebCLIResourceSockets.message(...)`](src/main/java/org/mycore/webcli/resources/MCRWebCLIResourceSockets.java)
 
 If the permission check fails after the socket is open, the backend sends:
 
@@ -105,7 +105,7 @@ This is a small message protocol rather than a REST API.
 
 ### 1. Request known commands
 Used by:
-- frontend startup via `WebCliTransport.getKnownCommands()`
+- frontend startup via [`WebCliTransport.getKnownCommands()`](src/main/vue/webcli/src/services/webcliTransport.ts)
 
 Request:
 ```json
@@ -390,7 +390,7 @@ A realistic message flow for a single command can look like this.
 ```
 
 ## Session and state model
-The backend stores a session-scoped `MCRWebCLIContainer` under the key:
+The backend stores a session-scoped [`MCRWebCLIContainer`](src/main/java/org/mycore/webcli/container/MCRWebCLIContainer.java) under the key:
 - `MCRWebCLI`
 
 It owns:
@@ -454,6 +454,6 @@ These are good protocol-level fixtures for unit and integration-style tests:
 
 ## Source of truth reminder
 If implementation and documentation ever diverge, re-check these first:
-- `src/main/vue/webcli/src/services/webcliTransport.ts`
-- `src/main/java/org/mycore/webcli/resources/MCRWebCLIResourceSockets.java`
-- `src/main/java/org/mycore/webcli/container/MCRWebCLIContainer.java`
+- [`src/main/vue/webcli/src/services/webcliTransport.ts`](src/main/vue/webcli/src/services/webcliTransport.ts)
+- [`src/main/java/org/mycore/webcli/resources/MCRWebCLIResourceSockets.java`](src/main/java/org/mycore/webcli/resources/MCRWebCLIResourceSockets.java)
+- [`src/main/java/org/mycore/webcli/container/MCRWebCLIContainer.java`](src/main/java/org/mycore/webcli/container/MCRWebCLIContainer.java)

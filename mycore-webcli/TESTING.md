@@ -10,8 +10,8 @@ The current frontend test stack is:
 
 Tests live under:
 
-- `src/main/vue/webcli/src/**/*.spec.ts`
-- `src/main/vue/webcli/tests/a11y/**/*.spec.ts`
+- [`src/main/vue/webcli/src/`](src/main/vue/webcli/src/) `**/*.spec.ts`
+- [`src/main/vue/webcli/tests/a11y/`](src/main/vue/webcli/tests/a11y/) `**/*.spec.ts`
 
 The Vitest suite is split by responsibility:
 
@@ -23,11 +23,11 @@ The Vitest suite is split by responsibility:
 
 Shared Vitest helpers live under:
 
-- `src/main/vue/webcli/src/test/helpers/`
+- [`src/main/vue/webcli/src/test/helpers/`](src/main/vue/webcli/src/test/helpers/)
 
 Shared Playwright helpers live under:
 
-- `src/main/vue/webcli/tests/a11y/helpers/`
+- [`src/main/vue/webcli/tests/a11y/helpers/`](src/main/vue/webcli/tests/a11y/helpers/)
 
 ## What to test
 
@@ -87,8 +87,8 @@ Requirement:
 
 Playwright artifacts are written under:
 
-- `target/playwright/test-results`
-- `target/playwright/report`
+- [`target/playwright/test-results/`](target/playwright/test-results/)
+- [`target/playwright/report/`](target/playwright/report/)
 
 ```bash
 yarn test:a11y
@@ -114,4 +114,4 @@ yarn test:a11y
 
 ## Canonical protocol reference
 
-Use `PROTOCOL.md` as the source of truth for the message contract.
+Use [`PROTOCOL.md`](PROTOCOL.md) as the source of truth for the message contract.

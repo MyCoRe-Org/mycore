@@ -22,18 +22,18 @@ The launch pad stays public as a normal webpage resource. The GUI itself is serv
 
 ### Frontend
 
-- `src/main/vue/webcli/` - Vue source, Vite config, and Vitest tests
-- `target/classes/META-INF/resources/modules/webcli/gui/` - Vite build output during Maven builds
-- `src/main/resources/META-INF/resources/modules/webcli/launchpad.xml` - launch page that opens the GUI
+- [`src/main/vue/webcli/`](src/main/vue/webcli/) - Vue source, Vite config, and Vitest tests
+- [`target/classes/META-INF/resources/modules/webcli/gui/`](target/classes/META-INF/resources/modules/webcli/gui/) - Vite build output during Maven builds
+- [`src/main/resources/META-INF/resources/modules/webcli/launchpad.xml`](src/main/resources/META-INF/resources/modules/webcli/launchpad.xml) - launch page that opens the GUI
 
 ### Backend
 
-- `src/main/resources/META-INF/web-fragment.xml` - `MCRVueRootServlet` mapping for the protected GUI
-- `src/main/java/org/mycore/webcli/resources/MCRWebCLIResourceSockets.java` - WebSocket endpoint
-- `src/main/java/org/mycore/webcli/resources/MCRWebCLIPermission.java` - permission check helper
-- `src/main/java/org/mycore/webcli/container/` - session-scoped command execution and message publishing
-- `src/main/java/org/mycore/webcli/flow/` - JSON/log/queue event processors
-- `src/main/java/org/mycore/webcli/cli/` - command discovery and built-in commands
+- [`src/main/resources/META-INF/web-fragment.xml`](src/main/resources/META-INF/web-fragment.xml) - `MCRVueRootServlet` mapping for the protected GUI
+- [`src/main/java/org/mycore/webcli/resources/MCRWebCLIResourceSockets.java`](src/main/java/org/mycore/webcli/resources/MCRWebCLIResourceSockets.java) - WebSocket endpoint
+- [`src/main/java/org/mycore/webcli/resources/MCRWebCLIPermission.java`](src/main/java/org/mycore/webcli/resources/MCRWebCLIPermission.java) - permission check helper
+- [`src/main/java/org/mycore/webcli/container/`](src/main/java/org/mycore/webcli/container/) - session-scoped command execution and message publishing
+- [`src/main/java/org/mycore/webcli/flow/`](src/main/java/org/mycore/webcli/flow/) - JSON/log/queue event processors
+- [`src/main/java/org/mycore/webcli/cli/`](src/main/java/org/mycore/webcli/cli/) - command discovery and built-in commands
 
 ## Build
 
@@ -50,7 +50,7 @@ Current frontend build flow:
 Important frontend config:
 
 - Vite `base` is `"./"`
-- Vite output goes directly to `target/classes/META-INF/resources/modules/webcli/gui`
+- Vite output goes directly to [`target/classes/META-INF/resources/modules/webcli/gui/`](target/classes/META-INF/resources/modules/webcli/gui/)
 
 ## Frontend/backend contract
 
@@ -58,7 +58,7 @@ The GUI is WebSocket-driven.
 
 Canonical protocol reference:
 
-- `PROTOCOL.md`
+- [`PROTOCOL.md`](PROTOCOL.md)
 
 The Vue transport preserves the established backend message types:
 
@@ -79,4 +79,4 @@ Frontend tests now live with the Vue app and run with Vitest. Browser-level acce
 
 See:
 
-- `TESTING.md`
+- [`TESTING.md`](TESTING.md)
