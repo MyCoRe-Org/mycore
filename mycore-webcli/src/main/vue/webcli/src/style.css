@@ -52,7 +52,6 @@ body {
   border: 1px solid var(--bs-border-color);
   border-radius: 0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  margin-top: 0;
   max-height: 320px;
   overflow-y: auto;
 }
@@ -82,69 +81,19 @@ body {
   font-size: 0.8rem;
 }
 
-.webcli-app .webcli-suggestion:hover,
-.webcli-app .webcli-suggestion:focus-visible,
-.webcli-app .webcli-suggestion.is-highlighted {
+.webcli-app .webcli-suggestion:is(.is-highlighted, :hover, :focus-visible) {
   background-color: #e9f2ff;
   border-color: #b9d3ff;
   color: #0f172a;
 }
 
-.webcli-app .webcli-suggestion.is-highlighted .webcli-suggestion-command {
-  color: #0f172a;
-}
-
-.webcli-app .webcli-suggestion.is-highlighted .webcli-suggestion-help,
-.webcli-app .webcli-suggestion.is-highlighted .webcli-suggestion-group,
-.webcli-app .webcli-suggestion:hover .webcli-suggestion-help,
-.webcli-app .webcli-suggestion:hover .webcli-suggestion-group,
-.webcli-app .webcli-suggestion:focus-visible .webcli-suggestion-help,
-.webcli-app .webcli-suggestion:focus-visible .webcli-suggestion-group {
+.webcli-app .webcli-suggestion:is(.is-highlighted, :hover, :focus-visible) :is(.webcli-suggestion-help, .webcli-suggestion-group) {
   color: #334155;
 }
 
-.webcli-app .navbar {
-  border-radius: 0;
-  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
-}
-
-.webcli-app .navbar-nav {
-  gap: 0.25rem;
-}
-
-.webcli-app .navbar-nav .nav-item {
-  display: flex;
-  align-items: center;
-}
-
-.webcli-app .nav-link.btn {
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  padding: var(--bs-nav-link-padding-y) var(--bs-nav-link-padding-x);
-  text-decoration: none;
-}
-
-.webcli-app .navbar-dark .navbar-nav .nav-link.btn {
-  color: rgba(var(--bs-white-rgb), 0.55);
-}
-
-.webcli-app .nav-link.btn:focus-visible,
-.webcli-app .dropdown-item:focus-visible,
-.webcli-app .btn-close:focus-visible,
-.webcli-app .form-control:focus-visible,
-.webcli-app .form-check-input:focus-visible {
+.webcli-app :is(.nav-link.btn, .dropdown-item, .btn-close, .form-control, .form-check-input):focus-visible {
   outline: 2px solid var(--bs-light);
   outline-offset: 2px;
-}
-
-.webcli-app .nav-link.btn:hover {
-  color: rgba(var(--bs-white-rgb), 0.75);
-}
-
-.webcli-app .navbar-dark .navbar-nav .nav-link.btn:focus-visible,
-.webcli-app .navbar-dark .navbar-nav .nav-link.btn[aria-expanded="true"] {
-  color: var(--bs-white);
 }
 
 .webcli-app #webcli-log-panel {
@@ -177,7 +126,8 @@ body {
   padding-top: 10px;
 }
 
-.webcli-app .row {
+.webcli-app #command-input,
+.webcli-app #current-command {
   width: 100%;
   margin: 0;
 }
@@ -186,12 +136,16 @@ body {
   padding: 5px;
 }
 
-.webcli-app .loader {
+.webcli-app .loader,
+.webcli-app .loader-no-animation {
   height: 4px;
   width: 100%;
   margin-top: 5px;
   position: relative;
   overflow: hidden;
+}
+
+.webcli-app .loader {
   background-color: var(--bs-white);
 }
 
@@ -229,11 +183,6 @@ body {
 }
 
 .webcli-app .loader-no-animation {
-  height: 4px;
-  width: 100%;
-  margin-top: 5px;
-  position: relative;
-  overflow: hidden;
   background-color: var(--bs-dark);
 }
 
@@ -247,28 +196,6 @@ body {
   text-overflow: ellipsis;
 }
 
-.webcli-app .nav-tabs .nav-link:hover,
-.webcli-app .nav-tabs .nav-link.active,
-.webcli-app .nav-tabs .nav-link.active:focus,
-.webcli-app .nav-tabs .nav-link.active:hover,
-.webcli-app .nav-tabs .nav-item.show .nav-link {
-  color: var(--bs-dark);
-  border-bottom: solid 2px var(--bs-dark);
-}
-
-.webcli-app .nav-tabs .nav-link {
-  border-top: 0;
-  border-left: 0;
-  border-right: 0;
-  border-bottom: 2px solid transparent;
-  padding-bottom: 0.6em;
-  color: var(--bs-secondary);
-}
-
-.webcli-app .nav-tabs .nav-item + .nav-item {
-  margin: 0;
-}
-
 .webcli-app #current-command .current-command-label {
   color: var(--bs-secondary);
 }
@@ -280,10 +207,6 @@ body {
 
 .webcli-app .webcli-settings-panel .form-check-label {
   color: rgba(var(--bs-white-rgb), 0.9);
-}
-
-.webcli-app .webcli-settings-panel .form-check-input {
-  cursor: pointer;
 }
 
 .webcli-app .dropdown-menu {
@@ -318,10 +241,6 @@ body {
   position: fixed !important;
   max-width: none;
   z-index: 3000 !important;
-}
-
-.webcli-app .dropdown-item {
-  text-align: left;
 }
 
 .webcli-app .comHistoryDeleteButton {
