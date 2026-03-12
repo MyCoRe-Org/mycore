@@ -28,7 +28,7 @@ const {
   entries: commandHistoryEntries,
   finalizeExecution,
   trimToSize,
-} = useCommandHistory(() => settings.value.comHistorySize);
+} = useCommandHistory(() => Math.max(0, settings.value.comHistorySize));
 
 const {
   clearCommandQueue,
@@ -267,7 +267,7 @@ watch(hasSuggestions, value => {
                 id="webcli-command-history-size"
                 v-model.number="settings.comHistorySize"
                 type="number"
-                min="1"
+                min="0"
                 inputmode="numeric"
                 class="form-control"
               />

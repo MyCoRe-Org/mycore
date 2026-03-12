@@ -7,14 +7,17 @@ const DEFAULT_SETTINGS: Settings = {
   continueIfOneFails: false,
 };
 
-function readNumber(key: string, fallback: number): number {
+function readNumber(key: string, fallback: number, min = Number.NEGATIVE_INFINITY): number {
   const value = window.localStorage.getItem(key);
   if (!value) {
     window.localStorage.setItem(key, String(fallback));
     return fallback;
   }
   const parsed = Number.parseInt(value, 10);
-  return Number.isNaN(parsed) ? fallback : parsed;
+  if (Number.isNaN(parsed)) {
+    return fallback;
+  }
+  return Math.max(min, parsed);
 }
 
 function readBoolean(key: string, fallback: boolean): boolean {
@@ -28,8 +31,8 @@ function readBoolean(key: string, fallback: boolean): boolean {
 
 export function loadSettings(): Settings {
   return {
-    historySize: readNumber('historySize', DEFAULT_SETTINGS.historySize),
-    comHistorySize: readNumber('comHistorySize', DEFAULT_SETTINGS.comHistorySize),
+    historySize: readNumber('historySize', DEFAULT_SETTINGS.historySize, 1),
+    comHistorySize: readNumber('comHistorySize', DEFAULT_SETTINGS.comHistorySize, 0),
     autoscroll: readBoolean('autoScroll', DEFAULT_SETTINGS.autoscroll),
     continueIfOneFails: readBoolean('continueIfOneFails', DEFAULT_SETTINGS.continueIfOneFails),
   };
