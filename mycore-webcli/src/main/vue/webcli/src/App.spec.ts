@@ -104,6 +104,19 @@ function makeCommandGroups(): CommandGroup[] {
         },
       ],
     },
+    {
+      name: 'Transformations',
+      commands: [
+        {
+          command: 'xslt transform {0}',
+          help: 'Run an XSLT transformation.',
+        },
+        {
+          command: 'validate xslt {0}',
+          help: 'Validate an XSLT transformation.',
+        },
+      ],
+    },
   ];
 }
 
@@ -315,6 +328,53 @@ describe('WebCLI app', () => {
     await nextTick();
 
     expect(document.activeElement).toBe(toggle.element);
+  });
+
+  it('keeps only one submenu open when mouse hover and keyboard navigation are mixed', async () => {
+    const wrapper = await mountApp();
+
+    currentTransport.emit({ type: 'commandList', value: makeCommandGroups() });
+    await nextTick();
+
+    const submenuGroups = wrapper.findAll('.dropdown-submenu');
+    expect(submenuGroups).toHaveLength(2);
+
+    submenuGroups.forEach((submenuGroup, index) => {
+      const groupElement = submenuGroup.element as HTMLElement;
+      groupElement.getBoundingClientRect = () => ({
+        top: 100 + index * 30,
+        right: 200,
+        bottom: 130 + index * 30,
+        left: 0,
+        width: 200,
+        height: 30,
+        x: 0,
+        y: 100 + index * 30,
+        toJSON: () => undefined,
+      });
+    });
+
+    const toggle = wrapper.get('.webcli-command-menu .dropdown-toggle');
+    await toggle.trigger('click');
+    await nextTick();
+
+    await submenuGroups[0].trigger('mouseenter');
+    await nextTick();
+
+    expect(submenuGroups[0].classes()).toContain('show');
+    expect(submenuGroups[1].classes()).not.toContain('show');
+
+    const firstGroupButton = submenuGroups[0].get('[data-group-button]');
+    await firstGroupButton.trigger('keydown', { key: 'ArrowDown', preventDefault: vi.fn() });
+    await nextTick();
+
+    expect(submenuGroups[0].classes()).not.toContain('show');
+    expect(submenuGroups[1].classes()).toContain('show');
+
+    const openSubmenus = wrapper
+      .findAll('.dropdown-submenu')
+      .filter(submenuGroup => submenuGroup.classes().includes('show'));
+    expect(openSubmenus).toHaveLength(1);
   });
 
   it('positions the flyout submenu on hover so it is visible in the browser', async () => {
