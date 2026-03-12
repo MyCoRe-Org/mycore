@@ -80,9 +80,3 @@ Frontend tests now live with the Vue app and run with Vitest. Browser-level acce
 See:
 
 - `TESTING.md`
-
-## Migration notes
-
-The Angular/SystemJS/Grunt frontend has been removed. The migration plan and rationale are documented in:
-
-- `ANGULAR_VUE_MIGRATION.md`

@@ -34,7 +34,7 @@ Examples:
 - `.../modules/webcli/gui/assets/index-*.css`
 
 ### Keepalive HTTP request
-While the page is open, `index.html` performs a periodic keepalive request:
+While the GUI is open, the frontend performs a periodic keepalive request:
 - `../../echo/ping`
 
 This is not part of the command protocol itself, but it does matter for session longevity.
@@ -76,7 +76,7 @@ The frontend treats this as a special case before attempting JSON parsing.
 The backend may close the WebSocket with normal closure after the current processing run is finished.
 
 Implication:
-- the frontend is not permanently connected during idle periods
+- the frontend does not require a permanently open socket during idle periods
 - reconnection is lazy and happens when the next outbound message is sent
 
 ## Permission model
@@ -117,7 +117,7 @@ Expected effect:
 
 ### 2. Run a command
 Used by:
-- `WebCliCommandInputComponent.execute()`
+- the Vue command input flow
 
 Request:
 ```json
@@ -167,7 +167,7 @@ Request:
 
 Expected effect:
 - queue is cleared
-- queue update and current-command reset are pushed back to the client
+- backend state updates are pushed back to the client through the normal queue/current-command event flow
 
 ### 6. Set failure handling mode
 Used by:
