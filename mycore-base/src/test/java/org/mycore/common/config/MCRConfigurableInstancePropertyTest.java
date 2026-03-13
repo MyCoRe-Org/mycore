@@ -135,666 +135,475 @@ public class MCRConfigurableInstancePropertyTest {
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyNotSetDefaultNotSetDefaultPropertyNotSet.class),
+        classNameOf = NotRequiredDefaultNotSet.class),
     })
     public void notRequiredPropertyNotSetDefaultNotSetDefaultPropertyNotSet() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyNotSetDefaultNotSetDefaultPropertyNotSet instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyNotSetDefaultNotSetDefaultPropertyNotSet.class, configuration);
+        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultNotSet.class, configuration);
         assertNull(instance.value);
-    }
-
-    public static class NotRequiredPropertyNotSetDefaultNotSetDefaultPropertyNotSet {
-        @MCRProperty(name = "Value", required = false)
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyNotSetDefaultNotSetDefaultPropertyEmpty.class),
+        classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "MCR.Value", empty = true),
     })
     public void notRequiredPropertyNotSetDefaultNotSetDefaultPropertyEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyNotSetDefaultNotSetDefaultPropertyEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyNotSetDefaultNotSetDefaultPropertyEmpty.class, configuration);
+        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultNotSet.class, configuration);
         assertNull(instance.value);
-    }
-
-    public static class NotRequiredPropertyNotSetDefaultNotSetDefaultPropertyEmpty {
-        @MCRProperty(name = "Value", required = false)
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyNotSetDefaultNotSetDefaultPropertyNotEmpty.class),
+        classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "MCR.Value", string = "DefaultValue"),
     })
     public void notRequiredPropertyNotSetDefaultNotSetDefaultPropertyNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyNotSetDefaultNotSetDefaultPropertyNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyNotSetDefaultNotSetDefaultPropertyNotEmpty.class, configuration);
+        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultNotSet.class, configuration);
         assertNull(instance.value);
-    }
-
-    public static class NotRequiredPropertyNotSetDefaultNotSetDefaultPropertyNotEmpty {
-        @MCRProperty(name = "Value", required = false)
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyNotSetDefaultSetDefaultPropertyNotSet.class),
+        classNameOf = NotRequiredDefaultSet.class),
     })
     public void notRequiredPropertyNotSetDefaultSetDefaultPropertyNotSet() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyNotSetDefaultSetDefaultPropertyNotSet.class, configuration);
+                NotRequiredDefaultSet.class, configuration);
         });
         assertEquals("The default property MCR.Value is missing", exception.getMessage());
     }
 
-    public static class NotRequiredPropertyNotSetDefaultSetDefaultPropertyNotSet {
-        @MCRProperty(name = "Value", required = false, defaultName = "MCR.Value")
-        public String value;
-    }
-
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyNotSetDefaultSetDefaultPropertyEmpty.class),
+        classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "MCR.Value", empty = true),
     })
     public void notRequiredPropertyNotSetDefaultSetDefaultPropertyEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyNotSetDefaultSetDefaultPropertyEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyNotSetDefaultSetDefaultPropertyEmpty.class, configuration);
+        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultSet.class, configuration);
         assertEquals("", instance.value);
-    }
-
-    public static class NotRequiredPropertyNotSetDefaultSetDefaultPropertyEmpty {
-        @MCRProperty(name = "Value", required = false, defaultName = "MCR.Value")
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyNotSetDefaultSetDefaultPropertyNotEmpty.class),
+        classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "MCR.Value", string = "DefaultValue"),
     })
     public void notRequiredPropertyNotSetDefaultSetDefaultPropertyNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyNotSetDefaultSetDefaultPropertyNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyNotSetDefaultSetDefaultPropertyNotEmpty.class, configuration);
+        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultSet.class, configuration);
         assertEquals("DefaultValue", instance.value);
-    }
-
-    public static class NotRequiredPropertyNotSetDefaultSetDefaultPropertyNotEmpty {
-        @MCRProperty(name = "Value", required = false, defaultName = "MCR.Value")
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyEmptyDefaultNotSetDefaultPropertyNotSet.class),
+        classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Value", empty = true),
     })
     public void notRequiredPropertyEmptyDefaultNotSetDefaultPropertyNotSet() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyEmptyDefaultNotSetDefaultPropertyNotSet instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyEmptyDefaultNotSetDefaultPropertyNotSet.class, configuration);
+        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultNotSet.class, configuration);
         assertEquals("", instance.value);
-    }
-
-    public static class NotRequiredPropertyEmptyDefaultNotSetDefaultPropertyNotSet {
-        @MCRProperty(name = "Value", required = false)
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyEmptyDefaultNotSetDefaultPropertyEmpty.class),
+        classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Value", empty = true),
         @MCRTestProperty(key = "MCR.Value", empty = true),
     })
     public void notRequiredPropertyEmptyDefaultNotSetDefaultPropertyEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyEmptyDefaultNotSetDefaultPropertyEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyEmptyDefaultNotSetDefaultPropertyEmpty.class, configuration);
+        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultNotSet.class, configuration);
         assertEquals("", instance.value);
-    }
-
-    public static class NotRequiredPropertyEmptyDefaultNotSetDefaultPropertyEmpty {
-        @MCRProperty(name = "Value", required = false)
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyEmptyDefaultNotSetDefaultPropertyNotEmpty.class),
+        classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Value", empty = true),
         @MCRTestProperty(key = "MCR.Value", string = "DefaultValue"),
     })
     public void notRequiredPropertyEmptyDefaultNotSetDefaultPropertyNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyEmptyDefaultNotSetDefaultPropertyNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyEmptyDefaultNotSetDefaultPropertyNotEmpty.class, configuration);
+        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultNotSet.class, configuration);
         assertEquals("", instance.value);
-    }
-
-    public static class NotRequiredPropertyEmptyDefaultNotSetDefaultPropertyNotEmpty {
-        @MCRProperty(name = "Value", required = false)
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyEmptyDefaultSetDefaultPropertyNotSet.class),
+        classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Value", empty = true),
     })
     public void notRequiredPropertyEmptyDefaultSetDefaultPropertyNotSet() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyEmptyDefaultSetDefaultPropertyNotSet instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyEmptyDefaultSetDefaultPropertyNotSet.class, configuration);
+        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultSet.class, configuration);
         assertEquals("", instance.value);
-    }
-
-    public static class NotRequiredPropertyEmptyDefaultSetDefaultPropertyNotSet {
-        @MCRProperty(name = "Value", required = false, defaultName = "MCR.Value")
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyEmptyDefaultSetDefaultPropertyEmpty.class),
+        classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Value", empty = true),
         @MCRTestProperty(key = "MCR.Value", empty = true),
     })
     public void notRequiredPropertyEmptyDefaultSetDefaultPropertyEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyEmptyDefaultSetDefaultPropertyEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyEmptyDefaultSetDefaultPropertyEmpty.class, configuration);
+        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultSet.class, configuration);
         assertEquals("", instance.value);
-    }
-
-    public static class NotRequiredPropertyEmptyDefaultSetDefaultPropertyEmpty {
-        @MCRProperty(name = "Value", required = false, defaultName = "MCR.Value")
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyEmptyDefaultSetDefaultPropertyNotEmpty.class),
+        classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Value", empty = true),
         @MCRTestProperty(key = "MCR.Value", string = "DefaultValue"),
     })
     public void notRequiredPropertyEmptyDefaultSetDefaultPropertyNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyEmptyDefaultSetDefaultPropertyNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyEmptyDefaultSetDefaultPropertyNotEmpty.class, configuration);
+        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultSet.class, configuration);
         assertEquals("", instance.value);
-    }
-
-    public static class NotRequiredPropertyEmptyDefaultSetDefaultPropertyNotEmpty {
-        @MCRProperty(name = "Value", required = false, defaultName = "MCR.Value")
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyNotEmptyDefaultNotSetDefaultPropertyNotSet.class),
+        classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Value", string = "Value"),
     })
     public void notRequiredPropertyNotEmptyDefaultNotSetDefaultPropertyNotSet() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyNotEmptyDefaultNotSetDefaultPropertyNotSet instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyNotEmptyDefaultNotSetDefaultPropertyNotSet.class, configuration);
+        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultNotSet.class, configuration);
         assertEquals("Value", instance.value);
-    }
-
-    public static class NotRequiredPropertyNotEmptyDefaultNotSetDefaultPropertyNotSet {
-        @MCRProperty(name = "Value", required = false)
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyNotEmptyDefaultNotSetDefaultPropertyEmpty.class),
+        classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Value", string = "Value"),
         @MCRTestProperty(key = "MCR.Value", empty = true),
     })
     public void notRequiredPropertyNotEmptyDefaultNotSetDefaultPropertyEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyNotEmptyDefaultNotSetDefaultPropertyEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyNotEmptyDefaultNotSetDefaultPropertyEmpty.class, configuration);
+        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultNotSet.class, configuration);
         assertEquals("Value", instance.value);
-    }
-
-    public static class NotRequiredPropertyNotEmptyDefaultNotSetDefaultPropertyEmpty {
-        @MCRProperty(name = "Value", required = false)
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyNotEmptyDefaultNotSetDefaultPropertyNotEmpty.class),
+        classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Value", string = "Value"),
         @MCRTestProperty(key = "MCR.Value", string = "DefaultValue"),
     })
     public void notRequiredPropertyNotEmptyDefaultNotSetDefaultPropertyNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyNotEmptyDefaultNotSetDefaultPropertyNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyNotEmptyDefaultNotSetDefaultPropertyNotEmpty.class, configuration);
+        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultNotSet.class, configuration);
         assertEquals("Value", instance.value);
-    }
-
-    public static class NotRequiredPropertyNotEmptyDefaultNotSetDefaultPropertyNotEmpty {
-        @MCRProperty(name = "Value", required = false)
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyNotEmptyDefaultSetDefaultPropertyNotSet.class),
+        classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Value", string = "Value"),
     })
     public void notRequiredPropertyNotEmptyDefaultSetDefaultPropertyNotSet() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyNotEmptyDefaultSetDefaultPropertyNotSet instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyNotEmptyDefaultSetDefaultPropertyNotSet.class, configuration);
+        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultSet.class, configuration);
         assertEquals("Value", instance.value);
-    }
-
-    public static class NotRequiredPropertyNotEmptyDefaultSetDefaultPropertyNotSet {
-        @MCRProperty(name = "Value", required = false, defaultName = "MCR.Value")
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyNotEmptyDefaultSetDefaultPropertyEmpty.class),
+        classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Value", string = "Value"),
         @MCRTestProperty(key = "MCR.Value", empty = true),
     })
     public void notRequiredPropertyNotEmptyDefaultSetDefaultPropertyEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyNotEmptyDefaultSetDefaultPropertyEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyNotEmptyDefaultSetDefaultPropertyEmpty.class, configuration);
+        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultSet.class, configuration);
         assertEquals("Value", instance.value);
-    }
-
-    public static class NotRequiredPropertyNotEmptyDefaultSetDefaultPropertyEmpty {
-        @MCRProperty(name = "Value", required = false, defaultName = "MCR.Value")
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyNotEmptyDefaultSetDefaultPropertyNotEmpty.class),
+        classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Value", string = "Value"),
         @MCRTestProperty(key = "MCR.Value", string = "DefaultValue"),
     })
     public void notRequiredPropertyNotEmptyDefaultSetDefaultPropertyNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyNotEmptyDefaultSetDefaultPropertyNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyNotEmptyDefaultSetDefaultPropertyNotEmpty.class, configuration);
+        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultSet.class, configuration);
         assertEquals("Value", instance.value);
-    }
-
-    public static class NotRequiredPropertyNotEmptyDefaultSetDefaultPropertyNotEmpty {
-        @MCRProperty(name = "Value", required = false, defaultName = "MCR.Value")
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyNotSetDefaultNotSetDefaultPropertyNotSet.class),
+        classNameOf = RequiredDefaultNotSet.class),
     })
     public void requiredPropertyNotSetDefaultNotSetDefaultPropertyNotSet() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyNotSetDefaultNotSetDefaultPropertyNotSet.class, configuration);
+                RequiredDefaultNotSet.class, configuration);
         });
         assertEquals("The required property Foo.Value is missing", exception.getMessage());
     }
 
-    public static class RequiredPropertyNotSetDefaultNotSetDefaultPropertyNotSet {
-        @MCRProperty(name = "Value")
-        public String value;
-    }
-
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyNotSetDefaultNotSetDefaultPropertyEmpty.class),
+        classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "MCR.Value", empty = true),
     })
     public void requiredPropertyNotSetDefaultNotSetDefaultPropertyEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyNotSetDefaultNotSetDefaultPropertyEmpty.class, configuration);
+                RequiredDefaultNotSet.class, configuration);
         });
         assertEquals("The required property Foo.Value is missing", exception.getMessage());
     }
 
-    public static class RequiredPropertyNotSetDefaultNotSetDefaultPropertyEmpty {
-        @MCRProperty(name = "Value")
-        public String value;
-    }
-
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyNotSetDefaultNotSetDefaultPropertyNotEmpty.class),
+        classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "MCR.Value", string = "DefaultValue"),
     })
     public void requiredPropertyNotSetDefaultNotSetDefaultPropertyNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyNotSetDefaultNotSetDefaultPropertyNotEmpty.class, configuration);
+                RequiredDefaultNotSet.class, configuration);
         });
         assertEquals("The required property Foo.Value is missing", exception.getMessage());
     }
 
-    public static class RequiredPropertyNotSetDefaultNotSetDefaultPropertyNotEmpty {
-        @MCRProperty(name = "Value")
-        public String value;
-    }
-
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyNotSetDefaultSetDefaultPropertyNotSet.class),
+        classNameOf = RequiredDefaultSet.class),
     })
     public void requiredPropertyNotSetDefaultSetDefaultPropertyNotSet() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyNotSetDefaultSetDefaultPropertyNotSet.class, configuration);
+                RequiredDefaultSet.class, configuration);
         });
         assertEquals("The default property MCR.Value is missing", exception.getMessage());
     }
 
-    public static class RequiredPropertyNotSetDefaultSetDefaultPropertyNotSet {
-        @MCRProperty(name = "Value", defaultName = "MCR.Value")
-        public String value;
-    }
-
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyNotSetDefaultSetDefaultPropertyEmpty.class),
+        classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "MCR.Value", empty = true),
     })
     public void requiredPropertyNotSetDefaultSetDefaultPropertyEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyNotSetDefaultSetDefaultPropertyEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyNotSetDefaultSetDefaultPropertyEmpty.class, configuration);
+        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultSet.class, configuration);
         assertEquals("", instance.value);
-    }
-
-    public static class RequiredPropertyNotSetDefaultSetDefaultPropertyEmpty {
-        @MCRProperty(name = "Value", defaultName = "MCR.Value")
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyNotSetDefaultSetDefaultPropertyNotEmpty.class),
+        classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "MCR.Value", string = "DefaultValue"),
     })
     public void requiredPropertyNotSetDefaultSetDefaultPropertyNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyNotSetDefaultSetDefaultPropertyNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyNotSetDefaultSetDefaultPropertyNotEmpty.class, configuration);
+        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultSet.class, configuration);
         assertEquals("DefaultValue", instance.value);
-    }
-
-    public static class RequiredPropertyNotSetDefaultSetDefaultPropertyNotEmpty {
-        @MCRProperty(name = "Value", defaultName = "MCR.Value")
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyEmptyDefaultNotSetDefaultPropertyNotSet.class),
+        classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Value", empty = true),
     })
     public void requiredPropertyEmptyDefaultNotSetDefaultPropertyNotSet() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyEmptyDefaultNotSetDefaultPropertyNotSet instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyEmptyDefaultNotSetDefaultPropertyNotSet.class, configuration);
+        RequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultNotSet.class, configuration);
         assertEquals("", instance.value);
-    }
-
-    public static class RequiredPropertyEmptyDefaultNotSetDefaultPropertyNotSet {
-        @MCRProperty(name = "Value")
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyEmptyDefaultNotSetDefaultPropertyEmpty.class),
+        classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Value", empty = true),
         @MCRTestProperty(key = "MCR.Value", empty = true),
     })
     public void requiredPropertyEmptyDefaultNotSetDefaultPropertyEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyEmptyDefaultNotSetDefaultPropertyEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyEmptyDefaultNotSetDefaultPropertyEmpty.class, configuration);
+        RequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultNotSet.class, configuration);
         assertEquals("", instance.value);
-    }
-
-    public static class RequiredPropertyEmptyDefaultNotSetDefaultPropertyEmpty {
-        @MCRProperty(name = "Value")
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyEmptyDefaultNotSetDefaultPropertyNotEmpty.class),
+        classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Value", empty = true),
         @MCRTestProperty(key = "MCR.Value", string = "DefaultValue"),
     })
     public void requiredPropertyEmptyDefaultNotSetDefaultPropertyNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyEmptyDefaultNotSetDefaultPropertyNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyEmptyDefaultNotSetDefaultPropertyNotEmpty.class, configuration);
+        RequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultNotSet.class, configuration);
         assertEquals("", instance.value);
-    }
-
-    public static class RequiredPropertyEmptyDefaultNotSetDefaultPropertyNotEmpty {
-        @MCRProperty(name = "Value")
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyEmptyDefaultSetDefaultPropertyNotSet.class),
+        classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Value", empty = true),
     })
     public void requiredPropertyEmptyDefaultSetDefaultPropertyNotSet() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyEmptyDefaultSetDefaultPropertyNotSet instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyEmptyDefaultSetDefaultPropertyNotSet.class, configuration);
+        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultSet.class, configuration);
         assertEquals("", instance.value);
-    }
-
-    public static class RequiredPropertyEmptyDefaultSetDefaultPropertyNotSet {
-        @MCRProperty(name = "Value", defaultName = "MCR.Value")
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyEmptyDefaultSetDefaultPropertyEmpty.class),
+        classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Value", empty = true),
         @MCRTestProperty(key = "MCR.Value", empty = true),
     })
     public void requiredPropertyEmptyDefaultSetDefaultPropertyEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyEmptyDefaultSetDefaultPropertyEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyEmptyDefaultSetDefaultPropertyEmpty.class, configuration);
+        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultSet.class, configuration);
         assertEquals("", instance.value);
-    }
-
-    public static class RequiredPropertyEmptyDefaultSetDefaultPropertyEmpty {
-        @MCRProperty(name = "Value", defaultName = "MCR.Value")
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyEmptyDefaultSetDefaultPropertyNotEmpty.class),
+        classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Value", empty = true),
         @MCRTestProperty(key = "MCR.Value", string = "DefaultValue"),
     })
     public void requiredPropertyEmptyDefaultSetDefaultPropertyNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyEmptyDefaultSetDefaultPropertyNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyEmptyDefaultSetDefaultPropertyNotEmpty.class, configuration);
+        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultSet.class, configuration);
         assertEquals("", instance.value);
-    }
-
-    public static class RequiredPropertyEmptyDefaultSetDefaultPropertyNotEmpty {
-        @MCRProperty(name = "Value", defaultName = "MCR.Value")
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyNotEmptyDefaultNotSetDefaultPropertyNotSet.class),
+        classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Value", string = "Value"),
     })
     public void requiredPropertyNotEmptyDefaultNotSetDefaultPropertyNotSet() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyNotEmptyDefaultNotSetDefaultPropertyNotSet instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyNotEmptyDefaultNotSetDefaultPropertyNotSet.class, configuration);
+        RequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultNotSet.class, configuration);
         assertEquals("Value", instance.value);
-    }
-
-    public static class RequiredPropertyNotEmptyDefaultNotSetDefaultPropertyNotSet {
-        @MCRProperty(name = "Value")
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyNotEmptyDefaultNotSetDefaultPropertyEmpty.class),
+        classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Value", string = "Value"),
         @MCRTestProperty(key = "MCR.Value", empty = true),
     })
     public void requiredPropertyNotEmptyDefaultNotSetDefaultPropertyEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyNotEmptyDefaultNotSetDefaultPropertyEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyNotEmptyDefaultNotSetDefaultPropertyEmpty.class, configuration);
+        RequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultNotSet.class, configuration);
         assertEquals("Value", instance.value);
-    }
-
-    public static class RequiredPropertyNotEmptyDefaultNotSetDefaultPropertyEmpty {
-        @MCRProperty(name = "Value")
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyNotEmptyDefaultNotSetDefaultPropertyNotEmpty.class),
+        classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.Value", string = "Value"),
         @MCRTestProperty(key = "MCR.Value", string = "DefaultValue"),
     })
     public void requiredPropertyNotEmptyDefaultNotSetDefaultPropertyNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyNotEmptyDefaultNotSetDefaultPropertyNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyNotEmptyDefaultNotSetDefaultPropertyNotEmpty.class, configuration);
+        RequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultNotSet.class, configuration);
         assertEquals("Value", instance.value);
-    }
-
-    public static class RequiredPropertyNotEmptyDefaultNotSetDefaultPropertyNotEmpty {
-        @MCRProperty(name = "Value")
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyNotEmptyDefaultSetDefaultPropertyNotSet.class),
+        classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Value", string = "Value"),
     })
     public void requiredPropertyNotEmptyDefaultSetDefaultPropertyNotSet() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyNotEmptyDefaultSetDefaultPropertyNotSet instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyNotEmptyDefaultSetDefaultPropertyNotSet.class, configuration);
+        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultSet.class, configuration);
         assertEquals("Value", instance.value);
-    }
-
-    public static class RequiredPropertyNotEmptyDefaultSetDefaultPropertyNotSet {
-        @MCRProperty(name = "Value", defaultName = "MCR.Value")
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyNotEmptyDefaultSetDefaultPropertyEmpty.class),
+        classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Value", string = "Value"),
         @MCRTestProperty(key = "MCR.Value", empty = true),
     })
     public void requiredPropertyNotEmptyDefaultSetDefaultPropertyEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyNotEmptyDefaultSetDefaultPropertyEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyNotEmptyDefaultSetDefaultPropertyEmpty.class, configuration);
+        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultSet.class, configuration);
         assertEquals("Value", instance.value);
-    }
-
-    public static class RequiredPropertyNotEmptyDefaultSetDefaultPropertyEmpty {
-        @MCRProperty(name = "Value", defaultName = "MCR.Value")
-        public String value;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyNotEmptyDefaultSetDefaultPropertyNotEmpty.class),
+        classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.Value", string = "Value"),
         @MCRTestProperty(key = "MCR.Value", string = "DefaultValue"),
     })
     public void requiredPropertyNotEmptyDefaultSetDefaultPropertyNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyNotEmptyDefaultSetDefaultPropertyNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyNotEmptyDefaultSetDefaultPropertyNotEmpty.class, configuration);
+        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultSet.class, configuration);
         assertEquals("Value", instance.value);
     }
 
-    public static class RequiredPropertyNotEmptyDefaultSetDefaultPropertyNotEmpty {
+    public static class NotRequiredDefaultNotSet {
+        @MCRProperty(name = "Value", required = false)
+        public String value;
+    }
+
+    public static class NotRequiredDefaultSet {
+        @MCRProperty(name = "Value", required = false, defaultName = "MCR.Value")
+        public String value;
+    }
+
+    public static class RequiredDefaultSet {
         @MCRProperty(name = "Value", defaultName = "MCR.Value")
+        public String value;
+    }
+
+    public static class RequiredDefaultNotSet {
+        @MCRProperty(name = "Value")
         public String value;
     }
 

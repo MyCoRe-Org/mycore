@@ -172,516 +172,355 @@ public class MCRConfigurableInstancePropertyListTest {
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyMissingDefaultNotSetDefaultPropertyMissing.class),
+        classNameOf = NotRequiredDefaultNotSet.class),
     })
     public void notRequiredPropertyMissingDefaultNotSetDefaultPropertyMissing() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyMissingDefaultNotSetDefaultPropertyMissing instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyMissingDefaultNotSetDefaultPropertyMissing.class, configuration);
+        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultNotSet.class, configuration);
         assertEquals(EMPTY, instance.list);
-    }
-
-    public static class NotRequiredPropertyMissingDefaultNotSetDefaultPropertyMissing {
-        @MCRPropertyList(name = "List", required = false)
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyMissingDefaultNotSetDefaultPropertyShortEmpty.class),
+        classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "MCR.List", empty = true),
     })
     public void notRequiredPropertyMissingDefaultNotSetDefaultPropertyShortEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyMissingDefaultNotSetDefaultPropertyShortEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyMissingDefaultNotSetDefaultPropertyShortEmpty.class, configuration);
+        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultNotSet.class, configuration);
         assertEquals(EMPTY, instance.list);
-    }
-
-    public static class NotRequiredPropertyMissingDefaultNotSetDefaultPropertyShortEmpty {
-        @MCRPropertyList(name = "List", required = false)
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyMissingDefaultNotSetDefaultPropertyShortNotEmpty.class),
+        classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "MCR.List", string = "DefaultValue,"),
     })
     public void notRequiredPropertyMissingDefaultNotSetDefaultPropertyShortNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyMissingDefaultNotSetDefaultPropertyShortNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyMissingDefaultNotSetDefaultPropertyShortNotEmpty.class, configuration);
+        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultNotSet.class, configuration);
         assertEquals(EMPTY, instance.list);
-    }
-
-    public static class NotRequiredPropertyMissingDefaultNotSetDefaultPropertyShortNotEmpty {
-        @MCRPropertyList(name = "List", required = false)
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyMissingDefaultNotSetDefaultPropertyLongNotEmpty.class),
+        classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "MCR.List.1", string = "DefaultValue"),
         @MCRTestProperty(key = "MCR.List.2", empty = true),
     })
     public void notRequiredPropertyMissingDefaultNotSetDefaultPropertyLongNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyMissingDefaultNotSetDefaultPropertyLongNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyMissingDefaultNotSetDefaultPropertyLongNotEmpty.class, configuration);
+        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultNotSet.class, configuration);
         assertEquals(EMPTY, instance.list);
-    }
-
-    public static class NotRequiredPropertyMissingDefaultNotSetDefaultPropertyLongNotEmpty {
-        @MCRPropertyList(name = "List", required = false)
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyMissingDefaultSetDefaultPropertyMissing.class),
+        classNameOf = NotRequiredDefaultSet.class),
     })
     public void notRequiredPropertyMissingDefaultSetDefaultPropertyMissing() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyMissingDefaultSetDefaultPropertyMissing.class, configuration);
+                NotRequiredDefaultSet.class, configuration);
         });
         assertEquals("Missing default configuration entries like: MCR.List, MCR.List.1, MCR.List.2, ...",
             exception.getMessage());
     }
 
-    public static class NotRequiredPropertyMissingDefaultSetDefaultPropertyMissing {
-        @MCRPropertyList(name = "List", required = false, defaultName = "MCR.List")
-        public List<String> list;
-    }
-
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyMissingDefaultSetDefaultPropertyShortEmpty.class),
+        classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "MCR.List", empty = true),
     })
     public void notRequiredPropertyMissingDefaultSetDefaultPropertyShortEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyMissingDefaultSetDefaultPropertyShortEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyMissingDefaultSetDefaultPropertyShortEmpty.class, configuration);
+        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultSet.class, configuration);
         assertEquals(EMPTY, instance.list);
-    }
-
-    public static class NotRequiredPropertyMissingDefaultSetDefaultPropertyShortEmpty {
-        @MCRPropertyList(name = "List", required = false, defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyMissingDefaultSetDefaultPropertyShortNotEmpty.class),
+        classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "MCR.List", string = "DefaultValue,"),
     })
     public void notRequiredPropertyMissingDefaultSetDefaultPropertyShortNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyMissingDefaultSetDefaultPropertyShortNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyMissingDefaultSetDefaultPropertyShortNotEmpty.class, configuration);
+        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultSet.class, configuration);
         assertEquals(DEFAULT_MAP, instance.list);
-    }
-
-    public static class NotRequiredPropertyMissingDefaultSetDefaultPropertyShortNotEmpty {
-        @MCRPropertyList(name = "List", required = false, defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyMissingDefaultSetDefaultPropertyLongNotEmpty.class),
+        classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "MCR.List.1", string = "DefaultValue"),
         @MCRTestProperty(key = "MCR.List.2", empty = true),
     })
     public void notRequiredPropertyMissingDefaultSetDefaultPropertyLongNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyMissingDefaultSetDefaultPropertyLongNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyMissingDefaultSetDefaultPropertyLongNotEmpty.class, configuration);
+        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultSet.class, configuration);
         assertEquals(DEFAULT_MAP, instance.list);
-    }
-
-    public static class NotRequiredPropertyMissingDefaultSetDefaultPropertyLongNotEmpty {
-        @MCRPropertyList(name = "List", required = false, defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyMissing.class),
+        classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.List", empty = true),
     })
     public void notRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyMissing() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyMissing instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyMissing.class, configuration);
+        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultNotSet.class, configuration);
         assertEquals(EMPTY, instance.list);
-    }
-
-    public static class NotRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyMissing {
-        @MCRPropertyList(name = "List", required = false)
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortEmpty.class),
+        classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.List", empty = true),
         @MCRTestProperty(key = "MCR.List", empty = true),
     })
     public void notRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortEmpty.class, configuration);
+        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultNotSet.class, configuration);
         assertEquals(EMPTY, instance.list);
-    }
-
-    public static class NotRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortEmpty {
-        @MCRPropertyList(name = "List", required = false)
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortNotEmpty.class),
+        classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.List", empty = true),
         @MCRTestProperty(key = "MCR.List", string = "DefaultValue,"),
     })
     public void notRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortNotEmpty.class, configuration);
+        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultNotSet.class, configuration);
         assertEquals(EMPTY, instance.list);
-    }
-
-    public static class NotRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortNotEmpty {
-        @MCRPropertyList(name = "List", required = false)
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyLongNotEmpty.class),
+        classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.List", empty = true),
         @MCRTestProperty(key = "MCR.List.1", string = "DefaultValue"),
         @MCRTestProperty(key = "MCR.List.2", empty = true),
     })
     public void notRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyLongNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyLongNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyLongNotEmpty.class, configuration);
+        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultNotSet.class, configuration);
         assertEquals(EMPTY, instance.list);
-    }
-
-    public static class NotRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyLongNotEmpty {
-        @MCRPropertyList(name = "List", required = false)
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyShortEmptyDefaultSetDefaultPropertyMissing.class),
+        classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.List", empty = true),
     })
     public void notRequiredPropertyShortEmptyDefaultSetDefaultPropertyMissing() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyShortEmptyDefaultSetDefaultPropertyMissing instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyShortEmptyDefaultSetDefaultPropertyMissing.class, configuration);
+        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultSet.class, configuration);
         assertEquals(EMPTY, instance.list);
-    }
-
-    public static class NotRequiredPropertyShortEmptyDefaultSetDefaultPropertyMissing {
-        @MCRPropertyList(name = "List", required = false, defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyShortEmptyDefaultSetDefaultPropertyShortEmpty.class),
+        classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.List", empty = true),
         @MCRTestProperty(key = "MCR.List", empty = true),
     })
     public void notRequiredPropertyShortEmptyDefaultSetDefaultPropertyShortEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyShortEmptyDefaultSetDefaultPropertyShortEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyShortEmptyDefaultSetDefaultPropertyShortEmpty.class, configuration);
+        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultSet.class, configuration);
         assertEquals(EMPTY, instance.list);
-    }
-
-    public static class NotRequiredPropertyShortEmptyDefaultSetDefaultPropertyShortEmpty {
-        @MCRPropertyList(name = "List", required = false, defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyShortEmptyDefaultSetDefaultPropertyShortNotEmpty.class),
+        classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.List", empty = true),
         @MCRTestProperty(key = "MCR.List", string = "DefaultValue,"),
     })
     public void notRequiredPropertyShortEmptyDefaultSetDefaultPropertyShortNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyShortEmptyDefaultSetDefaultPropertyShortNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyShortEmptyDefaultSetDefaultPropertyShortNotEmpty.class, configuration);
+        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultSet.class, configuration);
         assertEquals(EMPTY, instance.list);
-    }
-
-    public static class NotRequiredPropertyShortEmptyDefaultSetDefaultPropertyShortNotEmpty {
-        @MCRPropertyList(name = "List", required = false, defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyShortEmptyDefaultSetDefaultPropertyLongNotEmpty.class),
+        classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.List", empty = true),
         @MCRTestProperty(key = "MCR.List.1", string = "DefaultValue"),
         @MCRTestProperty(key = "MCR.List.2", empty = true),
     })
     public void notRequiredPropertyShortEmptyDefaultSetDefaultPropertyLongNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyShortEmptyDefaultSetDefaultPropertyLongNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyShortEmptyDefaultSetDefaultPropertyLongNotEmpty.class, configuration);
+        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultSet.class, configuration);
         assertEquals(EMPTY, instance.list);
-    }
-
-    public static class NotRequiredPropertyShortEmptyDefaultSetDefaultPropertyLongNotEmpty {
-        @MCRPropertyList(name = "List", required = false, defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyMissing.class),
+        classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.List", string = "Value,"),
     })
     public void notRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyMissing() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyMissing instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyMissing.class, configuration);
+        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultNotSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class NotRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyMissing {
-        @MCRPropertyList(name = "List", required = false)
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortEmpty.class),
+        classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.List", string = "Value,"),
         @MCRTestProperty(key = "MCR.List", empty = true),
     })
     public void notRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortEmpty.class, configuration);
+        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultNotSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class NotRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortEmpty {
-        @MCRPropertyList(name = "List", required = false)
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty.class),
+        classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.List", string = "Value,"),
         @MCRTestProperty(key = "MCR.List", string = "DefaultValue,"),
     })
     public void notRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty.class, configuration);
+        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultNotSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class NotRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty {
-        @MCRPropertyList(name = "List", required = false)
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty.class),
+        classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.List", string = "Value,"),
         @MCRTestProperty(key = "MCR.List.1", string = "DefaultValue"),
         @MCRTestProperty(key = "MCR.List.2", empty = true),
     })
     public void notRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty.class, configuration);
+        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultNotSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class NotRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty {
-        @MCRPropertyList(name = "List", required = false)
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyMissing.class),
+        classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.List", string = "Value,"),
     })
     public void notRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyMissing() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyMissing instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyMissing.class, configuration);
+        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class NotRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyMissing {
-        @MCRPropertyList(name = "List", required = false, defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortEmpty.class),
+        classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.List", string = "Value,"),
         @MCRTestProperty(key = "MCR.List", empty = true),
     })
     public void notRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortEmpty.class, configuration);
+        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class NotRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortEmpty {
-        @MCRPropertyList(name = "List", required = false, defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortNotEmpty.class),
+        classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.List", string = "Value,"),
         @MCRTestProperty(key = "MCR.List", string = "DefaultValue,"),
     })
     public void notRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortNotEmpty.class, configuration);
+        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class NotRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortNotEmpty {
-        @MCRPropertyList(name = "List", required = false, defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyLongNotEmpty.class),
+        classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.List", string = "Value,"),
         @MCRTestProperty(key = "MCR.List.1", string = "DefaultValue"),
         @MCRTestProperty(key = "MCR.List.2", empty = true),
     })
     public void notRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyLongNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyLongNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyLongNotEmpty.class, configuration);
+        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class NotRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyLongNotEmpty {
-        @MCRPropertyList(name = "List", required = false, defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyMissing.class),
+        classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.List.1", string = "Value"),
         @MCRTestProperty(key = "Foo.List.2", empty = true),
     })
     public void notRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyMissing() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyMissing instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyMissing.class, configuration);
+        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultNotSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class NotRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyMissing {
-        @MCRPropertyList(name = "List", required = false)
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortEmpty.class),
+        classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.List.1", string = "Value"),
         @MCRTestProperty(key = "Foo.List.2", empty = true),
         @MCRTestProperty(key = "MCR.List", empty = true),
     })
     public void notRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortEmpty.class, configuration);
+        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultNotSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class NotRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortEmpty {
-        @MCRPropertyList(name = "List", required = false)
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty.class),
+        classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.List.1", string = "Value"),
         @MCRTestProperty(key = "Foo.List.2", empty = true),
         @MCRTestProperty(key = "MCR.List", string = "DefaultValue,"),
     })
     public void notRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty.class, configuration);
+        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultNotSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class NotRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty {
-        @MCRPropertyList(name = "List", required = false)
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty.class),
+        classNameOf = NotRequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.List.1", string = "Value"),
         @MCRTestProperty(key = "Foo.List.2", empty = true),
         @MCRTestProperty(key = "MCR.List.1", string = "DefaultValue"),
@@ -689,79 +528,55 @@ public class MCRConfigurableInstancePropertyListTest {
     })
     public void notRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty.class, configuration);
+        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultNotSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class NotRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty {
-        @MCRPropertyList(name = "List", required = false)
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyMissing.class),
+        classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.List.1", string = "Value"),
         @MCRTestProperty(key = "Foo.List.2", empty = true),
     })
     public void notRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyMissing() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyMissing instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyMissing.class, configuration);
+        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class NotRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyMissing {
-        @MCRPropertyList(name = "List", required = false, defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortEmpty.class),
+        classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.List.1", string = "Value"),
         @MCRTestProperty(key = "Foo.List.2", empty = true),
         @MCRTestProperty(key = "MCR.List", empty = true),
     })
     public void notRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortEmpty.class, configuration);
+        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class NotRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortEmpty {
-        @MCRPropertyList(name = "List", required = false, defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortNotEmpty.class),
+        classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.List.1", string = "Value"),
         @MCRTestProperty(key = "Foo.List.2", empty = true),
         @MCRTestProperty(key = "MCR.List", string = "DefaultValue,"),
     })
     public void notRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortNotEmpty.class, configuration);
+        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class NotRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortNotEmpty {
-        @MCRPropertyList(name = "List", required = false, defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = NotRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyLongNotEmpty.class),
+        classNameOf = NotRequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.List.1", string = "Value"),
         @MCRTestProperty(key = "Foo.List.2", empty = true),
         @MCRTestProperty(key = "MCR.List.1", string = "DefaultValue"),
@@ -769,79 +584,58 @@ public class MCRConfigurableInstancePropertyListTest {
     })
     public void notRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyLongNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyLongNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                NotRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyLongNotEmpty.class, configuration);
+        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            NotRequiredDefaultSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class NotRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyLongNotEmpty {
-        @MCRPropertyList(name = "List", required = false, defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyMissingDefaultNotSetDefaultPropertyMissing.class),
+        classNameOf = RequiredDefaultNotSet.class),
     })
     public void requiredPropertyMissingDefaultNotSetDefaultPropertyMissing() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyMissingDefaultNotSetDefaultPropertyMissing.class, configuration);
+                RequiredDefaultNotSet.class, configuration);
         });
         assertEquals("Missing configuration entries like: Foo.List, Foo.List.1, Foo.List.2, ...",
             exception.getMessage());
     }
 
-    public static class RequiredPropertyMissingDefaultNotSetDefaultPropertyMissing {
-        @MCRPropertyList(name = "List")
-        public List<String> list;
-    }
-
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyMissingDefaultNotSetDefaultPropertyShortEmpty.class),
+        classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "MCR.List", empty = true),
     })
     public void requiredPropertyMissingDefaultNotSetDefaultPropertyShortEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyMissingDefaultNotSetDefaultPropertyShortEmpty.class, configuration);
+                RequiredDefaultNotSet.class, configuration);
         });
         assertEquals("Missing configuration entries like: Foo.List, Foo.List.1, Foo.List.2, ...",
             exception.getMessage());
     }
 
-    public static class RequiredPropertyMissingDefaultNotSetDefaultPropertyShortEmpty {
-        @MCRPropertyList(name = "List")
-        public List<String> list;
-    }
-
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyMissingDefaultNotSetDefaultPropertyShortNotEmpty.class),
+        classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "MCR.List", string = "DefaultValue,"),
     })
     public void requiredPropertyMissingDefaultNotSetDefaultPropertyShortNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyMissingDefaultNotSetDefaultPropertyShortNotEmpty.class, configuration);
+                RequiredDefaultNotSet.class, configuration);
         });
         assertEquals("Missing configuration entries like: Foo.List, Foo.List.1, Foo.List.2, ...",
             exception.getMessage());
     }
 
-    public static class RequiredPropertyMissingDefaultNotSetDefaultPropertyShortNotEmpty {
-        @MCRPropertyList(name = "List")
-        public List<String> list;
-    }
-
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyMissingDefaultNotSetDefaultPropertyLongNotEmpty.class),
+        classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "MCR.List.1", string = "DefaultValue"),
         @MCRTestProperty(key = "MCR.List.2", empty = true),
     })
@@ -849,457 +643,315 @@ public class MCRConfigurableInstancePropertyListTest {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyMissingDefaultNotSetDefaultPropertyLongNotEmpty.class, configuration);
+                RequiredDefaultNotSet.class, configuration);
         });
         assertEquals("Missing configuration entries like: Foo.List, Foo.List.1, Foo.List.2, ...",
             exception.getMessage());
     }
 
-    public static class RequiredPropertyMissingDefaultNotSetDefaultPropertyLongNotEmpty {
-        @MCRPropertyList(name = "List")
-        public List<String> list;
-    }
-
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyMissingDefaultSetDefaultPropertyMissing.class),
+        classNameOf = RequiredDefaultSet.class),
     })
     public void requiredPropertyMissingDefaultSetDefaultPropertyMissing() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyMissingDefaultSetDefaultPropertyMissing.class, configuration);
+                RequiredDefaultSet.class, configuration);
         });
         assertEquals("Missing default configuration entries like: MCR.List, MCR.List.1, MCR.List.2, ...",
             exception.getMessage());
     }
 
-    public static class RequiredPropertyMissingDefaultSetDefaultPropertyMissing {
-        @MCRPropertyList(name = "List", defaultName = "MCR.List")
-        public List<String> list;
-    }
-
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyMissingDefaultSetDefaultPropertyShortEmpty.class),
+        classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "MCR.List", empty = true),
     })
     public void requiredPropertyMissingDefaultSetDefaultPropertyShortEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyMissingDefaultSetDefaultPropertyShortEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyMissingDefaultSetDefaultPropertyShortEmpty.class, configuration);
+        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultSet.class, configuration);
         assertEquals(EMPTY, instance.list);
-    }
-
-    public static class RequiredPropertyMissingDefaultSetDefaultPropertyShortEmpty {
-        @MCRPropertyList(name = "List", defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyMissingDefaultSetDefaultPropertyShortNotEmpty.class),
+        classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "MCR.List", string = "DefaultValue,"),
     })
     public void requiredPropertyMissingDefaultSetDefaultPropertyShortNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyMissingDefaultSetDefaultPropertyShortNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyMissingDefaultSetDefaultPropertyShortNotEmpty.class, configuration);
+        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultSet.class, configuration);
         assertEquals(DEFAULT_MAP, instance.list);
-    }
-
-    public static class RequiredPropertyMissingDefaultSetDefaultPropertyShortNotEmpty {
-        @MCRPropertyList(name = "List", defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyMissingDefaultSetDefaultPropertyLongNotEmpty.class),
+        classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "MCR.List.1", string = "DefaultValue"),
         @MCRTestProperty(key = "MCR.List.2", empty = true),
     })
     public void requiredPropertyMissingDefaultSetDefaultPropertyLongNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyMissingDefaultSetDefaultPropertyLongNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyMissingDefaultSetDefaultPropertyLongNotEmpty.class, configuration);
+        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultSet.class, configuration);
         assertEquals(DEFAULT_MAP, instance.list);
-    }
-
-    public static class RequiredPropertyMissingDefaultSetDefaultPropertyLongNotEmpty {
-        @MCRPropertyList(name = "List", defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyShortEmptyDefaultNotSetDefaultPropertyMissing.class),
+        classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.List", empty = true),
     })
     public void requiredPropertyShortEmptyDefaultNotSetDefaultPropertyMissing() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyShortEmptyDefaultNotSetDefaultPropertyMissing instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyShortEmptyDefaultNotSetDefaultPropertyMissing.class, configuration);
+        RequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultNotSet.class, configuration);
         assertEquals(EMPTY, instance.list);
-    }
-
-    public static class RequiredPropertyShortEmptyDefaultNotSetDefaultPropertyMissing {
-        @MCRPropertyList(name = "List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortEmpty.class),
+        classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.List", empty = true),
         @MCRTestProperty(key = "MCR.List", empty = true),
     })
     public void requiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortEmpty.class, configuration);
+        RequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultNotSet.class, configuration);
         assertEquals(EMPTY, instance.list);
-    }
-
-    public static class RequiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortEmpty {
-        @MCRPropertyList(name = "List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortNotEmpty.class),
+        classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.List", empty = true),
         @MCRTestProperty(key = "MCR.List", string = "DefaultValue,"),
     })
     public void requiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortNotEmpty.class, configuration);
+        RequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultNotSet.class, configuration);
         assertEquals(EMPTY, instance.list);
-    }
-
-    public static class RequiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortNotEmpty {
-        @MCRPropertyList(name = "List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyShortEmptyDefaultNotSetDefaultPropertyLongNotEmpty.class),
+        classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.List", empty = true),
         @MCRTestProperty(key = "MCR.List.1", string = "DefaultValue"),
         @MCRTestProperty(key = "MCR.List.2", empty = true),
     })
     public void requiredPropertyShortEmptyDefaultNotSetDefaultPropertyLongNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyShortEmptyDefaultNotSetDefaultPropertyLongNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyShortEmptyDefaultNotSetDefaultPropertyLongNotEmpty.class, configuration);
+        RequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultNotSet.class, configuration);
         assertEquals(EMPTY, instance.list);
-    }
-
-    public static class RequiredPropertyShortEmptyDefaultNotSetDefaultPropertyLongNotEmpty {
-        @MCRPropertyList(name = "List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyShortEmptyDefaultSetDefaultPropertyMissing.class),
+        classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.List", empty = true),
     })
     public void requiredPropertyShortEmptyDefaultSetDefaultPropertyMissing() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyShortEmptyDefaultSetDefaultPropertyMissing instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyShortEmptyDefaultSetDefaultPropertyMissing.class, configuration);
+        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultSet.class, configuration);
         assertEquals(EMPTY, instance.list);
-    }
-
-    public static class RequiredPropertyShortEmptyDefaultSetDefaultPropertyMissing {
-        @MCRPropertyList(name = "List", defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyShortEmptyDefaultSetDefaultPropertyShortEmpty.class),
+        classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.List", empty = true),
         @MCRTestProperty(key = "MCR.List", empty = true),
     })
     public void requiredPropertyShortEmptyDefaultSetDefaultPropertyShortEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyShortEmptyDefaultSetDefaultPropertyShortEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyShortEmptyDefaultSetDefaultPropertyShortEmpty.class, configuration);
+        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultSet.class, configuration);
         assertEquals(EMPTY, instance.list);
-    }
-
-    public static class RequiredPropertyShortEmptyDefaultSetDefaultPropertyShortEmpty {
-        @MCRPropertyList(name = "List", defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyShortEmptyDefaultSetDefaultPropertyShortNotEmpty.class),
+        classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.List", empty = true),
         @MCRTestProperty(key = "MCR.List", string = "DefaultValue,"),
     })
     public void requiredPropertyShortEmptyDefaultSetDefaultPropertyShortNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyShortEmptyDefaultSetDefaultPropertyShortNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyShortEmptyDefaultSetDefaultPropertyShortNotEmpty.class, configuration);
+        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultSet.class, configuration);
         assertEquals(EMPTY, instance.list);
-    }
-
-    public static class RequiredPropertyShortEmptyDefaultSetDefaultPropertyShortNotEmpty {
-        @MCRPropertyList(name = "List", defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyShortEmptyDefaultSetDefaultPropertyLongNotEmpty.class),
+        classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.List", empty = true),
         @MCRTestProperty(key = "MCR.List.1", string = "DefaultValue"),
         @MCRTestProperty(key = "MCR.List.2", empty = true),
     })
     public void requiredPropertyShortEmptyDefaultSetDefaultPropertyLongNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyShortEmptyDefaultSetDefaultPropertyLongNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyShortEmptyDefaultSetDefaultPropertyLongNotEmpty.class, configuration);
+        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultSet.class, configuration);
         assertEquals(EMPTY, instance.list);
-    }
-
-    public static class RequiredPropertyShortEmptyDefaultSetDefaultPropertyLongNotEmpty {
-        @MCRPropertyList(name = "List", defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyMissing.class),
+        classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.List", string = "Value,"),
     })
     public void requiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyMissing() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyMissing instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyMissing.class, configuration);
+        RequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultNotSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class RequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyMissing {
-        @MCRPropertyList(name = "List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortEmpty.class),
+        classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.List", string = "Value,"),
         @MCRTestProperty(key = "MCR.List", empty = true),
     })
     public void requiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortEmpty.class, configuration);
+        RequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultNotSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class RequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortEmpty {
-        @MCRPropertyList(name = "List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty.class),
+        classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.List", string = "Value,"),
         @MCRTestProperty(key = "MCR.List", string = "DefaultValue,"),
     })
     public void requiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty.class, configuration);
+        RequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultNotSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class RequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty {
-        @MCRPropertyList(name = "List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty.class),
+        classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.List", string = "Value,"),
         @MCRTestProperty(key = "MCR.List.1", string = "DefaultValue"),
         @MCRTestProperty(key = "MCR.List.2", empty = true),
     })
     public void requiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty.class, configuration);
+        RequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultNotSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class RequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty {
-        @MCRPropertyList(name = "List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyShortNotEmptyDefaultSetDefaultPropertyMissing.class),
+        classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.List", string = "Value,"),
     })
     public void requiredPropertyShortNotEmptyDefaultSetDefaultPropertyMissing() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyShortNotEmptyDefaultSetDefaultPropertyMissing instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyShortNotEmptyDefaultSetDefaultPropertyMissing.class, configuration);
+        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class RequiredPropertyShortNotEmptyDefaultSetDefaultPropertyMissing {
-        @MCRPropertyList(name = "List", defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortEmpty.class),
+        classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.List", string = "Value,"),
         @MCRTestProperty(key = "MCR.List", empty = true),
     })
     public void requiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortEmpty.class, configuration);
+        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class RequiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortEmpty {
-        @MCRPropertyList(name = "List", defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortNotEmpty.class),
+        classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.List", string = "Value,"),
         @MCRTestProperty(key = "MCR.List", string = "DefaultValue,"),
     })
     public void requiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortNotEmpty.class, configuration);
+        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class RequiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortNotEmpty {
-        @MCRPropertyList(name = "List", defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyShortNotEmptyDefaultSetDefaultPropertyLongNotEmpty.class),
+        classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.List", string = "Value,"),
         @MCRTestProperty(key = "MCR.List.1", string = "DefaultValue"),
         @MCRTestProperty(key = "MCR.List.2", empty = true),
     })
     public void requiredPropertyShortNotEmptyDefaultSetDefaultPropertyLongNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyShortNotEmptyDefaultSetDefaultPropertyLongNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyShortNotEmptyDefaultSetDefaultPropertyLongNotEmpty.class, configuration);
+        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class RequiredPropertyShortNotEmptyDefaultSetDefaultPropertyLongNotEmpty {
-        @MCRPropertyList(name = "List", defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyMissing.class),
+        classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.List.1", string = "Value"),
         @MCRTestProperty(key = "Foo.List.2", empty = true),
     })
     public void requiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyMissing() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyMissing instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyMissing.class, configuration);
+        RequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultNotSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class RequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyMissing {
-        @MCRPropertyList(name = "List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortEmpty.class),
+        classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.List.1", string = "Value"),
         @MCRTestProperty(key = "Foo.List.2", empty = true),
         @MCRTestProperty(key = "MCR.List", empty = true),
     })
     public void requiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortEmpty.class, configuration);
+        RequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultNotSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class RequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortEmpty {
-        @MCRPropertyList(name = "List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty.class),
+        classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.List.1", string = "Value"),
         @MCRTestProperty(key = "Foo.List.2", empty = true),
         @MCRTestProperty(key = "MCR.List", string = "DefaultValue,"),
     })
     public void requiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty.class, configuration);
+        RequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultNotSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class RequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty {
-        @MCRPropertyList(name = "List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty.class),
+        classNameOf = RequiredDefaultNotSet.class),
         @MCRTestProperty(key = "Foo.List.1", string = "Value"),
         @MCRTestProperty(key = "Foo.List.2", empty = true),
         @MCRTestProperty(key = "MCR.List.1", string = "DefaultValue"),
@@ -1307,79 +959,55 @@ public class MCRConfigurableInstancePropertyListTest {
     })
     public void requiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty.class, configuration);
+        RequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultNotSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class RequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty {
-        @MCRPropertyList(name = "List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyLongNotEmptyDefaultSetDefaultPropertyMissing.class),
+        classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.List.1", string = "Value"),
         @MCRTestProperty(key = "Foo.List.2", empty = true),
     })
     public void requiredPropertyLongNotEmptyDefaultSetDefaultPropertyMissing() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyLongNotEmptyDefaultSetDefaultPropertyMissing instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyLongNotEmptyDefaultSetDefaultPropertyMissing.class, configuration);
+        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class RequiredPropertyLongNotEmptyDefaultSetDefaultPropertyMissing {
-        @MCRPropertyList(name = "List", defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortEmpty.class),
+        classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.List.1", string = "Value"),
         @MCRTestProperty(key = "Foo.List.2", empty = true),
         @MCRTestProperty(key = "MCR.List", empty = true),
     })
     public void requiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortEmpty.class, configuration);
+        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class RequiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortEmpty {
-        @MCRPropertyList(name = "List", defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortNotEmpty.class),
+        classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.List.1", string = "Value"),
         @MCRTestProperty(key = "Foo.List.2", empty = true),
         @MCRTestProperty(key = "MCR.List", string = "DefaultValue,"),
     })
     public void requiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortNotEmpty.class, configuration);
+        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultSet.class, configuration);
         assertEquals(MAP, instance.list);
-    }
-
-    public static class RequiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortNotEmpty {
-        @MCRPropertyList(name = "List", defaultName = "MCR.List")
-        public List<String> list;
     }
 
     @Test
     @MCRTestConfiguration(properties = { @MCRTestProperty(key = "Foo",
-        classNameOf = RequiredPropertyLongNotEmptyDefaultSetDefaultPropertyLongNotEmpty.class),
+        classNameOf = RequiredDefaultSet.class),
         @MCRTestProperty(key = "Foo.List.1", string = "Value"),
         @MCRTestProperty(key = "Foo.List.2", empty = true),
         @MCRTestProperty(key = "MCR.List.1", string = "DefaultValue"),
@@ -1387,14 +1015,28 @@ public class MCRConfigurableInstancePropertyListTest {
     })
     public void requiredPropertyLongNotEmptyDefaultSetDefaultPropertyLongNotEmpty() {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredPropertyLongNotEmptyDefaultSetDefaultPropertyLongNotEmpty instance =
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredPropertyLongNotEmptyDefaultSetDefaultPropertyLongNotEmpty.class, configuration);
+        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
+            RequiredDefaultSet.class, configuration);
         assertEquals(MAP, instance.list);
     }
 
-    public static class RequiredPropertyLongNotEmptyDefaultSetDefaultPropertyLongNotEmpty {
+    public static class NotRequiredDefaultNotSet {
+        @MCRPropertyList(name = "List", required = false)
+        public List<String> list;
+    }
+
+    public static class NotRequiredDefaultSet {
+        @MCRPropertyList(name = "List", required = false, defaultName = "MCR.List")
+        public List<String> list;
+    }
+
+    public static class RequiredDefaultSet {
         @MCRPropertyList(name = "List", defaultName = "MCR.List")
+        public List<String> list;
+    }
+
+    public static class RequiredDefaultNotSet {
+        @MCRPropertyList(name = "List")
         public List<String> list;
     }
 
