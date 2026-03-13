@@ -850,8 +850,8 @@ class MCRConfigurableInstanceHelper {
 
         public abstract V get(MCRInstanceConfiguration configuration, Target<?> target);
 
-        public final Set<Option> createOptions(Class<?> valueClass, boolean required) {
-            return required && Modifier.isFinal(valueClass.getModifiers())
+        public final Set<Option> createOptions(Class<?> valueClass) {
+            return Modifier.isFinal(valueClass.getModifiers())
                 ? ADD_IMPLICIT_CLASS_PROPERTIES : NO_OPTIONS;
         }
 
@@ -1330,7 +1330,7 @@ class MCRConfigurableInstanceHelper {
                 }
             }
 
-            Set<Option> options = createOptions(annotation.valueClass(), annotation.required());
+            Set<Option> options = createOptions(annotation.valueClass());
             Object instance = getInstance(annotation.valueClass(), nestedConfiguration, options);
 
             if (!annotation.valueClass().isAssignableFrom(instance.getClass())) {
@@ -1407,7 +1407,7 @@ class MCRConfigurableInstanceHelper {
                     + getExampleName(configuration, "B") + ", ...");
             }
 
-            Set<Option> options = createOptions(annotation.valueClass(), annotation.required());
+            Set<Option> options = createOptions(annotation.valueClass());
             Map<String, Object> instanceMap = nestedConfigurationMap.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey,
                     entry -> getInstance(annotation.valueClass(), entry.getValue(), options)));
@@ -1503,7 +1503,7 @@ class MCRConfigurableInstanceHelper {
                     + getExampleName(configuration, "2") + ", ...");
             }
 
-            Set<Option> options = createOptions(annotation.valueClass(), annotation.required());
+            Set<Option> options = createOptions(annotation.valueClass());
             List<Object> instanceList = nestedConfigurationList.stream()
                 .map(c -> (Object) getInstance(annotation.valueClass(), c, options)).toList();
 
