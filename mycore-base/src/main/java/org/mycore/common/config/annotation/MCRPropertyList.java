@@ -27,26 +27,25 @@ import java.lang.annotation.Target;
 import org.mycore.common.config.MCRConfigurationException;
 
 /**
- * This annotation is used to mark fields or methods that should be set to or called with a value of type
- * {@link String} from the configuration properties.
+ * This annotation is used to mark fields or methods that should be set to or called with
+ * a list of {@link String} values from the configuration properties.
  * <p>
  * The field or method needs to be public.
-  *
- * @author Sebastian Hofmann
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Inherited
-public @interface MCRProperty {
+public @interface MCRPropertyList {
 
     /**
-     * @return The name of property containing the string value.
+     * @return The prefix for names of properties containing the list values.
      */
-    String name();
+    String name() default "";
 
     /**
-     * @return true if the property specified by {@link MCRProperty#name()} has to be present in the properties.
-     * {@link MCRConfigurationException} is thrown if the property is required but not present.
+     * @return true if the at least one sub-property of the property specified by {@link MCRInstanceMap#name()}
+     * has to be present in the properties. {@link MCRConfigurationException} is thrown if a value is required
+     * but not present.
      */
     boolean required() default true;
 
@@ -57,11 +56,16 @@ public @interface MCRProperty {
     boolean absolute() default false;
 
     /**
-     * @return The name for a default property that should be used as a fallback, if no value is configured.
-     * A {@link MCRConfigurationException} is thrown if the default property is not configured.
+     * @return The name for a default property that should be used as a fallback, if no list values are configured.
+     * A {@link MCRConfigurationException} is thrown if no default property is not configured.
      * The default property must be absolute, e.g. MCR.NameOfProject.
      */
     String defaultName() default "";
+    
+    /**
+     * @return The {@link MCRSentinel} for the configured instances.
+     */
+    MCRSentinel sentinel() default @MCRSentinel(enabled = false);
 
     /**
      * @return The order in which the annotated fields or methods are processed. The higher the value, the later the
