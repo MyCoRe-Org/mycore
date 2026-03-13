@@ -1022,23 +1022,31 @@ public class MCRConfigurableInstancePropertyListTest {
     }
 
     public static class NotRequiredDefaultNotSet {
+
         @MCRPropertyList(name = "List", required = false)
         public List<String> list;
+
     }
 
     public static class NotRequiredDefaultSet {
+
         @MCRPropertyList(name = "List", required = false, defaultName = "MCR.List")
         public List<String> list;
-    }
 
-    public static class RequiredDefaultSet {
-        @MCRPropertyList(name = "List", defaultName = "MCR.List")
-        public List<String> list;
     }
 
     public static class RequiredDefaultNotSet {
+
         @MCRPropertyList(name = "List")
         public List<String> list;
+
+    }
+
+    public static class RequiredDefaultSet {
+
+        @MCRPropertyList(name = "List", defaultName = "MCR.List")
+        public List<String> list;
+
     }
 
 }

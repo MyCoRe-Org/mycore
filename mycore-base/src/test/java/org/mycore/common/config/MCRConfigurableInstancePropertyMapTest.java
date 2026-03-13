@@ -1021,23 +1021,31 @@ public class MCRConfigurableInstancePropertyMapTest {
     }
 
     public static class NotRequiredDefaultNotSet {
+
         @MCRPropertyMap(name = "Map", required = false)
         public Map<String, String> map;
+
     }
 
     public static class NotRequiredDefaultSet {
+
         @MCRPropertyMap(name = "Map", required = false, defaultName = "MCR.Map")
         public Map<String, String> map;
-    }
 
-    public static class RequiredDefaultSet {
-        @MCRPropertyMap(name = "Map", defaultName = "MCR.Map")
-        public Map<String, String> map;
     }
 
     public static class RequiredDefaultNotSet {
+
         @MCRPropertyMap(name = "Map")
         public Map<String, String> map;
+
+    }
+
+    public static class RequiredDefaultSet {
+
+        @MCRPropertyMap(name = "Map", defaultName = "MCR.Map")
+        public Map<String, String> map;
+
     }
 
 }

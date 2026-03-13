@@ -589,23 +589,31 @@ public class MCRConfigurableInstancePropertyTest {
     }
 
     public static class NotRequiredDefaultNotSet {
+
         @MCRProperty(name = "Value", required = false)
         public String value;
+
     }
 
     public static class NotRequiredDefaultSet {
+
         @MCRProperty(name = "Value", required = false, defaultName = "MCR.Value")
         public String value;
-    }
 
-    public static class RequiredDefaultSet {
-        @MCRProperty(name = "Value", defaultName = "MCR.Value")
-        public String value;
     }
 
     public static class RequiredDefaultNotSet {
+
         @MCRProperty(name = "Value")
         public String value;
+
+    }
+
+    public static class RequiredDefaultSet {
+
+        @MCRProperty(name = "Value", defaultName = "MCR.Value")
+        public String value;
+
     }
 
 }
