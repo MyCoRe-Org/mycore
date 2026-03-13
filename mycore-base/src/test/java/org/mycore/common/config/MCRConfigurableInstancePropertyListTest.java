@@ -40,6 +40,7 @@ import org.mycore.test.MyCoReTest;
  *   set non-empty in short form or set non-empty in long form </li>
  * </ol>
  * <table style="border-collapse: collapse;">
+ *   <caption>Expected results for different conditions</caption>
  *   <tr>
  *     <th style="border: 1px solid;">Is Required</th>
  *     <th style="border: 1px solid;">Property</th>

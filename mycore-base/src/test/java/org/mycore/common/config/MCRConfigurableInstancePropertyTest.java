@@ -37,6 +37,7 @@ import org.mycore.test.MyCoReTest;
  *   <li>Configuration property for default value is not set, empty or non-empty</li>
  * </ol>
  * <table style="border-collapse: collapse;">
+ *   <caption>Expected results for different conditions</caption>
  *   <tr>
  *     <th style="border: 1px solid;">Is Required</th>
  *     <th style="border: 1px solid;">Property</th>
