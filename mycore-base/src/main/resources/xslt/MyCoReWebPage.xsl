@@ -144,6 +144,16 @@
     <xsl:value-of select="mcri18n:translate(@key)" />
   </xsl:template>
 
+  <xsl:template match="@*[contains(. ,'{i18n:')][contains(. ,'}')]">
+    <xsl:variable name="before-key" select="substring-before(. ,'{i18n:')"/>
+    <xsl:variable name="after-key" select="substring-after(. ,'}')"/>
+    <xsl:variable name="key" select="substring-before(substring-after(. ,'{i18n:'), '}')"/>
+
+    <xsl:attribute name="{local-name()}">
+      <xsl:value-of select="concat($before-key, mcri18n:translate($key), $after-key)" disable-output-escaping="yes"/>
+    </xsl:attribute>
+  </xsl:template>
+
   <!-- =============================================================================== -->
 
   <!-- Dynamic includes -->
