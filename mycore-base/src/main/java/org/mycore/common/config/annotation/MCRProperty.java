@@ -40,10 +40,7 @@ import org.mycore.common.config.MCRConfigurationException;
 public @interface MCRProperty {
 
     /**
-     * @return The name of property, <code>*</code> for a map of all properties or a prefix,
-     * followed by <code>.*</code> for a map of all properties whose name starts with that prefix.
-     * Support for maps will be removed in a future release of MyCoRe. {@link MCRRawProperties}
-     * should be used instead.
+     * @return The name of property containing the string value.
      */
     String name();
 
@@ -60,9 +57,9 @@ public @interface MCRProperty {
     boolean absolute() default false;
 
     /**
-     * @return The name for a default property that should be used as a default value if the property
-     * specified by {@link MCRProperty#name()} is not present in the properties. {@link MCRConfigurationException} is
-     * thrown if the default property is not present. The default property must be absolute, e.g. MCR.NameOfProject.
+     * @return The name for a default property that should be used as a fallback, if no value is configured.
+     * A {@link MCRConfigurationException} is thrown if the default property is not configured.
+     * The default property must be absolute, e.g. MCR.NameOfProject.
      */
     String defaultName() default "";
 

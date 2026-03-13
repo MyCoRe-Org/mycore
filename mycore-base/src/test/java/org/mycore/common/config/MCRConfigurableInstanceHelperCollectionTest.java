@@ -246,6 +246,34 @@ public class MCRConfigurableInstanceHelperCollectionTest {
     @Test
     @MCRTestConfiguration(
         properties = {
+            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithMapWithPrefix.class),
+            @MCRTestProperty(key = "Foo.Map", string = "A:ShortValueA,B"),
+            @MCRTestProperty(key = "Foo.Map.EntryA", string = "ValueA"),
+            @MCRTestProperty(key = "Foo.Map.EntryB", empty = true),
+        })
+    public void mapWithEmptyMapValues() {
+
+        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
+        TestClassWithMapWithPrefix instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithMapWithPrefix.class, configuration);
+
+        assertNotNull(instance);
+        assertNotNull(instance.map);
+        assertEquals(2, instance.map.size());
+
+        String valueA = instance.map.get("EntryA");
+        assertNotNull(valueA);
+        assertEquals("ValueA", valueA);
+
+        String shortValueA = instance.map.get("A");
+        assertNotNull(shortValueA);
+        assertEquals("ShortValueA", shortValueA);
+
+    }
+
+    @Test
+    @MCRTestConfiguration(
+        properties = {
             @MCRTestProperty(key = "Foo", classNameOf = TestClassWithMapWithPrefixAndSentinel.class),
             @MCRTestProperty(key = "Foo.Map.EntryA.Sentinel", string = "false"),
             @MCRTestProperty(key = "Foo.Map.EntryA", string = "ValueA"),
@@ -472,6 +500,34 @@ public class MCRConfigurableInstanceHelperCollectionTest {
         String afterValue42 = instance.list.get(3);
         assertNotNull(afterValue42);
         assertEquals("AfterValue42", afterValue42);
+
+    }
+
+    @Test
+    @MCRTestConfiguration(
+        properties = {
+            @MCRTestProperty(key = "Foo", classNameOf = TestClassWithListWithPrefix.class),
+            @MCRTestProperty(key = "Foo.List", string = "ShortValue23,"),
+            @MCRTestProperty(key = "Foo.List.42", string = "AfterValue42"),
+            @MCRTestProperty(key = "Foo.List.-23", empty = true),
+        })
+    public void listWithEmptyValues() {
+
+        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
+        TestClassWithListWithPrefix instance = MCRConfigurableInstanceHelper
+            .getInstance(TestClassWithListWithPrefix.class, configuration);
+
+        assertNotNull(instance);
+        assertNotNull(instance.list);
+        assertEquals(2, instance.list.size());
+
+        String beforeValue23 = instance.list.get(0);
+        assertNotNull(beforeValue23);
+        assertEquals("ShortValue23", beforeValue23);
+
+        String shortValue23 = instance.list.get(1);
+        assertNotNull(shortValue23);
+        assertEquals("AfterValue42", shortValue23);
 
     }
 
