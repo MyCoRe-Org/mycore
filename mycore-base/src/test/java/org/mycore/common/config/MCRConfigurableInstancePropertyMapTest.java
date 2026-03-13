@@ -94,14 +94,14 @@ import org.mycore.test.MyCoReTest;
  *     <td style="border: 1px solid;"><code>A=B:b,C:c</code></td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>{A=a, B=b}</code></td>
+ *     <td style="border: 1px solid;"><code>{B=b, C=c}</code></td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;"><code>A.B=b</code>, <code>A.C=c</code></td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>{A=a, B=b}</code></td>
+ *     <td style="border: 1px solid;"><code>{B=b, C=c}</code></td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">yes</td>
@@ -150,14 +150,14 @@ import org.mycore.test.MyCoReTest;
  *     <td style="border: 1px solid;"><code>A=B:b,C:c</code></td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>{A=a, B=b}</code></td>
+ *     <td style="border: 1px solid;"><code>{B=b, C=c}</code></td>
  *   </tr>
  *   <tr>
  *     <td style="border: 1px solid;">yes</td>
  *     <td style="border: 1px solid;"><code>A.B=b</code>, <code>A.C=c</code></td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>{A=a, B=b}</code></td>
+ *     <td style="border: 1px solid;"><code>{B=b, C=c}</code></td>
  *   </tr>
  * </table>
  */
