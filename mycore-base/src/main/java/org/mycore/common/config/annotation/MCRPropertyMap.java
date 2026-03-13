@@ -38,7 +38,7 @@ import org.mycore.common.config.MCRConfigurationException;
 public @interface MCRPropertyMap {
 
     /**
-     * @return The prefix for names of properties containing the class names.
+     * @return The prefix for names of properties containing the map values.
      */
     String name() default "";
 
@@ -48,6 +48,19 @@ public @interface MCRPropertyMap {
      * but not present.
      */
     boolean required() default true;
+
+    /**
+     * @return true if the property name specified by {@link MCRProperty#name()} is absolute and not specific for
+     * this instance e.g. MCR.NameOfProject.
+     */
+    boolean absolute() default false;
+
+    /**
+     * @return The name for a default property that should be used as a fallback, if no map values are configured.
+     * A {@link MCRConfigurationException} is thrown if no default property is not configured.
+     * The default property must be absolute, e.g. MCR.NameOfProject.
+     */
+    String defaultName() default "";
 
     /**
      * @return The {@link MCRSentinel} for the configured instances.

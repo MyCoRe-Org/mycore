@@ -24,6 +24,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -40,6 +41,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
@@ -67,7 +69,7 @@ import jakarta.inject.Singleton;
  *
  * @author Sebastian Hofmann
  */
-@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.SingleMethodSingleton",
+@SuppressWarnings({ "PMD.AvoidDuplicateLiterals", "PMD.SingleMethodSingleton",
     "PMD.MCR.Singleton.MethodModifiers", "PMD.MCR.Singleton.MethodReturnType",
     "PMD.MCR.Singleton.ClassModifiers", "PMD.MCR.Singleton.PrivateConstructor",
     "PMD.MCR.Singleton.NonPrivateConstructors",
@@ -78,8 +80,8 @@ class MCRConfigurableInstanceHelper {
 
     public static final Set<Option> NO_OPTIONS = Collections.emptySet();
 
-    public static final Set<Option> ADD_IMPLICIT_CLASS_PROPERTIES
-        = Collections.singleton(Option.ADD_IMPLICIT_CLASS_PROPERTIES);
+    public static final Set<Option> ADD_IMPLICIT_CLASS_PROPERTIES =
+        Collections.singleton(Option.ADD_IMPLICIT_CLASS_PROPERTIES);
 
     private static final ConcurrentMap<Class<?>, ClassInfo<?>> INFOS = new ConcurrentHashMap<>();
 
@@ -186,8 +188,7 @@ class MCRConfigurableInstanceHelper {
         } else {
             throw new MCRConfigurationException("Configured instance of class " + instance.getClass().getName()
                 + " is incompatible with intended super class " + superClass.getName() + "'"
-                + (name != null ? " in configured class " + name : "")
-            );
+                + (name != null ? " in configured class " + name : ""));
         }
     }
 
@@ -340,20 +341,18 @@ class MCRConfigurableInstanceHelper {
 
             List<Method> declaredFactoryMethods = findFactoryMethods(targetClass, targetClass.getDeclaredMethods());
             Optional<Supplier<T>> factory = Stream.<Supplier<Optional<Supplier<T>>>>of(
-                    () -> findSingletonFactoryMethod(declaredFactoryMethods),
-                    () -> findAnnotatedFactoryMethod(declaredFactoryMethods),
-                    () -> findDefaultConstructor(targetClass))
+                () -> findSingletonFactoryMethod(declaredFactoryMethods),
+                () -> findAnnotatedFactoryMethod(declaredFactoryMethods),
+                () -> findDefaultConstructor(targetClass))
                 .map(Supplier::get)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .findFirst();
 
-            return factory.orElseThrow(() ->
-                new MCRConfigurationException("Class " + targetClass.getName() + " has "
-                    + " has no singleton factory method (public, static, matching return type, parameterless, name"
-                    + " equals 'getInstance'), no annotated factory method (public, static, matching return type,"
-                    + " parameterless, annotated with @MCRFactory) and no public parameterless constructor")
-            );
+            return factory.orElseThrow(() -> new MCRConfigurationException("Class " + targetClass.getName() + " has "
+                + " has no singleton factory method (public, static, matching return type, parameterless, name"
+                + " equals 'getInstance'), no annotated factory method (public, static, matching return type,"
+                + " parameterless, annotated with @MCRFactory) and no public parameterless constructor"));
 
         }
 
@@ -899,13 +898,15 @@ class MCRConfigurableInstanceHelper {
         @Override
         public String get(MCRInstanceConfiguration configuration, Target<?> target) {
 
-            String value;
-
-            if (!annotation.absolute()) {
-                value = configuration.properties().get(annotation.name());
-            } else {
-                value = configuration.fullProperties().get(annotation.name());
+            String name = annotation.name();
+            if (name.isEmpty()) {
+                throw new MCRConfigurationException("The name must not be empty");
             }
+
+            Map<String, String> properties =
+                annotation.absolute() ? configuration.fullProperties() : configuration.properties();
+
+            String value = properties.get(name);
 
             if (value == null && !Objects.equals("", annotation.defaultName())) {
                 value = configuration.fullProperties().get(annotation.defaultName());
@@ -918,7 +919,7 @@ class MCRConfigurableInstanceHelper {
             if (value == null && annotation.required()) {
                 throw new MCRConfigurationException("The required property "
                     + configuration.name().canonical() + "."
-                    + annotation.name() + " is missing");
+                    + name + " is missing");
             }
 
             return value;
@@ -968,21 +969,50 @@ class MCRConfigurableInstanceHelper {
         @Override
         public Map<String, String> get(MCRInstanceConfiguration configuration, Target<?> target) {
 
+            Map<String, String> properties =
+                annotation.absolute() ? configuration.fullProperties() : configuration.properties();
+
+            Map<String, String> propertyMap = getPropertyMap(annotation.name(), properties);
+            String defaultName = annotation.defaultName();
+            if (propertyMap == null && !defaultName.isEmpty()) {
+                propertyMap = getPropertyMap(defaultName, configuration.fullProperties());
+                if (propertyMap == null) {
+                    throw new MCRConfigurationException("Missing default configuration entries like: "
+                        + defaultName + ", " + defaultName + ".A, " + defaultName + ".B, ...");
+                }
+            }
+
+            if (propertyMap == null && annotation.required()) {
+                throw new MCRConfigurationException("Missing configuration entries like: "
+                    + getExampleNames(configuration, "A", "B") + ", ...");
+            }
+
+            return propertyMap == null ? new HashMap<>() : propertyMap;
+
+        }
+
+        private Map<String, String> getPropertyMap(String propertyName, Map<String, String> properties) {
+
+            AtomicBoolean hasRelevantProperty = new AtomicBoolean(false);
+            String prefix = propertyName.isEmpty() ? "" : propertyName + ".";
+
             Map<String, String> shortFormMap = Map.of();
-            String shortFormProperty = configuration.properties().get(annotation.name());
+            String shortFormProperty = properties.get(propertyName);
             if (shortFormProperty != null) {
+                hasRelevantProperty.set(true);
                 shortFormMap = parseShortFormMap(shortFormProperty);
             }
 
             Map<String, String> propertyMap = new HashMap<>(shortFormMap);
-            String annotationName = annotation.name();
-            String prefix = annotationName.isEmpty() ? "" : annotationName + ".";
             int prefixLength = prefix.length();
-            configuration.properties().forEach((key, value) -> {
+            properties.forEach((key, value) -> {
                 if (key.startsWith(prefix)) {
                     int index = key.indexOf('.', prefixLength);
                     if (index == -1) {
-                        propertyMap.put(key.substring(prefixLength), value);
+                        if(!value.isEmpty()) {
+                            hasRelevantProperty.set(true);
+                            propertyMap.put(key.substring(prefixLength), value);
+                        }
                     }
                 }
             });
@@ -991,7 +1021,7 @@ class MCRConfigurableInstanceHelper {
             if (sentinel.enabled()) {
                 for (String key : new HashSet<>(propertyMap.keySet())) {
                     boolean sentinelValue = sentinel.defaultValue();
-                    String configurationValue = configuration.properties().get(prefix + key + "." + sentinel.name());
+                    String configurationValue = properties.get(prefix + key + "." + sentinel.name());
                     if (configurationValue != null) {
                         sentinelValue = Boolean.parseBoolean(configurationValue);
                     }
@@ -1001,28 +1031,27 @@ class MCRConfigurableInstanceHelper {
                 }
             }
 
-            if (propertyMap.isEmpty() && annotation.required()) {
-                throw new MCRConfigurationException("Missing configuration entries like: "
-                    + getExampleName(configuration, "A") + ", "
-                    + getExampleName(configuration, "B") + ", ...");
-            }
-
-            return propertyMap;
+            return hasRelevantProperty.get() ? propertyMap : null;
 
         }
 
         private Map<String, String> parseShortFormMap(String value) {
             return MCRConfiguration2.splitValue(value)
                 .map(s -> s.split(":", 2))
-                .map(parts -> parts.length == 1 ? new String[] { parts[0], parts[0] } : parts)
+                .filter(parts -> parts.length != 1)
+                .filter(parts -> !parts[1].isBlank())
                 .collect(Collectors.toMap(parts -> parts[0].trim(), parts -> parts[1].trim()));
         }
 
-        private String getExampleName(MCRInstanceConfiguration configuration, String example) {
+        private String getExampleNames(MCRInstanceConfiguration configuration, String... examples) {
             if (Objects.equals("", annotation.name())) {
-                return configuration.name().subName(example).canonical();
+                return Arrays.stream(examples).map(example -> configuration.name().subName(example).canonical())
+                    .collect(Collectors.joining(", "));
             } else {
-                return configuration.name().subName(annotation.name() + "." + example).canonical();
+                return configuration.name().subName(annotation.name()).canonical() + ", "
+                    + Arrays.stream(examples).map(
+                        example -> configuration.name().subName(annotation.name() + "." + example).canonical())
+                        .collect(Collectors.joining(", "));
             }
         }
 
@@ -1069,15 +1098,43 @@ class MCRConfigurableInstanceHelper {
         @Override
         public List<String> get(MCRInstanceConfiguration configuration, Target<?> target) {
 
+            Map<String, String> properties =
+                annotation.absolute() ? configuration.fullProperties() : configuration.properties();
+
+            List<String> propertyList = getPropertyList(annotation.name(), properties);
+            String defaultName = annotation.defaultName();
+            if (propertyList == null && !defaultName.isEmpty()) {
+                propertyList = getPropertyList(defaultName, configuration.fullProperties());
+                if (propertyList == null) {
+                    throw new MCRConfigurationException("Missing default configuration entries like: "
+                        + defaultName + ", " + defaultName + ".1, " + defaultName + ".2, ...");
+                }
+            }
+
+            if (propertyList == null && annotation.required()) {
+                throw new MCRConfigurationException("Missing configuration entries like: "
+                    + getExampleNames(configuration, "1", "2") + ", ...");
+            }
+
+            return propertyList == null ? new ArrayList<>() : propertyList;
+
+        }
+
+        private List<String> getPropertyList(String propertyName, Map<String, String> properties) {
+
+            AtomicBoolean hasRelevantProperty = new AtomicBoolean(false);
+            String prefix = propertyName.isEmpty() ? "" : propertyName + ".";
+
             Map<String, String> propertyMap = new HashMap<>();
-            String annotationName = annotation.name();
-            String prefix = annotationName.isEmpty() ? "" : annotationName + ".";
             int prefixLength = prefix.length();
-            configuration.properties().forEach((key, value) -> {
+            properties.forEach((key, value) -> {
                 if (key.startsWith(prefix)) {
                     int index = key.indexOf('.', prefixLength);
                     if (index == -1) {
-                        propertyMap.put(key.substring(prefixLength), value);
+                        if (!value.isEmpty()) {
+                            hasRelevantProperty.set(true);
+                            propertyMap.put(key.substring(prefixLength), value);
+                        }
                     }
                 }
             });
@@ -1086,7 +1143,7 @@ class MCRConfigurableInstanceHelper {
             if (sentinel.enabled()) {
                 for (String key : new HashSet<>(propertyMap.keySet())) {
                     boolean sentinelValue = sentinel.defaultValue();
-                    String configurationValue = configuration.properties().get(prefix + key + "." + sentinel.name());
+                    String configurationValue = properties.get(prefix + key + "." + sentinel.name());
                     if (configurationValue != null) {
                         sentinelValue = Boolean.parseBoolean(configurationValue);
                     }
@@ -1099,14 +1156,10 @@ class MCRConfigurableInstanceHelper {
             SortedMap<Integer, String> orderedPropertyMap = new TreeMap<>();
             propertyMap.forEach((key, value) -> orderedPropertyMap.put(Integer.parseInt(key), value));
 
-            if (orderedPropertyMap.containsKey(0)) {
-                throw new MCRConfigurationException("Reserved configuration entry used: "
-                    + configuration.name().canonical());
-            }
-
             List<String> shortFormList = List.of();
-            String shortFormProperty = configuration.properties().get(annotationName);
+            String shortFormProperty = properties.get(propertyName);
             if (shortFormProperty != null) {
+                hasRelevantProperty.set(true);
                 shortFormList = parseShortFormList(shortFormProperty);
             }
 
@@ -1115,25 +1168,23 @@ class MCRConfigurableInstanceHelper {
             propertyList.addAll(shortFormList);
             propertyList.addAll(orderedPropertyMap.tailMap(0).values());
 
-            if (propertyList.isEmpty() && annotation.required()) {
-                throw new MCRConfigurationException("Missing configuration entries like: "
-                    + getExampleName(configuration, "1") + ", "
-                    + getExampleName(configuration, "2") + ", ...");
-            }
-
-            return propertyList;
+            return hasRelevantProperty.get() ? propertyList : null;
 
         }
 
-        public static List<String> parseShortFormList(String value) {
+        private List<String> parseShortFormList(String value) {
             return MCRConfiguration2.splitValue(value).toList();
         }
 
-        private String getExampleName(MCRInstanceConfiguration configuration, String example) {
+        private String getExampleNames(MCRInstanceConfiguration configuration, String... examples) {
             if (Objects.equals("", annotation.name())) {
-                return configuration.name().subName(example).canonical();
+                return Arrays.stream(examples).map(example -> configuration.name().subName(example).canonical())
+                    .collect(Collectors.joining(", "));
             } else {
-                return configuration.name().subName(annotation.name() + "." + example).canonical();
+                return configuration.name().subName(annotation.name()).canonical() + ", "
+                    + Arrays.stream(examples).map(
+                        example -> configuration.name().subName(annotation.name() + "." + example).canonical())
+                        .collect(Collectors.joining(", "));
             }
         }
 
@@ -1190,8 +1241,8 @@ class MCRConfigurableInstanceHelper {
         @Override
         public Map<String, String> get(MCRInstanceConfiguration configuration, Target<?> target) {
 
-            Map<String, String> properties = annotation.absolute() ?
-                configuration.fullProperties() : configuration.properties();
+            Map<String, String> properties =
+                annotation.absolute() ? configuration.fullProperties() : configuration.properties();
 
             Map<String, String> filteredProperties = new HashMap<>();
             properties.forEach((key, value) -> {
@@ -1253,7 +1304,12 @@ class MCRConfigurableInstanceHelper {
         @Override
         public Object get(MCRInstanceConfiguration configuration, Target<?> target) {
 
-            MCRInstanceConfiguration nestedConfiguration = configuration.nestedConfiguration(annotation().name());
+            String name = annotation().name();
+            if (name.isEmpty()) {
+                throw new MCRConfigurationException("The name must not be empty");
+            }
+
+            MCRInstanceConfiguration nestedConfiguration = configuration.nestedConfiguration(name);
 
             MCRSentinel sentinel = annotation.sentinel();
             if (sentinel.enabled()) {
@@ -1353,8 +1409,8 @@ class MCRConfigurableInstanceHelper {
 
             Set<Option> options = createOptions(annotation.valueClass(), annotation.required());
             Map<String, Object> instanceMap = nestedConfigurationMap.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry ->
-                    getInstance(annotation.valueClass(), entry.getValue(), options)));
+                .collect(Collectors.toMap(Map.Entry::getKey,
+                    entry -> getInstance(annotation.valueClass(), entry.getValue(), options)));
 
             instanceMap.values().forEach(instance -> {
                 if (!annotation.valueClass().isAssignableFrom(instance.getClass())) {
@@ -1448,8 +1504,8 @@ class MCRConfigurableInstanceHelper {
             }
 
             Set<Option> options = createOptions(annotation.valueClass(), annotation.required());
-            List<Object> instanceList = nestedConfigurationList.stream().map(c ->
-                (Object) getInstance(annotation.valueClass(), c, options)).toList();
+            List<Object> instanceList = nestedConfigurationList.stream()
+                .map(c -> (Object) getInstance(annotation.valueClass(), c, options)).toList();
 
             instanceList.forEach(instance -> {
                 if (!annotation.valueClass().isAssignableFrom(instance.getClass())) {
