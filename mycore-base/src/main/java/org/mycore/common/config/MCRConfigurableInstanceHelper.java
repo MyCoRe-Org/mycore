@@ -976,13 +976,13 @@ class MCRConfigurableInstanceHelper {
             String defaultName = annotation.defaultName();
             if (propertyMap == null && !defaultName.isEmpty()) {
                 propertyMap = getPropertyMap(defaultName, configuration.fullProperties());
-                if (propertyMap == null) {
+                if (propertyMap == null || (propertyMap.isEmpty() && annotation.required())) {
                     throw new MCRConfigurationException("Missing default configuration entries like: "
                         + defaultName + ", " + defaultName + ".A, " + defaultName + ".B, ...");
                 }
             }
 
-            if (propertyMap == null && annotation.required()) {
+            if ((propertyMap == null || propertyMap.isEmpty()) && annotation.required()) {
                 throw new MCRConfigurationException("Missing configuration entries like: "
                     + getExampleNames(configuration, "A", "B") + ", ...");
             }
@@ -1105,13 +1105,13 @@ class MCRConfigurableInstanceHelper {
             String defaultName = annotation.defaultName();
             if (propertyList == null && !defaultName.isEmpty()) {
                 propertyList = getPropertyList(defaultName, configuration.fullProperties());
-                if (propertyList == null) {
+                if (propertyList == null || (propertyList.isEmpty() && annotation.required())) {
                     throw new MCRConfigurationException("Missing default configuration entries like: "
                         + defaultName + ", " + defaultName + ".1, " + defaultName + ".2, ...");
                 }
             }
 
-            if (propertyList == null && annotation.required()) {
+            if ((propertyList == null || propertyList.isEmpty()) && annotation.required()) {
                 throw new MCRConfigurationException("Missing configuration entries like: "
                     + getExampleNames(configuration, "1", "2") + ", ...");
             }
