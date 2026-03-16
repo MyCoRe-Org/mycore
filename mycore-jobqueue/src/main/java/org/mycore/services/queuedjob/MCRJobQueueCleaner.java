@@ -93,9 +93,10 @@ public final class MCRJobQueueCleaner {
 
     public MCRJobQueueCleaner(Map<String, MCRJobSelector> selectors, boolean enabled) {
 
-        this.selectors = new HashMap<>(Objects.requireNonNull(selectors, "Selectors must not be null"));
-        this.selectors
-            .forEach((name, selector) -> Objects.requireNonNull(selector, "Selector " + name + " must not be null"));
+        this.selectors = new HashMap<>(Objects
+            .requireNonNull(selectors, "Selectors must not be null"));
+        this.selectors.forEach((name, selector) -> Objects
+            .requireNonNull(selector, "Selector " + name + " must not be null"));
         this.enabled = enabled;
 
         LOGGER.info(() -> "Working with selectors: " + String.join(", ", selectors.keySet()));
