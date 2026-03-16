@@ -63,7 +63,7 @@ public @interface MCRPropertyMap {
     String defaultName() default "";
 
     /**
-     * @return The {@link MCRSentinel} for the configured instances.
+     * @return The {@link MCRSentinel} for the configured properties.
      */
     MCRSentinel sentinel() default @MCRSentinel(enabled = false);
 

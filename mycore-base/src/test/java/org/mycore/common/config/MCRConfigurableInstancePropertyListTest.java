@@ -30,134 +30,78 @@ import org.mycore.common.config.annotation.MCRPropertyList;
 import org.mycore.test.MyCoReTest;
 
 /**
- * Programmatically created exhaustive list of tests for the following conditions:
+ * Exhaustive list of tests for the following conditions:
  * <ol>
  *   <li>Annotation has <code>required = false</code> or not</li>
- *   <li>Configuration property for instance value is not set, set empty in short form,
+ *   <li>Property value (for a single-element map) is not set, set empty in short form,
  *   set non-empty in short form or set non-empty in long form</li>
  *   <li>Annotation has <code>defaultName = "..."</code> or not</li>
- *   <li>Configuration property for default value is not set, set empty in short form,
+ *   <li>Default property value (for a single-element map) is not set, set empty in short form,
  *   set non-empty in short form or set non-empty in long form </li>
  * </ol>
  * <table style="border-collapse: collapse;">
- *   <caption>Expected results for different conditions</caption>
+ *   <caption><strong>Expected results for different conditions</strong></caption>
  *   <tr>
- *     <th style="border: 1px solid;">Is Required</th>
  *     <th style="border: 1px solid;">Property</th>
  *     <th style="border: 1px solid;">Has Default</th>
  *     <th style="border: 1px solid;">Default Property</th>
- *     <th style="border: 1px solid;">Expected Result</th>
+ *     <th style="border: 1px solid;">Expected Optional Result</th>
+ *     <th style="border: 1px solid;">Expected Required Result</th>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;"><code>[]</code></td>
+ *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">yes</td>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">Exception</td>
+ *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">yes</td>
  *     <td style="border: 1px solid;"><code>X=</code></td>
  *     <td style="border: 1px solid;"><code>[]</code></td>
+ *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">yes</td>
  *     <td style="border: 1px solid;"><code>X=y,z</code></td>
  *     <td style="border: 1px solid;"><code>[y, z]</code></td>
+ *     <td style="border: 1px solid;"><code>[y, z]</code></td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">yes</td>
  *     <td style="border: 1px solid;"><code>X.1=y</code>, <code>X.2=z</code></td>
  *     <td style="border: 1px solid;"><code>[y, z]</code></td>
+ *     <td style="border: 1px solid;"><code>[y, z]</code></td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;"><code>A=</code></td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;"><code>[]</code></td>
+ *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;"><code>A=b,c</code></td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;"><code>[b, c]</code></td>
+ *     <td style="border: 1px solid;"><code>[b, c]</code></td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;"><code>A.1=b</code>, <code>A.2=c</code></td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;"><code>[b, c]</code></td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">no</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;"><code>X=</code></td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;"><code>X=y,z</code></td>
- *     <td style="border: 1px solid;"><code>[y, z]</code></td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;"><code>X.1=y</code>, <code>X.2=z</code></td>
- *     <td style="border: 1px solid;"><code>[y, z]</code></td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;"><code>A=</code></td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;"><code>A=b,c</code></td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>[b, c]</code></td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;"><code>A.1=b</code>, <code>A.2=c</code></td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;"><code>[b, c]</code></td>
  *   </tr>
  * </table>
@@ -229,8 +173,9 @@ public class MCRConfigurableInstancePropertyListTest {
             MCRConfigurableInstanceHelper.getInstance(
                 NotRequiredDefaultSet.class, configuration);
         });
-        assertEquals("Missing default configuration entries like: MCR.List, MCR.List.1, MCR.List.2, ...",
-            exception.getMessage());
+        assertEquals("Default property list, configured in MCR.List (and its sub-properties)," +
+            " for target field 'list' in configured class " + NotRequiredDefaultSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -600,8 +545,9 @@ public class MCRConfigurableInstancePropertyListTest {
             MCRConfigurableInstanceHelper.getInstance(
                 RequiredDefaultNotSet.class, configuration);
         });
-        assertEquals("Missing configuration entries like: Foo.List, Foo.List.1, Foo.List.2, ...",
-            exception.getMessage());
+        assertEquals("Property list, configured in Foo.List (and its sub-properties)," +
+            " for target field 'list' in configured class " + RequiredDefaultNotSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -615,8 +561,9 @@ public class MCRConfigurableInstancePropertyListTest {
             MCRConfigurableInstanceHelper.getInstance(
                 RequiredDefaultNotSet.class, configuration);
         });
-        assertEquals("Missing configuration entries like: Foo.List, Foo.List.1, Foo.List.2, ...",
-            exception.getMessage());
+        assertEquals("Property list, configured in Foo.List (and its sub-properties)," +
+            " for target field 'list' in configured class " + RequiredDefaultNotSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -630,8 +577,9 @@ public class MCRConfigurableInstancePropertyListTest {
             MCRConfigurableInstanceHelper.getInstance(
                 RequiredDefaultNotSet.class, configuration);
         });
-        assertEquals("Missing configuration entries like: Foo.List, Foo.List.1, Foo.List.2, ...",
-            exception.getMessage());
+        assertEquals("Property list, configured in Foo.List (and its sub-properties)," +
+            " for target field 'list' in configured class " + RequiredDefaultNotSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -646,8 +594,9 @@ public class MCRConfigurableInstancePropertyListTest {
             MCRConfigurableInstanceHelper.getInstance(
                 RequiredDefaultNotSet.class, configuration);
         });
-        assertEquals("Missing configuration entries like: Foo.List, Foo.List.1, Foo.List.2, ...",
-            exception.getMessage());
+        assertEquals("Property list, configured in Foo.List (and its sub-properties)," +
+            " for target field 'list' in configured class " + RequiredDefaultNotSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -660,8 +609,9 @@ public class MCRConfigurableInstancePropertyListTest {
             MCRConfigurableInstanceHelper.getInstance(
                 RequiredDefaultSet.class, configuration);
         });
-        assertEquals("Missing default configuration entries like: MCR.List, MCR.List.1, MCR.List.2, ...",
-            exception.getMessage());
+        assertEquals("Default property list, configured in MCR.List (and its sub-properties)," +
+            " for target field 'list' in configured class " + RequiredDefaultSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -675,7 +625,8 @@ public class MCRConfigurableInstancePropertyListTest {
             MCRConfigurableInstanceHelper.getInstance(
                 RequiredDefaultSet.class, configuration);
         });
-        assertEquals("Missing default configuration entries like: MCR.List, MCR.List.1, MCR.List.2, ...",
+        assertEquals("Default property list, configured in MCR.List (and its sub-properties)," +
+            " for target field 'list' in configured class " + RequiredDefaultSet.class.getName() + " is empty",
             exception.getMessage());
     }
 
@@ -713,10 +664,11 @@ public class MCRConfigurableInstancePropertyListTest {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                    RequiredDefaultNotSet.class, configuration);
+                RequiredDefaultNotSet.class, configuration);
         });
-        assertEquals("Missing configuration entries like: Foo.List, Foo.List.1, Foo.List.2, ...",
-                exception.getMessage());
+        assertEquals("Property list, configured in Foo.List (and its sub-properties)," +
+            " for target field 'list' in configured class " + RequiredDefaultNotSet.class.getName() + " is empty",
+            exception.getMessage());
     }
 
     @Test
@@ -729,10 +681,11 @@ public class MCRConfigurableInstancePropertyListTest {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                    RequiredDefaultNotSet.class, configuration);
+                RequiredDefaultNotSet.class, configuration);
         });
-        assertEquals("Missing configuration entries like: Foo.List, Foo.List.1, Foo.List.2, ...",
-                exception.getMessage());
+        assertEquals("Property list, configured in Foo.List (and its sub-properties)," +
+            " for target field 'list' in configured class " + RequiredDefaultNotSet.class.getName() + " is empty",
+            exception.getMessage());
     }
 
     @Test
@@ -745,10 +698,11 @@ public class MCRConfigurableInstancePropertyListTest {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                    RequiredDefaultNotSet.class, configuration);
+                RequiredDefaultNotSet.class, configuration);
         });
-        assertEquals("Missing configuration entries like: Foo.List, Foo.List.1, Foo.List.2, ...",
-                exception.getMessage());
+        assertEquals("Property list, configured in Foo.List (and its sub-properties)," +
+            " for target field 'list' in configured class " + RequiredDefaultNotSet.class.getName() + " is empty",
+            exception.getMessage());
     }
 
     @Test
@@ -762,10 +716,11 @@ public class MCRConfigurableInstancePropertyListTest {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                    RequiredDefaultNotSet.class, configuration);
+                RequiredDefaultNotSet.class, configuration);
         });
-        assertEquals("Missing configuration entries like: Foo.List, Foo.List.1, Foo.List.2, ...",
-                exception.getMessage());
+        assertEquals("Property list, configured in Foo.List (and its sub-properties)," +
+            " for target field 'list' in configured class " + RequiredDefaultNotSet.class.getName() + " is empty",
+            exception.getMessage());
     }
 
     @Test
@@ -777,10 +732,11 @@ public class MCRConfigurableInstancePropertyListTest {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                    RequiredDefaultSet.class, configuration);
+                RequiredDefaultSet.class, configuration);
         });
-        assertEquals("Missing configuration entries like: Foo.List, Foo.List.1, Foo.List.2, ...",
-                exception.getMessage());
+        assertEquals("Property list, configured in Foo.List (and its sub-properties)," +
+            " for target field 'list' in configured class " + RequiredDefaultSet.class.getName() + " is empty",
+            exception.getMessage());
     }
 
     @Test
@@ -793,10 +749,11 @@ public class MCRConfigurableInstancePropertyListTest {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                    RequiredDefaultSet.class, configuration);
+                RequiredDefaultSet.class, configuration);
         });
-        assertEquals("Missing configuration entries like: Foo.List, Foo.List.1, Foo.List.2, ...",
-                exception.getMessage());
+        assertEquals("Property list, configured in Foo.List (and its sub-properties)," +
+            " for target field 'list' in configured class " + RequiredDefaultSet.class.getName() + " is empty",
+            exception.getMessage());
     }
 
     @Test
@@ -809,10 +766,11 @@ public class MCRConfigurableInstancePropertyListTest {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                    RequiredDefaultSet.class, configuration);
+                RequiredDefaultSet.class, configuration);
         });
-        assertEquals("Missing configuration entries like: Foo.List, Foo.List.1, Foo.List.2, ...",
-                exception.getMessage());
+        assertEquals("Property list, configured in Foo.List (and its sub-properties)," +
+            " for target field 'list' in configured class " + RequiredDefaultSet.class.getName() + " is empty",
+            exception.getMessage());
     }
 
     @Test
@@ -826,10 +784,11 @@ public class MCRConfigurableInstancePropertyListTest {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
             MCRConfigurableInstanceHelper.getInstance(
-                    RequiredDefaultSet.class, configuration);
+                RequiredDefaultSet.class, configuration);
         });
-        assertEquals("Missing configuration entries like: Foo.List, Foo.List.1, Foo.List.2, ...",
-                exception.getMessage());
+        assertEquals("Property list, configured in Foo.List (and its sub-properties)," +
+            " for target field 'list' in configured class " + RequiredDefaultSet.class.getName() + " is empty",
+            exception.getMessage());
     }
 
     @Test
