@@ -18,9 +18,9 @@
 
 package org.mycore.common.config;
 
-import org.mycore.common.MCRException;
-
 import java.io.Serial;
+
+import org.mycore.common.MCRException;
 
 /**
  * Instances of this class represent an exception thrown because of an error in the MyCoRe configuration. Normally this

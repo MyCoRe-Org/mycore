@@ -61,7 +61,7 @@ public @interface MCRPropertyList {
      * The default property must be absolute, e.g. <code>MCR.Foo.Bar</code>.
      */
     String defaultName() default "";
-    
+
     /**
      * @return The {@link MCRSentinel} for the configured properties.
      */

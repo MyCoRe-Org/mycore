@@ -29,6 +29,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.common.config.MCRInstanceConfiguration.Options;
 import org.mycore.common.config.annotation.MCRPropertyList;
 import org.mycore.common.config.annotation.MCRPropertyMap;
 import org.mycore.common.config.annotation.MCRSentinel;
@@ -253,7 +254,7 @@ public class MCRConfigurableInstanceHelperCollectionTest {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo.Class");
         TestClassWithMapWithoutPrefix instance = MCRConfigurableInstanceHelper
             .getInstance(TestClassWithMapWithoutPrefix.class, configuration,
-                MCRConfigurableInstanceHelper.ADD_IMPLICIT_CLASS_PROPERTIES);
+                Options.IMPLICIT);
 
         assertNotNull(instance);
         assertNotNull(instance.map);
@@ -539,7 +540,7 @@ public class MCRConfigurableInstanceHelperCollectionTest {
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo.Class");
         TestClassWithListWithoutPrefix instance = MCRConfigurableInstanceHelper
             .getInstance(TestClassWithListWithoutPrefix.class, configuration,
-                MCRConfigurableInstanceHelper.ADD_IMPLICIT_CLASS_PROPERTIES);
+                Options.IMPLICIT);
 
         assertNotNull(instance);
         assertNotNull(instance.list);
