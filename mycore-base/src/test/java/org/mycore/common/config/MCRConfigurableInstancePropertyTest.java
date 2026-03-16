@@ -29,104 +29,62 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.test.MyCoReTest;
 
 /**
- * Programmatically created exhaustive list of tests for the following conditions:
+ * Exhaustive list of tests for the following conditions:
  * <ol>
  *   <li>Annotation has <code>required = false</code> or not</li>
- *   <li>Configuration property for instance value is not set, empty or non-empty</li>
+ *   <li>Property value is not set, empty or non-empty</li>
  *   <li>Annotation has <code>defaultName = "..."</code> or not</li>
- *   <li>Configuration property for default value is not set, empty or non-empty</li>
+ *   <li>Default property value is not set, empty or non-empty</li>
  * </ol>
  * <table style="border-collapse: collapse;">
  *   <caption>Expected results for different conditions</caption>
  *   <tr>
- *     <th style="border: 1px solid;">Is Required</th>
  *     <th style="border: 1px solid;">Property</th>
  *     <th style="border: 1px solid;">Has Default</th>
  *     <th style="border: 1px solid;">Default Property</th>
- *     <th style="border: 1px solid;">Expected Result</th>
+ *     <th style="border: 1px solid;">Expected Optional Result</th>
+ *     <th style="border: 1px solid;">Expected Required Result</th>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;"><code>null</code></td>
+ *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">yes</td>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">no</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;">empty</td>
- *     <td style="border: 1px solid;">empty</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">no</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;"><code>DefaultValue</code></td>
- *     <td style="border: 1px solid;"><code>DefaultValue</code></td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">no</td>
- *     <td style="border: 1px solid;">empty</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">empty</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">no</td>
- *     <td style="border: 1px solid;"><code>Value</code></td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>Value</code></td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">no</td>
- *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">yes</td>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">yes</td>
  *     <td style="border: 1px solid;">empty</td>
  *     <td style="border: 1px solid;">empty</td>
+ *     <td style="border: 1px solid;">empty</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">yes</td>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">yes</td>
  *     <td style="border: 1px solid;"><code>DefaultValue</code></td>
  *     <td style="border: 1px solid;"><code>DefaultValue</code></td>
+ *     <td style="border: 1px solid;"><code>DefaultValue</code></td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">yes</td>
  *     <td style="border: 1px solid;">empty</td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;">empty</td>
+ *     <td style="border: 1px solid;">empty</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">yes</td>
  *     <td style="border: 1px solid;"><code>Value</code></td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;">-</td>
+ *     <td style="border: 1px solid;"><code>Value</code></td>
  *     <td style="border: 1px solid;"><code>Value</code></td>
  *   </tr>
  * </table>
@@ -179,7 +137,9 @@ public class MCRConfigurableInstancePropertyTest {
             MCRConfigurableInstanceHelper.getInstance(
                 NotRequiredDefaultSet.class, configuration);
         });
-        assertEquals("The default property MCR.Value is missing", exception.getMessage());
+        assertEquals("Default property, configured in MCR.Value (and its sub-properties)," +
+            " for target field 'value' in configured class " + NotRequiredDefaultSet.class.getName()
+            + " is missing", exception.getMessage());
     }
 
     @Test
@@ -368,7 +328,9 @@ public class MCRConfigurableInstancePropertyTest {
             MCRConfigurableInstanceHelper.getInstance(
                 RequiredDefaultNotSet.class, configuration);
         });
-        assertEquals("The required property Foo.Value is missing", exception.getMessage());
+        assertEquals("Property, configured in Foo.Value (and its sub-properties)," +
+            " for target field 'value' in configured class " + RequiredDefaultNotSet.class.getName()
+            + " is missing", exception.getMessage());
     }
 
     @Test
@@ -382,7 +344,9 @@ public class MCRConfigurableInstancePropertyTest {
             MCRConfigurableInstanceHelper.getInstance(
                 RequiredDefaultNotSet.class, configuration);
         });
-        assertEquals("The required property Foo.Value is missing", exception.getMessage());
+        assertEquals("Property, configured in Foo.Value (and its sub-properties)," +
+            " for target field 'value' in configured class " + RequiredDefaultNotSet.class.getName()
+            + " is missing", exception.getMessage());
     }
 
     @Test
@@ -396,7 +360,9 @@ public class MCRConfigurableInstancePropertyTest {
             MCRConfigurableInstanceHelper.getInstance(
                 RequiredDefaultNotSet.class, configuration);
         });
-        assertEquals("The required property Foo.Value is missing", exception.getMessage());
+        assertEquals("Property, configured in Foo.Value (and its sub-properties)," +
+            " for target field 'value' in configured class " + RequiredDefaultNotSet.class.getName()
+            + " is missing", exception.getMessage());
     }
 
     @Test
@@ -409,7 +375,9 @@ public class MCRConfigurableInstancePropertyTest {
             MCRConfigurableInstanceHelper.getInstance(
                 RequiredDefaultSet.class, configuration);
         });
-        assertEquals("The default property MCR.Value is missing", exception.getMessage());
+        assertEquals("Default property, configured in MCR.Value (and its sub-properties)," +
+            " for target field 'value' in configured class " + RequiredDefaultSet.class.getName()
+            + " is missing", exception.getMessage());
     }
 
     @Test
