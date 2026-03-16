@@ -19,9 +19,11 @@
 package org.mycore.common.config;
 
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Represents an extract of properties (typically {@link MCRConfiguration2#getPropertiesMap()}) used to
@@ -389,6 +391,9 @@ public final class MCRInstanceConfiguration {
      * @return the nested configuration map
      */
     public Map<String, MCRInstanceConfiguration> nestedConfigurationMap(String commonPrefix) {
+        if (commonPrefix.isEmpty()) {
+            return nestedConfigurationMap();
+        }
         String commonSuffixWithDelimiter = commonPrefix + ".";
         Map<String, MCRInstanceConfiguration> nestedConfigurationMap = new HashMap<>();
         for (Map.Entry<String, String> entry : properties().entrySet()) {
@@ -442,6 +447,30 @@ public final class MCRInstanceConfiguration {
             "className=" + className + ", " +
             "fullProperties=" + properties + ", " +
             "#fullProperties=" + fullProperties.size() + "}";
+    }
+
+    public enum Option {
+
+        /**
+         * If a class name is required to be in the configuration properties (for example, because of usage of
+         * {@link MCRConfiguration2#getInstanceOfOrThrow(Class, String)} or because of an annotation with
+         * <code>required=true</code>) and the expected super class is a final class (meaning, if the property
+         * containing the class name is required to exist and can only have the class name of that final class),
+         * assume that that property exists (if it doesn't).
+         */
+        IMPLICIT
+
+    }
+
+    public static final class Options {
+
+        public static final Set<Option> NONE = EnumSet.noneOf(Option.class);
+
+        public static final Set<Option> IMPLICIT = EnumSet.of(Option.IMPLICIT);
+
+        private Options() {
+        }
+
     }
 
 }
