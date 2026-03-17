@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- XSL to display login options as defined in realms.xml -->
-<xsl:stylesheet version="1.0"
+<xsl:stylesheet version="3.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
-  exclude-result-prefixes="mcri18n">
+  exclude-result-prefixes="#all">
 
   <xsl:include href="MyCoReLayout.xsl" />
 
@@ -14,18 +14,19 @@
       <div class="section">
         <p>
           <xsl:variable name="currentAccount">
-            <xsl:value-of select="'&lt;strong&gt;'" />
-            <xsl:choose>
-              <xsl:when test="@guest='true'">
-                <xsl:value-of select="mcri18n:translate('component.user2.login.guest')" />
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="concat(@user,' [',@realm,']')" />
-              </xsl:otherwise>
-            </xsl:choose>
-            <xsl:value-of select="'&lt;/strong&gt;'" />
+            <strong>
+              <xsl:choose>
+                <xsl:when test="@guest='true'">
+                  <xsl:value-of select="mcri18n:translate('component.user2.login.guest')" />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="concat(@user,' [',@realm,']')" />
+                </xsl:otherwise>
+              </xsl:choose>
+            </strong>
           </xsl:variable>
-          <xsl:value-of select="mcri18n:translate-with-params('component.user2.login.currentAccount', $currentAccount)" disable-output-escaping="yes" />
+          <xsl:copy-of
+            select="parse-xml-fragment(mcri18n:translate-with-params('component.user2.login.currentAccount', serialize($currentAccount)))/node()" />
         </p>
       </div>
       <div class="section" id="sectionlast">
@@ -66,7 +67,20 @@
 
   <xsl:template match="*[label]" mode="printLabel">
     <xsl:variable name="lang" select="mcri18n:select-present-lang(label)" />
-    <xsl:value-of select="label[lang($lang)]" disable-output-escaping="yes" />
+    <xsl:variable name="selectedLabel" select="label[lang($lang)][1]" />
+    <xsl:choose>
+      <xsl:when test="$selectedLabel/*">
+        <xsl:copy-of select="$selectedLabel/node()" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:try>
+          <xsl:copy-of select="parse-xml-fragment(string($selectedLabel))/node()" />
+          <xsl:catch>
+            <xsl:value-of select="$selectedLabel" />
+          </xsl:catch>
+        </xsl:try>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="realm">
