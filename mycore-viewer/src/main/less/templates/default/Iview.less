@@ -115,14 +115,18 @@
     li.list-group-item {
       border: none;
       margin: 3px;
-      display: flex;
+      display: grid;
       border-radius: 0;
+      grid-template-columns: 1fr max-content;
 
       span.childLabel {
         color: gray;
-        text-align: right;
-        min-width: 7rem;
+        margin-left: 1.5em;
       }
+    }
+
+    li.list-group-item.expandable {
+      grid-template-columns: max-content 1fr max-content;
     }
 
     li a {
@@ -131,10 +135,9 @@
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
-      flex-grow: 1;
     }
 
-    li[data-selected=true] {
+    li[data-selected=true], li.active {
       background: rgb(50, 118, 177);
       border-color: rgb(40, 94, 142);
       color: white;
@@ -162,6 +165,7 @@
         }
       }
       a {
+        margin-left: 0;
         white-space: normal;
         overflow: visible;
       }
