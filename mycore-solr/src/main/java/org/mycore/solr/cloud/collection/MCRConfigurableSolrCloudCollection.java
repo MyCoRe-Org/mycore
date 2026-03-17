@@ -50,7 +50,7 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
     private final CloudSolrClient client;
     private final CloudSolrClient baseClient;
     private final String collectionName;
-    private final Set<MCRIndexType> coreTypes;
+    private final Set<MCRIndexType> indexTypes;
 
     private final Integer numShards;
     private final Integer numNrtReplicas;
@@ -60,13 +60,13 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
     private final String configSetTemplate;
 
     public MCRConfigurableSolrCloudCollection(CloudSolrClient client, CloudSolrClient baseClient,
-        String collectionName, Set<MCRIndexType> coreTypes, Integer numShards,
+        String collectionName, Set<MCRIndexType> indexTypes, Integer numShards,
         Integer numNrtReplicas, Integer numTlogReplicas, Integer numPullReplicas,
         String configSetTemplate) {
         this.client = client;
         this.baseClient = baseClient;
         this.collectionName = collectionName;
-        this.coreTypes = coreTypes;
+        this.indexTypes = indexTypes;
         this.numShards = numShards;
         this.numNrtReplicas = numNrtReplicas;
         this.numTlogReplicas = numTlogReplicas;
@@ -96,8 +96,8 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
     }
 
     @Override
-    public Set<MCRIndexType> getCoreTypes() {
-        return coreTypes;
+    public Set<MCRIndexType> getIndexTypes() {
+        return indexTypes;
     }
 
     @Override
@@ -273,7 +273,7 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
                 clientPair.client,
                 clientPair.baseClient,
                 getCollectionName(),
-                buildCoreTypes(),
+                buildIndexTypes(),
                 numShards != null ? Integer.parseInt(numShards) : null,
                 numNrtReplicas != null ? Integer.parseInt(numNrtReplicas) : null,
                 numTlogReplicas != null ? Integer.parseInt(numTlogReplicas) : null,

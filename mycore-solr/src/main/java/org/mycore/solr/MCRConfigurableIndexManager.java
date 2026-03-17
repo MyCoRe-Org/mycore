@@ -33,6 +33,23 @@ import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.solr.MCRConfigurableIndexManager.ConfigAdapter;
 
+/**
+ * Configurable implementation of {@link MCRSolrIndexManager} that manages a set of
+ * {@link MCRSolrIndex} instances provided via the MyCoRe configuration system.
+ *
+ * <p>The indexes are injected as a name-to-index map through the {@link ConfigAdapter},
+ * which reads the configuration properties prefixed with
+ * {@link MCRSolrConstants#SOLR_COLLECTION_MANAGER_INDEX_PREFIX}. Each entry in the map
+ * represents a named Solr collection or core that can be looked up by its identifier
+ * or filtered by its {@link MCRIndexType}.</p>
+ *
+ * <p>This manager registers itself with the {@link MCRShutdownHandler} to ensure that
+ * all underlying Solr clients are properly closed when the application shuts down.</p>
+ *
+ * @see MCRSolrIndexManager
+ * @see MCRSolrIndex
+ * @see ConfigAdapter
+ */
 @MCRConfigurationProxy(
     proxyClass = ConfigAdapter.class)
 public class MCRConfigurableIndexManager implements MCRSolrIndexManager {
@@ -58,7 +75,7 @@ public class MCRConfigurableIndexManager implements MCRSolrIndexManager {
     public List<MCRSolrIndex> getIndexWithType(MCRIndexType type) {
         return configuredCollections.values()
             .stream()
-            .filter(col -> col.getCoreTypes().contains(type))
+            .filter(col -> col.getIndexTypes().contains(type))
             .toList();
     }
 

@@ -43,16 +43,16 @@ public class MCRConfigurableSolrCore implements MCRSolrIndex {
     private final HttpSolrClientBase client;
     private final HttpSolrClientBase baseClient;
     private final ConcurrentUpdateBaseSolrClient concurrentClient;
-    private final Set<MCRIndexType> coreTypes;
+    private final Set<MCRIndexType> indexTypes;
 
     MCRConfigurableSolrCore(HttpSolrClientBase client, HttpSolrClientBase baseClient,
         ConcurrentUpdateBaseSolrClient concurrentClient, String coreName,
-        Set<MCRIndexType> coreTypes) {
+        Set<MCRIndexType> indexTypes) {
         this.client = client;
         this.baseClient = baseClient;
         this.concurrentClient = concurrentClient;
         this.coreName = coreName;
-        this.coreTypes = coreTypes;
+        this.indexTypes = indexTypes;
     }
 
     @Override
@@ -76,8 +76,8 @@ public class MCRConfigurableSolrCore implements MCRSolrIndex {
     }
 
     @Override
-    public Set<MCRIndexType> getCoreTypes() {
-        return coreTypes;
+    public Set<MCRIndexType> getIndexTypes() {
+        return indexTypes;
     }
 
     @Override
@@ -179,7 +179,7 @@ public class MCRConfigurableSolrCore implements MCRSolrIndex {
                 }
             }
 
-            return new MCRConfigurableSolrCore(client, base, concurrentClient, getCoreName(), buildCoreTypes());
+            return new MCRConfigurableSolrCore(client, base, concurrentClient, getCoreName(), buildIndexTypes());
         }
 
     }

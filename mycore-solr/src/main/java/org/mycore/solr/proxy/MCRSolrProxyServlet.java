@@ -227,7 +227,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
         SOLR_AUTHENTICATION_MANAGER.applyAuthentication(queryRequest, MCRSolrAuthenticationLevel.SEARCH);
 
         String core = Optional.ofNullable(request.getParameter(QUERY_CORE_PARAMETER))
-            .orElse(MCRSolrConstants.MAIN_CORE_TYPE);
+            .orElse(MCRSolrConstants.MAIN_INDEX_ID);
 
         Optional<MCRSolrIndex> optionalIndex = MCRSolrIndexManager.obtainInstance().getIndex(core);
         if (optionalIndex.isEmpty()) {

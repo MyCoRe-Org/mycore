@@ -30,7 +30,7 @@ import org.mycore.common.config.annotation.MCRProperty;
 
 public abstract class MCRAbstractHttpBasedIndexConfigAdapter<T extends MCRSolrIndex> implements Supplier<T> {
 
-    private String coreTypes;
+    private String indexTypes;
 
     private String idleTimeout;
 
@@ -48,13 +48,13 @@ public abstract class MCRAbstractHttpBasedIndexConfigAdapter<T extends MCRSolrIn
 
     private boolean useJettyHttpClient;
 
-    public String getCoreTypes() {
-        return coreTypes;
+    public String getIndexTypes() {
+        return indexTypes;
     }
 
-    @MCRProperty(name = "CoreTypes")
-    public void setCoreTypes(String coreTypes) {
-        this.coreTypes = coreTypes;
+    @MCRProperty(name = "IndexTypes")
+    public void setIndexTypes(String indexTypes) {
+        this.indexTypes = indexTypes;
     }
 
     public String getIdleTimeout() {
@@ -170,8 +170,8 @@ public abstract class MCRAbstractHttpBasedIndexConfigAdapter<T extends MCRSolrIn
 
     }
 
-    protected Set<MCRIndexType> buildCoreTypes() {
-        return MCRConfiguration2.splitValue(coreTypes)
+    protected Set<MCRIndexType> buildIndexTypes() {
+        return MCRConfiguration2.splitValue(indexTypes)
             .map(String::trim)
             .map(MCRIndexType::new)
             .collect(java.util.stream.Collectors.toSet());

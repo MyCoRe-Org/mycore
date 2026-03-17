@@ -30,9 +30,9 @@ public class MCRSolrConstants {
 
     public static final String SOLR_CORE_PREFIX = SOLR_CONFIG_PREFIX + "Core.";
 
-    public static final String SOLR_COLLECTION_MANAGER_PROPERTY_PREFIX = SOLR_CONFIG_PREFIX + "IndexManager.";
+    public static final String SOLR_INDEX_MANAGER_PROPERTY_PREFIX = SOLR_CONFIG_PREFIX + "IndexManager.";
 
-    public static final String SOLR_COLLECTION_MANAGER_PROPERTY = SOLR_COLLECTION_MANAGER_PROPERTY_PREFIX +
+    public static final String SOLR_INDEX_MANAGER_PROPERTY = SOLR_INDEX_MANAGER_PROPERTY_PREFIX +
         "Class";
 
     public static final String SOLR_COLLECTION_MANAGER_INDEX_PREFIX = "Index";
@@ -51,5 +51,5 @@ public class MCRSolrConstants {
 
     public static final String SOLR_JOIN_PATTERN = "{!join from=returnId to=id}";
 
-    public static final String MAIN_CORE_TYPE = "main";
+    public static final String MAIN_INDEX_ID = "main";
 }

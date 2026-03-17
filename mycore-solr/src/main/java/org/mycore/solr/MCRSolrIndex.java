@@ -64,7 +64,7 @@ public interface MCRSolrIndex {
    * collection/core
    * @return a set
    */
-  Set<MCRIndexType> getCoreTypes();
+  Set<MCRIndexType> getIndexTypes();
 
   /**
    * Closes the underlying SolrClient(s) and releases any resources.
