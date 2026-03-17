@@ -1342,21 +1342,13 @@ class MCRConfigurableInstanceHelper {
 
     }
 
-    private static final class Injector<T, A extends Annotation> implements Comparable<Injector<?, ?>> {
+    private record Injector<T, A extends Annotation>(Target<T> target, Source<A, ?> source)
+        implements Comparable<Injector<?, ?>> {
 
         private static final Comparator<Injector<?, ?>> COMPARATOR = Comparator
             .comparingInt((ToIntFunction<Injector<?, ?>>) injector -> injector.target.type().order)
             .thenComparingInt(injector -> injector.source.type().order)
             .thenComparingInt(injector -> injector.source.order());
-
-        private final Target<T> target;
-
-        private final Source<A, ?> source;
-
-        private Injector(Target<T> target, Source<A, ?> source) {
-            this.target = target;
-            this.source = source;
-        }
 
         public void inject(T instance, MCRInstanceConfiguration configuration) {
             Object value = source.get(configuration, target);

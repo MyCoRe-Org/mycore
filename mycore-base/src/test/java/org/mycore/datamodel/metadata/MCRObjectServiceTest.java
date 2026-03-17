@@ -71,9 +71,9 @@ public class MCRObjectServiceTest {
      */
     @Test
     public void getServFlags() {
-        assertEquals("editorA", testService.getFlags(MCRObjectService.FLAG_TYPE_CREATEDBY).get(0),
+        assertEquals("editorA", testService.getFlags(MCRObjectService.FLAG_TYPE_CREATEDBY).getFirst(),
             "Servflag of type 'createdby' does not contain 'editorA'");
-        assertEquals("editorB", testService.getFlags(MCRObjectService.FLAG_TYPE_MODIFIEDBY).get(0),
+        assertEquals("editorB", testService.getFlags(MCRObjectService.FLAG_TYPE_MODIFIEDBY).getFirst(),
             "Servflag of type 'modifiedby' does not contain 'editorB'");
     }
 

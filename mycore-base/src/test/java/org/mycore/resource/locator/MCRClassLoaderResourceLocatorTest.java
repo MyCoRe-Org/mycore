@@ -98,7 +98,7 @@ public class MCRClassLoaderResourceLocatorTest {
         List<URL> resourceUrls = locator.locate(FOO_PATH, hints).toList();
 
         assertEquals(1, resourceUrls.size());
-        assertEquals(toUrl(fooBaseDir, "foo"), resourceUrls.get(0));
+        assertEquals(toUrl(fooBaseDir, "foo"), resourceUrls.getFirst());
 
     }
 
@@ -111,7 +111,7 @@ public class MCRClassLoaderResourceLocatorTest {
         List<URL> resourceUrls = locator.locate(FOO_PATH, hints).toList();
 
         assertEquals(1, resourceUrls.size());
-        assertEquals(toUrl(fooBaseDir, "foo"), resourceUrls.get(0));
+        assertEquals(toUrl(fooBaseDir, "foo"), resourceUrls.getFirst());
 
     }
 
@@ -138,7 +138,7 @@ public class MCRClassLoaderResourceLocatorTest {
         List<URL> resourceUrls = locator.locate(BAR_PATH, hints).toList();
 
         assertEquals(1, resourceUrls.size());
-        assertEquals(toUrl(barBaseDir, "bar"), resourceUrls.get(0));
+        assertEquals(toUrl(barBaseDir, "bar"), resourceUrls.getFirst());
 
     }
 

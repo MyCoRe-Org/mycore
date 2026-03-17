@@ -214,7 +214,7 @@ public class MCRNeo4JQueryRunner {
             metaDataList.add(new Neo4JMetaData(key, stringList));
         } else if (value instanceof String content) {
             if (content.contains(NEO4J_PARAMETER_SEPARATOR)) {
-                String[] sep = ((String) value).split(NEO4J_PARAMETER_SEPARATOR);
+                String[] sep = content.split(NEO4J_PARAMETER_SEPARATOR);
                 String classification = getClassificationLabel(sep[0], sep[1], lang);
                 metaDataList.add(new Neo4JMetaData(key, List.of(classification)));
             } else {

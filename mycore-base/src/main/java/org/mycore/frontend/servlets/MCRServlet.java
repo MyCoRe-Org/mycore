@@ -31,11 +31,11 @@ import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import javax.xml.transform.TransformerException;
 
@@ -549,23 +549,13 @@ public class MCRServlet extends HttpServlet {
      *            the http request parameters
      */
     protected String buildRedirectURL(String baseURL, Properties parameters) {
-        StringBuilder redirectURL = new StringBuilder(baseURL);
-        boolean first = true;
-        for (Enumeration<?> e = parameters.keys(); e.hasMoreElements();) {
-            if (first) {
-                redirectURL.append('?');
-                first = false;
-            } else {
-                redirectURL.append('&');
-            }
+        String query = parameters.stringPropertyNames().stream()
+            .map(name -> name + "=" + URLEncoder.encode(parameters.getProperty(name), StandardCharsets.UTF_8))
+            .collect(Collectors.joining("&"));
 
-            String name = (String) e.nextElement();
-            String value = URLEncoder.encode(parameters.getProperty(name), StandardCharsets.UTF_8);
-
-            redirectURL.append(name).append('=').append(value);
-        }
+        String redirectURL = query.isEmpty() ? baseURL : baseURL + "?" + query;
         LOGGER.debug("Sending redirect to {}", redirectURL);
-        return redirectURL.toString();
+        return redirectURL;
     }
 
     /**

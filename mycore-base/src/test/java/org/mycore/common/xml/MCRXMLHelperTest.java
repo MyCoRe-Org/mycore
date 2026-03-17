@@ -84,8 +84,12 @@ public class MCRXMLHelperTest {
         Element root = new Element("root");
         root.addContent(l1);
 
-        String formattedXML = "<root>\n<child>Hallo Welt</child>\n" + "<child>hello world</child>"
-            + "<child>Bonjour le monde</child>\n</root>";
+        String formattedXML = """
+                <root>
+                <child>Hallo Welt</child>
+                <child>hello world</child>
+                <child>Bonjour le monde</child>
+                </root>""";
         SAXBuilder b = new SAXBuilder();
         Document doc = b.build(new ByteArrayInputStream(formattedXML.getBytes(StandardCharsets.UTF_8)));
 

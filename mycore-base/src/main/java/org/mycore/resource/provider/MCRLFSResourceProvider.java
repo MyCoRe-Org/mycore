@@ -125,7 +125,7 @@ public class MCRLFSResourceProvider extends MCRResourceProviderBase {
         while (subsetIterator.hasPrevious()) {
             T element = subsetIterator.previous();
             list.remove(element);
-            list.add(0, element);
+            list.addFirst(element);
         }
         return list;
     }

@@ -18,16 +18,12 @@
 
 package org.mycore.common.xml;
 
-import java.util.Objects;
-
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.dom.DOMSource;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
@@ -62,8 +58,6 @@ import org.w3c.dom.Element;
  */
 public class MCRUserAndObjectRightsURIResolver implements URIResolver {
 
-    private static final Logger LOGGER = LogManager.getLogger();
-
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         String query = href.substring(href.indexOf(':') + 1);
@@ -72,45 +66,34 @@ public class MCRUserAndObjectRightsURIResolver implements URIResolver {
         String value = query.substring(query.indexOf(':') + 1);
 
         try {
-            if (Objects.equals(key, "isWorldReadable")) {
-                return MCRURIResolver.createBooleanResponse(MCRXMLFunctions.isWorldReadable(value));
-            }
-            if (Objects.equals(key, "isWorldReadableComplete")) {
-                return MCRURIResolver.createBooleanResponse(MCRXMLFunctions.isWorldReadableComplete(value));
-            }
+            return switch (key) {
+                case "isWorldReadable" -> MCRURIResolver.createBooleanResponse(MCRXMLFunctions.isWorldReadable(value));
+                case "isWorldReadableComplete"
+                    -> MCRURIResolver.createBooleanResponse(MCRXMLFunctions.isWorldReadableComplete(value));
+                case "isDisplayedEnabledDerivate"
+                    -> MCRURIResolver.createBooleanResponse(MCRAccessManager.checkDerivateDisplayPermission(value));
+                case "isCurrentUserInRole" -> MCRURIResolver
+                    .createBooleanResponse(MCRSessionMgr.getCurrentSession().getUserInformation().isUserInRole(value));
+                case "isCurrentUserSuperUser" -> MCRURIResolver.createBooleanResponse(MCRSessionMgr.getCurrentSession()
+                    .getUserInformation().getUserID().equals(MCRSystemUserInformation.SUPER_USER.getUserID()));
+                case "isCurrentUserGuestUser" -> MCRURIResolver.createBooleanResponse(MCRSessionMgr.getCurrentSession()
+                    .getUserInformation().getUserID().equals(MCRSystemUserInformation.GUEST.getUserID()));
+                case "getCurrentUserAttribute" -> {
+                    Document doc = MCRDOMUtils.getDocumentBuilder().newDocument();
+                    Element attr = doc.createElement("userattribute");
+                    attr.setAttribute("name", key);
+                    doc.appendChild(attr);
+                    attr.appendChild(
+                        doc.createTextNode(
+                            MCRSessionMgr.getCurrentSession().getUserInformation().getUserAttribute(value)));
+                    yield new DOMSource(doc);
+                }
+                default
+                    -> throw new TransformerException("Unknown query for MCRUserAndObjectRightsURIResolver: " + query);
+            };
 
-            if (Objects.equals(key, "isDisplayedEnabledDerivate")) {
-                return MCRURIResolver.createBooleanResponse(MCRAccessManager.checkDerivateDisplayPermission(value));
-            }
-
-            if (Objects.equals(key, "isCurrentUserInRole")) {
-                return MCRURIResolver.createBooleanResponse(
-                    MCRSessionMgr.getCurrentSession().getUserInformation().isUserInRole(value));
-            }
-            if (Objects.equals(key, "isCurrentUserSuperUser")) {
-                return MCRURIResolver.createBooleanResponse(
-                    MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
-                        .equals(MCRSystemUserInformation.SUPER_USER.getUserID()));
-            }
-
-            if (Objects.equals(key, "isCurrentUserGuestUser")) {
-                return MCRURIResolver.createBooleanResponse(
-                    MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
-                        .equals(MCRSystemUserInformation.GUEST.getUserID()));
-            }
-
-            if (Objects.equals(key, "getCurrentUserAttribute")) {
-                Document doc = MCRDOMUtils.getDocumentBuilder().newDocument();
-                Element attr = doc.createElement("userattribute");
-                attr.setAttribute("name", key);
-                doc.appendChild(attr);
-                attr.appendChild(
-                    doc.createTextNode(MCRSessionMgr.getCurrentSession().getUserInformation().getUserAttribute(value)));
-                return new DOMSource(doc);
-            }
         } catch (ParserConfigurationException e) {
-            LOGGER.error("Could not create DOM document", e);
+            throw new TransformerException("Error creating DOM document for " + href, e);
         }
-        throw new TransformerException("Unknown query for MCRUserAndObjectRightsURIResolver: " + query);
     }
 }
