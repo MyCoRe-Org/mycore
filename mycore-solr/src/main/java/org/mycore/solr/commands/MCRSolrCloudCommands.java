@@ -27,7 +27,6 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.jspecify.annotations.NonNull;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.solr.cloud.collection.MCRSolrCloudCollection;
@@ -143,7 +142,7 @@ public class MCRSolrCloudCommands {
      * @throws IllegalArgumentException if no index is found for the given collection name or
      * if the index is not a SolrCloud collection
      */
-    private static @NonNull MCRSolrCloudCollection obtainCollection(
+    private static MCRSolrCloudCollection obtainCollection(
         String collectionName) {
         Optional<MCRSolrIndex> optionalIndex = MCRSolrIndexManager.obtainInstance().getIndex(collectionName);
 
