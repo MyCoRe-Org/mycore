@@ -26,7 +26,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateBaseSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClientBase;
 import org.apache.solr.client.solrj.impl.HttpSolrClientBuilderBase;
-import org.apache.solr.client.solrj.jetty.ConcurrentUpdateJettySolrClient;
+import org.apache.solr.client.solrj.jetty.ConcurrentUpdateJettySolrClient.Builder;
 import org.apache.solr.client.solrj.jetty.HttpJettySolrClient;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
@@ -92,6 +92,9 @@ public class MCRConfigurableSolrCore implements MCRSolrIndex {
 
         private String solrUrl;
         private String coreName;
+        private Integer concurrentQueueSize;
+        private Integer concurrentThreadCount;
+        private boolean concurrentEnabled;
 
         public String getCoreName() {
             return coreName;
@@ -109,6 +112,36 @@ public class MCRConfigurableSolrCore implements MCRSolrIndex {
         @MCRProperty(name = "SolrUrl")
         public void setSolrUrl(String solrUrl) {
             this.solrUrl = solrUrl;
+        }
+
+        public Integer getConcurrentQueueSize() {
+            return concurrentQueueSize;
+        }
+
+        @MCRProperty(name = "Concurrent.QueueSize", required = false,
+            defaultName = "MCR.Solr.Default.ConcurrentClient.QueueSize")
+        public void setConcurrentQueueSize(String concurrentQueueSize) {
+            this.concurrentQueueSize = Integer.parseInt(concurrentQueueSize);
+        }
+
+        public Integer getConcurrentThreadCount() {
+            return concurrentThreadCount;
+        }
+
+        @MCRProperty(name = "Concurrent.ThreadCount", required = false,
+            defaultName = "MCR.Solr.Default.ConcurrentClient.ThreadCount")
+        public void setConcurrentThreadCount(String concurrentThreadCount) {
+            this.concurrentThreadCount = Integer.parseInt(concurrentThreadCount);
+        }
+
+        public boolean isConcurrentEnabled() {
+            return concurrentEnabled;
+        }
+
+        @MCRProperty(name = "Concurrent.Enabled", required = false,
+            defaultName = "MCR.Solr.Default.ConcurrentClient.Enabled")
+        public void setConcurrentEnabled(String concurrentEnabled) {
+            this.concurrentEnabled = Boolean.parseBoolean(concurrentEnabled);
         }
 
         @Override
@@ -133,9 +166,18 @@ public class MCRConfigurableSolrCore implements MCRSolrIndex {
                 .withDefaultCollection(getCoreName())
                 .build();
 
-            ConcurrentUpdateBaseSolrClient concurrentClient =
-                useJettyHttpClient() && client instanceof HttpJettySolrClient jc
-                    ? new ConcurrentUpdateJettySolrClient.Builder(normalizedSolrUrl, jc).build() : null;
+            ConcurrentUpdateBaseSolrClient concurrentClient = null;
+
+            if (this.isConcurrentEnabled() && useJettyHttpClient()) {
+                if (client instanceof HttpJettySolrClient jc) {
+                    Builder concurrentBuilder = new Builder(normalizedSolrUrl, jc);
+
+                    concurrentBuilder.withThreadCount(getConcurrentThreadCount());
+                    concurrentBuilder.withQueueSize(getConcurrentQueueSize());
+
+                    concurrentClient = concurrentBuilder.build();
+                }
+            }
 
             return new MCRConfigurableSolrCore(client, base, concurrentClient, getCoreName(), buildCoreTypes());
         }
