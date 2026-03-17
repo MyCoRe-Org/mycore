@@ -34,6 +34,7 @@ import org.apache.solr.client.solrj.impl.HttpClusterStateProvider;
 import org.apache.solr.client.solrj.impl.HttpSolrClientBuilderBase;
 import org.apache.solr.client.solrj.jetty.HttpJettySolrClient;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.solr.MCRAbstractHttpBasedIndexConfigAdapter;
@@ -219,7 +220,7 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
         private ClientPair buildClient() {
             CloudHttp2SolrClient.Builder builder;
             if (zkUrls != null && !zkUrls.isEmpty()) {
-                List<String> zkUrlList = List.of(zkUrls.split(","));
+                List<String> zkUrlList = MCRConfiguration2.splitValue(zkUrls).toList();
                 builder = new CloudHttp2SolrClient.Builder(zkUrlList, Optional.ofNullable(zkChroot));
             } else if (solrUrls != null && !solrUrls.isEmpty()) {
                 builder = getURLBaseCloudHttp2SolrClientBuilder();
@@ -248,7 +249,10 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
             // the Http2ClusterStateProvider requires a Http2SolrClient to fetch the cluster state,
             // the Client needs admin level authentication to fetch the cluster state
             try {
-                List<String> solrUrlList = List.of(solrUrls.split(","));
+                List<String> solrUrlList = MCRConfiguration2.splitValue(solrUrls)
+                    .map(String::trim)
+                    .map(p -> p.endsWith("solr/") ? p : p + "solr/")
+                    .toList();
                 HttpJettySolrClient.Builder clusterStateHttpClientBuilder = new HttpJettySolrClient.Builder();
                 MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(clusterStateHttpClientBuilder,
                     MCRSolrAuthenticationLevel.ADMIN);

@@ -21,11 +21,11 @@ package org.mycore.solr;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import org.apache.solr.client.solrj.impl.HttpJdkSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClientBuilderBase;
 import org.apache.solr.client.solrj.jetty.HttpJettySolrClient;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRProperty;
 
 public abstract class MCRAbstractHttpBasedIndexConfigAdapter<T extends MCRSolrIndex> implements Supplier<T> {
@@ -171,7 +171,7 @@ public abstract class MCRAbstractHttpBasedIndexConfigAdapter<T extends MCRSolrIn
     }
 
     protected Set<MCRIndexType> buildCoreTypes() {
-        return Stream.of(coreTypes.split(","))
+        return MCRConfiguration2.splitValue(coreTypes)
             .map(String::trim)
             .map(MCRIndexType::new)
             .collect(java.util.stream.Collectors.toSet());
