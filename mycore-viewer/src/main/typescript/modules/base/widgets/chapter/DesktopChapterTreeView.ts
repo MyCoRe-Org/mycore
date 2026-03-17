@@ -90,6 +90,7 @@ export class DesktopChapterTreeView implements ChapterTreeView {
       expander.classList.add("expander", "fas", DesktopChapterTreeView.OPEN_ICON_CLASS);
 
       this._inputHandler.registerExpander(expander, id);
+      insertedNode.classList.add("expandable");
       insertedNode.prepend(expander);
     }
     return  insertedNode;
@@ -136,7 +137,7 @@ export class DesktopChapterTreeView implements ChapterTreeView {
         }, 500
     );
 
-    const realElementPosition = elem.offsetTop - this._container.offsetTop;
+    const realElementPosition = elem.getBoundingClientRect().top - this._container.getBoundingClientRect().top;
     let move = 0;
     if (realElementPosition < 0) {
       move = realElementPosition - 10;
