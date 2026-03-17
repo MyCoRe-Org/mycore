@@ -56,13 +56,12 @@ public class MCRXEditorTransformer {
         editorSession.setTransformationState(transformationState);
 
         MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer("xeditor");
-        if (!(transformer instanceof MCRParameterizedTransformer)) {
+        if (!(transformer instanceof MCRParameterizedTransformer parameterizedTransformer)) {
             throw new MCRException("Xeditor needs parameterized MCRContentTransformer: " + transformer);
         }
 
         transformationParameters.setParameter("SessionID", editorSession.getID());
 
-        MCRParameterizedTransformer parameterizedTransformer = (MCRParameterizedTransformer) transformer;
         MCRContent result = parameterizedTransformer.transform(editorSource, transformationParameters);
         if (result instanceof MCRWrappedContent wrappedContent
             && result.getClass().getName().contains(MCRXSLTransformer.class.getName())) {

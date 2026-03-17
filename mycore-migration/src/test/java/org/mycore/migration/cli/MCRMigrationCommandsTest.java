@@ -138,7 +138,7 @@ public class MCRMigrationCommandsTest {
             .evaluate(migratedObject1);
         assertEquals(1, relatedItems.size(), "There should be one relatedItem");
 
-        assertEquals(0, relatedItems.get(0).getChildren().size(), "It should have no children");
+        assertEquals(0, relatedItems.getFirst().getChildren().size(), "It should have no children");
     }
 
     private MCRObjectID createTestData(String file) throws IOException, JDOMException {

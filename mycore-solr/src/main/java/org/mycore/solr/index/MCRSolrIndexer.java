@@ -141,11 +141,11 @@ public class MCRSolrIndexer {
             @Override
             public void close() {
                 //MCR-2349 close after MCRSolrIndexEventHandler
-                SOLR_EXECUTOR.submit(SOLR_EXECUTOR.getExecutor()::shutdown,
+                SOLR_EXECUTOR.submit(SOLR_EXECUTOR.executor()::shutdown,
                     Integer.MIN_VALUE)
                     .getFuture()
                     .join();
-                waitForShutdown(SOLR_EXECUTOR.getExecutor());
+                waitForShutdown(SOLR_EXECUTOR.executor());
                 String documentStats = new MessageFormat("Solr documents: {0}, each: {1} ms.", Locale.ROOT).format(
                     new Object[] { MCRSolrIndexStatisticCollector.DOCUMENTS.getDocuments(),
                         MCRSolrIndexStatisticCollector.DOCUMENTS.reset() });

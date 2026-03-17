@@ -318,14 +318,9 @@ class MCRDirectoryStreamHelper {
         }
     }
 
-    private static class SimpleDirectoryIterator implements Iterator<Path> {
-        private final Iterator<Path> baseIterator;
-
-        private final MCRPath dir;
-
-        SimpleDirectoryIterator(MCRPath dir, DirectoryStream<Path> baseStream) {
-            this.baseIterator = baseStream.iterator();
-            this.dir = dir;
+    private record SimpleDirectoryIterator(MCRPath dir, Iterator<Path> baseIterator) implements Iterator<Path> {
+        private SimpleDirectoryIterator(MCRPath dir, DirectoryStream<Path> baseIterator) {
+            this(dir, baseIterator.iterator());
         }
 
         @Override

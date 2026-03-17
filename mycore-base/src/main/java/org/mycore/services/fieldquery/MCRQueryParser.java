@@ -296,7 +296,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
         if (children.isEmpty()) {
             return null;
         } else if (children.size() == 1) {
-            return children.get(0);
+            return children.getFirst();
         } else {
             return source;
         }

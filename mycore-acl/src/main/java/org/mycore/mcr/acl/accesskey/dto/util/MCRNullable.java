@@ -101,8 +101,7 @@ public class MCRNullable<T> {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        if (obj instanceof MCRNullable<?>) {
-            MCRNullable<?> other = (MCRNullable<?>) obj;
+        if (obj instanceof MCRNullable<?> other) {
             return isPresent == other.isPresent && Objects.equals(value, other.value);
         }
         return false;

@@ -977,12 +977,10 @@ public class MCRXMLFunctions {
         public static final MCRCategLinkService INSTANCE = MCRCategLinkServiceFactory.obtainInstance();
     }
 
-    private static final class SetNodeList implements NodeList {
+    private record SetNodeList(Object[] objects) implements NodeList {
 
-        private final Object[] objects;
-
-        SetNodeList(Set<Node> set) {
-            objects = set.toArray();
+        private SetNodeList(Set<Node> objects) {
+            this(objects.toArray());
         }
 
         @Override

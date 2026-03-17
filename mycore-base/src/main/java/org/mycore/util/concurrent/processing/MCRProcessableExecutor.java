@@ -77,5 +77,5 @@ public interface MCRProcessableExecutor {
      * 
      * @return the thread pool.
      */
-    ExecutorService getExecutor();
+    ExecutorService executor();
 }

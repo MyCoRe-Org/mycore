@@ -110,7 +110,7 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
                 }
                 SolrDocumentList solrResults = solrResponse.getResults();
                 if (solrResults.getNumFound() == 1) {
-                    result = String.valueOf(solrResults.get(0).getFieldValue("id"));
+                    result = String.valueOf(solrResults.getFirst().getFieldValue("id"));
                 }
                 if (solrResults.getNumFound() == 0) {
                     LOGGER.info(() -> "ERROR: No MyCoRe ID found for query " + mcrid);
@@ -156,7 +156,7 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
 
                 SolrDocumentList solrResults = solrResponse.getResults();
                 if (solrResults.getNumFound() == 1) {
-                    result = String.valueOf(solrResults.get(0).getFieldValue("id"));
+                    result = String.valueOf(solrResults.getFirst().getFieldValue("id"));
                 }
                 if (solrResults.getNumFound() == 0) {
                     LOGGER.info(() -> "ERROR: No MyCoRe Derivate ID found for query " + derid);
