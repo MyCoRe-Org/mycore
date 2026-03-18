@@ -142,8 +142,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         help = "deletes all entries from index in Solr in core with the id {0}",
         order = 210)
     public static void dropIndex(String indexName) throws Exception {
-        MCRSolrIndex core = getIndex(indexName);
-        MCRSolrIndexer.dropIndex(core.getClient());
+        MCRSolrIndex index = getIndex(indexName);
+        MCRSolrIndexer.dropIndex(index.getClient());
     }
 
     @MCRCommand(
@@ -151,8 +151,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         help = "deletes all objects of type {0} from index in Solr in core with the id {1}",
         order = 220)
     public static void dropIndexByType(String type, String indexName) throws Exception {
-        MCRSolrIndex core = getIndex(indexName);
-        MCRSolrIndexer.dropIndexByType(type, core.getClient());
+        MCRSolrIndex index = getIndex(indexName);
+        MCRSolrIndexer.dropIndexByType(type, index.getClient());
     }
 
     @MCRCommand(
@@ -160,8 +160,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         help = "deletes all objects of base {0} from index in Solr in core with the id {1}",
         order = 220)
     public static void dropIndexByBase(String base, String indexName) throws Exception {
-        MCRSolrIndex core = getIndex(indexName);
-        MCRSolrIndexer.dropIndexByBase(base, core.getClient());
+        MCRSolrIndex index = getIndex(indexName);
+        MCRSolrIndexer.dropIndexByBase(base, index.getClient());
     }
 
     @MCRCommand(
@@ -169,8 +169,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         help = "deletes an object with id {0} from index in Solr in core with the id {1}",
         order = 230)
     public static void deleteByIdFromSolr(String objectID, String indexName) {
-        MCRSolrIndex core = getIndex(indexName);
-        MCRSolrIndexer.deleteById(core.getClient(), objectID);
+        MCRSolrIndex index = getIndex(indexName);
+        MCRSolrIndexer.deleteById(index.getClient(), objectID);
     }
 
     @MCRCommand(
@@ -178,8 +178,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         help = "selects mcr objects with a solr query {0} in core with the id {1}",
         order = 310)
     public static void selectObjectsWithSolrQuery(String query, String indexName) {
-        MCRSolrIndex core = getIndex(indexName);
-        MCRBasicCommands.setSelectedValues(MCRSolrSearchUtils.listIDs(core.getClient(), query));
+        MCRSolrIndex index = getIndex(indexName);
+        MCRBasicCommands.setSelectedValues(MCRSolrSearchUtils.listIDs(index.getClient(), query));
     }
 
     /**
@@ -197,21 +197,21 @@ public class MCRSolrCommands extends MCRAbstractCommands {
             + "Depending on the use cases, this operation should be performed infrequently (e.g. nightly), "
             + "since it is very expensive and involves reading and re-writing the entire index",
         order = 410)
-    public static void optimize(String coreID) {
-        List<MCRSolrIndex> cores = getIndexList(coreID);
+    public static void optimize(String indexName) {
+        List<MCRSolrIndex> cores = getIndexList(indexName);
         MCRSolrIndexer.optimize(cores);
     }
 
-    private static MCRSolrIndex getIndex(String indexName) {
-        return MCRSolrIndexRegistryManager.obtainRegistry().requireIndex(indexName);
+    private static MCRSolrIndex getIndex(String indexID) {
+        return MCRSolrIndexRegistryManager.obtainRegistry().requireIndex(indexID);
     }
 
     @MCRCommand(
         syntax = "synchronize solr metadata index for all objects of type {0} in core {1}",
         help = "synchronizes the MyCoRe store and index in Solr in core with the id {1} for objects of type {0}",
         order = 420)
-    public static void synchronizeMetadataIndex(String objectType, String coreID) throws Exception {
-        List<MCRSolrIndex> cores = getIndexList(coreID);
+    public static void synchronizeMetadataIndex(String objectType, String indexID) throws Exception {
+        List<MCRSolrIndex> cores = getIndexList(indexID);
         MCRSolrIndexer.synchronizeMetadataIndex(cores, objectType);
     }
 
@@ -219,22 +219,22 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         syntax = "synchronize solr metadata index for all objects of base {0} in core {1}",
         help = "synchronizes the MyCoRe store and index in Solr in core with the id {1} for objects of base {0}",
         order = 420)
-    public static void synchronizeMetadataIndexForObjectBase(String objectBase, String coreIDs) throws Exception {
-        List<MCRSolrIndex> core = getIndexList(coreIDs);
-        MCRSolrIndexer.synchronizeMetadataIndexForObjectBase(core, objectBase);
+    public static void synchronizeMetadataIndexForObjectBase(String objectBase, String indexIDs) throws Exception {
+        List<MCRSolrIndex> cores = getIndexList(indexIDs);
+        MCRSolrIndexer.synchronizeMetadataIndexForObjectBase(cores, objectBase);
     }
 
     @MCRCommand(
         syntax = "synchronize solr metadata index in core {0}",
         help = "synchronizes the MyCoRe store and index in Solr in core with the id {0}",
         order = 430)
-    public static void synchronizeMetadataIndex(String coreIDs) throws Exception {
-        List<MCRSolrIndex> cores = getIndexList(coreIDs);
+    public static void synchronizeMetadataIndex(String indexIDs) throws Exception {
+        List<MCRSolrIndex> cores = getIndexList(indexIDs);
         MCRSolrIndexer.synchronizeMetadataIndex(cores);
     }
 
-    private static List<MCRSolrIndex> getIndexList(String indexNames) {
-        return Stream.of(indexNames.split("[, ]")).map(MCRSolrCommands::getIndex)
+    private static List<MCRSolrIndex> getIndexList(String indexIDs) {
+        return Stream.of(indexIDs.split("[, ]")).map(MCRSolrCommands::getIndex)
             .toList();
     }
 }

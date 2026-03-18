@@ -42,11 +42,11 @@ public class MCRSolrIndexRegistryManager {
     }
 
     /**
-     * Returns the singleton {@link MCRSolrIndexRegistryManager} instance. The instance is
+     * Returns the singleton {@link MCRSolrIndexRegistry} instance. The instance is
      * lazily created using double-checked locking from the MyCoRe configuration
      * property {@link MCRSolrConstants#SOLR_INDEX_REGISTRY_PROPERTY}.
      *
-     * @return the singleton {@link MCRSolrIndexRegistryManager} instance
+     * @return the singleton {@link MCRSolrIndexRegistry} instance
      */
     public static MCRSolrIndexRegistry obtainRegistry() {
         if (instance == null) {
@@ -62,13 +62,16 @@ public class MCRSolrIndexRegistryManager {
     }
 
     /**
-     * Reloads the singleton {@link MCRSolrIndexRegistryManager} instance from the MyCoRe
+     * Reloads the singleton {@link MCRSolrIndexRegistry} instance from the MyCoRe
      * configuration. This discards the current instance and creates a new one based
      * on the current value of {@link MCRSolrConstants#SOLR_INDEX_REGISTRY_PROPERTY}.
      */
     public static void reloadRegistry() {
         synchronized (MCRSolrIndexRegistryManager.class) {
-            instance.closeIndexes();
+            if (instance != null) {
+                instance.closeIndexes();
+            }
+            instance = null;
             obtainRegistry();
         }
     }

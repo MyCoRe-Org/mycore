@@ -246,8 +246,8 @@ public final class MCRSolrClassificationUtil {
      */
     public static Collection<MCRCategoryID> fromString(Collection<String> categoryIds) {
         List<MCRCategoryID> idList = new ArrayList<>(categoryIds.size());
-        for (String categoyId : categoryIds) {
-            idList.add(MCRCategoryID.ofString(categoyId));
+        for (String categoryId : categoryIds) {
+            idList.add(MCRCategoryID.ofString(categoryId));
         }
         return idList;
     }

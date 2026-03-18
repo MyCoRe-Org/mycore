@@ -112,7 +112,7 @@ public class MCRSolrConfigReloader {
             }
             Set<Map.Entry<String, JsonElement>> configuredComponents = overlaySection.entrySet();
             final String deleteSectionCommand = "delete-" + observedType.toLowerCase(Locale.ROOT);
-            if (configuredComponents.isEmpty() || !isKnownSolrConfigCommmand(deleteSectionCommand)) {
+            if (configuredComponents.isEmpty() || !isKnownSolrConfigCommand(deleteSectionCommand)) {
                 continue;
             }
             for (Map.Entry<String, JsonElement> configuredComponent : configuredComponents) {
@@ -186,7 +186,7 @@ public class MCRSolrConfigReloader {
             final String configCommand = commandObject.getKey();
             final String configType = StringUtils.substringAfter(configCommand, "add-");
 
-            if (isKnownSolrConfigCommmand(configCommand)) {
+            if (isKnownSolrConfigCommand(configCommand)) {
 
                 if (observedTypes.contains(configType) && configCommand.startsWith("add-") &&
                     commandObject.getValue() instanceof JsonObject) {
@@ -293,7 +293,7 @@ public class MCRSolrConfigReloader {
      * @return true, if the command is in the list of known SOLR commands.
      */
 
-    private static boolean isKnownSolrConfigCommmand(String cmd) {
+    private static boolean isKnownSolrConfigCommand(String cmd) {
         String cfgObjName = cmd.substring(cmd.indexOf('-') + 1).toLowerCase(Locale.ROOT);
         return ((cmd.startsWith("add-") || cmd.startsWith("update-") || cmd.startsWith("delete-"))
             && (SOLR_CONFIG_OBJECT_NAMES.containsKey(cfgObjName)))

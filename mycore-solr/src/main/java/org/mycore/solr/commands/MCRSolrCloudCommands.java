@@ -22,16 +22,16 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
-
 import java.util.Optional;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.mycore.solr.cloud.collection.MCRSolrCloudCollection;
 import org.mycore.solr.MCRSolrIndex;
 import org.mycore.solr.MCRSolrIndexRegistryManager;
+import org.mycore.solr.cloud.collection.MCRSolrCloudCollection;
 import org.mycore.solr.cloud.collection.MCRSolrCollectionHelper;
 import org.mycore.solr.cloud.configsets.MCRSolrConfigSetHelper;
 import org.mycore.solr.cloud.configsets.MCRSolrConfigSetProvider;
@@ -49,8 +49,7 @@ public class MCRSolrCloudCommands {
 
     @MCRCommand(
         syntax = "show remote config sets of {0}",
-        help = "displays the names of the config sets on the remote Solr server were the collection"
-            + " for the core {0} is located",
+        help = "displays the names of the config sets on the remote Solr server for the collection {0}",
         order = 10)
     public static void listRemoteConfig(String collectionName) throws URISyntaxException,
         IOException, SolrServerException {
@@ -83,18 +82,18 @@ public class MCRSolrCloudCommands {
 
     @MCRCommand(
         syntax = "delete remote config set for {0}",
-        help = "looks up in the mycore.properties which config set is used for the core {0} and deletes it from the " +
-            "remote Solr server",
+        help = "looks up in the mycore.properties which config set is used for the index with id"
+            + " {0} and deletes it from the remote Solr server",
         order = 30)
-    public static void deleteRemoteConfig(String localCoreName) throws URISyntaxException {
-        MCRSolrCloudCollection collection = obtainCollection(localCoreName);
+    public static void deleteRemoteConfig(String indexID) throws URISyntaxException {
+        MCRSolrCloudCollection collection = obtainCollection(indexID);
         MCRSolrConfigSetHelper.deleteConfigSetFromRemoteSolrServer(collection);
     }
 
     @MCRCommand(
         syntax = "upload local config set for {0}",
-        help = "looks up in the mycore.properties which config set is used for the core {0} and uploads it to the" +
-            "remote Solr server",
+        help = "looks up in the mycore.properties which config set is used for the index with id "
+            + "{0} and uploads it to the remote Solr server",
         order = 40)
     public static void uploadLocalConfig(String collectionName)
         throws URISyntaxException, SolrServerException, IOException {
@@ -113,7 +112,7 @@ public class MCRSolrCloudCommands {
     @MCRCommand(
         syntax = "create collection for core {0}",
         help = "creates a new collection in the remote Solr server using the config set defined in the " +
-            "mycore.properties",
+            "mycore.properties for the index with id {0}",
         order = 60)
     public static void createCollection(String collectionName)
         throws SolrServerException, IOException {
@@ -123,8 +122,7 @@ public class MCRSolrCloudCommands {
 
     @MCRCommand(
         syntax = "remove collection for core {0}",
-        help = "remove a collection in the remote Solr server using the config set defined in the " +
-            "mycore.properties",
+        help = "removes a collection in the remote Solr server for the index with id {0}",
         order = 70)
     public static void removeCollection(String collectionName) throws SolrServerException,
         IOException {

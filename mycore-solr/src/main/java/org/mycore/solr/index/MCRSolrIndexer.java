@@ -347,8 +347,8 @@ public class MCRSolrIndexer {
      *            of the objects to index
      */
     public static void rebuildMetadataIndex(String type, List<MCRSolrIndex> indexList) {
-        List<String> identfiersOfType = MCRXMLMetadataManager.obtainInstance().listIDsOfType(type);
-        rebuildMetadataIndex(identfiersOfType, indexList);
+        List<String> identifiersOfType = MCRXMLMetadataManager.obtainInstance().listIDsOfType(type);
+        rebuildMetadataIndex(identifiersOfType, indexList);
     }
 
     /**
@@ -358,8 +358,8 @@ public class MCRSolrIndexer {
      *            of the objects to index
      */
     public static void rebuildMetadataIndexForObjectBase(String base, List<MCRSolrIndex> indexList) {
-        List<String> identfiersOfBase = MCRXMLMetadataManager.obtainInstance().listIDsForBase(base);
-        rebuildMetadataIndex(identfiersOfBase, indexList);
+        List<String> identifiersOfBase = MCRXMLMetadataManager.obtainInstance().listIDsForBase(base);
+        rebuildMetadataIndex(identifiersOfBase, indexList);
     }
 
     /**

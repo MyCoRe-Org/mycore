@@ -53,7 +53,7 @@ public class MCRSolrUtils {
      */
     public static String escapeSearchValue(final String value) {
         //    specialChars = "!&|+-(){}[]\"~*?:\\/^";
-        /* '*' and '?' should always be threatened as special character */
+        /* '*' and '?' should always be treated as special character */
         String specialChars = "!&|+-(){}[]\"~:\\/^";
         Pattern patternRestricted = Pattern.compile("([\\Q" + specialChars + "\\E])");
         if (value == null) {

@@ -35,7 +35,7 @@ import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.solr.MCRConfigurableIndexRegistry.ConfigAdapter;
 
 /**
- * Configurable implementation of {@link MCRSolrIndexRegistryManager} that manages a set of
+ * Configurable implementation of {@link MCRSolrIndexRegistry} that manages a set of
  * {@link MCRSolrIndex} instances provided via the MyCoRe configuration system.
  *
  * <p>The indexes are injected as a name-to-index map through the {@link ConfigAdapter},

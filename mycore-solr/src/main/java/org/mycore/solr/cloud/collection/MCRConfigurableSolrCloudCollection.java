@@ -169,13 +169,13 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
             this.zkChroot = zkChroot;
         }
 
-        public String getZkUrl() {
+        public String getZkUrls() {
             return zkUrls;
         }
 
         @MCRProperty(name = "ZkUrls", required = false)
-        public void setZkUrl(String zkUrl) {
-            this.zkUrls = zkUrl;
+        public void setZkUrls(String zkUrls) {
+            this.zkUrls = zkUrls;
         }
 
         public String getSolrUrls() {

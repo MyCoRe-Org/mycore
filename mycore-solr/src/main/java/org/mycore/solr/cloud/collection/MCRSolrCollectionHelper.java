@@ -85,7 +85,7 @@ public class MCRSolrCollectionHelper {
             .process(collection.getBaseClient());
 
         if (!collectionAdminResponse.isSuccess()) {
-            throw new MCRException("Error creating collection " + collection.getName() + ": " +
+            throw new MCRException("Error removing collection " + collection.getName() + ": " +
                 collectionAdminResponse.getErrorMessages());
         }
 
