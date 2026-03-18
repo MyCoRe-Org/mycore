@@ -48,16 +48,20 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
 
     private final CloudSolrClient client;
     private final CloudSolrClient baseClient;
+    private final HttpJettySolrClient clusterStateClient;
     private final String collectionName;
     private final Set<MCRSolrIndexType> indexTypes;
     private final MCRSorCloudCollectionCreationConfiguration creationConfiguration;
 
 
-    public MCRConfigurableSolrCloudCollection(CloudSolrClient client, CloudSolrClient baseClient,
+    public MCRConfigurableSolrCloudCollection(CloudSolrClient client,
+        CloudSolrClient baseClient,
+        HttpJettySolrClient clusterStateClient,
         String collectionName, Set<MCRSolrIndexType> indexTypes,
         MCRSorCloudCollectionCreationConfiguration creationConfiguration) {
         this.client = client;
         this.baseClient = baseClient;
+        this.clusterStateClient = clusterStateClient;
         this.collectionName = collectionName;
         this.indexTypes = indexTypes;
         this.creationConfiguration = creationConfiguration;
@@ -87,6 +91,9 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
     public void close() throws IOException {
         MCRSolrUtils.shutdownSolrClient(this.client);
         MCRSolrUtils.shutdownSolrClient(this.baseClient);
+        if (this.clusterStateClient != null) {
+            MCRSolrUtils.shutdownSolrClient(this.clusterStateClient);
+        }
     }
 
     @Override
@@ -180,14 +187,18 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
             this.solrUrls = solrUrls;
         }
 
-        private ClientPair buildClient() {
+        private SolrClients buildClients() {
             CloudHttp2SolrClient.Builder builder;
+            HttpJettySolrClient clusterStateSolrClient = null;
+
             if (zkUrls != null && !zkUrls.isEmpty()) {
                 List<String> zkUrlList = MCRConfiguration2.splitValue(zkUrls).toList();
                 builder = new CloudHttp2SolrClient.Builder(zkUrlList,
                     Optional.ofNullable(zkChroot));
             } else if (solrUrls != null && !solrUrls.isEmpty()) {
-                builder = getURLBaseCloudHttp2SolrClientBuilder();
+                HttpClusterStateProvider<HttpJettySolrClient> clusterStateProvider = getClusterStateProvider();
+                clusterStateSolrClient = clusterStateProvider.getHttpClient();
+                builder = new CloudHttp2SolrClient.Builder(clusterStateProvider);
             } else {
                 throw new IllegalStateException(
                     "No Solr URLs or Zookeeper URL configured for SolrCloud collection "
@@ -208,10 +219,10 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
             CloudHttp2SolrClient client = builder.withDefaultCollection(getCollectionName())
                 .build();
 
-            return new ClientPair(client, baseClient);
+            return new SolrClients(client, baseClient, clusterStateSolrClient);
         }
 
-        private CloudHttp2SolrClient.Builder getURLBaseCloudHttp2SolrClientBuilder() {
+        private HttpClusterStateProvider<HttpJettySolrClient> getClusterStateProvider() {
             // the Http2ClusterStateProvider requires a Http2SolrClient to fetch the cluster state,
             // the Client needs admin level authentication to fetch the cluster state
             try {
@@ -220,27 +231,29 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
                     .map(p -> p.endsWith("/") ? p : p + "/")
                     .map(p -> p.endsWith("solr/") ? p : p + "solr/")
                     .toList();
+
                 HttpJettySolrClient.Builder clusterStateHttpClientBuilder = new HttpJettySolrClient.Builder();
                 MCRSolrAuthenticationManager.obtainInstance()
                     .applyAuthentication(clusterStateHttpClientBuilder,
                         MCRSolrAuthenticationLevel.ADMIN);
+
                 HttpJettySolrClient clusterStateHttpClient = clusterStateHttpClientBuilder.build();
-                HttpClusterStateProvider<HttpJettySolrClient> clusterStateProvider =
-                    new HttpClusterStateProvider<>(solrUrlList, clusterStateHttpClient);
-                return new CloudHttp2SolrClient.Builder(clusterStateProvider);
+                return new HttpClusterStateProvider<>(solrUrlList, clusterStateHttpClient);
             } catch (Exception e) {
                 throw new MCRException(
                     "Error building SolrCloud client for collection " + collectionName, e);
+
             }
         }
 
         @Override
         public MCRConfigurableSolrCloudCollection get() {
-            ClientPair clientPair = buildClient();
+            SolrClients solrClients = buildClients();
 
             return new MCRConfigurableSolrCloudCollection(
-                clientPair.client,
-                clientPair.baseClient,
+                solrClients.client,
+                solrClients.baseClient,
+                solrClients.clusterStateClient,
                 getCollectionName(),
                 buildIndexTypes(),
                 new MCRSolrCloudCollectionCreationConfig(
@@ -260,7 +273,9 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
             this.configSetTemplate = configSetTemplate;
         }
 
-        private record ClientPair(CloudHttp2SolrClient client, CloudHttp2SolrClient baseClient) {
+        private record SolrClients(CloudHttp2SolrClient client,
+            CloudHttp2SolrClient baseClient,
+            HttpJettySolrClient clusterStateClient) {
 
         }
 
