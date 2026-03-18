@@ -19,20 +19,16 @@
 package org.mycore.solr.standalone.core;
 
 import java.io.IOException;
-import java.util.Optional;
 import java.util.Set;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateBaseSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClientBase;
 import org.apache.solr.client.solrj.impl.HttpSolrClientBuilderBase;
-import org.apache.solr.client.solrj.jetty.ConcurrentUpdateJettySolrClient.Builder;
-import org.apache.solr.client.solrj.jetty.HttpJettySolrClient;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
-import org.mycore.solr.MCRAbstractHttpBasedIndexConfigAdapter;
-import org.mycore.solr.MCRIndexType;
+import org.mycore.solr.MCRAbstractSolrHttpBasedIndexConfigAdapter;
 import org.mycore.solr.MCRSolrIndex;
+import org.mycore.solr.MCRSolrIndexType;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.standalone.core.MCRConfigurableSolrCore.ConfigAdapter;
 
@@ -42,15 +38,12 @@ public class MCRConfigurableSolrCore implements MCRSolrIndex {
     private final String coreName;
     private final HttpSolrClientBase client;
     private final HttpSolrClientBase baseClient;
-    private final ConcurrentUpdateBaseSolrClient concurrentClient;
-    private final Set<MCRIndexType> indexTypes;
+    private final Set<MCRSolrIndexType> indexTypes;
 
     MCRConfigurableSolrCore(HttpSolrClientBase client, HttpSolrClientBase baseClient,
-        ConcurrentUpdateBaseSolrClient concurrentClient, String coreName,
-        Set<MCRIndexType> indexTypes) {
+        String coreName, Set<MCRSolrIndexType> indexTypes) {
         this.client = client;
         this.baseClient = baseClient;
-        this.concurrentClient = concurrentClient;
         this.coreName = coreName;
         this.indexTypes = indexTypes;
     }
@@ -70,13 +63,9 @@ public class MCRConfigurableSolrCore implements MCRSolrIndex {
         return baseClient;
     }
 
-    @Override
-    public Optional<ConcurrentUpdateBaseSolrClient> getConcurrentClient() {
-        return Optional.ofNullable(this.concurrentClient);
-    }
 
     @Override
-    public Set<MCRIndexType> getIndexTypes() {
+    public Set<MCRSolrIndexType> getIndexTypes() {
         return indexTypes;
     }
 
@@ -84,11 +73,10 @@ public class MCRConfigurableSolrCore implements MCRSolrIndex {
     public void close() throws IOException {
         MCRSolrUtils.shutdownSolrClient(this.client);
         MCRSolrUtils.shutdownSolrClient(this.baseClient);
-        MCRSolrUtils.shutdownSolrClient(concurrentClient);
     }
 
     public static class ConfigAdapter extends
-        MCRAbstractHttpBasedIndexConfigAdapter<MCRConfigurableSolrCore> {
+        MCRAbstractSolrHttpBasedIndexConfigAdapter<MCRConfigurableSolrCore> {
 
         private String solrUrl;
         private String coreName;
@@ -153,7 +141,7 @@ public class MCRConfigurableSolrCore implements MCRSolrIndex {
                 normalizedSolrUrl += "/";
             }
 
-            HttpSolrClientBuilderBase builder = getBuilder();
+            HttpSolrClientBuilderBase<?, ?> builder = getBuilder();
 
             applySettings(builder);
 
@@ -166,20 +154,7 @@ public class MCRConfigurableSolrCore implements MCRSolrIndex {
                 .withDefaultCollection(getCoreName())
                 .build();
 
-            ConcurrentUpdateBaseSolrClient concurrentClient = null;
-
-            if (this.isConcurrentEnabled() && useJettyHttpClient()) {
-                if (client instanceof HttpJettySolrClient jc) {
-                    Builder concurrentBuilder = new Builder(normalizedSolrUrl, jc);
-
-                    concurrentBuilder.withThreadCount(getConcurrentThreadCount());
-                    concurrentBuilder.withQueueSize(getConcurrentQueueSize());
-
-                    concurrentClient = concurrentBuilder.build();
-                }
-            }
-
-            return new MCRConfigurableSolrCore(client, base, concurrentClient, getCoreName(), buildIndexTypes());
+            return new MCRConfigurableSolrCore(client, base, getCoreName(), buildIndexTypes());
         }
 
     }

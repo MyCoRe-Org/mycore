@@ -39,9 +39,9 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.solr.MCRIndexType;
 import org.mycore.solr.MCRSolrIndex;
-import org.mycore.solr.MCRSolrIndexManager;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
+import org.mycore.solr.MCRSolrIndexType;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.search.MCRSolrSearchUtils;
@@ -57,7 +57,7 @@ public final class MCRSolrClassificationUtil {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRIndexType CLASSIFICATION_INDEX_TYPE = MCRIndexType.CLASSIFICATION;
+    private static final MCRSolrIndexType CLASSIFICATION_INDEX_TYPE = MCRSolrIndexType.CLASSIFICATION;
 
     private MCRSolrClassificationUtil() {
     }
@@ -266,7 +266,7 @@ public final class MCRSolrClassificationUtil {
      * Returns the solr classification core.
      */
     public static List<MCRSolrIndex> getIndexList() {
-        return MCRSolrIndexManager.obtainInstance().getIndexWithType(CLASSIFICATION_INDEX_TYPE);
+        return MCRSolrIndexRegistryManager.obtainRegistry().getIndexWithType(CLASSIFICATION_INDEX_TYPE);
     }
 
     /**

@@ -28,16 +28,12 @@ public class MCRSolrConstants {
 
     public static final String SOLR_CONFIG_PREFIX = "MCR.Solr.";
 
-    public static final String SOLR_CORE_PREFIX = SOLR_CONFIG_PREFIX + "Core.";
+    public static final String SOLR_INDEX_REGISTRY_PROPERTY_PREFIX = SOLR_CONFIG_PREFIX + "IndexRegistry.";
 
-    public static final String SOLR_INDEX_MANAGER_PROPERTY_PREFIX = SOLR_CONFIG_PREFIX + "IndexManager.";
-
-    public static final String SOLR_INDEX_MANAGER_PROPERTY = SOLR_INDEX_MANAGER_PROPERTY_PREFIX +
+    public static final String SOLR_INDEX_REGISTRY_PROPERTY = SOLR_INDEX_REGISTRY_PROPERTY_PREFIX +
         "Class";
 
-    public static final String SOLR_COLLECTION_MANAGER_INDEX_PREFIX = "Index";
-
-    public static final String SOLR_CORE_NAME_SUFFIX = ".Name";
+    public static final String SOLR_INDEX_REGISTRY_INDEX_PREFIX = "Index";
 
     public static final String SOLR_QUERY_XML_PROTOCOL_VERSION = MCRConfiguration2
         .getStringOrThrow(SOLR_CONFIG_PREFIX + "XMLProtocolVersion");

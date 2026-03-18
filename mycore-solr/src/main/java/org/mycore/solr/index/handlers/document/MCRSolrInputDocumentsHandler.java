@@ -30,7 +30,7 @@ import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.solr.MCRSolrConstants;
-import org.mycore.solr.MCRIndexType;
+import org.mycore.solr.MCRSolrIndexType;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
@@ -47,7 +47,7 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public MCRSolrInputDocumentsHandler(Collection<SolrInputDocument> documents, MCRIndexType coreType) {
+    public MCRSolrInputDocumentsHandler(Collection<SolrInputDocument> documents, MCRSolrIndexType coreType) {
         this.documents = documents;
         setIndexType(coreType);
     }

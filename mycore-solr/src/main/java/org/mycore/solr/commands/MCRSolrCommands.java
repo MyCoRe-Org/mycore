@@ -27,7 +27,7 @@ import org.mycore.frontend.cli.MCRBasicCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.solr.MCRSolrIndex;
-import org.mycore.solr.MCRSolrIndexManager;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
 import org.mycore.solr.classification.MCRSolrClassificationUtil;
 import org.mycore.solr.index.MCRSolrIndexer;
 import org.mycore.solr.search.MCRSolrSearchUtils;
@@ -133,7 +133,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         help = "rebuilds classification index in Solr in the core with the id {0}",
         order = 190)
     public static void rebuildClassificationIndex(String indexName) {
-        MCRSolrIndex index = MCRSolrIndexManager.obtainInstance().requireIndex(indexName);
+        MCRSolrIndex index = MCRSolrIndexRegistryManager.obtainRegistry().requireIndex(indexName);
         MCRSolrClassificationUtil.rebuildIndex(List.of(index));
     }
 
@@ -203,7 +203,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     }
 
     private static MCRSolrIndex getIndex(String indexName) {
-        return MCRSolrIndexManager.obtainInstance().requireIndex(indexName);
+        return MCRSolrIndexRegistryManager.obtainRegistry().requireIndex(indexName);
     }
 
     @MCRCommand(

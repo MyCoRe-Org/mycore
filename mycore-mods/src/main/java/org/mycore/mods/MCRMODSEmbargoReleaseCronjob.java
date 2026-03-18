@@ -34,7 +34,7 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.cronjob.MCRCronjob;
-import org.mycore.solr.MCRSolrIndexManager;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.util.concurrent.MCRFixedUserFailableRunnable;
@@ -57,7 +57,7 @@ public class MCRMODSEmbargoReleaseCronjob extends MCRCronjob {
     @Override
     public void runJob() {
 
-        if(MCRSolrIndexManager.obtainInstance().getMainIndex().isPresent()) {
+        if(MCRSolrIndexRegistryManager.obtainRegistry().getMainIndex().isPresent()) {
             return;
         }
 
@@ -81,7 +81,8 @@ public class MCRMODSEmbargoReleaseCronjob extends MCRCronjob {
                 QueryRequest queryRequest = new QueryRequest(params);
                 SOLR_AUTHENTICATION_MANAGER.applyAuthentication(queryRequest, MCRSolrAuthenticationLevel.SEARCH);
                 QueryResponse solrResponse =
-                    queryRequest.process(MCRSolrIndexManager.obtainInstance().requireMainIndex().getClient());
+                    queryRequest.process(
+                        MCRSolrIndexRegistryManager.obtainRegistry().requireMainIndex().getClient());
                 solrResponse
                     .getResults()
                     .stream()

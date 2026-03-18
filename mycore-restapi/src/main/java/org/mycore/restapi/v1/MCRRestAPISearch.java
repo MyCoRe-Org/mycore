@@ -36,7 +36,7 @@ import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.solr.MCRSolrIndex;
-import org.mycore.solr.MCRSolrIndexManager;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.search.MCRSolrSearchUtils;
@@ -130,7 +130,7 @@ public class MCRRestAPISearch {
 
     // Method to execute the Solr query and handle response
     private Response executeSolrQuery(ModifiableSolrParams params, String wt) {
-        MCRSolrIndex solrIndex = MCRSolrIndexManager.obtainInstance().requireMainIndex();
+        MCRSolrIndex solrIndex = MCRSolrIndexRegistryManager.obtainRegistry().requireMainIndex();
         SolrClient client = solrIndex.getClient();
         QueryRequest queryRequest = new QueryRequest(params);
         MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,

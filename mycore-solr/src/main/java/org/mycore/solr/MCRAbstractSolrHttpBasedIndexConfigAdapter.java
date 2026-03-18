@@ -28,7 +28,7 @@ import org.apache.solr.client.solrj.jetty.HttpJettySolrClient;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRProperty;
 
-public abstract class MCRAbstractHttpBasedIndexConfigAdapter<T extends MCRSolrIndex> implements Supplier<T> {
+public abstract class MCRAbstractSolrHttpBasedIndexConfigAdapter<T extends MCRSolrIndex> implements Supplier<T> {
 
     private String indexTypes;
 
@@ -136,12 +136,12 @@ public abstract class MCRAbstractHttpBasedIndexConfigAdapter<T extends MCRSolrIn
         return useJettyHttpClient;
     }
 
-    protected HttpSolrClientBuilderBase getBuilder() {
+    protected HttpSolrClientBuilderBase<?, ?> getBuilder() {
         return useJettyHttpClient() ? new HttpJettySolrClient.Builder()
             : new HttpJdkSolrClient.Builder();
     }
 
-    protected void applySettings(HttpSolrClientBuilderBase builder) {
+    protected void applySettings(HttpSolrClientBuilderBase<?, ?> builder) {
 
         String idleTimeout = getIdleTimeout();
         String idleTimeoutUnit = getIdleTimeoutUnit();
@@ -170,10 +170,10 @@ public abstract class MCRAbstractHttpBasedIndexConfigAdapter<T extends MCRSolrIn
 
     }
 
-    protected Set<MCRIndexType> buildIndexTypes() {
+    protected Set<MCRSolrIndexType> buildIndexTypes() {
         return MCRConfiguration2.splitValue(indexTypes)
             .map(String::trim)
-            .map(MCRIndexType::new)
+            .map(MCRSolrIndexType::new)
             .collect(java.util.stream.Collectors.toSet());
     }
 

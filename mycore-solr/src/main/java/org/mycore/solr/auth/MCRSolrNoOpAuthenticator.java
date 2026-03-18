@@ -18,9 +18,9 @@
 
 package org.mycore.solr.auth;
 
-import org.apache.solr.client.solrj.SolrRequest;
-
 import java.net.http.HttpRequest;
+
+import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.impl.HttpSolrClientBuilderBase;
 
 
@@ -38,7 +38,7 @@ public class MCRSolrNoOpAuthenticator implements MCRSolrAuthenticator {
     }
 
     @Override
-    public void applyAuthentication(HttpSolrClientBuilderBase clientBuilder) {
+    public void applyAuthentication(HttpSolrClientBuilderBase<?, ?> clientBuilder) {
     }
 
 }

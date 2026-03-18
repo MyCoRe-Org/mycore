@@ -32,7 +32,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.mycore.frontend.servlets.MCRClassificationBrowser2.MCRQueryAdapter;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.solr.MCRSolrConstants;
-import org.mycore.solr.MCRSolrIndexManager;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
@@ -87,7 +87,7 @@ public class MCRSolrQueryAdapter implements MCRQueryAdapter {
             QueryRequest queryRequest = new QueryRequest(solrQuery);
             MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
                 MCRSolrAuthenticationLevel.SEARCH);
-            SolrClient client = MCRSolrIndexManager.obtainInstance().requireMainIndex()
+            SolrClient client = MCRSolrIndexRegistryManager.obtainRegistry().requireMainIndex()
                 .getClient();
             queryResponse = queryRequest.process(client);
         } catch (SolrServerException | IOException e) {

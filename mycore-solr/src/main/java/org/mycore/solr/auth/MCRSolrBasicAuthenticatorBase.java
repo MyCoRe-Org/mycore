@@ -18,11 +18,11 @@
 
 package org.mycore.solr.auth;
 
-import org.apache.solr.client.solrj.SolrRequest;
-
 import java.net.http.HttpRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+
+import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.impl.HttpSolrClientBuilderBase;
 
 /**
@@ -42,7 +42,7 @@ public abstract class MCRSolrBasicAuthenticatorBase implements MCRSolrAuthentica
     }
 
     @Override
-    public void applyAuthentication(HttpSolrClientBuilderBase clientBuilder) {
+    public void applyAuthentication(HttpSolrClientBuilderBase<?, ?> clientBuilder) {
         clientBuilder.withBasicAuthCredentials(getUsername(), getPassword());
     }
 

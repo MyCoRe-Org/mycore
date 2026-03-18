@@ -18,6 +18,8 @@
 
 package org.mycore.solr.index.handlers;
 
+import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -32,14 +34,12 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.solr.MCRIndexType;
+import org.mycore.solr.MCRSolrIndexType;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.file.MCRSolrPathDocumentFactory;
 import org.mycore.solr.index.handlers.document.MCRSolrInputDocumentHandler;
 import org.mycore.solr.index.handlers.stream.MCRSolrFileIndexHandler;
 import org.mycore.solr.index.strategy.MCRSolrIndexStrategyManager;
-
-import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -106,8 +106,8 @@ public abstract class MCRSolrIndexHandlerFactory {
         } else {
             indexHandler = new MCRSolrInputDocumentHandler(
                 () -> MCRSolrPathDocumentFactory.obtainInstance().getDocument(file, attrs), file.toString(),
-                MCRIndexType.MAIN);
-            indexHandler.setIndexType(MCRIndexType.MAIN);
+                MCRSolrIndexType.MAIN);
+            indexHandler.setIndexType(MCRSolrIndexType.MAIN);
         }
         long end = System.currentTimeMillis();
         indexHandler.getStatistic().addTime(end - start);

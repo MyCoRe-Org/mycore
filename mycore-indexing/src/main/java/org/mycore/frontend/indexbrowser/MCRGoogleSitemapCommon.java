@@ -49,7 +49,7 @@ import org.jdom2.Namespace;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.ifs2.MCRObjectIDDateImpl;
-import org.mycore.solr.MCRSolrIndexManager;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
@@ -184,7 +184,7 @@ public final class MCRGoogleSitemapCommon {
             QueryRequest queryRequest = new QueryRequest(query);
             SOLR_AUTHENTICATION_MANAGER.applyAuthentication(queryRequest,
                 MCRSolrAuthenticationLevel.SEARCH);
-            SolrClient client = MCRSolrIndexManager.obtainInstance().requireMainIndex().getClient();
+            SolrClient client = MCRSolrIndexRegistryManager.obtainRegistry().requireMainIndex().getClient();
             response = queryRequest.process(client);
             objidlist = response.getResults().stream().map((document) -> {
                 String id = (String) document.getFieldValue("id");

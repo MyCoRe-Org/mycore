@@ -40,7 +40,7 @@ import org.apache.solr.client.solrj.response.schema.FieldTypeRepresentation;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfigurationInputStream;
 import org.mycore.solr.MCRSolrIndex;
-import org.mycore.solr.MCRSolrIndexManager;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
@@ -82,9 +82,9 @@ public class MCRSolrSchemaReloader {
     public static void reset(String configType, String coreID) {
         LOGGER.info(() -> "Resetting SOLR schema for core " + coreID + " using configuration " + configType);
         try {
-            MCRSolrIndex index = MCRSolrIndexManager.obtainInstance()
+            MCRSolrIndex index = MCRSolrIndexRegistryManager.obtainRegistry()
                 .getIndex(coreID)
-                .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreID));
+                .orElseThrow(() -> MCRSolrUtils.getIndexConfigMissingException(coreID));
 
             SolrClient solrClient = index.getClient();
 
@@ -179,9 +179,9 @@ public class MCRSolrSchemaReloader {
      * @param coreID the ID of the core, which the configuration should be applied to
      */
     public static void processSchemaFiles(String configType, String coreID) {
-        MCRSolrIndex index = MCRSolrIndexManager.obtainInstance()
+        MCRSolrIndex index = MCRSolrIndexRegistryManager.obtainRegistry()
             .getIndex(coreID)
-            .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreID));
+            .orElseThrow(() -> MCRSolrUtils.getIndexConfigMissingException(coreID));
 
         LOGGER.info(() -> "Load schema definitions for core " + coreID + " using configuration " + configType);
         Collection<byte[]> schemaFileContents;

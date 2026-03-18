@@ -102,7 +102,7 @@ public final class MCRSolrAuthenticationManager {
      * @param clientBuilder the client builder to add the authentication to
      * @param level the level of authentication to add
      */
-    public void applyAuthentication(HttpSolrClientBuilderBase clientBuilder, MCRSolrAuthenticationLevel level) {
+    public void applyAuthentication(HttpSolrClientBuilderBase<?, ?> clientBuilder, MCRSolrAuthenticationLevel level) {
         authenticators.get(level).applyAuthentication(clientBuilder);
     }
 

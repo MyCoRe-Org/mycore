@@ -18,7 +18,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.solr.MCRSolrIndex;
-import org.mycore.solr.MCRSolrIndexManager;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
@@ -72,7 +72,7 @@ public class MCRSolrFieldsResolver implements URIResolver {
         }
 
         String solrCore = extractSolrCore(href);
-        Optional<MCRSolrIndex> mayCore = MCRSolrIndexManager.obtainInstance().getIndex(solrCore);
+        Optional<MCRSolrIndex> mayCore = MCRSolrIndexRegistryManager.obtainRegistry().getIndex(solrCore);
 
         if (mayCore.isEmpty()) {
             throw new TransformerException("MCRSolrCore not found: " + solrCore);

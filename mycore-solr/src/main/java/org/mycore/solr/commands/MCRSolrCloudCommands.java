@@ -31,7 +31,7 @@ import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.solr.cloud.collection.MCRSolrCloudCollection;
 import org.mycore.solr.MCRSolrIndex;
-import org.mycore.solr.MCRSolrIndexManager;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
 import org.mycore.solr.cloud.collection.MCRSolrCollectionHelper;
 import org.mycore.solr.cloud.configsets.MCRSolrConfigSetHelper;
 import org.mycore.solr.cloud.configsets.MCRSolrConfigSetProvider;
@@ -134,7 +134,7 @@ public class MCRSolrCloudCommands {
 
     /**
      * Helper method to obtain a {@link MCRSolrCloudCollection} for a given collection name.
-     * The collection name is looked up in the {@link MCRSolrIndexManager} and checked if it is an
+     * The collection name is looked up in the {@link MCRSolrIndexRegistryManager} and checked if it is an
      * instance of {@link MCRSolrCloudCollection}.
      *
      * @param collectionName the name of the collection to obtain
@@ -144,7 +144,7 @@ public class MCRSolrCloudCommands {
      */
     private static MCRSolrCloudCollection obtainCollection(
         String collectionName) {
-        Optional<MCRSolrIndex> optionalIndex = MCRSolrIndexManager.obtainInstance().getIndex(collectionName);
+        Optional<MCRSolrIndex> optionalIndex = MCRSolrIndexRegistryManager.obtainRegistry().getIndex(collectionName);
 
         if (optionalIndex.isEmpty()) {
             throw new IllegalArgumentException("No index found for collection name " + collectionName);

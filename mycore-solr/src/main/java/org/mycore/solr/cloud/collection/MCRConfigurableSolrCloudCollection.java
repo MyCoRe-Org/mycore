@@ -29,7 +29,6 @@ import java.util.Set;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.CloudHttp2SolrClient;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateBaseSolrClient;
 import org.apache.solr.client.solrj.impl.HttpClusterStateProvider;
 import org.apache.solr.client.solrj.impl.HttpSolrClientBuilderBase;
 import org.apache.solr.client.solrj.jetty.HttpJettySolrClient;
@@ -37,8 +36,8 @@ import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
-import org.mycore.solr.MCRAbstractHttpBasedIndexConfigAdapter;
-import org.mycore.solr.MCRIndexType;
+import org.mycore.solr.MCRAbstractSolrHttpBasedIndexConfigAdapter;
+import org.mycore.solr.MCRSolrIndexType;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
@@ -50,7 +49,7 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
     private final CloudSolrClient client;
     private final CloudSolrClient baseClient;
     private final String collectionName;
-    private final Set<MCRIndexType> indexTypes;
+    private final Set<MCRSolrIndexType> indexTypes;
 
     private final Integer numShards;
     private final Integer numNrtReplicas;
@@ -60,7 +59,7 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
     private final String configSetTemplate;
 
     public MCRConfigurableSolrCloudCollection(CloudSolrClient client, CloudSolrClient baseClient,
-        String collectionName, Set<MCRIndexType> indexTypes, Integer numShards,
+        String collectionName, Set<MCRSolrIndexType> indexTypes, Integer numShards,
         Integer numNrtReplicas, Integer numTlogReplicas, Integer numPullReplicas,
         String configSetTemplate) {
         this.client = client;
@@ -90,13 +89,7 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
     }
 
     @Override
-    public Optional<ConcurrentUpdateBaseSolrClient> getConcurrentClient() {
-        // You should use the normal Cloud Client, when using SolrCloud
-        return Optional.empty();
-    }
-
-    @Override
-    public Set<MCRIndexType> getIndexTypes() {
+    public Set<MCRSolrIndexType> getIndexTypes() {
         return indexTypes;
     }
 
@@ -132,7 +125,7 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
     }
 
     public static class ConfigAdapter extends
-        MCRAbstractHttpBasedIndexConfigAdapter<MCRSolrCloudCollection> {
+        MCRAbstractSolrHttpBasedIndexConfigAdapter<MCRSolrCloudCollection> {
 
         private String solrUrls;
         private String zkUrls;
@@ -229,7 +222,7 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
                     "No Solr URLs or Zookeeper URL configured for SolrCloud collection " + collectionName);
             }
 
-            HttpSolrClientBuilderBase baseClientBuilder = getBuilder();
+            HttpSolrClientBuilderBase<?, ?> baseClientBuilder = getBuilder();
 
             applySettings(baseClientBuilder);
 

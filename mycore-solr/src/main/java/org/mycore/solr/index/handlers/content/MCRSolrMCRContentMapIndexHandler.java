@@ -34,8 +34,8 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.solr.MCRIndexType;
 import org.mycore.solr.MCRSolrIndex;
+import org.mycore.solr.MCRSolrIndexType;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.document.MCRSolrInputDocumentFactory;
@@ -57,7 +57,7 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
 
     private Map<MCRObjectID, MCRContent> contentMap;
 
-    public MCRSolrMCRContentMapIndexHandler(Map<MCRObjectID, MCRContent> contentMap, MCRIndexType type) {
+    public MCRSolrMCRContentMapIndexHandler(Map<MCRObjectID, MCRContent> contentMap, MCRSolrIndexType type) {
         super();
         this.contentMap = contentMap;
         this.subhandlers = new ArrayList<>(contentMap.size());

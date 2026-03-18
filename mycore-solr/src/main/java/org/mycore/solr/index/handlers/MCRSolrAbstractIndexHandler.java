@@ -27,9 +27,9 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.solr.MCRIndexType;
 import org.mycore.solr.MCRSolrIndex;
-import org.mycore.solr.MCRSolrIndexManager;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
+import org.mycore.solr.MCRSolrIndexType;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.index.MCRSolrIndexHandler;
@@ -42,7 +42,7 @@ public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler
 
     protected int commitWithin;
 
-    private MCRIndexType indexType;
+    private MCRSolrIndexType indexType;
 
     public MCRSolrAbstractIndexHandler() {
         this.commitWithin = MCRConfiguration2.getInt("MCR.Solr.commitWithIn").orElseThrow();
@@ -75,7 +75,7 @@ public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler
         if (destinationIndexList != null) {
             return destinationIndexList;
         } else {
-            return MCRSolrIndexManager.obtainInstance().getIndexWithType(this.indexType);
+            return MCRSolrIndexRegistryManager.obtainRegistry().getIndexWithType(this.indexType);
         }
     }
 
@@ -108,11 +108,11 @@ public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler
     }
 
     @Override
-    public void setIndexType(MCRIndexType indexType) {
+    public void setIndexType(MCRSolrIndexType indexType) {
         this.indexType = indexType;
     }
 
-    public MCRIndexType getIndexType() {
+    public MCRSolrIndexType getIndexType() {
         return indexType;
     }
 }

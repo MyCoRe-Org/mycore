@@ -64,7 +64,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.services.http.MCRHttpUtils;
 import org.mycore.solr.MCRSolrConstants;
 import org.mycore.solr.MCRSolrIndex;
-import org.mycore.solr.MCRSolrIndexManager;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.xml.sax.SAXException;
@@ -229,7 +229,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
         String core = Optional.ofNullable(request.getParameter(QUERY_CORE_PARAMETER))
             .orElse(MCRSolrConstants.MAIN_INDEX_ID);
 
-        Optional<MCRSolrIndex> optionalIndex = MCRSolrIndexManager.obtainInstance().getIndex(core);
+        Optional<MCRSolrIndex> optionalIndex = MCRSolrIndexRegistryManager.obtainRegistry().getIndex(core);
         if (optionalIndex.isEmpty()) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "No such core: " + core);
             return;

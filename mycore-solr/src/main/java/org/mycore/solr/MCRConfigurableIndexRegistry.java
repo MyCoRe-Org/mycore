@@ -18,7 +18,7 @@
 
 package org.mycore.solr;
 
-import static org.mycore.solr.MCRSolrConstants.SOLR_COLLECTION_MANAGER_INDEX_PREFIX;
+import static org.mycore.solr.MCRSolrConstants.SOLR_INDEX_REGISTRY_INDEX_PREFIX;
 
 import java.io.IOException;
 import java.util.List;
@@ -31,34 +31,34 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.events.MCRShutdownHandler;
-import org.mycore.solr.MCRConfigurableIndexManager.ConfigAdapter;
+import org.mycore.solr.MCRConfigurableIndexRegistry.ConfigAdapter;
 
 /**
- * Configurable implementation of {@link MCRSolrIndexManager} that manages a set of
+ * Configurable implementation of {@link MCRSolrIndexRegistryManager} that manages a set of
  * {@link MCRSolrIndex} instances provided via the MyCoRe configuration system.
  *
  * <p>The indexes are injected as a name-to-index map through the {@link ConfigAdapter},
  * which reads the configuration properties prefixed with
- * {@link MCRSolrConstants#SOLR_COLLECTION_MANAGER_INDEX_PREFIX}. Each entry in the map
+ * {@link MCRSolrConstants#SOLR_INDEX_REGISTRY_INDEX_PREFIX}. Each entry in the map
  * represents a named Solr collection or core that can be looked up by its identifier
- * or filtered by its {@link MCRIndexType}.</p>
+ * or filtered by its {@link MCRSolrIndexType}.</p>
  *
  * <p>This manager registers itself with the {@link MCRShutdownHandler} to ensure that
  * all underlying Solr clients are properly closed when the application shuts down.</p>
  *
- * @see MCRSolrIndexManager
+ * @see MCRSolrIndexRegistryManager
  * @see MCRSolrIndex
  * @see ConfigAdapter
  */
 @MCRConfigurationProxy(
     proxyClass = ConfigAdapter.class)
-public class MCRConfigurableIndexManager implements MCRSolrIndexManager {
+public class MCRConfigurableIndexRegistry implements MCRSolrIndexRegistry {
 
-    private final Map<String, MCRSolrIndex> configuredCollections;
+    private final Map<String, MCRSolrIndex> configuredIndexes;
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public MCRConfigurableIndexManager(Map<String, MCRSolrIndex> configuredCollections) {
-        this.configuredCollections = configuredCollections;
+    public MCRConfigurableIndexRegistry(Map<String, MCRSolrIndex> configuredIndexes) {
+        this.configuredIndexes = configuredIndexes;
 
         MCRShutdownHandler shutdownHandler = MCRShutdownHandler.getInstance();
         if (shutdownHandler != null) {
@@ -68,19 +68,19 @@ public class MCRConfigurableIndexManager implements MCRSolrIndexManager {
 
     @Override
     public Optional<MCRSolrIndex> getIndex(String indexId) {
-        return Optional.ofNullable(configuredCollections.get(indexId));
+        return Optional.ofNullable(configuredIndexes.get(indexId));
     }
 
     @Override
-    public List<MCRSolrIndex> getIndexWithType(MCRIndexType type) {
-        return configuredCollections.values()
+    public List<MCRSolrIndex> getIndexWithType(MCRSolrIndexType type) {
+        return configuredIndexes.values()
             .stream()
             .filter(col -> col.getIndexTypes().contains(type))
             .toList();
     }
 
     public void closeIndexes() {
-        configuredCollections.values().forEach(col -> {
+        configuredIndexes.values().forEach(col -> {
             try {
                 col.close();
             } catch (IOException e) {
@@ -89,7 +89,7 @@ public class MCRConfigurableIndexManager implements MCRSolrIndexManager {
         });
     }
 
-    public static class ConfigAdapter implements Supplier<MCRConfigurableIndexManager> {
+    public static class ConfigAdapter implements Supplier<MCRConfigurableIndexRegistry> {
 
         private Map<String, MCRSolrIndex> collections;
 
@@ -97,14 +97,14 @@ public class MCRConfigurableIndexManager implements MCRSolrIndexManager {
             return collections;
         }
 
-        @MCRInstanceMap(name = SOLR_COLLECTION_MANAGER_INDEX_PREFIX, valueClass = MCRSolrIndex.class)
+        @MCRInstanceMap(name = SOLR_INDEX_REGISTRY_INDEX_PREFIX, valueClass = MCRSolrIndex.class)
         public void setCollections(Map<String, MCRSolrIndex> collections) {
             this.collections = collections;
         }
 
         @Override
-        public MCRConfigurableIndexManager get() {
-            return new MCRConfigurableIndexManager(this.getCollections());
+        public MCRConfigurableIndexRegistry get() {
+            return new MCRConfigurableIndexRegistry(this.getCollections());
         }
     }
 }

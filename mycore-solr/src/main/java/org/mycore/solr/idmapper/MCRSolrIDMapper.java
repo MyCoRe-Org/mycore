@@ -36,7 +36,7 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.idmapper.MCRDefaultIDMapper;
 import org.mycore.frontend.idmapper.MCRIDMapper;
-import org.mycore.solr.MCRSolrIndexManager;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
@@ -102,7 +102,7 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
                     QueryRequest queryRequest = new QueryRequest(params);
                     MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
                         MCRSolrAuthenticationLevel.SEARCH);
-                    SolrClient client = MCRSolrIndexManager.obtainInstance().requireMainIndex()
+                    SolrClient client = MCRSolrIndexRegistryManager.obtainRegistry().requireMainIndex()
                         .getClient();
                     solrResponse = queryRequest.process(client);
                 } catch (Exception e) {
@@ -149,7 +149,7 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
                     QueryRequest queryRequest = new QueryRequest(params);
                     MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
                         MCRSolrAuthenticationLevel.SEARCH);
-                    SolrClient client = MCRSolrIndexManager.obtainInstance().requireMainIndex()
+                    SolrClient client = MCRSolrIndexRegistryManager.obtainRegistry().requireMainIndex()
                         .getClient();
                     solrResponse = queryRequest.process(client);
                 } catch (Exception e) {

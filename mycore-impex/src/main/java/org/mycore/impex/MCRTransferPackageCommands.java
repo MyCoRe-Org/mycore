@@ -43,8 +43,8 @@ import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.services.packaging.MCRPackerManager;
-import org.mycore.solr.MCRIndexType;
-import org.mycore.solr.MCRSolrIndexManager;
+import org.mycore.solr.MCRSolrIndexType;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
 import org.mycore.solr.index.MCRSolrIndexer;
 import org.mycore.solr.search.MCRSolrSearchUtils;
 
@@ -57,7 +57,7 @@ public class MCRTransferPackageCommands {
     @MCRCommand(help = "Creates multiple transfer packages which matches the solr query in {0}.",
         syntax = "create transfer package for objects matching {0}")
     public static void create(String query) throws MCRAccessException {
-        SolrClient solrClient = MCRSolrIndexManager.obtainInstance().requireMainIndex().getClient();
+        SolrClient solrClient = MCRSolrIndexRegistryManager.obtainRegistry().requireMainIndex().getClient();
         List<String> ids = MCRSolrSearchUtils.listIDs(solrClient, query);
         for (String objectId : ids) {
             Map<String, String> parameters = new HashMap<>();
@@ -192,8 +192,8 @@ public class MCRTransferPackageCommands {
             markManager.remove(MCRObjectID.getInstance(id));
         }
         // index all objects
-        MCRSolrIndexer.rebuildMetadataIndex(mcrObjects, MCRSolrIndexManager.obtainInstance()
-            .getIndexWithType(MCRIndexType.MAIN));
+        MCRSolrIndexer.rebuildMetadataIndex(mcrObjects, MCRSolrIndexRegistryManager.obtainRegistry()
+            .getIndexWithType(MCRSolrIndexType.MAIN));
 
         // deleting expanded directory
         LOGGER.info("Deleting expanded tar in {}...", targetDirectoryPath);

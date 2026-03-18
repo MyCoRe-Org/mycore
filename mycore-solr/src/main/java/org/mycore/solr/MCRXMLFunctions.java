@@ -54,7 +54,7 @@ public class MCRXMLFunctions {
         QueryRequest queryRequest = new QueryRequest(solrQuery);
         MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
             MCRSolrAuthenticationLevel.SEARCH);
-        QueryResponse queryResponse = queryRequest.process(MCRSolrIndexManager.obtainInstance()
+        QueryResponse queryResponse = queryRequest.process(MCRSolrIndexRegistryManager.obtainRegistry()
             .requireMainIndex().getClient());
         return queryResponse.getResults().getNumFound();
     }
@@ -78,7 +78,7 @@ public class MCRXMLFunctions {
         QueryRequest queryRequest = new QueryRequest(solrQuery);
         MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
             MCRSolrAuthenticationLevel.SEARCH);
-        queryResponse = queryRequest.process(MCRSolrIndexManager.obtainInstance()
+        queryResponse = queryRequest.process(MCRSolrIndexRegistryManager.obtainRegistry()
             .requireMainIndex().getClient());
 
         if (queryResponse.getResults().getNumFound() == 0) {

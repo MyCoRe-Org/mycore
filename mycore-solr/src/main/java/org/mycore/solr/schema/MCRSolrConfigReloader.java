@@ -41,7 +41,7 @@ import org.apache.solr.client.solrj.request.GenericSolrRequest;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationInputStream;
 import org.mycore.solr.MCRSolrIndex;
-import org.mycore.solr.MCRSolrIndexManager;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
@@ -98,9 +98,9 @@ public class MCRSolrConfigReloader {
     public static void reset(String configType, String coreID) {
         LOGGER.info(() -> "Resetting config definitions for core " + coreID + " using configuration " + configType);
 
-        MCRSolrIndex index = MCRSolrIndexManager.obtainInstance()
+        MCRSolrIndex index = MCRSolrIndexRegistryManager.obtainRegistry()
             .getIndex(coreID)
-            .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreID));
+            .orElseThrow(() -> MCRSolrUtils.getIndexConfigMissingException(coreID));
 
         JsonObject currentSolrConfig = retrieveCurrentSolrConfigOverlay(index);
         JsonObject configPart = currentSolrConfig.getAsJsonObject("overlay");
@@ -134,7 +134,7 @@ public class MCRSolrConfigReloader {
     public static void processConfigFiles(String configType, String coreID) {
         LOGGER.info(() -> "Load config definitions for core " + coreID + " using configuration " + configType);
         try {
-            MCRSolrIndex index = MCRSolrIndexManager.obtainInstance().requireIndex(coreID);
+            MCRSolrIndex index = MCRSolrIndexRegistryManager.obtainRegistry().requireIndex(coreID);
 
             List<String> observedTypes = getObserverConfigTypes();
             JsonObject currentSolrConfig = retrieveCurrentSolrConfig(index);
