@@ -74,6 +74,7 @@ import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRSourceContent;
+import org.mycore.common.xml.derivate.MCRDerivateDisplayFilter;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -83,6 +84,7 @@ import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRLinkType;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRExpandedObject;
 import org.mycore.datamodel.metadata.MCRExpandedObjectStructure;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -388,14 +390,32 @@ public class MCRXMLFunctions {
      * (which is controlled by the configured {@link MCRDerivateDisplayFilter},
      * set by configuration property {@link MCRXMLFunctions#DERIVATE_DISPLAY_FILTER_PROPERTY}).
      * <p>
-     * This is independent of weather the derivate is allowed to be accessed,
+     * This check is independent of weather the derivate is allowed to be accessed,
      * which can be ascertained, depending on context, by, for example,
      * {@link MCRAccessManager#checkDerivateDisplayPermission(String)}
      * {@link MCRAccessManager#checkDerivateContentPermission(MCRObjectID, String)}
      * or {@link MCRAccessManager#checkPermission(MCRObjectID, String)}.
      */
     public static boolean isDerivateDisplayEnabled(String derivateId, String intent) {
-        return DERIVATE_DISPLAY_FILTER.isDerivateDisplayEnabled(derivateId, intent);
+        MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateId));
+        return isDerivateDisplayEnabled(derivate, intent);
+    }
+
+    /**
+     * Returns, weather the derivate identified by the given derivate ID
+     * should be included when displaying derivates for the given intent
+     * (which is controlled by the configured {@link MCRDerivateDisplayFilter},
+     * set by configuration property {@link MCRXMLFunctions#DERIVATE_DISPLAY_FILTER_PROPERTY}).
+     * <p>
+     * This check is independent of weather the derivate is allowed to be accessed,
+     * which can be ascertained, depending on context, by, for example,
+     * {@link MCRAccessManager#checkDerivateDisplayPermission(String)}
+     * {@link MCRAccessManager#checkDerivateContentPermission(MCRObjectID, String)}
+     * or {@link MCRAccessManager#checkPermission(MCRObjectID, String)}.
+     */
+    public static boolean isDerivateDisplayEnabled(MCRDerivate derivate, String intent) {
+        Boolean excludeDerivate = DERIVATE_DISPLAY_FILTER.isDisplayEnabled(derivate, intent);
+        return !Objects.equals(excludeDerivate, false);
     }
 
     /**
@@ -720,7 +740,7 @@ public class MCRXMLFunctions {
             MCRCategory category = dao.getCategory(categID, 0);
             Optional<MCRLabel> label = category.getLabel(lang);
             return label.isEmpty() ? getDisplayName(classificationId, categoryId)
-                                   : label.get().getText();
+                : label.get().getText();
         } catch (MCRException e) {
             LOGGER.error("Could not determine display name for classification id {} and category id {}",
                 classificationId, categoryId, e);
