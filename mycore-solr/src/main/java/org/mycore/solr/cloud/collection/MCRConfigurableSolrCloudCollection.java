@@ -51,14 +51,14 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
     private final HttpJettySolrClient clusterStateClient;
     private final String collectionName;
     private final Set<MCRSolrIndexType> indexTypes;
-    private final MCRSorCloudCollectionCreationConfiguration creationConfiguration;
+    private final MCRSolrCloudCollectionCreationConfiguration creationConfiguration;
 
 
     public MCRConfigurableSolrCloudCollection(CloudSolrClient client,
         CloudSolrClient baseClient,
         HttpJettySolrClient clusterStateClient,
         String collectionName, Set<MCRSolrIndexType> indexTypes,
-        MCRSorCloudCollectionCreationConfiguration creationConfiguration) {
+        MCRSolrCloudCollectionCreationConfiguration creationConfiguration) {
         this.client = client;
         this.baseClient = baseClient;
         this.clusterStateClient = clusterStateClient;
@@ -97,7 +97,7 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
     }
 
     @Override
-    public MCRSorCloudCollectionCreationConfiguration getCreationConfiguration() {
+    public MCRSolrCloudCollectionCreationConfiguration getCreationConfiguration() {
         return creationConfiguration;
     }
 
@@ -284,7 +284,7 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
             Integer numNrtReplicas,
             Integer numTlogReplicas,
             Integer numPullReplicas,
-            String configSetTemplate) implements MCRSorCloudCollectionCreationConfiguration {
+            String configSetTemplate) implements MCRSolrCloudCollectionCreationConfiguration {
 
         }
     }

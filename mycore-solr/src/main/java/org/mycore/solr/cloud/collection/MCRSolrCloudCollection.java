@@ -36,9 +36,9 @@ public interface MCRSolrCloudCollection extends MCRSolrIndex {
 
   /**
    * Returns the Configuration which is used to create the Collection on the Solr Server
-   * @return the {@link MCRSorCloudCollectionCreationConfiguration} instance containing the
+   * @return the {@link MCRSolrCloudCollectionCreationConfiguration} instance containing the
    * collection creation parameters
    */
-  MCRSorCloudCollectionCreationConfiguration getCreationConfiguration();
+  MCRSolrCloudCollectionCreationConfiguration getCreationConfiguration();
 
 }

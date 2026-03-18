@@ -48,7 +48,7 @@ public class MCRSolrCollectionHelper {
      * @throws IOException If an error occurs while communicating with the Solr server.
      */
     public static void createCollection(MCRSolrCloudCollection collection) throws SolrServerException, IOException {
-        MCRSorCloudCollectionCreationConfiguration creationConfiguration = collection.getCreationConfiguration();
+        MCRSolrCloudCollectionCreationConfiguration creationConfiguration = collection.getCreationConfiguration();
         CollectionAdminRequest.Create collectionCreateRequest = CollectionAdminRequest
             .createCollection(collection.getName(), buildRemoteConfigSetName(collection),
                 creationConfiguration.numShards(),

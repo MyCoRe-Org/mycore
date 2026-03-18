@@ -12,7 +12,7 @@ package org.mycore.solr.cloud.collection;
  * @see MCRSolrCloudCollection#getCreationConfiguration()
  * @see MCRSolrCollectionHelper#createCollection(MCRSolrCloudCollection)
  */
-public interface MCRSorCloudCollectionCreationConfiguration {
+public interface MCRSolrCloudCollectionCreationConfiguration {
 
 
   /**
