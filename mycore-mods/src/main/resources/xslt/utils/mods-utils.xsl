@@ -577,7 +577,12 @@
   </xsl:template>
 
   <xsl:template match="text()" mode="unescapeHtml">
-    <xsl:value-of select="." disable-output-escaping="yes" />
+    <xsl:try>
+      <xsl:copy-of select="parse-xml-fragment(.)/node()" />
+      <xsl:catch>
+        <xsl:value-of select="." />
+      </xsl:catch>
+    </xsl:try>
   </xsl:template>
 
   <xsl:template name="mods.seperateName">
