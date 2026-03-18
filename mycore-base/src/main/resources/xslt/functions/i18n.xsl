@@ -14,7 +14,7 @@
 
     <xsl:function name="mcri18n:translate-with-params" as="xs:string">
         <xsl:param name="key" as="xs:string"/>
-        <xsl:param name="arguments" as="xs:string*"/>
+        <xsl:param name="arguments" as="xs:anyAtomicType*"/>
         <xsl:variable name="translation" select="mcri18n:translate($key)" />
         <xsl:choose>
             <xsl:when test="count($arguments) = 0">
@@ -29,7 +29,8 @@
                         <xsl:value-of select="$replTrans" />
                     </xsl:on-completion>
                     <xsl:next-iteration>
-                        <xsl:with-param name="replTrans" select="fn:replace($replTrans, concat('\{',$repl,'\}'), .)" />
+                        <xsl:with-param name="replTrans"
+                                        select="fn:replace($replTrans, concat('\{',$repl,'\}'), string(.))" />
                         <xsl:with-param name="repl" select="($repl + 1)" />
                     </xsl:next-iteration>
                 </xsl:iterate>
