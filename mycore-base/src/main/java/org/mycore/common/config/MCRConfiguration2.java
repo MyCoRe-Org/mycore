@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.mycore.common.MCRClassTools;
+import org.mycore.common.config.instantiator.MCRInstantiator;
 import org.mycore.common.function.MCRTriConsumer;
 
 /**
@@ -131,11 +132,11 @@ public class MCRConfiguration2 {
      * @throws MCRConfigurationException if the class can not be loaded or instantiated
      */
     public static <S> Optional<S> getInstanceOf(Class<S> superClass, String name) throws MCRConfigurationException {
-        return getInstanceOf(superClass, name, MCRConfigurableInstanceHelper.NO_OPTIONS);
+        return getInstanceOf(superClass, name, MCRInstantiator.NO_OPTIONS);
     }
 
     private static <S> Optional<S> getInstanceOf(Class<S> superClass, String name,
-        Set<MCRConfigurableInstanceHelper.Option> options) {
+        Set<MCRInstantiator.Option> options) {
         if (MCRConfigurableInstanceHelper.isSingleton(superClass)) {
             return getSingleInstanceOf(superClass, name, options);
         } else {
@@ -153,7 +154,7 @@ public class MCRConfiguration2 {
      * or the configuration property is not set
      */
     public static <S> S getInstanceOfOrThrow(Class<S> superClass, String name) throws MCRConfigurationException {
-        return getInstanceOf(superClass, name, MCRConfigurableInstanceHelper.ADD_IMPLICIT_CLASS_PROPERTIES)
+        return getInstanceOf(superClass, name, MCRInstantiator.ADD_IMPLICIT_CLASS_PROPERTIES_OPTION)
             .orElseThrow(() -> createConfigurationException(name));
     }
 
@@ -167,11 +168,11 @@ public class MCRConfiguration2 {
      * @throws MCRConfigurationException if the class can not be loaded or instantiated
      */
     public static <S> Optional<S> getSingleInstanceOf(Class<S> superClass, String name) {
-        return getSingleInstanceOf(superClass, name, MCRConfigurableInstanceHelper.NO_OPTIONS);
+        return getSingleInstanceOf(superClass, name, MCRInstantiator.NO_OPTIONS);
     }
 
     private static <S> Optional<S> getSingleInstanceOf(Class<S> superClass, String name,
-        Set<MCRConfigurableInstanceHelper.Option> options) {
+        Set<MCRInstantiator.Option> options) {
         return getString(name)
             .map(className -> new ConfigSingletonKey(name, className))
             .map(key -> (S) instanceHolder.computeIfAbsent(key,
@@ -189,7 +190,7 @@ public class MCRConfiguration2 {
      * or the configuration property is not set
      */
     public static <S> S getSingleInstanceOfOrThrow(Class<S> superClass, String name) {
-        return getSingleInstanceOf(superClass, name, MCRConfigurableInstanceHelper.ADD_IMPLICIT_CLASS_PROPERTIES)
+        return getSingleInstanceOf(superClass, name, MCRInstantiator.ADD_IMPLICIT_CLASS_PROPERTIES_OPTION)
             .orElseThrow(() -> createConfigurationException(name));
     }
 

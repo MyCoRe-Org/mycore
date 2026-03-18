@@ -28,6 +28,7 @@ import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRFactory;
+import org.mycore.common.config.instantiator.MCRInstantiator;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
@@ -135,7 +136,7 @@ public class MCRConfigurableInstanceHelperBasicTest {
 
         MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
         ImplicitTestClass instance = MCRConfigurableInstanceHelper.getInstance(ImplicitTestClass.class, configuration,
-            MCRConfigurableInstanceHelper.ADD_IMPLICIT_CLASS_PROPERTIES);
+            MCRInstantiator.ADD_IMPLICIT_CLASS_PROPERTIES_OPTION);
 
         assertNotNull(instance);
 

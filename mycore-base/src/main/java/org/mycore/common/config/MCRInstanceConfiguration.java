@@ -389,6 +389,9 @@ public final class MCRInstanceConfiguration {
      * @return the nested configuration map
      */
     public Map<String, MCRInstanceConfiguration> nestedConfigurationMap(String commonPrefix) {
+        if (commonPrefix.isEmpty()) {
+            return nestedConfigurationMap();
+        }
         String commonSuffixWithDelimiter = commonPrefix + ".";
         Map<String, MCRInstanceConfiguration> nestedConfigurationMap = new HashMap<>();
         for (Map.Entry<String, String> entry : properties().entrySet()) {

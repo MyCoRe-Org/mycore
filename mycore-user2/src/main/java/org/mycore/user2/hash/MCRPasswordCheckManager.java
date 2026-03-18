@@ -118,11 +118,14 @@ public final class MCRPasswordCheckManager {
     public MCRPasswordCheckManager(SecureRandom random, Map<String, MCRPasswordCheckStrategy> strategies,
         String selectedStrategyType, Set<ConfigurationCheck> configurationChecks) {
 
-        this.random = Objects.requireNonNull(random, "Random must not be null");
-        this.strategies = new HashMap<>(Objects.requireNonNull(strategies, "Strategies must not be null"));
-        this.strategies.forEach((type, strategy) ->
-            Objects.requireNonNull(strategy, "Strategy " + type + " must not be null"));
-        this.selectedStrategyType = Objects.requireNonNull(selectedStrategyType, "Selected strategy must not be null");
+        this.random = Objects
+            .requireNonNull(random, "Random must not be null");
+        this.strategies = new HashMap<>(Objects
+            .requireNonNull(strategies, "Strategies must not be null"));
+        this.strategies.forEach((type, strategy) -> Objects
+            .requireNonNull(strategy, "Strategy " + type + " must not be null"));
+        this.selectedStrategyType = Objects
+            .requireNonNull(selectedStrategyType, "Selected strategy must not be null");
         this.selectedStrategy = this.strategies.get(selectedStrategyType);
 
         if (this.selectedStrategy == null) {
