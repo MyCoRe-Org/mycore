@@ -266,7 +266,7 @@ public final class MCRSolrClassificationUtil {
      * Returns the solr classification core.
      */
     public static List<MCRSolrIndex> getIndexList() {
-        return MCRSolrIndexRegistryManager.obtainRegistry().getIndexWithType(CLASSIFICATION_INDEX_TYPE);
+        return MCRSolrIndexRegistryManager.obtainRegistry().getIndexByType(CLASSIFICATION_INDEX_TYPE);
     }
 
     /**

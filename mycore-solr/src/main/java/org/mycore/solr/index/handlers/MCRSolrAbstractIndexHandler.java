@@ -75,7 +75,7 @@ public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler
         if (destinationIndexList != null) {
             return destinationIndexList;
         } else {
-            return MCRSolrIndexRegistryManager.obtainRegistry().getIndexWithType(this.indexType);
+            return MCRSolrIndexRegistryManager.obtainRegistry().getIndexByType(this.indexType);
         }
     }
 

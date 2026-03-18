@@ -19,22 +19,27 @@
 package org.mycore.solr;
 
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.events.MCRShutdownHandler;
 
 
 /**
- * Central manager interface for accessing and managing {@link MCRSolrIndex} instances.
+ * Central manager interface for accessing the singleton {@link MCRSolrIndexRegistry} instance.
+ * The registry is lazily created based on the MyCoRe configuration property
+ * {@link MCRSolrConstants#SOLR_INDEX_REGISTRY_PROPERTY} and can be reloaded at runtime using the
+ * {@link #reloadRegistry()} method, which discards the current instance and creates a new one.
  *
- * <p>Provides methods to look up Solr indexes by their identifier or by their
- * {@link MCRSolrIndexType}. A singleton instance is lazily created from the MyCoRe
- * configuration property defined by {@link MCRSolrConstants#SOLR_INDEX_REGISTRY_PROPERTY}
- * and can be obtained via {@link #obtainRegistry()}.</p>
- *
- * @see MCRSolrIndex
- * @see MCRSolrIndexType
+ * @see MCRSolrIndexRegistry
  */
 public class MCRSolrIndexRegistryManager {
 
     private static volatile MCRSolrIndexRegistry instance;
+
+    static {
+        MCRShutdownHandler shutdownHandler = MCRShutdownHandler.getInstance();
+        if (shutdownHandler != null) {
+            shutdownHandler.addCloseable(MCRSolrIndexRegistryManager::closeIndexes);
+        }
+    }
 
     /**
      * Returns the singleton {@link MCRSolrIndexRegistryManager} instance. The instance is
@@ -48,7 +53,7 @@ public class MCRSolrIndexRegistryManager {
             synchronized (MCRSolrIndexRegistryManager.class) {
                 if (instance == null) {
                     instance = MCRConfiguration2.getInstanceOf(
-                        MCRConfigurableIndexRegistry.class,
+                        MCRSolrIndexRegistry.class,
                         MCRSolrConstants.SOLR_INDEX_REGISTRY_PROPERTY).orElseThrow();
                 }
             }
@@ -63,9 +68,14 @@ public class MCRSolrIndexRegistryManager {
      */
     public static void reloadRegistry() {
         synchronized (MCRSolrIndexRegistryManager.class) {
-            instance = MCRConfiguration2.getInstanceOf(MCRSolrIndexRegistry.class,
-                MCRSolrConstants.SOLR_INDEX_REGISTRY_PROPERTY).orElseThrow();
+            instance.closeIndexes();
+            obtainRegistry();
         }
     }
 
+    private static void closeIndexes() {
+        if( instance != null ) {
+            instance.closeIndexes();
+        }
+    }
 }

@@ -53,7 +53,7 @@ public class MCRSolrCategLinkService extends MCRCategLinkServiceImpl {
         super.setLinks(objectReference, categories);
         // solr
         List<MCRSolrIndex> indexList =
-            MCRSolrIndexRegistryManager.obtainRegistry().getIndexWithType(MCRSolrIndexType.CLASSIFICATION);
+            MCRSolrIndexRegistryManager.obtainRegistry().getIndexByType(MCRSolrIndexType.CLASSIFICATION);
         List<SolrInputDocument> solrDocumentList = MCRSolrClassificationUtil
             .toSolrDocument(objectReference, categories);
 

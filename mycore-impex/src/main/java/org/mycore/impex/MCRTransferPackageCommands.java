@@ -193,7 +193,7 @@ public class MCRTransferPackageCommands {
         }
         // index all objects
         MCRSolrIndexer.rebuildMetadataIndex(mcrObjects, MCRSolrIndexRegistryManager.obtainRegistry()
-            .getIndexWithType(MCRSolrIndexType.MAIN));
+            .getIndexByType(MCRSolrIndexType.MAIN));
 
         // deleting expanded directory
         LOGGER.info("Deleting expanded tar in {}...", targetDirectoryPath);

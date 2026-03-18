@@ -21,6 +21,7 @@ package org.mycore.solr;
 import static org.mycore.solr.MCRSolrConstants.SOLR_INDEX_REGISTRY_INDEX_PREFIX;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -59,11 +60,6 @@ public class MCRConfigurableIndexRegistry implements MCRSolrIndexRegistry {
 
     public MCRConfigurableIndexRegistry(Map<String, MCRSolrIndex> configuredIndexes) {
         this.configuredIndexes = configuredIndexes;
-
-        MCRShutdownHandler shutdownHandler = MCRShutdownHandler.getInstance();
-        if (shutdownHandler != null) {
-            shutdownHandler.addCloseable(this::closeIndexes);
-        }
     }
 
     @Override
@@ -72,13 +68,19 @@ public class MCRConfigurableIndexRegistry implements MCRSolrIndexRegistry {
     }
 
     @Override
-    public List<MCRSolrIndex> getIndexWithType(MCRSolrIndexType type) {
+    public List<MCRSolrIndex> getIndexByType(MCRSolrIndexType type) {
         return configuredIndexes.values()
             .stream()
             .filter(col -> col.getIndexTypes().contains(type))
             .toList();
     }
 
+    @Override
+    public Map<String, MCRSolrIndex> getIndexes() {
+        return Collections.unmodifiableMap(configuredIndexes);
+    }
+
+    @Override
     public void closeIndexes() {
         configuredIndexes.values().forEach(col -> {
             try {
@@ -91,20 +93,20 @@ public class MCRConfigurableIndexRegistry implements MCRSolrIndexRegistry {
 
     public static class ConfigAdapter implements Supplier<MCRConfigurableIndexRegistry> {
 
-        private Map<String, MCRSolrIndex> collections;
+        private Map<String, MCRSolrIndex> configuredIndexes;
 
-        public Map<String, MCRSolrIndex> getCollections() {
-            return collections;
+        public Map<String, MCRSolrIndex> getConfiguredIndexes() {
+            return configuredIndexes;
         }
 
         @MCRInstanceMap(name = SOLR_INDEX_REGISTRY_INDEX_PREFIX, valueClass = MCRSolrIndex.class)
-        public void setCollections(Map<String, MCRSolrIndex> collections) {
-            this.collections = collections;
+        public void setConfiguredIndexes(Map<String, MCRSolrIndex> configuredIndexes) {
+            this.configuredIndexes = configuredIndexes;
         }
 
         @Override
         public MCRConfigurableIndexRegistry get() {
-            return new MCRConfigurableIndexRegistry(this.getCollections());
+            return new MCRConfigurableIndexRegistry(this.getConfiguredIndexes());
         }
     }
 }

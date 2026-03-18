@@ -1,9 +1,17 @@
 package org.mycore.solr;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
 import org.mycore.common.config.MCRConfigurationException;
 
+/**
+ * Central registry interface for accessing {@link MCRSolrIndex} instances.
+ *
+ * <p>Provides methods to look up Solr indexes by their identifier or by their
+ * {@link MCRSolrIndexType}.
+ */
 public interface MCRSolrIndexRegistry {
 
   /**
@@ -22,7 +30,23 @@ public interface MCRSolrIndexRegistry {
    * @param type the index type to filter by
    * @return a list of matching indexes; may be empty if no index matches the type
    */
-  List<MCRSolrIndex> getIndexWithType(MCRSolrIndexType type);
+  List<MCRSolrIndex> getIndexByType(MCRSolrIndexType type);
+
+  /**
+   * Returns a map of all configured {@link MCRSolrIndex} instances, keyed by their unique
+   * identifier.
+   * @return a readonly map of all configured indexes, where the key is the index identifier
+   * and the value is the corresponding {@link MCRSolrIndex}
+   */
+  Map<String, MCRSolrIndex> getIndexes();
+
+  /**
+   * Closes all registered {@link MCRSolrIndex} instances, ensuring that any underlying
+   * resources such as Solr clients are properly released. This method is typically called
+   * during application shutdown to clean up resources. After calling this method, the registry
+   * should not be used to access any indexes, as they will have been closed.
+   */
+  void closeIndexes();
 
   /**
    * Returns the main index, identified by {@link MCRSolrConstants#MAIN_INDEX_ID}.
