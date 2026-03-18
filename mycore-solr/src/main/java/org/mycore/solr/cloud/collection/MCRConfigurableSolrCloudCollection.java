@@ -244,6 +244,7 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
             try {
                 List<String> solrUrlList = MCRConfiguration2.splitValue(solrUrls)
                     .map(String::trim)
+                    .map(p -> p.endsWith("/") ? p : p + "/")
                     .map(p -> p.endsWith("solr/") ? p : p + "solr/")
                     .toList();
                 HttpJettySolrClient.Builder clusterStateHttpClientBuilder = new HttpJettySolrClient.Builder();

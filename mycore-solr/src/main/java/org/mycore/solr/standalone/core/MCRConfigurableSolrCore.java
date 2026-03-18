@@ -133,6 +133,7 @@ public class MCRConfigurableSolrCore implements MCRSolrIndex {
         }
 
         @Override
+        @SuppressWarnings("PMD.UseStringBufferForStringAppends") // garbage rule
         public MCRConfigurableSolrCore get() {
 
             String normalizedSolrUrl = getSolrUrl();
@@ -141,16 +142,20 @@ public class MCRConfigurableSolrCore implements MCRSolrIndex {
                 normalizedSolrUrl += "/";
             }
 
+            if (!normalizedSolrUrl.endsWith("solr/")) {
+                normalizedSolrUrl += "solr/";
+            }
+
             HttpSolrClientBuilderBase<?, ?> builder = getBuilder();
 
             applySettings(builder);
 
             HttpSolrClientBase base = builder
-                .withBaseSolrUrl(normalizedSolrUrl + "solr/")
+                .withBaseSolrUrl(normalizedSolrUrl)
                 .build();
 
             HttpSolrClientBase client = builder
-                .withBaseSolrUrl(normalizedSolrUrl + "solr/")
+                .withBaseSolrUrl(normalizedSolrUrl)
                 .withDefaultCollection(getCoreName())
                 .build();
 
