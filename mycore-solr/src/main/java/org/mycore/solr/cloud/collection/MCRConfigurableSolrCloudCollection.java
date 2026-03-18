@@ -50,27 +50,17 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
     private final CloudSolrClient baseClient;
     private final String collectionName;
     private final Set<MCRSolrIndexType> indexTypes;
+    private final MCRSorCloudCollectionCreationConfiguration creationConfiguration;
 
-    private final Integer numShards;
-    private final Integer numNrtReplicas;
-    private final Integer numTlogReplicas;
-    private final Integer numPullReplicas;
-
-    private final String configSetTemplate;
 
     public MCRConfigurableSolrCloudCollection(CloudSolrClient client, CloudSolrClient baseClient,
-        String collectionName, Set<MCRSolrIndexType> indexTypes, Integer numShards,
-        Integer numNrtReplicas, Integer numTlogReplicas, Integer numPullReplicas,
-        String configSetTemplate) {
+        String collectionName, Set<MCRSolrIndexType> indexTypes,
+        MCRSorCloudCollectionCreationConfiguration creationConfiguration) {
         this.client = client;
         this.baseClient = baseClient;
         this.collectionName = collectionName;
         this.indexTypes = indexTypes;
-        this.numShards = numShards;
-        this.numNrtReplicas = numNrtReplicas;
-        this.numTlogReplicas = numTlogReplicas;
-        this.numPullReplicas = numPullReplicas;
-        this.configSetTemplate = configSetTemplate;
+        this.creationConfiguration = creationConfiguration;
     }
 
     @Override
@@ -100,28 +90,8 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
     }
 
     @Override
-    public Integer getNumShards() {
-        return numShards;
-    }
-
-    @Override
-    public Integer getNumNrtReplicas() {
-        return numNrtReplicas;
-    }
-
-    @Override
-    public Integer getNumTlogReplicas() {
-        return numTlogReplicas;
-    }
-
-    @Override
-    public Integer getNumPullReplicas() {
-        return numPullReplicas;
-    }
-
-    @Override
-    public String getConfigSetTemplate() {
-        return configSetTemplate;
+    public MCRSorCloudCollectionCreationConfiguration getCreationConfiguration() {
+        return creationConfiguration;
     }
 
     public static class ConfigAdapter extends
@@ -214,12 +184,14 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
             CloudHttp2SolrClient.Builder builder;
             if (zkUrls != null && !zkUrls.isEmpty()) {
                 List<String> zkUrlList = MCRConfiguration2.splitValue(zkUrls).toList();
-                builder = new CloudHttp2SolrClient.Builder(zkUrlList, Optional.ofNullable(zkChroot));
+                builder = new CloudHttp2SolrClient.Builder(zkUrlList,
+                    Optional.ofNullable(zkChroot));
             } else if (solrUrls != null && !solrUrls.isEmpty()) {
                 builder = getURLBaseCloudHttp2SolrClientBuilder();
             } else {
                 throw new IllegalStateException(
-                    "No Solr URLs or Zookeeper URL configured for SolrCloud collection " + collectionName);
+                    "No Solr URLs or Zookeeper URL configured for SolrCloud collection "
+                        + collectionName);
             }
 
             HttpSolrClientBuilderBase<?, ?> baseClientBuilder = getBuilder();
@@ -233,7 +205,8 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
             builder.withHttpClientBuilder(http2Builder);
 
             CloudHttp2SolrClient baseClient = builder.build();
-            CloudHttp2SolrClient client = builder.withDefaultCollection(getCollectionName()).build();
+            CloudHttp2SolrClient client = builder.withDefaultCollection(getCollectionName())
+                .build();
 
             return new ClientPair(client, baseClient);
         }
@@ -248,14 +221,16 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
                     .map(p -> p.endsWith("solr/") ? p : p + "solr/")
                     .toList();
                 HttpJettySolrClient.Builder clusterStateHttpClientBuilder = new HttpJettySolrClient.Builder();
-                MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(clusterStateHttpClientBuilder,
-                    MCRSolrAuthenticationLevel.ADMIN);
+                MCRSolrAuthenticationManager.obtainInstance()
+                    .applyAuthentication(clusterStateHttpClientBuilder,
+                        MCRSolrAuthenticationLevel.ADMIN);
                 HttpJettySolrClient clusterStateHttpClient = clusterStateHttpClientBuilder.build();
                 HttpClusterStateProvider<HttpJettySolrClient> clusterStateProvider =
                     new HttpClusterStateProvider<>(solrUrlList, clusterStateHttpClient);
                 return new CloudHttp2SolrClient.Builder(clusterStateProvider);
             } catch (Exception e) {
-                throw new MCRException("Error building SolrCloud client for collection " + collectionName, e);
+                throw new MCRException(
+                    "Error building SolrCloud client for collection " + collectionName, e);
             }
         }
 
@@ -268,11 +243,12 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
                 clientPair.baseClient,
                 getCollectionName(),
                 buildIndexTypes(),
-                numShards != null ? Integer.parseInt(numShards) : null,
-                numNrtReplicas != null ? Integer.parseInt(numNrtReplicas) : null,
-                numTlogReplicas != null ? Integer.parseInt(numTlogReplicas) : null,
-                numPullReplicas != null ? Integer.parseInt(numPullReplicas) : null,
-                getConfigSetTemplate());
+                new MCRSolrCloudCollectionCreationConfig(
+                    numShards != null ? Integer.parseInt(numShards) : null,
+                    numNrtReplicas != null ? Integer.parseInt(numNrtReplicas) : null,
+                    numTlogReplicas != null ? Integer.parseInt(numTlogReplicas) : null,
+                    numPullReplicas != null ? Integer.parseInt(numPullReplicas) : null,
+                    getConfigSetTemplate()));
         }
 
         public String getConfigSetTemplate() {
@@ -285,6 +261,16 @@ public class MCRConfigurableSolrCloudCollection implements MCRSolrCloudCollectio
         }
 
         private record ClientPair(CloudHttp2SolrClient client, CloudHttp2SolrClient baseClient) {
+
+        }
+
+        private record MCRSolrCloudCollectionCreationConfig(
+            Integer numShards,
+            Integer numNrtReplicas,
+            Integer numTlogReplicas,
+            Integer numPullReplicas,
+            String configSetTemplate) implements MCRSorCloudCollectionCreationConfiguration {
+
         }
     }
 }

@@ -35,10 +35,10 @@ import org.apache.solr.client.solrj.response.ConfigSetAdminResponse;
 import org.apache.solr.common.util.ContentStreamBase;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.solr.cloud.collection.MCRSolrCloudCollection;
 import org.mycore.solr.MCRSolrConstants;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
+import org.mycore.solr.cloud.collection.MCRSolrCloudCollection;
 import org.mycore.solr.cloud.collection.MCRSolrCollectionHelper;
 
 /**
@@ -113,7 +113,8 @@ public class MCRSolrConfigSetHelper {
         MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(request, MCRSolrAuthenticationLevel.ADMIN);
         request.setConfigSetName(remoteName);
 
-        MCRSolrConfigSetProvider configSetProvider = getLocalConfigSets().get(collection.getConfigSetTemplate());
+        MCRSolrConfigSetProvider configSetProvider =
+            getLocalConfigSets().get(collection.getCreationConfiguration().configSetTemplate());
 
         request.setUploadStream(new ContentStreamBase() {
             @Override
@@ -159,7 +160,8 @@ public class MCRSolrConfigSetHelper {
             throw new MCRConfigurationException("Error while deleting config set from remote Solr server.", e);
         }
 
-        LOGGER.info("Config set {} deleted from remote Solr server.", collection::getConfigSetTemplate);
+        LOGGER.info("Config set {} deleted from remote Solr server.",
+            ()-> collection.getCreationConfiguration().configSetTemplate());
     }
 
 }

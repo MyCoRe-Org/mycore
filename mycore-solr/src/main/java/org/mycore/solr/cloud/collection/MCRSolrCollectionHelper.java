@@ -48,9 +48,12 @@ public class MCRSolrCollectionHelper {
      * @throws IOException If an error occurs while communicating with the Solr server.
      */
     public static void createCollection(MCRSolrCloudCollection collection) throws SolrServerException, IOException {
+        MCRSorCloudCollectionCreationConfiguration creationConfiguration = collection.getCreationConfiguration();
         CollectionAdminRequest.Create collectionCreateRequest = CollectionAdminRequest
-            .createCollection(collection.getName(), buildRemoteConfigSetName(collection), collection.getNumShards(),
-                collection.getNumNrtReplicas(), collection.getNumTlogReplicas(), collection.getNumPullReplicas());
+            .createCollection(collection.getName(), buildRemoteConfigSetName(collection),
+                creationConfiguration.numShards(),
+                creationConfiguration.numNrtReplicas(), creationConfiguration.numTlogReplicas(),
+                creationConfiguration.numPullReplicas());
 
         MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(collectionCreateRequest,
             MCRSolrAuthenticationLevel.ADMIN);
@@ -98,6 +101,7 @@ public class MCRSolrCollectionHelper {
      * @return The name of the remote config set.
      */
     public static String buildRemoteConfigSetName(MCRSolrCloudCollection collection) {
-        return collection.getName() + "_" + collection.getConfigSetTemplate();
+        return collection.getName() + "_" + collection.getCreationConfiguration()
+            .configSetTemplate();
     }
 }

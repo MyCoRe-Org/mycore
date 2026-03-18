@@ -99,7 +99,7 @@ public class MCRSolrCloudCommands {
     public static void uploadLocalConfig(String collectionName)
         throws URISyntaxException, SolrServerException, IOException {
         MCRSolrCloudCollection collection = obtainCollection(collectionName);
-        String localConfigSetName = collection.getConfigSetTemplate();
+        String localConfigSetName = collection.getCreationConfiguration().configSetTemplate();
 
         MCRSolrConfigSetProvider configSet = MCRSolrConfigSetHelper.getLocalConfigSets().get(localConfigSetName);
         if (configSet == null) {
