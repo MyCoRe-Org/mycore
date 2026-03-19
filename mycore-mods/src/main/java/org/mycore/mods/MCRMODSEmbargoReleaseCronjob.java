@@ -57,7 +57,7 @@ public class MCRMODSEmbargoReleaseCronjob extends MCRCronjob {
     @Override
     public void runJob() {
 
-        if(MCRSolrIndexRegistryManager.obtainRegistry().getMainIndex().isPresent()) {
+        if(MCRSolrIndexRegistryManager.obtainRegistry().getMainIndex().isEmpty()) {
             return;
         }
 
