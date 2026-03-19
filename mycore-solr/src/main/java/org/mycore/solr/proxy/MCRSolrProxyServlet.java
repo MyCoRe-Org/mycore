@@ -240,22 +240,22 @@ public class MCRSolrProxyServlet extends MCRServlet {
 
         try {
             NamedList<Object> solrResponse = solrIndex.getClient().request(queryRequest);
-            InputStream is = (InputStream) solrResponse.get("stream");
+            try (InputStream is = (InputStream) solrResponse.get("stream")) {
+                if (solrResponse.get("responseStatus") != null) {
+                    Integer responseStatus = (Integer) solrResponse.get("responseStatus");
+                    resp.setStatus(responseStatus);
+                }
 
-            if(solrResponse.get("responseStatus") != null) {
-                Integer responseStatus = (Integer) solrResponse.get("responseStatus");
-                resp.setStatus(responseStatus);
-            }
-
-            if (!writerType.equals("xml")) {
-                // copy solr response to servlet outputstream
-                OutputStream servletOutput = resp.getOutputStream();
-                is.transferTo(servletOutput);
-            } else {
-                MCRStreamContent solrResponseContent = new MCRStreamContent(is,
-                    request.getRequestURI(),
-                    "response");
-                MCRLayoutService.obtainInstance().doLayout(request, resp, solrResponseContent);
+                if (!writerType.equals("xml")) {
+                    // copy solr response to servlet outputstream
+                    OutputStream servletOutput = resp.getOutputStream();
+                    is.transferTo(servletOutput);
+                } else {
+                    MCRStreamContent solrResponseContent = new MCRStreamContent(is,
+                        request.getRequestURI(),
+                        "response");
+                    MCRLayoutService.obtainInstance().doLayout(request, resp, solrResponseContent);
+                }
             }
         } catch (SolrServerException e) {
             throw new IOException("Error while processing query request", e);
