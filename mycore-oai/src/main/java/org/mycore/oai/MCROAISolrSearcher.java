@@ -87,8 +87,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         query.set(CommonParams.Q, "id:" + MCRSolrUtils.escapeSearchValue(mcrId));
         query.setRows(1);
         // do the query
-        SolrClient solrClient = MCRSolrIndexRegistryManager.obtainRegistry()
-            .requireMainIndex().getClient();
+        SolrClient solrClient = MCRSolrIndexRegistryManager.requireMainIndex().getClient();
         try {
             QueryRequest queryRequest = new QueryRequest(query);
             queryRequest.setPath(getRequestHandlerPath());
@@ -160,7 +159,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         query.set(CommonParams.SORT, "id asc");
 
         // do the query
-        SolrClient solrClient = MCRSolrIndexRegistryManager.obtainRegistry().requireMainIndex().getClient();
+        SolrClient solrClient = MCRSolrIndexRegistryManager.requireMainIndex().getClient();
         QueryRequest queryRequest = new QueryRequest(query);
         queryRequest.setPath(getRequestHandlerPath());
         MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
@@ -271,7 +270,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         params.add(CommonParams.FQ, fieldName + ":[* TO *]");
         params.add(CommonParams.FL, fieldName);
         params.add(CommonParams.ROWS, "1");
-        SolrClient solrClient = MCRSolrIndexRegistryManager.obtainRegistry().requireMainIndex().getClient();
+        SolrClient solrClient = MCRSolrIndexRegistryManager.requireMainIndex().getClient();
         try {
             QueryRequest queryRequest = new QueryRequest(params);
             MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,

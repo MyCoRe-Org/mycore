@@ -184,7 +184,7 @@ public final class MCRGoogleSitemapCommon {
             QueryRequest queryRequest = new QueryRequest(query);
             SOLR_AUTHENTICATION_MANAGER.applyAuthentication(queryRequest,
                 MCRSolrAuthenticationLevel.SEARCH);
-            SolrClient client = MCRSolrIndexRegistryManager.obtainRegistry().requireMainIndex().getClient();
+            SolrClient client = MCRSolrIndexRegistryManager.requireMainIndex().getClient();
             response = queryRequest.process(client);
             objidlist = response.getResults().stream().map((document) -> {
                 String id = (String) document.getFieldValue("id");

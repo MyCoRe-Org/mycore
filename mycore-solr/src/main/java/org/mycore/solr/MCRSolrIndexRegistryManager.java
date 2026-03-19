@@ -18,6 +18,8 @@
 
 package org.mycore.solr;
 
+import java.util.Optional;
+
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
 
@@ -74,6 +76,46 @@ public class MCRSolrIndexRegistryManager {
             instance = null;
             obtainRegistry();
         }
+    }
+
+    /**
+     * Returns the main index, identified by {@link MCRSolrConstants#MAIN_INDEX_ID}.
+     *
+     * @return an {@link Optional} containing the main index, or an empty
+     *         {@link Optional} if no main index is configured
+     */
+    public static Optional<MCRSolrIndex> getMainIndex() {
+        return obtainRegistry().getMainIndex();
+    }
+
+    /**
+     * Returns the main index or throws an exception if it is not configured.
+     *
+     * @return the main {@link MCRSolrIndex}
+     * @throws org.mycore.common.config.MCRConfigurationException if no main index is configured
+     */
+    public static MCRSolrIndex requireMainIndex() {
+        return obtainRegistry().requireMainIndex();
+    }
+
+    /**
+     * Returns the classification index, identified by {@link MCRSolrConstants#CLASSIFICATION_INDEX_ID}.
+     *
+     * @return an {@link Optional} containing the classification index, or an empty
+     *         {@link Optional} if no classification index is configured
+     */
+    public static Optional<MCRSolrIndex> getClassificationIndex() {
+        return obtainRegistry().getClassificationIndex();
+    }
+
+    /**
+     * Returns the classification index or throws an exception if it is not configured.
+     *
+     * @return the classification {@link MCRSolrIndex}
+     * @throws org.mycore.common.config.MCRConfigurationException if no classification index is configured
+     */
+    public static MCRSolrIndex requireClassificationIndex() {
+        return obtainRegistry().requireClassificationIndex();
     }
 
     private static void closeIndexes() {

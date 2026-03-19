@@ -513,7 +513,7 @@ public class MCRRestAPIClassifications {
     }
 
     private void filterNonEmpty(String classId, Element e) {
-        SolrClient solrClient = MCRSolrIndexRegistryManager.obtainRegistry().requireMainIndex().getClient();
+        SolrClient solrClient = MCRSolrIndexRegistryManager.requireMainIndex().getClient();
         Element[] categories = e.getChildren(ELEMENT_CATEGORY).toArray(Element[]::new);
         for (Element cat : categories) {
             SolrQuery solrQuery = new SolrQuery();

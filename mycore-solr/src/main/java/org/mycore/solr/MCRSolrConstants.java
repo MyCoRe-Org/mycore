@@ -48,4 +48,6 @@ public class MCRSolrConstants {
     public static final String SOLR_JOIN_PATTERN = "{!join from=returnId to=id}";
 
     public static final String MAIN_INDEX_ID = "main";
+
+    public static final String CLASSIFICATION_INDEX_ID = "classification";
 }

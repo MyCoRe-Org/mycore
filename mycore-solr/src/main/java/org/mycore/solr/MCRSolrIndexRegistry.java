@@ -100,4 +100,25 @@ public interface MCRSolrIndexRegistry {
         .orElseThrow(() -> new MCRConfigurationException("No index with id " + indexId + " configured"));
   }
 
+  /**
+   * Returns the classification index, identified by {@link MCRSolrConstants#CLASSIFICATION_INDEX_ID}.
+   *
+   * @return an {@link Optional} containing the classification index, or an empty
+   *         {@link Optional} if no classification index is configured
+   */
+  default Optional<MCRSolrIndex> getClassificationIndex() {
+    return getIndex(MCRSolrConstants.CLASSIFICATION_INDEX_ID);
+  }
+
+  /**
+   * Returns the classification index or throws an exception if it is not configured.
+   *
+   * @return the classification {@link MCRSolrIndex}
+   * @throws MCRConfigurationException if no classification index is configured
+   */
+  default MCRSolrIndex requireClassificationIndex() {
+    return getClassificationIndex()
+        .orElseThrow(() -> new MCRConfigurationException("No classification index configured"));
+  }
+
 }

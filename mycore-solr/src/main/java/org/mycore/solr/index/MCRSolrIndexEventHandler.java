@@ -285,7 +285,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
         LOGGER.debug("Solr: submitting data of \"{}\" for deleting", id);
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
             //MCR-2349 initialize solr client early enough
-            SolrClient mainSolrClient = MCRSolrIndexRegistryManager.obtainRegistry().requireMainIndex()
+            SolrClient mainSolrClient = MCRSolrIndexRegistryManager.requireMainIndex()
                 .getClient();
             putIntoTaskQueue(new MCRDelayedRunnable(id.toString(), DELAY_IN_MS,
                 new MCRTransactionableRunnable(() -> MCRSolrIndexer.deleteById(mainSolrClient, id.toString()))));
@@ -296,7 +296,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
         LOGGER.debug("Solr: submitting data of \"{}\" for derivate", derivate::getId);
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
             //MCR-2349 initialize solr client early enough
-            SolrClient mainSolrClient = MCRSolrIndexRegistryManager.obtainRegistry().requireMainIndex()
+            SolrClient mainSolrClient = MCRSolrIndexRegistryManager.requireMainIndex()
                 .getClient();
             putIntoTaskQueue(new MCRDelayedRunnable(derivate.getId().toString(), DELAY_IN_MS,
                 new MCRTransactionableRunnable(
@@ -337,7 +337,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
         }
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
             //MCR-2349 initialize solr client early enough
-            SolrClient mainSolrClient = MCRSolrIndexRegistryManager.obtainRegistry().requireMainIndex()
+            SolrClient mainSolrClient = MCRSolrIndexRegistryManager.requireMainIndex()
                 .getClient();
             putIntoTaskQueue(
                 new MCRDelayedRunnable(file.toUri().toString(), DELAY_IN_MS, new MCRTransactionableRunnable(() -> {

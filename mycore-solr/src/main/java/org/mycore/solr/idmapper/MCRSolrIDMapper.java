@@ -102,7 +102,7 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
                     QueryRequest queryRequest = new QueryRequest(params);
                     MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
                         MCRSolrAuthenticationLevel.SEARCH);
-                    SolrClient client = MCRSolrIndexRegistryManager.obtainRegistry().requireMainIndex()
+                    SolrClient client = MCRSolrIndexRegistryManager.requireMainIndex()
                         .getClient();
                     solrResponse = queryRequest.process(client);
                 } catch (Exception e) {
@@ -149,7 +149,7 @@ public class MCRSolrIDMapper extends MCRDefaultIDMapper implements MCRIDMapper {
                     QueryRequest queryRequest = new QueryRequest(params);
                     MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
                         MCRSolrAuthenticationLevel.SEARCH);
-                    SolrClient client = MCRSolrIndexRegistryManager.obtainRegistry().requireMainIndex()
+                    SolrClient client = MCRSolrIndexRegistryManager.requireMainIndex()
                         .getClient();
                     solrResponse = queryRequest.process(client);
                 } catch (Exception e) {

@@ -120,7 +120,7 @@ public class MCRAltoHighlightResource {
             SOLR_AUTHENTICATION_MANAGER.applyAuthentication(queryRequest, MCRSolrAuthenticationLevel.SEARCH);
             QueryResponse solrResponse =
                 queryRequest.process(
-                    MCRSolrIndexRegistryManager.obtainRegistry().requireMainIndex().getClient());
+                    MCRSolrIndexRegistryManager.requireMainIndex().getClient());
             JsonArray response = buildQueryResponse(solrResponse.getHighlighting());
             return Response.ok().entity(new Gson().toJson(response)).build();
         } catch (Exception exc) {

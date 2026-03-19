@@ -61,7 +61,7 @@ public class MCRSwordSolrObjectIDSupplier extends MCRSwordObjectIDSupplier {
                 MCRSolrAuthenticationLevel.SEARCH);
             final QueryResponse queryResponse =
                 queryRequest.process(
-                    MCRSolrIndexRegistryManager.obtainRegistry().requireMainIndex().getClient());
+                    MCRSolrIndexRegistryManager.requireMainIndex().getClient());
 
             return queryResponse.getResults().getNumFound();
         } catch (SolrServerException | IOException e) {
@@ -82,7 +82,7 @@ public class MCRSwordSolrObjectIDSupplier extends MCRSwordObjectIDSupplier {
                 MCRSolrAuthenticationLevel.SEARCH);
             final QueryResponse queryResponse =
                 queryRequest.process(
-                    MCRSolrIndexRegistryManager.obtainRegistry().requireMainIndex().getClient());
+                    MCRSolrIndexRegistryManager.requireMainIndex().getClient());
             return queryResponse.getResults().stream()
                 .map(r -> (String) r.getFieldValue("id"))
                 .map(MCRObjectID::getInstance)

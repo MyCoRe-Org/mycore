@@ -57,7 +57,7 @@ public class MCRMODSEmbargoReleaseCronjob extends MCRCronjob {
     @Override
     public void runJob() {
 
-        if(MCRSolrIndexRegistryManager.obtainRegistry().getMainIndex().isEmpty()) {
+        if(MCRSolrIndexRegistryManager.getMainIndex().isEmpty()) {
             return;
         }
 
@@ -82,7 +82,7 @@ public class MCRMODSEmbargoReleaseCronjob extends MCRCronjob {
                 SOLR_AUTHENTICATION_MANAGER.applyAuthentication(queryRequest, MCRSolrAuthenticationLevel.SEARCH);
                 QueryResponse solrResponse =
                     queryRequest.process(
-                        MCRSolrIndexRegistryManager.obtainRegistry().requireMainIndex().getClient());
+                        MCRSolrIndexRegistryManager.requireMainIndex().getClient());
                 solrResponse
                     .getResults()
                     .stream()

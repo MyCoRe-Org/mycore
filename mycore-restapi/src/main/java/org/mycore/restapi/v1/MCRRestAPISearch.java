@@ -130,7 +130,7 @@ public class MCRRestAPISearch {
 
     // Method to execute the Solr query and handle response
     private Response executeSolrQuery(ModifiableSolrParams params, String wt) {
-        MCRSolrIndex solrIndex = MCRSolrIndexRegistryManager.obtainRegistry().requireMainIndex();
+        MCRSolrIndex solrIndex = MCRSolrIndexRegistryManager.requireMainIndex();
         SolrClient client = solrIndex.getClient();
         QueryRequest queryRequest = new QueryRequest(params);
         MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,

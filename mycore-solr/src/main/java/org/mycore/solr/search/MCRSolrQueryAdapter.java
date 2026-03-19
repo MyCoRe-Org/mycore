@@ -87,7 +87,7 @@ public class MCRSolrQueryAdapter implements MCRQueryAdapter {
             QueryRequest queryRequest = new QueryRequest(solrQuery);
             MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
                 MCRSolrAuthenticationLevel.SEARCH);
-            SolrClient client = MCRSolrIndexRegistryManager.obtainRegistry().requireMainIndex()
+            SolrClient client = MCRSolrIndexRegistryManager.requireMainIndex()
                 .getClient();
             queryResponse = queryRequest.process(client);
         } catch (SolrServerException | IOException e) {
