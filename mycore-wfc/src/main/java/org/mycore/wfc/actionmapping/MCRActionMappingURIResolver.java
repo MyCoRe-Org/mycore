@@ -27,6 +27,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.services.http.MCRURLQueryParameter;
 
 /**
  * URI resolver used by XSLT 3 function wrappers for workflow action mapping URLs.
@@ -58,7 +59,7 @@ public class MCRActionMappingURIResolver implements URIResolver {
             throw new TransformerException("Invalid href format: " + href);
         }
 
-        String[] methodParts = parts[1].split("/\\?", 2);
+        String[] methodParts = parts[1].split("\\?", 2);
         if (methodParts.length != 2) {
             throw new TransformerException("Invalid href format: " + href);
         }
@@ -99,10 +100,8 @@ public class MCRActionMappingURIResolver implements URIResolver {
     private static Map<String, String> getArgumentMap(String arguments) {
         Map<String, String> argumentMap = new HashMap<>();
         for (String arg : arguments.split("&")) {
-            String[] pair = arg.split("=", 2);
-            if (pair.length == 2) {
-                argumentMap.put(pair[0], pair[1]);
-            }
+            MCRURLQueryParameter param = MCRURLQueryParameter.ofEncodedString(arg);
+            argumentMap.put(param.name(), param.value());
         }
         return argumentMap;
     }

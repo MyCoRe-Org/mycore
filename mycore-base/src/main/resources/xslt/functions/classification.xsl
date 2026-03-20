@@ -28,8 +28,8 @@
       * categid: the category ID
   -->
   <xsl:function name="mcrclassification:is-category-id" as="xs:boolean">
-    <xsl:param name="classid" as="xs:string?" />
-    <xsl:param name="categid" as="xs:string?" />
+    <xsl:param name="classid" as="xs:string" />
+    <xsl:param name="categid" as="xs:string" />
 
     <xsl:sequence select="
       exists($classid)

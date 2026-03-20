@@ -16,7 +16,7 @@
       string(document(
         concat(
           $actionMappingURIPrefix,
-          'getURLforID/?action=',
+          'getURLforID?action=',
           $action,
           '&amp;id=',
           $mcrID,
@@ -37,7 +37,7 @@
       string(document(
         concat(
           $actionMappingURIPrefix,
-          'getURLforCollection/?action=',
+          'getURLforCollection?action=',
           $action,
           '&amp;collection=',
           $collection,
