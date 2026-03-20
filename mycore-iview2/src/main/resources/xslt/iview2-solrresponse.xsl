@@ -3,7 +3,7 @@
   xmlns:mcracl="http://www.mycore.de/xslt/acl"
   xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  exclude-result-prefixes="$all">
+  exclude-result-prefixes="#all">
 
   <xsl:param name="MCR.Module-iview2.useNewViewer" />
 

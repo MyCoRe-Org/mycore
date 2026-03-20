@@ -21,6 +21,25 @@
   </xsl:function>
 
   <!--
+    Returns whether the given classification ID and category ID resolve to an existing category.
+
+    Parameters
+      * classid: the classification ID
+      * categid: the category ID
+  -->
+  <xsl:function name="mcrclassification:is-category-id" as="xs:boolean">
+    <xsl:param name="classid" as="xs:string" />
+    <xsl:param name="categid" as="xs:string" />
+
+    <xsl:sequence select="
+      $classid != ''
+      and $categid != ''
+      and string-length($classid) le 32
+      and exists(mcrclassification:category($classid, $categid))
+    " />
+  </xsl:function>
+
+  <!--
     Returns the CurrentLang label element of the given classification.
 
     Parameters
