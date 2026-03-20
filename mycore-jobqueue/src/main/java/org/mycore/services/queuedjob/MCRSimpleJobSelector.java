@@ -33,11 +33,11 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.mycore.common.MCRClassTools;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRPropertyList;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
@@ -155,14 +155,14 @@ public final class MCRSimpleJobSelector implements MCRJobSelector {
 
     public static class Factory implements Supplier<MCRSimpleJobSelector> {
 
-        @MCRProperty(name = ACTIONS_KEY, defaultName = "MCR.QueuedJob.Selectors.Default.Actions")
-        public String actions;
+        @MCRPropertyList(name = ACTIONS_KEY, defaultName = "MCR.QueuedJob.Selectors.Default.Actions")
+        public List<String> actions;
 
         @MCRProperty(name = ACTION_MODE_KEY, defaultName = "MCR.QueuedJob.Selectors.Default.ActionMode")
         public String actionMode;
 
-        @MCRProperty(name = STATUSES_KEY, defaultName = "MCR.QueuedJob.Selectors.Default.Statuses")
-        public String statuses;
+        @MCRPropertyList(name = STATUSES_KEY, defaultName = "MCR.QueuedJob.Selectors.Default.Statuses")
+        public List<String> statuses;
 
         @MCRProperty(name = STATUS_MODE_KEY, defaultName = "MCR.QueuedJob.Selectors.Default.StatusMode")
         public String statusMode;
@@ -179,19 +179,16 @@ public final class MCRSimpleJobSelector implements MCRJobSelector {
 
         @Override
         public MCRSimpleJobSelector get() {
-
-            Set<Class<? extends MCRJobAction>> actions = MCRConfiguration2.splitValue(this.actions)
-                .map(this::toActionJobClass).collect(Collectors.toSet());
+            Set<Class<? extends MCRJobAction>> actions = getActions();
             Mode actionMode = Mode.valueOf(this.actionMode);
-
-            Set<MCRJobStatus> statuses = MCRConfiguration2.splitValue(this.statuses)
-                .map(MCRJobStatus::valueOf).collect(Collectors.toSet());
+            Set<MCRJobStatus> statuses = getJobStatuses();
             Mode statusMode = Mode.valueOf(this.statusMode);
-
             int ageDays = Integer.parseInt(this.ageDays);
-
             return new MCRSimpleJobSelector(actions, actionMode, statuses, statusMode, ageDays);
+        }
 
+        private Set<Class<? extends MCRJobAction>> getActions() {
+            return this.actions.stream().map(this::toActionJobClass).collect(Collectors.toSet());
         }
 
         private Class<? extends MCRJobAction> toActionJobClass(String action) {
@@ -201,6 +198,10 @@ public final class MCRSimpleJobSelector implements MCRJobSelector {
                 throw new MCRConfigurationException("Missing class (" + action + ") configured in property: " +
                     property + "." + ACTIONS_KEY, e);
             }
+        }
+
+        private Set<MCRJobStatus> getJobStatuses() {
+            return this.statuses.stream().map(MCRJobStatus::valueOf).collect(Collectors.toSet());
         }
 
     }
