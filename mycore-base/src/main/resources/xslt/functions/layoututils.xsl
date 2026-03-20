@@ -24,6 +24,11 @@
         <xsl:copy-of select="document('layoutUtils:personalNavigation')" />
     </xsl:function>
 
+  <xsl:function name="mcrlayoututils:is-mobile-device" as="xs:boolean">
+    <xsl:param name="user-agent" as="xs:string?" />
+    <xsl:sequence select="contains(lower-case(string($user-agent)), 'mobile')" />
+  </xsl:function>
+
   <!--
     Function: get-browser-address
     Synopsis: Identifies the currently selected menu entry and the associated element item/@href.

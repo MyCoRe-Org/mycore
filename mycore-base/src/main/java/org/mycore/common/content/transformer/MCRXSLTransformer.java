@@ -212,7 +212,20 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     @Override
     public String getMimeType() throws TransformerException, SAXException, ParserConfigurationException {
-        return getOutputProperties().getProperty("media-type", "text/xml");
+        Properties outputProperties = getOutputProperties();
+        String mediaType = outputProperties.getProperty("media-type");
+        if (mediaType != null && !mediaType.isBlank()) {
+            return mediaType;
+        }
+
+        String method = outputProperties.getProperty("method", "xml");
+        return switch (method) {
+            case "html" -> "text/html";
+            case "text" -> "text/plain";
+            case "xhtml" -> "application/xhtml+xml";
+            case "json" -> "application/json";
+            default -> "text/xml";
+        };
     }
 
     @Override
