@@ -178,7 +178,7 @@ public class MCRConfigurableInstanceHelperDefaultTest {
         assertNotNull(instance.list);
         assertEquals(2, instance.list.size());
 
-        Entry oneEntry = instance.list.getFirst();
+        Entry oneEntry = instance.list.get(0);
         assertNotNull(oneEntry);
         assertEquals(OneKindOfEntry.class, oneEntry.getClass());
         assertEquals("OneValue", oneEntry.get());
@@ -207,7 +207,7 @@ public class MCRConfigurableInstanceHelperDefaultTest {
         assertNotNull(instance.list);
         assertEquals(2, instance.list.size());
 
-        ImplicitEntry oneEntry = instance.list.getFirst();
+        ImplicitEntry oneEntry = instance.list.get(0);
         assertNotNull(oneEntry);
         assertEquals(ImplicitEntry.class, oneEntry.getClass());
         assertEquals("Custom1", oneEntry.string1);
