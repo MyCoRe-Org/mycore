@@ -18,13 +18,13 @@
 
 package org.mycore.user2.hash;
 
-import static org.mycore.common.config.MCRConfiguration2.splitValue;
 import static org.mycore.user2.hash.MCRPasswordCheckManagerHelper.checkConfigurationHasNoIncompatibleChange;
 import static org.mycore.user2.hash.MCRPasswordCheckManagerHelper.checkSelectedStrategyIsNotOutdated;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -39,6 +39,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceMap;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.annotation.MCRPropertyList;
 import org.mycore.common.config.annotation.MCRSentinel;
 
 /**
@@ -117,11 +118,14 @@ public final class MCRPasswordCheckManager {
     public MCRPasswordCheckManager(SecureRandom random, Map<String, MCRPasswordCheckStrategy> strategies,
         String selectedStrategyType, Set<ConfigurationCheck> configurationChecks) {
 
-        this.random = Objects.requireNonNull(random, "Random must not be null");
-        this.strategies = new HashMap<>(Objects.requireNonNull(strategies, "Strategies must not be null"));
-        this.strategies.forEach((type, strategy) ->
-            Objects.requireNonNull(strategy, "Strategy " + type + " must not be null"));
-        this.selectedStrategyType = Objects.requireNonNull(selectedStrategyType, "Selected strategy must not be null");
+        this.random = Objects
+            .requireNonNull(random, "Random must not be null");
+        this.strategies = new HashMap<>(Objects
+            .requireNonNull(strategies, "Strategies must not be null"));
+        this.strategies.forEach((type, strategy) -> Objects
+            .requireNonNull(strategy, "Strategy " + type + " must not be null"));
+        this.selectedStrategyType = Objects
+            .requireNonNull(selectedStrategyType, "Selected strategy must not be null");
         this.selectedStrategy = this.strategies.get(selectedStrategyType);
 
         if (this.selectedStrategy == null) {
@@ -179,17 +183,13 @@ public final class MCRPasswordCheckManager {
         @MCRProperty(name = SELECTED_STRATEGY_KEY)
         public String selectedStrategy;
 
-        @MCRProperty(name = CONFIGURATION_CHECKS_KEY)
-        public String configurationChecks;
+        @MCRPropertyList(name = CONFIGURATION_CHECKS_KEY, required = false)
+        public List<String> configurationChecks;
 
         @Override
         public MCRPasswordCheckManager get() {
-
             SecureRandom random = getStrongSecureRandom();
-
-            Set<ConfigurationCheck> configurationChecks = splitValue(this.configurationChecks)
-                .map(ConfigurationCheck::valueOf).collect(Collectors.toSet());
-
+            Set<ConfigurationCheck> configurationChecks = getConfigurationChecks();
             return new MCRPasswordCheckManager(random, strategies, selectedStrategy, configurationChecks);
 
         }
@@ -200,6 +200,10 @@ public final class MCRPasswordCheckManager {
             } catch (NoSuchAlgorithmException e) {
                 throw new MCRException("Failed to obtain strong secure random number generator", e);
             }
+        }
+
+        private Set<ConfigurationCheck> getConfigurationChecks() {
+            return this.configurationChecks.stream().map(ConfigurationCheck::valueOf).collect(Collectors.toSet());
         }
 
     }

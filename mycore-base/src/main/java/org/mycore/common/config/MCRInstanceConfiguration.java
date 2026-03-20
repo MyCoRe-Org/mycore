@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Represents an extract of properties (typically {@link MCRConfiguration2#getPropertiesMap()}) used to
@@ -390,6 +389,9 @@ public final class MCRInstanceConfiguration {
      * @return the nested configuration map
      */
     public Map<String, MCRInstanceConfiguration> nestedConfigurationMap(String commonPrefix) {
+        if (commonPrefix.isEmpty()) {
+            return nestedConfigurationMap();
+        }
         String commonSuffixWithDelimiter = commonPrefix + ".";
         Map<String, MCRInstanceConfiguration> nestedConfigurationMap = new HashMap<>();
         for (Map.Entry<String, String> entry : properties().entrySet()) {
@@ -405,134 +407,6 @@ public final class MCRInstanceConfiguration {
             }
         }
         return nestedConfigurationMap;
-    }
-
-    /**
-     * Returns a {@link List} of configurations for nested instances, ordered by the first name segment
-     * (which all must be integer values).
-     * <p>
-     * Example: Given an {@link MCRInstanceConfiguration}
-     * representing the {@link MCRInstanceName} <code>Some.Instance.Name</code>, properties
-     * <ul>
-     *     <li><code>1=some.nested.ClassName1</code></li>
-     *     <li><code>1.Key1=ValueA1</code></li>
-     *     <li><code>1.Key2=ValueA2</code></li>
-     *     <li><code>3=some.nested.ClassName3</code></li>
-     *     <li><code>3.Key1=ValueB1</code></li>
-     *     <li><code>3.Key2=ValueB2</code></li>
-     * </ul>
-     * this will return a list containing
-     * <ol>
-     *     <li>
-     *         at index <code>0</code> an {@link MCRInstanceConfiguration}
-     *         representing the {@link MCRInstanceConfiguration#name()} <code>Some.Instance.Name.Foo.1</code>,
-     *         {@link MCRInstanceConfiguration#className()} <code>some.nested.ClassName1</code> and
-     *         {@link MCRInstanceConfiguration#properties()}
-     *        <ul>
-     *            <li><code>Key1=ValueA1</code></li>
-     *            <li><code>Key2=ValueA2</code></li>
-     *        </ul>
-     *        and {@link MCRInstanceConfiguration#fullProperties()} that are equal to the the full properties of this
-     *        configuration (i.e. the full properties used to create the top level configuration).
-     *     </li>
-     *     <li>
-     *         at index <code>1</code> an {@link MCRInstanceConfiguration}
-     *         representing the {@link MCRInstanceConfiguration#name()} <code>Some.Instance.Name.Foo.3</code>,
-     *         {@link MCRInstanceConfiguration#className()} <code>some.nested.ClassName3</code> and
-     *         {@link MCRInstanceConfiguration#properties()}
-     *        <ul>
-     *            <li><code>Key1=ValueB1</code></li>
-     *            <li><code>Key2=ValueB2</code></li>
-     *        </ul>
-     *        and {@link MCRInstanceConfiguration#fullProperties()} that are equal to the the full properties of this
-     *        configuration (i.e. the full properties used to create the top level configuration).
-     *     </li>
-     * </ol>
-     * <p>
-     * If an {@link MCRInstanceName} with suffix <code>.Class</code> or <code>.class</code> would have been used in
-     * the top level {@link MCRInstanceConfiguration}, the same suffix is used for nested configurations.
-     * <p>
-     * Example: If a property with suffix <code>.Class</code> would have been used to convey the original class name
-     * in the top level configuration, properties <code>Foo.1.Class</code>/<code>Foo.3.Class</code> would be used to
-     * convey the class name for the nested configurations and properties
-     * <code>Foo.1.class</code>/<code>Foo.3.class</code> and <code>Foo.1</code>/<code>Foo.3</code> would be ignored.
-     * The resulting {@link MCRInstanceConfiguration#properties()} would not contain entries with keys
-     * <code>class</code> or the empty key, respectively.
-     *
-     * @return the nested configuration list
-     */
-    public List<MCRInstanceConfiguration> nestedConfigurationList() {
-        return mapToList(nestedConfigurationMap());
-    }
-
-    /**
-     * Returns a {@link List} of configurations for nested instances with a common prefix, ordered by the
-     * name segment following that common prefix (which all must be integer values).
-     * <p>
-     * Example: Given an {@link MCRInstanceConfiguration}
-     * representing the {@link MCRInstanceName} <code>Some.Instance.Name</code>, properties
-     * <ul>
-     *     <li><code>Foo.1=some.nested.ClassName1</code></li>
-     *     <li><code>Foo.1.Key1=ValueA1</code></li>
-     *     <li><code>Foo.1.Key2=ValueA2</code></li>
-     *     <li><code>Foo.3=some.nested.ClassName3</code></li>
-     *     <li><code>Foo.3.Key1=ValueB1</code></li>
-     *     <li><code>Foo.3.Key2=ValueB2</code></li>
-     *     <li><code>Bar=UnrelatedValue</code></li>
-     * </ul>
-     * and a <em>commonPrefix</em> of <code>Foo</code>, this will return a list containing
-     * <ol>
-     *     <li>
-     *         at index <code>0</code> an {@link MCRInstanceConfiguration}
-     *         representing the {@link MCRInstanceConfiguration#name()} <code>Some.Instance.Name.Foo.1</code>,
-     *         {@link MCRInstanceConfiguration#className()} <code>some.nested.ClassName1</code> and
-     *         {@link MCRInstanceConfiguration#properties()}
-     *        <ul>
-     *            <li><code>Key1=ValueA1</code></li>
-     *            <li><code>Key2=ValueA2</code></li>
-     *        </ul>
-     *        and {@link MCRInstanceConfiguration#fullProperties()} that are equal to the the full properties of this
-     *        configuration (i.e. the full properties used to create the top level configuration).
-     *     </li>
-     *     <li>
-     *         at index <code>1</code> an {@link MCRInstanceConfiguration}
-     *         representing the {@link MCRInstanceConfiguration#name()} <code>Some.Instance.Name.Foo.3</code>,
-     *         {@link MCRInstanceConfiguration#className()} <code>some.nested.ClassName3</code> and
-     *         {@link MCRInstanceConfiguration#properties()}
-     *        <ul>
-     *            <li><code>Key1=ValueB1</code></li>
-     *            <li><code>Key2=ValueB2</code></li>
-     *        </ul>
-     *        and {@link MCRInstanceConfiguration#fullProperties()} that are equal to the the full properties of this
-     *        configuration (i.e. the full properties used to create the top level configuration).
-     *     </li>
-     * </ol>
-     * <p>
-     * If an {@link MCRInstanceName} with suffix <code>.Class</code> or <code>.class</code> would have been used in
-     * the top level {@link MCRInstanceConfiguration}, the same suffix is used for nested configurations.
-     * <p>
-     * Example: If a property with suffix <code>.Class</code> would have been used to convey the original class name
-     * in the top level configuration, properties <code>Foo.1.Class</code>/<code>Foo.3.Class</code> would be used to
-     * convey the class name for the nested configurations and properties
-     * <code>Foo.1.class</code>/<code>Foo.3.class</code> and <code>Foo.1</code>/<code>Foo.3</code> would be ignored.
-     * The resulting {@link MCRInstanceConfiguration#properties()} would not contain entries with keys
-     * <code>class</code> or the empty key, respectively.
-     *
-     * @param commonPrefix the common prefix
-     * @return the nested configuration list
-     */
-    public List<MCRInstanceConfiguration> nestedConfigurationList(String commonPrefix) {
-        return mapToList(nestedConfigurationMap(commonPrefix));
-    }
-
-    private List<MCRInstanceConfiguration> mapToList(Map<String, MCRInstanceConfiguration> map) {
-        return map
-            .entrySet()
-            .stream()
-            .map(entry -> Map.entry(Integer.parseInt(entry.getKey()), entry.getValue()))
-            .sorted(Map.Entry.comparingByKey())
-            .map(Map.Entry::getValue)
-            .collect(Collectors.toList());
     }
 
     /**
@@ -560,7 +434,7 @@ public final class MCRInstanceConfiguration {
      * @param fixedClass the class to be used as a class name
      * @return the modified configuration
      */
-    public <S> MCRInstanceConfiguration fixedClass(Class<S> fixedClass) {
+    public <S> MCRInstanceConfiguration withClass(Class<S> fixedClass) {
         return new MCRInstanceConfiguration(name, fixedClass.getName(), properties, fullProperties);
     }
 
