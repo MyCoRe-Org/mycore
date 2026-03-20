@@ -20,7 +20,7 @@ package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 
 import javax.xml.transform.TransformerFactory;
 
@@ -29,7 +29,6 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Text;
 import org.jdom2.filter.Filters;
-import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
@@ -61,19 +60,14 @@ public class MCRPostProcessorXSL implements MCRXEditorPostProcessor {
             return xml.clone();
         }
 
-        Class<? extends TransformerFactory> factoryClass = null;
-        try {
-            if (Objects.equals(transformer, "xalan")) {
-                factoryClass = MCRClassTools
-                    .forName("org.apache.xalan.processor.TransformerFactoryImpl");
-            }
-            if (Objects.equals(transformer, "saxon")) {
-                factoryClass = MCRClassTools
-                    .forName("net.sf.saxon.TransformerFactoryImpl");
-            }
-        } catch (ClassNotFoundException e) {
-            //do nothing, use default
-        }
+        Optional<Class<? extends TransformerFactory>> oFactoryClass =
+            switch (transformer) {
+                case "xalan" -> MCRConfiguration2.<TransformerFactory>getClass("SLOWXALAN");
+                case "saxon" -> MCRConfiguration2.<TransformerFactory>getClass("SAXON");
+                default -> Optional.empty();
+            };
+
+        Class<? extends TransformerFactory> factoryClass = oFactoryClass.orElse(null);
 
         final String xslFolder = MCRConfiguration2.getStringOrThrow("MCR.Layout.Transformer.Factory.XSLFolder");
         MCRContent source = new MCRJDOMContent(xml);
@@ -88,9 +82,7 @@ public class MCRPostProcessorXSL implements MCRXEditorPostProcessor {
     @Override
     public void setAttributes(Map<String, String> attributeMap) {
         this.stylesheet = attributeMap.get("xsl");
-        if (attributeMap.containsKey("transformer")) {
-            this.transformer = attributeMap.get("transformer");
-        }
+        this.transformer = attributeMap.get("transformer");
     }
 
     public void setStylesheet(String stylesheet) {
