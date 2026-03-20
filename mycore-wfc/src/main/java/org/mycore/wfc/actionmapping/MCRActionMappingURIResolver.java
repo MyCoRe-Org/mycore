@@ -18,9 +18,9 @@
 
 package org.mycore.wfc.actionmapping;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
@@ -98,12 +98,9 @@ public class MCRActionMappingURIResolver implements URIResolver {
     }
 
     private static Map<String, String> getArgumentMap(String arguments) {
-        Map<String, String> argumentMap = new HashMap<>();
-        for (String arg : arguments.split("&")) {
-            MCRURLQueryParameter param = MCRURLQueryParameter.ofEncodedString(arg);
-            argumentMap.put(param.name(), param.value());
-        }
-        return argumentMap;
+        return MCRURLQueryParameter.parse(arguments)
+            .stream()
+            .collect(Collectors.toMap(MCRURLQueryParameter::name, MCRURLQueryParameter::value));
     }
 
 }

@@ -32,9 +32,7 @@
     <xsl:param name="categid" as="xs:string" />
 
     <xsl:sequence select="
-      exists($classid)
-      and exists($categid)
-      and $classid != ''
+      $classid != ''
       and $categid != ''
       and string-length($classid) le 32
       and exists(mcrclassification:category($classid, $categid))
