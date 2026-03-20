@@ -20,11 +20,8 @@ package org.mycore.solr.schema;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,19 +33,22 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.CollectionAdminRequest;
+import org.apache.solr.client.solrj.request.GenericSolrRequest;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.client.solrj.response.schema.FieldTypeRepresentation;
-import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfigurationInputStream;
-import org.mycore.services.http.MCRHttpUtils;
-import org.mycore.solr.MCRSolrCore;
-import org.mycore.solr.MCRSolrCoreManager;
+import org.mycore.solr.MCRSolrIndex;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
+import org.mycore.solr.search.MCRSolrSearchUtils;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 /**
@@ -82,8 +82,11 @@ public class MCRSolrSchemaReloader {
     public static void reset(String configType, String coreID) {
         LOGGER.info(() -> "Resetting SOLR schema for core " + coreID + " using configuration " + configType);
         try {
-            SolrClient solrClient = MCRSolrCoreManager.get(coreID).map(MCRSolrCore::getClient)
-                .orElseThrow(() -> new MCRConfigurationException("The core " + coreID + " is not configured!"));
+            MCRSolrIndex index = MCRSolrIndexRegistryManager.obtainRegistry()
+                .getIndex(coreID)
+                .orElseThrow(() -> MCRSolrUtils.getIndexConfigMissingException(coreID));
+
+            SolrClient solrClient = index.getClient();
 
             deleteCopyFields(solrClient);
             LOGGER.debug(() -> "CopyFields cleaned for core " + coreID + " for configuration " + configType);
@@ -176,51 +179,59 @@ public class MCRSolrSchemaReloader {
      * @param coreID the ID of the core, which the configuration should be applied to
      */
     public static void processSchemaFiles(String configType, String coreID) {
-        MCRSolrCore solrCore = MCRSolrCoreManager.get(coreID)
-            .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreID));
+        MCRSolrIndex index = MCRSolrIndexRegistryManager.obtainRegistry()
+            .getIndex(coreID)
+            .orElseThrow(() -> MCRSolrUtils.getIndexConfigMissingException(coreID));
 
         LOGGER.info(() -> "Load schema definitions for core " + coreID + " using configuration " + configType);
-        try (HttpClient httpClient = MCRHttpUtils.getHttpClient()) {
-            Collection<byte[]> schemaFileContents = MCRConfigurationInputStream.getConfigFileContents(
+        Collection<byte[]> schemaFileContents;
+        try {
+            schemaFileContents = MCRConfigurationInputStream.getConfigFileContents(
                 "solr/" + configType + "/" + SOLR_SCHEMA_UPDATE_FILE_NAME).values();
-            for (byte[] schemaFileData : schemaFileContents) {
-                InputStreamReader schemaReader = new InputStreamReader(new ByteArrayInputStream(schemaFileData),
-                    StandardCharsets.UTF_8);
-                JsonElement json = JsonParser.parseReader(schemaReader);
-                if (!json.isJsonArray()) {
-                    JsonElement e = json;
-                    json = new JsonArray();
-                    json.getAsJsonArray().add(e);
-                }
-                for (JsonElement e : json.getAsJsonArray()) {
-                    LOGGER.debug(e);
-                    String command = e.toString();
-
-                    HttpRequest.Builder solrRequestBuilder = MCRSolrUtils.getRequestBuilder()
-                        .uri(URI.create(solrCore.getV1CoreURL() + "/schema"))
-                        .header("Content-type", "application/json")
-                        .POST(HttpRequest.BodyPublishers.ofString(command));
-                    SOLR_AUTHENTICATION_MANAGER.applyAuthentication(solrRequestBuilder,
-                        MCRSolrAuthenticationLevel.ADMIN);
-                    String commandPrefix = command.indexOf('-') != -1 ? command.substring(2, command.indexOf('-'))
-                        : "unknown command";
-
-                    HttpResponse<String> response = httpClient.send(solrRequestBuilder.build(),
-                        HttpResponse.BodyHandlers.ofString());
-
-                    if (response.statusCode() == 200) {
-                        LOGGER.debug("SOLR schema {} successful \n{}", () -> commandPrefix, response::body);
-                    } else {
-
-                        LOGGER
-                            .error("SOLR schema {} error: {} {}\n{}", () -> commandPrefix, response::statusCode,
-                                () -> MCRHttpUtils.getReasonPhrase(response.statusCode()), response::body);
-                    }
+        } catch (IOException e) {
+            throw new MCRException(e);
+        }
+        for (byte[] schemaFileData : schemaFileContents) {
+            InputStreamReader schemaReader = new InputStreamReader(new ByteArrayInputStream(schemaFileData),
+                StandardCharsets.UTF_8);
+            JsonElement json = JsonParser.parseReader(schemaReader);
+            if (!json.isJsonArray()) {
+                JsonElement e = json;
+                json = new JsonArray();
+                json.getAsJsonArray().add(e);
+            }
+            for (JsonElement e : json.getAsJsonArray()) {
+                LOGGER.debug(e);
+                if (e.isJsonObject()) {
+                    executeSchemaRequest(index, e.getAsJsonObject());
                 }
             }
-        } catch (InterruptedException | IOException e) {
-            LOGGER.error(e);
         }
     }
 
+    /**
+     * Sends a schema request to SOLR server
+     * @param index to which the command will be send
+     * @param command the command
+     */
+    private static void executeSchemaRequest(MCRSolrIndex index, JsonObject command) {
+        GenericSolrRequest request = new GenericSolrRequest(CollectionAdminRequest.METHOD.POST,
+            "/schema");
+        request.setRequiresCollection(true);
+        request.withContent(command.toString().getBytes(StandardCharsets.UTF_8), "application/json");
+
+        MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(request,
+            MCRSolrAuthenticationLevel.ADMIN);
+        String commandPrefix = command.keySet().stream().findFirst().orElse("unknown command");
+
+        try (InputStream is = MCRSolrSearchUtils.streamRequest(index.getClient(), request, "json")) {
+            String response = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            LOGGER.debug(() -> "SOLR config " + commandPrefix + " command was successful \n" + response);
+        } catch (SolrServerException e) {
+            LOGGER
+                .error(() -> "SOLR config " + commandPrefix + " error: " + e.getMessage() + "\n" + command, e);
+        } catch (IOException e) {
+            LOGGER.error(() -> "Could not execute the following Solr config command:\n" + command, e);
+        }
+    }
 }

@@ -18,10 +18,10 @@
 
 package org.mycore.solr;
 
-public record MCRSolrCoreType(String name) {
+public record MCRSolrIndexType(String name) {
 
-    public static final MCRSolrCoreType MAIN = new MCRSolrCoreType("main");
+    public static final MCRSolrIndexType MAIN = new MCRSolrIndexType("main");
 
-    public static final MCRSolrCoreType CLASSIFICATION = new MCRSolrCoreType("classification");
+    public static final MCRSolrIndexType CLASSIFICATION = new MCRSolrIndexType("classification");
 
 }

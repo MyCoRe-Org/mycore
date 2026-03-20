@@ -95,7 +95,7 @@ public class MCRSolrFileIndexBaseAccumulator implements MCRSolrFileIndexAccumula
         doc.setField("stream_size", attr.size());
         doc.setField("stream_name", absolutePath);
         doc.setField("stream_source_info", input.toString());
-        doc.setField("stream_content_type", MCRContentTypes.probeContentType(input));
+        doc.setField("IN", MCRContentTypes.probeContentType(input));
         doc.setField("extension", Files.getFileExtension(input.getFileName().toString()));
         MCRISO8601Date iDate = new MCRISO8601Date();
         iDate.setDate(new Date(attr.lastModifiedTime().toMillis()));

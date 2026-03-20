@@ -34,7 +34,7 @@ import org.apache.solr.common.SolrDocument;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.oai.pmh.Set;
-import org.mycore.solr.MCRSolrCoreManager;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
@@ -63,7 +63,7 @@ class MCROAIQuerySetResolver extends MCROAISetResolver<String, SolrDocument> {
             idsInSet = Collections.emptySet();
             return;
         }
-        SolrClient solrClient = MCRSolrCoreManager.getMainSolrClient();
+        SolrClient solrClient = MCRSolrIndexRegistryManager.requireMainIndex().getClient();
         QueryResponse response;
         try {
             QueryRequest queryRequest = new QueryRequest(getQuery());

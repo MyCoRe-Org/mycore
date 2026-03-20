@@ -21,11 +21,8 @@ package org.mycore.solr.schema;
 import static java.util.Map.entry;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
@@ -38,14 +35,17 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.CollectionAdminRequest;
+import org.apache.solr.client.solrj.request.GenericSolrRequest;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationInputStream;
-import org.mycore.services.http.MCRHttpUtils;
-import org.mycore.solr.MCRSolrCore;
-import org.mycore.solr.MCRSolrCoreManager;
+import org.mycore.solr.MCRSolrIndex;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
+import org.mycore.solr.search.MCRSolrSearchUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -97,10 +97,12 @@ public class MCRSolrConfigReloader {
      */
     public static void reset(String configType, String coreID) {
         LOGGER.info(() -> "Resetting config definitions for core " + coreID + " using configuration " + configType);
-        String coreURL = MCRSolrCoreManager.get(coreID)
-            .map(MCRSolrCore::getV1CoreURL)
-            .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreID));
-        JsonObject currentSolrConfig = retrieveCurrentSolrConfigOverlay(coreURL);
+
+        MCRSolrIndex index = MCRSolrIndexRegistryManager.obtainRegistry()
+            .getIndex(coreID)
+            .orElseThrow(() -> MCRSolrUtils.getIndexConfigMissingException(coreID));
+
+        JsonObject currentSolrConfig = retrieveCurrentSolrConfigOverlay(index);
         JsonObject configPart = currentSolrConfig.getAsJsonObject("overlay");
 
         for (String observedType : getObserverConfigTypes()) {
@@ -110,18 +112,14 @@ public class MCRSolrConfigReloader {
             }
             Set<Map.Entry<String, JsonElement>> configuredComponents = overlaySection.entrySet();
             final String deleteSectionCommand = "delete-" + observedType.toLowerCase(Locale.ROOT);
-            if (configuredComponents.isEmpty() || !isKnownSolrConfigCommmand(deleteSectionCommand)) {
+            if (configuredComponents.isEmpty() || !isKnownSolrConfigCommand(deleteSectionCommand)) {
                 continue;
             }
             for (Map.Entry<String, JsonElement> configuredComponent : configuredComponents) {
                 final JsonObject deleteCommand = new JsonObject();
                 deleteCommand.addProperty(deleteSectionCommand, configuredComponent.getKey());
                 LOGGER.debug(deleteCommand);
-                try {
-                    executeSolrCommand(coreURL, deleteCommand);
-                } catch (IOException e) {
-                    LOGGER.error(() -> "Exception while executing '" + deleteCommand + "'.", e);
-                }
+                executeSolrCommand(index, deleteCommand);
             }
         }
     }
@@ -136,10 +134,10 @@ public class MCRSolrConfigReloader {
     public static void processConfigFiles(String configType, String coreID) {
         LOGGER.info(() -> "Load config definitions for core " + coreID + " using configuration " + configType);
         try {
-            String coreURL = MCRSolrCoreManager.get(coreID)
-                .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreID)).getV1CoreURL();
+            MCRSolrIndex index = MCRSolrIndexRegistryManager.obtainRegistry().requireIndex(coreID);
+
             List<String> observedTypes = getObserverConfigTypes();
-            JsonObject currentSolrConfig = retrieveCurrentSolrConfig(coreURL);
+            JsonObject currentSolrConfig = retrieveCurrentSolrConfig(index);
 
             Map<String, byte[]> configFileContents = MCRConfigurationInputStream.getConfigFileContents(
                 "solr/" + configType + "/" + SOLR_CONFIG_UPDATE_FILE_NAME);
@@ -154,7 +152,7 @@ public class MCRSolrConfigReloader {
 
                 for (JsonElement command : json.getAsJsonArray()) {
                     LOGGER.debug(command);
-                    processConfigCommand(coreURL, command, currentSolrConfig, observedTypes);
+                    processConfigCommand(index, command, currentSolrConfig, observedTypes);
                 }
             }
         } catch (IOException e) {
@@ -179,33 +177,29 @@ public class MCRSolrConfigReloader {
      * @param coreURL - the URL of the core
      * @param command - the command in JSON syntax
      */
-    private static void processConfigCommand(String coreURL, JsonElement command, JsonObject currentSolrConfig,
+    private static void processConfigCommand(MCRSolrIndex coreURL, JsonElement command, JsonObject currentSolrConfig,
         List<String> observedTypes) {
         if (command.isJsonObject()) {
-            try {
-                //get first and only? property of the command object
-                final JsonObject commandJsonObject = command.getAsJsonObject();
-                Entry<String, JsonElement> commandObject = commandJsonObject.entrySet().iterator().next();
-                final String configCommand = commandObject.getKey();
-                final String configType = StringUtils.substringAfter(configCommand, "add-");
+            //get first and only? property of the command object
+            final JsonObject commandJsonObject = command.getAsJsonObject();
+            Entry<String, JsonElement> commandObject = commandJsonObject.entrySet().iterator().next();
+            final String configCommand = commandObject.getKey();
+            final String configType = StringUtils.substringAfter(configCommand, "add-");
 
-                if (isKnownSolrConfigCommmand(configCommand)) {
+            if (isKnownSolrConfigCommand(configCommand)) {
 
-                    if (observedTypes.contains(configType) && configCommand.startsWith("add-") &&
-                        commandObject.getValue() instanceof JsonObject) {
-                        final JsonElement configCommandName = commandObject.getValue().getAsJsonObject().get("name");
-                        if (isConfigTypeAlreadyAdded(configType, configCommandName, currentSolrConfig)) {
-                            LOGGER.info(() -> "Current configuration has already an " + configCommand
-                                + " with name " + configCommandName.getAsString()
-                                + ". Rewrite config command as update-" + configType);
-                            commandJsonObject.add("update-" + configType, commandJsonObject.get(configCommand));
-                            commandJsonObject.remove(configCommand);
-                        }
+                if (observedTypes.contains(configType) && configCommand.startsWith("add-") &&
+                    commandObject.getValue() instanceof JsonObject) {
+                    final JsonElement configCommandName = commandObject.getValue().getAsJsonObject().get("name");
+                    if (isConfigTypeAlreadyAdded(configType, configCommandName, currentSolrConfig)) {
+                        LOGGER.info(() -> "Current configuration has already an " + configCommand
+                            + " with name " + configCommandName.getAsString()
+                            + ". Rewrite config command as update-" + configType);
+                        commandJsonObject.add("update-" + configType, commandJsonObject.get(configCommand));
+                        commandJsonObject.remove(configCommand);
                     }
-                    executeSolrCommand(coreURL, commandJsonObject);
                 }
-            } catch (IOException e) {
-                LOGGER.error(e);
+                executeSolrCommand(coreURL, commandJsonObject);
             }
         }
 
@@ -213,32 +207,26 @@ public class MCRSolrConfigReloader {
 
     /**
      * Sends a command to SOLR server
-     * @param coreURL to which the command will be send
+     * @param index to which the command will be send
      * @param command the command
-     * @throws UnsupportedEncodingException if command encoding is not supported
      */
-    private static void executeSolrCommand(String coreURL, JsonObject command) throws UnsupportedEncodingException {
-        HttpRequest.Builder requestBuilder = MCRSolrUtils.getRequestBuilder()
-            .uri(URI.create(coreURL + "/config"))
-            .header("Content-Type", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(command.toString()));
+    private static void executeSolrCommand(MCRSolrIndex index, JsonObject command) {
+        GenericSolrRequest request = new GenericSolrRequest(CollectionAdminRequest.METHOD.POST,
+            "/config");
+        request.setRequiresCollection(true);
+        request.withContent(command.toString().getBytes(StandardCharsets.UTF_8), "application/json");
 
-        MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(requestBuilder,
+        MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(request,
             MCRSolrAuthenticationLevel.ADMIN);
-        String commandprefix = command.keySet().stream().findFirst().orElse("unknown command");
-        try (HttpClient httpClient = MCRHttpUtils.getHttpClient()) {
-            HttpResponse<String> response =
-                httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() == 200) {
-                LOGGER.debug(() -> "SOLR config " + commandprefix + " command was successful \n" + response.body());
-            } else {
-                LOGGER
-                    .error(() -> "SOLR config " + commandprefix + " error: " + response.statusCode() + " "
-                        + MCRHttpUtils.getReasonPhrase(response.statusCode()) + "\n"
-                        + response.body());
-            }
+        String commandPrefix = command.keySet().stream().findFirst().orElse("unknown command");
 
-        } catch (InterruptedException | IOException e) {
+        try (InputStream is = MCRSolrSearchUtils.streamRequest(index.getClient(), request, "json")) {
+            String response = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            LOGGER.debug(() -> "SOLR config " + commandPrefix + " command was successful \n" + response);
+        } catch (SolrServerException e) {
+            LOGGER
+                .error(() -> "SOLR config " + commandPrefix + " error: " + e.getMessage() + "\n" + command, e);
+        } catch (IOException e) {
             LOGGER.error(() -> "Could not execute the following Solr config command:\n" + command, e);
         }
     }
@@ -260,42 +248,38 @@ public class MCRSolrConfigReloader {
 
     /**
      * retrieves the current SOLR configuration for the given core 
-     * @param coreURL from which the current SOLR configuration will be load
+     * @param solrIndex from which the current SOLR configuration will be load
      * @return the configuration as JSON object
      */
-    private static JsonObject retrieveCurrentSolrConfig(String coreURL) {
-        HttpRequest.Builder solrRequestBuilder = MCRSolrUtils.getRequestBuilder()
-            .uri(URI.create(coreURL + "/config"));
-        MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(solrRequestBuilder,
+    private static JsonObject retrieveCurrentSolrConfig(MCRSolrIndex solrIndex) {
+        GenericSolrRequest request = new GenericSolrRequest(CollectionAdminRequest.METHOD.GET,
+            "/config");
+        request.setRequiresCollection(true);
+        MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(request,
             MCRSolrAuthenticationLevel.ADMIN);
-        return getJSON(solrRequestBuilder.build());
+        return getJSON(solrIndex, request);
     }
 
     /**
      * retrieves the current SOLR configuration overlay for the given core
-     * @param coreURL from which the current SOLR configuration will be load
+     * @param solrIndex from which the current SOLR configuration will be load
      * @return the configuration as JSON object
      */
-    private static JsonObject retrieveCurrentSolrConfigOverlay(String coreURL) {
-        HttpRequest.Builder solrRequestBuilder = MCRSolrUtils.getRequestBuilder()
-            .uri(URI.create(coreURL + "/config/overlay"));
-        MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(solrRequestBuilder,
+    private static JsonObject retrieveCurrentSolrConfigOverlay(MCRSolrIndex solrIndex) {
+        GenericSolrRequest request = new GenericSolrRequest(CollectionAdminRequest.METHOD.GET,
+            "/config/overlay");
+        request.setRequiresCollection(true);
+        MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(request,
             MCRSolrAuthenticationLevel.ADMIN);
-        return getJSON(solrRequestBuilder.build());
+        return getJSON(solrIndex, request);
     }
 
-    private static JsonObject getJSON(HttpRequest getConfig) {
+    private static JsonObject getJSON(MCRSolrIndex solrIndex, GenericSolrRequest request) {
         JsonObject convertedObject = null;
-        try (HttpClient httpClient = MCRHttpUtils.getHttpClient()) {
-            HttpResponse<String> response = httpClient.send(getConfig, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() == 200) {
-                convertedObject = new Gson().fromJson(response.body(), JsonObject.class);
-            } else {
-                LOGGER.error(() -> "Could not retrieve current Solr configuration from solr server. Http Status: "
-                    + response.statusCode() + " " + MCRHttpUtils.getReasonPhrase(response.statusCode()));
-            }
-
-        } catch (IOException | InterruptedException e) {
+        try (InputStream jsonIS = MCRSolrSearchUtils.streamRequest(solrIndex.getClient(), request,
+            "json"); InputStreamReader reader = new InputStreamReader(jsonIS, StandardCharsets.UTF_8)) {
+            return new Gson().fromJson(reader, JsonObject.class);
+        } catch (IOException | SolrServerException e) {
             LOGGER.error("Could not read current Solr configuration", e);
         } catch (JsonSyntaxException e) {
             LOGGER.error("Current json configuration is not a valid json", e);
@@ -309,7 +293,7 @@ public class MCRSolrConfigReloader {
      * @return true, if the command is in the list of known SOLR commands.
      */
 
-    private static boolean isKnownSolrConfigCommmand(String cmd) {
+    private static boolean isKnownSolrConfigCommand(String cmd) {
         String cfgObjName = cmd.substring(cmd.indexOf('-') + 1).toLowerCase(Locale.ROOT);
         return ((cmd.startsWith("add-") || cmd.startsWith("update-") || cmd.startsWith("delete-"))
             && (SOLR_CONFIG_OBJECT_NAMES.containsKey(cfgObjName)))

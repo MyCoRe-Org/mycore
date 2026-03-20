@@ -27,9 +27,9 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.solr.MCRSolrCore;
-import org.mycore.solr.MCRSolrCoreManager;
-import org.mycore.solr.MCRSolrCoreType;
+import org.mycore.solr.MCRSolrIndex;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
+import org.mycore.solr.MCRSolrIndexType;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.index.MCRSolrIndexHandler;
@@ -38,14 +38,14 @@ public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler
 
     protected final MCRSolrAuthenticationManager solrAuthenticationFactory;
 
-    private List<MCRSolrCore> destinationCores;
+    private List<MCRSolrIndex> destinationIndexList;
 
     protected int commitWithin;
 
-    private MCRSolrCoreType coreType;
+    private MCRSolrIndexType indexType;
 
     public MCRSolrAbstractIndexHandler() {
-        this.commitWithin = MCRConfiguration2.getInt("MCR.Solr.commitWithIn").orElseThrow();
+        this.commitWithin = MCRConfiguration2.getInt("MCR.Solr.commitWithin").orElseThrow();
         this.solrAuthenticationFactory = MCRSolrAuthenticationManager.obtainInstance();
     }
 
@@ -71,16 +71,16 @@ public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler
         return commitWithin;
     }
 
-    public List<MCRSolrCore> getDestinationCores() {
-        if (destinationCores != null) {
-            return destinationCores;
+    public List<MCRSolrIndex> getDestinationIndex() {
+        if (destinationIndexList != null) {
+            return destinationIndexList;
         } else {
-            return MCRSolrCoreManager.getCoresForType(this.coreType);
+            return MCRSolrIndexRegistryManager.obtainRegistry().getIndexByType(this.indexType);
         }
     }
 
-    public void setDestinationCores(List<MCRSolrCore> destinationCores) {
-        this.destinationCores = destinationCores;
+    public void setDestinationIndex(List<MCRSolrIndex> destinationIndexList) {
+        this.destinationIndexList = destinationIndexList;
     }
 
     /**
@@ -88,7 +88,7 @@ public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler
      * @return set of solr clients
      */
     protected List<SolrClient> getClients() {
-        return getDestinationCores().stream().map(MCRSolrCore::getClient).collect(Collectors.toList());
+        return getDestinationIndex().stream().map(MCRSolrIndex::getClient).collect(Collectors.toList());
     }
 
     @Override
@@ -108,11 +108,11 @@ public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler
     }
 
     @Override
-    public void setCoreType(MCRSolrCoreType coreType) {
-        this.coreType = coreType;
+    public void setIndexType(MCRSolrIndexType indexType) {
+        this.indexType = indexType;
     }
 
-    public MCRSolrCoreType getCoreType() {
-        return coreType;
+    public MCRSolrIndexType getIndexType() {
+        return indexType;
     }
 }

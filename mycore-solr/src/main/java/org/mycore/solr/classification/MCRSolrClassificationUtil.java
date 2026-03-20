@@ -24,12 +24,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.common.SolrInputDocument;
@@ -41,9 +39,9 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.solr.MCRSolrCore;
-import org.mycore.solr.MCRSolrCoreManager;
-import org.mycore.solr.MCRSolrUtils;
+import org.mycore.solr.MCRSolrIndex;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
+import org.mycore.solr.MCRSolrIndexType;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.mycore.solr.search.MCRSolrSearchUtils;
@@ -59,7 +57,7 @@ public final class MCRSolrClassificationUtil {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final String CLASSIFICATION_CORE_TYPE = "classification";
+    private static final MCRSolrIndexType CLASSIFICATION_INDEX_TYPE = MCRSolrIndexType.CLASSIFICATION;
 
     private MCRSolrClassificationUtil() {
     }
@@ -68,15 +66,15 @@ public final class MCRSolrClassificationUtil {
      * Reindex the whole classification system with the default classification solr core.
      */
     public static void rebuildIndex() {
-        rebuildIndex(List.of(getCore()));
+        rebuildIndex(getIndexList());
     }
 
     /**
      * Reindex the whole classification system.
      *
-     * @param cores the solr cores to use
+     * @param indexList the solr cores to use
      */
-    public static void rebuildIndex(List<MCRSolrCore> cores) {
+    public static void rebuildIndex(List<MCRSolrIndex> indexList) {
         LOGGER.info("rebuild classification index...");
         // categories
         MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
@@ -88,14 +86,14 @@ public final class MCRSolrClassificationUtil {
             categoryList.add(rootCategory);
             List<SolrInputDocument> solrDocumentList = toSolrDocument(categoryList);
 
-            bulkIndex(cores, solrDocumentList);
+            bulkIndex(indexList, solrDocumentList);
         }
         // links
         MCRCategLinkService linkService = MCRCategLinkServiceFactory.obtainInstance();
         Collection<String> linkTypes = linkService.getTypes();
         for (String linkType : linkTypes) {
             LOGGER.info("rebuild '{}' links...", linkType);
-            bulkIndex(cores, linkService.getLinks(linkType)
+            bulkIndex(indexList, linkService.getLinks(linkType)
                 .stream()
                 .map(link -> new MCRSolrCategoryLink(link.getCategory().getId(),
                     link.getObjectReference()))
@@ -109,7 +107,7 @@ public final class MCRSolrClassificationUtil {
      *
      * @param solrDocumentList the list to index
      */
-    public static void bulkIndex(final List<MCRSolrCore> client, List<SolrInputDocument> solrDocumentList) {
+    public static void bulkIndex(final List<MCRSolrIndex> indexList, List<SolrInputDocument> solrDocumentList) {
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
             List<List<SolrInputDocument>> partitionList = Lists.partition(solrDocumentList, 1000);
             int docNum = solrDocumentList.size();
@@ -121,8 +119,8 @@ public final class MCRSolrClassificationUtil {
                     req.setCommitWithin(500);
                     MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(req,
                         MCRSolrAuthenticationLevel.INDEX);
-                    for (MCRSolrCore core : client) {
-                        req.process(core.getClient());
+                    for (MCRSolrIndex index : indexList) {
+                        req.process(index.getClient());
                     }
                     added += part.size();
                     LOGGER.info("Added {}/{} documents", added, docNum);
@@ -137,16 +135,18 @@ public final class MCRSolrClassificationUtil {
      * Drops the whole solr classification index.
      */
     public static void dropIndex() {
-        try {
-            SolrClient solrClient = getCore().getConcurrentClient();
-            UpdateRequest req = new UpdateRequest();
-            MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(req,
-                MCRSolrAuthenticationLevel.INDEX);
-            req.deleteByQuery("*:*");
-            req.process(solrClient);
-        } catch (Exception exc) {
-            LOGGER.error("Unable to drop solr classification index", exc);
-        }
+        // remove all descendants and itself
+        getIndexList().stream().map(MCRSolrIndex::getClient).forEach(solrClient -> {
+            try {
+                UpdateRequest req = new UpdateRequest();
+                MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(req,
+                    MCRSolrAuthenticationLevel.INDEX);
+                req.deleteByQuery("*:*");
+                req.process(solrClient);
+            } catch (Exception exc) {
+                LOGGER.error("Unable to drop solr classification index", exc);
+            }
+        });
     }
 
     /**
@@ -210,31 +210,33 @@ public final class MCRSolrClassificationUtil {
      * @param categories the categories to reindex
      */
     public static void reindex(MCRCategory... categories) {
-        SolrClient solrClient = getCore().getClient();
-        for (MCRCategory category : categories) {
-            if (category == null) {
-                continue;
+        // remove all descendants and itself
+        getIndexList().stream().map(MCRSolrIndex::getClient).forEach(solrClient -> {
+            for (MCRCategory category : categories) {
+                if (category == null) {
+                    continue;
+                }
+                MCRSolrCategory solrCategory = new MCRSolrCategory(category);
+                try {
+                    UpdateRequest req = new UpdateRequest();
+                    req.add(solrCategory.toSolrDocument());
+                    MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(req,
+                        MCRSolrAuthenticationLevel.INDEX);
+                    req.process(solrClient);
+                } catch (Exception exc) {
+                    LOGGER.error(() -> "Unable to reindex " + category.getId(), exc);
+                }
             }
-            MCRSolrCategory solrCategory = new MCRSolrCategory(category);
             try {
-                UpdateRequest req = new UpdateRequest();
-                req.add(solrCategory.toSolrDocument());
-                MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(req,
-                    MCRSolrAuthenticationLevel.INDEX);
-                req.process(solrClient);
+                UpdateRequest commitRequest = new UpdateRequest();
+                commitRequest.setAction(UpdateRequest.ACTION.COMMIT, true, true);
+                MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(commitRequest,
+                    MCRSolrAuthenticationLevel.ADMIN);
+                commitRequest.process(solrClient);
             } catch (Exception exc) {
-                LOGGER.error(() -> "Unable to reindex " + category.getId(), exc);
+                LOGGER.error("Unable to commit reindexed categories", exc);
             }
-        }
-        try {
-            UpdateRequest commitRequest = new UpdateRequest();
-            commitRequest.setAction(UpdateRequest.ACTION.COMMIT, true, true);
-            MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(commitRequest,
-                MCRSolrAuthenticationLevel.INDEX);
-            commitRequest.process(solrClient);
-        } catch (Exception exc) {
-            LOGGER.error("Unable to commit reindexed categories", exc);
-        }
+        });
     }
 
     /**
@@ -244,8 +246,8 @@ public final class MCRSolrClassificationUtil {
      */
     public static Collection<MCRCategoryID> fromString(Collection<String> categoryIds) {
         List<MCRCategoryID> idList = new ArrayList<>(categoryIds.size());
-        for (String categoyId : categoryIds) {
-            idList.add(MCRCategoryID.ofString(categoyId));
+        for (String categoryId : categoryIds) {
+            idList.add(MCRCategoryID.ofString(categoryId));
         }
         return idList;
     }
@@ -263,9 +265,8 @@ public final class MCRSolrClassificationUtil {
     /**
      * Returns the solr classification core.
      */
-    public static MCRSolrCore getCore() {
-        Optional<MCRSolrCore> classCore = MCRSolrCoreManager.get(CLASSIFICATION_CORE_TYPE);
-        return classCore.orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(CLASSIFICATION_CORE_TYPE));
+    public static List<MCRSolrIndex> getIndexList() {
+        return MCRSolrIndexRegistryManager.obtainRegistry().getIndexByType(CLASSIFICATION_INDEX_TYPE);
     }
 
     /**
@@ -278,36 +279,40 @@ public final class MCRSolrClassificationUtil {
     }
 
     static void solrDelete(MCRCategoryID id, MCRCategory parent) {
-        try {
-            // remove all descendants and itself
-            SolrClient solrClient = getCore().getClient();
-            List<String> toDelete = MCRSolrSearchUtils.listIDs(solrClient,
-                "ancestor:" + encodeCategoryId(id));
-            toDelete.add(id.toString());
-            UpdateRequest req = new UpdateRequest();
-            req.deleteById(toDelete);
-            MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(req,
-                MCRSolrAuthenticationLevel.INDEX);
-            req.process(solrClient);
-            // reindex parent
-            if (parent != null) {
-                reindex(parent);
+        // remove all descendants and itself
+        getIndexList().stream().map(MCRSolrIndex::getClient).forEach(solrClient -> {
+            try {
+                List<String> toDelete = MCRSolrSearchUtils.listIDs(solrClient,
+                    "ancestor:" + encodeCategoryId(id));
+                toDelete.add(id.toString());
+                UpdateRequest req = new UpdateRequest();
+                req.deleteById(toDelete);
+                MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(req,
+                    MCRSolrAuthenticationLevel.INDEX);
+                req.process(solrClient);
+                // reindex parent
+                if (parent != null) {
+                    reindex(parent);
+                }
+            } catch (Exception exc) {
+                LOGGER.error("Solr: unable to delete categories of parent {}", id);
             }
-        } catch (Exception exc) {
-            LOGGER.error("Solr: unable to delete categories of parent {}", id);
-        }
+        });
     }
 
     static void solrMove(MCRCategoryID id, MCRCategoryID newParentID) {
-        try {
-            SolrClient solrClient = getCore().getClient();
-            List<String> reindexList = MCRSolrSearchUtils.listIDs(solrClient,
-                "ancestor:" + encodeCategoryId(id));
-            reindexList.add(id.toString());
-            reindexList.add(newParentID.toString());
-            reindex(fromString(reindexList));
-        } catch (Exception exc) {
-            LOGGER.error("Solr: unable to move categories of category {} to {}", id, newParentID);
-        }
+        // remove all descendants and itself
+        getIndexList().stream().map(MCRSolrIndex::getClient).forEach(solrClient -> {
+            try {
+                List<String> reindexList = MCRSolrSearchUtils.listIDs(solrClient,
+                    "ancestor:" + encodeCategoryId(id));
+                reindexList.add(id.toString());
+                reindexList.add(newParentID.toString());
+                reindex(fromString(reindexList));
+            } catch (Exception exc) {
+                LOGGER.error("Solr: unable to move categories of category {} to {}", id,
+                    newParentID);
+            }
+        });
     }
 }

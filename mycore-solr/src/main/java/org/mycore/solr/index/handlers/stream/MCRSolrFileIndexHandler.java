@@ -36,7 +36,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.common.MCRUtils;
-import org.mycore.solr.MCRSolrCoreType;
+import org.mycore.solr.MCRSolrIndexType;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.index.cs.MCRSolrPathContentStream;
 import org.mycore.solr.index.file.MCRSolrPathDocumentFactory;
@@ -54,7 +54,7 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
     public MCRSolrFileIndexHandler(Path file, BasicFileAttributes attrs) {
         this.file = file;
         this.attrs = attrs;
-        this.setCoreType(MCRSolrCoreType.MAIN);
+        this.setIndexType(MCRSolrIndexType.MAIN);
     }
 
     @Override

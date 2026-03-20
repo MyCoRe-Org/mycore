@@ -60,7 +60,7 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRExpandedObject;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.solr.MCRSolrCore;
+import org.mycore.solr.MCRSolrIndex;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
@@ -212,7 +212,7 @@ public class MCRSolrIndexer {
      * @throws SolrServerException solr server exception
      * @throws IOException io exception
      */
-    public static void deleteOrphanedNestedDocuments(List<MCRSolrCore> solrCores)
+    public static void deleteOrphanedNestedDocuments(List<MCRSolrIndex> indexList)
         throws SolrServerException, IOException {
         if (!MCRSolrUtils.useNestedDocuments()) {
             return;
@@ -221,8 +221,8 @@ public class MCRSolrIndexer {
         req.deleteByQuery("-({!join from=id to=_root_ score=none}_root_:*) +_root_:*");
         req.setCommitWithin(0);
         SOLR_AUTHENTICATION_MANAGER.applyAuthentication(req, MCRSolrAuthenticationLevel.INDEX);
-        for (MCRSolrCore solrCore : solrCores) {
-            req.process(solrCore.getClient());
+        for (MCRSolrIndex solrIndex : indexList) {
+            req.process(solrIndex.getClient());
         }
     }
 
@@ -319,7 +319,7 @@ public class MCRSolrIndexer {
         UpdateRequest commitRequest = new UpdateRequest();
         commitRequest.setAction(UpdateRequest.ACTION.COMMIT, true, true);
         SOLR_AUTHENTICATION_MANAGER.applyAuthentication(commitRequest,
-            MCRSolrAuthenticationLevel.INDEX);
+            MCRSolrAuthenticationLevel.ADMIN);
         commitRequest.process(solrClient);
     }
 
@@ -336,8 +336,8 @@ public class MCRSolrIndexer {
     /**
      * Rebuilds solr's metadata index.
      */
-    public static void rebuildMetadataIndex(List<MCRSolrCore> solrCores) {
-        rebuildMetadataIndex(MCRXMLMetadataManager.obtainInstance().listIDs(), solrCores);
+    public static void rebuildMetadataIndex(List<MCRSolrIndex> indexList) {
+        rebuildMetadataIndex(MCRXMLMetadataManager.obtainInstance().listIDs(), indexList);
     }
 
     /**
@@ -346,9 +346,9 @@ public class MCRSolrIndexer {
      * @param type
      *            of the objects to index
      */
-    public static void rebuildMetadataIndex(String type, List<MCRSolrCore> solrCores) {
-        List<String> identfiersOfType = MCRXMLMetadataManager.obtainInstance().listIDsOfType(type);
-        rebuildMetadataIndex(identfiersOfType, solrCores);
+    public static void rebuildMetadataIndex(String type, List<MCRSolrIndex> indexList) {
+        List<String> identifiersOfType = MCRXMLMetadataManager.obtainInstance().listIDsOfType(type);
+        rebuildMetadataIndex(identifiersOfType, indexList);
     }
 
     /**
@@ -357,9 +357,9 @@ public class MCRSolrIndexer {
      * @param base
      *            of the objects to index
      */
-    public static void rebuildMetadataIndexForObjectBase(String base, List<MCRSolrCore> solrCores) {
-        List<String> identfiersOfBase = MCRXMLMetadataManager.obtainInstance().listIDsForBase(base);
-        rebuildMetadataIndex(identfiersOfBase, solrCores);
+    public static void rebuildMetadataIndexForObjectBase(String base, List<MCRSolrIndex> indexList) {
+        List<String> identifiersOfBase = MCRXMLMetadataManager.obtainInstance().listIDsForBase(base);
+        rebuildMetadataIndex(identifiersOfBase, indexList);
     }
 
     /**
@@ -367,10 +367,10 @@ public class MCRSolrIndexer {
      *
      * @param list
      *            list of identifiers of the objects to index
-     * @param solrCores
+     * @param indexList
      *            solr server to index
      */
-    public static void rebuildMetadataIndex(List<String> list, List<MCRSolrCore> solrCores) {
+    public static void rebuildMetadataIndex(List<String> list, List<MCRSolrIndex> indexList) {
         LOGGER.info("Re-building Metadata Index");
         if (list.isEmpty()) {
             LOGGER.info("Sorry, no documents to index");
@@ -398,7 +398,7 @@ public class MCRSolrIndexer {
                     MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.obtainInstance()
                         .getIndexHandler(contentMap);
                     if (indexHandler instanceof MCRSolrAbstractIndexHandler aie) {
-                        aie.setDestinationCores(solrCores);
+                        aie.setDestinationIndex(indexList);
                     } else {
                         throw new MCRException("indexHandler " + indexHandler.getClass().getName()
                             + " does not support indexing with cores");
@@ -421,33 +421,33 @@ public class MCRSolrIndexer {
     /**
      * Rebuilds solr's content index.
      */
-    public static void rebuildContentIndex(List<MCRSolrCore> cores) {
-        rebuildContentIndex(MCRXMLMetadataManager.obtainInstance().listIDsOfType(MCRDerivate.OBJECT_TYPE), cores);
+    public static void rebuildContentIndex(List<MCRSolrIndex> indexList) {
+        rebuildContentIndex(MCRXMLMetadataManager.obtainInstance().listIDsOfType(MCRDerivate.OBJECT_TYPE), indexList);
     }
 
     /**
      * Rebuilds solr's content index.
      *
-     * @param cores
+     * @param indexList
      *            the solr cores to send the objects to
      * @param list
      *            list of mycore object id's
      */
-    public static void rebuildContentIndex(List<String> list, List<MCRSolrCore> cores) {
-        rebuildContentIndex(list, cores, LOW_PRIORITY);
+    public static void rebuildContentIndex(List<String> list, List<MCRSolrIndex> indexList) {
+        rebuildContentIndex(list, indexList, LOW_PRIORITY);
     }
 
     /**
      * Rebuilds solr's content index.
      *
-     * @param cores
+     * @param indexList
      *            the solr cores to send the objects to
      * @param list
      *            list of mycore object id's
      * @param priority
      *            higher priority means earlier execution
      */
-    public static void rebuildContentIndex(List<String> list, List<MCRSolrCore> cores, int priority) {
+    public static void rebuildContentIndex(List<String> list, List<MCRSolrIndex> indexList, int priority) {
         LOGGER.info("Re-building Content Index");
 
         if (list.isEmpty()) {
@@ -461,7 +461,7 @@ public class MCRSolrIndexer {
         for (String id : list) {
             MCRSolrFilesIndexHandler indexHandler = new MCRSolrFilesIndexHandler(id);
             indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
-            indexHandler.setDestinationCores(cores);
+            indexHandler.setDestinationIndex(indexList);
             submitIndexHandler(indexHandler, priority);
         }
         long tStop = System.currentTimeMillis();
@@ -561,10 +561,10 @@ public class MCRSolrIndexer {
     /**
      * Sends a signal to the remote solr server to optimize its index.
      */
-    public static void optimize(List<MCRSolrCore> cores) {
+    public static void optimize(List<MCRSolrIndex> indexList) {
         try {
             MCRSolrOptimizeIndexHandler indexHandler = new MCRSolrOptimizeIndexHandler();
-            indexHandler.setDestinationCores(cores);
+            indexHandler.setDestinationIndex(indexList);
             indexHandler.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
             submitIndexHandler(indexHandler);
         } catch (Exception ex) {
@@ -576,10 +576,10 @@ public class MCRSolrIndexer {
      * Synchronizes the solr server with the database. As a result the solr server contains the same documents as the
      * database. All solr zombie documents will be removed, and all not indexed mycore objects will be indexed.
      */
-    public static void synchronizeMetadataIndex(List<MCRSolrCore> client) throws IOException, SolrServerException {
+    public static void synchronizeMetadataIndex(List<MCRSolrIndex> indexList) throws IOException, SolrServerException {
         Collection<String> objectTypes = MCRXMLMetadataManager.obtainInstance().getObjectTypes();
         for (String objectType : objectTypes) {
-            synchronizeMetadataIndex(client, objectType);
+            synchronizeMetadataIndex(indexList, objectType);
         }
     }
 
@@ -588,20 +588,21 @@ public class MCRSolrIndexer {
      * the same documents as the store. All solr zombie documents will be removed, and all not indexed mycore objects
      * will be indexed.
      */
-    public static void synchronizeMetadataIndex(List<MCRSolrCore> cores, String objectType)
+    public static void synchronizeMetadataIndex(List<MCRSolrIndex> indexList, String objectType)
         throws IOException, SolrServerException {
-        synchronizeMetadataIndex(cores, objectType,
-            () -> MCRXMLMetadataManager.obtainInstance().listIDsOfType(objectType), "objectType:" + objectType);
+        synchronizeMetadataIndex(indexList, objectType,
+            () -> MCRXMLMetadataManager.obtainInstance().listIDsOfType(objectType),
+            "objectType:" + objectType);
     }
 
-    public static void synchronizeMetadataIndexForObjectBase(List<MCRSolrCore> cores, String objectBase)
+    public static void synchronizeMetadataIndexForObjectBase(List<MCRSolrIndex> indexList, String objectBase)
         throws IOException, SolrServerException {
         final String solrQuery = "objectType:" + objectBase.split("_")[1] + " _root_:" + objectBase + "_*";
-        synchronizeMetadataIndex(cores, objectBase, () -> MCRXMLMetadataManager.obtainInstance()
+        synchronizeMetadataIndex(indexList, objectBase, () -> MCRXMLMetadataManager.obtainInstance()
                 .listIDsForBase(objectBase), solrQuery);
     }
 
-    private static void synchronizeMetadataIndex(List<MCRSolrCore> cores, String synchBase,
+    private static void synchronizeMetadataIndex(List<MCRSolrIndex> cores, String synchBase,
         Supplier<List<String>> localIDListSupplier, String query)
         throws SolrServerException, IOException {
         LOGGER.info("synchronize {}", synchBase);
@@ -611,7 +612,7 @@ public class MCRSolrIndexer {
         LOGGER.info("there are {} mycore objects", storeList::size);
         // get ids from solr
         LOGGER.info("fetching solr...");
-        for (MCRSolrCore core : cores) {
+        for (MCRSolrIndex core : cores) {
             List<String> solrList = MCRSolrSearchUtils.listIDs(core.getClient(), query);
             LOGGER.info("there are {} solr objects", solrList::size);
             // documents to remove

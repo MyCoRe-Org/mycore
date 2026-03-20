@@ -28,22 +28,12 @@ public class MCRSolrConstants {
 
     public static final String SOLR_CONFIG_PREFIX = "MCR.Solr.";
 
-    // public static final String SOLR_SERVER_URL;
+    public static final String SOLR_INDEX_REGISTRY_PROPERTY_PREFIX = SOLR_CONFIG_PREFIX + "IndexRegistry.";
 
-    public static final String DEFAULT_SOLR_SERVER_URL = MCRConfiguration2
-        .getStringOrThrow(SOLR_CONFIG_PREFIX + "ServerURL");
+    public static final String SOLR_INDEX_REGISTRY_PROPERTY = SOLR_INDEX_REGISTRY_PROPERTY_PREFIX +
+        "Class";
 
-    public static final String SOLR_CORE_PREFIX = SOLR_CONFIG_PREFIX + "Core.";
-
-    public static final String SOLR_CORE_NAME_SUFFIX = ".Name";
-
-    public static final String SOLR_CORE_SERVER_SUFFIX = ".ServerURL";
-
-    public static final String SOLR_CORE_CONFIGSET_TEMPLATE_SUFFIX = ".ConfigSetTemplate";
-
-    public static final String SOLR_CORE_SHARD_COUNT_SUFFIX = ".ShardCount";
-
-    public static final String SOLR_CORE_TYPE_SUFFIX = ".Type";
+    public static final String SOLR_INDEX_REGISTRY_INDEX_PREFIX = "Index";
 
     public static final String SOLR_QUERY_XML_PROTOCOL_VERSION = MCRConfiguration2
         .getStringOrThrow(SOLR_CONFIG_PREFIX + "XMLProtocolVersion");
@@ -57,5 +47,7 @@ public class MCRSolrConstants {
 
     public static final String SOLR_JOIN_PATTERN = "{!join from=returnId to=id}";
 
-    public static final String MAIN_CORE_TYPE = "main";
+    public static final String MAIN_INDEX_ID = "main";
+
+    public static final String CLASSIFICATION_INDEX_ID = "classification";
 }

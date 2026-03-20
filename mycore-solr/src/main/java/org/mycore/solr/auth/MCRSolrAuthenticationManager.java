@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrRequest;
+import org.apache.solr.client.solrj.impl.HttpSolrClientBuilderBase;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.solr.MCRSolrConstants;
@@ -95,6 +96,16 @@ public final class MCRSolrAuthenticationManager {
     public void applyAuthentication(HttpRequest.Builder request, MCRSolrAuthenticationLevel level) {
         authenticators.get(level).applyAuthentication(request);
     }
+
+    /**
+     * Add authentication to a Solr client builder.
+     * @param clientBuilder the client builder to add the authentication to
+     * @param level the level of authentication to add
+     */
+    public void applyAuthentication(HttpSolrClientBuilderBase<?, ?> clientBuilder, MCRSolrAuthenticationLevel level) {
+        authenticators.get(level).applyAuthentication(clientBuilder);
+    }
+
 
     public static MCRSolrAuthenticationManager obtainInstance() {
         return LazyInstanceHolder.SINGLETON_INSTANCE;

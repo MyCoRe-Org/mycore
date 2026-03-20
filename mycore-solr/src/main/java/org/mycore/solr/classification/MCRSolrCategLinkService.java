@@ -31,9 +31,9 @@ import org.apache.solr.common.SolrInputDocument;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl;
-import org.mycore.solr.MCRSolrCore;
-import org.mycore.solr.MCRSolrCoreManager;
-import org.mycore.solr.MCRSolrCoreType;
+import org.mycore.solr.MCRSolrIndex;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
+import org.mycore.solr.MCRSolrIndexType;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
@@ -52,37 +52,45 @@ public class MCRSolrCategLinkService extends MCRCategLinkServiceImpl {
     public void setLinks(MCRCategLinkReference objectReference, Collection<MCRCategoryID> categories) {
         super.setLinks(objectReference, categories);
         // solr
-        List<MCRSolrCore> cores = MCRSolrCoreManager.getCoresForType(MCRSolrCoreType.CLASSIFICATION);
+        List<MCRSolrIndex> indexList =
+            MCRSolrIndexRegistryManager.obtainRegistry().getIndexByType(MCRSolrIndexType.CLASSIFICATION);
         List<SolrInputDocument> solrDocumentList = MCRSolrClassificationUtil
             .toSolrDocument(objectReference, categories);
 
-        MCRSolrClassificationUtil.bulkIndex(cores, solrDocumentList);
+        MCRSolrClassificationUtil.bulkIndex(indexList, solrDocumentList);
     }
 
     @Override
     public void deleteLink(MCRCategLinkReference reference) {
         super.deleteLink(reference);
         // solr
-        try {
-            SolrClient solrClient = MCRSolrClassificationUtil.getCore().getClient();
-            delete(solrClient, reference);
-        } catch (Exception exc) {
-            LOGGER.error(() -> "Unable to delete links of object " + reference.getObjectID(), exc);
-        }
+        MCRSolrClassificationUtil.getIndexList().forEach(index -> {
+            try {
+                SolrClient solrClient = index.getClient();
+                delete(solrClient, reference);
+            } catch (Exception exc) {
+                LOGGER.error(() -> "Unable to delete links of object " + reference.getObjectID(), exc);
+            }
+        });
+
     }
 
     @Override
     public void deleteLinks(Collection<MCRCategLinkReference> references) {
         super.deleteLinks(references);
         // solr
-        SolrClient solrClient = MCRSolrClassificationUtil.getCore().getClient();
-        for (MCRCategLinkReference reference : references) {
-            try {
-                delete(solrClient, reference);
-            } catch (Exception exc) {
-                LOGGER.error(() -> "Unable to delete links of object " + reference.getObjectID(), exc);
+        MCRSolrClassificationUtil.getIndexList().forEach(index -> {
+            SolrClient solrClient = index.getClient();
+            for (MCRCategLinkReference reference : references) {
+                try {
+                    delete(solrClient, reference);
+                } catch (Exception exc) {
+                    LOGGER.error(
+                        () -> "Unable to delete links of object " + reference.getObjectID(),
+                        exc);
+                }
             }
-        }
+        });
     }
 
     /**

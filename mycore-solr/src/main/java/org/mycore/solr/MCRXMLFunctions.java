@@ -39,9 +39,14 @@ public class MCRXMLFunctions {
      * @param q the query to execute (in solr syntax)
      * 
      * @return the amount of documents matching the given query
+     * @deprecated the method lacks support for core selection and is used as xalan extension,
+     * which is deprecated as well. It will be removed in a future release, so please use the
+     * SolrJ API directly instead or implement a XSLT function which uses uri resolver to do the
+     * request to the correct core.
      */
+    @Deprecated(forRemoval = true, since = "2026.06.0")
     public static long getNumFound(String q) throws SolrServerException, IOException {
-        if (q == null || q.length() == 0) {
+        if (q == null || q.isEmpty()) {
             throw new IllegalArgumentException("The query string must not be null");
         }
         SolrQuery solrQuery = new SolrQuery(q);
@@ -49,16 +54,22 @@ public class MCRXMLFunctions {
         QueryRequest queryRequest = new QueryRequest(solrQuery);
         MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
             MCRSolrAuthenticationLevel.SEARCH);
-        QueryResponse queryResponse = queryRequest.process(MCRSolrCoreManager.getMainSolrClient());
+        QueryResponse queryResponse = queryRequest.process(MCRSolrIndexRegistryManager.obtainRegistry()
+            .requireMainIndex().getClient());
         return queryResponse.getResults().getNumFound();
     }
 
     /**
      * @param q the query to execute (in solr syntax)
      * @return the identifier of the first document matching the query
+     * @deprecated tje method lacks support for core selection and is used as xalan extension,
+     * which is deprecated as well. It will be removed in a future release, so please use the
+     * SolrJ API directly instead or implement a XSLT function which uses uri resolver to do the
+     * request to the correct core.
      */
+    @Deprecated(forRemoval = true, since = "2026.06.0")
     public static String getIdentifierOfFirst(String q) throws SolrServerException, IOException {
-        if (q == null || q.length() == 0) {
+        if (q == null || q.isEmpty()) {
             throw new IllegalArgumentException("The query string must not be null");
         }
         SolrQuery solrQuery = new SolrQuery(q);
@@ -67,7 +78,8 @@ public class MCRXMLFunctions {
         QueryRequest queryRequest = new QueryRequest(solrQuery);
         MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
             MCRSolrAuthenticationLevel.SEARCH);
-        queryResponse = queryRequest.process(MCRSolrCoreManager.getMainSolrClient());
+        queryResponse = queryRequest.process(MCRSolrIndexRegistryManager.obtainRegistry()
+            .requireMainIndex().getClient());
 
         if (queryResponse.getResults().getNumFound() == 0) {
             return null;

@@ -28,10 +28,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Serial;
-import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,7 +39,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import javax.xml.transform.TransformerException;
@@ -50,6 +46,9 @@ import javax.xml.transform.TransformerException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.request.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.InputStreamResponseParser;
+import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.MultiMapSolrParams;
 import org.apache.solr.common.util.NamedList;
@@ -64,8 +63,8 @@ import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.services.http.MCRHttpUtils;
 import org.mycore.solr.MCRSolrConstants;
-import org.mycore.solr.MCRSolrCoreManager;
-import org.mycore.solr.MCRSolrUtils;
+import org.mycore.solr.MCRSolrIndex;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.xml.sax.SAXException;
@@ -90,7 +89,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
 
     @Serial
     private static final long serialVersionUID = 1L;
-    
+
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**
@@ -111,14 +110,6 @@ public class MCRSolrProxyServlet extends MCRServlet {
 
     public static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
         MCRSolrAuthenticationManager.obtainInstance();
-
-    private static final Map<String, String> NEW_HTTP_RESPONSE_HEADER;
-
-    static {
-        Map<String, String> newRespHeader = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-        newRespHeader.putAll(MCRConfiguration2.getSubPropertiesMap(SOLR_CONFIG_PREFIX + "HTTPResponseHeader."));
-        NEW_HTTP_RESPONSE_HEADER = Collections.unmodifiableMap(newRespHeader);
-    }
 
     private HttpClient httpClient;
 
@@ -230,53 +221,50 @@ public class MCRSolrProxyServlet extends MCRServlet {
         throws IOException, TransformerException, SAXException {
         ModifiableSolrParams solrParameter = getSolrQueryParameter(request);
         filterParams(solrParameter);
-        HttpRequest.Builder solrHttpMethod = getSolrHttpMethod(queryHandlerPath, solrParameter,
-            Optional.ofNullable(request.getParameter(QUERY_CORE_PARAMETER)).orElse(MCRSolrConstants.MAIN_CORE_TYPE));
 
-        SOLR_AUTHENTICATION_MANAGER.applyAuthentication(solrHttpMethod, MCRSolrAuthenticationLevel.SEARCH);
+        QueryRequest queryRequest = new QueryRequest(solrParameter);
+        queryRequest.setPath(queryHandlerPath);
+        SOLR_AUTHENTICATION_MANAGER.applyAuthentication(queryRequest, MCRSolrAuthenticationLevel.SEARCH);
 
-        HttpRequest solrRequest;
+        String core = Optional.ofNullable(request.getParameter(QUERY_CORE_PARAMETER))
+            .orElse(MCRSolrConstants.MAIN_INDEX_ID);
+
+        Optional<MCRSolrIndex> optionalIndex = MCRSolrIndexRegistryManager.obtainRegistry().getIndex(core);
+        if (optionalIndex.isEmpty()) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "No such core: " + core);
+            return;
+        }
+        MCRSolrIndex solrIndex = optionalIndex.get();
+        String writerType = getWriterType(request);
+        queryRequest.setResponseParser(new InputStreamResponseParser(writerType));
+
         try {
-            solrRequest = solrHttpMethod.build();
-            LOGGER.info("Sending Request: {}", solrRequest::uri);
-            HttpResponse<InputStream> response =
-                httpClient.send(solrRequest, HttpResponse.BodyHandlers.ofInputStream());
-            int statusCode = response.statusCode();
-
-            // set status code
-            resp.setStatus(statusCode);
-
-            boolean isXML = response.headers().firstValue("Content-Type").orElse("").contains("/xml");
-            boolean justCopyInput = !isXML;
-
-            // set all headers
-            MCRHttpUtils.filterHopByHop(response.headers()).map().forEach((headerName, headerValues) -> {
-                LOGGER.debug("SOLR response header: {} - {}", headerName, headerValues);
-                if (NEW_HTTP_RESPONSE_HEADER.containsKey(headerName)) {
-                    String headerValue = NEW_HTTP_RESPONSE_HEADER.get(headerName);
-                    if (headerValue != null && !headerValue.isEmpty()) {
-                        resp.setHeader(headerName, headerValue);
-                    }
-                } else {
-                    headerValues.forEach(headerValue -> resp.setHeader(headerName, headerValue));
+            NamedList<Object> solrResponse = solrIndex.getClient().request(queryRequest);
+            try (InputStream is = (InputStream) solrResponse.get("stream")) {
+                if (solrResponse.get("responseStatus") != null) {
+                    Integer responseStatus = (Integer) solrResponse.get("responseStatus");
+                    resp.setStatus(responseStatus);
                 }
-            });
 
-            try (InputStream solrResponseStream = response.body()) {
-                if (justCopyInput) {
+                if (!writerType.equals("xml")) {
                     // copy solr response to servlet outputstream
                     OutputStream servletOutput = resp.getOutputStream();
-                    solrResponseStream.transferTo(servletOutput);
+                    is.transferTo(servletOutput);
                 } else {
-                    MCRStreamContent solrResponse = new MCRStreamContent(solrResponseStream,
-                        solrRequest.uri().toString(),
+                    MCRStreamContent solrResponseContent = new MCRStreamContent(is,
+                        request.getRequestURI(),
                         "response");
-                    MCRLayoutService.obtainInstance().doLayout(request, resp, solrResponse);
+                    MCRLayoutService.obtainInstance().doLayout(request, resp, solrResponseContent);
                 }
             }
-        } catch (InterruptedException ex) {
-            throw new IOException(ex);
+        } catch (SolrServerException e) {
+            throw new IOException("Error while processing query request", e);
         }
+    }
+
+    private String getWriterType(HttpServletRequest request) {
+        return Optional.ofNullable(request.getParameter("wt"))
+            .orElse("xml");
     }
 
     private void filterParams(ModifiableSolrParams solrParameter) {
@@ -301,23 +289,6 @@ public class MCRSolrProxyServlet extends MCRServlet {
             .map(s -> s.collect(Collectors.toList()))
             .orElseGet(() -> Collections.singletonList("/select"));
         this.queryHandlerWhitelist = new HashSet<>(whitelistPropertyList);
-    }
-
-    /**
-     * Gets a HttpGet to make a request to the Solr-Server.
-     *
-     * @param queryHandlerPath
-     *            The query handler path
-     * @param params
-     *            Parameters to use with the Request
-     * @return a method to make the request
-     */
-    private static HttpRequest.Builder getSolrHttpMethod(String queryHandlerPath, ModifiableSolrParams params,
-        String type) {
-        String serverURL = MCRSolrCoreManager.get(type).get().getV1CoreURL();
-
-        return MCRSolrUtils.getRequestBuilder()
-            .uri(URI.create(serverURL + queryHandlerPath + params.toQueryString()));
     }
 
     private static ModifiableSolrParams getSolrQueryParameter(HttpServletRequest request) {

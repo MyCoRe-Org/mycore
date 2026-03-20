@@ -50,7 +50,7 @@ import org.mycore.oai.set.MCROAISetHandler;
 import org.mycore.oai.set.MCROAISetResolver;
 import org.mycore.oai.set.MCROAISolrSetHandler;
 import org.mycore.oai.set.MCRSet;
-import org.mycore.solr.MCRSolrCoreManager;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
@@ -87,7 +87,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         query.set(CommonParams.Q, "id:" + MCRSolrUtils.escapeSearchValue(mcrId));
         query.setRows(1);
         // do the query
-        SolrClient solrClient = MCRSolrCoreManager.getMainSolrClient();
+        SolrClient solrClient = MCRSolrIndexRegistryManager.requireMainIndex().getClient();
         try {
             QueryRequest queryRequest = new QueryRequest(query);
             queryRequest.setPath(getRequestHandlerPath());
@@ -159,7 +159,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         query.set(CommonParams.SORT, "id asc");
 
         // do the query
-        SolrClient solrClient = MCRSolrCoreManager.getMainSolrClient();
+        SolrClient solrClient = MCRSolrIndexRegistryManager.requireMainIndex().getClient();
         QueryRequest queryRequest = new QueryRequest(query);
         queryRequest.setPath(getRequestHandlerPath());
         MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
@@ -270,7 +270,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         params.add(CommonParams.FQ, fieldName + ":[* TO *]");
         params.add(CommonParams.FL, fieldName);
         params.add(CommonParams.ROWS, "1");
-        SolrClient solrClient = MCRSolrCoreManager.getMainSolrClient();
+        SolrClient solrClient = MCRSolrIndexRegistryManager.requireMainIndex().getClient();
         try {
             QueryRequest queryRequest = new QueryRequest(params);
             MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,

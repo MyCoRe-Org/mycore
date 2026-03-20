@@ -20,12 +20,16 @@ package org.mycore.solr;
 
 import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 
+import java.io.IOException;
 import java.net.URLDecoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
@@ -37,6 +41,8 @@ import org.mycore.services.http.MCRHttpUtils;
  */
 public class MCRSolrUtils {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
     public static final String USE_HTTP_1_1_PROPERTY = "MCR.Solr.UseHttp_1_1";
 
     /**
@@ -47,7 +53,7 @@ public class MCRSolrUtils {
      */
     public static String escapeSearchValue(final String value) {
         //    specialChars = "!&|+-(){}[]\"~*?:\\/^";
-        /* '*' and '?' should always be threatened as special character */
+        /* '*' and '?' should always be treated as special character */
         String specialChars = "!&|+-(){}[]\"~:\\/^";
         Pattern patternRestricted = Pattern.compile("([\\Q" + specialChars + "\\E])");
         if (value == null) {
@@ -66,10 +72,9 @@ public class MCRSolrUtils {
         return MCRConfiguration2.getBoolean(SOLR_CONFIG_PREFIX + "NestedDocuments").orElse(true);
     }
 
-    public static MCRConfigurationException getCoreConfigMissingException(String coreID) {
+    public static MCRConfigurationException getIndexConfigMissingException(String indexID) {
         return new MCRConfigurationException(
-            "Missing property: " + MCRSolrConstants.SOLR_CORE_PREFIX + coreID
-                + MCRSolrConstants.SOLR_CORE_NAME_SUFFIX);
+            "Missing configuration for index " + indexID);
     }
 
     /**
@@ -132,6 +137,13 @@ public class MCRSolrUtils {
             params.add(decodedKey, decodedValue);
         }
         return params;
+    }
+
+    public static void shutdownSolrClient(SolrClient client) throws IOException {
+        if (client != null) {
+            LOGGER.info("Shutting down solr client: {}", client);
+            client.close();
+        }
     }
 
 }

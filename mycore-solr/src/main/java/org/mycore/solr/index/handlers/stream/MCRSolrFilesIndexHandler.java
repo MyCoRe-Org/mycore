@@ -33,7 +33,7 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
-import org.mycore.solr.MCRSolrCoreType;
+import org.mycore.solr.MCRSolrIndexType;
 import org.mycore.solr.index.MCRSolrIndexHandler;
 import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
 import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
@@ -63,7 +63,7 @@ public class MCRSolrFilesIndexHandler extends MCRSolrAbstractIndexHandler {
         super();
         this.mcrID = mcrID;
         this.subHandlerList = new ArrayList<>();
-        setCoreType(MCRSolrCoreType.MAIN);
+        setIndexType(MCRSolrIndexType.MAIN);
     }
 
     @Override

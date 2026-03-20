@@ -27,7 +27,7 @@ import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.solr.MCRSolrCoreManager;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 import org.swordapp.server.SwordServerException;
@@ -59,7 +59,9 @@ public class MCRSwordSolrObjectIDSupplier extends MCRSwordObjectIDSupplier {
             QueryRequest queryRequest = new QueryRequest(queryCopy);
             MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
                 MCRSolrAuthenticationLevel.SEARCH);
-            final QueryResponse queryResponse = queryRequest.process(MCRSolrCoreManager.getMainSolrClient());
+            final QueryResponse queryResponse =
+                queryRequest.process(
+                    MCRSolrIndexRegistryManager.requireMainIndex().getClient());
 
             return queryResponse.getResults().getNumFound();
         } catch (SolrServerException | IOException e) {
@@ -78,7 +80,9 @@ public class MCRSwordSolrObjectIDSupplier extends MCRSwordObjectIDSupplier {
             QueryRequest queryRequest = new QueryRequest(queryCopy);
             MCRSolrAuthenticationManager.obtainInstance().applyAuthentication(queryRequest,
                 MCRSolrAuthenticationLevel.SEARCH);
-            final QueryResponse queryResponse = queryRequest.process(MCRSolrCoreManager.getMainSolrClient());
+            final QueryResponse queryResponse =
+                queryRequest.process(
+                    MCRSolrIndexRegistryManager.requireMainIndex().getClient());
             return queryResponse.getResults().stream()
                 .map(r -> (String) r.getFieldValue("id"))
                 .map(MCRObjectID::getInstance)
