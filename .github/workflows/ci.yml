@@ -49,6 +49,8 @@ jobs:
         path: |
           ./**/surefire-reports
           ./**/failsafe-reports
+          ./**/target/playwright/test-results
+          ./**/target/playwright/report
           ./**/screenshots
           ./**/*error*.log
           ./**/*test.log

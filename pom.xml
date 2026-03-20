@@ -86,6 +86,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <neo4j.version>6.0.3</neo4j.version>
     <net.bytebuddy.experimental>true</net.bytebuddy.experimental>
     <net.bytebuddy.processor>CLASS_FILE_API_FIRST</net.bytebuddy.processor>
+    <node.version>v20.19.0</node.version>
     <oaipmh.version>3.0</oaipmh.version>
     <ocfl-java.version>2.2.3</ocfl-java.version>
     <pmd.analysisCache>true</pmd.analysisCache>
