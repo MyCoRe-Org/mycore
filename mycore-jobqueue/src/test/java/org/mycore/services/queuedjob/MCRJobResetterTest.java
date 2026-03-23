@@ -20,8 +20,11 @@ package org.mycore.services.queuedjob;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.time.Duration;
 import java.util.ArrayDeque;
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
 
 import org.junit.jupiter.api.Test;
@@ -126,6 +129,124 @@ public class MCRJobResetterTest {
         assertEquals(1, reset2.size(), "resetted jobs in queue2 should be 1");
         assertEquals("2", reset2.poll().getParameter("count"), "reseted job should have count 2");
 
+    }
+
+    @Test
+    public void testExponentialRetryDelay() {
+        MCRMockJobDAO mockDAO = new MCRMockJobDAO();
+        Queue<MCRJob> resetQueue = new ArrayDeque<>();
+
+        // config with 5 min base delay and multiplier of 2
+        MCRConfiguration2JobConfig baseConfig = new MCRConfiguration2JobConfig();
+        MCRJobConfig config = new MCRJobConfig() {
+            @Override
+            public Optional<Duration> timeTillReset(Class<? extends MCRJobAction> action) {
+                return Optional.of(Duration.ofMinutes(5));
+            }
+
+            @Override
+            public Optional<Integer> maxTryCount(Class<? extends MCRJobAction> action) {
+                return baseConfig.maxTryCount(action);
+            }
+
+            @Override
+            public Optional<Integer> maxJobThreadCount(Class<? extends MCRJobAction> action) {
+                return baseConfig.maxJobThreadCount(action);
+            }
+
+            @Override
+            public Optional<Boolean> activated(Class<? extends MCRJobAction> action) {
+                return baseConfig.activated(action);
+            }
+
+            @Override
+            public Optional<Integer> retryDelayMultiplier(Class<? extends MCRJobAction> action) {
+                return Optional.of(2);
+            }
+
+            @Override
+            public Integer maxJobThreadCount() {
+                return baseConfig.maxJobThreadCount();
+            }
+
+            @Override
+            public Duration timeTillReset() {
+                return Duration.ofMinutes(5);
+            }
+
+            @Override
+            public Integer maxTryCount() {
+                return baseConfig.maxTryCount();
+            }
+
+            @Override
+            public Boolean activated() {
+                return baseConfig.activated();
+            }
+
+            @Override
+            public List<MCRJobStatusListener> jobStatusListeners(Class<? extends MCRJobAction> action) {
+                return baseConfig.jobStatusListeners(action);
+            }
+        };
+
+        long now = System.currentTimeMillis();
+
+        // Job with 1 try, started 6 min ago -> base delay 5min -> should be reset
+        MCRJob job1 = new MCRJob();
+        job1.setAction(MCRTestJobAction1.class);
+        job1.setParameter("id", "try1-6min");
+        job1.setStatus(MCRJobStatus.ERROR);
+        job1.setTries(1);
+        job1.setAdded(new Date(now - 6 * 60 * 1000));
+        job1.setStart(new Date(now - 6 * 60 * 1000));
+        mockDAO.daoOfferedJobs.add(job1);
+
+        // Job with 2 tries, started 6 min ago -> delay 5*2=10min -> should NOT be reset
+        MCRJob job2 = new MCRJob();
+        job2.setAction(MCRTestJobAction1.class);
+        job2.setParameter("id", "try2-6min");
+        job2.setStatus(MCRJobStatus.ERROR);
+        job2.setTries(2);
+        job2.setAdded(new Date(now - 6 * 60 * 1000));
+        job2.setStart(new Date(now - 6 * 60 * 1000));
+        mockDAO.daoOfferedJobs.add(job2);
+
+        // Job with 2 tries, started 11 min ago -> delay 5*2=10min -> should be reset
+        MCRJob job3 = new MCRJob();
+        job3.setAction(MCRTestJobAction1.class);
+        job3.setParameter("id", "try2-11min");
+        job3.setStatus(MCRJobStatus.ERROR);
+        job3.setTries(2);
+        job3.setAdded(new Date(now - 11 * 60 * 1000));
+        job3.setStart(new Date(now - 11 * 60 * 1000));
+        mockDAO.daoOfferedJobs.add(job3);
+
+        // Job with 3 tries, started 15 min ago -> delay 5*4=20min -> should NOT be reset
+        MCRJob job4 = new MCRJob();
+        job4.setAction(MCRTestJobAction1.class);
+        job4.setParameter("id", "try3-15min");
+        job4.setStatus(MCRJobStatus.ERROR);
+        job4.setTries(3);
+        job4.setAdded(new Date(now - 15 * 60 * 1000));
+        job4.setStart(new Date(now - 15 * 60 * 1000));
+        mockDAO.daoOfferedJobs.add(job4);
+
+        // Job with 3 tries, started 21 min ago -> delay 5*4=20min -> should be reset
+        MCRJob job5 = new MCRJob();
+        job5.setAction(MCRTestJobAction1.class);
+        job5.setParameter("id", "try3-21min");
+        job5.setStatus(MCRJobStatus.ERROR);
+        job5.setTries(3);
+        job5.setAdded(new Date(now - 21 * 60 * 1000));
+        job5.setStart(new Date(now - 21 * 60 * 1000));
+        mockDAO.daoOfferedJobs.add(job5);
+
+        long resetCount = MCRJobResetter.resetJobsWithAction(
+            MCRTestJobAction1.class, config, mockDAO, resetQueue, MCRJobStatus.ERROR);
+
+        assertEquals(3, resetCount, "3 jobs should be reset (try1-6min, try2-11min, try3-21min)");
+        assertEquals(3, resetQueue.size());
     }
 
 }

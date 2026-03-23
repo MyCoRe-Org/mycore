@@ -44,6 +44,8 @@ public class MCRConfiguration2JobConfig implements MCRJobConfig {
 
     private static final String CONFIG_JOB_THREADS = "JobThreads";
 
+    private static final String CONFIG_RETRY_DELAY_MULTIPLIER = "RetryDelayMultiplier";
+
     private static final String CONFIG_ACTIVATED = "activated";
 
     private static final String CONFIG_PREFIX = "MCR.QueuedJob.";
@@ -73,6 +75,11 @@ public class MCRConfiguration2JobConfig implements MCRJobConfig {
     @Override
     public Optional<Boolean> activated(Class<? extends MCRJobAction> action) {
         return MCRConfiguration2.getBoolean(getActionConfigPrefix(action) + CONFIG_ACTIVATED);
+    }
+
+    @Override
+    public Optional<Integer> retryDelayMultiplier(Class<? extends MCRJobAction> action) {
+        return MCRConfiguration2.getInt(getActionConfigPrefix(action) + CONFIG_RETRY_DELAY_MULTIPLIER);
     }
 
     @Override
