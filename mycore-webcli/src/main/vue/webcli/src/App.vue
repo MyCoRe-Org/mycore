@@ -4,21 +4,26 @@ import { computed, nextTick, ref, watch } from 'vue';
 import CommandHistoryDialog from '@/components/CommandHistoryDialog.vue';
 import CommandMenu from '@/components/CommandMenu.vue';
 import CommandSuggestions from '@/components/CommandSuggestions.vue';
+import SettingsDialog from '@/components/SettingsDialog.vue';
 import { useCommandHistory } from '@/composables/useCommandHistory';
 import { useCommandSearch } from '@/composables/useCommandSearch';
 import { useWebCliTransport } from '@/composables/useWebCliTransport';
-import { loadSettings, persistSettings } from '@/services/settings';
+import { loadSettings, normalizeSettings, persistSettings } from '@/services/settings';
 
 const settings = ref(loadSettings());
 const command = ref('');
 const activeTab = ref<'log' | 'queue'>('log');
-const isSettingsVisible = ref(false);
+const isSettingsDialogOpen = ref(false);
 const isCommandHistoryOpen = ref(false);
 const isSuggestionMenuVisible = ref(false);
+const isSuggestionNavigationActive = ref(false);
+const suppressSuggestionMenuOnFocus = ref(false);
+const isQueueExpanded = ref(false);
 const inputElement = ref<HTMLInputElement | null>(null);
 const executeButtonElement = ref<HTMLButtonElement | null>(null);
 const logElement = ref<HTMLElement | null>(null);
 const suggestionListId = 'webcli-command-suggestions';
+const queuePreviewSize = 99;
 
 const {
   addEntry,
@@ -45,8 +50,12 @@ const {
   remoteContinueIfOneFails,
   runCommand,
   setRefresh,
+  trimLogs,
   updateContinueIfOneFails,
-} = useWebCliTransport(() => settings.value.continueIfOneFails);
+} = useWebCliTransport(
+  () => settings.value.continueIfOneFails,
+  () => settings.value.historySize
+);
 
 const {
   hasSuggestions,
@@ -55,10 +64,14 @@ const {
   highlightSuggestion,
   moveHighlight,
   resetHighlight,
+  totalSuggestionCount,
   suggestions,
-} = useCommandSearch(commandGroups, command);
+} = useCommandSearch(commandGroups, command, computed(() => settings.value.suggestionLimit));
 
-const visibleQueue = computed(() => queue.value.slice(0, 99));
+const visibleQueue = computed(() => {
+  return isQueueExpanded.value ? queue.value : queue.value.slice(0, queuePreviewSize);
+});
+const hiddenQueueCount = computed(() => Math.max(queueLength.value - visibleQueue.value.length, 0));
 const visibleLogLines = computed(() => {
   return logs.value.slice(-settings.value.historySize).flatMap(entry => {
     const lines = [`${entry.logLevel}: ${entry.message}`];
@@ -68,6 +81,39 @@ const visibleLogLines = computed(() => {
     return lines;
   });
 });
+
+function areSettingsEqual(left: typeof settings.value, right: typeof settings.value): boolean {
+  return (
+    left.historySize === right.historySize &&
+    left.comHistorySize === right.comHistorySize &&
+    left.suggestionLimit === right.suggestionLimit &&
+    left.autoscroll === right.autoscroll &&
+    left.continueIfOneFails === right.continueIfOneFails
+  );
+}
+
+function closeSuggestionMenu(restoreFocus = false): void {
+  isSuggestionMenuVisible.value = false;
+  isSuggestionNavigationActive.value = false;
+  resetHighlight();
+  if (restoreFocus) {
+    suppressSuggestionMenuOnFocus.value = true;
+    nextTick(() => {
+      if (inputElement.value && document.activeElement !== inputElement.value) {
+        inputElement.value.focus();
+      }
+    });
+  }
+}
+
+function activateSuggestionNavigation(index = 0): void {
+  if (!hasSuggestions.value) {
+    return;
+  }
+  isSuggestionMenuVisible.value = true;
+  isSuggestionNavigationActive.value = true;
+  highlightSuggestion(index);
+}
 
 function selectNextPlaceholder(startFrom = 0): boolean {
   const input = inputElement.value;
@@ -94,24 +140,30 @@ function executeCommand(): void {
   runCommand(value);
   addEntry(value);
   command.value = '';
-  isSuggestionMenuVisible.value = false;
-  resetHighlight();
+  closeSuggestionMenu();
 }
 
 function onCommandKeydown(event: KeyboardEvent): void {
-  if (event.key === 'ArrowDown' && hasSuggestions.value) {
+  if (event.key === 'ArrowDown' && isSuggestionMenuVisible.value && hasSuggestions.value) {
     event.preventDefault();
-    isSuggestionMenuVisible.value = true;
+    if (!isSuggestionNavigationActive.value) {
+      activateSuggestionNavigation(Math.min(1, suggestions.value.length - 1));
+      return;
+    }
     moveHighlight(1);
     return;
   }
-  if (event.key === 'ArrowUp' && hasSuggestions.value && isSuggestionMenuVisible.value) {
+  if (event.key === 'ArrowUp' && isSuggestionMenuVisible.value && hasSuggestions.value) {
     event.preventDefault();
+    if (!isSuggestionNavigationActive.value) {
+      activateSuggestionNavigation(suggestions.value.length - 1);
+      return;
+    }
     moveHighlight(-1);
     return;
   }
   if (event.key === 'Enter') {
-    if (isSuggestionMenuVisible.value && highlightedSuggestion.value) {
+    if (isSuggestionMenuVisible.value && isSuggestionNavigationActive.value && highlightedSuggestion.value) {
       event.preventDefault();
       selectCommand(highlightedSuggestion.value.command);
       return;
@@ -122,10 +174,11 @@ function onCommandKeydown(event: KeyboardEvent): void {
   }
   if (event.key === 'Escape' && isSuggestionMenuVisible.value) {
     event.preventDefault();
-    isSuggestionMenuVisible.value = false;
+    closeSuggestionMenu(true);
     return;
   }
   if (event.key === 'ArrowUp') {
+    closeSuggestionMenu();
     const previousCommand = browseUp(command.value);
     if (previousCommand !== null) {
       command.value = previousCommand;
@@ -133,6 +186,7 @@ function onCommandKeydown(event: KeyboardEvent): void {
     return;
   }
   if (event.key === 'ArrowDown') {
+    closeSuggestionMenu();
     const nextCommand = browseDown();
     if (nextCommand !== null) {
       command.value = nextCommand;
@@ -140,7 +194,11 @@ function onCommandKeydown(event: KeyboardEvent): void {
     return;
   }
   if (event.key === 'Tab' && !event.shiftKey) {
-    if (isSuggestionMenuVisible.value && highlightedSuggestion.value) {
+    if (
+      isSuggestionMenuVisible.value &&
+      highlightedSuggestion.value &&
+      command.value.trim() !== highlightedSuggestion.value.command
+    ) {
       event.preventDefault();
       selectCommand(highlightedSuggestion.value.command);
       return;
@@ -155,8 +213,7 @@ function onCommandKeydown(event: KeyboardEvent): void {
 
 function selectCommand(value: string): void {
   command.value = value;
-  isSuggestionMenuVisible.value = false;
-  resetHighlight();
+  closeSuggestionMenu();
   nextTick(() => {
     const focusedPlaceholder = selectNextPlaceholder(0);
     if (!focusedPlaceholder) {
@@ -167,10 +224,15 @@ function selectCommand(value: string): void {
 
 function onCommandInput(): void {
   isSuggestionMenuVisible.value = hasSuggestions.value;
+  isSuggestionNavigationActive.value = false;
   resetHighlight();
 }
 
 function onCommandInputFocus(): void {
+  if (suppressSuggestionMenuOnFocus.value) {
+    suppressSuggestionMenuOnFocus.value = false;
+    return;
+  }
   if (hasSuggestions.value) {
     isSuggestionMenuVisible.value = true;
   }
@@ -178,12 +240,24 @@ function onCommandInputFocus(): void {
 
 function onCommandInputBlur(): void {
   window.setTimeout(() => {
-    isSuggestionMenuVisible.value = false;
+    closeSuggestionMenu();
   }, 100);
 }
 
 function openCommandHistory(): void {
   isCommandHistoryOpen.value = true;
+}
+
+function openSettingsDialog(): void {
+  isSettingsDialogOpen.value = true;
+}
+
+function toggleQueueExpansion(): void {
+  isQueueExpanded.value = !isQueueExpanded.value;
+}
+
+function onSuggestionActivate(index: number): void {
+  activateSuggestionNavigation(index);
 }
 
 function restoreCommandFromHistory(value: string): void {
@@ -193,11 +267,20 @@ function restoreCommandFromHistory(value: string): void {
 }
 
 watch(settings, value => {
+  const normalized = normalizeSettings(value);
+  if (!areSettingsEqual(value, normalized)) {
+    settings.value = normalized;
+    return;
+  }
   persistSettings(value);
 }, { deep: true });
 
 watch(() => settings.value.continueIfOneFails, value => {
   updateContinueIfOneFails(value);
+});
+
+watch(() => settings.value.historySize, () => {
+  trimLogs();
 });
 
 watch(() => settings.value.comHistorySize, () => {
@@ -224,13 +307,13 @@ watch(visibleLogLines, async () => {
 watch(queueLength, value => {
   if (value < 1) {
     activeTab.value = 'log';
+    isQueueExpanded.value = false;
   }
 });
 
 watch(hasSuggestions, value => {
   if (!value) {
-    isSuggestionMenuVisible.value = false;
-    resetHighlight();
+    closeSuggestionMenu();
   }
 });
 </script>
@@ -245,70 +328,6 @@ watch(hasSuggestions, value => {
     </div>
 
     <div id="web-cli-header">
-      <div id="webcli-settings-panel" class="collapse" :class="{ show: isSettingsVisible }">
-        <div class="webcli-settings-panel bg-dark p-3">
-          <div class="mb-3 row">
-            <label for="webcli-history-size" class="col-sm-3 col-form-label">Log History Size:</label>
-            <div class="col-sm-2">
-              <input
-                id="webcli-history-size"
-                v-model.number="settings.historySize"
-                type="number"
-                min="1"
-                inputmode="numeric"
-                class="form-control"
-              />
-            </div>
-          </div>
-          <div class="mb-3 row">
-            <label for="webcli-command-history-size" class="col-sm-3 col-form-label">Command History Size:</label>
-            <div class="col-sm-2">
-              <input
-                id="webcli-command-history-size"
-                v-model.number="settings.comHistorySize"
-                type="number"
-                min="0"
-                inputmode="numeric"
-                class="form-control"
-              />
-            </div>
-            <div class="col-sm-auto d-flex align-items-center">
-              <button
-                type="button"
-                class="btn btn-link comHistoryDeleteButton"
-                aria-label="Delete command history"
-                @click="clearCommandHistory"
-              >
-                <i class="fa fa-eraser" aria-hidden="true"></i>
-              </button>
-            </div>
-          </div>
-          <div class="mb-3 row">
-            <div class="col-sm-3 col-form-label">AutoScroll Logs:</div>
-            <div class="col-sm-2 d-flex align-items-center">
-              <div class="form-check mb-0">
-                <input id="webcli-autoscroll" v-model="settings.autoscroll" type="checkbox" class="form-check-input" />
-                <label for="webcli-autoscroll" class="form-check-label">Enable automatic scrolling</label>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-sm-3 col-form-label">Continue if one fails:</div>
-            <div class="col-sm-2 d-flex align-items-center">
-              <div class="form-check mb-0">
-                <input
-                  id="webcli-continue-on-fail"
-                  v-model="settings.continueIfOneFails"
-                  type="checkbox"
-                  class="form-check-input"
-                />
-                <label for="webcli-continue-on-fail" class="form-check-label">Continue queue execution</label>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <nav class="navbar navbar-expand navbar-dark bg-dark">
         <ul class="nav navbar-nav flex-row flex-wrap align-items-center">
           <CommandMenu :groups="commandGroups" @select="selectCommand" />
@@ -341,9 +360,9 @@ watch(hasSuggestions, value => {
             <button
               type="button"
               class="nav-link btn btn-link"
-              aria-controls="webcli-settings-panel"
-              :aria-expanded="isSettingsVisible"
-              @click="isSettingsVisible = !isSettingsVisible"
+              aria-haspopup="dialog"
+              :aria-expanded="isSettingsDialogOpen"
+              @click="openSettingsDialog"
             >
               <i class="fa fa-cog" aria-hidden="true"></i> Settings
             </button>
@@ -388,11 +407,14 @@ watch(hasSuggestions, value => {
           :id="suggestionListId"
           :highlighted-index="highlightedIndex"
           :suggestions="suggestions"
-          @highlight="highlightSuggestion"
+          :total-count="totalSuggestionCount"
+          :suggestion-limit="settings.suggestionLimit"
+          @activate="onSuggestionActivate"
           @select="selectCommand"
         />
         <div id="webcli-command-help" class="visually-hidden">
-          Enter a command, press Tab to jump between placeholders, and press Enter to execute.
+          Enter executes the current command. Press Tab to accept a suggestion or jump between placeholders. When the
+          suggestion list is open, use Arrow keys to navigate it and Escape to close it.
         </div>
       </div>
     </div>
@@ -470,9 +492,15 @@ watch(hasSuggestions, value => {
         aria-labelledby="webcli-queue-tab"
       >
         <div class="col-12 web-cli-queue">
-          <pre class="web-cli-pre">{{ visibleQueue.join('\n') }}<span v-if="queue.length > 99">
-...
-</span></pre>
+          <div v-if="queueLength > queuePreviewSize" class="webcli-queue-toolbar">
+            <button type="button" class="btn btn-link px-0" @click="toggleQueueExpansion">
+              {{ isQueueExpanded ? `Show first ${queuePreviewSize} commands` : `Show all ${queueLength} commands` }}
+            </button>
+          </div>
+          <pre class="web-cli-pre">{{ visibleQueue.join('\n') }}</pre>
+          <div v-if="!isQueueExpanded && hiddenQueueCount > 0" class="small text-secondary">
+            {{ hiddenQueueCount }} more commands hidden.
+          </div>
         </div>
       </div>
     </div>
@@ -481,6 +509,12 @@ watch(hasSuggestions, value => {
       v-model="isCommandHistoryOpen"
       :entries="commandHistoryEntries"
       @select-command="restoreCommandFromHistory"
+    />
+    <SettingsDialog
+      v-model="isSettingsDialogOpen"
+      :settings="settings"
+      :has-command-history="commandHistoryEntries.length > 0"
+      @clear-command-history="clearCommandHistory"
     />
   </div>
 </template>

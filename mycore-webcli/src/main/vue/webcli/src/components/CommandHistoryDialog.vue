@@ -56,7 +56,7 @@ onBeforeUnmount(() => {
 <template>
   <dialog
     ref="dialogRef"
-    class="webcli-dialog p-0"
+    class="webcli-dialog webcli-history-dialog p-0"
     aria-labelledby="command-history-title"
     @cancel.prevent="closeDialog"
     @close="emit('update:modelValue', false)"
@@ -66,13 +66,13 @@ onBeforeUnmount(() => {
         <h5 id="command-history-title" class="modal-title">Command History</h5>
         <button type="button" class="btn-close" aria-label="Close" @click="closeDialog"></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body webcli-history-body">
         <div class="list-group comHistoryList">
           <button
-            v-for="entry in [...entries].reverse()"
-            :key="entry"
+            v-for="(entry, index) in [...entries].reverse()"
+            :key="`${index}-${entry}`"
             type="button"
-            class="list-group-item list-group-item-action text-start"
+            class="list-group-item list-group-item-action text-start webcli-history-entry"
             :title="entry"
             @click="selectCommand(entry)"
           >

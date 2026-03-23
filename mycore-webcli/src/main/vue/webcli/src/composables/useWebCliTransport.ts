@@ -3,7 +3,7 @@ import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { buildPingUrl, WebCliTransport } from '@/services/webcliTransport';
 import type { CommandGroup, LogEntry } from '@/types';
 
-export function useWebCliTransport(continueIfOneFails: () => boolean) {
+export function useWebCliTransport(continueIfOneFails: () => boolean, logLimit: () => number) {
   const transport = new WebCliTransport();
   const commandGroups = ref<CommandGroup[]>([]);
   const currentCommand = ref('');
@@ -17,6 +17,27 @@ export function useWebCliTransport(continueIfOneFails: () => boolean) {
   const remoteContinueIfOneFails = ref<boolean | null>(null);
   const keepAliveHandle = ref<number | null>(null);
   let unsubscribeTransport: (() => void) | null = null;
+
+  function resolveLogLimit(): number {
+    const limit = logLimit();
+    if (!Number.isFinite(limit)) {
+      return 1;
+    }
+    return Math.max(1, Math.trunc(limit));
+  }
+
+  function trimLogs(): void {
+    const maxEntries = resolveLogLimit();
+    if (logs.value.length > maxEntries) {
+      logs.value = logs.value.slice(-maxEntries);
+    }
+  }
+
+  function appendLog(entry: LogEntry): void {
+    logs.value = [...logs.value, entry];
+    trimLogs();
+    lastLogAnnouncement.value = `${entry.logLevel}: ${entry.message}`;
+  }
 
   function clearLogs(): void {
     logs.value = [];
@@ -59,8 +80,7 @@ export function useWebCliTransport(continueIfOneFails: () => boolean) {
           commandGroups.value = event.value;
           break;
         case 'log':
-          logs.value = [...logs.value, event.value];
-          lastLogAnnouncement.value = `${event.value.logLevel}: ${event.value.message}`;
+          appendLog(event.value);
           break;
         case 'queue':
           queue.value = event.value;
@@ -110,6 +130,7 @@ export function useWebCliTransport(continueIfOneFails: () => boolean) {
     remoteContinueIfOneFails,
     runCommand,
     setRefresh,
+    trimLogs,
     updateContinueIfOneFails,
   };
 }

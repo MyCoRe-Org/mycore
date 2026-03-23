@@ -115,11 +115,42 @@ describe('WebCLI app console and settings', () => {
     await wrapper.findAll('button.nav-link').find(node => node.text().includes('Settings'))!.trigger('click');
     await nextTick();
 
+    expect(wrapper.get('dialog[aria-labelledby="webcli-settings-title"]').attributes('open')).toBeDefined();
+
     const continueIfOneFails = wrapper.find('#webcli-continue-on-fail');
     expect(continueIfOneFails).toBeTruthy();
     await continueIfOneFails.setValue(true);
 
     expect(window.localStorage.getItem('continueIfOneFails')).toBe('true');
     expect(transport.setContinueIfOneFails).toHaveBeenLastCalledWith(true);
+  });
+
+  it('persists the configurable suggestion limit', async () => {
+    wrapper = await mountApp();
+
+    await wrapper.findAll('button.nav-link').find(node => node.text().includes('Settings'))!.trigger('click');
+    await nextTick();
+
+    await wrapper.get('#webcli-suggestion-limit').setValue('12');
+
+    expect(window.localStorage.getItem('suggestionLimit')).toBe('12');
+  });
+
+  it('offers queue expansion when more than ninety-nine commands are present', async () => {
+    wrapper = await mountApp();
+    const transport = getCurrentTransport();
+
+    transport.emit({
+      type: 'queue',
+      value: Array.from({ length: 120 }, (_, index) => `import object ${index + 1}`),
+      size: 120,
+    });
+    await nextTick();
+
+    await wrapper.get('.queueTab').trigger('click');
+    await nextTick();
+
+    expect(wrapper.get('.webcli-queue-toolbar button').text()).toContain('Show all 120 commands');
+    expect(wrapper.get('.small.text-secondary').text()).toContain('21 more commands hidden');
   });
 });

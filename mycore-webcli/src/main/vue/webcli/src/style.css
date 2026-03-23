@@ -15,6 +15,9 @@ body {
 
 .webcli-app {
   height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .webcli-app #command-input {
@@ -47,13 +50,19 @@ body {
   background-color: var(--bs-dark);
 }
 
+.webcli-app .webcli-suggestions-panel {
+  border: 1px solid var(--bs-border-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
 .webcli-app .webcli-suggestions {
   background-color: var(--bs-body-bg);
-  border: 1px solid var(--bs-border-color);
+  border: 0;
   border-radius: 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: none;
   max-height: 320px;
   overflow-y: auto;
+  margin-bottom: 0;
 }
 
 .webcli-app .webcli-suggestion {
@@ -91,6 +100,14 @@ body {
   color: #334155;
 }
 
+.webcli-app .webcli-suggestions-meta {
+  background-color: #f8fafc;
+  border-top: 1px solid var(--bs-border-color);
+  color: var(--bs-secondary-color);
+  font-size: 0.875rem;
+  padding: 0.5rem 0.75rem;
+}
+
 .webcli-app :is(.nav-link.btn, .dropdown-item, .btn-close, .form-control, .form-check-input):focus-visible {
   outline: 2px solid var(--bs-light);
   outline-offset: 2px;
@@ -101,8 +118,18 @@ body {
   height: 100%;
 }
 
+.webcli-app .tab-content {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.webcli-app .tab-content > .tab-pane {
+  min-height: 0;
+  height: 100%;
+}
+
 .webcli-app .web-cli-log {
-  height: calc(100vh - 232px);
+  height: 100%;
   overflow: auto;
   padding-right: 0;
   padding-bottom: 10px;
@@ -117,23 +144,24 @@ body {
 .webcli-app .web-cli-queue {
   height: 100%;
   padding-right: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .webcli-app .web-cli-queue > pre {
-  height: calc(100vh - 232px);
+  flex: 1 1 auto;
+  min-height: 0;
   overflow: auto;
   padding-right: 0;
   padding-top: 10px;
+  margin-bottom: 0;
 }
 
 .webcli-app #command-input,
 .webcli-app #current-command {
   width: 100%;
   margin: 0;
-}
-
-.webcli-app #webcli-settings-panel .row {
-  padding: 5px;
 }
 
 .webcli-app .loader,
@@ -200,15 +228,6 @@ body {
   color: var(--bs-secondary);
 }
 
-.webcli-app .webcli-settings-panel label,
-.webcli-app .webcli-settings-panel .col-form-label {
-  color: rgba(var(--bs-white-rgb), 0.75);
-}
-
-.webcli-app .webcli-settings-panel .form-check-label {
-  color: rgba(var(--bs-white-rgb), 0.9);
-}
-
 .webcli-app .dropdown-menu {
   max-height: 90vh;
   overflow-x: hidden;
@@ -256,16 +275,16 @@ body {
 }
 
 .webcli-app .comHistoryList {
-  height: 500px;
+  height: min(60vh, 500px);
   overflow-y: auto;
   overflow-x: hidden;
-  padding-right: 10px;
+  padding-right: 0;
 }
 
 .webcli-dialog {
   display: none;
-  width: min(100%, 500px);
-  max-width: 500px;
+  width: min(calc(100% - 1rem), 640px);
+  max-width: 640px;
   border: 0;
   border-radius: var(--bs-modal-border-radius);
   box-shadow: var(--bs-box-shadow-lg);
@@ -286,9 +305,70 @@ body {
 .webcli-dialog .modal-content {
   border: 0;
   border-radius: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.webcli-dialog .modal-body {
+  max-height: 70vh;
+  overflow: auto;
 }
 
 .webcli-dialog .modal-header,
-.webcli-dialog .modal-body {
-  padding: var(--bs-modal-padding);
+.webcli-dialog .modal-body,
+.webcli-dialog .modal-footer {
+  padding: 0;
+}
+
+.webcli-history-dialog {
+  width: min(calc(100% - 1rem), 780px);
+  max-width: 780px;
+}
+
+.webcli-settings-dialog {
+  width: min(calc(100% - 1rem), 640px);
+  max-width: 640px;
+}
+
+.webcli-history-entry {
+  font-family: var(--bs-font-monospace);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.webcli-history-body {
+  padding-right: 0.25rem;
+}
+
+.webcli-settings-stack {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.webcli-settings-section {
+  display: grid;
+  gap: 1rem;
+}
+
+.webcli-settings-section-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.webcli-settings-field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.webcli-settings-actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.webcli-queue-toolbar {
+  padding-top: 0.75rem;
 }

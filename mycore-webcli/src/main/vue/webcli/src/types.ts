@@ -24,6 +24,7 @@ export interface LogEntry {
 export interface Settings {
   historySize: number;
   comHistorySize: number;
+  suggestionLimit: number;
   autoscroll: boolean;
   continueIfOneFails: boolean;
 }

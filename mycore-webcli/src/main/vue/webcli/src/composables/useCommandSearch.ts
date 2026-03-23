@@ -29,13 +29,17 @@ function scoreCommand(searchTerm: string, command: SearchableCommand): number {
   return Number.MAX_SAFE_INTEGER;
 }
 
-export function useCommandSearch(commandGroups: Ref<CommandGroup[]>, commandInput: Ref<string>) {
+export function useCommandSearch(
+  commandGroups: Ref<CommandGroup[]>,
+  commandInput: Ref<string>,
+  suggestionLimit: Ref<number>
+) {
   const highlightedIndex = ref(0);
 
   const searchableCommands = computed(() => flattenCommands(commandGroups.value));
   const normalizedQuery = computed(() => commandInput.value.trim().toLowerCase());
-
-  const suggestions = computed(() => {
+  const maxSuggestions = computed(() => Math.max(1, Math.trunc(suggestionLimit.value || 1)));
+  const matchingCommands = computed(() => {
     if (!normalizedQuery.value) {
       return [];
     }
@@ -56,8 +60,11 @@ export function useCommandSearch(commandGroups: Ref<CommandGroup[]>, commandInpu
           return commandDifference;
         }
         return left.groupName.localeCompare(right.groupName);
-      })
-      .slice(0, 8);
+      });
+  });
+
+  const suggestions = computed(() => {
+    return matchingCommands.value.slice(0, maxSuggestions.value);
   });
 
   const hasSuggestions = computed(() => suggestions.value.length > 0);
@@ -97,6 +104,7 @@ export function useCommandSearch(commandGroups: Ref<CommandGroup[]>, commandInpu
     highlightSuggestion,
     moveHighlight,
     resetHighlight,
+    totalSuggestionCount: computed(() => matchingCommands.value.length),
     suggestions,
   };
 }

@@ -192,4 +192,51 @@ describe('CommandMenu', () => {
       writable: true,
     });
   });
+
+  it('repositions the flyout submenu to stay within the viewport horizontally', async () => {
+    wrapper = mount(CommandMenu, {
+      attachTo: document.body,
+      props: {
+        groups: makeCommandGroups(),
+      },
+    });
+    await nextTick();
+
+    const originalInnerWidth = window.innerWidth;
+    Object.defineProperty(window, 'innerWidth', {
+      configurable: true,
+      value: 420,
+      writable: true,
+    });
+
+    const submenuGroup = wrapper.find('.dropdown-submenu');
+    const groupElement = submenuGroup.element as HTMLElement;
+    groupElement.getBoundingClientRect = () => ({
+      top: 100,
+      right: 390,
+      bottom: 130,
+      left: 220,
+      width: 170,
+      height: 30,
+      x: 220,
+      y: 100,
+      toJSON: () => undefined,
+    });
+
+    const flyout = submenuGroup.find('.dropdown-menu').element as HTMLElement;
+    Object.defineProperty(flyout, 'offsetWidth', {
+      configurable: true,
+      value: 180,
+    });
+
+    await submenuGroup.trigger('mouseenter');
+
+    expect(flyout.style.left).toBe('40px');
+
+    Object.defineProperty(window, 'innerWidth', {
+      configurable: true,
+      value: originalInnerWidth,
+      writable: true,
+    });
+  });
 });

@@ -22,7 +22,7 @@
     </init-param>
   </servlet>
   <servlet-mapping>
-    <servlet-name>MCRVueRootServlet</servlet-name>
+    <servlet-name>MCRWebCLIVueServlet</servlet-name>
     <url-pattern>/modules/webcli/gui/*</url-pattern>
   </servlet-mapping>
 

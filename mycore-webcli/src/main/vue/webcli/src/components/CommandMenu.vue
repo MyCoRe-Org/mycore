@@ -74,9 +74,15 @@ function positionSubmenu(parent: HTMLElement, commands: CommandEntry[]): void {
     const neededShift = minRequiredHeight - availableSpaceBelow;
     newTop = Math.max(10, parentRect.top - neededShift);
   }
+  const submenuWidth = submenu.offsetWidth || 280;
+  const maxLeft = window.innerWidth - submenuWidth - 10;
+  let newLeft = parentRect.right;
+  if (newLeft > maxLeft) {
+    newLeft = Math.max(10, parentRect.left - submenuWidth);
+  }
   submenu.style.maxHeight = `${window.innerHeight - newTop - 10}px`;
   submenu.style.top = `${newTop}px`;
-  submenu.style.left = `${parentRect.right}px`;
+  submenu.style.left = `${Math.max(10, newLeft)}px`;
 }
 
 function openGroup(groupIndex: number): void {

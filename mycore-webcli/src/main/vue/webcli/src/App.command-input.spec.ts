@@ -70,7 +70,7 @@ describe('WebCLI app command input', () => {
     expect(document.activeElement).toBe(executeButton);
   });
 
-  it('shows substring suggestions with help text and selects one with Enter', async () => {
+  it('shows substring suggestions with help text and still executes the typed command on Enter', async () => {
     wrapper = await mountApp();
     const transport = getCurrentTransport();
 
@@ -101,7 +101,34 @@ describe('WebCLI app command input', () => {
     await input.trigger('keydown', { key: 'Enter', preventDefault: vi.fn() });
     await nextTick();
 
-    expect((input.element as HTMLInputElement).value).toBe('xslt transform {0}');
+    expect(transport.run).toHaveBeenCalledWith('xslt');
+  });
+
+  it('shows when suggestions are capped by the configured limit', async () => {
+    window.localStorage.setItem('suggestionLimit', '2');
+    wrapper = await mountApp();
+    const transport = getCurrentTransport();
+
+    transport.emit({
+      type: 'commandList',
+      value: [
+        {
+          name: 'Transformations',
+          commands: Array.from({ length: 4 }, (_, index) => ({
+            command: `xslt transform ${index}`,
+            help: `Run XSLT transformation ${index}.`,
+          })),
+        },
+      ],
+    });
+    await nextTick();
+
+    const input = wrapper.get('#webcli-command-input');
+    await input.setValue('xslt');
+    await nextTick();
+
+    expect(wrapper.findAll('.webcli-suggestion')).toHaveLength(2);
+    expect(wrapper.get('.webcli-suggestions-meta').text()).toContain('Showing top 2 of 4 matches');
   });
 
   it('accepts the highlighted suggestion with Tab before placeholder jumping starts', async () => {
@@ -132,7 +159,33 @@ describe('WebCLI app command input', () => {
     expect((input.element as HTMLInputElement).selectionStart).toBe('xslt transform {0}'.indexOf('{0}'));
   });
 
-  it('scrolls the highlighted suggestion into view during keyboard navigation', async () => {
+  it('accepts a highlighted suggestion with Enter after arrow-key navigation starts', async () => {
+    wrapper = await mountApp();
+    const transport = getCurrentTransport();
+
+    transport.emit({
+      type: 'commandList',
+      value: [
+        {
+          name: 'Transformations',
+          commands: [{ command: 'xslt transform {0}', help: 'Run an XSLT transformation.' }],
+        },
+      ],
+    });
+    await nextTick();
+
+    const input = wrapper.get('#webcli-command-input');
+    await input.setValue('xslt');
+    await nextTick();
+
+    await input.trigger('keydown', { key: 'ArrowDown', preventDefault: vi.fn() });
+    await input.trigger('keydown', { key: 'Enter', preventDefault: vi.fn() });
+    await nextTick();
+
+    expect((input.element as HTMLInputElement).value).toBe('xslt transform {0}');
+  });
+
+  it('scrolls the highlighted suggestion into view during arrow-key navigation', async () => {
     wrapper = await mountApp();
     const transport = getCurrentTransport();
     const scrollIntoView = vi.fn();
@@ -160,9 +213,116 @@ describe('WebCLI app command input', () => {
     await nextTick();
 
     await input.trigger('keydown', { key: 'ArrowDown', preventDefault: vi.fn() });
+    await input.trigger('keydown', { key: 'ArrowDown', preventDefault: vi.fn() });
     await nextTick();
 
     expect(scrollIntoView).toHaveBeenCalled();
+  });
+
+  it('uses Arrow keys for suggestion navigation while the popup is open', async () => {
+    window.localStorage.setItem('commandHistory', JSON.stringify(['process a', 'process b']));
+    wrapper = await mountApp();
+    const transport = getCurrentTransport();
+
+    transport.emit({
+      type: 'commandList',
+      value: [
+        {
+          name: 'Transformations',
+          commands: [{ command: 'xslt transform {0}', help: 'Run an XSLT transformation.' }],
+        },
+      ],
+    });
+    await nextTick();
+
+    const input = wrapper.get('#webcli-command-input');
+    await input.setValue('xslt');
+    await nextTick();
+
+    await input.trigger('keydown', { key: 'ArrowDown', preventDefault: vi.fn() });
+    await input.trigger('keydown', { key: 'Enter', preventDefault: vi.fn() });
+    await nextTick();
+
+    expect((input.element as HTMLInputElement).value).toBe('xslt transform {0}');
+  });
+
+  it('uses history browsing again after Escape closes the suggestions', async () => {
+    window.localStorage.setItem('commandHistory', JSON.stringify(['process a', 'process b']));
+    wrapper = await mountApp();
+    const transport = getCurrentTransport();
+
+    transport.emit({
+      type: 'commandList',
+      value: [
+        {
+          name: 'Transformations',
+          commands: [{ command: 'xslt transform {0}', help: 'Run an XSLT transformation.' }],
+        },
+      ],
+    });
+    await nextTick();
+
+    const input = wrapper.get('#webcli-command-input');
+    await input.setValue('xslt');
+    await nextTick();
+
+    await input.trigger('keydown', { key: 'Escape', preventDefault: vi.fn() });
+    await nextTick();
+    await input.trigger('keydown', { key: 'ArrowUp' });
+    await nextTick();
+
+    expect((input.element as HTMLInputElement).value).toBe('process b');
+  });
+
+  it('keeps focus in the input when Escape closes the suggestions', async () => {
+    wrapper = await mountApp();
+    const transport = getCurrentTransport();
+
+    transport.emit({
+      type: 'commandList',
+      value: [
+        {
+          name: 'Transformations',
+          commands: [{ command: 'xslt transform {0}', help: 'Run an XSLT transformation.' }],
+        },
+      ],
+    });
+    await nextTick();
+
+    const input = wrapper.get('#webcli-command-input');
+    await input.setValue('xslt');
+    await nextTick();
+
+    await input.trigger('keydown', { key: 'Escape', preventDefault: vi.fn() });
+    await nextTick();
+
+    expect(document.activeElement).toBe(input.element);
+  });
+
+  it('applies a suggestion reliably on pointer interaction before blur closes the popup', async () => {
+    wrapper = await mountApp();
+    const transport = getCurrentTransport();
+
+    transport.emit({
+      type: 'commandList',
+      value: [
+        {
+          name: 'Transformations',
+          commands: [{ command: 'xslt transform {0}', help: 'Run an XSLT transformation.' }],
+        },
+      ],
+    });
+    await nextTick();
+
+    const input = wrapper.get('#webcli-command-input');
+    await input.setValue('xslt');
+    await nextTick();
+
+    await wrapper.get('.webcli-suggestion').trigger('pointerdown');
+    await nextTick();
+    await nextTick();
+
+    expect((input.element as HTMLInputElement).value).toBe('xslt transform {0}');
   });
 
   it('moves through placeholders with Tab and then lets focus continue normally', async () => {
@@ -198,11 +358,13 @@ describe('WebCLI app command input', () => {
     wrapper = await mountApp();
 
     expect(wrapper.get('label[for="webcli-command-input"]').text()).toContain('Command input');
-    expect(wrapper.get('button[aria-controls="webcli-settings-panel"]').attributes('aria-expanded')).toBe('false');
+    expect(wrapper.get('button[aria-haspopup="dialog"]').attributes('aria-expanded')).toBe('false');
     expect(wrapper.get('input#webcli-history-size').attributes('type')).toBe('number');
     expect(wrapper.get('input#webcli-history-size').attributes('min')).toBe('1');
     expect(wrapper.get('input#webcli-command-history-size').attributes('type')).toBe('number');
     expect(wrapper.get('input#webcli-command-history-size').attributes('min')).toBe('0');
+    expect(wrapper.get('input#webcli-suggestion-limit').attributes('type')).toBe('number');
+    expect(wrapper.get('input#webcli-suggestion-limit').attributes('min')).toBe('1');
     expect(wrapper.get('input#webcli-command-input').attributes('role')).toBe('combobox');
   });
 });
