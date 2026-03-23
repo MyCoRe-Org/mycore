@@ -97,12 +97,10 @@ public interface MCRJobConfig {
 
     /**
      * The default multiplier used for exponential backoff when retrying failed jobs.
-     * @return the multiplier, defaults to 1 (no exponential backoff)
+     * @return the multiplier
      * @see #retryDelayMultiplier(Class)
      */
-    default Integer retryDelayMultiplier() {
-        return 1;
-    }
+    Integer retryDelayMultiplier();
 
     /**
      * Returns the list of {@link MCRJobStatusListener} for the given action.
