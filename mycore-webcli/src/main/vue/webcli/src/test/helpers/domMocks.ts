@@ -6,7 +6,11 @@ export function installLocalStorageMock(): void {
   Object.defineProperty(window, 'localStorage', {
     configurable: true,
     value: {
+      get length() {
+        return localStorageState.size;
+      },
       getItem: (key: string) => localStorageState.get(key) ?? null,
+      key: (index: number) => Array.from(localStorageState.keys())[index] ?? null,
       setItem: (key: string, value: string) => {
         localStorageState.set(key, String(value));
       },

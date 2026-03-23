@@ -7,6 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "test": "vitest",
+    "test:run": "vitest --run",
+    "test:coverage": "vitest --run --coverage",
+    "typecheck": "vue-tsc --noEmit --pretty false -p tsconfig.typecheck.json",
+    "ci:check": "yarn typecheck && yarn test:coverage && yarn test:a11y",
     "test:a11y": "playwright test"
   },
   "dependencies": {
@@ -19,10 +23,12 @@
     "@playwright/test": "^1.54.2",
     "@types/node": "^25.4.0",
     "@vitejs/plugin-vue": "^6.0.4",
+    "@vitest/coverage-v8": "^4.1.0",
     "@vue/test-utils": "^2.4.6",
     "jsdom": "^28.1.0",
     "typescript": "~5.9.3",
     "vite": "^8.0.0",
-    "vitest": "^4.1.0"
+    "vitest": "^4.1.0",
+    "vue-tsc": "^3.2.6"
   }
 }

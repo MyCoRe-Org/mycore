@@ -1,12 +1,13 @@
 import { mount, type VueWrapper } from '@vue/test-utils';
 import { defineComponent, nextTick } from 'vue';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { useWebCliTransport, type UseWebCliTransportRuntime, type WebCliTransportClient } from '@/composables/useWebCliTransport';
 import type { TransportEvent } from '@/types';
 
 type Handler = (event: TransportEvent) => void;
 
-class MockTransport {
+class MockTransport implements WebCliTransportClient {
   handlers: Handler[] = [];
 
   clearCommandList = vi.fn();
@@ -35,35 +36,27 @@ class MockTransport {
   }
 }
 
-let currentTransport: MockTransport;
+interface HarnessOptions {
+  continueIfOneFails?: () => boolean;
+  logLimit?: () => number;
+  runtime?: UseWebCliTransportRuntime;
+}
 
-vi.mock('@/services/webcliTransport', async () => {
-  const actual = await vi.importActual<typeof import('@/services/webcliTransport')>('@/services/webcliTransport');
-  const WebCliTransportMock = vi.fn(function MockedWebCliTransport(this: unknown) {
-    currentTransport = new MockTransport();
-    return currentTransport;
+function createHarness(options: HarnessOptions = {}) {
+  return defineComponent({
+    setup() {
+      return useWebCliTransport(
+        options.continueIfOneFails ?? (() => false),
+        options.logLimit ?? (() => 2),
+        options.runtime
+      );
+    },
+    template: '<div />',
   });
-  return {
-    ...actual,
-    WebCliTransport: WebCliTransportMock,
-  };
-});
-
-import { useWebCliTransport } from '@/composables/useWebCliTransport';
-
-const Harness = defineComponent({
-  setup() {
-    return useWebCliTransport(() => false, () => 2);
-  },
-  template: '<div />',
-});
+}
 
 describe('useWebCliTransport', () => {
   let wrapper: VueWrapper | null = null;
-
-  beforeEach(() => {
-    vi.spyOn(window, 'fetch').mockResolvedValue({ ok: true } as Response);
-  });
 
   afterEach(() => {
     wrapper?.unmount();
@@ -71,10 +64,31 @@ describe('useWebCliTransport', () => {
     vi.restoreAllMocks();
   });
 
-  it('keeps only the configured number of log entries in memory', async () => {
-    wrapper = mount(Harness);
+  it('connects and initializes the transport on mount', () => {
+    const transport = new MockTransport();
 
-    currentTransport.emit({
+    wrapper = mount(createHarness({
+      continueIfOneFails: () => true,
+      runtime: {
+        createTransport: () => transport,
+      },
+    }));
+
+    expect(transport.connect).toHaveBeenCalledTimes(1);
+    expect(transport.getKnownCommands).toHaveBeenCalledTimes(1);
+    expect(transport.startLog).toHaveBeenCalledTimes(1);
+    expect(transport.setContinueIfOneFails).toHaveBeenCalledWith(true);
+  });
+
+  it('keeps only the configured number of log entries in memory', async () => {
+    const transport = new MockTransport();
+    wrapper = mount(createHarness({
+      runtime: {
+        createTransport: () => transport,
+      },
+    }));
+
+    transport.emit({
       type: 'log',
       value: {
         logLevel: 'INFO',
@@ -83,7 +97,7 @@ describe('useWebCliTransport', () => {
         time: 1,
       },
     });
-    currentTransport.emit({
+    transport.emit({
       type: 'log',
       value: {
         logLevel: 'INFO',
@@ -92,7 +106,7 @@ describe('useWebCliTransport', () => {
         time: 2,
       },
     });
-    currentTransport.emit({
+    transport.emit({
       type: 'log',
       value: {
         logLevel: 'INFO',
@@ -103,27 +117,32 @@ describe('useWebCliTransport', () => {
     });
     await nextTick();
 
-    expect((wrapper.vm as { logs: { message: string }[] }).logs.map(entry => entry.message)).toEqual(['second', 'third']);
+    expect(((wrapper.vm as unknown) as { logs: { message: string }[] }).logs.map(entry => entry.message)).toEqual(['second', 'third']);
   });
 
   it('updates queue, current command, and permission state from transport events', async () => {
-    wrapper = mount(Harness);
+    const transport = new MockTransport();
+    wrapper = mount(createHarness({
+      runtime: {
+        createTransport: () => transport,
+      },
+    }));
 
-    currentTransport.emit({
+    transport.emit({
       type: 'queue',
       value: ['import object 1', 'import object 2'],
       size: 2,
     });
-    currentTransport.emit({
+    transport.emit({
       type: 'currentCommand',
       value: 'import object 1',
     });
-    currentTransport.emit({
+    transport.emit({
       type: 'noPermission',
     });
     await nextTick();
 
-    const vm = wrapper.vm as {
+    const vm = (wrapper.vm as unknown) as {
       currentCommand: string;
       liveStatus: string;
       permissionError: string;
@@ -139,9 +158,14 @@ describe('useWebCliTransport', () => {
   });
 
   it('toggles refresh state and delegates to the transport', async () => {
-    wrapper = mount(Harness);
+    const transport = new MockTransport();
+    wrapper = mount(createHarness({
+      runtime: {
+        createTransport: () => transport,
+      },
+    }));
 
-    const vm = wrapper.vm as {
+    const vm = (wrapper.vm as unknown) as {
       liveStatus: string;
       refreshRunning: boolean;
       setRefresh: (value: boolean) => void;
@@ -151,16 +175,21 @@ describe('useWebCliTransport', () => {
     vm.setRefresh(true);
     await nextTick();
 
-    expect(currentTransport.stopLog).toHaveBeenCalledTimes(1);
-    expect(currentTransport.startLog).toHaveBeenCalledTimes(2);
+    expect(transport.stopLog).toHaveBeenCalledTimes(1);
+    expect(transport.startLog).toHaveBeenCalledTimes(2);
     expect(vm.refreshRunning).toBe(true);
     expect(vm.liveStatus).toBe('Log refresh resumed.');
   });
 
   it('clears logs and forwards queue clearing and continue-on-fail updates', async () => {
-    wrapper = mount(Harness);
+    const transport = new MockTransport();
+    wrapper = mount(createHarness({
+      runtime: {
+        createTransport: () => transport,
+      },
+    }));
 
-    currentTransport.emit({
+    transport.emit({
       type: 'log',
       value: {
         logLevel: 'INFO',
@@ -171,7 +200,7 @@ describe('useWebCliTransport', () => {
     });
     await nextTick();
 
-    const vm = wrapper.vm as {
+    const vm = (wrapper.vm as unknown) as {
       clearCommandQueue: () => void;
       clearLogs: () => void;
       lastLogAnnouncement: string;
@@ -180,7 +209,7 @@ describe('useWebCliTransport', () => {
       updateContinueIfOneFails: (value: boolean) => void;
     };
 
-    currentTransport.emit({
+    transport.emit({
       type: 'continueIfOneFails',
       value: true,
     });
@@ -189,10 +218,44 @@ describe('useWebCliTransport', () => {
     vm.clearLogs();
     await nextTick();
 
-    expect(currentTransport.setContinueIfOneFails).toHaveBeenLastCalledWith(false);
-    expect(currentTransport.clearCommandList).toHaveBeenCalledTimes(1);
+    expect(transport.setContinueIfOneFails).toHaveBeenLastCalledWith(false);
+    expect(transport.clearCommandList).toHaveBeenCalledTimes(1);
     expect(vm.remoteContinueIfOneFails).toBe(true);
     expect(vm.logs).toEqual([]);
     expect(vm.lastLogAnnouncement).toBe('Logs cleared.');
+  });
+
+  it('uses injected keepalive dependencies and cleans the timer up on unmount', async () => {
+    const transport = new MockTransport();
+    const fetchImpl = vi.fn().mockResolvedValue({ ok: true });
+    const setIntervalFn = vi.fn((_handler: () => void, _timeout: number) => 42);
+    const clearIntervalFn = vi.fn();
+
+    wrapper = mount(createHarness({
+      runtime: {
+        clearIntervalFn,
+        createTransport: () => transport,
+        fetchImpl,
+        locationLike: {
+          host: 'localhost:8080',
+          pathname: '/myapp/modules/webcli/gui/index.html',
+          protocol: 'https:',
+        },
+        setIntervalFn,
+      },
+    }));
+
+    expect(setIntervalFn).toHaveBeenCalledTimes(1);
+
+    const keepAlive = setIntervalFn.mock.calls[0]?.[0] as (() => void) | undefined;
+    expect(typeof keepAlive).toBe('function');
+    await keepAlive?.();
+
+    expect(fetchImpl).toHaveBeenCalledWith('/myapp/echo/ping', { credentials: 'same-origin' });
+
+    wrapper.unmount();
+    wrapper = null;
+
+    expect(clearIntervalFn).toHaveBeenCalledWith(42);
   });
 });

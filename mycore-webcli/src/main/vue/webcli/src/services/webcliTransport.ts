@@ -9,8 +9,8 @@ export interface LocationLike {
 export interface WebSocketLike {
   readyState: number;
   send(data: string): void;
-  onmessage: ((event: { data: string }) => void) | null;
-  onopen: (() => void) | null;
+  onmessage: ((event: MessageEvent<string>) => void) | null;
+  onopen: ((event: Event) => void) | null;
 }
 
 export type WebSocketFactory = (url: string) => WebSocketLike;

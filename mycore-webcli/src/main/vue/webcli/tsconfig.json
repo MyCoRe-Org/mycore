@@ -1,16 +1,21 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
+    "target": "ES2022",
     "useDefineForClassFields": true,
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "Bundler",
     "strict": true,
     "jsx": "preserve",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "esModuleInterop": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "types": ["vite/client", "vitest/globals"]
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "lib": ["ES2022", "DOM", "DOM.Iterable", "ESNext"],
+    "types": ["vite/client", "vitest/globals", "node"]
   },
-  "include": ["src/**/*.ts", "src/**/*.vue", "vitest.config.ts", "playwright.config.ts", "tests/**/*.ts"]
+  "include": ["src/**/*.ts", "src/**/*.vue", "vite.config.ts", "playwright.config.ts", "tests/**/*.ts"]
 }

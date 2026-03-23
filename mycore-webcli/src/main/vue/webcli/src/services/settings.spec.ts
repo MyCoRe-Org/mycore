@@ -36,6 +36,7 @@ describe('settings service', () => {
     persistSettings({
       historySize: Number.NaN,
       comHistorySize: Number.NaN,
+      suggestionLimit: Number.NaN,
       autoscroll: true,
       continueIfOneFails: false,
     });

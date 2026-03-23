@@ -9,7 +9,7 @@ const DEFAULT_SETTINGS: Settings = {
 };
 
 function normalizeNumber(value: number | undefined, fallback: number, min: number): number {
-  if (!Number.isFinite(value)) {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
     return fallback;
   }
   return Math.max(min, Math.trunc(value));

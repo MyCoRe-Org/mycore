@@ -1,10 +1,37 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 
-import { buildPingUrl, WebCliTransport } from '@/services/webcliTransport';
-import type { CommandGroup, LogEntry } from '@/types';
+import { buildPingUrl, WebCliTransport, type LocationLike } from '@/services/webcliTransport';
+import type { CommandGroup, LogEntry, TransportEvent } from '@/types';
 
-export function useWebCliTransport(continueIfOneFails: () => boolean, logLimit: () => number) {
-  const transport = new WebCliTransport();
+export interface WebCliTransportClient {
+  clearCommandList(): void;
+  connect(): void;
+  getKnownCommands(): void;
+  run(command: string): void;
+  setContinueIfOneFails(value: boolean): void;
+  startLog(): void;
+  stopLog(): void;
+  subscribe(listener: (event: TransportEvent) => void): () => void;
+}
+
+export interface UseWebCliTransportRuntime {
+  clearIntervalFn?: (handle: number) => void;
+  createTransport?: () => WebCliTransportClient;
+  fetchImpl?: (input: string, init?: RequestInit) => Promise<unknown>;
+  locationLike?: LocationLike;
+  setIntervalFn?: (handler: () => void, timeout: number) => number;
+}
+
+export function useWebCliTransport(
+  continueIfOneFails: () => boolean,
+  logLimit: () => number,
+  runtime: UseWebCliTransportRuntime = {}
+) {
+  const locationLike = runtime.locationLike ?? window.location;
+  const fetchImpl = runtime.fetchImpl ?? ((input: string, init?: RequestInit) => window.fetch(input, init));
+  const setIntervalFn = runtime.setIntervalFn ?? window.setInterval.bind(window);
+  const clearIntervalFn = runtime.clearIntervalFn ?? window.clearInterval.bind(window);
+  const transport = runtime.createTransport?.() ?? new WebCliTransport(locationLike);
   const commandGroups = ref<CommandGroup[]>([]);
   const currentCommand = ref('');
   const queue = ref<string[]>([]);
@@ -69,8 +96,8 @@ export function useWebCliTransport(continueIfOneFails: () => boolean, logLimit: 
   }
 
   function keepAlive(): void {
-    const pingUrl = buildPingUrl(window.location);
-    window.fetch(pingUrl, { credentials: 'same-origin' }).catch(() => undefined);
+    const pingUrl = buildPingUrl(locationLike);
+    fetchImpl(pingUrl, { credentials: 'same-origin' }).catch(() => undefined);
   }
 
   onMounted(() => {
@@ -103,7 +130,7 @@ export function useWebCliTransport(continueIfOneFails: () => boolean, logLimit: 
     transport.getKnownCommands();
     transport.startLog();
     transport.setContinueIfOneFails(continueIfOneFails());
-    keepAliveHandle.value = window.setInterval(keepAlive, 1740000);
+    keepAliveHandle.value = setIntervalFn(keepAlive, 1740000);
   });
 
   onBeforeUnmount(() => {
@@ -111,7 +138,7 @@ export function useWebCliTransport(continueIfOneFails: () => boolean, logLimit: 
       unsubscribeTransport();
     }
     if (keepAliveHandle.value !== null) {
-      window.clearInterval(keepAliveHandle.value);
+      clearIntervalFn(keepAliveHandle.value);
     }
   });
 
