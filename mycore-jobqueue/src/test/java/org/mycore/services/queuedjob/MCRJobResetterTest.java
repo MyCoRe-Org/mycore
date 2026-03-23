@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.time.Duration;
 import java.util.ArrayDeque;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
 
