@@ -138,35 +138,10 @@ public class MCRJobResetterTest {
 
         // config with 5 min base delay and multiplier of 2
         MCRConfiguration2JobConfig baseConfig = new MCRConfiguration2JobConfig();
-        MCRJobConfig config = new MCRJobConfig() {
+        MCRJobConfig config = new MCRDelegatingJobConfig(baseConfig) {
             @Override
             public Optional<Duration> timeTillReset(Class<? extends MCRJobAction> action) {
                 return Optional.of(Duration.ofMinutes(5));
-            }
-
-            @Override
-            public Optional<Integer> maxTryCount(Class<? extends MCRJobAction> action) {
-                return baseConfig.maxTryCount(action);
-            }
-
-            @Override
-            public Optional<Integer> maxJobThreadCount(Class<? extends MCRJobAction> action) {
-                return baseConfig.maxJobThreadCount(action);
-            }
-
-            @Override
-            public Optional<Boolean> activated(Class<? extends MCRJobAction> action) {
-                return baseConfig.activated(action);
-            }
-
-            @Override
-            public Optional<Integer> retryDelayMultiplier(Class<? extends MCRJobAction> action) {
-                return Optional.of(2);
-            }
-
-            @Override
-            public Integer maxJobThreadCount() {
-                return baseConfig.maxJobThreadCount();
             }
 
             @Override
@@ -175,18 +150,8 @@ public class MCRJobResetterTest {
             }
 
             @Override
-            public Integer maxTryCount() {
-                return baseConfig.maxTryCount();
-            }
-
-            @Override
-            public Boolean activated() {
-                return baseConfig.activated();
-            }
-
-            @Override
-            public List<MCRJobStatusListener> jobStatusListeners(Class<? extends MCRJobAction> action) {
-                return baseConfig.jobStatusListeners(action);
+            public Optional<Integer> retryDelayMultiplier(Class<? extends MCRJobAction> action) {
+                return Optional.of(2);
             }
         };
 
