@@ -1,4 +1,4 @@
-import { computed, nextTick, ref, watch, type Ref } from 'vue';
+import { nextTick, ref, watch, type Ref } from 'vue';
 
 import { useCommandHistory } from '@/composables/useCommandHistory';
 import { useCommandSearch } from '@/composables/useCommandSearch';

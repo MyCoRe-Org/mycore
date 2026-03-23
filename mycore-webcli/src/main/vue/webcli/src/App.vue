@@ -325,7 +325,7 @@ watch(queueLength, value => {
     />
     <SettingsDialog
       v-model="isSettingsDialogOpen"
-      :settings="settings"
+      v-model:settings="settings"
       :has-command-history="commandHistoryEntries.length > 0"
       @clear-command-history="clearCommandHistory"
     />

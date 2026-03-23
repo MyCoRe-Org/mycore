@@ -79,6 +79,28 @@
               <arguments>test --run</arguments>
             </configuration>
           </execution>
+          <execution>
+            <id>yarn-lint-webcli</id>
+            <goals>
+              <goal>yarn</goal>
+            </goals>
+            <phase>test</phase>
+            <configuration>
+              <workingDirectory>${basedir}/src/main/vue/webcli</workingDirectory>
+              <arguments>lint</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>yarn-typecheck-webcli</id>
+            <goals>
+              <goal>yarn</goal>
+            </goals>
+            <phase>test</phase>
+            <configuration>
+              <workingDirectory>${basedir}/src/main/vue/webcli</workingDirectory>
+              <arguments>typecheck</arguments>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
     </plugins>
@@ -127,6 +149,30 @@
     </dependency>
   </dependencies>
   <profiles>
+    <profile>
+      <id>checks</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.github.eirslett</groupId>
+            <artifactId>frontend-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>yarn-ci-check-webcli</id>
+                <goals>
+                  <goal>yarn</goal>
+                </goals>
+                <phase>test</phase>
+                <configuration>
+                  <workingDirectory>${basedir}/src/main/vue/webcli</workingDirectory>
+                  <arguments>ci:check</arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
     <profile>
       <id>local-testing</id>
       <build>

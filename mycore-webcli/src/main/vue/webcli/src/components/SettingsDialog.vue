@@ -7,8 +7,8 @@ import type { Settings } from '@/types';
 const props = defineProps<{
   hasCommandHistory: boolean;
   modelValue: boolean;
-  settings: Settings;
 }>();
+const settings = defineModel<Settings>('settings', { required: true });
 
 const emit = defineEmits<{
   'clear-command-history': [];

@@ -228,7 +228,7 @@ describe('useWebCliTransport', () => {
   it('uses injected keepalive dependencies and cleans the timer up on unmount', async () => {
     const transport = new MockTransport();
     const fetchImpl = vi.fn().mockResolvedValue({ ok: true });
-    const setIntervalFn = vi.fn((_handler: () => void, _timeout: number) => 42);
+    const setIntervalFn = vi.fn<(handler: () => void, timeout: number) => number>().mockImplementation(() => 42);
     const clearIntervalFn = vi.fn();
 
     wrapper = mount(createHarness({
