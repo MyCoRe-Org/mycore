@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, ref, watch } from 'vue';
+import { ref, toRef } from 'vue';
 
+import { useDialogLifecycle } from '@/composables/useDialogLifecycle';
 import type { Settings } from '@/types';
 
 const props = defineProps<{
@@ -16,41 +17,14 @@ const emit = defineEmits<{
 
 const dialogRef = ref<HTMLDialogElement | null>(null);
 const initialFocusRef = ref<HTMLInputElement | null>(null);
-let previousFocus: HTMLElement | null = null;
 
 function closeDialog(): void {
   emit('update:modelValue', false);
 }
 
-watch(() => props.modelValue, async value => {
-  const dialog = dialogRef.value;
-  if (!dialog) {
-    return;
-  }
-  if (value) {
-    previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    if (typeof dialog.showModal === 'function' && !dialog.open) {
-      dialog.showModal();
-    } else {
-      dialog.setAttribute('open', '');
-    }
-    await nextTick();
-    initialFocusRef.value?.focus();
-    initialFocusRef.value?.select();
-    return;
-  }
-  if (dialog.open && typeof dialog.close === 'function') {
-    dialog.close();
-  } else {
-    dialog.removeAttribute('open');
-  }
-  previousFocus?.focus();
-});
-
-onBeforeUnmount(() => {
-  if (dialogRef.value?.open && typeof dialogRef.value.close === 'function') {
-    dialogRef.value.close();
-  }
+useDialogLifecycle(toRef(props, 'modelValue'), dialogRef, () => {
+  initialFocusRef.value?.focus();
+  initialFocusRef.value?.select();
 });
 </script>
 
