@@ -75,6 +75,11 @@ public class MCRDelegatingJobConfig implements MCRJobConfig {
     }
 
     @Override
+    public Integer retryDelayMultiplier() {
+        return delegate.retryDelayMultiplier();
+    }
+
+    @Override
     public Boolean activated() {
         return delegate.activated();
     }

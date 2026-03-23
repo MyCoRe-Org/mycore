@@ -105,6 +105,13 @@ public class MCRConfiguration2JobConfig implements MCRJobConfig {
     }
 
     @Override
+    public Integer retryDelayMultiplier() {
+        String property = CONFIG_PREFIX + CONFIG_RETRY_DELAY_MULTIPLIER;
+        return MCRConfiguration2.getInt(property)
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(property));
+    }
+
+    @Override
     public Boolean activated() {
         String property = CONFIG_PREFIX + CONFIG_ACTIVATED;
         return MCRConfiguration2.getBoolean(property)
