@@ -77,14 +77,17 @@ public class MCRJobResetter extends MCRCronjob {
      */
     protected static long resetJobsWithAction(Class<? extends MCRJobAction> action, MCRJobConfig config, MCRJobDAO dao,
         Queue<MCRJob> queue, MCRJobStatus status) {
-        Duration maxTimeDiff = config.timeTillReset(action).orElseGet(config::timeTillReset);
+        Duration baseDelay = config.timeTillReset(action).orElseGet(config::timeTillReset);
+        int multiplier = config.retryDelayMultiplier(action).orElseGet(config::retryDelayMultiplier);
         List<MCRJob> jobs = dao.getJobs(action, Collections.emptyMap(), List.of(status), null, null);
         long current = System.currentTimeMillis();
 
         return jobs.stream().filter(job -> {
             long start = job.getStart().getTime();
             Duration elapsedTime = Duration.ofMillis(current - start);
-            return maxTimeDiff.minus(elapsedTime).isNegative();
+            int tries = job.getTries() != null ? job.getTries() : 0;
+            Duration delay = baseDelay.multipliedBy((long) Math.pow(multiplier, Math.max(0, tries - 1)));
+            return delay.minus(elapsedTime).isNegative();
         }).filter(queue::offer).count();
     }
 
