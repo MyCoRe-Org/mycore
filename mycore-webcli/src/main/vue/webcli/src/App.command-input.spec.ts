@@ -50,7 +50,7 @@ describe('WebCLI app command input', () => {
     expect(window.localStorage.getItem('commandHistory')).toBe(JSON.stringify(['process resource {0}']));
   });
 
-  it('focuses the execute button after selecting a command without placeholders', async () => {
+  it('focuses the input and places the caret at the end after selecting a command without placeholders', async () => {
     wrapper = await mountApp();
     const transport = getCurrentTransport();
 
@@ -65,9 +65,13 @@ describe('WebCLI app command input', () => {
 
     await commandLink!.trigger('click');
     await nextTick();
+    await nextTick();
 
-    const executeButton = wrapper.get('#command-input button').element as HTMLButtonElement;
-    expect(document.activeElement).toBe(executeButton);
+    const input = wrapper.get('#command-input input').element as HTMLInputElement;
+    expect(document.activeElement).toBe(input);
+    expect(input.selectionStart).toBe('skip on error'.length);
+    expect(input.selectionEnd).toBe('skip on error'.length);
+    expect(wrapper.find('.webcli-suggestion').exists()).toBe(false);
   });
 
   it('shows substring suggestions with help text and still executes the typed command on Enter', async () => {
@@ -97,6 +101,8 @@ describe('WebCLI app command input', () => {
     expect(suggestions[0].text()).toContain('xslt transform {0}');
     expect(suggestions[0].text()).toContain('Run an XSLT transformation.');
     expect(suggestions[0].text()).toContain('Transformations');
+    expect(suggestions[0].classes()).not.toContain('is-highlighted');
+    expect(input.attributes('aria-activedescendant')).toBeUndefined();
 
     await input.trigger('keydown', { key: 'Enter', preventDefault: vi.fn() });
     await nextTick();
@@ -179,10 +185,14 @@ describe('WebCLI app command input', () => {
     await nextTick();
 
     await input.trigger('keydown', { key: 'ArrowDown', preventDefault: vi.fn() });
+    expect(wrapper.findAll('.webcli-suggestion')[0].classes()).toContain('is-highlighted');
     await input.trigger('keydown', { key: 'Enter', preventDefault: vi.fn() });
+    await nextTick();
     await nextTick();
 
     expect((input.element as HTMLInputElement).value).toBe('xslt transform {0}');
+    expect(document.activeElement).toBe(input.element);
+    expect(wrapper.find('.webcli-suggestion').exists()).toBe(false);
   });
 
   it('scrolls the highlighted suggestion into view during arrow-key navigation', async () => {
@@ -292,11 +302,16 @@ describe('WebCLI app command input', () => {
     const input = wrapper.get('#webcli-command-input');
     await input.setValue('xslt');
     await nextTick();
+    (input.element as HTMLInputElement).focus();
+    (input.element as HTMLInputElement).setSelectionRange(4, 4);
 
     await input.trigger('keydown', { key: 'Escape', preventDefault: vi.fn() });
     await nextTick();
+    await nextTick();
 
     expect(document.activeElement).toBe(input.element);
+    expect((input.element as HTMLInputElement).selectionStart).toBe(4);
+    expect((input.element as HTMLInputElement).selectionEnd).toBe(4);
   });
 
   it('applies a suggestion reliably on pointer interaction before blur closes the popup', async () => {
@@ -323,6 +338,72 @@ describe('WebCLI app command input', () => {
     await nextTick();
 
     expect((input.element as HTMLInputElement).value).toBe('xslt transform {0}');
+    expect(document.activeElement).toBe(input.element);
+    expect((input.element as HTMLInputElement).selectionStart).toBe('xslt transform {0}'.indexOf('{0}'));
+    expect(wrapper.find('.webcli-suggestion').exists()).toBe(false);
+  });
+
+  it('keeps suggestions hidden after selecting a command from the menu until the input changes', async () => {
+    wrapper = await mountApp();
+    const transport = getCurrentTransport();
+
+    transport.emit({ type: 'commandList', value: makeCommandGroups() });
+    await nextTick();
+
+    await wrapper.get('.webcli-command-menu .dropdown-toggle').trigger('click');
+    await nextTick();
+
+    const commandLink = wrapper.findAll('.dropdown-item').find(item => item.text() === 'skip on error');
+    expect(commandLink).toBeTruthy();
+
+    await commandLink!.trigger('click');
+    await nextTick();
+    await nextTick();
+
+    const input = wrapper.get('#webcli-command-input');
+    await input.trigger('focus');
+    await nextTick();
+
+    expect(wrapper.find('.webcli-suggestion').exists()).toBe(false);
+
+    await input.setValue('error');
+    await nextTick();
+
+    expect(wrapper.find('.webcli-suggestion').exists()).toBe(true);
+  });
+
+  it('keeps suggestions hidden after selecting a suggestion until the input changes', async () => {
+    wrapper = await mountApp();
+    const transport = getCurrentTransport();
+
+    transport.emit({
+      type: 'commandList',
+      value: [
+        {
+          name: 'Transformations',
+          commands: [{ command: 'xslt transform {0}', help: 'Run an XSLT transformation.' }],
+        },
+      ],
+    });
+    await nextTick();
+
+    const input = wrapper.get('#webcli-command-input');
+    await input.setValue('xslt');
+    await nextTick();
+
+    await wrapper.get('.webcli-suggestion').trigger('pointerdown');
+    await nextTick();
+    await nextTick();
+
+    await input.trigger('focus');
+    await nextTick();
+
+    expect(wrapper.find('.webcli-suggestion').exists()).toBe(false);
+
+    await input.setValue('xslt');
+    await nextTick();
+
+    expect(wrapper.find('.webcli-suggestion').exists()).toBe(true);
   });
 
   it('moves through placeholders with Tab and then lets focus continue normally', async () => {

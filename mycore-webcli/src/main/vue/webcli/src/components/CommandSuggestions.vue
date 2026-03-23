@@ -4,7 +4,7 @@ import { nextTick, ref, watch } from 'vue';
 import type { SearchableCommand } from '@/types';
 
 const props = defineProps<{
-  highlightedIndex: number;
+  highlightedIndex: number | null;
   id: string;
   suggestions: SearchableCommand[];
   suggestionLimit: number;
@@ -29,9 +29,14 @@ function activateSuggestion(index: number): void {
 }
 
 watch(() => props.highlightedIndex, async highlightedIndex => {
+  if (highlightedIndex === null) {
+    return;
+  }
   await nextTick();
   const activeOption = listRef.value?.querySelector<HTMLElement>(`#${props.id}-option-${highlightedIndex}`);
-  activeOption?.scrollIntoView({ block: 'nearest' });
+  if (typeof activeOption?.scrollIntoView === 'function') {
+    activeOption.scrollIntoView({ block: 'nearest' });
+  }
 });
 </script>
 

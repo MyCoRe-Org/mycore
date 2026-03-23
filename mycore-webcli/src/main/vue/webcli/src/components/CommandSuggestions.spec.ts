@@ -41,7 +41,7 @@ describe('CommandSuggestions', () => {
     wrapper = mount(CommandSuggestions, {
       props: {
         id: 'suggestions',
-        highlightedIndex: 0,
+        highlightedIndex: null,
         suggestionLimit: 2,
         totalCount: 4,
         suggestions: [
@@ -73,7 +73,7 @@ describe('CommandSuggestions', () => {
       attachTo: document.body,
       props: {
         id: 'suggestions',
-        highlightedIndex: 0,
+        highlightedIndex: null,
         suggestionLimit: 2,
         totalCount: 2,
         suggestions: [
@@ -95,5 +95,27 @@ describe('CommandSuggestions', () => {
     await nextTick();
 
     expect(scrollIntoView).toHaveBeenCalled();
+  });
+
+  it('renders suggestions without an active item before navigation starts', () => {
+    wrapper = mount(CommandSuggestions, {
+      props: {
+        id: 'suggestions',
+        highlightedIndex: null,
+        suggestionLimit: 2,
+        totalCount: 1,
+        suggestions: [
+          {
+            command: 'xslt transform',
+            help: 'Run an XSLT transformation.',
+            groupName: 'Transformations',
+          },
+        ],
+      },
+    });
+
+    const suggestion = wrapper.get('.webcli-suggestion');
+    expect(suggestion.classes()).not.toContain('is-highlighted');
+    expect(suggestion.attributes('aria-selected')).toBe('false');
   });
 });

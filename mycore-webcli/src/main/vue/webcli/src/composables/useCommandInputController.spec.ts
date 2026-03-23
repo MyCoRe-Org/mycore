@@ -37,7 +37,7 @@ function createHarness(
     },
     template: `
       <div>
-        <input ref="inputElement" />
+        <input ref="inputElement" v-model="command" />
         <button ref="executeButtonElement" type="button">Execute</button>
       </div>
     `,
@@ -93,6 +93,7 @@ describe('useCommandInputController', () => {
     });
     const vm = (wrapper.vm as unknown) as {
       command: string;
+      highlightedIndex: number | null;
       highlightedSuggestion: { command: string } | null;
       isSuggestionMenuVisible: boolean;
       onCommandInput: () => void;
@@ -103,9 +104,12 @@ describe('useCommandInputController', () => {
     vm.onCommandInput();
     await nextTick();
 
+    expect(vm.highlightedIndex).toBeNull();
+
     vm.onCommandKeydown({ key: 'ArrowDown', preventDefault: vi.fn() } as unknown as KeyboardEvent);
     expect(vm.isSuggestionMenuVisible).toBe(true);
-    expect(vm.highlightedSuggestion?.command).toBe('import object');
+    expect(vm.highlightedIndex).toBe(0);
+    expect(vm.highlightedSuggestion?.command).toBe('xslt transform {0}');
 
     vm.onCommandKeydown({ key: 'Escape', preventDefault: vi.fn() } as unknown as KeyboardEvent);
     await nextTick();
@@ -139,6 +143,73 @@ describe('useCommandInputController', () => {
 
     expect(preventDefault).toHaveBeenCalledTimes(1);
     expect(vm.command).toBe('xslt transform {0}');
+  });
+
+  it('keeps suggestions hidden after selecting a command until the input changes again', async () => {
+    const executedCommands: string[] = [];
+    const commandGroups = ref(buildCommandGroups());
+    const commandHistorySize = ref(10);
+    const suggestionLimit = ref(10);
+
+    wrapper = mount(createHarness(executedCommands, commandGroups, commandHistorySize, suggestionLimit), {
+      attachTo: document.body,
+    });
+    const vm = (wrapper.vm as unknown) as {
+      command: string;
+      inputElement: HTMLInputElement | null;
+      isSuggestionMenuVisible: boolean;
+      onCommandInput: () => void;
+      onCommandInputFocus: () => void;
+      selectCommand: (value: string) => void;
+    };
+
+    vm.selectCommand('import object');
+    await nextTick();
+    await nextTick();
+
+    expect(document.activeElement).toBe(vm.inputElement);
+    expect(vm.isSuggestionMenuVisible).toBe(false);
+
+    vm.onCommandInputFocus();
+    await nextTick();
+    expect(vm.isSuggestionMenuVisible).toBe(false);
+
+    vm.command = 'import';
+    vm.onCommandInput();
+    await nextTick();
+    expect(vm.isSuggestionMenuVisible).toBe(true);
+  });
+
+  it('focuses the input and preserves the caret when Escape closes suggestions', async () => {
+    const executedCommands: string[] = [];
+    const commandGroups = ref(buildCommandGroups());
+    const commandHistorySize = ref(10);
+    const suggestionLimit = ref(10);
+
+    wrapper = mount(createHarness(executedCommands, commandGroups, commandHistorySize, suggestionLimit), {
+      attachTo: document.body,
+    });
+    const vm = (wrapper.vm as unknown) as {
+      command: string;
+      inputElement: HTMLInputElement | null;
+      onCommandInput: () => void;
+      onCommandKeydown: (event: KeyboardEvent) => void;
+    };
+
+    vm.command = 'xslt';
+    await nextTick();
+    vm.inputElement?.focus();
+    vm.inputElement?.setSelectionRange(4, 4);
+    vm.onCommandInput();
+    await nextTick();
+
+    vm.onCommandKeydown({ key: 'Escape', preventDefault: vi.fn() } as unknown as KeyboardEvent);
+    await nextTick();
+    await nextTick();
+
+    expect(document.activeElement).toBe(vm.inputElement);
+    expect(vm.inputElement?.selectionStart).toBe(4);
+    expect(vm.inputElement?.selectionEnd).toBe(4);
   });
 
   it('trims stored history when the configured history size shrinks', async () => {

@@ -47,7 +47,6 @@ const {
   executeCommand,
   hasSuggestions,
   highlightedIndex,
-  highlightedSuggestion,
   inputElement,
   isSuggestionMenuVisible,
   onCommandInput,
@@ -200,7 +199,7 @@ watch(queueLength, value => {
             aria-describedby="webcli-command-help"
             :aria-expanded="isSuggestionMenuVisible && hasSuggestions"
             :aria-controls="suggestionListId"
-            :aria-activedescendant="isSuggestionMenuVisible && highlightedSuggestion ? `${suggestionListId}-option-${highlightedIndex}` : undefined"
+            :aria-activedescendant="isSuggestionMenuVisible && highlightedIndex !== null ? `${suggestionListId}-option-${highlightedIndex}` : undefined"
             @keydown="onCommandKeydown"
             @input="onCommandInput"
             @focus="onCommandInputFocus"

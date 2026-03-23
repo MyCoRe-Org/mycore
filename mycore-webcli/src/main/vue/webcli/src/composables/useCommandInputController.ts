@@ -1,4 +1,4 @@
-import { nextTick, ref, watch, type Ref } from 'vue';
+import { computed, nextTick, ref, watch, type Ref } from 'vue';
 
 import { useCommandHistory } from '@/composables/useCommandHistory';
 import { useCommandSearch } from '@/composables/useCommandSearch';
@@ -16,9 +16,13 @@ export function useCommandInputController(options: CommandInputControllerOptions
   const isSuggestionMenuVisible = ref(false);
   const isSuggestionNavigationActive = ref(false);
   const suppressSuggestionMenuOnFocus = ref(false);
+  const suppressSuggestionsUntilInput = ref(false);
   const inputElement = ref<HTMLInputElement | null>(null);
   const executeButtonElement = ref<HTMLButtonElement | null>(null);
   const suggestionListId = 'webcli-command-suggestions';
+  const activeHighlightedIndex = computed(() => {
+    return isSuggestionNavigationActive.value ? highlightedIndex.value : null;
+  });
 
   const {
     addEntry,
@@ -80,6 +84,29 @@ export function useCommandInputController(options: CommandInputControllerOptions
     return false;
   }
 
+  function focusInput(selectionStart = command.value.length, selectionEnd = selectionStart): void {
+    nextTick(() => {
+      const input = inputElement.value;
+      if (!input) {
+        return;
+      }
+      if (document.activeElement !== input) {
+        suppressSuggestionMenuOnFocus.value = true;
+      }
+      input.focus();
+      input.setSelectionRange(selectionStart, selectionEnd);
+    });
+  }
+
+  function focusSelectedCommand(): void {
+    nextTick(() => {
+      const focusedPlaceholder = selectNextPlaceholder(0);
+      if (!focusedPlaceholder) {
+        focusInput();
+      }
+    });
+  }
+
   function executeCommand(): void {
     const value = command.value.trim();
     if (!value) {
@@ -94,20 +121,16 @@ export function useCommandInputController(options: CommandInputControllerOptions
 
   function selectCommand(value: string): void {
     command.value = value;
+    suppressSuggestionsUntilInput.value = true;
     closeSuggestionMenu();
-    nextTick(() => {
-      const focusedPlaceholder = selectNextPlaceholder(0);
-      if (!focusedPlaceholder) {
-        executeButtonElement.value?.focus();
-      }
-    });
+    focusSelectedCommand();
   }
 
   function onCommandKeydown(event: KeyboardEvent): void {
     if (event.key === 'ArrowDown' && isSuggestionMenuVisible.value && hasSuggestions.value) {
       event.preventDefault();
       if (!isSuggestionNavigationActive.value) {
-        activateSuggestionNavigation(Math.min(1, suggestions.value.length - 1));
+        activateSuggestionNavigation(0);
         return;
       }
       moveHighlight(1);
@@ -134,7 +157,11 @@ export function useCommandInputController(options: CommandInputControllerOptions
     }
     if (event.key === 'Escape' && isSuggestionMenuVisible.value) {
       event.preventDefault();
-      closeSuggestionMenu(true);
+      const input = inputElement.value;
+      const selectionStart = input?.selectionStart ?? command.value.length;
+      const selectionEnd = input?.selectionEnd ?? selectionStart;
+      closeSuggestionMenu();
+      focusInput(selectionStart, selectionEnd);
       return;
     }
     if (event.key === 'ArrowUp') {
@@ -172,6 +199,7 @@ export function useCommandInputController(options: CommandInputControllerOptions
   }
 
   function onCommandInput(): void {
+    suppressSuggestionsUntilInput.value = false;
     isSuggestionMenuVisible.value = hasSuggestions.value;
     isSuggestionNavigationActive.value = false;
     resetHighlight();
@@ -180,6 +208,9 @@ export function useCommandInputController(options: CommandInputControllerOptions
   function onCommandInputFocus(): void {
     if (suppressSuggestionMenuOnFocus.value) {
       suppressSuggestionMenuOnFocus.value = false;
+      return;
+    }
+    if (suppressSuggestionsUntilInput.value) {
       return;
     }
     if (hasSuggestions.value) {
@@ -199,7 +230,8 @@ export function useCommandInputController(options: CommandInputControllerOptions
 
   function restoreCommandFromHistory(value: string): void {
     command.value = value;
-    nextTick(() => inputElement.value?.focus());
+    suppressSuggestionsUntilInput.value = true;
+    focusSelectedCommand();
   }
 
   watch(options.commandHistorySize, () => {
@@ -219,7 +251,7 @@ export function useCommandInputController(options: CommandInputControllerOptions
     executeButtonElement,
     executeCommand,
     hasSuggestions,
-    highlightedIndex,
+    highlightedIndex: activeHighlightedIndex,
     highlightedSuggestion,
     inputElement,
     isSuggestionMenuVisible,
