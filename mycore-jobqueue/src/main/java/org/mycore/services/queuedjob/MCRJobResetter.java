@@ -86,7 +86,11 @@ public class MCRJobResetter extends MCRCronjob {
             long start = job.getStart().getTime();
             Duration elapsedTime = Duration.ofMillis(current - start);
             int tries = job.getTries() != null ? job.getTries() : 0;
-            Duration delay = baseDelay.multipliedBy((long) Math.pow(multiplier, Math.max(0, tries - 1)));
+            long factor = (long) Math.pow(multiplier, Math.max(0, tries - 1));
+            if (factor <= 0) {
+                factor = Long.MAX_VALUE;
+            }
+            Duration delay = baseDelay.multipliedBy(factor);
             return delay.minus(elapsedTime).isNegative();
         }).filter(queue::offer).count();
     }
