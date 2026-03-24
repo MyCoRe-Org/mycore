@@ -193,18 +193,23 @@ body {
     left: -30%;
     width: 30%;
   }
+
   50% {
     width: 30%;
   }
+
   70% {
     width: 70%;
   }
+
   80% {
     left: 50%;
   }
+
   95% {
     left: 120%;
   }
+
   to {
     left: 100%;
   }
@@ -249,10 +254,6 @@ body {
   position: relative;
 }
 
-.webcli-app .dropdown-submenu.show > .dropdown-menu {
-  display: block;
-}
-
 .webcli-app .dropdown-submenu .dropdown-menu {
   top: 0;
   left: 0;
@@ -260,6 +261,10 @@ body {
   position: fixed !important;
   max-width: none;
   z-index: 3000 !important;
+}
+
+.webcli-app .dropdown-submenu.show > .dropdown-menu {
+  display: block;
 }
 
 .webcli-app .comHistoryDeleteButton {
@@ -307,108 +312,6 @@ body {
   margin-bottom: 1rem;
 }
 
-/*
-.webcli-dialog .modal-content {
-  border: 0;
-  border-radius: inherit;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 1.25rem;
-}
-
-.webcli-dialog .modal-body {
-  max-height: 70vh;
-  overflow: auto;
-}
-
-.webcli-dialog .modal-header,
-.webcli-dialog .modal-body,
-.webcli-dialog .modal-footer {
-  padding: 0;
-}
-
-.webcli-history-dialog {
-  width: min(calc(100% - 1rem), 780px);
-  max-width: 780px;
-}
-
-.webcli-settings-dialog {
-  width: min(calc(100% - 1rem), 640px);
-  max-width: 640px;
-}
-
-.webcli-history-entry {
-  font-family: var(--bs-font-monospace);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.webcli-history-body {
-  padding-right: 0.25rem;
-}
-
-.webcli-settings-stack {
-  display: grid;
-  gap: 0.85rem;
-}
-
-.webcli-settings-section {
-  display: grid;
-  gap: 0.5rem;
-}
-
-.webcli-settings-section-title {
-  margin: 0;
-  font-size: 0.95rem;
-  font-weight: 700;
-}
-
-.webcli-settings-field {
-  margin: 0;
-}
-
-.webcli-settings-field.row {
-  --bs-gutter-x: 0.75rem;
-  --bs-gutter-y: 0.2rem;
-}
-
-.webcli-settings-number {
-  margin-left: auto;
-  max-width: 5rem;
-  text-align: right;
-  width: 100%;
-}
-
-.webcli-settings-actions {
-  display: flex;
-  gap: 0.75rem;
-  justify-content: flex-start;
-}
-
-.webcli-settings-field .form-text {
-  margin-top: 0;
-}
-
-.webcli-settings-dialog .modal-footer {
-  border-top: 1px solid var(--bs-border-color);
-  justify-content: flex-start;
-  margin-top: 0.25rem;
-  padding-top: 1rem;
-}
-
-@media (max-width: 575.98px) {
-  .webcli-settings-field.row {
-    --bs-gutter-y: 0.35rem;
-  }
-
-  .webcli-settings-number {
-    text-align: left;
-    max-width: none;
-  }
-}
-*/
 .webcli-queue-toolbar {
   padding-top: 0.75rem;
 }
