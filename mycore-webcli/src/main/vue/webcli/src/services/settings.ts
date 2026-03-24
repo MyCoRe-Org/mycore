@@ -7,6 +7,7 @@ const DEFAULT_SETTINGS: Settings = {
   autoscroll: true,
   continueIfOneFails: false,
 };
+const SETTINGS_STORAGE_KEYS = ['historySize', 'comHistorySize', 'suggestionLimit', 'autoScroll', 'continueIfOneFails'];
 
 function normalizeNumber(value: number | undefined, fallback: number, min: number): number {
   if (typeof value !== 'number' || !Number.isFinite(value)) {
@@ -47,6 +48,10 @@ export function loadSettings(): Settings {
   });
 }
 
+export function getDefaultSettings(): Settings {
+  return { ...DEFAULT_SETTINGS };
+}
+
 export function persistSettings(settings: Settings): void {
   const normalized = normalizeSettings(settings);
   window.localStorage.setItem('historySize', String(normalized.historySize));
@@ -54,6 +59,12 @@ export function persistSettings(settings: Settings): void {
   window.localStorage.setItem('suggestionLimit', String(normalized.suggestionLimit));
   window.localStorage.setItem('autoScroll', String(normalized.autoscroll));
   window.localStorage.setItem('continueIfOneFails', String(normalized.continueIfOneFails));
+}
+
+export function clearPersistedSettings(): void {
+  SETTINGS_STORAGE_KEYS.forEach(key => {
+    window.localStorage.removeItem(key);
+  });
 }
 
 export function loadCommandHistory(): string[] {

@@ -70,7 +70,7 @@ describe('SettingsDialog', () => {
     await nextTick();
     await nextTick();
 
-    expect(wrapper.get('.webcli-settings-actions button').attributes('disabled')).toBeDefined();
+    expect(wrapper.get('.webcli-settings-history-actions button').attributes('disabled')).toBeDefined();
   });
 
   it('emits the clear-history action and updates bound setting values', async () => {
@@ -87,9 +87,26 @@ describe('SettingsDialog', () => {
     await nextTick();
 
     await wrapper.get('#webcli-suggestion-limit').setValue('12');
-    await wrapper.get('.webcli-settings-actions button').trigger('click');
+    await wrapper.get('.webcli-settings-history-actions button').trigger('click');
 
     expect(settings.suggestionLimit).toBe(12);
     expect(wrapper.emitted('clear-command-history')).toEqual([[]]);
+  });
+
+  it('emits a reset-settings action', async () => {
+    wrapper = mount(SettingsDialog, {
+      attachTo: document.body,
+      props: {
+        modelValue: true,
+        hasCommandHistory: true,
+        settings: buildSettings(),
+      },
+    });
+    await nextTick();
+    await nextTick();
+
+    await wrapper.get('.modal-footer button').trigger('click');
+
+    expect(wrapper.emitted('reset-settings')).toEqual([[]]);
   });
 });

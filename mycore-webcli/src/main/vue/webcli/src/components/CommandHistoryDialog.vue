@@ -33,7 +33,7 @@ useDialogLifecycle(toRef(props, 'modelValue'), dialogRef, () => {
 <template>
   <dialog
     ref="dialogRef"
-    class="webcli-dialog webcli-history-dialog p-0"
+    class="modal webcli-dialog webcli-history-dialog p-0"
     aria-labelledby="command-history-title"
     @cancel.prevent="closeDialog"
     @close="emit('update:modelValue', false)"

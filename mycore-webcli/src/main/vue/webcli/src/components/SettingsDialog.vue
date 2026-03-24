@@ -12,6 +12,7 @@ const settings = defineModel<Settings>('settings', { required: true });
 
 const emit = defineEmits<{
   'clear-command-history': [];
+  'reset-settings': [];
   'update:modelValue': [value: boolean];
 }>();
 
@@ -31,7 +32,7 @@ useDialogLifecycle(toRef(props, 'modelValue'), dialogRef, () => {
 <template>
   <dialog
     ref="dialogRef"
-    class="webcli-dialog webcli-settings-dialog p-0"
+    class="modal webcli-dialog webcli-settings-dialog p-0"
     aria-labelledby="webcli-settings-title"
     @cancel.prevent="closeDialog"
     @close="emit('update:modelValue', false)"
@@ -45,54 +46,75 @@ useDialogLifecycle(toRef(props, 'modelValue'), dialogRef, () => {
         <div class="webcli-settings-stack">
           <section class="webcli-settings-section" aria-labelledby="webcli-settings-history">
             <h6 id="webcli-settings-history" class="webcli-settings-section-title">History</h6>
-            <div class="webcli-settings-field">
-              <label for="webcli-history-size" class="form-label">Log History Size</label>
-              <input
-                id="webcli-history-size"
-                ref="initialFocusRef"
-                v-model.number="settings.historySize"
-                type="number"
-                min="1"
-                inputmode="numeric"
-                class="form-control"
-              />
-              <div class="form-text">Maximum log entries kept in the browser session.</div>
-            </div>
-
-            <div class="webcli-settings-field">
-              <label for="webcli-command-history-size" class="form-label">Command History Size</label>
-              <input
-                id="webcli-command-history-size"
-                v-model.number="settings.comHistorySize"
-                type="number"
-                min="0"
-                inputmode="numeric"
-                class="form-control"
-              />
-              <div class="form-text">Recently executed commands available from the input field.</div>
-              <div class="webcli-settings-actions">
-                <button
-                  type="button"
-                  class="btn btn-outline-secondary"
-                  :disabled="!hasCommandHistory"
-                  @click="emit('clear-command-history')"
-                >
-                  Clear command history
-                </button>
+            <div class="webcli-settings-field row align-items-center">
+              <label for="webcli-history-size" class="col-sm-8 col-form-label">Log History Size</label>
+              <div class="col-sm-3">
+                <input
+                  id="webcli-history-size"
+                  ref="initialFocusRef"
+                  v-model.number="settings.historySize"
+                  type="number"
+                  min="1"
+                  inputmode="numeric"
+                  class="form-control webcli-settings-number"
+                />
+              </div>
+              <div class="col-sm-8">
+                <div class="form-text">Maximum log entries kept in the browser session.</div>
               </div>
             </div>
 
-            <div class="webcli-settings-field">
-              <label for="webcli-suggestion-limit" class="form-label">Suggestion Limit</label>
-              <input
-                id="webcli-suggestion-limit"
-                v-model.number="settings.suggestionLimit"
-                type="number"
-                min="1"
-                inputmode="numeric"
-                class="form-control"
-              />
-              <div class="form-text">Maximum number of command suggestions shown below the input.</div>
+            <div class="webcli-settings-field row align-items-center">
+              <label for="webcli-command-history-size" class="col-sm-8 col-form-label">
+                Command History Size
+              </label>
+              <div class="col-sm-3">
+                <input
+                  id="webcli-command-history-size"
+                  v-model.number="settings.comHistorySize"
+                  type="number"
+                  min="0"
+                  inputmode="numeric"
+                  class="form-control webcli-settings-number"
+                />
+              </div>
+              <div class="col-sm-8">
+                <div class="form-text">Recently executed commands available from the input field.</div>
+              </div>
+              <div class="col-sm-3">
+                <div class="webcli-settings-actions webcli-settings-history-actions">
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    :disabled="!hasCommandHistory"
+                    @click="emit('clear-command-history')"
+                  >
+                    Clear history
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="webcli-settings-section" aria-labelledby="webcli-settings-suggestions">
+            <h6 id="webcli-settings-suggestions" class="webcli-settings-section-title">Suggestions</h6>
+            <div class="webcli-settings-field row align-items-center">
+              <label for="webcli-suggestion-limit" class="col-sm-8 col-form-label">
+                Suggestion Limit
+              </label>
+              <div class="col-sm-3">
+                <input
+                  id="webcli-suggestion-limit"
+                  v-model.number="settings.suggestionLimit"
+                  type="number"
+                  min="1"
+                  inputmode="numeric"
+                  class="form-control webcli-settings-number"
+                />
+              </div>
+              <div class="col-sm-8">
+                <div class="form-text">Maximum number of command suggestions shown below the input.</div>
+              </div>
             </div>
           </section>
 
@@ -122,6 +144,11 @@ useDialogLifecycle(toRef(props, 'modelValue'), dialogRef, () => {
             </div>
           </section>
         </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" @click="emit('reset-settings')">
+          Reset settings
+        </button>
       </div>
     </div>
   </dialog>

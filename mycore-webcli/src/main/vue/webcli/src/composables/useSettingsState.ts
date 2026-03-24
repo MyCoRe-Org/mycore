@@ -1,6 +1,6 @@
 import { ref, watch } from 'vue';
 
-import { loadSettings, normalizeSettings, persistSettings } from '@/services/settings';
+import { clearPersistedSettings, getDefaultSettings, loadSettings, normalizeSettings, persistSettings } from '@/services/settings';
 import type { Settings } from '@/types';
 
 function areSettingsEqual(left: Settings, right: Settings): boolean {
@@ -15,6 +15,7 @@ function areSettingsEqual(left: Settings, right: Settings): boolean {
 
 export function useSettingsState() {
   const settings = ref(loadSettings());
+  let skipNextPersist = false;
 
   watch(settings, value => {
     const normalized = normalizeSettings(value);
@@ -22,10 +23,21 @@ export function useSettingsState() {
       settings.value = normalized;
       return;
     }
+    if (skipNextPersist) {
+      skipNextPersist = false;
+      return;
+    }
     persistSettings(value);
   }, { deep: true });
 
+  function resetSettings(): void {
+    clearPersistedSettings();
+    skipNextPersist = true;
+    settings.value = getDefaultSettings();
+  }
+
   return {
+    resetSettings,
     settings,
   };
 }

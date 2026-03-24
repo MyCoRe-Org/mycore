@@ -15,7 +15,7 @@ const isCommandHistoryOpen = ref(false);
 const isQueueExpanded = ref(false);
 const logElement = ref<HTMLElement | null>(null);
 const queuePreviewSize = 99;
-const { settings } = useSettingsState();
+const { resetSettings, settings } = useSettingsState();
 
 const {
   clearCommandQueue,
@@ -327,6 +327,7 @@ watch(queueLength, value => {
       v-model:settings="settings"
       :has-command-history="commandHistoryEntries.length > 0"
       @clear-command-history="clearCommandHistory"
+      @reset-settings="resetSettings"
     />
   </div>
 </template>
