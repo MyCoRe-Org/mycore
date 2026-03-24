@@ -23,7 +23,13 @@ export class ObjectsContentHandler extends BaseContentHandler {
    * @param path path to the resource
    */
   async load(path: string): Promise<Content> {
-    const response = await fetch(`${this.mcrApplicationBaseURL}api/v2/objects/${path}`);
+    const authorizationHeader = await getAuthorizationHeader(this.mcrApplicationBaseURL);
+    const response = await fetch(`${this.mcrApplicationBaseURL}api/v2/objects/${path}`, {
+      method: "GET",
+      headers: {
+        "Authorization": authorizationHeader
+      },
+    });
     if (!response.ok) {
       throw this.buildError(`Unable to load ${path}.`, response);
     }
