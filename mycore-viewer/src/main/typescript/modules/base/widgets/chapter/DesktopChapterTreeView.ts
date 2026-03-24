@@ -54,17 +54,17 @@ export class DesktopChapterTreeView implements ChapterTreeView {
       return this.list;
     }
     const escapedId = CSS.escape(parentId);
-    const parentElement = document.querySelector<HTMLElement>(`ol[data-id='${escapedId}']`);
-    if (parentElement) {
-      return parentElement;
+    const parentOl = this.list.querySelector<HTMLElement>(`ol[data-id='${escapedId}']`);
+    if (parentOl) {
+      return parentOl;
     }
-    const liElement = document.querySelector<HTMLElement>(`li[data-id='${escapedId}']`);
-    if (!liElement || liElement.parentElement) {
+    const liElement = this.list.querySelector<HTMLElement>(`li[data-id='${escapedId}']`);
+    if (!liElement || !liElement.parentElement) {
       return this.list;
     }
-    const childrenList = document.createElement('ol');
+    const childrenList = document.createElement("ol");
     childrenList.dataset.id = parentId;
-    childrenList.dataset.opened = 'true';
+    childrenList.dataset.opened = "true";
     liElement.parentElement.insertBefore(childrenList, liElement.nextSibling);
     return childrenList;
   }
@@ -90,6 +90,7 @@ export class DesktopChapterTreeView implements ChapterTreeView {
       expander.classList.add("expander", "fas", DesktopChapterTreeView.OPEN_ICON_CLASS);
 
       this._inputHandler.registerExpander(expander, id);
+      insertedNode.classList.add("expandable");
       insertedNode.prepend(expander);
     }
     return  insertedNode;
@@ -136,7 +137,7 @@ export class DesktopChapterTreeView implements ChapterTreeView {
         }, 500
     );
 
-    const realElementPosition = elem.offsetTop - this._container.offsetTop;
+    const realElementPosition = elem.getBoundingClientRect().top - this._container.getBoundingClientRect().top;
     let move = 0;
     if (realElementPosition < 0) {
       move = realElementPosition - 10;
