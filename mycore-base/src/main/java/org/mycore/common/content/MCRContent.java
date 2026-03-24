@@ -245,10 +245,7 @@ public abstract class MCRContent {
         if (!Files.isWritable(dir)) {
             throw new IOException("Target directory is not writable: " + dir);
         }
-
         Path tmp = Files.createTempFile(dir, target.getFileName().toString(), ".tmp");
-
-        boolean tmpMoved = false;
         try {
             final int chunkSize = 128 * 1024;
             try (InputStream in = getInputStream();
@@ -268,14 +265,11 @@ public abstract class MCRContent {
             } catch (AtomicMoveNotSupportedException e) {
                 Files.move(tmp, target, StandardCopyOption.REPLACE_EXISTING);
             }
-            tmpMoved = true;
         } finally {
-            if (!tmpMoved) {
-                try {
-                    Files.deleteIfExists(tmp);
-                } catch (IOException e) {
-                    LOGGER.error("Failed to delete temporary file at {}", tmp, e);
-                }
+            try {
+                Files.deleteIfExists(tmp);
+            } catch (IOException e) {
+                LOGGER.error("Failed to delete temporary file at {}", tmp, e);
             }
         }
     }
