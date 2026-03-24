@@ -206,7 +206,7 @@ public class MCRVueRootServlet extends MCRContentServlet {
         if (requiredPermission != null && !requiredPermission.isBlank()
             && !MCRAccessManager.checkPermission(requiredPermission)) {
             MCRSession currentSession = MCRSessionMgr.getCurrentSession();
-            String mainParam = MCRTranslation.translate(headingI18nKey);
+            String mainParam = headingI18nKey == null ? req.getServletPath() : MCRTranslation.translate(headingI18nKey);
             resp.sendError(
                 HttpServletResponse.SC_FORBIDDEN,
                 getErrorI18N("component.webtools.error", "accessDenied", mainParam, currentSession.getUserInformation()

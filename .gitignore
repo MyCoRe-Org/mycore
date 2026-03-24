@@ -179,3 +179,4 @@ typings/
 .tscache/
 package-lock.json
 .aider*
+yarn-error.log
