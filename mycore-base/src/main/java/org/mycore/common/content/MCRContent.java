@@ -311,7 +311,7 @@ public abstract class MCRContent {
 
     protected MCRDataURLEncoding getDataURLEncoding() throws IOException {
         return getMimeType().startsWith("text/") ? MCRDataURLEncoding.URL
-                                                 : MCRDataURLEncoding.BASE64;
+            : MCRDataURLEncoding.BASE64;
     }
 
     /**
