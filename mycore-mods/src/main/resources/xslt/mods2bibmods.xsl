@@ -16,6 +16,18 @@
     </xsl:copy>
   </xsl:template>
 
+  <xsl:template match="mods:mods">
+    <xsl:copy>
+      <xsl:apply-templates select="@*"/>
+
+      <!-- all children except relatedItem -->
+      <xsl:apply-templates select="node()[not(self::mods:relatedItem)]"/>
+
+      <!-- relatedItem ans Ende -->
+      <xsl:apply-templates select="mods:relatedItem"/>
+    </xsl:copy>
+  </xsl:template>
+	
   <xsl:template match="mods:name[@type='personal']">
     <xsl:copy>
       <xsl:copy-of select="@*" />
