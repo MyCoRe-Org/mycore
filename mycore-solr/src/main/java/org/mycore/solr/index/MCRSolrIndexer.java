@@ -538,8 +538,8 @@ public class MCRSolrIndexer {
         }
 
         LOGGER.info("Dropping solr index for base {}...", base);
-        String deleteQuery = new MessageFormat("objectType:{0} _root_:{1}_*", Locale.ROOT)
-            .format(new Object[] { type, base });
+        String deleteQuery = new MessageFormat("id:{0}_* _root_:{1}_*", Locale.ROOT)
+                .format(new Object[] { base, base });
         UpdateRequest req = new UpdateRequest();
         req.deleteByQuery(deleteQuery);
         req.setCommitWithin(BATCH_AUTO_COMMIT_WITHIN_MS);
