@@ -281,16 +281,10 @@ public class MCRVueRootServlet extends MCRContentServlet {
             document.head().prependChild(propertiesScript);
             document.head().children().forEach(el -> {
                 if (el.hasAttr("href")) {
-                    String href = el.attr("href");
-                    if (isRelativePath(href)) {
-                        el.attr("href", absoluteServletPath + "/" + href);
-                    }
+                    el.attr("href", resolveAssetPath(absoluteServletPath, el.attr("href")));
                 }
                 if (el.hasAttr("src")) {
-                    String src = el.attr("src");
-                    if (isRelativePath(src)) {
-                        el.attr("src", absoluteServletPath + "/" + src);
-                    }
+                    el.attr("src", resolveAssetPath(absoluteServletPath, el.attr("src")));
                 }
             });
             MCRStringContent content = new MCRStringContent(document.outerHtml());
@@ -300,8 +294,19 @@ public class MCRVueRootServlet extends MCRContentServlet {
     }
 
     protected boolean isRelativePath(String path) {
-        return !path.isBlank() && !path.startsWith("http://") && !path.startsWith("https://")
-            && !path.startsWith("//") && !path.startsWith("data:");
+        if (path.isBlank() || path.startsWith("/") || path.startsWith("//") || path.startsWith("#")) {
+            return false;
+        }
+        int schemeSeparatorIndex = path.indexOf(':');
+        int slashIndex = path.indexOf('/');
+        if (schemeSeparatorIndex > 0 && (slashIndex == -1 || schemeSeparatorIndex < slashIndex)) {
+            return false;
+        }
+        return true;
+    }
+
+    protected String resolveAssetPath(String absoluteServletPath, String path) {
+        return isRelativePath(path) ? absoluteServletPath + "/" + path : path;
     }
 
     /**
@@ -401,11 +406,11 @@ public class MCRVueRootServlet extends MCRContentServlet {
             .stream().map(Element::detach).peek(el -> {
                 String hrefAttr = el.getAttributeValue("href");
                 if (hrefAttr != null) {
-                    el.setAttribute("href", absoluteServletPath + "/" + hrefAttr);
+                    el.setAttribute("href", resolveAssetPath(absoluteServletPath, hrefAttr));
                 }
                 String srcAttr = el.getAttributeValue("src");
                 if (srcAttr != null) {
-                    el.setAttribute("src", absoluteServletPath + "/" + srcAttr);
+                    el.setAttribute("src", resolveAssetPath(absoluteServletPath, srcAttr));
                 }
             }).toList();
     }
