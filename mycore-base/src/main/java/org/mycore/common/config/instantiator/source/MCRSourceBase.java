@@ -20,14 +20,12 @@ package org.mycore.common.config.instantiator.source;
 
 import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.incompatibilityException;
 
-import java.lang.reflect.Modifier;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRInstanceConfiguration;
 import org.mycore.common.config.annotation.MCRSentinel;
-import org.mycore.common.config.instantiator.MCRInstantiator;
+import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 import org.mycore.common.config.instantiator.target.MCRTargetType;
 
@@ -46,15 +44,14 @@ abstract class MCRSourceBase implements MCRSource {
         return MCRTargetType.ALL;
     }
 
-    protected Object getInstance(String property, MCRTarget target, Class<?> valueClass,
-        MCRInstanceConfiguration nestedConfiguration, MCRSentinel sentinel, String description) {
+    protected Object getInstance(MCRTarget target, MCRInstanceConfiguration<?> configuration,
+        MCRSentinel sentinel, String description) {
 
-        Set<MCRInstantiator.Option> options = options(valueClass);
-        boolean implicitValueClass = Modifier.isFinal(valueClass.getModifiers());
+        String property = configuration.name().canonical();
 
         if (sentinel.enabled()) {
             boolean sentinelValue = sentinel.defaultValue();
-            String configuredSentinelValue = nestedConfiguration.properties().remove(sentinel.name());
+            String configuredSentinelValue = configuration.properties().remove(sentinel.name());
             if (configuredSentinelValue != null) {
                 sentinelValue = Boolean.parseBoolean(configuredSentinelValue);
             }
@@ -66,36 +63,27 @@ abstract class MCRSourceBase implements MCRSource {
             }
         }
 
-        String className = nestedConfiguration.className();
-        if (className == null && !implicitValueClass) {
+        Class<?> className = configuration.valueClass();
+        if (className == null) {
             if (logger.isInfoEnabled()) {
-                logger.info("[CLEAN-UP] Ignoring {} {} and all sup-properties (no class name)",
-                    description, property);
-            }
-            return null;
-        } else if (className != null && className.isBlank()) {
-            if (logger.isInfoEnabled()) {
-                logger.info("[CLEAN-UP] Ignoring {} {} and all sup-properties (empty class name)",
-                    description, property);
+                logger.info("[CLEAN-UP] Ignoring {} {} and all sup-properties (no or empty class name)", description,
+                    property);
             }
             return null;
         }
 
-        Object instance = MCRInstantiator.getInstance(valueClass, nestedConfiguration, options);
-        if (!valueClass.isAssignableFrom(instance.getClass())) {
-            throw incompatibilityException(property, target, valueClass, instance);
+        if (!configuration.instantiatable()) {
+            return null;
+        }
+
+        Object instance = configuration.instantiate();
+
+        if (!configuration.valueClass().isAssignableFrom(instance.getClass())) {
+            throw incompatibilityException(property, target, configuration.valueClass(), instance);
         }
 
         return instance;
 
-    }
-
-    protected final Set<MCRInstantiator.Option> options(Class<?> valueClass) {
-        if (Modifier.isFinal(valueClass.getModifiers())) {
-            return MCRInstantiator.ADD_IMPLICIT_CLASS_PROPERTIES_OPTION;
-        } else {
-            return MCRInstantiator.NO_OPTIONS;
-        }
     }
 
 }

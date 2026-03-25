@@ -22,9 +22,8 @@ import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.emptyNa
 import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.missingException;
 import static org.mycore.common.config.instantiator.MCRInstantiatorUtils.property;
 
-import org.mycore.common.config.MCRInstanceConfiguration;
 import org.mycore.common.config.annotation.MCRInstance;
-import org.mycore.common.config.annotation.MCRSentinel;
+import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
 import org.mycore.common.config.instantiator.target.MCRTarget;
 
 /**
@@ -62,32 +61,21 @@ final class MCRInstanceSource extends MCRSourceBase {
     }
 
     @Override
-    public Object get(MCRInstanceConfiguration configuration, MCRTarget target) {
+    public Object get(MCRInstanceConfiguration<?> configuration, MCRTarget target) {
 
         String name = annotation.name();
         if (name.isEmpty()) {
             throw emptyNameException(target);
         }
 
-        Object instance = getInstance(configuration, target, name);
+        MCRInstanceConfiguration<?> nestedConfiguration = configuration.nested(annotation.valueClass(), name);
+        Object instance = getInstance(target, nestedConfiguration, annotation.sentinel(), "instance");
 
         if (instance == null && annotation.required()) {
             throw missingException(property(configuration, annotation.name()), target, "instance");
         }
 
         return instance;
-
-    }
-
-    private Object getInstance(MCRInstanceConfiguration configuration, MCRTarget target, String name) {
-
-        MCRInstanceConfiguration nestedConfiguration = configuration.nestedConfiguration(name);
-        String property = nestedConfiguration.name().canonical();
-
-        Class<?> valueClass = annotation.valueClass();
-        MCRSentinel sentinel = annotation.sentinel();
-
-        return getInstance(property, target, valueClass, nestedConfiguration, sentinel, "instance");
 
     }
 
