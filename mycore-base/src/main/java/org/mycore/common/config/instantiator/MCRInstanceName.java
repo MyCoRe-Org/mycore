@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common.config;
+package org.mycore.common.config.instantiator;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -137,14 +137,12 @@ public final class MCRInstanceName {
         public String appendTo(String string) {
             if (representation == null) {
                 return string;
-            } else {
-                if (string.isEmpty()) {
-                    return representation;
-                } else {
-                    return string + "." + representation;
-
-                }
             }
+            if (string.isEmpty()) {
+                return representation;
+            }
+            return string + "." + representation;
+
         }
     }
 

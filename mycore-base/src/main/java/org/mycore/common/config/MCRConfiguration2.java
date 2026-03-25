@@ -18,7 +18,12 @@
 
 package org.mycore.common.config;
 
+import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.IMPLICIT_OPTION;
+import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.NO_OPTIONS;
+import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.ofName;
+
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -32,8 +37,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.mycore.common.MCRClassTools;
-import org.mycore.common.config.instantiator.MCRInstantiator;
+import org.mycore.common.config.instantiator.MCRInstanceConfiguration;
+import org.mycore.common.config.instantiator.MCRInstanceConfiguration.Option;
+import org.mycore.common.config.instantiator.MCRInstanceName;
+import org.mycore.common.config.instantiator.MCRInstanceName.Suffix;
 import org.mycore.common.function.MCRTriConsumer;
+
+import jakarta.inject.Singleton;
 
 /**
  * Provides methods to manage and read all configuration properties from the MyCoRe configuration files.
@@ -82,7 +92,7 @@ import org.mycore.common.function.MCRTriConsumer;
  * @since 2018.05
  */
 // because of intrusive test case org.mycore.common.config.MCRConfigurationTest.testSingletonMapGet
-@SuppressWarnings("PMD.MutableStaticState") 
+@SuppressWarnings("PMD.MutableStaticState")
 public class MCRConfiguration2 {
 
     private static final Map<UUID, EventListener> LISTENERS = new ConcurrentHashMap<>();
@@ -132,16 +142,7 @@ public class MCRConfiguration2 {
      * @throws MCRConfigurationException if the class can not be loaded or instantiated
      */
     public static <S> Optional<S> getInstanceOf(Class<S> superClass, String name) throws MCRConfigurationException {
-        return getInstanceOf(superClass, name, MCRInstantiator.NO_OPTIONS);
-    }
-
-    private static <S> Optional<S> getInstanceOf(Class<S> superClass, String name,
-        Set<MCRInstantiator.Option> options) {
-        if (MCRConfigurableInstanceHelper.isSingleton(superClass)) {
-            return getSingleInstanceOf(superClass, name, options);
-        } else {
-            return MCRConfigurableInstanceHelper.getInstance(superClass, name, options);
-        }
+        return getInstanceOf(superClass, name, NO_OPTIONS);
     }
 
     /**
@@ -154,8 +155,7 @@ public class MCRConfiguration2 {
      * or the configuration property is not set
      */
     public static <S> S getInstanceOfOrThrow(Class<S> superClass, String name) throws MCRConfigurationException {
-        return getInstanceOf(superClass, name, MCRInstantiator.ADD_IMPLICIT_CLASS_PROPERTIES_OPTION)
-            .orElseThrow(() -> createConfigurationException(name));
+        return getInstanceOf(superClass, name, IMPLICIT_OPTION).orElseThrow(() -> createConfigurationException(name));
     }
 
     /**
@@ -168,15 +168,7 @@ public class MCRConfiguration2 {
      * @throws MCRConfigurationException if the class can not be loaded or instantiated
      */
     public static <S> Optional<S> getSingleInstanceOf(Class<S> superClass, String name) {
-        return getSingleInstanceOf(superClass, name, MCRInstantiator.NO_OPTIONS);
-    }
-
-    private static <S> Optional<S> getSingleInstanceOf(Class<S> superClass, String name,
-        Set<MCRInstantiator.Option> options) {
-        return getString(name)
-            .map(className -> new ConfigSingletonKey(name, className))
-            .map(key -> (S) instanceHolder.computeIfAbsent(key,
-                k -> MCRConfigurableInstanceHelper.getInstance(superClass, name, options).orElse(null)));
+        return getSingleInstanceOf(superClass, name, NO_OPTIONS);
     }
 
     /**
@@ -190,17 +182,51 @@ public class MCRConfiguration2 {
      * or the configuration property is not set
      */
     public static <S> S getSingleInstanceOfOrThrow(Class<S> superClass, String name) {
-        return getSingleInstanceOf(superClass, name, MCRInstantiator.ADD_IMPLICIT_CLASS_PROPERTIES_OPTION)
+        return getSingleInstanceOf(superClass, name, IMPLICIT_OPTION)
             .orElseThrow(() -> createConfigurationException(name));
+    }
+
+    private static <S> Optional<S> getInstanceOf(Class<S> superClass, String name, Set<Option> options) {
+        if (isSingleton(superClass)) {
+            return getSingleInstanceOf(superClass, name, options);
+        }
+        return getInstantiableConfiguration(superClass, name, options).map(MCRInstanceConfiguration::instantiate);
+
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <S> Optional<S> getSingleInstanceOf(Class<S> superClass, String name, Set<Option> options) {
+        return getInstantiableConfiguration(superClass, name, options).map(
+            configuration -> {
+                SingletonKey key = new ConfigSingletonKey(name, configuration.valueClass().getName());
+                return (S) instanceHolder.computeIfAbsent(key, _ -> configuration.instantiate());
+            });
+    }
+
+    private static <S> Optional<MCRInstanceConfiguration<S>> getInstantiableConfiguration(Class<S> superClass,
+        String name, Set<Option> options) {
+        MCRInstanceConfiguration<S> configuration = ofName(superClass, name, getPropertiesMap(), options);
+        return configuration.instantiatable() ? Optional.of(configuration) : Optional.empty();
+
+    }
+
+    /**
+     * Checks if a class is annotated with {@link Singleton}.
+     *
+     * @param targetClass the class
+     * @return true if the class in the property is annotated with {@link Singleton}
+     */
+    public static boolean isSingleton(Class<?> targetClass) {
+        return targetClass.getDeclaredAnnotation(Singleton.class) != null;
     }
 
     /**
      * Loads a Java Class defined in property <code>name</code>.
      * @param name Name of the property
      * @param <T> Supertype of class defined in <code>name</code>
-     * @return Optional of Class asignable to <code>&lt;T&gt;</code>
+     * @return Optional of Class assignable to <code>&lt;T&gt;</code>
      * @throws MCRConfigurationException
-     *             if the the class can not be loaded or instantiated
+     *             if the class can not be loaded or instantiated
      */
     public static <T> Optional<Class<? extends T>> getClass(String name) throws MCRConfigurationException {
         return getString(name).map(MCRConfiguration2::<T>getClassObject);
@@ -426,7 +452,8 @@ public class MCRConfiguration2 {
     }
 
     public static <S> S instantiateClass(Class<S> superClass, String className) {
-        return MCRConfigurableInstanceHelper.getInstance(superClass, MCRInstanceConfiguration.ofClass(className));
+        return MCRInstanceConfiguration.ofClassName(superClass, className, Suffix.UPPER_CASE,
+            new HashMap<>(), getPropertiesMap()).instantiate();
     }
 
     public static <S> Stream<S> instantiateClasses(Class<S> superClass, String propertyName) {
@@ -446,11 +473,11 @@ public class MCRConfiguration2 {
 
     private static class EventListener {
 
-        private Predicate<String> keyPredicate;
+        private final Predicate<String> keyPredicate;
 
-        private MCRTriConsumer<String, Optional<String>, Optional<String>> listener;
+        private final MCRTriConsumer<String, Optional<String>, Optional<String>> listener;
 
-        private UUID uuid;
+        private final UUID uuid;
 
         EventListener(Predicate<String> keyPredicate,
             MCRTriConsumer<String, Optional<String>, Optional<String>> listener) {
