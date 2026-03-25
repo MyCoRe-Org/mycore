@@ -40,7 +40,6 @@ import org.mycore.common.MCRTestProperty;
 import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.test.MCRJPAExtension;
@@ -62,7 +61,7 @@ public class MCRDefaultGeneratorClassificationMapperTest {
     public static final String TEST_DIRECTORY = MCRDefaultGeneratorClassificationMapperTest.class.getSimpleName() + "/";
 
     public MCRCategoryDAO getDAO() {
-        return MCRCategoryDAOFactory.obtainInstance();
+        return MCRCategoryDAO.obtainInstance();
     }
 
     /**

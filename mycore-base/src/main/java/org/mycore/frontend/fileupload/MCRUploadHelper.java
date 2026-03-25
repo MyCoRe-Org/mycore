@@ -46,7 +46,6 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
@@ -310,7 +309,7 @@ public final class MCRUploadHelper {
         if (classifications == null || classifications.isBlank()) {
             return Collections.emptyList();
         }
-        final MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
+        final MCRCategoryDAO dao = MCRCategoryDAO.obtainInstance();
         final List<MCRCategoryID> categoryIDS = Stream.of(classifications)
             .filter(Objects::nonNull)
             .filter(Predicate.not(String::isBlank))

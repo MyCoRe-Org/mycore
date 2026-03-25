@@ -82,7 +82,7 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.content.MCRStringContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -823,7 +823,7 @@ public class MCRRestObjects {
         if (!state.isEmpty()) {
             MCRCategoryID categState = new MCRCategoryID(
                 MCRConfiguration2.getString("MCR.Metadata.Service.State.Classification.ID").orElse("state"), state);
-            if (!MCRCategoryDAOFactory.obtainInstance().exist(categState)) {
+            if (!MCRCategoryDAO.obtainInstance().exist(categState)) {
                 throw MCRErrorResponse.ofStatusCode(Response.Status.BAD_REQUEST.getStatusCode())
                     .withErrorCode(MCRErrorCodeConstants.MCROBJECT_INVALID_STATE)
                     .withMessage("Category " + categState + " not found")

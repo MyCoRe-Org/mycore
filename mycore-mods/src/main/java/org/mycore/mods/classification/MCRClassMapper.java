@@ -26,7 +26,6 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRXlink;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.w3c.dom.Element;
@@ -50,7 +49,7 @@ public final class MCRClassMapper {
 
     private static final String NS_MODS_URI = MCRConstants.MODS_NAMESPACE.getURI();
 
-    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.obtainInstance();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAO.obtainInstance();
 
     private static final MCRCache<String, String> AUTH_CACHE = new MCRCache<>(100, "MCRCategory authority");
 

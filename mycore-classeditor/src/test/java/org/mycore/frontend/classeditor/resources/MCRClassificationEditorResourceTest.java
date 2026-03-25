@@ -40,7 +40,7 @@ import org.mycore.common.MCRJSONManager;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.classifications2.MCRCategory;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRXMLMetadataEventHandler;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
@@ -97,8 +97,7 @@ public class MCRClassificationEditorResourceTest {
             /* its important to set the daomock via this method because the factory could be called
              * by a previous test. In this case a class cast exception occur because MCRCategoryDAOImpl
              * was loaded. */
-            MCRCategoryDAOFactory.set(CategoryDAOMock.class);
-            categDAO = (CategoryDAOMock) MCRCategoryDAOFactory.obtainInstance();
+            categDAO = (CategoryDAOMock) MCRCategoryDAO.obtainInstance();
             categDAO.init();
         } catch (Exception exc) {
             fail();

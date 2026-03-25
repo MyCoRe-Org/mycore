@@ -46,10 +46,8 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRJSONManager;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
-import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRClassificationUtils;
 import org.mycore.frontend.classeditor.access.MCRClassificationWritePermission;
@@ -108,9 +106,9 @@ import jakarta.ws.rs.core.UriInfo;
  */
 @Path("classifications")
 public class MCRClassificationEditorResource {
-    private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.obtainInstance();
+    private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAO.obtainInstance();
 
-    private static final MCRCategLinkService CATEG_LINK_SERVICE = MCRCategLinkServiceFactory.obtainInstance();
+    private static final MCRCategLinkService CATEG_LINK_SERVICE = MCRCategLinkService.obtainInstance();
 
     protected static final MCRSolrAuthenticationManager SOLR_AUTHENTICATION_MANAGER =
         MCRSolrAuthenticationManager.obtainInstance();
@@ -496,7 +494,7 @@ public class MCRClassificationEditorResource {
         public void run() {
             MCRCategoryID mcrCategoryID = category.getId();
             boolean isAdded = isAdded(jsonObject);
-            if (isAdded && MCRCategoryDAOFactory.obtainInstance().exist(mcrCategoryID)) {
+            if (isAdded && MCRCategoryDAO.obtainInstance().exist(mcrCategoryID)) {
                 // an added category already exist -> throw conflict error
                 throw new WebApplicationException(
                     Response.status(Status.CONFLICT).entity(buildJsonError("duplicateID", mcrCategoryID)).build());

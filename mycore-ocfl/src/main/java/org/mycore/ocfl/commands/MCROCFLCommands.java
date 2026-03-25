@@ -55,7 +55,6 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.digest.MCRDigest;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
@@ -306,7 +305,7 @@ public class MCROCFLCommands {
         MCRCategoryID cId = MCRCategoryID.ofString(classId);
         MCRContent content = manager.retrieveContent(cId, revision);
         MCRCategory category = MCRXMLTransformer.getCategory(content.asXML());
-        MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
+        MCRCategoryDAO dao = MCRCategoryDAO.obtainInstance();
         if (dao.exist(category.getId())) {
             dao.replaceCategory(category);
         } else {

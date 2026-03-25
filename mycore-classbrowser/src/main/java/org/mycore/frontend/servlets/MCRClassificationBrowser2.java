@@ -38,9 +38,9 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
+import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategory;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.xml.sax.SAXException;
@@ -89,7 +89,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         MCRCategoryID id = settings.getCategID()
             .map(categId -> new MCRCategoryID(settings.getClassifID(), categId))
             .orElse(new MCRCategoryID(settings.getClassifID()));
-        MCRCategory category = MCRCategoryDAOFactory.obtainInstance().getCategory(id, 1);
+        MCRCategory category = MCRCategoryDAO.obtainInstance().getCategory(id, 1);
         if (category == null) {
             job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, "Could not find category: " + id);
             return;
@@ -195,9 +195,9 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         }
 
         String classifID = category.getId().getRootID();
-        Map<MCRCategoryID, Number> count = MCRCategLinkServiceFactory.obtainInstance().countLinksForType(category,
+        Map<MCRCategoryID, Number> count = MCRCategLinkService.obtainInstance().countLinksForType(category,
             objType, true);
-        for (Iterator<Element> it = data.iterator(); it.hasNext();) {
+        for (Iterator<Element> it = data.iterator(); it.hasNext(); ) {
             Element child = it.next();
             MCRCategoryID childID = new MCRCategoryID(classifID, child.getAttributeValue("id"));
             int num = (count.containsKey(childID) ? count.get(childID).intValue() : 0);

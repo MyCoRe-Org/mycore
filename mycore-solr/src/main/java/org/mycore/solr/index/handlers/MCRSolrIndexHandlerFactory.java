@@ -49,11 +49,9 @@ public abstract class MCRSolrIndexHandlerFactory {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRSolrIndexHandlerFactory SHARED_INSTANCE = MCRConfiguration2
-        .getInstanceOfOrThrow(MCRSolrIndexHandlerFactory.class, SOLR_CONFIG_PREFIX + "IndexHandler.Factory");
-
     public static MCRSolrIndexHandlerFactory obtainInstance() {
-        return SHARED_INSTANCE;
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRSolrIndexHandlerFactory.class,
+            SOLR_CONFIG_PREFIX + "IndexHandler.Factory");
     }
 
     public abstract MCRSolrIndexHandler getIndexHandler(MCRContent content, MCRObjectID id);

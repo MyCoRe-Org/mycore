@@ -63,7 +63,6 @@ import org.mycore.common.events.MCREventManager;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXSLTransformerUtils;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -840,7 +839,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             + "of classification 'derivate_types' or any fully qualified category, removing any previous definition.")
     public static void setClassificationOfDerivate(String derivateIDStr, String categoriesCommaList)
         throws MCRAccessException {
-        final MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.obtainInstance();
+        final MCRCategoryDAO categoryDAO = MCRCategoryDAO.obtainInstance();
         final List<MCRCategoryID> derivateTypes = Stream.of(categoriesCommaList.split(","))
             .map(String::trim)
             .map(category -> category.contains(":") ? MCRCategoryID.ofString(category)

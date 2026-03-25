@@ -71,11 +71,11 @@ public final class MCRUserInformationResolver {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRUserInformationResolver SHARED_INSTANCE = createInstance();
-
     public static final String RESOLVER_PROPERTY = "MCR.UserInformation.Resolver";
 
     public static final String PROVIDERS_KEY = "Providers";
+
+    private static final String CLASS_PROPERTY = RESOLVER_PROPERTY + ".Class";
 
     private final Map<String, MCRUserInformationProvider> providers;
 
@@ -90,12 +90,11 @@ public final class MCRUserInformationResolver {
     }
 
     public static MCRUserInformationResolver obtainInstance() {
-        return SHARED_INSTANCE;
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRUserInformationResolver.class, CLASS_PROPERTY);
     }
 
     public static MCRUserInformationResolver createInstance() {
-        String classProperty = RESOLVER_PROPERTY + ".Class";
-        return MCRConfiguration2.getInstanceOfOrThrow(MCRUserInformationResolver.class, classProperty);
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRUserInformationResolver.class, CLASS_PROPERTY);
     }
 
     public MCRUserInformation getOrThrow(String schema, String userId) {

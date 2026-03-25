@@ -97,8 +97,6 @@ public final class MCRPasswordCheckManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRPasswordCheckManager INSTANCE = createInstance();
-
     public static final String MANAGER_PROPERTY = "MCR.User.PasswordCheck";
 
     public static final String STRATEGIES_KEY = "Strategies";
@@ -106,6 +104,8 @@ public final class MCRPasswordCheckManager {
     public static final String SELECTED_STRATEGY_KEY = "SelectedStrategy";
 
     public static final String CONFIGURATION_CHECKS_KEY = "ConfigurationChecks";
+
+    private static final String CLASS_PROPERTY = MANAGER_PROPERTY + ".Class";
 
     private final SecureRandom random;
 
@@ -143,12 +143,11 @@ public final class MCRPasswordCheckManager {
     }
 
     public static MCRPasswordCheckManager obtainInstance() {
-        return INSTANCE;
+        return MCRConfiguration2.getSingleInstanceOfOrThrow(MCRPasswordCheckManager.class, CLASS_PROPERTY);
     }
 
     public static MCRPasswordCheckManager createInstance() {
-        String classProperty = MANAGER_PROPERTY + ".Class";
-        return MCRConfiguration2.getInstanceOfOrThrow(MCRPasswordCheckManager.class, classProperty);
+        return MCRConfiguration2.getInstanceOfOrThrow(MCRPasswordCheckManager.class, CLASS_PROPERTY);
     }
 
     public MCRPasswordCheckData create(String password) {

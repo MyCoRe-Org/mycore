@@ -31,10 +31,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
-import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
@@ -55,11 +53,11 @@ public class MCRRoleManager {
     /** List of all defined roles */
     private static List<MCRRole> rolesList = new ArrayList<>();
 
-    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.obtainInstance();
+    private static final MCRCategoryDAO DAO = MCRCategoryDAO.obtainInstance();
 
     private static long lastLoaded;
 
-    private static final MCRCategLinkService CATEG_LINK_SERVICE = MCRCategLinkServiceFactory.obtainInstance();
+    private static final MCRCategLinkService CATEG_LINK_SERVICE = MCRCategLinkService.obtainInstance();
 
     static {
         loadSystemRoles();

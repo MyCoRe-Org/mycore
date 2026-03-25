@@ -31,7 +31,6 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -83,7 +82,7 @@ public class MCRRoleServlet extends MCRServlet {
             }
         }
         roleClassificationsDefined = roleCategories.size() > 1;
-        categoryDao = MCRCategoryDAOFactory.obtainInstance();
+        categoryDao = MCRCategoryDAO.obtainInstance();
     }
 
     /* (non-Javadoc)

@@ -35,7 +35,7 @@ import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRISO8601Date;
 
@@ -361,7 +361,7 @@ public class MCRObjectService {
         if (state == null) {
             this.state = state;
         } else {
-            if (MCRCategoryDAOFactory.obtainInstance().exist(state)) {
+            if (MCRCategoryDAO.obtainInstance().exist(state)) {
                 this.state = state;
             } else {
                 MCRException logEx = new MCRException("The category " + state + " does not exist.");

@@ -40,8 +40,6 @@ public final class MCRObjectCacheFactory extends MCREventHandlerBase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRObjectCacheFactory SINGLETON_INSTANCE = new MCRObjectCacheFactory();
-
     private static final int CACHE_MAX_SIZE = 100;
 
     private final MCRCache<MCRObjectID, MCRObject> objectCache;
@@ -52,7 +50,7 @@ public final class MCRObjectCacheFactory extends MCREventHandlerBase {
     }
 
     public static MCRObjectCacheFactory getInstance() {
-        return SINGLETON_INSTANCE;
+        return LazyInstanceHolder.SINGLETON_INSTANCE;
     }
 
     public MCRObject getObject(MCRObjectID oid) {
@@ -90,4 +88,9 @@ public final class MCRObjectCacheFactory extends MCREventHandlerBase {
         objectCache.remove(obj.getId());
         LOGGER.debug("removing object {} from cache", obj::getId);
     }
+
+    private static final class LazyInstanceHolder {
+        private static final MCRObjectCacheFactory SINGLETON_INSTANCE = new MCRObjectCacheFactory();
+    }
+
 }

@@ -38,7 +38,6 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTransactionManager;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.mapping.MCRXMappingClassificationGeneratorBase.OnMissingMappedCategory;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -56,7 +55,7 @@ public class MCRMODSGeneratorClassificationMapperTest {
     public static final String TEST_DIRECTORY = MCRMODSGeneratorClassificationMapperTest.class.getSimpleName() + "/";
 
     public MCRCategoryDAO getDAO() {
-        return MCRCategoryDAOFactory.obtainInstance();
+        return MCRCategoryDAO.obtainInstance();
     }
 
     @Test
