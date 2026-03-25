@@ -2596,6 +2596,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <module>mycore-restapi</module>
     <module>mycore-sass</module>
     <module>mycore-solr</module>
+    <module>mycore-solr-restapi</module>
     <module>mycore-sword</module>
     <module>mycore-tei</module>
     <module>mycore-user2</module>
