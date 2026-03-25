@@ -56,6 +56,27 @@
         <xsl:value-of select="text()" />
       </field>
     </xsl:for-each>
+    <!-- language-specific title fields -->
+    <xsl:for-each select="mods:titleInfo[@xml:lang]">
+      <xsl:variable name="titleLang" select="@xml:lang" />
+      <xsl:variable name="composedTitle">
+        <xsl:if test="mods:nonSort">
+          <xsl:value-of select="concat(mods:nonSort, ' ')" />
+        </xsl:if>
+        <xsl:value-of select="mods:title" />
+        <xsl:if test="mods:subTitle">
+          <xsl:value-of select="concat(' : ', mods:subTitle)" />
+        </xsl:if>
+      </xsl:variable>
+      <field name="mods.title.lang.{$titleLang}">
+        <xsl:value-of select="$composedTitle" />
+      </field>
+      <xsl:if test="$titleLang = 'ru'">
+        <field name="mods.title.lang.ru.latin">
+          <xsl:value-of select="$composedTitle" />
+        </field>
+      </xsl:if>
+    </xsl:for-each>
     <field name="mods.title.main">
       <xsl:apply-templates mode="mods.title" select="." />
     </field>
@@ -127,11 +148,36 @@
       <field name="mods.subject">
         <xsl:value-of select="." />
       </field>
+      <field name="mods.subject.string">
+        <xsl:value-of select="." />
+      </field>
+      <xsl:if test="@xml:lang">
+        <xsl:variable name="topicLang" select="@xml:lang" />
+        <field name="mods.subject.lang.{$topicLang}">
+          <xsl:value-of select="." />
+        </field>
+        <xsl:if test="$topicLang = 'ru'">
+          <field name="mods.subject.lang.ru.latin">
+            <xsl:value-of select="." />
+          </field>
+        </xsl:if>
+      </xsl:if>
     </xsl:for-each>
     <xsl:for-each select="mods:abstract">
       <field name="mods.abstract">
         <xsl:value-of select="text()" />
       </field>
+      <xsl:if test="@xml:lang">
+        <xsl:variable name="abstractLang" select="@xml:lang" />
+        <field name="mods.abstract.lang.{$abstractLang}">
+          <xsl:value-of select="text()" />
+        </field>
+        <xsl:if test="$abstractLang = 'ru'">
+          <field name="mods.abstract.lang.ru.latin">
+            <xsl:value-of select="text()" />
+          </field>
+        </xsl:if>
+      </xsl:if>
     </xsl:for-each>
     <xsl:for-each select="mods:originInfo[not(@eventType) or @eventType='publication']/mods:dateIssued[@encoding='w3cdtf']">
       <xsl:sort data-type="number" select="count(ancestor::mods:originInfo[not(@eventType) or @eventType='publication'])" />
