@@ -243,6 +243,15 @@ body {
   position: relative;
 }
 
+.webcli-app .dropdown-submenu .dropdown-menu {
+  top: 0;
+  left: 0;
+  margin-top: -6px;
+  position: fixed !important;
+  max-width: none;
+  z-index: 3000 !important;
+}
+
 .webcli-app .nav-item.dropdown > .dropdown-menu {
   position: absolute;
   top: 100%;
@@ -252,15 +261,6 @@ body {
 
 .webcli-app .dropdown-submenu {
   position: relative;
-}
-
-.webcli-app .dropdown-submenu .dropdown-menu {
-  top: 0;
-  left: 0;
-  margin-top: -6px;
-  position: fixed !important;
-  max-width: none;
-  z-index: 3000 !important;
 }
 
 .webcli-app .dropdown-submenu.show > .dropdown-menu {
