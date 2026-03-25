@@ -43,6 +43,10 @@ public final class MCRSassCompilerManager {
 
     private static final String DEVELOPER_MODE_CONFIG_KEY = "MCR.SASS.DeveloperMode";
 
+    private static final String SASS_QUIET_DEPS = "MCR.SASS.QuietDeps";
+
+    private static final String SASS_SILENCE_DEPRECATIONS = "MCR.SASS.SilenceDeprecations";
+
     private final Map<String, String> fileCompiledContentMap = new ConcurrentHashMap<>();
 
     private final Map<String, Date> fileLastCompileDateMap = new ConcurrentHashMap<>();
@@ -106,6 +110,11 @@ public final class MCRSassCompilerManager {
         throws IOException, SassCompilationFailedException {
         String css;
         try (MCRSassCompiler sassCompiler = new MCRSassCompiler(ConnectionFactory.bundled())) {
+            sassCompiler.setQuietDeps(MCRConfiguration2.getBoolean(SASS_QUIET_DEPS)
+                .orElseThrow(() -> MCRConfiguration2.createConfigurationException(SASS_QUIET_DEPS)));
+            sassCompiler.setSilenceDeprecations(
+                MCRConfiguration2.getOrThrow(SASS_SILENCE_DEPRECATIONS, MCRConfiguration2::splitValue)
+                    .toList());
             String realFileName = getRealFileName(name);
             var compileSuccess = sassCompiler.compile(realFileName);
             css = compileSuccess.getCss();

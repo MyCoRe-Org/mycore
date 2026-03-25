@@ -22,7 +22,9 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -79,6 +81,8 @@ class MCRSassCompiler implements Closeable {
 
     private boolean emitCharset;
 
+    private List<String> silenceDeprecations;
+
     private final CompilerConnection connection;
 
     private static final AtomicInteger COMPILE_REQUEST_IDS = new AtomicInteger();
@@ -96,10 +100,27 @@ class MCRSassCompiler implements Closeable {
         this.quietDeps = false;
         this.sourceMapIncludeSources = false;
         this.emitCharset = false;
+        this.silenceDeprecations = new ArrayList<>();
         this.customImporters = new HashMap<>();
         this.loggingHandler = new Log4jLoggingHandler(LOGGER);
         this.connection = connection;
 
+    }
+
+    public boolean isQuietDeps() {
+        return quietDeps;
+    }
+
+    public void setQuietDeps(boolean quietDeps) {
+        this.quietDeps = quietDeps;
+    }
+
+    public List<String> getSilenceDeprecations() {
+        return silenceDeprecations;
+    }
+
+    public void setSilenceDeprecations(List<String> silenceDeprecations) {
+        this.silenceDeprecations = silenceDeprecations;
     }
 
     protected CompileRequest.Builder compileRequestBuilder() {
@@ -121,6 +142,7 @@ class MCRSassCompiler implements Closeable {
         builder.setQuietDeps(quietDeps);
         builder.setSourceMapIncludeSources(sourceMapIncludeSources);
         builder.setCharset(emitCharset);
+        builder.addAllSilenceDeprecation(silenceDeprecations);
         return builder;
     }
 
