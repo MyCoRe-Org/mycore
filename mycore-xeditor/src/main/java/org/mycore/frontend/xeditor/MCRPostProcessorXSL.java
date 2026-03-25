@@ -64,7 +64,7 @@ public class MCRPostProcessorXSL implements MCRXEditorPostProcessor {
             switch (transformer) {
                 case "xalan" -> MCRConfiguration2.<TransformerFactory>getClass("SLOWXALAN");
                 case "saxon" -> MCRConfiguration2.<TransformerFactory>getClass("SAXON");
-                default -> Optional.empty();
+                case null, default -> Optional.empty();
             };
 
         Class<? extends TransformerFactory> factoryClass = oFactoryClass.orElse(null);
