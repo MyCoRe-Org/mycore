@@ -16,7 +16,9 @@ The current frontend is a Vue 3 + Vite application. It lets an authorized user:
 - protected GUI: `/modules/webcli/gui/`
 - WebSocket endpoint: `/ws/mycore-webcli/socket`
 
-The launch pad stays public as a normal webpage resource. The GUI itself is served through `MCRVueRootServlet` with the optional init-param `permission=use-webcli`, so both the wrapped `index.html` and the pass-through built assets stay protected.
+The GUI is served through `MCRVueRootServlet` with the init-param `permission=use-webcli`, so both the wrapped `index.html` and the pass-through built assets stay protected.
+
+The launch pad is a normal webpage resource, but in the default integration it is not public either: the module setup grants read access to localhost administrators and loads the `use-webcli` permission rule from the component config.
 
 ## Module layout
 
@@ -41,24 +43,27 @@ The module uses `frontend-maven-plugin` from Maven.
 
 Current frontend build flow:
 
-1. install Node and Yarn
+1. install Node and Yarn through the parent `frontend-maven-plugin` configuration
 2. run `yarn install` in `src/main/vue/webcli`
 3. run `yarn build` in `src/main/vue/webcli`
-4. run `yarn test --run` in `src/main/vue/webcli` during Maven `test`
-5. in Maven profile `local-testing`, run `yarn test:a11y` during integration testing against a Chromium-based browser; Playwright uses `CHROME_BIN` or `CHROMIUM_BIN` when set and otherwise tries to detect a local installation
+4. during Maven `test`, run `yarn test --run`, `yarn lint`, and `yarn typecheck` in `src/main/vue/webcli`
+5. in Maven profile `checks`, run `yarn ci:check` during `test`
+6. in Maven profile `local-testing`, run `yarn test:a11y` during integration testing against a Chromium-based browser; Playwright uses `CHROME_BIN` or `CHROMIUM_BIN` when set and otherwise tries to detect a local installation
 
 Important frontend config:
 
 - Vite `base` is `"./"`
 - Vite output goes directly to [`target/classes/META-INF/resources/modules/webcli/gui/`](target/classes/META-INF/resources/modules/webcli/gui/)
+- Vitest coverage reports go to `target/vitest-coverage` and enforce coverage thresholds in `vite.config.ts`
 
 ## Frontend/backend contract
 
 The GUI is WebSocket-driven.
 
-Canonical protocol reference:
+Current protocol implementation lives in:
 
-- [`PROTOCOL.md`](PROTOCOL.md)
+- [`src/main/java/org/mycore/webcli/resources/MCRWebCLIResourceSockets.java`](src/main/java/org/mycore/webcli/resources/MCRWebCLIResourceSockets.java)
+- [`src/main/vue/webcli/src/services/webcliTransport.ts`](src/main/vue/webcli/src/services/webcliTransport.ts)
 
 The Vue transport preserves the established backend message types:
 
@@ -77,6 +82,9 @@ The backend may still send the special plain-text frame:
 
 Frontend tests now live with the Vue app and run with Vitest. Browser-level accessibility checks run with Playwright + axe-core in the `local-testing` profile.
 
-See:
+Relevant files:
 
-- [`TESTING.md`](TESTING.md)
+- [`src/main/vue/webcli/package.json`](src/main/vue/webcli/package.json)
+- [`src/main/vue/webcli/vite.config.ts`](src/main/vue/webcli/vite.config.ts)
+- [`src/main/vue/webcli/playwright.config.ts`](src/main/vue/webcli/playwright.config.ts)
+- [`src/main/vue/webcli/tests/a11y/`](src/main/vue/webcli/tests/a11y/)
