@@ -24,12 +24,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.Date;
 
 import org.jdom2.Document;
@@ -37,7 +35,6 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,11 +44,8 @@ import org.mycore.common.MCRTestProperty;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectIDTest;
-import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.test.MCRMetadataExtension;
 import org.mycore.test.MyCoReTest;
-import org.tmatesoft.svn.core.internal.wc.SVNFileUtil;
-import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -85,25 +79,6 @@ public class MCRXMLMetadataManagerTest {
             "<object id=\"MyCoRe_document_00000001\" update=\"true\"/>".getBytes(StandardCharsets.UTF_8), new Date());
         mcrDocument = new XMLInfo("MCR_document_00000001",
             "<object id=\"MCR_document_00000001\"/>".getBytes(StandardCharsets.UTF_8), new Date());
-    }
-
-    @AfterEach
-    public void tearDown(MCRMetadataExtension.BaseDirs baseDirs) throws Exception {
-        for (File projectDir : baseDirs.storeBaseDir().toFile().listFiles()) {
-            for (File typeDir : projectDir.listFiles()) {
-                Files.walkFileTree(typeDir.toPath(), new MCRRecursiveDeleter());
-                typeDir.mkdir();
-            }
-        }
-        for (File projectDir : baseDirs.storeBaseDir().toFile().listFiles()) {
-            for (File typeDir : projectDir.listFiles()) {
-                //does not work on Windows (AccessdeniedExceptions):
-                //Files.walkFileTree(typeDir.toPath(), new MCRRecursiveDeleter());
-                SVNFileUtil.deleteAll(typeDir, true);
-                typeDir.mkdir();
-                SVNRepositoryFactory.createLocalRepository(typeDir, true, false);
-            }
-        }
     }
 
     static Document getDocument(InputStream in) throws JDOMException, IOException {
