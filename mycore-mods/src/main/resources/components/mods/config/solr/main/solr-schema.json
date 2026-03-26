@@ -91,7 +91,70 @@
   {
     "add-field": {
       "name": "mods.abstract",
-      "type": "mods.text_de",
+      "type": "text_general",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.abstract.lang.de",
+      "type": "text_de",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.abstract.lang.en",
+      "type": "text_en",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.abstract.lang.es",
+      "type": "text_es",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.abstract.lang.fr",
+      "type": "text_fr",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.abstract.lang.it",
+      "type": "text_it",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.abstract.lang.ru",
+      "type": "text_ru",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.abstract.lang.ru.latin",
+      "type": "text_ru_latin",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.abstract.lang.tr",
+      "type": "text_tr",
+      "multiValued": true
+    }
+  },
+  {
+    "add-dynamic-field": {
+      "name": "mods.abstract.lang.*",
+      "type": "text_general",
       "multiValued": true
     }
   },
@@ -119,6 +182,76 @@
   {
     "add-field": {
       "name": "mods.subject",
+      "type": "text_general",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.subject.string",
+      "type": "string",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.subject.lang.de",
+      "type": "text_de",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.subject.lang.en",
+      "type": "text_en",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.subject.lang.es",
+      "type": "text_es",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.subject.lang.fr",
+      "type": "text_fr",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.subject.lang.it",
+      "type": "text_it",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.subject.lang.ru",
+      "type": "text_ru",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.subject.lang.ru.latin",
+      "type": "text_ru_latin",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.subject.lang.tr",
+      "type": "text_tr",
+      "multiValued": true
+    }
+  },
+  {
+    "add-dynamic-field": {
+      "name": "mods.subject.lang.*",
       "type": "text_general",
       "multiValued": true
     }
@@ -203,6 +336,69 @@
   {
     "add-field": {
       "name": "mods.title",
+      "type": "text_general",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.title.lang.de",
+      "type": "text_de",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.title.lang.en",
+      "type": "text_en",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.title.lang.es",
+      "type": "text_es",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.title.lang.fr",
+      "type": "text_fr",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.title.lang.it",
+      "type": "text_it",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.title.lang.ru",
+      "type": "text_ru",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.title.lang.ru.latin",
+      "type": "text_ru_latin",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.title.lang.tr",
+      "type": "text_tr",
+      "multiValued": true
+    }
+  },
+  {
+    "add-dynamic-field": {
+      "name": "mods.title.lang.*",
       "type": "text_general",
       "multiValued": true
     }
