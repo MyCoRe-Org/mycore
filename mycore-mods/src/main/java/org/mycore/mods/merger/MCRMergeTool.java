@@ -18,6 +18,8 @@
 
 package org.mycore.mods.merger;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 
 /**
@@ -27,6 +29,8 @@ import org.jdom2.Element;
  */
 public class MCRMergeTool {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
     /**
      * Merges a given MODS element with another.
      *
@@ -34,6 +38,11 @@ public class MCRMergeTool {
      * @param modsToMergeFrom the MODS element that contains the data to merge from
      */
     public static void merge(Element modsToMergeInto, Element modsToMergeFrom) {
+        if (modsToMergeInto == null || modsToMergeFrom == null) {
+            LOGGER.warn("Could not merge mods elements as one of it is null");
+            return;
+        }
+
         MCRMerger mBaseToMergeInto = MCRMergerFactory.buildFrom(modsToMergeInto);
         MCRMerger mToMergeFrom = MCRMergerFactory.buildFrom(modsToMergeFrom);
         mBaseToMergeInto.mergeFrom(mToMergeFrom);
