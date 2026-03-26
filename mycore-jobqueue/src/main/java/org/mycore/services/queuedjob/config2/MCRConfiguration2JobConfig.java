@@ -44,6 +44,8 @@ public class MCRConfiguration2JobConfig implements MCRJobConfig {
 
     private static final String CONFIG_JOB_THREADS = "JobThreads";
 
+    private static final String CONFIG_RETRY_DELAY_MULTIPLIER = "RetryDelayMultiplier";
+
     private static final String CONFIG_ACTIVATED = "activated";
 
     private static final String CONFIG_PREFIX = "MCR.QueuedJob.";
@@ -76,6 +78,11 @@ public class MCRConfiguration2JobConfig implements MCRJobConfig {
     }
 
     @Override
+    public Optional<Integer> retryDelayMultiplier(Class<? extends MCRJobAction> action) {
+        return MCRConfiguration2.getInt(getActionConfigPrefix(action) + CONFIG_RETRY_DELAY_MULTIPLIER);
+    }
+
+    @Override
     public Integer maxJobThreadCount() {
         String property = CONFIG_PREFIX + CONFIG_JOB_THREADS;
         return MCRConfiguration2.getInt(property)
@@ -93,6 +100,13 @@ public class MCRConfiguration2JobConfig implements MCRJobConfig {
     @Override
     public Integer maxTryCount() {
         String property = CONFIG_PREFIX + CONFIG_MAX_TRY;
+        return MCRConfiguration2.getInt(property)
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(property));
+    }
+
+    @Override
+    public Integer retryDelayMultiplier() {
+        String property = CONFIG_PREFIX + CONFIG_RETRY_DELAY_MULTIPLIER;
         return MCRConfiguration2.getInt(property)
             .orElseThrow(() -> MCRConfiguration2.createConfigurationException(property));
     }
