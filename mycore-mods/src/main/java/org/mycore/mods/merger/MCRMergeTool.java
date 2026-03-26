@@ -38,8 +38,12 @@ public class MCRMergeTool {
      * @param modsToMergeFrom the MODS element that contains the data to merge from
      */
     public static void merge(Element modsToMergeInto, Element modsToMergeFrom) {
-        if (modsToMergeInto == null || modsToMergeFrom == null) {
-            LOGGER.warn("Could not merge mods elements as one of it is null");
+        if (modsToMergeInto == null) {
+            throw new IllegalArgumentException("'modsToMergeInto' must not be null");
+        }
+
+        if (modsToMergeFrom == null) {
+            LOGGER.warn("Could not merge mods elements as 'modsToMergeFrom' is null");
             return;
         }
 
