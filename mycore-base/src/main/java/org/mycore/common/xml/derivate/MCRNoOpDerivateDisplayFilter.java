@@ -16,23 +16,25 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common.xml;
+package org.mycore.common.xml.derivate;
+
+import org.mycore.datamodel.metadata.MCRDerivate;
 
 /**
- * A {@link MCRNoOpDerivateDisplayFilter} is a {@link MCRDerivateDisplayFilter} that allows all derivates
- * to be included when displaying derivates, regardless of intent.
+ * A {@link MCRNoOpDerivateDisplayFilter} is a {@link MCRDerivateDisplayFilter} that, regardless of intent,
+ * and always returns <code>null</code>.
  * <p>
  * No configuration options are available.
  * Example:
  * <pre><code>
- * [...].Class=org.mycore.common.xml.MCRNoOpDerivateDisplayFilter
+ * [...].Class=org.mycore.common.xml.derivate.MCRNoOpDerivateDisplayFilter
  * </code></pre>
  */
 public class MCRNoOpDerivateDisplayFilter implements MCRDerivateDisplayFilter {
 
     @Override
-    public boolean isDerivateDisplayEnabled(String derivateId, String intent) {
-        return true;
+    public Boolean isDisplayEnabled(MCRDerivate derivate, String intent) {
+        return null;
     }
 
 }

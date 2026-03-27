@@ -16,14 +16,23 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common.xml;
+package org.mycore.common.xml.derivate;
+
+import org.mycore.datamodel.metadata.MCRDerivate;
 
 /**
  * A {@link MCRDerivateDisplayFilter} is a component that decides weather a derivate should be included
- * when displaying derivates for the given intent.
+ * when displaying derivates for a given intent.
  */
 public interface MCRDerivateDisplayFilter {
 
-    boolean isDerivateDisplayEnabled(String derivateId, String intent);
+    String DEFAULT_KEY_PREFIX = "MCR.Default.Derivate.DisplayFilter.";
+
+
+    /**
+     * Returns, weather the given derivate should be included when displaying derivates for the given intent, or
+     * <code>null</code> to indicate, that no opinion is expressed.
+     */
+    Boolean isDisplayEnabled(MCRDerivate derivate, String intent);
 
 }
