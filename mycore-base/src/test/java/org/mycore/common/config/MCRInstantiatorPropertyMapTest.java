@@ -20,6 +20,7 @@ package org.mycore.common.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.ofName;
 
 import java.util.Map;
 
@@ -30,140 +31,84 @@ import org.mycore.common.config.annotation.MCRPropertyMap;
 import org.mycore.test.MyCoReTest;
 
 /**
- * Programmatically created exhaustive list of tests for the following conditions:
+ * Exhaustive list of tests for the following conditions:
  * <ol>
  *   <li>Annotation has <code>required = false</code> or not</li>
- *   <li>Configuration property for instance value is not set, set empty in short form,
+ *   <li>Property value (for a single-element map) is not set, set empty in short form,
  *   set non-empty in short form or set non-empty in long form</li>
  *   <li>Annotation has <code>defaultName = "..."</code> or not</li>
- *   <li>Configuration property for default value is not set, set empty in short form,
+ *   <li>Default property value (for a single-element map) is not set, set empty in short form,
  *   set non-empty in short form or set non-empty in long form </li>
  * </ol>
  * <table style="border-collapse: collapse;">
- *   <caption>Expected results for different conditions</caption>
+ *   <caption><strong>Expected results for different conditions</strong></caption>
  *   <tr>
- *     <th style="border: 1px solid;">Is Required</th>
  *     <th style="border: 1px solid;">Property</th>
  *     <th style="border: 1px solid;">Has Default</th>
  *     <th style="border: 1px solid;">Default Property</th>
- *     <th style="border: 1px solid;">Expected Result</th>
+ *     <th style="border: 1px solid;">Expected Optional Result</th>
+ *     <th style="border: 1px solid;">Expected Required Result</th>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;"><code>{}</code></td>
+ *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">yes</td>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">Exception</td>
+ *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">yes</td>
  *     <td style="border: 1px solid;"><code>X=</code></td>
  *     <td style="border: 1px solid;"><code>{}</code></td>
+ *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">yes</td>
  *     <td style="border: 1px solid;"><code>X=Y:y,Z:z</code></td>
  *     <td style="border: 1px solid;"><code>{Y=y, Z=z}</code></td>
+ *     <td style="border: 1px solid;"><code>{Y=y, Z=z}</code></td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;">not set</td>
  *     <td style="border: 1px solid;">yes</td>
  *     <td style="border: 1px solid;"><code>X.Y=y</code>, <code>X.Z=z</code></td>
  *     <td style="border: 1px solid;"><code>{Y=y, Z=z}</code></td>
+ *     <td style="border: 1px solid;"><code>{Y=y, Z=z}</code></td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;"><code>A=</code></td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;"><code>{}</code></td>
+ *     <td style="border: 1px solid;">Exception</td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;"><code>A=B:b,C:c</code></td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;"><code>{B=b, C=c}</code></td>
+ *     <td style="border: 1px solid;"><code>{B=b, C=c}</code></td>
  *   </tr>
  *   <tr>
- *     <td style="border: 1px solid;">no</td>
  *     <td style="border: 1px solid;"><code>A.B=b</code>, <code>A.C=c</code></td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;"><code>{B=b, C=c}</code></td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">no</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;"><code>X=</code></td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;"><code>X=Y:y,Z:z</code></td>
- *     <td style="border: 1px solid;"><code>{Y=y, Z=z}</code></td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;">not set</td>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;"><code>X.Y=y</code>, <code>X.Z=z</code></td>
- *     <td style="border: 1px solid;"><code>{Y=y, Z=z}</code></td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;"><code>A=</code></td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">Exception</td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;"><code>A=B:b,C:c</code></td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;"><code>{B=b, C=c}</code></td>
- *   </tr>
- *   <tr>
- *     <td style="border: 1px solid;">yes</td>
- *     <td style="border: 1px solid;"><code>A.B=b</code>, <code>A.C=c</code></td>
- *     <td style="border: 1px solid;">-</td>
- *     <td style="border: 1px solid;">-</td>
  *     <td style="border: 1px solid;"><code>{B=b, C=c}</code></td>
  *   </tr>
  * </table>
  */
 @MyCoReTest
-public class MCRConfigurableInstancePropertyMapTest {
+public class MCRInstantiatorPropertyMapTest {
 
     private static final Map<String, String> EMPTY = Map.of();
 
@@ -176,9 +121,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         classNameOf = NotRequiredDefaultNotSet.class),
     })
     public void notRequiredPropertyMissingDefaultNotSetDefaultPropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultNotSet.class, configuration);
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
         assertEquals(EMPTY, instance.map);
     }
 
@@ -188,9 +131,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void notRequiredPropertyMissingDefaultNotSetDefaultPropertyShortEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultNotSet.class, configuration);
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
         assertEquals(EMPTY, instance.map);
     }
 
@@ -200,9 +141,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void notRequiredPropertyMissingDefaultNotSetDefaultPropertyShortNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultNotSet.class, configuration);
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
         assertEquals(EMPTY, instance.map);
     }
 
@@ -213,9 +152,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void notRequiredPropertyMissingDefaultNotSetDefaultPropertyLongNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultNotSet.class, configuration);
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
         assertEquals(EMPTY, instance.map);
     }
 
@@ -224,12 +161,11 @@ public class MCRConfigurableInstancePropertyMapTest {
         classNameOf = NotRequiredDefaultSet.class),
     })
     public void notRequiredPropertyMissingDefaultSetDefaultPropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(NotRequiredDefaultSet.class, configuration);
-        });
-        assertEquals("Missing default configuration entries like: MCR.Map, MCR.Map.A, MCR.Map.B, ...",
-            exception.getMessage());
+        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
+            () -> ofName(NotRequiredDefaultSet.class, "Foo").instantiate());
+        assertEquals("Default property map, configured in MCR.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + NotRequiredDefaultSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -238,9 +174,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void notRequiredPropertyMissingDefaultSetDefaultPropertyShortEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultSet.class, configuration);
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
         assertEquals(EMPTY, instance.map);
     }
 
@@ -250,9 +184,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void notRequiredPropertyMissingDefaultSetDefaultPropertyShortNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultSet.class, configuration);
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
         assertEquals(DEFAULT_LIST, instance.map);
     }
 
@@ -263,9 +195,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void notRequiredPropertyMissingDefaultSetDefaultPropertyLongNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultSet.class, configuration);
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
         assertEquals(DEFAULT_LIST, instance.map);
     }
 
@@ -275,9 +205,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "Foo.Map", empty = true),
     })
     public void notRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultNotSet.class, configuration);
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
         assertEquals(EMPTY, instance.map);
     }
 
@@ -288,9 +216,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void notRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultNotSet.class, configuration);
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
         assertEquals(EMPTY, instance.map);
     }
 
@@ -301,9 +227,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void notRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultNotSet.class, configuration);
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
         assertEquals(EMPTY, instance.map);
     }
 
@@ -315,9 +239,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void notRequiredPropertyShortEmptyDefaultNotSetDefaultPropertyLongNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultNotSet.class, configuration);
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
         assertEquals(EMPTY, instance.map);
     }
 
@@ -327,9 +249,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "Foo.Map", empty = true),
     })
     public void notRequiredPropertyShortEmptyDefaultSetDefaultPropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultSet.class, configuration);
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
         assertEquals(EMPTY, instance.map);
     }
 
@@ -340,9 +260,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void notRequiredPropertyShortEmptyDefaultSetDefaultPropertyShortEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultSet.class, configuration);
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
         assertEquals(EMPTY, instance.map);
     }
 
@@ -353,9 +271,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void notRequiredPropertyShortEmptyDefaultSetDefaultPropertyShortNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultSet.class, configuration);
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
         assertEquals(EMPTY, instance.map);
     }
 
@@ -367,9 +283,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void notRequiredPropertyShortEmptyDefaultSetDefaultPropertyLongNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultSet.class, configuration);
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
         assertEquals(EMPTY, instance.map);
     }
 
@@ -379,9 +293,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "Foo.Map", string = "NonEmpty:Value,Empty:"),
     })
     public void notRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultNotSet.class, configuration);
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -392,9 +304,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void notRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultNotSet.class, configuration);
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -405,9 +315,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void notRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultNotSet.class, configuration);
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -419,9 +327,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void notRequiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultNotSet.class, configuration);
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -431,9 +337,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "Foo.Map", string = "NonEmpty:Value,Empty:"),
     })
     public void notRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultSet.class, configuration);
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -444,9 +348,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void notRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultSet.class, configuration);
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -457,9 +359,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void notRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultSet.class, configuration);
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -471,9 +371,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void notRequiredPropertyShortNotEmptyDefaultSetDefaultPropertyLongNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultSet.class, configuration);
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -484,9 +382,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "Foo.Map.Empty", empty = true),
     })
     public void notRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultNotSet.class, configuration);
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -498,9 +394,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void notRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultNotSet.class, configuration);
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -512,9 +406,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void notRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultNotSet.class, configuration);
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -527,9 +419,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void notRequiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultNotSet.class, configuration);
+        NotRequiredDefaultNotSet instance = ofName(NotRequiredDefaultNotSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -540,9 +430,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "Foo.Map.Empty", empty = true),
     })
     public void notRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultSet.class, configuration);
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -554,9 +442,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void notRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultSet.class, configuration);
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -568,9 +454,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void notRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultSet.class, configuration);
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -583,9 +467,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void notRequiredPropertyLongNotEmptyDefaultSetDefaultPropertyLongNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        NotRequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
-            NotRequiredDefaultSet.class, configuration);
+        NotRequiredDefaultSet instance = ofName(NotRequiredDefaultSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -594,13 +476,11 @@ public class MCRConfigurableInstancePropertyMapTest {
         classNameOf = RequiredDefaultNotSet.class),
     })
     public void requiredPropertyMissingDefaultNotSetDefaultPropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredDefaultNotSet.class, configuration);
-        });
-        assertEquals("Missing configuration entries like: Foo.Map, Foo.Map.A, Foo.Map.B, ...",
-            exception.getMessage());
+        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
+            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+        assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultNotSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -609,13 +489,11 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void requiredPropertyMissingDefaultNotSetDefaultPropertyShortEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredDefaultNotSet.class, configuration);
-        });
-        assertEquals("Missing configuration entries like: Foo.Map, Foo.Map.A, Foo.Map.B, ...",
-            exception.getMessage());
+        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
+            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+        assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultNotSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -624,13 +502,11 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void requiredPropertyMissingDefaultNotSetDefaultPropertyShortNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredDefaultNotSet.class, configuration);
-        });
-        assertEquals("Missing configuration entries like: Foo.Map, Foo.Map.A, Foo.Map.B, ...",
-            exception.getMessage());
+        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
+            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+        assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultNotSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -640,13 +516,11 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void requiredPropertyMissingDefaultNotSetDefaultPropertyLongNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredDefaultNotSet.class, configuration);
-        });
-        assertEquals("Missing configuration entries like: Foo.Map, Foo.Map.A, Foo.Map.B, ...",
-            exception.getMessage());
+        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
+            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+        assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultNotSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -654,13 +528,11 @@ public class MCRConfigurableInstancePropertyMapTest {
         classNameOf = RequiredDefaultSet.class),
     })
     public void requiredPropertyMissingDefaultSetDefaultPropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                RequiredDefaultSet.class, configuration);
-        });
-        assertEquals("Missing default configuration entries like: MCR.Map, MCR.Map.A, MCR.Map.B, ...",
-            exception.getMessage());
+        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
+            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+        assertEquals("Default property map, configured in MCR.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -669,13 +541,11 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void requiredPropertyMissingDefaultSetDefaultPropertyShortEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                    RequiredDefaultSet.class, configuration);
-        });
-        assertEquals("Missing default configuration entries like: MCR.Map, MCR.Map.A, MCR.Map.B, ...",
-                exception.getMessage());
+        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
+            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+        assertEquals("Default property map, configured in MCR.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -684,9 +554,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void requiredPropertyMissingDefaultSetDefaultPropertyShortNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
-            RequiredDefaultSet.class, configuration);
+        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo").instantiate();
         assertEquals(DEFAULT_LIST, instance.map);
     }
 
@@ -697,9 +565,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void requiredPropertyMissingDefaultSetDefaultPropertyLongNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
-            RequiredDefaultSet.class, configuration);
+        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo").instantiate();
         assertEquals(DEFAULT_LIST, instance.map);
     }
 
@@ -709,13 +575,11 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "Foo.Map", empty = true),
     })
     public void requiredPropertyShortEmptyDefaultNotSetDefaultPropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                    RequiredDefaultNotSet.class, configuration);
-        });
-        assertEquals("Missing configuration entries like: Foo.Map, Foo.Map.A, Foo.Map.B, ...",
-                exception.getMessage());
+        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
+            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+        assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultNotSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -725,13 +589,11 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void requiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                    RequiredDefaultNotSet.class, configuration);
-        });
-        assertEquals("Missing configuration entries like: Foo.Map, Foo.Map.A, Foo.Map.B, ...",
-                exception.getMessage());
+        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
+            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+        assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultNotSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -741,13 +603,11 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void requiredPropertyShortEmptyDefaultNotSetDefaultPropertyShortNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                    RequiredDefaultNotSet.class, configuration);
-        });
-        assertEquals("Missing configuration entries like: Foo.Map, Foo.Map.A, Foo.Map.B, ...",
-                exception.getMessage());
+        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
+            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+        assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultNotSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -758,13 +618,11 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void requiredPropertyShortEmptyDefaultNotSetDefaultPropertyLongNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                    RequiredDefaultNotSet.class, configuration);
-        });
-        assertEquals("Missing configuration entries like: Foo.Map, Foo.Map.A, Foo.Map.B, ...",
-                exception.getMessage());
+        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
+            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+        assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultNotSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -773,13 +631,11 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "Foo.Map", empty = true),
     })
     public void requiredPropertyShortEmptyDefaultSetDefaultPropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                    RequiredDefaultSet.class, configuration);
-        });
-        assertEquals("Missing configuration entries like: Foo.Map, Foo.Map.A, Foo.Map.B, ...",
-                exception.getMessage());
+        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
+            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+        assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -789,13 +645,11 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void requiredPropertyShortEmptyDefaultSetDefaultPropertyShortEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                    RequiredDefaultSet.class, configuration);
-        });
-        assertEquals("Missing configuration entries like: Foo.Map, Foo.Map.A, Foo.Map.B, ...",
-                exception.getMessage());
+        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
+            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+        assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -805,13 +659,11 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void requiredPropertyShortEmptyDefaultSetDefaultPropertyShortNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                    RequiredDefaultSet.class, configuration);
-        });
-        assertEquals("Missing configuration entries like: Foo.Map, Foo.Map.A, Foo.Map.B, ...",
-                exception.getMessage());
+        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
+            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+        assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -822,13 +674,11 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void requiredPropertyShortEmptyDefaultSetDefaultPropertyLongNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class, () -> {
-            MCRConfigurableInstanceHelper.getInstance(
-                    RequiredDefaultSet.class, configuration);
-        });
-        assertEquals("Missing configuration entries like: Foo.Map, Foo.Map.A, Foo.Map.B, ...",
-                exception.getMessage());
+        MCRConfigurationException exception = assertThrows(MCRConfigurationException.class,
+            () -> ofName(MCRConfigurationException.class, "Foo").instantiate());
+        assertEquals("Property map, configured in Foo.Map (and its sub-properties)," +
+            " for target field 'map' in configured class " + RequiredDefaultSet.class.getName()
+            + " is empty", exception.getMessage());
     }
 
     @Test
@@ -837,9 +687,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "Foo.Map", string = "NonEmpty:Value,Empty:"),
     })
     public void requiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
-            RequiredDefaultNotSet.class, configuration);
+        RequiredDefaultNotSet instance = ofName(RequiredDefaultNotSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -850,9 +698,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void requiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
-            RequiredDefaultNotSet.class, configuration);
+        RequiredDefaultNotSet instance = ofName(RequiredDefaultNotSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -863,9 +709,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void requiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
-            RequiredDefaultNotSet.class, configuration);
+        RequiredDefaultNotSet instance = ofName(RequiredDefaultNotSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -877,9 +721,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void requiredPropertyShortNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
-            RequiredDefaultNotSet.class, configuration);
+        RequiredDefaultNotSet instance = ofName(RequiredDefaultNotSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -889,9 +731,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "Foo.Map", string = "NonEmpty:Value,Empty:"),
     })
     public void requiredPropertyShortNotEmptyDefaultSetDefaultPropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
-            RequiredDefaultSet.class, configuration);
+        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -902,9 +742,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void requiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
-            RequiredDefaultSet.class, configuration);
+        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -915,9 +753,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void requiredPropertyShortNotEmptyDefaultSetDefaultPropertyShortNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
-            RequiredDefaultSet.class, configuration);
+        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -929,9 +765,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void requiredPropertyShortNotEmptyDefaultSetDefaultPropertyLongNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
-            RequiredDefaultSet.class, configuration);
+        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -942,9 +776,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "Foo.Map.Empty", empty = true),
     })
     public void requiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
-            RequiredDefaultNotSet.class, configuration);
+        RequiredDefaultNotSet instance = ofName(RequiredDefaultNotSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -956,9 +788,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void requiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
-            RequiredDefaultNotSet.class, configuration);
+        RequiredDefaultNotSet instance = ofName(RequiredDefaultNotSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -970,9 +800,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void requiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyShortNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
-            RequiredDefaultNotSet.class, configuration);
+        RequiredDefaultNotSet instance = ofName(RequiredDefaultNotSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -985,9 +813,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void requiredPropertyLongNotEmptyDefaultNotSetDefaultPropertyLongNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredDefaultNotSet instance = MCRConfigurableInstanceHelper.getInstance(
-            RequiredDefaultNotSet.class, configuration);
+        RequiredDefaultNotSet instance = ofName(RequiredDefaultNotSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -998,9 +824,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "Foo.Map.Empty", empty = true),
     })
     public void requiredPropertyLongNotEmptyDefaultSetDefaultPropertyMissing() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
-            RequiredDefaultSet.class, configuration);
+        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -1012,9 +836,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", empty = true),
     })
     public void requiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
-            RequiredDefaultSet.class, configuration);
+        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -1026,9 +848,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map", string = "NonEmpty:DefaultValue,Empty:"),
     })
     public void requiredPropertyLongNotEmptyDefaultSetDefaultPropertyShortNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
-            RequiredDefaultSet.class, configuration);
+        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 
@@ -1041,9 +861,7 @@ public class MCRConfigurableInstancePropertyMapTest {
         @MCRTestProperty(key = "MCR.Map.Empty", empty = true),
     })
     public void requiredPropertyLongNotEmptyDefaultSetDefaultPropertyLongNotEmpty() {
-        MCRInstanceConfiguration configuration = MCRInstanceConfiguration.ofName("Foo");
-        RequiredDefaultSet instance = MCRConfigurableInstanceHelper.getInstance(
-            RequiredDefaultSet.class, configuration);
+        RequiredDefaultSet instance = ofName(RequiredDefaultSet.class, "Foo").instantiate();
         assertEquals(MAP, instance.map);
     }
 

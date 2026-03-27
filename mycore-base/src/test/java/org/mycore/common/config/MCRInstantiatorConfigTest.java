@@ -19,14 +19,15 @@
 package org.mycore.common.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mycore.common.config.instantiator.MCRInstanceConfiguration.ofName;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 
@@ -38,7 +39,7 @@ import org.mycore.common.config.annotation.MCRRawProperties;
 import org.mycore.test.MyCoReTest;
 
 @MyCoReTest
-public class MCRConfigurableInstanceHelperConfigTest {
+public class MCRInstantiatorConfigTest {
 
     public static final String INSTANCE_NAME_PREFIX = "MCR.CIH.";
 
@@ -162,13 +163,12 @@ public class MCRConfigurableInstanceHelperConfigTest {
         List<String> list = MCRConfiguration2.getInstantiatablePropertyKeys(fullInstanceName).toList();
         assertTrue(list.contains(fullInstanceName), "Properties should contain " + instanceName);
 
-        Optional<ConfigurableTestInstance> instance = MCRConfigurableInstanceHelper
-            .getInstance(ConfigurableTestInstance.class, fullInstanceName);
-        assertTrue(instance.isPresent(), "Test " + fullInstanceName + " should be present");
+        ConfigurableTestInstance instance = ofName(ConfigurableTestInstance.class, fullInstanceName).instantiate();
+        assertNotNull(instance, "Test " + fullInstanceName + " should be present");
 
-        validateFields(instance.get());
-        validateMethods(instance.get());
-        validatePostConstruction(instance.get(), fullInstanceName);
+        validateFields(instance);
+        validateMethods(instance);
+        validatePostConstruction(instance, fullInstanceName);
 
     }
 
