@@ -16,16 +16,14 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.orcid2.util;
+package org.mycore.datamodel.legalentity;
 
 import java.util.Locale;
 import java.util.Objects;
 
 /**
  * Class to store IDs.
- * @deprecated moved to mycore-base / org.mycore.datamodel.legalentity
  */
-@Deprecated
 public class MCRIdentifier {
 
     private final String type;
