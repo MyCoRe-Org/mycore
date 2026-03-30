@@ -42,17 +42,14 @@ import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.util.NamedList;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.solr.MCRSolrConstants;
 import org.mycore.solr.MCRSolrIndex;
 import org.mycore.solr.MCRSolrIndexRegistryManager;
 import org.mycore.solr.auth.MCRSolrAuthenticationLevel;
 import org.mycore.solr.auth.MCRSolrAuthenticationManager;
 
-import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
@@ -67,9 +64,9 @@ public class MCRSolrProxyResource {
         MCRSolrAuthenticationManager.obtainInstance();
 
     @GET
-    @Path("{queryHandler: .+}")
-    public Response query(@PathParam("queryHandler") String queryHandler,
-        @QueryParam("core") @DefaultValue(MCRSolrConstants.MAIN_INDEX_ID) String core,
+    @Path("{core}/{queryHandler: .+}")
+    public Response query(@PathParam("core") String core,
+        @PathParam("queryHandler") String queryHandler,
         @Context UriInfo uriInfo) {
 
         String queryHandlerPath = "/" + queryHandler;
@@ -139,11 +136,7 @@ public class MCRSolrProxyResource {
     private ModifiableSolrParams buildSolrParams(MultivaluedMap<String, String> queryParameters) {
         Map<String, String[]> parameterMap = new LinkedHashMap<>();
         for (Map.Entry<String, List<String>> entry : queryParameters.entrySet()) {
-            String key = entry.getKey();
-            if ("core".equals(key)) {
-                continue;
-            }
-            parameterMap.put(key, entry.getValue().toArray(new String[0]));
+            parameterMap.put(entry.getKey(), entry.getValue().toArray(new String[0]));
         }
 
         ModifiableSolrParams solrParams = new ModifiableSolrParams(parameterMap);
