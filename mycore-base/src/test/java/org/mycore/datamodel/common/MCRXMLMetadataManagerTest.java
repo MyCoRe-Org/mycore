@@ -31,6 +31,7 @@ import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Date;
+import java.util.Locale;
 
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
@@ -89,19 +90,21 @@ public class MCRXMLMetadataManagerTest {
 
     @AfterEach
     public void tearDown(MCRMetadataExtension.BaseDirs baseDirs) throws Exception {
-        for (File projectDir : baseDirs.storeBaseDir().toFile().listFiles()) {
-            for (File typeDir : projectDir.listFiles()) {
-                Files.walkFileTree(typeDir.toPath(), new MCRRecursiveDeleter());
-                typeDir.mkdir();
+        if (!System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("windows")) {
+            for (File projectDir : baseDirs.storeBaseDir().toFile().listFiles()) {
+                for (File typeDir : projectDir.listFiles()) {
+                    Files.walkFileTree(typeDir.toPath(), new MCRRecursiveDeleter());
+                    typeDir.mkdir();
+                }
             }
-        }
-        for (File projectDir : baseDirs.storeBaseDir().toFile().listFiles()) {
-            for (File typeDir : projectDir.listFiles()) {
-                //does not work on Windows (AccessdeniedExceptions):
-                //Files.walkFileTree(typeDir.toPath(), new MCRRecursiveDeleter());
-                SVNFileUtil.deleteAll(typeDir, true);
-                typeDir.mkdir();
-                SVNRepositoryFactory.createLocalRepository(typeDir, true, false);
+            for (File projectDir : baseDirs.storeBaseDir().toFile().listFiles()) {
+                for (File typeDir : projectDir.listFiles()) {
+                    //does not work on Windows (AccessdeniedExceptions):
+                    //Files.walkFileTree(typeDir.toPath(), new MCRRecursiveDeleter());
+                    SVNFileUtil.deleteAll(typeDir, true);
+                    typeDir.mkdir();
+                    SVNRepositoryFactory.createLocalRepository(typeDir, true, false);
+                }
             }
         }
     }
