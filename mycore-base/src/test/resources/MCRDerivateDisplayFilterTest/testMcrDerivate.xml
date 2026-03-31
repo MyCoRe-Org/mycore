@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mycorederivate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="datamodel-derivate.xsd" xmlns:xlink="http://www.w3.org/1999/xlink" ID="mcr_derivate_01"
+  order="1">
+  <derivate>
+    <linkmetas class="MCRMetaLinkID" heritable="false">
+      <linkmeta inherited="0" xlink:type="locator" xlink:href="mcr_derivate_01"/>
+    </linkmetas>
+  </derivate>
+  <service/>
+</mycorederivate>
