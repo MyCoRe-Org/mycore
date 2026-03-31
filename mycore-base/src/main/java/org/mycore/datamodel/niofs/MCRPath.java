@@ -38,7 +38,9 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.text.MessageFormat;
 import java.text.Normalizer;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.NoSuchElementException;
@@ -404,65 +406,80 @@ public abstract class MCRPath implements Path {
         };
     }
 
+    private static boolean needsNormalization(String path) {
+        int start = 0;
+        int length = path.length();
+
+        while (start < length) {
+            int end = path.indexOf(SEPARATOR, start);
+            if (end < 0) {
+                end = length;
+            }
+
+            int segmentLength = end - start;
+            if (segmentLength == 1 && path.charAt(start) == '.') {
+                return true;
+            }
+            if (segmentLength == 2
+                && path.charAt(start) == '.'
+                && path.charAt(start + 1) == '.') {
+                return true;
+            }
+
+            start = end + 1;
+        }
+
+        return false;
+    }
+
     /* (non-Javadoc)
      * @see java.nio.file.Path#normalize()
      */
     @Override
-    public Path normalize() {
-        final int count = getNameCount();
-        int remaining = count;
-        final boolean[] ignoreSubPath = new boolean[count];
-
-        for (int i = 0; i < count; i++) {
-            if (ignoreSubPath[i]) {
-                continue;
-            }
-            final int subPathIndex = offsets[i];
-            int subPathLength;
-            if (i == offsets.length - 1) {
-                subPathLength = path.length() - subPathIndex;
-            } else {
-                subPathLength = offsets[i + 1] - subPathIndex - 1;
-            }
-            if (path.charAt(subPathIndex) == '.') {
-                if (subPathLength == 1) {
-                    ignoreSubPath[i] = true;
-                    remaining--;
-                } else if (subPathLength == 2 && path.charAt(subPathIndex + 1) == '.') {
-                    ignoreSubPath[i] = true;
-                    remaining--;
-                    //go backward to the last unignored and mark it ignored
-                    //can't normalize if all preceding elements already ignored
-                    for (int r = i - 1; r > 0; r--) {
-                        if (!ignoreSubPath[r]) {
-                            ignoreSubPath[r] = true;
-                            remaining--;
-                            break;
-                        }
-                    }
-                }
-            }
-
-        }
-
-        if (count == remaining) {
+    public MCRPath normalize() {
+        if (!needsNormalization(path)) {
             return this;
         }
-        if (remaining == 0) {
+
+        final int count = getNameCount();
+        final boolean absolute = isAbsolute();
+        final Deque<String> normalizedElements = new ArrayDeque<>(count);
+        boolean changed = false;
+
+        for (int i = 0; i < count; i++) {
+            final String element = getPathElement(i);
+            switch (element) {
+                case "." -> changed = true;
+                case ".." -> {
+                    if (!normalizedElements.isEmpty() && !"..".equals(normalizedElements.getLast())) {
+                        normalizedElements.removeLast();
+                        changed = true;
+                    } else if (absolute) {
+                        changed = true;
+                    } else {
+                        normalizedElements.addLast(element);
+                    }
+                }
+                default -> normalizedElements.addLast(element);
+            }
+        }
+
+        if (!changed) {
+            return this;
+        }
+        if (normalizedElements.isEmpty()) {
             return isAbsolute() ? getRoot() : getFileSystem().emptyPath();
         }
+
         final StringBuilder sb = new StringBuilder(path.length());
-        if (isAbsolute()) {
+        if (absolute) {
             sb.append(SEPARATOR);
         }
-        for (int i = 0; i < count; i++) {
-            if (ignoreSubPath[i]) {
-                continue;
-            }
-            sb.append(getPathElement(i));
-            if (--remaining > 0) {
-                sb.append('/');
-            }
+
+        final Iterator<String> it = normalizedElements.iterator();
+        sb.append(it.next());
+        while (it.hasNext()) {
+            sb.append(SEPARATOR).append(it.next());
         }
         return MCRAbstractFileSystem.getPath(root, sb.toString(), getFileSystem());
     }
